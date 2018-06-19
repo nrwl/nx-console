@@ -1,0 +1,20 @@
+<div *ngIf="projects$|async as projects">
+  <h2>Available Targets</h2>
+  <div *ngFor="let p of projects; trackBy: trackByName">
+    <h3>Project: {{p.name}}</h3>
+    <div>
+      ({{p.root}}) {{p.projectType}}
+    </div>
+
+    <ul>
+      <li *ngFor="let aa of p.architect; trackBy: trackByName">
+        <a [routerLink]="[aa.name, p.name]">
+          {{aa.name}}
+          {{aa.description}}
+          {{aa.builder}}
+        </a>
+      </li>
+    </ul>
+
+  </div>
+</div>

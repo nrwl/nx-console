@@ -1,0 +1,13 @@
+<div *ngIf="workspace$|async as workspace">
+  <p>Name: {{workspace.name}}</p>
+  <p>Path: {{workspace.path}}</p>
+  <p>Cli Version: {{workspace.versions.cli}}</p>
+
+  <h2>Projects</h2>
+  <ul>
+    <li *ngFor="let p of workspace.projects; trackBy: trackByName">
+      {{p.name}} ({{p.root}}) {{p.projectType}}
+    </li>
+  </ul>
+</div>
+

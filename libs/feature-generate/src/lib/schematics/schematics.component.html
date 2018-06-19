@@ -1,0 +1,12 @@
+<div *ngIf="schematics$|async as schematics">
+  <h2>Available Schematics</h2>
+  <ul>
+    <li *ngFor="let s of schematics; trackBy: trackByName">
+      <a [routerLink]="schematicUrl(s)">
+        {{s.collection}}
+        {{s.name}}
+        {{s.description}}
+      </a>
+    </li>
+  </ul>
+</div>

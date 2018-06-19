@@ -1,0 +1,27 @@
+<div *ngIf="addons$|async as addons">
+  <h2>Installed Addons</h2>
+  <ul>
+    <li *ngFor="let a of addons.workspace.addons; trackBy: trackByName">
+      {{a.name}}
+      {{a.version}}
+      {{a.description}}
+    </li>
+  </ul>
+
+  <h2>Available Addons</h2>
+  <ul>
+    <li *ngFor="let a of addons.availableAddons; trackBy: trackByName">
+      {{a.name}}
+      {{a.version}}
+      {{a.description}}
+
+      <button (click)="ngAdd(a)">Add</button>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="commandOutput$|async as commandOutput">
+  <p>Status: {{commandOutput.status}}</p>
+  <pre>{{commandOutput.stdout}}</pre>
+  <pre>{{commandOutput.stderr}}</pre>
+</div>

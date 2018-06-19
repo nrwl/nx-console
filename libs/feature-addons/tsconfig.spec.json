@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc/libs/feature-addons",
+    "types": [
+      "jasmine",
+      "node"
+    ]
+  },
+  "files": [
+    "src/test.ts"
+  ],
+  "include": [
+    "**/*.spec.ts",
+    "**/*.d.ts"
+  ]
+}

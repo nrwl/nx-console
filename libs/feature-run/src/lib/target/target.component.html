@@ -1,0 +1,23 @@
+<div *ngIf="project$|async as project">
+  <div>
+    {{project.name}}
+    {{project.root}}
+    {{project.projectType}}
+  </div>
+
+  <ui-flags action="Run" [prefix]="[project.architect[0].name, project.name]" [fields]="project.architect[0].schema" (value)="onFlagsChange($event)" (submit)="run()"></ui-flags>
+
+  <h2>Command</h2>
+  <div>
+    <div>
+      Command: <code>ng {{command$|async}}</code>
+    </div>
+  </div>
+
+  <h2>Command Run</h2>
+  <div *ngIf="commandOutput$|async as commandOutput">
+    <p>Status: {{commandOutput.status}}</p>
+    <pre>{{commandOutput.stdout}}</pre>
+    <pre>{{commandOutput.stderr}}</pre>
+  </div>
+</div>

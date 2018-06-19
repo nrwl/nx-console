@@ -1,0 +1,25 @@
+<form [formGroup]="_form" (submit)="onSubmit()">
+  <div *ngFor="let field of _fields" style="margin: 20px;">
+    {{field.name}} type: {{field.type}}, {{field.description}}
+
+    <span *ngIf="field.type === 'boolean' || field.enum">
+          <select [formControlName]="field.name" [required]="field.required">
+            <option *ngFor="let value of fieldOptions(field)" [ngValue]="value">
+              {{fieldOption(value)}}
+            </option>
+          </select>
+        </span>
+    <span *ngIf="!field.enum && field.type !== 'boolean'">
+          <input type="text" [formControlName]="field.name" [required]="field.required">
+        </span>
+    <span *ngIf="field.defaultValue">
+          (default: {{field.defaultValue}})
+        </span>
+    <span *ngIf="field.required">
+          *
+        </span>
+  </div>
+
+  <button type="submit" [disabled]="_form.invalid">{{action}}</button>
+  <button type="reset" (click)="onReset()">Reset</button>
+</form>
