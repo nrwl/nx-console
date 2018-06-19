@@ -33,7 +33,8 @@
     "graphql-tag": "^2.9.2",
     "rxjs": "6.0.0",
     "rxjs-compat": "6.0.0",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "xterm": "3.4.1"
   },
   "devDependencies": {
     "@angular/compiler-cli": "6.0.1",

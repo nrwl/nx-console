@@ -7,8 +7,7 @@ import { Injectable } from '@angular/core';
 
 export interface CommandOutput {
   status: string;
-  stdout: string;
-  stderr: string;
+  out: string;
 }
 
 @Injectable({
@@ -31,8 +30,7 @@ export class CommandRunner {
                 query($command: String!) {
                   commandStatus(command: $command) {
                     status
-                    stdout
-                    stderr
+                    out
                   } 
                 }
                `,
@@ -52,6 +50,23 @@ export class CommandRunner {
         );
       })
     );
+  }
+
+  stopAllCommands() {
+    this.runCommand(
+      gql`
+        mutation($path: String!) {
+          stop(path: $path) {
+            result
+          }
+        }
+      `,
+      {
+        path: "",
+      },
+      (r) => r,
+      false
+    ).subscribe(() => {});
   }
 }
 

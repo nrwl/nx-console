@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { debounceTime, filter, map, publishReplay, refCount, switchMap, withLatestFrom } from 'rxjs/operators';
@@ -6,6 +6,7 @@ import { debounceTime, filter, map, publishReplay, refCount, switchMap, withLate
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CommandOutput, CommandRunner, Schematic, Serializer } from '@nxui/utils';
+import { TerminalComponent } from '@nxui/ui';
 
 @Component({
   selector: 'nxui-schematic',
@@ -18,6 +19,8 @@ export class SchematicComponent implements OnInit {
   command$: Observable<string>;
   dryRunResult$: Observable<CommandOutput>;
   commandOutput$: Observable<CommandOutput>;
+  @ViewChild('out', { read: TerminalComponent }) out: TerminalComponent;
+  @ViewChild('dryRun', { read: TerminalComponent }) dryRun: TerminalComponent;
 
   private ngGen$ = new Subject<void>();
 
@@ -74,6 +77,7 @@ export class SchematicComponent implements OnInit {
       debounceTime(300),
       filter(c => c.valid),
       switchMap(c => {
+        this.dryRun.clear();
         return this.runner.runCommand(
           gql`
               mutation($path: String!, $genCommand: [String]!) {
@@ -89,7 +93,9 @@ export class SchematicComponent implements OnInit {
           (r) => r.data.generate.command,
           true
         );
-      })
+      }),
+      publishReplay(1),
+      refCount()
     );
 
     this.commandOutput$ = this.ngGen$.pipe(
@@ -110,13 +116,19 @@ export class SchematicComponent implements OnInit {
           (r) => r.data.generate.command,
           false
         );
-      })
+      }),
+      publishReplay(1),
+      refCount()
     );
   }
 
-  generate() {
-    this.ngGen$.next(null);
-    return false;
+  onGenerate() {
+    this.out.clear();
+    this.ngGen$.next();
+  }
+
+  onStop() {
+    this.runner.stopAllCommands();
   }
 
   onFlagsChange(e: {commands: string[], valid: boolean}) {

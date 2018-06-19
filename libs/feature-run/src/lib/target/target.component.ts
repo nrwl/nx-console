@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { map, publishReplay, refCount, switchMap, withLatestFrom } from 'rxjs/operators';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { concatMap, map, publishReplay, refCount, switchMap, withLatestFrom } from 'rxjs/operators';
 import gql from 'graphql-tag';
-import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, Subject } from 'rxjs';
 import { CommandOutput, CommandRunner, Project, Serializer } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import { ActivatedRoute } from '@angular/router';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Field } from '@nxui/utils/src/lib/serializer.service';
+import { TerminalComponent } from '@nxui/ui';
 
 @Component({
   selector: 'nxui-target',
@@ -15,10 +14,11 @@ import { Field } from '@nxui/utils/src/lib/serializer.service';
 })
 export class TargetComponent implements OnInit {
   project$: Observable<Project>;
-  commandArray$ = new BehaviorSubject<{commands: string[], valid: boolean}>({commands: [], valid: false});
+  commandArray$ = new BehaviorSubject<{ commands: string[], valid: boolean }>({ commands: [], valid: false });
   command$: Observable<string>;
   commandOutput$: Observable<CommandOutput>;
-  private ngRun$ = new Subject<void>();
+  @ViewChild('out', { read: TerminalComponent }) out: TerminalComponent;
+  private ngRun$ = new Subject<any>();
 
   constructor(private apollo: Apollo, private route: ActivatedRoute, private runner: CommandRunner, private serializer: Serializer) {
   }
@@ -61,7 +61,10 @@ export class TargetComponent implements OnInit {
       }),
       map((r: any) => {
         const project = r.data.workspace.projects[0];
-        const architect = r.data.workspace.projects[0].architect.map(a => ({...a, schema: this.serializer.normalize(a.schema)}));
+        const architect = r.data.workspace.projects[0].architect.map(a => ({
+          ...a,
+          schema: this.serializer.normalize(a.schema)
+        }));
         return {
           ...project,
           architect
@@ -75,15 +78,15 @@ export class TargetComponent implements OnInit {
 
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$),
-      switchMap(([_, c]) => {
+      switchMap(([q, c]) => {
         return this.runner.runCommand(
           gql`
-            mutation($path: String!, $runCommand: [String]!) {
-              run(path: $path, runCommand: $runCommand) {
-                command
+              mutation($path: String!, $runCommand: [String]!) {
+                run(path: $path, runCommand: $runCommand) {
+                  command
+                }
               }
-            }
-           `,
+             `,
           {
             path: this.route.snapshot.params['path'],
             runCommand: c.commands
@@ -91,16 +94,22 @@ export class TargetComponent implements OnInit {
           (r) => r.data.run.command,
           false
         );
-      })
+      }),
+      publishReplay(1),
+      refCount()
     );
   }
 
-  run() {
-    this.ngRun$.next(null);
-    return false;
+  onRun() {
+    this.out.clear();
+    this.ngRun$.next();
   }
 
-  onFlagsChange(e: {commands: string[], valid: boolean}) {
+  onStop() {
+    this.runner.stopAllCommands();
+  }
+
+  onFlagsChange(e: { commands: string[], valid: boolean }) {
     this.commandArray$.next(e);
   }
 }

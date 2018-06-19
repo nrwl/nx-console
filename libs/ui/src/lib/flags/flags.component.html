@@ -1,4 +1,4 @@
-<form [formGroup]="_form" (submit)="onSubmit()">
+<form [formGroup]="_form">
   <div *ngFor="let field of _fields" style="margin: 20px;">
     {{field.name}} type: {{field.type}}, {{field.description}}
 
@@ -20,6 +20,7 @@
         </span>
   </div>
 
-  <button type="submit" [disabled]="_form.invalid">{{action}}</button>
+  <button [disabled]="_form.invalid" (click)="onSubmit()">{{actionLabel}}</button>
   <button type="reset" (click)="onReset()">Reset</button>
+  <button type="button" (click)="onStop()">Stop</button>
 </form>

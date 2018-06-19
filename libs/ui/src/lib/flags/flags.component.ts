@@ -13,7 +13,7 @@ export class FlagsComponent {
   _form: FormGroup;
   private subscription: Subscription;
 
-  @Input() action: string;
+  @Input() actionLabel: string;
   @Input() prefix: string[];
   @Input()
   set fields(f: Field[]) {
@@ -22,9 +22,11 @@ export class FlagsComponent {
   }
 
   @Output() value = new EventEmitter();
+  @Output() action = new EventEmitter();
+  @Output() stop = new EventEmitter();
 
-  @Output() submit = new EventEmitter();
-  constructor(private serializer: Serializer) { }
+  constructor(private serializer: Serializer) {
+  }
 
   fieldOptions(field: Field) {
     if (field.enum) {
@@ -39,11 +41,15 @@ export class FlagsComponent {
   }
 
   onSubmit() {
-    this.submit.next();
+    this.action.next(null);
   }
 
   onReset() {
     this.setForm();
+  }
+
+  onStop() {
+    this.stop.next();
   }
 
   private setForm() {

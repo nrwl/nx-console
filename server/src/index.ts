@@ -4,18 +4,17 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 import { readJsonFile } from './utils';
 import { readSchematics } from './read-schematics';
-import { GraphQLList } from 'graphql';
 import { readProjects } from './read-projects';
 
 const graphqlHTTP = require('express-graphql');
 
 interface CommandResult {
   status: string;
-  stdout: string;
-  stderr: string;
+  out: string;
+  commandRunning: any;
 }
 
-const commands: {[k: string]: CommandResult} = {};
+let commands: {[k: string]: CommandResult} = {};
 
 export const commandResultType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType({
   name: 'CommandResult',
@@ -24,12 +23,9 @@ export const commandResultType: graphql.GraphQLObjectType = new graphql.GraphQLO
       status: {
         type: new graphql.GraphQLNonNull(graphql.GraphQLString)
       },
-      stdout: {
+      out: {
         type: new graphql.GraphQLNonNull(graphql.GraphQLString)
       },
-      stderr: {
-        type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-      }
     };
   }
 });
@@ -100,7 +96,7 @@ export const schematicType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
                   type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
                 },
                 enum: {
-                  type: new GraphQLList(graphql.GraphQLString)
+                  type: new graphql.GraphQLList(graphql.GraphQLString)
                 }
               };
             }
@@ -149,7 +145,7 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
                   type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
                 },
                 enum: {
-                  type: new GraphQLList(graphql.GraphQLString)
+                  type: new graphql.GraphQLList(graphql.GraphQLString)
                 }
               };
             }
@@ -301,7 +297,14 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
           command: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
         resolve: (_root: any, args: any) => {
-          return commands[args.command];
+          const cmd = commands[args.command];
+          if (cmd) {
+            const r = {status: cmd.status, out: cmd.out};
+            cmd.out = "";
+            return r;
+          } else {
+            return {status: "terminated", out: ""};
+          }
         }
       }
     };
@@ -345,36 +348,65 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
         resolve: async (_root: any, args: any) => {
           return runCommand(args.path, args.runCommand);
         }
+      },
+      stop: {
+        type: new graphql.GraphQLObjectType({
+          name: 'StopResult',
+          fields: {
+            result: {type: graphql.GraphQLBoolean}
+          }
+        }),
+        args: {
+          path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+        },
+        resolve: async () => {
+          stopAllCommands();
+          return {result: true};
+        }
       }
     };
   }
 });
 
 function runCommand(cwd: string, cmds: string[]) {
+  stopAllCommands();
+
   const ng = path.join('node_modules', '.bin', 'ng');
-  const command = `ng ${cmds.join(' ')}`;
+  const command = `ng ${cmds.join(' ')} ${Math.random()}`;
   const commandRunning = spawn(ng, cmds, {cwd});
   commands[command] = {
     status: 'inprogress',
-    stdout: '',
-    stderr: ''
+    out: '',
+    commandRunning
   };
 
   commandRunning.stdout.on('data', (data) => {
-    commands[command].stdout += data.toString();
+    if (commands[command]) {
+      commands[command].out += data.toString();
+    }
   });
 
   commandRunning.stderr.on('data', (data) => {
-    commands[command].stderr += data.toString();
+    if (commands[command]) {
+      commands[command].out += data.toString();
+    }
   });
 
   commandRunning.on('exit', (code) => {
-    commands[command].status = code === 0 ? 'success' : 'failure';
+    if (commands[command]) {
+      commands[command].status = code === 0 ? 'success' : 'failure';
+    }
   });
 
   return {command};
 }
 
+function stopAllCommands() {
+  Object.values(commands).forEach(v => {
+    v.commandRunning.kill();
+  });
+  commands = {};
+}
 
 export const buildSchema: graphql.GraphQLSchema = new graphql.GraphQLSchema({
   query: queryType,
