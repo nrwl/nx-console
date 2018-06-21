@@ -3,9 +3,13 @@ import { CommonModule } from '@angular/common';
 import { SchematicsComponent } from './schematics/schematics.component';
 import { Route, RouterModule } from '@angular/router';
 import { SchematicComponent } from './schematic/schematic.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { UiModule } from '@nxui/ui';
-import { MatListModule, MatOptionModule } from '@angular/material';
+import {
+  MatListModule,
+  MatOptionModule,
+  MatIconModule
+} from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 export const generateRoutes: Route[] = [
@@ -14,6 +18,8 @@ export const generateRoutes: Route[] = [
 
 @NgModule({
   imports: [
+    FormsModule,
+    MatIconModule,
     MatListModule,
     FlexLayoutModule,
     MatOptionModule,

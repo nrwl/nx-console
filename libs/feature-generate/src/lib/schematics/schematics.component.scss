@@ -1,0 +1,51 @@
+.schematic-list {
+  width: 280px;
+  padding: 0;
+  overflow: auto;
+
+  max-height: 100%;
+}
+
+.outer-container {
+  height: 100%;
+}
+
+.schematics-container {
+  background-color: rgb(245, 245, 245);
+}
+
+.collection-name {
+  position: sticky;
+  top: 0;
+  background: rgb(240, 240, 240);
+  z-index: 1;
+}
+
+.collection-name h3 {
+  color: rgb(84, 118, 186);
+}
+
+nxui-schematic {
+  overflow: auto;
+}
+
+.schematic-filter-container {
+  background-color: rgb(245, 245, 245);
+  height: 55px;
+  min-height: 55px;
+  max-height: 55px;
+
+  input {
+    background: none;
+    background-color: none;
+    outline: none;
+    border: none;
+    font-size: 14px;
+    padding: 24px 12px;
+  }
+
+  .filter-icon {
+    cursor: pointer;
+    margin-right: 12px;
+  }
+}

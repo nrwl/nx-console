@@ -1,16 +1,22 @@
-<div fxLayout="row" class="schematics-container">
-  <mat-selection-list class="schematic-list">
-    <ng-container *ngFor="let collection of (schematicCollections$ | async); let last = last; trackBy: trackByName">
-      <div class="collection-name">
-        <mat-divider></mat-divider>
-        <h3 matSubheader>{{ collection.name }}</h3>
-        <mat-divider></mat-divider>
-      </div>
-      <mat-list-option [value]="s" role="option" *ngFor="let s of collection.schematics; trackBy: trackByName">
-        {{s.name}}
-      </mat-list-option>
+<div fxLayout="row" class="outer-container">
+  <div fxLayout="column" class="schematics-container">
+    <div class="schematic-filter-container" fxLayout="row" fxLayoutAlign="start center">
+      <input placeholder="Filter schematics" #schematicFilter fxFlex [formControl]="schematicFilterFormControl">
+      <mat-icon class="filter-icon" (click)="schematicFilter.select()">filter_list</mat-icon>
+    </div>
+    <mat-selection-list class="schematic-list">
+      <ng-container *ngFor="let collection of (schematicCollections$ | async); let last = last; trackBy: trackByName">
+        <div class="collection-name">
+          <mat-divider></mat-divider>
+          <h3 matSubheader>{{ collection.name }}</h3>
+          <mat-divider></mat-divider>
+        </div>
+        <mat-list-option [value]="s" role="option" *ngFor="let s of collection.schematics; trackBy: trackByName">
+          {{s.name}}
+        </mat-list-option>
 
-    </ng-container>
-  </mat-selection-list>
+      </ng-container>
+    </mat-selection-list>
+  </div>
   <nxui-schematic fxFlex [schematicDescription$]="selectedSchematic$"></nxui-schematic>
 </div>

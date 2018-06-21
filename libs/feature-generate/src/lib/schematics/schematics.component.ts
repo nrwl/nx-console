@@ -2,14 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { ActivatedRoute } from '@angular/router';
 import gql from 'graphql-tag';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, startWith, combineLatest } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { MatSelectionListChange, MatSelectionList } from '@angular/material';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'nxui-generate',
   templateUrl: './schematics.component.html',
-  styleUrls: ['./schematics.component.css']
+  styleUrls: ['./schematics.component.scss']
 })
 export class SchematicsComponent implements OnInit {
   @ViewChild(MatSelectionList) schematicSelectionList: MatSelectionList;
@@ -17,6 +18,8 @@ export class SchematicsComponent implements OnInit {
   schematicCollections$: Observable<Array<SchematicDescriptionColltion>>;
 
   selectedSchematic$: Observable<SchematicDescription | null>;
+
+  schematicFilterFormControl = new FormControl();
 
   constructor(private apollo: Apollo, private route: ActivatedRoute) {}
 
@@ -61,14 +64,24 @@ export class SchematicsComponent implements OnInit {
           }
         }).valueChanges;
       }),
-      map((r: any) => r.data.workspace.schematics),
+      combineLatest(
+        this.schematicFilterFormControl.valueChanges.pipe(startWith(''))
+      ),
+      map(([r, schemaicFilterValue]: [any, string]) => {
+        schemaicFilterValue = schemaicFilterValue.toLowerCase();
+        const schematics: Array<SchematicDescription> = (r as any).data
+          .workspace.schematics;
+        return schematics.filter(({ name }) =>
+          name.includes(schemaicFilterValue)
+        );
+      }),
       map((schematics: Array<SchematicDescription>) => {
         const collections = new Map<string, Set<SchematicDescription>>();
         schematics.forEach(schematic => {
           if (!collections.has(schematic.collection)) {
             collections.set(schematic.collection, new Set());
           }
-          collections.get(schematic.collection).add(schematic);
+          collections.get(schematic.collection)!.add(schematic);
         });
 
         return (
