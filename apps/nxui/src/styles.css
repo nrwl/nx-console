@@ -7,14 +7,16 @@ body {
   padding: 0;
 }
 
+.outlet-container {
+  max-height: 100%;
+}
+
 .outlet-container > :not(router-outlet) {
-  overflow: auto;
   position: absolute;
   left: 56px;
   top: 0;
   bottom: 0;
   right: 0;
   transform: translate3d(0%, 0, 0);
-  overflow-y: auto;
   overflow-x: hidden;
 }

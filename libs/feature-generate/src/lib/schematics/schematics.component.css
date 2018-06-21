@@ -3,6 +3,13 @@
 
   background-color: rgb(245, 245, 245);
   padding: 0;
+  overflow: auto;
+
+  max-height: 100%;
+}
+
+.schematics-container {
+  max-height: 100%;
 }
 
 .collection-name {
@@ -14,4 +21,8 @@
 
 .collection-name h3 {
   color: rgb(84, 118, 186);
+}
+
+nxui-schematic {
+  overflow: auto;
 }

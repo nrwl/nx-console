@@ -1,4 +1,4 @@
-<div fxLayout="row">
+<div fxLayout="row" class="schematics-container">
   <mat-selection-list class="schematic-list">
     <ng-container *ngFor="let collection of (schematicCollections$ | async); let last = last; trackBy: trackByName">
       <div class="collection-name">
@@ -12,5 +12,5 @@
 
     </ng-container>
   </mat-selection-list>
-  <nxui-schematic [schematicDescription$]="selectedSchematic$"></nxui-schematic>
+  <nxui-schematic fxFlex [schematicDescription$]="selectedSchematic$"></nxui-schematic>
 </div>
