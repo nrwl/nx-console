@@ -38,9 +38,7 @@ export class SchematicsComponent implements OnInit {
     (this.schematicSelectionList.selectedOptions as any)._multiple = false;
 
     this.selectedSchematic$ = this.schematicSelectionList.selectionChange.pipe(
-      map(change => {
-        return change.option ? change.option.value : null;
-      })
+      map(change => (change.option.selected ? change.option.value : null))
     );
 
     this.schematicCollections$ = this.route.params.pipe(
