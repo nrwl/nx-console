@@ -63,7 +63,7 @@ export class TargetComponent implements OnInit {
         const project = r.data.workspace.projects[0];
         const architect = r.data.workspace.projects[0].architect.map(a => ({
           ...a,
-          schema: this.serializer.normalize(a.schema)
+          schema: this.serializer.normalizeTarget(a.builder, a.schema)
         }));
         return {
           ...project,

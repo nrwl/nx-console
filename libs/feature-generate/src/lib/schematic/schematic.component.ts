@@ -60,10 +60,7 @@ export class SchematicComponent implements OnInit {
       }),
       map((r: any) => {
         const schematic = r.data.workspace.schematics[0];
-        return {
-          ...schematic,
-          schema: this.serializer.normalize(schematic.schema)
-        }
+        return this.serializer.normalizeSchematic(schematic);
       }),
       publishReplay(1),
       refCount()

@@ -1,6 +1,8 @@
 <form [formGroup]="_form">
   <div *ngFor="let field of _fields" style="margin: 20px;">
-    {{field.name}} type: {{field.type}}, {{field.description}}
+    <span [ngClass]="{important: field.important}">
+      {{field.name}} type: {{field.type}}, {{field.description}}
+    </span>
 
     <span *ngIf="field.type === 'boolean' || field.enum">
           <select [formControlName]="field.name" [required]="field.required">

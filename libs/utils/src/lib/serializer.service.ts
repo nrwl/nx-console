@@ -8,6 +8,7 @@ export interface Field {
   defaultValue: any;
   required: boolean;
   positional: boolean;
+  important: boolean;
 }
 
 export interface Schematic {
@@ -36,8 +37,24 @@ export interface Project {
   providedIn: 'root'
 })
 export class Serializer {
-  normalize(fields: Field[]): Field[] {
-    return [...fields.filter(r => r.positional), ...fields.filter(r => !r.positional)].map(f => {
+  normalizeSchematic(schematic: Schematic): Schematic {
+    const schema = schematic.schema.map(f =>
+      ({...f, important: f.positional || this.importantSchematicField(schematic.collection, f.name})
+    );
+    return ({
+      ...schematic,
+      schema: this.reoderFields(schema)
+    });
+  }
+
+  normalizeTarget(builder: string, schema: Field[]): Field[] {
+    return this.reoderFields(schema.map(f =>  ({...f, important: f.positional || this.importantBuilderField(builder, f.name})));
+  }
+
+  reoderFields(fields: Field[]): Field[] {
+    return [...fields.filter(r => r.positional),
+      ...fields.filter(r => !r.positional && r.important),
+      ...fields.filter(r => !r.positional && !r.important)].map(f => {
       let d = f.defaultValue;
       if (f.type === 'boolean' && f.defaultValue !== undefined) {
         d = f.defaultValue === 'true';
@@ -58,5 +75,20 @@ export class Serializer {
       }
     });
     return args;
+  }
+
+  private importantSchematicField(collection: string, name: string) {
+    if (collection === '@schematics/angular' || collection === '@ngrx/schematics' || collection === '@nrwl/schematics') {
+      return name === 'export' || name === 'module' || name === 'project';
+    } else {
+      return false;
+    }
+  }
+  private importantBuilderField(builder: string, name: string) {
+    if (builder.startsWith('@angular-devkit/build-angular')) {
+      return name === 'aot' || name === 'watch' || name === 'browsers';
+    } else {
+      return false;
+    }
   }
 }
