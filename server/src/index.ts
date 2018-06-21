@@ -241,13 +241,18 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
         }
       },
       files: {
-        type: new graphql.GraphQLList(graphql.GraphQLString),
+        type: new graphql.GraphQLList(new graphql.GraphQLObjectType({
+          name: 'File',
+          fields: {
+            name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          }
+        })),
         args: {
           glob: {type: graphql.GraphQLString},
         },
         resolve: (workspace: any, args: any) => {
           if (!files[workspace.path]) return [];
-          return files[workspace.path].filter(f => f.indexOf(args.glob) > -1);
+          return files[workspace.path].filter(f => f.indexOf(args.glob) > -1).map(f => ({name: f}));
         }
       }
     };
@@ -431,6 +436,8 @@ function listFiles(path: string) {
 
 
 function listFilesRec(dirName: string): string[] {
+  if (dirName.indexOf('node_modules') > -1) return [];
+
   const res = [dirName];
   fs.readdirSync(dirName).forEach(c => {
     const child = path.join(dirName, c);
