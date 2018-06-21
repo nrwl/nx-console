@@ -1,28 +1,12 @@
-<div *ngIf="schematic$|async as schematic">
-  <div>
-    {{schematic.collection}} {{schematic.name}} {{schematic.description}}
-  </div>
-
-  <ui-flags actionLabel="Generate" [prefix]="[schematic.name]" [fields]="schematic.schema" (value)="onFlagsChange($event)"
-    (action)="onGenerate()" (stop)="onStop()"></ui-flags>
-
-  <h2>Command</h2>
-  <div>
+<div class="outer-container" fxLayout="column" fxFlex fxLayoutAlign="end">
+  <div *ngIf="schematic$|async as schematic" class="ui-flags-container">
     <div>
-      Command:
-      <code>ng generate {{command$|async}}</code>
+      {{schematic.collection}} {{schematic.name}} {{schematic.description}}
     </div>
+    <ui-flags actionLabel="Generate" [prefix]="[schematic.name]" [fields]="schematic.schema" (value)="onFlagsChange($event)"
+      (action)="onGenerate()" (stop)="onStop()"></ui-flags>
   </div>
-
-  <h2>Dry Run</h2>
-  <div>
-    <p>Status: {{(dryRunResult$|async)?.status}}</p>
-    <ui-terminal [input]="(dryRunResult$|async)?.out" #dryRun></ui-terminal>
-  </div>
-
-  <h2>Command Run</h2>
-  <div>
-    <p>Status: {{(commandOutput$|async)?.status}}</p>
-    <ui-terminal [input]="(commandOutput$|async)?.out" #out></ui-terminal>
+  <div class="ui-terminal-container">
+    <ui-terminal [input]="(combinedOutput$|async)?.out" #combinedOutput></ui-terminal>
   </div>
 </div>

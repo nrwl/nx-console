@@ -11,7 +11,7 @@ import {
   withLatestFrom
 } from 'rxjs/operators';
 
-import { BehaviorSubject, Observable, Subject, of } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, of, merge } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import {
   CommandOutput,
@@ -37,10 +37,11 @@ export class SchematicComponent implements OnInit {
   command$: Observable<string>;
   dryRunResult$: Observable<CommandOutput | null>;
   commandOutput$: Observable<CommandOutput | null>;
-  @ViewChild('out', { read: TerminalComponent })
-  out: TerminalComponent;
-  @ViewChild('dryRun', { read: TerminalComponent })
-  dryRun: TerminalComponent;
+
+  combinedOutput$: Observable<CommandOutput | null>;
+
+  @ViewChild('combinedOutput', { read: TerminalComponent })
+  combinedOutput: TerminalComponent;
 
   private ngGen$ = new Subject<void>();
 
@@ -107,7 +108,7 @@ export class SchematicComponent implements OnInit {
           return of(null);
         }
 
-        this.dryRun.clear();
+        this.combinedOutput.clear();
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $genCommand: [String]!) {
@@ -153,10 +154,26 @@ export class SchematicComponent implements OnInit {
       publishReplay(1),
       refCount()
     );
+
+    this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$).pipe(
+      withLatestFrom(this.command$),
+      map(([output, command]) => {
+        let out = `> ng generate ${command}`;
+        let status = '';
+        if (output) {
+          out = `${out}\n\n\n${output.out}`;
+          status = output.status;
+        }
+        return {
+          out,
+          status
+        };
+      })
+    );
   }
 
   onGenerate() {
-    this.out.clear();
+    this.combinedOutput.clear();
     this.ngGen$.next();
   }
 

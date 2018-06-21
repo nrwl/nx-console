@@ -1,0 +1,16 @@
+.ui-flags-container {
+  overflow: auto;
+}
+
+.ui-terminal-container {
+  background-color: black;
+  padding: 12px;
+  padding-right: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.outer-container {
+  width: 100%;
+}
