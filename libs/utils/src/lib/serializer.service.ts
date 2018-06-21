@@ -25,7 +25,6 @@ export interface Builder {
   schema: Field[];
 }
 
-
 export interface Project {
   name: string;
   projectType: string;
@@ -38,23 +37,33 @@ export interface Project {
 })
 export class Serializer {
   normalizeSchematic(schematic: Schematic): Schematic {
-    const schema = schematic.schema.map(f =>
-      ({...f, important: f.positional || this.importantSchematicField(schematic.collection, f.name)})
-    );
-    return ({
+    const schema = schematic.schema.map(f => ({
+      ...f,
+      important:
+        f.positional ||
+        this.importantSchematicField(schematic.collection, f.name)
+    }));
+    return {
       ...schematic,
       schema: this.reoderFields(schema)
-    });
+    };
   }
 
   normalizeTarget(builder: string, schema: Field[]): Field[] {
-    return this.reoderFields(schema.map(f =>  ({...f, important: f.positional || this.importantBuilderField(builder, f.name})));
+    return this.reoderFields(
+      schema.map(f => ({
+        ...f,
+        important: f.positional || this.importantBuilderField(builder, f.name)
+      }))
+    );
   }
 
   reoderFields(fields: Field[]): Field[] {
-    return [...fields.filter(r => r.positional),
+    return [
+      ...fields.filter(r => r.positional),
       ...fields.filter(r => !r.positional && r.important),
-      ...fields.filter(r => !r.positional && !r.important)].map(f => {
+      ...fields.filter(r => !r.positional && !r.important)
+    ].map(f => {
       let d = f.defaultValue;
       if (f.type === 'boolean' && f.defaultValue !== undefined) {
         d = f.defaultValue === 'true';
@@ -64,7 +73,9 @@ export class Serializer {
   }
 
   serializeArgs(value: { [p: string]: any }, schema: Field[]): string[] {
-    let fields = schema.filter(s => value[s.name] !== undefined && value[s.name] !== null);
+    let fields = schema.filter(
+      s => value[s.name] !== undefined && value[s.name] !== null
+    );
     const args = fields.map(f => {
       if (f.positional) {
         return value[f.name];
@@ -78,7 +89,11 @@ export class Serializer {
   }
 
   private importantSchematicField(collection: string, name: string) {
-    if (collection === '@schematics/angular' || collection === '@ngrx/schematics' || collection === '@nrwl/schematics') {
+    if (
+      collection === '@schematics/angular' ||
+      collection === '@ngrx/schematics' ||
+      collection === '@nrwl/schematics'
+    ) {
       return name === 'export' || name === 'module' || name === 'project';
     } else {
       return false;
