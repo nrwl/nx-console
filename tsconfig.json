@@ -9,7 +9,10 @@
     "target": "es5",
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "typeRoots": ["node_modules/@types"],
+    "downlevelIteration": true,
     "lib": ["es2017", "dom", "esnext.asynciterable"],
     "baseUrl": ".",
     "paths": {

@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { ActivatedRoute } from '@angular/router';
 import gql from 'graphql-tag';
 import { map, switchMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-
-type Schematic = { collection: string, name: string };
+import { MatSelectionListChange, MatSelectionList } from '@angular/material';
 
 @Component({
   selector: 'nxui-generate',
@@ -13,12 +12,35 @@ type Schematic = { collection: string, name: string };
   styleUrls: ['./schematics.component.css']
 })
 export class SchematicsComponent implements OnInit {
-  public schematics$: Observable<any>;
+  @ViewChild(MatSelectionList) schematicSelectionList: MatSelectionList;
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute) { }
+  schematicCollections$: Observable<Array<SchematicDescriptionColltion>>;
+
+  selectedSchematic$: Observable<SchematicDescription | null>;
+
+  constructor(private apollo: Apollo, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.schematics$ = this.route.params.pipe(
+    document.querySelector('.schematic-list')!.addEventListener(
+      'sticky-change',
+      e => {
+        debugger;
+        // const header = e.detail.target;  // header became sticky or stopped sticking.
+        // const sticking = e.detail.stuck; // true when header is sticky.
+        // header.classList.toggle('shadow', sticking); // add drop shadow when sticking.
+      }
+    );
+
+    // TODO: Remove this hack when material exposes this boolean as a public API.
+    (this.schematicSelectionList.selectedOptions as any)._multiple = false;
+
+    this.selectedSchematic$ = this.schematicSelectionList.selectionChange.pipe(
+      map(change => {
+        return change.option ? change.option.value : null;
+      })
+    );
+
+    this.schematicCollections$ = this.route.params.pipe(
       map(m => m['path']),
       switchMap(path => {
         return this.apollo.watchQuery({
@@ -29,7 +51,7 @@ export class SchematicsComponent implements OnInit {
                 schematics {
                   collection
                   name
-                  description     
+                  description
                 }
               }
             }
@@ -39,15 +61,36 @@ export class SchematicsComponent implements OnInit {
           }
         }).valueChanges;
       }),
-      map((r: any) => r.data.workspace.schematics)
+      map((r: any) => r.data.workspace.schematics),
+      map((schematics: Array<SchematicDescription>) => {
+        const collections = new Map<string, Set<SchematicDescription>>();
+        schematics.forEach(schematic => {
+          if (!collections.has(schematic.collection)) {
+            collections.set(schematic.collection, new Set());
+          }
+          collections.get(schematic.collection).add(schematic);
+        });
+
+        return (
+          Array.from(collections.entries())
+            .map(([collection, schematics]) => {
+              const schematicColltion: SchematicDescriptionColltion = {
+                name: collection,
+                schematics: Array.from(schematics).sort((a, b) =>
+                  a.name.localeCompare(b.name)
+                )
+              };
+              return schematicColltion;
+            })
+            /**
+             * TODO: The ordering should be as follows.
+             *   First element is projects default collection
+             *   Second element is @schematics/angular if it wasn't the default
+             *   The rest follow in alphabetical order.
+             */
+            .sort((a, b) => a.name.localeCompare(b.name))
+        );
+      })
     );
-  }
-
-  schematicUrl(schematic: Schematic) {
-    return [encodeURIComponent(schematic.collection), encodeURIComponent(schematic.name)];
-  }
-
-  trackByName(index: number, schematic: Schematic) {
-    return `${schematic.collection}:${schematic.name}`;
   }
 }

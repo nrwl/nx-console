@@ -1,12 +1,16 @@
-<div *ngIf="schematics$|async as schematics">
-  <h2>Available Schematics</h2>
-  <ul>
-    <li *ngFor="let s of schematics; trackBy: trackByName">
-      <a [routerLink]="schematicUrl(s)">
-        {{s.collection}}
+<div fxLayout="row">
+  <mat-selection-list class="schematic-list">
+    <ng-container *ngFor="let collection of (schematicCollections$ | async); let last = last; trackBy: trackByName">
+      <div class="collection-name">
+        <mat-divider></mat-divider>
+        <h3 matSubheader>{{ collection.name }}</h3>
+        <mat-divider></mat-divider>
+      </div>
+      <mat-list-option [value]="s" role="option" *ngFor="let s of collection.schematics; trackBy: trackByName">
         {{s.name}}
-        {{s.description}}
-      </a>
-    </li>
-  </ul>
+      </mat-list-option>
+
+    </ng-container>
+  </mat-selection-list>
+  <nxui-schematic [schematicDescription$]="selectedSchematic$"></nxui-schematic>
 </div>

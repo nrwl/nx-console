@@ -1,0 +1,17 @@
+.schematic-list {
+  width: 280px;
+
+  background-color: rgb(245, 245, 245);
+  padding: 0;
+}
+
+.collection-name {
+  position: sticky;
+  top: 0;
+  background: rgb(240, 240, 240);
+  z-index: 1;
+}
+
+.collection-name h3 {
+  color: rgb(84, 118, 186);
+}

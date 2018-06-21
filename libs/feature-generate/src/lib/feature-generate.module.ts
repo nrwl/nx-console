@@ -5,14 +5,18 @@ import { Route, RouterModule } from '@angular/router';
 import { SchematicComponent } from './schematic/schematic.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UiModule } from '@nxui/ui';
+import { MatListModule, MatOptionModule } from '@angular/material';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 export const generateRoutes: Route[] = [
-  { path: '', pathMatch: 'full', component: SchematicsComponent },
-  { path: ':collection/:schematic', component: SchematicComponent },
+  { path: '', pathMatch: 'full', component: SchematicsComponent }
 ];
 
 @NgModule({
   imports: [
+    MatListModule,
+    FlexLayoutModule,
+    MatOptionModule,
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
@@ -20,5 +24,4 @@ export const generateRoutes: Route[] = [
   ],
   declarations: [SchematicsComponent, SchematicComponent]
 })
-export class FeatureGenerateModule {
-}
+export class FeatureGenerateModule {}

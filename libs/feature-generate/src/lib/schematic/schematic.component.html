@@ -1,16 +1,16 @@
 <div *ngIf="schematic$|async as schematic">
   <div>
-    {{schematic.collection}}
-    {{schematic.name}}
-    {{schematic.description}}
+    {{schematic.collection}} {{schematic.name}} {{schematic.description}}
   </div>
 
-  <ui-flags actionLabel="Generate" [prefix]="[schematic.name]" [fields]="schematic.schema" (value)="onFlagsChange($event)" (action)="onGenerate()" (stop)="onStop()"></ui-flags>
+  <ui-flags *ngIf="schematic$|async as schematic" actionLabel="Generate" [prefix]="[schematic.name]" [fields]="schematic.schema"
+    (value)="onFlagsChange($event)" (action)="onGenerate()" (stop)="onStop()"></ui-flags>
 
   <h2>Command</h2>
   <div>
     <div>
-      Command: <code>ng generate {{command$|async}}</code>
+      Command:
+      <code>ng generate {{command$|async}}</code>
     </div>
   </div>
 
