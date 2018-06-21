@@ -18,13 +18,8 @@
             "main": "apps/nxui/src/main.ts",
             "polyfills": "apps/nxui/src/polyfills.ts",
             "tsConfig": "apps/nxui/tsconfig.app.json",
-            "assets": [
-              "apps/nxui/src/favicon.ico",
-              "apps/nxui/src/assets"
-            ],
-            "styles": [
-              "apps/nxui/src/styles.css"
-            ],
+            "assets": ["apps/nxui/src/favicon.ico", "apps/nxui/src/assets"],
+            "styles": ["apps/nxui/src/styles.css"],
             "scripts": []
           },
           "configurations": {
@@ -72,14 +67,9 @@
             "polyfills": "apps/nxui/src/polyfills.ts",
             "tsConfig": "apps/nxui/tsconfig.spec.json",
             "karmaConfig": "apps/nxui/karma.conf.js",
-            "styles": [
-              "apps/nxui/src/styles.css"
-            ],
+            "styles": ["apps/nxui/src/styles.css"],
             "scripts": [],
-            "assets": [
-              "apps/nxui/src/favicon.ico",
-              "apps/nxui/src/assets"
-            ]
+            "assets": ["apps/nxui/src/favicon.ico", "apps/nxui/src/assets"]
           }
         },
         "lint": {
@@ -89,9 +79,7 @@
               "apps/nxui/tsconfig.app.json",
               "apps/nxui/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -111,9 +99,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": "apps/nxui-e2e/tsconfig.e2e.json",
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -139,9 +125,7 @@
               "libs/feature-workspaces/tsconfig.lib.json",
               "libs/feature-workspaces/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -167,9 +151,7 @@
               "libs/feature-addons/tsconfig.lib.json",
               "libs/feature-addons/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -195,9 +177,7 @@
               "libs/feature-generate/tsconfig.lib.json",
               "libs/feature-generate/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -223,9 +203,7 @@
               "libs/utils/tsconfig.lib.json",
               "libs/utils/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -251,9 +229,7 @@
               "libs/feature-run/tsconfig.lib.json",
               "libs/feature-run/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -265,7 +241,7 @@
       "prefix": "nxlibs/ui",
       "architect": {
         "test": {
-          "builder": "@angular-devkit/blibs/uild-angular:karma",
+          "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "libs/ui/src/test.ts",
             "tsConfig": "libs/ui/tsconfig.spec.json",
@@ -273,15 +249,13 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/blibs/uild-angular:tslint",
+          "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
               "libs/ui/tsconfig.lib.json",
               "libs/ui/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }

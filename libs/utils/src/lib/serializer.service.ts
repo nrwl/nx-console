@@ -39,7 +39,7 @@ export interface Project {
 export class Serializer {
   normalizeSchematic(schematic: Schematic): Schematic {
     const schema = schematic.schema.map(f =>
-      ({...f, important: f.positional || this.importantSchematicField(schematic.collection, f.name})
+      ({...f, important: f.positional || this.importantSchematicField(schematic.collection, f.name)})
     );
     return ({
       ...schematic,

@@ -1,0 +1,68 @@
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+mat-toolbar.title-bar {
+  z-index: 1;
+  color: rgb(255, 255, 255);
+  background: linear-gradient(145deg, rgb(13, 71, 161), rgb(66, 165, 245));
+
+  a.branding {
+    text-decoration: none;
+
+    .site-name {
+      font-size: 20px;
+      margin-left: 8px;
+      margin-right: 30px;
+      font-weight: 300;
+      color: white;
+      text-decoration: none;
+      position: relative;
+      top: 1px;
+    }
+  }
+}
+
+.content {
+  position: relative;
+
+  .routes-side-nav {
+    z-index: 1;
+    padding-top: 4px;
+
+    background-color: rgb(242, 242, 242);
+
+    .mat-icon-button {
+      width: 48px;
+      height: 48px;
+      margin: 4px;
+
+      transition: all 0.3s ease-in-out;
+
+      &.active {
+        background-color: rgb(217, 217, 217);
+        color: rgb(67, 118, 197) !important;
+      }
+    }
+
+    #extension.route-icon {
+      position: relative;
+      top: -2px;
+      right: -1px;
+    }
+
+    #create_new_folder.route-icon {
+      position: relative;
+      top: -2px;
+    }
+
+    .route-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 32px;
+      line-height: 32px;
+    }
+  }
+}

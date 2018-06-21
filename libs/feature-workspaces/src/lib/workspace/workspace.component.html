@@ -1,16 +1,20 @@
-<ul>
-  <li>
-    <a routerLink="details">Details</a>
-  </li>
-  <li>
-    <a routerLink="addons">Add-ons</a>
-  </li>
-  <li>
-    <a routerLink="generate">Generate</a>
-  </li>
-  <li>
-    <a routerLink="run">Run</a>
-  </li>
-</ul>
-
-<router-outlet></router-outlet>
+<div fxFlex fxLayout="column">
+  <mat-toolbar class="title-bar">
+    <a class="branding" fxLayout="row" fxLayoutAlign="start center" href="/">
+      <img alt="Home" height="40" src="/assets/logo-nav@2x.png" title="Home" width="150">
+      <span class="site-name">Console</span>
+    </a>
+    <div class="workspace-name">{{ workspaceName$ | async }} - {{ activeRouteTitle$ | async }} </div>
+  </mat-toolbar>
+  <div class="content" fxLayout="row" fxFlex>
+    <div fxLayoutGap="4px" class="routes-side-nav" fxLayout="column" fxLayoutAlign="start center">
+      <button class="route-button" [routerLink]="route.url" routerLinkActive="active" mat-icon-button fxLayout="column" fxLayoutAlign="center"
+        *ngFor="let route of routes" #routeButton>
+        <mat-icon class="route-icon" [id]="route.icon" [matTooltip]="route.title" matTooltipPosition="right">{{ route.icon }}</mat-icon>
+      </button>
+    </div>
+    <div fxFlex class="outlet-container" [@routerTransition]="outlet.activatedRouteData.state">
+      <router-outlet #outlet="outlet"></router-outlet>
+    </div>
+  </div>
+</div>
