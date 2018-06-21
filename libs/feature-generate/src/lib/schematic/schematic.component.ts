@@ -8,7 +8,10 @@ import {
   publishReplay,
   refCount,
   switchMap,
-  withLatestFrom
+  withLatestFrom,
+  startWith,
+  defaultIfEmpty,
+  tap
 } from 'rxjs/operators';
 
 import { BehaviorSubject, Observable, Subject, of, merge } from 'rxjs';
@@ -39,9 +42,6 @@ export class SchematicComponent implements OnInit {
   commandOutput$: Observable<CommandOutput | null>;
 
   combinedOutput$: Observable<CommandOutput | null>;
-
-  @ViewChild('combinedOutput', { read: TerminalComponent })
-  combinedOutput: TerminalComponent;
 
   private ngGen$ = new Subject<void>();
 
@@ -108,22 +108,23 @@ export class SchematicComponent implements OnInit {
           return of(null);
         }
 
-        this.combinedOutput.clear();
-        return this.runner.runCommand(
-          gql`
-            mutation($path: String!, $genCommand: [String]!) {
-              generate(path: $path, genCommand: $genCommand, dryRun: true) {
-                command
+        return this.runner
+          .runCommand(
+            gql`
+              mutation($path: String!, $genCommand: [String]!) {
+                generate(path: $path, genCommand: $genCommand, dryRun: true) {
+                  command
+                }
               }
-            }
-          `,
-          {
-            path: this.route.snapshot.params['path'],
-            genCommand: c.commands
-          },
-          r => r.data.generate.command,
-          true
-        );
+            `,
+            {
+              path: this.route.snapshot.params['path'],
+              genCommand: c.commands
+            },
+            r => r.data.generate.command,
+            true
+          )
+          .pipe(startWith(null));
       }),
       publishReplay(1),
       refCount()
@@ -135,21 +136,23 @@ export class SchematicComponent implements OnInit {
         if (!schematicDescription) {
           return of(null);
         }
-        return this.runner.runCommand(
-          gql`
-            mutation($path: String!, $genCommand: [String]!) {
-              generate(path: $path, genCommand: $genCommand, dryRun: false) {
-                command
+        return this.runner
+          .runCommand(
+            gql`
+              mutation($path: String!, $genCommand: [String]!) {
+                generate(path: $path, genCommand: $genCommand, dryRun: false) {
+                  command
+                }
               }
-            }
-          `,
-          {
-            path: this.route.snapshot.params['path'],
-            genCommand: c.commands
-          },
-          r => r.data.generate.command,
-          false
-        );
+            `,
+            {
+              path: this.route.snapshot.params['path'],
+              genCommand: c.commands
+            },
+            r => r.data.generate.command,
+            false
+          )
+          .pipe(startWith(null));
       }),
       publishReplay(1),
       refCount()
@@ -158,12 +161,13 @@ export class SchematicComponent implements OnInit {
     this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$).pipe(
       withLatestFrom(this.command$),
       map(([output, command]) => {
-        let out = `> ng generate ${command}`;
+        let out = `> ng generate ${command} --dry-run`;
         let status = '';
         if (output) {
-          out = `${out}\n\n\n${output.out}`;
+          out = `${out}\n\n${output.out}`;
           status = output.status;
         }
+
         return {
           out,
           status
@@ -173,7 +177,6 @@ export class SchematicComponent implements OnInit {
   }
 
   onGenerate() {
-    this.combinedOutput.clear();
     this.ngGen$.next();
   }
 
