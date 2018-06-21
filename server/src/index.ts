@@ -5,6 +5,7 @@ import * as path from 'path';
 import { readJsonFile } from './utils';
 import { readSchematics } from './read-schematics';
 import { readProjects } from './read-projects';
+import * as fs from "fs";
 
 const graphqlHTTP = require('express-graphql');
 
@@ -15,6 +16,7 @@ interface CommandResult {
 }
 
 let commands: {[k: string]: CommandResult} = {};
+const files: {[path: string]: string[]} = {};
 
 export const commandResultType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType({
   name: 'CommandResult',
@@ -237,6 +239,16 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
             return workspace.projects;
           }
         }
+      },
+      files: {
+        type: new graphql.GraphQLList(graphql.GraphQLString),
+        args: {
+          glob: {type: graphql.GraphQLString},
+        },
+        resolve: (workspace: any, args: any) => {
+          if (!files[workspace.path]) return [];
+          return files[workspace.path].filter(f => f.indexOf(args.glob) > -1);
+        }
       }
     };
   }
@@ -260,6 +272,9 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
               description: 'Makes your CLI more awesome',
               version: '6.1.0'
             });
+          }
+          if (! files[args.path]) {
+            listFiles(args.path);
           }
 
           const angularJson = readJsonFile('./angular.json', args.path).json;
@@ -407,6 +422,29 @@ function stopAllCommands() {
   });
   commands = {};
 }
+
+function listFiles(path: string) {
+  setTimeout(() => {
+    files[path] = listFilesRec(path);
+  }, 0);
+}
+
+
+function listFilesRec(dirName: string): string[] {
+  const res = [dirName];
+  fs.readdirSync(dirName).forEach(c => {
+    const child = path.join(dirName, c);
+    try {
+      if (!fs.statSync(child).isDirectory()) {
+        res.push(child);
+      } else if (fs.statSync(child).isDirectory()) {
+        res.push(...listFilesRec(child));
+      }
+    } catch (e) {}
+  });
+  return res;
+}
+
 
 export const buildSchema: graphql.GraphQLSchema = new graphql.GraphQLSchema({
   query: queryType,
