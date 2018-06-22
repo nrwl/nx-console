@@ -8,6 +8,7 @@
 # dependencies
 /node_modules
 /server/node_modules
+/electron/node_modules
 
 # IDEs and editors
 /.idea

@@ -1,7 +1,6 @@
 {
-  "name": "nx-platform",
+  "name": "angular-console",
   "private": true,
-  "workspaces": ["server"],
   "scripts": {
     "start": "nps"
   },
@@ -62,6 +61,12 @@
     "tsickle": ">=0.25.5",
     "tslib": "^1.7.1",
     "tslint": "~5.9.1",
-    "typescript": "2.7.2"
+    "typescript": "2.7.2",
+    "express": "^4.16.3",
+    "express-graphql": "^0.6.12",
+    "graphql": "0.13.2",
+    "electron": "^2.0.3",
+    "electron-packager": "12.1.0",
+    "electron-installer-dmg": "^1.0.0"
   }
 }

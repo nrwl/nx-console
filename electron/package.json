@@ -1,0 +1,10 @@
+{
+  "name": "angular-console",
+  "version": "0.1.0",
+  "main": "electron.js",
+  "devDependencies": {
+    "electron": "^2.0.3",
+    "electron-packager": "12.1.0",
+    "electron-installer-dmg": "^1.0.0"
+  }
+}

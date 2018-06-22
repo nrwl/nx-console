@@ -491,4 +491,11 @@ app.use(
   })
 );
 
+app.get('/workspaces/*', (req, res) => {
+  res.sendFile('index.html', {root: path.join(__dirname, 'public')});
+});
+
+// workspaces
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.listen(7777);
