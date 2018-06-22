@@ -243,10 +243,10 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
           name: {type: graphql.GraphQLString},
         },
         resolve: (workspace: any, args: any) => {
-          if (args.collection && args.schematic) {
-            return workspace.schematics.filter(s => s.name === args.name);
+          if (args.name) {
+            return workspace.schematicCollections.filter(s => s.name === args.name);
           } else {
-            return workspace.schematics;
+            return workspace.schematicCollections;
           }
         }
       },
@@ -256,7 +256,7 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
           name: {type: graphql.GraphQLString}
         },
         resolve: (workspace: any, args: any) => {
-          if (args.collection && args.schematic) {
+          if (args.name) {
             return workspace.projects.filter(s => s.name === args.name);
           } else {
             return workspace.projects;
@@ -293,7 +293,7 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
         },
         resolve: (_root, args: any) => {
           const packageJson = readJsonFile('./package.json', args.path).json;
-          const addons = [];
+          const addons = [] as any[];
           if (packageJson.devDependencies['@nrwl/schematics']) {
             addons.push({
               name: '@nrwl/schematics',
@@ -307,7 +307,7 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
 
           const angularJson = readJsonFile('./angular.json', args.path).json;
           const collectionName = angularJson.cli && angularJson.cli.defaultCollection ? angularJson.cli.defaultCollection : '@schematics/angular';
-          const schematics = readSchematics(args.path, collectionName);
+          const schematicCollections = readSchematics(args.path, collectionName);
           const projects = readProjects(args.path, angularJson.projects);
 
           return ({
@@ -317,7 +317,7 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
               cli: packageJson.devDependencies['@angular/cli']
             },
             addons,
-            schematics,
+            schematicCollections,
             projects
           });
         }

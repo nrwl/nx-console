@@ -1,6 +1,7 @@
 {
   "name": "angular-console",
   "private": true,
+  "workspaces": ["server", "electron"],
   "scripts": {
     "start": "nps"
   },

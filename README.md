@@ -2,7 +2,6 @@
 
 ## Prepare
 1. Run `yarn`
-2. Run `nps install.all`
 
 ## Run
 For development run: `nps dev.up`

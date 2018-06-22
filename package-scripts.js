@@ -2,12 +2,6 @@ const npsUtils = require('nps-utils');
 
 module.exports = {
   scripts: {
-    install: {
-      frontend: 'yarn',
-      server: 'cd server && yarn',
-      electron: 'cd electron && yarn',
-      all: npsUtils.concurrent.nps('install.frontend', 'install.server', 'install.electron')
-    },
     frontend: {
       ng: 'ng',
       build: 'ng build nxui --prod',
@@ -22,11 +16,12 @@ module.exports = {
       'clean': 'rm -rf dist',
       'compile': 'tsc -p electron/tsconfig.json',
       'copy-assets': 'cp electron/package.json dist/electron/package.json && cp -r electron/assets dist/electron',
-      'copy-server': 'cp -r dist/server dist/electron/server && cp -r server/node_modules dist/electron',
+      'copy-server': 'cp -r dist/server dist/electron/server',
+      'install-node-modules': 'cd dist/electron && yarn',
       'copy-frontend': 'cp -r dist/apps/nxui dist/electron/server/public',
       'start': 'electron dist/electron',
       'restart': npsUtils.series.nps('electron.compile', 'electron.copy-assets', 'electron.start'),
-      'prepackage': npsUtils.series.nps('electron.clean', 'electron.compile', 'electron.copy-assets', 'frontend.build', 'server.compile', 'electron.copy-server', 'electron.copy-frontend'),
+      'prepackage': npsUtils.series.nps('electron.clean', 'electron.compile', 'electron.copy-assets', 'frontend.build', 'server.compile', 'electron.copy-server', 'electron.copy-frontend', 'electron.install-node-modules'),
       'up': npsUtils.series.nps('electron.prepackage', 'electron.start'),
 
       "inner-package-mac": "electron-packager dist/electron --overwrite --platform=darwin --arch=x64 --icon=dist/electron/assets/icons/mac/icon.icns --prune=true --out=dist/release-builds",

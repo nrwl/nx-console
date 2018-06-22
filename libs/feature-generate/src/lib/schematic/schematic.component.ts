@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import {
@@ -15,6 +15,7 @@ import {
 import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
 import { CommandOutput, CommandRunner, Schematic, Serializer } from '@nxui/utils';
 import { ActivatedRoute } from '@angular/router';
+import { TerminalComponent } from '@nxui/ui';
 
 @Component({
   selector: 'nxui-schematic',
@@ -34,6 +35,7 @@ export class SchematicComponent implements OnInit {
   commandOutput$: Observable<CommandOutput | null>;
 
   combinedOutput$: Observable<CommandOutput | null>;
+  @ViewChild('combinedOutput', { read: TerminalComponent }) out: TerminalComponent;
 
   private ngGen$ = new Subject<void>();
 
@@ -101,7 +103,6 @@ export class SchematicComponent implements OnInit {
         if (!schematicDescription) {
           return of(null);
         }
-
         return this.runner
           .runCommand(
             gql`
@@ -155,6 +156,8 @@ export class SchematicComponent implements OnInit {
     this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$).pipe(
       withLatestFrom(this.command$),
       map(([output, command]) => {
+        this.out.clear();
+
         let out = `> ng generate ${command} --dry-run`;
         let status = '';
         if (output) {
@@ -171,6 +174,7 @@ export class SchematicComponent implements OnInit {
   }
 
   onGenerate() {
+    this.out.clear();
     this.ngGen$.next();
   }
 
