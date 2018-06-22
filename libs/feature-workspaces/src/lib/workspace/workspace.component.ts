@@ -24,7 +24,7 @@ export class WorkspaceComponent {
     map((event: NavigationEnd) => event.url),
     startWith(this.router.url),
     map(
-      (url: string) => (this.routes as any).find(route => url.endsWith(route.url)).title
+      (url: string) => (this.routes as any).find(route => url.indexOf(route.url) > -1).title
     )
   );
 
