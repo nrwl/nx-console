@@ -42,8 +42,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   }
 
   writeOutput() {
-    this.term.clear();
-
     const s = this.output;
     if (this.code && s) {
       if (s.indexOf('\n') > -1) {
