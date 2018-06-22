@@ -5,7 +5,7 @@
       <mat-icon class="filter-icon" (click)="schematicFilter.select()">filter_list</mat-icon>
     </div>
     <mat-selection-list class="schematic-list">
-      <ng-container *ngFor="let collection of (schematicCollections$ | async); let last = last; trackBy: trackByName">
+      <ng-container *ngFor="let collection of (schematicCollections$ | async); trackBy: trackByName">
         <div class="collection-name">
           <mat-divider></mat-divider>
           <h3 matSubheader>{{ collection.name }}</h3>

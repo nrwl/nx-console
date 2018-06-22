@@ -18,6 +18,11 @@ export interface Schematic {
   schema: Field[];
 }
 
+export interface SchematicCollection {
+  name: string;
+  schematics: Array<Schematic>;
+}
+
 export interface Builder {
   name: string;
   description: string;

@@ -2,10 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { ActivatedRoute } from '@angular/router';
 import gql from 'graphql-tag';
-import { map, switchMap, startWith, combineLatest } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { MatSelectionListChange, MatSelectionList } from '@angular/material';
+import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import { combineLatest, Observable } from 'rxjs';
+import { MatSelectionList } from '@angular/material';
 import { FormControl } from '@angular/forms';
+import { Schematic, SchematicCollection } from '@nxui/utils';
 
 @Component({
   selector: 'nxui-generate',
@@ -15,25 +16,16 @@ import { FormControl } from '@angular/forms';
 export class SchematicsComponent implements OnInit {
   @ViewChild(MatSelectionList) schematicSelectionList: MatSelectionList;
 
-  schematicCollections$: Observable<Array<SchematicDescriptionColltion>>;
+  schematicCollections$: Observable<Array<SchematicCollection>>;
 
-  selectedSchematic$: Observable<SchematicDescription | null>;
+  selectedSchematic$: Observable<Schematic | null>;
 
   schematicFilterFormControl = new FormControl();
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute) {}
+  constructor(private apollo: Apollo, private route: ActivatedRoute) {
+  }
 
   ngOnInit() {
-    document.querySelector('.schematic-list')!.addEventListener(
-      'sticky-change',
-      e => {
-        debugger;
-        // const header = e.detail.target;  // header became sticky or stopped sticking.
-        // const sticking = e.detail.stuck; // true when header is sticky.
-        // header.classList.toggle('shadow', sticking); // add drop shadow when sticking.
-      }
-    );
-
     // TODO: Remove this hack when material exposes this boolean as a public API.
     (this.schematicSelectionList.selectedOptions as any)._multiple = false;
 
@@ -41,67 +33,47 @@ export class SchematicsComponent implements OnInit {
       map(change => (change.option.selected ? change.option.value : null))
     );
 
-    this.schematicCollections$ = this.route.params.pipe(
-      map(m => m['path']),
-      switchMap(path => {
-        return this.apollo.watchQuery({
-          pollInterval: 5000,
-          query: gql`
+    this.schematicCollections$ = combineLatest(
+      this.schematicFilterFormControl.valueChanges.pipe(startWith('')),
+      this.route.params.pipe(
+        map(m => m['path']),
+        switchMap(path => {
+          return this.apollo.watchQuery({
+            pollInterval: 5000,
+            query: gql`
             query($path: String!) {
               workspace(path: $path) {
-                schematics {
-                  collection
-                  name
-                  description
+                schematicCollections {
+                  name 
+                  schematics {
+                    name
+                    description
+                    collection
+                  }
                 }
               }
             }
           `,
-          variables: {
-            path
-          }
-        }).valueChanges;
-      }),
-      combineLatest(
-        this.schematicFilterFormControl.valueChanges.pipe(startWith(''))
-      ),
-      map(([r, schemaicFilterValue]: [any, string]) => {
-        schemaicFilterValue = schemaicFilterValue.toLowerCase();
-        const schematics: Array<SchematicDescription> = (r as any).data
-          .workspace.schematics;
-        return schematics.filter(({ name }) =>
-          name.includes(schemaicFilterValue)
-        );
-      }),
-      map((schematics: Array<SchematicDescription>) => {
-        const collections = new Map<string, Set<SchematicDescription>>();
-        schematics.forEach(schematic => {
-          if (!collections.has(schematic.collection)) {
-            collections.set(schematic.collection, new Set());
-          }
-          collections.get(schematic.collection)!.add(schematic);
+            variables: {
+              path
+            }
+          }).valueChanges;
+        })
+      )
+    ).pipe(
+      map(([schematicFilterValue, r]: [string, any]) => {
+        const f = schematicFilterValue.toLowerCase();
+        const collections = (r as any).data.workspace.schematicCollections;
+        return collections.map(c => {
+          const s = c.schematics.filter(({ name }) => name.includes(schematicFilterValue)).sort((a, b) => a.name.localeCompare(b.name));
+          return ({ ...c, schematics: s });
         });
-
-        return (
-          Array.from(collections.entries())
-            .map(([collection, schematics]) => {
-              const schematicColltion: SchematicDescriptionColltion = {
-                name: collection,
-                schematics: Array.from(schematics).sort((a, b) =>
-                  a.name.localeCompare(b.name)
-                )
-              };
-              return schematicColltion;
-            })
-            /**
-             * TODO: The ordering should be as follows.
-             *   First element is projects default collection
-             *   Second element is @schematics/angular if it wasn't the default
-             *   The rest follow in alphabetical order.
-             */
-            .sort((a, b) => a.name.localeCompare(b.name))
-        );
-      })
+      }),
+      filter(collections => collections.filter(c => c.schematics.length > 0))
     );
+  }
+
+  trackByName(index: number, schematic: Schematic) {
+    return `${schematic.collection}:${schematic.name}`;
   }
 }

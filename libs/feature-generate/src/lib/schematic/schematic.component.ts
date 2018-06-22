@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import {
@@ -7,22 +7,14 @@ import {
   map,
   publishReplay,
   refCount,
-  switchMap,
-  withLatestFrom,
   startWith,
-  defaultIfEmpty,
-  tap
+  switchMap,
+  withLatestFrom
 } from 'rxjs/operators';
 
-import { BehaviorSubject, Observable, Subject, of, merge } from 'rxjs';
+import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
+import { CommandOutput, CommandRunner, Schematic, Serializer } from '@nxui/utils';
 import { ActivatedRoute } from '@angular/router';
-import {
-  CommandOutput,
-  CommandRunner,
-  Schematic,
-  Serializer
-} from '@nxui/utils';
-import { TerminalComponent } from '@nxui/ui';
 
 @Component({
   selector: 'nxui-schematic',
@@ -30,7 +22,7 @@ import { TerminalComponent } from '@nxui/ui';
   styleUrls: ['./schematic.component.css']
 })
 export class SchematicComponent implements OnInit {
-  @Input() schematicDescription$: Observable<SchematicDescription | null>;
+  @Input() schematicDescription$: Observable<any>;
 
   schematic$: Observable<Schematic | null>;
   commandArray$ = new BehaviorSubject<{ commands: string[]; valid: boolean }>({
@@ -62,18 +54,20 @@ export class SchematicComponent implements OnInit {
           query: gql`
             query($path: String!, $collection: String!, $schematic: String!) {
               workspace(path: $path) {
-                schematics(collection: $collection, schematic: $schematic) {
-                  collection
-                  name
-                  description
-                  schema {
+                schematicCollections(name: $collection) {
+                  schematics(name: $schematic) {
+                    collection
                     name
-                    enum
-                    type
                     description
-                    defaultValue
-                    required
-                    positional
+                    schema {
+                      name
+                      enum
+                      type
+                      description
+                      defaultValue
+                      required
+                      positional
+                    }
                   }
                 }
               }
@@ -81,8 +75,8 @@ export class SchematicComponent implements OnInit {
           `,
           variables: {
             path: this.route.snapshot.params['path'],
-            collection: decodeURIComponent(p.collection),
-            schematic: decodeURIComponent(p.name)
+            collection: p.collection,
+            schematic: p.name
           }
         });
       }),
@@ -90,7 +84,7 @@ export class SchematicComponent implements OnInit {
         if (!r) {
           return null;
         }
-        const schematic = r.data.workspace.schematics[0];
+        const schematic = r.data.workspace.schematicCollections[0].schematics[0];
         return this.serializer.normalizeSchematic(schematic);
       }),
       publishReplay(1),

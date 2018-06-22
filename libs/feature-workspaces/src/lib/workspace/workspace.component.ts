@@ -24,11 +24,11 @@ export class WorkspaceComponent {
     map((event: NavigationEnd) => event.url),
     startWith(this.router.url),
     map(
-      (url: string) => this.routes.find(route => url.endsWith(route.url)).title
+      (url: string) => (this.routes as any).find(route => url.endsWith(route.url)).title
     )
   );
 
-  routes: Array<Route> = [
+  readonly routes: Array<Route> = [
     { icon: 'details', url: 'details', title: 'Details' },
     { icon: 'create_new_folder', url: 'generate', title: 'Generate' },
     { icon: 'extension', url: 'extensions', title: 'CLI Extensions' },

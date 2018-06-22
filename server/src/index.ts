@@ -109,6 +109,30 @@ export const schematicType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
   }
 });
 
+export const schematicCollectionType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType({
+  name: 'SchematicCollection',
+  fields: () => {
+    return {
+      name: {
+        type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+      },
+      schematics: {
+        type: new graphql.GraphQLList(schematicType),
+        args: {
+          name: {type: graphql.GraphQLString},
+        },
+        resolve: (collection: any, args: any) => {
+          if (args.name) {
+            return collection.schematics.filter(s => s.name === args.name);
+          } else {
+            return collection.schematics;
+          }
+        }
+      }
+    };
+  }
+});
+
 export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType({
   name: 'Architect',
   fields: () => {
@@ -213,15 +237,14 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
       addons: {
         type: new graphql.GraphQLList(addonType)
       },
-      schematics: {
-        type: new graphql.GraphQLList(schematicType),
+      schematicCollections: {
+        type: new graphql.GraphQLList(schematicCollectionType),
         args: {
-          collection: {type: graphql.GraphQLString},
-          schematic: {type: graphql.GraphQLString}
+          name: {type: graphql.GraphQLString},
         },
         resolve: (workspace: any, args: any) => {
           if (args.collection && args.schematic) {
-            return workspace.schematics.filter(s => s.collection === args.collection && s.name === args.schematic);
+            return workspace.schematics.filter(s => s.name === args.name);
           } else {
             return workspace.schematics;
           }

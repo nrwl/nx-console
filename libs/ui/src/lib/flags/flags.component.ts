@@ -41,7 +41,7 @@ export class FlagsComponent {
   }
 
   onSubmit() {
-    this.action.next(null);
+    this.action.next();
   }
 
   onReset() {
