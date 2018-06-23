@@ -1,15 +1,17 @@
 {
-  "name": "angular-console",
+  "name": "AngularConsole",
   "version": "0.1.0",
   "main": "electron.js",
   "dependencies": {
-    "electron": "^2.0.3",
     "express": "^4.16.3",
     "express-graphql": "^0.6.12",
     "graphql": "0.13.2",
-    "resolve": "1.8.1"
+    "resolve": "1.8.1",
+    "fix-path": "2.1.0",
+    "get-port": "3.2.0"
   },
   "devDependencies": {
+    "electron": "^2.0.3",
     "electron-packager": "12.1.0",
     "electron-installer-dmg": "^1.0.0"
   }

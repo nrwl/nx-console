@@ -1,31 +1,48 @@
-import {app, BrowserWindow} from 'electron';
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { spawn } from 'child_process';
-import { statSync } from "fs";
+import { statSync } from 'fs';
+import * as fixPath from 'fix-path';
+import * as getPort from 'get-port';
 
 let win;
-function createWindow () {
-  win = new BrowserWindow({width: 1200, height: 900});
+let p;
+
+fixPath();
+
+function createWindow() {
+  win = new BrowserWindow({ width: 1400, height: 1200 });
   // win.webContents.openDevTools();
 
-  startServer().then(() => {
-    if (fileExists(path.join(process.cwd(), "angular.json"))) {
-      win.loadURL(`http://localhost:7777/workspaces/${encodeURIComponent(process.cwd())}/details`);
-    } else {
-      win.loadURL("http://localhost:7777");
+  getPort({port: 7777}).then(port => {
+    startServer(port).then(() => {
+      if (fileExists(path.join(process.cwd(), 'angular.json'))) {
+        win.loadURL(`http://localhost:${port}/workspaces/${encodeURIComponent(process.cwd())}/details`);
+      } else {
+        win.loadURL('http://localhost:${port}');
+      }
+    });
+  });
+
+  win.on('close', () => {
+    win = null;
+    app.quit();
+    if (p) {
+      p.kill();
     }
   });
 }
 
-function startServer() {
-  const program = path.join(__dirname, 'server', 'index.js');
-  spawn('node', [program], {stdio: [0, 1, 2]});
+app.on('ready', createWindow);
+
+function startServer(port: number) {
+  p = spawn('node', ['index.js', port.toString()], {stdio: [0, 1, 2], cwd: path.join(__dirname, 'server'), shell: true});
   return new Promise(res => {
-    setTimeout(() => {res()}, 300);
+    setTimeout(() => {
+      res();
+    }, 300);
   });
 }
-
-app.on('ready', createWindow);
 
 function fileExists(filePath: string): boolean {
   try {

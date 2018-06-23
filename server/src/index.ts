@@ -491,6 +491,10 @@ app.use(
   })
 );
 
+app.get('/workspaces', (req, res) => {
+  res.sendFile('index.html', {root: path.join(__dirname, 'public')});
+});
+
 app.get('/workspaces/*', (req, res) => {
   res.sendFile('index.html', {root: path.join(__dirname, 'public')});
 });
@@ -498,4 +502,5 @@ app.get('/workspaces/*', (req, res) => {
 // workspaces
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(7777);
+const port = process.argv[2];
+app.listen(port ? port : 7777);
