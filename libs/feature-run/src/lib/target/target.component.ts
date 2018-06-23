@@ -38,6 +38,9 @@ export class TargetComponent implements OnInit {
                     name
                     description
                     builder
+                    configurations {
+                      name
+                    }
                     schema {
                       name
                       enum

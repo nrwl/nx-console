@@ -1,4 +1,18 @@
 <form [formGroup]="_form">
+  <div *ngIf="configurations && configurations.length > 0">
+    Configuration
+    <select formControlName="configurations">
+      <option [ngValue]="null">
+        default
+      </option>
+      <option *ngFor="let config of configurations" [ngValue]="config.name">
+        {{config.name}}
+      </option>
+    </select>
+    <hr>
+  </div>
+
+
   <div *ngFor="let field of _fields" style="margin: 20px;">
     <span [ngClass]="{important: field.important}">
       {{field.name}} type: {{field.type}}, {{field.description}}

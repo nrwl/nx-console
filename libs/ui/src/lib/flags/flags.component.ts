@@ -14,6 +14,7 @@ export class FlagsComponent {
   private subscription: Subscription;
 
   @Input() actionLabel: string;
+  @Input() configurations: {name: string}[];
   @Input() prefix: string[];
   @Input()
   set fields(f: Field[]) {
@@ -57,6 +58,9 @@ export class FlagsComponent {
       m[f.name] = new FormControl(null, f.required ? Validators.required : null);
       return m;
     }, {});
+    if (this.configurations && this.configurations.length > 0) {
+      children['configurations'] = new FormControl(null, Validators.required);
+    }
     this._form = new FormGroup(children);
 
     if (this.subscription) {
@@ -69,6 +73,7 @@ export class FlagsComponent {
   }
 
   private emitNext(value: string[]) {
-    this.value.next({ commands: [...this.prefix, ...this.serializer.serializeArgs(value, this._fields)], valid: this._form.valid });
+    const configuration = this.configurations && value['configurations'] ? [`--configuration=${value['configurations']}`] : [];
+    this.value.next({ commands: [...this.prefix, ...configuration, ...this.serializer.serializeArgs(value, this._fields)], valid: this._form.valid });
   }
 }

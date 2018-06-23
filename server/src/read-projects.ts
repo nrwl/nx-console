@@ -5,6 +5,13 @@ interface Project {
   name: string;
   root: string;
   projectType: string;
+  architect: {
+    name: string;
+    description: string;
+    builder: string;
+    configurations: {name: string}[],
+    schema: { name: string, type: string, description: string, defaultValue: string, required: boolean, positional: boolean, enum: string[] }[]
+  }[]
 }
 
 export function readProjects(basedir: string, json: any): Project[] {
@@ -21,9 +28,10 @@ export function readProjects(basedir: string, json: any): Project[] {
 function readArchitect(basedir: string, architect: any) {
   return Object.entries(architect).map(([key, value]: [string, any]) => {
     const [npmPackage, builderName] = value.builder.split(":");
+    const configurations = value.configurations ? Object.keys(value.configurations).map(name => ({name})) : [];
     const builderConfiguration = readBuildersFile(basedir, npmPackage)[builderName];
     const schema = builderConfiguration.schema.filter(p => !value.options[p.name]);
-    return {...builderConfiguration, name: key, builder: value.builder, schema};
+    return {...builderConfiguration, configurations, name: key, builder: value.builder, schema};
   });
 }
 

@@ -146,6 +146,20 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
       builder: {
         type: new graphql.GraphQLNonNull(graphql.GraphQLString)
       },
+      configurations: {
+        type: new graphql.GraphQLList(
+          new graphql.GraphQLObjectType({
+            name: 'ArchitectConfigurations',
+            fields: () => {
+              return {
+                name: {
+                  type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+                }
+              };
+            }
+          })
+        )
+      },
       schema: {
         type: new graphql.GraphQLList(
           new graphql.GraphQLObjectType({
@@ -176,7 +190,7 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
               };
             }
           })
-        ),
+        )
       }
     };
   }

@@ -5,7 +5,7 @@
     {{project.projectType}}
   </div>
 
-  <ui-flags actionLabel="Run" [prefix]="[project.architect[0].name, project.name]" [fields]="project.architect[0].schema" (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()"></ui-flags>
+  <ui-flags actionLabel="Run" [configurations]="project.architect[0].configurations" [prefix]="[project.architect[0].name, project.name]" [fields]="project.architect[0].schema" (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()"></ui-flags>
 
   <h2>Command</h2>
   <div>
