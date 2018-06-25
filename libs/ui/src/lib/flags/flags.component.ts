@@ -2,6 +2,7 @@ import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { Field, Serializer } from '@nxui/utils';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'ui-flags',
@@ -9,14 +10,16 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./flags.component.css']
 })
 export class FlagsComponent {
-  _fields: Field[];
-  _form: FormGroup;
+  private _fields: Field[];
   private subscription: Subscription;
 
   @Input() actionLabel: string;
-  @Input() configurations: {name: string}[];
+  @Input() configurations: { name: string }[];
   @Input() prefix: string[];
   @Input()
+  get fields() {
+    return this._fields;
+  }
   set fields(f: Field[]) {
     this._fields = f;
     this.setForm();
@@ -26,8 +29,9 @@ export class FlagsComponent {
   @Output() action = new EventEmitter();
   @Output() stop = new EventEmitter();
 
-  constructor(private serializer: Serializer) {
-  }
+  formGroup: FormGroup;
+
+  constructor(private readonly serializer: Serializer) {}
 
   fieldOptions(field: Field) {
     if (field.enum) {
@@ -55,25 +59,40 @@ export class FlagsComponent {
 
   private setForm() {
     const children = this._fields.reduce((m, f) => {
-      m[f.name] = new FormControl(null, f.required ? Validators.required : null);
+      m[f.name] = new FormControl(
+        null,
+        f.required ? Validators.required : null
+      );
       return m;
     }, {});
     if (this.configurations && this.configurations.length > 0) {
       children['configurations'] = new FormControl(null, Validators.required);
     }
-    this._form = new FormGroup(children);
+    this.formGroup = new FormGroup(children);
 
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-    this.subscription = this._form.valueChanges.subscribe(value => {
-      this.emitNext(value);
-    });
-    this.emitNext(this._form.value);
+    this.subscription = this.formGroup.valueChanges
+      .pipe(startWith(this.formGroup.value))
+      .subscribe(value => {
+        this.emitNext(value);
+      });
   }
 
   private emitNext(value: string[]) {
-    const configuration = this.configurations && value['configurations'] ? [`--configuration=${value['configurations']}`] : [];
-    this.value.next({ commands: [...this.prefix, ...configuration, ...this.serializer.serializeArgs(value, this._fields)], valid: this._form.valid });
+    const configuration =
+      this.configurations && value['configurations']
+        ? [`--configuration=${value['configurations']}`]
+        : [];
+
+    this.value.next({
+      commands: [
+        ...this.prefix,
+        ...configuration,
+        ...this.serializer.serializeArgs(value, this._fields)
+      ],
+      valid: this.formGroup.valid
+    });
   }
 }

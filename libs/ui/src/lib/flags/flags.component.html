@@ -1,4 +1,4 @@
-<form [formGroup]="_form">
+<form [formGroup]="formGroup">
   <div *ngIf="configurations && configurations.length > 0">
     Configuration
     <select formControlName="configurations">
@@ -13,30 +13,34 @@
   </div>
 
 
-  <div *ngFor="let field of _fields" style="margin: 20px;">
+  <div *ngFor="let field of fields" style="margin: 20px;">
     <span [ngClass]="{important: field.important}">
-      {{field.name}} type: {{field.type}}, {{field.description}}
+      {{ field.name }} type: {{ field.type }}, {{ field.description }}
     </span>
 
-    <span *ngIf="field.type === 'boolean' || field.enum">
-          <select [formControlName]="field.name" [required]="field.required">
-            <option *ngFor="let value of fieldOptions(field)" [ngValue]="value">
-              {{fieldOption(value)}}
-            </option>
-          </select>
-        </span>
+    <span *ngIf="field.type === 'boolean'">
+      <mat-slide-toggle [formControlName]="field.name" [required]="field.required">{{ fieldOption(value) }} (default: {{ field.defaultValue }})</mat-slide-toggle>
+    </span>
+
+    <span *ngIf="field.enum">
+      <select [formControlName]="field.name" [required]="field.required">
+        <option *ngFor="let value of fieldOptions(field)" [ngValue]="value">
+          {{ fieldOption(value) }}
+        </option>
+      </select>
+    </span>
     <span *ngIf="!field.enum && field.type !== 'boolean'">
-          <input type="text" [formControlName]="field.name" [required]="field.required">
-        </span>
+      <input type="text" [formControlName]="field.name" [required]="field.required">
+    </span>
     <span *ngIf="field.defaultValue">
-          (default: {{field.defaultValue}})
-        </span>
+      (default: {{ field.defaultValue }})
+    </span>
     <span *ngIf="field.required">
-          *
-        </span>
+      *
+    </span>
   </div>
 
-  <button [disabled]="_form.invalid" (click)="onSubmit()">{{actionLabel}}</button>
+  <button [disabled]="formGroup.invalid" (click)="onSubmit()">{{ actionLabel }}</button>
   <button type="reset" (click)="onReset()">Reset</button>
   <button type="button" (click)="onStop()">Stop</button>
 </form>
