@@ -9,13 +9,29 @@ import {
   refCount,
   startWith,
   switchMap,
-  withLatestFrom
+  withLatestFrom,
+  distinctUntilChanged
 } from 'rxjs/operators';
 
 import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
-import { CommandOutput, CommandRunner, Schematic, Serializer } from '@nxui/utils';
+import {
+  CommandOutput,
+  CommandRunner,
+  Schematic,
+  Serializer
+} from '@nxui/utils';
 import { ActivatedRoute } from '@angular/router';
 import { TerminalComponent } from '@nxui/ui';
+
+const MISSING_REQUIRED_FLAGS: CommandOutput = {
+  status: 'Invalid flags',
+  out: 'Command is missing required fields'
+};
+
+const RUNNING_COMMAND: CommandOutput = {
+  status: 'Running',
+  out: 'Running...'
+};
 
 @Component({
   selector: 'nxui-schematic',
@@ -31,11 +47,12 @@ export class SchematicComponent implements OnInit {
     valid: false
   });
   command$: Observable<string>;
-  dryRunResult$: Observable<CommandOutput | null>;
-  commandOutput$: Observable<CommandOutput | null>;
+  dryRunResult$: Observable<CommandOutput>;
+  commandOutput$: Observable<CommandOutput>;
 
-  combinedOutput$: Observable<CommandOutput | null>;
-  @ViewChild('combinedOutput', { read: TerminalComponent }) out: TerminalComponent;
+  combinedOutput$: Observable<CommandOutput>;
+  @ViewChild('combinedOutput', { read: TerminalComponent })
+  out: TerminalComponent;
 
   private ngGen$ = new Subject<void>();
 
@@ -50,7 +67,7 @@ export class SchematicComponent implements OnInit {
     this.schematic$ = this.schematicDescription$.pipe(
       switchMap(p => {
         if (!p) {
-          return of(null);
+          return of(MISSING_REQUIRED_FLAGS);
         }
         return this.apollo.query({
           query: gql`
@@ -86,7 +103,9 @@ export class SchematicComponent implements OnInit {
         if (!r) {
           return null;
         }
-        const schematic = r.data.workspace.schematicCollections[0].schematics[0];
+        const schematic: Schematic =
+          r.data.workspace.schematicCollections[0].schematics[0];
+
         return this.serializer.normalizeSchematic(schematic);
       }),
       publishReplay(1),
@@ -97,11 +116,16 @@ export class SchematicComponent implements OnInit {
 
     this.dryRunResult$ = this.commandArray$.pipe(
       debounceTime(300),
-      filter(c => c.valid),
       withLatestFrom(this.schematicDescription$),
       switchMap(([c, schematicDescription]) => {
+        if (!c.valid) {
+          return of(MISSING_REQUIRED_FLAGS);
+        }
         if (!schematicDescription) {
-          return of(null);
+          return of({
+            status: 'Invalid',
+            out: 'Please select a schematic'
+          });
         }
         return this.runner
           .runCommand(
@@ -119,7 +143,7 @@ export class SchematicComponent implements OnInit {
             r => r.data.generate.command,
             true
           )
-          .pipe(startWith(null));
+          .pipe(startWith(RUNNING_COMMAND));
       }),
       publishReplay(1),
       refCount()
@@ -129,7 +153,10 @@ export class SchematicComponent implements OnInit {
       withLatestFrom(this.commandArray$, this.schematicDescription$),
       switchMap(([_, c, schematicDescription]) => {
         if (!schematicDescription) {
-          return of(null);
+          return of({
+            status: 'Invalid',
+            out: 'Please select a schematic'
+          });
         }
         return this.runner
           .runCommand(
@@ -147,13 +174,16 @@ export class SchematicComponent implements OnInit {
             r => r.data.generate.command,
             false
           )
-          .pipe(startWith(null));
+          .pipe(startWith(RUNNING_COMMAND));
       }),
       publishReplay(1),
       refCount()
     );
 
     this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$).pipe(
+      distinctUntilChanged((a, b) =>
+        Boolean(a.out === b.out && a.status === b.status)
+      ),
       withLatestFrom(this.command$),
       map(([output, command]) => {
         this.out.clear();
