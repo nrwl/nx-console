@@ -9,46 +9,75 @@ interface Project {
     name: string;
     description: string;
     builder: string;
-    configurations: {name: string}[],
-    schema: { name: string, type: string, description: string, defaultValue: string, required: boolean, positional: boolean, enum: string[] }[]
-  }[]
+    configurations: { name: string }[];
+    schema: {
+      name: string;
+      type: string;
+      description: string;
+      defaultValue: string;
+      required: boolean;
+      positional: boolean;
+      enum: string[];
+    }[];
+  }[];
 }
 
 export function readProjects(basedir: string, json: any): Project[] {
   return Object.entries(json).map(([key, value]: [string, any]) => {
-    return ({
+    return {
       name: key,
       root: value.root,
       projectType: value.projectType,
       architect: readArchitect(basedir, value.architect)
-    });
+    };
   });
 }
 
 function readArchitect(basedir: string, architect: any) {
   return Object.entries(architect).map(([key, value]: [string, any]) => {
-    const [npmPackage, builderName] = value.builder.split(":");
-    const configurations = value.configurations ? Object.keys(value.configurations).map(name => ({name})) : [];
-    const builderConfiguration = readBuildersFile(basedir, npmPackage)[builderName];
-    const schema = builderConfiguration.schema.filter(p => !value.options[p.name]);
-    return {...builderConfiguration, configurations, name: key, builder: value.builder, schema};
+    const [npmPackage, builderName] = value.builder.split(':');
+    const configurations = value.configurations
+      ? Object.keys(value.configurations).map(name => ({ name }))
+      : [];
+    const builderConfiguration = readBuildersFile(basedir, npmPackage)[
+      builderName
+    ];
+    const schema = builderConfiguration.schema.filter(
+      p => !value.options[p.name]
+    );
+    return {
+      ...builderConfiguration,
+      configurations,
+      name: key,
+      builder: value.builder,
+      schema
+    };
   });
 }
 
 function readBuildersFile(basedir: string, npmPackage: string) {
-  const packageJson = readJsonFile(path.join(npmPackage, 'package.json'), basedir);
+  const packageJson = readJsonFile(
+    path.join(npmPackage, 'package.json'),
+    basedir
+  );
   const b = packageJson.json.builders;
   const buildersPath = b.startsWith('.') ? b : `./${b}`;
-  const buildersJson = readJsonFile(buildersPath, path.dirname(packageJson.path));
+  const buildersJson = readJsonFile(
+    buildersPath,
+    path.dirname(packageJson.path)
+  );
 
   const builders = {};
   Object.entries(buildersJson.json.builders).forEach(([k, v]: [any, any]) => {
-    const builderSchema = readJsonFile(v.schema, path.dirname(buildersJson.path));
-    builders[k] = ({
+    const builderSchema = readJsonFile(
+      v.schema,
+      path.dirname(buildersJson.path)
+    );
+    builders[k] = {
       name: k,
       schema: normalizeSchema(builderSchema.json),
       description: v.description
-    });
+    };
   });
 
   return builders;

@@ -1,0 +1,11 @@
+{
+  "baseUrl": "http://localhost:4200",
+  "fileServerFolder": "../../dist/apps/nxui-e2e",
+  "fixturesFolder": "../../dist/apps/nxui-e2e/fixtures",
+  "integrationFolder": "../../dist/apps/nxui-e2e/integration",
+  "pluginsFile": "../../dist/apps/nxui-e2e/plugins/index.js",
+  "supportFile": "../../dist/apps/nxui-e2e/support/index.js",
+  "videosFolder": "../../dist/apps/nxui-e2e/video",
+  "video": false,
+  "screenshotsFolder": "../../dist/apps/nxui-e2e/screenshot"
+}

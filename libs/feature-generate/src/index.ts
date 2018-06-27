@@ -1,3 +1,1 @@
-
-      export * from './lib/feature-generate.module';
-      
+export * from './lib/feature-generate.module';

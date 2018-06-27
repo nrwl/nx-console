@@ -1,0 +1,26 @@
+language: node_js
+dist: trusty
+sudo: required
+node_js:
+- '8.9.3'
+before_install:
+- export DISPLAY=:99.0
+install:
+- sh -e /etc/init.d/xvfb start
+- yarn install
+script:
+- yarn start format.check
+- yarn start lint
+- yarn start e2e.fixtures
+- yarn start e2e.run
+addons:
+  chrome: stable
+cache:
+  directories:
+  - node_modules
+notifications:
+  email: false
+  webhooks:
+    on_success: true
+    on_failure: true
+    on_start: true

@@ -8,17 +8,11 @@ import { UiModule } from '@nxui/ui';
 
 export const runRoutes: Route[] = [
   { path: '', component: TargetsComponent },
-  { path: ':targetName/:projectName', component: TargetComponent },
+  { path: ':targetName/:projectName', component: TargetComponent }
 ];
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RouterModule,
-    ReactiveFormsModule,
-    UiModule
-  ],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, UiModule],
   declarations: [TargetsComponent, TargetComponent]
 })
-export class FeatureRunModule {
-}
+export class FeatureRunModule {}

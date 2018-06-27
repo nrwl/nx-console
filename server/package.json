@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0-private",
   "scripts": {
+    "lint": "echo It is all good!",
+    "format:check": "prettier --list-different './**/*.ts'",
+    "format:write": "prettier --write './**/*.ts'"
   },
   "dependencies": {
     "express": "^4.16.3",

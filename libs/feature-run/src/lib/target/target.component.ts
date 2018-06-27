@@ -1,5 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { concatMap, map, publishReplay, refCount, switchMap, withLatestFrom } from 'rxjs/operators';
+import {
+  concatMap,
+  map,
+  publishReplay,
+  refCount,
+  switchMap,
+  withLatestFrom
+} from 'rxjs/operators';
 import gql from 'graphql-tag';
 import { BehaviorSubject, combineLatest, Observable, of, Subject } from 'rxjs';
 import { CommandOutput, CommandRunner, Project, Serializer } from '@nxui/utils';
@@ -14,18 +21,26 @@ import { TerminalComponent } from '@nxui/ui';
 })
 export class TargetComponent implements OnInit {
   project$: Observable<Project>;
-  commandArray$ = new BehaviorSubject<{ commands: string[], valid: boolean }>({ commands: [], valid: false });
+  commandArray$ = new BehaviorSubject<{ commands: string[]; valid: boolean }>({
+    commands: [],
+    valid: false
+  });
   command$: Observable<string>;
   commandOutput$: Observable<CommandOutput>;
-  @ViewChild('out', { read: TerminalComponent }) out: TerminalComponent;
+  @ViewChild('out', { read: TerminalComponent })
+  out: TerminalComponent;
   private ngRun$ = new Subject<any>();
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute, private runner: CommandRunner, private serializer: Serializer) {
-  }
+  constructor(
+    private apollo: Apollo,
+    private route: ActivatedRoute,
+    private runner: CommandRunner,
+    private serializer: Serializer
+  ) {}
 
   ngOnInit() {
     this.project$ = this.route.params.pipe(
-      switchMap((p) => {
+      switchMap(p => {
         return this.apollo.query({
           query: gql`
             query($path: String!, $projectName: String!, $targetName: String!) {
@@ -84,17 +99,17 @@ export class TargetComponent implements OnInit {
       switchMap(([q, c]) => {
         return this.runner.runCommand(
           gql`
-              mutation($path: String!, $runCommand: [String]!) {
-                run(path: $path, runCommand: $runCommand) {
-                  command
-                }
+            mutation($path: String!, $runCommand: [String]!) {
+              run(path: $path, runCommand: $runCommand) {
+                command
               }
-             `,
+            }
+          `,
           {
             path: this.route.snapshot.params['path'],
             runCommand: c.commands
           },
-          (r) => r.data.run.command,
+          r => r.data.run.command,
           false
         );
       }),
@@ -112,7 +127,7 @@ export class TargetComponent implements OnInit {
     this.runner.stopAllCommands();
   }
 
-  onFlagsChange(e: { commands: string[], valid: boolean }) {
+  onFlagsChange(e: { commands: string[]; valid: boolean }) {
     this.commandArray$.next(e);
   }
 }

@@ -3,11 +3,21 @@ import { ActivatedRoute } from '@angular/router';
 import gql from 'graphql-tag';
 import { map, switchMap } from 'rxjs/operators';
 import { Apollo } from 'apollo-angular';
-import { BehaviorSubject, interval, Observable, Subscription, combineLatest, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  interval,
+  Observable,
+  Subscription,
+  combineLatest,
+  Subject
+} from 'rxjs';
 import { CommandRunner, Messenger } from '@nxui/utils';
 import { CommandOutput } from '@nxui/utils';
 
-type Addon = { name: string, version: string };
+interface Addon {
+  name: string;
+  version: string;
+}
 
 @Component({
   selector: 'nxui-addons',
@@ -19,8 +29,12 @@ export class AddonsComponent implements OnInit {
   commandOutput$: Observable<CommandOutput>;
   private ngAdd$ = new Subject<Addon>();
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute, private commandRunner: CommandRunner, private messenger: Messenger) {
-  }
+  constructor(
+    private apollo: Apollo,
+    private route: ActivatedRoute,
+    private commandRunner: CommandRunner,
+    private messenger: Messenger
+  ) {}
 
   ngOnInit() {
     this.addons$ = this.route.params.pipe(

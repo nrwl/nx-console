@@ -13,8 +13,7 @@ import { Observable } from 'rxjs';
 export class DetailsComponent implements OnInit {
   public workspace$: Observable<any>;
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute) {
-  }
+  constructor(private apollo: Apollo, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.workspace$ = this.route.params.pipe(

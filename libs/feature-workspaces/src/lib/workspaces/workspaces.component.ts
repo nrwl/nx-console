@@ -11,25 +11,34 @@ import { Messenger } from '@nxui/utils';
   styleUrls: ['./workspaces.component.css']
 })
 export class WorkspacesComponent {
-  constructor(private apollo: Apollo, private messenger: Messenger, private router: Router) {}
+  constructor(
+    private apollo: Apollo,
+    private messenger: Messenger,
+    private router: Router
+  ) {}
 
   openWorkspace(path: string) {
     // this query is just a smoke check
-    this.apollo.query({
-      query: gql`
-        query($path: String!) {
-          workspace(path: $path) {
-            name
+    this.apollo
+      .query({
+        query: gql`
+          query($path: String!) {
+            workspace(path: $path) {
+              name
+            }
           }
+        `,
+        variables: {
+          path
         }
-      `,
-      variables: {
-        path
-      }
-    }).subscribe((r) => {
-      this.router.navigate(['/workspaces', path]);
-    }, (e) => {
-      this.messenger.error(e);
-    });
+      })
+      .subscribe(
+        r => {
+          this.router.navigate(['/workspaces', path]);
+        },
+        e => {
+          this.messenger.error(e);
+        }
+      );
   }
 }

@@ -4,7 +4,7 @@
   <p>Cli Version: {{workspace.versions.cli}}</p>
 
   <h2>Projects</h2>
-  <ul>
+  <ul class="projects">
     <li *ngFor="let p of workspace.projects; trackBy: trackByName">
       {{p.name}} ({{p.root}}) {{p.projectType}}
     </li>
