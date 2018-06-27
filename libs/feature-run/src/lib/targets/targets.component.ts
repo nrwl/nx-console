@@ -14,7 +14,7 @@ import { Builder, Project } from '@nxui/utils';
 export class TargetsComponent implements OnInit {
   public projects$: Observable<Project>;
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute) { }
+  constructor(private apollo: Apollo, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.projects$ = this.route.params.pipe(

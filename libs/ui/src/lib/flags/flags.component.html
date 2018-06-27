@@ -1,7 +1,7 @@
 <form [formGroup]="formGroup">
   <div *ngIf="configurations && configurations.length > 0">
     Configuration
-    <select formControlName="configurations">
+    <select formControlName="configurations" name="configurations">
       <option [ngValue]="null">
         default
       </option>
@@ -19,18 +19,18 @@
     </span>
 
     <span *ngIf="field.type === 'boolean'">
-      <mat-slide-toggle [formControlName]="field.name" [required]="field.required">{{ fieldOption(value) }} (default: {{ field.defaultValue }})</mat-slide-toggle>
+      <mat-slide-toggle [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">(default: {{ field.defaultValue }})</mat-slide-toggle>
     </span>
 
     <span *ngIf="field.enum">
-      <select [formControlName]="field.name" [required]="field.required">
+      <select [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">
         <option *ngFor="let value of fieldOptions(field)" [ngValue]="value">
           {{ fieldOption(value) }}
         </option>
       </select>
     </span>
     <span *ngIf="!field.enum && field.type !== 'boolean'">
-      <input type="text" [formControlName]="field.name" [required]="field.required">
+      <input type="text" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">
     </span>
     <span *ngIf="field.defaultValue">
       (default: {{ field.defaultValue }})
@@ -40,7 +40,7 @@
     </span>
   </div>
 
-  <button [disabled]="formGroup.invalid" (click)="onSubmit()">{{ actionLabel }}</button>
+  <button [disabled]="formGroup.invalid" (click)="onSubmit()" id="action">{{ actionLabel }}</button>
   <button type="reset" (click)="onReset()">Reset</button>
   <button type="button" (click)="onStop()">Stop</button>
 </form>

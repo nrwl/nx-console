@@ -8,4 +8,3 @@ export class Messenger {
     console.error(m);
   }
 }
-

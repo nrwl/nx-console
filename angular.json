@@ -86,23 +86,8 @@
     },
     "nxui-e2e": {
       "root": "apps/nxui-e2e/",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "apps/nxui-e2e/protractor.conf.js",
-            "devServerTarget": "nxui:serve"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "apps/nxui-e2e/tsconfig.e2e.json",
-            "exclude": ["**/node_modules/**"]
-          }
-        }
-      }
+      "sourceRoot": "apps/nxui-e2e/src",
+      "projectType": "application"
     },
     "feature-workspaces": {
       "root": "libs/feature-workspaces",

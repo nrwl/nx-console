@@ -5,6 +5,8 @@
 /tmp
 /out-tsc
 
+/cypress
+
 # dependencies
 /node_modules
 /server/node_modules

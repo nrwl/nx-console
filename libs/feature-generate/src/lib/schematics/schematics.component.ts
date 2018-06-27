@@ -22,8 +22,7 @@ export class SchematicsComponent implements OnInit {
 
   schematicFilterFormControl = new FormControl();
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute) {
-  }
+  constructor(private apollo: Apollo, private route: ActivatedRoute) {}
 
   ngOnInit() {
     // TODO: Remove this hack when material exposes this boolean as a public API.
@@ -41,19 +40,19 @@ export class SchematicsComponent implements OnInit {
           return this.apollo.watchQuery({
             pollInterval: 5000,
             query: gql`
-            query($path: String!) {
-              workspace(path: $path) {
-                schematicCollections {
-                  name 
-                  schematics {
+              query($path: String!) {
+                workspace(path: $path) {
+                  schematicCollections {
                     name
-                    description
-                    collection
+                    schematics {
+                      name
+                      description
+                      collection
+                    }
                   }
                 }
               }
-            }
-          `,
+            `,
             variables: {
               path
             }
@@ -65,8 +64,10 @@ export class SchematicsComponent implements OnInit {
         const f = schematicFilterValue.toLowerCase();
         const collections = (r as any).data.workspace.schematicCollections;
         return collections.map(c => {
-          const s = c.schematics.filter(({ name }) => name.includes(schematicFilterValue)).sort((a, b) => a.name.localeCompare(b.name));
-          return ({ ...c, schematics: s });
+          const s = c.schematics
+            .filter(({ name }) => name.includes(schematicFilterValue))
+            .sort((a, b) => a.name.localeCompare(b.name));
+          return { ...c, schematics: s };
         });
       }),
       filter(collections => collections.filter(c => c.schematics.length > 0))

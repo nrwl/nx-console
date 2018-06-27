@@ -9,7 +9,7 @@
   <div class="content" fxLayout="row" fxFlex>
     <div fxLayoutGap="4px" class="routes-side-nav" fxLayout="column" fxLayoutAlign="start center">
       <button class="route-button" [routerLink]="route.url" routerLinkActive="active" mat-icon-button fxLayout="column" fxLayoutAlign="center"
-        *ngFor="let route of routes" #routeButton>
+        *ngFor="let route of routes" #routeButton [id]="'go-to-' + route.url">
         <mat-icon class="route-icon" [id]="route.icon" [matTooltip]="route.title" matTooltipPosition="right">{{ route.icon }}</mat-icon>
       </button>
     </div>
