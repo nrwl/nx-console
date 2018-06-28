@@ -81,16 +81,27 @@ export class Serializer {
     const fields = schema.filter(
       s => value[s.name] !== undefined && value[s.name] !== null
     );
-    const args = fields.map(f => {
-      if (f.positional) {
-        return value[f.name];
-      } else if (f.type === 'boolean') {
-        return value[f.name] ? `--${f.name}` : `--no-${f.name}`;
-      } else {
-        return `--${f.name}=${value[f.name]}`;
-      }
-    });
+    const args = fields
+      .map(f => {
+        if (f.defaultValue === value[f.name]) return null;
+        if (f.positional) {
+          return value[f.name];
+        } else if (f.type === 'boolean') {
+          return value[f.name] ? `--${f.name}` : `--no-${f.name}`;
+        } else {
+          return `--${f.name}=${value[f.name]}`;
+        }
+      })
+      .filter(r => !!r);
     return args;
+  }
+
+  argsToString(args: string[]): string {
+    return args
+      .map(a => {
+        return a.indexOf(' ') > -1 ? `"${a}"` : a;
+      })
+      .join(' ');
   }
 
   private importantSchematicField(collection: string, name: string) {

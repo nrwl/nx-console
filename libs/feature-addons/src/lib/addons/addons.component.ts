@@ -3,16 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import gql from 'graphql-tag';
 import { map, switchMap } from 'rxjs/operators';
 import { Apollo } from 'apollo-angular';
-import {
-  BehaviorSubject,
-  interval,
-  Observable,
-  Subscription,
-  combineLatest,
-  Subject
-} from 'rxjs';
-import { CommandRunner, Messenger } from '@nxui/utils';
-import { CommandOutput } from '@nxui/utils';
+import { Observable, Subject } from 'rxjs';
+import { CommandOutput, CommandRunner, Messenger } from '@nxui/utils';
 
 interface Addon {
   name: string;

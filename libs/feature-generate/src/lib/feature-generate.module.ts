@@ -13,7 +13,14 @@ import {
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 export const generateRoutes: Route[] = [
-  { path: '', pathMatch: 'full', component: SchematicsComponent }
+  {
+    path: '',
+    component: SchematicsComponent,
+    children: [
+      { path: ':collection/:schematic', component: SchematicComponent },
+      { path: '', pathMatch: 'full', component: SchematicComponent }
+    ]
+  }
 ];
 
 @NgModule({

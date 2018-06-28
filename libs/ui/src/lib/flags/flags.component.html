@@ -28,12 +28,15 @@
           {{ fieldOption(value) }}
         </option>
       </select>
+      <span *ngIf="field.defaultValue">
+        (default: {{ field.defaultValue }})
+      </span>
     </span>
     <span *ngIf="!field.enum && field.type !== 'boolean'">
       <input type="text" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">
-    </span>
-    <span *ngIf="field.defaultValue">
-      (default: {{ field.defaultValue }})
+      <span *ngIf="field.defaultValue">
+        (default: {{ field.defaultValue }})
+      </span>
     </span>
     <span *ngIf="field.required">
       *

@@ -4,9 +4,14 @@
       {{schematic.collection}} {{schematic.name}} {{schematic.description}}
     </div>
     <ui-flags actionLabel="Generate" [prefix]="[schematic.name]" [fields]="schematic.schema" (value)="onFlagsChange($event)"
-      (action)="onGenerate()" (stop)="onStop()"></ui-flags>
+              (action)="onGenerate()" (stop)="onStop()"></ui-flags>
   </div>
-  <div class="ui-terminal-container">
-    <ui-terminal [input]="(combinedOutput$|async)?.out" #combinedOutput></ui-terminal>
+
+  <div *ngIf="!(schematic$|async)" class="ui-flags-container">
+    No Schematic Selected
+  </div>
+
+  <div *ngIf="(schematic$|async)" class="ui-terminal-container">
+    <ui-terminal [command]="command$|async" [input]="(combinedOutput$|async)?.out" #combinedOutput></ui-terminal>
   </div>
 </div>

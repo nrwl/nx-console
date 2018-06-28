@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import gql from 'graphql-tag';
 import { filter, map, startWith, switchMap } from 'rxjs/operators';
 import { combineLatest, Observable } from 'rxjs';
@@ -18,19 +18,31 @@ export class SchematicsComponent implements OnInit {
 
   schematicCollections$: Observable<Array<SchematicCollection>>;
 
-  selectedSchematic$: Observable<Schematic | null>;
-
   schematicFilterFormControl = new FormControl();
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute) {}
+  constructor(
+    private apollo: Apollo,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
+
+  navigateToSelectedSchematic(s: { selected: boolean; value: any }) {
+    if (s.selected) {
+      this.router.navigate(
+        [
+          encodeURIComponent(s.value.collection),
+          encodeURIComponent(s.value.name)
+        ],
+        { relativeTo: this.route }
+      );
+    } else {
+      this.router.navigate(['.'], { relativeTo: this.route });
+    }
+  }
 
   ngOnInit() {
     // TODO: Remove this hack when material exposes this boolean as a public API.
     (this.schematicSelectionList.selectedOptions as any)._multiple = false;
-
-    this.selectedSchematic$ = this.schematicSelectionList.selectionChange.pipe(
-      map(change => (change.option.selected ? change.option.value : null))
-    );
 
     this.schematicCollections$ = combineLatest(
       this.schematicFilterFormControl.valueChanges.pipe(startWith('')),
@@ -76,5 +88,15 @@ export class SchematicsComponent implements OnInit {
 
   trackByName(index: number, schematic: Schematic) {
     return `${schematic.collection}:${schematic.name}`;
+  }
+
+  isSelected(collection: string, schematic: string): boolean {
+    return (
+      this.router.url.indexOf(
+        `${encodeURIComponent(
+          encodeURIComponent(collection)
+        )}/${encodeURIComponent(encodeURIComponent(schematic))}`
+      ) > -1
+    );
   }
 }

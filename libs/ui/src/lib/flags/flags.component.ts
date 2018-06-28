@@ -34,10 +34,10 @@ export class FlagsComponent {
   constructor(private readonly serializer: Serializer) {}
 
   fieldOptions(field: Field) {
-    if (field.enum) {
+    if (field.defaultValue) {
+      return field.enum;
+    } else {
       return [null, ...field.enum];
-    } else if (field.type === 'boolean') {
-      return [null, false, true];
     }
   }
 
@@ -60,7 +60,7 @@ export class FlagsComponent {
   private setForm() {
     const children = this._fields.reduce((m, f) => {
       m[f.name] = new FormControl(
-        null,
+        f.defaultValue,
         f.required ? Validators.required : null
       );
       return m;
@@ -85,7 +85,6 @@ export class FlagsComponent {
       this.configurations && value['configurations']
         ? [`--configuration=${value['configurations']}`]
         : [];
-
     this.value.next({
       commands: [
         ...this.prefix,
