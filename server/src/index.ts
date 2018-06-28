@@ -254,17 +254,22 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
         path: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
-        versions: {
-          type: new graphql.GraphQLObjectType({
-            name: 'WorkspaceVersions',
-            fields: () => {
-              return {
-                cli: {
-                  type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-                }
-              };
-            }
-          })
+        dependencies: {
+          type: new graphql.GraphQLList(
+            new graphql.GraphQLObjectType({
+              name: 'Dependencies',
+              fields: () => {
+                return {
+                  name: {
+                    type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+                  },
+                  version: {
+                    type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+                  }
+                };
+              }
+            })
+          )
         },
         addons: {
           type: new graphql.GraphQLList(addonType)
@@ -323,6 +328,26 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
   }
 );
 
+function dependencies(packageJson: any): { name: string; version: string }[] {
+  const deps = [
+    '@angular/cli',
+    '@angular/core',
+    '@angular/common',
+    '@angular/router',
+    'typescript',
+    'rxjs',
+    '@ngrx/store',
+    '@ngrx/effects',
+    '@nrwl/schematics'
+  ];
+  return Object.entries({
+    ...packageJson.devDependencies,
+    ...packageJson.dependencies
+  })
+    .filter(([name]) => deps.includes(name))
+    .map(([name, version]: [string, any]) => ({ name, version }));
+}
+
 export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
   {
     name: 'Database',
@@ -343,6 +368,14 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
                 version: '6.1.0'
               });
             }
+            if (packageJson.devDependencies['@ngrx/scheamtics']) {
+              addons.push({
+                name: '@nrwl/schematics',
+                description:
+                  'State management and side-effect management library for Angular',
+                version: '6.0.1'
+              });
+            }
             if (!files[args.path]) {
               listFiles(args.path);
             }
@@ -361,9 +394,7 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
             return {
               name: packageJson.name,
               path: args.path,
-              versions: {
-                cli: packageJson.devDependencies['@angular/cli']
-              },
+              dependencies: dependencies(packageJson),
               addons,
               schematicCollections,
               projects
@@ -376,8 +407,14 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
             return [
               {
                 name: '@nrwl/schematics',
-                description: 'Makes your CLI more awesome',
+                description: 'Enterprise-ready Angular CLI',
                 version: '6.1.0'
+              },
+              {
+                name: '@ngrx/schematics',
+                description:
+                  'State management and side-effect management library for Angular',
+                version: '6.0.1'
               }
             ];
           }

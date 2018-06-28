@@ -1,13 +1,42 @@
 <div *ngIf="workspace$|async as workspace">
-  <p>Name: {{workspace.name}}</p>
-  <p>Path: {{workspace.path}}</p>
-  <p>Cli Version: {{workspace.versions.cli}}</p>
+  <div>
+    <h2>Basic Information</h2>
+    <p>Name: {{workspace.name}}</p>
+    <p>Path: {{workspace.path}}</p>
+  </div>
 
-  <h2>Projects</h2>
-  <ul class="projects">
-    <li *ngFor="let p of workspace.projects; trackBy: trackByName">
-      {{p.name}} ({{p.root}}) {{p.projectType}}
-    </li>
-  </ul>
+  <div>
+    <h2>Workspace Actions</h2>
+    <p>No Actions Available</p>
+  </div>
+
+  <div>
+    <h2>Dependencies</h2>
+    <p>This workspace is built on top of:</p>
+    <ul>
+      <li *ngFor="let d of workspace.dependencies">
+        {{d.name}} {{d.version}}
+      </li>
+    </ul>
+  </div>
+
+  <div>
+    <h2>Projects</h2>
+    <div class="projects">
+      <div *ngFor="let p of workspace.projects; trackBy: trackByName">
+        <h3>{{p.name}}</h3>
+        <p>Root: {{p.root}}</p>
+        <p>Type: {{p.projectType}}</p>
+        <h4>Common Actions</h4>
+
+        <span *ngFor="let a of p.actions">
+          <a [routerLink]="a.link" >
+            {{a.actionDescription}}
+          </a>
+          |
+        </span>
+      </div>
+    </div>
+  </div>
 </div>
 

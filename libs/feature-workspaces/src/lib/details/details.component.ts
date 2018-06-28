@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs/operators';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
+import { Project } from '@nxui/utils';
 
 @Component({
   selector: 'nxui-details',
@@ -26,13 +27,17 @@ export class DetailsComponent implements OnInit {
               workspace(path: $path) {
                 name
                 path
-                versions {
-                  cli
+                dependencies {
+                  name
+                  version
                 }
                 projects {
                   name
                   root
                   projectType
+                  architect {
+                    name
+                  }
                 }
               }
             }
@@ -42,11 +47,54 @@ export class DetailsComponent implements OnInit {
           }
         }).valueChanges;
       }),
-      map((r: any) => r.data.workspace)
+      map((r: any) => {
+        const w = r.data.workspace;
+        const projects = w.projects.map(p => {
+          const actions = [
+            ...createLinkForTask(p, 'build', 'Build'),
+            ...createLinkForTask(p, 'test', 'Test'),
+            ...createLinkForTask(p, 'e2e', 'E2E'),
+            ...createLinkForCoreSchematic(p, 'component', 'Generate Component'),
+            ...createLinkForCoreSchematic(p, 'service', 'Generate Service')
+          ] as any[];
+          return { ...p, actions };
+        });
+        return { ...w, projects };
+      })
     );
   }
 
   trackByName(p: any) {
     return p.name;
   }
+}
+
+function createLinkForTask(
+  project: Project,
+  name: string,
+  actionDescription: string
+) {
+  if (project.architect.find(a => a.name === name)) {
+    return [{ actionDescription, link: ['../tasks', name, project.name] }];
+  } else {
+    return [];
+  }
+}
+
+function createLinkForCoreSchematic(
+  project: Project,
+  name: string,
+  actionDescription: string
+) {
+  return [
+    {
+      actionDescription,
+      link: [
+        '../generate',
+        decodeURIComponent('@schematics/angular'),
+        name,
+        { project: project.name }
+      ]
+    }
+  ];
 }

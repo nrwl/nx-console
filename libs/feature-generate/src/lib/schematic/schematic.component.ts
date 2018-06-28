@@ -42,6 +42,7 @@ export class SchematicComponent implements OnInit {
   command$: Observable<string>;
   dryRunResult$: Observable<CommandOutput>;
   commandOutput$: Observable<CommandOutput>;
+  initValues$: Observable<any>;
 
   combinedOutput$: Observable<CommandOutput>;
   @ViewChild('combinedOutput', { read: TerminalComponent })
@@ -64,6 +65,14 @@ export class SchematicComponent implements OnInit {
           collection: decodeURIComponent(p.collection),
           schematic: decodeURIComponent(p.schematic),
           path: p.path
+        };
+      })
+    );
+
+    this.initValues$ = this.route.params.pipe(
+      map(p => {
+        return {
+          project: p.project
         };
       })
     );

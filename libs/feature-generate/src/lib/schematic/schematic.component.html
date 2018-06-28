@@ -4,7 +4,7 @@
       {{schematic.collection}} {{schematic.name}} {{schematic.description}}
     </div>
     <ui-flags actionLabel="Generate" [prefix]="[schematic.name]" [fields]="schematic.schema" (value)="onFlagsChange($event)"
-              (action)="onGenerate()" (stop)="onStop()"></ui-flags>
+              (action)="onGenerate()" (stop)="onStop()" [init]="initValues$|async"></ui-flags>
   </div>
 
   <div *ngIf="!(schematic$|async)" class="ui-flags-container">
