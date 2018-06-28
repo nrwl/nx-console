@@ -1,10 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   concatMap,
+  debounceTime,
+  first,
   map,
   publishReplay,
   refCount,
   switchMap,
+  tap,
   withLatestFrom
 } from 'rxjs/operators';
 import gql from 'graphql-tag';
@@ -23,7 +26,7 @@ export class TargetComponent implements OnInit {
   project$: Observable<Project>;
   commandArray$ = new BehaviorSubject<{ commands: string[]; valid: boolean }>({
     commands: [],
-    valid: false
+    valid: true
   });
   command$: Observable<string>;
   commandOutput$: Observable<CommandOutput>;
@@ -109,6 +112,7 @@ export class TargetComponent implements OnInit {
       withLatestFrom(this.commandArray$),
       switchMap(([q, c]) => {
         this.out.clear();
+        console.log('run', c.commands);
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $runCommand: [String]!) {
@@ -135,6 +139,7 @@ export class TargetComponent implements OnInit {
   }
 
   onRun() {
+    console.log('onRun');
     this.ngRun$.next();
   }
 

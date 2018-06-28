@@ -16,6 +16,7 @@ export class FlagsComponent {
   @Input() actionLabel: string;
   @Input() configurations: { name: string }[];
   @Input() prefix: string[];
+  @Input() init: { [k: string]: any };
   @Input()
   get fields() {
     return this._fields;
@@ -59,8 +60,10 @@ export class FlagsComponent {
 
   private setForm() {
     const children = this._fields.reduce((m, f) => {
+      const value =
+        this.init && this.init[f.name] ? this.init[f.name] : f.defaultValue;
       m[f.name] = new FormControl(
-        f.defaultValue,
+        value,
         f.required ? Validators.required : null
       );
       return m;
