@@ -13,7 +13,7 @@
   </div>
 
 
-  <div *ngFor="let field of fields" style="margin: 20px;">
+  <div *ngFor="let field of fields" style="margin: 20px;" [class.error]="formGroup.hasError('required', field.name) && formGroup.get(field.name).touched">
     <span [ngClass]="{important: field.important}">
       {{ field.name }} type: {{ field.type }}, {{ field.description }}
     </span>

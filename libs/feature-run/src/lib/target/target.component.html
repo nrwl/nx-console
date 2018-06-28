@@ -1,22 +1,22 @@
-<div *ngIf="project$|async as project">
-  <div>
-    {{project.name}}
-    {{project.root}}
-    {{project.projectType}}
-  </div>
-
-  <ui-flags actionLabel="Run" [configurations]="project.architect[0].configurations" [prefix]="[project.architect[0].name, project.name]" [fields]="project.architect[0].schema" (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()"></ui-flags>
-
-  <h2>Command</h2>
-  <div>
+<div class="outer-container" fxLayout="column" fxFlex fxLayoutAlign="end">
+  <div *ngIf="project$|async as project" class="ui-flags-container">
     <div>
-      Command: <code>ng {{command$|async}}</code>
+      {{project.name}}
+      {{project.root}}
+      {{project.projectType}}
+      {{project.architect[0].name}}
+      {{project.architect[0].builder}}
+      {{project.architect[0].description}}
     </div>
+
+    <ui-flags actionLabel="Run" [configurations]="project.architect[0].configurations" [prefix]="[project.architect[0].name, project.name]" [fields]="project.architect[0].schema" (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()"></ui-flags>
   </div>
 
-  <h2>Command Run</h2>
-  <div>
-    <p>Status: {{(commandOutput$|async)?.status}}</p>
-    <ui-terminal [input]="(commandOutput$|async)?.out" #out></ui-terminal>
+  <div *ngIf="!(project$|async)" class="ui-flags-container">
+    No Target Selected
+  </div>
+
+  <div *ngIf="(project$|async)" class="ui-terminal-container">
+    <ui-terminal [command]="command$|async" [input]="(commandOutput$|async)?.out" #output></ui-terminal>
   </div>
 </div>

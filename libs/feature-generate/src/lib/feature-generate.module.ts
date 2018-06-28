@@ -25,7 +25,6 @@ export const generateRoutes: Route[] = [
 
 @NgModule({
   imports: [
-    FormsModule,
     MatIconModule,
     MatListModule,
     FlexLayoutModule,

@@ -75,14 +75,15 @@ export class SchematicsComponent implements OnInit {
       map(([schematicFilterValue, r]: [string, any]) => {
         const f = schematicFilterValue.toLowerCase();
         const collections = (r as any).data.workspace.schematicCollections;
-        return collections.map(c => {
-          const s = c.schematics
-            .filter(({ name }) => name.includes(schematicFilterValue))
-            .sort((a, b) => a.name.localeCompare(b.name));
-          return { ...c, schematics: s };
-        });
-      }),
-      filter(collections => collections.filter(c => c.schematics.length > 0))
+        return collections
+          .map(c => {
+            const s = c.schematics
+              .filter(({ name }) => name.includes(schematicFilterValue))
+              .sort((a, b) => a.name.localeCompare(b.name));
+            return { ...c, schematics: s };
+          })
+          .filter(c => c.schematics.length > 0);
+      })
     );
   }
 

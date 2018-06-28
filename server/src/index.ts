@@ -154,6 +154,9 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
         description: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
+        project: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
         builder: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
