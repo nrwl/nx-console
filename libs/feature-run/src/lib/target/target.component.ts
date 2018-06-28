@@ -27,7 +27,7 @@ export class TargetComponent implements OnInit {
   });
   command$: Observable<string>;
   commandOutput$: Observable<CommandOutput>;
-  @ViewChild('out', { read: TerminalComponent })
+  @ViewChild('output', { read: TerminalComponent })
   out: TerminalComponent;
   private ngRun$ = new Subject<any>();
 
@@ -39,17 +39,34 @@ export class TargetComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.project$ = this.route.params.pipe(
+    const targetDescription$ = this.route.params.pipe(
+      map(p => {
+        if (!p.target || !p.project) return null;
+        return {
+          target: decodeURIComponent(p.target),
+          project: decodeURIComponent(p.project),
+          path: p.path
+        };
+      })
+    );
+
+    this.project$ = targetDescription$.pipe(
       switchMap(p => {
+        if (!p) {
+          return of();
+        }
+        if (this.out) {
+          this.out.clear();
+        }
         return this.apollo.query({
           query: gql`
-            query($path: String!, $projectName: String!, $targetName: String!) {
+            query($path: String!, $project: String!, $target: String!) {
               workspace(path: $path) {
-                projects(name: $projectName) {
+                projects(name: $project) {
                   name
                   root
                   projectType
-                  architect(name: $targetName) {
+                  architect(name: $target) {
                     name
                     description
                     builder
@@ -70,11 +87,7 @@ export class TargetComponent implements OnInit {
               }
             }
           `,
-          variables: {
-            path: p['path'],
-            projectName: p['projectName'],
-            targetName: p['targetName']
-          }
+          variables: p
         });
       }),
       map((r: any) => {
@@ -92,11 +105,10 @@ export class TargetComponent implements OnInit {
       refCount()
     );
 
-    this.command$ = this.commandArray$.pipe(map(r => r.commands.join(' ')));
-
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$),
       switchMap(([q, c]) => {
+        this.out.clear();
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $runCommand: [String]!) {
@@ -116,10 +128,13 @@ export class TargetComponent implements OnInit {
       publishReplay(1),
       refCount()
     );
+
+    this.command$ = this.commandArray$.pipe(
+      map(c => `ng ${this.serializer.argsToString(c.commands)}`)
+    );
   }
 
   onRun() {
-    this.out.clear();
     this.ngRun$.next();
   }
 
@@ -128,6 +143,6 @@ export class TargetComponent implements OnInit {
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {
-    this.commandArray$.next(e);
+    setTimeout(() => this.commandArray$.next(e), 0);
   }
 }

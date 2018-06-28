@@ -28,12 +28,12 @@ export function readProjects(basedir: string, json: any): Project[] {
       name: key,
       root: value.root,
       projectType: value.projectType,
-      architect: readArchitect(basedir, value.architect)
+      architect: readArchitect(key, basedir, value.architect)
     };
   });
 }
 
-function readArchitect(basedir: string, architect: any) {
+function readArchitect(project: string, basedir: string, architect: any) {
   return Object.entries(architect).map(([key, value]: [string, any]) => {
     const [npmPackage, builderName] = value.builder.split(':');
     const configurations = value.configurations
@@ -49,6 +49,7 @@ function readArchitect(basedir: string, architect: any) {
       ...builderConfiguration,
       configurations,
       name: key,
+      project,
       builder: value.builder,
       schema
     };

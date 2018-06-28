@@ -66,7 +66,7 @@ export class FlagsComponent {
       return m;
     }, {});
     if (this.configurations && this.configurations.length > 0) {
-      children['configurations'] = new FormControl(null, Validators.required);
+      children['configurations'] = new FormControl(null);
     }
     this.formGroup = new FormGroup(children);
 

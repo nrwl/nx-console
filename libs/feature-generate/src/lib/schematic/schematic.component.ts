@@ -62,7 +62,8 @@ export class SchematicComponent implements OnInit {
         if (!p.collection || !p.schematic) return null;
         return {
           collection: decodeURIComponent(p.collection),
-          name: decodeURIComponent(p.schematic)
+          schematic: decodeURIComponent(p.schematic),
+          path: p.path
         };
       })
     );
@@ -71,6 +72,9 @@ export class SchematicComponent implements OnInit {
       switchMap(p => {
         if (!p) {
           return of();
+        }
+        if (this.out) {
+          this.out.clear();
         }
         return this.apollo.query({
           query: gql`
@@ -95,11 +99,7 @@ export class SchematicComponent implements OnInit {
               }
             }
           `,
-          variables: {
-            path: this.route.snapshot.params['path'],
-            collection: p.collection,
-            schematic: p.name
-          }
+          variables: p
         });
       }),
       map((r: any) => {

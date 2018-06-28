@@ -1,3 +1,7 @@
 .important {
   font-size: 22px;
 }
+
+.error {
+  color: red;
+}

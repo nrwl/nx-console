@@ -1,20 +1,25 @@
-<div *ngIf="projects$|async as projects">
-  <h2>Available Targets</h2>
-  <div *ngFor="let p of projects; trackBy: trackByName">
-    <h3>Project: {{p.name}}</h3>
-    <div>
-      ({{p.root}}) {{p.projectType}}
+<div fxLayout="row" class="outer-container">
+  <div fxLayout="column" class="targets-container">
+    <div class="target-filter-container" fxLayout="row" fxLayoutAlign="start center">
+      <input placeholder="Filter tasks" #targetFilter fxFlex [formControl]="targetFilterFormControl">
+      <mat-icon class="filter-icon" (click)="targetFilter.select()">filter_list</mat-icon>
     </div>
-
-    <ul>
-      <li *ngFor="let aa of p.architect; trackBy: trackByName">
-        <a [routerLink]="[aa.name, p.name]">
-          {{aa.name}}
-          {{aa.description}}
-          {{aa.builder}}
-        </a>
-      </li>
-    </ul>
-
+    <mat-selection-list class="target-list" (selectionChange)="navigateToSelectedTarget($event.option)">
+      <ng-container *ngFor="let p of (projects$|async); trackBy: trackByName">
+        <div class="collection-name">
+          <mat-divider></mat-divider>
+          <h3 matSubheader>
+            {{ p.name }}
+          </h3>
+          <div matSubheader>Type: {{p.projectType}}</div>
+          <mat-divider></mat-divider>
+        </div>
+        <mat-list-option [value]="a" role="option" *ngFor="let a of p.architect; trackBy: trackByName" [selected]="isSelected(p.name, a.name)">
+          {{a.name}}
+        </mat-list-option>
+      </ng-container>
+    </mat-selection-list>
   </div>
+
+  <router-outlet></router-outlet>
 </div>
