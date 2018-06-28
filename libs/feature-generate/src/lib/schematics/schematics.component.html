@@ -4,19 +4,20 @@
       <input placeholder="Filter schematics" #schematicFilter fxFlex [formControl]="schematicFilterFormControl">
       <mat-icon class="filter-icon" (click)="schematicFilter.select()">filter_list</mat-icon>
     </div>
-    <mat-selection-list class="schematic-list">
+    <mat-selection-list class="schematic-list" (selectionChange)="navigateToSelectedSchematic($event.option)">
       <ng-container *ngFor="let collection of (schematicCollections$ | async); trackBy: trackByName">
         <div class="collection-name">
           <mat-divider></mat-divider>
           <h3 matSubheader>{{ collection.name }}</h3>
           <mat-divider></mat-divider>
         </div>
-        <mat-list-option [value]="s" role="option" *ngFor="let s of collection.schematics; trackBy: trackByName">
+        <mat-list-option [value]="s" role="option" *ngFor="let s of collection.schematics; trackBy: trackByName" [selected]="isSelected(collection.name, s.name)">
           {{s.name}}
         </mat-list-option>
 
       </ng-container>
     </mat-selection-list>
   </div>
-  <nxui-schematic fxFlex [schematicDescription$]="selectedSchematic$"></nxui-schematic>
+
+  <router-outlet></router-outlet>
 </div>

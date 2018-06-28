@@ -3,14 +3,14 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import {
   debounceTime,
-  filter,
   map,
   publishReplay,
   refCount,
-  startWith,
   switchMap,
+  tap,
   withLatestFrom,
-  distinctUntilChanged
+  startWith,
+  filter
 } from 'rxjs/operators';
 
 import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
@@ -24,13 +24,8 @@ import { ActivatedRoute } from '@angular/router';
 import { TerminalComponent } from '@nxui/ui';
 
 const MISSING_REQUIRED_FLAGS: CommandOutput = {
-  status: 'Invalid flags',
+  status: 'success',
   out: 'Command is missing required fields'
-};
-
-const RUNNING_COMMAND: CommandOutput = {
-  status: 'Running',
-  out: 'Running...'
 };
 
 @Component({
@@ -39,8 +34,6 @@ const RUNNING_COMMAND: CommandOutput = {
   styleUrls: ['./schematic.component.css']
 })
 export class SchematicComponent implements OnInit {
-  @Input() schematicDescription$: Observable<any>;
-
   schematic$: Observable<Schematic | null>;
   commandArray$ = new BehaviorSubject<{ commands: string[]; valid: boolean }>({
     commands: [],
@@ -64,10 +57,20 @@ export class SchematicComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.schematic$ = this.schematicDescription$.pipe(
+    const schematicDescription$ = this.route.params.pipe(
+      map(p => {
+        if (!p.collection || !p.schematic) return null;
+        return {
+          collection: decodeURIComponent(p.collection),
+          name: decodeURIComponent(p.schematic)
+        };
+      })
+    );
+
+    this.schematic$ = schematicDescription$.pipe(
       switchMap(p => {
         if (!p) {
-          return of(MISSING_REQUIRED_FLAGS);
+          return of();
         }
         return this.apollo.query({
           query: gql`
@@ -112,99 +115,65 @@ export class SchematicComponent implements OnInit {
       refCount()
     );
 
-    this.command$ = this.commandArray$.pipe(map(r => r.commands.join(' ')));
-
     this.dryRunResult$ = this.commandArray$.pipe(
       debounceTime(300),
-      withLatestFrom(this.schematicDescription$),
-      switchMap(([c, schematicDescription]) => {
+      switchMap(c => {
+        this.out.clear();
         if (!c.valid) {
           return of(MISSING_REQUIRED_FLAGS);
         }
-        if (!schematicDescription) {
-          return of({
-            status: 'Invalid',
-            out: 'Please select a schematic'
-          });
-        }
-        return this.runner
-          .runCommand(
-            gql`
-              mutation($path: String!, $genCommand: [String]!) {
-                generate(path: $path, genCommand: $genCommand, dryRun: true) {
-                  command
-                }
+        return this.runner.runCommand(
+          gql`
+            mutation($path: String!, $genCommand: [String]!) {
+              generate(path: $path, genCommand: $genCommand, dryRun: true) {
+                command
               }
-            `,
-            {
-              path: this.route.snapshot.params['path'],
-              genCommand: c.commands
-            },
-            r => r.data.generate.command,
-            true
-          )
-          .pipe(startWith(RUNNING_COMMAND));
+            }
+          `,
+          {
+            path: this.route.snapshot.params['path'],
+            genCommand: c.commands
+          },
+          r => r.data.generate.command,
+          true
+        );
       }),
       publishReplay(1),
       refCount()
     );
 
     this.commandOutput$ = this.ngGen$.pipe(
-      withLatestFrom(this.commandArray$, this.schematicDescription$),
-      switchMap(([_, c, schematicDescription]) => {
-        if (!schematicDescription) {
-          return of({
-            status: 'Invalid',
-            out: 'Please select a schematic'
-          });
-        }
-        return this.runner
-          .runCommand(
-            gql`
-              mutation($path: String!, $genCommand: [String]!) {
-                generate(path: $path, genCommand: $genCommand, dryRun: false) {
-                  command
-                }
+      withLatestFrom(this.commandArray$),
+      switchMap(([_, c]) => {
+        this.out.clear();
+        return this.runner.runCommand(
+          gql`
+            mutation($path: String!, $genCommand: [String]!) {
+              generate(path: $path, genCommand: $genCommand, dryRun: false) {
+                command
               }
-            `,
-            {
-              path: this.route.snapshot.params['path'],
-              genCommand: c.commands
-            },
-            r => r.data.generate.command,
-            false
-          )
-          .pipe(startWith(RUNNING_COMMAND));
+            }
+          `,
+          {
+            path: this.route.snapshot.params['path'],
+            genCommand: c.commands
+          },
+          r => r.data.generate.command,
+          false
+        );
       }),
       publishReplay(1),
       refCount()
     );
 
-    this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$).pipe(
-      distinctUntilChanged((a, b) =>
-        Boolean(a.out === b.out && a.status === b.status)
-      ),
-      withLatestFrom(this.command$),
-      map(([output, command]) => {
-        this.out.clear();
+    this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$);
 
-        let out = `> ng generate ${command} --dry-run`;
-        let status = '';
-        if (output) {
-          out = `${out}\n\n${output.out}`;
-          status = output.status;
-        }
-
-        return {
-          out,
-          status
-        };
-      })
+    this.command$ = this.commandArray$.pipe(
+      map(c => `ng generate ${this.serializer.argsToString(c.commands)}`)
     );
   }
 
   onGenerate() {
-    this.out.clear();
     this.ngGen$.next();
   }
 
@@ -213,6 +182,6 @@ export class SchematicComponent implements OnInit {
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {
-    this.commandArray$.next(e);
+    setTimeout(() => this.commandArray$.next(e), 0);
   }
 }

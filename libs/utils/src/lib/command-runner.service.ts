@@ -6,7 +6,7 @@ import { Apollo } from 'apollo-angular';
 import { Injectable } from '@angular/core';
 
 export interface CommandOutput {
-  status: string;
+  status: 'success' | 'failure' | 'inprogress';
   out: string;
 }
 

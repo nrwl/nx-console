@@ -3,12 +3,10 @@ import {
   Component,
   ElementRef,
   Input,
-  OnInit,
-  ViewChild,
-  OnDestroy
+  OnDestroy,
+  ViewChild
 } from '@angular/core';
 import { Terminal } from 'xterm';
-import { fit } from 'xterm/lib/addons/fit/fit';
 
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -34,6 +32,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   code: ElementRef;
 
   output: string;
+
+  @Input() command: string;
 
   @Input()
   set input(s: string) {

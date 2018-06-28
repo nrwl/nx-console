@@ -20,8 +20,6 @@
   </ul>
 </div>
 
-<div *ngIf="commandOutput$|async as commandOutput">
-  <p>Status: {{commandOutput.status}}</p>
-  <pre>{{commandOutput.stdout}}</pre>
-  <pre>{{commandOutput.stderr}}</pre>
+<div class="ui-terminal-container">
+  <ui-terminal [input]="(commandOutput$|async)?.out" #output></ui-terminal>
 </div>
