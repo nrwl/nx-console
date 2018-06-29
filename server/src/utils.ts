@@ -57,3 +57,7 @@ function hasSource(prop: any): any {
   const d = prop['default'] !== undefined ? prop['default'] : prop['$default'];
   return !!d['$source'];
 }
+
+export function filterByName<T>(t: T[], args: { name?: string }): T[] {
+  return args.name ? t.filter((s: any) => s.name === args.name) : t;
+}

@@ -21,7 +21,7 @@ interface Schematic {
   }[];
 }
 
-export function readSchematics(
+export function readSchematicCollections(
   basedir: string,
   collectionName: string
 ): SchematicCollection[] {
@@ -33,11 +33,13 @@ export function readSchematics(
     packageJson.json.schematics,
     path.dirname(packageJson.path)
   );
-
   const collectionSchematics = [];
-  const ex = [] as any[];
+  let ex = [] as any[];
   if (collection.json.extends) {
-    ex.push(collection.json.extends);
+    const e = Array.isArray(collection.json.extends)
+      ? collection.json.extends
+      : [collection.json.extends];
+    ex = [...ex, ...e];
   }
 
   const schematicCollection = {
@@ -65,7 +67,7 @@ export function readSchematics(
 
   let res = [schematicCollection];
   new Set(ex).forEach(e => {
-    res = [...res, ...readSchematics(basedir, e)];
+    res = [...res, ...readSchematicCollections(basedir, e)];
   });
   return res;
 }

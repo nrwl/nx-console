@@ -2,10 +2,12 @@ import * as express from 'express';
 import * as graphql from 'graphql';
 import { spawn } from 'child_process';
 import * as path from 'path';
-import { readJsonFile } from './utils';
-import { readSchematics } from './read-schematics';
+import { filterByName, readJsonFile } from './utils';
+import { readSchematicCollections } from './read-schematic-collections';
 import { readProjects } from './read-projects';
 import * as fs from 'fs';
+import { availableAddons, readAddons } from './read-addons';
+import { readDependencies } from './read-dependencies';
 
 const graphqlHTTP = require('express-graphql');
 
@@ -131,11 +133,7 @@ export const schematicCollectionType: graphql.GraphQLObjectType = new graphql.Gr
             name: { type: graphql.GraphQLString }
           },
           resolve: (collection: any, args: any) => {
-            if (args.name) {
-              return collection.schematics.filter(s => s.name === args.name);
-            } else {
-              return collection.schematics;
-            }
+            return filterByName(collection.schematics, args);
           }
         }
       };
@@ -231,11 +229,7 @@ export const projectType: graphql.GraphQLObjectType = new graphql.GraphQLObjectT
             name: { type: graphql.GraphQLString }
           },
           resolve: (project: any, args: any) => {
-            if (args.name) {
-              return project.architect.filter(a => a.name === args.name);
-            } else {
-              return project.architect;
-            }
+            return filterByName(project.architect, args);
           }
         }
       };
@@ -280,13 +274,7 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
             name: { type: graphql.GraphQLString }
           },
           resolve: (workspace: any, args: any) => {
-            if (args.name) {
-              return workspace.schematicCollections.filter(
-                s => s.name === args.name
-              );
-            } else {
-              return workspace.schematicCollections;
-            }
+            return filterByName(workspace.schematicCollections, args);
           }
         },
         projects: {
@@ -295,11 +283,7 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
             name: { type: graphql.GraphQLString }
           },
           resolve: (workspace: any, args: any) => {
-            if (args.name) {
-              return workspace.projects.filter(s => s.name === args.name);
-            } else {
-              return workspace.projects;
-            }
+            return filterByName(workspace.projects, args);
           }
         },
         files: {
@@ -328,26 +312,6 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
   }
 );
 
-function dependencies(packageJson: any): { name: string; version: string }[] {
-  const deps = [
-    '@angular/cli',
-    '@angular/core',
-    '@angular/common',
-    '@angular/router',
-    'typescript',
-    'rxjs',
-    '@ngrx/store',
-    '@ngrx/effects',
-    '@nrwl/schematics'
-  ];
-  return Object.entries({
-    ...packageJson.devDependencies,
-    ...packageJson.dependencies
-  })
-    .filter(([name]) => deps.includes(name))
-    .map(([name, version]: [string, any]) => ({ name, version }));
-}
-
 export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
   {
     name: 'Database',
@@ -359,64 +323,41 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
             path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
           },
           resolve: (_root, args: any) => {
-            const packageJson = readJsonFile('./package.json', args.path).json;
-            const addons = [] as any[];
-            if (packageJson.devDependencies['@nrwl/schematics']) {
-              addons.push({
-                name: '@nrwl/schematics',
-                description: 'Makes your CLI more awesome',
-                version: '6.1.0'
-              });
-            }
-            if (packageJson.devDependencies['@ngrx/scheamtics']) {
-              addons.push({
-                name: '@nrwl/schematics',
-                description:
-                  'State management and side-effect management library for Angular',
-                version: '6.0.1'
-              });
-            }
-            if (!files[args.path]) {
-              listFiles(args.path);
-            }
+            try {
+              if (!files[args.path]) {
+                listFiles(args.path);
+              }
 
-            const angularJson = readJsonFile('./angular.json', args.path).json;
-            const collectionName =
-              angularJson.cli && angularJson.cli.defaultCollection
-                ? angularJson.cli.defaultCollection
-                : '@schematics/angular';
-            const schematicCollections = readSchematics(
-              args.path,
-              collectionName
-            );
-            const projects = readProjects(args.path, angularJson.projects);
+              const packageJson = readJsonFile('./package.json', args.path)
+                .json;
+              const angularJson = readJsonFile('./angular.json', args.path)
+                .json;
+              const collectionName =
+                angularJson.cli && angularJson.cli.defaultCollection
+                  ? angularJson.cli.defaultCollection
+                  : '@schematics/angular';
 
-            return {
-              name: packageJson.name,
-              path: args.path,
-              dependencies: dependencies(packageJson),
-              addons,
-              schematicCollections,
-              projects
-            };
+              return {
+                name: packageJson.name,
+                path: args.path,
+                dependencies: readDependencies(packageJson),
+                addons: readAddons(packageJson),
+                schematicCollections: readSchematicCollections(
+                  args.path,
+                  collectionName
+                ),
+                projects: readProjects(args.path, angularJson.projects)
+              };
+            } catch (e) {
+              console.log(e);
+              throw e;
+            }
           }
         },
         availableAddons: {
           type: new graphql.GraphQLList(addonType),
           resolve: () => {
-            return [
-              {
-                name: '@nrwl/schematics',
-                description: 'Enterprise-ready Angular CLI',
-                version: '6.1.0'
-              },
-              {
-                name: '@ngrx/schematics',
-                description:
-                  'State management and side-effect management library for Angular',
-                version: '6.0.1'
-              }
-            ];
+            return availableAddons();
           }
         },
         commandStatus: {
