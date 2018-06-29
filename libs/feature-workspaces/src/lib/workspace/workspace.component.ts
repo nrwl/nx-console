@@ -5,6 +5,7 @@ import { map, switchMap, filter, startWith } from 'rxjs/operators';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
 import { ROUTING_ANIMATION } from './workspace.component.animations';
+import { CommandRunner } from '@nxui/utils';
 
 interface Route {
   icon: string;
@@ -59,6 +60,7 @@ export class WorkspaceComponent {
   constructor(
     private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    readonly commandRunner: CommandRunner
   ) {}
 }

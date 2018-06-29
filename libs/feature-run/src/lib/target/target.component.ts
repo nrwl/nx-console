@@ -112,7 +112,6 @@ export class TargetComponent implements OnInit {
       withLatestFrom(this.commandArray$),
       switchMap(([q, c]) => {
         this.out.clear();
-        console.log('run', c.commands);
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $runCommand: [String]!) {

@@ -21,5 +21,5 @@
 </div>
 
 <div class="ui-terminal-container">
-  <ui-terminal [input]="(commandOutput$|async)?.out" #output></ui-terminal>
+  <ui-terminal [command]="command$|async" [input]="(commandOutput$|async)?.out" #out></ui-terminal>
 </div>

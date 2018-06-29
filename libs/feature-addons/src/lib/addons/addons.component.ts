@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import gql from 'graphql-tag';
-import { map, switchMap } from 'rxjs/operators';
+import { map, publishReplay, refCount, switchMap } from 'rxjs/operators';
 import { Apollo } from 'apollo-angular';
 import { Observable, Subject } from 'rxjs';
 import { CommandOutput, CommandRunner, Messenger } from '@nxui/utils';
+import { TerminalComponent } from '@nxui/ui';
 
 interface Addon {
   name: string;
@@ -19,7 +20,10 @@ interface Addon {
 export class AddonsComponent implements OnInit {
   addons$: Observable<any>;
   commandOutput$: Observable<CommandOutput>;
+  command$ = new Subject();
   private ngAdd$ = new Subject<Addon>();
+  @ViewChild('out', { read: TerminalComponent })
+  out: TerminalComponent;
 
   constructor(
     private apollo: Apollo,
@@ -55,11 +59,20 @@ export class AddonsComponent implements OnInit {
           }
         }).valueChanges;
       }),
-      map((r: any) => r.data)
+      map((r: any) => {
+        const d = r.data;
+        const availableAddons = d.availableAddons.filter(aa => {
+          return !d.workspace.addons.find(a => aa.name === a.name);
+        });
+        return { ...d, availableAddons };
+      }),
+      publishReplay(1),
+      refCount()
     );
 
     this.commandOutput$ = this.ngAdd$.pipe(
       switchMap(addon => {
+        this.out.clear();
         return this.commandRunner.runCommand(
           gql`
             mutation($path: String!, $name: String!, $version: String!) {
@@ -76,11 +89,14 @@ export class AddonsComponent implements OnInit {
           (res: any) => res.data.ngAdd.command,
           false
         );
-      })
+      }),
+      publishReplay(1),
+      refCount()
     );
   }
 
   ngAdd(addon: Addon) {
+    this.command$.next(`ng add ${addon.name}@${addon.version}`);
     this.ngAdd$.next(addon);
   }
 

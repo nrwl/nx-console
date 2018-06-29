@@ -5,6 +5,9 @@
       <span class="site-name">Console</span>
     </a>
     <div class="workspace-name">{{ workspaceName$ | async }} - {{ activeRouteTitle$ | async }} </div>
+    <div>
+      <span *ngIf="commandRunner.busy|async"> &nbsp;  ...Spinner Added Here...</span>
+    </div>
   </mat-toolbar>
   <div class="content" fxLayout="row" fxFlex>
     <div fxLayoutGap="4px" class="routes-side-nav" fxLayout="column" fxLayoutAlign="start center">
