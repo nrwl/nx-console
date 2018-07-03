@@ -6,7 +6,7 @@ import { filterByName, readJsonFile } from './utils';
 import * as fs from 'fs';
 import { dirSync } from 'tmp';
 import { readSchematicCollections } from './read-schematic-collections';
-import { readProjects } from './read-projects';
+import { readDescription, readProjects, readSchema } from './read-projects';
 import { availableAddons, readAddons } from './read-addons';
 import { readDependencies } from './read-dependencies';
 import { schematicCollectionsForNgNew } from './read-ngnews';
@@ -149,9 +149,6 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
         name: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
-        description: {
-          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-        },
         project: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
@@ -171,6 +168,17 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
               }
             })
           )
+        },
+        description: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString),
+          resolve: (a, _, __, i) => {
+            if (
+              !directoryExists(path.join(i.variableValues.path, 'node_modules'))
+            ) {
+              throw new Error(`node_modules is not found`);
+            }
+            return readDescription(i.variableValues.path, a.builder);
+          }
         },
         schema: {
           type: new graphql.GraphQLList(
@@ -202,7 +210,15 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
                 };
               }
             })
-          )
+          ),
+          resolve: (a, _, __, i) => {
+            if (
+              !directoryExists(path.join(i.variableValues.path, 'node_modules'))
+            ) {
+              throw new Error(`node_modules is not found`);
+            }
+            return readSchema(i.variableValues.path, a.builder);
+          }
         }
       };
     }
@@ -274,7 +290,20 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
             name: { type: graphql.GraphQLString }
           },
           resolve: (workspace: any, args: any) => {
-            return filterByName(workspace.schematicCollections, args);
+            if (!directoryExists(path.join(workspace.path, 'node_modules'))) {
+              throw new Error(`node_modules is not found`);
+            }
+
+            const angularJson = readJsonFile('./angular.json', args.path).json;
+            const collectionName =
+              angularJson.cli && angularJson.cli.defaultCollection
+                ? angularJson.cli.defaultCollection
+                : '@schematics/angular';
+
+            return filterByName(
+              readSchematicCollections(args.path, collectionName),
+              args
+            );
           }
         },
         projects: {
@@ -349,25 +378,16 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
               if (!files[args.path]) {
                 listFiles(args.path);
               }
-
               const packageJson = readJsonFile('./package.json', args.path)
                 .json;
               const angularJson = readJsonFile('./angular.json', args.path)
                 .json;
-              const collectionName =
-                angularJson.cli && angularJson.cli.defaultCollection
-                  ? angularJson.cli.defaultCollection
-                  : '@schematics/angular';
 
               return {
                 name: packageJson.name,
                 path: args.path,
                 dependencies: readDependencies(packageJson),
                 addons: readAddons(packageJson),
-                schematicCollections: readSchematicCollections(
-                  args.path,
-                  collectionName
-                ),
                 projects: readProjects(args.path, angularJson.projects)
               };
             } catch (e) {
