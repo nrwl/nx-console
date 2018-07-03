@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { map, switchMap, filter, startWith } from 'rxjs/operators';
+import { map, switchMap, filter, startWith, refCount, publishReplay } from 'rxjs/operators';
 import gql from 'graphql-tag';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { ROUTING_ANIMATION } from './workspace.component.animations';
 import { CommandRunner } from '@nxui/utils';
+import { Settings } from '@nxui/utils';
 
 interface Route {
   icon: string;
@@ -19,7 +20,7 @@ interface Route {
   styleUrls: ['./workspace.component.scss'],
   animations: [ROUTING_ANIMATION]
 })
-export class WorkspaceComponent {
+export class WorkspaceComponent implements OnInit, OnDestroy {
   activeRouteTitle$: Observable<string> = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
     map((event: NavigationEnd) => event.url),
@@ -37,7 +38,7 @@ export class WorkspaceComponent {
     { icon: 'chevron_right', url: 'tasks', title: 'Tasks' }
   ];
 
-  workspaceName$ = this.route.params.pipe(
+  workspace$ = this.route.params.pipe(
     map(m => m['path']),
     switchMap(path => {
       return this.apollo.watchQuery({
@@ -45,6 +46,7 @@ export class WorkspaceComponent {
         query: gql`
           query($path: String!) {
             workspace(path: $path) {
+              path
               name
             }
           }
@@ -54,13 +56,27 @@ export class WorkspaceComponent {
         }
       }).valueChanges;
     }),
-    map((r: any) => r.data.workspace.name)
+    map((r: any) => r.data.workspace),
+    publishReplay(1),
+    refCount()
   );
+  private subscription: Subscription;
 
   constructor(
     private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
+    private readonly settings: Settings,
     readonly commandRunner: CommandRunner
   ) {}
+
+  ngOnInit() {
+    this.subscription = this.workspace$.subscribe(w => {
+      this.settings.addRecent({name: w.name, path: w.path});
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 }
