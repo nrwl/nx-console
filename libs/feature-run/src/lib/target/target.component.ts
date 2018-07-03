@@ -138,7 +138,6 @@ export class TargetComponent implements OnInit {
   }
 
   onRun() {
-    console.log('onRun');
     this.ngRun$.next();
   }
 

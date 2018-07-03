@@ -15,7 +15,7 @@ export class WorkspacesComponent {
     private apollo: Apollo,
     private messenger: Messenger,
     private router: Router,
-    public settings: Settings,
+    public settings: Settings
   ) {}
 
   openWorkspace(path: string) {

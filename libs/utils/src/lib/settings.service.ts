@@ -18,7 +18,7 @@ export class Settings {
 
   addRecent(w: WorkspaceDescription): void {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
-    window.localStorage.setItem(key, JSON.stringify({recent: [w, ...r]}));
+    window.localStorage.setItem(key, JSON.stringify({ recent: [w, ...r] }));
   }
 
   clear(): void {

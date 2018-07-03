@@ -9,7 +9,7 @@ import { TerminalComponent } from '@nxui/ui';
 
 interface Addon {
   name: string;
-  version: string;
+  description: string;
 }
 
 @Component({
@@ -44,13 +44,11 @@ export class AddonsComponent implements OnInit {
                 addons {
                   name
                   description
-                  version
                 }
               }
               availableAddons {
                 name
                 description
-                version
               }
             }
           `,
@@ -75,16 +73,15 @@ export class AddonsComponent implements OnInit {
         this.out.clear();
         return this.commandRunner.runCommand(
           gql`
-            mutation($path: String!, $name: String!, $version: String!) {
-              ngAdd(path: $path, name: $name, version: $version) {
+            mutation($path: String!, $name: String!) {
+              ngAdd(path: $path, name: $name) {
                 command
               }
             }
           `,
           {
             path: this.route.snapshot.params['path'],
-            name: addon.name,
-            version: addon.version
+            name: addon.name
           },
           (res: any) => res.data.ngAdd.command,
           false
@@ -96,7 +93,7 @@ export class AddonsComponent implements OnInit {
   }
 
   ngAdd(addon: Addon) {
-    this.command$.next(`ng add ${addon.name}@${addon.version}`);
+    this.command$.next(`ng add ${addon.name}`);
     this.ngAdd$.next(addon);
   }
 

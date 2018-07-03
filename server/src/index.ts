@@ -3,11 +3,14 @@ import * as graphql from 'graphql';
 import { spawn } from 'child_process';
 import * as path from 'path';
 import { filterByName, readJsonFile } from './utils';
+import * as fs from 'fs';
+import { dirSync } from 'tmp';
 import { readSchematicCollections } from './read-schematic-collections';
 import { readProjects } from './read-projects';
-import * as fs from 'fs';
 import { availableAddons, readAddons } from './read-addons';
 import { readDependencies } from './read-dependencies';
+import { schematicCollectionsForNgNew } from './read-ngnews';
+import { statSync } from 'fs';
 
 const graphqlHTTP = require('express-graphql');
 
@@ -58,9 +61,6 @@ export const addonType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
         description: {
-          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-        },
-        version: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         }
       };
@@ -312,11 +312,33 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
   }
 );
 
+export const schematicCollectionForNgNewType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
+  {
+    name: 'SchematicCollectionForNgNew',
+    fields: () => {
+      return {
+        name: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        description: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        }
+      };
+    }
+  }
+);
+
 export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
   {
     name: 'Database',
     fields: () => {
       return {
+        schematicCollections: {
+          type: new graphql.GraphQLList(schematicCollectionForNgNewType),
+          resolve: () => {
+            return schematicCollectionsForNgNew();
+          }
+        },
         workspace: {
           type: new graphql.GraphQLNonNull(workspaceType),
           args: {
@@ -390,14 +412,27 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
           type: commandStartedType,
           args: {
             path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
-            name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
-            version: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
+            name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(args.path, [
-              'add',
-              `${args.name}@${args.version}`
-            ]);
+            return runCommand(args.path, ['add', args.name]);
+          }
+        },
+        ngNew: {
+          type: commandStartedType,
+          args: {
+            path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+            name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+            collection: {
+              type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+            }
+          },
+          resolve: async (_root: any, args: any) => {
+            return runCommand(
+              args.path,
+              ['new', args.name, `--collection=${args.collection}`],
+              false
+            );
           }
         },
         generate: {
@@ -448,11 +483,23 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
   }
 );
 
-function runCommand(cwd: string, cmds: string[]) {
+function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   stopAllCommands();
-
-  const ng = path.join('node_modules', '.bin', 'ng');
   const command = `ng ${cmds.join(' ')} ${Math.random()}`;
+
+  if (!directoryExists(cwd)) {
+    commands[command] = {
+      status: 'terminated',
+      out: `Invalid directory provided: ${cwd}`,
+      commandRunning: null
+    };
+
+    return { command };
+  }
+
+  const ng = localNg
+    ? path.join('node_modules', '.bin', 'ng')
+    : findClosestNg(__dirname);
   const commandRunning = spawn(ng, cmds, { cwd });
   commands[command] = {
     status: 'inprogress',
@@ -477,13 +524,22 @@ function runCommand(cwd: string, cmds: string[]) {
       commands[command].status = code === 0 ? 'success' : 'failure';
     }
   });
-
   return { command };
+}
+
+function findClosestNg(dir: string) {
+  if (directoryExists(path.join(dir, 'node_modules'))) {
+    return path.join(dir, 'node_modules', '.bin', 'ng');
+  } else {
+    return findClosestNg(path.dirname(dir));
+  }
 }
 
 function stopAllCommands() {
   Object.values(commands).forEach(v => {
-    v.commandRunning.kill();
+    if (v.commandRunning) {
+      v.commandRunning.kill();
+    }
   });
   commands = {};
 }
@@ -509,6 +565,14 @@ function listFilesRec(dirName: string): string[] {
     } catch (e) {}
   });
   return res;
+}
+
+function directoryExists(filePath: string): boolean {
+  try {
+    return statSync(filePath).isDirectory();
+  } catch (err) {
+    return false;
+  }
 }
 
 export const buildSchema: graphql.GraphQLSchema = new graphql.GraphQLSchema({
