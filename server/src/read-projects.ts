@@ -7,10 +7,10 @@ interface Project {
   projectType: string;
   architect: {
     name: string;
-    description: string;
+    description?: string;
     builder: string;
     configurations: { name: string }[];
-    schema: {
+    schema?: {
       name: string;
       type: string;
       description: string;
@@ -35,25 +35,26 @@ export function readProjects(basedir: string, json: any): Project[] {
 
 function readArchitect(project: string, basedir: string, architect: any) {
   return Object.entries(architect).map(([key, value]: [string, any]) => {
-    const [npmPackage, builderName] = value.builder.split(':');
     const configurations = value.configurations
       ? Object.keys(value.configurations).map(name => ({ name }))
       : [];
-    const builderConfiguration = readBuildersFile(basedir, npmPackage)[
-      builderName
-    ];
-    const schema = builderConfiguration.schema.filter(
-      p => !value.options[p.name]
-    );
     return {
-      ...builderConfiguration,
       configurations,
       name: key,
       project,
-      builder: value.builder,
-      schema
+      builder: value.builder
     };
   });
+}
+
+export function readDescription(basedir: string, builder: string) {
+  const [npmPackage, builderName] = builder.split(':');
+  return readBuildersFile(basedir, npmPackage)[builderName].description;
+}
+
+export function readSchema(basedir: string, builder: string) {
+  const [npmPackage, builderName] = builder.split(':');
+  return readBuildersFile(basedir, npmPackage)[builderName].schema;
 }
 
 function readBuildersFile(basedir: string, npmPackage: string) {
