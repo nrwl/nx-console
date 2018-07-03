@@ -4,16 +4,14 @@ export function readAddons(packageJson: any) {
   if (packageJson.devDependencies['@nrwl/schematics']) {
     addons.push({
       name: '@nrwl/schematics',
-      description: 'Makes your CLI more awesome',
-      version: '6.1.0'
+      description: 'Makes your CLI more awesome'
     });
   }
   if (packageJson.devDependencies['@ngrx/scheamtics']) {
     addons.push({
       name: '@nrwl/schematics',
       description:
-        'State management and side-effect management library for Angular',
-      version: '6.0.1'
+        'State management and side-effect management library for Angular'
     });
   }
 
@@ -24,14 +22,12 @@ export function availableAddons() {
   return [
     {
       name: '@nrwl/schematics',
-      description: 'Enterprise-ready Angular CLI',
-      version: '6.1.0'
+      description: 'Enterprise-ready Angular CLI'
     },
     {
       name: '@ngrx/schematics',
       description:
-        'State management and side-effect management library for Angular',
-      version: '6.0.1'
+        'State management and side-effect management library for Angular'
     }
   ];
 }

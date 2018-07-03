@@ -8,7 +8,9 @@
     "graphql": "0.13.2",
     "resolve": "1.8.1",
     "fix-path": "2.1.0",
-    "get-port": "3.2.0"
+    "get-port": "3.2.0",
+    "@angular/cli": "6.0.8",
+    "@nrwl/schematics": "6.1.0"
   },
   "devDependencies": {
     "electron": "^2.0.3",

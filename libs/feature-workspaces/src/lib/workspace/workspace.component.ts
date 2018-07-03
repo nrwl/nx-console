@@ -1,7 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { map, switchMap, filter, startWith, refCount, publishReplay } from 'rxjs/operators';
+import {
+  map,
+  switchMap,
+  filter,
+  startWith,
+  refCount,
+  publishReplay
+} from 'rxjs/operators';
 import gql from 'graphql-tag';
 import { Observable, Subscription } from 'rxjs';
 import { ROUTING_ANIMATION } from './workspace.component.animations';
@@ -72,7 +79,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription = this.workspace$.subscribe(w => {
-      this.settings.addRecent({name: w.name, path: w.path});
+      this.settings.addRecent({ name: w.name, path: w.path });
     });
   }
 

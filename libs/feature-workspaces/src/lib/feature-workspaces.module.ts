@@ -17,9 +17,13 @@ import {
 import { DetailsComponent } from './details/details.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspacesComponent } from './workspaces/workspaces.component';
+import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { UiModule } from '@nxui/ui';
 
 export const workspaceRoutes: Route[] = [
   { path: '', component: WorkspacesComponent },
+  { path: 'new', component: NewWorkspaceComponent },
   {
     path: ':path',
     component: WorkspaceComponent,
@@ -58,8 +62,15 @@ export const workspaceRoutes: Route[] = [
     RouterModule,
     FeatureAddonsModule,
     FeatureGenerateModule,
-    FeatureRunModule
+    FeatureRunModule,
+    ReactiveFormsModule,
+    UiModule
   ],
-  declarations: [WorkspacesComponent, WorkspaceComponent, DetailsComponent]
+  declarations: [
+    WorkspacesComponent,
+    WorkspaceComponent,
+    DetailsComponent,
+    NewWorkspaceComponent
+  ]
 })
 export class FeatureWorkspacesModule {}
