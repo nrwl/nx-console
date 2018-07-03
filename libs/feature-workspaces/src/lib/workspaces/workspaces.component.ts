@@ -3,7 +3,7 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 import { Router } from '@angular/router';
-import { Messenger } from '@nxui/utils';
+import { Messenger, Settings } from '@nxui/utils';
 
 @Component({
   selector: 'nxui-workspaces',
@@ -14,7 +14,8 @@ export class WorkspacesComponent {
   constructor(
     private apollo: Apollo,
     private messenger: Messenger,
-    private router: Router
+    private router: Router,
+    public settings: Settings,
   ) {}
 
   openWorkspace(path: string) {
@@ -40,5 +41,9 @@ export class WorkspacesComponent {
           this.messenger.error(e);
         }
       );
+  }
+
+  clearRecent() {
+    this.settings.clear();
   }
 }
