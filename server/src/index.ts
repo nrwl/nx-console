@@ -521,7 +521,7 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   const ng = localNg
     ? path.join('node_modules', '.bin', 'ng')
     : findClosestNg(__dirname);
-  const commandRunning = spawn(ng, cmds, { cwd, cols: 80 });
+  const commandRunning = spawn(ng, cmds, { cwd, cols: 100});
   commands[command] = {
     status: 'inprogress',
     out: '',
@@ -544,7 +544,7 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
 
 function findClosestNg(dir: string) {
   if (directoryExists(path.join(dir, 'node_modules'))) {
-    return path.join(dir, 'node_modules', '.bin', 'ng');
+    return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
   } else {
     return findClosestNg(path.dirname(dir));
   }
