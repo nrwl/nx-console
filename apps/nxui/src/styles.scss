@@ -1,4 +1,13 @@
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '~@angular/material/theming';
+@include mat-core();
+
+$primary: mat-palette($mat-blue, 700, 600, 800);
+$accent: mat-palette($mat-red);
+$warn: mat-palette($mat-red);
+
+$theme: mat-light-theme($primary, $accent, $warn);
+
+@include angular-material-theme($theme);
 
 body {
   font-family: Roboto, 'Helvetica Neue Light', 'Helvetica Neue', Helvetica,
@@ -8,12 +17,13 @@ body {
 }
 
 .outlet-container {
-  max-height: 100%;
+  position: relative;
+  height: 100%;
 }
 
 .outlet-container > :not(router-outlet) {
   position: absolute;
-  left: 56px;
+  left: 0;
   top: 0;
   bottom: 0;
   right: 0;

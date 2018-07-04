@@ -4,7 +4,8 @@ import {
   ElementRef,
   Input,
   OnDestroy,
-  ViewChild
+  ViewChild,
+  ViewEncapsulation
 } from '@angular/core';
 import { Terminal } from 'xterm';
 
@@ -14,6 +15,7 @@ import { debounceTime } from 'rxjs/operators';
 @Component({
   selector: 'ui-terminal',
   templateUrl: './terminal.component.html',
+  encapsulation: ViewEncapsulation.None,
   styleUrls: [
     'terminal.component.scss',
     '../../../../../node_modules/xterm/dist/xterm.css'

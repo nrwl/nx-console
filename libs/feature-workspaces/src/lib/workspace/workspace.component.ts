@@ -1,19 +1,27 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Apollo } from 'apollo-angular';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import {
-  map,
-  switchMap,
-  filter,
-  startWith,
-  refCount,
-  publishReplay
-} from 'rxjs/operators';
+  Component,
+  HostBinding,
+  OnDestroy,
+  ViewEncapsulation
+} from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ContextualActionBarService } from '@nxui/ui';
+import { Settings } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable, Subscription } from 'rxjs';
+import {
+  filter,
+  map,
+  publishReplay,
+  refCount,
+  shareReplay,
+  startWith,
+  switchMap,
+  withLatestFrom
+} from 'rxjs/operators';
+
 import { ROUTING_ANIMATION } from './workspace.component.animations';
-import { CommandRunner } from '@nxui/utils';
-import { Settings } from '@nxui/utils';
 
 interface Route {
   icon: string;
@@ -25,27 +33,35 @@ interface Route {
   selector: 'nxui-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   animations: [ROUTING_ANIMATION]
 })
-export class WorkspaceComponent implements OnInit, OnDestroy {
-  activeRouteTitle$: Observable<string> = this.router.events.pipe(
+export class WorkspaceComponent implements OnDestroy {
+  @HostBinding('@.disabled') animationsDisabled = false;
+
+  readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
     map((event: NavigationEnd) => event.url),
     startWith(this.router.url),
     map(
       (url: string) =>
         (this.routes as any).find(route => url.indexOf(route.url) > -1).title
-    )
+    ),
+    shareReplay(1)
   );
 
   readonly routes: Array<Route> = [
-    { icon: 'details', url: 'details', title: 'Details' },
-    { icon: 'create_new_folder', url: 'generate', title: 'Generate' },
-    { icon: 'extension', url: 'extensions', title: 'CLI Extensions' },
-    { icon: 'chevron_right', url: 'tasks', title: 'Tasks' }
+    { icon: 'details', url: 'details', title: 'View Workspace Details' },
+    { icon: 'create_new_folder', url: 'generate', title: 'Generate Code' },
+    {
+      icon: 'extension',
+      url: 'extensions',
+      title: 'Add/Remove CLI Extensions'
+    },
+    { icon: 'chevron_right', url: 'tasks', title: 'Run Tasks' }
   ];
 
-  workspace$ = this.route.params.pipe(
+  private readonly workspace$ = this.route.params.pipe(
     map(m => m['path']),
     switchMap(path => {
       return this.apollo.watchQuery({
@@ -67,23 +83,34 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     publishReplay(1),
     refCount()
   );
-  private subscription: Subscription;
+
+  private readonly workplaceSubscription = this.workspace$
+    .pipe(withLatestFrom(this.activeRouteTitle$))
+    .subscribe(([workspaceName, routeTitle]) => {
+      this.contextualActionBarService.breadcrumbs$.next([
+        { title: workspaceName.name },
+        { title: routeTitle }
+      ]);
+    });
+
+  private readonly subscription = this.workspace$.subscribe(w => {
+    this.settings.addRecent({ name: w.name, path: w.path });
+  });
 
   constructor(
     private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly settings: Settings,
-    readonly commandRunner: CommandRunner
+    private readonly contextualActionBarService: ContextualActionBarService
   ) {}
 
-  ngOnInit() {
-    this.subscription = this.workspace$.subscribe(w => {
-      this.settings.addRecent({ name: w.name, path: w.path });
-    });
+  ngOnDestroy(): void {
+    this.workplaceSubscription.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  toggleAnimations() {
+    this.animationsDisabled = !this.animationsDisabled;
   }
 }

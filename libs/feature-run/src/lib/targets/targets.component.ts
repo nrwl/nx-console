@@ -1,33 +1,107 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { combineLatest, Observable } from 'rxjs';
-import { Apollo } from 'apollo-angular';
-import { filter, map, startWith, switchMap, tap } from 'rxjs/operators';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
+import { Project } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { Builder, Project } from '@nxui/utils';
-import { FormControl } from '@angular/forms';
-import { MatSelectionList } from '@angular/material';
+import { Observable, Subject } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+
+interface Target {
+  projectName: string;
+  targetName: string;
+}
 
 @Component({
   selector: 'nxui-targets',
   templateUrl: './targets.component.html',
   styleUrls: ['./targets.component.scss']
 })
-export class TargetsComponent implements OnInit {
-  @ViewChild(MatSelectionList) targetSelectionList: MatSelectionList;
-  public projects$: Observable<Project>;
-  targetFilterFormControl = new FormControl();
+export class TargetsComponent {
+  private readonly projects$: Observable<
+    Array<Project>
+  > = this.route.params.pipe(
+    map(m => m['path']),
+    switchMap(path => {
+      return this.apollo.watchQuery({
+        pollInterval: 5000,
+        query: gql`
+          query($path: String!) {
+            workspace(path: $path) {
+              projects {
+                name
+                root
+                projectType
+                architect {
+                  name
+                  project
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          path
+        }
+      }).valueChanges;
+    }),
+    map(r => {
+      const projects = (r as any).data.workspace.projects;
+      return projects
+        .map(c => {
+          const s = [...c.architect].sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          return { ...c, architect: s };
+        })
+        .filter(p => p.architect.length > 0);
+    })
+  );
+
+  readonly taskCollections$: Observable<
+    TaskCollections<Target>
+  > = this.projects$.pipe(
+    map(projects => {
+      const collections: Array<TaskCollection<Target>> = projects.map(
+        project => ({
+          collectionName: project.name,
+          tasks: project.architect.map(builder => ({
+            taskName: builder.name,
+            task: {
+              projectName: project.name,
+              targetName: builder.name
+            },
+            contextualActions: {
+              contextTitle: `ng ${builder.name} ${project.name}`,
+              close: new Subject(),
+              actions: []
+            }
+          }))
+        })
+      );
+
+      const taskCollections: TaskCollections<Target> = {
+        selectedTask: this.getSelectedTarget(collections),
+        taskCollections: collections
+      };
+
+      return taskCollections;
+    })
+  );
 
   constructor(
-    private apollo: Apollo,
-    private route: ActivatedRoute,
-    private router: Router
+    private readonly apollo: Apollo,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
   ) {}
 
-  navigateToSelectedTarget(s: { selected: boolean; value: any }) {
-    if (s.selected) {
+  navigateToSelectedTarget(target: Target | null) {
+    if (target) {
       this.router.navigate(
-        [encodeURIComponent(s.value.name), encodeURIComponent(s.value.project)],
+        [
+          encodeURIComponent(target.targetName),
+          encodeURIComponent(target.projectName)
+        ],
         { relativeTo: this.route }
       );
     } else {
@@ -35,65 +109,25 @@ export class TargetsComponent implements OnInit {
     }
   }
 
-  ngOnInit() {
-    (this.targetSelectionList.selectedOptions as any)._multiple = false;
+  getSelectedTarget(
+    taskCollections: Array<TaskCollection<Target>>
+  ): Task<Target> | null {
+    const projectName = this.route.snapshot.params.project;
+    const targetName = this.route.snapshot.params.target;
+    if (!projectName || !targetName) {
+      return null;
+    }
 
-    this.projects$ = combineLatest(
-      this.targetFilterFormControl.valueChanges.pipe(startWith('')),
-      this.route.params.pipe(
-        map(m => m['path']),
-        switchMap(path => {
-          return this.apollo.watchQuery({
-            pollInterval: 5000,
-            query: gql`
-              query($path: String!) {
-                workspace(path: $path) {
-                  projects {
-                    name
-                    root
-                    projectType
-                    architect {
-                      name
-                      project
-                    }
-                  }
-                }
-              }
-            `,
-            variables: {
-              path
-            }
-          }).valueChanges;
-        })
+    const selectedTask = taskCollections
+      .reduce(
+        (targets, collection) => [...targets, ...collection.tasks],
+        [] as Array<Task<Target>>
       )
-    ).pipe(
-      map(([targetFilterValue, r]: [string, any]) => {
-        const f = targetFilterValue.toLowerCase();
-        const projects = r.data.workspace.projects;
-        return projects
-          .map(c => {
-            if (c.name.includes(targetFilterValue)) return c;
-            const s = c.architect
-              .filter(({ name }) => name.includes(targetFilterValue))
-              .sort((a, b) => a.name.localeCompare(b.name));
-            return { ...c, architect: s };
-          })
-          .filter(p => p.architect.length > 0);
-      })
-    );
-  }
+      .find(
+        ({ task }) =>
+          task.projectName === projectName && task.targetName === targetName
+      );
 
-  trackByName(index: number, project: Project) {
-    return project.name;
-  }
-
-  isSelected(project: string, target: string): boolean {
-    return (
-      this.router.url.indexOf(
-        `${encodeURIComponent(encodeURIComponent(target))}/${encodeURIComponent(
-          encodeURIComponent(project)
-        )}`
-      ) > -1
-    );
+    return selectedTask || null;
   }
 }

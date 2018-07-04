@@ -1,12 +1,18 @@
-.terminal-container {
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-}
+ui-terminal {
+  .terminal-container {
+    overflow: hidden;
+    max-width: 100%;
+    height: calc(100% - 44px);
+  }
 
-.command {
-  color: white;
-  background-color: black;
-  font-family: monospace;
-  padding: 3px;
+  .command {
+    color: white;
+    font-family: monospace;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+
+  .xterm-viewport {
+    overflow-y: auto !important;
+  }
 }

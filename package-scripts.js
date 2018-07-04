@@ -5,7 +5,10 @@ module.exports = {
     frontend: {
       ng: 'ng',
       build: 'ng build nxui --prod',
-      serve: 'ng serve nxui',
+      serve: {
+        default: 'ng serve nxui',
+        prod: 'ng serve nxui --prod'
+      },
       format: {
         default: 'nx format:write',
         write: 'nx format:write',
@@ -47,6 +50,9 @@ module.exports = {
     },
     dev: {
       up: npsUtils.concurrent.nps('server.up', 'frontend.serve')
+    },
+    demo: {
+      up: npsUtils.concurrent.nps('server.up', 'frontend.serve.prod')
     },
     e2e: {
       'compile': 'tsc -p apps/nxui-e2e/tsconfig.json',

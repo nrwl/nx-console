@@ -1,18 +1,50 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { Field, Serializer } from '@nxui/utils';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger
+} from '@angular/animations';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewEncapsulation
+} from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Field, Serializer } from '@nxui/utils';
 import { Subscription } from 'rxjs';
 import { startWith } from 'rxjs/operators';
+
+interface FieldGrouping {
+  type: 'important' | 'optional';
+  fields: Array<Field>;
+  expanded: boolean;
+}
 
 @Component({
   selector: 'ui-flags',
   templateUrl: './flags.component.html',
-  styleUrls: ['./flags.component.css']
+  styleUrls: ['./flags.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('fadeInOut', [
+      state('void', style({ opacity: 0 })),
+      state('*', style({ opacity: 1 })),
+      transition(`:enter`, animate(`150ms ease-in-out`)),
+      transition(`:leave`, animate(`150ms ease-in-out`))
+    ])
+  ]
 })
 export class FlagsComponent {
   private _fields: Field[];
   private subscription: Subscription;
 
+  fieldGroups: Array<FieldGrouping> = [];
+
+  @Input() description: string;
   @Input() actionLabel: string;
   @Input() configurations: { name: string }[];
   @Input() prefix: string[];
@@ -23,6 +55,7 @@ export class FlagsComponent {
   }
   set fields(f: Field[]) {
     this._fields = f;
+    this.fieldGroups = this.toFieldGroups(f);
     this.setForm();
   }
 
@@ -32,7 +65,10 @@ export class FlagsComponent {
 
   formGroup: FormGroup;
 
-  constructor(private readonly serializer: Serializer) {}
+  constructor(
+    private readonly serializer: Serializer,
+    private readonly elementRef: ElementRef
+  ) {}
 
   fieldOptions(field: Field) {
     if (field.defaultValue) {
@@ -56,6 +92,51 @@ export class FlagsComponent {
 
   onStop() {
     this.stop.next();
+  }
+
+  clearFormField(f: Field) {
+    const formControl = this.formGroup.get(f.name);
+    if (formControl) {
+      formControl.reset();
+    }
+  }
+
+  toggleBooleanField(f: Field) {
+    const formControl = this.formGroup.get(f.name);
+    if (formControl) {
+      formControl.setValue(!formControl.value);
+    }
+  }
+
+  private toFieldGroups(fields: Array<Field>): Array<FieldGrouping> {
+    const importantFields: FieldGrouping = {
+      type: 'important',
+      fields: fields.filter(f => f.important),
+      expanded: true
+    };
+
+    const optionalFields: FieldGrouping = {
+      type: 'optional',
+      fields: fields.filter(f => !f.important),
+      expanded: false
+    };
+
+    if (importantFields.fields.length) {
+      const groupings: Array<FieldGrouping> = [importantFields];
+
+      if (optionalFields.fields.length) {
+        groupings.push(optionalFields);
+      }
+
+      return groupings;
+    } else {
+      return [
+        {
+          ...importantFields,
+          fields
+        }
+      ];
+    }
   }
 
   private setForm() {
@@ -95,6 +176,10 @@ export class FlagsComponent {
         ...this.serializer.serializeArgs(value, this._fields)
       ],
       valid: this.formGroup.valid
+    });
+    (this.elementRef.nativeElement as HTMLElement).scrollTo({
+      top: 0,
+      behavior: 'instant'
     });
   }
 }

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { ContextualActionBarService } from '@nxui/ui';
+import { Messenger, Settings } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-
-import { Router } from '@angular/router';
-import { Messenger, Settings } from '@nxui/utils';
 
 @Component({
   selector: 'nxui-workspaces',
@@ -12,11 +12,16 @@ import { Messenger, Settings } from '@nxui/utils';
 })
 export class WorkspacesComponent {
   constructor(
-    private apollo: Apollo,
-    private messenger: Messenger,
-    private router: Router,
-    public settings: Settings
-  ) {}
+    private readonly apollo: Apollo,
+    private readonly messenger: Messenger,
+    private readonly router: Router,
+    public readonly settings: Settings,
+    private readonly contextualActionBarService: ContextualActionBarService
+  ) {
+    contextualActionBarService.breadcrumbs$.next([
+      { title: 'Choose A Workspace' }
+    ]);
+  }
 
   openWorkspace(path: string) {
     // this query is just a smoke check

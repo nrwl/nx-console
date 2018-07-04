@@ -1,8 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ContextualActionBarService, TerminalComponent } from '@nxui/ui';
+import { CommandOutput, CommandRunner, Project, Serializer } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import {
-  concatMap,
-  debounceTime,
-  first,
   map,
   publishReplay,
   refCount,
@@ -10,12 +13,6 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import gql from 'graphql-tag';
-import { BehaviorSubject, combineLatest, Observable, of, Subject } from 'rxjs';
-import { CommandOutput, CommandRunner, Project, Serializer } from '@nxui/utils';
-import { Apollo } from 'apollo-angular';
-import { ActivatedRoute } from '@angular/router';
-import { TerminalComponent } from '@nxui/ui';
 
 @Component({
   selector: 'nxui-target',
@@ -32,13 +29,15 @@ export class TargetComponent implements OnInit {
   commandOutput$: Observable<CommandOutput>;
   @ViewChild('output', { read: TerminalComponent })
   out: TerminalComponent;
-  private ngRun$ = new Subject<any>();
+  private readonly ngRun$ = new Subject<any>();
+  private readonly ngRunDisabled$ = new BehaviorSubject(true);
 
   constructor(
-    private apollo: Apollo,
-    private route: ActivatedRoute,
-    private runner: CommandRunner,
-    private serializer: Serializer
+    private readonly apollo: Apollo,
+    private readonly route: ActivatedRoute,
+    private readonly runner: CommandRunner,
+    private readonly serializer: Serializer,
+    private readonly contextActionService: ContextualActionBarService
   ) {}
 
   ngOnInit() {
@@ -104,6 +103,27 @@ export class TargetComponent implements OnInit {
           architect
         };
       }),
+      tap((project: Project) => {
+        let contextTitle =
+          project.architect[0].description ||
+          `${project.architect[0].name} - ${project.architect[0].builder}`;
+
+        if (contextTitle.endsWith('.')) {
+          contextTitle = contextTitle.slice(0, contextTitle.length - 1);
+        }
+
+        this.contextActionService.contextualActions$.next({
+          contextTitle,
+          actions: [
+            {
+              icon: 'play_arrow',
+              invoke: this.ngRun$,
+              disabled: this.ngRunDisabled$,
+              name: 'Run command'
+            }
+          ]
+        });
+      }),
       publishReplay(1),
       refCount()
     );
@@ -147,5 +167,6 @@ export class TargetComponent implements OnInit {
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {
     setTimeout(() => this.commandArray$.next(e), 0);
+    this.ngRunDisabled$.next(!e.valid);
   }
 }

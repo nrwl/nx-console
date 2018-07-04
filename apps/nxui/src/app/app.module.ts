@@ -1,18 +1,19 @@
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
-
-import { MatIconModule, MatIconRegistry } from '@angular/material';
-import { AppComponent } from './app.component';
-import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
-import { Apollo, ApolloModule } from 'apollo-angular';
-import { InMemoryCache } from 'apollo-cache-inmemory';
 import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { MatIconModule, MatIconRegistry } from '@angular/material';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import {
   FeatureWorkspacesModule,
   workspaceRoutes
 } from '@nxui/feature-workspaces';
-import { BrowserModule } from '@angular/platform-browser';
+import { UiModule } from '@nxui/ui';
+import { Apollo, ApolloModule } from 'apollo-angular';
+import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+
+import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -24,6 +25,7 @@ import { BrowserModule } from '@angular/platform-browser';
     HttpLinkModule,
     HttpClientModule,
     FeatureWorkspacesModule,
+    UiModule,
     RouterModule.forRoot(
       [
         { path: '', pathMatch: 'full', redirectTo: '/workspaces' },

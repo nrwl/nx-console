@@ -1,6 +1,15 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ContextualActionBarService, TerminalComponent } from '@nxui/ui';
+import {
+  CommandOutput,
+  CommandRunner,
+  Schematic,
+  Serializer
+} from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
+import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
 import {
   debounceTime,
   map,
@@ -8,20 +17,8 @@ import {
   refCount,
   switchMap,
   tap,
-  withLatestFrom,
-  startWith,
-  filter
+  withLatestFrom
 } from 'rxjs/operators';
-
-import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
-import {
-  CommandOutput,
-  CommandRunner,
-  Schematic,
-  Serializer
-} from '@nxui/utils';
-import { ActivatedRoute } from '@angular/router';
-import { TerminalComponent } from '@nxui/ui';
 
 const MISSING_REQUIRED_FLAGS: CommandOutput = {
   status: 'success',
@@ -31,7 +28,7 @@ const MISSING_REQUIRED_FLAGS: CommandOutput = {
 @Component({
   selector: 'nxui-schematic',
   templateUrl: './schematic.component.html',
-  styleUrls: ['./schematic.component.css']
+  styleUrls: ['./schematic.component.scss']
 })
 export class SchematicComponent implements OnInit {
   schematic$: Observable<Schematic | null>;
@@ -48,13 +45,16 @@ export class SchematicComponent implements OnInit {
   @ViewChild('combinedOutput', { read: TerminalComponent })
   out: TerminalComponent;
 
-  private ngGen$ = new Subject<void>();
+  private readonly ngGen$ = new Subject<void>();
+  private readonly ngGenDisabled$ = new BehaviorSubject(true);
 
   constructor(
     private readonly apollo: Apollo,
     private readonly runner: CommandRunner,
     private readonly route: ActivatedRoute,
-    private readonly serializer: Serializer
+    private readonly serializer: Serializer,
+    private readonly elementRef: ElementRef,
+    private readonly contextActionService: ContextualActionBarService
   ) {}
 
   ngOnInit() {
@@ -120,6 +120,37 @@ export class SchematicComponent implements OnInit {
 
         return this.serializer.normalizeSchematic(schematic);
       }),
+      tap((schematic: Schematic) => {
+        const uiFlags = (this.elementRef
+          .nativeElement as HTMLElement).querySelector('.ui-flags-container');
+
+        let contextTitle =
+          schematic.description ||
+          `${schematic.collection} - ${schematic.name}`;
+
+        if (contextTitle.endsWith('.')) {
+          contextTitle = contextTitle.slice(0, contextTitle.length - 1);
+        }
+
+        this.contextActionService.contextualActions$.next({
+          contextTitle,
+          actions: [
+            {
+              icon: 'play_arrow',
+              invoke: this.ngGen$,
+              disabled: this.ngGenDisabled$,
+              name: 'Run generate command'
+            }
+          ]
+        });
+
+        if (uiFlags) {
+          uiFlags.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        }
+      }),
       publishReplay(1),
       refCount()
     );
@@ -177,20 +208,22 @@ export class SchematicComponent implements OnInit {
 
     this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$);
 
-    this.command$ = this.commandArray$.pipe(
-      map(c => `ng generate ${this.serializer.argsToString(c.commands)}`)
+    this.command$ = merge(
+      this.dryRunResult$.pipe(
+        withLatestFrom(this.commandArray$),
+        map(([_, commandArray]) => [...commandArray.commands, '--dry-run'])
+      ),
+      this.commandOutput$.pipe(
+        withLatestFrom(this.commandArray$),
+        map(([_, commandArray]) => commandArray.commands)
+      )
+    ).pipe(
+      map(commands => `ng generate ${this.serializer.argsToString(commands)}`)
     );
   }
 
-  onGenerate() {
-    this.ngGen$.next();
-  }
-
-  onStop() {
-    this.runner.stopAllCommands();
-  }
-
   onFlagsChange(e: { commands: string[]; valid: boolean }) {
-    setTimeout(() => this.commandArray$.next(e), 0);
+    this.commandArray$.next(e);
+    this.ngGenDisabled$.next(!e.valid);
   }
 }
