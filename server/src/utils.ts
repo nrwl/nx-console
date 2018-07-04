@@ -16,7 +16,7 @@ export function normalizeSchema(p: {
   properties: { [k: string]: any };
   required: string[];
 }): any[] {
-  const res = [];
+  const res = [] as any[];
   Object.entries(p.properties).forEach(([k, v]: [string, any]) => {
     if (v.visible === undefined || v.visible) {
       const d = getDefault(v);
