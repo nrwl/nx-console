@@ -1,6 +1,5 @@
 import * as express from 'express';
 import * as graphql from 'graphql';
-import { spawn } from 'child_process';
 import * as path from 'path';
 import { filterByName, readJsonFile } from './utils';
 import * as fs from 'fs';
@@ -11,6 +10,7 @@ import { availableAddons, readAddons } from './read-addons';
 import { readDependencies } from './read-dependencies';
 import { schematicCollectionsForNgNew } from './read-ngnews';
 import { statSync } from 'fs';
+import { spawn } from 'pty.js';
 
 const graphqlHTTP = require('express-graphql');
 
@@ -289,19 +289,20 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
           args: {
             name: { type: graphql.GraphQLString }
           },
-          resolve: (workspace: any, args: any) => {
-            if (!directoryExists(path.join(workspace.path, 'node_modules'))) {
+          resolve: (workspace: any, args: any, _: any, i: any) => {
+            const p = i.variableValues.path;
+            if (!directoryExists(path.join(p, 'node_modules'))) {
               throw new Error(`node_modules is not found`);
             }
 
-            const angularJson = readJsonFile('./angular.json', args.path).json;
+            const angularJson = readJsonFile('./angular.json', p).json;
             const collectionName =
               angularJson.cli && angularJson.cli.defaultCollection
                 ? angularJson.cli.defaultCollection
                 : '@schematics/angular';
 
             return filterByName(
-              readSchematicCollections(args.path, collectionName),
+              readSchematicCollections(p, collectionName),
               args
             );
           }
@@ -520,20 +521,14 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   const ng = localNg
     ? path.join('node_modules', '.bin', 'ng')
     : findClosestNg(__dirname);
-  const commandRunning = spawn(ng, cmds, { cwd });
+  const commandRunning = spawn(ng, cmds, { cwd, cols: 80 });
   commands[command] = {
     status: 'inprogress',
     out: '',
     commandRunning
   };
 
-  commandRunning.stdout.on('data', data => {
-    if (commands[command]) {
-      commands[command].out += data.toString();
-    }
-  });
-
-  commandRunning.stderr.on('data', data => {
+  commandRunning.on('data', data => {
     if (commands[command]) {
       commands[command].out += data.toString();
     }
