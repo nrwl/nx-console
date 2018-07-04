@@ -12,14 +12,13 @@ fixPath();
 
 function createWindow() {
   win = new BrowserWindow({ width: 1400, height: 1200 });
-  // win.webContents.openDevTools();
 
   getPort({port: 7777}).then(port => {
     startServer(port).then(() => {
       if (fileExists(path.join(process.cwd(), 'angular.json'))) {
         win.loadURL(`http://localhost:${port}/workspaces/${encodeURIComponent(process.cwd())}/details`);
       } else {
-        win.loadURL('http://localhost:${port}');
+        win.loadURL(`http://localhost:${port}`);
       }
     });
   });

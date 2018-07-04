@@ -10,7 +10,9 @@
     "fix-path": "2.1.0",
     "get-port": "3.2.0",
     "@angular/cli": "6.0.8",
-    "@nrwl/schematics": "6.1.0"
+    "@nrwl/schematics": "6.1.0",
+    "@ngrx/schematics": "6.0.1",
+    "pty.js": "0.3.1"
   },
   "devDependencies": {
     "electron": "^2.0.3",

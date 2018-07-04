@@ -521,7 +521,7 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   const ng = localNg
     ? path.join('node_modules', '.bin', 'ng')
     : findClosestNg(__dirname);
-  const commandRunning = spawn(ng, cmds, { cwd, cols: 100});
+  const commandRunning = spawn(ng, cmds, { cwd, cols: 100 });
   commands[command] = {
     status: 'inprogress',
     out: '',

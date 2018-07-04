@@ -232,6 +232,10 @@
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@ngrx/schematics/-/schematics-5.2.0.tgz#ab7180d79f0ec68bd4ac3ef4ec83b9348d18d26c"
 
+"@ngrx/schematics@6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@ngrx/schematics/-/schematics-6.0.1.tgz#f6ff797faf1f46d5cdb980719d97b9991cca515f"
+
 "@ngtools/json-schema@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@ngtools/json-schema/-/json-schema-1.1.0.tgz#c3a0c544d62392acc2813a42c8a0dc6f58f86922"
