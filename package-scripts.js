@@ -39,10 +39,11 @@ module.exports = {
       'inner-package-mac': 'electron-packager dist/electron --overwrite --platform=darwin --arch=x64 --icon=dist/electron/assets/icons/mac/icon.icns --prune=true --out=dist/release-builds',
       'inner-installer-mac': 'electron-installer-dmg dist/release-builds/AngularConsole-darwin-x64/AngularConsole.app AngularConsole --out=dist --overwrite --icon=dist/electron/assets/icons/mac/icon.icns',
 
-      'inner-package-win': 'electron-packager dist/electron AngularConsole --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/electron/assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\'Angular Console\'',
-      'inner-package-linux': 'electron-packager dist/electron AngularConsole --overwrite --asar=true --platform=linux --arch=x64 --icon=dist/electron/assets/icons/png/icon.png --prune=true --out=release-builds',
+      'inner-package-win': 'electron-packager dist/electron AngularConsole --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/electron/assets/icons/win/icon.ico --prune=true --out=--out=dist/release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\'Angular Console\'',
+      'inner-package-linux': 'electron-packager dist/electron AngularConsole --overwrite --asar=true --platform=linux --arch=x64 --icon=dist/electron/assets/icons/png/icon.png --prune=true --out=--out=dist/release-builds',
 
-      'package-mac': npsUtils.series.nps('electron.prepackage', 'electron.inner-package-mac', 'electron.inner-installer-mac')
+      'package-mac': npsUtils.series.nps('electron.prepackage', 'electron.inner-package-mac', 'electron.inner-installer-mac'),
+      'package-linux': npsUtils.series.nps('electron.prepackage', 'electron.inner-package-linux')
     },
     dev: {
       up: npsUtils.concurrent.nps('server.up', 'frontend.serve')
