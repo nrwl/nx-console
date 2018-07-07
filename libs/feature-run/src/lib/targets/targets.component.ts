@@ -46,7 +46,7 @@ export class TargetsComponent {
       }).valueChanges;
     }),
     map(r => {
-      const projects = (r as any).data.workspace.projects;
+      const projects: Array<Project> = (r as any).data.workspace.projects;
       return projects
         .map(c => {
           const s = [...c.architect].sort((a, b) =>

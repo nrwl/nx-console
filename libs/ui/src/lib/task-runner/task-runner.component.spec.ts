@@ -6,13 +6,11 @@ describe('TaskRunnerComponent', () => {
   let component: TaskRunnerComponent;
   let fixture: ComponentFixture<TaskRunnerComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [TaskRunnerComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [TaskRunnerComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TaskRunnerComponent);

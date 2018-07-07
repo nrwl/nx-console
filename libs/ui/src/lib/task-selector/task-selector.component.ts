@@ -60,7 +60,7 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   @Input() taskCollections$: Observable<TaskCollections<T>>;
   @Input() filterPlaceholder: string;
 
-  @Output() selectionChange = new EventEmitter<T | null>();
+  @Output() readonly selectionChange = new EventEmitter<T | null>();
 
   taskFilterFormControl = new FormControl();
   filteredTaskCollections$: Observable<TaskCollections<T>>;
@@ -110,11 +110,11 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
     this.contextActionCloseSubscription.unsubscribe();
   }
 
-  trackByCollectionName(index: number, taskCollection: TaskCollection<T>) {
+  trackByCollectionName(_: number, taskCollection: TaskCollection<T>) {
     return taskCollection.collectionName;
   }
 
-  trackByTaskName(index: number, task: Task<T>) {
+  trackByTaskName(_: number, task: Task<T>) {
     return task.taskName;
   }
 

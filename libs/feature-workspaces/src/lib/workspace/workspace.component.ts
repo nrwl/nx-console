@@ -9,7 +9,7 @@ import { ContextualActionBarService } from '@nxui/ui';
 import { Settings } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   filter,
   map,
@@ -43,10 +43,10 @@ export class WorkspaceComponent implements OnDestroy {
     filter(event => event instanceof NavigationEnd),
     map((event: NavigationEnd) => event.url),
     startWith(this.router.url),
-    map(
-      (url: string) =>
-        (this.routes as any).find(route => url.indexOf(route.url) > -1).title
-    ),
+    map((url: string) => {
+      const route = this.routes.find(r => url.indexOf(r.url) > -1);
+      return route ? route.title : '';
+    }),
     shareReplay(1)
   );
 

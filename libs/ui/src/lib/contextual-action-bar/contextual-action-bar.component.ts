@@ -1,5 +1,3 @@
-import { Component, OnInit } from '@angular/core';
-import { ContextualActionBarService } from './contextual-action-bar.service';
 import {
   animate,
   state,
@@ -7,6 +5,9 @@ import {
   transition,
   trigger
 } from '@angular/animations';
+import { Component } from '@angular/core';
+
+import { ContextualActionBarService } from './contextual-action-bar.service';
 
 @Component({
   selector: 'ui-contextual-action-bar',

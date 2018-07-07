@@ -11,8 +11,7 @@ xdescribe('Regular CLI', () => {
 
     cy.contains('Name: proj');
 
-    cy
-      .get('ul.projects')
+    cy.get('ul.projects')
       .find('li')
       .should($p => {
         expect($p.length).to.equal(2);
@@ -27,16 +26,14 @@ xdescribe('Regular CLI', () => {
     cy.get('button#go-to-generate').click();
 
     cy.get('mat-selection-list.task-list').within(() => {
-      cy
-        .root()
+      cy.root()
         .find('div.collection-name')
         .should($p => {
           expect($p.length).to.equal(1);
           expect(texts($p)[0]).to.contain('@schematics/angular');
         });
 
-      cy
-        .root()
+      cy.root()
         .find('mat-list-option')
         .should($p => {
           const serviceSchematic = els($p).filter(

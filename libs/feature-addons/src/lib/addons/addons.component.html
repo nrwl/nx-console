@@ -2,16 +2,14 @@
   <h2>Installed Addons</h2>
   <ul>
     <li *ngFor="let a of addons.workspace.addons; trackBy: trackByName">
-      {{a.name}}
-      {{a.description}}
+      {{ a.name }} {{ a.description }}
     </li>
   </ul>
 
   <h2>Available Addons</h2>
   <ul>
     <li *ngFor="let a of addons.availableAddons; trackBy: trackByName">
-      {{a.name}}
-      {{a.description}}
+      {{ a.name }} {{ a.description }}
 
       <button (click)="ngAdd(a)">Add</button>
     </li>

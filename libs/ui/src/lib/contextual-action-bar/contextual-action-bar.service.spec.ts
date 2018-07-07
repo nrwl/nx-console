@@ -9,13 +9,10 @@ describe('ContextualActionBarService', () => {
     });
   });
 
-  it(
-    'should be created',
-    inject(
-      [ContextualActionBarService],
-      (service: ContextualActionBarService) => {
-        expect(service).toBeTruthy();
-      }
-    )
-  );
+  it('should be created', inject(
+    [ContextualActionBarService],
+    (service: ContextualActionBarService) => {
+      expect(service).toBeTruthy();
+    }
+  ));
 });

@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import gql from 'graphql-tag';
-import { map, publishReplay, refCount, switchMap } from 'rxjs/operators';
-import { Apollo } from 'apollo-angular';
-import { Observable, Subject } from 'rxjs';
-import { CommandOutput, CommandRunner, Messenger } from '@nxui/utils';
 import { TerminalComponent } from '@nxui/ui';
+import { CommandOutput, CommandRunner } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
+import { Observable, Subject } from 'rxjs';
+import { map, publishReplay, refCount, switchMap } from 'rxjs/operators';
 
 interface Addon {
   name: string;
@@ -28,8 +28,7 @@ export class AddonsComponent implements OnInit {
   constructor(
     private apollo: Apollo,
     private route: ActivatedRoute,
-    private commandRunner: CommandRunner,
-    private messenger: Messenger
+    private commandRunner: CommandRunner
   ) {}
 
   ngOnInit() {
@@ -59,8 +58,8 @@ export class AddonsComponent implements OnInit {
       }),
       map((r: any) => {
         const d = r.data;
-        const availableAddons = d.availableAddons.filter(aa => {
-          return !d.workspace.addons.find(a => aa.name === a.name);
+        const availableAddons = d.availableAddons.filter((aa: any) => {
+          return !d.workspace.addons.find((a: any) => aa.name === a.name);
         });
         return { ...d, availableAddons };
       }),
@@ -97,7 +96,7 @@ export class AddonsComponent implements OnInit {
     this.ngAdd$.next(addon);
   }
 
-  trackByName(index: number, addon: Addon) {
+  trackByName(_: number, addon: Addon) {
     return addon.name;
   }
 }

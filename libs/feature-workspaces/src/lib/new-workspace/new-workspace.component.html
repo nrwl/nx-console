@@ -2,16 +2,18 @@
   <ng-container *ngIf="ngNewForm$|async as form">
     <form [formGroup]="form">
       <div [class.error]="form.hasError('required', 'name') && form.get('name')?.touched">
-        Name: <input formControlName="name" required>
+        Name:
+        <input formControlName="name" required>
       </div>
 
       <div [class.error]="form.hasError('required', 'path') && form.get('path')?.touched">
-        Path: <input formControlName="path" required>
+        Path:
+        <input formControlName="path" required>
       </div>
 
       <div *ngFor="let n of schematicCollectionsForNgNew; trackBy: trackByName">
-        <input type="radio" [value]="n.name" name="collection" formControlName="collection"> {{n.name}}
-        <p>{{n.description}}</p>
+        <input type="radio" [value]="n.name" name="collection" formControlName="collection"> {{ n.name }}
+        <p>{{ n.description }}</p>
       </div>
       <button [disabled]="form.invalid" (click)="createNewWorkspace(form.value)">Create New Workspace</button>
     </form>
