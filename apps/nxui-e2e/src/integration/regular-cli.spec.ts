@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-describe('Regular CLI', () => {
+xdescribe('Regular CLI', () => {
   beforeEach(() => {
     cy.visit('/workspaces');
   });
@@ -26,7 +26,7 @@ describe('Regular CLI', () => {
     cy.get('button').click();
     cy.get('button#go-to-generate').click();
 
-    cy.get('mat-selection-list.schematic-list').within(() => {
+    cy.get('mat-selection-list.task-list').within(() => {
       cy
         .root()
         .find('div.collection-name')

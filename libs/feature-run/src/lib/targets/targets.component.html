@@ -1,25 +1,3 @@
-<div fxLayout="row" class="outer-container">
-  <div fxLayout="column" class="targets-container">
-    <div class="target-filter-container" fxLayout="row" fxLayoutAlign="start center">
-      <input placeholder="Filter tasks" #targetFilter fxFlex [formControl]="targetFilterFormControl">
-      <mat-icon class="filter-icon" (click)="targetFilter.select()">filter_list</mat-icon>
-    </div>
-    <mat-selection-list class="target-list" (selectionChange)="navigateToSelectedTarget($event.option)">
-      <ng-container *ngFor="let p of (projects$|async); trackBy: trackByName">
-        <div class="collection-name">
-          <mat-divider></mat-divider>
-          <h3 matSubheader>
-            {{ p.name }}
-          </h3>
-          <div matSubheader>Type: {{p.projectType}}</div>
-          <mat-divider></mat-divider>
-        </div>
-        <mat-list-option [value]="a" role="option" *ngFor="let a of p.architect; trackBy: trackByName" [selected]="isSelected(p.name, a.name)">
-          {{a.name}}
-        </mat-list-option>
-      </ng-container>
-    </mat-selection-list>
-  </div>
-
+<ui-task-selector [taskCollections$]="taskCollections$" [filterPlaceholder]="'Filter targets'" (selectionChange)="navigateToSelectedTarget($event)">
   <router-outlet></router-outlet>
-</div>
+</ui-task-selector>

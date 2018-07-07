@@ -1,49 +1,76 @@
 <form [formGroup]="formGroup">
-  <div *ngIf="configurations && configurations.length > 0">
-    Configuration
-    <select formControlName="configurations" name="configurations">
-      <option [ngValue]="null">
-        default
-      </option>
-      <option *ngFor="let config of configurations" [ngValue]="config.name">
-        {{config.name}}
-      </option>
-    </select>
-    <hr>
+  <div class="headline-container" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="configurations && configurations.length > 0">
+    <div class="headline">
+      Configuration
+    </div>
+    <mat-radio-group class="configuration-container" formControlName="configurations" name="configurations" fxLayout="row" fxLayoutGap="16px">
+      <mat-radio-button [value]="null">Default</mat-radio-button>
+      <mat-radio-button *ngFor="let config of configurations" [value]="config.name">{{ config.name | titlecase}}</mat-radio-button>
+    </mat-radio-group>
   </div>
 
+  <mat-divider></mat-divider>
 
-  <div *ngFor="let field of fields" style="margin: 20px;" [class.error]="formGroup.hasError('required', field.name) && formGroup.get(field.name)?.touched">
-    <span [ngClass]="{important: field.important}">
-      {{ field.name }} type: {{ field.type }}, {{ field.description }}
-    </span>
+  <mat-accordion [multi]="true" displayMode="flat">
+    <mat-expansion-panel *ngFor="let fieldGroup of fieldGroups" [expanded]="fieldGroup.expanded">
+      <mat-expansion-panel-header>
+        <mat-panel-title *ngIf="fieldGroups.length > 1" [ngSwitch]="fieldGroup.type">
+          <ng-container *ngSwitchCase="'important'">Important fields</ng-container>
+          <ng-container *ngSwitchCase="'optional'">Optional fields</ng-container>
+        </mat-panel-title>
+        <mat-panel-title *ngIf="fieldGroups.length === 1">
+          Fields
+        </mat-panel-title>
+      </mat-expansion-panel-header>
 
-    <span *ngIf="field.type === 'boolean'">
-      <mat-slide-toggle [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">(default: {{ field.defaultValue }})</mat-slide-toggle>
-    </span>
+      <div class="field" *ngFor="let field of fieldGroup.fields" [class.error]="formGroup.hasError('required', field.name) && formGroup.get(field.name).touched"
+        fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.enum]="field.enum" [class.text]="!field.enum && field.type !== 'boolean'">
+        <ng-container *ngIf="field.type === 'boolean'">
+          <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
+          <div fxFlex class="boolean-field-container" fxLayout="row" fxLayoutAlign="space-between center">
+            <div class="boolean-ripple" mat-ripple (click)="toggleBooleanField(field)"></div>
+            <span [class.on]="toggle.checked">{{ field.name }} {{ field.required ? '*' : '' }}</span>
+            <mat-slide-toggle #toggle color="primary" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name"></mat-slide-toggle>
+            <span class="boolean-field-hint field-hint">
+              {{ field.description }}
+              <ng-container *ngIf="field.required">Required. </ng-container>
+              <ng-container *ngIf="field.defaultValue !== null">(Default: {{ field.defaultValue ? 'true' : 'false' }})</ng-container>
+            </span>
+          </div>
+        </ng-container>
 
-    <span *ngIf="field.enum">
-      <select [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">
-        <option *ngFor="let value of fieldOptions(field)" [ngValue]="value">
-          {{ fieldOption(value) }}
-        </option>
-      </select>
-      <span *ngIf="field.defaultValue">
-        (default: {{ field.defaultValue }})
-      </span>
-    </span>
-    <span *ngIf="!field.enum && field.type !== 'boolean'">
-      <input type="text" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">
-      <span *ngIf="field.defaultValue">
-        (default: {{ field.defaultValue }})
-      </span>
-    </span>
-    <span *ngIf="field.required">
-      *
-    </span>
-  </div>
+        <ng-container *ngIf="field.enum">
+          <mat-icon>arrow_drop_down_circle</mat-icon>
+          <mat-form-field fxFlex>
+            <mat-select [formControlName]="field.name" [required]="field.required" [attr.name]="field.name" [placeholder]="field.name">
+              <mat-option *ngFor="let value of fieldOptions(field)" [value]="value">
+                {{ fieldOption(value) }}
+              </mat-option>
+            </mat-select>
+            <span class="select-field-hint field-hint">
+              {{ field.description }}
+              <ng-container *ngIf="field.required">Required. </ng-container>
+              <ng-container *ngIf="field.defaultValue !== null">(Default: {{ field.defaultValue }})</ng-container>
+            </span>
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngIf="!field.enum && field.type !== 'boolean'">
+          <mat-icon>create</mat-icon>
+          <div fxLayout="column" fxFlex>
+            <mat-form-field>
+              <input #input fxFlex type="text" matInput [placeholder]="field.name" [attr.name]="field.name" [required]="field.required"
+                [formControlName]="field.name">
+              <mat-icon @fadeInOut *ngIf="input.value" class="clear-text-field" (click)="clearFormField(field)">close_outline</mat-icon>
+            </mat-form-field>
+            <div class="text-field-hint field-hint">
+              {{ field.description }}
+              <ng-container *ngIf="field.required">Required. </ng-container>
+              <ng-container *ngIf="field.defaultValue !== null">(Default: {{ field.defaultValue }})</ng-container>
+            </div>
+          </div>
 
-  <button [disabled]="formGroup.invalid" (click)="onSubmit()" id="action">{{ actionLabel }}</button>
-  <button type="reset" (click)="onReset()">Reset</button>
-  <button type="button" (click)="onStop()">Stop</button>
+        </ng-container>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
 </form>

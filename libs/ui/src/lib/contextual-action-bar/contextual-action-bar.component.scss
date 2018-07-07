@@ -1,0 +1,35 @@
+mat-toolbar.title-bar {
+  transition: all 0 0.5s ease-in-out;
+
+  .exit-action {
+    cursor: pointer;
+  }
+
+  &.actionable {
+    color: rgb(255, 255, 255);
+    background: rgb(33, 33, 33);
+  }
+
+  z-index: 1;
+
+  a.branding {
+    text-decoration: none;
+    min-width: 260px;
+    max-width: 260px;
+
+    .site-name {
+      font-size: 20px;
+      margin-left: 8px;
+      margin-right: 30px;
+      font-weight: 300;
+      color: white;
+      text-decoration: none;
+      position: relative;
+      top: 1px;
+    }
+  }
+
+  .action-button[disabled] {
+    color: rgb(185, 185, 185);
+  }
+}

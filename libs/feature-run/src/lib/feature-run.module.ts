@@ -1,16 +1,17 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TargetsComponent } from './targets/targets.component';
-import { Route, RouterModule } from '@angular/router';
-import { TargetComponent } from './target/target.component';
+import { NgModule } from '@angular/core';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
-import { UiModule } from '@nxui/ui';
 import {
   MatIconModule,
   MatListModule,
   MatOptionModule
 } from '@angular/material';
-import { FlexLayoutModule } from '@angular/flex-layout';
+import { Route, RouterModule } from '@angular/router';
+import { UiModule } from '@nxui/ui';
+
+import { TargetComponent } from './target/target.component';
+import { TargetsComponent } from './targets/targets.component';
 
 export const runRoutes: Route[] = [
   {

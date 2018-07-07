@@ -1,16 +1,17 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SchematicsComponent } from './schematics/schematics.component';
-import { Route, RouterModule } from '@angular/router';
-import { SchematicComponent } from './schematic/schematic.component';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { UiModule } from '@nxui/ui';
-import {
-  MatListModule,
-  MatOptionModule,
-  MatIconModule
-} from '@angular/material';
+import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ReactiveFormsModule } from '@angular/forms';
+import {
+  MatIconModule,
+  MatListModule,
+  MatOptionModule
+} from '@angular/material';
+import { Route, RouterModule } from '@angular/router';
+import { UiModule } from '@nxui/ui';
+
+import { SchematicComponent } from './schematic/schematic.component';
+import { SchematicsComponent } from './schematics/schematics.component';
 
 export const generateRoutes: Route[] = [
   {

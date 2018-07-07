@@ -1,8 +1,9 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { AddonsComponent } from './addons/addons.component';
 import { UiModule } from '@nxui/ui';
+
+import { AddonsComponent } from './addons/addons.component';
 
 export const addonsRoutes: Route[] = [{ path: '', component: AddonsComponent }];
 

@@ -27,6 +27,7 @@ export interface Builder {
   name: string;
   description: string;
   builder: string;
+  project: string;
   schema: Field[];
 }
 
@@ -48,17 +49,27 @@ export class Serializer {
         f.positional ||
         this.importantSchematicField(schematic.collection, f.name)
     }));
-    return {
+    const normal = {
       ...schematic,
       schema: this.reoderFields(schema)
     };
+    if (normal.description.endsWith('.')) {
+      normal.description = normal.description.slice(
+        0,
+        normal.description.length - 1
+      );
+    }
+    return normal;
   }
 
   normalizeTarget(builder: string, schema: Field[]): Field[] {
     return this.reoderFields(
       schema.map(f => ({
         ...f,
-        important: f.positional || this.importantBuilderField(builder, f.name)
+        important:
+          f.positional ||
+          f.required ||
+          this.importantBuilderField(builder, f.name)
       }))
     );
   }

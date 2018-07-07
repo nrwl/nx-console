@@ -1,25 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ReactiveFormsModule } from '@angular/forms';
+import {
+  MatButtonModule,
+  MatIconModule,
+  MatRippleModule,
+  MatSidenavModule,
+  MatTooltipModule
+} from '@angular/material';
 import { Route, RouterModule } from '@angular/router';
 import { addonsRoutes, FeatureAddonsModule } from '@nxui/feature-addons';
 import { FeatureGenerateModule, generateRoutes } from '@nxui/feature-generate';
 import { FeatureRunModule, runRoutes } from '@nxui/feature-run';
-import {
-  MatToolbarModule,
-  MatSidenavModule,
-  MatIconModule,
-  MatTooltipModule,
-  MatButtonModule,
-  MatRippleModule
-} from '@angular/material';
+import { UiModule } from '@nxui/ui';
 
 import { DetailsComponent } from './details/details.component';
+import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspacesComponent } from './workspaces/workspaces.component';
-import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { UiModule } from '@nxui/ui';
 
 export const workspaceRoutes: Route[] = [
   { path: '', component: WorkspacesComponent },
@@ -53,7 +52,6 @@ export const workspaceRoutes: Route[] = [
   imports: [
     MatButtonModule,
     MatRippleModule,
-    MatToolbarModule,
     MatSidenavModule,
     MatIconModule,
     MatTooltipModule,

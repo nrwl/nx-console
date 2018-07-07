@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
 import { concatMap, last, map, switchMap, takeWhile } from 'rxjs/operators';
-import { BehaviorSubject, interval, Observable, of } from 'rxjs';
+import { interval, Observable, of } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import { Injectable } from '@angular/core';
 
@@ -14,15 +14,13 @@ export interface CommandOutput {
   providedIn: 'root'
 })
 export class CommandRunner {
-  busy = new BehaviorSubject(false);
-
-  constructor(private readonly apollo: Apollo) {}
+  constructor(private apollo: Apollo) {}
 
   runCommand(
     mutation: DocumentNode,
     variables: { [key: string]: any },
     extractCommand: (r: any) => any,
-    dryRun: boolean
+    onlyLast: boolean
   ): Observable<CommandOutput> {
     return this.apollo
       .mutate({
@@ -32,9 +30,6 @@ export class CommandRunner {
       .pipe(
         map(extractCommand),
         switchMap((command: string) => {
-          if (!dryRun) {
-            this.busy.next(true);
-          }
           return interval(500).pipe(
             switchMap(() => {
               return this.apollo.query({
@@ -52,14 +47,13 @@ export class CommandRunner {
             map((r: any) => r.data.commandStatus),
             concatMap(r => {
               if (r.status !== 'inprogress') {
-                this.busy.next(false);
                 return of(r, null);
               } else {
                 return of(r);
               }
             }),
             takeWhile(r => r),
-            dryRun ? last() : map(r => r)
+            onlyLast ? last() : map(r => r)
           );
         })
       );

@@ -1,38 +1,131 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Apollo } from 'apollo-angular';
-import { ActivatedRoute, Router } from '@angular/router';
-import gql from 'graphql-tag';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
-import { combineLatest, Observable } from 'rxjs';
-import { MatSelectionList } from '@angular/material';
-import { FormControl } from '@angular/forms';
+import { Component } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
 import { Schematic, SchematicCollection } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
+import { Observable, combineLatest } from 'rxjs';
+import {
+  distinctUntilChanged,
+  filter,
+  map,
+  shareReplay,
+  startWith,
+  switchMap
+} from 'rxjs/operators';
+
+interface SchematicId {
+  collectionName: string | undefined;
+  schematicName: string | undefined;
+}
 
 @Component({
   selector: 'nxui-generate',
   templateUrl: './schematics.component.html',
   styleUrls: ['./schematics.component.scss']
 })
-export class SchematicsComponent implements OnInit {
-  @ViewChild(MatSelectionList) schematicSelectionList: MatSelectionList;
+export class SchematicsComponent {
+  private readonly schematicCollections$: Observable<
+    Array<SchematicCollection>
+  > = this.route.params.pipe(
+    map(m => m['path']),
+    switchMap(path => {
+      return this.apollo.watchQuery({
+        pollInterval: 5000,
+        query: gql`
+          query($path: String!) {
+            workspace(path: $path) {
+              schematicCollections {
+                name
+                schematics {
+                  name
+                  description
+                  collection
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          path
+        }
+      }).valueChanges;
+    }),
+    map(r => {
+      const collections = (r as any).data.workspace.schematicCollections;
+      return collections
+        .map(c => {
+          const s = [...c.schematics].sort((a, b) =>
+            a.name.localeCompare(b.name)
+          );
+          return { ...c, schematics: s };
+        })
+        .filter(c => c.schematics.length > 0);
+    })
+  );
 
-  schematicCollections$: Observable<Array<SchematicCollection>>;
+  private readonly selectedSchematicId$: Observable<
+    SchematicId
+  > = this.router.events.pipe(
+    filter(event => event instanceof NavigationEnd),
+    startWith(null),
+    map(() => {
+      const firstChild = this.route.snapshot.firstChild;
+      if (firstChild) {
+        return {
+          collectionName: decodeURIComponent(firstChild.params.collection),
+          schematicName: decodeURIComponent(firstChild.params.schematic)
+        };
+      }
+      return {
+        collectionName: '',
+        schematicName: ''
+      };
+    }),
+    distinctUntilChanged(
+      (a: SchematicId, b: SchematicId) =>
+        a.collectionName === b.collectionName &&
+        a.schematicName === b.schematicName
+    )
+  );
 
-  schematicFilterFormControl = new FormControl();
+  readonly taskCollections$: Observable<
+    TaskCollections<Schematic>
+  > = combineLatest(this.schematicCollections$, this.selectedSchematicId$).pipe(
+    map(([schematicCollections, selectedSchematicId]) => {
+      const collections: Array<
+        TaskCollection<Schematic>
+      > = schematicCollections.map(schematicCollection => ({
+        collectionName: schematicCollection.name,
+        tasks: schematicCollection.schematics.map(schematic => ({
+          taskName: schematic.name,
+          task: schematic
+        }))
+      }));
+
+      const taskCollections: TaskCollections<Schematic> = {
+        selectedTask: this.findSelectedSchematic(
+          selectedSchematicId,
+          collections
+        ),
+        taskCollections: collections
+      };
+
+      return taskCollections;
+    }),
+    shareReplay(1)
+  );
 
   constructor(
-    private apollo: Apollo,
-    private route: ActivatedRoute,
-    private router: Router
+    private readonly apollo: Apollo,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router
   ) {}
 
-  navigateToSelectedSchematic(s: { selected: boolean; value: any }) {
-    if (s.selected) {
+  navigateToSelectedSchematic(s: Schematic | null) {
+    if (s) {
       this.router.navigate(
-        [
-          encodeURIComponent(s.value.collection),
-          encodeURIComponent(s.value.name)
-        ],
+        [encodeURIComponent(s.collection), encodeURIComponent(s.name)],
         { relativeTo: this.route }
       );
     } else {
@@ -40,64 +133,26 @@ export class SchematicsComponent implements OnInit {
     }
   }
 
-  ngOnInit() {
-    // TODO: Remove this hack when material exposes this boolean as a public API.
-    (this.schematicSelectionList.selectedOptions as any)._multiple = false;
+  findSelectedSchematic(
+    schematicId: SchematicId,
+    taskCollections: Array<TaskCollection<Schematic>>
+  ): Task<Schematic> | null {
+    if (!schematicId.collectionName || !schematicId.schematicName) {
+      return null;
+    }
 
-    this.schematicCollections$ = combineLatest(
-      this.schematicFilterFormControl.valueChanges.pipe(startWith('')),
-      this.route.params.pipe(
-        map(m => m['path']),
-        switchMap(path => {
-          return this.apollo.watchQuery({
-            pollInterval: 5000,
-            query: gql`
-              query($path: String!) {
-                workspace(path: $path) {
-                  schematicCollections {
-                    name
-                    schematics {
-                      name
-                      description
-                      collection
-                    }
-                  }
-                }
-              }
-            `,
-            variables: {
-              path
-            }
-          }).valueChanges;
-        })
-      )
-    ).pipe(
-      map(([schematicFilterValue, r]: [string, any]) => {
-        const f = schematicFilterValue.toLowerCase();
-        const collections = (r as any).data.workspace.schematicCollections;
-        return collections
-          .map(c => {
-            const s = c.schematics
-              .filter(({ name }) => name.includes(schematicFilterValue))
-              .sort((a, b) => a.name.localeCompare(b.name));
-            return { ...c, schematics: s };
-          })
-          .filter(c => c.schematics.length > 0);
-      })
+    const selectedTaskCollection = taskCollections.find(
+      collection => collection.collectionName === schematicId.collectionName
     );
-  }
 
-  trackByName(index: number, schematic: Schematic) {
-    return `${schematic.collection}:${schematic.name}`;
-  }
+    if (!selectedTaskCollection) {
+      return null;
+    }
 
-  isSelected(collection: string, schematic: string): boolean {
-    return (
-      this.router.url.indexOf(
-        `${encodeURIComponent(
-          encodeURIComponent(collection)
-        )}/${encodeURIComponent(encodeURIComponent(schematic))}`
-      ) > -1
+    const selectedTask = selectedTaskCollection.tasks.find(
+      task => task.taskName === schematicId.schematicName
     );
+
+    return selectedTask || null;
   }
 }

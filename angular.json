@@ -19,7 +19,7 @@
             "polyfills": "apps/nxui/src/polyfills.ts",
             "tsConfig": "apps/nxui/tsconfig.app.json",
             "assets": ["apps/nxui/src/favicon.ico", "apps/nxui/src/assets"],
-            "styles": ["apps/nxui/src/styles.css"],
+            "styles": ["apps/nxui/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -67,7 +67,7 @@
             "polyfills": "apps/nxui/src/polyfills.ts",
             "tsConfig": "apps/nxui/tsconfig.spec.json",
             "karmaConfig": "apps/nxui/karma.conf.js",
-            "styles": ["apps/nxui/src/styles.css"],
+            "styles": ["apps/nxui/src/styles.scss"],
             "scripts": [],
             "assets": ["apps/nxui/src/favicon.ico", "apps/nxui/src/assets"]
           }

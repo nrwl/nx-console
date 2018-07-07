@@ -17,13 +17,13 @@ const STAGE_TOP = style({ transform: 'translate3d(0, -100%, 0)' });
 const STAGE_BOTTOM = style({ transform: 'translate3d(0, 100%, 0)' });
 
 const ANIMATE_UP = group([
-  query(':enter', [STAGE_TOP, animate(TIMING, STAGE)]),
-  query(':leave', [STAGE, animate(TIMING, STAGE_BOTTOM)])
+  query(':enter', [STAGE_TOP, animate(TIMING, STAGE)], { optional: true }),
+  query(':leave', [STAGE, animate(TIMING, STAGE_BOTTOM)], { optional: true })
 ]);
 
 const ANIMATE_DOWN = group([
-  query(':enter', [STAGE_BOTTOM, animate(TIMING, STAGE)]),
-  query(':leave', [STAGE, animate(TIMING, STAGE_TOP)])
+  query(':enter', [STAGE_BOTTOM, animate(TIMING, STAGE)], { optional: true }),
+  query(':leave', [STAGE, animate(TIMING, STAGE_TOP)], { optional: true })
 ]);
 
 export const ROUTING_ANIMATION = trigger('routerTransition', [
