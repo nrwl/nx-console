@@ -1,20 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { TerminalComponent } from '@nxui/ui';
 import { CommandOutput, CommandRunner } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable, Subject } from 'rxjs';
-import {
-  filter,
-  first,
-  map,
-  publishReplay,
-  refCount,
-  switchMap,
-  withLatestFrom
-} from 'rxjs/operators';
-import { Apollo } from 'apollo-angular';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { TerminalComponent } from '@nxui/ui';
-import { Router } from '@angular/router';
+import { map, publishReplay, refCount, switchMap } from 'rxjs/operators';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -117,7 +109,7 @@ export class NewWorkspaceComponent implements OnInit {
     this.ngNew$.next(ngNewInvocation);
   }
 
-  trackByName(index: number, addon: SchematicCollectionForNgNew) {
+  trackByName(_: number, addon: SchematicCollectionForNgNew) {
     return addon.name;
   }
 }

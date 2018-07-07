@@ -6,13 +6,11 @@ describe('TaskSelectorComponent', () => {
   let component: TaskSelectorComponent;
   let fixture: ComponentFixture<TaskSelectorComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [TaskSelectorComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [TaskSelectorComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TaskSelectorComponent);

@@ -59,9 +59,9 @@ export class FlagsComponent {
     this.setForm();
   }
 
-  @Output() value = new EventEmitter();
-  @Output() action = new EventEmitter();
-  @Output() stop = new EventEmitter();
+  @Output() readonly value = new EventEmitter();
+  @Output() readonly action = new EventEmitter();
+  @Output() readonly stop = new EventEmitter();
 
   formGroup: FormGroup;
 
@@ -140,15 +140,18 @@ export class FlagsComponent {
   }
 
   private setForm() {
-    const children = this._fields.reduce((m, f) => {
-      const value =
-        this.init && this.init[f.name] ? this.init[f.name] : f.defaultValue;
-      m[f.name] = new FormControl(
-        value,
-        f.required ? Validators.required : null
-      );
-      return m;
-    }, {});
+    const children = this._fields.reduce(
+      (m, f) => {
+        const value =
+          this.init && this.init[f.name] ? this.init[f.name] : f.defaultValue;
+        m[f.name] = new FormControl(
+          value,
+          f.required ? Validators.required : null
+        );
+        return m;
+      },
+      {} as any
+    );
     if (this.configurations && this.configurations.length > 0) {
       children['configurations'] = new FormControl(null);
     }
@@ -164,7 +167,7 @@ export class FlagsComponent {
       });
   }
 
-  private emitNext(value: string[]) {
+  private emitNext(value: { [p: string]: any }) {
     const configuration =
       this.configurations && value['configurations']
         ? [`--configuration=${value['configurations']}`]

@@ -4,7 +4,7 @@ import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
 import { Schematic, SchematicCollection } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { Observable, combineLatest } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
   filter,
@@ -52,7 +52,8 @@ export class SchematicsComponent {
       }).valueChanges;
     }),
     map(r => {
-      const collections = (r as any).data.workspace.schematicCollections;
+      const collections: Array<SchematicCollection> = (r as any).data.workspace
+        .schematicCollections;
       return collections
         .map(c => {
           const s = [...c.schematics].sort((a, b) =>

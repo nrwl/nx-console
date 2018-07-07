@@ -13,7 +13,7 @@
             <mat-divider></mat-divider>
           </div>
           <mat-list-option [value]="t" role="option" *ngFor="let t of collection.tasks; trackBy: trackByTaskName" [selected]="filteredTaskCollections.selectedTask?.task === t.task">
-            {{t.taskName}}
+            {{ t.taskName }}
           </mat-list-option>
 
         </ng-container>

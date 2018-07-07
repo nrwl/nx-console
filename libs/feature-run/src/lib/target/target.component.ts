@@ -93,8 +93,8 @@ export class TargetComponent implements OnInit {
         });
       }),
       map((r: any) => {
-        const project = r.data.workspace.projects[0];
-        const architect = r.data.workspace.projects[0].architect.map(a => ({
+        const project: Project = r.data.workspace.projects[0];
+        const architect = project.architect.map(a => ({
           ...a,
           schema: this.serializer.normalizeTarget(a.builder, a.schema)
         }));
@@ -130,7 +130,7 @@ export class TargetComponent implements OnInit {
 
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$),
-      switchMap(([q, c]) => {
+      switchMap(([_, c]) => {
         this.out.clear();
         return this.runner.runCommand(
           gql`

@@ -16,7 +16,7 @@ export class WorkspacesComponent {
     private readonly messenger: Messenger,
     private readonly router: Router,
     public readonly settings: Settings,
-    private readonly contextualActionBarService: ContextualActionBarService
+    contextualActionBarService: ContextualActionBarService
   ) {
     contextualActionBarService.breadcrumbs$.next([
       { title: 'Choose A Workspace' }
@@ -39,7 +39,7 @@ export class WorkspacesComponent {
         }
       })
       .subscribe(
-        r => {
+        () => {
           this.router.navigate(['/workspaces', path]);
         },
         e => {

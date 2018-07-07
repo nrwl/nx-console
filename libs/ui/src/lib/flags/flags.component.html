@@ -5,7 +5,7 @@
     </div>
     <mat-radio-group class="configuration-container" formControlName="configurations" name="configurations" fxLayout="row" fxLayoutGap="16px">
       <mat-radio-button [value]="null">Default</mat-radio-button>
-      <mat-radio-button *ngFor="let config of configurations" [value]="config.name">{{ config.name | titlecase}}</mat-radio-button>
+      <mat-radio-button *ngFor="let config of configurations" [value]="config.name">{{ config.name | titlecase }}</mat-radio-button>
     </mat-radio-group>
   </div>
 

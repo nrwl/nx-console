@@ -6,13 +6,11 @@ describe('ContextualActionBarComponent', () => {
   let component: ContextualActionBarComponent;
   let fixture: ComponentFixture<ContextualActionBarComponent>;
 
-  beforeEach(
-    async(() => {
-      TestBed.configureTestingModule({
-        declarations: [ContextualActionBarComponent]
-      }).compileComponents();
-    })
-  );
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ContextualActionBarComponent]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ContextualActionBarComponent);

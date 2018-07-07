@@ -2,7 +2,6 @@ import {
   animate,
   group,
   query,
-  state,
   style,
   transition,
   trigger
@@ -11,8 +10,6 @@ import {
 const TIMING = '0.5s ease-in-out';
 const STAGE = style({ transform: 'translate3d(0%, 0, 0)' });
 
-const STAGE_RIGHT = style({ transform: 'translate3d(100%, 0, 0)' });
-const STAGE_LEFT = style({ transform: 'translate3d(-100%, 0, 0)' });
 const STAGE_TOP = style({ transform: 'translate3d(0, -100%, 0)' });
 const STAGE_BOTTOM = style({ transform: 'translate3d(0, 100%, 0)' });
 

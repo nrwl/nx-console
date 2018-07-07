@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Apollo } from 'apollo-angular';
 import { ActivatedRoute } from '@angular/router';
-import { map, switchMap } from 'rxjs/operators';
+import { Project } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
-import { Project } from '@nxui/utils';
+import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'nxui-details',
@@ -49,7 +49,7 @@ export class DetailsComponent implements OnInit {
       }),
       map((r: any) => {
         const w = r.data.workspace;
-        const projects = w.projects.map(p => {
+        const projects = w.projects.map((p: any) => {
           const actions = [
             ...createLinkForTask(p, 'build', 'Build'),
             ...createLinkForTask(p, 'test', 'Test'),
