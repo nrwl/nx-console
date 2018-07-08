@@ -317,26 +317,9 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
             return filterByName(workspace.projects, args);
           }
         },
-        files: {
-          type: new graphql.GraphQLList(
-            new graphql.GraphQLObjectType({
-              name: 'File',
-              fields: {
-                name: {
-                  type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-                }
-              }
-            })
-          ),
-          args: {
-            glob: { type: graphql.GraphQLString }
-          },
-          resolve: (workspace: any, args: any) => {
-            if (!files[workspace.path]) return [];
-            return files[workspace.path]
-              .filter(f => f.indexOf(args.glob) > -1)
-              .map(f => ({ name: f }));
-          }
+        completions: {
+          type: completionsType,
+          resolve: (workspace: any) => workspace
         }
       };
     }
@@ -369,6 +352,70 @@ export const editorSupportType: graphql.GraphQLObjectType = new graphql.GraphQLO
         },
         icon: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        }
+      };
+    }
+  }
+);
+
+export const completionResultType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
+  {
+    name: 'CompletionResultType',
+    fields: () => {
+      return {
+        value: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        }
+      };
+    }
+  }
+);
+
+export const completionsType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
+  {
+    name: 'CompletionsTypes',
+    fields: () => {
+      return {
+        files: {
+          type: new graphql.GraphQLList(completionResultType),
+          args: {
+            input: { type: graphql.GraphQLString }
+          },
+          resolve: (workspace: any, args: any) => {
+            const path = workspace.path;
+            if (!files[path]) return [];
+            return files[path]
+              .filter(f => f.indexOf(args.input) > -1)
+              .map(value => value.substring(workspace.path.length + 1))
+              .map(value => ({ value }));
+          }
+        },
+        projects: {
+          type: new graphql.GraphQLList(completionResultType),
+          args: {
+            input: { type: graphql.GraphQLString }
+          },
+          resolve: (workspace: any, args: any) => {
+            return workspace.projects
+              .map((p: any) => p.name)
+              .filter((p: string) => p.indexOf(args.input) > -1)
+              .map((value: any) => ({ value }));
+          }
+        },
+        modules: {
+          type: new graphql.GraphQLList(completionResultType),
+          args: {
+            input: { type: graphql.GraphQLString }
+          },
+          resolve: (workspace: any, args: any) => {
+            const path = workspace.path;
+            if (!files[path]) return [];
+            return files[path]
+              .filter(f => f.indexOf('module.ts') > -1)
+              .filter(f => f.indexOf(args.input) > -1)
+              .map(value => value.substring(workspace.path.length + 1))
+              .map(value => ({ value }));
+          }
         }
       };
     }

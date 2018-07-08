@@ -14,9 +14,9 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Field, Serializer } from '@nxui/utils';
+import { Completions, Field, Serializer } from '@nxui/utils';
 import { Subscription } from 'rxjs';
-import { startWith } from 'rxjs/operators';
+import { debounceTime, startWith, switchMap } from 'rxjs/operators';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
@@ -44,6 +44,7 @@ export class FlagsComponent {
 
   fieldGroups: Array<FieldGrouping> = [];
 
+  @Input() path: string;
   @Input() description: string;
   @Input() actionLabel: string;
   @Input() configurations: { name: string }[];
@@ -67,7 +68,8 @@ export class FlagsComponent {
 
   constructor(
     private readonly serializer: Serializer,
-    private readonly elementRef: ElementRef
+    private readonly elementRef: ElementRef,
+    private readonly completions: Completions
   ) {}
 
   fieldOptions(field: Field) {
@@ -148,6 +150,21 @@ export class FlagsComponent {
           value,
           f.required ? Validators.required : null
         );
+
+        // TODO: DAN remove this and replace with real UI
+        if (f.completion) {
+          m[f.name].valueChanges
+            .pipe(
+              debounceTime(100),
+              switchMap((v: string) =>
+                this.completions.completionsFor(this.path, f, v)
+              )
+            )
+            .subscribe((v: string[]) => {
+              console.log('completions for', f.name, v);
+            });
+        }
+
         return m;
       },
       {} as any

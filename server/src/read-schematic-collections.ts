@@ -18,6 +18,7 @@ interface Schematic {
     required: boolean;
     positional: boolean;
     enum: string[];
+    completion: 'module' | 'file' | 'project' | undefined;
   }[];
 }
 

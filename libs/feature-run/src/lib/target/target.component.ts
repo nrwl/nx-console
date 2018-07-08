@@ -141,7 +141,7 @@ export class TargetComponent implements OnInit {
             }
           `,
           {
-            path: this.route.snapshot.params['path'],
+            path: this.path(),
             runCommand: c.commands
           },
           r => r.data.run.command,
@@ -155,6 +155,10 @@ export class TargetComponent implements OnInit {
     this.command$ = this.commandArray$.pipe(
       map(c => `ng ${this.serializer.argsToString(c.commands)}`)
     );
+  }
+
+  public path() {
+    return this.route.snapshot.params['path'];
   }
 
   onRun() {
