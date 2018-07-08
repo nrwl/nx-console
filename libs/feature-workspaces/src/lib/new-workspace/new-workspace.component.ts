@@ -15,7 +15,7 @@ interface SchematicCollectionForNgNew {
 
 interface NgNewInvocation {
   name: string;
-  path: string;
+  directory: string;
   collection: string;
 }
 
@@ -63,7 +63,7 @@ export class NewWorkspaceComponent implements OnInit {
       map(r => {
         return new FormGroup({
           name: new FormControl(null, Validators.required),
-          path: new FormControl(null, Validators.required),
+          directory: new FormControl(null, Validators.required),
           collection: new FormControl(r[0].name, Validators.required)
         });
       }),
@@ -76,8 +76,16 @@ export class NewWorkspaceComponent implements OnInit {
         this.out.clear();
         return this.commandRunner.runCommand(
           gql`
-            mutation($path: String!, $name: String!, $collection: String!) {
-              ngNew(path: $path, name: $name, collection: $collection) {
+            mutation(
+              $directory: String!
+              $name: String!
+              $collection: String!
+            ) {
+              ngNew(
+                directory: $directory
+                name: $name
+                collection: $collection
+              ) {
                 command
               }
             }
@@ -94,7 +102,7 @@ export class NewWorkspaceComponent implements OnInit {
     combineLatest(this.ngNew$, this.commandOutput$).subscribe(
       ([ngNew, command]) => {
         if (command.status === 'success') {
-          this.router.navigate(['/workspaces', `${ngNew.path}/${ngNew.name}`]);
+          this.router.navigate(['/workspaces', ngNew.directory, 'details']);
         }
       }
     );
@@ -102,9 +110,9 @@ export class NewWorkspaceComponent implements OnInit {
 
   createNewWorkspace(ngNewInvocation: NgNewInvocation) {
     this.command$.next(
-      `ng new ${ngNewInvocation.name} --collection=${
-        ngNewInvocation.collection
-      }`
+      `ng new ${ngNewInvocation.name} --directory=${
+        ngNewInvocation.directory
+      } --collection=${ngNewInvocation.collection}`
     );
     this.ngNew$.next(ngNewInvocation);
   }

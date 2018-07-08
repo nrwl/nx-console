@@ -465,7 +465,9 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
         ngNew: {
           type: commandStartedType,
           args: {
-            path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+            directory: {
+              type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+            },
             name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
             collection: {
               type: new graphql.GraphQLNonNull(graphql.GraphQLString)
@@ -473,8 +475,13 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
           },
           resolve: async (_root: any, args: any) => {
             return runCommand(
-              args.path,
-              ['new', args.name, `--collection=${args.collection}`],
+              '/',
+              [
+                'new',
+                args.name,
+                `--directory=${args.directory}`,
+                `--collection=${args.collection}`
+              ],
               false
             );
           }
@@ -548,16 +555,6 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
 function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   stopAllCommands();
   const command = `ng ${cmds.join(' ')} ${Math.random()}`;
-
-  if (!directoryExists(cwd)) {
-    commands[command] = {
-      status: 'terminated',
-      out: `Invalid directory provided: ${cwd}`,
-      commandRunning: null
-    };
-
-    return { command };
-  }
 
   const ng = localNg
     ? path.join('node_modules', '.bin', 'ng')

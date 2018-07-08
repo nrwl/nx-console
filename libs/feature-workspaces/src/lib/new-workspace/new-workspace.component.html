@@ -6,9 +6,9 @@
         <input formControlName="name" required>
       </div>
 
-      <div [class.error]="form.hasError('required', 'path') && form.get('path')?.touched">
-        Path:
-        <input formControlName="path" required>
+      <div [class.error]="form.hasError('required', 'directory') && form.get('directory')?.touched">
+        Directory:
+        <input formControlName="directory" required>
       </div>
 
       <div *ngFor="let n of schematicCollectionsForNgNew; trackBy: trackByName">
