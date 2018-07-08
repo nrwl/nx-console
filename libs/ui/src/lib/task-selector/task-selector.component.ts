@@ -11,11 +11,9 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Output,
-  ViewChild
+  Output
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatSelectionList } from '@angular/material';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { map, startWith, take } from 'rxjs/operators';
 
@@ -44,8 +42,8 @@ const ANIMATION_MILLIS = 600;
   styleUrls: ['./task-selector.component.scss'],
   animations: [
     trigger('growShrink', [
-      state('void', style({ width: '240px' })),
-      state('collapse', style({ width: '240px' })),
+      state('void', style({ width: '0' })),
+      state('collapse', style({ width: '0' })),
       state('expand', style({ width: '*' })),
       transition(
         `collapse <=> expand`,
@@ -55,8 +53,6 @@ const ANIMATION_MILLIS = 600;
   ]
 })
 export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
-  @ViewChild(MatSelectionList) taskSelectionList: MatSelectionList;
-
   @Input() taskCollections$: Observable<TaskCollections<T>>;
   @Input() filterPlaceholder: string;
 
@@ -66,8 +62,15 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   filteredTaskCollections$: Observable<TaskCollections<T>>;
   taskAnimationState$ = new Subject<'collapse' | 'expand'>();
 
-  private readonly contextActionCloseSubscription = this.contextActionService.close.subscribe(
-    () => this.selectTask(null)
+  private readonly contextActionCloseSubscription = this.contextActionService.contextualActions$.subscribe(
+    actions => {
+      if (actions === null) {
+        this.taskAnimationState$.next('expand');
+        setTimeout(() => {
+          this.selectionChange.next(null);
+        }, ANIMATION_MILLIS);
+      }
+    }
   );
 
   constructor(
@@ -75,9 +78,6 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // TODO: Remove this hack when material exposes this boolean as a public API.
-    (this.taskSelectionList.selectedOptions as any)._multiple = false;
-
     this.taskCollections$.pipe(take(1)).subscribe(taskCollections => {
       if (taskCollections.selectedTask) {
         this.taskAnimationState$.next('collapse');
@@ -126,10 +126,6 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
       }, 300);
     } else {
       this.contextActionService.contextualActions$.next(null);
-      this.taskAnimationState$.next('expand');
-      setTimeout(() => {
-        this.selectionChange.next(null);
-      }, ANIMATION_MILLIS);
     }
   }
 }

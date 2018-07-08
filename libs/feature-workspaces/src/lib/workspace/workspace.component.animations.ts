@@ -4,12 +4,12 @@ import {
   query,
   style,
   transition,
-  trigger
+  trigger,
+  state
 } from '@angular/animations';
 
-const TIMING = '0.5s ease-in-out';
-const STAGE = style({ transform: 'translate3d(0%, 0, 0)' });
-
+const TIMING = '0.7s 0.3s ease-in-out';
+const STAGE = style({ transform: 'translate3d(0, 0%, 0)' });
 const STAGE_TOP = style({ transform: 'translate3d(0, -100%, 0)' });
 const STAGE_BOTTOM = style({ transform: 'translate3d(0, 100%, 0)' });
 
@@ -24,10 +24,19 @@ const ANIMATE_DOWN = group([
 ]);
 
 export const ROUTING_ANIMATION = trigger('routerTransition', [
+  transition('void => *', []),
   transition('* => details', ANIMATE_UP),
   transition('details => *', ANIMATE_DOWN),
   transition('tasks => *', ANIMATE_UP),
   transition('generate => extensions', ANIMATE_DOWN),
   transition('extensions => generate', ANIMATE_UP),
   transition('* => tasks', ANIMATE_DOWN)
+]);
+
+export const GROW_SHRINK = trigger('growShrink', [
+  state('void', style({ width: '0' })),
+  state('collapse', style({ width: '0' })),
+  state('expand', style({ width: '*' })),
+  transition(`expand => collapse`, animate(`600ms 300ms ease-in-out`)),
+  transition(`collapse => expand`, animate(`600ms ease-in-out`))
 ]);

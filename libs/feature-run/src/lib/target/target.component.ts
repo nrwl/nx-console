@@ -1,6 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ContextualActionBarService, TerminalComponent } from '@nxui/ui';
+import {
+  ContextualActionBarService,
+  FlagsComponent,
+  TaskRunnerComponent,
+  TerminalComponent
+} from '@nxui/ui';
 import { CommandOutput, CommandRunner, Project, Serializer } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
@@ -29,6 +34,8 @@ export class TargetComponent implements OnInit {
   commandOutput$: Observable<CommandOutput>;
   @ViewChild('output', { read: TerminalComponent })
   out: TerminalComponent;
+  @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
+  @ViewChild(FlagsComponent) flags: FlagsComponent;
   private readonly ngRun$ = new Subject<any>();
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
 
@@ -119,7 +126,7 @@ export class TargetComponent implements OnInit {
               icon: 'play_arrow',
               invoke: this.ngRun$,
               disabled: this.ngRunDisabled$,
-              name: 'Run command'
+              name: 'Run task'
             }
           ]
         });
@@ -130,6 +137,10 @@ export class TargetComponent implements OnInit {
 
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$),
+      tap(() => {
+        this.flags.hideFields();
+        this.taskRunner.terminalVisible.next(true);
+      }),
       switchMap(([_, c]) => {
         this.out.clear();
         return this.runner.runCommand(

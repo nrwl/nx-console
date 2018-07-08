@@ -2,6 +2,7 @@
   padding: 0;
   overflow: auto;
   max-height: calc(100% - 55px);
+  min-width: calc(100vw - 56px);
 }
 
 .outer-container {
@@ -13,6 +14,7 @@
   position: relative;
   height: 100%;
   z-index: 3;
+  overflow-x: hidden;
   background-color: rgb(245, 245, 245);
 
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
@@ -23,7 +25,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 240px;
+  width: 100vw;
   right: 0;
   z-index: 0;
 }

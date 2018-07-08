@@ -15,8 +15,8 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./task-runner.component.scss'],
   animations: [
     trigger('growShrink', [
-      state('void', style({ flex: '0 0', 'min-height': '68px' })),
-      state('shrink', style({ flex: '0 0', 'min-height': '68px' })),
+      state('void', style({ flex: '0 0', 'min-height': '32px' })),
+      state('shrink', style({ flex: '0 0', 'min-height': '32px' })),
       state('grow', style({ flex: '1 1', 'min-height': '240px' })),
       transition(`shrink <=> grow`, animate(`300ms ease-in-out`))
     ])
@@ -25,8 +25,8 @@ import { map } from 'rxjs/operators';
 export class TaskRunnerComponent {
   @Input() terminalWindowTitle: string;
 
-  dryRunVisible = new BehaviorSubject(false);
-  dryRunAnimationState = this.dryRunVisible.pipe(
+  terminalVisible = new BehaviorSubject(false);
+  terminalAnimationState = this.terminalVisible.pipe(
     map(visible => (visible ? 'grow' : 'shrink'))
   );
 }

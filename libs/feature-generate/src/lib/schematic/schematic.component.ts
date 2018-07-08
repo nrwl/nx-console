@@ -1,6 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ContextualActionBarService, TerminalComponent } from '@nxui/ui';
+import {
+  ContextualActionBarService,
+  TerminalComponent,
+  TaskRunnerComponent,
+  FlagsComponent
+} from '@nxui/ui';
 import {
   CommandOutput,
   CommandRunner,
@@ -42,8 +47,9 @@ export class SchematicComponent implements OnInit {
   initValues$: Observable<any>;
 
   combinedOutput$: Observable<CommandOutput>;
-  @ViewChild('combinedOutput', { read: TerminalComponent })
-  out: TerminalComponent;
+  @ViewChild(TerminalComponent) out: TerminalComponent;
+  @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
+  @ViewChild(FlagsComponent) flags: FlagsComponent;
 
   private readonly ngGen$ = new Subject<void>();
   private readonly ngGenDisabled$ = new BehaviorSubject(true);
@@ -139,7 +145,7 @@ export class SchematicComponent implements OnInit {
               icon: 'play_arrow',
               invoke: this.ngGen$,
               disabled: this.ngGenDisabled$,
-              name: 'Run generate command'
+              name: 'Generate'
             }
           ]
         });
@@ -184,6 +190,10 @@ export class SchematicComponent implements OnInit {
 
     this.commandOutput$ = this.ngGen$.pipe(
       withLatestFrom(this.commandArray$),
+      tap(() => {
+        this.flags.hideFields();
+        this.taskRunner.terminalVisible.next(true);
+      }),
       switchMap(([_, c]) => {
         this.out.clear();
         return this.runner.runCommand(

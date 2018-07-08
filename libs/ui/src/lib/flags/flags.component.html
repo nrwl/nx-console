@@ -50,22 +50,27 @@
             <span class="select-field-hint field-hint">
               {{ field.description }}
               <ng-container *ngIf="field.required">Required. </ng-container>
-              <ng-container *ngIf="field.defaultValue !== null">(Default: {{ field.defaultValue }})</ng-container>
+              <ng-container *ngIf="field.defaultValue && field.defaultValue !== 'Default'">(Default: {{ field.defaultValue }})</ng-container>
             </span>
           </mat-form-field>
         </ng-container>
-        <ng-container *ngIf="!field.enum && field.type !== 'boolean'">
-          <mat-icon>create</mat-icon>
-          <div fxLayout="column" fxFlex>
+        <ng-container *ngIf=" !field.enum && field.type !=='boolean'">
+          <mat-icon>{{ field.completionValues ? 'search' : 'create' }}</mat-icon>
+          <div fxLayout="column " fxFlex>
             <mat-form-field>
-              <input #input fxFlex type="text" matInput [placeholder]="field.name" [attr.name]="field.name" [required]="field.required"
-                [formControlName]="field.name">
-              <mat-icon @fadeInOut *ngIf="input.value" class="clear-text-field" (click)="clearFormField(field)">close_outline</mat-icon>
+              <input #input fxFlex type="text " matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
+                [formControlName]="field.name" [matAutocomplete]="auto">
+              <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
+              <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let value of field.completionValues | async" [value]="value">
+                  {{ value }}
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
-            <div class="text-field-hint field-hint">
+            <div class="text-field-hint field-hint ">
               {{ field.description }}
-              <ng-container *ngIf="field.required">Required. </ng-container>
-              <ng-container *ngIf="field.defaultValue !== null">(Default: {{ field.defaultValue }})</ng-container>
+              <ng-container *ngIf="field.required ">Required. </ng-container>
+              <ng-container *ngIf="field.defaultValue">(Default: {{ field.defaultValue }})</ng-container>
             </div>
           </div>
 

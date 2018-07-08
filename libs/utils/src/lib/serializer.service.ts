@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+export type AutocompletionType = 'modules' | 'projects' | 'file';
 
 export interface Field {
   name: string;
@@ -9,7 +12,8 @@ export interface Field {
   required: boolean;
   positional: boolean;
   important: boolean;
-  completion: 'module' | 'project' | 'file' | undefined;
+  completion?: AutocompletionType;
+  completionValues?: Observable<Array<string>>;
 }
 
 export interface Schematic {
@@ -153,7 +157,10 @@ export class Serializer {
     return undefined;
   }
 
-  private completionBuilderType(builder: string, name: string): any {
+  private completionBuilderType(
+    builder: string,
+    name: string
+  ): AutocompletionType | undefined {
     if (builder.startsWith('@angular-devkit/build-angular')) {
       if (name === 'project') return 'projects';
       if (name === 'module') return 'modules';
