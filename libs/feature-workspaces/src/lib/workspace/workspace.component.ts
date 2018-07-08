@@ -9,7 +9,7 @@ import { ContextualActionBarService } from '@nxui/ui';
 import { Settings } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import {
   filter,
   map,
@@ -42,7 +42,6 @@ export class WorkspaceComponent implements OnDestroy {
   readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
     map((event: NavigationEnd) => event.url),
-    startWith(this.router.url),
     map((url: string) => {
       const route = this.routes.find(r => url.indexOf(r.url) > -1);
       return route ? route.title : '';
@@ -84,14 +83,15 @@ export class WorkspaceComponent implements OnDestroy {
     refCount()
   );
 
-  private readonly workplaceSubscription = this.workspace$
-    .pipe(withLatestFrom(this.activeRouteTitle$))
-    .subscribe(([workspaceName, routeTitle]) => {
-      this.contextualActionBarService.breadcrumbs$.next([
-        { title: workspaceName.name },
-        { title: routeTitle }
-      ]);
-    });
+  private readonly workplaceSubscription = combineLatest(
+    this.workspace$,
+    this.activeRouteTitle$
+  ).subscribe(([workspace, routeTitle]) => {
+    this.contextualActionBarService.breadcrumbs$.next([
+      { title: workspace.name },
+      { title: routeTitle }
+    ]);
+  });
 
   private readonly subscription = this.workspace$.subscribe(w => {
     this.settings.addRecent({ name: w.name, path: w.path });
