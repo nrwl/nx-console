@@ -9,6 +9,7 @@ export interface Field {
   required: boolean;
   positional: boolean;
   important: boolean;
+  completion: 'module' | 'project' | 'file' | undefined;
 }
 
 export interface Schematic {
@@ -47,7 +48,8 @@ export class Serializer {
       ...f,
       important:
         f.positional ||
-        this.importantSchematicField(schematic.collection, f.name)
+        this.importantSchematicField(schematic.collection, f.name),
+      completion: this.completionSchematicType(schematic.collection, f.name)
     }));
     const normal = {
       ...schematic,
@@ -69,7 +71,8 @@ export class Serializer {
         important:
           f.positional ||
           f.required ||
-          this.importantBuilderField(builder, f.name)
+          this.importantBuilderField(builder, f.name),
+        completion: this.completionBuilderType(builder, f.name)
       }))
     );
   }
@@ -135,5 +138,27 @@ export class Serializer {
     } else {
       return false;
     }
+  }
+
+  private completionSchematicType(collection: string, name: string): any {
+    if (
+      collection === '@schematics/angular' ||
+      collection === '@ngrx/schematics' ||
+      collection === '@nrwl/schematics'
+    ) {
+      if (name === 'project') return 'projects';
+      if (name === 'module') return 'modules';
+      if (name === 'parentModule') return 'modules';
+    }
+    return undefined;
+  }
+
+  private completionBuilderType(builder: string, name: string): any {
+    if (builder.startsWith('@angular-devkit/build-angular')) {
+      if (name === 'project') return 'projects';
+      if (name === 'module') return 'modules';
+      if (name === 'parentModule') return 'modules';
+    }
+    return undefined;
   }
 }

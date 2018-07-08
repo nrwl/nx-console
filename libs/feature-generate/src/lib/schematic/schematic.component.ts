@@ -171,7 +171,7 @@ export class SchematicComponent implements OnInit {
             }
           `,
           {
-            path: this.route.snapshot.params['path'],
+            path: this.path(),
             genCommand: c.commands
           },
           r => r.data.generate.command,
@@ -220,6 +220,10 @@ export class SchematicComponent implements OnInit {
     ).pipe(
       map(commands => `ng generate ${this.serializer.argsToString(commands)}`)
     );
+  }
+
+  public path() {
+    return this.route.snapshot.params['path'];
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {
