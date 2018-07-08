@@ -5,6 +5,11 @@ import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+interface CompletetionValue {
+  value: string;
+  display?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,7 +20,7 @@ export class Completions {
     path: string,
     field: Field,
     input: string
-  ): Observable<Array<string>> {
+  ): Observable<Array<CompletetionValue>> {
     return this.apollo
       .query({
         query: gql`
@@ -23,7 +28,8 @@ export class Completions {
           workspace(path: $path) {
             completions {
               ${field.completion}(input: $input) {
-                value
+                value,
+                display
               }
             }
           }
@@ -35,11 +41,7 @@ export class Completions {
         }
       })
       .pipe(
-        map((v: any) => {
-          return v.data.workspace.completions[field.completion as any].map(
-            (r: any) => r.value
-          );
-        })
+        map((v: any) => v.data.workspace.completions[field.completion as any])
       );
   }
 }
