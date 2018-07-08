@@ -66,18 +66,22 @@ import { TerminalComponent } from './terminal/terminal.component';
   ]
 })
 export class UiModule {
-  constructor(matIconRegistry: MatIconRegistry, domSanitizer: DomSanitizer) {
-    matIconRegistry.addSvgIcon(
-      'toggle_on',
-      domSanitizer.bypassSecurityTrustResourceUrl(
-        'assets/baseline-toggle_on-24px.svg'
-      )
-    );
-    matIconRegistry.addSvgIcon(
-      'toggle_off',
-      domSanitizer.bypassSecurityTrustResourceUrl(
-        'assets/baseline-toggle_off-24px.svg'
-      )
+  constructor(
+    private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer
+  ) {
+    this.addIcon('toggle_on', 'baseline-toggle_on-24px.svg');
+    this.addIcon('toggle_off', 'baseline-toggle_off-24px.svg');
+    this.addIcon('finder', 'finder.svg');
+    this.addIcon('vscode', 'vscode.svg');
+    this.addIcon('webstorm', 'webstorm.svg');
+    this.addIcon('intellij', 'intellij.svg');
+  }
+
+  private addIcon(name: string, url: string) {
+    this.matIconRegistry.addSvgIcon(
+      name,
+      this.domSanitizer.bypassSecurityTrustResourceUrl(`assets/${url}`)
     );
   }
 }

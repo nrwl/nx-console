@@ -7,7 +7,12 @@
 
   <div>
     <h2>Workspace Actions</h2>
-    <p>No Actions Available</p>
+    <div *ngFor="let e of editorSupport.editors|async">
+      <button mat-icon-button (click)="editorSupport.openInEditor(e.name, workspace.path)">
+        <mat-icon [svgIcon]="e.icon"></mat-icon>
+        Open in {{ e.name }}
+      </button>
+    </div>
   </div>
 
   <div>

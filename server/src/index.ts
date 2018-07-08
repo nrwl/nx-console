@@ -3,14 +3,15 @@ import * as graphql from 'graphql';
 import * as path from 'path';
 import { filterByName, readJsonFile } from './utils';
 import * as fs from 'fs';
-import { dirSync } from 'tmp';
+const dirSync = require('tmp').dirSync;
 import { readSchematicCollections } from './read-schematic-collections';
 import { readDescription, readProjects, readSchema } from './read-projects';
 import { availableAddons, readAddons } from './read-addons';
 import { readDependencies } from './read-dependencies';
 import { schematicCollectionsForNgNew } from './read-ngnews';
 import { statSync } from 'fs';
-import { spawn } from 'pty.js';
+const spawn = require('pty.js').spawn;
+import { openInEditor, readEditors } from './read-editors';
 
 const graphqlHTTP = require('express-graphql');
 
@@ -358,6 +359,22 @@ export const schematicCollectionForNgNewType: graphql.GraphQLObjectType = new gr
   }
 );
 
+export const editorSupportType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
+  {
+    name: 'EditorSupport',
+    fields: () => {
+      return {
+        name: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        icon: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        }
+      };
+    }
+  }
+);
+
 export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
   {
     name: 'Database',
@@ -395,6 +412,12 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
               console.log(e);
               throw e;
             }
+          }
+        },
+        editors: {
+          type: new graphql.GraphQLList(editorSupportType),
+          resolve: () => {
+            return readEditors();
           }
         },
         availableAddons: {
@@ -498,6 +521,24 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             stopAllCommands();
             return { result: true };
           }
+        },
+        openInEditor: {
+          type: new graphql.GraphQLObjectType({
+            name: 'OpenInEditor',
+            fields: {
+              response: {
+                type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+              }
+            }
+          }),
+          args: {
+            editor: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+            path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
+          },
+          resolve: (_root: any, args: any) => {
+            openInEditor(args.editor, args.path);
+            return { response: 'Success' };
+          }
         }
       };
     }
@@ -528,13 +569,13 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
     commandRunning
   };
 
-  commandRunning.on('data', data => {
+  commandRunning.on('data', (data: any) => {
     if (commands[command]) {
       commands[command].out += data.toString();
     }
   });
 
-  commandRunning.on('exit', code => {
+  commandRunning.on('exit', (code: any) => {
     if (commands[command]) {
       commands[command].status = code === 0 ? 'success' : 'failure';
     }
@@ -542,7 +583,7 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   return { command };
 }
 
-function findClosestNg(dir: string) {
+function findClosestNg(dir: string): string {
   if (directoryExists(path.join(dir, 'node_modules'))) {
     return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
   } else {
