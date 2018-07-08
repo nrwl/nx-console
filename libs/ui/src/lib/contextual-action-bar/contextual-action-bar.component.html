@@ -13,15 +13,21 @@
   </div>
   <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) as contextualActions" fxLayout="row" fxLayoutGap="24px"
     fxLayoutAlign="start center" fxFlex>
-    <mat-icon (click)="contextualActionBarService.close.next()" class="exit-action">arrow_back</mat-icon>
+    <mat-icon (click)="contextualActionBarService.contextualActions$.next(null)" class="exit-action">clear</mat-icon>
     <div class="context-title" fxFlex>
       {{ contextualActions.contextTitle }}
     </div>
     <div class="actions-container" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
-      <button [disabled]="action.disabled | async" (click)="action.invoke.next()" class="action-button" [matTooltip]="action.name"
-        mat-icon-button fxLayout="column" fxLayoutAlign="center" *ngFor="let action of contextualActions.actions">
-        <mat-icon class="action-icon">{{ action.icon }}</mat-icon>
-      </button>
+      <ng-container *ngFor="let action of contextualActions.actions; let last = last">
+
+        <button *ngIf="!last" [disabled]="action.disabled | async" (click)="action.invoke.next()" class="action-button" mat-button>
+          <span>{{ action.name }}</span>
+        </button>
+        <button *ngIf="last" [disabled]="action.disabled | async" (click)="action.invoke.next()" class="action-button" mat-raised-button
+          color="primary">
+          {{ action.name }}
+        </button>
+      </ng-container>
     </div>
   </div>
 </mat-toolbar>

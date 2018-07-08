@@ -11,12 +11,15 @@ import {
   EventEmitter,
   Input,
   Output,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ViewChildren,
+  QueryList
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Completions, Field, Serializer } from '@nxui/utils';
+import { Field, Serializer, Completions } from '@nxui/utils';
 import { Subscription } from 'rxjs';
 import { debounceTime, startWith, switchMap } from 'rxjs/operators';
+import { MatExpansionPanel } from '@angular/material';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
@@ -42,10 +45,14 @@ export class FlagsComponent {
   private _fields: Field[];
   private subscription: Subscription;
 
+  @ViewChildren(MatExpansionPanel)
+  matExpansionPanels: QueryList<MatExpansionPanel>;
+
   fieldGroups: Array<FieldGrouping> = [];
 
   @Input() path: string;
   @Input() description: string;
+  @Input() workspacePath: string;
   @Input() actionLabel: string;
   @Input() configurations: { name: string }[];
   @Input() prefix: string[];
@@ -71,6 +78,12 @@ export class FlagsComponent {
     private readonly elementRef: ElementRef,
     private readonly completions: Completions
   ) {}
+
+  hideFields() {
+    this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
+      panel.close();
+    });
+  }
 
   fieldOptions(field: Field) {
     if (field.defaultValue) {
@@ -146,24 +159,22 @@ export class FlagsComponent {
       (m, f) => {
         const value =
           this.init && this.init[f.name] ? this.init[f.name] : f.defaultValue;
-        m[f.name] = new FormControl(
+        const formControl = new FormControl(
           value,
           f.required ? Validators.required : null
         );
 
-        // TODO: DAN remove this and replace with real UI
         if (f.completion) {
-          m[f.name].valueChanges
-            .pipe(
-              debounceTime(100),
-              switchMap((v: string) =>
-                this.completions.completionsFor(this.path, f, v)
-              )
+          f.completionValues = formControl.valueChanges.pipe(
+            debounceTime(300),
+            startWith(formControl.value),
+            switchMap((v: string | null) =>
+              this.completions.completionsFor(this.path, f, v || '')
             )
-            .subscribe((v: string[]) => {
-              console.log('completions for', f.name, v);
-            });
+          );
         }
+
+        m[f.name] = formControl;
 
         return m;
       },

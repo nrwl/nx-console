@@ -21,7 +21,10 @@ import {
   withLatestFrom
 } from 'rxjs/operators';
 
-import { ROUTING_ANIMATION } from './workspace.component.animations';
+import {
+  GROW_SHRINK,
+  ROUTING_ANIMATION
+} from './workspace.component.animations';
 
 interface Route {
   icon: string;
@@ -34,17 +37,27 @@ interface Route {
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  animations: [ROUTING_ANIMATION]
+  animations: [GROW_SHRINK, ROUTING_ANIMATION]
 })
 export class WorkspaceComponent implements OnDestroy {
   @HostBinding('@.disabled') animationsDisabled = false;
 
   readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
-    map((event: NavigationEnd) => event.url),
-    map((url: string) => {
+    map(() => {
+      const firstChild = this.route.snapshot.firstChild;
+      if (!firstChild) {
+        throw new Error('This should never happen');
+      }
+
+      const url = firstChild.url[0].path;
+
       const route = this.routes.find(r => url.indexOf(r.url) > -1);
-      return route ? route.title : '';
+      if (!route) {
+        throw new Error('This should never happen');
+      }
+
+      return route.title;
     }),
     shareReplay(1)
   );
@@ -59,6 +72,16 @@ export class WorkspaceComponent implements OnDestroy {
     },
     { icon: 'chevron_right', url: 'tasks', title: 'Run Tasks' }
   ];
+
+  readonly sideNavAnimationState$ = this.contextualActionBarService.contextualActions$.pipe(
+    map(actions => {
+      if (actions === null) {
+        return 'expand';
+      } else {
+        return 'collapse';
+      }
+    })
+  );
 
   private readonly workspace$ = this.route.params.pipe(
     map(m => m['path']),

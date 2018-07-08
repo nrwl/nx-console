@@ -1,16 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Apollo } from 'apollo-angular';
 import { Field } from '@nxui/utils';
+import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Completions {
-  constructor(private apollo: Apollo) {}
+  constructor(private readonly apollo: Apollo) {}
 
-  completionsFor(path: string, field: Field, input: string) {
+  completionsFor(
+    path: string,
+    field: Field,
+    input: string
+  ): Observable<Array<string>> {
     return this.apollo
       .query({
         query: gql`

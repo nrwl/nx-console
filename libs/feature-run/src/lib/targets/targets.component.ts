@@ -4,7 +4,7 @@ import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
 import { Project } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 interface Target {
@@ -70,11 +70,6 @@ export class TargetsComponent {
             task: {
               projectName: project.name,
               targetName: builder.name
-            },
-            contextualActions: {
-              contextTitle: `ng ${builder.name} ${project.name}`,
-              close: new Subject(),
-              actions: []
             }
           }))
         })

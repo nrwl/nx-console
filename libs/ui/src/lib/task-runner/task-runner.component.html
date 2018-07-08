@@ -3,7 +3,7 @@
     <ng-content select="ui-flags"></ng-content>
   </div>
 
-  <div class="ui-terminal-container" fxFlex [@growShrink]="dryRunAnimationState | async">
+  <div class="ui-terminal-container" fxFlex [@growShrink]="terminalAnimationState | async">
     <div class="window-chrome" fxLayout="row" fxLayoutAlign="start center">
       <svg xmlns="http://www.w3.org/2000/svg" width="54" height="14" viewBox="0 0 54 14">
         <g fill="none" fill-rule="evenodd" transform="translate(1 1)">
@@ -15,8 +15,8 @@
       <div class="window-header" fxFlex fxLayout="row" fxLayoutAlign="center center">
         {{ terminalWindowTitle }}
       </div>
-      <button mat-button (click)="this.dryRunVisible.next(!this.dryRunVisible.value)">
-        {{ (dryRunVisible | async) ? 'Hide' : 'Show' }}
+      <button mat-button (click)="this.terminalVisible.next(!this.terminalVisible.value)">
+        {{ (terminalVisible | async) ? 'Hide' : 'Show' }}
       </button>
     </div>
     <div class="ng-content-container">

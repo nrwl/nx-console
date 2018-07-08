@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 export interface Breadcrumb {
   title: string;
@@ -21,11 +21,7 @@ export interface ContextualActions {
   providedIn: 'root'
 })
 export class ContextualActionBarService {
-  readonly breadcrumbs$ = new BehaviorSubject<Array<Breadcrumb>>([]);
+  readonly breadcrumbs$ = new Subject<Array<Breadcrumb>>();
 
-  readonly contextualActions$ = new BehaviorSubject<ContextualActions | null>(
-    null
-  );
-
-  readonly close = new Subject<void>();
+  readonly contextualActions$ = new Subject<ContextualActions | null>();
 }
