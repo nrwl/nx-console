@@ -81,8 +81,11 @@ export class Serializer {
       ...fields.filter(r => !r.positional && !r.important)
     ].map(f => {
       let d = f.defaultValue;
-      if (f.type === 'boolean' && f.defaultValue !== undefined) {
-        d = f.defaultValue === 'true';
+      if (f.type === 'boolean' && f.defaultValue === 'false') {
+        d = f.defaultValue === false;
+      }
+      if (f.type === 'boolean' && f.defaultValue === 'true') {
+        d = f.defaultValue === true;
       }
       return { ...f, defaultValue: d };
     });
