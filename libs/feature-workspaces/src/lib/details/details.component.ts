@@ -90,15 +90,23 @@ function createLinkForCoreSchematic(
   name: string,
   actionDescription: string
 ) {
-  return [
-    {
-      actionDescription,
-      link: [
-        '../generate',
-        decodeURIComponent('@schematics/angular'),
-        name,
-        { project: project.name }
-      ]
-    }
-  ];
+  if (
+    (project.projectType === 'application' ||
+      project.projectType === 'library') &&
+    !project.architect.find(a => a.name === 'e2e')
+  ) {
+    return [
+      {
+        actionDescription,
+        link: [
+          '../generate',
+          decodeURIComponent('@schematics/angular'),
+          name,
+          { project: project.name }
+        ]
+      }
+    ];
+  } else {
+    return [];
+  }
 }
