@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Project } from '@nxui/utils';
+import { Project, EditorSupport } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
@@ -14,7 +14,11 @@ import { map, switchMap } from 'rxjs/operators';
 export class DetailsComponent implements OnInit {
   public workspace$: Observable<any>;
 
-  constructor(private apollo: Apollo, private route: ActivatedRoute) {}
+  constructor(
+    private apollo: Apollo,
+    private route: ActivatedRoute,
+    public editorSupport: EditorSupport
+  ) {}
 
   ngOnInit() {
     this.workspace$ = this.route.params.pipe(

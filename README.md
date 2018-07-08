@@ -4,6 +4,7 @@
 ## Prepare
 * Run `yarn`
 
+
 ## Developing
 * For development run: `yarn start dev.up`
 * To run wrapped in Electron: Run `yarn start electron.up`
