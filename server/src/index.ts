@@ -365,6 +365,9 @@ export const completionResultType: graphql.GraphQLObjectType = new graphql.Graph
       return {
         value: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        display: {
+          type: graphql.GraphQLString
         }
       };
     }
@@ -413,8 +416,17 @@ export const completionsType: graphql.GraphQLObjectType = new graphql.GraphQLObj
             return files[path]
               .filter(f => f.indexOf('module.ts') > -1)
               .filter(f => f.indexOf(args.input) > -1)
-              .map(value => value.substring(workspace.path.length + 1))
-              .map(value => ({ value }));
+              .map(fullPath => {
+                const modulePath = fullPath.substring(
+                  workspace.path.length + 1
+                );
+                const parts = modulePath.split('/');
+                const value = parts[parts.length - 1];
+                return {
+                  value,
+                  display: modulePath
+                };
+              });
           }
         }
       };

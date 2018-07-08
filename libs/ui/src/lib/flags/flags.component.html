@@ -62,8 +62,8 @@
                 [formControlName]="field.name" [matAutocomplete]="auto">
               <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
               <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let value of field.completionValues | async" [value]="value">
-                  {{ value }}
+                <mat-option *ngFor="let completionValue of field.completionValues | async" [value]="completionValue.value">
+                  {{ completionValue.display || completionValue.value }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
