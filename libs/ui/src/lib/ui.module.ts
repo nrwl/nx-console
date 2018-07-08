@@ -27,6 +27,7 @@ import { FlagsComponent } from './flags/flags.component';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -47,7 +48,8 @@ import { TerminalComponent } from './terminal/terminal.component';
     MatRippleModule,
     MatSelectModule,
     MatSlideToggleModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule
   ],
   declarations: [
     FlagsComponent,
