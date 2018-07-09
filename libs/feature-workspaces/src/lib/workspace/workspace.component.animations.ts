@@ -8,19 +8,19 @@ import {
   state
 } from '@angular/animations';
 
-const TIMING = '0.7s 0.3s ease-in-out';
-const STAGE = style({ transform: 'translate3d(0, 0%, 0)' });
+const TIMING = '700ms 150ms ease-in-out';
+const STAGE = style({ transform: 'translateZ(0)' });
 const STAGE_TOP = style({ transform: 'translate3d(0, -100%, 0)' });
 const STAGE_BOTTOM = style({ transform: 'translate3d(0, 100%, 0)' });
 
 const ANIMATE_UP = group([
-  query(':enter', [STAGE_TOP, animate(TIMING, STAGE)], { optional: true }),
-  query(':leave', [STAGE, animate(TIMING, STAGE_BOTTOM)], { optional: true })
+  query(':enter', [STAGE_TOP, animate(TIMING, STAGE)]),
+  query(':leave', animate(TIMING, STAGE_BOTTOM))
 ]);
 
 const ANIMATE_DOWN = group([
-  query(':enter', [STAGE_BOTTOM, animate(TIMING, STAGE)], { optional: true }),
-  query(':leave', [STAGE, animate(TIMING, STAGE_TOP)], { optional: true })
+  query(':enter', [STAGE_BOTTOM, animate(TIMING, STAGE)]),
+  query(':leave', animate(TIMING, STAGE_TOP))
 ]);
 
 export const ROUTING_ANIMATION = trigger('routerTransition', [
@@ -37,6 +37,6 @@ export const GROW_SHRINK = trigger('growShrink', [
   state('void', style({ width: '0' })),
   state('collapse', style({ width: '0' })),
   state('expand', style({ width: '*' })),
-  transition(`expand => collapse`, animate(`600ms 300ms ease-in-out`)),
-  transition(`collapse => expand`, animate(`600ms ease-in-out`))
+  transition(`expand => collapse`, animate(`800ms 300ms ease-in-out`)),
+  transition(`collapse => expand`, animate(`800ms ease-in-out`))
 ]);

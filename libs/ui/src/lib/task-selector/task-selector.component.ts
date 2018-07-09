@@ -34,7 +34,7 @@ export interface TaskCollections<T> {
   selectedTask: Task<T> | null;
 }
 
-const ANIMATION_MILLIS = 600;
+const ANIMATION_MILLIS = 800;
 
 @Component({
   selector: 'ui-task-selector',

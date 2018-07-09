@@ -111,22 +111,15 @@ export class TargetComponent implements OnInit {
         };
       }),
       tap((project: Project) => {
-        let contextTitle =
-          project.architect[0].description ||
-          `${project.architect[0].name} - ${project.architect[0].builder}`;
-
-        if (contextTitle.endsWith('.')) {
-          contextTitle = contextTitle.slice(0, contextTitle.length - 1);
-        }
+        const contextTitle = this.getContextTitle(project);
 
         this.contextActionService.contextualActions$.next({
           contextTitle,
           actions: [
             {
-              icon: 'play_arrow',
               invoke: this.ngRun$,
               disabled: this.ngRunDisabled$,
-              name: 'Run task'
+              name: 'Run'
             }
           ]
         });
@@ -166,6 +159,10 @@ export class TargetComponent implements OnInit {
     this.command$ = this.commandArray$.pipe(
       map(c => `ng ${this.serializer.argsToString(c.commands)}`)
     );
+  }
+
+  getContextTitle(project: Project) {
+    return `ng ${project.architect[0].name} ${project.name}`;
   }
 
   public path() {
