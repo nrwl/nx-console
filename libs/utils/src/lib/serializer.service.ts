@@ -3,6 +3,11 @@ import { Observable } from 'rxjs';
 
 export type AutocompletionType = 'modules' | 'projects' | 'file';
 
+export interface CompletetionValue {
+  value: string;
+  display?: string;
+}
+
 export interface Field {
   name: string;
   enum: string[];
@@ -13,7 +18,7 @@ export interface Field {
   positional: boolean;
   important: boolean;
   completion?: AutocompletionType;
-  completionValues?: Observable<Array<string>>;
+  completionValues?: Observable<Array<CompletetionValue>>;
 }
 
 export interface Schematic {

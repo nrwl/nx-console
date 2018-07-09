@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Field } from '@nxui/utils';
+import { Field, CompletetionValue } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-interface CompletetionValue {
-  value: string;
-  display?: string;
-}
 
 @Injectable({
   providedIn: 'root'

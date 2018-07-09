@@ -1,5 +1,5 @@
-<ui-task-runner *ngIf="schematic$|async as schematic" [terminalWindowTitle]="schematic.collection + ' - ' + schematic.name + ' (dry run)'">
-  <ui-flags actionLabel="Generate" [description]="schematic.description" [prefix]="[schematic.name]" [fields]="schematic.schema"
-    (value)="onFlagsChange($event)" [init]="initValues$|async" [path]="path()"></ui-flags>
+<ui-task-runner *ngIf="schematic$ | async as schematic" [terminalWindowTitle]="schematic.collection + ' - ' + schematic.name + ' (dry run)'">
+  <ui-flags [description]="schematic.description" [prefix]="[schematic.name]" [fields]="schematic.schema" (value)="onFlagsChange($event)"
+    [init]="initValues$ | async" [path]="path()"></ui-flags>
   <ui-terminal [command]="command$|async" [input]="(combinedOutput$|async)?.out" #combinedOutput></ui-terminal>
 </ui-task-runner>

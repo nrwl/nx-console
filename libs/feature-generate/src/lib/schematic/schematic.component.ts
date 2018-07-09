@@ -130,19 +130,10 @@ export class SchematicComponent implements OnInit {
         const uiFlags = (this.elementRef
           .nativeElement as HTMLElement).querySelector('.ui-flags-container');
 
-        let contextTitle =
-          schematic.description ||
-          `${schematic.collection} - ${schematic.name}`;
-
-        if (contextTitle.endsWith('.')) {
-          contextTitle = contextTitle.slice(0, contextTitle.length - 1);
-        }
-
         this.contextActionService.contextualActions$.next({
-          contextTitle,
+          contextTitle: this.getContextTitle(schematic),
           actions: [
             {
-              icon: 'play_arrow',
               invoke: this.ngGen$,
               disabled: this.ngGenDisabled$,
               name: 'Generate'
@@ -230,6 +221,17 @@ export class SchematicComponent implements OnInit {
     ).pipe(
       map(commands => `ng generate ${this.serializer.argsToString(commands)}`)
     );
+  }
+
+  getContextTitle(schematic: Schematic) {
+    let contextTitle =
+      schematic.description || `${schematic.collection} - ${schematic.name}`;
+
+    if (contextTitle.endsWith('.')) {
+      contextTitle = contextTitle.slice(0, contextTitle.length - 1);
+    }
+
+    return contextTitle;
   }
 
   public path() {

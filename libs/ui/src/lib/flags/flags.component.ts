@@ -51,9 +51,6 @@ export class FlagsComponent {
   fieldGroups: Array<FieldGrouping> = [];
 
   @Input() path: string;
-  @Input() description: string;
-  @Input() workspacePath: string;
-  @Input() actionLabel: string;
   @Input() configurations: { name: string }[];
   @Input() prefix: string[];
   @Input() init: { [k: string]: any };
