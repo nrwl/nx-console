@@ -1,6 +1,8 @@
 {
   "name": "angular-console",
   "private": true,
+  "author": "Narwhal Technologies Inc",
+  "license": "MIT",
   "workspaces": [
     "server",
     "electron"
