@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as os from 'os';
 import { spawn } from 'child_process';
 
 export function readEditors() {
@@ -37,47 +38,98 @@ function hasFinder() {
 }
 
 function hasVsCode() {
-  try {
-    const apps = fs.readdirSync('/Applications');
-    return apps.indexOf('Visual Studio Code.app') > -1;
-  } catch (e) {
-    console.error(e);
+  if (os.platform() === 'darwin') {
+    try {
+      const apps = fs.readdirSync('/Applications');
+      return apps.indexOf('Visual Studio Code.app') > -1;
+    } catch (e) {
+      return false;
+    }
+  } else if (os.platform() === 'linux') {
+    // TODO implement linux support
+    return false;
+  } else if (os.platform() === 'win32') {
+    // TODO implement windows support
+    return false;
+  } else {
     return false;
   }
 }
 
 function hasWebStorm() {
-  try {
-    const apps = fs.readdirSync('/Applications');
-    return apps.indexOf('WebStorm.app') > -1;
-  } catch (e) {
-    console.error(e);
+  if (os.platform() === 'darwin') {
+    try {
+      const apps = fs.readdirSync('/Applications');
+      return apps.indexOf('WebStorm.app') > -1;
+    } catch (e) {
+      return false;
+    }
+  } else if (os.platform() === 'linux') {
+    // TODO implement linux support
+    return false;
+  } else if (os.platform() === 'win32') {
+    // TODO implement windows support
+    return false;
+  } else {
     return false;
   }
 }
 
 function hasIntellij() {
-  try {
-    const apps = fs.readdirSync('/Applications');
-    return apps.indexOf('IntelliJ IDEA') > -1;
-  } catch (e) {
-    console.error(e);
+  if (os.platform() === 'darwin') {
+    try {
+      const apps = fs.readdirSync('/Applications');
+      return apps.indexOf('IntelliJ IDEA') > -1;
+    } catch (e) {
+      return false;
+    }
+  } else if (os.platform() === 'linux') {
+    // TODO implement linux support
+    return false;
+  } else if (os.platform() === 'win32') {
+    // TODO implement windows support
+    return false;
+  } else {
     return false;
   }
 }
 
 function openInFinder(path: string) {
-  spawn('open', [path], { detached: true });
+  if (os.platform() === 'darwin') {
+    spawn('open', [path], { detached: true });
+  } else if (os.platform() === 'linux') {
+    // TODO implement linux support
+  } else if (os.platform() === 'win32') {
+    // TODO implement windows support
+  }
 }
 
 function openInVsCode(path: string) {
-  spawn('open', ['-a', 'Visual Studio Code', path], { detached: true });
+  if (os.platform() === 'darwin') {
+    spawn('open', ['-a', 'Visual Studio Code', path], { detached: true });
+  } else if (os.platform() === 'linux') {
+    // TODO implement linux support
+  } else if (os.platform() === 'win32') {
+    // TODO implement windows support
+  }
 }
 
 function openInWebStorm(path: string) {
-  spawn('open', ['-a', 'WebStorm', path], { detached: true });
+  if (os.platform() === 'darwin') {
+    spawn('open', ['-a', 'WebStorm', path], { detached: true });
+  } else if (os.platform() === 'linux') {
+    // TODO implement linux support
+  } else if (os.platform() === 'win32') {
+    // TODO implement windows support
+  }
 }
 
 function openInIntelliJ(path: string) {
-  spawn('open', ['-a', 'IntelliJ IDEA', path], { detached: true });
+  if (os.platform() === 'darwin') {
+    spawn('open', ['-a', 'IntelliJ IDEA', path], { detached: true });
+  } else if (os.platform() === 'linux') {
+    // TODO implement linux support
+  } else if (os.platform() === 'win32') {
+    // TODO implement windows support
+  }
 }

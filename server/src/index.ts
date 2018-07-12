@@ -10,7 +10,8 @@ import { availableAddons, readAddons } from './read-addons';
 import { readDependencies } from './read-dependencies';
 import { schematicCollectionsForNgNew } from './read-ngnews';
 import { statSync } from 'fs';
-const spawn = require('pty.js').spawn;
+const spawn = require('node-pty-prebuilt').spawn;
+import { platform } from 'os';
 import { openInEditor, readEditors } from './read-editors';
 
 const graphqlHTTP = require('express-graphql');
@@ -524,7 +525,7 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
         ngNew: {
           type: commandStartedType,
           args: {
-            directory: {
+            path: {
               type: new graphql.GraphQLNonNull(graphql.GraphQLString)
             },
             name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
@@ -534,11 +535,11 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
           },
           resolve: async (_root: any, args: any) => {
             return runCommand(
-              '/',
+              args.path,
               [
                 'new',
                 args.name,
-                `--directory=${args.directory}`,
+                `--directory=${args.name}`,
                 `--collection=${args.collection}`
               ],
               false
@@ -615,9 +616,7 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   stopAllCommands();
   const command = `ng ${cmds.join(' ')} ${Math.random()}`;
 
-  const ng = localNg
-    ? path.join('node_modules', '.bin', 'ng')
-    : findClosestNg(__dirname);
+  const ng = localNg ? findClosestNg(cwd) : findClosestNg(__dirname);
   const commandRunning = spawn(ng, cmds, { cwd, cols: 100 });
   commands[command] = {
     status: 'inprogress',
@@ -641,7 +640,11 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
 
 function findClosestNg(dir: string): string {
   if (directoryExists(path.join(dir, 'node_modules'))) {
-    return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
+    if (platform() === 'win32') {
+      return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
+    } else {
+      return path.join(dir, 'node_modules', '.bin', 'ng');
+    }
   } else {
     return findClosestNg(path.dirname(dir));
   }
