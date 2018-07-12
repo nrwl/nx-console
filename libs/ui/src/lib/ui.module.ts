@@ -69,8 +69,8 @@ import { RouterModule } from '@angular/router';
 })
 export class UiModule {
   constructor(
-    private matIconRegistry: MatIconRegistry,
-    private domSanitizer: DomSanitizer
+    private readonly matIconRegistry: MatIconRegistry,
+    private readonly domSanitizer: DomSanitizer
   ) {
     this.addIcon('toggle_on', 'baseline-toggle_on-24px.svg');
     this.addIcon('toggle_off', 'baseline-toggle_off-24px.svg');

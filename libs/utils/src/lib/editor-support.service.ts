@@ -8,9 +8,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class EditorSupport {
-  private editors$: Observable<{ name: string; icon: string }>;
+  private readonly editors$: Observable<{ name: string; icon: string }>;
 
-  constructor(private apollo: Apollo) {
+  constructor(private readonly apollo: Apollo) {
     this.editors$ = this.apollo
       .query({
         query: gql`

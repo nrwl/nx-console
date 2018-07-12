@@ -30,7 +30,7 @@ export class NewWorkspaceComponent implements OnInit {
 
   commandOutput$: Observable<CommandOutput>;
   command$ = new Subject();
-  private ngNew$ = new Subject<NgNewInvocation>();
+  private readonly ngNew$ = new Subject<NgNewInvocation>();
   @ViewChild('out', { read: TerminalComponent })
   out: TerminalComponent;
 

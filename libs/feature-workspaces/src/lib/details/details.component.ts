@@ -12,17 +12,17 @@ import { map, switchMap } from 'rxjs/operators';
   styleUrls: ['./details.component.css']
 })
 export class DetailsComponent implements OnInit {
-  public workspace$: Observable<any>;
+  workspace$: Observable<any>;
 
   constructor(
-    private apollo: Apollo,
-    private route: ActivatedRoute,
+    private readonly apollo: Apollo,
+    private readonly route: ActivatedRoute,
     public editorSupport: EditorSupport
   ) {}
 
   ngOnInit() {
     this.workspace$ = this.route.params.pipe(
-      map(m => m['path']),
+      map(m => m.path),
       switchMap(path => {
         return this.apollo.watchQuery({
           pollInterval: 2000,

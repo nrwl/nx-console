@@ -10,7 +10,6 @@ import {
   CommandOutput,
   CommandRunner,
   NpmScript,
-  Project,
   Serializer
 } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
@@ -169,8 +168,8 @@ export class NpmScriptComponent implements OnInit {
     return `${script.npmClient} run ${script.name}`;
   }
 
-  public path() {
-    return this.route.snapshot.params['path'];
+  path() {
+    return this.route.snapshot.params.path;
   }
 
   onRun() {

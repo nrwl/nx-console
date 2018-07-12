@@ -7,10 +7,12 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import { Terminal } from 'xterm';
-
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { Terminal } from 'xterm';
+
+const DEBOUNCE_TIME = 300;
+const SCROLL_BAR_WIDTH = 48;
 
 @Component({
   selector: 'ui-terminal',
@@ -25,7 +27,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   term = new Terminal({ disableStdin: true, fontSize: 12 });
 
   resizeSubscription = fromEvent(window, 'resize')
-    .pipe(debounceTime(350))
+    .pipe(debounceTime(DEBOUNCE_TIME))
     .subscribe(() => {
       this.resizeTerminal();
     });
@@ -68,7 +70,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     renderer.clear();
 
     const height = (this.code.nativeElement as HTMLElement).clientHeight;
-    const width = (this.code.nativeElement as HTMLElement).clientWidth - 48;
+    const width =
+      (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
 
     const cols = Math.floor(width / renderer.dimensions.actualCellWidth);
     const rows = Math.floor(height / renderer.dimensions.actualCellHeight);

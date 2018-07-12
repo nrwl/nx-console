@@ -16,9 +16,7 @@ import {
   publishReplay,
   refCount,
   shareReplay,
-  startWith,
-  switchMap,
-  withLatestFrom
+  switchMap
 } from 'rxjs/operators';
 
 import {
@@ -84,7 +82,7 @@ export class WorkspaceComponent implements OnDestroy {
   );
 
   private readonly workspace$ = this.route.params.pipe(
-    map(m => m['path']),
+    map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
         pollInterval: 2000,

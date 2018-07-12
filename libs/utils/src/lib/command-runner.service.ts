@@ -1,20 +1,22 @@
+import { Injectable } from '@angular/core';
+import { Apollo } from 'apollo-angular';
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
-import { concatMap, last, map, switchMap, takeWhile } from 'rxjs/operators';
 import { interval, Observable, of } from 'rxjs';
-import { Apollo } from 'apollo-angular';
-import { Injectable } from '@angular/core';
+import { concatMap, last, map, switchMap, takeWhile } from 'rxjs/operators';
 
 export interface CommandOutput {
   status: 'success' | 'failure' | 'inprogress';
   out: string;
 }
 
+const POLLING_INTERVAL_MILLIS = 500;
+
 @Injectable({
   providedIn: 'root'
 })
 export class CommandRunner {
-  constructor(private apollo: Apollo) {}
+  constructor(private readonly apollo: Apollo) {}
 
   runCommand(
     mutation: DocumentNode,
@@ -30,7 +32,7 @@ export class CommandRunner {
       .pipe(
         map(extractCommand),
         switchMap((command: string) => {
-          return interval(500).pipe(
+          return interval(POLLING_INTERVAL_MILLIS).pipe(
             switchMap(() => {
               return this.apollo.query({
                 query: gql`

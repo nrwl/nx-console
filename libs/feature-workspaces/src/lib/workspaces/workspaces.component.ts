@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ContextualActionBarService } from '@nxui/ui';
-import { Messenger, Settings } from '@nxui/utils';
+import { Settings } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
@@ -13,9 +13,8 @@ import gql from 'graphql-tag';
 export class WorkspacesComponent {
   constructor(
     private readonly apollo: Apollo,
-    private readonly messenger: Messenger,
     private readonly router: Router,
-    public readonly settings: Settings,
+    readonly settings: Settings,
     contextualActionBarService: ContextualActionBarService
   ) {
     contextualActionBarService.breadcrumbs$.next([

@@ -21,19 +21,19 @@ export class AddonsComponent implements OnInit {
   addons$: Observable<any>;
   commandOutput$: Observable<CommandOutput>;
   command$ = new Subject();
-  private ngAdd$ = new Subject<Addon>();
+  private readonly ngAdd$ = new Subject<Addon>();
   @ViewChild('out', { read: TerminalComponent })
   out: TerminalComponent;
 
   constructor(
-    private apollo: Apollo,
-    private route: ActivatedRoute,
-    private commandRunner: CommandRunner
+    private readonly apollo: Apollo,
+    private readonly route: ActivatedRoute,
+    private readonly commandRunner: CommandRunner
   ) {}
 
   ngOnInit() {
     this.addons$ = this.route.params.pipe(
-      map(m => m['path']),
+      map(m => m.path),
       switchMap(path => {
         return this.apollo.watchQuery({
           pollInterval: 2000,
@@ -79,7 +79,7 @@ export class AddonsComponent implements OnInit {
             }
           `,
           {
-            path: this.route.snapshot.params['path'],
+            path: this.route.snapshot.params.path,
             name: addon.name
           },
           (res: any) => res.data.ngAdd.command,
