@@ -643,7 +643,11 @@ function findClosestNg(dir: string): string {
     if (platform() === 'win32') {
       return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
     } else {
-      return path.join(dir, 'node_modules', '.bin', 'ng');
+      if (fileExists(path.join(dir, 'node_modules', '.bin', 'ng'))) {
+        return path.join(dir, 'node_modules', '.bin', 'ng');
+      } else {
+        return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
+      }
     }
   } else {
     return findClosestNg(path.dirname(dir));
@@ -685,6 +689,14 @@ function listFilesRec(dirName: string): string[] {
 function directoryExists(filePath: string): boolean {
   try {
     return statSync(filePath).isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
+function fileExists(filePath: string): boolean {
+  try {
+    return statSync(filePath).isFile();
   } catch (err) {
     return false;
   }
