@@ -1,6 +1,8 @@
 {
   "name": "AngularConsole",
-  "version": "0.1.0",
+  "description": "Angular Console",
+  "version": "1.0.0",
+  "author": "Nrwl",
   "main": "electron.js",
   "dependencies": {
     "express": "^4.16.3",
@@ -12,11 +14,9 @@
     "@angular/cli": "6.0.8",
     "@nrwl/schematics": "6.1.0",
     "@ngrx/schematics": "6.0.1",
-    "pty.js": "0.3.1"
+    "node-pty-prebuilt": "0.7.3"
   },
   "devDependencies": {
-    "electron": "^2.0.3",
-    "electron-packager": "12.1.0",
-    "electron-installer-dmg": "^1.0.0"
+    "electron": "^2.0.3"
   }
 }

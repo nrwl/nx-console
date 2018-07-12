@@ -2,12 +2,12 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { spawn } from 'child_process';
 import { statSync, writeFileSync } from 'fs';
-import * as fixPath from 'fix-path';
-import * as getPort from 'get-port';
+const fixPath = require('fix-path');
+const getPort = require('get-port');
 import * as os from 'os';
 
-let win;
-let p;
+let win: any;
+let p: any;
 
 fixPath();
 
