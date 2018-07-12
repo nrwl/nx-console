@@ -14,7 +14,18 @@ module.exports = {
         write: 'nx format:write',
         check: 'nx format:check'
       },
-      lint: npsUtils.series('nx lint', 'ng lint')
+      lint: {
+        default: npsUtils.series('nx lint', 'ng lint'),
+        fix: npsUtils.series(
+          'ng lint --fix --project nxui',
+          'ng lint --fix --project feature-workspaces',
+          'ng lint --fix --project feature-addons',
+          'ng lint --fix --project feature-generate',
+          'ng lint --fix --project utils',
+          'ng lint --fix --project feature-run',
+          'ng lint --fix --project ui'
+        )
+      }
     },
     server: {
       compile: 'tsc -p server/tsconfig.json',
@@ -59,7 +70,8 @@ module.exports = {
       write: npsUtils.concurrent.nps('frontend.format.write', 'server.format.write')
     },
     lint: {
-      default: npsUtils.concurrent.nps('frontend.lint')
+      default: npsUtils.concurrent.nps('frontend.lint'),
+      fix: npsUtils.concurrent.nps('frontend.lint.fix')
     }
   }
 };

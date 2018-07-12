@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
-import { NpmScript, NpmScripts, Project } from '@nxui/utils';
+import { NpmScripts, Project } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
@@ -21,7 +21,7 @@ export class TargetsComponent {
   private readonly projectsAndNpmScripts$: Observable<
     Array<Project | NpmScripts>
   > = this.route.params.pipe(
-    map(m => m['path']),
+    map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
         pollInterval: 5000,

@@ -11,21 +11,23 @@ import {
   EventEmitter,
   Input,
   Output,
-  ViewEncapsulation,
+  QueryList,
   ViewChildren,
-  QueryList
+  ViewEncapsulation
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Field, Serializer, Completions } from '@nxui/utils';
+import { MatExpansionPanel } from '@angular/material';
+import { Completions, Field, Serializer } from '@nxui/utils';
 import { Subscription } from 'rxjs';
 import { debounceTime, startWith, switchMap } from 'rxjs/operators';
-import { MatExpansionPanel } from '@angular/material';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
   fields: Array<Field>;
   expanded: boolean;
 }
+
+const DEBOUNCE_TIME = 300;
 
 @Component({
   selector: 'ui-flags',
@@ -163,7 +165,7 @@ export class FlagsComponent {
 
         if (f.completion) {
           f.completionValues = formControl.valueChanges.pipe(
-            debounceTime(300),
+            debounceTime(DEBOUNCE_TIME),
             startWith(formControl.value),
             switchMap((v: string | null) =>
               this.completions.completionsFor(this.path, f, v || '')
@@ -178,7 +180,7 @@ export class FlagsComponent {
       {} as any
     );
     if (this.configurations && this.configurations.length > 0) {
-      children['configurations'] = new FormControl(null);
+      children.configurations = new FormControl(null);
     }
     this.formGroup = new FormGroup(children);
 
@@ -194,8 +196,8 @@ export class FlagsComponent {
 
   private emitNext(value: { [p: string]: any }) {
     const configuration =
-      this.configurations && value['configurations']
-        ? [`--configuration=${value['configurations']}`]
+      this.configurations && value.configurations
+        ? [`--configuration=${value.configurations}`]
         : [];
     this.value.next({
       commands: [

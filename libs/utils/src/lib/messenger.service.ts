@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material';
   providedIn: 'root'
 })
 export class Messenger {
-  constructor(private snackBar: MatSnackBar) {}
+  constructor(private readonly snackBar: MatSnackBar) {}
 
   error(m: string) {
     this.snackBar.open(`Error: ${m}`, 'Close');

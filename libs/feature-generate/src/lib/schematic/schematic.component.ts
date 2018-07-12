@@ -2,9 +2,9 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   ContextualActionBarService,
-  TerminalComponent,
+  FlagsComponent,
   TaskRunnerComponent,
-  FlagsComponent
+  TerminalComponent
 } from '@nxui/ui';
 import {
   CommandOutput,
@@ -29,6 +29,8 @@ const MISSING_REQUIRED_FLAGS: CommandOutput = {
   status: 'success',
   out: 'Command is missing required fields'
 };
+
+const DEBOUNCE_TIME = 300;
 
 @Component({
   selector: 'nxui-schematic',
@@ -153,7 +155,7 @@ export class SchematicComponent implements OnInit {
     );
 
     this.dryRunResult$ = this.commandArray$.pipe(
-      debounceTime(300),
+      debounceTime(DEBOUNCE_TIME),
       switchMap(c => {
         this.out.clear();
         if (!c.valid) {
@@ -196,7 +198,7 @@ export class SchematicComponent implements OnInit {
             }
           `,
           {
-            path: this.route.snapshot.params['path'],
+            path: this.route.snapshot.params.path,
             genCommand: c.commands
           },
           r => r.data.generate.command,
@@ -234,8 +236,8 @@ export class SchematicComponent implements OnInit {
     return contextTitle;
   }
 
-  public path() {
-    return this.route.snapshot.params['path'];
+  path() {
+    return this.route.snapshot.params.path;
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {

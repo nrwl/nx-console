@@ -28,7 +28,7 @@ export class SchematicsComponent {
   private readonly schematicCollections$: Observable<
     Array<SchematicCollection>
   > = this.route.params.pipe(
-    map(m => m['path']),
+    map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
         pollInterval: 5000,

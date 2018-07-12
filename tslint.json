@@ -5,6 +5,34 @@
   ],
   "extends": ["codelyzer"],
   "rules": {
+    "adjacent-overload-signatures": true,
+    "member-access": [true, "no-public"],
+    "no-empty-interface": true,
+    "no-parameter-reassignment": true,
+    "no-namespace": true,
+    "no-magic-numbers": [true, -1, 0, 1],
+    "no-internal-module": true,
+    "no-reference": true,
+    "no-unnecessary-type-assertion": true,
+    "prefer-const": [true, { "destructuring": "all" }],
+    "curly": [true, "ignore-same-line"],
+    "typedef": [true, "parameter"],
+    "no-var-requires": true,
+    "prefer-readonly": true,
+    "no-duplicate-imports": true,
+    "no-default-export": true,
+    "use-isnan": true,
+    "triple-equals": true,
+    "strict-type-predicates": true,
+    "restrict-plus-operands": true,
+    "prefer-object-spread": true,
+    "no-unused-variable": [true, { "ignore-pattern": "^_" }],
+    "no-unsafe-finally": true,
+    "no-unsafe-any": false,
+    "no-this-assignment": true,
+    "no-string-literal": true,
+    "no-object-literal-type-assertion": true,
+
     "angular-whitespace": [true, "check-interpolation", "check-semicolon"],
     "banana-in-box": true,
     "templates-no-negated-async": true,
@@ -28,12 +56,8 @@
       "severity": "warn"
     },
     "forin": true,
-    "import-blacklist": [
-      true,
-      "rxjs/Rx"
-    ],
+    "import-blacklist": [true, "rxjs/Rx"],
     "interface-over-type-literal": true,
-    "member-access": false,
     "member-ordering": [
       true,
       {
@@ -47,28 +71,16 @@
     ],
     "no-arg": true,
     "no-bitwise": true,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
+    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
     "no-construct": true,
     "no-debugger": true,
     "no-duplicate-super": true,
     "no-empty": false,
-    "no-empty-interface": true,
     "no-eval": true,
-    "no-inferrable-types": [
-      true,
-      "ignore-params"
-    ],
+    "no-inferrable-types": [true, "ignore-params"],
     "no-misused-new": true,
     "no-non-null-assertion": true,
     "no-shadowed-variable": true,
-    "no-string-literal": false,
     "no-string-throw": true,
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
@@ -77,26 +89,11 @@
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,
-    "prefer-const": true,
     "radix": true,
-    "triple-equals": [
-      true,
-      "allow-null-check"
-    ],
     "unified-signatures": true,
     "variable-name": false,
-    "directive-selector": [
-      true,
-      "attribute",
-      "app",
-      "camelCase"
-    ],
-    "component-selector": [
-      true,
-      "element",
-      "app",
-      "kebab-case"
-    ],
+    "directive-selector": [true, "attribute", "app", "camelCase"],
+    "component-selector": [true, "element", "app", "kebab-case"],
     "no-output-on-prefix": true,
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,

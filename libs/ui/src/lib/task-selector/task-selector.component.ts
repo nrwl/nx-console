@@ -35,6 +35,7 @@ export interface TaskCollections<T> {
 }
 
 const ANIMATION_MILLIS = 800;
+const ROUTE_CHANGE_DELAY = 300;
 
 @Component({
   selector: 'ui-task-selector',
@@ -133,7 +134,7 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
       this.selectionChange.next(task.task);
       setTimeout(() => {
         this.taskAnimationState$.next('collapse');
-      }, 300);
+      }, ROUTE_CHANGE_DELAY);
     } else {
       this.contextActionService.contextualActions$.next(null);
     }

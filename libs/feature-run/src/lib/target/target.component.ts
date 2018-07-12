@@ -165,8 +165,8 @@ export class TargetComponent implements OnInit {
     return `ng ${project.architect[0].name} ${project.name}`;
   }
 
-  public path() {
-    return this.route.snapshot.params['path'];
+  path() {
+    return this.route.snapshot.params.path;
   }
 
   onRun() {
