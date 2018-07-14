@@ -38,14 +38,9 @@ export class WorkspacesComponent {
           path
         }
       })
-      .subscribe(
-        () => {
-          this.router.navigate(['/workspaces', path]);
-        },
-        e => {
-          this.messenger.error(e);
-        }
-      );
+      .subscribe(() => {
+        this.router.navigate(['/workspaces', path]);
+      });
   }
 
   clearRecent() {

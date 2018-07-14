@@ -1,22 +1,27 @@
 import {
   autocompletion,
-  checkFieldError,
+  checkButtonIsDisabled,
+  checkDisplayedCommand,
+  checkFieldHasClass,
   clickOnTask,
-  els,
+  expandTerminal,
   goToGenerate,
   openProject,
   projectPath,
   texts,
+  toggleBoolean,
   uniqName,
+  waitForAnimation,
   waitForAutocomplete
 } from './utils';
 
 describe('Forms', () => {
   beforeEach(() => {
     cy.visit('/workspaces');
-    openProject(projectPath());
+    openProject(projectPath('proj'));
     goToGenerate();
-    clickOnTask('service');
+    clickOnTask('component');
+    waitForAnimation();
   });
 
   it('supports basic validations', () => {
@@ -24,13 +29,15 @@ describe('Forms', () => {
     cy.get('input[name="name"]').clear();
     cy.get('input[name="project"').type('proj');
 
-    checkFieldError('name', true);
+    checkFieldHasClass('name', true, 'error');
+    checkButtonIsDisabled('Generate', true);
 
     cy.get('input[name="name"]').type(uniqName('someservice'));
-    checkFieldError('name', false);
+    checkFieldHasClass('name', false, 'error');
+    checkButtonIsDisabled('Generate', false);
   });
 
-  it('supports module autocompletion', () => {
+  it('supports project autocompletion', () => {
     cy.get('input[name="project"]').type('e2e');
 
     autocompletion($p => {
@@ -45,5 +52,36 @@ describe('Forms', () => {
       expect(texts($p)[0]).to.contain('proj');
       expect(texts($p)[1]).to.contain('proj-e2e');
     });
+  });
+
+  it('supports module autocompletion', () => {
+    cy.get('input[name="module"]').type('nothing');
+
+    autocompletion($p => {
+      expect($p.length).to.equal(0);
+    });
+
+    cy.get('input[name="module"]').clear();
+    cy.get('input[name="module"]').type('app');
+    waitForAutocomplete();
+
+    autocompletion($p => {
+      expect($p.length).to.equal(1);
+      expect(texts($p)[0]).to.include('src/app/app.module.ts');
+    });
+  });
+
+  it('updates the command in the terminal', () => {
+    expandTerminal();
+    checkDisplayedCommand('$ ng generate component --dry-run');
+
+    cy.get('input[name="name"]').type('cmp');
+    checkDisplayedCommand('$ ng generate component cmp --dry-run');
+
+    toggleBoolean('export');
+    checkDisplayedCommand('$ ng generate component cmp --export --dry-run');
+
+    toggleBoolean('export');
+    checkDisplayedCommand('$ ng generate component cmp --dry-run');
   });
 });
