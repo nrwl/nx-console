@@ -2,10 +2,13 @@ import {
   checkDisplayedCommand,
   checkFileExists,
   clickOnTask,
+  expandTerminal,
+  goBack,
   goToTasks,
   openProject,
   projectPath,
   taskListHeaders,
+  tasks,
   texts,
   waitForAnimation,
   waitForBuild
@@ -14,17 +17,62 @@ import {
 describe('Tasks', () => {
   beforeEach(() => {
     cy.visit('/workspaces');
+    openProject(projectPath('proj'));
+    goToTasks();
+  });
+
+  it('filters tasks', () => {
+    cy.get('div.title').contains('Run Tasks');
+
+    taskListHeaders($p => {
+      expect($p.length).to.equal(2);
+      expect(texts($p)[0]).to.equal('proj');
+      expect(texts($p)[1]).to.equal('proj-e2e');
+    });
+
+    tasks($p => {
+      const t = texts($p);
+      expect(t.indexOf(' build ') > -1).to.equal(true);
+      expect(t.indexOf(' serve ') > -1).to.equal(true);
+    });
+
+    // filter by item
+    cy.get('input#filter').type('build');
+    tasks($p => {
+      const t = texts($p);
+      expect(t.indexOf(' build ') > -1).to.equal(true);
+      expect(t.indexOf(' serve ') > -1).to.equal(false);
+    });
+
+    // filter by project
+    cy.get('input#filter').clear();
+    cy.get('input#filter').type('proj-e2e');
+
+    tasks($p => {
+      const t = texts($p);
+      expect(t.indexOf(' e2e ') > -1).to.equal(true);
+      expect(t.indexOf(' lint ') > -1).to.equal(true);
+    });
   });
 
   it('runs a task', () => {
-    openProject(projectPath());
-    goToTasks();
-
-    taskListHeaders($p => {
-      expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
-    });
     clickOnTask('build');
     waitForAnimation();
+
+    cy.get('div.context-title').contains('ng build proj');
+
+    expandTerminal();
+    checkDisplayedCommand('$ ng build proj');
+
+    cy.get('mat-radio-button')
+      .contains('Production')
+      .click();
+    checkDisplayedCommand('$ ng build proj --configuration=production');
+
+    cy.get('mat-radio-button')
+      .contains('Default')
+      .click();
+    checkDisplayedCommand('$ ng build proj');
 
     cy.get('button')
       .contains('Run')
@@ -34,5 +82,13 @@ describe('Tasks', () => {
 
     waitForBuild();
     checkFileExists(`dist/proj/main.js`);
+
+    goBack();
+    waitForAnimation();
+
+    cy.get('div.title').contains('Run Tasks');
+    taskListHeaders($p => {
+      expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
+    });
   });
 });

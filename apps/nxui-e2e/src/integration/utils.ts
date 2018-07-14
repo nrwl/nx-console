@@ -6,13 +6,57 @@ export function clickOnFieldGroup(group: string) {
     .click();
 }
 
-export function checkFieldError(field: string, hasError: boolean) {
+export function checkError(error: string) {
+  cy.get('simple-snack-bar').contains(error);
+}
+
+export function goBack() {
+  cy.get('mat-icon')
+    .contains('clear')
+    .click();
+}
+
+export function expandTerminal() {
+  cy.get('button')
+    .contains('Show')
+    .click();
+}
+
+export function toggleBoolean(field: string) {
+  fieldOperation(field, el => {
+    el.querySelector('div.boolean-ripple').click();
+  });
+}
+
+export function checkButtonIsDisabled(text: string, disabled: boolean) {
+  cy.get('button').should($p => {
+    for (let i = 0; i < $p.length; ++i) {
+      if ($p[i].innerText.indexOf(text) > -1) {
+        expect($p[i].hasAttribute('disabled')).to.equal(disabled);
+      }
+    }
+  });
+}
+
+export function checkFieldHasClass(
+  field: string,
+  hasClass: boolean,
+  className: string
+) {
+  fieldOperation(field, el => {
+    if (hasClass) {
+      expect(el.className).to.contain(className);
+    } else {
+      expect(el.className).not.to.contain(className);
+    }
+  });
+}
+
+function fieldOperation(field: string, operation: (el: any) => void) {
   cy.get('div.field').should($p => {
     for (let i = 0; i < $p.length; ++i) {
       if ($p[i].querySelector(`[name="${field}"]`)) {
-        if (hasError) {
-          expect($p[i].className).to.contain('error');
-        }
+        operation($p[i]);
       }
     }
   });
@@ -49,6 +93,14 @@ export function taskListHeaders(callback: (s: any) => void) {
   cy.get('mat-nav-list.task-list').within(() => {
     cy.root()
       .find('h3.mat-subheader')
+      .should(callback);
+  });
+}
+
+export function tasks(callback: (s: any) => void) {
+  cy.get('mat-nav-list.task-list').within(() => {
+    cy.root()
+      .find('mat-list-item')
       .should(callback);
   });
 }
@@ -103,6 +155,6 @@ export function texts($p: any): string[] {
     .toArray();
 }
 
-export function projectPath() {
-  return path.join(Cypress.env('projectsRoot'), 'proj');
+export function projectPath(name: string) {
+  return path.join(Cypress.env('projectsRoot'), name);
 }

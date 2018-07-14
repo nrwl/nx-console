@@ -1,37 +1,65 @@
-import * as path from 'path';
 import {
   autocompletion,
+  checkDisplayedCommand,
+  checkFileExists,
   clickOnTask,
   els,
-  checkFileExists,
+  goBack,
   goToGenerate,
   openProject,
-  projectNames,
   projectPath,
   taskListHeaders,
+  tasks,
   texts,
   uniqName,
   waitForAnimation,
-  waitForAutocomplete,
-  checkDisplayedCommand
+  waitForAutocomplete
 } from './utils';
 
 describe('Generate', () => {
   beforeEach(() => {
     cy.visit('/workspaces');
+    openProject(projectPath('proj'));
+    goToGenerate();
+  });
+
+  it('filters schematics', () => {
+    cy.get('div.title').contains('Generate Code');
+
+    taskListHeaders($p => {
+      expect($p.length).to.equal(1);
+      expect(texts($p)[0]).to.equal('@schematics/angular');
+    });
+
+    tasks($p => {
+      const t = texts($p);
+      expect(t.indexOf(' service ') > -1).to.equal(true);
+      expect(t.indexOf(' component ') > -1).to.equal(true);
+    });
+
+    // filter by item
+    cy.get('input#filter').type('servi');
+    tasks($p => {
+      const t = texts($p);
+      expect(t.indexOf(' service ') > -1).to.equal(true);
+      expect(t.indexOf(' component ') > -1).to.equal(false);
+    });
+
+    // filter by collection
+    cy.get('input#filter').clear();
+    cy.get('input#filter').type('angular');
+    tasks($p => {
+      const t = texts($p);
+      expect(t.indexOf(' service ') > -1).to.equal(true);
+      expect(t.indexOf(' component ') > -1).to.equal(true);
+    });
   });
 
   it('runs a schematic', () => {
-    openProject(projectPath());
-    goToGenerate();
-
-    taskListHeaders($p => {
-      expect(
-        texts($p).filter(r => r === '@schematics/angular').length
-      ).to.equal(1);
-    });
     clickOnTask('service');
     waitForAnimation();
+
+    cy.get('div.context-title').contains('Create an Angular service');
 
     const name = uniqName('example');
     cy.get('input[name="name"]').type(name);
@@ -52,5 +80,13 @@ describe('Generate', () => {
     checkDisplayedCommand(`$ ng generate service ${name} --project=proj`);
     checkFileExists(`src/app/${name}.service.ts`);
     checkFileExists(`src/app/${name}.service.spec.ts`);
+
+    goBack();
+    waitForAnimation();
+
+    cy.get('div.title').contains('Generate Code');
+    taskListHeaders($p => {
+      expect(texts($p)[0]).to.equal('@schematics/angular');
+    });
   });
 });

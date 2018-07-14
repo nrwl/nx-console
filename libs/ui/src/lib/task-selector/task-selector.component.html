@@ -1,7 +1,7 @@
 <div class="outer-container">
   <div [@growShrink]="taskAnimationState$ | async" class="tasks-container">
     <div class="task-filter-container" fxLayout="row" fxLayoutAlign="start center">
-      <input [placeholder]="filterPlaceholder" #taskFilter fxFlex [formControl]="taskFilterFormControl">
+      <input [placeholder]="filterPlaceholder" #taskFilter fxFlex [formControl]="taskFilterFormControl" id="filter">
       <mat-icon class="filter-icon" (click)="taskFilter.select()">filter_list</mat-icon>
     </div>
     <mat-nav-list class="task-list" (selectionChange)="selectTask($event.option.selected ? $event.option.value : null)">
