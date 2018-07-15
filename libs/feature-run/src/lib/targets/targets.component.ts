@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
-import { Project } from '@nxui/utils';
+import { NpmScript, NpmScripts, Project } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
@@ -18,8 +18,8 @@ interface Target {
   styleUrls: ['./targets.component.scss']
 })
 export class TargetsComponent {
-  private readonly projects$: Observable<
-    Array<Project>
+  private readonly projectsAndNpmScripts$: Observable<
+    Array<Project | NpmScripts>
   > = this.route.params.pipe(
     map(m => m['path']),
     switchMap(path => {
@@ -28,6 +28,10 @@ export class TargetsComponent {
         query: gql`
           query($path: String!) {
             workspace(path: $path) {
+              npmScripts {
+                name
+              }
+
               projects {
                 name
                 root
@@ -46,33 +50,55 @@ export class TargetsComponent {
       }).valueChanges;
     }),
     map(r => {
-      const projects: Array<Project> = (r as any).data.workspace.projects;
-      return projects
-        .map(c => {
+      const sortedProjects = (r as any).data.workspace.projects
+        .map((c: any) => {
           const s = [...c.architect].sort((a, b) =>
             a.name.localeCompare(b.name)
           );
           return { ...c, architect: s };
         })
-        .filter(p => p.architect.length > 0);
+        .filter((p: any) => p.architect.length > 0);
+
+      const scripts = {
+        name: 'package.json scripts',
+        scripts: (r as any).data.workspace.npmScripts
+      };
+      return [scripts, ...sortedProjects];
     })
   );
 
   readonly taskCollections$: Observable<
     TaskCollections<Target>
-  > = this.projects$.pipe(
+  > = this.projectsAndNpmScripts$.pipe(
     map(projects => {
       const collections: Array<TaskCollection<Target>> = projects.map(
-        project => ({
-          collectionName: project.name,
-          tasks: project.architect.map(builder => ({
-            taskName: builder.name,
-            task: {
-              projectName: project.name,
-              targetName: builder.name
-            }
-          }))
-        })
+        projectOrScripts => {
+          if ((projectOrScripts as any).projectType) {
+            const project = projectOrScripts as Project;
+            return {
+              collectionName: project.name,
+              tasks: project.architect.map(builder => ({
+                taskName: builder.name,
+                task: {
+                  projectName: project.name,
+                  targetName: builder.name
+                }
+              }))
+            };
+          } else {
+            const scripts = projectOrScripts as NpmScripts;
+            return {
+              collectionName: projectOrScripts.name,
+              tasks: scripts.scripts.map(script => ({
+                taskName: script.name,
+                task: {
+                  projectName: scripts.name,
+                  targetName: script.name
+                }
+              }))
+            };
+          }
+        }
       );
 
       const taskCollections: TaskCollections<Target> = {
@@ -91,7 +117,11 @@ export class TargetsComponent {
   ) {}
 
   navigateToSelectedTarget(target: Target | null) {
-    if (target) {
+    if (target && isNpmScript(target)) {
+      this.router.navigate(['script', encodeURIComponent(target.targetName)], {
+        relativeTo: this.route
+      });
+    } else if (target) {
       this.router.navigate(
         [
           encodeURIComponent(target.targetName),
@@ -125,4 +155,8 @@ export class TargetsComponent {
 
     return selectedTask || null;
   }
+}
+
+function isNpmScript(target: Target) {
+  return target.projectName.indexOf('package.json') > -1;
 }

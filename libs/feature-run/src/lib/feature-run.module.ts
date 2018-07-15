@@ -12,12 +12,14 @@ import { UiModule } from '@nxui/ui';
 
 import { TargetComponent } from './target/target.component';
 import { TargetsComponent } from './targets/targets.component';
+import { NpmScriptComponent } from './npmscript/npmscript.component';
 
 export const runRoutes: Route[] = [
   {
     path: '',
     component: TargetsComponent,
     children: [
+      { path: 'script/:script', component: NpmScriptComponent },
       { path: ':target/:project', component: TargetComponent },
       { path: '', pathMatch: 'full', component: TargetComponent }
     ]
@@ -35,6 +37,6 @@ export const runRoutes: Route[] = [
     ReactiveFormsModule,
     UiModule
   ],
-  declarations: [TargetsComponent, TargetComponent]
+  declarations: [TargetsComponent, TargetComponent, NpmScriptComponent]
 })
 export class FeatureRunModule {}

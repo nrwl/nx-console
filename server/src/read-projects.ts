@@ -58,7 +58,7 @@ export function readSchema(basedir: string, builder: string) {
   return readBuildersFile(basedir, npmPackage)[builderName].schema;
 }
 
-function readBuildersFile(basedir: string, npmPackage: string) {
+function readBuildersFile(basedir: string, npmPackage: string): any {
   const packageJson = readJsonFile(
     path.join(npmPackage, 'package.json'),
     basedir
@@ -70,7 +70,7 @@ function readBuildersFile(basedir: string, npmPackage: string) {
     path.dirname(packageJson.path)
   );
 
-  const builders = {};
+  const builders = {} as any;
   Object.entries(buildersJson.json.builders).forEach(([k, v]: [any, any]) => {
     const builderSchema = readJsonFile(
       v.schema,

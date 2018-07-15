@@ -105,16 +105,19 @@ export function tasks(callback: (s: any) => void) {
   });
 }
 
-export function clickOnTask(name: string) {
-  cy.get('mat-nav-list.task-list').within(() => {
-    cy.root()
-      .find('mat-list-item')
-      .should($p => {
-        const serviceSchematic = els($p).filter(
-          (i, f) => f.text().indexOf(name) > -1
-        )[0];
-        serviceSchematic.click();
-      });
+export function clickOnTask(group: string, name: string) {
+  cy.get('mat-nav-list.task-list').should(($p: any) => {
+    const children = $p.get()[0].children;
+    let insideGroup = false;
+    for (let i = 0; i < children.length; ++i) {
+      const c = children[i];
+      if (c.className.indexOf('collection-name') > -1) {
+        insideGroup = c.innerText.trim() === group;
+      }
+      if (insideGroup && c.innerText.trim() === name) {
+        c.click();
+      }
+    }
   });
 }
 
