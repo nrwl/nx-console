@@ -36,13 +36,7 @@ module.exports = {
       'start': 'electron dist/electron',
       'restart': npsUtils.series.nps('electron.compile', 'electron.copy-assets', 'electron.start'),
       'prepackage': npsUtils.series.nps('electron.clean', 'electron.compile', 'electron.copy-assets', 'frontend.build', 'server.compile', 'electron.copy-server', 'electron.copy-frontend', 'electron.install-node-modules'),
-      'up': npsUtils.series.nps('electron.prepackage', 'electron.start'),
-
-      'builder-dist-mac': 'electron-builder --mac',
-      'builder-dist-win': 'electron-builder --win',
-      'dist-mac': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-mac'),
-      'dist-win': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-win'),
-      'dist-all': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-mac', 'electron.builder-dist-win')
+      'up': npsUtils.series.nps('electron.prepackage', 'electron.start')
     },
     dev: {
       up: npsUtils.concurrent.nps('server.up', 'frontend.serve')

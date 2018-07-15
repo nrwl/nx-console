@@ -1,6 +1,6 @@
 {
   "name": "angular-console",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "author": "Narwhal Technologies Inc",
   "license": "MIT",
@@ -18,13 +18,6 @@
       "app": "dist/electron",
       "buildResources": "dist/electron",
       "output": "dist/packages"
-    },
-    "mac": {
-      "category": "public.app-category.developer-tools",
-      "icon": "./dist/electron/assets/icons/mac/icon.icns"
-    },
-    "win": {
-      "target": "nsis"
     }
   },
   "dependencies": {
