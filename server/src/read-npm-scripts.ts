@@ -8,7 +8,7 @@ export function readNpmScripts(
   const npmClient = fileExists(path.join(workspacePath, 'yarn.lock'))
     ? 'yarn'
     : 'npm';
-  return Object.keys(packageJson.scripts).map(name => {
+  return Object.keys(packageJson.scripts || {}).map(name => {
     return { name, npmClient };
   });
 }
