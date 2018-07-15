@@ -51,7 +51,10 @@ function createCommandLineLauncher() {
 }
 
 function startServer(port: number) {
-  p = spawn('node', ['index.js', port.toString()], {stdio: [0, 1, 2], cwd: path.join(__dirname, 'server'), shell: true});
+  p = spawn('node', ['index.js', port.toString()], {cwd: path.join(__dirname, 'server'), shell: true});
+  p.stdout.on('data', (d) => console.log(d.toString()));
+  p.stderr.on('data', (d) => console.log(d.toString()));
+  p.on('exit', (d) => console.log(d.toString()));
   return new Promise(res => {
     setTimeout(() => {
       res();
