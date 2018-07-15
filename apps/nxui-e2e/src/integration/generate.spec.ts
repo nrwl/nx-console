@@ -55,8 +55,8 @@ describe('Generate', () => {
     });
   });
 
-  it('runs a schematic', () => {
-    clickOnTask('service');
+  it.only('runs a schematic', () => {
+    clickOnTask('@schematics/angular', 'service');
     waitForAnimation();
 
     cy.get('div.context-title').contains('Create an Angular service');

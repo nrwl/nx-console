@@ -25,9 +25,10 @@ describe('Tasks', () => {
     cy.get('div.title').contains('Run Tasks');
 
     taskListHeaders($p => {
-      expect($p.length).to.equal(2);
-      expect(texts($p)[0]).to.equal('proj');
-      expect(texts($p)[1]).to.equal('proj-e2e');
+      expect($p.length).to.equal(3);
+      expect(texts($p)[0]).to.equal('package.json scripts');
+      expect(texts($p)[1]).to.equal('proj');
+      expect(texts($p)[2]).to.equal('proj-e2e');
     });
 
     tasks($p => {
@@ -56,7 +57,7 @@ describe('Tasks', () => {
   });
 
   it('runs a task', () => {
-    clickOnTask('build');
+    clickOnTask('proj', 'build');
     waitForAnimation();
 
     cy.get('div.context-title').contains('ng build proj');
@@ -78,7 +79,30 @@ describe('Tasks', () => {
       .contains('Run')
       .click();
 
-    checkDisplayedCommand('$ ng build proj');
+    waitForBuild();
+    checkFileExists(`dist/proj/main.js`);
+
+    goBack();
+    waitForAnimation();
+
+    cy.get('div.title').contains('Run Tasks');
+    taskListHeaders($p => {
+      expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
+    });
+  });
+
+  it('runs an npm script', () => {
+    clickOnTask('package.json scripts', 'build');
+    waitForAnimation();
+
+    cy.get('div.context-title').contains('npm run build');
+
+    expandTerminal();
+    checkDisplayedCommand('$ npm run build');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
 
     waitForBuild();
     checkFileExists(`dist/proj/main.js`);

@@ -1,18 +1,23 @@
 import * as express from 'express';
 import * as graphql from 'graphql';
 import * as path from 'path';
-import { filterByName, readJsonFile } from './utils';
-import * as fs from 'fs';
-const dirSync = require('tmp').dirSync;
+import {
+  directoryExists,
+  filterByName,
+  findClosestNg,
+  listFilesRec,
+  readJsonFile
+} from './utils';
 import { readSchematicCollections } from './read-schematic-collections';
 import { readDescription, readProjects, readSchema } from './read-projects';
 import { availableAddons, readAddons } from './read-addons';
 import { readDependencies } from './read-dependencies';
 import { schematicCollectionsForNgNew } from './read-ngnews';
-import { statSync } from 'fs';
-const spawn = require('node-pty-prebuilt').spawn;
-import { platform } from 'os';
 import { openInEditor, readEditors } from './read-editors';
+import { readNpmScripts, readNpmScriptSchema } from './read-npm-scripts';
+
+const dirSync = require('tmp').dirSync;
+const spawn = require('node-pty-prebuilt').spawn;
 
 const graphqlHTTP = require('express-graphql');
 
@@ -143,6 +148,37 @@ export const schematicCollectionType: graphql.GraphQLObjectType = new graphql.Gr
   }
 );
 
+export const schemaType = new graphql.GraphQLList(
+  new graphql.GraphQLObjectType({
+    name: 'ArchitectSchema',
+    fields: () => {
+      return {
+        name: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        type: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        description: {
+          type: graphql.GraphQLString
+        },
+        defaultValue: {
+          type: graphql.GraphQLString
+        },
+        required: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
+        },
+        positional: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
+        },
+        enum: {
+          type: new graphql.GraphQLList(graphql.GraphQLString)
+        }
+      };
+    }
+  })
+);
+
 export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
   {
     name: 'Architect',
@@ -183,36 +219,7 @@ export const architectType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
           }
         },
         schema: {
-          type: new graphql.GraphQLList(
-            new graphql.GraphQLObjectType({
-              name: 'ArchitectSchema',
-              fields: () => {
-                return {
-                  name: {
-                    type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-                  },
-                  type: {
-                    type: new graphql.GraphQLNonNull(graphql.GraphQLString)
-                  },
-                  description: {
-                    type: graphql.GraphQLString
-                  },
-                  defaultValue: {
-                    type: graphql.GraphQLString
-                  },
-                  required: {
-                    type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
-                  },
-                  positional: {
-                    type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
-                  },
-                  enum: {
-                    type: new graphql.GraphQLList(graphql.GraphQLString)
-                  }
-                };
-              }
-            })
-          ),
+          type: schemaType,
           resolve: (a, _, __, i) => {
             if (
               !directoryExists(path.join(i.variableValues.path, 'node_modules'))
@@ -248,6 +255,33 @@ export const projectType: graphql.GraphQLObjectType = new graphql.GraphQLObjectT
           },
           resolve: (project: any, args: any) => {
             return filterByName(project.architect, args);
+          }
+        }
+      };
+    }
+  }
+);
+
+export const npmScriptType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
+  {
+    name: 'NpmScript',
+    fields: () => {
+      return {
+        name: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        npmClient: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        schema: {
+          type: schemaType,
+          resolve: (a, _, __, i) => {
+            if (
+              !directoryExists(path.join(i.variableValues.path, 'node_modules'))
+            ) {
+              throw new Error(`node_modules is not found`);
+            }
+            return readNpmScriptSchema(i.variableValues.path, a.name);
           }
         }
       };
@@ -307,6 +341,15 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
               readSchematicCollections(p, collectionName),
               args
             );
+          }
+        },
+        npmScripts: {
+          type: new graphql.GraphQLList(npmScriptType),
+          args: {
+            name: { type: graphql.GraphQLString }
+          },
+          resolve: (workspace: any, args: any) => {
+            return filterByName(workspace.npmScripts, args);
           }
         },
         projects: {
@@ -466,7 +509,8 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
                 path: args.path,
                 dependencies: readDependencies(packageJson),
                 addons: readAddons(packageJson),
-                projects: readProjects(args.path, angularJson.projects)
+                projects: readProjects(args.path, angularJson.projects),
+                npmScripts: readNpmScripts(args.path, packageJson)
               };
             } catch (e) {
               console.log(e);
@@ -519,7 +563,10 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(args.path, ['add', args.name]);
+            return runCommand(args.path, findClosestNg(args.path), [
+              'add',
+              args.name
+            ]);
           }
         },
         ngNew: {
@@ -534,16 +581,12 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(
-              args.path,
-              [
-                'new',
-                args.name,
-                `--directory=${args.name}`,
-                `--collection=${args.collection}`
-              ],
-              false
-            );
+            return runCommand(args.path, findClosestNg(__dirname), [
+              'new',
+              args.name,
+              `--directory=${args.name}`,
+              `--collection=${args.collection}`
+            ]);
           }
         },
         generate: {
@@ -557,21 +600,38 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
           },
           resolve: async (_root: any, args: any) => {
             const dryRun = args.dryRun ? ['--dry-run'] : [];
-            return runCommand(args.path, [
+            return runCommand(args.path, findClosestNg(args.path), [
               'generate',
               ...args.genCommand,
               ...dryRun
             ]);
           }
         },
-        run: {
+        runNg: {
           type: commandStartedType,
           args: {
             path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
             runCommand: { type: new graphql.GraphQLList(graphql.GraphQLString) }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(args.path, args.runCommand);
+            return runCommand(
+              args.path,
+              findClosestNg(args.path),
+              args.runCommand
+            );
+          }
+        },
+        runNpm: {
+          type: commandStartedType,
+          args: {
+            path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+            npmClient: {
+              type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+            },
+            runCommand: { type: new graphql.GraphQLList(graphql.GraphQLString) }
+          },
+          resolve: async (_root: any, args: any) => {
+            return runCommand(args.path, args.npmClient, args.runCommand);
           }
         },
         stop: {
@@ -612,12 +672,11 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
   }
 );
 
-function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
+function runCommand(cwd: string, program: string, cmds: string[]) {
   stopAllCommands();
-  const command = `ng ${cmds.join(' ')} ${Math.random()}`;
+  const command = `${program} ${cmds.join(' ')} ${Math.random()}`;
 
-  const ng = localNg ? findClosestNg(cwd) : findClosestNg(__dirname);
-  const commandRunning = spawn(ng, cmds, { cwd, cols: 100 });
+  const commandRunning = spawn(program, cmds, { cwd, cols: 100 });
   commands[command] = {
     status: 'inprogress',
     out: '',
@@ -638,22 +697,6 @@ function runCommand(cwd: string, cmds: string[], localNg: boolean = true) {
   return { command };
 }
 
-function findClosestNg(dir: string): string {
-  if (directoryExists(path.join(dir, 'node_modules'))) {
-    if (platform() === 'win32') {
-      return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
-    } else {
-      if (fileExists(path.join(dir, 'node_modules', '.bin', 'ng'))) {
-        return path.join(dir, 'node_modules', '.bin', 'ng');
-      } else {
-        return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
-      }
-    }
-  } else {
-    return findClosestNg(path.dirname(dir));
-  }
-}
-
 function stopAllCommands() {
   Object.values(commands).forEach(v => {
     if (v.commandRunning) {
@@ -667,39 +710,6 @@ function listFiles(path: string) {
   setTimeout(() => {
     files[path] = listFilesRec(path);
   }, 0);
-}
-
-function listFilesRec(dirName: string): string[] {
-  if (dirName.indexOf('node_modules') > -1) return [];
-
-  const res = [dirName];
-  fs.readdirSync(dirName).forEach(c => {
-    const child = path.join(dirName, c);
-    try {
-      if (!fs.statSync(child).isDirectory()) {
-        res.push(child);
-      } else if (fs.statSync(child).isDirectory()) {
-        res.push(...listFilesRec(child));
-      }
-    } catch (e) {}
-  });
-  return res;
-}
-
-function directoryExists(filePath: string): boolean {
-  try {
-    return statSync(filePath).isDirectory();
-  } catch (err) {
-    return false;
-  }
-}
-
-function fileExists(filePath: string): boolean {
-  try {
-    return statSync(filePath).isFile();
-  } catch (err) {
-    return false;
-  }
 }
 
 export const buildSchema: graphql.GraphQLSchema = new graphql.GraphQLSchema({

@@ -20,7 +20,7 @@ describe('Forms', () => {
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToGenerate();
-    clickOnTask('component');
+    clickOnTask('@schematics/angular', 'component');
     waitForAnimation();
   });
 

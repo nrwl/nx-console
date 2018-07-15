@@ -48,6 +48,17 @@ export interface Project {
   architect: Builder[];
 }
 
+export interface NpmScript {
+  name: string;
+  npmClient: string;
+  schema: Field[];
+}
+
+export interface NpmScripts {
+  name: string;
+  scripts: NpmScript[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -114,6 +125,8 @@ export class Serializer {
           return value[f.name];
         } else if (f.type === 'boolean') {
           return value[f.name] ? `--${f.name}` : `--no-${f.name}`;
+        } else if (f.type === 'arguments') {
+          return value[f.name];
         } else {
           return `--${f.name}=${value[f.name]}`;
         }

@@ -1,5 +1,58 @@
-import * as resolve from 'resolve';
+import * as path from 'path';
+
+const resolve = require('resolve');
 import * as fs from 'fs';
+import { platform } from 'os';
+import { statSync } from 'fs';
+
+export function findClosestNg(dir: string): string {
+  if (directoryExists(path.join(dir, 'node_modules'))) {
+    if (platform() === 'win32') {
+      return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
+    } else {
+      if (fileExists(path.join(dir, 'node_modules', '.bin', 'ng'))) {
+        return path.join(dir, 'node_modules', '.bin', 'ng');
+      } else {
+        return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
+      }
+    }
+  } else {
+    return findClosestNg(path.dirname(dir));
+  }
+}
+
+export function listFilesRec(dirName: string): string[] {
+  if (dirName.indexOf('node_modules') > -1) return [];
+
+  const res = [dirName];
+  fs.readdirSync(dirName).forEach(c => {
+    const child = path.join(dirName, c);
+    try {
+      if (!fs.statSync(child).isDirectory()) {
+        res.push(child);
+      } else if (fs.statSync(child).isDirectory()) {
+        res.push(...listFilesRec(child));
+      }
+    } catch (e) {}
+  });
+  return res;
+}
+
+export function directoryExists(filePath: string): boolean {
+  try {
+    return statSync(filePath).isDirectory();
+  } catch (err) {
+    return false;
+  }
+}
+
+export function fileExists(filePath: string): boolean {
+  try {
+    return statSync(filePath).isFile();
+  } catch (err) {
+    return false;
+  }
+}
 
 export function readJsonFile(
   path: string,

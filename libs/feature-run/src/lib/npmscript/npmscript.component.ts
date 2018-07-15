@@ -6,7 +6,13 @@ import {
   TaskRunnerComponent,
   TerminalComponent
 } from '@nxui/ui';
-import { CommandOutput, CommandRunner, Project, Serializer } from '@nxui/utils';
+import {
+  CommandOutput,
+  CommandRunner,
+  NpmScript,
+  Project,
+  Serializer
+} from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
@@ -20,12 +26,12 @@ import {
 } from 'rxjs/operators';
 
 @Component({
-  selector: 'nxui-target',
-  templateUrl: './target.component.html',
-  styleUrls: ['./target.component.css']
+  selector: 'nxui-npmscript',
+  templateUrl: './npmscript.component.html',
+  styleUrls: ['./npmscript.component.css']
 })
-export class TargetComponent implements OnInit {
-  project$: Observable<Project>;
+export class NpmScriptComponent implements OnInit {
+  script$: Observable<NpmScript>;
   commandArray$ = new BehaviorSubject<{ commands: string[]; valid: boolean }>({
     commands: [],
     valid: true
@@ -50,16 +56,15 @@ export class TargetComponent implements OnInit {
   ngOnInit() {
     const targetDescription$ = this.route.params.pipe(
       map(p => {
-        if (!p.target || !p.project) return null;
+        if (!p.script) return null;
         return {
-          target: decodeURIComponent(p.target),
-          project: decodeURIComponent(p.project),
+          script: decodeURIComponent(p.script),
           path: p.path
         };
       })
     );
 
-    this.project$ = targetDescription$.pipe(
+    this.script$ = targetDescription$.pipe(
       switchMap(p => {
         if (!p) {
           return of();
@@ -69,28 +74,19 @@ export class TargetComponent implements OnInit {
         }
         return this.apollo.query({
           query: gql`
-            query($path: String!, $project: String!, $target: String!) {
+            query($path: String!, $script: String!) {
               workspace(path: $path) {
-                projects(name: $project) {
+                npmScripts(name: $script) {
                   name
-                  root
-                  projectType
-                  architect(name: $target) {
+                  npmClient
+                  schema {
                     name
+                    enum
+                    type
                     description
-                    builder
-                    configurations {
-                      name
-                    }
-                    schema {
-                      name
-                      enum
-                      type
-                      description
-                      defaultValue
-                      required
-                      positional
-                    }
+                    defaultValue
+                    required
+                    positional
                   }
                 }
               }
@@ -100,18 +96,14 @@ export class TargetComponent implements OnInit {
         });
       }),
       map((r: any) => {
-        const project: Project = r.data.workspace.projects[0];
-        const architect = project.architect.map(a => ({
-          ...a,
-          schema: this.serializer.normalizeTarget(a.builder, a.schema)
-        }));
+        const script: NpmScript = r.data.workspace.npmScripts[0];
         return {
-          ...project,
-          architect
+          ...script,
+          schema: this.serializer.normalizeTarget(script.name, script.schema)
         };
       }),
-      tap((project: Project) => {
-        const contextTitle = this.getContextTitle(project);
+      tap((script: NpmScript) => {
+        const contextTitle = this.getContextTitle(script);
 
         this.contextActionService.contextualActions$.next({
           contextTitle,
@@ -129,26 +121,35 @@ export class TargetComponent implements OnInit {
     );
 
     this.commandOutput$ = this.ngRun$.pipe(
-      withLatestFrom(this.commandArray$),
+      withLatestFrom(this.commandArray$, this.script$),
       tap(() => {
         this.flags.hideFields();
         this.taskRunner.terminalVisible.next(true);
       }),
-      switchMap(([_, c]) => {
+      switchMap(([_, c, s]) => {
         this.out.clear();
         return this.runner.runCommand(
           gql`
-            mutation($path: String!, $runCommand: [String]!) {
-              runNg(path: $path, runCommand: $runCommand) {
+            mutation(
+              $path: String!
+              $npmClient: String!
+              $runCommand: [String]!
+            ) {
+              runNpm(
+                path: $path
+                npmClient: $npmClient
+                runCommand: $runCommand
+              ) {
                 command
               }
             }
           `,
           {
             path: this.path(),
+            npmClient: s.npmClient,
             runCommand: c.commands
           },
-          r => r.data.runNg.command,
+          r => r.data.runNpm.command,
           false
         );
       }),
@@ -157,12 +158,15 @@ export class TargetComponent implements OnInit {
     );
 
     this.command$ = this.commandArray$.pipe(
-      map(c => `ng ${this.serializer.argsToString(c.commands)}`)
+      withLatestFrom(this.script$),
+      map(
+        ([c, s]) => `${s.npmClient} ${this.serializer.argsToString(c.commands)}`
+      )
     );
   }
 
-  getContextTitle(project: Project) {
-    return `ng ${project.architect[0].name} ${project.name}`;
+  getContextTitle(script: NpmScript) {
+    return `${script.npmClient} run ${script.name}`;
   }
 
   public path() {
