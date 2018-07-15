@@ -8,7 +8,11 @@ import { statSync } from 'fs';
 export function findClosestNg(dir: string): string {
   if (directoryExists(path.join(dir, 'node_modules'))) {
     if (platform() === 'win32') {
-      return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
+      if (fileExists(path.join(dir, 'ng.cmd'))) {
+        return path.join(dir, 'ng.cmd');
+      } else {
+        return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
+      }
     } else {
       if (fileExists(path.join(dir, 'node_modules', '.bin', 'ng'))) {
         return path.join(dir, 'node_modules', '.bin', 'ng');
