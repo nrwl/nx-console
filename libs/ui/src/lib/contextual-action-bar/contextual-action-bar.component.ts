@@ -6,8 +6,10 @@ import {
   trigger
 } from '@angular/animations';
 import { Component } from '@angular/core';
-
-import { ContextualActionBarService } from './contextual-action-bar.service';
+import {
+  ContextualActionBarService,
+  ContextualTab
+} from './contextual-action-bar.service';
 
 @Component({
   selector: 'ui-contextual-action-bar',
@@ -25,4 +27,8 @@ export class ContextualActionBarComponent {
   constructor(
     readonly contextualActionBarService: ContextualActionBarService
   ) {}
+
+  trackByName(_: number, tab: ContextualTab) {
+    return tab.name;
+  }
 }

@@ -1,22 +1,10 @@
 <div>
-  <h2>Open</h2>
-  Path:
-  <input #path>
-  <button (click)="openWorkspace(path.value)" id="open-workspace">Open Workspace</button>
-</div>
-
-<div>
   <h2>Recent</h2>
   <ul>
     <li *ngFor="let w of settings.getRecentWorkspaces()">
       {{ w.name }} (path: {{ w.path }})
-      <button (click)="openWorkspace(w.path)">Open</button>
+      <button (click)="workspacesService.openWorkspace(w.path)">Open</button>
     </li>
   </ul>
   <button (click)="clearRecent()">Clear</button>
-</div>
-
-<div>
-  <h2>Create New</h2>
-  <a routerLink="/workspaces/new">Create New Workspace</a>
 </div>

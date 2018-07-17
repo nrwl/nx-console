@@ -13,13 +13,13 @@ import {
   workspaceRoutes
 } from '@nxui/feature-workspaces';
 import { UiModule } from '@nxui/ui';
+import { Messenger } from '@nxui/utils';
 import { Apollo, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
 
 import { AppComponent } from './app.component';
-import { Messenger } from '@nxui/utils';
 
 @NgModule({
   declarations: [AppComponent],
@@ -36,7 +36,7 @@ import { Messenger } from '@nxui/utils';
     RouterModule.forRoot(
       [
         { path: '', pathMatch: 'full', redirectTo: '/workspaces' },
-        { path: 'workspaces', children: workspaceRoutes }
+        { path: '', children: workspaceRoutes }
       ],
       { paramsInheritanceStrategy: 'always' }
     )

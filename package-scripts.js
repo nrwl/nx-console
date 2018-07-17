@@ -6,7 +6,7 @@ module.exports = {
       ng: 'ng',
       build: 'ng build nxui --prod',
       serve: {
-        default: 'ng serve nxui',
+        default: 'ng serve nxui --aot',
         prod: 'ng serve nxui --prod'
       },
       format: {

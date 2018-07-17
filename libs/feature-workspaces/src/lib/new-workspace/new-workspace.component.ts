@@ -95,7 +95,7 @@ export class NewWorkspaceComponent implements OnInit {
       ([ngNew, command]) => {
         if (command.status === 'success') {
           this.router.navigate([
-            '/workspaces',
+            '/workspace',
             `${ngNew.path}/${ngNew.name}`,
             'details'
           ]);

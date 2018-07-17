@@ -16,10 +16,12 @@ import {
   MatRippleModule,
   MatSelectModule,
   MatSlideToggleModule,
+  MatTabsModule,
   MatToolbarModule,
   MatTooltipModule
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
 import { ContextualActionBarService } from '@nxui/ui/src/lib/contextual-action-bar/contextual-action-bar.service';
 
 import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
@@ -27,7 +29,6 @@ import { FlagsComponent } from './flags/flags.component';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
-import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -40,6 +41,7 @@ import { RouterModule } from '@angular/router';
     MatButtonModule,
     MatDividerModule,
     MatExpansionModule,
+    MatTabsModule,
     MatIconModule,
     MatInputModule,
     MatListModule,

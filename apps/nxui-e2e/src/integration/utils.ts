@@ -71,6 +71,8 @@ export function checkDisplayedCommand(s: string) {
 }
 
 export function openProject(p: string) {
+  cy.get('.mat-tab-link:nth-of-type(3)').click();
+  waitForAnimation();
   cy.get('input').type(p);
   cy.get('button#open-workspace').click();
 }

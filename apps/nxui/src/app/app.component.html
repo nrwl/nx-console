@@ -1,2 +1,5 @@
 <ui-contextual-action-bar></ui-contextual-action-bar>
-<router-outlet></router-outlet>
+
+<div fxFlex class="outlet-container" [@routerTransition]="outlet.activatedRouteData.state">
+    <router-outlet #outlet="outlet"></router-outlet>
+</div>

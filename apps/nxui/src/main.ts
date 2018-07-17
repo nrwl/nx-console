@@ -18,9 +18,9 @@ import { WebFrame } from 'electron';
  */
 declare var global: any;
 let webFrame: WebFrame;
-if (typeof global !== 'undefined' && global['require']) {
+if (typeof global !== 'undefined' && global.require) {
   try {
-    webFrame = global['require']('electron').webFrame;
+    webFrame = global.require('electron').webFrame;
     webFrame.setZoomLevel(0);
     webFrame.setVisualZoomLevelLimits(1, 1);
   } catch (e) {
