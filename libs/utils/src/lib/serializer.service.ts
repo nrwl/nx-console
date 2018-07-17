@@ -3,6 +3,11 @@ import { Observable } from 'rxjs';
 
 export type AutocompletionType = 'modules' | 'projects' | 'file';
 
+export interface Directory {
+  path: string;
+  files: { name: string; type: 'file' | 'directory' | 'angularDirectory' }[];
+}
+
 export interface CompletetionValue {
   value: string;
   display?: string;
