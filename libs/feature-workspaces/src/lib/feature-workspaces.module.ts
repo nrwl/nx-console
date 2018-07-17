@@ -14,18 +14,31 @@ import { Route, RouterModule } from '@angular/router';
 import { addonsRoutes, FeatureAddonsModule } from '@nxui/feature-addons';
 import { FeatureGenerateModule, generateRoutes } from '@nxui/feature-generate';
 import { FeatureRunModule, runRoutes } from '@nxui/feature-run';
+import { DetailsComponent } from '@nxui/feature-workspaces/src/lib/details/details.component';
+import { ImportWorkspaceComponent } from '@nxui/feature-workspaces/src/lib/import-workspace/import-workspace.component';
+import { NewWorkspaceComponent } from '@nxui/feature-workspaces/src/lib/new-workspace/new-workspace.component';
+import { WorkspaceComponent } from '@nxui/feature-workspaces/src/lib/workspace/workspace.component';
+import { WorkspacesComponent } from '@nxui/feature-workspaces/src/lib/workspaces/workspaces.component';
 import { UiModule } from '@nxui/ui';
 
-import { DetailsComponent } from './details/details.component';
-import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
-import { WorkspaceComponent } from './workspace/workspace.component';
-import { WorkspacesComponent } from './workspaces/workspaces.component';
-
 export const workspaceRoutes: Route[] = [
-  { path: '', component: WorkspacesComponent },
-  { path: 'new', component: NewWorkspaceComponent },
   {
-    path: ':path',
+    path: 'workspaces',
+    component: WorkspacesComponent,
+    data: { state: 'workspaces' }
+  },
+  {
+    path: 'create-workspace',
+    component: NewWorkspaceComponent,
+    data: { state: 'create-workspace' }
+  },
+  {
+    path: 'import-workspace',
+    component: ImportWorkspaceComponent,
+    data: { state: 'import-workspace' }
+  },
+  {
+    path: 'workspace/:path',
     component: WorkspaceComponent,
     children: [
       {
@@ -70,7 +83,8 @@ export const workspaceRoutes: Route[] = [
     WorkspacesComponent,
     WorkspaceComponent,
     DetailsComponent,
-    NewWorkspaceComponent
+    NewWorkspaceComponent,
+    ImportWorkspaceComponent
   ]
 })
 export class FeatureWorkspacesModule {}

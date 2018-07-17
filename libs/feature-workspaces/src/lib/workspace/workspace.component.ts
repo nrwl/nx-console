@@ -1,3 +1,4 @@
+import { transition, trigger } from '@angular/animations';
 import {
   Component,
   HostBinding,
@@ -5,7 +6,12 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { ContextualActionBarService } from '@nxui/ui';
+import {
+  animateDown,
+  animateUp,
+  ContextualActionBarService,
+  GROW_SHRINK
+} from '@nxui/ui';
 import { Settings } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
@@ -19,23 +25,33 @@ import {
   switchMap
 } from 'rxjs/operators';
 
-import {
-  GROW_SHRINK,
-  ROUTING_ANIMATION
-} from './workspace.component.animations';
-
 interface Route {
   icon: string;
   url: string;
   title: string;
 }
 
+const ROUTER_TRANSITION_TIMING = '700ms 150ms ease-in-out';
+const ANIMATE_UP = animateUp(ROUTER_TRANSITION_TIMING);
+const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
+
 @Component({
   selector: 'nxui-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  animations: [GROW_SHRINK, ROUTING_ANIMATION]
+  animations: [
+    GROW_SHRINK,
+    trigger('routerTransition', [
+      transition('void => *', []),
+      transition('* => details', ANIMATE_UP),
+      transition('details => *', ANIMATE_DOWN),
+      transition('tasks => *', ANIMATE_UP),
+      transition('generate => extensions', ANIMATE_DOWN),
+      transition('extensions => generate', ANIMATE_UP),
+      transition('* => tasks', ANIMATE_DOWN)
+    ])
+  ]
 })
 export class WorkspaceComponent implements OnDestroy {
   @HostBinding('@.disabled') animationsDisabled = false;

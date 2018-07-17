@@ -2,6 +2,23 @@ mat-toolbar.title-bar {
   transition: all 0 0.5s ease-in-out;
   position: relative;
   z-index: 1;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+
+  .tabs-container {
+    height: unset;
+    padding: 0;
+
+    .nav-link {
+      &.active {
+        opacity: 1 !important;
+      }
+
+      mat-icon {
+        font-weight: 300;
+      }
+    }
+  }
 
   .exit-action {
     cursor: pointer;
