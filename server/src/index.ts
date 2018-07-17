@@ -15,6 +15,7 @@ import { readDependencies } from './read-dependencies';
 import { schematicCollectionsForNgNew } from './read-ngnews';
 import { openInEditor, readEditors } from './read-editors';
 import { readNpmScripts, readNpmScriptSchema } from './read-npm-scripts';
+import { readDirectory } from './read-directory';
 
 const dirSync = require('tmp').dirSync;
 const spawn = require('node-pty-prebuilt').spawn;
@@ -478,6 +479,45 @@ export const completionsType: graphql.GraphQLObjectType = new graphql.GraphQLObj
   }
 );
 
+export const filesType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
+  {
+    name: 'FilesType',
+    fields: () => {
+      return {
+        path: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        files: {
+          type: new graphql.GraphQLList(
+            new graphql.GraphQLObjectType({
+              name: 'FileListType',
+              fields: () => {
+                return {
+                  name: {
+                    type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+                  },
+                  type: {
+                    type: new graphql.GraphQLNonNull(
+                      new graphql.GraphQLEnumType({
+                        name: 'FileType',
+                        values: {
+                          file: { value: 'file' },
+                          directory: { value: 'directory' },
+                          angularDirectory: { value: 'angularDirectory' }
+                        }
+                      })
+                    )
+                  }
+                };
+              }
+            })
+          )
+        }
+      };
+    }
+  }
+);
+
 export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
   {
     name: 'Database',
@@ -544,6 +584,21 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
             } else {
               return { status: 'terminated', out: '' };
             }
+          }
+        },
+        directory: {
+          type: new graphql.GraphQLNonNull(filesType),
+          args: {
+            path: { type: graphql.GraphQLString },
+            onlyDirectories: { type: graphql.GraphQLBoolean },
+            showHidden: { type: graphql.GraphQLBoolean }
+          },
+          resolve: (_: any, args: any) => {
+            return readDirectory(
+              args.path,
+              args.onlyDirectories,
+              args.showHidden
+            );
           }
         }
       };
