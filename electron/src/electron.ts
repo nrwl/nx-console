@@ -35,20 +35,20 @@ function createWindow() {
   });
 }
 
-createCommandLineLauncher();
 app.on('ready', createWindow);
 
-function createCommandLineLauncher() {
-  if (os.platform() === "win32") {
-    // TODO: implement this
-  } else if (os.platform() === "linux") {
-    // TODO: implement this
-  } else {
-    writeFileSync('/usr/local/bin/angular-console', `#!/bin/bash
-/Applications/AngularConsole.app/Contents/MacOS/AngularConsole &>/dev/null &
-`);
-  }
-}
+// TODO: Implement Command-Line Launcher
+// function createCommandLineLauncher() {
+//   if (os.platform() === "win32") {
+//     // TODO: implement this
+//   } else if (os.platform() === "linux") {
+//     // TODO: implement this
+//   } else {
+//     writeFileSync('/usr/local/bin/angular-console', `#!/bin/bash
+// /Applications/AngularConsole.app/Contents/MacOS/AngularConsole &>/dev/null &
+// `);
+//   }
+// }
 
 function startServer(port: number) {
   p = spawn('node', ['index.js', port.toString()], {cwd: path.join(__dirname, 'server'), shell: true});
