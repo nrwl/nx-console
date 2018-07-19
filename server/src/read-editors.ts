@@ -1,11 +1,14 @@
 import * as fs from 'fs';
 import * as os from 'os';
-import { spawn } from 'child_process';
+import { spawn, exec, execSync } from 'child_process';
 
 export function readEditors() {
   const editors = [];
   if (hasFinder()) {
     editors.push({ name: 'Finder', icon: 'finder' });
+  }
+  if (hasExplorer()) {
+    editors.push({ name: 'Explorer', icon: 'explorer' });
   }
   if (hasVsCode()) {
     editors.push({ name: 'VS Code', icon: 'vscode' });
@@ -22,6 +25,8 @@ export function readEditors() {
 export function openInEditor(editor: string, path: string) {
   if (editor === 'Finder') {
     openInFinder(path);
+  } else if (editor === 'Explorer') {
+    openInExplorer(path);
   } else if (editor === 'VS Code') {
     openInVsCode(path);
   } else if (editor === 'WebStorm') {
@@ -34,7 +39,11 @@ export function openInEditor(editor: string, path: string) {
 }
 
 function hasFinder() {
-  return true;
+  return os.platform() === 'darwin';
+}
+
+function hasExplorer() {
+  return os.platform() === 'win32';
 }
 
 function hasVsCode() {
@@ -49,8 +58,7 @@ function hasVsCode() {
     // TODO implement linux support
     return false;
   } else if (os.platform() === 'win32') {
-    // TODO implement windows support
-    return false;
+    return execSync('code --version').indexOf('is not recognized') === -1;
   } else {
     return false;
   }
@@ -97,10 +105,12 @@ function hasIntellij() {
 function openInFinder(path: string) {
   if (os.platform() === 'darwin') {
     spawn('open', [path], { detached: true });
-  } else if (os.platform() === 'linux') {
-    // TODO implement linux support
-  } else if (os.platform() === 'win32') {
-    // TODO implement windows support
+  }
+}
+
+function openInExplorer(path: string) {
+  if (os.platform() === 'win32') {
+    exec(`start "" "${path}"`);
   }
 }
 
@@ -110,7 +120,7 @@ function openInVsCode(path: string) {
   } else if (os.platform() === 'linux') {
     // TODO implement linux support
   } else if (os.platform() === 'win32') {
-    // TODO implement windows support
+    exec(`code "${path}"`);
   }
 }
 

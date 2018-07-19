@@ -75,6 +75,7 @@ export class UiModule {
     this.addIcon('toggle_on', 'baseline-toggle_on-24px.svg');
     this.addIcon('toggle_off', 'baseline-toggle_off-24px.svg');
     this.addIcon('finder', 'finder.svg');
+    this.addIcon('explorer', 'explorer.svg');
     this.addIcon('vscode', 'vscode.svg');
     this.addIcon('webstorm', 'webstorm.svg');
     this.addIcon('intellij', 'intellij.svg');
