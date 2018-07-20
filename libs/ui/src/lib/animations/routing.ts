@@ -3,7 +3,8 @@ import {
   group,
   query,
   style,
-  AnimationGroupMetadata
+  AnimationGroupMetadata,
+  AnimationQueryMetadata
 } from '@angular/animations';
 
 const STAGE = style({ transform: 'translateZ(0)' });
@@ -37,5 +38,12 @@ export function animateRight(timing: string): AnimationGroupMetadata {
   return group([
     query(':enter', [STAGE_RIGHT, animate(timing, STAGE)]),
     query(':leave', animate(timing, STAGE_LEFT))
+  ]);
+}
+
+export function fadeIn(timing: string): AnimationQueryMetadata {
+  return query(':enter', [
+    style({ opacity: 0 }),
+    animate(timing, style({ opacity: 1 }))
   ]);
 }

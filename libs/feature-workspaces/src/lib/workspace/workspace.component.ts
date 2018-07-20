@@ -43,13 +43,21 @@ const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
   animations: [
     GROW_SHRINK,
     trigger('routerTransition', [
-      transition('void => *', []),
-      transition('* => details', ANIMATE_UP),
-      transition('details => *', ANIMATE_DOWN),
-      transition('tasks => *', ANIMATE_UP),
+      transition('details => tasks', ANIMATE_DOWN),
+      transition('details => generate', ANIMATE_DOWN),
+      transition('details => extensions', ANIMATE_DOWN),
+
+      transition('tasks => details', ANIMATE_UP),
+      transition('tasks => generate', ANIMATE_UP),
+      transition('tasks => extensions', ANIMATE_UP),
+
       transition('generate => extensions', ANIMATE_DOWN),
+      transition('generate => details', ANIMATE_UP),
+      transition('generate => tasks', ANIMATE_DOWN),
+
       transition('extensions => generate', ANIMATE_UP),
-      transition('* => tasks', ANIMATE_DOWN)
+      transition('extensions => details', ANIMATE_UP),
+      transition('extensions => tasks', ANIMATE_DOWN)
     ])
   ]
 })

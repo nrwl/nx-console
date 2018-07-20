@@ -21,25 +21,37 @@ import { WorkspaceComponent } from '@nxui/feature-workspaces/src/lib/workspace/w
 import { WorkspacesComponent } from '@nxui/feature-workspaces/src/lib/workspaces/workspaces.component';
 import { UiModule } from '@nxui/ui';
 
+export type FeatureWorkspaceRouteState =
+  | 'workspaces'
+  | 'create-workspace'
+  | 'import-workspace'
+  | 'workspace';
+
+export const WORKSPACES: FeatureWorkspaceRouteState = 'workspaces';
+export const CREATE_WORKSPACE: FeatureWorkspaceRouteState = 'create-workspace';
+export const IMPORT_WORKSPACE: FeatureWorkspaceRouteState = 'import-workspace';
+export const WORKSPACE: FeatureWorkspaceRouteState = 'workspace';
+
 export const workspaceRoutes: Route[] = [
   {
     path: 'workspaces',
     component: WorkspacesComponent,
-    data: { state: 'workspaces' }
+    data: { state: WORKSPACES }
   },
   {
     path: 'create-workspace',
     component: NewWorkspaceComponent,
-    data: { state: 'create-workspace' }
+    data: { state: CREATE_WORKSPACE }
   },
   {
     path: 'import-workspace',
     component: ImportWorkspaceComponent,
-    data: { state: 'import-workspace' }
+    data: { state: IMPORT_WORKSPACE }
   },
   {
     path: 'workspace/:path',
     component: WorkspaceComponent,
+    data: { state: WORKSPACE },
     children: [
       {
         data: { state: 'details' },
