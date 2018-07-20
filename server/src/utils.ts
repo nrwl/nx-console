@@ -29,16 +29,21 @@ export function listFilesRec(dirName: string): string[] {
   if (dirName.indexOf('node_modules') > -1) return [];
 
   const res = [dirName];
-  fs.readdirSync(dirName).forEach(c => {
-    const child = path.join(dirName, c);
-    try {
-      if (!fs.statSync(child).isDirectory()) {
-        res.push(child);
-      } else if (fs.statSync(child).isDirectory()) {
-        res.push(...listFilesRec(child));
+  // the try-catch here is intentional. It's only used in autocomletion.
+  // If it doesn't work, we don't want the process to exit
+  try {
+    fs.readdirSync(dirName).forEach(c => {
+      const child = path.join(dirName, c);
+      try {
+        if (!fs.statSync(child).isDirectory()) {
+          res.push(child);
+        } else if (fs.statSync(child).isDirectory()) {
+          res.push(...listFilesRec(child));
+        }
+      } catch (e) {
       }
-    } catch (e) {}
-  });
+    });
+  } catch (e) {}
   return res;
 }
 
