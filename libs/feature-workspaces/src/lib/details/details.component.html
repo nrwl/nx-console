@@ -1,46 +1,71 @@
 <div *ngIf="workspace$|async as workspace">
-  <div>
-    <h2>Basic Information</h2>
-    <p>Name: {{ workspace.name }}</p>
-    <p>Path: {{ workspace.path }}</p>
-  </div>
+  <div fxLayout="column" fxLayoutGap="24px">
+    <mat-card fxFlex>
+      <mat-card-title>Basic Information</mat-card-title>
+      <mat-card-subtitle>Name</mat-card-subtitle>
+      <mat-card-content>
+        <strong>{{ workspace.name }}</strong>
+      </mat-card-content>
+      <mat-card-subtitle>Path</mat-card-subtitle>
+      <mat-card-content>{{ workspace.path }}</mat-card-content>
+    </mat-card>
+    <mat-card fxFlex>
+      <mat-card-title>Open Workspace</mat-card-title>
 
-  <div>
-    <h2>Workspace Actions</h2>
-    <div *ngFor="let e of editorSupport.editors|async">
-      <button mat-icon-button (click)="editorSupport.openInEditor(e.name, workspace.path)">
-        <mat-icon [svgIcon]="e.icon"></mat-icon>
-        Open in {{ e.name }}
-      </button>
-    </div>
-  </div>
+      <mat-card-actions>
+        <button *ngFor="let e of editorSupport.editors|async" mat-button (click)="editorSupport.openInEditor(e.name, workspace.path)">
+          <mat-icon [svgIcon]="e.icon"></mat-icon>
+          {{ e.name }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
 
-  <div>
-    <h2>Dependencies</h2>
-    <p>This workspace is built on top of:</p>
-    <ul>
-      <li *ngFor="let d of workspace.dependencies">
-        {{ d.name }} {{ d.version }}
-      </li>
-    </ul>
-  </div>
+    <mat-card fxFlex>
+      <mat-card-title-group>
+        <mat-card-title>
+          Dependencies
+        </mat-card-title>
+        <mat-card-subtitle>
+          This workspace is built on top of:
+        </mat-card-subtitle>
+      </mat-card-title-group>
+      <mat-card-content>
+        <ul>
+          <li *ngFor="let d of workspace.dependencies">
+            {{ d.name }} {{ d.version }}
+          </li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+    <mat-card fxFlex>
+      <mat-card-title>Projects</mat-card-title>
+      <mat-card-content *ngIf="workspace.projects.length; else createProject">
+        <div class="projects">
+          <div *ngFor="let p of workspace.projects; trackBy: trackByName">
+            <h3>{{ p.name }}</h3>
+            <p>Root: {{ p.root }}</p>
+            <p>Type: {{ p.projectType }}</p>
+            <h4>Common Actions</h4>
 
-  <div>
-    <h2>Projects</h2>
-    <div class="projects">
-      <div *ngFor="let p of workspace.projects; trackBy: trackByName">
-        <h3>{{ p.name }}</h3>
-        <p>Root: {{ p.root }}</p>
-        <p>Type: {{ p.projectType }}</p>
-        <h4>Common Actions</h4>
-
-        <span *ngFor="let a of p.actions">
-          <a [routerLink]="a.link">
-            {{ a.actionDescription }}
+            <span *ngFor="let a of p.actions">
+              <a [routerLink]="a.link">
+                {{ a.actionDescription }}
+              </a>
+              |
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+      <ng-template #createProject>
+        <mat-card-content>
+          <em>No projects yet</em>
+        </mat-card-content>
+        <mat-card-actions>
+          <a mat-button routerLink="../generate">
+            Generate Project
           </a>
-          |
-        </span>
-      </div>
-    </div>
+        </mat-card-actions>
+      </ng-template>
+    </mat-card>
   </div>
 </div>

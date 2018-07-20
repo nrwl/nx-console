@@ -7,7 +7,8 @@ import {
   MatIconModule,
   MatRippleModule,
   MatSidenavModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatCardModule
 } from '@angular/material';
 import { Route, RouterModule } from '@angular/router';
 import { addonsRoutes, FeatureAddonsModule } from '@nxui/feature-addons';
@@ -51,6 +52,7 @@ export const workspaceRoutes: Route[] = [
 @NgModule({
   imports: [
     MatButtonModule,
+    MatCardModule,
     MatRippleModule,
     MatSidenavModule,
     MatIconModule,
