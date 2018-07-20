@@ -1,12 +1,20 @@
 import { transition, trigger } from '@angular/animations';
-import { Component } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
   animateLeft,
   animateRight,
-  ContextualActionBarService
+  ContextualActionBarService,
+  fadeIn
 } from '@nxui/ui';
-import { filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
+import {
+  CREATE_WORKSPACE,
+  IMPORT_WORKSPACE,
+  WORKSPACES,
+  WORKSPACE
+} from '@nxui/feature-workspaces';
+import { Observable } from 'rxjs';
 
 const TIMING = '500ms ease-in-out';
 const ANIMATE_LEFT = animateLeft(TIMING);
@@ -19,16 +27,26 @@ const ANIMATE_RIGHT = animateRight(TIMING);
   animations: [
     trigger('routerTransition', [
       transition('void => *', []),
-      transition('create-workspace => workspaces', ANIMATE_LEFT),
-      transition('import-workspace => workspaces', ANIMATE_LEFT),
-      transition('import-workspace => create-workspace', ANIMATE_LEFT),
-      transition('workspaces => create-workspace', ANIMATE_RIGHT),
-      transition('workspaces => import-workspace', ANIMATE_RIGHT),
-      transition('create-workspace => import-workspace', ANIMATE_RIGHT)
+      transition(`${CREATE_WORKSPACE} => ${WORKSPACES}`, ANIMATE_LEFT),
+      transition(`${IMPORT_WORKSPACE} => ${WORKSPACES}`, ANIMATE_LEFT),
+      transition(`${IMPORT_WORKSPACE} => ${CREATE_WORKSPACE}`, ANIMATE_LEFT),
+      transition(`${WORKSPACES} => ${CREATE_WORKSPACE}`, ANIMATE_RIGHT),
+      transition(`${WORKSPACES} => ${IMPORT_WORKSPACE}`, ANIMATE_RIGHT),
+      transition(`${CREATE_WORKSPACE} => ${IMPORT_WORKSPACE}`, ANIMATE_RIGHT),
+      transition(`* <=> ${WORKSPACE}`, fadeIn(`500ms ease-in-out`))
     ])
   ]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  @ViewChild(RouterOutlet) routerOutlet: RouterOutlet;
+  routerTransition: Observable<string>;
+
+  ngOnInit() {
+    this.routerTransition = this.routerOutlet.activateEvents.pipe(
+      map(() => this.routerOutlet.activatedRouteData.state)
+    );
+  }
+
   constructor(
     router: Router,
     contextualActionBarService: ContextualActionBarService
