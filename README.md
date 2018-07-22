@@ -3,7 +3,7 @@ LOGO
 
 <p align="center">
 
-[![Build Status](https://travis-ci.org/nrwl/nx.svg?branch=master)](https://travis-ci.org/nrwl/nx)
+[![Build Status](https://travis-ci.com/nrwl/angular-console.svg?branch=master)](https://travis-ci.com/nrwl/angular-console)
 [![License](https://img.shields.io/npm/l/@nrwl/schematics.svg?style=flat-square)]()
 
 </p>
