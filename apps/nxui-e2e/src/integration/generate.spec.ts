@@ -55,7 +55,7 @@ describe('Generate', () => {
     });
   });
 
-  it.only('runs a schematic', () => {
+  it('runs a schematic', () => {
     clickOnTask('@schematics/angular', 'service');
     waitForAnimation();
 

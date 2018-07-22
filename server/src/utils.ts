@@ -40,8 +40,7 @@ export function listFilesRec(dirName: string): string[] {
         } else if (fs.statSync(child).isDirectory()) {
           res.push(...listFilesRec(child));
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     });
   } catch (e) {}
   return res;

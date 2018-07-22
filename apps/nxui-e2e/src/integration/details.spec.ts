@@ -9,7 +9,7 @@ describe('Details', () => {
     openProject(projectPath('proj'));
 
     cy.get('div.title').contains('View Workspace Details');
-    cy.contains('Name: proj');
+    cy.contains('proj');
 
     projectNames($p => {
       expect($p.length).to.equal(2);
