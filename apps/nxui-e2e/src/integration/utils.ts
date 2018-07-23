@@ -70,11 +70,13 @@ export function checkDisplayedCommand(s: string) {
   });
 }
 
-export function openProject(p: string) {
-  cy.get('.mat-tab-link:nth-of-type(3)').click();
-  waitForAnimation();
-  cy.get('input').type(p);
-  cy.get('button#open-workspace').click();
+export function openProject(_: string) {
+  // TODO: Create a directory autocomplete bar and re-enable below logic.
+  // cy.get('.mat-tab-link:nth-of-type(3)').click();
+  // waitForAnimation();
+  // cy.get('input').type(p);
+  // cy.get('button#open-workspace').click();
+  cy.visit('workspace/.%2Ftmp%2Fproj/details');
 }
 
 export function projectNames(callback: (s: any) => void) {

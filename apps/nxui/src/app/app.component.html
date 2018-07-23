@@ -1,5 +1,7 @@
-<ui-contextual-action-bar></ui-contextual-action-bar>
+<div fxLayout="column" fxFlex>
+    <ui-contextual-action-bar></ui-contextual-action-bar>
 
-<div fxFlex class="outlet-container" [@routerTransition]="routerTransition | async">
-    <router-outlet></router-outlet>
+    <div fxFlex class="outlet-container" [@routerTransition]="routerTransition | async">
+        <router-outlet></router-outlet>
+    </div>
 </div>

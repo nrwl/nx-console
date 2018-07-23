@@ -1,4 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TerminalComponent } from '@nxui/ui';
 import { CommandOutput, CommandRunner } from '@nxui/utils';
@@ -13,6 +18,7 @@ interface Addon {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-addons',
   templateUrl: './addons.component.html',
   styleUrls: ['./addons.component.css']

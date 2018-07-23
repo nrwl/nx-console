@@ -126,9 +126,9 @@
   dependencies:
     tslib "^1.9.0"
 
-"@angular/cdk@^6.3.2":
-  version "6.3.2"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-6.3.2.tgz#d1a9599275fd08f5a996c668985a39e4ce1c514b"
+"@angular/cdk@^6.4.0":
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-6.4.0.tgz#4339b72d96acdf1335b7b2ba1a94c07898df595e"
   dependencies:
     tslib "^1.7.1"
 
@@ -192,9 +192,9 @@
   version "6.0.7"
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-6.0.7.tgz#047dcd762be8a6c24e7309905e468ca82bcf91ec"
 
-"@angular/material@^6.3.3":
-  version "6.3.3"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-6.3.3.tgz#4f74402ba6e4b80cf0426e62c1240244e6974069"
+"@angular/material@^6.4.0":
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-6.4.0.tgz#7c68be455059aab5feae969b22307880237d2354"
   dependencies:
     tslib "^1.7.1"
   optionalDependencies:

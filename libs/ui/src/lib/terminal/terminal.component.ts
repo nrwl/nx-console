@@ -5,7 +5,8 @@ import {
   Input,
   OnDestroy,
   ViewChild,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -15,6 +16,7 @@ const DEBOUNCE_TIME = 300;
 const SCROLL_BAR_WIDTH = 48;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-terminal',
   templateUrl: './terminal.component.html',
   encapsulation: ViewEncapsulation.None,

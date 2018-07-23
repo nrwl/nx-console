@@ -35,7 +35,7 @@
 
     "angular-whitespace": [true, "check-interpolation", "check-semicolon"],
     "banana-in-box": true,
-    "templates-no-negated-async": true,
+    "templates-no-negated-async": false,
     "max-inline-declarations": true,
     "no-life-cycle-call": true,
     "prefer-output-readonly": true,
@@ -45,7 +45,7 @@
     "no-attribute-parameter-decorator": true,
     "no-output-named-after-standard-event": true,
     "no-forward-ref": true,
-    "no-unused-css": true,
+    "no-unused-css": false,
     "contextual-life-cycle": true,
     "trackBy-function": false,
     "pipe-impure": true,

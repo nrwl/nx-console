@@ -11,6 +11,7 @@ import {
   MatIconRegistry,
   MatInputModule,
   MatListModule,
+  MatTreeModule,
   MatOptionModule,
   MatRadioModule,
   MatRippleModule,
@@ -29,44 +30,53 @@ import { FlagsComponent } from './flags/flags.component';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
+import { DirectorySelectorComponent } from './directory-selector/directory-selector.component';
+import { CdkTreeModule } from '@angular/cdk/tree';
+
+const IMPORTS = [
+  CommonModule,
+  FlexLayoutModule,
+  MatIconModule,
+  MatTreeModule,
+  MatTooltipModule,
+  MatToolbarModule,
+  MatAutocompleteModule,
+  CdkTreeModule,
+  MatButtonModule,
+  MatDividerModule,
+  MatExpansionModule,
+  MatTabsModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatOptionModule,
+  MatRadioModule,
+  MatRippleModule,
+  MatSelectModule,
+  MatSlideToggleModule,
+  ReactiveFormsModule,
+  RouterModule
+];
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FlexLayoutModule,
-    MatIconModule,
-    MatTooltipModule,
-    MatToolbarModule,
-    MatAutocompleteModule,
-    MatButtonModule,
-    MatDividerModule,
-    MatExpansionModule,
-    MatTabsModule,
-    MatIconModule,
-    MatInputModule,
-    MatListModule,
-    MatOptionModule,
-    MatRadioModule,
-    MatRippleModule,
-    MatSelectModule,
-    MatSlideToggleModule,
-    ReactiveFormsModule,
-    RouterModule
-  ],
+  imports: IMPORTS,
   declarations: [
     FlagsComponent,
     TerminalComponent,
     TaskRunnerComponent,
     TaskSelectorComponent,
-    ContextualActionBarComponent
+    ContextualActionBarComponent,
+    DirectorySelectorComponent
   ],
   providers: [ContextualActionBarService],
   exports: [
+    ...IMPORTS,
     ContextualActionBarComponent,
     FlagsComponent,
     TerminalComponent,
     TaskRunnerComponent,
-    TaskSelectorComponent
+    TaskSelectorComponent,
+    DirectorySelectorComponent
   ]
 })
 export class UiModule {

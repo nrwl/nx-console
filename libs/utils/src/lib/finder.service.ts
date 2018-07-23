@@ -19,12 +19,13 @@ export class Finder {
     return this.apollo
       .query({
         query: gql`
-          query($path: String!) {
-            directory(path: $path) {
+          query($path: String!, $onlyDirectories: Boolean) {
+            directory(path: $path, onlyDirectories: $onlyDirectories) {
               path
               files {
                 name
                 type
+                hasChildren
               }
             }
           }

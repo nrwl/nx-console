@@ -2,17 +2,16 @@
   <mat-toolbar-row>
     <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) === null" fxLayout="row" fxLayoutAlign="start center">
       <a class="branding" fxLayout="row" fxLayoutAlign="start center" routerLink="/workspaces">
-        <img alt="Home" height="40" src="/assets/logo-nav@2x.png" title="Home" width="150">
-        <span class="site-name">Console</span>
+        <img alt="Home" height="40" width="40" src="/assets/angular_circle.png" title="Home">
       </a>
       <div class="title" fxLayout="row" fxLayoutGap="16px">
-        <ng-container *ngFor="let breadcrumb of (contextualActionBarService.breadcrumbs$ | async); let last = last">
+        <ng-container *ngFor="let breadcrumb of (contextualActionBarService.breadcrumbs$ | async); let last = last;">
           <span>{{ breadcrumb.title }}</span>
           <span *ngIf="!last">|</span>
         </ng-container>
       </div>
     </div>
-    <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) as contextualActions" fxLayout="row" fxLayoutGap="24px"
+    <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) as contextualActions" fxLayout="row" fxLayoutGap="32px"
       fxLayoutAlign="start center" fxFlex>
       <mat-icon (click)="contextualActionBarService.contextualActions$.next(null)" class="exit-action">clear</mat-icon>
       <div class="context-title" fxFlex>
@@ -32,8 +31,8 @@
       </div>
     </div>
   </mat-toolbar-row>
-  <mat-toolbar-row class="tabs-container">
-    <nav fxFlex mat-tab-nav-bar backgroundColor="primary" *ngIf="(contextualActionBarService.contextualTabs$ | async)?.tabs as tabs">
+  <mat-toolbar-row class="tabs-container" @growShrink *ngIf="!(contextualActionBarService.contextualActions$ | async) && (contextualActionBarService.contextualTabs$ | async)?.tabs as tabs">
+    <nav fxFlex mat-tab-nav-bar backgroundColor="primary">
       <a fxFlex mat-tab-link *ngFor="let tab of tabs; trackBy: trackByName" [routerLink]="tab.routerLink" routerLinkActive="active"
         #rla="routerLinkActive" [active]="rla.isActive" class="nav-link">
         <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">

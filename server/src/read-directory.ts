@@ -38,6 +38,13 @@ export function readDirectory(
         show = false;
       }
       return show;
+    })
+    .map(t => {
+      const hasChildren =
+        fs.readdirSync(`${dirName}/${t.name}`).filter(child => {
+          return fs.statSync(`${dirName}/${t.name}/${child}`).isDirectory();
+        }).length > 0;
+      return { ...t, hasChildren };
     });
 
   return { path: dirName, files };

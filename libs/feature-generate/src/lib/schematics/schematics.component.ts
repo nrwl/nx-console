@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
 import { Schematic, SchematicCollection } from '@nxui/utils';
@@ -20,6 +20,7 @@ interface SchematicId {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-generate',
   templateUrl: './schematics.component.html',
   styleUrls: ['./schematics.component.scss']

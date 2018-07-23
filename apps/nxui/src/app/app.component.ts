@@ -1,5 +1,10 @@
 import { transition, trigger } from '@angular/animations';
-import { Component, ViewChild, OnInit } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  ViewChild,
+  OnInit
+} from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
   animateLeft,
@@ -12,6 +17,7 @@ import {
   CREATE_WORKSPACE,
   IMPORT_WORKSPACE,
   WORKSPACES,
+  FeatureWorkspaceRouteState,
   WORKSPACE
 } from '@nxui/feature-workspaces';
 import { Observable } from 'rxjs';
@@ -21,6 +27,7 @@ const ANIMATE_LEFT = animateLeft(TIMING);
 const ANIMATE_RIGHT = animateRight(TIMING);
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
@@ -58,9 +65,26 @@ export class AppComponent implements OnInit {
         if (navigationEnd.url.startsWith('/workspace/')) {
           contextualActionBarService.contextualTabs$.next(null);
         } else {
-          contextualActionBarService.breadcrumbs$.next([
-            { title: 'Choose A Workspace' }
-          ]);
+          switch (
+            this.routerOutlet.activatedRouteData
+              .state as FeatureWorkspaceRouteState
+          ) {
+            case CREATE_WORKSPACE:
+              contextualActionBarService.breadcrumbs$.next([
+                { title: 'Create A New Workspace' }
+              ]);
+              break;
+            case IMPORT_WORKSPACE:
+              contextualActionBarService.breadcrumbs$.next([
+                { title: 'Import An Existing Workspace' }
+              ]);
+              break;
+            case WORKSPACES:
+              contextualActionBarService.breadcrumbs$.next([
+                { title: 'Recently Opened Workspaces' }
+              ]);
+              break;
+          }
 
           contextualActionBarService.contextualTabs$.next({
             tabs: [
