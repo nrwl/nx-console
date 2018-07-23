@@ -795,3 +795,5 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const port = process.argv[2];
 app.listen(port ? port : 7777);
+
+console.log('AngularConsole Server Started');
