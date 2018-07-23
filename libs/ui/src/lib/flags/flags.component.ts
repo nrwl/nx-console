@@ -7,6 +7,7 @@ import {
 } from '@angular/animations';
 import {
   Component,
+  ChangeDetectionStrategy,
   ElementRef,
   EventEmitter,
   Input,
@@ -30,6 +31,7 @@ interface FieldGrouping {
 const DEBOUNCE_TIME = 300;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-flags',
   templateUrl: './flags.component.html',
   styleUrls: ['./flags.component.scss'],

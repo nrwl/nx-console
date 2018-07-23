@@ -1,4 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TerminalComponent } from '@nxui/ui';
@@ -20,6 +25,7 @@ interface NgNewInvocation {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-new-workspace',
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.css']

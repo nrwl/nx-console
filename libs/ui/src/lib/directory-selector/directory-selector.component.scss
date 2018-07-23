@@ -1,0 +1,66 @@
+mat-tree-node {
+  overflow: hidden;
+  min-height: 0 !important;
+
+  &:nth-child(2n) {
+    background: rgb(245, 245, 245);
+  }
+
+  &.selected {
+    background: #1976d2;
+
+    .angular-directory-name {
+      color: white !important;
+    }
+  }
+}
+
+:host {
+  background: #efeff0;
+}
+
+.directory {
+  min-height: 48px;
+  max-height: 48px;
+  height: 48px;
+  text-align: left;
+  padding-left: 0;
+}
+
+.directory-name {
+  color: rgb(183, 183, 183);
+  font-weight: 400;
+
+  // &.angular-directory-name {
+  //   color: rgba(0, 0, 0, 0.87);
+  //   font-weight: 500;
+  // }
+}
+
+.angular-icon {
+  margin-right: 7px;
+  margin-left: 45px;
+}
+
+.directory-icon {
+  margin-left: 4px;
+  margin-right: 6px;
+  color: rgb(148, 204, 242);
+}
+
+.expand-icon {
+  margin-left: 8px;
+  color: rgb(171, 171, 171);
+  cursor: pointer;
+  font-size: 36px;
+  line-height: 36px;
+  width: 36px;
+  height: 36px;
+  transform: rotate(0deg);
+  transition: all 0.1s ease-in-out;
+
+  &.expanded {
+    transform: rotate(90deg);
+    color: rgb(71, 71, 71);
+  }
+}

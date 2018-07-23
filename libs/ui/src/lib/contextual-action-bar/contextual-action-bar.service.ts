@@ -34,5 +34,5 @@ export class ContextualActionBarService {
 
   readonly contextualActions$ = new Subject<ContextualActions | null>();
 
-  readonly contextualTabs$ = new Subject<ContextualTabs | null>();
+  readonly contextualTabs$ = new BehaviorSubject<ContextualTabs | null>(null);
 }

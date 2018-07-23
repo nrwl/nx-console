@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
 import { NpmScripts, Project } from '@nxui/utils';
@@ -13,6 +13,7 @@ interface Target {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-targets',
   templateUrl: './targets.component.html',
   styleUrls: ['./targets.component.scss']

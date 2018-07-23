@@ -11,6 +11,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  ChangeDetectionStrategy,
   Output
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -38,6 +39,7 @@ const ANIMATION_MILLIS = 800;
 const ROUTE_CHANGE_DELAY = 300;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-task-selector',
   templateUrl: './task-selector.component.html',
   styleUrls: ['./task-selector.component.scss'],

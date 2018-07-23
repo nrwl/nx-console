@@ -8,7 +8,7 @@ describe('Details', () => {
   it('shows details screen', () => {
     openProject(projectPath('proj'));
 
-    cy.get('div.title').contains('View Workspace Details');
+    cy.get('div.title').contains('Workspace Overview');
     cy.contains('proj');
 
     projectNames($p => {

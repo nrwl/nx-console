@@ -3,7 +3,8 @@ import {
   Component,
   HostBinding,
   OnDestroy,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
@@ -31,11 +32,12 @@ interface Route {
   title: string;
 }
 
-const ROUTER_TRANSITION_TIMING = '700ms 150ms ease-in-out';
+const ROUTER_TRANSITION_TIMING = '500ms ease-in-out';
 const ANIMATE_UP = animateUp(ROUTER_TRANSITION_TIMING);
 const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
@@ -85,7 +87,7 @@ export class WorkspaceComponent implements OnDestroy {
   );
 
   readonly routes: Array<Route> = [
-    { icon: 'details', url: 'details', title: 'View Workspace Details' },
+    { icon: 'details', url: 'details', title: 'Workspace Overview' },
     { icon: 'create_new_folder', url: 'generate', title: 'Generate Code' },
     {
       icon: 'extension',

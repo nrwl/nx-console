@@ -56,7 +56,7 @@
         </ng-container>
         <ng-container *ngIf=" !field.enum && field.type !=='boolean'">
           <mat-icon>{{ field.completionValues ? 'search' : 'create' }}</mat-icon>
-          <div fxLayout="column " fxFlex>
+          <div fxLayout="column " fxFlex class="text-field-container">
             <mat-form-field>
               <input #input fxFlex type="text" matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
                 [formControlName]="field.name" [matAutocomplete]="auto">

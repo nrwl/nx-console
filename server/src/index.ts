@@ -496,6 +496,9 @@ export const filesType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
                   name: {
                     type: new graphql.GraphQLNonNull(graphql.GraphQLString)
                   },
+                  hasChildren: {
+                    type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
+                  },
                   type: {
                     type: new graphql.GraphQLNonNull(
                       new graphql.GraphQLEnumType({

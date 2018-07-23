@@ -1,6 +1,1 @@
-<div>
-  <h2>Open</h2>
-  Path:
-  <input #path>
-  <button (click)="workspacesService.openWorkspace(path.value)" id="open-workspace">Open Workspace</button>
-</div>
+<ui-directory-selector [selectedNode]="selectedNode" (toggleNodeSelection)="toggleNodeSelection($event)" [disableNode]="disableNode"></ui-directory-selector>

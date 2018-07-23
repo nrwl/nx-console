@@ -1,4 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   ContextualActionBarService,
@@ -25,6 +30,7 @@ import {
 } from 'rxjs/operators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-npmscript',
   templateUrl: './npmscript.component.html',
   styleUrls: ['./npmscript.component.css']

@@ -7,3 +7,4 @@ export * from '@nxui/ui/src/lib/task-runner/task-runner.component';
 export * from '@nxui/ui/src/lib/flags/flags.component';
 export * from '@nxui/ui/src/lib/animations/routing';
 export * from '@nxui/ui/src/lib/animations/grow-shink';
+export * from '@nxui/ui/src/lib/directory-selector/directory-data-source';

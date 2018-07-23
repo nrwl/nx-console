@@ -8,6 +8,7 @@ mat-toolbar.title-bar {
   .tabs-container {
     height: unset;
     padding: 0;
+    overflow: hidden;
 
     .nav-link {
       &.active {
@@ -29,21 +30,20 @@ mat-toolbar.title-bar {
     background: rgb(33, 33, 33);
   }
 
+  .title {
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  mat-toolbar-row {
+    padding: 0 12px;
+  }
+
   a.branding {
     text-decoration: none;
-    min-width: 260px;
-    max-width: 260px;
-
-    .site-name {
-      font-size: 20px;
-      margin-left: 8px;
-      margin-right: 30px;
-      font-weight: 300;
-      color: white;
-      text-decoration: none;
-      position: relative;
-      top: 1px;
-    }
+    position: relative;
+    left: -4px;
+    margin-right: 18px;
   }
 
   // tslint:disable-next-line

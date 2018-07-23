@@ -5,11 +5,12 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { Component, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-task-runner',
   templateUrl: './task-runner.component.html',
   styleUrls: ['./task-runner.component.scss'],

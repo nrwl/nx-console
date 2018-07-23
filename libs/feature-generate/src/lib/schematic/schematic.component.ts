@@ -1,4 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  ElementRef,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   ContextualActionBarService,
@@ -33,6 +39,7 @@ const MISSING_REQUIRED_FLAGS: CommandOutput = {
 const DEBOUNCE_TIME = 300;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-schematic',
   templateUrl: './schematic.component.html',
   styleUrls: ['./schematic.component.scss']

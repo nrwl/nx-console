@@ -3,9 +3,15 @@ import { Observable } from 'rxjs';
 
 export type AutocompletionType = 'modules' | 'projects' | 'file';
 
+export interface LocalFile {
+  name: string;
+  type: 'file' | 'directory' | 'angularDirectory';
+  hasChildren: boolean;
+}
+
 export interface Directory {
   path: string;
-  files: { name: string; type: 'file' | 'directory' | 'angularDirectory' }[];
+  files: Array<LocalFile>;
 }
 
 export interface CompletetionValue {

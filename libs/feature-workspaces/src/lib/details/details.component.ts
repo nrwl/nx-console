@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Project, EditorSupport } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-details',
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss']
