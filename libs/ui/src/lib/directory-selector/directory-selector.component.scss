@@ -31,10 +31,10 @@ mat-tree-node {
   color: rgb(183, 183, 183);
   font-weight: 400;
 
-  // &.angular-directory-name {
-  //   color: rgba(0, 0, 0, 0.87);
-  //   font-weight: 500;
-  // }
+  &.angular-directory-name {
+    color: rgba(0, 0, 0, 0.87);
+    font-weight: 500;
+  }
 }
 
 .angular-icon {
