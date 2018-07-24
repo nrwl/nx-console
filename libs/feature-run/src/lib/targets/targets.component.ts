@@ -1,11 +1,17 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
 import { NpmScripts, Project } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import {
+  map,
+  switchMap,
+  filter,
+  startWith,
+  distinctUntilChanged
+} from 'rxjs/operators';
 
 interface Target {
   projectName: string;
@@ -68,10 +74,41 @@ export class TargetsComponent {
     })
   );
 
+  private readonly selectedTargetId$: Observable<
+    Target
+  > = this.router.events.pipe(
+    filter(event => event instanceof NavigationEnd),
+    startWith(null),
+    map(() => {
+      const firstChild = this.route.snapshot.firstChild;
+      if (firstChild) {
+        if (firstChild.params.script) {
+          return {
+            projectName: 'package.json scripts',
+            targetName: decodeURIComponent(firstChild.params.script)
+          };
+        } else {
+          return {
+            projectName: decodeURIComponent(firstChild.params.project),
+            targetName: decodeURIComponent(firstChild.params.target)
+          };
+        }
+      }
+      return {
+        projectName: '',
+        targetName: ''
+      };
+    }),
+    distinctUntilChanged(
+      (a: Target, b: Target) =>
+        a.projectName === b.projectName && a.targetName === b.targetName
+    )
+  );
+
   readonly taskCollections$: Observable<
     TaskCollections<Target>
-  > = this.projectsAndNpmScripts$.pipe(
-    map(projects => {
+  > = combineLatest(this.projectsAndNpmScripts$, this.selectedTargetId$).pipe(
+    map(([projects, target]) => {
       const collections: Array<TaskCollection<Target>> = projects.map(
         projectOrScripts => {
           if ((projectOrScripts as any).projectType) {
@@ -103,7 +140,7 @@ export class TargetsComponent {
       );
 
       const taskCollections: TaskCollections<Target> = {
-        selectedTask: this.getSelectedTarget(collections),
+        selectedTask: this.getSelectedTask(collections, target),
         taskCollections: collections
       };
 
@@ -135,12 +172,11 @@ export class TargetsComponent {
     }
   }
 
-  getSelectedTarget(
-    taskCollections: Array<TaskCollection<Target>>
+  getSelectedTask(
+    taskCollections: Array<TaskCollection<Target>>,
+    target: Target
   ): Task<Target> | null {
-    const projectName = this.route.snapshot.params.project;
-    const targetName = this.route.snapshot.params.target;
-    if (!projectName || !targetName) {
+    if (!target.projectName || !target.targetName) {
       return null;
     }
 
@@ -151,7 +187,8 @@ export class TargetsComponent {
       )
       .find(
         ({ task }) =>
-          task.projectName === projectName && task.targetName === targetName
+          task.projectName === target.projectName &&
+          task.targetName === target.targetName
       );
 
     return selectedTask || null;
