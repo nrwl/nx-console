@@ -87,14 +87,14 @@ export class WorkspaceComponent implements OnDestroy {
   );
 
   readonly routes: Array<Route> = [
-    { icon: 'details', url: 'details', title: 'Workspace Overview' },
-    { icon: 'create_new_folder', url: 'generate', title: 'Generate Code' },
+    { icon: 'view_list', url: 'details', title: 'Workspace Overview' },
+    { icon: 'code', url: 'generate', title: 'Generate Code' },
     {
       icon: 'extension',
       url: 'extensions',
       title: 'Add/Remove CLI Extensions'
     },
-    { icon: 'chevron_right', url: 'tasks', title: 'Run Tasks' }
+    { icon: 'play_arrow', url: 'tasks', title: 'Run Tasks' }
   ];
 
   readonly sideNavAnimationState$ = this.contextualActionBarService.contextualActions$.pipe(

@@ -24,7 +24,7 @@
       </mat-expansion-panel-header>
 
       <div class="field" *ngFor="let field of fieldGroup.fields" [class.error]="formGroup.hasError('required', field.name) && formGroup.get(field.name).touched"
-        fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.enum]="field.enum" [class.text]="!field.enum && field.type !== 'boolean'">
+        fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.text]="field.type !== 'boolean'">
         <ng-container *ngIf="field.type === 'boolean'">
           <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
           <div fxFlex class="boolean-field-container" fxLayout="row" fxLayoutAlign="space-between center">
@@ -39,30 +39,15 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="field.enum">
-          <mat-icon>arrow_drop_down_circle</mat-icon>
-          <mat-form-field fxFlex>
-            <mat-select [formControlName]="field.name" [required]="field.required" [attr.name]="field.name" [placeholder]="field.name">
-              <mat-option *ngFor="let value of fieldOptions(field)" [value]="value">
-                {{ fieldOption(value) }}
-              </mat-option>
-            </mat-select>
-            <span class="select-field-hint field-hint">
-              {{ field.description }}
-              <ng-container *ngIf="field.required">Required. </ng-container>
-              <ng-container *ngIf="field.defaultValue && field.defaultValue !== 'Default'">(Default: {{ field.defaultValue }})</ng-container>
-            </span>
-          </mat-form-field>
-        </ng-container>
-        <ng-container *ngIf=" !field.enum && field.type !=='boolean'">
+        <ng-container *ngIf="field.type !=='boolean'">
           <mat-icon>{{ field.completionValues ? 'search' : 'create' }}</mat-icon>
-          <div fxLayout="column " fxFlex class="text-field-container">
+          <div fxLayout="column" fxFlex class="text-field-container">
             <mat-form-field>
               <input #input fxFlex type="text" matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
                 [formControlName]="field.name" [matAutocomplete]="auto">
               <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
               <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let completionValue of field.completionValues | async" [value]="completionValue.value">
+                <mat-option (click)="input.blur()" *ngFor="let completionValue of field.completionValues | async" [value]="completionValue.value">
                   {{ completionValue.display || completionValue.value }}
                 </mat-option>
               </mat-autocomplete>
