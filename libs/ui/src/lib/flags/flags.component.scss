@@ -67,13 +67,6 @@ ui-flags {
       margin-left: $input-padding-horizontal;
       margin-right: $input-padding-horizontal;
     }
-
-    &.select-field-hint {
-      position: absolute;
-      left: 0;
-      bottom: -26px;
-      right: 0;
-    }
   }
 
   .text-field-container {
@@ -83,7 +76,7 @@ ui-flags {
 
   .field {
     position: relative;
-    margin-bottom: 12px;
+    margin-bottom: 24px;
 
     & > mat-icon {
       position: relative;
@@ -119,7 +112,7 @@ ui-flags {
     &.boolean {
       min-height: 48px;
       border-radius: $border-radius;
-      margin-bottom: 32px;
+      margin-bottom: 44px;
 
       .boolean-ripple {
         position: absolute;
@@ -155,34 +148,15 @@ ui-flags {
       }
     }
 
-    &.enum {
-      .mat-form-field-type-mat-select {
-        .mat-form-field-flex {
-          padding-left: 18px;
-        }
-      }
-
-      .mat-form-field-type-mat-select:not(.mat-focused)
-        .mat-form-field-empty:not(.mat-form-field-empty) {
-        transform: translateY(0) perspective(0) !important;
-      }
-    }
-
-    &.text,
-    &.enum {
+    &.text {
       .mat-form-field-can-float:not(.mat-form-field-should-float) {
         input {
           position: relative;
           top: -10px;
         }
-
-        mat-select {
-          transform: translateY(-10px) perspective(100px);
-        }
       }
 
-      .mat-form-field-can-float:not(.mat-focused),
-      .mat-form-field-type-mat-select {
+      .mat-form-field-can-float:not(.mat-focused) {
         .mat-form-field-empty.mat-form-field-label {
           transform: translateY(-10px) perspective(100px);
         }

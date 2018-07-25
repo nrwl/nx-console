@@ -2,7 +2,7 @@
   <mat-toolbar-row>
     <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) === null" fxLayout="row" fxLayoutAlign="start center">
       <a class="branding" fxLayout="row" fxLayoutAlign="start center" routerLink="/workspaces">
-        <img alt="Home" height="40" width="40" src="/assets/angular_circle.png" title="Home">
+        <img alt="Home" height="48" width="48" src="/assets/angular_logo.svg" title="Home">
       </a>
       <div class="title" fxLayout="row" fxLayoutGap="16px">
         <ng-container *ngFor="let breadcrumb of (contextualActionBarService.breadcrumbs$ | async); let last = last;">
@@ -11,7 +11,7 @@
         </ng-container>
       </div>
     </div>
-    <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) as contextualActions" fxLayout="row" fxLayoutGap="32px"
+    <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) as contextualActions" fxLayout="row" fxLayoutGap="28px"
       fxLayoutAlign="start center" fxFlex>
       <mat-icon (click)="contextualActionBarService.contextualActions$.next(null)" class="exit-action">clear</mat-icon>
       <div class="context-title" fxFlex>

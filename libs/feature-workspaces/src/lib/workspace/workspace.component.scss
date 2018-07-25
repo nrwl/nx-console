@@ -30,7 +30,9 @@ nxui-workspace {
         transition: all 0.3s ease-in-out;
 
         &.active {
-          color: rgb(67, 118, 197) !important;
+          .route-icon {
+            color: rgb(67, 118, 197) !important;
+          }
 
           &.route-button {
             background-color: rgb(217, 217, 217);
@@ -55,6 +57,7 @@ nxui-workspace {
       }
 
       .route-icon {
+        color: rgba(0, 0, 0, 0.54);
         width: 32px;
         height: 32px;
         font-size: 32px;
