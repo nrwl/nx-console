@@ -1,10 +1,11 @@
 language: node_js
-dist: trusty
+dist: xenial
 sudo: required
 node_js:
-- '8.9.3'
+- '10.7.0'
 before_install:
 - export DISPLAY=:99.0
+- sudo apt-get install libgconf-2-4
 install:
 - sh -e /etc/init.d/xvfb start
 - yarn install
@@ -17,7 +18,9 @@ addons:
   chrome: stable
 cache:
   directories:
-  - node_modules
+    - ~/.npm
+    - ~/.yarn
+    - ~/.cache
 notifications:
   email: false
   webhooks:
