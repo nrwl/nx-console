@@ -33,23 +33,20 @@ import { DirectoryDataSource, DynamicFlatNode } from './directory-data-source';
   ]
 })
 export class DirectorySelectorComponent implements AfterViewInit {
-  @Output() readonly toggleNodeSelection = new EventEmitter<DynamicFlatNode>();
-
-  @Input()
-  readonly disableNode: (node: DynamicFlatNode) => boolean = () => false;
-
   readonly treeControl: FlatTreeControl<DynamicFlatNode> = new FlatTreeControl(
     node => node.level,
     node => this.hasChild(0, node)
   );
-
   readonly dataSource = new DirectoryDataSource(this.treeControl, this.finder);
+  afterViewInit = false;
+
+  @Output() readonly toggleNodeSelection = new EventEmitter<DynamicFlatNode>();
 
   @Input() selectedNode: DynamicFlatNode | null;
+  @Input()
+  readonly disableNode: (node: DynamicFlatNode) => boolean = () => false;
 
   constructor(private readonly finder: Finder) {}
-
-  afterViewInit = false;
 
   ngAfterViewInit() {
     this.afterViewInit = true;
