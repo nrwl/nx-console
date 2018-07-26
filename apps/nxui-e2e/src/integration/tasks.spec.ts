@@ -2,7 +2,6 @@ import {
   checkDisplayedCommand,
   checkFileExists,
   clickOnTask,
-  expandTerminal,
   goBack,
   goToTasks,
   openProject,
@@ -58,7 +57,6 @@ describe('Tasks', () => {
     clickOnTask('proj', 'build');
     cy.get('div.context-title').contains('ng build proj');
 
-    expandTerminal();
     checkDisplayedCommand('$ ng build proj');
 
     cy.get('mat-radio-button')
@@ -90,7 +88,6 @@ describe('Tasks', () => {
     clickOnTask('package.json scripts', 'build');
     cy.get('div.context-title').contains('npm run build');
 
-    expandTerminal();
     checkDisplayedCommand('$ npm run build');
 
     cy.get('button')

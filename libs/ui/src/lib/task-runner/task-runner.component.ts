@@ -26,7 +26,7 @@ import { map } from 'rxjs/operators';
 export class TaskRunnerComponent {
   @Input() terminalWindowTitle: string;
 
-  terminalVisible = new BehaviorSubject(false);
+  terminalVisible = new BehaviorSubject(true);
   terminalAnimationState = this.terminalVisible.pipe(
     map(visible => (visible ? 'grow' : 'shrink'))
   );

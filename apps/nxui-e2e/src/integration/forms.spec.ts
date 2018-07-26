@@ -4,7 +4,6 @@ import {
   checkDisplayedCommand,
   checkFieldHasClass,
   clickOnTask,
-  expandTerminal,
   goToGenerate,
   openProject,
   projectPath,
@@ -73,7 +72,6 @@ describe('Forms', () => {
   });
 
   it('updates the command in the terminal', () => {
-    expandTerminal();
     checkDisplayedCommand('$ ng generate component --dry-run');
 
     cy.get('input[name="name"]').type('cmp');
