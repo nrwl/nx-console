@@ -19,7 +19,7 @@
         {{ (terminalVisible | async) ? 'Hide' : 'Show' }}
       </button>
     </div>
-    <div class="ng-content-container">
+    <div class="ng-content-container" fxFlexFill>
       <ng-content select="ui-terminal"></ng-content>
     </div>
   </div>

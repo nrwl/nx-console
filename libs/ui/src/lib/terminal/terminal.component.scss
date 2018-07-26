@@ -1,18 +1,21 @@
-ui-terminal {
-  .terminal-container {
-    overflow: hidden;
-    max-width: 100%;
-    height: calc(100% - 44px);
-  }
+:host {
+  display: block;
+  height: 100%;
+}
 
-  .command {
-    color: white;
-    font-family: monospace;
-    margin-bottom: 8px;
-    font-size: 14px;
-  }
+.terminal-container {
+  overflow: hidden;
+  max-width: 100%;
+  height: calc(100% - 44px);
+}
 
-  .xterm-viewport {
-    overflow-y: auto !important;
-  }
+.command {
+  color: white;
+  font-family: monospace;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.xterm-viewport {
+  overflow-y: auto !important;
 }
