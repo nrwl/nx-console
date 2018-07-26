@@ -28,7 +28,7 @@ interface NgNewInvocation {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nxui-new-workspace',
   templateUrl: './new-workspace.component.html',
-  styleUrls: ['./new-workspace.component.css']
+  styleUrls: ['./new-workspace.component.scss']
 })
 export class NewWorkspaceComponent implements OnInit {
   schematicCollectionsForNgNew$: Observable<any>;
@@ -37,8 +37,7 @@ export class NewWorkspaceComponent implements OnInit {
   commandOutput$: Observable<CommandOutput>;
   command$ = new Subject();
   private readonly ngNew$ = new Subject<NgNewInvocation>();
-  @ViewChild('out', { read: TerminalComponent })
-  out: TerminalComponent;
+  @ViewChild(TerminalComponent) out: TerminalComponent;
 
   constructor(
     private readonly apollo: Apollo,

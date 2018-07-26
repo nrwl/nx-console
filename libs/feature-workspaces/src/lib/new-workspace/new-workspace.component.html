@@ -1,5 +1,5 @@
-<div *ngIf="schematicCollectionsForNgNew$|async as schematicCollectionsForNgNew">
-  <ng-container *ngIf="ngNewForm$|async as form">
+<ui-task-runner *ngIf="schematicCollectionsForNgNew$|async as schematicCollectionsForNgNew" terminalWindowTitle="Task output">
+  <div class="ui-flags" *ngIf="ngNewForm$|async as form">
     <form [formGroup]="form">
       <div [class.error]="form.hasError('required', 'name') && form.get('name')?.touched">
         Name:
@@ -17,10 +17,7 @@
       </div>
       <button [disabled]="form.invalid" (click)="createNewWorkspace(form.value)">Create New Workspace</button>
     </form>
-  </ng-container>
+  </div>
+  <ui-terminal [command]="command$|async" [input]="(commandOutput$|async)?.out"></ui-terminal>
+</ui-task-runner>
 
-</div>
-
-<div class="ui-terminal-container">
-  <ui-terminal [command]="command$|async" [input]="(commandOutput$|async)?.out" #out></ui-terminal>
-</div>

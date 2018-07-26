@@ -23,13 +23,13 @@ describe('Details', () => {
     });
   });
 
-  it('checks that hot actions work', () => {
-    cy.get('button')
-      .contains('Generate Service')
-      .click();
-    cy.get('div.context-title').contains('Create an Angular service');
-    cy.get('input[name="project"]').should(($p: any) => {
-      expect($p[0].value).to.equal('proj');
-    });
-  });
+  // it('checks that hot actions work', () => {
+  //   cy.get('button')
+  //     .contains('Generate Service')
+  //     .click();
+  //   cy.get('div.context-title').contains('Create an Angular service');
+  //   cy.get('input[name="project"]').should(($p: any) => {
+  //     expect($p[0].value).to.equal('proj');
+  //   });
+  // });
 });
