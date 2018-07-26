@@ -4,17 +4,33 @@
     <!-- Non-Angular Directory -->
     <ng-container *ngIf="node.file.type !== 'angularDirectory'">
       <mat-icon class="expand-icon" [class.expanded]="treeControl.isExpanded(node)" matTreeNodeToggle>arrow_right</mat-icon>
-      <button class="directory" fxFlex mat-button [disabled]="disableNode(node)" matTreeNodeToggle>
+
+      <!-- Read and select only -->
+      <ng-container *ngIf="!handleNodeCreation">
+        <button class="directory" fxFlex mat-button [disabled]="disableNode(node)" matTreeNodeToggle>
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-icon class="directory-icon">folder</mat-icon>
+            <span fxFlex class="directory-name">{{ node.file.name }}</span>
+          </div>
+        </button>
+      </ng-container>
+
+      <!-- Read and create -->
+      <ng-container *ngIf="handleNodeCreation">
         <div fxLayout="row" fxLayoutAlign="start center">
-          <mat-icon class="directory-icon">folder</mat-icon>
-          <span fxFlex class="directory-name">{{ node.file.name }}</span>
+          <mat-icon class="directory-icon" matTreeNodeToggle>folder</mat-icon>
+          <span fxFlex class="directory-name" matTreeNodeToggle>{{ node.file.name }}</span>
+          <button mat-icon-button (click)="handleNodeCreation(node)">
+            <mat-icon>add</mat-icon>
+          </button>
         </div>
-      </button>
+      </ng-container>
+
     </ng-container>
 
     <!-- Angular Directory -->
     <button *ngIf="node.file.type === 'angularDirectory'" (click)="toggleNodeSelection.next(node)" class="directory" fxFlex mat-button
-      [disabled]="disableNode(node)">
+      [disabled]="handleNodeCreation || disableNode(node)">
       <div fxLayout="row" fxLayoutAlign="start center">
         <img class="angular-icon" src="/assets/angular_logo.svg" width="28" height="28">
         <span fxFlex class="directory-name angular-directory-name">{{ node.file.name }}</span>
