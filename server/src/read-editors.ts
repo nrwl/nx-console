@@ -10,14 +10,14 @@ export function readEditors() {
   if (hasExplorer()) {
     editors.push({ name: 'Explorer', icon: 'explorer' });
   }
-  if (hasVsCode()) {
-    editors.push({ name: 'VS Code', icon: 'vscode' });
-  }
   if (hasWebStorm()) {
     editors.push({ name: 'WebStorm', icon: 'webstorm' });
   }
   if (hasIntellij()) {
     editors.push({ name: 'IntelliJ IDEA', icon: 'intellij' });
+  }
+  if (hasVsCode()) {
+    editors.push({ name: 'VS Code', icon: 'vscode' });
   }
   return editors;
 }
@@ -87,7 +87,7 @@ function hasIntellij() {
   if (os.platform() === 'darwin') {
     try {
       const apps = fs.readdirSync('/Applications');
-      return apps.indexOf('IntelliJ IDEA') > -1;
+      return apps.indexOf('IntelliJ IDEA.app') > -1;
     } catch (e) {
       return false;
     }
