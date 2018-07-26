@@ -11,7 +11,6 @@ import {
   texts,
   toggleBoolean,
   uniqName,
-  waitForAnimation,
   waitForAutocomplete
 } from './utils';
 
@@ -20,8 +19,10 @@ describe('Forms', () => {
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToGenerate();
+    cy.get('div.title').contains('Generate Code');
+
     clickOnTask('@schematics/angular', 'component');
-    waitForAnimation();
+    cy.get('div.context-title').contains('Create an Angular component');
   });
 
   it('supports basic validations', () => {

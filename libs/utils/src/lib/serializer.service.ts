@@ -44,6 +44,18 @@ export interface SchematicCollection {
   schematics: Array<Schematic>;
 }
 
+export interface ExtensionGroup {
+  name: string;
+  extensions: Extension[];
+}
+
+export interface Extension {
+  name: string;
+  description: string;
+  detailedDescription: string;
+  installed: boolean;
+}
+
 export interface Builder {
   name: string;
   description: string;

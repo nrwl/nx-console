@@ -115,26 +115,26 @@
         }
       }
     },
-    "feature-addons": {
-      "root": "libs/feature-addons",
-      "sourceRoot": "libs/feature-addons/src",
+    "feature-extensions": {
+      "root": "libs/feature-extensions",
+      "sourceRoot": "libs/feature-extensions/src",
       "projectType": "library",
       "prefix": "nxui",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "libs/feature-addons/src/test.ts",
-            "tsConfig": "libs/feature-addons/tsconfig.spec.json",
-            "karmaConfig": "libs/feature-addons/karma.conf.js"
+            "main": "libs/feature-extensions/src/test.ts",
+            "tsConfig": "libs/feature-extensions/tsconfig.spec.json",
+            "karmaConfig": "libs/feature-extensions/karma.conf.js"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/feature-addons/tsconfig.lib.json",
-              "libs/feature-addons/tsconfig.spec.json"
+              "libs/feature-extensions/tsconfig.lib.json",
+              "libs/feature-extensions/tsconfig.spec.json"
             ],
             "exclude": ["**/node_modules/**"]
           }

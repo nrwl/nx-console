@@ -119,7 +119,7 @@ export class NewWorkspaceComponent implements OnInit {
     this.ngNew$.next(ngNewInvocation);
   }
 
-  trackByName(_: number, addon: SchematicCollectionForNgNew) {
-    return addon.name;
+  trackByName(_: number, collection: SchematicCollectionForNgNew) {
+    return collection.name;
   }
 }

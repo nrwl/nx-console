@@ -12,7 +12,6 @@ import {
   tasks,
   texts,
   uniqName,
-  waitForAnimation,
   waitForAutocomplete
 } from './utils';
 
@@ -21,11 +20,10 @@ describe('Generate', () => {
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToGenerate();
+    cy.get('div.title').contains('Generate Code');
   });
 
   it('filters schematics', () => {
-    cy.get('div.title').contains('Generate Code');
-
     taskListHeaders($p => {
       expect($p.length).to.equal(1);
       expect(texts($p)[0]).to.equal('@schematics/angular');
@@ -33,16 +31,16 @@ describe('Generate', () => {
 
     tasks($p => {
       const t = texts($p);
-      expect(t.indexOf(' service ') > -1).to.equal(true);
-      expect(t.indexOf(' component ') > -1).to.equal(true);
+      expect(t.indexOf('service') > -1).to.equal(true);
+      expect(t.indexOf('component') > -1).to.equal(true);
     });
 
     // filter by item
     cy.get('input#filter').type('servi');
     tasks($p => {
       const t = texts($p);
-      expect(t.indexOf(' service ') > -1).to.equal(true);
-      expect(t.indexOf(' component ') > -1).to.equal(false);
+      expect(t.indexOf('service') > -1).to.equal(true);
+      expect(t.indexOf('component') > -1).to.equal(false);
     });
 
     // filter by collection
@@ -50,15 +48,13 @@ describe('Generate', () => {
     cy.get('input#filter').type('angular');
     tasks($p => {
       const t = texts($p);
-      expect(t.indexOf(' service ') > -1).to.equal(true);
-      expect(t.indexOf(' component ') > -1).to.equal(true);
+      expect(t.indexOf('service') > -1).to.equal(true);
+      expect(t.indexOf('component') > -1).to.equal(true);
     });
   });
 
   it('runs a schematic', () => {
     clickOnTask('@schematics/angular', 'service');
-    waitForAnimation();
-
     cy.get('div.context-title').contains('Create an Angular service');
 
     const name = uniqName('example');
@@ -82,7 +78,6 @@ describe('Generate', () => {
     checkFileExists(`src/app/${name}.service.spec.ts`);
 
     goBack();
-    waitForAnimation();
 
     cy.get('div.title').contains('Generate Code');
     taskListHeaders($p => {

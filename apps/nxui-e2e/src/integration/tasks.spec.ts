@@ -10,7 +10,6 @@ import {
   taskListHeaders,
   tasks,
   texts,
-  waitForAnimation,
   waitForBuild
 } from './utils';
 
@@ -19,11 +18,10 @@ describe('Tasks', () => {
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToTasks();
+    cy.get('div.title').contains('Run Tasks');
   });
 
   it('filters tasks', () => {
-    cy.get('div.title').contains('Run Tasks');
-
     taskListHeaders($p => {
       expect($p.length).to.equal(3);
       expect(texts($p)[0]).to.equal('package.json scripts');
@@ -33,16 +31,16 @@ describe('Tasks', () => {
 
     tasks($p => {
       const t = texts($p);
-      expect(t.indexOf(' build ') > -1).to.equal(true);
-      expect(t.indexOf(' serve ') > -1).to.equal(true);
+      expect(t.indexOf('build') > -1).to.equal(true);
+      expect(t.indexOf('serve') > -1).to.equal(true);
     });
 
     // filter by item
     cy.get('input#filter').type('build');
     tasks($p => {
       const t = texts($p);
-      expect(t.indexOf(' build ') > -1).to.equal(true);
-      expect(t.indexOf(' serve ') > -1).to.equal(false);
+      expect(t.indexOf('build') > -1).to.equal(true);
+      expect(t.indexOf('serve') > -1).to.equal(false);
     });
 
     // filter by project
@@ -51,15 +49,13 @@ describe('Tasks', () => {
 
     tasks($p => {
       const t = texts($p);
-      expect(t.indexOf(' e2e ') > -1).to.equal(true);
-      expect(t.indexOf(' lint ') > -1).to.equal(true);
+      expect(t.indexOf('e2e') > -1).to.equal(true);
+      expect(t.indexOf('lint') > -1).to.equal(true);
     });
   });
 
   it('runs a task', () => {
     clickOnTask('proj', 'build');
-    waitForAnimation();
-
     cy.get('div.context-title').contains('ng build proj');
 
     expandTerminal();
@@ -83,7 +79,6 @@ describe('Tasks', () => {
     checkFileExists(`dist/proj/main.js`);
 
     goBack();
-    waitForAnimation();
 
     cy.get('div.title').contains('Run Tasks');
     taskListHeaders($p => {
@@ -93,8 +88,6 @@ describe('Tasks', () => {
 
   it('runs an npm script', () => {
     clickOnTask('package.json scripts', 'build');
-    waitForAnimation();
-
     cy.get('div.context-title').contains('npm run build');
 
     expandTerminal();
@@ -108,7 +101,6 @@ describe('Tasks', () => {
     checkFileExists(`dist/proj/main.js`);
 
     goBack();
-    waitForAnimation();
 
     cy.get('div.title').contains('Run Tasks');
     taskListHeaders($p => {

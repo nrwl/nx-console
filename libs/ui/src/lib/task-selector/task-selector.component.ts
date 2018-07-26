@@ -22,6 +22,7 @@ import { ContextualActionBarService } from '../contextual-action-bar/contextual-
 
 export interface Task<T> {
   taskName: string;
+  taskDescription?: string;
   task: T;
 }
 

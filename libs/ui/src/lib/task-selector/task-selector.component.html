@@ -13,9 +13,11 @@
             <mat-divider></mat-divider>
           </div>
           <mat-list-item *ngFor="let t of collection.tasks; trackBy: trackByTaskName" (click)="selectTask(t)">
-            {{ t.taskName }}
+            <h3 matLine>{{ t.taskName }}</h3>
+            <p *ngIf="t.taskDescription" matLine>
+              <span>{{ t.taskDescription }}</span>
+            </p>
           </mat-list-item>
-
         </ng-container>
       </ng-container>
     </mat-nav-list>
