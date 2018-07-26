@@ -2,18 +2,16 @@
   <div fxLayout="column" fxLayoutGap="24px">
     <mat-card fxFlex>
       <mat-card-title>Basic Information</mat-card-title>
-      <mat-card-subtitle>Name</mat-card-subtitle>
       <mat-card-content>
-        <strong>{{ workspace.name }}</strong>
+        <p><strong>Name:</strong> {{ workspace.name }}</p>
+        <p><strong>Path:</strong> {{ workspace.path }}</p>
       </mat-card-content>
-      <mat-card-subtitle>Path</mat-card-subtitle>
-      <mat-card-content>{{ workspace.path }}</mat-card-content>
     </mat-card>
     <mat-card fxFlex>
       <mat-card-title>Open Workspace</mat-card-title>
-
       <mat-card-actions>
-        <button *ngFor="let e of editorSupport.editors|async" mat-button (click)="editorSupport.openInEditor(e.name, workspace.path)">
+        <button *ngFor="let e of editorSupport.editors|async" mat-button
+                (click)="editorSupport.openInEditor(e.name, workspace.path)">
           <mat-icon [svgIcon]="e.icon"></mat-icon>
           {{ e.name }}
         </button>
@@ -37,35 +35,29 @@
         </ul>
       </mat-card-content>
     </mat-card>
-    <mat-card fxFlex>
-      <mat-card-title>Projects</mat-card-title>
-      <mat-card-content *ngIf="workspace.projects.length; else createProject">
-        <div class="projects">
-          <div *ngFor="let p of workspace.projects; trackBy: trackByName">
-            <h3>{{ p.name }}</h3>
-            <p>Root: {{ p.root }}</p>
-            <p>Type: {{ p.projectType }}</p>
-            <h4>Common Actions</h4>
 
-            <span *ngFor="let a of p.actions">
-              <a [routerLink]="a.link">
-                {{ a.actionDescription }}
-              </a>
-              |
-            </span>
-          </div>
-        </div>
+    <h2>Projects</h2>
+
+    <mat-card fxFlex *ngFor="let p of workspace.projects">
+      <mat-card-title>{{ p.name }}</mat-card-title>
+      <mat-card-content>
+        <p><strong>Root:</strong> {{ p.root }}</p>
+        <p><strong>Type:</strong> {{ p.projectType }}</p>
       </mat-card-content>
-      <ng-template #createProject>
-        <mat-card-content>
-          <em>No projects yet</em>
-        </mat-card-content>
-        <mat-card-actions>
-          <a mat-button routerLink="../generate">
-            Generate Project
-          </a>
-        </mat-card-actions>
-      </ng-template>
+      <mat-card-actions>
+        <button *ngFor="let a of p.actions" mat-button [routerLink]="a.link">
+          {{ a.actionDescription }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card *ngIf="workspace.projects.length === 0">
+      <mat-card-title>No projects yet</mat-card-title>
+      <mat-card-actions>
+        <button mat-button routerLink="../generate">
+          Create Project
+        </button>
+      </mat-card-actions>
     </mat-card>
   </div>
 </div>
