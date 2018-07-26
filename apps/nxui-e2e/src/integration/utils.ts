@@ -16,12 +16,6 @@ export function goBack() {
     .click();
 }
 
-export function expandTerminal() {
-  cy.get('button')
-    .contains('Show')
-    .click();
-}
-
 export function toggleBoolean(field: string) {
   fieldOperation(field, el => {
     el.querySelector('div.boolean-ripple').click();
