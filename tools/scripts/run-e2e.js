@@ -8,6 +8,7 @@ function runE2eTests() {
     cp.execSync('nps e2e.cypress', { stdio: [0, 1, 2] });
   } catch (e) {
     console.error(e);
+    process.exit(1);
   } finally {
     frontend.kill();
     server.kill();
@@ -39,6 +40,7 @@ try {
   if (server) {
     server.kill();
   }
+  process.exit(1);
 }
 
 
