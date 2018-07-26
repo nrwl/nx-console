@@ -16,8 +16,11 @@
     <button *ngIf="node.file.type === 'angularDirectory'" (click)="toggleNodeSelection.next(node)" class="directory" fxFlex mat-button
       [disabled]="disableNode(node)">
       <div fxLayout="row" fxLayoutAlign="start center">
+        <mat-icon class="directory-icon" *ngIf="node.file.type !== 'angularDirectory'">
+          folder
+        </mat-icon>
         <img class="angular-icon" src="/assets/angular_logo.svg" width="28" height="28">
-        <span fxFlex class="directory-name angular-directory-name">{{ node.file.name }}</span>
+        <span fxFlex class="directory-name" [class.angular-directory-name]="node.file.type === 'angularDirectory'">{{ node.file.name }}</span>
       </div>
     </button>
 
