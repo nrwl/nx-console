@@ -38,8 +38,7 @@ export class TargetComponent implements OnInit {
   });
   command$: Observable<string>;
   commandOutput$: Observable<CommandOutput>;
-  @ViewChild('output', { read: TerminalComponent })
-  out: TerminalComponent;
+  @ViewChild(TerminalComponent) out: TerminalComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
   private readonly ngRun$ = new Subject<any>();
@@ -71,7 +70,7 @@ export class TargetComponent implements OnInit {
           return of();
         }
         if (this.out) {
-          this.out.clear();
+          this.out.reset();
         }
         return this.apollo.query({
           query: gql`
@@ -141,7 +140,7 @@ export class TargetComponent implements OnInit {
         this.taskRunner.terminalVisible.next(true);
       }),
       switchMap(([_, c]) => {
-        this.out.clear();
+        this.out.reset();
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $runCommand: [String]!) {

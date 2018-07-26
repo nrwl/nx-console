@@ -98,7 +98,7 @@ export class SchematicComponent implements OnInit {
           return of();
         }
         if (this.out) {
-          this.out.clear();
+          this.out.reset();
         }
         return this.apollo.query({
           query: gql`
@@ -164,7 +164,7 @@ export class SchematicComponent implements OnInit {
     this.dryRunResult$ = this.commandArray$.pipe(
       debounceTime(DEBOUNCE_TIME),
       switchMap(c => {
-        this.out.clear();
+        this.out.reset();
         if (!c.valid) {
           return of(MISSING_REQUIRED_FLAGS);
         }
@@ -195,7 +195,7 @@ export class SchematicComponent implements OnInit {
         this.taskRunner.terminalVisible.next(true);
       }),
       switchMap(([_, c]) => {
-        this.out.clear();
+        this.out.reset();
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $genCommand: [String]!) {

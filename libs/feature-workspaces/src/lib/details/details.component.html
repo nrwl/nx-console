@@ -39,7 +39,7 @@
     <h2>Projects</h2>
 
     <mat-card fxFlex *ngFor="let p of workspace.projects">
-      <mat-card-title>{{ p.name }}</mat-card-title>
+      <mat-card-title class="project-name">{{ p.name }}</mat-card-title>
       <mat-card-content>
         <p><strong>Root:</strong> {{ p.root }}</p>
         <p><strong>Type:</strong> {{ p.projectType }}</p>

@@ -33,8 +33,7 @@ export class ExtensionComponent implements OnInit {
   extension$: Observable<Extension>;
   command$: Observable<string>;
   commandOutput$: Observable<CommandOutput>;
-  @ViewChild('output', { read: TerminalComponent })
-  out: TerminalComponent;
+  @ViewChild(TerminalComponent) out: TerminalComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
 
   private readonly ngAdd$ = new Subject<any>();
@@ -64,7 +63,7 @@ export class ExtensionComponent implements OnInit {
           return of();
         }
         if (this.out) {
-          this.out.clear();
+          this.out.reset();
         }
         return this.apollo.query({
           query: gql`
@@ -120,7 +119,7 @@ export class ExtensionComponent implements OnInit {
         this.taskRunner.terminalVisible.next(true);
       }),
       switchMap(([_, a]) => {
-        this.out.clear();
+        this.out.reset();
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $name: String!) {

@@ -1,5 +1,5 @@
 <ui-task-runner *ngIf="script$ | async as script" terminalWindowTitle="Task output">
   <ui-flags [fields]="script.schema" [prefix]="['run', script.name]"
     (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()" [path]="path()"></ui-flags>
-  <ui-terminal [command]="command$ | async" [input]="(commandOutput$|async)?.out" #output></ui-terminal>
+  <ui-terminal [command]="command$ | async" [input]="(commandOutput$|async)?.out"></ui-terminal>
 </ui-task-runner>
