@@ -25,7 +25,8 @@
 
       <div class="field" *ngFor="let field of fieldGroup.fields" [class.error]="formGroup.hasError('required', field.name) && formGroup.get(field.name).touched"
         fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.enum]="field.enum" [class.text]="!field.enum && field.type !== 'boolean'">
-        <ng-container *ngIf="field.type === 'boolean'">
+
+        <ng-container *ngIf="field.type === 'boolean' && field.defaultValue !== null">
           <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
           <div fxFlex class="boolean-field-container" fxLayout="row" fxLayoutAlign="space-between center">
             <div class="boolean-ripple" mat-ripple (click)="toggleBooleanField(field)"></div>
@@ -39,11 +40,27 @@
           </div>
         </ng-container>
 
+        <ng-container *ngIf="field.type === 'boolean' && field.defaultValue === null">
+          <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
+
+          <mat-form-field fxFlex>
+            <mat-select [formControlName]="field.name" [required]="field.required" [attr.name]="field.name" [placeholder]="field.name">
+              <mat-option [value]="null">--</mat-option>
+              <mat-option [value]="true">true</mat-option>
+              <mat-option [value]="false">false</mat-option>
+            </mat-select>
+            <span class="select-field-hint field-hint">
+              {{ field.description }}
+              <ng-container *ngIf="field.required">Required. </ng-container>
+            </span>
+          </mat-form-field>
+        </ng-container>
+
         <ng-container *ngIf="field.enum">
           <mat-icon>arrow_drop_down_circle</mat-icon>
           <mat-form-field fxFlex>
             <mat-select [formControlName]="field.name" [required]="field.required" [attr.name]="field.name" [placeholder]="field.name">
-              <mat-option *ngFor="let value of fieldOptions(field)" [value]="value">
+              <mat-option *ngFor="let value of fieldEnumOptions(field)" [value]="value">
                 {{ fieldOption(value) }}
               </mat-option>
             </mat-select>
@@ -54,6 +71,8 @@
             </span>
           </mat-form-field>
         </ng-container>
+
+
         <ng-container *ngIf=" !field.enum && field.type !=='boolean'">
           <mat-icon>{{ field.completionValues ? 'search' : 'create' }}</mat-icon>
           <div fxLayout="column " fxFlex class="text-field-container">
