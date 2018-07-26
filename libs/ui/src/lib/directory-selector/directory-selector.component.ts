@@ -35,7 +35,8 @@ import { DirectoryDataSource, DynamicFlatNode } from './directory-data-source';
 export class DirectorySelectorComponent implements AfterViewInit {
   @Output() readonly toggleNodeSelection = new EventEmitter<DynamicFlatNode>();
 
-  @Input() readonly disableNode: (node: DynamicFlatNode) => boolean;
+  @Input()
+  readonly disableNode: (node: DynamicFlatNode) => boolean = () => false;
 
   readonly treeControl: FlatTreeControl<DynamicFlatNode> = new FlatTreeControl(
     node => node.level,
