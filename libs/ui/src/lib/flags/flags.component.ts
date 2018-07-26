@@ -18,9 +18,9 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material';
-import { Completions, Field, Serializer } from '@nxui/utils';
+import { Completions, Field, Serializer, CompletetionValue } from '@nxui/utils';
 import { Subscription } from 'rxjs';
-import { debounceTime, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, startWith, switchMap, map } from 'rxjs/operators';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
@@ -172,6 +172,30 @@ export class FlagsComponent {
             switchMap((v: string | null) =>
               this.completions.completionsFor(this.path, f, v || '')
             )
+          );
+        } else if (f.enum) {
+          const completionValues: CompletetionValue[] = this.fieldEnumOptions(
+            f
+          ).map(f => {
+            const completion: CompletetionValue = {
+              value: f,
+              display: f || '--'
+            };
+            return completion;
+          });
+          f.completionValues = formControl.valueChanges.pipe(
+            debounceTime(DEBOUNCE_TIME),
+            startWith(formControl.value),
+            map((v: string | null) => {
+              if (!v) {
+                return completionValues;
+              } else {
+                const lowercase = v.toLowerCase();
+                return completionValues.filter(
+                  c => c.value && c.value.indexOf(lowercase) !== -1
+                );
+              }
+            })
           );
         }
 

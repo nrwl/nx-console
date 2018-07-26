@@ -28,8 +28,8 @@ mat-tree-node {
 }
 
 .directory-name {
-  color: rgb(183, 183, 183);
   font-weight: 400;
+  color: rgba(0, 0, 0, 0.54);
 
   &.angular-directory-name {
     color: rgba(0, 0, 0, 0.87);
@@ -45,12 +45,13 @@ mat-tree-node {
 .directory-icon {
   margin-left: 4px;
   margin-right: 6px;
-  color: rgb(148, 204, 242);
+  color: rgba(0, 0, 0, 0.27);
 }
 
 .expand-icon {
+  user-select: none;
   margin-left: 8px;
-  color: rgb(171, 171, 171);
+  color: rgba(0, 0, 0, 0.54);
   cursor: pointer;
   font-size: 36px;
   line-height: 36px;
@@ -61,6 +62,6 @@ mat-tree-node {
 
   &.expanded {
     transform: rotate(90deg);
-    color: rgb(71, 71, 71);
+    color: rgba(0, 0, 0, 0.87);
   }
 }

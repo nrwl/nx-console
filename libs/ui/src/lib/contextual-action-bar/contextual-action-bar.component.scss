@@ -23,6 +23,7 @@ mat-toolbar.title-bar {
 
   .exit-action {
     cursor: pointer;
+    margin-left: 4px;
   }
 
   &.actionable {
@@ -43,7 +44,7 @@ mat-toolbar.title-bar {
     text-decoration: none;
     position: relative;
     left: -4px;
-    margin-right: 18px;
+    margin-right: 10px;
   }
 
   // tslint:disable-next-line

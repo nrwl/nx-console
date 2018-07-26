@@ -15,7 +15,7 @@ export interface Directory {
 }
 
 export interface CompletetionValue {
-  value: string;
+  value: string | null;
   display?: string;
 }
 
