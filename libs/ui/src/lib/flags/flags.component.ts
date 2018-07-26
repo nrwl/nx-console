@@ -86,7 +86,7 @@ export class FlagsComponent {
     });
   }
 
-  fieldOptions(field: Field) {
+  fieldEnumOptions(field: Field) {
     if (field.defaultValue) {
       return field.enum;
     } else {
