@@ -26,7 +26,7 @@ const SCROLL_BAR_WIDTH = 48;
   ]
 })
 export class TerminalComponent implements AfterViewInit, OnDestroy {
-  term = new Terminal({ disableStdin: true, fontSize: 12 });
+  term = new Terminal({ disableStdin: true, fontSize: 14 });
 
   resizeSubscription = fromEvent(window, 'resize')
     .pipe(debounceTime(DEBOUNCE_TIME))
@@ -63,8 +63,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     this.resizeSubscription.unsubscribe();
   }
 
-  clear() {
-    this.term.clear();
+  reset() {
+    this.term.reset();
   }
 
   resizeTerminal() {
@@ -79,7 +79,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
 
     if (this.term.rows !== rows || this.term.cols !== cols) {
-      this.term.clear();
+      this.reset();
       this.term.resize(cols, rows);
       this.writeOutput();
     }

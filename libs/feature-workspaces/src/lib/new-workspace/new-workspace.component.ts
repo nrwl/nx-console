@@ -79,7 +79,7 @@ export class NewWorkspaceComponent implements OnInit {
 
     this.commandOutput$ = this.ngNew$.pipe(
       switchMap(ngNewInvocation => {
-        this.out.clear();
+        this.out.reset();
         return this.commandRunner.runCommand(
           gql`
             mutation($path: String!, $name: String!, $collection: String!) {

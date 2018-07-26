@@ -74,9 +74,7 @@ export function openProject(proj: string) {
 }
 
 export function projectNames(callback: (s: any) => void) {
-  cy.get('div.projects')
-    .find('h3')
-    .should(callback);
+  cy.get('.project-name').should(callback);
 }
 
 export function goToGenerate() {
