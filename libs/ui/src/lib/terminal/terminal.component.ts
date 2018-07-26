@@ -1,12 +1,12 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
   OnDestroy,
   ViewChild,
-  ViewEncapsulation,
-  ChangeDetectionStrategy
+  ViewEncapsulation
 } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -26,32 +26,26 @@ const SCROLL_BAR_WIDTH = 48;
   ]
 })
 export class TerminalComponent implements AfterViewInit, OnDestroy {
-  term = new Terminal({ disableStdin: true, fontSize: 14 });
-
-  resizeSubscription = fromEvent(window, 'resize')
+  private output: string = '';
+  private term = new Terminal({ disableStdin: true, fontSize: 14 });
+  private resizeSubscription = fromEvent(window, 'resize')
     .pipe(debounceTime(DEBOUNCE_TIME))
     .subscribe(() => {
       this.resizeTerminal();
     });
 
   @ViewChild('code', { read: ElementRef })
-  code: ElementRef;
-
-  output: string;
+  private code: ElementRef;
 
   @Input() command: string;
 
   @Input()
   set input(s: string) {
-    this.output = s;
-    this.writeOutput();
-  }
-
-  writeOutput() {
-    const s = this.output;
-    if (this.code) {
-      this.term.write(s);
+    if (!s) {
+      return;
     }
+    this.output += s;
+    this.writeOutput(s);
   }
 
   ngAfterViewInit(): void {
@@ -63,25 +57,41 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     this.resizeSubscription.unsubscribe();
   }
 
+  private writeOutput(output: string) {
+    if (!this.output || !this.code) {
+      return;
+    }
+    this.term.write(output);
+  }
+
+  private writeFullCachedOutput() {
+    if (!this.output || !this.code) {
+      return;
+    }
+    this.term.write(this.output);
+  }
+
   reset() {
     this.term.reset();
   }
 
   resizeTerminal() {
-    const renderer = (this.term as any).renderer;
-    renderer.clear();
-
-    const height = (this.code.nativeElement as HTMLElement).clientHeight;
-    const width =
-      (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
-
-    const cols = Math.floor(width / renderer.dimensions.actualCellWidth);
-    const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
-
-    if (this.term.rows !== rows || this.term.cols !== cols) {
-      this.reset();
-      this.term.resize(cols, rows);
-      this.writeOutput();
-    }
+    setTimeout(() => {
+      const renderer = (this.term as any).renderer;
+      if (!renderer) {
+        return;
+      }
+      renderer.clear();
+      const height = (this.code.nativeElement as HTMLElement).clientHeight;
+      const width =
+        (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
+      const cols = Math.floor(width / renderer.dimensions.actualCellWidth);
+      const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
+      if (this.term.rows !== rows || this.term.cols !== cols) {
+        this.reset();
+        this.term.resize(cols, rows);
+        this.writeFullCachedOutput();
+      }
+    });
   }
 }

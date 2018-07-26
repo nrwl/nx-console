@@ -12,7 +12,7 @@
   <mat-divider></mat-divider>
 
   <mat-accordion [multi]="true" displayMode="flat">
-    <mat-expansion-panel *ngFor="let fieldGroup of fieldGroups" [expanded]="fieldGroup.expanded">
+    <mat-expansion-panel *ngFor="let fieldGroup of fieldGroups" [expanded]="fieldGroup.expanded" (opened)="resize.emit()" (closed)="resize.emit()">
       <mat-expansion-panel-header>
         <mat-panel-title *ngIf="fieldGroups.length > 1" [ngSwitch]="fieldGroup.type">
           <ng-container *ngSwitchCase="'important'">Important fields</ng-container>
@@ -24,7 +24,7 @@
       </mat-expansion-panel-header>
 
       <div class="field" *ngFor="let field of fieldGroup.fields" [class.error]="formGroup.hasError('required', field.name) && formGroup.get(field.name).touched"
-           fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.text]="field.type !== 'boolean'">
+        fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.text]="field.type !== 'boolean'">
         <ng-container *ngIf="field.type === 'boolean' && field.defaultValue !== null">
           <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
           <div fxFlex class="boolean-field-container" fxLayout="row" fxLayoutAlign="space-between center">
@@ -44,10 +44,11 @@
           <div fxLayout="column" fxFlex class="text-field-container">
             <mat-form-field>
               <input #input fxFlex type="text" matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
-                     [formControlName]="field.name" [matAutocomplete]="auto">
+                [formControlName]="field.name" [matAutocomplete]="auto">
               <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
               <mat-autocomplete #auto="matAutocomplete">
-                <mat-option (click)="input.blur()" *ngFor="let completionValue of [{display: '--', value: null}, {value: true}, {value: false}]" [value]="completionValue.value">
+                <mat-option (click)="input.blur()" *ngFor="let completionValue of [{display: '--', value: null}, {value: true}, {value: false}]"
+                  [value]="completionValue.value">
                   {{ completionValue.display || completionValue.value }}
                 </mat-option>
               </mat-autocomplete>
@@ -65,7 +66,7 @@
           <div fxLayout="column" fxFlex class="text-field-container">
             <mat-form-field>
               <input #input fxFlex type="text" matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
-                     [formControlName]="field.name" [matAutocomplete]="auto">
+                [formControlName]="field.name" [matAutocomplete]="auto">
               <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
               <mat-autocomplete #auto="matAutocomplete">
                 <mat-option (click)="input.blur()" *ngFor="let completionValue of field.completionValues | async" [value]="completionValue.value">
