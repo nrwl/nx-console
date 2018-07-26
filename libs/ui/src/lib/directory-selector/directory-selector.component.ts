@@ -46,6 +46,8 @@ export class DirectorySelectorComponent implements AfterViewInit {
   @Input()
   readonly disableNode: (node: DynamicFlatNode) => boolean = () => false;
 
+  @Input() readonly handleNodeCreation: (node: DynamicFlatNode) => void;
+
   constructor(private readonly finder: Finder) {}
 
   ngAfterViewInit() {

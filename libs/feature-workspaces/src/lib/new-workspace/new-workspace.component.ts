@@ -6,7 +6,11 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TerminalComponent } from '@nxui/ui';
+import {
+  TerminalComponent,
+  DynamicFlatNode,
+  ContextualActionBarService
+} from '@nxui/ui';
 import { CommandOutput, CommandRunner } from '@nxui/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
@@ -38,11 +42,13 @@ export class NewWorkspaceComponent implements OnInit {
   command$ = new Subject();
   private readonly ngNew$ = new Subject<NgNewInvocation>();
   @ViewChild(TerminalComponent) out: TerminalComponent;
+  selectedNode: DynamicFlatNode | null = null;
 
   constructor(
     private readonly apollo: Apollo,
     private readonly commandRunner: CommandRunner,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly contextActionService: ContextualActionBarService
   ) {}
 
   ngOnInit() {
@@ -120,5 +126,19 @@ export class NewWorkspaceComponent implements OnInit {
 
   trackByName(_: number, collection: SchematicCollectionForNgNew) {
     return collection.name;
+  }
+
+  setPathField(node: DynamicFlatNode) {
+    if (this.selectedNode === node) {
+      this.selectedNode = null;
+      this.ngNewForm$.subscribe(form => {
+        form.get('path')!.setValue(null);
+      });
+      return;
+    }
+    this.selectedNode = node;
+    this.ngNewForm$.subscribe(form => {
+      form.get('path')!.setValue(node.path);
+    });
   }
 }
