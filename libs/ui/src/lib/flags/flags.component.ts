@@ -176,10 +176,10 @@ export class FlagsComponent {
         } else if (f.enum) {
           const completionValues: CompletetionValue[] = this.fieldEnumOptions(
             f
-          ).map(f => {
+          ).map(o => {
             const completion: CompletetionValue = {
-              value: f,
-              display: f || '--'
+              value: o,
+              display: o || '--'
             };
             return completion;
           });
