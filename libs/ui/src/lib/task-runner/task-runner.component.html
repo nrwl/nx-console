@@ -1,6 +1,6 @@
 <div class="outer-container" fxLayout="column" fxLayoutAlign="space-between" fxFlex>
   <div class="ui-flags-container">
-    <ng-content select="ui-flags"></ng-content>
+    <ng-content select="ui-flags,.ui-flags"></ng-content>
   </div>
 
   <div class="ui-terminal-container" fxFlex [@growShrink]="terminalAnimationState | async">

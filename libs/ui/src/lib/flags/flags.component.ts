@@ -209,9 +209,12 @@ export class FlagsComponent {
       ],
       valid: this.formGroup.valid
     });
-    (this.elementRef.nativeElement as HTMLElement).scrollTo({
-      top: 0,
-      behavior: 'instant'
-    });
+    const e = this.elementRef.nativeElement as HTMLElement;
+    if (e.scrollTo) {
+      e.scrollTo({
+        top: 0,
+        behavior: 'instant'
+      });
+    }
   }
 }

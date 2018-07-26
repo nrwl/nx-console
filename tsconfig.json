@@ -22,7 +22,7 @@
     "paths": {
       "@nxui/*": ["libs/*"],
       "@nxui/feature-workspaces": ["libs/feature-workspaces/src/index.ts"],
-      "@nxui/feature-addons": ["libs/feature-addons/src/index.ts"],
+      "@nxui/feature-extensions": ["libs/feature-extensions/src/index.ts"],
       "@nxui/feature-generate": ["libs/feature-generate/src/index.ts"],
       "@nxui/utils": ["libs/utils/src/index.ts"],
       "@nxui/feature-run": ["libs/feature-run/src/index.ts"],

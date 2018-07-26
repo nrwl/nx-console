@@ -6,7 +6,7 @@ module.exports = {
       ng: 'ng',
       build: 'ng build nxui --prod',
       serve: {
-        default: 'ng serve nxui --aot',
+        default: 'ng serve nxui',
         prod: 'ng serve nxui --prod'
       },
       format: {
@@ -19,7 +19,7 @@ module.exports = {
         fix: npsUtils.series(
           'ng lint --fix --project nxui',
           'ng lint --fix --project feature-workspaces',
-          'ng lint --fix --project feature-addons',
+          'ng lint --fix --project feature-extensions',
           'ng lint --fix --project feature-generate',
           'ng lint --fix --project utils',
           'ng lint --fix --project feature-run',
@@ -59,7 +59,7 @@ module.exports = {
       'compile': 'tsc -p apps/nxui-e2e/tsconfig.json',
       'compile-watch': 'tsc -p apps/nxui-e2e/tsconfig.json --watch',
       'fixtures': 'node ./tools/scripts/set-up-e2e-fixtures.js',
-      'cypress': `cypress run --project apps/nxui-e2e --env projectsRoot=${__dirname + '/tmp'}`,
+      'cypress': `cypress run --project apps/nxui-e2e --env projectsRoot=${__dirname + '/tmp'} --record --key bab6b9ec-ce6d-48af-a8be-9e606f48f70e`,
       'open-cypress': `cypress open --project apps/nxui-e2e --env projectsRoot=${__dirname + '/tmp'}`,
       'run': 'node ./tools/scripts/run-e2e.js',
       'up': npsUtils.concurrent.nps('dev.up', 'e2e.compile-watch', 'e2e.open-cypress')

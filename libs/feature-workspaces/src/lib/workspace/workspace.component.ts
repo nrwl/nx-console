@@ -51,7 +51,7 @@ const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
 
       transition('tasks => details', ANIMATE_UP),
       transition('tasks => generate', ANIMATE_UP),
-      transition('tasks => extensions', ANIMATE_UP),
+      transition('tasks => extensions', ANIMATE_DOWN),
 
       transition('generate => extensions', ANIMATE_DOWN),
       transition('generate => details', ANIMATE_UP),
@@ -59,7 +59,7 @@ const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
 
       transition('extensions => generate', ANIMATE_UP),
       transition('extensions => details', ANIMATE_UP),
-      transition('extensions => tasks', ANIMATE_DOWN)
+      transition('extensions => tasks', ANIMATE_UP)
     ])
   ]
 })
@@ -89,12 +89,12 @@ export class WorkspaceComponent implements OnDestroy {
   readonly routes: Array<Route> = [
     { icon: 'details', url: 'details', title: 'Workspace Overview' },
     { icon: 'create_new_folder', url: 'generate', title: 'Generate Code' },
+    { icon: 'chevron_right', url: 'tasks', title: 'Run Tasks' },
     {
       icon: 'extension',
       url: 'extensions',
       title: 'Add/Remove CLI Extensions'
-    },
-    { icon: 'chevron_right', url: 'tasks', title: 'Run Tasks' }
+    }
   ];
 
   readonly sideNavAnimationState$ = this.contextualActionBarService.contextualActions$.pipe(

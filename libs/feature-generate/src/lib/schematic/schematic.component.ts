@@ -150,7 +150,7 @@ export class SchematicComponent implements OnInit {
           ]
         });
 
-        if (uiFlags) {
+        if (uiFlags && uiFlags.scrollTo) {
           uiFlags.scrollTo({
             top: 0,
             behavior: 'smooth'

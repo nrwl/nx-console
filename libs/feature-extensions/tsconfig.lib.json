@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc/libs/feature-addons",
+    "outDir": "../../dist/out-tsc/libs/feature-extensions",
     "target": "es2015",
     "module": "es2015",
     "moduleResolution": "node",

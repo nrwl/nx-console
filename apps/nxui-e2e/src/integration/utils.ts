@@ -70,13 +70,13 @@ export function checkDisplayedCommand(s: string) {
   });
 }
 
-export function openProject(_: string) {
+export function openProject(proj: string) {
   // TODO: Create a directory autocomplete bar and re-enable below logic.
   // cy.get('.mat-tab-link:nth-of-type(3)').click();
   // waitForAnimation();
   // cy.get('input').type(p);
   // cy.get('button#open-workspace').click();
-  cy.visit('workspace/.%2Ftmp%2Fproj/details');
+  cy.visit(`workspace/${encodeURIComponent(proj)}/details`);
 }
 
 export function projectNames(callback: (s: any) => void) {
@@ -87,10 +87,17 @@ export function projectNames(callback: (s: any) => void) {
 
 export function goToGenerate() {
   cy.get('button#go-to-generate').click();
+  waitForAnimation();
+}
+
+export function goToExtensions() {
+  cy.get('button#go-to-extensions').click();
+  waitForAnimation();
 }
 
 export function goToTasks() {
   cy.get('button#go-to-tasks').click();
+  waitForAnimation();
 }
 
 export function taskListHeaders(callback: (s: any) => void) {
@@ -109,7 +116,11 @@ export function tasks(callback: (s: any) => void) {
   });
 }
 
-export function clickOnTask(group: string, name: string) {
+export function clickOnTask(
+  group: string,
+  name: string,
+  exact: boolean = true
+) {
   cy.get('mat-nav-list.task-list').should(($p: any) => {
     const children = $p.get()[0].children;
     let insideGroup = false;
@@ -118,11 +129,17 @@ export function clickOnTask(group: string, name: string) {
       if (c.className.indexOf('collection-name') > -1) {
         insideGroup = c.innerText.trim() === group;
       }
-      if (insideGroup && c.innerText.trim() === name) {
+      if (
+        insideGroup &&
+        (exact
+          ? c.innerText.trim() === name
+          : c.innerText.trim().indexOf(name) > -1)
+      ) {
         c.click();
       }
     }
   });
+  waitForAnimation();
 }
 
 export function waitForAnimation() {
@@ -130,10 +147,10 @@ export function waitForAnimation() {
 }
 
 export function waitForAutocomplete() {
-  cy.wait(400);
+  cy.wait(500);
 }
 export function waitForBuild() {
-  cy.wait(10000);
+  cy.wait(25000);
 }
 
 export function autocompletion(callback: (s: any) => void) {

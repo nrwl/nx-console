@@ -10,12 +10,17 @@ import {
 } from './utils';
 import { readSchematicCollections } from './read-schematic-collections';
 import { readDescription, readProjects, readSchema } from './read-projects';
-import { availableAddons, readAddons } from './read-addons';
+import { availableExtensions, readExtensions } from './read-extensions';
 import { readDependencies } from './read-dependencies';
 import { schematicCollectionsForNgNew } from './read-ngnews';
 import { openInEditor, readEditors } from './read-editors';
 import { readNpmScripts, readNpmScriptSchema } from './read-npm-scripts';
 import { readDirectory } from './read-directory';
+import {
+  completeFiles,
+  completeModules,
+  completeProjects
+} from './completions';
 
 const dirSync = require('tmp').dirSync;
 const spawn = require('node-pty-prebuilt').spawn;
@@ -60,9 +65,9 @@ export const commandStartedType: graphql.GraphQLObjectType = new graphql.GraphQL
   }
 );
 
-export const addonType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
+export const extensionType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
   {
-    name: 'Addon',
+    name: 'Extension',
     fields: () => {
       return {
         name: {
@@ -70,6 +75,9 @@ export const addonType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
         },
         description: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+        },
+        detailedDescription: {
+          type: graphql.GraphQLString
         }
       };
     }
@@ -318,8 +326,8 @@ export const workspaceType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
             })
           )
         },
-        addons: {
-          type: new graphql.GraphQLList(addonType)
+        extensions: {
+          type: new graphql.GraphQLList(extensionType)
         },
         schematicCollections: {
           type: new graphql.GraphQLList(schematicCollectionType),
@@ -430,12 +438,7 @@ export const completionsType: graphql.GraphQLObjectType = new graphql.GraphQLObj
             input: { type: graphql.GraphQLString }
           },
           resolve: (workspace: any, args: any) => {
-            const path = workspace.path;
-            if (!files[path]) return [];
-            return files[path]
-              .filter(f => f.indexOf(args.input) > -1)
-              .map(value => value.substring(workspace.path.length + 1))
-              .map(value => ({ value }));
+            return completeFiles(files, workspace, args.input);
           }
         },
         projects: {
@@ -444,10 +447,7 @@ export const completionsType: graphql.GraphQLObjectType = new graphql.GraphQLObj
             input: { type: graphql.GraphQLString }
           },
           resolve: (workspace: any, args: any) => {
-            return workspace.projects
-              .map((p: any) => p.name)
-              .filter((p: string) => p.indexOf(args.input) > -1)
-              .map((value: any) => ({ value }));
+            return completeProjects(workspace, args.input);
           }
         },
         modules: {
@@ -456,22 +456,7 @@ export const completionsType: graphql.GraphQLObjectType = new graphql.GraphQLObj
             input: { type: graphql.GraphQLString }
           },
           resolve: (workspace: any, args: any) => {
-            const path = workspace.path;
-            if (!files[path]) return [];
-            return files[path]
-              .filter(f => f.indexOf('module.ts') > -1)
-              .filter(f => f.indexOf(args.input) > -1)
-              .map(fullPath => {
-                const modulePath = fullPath.substring(
-                  workspace.path.length + 1
-                );
-                const parts = modulePath.split('/');
-                const value = parts[parts.length - 1];
-                return {
-                  value,
-                  display: modulePath
-                };
-              });
+            return completeModules(files, workspace, args.input);
           }
         }
       };
@@ -551,7 +536,7 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
                 name: packageJson.name,
                 path: args.path,
                 dependencies: readDependencies(packageJson),
-                addons: readAddons(packageJson),
+                extensions: readExtensions(packageJson),
                 projects: readProjects(args.path, angularJson.projects),
                 npmScripts: readNpmScripts(args.path, packageJson)
               };
@@ -567,10 +552,13 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
             return readEditors();
           }
         },
-        availableAddons: {
-          type: new graphql.GraphQLList(addonType),
-          resolve: () => {
-            return availableAddons();
+        availableExtensions: {
+          type: new graphql.GraphQLList(extensionType),
+          args: {
+            name: { type: graphql.GraphQLString }
+          },
+          resolve: (_: any, args: any) => {
+            return filterByName(availableExtensions(), args);
           }
         },
         commandStatus: {
