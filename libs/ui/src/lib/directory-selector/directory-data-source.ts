@@ -38,7 +38,7 @@ export class DirectoryDataSource extends DataSource<DynamicFlatNode> {
   }
 
   connect(collectionViewer: CollectionViewer): Observable<DynamicFlatNode[]> {
-    this.getChildren('', 0).subscribe(dynamicFlatNodes => {
+    this.getChildren('/', 0).subscribe(dynamicFlatNodes => {
       this.data = dynamicFlatNodes;
     });
 

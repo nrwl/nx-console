@@ -58,8 +58,4 @@ export class ImportWorkspaceComponent implements OnDestroy {
       this.contextActionService.contextualActions$.next(null);
     }
   }
-
-  disableNode(node: DynamicFlatNode): boolean {
-    return node.file.type !== 'angularDirectory';
-  }
 }
