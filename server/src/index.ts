@@ -777,7 +777,7 @@ app.get('/workspaces', (req, res) => {
   res.sendFile('index.html', { root: path.join(__dirname, 'public') });
 });
 
-app.get('/workspaces/*', (req, res) => {
+app.get('/workspace/*', (req, res) => {
   res.sendFile('index.html', { root: path.join(__dirname, 'public') });
 });
 
