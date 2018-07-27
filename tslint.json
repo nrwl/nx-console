@@ -59,7 +59,7 @@
     "import-blacklist": [true, "rxjs/Rx"],
     "interface-over-type-literal": true,
     "member-ordering": [
-      true,
+      false,
       {
         "order": [
           "static-field",
