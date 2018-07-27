@@ -579,17 +579,22 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
         },
         directory: {
           type: new graphql.GraphQLNonNull(filesType),
+          resolve: (_: any, args: any) => {
+            try {
+              return readDirectory(
+                args.path,
+                args.onlyDirectories,
+                args.showHidden
+              );
+            } catch (e) {
+              console.log(e);
+              throw new Error(`Cannot open directory: "${args.path}"`);
+            }
+          },
           args: {
             path: { type: graphql.GraphQLString },
             onlyDirectories: { type: graphql.GraphQLBoolean },
             showHidden: { type: graphql.GraphQLBoolean }
-          },
-          resolve: (_: any, args: any) => {
-            return readDirectory(
-              args.path,
-              args.onlyDirectories,
-              args.showHidden
-            );
           }
         }
       };

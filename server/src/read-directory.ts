@@ -7,12 +7,12 @@ export function readDirectory(
   onlyDirectories: boolean,
   showHidden: boolean
 ) {
-  if (!dirName) {
-    dirName = process.env.HOME;
+  if (dirName && !directoryExists(dirName)) {
+    throw new Error(`Cannot find directory: '${dirName}'`);
   }
 
-  if (!directoryExists(dirName)) {
-    throw new Error(`Cannot find directory: '${dirName}'`);
+  if (!dirName) {
+    dirName = '/';
   }
 
   const files = fs
@@ -42,7 +42,11 @@ export function readDirectory(
     .map(t => {
       const hasChildren =
         fs.readdirSync(`${dirName}/${t.name}`).filter(child => {
-          return fs.statSync(`${dirName}/${t.name}/${child}`).isDirectory();
+          try {
+            return fs.statSync(`${dirName}/${t.name}/${child}`).isDirectory();
+          } catch (e) {
+            return false;
+          }
         }).length > 0;
       return { ...t, hasChildren };
     });

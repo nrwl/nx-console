@@ -57,7 +57,12 @@ export class AppModule {
           messenger.error(message);
         });
       } else if (networkError) {
-        messenger.error(networkError.message);
+        const n: any = networkError;
+        if (n.error && n.error.errors && n.error.errors.length > 0) {
+          messenger.error(n.error.errors[0].message);
+        } else {
+          messenger.error(n.message);
+        }
       }
     });
 
