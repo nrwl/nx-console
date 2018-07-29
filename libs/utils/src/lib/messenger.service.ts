@@ -8,6 +8,6 @@ export class Messenger {
   constructor(private readonly snackBar: MatSnackBar) {}
 
   error(m: string) {
-    this.snackBar.open(`Error: ${m}`, 'Close');
+    this.snackBar.open(m, 'Close');
   }
 }
