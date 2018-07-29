@@ -25,7 +25,7 @@
 
       <div class="field" *ngFor="let field of fieldGroup.fields" [class.error]="formGroup.hasError('required', field.name) && formGroup.get(field.name).touched"
            fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.text]="field.type !== 'boolean'">
-        <ng-container *ngIf="field.type === 'boolean'">
+        <ng-container *ngIf="field.type === 'boolean' && field.defaultValue !== null">
           <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
           <div fxFlex class="boolean-field-container" fxLayout="row" fxLayoutAlign="space-between center">
             <div class="boolean-ripple" mat-ripple (click)="toggleBooleanField(field)"></div>
@@ -36,6 +36,27 @@
               <ng-container *ngIf="field.required">Required. </ng-container>
               <ng-container *ngIf="field.defaultValue !== null">(Default: {{ field.defaultValue ? 'true' : 'false' }})</ng-container>
             </span>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="field.type === 'boolean' && field.defaultValue === null">
+          <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
+          <div fxLayout="column" fxFlex class="text-field-container">
+            <mat-form-field>
+              <input #input fxFlex type="text" matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
+                     [formControlName]="field.name" [matAutocomplete]="auto">
+              <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
+              <mat-autocomplete #auto="matAutocomplete">
+                <mat-option (click)="input.blur()" *ngFor="let completionValue of [{display: '--', value: null}, {value: true}, {value: false}]" [value]="completionValue.value">
+                  {{ completionValue.display || completionValue.value }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+            <div class="text-field-hint field-hint ">
+              {{ field.description }}
+              <ng-container *ngIf="field.required ">Required. </ng-container>
+              <ng-container *ngIf="field.defaultValue">(Default: {{ field.defaultValue }})</ng-container>
+            </div>
           </div>
         </ng-container>
 
