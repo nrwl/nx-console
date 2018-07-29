@@ -59,13 +59,9 @@ describe('Generate', () => {
 
     const name = uniqName('example');
     cy.get('input[name="name"]').type(name);
-    cy.get('input[name="project"]').type('pro');
-    waitForAutocomplete();
-    autocompletion($p => {
-      els($p)[0].click();
-    });
+    cy.get('input[name="project"]').type('proj');
 
-    cy.wait(200);
+    cy.wait(100);
 
     cy.get('button')
       .contains('Generate')
