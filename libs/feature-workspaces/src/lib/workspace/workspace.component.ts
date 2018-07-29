@@ -51,7 +51,7 @@ const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
 
       transition('tasks => details', ANIMATE_UP),
       transition('tasks => generate', ANIMATE_UP),
-      transition('tasks => extensions', ANIMATE_UP),
+      transition('tasks => extensions', ANIMATE_DOWN),
 
       transition('generate => extensions', ANIMATE_DOWN),
       transition('generate => details', ANIMATE_UP),
@@ -59,7 +59,7 @@ const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
 
       transition('extensions => generate', ANIMATE_UP),
       transition('extensions => details', ANIMATE_UP),
-      transition('extensions => tasks', ANIMATE_DOWN)
+      transition('extensions => tasks', ANIMATE_UP)
     ])
   ]
 })
