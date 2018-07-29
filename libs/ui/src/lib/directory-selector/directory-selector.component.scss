@@ -65,3 +65,14 @@ mat-tree-node {
     color: rgba(0, 0, 0, 0.87);
   }
 }
+
+.node-creation-button {
+  margin-left: 10px;
+  height: 20px;
+  font-size: 11px;
+  line-height: 20px;
+  padding: 0 8px;
+}
+.hidden {
+  display: none;
+}
