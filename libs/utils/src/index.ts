@@ -5,3 +5,4 @@ export * from './lib/settings.service';
 export * from './lib/editor-support.service';
 export * from './lib/completion.service';
 export * from './lib/finder.service';
+export * from './lib/cancel-command.guard';

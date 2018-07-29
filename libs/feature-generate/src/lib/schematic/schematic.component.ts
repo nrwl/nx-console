@@ -180,7 +180,6 @@ export class SchematicComponent implements OnInit {
             path: this.path(),
             genCommand: c.commands
           },
-          r => r.data.generate.command,
           true
         );
       }),
@@ -208,7 +207,6 @@ export class SchematicComponent implements OnInit {
             path: this.route.snapshot.params.path,
             genCommand: c.commands
           },
-          r => r.data.generate.command,
           false
         );
       }),

@@ -132,7 +132,6 @@ export class ExtensionComponent implements OnInit {
             path: this.path(),
             name: a.name
           },
-          r => r.data.ngAdd.command,
           false
         );
       }),
@@ -156,6 +155,6 @@ export class ExtensionComponent implements OnInit {
   }
 
   onStop() {
-    this.runner.stopAllCommands();
+    this.runner.stopCommand();
   }
 }

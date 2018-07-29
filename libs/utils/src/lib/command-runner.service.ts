@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
-import { interval, Observable, of } from 'rxjs';
+import { BehaviorSubject, interval, Observable, of } from 'rxjs';
 import { concatMap, last, map, switchMap, takeWhile } from 'rxjs/operators';
 
 export interface CommandOutput {
@@ -10,45 +10,46 @@ export interface CommandOutput {
   out: string;
 }
 
-const POLLING_INTERVAL_MILLIS = 500;
+const POLLING_INTERVAL_MILLIS = 100;
 
 @Injectable({
   providedIn: 'root'
 })
 export class CommandRunner {
+  readonly activeCommand$ = new BehaviorSubject(false);
+
   constructor(private readonly apollo: Apollo) {}
 
   runCommand(
     mutation: DocumentNode,
     variables: { [key: string]: any },
-    extractCommand: (r: any) => any,
     onlyLast: boolean
   ): Observable<CommandOutput> {
+    this.activeCommand$.next(true);
     return this.apollo
       .mutate({
         mutation,
         variables
       })
       .pipe(
-        map(extractCommand),
-        switchMap((command: string) => {
+        switchMap(() => {
           return interval(POLLING_INTERVAL_MILLIS).pipe(
             switchMap(() => {
               return this.apollo.query({
                 query: gql`
-                  query($command: String!) {
-                    commandStatus(command: $command) {
+                  query {
+                    commandStatus {
                       status
                       out
                     }
                   }
-                `,
-                variables: { command }
+                `
               });
             }),
             map((r: any) => r.data.commandStatus),
             concatMap(r => {
               if (r.status !== 'inprogress') {
+                this.activeCommand$.next(false);
                 return of(r, null);
               } else {
                 return of(r);
@@ -61,19 +62,16 @@ export class CommandRunner {
       );
   }
 
-  stopAllCommands() {
+  stopCommand() {
     this.runCommand(
       gql`
-        mutation($path: String!) {
-          stop(path: $path) {
+        mutation {
+          stop {
             result
           }
         }
       `,
-      {
-        path: ''
-      },
-      r => r,
+      {},
       false
     ).subscribe(() => {});
   }

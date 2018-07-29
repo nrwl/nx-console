@@ -13,7 +13,7 @@ import {
   workspaceRoutes
 } from '@nxui/feature-workspaces';
 import { UiModule } from '@nxui/ui';
-import { Messenger } from '@nxui/utils';
+import { CancelCommandGuard, Messenger } from '@nxui/utils';
 import { Apollo, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -36,12 +36,16 @@ import { AppComponent } from './app.component';
     RouterModule.forRoot(
       [
         { path: '', pathMatch: 'full', redirectTo: '/workspaces' },
-        { path: '', children: workspaceRoutes }
+        {
+          path: '',
+          children: workspaceRoutes,
+          canActivateChild: [CancelCommandGuard]
+        }
       ],
       { paramsInheritanceStrategy: 'always' }
     )
   ],
-  providers: [],
+  providers: [CancelCommandGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {
