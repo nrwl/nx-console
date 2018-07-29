@@ -5,7 +5,7 @@
   "integrationFolder": "../../dist/apps/nxui-e2e/integration",
   "pluginsFile": "../../dist/apps/nxui-e2e/plugins/index.js",
   "supportFile": "../../dist/apps/nxui-e2e/support/index.js",
-  "video": false,
+  "video": true,
   "videosFolder": "../../dist/apps/nxui-e2e/video",
   "screenshotsFolder": "../../dist/apps/nxui-e2e/screenshot",
   "projectId": "x2ebye"
