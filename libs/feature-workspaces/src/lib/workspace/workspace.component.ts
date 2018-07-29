@@ -12,8 +12,8 @@ import {
   animateUp,
   ContextualActionBarService,
   GROW_SHRINK
-} from '@nxui/ui';
-import { Settings } from '@nxui/utils';
+} from '@angular-console/ui';
+import { Settings } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';
@@ -38,7 +38,7 @@ const ANIMATE_DOWN = animateDown(ROUTER_TRANSITION_TIMING);
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-workspace',
+  selector: 'angular-console-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
   encapsulation: ViewEncapsulation.None,

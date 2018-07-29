@@ -6,8 +6,8 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TerminalComponent, DynamicFlatNode } from '@nxui/ui';
-import { CommandOutput, CommandRunner } from '@nxui/utils';
+import { TerminalComponent, DynamicFlatNode } from '@angular-console/ui';
+import { CommandOutput, CommandRunner } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable, Subject } from 'rxjs';
@@ -26,7 +26,7 @@ interface NgNewInvocation {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-new-workspace',
+  selector: 'angular-console-new-workspace',
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.scss']
 })

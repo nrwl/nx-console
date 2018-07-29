@@ -11,7 +11,7 @@ import {
   animateRight,
   ContextualActionBarService,
   fadeIn
-} from '@nxui/ui';
+} from '@angular-console/ui';
 import { filter, map } from 'rxjs/operators';
 import {
   CREATE_WORKSPACE,
@@ -19,7 +19,7 @@ import {
   WORKSPACES,
   FeatureWorkspaceRouteState,
   WORKSPACE
-} from '@nxui/feature-workspaces';
+} from '@angular-console/feature-workspaces';
 import { Observable } from 'rxjs';
 
 const TIMING = '500ms ease-in-out';
@@ -28,7 +28,7 @@ const ANIMATE_RIGHT = animateRight(TIMING);
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-root',
+  selector: 'angular-console-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   animations: [

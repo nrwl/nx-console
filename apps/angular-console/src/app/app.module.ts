@@ -11,9 +11,9 @@ import { RouterModule } from '@angular/router';
 import {
   FeatureWorkspacesModule,
   workspaceRoutes
-} from '@nxui/feature-workspaces';
-import { UiModule } from '@nxui/ui';
-import { CancelCommandGuard, Messenger } from '@nxui/utils';
+} from '@angular-console/feature-workspaces';
+import { UiModule } from '@angular-console/ui';
+import { CancelCommandGuard, Messenger } from '@angular-console/utils';
 import { Apollo, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';

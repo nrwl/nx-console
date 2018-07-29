@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Extension, ExtensionGroup, Schematic } from '@nxui/utils';
+import { Extension, ExtensionGroup, Schematic } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';
@@ -12,7 +12,7 @@ import {
   startWith,
   switchMap
 } from 'rxjs/operators';
-import { TaskCollection, TaskCollections, Task } from '@nxui/ui';
+import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
 
 interface ExtensionId {
   name: string | undefined;
@@ -20,7 +20,7 @@ interface ExtensionId {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-extensions',
+  selector: 'angular-console-extensions',
   templateUrl: './extensions.component.html',
   styleUrls: ['./extensions.component.scss']
 })

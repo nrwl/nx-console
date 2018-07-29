@@ -1,7 +1,7 @@
 import { CollectionViewer, SelectionChange } from '@angular/cdk/collections';
 import { DataSource } from '@angular/cdk/table';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Finder, LocalFile } from '@nxui/utils';
+import { Finder, LocalFile } from '@angular-console/utils';
 import { BehaviorSubject, merge, Observable } from 'rxjs';
 import { first, map, tap } from 'rxjs/operators';
 

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Project, EditorSupport } from '@nxui/utils';
+import { Project, EditorSupport } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
@@ -8,7 +8,7 @@ import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-details',
+  selector: 'angular-console-details',
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss']
 })

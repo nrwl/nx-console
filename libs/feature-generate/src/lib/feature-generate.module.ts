@@ -8,7 +8,7 @@ import {
   MatOptionModule
 } from '@angular/material';
 import { Route, RouterModule } from '@angular/router';
-import { UiModule } from '@nxui/ui';
+import { UiModule } from '@angular-console/ui';
 
 import { SchematicComponent } from './schematic/schematic.component';
 import { SchematicsComponent } from './schematics/schematics.component';

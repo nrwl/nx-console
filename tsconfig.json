@@ -20,13 +20,13 @@
     "lib": ["es2017", "dom", "esnext.asynciterable"],
     "baseUrl": ".",
     "paths": {
-      "@nxui/*": ["libs/*"],
-      "@nxui/feature-workspaces": ["libs/feature-workspaces/src/index.ts"],
-      "@nxui/feature-extensions": ["libs/feature-extensions/src/index.ts"],
-      "@nxui/feature-generate": ["libs/feature-generate/src/index.ts"],
-      "@nxui/utils": ["libs/utils/src/index.ts"],
-      "@nxui/feature-run": ["libs/feature-run/src/index.ts"],
-      "@nxui/ui": ["libs/ui/src/index.ts"]
+      "@angular-console/*": ["libs/*"],
+      "@angular-console/feature-workspaces": ["libs/feature-workspaces/src/index.ts"],
+      "@angular-console/feature-extensions": ["libs/feature-extensions/src/index.ts"],
+      "@angular-console/feature-generate": ["libs/feature-generate/src/index.ts"],
+      "@angular-console/utils": ["libs/utils/src/index.ts"],
+      "@angular-console/feature-run": ["libs/feature-run/src/index.ts"],
+      "@angular-console/ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

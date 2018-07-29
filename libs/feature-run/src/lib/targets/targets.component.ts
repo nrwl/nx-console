@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
-import { NpmScripts, Project } from '@nxui/utils';
+import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
+import { NpmScripts, Project } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable, combineLatest } from 'rxjs';
@@ -20,7 +20,7 @@ interface Target {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-targets',
+  selector: 'angular-console-targets',
   templateUrl: './targets.component.html',
   styleUrls: ['./targets.component.scss']
 })

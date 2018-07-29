@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { Settings } from '@nxui/utils';
+import { Settings } from '@angular-console/utils';
 import { WorkspacesService } from '../workspaces.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-workspaces',
+  selector: 'angular-console-workspaces',
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.css']
 })
