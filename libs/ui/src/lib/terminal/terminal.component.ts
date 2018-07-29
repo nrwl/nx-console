@@ -72,6 +72,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   }
 
   reset() {
+    this.output = '';
     this.term.reset();
   }
 
@@ -88,7 +89,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
       const cols = Math.floor(width / renderer.dimensions.actualCellWidth);
       const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
       if (this.term.rows !== rows || this.term.cols !== cols) {
-        this.reset();
+        this.term.reset();
         this.term.resize(cols, rows);
         this.writeFullCachedOutput();
       }

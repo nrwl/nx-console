@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
   '/graphql': {
-    target: "http://localhost:7777",
+    target: "http://localhost:8888",
     secure: false
   }
 };

@@ -12,7 +12,7 @@
   <mat-divider></mat-divider>
 
   <mat-accordion [multi]="true" displayMode="flat">
-    <mat-expansion-panel *ngFor="let fieldGroup of fieldGroups" [expanded]="fieldGroup.expanded" (opened)="resize.emit()" (closed)="resize.emit()">
+    <mat-expansion-panel *ngFor="let fieldGroup of fieldGroups" [expanded]="fieldGroup.expanded" (opened)="resizeFlags.emit()" (closed)="resizeFlags.emit()">
       <mat-expansion-panel-header>
         <mat-panel-title *ngIf="fieldGroups.length > 1" [ngSwitch]="fieldGroup.type">
           <ng-container *ngSwitchCase="'important'">Important fields</ng-container>
