@@ -26,16 +26,16 @@ const SCROLL_BAR_WIDTH = 48;
   ]
 })
 export class TerminalComponent implements AfterViewInit, OnDestroy {
-  private output: string = '';
-  private term = new Terminal({ disableStdin: true, fontSize: 14 });
-  private resizeSubscription = fromEvent(window, 'resize')
+  private output = '';
+  private readonly term = new Terminal({ disableStdin: true, fontSize: 14 });
+  private readonly resizeSubscription = fromEvent(window, 'resize')
     .pipe(debounceTime(DEBOUNCE_TIME))
     .subscribe(() => {
       this.resizeTerminal();
     });
 
   @ViewChild('code', { read: ElementRef })
-  private code: ElementRef;
+  private readonly code: ElementRef;
 
   @Input() command: string;
 

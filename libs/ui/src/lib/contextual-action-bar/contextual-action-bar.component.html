@@ -18,8 +18,9 @@
         {{ contextualActions.contextTitle }}
       </div>
       <div class="actions-container" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
-        <ng-container *ngFor="let action of contextualActions.actions; let last = last">
+        <mat-icon class="exit-action" *ngIf="commandRunner.activeCommand$|async" (click)="stopCommand()" title="Cancel the command">cancel</mat-icon>
 
+        <ng-container *ngFor="let action of contextualActions.actions; let last = last">
           <button *ngIf="!last" [disabled]="action.disabled | async" (click)="action.invoke.next()" class="action-button" mat-button>
             <span>{{ action.name }}</span>
           </button>

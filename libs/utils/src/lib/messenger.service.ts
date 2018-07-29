@@ -8,6 +8,10 @@ export class Messenger {
   constructor(private readonly snackBar: MatSnackBar) {}
 
   error(m: string) {
-    this.snackBar.open(m, 'Close');
+    this.snackBar.open(m, 'Close', { duration: 15000 });
+  }
+
+  notify(m: string) {
+    this.snackBar.open(m, undefined, { duration: 3000 });
   }
 }

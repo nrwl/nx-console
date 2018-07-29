@@ -10,6 +10,7 @@ import {
   ContextualActionBarService,
   ContextualTab
 } from './contextual-action-bar.service';
+import { CommandRunner, Messenger } from '@nxui/utils';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,10 +33,17 @@ import {
 })
 export class ContextualActionBarComponent {
   constructor(
-    readonly contextualActionBarService: ContextualActionBarService
+    readonly contextualActionBarService: ContextualActionBarService,
+    readonly commandRunner: CommandRunner,
+    readonly messenger: Messenger
   ) {}
 
   trackByName(_: number, tab: ContextualTab) {
     return tab.name;
+  }
+
+  stopCommand() {
+    this.commandRunner.stopCommand();
+    this.messenger.notify('Command has been canceled');
   }
 }

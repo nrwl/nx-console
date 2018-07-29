@@ -28,12 +28,13 @@ const spawn = require('node-pty-prebuilt').spawn;
 const graphqlHTTP = require('express-graphql');
 
 interface CommandResult {
+  command: string;
   status: string;
   out: string;
   commandRunning: any;
 }
 
-let commands: { [k: string]: CommandResult } = {};
+let commandInProgress: CommandResult | null;
 const files: { [path: string]: string[] } = {};
 
 export const commandResultType: graphql.GraphQLObjectType = new graphql.GraphQLObjectType(
@@ -41,6 +42,9 @@ export const commandResultType: graphql.GraphQLObjectType = new graphql.GraphQLO
     name: 'CommandResult',
     fields: () => {
       return {
+        command: {
+          type: graphql.GraphQLString
+        },
         status: {
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
@@ -583,18 +587,18 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
         },
         commandStatus: {
           type: commandResultType,
-          args: {
-            command: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
-          },
           resolve: (_root: any, args: any) => {
             try {
-              const cmd = commands[args.command];
-              if (cmd) {
-                const r = { status: cmd.status, out: cmd.out };
-                cmd.out = '';
+              if (commandInProgress) {
+                const r = {
+                  command: commandInProgress.command,
+                  status: commandInProgress.status,
+                  out: commandInProgress.out
+                };
+                commandInProgress.out = '';
                 return r;
               } else {
-                return { status: 'terminated', out: '' };
+                return { command: null, status: 'terminated', out: '' };
               }
             } catch (e) {
               console.log(e);
@@ -758,9 +762,6 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
               result: { type: graphql.GraphQLBoolean }
             }
           }),
-          args: {
-            path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
-          },
           resolve: async () => {
             try {
               stopAllCommands();
@@ -805,36 +806,35 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
 
 function runCommand(cwd: string, program: string, cmds: string[]) {
   stopAllCommands();
-  const command = `${program} ${cmds.join(' ')} ${Math.random()}`;
+  const command = `${program} ${cmds.join(' ')}`;
 
   const commandRunning = spawn(program, cmds, { cwd, cols: 100 });
-  commands[command] = {
+  commandInProgress = {
+    command,
     status: 'inprogress',
     out: '',
     commandRunning
   };
 
   commandRunning.on('data', (data: any) => {
-    if (commands[command]) {
-      commands[command].out += data.toString();
+    if (commandInProgress && commandInProgress.command === command) {
+      commandInProgress.out += data.toString();
     }
   });
 
   commandRunning.on('exit', (code: any) => {
-    if (commands[command]) {
-      commands[command].status = code === 0 ? 'success' : 'failure';
+    if (commandInProgress && commandInProgress.command === command) {
+      commandInProgress.status = code === 0 ? 'success' : 'failure';
     }
   });
   return { command };
 }
 
 function stopAllCommands() {
-  Object.values(commands).forEach(v => {
-    if (v.commandRunning) {
-      v.commandRunning.kill();
-    }
-  });
-  commands = {};
+  if (commandInProgress && commandInProgress.commandRunning) {
+    commandInProgress.commandRunning.kill('SIGKILL');
+  }
+  commandInProgress = null;
 }
 
 function listFiles(path: string) {

@@ -153,7 +153,6 @@ export class NpmScriptComponent implements OnInit {
             npmClient: s.npmClient,
             runCommand: c.commands
           },
-          r => r.data.runNpm.command,
           false
         );
       }),
@@ -182,7 +181,7 @@ export class NpmScriptComponent implements OnInit {
   }
 
   onStop() {
-    this.runner.stopAllCommands();
+    this.runner.stopCommand();
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {

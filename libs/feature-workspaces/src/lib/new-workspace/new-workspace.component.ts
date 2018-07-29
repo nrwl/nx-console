@@ -89,7 +89,6 @@ export class NewWorkspaceComponent implements OnInit {
             }
           `,
           ngNewInvocation,
-          (res: any) => res.data.ngNew.command,
           false
         );
       }),

@@ -1,5 +1,6 @@
 import {
   checkDisplayedCommand,
+  checkMessage,
   checkFileExists,
   clickOnTask,
   goBack,
@@ -82,6 +83,24 @@ describe('Tasks', () => {
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
+  });
+
+  it('cancels a task when navigating away', () => {
+    clickOnTask('proj', 'test');
+    cy.get('div.context-title').contains('ng test proj');
+
+    checkDisplayedCommand('$ ng test proj');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.wait(100);
+
+    goBack();
+
+    cy.get('div.title').contains('Run Tasks');
+    checkMessage('Command has been canceled');
   });
 
   it('runs an npm script', () => {

@@ -13,7 +13,7 @@ import {
   Input,
   OnDestroy
 } from '@angular/core';
-import { BehaviorSubject, empty, merge, Subscription } from 'rxjs';
+import { BehaviorSubject, merge, Subscription, EMPTY } from 'rxjs';
 import { map, delay } from 'rxjs/operators';
 import { FlagsComponent } from '../flags/flags.component';
 import { TerminalComponent } from '../terminal/terminal.component';
@@ -50,10 +50,11 @@ export class TaskRunnerComponent implements AfterContentInit, OnDestroy {
   resizeSubscription: Subscription | undefined;
 
   ngAfterContentInit() {
-    const DELAY = ANIMATION_DURATION + 50;
+    const TIME_BUFFER = 50;
+    const DELAY = ANIMATION_DURATION + TIME_BUFFER;
     const flagsComponentResize$ = this.flagsComponent
-      ? this.flagsComponent.resize.pipe(delay(DELAY))
-      : empty();
+      ? this.flagsComponent.resizeFlags.pipe(delay(DELAY))
+      : EMPTY;
     this.resizeSubscription = merge(
       flagsComponentResize$,
       this.terminalVisible.pipe(delay(DELAY))

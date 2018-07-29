@@ -153,7 +153,6 @@ export class TargetComponent implements OnInit {
             path: this.path(),
             runCommand: c.commands
           },
-          r => r.data.runNg.command,
           false
         );
       }),
@@ -179,7 +178,7 @@ export class TargetComponent implements OnInit {
   }
 
   onStop() {
-    this.runner.stopAllCommands();
+    this.runner.stopCommand();
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {

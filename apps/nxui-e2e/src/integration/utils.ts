@@ -6,7 +6,7 @@ export function clickOnFieldGroup(group: string) {
     .click();
 }
 
-export function checkError(error: string) {
+export function checkMessage(error: string) {
   cy.get('simple-snack-bar').contains(error);
 }
 
