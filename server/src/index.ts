@@ -514,7 +514,16 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
         schematicCollections: {
           type: new graphql.GraphQLList(schematicCollectionForNgNewType),
           resolve: () => {
-            return schematicCollectionsForNgNew();
+            try {
+              return schematicCollectionsForNgNew();
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when reading the collection list. Message: "${
+                  e.message
+                }"`
+              );
+            }
           }
         },
         workspace: {
@@ -542,7 +551,9 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
               };
             } catch (e) {
               console.log(e);
-              throw e;
+              throw new Error(
+                `Eror when reading the workspace data. Message: "${e.message}"`
+              );
             }
           }
         },
@@ -558,7 +569,16 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
             name: { type: graphql.GraphQLString }
           },
           resolve: (_: any, args: any) => {
-            return filterByName(availableExtensions(), args);
+            try {
+              return filterByName(availableExtensions(), args);
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when reading the list of extensions. Message: "${
+                  e.message
+                }"`
+              );
+            }
           }
         },
         commandStatus: {
@@ -567,13 +587,20 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
             command: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
           },
           resolve: (_root: any, args: any) => {
-            const cmd = commands[args.command];
-            if (cmd) {
-              const r = { status: cmd.status, out: cmd.out };
-              cmd.out = '';
-              return r;
-            } else {
-              return { status: 'terminated', out: '' };
+            try {
+              const cmd = commands[args.command];
+              if (cmd) {
+                const r = { status: cmd.status, out: cmd.out };
+                cmd.out = '';
+                return r;
+              } else {
+                return { status: 'terminated', out: '' };
+              }
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when reading the command status. Message: "${e.message}"`
+              );
             }
           }
         },
@@ -588,7 +615,11 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
               );
             } catch (e) {
               console.log(e);
-              throw new Error(`Cannot open directory: "${args.path}"`);
+              throw new Error(
+                `Error when reading the directory "${args.path}". Message: "${
+                  e.message
+                }"`
+              );
             }
           },
           args: {
@@ -614,10 +645,17 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             name: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(args.path, findClosestNg(args.path), [
-              'add',
-              args.name
-            ]);
+            try {
+              return runCommand(args.path, findClosestNg(args.path), [
+                'add',
+                args.name
+              ]);
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when running 'ng add'. Message: "${e.message}"`
+              );
+            }
           }
         },
         ngNew: {
@@ -632,12 +670,19 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(args.path, findClosestNg(__dirname), [
-              'new',
-              args.name,
-              `--directory=${args.name}`,
-              `--collection=${args.collection}`
-            ]);
+            try {
+              return runCommand(args.path, findClosestNg(__dirname), [
+                'new',
+                args.name,
+                `--directory=${args.name}`,
+                `--collection=${args.collection}`
+              ]);
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when running 'ng new'. Message: "${e.message}"`
+              );
+            }
           }
         },
         generate: {
@@ -650,12 +695,19 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             dryRun: { type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean) }
           },
           resolve: async (_root: any, args: any) => {
-            const dryRun = args.dryRun ? ['--dry-run'] : [];
-            return runCommand(args.path, findClosestNg(args.path), [
-              'generate',
-              ...args.genCommand,
-              ...dryRun
-            ]);
+            try {
+              const dryRun = args.dryRun ? ['--dry-run'] : [];
+              return runCommand(args.path, findClosestNg(args.path), [
+                'generate',
+                ...args.genCommand,
+                ...dryRun
+              ]);
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when running 'ng generate'. Message: "${e.message}"`
+              );
+            }
           }
         },
         runNg: {
@@ -665,11 +717,18 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             runCommand: { type: new graphql.GraphQLList(graphql.GraphQLString) }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(
-              args.path,
-              findClosestNg(args.path),
-              args.runCommand
-            );
+            try {
+              return runCommand(
+                args.path,
+                findClosestNg(args.path),
+                args.runCommand
+              );
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when running 'ng ...'. Message: "${e.message}"`
+              );
+            }
           }
         },
         runNpm: {
@@ -682,7 +741,14 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             runCommand: { type: new graphql.GraphQLList(graphql.GraphQLString) }
           },
           resolve: async (_root: any, args: any) => {
-            return runCommand(args.path, args.npmClient, args.runCommand);
+            try {
+              return runCommand(args.path, args.npmClient, args.runCommand);
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when running npm script. Message:"${e.message}"`
+              );
+            }
           }
         },
         stop: {
@@ -696,8 +762,15 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
           },
           resolve: async () => {
-            stopAllCommands();
-            return { result: true };
+            try {
+              stopAllCommands();
+              return { result: true };
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when stopping commands. Message: "${e.message}"`
+              );
+            }
           }
         },
         openInEditor: {
@@ -714,8 +787,15 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
             path: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }
           },
           resolve: (_root: any, args: any) => {
-            openInEditor(args.editor, args.path);
-            return { response: 'Success' };
+            try {
+              openInEditor(args.editor, args.path);
+              return { response: 'Success' };
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when opening an editor. Message: "${e.message}"`
+              );
+            }
           }
         }
       };
