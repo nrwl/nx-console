@@ -1,5 +1,6 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" fxFlex [@.disabled]="!afterViewInit">
-  <mat-tree-node @growIn fxLayout="row" fxLayoutAlign="start center" *matTreeNodeDef="let node" matTreeNodePadding [class.selected]="selectedNode === node">
+  <mat-tree-node @growIn fxLayout="row" fxLayoutAlign="start center" *matTreeNodeDef="let node" matTreeNodePadding [class.selected]="selectedNode === node"
+    (mouseenter)="onTreeNodeMouseenter($event)" (mouseleave)="onTreeNodeMouseleave($event)">
 
     <!-- Non-Angular Directory -->
     <ng-container *ngIf="node.file.type !== 'angularDirectory'">
@@ -20,8 +21,8 @@
         <div fxLayout="row" fxLayoutAlign="start center">
           <mat-icon class="directory-icon" matTreeNodeToggle>folder</mat-icon>
           <span fxFlex class="directory-name" matTreeNodeToggle>{{ node.file.name }}</span>
-          <button mat-icon-button (click)="handleNodeCreation(node)">
-            <mat-icon>add</mat-icon>
+          <button class="node-creation-button hidden" mat-stroked-button (click)="handleNodeCreation(node)">
+            Select Directory
           </button>
         </div>
       </ng-container>
