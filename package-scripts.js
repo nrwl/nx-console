@@ -29,7 +29,7 @@ module.exports = {
     },
     server: {
       compile: 'tsc -p server/tsconfig.json',
-      start: 'node dist/server',
+      start: 'node dist/server 8888',
       up: npsUtils.series.nps('server.compile', 'server.start'),
       format: {
         default: npsUtils.series.nps('server.format.write'),
@@ -44,13 +44,21 @@ module.exports = {
       'copy-server': 'cp -r dist/server dist/electron/server',
       'install-node-modules': 'cd dist/electron && yarn',
       'copy-frontend': 'cp -r dist/apps/nxui dist/electron/server/public',
-      'start': 'electron dist/electron',
+      'start': 'NODE_ENV=development electron dist/electron',
       'restart': npsUtils.series.nps('electron.compile', 'electron.copy-assets', 'electron.start'),
       'prepackage': npsUtils.series.nps('electron.clean', 'electron.compile', 'electron.copy-assets', 'frontend.build', 'server.compile', 'electron.copy-server', 'electron.copy-frontend', 'electron.install-node-modules'),
-      'up': npsUtils.series.nps('electron.prepackage', 'electron.start')
+      'up': npsUtils.series.nps('electron.prepackage', 'electron.start'),
+
+      'builder-dist-mac': 'electron-builder --mac -p never',
+      'dist-mac': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-mac'),
+      'builder-dist-win': 'electron-builder --win -p never',
+      'dist-win': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-win'),
+      'builder-dist-mac-and-win': 'electron-builder --mac --win -p always',
+      'publish': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-mac-and-win'),
     },
     dev: {
-      up: npsUtils.concurrent.nps('server.up', 'frontend.serve')
+      up: npsUtils.concurrent.nps('server.up', 'frontend.serve'),
+      'path-node-pty': 'rm -rf node_modules/node-pty-prebuilt && cp -r tools/win/node-pty-prebuilt node_modules/node-pty-prebuilt'
     },
     demo: {
       up: npsUtils.concurrent.nps('server.up', 'frontend.serve.prod')

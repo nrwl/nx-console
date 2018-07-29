@@ -168,6 +168,9 @@ export class SchematicComponent implements OnInit {
         if (!c.valid) {
           return of(MISSING_REQUIRED_FLAGS);
         }
+        if (this.runner.activeCommand$.value) {
+          return of();
+        }
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $genCommand: [String]!) {

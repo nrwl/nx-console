@@ -1,6 +1,6 @@
 {
   "name": "angular-console",
-  "version": "0.1.0",
+  "version": "6.0.0-beta.1",
   "private": true,
   "author": "Narwhal Technologies Inc",
   "license": "MIT",
@@ -16,9 +16,30 @@
     "asar": false,
     "directories": {
       "app": "dist/electron",
-      "buildResources": "dist/electron",
+      "buildResources": "dist/electron/assets/icons/build",
       "output": "dist/packages"
-    }
+    },
+    "npmRebuild": false,
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "icon.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "createDesktopShortcut": "always",
+      "installerIcon": "icon.ico"
+    },
+    "afterPack": "./tools/scripts/after-pack.js",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "nrwl",
+        "repo": "angular-console"
+      }
+    ]
   },
   "dependencies": {
     "@nrwl/nx": "6.1.0"
@@ -47,7 +68,7 @@
     "@types/graphql": "0.13.0",
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
-    "@types/node": "10.5.2",
+    "@types/node": "8.10.21",
     "@types/sinon": "4.3.3",
     "@types/sinon-chai": "2.7.31",
     "angular-playground": "5.0.1",
@@ -93,6 +114,7 @@
     "tslint": "~5.10.0",
     "typescript": "2.7.x",
     "xterm": "3.4.1",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "electron-updater": "^2.21.4"
   }
 }
