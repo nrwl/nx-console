@@ -10,8 +10,13 @@ import {
   FlagsComponent,
   TaskRunnerComponent,
   TerminalComponent
-} from '@nxui/ui';
-import { CommandOutput, CommandRunner, Project, Serializer } from '@nxui/utils';
+} from '@angular-console/ui';
+import {
+  CommandOutput,
+  CommandRunner,
+  Project,
+  Serializer
+} from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
@@ -26,7 +31,7 @@ import {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-target',
+  selector: 'angular-console-target',
   templateUrl: './target.component.html',
   styleUrls: ['./target.component.css']
 })

@@ -11,13 +11,13 @@ import {
   FlagsComponent,
   TaskRunnerComponent,
   TerminalComponent
-} from '@nxui/ui';
+} from '@angular-console/ui';
 import {
   CommandOutput,
   CommandRunner,
   Schematic,
   Serializer
-} from '@nxui/utils';
+} from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
@@ -40,7 +40,7 @@ const DEBOUNCE_TIME = 300;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-schematic',
+  selector: 'angular-console-schematic',
   templateUrl: './schematic.component.html',
   styleUrls: ['./schematic.component.scss']
 })

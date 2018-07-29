@@ -1,11 +1,14 @@
 import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { WorkspacesService } from '../workspaces.service';
-import { DynamicFlatNode, ContextualActionBarService } from '@nxui/ui';
+import {
+  DynamicFlatNode,
+  ContextualActionBarService
+} from '@angular-console/ui';
 import { Subject } from 'rxjs';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-import-workspace',
+  selector: 'angular-console-import-workspace',
   templateUrl: './import-workspace.component.html',
   styleUrls: ['./import-workspace.component.scss']
 })

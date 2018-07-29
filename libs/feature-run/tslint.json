@@ -4,13 +4,13 @@
     "directive-selector": [
       true,
       "attribute",
-      "nxui",
+      "angular-console",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "nxui",
+      "angular-console",
       "kebab-case"
     ]
   }

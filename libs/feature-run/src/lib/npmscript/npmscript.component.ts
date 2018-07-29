@@ -10,13 +10,13 @@ import {
   FlagsComponent,
   TaskRunnerComponent,
   TerminalComponent
-} from '@nxui/ui';
+} from '@angular-console/ui';
 import {
   CommandOutput,
   CommandRunner,
   NpmScript,
   Serializer
-} from '@nxui/utils';
+} from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
@@ -31,7 +31,7 @@ import {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-npmscript',
+  selector: 'angular-console-npmscript',
   templateUrl: './npmscript.component.html',
   styleUrls: ['./npmscript.component.css']
 })

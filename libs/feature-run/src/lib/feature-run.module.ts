@@ -8,7 +8,7 @@ import {
   MatOptionModule
 } from '@angular/material';
 import { Route, RouterModule } from '@angular/router';
-import { UiModule } from '@nxui/ui';
+import { UiModule } from '@angular-console/ui';
 
 import { TargetComponent } from './target/target.component';
 import { TargetsComponent } from './targets/targets.component';

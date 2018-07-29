@@ -3,31 +3,31 @@
   "version": 1,
   "newProjectRoot": "",
   "projects": {
-    "nxui": {
-      "root": "apps/nxui/",
-      "sourceRoot": "apps/nxui/src",
+    "angular-console": {
+      "root": "apps/angular-console/",
+      "sourceRoot": "apps/angular-console/src",
       "projectType": "application",
-      "prefix": "apps/nxui",
+      "prefix": "apps/angular-console",
       "schematics": {},
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/apps/nxui",
-            "index": "apps/nxui/src/index.html",
-            "main": "apps/nxui/src/main.ts",
-            "polyfills": "apps/nxui/src/polyfills.ts",
-            "tsConfig": "apps/nxui/tsconfig.app.json",
-            "assets": ["apps/nxui/src/favicon.ico", "apps/nxui/src/assets"],
-            "styles": ["apps/nxui/src/styles.scss"],
+            "outputPath": "dist/apps/angular-console",
+            "index": "apps/angular-console/src/index.html",
+            "main": "apps/angular-console/src/main.ts",
+            "polyfills": "apps/angular-console/src/polyfills.ts",
+            "tsConfig": "apps/angular-console/tsconfig.app.json",
+            "assets": ["apps/angular-console/src/favicon.ico", "apps/angular-console/src/assets"],
+            "styles": ["apps/angular-console/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "apps/nxui/src/environments/environment.ts",
-                  "with": "apps/nxui/src/environments/environment.prod.ts"
+                  "replace": "apps/angular-console/src/environments/environment.ts",
+                  "with": "apps/angular-console/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -45,55 +45,55 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "nxui:build",
-            "proxyConfig": "apps/nxui/proxy.conf.js"
+            "browserTarget": "angular-console:build",
+            "proxyConfig": "apps/angular-console/proxy.conf.js"
           },
           "configurations": {
             "production": {
-              "browserTarget": "nxui:build:production"
+              "browserTarget": "angular-console:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "nxui:build"
+            "browserTarget": "angular-console:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "apps/nxui/src/test.ts",
-            "polyfills": "apps/nxui/src/polyfills.ts",
-            "tsConfig": "apps/nxui/tsconfig.spec.json",
-            "karmaConfig": "apps/nxui/karma.conf.js",
-            "styles": ["apps/nxui/src/styles.scss"],
+            "main": "apps/angular-console/src/test.ts",
+            "polyfills": "apps/angular-console/src/polyfills.ts",
+            "tsConfig": "apps/angular-console/tsconfig.spec.json",
+            "karmaConfig": "apps/angular-console/karma.conf.js",
+            "styles": ["apps/angular-console/src/styles.scss"],
             "scripts": [],
-            "assets": ["apps/nxui/src/favicon.ico", "apps/nxui/src/assets"]
+            "assets": ["apps/angular-console/src/favicon.ico", "apps/angular-console/src/assets"]
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "apps/nxui/tsconfig.app.json",
-              "apps/nxui/tsconfig.spec.json"
+              "apps/angular-console/tsconfig.app.json",
+              "apps/angular-console/tsconfig.spec.json"
             ],
             "exclude": ["**/node_modules/**"]
           }
         }
       }
     },
-    "nxui-e2e": {
-      "root": "apps/nxui-e2e/",
-      "sourceRoot": "apps/nxui-e2e/src",
+    "angular-console-e2e": {
+      "root": "apps/angular-console-e2e/",
+      "sourceRoot": "apps/angular-console-e2e/src",
       "projectType": "application"
     },
     "feature-workspaces": {
       "root": "libs/feature-workspaces",
       "sourceRoot": "libs/feature-workspaces/src",
       "projectType": "library",
-      "prefix": "nxui",
+      "prefix": "angular-console",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -119,7 +119,7 @@
       "root": "libs/feature-extensions",
       "sourceRoot": "libs/feature-extensions/src",
       "projectType": "library",
-      "prefix": "nxui",
+      "prefix": "angular-console",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -145,7 +145,7 @@
       "root": "libs/feature-generate",
       "sourceRoot": "libs/feature-generate/src",
       "projectType": "library",
-      "prefix": "nxui",
+      "prefix": "angular-console",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -171,7 +171,7 @@
       "root": "libs/utils",
       "sourceRoot": "libs/utils/src",
       "projectType": "library",
-      "prefix": "nxui",
+      "prefix": "angular-console",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -197,7 +197,7 @@
       "root": "libs/feature-run",
       "sourceRoot": "libs/feature-run/src",
       "projectType": "library",
-      "prefix": "nxui",
+      "prefix": "angular-console",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -253,5 +253,5 @@
     },
     "defaultCollection": "@nrwl/schematics"
   },
-  "defaultProject": "nxui"
+  "defaultProject": "angular-console"
 }

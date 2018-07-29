@@ -10,7 +10,7 @@ import {
   ContextualActionBarService,
   ContextualTab
 } from './contextual-action-bar.service';
-import { CommandRunner, Messenger } from '@nxui/utils';
+import { CommandRunner, Messenger } from '@angular-console/utils';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

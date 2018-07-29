@@ -9,8 +9,12 @@ import {
   ContextualActionBarService,
   TaskRunnerComponent,
   TerminalComponent
-} from '@nxui/ui';
-import { Extension, CommandOutput, CommandRunner } from '@nxui/utils';
+} from '@angular-console/ui';
+import {
+  Extension,
+  CommandOutput,
+  CommandRunner
+} from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
@@ -25,7 +29,7 @@ import {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-extension',
+  selector: 'angular-console-extension',
   templateUrl: './extension.component.html',
   styleUrls: ['./extension.component.scss']
 })

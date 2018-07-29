@@ -23,7 +23,7 @@ import {
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { ContextualActionBarService } from '@nxui/ui/src/lib/contextual-action-bar/contextual-action-bar.service';
+import { ContextualActionBarService } from '@angular-console/ui/src/lib/contextual-action-bar/contextual-action-bar.service';
 
 import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
 import { FlagsComponent } from './flags/flags.component';

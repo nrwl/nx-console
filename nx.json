@@ -1,5 +1,5 @@
 {
-  "npmScope": "nxui",
+  "npmScope": "angular-console",
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": "*",
@@ -7,10 +7,10 @@
     "tslint.json": "*"
   },
   "projects": {
-    "nxui": {
+    "angular-console": {
       "tags": []
     },
-    "nxui-e2e": {
+    "angular-console-e2e": {
       "tags": []
     },
     "feature-workspaces": {

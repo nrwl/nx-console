@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Task, TaskCollection, TaskCollections } from '@nxui/ui';
-import { Schematic, SchematicCollection } from '@nxui/utils';
+import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
+import { Schematic, SchematicCollection } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';
@@ -21,7 +21,7 @@ interface SchematicId {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'nxui-generate',
+  selector: 'angular-console-generate',
   templateUrl: './schematics.component.html',
   styleUrls: ['./schematics.component.scss']
 })

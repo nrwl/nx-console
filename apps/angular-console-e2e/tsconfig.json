@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "../../dist/apps/nxui-e2e",
+    "outDir": "../../dist/apps/angular-console-e2e",
     "baseUrl": "../../node_modules",
     "target": "es5",
     "lib": ["es2017", "dom", "esnext.asynciterable"],

@@ -14,7 +14,7 @@ import {
   Input,
   Output
 } from '@angular/core';
-import { Finder } from '@nxui/utils';
+import { Finder } from '@angular-console/utils';
 
 import { DirectoryDataSource, DynamicFlatNode } from './directory-data-source';
 

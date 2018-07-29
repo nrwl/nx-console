@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { UiModule } from '@nxui/ui';
+import { UiModule } from '@angular-console/ui';
 
 import { ExtensionsComponent } from './extensions/extensions.component';
 import { ExtensionComponent } from './extension/extension.component';
