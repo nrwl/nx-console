@@ -1,0 +1,29 @@
+language: node_js
+dist: xenial
+sudo: required
+node_js:
+- '10.7.0'
+before_install:
+- export DISPLAY=:99.0
+- sudo apt-get install libgconf-2-4
+install:
+- sh -e /etc/init.d/xvfb start
+- yarn install
+script:
+- yarn start format.check
+- yarn start lint
+- yarn start e2e.fixtures
+- yarn start e2e.run
+addons:
+  chrome: stable
+cache:
+  directories:
+    - ~/.npm
+    - ~/.yarn
+    - ~/.cache
+notifications:
+  email: false
+  webhooks:
+    on_success: true
+    on_failure: true
+    on_start: true

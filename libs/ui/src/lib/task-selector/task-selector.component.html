@@ -1,0 +1,29 @@
+<div class="outer-container">
+  <div [@growShrink]="taskAnimationState$ | async" class="tasks-container">
+    <div class="task-filter-container" fxLayout="row" fxLayoutAlign="start center">
+      <input [placeholder]="filterPlaceholder" #taskFilter fxFlex [formControl]="taskFilterFormControl" id="filter">
+      <mat-icon class="filter-icon" (click)="taskFilter.select()">filter_list</mat-icon>
+    </div>
+    <mat-nav-list class="task-list" (selectionChange)="selectTask($event.option.selected ? $event.option.value : null)">
+      <ng-container *ngIf="(filteredTaskCollections$ | async) as filteredTaskCollections">
+        <ng-container *ngFor="let collection of filteredTaskCollections.taskCollections; trackBy: trackByCollectionName">
+          <div class="collection-name">
+            <mat-divider></mat-divider>
+            <h3 matSubheader>{{ collection.collectionName }}</h3>
+            <mat-divider></mat-divider>
+          </div>
+          <mat-list-item *ngFor="let t of collection.tasks; trackBy: trackByTaskName" (click)="selectTask(t)">
+            <h3 matLine>{{ t.taskName }}</h3>
+            <p *ngIf="t.taskDescription" matLine>
+              <span>{{ t.taskDescription }}</span>
+            </p>
+          </mat-list-item>
+        </ng-container>
+      </ng-container>
+    </mat-nav-list>
+  </div>
+
+  <div class="nested-outlet-container">
+    <ng-content></ng-content>
+  </div>
+</div>

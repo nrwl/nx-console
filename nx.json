@@ -1,0 +1,35 @@
+{
+  "npmScope": "angular-console",
+  "implicitDependencies": {
+    "angular.json": "*",
+    "package.json": "*",
+    "tsconfig.json": "*",
+    "tslint.json": "*"
+  },
+  "projects": {
+    "angular-console": {
+      "tags": []
+    },
+    "angular-console-e2e": {
+      "tags": []
+    },
+    "feature-workspaces": {
+      "tags": []
+    },
+    "feature-extensions": {
+      "tags": []
+    },
+    "feature-generate": {
+      "tags": []
+    },
+    "utils": {
+      "tags": []
+    },
+    "feature-run": {
+      "tags": []
+    },
+    "ui": {
+      "tags": []
+    }
+  }
+}

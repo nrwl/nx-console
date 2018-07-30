@@ -1,0 +1,118 @@
+{
+  "rulesDirectory": [
+    "node_modules/codelyzer",
+    "node_modules/@nrwl/schematics/src/tslint"
+  ],
+  "extends": ["codelyzer"],
+  "rules": {
+    "adjacent-overload-signatures": true,
+    "member-access": [true, "no-public"],
+    "no-empty-interface": true,
+    "no-parameter-reassignment": true,
+    "no-namespace": true,
+    "no-magic-numbers": [true, -1, 0, 1],
+    "no-internal-module": true,
+    "no-reference": true,
+    "no-unnecessary-type-assertion": true,
+    "prefer-const": [true, { "destructuring": "all" }],
+    "curly": [true, "ignore-same-line"],
+    "typedef": [true, "parameter"],
+    "no-var-requires": true,
+    "prefer-readonly": true,
+    "no-duplicate-imports": true,
+    "no-default-export": true,
+    "use-isnan": true,
+    "triple-equals": true,
+    "strict-type-predicates": true,
+    "restrict-plus-operands": true,
+    "prefer-object-spread": true,
+    "no-unused-variable": [true, { "ignore-pattern": "^_" }],
+    "no-unsafe-finally": true,
+    "no-unsafe-any": false,
+    "no-this-assignment": true,
+    "no-string-literal": true,
+    "no-object-literal-type-assertion": true,
+
+    "angular-whitespace": [true, "check-interpolation", "check-semicolon"],
+    "banana-in-box": true,
+    "templates-no-negated-async": false,
+    "max-inline-declarations": true,
+    "no-life-cycle-call": true,
+    "prefer-output-readonly": true,
+    "no-conflicting-life-cycle-hooks": true,
+    "enforce-component-selector": true,
+    "no-queries-parameter": true,
+    "no-attribute-parameter-decorator": true,
+    "no-output-named-after-standard-event": true,
+    "no-forward-ref": true,
+    "no-unused-css": false,
+    "contextual-life-cycle": true,
+    "trackBy-function": false,
+    "pipe-impure": true,
+    "arrow-return-shorthand": true,
+    "callable-types": true,
+    "class-name": true,
+    "deprecation": {
+      "severity": "warn"
+    },
+    "forin": true,
+    "import-blacklist": [true, "rxjs/Rx"],
+    "interface-over-type-literal": true,
+    "member-ordering": [
+      false,
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "static-method",
+          "instance-method"
+        ]
+      }
+    ],
+    "no-arg": true,
+    "no-bitwise": true,
+    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
+    "no-construct": true,
+    "no-debugger": true,
+    "no-duplicate-super": true,
+    "no-empty": false,
+    "no-eval": true,
+    "no-inferrable-types": [true, "ignore-params"],
+    "no-misused-new": true,
+    "no-non-null-assertion": true,
+    "no-shadowed-variable": true,
+    "no-string-throw": true,
+    "no-switch-case-fall-through": true,
+    "no-trailing-whitespace": true,
+    "no-unnecessary-initializer": true,
+    "no-unused-expression": true,
+    "no-use-before-declare": true,
+    "no-var-keyword": true,
+    "object-literal-sort-keys": false,
+    "radix": true,
+    "unified-signatures": true,
+    "variable-name": false,
+    "directive-selector": [true, "attribute", "app", "camelCase"],
+    "component-selector": [true, "element", "app", "kebab-case"],
+    "no-output-on-prefix": true,
+    "use-input-property-decorator": true,
+    "use-output-property-decorator": true,
+    "use-host-property-decorator": true,
+    "no-input-rename": true,
+    "no-output-rename": true,
+    "use-life-cycle-interface": true,
+    "use-pipe-transform-interface": true,
+    "component-class-suffix": true,
+    "directive-class-suffix": true,
+
+    "nx-enforce-module-boundaries": [
+      true,
+      {
+        "allow": [],
+        "depConstraints": [
+          { "sourceTag": "*", "onlyDependOnLibsWithTags": ["*"] }
+        ]
+      }
+    ]
+  }
+}

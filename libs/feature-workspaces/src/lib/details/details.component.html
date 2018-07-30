@@ -1,0 +1,63 @@
+<div *ngIf="workspace$|async as workspace">
+  <div fxLayout="column" fxLayoutGap="24px">
+    <mat-card fxFlex>
+      <mat-card-title>Basic Information</mat-card-title>
+      <mat-card-content>
+        <p><strong>Name:</strong> {{ workspace.name }}</p>
+        <p><strong>Path:</strong> {{ workspace.path }}</p>
+      </mat-card-content>
+    </mat-card>
+    <mat-card fxFlex>
+      <mat-card-title>Open Workspace</mat-card-title>
+      <mat-card-actions>
+        <button *ngFor="let e of editorSupport.editors|async" mat-button
+                (click)="editorSupport.openInEditor(e.name, workspace.path)">
+          <mat-icon [svgIcon]="e.icon"></mat-icon>
+          {{ e.name }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card fxFlex>
+      <mat-card-title-group>
+        <mat-card-title>
+          Dependencies
+        </mat-card-title>
+        <mat-card-subtitle>
+          This workspace is built on top of:
+        </mat-card-subtitle>
+      </mat-card-title-group>
+      <mat-card-content>
+        <ul>
+          <li *ngFor="let d of workspace.dependencies">
+            {{ d.name }} {{ d.version }}
+          </li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+
+    <h2>Projects</h2>
+
+    <mat-card fxFlex *ngFor="let p of workspace.projects">
+      <mat-card-title class="project-name">{{ p.name }}</mat-card-title>
+      <mat-card-content>
+        <p><strong>Root:</strong> {{ p.root }}</p>
+        <p><strong>Type:</strong> {{ p.projectType }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button *ngFor="let a of p.actions" mat-button [routerLink]="a.link">
+          {{ a.actionDescription }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card *ngIf="workspace.projects.length === 0">
+      <mat-card-title>No projects yet</mat-card-title>
+      <mat-card-actions>
+        <button mat-button routerLink="../generate">
+          Create Project
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
