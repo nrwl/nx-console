@@ -1,0 +1,11 @@
+<ui-task-runner *ngIf="extension$ | async as extension" terminalWindowTitle="Task output">
+  <div class="ui-flags">
+    <div class="name">
+      {{ extension.name }}
+    </div>[
+    <div class="description">
+      {{ extension.description }}
+    </div>
+  </div>
+  <ui-terminal [command]="command$ | async" [input]="(commandOutput$|async)?.out"></ui-terminal>
+</ui-task-runner>

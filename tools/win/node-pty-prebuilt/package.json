@@ -1,0 +1,56 @@
+{
+  "name": "node-pty-prebuilt",
+  "description": "Fork pseudoterminals in Node.JS",
+  "author": {
+    "name": "David Wilson"
+  },
+  "version": "0.7.3",
+  "license": "MIT",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/daviwil/node-pty-prebuilt.git"
+  },
+  "files": [
+    "binding.gyp",
+    "lib/",
+    "scripts/",
+    "src/",
+    "deps/"
+  ],
+  "homepage": "https://github.com/daviwil/node-pty-prebuilt",
+  "bugs": {
+    "url": "https://github.com/daviwil/node-pty-prebuilt/issues"
+  },
+  "keywords": [
+    "pty",
+    "tty",
+    "terminal",
+    "pseudoterminal",
+    "forkpty",
+    "openpty"
+  ],
+  "scripts": {
+    "tsc": "tsc",
+    "tslint": "tslint src/**/*.ts",
+    "install": "prebuild-install || node scripts/install.js",
+    "postinstall": "node scripts/post-install.js",
+    "test": "cross-env NODE_ENV=test mocha -R spec lib/*.test.js",
+    "prepublish": "npm run tsc"
+  },
+  "dependencies": {
+    "nan": "^2.6.2",
+    "prebuild-install": "^2.4.1"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^6.0.58",
+    "cross-env": "^3.2.4",
+    "mocha": "^3.1.2",
+    "pollUntil": "^1.0.3",
+    "prebuild": "^7.0.0",
+    "tslint": "^4.3.1",
+    "typescript": "^2.1.4"
+  }
+}

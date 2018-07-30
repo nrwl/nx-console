@@ -1,0 +1,33 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictFunctionTypes": true,
+    "typeRoots": ["node_modules/@types"],
+    "downlevelIteration": true,
+    "lib": ["es2017", "dom", "esnext.asynciterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@angular-console/*": ["libs/*"],
+      "@angular-console/feature-workspaces": ["libs/feature-workspaces/src/index.ts"],
+      "@angular-console/feature-extensions": ["libs/feature-extensions/src/index.ts"],
+      "@angular-console/feature-generate": ["libs/feature-generate/src/index.ts"],
+      "@angular-console/utils": ["libs/utils/src/index.ts"],
+      "@angular-console/feature-run": ["libs/feature-run/src/index.ts"],
+      "@angular-console/ui": ["libs/ui/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

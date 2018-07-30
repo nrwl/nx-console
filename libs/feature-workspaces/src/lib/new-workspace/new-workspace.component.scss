@@ -1,0 +1,26 @@
+.error {
+  background-color: red;
+}
+
+:host {
+  width: 100%;
+}
+
+.ui-flags {
+  background: white;
+  overflow: auto;
+
+  .name {
+    padding: 24px;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .description {
+    padding: 24px;
+  }
+}
+
+.submit-button-container {
+  margin: 40px 20px;
+}

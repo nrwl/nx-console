@@ -1,0 +1,67 @@
+.task-list {
+  padding: 0;
+  overflow: auto;
+  max-height: calc(100% - 55px);
+  min-width: calc(100vw - 56px);
+}
+
+.outer-container {
+  height: 100%;
+  position: relative;
+}
+
+.tasks-container {
+  position: relative;
+  height: 100%;
+  z-index: 3;
+  overflow-x: hidden;
+  background-color: rgb(245, 245, 245);
+
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.nested-outlet-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  right: 0;
+  z-index: 0;
+}
+
+.collection-name {
+  position: sticky;
+  top: 0;
+  background: rgb(240, 240, 240);
+  z-index: 3;
+}
+
+.collection-name h3 {
+  color: rgb(84, 118, 186);
+}
+
+.task-filter-container {
+  background-color: rgb(245, 245, 245);
+  height: 55px;
+  min-height: 55px;
+  max-height: 55px;
+
+  input {
+    background: none;
+    background-color: none;
+    outline: none;
+    border: none;
+    font-size: 14px;
+    padding: 24px 16px;
+  }
+
+  .filter-icon {
+    cursor: pointer;
+    margin-right: 12px;
+  }
+}
+
+.task-description {
+  font-size: 12px;
+}
