@@ -1,10 +1,18 @@
-<div>
-  <h2>Recent</h2>
-  <ul>
-    <li *ngFor="let w of settings.getRecentWorkspaces()">
-      {{ w.name }} (path: {{ w.path }})
-      <button (click)="workspacesService.openWorkspace(w.path)">Open</button>
-    </li>
-  </ul>
-  <button (click)="clearRecent()">Clear</button>
+<div fxLayout="column" fxLayoutGap="24px">
+  <mat-card fxFlex>
+    <mat-card-title>Recent</mat-card-title>
+    <mat-card-content>
+      <mat-list class="list">
+        <mat-list-item *ngFor="let w of settings.getRecentWorkspaces()">
+          <h2 mat-line>{{ w.name }}</h2>
+          <p mat-line>(path: {{ w.path }})</p>
+          <button (click)="workspacesService.openWorkspace(w.path)" mat-raised-button>Open</button>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+    <mat-divider></mat-divider>
+    <mat-card-actions>
+      <button (click)="clearRecent()" mat-raised-button color="primary">Clear Recent</button>
+    </mat-card-actions>
+  </mat-card>
 </div>

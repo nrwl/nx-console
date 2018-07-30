@@ -6,7 +6,7 @@ import { WorkspacesService } from '../workspaces.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-workspaces',
   templateUrl: './workspaces.component.html',
-  styleUrls: ['./workspaces.component.css']
+  styleUrls: ['./workspaces.component.scss']
 })
 export class WorkspacesComponent {
   constructor(

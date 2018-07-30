@@ -1,27 +1,20 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
-import {
-  MatButtonModule,
-  MatIconModule,
-  MatRippleModule,
-  MatSidenavModule,
-  MatTooltipModule,
-  MatCardModule
-} from '@angular/material';
 import { Route, RouterModule } from '@angular/router';
+
 import {
   FeatureGenerateModule,
   generateRoutes
 } from '@angular-console/feature-generate';
 import { FeatureRunModule, runRoutes } from '@angular-console/feature-run';
-import { DetailsComponent } from '@angular-console/feature-workspaces/src/lib/details/details.component';
-import { ImportWorkspaceComponent } from '@angular-console/feature-workspaces/src/lib/import-workspace/import-workspace.component';
-import { NewWorkspaceComponent } from '@angular-console/feature-workspaces/src/lib/new-workspace/new-workspace.component';
-import { WorkspaceComponent } from '@angular-console/feature-workspaces/src/lib/workspace/workspace.component';
-import { WorkspacesComponent } from '@angular-console/feature-workspaces/src/lib/workspaces/workspaces.component';
 import { UiModule } from '@angular-console/ui';
+
+import { DetailsComponent } from './details/details.component';
+import { ImportWorkspaceComponent } from './import-workspace/import-workspace.component';
+import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
+import { WorkspaceComponent } from './workspace/workspace.component';
+import { WorkspacesComponent } from './workspaces/workspaces.component';
+
 import {
   extensionsRoutes,
   FeatureExtensionsModule
@@ -82,14 +75,6 @@ export const workspaceRoutes: Route[] = [
 
 @NgModule({
   imports: [
-    MatButtonModule,
-    MatCardModule,
-    MatRippleModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatTooltipModule,
-    FlexLayoutModule,
-    CommonModule,
     RouterModule,
     FeatureExtensionsModule,
     FeatureGenerateModule,
@@ -98,11 +83,11 @@ export const workspaceRoutes: Route[] = [
     UiModule
   ],
   declarations: [
-    WorkspacesComponent,
-    WorkspaceComponent,
     DetailsComponent,
     NewWorkspaceComponent,
-    ImportWorkspaceComponent
+    ImportWorkspaceComponent,
+    WorkspaceComponent,
+    WorkspacesComponent
   ]
 })
 export class FeatureWorkspacesModule {}

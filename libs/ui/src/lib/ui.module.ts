@@ -1,51 +1,50 @@
 import { CommonModule } from '@angular/common';
+import { DomSanitizer } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
+import { ContextualActionBarService } from './contextual-action-bar/contextual-action-bar.service';
+import { DirectorySelectorComponent } from './directory-selector/directory-selector.component';
+import { FlagsComponent } from './flags/flags.component';
+import { TaskRunnerComponent } from './task-runner/task-runner.component';
+import { TaskSelectorComponent } from './task-selector/task-selector.component';
+import { TerminalComponent } from './terminal/terminal.component';
+
+import { CdkTreeModule } from '@angular/cdk/tree';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import {
   MatAutocompleteModule,
   MatButtonModule,
+  MatCardModule,
   MatDividerModule,
   MatExpansionModule,
   MatIconModule,
   MatIconRegistry,
   MatInputModule,
   MatListModule,
-  MatTreeModule,
   MatOptionModule,
   MatRadioModule,
   MatRippleModule,
   MatSelectModule,
+  MatSidenavModule,
   MatSlideToggleModule,
   MatTabsModule,
   MatToolbarModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatTreeModule
 } from '@angular/material';
-import { DomSanitizer } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { ContextualActionBarService } from '@angular-console/ui/src/lib/contextual-action-bar/contextual-action-bar.service';
-
-import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
-import { FlagsComponent } from './flags/flags.component';
-import { TaskRunnerComponent } from './task-runner/task-runner.component';
-import { TaskSelectorComponent } from './task-selector/task-selector.component';
-import { TerminalComponent } from './terminal/terminal.component';
-import { DirectorySelectorComponent } from './directory-selector/directory-selector.component';
-import { CdkTreeModule } from '@angular/cdk/tree';
 
 const IMPORTS = [
+  CdkTreeModule,
   CommonModule,
   FlexLayoutModule,
-  MatIconModule,
-  MatTreeModule,
-  MatTooltipModule,
-  MatToolbarModule,
   MatAutocompleteModule,
-  CdkTreeModule,
   MatButtonModule,
+  MatCardModule,
   MatDividerModule,
   MatExpansionModule,
-  MatTabsModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
@@ -53,7 +52,31 @@ const IMPORTS = [
   MatRadioModule,
   MatRippleModule,
   MatSelectModule,
+  MatSidenavModule,
   MatSlideToggleModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
+  MatTreeModule,
+  CdkTreeModule,
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatCardModule,
+  MatDividerModule,
+  MatExpansionModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatOptionModule,
+  MatRadioModule,
+  MatRippleModule,
+  MatSelectModule,
+  MatSidenavModule,
+  MatSlideToggleModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
+  MatTreeModule,
   ReactiveFormsModule,
   RouterModule
 ];
@@ -72,11 +95,11 @@ const IMPORTS = [
   exports: [
     ...IMPORTS,
     ContextualActionBarComponent,
+    DirectorySelectorComponent,
     FlagsComponent,
-    TerminalComponent,
     TaskRunnerComponent,
     TaskSelectorComponent,
-    DirectorySelectorComponent
+    TerminalComponent
   ]
 })
 export class UiModule {
