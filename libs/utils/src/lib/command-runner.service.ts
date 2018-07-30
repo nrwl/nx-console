@@ -23,9 +23,11 @@ export class CommandRunner {
   runCommand(
     mutation: DocumentNode,
     variables: { [key: string]: any },
-    onlyLast: boolean
+    dryRun: boolean
   ): Observable<CommandOutput> {
-    this.activeCommand$.next(true);
+    if (!dryRun) {
+      this.activeCommand$.next(true);
+    }
     return this.apollo
       .mutate({
         mutation,
@@ -49,14 +51,16 @@ export class CommandRunner {
             map((r: any) => r.data.commandStatus),
             concatMap(r => {
               if (r.status !== 'inprogress') {
-                this.activeCommand$.next(false);
+                if (!dryRun) {
+                  this.activeCommand$.next(false);
+                }
                 return of(r, null);
               } else {
                 return of(r);
               }
             }),
             takeWhile(r => r),
-            onlyLast ? last() : map(r => r)
+            dryRun ? last() : map(r => r)
           );
         })
       );

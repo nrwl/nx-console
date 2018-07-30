@@ -1,6 +1,6 @@
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   ElementRef,
   OnInit,
   ViewChild
@@ -26,15 +26,11 @@ import {
   map,
   publishReplay,
   refCount,
+  startWith,
   switchMap,
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-
-const MISSING_REQUIRED_FLAGS: CommandOutput = {
-  status: 'success',
-  out: 'Command is missing required fields'
-};
 
 const DEBOUNCE_TIME = 300;
 
@@ -164,13 +160,17 @@ export class SchematicComponent implements OnInit {
     this.dryRunResult$ = this.commandArray$.pipe(
       debounceTime(DEBOUNCE_TIME),
       switchMap(c => {
-        this.out.reset();
-        if (!c.valid) {
-          return of(MISSING_REQUIRED_FLAGS);
-        }
         if (this.runner.activeCommand$.value) {
           return of();
         }
+
+        this.out.reset();
+        if (!c.valid) {
+          // cannot use change detection because the operation isn't idempotent
+          this.out.input = 'Command is missing required fields';
+          return of();
+        }
+
         return this.runner.runCommand(
           gql`
             mutation($path: String!, $genCommand: [String]!) {
@@ -219,17 +219,30 @@ export class SchematicComponent implements OnInit {
 
     this.combinedOutput$ = merge(this.dryRunResult$, this.commandOutput$);
 
-    this.command$ = merge(
-      this.dryRunResult$.pipe(
-        withLatestFrom(this.commandArray$),
-        map(([_, commandArray]) => [...commandArray.commands, '--dry-run'])
-      ),
-      this.commandOutput$.pipe(
-        withLatestFrom(this.commandArray$),
-        map(([_, commandArray]) => commandArray.commands)
-      )
+    const isDryRun = merge(
+      this.dryRunResult$.pipe(map(() => ['--dry-run'])),
+      this.commandOutput$.pipe(map(() => []))
     ).pipe(
-      map(commands => `ng generate ${this.serializer.argsToString(commands)}`)
+      startWith(['--dry-run']),
+      publishReplay(1),
+      refCount()
+    );
+
+    this.command$ = merge(
+      this.commandArray$,
+      this.commandOutput$,
+      this.dryRunResult$
+    ).pipe(
+      switchMap(() => {
+        return this.commandArray$.pipe(
+          map(r => r.commands),
+          withLatestFrom(isDryRun),
+          map(
+            c =>
+              `ng generate ${this.serializer.argsToString([...c[0], ...c[1]])}`
+          )
+        );
+      })
     );
   }
 
