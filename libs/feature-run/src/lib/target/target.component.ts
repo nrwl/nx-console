@@ -14,9 +14,9 @@ import {
 import {
   CommandOutput,
   CommandRunner,
-  Project,
   Serializer
 } from '@angular-console/utils';
+import { Project } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';

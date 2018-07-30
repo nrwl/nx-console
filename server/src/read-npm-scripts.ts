@@ -1,11 +1,11 @@
-import { fileExists } from './utils';
+import { fileExistsSync } from './utils';
 import * as path from 'path';
 
 export function readNpmScripts(
   workspacePath: string,
   packageJson: any
 ): { name: string; npmClient: string }[] {
-  const npmClient = fileExists(path.join(workspacePath, 'yarn.lock'))
+  const npmClient = fileExistsSync(path.join(workspacePath, 'yarn.lock'))
     ? 'yarn'
     : 'npm';
   return Object.keys(packageJson.scripts || {}).map(name => {

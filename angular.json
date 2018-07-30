@@ -18,8 +18,13 @@
             "main": "apps/angular-console/src/main.ts",
             "polyfills": "apps/angular-console/src/polyfills.ts",
             "tsConfig": "apps/angular-console/tsconfig.app.json",
-            "assets": ["apps/angular-console/src/favicon.ico", "apps/angular-console/src/assets"],
-            "styles": ["apps/angular-console/src/styles.scss"],
+            "assets": [
+              "apps/angular-console/src/favicon.ico",
+              "apps/angular-console/src/assets"
+            ],
+            "styles": [
+              "apps/angular-console/src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -67,9 +72,14 @@
             "polyfills": "apps/angular-console/src/polyfills.ts",
             "tsConfig": "apps/angular-console/tsconfig.spec.json",
             "karmaConfig": "apps/angular-console/karma.conf.js",
-            "styles": ["apps/angular-console/src/styles.scss"],
+            "styles": [
+              "apps/angular-console/src/styles.scss"
+            ],
             "scripts": [],
-            "assets": ["apps/angular-console/src/favicon.ico", "apps/angular-console/src/assets"]
+            "assets": [
+              "apps/angular-console/src/favicon.ico",
+              "apps/angular-console/src/assets"
+            ]
           }
         },
         "lint": {
@@ -79,7 +89,9 @@
               "apps/angular-console/tsconfig.app.json",
               "apps/angular-console/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -110,7 +122,9 @@
               "libs/feature-workspaces/tsconfig.lib.json",
               "libs/feature-workspaces/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -136,7 +150,9 @@
               "libs/feature-extensions/tsconfig.lib.json",
               "libs/feature-extensions/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -162,7 +178,9 @@
               "libs/feature-generate/tsconfig.lib.json",
               "libs/feature-generate/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -188,7 +206,9 @@
               "libs/utils/tsconfig.lib.json",
               "libs/utils/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -214,7 +234,9 @@
               "libs/feature-run/tsconfig.lib.json",
               "libs/feature-run/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -240,7 +262,37 @@
               "libs/ui/tsconfig.lib.json",
               "libs/ui/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "schema": {
+      "root": "libs/schema",
+      "sourceRoot": "libs/schema/src",
+      "projectType": "library",
+      "prefix": "angular-console",
+      "architect": {
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/schema/src/test.ts",
+            "tsConfig": "libs/schema/tsconfig.spec.json",
+            "karmaConfig": "libs/schema/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/schema/tsconfig.lib.json",
+              "libs/schema/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }

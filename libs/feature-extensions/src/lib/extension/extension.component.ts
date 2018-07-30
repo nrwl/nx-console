@@ -10,11 +10,8 @@ import {
   TaskRunnerComponent,
   TerminalComponent
 } from '@angular-console/ui';
-import {
-  Extension,
-  CommandOutput,
-  CommandRunner
-} from '@angular-console/utils';
+import { CommandOutput, CommandRunner } from '@angular-console/utils';
+import { Extension } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';

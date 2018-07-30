@@ -18,12 +18,8 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material';
-import {
-  Completions,
-  Field,
-  Serializer,
-  CompletetionValue
-} from '@angular-console/utils';
+import { Completions, Serializer } from '@angular-console/utils';
+import { Field, CompletetionValue } from '@angular-console/schema';
 import { Subscription } from 'rxjs';
 import { debounceTime, startWith, switchMap, map } from 'rxjs/operators';
 
