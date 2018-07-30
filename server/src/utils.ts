@@ -3,18 +3,20 @@ import * as path from 'path';
 const resolve = require('resolve');
 import * as fs from 'fs';
 import { platform } from 'os';
-import { statSync } from 'fs';
+import { statSync, stat } from 'fs';
+import { Observable, bindNodeCallback } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export function findClosestNg(dir: string): string {
   if (directoryExists(path.join(dir, 'node_modules'))) {
     if (platform() === 'win32') {
-      if (fileExists(path.join(dir, 'ng.cmd'))) {
+      if (fileExistsSync(path.join(dir, 'ng.cmd'))) {
         return path.join(dir, 'ng.cmd');
       } else {
         return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
       }
     } else {
-      if (fileExists(path.join(dir, 'node_modules', '.bin', 'ng'))) {
+      if (fileExistsSync(path.join(dir, 'node_modules', '.bin', 'ng'))) {
         return path.join(dir, 'node_modules', '.bin', 'ng');
       } else {
         return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
@@ -54,12 +56,17 @@ export function directoryExists(filePath: string): boolean {
   }
 }
 
-export function fileExists(filePath: string): boolean {
+export function fileExistsSync(filePath: string): boolean {
   try {
     return statSync(filePath).isFile();
   } catch (err) {
     return false;
   }
+}
+
+const observableStat = bindNodeCallback(stat);
+export function fileExists(filePath: string): Observable<boolean> {
+  return observableStat(filePath).pipe(map(stat => stat.isFile()));
 }
 
 export function readJsonFile(

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Field, CompletetionValue } from '@angular-console/utils';
+import { Field, CompletetionValue } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';

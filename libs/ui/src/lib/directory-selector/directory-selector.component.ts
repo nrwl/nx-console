@@ -55,7 +55,7 @@ export class DirectorySelectorComponent implements AfterViewInit {
   }
 
   hasChild(_: number, node: DynamicFlatNode): boolean {
-    return node.hasChildren;
+    return node.file.type === 'directory';
   }
 
   onTreeNodeMouseenter(event: Event) {

@@ -29,7 +29,7 @@ module.exports = {
     },
     server: {
       compile: 'tsc -p server/tsconfig.json',
-      start: 'node dist/server 8888',
+      start: 'node dist/server/src/index.js 8888',
       up: npsUtils.series.nps('server.compile', 'server.start'),
       format: {
         default: npsUtils.series.nps('server.format.write'),

@@ -22,6 +22,7 @@ import {
   completeProjects
 } from './completions';
 import * as os from 'os';
+import { catchError } from 'rxjs/operators';
 
 const dirSync = require('tmp').dirSync;
 const spawn = require('node-pty-prebuilt').spawn;
@@ -486,9 +487,6 @@ export const filesType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
                   name: {
                     type: new graphql.GraphQLNonNull(graphql.GraphQLString)
                   },
-                  hasChildren: {
-                    type: new graphql.GraphQLNonNull(graphql.GraphQLBoolean)
-                  },
                   type: {
                     type: new graphql.GraphQLNonNull(
                       new graphql.GraphQLEnumType({
@@ -612,20 +610,21 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
         directory: {
           type: new graphql.GraphQLNonNull(filesType),
           resolve: (_: any, args: any) => {
-            try {
-              return readDirectory(
-                args.path,
-                args.onlyDirectories,
-                args.showHidden
-              );
-            } catch (e) {
-              console.log(e);
-              throw new Error(
-                `Error when reading the directory "${args.path}". Message: "${
-                  e.message
-                }"`
-              );
-            }
+            return readDirectory(
+              args.path,
+              args.onlyDirectories,
+              args.showHidden
+            )
+              .pipe(
+                catchError(e => {
+                  throw new Error(
+                    `Error when reading the directory "${
+                      args.path
+                    }". Message: "${e.message}"`
+                  );
+                })
+              )
+              .toPromise();
           },
           args: {
             path: { type: graphql.GraphQLString },
