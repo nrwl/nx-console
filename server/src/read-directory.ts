@@ -2,61 +2,80 @@ import { directoryExists, fileExists } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { Observable, bindNodeCallback, of, throwError } from 'rxjs';
+import { Directory, LocalFile, LocalFileType } from '../../libs/schema/src';
+import { map, switchMap, catchError, concatAll, zipAll } from 'rxjs/operators';
+
+const observableReadDir = bindNodeCallback(fs.readdir);
+const observableStat = bindNodeCallback(fs.stat);
 
 export function readDirectory(
   _dirName: string,
   onlyDirectories: boolean,
   showHidden: boolean
-) {
+): Observable<Directory> {
   const dirName =
     _dirName !== '' ? _dirName : os.platform() === 'win32' ? 'C:' : '/';
+
   if (!directoryExists(dirName)) {
     throw new Error(`Cannot find directory: '${dirName}'`);
   }
-  const files = fs
-    .readdirSync(dirName)
-    .map(c => {
-      const child = path.join(dirName, c);
-      console.log(child);
-      try {
-        if (fs.statSync(child).isDirectory()) {
-          if (fileExists(path.join(dirName, c, 'angular.json'))) {
-            return { name: c, type: 'angularDirectory' };
-          } else {
-            return { name: c, type: 'directory' };
+
+  return observableReadDir(dirName).pipe(
+    switchMap(
+      (files: Array<string>): Array<Observable<LocalFile>> => {
+        return files.map(
+          (c): Observable<LocalFile> => {
+            const child = path.join(dirName, c);
+
+            return observableStat(child).pipe(
+              switchMap(
+                (stat: fs.Stats): Observable<LocalFile> => {
+                  if (!stat.isDirectory()) {
+                    return of({ name: c, type: 'file' as LocalFileType });
+                  }
+                  return fileExists(path.join(dirName, c, 'angular.json')).pipe(
+                    map(() => {
+                      return {
+                        name: c,
+                        type: 'angularDirectory' as LocalFileType
+                      };
+                    }),
+                    catchError(
+                      (): Observable<LocalFile> => {
+                        return of({
+                          name: c,
+                          type: 'directory' as LocalFileType
+                        });
+                      }
+                    )
+                  );
+                }
+              )
+            );
           }
-        } else {
-          return { name: c, type: 'file' };
-        }
-      } catch (e) {}
-    })
-    .filter(t => {
-      if (!t) return false;
+        );
+      }
+    ),
+    zipAll(),
+    map(
+      (files: Array<LocalFile>): Directory => {
+        return {
+          path: dirName,
+          files: files.filter(t => {
+            if (!t) return false;
 
-      let show = true;
-      if (onlyDirectories && t.type === 'file') {
-        show = false;
-      }
-      if (!showHidden && t.name.startsWith('.')) {
-        show = false;
-      }
-      return show;
-    })
-    .map((t: any) => {
-      try {
-        const hasChildren =
-          fs.readdirSync(`${dirName}/${t.name}`).filter(child => {
-            try {
-              return fs.statSync(`${dirName}/${t.name}/${child}`).isDirectory();
-            } catch (e) {
-              return false;
+            let show = true;
+            if (onlyDirectories && t.type === 'file') {
+              show = false;
             }
-          }).length > 0;
-        return { ...t, hasChildren };
-      } catch (e) {
-        return { ...t, hasChildren: false };
+            if (!showHidden && t.name.startsWith('.')) {
+              show = false;
+            }
+            return show;
+          })
+        };
       }
-    });
-
-  return { path: dirName, files };
+    )
+  );
 }

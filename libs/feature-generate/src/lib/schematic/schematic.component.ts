@@ -15,9 +15,9 @@ import {
 import {
   CommandOutput,
   CommandRunner,
-  Schematic,
   Serializer
 } from '@angular-console/utils';
+import { Schematic } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';

@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "../dist/server",
+    "outDir": "../dist",
     "module": "commonjs",
     "sourceMap": false,
     "declaration": false,

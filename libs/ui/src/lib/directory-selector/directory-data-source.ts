@@ -1,7 +1,8 @@
 import { CollectionViewer, SelectionChange } from '@angular/cdk/collections';
 import { DataSource } from '@angular/cdk/table';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Finder, LocalFile } from '@angular-console/utils';
+import { Finder } from '@angular-console/utils';
+import { LocalFile } from '@angular-console/schema';
 import { BehaviorSubject, merge, Observable } from 'rxjs';
 import { first, map, tap } from 'rxjs/operators';
 
@@ -11,7 +12,6 @@ export class DynamicFlatNode {
   constructor(
     readonly file: LocalFile,
     readonly path: string,
-    readonly hasChildren: boolean,
     readonly level: number,
     isLoading: boolean = false
   ) {
@@ -117,12 +117,7 @@ export class DirectoryDataSource extends DataSource<DynamicFlatNode> {
       map(directory =>
         directory.files.map(
           file =>
-            new DynamicFlatNode(
-              file,
-              `${directory.path}/${file.name}`,
-              file.hasChildren,
-              level
-            )
+            new DynamicFlatNode(file, `${directory.path}/${file.name}`, level)
         )
       )
     );
