@@ -16,7 +16,8 @@
     "@nrwl/schematics": "6.1.0",
     "@ngrx/schematics": "6.0.1",
     "node-pty-prebuilt": "0.7.3",
-    "electron-updater": "^2.21.4"
+    "electron-updater": "^2.21.4",
+    "semver": "^5.5.0"
   },
   "devDependencies": {
     "electron": "^2.0.3"
