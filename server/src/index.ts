@@ -806,6 +806,11 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
 
 function runCommand(cwd: string, program: string, cmds: string[]) {
   stopAllCommands();
+  if (os.platform() === 'win32') {
+    if (program === 'npm') {
+      program = '"C:\\Program Files\\nodejs\\npm"';
+    }
+  }
   const command = `${program} ${cmds.join(' ')}`;
 
   const commandRunning = spawn(program, cmds, { cwd, cols: 100 });
