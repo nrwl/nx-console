@@ -1,11 +1,12 @@
 import { app, BrowserWindow, Menu, dialog  } from 'electron';
 import * as path from 'path';
-import { spawn } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import { statSync, writeFileSync } from 'fs';
 const fixPath = require('fix-path');
 const getPort = require('get-port');
 import * as os from 'os';
 import { autoUpdater } from 'electron-updater';
+import * as semver from 'semver';
 
 let win: any;
 let p: any;
@@ -115,6 +116,14 @@ function startServer(port: number) {
   console.log('starting server on port', port);
   let started;
 
+  try {
+    if (!semver.gt(execSync('node --version').toString(), 'v7.0.0')) {
+      showCloseDialog();
+    }
+  } catch (e) {
+    showCloseDialog();
+  }
+
   p = spawn('node', ['index.js', port.toString()], {cwd: path.join(__dirname, 'server'), shell: true});
   p.stdout.on('data', (d) => {
     if (d && d.toString().indexOf('AngularConsole Server Started') > -1) {
@@ -134,6 +143,19 @@ function fileExists(filePath: string): boolean {
   } catch (err) {
     return false;
   }
+}
+
+function showCloseDialog() {
+  const dialogOptions = {
+    type: 'error',
+    buttons: ['Close'],
+    message: 'AngularConsole requires NodeJs >= v7.0.0 available in PATH. Download NodeJS here: https://nodejs.org'
+  };
+  dialog.showMessageBox(dialogOptions, i => {
+    if (i === 0) {
+      app.quit();
+    }
+  });
 }
 
 function showRestartDialog() {
