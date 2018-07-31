@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
-import { Schematic, SchematicCollection } from '@angular-console/utils';
+import { SchematicCollection, Schematic } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';

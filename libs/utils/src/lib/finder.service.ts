@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Directory } from '@angular-console/utils';
+import { Directory } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
@@ -25,7 +25,6 @@ export class Finder {
               files {
                 name
                 type
-                hasChildren
               }
             }
           }
