@@ -1,17 +1,37 @@
 import {
+  ContextualActionBarService,
+  DynamicFlatNode,
+  TerminalComponent
+} from '@angular-console/ui';
+import { CommandRunner } from '@angular-console/utils';
+import {
   Component,
-  ChangeDetectionStrategy,
+  Inject,
   OnInit,
-  ViewChild
+  QueryList,
+  ViewChild,
+  ViewChildren,
+  ViewEncapsulation
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+  MatExpansionPanel
+} from '@angular/material';
 import { Router } from '@angular/router';
-import { TerminalComponent, DynamicFlatNode } from '@angular-console/ui';
-import { CommandOutput, CommandRunner } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { combineLatest, Observable, Subject } from 'rxjs';
-import { map, publishReplay, refCount, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import {
+  filter,
+  map,
+  publishReplay,
+  refCount,
+  switchMap,
+  tap
+} from 'rxjs/operators';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -25,28 +45,46 @@ interface NgNewInvocation {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
   selector: 'angular-console-new-workspace',
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.scss']
 })
 export class NewWorkspaceComponent implements OnInit {
+  @ViewChildren(MatExpansionPanel)
+  matExpansionPanels: QueryList<MatExpansionPanel>;
   schematicCollectionsForNgNew$: Observable<any>;
-  ngNewForm$: Observable<FormGroup>;
+  ngNewForm$ = new BehaviorSubject<FormGroup | null>(null);
 
-  commandOutput$: Observable<CommandOutput>;
-  command$ = new Subject();
-  private readonly ngNew$ = new Subject<NgNewInvocation>();
-  @ViewChild(TerminalComponent) out: TerminalComponent;
   selectedNode: DynamicFlatNode | null = null;
+
+  private createNewWorkspace$ = new Subject<void>();
 
   constructor(
     private readonly apollo: Apollo,
-    private readonly commandRunner: CommandRunner,
-    private readonly router: Router
+    private readonly contextActionService: ContextualActionBarService,
+    private readonly matDialog: MatDialog
   ) {}
 
+  private static newFormGroup(): FormGroup {
+    return new FormGroup({
+      name: new FormControl(null, Validators.required),
+      path: new FormControl(null, Validators.required),
+      collection: new FormControl(null, Validators.required)
+    });
+  }
+
   ngOnInit() {
+    this.contextActionService.contextualActions$.subscribe(actions => {
+      if (!actions) {
+        this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
+          panel.close();
+        });
+        this.selectedNode = null;
+        this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
+      }
+    });
+
     this.schematicCollectionsForNgNew$ = this.apollo
       .watchQuery({
         pollInterval: 2000,
@@ -65,57 +103,52 @@ export class NewWorkspaceComponent implements OnInit {
         refCount()
       );
 
-    this.ngNewForm$ = this.schematicCollectionsForNgNew$.pipe(
-      map(r => {
-        return new FormGroup({
-          name: new FormControl(null, Validators.required),
-          path: new FormControl(null, Validators.required),
-          collection: new FormControl(r[0].name, Validators.required)
-        });
-      }),
-      publishReplay(1),
-      refCount()
-    );
+    this.schematicCollectionsForNgNew$.subscribe(() => {
+      this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
+    });
 
-    this.commandOutput$ = this.ngNew$.pipe(
-      switchMap(ngNewInvocation => {
-        this.out.reset();
-        return this.commandRunner.runCommand(
-          gql`
-            mutation($path: String!, $name: String!, $collection: String!) {
-              ngNew(path: $path, name: $name, collection: $collection) {
-                command
-              }
-            }
-          `,
-          ngNewInvocation,
-          false
-        );
-      }),
-      publishReplay(1),
-      refCount()
-    );
-
-    combineLatest(this.ngNew$, this.commandOutput$).subscribe(
-      ([ngNew, command]) => {
-        if (command.status === 'success') {
-          this.router.navigate([
-            '/workspace',
-            `${ngNew.path}/${ngNew.name}`,
-            'details'
-          ]);
-        }
+    this.createNewWorkspace$.subscribe(() => {
+      const form = this.ngNewForm$.value;
+      if (form) {
+        this.createNewWorkspace(form.value as NgNewInvocation);
       }
-    );
+    });
+
+    this.ngNewForm$
+      .pipe(
+        filter(form => Boolean(form)),
+        switchMap((form: FormGroup) => form.valueChanges)
+      )
+      .subscribe((formValue: any) => {
+        if (formValue.path) {
+          this.contextActionService.contextualActions$.next({
+            contextTitle: 'Fill In Required Details',
+            actions: [
+              {
+                name: 'Create',
+                disabled: new BehaviorSubject(this.ngNewForm$.value!.invalid),
+                invoke: this.createNewWorkspace$
+              }
+            ]
+          });
+        } else {
+          this.contextActionService.contextualActions$.next(null);
+        }
+      });
   }
 
   createNewWorkspace(ngNewInvocation: NgNewInvocation) {
-    this.command$.next(
-      `ng new ${ngNewInvocation.name} --collection=${
-        ngNewInvocation.collection
-      }`
-    );
-    this.ngNew$.next(ngNewInvocation);
+    this.matDialog
+      .open(CreateNewWorkspaceDialog, {
+        width: 'calc(100vw - 128px)',
+        height: 'calc(100vh - 128px)',
+        panelClass: 'create-new-workspace-dialog',
+        data: { ngNewInvocation }
+      })
+      .beforeClose()
+      .subscribe(() => {
+        this.contextActionService.contextualActions$.next(null);
+      });
   }
 
   trackByName(_: number, collection: SchematicCollectionForNgNew) {
@@ -123,22 +156,74 @@ export class NewWorkspaceComponent implements OnInit {
   }
 
   setPathField(node: DynamicFlatNode) {
-    if (this.selectedNode === node) {
-      this.selectedNode = null;
-      this.ngNewForm$.subscribe(form => {
-        const field = form.get('path');
-        if (field) {
-          field.setValue(null);
-        }
-      });
+    const form = this.ngNewForm$.value;
+    if (!form) {
       return;
     }
-    this.selectedNode = node;
-    this.ngNewForm$.subscribe(form => {
+
+    const field = form.get('path');
+    if (!field) {
+      return;
+    }
+
+    if (this.selectedNode === node) {
+      this.selectedNode = null;
       const field = form.get('path');
       if (field) {
-        field.setValue(node.path);
+        field.setValue(null);
       }
-    });
+    } else {
+      this.selectedNode = node;
+      field.setValue(node.path);
+    }
   }
+}
+
+@Component({
+  selector: 'create-new-workspace-dialog',
+  template: `
+    <ui-terminal [command]="command" [input]="(commandOutput$|async)?.out"></ui-terminal>
+  `
+})
+export class CreateNewWorkspaceDialog {
+  command = `ng new ${this.data.ngNewInvocation.name} --collection=${
+    this.data.ngNewInvocation.collection
+  }`;
+
+  commandOutput$ = this.commandRunner
+    .runCommand(
+      gql`
+        mutation($path: String!, $name: String!, $collection: String!) {
+          ngNew(path: $path, name: $name, collection: $collection) {
+            command
+          }
+        }
+      `,
+      this.data.ngNewInvocation,
+      false
+    )
+    .pipe(
+      tap(command => {
+        if (command.status === 'success') {
+          this.dialogRef.close();
+          this.router.navigate([
+            '/workspace',
+            `${this.data.ngNewInvocation.path}/${
+              this.data.ngNewInvocation.name
+            }`,
+            'details'
+          ]);
+        }
+      })
+    );
+
+  constructor(
+    private readonly dialogRef: MatDialogRef<CreateNewWorkspaceDialog>,
+    private readonly commandRunner: CommandRunner,
+    private readonly router: Router,
+    @Inject(MAT_DIALOG_DATA)
+    readonly data: {
+      ngNewInvocation: NgNewInvocation;
+    }
+  ) {}
 }

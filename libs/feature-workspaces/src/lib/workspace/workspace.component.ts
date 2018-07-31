@@ -1,19 +1,20 @@
+import {
+  ContextualActionBarService,
+  FADE_IN,
+  GROW_SHRINK,
+  animateUp,
+  animateDown
+} from '@angular-console/ui';
+import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
 import {
+  ChangeDetectionStrategy,
   Component,
   HostBinding,
   OnDestroy,
-  ViewEncapsulation,
-  ChangeDetectionStrategy
+  ViewEncapsulation
 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import {
-  animateDown,
-  animateUp,
-  ContextualActionBarService,
-  GROW_SHRINK
-} from '@angular-console/ui';
-import { Settings } from '@angular-console/utils';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';

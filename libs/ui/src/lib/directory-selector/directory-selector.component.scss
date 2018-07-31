@@ -9,7 +9,8 @@ mat-tree-node {
   &.selected {
     background: #1976d2;
 
-    .angular-directory-name {
+    .expand-icon,
+    .directory-name {
       color: white !important;
     }
   }
@@ -20,20 +21,18 @@ mat-tree-node {
 }
 
 .directory {
-  min-height: 48px;
-  max-height: 48px;
-  height: 48px;
+  min-height: 36px;
+  max-height: 36px;
+  height: 36px;
   text-align: left;
   padding-left: 0;
-}
 
-.directory-name {
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.54);
+  .directory-name {
+    font-weight: 400;
 
-  &.angular-directory-name {
-    color: rgba(0, 0, 0, 0.87);
-    font-weight: 500;
+    &.angular-directory-name {
+      font-weight: 500;
+    }
   }
 }
 

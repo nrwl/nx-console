@@ -5,6 +5,7 @@ import {
   ContextualActionBarService
 } from '@angular-console/ui';
 import { Subject } from 'rxjs';
+import { LocalFile } from '@angular-console/schema';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +38,10 @@ export class ImportWorkspaceComponent implements OnDestroy {
         this.selectedNode = null;
       }
     });
+  }
+
+  disableNonAngularDirectory(node: DynamicFlatNode): boolean {
+    return node.file.type !== 'angularDirectory';
   }
 
   ngOnDestroy() {

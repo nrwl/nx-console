@@ -6,12 +6,7 @@ import {
   OnInit
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import {
-  animateLeft,
-  animateRight,
-  ContextualActionBarService,
-  fadeIn
-} from '@angular-console/ui';
+import { ContextualActionBarService, FADE_IN } from '@angular-console/ui';
 import { filter, map } from 'rxjs/operators';
 import {
   CREATE_WORKSPACE,
@@ -22,10 +17,6 @@ import {
 } from '@angular-console/feature-workspaces';
 import { Observable } from 'rxjs';
 
-const TIMING = '500ms ease-in-out';
-const ANIMATE_LEFT = animateLeft(TIMING);
-const ANIMATE_RIGHT = animateRight(TIMING);
-
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-root',
@@ -34,13 +25,7 @@ const ANIMATE_RIGHT = animateRight(TIMING);
   animations: [
     trigger('routerTransition', [
       transition('void => *', []),
-      transition(`${CREATE_WORKSPACE} => ${WORKSPACES}`, ANIMATE_LEFT),
-      transition(`${IMPORT_WORKSPACE} => ${WORKSPACES}`, ANIMATE_LEFT),
-      transition(`${IMPORT_WORKSPACE} => ${CREATE_WORKSPACE}`, ANIMATE_LEFT),
-      transition(`${WORKSPACES} => ${CREATE_WORKSPACE}`, ANIMATE_RIGHT),
-      transition(`${WORKSPACES} => ${IMPORT_WORKSPACE}`, ANIMATE_RIGHT),
-      transition(`${CREATE_WORKSPACE} => ${IMPORT_WORKSPACE}`, ANIMATE_RIGHT),
-      transition(`* <=> ${WORKSPACE}`, fadeIn(`500ms ease-in-out`))
+      transition(`* => *`, FADE_IN)
     ])
   ]
 })

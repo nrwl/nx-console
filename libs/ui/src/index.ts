@@ -5,6 +5,7 @@ export * from '@angular-console/ui/src/lib/contextual-action-bar/contextual-acti
 export * from '@angular-console/ui/src/lib/contextual-action-bar/contextual-action-bar.component';
 export * from '@angular-console/ui/src/lib/task-runner/task-runner.component';
 export * from '@angular-console/ui/src/lib/flags/flags.component';
-export * from '@angular-console/ui/src/lib/animations/routing';
+export * from '@angular-console/ui/src/lib/animations/fade-in';
 export * from '@angular-console/ui/src/lib/animations/grow-shink';
 export * from '@angular-console/ui/src/lib/directory-selector/directory-data-source';
+export * from '@angular-console/ui/src/lib/animations/routing';

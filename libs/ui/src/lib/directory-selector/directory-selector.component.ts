@@ -46,8 +46,6 @@ export class DirectorySelectorComponent implements AfterViewInit {
   @Input()
   readonly disableNode: (node: DynamicFlatNode) => boolean = () => false;
 
-  @Input() readonly handleNodeCreation: (node: DynamicFlatNode) => void;
-
   constructor(private readonly finder: Finder) {}
 
   ngAfterViewInit() {
@@ -56,31 +54,5 @@ export class DirectorySelectorComponent implements AfterViewInit {
 
   hasChild(_: number, node: DynamicFlatNode): boolean {
     return node.file.type === 'directory';
-  }
-
-  onTreeNodeMouseenter(event: Event) {
-    if (!this.handleNodeCreation || !event.target) {
-      return;
-    }
-    const btn = (event.target as HTMLElement).querySelector(
-      '.node-creation-button'
-    );
-    if (!btn) {
-      return;
-    }
-    btn.classList.remove('hidden');
-  }
-
-  onTreeNodeMouseleave(event: Event) {
-    if (!this.handleNodeCreation || !event.target) {
-      return;
-    }
-    const btn = (event.target as HTMLElement).querySelector(
-      '.node-creation-button'
-    );
-    if (!btn) {
-      return;
-    }
-    btn.classList.add('hidden');
   }
 }
