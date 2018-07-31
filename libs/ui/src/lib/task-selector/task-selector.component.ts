@@ -36,7 +36,7 @@ export interface TaskCollections<T> {
   selectedTask: Task<T> | null;
 }
 
-const ANIMATION_MILLIS = 800;
+const ANIMATION_MILLIS = 400;
 const ROUTE_CHANGE_DELAY = 300;
 
 @Component({

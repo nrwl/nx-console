@@ -11,7 +11,10 @@ import { UiModule } from '@angular-console/ui';
 
 import { DetailsComponent } from './details/details.component';
 import { ImportWorkspaceComponent } from './import-workspace/import-workspace.component';
-import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
+import {
+  NewWorkspaceComponent,
+  CreateNewWorkspaceDialog
+} from './new-workspace/new-workspace.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspacesComponent } from './workspaces/workspaces.component';
 
@@ -19,6 +22,7 @@ import {
   extensionsRoutes,
   FeatureExtensionsModule
 } from '@angular-console/feature-extensions';
+import { MatDialogModule } from '../../../../node_modules/@angular/material';
 
 export type FeatureWorkspaceRouteState =
   | 'workspaces'
@@ -75,6 +79,7 @@ export const workspaceRoutes: Route[] = [
 
 @NgModule({
   imports: [
+    MatDialogModule,
     RouterModule,
     FeatureExtensionsModule,
     FeatureGenerateModule,
@@ -87,7 +92,9 @@ export const workspaceRoutes: Route[] = [
     NewWorkspaceComponent,
     ImportWorkspaceComponent,
     WorkspaceComponent,
-    WorkspacesComponent
-  ]
+    WorkspacesComponent,
+    CreateNewWorkspaceDialog
+  ],
+  entryComponents: [CreateNewWorkspaceDialog]
 })
 export class FeatureWorkspacesModule {}

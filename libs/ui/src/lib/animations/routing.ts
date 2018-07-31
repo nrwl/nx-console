@@ -40,10 +40,3 @@ export function animateRight(timing: string): AnimationGroupMetadata {
     query(':leave', animate(timing, STAGE_LEFT))
   ]);
 }
-
-export function fadeIn(timing: string): AnimationQueryMetadata {
-  return query(':enter', [
-    style({ opacity: 0 }),
-    animate(timing, style({ opacity: 1 }))
-  ]);
-}

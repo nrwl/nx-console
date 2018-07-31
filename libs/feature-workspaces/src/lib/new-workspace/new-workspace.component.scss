@@ -1,26 +1,76 @@
-.error {
-  background-color: red;
-}
-
-:host {
+angular-console-new-workspace {
   width: 100%;
-}
+  overflow: hidden;
 
-.ui-flags {
-  background: white;
-  overflow: auto;
-
-  .name {
-    padding: 24px;
-    font-size: 20px;
-    font-weight: 500;
+  .error {
+    background-color: red;
   }
 
-  .description {
-    padding: 24px;
+  .ui-flags {
+    background: white;
+    overflow: auto;
+
+    .name {
+      padding: 24px;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .description {
+      padding: 24px;
+    }
+  }
+
+  .submit-button-container {
+    margin: 40px 20px;
+  }
+
+  .mat-expansion-panel-content {
+    max-height: calc(100vh - 278px) !important;
+
+    overflow: auto !important;
+  }
+
+  .expand .mat-expansion-panel-content {
+    max-height: calc(100vh - 230px) !important;
+  }
+
+  .mat-expanded mat-expansion-panel-header {
+    z-index: 1;
+    position: relative;
+  }
+
+  mat-expansion-panel-header {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: rgba(0, 0, 0, 0);
+    transition: border-bottom-color 0.1s ease-in-out;
+
+    &.mat-expanded {
+      border-bottom-color: rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .mat-expansion-panel-content {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  .mat-expansion-panel-body {
+    padding-top: 16px;
+  }
+
+  .directory-selector .mat-expansion-panel-body {
+    padding: 0 !important;
   }
 }
 
-.submit-button-container {
-  margin: 40px 20px;
+.create-new-workspace-dialog mat-dialog-container {
+  background: black !important;
+  overflow: hidden;
+  padding: 12px !important;
+  padding-bottom: 0 !important;
+
+  .terminal-container {
+    height: 100% !important;
+  }
 }
