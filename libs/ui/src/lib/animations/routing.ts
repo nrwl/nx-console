@@ -1,10 +1,9 @@
 import {
   animate,
+  AnimationGroupMetadata,
   group,
   query,
-  style,
-  AnimationGroupMetadata,
-  AnimationQueryMetadata
+  style
 } from '@angular/animations';
 
 const STAGE = style({ transform: 'translateZ(0)' });

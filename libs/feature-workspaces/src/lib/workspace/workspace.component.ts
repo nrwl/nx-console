@@ -1,6 +1,5 @@
 import {
   ContextualActionBarService,
-  FADE_IN,
   GROW_SHRINK,
   animateUp,
   animateDown

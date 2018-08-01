@@ -5,7 +5,6 @@ import {
   ContextualActionBarService
 } from '@angular-console/ui';
 import { Subject } from 'rxjs';
-import { LocalFile } from '@angular-console/schema';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

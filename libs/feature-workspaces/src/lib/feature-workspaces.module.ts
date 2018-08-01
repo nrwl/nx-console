@@ -11,10 +11,8 @@ import { UiModule } from '@angular-console/ui';
 
 import { DetailsComponent } from './details/details.component';
 import { ImportWorkspaceComponent } from './import-workspace/import-workspace.component';
-import {
-  NewWorkspaceComponent,
-  CreateNewWorkspaceDialog
-} from './new-workspace/new-workspace.component';
+import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
+import { NewWorkspaceDialogComponent } from './new-workspace/new-workspace-dialog.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspacesComponent } from './workspaces/workspaces.component';
 
@@ -93,8 +91,8 @@ export const workspaceRoutes: Route[] = [
     ImportWorkspaceComponent,
     WorkspaceComponent,
     WorkspacesComponent,
-    CreateNewWorkspaceDialog
+    NewWorkspaceDialogComponent
   ],
-  entryComponents: [CreateNewWorkspaceDialog]
+  entryComponents: [NewWorkspaceDialogComponent]
 })
 export class FeatureWorkspacesModule {}
