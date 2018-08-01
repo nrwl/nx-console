@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class EditorSupport {
-  private readonly editors$: Observable<{ name: string; icon: string }>;
+  private readonly editors$: Observable<Array<{ name: string; icon: string }>>;
 
   constructor(private readonly apollo: Apollo) {
     this.editors$ = this.apollo
