@@ -93,14 +93,17 @@ function createMenu() {
 function createWindow() {
   win = new BrowserWindow({ width: 1400, height: 1200 });
 
-  getPort({port: 7777}).then(port => {
-    startServer(port).then(() => {
+  getPort({ port: 7777 }).then(port => {
+    try {
+      startServer(port);
       if (fileExists(path.join(currentDirectory, 'angular.json'))) {
         win.loadURL(`http://localhost:${port}/workspace/${encodeURIComponent(currentDirectory)}/details`);
       } else {
         win.loadURL(`http://localhost:${port}`);
       }
-    });
+    } catch (e) {
+      showCloseDialog(`Error when starting Angular Console: ${e.message}`);
+    }
   });
 
   win.on('close', () => {
@@ -114,27 +117,8 @@ function createWindow() {
 
 function startServer(port: number) {
   console.log('starting server on port', port);
-  let started;
-
-  try {
-    if (!semver.gt(execSync('node --version').toString(), 'v7.0.0')) {
-      showCloseDialog();
-    }
-  } catch (e) {
-    showCloseDialog();
-  }
-
-  p = spawn('node', ['index.js', port.toString()], {cwd: path.join(__dirname, 'server'), shell: true});
-  p.stdout.on('data', (d) => {
-    if (d && d.toString().indexOf('AngularConsole Server Started') > -1) {
-      started();
-    }
-    console.log(d && d.toString());
-  });
-  p.stderr.on('data', (d) => console.log(d && d.toString()));
-  p.on('exit', (d) => console.log(d && d.toString()));
-
-  return new Promise(res => started = res);
+  const {start} = require('./server/index');
+  start(port);
 }
 
 function fileExists(filePath: string): boolean {
@@ -145,11 +129,11 @@ function fileExists(filePath: string): boolean {
   }
 }
 
-function showCloseDialog() {
+function showCloseDialog(message: string) {
   const dialogOptions = {
     type: 'error',
     buttons: ['Close'],
-    message: 'AngularConsole requires NodeJs >= v7.0.0 available in PATH. Download NodeJS here: https://nodejs.org'
+    message
   };
   dialog.showMessageBox(dialogOptions, i => {
     if (i === 0) {

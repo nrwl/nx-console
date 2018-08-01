@@ -3,8 +3,8 @@
     <h3 mat-subheader *ngIf="first">Favorites</h3>
     <mat-list-item [disableRipple]="true" (click)="workspacesService.openWorkspace(w.path)">
       <mat-icon (click)="settings.toggleFavorite(w); $event.stopPropagation();" mat-list-icon class="favorite-icon favorited">favorite</mat-icon>
-      <h4 mat-line>{{w.name}}</h4>
-      <p mat-line> {{w.path}} </p>
+      <h4 mat-line>{{ w.name }}</h4>
+      <p mat-line> {{ w.path }} </p>
       <mat-icon (click)="settings.removeRecent(w); $event.stopPropagation()">clear</mat-icon>
     </mat-list-item>
   </ng-container>
@@ -12,8 +12,8 @@
     <h3 mat-subheader *ngIf="first">Recently opened</h3>
     <mat-list-item [disableRipple]="true" (click)="workspacesService.openWorkspace(w.path)">
       <mat-icon (click)="settings.toggleFavorite(w); $event.stopPropagation();" mat-list-icon class="favorite-icon">favorite_border</mat-icon>
-      <h4 mat-line>{{w.name}}</h4>
-      <p mat-line> {{w.path}} </p>
+      <h4 mat-line>{{ w.name }}</h4>
+      <p mat-line> {{ w.path }} </p>
       <mat-icon (click)="settings.removeRecent(w); $event.stopPropagation()">clear</mat-icon>
     </mat-list-item>
   </ng-container>

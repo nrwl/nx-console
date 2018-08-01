@@ -2,9 +2,9 @@ import { directoryExists, fileExists } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { Observable, bindNodeCallback, of, throwError } from 'rxjs';
+import { bindNodeCallback, Observable, of } from 'rxjs';
 import { Directory, LocalFile, LocalFileType } from '../../libs/schema/src';
-import { map, switchMap, catchError, concatAll, zipAll } from 'rxjs/operators';
+import { catchError, map, switchMap, zipAll } from 'rxjs/operators';
 
 const observableReadDir = bindNodeCallback(fs.readdir);
 const observableStat = bindNodeCallback(fs.stat);
@@ -15,17 +15,15 @@ export function readDirectory(
   showHidden: boolean
 ): Observable<Directory> {
   const dirName =
-    _dirName !== '' ? _dirName : os.platform() === 'win32' ? 'C:' : '/';
-
+    _dirName !== '' ? _dirName : os.platform() === 'win32' ? 'C://' : '/';
   if (!directoryExists(dirName)) {
     throw new Error(`Cannot find directory: '${dirName}'`);
   }
-
   return observableReadDir(dirName).pipe(
     switchMap(
-      (files: Array<string>): Array<Observable<LocalFile>> => {
+      (files: Array<string>): Array<Observable<LocalFile | null>> => {
         return files.map(
-          (c): Observable<LocalFile> => {
+          (c): Observable<LocalFile | null> => {
             const child = path.join(dirName, c);
 
             return observableStat(child).pipe(
@@ -51,6 +49,11 @@ export function readDirectory(
                     )
                   );
                 }
+              ),
+              catchError(
+                (): Observable<LocalFile | null> => {
+                  return of(null);
+                }
               )
             );
           }
@@ -59,7 +62,7 @@ export function readDirectory(
     ),
     zipAll(),
     map(
-      (files: Array<LocalFile>): Directory => {
+      (files: Array<LocalFile | null>): Directory => {
         return {
           path: dirName,
           files: files.filter(t => {
@@ -73,7 +76,7 @@ export function readDirectory(
               show = false;
             }
             return show;
-          })
+          }) as any
         };
       }
     )
