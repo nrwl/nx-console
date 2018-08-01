@@ -1,0 +1,61 @@
+import { CommandRunner } from '@angular-console/utils';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { Router } from '@angular/router';
+import gql from 'graphql-tag';
+import { tap } from 'rxjs/operators';
+
+export interface NgNewInvocation {
+  name: string;
+  path: string;
+  collection: string;
+}
+
+@Component({
+  selector: 'angular-console-new-workspace-dialog',
+  template: `
+      <ui-terminal [command]="command" [input]="(commandOutput$|async)?.out"></ui-terminal>
+    `
+})
+export class NewWorkspaceDialogComponent {
+  command = `ng new ${this.data.ngNewInvocation.name} --collection=${
+    this.data.ngNewInvocation.collection
+  }`;
+
+  commandOutput$ = this.commandRunner
+    .runCommand(
+      gql`
+        mutation($path: String!, $name: String!, $collection: String!) {
+          ngNew(path: $path, name: $name, collection: $collection) {
+            command
+          }
+        }
+      `,
+      this.data.ngNewInvocation,
+      false
+    )
+    .pipe(
+      tap(command => {
+        if (command.status === 'success') {
+          this.dialogRef.close();
+          this.router.navigate([
+            '/workspace',
+            `${this.data.ngNewInvocation.path}/${
+              this.data.ngNewInvocation.name
+            }`,
+            'details'
+          ]);
+        }
+      })
+    );
+
+  constructor(
+    private readonly dialogRef: MatDialogRef<NewWorkspaceDialogComponent>,
+    private readonly commandRunner: CommandRunner,
+    private readonly router: Router,
+    @Inject(MAT_DIALOG_DATA)
+    readonly data: {
+      ngNewInvocation: NgNewInvocation;
+    }
+  ) {}
+}

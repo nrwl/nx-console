@@ -1,26 +1,16 @@
 import {
   ContextualActionBarService,
-  DynamicFlatNode,
-  TerminalComponent
+  DynamicFlatNode
 } from '@angular-console/ui';
-import { CommandRunner } from '@angular-console/utils';
 import {
   Component,
-  Inject,
   OnInit,
   QueryList,
-  ViewChild,
   ViewChildren,
   ViewEncapsulation
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import {
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatDialogRef,
-  MatExpansionPanel
-} from '@angular/material';
-import { Router } from '@angular/router';
+import { MatDialog, MatExpansionPanel } from '@angular/material';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -29,19 +19,16 @@ import {
   map,
   publishReplay,
   refCount,
-  switchMap,
-  tap
+  switchMap
 } from 'rxjs/operators';
+import {
+  NewWorkspaceDialogComponent,
+  NgNewInvocation
+} from './new-workspace-dialog.component';
 
 interface SchematicCollectionForNgNew {
   name: string;
   description: string;
-}
-
-interface NgNewInvocation {
-  name: string;
-  path: string;
-  collection: string;
 }
 
 @Component({
@@ -58,7 +45,7 @@ export class NewWorkspaceComponent implements OnInit {
 
   selectedNode: DynamicFlatNode | null = null;
 
-  private createNewWorkspace$ = new Subject<void>();
+  private readonly createNewWorkspace$ = new Subject<void>();
 
   constructor(
     private readonly apollo: Apollo,
@@ -120,13 +107,14 @@ export class NewWorkspaceComponent implements OnInit {
         switchMap((form: FormGroup) => form.valueChanges)
       )
       .subscribe((formValue: any) => {
-        if (formValue.path) {
+        const form = this.ngNewForm$.value;
+        if (form && formValue.path) {
           this.contextActionService.contextualActions$.next({
             contextTitle: 'Fill In Required Details',
             actions: [
               {
                 name: 'Create',
-                disabled: new BehaviorSubject(this.ngNewForm$.value!.invalid),
+                disabled: new BehaviorSubject(form.invalid),
                 invoke: this.createNewWorkspace$
               }
             ]
@@ -139,7 +127,7 @@ export class NewWorkspaceComponent implements OnInit {
 
   createNewWorkspace(ngNewInvocation: NgNewInvocation) {
     this.matDialog
-      .open(CreateNewWorkspaceDialog, {
+      .open(NewWorkspaceDialogComponent, {
         width: 'calc(100vw - 128px)',
         height: 'calc(100vh - 128px)',
         panelClass: 'create-new-workspace-dialog',
@@ -168,62 +156,10 @@ export class NewWorkspaceComponent implements OnInit {
 
     if (this.selectedNode === node) {
       this.selectedNode = null;
-      const field = form.get('path');
-      if (field) {
-        field.setValue(null);
-      }
+      field.setValue(null);
     } else {
       this.selectedNode = node;
       field.setValue(node.path);
     }
   }
-}
-
-@Component({
-  selector: 'create-new-workspace-dialog',
-  template: `
-    <ui-terminal [command]="command" [input]="(commandOutput$|async)?.out"></ui-terminal>
-  `
-})
-export class CreateNewWorkspaceDialog {
-  command = `ng new ${this.data.ngNewInvocation.name} --collection=${
-    this.data.ngNewInvocation.collection
-  }`;
-
-  commandOutput$ = this.commandRunner
-    .runCommand(
-      gql`
-        mutation($path: String!, $name: String!, $collection: String!) {
-          ngNew(path: $path, name: $name, collection: $collection) {
-            command
-          }
-        }
-      `,
-      this.data.ngNewInvocation,
-      false
-    )
-    .pipe(
-      tap(command => {
-        if (command.status === 'success') {
-          this.dialogRef.close();
-          this.router.navigate([
-            '/workspace',
-            `${this.data.ngNewInvocation.path}/${
-              this.data.ngNewInvocation.name
-            }`,
-            'details'
-          ]);
-        }
-      })
-    );
-
-  constructor(
-    private readonly dialogRef: MatDialogRef<CreateNewWorkspaceDialog>,
-    private readonly commandRunner: CommandRunner,
-    private readonly router: Router,
-    @Inject(MAT_DIALOG_DATA)
-    readonly data: {
-      ngNewInvocation: NgNewInvocation;
-    }
-  ) {}
 }

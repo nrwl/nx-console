@@ -12,8 +12,7 @@ import {
   CREATE_WORKSPACE,
   IMPORT_WORKSPACE,
   WORKSPACES,
-  FeatureWorkspaceRouteState,
-  WORKSPACE
+  FeatureWorkspaceRouteState
 } from '@angular-console/feature-workspaces';
 import { Observable } from 'rxjs';
 
