@@ -12,6 +12,24 @@ export function findExecutable(command: string, cwd: string): string {
   if (paths === void 0 || paths.length === 0) {
     return path.join(cwd, command);
   }
+  const r = findInPath(command, cwd, paths);
+  return r ? r : path.join(cwd, command);
+}
+
+export function hasExecutable(command: string, cwd: string): boolean {
+  const paths = (process.env.PATH as string).split(path.delimiter);
+  if (paths === void 0 || paths.length === 0) {
+    return false;
+  } else {
+    return !!findInPath(command, cwd, paths);
+  }
+}
+
+function findInPath(
+  command: string,
+  cwd: string,
+  paths: string[]
+): string | undefined {
   for (let pathEntry of paths) {
     let fullPath: string;
     if (path.isAbsolute(pathEntry)) {
@@ -27,7 +45,7 @@ export function findExecutable(command: string, cwd: string): string {
       return fullPath;
     }
   }
-  return path.join(cwd, command);
+  return undefined;
 }
 
 export function findClosestNg(dir: string): string {
