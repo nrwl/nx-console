@@ -5,6 +5,7 @@ import {
   directoryExists,
   filterByName,
   findClosestNg,
+  findExecutable,
   listFilesRec,
   readJsonFile
 } from './utils';
@@ -609,22 +610,25 @@ export const queryType: graphql.GraphQLObjectType = new graphql.GraphQLObjectTyp
         },
         directory: {
           type: new graphql.GraphQLNonNull(filesType),
-          resolve: (_: any, args: any) => {
-            return readDirectory(
-              args.path,
-              args.onlyDirectories,
-              args.showHidden
-            )
-              .pipe(
-                catchError(e => {
-                  throw new Error(
-                    `Error when reading the directory "${
-                      args.path
-                    }". Message: "${e.message}"`
-                  );
-                })
-              )
-              .toPromise();
+          resolve: async (_: any, args: any) => {
+            try {
+              const v = await readDirectory(
+                args.path,
+                args.onlyDirectories,
+                args.showHidden
+              ).toPromise();
+              if (!v) {
+                return { path: args.path, files: [] };
+              }
+              return v;
+            } catch (e) {
+              console.log(e);
+              throw new Error(
+                `Error when reading the directory "${args.path}". Message: "${
+                  e.message
+                }"`
+              );
+            }
           },
           args: {
             path: { type: graphql.GraphQLString },
@@ -746,7 +750,11 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
           },
           resolve: async (_root: any, args: any) => {
             try {
-              return runCommand(args.path, args.npmClient, args.runCommand);
+              return runCommand(
+                args.path,
+                findExecutable(args.npmClient, args.path),
+                args.runCommand
+              );
             } catch (e) {
               console.log(e);
               throw new Error(
@@ -807,7 +815,6 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
 function runCommand(cwd: string, program: string, cmds: string[]) {
   stopAllCommands();
   const command = `${program} ${cmds.join(' ')}`;
-
   const commandRunning = spawn(program, cmds, { cwd, cols: 100 });
   commandInProgress = {
     command,
@@ -873,7 +880,10 @@ app.get('/workspace/*', (req, res) => {
 // workspaces
 app.use(express.static(path.join(__dirname, 'public')));
 
-const port = process.argv[2];
-app.listen(port ? port : 7777);
+export function start(port: number) {
+  app.listen(port ? port : 7777);
+}
 
-console.log('AngularConsole Server Started');
+if (process.argv[2]) {
+  start(+process.argv[2]);
+}

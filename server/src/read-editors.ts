@@ -58,7 +58,15 @@ function hasVsCode() {
     // TODO implement linux support
     return false;
   } else if (os.platform() === 'win32') {
-    return execSync('code --version').indexOf('is not recognized') === -1;
+    try {
+      return (
+        execSync('code --version')
+          .toString()
+          .indexOf('is not recognized') === -1
+      );
+    } catch (e) {
+      return false;
+    }
   } else {
     return false;
   }

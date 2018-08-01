@@ -115,10 +115,21 @@ export class DirectoryDataSource extends DataSource<DynamicFlatNode> {
     return this.finder.listFiles(path, true).pipe(
       first(),
       map(directory =>
-        directory.files.map(
-          file =>
-            new DynamicFlatNode(file, `${directory.path}/${file.name}`, level)
-        )
+        directory.files.map(file => {
+          if (directory.path === '/' || directory.path === 'C://') {
+            return new DynamicFlatNode(
+              file,
+              `${directory.path}${file.name}`,
+              level
+            );
+          } else {
+            return new DynamicFlatNode(
+              file,
+              `${directory.path}/${file.name}`,
+              level
+            );
+          }
+        })
       )
     );
   }

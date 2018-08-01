@@ -33,15 +33,15 @@ module.exports = {
       up: npsUtils.series.nps('server.compile', 'server.start'),
       format: {
         default: npsUtils.series.nps('server.format.write'),
-        write: 'prettier --write \'./server/**/*.ts\'',
-        check: 'prettier --list-different \'./server/**/*.ts\''
+        write: 'prettier --write \"./server/**/*.ts\"',
+        check: 'prettier --list-different \"./server/**/*.ts\"'
       }
     },
     electron: {
       'clean': 'rm -rf dist',
       'compile': 'tsc -p electron/tsconfig.json',
       'copy-assets': 'cp electron/package.json dist/electron/package.json && cp -r electron/assets dist/electron',
-      'copy-server': 'cp -r dist/server dist/electron/server',
+      'copy-server': 'cp -r dist/server/src dist/electron/server',
       'install-node-modules': 'cd dist/electron && yarn',
       'copy-frontend': 'cp -r dist/apps/angular-console dist/electron/server/public',
       'start': 'NODE_ENV=development electron dist/electron',
@@ -49,12 +49,24 @@ module.exports = {
       'prepackage': npsUtils.series.nps('electron.clean', 'electron.compile', 'electron.copy-assets', 'frontend.build', 'server.compile', 'electron.copy-server', 'electron.copy-frontend', 'electron.install-node-modules'),
       'up': npsUtils.series.nps('electron.prepackage', 'electron.start'),
 
-      'builder-dist-mac': 'electron-builder --mac -p never',
-      'dist-mac': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-mac'),
-      'builder-dist-win': 'electron-builder --win -p never',
-      'dist-win': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-win'),
-      'builder-dist-mac-and-win': 'electron-builder --mac --win -p always',
-      'publish': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-mac-and-win'),
+      'builder-dist': 'electron-builder --mac -p never',
+      'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
+      'dist': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist', 'electron.copy-to-osbuilds')
+    },
+    electronwin: {
+      'clean': 'rmdir dist /s /q',
+      'compile': 'tsc -p electron/tsconfig.json',
+      'copy-assets': 'copy electron\\package.json dist\\electron\\package.json && (robocopy electron\\assets dist\\electron\\assets /e || echo 0)',
+      'copy-server': 'robocopy dist\\server\\src dist\\electron\\server /e || echo 0',
+      'install-node-modules': 'cd dist\\electron && yarn',
+      'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\electron\\server\\public /e || echo 0',
+      'start': 'electron dist/electron',
+      'prepackage': npsUtils.series.nps('electronwin.clean', 'electronwin.compile', 'electronwin.copy-assets', 'frontend.build', 'server.compile', 'electronwin.copy-server', 'electronwin.copy-frontend', 'electronwin.install-node-modules'),
+      'up': npsUtils.series.nps('electronwin.prepackage', 'electronwin.start'),
+
+      'builder-dist': 'electron-builder --win -p never',
+      'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
+      'dist': npsUtils.series.nps('electronwin.prepackage', 'electronwin.builder-dist', 'electronwin.copy-to-osbuilds')
     },
     dev: {
       up: npsUtils.concurrent.nps('server.up', 'frontend.serve'),

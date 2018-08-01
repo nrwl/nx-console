@@ -113,9 +113,6 @@ describe('Tasks', () => {
       .contains('Run')
       .click();
 
-    waitForBuild();
-    checkFileExists(`dist/proj/main.js`);
-
     goBack();
 
     cy.get('div.title').contains('Run Tasks');

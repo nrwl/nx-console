@@ -7,6 +7,29 @@ import { statSync, stat } from 'fs';
 import { Observable, bindNodeCallback } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+export function findExecutable(command: string, cwd: string): string {
+  const paths = (process.env.PATH as string).split(path.delimiter);
+  if (paths === void 0 || paths.length === 0) {
+    return path.join(cwd, command);
+  }
+  for (let pathEntry of paths) {
+    let fullPath: string;
+    if (path.isAbsolute(pathEntry)) {
+      fullPath = path.join(pathEntry, command);
+    } else {
+      fullPath = path.join(cwd, pathEntry, command);
+    }
+    if (fs.existsSync(fullPath + '.exe')) {
+      return fullPath + '.exe';
+    } else if (fs.existsSync(fullPath + '.cmd')) {
+      return fullPath + '.cmd';
+    } else if (fs.existsSync(fullPath)) {
+      return fullPath;
+    }
+  }
+  return path.join(cwd, command);
+}
+
 export function findClosestNg(dir: string): string {
   if (directoryExists(path.join(dir, 'node_modules'))) {
     if (platform() === 'win32') {
