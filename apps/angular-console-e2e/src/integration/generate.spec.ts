@@ -1,9 +1,7 @@
 import {
-  autocompletion,
   checkDisplayedCommand,
   checkFileExists,
   clickOnTask,
-  els,
   goBack,
   goToGenerate,
   openProject,
@@ -11,8 +9,7 @@ import {
   taskListHeaders,
   tasks,
   texts,
-  uniqName,
-  waitForAutocomplete
+  uniqName
 } from './utils';
 
 describe('Generate', () => {
