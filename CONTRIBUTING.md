@@ -16,7 +16,11 @@ After cloning the project run: `yarn`.
 After that, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200. To test electron specific features, run `yarn start electron.up`.
 
 
-## Running Tests
+## Running Unit Tests
+
+* Run `yarn start test` to run unit tests.
+
+## Running E2e Tests
 
 * Run `yarn start e2e.fixtures` to create fixtures. This will create a few projects in the tmp folder you can develop against or run e2e tests against.
 * Run `yarn start e2e.run` to run e2e tests. This will compile and frontend and the backend, and run cypress tests (The fixtures must be created).
@@ -31,6 +35,7 @@ Run the following commands to make sure the linting and the tests pass.
 
 * `yarn start format.check`
 * `yarn start lint`
+* `yarn start test`
 * `yarn start e2e.fixtures`
 * `yarn start e2e.run`
 

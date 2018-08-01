@@ -25,7 +25,8 @@ module.exports = {
           'ng lint --fix --project feature-run',
           'ng lint --fix --project ui'
         )
-      }
+      },
+      test: 'nx affected:test --all'
     },
     server: {
       compile: 'tsc -p server/tsconfig.json',
@@ -35,7 +36,8 @@ module.exports = {
         default: npsUtils.series.nps('server.format.write'),
         write: 'prettier --write \"./server/**/*.ts\"',
         check: 'prettier --list-different \"./server/**/*.ts\"'
-      }
+      },
+      test: 'echo 0'
     },
     electron: {
       'clean': 'rm -rf dist',
@@ -92,6 +94,7 @@ module.exports = {
     lint: {
       default: npsUtils.concurrent.nps('frontend.lint'),
       fix: npsUtils.concurrent.nps('frontend.lint.fix')
-    }
+    },
+    test: npsUtils.concurrent.nps('frontend.test', 'server.test')
   }
 };

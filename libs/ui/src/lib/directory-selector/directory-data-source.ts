@@ -116,7 +116,7 @@ export class DirectoryDataSource extends DataSource<DynamicFlatNode> {
       first(),
       map(directory =>
         directory.files.map(file => {
-          if (directory.path === '/' || directory.path === 'C://') {
+          if (directory.path.endsWith('/') || directory.path === '') {
             return new DynamicFlatNode(
               file,
               `${directory.path}${file.name}`,

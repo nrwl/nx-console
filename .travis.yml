@@ -12,6 +12,7 @@ install:
 script:
 - yarn start format.check
 - yarn start lint
+- yarn start test
 - yarn start e2e.fixtures
 - yarn start e2e.run
 addons:

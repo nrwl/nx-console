@@ -115,6 +115,7 @@
     "typescript": "2.7.x",
     "xterm": "3.4.1",
     "zone.js": "^0.8.26",
-    "electron-updater": "^2.21.4"
+    "electron-updater": "^2.21.4",
+    "drivelist": "6.3.0"
   }
 }
