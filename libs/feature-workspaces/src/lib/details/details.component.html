@@ -3,11 +3,13 @@
     <mat-card fxFlex>
       <mat-card-title>Basic Information</mat-card-title>
       <mat-card-content>
-        <p><strong>Name:</strong> {{ workspace.name }}</p>
-        <p><strong>Path:</strong> {{ workspace.path }}</p>
+        <p>
+          <strong>Name:</strong> {{ workspace.name }}</p>
+        <p>
+          <strong>Path:</strong> {{ workspace.path }}</p>
       </mat-card-content>
     </mat-card>
-    <mat-card fxFlex>
+    <!-- <mat-card fxFlex>
       <mat-card-title>Open Workspace</mat-card-title>
       <mat-card-actions>
         <button *ngFor="let e of editorSupport.editors|async" mat-button
@@ -16,7 +18,7 @@
           {{ e.name }}
         </button>
       </mat-card-actions>
-    </mat-card>
+    </mat-card> -->
 
     <mat-card fxFlex>
       <mat-card-title-group>
@@ -41,8 +43,10 @@
     <mat-card fxFlex *ngFor="let p of workspace.projects">
       <mat-card-title class="project-name">{{ p.name }}</mat-card-title>
       <mat-card-content>
-        <p><strong>Root:</strong> {{ p.root }}</p>
-        <p><strong>Type:</strong> {{ p.projectType }}</p>
+        <p>
+          <strong>Root:</strong> {{ p.root }}</p>
+        <p>
+          <strong>Type:</strong> {{ p.projectType }}</p>
       </mat-card-content>
       <mat-card-actions>
         <button *ngFor="let a of p.actions" mat-button [routerLink]="a.link">

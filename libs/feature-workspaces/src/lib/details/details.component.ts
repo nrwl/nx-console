@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EditorSupport } from '@angular-console/utils';
 import { Project } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
@@ -18,8 +17,7 @@ export class DetailsComponent implements OnInit {
 
   constructor(
     private readonly apollo: Apollo,
-    private readonly route: ActivatedRoute,
-    public editorSupport: EditorSupport
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit() {

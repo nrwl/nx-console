@@ -5,6 +5,12 @@ export interface Breadcrumb {
   title: string;
 }
 
+export interface NonContextualAction {
+  description: string;
+  icon: string;
+  invoke: () => void;
+}
+
 export interface ContextualAction {
   name: string;
   invoke: Subject<void>;
@@ -31,6 +37,10 @@ export interface ContextualTabs {
 })
 export class ContextualActionBarService {
   readonly breadcrumbs$ = new BehaviorSubject<Array<Breadcrumb>>([]);
+
+  readonly nonContextualActions$ = new BehaviorSubject<
+    Array<NonContextualAction>
+  >([]);
 
   readonly contextualActions$ = new Subject<ContextualActions | null>();
 

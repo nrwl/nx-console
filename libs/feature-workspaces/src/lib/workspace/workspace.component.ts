@@ -2,9 +2,10 @@ import {
   ContextualActionBarService,
   GROW_SHRINK,
   animateUp,
-  animateDown
+  animateDown,
+  NonContextualAction
 } from '@angular-console/ui';
-import { Settings } from '@angular-console/utils';
+import { Settings, EditorSupport } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
@@ -23,7 +24,8 @@ import {
   publishReplay,
   refCount,
   shareReplay,
-  switchMap
+  switchMap,
+  first
 } from 'rxjs/operators';
 
 interface Route {
@@ -107,7 +109,10 @@ export class WorkspaceComponent implements OnDestroy {
     })
   );
 
-  private readonly workspace$ = this.route.params.pipe(
+  private readonly workspace$: Observable<{
+    name: string;
+    path: string;
+  }> = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
@@ -130,6 +135,26 @@ export class WorkspaceComponent implements OnDestroy {
     refCount()
   );
 
+  private readonly editorSubscription = this.editorSupport.editors.subscribe(
+    editors => {
+      this.contextualActionBarService.nonContextualActions$.next(
+        editors.map(
+          (editor): NonContextualAction => {
+            return {
+              description: `Open in ${editor.name}`,
+              icon: editor.icon,
+              invoke: () => {
+                this.workspace$.pipe(first()).subscribe(w => {
+                  this.editorSupport.openInEditor(editor.name, w.path);
+                });
+              }
+            };
+          }
+        )
+      );
+    }
+  );
+
   private readonly workplaceSubscription = combineLatest(
     this.workspace$,
     this.activeRouteTitle$
@@ -149,12 +174,15 @@ export class WorkspaceComponent implements OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly settings: Settings,
-    private readonly contextualActionBarService: ContextualActionBarService
+    private readonly contextualActionBarService: ContextualActionBarService,
+    private readonly editorSupport: EditorSupport
   ) {}
 
   ngOnDestroy(): void {
+    this.contextualActionBarService.nonContextualActions$.next([]);
     this.workplaceSubscription.unsubscribe();
     this.subscription.unsubscribe();
+    this.editorSubscription.unsubscribe();
   }
 
   toggleAnimations() {
