@@ -14,7 +14,7 @@
 
       </mat-expansion-panel>
 
-      <mat-expansion-panel [disabled]="form.get('path').invalid">
+      <mat-expansion-panel class="name-selector" [disabled]="form.get('path').invalid">
         <mat-expansion-panel-header>
           <mat-panel-title>
             2. Set a&nbsp;
@@ -24,11 +24,11 @@
 
         <mat-form-field class="workspace-name-form-field" fxFlex>
           <mat-label>Workspace Name</mat-label>
-          <input matInput placeholder="MyNewWorkspace" required formControlName="name">
+          <input matInput placeholder="MyNewWorkspace" required formControlName="name" name="name">
         </mat-form-field>
       </mat-expansion-panel>
 
-      <mat-expansion-panel [disabled]="form.get('path').invalid || form.get('name').invalid">
+      <mat-expansion-panel class="collection-selector" [disabled]="form.get('path').invalid || form.get('name').invalid">
         <mat-expansion-panel-header>
           <mat-panel-title>
             3. Choose which&nbsp;

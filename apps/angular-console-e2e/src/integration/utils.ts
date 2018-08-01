@@ -134,6 +134,39 @@ export function clickOnTask(
   waitForAnimation();
 }
 
+export function expandFolder(name: string) {
+  cy.get('button.directory').should(($p: any) => {
+    let found = false;
+    for (let i = 0; i < $p.length; ++i) {
+      if ($p[i].innerText.indexOf(name) > -1) {
+        found = true;
+        $p[i].querySelector('mat-icon.expand-icon').click();
+      }
+    }
+
+    if (!found) {
+      throw new Error(`Didn't find ${name}`);
+    }
+  });
+}
+
+export function selectFolder(name: string) {
+  cy.get('button.directory').should(($p: any) => {
+    let found = false;
+
+    for (let i = 0; i < $p.length; ++i) {
+      if ($p[i].innerText.indexOf(name) > -1) {
+        found = true;
+        $p[i].click();
+      }
+    }
+
+    if (!found) {
+      throw new Error(`Didn't find ${name}`);
+    }
+  });
+}
+
 export function waitForAnimation() {
   cy.wait(300);
 }
@@ -141,8 +174,13 @@ export function waitForAnimation() {
 export function waitForAutocomplete() {
   cy.wait(500);
 }
+
 export function waitForBuild() {
   cy.wait(25000);
+}
+
+export function waitForNgNew() {
+  cy.wait(120000);
 }
 
 export function autocompletion(callback: (s: any) => void) {
@@ -158,7 +196,7 @@ export function checkFileExists(f: string) {
 }
 
 export function uniqName(prefix: string): string {
-  return `${prefix}-${Math.floor(Math.random() * 100000)}`;
+  return `${prefix}${Math.floor(Math.random() * 100000)}`;
 }
 
 export function els($p: any): any {
