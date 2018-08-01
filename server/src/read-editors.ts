@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import { spawn, exec, execSync } from 'child_process';
+import { findExecutable, hasExecutable } from './utils';
 
 export function readEditors() {
   const editors = [];
@@ -84,8 +85,7 @@ function hasWebStorm() {
     // TODO implement linux support
     return false;
   } else if (os.platform() === 'win32') {
-    // TODO implement windows support
-    return false;
+    return hasExecutable('webstorm', process.cwd());
   } else {
     return false;
   }
@@ -103,8 +103,7 @@ function hasIntellij() {
     // TODO implement linux support
     return false;
   } else if (os.platform() === 'win32') {
-    // TODO implement windows support
-    return false;
+    return hasExecutable('idea', process.cwd());
   } else {
     return false;
   }
@@ -128,7 +127,7 @@ function openInVsCode(path: string) {
   } else if (os.platform() === 'linux') {
     // TODO implement linux support
   } else if (os.platform() === 'win32') {
-    exec(`code "${path}"`);
+    exec(`code "${toWindows(path)}"`);
   }
 }
 
@@ -138,7 +137,9 @@ function openInWebStorm(path: string) {
   } else if (os.platform() === 'linux') {
     // TODO implement linux support
   } else if (os.platform() === 'win32') {
-    // TODO implement windows support
+    spawn(findExecutable('webstorm', process.cwd()), [toWindows(path)], {
+      detached: true
+    });
   }
 }
 
@@ -148,6 +149,15 @@ function openInIntelliJ(path: string) {
   } else if (os.platform() === 'linux') {
     // TODO implement linux support
   } else if (os.platform() === 'win32') {
-    // TODO implement windows support
+    spawn(findExecutable('idea', process.cwd()), [toWindows(path)], {
+      detached: true
+    });
   }
+}
+
+function toWindows(path: string): string {
+  return path
+    .split('/')
+    .filter(p => !!p)
+    .join('\\');
 }
