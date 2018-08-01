@@ -35,6 +35,7 @@ import {
   MatTooltipModule,
   MatTreeModule
 } from '@angular/material';
+import { NormalizePathPipe } from './normalize-path.pipe';
 
 const IMPORTS = [
   CdkTreeModule,
@@ -89,7 +90,8 @@ const IMPORTS = [
     TaskRunnerComponent,
     TaskSelectorComponent,
     ContextualActionBarComponent,
-    DirectorySelectorComponent
+    DirectorySelectorComponent,
+    NormalizePathPipe
   ],
   providers: [ContextualActionBarService],
   exports: [
@@ -99,7 +101,8 @@ const IMPORTS = [
     FlagsComponent,
     TaskRunnerComponent,
     TaskSelectorComponent,
-    TerminalComponent
+    TerminalComponent,
+    NormalizePathPipe
   ]
 })
 export class UiModule {

@@ -8,7 +8,7 @@
         <div fxLayout="row" fxLayoutAlign="start center">
           <mat-icon class="expand-icon" [class.expanded]="treeControl.isExpanded(node)" matTreeNodeToggle>arrow_right</mat-icon>
           <mat-icon class="directory-icon">folder</mat-icon>
-          <span fxFlex class="directory-name">{{ node.file.name }}</span>
+          <span fxFlex class="directory-name">{{ node.file.name | normalizePath }}</span>
         </div>
       </button>
 
@@ -22,7 +22,7 @@
           folder
         </mat-icon>
         <img class="angular-icon" src="/assets/angular_logo.svg" width="28" height="28">
-        <span fxFlex class="directory-name" [class.angular-directory-name]="node.file.type === 'angularDirectory'">{{ node.file.name }}</span>
+        <span fxFlex class="directory-name" [class.angular-directory-name]="node.file.type === 'angularDirectory'">{{ node.file.name | normalizePath }}</span>
       </div>
     </button>
 

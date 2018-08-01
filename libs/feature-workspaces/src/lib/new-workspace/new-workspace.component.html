@@ -5,7 +5,7 @@
         <mat-expansion-panel-header>
           <mat-panel-title>
             1. Select a&nbsp;
-            <b>path</b>&nbsp;for your new workspace {{ form.get('path')?.value ? ' - ' + form.get('path')?.value : '' }}
+            <b>path</b>&nbsp;for your new workspace {{ (form.get('path')?.value ? ' - ' + form.get('path')?.value : '') | normalizePath }}
           </mat-panel-title>
         </mat-expansion-panel-header>
 

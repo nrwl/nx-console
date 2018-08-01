@@ -3,10 +3,8 @@
     <mat-card fxFlex>
       <mat-card-title>Basic Information</mat-card-title>
       <mat-card-content>
-        <p>
-          <strong>Name:</strong> {{ workspace.name }}</p>
-        <p>
-          <strong>Path:</strong> {{ workspace.path }}</p>
+        <p><strong>Name:</strong> {{ workspace.name }}</p>
+        <p><strong>Path:</strong> {{ workspace.path | normalizePath }}</p>
       </mat-card-content>
     </mat-card>
     <!-- <mat-card fxFlex>

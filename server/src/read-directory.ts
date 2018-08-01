@@ -1,24 +1,37 @@
 import { directoryExists, fileExists } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
-import { bindNodeCallback, Observable, of } from 'rxjs';
+import * as drivelist from 'drivelist';
+import { bindNodeCallback, Observable, of, Subject } from 'rxjs';
 import { Directory, LocalFile, LocalFileType } from '../../libs/schema/src';
 import { catchError, map, switchMap, zipAll } from 'rxjs/operators';
+import * as os from 'os';
 
 const observableReadDir = bindNodeCallback(fs.readdir);
 const observableStat = bindNodeCallback(fs.stat);
 
 export function readDirectory(
-  _dirName: string,
+  dirName: string,
   onlyDirectories: boolean,
   showHidden: boolean
 ): Observable<Directory> {
-  const dirName =
-    _dirName !== '' ? _dirName : os.platform() === 'win32' ? 'C://' : '/';
-  if (!directoryExists(dirName)) {
-    throw new Error(`Cannot find directory: '${dirName}'`);
+  if (dirName === '' && os.platform() === 'win32') {
+    return mountPoints();
+  } else if (dirName === '') {
+    return _readDirectory('/', onlyDirectories, showHidden);
+  } else {
+    if (dirName !== '/' && !directoryExists(dirName)) {
+      throw new Error(`Cannot find directory: '${dirName}'`);
+    }
+    return _readDirectory(dirName, onlyDirectories, showHidden);
   }
+}
+
+function _readDirectory(
+  dirName: string,
+  onlyDirectories: boolean,
+  showHidden: boolean
+) {
   return observableReadDir(dirName).pipe(
     switchMap(
       (files: Array<string>): Array<Observable<LocalFile | null>> => {
@@ -81,4 +94,31 @@ export function readDirectory(
       }
     )
   );
+}
+
+export function mountPoints(): Observable<Directory> {
+  const res = new Subject<Directory>();
+
+  drivelist.list((errors, drives) => {
+    if (errors) {
+      res.error(errors[0]);
+    } else {
+      let mountpoints = [];
+      drives.forEach(d => {
+        mountpoints = [
+          ...mountpoints,
+          ...d.mountpoints.map(p => {
+            const name = p.path.endsWith('\\')
+              ? `${p.path.substring(0, p.path.length - 1)}//`
+              : p.path;
+            return { name, type: 'directory' };
+          })
+        ];
+      });
+      res.next({ path: '', files: mountpoints });
+      res.complete();
+    }
+  });
+
+  return res;
 }
