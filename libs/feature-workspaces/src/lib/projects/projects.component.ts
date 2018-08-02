@@ -55,8 +55,9 @@ export class ProjectsComponent implements OnInit {
         const w = r.data.workspace;
         const projects = w.projects.map((p: any) => {
           const actions = [
-            ...createLinkForTask(p, 'build', 'Build'),
+            ...createLinkForTask(p, 'serve', 'Serve'),
             ...createLinkForTask(p, 'test', 'Test'),
+            ...createLinkForTask(p, 'build', 'Build'),
             ...createLinkForTask(p, 'e2e', 'E2E'),
             ...createLinkForCoreSchematic(p, 'component', 'Generate Component')
           ] as any[];
