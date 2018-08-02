@@ -37,6 +37,7 @@ interface CommandResult {
   commandRunning: any;
 }
 
+let commandRunIndex = 0;
 let commandInProgress: CommandResult | null;
 const files: { [path: string]: string[] } = {};
 
@@ -814,7 +815,7 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
 
 function runCommand(cwd: string, program: string, cmds: string[]) {
   stopAllCommands();
-  const command = `${program} ${cmds.join(' ')}`;
+  const command = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
   const commandRunning = spawn(program, cmds, { cwd, cols: 100 });
   commandInProgress = {
     command,
