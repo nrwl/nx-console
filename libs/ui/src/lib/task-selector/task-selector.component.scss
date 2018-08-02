@@ -1,8 +1,12 @@
 .task-list {
   padding: 0;
   overflow: auto;
-  max-height: calc(100% - 55px);
+  max-height: calc(100% - 56px);
   min-width: calc(100vw - 56px);
+}
+
+.mat-nav-list .mat-list-item:first-of-type {
+  margin-top: 8px;
 }
 
 .outer-container {
@@ -46,7 +50,7 @@
 }
 
 .task-filter-container {
-  background-color: rgb(245, 245, 245);
+  background-color: white;
   height: 55px;
   min-height: 55px;
   max-height: 55px;
@@ -57,13 +61,18 @@
     outline: none;
     border: none;
     font-size: 16px;
-    padding: 24px 16px;
+    padding: 0 16px;
   }
 
   .filter-icon {
     cursor: pointer;
     margin-right: 12px;
     color: rgba(0, 0, 0, 0.87);
+    height: 28px;
+    width: 28px;
+    font-size: 28px;
+    position: relative;
+    top: -1px;
   }
 }
 

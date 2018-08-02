@@ -6,6 +6,11 @@ h4 {
   color: rgba(0, 0, 0, 0.87);
 }
 
+.recents-container,
+mat-list-item {
+  overflow: hidden;
+}
+
 mat-list-item mat-icon {
   cursor: pointer;
   color: rgb(128, 128, 128);
@@ -15,6 +20,14 @@ mat-list-item mat-icon {
   &:hover {
     color: rgba(0, 0, 0, 0.87);
     transform: scale(1.05);
+  }
+
+  &.favorite-icon:hover {
+    color: #a53339;
+  }
+
+  &.favorited {
+    color: #bb3a3f;
   }
 }
 
