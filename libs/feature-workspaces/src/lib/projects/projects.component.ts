@@ -8,11 +8,11 @@ import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'angular-console-details',
-  templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss']
+  selector: 'angular-console-projects',
+  templateUrl: './projects.component.html',
+  styleUrls: ['./projects.component.scss']
 })
-export class DetailsComponent implements OnInit {
+export class ProjectsComponent implements OnInit {
   workspace$: Observable<any>;
 
   constructor(
@@ -58,8 +58,7 @@ export class DetailsComponent implements OnInit {
             ...createLinkForTask(p, 'build', 'Build'),
             ...createLinkForTask(p, 'test', 'Test'),
             ...createLinkForTask(p, 'e2e', 'E2E'),
-            ...createLinkForCoreSchematic(p, 'component', 'Generate Component'),
-            ...createLinkForCoreSchematic(p, 'service', 'Generate Service')
+            ...createLinkForCoreSchematic(p, 'component', 'Generate Component')
           ] as any[];
           return { ...p, actions };
         });

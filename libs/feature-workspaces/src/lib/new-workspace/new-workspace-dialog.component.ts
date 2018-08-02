@@ -43,7 +43,7 @@ export class NewWorkspaceDialogComponent {
             `${this.data.ngNewInvocation.path}/${
               this.data.ngNewInvocation.name
             }`,
-            'details'
+            'projects'
           ]);
         }
       })

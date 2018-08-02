@@ -38,8 +38,8 @@
 }
 
 .collection-name h3 {
-  color: rgba(0, 0, 0, 0.87);
-  font-weight: 500;
+  color: rgba(0, 0, 0, 0.54);
+  font-weight: 400;
   letter-spacing: 0.01em;
   font-size: 16px;
   line-height: 24px;
@@ -56,16 +56,32 @@
     background-color: none;
     outline: none;
     border: none;
-    font-size: 14px;
+    font-size: 16px;
     padding: 24px 16px;
   }
 
   .filter-icon {
     cursor: pointer;
     margin-right: 12px;
+    color: rgba(0, 0, 0, 0.87);
   }
 }
 
 .task-description {
   font-size: 12px;
+}
+
+.no-tasks-container {
+  color: rgba(0, 0, 0, 0.54);
+
+  .empty-filter-icon {
+    user-select: none;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    height: 72px;
+    width: 72px;
+    font-size: 72px;
+    line-height: 72px;
+    color: rgba(0, 0, 0, 0.54);
+  }
 }

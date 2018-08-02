@@ -67,8 +67,9 @@ angular-console-new-workspace {
 .create-new-workspace-dialog mat-dialog-container {
   background: black !important;
   overflow: hidden;
-  padding: 12px !important;
   padding-bottom: 0 !important;
+  padding-right: 0 !important;
+  border-radius: 4px;
 
   .terminal-container {
     height: 100% !important;

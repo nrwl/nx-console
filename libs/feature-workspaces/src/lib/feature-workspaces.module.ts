@@ -1,26 +1,24 @@
-import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Route, RouterModule } from '@angular/router';
-
+import {
+  extensionsRoutes,
+  FeatureExtensionsModule
+} from '@angular-console/feature-extensions';
 import {
   FeatureGenerateModule,
   generateRoutes
 } from '@angular-console/feature-generate';
 import { FeatureRunModule, runRoutes } from '@angular-console/feature-run';
 import { UiModule } from '@angular-console/ui';
+import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material';
+import { Route, RouterModule } from '@angular/router';
 
-import { DetailsComponent } from './details/details.component';
 import { ImportWorkspaceComponent } from './import-workspace/import-workspace.component';
-import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
 import { NewWorkspaceDialogComponent } from './new-workspace/new-workspace-dialog.component';
+import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
+import { ProjectsComponent } from './projects/projects.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspacesComponent } from './workspaces/workspaces.component';
-
-import {
-  extensionsRoutes,
-  FeatureExtensionsModule
-} from '@angular-console/feature-extensions';
-import { MatDialogModule } from '../../../../node_modules/@angular/material';
 
 export type FeatureWorkspaceRouteState =
   | 'workspaces'
@@ -55,11 +53,11 @@ export const workspaceRoutes: Route[] = [
     data: { state: WORKSPACE },
     children: [
       {
-        data: { state: 'details' },
-        path: 'details',
-        component: DetailsComponent
+        data: { state: 'projects' },
+        path: 'projects',
+        component: ProjectsComponent
       },
-      { path: '', pathMatch: 'full', redirectTo: 'details' },
+      { path: '', pathMatch: 'full', redirectTo: 'projects' },
       {
         data: { state: 'extensions' },
         path: 'extensions',
@@ -86,7 +84,7 @@ export const workspaceRoutes: Route[] = [
     UiModule
   ],
   declarations: [
-    DetailsComponent,
+    ProjectsComponent,
     NewWorkspaceComponent,
     ImportWorkspaceComponent,
     WorkspaceComponent,

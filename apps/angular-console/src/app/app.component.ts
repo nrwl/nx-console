@@ -1,20 +1,20 @@
-import { transition, trigger } from '@angular/animations';
-import {
-  Component,
-  ChangeDetectionStrategy,
-  ViewChild,
-  OnInit
-} from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { ContextualActionBarService, FADE_IN } from '@angular-console/ui';
-import { filter, map } from 'rxjs/operators';
 import {
   CREATE_WORKSPACE,
+  FeatureWorkspaceRouteState,
   IMPORT_WORKSPACE,
-  WORKSPACES,
-  FeatureWorkspaceRouteState
+  WORKSPACES
 } from '@angular-console/feature-workspaces';
+import { ContextualActionBarService, FADE_IN } from '@angular-console/ui';
+import { transition, trigger } from '@angular/animations';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  ViewChild
+} from '@angular/core';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
