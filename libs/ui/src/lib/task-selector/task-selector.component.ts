@@ -99,22 +99,24 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
     ).pipe(
       map(([lowerCaseFilterValue, taskCollections]) => ({
         selectedTask: taskCollections.selectedTask,
-        taskCollections: taskCollections.taskCollections.map(collection => {
-          if (
-            collection.collectionName
-              .toLowerCase()
-              .includes(lowerCaseFilterValue)
-          ) {
-            return collection;
-          } else {
-            return {
-              collectionName: collection.collectionName,
-              tasks: collection.tasks.filter(task =>
-                task.taskName.toLowerCase().includes(lowerCaseFilterValue)
-              )
-            };
-          }
-        })
+        taskCollections: taskCollections.taskCollections
+          .map(collection => {
+            if (
+              collection.collectionName
+                .toLowerCase()
+                .includes(lowerCaseFilterValue)
+            ) {
+              return collection;
+            } else {
+              return {
+                collectionName: collection.collectionName,
+                tasks: collection.tasks.filter(task =>
+                  task.taskName.toLowerCase().includes(lowerCaseFilterValue)
+                )
+              };
+            }
+          })
+          .filter(collection => Boolean(collection.tasks.length > 0))
       }))
     );
   }

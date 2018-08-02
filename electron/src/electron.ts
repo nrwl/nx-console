@@ -97,7 +97,7 @@ function createWindow() {
     try {
       startServer(port);
       if (fileExists(path.join(currentDirectory, 'angular.json'))) {
-        win.loadURL(`http://localhost:${port}/workspace/${encodeURIComponent(currentDirectory)}/details`);
+        win.loadURL(`http://localhost:${port}/workspace/${encodeURIComponent(currentDirectory)}/projects`);
       } else {
         win.loadURL(`http://localhost:${port}`);
       }

@@ -40,7 +40,7 @@ describe('Workspaces', () => {
 
     waitForNgNew();
 
-    cy.get('div.title').contains('Workspace Overview');
+    cy.get('div.title').contains('Projects');
   });
 
   it('imports a workspace', () => {
@@ -55,6 +55,6 @@ describe('Workspaces', () => {
       .contains('Import')
       .click();
 
-    cy.get('div.title').contains('Workspace Overview');
+    cy.get('div.title').contains('Projects');
   });
 });

@@ -6,14 +6,14 @@ import {
   waitForAnimation
 } from './utils';
 
-describe('Details', () => {
+describe('Projects', () => {
   beforeEach(() => {
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
-    cy.get('div.title').contains('Workspace Overview');
+    cy.get('div.title').contains('Projects');
   });
 
-  it('shows details screen', () => {
+  it('shows projects screen', () => {
     cy.contains('proj');
 
     projectNames($p => {

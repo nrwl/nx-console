@@ -70,7 +70,7 @@ export function openProject(proj: string) {
   // waitForAnimation();
   // cy.get('input').type(p);
   // cy.get('button#open-workspace').click();
-  cy.visit(`workspace/${encodeURIComponent(proj)}/details`);
+  cy.visit(`workspace/${encodeURIComponent(proj)}/projects`);
 }
 
 export function projectNames(callback: (s: any) => void) {

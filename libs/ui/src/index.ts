@@ -8,4 +8,3 @@ export * from '@angular-console/ui/src/lib/flags/flags.component';
 export * from '@angular-console/ui/src/lib/animations/fade-in';
 export * from '@angular-console/ui/src/lib/animations/grow-shink';
 export * from '@angular-console/ui/src/lib/directory-selector/directory-data-source';
-export * from '@angular-console/ui/src/lib/animations/routing';
