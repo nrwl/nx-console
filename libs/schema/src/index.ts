@@ -1,6 +1,10 @@
 import { Observable } from 'rxjs';
 
-export type AutocompletionType = 'modules' | 'projects' | 'file';
+export type AutocompletionType =
+  | 'localModules'
+  | 'absoluteModules'
+  | 'projects'
+  | 'file';
 
 export type LocalFileType = 'file' | 'directory' | 'angularDirectory';
 
