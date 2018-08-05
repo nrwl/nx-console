@@ -1,7 +1,8 @@
 export function readExtensions(packageJson: any) {
   return availableExtensions().filter(e => {
     const hasDep = packageJson.dependencies && packageJson.dependencies[e.name];
-    const hasDevDep = packageJson.devDependencies && packageJson.devDependencies[e.name];
+    const hasDevDep =
+      packageJson.devDependencies && packageJson.devDependencies[e.name];
     return hasDep || hasDevDep;
   });
 }
