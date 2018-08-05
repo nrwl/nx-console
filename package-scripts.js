@@ -70,6 +70,10 @@ module.exports = {
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'dist': npsUtils.series.nps('electronwin.prepackage', 'electronwin.builder-dist', 'electronwin.copy-to-osbuilds')
     },
+    publish: {
+      'builder-publish': 'electron-builder --mac --win -p always',
+      'publish': npsUtils.series.nps('electron.prepackage', 'publish.builder-publish')
+    },
     dev: {
       up: npsUtils.concurrent.nps('server.up', 'frontend.serve'),
       'path-node-pty': 'rm -rf node_modules/node-pty-prebuilt && cp -r tools/win/node-pty-prebuilt node_modules/node-pty-prebuilt'
