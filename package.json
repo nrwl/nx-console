@@ -7,7 +7,7 @@
   "scripts": {
     "start": "nps",
     "format": "nps format.write",
-    "postinstall": "rm -rf node_modules/cypress/node_modules/@types && rm -rf node_modules/@types/sinon-chai/node_modules/@types"
+    "postinstall": "node ./tools/scripts/postinstall.js"
   },
   "build": {
     "appId": "io.nrwl.AngularConsole",
@@ -80,7 +80,7 @@
     "apollo-link-error": "1.1.0",
     "codelyzer": "~4.4.2",
     "core-js": "^2.5.7",
-    "cypress": "3.0.2",
+    "cypress": "3.0.3",
     "electron": "2.0.5",
     "electron-builder": "20.19.2",
     "electron-installer-dmg": "^1.0.0",
@@ -116,6 +116,7 @@
     "xterm": "3.4.1",
     "zone.js": "^0.8.26",
     "electron-updater": "^2.21.4",
-    "drivelist": "6.3.0"
+    "drivelist": "6.3.0",
+    "shelljs": "0.8.2"
   }
 }

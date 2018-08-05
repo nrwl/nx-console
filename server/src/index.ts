@@ -19,7 +19,8 @@ import { readNpmScripts, readNpmScriptSchema } from './read-npm-scripts';
 import { readDirectory } from './read-directory';
 import {
   completeFiles,
-  completeModules,
+  completeLocalModules,
+  completeAbsoluteModules,
   completeProjects
 } from './completions';
 import * as os from 'os';
@@ -458,13 +459,22 @@ export const completionsType: graphql.GraphQLObjectType = new graphql.GraphQLObj
             return completeProjects(workspace, args.input);
           }
         },
-        modules: {
+        localModules: {
           type: new graphql.GraphQLList(completionResultType),
           args: {
             input: { type: graphql.GraphQLString }
           },
           resolve: (workspace: any, args: any) => {
-            return completeModules(files, workspace, args.input);
+            return completeLocalModules(files, workspace, args.input);
+          }
+        },
+        absoluteModules: {
+          type: new graphql.GraphQLList(completionResultType),
+          args: {
+            input: { type: graphql.GraphQLString }
+          },
+          resolve: (workspace: any, args: any) => {
+            return completeAbsoluteModules(files, workspace, args.input);
           }
         }
       };
@@ -852,6 +862,9 @@ function stopAllCommands() {
 function listFiles(path: string) {
   setTimeout(() => {
     files[path] = listFilesRec(path);
+    setTimeout(() => {
+      listFiles(path);
+    }, 60000);
   }, 0);
 }
 

@@ -67,7 +67,7 @@ describe('Forms', () => {
 
     autocompletion($p => {
       expect($p.length).to.equal(1);
-      expect(texts($p)[0]).to.include('src/app/app.module.ts');
+      expect(texts($p)[0]).to.include('app.module.ts');
     });
   });
 

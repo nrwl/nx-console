@@ -1,11 +1,14 @@
+const path = require("path");
+const fs = require("fs");
+
 const cp = require('child_process');
 let frontend;
 let server;
 
 function runE2eTests() {
   try {
-    cp.execSync('nps e2e.compile', { stdio: [0, 1, 2] });
-    cp.execSync('nps e2e.cypress', { stdio: [0, 1, 2] });
+    cp.execSync('yarn start e2e.compile', { stdio: [0, 1, 2] });
+    cp.execSync('yarn start e2e.cypress', { stdio: [0, 1, 2] });
   } catch (e) {
     console.error(e);
     process.exit(1);
@@ -17,8 +20,8 @@ function runE2eTests() {
 }
 
 try {
-  frontend = cp.spawn('nps', ['frontend.serve']);
-  server = cp.spawn('nps', ['server.up'], {stdio: [0,1,2]});
+  frontend = cp.spawn(findInPath('yarn'), ['start', 'frontend.serve']);
+  server = cp.spawn(findInPath('yarn'), ['start', 'server.up'], {stdio: [0,1,2]});
 
   frontend.stdout.on('data', data => {
     console.log(data.toString());
@@ -43,6 +46,22 @@ try {
   process.exit(1);
 }
 
-
-
-
+function findInPath(command) {
+  const paths = process.env.PATH.split(path.delimiter);
+  for (let pathEntry of paths) {
+    let fullPath;
+    if (path.isAbsolute(pathEntry)) {
+      fullPath = path.join(pathEntry, command);
+    } else {
+      fullPath = path.join(process.cwd(), pathEntry, command);
+    }
+    if (fs.existsSync(fullPath + '.exe')) {
+      return fullPath + '.exe';
+    } else if (fs.existsSync(fullPath + '.cmd')) {
+      return fullPath + '.cmd';
+    } else if (fs.existsSync(fullPath)) {
+      return fullPath;
+    }
+  }
+  return undefined;
+}

@@ -1,21 +1,24 @@
 const cp = require('child_process');
-cp.execSync('rm -rf tmp', { stdio: [0, 1, 2] });
-cp.execSync('mkdir tmp', { stdio: [0, 1, 2] });
+const shell = require('shelljs');
+const tmp = shell.tempdir();
+const path = require('path');
 
-cp.execSync('rm -rf /tmp/proj', { stdio: [0, 1, 2] });
-cp.execSync('mkdir /tmp/proj', { stdio: [0, 1, 2] });
+console.log('setting up fixtures');
+shell.rm('-rf', 'tmp');
+shell.mkdir('tmp');
 
-cp.execSync('rm -rf /tmp/proj-extensions', { stdio: [0, 1, 2] });
-cp.execSync('mkdir /tmp/proj-extensions', { stdio: [0, 1, 2] });
+shell.rm('-rf', path.join(tmp, 'proj'));
+shell.mkdir(path.join(tmp, 'proj'));
+shell.rm('-rf', path.join(tmp, 'proj-extensions'));
+shell.mkdir(path.join(tmp, 'proj-exteions'));
+shell.rm('-rf', path.join(tmp, 'proj-no-node-modules'));
+shell.mkdir(path.join(tmp, 'proj-no-node-modules'));
 
-cp.execSync('rm -rf /tmp/proj-no-node-modules', { stdio: [0, 1, 2] });
-cp.execSync('mkdir /tmp/proj-no-node-modules', { stdio: [0, 1, 2] });
+cp.execSync(`${process.cwd()}/node_modules/.bin/ng new proj --collection=@schematics/angular --directory=proj`, { cwd: tmp, stdio: [0, 1, 2] });
+shell.mv(path.join(tmp, 'proj'), './tmp/proj');
 
-cp.execSync(`${process.cwd()}/node_modules/.bin/ng new proj --collection=@schematics/angular --directory=proj`, { cwd: '/tmp', stdio: [0, 1, 2] });
-cp.execSync('mv /tmp/proj ./tmp/proj', { stdio: [0, 1, 2] });
+cp.execSync(`${process.cwd()}/node_modules/.bin/ng new proj-extensions --collection=@schematics/angular --directory=proj-extensions`, { cwd: tmp, stdio: [0, 1, 2] });
+shell.mv(path.join(tmp, 'proj-extensions'), './tmp/proj-extensions');
 
-cp.execSync(`${process.cwd()}/node_modules/.bin/ng new proj-extensions --collection=@schematics/angular --directory=proj-extensions`, { cwd: '/tmp', stdio: [0, 1, 2] });
-cp.execSync('mv /tmp/proj-extensions ./tmp/proj-extensions', { stdio: [0, 1, 2] });
-
-cp.execSync(`${process.cwd()}/node_modules/.bin/ng new proj-no-node-modules --collection=@schematics/angular --directory=proj-no-node-modules --skip-install`, { cwd: '/tmp', stdio: [0, 1, 2] });
-cp.execSync('mv /tmp/proj-no-node-modules ./tmp/proj-no-node-modules', { stdio: [0, 1, 2] });
+cp.execSync(`${process.cwd()}/node_modules/.bin/ng new proj-no-node-modules --collection=@schematics/angular --directory=proj-no-node-modules --skip-install`, { cwd: tmp, stdio: [0, 1, 2] });
+shell.mv(path.join(tmp, 'proj-no-node-modules'), './tmp/proj-no-node-modules');

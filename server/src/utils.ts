@@ -69,7 +69,9 @@ export function findClosestNg(dir: string): string {
 }
 
 export function listFilesRec(dirName: string): string[] {
+  // TODO use .gitignore to skip files
   if (dirName.indexOf('node_modules') > -1) return [];
+  if (dirName.indexOf('dist') > -1) return [];
 
   const res = [dirName];
   // the try-catch here is intentional. It's only used in autocomletion.
@@ -169,4 +171,15 @@ function hasSource(prop: any): any {
 
 export function filterByName<T>(t: T[], args: { name?: string }): T[] {
   return args.name ? t.filter((s: any) => s.name === args.name) : t;
+}
+
+export function normalizePath(value: string): string {
+  const firstPart = value.split('/')[0];
+  if (!firstPart) return value;
+  if (!firstPart.endsWith(':')) return value;
+  return value
+    .replace(new RegExp('/', 'g'), '\\')
+    .split('\\')
+    .filter(r => !!r)
+    .join('\\');
 }

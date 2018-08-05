@@ -95,6 +95,7 @@ export class Serializer {
         name === 'export' ||
         name === 'module' ||
         name === 'project' ||
+        name === 'directory' ||
         name === 'name'
       );
     } else {
@@ -116,8 +117,8 @@ export class Serializer {
       collection === '@nrwl/schematics'
     ) {
       if (name === 'project') return 'projects';
-      if (name === 'module') return 'modules';
-      if (name === 'parentModule') return 'modules';
+      if (name === 'module') return 'localModules';
+      if (name === 'parentModule') return 'absoluteModules';
     }
     return undefined;
   }
@@ -128,8 +129,8 @@ export class Serializer {
   ): AutocompletionType | undefined {
     if (builder.startsWith('@angular-devkit/build-angular')) {
       if (name === 'project') return 'projects';
-      if (name === 'module') return 'modules';
-      if (name === 'parentModule') return 'modules';
+      if (name === 'module') return 'localModules';
+      if (name === 'parentModule') return 'absoluteModules';
     }
     return undefined;
   }
