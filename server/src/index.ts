@@ -83,7 +83,7 @@ export const extensionType: graphql.GraphQLObjectType = new graphql.GraphQLObjec
           type: new graphql.GraphQLNonNull(graphql.GraphQLString)
         },
         description: {
-          type: new graphql.GraphQLNonNull(graphql.GraphQLString)
+          type: graphql.GraphQLString
         },
         detailedDescription: {
           type: graphql.GraphQLString

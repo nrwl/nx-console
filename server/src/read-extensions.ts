@@ -1,21 +1,9 @@
 export function readExtensions(packageJson: any) {
-  const exts = [];
-
-  if (packageJson.devDependencies['@nrwl/schematics']) {
-    exts.push({
-      name: '@nrwl/schematics',
-      description: 'Makes your CLI more awesome'
-    });
-  }
-  if (packageJson.devDependencies['@ngrx/scheamtics']) {
-    exts.push({
-      name: '@nrwl/schematics',
-      description:
-        'State management and side-effect management library for Angular'
-    });
-  }
-
-  return exts;
+  return availableExtensions().filter(e => {
+    const hasDep = packageJson.dependencies && packageJson.dependencies[e.name];
+    const hasDevDep = packageJson.devDependencies && packageJson.devDependencies[e.name];
+    return hasDep || hasDevDep;
+  });
 }
 
 export function availableExtensions() {
