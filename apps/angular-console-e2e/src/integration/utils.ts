@@ -176,7 +176,7 @@ export function waitForAutocomplete() {
 }
 
 export function waitForBuild() {
-  cy.wait(25000);
+  cy.wait(35000);
 }
 
 export function waitForNgNew() {

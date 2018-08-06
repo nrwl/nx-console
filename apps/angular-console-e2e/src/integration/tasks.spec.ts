@@ -105,7 +105,7 @@ describe('Tasks', () => {
 
   it('runs an npm script', () => {
     clickOnTask('package.json scripts', 'build');
-    cy.get('div.context-title').contains('npm run build');
+    cy.get('div.context-title').contains('run build');
 
     checkDisplayedCommand('$ yarn run build');
 
