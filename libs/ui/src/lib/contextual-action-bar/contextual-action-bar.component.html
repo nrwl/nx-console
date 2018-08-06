@@ -1,0 +1,58 @@
+<mat-toolbar class="title-bar" color="primary" [class.actionable]="contextualActionBarService.contextualActions$ | async">
+  <mat-toolbar-row>
+    <div fxFlex @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) === null" fxLayout="row" fxLayoutAlign="start center">
+      <a class="branding" fxLayout="row" fxLayoutAlign="start center" routerLink="/workspaces">
+        <img alt="Home" height="48" width="48" src="/assets/angular_logo.svg" title="Home">
+      </a>
+      <div class="title" fxFlex fxLayout="row" fxLayoutGap="16px">
+        <ng-container *ngFor="let breadcrumb of (contextualActionBarService.breadcrumbs$ | async); let last = last;">
+          <span>{{ breadcrumb.title }}</span>
+          <span *ngIf="!last">|</span>
+        </ng-container>
+      </div>
+      <div *ngIf="(contextualActionBarService.nonContextualActions$ | async) as nonContextualActions" class="non-contextual-actions-container"
+        fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+        <ng-container *ngFor="let action of nonContextualActions;">
+          <button @fadeIn (click)="action.invoke()" class="action-button" mat-icon-button [matTooltip]="action.description">
+            <img height="32px" [src]="'/assets/' + action.icon + '.png'" />
+          </button>
+        </ng-container>
+      </div>
+    </div>
+    <div @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) as contextualActions" fxLayout="row" fxLayoutGap="28px"
+      fxLayoutAlign="start center" fxFlex>
+      <mat-icon (click)="contextualActionBarService.contextualActions$.next(null)" class="exit-action">clear</mat-icon>
+      <div class="context-title" fxFlex>
+        {{ contextualActions.contextTitle }}
+      </div>
+      <div class="actions-container" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+        <button class="action-button" *ngIf="commandRunner.activeCommand$|async as activeCommand" (click)="stopCommand()" title="Cancel the command" mat-raised-button>Cancel</button>
+
+        <ng-container *ngFor="let action of contextualActions.actions; let last = last">
+          <button *ngIf="!last" [disabled]="(action.disabled|async) || (commandRunner.activeCommand$|async)" (click)="action.invoke.next()" class="action-button" mat-button>
+            <span>{{ action.name }}</span>
+          </button>
+          <button *ngIf="last" [disabled]="(action.disabled|async) || (commandRunner.activeCommand$|async)" (click)="action.invoke.next()" class="action-button" mat-raised-button
+            color="primary">
+            {{ action.name }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </mat-toolbar-row>
+  <mat-toolbar-row class="tabs-container" @growShrink *ngIf="!(contextualActionBarService.contextualActions$ | async) && (contextualActionBarService.contextualTabs$ | async)?.tabs as tabs">
+    <nav fxFlex mat-tab-nav-bar backgroundColor="primary">
+      <a fxFlex mat-tab-link *ngFor="let tab of tabs; trackBy: trackByName" [routerLink]="tab.routerLink" routerLinkActive="active"
+        #rla="routerLinkActive" [active]="rla.isActive" class="nav-link">
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+          <mat-icon>
+            {{ tab.icon }}
+          </mat-icon>
+          <span>
+            {{ tab.name }}
+          </span>
+        </div>
+      </a>
+    </nav>
+  </mat-toolbar-row>
+</mat-toolbar>

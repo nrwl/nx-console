@@ -1,0 +1,54 @@
+<div class="ui-flags" *ngIf="ngNewForm$|async as form" [class.expand]="form.get('path').value">
+  <form [formGroup]="form" *ngIf="schematicCollectionsForNgNew$|async as schematicCollectionsForNgNew">
+    <mat-accordion [multi]="false" displayMode="flat">
+      <mat-expansion-panel class="directory-selector">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            1. Select a&nbsp;
+            <b>path</b>&nbsp;for your new workspace {{ (form.get('path')?.value ? ' - ' + form.get('path')?.value : '') | normalizePath }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <input [hidden]="true" formControlName="path" required>
+        <ui-directory-selector [selectedNode]="selectedNode" (toggleNodeSelection)="setPathField($event)"></ui-directory-selector>
+
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="name-selector" [disabled]="form.get('path').invalid">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            2. Set a&nbsp;
+            <b>name</b>&nbsp;for your new workspace {{ form.get('name')?.value ? ' - ' + form.get('name')?.value : '' }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-form-field class="workspace-name-form-field" fxFlex>
+          <mat-label>Workspace Name</mat-label>
+          <input matInput placeholder="MyNewWorkspace" required formControlName="name" name="name">
+        </mat-form-field>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel class="collection-selector" [disabled]="form.get('path').invalid || form.get('name').invalid">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            3. Choose which&nbsp;
+            <b>schematics</b>&nbsp;you would like to use {{ form.get('collection')?.value ? ' - ' + form.get('collection')?.value
+            : '' }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-radio-group fxLayout="column" fxLayoutGap="8px" fxFlex formControlName="collection">
+          <div *ngFor="let n of schematicCollectionsForNgNew; trackBy: trackByName">
+            <mat-radio-button fxFlex [value]="n.name">
+              <div fxFlex fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <span fxFlex>{{ n.name }}</span>
+                <span>-</span>
+                <span>{{ n.description }}</span>
+              </div>
+            </mat-radio-button>
+          </div>
+        </mat-radio-group>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
+</div>

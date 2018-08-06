@@ -1,0 +1,84 @@
+.project-name {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+
+.project-root {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.project-card {
+  padding: 16px !important;
+  padding-bottom: 24px !important;
+}
+
+.mat-card-actions .mat-button {
+  padding: 0;
+}
+
+.project-type {
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 12px !important;
+  line-height: unset !important;
+  letter-spacing: 2px !important;
+  -webkit-font-smoothing: antialiased !important;
+  font-weight: 500 !important;
+}
+
+.project-name {
+  font-size: 16px !important;
+  line-height: unset !important;
+  padding-top: 3px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.01em !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+  padding-bottom: 5px !important;
+}
+
+.project-root {
+  color: rgba(0, 0, 0, 0.54) !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.01em !important;
+
+  mat-icon {
+    height: 13px;
+    width: 13px;
+    font-size: 13px;
+    line-height: 20px;
+    position: relative;
+    top: 2px;
+  }
+}
+
+.mat-stroked-button {
+  min-width: unset !important;
+}
+
+.application {
+  .project-type {
+    color: #bb3a3f;
+  }
+
+  .project-name {
+    font-weight: 500 !important;
+  }
+}
+
+.avatar {
+  height: 48px;
+  width: 48px;
+  line-height: 48px;
+  background: rgba(0, 0, 0, 0.27);
+  color: white;
+  border-radius: 50%;
+  overflow: hidden;
+  text-transform: uppercase;
+}

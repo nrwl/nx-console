@@ -1,0 +1,11 @@
+{
+  "baseUrl": "http://localhost:4200",
+  "fileServerFolder": "../../dist/apps/angular-console-e2e",
+  "fixturesFolder": "../../dist/apps/angular-console-e2e/fixtures",
+  "integrationFolder": "../../dist/apps/angular-console-e2e/integration",
+  "pluginsFile": "../../dist/apps/angular-console-e2e/plugins/index.js",
+  "video": true,
+  "videosFolder": "../../dist/apps/angular-console-e2e/video",
+  "screenshotsFolder": "../../dist/apps/angular-console-e2e/screenshot",
+  "projectId": "x2ebye"
+}
