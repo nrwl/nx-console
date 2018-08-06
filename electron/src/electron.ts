@@ -91,7 +91,7 @@ function createMenu() {
 }
 
 function createWindow() {
-  win = new BrowserWindow({ width: 1400, height: 1200 });
+  win = new BrowserWindow({ width: 800, height: 1400 });
 
   getPort({ port: 7777 }).then(port => {
     try {
