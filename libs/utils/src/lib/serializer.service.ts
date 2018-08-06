@@ -58,7 +58,10 @@ export class Serializer {
 
   serializeArgs(value: { [p: string]: any }, schema: Field[]): string[] {
     const fields = schema.filter(
-      s => value[s.name] !== undefined && value[s.name] !== null
+      s =>
+        value[s.name] !== undefined &&
+        value[s.name] !== null &&
+        value[s.name] !== ''
     );
     const args = fields
       .map(f => {

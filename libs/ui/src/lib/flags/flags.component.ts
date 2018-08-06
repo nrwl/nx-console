@@ -6,8 +6,8 @@ import {
   trigger
 } from '@angular/animations';
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   ElementRef,
   EventEmitter,
   Input,
@@ -19,9 +19,16 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material';
 import { Completions, Serializer } from '@angular-console/utils';
-import { Field, CompletetionValue } from '@angular-console/schema';
+import { CompletetionValue, Field } from '@angular-console/schema';
 import { Subscription } from 'rxjs';
-import { debounceTime, startWith, switchMap, map } from 'rxjs/operators';
+import {
+  debounceTime,
+  map,
+  publishReplay,
+  refCount,
+  startWith,
+  switchMap
+} from 'rxjs/operators';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
@@ -173,7 +180,9 @@ export class FlagsComponent {
             startWith(formControl.value),
             switchMap((v: string | null) =>
               this.completions.completionsFor(this.path, f, v || '')
-            )
+            ),
+            publishReplay(1),
+            refCount()
           );
         } else if (f.enum) {
           const completionValues: CompletetionValue[] = this.fieldEnumOptions(
@@ -197,7 +206,9 @@ export class FlagsComponent {
                   c => c.value && c.value.indexOf(lowercase) !== -1
                 );
               }
-            })
+            }),
+            publishReplay(1),
+            refCount()
           );
         }
 
@@ -218,6 +229,7 @@ export class FlagsComponent {
     this.subscription = this.formGroup.valueChanges
       .pipe(startWith(this.formGroup.value))
       .subscribe(value => {
+        console.log('changes', value);
         this.emitNext(value);
       });
   }
@@ -242,5 +254,12 @@ export class FlagsComponent {
         behavior: 'instant'
       });
     }
+  }
+
+  // this is needed because of a bug in MatAutocomplete
+  triggerValueUpdate(name: string, value: string) {
+    (this.formGroup.get(name) as FormControl).setValue(value, {
+      emitEvent: true
+    });
   }
 }
