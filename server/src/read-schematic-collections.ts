@@ -56,6 +56,7 @@ export function readSchematicCollections(
           v.schema,
           path.dirname(collection.path)
         );
+
         schematicCollection.schematics.push({
           name: k,
           collection: collectionName,

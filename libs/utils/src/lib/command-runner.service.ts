@@ -3,7 +3,7 @@ import { Apollo } from 'apollo-angular';
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
 import { BehaviorSubject, interval, Observable, of } from 'rxjs';
-import { concatMap, last, map, switchMap, takeWhile } from 'rxjs/operators';
+import { concatMap, last, map, takeWhile } from 'rxjs/operators';
 
 export interface CommandOutput {
   status: 'success' | 'failure' | 'inprogress';
@@ -34,9 +34,9 @@ export class CommandRunner {
         variables
       })
       .pipe(
-        switchMap(() => {
+        concatMap(() => {
           return interval(POLLING_INTERVAL_MILLIS).pipe(
-            switchMap(() => {
+            concatMap(() => {
               return this.apollo.query({
                 query: gql`
                   query {

@@ -1,11 +1,11 @@
 import * as path from 'path';
+import * as fs from 'fs';
+import { stat, statSync } from 'fs';
+import { platform } from 'os';
+import { bindNodeCallback, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 const resolve = require('resolve');
-import * as fs from 'fs';
-import { platform } from 'os';
-import { statSync, stat } from 'fs';
-import { Observable, bindNodeCallback } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 export function findExecutable(command: string, cwd: string): string {
   const paths = (process.env.PATH as string).split(path.delimiter);
@@ -131,7 +131,6 @@ export function normalizeSchema(p: {
   Object.entries(p.properties).forEach(([k, v]: [string, any]) => {
     if (v.visible === undefined || v.visible) {
       const d = getDefault(v);
-      const p = isPositional(v);
       const r = (p.required && p.required.indexOf(k) > -1) || hasSource(v);
 
       res.push({
@@ -140,7 +139,7 @@ export function normalizeSchema(p: {
         description: v.description,
         defaultValue: d,
         required: r,
-        positional: p,
+        positional: isPositional(v),
         enum: v.enum
       });
     }

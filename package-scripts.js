@@ -37,7 +37,7 @@ module.exports = {
         write: 'prettier --write \"./server/**/*.ts\"',
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
-      test: 'echo 0'
+      test: 'jest --maxWorkers=1 ./dist/server/test'
     },
     electron: {
       'clean': 'rm -rf dist',

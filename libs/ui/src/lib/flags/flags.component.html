@@ -65,8 +65,8 @@
           <mat-icon>{{ field.completionValues ? 'search' : 'create' }}</mat-icon>
           <div fxLayout="column" fxFlex class="text-field-container">
             <mat-form-field>
-              <input #input fxFlex type="text" matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
-                [formControlName]="field.name" [matAutocomplete]="auto">
+              <input #input fxFlex type="text" matInput [placeholder]="field.name" [attr.name]="field.name" [required]="field.required "
+                [formControlName]="field.name" [matAutocomplete]="auto" (input)="triggerValueUpdate(field.name, input.value)">
               <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
               <mat-autocomplete #auto="matAutocomplete">
                 <mat-option (click)="input.blur()" *ngFor="let completionValue of field.completionValues | async" [value]="completionValue.value">

@@ -172,7 +172,7 @@ export function waitForAnimation() {
 }
 
 export function waitForAutocomplete() {
-  cy.wait(500);
+  cy.wait(700);
 }
 
 export function waitForBuild() {
