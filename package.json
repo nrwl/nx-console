@@ -117,6 +117,14 @@
     "zone.js": "^0.8.26",
     "electron-updater": "^2.21.4",
     "drivelist": "6.3.0",
-    "shelljs": "0.8.2"
+    "shelljs": "0.8.2",
+    "jest": "23.4.2",
+    "jest-jasmine2": "^23.4.2"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "tmp"
+    ],
+    "testURL": "http://localhost"
   }
 }
