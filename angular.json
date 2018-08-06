@@ -99,7 +99,9 @@
     "angular-console-e2e": {
       "root": "apps/angular-console-e2e/",
       "sourceRoot": "apps/angular-console-e2e/src",
-      "projectType": "application"
+      "projectType": "application",
+      "architect": {
+      }
     },
     "feature-workspaces": {
       "root": "libs/feature-workspaces",
@@ -303,6 +305,7 @@
       "typescriptMismatch": false,
       "versionMismatch": false
     },
+    "packageManager": "yarn",
     "defaultCollection": "@nrwl/schematics"
   },
   "defaultProject": "angular-console"
