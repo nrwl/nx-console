@@ -1,20 +1,23 @@
 import {
-  CREATE_WORKSPACE,
-  FeatureWorkspaceRouteState,
-  IMPORT_WORKSPACE,
-  WORKSPACES
-} from '@angular-console/feature-workspaces';
-import { ContextualActionBarService, FADE_IN } from '@angular-console/ui';
-import { transition, trigger } from '@angular/animations';
-import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
   ViewChild
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { transition, trigger } from '@angular/animations';
+
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+
+import {
+  CREATE_WORKSPACE,
+  FeatureWorkspaceRouteState,
+  IMPORT_WORKSPACE,
+  WORKSPACES
+} from '@angular-console/feature-workspaces';
+import { ContextualActionBarService, FADE_IN } from '@angular-console/ui';
+import { AnalyticsService } from '@angular-console/utils';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,6 +42,7 @@ export class AppComponent implements OnInit {
   }
 
   constructor(
+    analytics: AnalyticsService,
     router: Router,
     contextualActionBarService: ContextualActionBarService
   ) {
@@ -47,6 +51,10 @@ export class AppComponent implements OnInit {
       .subscribe(event => {
         const navigationEnd = event as NavigationEnd;
         if (navigationEnd.url.startsWith('/workspace/')) {
+          const path =
+            navigationEnd.urlAfterRedirects.split('/').pop() || '/workspace';
+          analytics.reportPageView(path);
+
           contextualActionBarService.contextualTabs$.next(null);
         } else {
           switch (
@@ -54,16 +62,19 @@ export class AppComponent implements OnInit {
               .state as FeatureWorkspaceRouteState
           ) {
             case CREATE_WORKSPACE:
+              analytics.reportPageView('/create-workspace');
               contextualActionBarService.breadcrumbs$.next([
                 { title: 'Create A New Workspace' }
               ]);
               break;
             case IMPORT_WORKSPACE:
+              analytics.reportPageView('/import-workspace');
               contextualActionBarService.breadcrumbs$.next([
                 { title: 'Import An Existing Workspace' }
               ]);
               break;
             case WORKSPACES:
+              analytics.reportPageView('/workspaces');
               contextualActionBarService.breadcrumbs$.next([
                 { title: 'Recently Opened Workspaces' }
               ]);

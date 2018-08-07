@@ -13,6 +13,7 @@ import {
   startWith,
   switchMap
 } from 'rxjs/operators';
+import { AnalyticsService } from '@angular-console/utils';
 
 interface SchematicId {
   collectionName: string | undefined;
@@ -119,6 +120,7 @@ export class SchematicsComponent {
   );
 
   constructor(
+    private readonly analytics: AnalyticsService,
     private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
     private readonly router: Router
@@ -126,6 +128,7 @@ export class SchematicsComponent {
 
   navigateToSelectedSchematic(s: Schematic | null) {
     if (s) {
+      this.analytics.reportPageView(encodeURIComponent(s.name));
       this.router.navigate(
         [encodeURIComponent(s.collection), encodeURIComponent(s.name)],
         { relativeTo: this.route }

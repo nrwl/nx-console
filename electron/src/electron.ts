@@ -7,12 +7,20 @@ const getPort = require('get-port');
 import * as os from 'os';
 import { autoUpdater } from 'electron-updater';
 import * as semver from 'semver';
+import ipcRenderer = Electron.ipcRenderer;
+import { reportEvent, reportException, reportPageView } from './analytics';
 
 let win: any;
 let p: any;
+let sessionStart: number;
+const millisecond = 1000;
 
 fixPath();
-
+/**
+ * Needs to be set before the electron app is created because of the limit issues with Google Analytics.
+ * @type {string}
+ */
+process.env.trackingID = 'UA-88380372-8';
 const currentDirectory = process.cwd();
 
 function createMenu() {
@@ -63,7 +71,7 @@ function createMenu() {
             label: 'Quit ' + name,
             accelerator: 'Command+Q',
             click() {
-              app.quit();
+              endSession();
             }
           }
         ]
@@ -79,7 +87,7 @@ function createMenu() {
             label: 'Exit',
             accelerator: 'Ctrl+Q',
             click() {
-              app.quit();
+              endSession();
             }
           }
         ]
@@ -103,6 +111,7 @@ function createWindow() {
       }
     } catch (e) {
       showCloseDialog(`Error when starting Angular Console: ${e.message}`);
+      reportEvent('Electron', 'StartFailed', e.message);
     }
   });
 
@@ -111,7 +120,7 @@ function createWindow() {
     if (p) {
       p.kill();
     }
-    app.quit();
+    endSession();
   });
 }
 
@@ -125,11 +134,13 @@ function fileExists(filePath: string): boolean {
   try {
     return statSync(filePath).isFile();
   } catch (err) {
+    reportException('File does not exist');
     return false;
   }
 }
 
 function showCloseDialog(message: string) {
+  reportEvent('CloseDialog', 'Opened', message );
   const dialogOptions = {
     type: 'error',
     buttons: ['Close'],
@@ -137,7 +148,7 @@ function showCloseDialog(message: string) {
   };
   dialog.showMessageBox(dialogOptions, i => {
     if (i === 0) {
-      app.quit();
+      endSession();
     }
   });
 }
@@ -151,6 +162,7 @@ function showRestartDialog() {
   dialog.showMessageBox(dialogOptions, i => {
     if (i === 0) { // Restart
       autoUpdater.quitAndInstall();
+      reportEvent('Electron', 'Restart', 'QuitAndInstall');
     }
   });
 }
@@ -167,12 +179,24 @@ function checkForUpdates() {
           console.log('checkForUpdates is called. downloadPromise is null.');
         }
       } catch (e) {
+        reportException(e);
         console.log('checkForUpdates failed');
         console.log(e.message);
       }
     }
   }, 0);
 }
+
+function endSession() {
+  const d = (Date.now() - sessionStart) / millisecond;
+  reportEvent('Electron','Session',  'Duration', d, app.quit);
+};
+
+function startSession() {
+  sessionStart = Date.now();
+  reportEvent('Electron','Session',  'Start', sessionStart);
+  // TODO: set session cookies here
+};
 
 app.on('ready', () => {
   createMenu();
