@@ -56,7 +56,7 @@ module.exports = {
       'dist': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist', 'electron.copy-to-osbuilds')
     },
     electronwin: {
-      'clean': 'rmdir dist /s /q',
+      'clean': 'if exist dist rmdir dist /s /q',
       'compile': 'tsc -p electron/tsconfig.json',
       'copy-assets': 'copy electron\\package.json dist\\electron\\package.json && (robocopy electron\\assets dist\\electron\\assets /e || echo 0)',
       'copy-server': 'robocopy dist\\server\\src dist\\electron\\server /e || echo 0',
