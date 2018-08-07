@@ -1,0 +1,57 @@
+<mat-nav-list *ngIf="settings.getRecentWorkspaces().length > 0; else empty">
+  <ng-container *ngIf="settings.getRecentWorkspaces(true) as workspaces">
+    <div class="recents-container" @growShrink *ngIf="workspaces.length">
+      <h3 mat-subheader>Favorites</h3>
+      <mat-list-item @growShrink *ngFor="let w of settings.getRecentWorkspaces(true); let first = first; trackBy: trackByPath"
+        [disableRipple]="true" (click)="workspacesService.openWorkspace(w.path)">
+        <mat-icon (click)="settings.toggleFavorite(w); $event.stopPropagation();" mat-list-icon class="favorite-icon favorited">favorite</mat-icon>
+        <h4 mat-line>{{ w.name }}</h4>
+        <p mat-line> {{ w.path | normalizePath }} </p>
+        <mat-icon (click)="settings.removeRecent(w); $event.stopPropagation()">clear</mat-icon>
+      </mat-list-item>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="settings.getRecentWorkspaces(false) as workspaces">
+    <div class="recents-container" @growShrink *ngIf="workspaces.length">
+      <h3 @growShrink mat-subheader> Recently opened</h3>
+      <mat-list-item @growShrink *ngFor="let w of settings.getRecentWorkspaces(false); let first = first; trackBy: trackByPath"
+        [disableRipple]="true" (click)="workspacesService.openWorkspace(w.path)">
+        <mat-icon (click)="settings.toggleFavorite(w); $event.stopPropagation();" mat-list-icon class="favorite-icon">favorite_border</mat-icon>
+        <h4 mat-line>{{ w.name }}</h4>
+        <p mat-line> {{ w.path | normalizePath }} </p>
+        <mat-icon (click)="settings.removeRecent(w); $event.stopPropagation()">clear</mat-icon>
+      </mat-list-item>
+    </div>
+  </ng-container>
+
+</mat-nav-list>
+
+<ng-template #empty>
+  <div fxFlex class="empty-container" fxFlex fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="48px">
+    <mat-card fxLayout="column">
+      <div class="code-image-container" fxLayout="row" fxLayoutAlign="center center">
+        <img src="assets/code-icon.svg" height="180px">
+      </div>
+      <mat-card-content fxLayout="column">
+        <div class="headline">Get Started</div>
+        <div class="sub-headline">
+          Create a new Angular workspace or continue working on an existing one.
+        </div>
+        <div class="action-container" fxLayout="row" fxLayoutAlign="space-evenly">
+          <button mat-raised-button color="primary" routerLink="/create-workspace">
+            <div fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon>create_new_folder</mat-icon>
+              <div>Create</div>
+            </div>
+          </button>
+          <button mat-raised-button color="primary" routerLink="/import-workspace">
+            <div fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon>folder_open</mat-icon>
+              <div>Import</div>
+            </div>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</ng-template>

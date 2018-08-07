@@ -1,0 +1,5 @@
+<ui-task-runner *ngIf="project$ | async as project" terminalWindowTitle="Task output">
+  <ui-flags [configurations]="project.architect[0].configurations" [prefix]="[project.architect[0].name, project.name]" [fields]="project.architect[0].schema"
+    (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()" [path]="path()"></ui-flags>
+  <ui-terminal [command]="command$ | async" [input]="(commandOutput$|async)?.out" #output></ui-terminal>
+</ui-task-runner>

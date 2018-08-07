@@ -1,0 +1,54 @@
+mat-toolbar.title-bar {
+  transition: all 0 0.5s ease-in-out;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+
+  .tabs-container {
+    height: unset;
+    padding: 0;
+    overflow: hidden;
+
+    .nav-link {
+      &.active {
+        opacity: 1 !important;
+      }
+
+      mat-icon {
+        font-weight: 300;
+      }
+    }
+  }
+
+  .exit-action {
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  &.actionable {
+    color: rgb(255, 255, 255);
+    background: rgb(33, 33, 33);
+  }
+
+  .title {
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  mat-toolbar-row {
+    padding: 0 12px;
+  }
+
+  a.branding {
+    text-decoration: none;
+    position: relative;
+    left: -4px;
+    margin-right: 10px;
+  }
+
+  // tslint:disable-next-line
+  .action-button[disabled] {
+    color: rgb(185, 185, 185);
+  }
+}

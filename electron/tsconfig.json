@@ -1,0 +1,14 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "../dist/electron",
+    "module": "commonjs",
+    "sourceMap": false,
+    "declaration": false,
+    "moduleResolution": "node",
+    "target": "es2017",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["dom", "es2017", "esnext.asynciterable"]
+  },
+  "exclude": ["node_modules", "tmp"]
+}

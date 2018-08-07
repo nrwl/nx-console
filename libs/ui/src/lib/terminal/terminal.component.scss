@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.terminal-container {
+  overflow: hidden;
+  max-width: 100%;
+  height: calc(100% - 44px);
+}
+
+.command {
+  color: white;
+  font-family: monospace;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.xterm-viewport {
+  overflow-y: auto !important;
+}
