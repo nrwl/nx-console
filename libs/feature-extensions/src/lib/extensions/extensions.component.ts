@@ -13,6 +13,7 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
+import { AnalyticsService } from '@angular-console/utils';
 
 interface ExtensionId {
   name: string | undefined;
@@ -111,6 +112,7 @@ export class ExtensionsComponent {
   );
 
   constructor(
+    private readonly analytics: AnalyticsService,
     private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
     private readonly router: Router
@@ -118,6 +120,7 @@ export class ExtensionsComponent {
 
   navigateToSelectedExtension(s: Extension | null) {
     if (s) {
+      this.analytics.reportPageView(s.name);
       this.router.navigate([encodeURIComponent(s.name)], {
         relativeTo: this.route
       });
