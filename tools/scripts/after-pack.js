@@ -9,11 +9,6 @@ exports.default = async function(context) {
     } else {
       execSync('cp tools/win/.bin/ng.cmd dist/electron/ng.cmd');
       execSync('cp tools/win/.bin/ng.cmd dist/packages/win-unpacked/resources/app/ng.cmd');
-
-      execSync('rm -rf dist/electron/node_modules');
-      execSync('rm -rf dist/packages/win-unpacked/resources/app/node_modules');
-      execSync('unzip ./tools/win/node_modules.zip -d ./dist/electron');
-      execSync('unzip ./tools/win/node_modules.zip -d dist/packages/win-unpacked/resources/app');
     }
   }
 };
