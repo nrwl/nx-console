@@ -26,7 +26,8 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "icon.ico"
+      "icon": "icon.ico",
+      "certificateSubjectName": "Narwhal Technologies Inc."
     },
     "nsis": {
       "createDesktopShortcut": "always",
