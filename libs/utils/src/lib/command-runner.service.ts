@@ -4,6 +4,7 @@ import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
 import { BehaviorSubject, interval, Observable, of } from 'rxjs';
 import { concatMap, last, map, takeWhile } from 'rxjs/operators';
+import { AnalyticsService } from '@angular-console/utils';
 
 export interface CommandOutput {
   status: 'success' | 'failure' | 'inprogress';
@@ -18,7 +19,10 @@ const POLLING_INTERVAL_MILLIS = 100;
 export class CommandRunner {
   readonly activeCommand$ = new BehaviorSubject(false);
 
-  constructor(private readonly apollo: Apollo) {}
+  constructor(
+    private readonly analytics: AnalyticsService,
+    private readonly apollo: Apollo
+  ) {}
 
   runCommand(
     mutation: DocumentNode,
@@ -26,6 +30,22 @@ export class CommandRunner {
     dryRun: boolean
   ): Observable<CommandOutput> {
     if (!dryRun) {
+      console.log('variables', variables);
+      if (variables.runCommand) {
+        this.analytics.reportEvent({
+          category: 'Command',
+          action: 'Run',
+          label: variables.runCommand[1]
+        });
+      } else {
+        console.log('Mutation', mutation);
+        this.analytics.reportEvent({
+          category: 'Command',
+          action: 'Run',
+          label: 'Cancelled'
+        });
+      }
+
       this.activeCommand$.next(true);
     }
     return this.apollo
