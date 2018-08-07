@@ -1,7 +1,7 @@
 <div *ngIf="workspace$|async as workspace">
   <mat-list *ngIf="workspace.projects.length > 0; else empty">
     <ng-container *ngFor="let p of workspace.projects">
-      <mat-list-item [ngClass]="p.projectType" [disableRipple]="true" (click)="workspacesService.openWorkspace(w.path)">
+      <mat-list-item [ngClass]="p.projectType" [disableRipple]="true">
         <div class="project-type" mat-line>{{ p.projectType }}</div>
         <div class="project-name" mat-line>{{ p.name }}</div>
         <div class="project-root" mat-line *ngIf="p.root">
