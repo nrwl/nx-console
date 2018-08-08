@@ -7,5 +7,6 @@
   "video": true,
   "videosFolder": "../../dist/apps/angular-console-e2e/video",
   "screenshotsFolder": "../../dist/apps/angular-console-e2e/screenshot",
-  "projectId": "x2ebye"
+  "projectId": "x2ebye",
+  "chromeWebSecurity": false
 }

@@ -26,8 +26,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "icon.ico",
-      "certificateSubjectName": "Narwhal Technologies Inc."
+      "icon": "icon.ico"
     },
     "nsis": {
       "createDesktopShortcut": "always",
@@ -120,7 +119,11 @@
     "drivelist": "6.3.0",
     "shelljs": "0.8.2",
     "jest": "23.4.2",
-    "jest-jasmine2": "^23.4.2"
+    "jest-jasmine2": "^23.4.2",
+    "universal-analytics": "^0.4.17",
+    "@types/universal-analytics": "^0.4.2",
+    "uuid": "^3.3.2",
+    "electron-store": "2.0.0"
   },
   "jest": {
     "modulePathIgnorePatterns": [

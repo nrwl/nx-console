@@ -1,24 +1,22 @@
-import { app, BrowserWindow, Menu, dialog  } from 'electron';
+import {app, BrowserWindow, dialog, Menu} from 'electron';
 import * as path from 'path';
-import { execSync, spawn } from 'child_process';
-import { statSync, writeFileSync } from 'fs';
+import {statSync} from 'fs';
+import * as os from 'os';
+import {autoUpdater} from 'electron-updater';
+import {reportEvent, reportException, setUpAnalytics} from './analytics';
+
 const fixPath = require('fix-path');
 const getPort = require('get-port');
-import * as os from 'os';
-import { autoUpdater } from 'electron-updater';
-import * as semver from 'semver';
 
 let win: any;
-let p: any;
 
 fixPath();
-
 const currentDirectory = process.cwd();
 
 function createMenu() {
   let menu = [];
   const name = app.getName();
-  const common = [
+  const common: any = [
     {
       label: 'Edit',
       submenu: [
@@ -63,7 +61,7 @@ function createMenu() {
             label: 'Quit ' + name,
             accelerator: 'Command+Q',
             click() {
-              app.quit();
+              quit();
             }
           }
         ]
@@ -79,7 +77,7 @@ function createMenu() {
             label: 'Exit',
             accelerator: 'Ctrl+Q',
             click() {
-              app.quit();
+              quit();
             }
           }
         ]
@@ -93,7 +91,7 @@ function createMenu() {
 function createWindow() {
   win = new BrowserWindow({ width: 800, height: 1400 });
 
-  getPort({ port: 7777 }).then(port => {
+  getPort({ port: 7777 }).then((port: number) => {
     try {
       startServer(port);
       if (fileExists(path.join(currentDirectory, 'angular.json'))) {
@@ -103,22 +101,24 @@ function createWindow() {
       }
     } catch (e) {
       showCloseDialog(`Error when starting Angular Console: ${e.message}`);
+      reportException(`Start failed: ${e.message}`);
     }
   });
 
   win.on('close', () => {
-    win = null;
-    if (p) {
-      p.kill();
-    }
-    app.quit();
+    quit();
   });
 }
 
 function startServer(port: number) {
   console.log('starting server on port', port);
-  const {start} = require('./server/index');
-  start(port);
+  try {
+    const { start } = require('./server/index');
+    start(port);
+  } catch (e) {
+    reportException(`Start Server: ${e.message}`);
+    throw e;
+  }
 }
 
 function fileExists(filePath: string): boolean {
@@ -137,7 +137,7 @@ function showCloseDialog(message: string) {
   };
   dialog.showMessageBox(dialogOptions, i => {
     if (i === 0) {
-      app.quit();
+      quit();
     }
   });
 }
@@ -150,6 +150,7 @@ function showRestartDialog() {
   };
   dialog.showMessageBox(dialogOptions, i => {
     if (i === 0) { // Restart
+      reportEvent('Lifecycle', 'QuitAndInstall');
       autoUpdater.quitAndInstall();
     }
   });
@@ -167,14 +168,26 @@ function checkForUpdates() {
           console.log('checkForUpdates is called. downloadPromise is null.');
         }
       } catch (e) {
-        console.log('checkForUpdates failed');
-        console.log(e.message);
+        reportException(e);
       }
     }
   }, 0);
 }
 
+function startSession() {
+  reportEvent('Lifecycle', 'StartSession');
+}
+
+function quit() {
+  if (win) {
+    win = null;
+    app.quit();
+  }
+}
+
 app.on('ready', () => {
+  setUpAnalytics();
+  startSession();
   createMenu();
   createWindow();
   checkForUpdates();
