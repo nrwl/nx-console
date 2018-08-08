@@ -7,12 +7,6 @@
           <mat-icon class="route-icon" [id]="route.icon" [matTooltip]="route.title" matTooltipPosition="right">{{ route.icon }}</mat-icon>
         </button>
         <span fxFlex></span>
-        <button class="animations-button" [class.active]="!animationsDisabled" mat-icon-button fxLayout="column" fxLayoutAlign="center"
-          (click)="toggleAnimations()">
-          <mat-icon class="route-icon" [matTooltip]="animationsDisabled ? 'Animations disabled' : 'Animations enabled'" matTooltipPosition="right">
-            {{ animationsDisabled ? 'videocam_off' : 'videocam' }}
-          </mat-icon>
-        </button>
       </div>
     </div>
     <div fxFlex class="outlet-container" [@routerTransition]="outlet.activatedRouteData.state">
