@@ -826,7 +826,7 @@ export const mutationType: graphql.GraphQLObjectType = new graphql.GraphQLObject
 function runCommand(cwd: string, program: string, cmds: string[]) {
   stopAllCommands();
   const command = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
-  const commandRunning = spawn(program, cmds, { cwd, cols: 100 });
+  const commandRunning = spawn(program, cmds, { cwd, cols: 80 });
   commandInProgress = {
     command,
     status: 'inprogress',

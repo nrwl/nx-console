@@ -128,9 +128,10 @@ export class NewWorkspaceComponent implements OnInit {
   createNewWorkspace(ngNewInvocation: NgNewInvocation) {
     this.matDialog
       .open(NewWorkspaceDialogComponent, {
-        width: 'calc(100vw - 128px)',
+        width: 'calc(100vw - 39px)',
         height: 'calc(100vh - 128px)',
         panelClass: 'create-new-workspace-dialog',
+        maxWidth: '95vw',
         data: { ngNewInvocation }
       })
       .beforeClose()
