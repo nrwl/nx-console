@@ -64,14 +64,14 @@ module.exports = {
       'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\electron\\server\\public /e || echo 0',
       'start': 'electron dist/electron',
       'prepackage': npsUtils.series.nps('electronwin.clean', 'electronwin.compile', 'electronwin.copy-assets', 'frontend.build', 'server.compile', 'electronwin.copy-server', 'electronwin.copy-frontend', 'electronwin.install-node-modules'),
-      'up': npsUtils.series.nps('electronwin.prepackage', 'electronwin.start'),
-
+      'pack': 'electron-builder --dir',
+      'up': npsUtils.series.nps('electronwin.prepackage', 'electronwin.pack'),
       'builder-dist': 'electron-builder --win -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'dist': npsUtils.series.nps('electronwin.prepackage', 'electronwin.builder-dist', 'electronwin.copy-to-osbuilds')
     },
     publish: {
-      'builder-publish': 'electron-builder --mac --win -p always',
+      'builder-publish': 'electron-builder --mac --win -p always --config.win.certificateSubjectName="Narwhal Technologies Inc."',
       'publish': npsUtils.series.nps('electron.prepackage', 'publish.builder-publish')
     },
     dev: {

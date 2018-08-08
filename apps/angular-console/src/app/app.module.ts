@@ -13,7 +13,11 @@ import {
   workspaceRoutes
 } from '@angular-console/feature-workspaces';
 import { UiModule } from '@angular-console/ui';
-import { CancelCommandGuard, Messenger } from '@angular-console/utils';
+import {
+  AnalyticsCollector,
+  CancelCommandGuard,
+  Messenger
+} from '@angular-console/utils';
 import { Apollo, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -45,27 +49,34 @@ import { AppComponent } from './app.component';
       { paramsInheritanceStrategy: 'always' }
     )
   ],
-  providers: [CancelCommandGuard],
+  providers: [CancelCommandGuard, AnalyticsCollector],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor(
+    analytics: AnalyticsCollector,
     apollo: Apollo,
     httpLink: HttpLink,
     matIconRegistry: MatIconRegistry,
     messenger: Messenger
   ) {
+    analytics.setUpRouterLogging();
+
     const errorLink = onError(({ graphQLErrors, networkError }) => {
       if (graphQLErrors) {
         graphQLErrors.forEach(({ message }) => {
           messenger.error(message);
+          analytics.reportException(message);
         });
       } else if (networkError) {
         const n: any = networkError;
         if (n.error && n.error.errors && n.error.errors.length > 0) {
-          messenger.error(n.error.errors[0].message);
+          const message = n.error.errors[0].message;
+          messenger.error(message);
+          analytics.reportException(message);
         } else {
           messenger.error(n.message);
+          analytics.reportException(n.message);
         }
       }
     });

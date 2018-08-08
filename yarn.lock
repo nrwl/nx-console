@@ -450,6 +450,10 @@
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-4.3.3.tgz#97cbbfddc3282b5fd40c7abf80b99db426fd4237"
 
+"@types/universal-analytics@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@types/universal-analytics/-/universal-analytics-0.4.2.tgz#d21a122a984bf8261eb206bcb7ccb1c0e8353d04"
+
 "@types/yargs@^11.0.0":
   version "11.1.1"
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-11.1.1.tgz#2e724257167fd6b615dbe4e54301e65fe597433f"
@@ -1430,6 +1434,18 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
+boom@4.x.x:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/boom/-/boom-4.3.1.tgz#4f8a3005cb4a7e3889f749030fd25b96e01d2e31"
+  dependencies:
+    hoek "4.x.x"
+
+boom@5.x.x:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/boom/-/boom-5.2.0.tgz#5dd9da6ee3a5f302077436290cb717d3f4a54e02"
+  dependencies:
+    hoek "4.x.x"
+
 boxen@^1.2.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/boxen/-/boxen-1.3.0.tgz#55c6c39a8ba58d9c61ad22cd877532deb665a20b"
@@ -2147,6 +2163,16 @@ concurrently@^3.4.0:
     supports-color "^3.2.3"
     tree-kill "^1.1.0"
 
+conf@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/conf/-/conf-2.0.0.tgz#43f7e282b32faca31f4d18bf279d6841ad657d5a"
+  dependencies:
+    dot-prop "^4.1.0"
+    env-paths "^1.0.0"
+    make-dir "^1.0.0"
+    pkg-up "^2.0.0"
+    write-file-atomic "^2.3.0"
+
 configstore@^3.0.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/configstore/-/configstore-3.1.2.tgz#c6f25defaeef26df12dd33414b001fe81a543f8f"
@@ -2369,6 +2395,12 @@ cryptiles@2.x.x:
   resolved "https://registry.yarnpkg.com/cryptiles/-/cryptiles-2.0.5.tgz#3bdfecdc608147c1c67202fa291e7dca59eaa3b8"
   dependencies:
     boom "2.x.x"
+
+cryptiles@3.x.x:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/cryptiles/-/cryptiles-3.1.2.tgz#a89fbb220f5ce25ec56e8c4aa8a4fd7b5b0d29fe"
+  dependencies:
+    boom "5.x.x"
 
 crypto-browserify@^3.11.0:
   version "3.12.0"
@@ -3017,6 +3049,12 @@ electron-publish@20.19.0:
     fs-extra-p "^4.6.1"
     lazy-val "^1.0.3"
     mime "^2.3.1"
+
+electron-store@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/electron-store/-/electron-store-2.0.0.tgz#1035cca2a95409d1f54c7466606345852450d64a"
+  dependencies:
+    conf "^2.0.0"
 
 electron-to-chromium@^1.3.47:
   version "1.3.55"
@@ -4358,6 +4396,15 @@ hawk@~3.1.3:
     hoek "2.x.x"
     sntp "1.x.x"
 
+hawk@~6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/hawk/-/hawk-6.0.2.tgz#af4d914eb065f9b5ce4d9d11c1cb2126eecc3038"
+  dependencies:
+    boom "4.x.x"
+    cryptiles "3.x.x"
+    hoek "4.x.x"
+    sntp "2.x.x"
+
 he@1.1.x:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
@@ -4380,6 +4427,10 @@ hmac-drbg@^1.0.0:
 hoek@2.x.x:
   version "2.16.3"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-2.16.3.tgz#20bb7403d3cea398e91dc4710a8ff1b8274a25ed"
+
+hoek@4.x.x:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/hoek/-/hoek-4.2.1.tgz#9634502aa12c445dd5a7c5734b572bb8738aacbb"
 
 home-or-tmp@^2.0.0:
   version "2.0.0"
@@ -7287,6 +7338,12 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
+pkg-up@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/pkg-up/-/pkg-up-2.0.0.tgz#c819ac728059a461cab1c3889a2be3c49a004d7f"
+  dependencies:
+    find-up "^2.1.0"
+
 plist@^2.0.0, plist@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/plist/-/plist-2.1.0.tgz#57ccdb7a0821df21831217a3cad54e3e146a1025"
@@ -8039,6 +8096,32 @@ request@2.75.x:
     tough-cookie "~2.3.0"
     tunnel-agent "~0.4.1"
 
+request@2.86.0:
+  version "2.86.0"
+  resolved "https://registry.yarnpkg.com/request/-/request-2.86.0.tgz#2b9497f449b0a32654c081a5cf426bbfb5bf5b69"
+  dependencies:
+    aws-sign2 "~0.7.0"
+    aws4 "^1.6.0"
+    caseless "~0.12.0"
+    combined-stream "~1.0.5"
+    extend "~3.0.1"
+    forever-agent "~0.6.1"
+    form-data "~2.3.1"
+    har-validator "~5.0.3"
+    hawk "~6.0.2"
+    http-signature "~1.2.0"
+    is-typedarray "~1.0.0"
+    isstream "~0.1.2"
+    json-stringify-safe "~5.0.1"
+    mime-types "~2.1.17"
+    oauth-sign "~0.8.2"
+    performance-now "^2.1.0"
+    qs "~6.5.1"
+    safe-buffer "^5.1.1"
+    tough-cookie "~2.3.3"
+    tunnel-agent "^0.6.0"
+    uuid "^3.1.0"
+
 request@2.87.0, request@^2.0.0, request@^2.45.0, request@^2.74.0, request@^2.79.0, request@^2.83.0, request@^2.87.0:
   version "2.87.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.87.0.tgz#32f00235cd08d482b4d0d68db93a829c0ed5756e"
@@ -8629,6 +8712,12 @@ sntp@1.x.x:
   resolved "https://registry.yarnpkg.com/sntp/-/sntp-1.0.9.tgz#6541184cc90aeea6c6e7b35e2659082443c66198"
   dependencies:
     hoek "2.x.x"
+
+sntp@2.x.x:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/sntp/-/sntp-2.1.0.tgz#2c6cec14fedc2222739caf9b5c3d85d1cc5a2cc8"
+  dependencies:
+    hoek "4.x.x"
 
 socket.io-adapter@~1.1.0:
   version "1.1.1"
@@ -9609,6 +9698,14 @@ unique-string@^1.0.0:
   dependencies:
     crypto-random-string "^1.0.0"
 
+universal-analytics@^0.4.17:
+  version "0.4.17"
+  resolved "https://registry.yarnpkg.com/universal-analytics/-/universal-analytics-0.4.17.tgz#b57a07e37446ebe4f32872b2152a44cbc5cc4b73"
+  dependencies:
+    debug "^3.0.0"
+    request "2.86.0"
+    uuid "^3.0.0"
+
 universalify@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
@@ -9757,7 +9854,7 @@ uuid@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
 
-uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0:
+uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0, uuid@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
 
@@ -10090,7 +10187,7 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
 
-write-file-atomic@^2.0.0, write-file-atomic@^2.1.0:
+write-file-atomic@^2.0.0, write-file-atomic@^2.1.0, write-file-atomic@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/write-file-atomic/-/write-file-atomic-2.3.0.tgz#1ff61575c2e2a4e8e510d6fa4e243cce183999ab"
   dependencies:

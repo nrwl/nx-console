@@ -1,7 +1,7 @@
 import { directoryExists, fileExists } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as drivelist from 'drivelist';
+const drivelist: any = require('drivelist');
 import { bindNodeCallback, Observable, of, Subject } from 'rxjs';
 import { Directory, LocalFile, LocalFileType } from '../../libs/schema/src';
 import { catchError, map, switchMap, zipAll } from 'rxjs/operators';
@@ -99,15 +99,15 @@ function _readDirectory(
 export function mountPoints(): Observable<Directory> {
   const res = new Subject<Directory>();
 
-  drivelist.list((errors, drives) => {
+  drivelist.list((errors: any, drives: any) => {
     if (errors) {
       res.error(errors[0]);
     } else {
-      let mountpoints = [];
-      drives.forEach(d => {
+      let mountpoints: any = [];
+      drives.forEach((d: any) => {
         mountpoints = [
           ...mountpoints,
-          ...d.mountpoints.map(p => {
+          ...d.mountpoints.map((p: any) => {
             const name = p.path.endsWith('\\')
               ? `${p.path.substring(0, p.path.length - 1)}//`
               : p.path;
