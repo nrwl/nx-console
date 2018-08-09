@@ -8,8 +8,12 @@
     </br>
 </h1>
 
+<h3 align="center">
+    The Power of the Angular CLI. The Convenience of an App.
+</h3>
+
 <h4 align="center">
-    Spend less time looking up command line arguements and more time shipping incredible products.
+    Spend less time looking up command line arguments and more time shipping incredible products.
 </h4>
 
 <p align="center">
