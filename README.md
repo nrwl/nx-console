@@ -37,6 +37,7 @@
 
 **Angular Console is the user interface for the Angular CLI**.
 
+
 It allows you to create new projects, install extensions, generate artifacts, build, test, and deploy your projects. Anything you can do with the Angular CLI, you can do with Angular Console. It also gives you a visual overview of your projects.
 
 
