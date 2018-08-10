@@ -21,6 +21,7 @@ import {
   refCount,
   switchMap
 } from 'rxjs/operators';
+
 import {
   NewWorkspaceDialogComponent,
   NgNewInvocation
@@ -110,7 +111,7 @@ export class NewWorkspaceComponent implements OnInit {
         const form = this.ngNewForm$.value;
         if (form && formValue.path) {
           this.contextActionService.contextualActions$.next({
-            contextTitle: 'Fill In Required Details',
+            contextTitle: 'Create a New Angular Workspace',
             actions: [
               {
                 name: 'Create',
@@ -128,6 +129,7 @@ export class NewWorkspaceComponent implements OnInit {
   createNewWorkspace(ngNewInvocation: NgNewInvocation) {
     this.matDialog
       .open(NewWorkspaceDialogComponent, {
+        disableClose: true,
         width: 'calc(100vw - 39px)',
         height: 'calc(100vh - 128px)',
         panelClass: 'create-new-workspace-dialog',
