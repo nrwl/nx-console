@@ -21,9 +21,9 @@
 		alt="Angular Console Website"
 		src="https://img.shields.io/badge/Angular-Console-blue.svg"></a>
 	<br>
-    <a href="https://travis-ci.com/nrwl/angular-console/"><img
+    <a href="https://travis-ci.org/nrwl/angular-console/"><img
 		alt="Build Status"
-		src="https://travis-ci.com/nrwl/angular-console.svg?branch=master"></a>
+		src="https://travis-ci.org/nrwl/angular-console.svg?branch=master"></a>
     <a href="https://opensource.org/licenses/MIT"><img
 		alt="License"
 		src="https://img.shields.io/npm/l/@nrwl/schematics.svg"></a>
