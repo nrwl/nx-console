@@ -21,7 +21,7 @@ function runE2eTests() {
 
 try {
   frontend = cp.spawn(findInPath('yarn'), ['start', 'frontend.serve']);
-  server = cp.spawn(findInPath('yarn'), ['start', 'server.up'], {stdio: [0,1,2]});
+  server = cp.spawn(findInPath('yarn'), ['start', 'dev.server'], {stdio: [0,1,2]});
 
   frontend.stdout.on('data', data => {
     console.log(data.toString());

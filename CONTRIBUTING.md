@@ -11,9 +11,11 @@ We are trying to keep GitHub issues for bug reports and feature requests. Stack 
 
 ## Running Dev
 
-After cloning the project run: `yarn`.
+After cloning the project run: `yarn`. 
 
-After that, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200. To test electron specific features, run `yarn start electron.up`.
+After that, run `yarn start dev.prepare`. Every time you add or remove dependencies in electron/package.json, you will need to rerun `dev.prepare`. 
+
+After this, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200.
 
 
 ## Running Unit Tests
