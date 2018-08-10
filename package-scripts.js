@@ -41,6 +41,7 @@ module.exports = {
     },
     electron: {
       'clean': 'rm -rf dist',
+      'clean-packages': 'rm -rf dist/packages',
       'compile': 'tsc -p electron/tsconfig.json',
       'copy-assets': 'cp electron/package.json dist/electron/package.json && cp -r electron/assets dist/electron',
       'copy-server': 'cp -r dist/server/src dist/electron/server',
@@ -51,9 +52,11 @@ module.exports = {
       'prepackage': npsUtils.series.nps('electron.clean', 'electron.compile', 'electron.copy-assets', 'frontend.build', 'server.compile', 'electron.copy-server', 'electron.copy-frontend', 'electron.install-node-modules'),
       'up': npsUtils.series.nps('electron.prepackage', 'electron.start'),
 
-      'builder-dist': 'electron-builder --mac -p never',
-      'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
-      'dist': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist', 'electron.copy-to-osbuilds')
+      'builder-dist-mac': 'electron-builder --mac -p never',
+      'builder-dist-linux': 'electron-builder --linux -p never',
+      'copy-to-osbuilds-mac': 'cp -r dist/packages osbuilds/mac',
+      'copy-to-osbuilds-linux': 'cp -r dist/packages osbuilds/linux',
+      'dist': npsUtils.series.nps('electron.prepackage', 'electron.builder-dist-mac', 'electron.copy-to-osbuilds-mac', 'clean-packages', 'electron.builder-dist-linux', 'electron.copy-to-osbuilds-linux')
     },
     electronwin: {
       'clean': 'if exist dist rmdir dist /s /q',
