@@ -38,7 +38,7 @@ describe('Forms', () => {
   });
 
   // TODO vsavkin: reenable flaky test
-  it.skip('supports project autocompletion', () => {
+  it('supports project autocompletion', () => {
     cy.get('input[name="project"]').type('e2e');
     waitForAutocomplete();
 
@@ -57,7 +57,7 @@ describe('Forms', () => {
   });
 
   // TODO vsavkin: reenable flaky test
-  it.skip('supports module autocompletion', () => {
+  it('supports module autocompletion', () => {
     cy.get('input[name="module"]').type('nothing');
     waitForAutocomplete();
 

@@ -32,4 +32,4 @@ jobs:
     - run:
         command: yarn start e2e.run
         environment:
-          CYPRESS_RECORD_KEY: bab6b9ec-ce6d-48af-a8be-9e606f48f70e
+          CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
