@@ -1,0 +1,6 @@
+{
+  "watch": ["server"],
+  "ext": "ts",
+  "ignore": ["apps", "electron", "libs", "tools"],
+  "exec": "ts-node -P ./server/tsconfig.json ./server/src/index.ts 7777"
+}

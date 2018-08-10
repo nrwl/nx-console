@@ -29,6 +29,7 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
+      dev: 'nodemon --config server/nodemon.json',
       compile: 'tsc -p server/tsconfig.json',
       start: 'node dist/server/src/index.js 8888',
       up: npsUtils.series.nps('server.compile', 'server.start'),
