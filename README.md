@@ -24,7 +24,6 @@
     <a href="https://circleci.com/gh/nrwl/angular-console/tree/master"><img
 		alt="Build Status"
 		src="https://circleci.com/gh/nrwl/angular-console/tree/master.svg?style=svg"></a>
-		
     <a href="https://opensource.org/licenses/MIT"><img
 		alt="License"
 		src="https://img.shields.io/npm/l/@nrwl/schematics.svg"></a>
