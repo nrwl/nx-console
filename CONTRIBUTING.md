@@ -26,6 +26,8 @@ After that, run `yarn start dev.up` to start the dev environment. The applicatio
 * Run `yarn start e2e.run` to run e2e tests. This will compile and frontend and the backend, and run cypress tests (The fixtures must be created).
 * Run `yarn start e2e.up` to server the app and launch cypress. (The fixtures must be created). This is useful for development.
 
+Cypress, which we use to run e2e tests, records the videos of the tests ran on CI. You can access them here: [https://dashboard.cypress.io/#/projects/x2ebye/runs](https://dashboard.cypress.io/#/projects/x2ebye/runs). This is very useful for troubleshooting.
+
 
 ## Submitting a PR
 
@@ -37,7 +39,7 @@ Run the following commands to make sure the linting and the tests pass.
 * `yarn start lint`
 * `yarn start test`
 * `yarn start e2e.fixtures`
-* `yarn start e2e.run`
+* `yarn start e2e.up`
 
 If `yarn start format.check` fails, run `yarn start format`.
 

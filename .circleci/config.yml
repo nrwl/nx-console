@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-    - image: circleci/node:8.11.1-browsers
+    - image: cypress/browsers:chrome65-ff57
     working_directory: ~/repo
 
     steps:
@@ -25,3 +25,11 @@ jobs:
         key: v1-dependencies-{{ checksum "package.json" }}
 
     - run: yarn start format.check
+    - run: yarn start lint
+    - run: yarn start server.compile
+    - run: yarn start test
+    - run: yarn start e2e.fixtures
+    - run:
+        command: yarn start e2e.run
+        environment:
+          CYPRESS_RECORD_KEY: bab6b9ec-ce6d-48af-a8be-9e606f48f70e
