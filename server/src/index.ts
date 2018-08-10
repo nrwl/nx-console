@@ -894,8 +894,8 @@ app.get('/workspace/*', (req, res) => {
 // workspaces
 app.use(express.static(path.join(__dirname, 'public')));
 
-export function start(port: number) {
-  app.listen(port ? port : 7777);
+export function start(port: number = 7777) {
+  app.listen(port, () => console.log(`🐬 Server running on port ${port}`));
 }
 
 if (process.argv[2]) {
