@@ -26,7 +26,7 @@ module.exports = {
           'ng lint --fix --project ui'
         )
       },
-      test: 'nx affected:test --all'
+      test: 'nx affected:test --base=master'
     },
     server: {
       compile: 'tsc -p server/tsconfig.json',
