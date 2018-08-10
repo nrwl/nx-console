@@ -85,7 +85,7 @@ module.exports = {
       'compile': 'tsc -p apps/angular-console-e2e/tsconfig.json',
       'compile-watch': 'tsc -p apps/angular-console-e2e/tsconfig.json --watch',
       'fixtures': 'node ./tools/scripts/set-up-e2e-fixtures.js',
-      'cypress': `cypress run --project ./apps/angular-console-e2e --env projectsRoot=${__dirname + '/tmp'} --record --key bab6b9ec-ce6d-48af-a8be-9e606f48f70e`,
+      'cypress': `cypress run --project ./apps/angular-console-e2e --env projectsRoot=${__dirname + '/tmp'} --record`,
       'open-cypress': `cypress open --project ./apps/angular-console-e2e --env projectsRoot=${__dirname + '/tmp'}`,
       'run': 'node ./tools/scripts/run-e2e.js',
       'up': npsUtils.concurrent.nps('dev.up', 'e2e.compile-watch', 'e2e.open-cypress')
