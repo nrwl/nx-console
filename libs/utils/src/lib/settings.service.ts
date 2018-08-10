@@ -8,6 +8,15 @@ export interface WorkspaceDescription {
 
 const key = '$angularConsoleSettings';
 
+
+
+
+
+
+
+
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,6 +48,9 @@ export class Settings {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
     this.store({ recent: [...r] });
   }
+
+
+
 
   clear(): void {
     window.localStorage.clear();
