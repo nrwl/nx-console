@@ -26,7 +26,7 @@ export function availableExtensions() {
       name: '@angular/pwa',
       description: 'PWA support for Angular'
     },
-    { name: '@clr/angular', description: 'Alarify components' },
+    { name: '@clr/angular', description: 'Clarity components' },
     {
       name: '@nativescript/schematics',
       description: 'NativeScript Support'
@@ -80,7 +80,7 @@ export function availableExtensions() {
     },
     {
       name: 'ngcli-wallaby',
-      description: 'An schematic to add wallabyJS config to Angular project'
+      description: 'A schematic to add wallabyJS config to Angular project'
     }
   ];
 }
