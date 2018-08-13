@@ -37,7 +37,6 @@ describe('Forms', () => {
     checkButtonIsDisabled('Generate', false);
   });
 
-  // TODO vsavkin: reenable flaky test
   it('supports project autocompletion', () => {
     cy.get('input[name="project"]').type('e2e');
     waitForAutocomplete();
@@ -56,7 +55,6 @@ describe('Forms', () => {
     });
   });
 
-  // TODO vsavkin: reenable flaky test
   it('supports module autocompletion', () => {
     cy.get('input[name="module"]').type('nothing');
     waitForAutocomplete();

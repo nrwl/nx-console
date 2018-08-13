@@ -186,9 +186,13 @@ function quit() {
 }
 
 app.on('ready', () => {
-  setUpAnalytics();
-  startSession();
-  createMenu();
-  createWindow();
-  checkForUpdates();
+  if (process.argv[2] === '--server') {
+    startServer(8888);
+  } else {
+    setUpAnalytics();
+    startSession();
+    createMenu();
+    createWindow();
+    checkForUpdates();
+  }
 });
