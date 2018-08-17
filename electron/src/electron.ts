@@ -7,8 +7,10 @@ import {reportEvent, reportException, setUpAnalytics} from './analytics';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');
+const Store = require('electron-store');
 
 let win: any;
+const store = new Store();
 
 fixPath();
 const currentDirectory = process.cwd();
@@ -89,7 +91,11 @@ function createMenu() {
 }
 
 function createWindow() {
-  win = new BrowserWindow({ width: 800, height: 1400 });
+  try {
+    win = new BrowserWindow(JSON.parse(store.get('windowBounds')));
+  } catch {
+    win = new BrowserWindow({ width: 800, height: 1400 });
+  }
 
   getPort({ port: 7777 }).then((port: number) => {
     try {
@@ -106,6 +112,7 @@ function createWindow() {
   });
 
   win.on('close', () => {
+    saveWindowInfo();
     quit();
   });
 }
@@ -182,6 +189,16 @@ function quit() {
   if (win) {
     win = null;
     app.quit();
+  }
+}
+
+function saveWindowInfo() {
+  if (win) {
+    try {
+      store.set('windowBounds', JSON.stringify(win.getBounds()));
+    } catch (e) {
+      reportException(`Saving window bounds failed: ${e.message}`);
+    }
   }
 }
 
