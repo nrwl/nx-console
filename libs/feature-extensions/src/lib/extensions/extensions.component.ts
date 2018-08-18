@@ -1,16 +1,17 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Extension, ExtensionGroup, Schematic } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import {
   distinctUntilChanged,
   filter,
   map,
   shareReplay,
   startWith,
-  switchMap
+  switchMap,
+  takeUntil
 } from 'rxjs/operators';
 import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
 
@@ -24,7 +25,8 @@ interface ExtensionId {
   templateUrl: './extensions.component.html',
   styleUrls: ['./extensions.component.scss']
 })
-export class ExtensionsComponent {
+export class ExtensionsComponent implements OnDestroy {
+  destroy$ = new Subject<void>();
   private readonly extensions$: Observable<
     Array<ExtensionGroup>
   > = this.route.params.pipe(
@@ -63,7 +65,8 @@ export class ExtensionsComponent {
         };
       });
       return [{ name: 'Available Extensions', extensions }];
-    })
+    }),
+    takeUntil(this.destroy$)
   );
 
   private readonly selectedExtensionId$: Observable<
@@ -137,5 +140,10 @@ export class ExtensionsComponent {
       task => task.taskName === extensionId.name
     );
     return selectedTask || null;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
