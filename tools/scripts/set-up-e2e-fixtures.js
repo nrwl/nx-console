@@ -10,7 +10,7 @@ shell.mkdir('tmp');
 shell.rm('-rf', path.join(tmp, 'proj'));
 shell.mkdir(path.join(tmp, 'proj'));
 shell.rm('-rf', path.join(tmp, 'proj-extensions'));
-shell.mkdir(path.join(tmp, 'proj-exteions'));
+shell.mkdir(path.join(tmp, 'proj-extensions'));
 shell.rm('-rf', path.join(tmp, 'proj-no-node-modules'));
 shell.mkdir(path.join(tmp, 'proj-no-node-modules'));
 
