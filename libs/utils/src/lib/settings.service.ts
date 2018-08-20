@@ -6,14 +6,35 @@ export interface WorkspaceDescription {
   readonly favorite?: boolean;
 }
 
-const key = '$angularConsoleSettings';
+declare var global: any;
+
+interface SettingsData {
+  readonly recent: WorkspaceDescription[];
+  readonly canCollectData: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class Settings {
+  private readonly ipc: any;
+  private settings: SettingsData;
+
+  constructor() {
+    if (typeof global !== 'undefined' && global.require) {
+      try {
+        this.ipc = global.require('electron').ipcRenderer;
+        this.settings = this.ipc.sendSync('readSettings');
+      } catch (e) {
+        console.error('Could not get a hold of ipcRenderer to log settings');
+      }
+    } else {
+      this.settings = { recent: [], canCollectData: false };
+    }
+  }
+
   getRecentWorkspaces(favorite?: boolean): WorkspaceDescription[] {
-    const all: WorkspaceDescription[] = this.read().recent || [];
+    const all: WorkspaceDescription[] = this.settings.recent || [];
     switch (favorite) {
       case undefined:
         return all;
@@ -27,42 +48,34 @@ export class Settings {
   toggleFavorite(w: WorkspaceDescription): void {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
     const favorite: WorkspaceDescription = { ...w, favorite: !w.favorite };
-    this.store({ recent: [favorite, ...r] });
+    this.store({ ...this.settings, recent: [favorite, ...r] });
   }
 
   addRecent(w: WorkspaceDescription): void {
-    const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
-    this.store({ recent: [w, ...r] });
+    if (
+      this.getRecentWorkspaces().filter(rr => rr.path === w.path).length === 0
+    ) {
+      this.store({ ...this.settings, recent: [w, ...this.settings.recent] });
+    }
   }
 
   removeRecent(w: WorkspaceDescription): void {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
-    this.store({ recent: [...r] });
-  }
-
-  clear(): void {
-    window.localStorage.clear();
+    this.store({ ...this.settings, recent: [...r] });
   }
 
   canCollectData(): boolean | undefined {
-    return this.read().canCollectData;
+    return this.settings.canCollectData;
   }
 
   setCanCollectData(canCollectData: boolean): void {
-    this.store({ canCollectData });
+    this.store({ ...this.settings, canCollectData });
   }
 
-  private store(v: { [k: string]: any }) {
-    const prev = this.read();
-    window.localStorage.setItem(key, JSON.stringify({ ...prev, ...v }));
-  }
-
-  private read() {
-    try {
-      const settingsStr = window.localStorage.getItem(key);
-      return settingsStr ? JSON.parse(settingsStr) : {};
-    } catch (e) {
-      return {};
+  private store(v: SettingsData) {
+    this.settings = v;
+    if (this.ipc) {
+      this.ipc.send('storeSettings', v);
     }
   }
 }

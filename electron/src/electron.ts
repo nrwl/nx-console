@@ -1,9 +1,11 @@
+/* tslint:disable */
+
 import {app, BrowserWindow, dialog, Menu} from 'electron';
 import * as path from 'path';
 import {statSync} from 'fs';
 import * as os from 'os';
 import {autoUpdater} from 'electron-updater';
-import {reportEvent, reportException, setUpAnalytics} from './analytics';
+import {reportEvent, reportException, setupEvents} from './analytics_and_settings';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');
@@ -204,9 +206,10 @@ function saveWindowInfo() {
 
 app.on('ready', () => {
   if (process.argv[2] === '--server') {
-    startServer(8888);
+    const defaultPort = 8888;
+    startServer(defaultPort);
   } else {
-    setUpAnalytics();
+    setupEvents();
     startSession();
     createMenu();
     createWindow();

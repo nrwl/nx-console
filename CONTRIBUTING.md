@@ -15,7 +15,9 @@ After cloning the project run: `yarn`.
 
 After that, run `yarn start dev.prepare`. Every time you add or remove dependencies in electron/package.json, you will need to rerun `dev.prepare`. 
 
-After this, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200.
+After this, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200. 
+
+You can also run the electron app by running `yarn start mac.start-electron` or `yarn start win.start-electron`.
 
 
 ## Running Unit Tests

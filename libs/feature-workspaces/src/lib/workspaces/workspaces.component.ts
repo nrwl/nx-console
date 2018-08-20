@@ -30,10 +30,6 @@ export class WorkspacesComponent {
     readonly workspacesService: WorkspacesService
   ) {}
 
-  clearRecent() {
-    this.settings.clear();
-  }
-
   trackByPath(_: number, w: WorkspaceDescription) {
     return w.path;
   }
