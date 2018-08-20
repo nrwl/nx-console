@@ -35,6 +35,7 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
+      dev: 'nodemon --config server/nodemon.json',
       compile: 'tsc -p server/tsconfig.json',
       format: {
         default: npsUtils.series.nps('server.format.write'),
