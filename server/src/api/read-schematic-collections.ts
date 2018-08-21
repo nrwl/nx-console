@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { normalizeSchema, readJsonFile } from './utils';
+import { normalizeSchema, readJsonFile } from '../utils';
 
 interface SchematicCollection {
   name: string;

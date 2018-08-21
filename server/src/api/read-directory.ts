@@ -1,9 +1,9 @@
-import { directoryExists, fileExists } from './utils';
+import { directoryExists, fileExists } from '../utils';
 import * as fs from 'fs';
 import * as path from 'path';
 const drivelist: any = require('drivelist');
 import { bindNodeCallback, Observable, of, Subject } from 'rxjs';
-import { Directory, LocalFile, LocalFileType } from '../../libs/schema/src';
+import { Directory, LocalFile, LocalFileType } from '../../../libs/schema/src';
 import { catchError, map, switchMap, zipAll } from 'rxjs/operators';
 import * as os from 'os';
 
