@@ -112,14 +112,15 @@ export class Serializer {
   }
 
   private completionSchematicType(collection: string, name: string): any {
+    if (collection === '@nrwl/schematics') {
+      return 'absoluteModules';
+    }
     if (
       collection === '@schematics/angular' ||
-      collection === '@ngrx/schematics' ||
-      collection === '@nrwl/schematics'
+      collection === '@ngrx/schematics'
     ) {
       if (name === 'project') return 'projects';
       if (name === 'module') return 'localModules';
-      if (name === 'parentModule') return 'absoluteModules';
     }
     return undefined;
   }
