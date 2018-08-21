@@ -1,3 +1,5 @@
+/* tslint:disable */
+
 import * as ua from 'universal-analytics';
 import {ipcMain} from 'electron';
 const uuidv4 = require('uuid/v4');
@@ -9,7 +11,7 @@ const visitor = new ua.Visitor('UA-88380372-8', getUuiId(), {
 });
 
 // must be called before electron app is created
-export function setUpAnalytics() {
+export function setupEvents() {
   process.env.trackingID = 'UA-88380372-8';
   ipcMain.on(
     'reportEvent',
@@ -23,11 +25,31 @@ export function setUpAnalytics() {
   ipcMain.on(
     'reportException',
     (event: any, arg: any) => reportException(arg.description));
+  ipcMain.on(
+    'storeSettings',
+    (event: any, arg: any) => storeSettings(arg));
+  ipcMain.on(
+    'readSettings',
+    (event: any, arg: any) => event.returnValue = readSettings());
 }
 
 export function dataCollectionEvent(value: boolean) {
-  store.set('canCollectData', value);
   visitor.event("DataCollection", "DataCollectionResponse", value.toString()).send();
+}
+
+export function storeSettings(value: any) {
+  store.set('settings', value);
+}
+
+export function readSettings() {
+  const settings = store.get('settings') || {};
+  if (settings.canCollectData === undefined) {
+    settings.canCollectData = store.get('canCollectData');
+  }
+  if (settings.recent === undefined) {
+    settings.recent = [];
+  }
+  return settings;
 }
 
 export function reportEvent(category: string, action: string, label?: string, value?: number) {
@@ -63,6 +85,7 @@ function getUuiId() {
 }
 
 function canCollectData(): boolean {
-  return store.get('canCollectData') === true;
+  const settings = store.get('settings');
+  return settings && settings.canCollectData;
 }
 

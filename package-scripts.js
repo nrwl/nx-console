@@ -53,6 +53,7 @@ module.exports = {
       'pack': 'electron-builder --mac --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
       'start-server': 'electron dist/electron --server',
+      'start-electron': 'NODE_ENV=development electron dist/electron',
       'builder-dist': 'mac-builder --mac -p never',
       'builder-dist-linux': 'electron-builder --linux -p never'
     },
@@ -66,18 +67,19 @@ module.exports = {
       'pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'start-server': 'electron dist\\electron --server',
+      'start-electron': 'electron dist\\electron',
       'builder-dist': 'electron-builder --win -p never'
     },
     dev: {
       'compile-server-and-electron': npsUtils.series.nps(withPlatform('compile'), withPlatform('copy-assets'), 'server.compile', withPlatform('copy-server')),
-      'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server-and-electron', withPlatform('pack'), 'frontend.build', withPlatform('copy-frontend')),
+      'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server-and-electron', 'frontend.build', withPlatform('copy-frontend'), withPlatform('pack')),
       'server': npsUtils.series.nps('dev.compile-server-and-electron', withPlatform('start-server')),
       'up': npsUtils.concurrent.nps('dev.server', 'frontend.serve'),
       'dist': npsUtils.series.nps(withPlatform('prepare'), withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
     },
     publish: {
       'builder-publish': 'electron-builder --mac --win -p always --config.win.certificateSubjectName="Narwhal Technologies Inc."',
-      'publish': npsUtils.series.nps('mac.prepackage', 'publish.builder-publish')
+      'publish': npsUtils.series.nps('dev.prepare', 'publish.builder-publish')
     },
     e2e: {
       'compile': 'tsc -p apps/angular-console-e2e/tsconfig.json',
