@@ -13,14 +13,16 @@ import { schema } from './schema';
 
 const apollo = new ApolloServer({
   schema,
-  rootValue: global,
+  rootValue: global
 });
 
 export const app: express.Express = express();
 
 apollo.applyMiddleware({
-  app, path: '/graphql', bodyParserConfig: true
-})
+  app,
+  path: '/graphql',
+  bodyParserConfig: true
+});
 
 app.get('/workspaces', (req, res) => {
   res.sendFile('index.html', { root: path.join(__dirname, 'public') });

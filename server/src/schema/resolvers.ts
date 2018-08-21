@@ -14,7 +14,11 @@ import {
 } from '../api/completions';
 
 import { readSchematicCollections } from '../api/read-schematic-collections';
-import { readDescription, readProjects, readSchema } from '../api/read-projects';
+import {
+  readDescription,
+  readProjects,
+  readSchema
+} from '../api/read-projects';
 import { availableExtensions, readExtensions } from '../api/read-extensions';
 import { readDependencies } from '../api/read-dependencies';
 import { schematicCollectionsForNgNew } from '../api/read-ngnews';
