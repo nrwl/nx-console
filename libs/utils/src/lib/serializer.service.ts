@@ -61,20 +61,19 @@ export class Serializer {
         value[s.name] !== null &&
         value[s.name] !== ''
     );
-    const args = fields
-      .map(f => {
-        if (f.defaultValue === value[f.name]) return null;
-        if (f.positional) {
-          return value[f.name];
-        } else if (f.type === 'boolean') {
-          return value[f.name] ? `--${f.name}` : `--no-${f.name}`;
-        } else if (f.type === 'arguments') {
-          return value[f.name];
-        } else {
-          return `--${f.name}=${value[f.name]}`;
-        }
-      })
-      .filter(r => !!r);
+    let args: string[] = [];
+    fields.forEach(f => {
+      if (f.defaultValue === value[f.name]) return;
+      if (f.positional) {
+        args.push(value[f.name]);
+      } else if (f.type === 'boolean') {
+        args.push(value[f.name] ? `--${f.name}` : `--no-${f.name}`);
+      } else if (f.type === 'arguments') {
+        args = [...args, ...value[f.name].split(' ').filter((r: any) => !!r)];
+      } else {
+        args.push(`--${f.name}=${value[f.name]}`);
+      }
+    });
     return args;
   }
 
