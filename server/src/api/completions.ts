@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { normalizePath } from './utils';
+import { normalizePath } from '../utils';
 
 export function completeFiles(
   files: { [path: string]: string[] },

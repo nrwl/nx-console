@@ -1,4 +1,4 @@
-import { normalizeSchema, readJsonFile } from './utils';
+import { normalizeSchema, readJsonFile } from '../utils';
 import * as path from 'path';
 
 interface Project {

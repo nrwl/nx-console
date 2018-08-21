@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import { spawn, exec, execSync } from 'child_process';
-import { findExecutable, hasExecutable } from './utils';
+import { findExecutable, hasExecutable } from '../utils';
 
 export function readEditors() {
   const editors = [];
