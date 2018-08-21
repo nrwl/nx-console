@@ -107,18 +107,6 @@ export class FlagsComponent {
     return value === null ? '--' : value;
   }
 
-  onSubmit() {
-    this.action.next();
-  }
-
-  onReset() {
-    this.setForm();
-  }
-
-  onStop() {
-    this.stop.next();
-  }
-
   clearFormField(f: Field) {
     const formControl = this.formGroup.get(f.name);
     if (formControl) {
