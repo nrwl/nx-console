@@ -54,7 +54,7 @@ module.exports = {
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
       'start-server': 'electron dist/electron --server',
       'start-electron': 'NODE_ENV=development electron dist/electron',
-      'builder-dist': 'mac-builder --mac -p never',
+      'builder-dist': 'electron-builder --mac -p never',
       'builder-dist-linux': 'electron-builder --linux -p never'
     },
     win: {
