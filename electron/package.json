@@ -9,9 +9,9 @@
   "main": "electron.js",
   "license": "MIT",
   "dependencies": {
-    "@angular/cli": "6.1.1",
+    "@angular/cli": "6.1.2",
     "@ngrx/schematics": "6.1.0",
-    "@nrwl/schematics": "6.2.0",
+    "@nrwl/schematics": "6.2.1",
     "drivelist": "6.3.0",
     "electron-updater": "^2.21.4",
     "express": "^4.16.3",
