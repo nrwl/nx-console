@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as models from '../graphql-types';
 import {
   directoryExists,
   filterByName,
@@ -33,13 +34,13 @@ import {
   stopAllCommands
 } from '../api/commands';
 
-const SchematicCollection = {
+const SchematicCollection: models.SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
     return filterByName(collection.schematics, args);
   }
 };
 
-const Architect = {
+const Architect: models.ArchitectResolvers.Resolvers = {
   description(a, _, __, i) {
     if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
@@ -54,13 +55,13 @@ const Architect = {
   }
 };
 
-const Project = {
+const Project: models.ProjectResolvers.Resolvers = {
   architect(project: any, args: any) {
     return filterByName(project.architect, args);
   }
 };
 
-const NpmScript = {
+const NpmScript: models.NpmScriptResolvers.Resolvers = {
   schema(a, _, __, i) {
     if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
@@ -69,7 +70,7 @@ const NpmScript = {
   }
 };
 
-const Workspace = {
+const Workspace: models.WorkspaceResolvers.Resolvers = {
   schematicCollections(workspace: any, args: any, _: any, i: any) {
     const p = i.variableValues.path;
     if (!directoryExists(path.join(p, 'node_modules'))) {
@@ -95,7 +96,7 @@ const Workspace = {
   }
 };
 
-const CompletionsTypes = {
+const CompletionsTypes: models.CompletionsTypesResolvers.Resolvers = {
   files(workspace: any, args: any) {
     return completeFiles(files, workspace, args.input);
   },
@@ -110,7 +111,7 @@ const CompletionsTypes = {
   }
 };
 
-const Database = {
+const Database: models.DatabaseResolvers.Resolvers = {
   schematicCollections() {
     try {
       return schematicCollectionsForNgNew();
@@ -121,7 +122,7 @@ const Database = {
       );
     }
   },
-  workspace(_root, args: any) {
+  async workspace(_root, args: any) {
     try {
       if (!files[args.path]) {
         listFiles(args.path);
@@ -179,7 +180,8 @@ const Database = {
   },
   async directory(_: any, args: any) {
     try {
-      const v = await readDirectory(
+      // XXX: any? Because TS throws an error that string doesn't match Enum
+      const v: any = await readDirectory(
         args.path,
         args.onlyDirectories,
         args.showHidden
@@ -199,7 +201,7 @@ const Database = {
   }
 };
 
-const Mutation = {
+const Mutation: models.MutationResolvers.Resolvers = {
   async ngAdd(_root: any, args: any) {
     try {
       return runCommand(args.path, findClosestNg(args.path), [

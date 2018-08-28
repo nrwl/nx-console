@@ -1,0 +1,19 @@
+import { generate } from 'graphql-code-generator';
+import { resolve } from 'path';
+
+generate(
+  {
+    require: ['ts-node/register/transpile-only'],
+    schema: resolve(__dirname, 'src/schema/index.ts'),
+    template: 'graphql-codegen-typescript-template',
+    out: resolve(__dirname, 'src/graphql-types.ts'),
+    overwrite: true
+  },
+  true
+)
+  .then(_ => {
+    process.exit(0);
+  })
+  .catch(_ => {
+    process.exit(1);
+  });

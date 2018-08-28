@@ -1,34 +1,15 @@
 import { normalizeSchema, readJsonFile } from '../utils';
+import * as models  from '../graphql-types';
 import * as path from 'path';
 
-interface Project {
-  name: string;
-  root: string;
-  projectType: string;
-  architect: {
-    name: string;
-    description?: string;
-    builder: string;
-    configurations: { name: string }[];
-    schema?: {
-      name: string;
-      type: string;
-      description: string;
-      defaultValue: string;
-      required: boolean;
-      positional: boolean;
-      enum: string[];
-    }[];
-  }[];
-}
 
-export function readProjects(basedir: string, json: any): Project[] {
+export function readProjects(basedir: string, json: any): models.Project[] {
   return Object.entries(json).map(([key, value]: [string, any]) => {
     return {
       name: key,
       root: value.root,
       projectType: value.projectType,
-      architect: readArchitect(key, basedir, value.architect)
+      architect: readArchitect(key, basedir, value.architect),
     };
   });
 }
@@ -40,6 +21,7 @@ function readArchitect(project: string, basedir: string, architect: any) {
       ? Object.keys(value.configurations).map(name => ({ name }))
       : [];
     return {
+      description: null,
       configurations,
       name: key,
       project,
