@@ -14,6 +14,7 @@ generate(
   .then(_ => {
     process.exit(0);
   })
-  .catch(_ => {
+  .catch(e => {
+    console.log(e);
     process.exit(1);
   });

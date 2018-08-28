@@ -20,7 +20,7 @@ function readArchitect(project: string, basedir: string, architect: any) {
       ? Object.keys(value.configurations).map(name => ({ name }))
       : [];
     return {
-      description: null,
+      description: '',
       configurations,
       name: key,
       project,
