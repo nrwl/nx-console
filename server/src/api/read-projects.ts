@@ -1,7 +1,6 @@
 import { normalizeSchema, readJsonFile } from '../utils';
-import * as models  from '../graphql-types';
+import * as models from '../graphql-types';
 import * as path from 'path';
-
 
 export function readProjects(basedir: string, json: any): models.Project[] {
   return Object.entries(json).map(([key, value]: [string, any]) => {
@@ -9,7 +8,7 @@ export function readProjects(basedir: string, json: any): models.Project[] {
       name: key,
       root: value.root,
       projectType: value.projectType,
-      architect: readArchitect(key, basedir, value.architect),
+      architect: readArchitect(key, basedir, value.architect)
     };
   });
 }
