@@ -50,17 +50,18 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
-      compile: 'tsc -p server/tsconfig.json',
+      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.compile-only'),
+      'compile-only': 'tsc -p server/tsconfig.json',
       format: {
         default: npsUtils.series.nps('server.format.write'),
         write: 'prettier --write \"./server/**/*.ts\"',
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
-      test: 'jest --maxWorkers=1 ./dist/server/test'
+      test: 'jest --maxWorkers=1 ./dist/server/test',
+      'gen-graphql-types': 'ts-node tools/gen-graphql-types.ts'
     },
     mac: {
       'clean': 'rm -rf dist',
-      'compile': 'tsc -p server/tsconfig.json',
       'copy-assets': 'cp server/package.json dist/server/package.json && cp -r server/assets dist/server',
       'install-node-modules': 'cd dist/server && yarn',
       'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
@@ -72,7 +73,6 @@ module.exports = {
     },
     linux: {
       'clean': 'rm -rf dist',
-      'compile': 'tsc -p server/tsconfig.json',
       'copy-assets': 'cp server/package.json dist/server/package.json && cp -r server/assets dist/server',
       'install-node-modules': 'cd dist/server && yarn',
       'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
@@ -84,7 +84,6 @@ module.exports = {
     },
     win: {
       'clean': 'if exist dist rmdir dist /s /q',
-      'compile': 'tsc -p server/tsconfig.json',
       'copy-assets': 'copy server\\package.json dist\\server\\package.json && (robocopy server\\assets dist\\server\\assets /e || echo 0)',
       'install-node-modules': 'cd dist\\server && yarn',
       'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\server\\src\\public /e || echo 0',
@@ -95,7 +94,7 @@ module.exports = {
       'builder-dist': 'electron-builder --win -p never'
     },
     dev: {
-      'compile-server': npsUtils.series.nps(withPlatform('compile'), withPlatform('copy-assets')),
+      'compile-server': npsUtils.series.nps('server.compile', withPlatform('copy-assets')),
       'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server', 'frontend.build', withPlatform('copy-frontend'), withPlatform('pack')),
       'server': npsUtils.series.nps('dev.compile-server', withPlatform('start-server')),
       'up': npsUtils.concurrent.nps('dev.server', 'frontend.serve'),
