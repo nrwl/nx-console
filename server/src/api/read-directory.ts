@@ -2,13 +2,14 @@ import { directoryExists, fileExists } from '../utils';
 import * as fs from 'fs';
 import * as path from 'path';
 const drivelist: any = require('drivelist');
-import { bindNodeCallback, Observable, of, Subject } from 'rxjs';
+import { bindNodeCallback, Observable, of, Subject, zip } from 'rxjs';
 import { Directory, LocalFile, LocalFileType } from '../../../libs/schema/src';
 import { catchError, map, switchMap, zipAll } from 'rxjs/operators';
 import * as os from 'os';
 
 const observableReadDir = bindNodeCallback(fs.readdir);
 const observableStat = bindNodeCallback(fs.stat);
+const observableRealpath = bindNodeCallback(fs.realpath);
 
 export function readDirectory(
   dirName: string,
@@ -27,6 +28,10 @@ export function readDirectory(
   }
 }
 
+function skipSyntheticDirsOnWindows(p: string, realPath: string): boolean {
+  return p !== realPath && os.platform() === 'win32';
+}
+
 function _readDirectory(
   dirName: string,
   onlyDirectories: boolean,
@@ -39,9 +44,16 @@ function _readDirectory(
           (c): Observable<LocalFile | null> => {
             const child = path.join(dirName, c);
 
-            return observableStat(child).pipe(
+            return zip(observableStat(child), observableRealpath(child)).pipe(
               switchMap(
-                (stat: fs.Stats): Observable<LocalFile> => {
+                ([stat, realPath]: [
+                  fs.Stats,
+                  string
+                ]): Observable<LocalFile | null> => {
+                  if (skipSyntheticDirsOnWindows(child, realPath)) {
+                    return of(null);
+                  }
+
                   if (!stat.isDirectory()) {
                     return of({ name: c, type: 'file' as LocalFileType });
                   }
