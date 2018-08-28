@@ -1,26 +1,6 @@
 import { normalizeSchema, readJsonFile } from '../utils';
+import { Project, Architect } from '../graphql-types';
 import * as path from 'path';
-
-interface Project {
-  name: string;
-  root: string;
-  projectType: string;
-  architect: {
-    name: string;
-    description?: string;
-    builder: string;
-    configurations: { name: string }[];
-    schema?: {
-      name: string;
-      type: string;
-      description: string;
-      defaultValue: string;
-      required: boolean;
-      positional: boolean;
-      enum: string[];
-    }[];
-  }[];
-}
 
 export function readProjects(basedir: string, json: any): Project[] {
   return Object.entries(json).map(([key, value]: [string, any]) => {
@@ -33,7 +13,11 @@ export function readProjects(basedir: string, json: any): Project[] {
   });
 }
 
-function readArchitect(project: string, basedir: string, architect: any) {
+function readArchitect(
+  project: string,
+  basedir: string,
+  architect: any
+): Architect[] {
   if (!architect) return [];
   return Object.entries(architect).map(([key, value]: [string, any]) => {
     const configurations = value.configurations
