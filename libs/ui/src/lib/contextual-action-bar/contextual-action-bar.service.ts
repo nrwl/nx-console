@@ -5,10 +5,17 @@ export interface Breadcrumb {
   title: string;
 }
 
+export interface MenuOption {
+  name: string;
+  image: string;
+  invoke: () => void;
+}
+
 export interface NonContextualAction {
+  name: string;
   description: string;
   icon: string;
-  invoke: () => void;
+  options: Array<MenuOption>;
 }
 
 export interface ContextualAction {
