@@ -32,11 +32,11 @@
       "icon": "icon.ico"
     },
     "linux": {
+      "icon": "icon.png",
       "target": [
-        "snap",
-        "deb",
         "AppImage",
-        "tar.xz"
+        "deb",
+        "tar.gz"
       ],
       "synopsis": "Angular Console",
       "category": "Development"
@@ -53,7 +53,7 @@
         "repo": "angular-console"
       }
     ]
-  },
+  },  
   "dependencies": {
     "@nrwl/nx": "6.2.1"
   },

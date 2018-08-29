@@ -2,7 +2,18 @@ const npsUtils = require('nps-utils');
 const os = require('os');
 
 function withPlatform(command) {
-  const platform = os.platform() === 'win32' ? 'win' : 'mac';
+  let platform;
+  switch (os.platform()) {
+    case 'win32':
+      platform = 'win';
+      break;
+    case 'darwin':
+      platform = 'mac';
+      break;
+    default:
+      platform = 'linux';
+      break;
+  }
   return `${platform}.${command}`;
 }
 
@@ -55,7 +66,19 @@ module.exports = {
       'start-server': 'electron dist/electron --server',
       'start-electron': 'NODE_ENV=development electron dist/electron',
       'builder-dist': 'electron-builder --mac -p never',
-      'builder-dist-linux': 'electron-builder --linux -p never'
+    },
+    linux: {
+      'clean': 'rm -rf dist',
+      'compile': 'tsc -p electron/tsconfig.json',
+      'copy-assets': 'cp electron/package.json dist/electron/package.json && cp -r electron/assets dist/electron',
+      'copy-server': 'cp -r dist/server/src dist/electron/server',
+      'install-node-modules': 'cd dist/electron && yarn',
+      'copy-frontend': 'cp -r dist/apps/angular-console dist/electron/server/public',
+      'pack': 'electron-builder --linux --dir -p never',
+      'copy-to-osbuilds': 'cp -r dist/packages osbuilds/linux',
+      'start-server': 'electron dist/electron --server',
+      'start-electron': 'NODE_ENV=development electron dist/electron',
+      'builder-dist': 'electron-builder --linux -p never'
     },
     win: {
       'clean': 'if exist dist rmdir dist /s /q',
@@ -75,10 +98,10 @@ module.exports = {
       'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server-and-electron', 'frontend.build', withPlatform('copy-frontend'), withPlatform('pack')),
       'server': npsUtils.series.nps('dev.compile-server-and-electron', withPlatform('start-server')),
       'up': npsUtils.concurrent.nps('dev.server', 'frontend.serve'),
-      'dist': npsUtils.series.nps(withPlatform('prepare'), withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
+      'dist': npsUtils.series.nps('dev.prepare', withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
     },
     publish: {
-      'builder-publish': 'electron-builder --mac --win -p always --config.win.certificateSubjectName="Narwhal Technologies Inc."',
+      'builder-publish': 'electron-builder --mac --win --linux -p always --config.win.certificateSubjectName="Narwhal Technologies Inc."',
       'publish': npsUtils.series.nps('dev.prepare', 'publish.builder-publish')
     },
     e2e: {
