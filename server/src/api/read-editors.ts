@@ -8,6 +8,9 @@ export function readEditors() {
   if (hasFinder()) {
     editors.push({ name: 'Finder', icon: 'finder' });
   }
+  if (hasNautilus()) {
+    editors.push({ name: 'Files', icon: 'nautilus' });
+  }
   if (hasExplorer()) {
     editors.push({ name: 'Explorer', icon: 'explorer' });
   }
@@ -26,6 +29,8 @@ export function readEditors() {
 export function openInEditor(editor: string, path: string) {
   if (editor === 'Finder') {
     openInFinder(path);
+  } else if (editor === 'Files') {
+    openInNautilus(path);
   } else if (editor === 'Explorer') {
     openInExplorer(path);
   } else if (editor === 'VS Code') {
@@ -43,6 +48,10 @@ function hasFinder() {
   return os.platform() === 'darwin';
 }
 
+function hasNautilus() {
+  return exists('nautilus');
+}
+
 function hasExplorer() {
   return os.platform() === 'win32';
 }
@@ -56,8 +65,7 @@ function hasVsCode() {
       return false;
     }
   } else if (os.platform() === 'linux') {
-    // TODO implement linux support
-    return false;
+    return exists('code');
   } else if (os.platform() === 'win32') {
     try {
       return (
@@ -82,8 +90,7 @@ function hasWebStorm() {
       return false;
     }
   } else if (os.platform() === 'linux') {
-    // TODO implement linux support
-    return false;
+    return exists('wstorm') || exists('webstorm.sh');
   } else if (os.platform() === 'win32') {
     return hasExecutable('webstorm', process.cwd());
   } else {
@@ -100,8 +107,7 @@ function hasIntellij() {
       return false;
     }
   } else if (os.platform() === 'linux') {
-    // TODO implement linux support
-    return false;
+    return exists('idea');
   } else if (os.platform() === 'win32') {
     return hasExecutable('idea', process.cwd());
   } else {
@@ -115,6 +121,10 @@ function openInFinder(path: string) {
   }
 }
 
+function openInNautilus(path: string) {
+  exec(`nautilus ${path}`);
+}
+
 function openInExplorer(path: string) {
   if (os.platform() === 'win32') {
     exec(`start "" "${path}"`);
@@ -125,7 +135,7 @@ function openInVsCode(path: string) {
   if (os.platform() === 'darwin') {
     spawn('open', ['-a', 'Visual Studio Code', path], { detached: true });
   } else if (os.platform() === 'linux') {
-    // TODO implement linux support
+    exec(`code ${path}`);
   } else if (os.platform() === 'win32') {
     exec(`code "${toWindows(path)}"`);
   }
@@ -135,7 +145,11 @@ function openInWebStorm(path: string) {
   if (os.platform() === 'darwin') {
     spawn('open', ['-a', 'WebStorm', path], { detached: true });
   } else if (os.platform() === 'linux') {
-    // TODO implement linux support
+    if (exists('wstorm')) {
+      exec(`wstorm ${path}`);
+    } else {
+      exec(`webstorm.sh ${path}`);
+    }
   } else if (os.platform() === 'win32') {
     spawn(findExecutable('webstorm', process.cwd()), [toWindows(path)], {
       detached: true
@@ -147,7 +161,7 @@ function openInIntelliJ(path: string) {
   if (os.platform() === 'darwin') {
     spawn('open', ['-a', 'IntelliJ IDEA', path], { detached: true });
   } else if (os.platform() === 'linux') {
-    // TODO implement linux support
+    exec(`idea ${path}`);
   } else if (os.platform() === 'win32') {
     spawn(findExecutable('idea', process.cwd()), [toWindows(path)], {
       detached: true
@@ -160,4 +174,13 @@ function toWindows(path: string): string {
     .split('/')
     .filter(p => !!p)
     .join('\\');
+}
+
+function exists(cmd: string): boolean {
+  try {
+    execSync(`which ${cmd}`).toString();
+    return true;
+  } catch (error) {
+    return false;
+  }
 }

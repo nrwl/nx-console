@@ -23,9 +23,10 @@
     "resolve": "1.8.1",
     "universal-analytics": "^0.4.17",
     "uuid": "^3.3.2",
+    "apollo-server-express": "^2.0.4",
     "electron-store": "2.0.0"
   },
   "devDependencies": {
-    "electron": "^2.0.3"
+    "electron": "2.0.5"
   }
 }

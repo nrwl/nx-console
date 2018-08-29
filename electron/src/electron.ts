@@ -1,11 +1,15 @@
 /* tslint:disable */
 
-import {app, BrowserWindow, dialog, Menu} from 'electron';
+import { app, BrowserWindow, dialog, Menu } from 'electron';
 import * as path from 'path';
-import {statSync} from 'fs';
+import { statSync } from 'fs';
 import * as os from 'os';
-import {autoUpdater} from 'electron-updater';
-import {reportEvent, reportException, setupEvents} from './analytics_and_settings';
+import { autoUpdater } from 'electron-updater';
+import {
+  reportEvent,
+  reportException,
+  setupEvents
+} from './analytics_and_settings';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');
@@ -46,10 +50,7 @@ function createMenu() {
     },
     {
       role: 'window',
-      submenu: [
-        { role: 'minimize' },
-        { role: 'close' }
-      ]
+      submenu: [{ role: 'minimize' }, { role: 'close' }]
     }
   ];
   if (os.platform() === 'darwin') {
@@ -96,14 +97,22 @@ function createWindow() {
   try {
     win = new BrowserWindow(JSON.parse(store.get('windowBounds')));
   } catch {
-    win = new BrowserWindow({ width: 800, height: 1400 });
+    win = new BrowserWindow({
+      width: 800,
+      height: 1400,
+      icon: path.join(__dirname, '/assets/icons/build/icon.png')
+    });
   }
 
   getPort({ port: 7777 }).then((port: number) => {
     try {
       startServer(port);
       if (fileExists(path.join(currentDirectory, 'angular.json'))) {
-        win.loadURL(`http://localhost:${port}/workspace/${encodeURIComponent(currentDirectory)}/projects`);
+        win.loadURL(
+          `http://localhost:${port}/workspace/${encodeURIComponent(
+            currentDirectory
+          )}/projects`
+        );
       } else {
         win.loadURL(`http://localhost:${port}`);
       }
@@ -155,10 +164,12 @@ function showRestartDialog() {
   const dialogOptions = {
     type: 'info',
     buttons: ['Restart', 'Later'],
-    message: 'A new version of Angular Console has been downloaded. Restart Angular Console to install the new version.'
+    message:
+      'A new version of Angular Console has been downloaded. Restart Angular Console to install the new version.'
   };
   dialog.showMessageBox(dialogOptions, i => {
-    if (i === 0) { // Restart
+    if (i === 0) {
+      // Restart
       reportEvent('Lifecycle', 'QuitAndInstall');
       autoUpdater.quitAndInstall();
     }
