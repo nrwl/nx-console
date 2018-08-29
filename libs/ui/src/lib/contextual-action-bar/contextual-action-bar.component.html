@@ -13,9 +13,20 @@
       <div *ngIf="(contextualActionBarService.nonContextualActions$ | async) as nonContextualActions" class="non-contextual-actions-container"
         fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
         <ng-container *ngFor="let action of nonContextualActions;">
-          <button @fadeIn (click)="action.invoke()" class="action-button" mat-icon-button [matTooltip]="action.description">
-            <img height="32px" [src]="'/assets/' + action.icon + '.png'" />
+          <button  @fadeIn [matMenuTriggerFor]="menu" class="action-button" mat-button [matTooltip]="action.description">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+              <mat-icon>{{ action.icon }}</mat-icon>
+              <span>{{ action.name }}</span>
+            </div>
           </button>
+          <mat-menu #menu="matMenu">
+            <button (click)="option.invoke()" mat-menu-item *ngFor="let option of action.options">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                  <img height="24px" [src]="'/assets/' + option.image + '.png'" />
+                  <span>{{ option.name }}</span>
+              </div>
+            </button>
+          </mat-menu>
         </ng-container>
       </div>
     </div>

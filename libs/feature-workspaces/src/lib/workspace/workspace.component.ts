@@ -2,10 +2,10 @@ import {
   ContextualActionBarService,
   FADE_IN,
   GROW_SHRINK,
-  NonContextualAction
+  MenuOption
 } from '@angular-console/ui';
 import { EditorSupport, Settings } from '@angular-console/utils';
-import { transition, trigger, style } from '@angular/animations';
+import { style, transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -120,21 +120,28 @@ export class WorkspaceComponent implements OnDestroy {
 
   private readonly editorSubscription = this.editorSupport.editors.subscribe(
     editors => {
-      this.contextualActionBarService.nonContextualActions$.next(
-        editors.map(
-          (editor): NonContextualAction => {
-            return {
-              description: `Open in ${editor.name}`,
-              icon: editor.icon,
-              invoke: () => {
-                this.workspace$.pipe(first()).subscribe(w => {
-                  this.editorSupport.openInEditor(editor.name, w.path);
-                });
-              }
-            };
-          }
-        )
-      );
+      this.contextualActionBarService.nonContextualActions$.next([
+        {
+          name: 'Open',
+          description: 'Open workspace in another program',
+          icon: 'open_in_browser',
+          options: editors.map(
+            (editor): MenuOption => {
+              return {
+                name: `Open in ${editor.name}`,
+                image: editor.icon,
+                invoke: () => {
+                  this.workspace$
+                    .pipe(first())
+                    .subscribe(w =>
+                      this.editorSupport.openInEditor(editor.name, w.path)
+                    );
+                }
+              };
+            }
+          )
+        }
+      ]);
     }
   );
 
