@@ -18,8 +18,8 @@
     "copyright": "Copyright © 2018 Narwhal Technologies Inc",
     "asar": false,
     "directories": {
-      "app": "dist/electron",
-      "buildResources": "dist/electron/assets/icons/build",
+      "app": "dist/server",
+      "buildResources": "dist/server/assets/icons/build",
       "output": "dist/packages"
     },
     "npmRebuild": true,

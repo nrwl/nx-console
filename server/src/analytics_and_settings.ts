@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 import * as ua from 'universal-analytics';
-import {ipcMain} from 'electron';
+import { ipcMain } from 'electron';
 const uuidv4 = require('uuid/v4');
 const Store = require('electron-store');
 const store = new Store();
@@ -13,28 +13,29 @@ const visitor = new ua.Visitor('UA-88380372-8', getUuiId(), {
 // must be called before electron app is created
 export function setupEvents() {
   process.env.trackingID = 'UA-88380372-8';
-  ipcMain.on(
-    'reportEvent',
-    (event: any, arg: any) => reportEvent(arg.categroy, arg.action, arg.label, arg.value));
-  ipcMain.on(
-    'dataCollectionEvent',
-    (event: any, arg: any) => dataCollectionEvent(arg.value));
-  ipcMain.on(
-    'reportPageView',
-    (event: any, arg: any) => reportPageView(arg.path));
-  ipcMain.on(
-    'reportException',
-    (event: any, arg: any) => reportException(arg.description));
-  ipcMain.on(
-    'storeSettings',
-    (event: any, arg: any) => storeSettings(arg));
+  ipcMain.on('reportEvent', (event: any, arg: any) =>
+    reportEvent(arg.categroy, arg.action, arg.label, arg.value)
+  );
+  ipcMain.on('dataCollectionEvent', (event: any, arg: any) =>
+    dataCollectionEvent(arg.value)
+  );
+  ipcMain.on('reportPageView', (event: any, arg: any) =>
+    reportPageView(arg.path)
+  );
+  ipcMain.on('reportException', (event: any, arg: any) =>
+    reportException(arg.description)
+  );
+  ipcMain.on('storeSettings', (event: any, arg: any) => storeSettings(arg));
   ipcMain.on(
     'readSettings',
-    (event: any, arg: any) => event.returnValue = readSettings());
+    (event: any, arg: any) => (event.returnValue = readSettings())
+  );
 }
 
 export function dataCollectionEvent(value: boolean) {
-  visitor.event("DataCollection", "DataCollectionResponse", value.toString()).send();
+  visitor
+    .event('DataCollection', 'DataCollectionResponse', value.toString())
+    .send();
 }
 
 export function storeSettings(value: any) {
@@ -52,12 +53,17 @@ export function readSettings() {
   return settings;
 }
 
-export function reportEvent(category: string, action: string, label?: string, value?: number) {
+export function reportEvent(
+  category: string,
+  action: string,
+  label?: string,
+  value?: number
+) {
   if (canCollectData()) {
     if (value) {
-      visitor.event(category, action, label, value, {}).send();
+      visitor.event(category, action, label!, value, {}).send();
     } else {
-      visitor.event(category, action, label).send();
+      visitor.event(category, action, label!).send();
     }
   }
 }
@@ -88,4 +94,3 @@ function canCollectData(): boolean {
   const settings = store.get('settings');
   return settings && settings.canCollectData;
 }
-
