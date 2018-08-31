@@ -17,6 +17,10 @@ function withPlatform(command) {
   return `${platform}.${command}`;
 }
 
+function electronBuilder(dashP) {
+  return `electron-builder --mac --win --linux -p ${dashP} --config.win.certificateSubjectName="Narwhal Technologies Inc."`
+}
+
 module.exports = {
   scripts: {
     frontend: {
@@ -101,7 +105,9 @@ module.exports = {
       'dist': npsUtils.series.nps('dev.prepare', withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
     },
     publish: {
-      'builder-publish': 'electron-builder --mac --win --linux -p always --config.win.certificateSubjectName="Narwhal Technologies Inc."',
+      'builder-prerelease': electronBuilder('never'),
+      'builder-publish': electronBuilder('always'),
+      'prerelease': npsUtils.series.nps('dev.prepare', 'publish.builder-prerelease'),
       'publish': npsUtils.series.nps('dev.prepare', 'publish.builder-publish')
     },
     e2e: {
