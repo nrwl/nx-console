@@ -71,7 +71,7 @@ export function reportException(description: string) {
 
 export function reportPageView(path: string) {
   if (canCollectData()) {
-    visitor.pageview(path, 'Angular Console', '6.0.0-beta.1').send();
+    visitor.pageview(path, 'Angular Console', '6.0.0-beta.2').send();
   }
 }
 
