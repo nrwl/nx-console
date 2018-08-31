@@ -25,32 +25,12 @@ export function setupEvents() {
   ipcMain.on('reportException', (event: any, arg: any) =>
     reportException(arg.description)
   );
-  ipcMain.on('storeSettings', (event: any, arg: any) => storeSettings(arg));
-  ipcMain.on(
-    'readSettings',
-    (event: any, arg: any) => (event.returnValue = readSettings())
-  );
 }
 
 export function dataCollectionEvent(value: boolean) {
   visitor
     .event('DataCollection', 'DataCollectionResponse', value.toString())
     .send();
-}
-
-export function storeSettings(value: any) {
-  store.set('settings', value);
-}
-
-export function readSettings() {
-  const settings = store.get('settings') || {};
-  if (settings.canCollectData === undefined) {
-    settings.canCollectData = store.get('canCollectData');
-  }
-  if (settings.recent === undefined) {
-    settings.recent = [];
-  }
-  return settings;
 }
 
 export function reportEvent(

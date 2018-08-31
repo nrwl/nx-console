@@ -32,6 +32,7 @@ import {
   runCommand,
   stopAllCommands
 } from '../api/commands';
+import { storeSettings, readSettings } from '../api/read-settings';
 
 const SchematicCollection = {
   schematics(collection: any, args: any) {
@@ -111,6 +112,9 @@ const CompletionsTypes = {
 };
 
 const Database = {
+  settings() {
+    return readSettings();
+  },
   schematicCollections() {
     try {
       return schematicCollectionsForNgNew();
@@ -276,6 +280,10 @@ const Mutation = {
       console.log(e);
       throw new Error(`Error when opening an editor. Message: "${e.message}"`);
     }
+  },
+  updateSettings(_root: any, args: any) {
+    storeSettings(JSON.parse(args.data));
+    return readSettings();
   }
 };
 

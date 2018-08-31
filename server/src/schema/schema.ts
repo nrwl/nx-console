@@ -51,7 +51,19 @@ export const typeDefs = gql`
     absoluteModules(input: String): [CompletionResultType]
   }
 
+  type WorkspaceDefinition {
+    path: String!
+    name: String!
+    favorite: Boolean
+  }
+
+  type Settings {
+    canCollectData: Boolean!
+    recent: [WorkspaceDefinition]
+  }
+
   type Database {
+    settings: Settings!
     schematicCollections: [SchematicCollectionForNgNew]
     workspace(path: String!): Workspace!
     editors: [EditorSupport]
@@ -112,6 +124,7 @@ export const typeDefs = gql`
     ): CommandStarted
     stop: StopResult
     openInEditor(editor: String!, path: String!): OpenInEditor
+    updateSettings(data: String!): Settings!
   }
 
   type NpmScript {

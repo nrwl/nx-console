@@ -15,6 +15,7 @@ import {
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { Settings } from '@angular-console/utils';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,6 +32,7 @@ import { filter, map } from 'rxjs/operators';
 export class AppComponent implements OnInit {
   @ViewChild(RouterOutlet) routerOutlet: RouterOutlet;
   routerTransition: Observable<string>;
+  settingsLoaded: boolean;
 
   ngOnInit() {
     this.routerTransition = this.routerOutlet.activateEvents.pipe(
@@ -40,8 +42,14 @@ export class AppComponent implements OnInit {
 
   constructor(
     router: Router,
+    public settings: Settings,
     contextualActionBarService: ContextualActionBarService
   ) {
+    settings.fetch().subscribe(() => {
+      this.settingsLoaded = true;
+      router.initialNavigation();
+    });
+
     router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(event => {
