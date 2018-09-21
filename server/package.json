@@ -27,6 +27,6 @@
     "electron-store": "2.0.0"
   },
   "devDependencies": {
-    "electron": "2.0.5"
+    "electron": "2.0.8"
   }
 }
