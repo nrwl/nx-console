@@ -35,7 +35,7 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
-      compile: npsUtils.series.nps('server.codegen', 'server.compile-only'),
+      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.compile-only'),
       'compile-only': 'tsc -p server/tsconfig.json',
       format: {
         default: npsUtils.series.nps('server.format.write'),
@@ -43,7 +43,7 @@ module.exports = {
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
       test: 'jest --maxWorkers=1 ./dist/server/test',
-      codegen: 'ts-node server/code-gen.ts'
+      'gen-graphql-types': 'ts-node server/gen-graphql-types.ts'
     },
     mac: {
       'clean': 'rm -rf dist',

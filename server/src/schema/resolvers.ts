@@ -1,5 +1,14 @@
 import * as path from 'path';
-import * as models from '../graphql-types';
+import {
+  SchematicCollectionResolvers,
+  ArchitectResolvers,
+  ProjectResolvers,
+  NpmScriptResolvers,
+  WorkspaceResolvers,
+  CompletionsTypesResolvers,
+  DatabaseResolvers,
+  MutationResolvers,
+} from '../graphql-types';
 import {
   directoryExists,
   filterByName,
@@ -34,19 +43,13 @@ import {
   stopAllCommands
 } from '../api/commands';
 
-const SchematicCollection: models.SchematicCollectionResolvers.Resolvers = {
+const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
     return filterByName(collection.schematics, args);
   }
 };
 
-const Architect: models.ArchitectResolvers.Resolvers = {
-  description(a, _, __, i) {
-    if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
-      throw new Error(`node_modules is not found`);
-    }
-    return readDescription(i.variableValues.path, a.builder);
-  },
+const Architect: ArchitectResolvers.Resolvers = {
   schema(a, _, __, i) {
     if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
@@ -55,13 +58,13 @@ const Architect: models.ArchitectResolvers.Resolvers = {
   }
 };
 
-const Project: models.ProjectResolvers.Resolvers = {
+const Project: ProjectResolvers.Resolvers = {
   architect(project: any, args: any) {
     return filterByName(project.architect, args);
   }
 };
 
-const NpmScript: models.NpmScriptResolvers.Resolvers = {
+const NpmScript: NpmScriptResolvers.Resolvers = {
   schema(a, _, __, i) {
     if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
@@ -70,7 +73,7 @@ const NpmScript: models.NpmScriptResolvers.Resolvers = {
   }
 };
 
-const Workspace: models.WorkspaceResolvers.Resolvers = {
+const Workspace: WorkspaceResolvers.Resolvers = {
   schematicCollections(workspace: any, args: any, _: any, i: any) {
     const p = i.variableValues.path;
     if (!directoryExists(path.join(p, 'node_modules'))) {
@@ -96,7 +99,7 @@ const Workspace: models.WorkspaceResolvers.Resolvers = {
   }
 };
 
-const CompletionsTypes: models.CompletionsTypesResolvers.Resolvers = {
+const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
   files(workspace: any, args: any) {
     return completeFiles(files, workspace, args.input);
   },
@@ -111,7 +114,7 @@ const CompletionsTypes: models.CompletionsTypesResolvers.Resolvers = {
   }
 };
 
-const Database: models.DatabaseResolvers.Resolvers = {
+const Database: DatabaseResolvers.Resolvers = {
   schematicCollections() {
     try {
       return schematicCollectionsForNgNew();
@@ -201,7 +204,7 @@ const Database: models.DatabaseResolvers.Resolvers = {
   }
 };
 
-const Mutation: models.MutationResolvers.Resolvers = {
+const Mutation: MutationResolvers.Resolvers = {
   async ngAdd(_root: any, args: any) {
     try {
       return runCommand(args.path, findClosestNg(args.path), [
