@@ -55,14 +55,7 @@ export class SchematicsComponent {
     map(r => {
       const collections: Array<SchematicCollection> = (r as any).data.workspace
         .schematicCollections;
-      return collections
-        .map(c => {
-          const s = [...c.schematics].sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-          return { ...c, schematics: s };
-        })
-        .filter(c => c.schematics.length > 0);
+      return collections.filter(c => c.schematics.length > 0);
     })
   );
 

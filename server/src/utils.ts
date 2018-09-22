@@ -4,8 +4,10 @@ import { stat, statSync } from 'fs';
 import { platform } from 'os';
 import { bindNodeCallback, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import * as stripJsonComments from 'strip-json-comments';
 
-const resolve = require('resolve');
+export const files: { [path: string]: string[] } = {};
+export let fileContents: { [path: string]: any } = {};
 
 export function findExecutable(command: string, cwd: string): string {
   const paths = (process.env.PATH as string).split(path.delimiter);
@@ -68,7 +70,23 @@ export function findClosestNg(dir: string): string {
   }
 }
 
-export function listFilesRec(dirName: string): string[] {
+export function listOfUnnestedNpmPackages(nodeModulesDir: string): string[] {
+  const res: string[] = [];
+  fs.readdirSync(nodeModulesDir).forEach(npmPackageOrScope => {
+    if (npmPackageOrScope.startsWith('@')) {
+      fs.readdirSync(path.join(nodeModulesDir, npmPackageOrScope)).forEach(
+        p => {
+          res.push(`${npmPackageOrScope}/${p}`);
+        }
+      );
+    } else {
+      res.push(npmPackageOrScope);
+    }
+  });
+  return res;
+}
+
+export function listFiles(dirName: string): string[] {
   // TODO use .gitignore to skip files
   if (dirName.indexOf('node_modules') > -1) return [];
   if (dirName.indexOf('dist') > -1) return [];
@@ -83,12 +101,31 @@ export function listFilesRec(dirName: string): string[] {
         if (!fs.statSync(child).isDirectory()) {
           res.push(child);
         } else if (fs.statSync(child).isDirectory()) {
-          res.push(...listFilesRec(child));
+          res.push(...listFiles(child));
         }
       } catch (e) {}
     });
   } catch (e) {}
   return res;
+}
+
+function cacheJsonFiles(basedir: string) {
+  try {
+    const nodeModulesDir = path.join(basedir, 'node_modules');
+    const packages = listOfUnnestedNpmPackages(nodeModulesDir);
+
+    const res: any = {};
+    const schematicCollections = packages.forEach(p => {
+      const filePath = path.join(nodeModulesDir, p, 'package.json');
+      if (!fileExistsSync(filePath)) return;
+      res[filePath] = readAndParseJson(
+        path.join(nodeModulesDir, p, 'package.json')
+      );
+    });
+    return res;
+  } catch (e) {
+    return {};
+  }
 }
 
 export function directoryExists(filePath: string): boolean {
@@ -112,15 +149,32 @@ export function fileExists(filePath: string): Observable<boolean> {
   return observableStat(filePath).pipe(map(stat => stat.isFile()));
 }
 
+function readAndParseJson(fullFilePath: string): any {
+  return JSON.parse(
+    stripJsonComments(fs.readFileSync(fullFilePath).toString())
+  );
+}
+
 export function readJsonFile(
-  path: string,
+  filePath: string,
   basedir: string
-): { [k: string]: any } {
-  const fullFilePath = resolve.sync(path, { basedir });
-  return {
-    path: fullFilePath,
-    json: JSON.parse(fs.readFileSync(fullFilePath).toString())
-  };
+): { path: string; json: any } {
+  const fullFilePath = path.join(basedir, filePath);
+
+  // we can try to retrieve node_modules files from the cache because
+  // they don't change very often
+  const cache = basedir.endsWith('node_modules');
+  if (cache && fileContents[fullFilePath]) {
+    return {
+      path: fullFilePath,
+      json: fileContents[fullFilePath]
+    };
+  } else {
+    return {
+      path: fullFilePath,
+      json: readAndParseJson(fullFilePath)
+    };
+  }
 }
 
 export function normalizeSchema(p: {
@@ -181,4 +235,22 @@ export function normalizePath(value: string): string {
     .split('\\')
     .filter(r => !!r)
     .join('\\');
+}
+
+/**
+ * To improve performance angularconsole preprocesses
+ *
+ * * the list of local files
+ * * json files from node_modules we are likely to read
+ *
+ * both the data sets get updated every 30 seconds.
+ */
+export function cacheFiles(path: string) {
+  setTimeout(() => {
+    files[path] = listFiles(path);
+    fileContents = cacheJsonFiles(path);
+    setTimeout(() => {
+      cacheFiles(path);
+    }, 30000);
+  }, 0);
 }

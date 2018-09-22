@@ -61,7 +61,7 @@ export function readSchema(basedir: string, builder: string) {
 function readBuildersFile(basedir: string, npmPackage: string): any {
   const packageJson = readJsonFile(
     path.join(npmPackage, 'package.json'),
-    basedir
+    path.join(basedir, 'node_modules')
   );
   const b = packageJson.json.builders;
   const buildersPath = b.startsWith('.') ? b : `./${b}`;

@@ -22,7 +22,7 @@ describe('Generate', () => {
 
   it('filters schematics', () => {
     taskListHeaders($p => {
-      expect($p.length).to.equal(1);
+      expect($p.length).to.equal(2);
       expect(texts($p)[0]).to.equal('@schematics/angular');
     });
 

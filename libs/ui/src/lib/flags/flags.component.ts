@@ -217,7 +217,6 @@ export class FlagsComponent {
     this.subscription = this.formGroup.valueChanges
       .pipe(startWith(this.formGroup.value))
       .subscribe(value => {
-        console.log('changes', value);
         this.emitNext(value);
       });
   }

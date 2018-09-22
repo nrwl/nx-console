@@ -6,7 +6,7 @@ import {
   filterByName,
   findClosestNg,
   findExecutable,
-  listFilesRec,
+  listFiles,
   readJsonFile
 } from './utils';
 import { schema } from './schema';
