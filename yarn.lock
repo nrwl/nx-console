@@ -252,6 +252,22 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@graphql-modules/epoxy@0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@graphql-modules/epoxy/-/epoxy-0.1.6.tgz#f0555d72f5477f5a65bf880397137f422fb5bda5"
+  dependencies:
+    "@graphql-modules/logger" "0.1.6"
+    "@types/deepmerge" "2.1.0"
+    deepmerge "2.1.1"
+    graphql-tools "3.1.1"
+
+"@graphql-modules/logger@0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@graphql-modules/logger/-/logger-0.1.6.tgz#89da70baf9e5802f5dc970a501f500bdbd8efedf"
+  dependencies:
+    moment "2.22.2"
+    winston "3.0.0"
+
 "@ngtools/json-schema@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@ngtools/json-schema/-/json-schema-1.1.0.tgz#c3a0c544d62392acc2813a42c8a0dc6f58f86922"
@@ -410,6 +426,10 @@
   resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.4.tgz#50991a759a29c0b89492751008c6af7a7c8267b0"
   dependencies:
     "@types/express" "*"
+
+"@types/deepmerge@2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/deepmerge/-/deepmerge-2.1.0.tgz#22f175e5cb55874fe818caa6fd50a1d98fc3d748"
 
 "@types/estree@0.0.39":
   version "0.0.39"
@@ -2371,9 +2391,9 @@ commander@2.16.x, commander@~2.16.0:
   version "2.16.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.16.0.tgz#f16390593996ceb4f3eeb020b31d78528f7f8a50"
 
-commander@2.17.1:
-  version "2.17.1"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
+commander@2.18.0:
+  version "2.18.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.18.0.tgz#2bf063ddee7c7891176981a2cc798e5754bc6970"
 
 commander@2.6.0:
   version "2.6.0"
@@ -2386,6 +2406,10 @@ commander@^2.12.0, commander@^2.12.1, commander@^2.15.1, commander@^2.9.0:
 commander@~2.13.0:
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
+
+commander@~2.17.1:
+  version "2.17.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
 
 common-tags@1.4.0:
   version "1.4.0"
@@ -2947,6 +2971,10 @@ deep-is@~0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.3.tgz#b369d6fb5dbc13eecf524f91b070feedc357cf34"
 
+deepmerge@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-2.1.1.tgz#e862b4e45ea0555072bf51e7fd0d9845170ae768"
+
 default-require-extensions@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/default-require-extensions/-/default-require-extensions-2.0.0.tgz#f5f8fbb18a7d6d50b21f641f649ebb522cfe24f7"
@@ -3067,7 +3095,7 @@ di@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/di/-/di-0.0.1.tgz#806649326ceaa7caa3306d75d985ea2748ba913c"
 
-diagnostics@^1.0.1:
+diagnostics@^1.0.1, diagnostics@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/diagnostics/-/diagnostics-1.1.1.tgz#cab6ac33df70c9d9a727490ae43ac995a769b22a"
   dependencies:
@@ -4500,6 +4528,17 @@ glob@7.1.2, glob@^7.0.0, glob@^7.0.3, glob@^7.0.5, glob@^7.0.6, glob@^7.1.1, glo
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
+glob@7.1.3:
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.3.tgz#3960832d3f1574108342dafd3a67b332c0969df1"
+  dependencies:
+    fs.realpath "^1.0.0"
+    inflight "^1.0.4"
+    inherits "2"
+    minimatch "^3.0.4"
+    once "^1.3.0"
+    path-is-absolute "^1.0.0"
+
 glob@^5.0.15:
   version "5.0.15"
   resolved "https://registry.yarnpkg.com/glob/-/glob-5.0.15.tgz#1bc936b9e02f4a603fcc222ecf7633d30b8b93b1"
@@ -4607,22 +4646,23 @@ graphql-anywhere@^4.1.15:
   dependencies:
     apollo-utilities "^1.0.17"
 
-graphql-code-generator@0.11.1-alpha.0b05570:
-  version "0.11.1-alpha.0b05570"
-  resolved "https://registry.yarnpkg.com/graphql-code-generator/-/graphql-code-generator-0.11.1-alpha.0b05570.tgz#7ec7c92d7d3f51e47d15a1bf372227b448821797"
+graphql-code-generator@0.12.5:
+  version "0.12.5"
+  resolved "https://registry.yarnpkg.com/graphql-code-generator/-/graphql-code-generator-0.12.5.tgz#0c280dd87a3e393836148d974cf63f2ef630b264"
   dependencies:
+    "@graphql-modules/epoxy" "0.1.6"
     "@types/babylon" "6.16.3"
     "@types/is-glob" "4.0.0"
     "@types/prettier" "1.13.2"
     "@types/valid-url" "1.0.2"
     babel-types "7.0.0-beta.3"
     babylon "7.0.0-beta.47"
-    commander "2.17.1"
+    commander "2.18.0"
     fb-watchman "2.0.0"
-    glob "7.1.2"
-    graphql-codegen-compiler "0.11.0"
-    graphql-codegen-core "0.11.0"
-    graphql-import "0.6.0"
+    glob "7.1.3"
+    graphql-codegen-compiler "0.12.5"
+    graphql-codegen-core "0.12.5"
+    graphql-import "0.7.1"
     is-glob "4.0.0"
     is-valid-path "0.1.1"
     mkdirp "0.5.1"
@@ -4631,28 +4671,29 @@ graphql-code-generator@0.11.1-alpha.0b05570:
     request "2.88.0"
     valid-url "1.0.9"
 
-graphql-codegen-compiler@0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/graphql-codegen-compiler/-/graphql-codegen-compiler-0.11.0.tgz#fbd34e3169309ca6249e58e081ca1ad37323f794"
+graphql-codegen-compiler@0.12.5:
+  version "0.12.5"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-compiler/-/graphql-codegen-compiler-0.12.5.tgz#b7bb9a9b83139a79ebba88c65bb70e45b02a43f1"
   dependencies:
     "@types/handlebars" "4.0.39"
     change-case "3.0.2"
     common-tags "1.8.0"
-    graphql-codegen-core "0.11.0"
-    handlebars "4.0.11"
+    graphql-codegen-core "0.12.5"
+    handlebars "4.0.12"
     moment "2.22.2"
 
-graphql-codegen-core@0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/graphql-codegen-core/-/graphql-codegen-core-0.11.0.tgz#06cf132b6e3745dbcd514efdbbc065d0ed3eb30a"
+graphql-codegen-core@0.12.5:
+  version "0.12.5"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-core/-/graphql-codegen-core-0.12.5.tgz#1d6376e28f8e5b1b57595d4b202aa5da1ca4bbb1"
   dependencies:
     graphql-tag "2.9.2"
     graphql-tools "3.1.1"
-    winston "3.0.0"
+    ts-log "2.1.3"
+    winston "3.1.0"
 
-graphql-codegen-typescript-template@0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-template/-/graphql-codegen-typescript-template-0.11.0.tgz#c68ef256044c3a778c5acc0e13ee9c0302902b8a"
+graphql-codegen-typescript-template@0.12.5:
+  version "0.12.5"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-template/-/graphql-codegen-typescript-template-0.12.5.tgz#c6d635f858bfffb9650a6961a29343d8510fa339"
 
 graphql-extensions@0.1.2:
   version "0.1.2"
@@ -4660,11 +4701,12 @@ graphql-extensions@0.1.2:
   dependencies:
     apollo-server-env "2.0.2"
 
-graphql-import@0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/graphql-import/-/graphql-import-0.6.0.tgz#c00cb8a269ceea263e062922c8c81a2272d1ffcb"
+graphql-import@0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/graphql-import/-/graphql-import-0.7.1.tgz#4add8d91a5f752d764b0a4a7a461fcd93136f223"
   dependencies:
     lodash "^4.17.4"
+    resolve-from "^4.0.0"
 
 graphql-subscriptions@^0.5.8:
   version "0.5.8"
@@ -4706,7 +4748,17 @@ handle-thing@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/handle-thing/-/handle-thing-1.2.5.tgz#fd7aad726bf1a5fd16dfc29b2f7a6601d27139c4"
 
-handlebars@4.0.11, handlebars@^4.0.1, handlebars@^4.0.3:
+handlebars@4.0.12:
+  version "4.0.12"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.0.12.tgz#2c15c8a96d46da5e266700518ba8cb8d919d5bc5"
+  dependencies:
+    async "^2.5.0"
+    optimist "^0.6.1"
+    source-map "^0.6.1"
+  optionalDependencies:
+    uglify-js "^3.1.4"
+
+handlebars@^4.0.1, handlebars@^4.0.3:
   version "4.0.11"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.0.11.tgz#630a35dfe0294bc281edae6ffc5d329fc7982dcc"
   dependencies:
@@ -6505,6 +6557,16 @@ log4js@^2.5.3:
 logform@^1.9.0:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/logform/-/logform-1.9.1.tgz#58b29d7b11c332456d7a217e17b48a13ad69d60a"
+  dependencies:
+    colors "^1.2.1"
+    fast-safe-stringify "^2.0.4"
+    fecha "^2.3.3"
+    ms "^2.1.1"
+    triple-beam "^1.2.0"
+
+logform@^1.9.1:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/logform/-/logform-1.10.0.tgz#c9d5598714c92b546e23f4e78147c40f1e02012e"
   dependencies:
     colors "^1.2.1"
     fast-safe-stringify "^2.0.4"
@@ -8822,6 +8884,10 @@ resolve-from@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-3.0.0.tgz#b22c7af7d9d6881bc8b6e653335eebcb0a188748"
 
+resolve-from@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
+
 resolve-url@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/resolve-url/-/resolve-url-0.2.1.tgz#2c637fe77c893afd2a663fe21aa9080068e2052a"
@@ -10194,6 +10260,10 @@ truncate-utf8-bytes@^1.0.0:
   dependencies:
     utf8-byte-length "^1.0.1"
 
+ts-log@2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/ts-log/-/ts-log-2.1.3.tgz#9e30aca1baffe7693a2e4142b8f07ecb01cb8340"
+
 ts-node@~7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-7.0.0.tgz#a94a13c75e5e1aa6b82814b84c68deb339ba7bff"
@@ -10317,6 +10387,13 @@ uglify-js@^2.6:
     yargs "~3.10.0"
   optionalDependencies:
     uglify-to-browserify "~1.0.0"
+
+uglify-js@^3.1.4:
+  version "3.4.9"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.4.9.tgz#af02f180c1207d76432e473ed24a28f4a782bae3"
+  dependencies:
+    commander "~2.17.1"
+    source-map "~0.6.1"
 
 uglify-to-browserify@~1.0.0:
   version "1.0.2"
@@ -10855,6 +10932,20 @@ winston@3.0.0:
     diagnostics "^1.0.1"
     is-stream "^1.1.0"
     logform "^1.9.0"
+    one-time "0.0.4"
+    readable-stream "^2.3.6"
+    stack-trace "0.0.x"
+    triple-beam "^1.3.0"
+    winston-transport "^4.2.0"
+
+winston@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/winston/-/winston-3.1.0.tgz#80724376aef164e024f316100d5b178d78ac5331"
+  dependencies:
+    async "^2.6.0"
+    diagnostics "^1.1.1"
+    is-stream "^1.1.0"
+    logform "^1.9.1"
     one-time "0.0.4"
     readable-stream "^2.3.6"
     stack-trace "0.0.x"
