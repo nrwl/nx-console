@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
+import { first, tap } from 'rxjs/operators';
 
 export interface WorkspaceDescription {
   readonly path: string;
   readonly name: string;
   readonly favorite?: boolean;
 }
-
-declare var global: any;
 
 interface SettingsData {
   readonly recent: WorkspaceDescription[];
@@ -17,21 +18,9 @@ interface SettingsData {
   providedIn: 'root'
 })
 export class Settings {
-  private readonly ipc: any;
   private settings: SettingsData;
 
-  constructor() {
-    if (typeof global !== 'undefined' && global.require) {
-      try {
-        this.ipc = global.require('electron').ipcRenderer;
-        this.settings = this.ipc.sendSync('readSettings');
-      } catch (e) {
-        console.error('Could not get a hold of ipcRenderer to log settings');
-      }
-    } else {
-      this.settings = { recent: [], canCollectData: false };
-    }
-  }
+  constructor(private readonly apollo: Apollo) {}
 
   getRecentWorkspaces(favorite?: boolean): WorkspaceDescription[] {
     const all: WorkspaceDescription[] = this.settings.recent || [];
@@ -72,10 +61,50 @@ export class Settings {
     this.store({ ...this.settings, canCollectData });
   }
 
+  fetch() {
+    return this.apollo
+      .query({
+        query: gql`
+          {
+            settings {
+              canCollectData
+              recent {
+                path
+                name
+                favorite
+              }
+            }
+          }
+        `
+      })
+      .pipe(
+        first(),
+        tap(r => {
+          this.settings = (r.data as any).settings;
+        })
+      );
+  }
+
   private store(v: SettingsData) {
     this.settings = v;
-    if (this.ipc) {
-      this.ipc.send('storeSettings', v);
-    }
+    this.apollo
+      .mutate({
+        mutation: gql`
+          mutation($data: String!) {
+            updateSettings(data: $data) {
+              canCollectData
+              recent {
+                path
+                name
+                favorite
+              }
+            }
+          }
+        `,
+        variables: { data: JSON.stringify(v) }
+      })
+      .subscribe(r => {
+        this.settings = r.data as any;
+      });
   }
 }

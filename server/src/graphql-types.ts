@@ -29,12 +29,24 @@ export type SubscriptionResolver<
 };
 
 export interface Database {
+  settings: Settings;
   schematicCollections?: (SchematicCollectionForNgNew | null)[] | null;
   workspace: Workspace;
   editors?: (EditorSupport | null)[] | null;
   availableExtensions?: (Extension | null)[] | null;
   commandStatus?: CommandResult | null;
   directory: FilesType;
+}
+
+export interface Settings {
+  canCollectData: boolean;
+  recent?: (WorkspaceDefinition | null)[] | null;
+}
+
+export interface WorkspaceDefinition {
+  path: string;
+  name: string;
+  favorite?: boolean | null;
 }
 
 export interface SchematicCollectionForNgNew {
@@ -114,6 +126,7 @@ export interface Architect {
   project: string;
   builder: string;
   configurations?: (ArchitectConfigurations | null)[] | null;
+  description: string;
   schema?: (ArchitectSchema | null)[] | null;
 }
 
@@ -162,6 +175,7 @@ export interface Mutation {
   runNpm?: CommandStarted | null;
   stop?: StopResult | null;
   openInEditor?: OpenInEditor | null;
+  updateSettings: Settings;
 }
 
 export interface CommandStarted {
@@ -240,6 +254,9 @@ export interface OpenInEditorMutationArgs {
   editor: string;
   path: string;
 }
+export interface UpdateSettingsMutationArgs {
+  data: string;
+}
 
 export enum FileType {
   file = 'file',
@@ -249,6 +266,7 @@ export enum FileType {
 
 export namespace DatabaseResolvers {
   export interface Resolvers<Context = any> {
+    settings?: SettingsResolver<Settings, any, Context>;
     schematicCollections?: SchematicCollectionsResolver<
       (SchematicCollectionForNgNew | null)[] | null,
       any,
@@ -265,6 +283,11 @@ export namespace DatabaseResolvers {
     directory?: DirectoryResolver<FilesType, any, Context>;
   }
 
+  export type SettingsResolver<
+    R = Settings,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type SchematicCollectionsResolver<
     R = (SchematicCollectionForNgNew | null)[] | null,
     Parent = any,
@@ -308,6 +331,52 @@ export namespace DatabaseResolvers {
     onlyDirectories?: boolean | null;
     showHidden?: boolean | null;
   }
+}
+
+export namespace SettingsResolvers {
+  export interface Resolvers<Context = any> {
+    canCollectData?: CanCollectDataResolver<boolean, any, Context>;
+    recent?: RecentResolver<
+      (WorkspaceDefinition | null)[] | null,
+      any,
+      Context
+    >;
+  }
+
+  export type CanCollectDataResolver<
+    R = boolean,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type RecentResolver<
+    R = (WorkspaceDefinition | null)[] | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace WorkspaceDefinitionResolvers {
+  export interface Resolvers<Context = any> {
+    path?: PathResolver<string, any, Context>;
+    name?: NameResolver<string, any, Context>;
+    favorite?: FavoriteResolver<boolean | null, any, Context>;
+  }
+
+  export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type FavoriteResolver<
+    R = boolean | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace SchematicCollectionForNgNewResolvers {
@@ -662,6 +731,7 @@ export namespace ArchitectResolvers {
       any,
       Context
     >;
+    description?: DescriptionResolver<string, any, Context>;
     schema?: SchemaResolver<(ArchitectSchema | null)[] | null, any, Context>;
   }
 
@@ -682,6 +752,11 @@ export namespace ArchitectResolvers {
   > = Resolver<R, Parent, Context>;
   export type ConfigurationsResolver<
     R = (ArchitectConfigurations | null)[] | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type DescriptionResolver<
+    R = string,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
@@ -866,6 +941,7 @@ export namespace MutationResolvers {
     runNpm?: RunNpmResolver<CommandStarted | null, any, Context>;
     stop?: StopResolver<StopResult | null, any, Context>;
     openInEditor?: OpenInEditorResolver<OpenInEditor | null, any, Context>;
+    updateSettings?: UpdateSettingsResolver<Settings, any, Context>;
   }
 
   export type NgAddResolver<
@@ -934,6 +1010,15 @@ export namespace MutationResolvers {
   export interface OpenInEditorArgs {
     editor: string;
     path: string;
+  }
+
+  export type UpdateSettingsResolver<
+    R = Settings,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, UpdateSettingsArgs>;
+  export interface UpdateSettingsArgs {
+    data: string;
   }
 }
 

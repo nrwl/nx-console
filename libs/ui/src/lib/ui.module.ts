@@ -33,12 +33,14 @@ import {
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
-  MatTreeModule
+  MatTreeModule,
+  MatMenuModule
 } from '@angular/material';
 import { NormalizePathPipe } from './normalize-path.pipe';
 import { DataCollectionComponent } from './data-collection/data-collection.component';
 
 const IMPORTS = [
+  MatMenuModule,
   CdkTreeModule,
   CommonModule,
   FlexLayoutModule,

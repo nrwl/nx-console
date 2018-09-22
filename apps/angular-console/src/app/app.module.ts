@@ -82,7 +82,7 @@ export function initApollo(
           canActivateChild: [CancelCommandGuard]
         }
       ],
-      { paramsInheritanceStrategy: 'always' }
+      { paramsInheritanceStrategy: 'always', initialNavigation: 'disabled' }
     )
   ],
   providers: [

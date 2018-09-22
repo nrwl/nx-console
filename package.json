@@ -1,6 +1,6 @@
 {
   "name": "angular-console",
-  "version": "6.0.0-beta.1",
+  "version": "6.0.0-beta.2",
   "private": true,
   "author": {
     "name": "Narwhal Technologies Inc",
@@ -18,8 +18,8 @@
     "copyright": "Copyright © 2018 Narwhal Technologies Inc",
     "asar": false,
     "directories": {
-      "app": "dist/electron",
-      "buildResources": "dist/electron/assets/icons/build",
+      "app": "dist/server",
+      "buildResources": "dist/server/assets/icons/build",
       "output": "dist/packages"
     },
     "npmRebuild": true,
@@ -32,11 +32,11 @@
       "icon": "icon.ico"
     },
     "linux": {
+      "icon": "icon.png",
       "target": [
-        "snap",
-        "deb",
         "AppImage",
-        "tar.xz"
+        "deb",
+        "tar.gz"
       ],
       "synopsis": "Angular Console",
       "category": "Development"
@@ -53,7 +53,7 @@
         "repo": "angular-console"
       }
     ]
-  },
+  },  
   "dependencies": {
     "@nrwl/nx": "6.2.1"
   },
@@ -97,7 +97,7 @@
     "core-js": "^2.5.7",
     "cypress": "3.0.3",
     "drivelist": "6.3.0",
-    "electron": "2.0.5",
+    "electron": "2.0.8",
     "electron-builder": "20.19.2",
     "electron-installer-dmg": "^1.0.0",
     "electron-packager": "12.1.0",

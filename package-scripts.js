@@ -2,8 +2,23 @@ const npsUtils = require('nps-utils');
 const os = require('os');
 
 function withPlatform(command) {
-  const platform = os.platform() === 'win32' ? 'win' : 'mac';
+  let platform;
+  switch (os.platform()) {
+    case 'win32':
+      platform = 'win';
+      break;
+    case 'darwin':
+      platform = 'mac';
+      break;
+    default:
+      platform = 'linux';
+      break;
+  }
   return `${platform}.${command}`;
+}
+
+function electronBuilder(dashP) {
+  return `electron-builder --mac --win --linux -p ${dashP} --config.win.certificateSubjectName="Narwhal Technologies Inc."`
 }
 
 module.exports = {
@@ -47,40 +62,51 @@ module.exports = {
     },
     mac: {
       'clean': 'rm -rf dist',
-      'compile': 'tsc -p electron/tsconfig.json',
-      'copy-assets': 'cp electron/package.json dist/electron/package.json && cp -r electron/assets dist/electron',
-      'copy-server': 'cp -r dist/server/src dist/electron/server',
-      'install-node-modules': 'cd dist/electron && yarn',
-      'copy-frontend': 'cp -r dist/apps/angular-console dist/electron/server/public',
+      'compile': 'tsc -p server/tsconfig.json',
+      'copy-assets': 'cp server/package.json dist/server/package.json && cp -r server/assets dist/server',
+      'install-node-modules': 'cd dist/server && yarn',
+      'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
       'pack': 'electron-builder --mac --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
-      'start-server': 'electron dist/electron --server',
-      'start-electron': 'NODE_ENV=development electron dist/electron',
+      'start-server': 'electron dist/server --server',
+      'start-electron': 'NODE_ENV=development electron dist/server',
       'builder-dist': 'electron-builder --mac -p never',
-      'builder-dist-linux': 'electron-builder --linux -p never'
+    },
+    linux: {
+      'clean': 'rm -rf dist',
+      'compile': 'tsc -p server/tsconfig.json',
+      'copy-assets': 'cp server/package.json dist/server/package.json && cp -r server/assets dist/server',
+      'install-node-modules': 'cd dist/server && yarn',
+      'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
+      'pack': 'electron-builder --linux --dir -p never',
+      'copy-to-osbuilds': 'cp -r dist/packages osbuilds/linux',
+      'start-server': 'electron dist/server --server',
+      'start-electron': 'NODE_ENV=development electron dist/server',
+      'builder-dist': 'electron-builder --linux -p never'
     },
     win: {
       'clean': 'if exist dist rmdir dist /s /q',
-      'compile': 'tsc -p electron/tsconfig.json',
-      'copy-assets': 'copy electron\\package.json dist\\electron\\package.json && (robocopy electron\\assets dist\\electron\\assets /e || echo 0)',
-      'copy-server': 'robocopy dist\\server\\src dist\\electron\\server /e || echo 0',
+      'compile': 'tsc -p server/tsconfig.json',
+      'copy-assets': 'copy server\\package.json dist\\server\\package.json && (robocopy server\\assets dist\\server\\assets /e || echo 0)',
       'install-node-modules': 'cd dist\\electron && yarn',
-      'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\electron\\server\\public /e || echo 0',
+      'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\server\\src\\public /e || echo 0',
       'pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
-      'start-server': 'electron dist\\electron --server',
-      'start-electron': 'electron dist\\electron',
+      'start-server': 'electron dist\\server --server',
+      'start-electron': 'electron dist\\server',
       'builder-dist': 'electron-builder --win -p never'
     },
     dev: {
-      'compile-server-and-electron': npsUtils.series.nps(withPlatform('compile'), withPlatform('copy-assets'), 'server.compile', withPlatform('copy-server')),
-      'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server-and-electron', 'frontend.build', withPlatform('copy-frontend'), withPlatform('pack')),
-      'server': npsUtils.series.nps('dev.compile-server-and-electron', withPlatform('start-server')),
+      'compile-server': npsUtils.series.nps(withPlatform('compile'), withPlatform('copy-assets')),
+      'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server', 'frontend.build', withPlatform('copy-frontend'), withPlatform('pack')),
+      'server': npsUtils.series.nps('dev.compile-server', withPlatform('start-server')),
       'up': npsUtils.concurrent.nps('dev.server', 'frontend.serve'),
-      'dist': npsUtils.series.nps(withPlatform('prepare'), withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
+      'dist': npsUtils.series.nps('dev.prepare', withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
     },
     publish: {
-      'builder-publish': 'electron-builder --mac --win -p always --config.win.certificateSubjectName="Narwhal Technologies Inc."',
+      'builder-prerelease': electronBuilder('never'),
+      'builder-publish': electronBuilder('always'),
+      'prerelease': npsUtils.series.nps('dev.prepare', 'publish.builder-prerelease'),
       'publish': npsUtils.series.nps('dev.prepare', 'publish.builder-publish')
     },
     e2e: {

@@ -25,7 +25,6 @@ import {
 
 import { readSchematicCollections } from '../api/read-schematic-collections';
 import {
-  readDescription,
   readProjects,
   readSchema
 } from '../api/read-projects';
@@ -42,6 +41,7 @@ import {
   runCommand,
   stopAllCommands
 } from '../api/commands';
+import { storeSettings, readSettings } from '../api/read-settings';
 
 const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
@@ -115,6 +115,9 @@ const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
 };
 
 const Database: DatabaseResolvers.Resolvers = {
+  settings() {
+    return readSettings();
+  },
   schematicCollections() {
     try {
       return schematicCollectionsForNgNew();
@@ -281,6 +284,10 @@ const Mutation: MutationResolvers.Resolvers = {
       console.log(e);
       throw new Error(`Error when opening an editor. Message: "${e.message}"`);
     }
+  },
+  updateSettings(_root: any, args: any) {
+    storeSettings(JSON.parse(args.data));
+    return readSettings();
   }
 };
 
