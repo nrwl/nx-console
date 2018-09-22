@@ -126,7 +126,6 @@ export interface Architect {
   project: string;
   builder: string;
   configurations?: (ArchitectConfigurations | null)[] | null;
-  description: string;
   schema?: (ArchitectSchema | null)[] | null;
 }
 
@@ -731,7 +730,6 @@ export namespace ArchitectResolvers {
       any,
       Context
     >;
-    description?: DescriptionResolver<string, any, Context>;
     schema?: SchemaResolver<(ArchitectSchema | null)[] | null, any, Context>;
   }
 
@@ -752,11 +750,6 @@ export namespace ArchitectResolvers {
   > = Resolver<R, Parent, Context>;
   export type ConfigurationsResolver<
     R = (ArchitectConfigurations | null)[] | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type DescriptionResolver<
-    R = string,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

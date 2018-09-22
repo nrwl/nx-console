@@ -11,7 +11,6 @@ export const typeDefs = gql`
     project: String!
     builder: String!
     configurations: [ArchitectConfigurations]
-    description: String!
     schema: [ArchitectSchema]
   }
 
