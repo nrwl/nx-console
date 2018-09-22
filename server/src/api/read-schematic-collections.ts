@@ -1,5 +1,10 @@
 import * as path from 'path';
-import { normalizeSchema, readJsonFile } from '../utils';
+import {
+  fileExistsSync,
+  listOfUnnestedNpmPackages,
+  normalizeSchema,
+  readJsonFile
+} from '../utils';
 
 interface SchematicCollection {
   name: string;
@@ -22,10 +27,34 @@ interface Schematic {
   }[];
 }
 
-export function readSchematicCollections(
+export function readAllSchematicCollections(basedir: string) {
+  const nodeModulesDir = path.join(basedir, 'node_modules');
+  const packages = listOfUnnestedNpmPackages(nodeModulesDir);
+  const schematicCollections = packages.filter(p => {
+    try {
+      return !!readJsonFile(path.join(p, 'package.json'), nodeModulesDir).json
+        .schematics;
+    } catch (e) {
+      if (
+        e.message &&
+        (e.message.indexOf('no such file') > -1 ||
+          e.message.indexOf('not a directory') > -1)
+      ) {
+        return false;
+      } else {
+        throw e;
+      }
+    }
+  });
+  return schematicCollections.map(c =>
+    readSchematicCollections(nodeModulesDir, c)
+  );
+}
+
+function readSchematicCollections(
   basedir: string,
   collectionName: string
-): SchematicCollection[] {
+): SchematicCollection {
   const packageJson = readJsonFile(
     path.join(collectionName, 'package.json'),
     basedir
@@ -34,42 +63,24 @@ export function readSchematicCollections(
     packageJson.json.schematics,
     path.dirname(packageJson.path)
   );
-  const collectionSchematics = [];
-  let ex = [] as any[];
-  if (collection.json.extends) {
-    const e = Array.isArray(collection.json.extends)
-      ? collection.json.extends
-      : [collection.json.extends];
-    ex = [...ex, ...e];
-  }
-
   const schematicCollection = {
     name: collectionName,
     schematics: [] as Schematic[]
   };
   Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
-    if (!v.hidden) {
-      if (v.extends) {
-        ex.push(v.extends.split(':')[0]);
-      } else {
-        const schematicSchema = readJsonFile(
-          v.schema,
-          path.dirname(collection.path)
-        );
+    if (!v.hidden && !v.extends) {
+      const schematicSchema = readJsonFile(
+        v.schema,
+        path.dirname(collection.path)
+      );
 
-        schematicCollection.schematics.push({
-          name: k,
-          collection: collectionName,
-          schema: normalizeSchema(schematicSchema.json),
-          description: v.description
-        });
-      }
+      schematicCollection.schematics.push({
+        name: k,
+        collection: collectionName,
+        schema: normalizeSchema(schematicSchema.json),
+        description: v.description
+      });
     }
   });
-
-  let res = [schematicCollection];
-  new Set(ex).forEach(e => {
-    res = [...res, ...readSchematicCollections(basedir, e)];
-  });
-  return res;
+  return schematicCollection;
 }

@@ -3,11 +3,13 @@ import {
   clickOnTask,
   goBack,
   goToExtensions,
+  goToGenerate,
   openProject,
   projectPath,
   taskListHeaders,
   tasks,
-  texts
+  texts,
+  waitForActionToComplete
 } from './utils';
 
 describe('Extensions', () => {
@@ -33,24 +35,28 @@ describe('Extensions', () => {
   });
 
   it('adds an extension', () => {
-    clickOnTask('Available Extensions', '@progress/kendo-angular-menu', false);
-    cy.get('div.context-title').contains(
-      '@progress/kendo-angular-menu extension'
-    );
+    clickOnTask('Available Extensions', '@angular/material', false);
+    cy.get('div.context-title').contains('@angular/material');
 
     cy.get('button')
       .contains('Add')
       .click();
 
-    cy.wait(100);
+    checkDisplayedCommand(`$ ng add @angular/material`);
 
-    checkDisplayedCommand(`$ ng add @progress/kendo-angular-menu`);
+    waitForActionToComplete();
 
     goBack();
 
     cy.get('div.title').contains('Add/Remove CLI Extensions');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Available Extensions');
+    });
+
+    // check that the schematics added by angular material are available
+    goToGenerate();
+    taskListHeaders($p => {
+      expect(texts($p)[0]).to.equal('@angular/material');
     });
   });
 });

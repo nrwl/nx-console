@@ -4,7 +4,9 @@ import {
   filterByName,
   findClosestNg,
   findExecutable,
-  readJsonFile
+  readJsonFile,
+  files,
+  cacheFiles
 } from '../utils';
 import {
   completeFiles,
@@ -13,7 +15,7 @@ import {
   completeProjects
 } from '../api/completions';
 
-import { readSchematicCollections } from '../api/read-schematic-collections';
+import { readAllSchematicCollections } from '../api/read-schematic-collections';
 import {
   readDescription,
   readProjects,
@@ -26,8 +28,6 @@ import { openInEditor, readEditors } from '../api/read-editors';
 import { readNpmScripts, readNpmScriptSchema } from '../api/read-npm-scripts';
 import { readDirectory } from '../api/read-directory';
 import {
-  listFiles,
-  files,
   commandInProgress,
   runCommand,
   stopAllCommands
@@ -76,14 +76,7 @@ const Workspace = {
     if (!directoryExists(path.join(p, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
     }
-
-    const angularJson = readJsonFile('./angular.json', p).json;
-    const collectionName =
-      angularJson.cli && angularJson.cli.defaultCollection
-        ? angularJson.cli.defaultCollection
-        : '@schematics/angular';
-
-    return filterByName(readSchematicCollections(p, collectionName), args);
+    return filterByName(readAllSchematicCollections(p), args);
   },
   npmScripts(workspace: any, args: any) {
     return filterByName(workspace.npmScripts, args);
@@ -128,7 +121,7 @@ const Database = {
   workspace(_root, args: any) {
     try {
       if (!files[args.path]) {
-        listFiles(args.path);
+        cacheFiles(args.path);
       }
       const packageJson = readJsonFile('./package.json', args.path).json;
       const angularJson = readJsonFile('./angular.json', args.path).json;

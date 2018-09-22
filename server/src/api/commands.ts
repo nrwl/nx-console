@@ -1,6 +1,5 @@
-import { listFilesRec } from '../utils';
-
 import * as os from 'os';
+
 const spawn = require('node-pty-prebuilt').spawn;
 
 interface CommandResult {
@@ -12,7 +11,6 @@ interface CommandResult {
 
 let commandRunIndex = 0;
 export let commandInProgress: CommandResult | null;
-export const files: { [path: string]: string[] } = {};
 
 export function runCommand(cwd: string, program: string, cmds: string[]) {
   stopAllCommands();
@@ -48,13 +46,4 @@ export function stopAllCommands() {
     }
   }
   commandInProgress = null;
-}
-
-export function listFiles(path: string) {
-  setTimeout(() => {
-    files[path] = listFilesRec(path);
-    setTimeout(() => {
-      listFiles(path);
-    }, 60000);
-  }, 0);
 }

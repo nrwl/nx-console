@@ -138,7 +138,8 @@
     "universal-analytics": "^0.4.17",
     "uuid": "^3.3.2",
     "xterm": "3.4.1",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "strip-json-comments": "2.0.1"
   },
   "jest": {
     "modulePathIgnorePatterns": [

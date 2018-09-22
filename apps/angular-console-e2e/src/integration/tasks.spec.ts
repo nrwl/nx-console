@@ -10,7 +10,7 @@ import {
   taskListHeaders,
   tasks,
   texts,
-  waitForBuild
+  waitForActionToComplete
 } from './utils';
 
 describe('Tasks', () => {
@@ -74,7 +74,7 @@ describe('Tasks', () => {
       .contains('Run')
       .click();
 
-    waitForBuild();
+    waitForActionToComplete();
     checkFileExists(`dist/proj/main.js`);
 
     goBack();

@@ -175,12 +175,17 @@ export function waitForAutocomplete() {
   cy.wait(700);
 }
 
-export function waitForBuild() {
-  cy.wait(35000);
-}
-
 export function waitForNgNew() {
   cy.wait(120000);
+}
+
+export function waitForActionToComplete() {
+  cy.wait(100); // this is to give the app time ot disable the button first
+  cy.get('button.action-button:enabled[color="primary"]', {
+    timeout: 120000
+  }).should($p => {
+    expect($p.length).to.equal(1);
+  });
 }
 
 export function autocompletion(callback: (s: any) => void) {
