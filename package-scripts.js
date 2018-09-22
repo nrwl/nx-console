@@ -86,7 +86,7 @@ module.exports = {
       'clean': 'if exist dist rmdir dist /s /q',
       'compile': 'tsc -p server/tsconfig.json',
       'copy-assets': 'copy server\\package.json dist\\server\\package.json && (robocopy server\\assets dist\\server\\assets /e || echo 0)',
-      'install-node-modules': 'cd dist\\electron && yarn',
+      'install-node-modules': 'cd dist\\server && yarn',
       'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\server\\src\\public /e || echo 0',
       'pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
