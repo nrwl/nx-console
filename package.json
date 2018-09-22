@@ -17,6 +17,7 @@
     "productName": "Angular Console",
     "copyright": "Copyright © 2018 Narwhal Technologies Inc",
     "asar": false,
+    "removePackageScripts": false,
     "directories": {
       "app": "dist/server",
       "buildResources": "dist/server/assets/icons/build",
