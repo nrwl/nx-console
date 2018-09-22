@@ -1,17 +1,18 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
 import { SchematicCollection, Schematic } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import {
   distinctUntilChanged,
   filter,
   map,
   shareReplay,
   startWith,
-  switchMap
+  switchMap,
+  takeUntil
 } from 'rxjs/operators';
 
 interface SchematicId {
@@ -25,7 +26,8 @@ interface SchematicId {
   templateUrl: './schematics.component.html',
   styleUrls: ['./schematics.component.scss']
 })
-export class SchematicsComponent {
+export class SchematicsComponent implements OnDestroy {
+  destroy$ = new Subject<void>();
   private readonly schematicCollections$: Observable<
     Array<SchematicCollection>
   > = this.route.params.pipe(
@@ -63,7 +65,8 @@ export class SchematicsComponent {
           return { ...c, schematics: s };
         })
         .filter(c => c.schematics.length > 0);
-    })
+    }),
+    takeUntil(this.destroy$)
   );
 
   private readonly selectedSchematicId$: Observable<
@@ -156,5 +159,10 @@ export class SchematicsComponent {
     );
 
     return selectedTask || null;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

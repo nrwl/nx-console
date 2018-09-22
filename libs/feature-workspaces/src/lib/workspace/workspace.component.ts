@@ -16,7 +16,7 @@ import {
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import {
   filter,
   first,
@@ -24,7 +24,8 @@ import {
   publishReplay,
   refCount,
   shareReplay,
-  switchMap
+  switchMap,
+  takeUntil
 } from 'rxjs/operators';
 
 interface Route {
@@ -49,6 +50,7 @@ interface Route {
   ]
 })
 export class WorkspaceComponent implements OnDestroy {
+  destroy$ = new Subject<void>();
   @HostBinding('@.disabled') animationsDisabled = false;
 
   readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
@@ -115,7 +117,8 @@ export class WorkspaceComponent implements OnDestroy {
     }),
     map((r: any) => r.data.workspace),
     publishReplay(1),
-    refCount()
+    refCount(),
+    takeUntil(this.destroy$)
   );
 
   private readonly editorSubscription = this.editorSupport.editors.subscribe(
@@ -173,6 +176,8 @@ export class WorkspaceComponent implements OnDestroy {
     this.workplaceSubscription.unsubscribe();
     this.subscription.unsubscribe();
     this.editorSubscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   toggleAnimations() {

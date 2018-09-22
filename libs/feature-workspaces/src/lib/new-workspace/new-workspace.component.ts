@@ -7,7 +7,8 @@ import {
   OnInit,
   QueryList,
   ViewChildren,
-  ViewEncapsulation
+  ViewEncapsulation,
+  OnDestroy
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatExpansionPanel } from '@angular/material';
@@ -19,7 +20,8 @@ import {
   map,
   publishReplay,
   refCount,
-  switchMap
+  switchMap,
+  takeUntil
 } from 'rxjs/operators';
 
 import {
@@ -38,7 +40,8 @@ interface SchematicCollectionForNgNew {
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.scss']
 })
-export class NewWorkspaceComponent implements OnInit {
+export class NewWorkspaceComponent implements OnInit, OnDestroy {
+  destroy$ = new Subject<void>();
   @ViewChildren(MatExpansionPanel)
   matExpansionPanels: QueryList<MatExpansionPanel>;
   schematicCollectionsForNgNew$: Observable<any>;
@@ -91,9 +94,11 @@ export class NewWorkspaceComponent implements OnInit {
         refCount()
       );
 
-    this.schematicCollectionsForNgNew$.subscribe(() => {
-      this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
-    });
+    this.schematicCollectionsForNgNew$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
+      });
 
     this.createNewWorkspace$.subscribe(() => {
       const form = this.ngNewForm$.value;
@@ -164,5 +169,10 @@ export class NewWorkspaceComponent implements OnInit {
       this.selectedNode = node;
       field.setValue(node.path);
     }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

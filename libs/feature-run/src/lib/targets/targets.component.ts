@@ -1,16 +1,17 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
 import { NpmScripts, Project } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, combineLatest, Subject } from 'rxjs';
 import {
   map,
   switchMap,
   filter,
   startWith,
-  distinctUntilChanged
+  distinctUntilChanged,
+  takeUntil
 } from 'rxjs/operators';
 
 interface Target {
@@ -24,7 +25,8 @@ interface Target {
   templateUrl: './targets.component.html',
   styleUrls: ['./targets.component.scss']
 })
-export class TargetsComponent {
+export class TargetsComponent implements OnDestroy {
+  destroy$ = new Subject<void>();
   private readonly projectsAndNpmScripts$: Observable<
     Array<Project | NpmScripts>
   > = this.route.params.pipe(
@@ -71,7 +73,8 @@ export class TargetsComponent {
         scripts: (r as any).data.workspace.npmScripts
       };
       return [scripts, ...sortedProjects];
-    })
+    }),
+    takeUntil(this.destroy$)
   );
 
   private readonly selectedTargetId$: Observable<
@@ -192,6 +195,11 @@ export class TargetsComponent {
       );
 
     return selectedTask || null;
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
 
