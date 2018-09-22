@@ -1,8 +1,8 @@
 <h1 align="center">
 	<img
 		width="150"
-		alt="The Lounge"
-		src="electron/assets/icons/build/icon.png">
+		alt="Logo"
+		src="server/assets/icons/build/icon.png">
     </br>
     <div>Angular Console</div>
     </br>
