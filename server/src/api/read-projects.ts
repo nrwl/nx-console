@@ -13,7 +13,11 @@ export function readProjects(basedir: string, json: any): Project[] {
   });
 }
 
-function readArchitect(project: string, basedir: string, architect: any): Architect[] {
+function readArchitect(
+  project: string,
+  basedir: string,
+  architect: any
+): Architect[] {
   if (!architect) return [];
   return Object.entries(architect).map(([key, value]: [string, any]) => {
     const configurations = value.configurations

@@ -7,7 +7,7 @@ import {
   WorkspaceResolvers,
   CompletionsTypesResolvers,
   DatabaseResolvers,
-  MutationResolvers,
+  MutationResolvers
 } from '../graphql-types';
 import {
   directoryExists,
@@ -24,10 +24,7 @@ import {
 } from '../api/completions';
 
 import { readSchematicCollections } from '../api/read-schematic-collections';
-import {
-  readProjects,
-  readSchema
-} from '../api/read-projects';
+import { readProjects, readSchema } from '../api/read-projects';
 import { availableExtensions, readExtensions } from '../api/read-extensions';
 import { readDependencies } from '../api/read-dependencies';
 import { schematicCollectionsForNgNew } from '../api/read-ngnews';
