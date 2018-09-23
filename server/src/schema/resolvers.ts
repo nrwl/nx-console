@@ -1,5 +1,15 @@
 import * as path from 'path';
 import {
+  SchematicCollectionResolvers,
+  ArchitectResolvers,
+  ProjectResolvers,
+  NpmScriptResolvers,
+  WorkspaceResolvers,
+  CompletionsTypesResolvers,
+  DatabaseResolvers,
+  MutationResolvers
+} from '../graphql-types';
+import {
   directoryExists,
   filterByName,
   findClosestNg,
@@ -14,11 +24,7 @@ import {
 } from '../api/completions';
 
 import { readSchematicCollections } from '../api/read-schematic-collections';
-import {
-  readDescription,
-  readProjects,
-  readSchema
-} from '../api/read-projects';
+import { readProjects, readSchema } from '../api/read-projects';
 import { availableExtensions, readExtensions } from '../api/read-extensions';
 import { readDependencies } from '../api/read-dependencies';
 import { schematicCollectionsForNgNew } from '../api/read-ngnews';
@@ -34,19 +40,13 @@ import {
 } from '../api/commands';
 import { storeSettings, readSettings } from '../api/read-settings';
 
-const SchematicCollection = {
+const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
     return filterByName(collection.schematics, args);
   }
 };
 
-const Architect = {
-  description(a, _, __, i) {
-    if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
-      throw new Error(`node_modules is not found`);
-    }
-    return readDescription(i.variableValues.path, a.builder);
-  },
+const Architect: ArchitectResolvers.Resolvers = {
   schema(a, _, __, i) {
     if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
@@ -55,13 +55,13 @@ const Architect = {
   }
 };
 
-const Project = {
+const Project: ProjectResolvers.Resolvers = {
   architect(project: any, args: any) {
     return filterByName(project.architect, args);
   }
 };
 
-const NpmScript = {
+const NpmScript: NpmScriptResolvers.Resolvers = {
   schema(a, _, __, i) {
     if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
@@ -70,7 +70,7 @@ const NpmScript = {
   }
 };
 
-const Workspace = {
+const Workspace: WorkspaceResolvers.Resolvers = {
   schematicCollections(workspace: any, args: any, _: any, i: any) {
     const p = i.variableValues.path;
     if (!directoryExists(path.join(p, 'node_modules'))) {
@@ -96,7 +96,7 @@ const Workspace = {
   }
 };
 
-const CompletionsTypes = {
+const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
   files(workspace: any, args: any) {
     return completeFiles(files, workspace, args.input);
   },
@@ -111,7 +111,7 @@ const CompletionsTypes = {
   }
 };
 
-const Database = {
+const Database: DatabaseResolvers.Resolvers = {
   settings() {
     return readSettings();
   },
@@ -125,7 +125,7 @@ const Database = {
       );
     }
   },
-  workspace(_root, args: any) {
+  async workspace(_root, args: any) {
     try {
       if (!files[args.path]) {
         listFiles(args.path);
@@ -183,7 +183,8 @@ const Database = {
   },
   async directory(_: any, args: any) {
     try {
-      const v = await readDirectory(
+      // XXX: any? Because TS throws an error that string doesn't match Enum
+      const v: any = await readDirectory(
         args.path,
         args.onlyDirectories,
         args.showHidden
@@ -203,7 +204,7 @@ const Database = {
   }
 };
 
-const Mutation = {
+const Mutation: MutationResolvers.Resolvers = {
   async ngAdd(_root: any, args: any) {
     try {
       return runCommand(args.path, findClosestNg(args.path), [

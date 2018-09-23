@@ -50,13 +50,15 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
-      compile: 'tsc -p server/tsconfig.json',
+      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.compile-only'),
+      'compile-only': 'tsc -p server/tsconfig.json',
       format: {
         default: npsUtils.series.nps('server.format.write'),
         write: 'prettier --write \"./server/**/*.ts\"',
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
-      test: 'jest --maxWorkers=1 ./dist/server/test'
+      test: 'jest --maxWorkers=1 ./dist/server/test',
+      'gen-graphql-types': 'ts-node server/gen-graphql-types.ts'
     },
     mac: {
       'clean': 'rm -rf dist',
