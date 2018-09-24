@@ -87,7 +87,6 @@ export class TargetComponent implements OnInit {
                   projectType
                   architect(name: $target) {
                     name
-                    description
                     builder
                     configurations {
                       name
