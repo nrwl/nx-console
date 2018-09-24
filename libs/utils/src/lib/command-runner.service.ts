@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { FetchResult } from 'apollo-link';
 import { BehaviorSubject, interval, Observable, of } from 'rxjs';
-import { concatMap, map, takeWhile } from 'rxjs/operators';
+import {
+  concatMap,
+  map,
+  takeWhile,
+  distinctUntilChanged
+} from 'rxjs/operators';
 import { COMMANDS_POLLING } from './polling-constants';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import {
@@ -24,6 +29,7 @@ export enum CommandStatus {
 export interface IncrementalCommandOutput {
   status: CommandStatus;
   outChunk: string;
+
   detailedStatus: any;
 }
 
@@ -94,6 +100,21 @@ export class CommandRunner {
             } else {
               return of(c);
             }
+          }),
+          distinctUntilChanged((a, b) => {
+            if ((a && !b) || (b && !a)) {
+              return false;
+            }
+
+            if (a.status !== b.status) {
+              return false;
+            }
+
+            if (a.outChunk !== b.outChunk) {
+              return false;
+            }
+
+            return true;
           }),
           takeWhile(r => !!r)
         );

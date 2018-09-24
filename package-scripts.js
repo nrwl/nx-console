@@ -46,7 +46,7 @@ module.exports = {
         write: 'prettier --write \"./server/**/*.ts\"',
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
-      test: 'node ./tools/scripts/test ./dist/server/test',
+      test: 'node ./tools/scripts/test ./server/test',
       'gen-graphql-types': 'ts-node tools/gen-graphql-types.ts',
       'gen-apollo-angular': 'ts-node tools/gen-apollo-angular.ts'
     },

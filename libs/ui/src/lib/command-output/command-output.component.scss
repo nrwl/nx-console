@@ -1,0 +1,57 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$empty-palette: mat-palette($mat-grey, 500);
+$actions-palette: mat-palette($mat-grey, 100);
+$accent-palette: mat-palette($mat-blue);
+$failure-palette: mat-palette($mat-red);
+$success-palette: mat-palette($mat-green);
+
+.container {
+  height: 100%;
+
+  .mat-progress-spinner {
+    display: inline-block;
+    margin: 0 4px;
+  }
+
+  a {
+    color: mat-color($accent-palette);
+    cursor: pointer;
+  }
+}
+
+.empty-container {
+  color: mat-color($empty-palette);
+  height: 100%;
+  font-size: 20px;
+}
+
+.toggle-container {
+  background: mat-color($actions-palette);
+  padding: 8px 16px;
+}
+
+.status-successful mat-icon {
+  color: mat-color($success-palette);
+}
+
+.status-failed mat-icon {
+  color: mat-color($failure-palette);
+}
+
+.details-container {
+  background: white;
+  height: 100%;
+  overflow: auto;
+}
+
+.terminal-container {
+  background: black;
+  overflow: hidden;
+  height: 100%;
+}
+
+.output-icon-active {
+  color: mat-color($accent-palette);
+}

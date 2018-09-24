@@ -168,7 +168,7 @@ export class SchematicComponent implements OnInit {
       withLatestFrom(this.commandArray$),
       tap(() => {
         this.flags.hideFields();
-        this.taskRunner.terminalVisible.next(true);
+        this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c]) => {
         this.out.reset();

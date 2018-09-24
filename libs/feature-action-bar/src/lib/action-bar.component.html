@@ -22,7 +22,7 @@
   <!-- Task list -->
   <mat-list [@growShrink]="(showActionList$ | async) ? 'expand' : 'contract'">
     <ng-container *ngFor="let action of actions; trackBy: trackByCommandId" [ngSwitch]="action.status">
-      <mat-list-item @growShrink matRipple #itemRipple="matRipple" (click)="itemRipple.disabled ? '' : toggleItemExpansion(action.id)">
+      <mat-list-item class="action-bar-title" @growShrink matRipple #itemRipple="matRipple" (click)="itemRipple.disabled ? '' : toggleItemExpansion(action.id)">
 
         <!-- Task avatar -->
         <span class="task-avatar" #taskAvatar matListAvatar fxLayout="row" fxLayoutAlign="center center" [ngSwitch]="action.status"
@@ -69,10 +69,14 @@
       </mat-list-item>
 
       <!-- Terminal output -->
-      <div class="terminal-container" #terminalContainer [@growShrinkTerminal]="{value: terminalHeight, params: {terminalHeight:
+      <div class="output-container" #terminalContainer [@growShrinkTerminal]="{value: terminalHeight, params: {terminalHeight:
           terminalHeight}}"
         *ngIf="expandedAction?.id === action.id" (@growShrinkTerminal.done)="terminalContainer.expanded = true">
-        <ui-terminal #terminal *ngIf="terminalContainer.expanded" [command]="(expandedAction?.command | async).command" [out]="(expandedAction?.command | async)?.out"></ui-terminal>
+        <ui-command-output
+          #terminal
+          *ngIf="terminalContainer.expanded"
+          [commandResponse]="expandedAction?.command | async">
+        </ui-command-output>
       </div>
 
       <mat-divider></mat-divider>

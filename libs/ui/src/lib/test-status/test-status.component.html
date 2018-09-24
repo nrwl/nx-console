@@ -1,0 +1,65 @@
+<div class="container">
+  <div class="inner-container">
+    <mat-list role="list">
+      <div class="status-test_success">
+        <mat-list-item *ngIf="status?.buildProgress === 100">
+          <mat-icon matListIcon>check_circle</mat-icon>
+          <div class="status-content">
+            <div fxFill fxLayout="row" fxLayoutAlign="start center">
+              <div fxFlex>Build successful</div>
+            </div>
+          </div>
+        </mat-list-item>
+      </div>
+      <div [ngSwitch]="status?.testStatus" [ngClass]="statusClassName()">
+        <mat-list-item *ngSwitchCase="'test_pending'">
+          <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
+          Starting...
+        </mat-list-item>
+        <mat-list-item *ngSwitchCase="'test_inprogress'">
+          <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
+          <span *ngIf="status?.buildProgress === 100; then built; else building"></span>
+          <ng-template #building>
+            Building... ({{ status?.buildProgress }}%)
+          </ng-template>
+          <ng-template #built>
+            Running tests ({{ testProgress() }})...
+          </ng-template>
+        </mat-list-item>
+        <mat-list-item *ngSwitchCase="'test_success'">
+          <mat-icon matListIcon>check_circle</mat-icon>
+          <div class="status-content">
+            <div fxFill fxLayout="row" fxLayoutAlign="start center">
+              <div fxFlex>All tests passed</div>
+            </div>
+          </div>
+        </mat-list-item>
+        <mat-list-item *ngSwitchCase="'test_failure'">
+          <mat-icon matListIcon>error</mat-icon>
+          <div class="status-content">
+            <div fxFill fxLayout="row" fxLayoutAlign="start center">
+              <div fxFlex>{{ status?.failure }} failed, {{ status?.success }} passed</div>
+            </div>
+          </div>
+        </mat-list-item>
+      </div>
+      <ng-container *ngIf="status?.errors.length > 0">
+        <mat-divider></mat-divider>
+        <h3 matSubheader>
+          Failed tests
+        </h3>
+        <mat-divider></mat-divider>
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let error of status?.errors; trackBy: errorTrackByFn">
+            <mat-expansion-panel-header>
+              <mat-panel-title class="error-label">
+                {{ error.label }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <pre>{{ error.details }}</pre>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </ng-container>
+    </mat-list>
+  </div>
+</div>

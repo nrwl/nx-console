@@ -29,6 +29,7 @@ module.exports = () => {
     logLevel: constants.LOG_INFO,
     autoWatch: false,
     browsers: ['Chrome'],
-    singleRun: true
+    singleRun: true,
+    failOnEmptyTestSuite: false
   };
 };

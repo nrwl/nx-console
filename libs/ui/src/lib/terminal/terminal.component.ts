@@ -14,6 +14,7 @@ import { Terminal } from 'xterm';
 
 const DEBOUNCE_TIME = 300;
 const SCROLL_BAR_WIDTH = 48;
+const MIN_TERMINAL_WIDTH = 20;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -92,7 +93,10 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
       const height = (this.code.nativeElement as HTMLElement).clientHeight;
       const width =
         (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
-      const cols = Math.floor(width / renderer.dimensions.actualCellWidth);
+      const cols = Math.max(
+        MIN_TERMINAL_WIDTH,
+        Math.floor(width / renderer.dimensions.actualCellWidth)
+      );
       const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
       if (this.term.rows !== rows || this.term.cols !== cols) {
         this.term.reset();

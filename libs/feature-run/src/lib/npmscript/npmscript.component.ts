@@ -2,7 +2,7 @@ import { NpmScript } from '@angular-console/schema';
 import {
   FlagsComponent,
   TaskRunnerComponent,
-  TerminalComponent
+  CommandOutputComponent
 } from '@angular-console/ui';
 import {
   IncrementalCommandOutput,
@@ -42,7 +42,7 @@ export class NpmScriptComponent implements OnInit {
   });
   command$: Observable<string>;
   commandOutput$: Observable<IncrementalCommandOutput>;
-  @ViewChild(TerminalComponent) out: TerminalComponent;
+  @ViewChild(CommandOutputComponent) out: CommandOutputComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
   private readonly ngRun$ = new Subject<any>();
@@ -108,7 +108,7 @@ export class NpmScriptComponent implements OnInit {
       withLatestFrom(this.commandArray$, this.script$),
       tap(() => {
         this.flags.hideFields();
-        this.taskRunner.terminalVisible.next(true);
+        this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c, s]) => {
         this.out.reset();

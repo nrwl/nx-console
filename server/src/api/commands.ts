@@ -1,5 +1,6 @@
 import * as os from 'os';
 import { DetailedStatusCalculator } from './detailed-status-calculator';
+import { normalize } from './command-normalizer';
 
 interface CommandInformation {
   id: string;

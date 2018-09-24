@@ -34,18 +34,11 @@
   }
 }
 
-.terminal-container {
-  margin: 0px 16px;
-  margin-bottom: 16px;
-  background: black;
-  padding: 8px;
-  border-radius: 8px;
-  box-sizing: border-box;
+.action-bar-title {
+  background: rgba(0, 0, 0, 0.03);
+}
 
-  ui-terminal {
-    display: block;
-    height: 100%;
-  }
+.output-container {
 }
 
 mat-list {

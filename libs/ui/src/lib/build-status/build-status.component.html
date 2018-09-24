@@ -1,0 +1,75 @@
+<div class="container">
+  <div class="inner-container">
+    <mat-list role="list">
+      <div class="status-build_success">
+        <mat-list-item *ngIf="status?.serverHost && status?.serverPort">
+          <mat-icon matListIcon>check_circle</mat-icon>
+          <div class="status-content">
+            <div fxFill fxLayout="row" fxLayoutAlign="start center">
+              <div fxFlex>Server started</div>
+              <a target="_blank" [href]="'http://' + (status?.serverHost || '') + ':' + (status?.serverPort || '')">
+                <mat-icon>launch</mat-icon>
+              </a>
+            </div>
+          </div>
+        </mat-list-item>
+      </div>
+      <mat-list-item *ngIf="!status">
+        Not started
+      </mat-list-item>
+      <div [ngSwitch]="status?.buildStatus" [ngClass]="statusClassName()">
+        <mat-list-item *ngSwitchCase="'build_pending'">
+          <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
+          Starting build...
+        </mat-list-item>
+        <mat-list-item *ngSwitchCase="'build_inprogress'">
+          <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
+          Running build... ({{ status?.progress }}%)
+        </mat-list-item>
+        <mat-list-item *ngSwitchCase="'build_success'">
+          <mat-icon matListIcon>check_circle</mat-icon>
+          <div class="status-content">
+            <div fxFill fxLayout="row" fxLayoutAlign="start center">
+              <div fxFlex>Build successful</div>
+              <div class="hint"
+                   matTooltip="Total build time">
+                {{ status?.time }}
+              </div>
+            </div>
+          </div>
+        </mat-list-item>
+        <mat-list-item *ngSwitchCase="'build_failure'">
+          <mat-icon matListIcon>error</mat-icon>
+          <div class="status-content">
+            <div fxFill fxLayout="row" fxLayoutAlign="start center">
+              <div fxFlex>Build failed</div>
+              <div class="hint"
+                   matTooltip="Total build time">
+                {{ status?.time }}
+              </div>
+            </div>
+          </div>
+        </mat-list-item>
+      </div>
+      <ng-container *ngIf="status?.errors.length > 0">
+        <mat-divider></mat-divider>
+        <h3 matSubheader>
+          Errors
+        </h3>
+        <mat-list-item class="build-error" *ngFor="let error of status?.errors; trackBy: errorTrackByFn">
+          {{ error }}
+        </mat-list-item>
+      </ng-container>
+      <h3 matSubheader *ngIf="status?.chunks.length > 0">
+        Assets
+      </h3>
+      <mat-list-item role="listitem" *ngFor="let chunk of status?.chunks">
+        <mat-divider></mat-divider>
+        <div fxFill fxLayout="row" fxLayoutAlign="start center">
+          <div fxFlex>{{ chunk.name }}</div>
+          <div class="hint" matTooltip="Asset size">{{ chunk.size }}</div>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </div>
+</div>

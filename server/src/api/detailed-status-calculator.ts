@@ -1,11 +1,12 @@
-export function createDetailedStatusCalculator(operationName: string) {
+export function createDetailedStatusCalculator(cwd: string, cmds: string[]) {
+  const operationName = cmds[0];
   switch (operationName) {
     case 'build':
       return new BuildDetailedStatusCalculator();
-
     case 'serve':
       return new BuildDetailedStatusCalculator();
-
+    case 'test':
+      return new TestDetailedStatusCalculator();
     default:
       return new EmptyDetailedStatusCalculator();
   }
@@ -13,13 +14,13 @@ export function createDetailedStatusCalculator(operationName: string) {
 
 export interface DetailedStatusCalculator<T> {
   addOut(value: string): void;
-  setStatus(value: 'success' | 'failure' | 'terminated'): void;
+  setStatus(value: 'successful' | 'failure' | 'terminated'): void;
   detailedStatus: T;
 }
 
 class EmptyDetailedStatusCalculator implements DetailedStatusCalculator<null> {
   addOut(value: string) {}
-  setStatus(value: 'success' | 'failure' | 'terminated') {}
+  setStatus(value: 'successful' | 'failure' | 'terminated') {}
   detailedStatus = null;
 }
 
@@ -31,7 +32,11 @@ export interface Chunk {
 }
 
 export interface BuildDetailedStatus {
-  buildStatus: 'build_inprogress' | 'build_success' | 'build_failure';
+  buildStatus:
+    | 'build_pending'
+    | 'build_inprogress'
+    | 'build_success'
+    | 'build_failure';
   progress: number;
   date: string;
   time: string;
@@ -59,8 +64,25 @@ export class BuildDetailedStatusCalculator
       /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
       ''
     );
-    const parsed = parseBuildState(_value);
+    const parsed = getNextBuildState(
+      {
+        chunks: this.chunks,
+        progress: this.detailedStatus.progress,
+        serverHost: this.detailedStatus.serverHost,
+        serverPort: this.detailedStatus.serverPort
+      },
+      _value
+    );
     this.chunks = { ...this.chunks, ...parsed.chunks };
+
+    if (value.indexOf('0% compiling') > -1) {
+      this.detailedStatus = {
+        ...this.detailedStatus,
+        progress: 0,
+        buildStatus: 'build_inprogress'
+      };
+    }
+
     if (parsed.errors && parsed.errors.length > 0) {
       this.detailedStatus = {
         ...this.detailedStatus,
@@ -84,26 +106,96 @@ export class BuildDetailedStatusCalculator
       this.detailedStatus = {
         ...this.detailedStatus,
         ...parsed,
-        buildStatus: 'build_inprogress',
         chunks: Object.values(this.chunks)
       };
     }
   }
 
-  setStatus(value: 'success' | 'failure' | 'terminated') {
+  setStatus(value: 'successful' | 'failure' | 'terminated') {
     this.detailedStatus = {
       ...this.detailedStatus,
-      buildStatus: value === 'success' ? 'build_success' : 'build_failure'
+      buildStatus: value === 'successful' ? 'build_success' : 'build_failure'
     };
   }
 }
 
-function parseBuildState(value: string) {
-  const chunks = {} as any;
-  let date;
-  let time;
-  let errors;
-  let progress;
+type TestError = { label: string; details: string };
+
+export type TestDetailedStatus = {
+  testStatus:
+    | 'test_pending'
+    | 'test_inprogress'
+    | 'test_success'
+    | 'test_failure';
+  buildProgress: number;
+  total: number;
+  failure: number;
+  success: number;
+  errors: TestError[];
+};
+
+export class TestDetailedStatusCalculator
+  implements DetailedStatusCalculator<TestDetailedStatus> {
+  detailedStatus: TestDetailedStatus = {
+    testStatus: 'test_pending',
+    buildProgress: 0,
+    total: 0,
+    failure: 0,
+    success: 0,
+    errors: []
+  };
+
+  addOut(rawValue: string) {
+    const value = sanitize(rawValue);
+
+    const buildProgress = getNextProgress(
+      this.detailedStatus.buildProgress,
+      value
+    );
+
+    const errors = getNextTestErrorState(this.detailedStatus.errors, value);
+
+    const { total, failure, success, testStatus } = getNextTestStatusState(
+      this.detailedStatus,
+      value
+    );
+
+    this.detailedStatus = {
+      buildProgress,
+      errors,
+      total,
+      failure,
+      success,
+      testStatus:
+        testStatus === 'test_pending' && buildProgress === 100
+          ? 'test_inprogress'
+          : testStatus
+    };
+  }
+
+  setStatus(value: 'successful' | 'failure' | 'terminated') {
+    this.detailedStatus = {
+      ...this.detailedStatus,
+      testStatus: value === 'successful' ? 'test_success' : 'test_failure'
+    };
+  }
+}
+
+function getNextBuildState(
+  state: {
+    chunks: { [k: string]: Chunk };
+    progress: number;
+    serverHost?: string;
+    serverPort?: number;
+  },
+  value: string
+) {
+  const chunks = { ...state.chunks } as any;
+  const serverErrorRegExp = /(Port \d+ is already in use)|(getaddrinfo ENOTFOUND .*)/;
+  let date = '';
+  let time = '';
+  let errors = [] as string[];
+  let progress = state.progress;
 
   if (value.indexOf('chunk') > -1 && value.indexOf('Hash:') > -1) {
     value
@@ -143,25 +235,125 @@ function parseBuildState(value: string) {
       .filter(v => v.length > 0);
   }
 
-  const progressRegExp = /\d{1,2}%/g;
-  const progressMatch = value.match(progressRegExp);
-  if (progressMatch) {
-    const lastBit = progressMatch[progressMatch.length - 1];
-    progress = Number(lastBit.substr(0, lastBit.length - 1));
+  const serverErrorMatch = value.match(serverErrorRegExp);
+  if (serverErrorMatch) {
+    errors.push(serverErrorMatch[0]);
   }
+
+  progress = getNextProgress(progress, value);
 
   const serverRegExp = /listening on (.+?):(\d+)/;
   const serverMatch = value.match(serverRegExp);
 
-  const res = {} as any;
-  if (chunks) res.chunks = chunks;
-  if (date) res.date = date;
-  if (time) res.time = time;
-  if (errors) res.errors = errors;
-  if (progress) res.progress = progress;
-  if (serverMatch) {
-    res.serverHost = serverMatch[1];
-    res.serverPort = Number(serverMatch[2]);
+  return {
+    chunks,
+    date,
+    time,
+    errors,
+    progress,
+    serverHost: serverMatch ? serverMatch[1] : state.serverHost,
+    serverPort: serverMatch ? Number(serverMatch[2]) : state.serverPort
+  };
+}
+
+const COLOR_OUTPUT_REGEXP = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+
+function sanitize(value: string) {
+  return value.replace(COLOR_OUTPUT_REGEXP, '');
+}
+
+const PROGRESS_REGEXP = /\d{1,2}%/g;
+
+function getNextProgress(curr: number, value: string): number {
+  const progressMatch = value.match(PROGRESS_REGEXP);
+  if (isFinishedProcessingChunks(value)) {
+    return 100;
+  } else if (progressMatch) {
+    const lastBit = progressMatch[progressMatch.length - 1];
+    const p = Number(lastBit.substr(0, lastBit.length - 1));
+    return Math.max(curr, p);
+  } else {
+    return curr;
   }
-  return res;
+}
+
+function isFinishedProcessingChunks(value: string) {
+  return (
+    value.indexOf('Connected on socket') > -1 ||
+    (value.indexOf('chunk') > -1 && value.indexOf('Hash:') > -1)
+  );
+}
+
+type TestState = {
+  total: number;
+  failure: number;
+  success: number;
+  testStatus:
+    | 'test_pending'
+    | 'test_inprogress'
+    | 'test_failure'
+    | 'test_success';
+};
+
+const TEST_PROGRESS_REGEXP = /Executed\s+(\d+)\s+of\s+(\d+)\s+SUCCESS\s+(\((\d+)\s+FAILED\))?/;
+const TEST_RESULT_REGEXP = /TOTAL:\s+((\d+)\s+FAILED,\s+)?(\d+)\s+SUCCESS/;
+
+function getNextTestStatusState(s: TestState, value: string): TestState {
+  let match;
+  if ((match = value.match(TEST_RESULT_REGEXP))) {
+    const failure = Number(match[2] || 0);
+    const success = Number(match[3]);
+    const total = failure + success;
+    return {
+      total: total,
+      testStatus: failure > 0 ? 'test_failure' : 'test_success',
+      failure,
+      success
+    };
+  } else if ((match = value.match(TEST_PROGRESS_REGEXP))) {
+    const total = Number(match[2]);
+    const success = Number(match[1]);
+    const failure = Number(match[4] || 0);
+    return {
+      total: total,
+      testStatus: 'test_inprogress',
+      failure,
+      success
+    };
+  } else {
+    return s;
+  }
+}
+
+function getNextTestErrorState(_buffer: TestError[], value: string) {
+  const newCaseRegExp = /^\s*[^\(\)]+\([^\)]+\)+(.+) FAILED\s*$/;
+  const errorRegExp = /^\s+((Expected .+)|(  at .+))$/;
+
+  let buffer = _buffer;
+
+  if (value.indexOf('Connected on socket') > -1) {
+    buffer = [];
+  }
+
+  const lines = value.split(/[\r\n]/);
+
+  lines.forEach(line => {
+    let match;
+    if ((match = line.match(newCaseRegExp))) {
+      const label = match[1].trim();
+      if (buffer.every(b => b.label !== label)) {
+        buffer = [...buffer, { label, details: '' }];
+      }
+    } else if ((match = line.match(errorRegExp))) {
+      const [last, ...rest] = buffer.reverse();
+      if (last) {
+        buffer = [
+          ...rest,
+          { ...last, details: `${last.details}${match[1]}\n` }
+        ];
+      }
+    }
+  });
+
+  return buffer;
 }

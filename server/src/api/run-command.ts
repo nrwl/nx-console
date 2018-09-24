@@ -20,7 +20,7 @@ export function runCommand(
   const id = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
   const command = `${programName} ${cmds.join(' ')}`;
   const factory = createExecutableCommand(id, cwd, program, cmds);
-  const statusCalculator = createDetailedStatusCalculator(cmds[0]);
+  const statusCalculator = createDetailedStatusCalculator(cwd, cmds);
 
   recentCommands.addCommand(
     type,

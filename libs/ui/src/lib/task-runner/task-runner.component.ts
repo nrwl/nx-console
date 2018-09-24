@@ -16,7 +16,7 @@ import {
 import { BehaviorSubject, merge, Subscription, EMPTY } from 'rxjs';
 import { map, delay } from 'rxjs/operators';
 import { FlagsComponent } from '../flags/flags.component';
-import { TerminalComponent } from '../terminal/terminal.component';
+import { CommandOutputComponent } from '../command-output/command-output.component';
 
 const ANIMATION_DURATION = 300;
 
@@ -27,8 +27,8 @@ const ANIMATION_DURATION = 300;
   styleUrls: ['./task-runner.component.scss'],
   animations: [
     trigger('growShrink', [
-      state('void', style({ flex: '0 0', 'min-height': '32px' })),
-      state('shrink', style({ flex: '0 0', 'min-height': '32px' })),
+      state('void', style({ flex: '0 0', 'min-height': '45px' })),
+      state('shrink', style({ flex: '0 0', 'min-height': '45px' })),
       state('grow', style({ flex: '1 1', 'min-height': '240px' })),
       transition(
         `shrink <=> grow`,
@@ -41,10 +41,11 @@ export class TaskRunnerComponent implements AfterContentInit, OnDestroy {
   @Input() terminalWindowTitle: string;
 
   @ContentChild(FlagsComponent) flagsComponent: FlagsComponent | undefined;
-  @ContentChild(TerminalComponent) terminalComponent: TerminalComponent;
+  @ContentChild(CommandOutputComponent)
+  statusComponent: CommandOutputComponent | undefined;
 
-  terminalVisible = new BehaviorSubject(true);
-  terminalAnimationState = this.terminalVisible.pipe(
+  terminalVisible$ = new BehaviorSubject(true);
+  terminalAnimationState = this.terminalVisible$.pipe(
     map(visible => (visible ? 'grow' : 'shrink'))
   );
   resizeSubscription: Subscription | undefined;
@@ -57,9 +58,11 @@ export class TaskRunnerComponent implements AfterContentInit, OnDestroy {
       : EMPTY;
     this.resizeSubscription = merge(
       flagsComponentResize$,
-      this.terminalVisible.pipe(delay(DELAY))
+      this.terminalVisible$.pipe(delay(DELAY))
     ).subscribe(() => {
-      this.terminalComponent.resizeTerminal();
+      if (this.statusComponent) {
+        this.statusComponent.resizeTerminal();
+      }
     });
   }
 
