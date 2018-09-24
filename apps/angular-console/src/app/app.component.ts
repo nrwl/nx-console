@@ -5,13 +5,14 @@ import {
   WORKSPACES
 } from '@angular-console/feature-workspaces';
 import { FADE_IN } from '@angular-console/ui';
-import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  ViewChild
+  ViewChild,
+  Inject,
+  PLATFORM_ID
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
@@ -20,6 +21,8 @@ import {
 } from '@nrwl/angular-console-enterprise-frontend';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { Settings } from '@angular-console/utils';
+import { isPlatformBrowser } from '@angular/common';
 
 interface SidenavLink {
   icon: string;
@@ -44,14 +47,12 @@ export class AppComponent implements OnInit {
   routerTransition: Observable<string>;
   settingsLoaded: boolean;
   showSiteMenu = false;
+  isBrowser: boolean;
 
   ngOnInit() {
     this.routerTransition = this.routerOutlet.activateEvents.pipe(
       map(() => this.routerOutlet.activatedRouteData.state)
     );
-    this.authService.isAuthenticated$.subscribe(isAuthenticated => {
-      console.log('is authenticated?', isAuthenticated);
-    });
   }
 
   sidenavLinks: SidenavLink[] = [
@@ -61,20 +62,27 @@ export class AppComponent implements OnInit {
   constructor(
     router: Router,
     public settings: Settings,
+    @Inject(PLATFORM_ID) private readonly platformId: string,
     contextualActionBarService: ContextualActionBarService,
     private readonly authService: AuthService
   ) {
-    settings.fetch().subscribe(() => {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    if (this.isBrowser) {
+      settings.fetch().subscribe(() => {
+        this.settingsLoaded = true;
+        if (settings.showSupportPlugin()) {
+          this.sidenavLinks.push({
+            icon: 'question_answer',
+            route: '/support',
+            text: 'Ask a Narwhal Engineer'
+          });
+        }
+        router.initialNavigation();
+      });
+    } else {
       this.settingsLoaded = true;
-      if (settings.showSupportPlugin()) {
-        this.sidenavLinks.push({
-          icon: 'question_answer',
-          route: '/support',
-          text: 'Ask a Narwhal Engineer'
-        });
-      }
       router.initialNavigation();
-    });
+    }
 
     router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -82,6 +90,10 @@ export class AppComponent implements OnInit {
         const navigationEnd = event as NavigationEnd;
         if (navigationEnd.url.startsWith('/workspace/')) {
           contextualActionBarService.contextualTabs$.next(null);
+        } else if (navigationEnd.url === '/_app-shell') {
+          contextualActionBarService.breadcrumbs$.next([
+            { title: 'Loading' }
+          ]);
         } else {
           switch (
             this.routerOutlet.activatedRouteData

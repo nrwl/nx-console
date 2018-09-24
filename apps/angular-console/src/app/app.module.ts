@@ -1,40 +1,28 @@
-import {
-  FeatureWorkspacesModule,
-  workspaceRoutes
-} from '@angular-console/feature-workspaces';
-import { UiModule } from '@angular-console/ui';
-import {
-  AnalyticsCollector,
-  CancelCommandGuard,
-  Messenger
-} from '@angular-console/utils';
-import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
-import {
-  MatIconModule,
-  MatIconRegistry,
-  MatListModule,
-  MatSidenavModule,
-  MatSnackBarModule
-} from '@angular/material';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
-import {
-  AngularConsoleEnterpriseFrontendModule,
-  supportRoutes
-} from '@nrwl/angular-console-enterprise-frontend';
-import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
-import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { onError } from 'apollo-link-error';
+import {FeatureWorkspacesModule, workspaceRoutes} from '@angular-console/feature-workspaces';
+import {UiModule} from '@angular-console/ui';
+import {AnalyticsCollector, CancelCommandGuard, Messenger} from '@angular-console/utils';
+import {HttpClientModule} from '@angular/common/http';
+import {InjectionToken, NgModule, Optional} from '@angular/core';
+import {MatIconModule, MatIconRegistry, MatListModule, MatSidenavModule, MatSnackBarModule} from '@angular/material';
+import {BrowserModule} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {RouterModule} from '@angular/router';
+import {AngularConsoleEnterpriseFrontendModule, supportRoutes} from '@nrwl/angular-console-enterprise-frontend';
+import {APOLLO_OPTIONS, ApolloModule} from 'apollo-angular';
+import {HttpLink, HttpLinkModule, Options as ApolloLinkOptions} from 'apollo-angular-link-http';
+import {InMemoryCache} from 'apollo-cache-inmemory';
+import {onError} from 'apollo-link-error';
 
-import { AppComponent } from './app.component';
+import {AppComponent} from './app.component';
+import {appShellRoutes, FeatureAppShellModule} from '@angular-console/feature-app-shell';
+
+export const BACKEND_PORT = new InjectionToken<number>('BACKEND_PORT');
 
 export function initApollo(
   analytics: AnalyticsCollector,
   messenger: Messenger,
-  httpLink: HttpLink
+  httpLink: HttpLink,
+  port?: number
 ) {
   analytics.setUpRouterLogging();
 
@@ -57,12 +45,17 @@ export function initApollo(
     }
   });
 
+  const linkOptions: ApolloLinkOptions = {};
+  if (port) {
+    linkOptions.uri = `http://localhost:${port}/graphql`;
+  }
+
   return {
     defaultOptions: {
       query: { fetchPolicy: 'network-only' },
       watchQuery: { fetchPolicy: 'network-only' }
     },
-    link: errorLink.concat(httpLink.create({})),
+    link: errorLink.concat(httpLink.create(linkOptions)),
     cache: new InMemoryCache()
   };
 }
@@ -74,11 +67,12 @@ export function initApollo(
     MatListModule,
     MatIconModule,
     MatSnackBarModule,
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     BrowserAnimationsModule,
     ApolloModule,
     HttpLinkModule,
     HttpClientModule,
+    FeatureAppShellModule,
     FeatureWorkspacesModule,
     UiModule,
     AngularConsoleEnterpriseFrontendModule.forRoot(),
@@ -93,7 +87,8 @@ export function initApollo(
         {
           path: 'support',
           children: supportRoutes
-        }
+        },
+        ...appShellRoutes
       ],
       { paramsInheritanceStrategy: 'always', initialNavigation: 'disabled' }
     )
@@ -104,7 +99,7 @@ export function initApollo(
     {
       provide: APOLLO_OPTIONS,
       useFactory: initApollo,
-      deps: [AnalyticsCollector, Messenger, HttpLink]
+      deps: [AnalyticsCollector, Messenger, HttpLink, [new Optional(), BACKEND_PORT]]
     }
   ],
   bootstrap: [AppComponent]

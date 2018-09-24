@@ -1,14 +1,6 @@
 import * as express from 'express';
-import * as path from 'path';
+import * as cors from 'cors';
 import { ApolloServer } from 'apollo-server-express';
-import {
-  directoryExists,
-  filterByName,
-  findClosestNg,
-  findExecutable,
-  listFiles,
-  readJsonFile
-} from './utils';
 import { schema } from './schema';
 
 const apollo = new ApolloServer({
@@ -24,18 +16,15 @@ apollo.applyMiddleware({
   bodyParserConfig: true
 });
 
-app.get('/workspaces', (req, res) => {
-  res.sendFile('index.html', { root: path.join(__dirname, 'public') });
-});
-
-app.get('/workspace/*', (req, res) => {
-  res.sendFile('index.html', { root: path.join(__dirname, 'public') });
-});
-
-// workspaces
-app.use(express.static(path.join(__dirname, 'public')));
-
-export function start(port: number) {
+export function start(port: number, frontendPort?: number) {
+  if (frontendPort) {
+    app.use(
+      cors({
+        origin: `http://localhost:${frontendPort}`,
+        optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+      })
+    );
+  }
   app.listen(port ? port : 7777);
 }
 

@@ -4,10 +4,12 @@
       <button class="hamburger-button" mat-icon-button (click)="hamburgerClicked.next()">
         <mat-icon>menu</mat-icon>
       </button>
-
       <div class="title" fxFlex fxLayout="row" fxLayoutGap="16px">
         <ng-container *ngFor="let breadcrumb of (contextualActionBarService.breadcrumbs$ | async); let last = last;">
-          <span>{{ breadcrumb.title }}</span>
+          <ui-content-loader *ngIf="breadcrumb.title === 'Loading'" [width]="200" [height]="20" [preserveAspectRatio]="null" primaryColor="#1976d2">
+            <svg:rect x="0" y="0" rx="3" ry="3" width="200" height="20" />
+          </ui-content-loader>
+          <span *ngIf="!breadcrumb.loading">{{ breadcrumb.title }}</span>
           <span *ngIf="!last">|</span>
         </ng-container>
       </div>

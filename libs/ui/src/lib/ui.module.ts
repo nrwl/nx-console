@@ -36,6 +36,7 @@ import { NormalizePathPipe } from './normalize-path.pipe';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
+import { ContentLoaderComponent } from './content-loader/content-loader.component';
 
 const IMPORTS = [
   MatMenuModule,
@@ -93,7 +94,8 @@ const IMPORTS = [
     ContextualActionBarComponent,
     DirectorySelectorComponent,
     NormalizePathPipe,
-    DataCollectionComponent
+    DataCollectionComponent,
+    ContentLoaderComponent
   ],
   exports: [
     ...IMPORTS,
@@ -104,7 +106,8 @@ const IMPORTS = [
     TaskSelectorComponent,
     TerminalComponent,
     NormalizePathPipe,
-    DataCollectionComponent
+    DataCollectionComponent,
+    ContentLoaderComponent
   ]
 })
 export class UiModule {
