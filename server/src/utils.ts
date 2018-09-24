@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
-import { stat, statSync } from 'fs';
+import { existsSync, stat, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
 import { bindNodeCallback, Observable } from 'rxjs';
@@ -183,10 +183,15 @@ export function readJsonFile(
       path: fullFilePath,
       json: fileContents[fullFilePath]
     };
-  } else {
+  } else if (existsSync(fullFilePath)) {
     return {
       path: fullFilePath,
       json: readAndParseJson(fullFilePath)
+    };
+  } else {
+    return {
+      path: fullFilePath,
+      json: {}
     };
   }
 }

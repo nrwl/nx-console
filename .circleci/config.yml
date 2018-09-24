@@ -13,10 +13,7 @@ jobs:
       - checkout
       - restore_cache:
           name: Restore Global Yarn Package Cache
-          keys:
-            - yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-packages-{{ .Branch }}-
-            - yarn-packages-
+          key: yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run: yarn install
       - run: yarn start format.check
       - run: yarn start lint

@@ -1,5 +1,8 @@
 import { Extension } from '@angular-console/schema';
-import { TaskRunnerComponent, TerminalComponent } from '@angular-console/ui';
+import {
+  TaskRunnerComponent,
+  CommandOutputComponent
+} from '@angular-console/ui';
 import {
   IncrementalCommandOutput,
   CommandRunner
@@ -36,7 +39,7 @@ export class ExtensionComponent implements OnInit {
   extension$: Observable<Extension>;
   command$: Observable<string>;
   commandOutput$: Observable<IncrementalCommandOutput>;
-  @ViewChild(TerminalComponent) out: TerminalComponent;
+  @ViewChild(CommandOutputComponent) out: CommandOutputComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
 
   private readonly ngAdd$ = new Subject<any>();
@@ -105,7 +108,7 @@ export class ExtensionComponent implements OnInit {
     this.commandOutput$ = this.ngAdd$.pipe(
       withLatestFrom(this.extension$),
       tap(() => {
-        this.taskRunner.terminalVisible.next(true);
+        this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, a]) => {
         this.out.reset();

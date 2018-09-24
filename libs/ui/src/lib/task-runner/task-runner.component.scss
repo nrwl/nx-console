@@ -1,26 +1,25 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$runner-container: mat-palette($mat-grey, 100);
+$window-chrome-height: 45px;
+
 .ui-flags-container {
   overflow: auto;
   background: white;
+  padding-bottom: 40px;
 }
 
 .ui-terminal-container {
-  background-color: black;
+  background: mat-color($runner-container);
   padding-right: 0;
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
-  background: rgb(240, 240, 240);
-  background: black;
-  padding: 12px;
   overflow: hidden;
-
-  .ng-content-container {
-    overflow: hidden;
-  }
 
   button {
     margin: 0;
-    color: white;
   }
 }
 
@@ -29,22 +28,23 @@
   background-color: rgb(240, 240, 240);
 }
 
+.content-container {
+  height: calc(100% - #{$window-chrome-height});
+  overflow: hidden;
+}
+
 :host {
   width: 100%;
   height: 100%;
 }
 
 .window-chrome {
-  margin-bottom: 16px;
   position: relative;
-  height: 20px;
+  height: $window-chrome-height;
+  padding: 0 12px;
 
   .window-header {
-    color: white;
     font-size: 14px;
-    position: absolute;
-    left: 64px;
-    right: 64px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

@@ -59,7 +59,10 @@
     ]
   },
   "dependencies": {
-    "@nrwl/nx": "6.3.1"
+    "@nrwl/nx": "6.3.1",
+    "@types/strip-json-comments": "^0.0.30",
+    "karma-spec-reporter": "^0.0.32",
+    "karma-verbose-reporter": "^0.0.6"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.8.5",
@@ -138,6 +141,8 @@
     "rxjs": "6.2.2",
     "rxjs-compat": "6.2.2",
     "shelljs": "0.8.2",
+    "strip-json-comments": "2.0.1",
+    "ts-jest": "23.10.4",
     "ts-node": "7.0.1",
     "tsickle": "0.33.0",
     "tslib": "1.9.3",
@@ -146,14 +151,28 @@
     "universal-analytics": "0.4.17",
     "uuid": "3.3.2",
     "xterm": "3.4.1",
-    "zone.js": "0.8.26",
-    "strip-json-comments": "2.0.1",
-    "dotenv": "6.0.0"
+    "zone.js": "0.8.26"
   },
   "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
     "modulePathIgnorePatterns": [
+      "dist",
       "tmp"
     ],
-    "testURL": "http://localhost"
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    },
+    "testURL": "http://localhost",
+    "testMatch": [
+      "**/*.+(spec|test).(ts|js)"
+    ]
   }
 }

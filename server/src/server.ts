@@ -4,10 +4,11 @@ import { ApolloServer, mergeSchemas } from 'apollo-server-express';
 import { schema } from './schema';
 import { createSchema } from '@nrwl/angular-console-enterprise-electron';
 
+// TODO(jack): Temporarily get around type errors.
 const apollo = new ApolloServer({
   schema: mergeSchemas({
-    schemas: [schema, createSchema({})]
-  }),
+    schemas: [schema, createSchema({})] as any
+  }) as any,
   rootValue: global
 });
 

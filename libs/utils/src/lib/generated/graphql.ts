@@ -18,6 +18,7 @@ export namespace Commands {
 
   export type Commands = {
     __typename?: 'CommandResponse';
+    command: string;
     status: string;
     outChunk: string;
     detailedStatus?: string | null;
@@ -262,6 +263,7 @@ export class CommandsGQL extends Apollo.Query<
   document: any = gql`
     query Commands($id: String) {
       commands(id: $id) {
+        command
         status
         outChunk
         detailedStatus

@@ -20,7 +20,7 @@ import {
   CommandStatus
 } from '@angular-console/utils';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { TerminalComponent } from '@angular-console/ui';
+import { CommandOutputComponent } from '@angular-console/ui';
 
 const TERMINAL_PADDING = 44;
 const COMMAND_HEIGHT = 64;
@@ -43,20 +43,14 @@ const COMMAND_HEIGHT = 64;
         'void',
         style({
           height: 0,
-          opacity: 0,
-          'margin-bottom': '0',
-          'padding-top': '0',
-          'padding-bottom': '0'
+          opacity: 0
         })
       ),
       state(
         '*',
         style({
           height: '{{terminalHeight}}', // use interpolation
-          opacity: 1,
-          'margin-bottom': '16px',
-          'padding-top': '8px',
-          'padding-bottom': '8px'
+          opacity: 1
         }),
         { params: { terminalHeight: '0' } }
       ),
@@ -65,8 +59,8 @@ const COMMAND_HEIGHT = 64;
   ]
 })
 export class ActionBarComponent {
-  @ViewChildren(TerminalComponent)
-  activeTerminals?: QueryList<TerminalComponent>;
+  @ViewChildren(CommandOutputComponent)
+  activeTerminals?: QueryList<CommandOutputComponent>;
 
   // For use within the action bar's template.
   CommandStatus = CommandStatus;

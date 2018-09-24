@@ -63,7 +63,7 @@ export function initApollo(
       query: { fetchPolicy: 'network-only' },
       watchQuery: { fetchPolicy: 'network-only' }
     },
-    link: errorLink.concat(httpLink.create({})),
+    link: errorLink.concat(httpLink.create({}) as any), // TODO(jack): Remove the any once type errors are resolved.
     cache: new InMemoryCache()
   };
 }
