@@ -14,6 +14,7 @@ import {
 import {
   CommandOutput,
   CommandRunner,
+  FeatureFlags,
   Serializer
 } from '@angular-console/utils';
 import { Project } from '@angular-console/schema';
@@ -54,7 +55,8 @@ export class TargetComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly runner: CommandRunner,
     private readonly serializer: Serializer,
-    private readonly contextActionService: ContextualActionBarService
+    private readonly contextActionService: ContextualActionBarService,
+    readonly featureFlags: FeatureFlags
   ) {}
 
   ngOnInit() {

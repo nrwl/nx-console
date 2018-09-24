@@ -1,5 +1,13 @@
 <ui-task-runner *ngIf="project$ | async as project" terminalWindowTitle="Task output">
-  <ui-flags [configurations]="project.architect[0].configurations" [prefix]="[project.architect[0].name, project.name]" [fields]="project.architect[0].schema"
-    (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()" [path]="path()"></ui-flags>
+  <ui-flags [configurations]="project.architect[0].configurations" [prefix]="[project.architect[0].name, project.name]"
+            [fields]="project.architect[0].schema"
+            (value)="onFlagsChange($event)" (action)="onRun()" (stop)="onStop()" [path]="path()"></ui-flags>
+  }
+  <div *ngIf="featureFlags.showDetailedStatus && project$ | async as project" class="detailed-status">
+    <div *ngIf="project.architect[0].name === 'build'">
+      <ui-build-status [status]="(commandOutput$|async)?.detailedStatus"></ui-build-status>
+    </div>
+  </div>
+
   <ui-terminal [command]="command$ | async" [input]="(commandOutput$|async)?.out" #output></ui-terminal>
 </ui-task-runner>

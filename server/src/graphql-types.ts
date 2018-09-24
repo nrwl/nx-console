@@ -154,6 +154,7 @@ export interface CommandResult {
   command?: string | null;
   status: string;
   out: string;
+  detailedStatus?: string | null;
 }
 
 export interface FilesType {
@@ -870,6 +871,7 @@ export namespace CommandResultResolvers {
     command?: CommandResolver<string | null, any, Context>;
     status?: StatusResolver<string, any, Context>;
     out?: OutResolver<string, any, Context>;
+    detailedStatus?: DetailedStatusResolver<string | null, any, Context>;
   }
 
   export type CommandResolver<
@@ -887,6 +889,11 @@ export namespace CommandResultResolvers {
     Parent,
     Context
   >;
+  export type DetailedStatusResolver<
+    R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace FilesTypeResolvers {

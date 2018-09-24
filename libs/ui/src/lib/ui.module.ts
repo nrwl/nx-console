@@ -38,6 +38,7 @@ import {
 } from '@angular/material';
 import { NormalizePathPipe } from './normalize-path.pipe';
 import { DataCollectionComponent } from './data-collection/data-collection.component';
+import { BuildStatusComponent } from './build-status/build-status.component';
 
 const IMPORTS = [
   MatMenuModule,
@@ -95,7 +96,8 @@ const IMPORTS = [
     ContextualActionBarComponent,
     DirectorySelectorComponent,
     NormalizePathPipe,
-    DataCollectionComponent
+    DataCollectionComponent,
+    BuildStatusComponent
   ],
   providers: [ContextualActionBarService],
   exports: [
@@ -107,7 +109,8 @@ const IMPORTS = [
     TaskSelectorComponent,
     TerminalComponent,
     NormalizePathPipe,
-    DataCollectionComponent
+    DataCollectionComponent,
+    BuildStatusComponent
   ]
 })
 export class UiModule {

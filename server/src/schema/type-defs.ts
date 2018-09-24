@@ -32,6 +32,7 @@ export const typeDefs = gql`
     command: String
     status: String!
     out: String!
+    detailedStatus: String
   }
 
   type CommandStarted {
