@@ -5,6 +5,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   MatAutocompleteModule,
+  MatBadgeModule,
   MatButtonModule,
   MatCardModule,
   MatDividerModule,
@@ -38,6 +39,9 @@ import { NormalizePathPipe } from './normalize-path.pipe';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
+import { BuildStatusComponent } from './build-status/build-status.component';
+import { CommandOutputComponent } from './command-output/command-output.component';
+import { TestStatusComponent } from './test-status/test-status.component';
 
 const IMPORTS = [
   MatProgressSpinnerModule,
@@ -47,6 +51,7 @@ const IMPORTS = [
   CommonModule,
   FlexLayoutModule,
   MatAutocompleteModule,
+  MatBadgeModule,
   MatButtonModule,
   MatCardModule,
   MatDividerModule,
@@ -60,6 +65,7 @@ const IMPORTS = [
   MatSelectModule,
   MatSidenavModule,
   MatSlideToggleModule,
+  MatProgressSpinnerModule,
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
@@ -97,7 +103,10 @@ const IMPORTS = [
     ContextualActionBarComponent,
     DirectorySelectorComponent,
     NormalizePathPipe,
-    DataCollectionComponent
+    DataCollectionComponent,
+    BuildStatusComponent,
+    CommandOutputComponent,
+    TestStatusComponent
   ],
   exports: [
     ...IMPORTS,
@@ -108,7 +117,10 @@ const IMPORTS = [
     TaskSelectorComponent,
     TerminalComponent,
     NormalizePathPipe,
-    DataCollectionComponent
+    DataCollectionComponent,
+    BuildStatusComponent,
+    CommandOutputComponent,
+    TestStatusComponent
   ]
 })
 export class UiModule {
@@ -124,6 +136,7 @@ export class UiModule {
     this.addIcon('webstorm', 'webstorm.svg');
     this.addIcon('intellij', 'intellij.svg');
     this.addIcon('terminal', 'terminal.svg');
+    this.addIcon('console', 'console.svg');
   }
 
   private addIcon(name: string, url: string) {

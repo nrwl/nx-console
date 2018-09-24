@@ -1,6 +1,8 @@
 import { RecentCommands } from './commands';
 import { readJsonFile } from '../utils';
 import { createDetailedStatusCalculator } from './detailed-status-calculator';
+import { normalizeCommands } from '../builder-utils';
+
 // noinspection TsLint
 const spawn = require('node-pty-prebuilt').spawn;
 
@@ -20,7 +22,7 @@ export function runCommand(
   const id = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
   const command = `${programName} ${cmds.join(' ')}`;
   const factory = createExecutableCommand(id, cwd, program, cmds);
-  const statusCalculator = createDetailedStatusCalculator(cmds[0]);
+  const statusCalculator = createDetailedStatusCalculator(cwd, cmds);
 
   recentCommands.addCommand(
     type,
@@ -41,7 +43,10 @@ function createExecutableCommand(
   cmds: string[]
 ) {
   return () => {
-    const commandRunning = spawn(program, cmds, { cwd, cols: 80 });
+    const commandRunning = spawn(program, normalizeCommands(cwd, cmds), {
+      cwd,
+      cols: 80
+    });
     commandRunning.on('data', (data: any) => {
       recentCommands.addOut(id, data.toString());
     });

@@ -2,7 +2,7 @@ import { Schematic } from '@angular-console/schema';
 import {
   FlagsComponent,
   TaskRunnerComponent,
-  TerminalComponent
+  CommandOutputComponent
 } from '@angular-console/ui';
 import {
   IncrementalCommandOutput,
@@ -54,12 +54,12 @@ export class SchematicComponent implements OnInit {
   initValues$: Observable<any>;
 
   combinedOutput$: Observable<IncrementalCommandOutput>;
-  @ViewChild(TerminalComponent) out: TerminalComponent;
+  @ViewChild(CommandOutputComponent) out: CommandOutputComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
 
   private readonly ngGen$ = new Subject<void>();
-  private readonly ngGenDisabled$ = new BehaviorSubject(true);
+  readonly ngGenDisabled$ = new BehaviorSubject(true);
 
   constructor(
     private readonly runner: CommandRunner,
@@ -146,8 +146,6 @@ export class SchematicComponent implements OnInit {
 
         this.out.reset();
         if (!c.valid) {
-          // cannot use change detection because the operation isn't idempotent
-          this.out.out = 'Command is missing required fields';
           return of();
         }
 
@@ -168,7 +166,7 @@ export class SchematicComponent implements OnInit {
       withLatestFrom(this.commandArray$),
       tap(() => {
         this.flags.hideFields();
-        this.taskRunner.terminalVisible.next(true);
+        this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c]) => {
         this.out.reset();

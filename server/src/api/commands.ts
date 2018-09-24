@@ -63,6 +63,7 @@ export class RecentCommands {
       c.outChunk = '';
       c.status = 'in-progress';
       c.commandRunning = c.factory();
+      c.detailedStatusCalculator.reset();
     }
   }
 

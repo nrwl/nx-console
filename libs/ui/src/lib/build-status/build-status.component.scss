@@ -1,0 +1,49 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$hint-palette: mat-palette($mat-blue-gray, 800);
+$failure-palette: mat-palette($mat-red);
+$success-palette: mat-palette($mat-green);
+
+.container {
+  height: 100%;
+
+  .mat-progress-spinner {
+    display: inline-block;
+    margin: 0 4px;
+  }
+
+  h3 mat-icon {
+    margin: 0 4px;
+  }
+}
+
+.inner-container {
+  height: 100%;
+  overflow: auto;
+}
+
+.status-build_success mat-icon {
+  color: mat-color($success-palette);
+}
+
+.status-build_failure mat-icon {
+  color: mat-color($failure-palette);
+}
+
+.status-content {
+  width: 100%;
+
+  mat-icon {
+    color: mat-color($hint-palette);
+  }
+}
+
+.build-error {
+  color: mat-color($failure-palette);
+}
+
+.hint {
+  color: mat-color($hint-palette);
+  font-size: 12px;
+}

@@ -177,6 +177,7 @@ describe('RecentCommands', () => {
     return {
       addOut: jasmine.createSpy(),
       setStatus: jasmine.createSpy(),
+      reset: jasmine.createSpy(),
       detailedStatus: jasmine.createSpy()
     };
   }

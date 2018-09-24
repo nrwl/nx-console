@@ -4,16 +4,18 @@
   </div>
 
   <div class="ui-terminal-container" fxFlex [@growShrink]="terminalAnimationState | async">
-    <div class="window-chrome" fxLayout="row" fxLayoutAlign="end center">
+    <mat-divider></mat-divider>
+      <div class="window-chrome" fxLayout="row" fxLayoutAlign="end center">
       <div class="window-header" fxFlex fxLayout="row" fxLayoutAlign="center center">
         {{ terminalWindowTitle }}
       </div>
-      <button mat-button (click)="this.terminalVisible.next(!this.terminalVisible.value)">
-        {{ (terminalVisible | async) ? 'Hide' : 'Show' }}
+      <button mat-button (click)="this.terminalVisible$.next(!this.terminalVisible$.value)">
+        {{ (terminalVisible$ | async) ? 'Hide' : 'Show' }}
       </button>
     </div>
-    <div class="ng-content-container" fxFlexFill>
-      <ng-content select="ui-terminal"></ng-content>
+    <mat-divider></mat-divider>
+    <div class="content-container">
+      <ng-content select="ui-command-output"></ng-content>
     </div>
   </div>
 </div>

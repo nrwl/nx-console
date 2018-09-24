@@ -13,7 +13,7 @@ import {
   waitForAnimation,
   whitelistGraphql
 } from './utils';
-import { clearRecentTask } from './tasks.utils';
+import { clearAllRecentTasks } from './tasks.utils';
 
 describe('Extensions', () => {
   beforeEach(() => {
@@ -69,6 +69,6 @@ describe('Extensions', () => {
   after(() => {
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
-    clearRecentTask();
+    clearAllRecentTasks();
   });
 });
