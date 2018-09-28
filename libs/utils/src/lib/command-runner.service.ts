@@ -8,6 +8,7 @@ import { concatMap, last, map, takeWhile } from 'rxjs/operators';
 export interface CommandOutput {
   status: 'success' | 'failure' | 'inprogress';
   out: string;
+  detailedStatus: any;
 }
 
 const POLLING_INTERVAL_MILLIS = 100;
@@ -43,6 +44,7 @@ export class CommandRunner {
                     commandStatus {
                       status
                       out
+                      detailedStatus
                     }
                   }
                 `
@@ -50,13 +52,19 @@ export class CommandRunner {
             }),
             map((r: any) => r.data.commandStatus),
             concatMap(r => {
-              if (r.status !== 'inprogress') {
+              const rr = {
+                ...r,
+                detailedStatus: r.detailedStatus
+                  ? JSON.parse(r.detailedStatus)
+                  : null
+              };
+              if (rr.status !== 'inprogress') {
                 if (!dryRun) {
                   this.activeCommand$.next(false);
                 }
-                return of(r, null);
+                return of(rr, null);
               } else {
-                return of(r);
+                return of(rr);
               }
             }),
             takeWhile(r => r),

@@ -3,6 +3,10 @@
     <ng-content select="ui-flags,.ui-flags"></ng-content>
   </div>
 
+  <div>
+    <ng-content select=".detailed-status"></ng-content>
+  </div>
+
   <div class="ui-terminal-container" fxFlex [@growShrink]="terminalAnimationState | async">
     <div class="window-chrome" fxLayout="row" fxLayoutAlign="space-between center">
       <svg xmlns="http://www.w3.org/2000/svg" width="54" height="14" viewBox="0 0 54 14">

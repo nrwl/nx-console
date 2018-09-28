@@ -164,7 +164,13 @@ const Database: DatabaseResolvers.Resolvers = {
         const r = {
           command: commandInProgress.command,
           status: commandInProgress.status,
-          out: commandInProgress.out
+          out: commandInProgress.out,
+          detailedStatus: commandInProgress.detailedStatusCalculator
+            .detailedStatus
+            ? JSON.stringify(
+                commandInProgress.detailedStatusCalculator.detailedStatus
+              )
+            : null
         };
         commandInProgress.out = '';
         return r;

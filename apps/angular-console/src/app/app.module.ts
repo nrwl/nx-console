@@ -16,6 +16,7 @@ import { UiModule } from '@angular-console/ui';
 import {
   AnalyticsCollector,
   CancelCommandGuard,
+  FeatureFlags,
   Messenger
 } from '@angular-console/utils';
 import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
@@ -92,7 +93,8 @@ export function initApollo(
       provide: APOLLO_OPTIONS,
       useFactory: initApollo,
       deps: [AnalyticsCollector, Messenger, HttpLink]
-    }
+    },
+    FeatureFlags
   ],
   bootstrap: [AppComponent]
 })
