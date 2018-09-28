@@ -1,10 +1,9 @@
-import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { WorkspacesService } from '../workspaces.service';
-import {
-  DynamicFlatNode,
-  ContextualActionBarService
-} from '@angular-console/ui';
+import { DynamicFlatNode } from '@angular-console/ui';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Subject } from 'rxjs';
+
+import { WorkspacesService } from '../workspaces.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

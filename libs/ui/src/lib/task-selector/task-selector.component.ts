@@ -1,24 +1,9 @@
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger
-} from '@angular/animations';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  ChangeDetectionStrategy,
-  Output
-} from '@angular/core';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { map, startWith, take } from 'rxjs/operators';
-
-import { ContextualActionBarService } from '../contextual-action-bar/contextual-action-bar.service';
 
 export interface Task<T> {
   taskName: string;

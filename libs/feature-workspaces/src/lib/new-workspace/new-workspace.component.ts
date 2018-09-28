@@ -1,31 +1,14 @@
-import {
-  ContextualActionBarService,
-  DynamicFlatNode
-} from '@angular-console/ui';
-import {
-  Component,
-  OnInit,
-  QueryList,
-  ViewChildren,
-  ViewEncapsulation
-} from '@angular/core';
+import { DynamicFlatNode } from '@angular-console/ui';
+import { Component, OnInit, QueryList, ViewChildren, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatExpansionPanel } from '@angular/material';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import {
-  filter,
-  map,
-  publishReplay,
-  refCount,
-  switchMap
-} from 'rxjs/operators';
+import { filter, map, publishReplay, refCount, switchMap } from 'rxjs/operators';
 
-import {
-  NewWorkspaceDialogComponent,
-  NgNewInvocation
-} from './new-workspace-dialog.component';
+import { NewWorkspaceDialogComponent, NgNewInvocation } from './new-workspace-dialog.component';
 
 interface SchematicCollectionForNgNew {
   name: string;

@@ -3,3 +3,15 @@
   height: 100vh;
   overflow: hidden;
 }
+
+mat-sidenav-container {
+  height: 100%;
+}
+
+a {
+  background: rgba(0, 0, 0, 0) !important;
+}
+
+a.active-link {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
