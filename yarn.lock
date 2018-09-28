@@ -281,6 +281,16 @@
     tree-kill "^1.0.0"
     webpack-sources "^1.1.0"
 
+"@nrwl/angular-console-enterprise-electron@file:../angular-console-nrwl-extensions/dist/libs/angular-console-enterprise-electron":
+  version "0.0.1"
+  dependencies:
+    tslib "^1.9.0"
+
+"@nrwl/angular-console-enterprise-frontend@file:../angular-console-nrwl-extensions/dist/libs/angular-console-enterprise-frontend":
+  version "0.0.1"
+  dependencies:
+    tslib "^1.9.0"
+
 "@nrwl/nx@6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@nrwl/nx/-/nx-6.2.1.tgz#b75a5c35bab53675a89320e1d8d16f40b70e66d1"
@@ -3244,7 +3254,7 @@ dotenv-expand@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-4.2.0.tgz#def1f1ca5d6059d24a766e587942c21106ce1275"
 
-dotenv@^6.0.0:
+dotenv@6.0.0, dotenv@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.0.0.tgz#24e37c041741c5f4b25324958ebbc34bca965935"
 

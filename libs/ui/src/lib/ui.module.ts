@@ -1,19 +1,8 @@
-import { CommonModule } from '@angular/common';
-import { DomSanitizer } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-
-import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
-import { ContextualActionBarService } from './contextual-action-bar/contextual-action-bar.service';
-import { DirectorySelectorComponent } from './directory-selector/directory-selector.component';
-import { FlagsComponent } from './flags/flags.component';
-import { TaskRunnerComponent } from './task-runner/task-runner.component';
-import { TaskSelectorComponent } from './task-selector/task-selector.component';
-import { TerminalComponent } from './terminal/terminal.component';
-
 import { CdkTreeModule } from '@angular/cdk/tree';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ReactiveFormsModule } from '@angular/forms';
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -24,6 +13,7 @@ import {
   MatIconRegistry,
   MatInputModule,
   MatListModule,
+  MatMenuModule,
   MatOptionModule,
   MatRadioModule,
   MatRippleModule,
@@ -33,11 +23,19 @@ import {
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
-  MatTreeModule,
-  MatMenuModule
+  MatTreeModule
 } from '@angular/material';
-import { NormalizePathPipe } from './normalize-path.pipe';
+import { DomSanitizer } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
+
+import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
 import { DataCollectionComponent } from './data-collection/data-collection.component';
+import { DirectorySelectorComponent } from './directory-selector/directory-selector.component';
+import { FlagsComponent } from './flags/flags.component';
+import { NormalizePathPipe } from './normalize-path.pipe';
+import { TaskRunnerComponent } from './task-runner/task-runner.component';
+import { TaskSelectorComponent } from './task-selector/task-selector.component';
+import { TerminalComponent } from './terminal/terminal.component';
 
 const IMPORTS = [
   MatMenuModule,
@@ -97,7 +95,6 @@ const IMPORTS = [
     NormalizePathPipe,
     DataCollectionComponent
   ],
-  providers: [ContextualActionBarService],
   exports: [
     ...IMPORTS,
     ContextualActionBarComponent,
