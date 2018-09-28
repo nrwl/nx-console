@@ -1,9 +1,10 @@
 <mat-toolbar class="title-bar" color="primary" [class.actionable]="contextualActionBarService.contextualActions$ | async">
   <mat-toolbar-row>
     <div fxFlex @fadeIn *ngIf="(contextualActionBarService.contextualActions$ | async) === null" fxLayout="row" fxLayoutAlign="start center">
-      <a class="branding" fxLayout="row" fxLayoutAlign="start center" routerLink="/workspaces">
-        <img alt="Home" height="48" width="48" src="/assets/angular_logo.svg" title="Home">
-      </a>
+      <button class="hamburger-button" mat-icon-button (click)="hamburgerClicked.next()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
       <div class="title" fxFlex fxLayout="row" fxLayoutGap="16px">
         <ng-container *ngFor="let breadcrumb of (contextualActionBarService.breadcrumbs$ | async); let last = last;">
           <span>{{ breadcrumb.title }}</span>

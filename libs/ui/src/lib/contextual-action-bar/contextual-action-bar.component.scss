@@ -40,11 +40,8 @@ mat-toolbar.title-bar {
     padding: 0 12px;
   }
 
-  a.branding {
-    text-decoration: none;
-    position: relative;
-    left: -4px;
-    margin-right: 10px;
+  .hamburger-button {
+    margin-right: 12px;
   }
 
   // tslint:disable-next-line

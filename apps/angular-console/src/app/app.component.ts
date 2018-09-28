@@ -4,18 +4,20 @@ import {
   IMPORT_WORKSPACE,
   WORKSPACES
 } from '@angular-console/feature-workspaces';
-import { ContextualActionBarService, FADE_IN } from '@angular-console/ui';
+import { FADE_IN } from '@angular-console/ui';
+import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { AuthService, ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { Settings } from '@angular-console/utils';
+
+interface SidenavLink {
+  icon: string;
+  route: string;
+  text: string;
+}
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,12 +40,25 @@ export class AppComponent implements OnInit {
     this.routerTransition = this.routerOutlet.activateEvents.pipe(
       map(() => this.routerOutlet.activatedRouteData.state)
     );
+    this.authService.isAuthenticated$.subscribe(isAuthenticated => {
+      console.log('is authenticated?', isAuthenticated);
+    });
   }
+
+  sidenavLinks: SidenavLink[] = [
+    { icon: 'view_list', route: '/workspaces', text: 'Recent Workspaces' },
+    {
+      icon: 'question_answer',
+      route: '/support',
+      text: 'Ask a Narwhal Engineer'
+    }
+  ];
 
   constructor(
     router: Router,
     public settings: Settings,
-    contextualActionBarService: ContextualActionBarService
+    contextualActionBarService: ContextualActionBarService,
+    private authService: AuthService
   ) {
     settings.fetch().subscribe(() => {
       this.settingsLoaded = true;

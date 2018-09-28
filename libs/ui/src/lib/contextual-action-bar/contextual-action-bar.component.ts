@@ -1,16 +1,7 @@
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger
-} from '@angular/animations';
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import {
-  ContextualActionBarService,
-  ContextualTab
-} from './contextual-action-bar.service';
 import { CommandRunner, Messenger } from '@angular-console/utils';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { AuthService, ContextualActionBarService, ContextualTab } from '@nrwl/angular-console-enterprise-frontend';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,11 +23,22 @@ import { CommandRunner, Messenger } from '@angular-console/utils';
   ]
 })
 export class ContextualActionBarComponent {
+  @Output() hamburgerClicked = new EventEmitter();
+
   constructor(
     readonly contextualActionBarService: ContextualActionBarService,
     readonly commandRunner: CommandRunner,
-    readonly messenger: Messenger
+    readonly messenger: Messenger,
+    public readonly authService: AuthService
   ) {}
+
+  login() {
+    this.authService.auth();
+  }
+
+  logout() {
+    this.authService.unauth();
+  }
 
   trackByName(_: number, tab: ContextualTab) {
     return tab.name;

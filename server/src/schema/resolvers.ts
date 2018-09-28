@@ -1,3 +1,4 @@
+import { authUtils } from '@nrwl/angular-console-enterprise-electron';
 import * as path from 'path';
 import {
   SchematicCollectionResolvers,
@@ -19,9 +20,9 @@ import {
   cacheFiles
 } from '../utils';
 import {
+  completeAbsoluteModules,
   completeFiles,
   completeLocalModules,
-  completeAbsoluteModules,
   completeProjects
 } from '../api/completions';
 
@@ -31,18 +32,19 @@ import {
   readSchema,
   readDescription
 } from '../api/read-projects';
-import { availableExtensions, readExtensions } from '../api/read-extensions';
-import { readDependencies } from '../api/read-dependencies';
-import { schematicCollectionsForNgNew } from '../api/read-ngnews';
-import { openInEditor, readEditors } from '../api/read-editors';
-import { readNpmScripts, readNpmScriptSchema } from '../api/read-npm-scripts';
-import { readDirectory } from '../api/read-directory';
 import {
   commandInProgress,
   runCommand,
   stopAllCommands
 } from '../api/commands';
 import { storeSettings, readSettings } from '../api/read-settings';
+
+import { openInEditor, readEditors } from '../api/read-editors';
+import { readDirectory } from '../api/read-directory';
+import { availableExtensions, readExtensions } from '../api/read-extensions';
+import { readNpmScriptSchema, readNpmScripts } from '../api/read-npm-scripts';
+import { schematicCollectionsForNgNew } from '../api/read-ngnews';
+import { readDependencies } from '../api/read-dependencies';
 
 const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
@@ -282,6 +284,33 @@ const Mutation: MutationResolvers.Resolvers = {
   updateSettings(_root: any, args: any) {
     storeSettings(JSON.parse(args.data));
     return readSettings();
+  },
+  async authenticate(_root: any, _args: any) {
+    try {
+      const authResult = await authUtils.authenticate();
+      authUtils.setSession(authResult);
+      return { response: 'Success' };
+    } catch (e) {
+      console.log(e);
+      if (e.message === 'Auth window closed') {
+        return { response: 'Not authed' };
+      }
+      authUtils.clearSession();
+      throw new Error(
+        `Error when attempting to authenticate. Message: "${e.message}"`
+      );
+    }
+  },
+  async unauthenticate(_root: any, _args: any) {
+    try {
+      authUtils.clearSession();
+      return { response: 'Success' };
+    } catch (e) {
+      console.log(e);
+      throw new Error(
+        `Error when attempting to unauthenticate. Message: "${e.message}"`
+      );
+    }
   }
 };
 
