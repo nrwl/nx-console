@@ -13,7 +13,7 @@
     "@ngrx/schematics": "6.1.0",
     "@nrwl/schematics": "6.2.1",
     "drivelist": "6.3.0",
-    "electron-updater": "^2.21.4",
+    "electron-updater": "^3.0.3",
     "express": "^4.16.3",
     "express-graphql": "^0.6.12",
     "fix-path": "2.1.0",

@@ -44,7 +44,8 @@
     },
     "nsis": {
       "createDesktopShortcut": "always",
-      "installerIcon": "icon.ico"
+      "installerIcon": "icon.ico",
+      "artifactName": "AngularConsole-Setup-${version}.${ext}"
     },
     "afterPack": "./tools/scripts/after-pack.js",
     "publish": [
@@ -99,11 +100,11 @@
     "cypress": "3.0.3",
     "drivelist": "6.3.0",
     "electron": "2.0.8",
-    "electron-builder": "20.19.2",
+    "electron-builder": "20.28.4",
     "electron-installer-dmg": "^1.0.0",
     "electron-packager": "12.1.0",
     "electron-store": "2.0.0",
-    "electron-updater": "^2.21.4",
+    "electron-updater": "^3.0.3",
     "express": "^4.16.3",
     "express-graphql": "^0.6.12",
     "fix-path": "2.1.0",
