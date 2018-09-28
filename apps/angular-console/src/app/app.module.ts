@@ -1,23 +1,13 @@
+import { FeatureWorkspacesModule, workspaceRoutes } from '@angular-console/feature-workspaces';
+import { UiModule } from '@angular-console/ui';
+import { AnalyticsCollector, CancelCommandGuard, Messenger } from '@angular-console/utils';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import {
-  MatIconModule,
-  MatIconRegistry,
-  MatSnackBarModule
-} from '@angular/material';
+import { MatIconModule, MatIconRegistry, MatListModule, MatSidenavModule, MatSnackBarModule } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import {
-  FeatureWorkspacesModule,
-  workspaceRoutes
-} from '@angular-console/feature-workspaces';
-import { UiModule } from '@angular-console/ui';
-import {
-  AnalyticsCollector,
-  CancelCommandGuard,
-  Messenger
-} from '@angular-console/utils';
+import { AngularConsoleEnterpriseFrontendModule, SupportComponent } from '@nrwl/angular-console-enterprise-frontend';
 import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -64,6 +54,8 @@ export function initApollo(
 @NgModule({
   declarations: [AppComponent],
   imports: [
+    MatSidenavModule,
+    MatListModule,
     MatIconModule,
     MatSnackBarModule,
     BrowserModule,
@@ -73,6 +65,7 @@ export function initApollo(
     HttpClientModule,
     FeatureWorkspacesModule,
     UiModule,
+    AngularConsoleEnterpriseFrontendModule.forRoot(),
     RouterModule.forRoot(
       [
         { path: '', pathMatch: 'full', redirectTo: '/workspaces' },
@@ -80,6 +73,10 @@ export function initApollo(
           path: '',
           children: workspaceRoutes,
           canActivateChild: [CancelCommandGuard]
+        },
+        {
+          path: 'support',
+          component: SupportComponent
         }
       ],
       { paramsInheritanceStrategy: 'always', initialNavigation: 'disabled' }

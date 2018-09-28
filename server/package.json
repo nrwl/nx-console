@@ -11,6 +11,7 @@
   "dependencies": {
     "@angular/cli": "6.1.2",
     "@ngrx/schematics": "6.1.0",
+    "@nrwl/angular-console-enterprise-electron": "0.0.1",
     "@nrwl/schematics": "6.2.1",
     "drivelist": "6.3.0",
     "electron-updater": "^3.0.3",
