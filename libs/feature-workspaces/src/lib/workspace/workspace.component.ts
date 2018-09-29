@@ -1,9 +1,4 @@
-import {
-  ContextualActionBarService,
-  FADE_IN,
-  GROW_SHRINK,
-  MenuOption
-} from '@angular-console/ui';
+import { FADE_IN, GROW_SHRINK } from '@angular-console/ui';
 import { EditorSupport, Settings } from '@angular-console/utils';
 import { style, transition, trigger } from '@angular/animations';
 import {
@@ -26,6 +21,10 @@ import {
   shareReplay,
   switchMap
 } from 'rxjs/operators';
+import {
+  ContextualActionBarService,
+  MenuOption
+} from '@nrwl/angular-console-enterprise-frontend';
 
 interface Route {
   icon: string;

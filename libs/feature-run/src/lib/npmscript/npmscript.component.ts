@@ -1,13 +1,33 @@
 import { NpmScript } from '@angular-console/schema';
-import { FlagsComponent, TaskRunnerComponent, TerminalComponent } from '@angular-console/ui';
-import { CommandOutput, CommandRunner, Serializer } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  FlagsComponent,
+  TaskRunnerComponent,
+  TerminalComponent
+} from '@angular-console/ui';
+import {
+  CommandOutput,
+  CommandRunner,
+  Serializer
+} from '@angular-console/utils';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { map, publishReplay, refCount, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import {
+  map,
+  publishReplay,
+  refCount,
+  switchMap,
+  tap,
+  withLatestFrom
+} from 'rxjs/operators';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,7 +1,22 @@
 import { CommandRunner, Messenger } from '@angular-console/utils';
-import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
-import { AuthService, ContextualActionBarService, ContextualTab } from '@nrwl/angular-console-enterprise-frontend';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger
+} from '@angular/animations';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Output
+} from '@angular/core';
+import {
+  AuthService,
+  ContextualActionBarService,
+  ContextualTab
+} from '@nrwl/angular-console-enterprise-frontend';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,13 +38,13 @@ import { AuthService, ContextualActionBarService, ContextualTab } from '@nrwl/an
   ]
 })
 export class ContextualActionBarComponent {
-  @Output() hamburgerClicked = new EventEmitter();
+  @Output() readonly hamburgerClicked = new EventEmitter();
 
   constructor(
     readonly contextualActionBarService: ContextualActionBarService,
     readonly commandRunner: CommandRunner,
     readonly messenger: Messenger,
-    public readonly authService: AuthService
+    readonly authService: AuthService
   ) {}
 
   login() {

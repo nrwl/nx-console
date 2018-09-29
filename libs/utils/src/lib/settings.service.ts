@@ -12,6 +12,7 @@ export interface WorkspaceDescription {
 interface SettingsData {
   readonly recent: WorkspaceDescription[];
   readonly canCollectData: boolean;
+  readonly showSupportPlugin: boolean;
 }
 
 @Injectable({
@@ -57,6 +58,10 @@ export class Settings {
     return this.settings.canCollectData;
   }
 
+  showSupportPlugin(): boolean | undefined {
+    return this.settings.showSupportPlugin;
+  }
+
   setCanCollectData(canCollectData: boolean): void {
     this.store({ ...this.settings, canCollectData });
   }
@@ -68,6 +73,7 @@ export class Settings {
           {
             settings {
               canCollectData
+              showSupportPlugin
               recent {
                 path
                 name
@@ -93,6 +99,7 @@ export class Settings {
           mutation($data: String!) {
             updateSettings(data: $data) {
               canCollectData
+              showSupportPlugin
               recent {
                 path
                 name
