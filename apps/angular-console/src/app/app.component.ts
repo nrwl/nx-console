@@ -7,9 +7,17 @@ import {
 import { FADE_IN } from '@angular-console/ui';
 import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { AuthService, ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
+import {
+  AuthService,
+  ContextualActionBarService
+} from '@nrwl/angular-console-enterprise-frontend';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
@@ -35,6 +43,7 @@ export class AppComponent implements OnInit {
   @ViewChild(RouterOutlet) routerOutlet: RouterOutlet;
   routerTransition: Observable<string>;
   settingsLoaded: boolean;
+  showSiteMenu = false;
 
   ngOnInit() {
     this.routerTransition = this.routerOutlet.activateEvents.pipe(
@@ -46,22 +55,24 @@ export class AppComponent implements OnInit {
   }
 
   sidenavLinks: SidenavLink[] = [
-    { icon: 'view_list', route: '/workspaces', text: 'Recent Workspaces' },
-    {
-      icon: 'question_answer',
-      route: '/support',
-      text: 'Ask a Narwhal Engineer'
-    }
+    { icon: 'view_list', route: '/workspaces', text: 'Recent Workspaces' }
   ];
 
   constructor(
     router: Router,
     public settings: Settings,
     contextualActionBarService: ContextualActionBarService,
-    private authService: AuthService
+    private readonly authService: AuthService
   ) {
     settings.fetch().subscribe(() => {
       this.settingsLoaded = true;
+      if (settings.showSupportPlugin()) {
+        this.sidenavLinks.push({
+          icon: 'question_answer',
+          route: '/support',
+          text: 'Ask a Narwhal Engineer'
+        });
+      }
       router.initialNavigation();
     });
 

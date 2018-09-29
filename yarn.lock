@@ -281,13 +281,15 @@
     tree-kill "^1.0.0"
     webpack-sources "^1.1.0"
 
-"@nrwl/angular-console-enterprise-electron@file:../angular-console-nrwl-extensions/dist/libs/angular-console-enterprise-electron":
-  version "0.0.1"
+"@nrwl/angular-console-enterprise-electron@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.0.3.tgz#801fac781722f11aee9ec76f509aa2842e6c635c"
   dependencies:
     tslib "^1.9.0"
 
-"@nrwl/angular-console-enterprise-frontend@file:../angular-console-nrwl-extensions/dist/libs/angular-console-enterprise-frontend":
-  version "0.0.1"
+"@nrwl/angular-console-enterprise-frontend@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-frontend/-/angular-console-enterprise-frontend-0.0.3.tgz#10c62fb3ee3c44b3d76380dda045dcfafe82172d"
   dependencies:
     tslib "^1.9.0"
 

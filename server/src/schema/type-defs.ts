@@ -51,6 +51,7 @@ export const typeDefs = gql`
   }
 
   type Database {
+    isAuthenticated: Boolean!
     settings: Settings!
     schematicCollections: [SchematicCollectionForNgNew]
     workspace(path: String!): Workspace!
@@ -62,6 +63,7 @@ export const typeDefs = gql`
       onlyDirectories: Boolean
       showHidden: Boolean
     ): FilesType!
+    tickets(id: Int): [Ticket]
   }
 
   type Dependencies {
@@ -96,6 +98,10 @@ export const typeDefs = gql`
     angularDirectory
   }
 
+  type AuthResponseType {
+    response: String!
+  }
+
   type Mutation {
     ngAdd(path: String!, name: String!): CommandStarted
     ngNew(path: String!, name: String!, collection: String!): CommandStarted
@@ -113,6 +119,12 @@ export const typeDefs = gql`
     stop: StopResult
     openInEditor(editor: String!, path: String!): OpenInEditor
     updateSettings(data: String!): Settings!
+
+    authenticate: AuthResponseType!
+    unauthenticate: AuthResponseType!
+    addTicket(subject: String!, question: String!): Ticket
+    markTicketAsSolved(id: Int!): TicketUpdateResponse
+    addComment(id: Int!, comment: String!): TicketUpdateResponse
   }
 
   type NpmScript {
@@ -171,6 +183,7 @@ export const typeDefs = gql`
 
   type Settings {
     canCollectData: Boolean!
+    showSupportPlugin: Boolean
     recent: [WorkspaceDefinition]
   }
 
@@ -183,5 +196,23 @@ export const typeDefs = gql`
     npmScripts(name: String): [NpmScript]
     projects(name: String): [Project]
     completions: CompletionsTypes
+  }
+
+  type Comment {
+    text: String!
+    author: String!
+    date: String!
+  }
+
+  type Ticket {
+    subject: String!
+    question: String
+    id: Int!
+    status: String!
+    comments: [Comment]
+  }
+
+  type TicketUpdateResponse {
+    msg: String
   }
 `;

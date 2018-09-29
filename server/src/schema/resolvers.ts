@@ -1,4 +1,5 @@
-import { authUtils } from '@nrwl/angular-console-enterprise-electron';
+import { queries, mutations } from '@nrwl/angular-console-enterprise-electron';
+
 import * as path from 'path';
 import {
   SchematicCollectionResolvers,
@@ -200,7 +201,8 @@ const Database: DatabaseResolvers.Resolvers = {
         }"`
       );
     }
-  }
+  },
+  ...(queries as any)
 };
 
 const Mutation: MutationResolvers.Resolvers = {
@@ -285,33 +287,7 @@ const Mutation: MutationResolvers.Resolvers = {
     storeSettings(JSON.parse(args.data));
     return readSettings();
   },
-  async authenticate(_root: any, _args: any) {
-    try {
-      const authResult = await authUtils.authenticate();
-      authUtils.setSession(authResult);
-      return { response: 'Success' };
-    } catch (e) {
-      console.log(e);
-      if (e.message === 'Auth window closed') {
-        return { response: 'Not authed' };
-      }
-      authUtils.clearSession();
-      throw new Error(
-        `Error when attempting to authenticate. Message: "${e.message}"`
-      );
-    }
-  },
-  async unauthenticate(_root: any, _args: any) {
-    try {
-      authUtils.clearSession();
-      return { response: 'Success' };
-    } catch (e) {
-      console.log(e);
-      throw new Error(
-        `Error when attempting to unauthenticate. Message: "${e.message}"`
-      );
-    }
-  }
+  ...mutations
 };
 
 export const resolvers = {

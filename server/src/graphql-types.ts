@@ -29,6 +29,7 @@ export type SubscriptionResolver<
 };
 
 export interface Database {
+  isAuthenticated: boolean;
   settings: Settings;
   schematicCollections?: (SchematicCollectionForNgNew | null)[] | null;
   workspace: Workspace;
@@ -36,10 +37,12 @@ export interface Database {
   availableExtensions?: (Extension | null)[] | null;
   commandStatus?: CommandResult | null;
   directory: FilesType;
+  tickets?: (Ticket | null)[] | null;
 }
 
 export interface Settings {
   canCollectData: boolean;
+  showSupportPlugin?: boolean | null;
   recent?: (WorkspaceDefinition | null)[] | null;
 }
 
@@ -166,6 +169,20 @@ export interface FileListType {
   type: FileType;
 }
 
+export interface Ticket {
+  subject: string;
+  question?: string | null;
+  id: number;
+  status: string;
+  comments?: (Comment | null)[] | null;
+}
+
+export interface Comment {
+  text: string;
+  author: string;
+  date: string;
+}
+
 export interface Mutation {
   ngAdd?: CommandStarted | null;
   ngNew?: CommandStarted | null;
@@ -175,6 +192,11 @@ export interface Mutation {
   stop?: StopResult | null;
   openInEditor?: OpenInEditor | null;
   updateSettings: Settings;
+  authenticate: AuthResponseType;
+  unauthenticate: AuthResponseType;
+  addTicket?: Ticket | null;
+  markTicketAsSolved?: TicketUpdateResponse | null;
+  addComment?: TicketUpdateResponse | null;
 }
 
 export interface CommandStarted {
@@ -188,6 +210,14 @@ export interface StopResult {
 export interface OpenInEditor {
   response: string;
 }
+
+export interface AuthResponseType {
+  response: string;
+}
+
+export interface TicketUpdateResponse {
+  msg?: string | null;
+}
 export interface WorkspaceDatabaseArgs {
   path: string;
 }
@@ -198,6 +228,9 @@ export interface DirectoryDatabaseArgs {
   path?: string | null;
   onlyDirectories?: boolean | null;
   showHidden?: boolean | null;
+}
+export interface TicketsDatabaseArgs {
+  id?: number | null;
 }
 export interface SchematicCollectionsWorkspaceArgs {
   name?: string | null;
@@ -256,6 +289,17 @@ export interface OpenInEditorMutationArgs {
 export interface UpdateSettingsMutationArgs {
   data: string;
 }
+export interface AddTicketMutationArgs {
+  subject: string;
+  question: string;
+}
+export interface MarkTicketAsSolvedMutationArgs {
+  id: number;
+}
+export interface AddCommentMutationArgs {
+  id: number;
+  comment: string;
+}
 
 export enum FileType {
   file = 'file',
@@ -265,6 +309,7 @@ export enum FileType {
 
 export namespace DatabaseResolvers {
   export interface Resolvers<Context = any> {
+    isAuthenticated?: IsAuthenticatedResolver<boolean, any, Context>;
     settings?: SettingsResolver<Settings, any, Context>;
     schematicCollections?: SchematicCollectionsResolver<
       (SchematicCollectionForNgNew | null)[] | null,
@@ -280,8 +325,14 @@ export namespace DatabaseResolvers {
     >;
     commandStatus?: CommandStatusResolver<CommandResult | null, any, Context>;
     directory?: DirectoryResolver<FilesType, any, Context>;
+    tickets?: TicketsResolver<(Ticket | null)[] | null, any, Context>;
   }
 
+  export type IsAuthenticatedResolver<
+    R = boolean,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type SettingsResolver<
     R = Settings,
     Parent = any,
@@ -330,11 +381,21 @@ export namespace DatabaseResolvers {
     onlyDirectories?: boolean | null;
     showHidden?: boolean | null;
   }
+
+  export type TicketsResolver<
+    R = (Ticket | null)[] | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, TicketsArgs>;
+  export interface TicketsArgs {
+    id?: number | null;
+  }
 }
 
 export namespace SettingsResolvers {
   export interface Resolvers<Context = any> {
     canCollectData?: CanCollectDataResolver<boolean, any, Context>;
+    showSupportPlugin?: ShowSupportPluginResolver<boolean | null, any, Context>;
     recent?: RecentResolver<
       (WorkspaceDefinition | null)[] | null,
       any,
@@ -344,6 +405,11 @@ export namespace SettingsResolvers {
 
   export type CanCollectDataResolver<
     R = boolean,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type ShowSupportPluginResolver<
+    R = boolean | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
@@ -925,6 +991,66 @@ export namespace FileListTypeResolvers {
   > = Resolver<R, Parent, Context>;
 }
 
+export namespace TicketResolvers {
+  export interface Resolvers<Context = any> {
+    subject?: SubjectResolver<string, any, Context>;
+    question?: QuestionResolver<string | null, any, Context>;
+    id?: IdResolver<number, any, Context>;
+    status?: StatusResolver<string, any, Context>;
+    comments?: CommentsResolver<(Comment | null)[] | null, any, Context>;
+  }
+
+  export type SubjectResolver<
+    R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type QuestionResolver<
+    R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type IdResolver<R = number, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type StatusResolver<
+    R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type CommentsResolver<
+    R = (Comment | null)[] | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace CommentResolvers {
+  export interface Resolvers<Context = any> {
+    text?: TextResolver<string, any, Context>;
+    author?: AuthorResolver<string, any, Context>;
+    date?: DateResolver<string, any, Context>;
+  }
+
+  export type TextResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type AuthorResolver<
+    R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type DateResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+}
+
 export namespace MutationResolvers {
   export interface Resolvers<Context = any> {
     ngAdd?: NgAddResolver<CommandStarted | null, any, Context>;
@@ -935,6 +1061,15 @@ export namespace MutationResolvers {
     stop?: StopResolver<StopResult | null, any, Context>;
     openInEditor?: OpenInEditorResolver<OpenInEditor | null, any, Context>;
     updateSettings?: UpdateSettingsResolver<Settings, any, Context>;
+    authenticate?: AuthenticateResolver<AuthResponseType, any, Context>;
+    unauthenticate?: UnauthenticateResolver<AuthResponseType, any, Context>;
+    addTicket?: AddTicketResolver<Ticket | null, any, Context>;
+    markTicketAsSolved?: MarkTicketAsSolvedResolver<
+      TicketUpdateResponse | null,
+      any,
+      Context
+    >;
+    addComment?: AddCommentResolver<TicketUpdateResponse | null, any, Context>;
   }
 
   export type NgAddResolver<
@@ -1013,6 +1148,45 @@ export namespace MutationResolvers {
   export interface UpdateSettingsArgs {
     data: string;
   }
+
+  export type AuthenticateResolver<
+    R = AuthResponseType,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type UnauthenticateResolver<
+    R = AuthResponseType,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type AddTicketResolver<
+    R = Ticket | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, AddTicketArgs>;
+  export interface AddTicketArgs {
+    subject: string;
+    question: string;
+  }
+
+  export type MarkTicketAsSolvedResolver<
+    R = TicketUpdateResponse | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, MarkTicketAsSolvedArgs>;
+  export interface MarkTicketAsSolvedArgs {
+    id: number;
+  }
+
+  export type AddCommentResolver<
+    R = TicketUpdateResponse | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, AddCommentArgs>;
+  export interface AddCommentArgs {
+    id: number;
+    comment: string;
+  }
 }
 
 export namespace CommandStartedResolvers {
@@ -1046,6 +1220,30 @@ export namespace OpenInEditorResolvers {
 
   export type ResponseResolver<
     R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace AuthResponseTypeResolvers {
+  export interface Resolvers<Context = any> {
+    response?: ResponseResolver<string, any, Context>;
+  }
+
+  export type ResponseResolver<
+    R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace TicketUpdateResponseResolvers {
+  export interface Resolvers<Context = any> {
+    msg?: MsgResolver<string | null, any, Context>;
+  }
+
+  export type MsgResolver<
+    R = string | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
