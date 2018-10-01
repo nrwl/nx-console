@@ -41,6 +41,8 @@ describe('Workspaces', () => {
     waitForNgNew();
 
     cy.get('div.title').contains('Projects');
+
+    cy.get('div.title').contains(name);
   });
 
   it('imports a workspace', () => {
