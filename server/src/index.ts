@@ -1,6 +1,5 @@
 /* tslint:disable */
-
-import { app, BrowserWindow, dialog, Menu } from 'electron';
+import { app, BrowserWindow, dialog, Menu, ipcMain } from 'electron';
 import * as path from 'path';
 import { statSync } from 'fs';
 import * as os from 'os';
@@ -15,7 +14,7 @@ const fixPath = require('fix-path');
 const getPort = require('get-port');
 const Store = require('electron-store');
 
-let win: any;
+let win: BrowserWindow | null;
 const store = new Store();
 
 fixPath();
@@ -94,45 +93,63 @@ function createMenu() {
 }
 
 function createWindow() {
-  try {
-    win = new BrowserWindow(JSON.parse(store.get('windowBounds')));
-  } catch {
-    win = new BrowserWindow({
-      width: 800,
-      height: 1400,
-      icon: path.join(__dirname, '/assets/icons/build/icon.png')
-    });
-  }
+  Promise.all([getPort({ port: 7777 }), getPort({ port: 9999 })]).then(
+    ([frontendPort, backendPort]: number[]) => {
+      try {
+        startFrontend(frontendPort);
+        try {
+          win = new BrowserWindow(JSON.parse(store.get('windowBounds')));
+        } catch {
+          win = new BrowserWindow({
+            width: 800,
+            height: 1400,
+            icon: path.join(__dirname, '/assets/icons/build/icon.png')
+          });
+        }
+        if (fileExists(path.join(currentDirectory, 'angular.json'))) {
+          win.loadURL(
+            `http://localhost:${frontendPort}/workspace/${encodeURIComponent(
+              currentDirectory
+            )}/projects`
+          );
+        } else {
+          win.loadURL(`http://localhost:${frontendPort}`);
+        }
 
-  getPort({ port: 7777 }).then((port: number) => {
-    try {
-      startServer(port);
-      if (fileExists(path.join(currentDirectory, 'angular.json'))) {
-        win.loadURL(
-          `http://localhost:${port}/workspace/${encodeURIComponent(
-            currentDirectory
-          )}/projects`
-        );
-      } else {
-        win.loadURL(`http://localhost:${port}`);
+        startServer(backendPort, frontendPort);
+        win.webContents.send('backend.ready', backendPort);
+        ipcMain.on('backend.ready', event => {
+          event.sender.send('backend.ready', backendPort);
+        });
+
+        win.on('close', () => {
+          saveWindowInfo();
+          quit();
+        });
+      } catch (e) {
+        showCloseDialog(`Error when starting Angular Console: ${e.message}`);
+        reportException(`Start failed: ${e.message}`);
       }
-    } catch (e) {
-      showCloseDialog(`Error when starting Angular Console: ${e.message}`);
-      reportException(`Start failed: ${e.message}`);
     }
-  });
-
-  win.on('close', () => {
-    saveWindowInfo();
-    quit();
-  });
+  );
 }
 
-function startServer(port: number) {
+function startFrontend(port: number) {
+  console.log('starting frontend server on port', port);
+  try {
+    const { start } = require('./server.frontend');
+    start(port);
+  } catch (e) {
+    reportException(`Start FrontendServer: ${e.message}`);
+    throw e;
+  }
+}
+
+function startServer(port: number, frontendPort?: number) {
   console.log('starting server on port', port);
   try {
     const { start } = require('./server');
-    start(port);
+    start(port, frontendPort);
   } catch (e) {
     reportException(`Start Server: ${e.message}`);
     throw e;

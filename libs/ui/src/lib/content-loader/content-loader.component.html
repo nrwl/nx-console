@@ -1,0 +1,36 @@
+<svg attr.viewBox="0 0 {{width}} {{height}}" version="1.1" [attr.preserveAspectRatio]="preserveAspectRatio">
+
+  <rect attr.clip-path="url(#{{ idClip }})" [ngStyle]="{fill: 'url(#' + idGradient + ')' }" x="0" y="0" [attr.width]="width"
+    [attr.height]="height" />
+
+  <defs>
+
+    <clipPath [attr.id]="idClip">
+      <ng-content></ng-content>
+    </clipPath>
+
+    <linearGradient [attr.id]="idGradient">
+
+      <stop offset="0%" [attr.stop-color]="primaryColor" [attr.stop-opacity]="primaryOpacity">
+        <ng-container *ngIf="animate">
+          <animate attributeName="offset" values="-2; 1" attr.dur={{speed}}s repeatCount="indefinite" />
+        </ng-container>
+      </stop>
+
+      <stop offset="50%" [attr.stop-color]="secondaryColor" [attr.stop-opacity]="secondaryOpacity">
+        <ng-container *ngIf="animate">
+          <animate attributeName="offset" values="-1.5; 1.5" attr.dur={{speed}}s repeatCount="indefinite" />
+        </ng-container>
+      </stop>
+
+      <stop offset="100%" [attr.stop-color]="primaryColor" [attr.stop-opacity]="primaryOpacity">
+        <ng-container *ngIf="animate">
+          <animate attributeName="offset" values="-1; 2" attr.dur={{speed}}s repeatCount="indefinite" />
+        </ng-container>
+      </stop>
+
+    </linearGradient>
+
+  </defs>
+
+</svg>

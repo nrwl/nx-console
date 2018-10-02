@@ -22,17 +22,17 @@
               "apps/angular-console/src/favicon.ico",
               "apps/angular-console/src/assets"
             ],
-            "styles": [
-              "apps/angular-console/src/styles.scss"
-            ],
+            "styles": ["apps/angular-console/src/styles.scss", "apps/angular-console/src/assets/xterm.css"],
             "scripts": []
           },
           "configurations": {
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.prod.ts"
+                  "replace":
+                    "apps/angular-console/src/environments/environment.ts",
+                  "with":
+                    "apps/angular-console/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -72,9 +72,7 @@
             "polyfills": "apps/angular-console/src/polyfills.ts",
             "tsConfig": "apps/angular-console/tsconfig.spec.json",
             "karmaConfig": "apps/angular-console/karma.conf.js",
-            "styles": [
-              "apps/angular-console/src/styles.scss"
-            ],
+            "styles": ["apps/angular-console/src/styles.scss"],
             "scripts": [],
             "assets": [
               "apps/angular-console/src/favicon.ico",
@@ -89,9 +87,15 @@
               "apps/angular-console/tsconfig.app.json",
               "apps/angular-console/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
+          }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/apps/angular-console-server",
+            "main": "apps/angular-console/src/main.server.ts",
+            "tsConfig": "apps/angular-console/tsconfig.server.json"
           }
         }
       }
@@ -100,8 +104,7 @@
       "root": "apps/angular-console-e2e/",
       "sourceRoot": "apps/angular-console-e2e/src",
       "projectType": "application",
-      "architect": {
-      }
+      "architect": {}
     },
     "feature-workspaces": {
       "root": "libs/feature-workspaces",
@@ -124,9 +127,7 @@
               "libs/feature-workspaces/tsconfig.lib.json",
               "libs/feature-workspaces/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -152,9 +153,7 @@
               "libs/feature-extensions/tsconfig.lib.json",
               "libs/feature-extensions/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -180,9 +179,7 @@
               "libs/feature-generate/tsconfig.lib.json",
               "libs/feature-generate/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -208,9 +205,7 @@
               "libs/utils/tsconfig.lib.json",
               "libs/utils/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -236,9 +231,7 @@
               "libs/feature-run/tsconfig.lib.json",
               "libs/feature-run/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -247,7 +240,7 @@
       "root": "libs/ui",
       "sourceRoot": "libs/ui/src",
       "projectType": "library",
-      "prefix": "nxlibs/ui",
+      "prefix": "ui",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -264,9 +257,7 @@
               "libs/ui/tsconfig.lib.json",
               "libs/ui/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
@@ -292,9 +283,33 @@
               "libs/schema/tsconfig.lib.json",
               "libs/schema/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
+          }
+        }
+      }
+    },
+    "feature-app-shell": {
+      "root": "libs/feature-app-shell",
+      "sourceRoot": "libs/feature-app-shell/src",
+      "projectType": "library",
+      "prefix": "angular-console",
+      "architect": {
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/feature-app-shell/src/test.ts",
+            "tsConfig": "libs/feature-app-shell/tsconfig.spec.json",
+            "karmaConfig": "libs/feature-app-shell/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/feature-app-shell/tsconfig.lib.json",
+              "libs/feature-app-shell/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**"]
           }
         }
       }
