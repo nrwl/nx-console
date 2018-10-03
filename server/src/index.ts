@@ -95,14 +95,25 @@ function createMenu() {
 
 function createWindow() {
   try {
-    win = new BrowserWindow(JSON.parse(store.get('windowBounds')));
+    const bounds = JSON.parse(store.get('windowBounds'));
+    win = new BrowserWindow({
+      width: bounds.width,
+      height: bounds.height,
+      icon: path.join(__dirname, '/assets/icons/build/icon.png'),
+      show: false
+    });
   } catch {
     win = new BrowserWindow({
       width: 800,
       height: 1400,
-      icon: path.join(__dirname, '/assets/icons/build/icon.png')
+      icon: path.join(__dirname, '/assets/icons/build/icon.png'),
+      show: false
     });
   }
+
+  win.on('ready-to-show', () => {
+    win.show();
+  });
 
   getPort({ port: 7777 }).then((port: number) => {
     try {
