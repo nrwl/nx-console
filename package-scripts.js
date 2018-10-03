@@ -67,7 +67,7 @@ module.exports = {
       'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
       'pack': 'electron-builder --mac --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
-      'start-server': 'electron dist/server --server',
+      'start-server': 'electron dist/server --server --inspect=9229',
       'start-electron': 'NODE_ENV=development electron dist/server',
       'builder-dist': 'electron-builder --mac -p never',
     },
@@ -78,7 +78,7 @@ module.exports = {
       'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
       'pack': 'electron-builder --linux --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/linux',
-      'start-server': 'electron dist/server --server',
+      'start-server': 'electron dist/server --server --inspect=9229',
       'start-electron': 'NODE_ENV=development electron dist/server',
       'builder-dist': 'electron-builder --linux -p never'
     },
@@ -89,7 +89,7 @@ module.exports = {
       'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\server\\src\\public /e || echo 0',
       'pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
-      'start-server': 'electron dist\\server --server',
+      'start-server': 'electron dist\\server --server --inspect=9229',
       'start-electron': 'electron dist\\server',
       'builder-dist': 'electron-builder --win -p never'
     },
