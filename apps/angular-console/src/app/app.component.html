@@ -13,13 +13,13 @@
   </mat-sidenav>
   <mat-sidenav-content id="navigationSidenavContent">
     <div fxLayout="column" fxFlex>
-      <ui-contextual-action-bar *ngIf="settingsLoaded" (hamburgerClicked)="showSiteMenu = true"></ui-contextual-action-bar>
+      <ui-contextual-action-bar (hamburgerClicked)="showSiteMenu = true"></ui-contextual-action-bar>
 
       <div fxFlex class="outlet-container" [@routerTransition]="routerTransition | async">
         <router-outlet></router-outlet>
       </div>
 
-      <ui-data-collection *ngIf="settingsLoaded"></ui-data-collection>
+      <ui-data-collection></ui-data-collection>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -46,41 +46,53 @@ export function readAllSchematicCollections(basedir: string) {
       }
     }
   });
-  return schematicCollections.map(c =>
-    readSchematicCollections(nodeModulesDir, c)
-  );
+  return schematicCollections
+    .map(c => readSchematicCollections(nodeModulesDir, c))
+    .filter(collection => !!collection && collection.schematics.length > 0);
 }
 
 function readSchematicCollections(
   basedir: string,
   collectionName: string
 ): SchematicCollection {
-  const packageJson = readJsonFile(
-    path.join(collectionName, 'package.json'),
-    basedir
-  );
-  const collection = readJsonFile(
-    packageJson.json.schematics,
-    path.dirname(packageJson.path)
-  );
-  const schematicCollection = {
-    name: collectionName,
-    schematics: [] as Schematic[]
-  };
-  Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
-    if (!v.hidden && !v.extends) {
-      const schematicSchema = readJsonFile(
-        v.schema,
-        path.dirname(collection.path)
-      );
+  try {
+    const packageJson = readJsonFile(
+      path.join(collectionName, 'package.json'),
+      basedir
+    );
+    const collection = readJsonFile(
+      packageJson.json.schematics,
+      path.dirname(packageJson.path)
+    );
+    const schematicCollection = {
+      name: collectionName,
+      schematics: [] as Schematic[]
+    };
+    Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
+      if (canAdd(k, v)) {
+        const schematicSchema = readJsonFile(
+          v.schema,
+          path.dirname(collection.path)
+        );
 
-      schematicCollection.schematics.push({
-        name: k,
-        collection: collectionName,
-        schema: normalizeSchema(schematicSchema.json),
-        description: v.description
-      });
-    }
-  });
-  return schematicCollection;
+        schematicCollection.schematics.push({
+          name: k,
+          collection: collectionName,
+          schema: normalizeSchema(schematicSchema.json),
+          description: v.description
+        });
+      }
+    });
+    return schematicCollection;
+  } catch (e) {
+    // this happens when package is misconfigured. We decided to ignore such a case.
+    return null;
+  }
+}
+
+function canAdd(
+  name: string,
+  s: { hidden: boolean; extends: string; schema: string }
+): boolean {
+  return !s.hidden && !s.extends && !!s.schema && name !== 'ng-add';
 }

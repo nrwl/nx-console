@@ -19,7 +19,11 @@ interface SettingsData {
   providedIn: 'root'
 })
 export class Settings {
-  private settings: SettingsData;
+  private settings: SettingsData = {
+    recent: [],
+    canCollectData: false,
+    showSupportPlugin: false
+  };
 
   constructor(private readonly apollo: Apollo) {}
 
@@ -108,10 +112,10 @@ export class Settings {
             }
           }
         `,
-        variables: { data: JSON.stringify(v) }
+        variables: { data: JSON.stringify({ ...v }) }
       })
       .subscribe(r => {
-        this.settings = r.data as any;
+        this.settings = (r.data as any).updateSettings;
       });
   }
 }
