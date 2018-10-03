@@ -4,6 +4,7 @@ import {
   IMPORT_WORKSPACE,
   WORKSPACES
 } from '@angular-console/feature-workspaces';
+import { Title } from '@angular/platform-browser';
 import { FADE_IN } from '@angular-console/ui';
 import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
@@ -11,12 +12,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  OnDestroy,
   ViewChild
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
   AuthService,
-  ContextualActionBarService
+  ContextualActionBarService,
+  Breadcrumb
 } from '@nrwl/angular-console-enterprise-frontend';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
@@ -26,6 +29,9 @@ interface SidenavLink {
   route: string;
   text: string;
 }
+
+const DEFAULT_TITLE = 'Angular Console';
+const TITLE_SEPARATOR = ' - ';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,7 +45,7 @@ interface SidenavLink {
     ])
   ]
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   @ViewChild(RouterOutlet) routerOutlet: RouterOutlet;
   routerTransition: Observable<string>;
   settingsLoaded: boolean;
@@ -54,6 +60,10 @@ export class AppComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.titleSubscription.unsubscribe();
+  }
+
   sidenavLinks: SidenavLink[] = [
     { icon: 'view_list', route: '/workspaces', text: 'Recent Workspaces' }
   ];
@@ -61,8 +71,9 @@ export class AppComponent implements OnInit {
   constructor(
     router: Router,
     public settings: Settings,
-    contextualActionBarService: ContextualActionBarService,
-    private readonly authService: AuthService
+    private readonly contextualActionBarService: ContextualActionBarService,
+    private readonly authService: AuthService,
+    private readonly titleService: Title
   ) {
     settings.fetch().subscribe(() => {
       this.settingsLoaded = true;
@@ -126,4 +137,23 @@ export class AppComponent implements OnInit {
         }
       });
   }
+
+  private readonly titleSubscription = this.contextualActionBarService.breadcrumbs$
+    .pipe(map(makeTitle))
+    .subscribe(title => {
+      this.titleService.setTitle(title);
+    });
+}
+
+function makeTitle(tabs: Breadcrumb[]) {
+  return tabs
+    .reduce(
+      (acc, t) => {
+        acc.unshift(t.title);
+        return acc;
+      },
+      [] as string[]
+    )
+    .concat([DEFAULT_TITLE])
+    .join(TITLE_SEPARATOR);
 }
