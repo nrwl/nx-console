@@ -68,7 +68,7 @@ function readSchematicCollections(
     schematics: [] as Schematic[]
   };
   Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
-    if (!v.hidden && !v.extends) {
+    if (canAdd(v)) {
       const schematicSchema = readJsonFile(
         v.schema,
         path.dirname(collection.path)
@@ -83,4 +83,8 @@ function readSchematicCollections(
     }
   });
   return schematicCollection;
+}
+
+function canAdd(s: any) : boolean {
+  return !s.hidden && !s.extends && s.schema
 }
