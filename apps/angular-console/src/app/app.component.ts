@@ -4,22 +4,16 @@ import {
   IMPORT_WORKSPACE,
   WORKSPACES
 } from '@angular-console/feature-workspaces';
-import { Title } from '@angular/platform-browser';
 import { FADE_IN } from '@angular-console/ui';
 import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild
-} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
   AuthService,
-  ContextualActionBarService,
-  Breadcrumb
+  Breadcrumb,
+  ContextualActionBarService
 } from '@nrwl/angular-console-enterprise-frontend';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
@@ -34,7 +28,6 @@ const DEFAULT_TITLE = 'Angular Console';
 const TITLE_SEPARATOR = ' - ';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
@@ -76,7 +69,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly titleService: Title
   ) {
     settings.fetch().subscribe(() => {
-      this.settingsLoaded = true;
       if (settings.showSupportPlugin()) {
         this.sidenavLinks.push({
           icon: 'question_answer',
@@ -84,9 +76,7 @@ export class AppComponent implements OnInit, OnDestroy {
           text: 'Ask a Narwhal Engineer'
         });
       }
-      router.initialNavigation();
     });
-
     router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(event => {

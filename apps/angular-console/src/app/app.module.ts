@@ -95,7 +95,7 @@ export function initApollo(
           children: supportRoutes
         }
       ],
-      { paramsInheritanceStrategy: 'always', initialNavigation: 'disabled' }
+      { paramsInheritanceStrategy: 'always' }
     )
   ],
   providers: [

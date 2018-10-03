@@ -181,24 +181,29 @@ export function normalizeSchema(p: {
   properties: { [k: string]: any };
   required: string[];
 }): any[] {
-  const res = [] as any[];
-  Object.entries(p.properties).forEach(([k, v]: [string, any]) => {
-    if (v.visible === undefined || v.visible) {
-      const d = getDefault(v);
-      const r = (p.required && p.required.indexOf(k) > -1) || hasSource(v);
+  try {
+    const res = [] as any[];
+    Object.entries(p.properties).forEach(([k, v]: [string, any]) => {
+      if (v.visible === undefined || v.visible) {
+        const d = getDefault(v);
+        const r = (p.required && p.required.indexOf(k) > -1) || hasSource(v);
 
-      res.push({
-        name: k,
-        type: v.type || 'string',
-        description: v.description,
-        defaultValue: d,
-        required: r,
-        positional: isPositional(v),
-        enum: v.enum
-      });
-    }
-  });
-  return res;
+        res.push({
+          name: k,
+          type: v.type || 'string',
+          description: v.description,
+          defaultValue: d,
+          required: r,
+          positional: isPositional(v),
+          enum: v.enum
+        });
+      }
+    });
+    return res;
+  } catch (e) {
+    console.error(`normalizeSchema error: '${e.message}'`);
+    throw e;
+  }
 }
 
 function getDefault(prop: any): any {

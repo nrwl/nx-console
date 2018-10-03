@@ -6,12 +6,10 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-
+import { Component } from '@angular/core';
 import { WorkspacesService } from '../workspaces.service';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-workspaces',
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.scss'],

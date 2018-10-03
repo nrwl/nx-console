@@ -17,7 +17,7 @@ describe('Extensions', () => {
     cy.visit('/workspaces');
     openProject(projectPath('proj-extensions'));
     goToExtensions();
-    cy.get('div.title').contains('Add/Remove CLI Extensions');
+    cy.get('div.title').contains('Add CLI Extensions');
   });
 
   it('filters extensions', () => {
@@ -48,7 +48,7 @@ describe('Extensions', () => {
 
     goBack();
 
-    cy.get('div.title').contains('Add/Remove CLI Extensions');
+    cy.get('div.title').contains('Add CLI Extensions');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Available Extensions');
     });

@@ -77,7 +77,7 @@ export class WorkspaceComponent implements OnDestroy {
     {
       icon: 'extension',
       url: 'extensions',
-      title: 'Add/Remove CLI Extensions'
+      title: 'Add CLI Extensions'
     }
   ];
 
