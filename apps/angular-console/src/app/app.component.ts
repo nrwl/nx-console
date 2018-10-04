@@ -81,7 +81,14 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(event => {
         const navigationEnd = event as NavigationEnd;
-        if (navigationEnd.url.startsWith('/workspace/')) {
+        if (navigationEnd.url.startsWith('/install-nodejs')) {
+          contextualActionBarService.contextualTabs$.next(null);
+          contextualActionBarService.breadcrumbs$.next([
+            { title: 'Welcome to Angular Console' }
+          ]);
+          contextualActionBarService.nonContextualActions$.next([]);
+          contextualActionBarService.contextualActions$.next(null);
+        } else if (navigationEnd.url.startsWith('/workspace/')) {
           contextualActionBarService.contextualTabs$.next(null);
         } else {
           switch (

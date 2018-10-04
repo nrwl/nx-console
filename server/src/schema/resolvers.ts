@@ -1,51 +1,52 @@
-import { queries, mutations } from '@nrwl/angular-console-enterprise-electron';
-
+import { mutations, queries } from '@nrwl/angular-console-enterprise-electron';
 import * as path from 'path';
+
 import {
-  SchematicCollectionResolvers,
-  ArchitectResolvers,
-  ProjectResolvers,
-  NpmScriptResolvers,
-  WorkspaceResolvers,
-  CompletionsTypesResolvers,
-  DatabaseResolvers,
-  MutationResolvers
-} from '../graphql-types';
-import {
-  directoryExists,
-  filterByName,
-  findClosestNg,
-  findExecutable,
-  readJsonFile,
-  files,
-  cacheFiles
-} from '../utils';
+  commandInProgress,
+  runCommand,
+  stopAllCommands
+} from '../api/commands';
 import {
   completeAbsoluteModules,
   completeFiles,
   completeLocalModules,
   completeProjects
 } from '../api/completions';
-
-import { readAllSchematicCollections } from '../api/read-schematic-collections';
 import {
-  readProjects,
-  readSchema,
-  readDescription
-} from '../api/read-projects';
-import {
-  commandInProgress,
-  runCommand,
-  stopAllCommands
-} from '../api/commands';
-import { storeSettings, readSettings } from '../api/read-settings';
-
-import { openInEditor, readEditors } from '../api/read-editors';
-import { readDirectory } from '../api/read-directory';
-import { availableExtensions, readExtensions } from '../api/read-extensions';
-import { readNpmScriptSchema, readNpmScripts } from '../api/read-npm-scripts';
-import { schematicCollectionsForNgNew } from '../api/read-ngnews';
+  installNodeJs,
+  nodeDownloadProgress,
+  nodeInstallDone
+} from '../api/install-nodejs';
 import { readDependencies } from '../api/read-dependencies';
+import { readDirectory } from '../api/read-directory';
+import { openInEditor, readEditors } from '../api/read-editors';
+import { availableExtensions, readExtensions } from '../api/read-extensions';
+import { schematicCollectionsForNgNew } from '../api/read-ngnews';
+import { readNpmScripts, readNpmScriptSchema } from '../api/read-npm-scripts';
+import { readProjects, readSchema } from '../api/read-projects';
+import { readAllSchematicCollections } from '../api/read-schematic-collections';
+import { readSettings, storeSettings } from '../api/read-settings';
+import {
+  ArchitectResolvers,
+  CompletionsTypesResolvers,
+  DatabaseResolvers,
+  InstallNodeJsStatus,
+  MutationResolvers,
+  NpmScriptResolvers,
+  ProjectResolvers,
+  SchematicCollectionResolvers,
+  WorkspaceResolvers
+} from '../graphql-types';
+import {
+  cacheFiles,
+  directoryExists,
+  exists,
+  files,
+  filterByName,
+  findClosestNg,
+  findExecutable,
+  readJsonFile
+} from '../utils';
 
 const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
@@ -112,6 +113,11 @@ const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
 };
 
 const Database: DatabaseResolvers.Resolvers = {
+  isNodejsInstalled() {
+    return {
+      result: exists('node')
+    };
+  },
   settings() {
     return readSettings();
   },
@@ -158,6 +164,29 @@ const Database: DatabaseResolvers.Resolvers = {
       console.log(e);
       throw new Error(
         `Error when reading the list of extensions. Message: "${e.message}"`
+      );
+    }
+  },
+  installNodeJsStatus(_root: any, args: any): InstallNodeJsStatus {
+    try {
+      if (exists('node')) {
+        return { success: true };
+      }
+      if (nodeInstallDone) {
+        return { cancelled: true };
+      } else if (nodeDownloadProgress) {
+        const { percentage, speed } = nodeDownloadProgress.progress();
+        return {
+          downloadPercentage: percentage,
+          downloadSpeed: speed
+        };
+      } else {
+        return {};
+      }
+    } catch (e) {
+      console.log(e);
+      throw new Error(
+        `Error when reading the command status. Message: "${e.message}"`
       );
     }
   },
@@ -264,6 +293,9 @@ const Mutation: MutationResolvers.Resolvers = {
       console.log(e);
       throw new Error(`Error when running npm script. Message:"${e.message}"`);
     }
+  },
+  async installNodeJs() {
+    return installNodeJs();
   },
   async stop() {
     try {

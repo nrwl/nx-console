@@ -168,7 +168,7 @@ export function selectFolder(name: string) {
 }
 
 export function waitForAnimation() {
-  cy.wait(300);
+  cy.wait(400);
 }
 
 export function waitForAutocomplete() {
