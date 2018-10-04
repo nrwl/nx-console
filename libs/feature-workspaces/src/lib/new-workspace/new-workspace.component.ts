@@ -6,12 +6,19 @@ import {
   ViewChildren,
   ViewEncapsulation
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AsyncValidatorFn,
+  ValidationErrors,
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 import { MatDialog, MatExpansionPanel } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { of, BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   filter,
   map,
@@ -24,6 +31,8 @@ import {
   NewWorkspaceDialogComponent,
   NgNewInvocation
 } from './new-workspace-dialog.component';
+import { Directory } from '@angular-console/schema';
+import { Finder } from '@angular-console/utils';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -49,13 +58,18 @@ export class NewWorkspaceComponent implements OnInit {
   constructor(
     private readonly apollo: Apollo,
     private readonly contextActionService: ContextualActionBarService,
-    private readonly matDialog: MatDialog
+    private readonly matDialog: MatDialog,
+    private readonly finderService: Finder
   ) {}
 
-  private static newFormGroup(): FormGroup {
+  private static newFormGroup(finderService: Finder): FormGroup {
     return new FormGroup({
-      name: new FormControl(null, Validators.required),
       path: new FormControl(null, Validators.required),
+      name: new FormControl(
+        null,
+        Validators.required,
+        makeNameAvailableValidator(finderService)
+      ),
       collection: new FormControl(null, Validators.required)
     });
   }
@@ -67,7 +81,9 @@ export class NewWorkspaceComponent implements OnInit {
           panel.close();
         });
         this.selectedNode = null;
-        this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
+        this.ngNewForm$.next(
+          NewWorkspaceComponent.newFormGroup(this.finderService)
+        );
       }
     });
 
@@ -90,7 +106,9 @@ export class NewWorkspaceComponent implements OnInit {
       );
 
     this.schematicCollectionsForNgNew$.subscribe(() => {
-      this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
+      this.ngNewForm$.next(
+        NewWorkspaceComponent.newFormGroup(this.finderService)
+      );
     });
 
     this.createNewWorkspace$.subscribe(() => {
@@ -163,4 +181,23 @@ export class NewWorkspaceComponent implements OnInit {
       field.setValue(node.path);
     }
   }
+}
+
+export function makeNameAvailableValidator(
+  finderService: Finder
+): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    const form = control.parent;
+    const path = form.get('path');
+    const name = form.get('name');
+    return of(name && path ? `${path.value}/${name.value}` : null).pipe(
+      switchMap(
+        (path: null | string): Observable<null | Directory> =>
+          path ? finderService.listFiles(path) : of(null)
+      ),
+      map(
+        (d: null | Directory) => (!d || !d.exists ? null : { nameTaken: true })
+      )
+    );
+  };
 }

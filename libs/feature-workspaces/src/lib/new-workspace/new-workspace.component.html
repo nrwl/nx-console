@@ -25,6 +25,9 @@
         <mat-form-field class="workspace-name-form-field" fxFlex>
           <mat-label>Workspace Name</mat-label>
           <input matInput placeholder="MyNewWorkspace" required formControlName="name" name="name">
+          <mat-error *ngIf="form.get('name').invalid && form.get('name').errors.nameTaken">
+            This name is already taken
+          </mat-error>
         </mat-form-field>
       </mat-expansion-panel>
 
