@@ -58,7 +58,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   sidenavLinks: SidenavLink[] = [
-    { icon: 'view_list', route: '/workspaces', text: 'Recent Workspaces' }
+    { icon: 'view_list', route: '/workspaces', text: 'Workspaces' }
   ];
 
   constructor(
@@ -90,17 +90,17 @@ export class AppComponent implements OnInit, OnDestroy {
           ) {
             case CREATE_WORKSPACE:
               contextualActionBarService.breadcrumbs$.next([
-                { title: 'Create A New Workspace' }
+                { title: 'Create Workspace' }
               ]);
               break;
             case IMPORT_WORKSPACE:
               contextualActionBarService.breadcrumbs$.next([
-                { title: 'Import An Existing Workspace' }
+                { title: 'Open Workspace' }
               ]);
               break;
             case WORKSPACES:
               contextualActionBarService.breadcrumbs$.next([
-                { title: 'Recently Opened Workspaces' }
+                { title: 'Workspaces' }
               ]);
               break;
           }
@@ -114,13 +114,13 @@ export class AppComponent implements OnInit, OnDestroy {
               },
               {
                 icon: 'create_new_folder',
-                name: 'Create',
+                name: 'Create Workspace',
                 routerLink: '/create-workspace'
               },
               {
                 icon: 'folder_open',
-                name: 'Import',
-                routerLink: '/import-workspace'
+                name: 'Open',
+                routerLink: '/open-workspace'
               }
             ]
           });

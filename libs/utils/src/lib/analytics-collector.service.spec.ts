@@ -6,7 +6,7 @@ describe('AnalyticsCollector', () => {
       '/workspace/PATH/aa/bb'
     );
     expect(cleanUpUrl('/workspace')).toEqual('/workspace');
-    expect(cleanUpUrl('/import-workspace')).toEqual('/import-workspace');
+    expect(cleanUpUrl('/open-workspace')).toEqual('/open-workspace');
     expect(cleanUpUrl('/workspaces')).toEqual('/workspaces');
   });
 });
