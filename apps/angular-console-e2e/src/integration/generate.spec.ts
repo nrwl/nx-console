@@ -66,7 +66,9 @@ describe('Generate', () => {
 
     cy.wait(100);
 
-    checkDisplayedCommand(`$ ng generate service ${name} --project=proj`);
+    checkDisplayedCommand(
+      `$ ng generate @schematics/angular:service ${name} --project=proj`
+    );
     checkFileExists(`src/app/${name}.service.ts`);
     checkFileExists(`src/app/${name}.service.spec.ts`);
 
