@@ -11,6 +11,9 @@ export function readSettings() {
   if (settings.recent === undefined) {
     settings.recent = [];
   }
+  if (!settings.installNodeManually) {
+    settings.installNodeManually = false;
+  }
   return settings;
 }
 

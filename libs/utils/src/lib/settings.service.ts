@@ -13,6 +13,7 @@ interface SettingsData {
   readonly recent: WorkspaceDescription[];
   readonly canCollectData: boolean;
   readonly showSupportPlugin: boolean;
+  readonly installNodeManually: boolean;
 }
 
 @Injectable({
@@ -22,7 +23,8 @@ export class Settings {
   private settings: SettingsData = {
     recent: [],
     canCollectData: false,
-    showSupportPlugin: false
+    showSupportPlugin: false,
+    installNodeManually: false
   };
 
   constructor(private readonly apollo: Apollo) {}
@@ -70,6 +72,10 @@ export class Settings {
     this.store({ ...this.settings, canCollectData });
   }
 
+  setInstallManually(installNodeManually: boolean): void {
+    this.store({ ...this.settings, installNodeManually });
+  }
+
   fetch() {
     return this.apollo
       .query({
@@ -78,6 +84,7 @@ export class Settings {
             settings {
               canCollectData
               showSupportPlugin
+              installNodeManually
               recent {
                 path
                 name
@@ -104,6 +111,7 @@ export class Settings {
             updateSettings(data: $data) {
               canCollectData
               showSupportPlugin
+              installNodeManually
               recent {
                 path
                 name

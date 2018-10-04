@@ -7,3 +7,4 @@ export * from './lib/finder.service';
 export * from './lib/messenger.service';
 export * from './lib/serializer.service';
 export * from './lib/settings.service';
+export * from './lib/is-node-js-installed.guard';

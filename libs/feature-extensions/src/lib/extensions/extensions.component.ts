@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Extension, ExtensionGroup, Schematic } from '@angular-console/schema';
+import { Extension, ExtensionGroup } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';
@@ -86,7 +86,7 @@ export class ExtensionsComponent {
   );
 
   readonly taskCollections$: Observable<
-    TaskCollections<Schematic>
+    TaskCollections<Extension>
   > = combineLatest(this.extensions$, this.selectedExtensionId$).pipe(
     map(([extensions, selectedId]) => {
       const collections: Array<TaskCollection<Extension>> = extensions.map(

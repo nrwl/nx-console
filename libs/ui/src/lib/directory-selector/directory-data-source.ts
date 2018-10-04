@@ -42,11 +42,11 @@ export class DirectoryDataSource extends DataSource<DynamicFlatNode> {
       this.data = dynamicFlatNodes;
     });
 
-    if (!this.treeControl.expansionModel.onChange) {
+    if (!this.treeControl.expansionModel.changed) {
       throw new Error('Tree control does not have change handler');
     }
 
-    this.treeControl.expansionModel.onChange.subscribe(change => {
+    this.treeControl.expansionModel.changed.subscribe(change => {
       if (change.added || change.removed) {
         this.handleTreeControl(change);
       }

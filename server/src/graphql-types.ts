@@ -36,6 +36,8 @@ export interface Database {
   editors?: (EditorSupport | null)[] | null;
   availableExtensions?: (Extension | null)[] | null;
   commandStatus?: CommandResult | null;
+  installNodeJsStatus?: InstallNodeJsStatus | null;
+  isNodejsInstalled?: IsNodeInstalledResult | null;
   directory: FilesType;
   tickets?: (Ticket | null)[] | null;
 }
@@ -43,6 +45,7 @@ export interface Database {
 export interface Settings {
   canCollectData: boolean;
   showSupportPlugin?: boolean | null;
+  installNodeManually?: boolean | null;
   recent?: (WorkspaceDefinition | null)[] | null;
 }
 
@@ -159,6 +162,18 @@ export interface CommandResult {
   out: string;
 }
 
+export interface InstallNodeJsStatus {
+  downloadPercentage?: number | null;
+  downloadSpeed?: number | null;
+  success?: boolean | null;
+  cancelled?: boolean | null;
+  error?: string | null;
+}
+
+export interface IsNodeInstalledResult {
+  result: boolean;
+}
+
 export interface FilesType {
   path: string;
   exists: boolean;
@@ -193,6 +208,7 @@ export interface Mutation {
   stop?: StopResult | null;
   openInEditor?: OpenInEditor | null;
   updateSettings: Settings;
+  installNodeJs?: InstallNodeJsStatus | null;
   authenticate: AuthResponseType;
   unauthenticate: AuthResponseType;
   addTicket?: Ticket | null;
@@ -325,6 +341,16 @@ export namespace DatabaseResolvers {
       Context
     >;
     commandStatus?: CommandStatusResolver<CommandResult | null, any, Context>;
+    installNodeJsStatus?: InstallNodeJsStatusResolver<
+      InstallNodeJsStatus | null,
+      any,
+      Context
+    >;
+    isNodejsInstalled?: IsNodejsInstalledResolver<
+      IsNodeInstalledResult | null,
+      any,
+      Context
+    >;
     directory?: DirectoryResolver<FilesType, any, Context>;
     tickets?: TicketsResolver<(Ticket | null)[] | null, any, Context>;
   }
@@ -372,6 +398,16 @@ export namespace DatabaseResolvers {
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
+  export type InstallNodeJsStatusResolver<
+    R = InstallNodeJsStatus | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type IsNodejsInstalledResolver<
+    R = IsNodeInstalledResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type DirectoryResolver<
     R = FilesType,
     Parent = any,
@@ -397,6 +433,11 @@ export namespace SettingsResolvers {
   export interface Resolvers<Context = any> {
     canCollectData?: CanCollectDataResolver<boolean, any, Context>;
     showSupportPlugin?: ShowSupportPluginResolver<boolean | null, any, Context>;
+    installNodeManually?: InstallNodeManuallyResolver<
+      boolean | null,
+      any,
+      Context
+    >;
     recent?: RecentResolver<
       (WorkspaceDefinition | null)[] | null,
       any,
@@ -410,6 +451,11 @@ export namespace SettingsResolvers {
     Context = any
   > = Resolver<R, Parent, Context>;
   export type ShowSupportPluginResolver<
+    R = boolean | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type InstallNodeManuallyResolver<
     R = boolean | null,
     Parent = any,
     Context = any
@@ -956,6 +1002,58 @@ export namespace CommandResultResolvers {
   >;
 }
 
+export namespace InstallNodeJsStatusResolvers {
+  export interface Resolvers<Context = any> {
+    downloadPercentage?: DownloadPercentageResolver<
+      number | null,
+      any,
+      Context
+    >;
+    downloadSpeed?: DownloadSpeedResolver<number | null, any, Context>;
+    success?: SuccessResolver<boolean | null, any, Context>;
+    cancelled?: CancelledResolver<boolean | null, any, Context>;
+    error?: ErrorResolver<string | null, any, Context>;
+  }
+
+  export type DownloadPercentageResolver<
+    R = number | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type DownloadSpeedResolver<
+    R = number | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type SuccessResolver<
+    R = boolean | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type CancelledResolver<
+    R = boolean | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type ErrorResolver<
+    R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace IsNodeInstalledResultResolvers {
+  export interface Resolvers<Context = any> {
+    result?: ResultResolver<boolean, any, Context>;
+  }
+
+  export type ResultResolver<
+    R = boolean,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
 export namespace FilesTypeResolvers {
   export interface Resolvers<Context = any> {
     path?: PathResolver<string, any, Context>;
@@ -1068,6 +1166,11 @@ export namespace MutationResolvers {
     stop?: StopResolver<StopResult | null, any, Context>;
     openInEditor?: OpenInEditorResolver<OpenInEditor | null, any, Context>;
     updateSettings?: UpdateSettingsResolver<Settings, any, Context>;
+    installNodeJs?: InstallNodeJsResolver<
+      InstallNodeJsStatus | null,
+      any,
+      Context
+    >;
     authenticate?: AuthenticateResolver<AuthResponseType, any, Context>;
     unauthenticate?: UnauthenticateResolver<AuthResponseType, any, Context>;
     addTicket?: AddTicketResolver<Ticket | null, any, Context>;
@@ -1156,6 +1259,11 @@ export namespace MutationResolvers {
     data: string;
   }
 
+  export type InstallNodeJsResolver<
+    R = InstallNodeJsStatus | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type AuthenticateResolver<
     R = AuthResponseType,
     Parent = any,

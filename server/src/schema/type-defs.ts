@@ -50,6 +50,14 @@ export const typeDefs = gql`
     absoluteModules(input: String): [CompletionResultType]
   }
 
+  type InstallNodeJsStatus {
+    downloadPercentage: Float
+    downloadSpeed: Float
+    success: Boolean
+    cancelled: Boolean
+    error: String
+  }
+
   type Database {
     isAuthenticated: Boolean!
     settings: Settings!
@@ -58,6 +66,8 @@ export const typeDefs = gql`
     editors: [EditorSupport]
     availableExtensions(name: String): [Extension]
     commandStatus: CommandResult
+    installNodeJsStatus: InstallNodeJsStatus
+    isNodejsInstalled: IsNodeInstalledResult
     directory(
       path: String
       onlyDirectories: Boolean
@@ -103,6 +113,10 @@ export const typeDefs = gql`
     response: String!
   }
 
+  type IsNodeInstalledResult {
+    result: Boolean!
+  }
+
   type Mutation {
     ngAdd(path: String!, name: String!): CommandStarted
     ngNew(path: String!, name: String!, collection: String!): CommandStarted
@@ -120,7 +134,7 @@ export const typeDefs = gql`
     stop: StopResult
     openInEditor(editor: String!, path: String!): OpenInEditor
     updateSettings(data: String!): Settings!
-
+    installNodeJs: InstallNodeJsStatus
     authenticate: AuthResponseType!
     unauthenticate: AuthResponseType!
     addTicket(subject: String!, question: String!): Ticket
@@ -185,6 +199,7 @@ export const typeDefs = gql`
   type Settings {
     canCollectData: Boolean!
     showSupportPlugin: Boolean
+    installNodeManually: Boolean
     recent: [WorkspaceDefinition]
   }
 

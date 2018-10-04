@@ -23,7 +23,8 @@ import {
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
-  MatTreeModule
+  MatTreeModule,
+  MatProgressBarModule
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
@@ -38,6 +39,7 @@ import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
 
 const IMPORTS = [
+  MatProgressBarModule,
   MatMenuModule,
   CdkTreeModule,
   CommonModule,
