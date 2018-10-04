@@ -20,7 +20,9 @@
     "lib": ["es2017", "dom", "esnext.asynciterable"],
     "baseUrl": ".",
     "paths": {
-      "@angular-console/*": ["libs/*"],
+      "@angular-console/feature-install-node-js": [
+        "libs/feature-install-node-js/src/index.ts"
+      ],
       "@angular-console/feature-workspaces": [
         "libs/feature-workspaces/src/index.ts"
       ],

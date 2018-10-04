@@ -6,6 +6,7 @@ import { UiModule } from '@angular-console/ui';
 import {
   AnalyticsCollector,
   CancelCommandGuard,
+  IsNodeJsInstalledGuard,
   Messenger
 } from '@angular-console/utils';
 import { HttpClientModule } from '@angular/common/http';
@@ -88,7 +89,12 @@ export function initApollo(
         {
           path: '',
           children: workspaceRoutes,
-          canActivateChild: [CancelCommandGuard]
+          canActivateChild: [IsNodeJsInstalledGuard, CancelCommandGuard]
+        },
+        {
+          path: 'install-nodejs',
+          loadChildren:
+            '@angular-console/feature-install-node-js#FeatureInstallNodeJsModule'
         },
         {
           path: 'support',
@@ -99,6 +105,7 @@ export function initApollo(
     )
   ],
   providers: [
+    IsNodeJsInstalledGuard,
     CancelCommandGuard,
     AnalyticsCollector,
     {

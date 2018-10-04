@@ -9,7 +9,8 @@ import {
   taskListHeaders,
   tasks,
   texts,
-  waitForActionToComplete
+  waitForActionToComplete,
+  waitForAnimation
 } from './utils';
 
 describe('Extensions', () => {
@@ -52,6 +53,7 @@ describe('Extensions', () => {
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Available Extensions');
     });
+    waitForAnimation();
 
     // check that the schematics added by angular material are available
     goToGenerate();

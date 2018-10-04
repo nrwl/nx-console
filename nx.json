@@ -13,6 +13,9 @@
     "angular-console-e2e": {
       "tags": []
     },
+    "feature-install-node-js": {
+      "tags": []
+    },
     "feature-workspaces": {
       "tags": []
     },

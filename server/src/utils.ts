@@ -1,13 +1,27 @@
-import * as path from 'path';
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import { stat, statSync } from 'fs';
 import { platform } from 'os';
+import * as path from 'path';
 import { bindNodeCallback, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as stripJsonComments from 'strip-json-comments';
 
 export const files: { [path: string]: string[] } = {};
 export let fileContents: { [path: string]: any } = {};
+
+export function exists(cmd: string): boolean {
+  try {
+    if (platform() === 'win32') {
+      execSync(`where ${cmd}`).toString();
+    } else {
+      execSync(`which ${cmd}`).toString();
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 export function findExecutable(command: string, cwd: string): string {
   const paths = (process.env.PATH as string).split(path.delimiter);
@@ -92,7 +106,7 @@ export function listFiles(dirName: string): string[] {
   if (dirName.indexOf('dist') > -1) return [];
 
   const res = [dirName];
-  // the try-catch here is intentional. It's only used in autocomletion.
+  // the try-catch here is intentional. It's only used in auto-completion.
   // If it doesn't work, we don't want the process to exit
   try {
     fs.readdirSync(dirName).forEach(c => {
@@ -243,7 +257,7 @@ export function normalizePath(value: string): string {
 }
 
 /**
- * To improve performance angularconsole preprocesses
+ * To improve performance angular console pre-processes
  *
  * * the list of local files
  * * json files from node_modules we are likely to read
