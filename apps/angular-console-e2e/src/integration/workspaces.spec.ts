@@ -15,7 +15,7 @@ describe('Workspaces', () => {
 
   it('creates new workspaces', () => {
     cy.get('a[href="/create-workspace"]').click();
-    cy.get('div.title').contains('Create A New Workspace');
+    cy.get('div.title').contains('Create Workspace');
     checkButtonIsDisabled('Create', true);
 
     cy.get('mat-expansion-panel.directory-selector').click();
@@ -45,16 +45,16 @@ describe('Workspaces', () => {
     cy.get('div.title').contains(name);
   });
 
-  it('imports a workspace', () => {
-    cy.get('a[href="/import-workspace"]').click();
-    cy.get('div.title').contains('Import An Existing Workspace');
+  it('opens a workspace', () => {
+    cy.get('a[href="/open-workspace"]').click();
+    cy.get('div.title').contains('Open Workspace');
     checkButtonIsDisabled('Create', true);
     expandFolder('tmp');
     selectFolder(name);
     cy.get('div.context-title').contains(`Selected Workspace: ${name}`);
 
     cy.get('button')
-      .contains('Import')
+      .contains('Open')
       .click();
 
     cy.get('div.title').contains('Projects');
