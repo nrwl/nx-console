@@ -60,7 +60,7 @@ export class ContextualActionBarComponent {
   }
 
   stopCommand() {
-    this.commandRunner.stopCommand();
+    this.commandRunner.stopActiveCommand();
     this.messenger.notify('Command has been canceled');
   }
 }

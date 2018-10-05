@@ -13,6 +13,7 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
+import { EXTENSIONS_POLLING } from '@angular-console/utils';
 
 interface ExtensionId {
   name: string | undefined;
@@ -31,7 +32,7 @@ export class ExtensionsComponent {
     map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
-        pollInterval: 5000,
+        pollInterval: EXTENSIONS_POLLING,
         query: gql`
           query($path: String!) {
             workspace(path: $path) {

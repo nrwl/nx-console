@@ -5,7 +5,7 @@ import {
   TerminalComponent
 } from '@angular-console/ui';
 import {
-  CommandOutput,
+  IncrementalCommandOutput,
   CommandRunner,
   Serializer
 } from '@angular-console/utils';
@@ -47,11 +47,11 @@ export class SchematicComponent implements OnInit {
     valid: false
   });
   command$: Observable<string>;
-  dryRunResult$: Observable<CommandOutput>;
-  commandOutput$: Observable<CommandOutput>;
+  dryRunResult$: Observable<IncrementalCommandOutput>;
+  commandOutput$: Observable<IncrementalCommandOutput>;
   initValues$: Observable<any>;
 
-  combinedOutput$: Observable<CommandOutput>;
+  combinedOutput$: Observable<IncrementalCommandOutput>;
   @ViewChild(TerminalComponent) out: TerminalComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
@@ -175,7 +175,7 @@ export class SchematicComponent implements OnInit {
           gql`
             mutation($path: String!, $genCommand: [String]!) {
               generate(path: $path, genCommand: $genCommand, dryRun: true) {
-                command
+                id
               }
             }
           `,
@@ -202,7 +202,7 @@ export class SchematicComponent implements OnInit {
           gql`
             mutation($path: String!, $genCommand: [String]!) {
               generate(path: $path, genCommand: $genCommand, dryRun: false) {
-                command
+                id
               }
             }
           `,

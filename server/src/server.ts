@@ -1,18 +1,13 @@
 import * as express from 'express';
 import * as path from 'path';
-import { ApolloServer } from 'apollo-server-express';
-import {
-  directoryExists,
-  filterByName,
-  findClosestNg,
-  findExecutable,
-  listFiles,
-  readJsonFile
-} from './utils';
+import { ApolloServer, mergeSchemas } from 'apollo-server-express';
 import { schema } from './schema';
+import { createSchema } from '@nrwl/angular-console-enterprise-electron';
 
 const apollo = new ApolloServer({
-  schema,
+  schema: mergeSchemas({
+    schemas: [schema, createSchema({})]
+  }),
   rootValue: global
 });
 

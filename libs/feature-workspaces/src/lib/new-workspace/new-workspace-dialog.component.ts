@@ -14,7 +14,7 @@ export interface NgNewInvocation {
 @Component({
   selector: 'angular-console-new-workspace-dialog',
   template: `
-      <ui-terminal [command]="command" [input]="(commandOutput$|async)?.out"></ui-terminal>
+      <ui-terminal [command]="command" [input]="(commandOutput$|async)?.outChunk"></ui-terminal>
     `
 })
 export class NewWorkspaceDialogComponent {
@@ -27,7 +27,7 @@ export class NewWorkspaceDialogComponent {
       gql`
         mutation($path: String!, $name: String!, $collection: String!) {
           ngNew(path: $path, name: $name, collection: $collection) {
-            command
+            id
           }
         }
       `,

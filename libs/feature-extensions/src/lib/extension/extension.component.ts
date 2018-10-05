@@ -1,6 +1,9 @@
 import { Extension } from '@angular-console/schema';
 import { TaskRunnerComponent, TerminalComponent } from '@angular-console/ui';
-import { CommandOutput, CommandRunner } from '@angular-console/utils';
+import {
+  IncrementalCommandOutput,
+  CommandRunner
+} from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -30,7 +33,7 @@ import {
 export class ExtensionComponent implements OnInit {
   extension$: Observable<Extension>;
   command$: Observable<string>;
-  commandOutput$: Observable<CommandOutput>;
+  commandOutput$: Observable<IncrementalCommandOutput>;
   @ViewChild(TerminalComponent) out: TerminalComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
 
@@ -122,7 +125,7 @@ export class ExtensionComponent implements OnInit {
           gql`
             mutation($path: String!, $name: String!) {
               ngAdd(path: $path, name: $name) {
-                command
+                id
               }
             }
           `,
@@ -150,9 +153,5 @@ export class ExtensionComponent implements OnInit {
 
   onRun() {
     this.ngAdd$.next();
-  }
-
-  onStop() {
-    this.runner.stopCommand();
   }
 }

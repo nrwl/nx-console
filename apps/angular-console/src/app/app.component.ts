@@ -11,7 +11,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
-  AuthService,
   Breadcrumb,
   ContextualActionBarService
 } from '@nrwl/angular-console-enterprise-frontend';
@@ -48,9 +47,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.routerTransition = this.routerOutlet.activateEvents.pipe(
       map(() => this.routerOutlet.activatedRouteData.state)
     );
-    this.authService.isAuthenticated$.subscribe(isAuthenticated => {
-      console.log('is authenticated?', isAuthenticated);
-    });
   }
 
   ngOnDestroy(): void {
@@ -65,7 +61,6 @@ export class AppComponent implements OnInit, OnDestroy {
     router: Router,
     public settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
-    private readonly authService: AuthService,
     private readonly titleService: Title
   ) {
     settings.fetch().subscribe(() => {

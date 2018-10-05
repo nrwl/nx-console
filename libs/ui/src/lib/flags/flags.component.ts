@@ -78,7 +78,6 @@ export class FlagsComponent {
 
   @Output() readonly value = new EventEmitter();
   @Output() readonly action = new EventEmitter();
-  @Output() readonly stop = new EventEmitter();
   @Output() readonly resizeFlags = new EventEmitter();
 
   formGroup: FormGroup;

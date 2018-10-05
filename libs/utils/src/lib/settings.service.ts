@@ -66,6 +66,10 @@ export class Settings {
     return true;
   }
 
+  showBackgroundTasks(): boolean | undefined {
+    return false;
+  }
+
   setCanCollectData(canCollectData: boolean): void {
     this.store({ ...this.settings, canCollectData });
   }

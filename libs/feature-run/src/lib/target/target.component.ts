@@ -5,7 +5,7 @@ import {
   TerminalComponent
 } from '@angular-console/ui';
 import {
-  CommandOutput,
+  IncrementalCommandOutput,
   CommandRunner,
   Serializer
 } from '@angular-console/utils';
@@ -42,7 +42,7 @@ export class TargetComponent implements OnInit {
     valid: true
   });
   command$: Observable<string>;
-  commandOutput$: Observable<CommandOutput>;
+  commandOutput$: Observable<IncrementalCommandOutput>;
   @ViewChild(TerminalComponent) out: TerminalComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
@@ -149,7 +149,7 @@ export class TargetComponent implements OnInit {
           gql`
             mutation($path: String!, $runCommand: [String]!) {
               runNg(path: $path, runCommand: $runCommand) {
-                command
+                id
               }
             }
           `,
@@ -179,10 +179,6 @@ export class TargetComponent implements OnInit {
 
   onRun() {
     this.ngRun$.next();
-  }
-
-  onStop() {
-    this.runner.stopCommand();
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {

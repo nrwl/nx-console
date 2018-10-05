@@ -72,8 +72,7 @@ export class NewWorkspaceComponent implements OnInit {
     });
 
     this.schematicCollectionsForNgNew$ = this.apollo
-      .watchQuery({
-        pollInterval: 2000,
+      .query({
         query: gql`
           {
             schematicCollections {
@@ -83,7 +82,7 @@ export class NewWorkspaceComponent implements OnInit {
           }
         `
       })
-      .valueChanges.pipe(
+      .pipe(
         map((r: any) => r.data.schematicCollections),
         publishReplay(1),
         refCount()

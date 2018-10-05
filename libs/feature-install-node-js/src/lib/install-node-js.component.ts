@@ -4,7 +4,11 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
 import { filter, first, map, switchMap, takeWhile, tap } from 'rxjs/operators';
-import { Messenger, Settings } from '@angular-console/utils';
+import {
+  Messenger,
+  NODE_JS_INSTALL_POLLING,
+  Settings
+} from '@angular-console/utils';
 
 @Component({
   selector: 'angular-console-install-node-js',
@@ -40,7 +44,7 @@ export class InstallNodeJsComponent {
         switchMap(status => {
           return this.apollo
             .watchQuery({
-              pollInterval: 300,
+              pollInterval: NODE_JS_INSTALL_POLLING,
               query: gql`
                 query {
                   installNodeJsStatus {

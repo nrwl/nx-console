@@ -1,11 +1,7 @@
-import { mutations, queries } from '@nrwl/angular-console-enterprise-electron';
 import * as path from 'path';
 import { shell } from 'electron';
-import {
-  commandInProgress,
-  runCommand,
-  stopAllCommands
-} from '../api/commands';
+
+import { recentCommands, runCommand } from '../api/run-command';
 import {
   completeAbsoluteModules,
   completeFiles,
@@ -21,8 +17,8 @@ import { readDependencies } from '../api/read-dependencies';
 import { readDirectory } from '../api/read-directory';
 import { openInEditor, readEditors } from '../api/read-editors';
 import { availableExtensions, readExtensions } from '../api/read-extensions';
-import { schematicCollectionsForNgNew } from '../api/read-ngnews';
 import { readNpmScripts, readNpmScriptSchema } from '../api/read-npm-scripts';
+import { schematicCollectionsForNgNew } from '../api/read-ngnews';
 import { readProjects, readSchema } from '../api/read-projects';
 import { readAllSchematicCollections } from '../api/read-schematic-collections';
 import { readSettings, storeSettings } from '../api/read-settings';
@@ -42,6 +38,7 @@ import {
   directoryExists,
   exists,
   files,
+  filterById,
   filterByName,
   findClosestNg,
   findExecutable,
@@ -55,11 +52,11 @@ const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
 };
 
 const Architect: ArchitectResolvers.Resolvers = {
-  schema(a, _, __, i) {
-    if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
+  schema(a: any, _: any, context: any) {
+    if (!directoryExists(path.join(context.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
     }
-    return readSchema(i.variableValues.path, a.builder);
+    return readSchema(context.path, a.builder);
   }
 };
 
@@ -70,21 +67,20 @@ const Project: ProjectResolvers.Resolvers = {
 };
 
 const NpmScript: NpmScriptResolvers.Resolvers = {
-  schema(a, _, __, i) {
-    if (!directoryExists(path.join(i.variableValues.path, 'node_modules'))) {
+  schema(a: any, _: any, context: any) {
+    if (!directoryExists(path.join(context.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
     }
-    return readNpmScriptSchema(i.variableValues.path, a.name);
+    return readNpmScriptSchema(context.path, a.name);
   }
 };
 
 const Workspace: WorkspaceResolvers.Resolvers = {
-  schematicCollections(workspace: any, args: any, _: any, i: any) {
-    const p = i.variableValues.path;
-    if (!directoryExists(path.join(p, 'node_modules'))) {
+  schematicCollections(workspace: any, args: any, context: any) {
+    if (!directoryExists(path.join(context.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
     }
-    return filterByName(readAllSchematicCollections(p), args);
+    return filterByName(readAllSchematicCollections(context.path), args);
   },
   npmScripts(workspace: any, args: any) {
     return filterByName(workspace.npmScripts, args);
@@ -131,14 +127,14 @@ const Database: DatabaseResolvers.Resolvers = {
       );
     }
   },
-  async workspace(_root, args: any) {
+  async workspace(_root: any, args: any, context: any) {
     try {
       if (!files[args.path]) {
         cacheFiles(args.path);
       }
+      context.path = args.path;
       const packageJson = readJsonFile('./package.json', args.path).json;
       const angularJson = readJsonFile('./angular.json', args.path).json;
-
       return {
         name: packageJson.name,
         path: args.path,
@@ -190,24 +186,27 @@ const Database: DatabaseResolvers.Resolvers = {
       );
     }
   },
-  commandStatus(_root: any, args: any) {
+  commands(_root: any, args: any) {
     try {
-      if (commandInProgress) {
-        const r = {
-          command: commandInProgress.command,
-          status: commandInProgress.status,
-          out: commandInProgress.out
-        };
-        commandInProgress.out = '';
-        return r;
-      } else {
-        return { command: null, status: 'terminated', out: '' };
-      }
+      return filterById(
+        recentCommands.commandInfos.map(c => {
+          const r = {
+            id: c.id,
+            type: c.id,
+            workspace: c.workspace,
+            command: c.command,
+            status: c.status,
+            out: c.out,
+            outChunk: c.outChunk
+          };
+          c.outChunk = '';
+          return r;
+        }),
+        args
+      );
     } catch (e) {
       console.log(e);
-      throw new Error(
-        `Error when reading the command status. Message: "${e.message}"`
-      );
+      throw new Error(`Error when reading commands. Message: "${e.message}"`);
     }
   },
   async directory(_: any, args: any) {
@@ -230,14 +229,13 @@ const Database: DatabaseResolvers.Resolvers = {
         }"`
       );
     }
-  },
-  ...(queries as any)
+  }
 };
 
 const Mutation: MutationResolvers.Resolvers = {
   async ngAdd(_root: any, args: any) {
     try {
-      return runCommand(args.path, findClosestNg(args.path), [
+      return runCommand('add', args.path, 'ng', findClosestNg(args.path), [
         'add',
         args.name
       ]);
@@ -248,7 +246,7 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async ngNew(_root: any, args: any) {
     try {
-      return runCommand(args.path, findClosestNg(__dirname), [
+      return runCommand('new', args.path, 'ng', findClosestNg(__dirname), [
         'new',
         args.name,
         `--directory=${args.name}`,
@@ -262,7 +260,7 @@ const Mutation: MutationResolvers.Resolvers = {
   async generate(_root: any, args: any) {
     try {
       const dryRun = args.dryRun ? ['--dry-run'] : [];
-      return runCommand(args.path, findClosestNg(args.path), [
+      return runCommand('generate', args.path, 'ng', findClosestNg(args.path), [
         'generate',
         ...args.genCommand,
         ...dryRun
@@ -276,7 +274,13 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async runNg(_root: any, args: any) {
     try {
-      return runCommand(args.path, findClosestNg(args.path), args.runCommand);
+      return runCommand(
+        'ng',
+        args.path,
+        'ng',
+        findClosestNg(args.path),
+        args.runCommand
+      );
     } catch (e) {
       console.log(e);
       throw new Error(`Error when running 'ng ...'. Message: "${e.message}"`);
@@ -285,7 +289,9 @@ const Mutation: MutationResolvers.Resolvers = {
   async runNpm(_root: any, args: any) {
     try {
       return runCommand(
+        'npm',
         args.path,
+        args.npmClient,
         findExecutable(args.npmClient, args.path),
         args.runCommand
       );
@@ -297,9 +303,9 @@ const Mutation: MutationResolvers.Resolvers = {
   async installNodeJs() {
     return installNodeJs();
   },
-  async stop() {
+  async stopCommand(_root: any, args: any) {
     try {
-      stopAllCommands();
+      recentCommands.stopCommand(args.id);
       return { result: true };
     } catch (e) {
       console.log(e);
@@ -307,9 +313,28 @@ const Mutation: MutationResolvers.Resolvers = {
     }
   },
   async openInBrowser(_root: any, args: any) {
-    console.log('open external', args.url);
     shell.openExternal(args.url);
     return { result: true };
+  },
+  async removeCommand(_root: any, args: any) {
+    try {
+      recentCommands.removeCommand(args.id);
+      return { result: true };
+    } catch (e) {
+      console.log(e);
+      throw new Error(`Error when removing commands. Message: "${e.message}"`);
+    }
+  },
+  async restartCommand(_root: any, args: any) {
+    try {
+      recentCommands.restartCommand(args.id);
+      return { result: true };
+    } catch (e) {
+      console.log(e);
+      throw new Error(
+        `Error when restarting commands. Message: "${e.message}"`
+      );
+    }
   },
   openInEditor(_root: any, args: any) {
     try {
@@ -323,8 +348,7 @@ const Mutation: MutationResolvers.Resolvers = {
   updateSettings(_root: any, args: any) {
     storeSettings(JSON.parse(args.data));
     return readSettings();
-  },
-  ...mutations
+  }
 };
 
 export const resolvers = {

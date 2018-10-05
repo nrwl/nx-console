@@ -12,6 +12,7 @@ import {
   startWith,
   distinctUntilChanged
 } from 'rxjs/operators';
+import { TARGET_POLLING } from '@angular-console/utils';
 
 interface Target {
   projectName: string;
@@ -31,7 +32,7 @@ export class TargetsComponent {
     map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
-        pollInterval: 5000,
+        pollInterval: TARGET_POLLING,
         query: gql`
           query($path: String!) {
             workspace(path: $path) {

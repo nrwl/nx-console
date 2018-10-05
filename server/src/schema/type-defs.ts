@@ -28,14 +28,18 @@ export const typeDefs = gql`
     enum: [String]
   }
 
-  type CommandResult {
-    command: String
+  type CommandResponse {
+    type: String!
+    id: String!
+    workspace: String
+    command: String!
     status: String!
+    outChunk: String!
     out: String!
   }
 
   type CommandStarted {
-    command: String!
+    id: String!
   }
 
   type CompletionResultType {
@@ -59,13 +63,11 @@ export const typeDefs = gql`
   }
 
   type Database {
-    isAuthenticated: Boolean!
     settings: Settings!
     schematicCollections: [SchematicCollectionForNgNew]
     workspace(path: String!): Workspace!
     editors: [EditorSupport]
     availableExtensions(name: String): [Extension]
-    commandStatus: CommandResult
     installNodeJsStatus: InstallNodeJsStatus
     isNodejsInstalled: IsNodeInstalledResult
     directory(
@@ -73,7 +75,7 @@ export const typeDefs = gql`
       onlyDirectories: Boolean
       showHidden: Boolean
     ): FilesType!
-    tickets(id: Int): [Ticket]
+    commands(id: String): [CommandResponse]
   }
 
   type Dependencies {
@@ -108,10 +110,6 @@ export const typeDefs = gql`
     angularDirectory
   }
 
-  type AuthResponseType {
-    response: String!
-  }
-
   type IsNodeInstalledResult {
     result: Boolean!
   }
@@ -134,16 +132,13 @@ export const typeDefs = gql`
       npmClient: String!
       runCommand: [String]
     ): CommandStarted
-    stop: StopResult
+    stopCommand(id: String!): StopResult
+    removeCommand(id: String!): RemoveResult
+    restartCommand(id: String!): RemoveResult
     openInEditor(editor: String!, path: String!): OpenInEditor
     updateSettings(data: String!): Settings!
     installNodeJs: InstallNodeJsStatus
     openInBrowser(url: String!): OpenInBrowserResult
-    authenticate: AuthResponseType!
-    unauthenticate: AuthResponseType!
-    addTicket(subject: String!, question: String!): Ticket
-    markTicketAsSolved(id: Int!): TicketUpdateResponse
-    addComment(id: Int!, comment: String!): TicketUpdateResponse
   }
 
   type NpmScript {
@@ -194,6 +189,10 @@ export const typeDefs = gql`
     result: Boolean
   }
 
+  type RemoveResult {
+    result: Boolean
+  }
+
   type WorkspaceDefinition {
     path: String!
     name: String!
@@ -216,23 +215,5 @@ export const typeDefs = gql`
     npmScripts(name: String): [NpmScript]
     projects(name: String): [Project]
     completions: CompletionsTypes
-  }
-
-  type Comment {
-    text: String!
-    author: String!
-    date: String!
-  }
-
-  type Ticket {
-    subject: String!
-    question: String
-    id: Int!
-    status: String!
-    comments: [Comment]
-  }
-
-  type TicketUpdateResponse {
-    msg: String
   }
 `;

@@ -1,5 +1,4 @@
 export * from './lib/analytics-collector.service';
-export * from './lib/cancel-command.guard';
 export * from './lib/completion.service';
 export * from './lib/command-runner.service';
 export * from './lib/editor-support.service';
@@ -8,3 +7,5 @@ export * from './lib/messenger.service';
 export * from './lib/serializer.service';
 export * from './lib/settings.service';
 export * from './lib/is-node-js-installed.guard';
+export * from './lib/polling-constants';
+export * from './lib/cancel-command.guard';

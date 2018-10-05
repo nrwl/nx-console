@@ -31,6 +31,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
 
 import { AppComponent } from './app.component';
+import { BackgroundTasksComponent } from './background-tasks.component';
 
 export function initApollo(
   analytics: AnalyticsCollector,
@@ -69,7 +70,10 @@ export function initApollo(
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [
+    AppComponent,
+    BackgroundTasksComponent // delete it
+  ],
   imports: [
     MatSidenavModule,
     MatListModule,
