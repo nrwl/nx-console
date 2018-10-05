@@ -45,6 +45,19 @@ describe('Workspaces', () => {
     cy.get('div.title').contains(name);
   });
 
+  it('validates new workspace name against existing folders', () => {
+    cy.get('a[href="/create-workspace"]').click();
+    cy.get('div.title').contains('Create Workspace');
+    checkButtonIsDisabled('Create', true);
+
+    cy.get('mat-expansion-panel.directory-selector').click();
+    selectFolder('tmp');
+    cy.get('mat-expansion-panel.name-selector').click();
+    cy.get('input[name="name"]').type(name);
+
+    cy.get('.workspace-name-form-field').contains('already taken');
+  });
+
   it('opens a workspace', () => {
     cy.get('a[href="/open-workspace"]').click();
     cy.get('div.title').contains('Open Workspace');

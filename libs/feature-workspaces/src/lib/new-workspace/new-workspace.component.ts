@@ -2,28 +2,40 @@ import { DynamicFlatNode } from '@angular-console/ui';
 import {
   Component,
   OnInit,
+  OnDestroy,
   QueryList,
   ViewChildren,
   ViewEncapsulation
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AsyncValidatorFn,
+  ValidationErrors,
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 import { MatDialog, MatExpansionPanel } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { of, BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   filter,
   map,
   publishReplay,
   refCount,
-  switchMap
+  switchMap,
+  take,
+  takeUntil
 } from 'rxjs/operators';
 
 import {
   NewWorkspaceDialogComponent,
   NgNewInvocation
 } from './new-workspace-dialog.component';
+import { Directory } from '@angular-console/schema';
+import { Finder } from '@angular-console/utils';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -36,7 +48,7 @@ interface SchematicCollectionForNgNew {
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.scss']
 })
-export class NewWorkspaceComponent implements OnInit {
+export class NewWorkspaceComponent implements OnInit, OnDestroy {
   @ViewChildren(MatExpansionPanel)
   matExpansionPanels: QueryList<MatExpansionPanel>;
   schematicCollectionsForNgNew$: Observable<any>;
@@ -49,27 +61,38 @@ export class NewWorkspaceComponent implements OnInit {
   constructor(
     private readonly apollo: Apollo,
     private readonly contextActionService: ContextualActionBarService,
-    private readonly matDialog: MatDialog
+    private readonly matDialog: MatDialog,
+    private readonly finderService: Finder
   ) {}
 
-  private static newFormGroup(): FormGroup {
+  private static newFormGroup(finderService: Finder): FormGroup {
     return new FormGroup({
-      name: new FormControl(null, Validators.required),
       path: new FormControl(null, Validators.required),
+      name: new FormControl(
+        null,
+        Validators.required,
+        makeNameAvailableValidator(finderService)
+      ),
       collection: new FormControl(null, Validators.required)
     });
   }
 
+  private readonly unsubscribe$: Subject<null> = new Subject();
+
   ngOnInit() {
-    this.contextActionService.contextualActions$.subscribe(actions => {
-      if (!actions) {
-        this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
-          panel.close();
-        });
-        this.selectedNode = null;
-        this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
-      }
-    });
+    this.contextActionService.contextualActions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(actions => {
+        if (!actions) {
+          this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
+            panel.close();
+          });
+          this.selectedNode = null;
+          this.ngNewForm$.next(
+            NewWorkspaceComponent.newFormGroup(this.finderService)
+          );
+        }
+      });
 
     this.schematicCollectionsForNgNew$ = this.apollo
       .watchQuery({
@@ -89,39 +112,45 @@ export class NewWorkspaceComponent implements OnInit {
         refCount()
       );
 
-    this.schematicCollectionsForNgNew$.subscribe(() => {
-      this.ngNewForm$.next(NewWorkspaceComponent.newFormGroup());
-    });
+    this.schematicCollectionsForNgNew$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.ngNewForm$.next(
+          NewWorkspaceComponent.newFormGroup(this.finderService)
+        );
+      });
 
-    this.createNewWorkspace$.subscribe(() => {
-      const form = this.ngNewForm$.value;
-      if (form) {
-        this.createNewWorkspace(form.value as NgNewInvocation);
-      }
-    });
+    this.createNewWorkspace$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        const form = this.ngNewForm$.value;
+        if (form) {
+          this.createNewWorkspace(form.value as NgNewInvocation);
+        }
+      });
 
     this.ngNewForm$
       .pipe(
         filter(form => Boolean(form)),
-        switchMap((form: FormGroup) => form.valueChanges)
+        switchMap((form: FormGroup) => form.statusChanges)
       )
-      .subscribe((formValue: any) => {
-        const form = this.ngNewForm$.value;
-        if (form && formValue.path) {
-          this.contextActionService.contextualActions$.next({
-            contextTitle: 'Create a New Angular Workspace',
-            actions: [
-              {
-                name: 'Create',
-                disabled: new BehaviorSubject(form.invalid),
-                invoke: this.createNewWorkspace$
-              }
-            ]
-          });
-        } else {
-          this.contextActionService.contextualActions$.next(null);
-        }
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((formStatus: any) => {
+        this.contextActionService.contextualActions$.next({
+          contextTitle: 'Create a New Angular Workspace',
+          actions: [
+            {
+              name: 'Create',
+              disabled: new BehaviorSubject(formStatus !== 'VALID'),
+              invoke: this.createNewWorkspace$
+            }
+          ]
+        });
       });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(null);
   }
 
   createNewWorkspace(ngNewInvocation: NgNewInvocation) {
@@ -163,4 +192,26 @@ export class NewWorkspaceComponent implements OnInit {
       field.setValue(node.path);
     }
   }
+}
+
+export function makeNameAvailableValidator(
+  finderService: Finder
+): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    const form = control.parent;
+    const pathCtrl = form.get('path');
+    const nameCtrl = form.get('name');
+    return of(
+      nameCtrl && pathCtrl ? `${pathCtrl.value}/${nameCtrl.value}` : null
+    ).pipe(
+      switchMap(
+        (workspacePath: null | string): Observable<null | Directory> =>
+          workspacePath ? finderService.listFiles(workspacePath) : of(null)
+      ),
+      map(
+        (d: null | Directory) => (!d || !d.exists ? null : { nameTaken: true })
+      ),
+      take(1)
+    );
+  };
 }
