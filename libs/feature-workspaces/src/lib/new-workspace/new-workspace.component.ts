@@ -2,6 +2,7 @@ import { DynamicFlatNode } from '@angular-console/ui';
 import {
   Component,
   OnInit,
+  OnDestroy,
   QueryList,
   ViewChildren,
   ViewEncapsulation
@@ -24,7 +25,9 @@ import {
   map,
   publishReplay,
   refCount,
-  switchMap
+  switchMap,
+  take,
+  takeUntil
 } from 'rxjs/operators';
 
 import {
@@ -45,7 +48,7 @@ interface SchematicCollectionForNgNew {
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.scss']
 })
-export class NewWorkspaceComponent implements OnInit {
+export class NewWorkspaceComponent implements OnInit, OnDestroy {
   @ViewChildren(MatExpansionPanel)
   matExpansionPanels: QueryList<MatExpansionPanel>;
   schematicCollectionsForNgNew$: Observable<any>;
@@ -74,18 +77,22 @@ export class NewWorkspaceComponent implements OnInit {
     });
   }
 
+  private readonly unsubscribe$: Subject<null> = new Subject();
+
   ngOnInit() {
-    this.contextActionService.contextualActions$.subscribe(actions => {
-      if (!actions) {
-        this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
-          panel.close();
-        });
-        this.selectedNode = null;
-        this.ngNewForm$.next(
-          NewWorkspaceComponent.newFormGroup(this.finderService)
-        );
-      }
-    });
+    this.contextActionService.contextualActions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(actions => {
+        if (!actions) {
+          this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
+            panel.close();
+          });
+          this.selectedNode = null;
+          this.ngNewForm$.next(
+            NewWorkspaceComponent.newFormGroup(this.finderService)
+          );
+        }
+      });
 
     this.schematicCollectionsForNgNew$ = this.apollo
       .watchQuery({
@@ -105,41 +112,45 @@ export class NewWorkspaceComponent implements OnInit {
         refCount()
       );
 
-    this.schematicCollectionsForNgNew$.subscribe(() => {
-      this.ngNewForm$.next(
-        NewWorkspaceComponent.newFormGroup(this.finderService)
-      );
-    });
+    this.schematicCollectionsForNgNew$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.ngNewForm$.next(
+          NewWorkspaceComponent.newFormGroup(this.finderService)
+        );
+      });
 
-    this.createNewWorkspace$.subscribe(() => {
-      const form = this.ngNewForm$.value;
-      if (form) {
-        this.createNewWorkspace(form.value as NgNewInvocation);
-      }
-    });
+    this.createNewWorkspace$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        const form = this.ngNewForm$.value;
+        if (form) {
+          this.createNewWorkspace(form.value as NgNewInvocation);
+        }
+      });
 
     this.ngNewForm$
       .pipe(
         filter(form => Boolean(form)),
-        switchMap((form: FormGroup) => form.valueChanges)
+        switchMap((form: FormGroup) => form.statusChanges)
       )
-      .subscribe((formValue: any) => {
-        const form = this.ngNewForm$.value;
-        if (form && formValue.path) {
-          this.contextActionService.contextualActions$.next({
-            contextTitle: 'Create a New Angular Workspace',
-            actions: [
-              {
-                name: 'Create',
-                disabled: new BehaviorSubject(form.invalid),
-                invoke: this.createNewWorkspace$
-              }
-            ]
-          });
-        } else {
-          this.contextActionService.contextualActions$.next(null);
-        }
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((formStatus: any) => {
+        this.contextActionService.contextualActions$.next({
+          contextTitle: 'Create a New Angular Workspace',
+          actions: [
+            {
+              name: 'Create',
+              disabled: new BehaviorSubject(formStatus !== 'VALID'),
+              invoke: this.createNewWorkspace$
+            }
+          ]
+        });
       });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(null);
   }
 
   createNewWorkspace(ngNewInvocation: NgNewInvocation) {
@@ -188,16 +199,19 @@ export function makeNameAvailableValidator(
 ): AsyncValidatorFn {
   return (control: AbstractControl): Observable<ValidationErrors | null> => {
     const form = control.parent;
-    const path = form.get('path');
-    const name = form.get('name');
-    return of(name && path ? `${path.value}/${name.value}` : null).pipe(
+    const pathCtrl = form.get('path');
+    const nameCtrl = form.get('name');
+    return of(
+      nameCtrl && pathCtrl ? `${pathCtrl.value}/${nameCtrl.value}` : null
+    ).pipe(
       switchMap(
-        (path: null | string): Observable<null | Directory> =>
-          path ? finderService.listFiles(path) : of(null)
+        (workspacePath: null | string): Observable<null | Directory> =>
+          workspacePath ? finderService.listFiles(workspacePath) : of(null)
       ),
       map(
         (d: null | Directory) => (!d || !d.exists ? null : { nameTaken: true })
-      )
+      ),
+      take(1)
     );
   };
 }

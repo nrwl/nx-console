@@ -257,6 +257,10 @@ export class SchematicComponent implements OnInit {
     return contextTitle;
   }
 
+  getPrefix(schematic: Schematic) {
+    return [`${schematic.collection}:${schematic.name}`];
+  }
+
   path() {
     return this.route.snapshot.params.path;
   }

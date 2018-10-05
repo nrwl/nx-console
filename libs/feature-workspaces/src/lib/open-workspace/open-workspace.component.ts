@@ -7,23 +7,21 @@ import { WorkspacesService } from '../workspaces.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'angular-console-import-workspace',
-  templateUrl: './import-workspace.component.html',
-  styleUrls: ['./import-workspace.component.scss']
+  selector: 'angular-console-open-workspace',
+  templateUrl: './open-workspace.component.html',
+  styleUrls: ['./open-workspace.component.scss']
 })
-export class ImportWorkspaceComponent implements OnDestroy {
-  private readonly invokeImport = new Subject<void>();
+export class OpenWorkspaceComponent implements OnDestroy {
+  private readonly invokeOpen = new Subject<void>();
 
-  private readonly invokeImportSubscription = this.invokeImport.subscribe(
-    () => {
-      if (!this.selectedNode) {
-        throw new Error('Cannot import without a selection');
-      }
-
-      this.workspacesService.openWorkspace(this.selectedNode.path);
-      this.contextActionService.contextualActions$.next(null);
+  private readonly invokeOpenSubscription = this.invokeOpen.subscribe(() => {
+    if (!this.selectedNode) {
+      throw new Error('Cannot open without a selection');
     }
-  );
+
+    this.workspacesService.openWorkspace(this.selectedNode.path);
+    this.contextActionService.contextualActions$.next(null);
+  });
 
   selectedNode: DynamicFlatNode | null = null;
 
@@ -43,7 +41,7 @@ export class ImportWorkspaceComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.invokeImportSubscription.unsubscribe();
+    this.invokeOpenSubscription.unsubscribe();
   }
 
   toggleNodeSelection(node: DynamicFlatNode) {
@@ -54,8 +52,8 @@ export class ImportWorkspaceComponent implements OnDestroy {
         contextTitle: `Selected Workspace: ${node.file.name}`,
         actions: [
           {
-            name: 'Import',
-            invoke: this.invokeImport,
+            name: 'Open',
+            invoke: this.invokeOpen,
             disabled: new Subject()
           }
         ]

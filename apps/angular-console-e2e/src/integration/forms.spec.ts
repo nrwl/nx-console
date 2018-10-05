@@ -74,15 +74,23 @@ describe('Forms', () => {
   });
 
   it('updates the command in the terminal', () => {
-    checkDisplayedCommand('$ ng generate component --dry-run');
+    checkDisplayedCommand(
+      '$ ng generate @schematics/angular:component --dry-run'
+    );
 
     cy.get('input[name="name"]').type('cmp');
-    checkDisplayedCommand('$ ng generate component cmp --dry-run');
+    checkDisplayedCommand(
+      '$ ng generate @schematics/angular:component cmp --dry-run'
+    );
 
     toggleBoolean('export');
-    checkDisplayedCommand('$ ng generate component cmp --export --dry-run');
+    checkDisplayedCommand(
+      '$ ng generate @schematics/angular:component cmp --export --dry-run'
+    );
 
     toggleBoolean('export');
-    checkDisplayedCommand('$ ng generate component cmp --dry-run');
+    checkDisplayedCommand(
+      '$ ng generate @schematics/angular:component cmp --dry-run'
+    );
   });
 });
