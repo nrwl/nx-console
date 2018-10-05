@@ -5,6 +5,7 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { PROJECTS_POLLING } from '@angular-console/utils';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +26,7 @@ export class ProjectsComponent implements OnInit {
       map(m => m.path),
       switchMap(path => {
         return this.apollo.watchQuery({
-          pollInterval: 2000,
+          pollInterval: PROJECTS_POLLING,
           query: gql`
             query($path: String!) {
               workspace(path: $path) {

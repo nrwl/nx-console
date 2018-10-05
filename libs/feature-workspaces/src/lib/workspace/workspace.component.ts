@@ -1,5 +1,9 @@
 import { FADE_IN, GROW_SHRINK } from '@angular-console/ui';
-import { EditorSupport, Settings } from '@angular-console/utils';
+import {
+  BASIC_WORKSPACE_POLLING,
+  EditorSupport,
+  Settings
+} from '@angular-console/utils';
 import { style, transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
@@ -98,7 +102,7 @@ export class WorkspaceComponent implements OnDestroy {
     map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
-        pollInterval: 2000,
+        pollInterval: BASIC_WORKSPACE_POLLING,
         query: gql`
           query($path: String!) {
             workspace(path: $path) {

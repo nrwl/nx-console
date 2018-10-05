@@ -14,6 +14,7 @@
   <mat-sidenav-content id="navigationSidenavContent">
     <div fxLayout="column" fxFlex>
       <ui-contextual-action-bar (hamburgerClicked)="showSiteMenu = true"></ui-contextual-action-bar>
+      <angular-console-background-tasks></angular-console-background-tasks>
 
       <div fxFlex class="outlet-container" [@routerTransition]="routerTransition | async">
         <router-outlet></router-outlet>

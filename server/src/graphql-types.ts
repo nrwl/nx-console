@@ -29,17 +29,15 @@ export type SubscriptionResolver<
 };
 
 export interface Database {
-  isAuthenticated: boolean;
   settings: Settings;
   schematicCollections?: (SchematicCollectionForNgNew | null)[] | null;
   workspace: Workspace;
   editors?: (EditorSupport | null)[] | null;
   availableExtensions?: (Extension | null)[] | null;
-  commandStatus?: CommandResult | null;
   installNodeJsStatus?: InstallNodeJsStatus | null;
   isNodejsInstalled?: IsNodeInstalledResult | null;
   directory: FilesType;
-  tickets?: (Ticket | null)[] | null;
+  commands?: (CommandResponse | null)[] | null;
 }
 
 export interface Settings {
@@ -156,12 +154,6 @@ export interface EditorSupport {
   icon: string;
 }
 
-export interface CommandResult {
-  command?: string | null;
-  status: string;
-  out: string;
-}
-
 export interface InstallNodeJsStatus {
   downloadPercentage?: number | null;
   downloadSpeed?: number | null;
@@ -184,18 +176,14 @@ export interface FileListType {
   type: FileType;
 }
 
-export interface Ticket {
-  subject: string;
-  question?: string | null;
-  id: number;
+export interface CommandResponse {
+  type: string;
+  id: string;
+  workspace?: string | null;
+  command: string;
   status: string;
-  comments?: (Comment | null)[] | null;
-}
-
-export interface Comment {
-  text: string;
-  author: string;
-  date: string;
+  outChunk: string;
+  out: string;
 }
 
 export interface Mutation {
@@ -204,23 +192,24 @@ export interface Mutation {
   generate?: CommandStarted | null;
   runNg?: CommandStarted | null;
   runNpm?: CommandStarted | null;
-  stop?: StopResult | null;
+  stopCommand?: StopResult | null;
+  removeCommand?: RemoveResult | null;
+  restartCommand?: RemoveResult | null;
   openInEditor?: OpenInEditor | null;
   updateSettings: Settings;
   installNodeJs?: InstallNodeJsStatus | null;
   openInBrowser?: OpenInBrowserResult | null;
-  authenticate: AuthResponseType;
-  unauthenticate: AuthResponseType;
-  addTicket?: Ticket | null;
-  markTicketAsSolved?: TicketUpdateResponse | null;
-  addComment?: TicketUpdateResponse | null;
 }
 
 export interface CommandStarted {
-  command: string;
+  id: string;
 }
 
 export interface StopResult {
+  result?: boolean | null;
+}
+
+export interface RemoveResult {
   result?: boolean | null;
 }
 
@@ -230,14 +219,6 @@ export interface OpenInEditor {
 
 export interface OpenInBrowserResult {
   result: boolean;
-}
-
-export interface AuthResponseType {
-  response: string;
-}
-
-export interface TicketUpdateResponse {
-  msg?: string | null;
 }
 export interface WorkspaceDatabaseArgs {
   path: string;
@@ -250,8 +231,8 @@ export interface DirectoryDatabaseArgs {
   onlyDirectories?: boolean | null;
   showHidden?: boolean | null;
 }
-export interface TicketsDatabaseArgs {
-  id?: number | null;
+export interface CommandsDatabaseArgs {
+  id?: string | null;
 }
 export interface SchematicCollectionsWorkspaceArgs {
   name?: string | null;
@@ -303,6 +284,15 @@ export interface RunNpmMutationArgs {
   npmClient: string;
   runCommand?: (string | null)[] | null;
 }
+export interface StopCommandMutationArgs {
+  id: string;
+}
+export interface RemoveCommandMutationArgs {
+  id: string;
+}
+export interface RestartCommandMutationArgs {
+  id: string;
+}
 export interface OpenInEditorMutationArgs {
   editor: string;
   path: string;
@@ -313,17 +303,6 @@ export interface UpdateSettingsMutationArgs {
 export interface OpenInBrowserMutationArgs {
   url: string;
 }
-export interface AddTicketMutationArgs {
-  subject: string;
-  question: string;
-}
-export interface MarkTicketAsSolvedMutationArgs {
-  id: number;
-}
-export interface AddCommentMutationArgs {
-  id: number;
-  comment: string;
-}
 
 export enum FileType {
   file = 'file',
@@ -333,7 +312,6 @@ export enum FileType {
 
 export namespace DatabaseResolvers {
   export interface Resolvers<Context = any> {
-    isAuthenticated?: IsAuthenticatedResolver<boolean, any, Context>;
     settings?: SettingsResolver<Settings, any, Context>;
     schematicCollections?: SchematicCollectionsResolver<
       (SchematicCollectionForNgNew | null)[] | null,
@@ -347,7 +325,6 @@ export namespace DatabaseResolvers {
       any,
       Context
     >;
-    commandStatus?: CommandStatusResolver<CommandResult | null, any, Context>;
     installNodeJsStatus?: InstallNodeJsStatusResolver<
       InstallNodeJsStatus | null,
       any,
@@ -359,14 +336,13 @@ export namespace DatabaseResolvers {
       Context
     >;
     directory?: DirectoryResolver<FilesType, any, Context>;
-    tickets?: TicketsResolver<(Ticket | null)[] | null, any, Context>;
+    commands?: CommandsResolver<
+      (CommandResponse | null)[] | null,
+      any,
+      Context
+    >;
   }
 
-  export type IsAuthenticatedResolver<
-    R = boolean,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
   export type SettingsResolver<
     R = Settings,
     Parent = any,
@@ -400,11 +376,6 @@ export namespace DatabaseResolvers {
     name?: string | null;
   }
 
-  export type CommandStatusResolver<
-    R = CommandResult | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
   export type InstallNodeJsStatusResolver<
     R = InstallNodeJsStatus | null,
     Parent = any,
@@ -426,13 +397,13 @@ export namespace DatabaseResolvers {
     showHidden?: boolean | null;
   }
 
-  export type TicketsResolver<
-    R = (Ticket | null)[] | null,
+  export type CommandsResolver<
+    R = (CommandResponse | null)[] | null,
     Parent = any,
     Context = any
-  > = Resolver<R, Parent, Context, TicketsArgs>;
-  export interface TicketsArgs {
-    id?: number | null;
+  > = Resolver<R, Parent, Context, CommandsArgs>;
+  export interface CommandsArgs {
+    id?: string | null;
   }
 }
 
@@ -985,30 +956,6 @@ export namespace EditorSupportResolvers {
   >;
 }
 
-export namespace CommandResultResolvers {
-  export interface Resolvers<Context = any> {
-    command?: CommandResolver<string | null, any, Context>;
-    status?: StatusResolver<string, any, Context>;
-    out?: OutResolver<string, any, Context>;
-  }
-
-  export type CommandResolver<
-    R = string | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type StatusResolver<
-    R = string,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type OutResolver<R = string, Parent = any, Context = any> = Resolver<
-    R,
-    Parent,
-    Context
-  >;
-}
-
 export namespace InstallNodeJsStatusResolvers {
   export interface Resolvers<Context = any> {
     downloadPercentage?: DownloadPercentageResolver<
@@ -1097,60 +1044,48 @@ export namespace FileListTypeResolvers {
   > = Resolver<R, Parent, Context>;
 }
 
-export namespace TicketResolvers {
+export namespace CommandResponseResolvers {
   export interface Resolvers<Context = any> {
-    subject?: SubjectResolver<string, any, Context>;
-    question?: QuestionResolver<string | null, any, Context>;
-    id?: IdResolver<number, any, Context>;
+    type?: TypeResolver<string, any, Context>;
+    id?: IdResolver<string, any, Context>;
+    workspace?: WorkspaceResolver<string | null, any, Context>;
+    command?: CommandResolver<string, any, Context>;
     status?: StatusResolver<string, any, Context>;
-    comments?: CommentsResolver<(Comment | null)[] | null, any, Context>;
+    outChunk?: OutChunkResolver<string, any, Context>;
+    out?: OutResolver<string, any, Context>;
   }
 
-  export type SubjectResolver<
-    R = string,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type QuestionResolver<
-    R = string | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type IdResolver<R = number, Parent = any, Context = any> = Resolver<
+  export type TypeResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
     Context
   >;
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type WorkspaceResolver<
+    R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type CommandResolver<
+    R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type StatusResolver<
     R = string,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
-  export type CommentsResolver<
-    R = (Comment | null)[] | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-}
-
-export namespace CommentResolvers {
-  export interface Resolvers<Context = any> {
-    text?: TextResolver<string, any, Context>;
-    author?: AuthorResolver<string, any, Context>;
-    date?: DateResolver<string, any, Context>;
-  }
-
-  export type TextResolver<R = string, Parent = any, Context = any> = Resolver<
-    R,
-    Parent,
-    Context
-  >;
-  export type AuthorResolver<
+  export type OutChunkResolver<
     R = string,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
-  export type DateResolver<R = string, Parent = any, Context = any> = Resolver<
+  export type OutResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
     Context
@@ -1164,7 +1099,9 @@ export namespace MutationResolvers {
     generate?: GenerateResolver<CommandStarted | null, any, Context>;
     runNg?: RunNgResolver<CommandStarted | null, any, Context>;
     runNpm?: RunNpmResolver<CommandStarted | null, any, Context>;
-    stop?: StopResolver<StopResult | null, any, Context>;
+    stopCommand?: StopCommandResolver<StopResult | null, any, Context>;
+    removeCommand?: RemoveCommandResolver<RemoveResult | null, any, Context>;
+    restartCommand?: RestartCommandResolver<RemoveResult | null, any, Context>;
     openInEditor?: OpenInEditorResolver<OpenInEditor | null, any, Context>;
     updateSettings?: UpdateSettingsResolver<Settings, any, Context>;
     installNodeJs?: InstallNodeJsResolver<
@@ -1177,15 +1114,6 @@ export namespace MutationResolvers {
       any,
       Context
     >;
-    authenticate?: AuthenticateResolver<AuthResponseType, any, Context>;
-    unauthenticate?: UnauthenticateResolver<AuthResponseType, any, Context>;
-    addTicket?: AddTicketResolver<Ticket | null, any, Context>;
-    markTicketAsSolved?: MarkTicketAsSolvedResolver<
-      TicketUpdateResponse | null,
-      any,
-      Context
-    >;
-    addComment?: AddCommentResolver<TicketUpdateResponse | null, any, Context>;
   }
 
   export type NgAddResolver<
@@ -1241,11 +1169,33 @@ export namespace MutationResolvers {
     runCommand?: (string | null)[] | null;
   }
 
-  export type StopResolver<
+  export type StopCommandResolver<
     R = StopResult | null,
     Parent = any,
     Context = any
-  > = Resolver<R, Parent, Context>;
+  > = Resolver<R, Parent, Context, StopCommandArgs>;
+  export interface StopCommandArgs {
+    id: string;
+  }
+
+  export type RemoveCommandResolver<
+    R = RemoveResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, RemoveCommandArgs>;
+  export interface RemoveCommandArgs {
+    id: string;
+  }
+
+  export type RestartCommandResolver<
+    R = RemoveResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, RestartCommandArgs>;
+  export interface RestartCommandArgs {
+    id: string;
+  }
+
   export type OpenInEditorResolver<
     R = OpenInEditor | null,
     Parent = any,
@@ -1278,60 +1228,33 @@ export namespace MutationResolvers {
   export interface OpenInBrowserArgs {
     url: string;
   }
-
-  export type AuthenticateResolver<
-    R = AuthResponseType,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type UnauthenticateResolver<
-    R = AuthResponseType,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type AddTicketResolver<
-    R = Ticket | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context, AddTicketArgs>;
-  export interface AddTicketArgs {
-    subject: string;
-    question: string;
-  }
-
-  export type MarkTicketAsSolvedResolver<
-    R = TicketUpdateResponse | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context, MarkTicketAsSolvedArgs>;
-  export interface MarkTicketAsSolvedArgs {
-    id: number;
-  }
-
-  export type AddCommentResolver<
-    R = TicketUpdateResponse | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context, AddCommentArgs>;
-  export interface AddCommentArgs {
-    id: number;
-    comment: string;
-  }
 }
 
 export namespace CommandStartedResolvers {
   export interface Resolvers<Context = any> {
-    command?: CommandResolver<string, any, Context>;
+    id?: IdResolver<string, any, Context>;
   }
 
-  export type CommandResolver<
-    R = string,
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+}
+
+export namespace StopResultResolvers {
+  export interface Resolvers<Context = any> {
+    result?: ResultResolver<boolean | null, any, Context>;
+  }
+
+  export type ResultResolver<
+    R = boolean | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
 }
 
-export namespace StopResultResolvers {
+export namespace RemoveResultResolvers {
   export interface Resolvers<Context = any> {
     result?: ResultResolver<boolean | null, any, Context>;
   }
@@ -1362,30 +1285,6 @@ export namespace OpenInBrowserResultResolvers {
 
   export type ResultResolver<
     R = boolean,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-}
-
-export namespace AuthResponseTypeResolvers {
-  export interface Resolvers<Context = any> {
-    response?: ResponseResolver<string, any, Context>;
-  }
-
-  export type ResponseResolver<
-    R = string,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-}
-
-export namespace TicketUpdateResponseResolvers {
-  export interface Resolvers<Context = any> {
-    msg?: MsgResolver<string | null, any, Context>;
-  }
-
-  export type MsgResolver<
-    R = string | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

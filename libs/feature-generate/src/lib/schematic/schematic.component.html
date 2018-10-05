@@ -1,5 +1,5 @@
 <ui-task-runner *ngIf="schematic$ | async as schematic" [terminalWindowTitle]="schematic.collection + ' - ' + schematic.name">
   <ui-flags [prefix]="getPrefix(schematic)" [fields]="schematic.schema" (value)="onFlagsChange($event)"
     [init]="initValues$ | async" [path]="path()"></ui-flags>
-  <ui-terminal [command]="command$|async" [input]="(combinedOutput$|async)?.out"></ui-terminal>
+  <ui-terminal [command]="command$|async" [input]="(combinedOutput$|async)?.outChunk"></ui-terminal>
 </ui-task-runner>

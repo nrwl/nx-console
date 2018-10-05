@@ -5,7 +5,7 @@ import {
   TerminalComponent
 } from '@angular-console/ui';
 import {
-  CommandOutput,
+  IncrementalCommandOutput,
   CommandRunner,
   Serializer
 } from '@angular-console/utils';
@@ -42,7 +42,7 @@ export class NpmScriptComponent implements OnInit {
     valid: true
   });
   command$: Observable<string>;
-  commandOutput$: Observable<CommandOutput>;
+  commandOutput$: Observable<IncrementalCommandOutput>;
   @ViewChild(TerminalComponent) out: TerminalComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
@@ -144,7 +144,7 @@ export class NpmScriptComponent implements OnInit {
                 npmClient: $npmClient
                 runCommand: $runCommand
               ) {
-                command
+                id
               }
             }
           `,
@@ -178,10 +178,6 @@ export class NpmScriptComponent implements OnInit {
 
   onRun() {
     this.ngRun$.next();
-  }
-
-  onStop() {
-    this.runner.stopCommand();
   }
 
   onFlagsChange(e: { commands: string[]; valid: boolean }) {

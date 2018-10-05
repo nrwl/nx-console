@@ -245,6 +245,10 @@ export function filterByName<T>(t: T[], args: { name?: string }): T[] {
   return args.name ? t.filter((s: any) => s.name === args.name) : t;
 }
 
+export function filterById<T>(t: T[], args: { id?: string }): T[] {
+  return args.id ? t.filter((s: any) => s.id === args.id) : t;
+}
+
 export function normalizePath(value: string): string {
   const firstPart = value.split('/')[0];
   if (!firstPart) return value;

@@ -13,6 +13,7 @@ import {
   startWith,
   switchMap
 } from 'rxjs/operators';
+import { SCHEMATICS_POLLING } from '@angular-console/utils';
 
 interface SchematicId {
   collectionName: string | undefined;
@@ -32,7 +33,7 @@ export class SchematicsComponent {
     map(m => m.path),
     switchMap(path => {
       return this.apollo.watchQuery({
-        pollInterval: 5000,
+        pollInterval: SCHEMATICS_POLLING,
         query: gql`
           query($path: String!) {
             workspace(path: $path) {
