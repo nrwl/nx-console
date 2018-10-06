@@ -1,7 +1,8 @@
+import { exec, execSync, spawn } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
-import { spawn, exec, execSync } from 'child_process';
-import { findExecutable, hasExecutable } from '../utils';
+
+import { exists, findExecutable, hasExecutable } from '../utils';
 
 export function readEditors() {
   const editors = [];
@@ -174,13 +175,4 @@ function toWindows(path: string): string {
     .split('/')
     .filter(p => !!p)
     .join('\\');
-}
-
-function exists(cmd: string): boolean {
-  try {
-    execSync(`which ${cmd}`).toString();
-    return true;
-  } catch (error) {
-    return false;
-  }
 }

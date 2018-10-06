@@ -103,6 +103,25 @@
       "architect": {
       }
     },
+    "feature-install-node-js": {
+      "root": "libs/feature-install-node-js",
+      "sourceRoot": "libs/feature-install-node-js/src",
+      "projectType": "library",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/feature-install-node-js/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
     "feature-workspaces": {
       "root": "libs/feature-workspaces",
       "sourceRoot": "libs/feature-workspaces/src",
