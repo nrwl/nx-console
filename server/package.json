@@ -9,10 +9,9 @@
   "main": "src/index.js",
   "license": "MIT",
   "dependencies": {
-    "@angular/cli": "6.1.2",
-    "@ngrx/schematics": "6.1.0",
+    "@angular/cli": "6.2.4",
     "@nrwl/angular-console-enterprise-electron": "0.0.4",
-    "@nrwl/schematics": "6.2.1",
+    "@nrwl/schematics": "6.4.0",
     "@types/tmp": "^0.0.33",
     "apollo-server-express": "^2.0.4",
     "dotenv": "6.0.0",
