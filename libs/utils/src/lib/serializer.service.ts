@@ -103,7 +103,10 @@ export class Serializer {
     }
   }
   private importantBuilderField(builder: string, name: string) {
-    if (builder.startsWith('@angular-devkit/build-angular')) {
+    if (
+      builder.startsWith('@angular-devkit/build-angular') ||
+      builder.startsWith('@nrwl/builders')
+    ) {
       return name === 'aot' || name === 'watch' || name === 'browsers';
     } else {
       return false;
@@ -111,7 +114,7 @@ export class Serializer {
   }
 
   private completionSchematicType(collection: string, name: string): any {
-    if (collection === '@nrwl/schematics') {
+    if (collection === '@nrwl/schematics' && name === 'module') {
       return 'absoluteModules';
     }
     if (
