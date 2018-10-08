@@ -26,7 +26,6 @@
     "strict-type-predicates": true,
     "restrict-plus-operands": true,
     "prefer-object-spread": true,
-    "no-unused-variable": [true, { "ignore-pattern": "^_" }],
     "no-unsafe-finally": true,
     "no-unsafe-any": false,
     "no-this-assignment": true,

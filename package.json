@@ -10,7 +10,9 @@
   "scripts": {
     "start": "nps",
     "format": "nps format.write",
-    "postinstall": "node ./tools/scripts/postinstall.js"
+    "postinstall": "node ./tools/scripts/postinstall.js",
+    "ng": "ng",
+    "nx": "nx"
   },
   "build": {
     "appId": "io.nrwl.AngularConsole",
@@ -57,11 +59,14 @@
     ]
   },
   "dependencies": {
-    "@nrwl/nx": "6.3.1"
+    "@nrwl/nx": "6.4.0",
+    "@ngrx/effects": "6.1.0",
+    "@ngrx/store": "6.1.0",
+    "@ngrx/router-store": "6.1.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.8.4",
-    "@angular-devkit/build-ng-packagr": "~0.8.4",
+    "@angular-devkit/build-angular": "~0.8.0",
+    "@angular-devkit/build-ng-packagr": "~0.8.0",
     "@angular-devkit/core": "~0.8.4",
     "@angular-devkit/schematics": "~0.8.4",
     "@angular/animations": "6.1.9",
@@ -80,7 +85,7 @@
     "@angular/router": "6.1.9",
     "@nrwl/angular-console-enterprise-electron": "0.0.4",
     "@nrwl/angular-console-enterprise-frontend": "0.0.4",
-    "@nrwl/schematics": "6.3.1",
+    "@nrwl/schematics": "6.4.0",
     "@types/express": "^4.16.0",
     "@types/graphql": "0.13.0",
     "@types/jasmine": "~2.8.6",
@@ -120,7 +125,7 @@
     "jasmine-spec-reporter": "~4.2.1",
     "jest": "23.4.2",
     "jest-jasmine2": "^23.4.2",
-    "karma": "~2.0.4",
+    "karma": "~3.0.0",
     "karma-chrome-launcher": "~2.2.0",
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~1.1.0",
@@ -130,22 +135,23 @@
     "nps": "^5.9.2",
     "nps-utils": "^1.5.0",
     "prettier": "1.13.7",
-    "protractor": "~5.3.0",
+    "protractor": "~5.4.0",
     "resolve": "1.8.1",
-    "rxjs": "6.2.2",
-    "rxjs-compat": "6.2.2",
+    "rxjs": "6.3.3",
+    "rxjs-compat": "6.3.3",
     "shelljs": "0.8.2",
     "ts-node": "~7.0.0",
     "tsickle": "^0.32.0",
     "tslib": "^1.9.3",
-    "tslint": "~5.10.0",
+    "tslint": "~5.11.0",
     "typescript": "~2.9.2",
     "universal-analytics": "^0.4.17",
     "uuid": "^3.3.2",
     "xterm": "3.4.1",
     "zone.js": "^0.8.26",
     "strip-json-comments": "2.0.1",
-    "dotenv": "6.0.0"
+    "dotenv": "6.0.0",
+    "@ngrx/store-devtools": "6.1.0"
   },
   "jest": {
     "modulePathIgnorePatterns": [
