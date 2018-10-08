@@ -28,8 +28,8 @@ import {
   refCount,
   startWith,
   switchMap,
-  tap,
-  withLatestFrom
+  withLatestFrom,
+  tap
 } from 'rxjs/operators';
 
 const DEBOUNCE_TIME = 300;
@@ -123,9 +123,6 @@ export class SchematicComponent implements OnInit {
         });
       }),
       map((r: any) => {
-        if (!r) {
-          return null;
-        }
         const schematic: Schematic =
           r.data.workspace.schematicCollections[0].schematics[0];
 

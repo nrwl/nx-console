@@ -1,4 +1,6 @@
+import { Directory } from '@angular-console/schema';
 import { DynamicFlatNode } from '@angular-console/ui';
+import { Finder } from '@angular-console/utils';
 import {
   Component,
   OnInit,
@@ -7,18 +9,24 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import {
-  AsyncValidatorFn,
-  ValidationErrors,
   AbstractControl,
+  AsyncValidatorFn,
   FormControl,
   FormGroup,
+  ValidationErrors,
   Validators
 } from '@angular/forms';
 import { MatDialog, MatExpansionPanel } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { of, BehaviorSubject, Observable, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  of,
+  OperatorFunction,
+  Subject
+} from 'rxjs';
 import {
   filter,
   map,
@@ -31,8 +39,6 @@ import {
   NewWorkspaceDialogComponent,
   NgNewInvocation
 } from './new-workspace-dialog.component';
-import { Directory } from '@angular-console/schema';
-import { Finder } from '@angular-console/utils';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -120,8 +126,11 @@ export class NewWorkspaceComponent implements OnInit {
 
     this.ngNewForm$
       .pipe(
-        filter(form => Boolean(form)),
-        switchMap((form: FormGroup) => form.valueChanges)
+        filter(form => Boolean(form)) as OperatorFunction<
+          FormGroup | null,
+          FormGroup
+        >,
+        switchMap(form => form.valueChanges)
       )
       .subscribe((formValue: any) => {
         const form = this.ngNewForm$.value;
@@ -192,8 +201,8 @@ export function makeNameAvailableValidator(
     const name = form.get('name');
     return of(name && path ? `${path.value}/${name.value}` : null).pipe(
       switchMap(
-        (path: null | string): Observable<null | Directory> =>
-          path ? finderService.listFiles(path) : of(null)
+        (p: null | string): Observable<null | Directory> =>
+          p ? finderService.listFiles(p) : of(null)
       ),
       map(
         (d: null | Directory) => (!d || !d.exists ? null : { nameTaken: true })

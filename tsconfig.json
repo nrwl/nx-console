@@ -12,6 +12,8 @@
     "strictNullChecks": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictFunctionTypes": true,
