@@ -23,7 +23,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import {
   AngularConsoleEnterpriseFrontendModule,
-  supportRoutes
+  connectRoutes
 } from '@nrwl/angular-console-enterprise-frontend';
 import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
@@ -97,8 +97,8 @@ export function initApollo(
             '@angular-console/feature-install-node-js#FeatureInstallNodeJsModule'
         },
         {
-          path: 'support',
-          children: supportRoutes
+          path: 'connect',
+          children: connectRoutes
         }
       ],
       { paramsInheritanceStrategy: 'always' }
