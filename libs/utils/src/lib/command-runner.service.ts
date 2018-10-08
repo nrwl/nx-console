@@ -3,7 +3,7 @@ import { Apollo } from 'apollo-angular';
 import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
 import { BehaviorSubject, interval, Observable, of } from 'rxjs';
-import { concatMap, last, map, takeWhile } from 'rxjs/operators';
+import { concatMap, map, takeWhile } from 'rxjs/operators';
 
 export interface CommandOutput {
   status: 'success' | 'failure' | 'inprogress';
@@ -59,8 +59,7 @@ export class CommandRunner {
                 return of(r);
               }
             }),
-            takeWhile(r => r),
-            dryRun ? last() : map(r => r)
+            takeWhile(r => !!r)
           );
         })
       );
