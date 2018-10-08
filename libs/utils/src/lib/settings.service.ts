@@ -12,7 +12,6 @@ export interface WorkspaceDescription {
 interface SettingsData {
   readonly recent: WorkspaceDescription[];
   readonly canCollectData: boolean;
-  readonly showSupportPlugin: boolean;
   readonly installNodeManually: boolean;
 }
 
@@ -23,7 +22,6 @@ export class Settings {
   private settings: SettingsData = {
     recent: [],
     canCollectData: false,
-    showSupportPlugin: false,
     installNodeManually: false
   };
 
@@ -64,8 +62,8 @@ export class Settings {
     return this.settings.canCollectData;
   }
 
-  showSupportPlugin(): boolean | undefined {
-    return this.settings.showSupportPlugin;
+  showConnectPlugin(): boolean | undefined {
+    return true;
   }
 
   setCanCollectData(canCollectData: boolean): void {
@@ -83,7 +81,6 @@ export class Settings {
           {
             settings {
               canCollectData
-              showSupportPlugin
               installNodeManually
               recent {
                 path
@@ -110,7 +107,6 @@ export class Settings {
           mutation($data: String!) {
             updateSettings(data: $data) {
               canCollectData
-              showSupportPlugin
               installNodeManually
               recent {
                 path

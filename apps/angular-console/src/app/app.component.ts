@@ -69,11 +69,11 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly titleService: Title
   ) {
     settings.fetch().subscribe(() => {
-      if (settings.showSupportPlugin()) {
+      if (settings.showConnectPlugin()) {
         this.sidenavLinks.push({
           icon: 'question_answer',
-          route: '/support',
-          text: 'Ask a Narwhal Engineer'
+          route: '/connect',
+          text: 'Nrwl Connect'
         });
       }
     });
