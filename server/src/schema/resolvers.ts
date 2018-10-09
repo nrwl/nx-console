@@ -218,7 +218,7 @@ const Database: DatabaseResolvers.Resolvers = {
         args.showHidden
       ).toPromise();
       if (!v) {
-        return { path: args.path, files: [] };
+        return { path: args.path, exists: false, files: [] };
       }
       return v;
     } catch (e) {
