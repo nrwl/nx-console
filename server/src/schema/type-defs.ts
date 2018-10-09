@@ -101,6 +101,7 @@ export const typeDefs = gql`
 
   type FilesType {
     path: String!
+    exists: Boolean!
     files: [FileListType]
   }
 
