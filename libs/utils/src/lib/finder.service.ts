@@ -22,6 +22,7 @@ export class Finder {
           query($path: String!, $onlyDirectories: Boolean) {
             directory(path: $path, onlyDirectories: $onlyDirectories) {
               path
+              exists
               files {
                 name
                 type
