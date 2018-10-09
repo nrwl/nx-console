@@ -176,7 +176,6 @@ export interface IsNodeInstalledResult {
 
 export interface FilesType {
   path: string;
-  exists: boolean;
   files?: (FileListType | null)[] | null;
 }
 
@@ -1057,7 +1056,6 @@ export namespace IsNodeInstalledResultResolvers {
 export namespace FilesTypeResolvers {
   export interface Resolvers<Context = any> {
     path?: PathResolver<string, any, Context>;
-    exists?: ExistsResolver<boolean, any, Context>;
     files?: FilesResolver<(FileListType | null)[] | null, any, Context>;
   }
 
@@ -1066,11 +1064,6 @@ export namespace FilesTypeResolvers {
     Parent,
     Context
   >;
-  export type ExistsResolver<
-    R = boolean,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
   export type FilesResolver<
     R = (FileListType | null)[] | null,
     Parent = any,

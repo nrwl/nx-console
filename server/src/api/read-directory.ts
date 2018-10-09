@@ -16,11 +16,13 @@ export function readDirectory(
   onlyDirectories: boolean,
   showHidden: boolean
 ): Observable<Directory> {
-  if (dirName === '') {
-    return _defaultRootDirectory(onlyDirectories, showHidden);
+  if (dirName === '' && os.platform() === 'win32') {
+    return mountPoints();
+  } else if (dirName === '') {
+    return _readDirectory('/', onlyDirectories, showHidden);
   } else {
     if (dirName !== '/' && !directoryExists(dirName)) {
-      return of(null);
+      throw new Error(`Cannot find directory: '${dirName}'`);
     }
     return _readDirectory(dirName, onlyDirectories, showHidden);
   }
@@ -88,7 +90,6 @@ function _readDirectory(
       (files: Array<LocalFile | null>): Directory => {
         return {
           path: dirName,
-          exists: true,
           files: files.filter(t => {
             if (!t) return false;
 
@@ -105,12 +106,6 @@ function _readDirectory(
       }
     )
   );
-}
-
-function _defaultRootDirectory(onlyDirectories: boolean, showHidden: boolean) {
-  return os.platform() === 'win32'
-    ? mountPoints()
-    : _readDirectory('/', onlyDirectories, showHidden);
 }
 
 export function mountPoints(): Observable<Directory> {
@@ -132,7 +127,7 @@ export function mountPoints(): Observable<Directory> {
           })
         ];
       });
-      res.next({ path: '', exists: true, files: mountpoints });
+      res.next({ path: '', files: mountpoints });
       res.complete();
     }
   });

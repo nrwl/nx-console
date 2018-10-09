@@ -15,7 +15,6 @@ export interface LocalFile {
 
 export interface Directory {
   path: string;
-  exists: boolean;
   files: Array<LocalFile>;
 }
 
