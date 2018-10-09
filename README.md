@@ -80,3 +80,17 @@ Angular Console is a generic UI for the Angular CLI. It will work for any schema
 Please read the [contributing](https://github.com/nrwl/angular-console/blob/master/CONTRIBUTING.md) guidelines.
 
 Pick one of the issues from the [good first issue](https://github.com/nrwl/angular-console/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) list to get started.
+
+## Core Team
+
+Dan Muller | Victor Savkin | Jack Hsu | Wassim Chegham
+------------ | ------------- | ------------- | -------------
+![Dan Muller](https://github.com/nrwl/angular-console/blob/master/static/dan_pic.jpg) | ![Victor Savkin](https://github.com/nrwl/angular-console/blob/master/static/victor_pic.jpg) | ![Jack Hsu](https://github.com/nrwl/angular-console/blob/master/static/jack_pic.jpg) | ![Wassim Chegham](https://github.com/nrwl/angular-console/blob/master/static/wassim_pic.jpg)
+[mrmeku](https://github.com/mrmeku)|[vsavkin](https://github.com/vsavkin)|[jaysoo](https://github.com/jaysoo)|[manekinekko](https://github.com/manekinekko)
+
+The following folks from the Angular team at Google are working with the Angular Console team.
+
+
+Alex Eagle | Stephen Fluin | Matias Niemelä
+------------ | ------------- | -------------
+![Alex Eagle](https://github.com/nrwl/angular-console/blob/master/static/alex_eagle_pic.jpg) | ![Stephen Fluin](https://github.com/nrwl/angular-console/blob/master/static/stephen_pic.jpg) | ![Matias Niemelä](https://github.com/nrwl/angular-console/blob/master/static/matias_pic.jpg)
