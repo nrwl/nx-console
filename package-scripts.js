@@ -57,7 +57,7 @@ module.exports = {
         write: 'prettier --write \"./server/**/*.ts\"',
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
-      test: 'jest --maxWorkers=1 ./dist/server/test',
+      test: 'node ./tools/scripts/test ./dist/server/test',
       'gen-graphql-types': 'ts-node tools/gen-graphql-types.ts'
     },
     mac: {
