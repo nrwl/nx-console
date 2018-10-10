@@ -10,11 +10,14 @@ import {
   tasks,
   texts,
   waitForActionToComplete,
-  waitForAnimation
+  waitForAnimation,
+  whitelistGraphql
 } from './utils';
+import { clearRecentTask } from './tasks.utils';
 
 describe('Extensions', () => {
   beforeEach(() => {
+    whitelistGraphql();
     cy.visit('/workspaces');
     openProject(projectPath('proj-extensions'));
     goToExtensions();
@@ -57,8 +60,15 @@ describe('Extensions', () => {
 
     // check that the schematics added by angular material are available
     goToGenerate();
+    cy.wait(300); // Needed to de-flake this test
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('@angular/material');
     });
+  });
+
+  after(() => {
+    cy.visit('/workspaces');
+    openProject(projectPath('proj'));
+    clearRecentTask();
   });
 });

@@ -136,6 +136,7 @@ export const typeDefs = gql`
     ): CommandStarted
     stopCommand(id: String!): StopResult
     removeCommand(id: String!): RemoveResult
+    removeAllCommands: RemoveResult
     restartCommand(id: String!): RemoveResult
     openInEditor(editor: String!, path: String!): OpenInEditor
     updateSettings(data: String!): Settings!

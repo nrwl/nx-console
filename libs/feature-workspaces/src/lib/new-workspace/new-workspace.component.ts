@@ -18,7 +18,13 @@ import { MatDialog, MatExpansionPanel } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { of, BehaviorSubject, Observable, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  OperatorFunction,
+  of
+} from 'rxjs';
 import {
   filter,
   map,
@@ -120,7 +126,10 @@ export class NewWorkspaceComponent implements OnInit {
 
     this.ngNewForm$
       .pipe(
-        filter(form => Boolean(form)),
+        filter(form => Boolean(form)) as OperatorFunction<
+          FormGroup | null,
+          FormGroup
+        >,
         switchMap((form: FormGroup) => form.statusChanges)
       )
       .subscribe((formStatus: any) => {

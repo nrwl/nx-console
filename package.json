@@ -8,6 +8,8 @@
   },
   "license": "MIT",
   "scripts": {
+    "nx": "nx",
+    "ng": "ng",
     "start": "nps",
     "format": "nps format.write",
     "postinstall": "node ./tools/scripts/postinstall.js"

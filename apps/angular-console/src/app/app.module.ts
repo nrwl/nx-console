@@ -5,7 +5,6 @@ import {
 import { UiModule } from '@angular-console/ui';
 import {
   AnalyticsCollector,
-  CancelCommandGuard,
   IsNodeJsInstalledGuard,
   Messenger
 } from '@angular-console/utils';
@@ -31,7 +30,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
 
 import { AppComponent } from './app.component';
-import { BackgroundTasksComponent } from './background-tasks.component';
+import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
 
 export function initApollo(
   analytics: AnalyticsCollector,
@@ -70,11 +69,9 @@ export function initApollo(
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    BackgroundTasksComponent // delete it
-  ],
+  declarations: [AppComponent],
   imports: [
+    FeatureActionBarModule,
     MatSidenavModule,
     MatListModule,
     MatIconModule,
@@ -93,7 +90,7 @@ export function initApollo(
         {
           path: '',
           children: workspaceRoutes,
-          canActivateChild: [IsNodeJsInstalledGuard, CancelCommandGuard]
+          canActivateChild: [IsNodeJsInstalledGuard]
         },
         {
           path: 'install-nodejs',
@@ -110,7 +107,6 @@ export function initApollo(
   ],
   providers: [
     IsNodeJsInstalledGuard,
-    CancelCommandGuard,
     AnalyticsCollector,
     {
       provide: APOLLO_OPTIONS,

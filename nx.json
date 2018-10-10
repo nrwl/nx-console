@@ -36,6 +36,9 @@
     },
     "schema": {
       "tags": []
+    },
+    "feature-action-bar": {
+      "tags": []
     }
   }
 }

@@ -7,5 +7,5 @@
       {{ extension.description }}
     </div>
   </div>
-  <ui-terminal [command]="command$ | async" [input]="(commandOutput$|async)?.outChunk"></ui-terminal>
+  <ui-terminal [command]="command$ | async" [outChunk]="(commandOutput$|async)?.outChunk"></ui-terminal>
 </ui-task-runner>

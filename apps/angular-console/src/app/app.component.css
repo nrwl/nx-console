@@ -4,6 +4,10 @@
   overflow: hidden;
 }
 
+.content-container {
+  position: relative;
+}
+
 mat-sidenav-container {
   height: 100%;
 }

@@ -196,6 +196,7 @@ export interface Mutation {
   runNpm?: CommandStarted | null;
   stopCommand?: StopResult | null;
   removeCommand?: RemoveResult | null;
+  removeAllCommands?: RemoveResult | null;
   restartCommand?: RemoveResult | null;
   openInEditor?: OpenInEditor | null;
   updateSettings: Settings;
@@ -1115,6 +1116,11 @@ export namespace MutationResolvers {
     runNpm?: RunNpmResolver<CommandStarted | null, any, Context>;
     stopCommand?: StopCommandResolver<StopResult | null, any, Context>;
     removeCommand?: RemoveCommandResolver<RemoveResult | null, any, Context>;
+    removeAllCommands?: RemoveAllCommandsResolver<
+      RemoveResult | null,
+      any,
+      Context
+    >;
     restartCommand?: RestartCommandResolver<RemoveResult | null, any, Context>;
     openInEditor?: OpenInEditorResolver<OpenInEditor | null, any, Context>;
     updateSettings?: UpdateSettingsResolver<Settings, any, Context>;
@@ -1201,6 +1207,11 @@ export namespace MutationResolvers {
     id: string;
   }
 
+  export type RemoveAllCommandsResolver<
+    R = RemoveResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type RestartCommandResolver<
     R = RemoveResult | null,
     Parent = any,

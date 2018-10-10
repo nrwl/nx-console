@@ -47,7 +47,7 @@ describe('RecentCommands', () => {
       createStatusCalculator()
     );
     r.restartCommand('command3');
-    r.setFinalStatus('command2', 'success');
+    r.setFinalStatus('command2', 'successful');
     r.addCommand(
       'type',
       'command4',
@@ -59,9 +59,9 @@ describe('RecentCommands', () => {
     r.restartCommand('command4');
 
     expect(r.commandInfos.map(c => c.id)).toEqual([
-      'command1',
+      'command4',
       'command3',
-      'command4'
+      'command1'
     ]);
   });
 
@@ -132,9 +132,9 @@ describe('RecentCommands', () => {
       () => {},
       createStatusCalculator()
     );
-    r.setFinalStatus('command1', 'success');
+    r.setFinalStatus('command1', 'successful');
 
-    expect(r.commandInfos[0].status).toEqual('success');
+    expect(r.commandInfos[0].status).toEqual('successful');
   });
 
   it('should add out', () => {
@@ -158,8 +158,8 @@ describe('RecentCommands', () => {
     r.addOut('command2', 'one');
     r.addOut('command2', 'two');
 
-    expect(r.commandInfos[1].out).toEqual('onetwo');
-    expect(r.commandInfos[1].outChunk).toEqual('onetwo');
+    expect(r.commandInfos[0].out).toEqual('onetwo');
+    expect(r.commandInfos[0].outChunk).toEqual('onetwo');
   });
 
   it('should invoke calculator when adding out and setting status', () => {

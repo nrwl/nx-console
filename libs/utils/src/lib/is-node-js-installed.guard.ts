@@ -24,10 +24,7 @@ export class IsNodeJsInstalledGuard implements CanActivateChild {
         `
       })
       .pipe(
-        map(
-          (v: { data: { isNodejsInstalled: { result: boolean } } }) =>
-            v.data.isNodejsInstalled.result
-        ),
+        map((v: any) => v.data.isNodejsInstalled.result as boolean),
         tap(result => {
           if (!result) {
             this.router.navigate(['/install-nodejs']);

@@ -308,7 +308,7 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async stopCommand(_root: any, args: any) {
     try {
-      recentCommands.stopCommand(args.id);
+      recentCommands.stopCommands(recentCommands.getCommandById(args.id));
       return { result: true };
     } catch (e) {
       console.log(e);
@@ -322,6 +322,15 @@ const Mutation: MutationResolvers.Resolvers = {
   async removeCommand(_root: any, args: any) {
     try {
       recentCommands.removeCommand(args.id);
+      return { result: true };
+    } catch (e) {
+      console.log(e);
+      throw new Error(`Error when removing commands. Message: "${e.message}"`);
+    }
+  },
+  async removeAllCommands(_root: any, args: any) {
+    try {
+      recentCommands.removeAllCommands();
       return { result: true };
     } catch (e) {
       console.log(e);

@@ -3,13 +3,15 @@ import {
   expandFolder,
   selectFolder,
   uniqName,
-  waitForNgNew
+  waitForNgNew,
+  whitelistGraphql
 } from './utils';
 
 describe('Workspaces', () => {
   const name = uniqName('workspace');
 
   beforeEach(() => {
+    whitelistGraphql();
     cy.visit('/workspaces');
   });
 
