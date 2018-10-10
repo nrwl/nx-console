@@ -13,7 +13,6 @@ import {
   Output
 } from '@angular/core';
 import {
-  AuthService,
   ContextualActionBarService,
   ContextualTab
 } from '@nrwl/angular-console-enterprise-frontend';
@@ -43,17 +42,8 @@ export class ContextualActionBarComponent {
   constructor(
     readonly contextualActionBarService: ContextualActionBarService,
     readonly commandRunner: CommandRunner,
-    readonly messenger: Messenger,
-    readonly authService: AuthService
+    readonly messenger: Messenger
   ) {}
-
-  login() {
-    this.authService.auth();
-  }
-
-  logout() {
-    this.authService.unauth();
-  }
 
   trackByName(_: number, tab: ContextualTab) {
     return tab.name;

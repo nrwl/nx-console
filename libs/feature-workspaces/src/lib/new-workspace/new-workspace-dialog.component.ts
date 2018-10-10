@@ -14,7 +14,7 @@ export interface NgNewInvocation {
 @Component({
   selector: 'angular-console-new-workspace-dialog',
   template: `
-      <ui-terminal [command]="command" [input]="(commandOutput$|async)?.outChunk"></ui-terminal>
+      <ui-terminal [command]="command" [outChunk]="(commandOutput$|async)?.outChunk"></ui-terminal>
     `
 })
 export class NewWorkspaceDialogComponent {
@@ -36,7 +36,7 @@ export class NewWorkspaceDialogComponent {
     )
     .pipe(
       tap(command => {
-        if (command.status === 'success') {
+        if (command.status === 'successful') {
           this.dialogRef.close();
           this.router.navigate([
             '/workspace',

@@ -46,7 +46,7 @@ function createExecutableCommand(
       recentCommands.addOut(id, data.toString());
     });
     commandRunning.on('exit', (code: any) => {
-      recentCommands.setFinalStatus(id, code === 0 ? 'success' : 'failure');
+      recentCommands.setFinalStatus(id, code === 0 ? 'successful' : 'failed');
     });
     return commandRunning;
   };

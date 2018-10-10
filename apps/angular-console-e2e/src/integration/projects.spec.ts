@@ -3,11 +3,13 @@ import {
   projectNames,
   projectPath,
   texts,
-  waitForAnimation
+  waitForAnimation,
+  whitelistGraphql
 } from './utils';
 
 describe('Projects', () => {
   beforeEach(() => {
+    whitelistGraphql();
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     cy.get('div.title').contains('Projects');

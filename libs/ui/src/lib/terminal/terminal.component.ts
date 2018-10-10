@@ -40,11 +40,17 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   @Input() command: string;
 
   @Input()
-  set input(s: string) {
+  set outChunk(s: string) {
     if (!s) {
       return;
     }
     this.output += s;
+    this.writeOutput(s);
+  }
+
+  @Input()
+  set out(s: string) {
+    this.output = s;
     this.writeOutput(s);
   }
 

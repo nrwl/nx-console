@@ -8,4 +8,3 @@ export * from './lib/serializer.service';
 export * from './lib/settings.service';
 export * from './lib/is-node-js-installed.guard';
 export * from './lib/polling-constants';
-export * from './lib/cancel-command.guard';

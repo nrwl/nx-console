@@ -10,11 +10,13 @@ import {
   texts,
   toggleBoolean,
   uniqName,
-  waitForAutocomplete
+  waitForAutocomplete,
+  whitelistGraphql
 } from './utils';
 
 describe('Forms', () => {
   beforeEach(() => {
+    whitelistGraphql();
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToGenerate();

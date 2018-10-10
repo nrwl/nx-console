@@ -12,14 +12,14 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content id="navigationSidenavContent">
-    <div fxLayout="column" fxFlex>
+    <div fxLayout="column" fxFlex class="content-container">
       <ui-contextual-action-bar (hamburgerClicked)="showSiteMenu = true"></ui-contextual-action-bar>
-      <angular-console-background-tasks></angular-console-background-tasks>
 
       <div fxFlex class="outlet-container" [@routerTransition]="routerTransition | async">
         <router-outlet></router-outlet>
       </div>
 
+      <angular-console-action-bar></angular-console-action-bar>
       <ui-data-collection></ui-data-collection>
     </div>
   </mat-sidenav-content>

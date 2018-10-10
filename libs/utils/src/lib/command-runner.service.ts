@@ -5,9 +5,17 @@ import gql from 'graphql-tag';
 import { BehaviorSubject, interval, Observable, of } from 'rxjs';
 import { concatMap, map, takeWhile } from 'rxjs/operators';
 import { COMMANDS_POLLING } from './polling-constants';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
+
+export enum CommandStatus {
+  SUCCESSFUL = 'successful',
+  FAILED = 'failed',
+  IN_PROGRESS = 'in-progress',
+  TERMINATED = 'terminated'
+}
 
 export interface IncrementalCommandOutput {
-  status: 'success' | 'failure' | 'inprogress' | 'terminated';
+  status: CommandStatus;
   outChunk: string;
   detailedStatus: any;
 }
@@ -18,7 +26,7 @@ export interface CommandResponse {
   out: string;
   outChunk: string;
   detailedStatus: any;
-  status: 'success' | 'failure' | 'inprogress' | 'terminated';
+  status: CommandStatus;
 }
 
 @Injectable({
@@ -28,7 +36,19 @@ export class CommandRunner {
   readonly activeCommand$ = new BehaviorSubject(false);
   activeCommandId: string;
 
-  constructor(private readonly apollo: Apollo) {}
+  constructor(
+    private readonly apollo: Apollo,
+    contextualActionBarService: ContextualActionBarService
+  ) {
+    contextualActionBarService.contextualActions$.subscribe(
+      contextualActions => {
+        if (!contextualActions) {
+          this.activeCommandId = '';
+          this.activeCommand$.next(false);
+        }
+      }
+    );
+  }
 
   runCommand(
     mutation: DocumentNode,
@@ -72,7 +92,7 @@ export class CommandRunner {
                   ? JSON.parse(cc.detailedStatus)
                   : null
               };
-              if (c.status !== 'inprogress') {
+              if (c.status !== 'in-progress') {
                 if (!dryRun) {
                   this.activeCommand$.next(false);
                 }
@@ -150,6 +170,20 @@ export class CommandRunner {
           }
         `,
         variables: { id }
+      })
+      .subscribe(() => {});
+  }
+
+  removeAllCommands() {
+    return this.apollo
+      .mutate({
+        mutation: gql`
+          mutation {
+            removeAllCommands {
+              result
+            }
+          }
+        `
       })
       .subscribe(() => {});
   }

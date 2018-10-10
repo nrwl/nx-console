@@ -31,7 +31,8 @@ import {
 } from '@nrwl/angular-console-enterprise-frontend';
 
 interface Route {
-  icon: string;
+  icon?: string;
+  svgIcon?: string;
   url: string;
   title: string;
 }
@@ -77,7 +78,7 @@ export class WorkspaceComponent implements OnDestroy {
   readonly routes: Array<Route> = [
     { icon: 'view_list', url: 'projects', title: 'Projects' },
     { icon: 'code', url: 'generate', title: 'Generate Code' },
-    { icon: 'play_arrow', url: 'tasks', title: 'Run Tasks' },
+    { svgIcon: 'terminal', url: 'tasks', title: 'Run Tasks' },
     {
       icon: 'extension',
       url: 'extensions',

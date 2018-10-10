@@ -1,0 +1,182 @@
+.action-bar-spacer {
+  height: 64px;
+}
+
+.action-bar-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  position: absolute;
+  overflow: hidden;
+  background: white;
+  z-index: 10;
+  max-height: calc(100vh - 24px);
+  overflow-y: hidden;
+}
+
+.action-bar {
+  overflow: hidden;
+  width: auto;
+  position: relative;
+  cursor: pointer;
+
+  span {
+    user-select: none;
+  }
+}
+
+.terminal-container {
+  margin: 0px 16px;
+  margin-bottom: 16px;
+  background: black;
+  padding: 8px;
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  ui-terminal {
+    display: block;
+    height: 100%;
+  }
+}
+
+mat-list {
+  padding: 0;
+
+  mat-list-item {
+    height: 64px !important;
+    position: relative;
+    cursor: pointer;
+    z-index: 2;
+
+    .command {
+      font-family: 'Roboto Mono', monospace;
+      padding-right: 16px !important;
+      font-size: 16px;
+      color: #000000de;
+      line-height: 20px;
+    }
+
+    .replay-button mat-icon {
+      position: relative;
+      top: 2px !important;
+    }
+
+    .task-avatar {
+      line-height: 40px;
+
+      text-align: center;
+      color: white;
+      position: relative;
+      background: rgba(0, 0, 0, 0.54);
+
+      &:hover:not(.freshly-toggled) {
+        background: rgba(0, 0, 0, 0.87);
+      }
+
+      .process-action mat-icon {
+        position: relative;
+        top: -1px;
+      }
+
+      &.in-progress {
+        background: none;
+
+        .process-action mat-icon {
+          top: 1px;
+        }
+      }
+
+      .task-status {
+        opacity: 1;
+        cursor: default;
+      }
+
+      .task-status,
+      .process-action {
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      &.freshly-toggled {
+        .task-status,
+        .process-action {
+          transition: none;
+        }
+
+        .process-action {
+          pointer-events: none;
+        }
+      }
+
+      &:hover:not(.freshly-toggled) {
+        .task-status {
+          opacity: 0;
+        }
+
+        .process-action {
+          opacity: 1;
+        }
+      }
+
+      .process-action {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        z-index: 11;
+        color: #4275c6;
+      }
+
+      mat-icon {
+        height: 28px;
+        width: 28px;
+        font-size: 28px;
+        color: white;
+      }
+    }
+
+    .workspace-indicator {
+      border-radius: 50%;
+      height: 12px;
+      width: 12px;
+      min-height: 12px;
+      min-width: 12px;
+      display: inline-block;
+      margin-right: 6px;
+      position: relative;
+      top: 1px;
+    }
+
+    .task-action {
+      &:hover {
+        mat-icon {
+          color: rgba(0, 0, 0, 0.87);
+        }
+      }
+      mat-icon {
+        transition: color 0.15s ease-in-out;
+        color: rgba(0, 0, 0, 0.54);
+      }
+    }
+
+    .workspace-name {
+      color: #00000099;
+    }
+
+    .second-line {
+      padding-top: 6px !important;
+      font-size: 14px;
+      line-height: 16px;
+    }
+  }
+}

@@ -1,5 +1,21 @@
 import * as path from 'path';
 
+export function whitelistGraphql() {
+  cy.server({
+    whitelist: xhr => {
+      if (xhr.url.indexOf('graphql') !== -1) {
+        return true;
+      }
+      // this function receives the xhr object in question and
+      // will whitelist if it's a GET that appears to be a static resource
+      return (
+        xhr.method === 'GET' &&
+        /\.(jsx?|html|css|svg|png|jpg)(\?.*)?$/.test(xhr.url)
+      );
+    }
+  });
+}
+
 export function clickOnFieldGroup(group: string) {
   cy.get('mat-expansion-panel-header')
     .contains(group)
@@ -78,24 +94,24 @@ export function projectNames(callback: (s: any) => void) {
 }
 
 export function goToGenerate() {
-  cy.get('button#go-to-generate').click();
+  cy.get('button#go-to-generate').click({ force: true });
   waitForAnimation();
 }
 
 export function goToExtensions() {
-  cy.get('button#go-to-extensions').click();
+  cy.get('button#go-to-extensions').click({ force: true });
   waitForAnimation();
 }
 
 export function goToTasks() {
-  cy.get('button#go-to-tasks').click();
+  cy.get('button#go-to-tasks').click({ force: true });
   waitForAnimation();
 }
 
 export function taskListHeaders(callback: (s: any) => void) {
   cy.get('mat-nav-list.task-list').within(() => {
     cy.root()
-      .find('h3.mat-subheader')
+      .find('h3.mat-subheader', { timeout: 5000 })
       .should(callback);
   });
 }

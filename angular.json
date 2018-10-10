@@ -100,8 +100,7 @@
       "root": "apps/angular-console-e2e/",
       "sourceRoot": "apps/angular-console-e2e/src",
       "projectType": "application",
-      "architect": {
-      }
+      "architect": {}
     },
     "feature-install-node-js": {
       "root": "libs/feature-install-node-js",
@@ -317,6 +316,25 @@
           }
         }
       }
+    },
+    "feature-action-bar": {
+      "root": "libs/feature-action-bar",
+      "sourceRoot": "libs/feature-action-bar/src",
+      "projectType": "library",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/feature-action-bar/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {
@@ -326,6 +344,14 @@
     },
     "packageManager": "yarn",
     "defaultCollection": "@nrwl/schematics"
+  },
+  "schematics": {
+    "@nrwl/schematics:component": {
+      "styleext": "scss"
+    },
+    "@nrwl/schematics:library": {
+      "unitTestRunner": "jest"
+    }
   },
   "defaultProject": "angular-console"
 }

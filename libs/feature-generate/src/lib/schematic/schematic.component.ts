@@ -167,7 +167,7 @@ export class SchematicComponent implements OnInit {
         this.out.reset();
         if (!c.valid) {
           // cannot use change detection because the operation isn't idempotent
-          this.out.input = 'Command is missing required fields';
+          this.out.out = 'Command is missing required fields';
           return of();
         }
 

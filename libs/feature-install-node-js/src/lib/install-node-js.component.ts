@@ -37,11 +37,7 @@ export class InstallNodeJsComponent {
         `
       })
       .pipe(
-        map(
-          (response: { data: { installNodeJs: any } }) =>
-            response.data.installNodeJs
-        ),
-        switchMap(status => {
+        switchMap(() => {
           return this.apollo
             .watchQuery({
               pollInterval: NODE_JS_INSTALL_POLLING,
@@ -58,10 +54,7 @@ export class InstallNodeJsComponent {
               `
             })
             .valueChanges.pipe(
-              map(
-                (result: { data: { installNodeJsStatus: any } }) =>
-                  result.data.installNodeJsStatus
-              )
+              map((result: any) => result.data.installNodeJsStatus)
             );
         }),
         tap(({ success, error }: any) => {

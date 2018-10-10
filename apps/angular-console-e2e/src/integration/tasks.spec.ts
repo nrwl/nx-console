@@ -10,11 +10,21 @@ import {
   taskListHeaders,
   tasks,
   texts,
-  waitForActionToComplete
+  waitForActionToComplete,
+  whitelistGraphql
 } from './utils';
+import {
+  checkMultipleRecentTasks,
+  checkSingleRecentTask,
+  CommandStatus,
+  toggleRecentTasksExpansion,
+  checkActionBarHidden,
+  clearAllRecentTasks
+} from './tasks.utils';
 
 describe('Tasks', () => {
   beforeEach(() => {
+    whitelistGraphql();
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToTasks();
@@ -76,6 +86,7 @@ describe('Tasks', () => {
 
     waitForActionToComplete();
     checkFileExists(`dist/proj/main.js`);
+    checkActionBarHidden();
 
     goBack();
 
@@ -85,7 +96,12 @@ describe('Tasks', () => {
     });
   });
 
-  it('cancels a task when navigating away', () => {
+  it('show the recent tasks bar after navigating away', () => {
+    checkSingleRecentTask({
+      command: 'ng build proj',
+      status: CommandStatus.SUCCESSFUL
+    });
+
     clickOnTask('proj', 'test');
     cy.get('div.context-title').contains('ng test proj');
 
@@ -95,12 +111,33 @@ describe('Tasks', () => {
       .contains('Run')
       .click();
 
+    checkActionBarHidden();
+
     cy.wait(100);
 
     goBack();
 
     cy.get('div.title').contains('Run Tasks');
-    checkMessage('Command has been canceled');
+
+    checkMultipleRecentTasks({
+      numTasks: 2,
+      isExpanded: false
+    });
+
+    toggleRecentTasksExpansion();
+
+    checkMultipleRecentTasks({
+      numTasks: 2,
+      isExpanded: true,
+      tasks: [
+        { command: 'ng test proj', status: CommandStatus.IN_PROGRESS },
+        { command: 'ng build proj', status: CommandStatus.SUCCESSFUL }
+      ]
+    });
+
+    clearAllRecentTasks();
+
+    checkActionBarHidden();
   });
 
   it('runs an npm script', () => {

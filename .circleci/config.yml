@@ -6,18 +6,19 @@ version: 2
 jobs:
   build:
     docker:
-    - image: circleci/node:8.11.3-stretch-browsers
+      - image: circleci/node:8.11.3-stretch-browsers
     working_directory: ~/repo
 
     steps:
-    - checkout
-    - run: yarn install
-    - run: yarn start format.check
-    - run: yarn start lint
-    - run: yarn start server.compile
-    - run: yarn start test
-    - run: yarn start e2e.fixtures
-    - run:
-        command: yarn start e2e.run
-        environment:
-          CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
+      - checkout
+      - run: yarn install
+      - run: yarn start format.check
+      - run: yarn start lint
+      - run: yarn start server.compile
+      - run: yarn start test
+      - run: yarn start e2e.fixtures
+      - run:
+          command: yarn start e2e.run
+          no_output_timeout: 20m
+          environment:
+            CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26

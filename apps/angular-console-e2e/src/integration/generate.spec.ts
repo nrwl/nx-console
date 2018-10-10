@@ -9,11 +9,14 @@ import {
   taskListHeaders,
   tasks,
   texts,
-  uniqName
+  uniqName,
+  whitelistGraphql
 } from './utils';
+import { clearRecentTask } from './tasks.utils';
 
 describe('Generate', () => {
   beforeEach(() => {
+    whitelistGraphql();
     cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToGenerate();
@@ -78,5 +81,11 @@ describe('Generate', () => {
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('@schematics/angular');
     });
+  });
+
+  after(() => {
+    cy.visit('/workspaces');
+    openProject(projectPath('proj'));
+    clearRecentTask();
   });
 });

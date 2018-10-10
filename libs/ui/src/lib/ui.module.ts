@@ -24,7 +24,8 @@ import {
   MatToolbarModule,
   MatTooltipModule,
   MatTreeModule,
-  MatProgressBarModule
+  MatProgressBarModule,
+  MatProgressSpinnerModule
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
@@ -39,6 +40,7 @@ import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
 
 const IMPORTS = [
+  MatProgressSpinnerModule,
   MatProgressBarModule,
   MatMenuModule,
   CdkTreeModule,
@@ -121,6 +123,7 @@ export class UiModule {
     this.addIcon('vscode', 'vscode.svg');
     this.addIcon('webstorm', 'webstorm.svg');
     this.addIcon('intellij', 'intellij.svg');
+    this.addIcon('terminal', 'terminal.svg');
   }
 
   private addIcon(name: string, url: string) {
