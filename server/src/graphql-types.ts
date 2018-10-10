@@ -208,6 +208,7 @@ export interface Mutation {
   openInEditor?: OpenInEditor | null;
   updateSettings: Settings;
   installNodeJs?: InstallNodeJsStatus | null;
+  openInBrowser?: OpenInBrowserResult | null;
   authenticate: AuthResponseType;
   unauthenticate: AuthResponseType;
   addTicket?: Ticket | null;
@@ -225,6 +226,10 @@ export interface StopResult {
 
 export interface OpenInEditor {
   response: string;
+}
+
+export interface OpenInBrowserResult {
+  result: boolean;
 }
 
 export interface AuthResponseType {
@@ -304,6 +309,9 @@ export interface OpenInEditorMutationArgs {
 }
 export interface UpdateSettingsMutationArgs {
   data: string;
+}
+export interface OpenInBrowserMutationArgs {
+  url: string;
 }
 export interface AddTicketMutationArgs {
   subject: string;
@@ -1164,6 +1172,11 @@ export namespace MutationResolvers {
       any,
       Context
     >;
+    openInBrowser?: OpenInBrowserResolver<
+      OpenInBrowserResult | null,
+      any,
+      Context
+    >;
     authenticate?: AuthenticateResolver<AuthResponseType, any, Context>;
     unauthenticate?: UnauthenticateResolver<AuthResponseType, any, Context>;
     addTicket?: AddTicketResolver<Ticket | null, any, Context>;
@@ -1257,6 +1270,15 @@ export namespace MutationResolvers {
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
+  export type OpenInBrowserResolver<
+    R = OpenInBrowserResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, OpenInBrowserArgs>;
+  export interface OpenInBrowserArgs {
+    url: string;
+  }
+
   export type AuthenticateResolver<
     R = AuthResponseType,
     Parent = any,
@@ -1328,6 +1350,18 @@ export namespace OpenInEditorResolvers {
 
   export type ResponseResolver<
     R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace OpenInBrowserResultResolvers {
+  export interface Resolvers<Context = any> {
+    result?: ResultResolver<boolean, any, Context>;
+  }
+
+  export type ResultResolver<
+    R = boolean,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

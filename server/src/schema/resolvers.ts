@@ -1,6 +1,6 @@
 import { mutations, queries } from '@nrwl/angular-console-enterprise-electron';
 import * as path from 'path';
-
+import { shell } from 'electron';
 import {
   commandInProgress,
   runCommand,
@@ -305,6 +305,11 @@ const Mutation: MutationResolvers.Resolvers = {
       console.log(e);
       throw new Error(`Error when stopping commands. Message: "${e.message}"`);
     }
+  },
+  async openInBrowser(_root: any, args: any) {
+    console.log('open external', args.url);
+    shell.openExternal(args.url);
+    return { result: true };
   },
   openInEditor(_root: any, args: any) {
     try {

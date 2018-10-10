@@ -116,6 +116,10 @@ export const typeDefs = gql`
     result: Boolean!
   }
 
+  type OpenInBrowserResult {
+    result: Boolean!
+  }
+
   type Mutation {
     ngAdd(path: String!, name: String!): CommandStarted
     ngNew(path: String!, name: String!, collection: String!): CommandStarted
@@ -134,6 +138,7 @@ export const typeDefs = gql`
     openInEditor(editor: String!, path: String!): OpenInEditor
     updateSettings(data: String!): Settings!
     installNodeJs: InstallNodeJsStatus
+    openInBrowser(url: String!): OpenInBrowserResult
     authenticate: AuthResponseType!
     unauthenticate: AuthResponseType!
     addTicket(subject: String!, question: String!): Ticket
