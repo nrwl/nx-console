@@ -194,7 +194,13 @@ function checkForUpdates() {
         const r = await autoUpdater.checkForUpdates();
         if (r.downloadPromise) {
           await r.downloadPromise;
-          showRestartDialog();
+
+          // awaiting for downloadPromise isn't a good indication
+          // there is a race condition, so we should give the system
+          // some time to apply the update
+          setTimeout(() => {
+            showRestartDialog();
+          }, 15000);
         } else {
           console.log('checkForUpdates is called. downloadPromise is null.');
         }
