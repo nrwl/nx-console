@@ -34,6 +34,7 @@ export const typeDefs = gql`
     workspace: String
     command: String!
     status: String!
+    detailedStatus: String
     outChunk: String!
     out: String!
   }
