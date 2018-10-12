@@ -197,7 +197,10 @@ const Database: DatabaseResolvers.Resolvers = {
             command: c.command,
             status: c.status,
             out: c.out,
-            outChunk: c.outChunk
+            outChunk: c.outChunk,
+            detailedStatus: c.detailedStatusCalculator.detailedStatus
+              ? JSON.stringify(c.detailedStatusCalculator.detailedStatus)
+              : null
           };
           c.outChunk = '';
           return r;

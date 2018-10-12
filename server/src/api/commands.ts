@@ -1,4 +1,5 @@
 import * as os from 'os';
+import { DetailedStatusCalculator } from './detailed-status-calculator';
 
 interface CommandInformation {
   id: string;
@@ -10,6 +11,7 @@ interface CommandInformation {
   out: string;
   factory: Function;
   commandRunning: any;
+  detailedStatusCalculator: DetailedStatusCalculator<any>;
 }
 
 export class RecentCommands {
@@ -22,7 +24,8 @@ export class RecentCommands {
     id: string,
     workspace: string,
     command: string,
-    factory: any
+    factory: any,
+    detailedStatusCalculator: DetailedStatusCalculator<any>
   ) {
     if (this.commandInfos.length >= this.MAX_COMMANDS) {
       if (!this.hasCompletedCommands(this.commandInfos)) {
@@ -42,6 +45,7 @@ export class RecentCommands {
       out: '',
       outChunk: '',
       factory,
+      detailedStatusCalculator,
       commandRunning: null
     });
   }
@@ -61,6 +65,14 @@ export class RecentCommands {
     const c = this.findMatchingCommand(id, this.commandInfos);
     c.out += out;
     c.outChunk += out;
+    try {
+      c.detailedStatusCalculator.addOut(out);
+    } catch (e) {
+      // Because detailedStatusCalculator are implemented
+      // without the build event protocol for now, they may fail.
+      // Console must remain working after their failure.
+      console.error('detailedStatusCalculator.addOut failed', e.message);
+    }
   }
 
   // TOOD: vsavkin should convert status into an enum
@@ -68,6 +80,14 @@ export class RecentCommands {
     const c = this.findMatchingCommand(id, this.commandInfos);
     if (c.status === 'inprogress' || c.status === 'waiting') {
       c.status = status;
+    }
+    try {
+      c.detailedStatusCalculator.setStatus(c.status as any);
+    } catch (e) {
+      // Because detailedStatusCalculator are implemented
+      // without the build event protocol for now, they may fail.
+      // Console must remain working after their failure.
+      console.error('detailedStatusCalculator.setStatus failed', e);
     }
   }
 
@@ -80,6 +100,7 @@ export class RecentCommands {
           c.commandRunning.kill('SIGKILL');
         }
         c.status = 'terminated';
+        c.detailedStatusCalculator.setStatus('terminated');
         c.commandRunning = null;
       }
     });

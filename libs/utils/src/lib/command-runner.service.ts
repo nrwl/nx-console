@@ -9,6 +9,7 @@ import { COMMANDS_POLLING } from './polling-constants';
 export interface IncrementalCommandOutput {
   status: 'success' | 'failure' | 'inprogress' | 'terminated';
   outChunk: string;
+  detailedStatus: any;
 }
 
 export interface CommandResponse {
@@ -16,6 +17,7 @@ export interface CommandResponse {
   command: string;
   out: string;
   outChunk: string;
+  detailedStatus: any;
   status: 'success' | 'failure' | 'inprogress' | 'terminated';
 }
 
@@ -55,6 +57,7 @@ export class CommandRunner {
                     commands(id: $id) {
                       status
                       outChunk
+                      detailedStatus
                     }
                   }
                 `,
@@ -62,14 +65,20 @@ export class CommandRunner {
               });
             }),
             map((r: any) => r.data.commands[0]),
-            concatMap(r => {
-              if (r.status !== 'inprogress') {
+            concatMap(cc => {
+              const c = {
+                ...cc,
+                detailedStatus: cc.detailedStatus
+                  ? JSON.parse(cc.detailedStatus)
+                  : null
+              };
+              if (c.status !== 'inprogress') {
                 if (!dryRun) {
                   this.activeCommand$.next(false);
                 }
-                return of(r, null);
+                return of(c, null);
               } else {
-                return of(r);
+                return of(c);
               }
             }),
             takeWhile(r => !!r)
@@ -111,12 +120,23 @@ export class CommandRunner {
               status
               out
               outChunk
+              detailedStatus
             }
           }
         `,
         variables: { id }
       })
-      .valueChanges.pipe(map((r: any) => r.data.commands[0]));
+      .valueChanges.pipe(
+        map((r: any) => {
+          const c = r.data.commands[0];
+          return {
+            ...c,
+            detailedStatus: c.detailedStatus
+              ? JSON.parse(c.detailedStatus)
+              : null
+          };
+        })
+      );
   }
 
   stopCommand(id: string) {

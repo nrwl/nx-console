@@ -183,6 +183,7 @@ export interface CommandResponse {
   workspace?: string | null;
   command: string;
   status: string;
+  detailedStatus?: string | null;
   outChunk: string;
   out: string;
 }
@@ -1058,6 +1059,7 @@ export namespace CommandResponseResolvers {
     workspace?: WorkspaceResolver<string | null, any, Context>;
     command?: CommandResolver<string, any, Context>;
     status?: StatusResolver<string, any, Context>;
+    detailedStatus?: DetailedStatusResolver<string | null, any, Context>;
     outChunk?: OutChunkResolver<string, any, Context>;
     out?: OutResolver<string, any, Context>;
   }
@@ -1084,6 +1086,11 @@ export namespace CommandResponseResolvers {
   > = Resolver<R, Parent, Context>;
   export type StatusResolver<
     R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type DetailedStatusResolver<
+    R = string | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
