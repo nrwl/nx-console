@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { shell } from 'electron';
 
-import { recentCommands, runCommand } from '../api/run-command';
+import { commands, runCommand } from '../api/run-command';
 import {
   completeAbsoluteModules,
   completeFiles,
@@ -189,7 +189,7 @@ const Database: DatabaseResolvers.Resolvers = {
   commands(_root: any, args: any) {
     try {
       return filterById(
-        recentCommands.commandInfos.map(c => {
+        commands.recent.map(c => {
           const r = {
             id: c.id,
             type: c.id,
@@ -308,7 +308,9 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async stopCommand(_root: any, args: any) {
     try {
-      recentCommands.stopCommands(recentCommands.getCommandById(args.id));
+      commands.stopCommands([
+        commands.findMatchingCommand(args.id, commands.recent)
+      ]);
       return { result: true };
     } catch (e) {
       console.log(e);
@@ -321,7 +323,7 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async removeCommand(_root: any, args: any) {
     try {
-      recentCommands.removeCommand(args.id);
+      commands.removeCommand(args.id);
       return { result: true };
     } catch (e) {
       console.log(e);
@@ -330,7 +332,7 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async removeAllCommands(_root: any, args: any) {
     try {
-      recentCommands.removeAllCommands();
+      commands.removeAllCommands();
       return { result: true };
     } catch (e) {
       console.log(e);
@@ -339,7 +341,7 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async restartCommand(_root: any, args: any) {
     try {
-      recentCommands.restartCommand(args.id);
+      commands.restartCommand(args.id);
       return { result: true };
     } catch (e) {
       console.log(e);
@@ -351,7 +353,7 @@ const Mutation: MutationResolvers.Resolvers = {
   openInEditor(_root: any, args: any) {
     try {
       openInEditor(args.editor, args.path);
-      return { response: 'Success' };
+      return { response: 'successful' };
     } catch (e) {
       console.log(e);
       throw new Error(`Error when opening an editor. Message: "${e.message}"`);
