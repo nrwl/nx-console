@@ -1,6 +1,6 @@
 query BasicWorkspace($path: String!) {
   workspace(path: $path)
-    @NgModule(module: "../feature-workspaces.module#FeatureWorkspaces") {
+    @NgModule(module: "../feature-workspaces.module#FeatureWorkspacesModule") {
     path
     name
   }
