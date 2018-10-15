@@ -116,10 +116,10 @@ import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
 
-import { FeatureWorkspaces } from '../feature-workspaces.module';
+import { FeatureWorkspacesModule } from '../feature-workspaces.module';
 
 @Injectable({
-  providedIn: FeatureWorkspaces
+  providedIn: FeatureWorkspacesModule
 })
 export class BasicWorkspaceGQL extends Apollo.Query<
   BasicWorkspace.Query,
@@ -135,7 +135,7 @@ export class BasicWorkspaceGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureWorkspaces
+  providedIn: FeatureWorkspacesModule
 })
 export class NgNewGQL extends Apollo.Mutation<NgNew.Mutation, NgNew.Variables> {
   document: any = gql`
@@ -147,7 +147,7 @@ export class NgNewGQL extends Apollo.Mutation<NgNew.Mutation, NgNew.Variables> {
   `;
 }
 @Injectable({
-  providedIn: FeatureWorkspaces
+  providedIn: FeatureWorkspacesModule
 })
 export class OpenWorkspaceGQL extends Apollo.Query<
   OpenWorkspace.Query,
@@ -162,7 +162,7 @@ export class OpenWorkspaceGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureWorkspaces
+  providedIn: FeatureWorkspacesModule
 })
 export class SchematicCollectionsGQL extends Apollo.Query<
   SchematicCollections.Query,
@@ -178,7 +178,7 @@ export class SchematicCollectionsGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureWorkspaces
+  providedIn: FeatureWorkspacesModule
 })
 export class WorkspaceGQL extends Apollo.Query<
   Workspace.Query,
