@@ -1,4 +1,4 @@
-import { RecentCommands } from './commands';
+import { Commands } from './commands';
 import { readJsonFile } from '../utils';
 import { createDetailedStatusCalculator } from './detailed-status-calculator';
 import { normalizeCommands } from '../builder-utils';
@@ -8,7 +8,7 @@ const spawn = require('node-pty-prebuilt').spawn;
 
 let commandRunIndex = 0;
 
-export const recentCommands = new RecentCommands(5);
+export const commands = new Commands(5, 15);
 
 export function runCommand(
   type: string,
@@ -24,15 +24,8 @@ export function runCommand(
   const factory = createExecutableCommand(id, cwd, program, cmds);
   const statusCalculator = createDetailedStatusCalculator(cwd, cmds);
 
-  recentCommands.addCommand(
-    type,
-    id,
-    workspace,
-    command,
-    factory,
-    statusCalculator
-  );
-  recentCommands.restartCommand(id);
+  commands.addCommand(type, id, workspace, command, factory, statusCalculator);
+  commands.startCommand(id);
   return { id };
 }
 
@@ -48,10 +41,10 @@ function createExecutableCommand(
       cols: 80
     });
     commandRunning.on('data', (data: any) => {
-      recentCommands.addOut(id, data.toString());
+      commands.addOut(id, data.toString());
     });
     commandRunning.on('exit', (code: any) => {
-      recentCommands.setFinalStatus(id, code === 0 ? 'successful' : 'failed');
+      commands.setFinalStatus(id, code === 0 ? 'successful' : 'failed');
     });
     return commandRunning;
   };

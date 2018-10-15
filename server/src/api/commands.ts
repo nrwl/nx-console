@@ -14,10 +14,14 @@ interface CommandInformation {
   detailedStatusCalculator: DetailedStatusCalculator<any>;
 }
 
-export class RecentCommands {
-  commandInfos = [] as CommandInformation[];
+export class Commands {
+  recent = [] as CommandInformation[];
+  history = [] as CommandInformation[];
 
-  constructor(private readonly MAX_COMMANDS: number) {}
+  constructor(
+    private readonly MAX_RECENT: number,
+    private readonly MAX_HISTORY: number
+  ) {}
 
   addCommand(
     type: string,
@@ -27,82 +31,33 @@ export class RecentCommands {
     factory: any,
     detailedStatusCalculator: DetailedStatusCalculator<any>
   ) {
-    if (this.commandInfos.length >= this.MAX_COMMANDS) {
-      if (!this.hasCompletedCommands(this.commandInfos)) {
-        throw new Error(
-          `Cannot run more than ${this.MAX_COMMANDS} commands in parallel`
-        );
-      }
-      this.commandInfos = this.withoutFirstCompletedCommand(this.commandInfos);
-    }
-
-    this.commandInfos = [
-      {
-        id,
-        type,
-        workspace,
-        command,
-        status: 'waiting',
-        out: '',
-        outChunk: '',
-        factory,
-        detailedStatusCalculator,
-        commandRunning: null
-      },
-      ...this.commandInfos
-    ];
+    const item = {
+      id,
+      type,
+      workspace,
+      command,
+      status: 'waiting',
+      out: '',
+      outChunk: '',
+      factory,
+      detailedStatusCalculator,
+      commandRunning: null
+    };
+    this.insertIntoHistory(item);
+    this.insertIntoRecent(item);
   }
 
   restartCommand(id: string) {
-    const c = this.findMatchingCommand(id, this.commandInfos);
+    const c = this.findMatchingCommand(id, this.recent);
     if (c) {
       if (c.status === 'in-progress') {
-        this.stopCommands(this.getCommandById(id));
+        this.stopCommands([this.findMatchingCommand(id, this.recent)]);
       }
-      c.out = '';
-      c.outChunk = '';
-      c.status = 'in-progress';
-      c.commandRunning = c.factory();
-      c.detailedStatusCalculator.reset();
+      const restarted = { ...c, out: '', outChunk: '' };
+      this.insertIntoHistory(restarted);
+      this.insertIntoRecent(restarted);
+      restarted.detailedStatusCalculator.reset();
     }
-  }
-
-  addOut(id: string, out: string) {
-    const c = this.findMatchingCommand(id, this.commandInfos);
-    if (c) {
-      c.out += out;
-      c.outChunk += out;
-      try {
-        c.detailedStatusCalculator.addOut(out);
-      } catch (e) {
-        // Because detailedStatusCalculator are implemented
-        // without the build event protocol for now, they may fail.
-        // Console must remain working after their failure.
-        console.error('detailedStatusCalculator.addOut failed', e.message);
-      }
-    }
-  }
-
-  // TOOD: vsavkin should convert status into an enum
-  setFinalStatus(id: string, status: string) {
-    const c = this.findMatchingCommand(id, this.commandInfos);
-    if (c) {
-      if (c.status === 'in-progress' || c.status === 'waiting') {
-        c.status = status;
-      }
-      try {
-        c.detailedStatusCalculator.setStatus(c.status as any);
-      } catch (e) {
-        // Because detailedStatusCalculator are implemented
-        // without the build event protocol for now, they may fail.
-        // Console must remain working after their failure.
-        console.error('detailedStatusCalculator.setStatus failed', e);
-      }
-    }
-  }
-
-  getCommandById(id: string) {
-    return this.commandInfos.filter(c => c.id === id);
   }
 
   stopCommands(commands: CommandInformation[]) {
@@ -120,40 +75,111 @@ export class RecentCommands {
     });
   }
 
-  removeAllCommands() {
-    const commandInfos = this.commandInfos;
-    this.commandInfos = [];
-    this.stopCommands(commandInfos);
+  startCommand(id: string) {
+    const c = this.findMatchingCommand(id, this.recent);
+    c.commandRunning = c.factory();
+    c.status = 'in-progress';
+  }
+
+  addOut(id: string, out: string) {
+    const c = this.findMatchingCommand(id, this.recent);
+    if (c) {
+      c.out += out;
+      c.outChunk += out;
+      try {
+        c.detailedStatusCalculator.addOut(out);
+      } catch (e) {
+        // Because detailedStatusCalculator are implemented
+        // without the build event protocol for now, they may fail.
+        // Console must remain working after their failure.
+        console.error('detailedStatusCalculator.addOut failed', e.message);
+      }
+    }
+  }
+
+  // TOOD: vsavkin should convert status into an enum
+  setFinalStatus(id: string, status: string) {
+    const c = this.findMatchingCommand(id, this.recent);
+    if (c && (c.status === 'in-progress' || c.status === 'waiting')) {
+      this.setStatus(id, status);
+    }
+  }
+
+  // TOOD: vsavkin should convert status into an enum
+  setStatus(id: string, status: string) {
+    const c = this.findMatchingCommand(id, this.recent);
+    if (c) {
+      c.status = status;
+      try {
+        c.detailedStatusCalculator.setStatus(c.status as any);
+      } catch (e) {
+        // Because detailedStatusCalculator are implemented
+        // without the build event protocol for now, they may fail.
+        // Console must remain working after their failure.
+        console.error('detailedStatusCalculator.setStatus failed', e);
+      }
+    }
   }
 
   removeCommand(id: string) {
-    const commandToRemove = this.getCommandById(id);
-    this.commandInfos = this.withoutCommandWithId(id, this.commandInfos);
-    this.stopCommands(commandToRemove);
+    this.stopCommands([this.findMatchingCommand(id, this.recent)]);
+    this.recent = this.withoutCommandWithId(id, this.recent);
+  }
+
+  removeAllCommands() {
+    const commandInfos = this.recent;
+    this.recent = [];
+    this.stopCommands(commandInfos);
+  }
+
+  findMatchingCommand(id: string, commands: CommandInformation[]) {
+    const matchingCommand = commands.find(c => c.id === id);
+    if (!matchingCommand) {
+      throw new Error(`Cannot find matching command: ${id}`);
+    }
+    return matchingCommand;
+  }
+
+  private insertIntoRecent(c: CommandInformation) {
+    const sameIdIndex = this.recent.findIndex(r => r.id === c.id);
+    if (sameIdIndex > -1) {
+      this.recent = [
+        ...this.recent.slice(0, sameIdIndex),
+        c,
+        ...this.recent.slice(sameIdIndex + 1)
+      ];
+    } else if (this.recent.length === this.MAX_RECENT) {
+      if (!this.hasCompletedCommands(this.recent)) {
+        throw new Error(
+          `Cannot run more than ${this.MAX_RECENT} commands in parallel`
+        );
+      }
+      this.recent = [...this.withoutFirstCompletedCommand(this.recent), c];
+    } else {
+      this.recent = [...this.recent, c];
+    }
+  }
+
+  private insertIntoHistory(c: CommandInformation) {
+    const preservedHistory =
+      this.history.length === this.MAX_HISTORY
+        ? this.history.slice(1)
+        : this.history;
+    this.history = [...preservedHistory, c];
   }
 
   private hasCompletedCommands(commands: CommandInformation[]) {
-    return !!this.commandInfos.find(c => this.isCompleted(c));
+    return !!commands.find(c => this.isCompleted(c));
   }
 
   private withoutFirstCompletedCommand(commands: CommandInformation[]) {
-    const index = this.commandInfos.findIndex(c => this.isCompleted(c));
-    return [
-      ...this.commandInfos.slice(0, index),
-      ...this.commandInfos.slice(index + 1)
-    ];
+    const index = commands.findIndex(c => this.isCompleted(c));
+    return [...commands.slice(0, index), ...commands.slice(index + 1)];
   }
 
   private withoutCommandWithId(id: string, commands: CommandInformation[]) {
-    const index = this.commandInfos.findIndex(c => c.id === id);
-    return [
-      ...this.commandInfos.slice(0, index),
-      ...this.commandInfos.slice(index + 1)
-    ];
-  }
-
-  private findMatchingCommand(id: string, commands: CommandInformation[]) {
-    return this.commandInfos.find(c => c.id === id);
+    const index = commands.findIndex(c => c.id === id);
+    return [...commands.slice(0, index), ...commands.slice(index + 1)];
   }
 
   private isCompleted(c: CommandInformation): boolean {

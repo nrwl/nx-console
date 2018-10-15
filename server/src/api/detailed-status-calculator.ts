@@ -27,14 +27,14 @@ export function createDetailedStatusCalculator(cwd: string, cmds: string[]) {
 export interface DetailedStatusCalculator<T> {
   detailedStatus: T;
   addOut(value: string): void;
-  setStatus(value: 'successful' | 'failure' | 'terminated'): void;
+  setStatus(value: 'successful' | 'failed' | 'terminated'): void;
   reset(): void;
 }
 
 class EmptyDetailedStatusCalculator implements DetailedStatusCalculator<null> {
   detailedStatus = null;
   addOut(value: string) {}
-  setStatus(value: 'successful' | 'failure' | 'terminated') {}
+  setStatus(value: 'successful' | 'failed' | 'terminated') {}
   reset() {}
 }
 
@@ -134,7 +134,7 @@ export class BuildDetailedStatusCalculator
     }
   }
 
-  setStatus(value: 'successful' | 'failure' | 'terminated') {
+  setStatus(value: 'successful' | 'failed' | 'terminated') {
     this.detailedStatus = {
       ...this.detailedStatus,
       buildStatus: value === 'successful' ? 'build_success' : 'build_failure'
@@ -215,7 +215,7 @@ export class TestDetailedStatusCalculator
     };
   }
 
-  setStatus(value: 'successful' | 'failure' | 'terminated') {
+  setStatus(value: 'successful' | 'failed' | 'terminated') {
     this.detailedStatus = {
       ...this.detailedStatus,
       testStatus: value === 'successful' ? 'test_success' : 'test_failure'

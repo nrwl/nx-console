@@ -39,6 +39,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+server/yarn.lock
 
 # System Files
 .DS_Store

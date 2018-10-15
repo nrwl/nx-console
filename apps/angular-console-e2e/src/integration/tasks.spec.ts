@@ -130,8 +130,8 @@ describe('Tasks', () => {
       numTasks: 2,
       isExpanded: true,
       tasks: [
-        { command: 'ng test proj', status: CommandStatus.IN_PROGRESS },
-        { command: 'ng build proj', status: CommandStatus.SUCCESSFUL }
+        { command: 'ng build proj', status: CommandStatus.SUCCESSFUL },
+        { command: 'ng test proj', status: CommandStatus.IN_PROGRESS }
       ]
     });
 
