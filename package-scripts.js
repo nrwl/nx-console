@@ -35,18 +35,7 @@ module.exports = {
         write: 'nx format:write',
         check: 'nx format:check'
       },
-      lint: {
-        default: npsUtils.series('nx lint', 'ng lint'),
-        fix: npsUtils.series(
-          'ng lint --fix --project angular-console',
-          'ng lint --fix --project feature-workspaces',
-          'ng lint --fix --project feature-extensions',
-          'ng lint --fix --project feature-generate',
-          'ng lint --fix --project utils',
-          'ng lint --fix --project feature-run',
-          'ng lint --fix --project ui'
-        )
-      },
+      lint: npsUtils.series('nx lint', 'nx affected:lint --base=master --parallel'),
       test: 'nx affected:test --base=master'
     },
     server: {
