@@ -1,0 +1,13 @@
+query SchematicCollections($path: String!) {
+  workspace(path: $path)
+    @NgModule(module: "../feature-generate.module#FeatureGenerateModule") {
+    schematicCollections {
+      name
+      schematics {
+        name
+        description
+        collection
+      }
+    }
+  }
+}

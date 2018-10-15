@@ -1,0 +1,25 @@
+query SchematicCollectionsByName(
+  $path: String!
+  $collection: String!
+  $schematic: String!
+) {
+  workspace(path: $path)
+    @NgModule(module: "../feature-generate.module#FeatureGenerateModule") {
+    schematicCollections(name: $collection) {
+      schematics(name: $schematic) {
+        collection
+        name
+        description
+        schema {
+          name
+          enum
+          type
+          description
+          defaultValue
+          required
+          positional
+        }
+      }
+    }
+  }
+}

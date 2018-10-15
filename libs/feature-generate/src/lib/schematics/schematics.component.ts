@@ -2,8 +2,6 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
 import { SchematicCollection, Schematic } from '@angular-console/schema';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -14,6 +12,7 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { SCHEMATICS_POLLING } from '@angular-console/utils';
+import { SchematicCollectionsGQL } from '../generated/graphql';
 
 interface SchematicId {
   collectionName: string | undefined;
@@ -32,26 +31,14 @@ export class SchematicsComponent {
   > = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.apollo.watchQuery({
-        pollInterval: SCHEMATICS_POLLING,
-        query: gql`
-          query($path: String!) {
-            workspace(path: $path) {
-              schematicCollections {
-                name
-                schematics {
-                  name
-                  description
-                  collection
-                }
-              }
-            }
-          }
-        `,
-        variables: {
+      return this.schematicCollectionsGQL.watch(
+        {
           path
+        },
+        {
+          pollInterval: SCHEMATICS_POLLING
         }
-      }).valueChanges;
+      ).valueChanges;
     }),
     map(r => {
       const collections: Array<SchematicCollection> = (r as any).data.workspace
@@ -113,9 +100,9 @@ export class SchematicsComponent {
   );
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly schematicCollectionsGQL: SchematicCollectionsGQL
   ) {}
 
   navigateToSelectedSchematic(s: Schematic | null) {

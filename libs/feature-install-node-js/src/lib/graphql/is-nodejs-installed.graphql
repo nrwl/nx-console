@@ -1,0 +1,8 @@
+query IsNodejsInstalled {
+  isNodejsInstalled
+    @NgModule(
+      module: "../feature-install-node-js.module#FeatureInstallNodeJsModule"
+    ) {
+    result
+  }
+}

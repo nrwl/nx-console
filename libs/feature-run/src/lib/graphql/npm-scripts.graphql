@@ -1,0 +1,18 @@
+query NpmScripts($path: String!, $script: String!) {
+  workspace(path: $path)
+    @NgModule(module: "../feature-run.module#FeatureRunModule") {
+    npmScripts(name: $script) {
+      name
+      npmClient
+      schema {
+        name
+        enum
+        type
+        description
+        defaultValue
+        required
+        positional
+      }
+    }
+  }
+}

@@ -1,32 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Apollo } from 'apollo-angular';
 import { Router } from '@angular/router';
 import { first } from 'rxjs/operators';
-import gql from 'graphql-tag';
+import { OpenWorkspaceGQL } from './generated/graphql';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorkspacesService {
   constructor(
-    private readonly apollo: Apollo,
+    private readonly openWorkspaceGQL: OpenWorkspaceGQL,
     private readonly router: Router
   ) {}
 
   openWorkspace(path: string) {
     // this query is just a smoke check
-    this.apollo
-      .query({
-        query: gql`
-          query($path: String!) {
-            workspace(path: $path) {
-              name
-            }
-          }
-        `,
-        variables: {
-          path
-        }
+    this.openWorkspaceGQL
+      .fetch({
+        path
       })
       .pipe(first())
       .subscribe(() => {

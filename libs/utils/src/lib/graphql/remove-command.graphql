@@ -1,0 +1,5 @@
+mutation RemoveCommand($id: String!) {
+  removeCommand(id: $id) {
+    result
+  }
+}

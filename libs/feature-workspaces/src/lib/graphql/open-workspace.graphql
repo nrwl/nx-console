@@ -1,0 +1,6 @@
+query OpenWorkspace($path: String!) {
+  workspace(path: $path)
+    @NgModule(module: "../feature-workspaces.module#FeatureWorkspaces") {
+    name
+  }
+}

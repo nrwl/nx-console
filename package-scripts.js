@@ -39,7 +39,7 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
-      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.compile-only'),
+      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.gen-apollo-angular', 'server.compile-only'),
       'compile-only': 'tsc -p server/tsconfig.json',
       format: {
         default: npsUtils.series.nps('server.format.write'),
@@ -47,7 +47,8 @@ module.exports = {
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
       test: 'node ./tools/scripts/test ./dist/server/test',
-      'gen-graphql-types': 'ts-node tools/gen-graphql-types.ts'
+      'gen-graphql-types': 'ts-node tools/gen-graphql-types.ts',
+      'gen-apollo-angular': 'ts-node tools/gen-apollo-angular.ts'
     },
     mac: {
       'clean': 'rm -rf dist',

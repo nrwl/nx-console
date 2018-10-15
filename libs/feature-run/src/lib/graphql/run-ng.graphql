@@ -1,0 +1,6 @@
+mutation RunNg($path: String!, $runCommand: [String]!) {
+  runNg(path: $path, runCommand: $runCommand)
+    @NgModule(module: "../feature-run.module#FeatureRunModule") {
+    id
+  }
+}
