@@ -12,8 +12,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import {
   map,
@@ -23,6 +21,10 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
+import {
+  NgAddGQL,
+  WorkspaceAndExtensionsByNameGQL
+} from '../generated/graphql';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,10 +43,11 @@ export class ExtensionComponent implements OnInit {
   private readonly ngAddDisabled$ = new BehaviorSubject(true);
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
     private readonly runner: CommandRunner,
-    private readonly contextActionService: ContextualActionBarService
+    private readonly contextActionService: ContextualActionBarService,
+    private readonly ngAddGQL: NgAddGQL,
+    private readonly workspaceAndExtensionsByNameGQL: WorkspaceAndExtensionsByNameGQL
   ) {}
 
   ngOnInit() {
@@ -66,23 +69,8 @@ export class ExtensionComponent implements OnInit {
         if (this.out) {
           this.out.reset();
         }
-        return this.apollo.query({
-          query: gql`
-            query($path: String!, $name: String!) {
-              workspace(path: $path) {
-                extensions {
-                  name
-                }
-              }
-              availableExtensions(name: $name) {
-                name
-                description
-                detailedDescription
-              }
-            }
-          `,
-          variables: p
-        });
+
+        return this.workspaceAndExtensionsByNameGQL.fetch(p);
       }),
       map((r: any) => {
         const extension: Extension = r.data.availableExtensions[0];
@@ -122,17 +110,10 @@ export class ExtensionComponent implements OnInit {
       switchMap(([_, a]) => {
         this.out.reset();
         return this.runner.runCommand(
-          gql`
-            mutation($path: String!, $name: String!) {
-              ngAdd(path: $path, name: $name) {
-                id
-              }
-            }
-          `,
-          {
+          this.ngAddGQL.mutate({
             path: this.path(),
             name: a.name
-          },
+          }),
           false
         );
       }),

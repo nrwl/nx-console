@@ -1,0 +1,11 @@
+query Settings {
+  settings {
+    canCollectData
+    installNodeManually
+    recent {
+      path
+      name
+      favorite
+    }
+  }
+}

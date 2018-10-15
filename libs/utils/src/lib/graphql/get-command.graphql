@@ -1,0 +1,12 @@
+query GetCommand($id: String) {
+  commands(id: $id) {
+    id
+    type
+    workspace
+    command
+    status
+    out
+    outChunk
+    detailedStatus
+  }
+}

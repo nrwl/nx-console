@@ -1,0 +1,9 @@
+query InstallNodeJsStatus {
+  installNodeJsStatus {
+    downloadPercentage
+    downloadSpeed
+    success
+    cancelled
+    error
+  }
+}

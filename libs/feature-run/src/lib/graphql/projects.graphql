@@ -1,0 +1,25 @@
+query Projects($path: String!, $project: String!, $target: String!) {
+  workspace(path: $path) {
+    projects(name: $project) {
+      name
+      root
+      projectType
+      architect(name: $target) {
+        name
+        builder
+        configurations {
+          name
+        }
+        schema {
+          name
+          enum
+          type
+          description
+          defaultValue
+          required
+          positional
+        }
+      }
+    }
+  }
+}

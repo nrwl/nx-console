@@ -1,0 +1,17 @@
+query WorkspaceAndProjects($path: String!) {
+  workspace(path: $path) {
+    npmScripts {
+      name
+    }
+
+    projects {
+      name
+      root
+      projectType
+      architect {
+        name
+        project
+      }
+    }
+  }
+}
