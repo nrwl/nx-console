@@ -3,7 +3,6 @@ import {
   expandFolder,
   selectFolder,
   uniqName,
-  waitForNgNew,
   whitelistGraphql
 } from './utils';
 
@@ -40,9 +39,7 @@ describe('Workspaces', () => {
       .contains('Create')
       .click();
 
-    waitForNgNew();
-
-    cy.get('div.title').contains('Projects');
+    cy.get('div.title', { timeout: 120000 }).contains('Projects');
 
     cy.get('div.title').contains(name);
   });

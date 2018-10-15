@@ -11,6 +11,12 @@ jobs:
 
     steps:
       - checkout
+      - restore_cache:
+          name: Restore Global Yarn Package Cache
+          keys:
+            - yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-packages-{{ .Branch }}-
+            - yarn-packages-
       - run: yarn install
       - run: yarn start format.check
       - run: yarn start lint
@@ -22,3 +28,10 @@ jobs:
           no_output_timeout: 20m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+            - ./node_modules
+            - /home/circleci/.cache/Cypress
