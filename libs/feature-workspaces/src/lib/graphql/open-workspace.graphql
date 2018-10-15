@@ -1,0 +1,5 @@
+query OpenWorkspace($path: String!) {
+  workspace(path: $path) {
+    name
+  }
+}

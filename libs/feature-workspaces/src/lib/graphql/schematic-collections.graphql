@@ -1,0 +1,6 @@
+query SchematicCollections {
+  schematicCollections {
+    name
+    description
+  }
+}

@@ -1,0 +1,5 @@
+query IsNodejsInstalled {
+  isNodejsInstalled {
+    result
+  }
+}

@@ -16,8 +16,6 @@ import {
 } from '@angular/forms';
 import { MatDialog, MatExpansionPanel } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import {
   BehaviorSubject,
   Observable,
@@ -33,6 +31,7 @@ import {
   switchMap,
   take
 } from 'rxjs/operators';
+import { SchematicCollectionsGQL } from '../generated/graphql';
 
 import {
   NewWorkspaceDialogComponent,
@@ -63,10 +62,10 @@ export class NewWorkspaceComponent implements OnInit {
   private readonly createNewWorkspace$ = new Subject<void>();
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly contextActionService: ContextualActionBarService,
     private readonly matDialog: MatDialog,
-    private readonly finderService: Finder
+    private readonly finderService: Finder,
+    private readonly schematicCollectionsGQL: SchematicCollectionsGQL
   ) {}
 
   private static newFormGroup(finderService: Finder): FormGroup {
@@ -94,19 +93,10 @@ export class NewWorkspaceComponent implements OnInit {
       }
     });
 
-    this.schematicCollectionsForNgNew$ = this.apollo
-      .query({
-        query: gql`
-          {
-            schematicCollections {
-              name
-              description
-            }
-          }
-        `
-      })
+    this.schematicCollectionsForNgNew$ = this.schematicCollectionsGQL
+      .fetch()
       .pipe(
-        map((r: any) => r.data.schematicCollections),
+        map(r => r.data.schematicCollections),
         publishReplay(1),
         refCount()
       );

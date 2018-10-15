@@ -1,0 +1,5 @@
+mutation Generate($path: String!, $genCommand: [String]!, $dryRun: Boolean!) {
+  generate(path: $path, genCommand: $genCommand, dryRun: $dryRun) {
+    id
+  }
+}

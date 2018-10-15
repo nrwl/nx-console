@@ -1,0 +1,18 @@
+query Workspace($path: String!) {
+  workspace(path: $path) {
+    name
+    path
+    dependencies {
+      name
+      version
+    }
+    projects {
+      name
+      root
+      projectType
+      architect {
+        name
+      }
+    }
+  }
+}

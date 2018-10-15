@@ -13,8 +13,6 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';
 import {
   filter,
@@ -29,6 +27,7 @@ import {
   ContextualActionBarService,
   MenuOption
 } from '@nrwl/angular-console-enterprise-frontend';
+import { BasicWorkspaceGQL } from '../generated/graphql';
 
 interface Route {
   icon?: string;
@@ -102,20 +101,14 @@ export class WorkspaceComponent implements OnDestroy {
   }> = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.apollo.watchQuery({
-        pollInterval: BASIC_WORKSPACE_POLLING,
-        query: gql`
-          query($path: String!) {
-            workspace(path: $path) {
-              path
-              name
-            }
-          }
-        `,
-        variables: {
+      return this.basicWorkspaceGQL.watch(
+        {
           path
+        },
+        {
+          pollInterval: BASIC_WORKSPACE_POLLING
         }
-      }).valueChanges;
+      ).valueChanges;
     }),
     map((r: any) => r.data.workspace),
     publishReplay(1),
@@ -164,12 +157,12 @@ export class WorkspaceComponent implements OnDestroy {
   });
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
-    private readonly editorSupport: EditorSupport
+    private readonly editorSupport: EditorSupport,
+    private readonly basicWorkspaceGQL: BasicWorkspaceGQL
   ) {}
 
   ngOnDestroy(): void {

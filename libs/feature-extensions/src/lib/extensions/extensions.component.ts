@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Extension, ExtensionGroup } from '@angular-console/schema';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -14,6 +12,7 @@ import {
 } from 'rxjs/operators';
 import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
 import { EXTENSIONS_POLLING } from '@angular-console/utils';
+import { WorkspaceAndExtensionsGQL } from '../generated/graphql';
 
 interface ExtensionId {
   name: string | undefined;
@@ -31,25 +30,14 @@ export class ExtensionsComponent {
   > = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.apollo.watchQuery({
-        pollInterval: EXTENSIONS_POLLING,
-        query: gql`
-          query($path: String!) {
-            workspace(path: $path) {
-              extensions {
-                name
-              }
-            }
-            availableExtensions {
-              name
-              description
-            }
-          }
-        `,
-        variables: {
+      return this.workspaceAndExtensionsGQL.watch(
+        {
           path
+        },
+        {
+          pollInterval: EXTENSIONS_POLLING
         }
-      }).valueChanges;
+      ).valueChanges;
     }),
     map(r => {
       const availableExtensions: Array<Extension> = (r as any).data
@@ -112,9 +100,9 @@ export class ExtensionsComponent {
   );
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly workspaceAndExtensionsGQL: WorkspaceAndExtensionsGQL
   ) {}
 
   navigateToSelectedExtension(s: Extension | null) {

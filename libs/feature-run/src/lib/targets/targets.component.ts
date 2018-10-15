@@ -2,8 +2,6 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
 import { NpmScripts, Project } from '@angular-console/schema';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { Observable, combineLatest } from 'rxjs';
 import {
   map,
@@ -13,6 +11,7 @@ import {
   distinctUntilChanged
 } from 'rxjs/operators';
 import { TARGET_POLLING } from '@angular-console/utils';
+import { WorkspaceAndProjectsGQL } from '../generated/graphql';
 
 interface Target {
   projectName: string;
@@ -31,31 +30,14 @@ export class TargetsComponent {
   > = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.apollo.watchQuery({
-        pollInterval: TARGET_POLLING,
-        query: gql`
-          query($path: String!) {
-            workspace(path: $path) {
-              npmScripts {
-                name
-              }
-
-              projects {
-                name
-                root
-                projectType
-                architect {
-                  name
-                  project
-                }
-              }
-            }
-          }
-        `,
-        variables: {
+      return this.workspaceAndProjectsGQL.watch(
+        {
           path
+        },
+        {
+          pollInterval: TARGET_POLLING
         }
-      }).valueChanges;
+      ).valueChanges;
     }),
     map(r => {
       const sortedProjects = (r as any).data.workspace.projects
@@ -150,9 +132,9 @@ export class TargetsComponent {
   );
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly workspaceAndProjectsGQL: WorkspaceAndProjectsGQL
   ) {}
 
   navigateToSelectedTarget(target: Target | null) {

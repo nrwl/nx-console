@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { map, publishReplay, refCount } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { EditorsGQL, OpenInEditorGQL } from './generated/graphql';
 
 @Injectable({
   providedIn: 'root'
@@ -10,23 +9,15 @@ import { Observable } from 'rxjs';
 export class EditorSupport {
   private readonly editors$: Observable<Array<{ name: string; icon: string }>>;
 
-  constructor(private readonly apollo: Apollo) {
-    this.editors$ = this.apollo
-      .query({
-        query: gql`
-          {
-            editors {
-              name
-              icon
-            }
-          }
-        `
-      })
-      .pipe(
-        map((r: any) => r.data.editors),
-        publishReplay(1),
-        refCount()
-      );
+  constructor(
+    private readonly editorsGQL: EditorsGQL,
+    private readonly openInEditorGQL: OpenInEditorGQL
+  ) {
+    this.editors$ = this.editorsGQL.fetch().pipe(
+      map(r => r.data.editors),
+      publishReplay(1),
+      refCount()
+    );
   }
 
   get editors() {
@@ -34,19 +25,10 @@ export class EditorSupport {
   }
 
   openInEditor(editor: string, path: string) {
-    this.apollo
+    this.openInEditorGQL
       .mutate({
-        mutation: gql`
-          mutation($editor: String!, $path: String!) {
-            openInEditor(editor: $editor, path: $path) {
-              response
-            }
-          }
-        `,
-        variables: {
-          editor,
-          path
-        }
+        editor,
+        path
       })
       .subscribe(e => {});
   }
