@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Router } from '@angular/router';
 import gql from 'graphql-tag';
 import { tap } from 'rxjs/operators';
+import { NgNewGQL } from '../generated/graphql';
 
 export interface NgNewInvocation {
   name: string;
@@ -23,17 +24,7 @@ export class NewWorkspaceDialogComponent {
   }`;
 
   commandOutput$ = this.commandRunner
-    .runCommand(
-      gql`
-        mutation($path: String!, $name: String!, $collection: String!) {
-          ngNew(path: $path, name: $name, collection: $collection) {
-            id
-          }
-        }
-      `,
-      this.data.ngNewInvocation,
-      false
-    )
+    .runCommand(this.ngNewGQL.mutate(this.data.ngNewInvocation), false)
     .pipe(
       tap(command => {
         if (command.status === 'successful') {
@@ -53,6 +44,7 @@ export class NewWorkspaceDialogComponent {
     private readonly dialogRef: MatDialogRef<NewWorkspaceDialogComponent>,
     private readonly commandRunner: CommandRunner,
     private readonly router: Router,
+    private readonly ngNewGQL: NgNewGQL,
     @Inject(MAT_DIALOG_DATA)
     readonly data: {
       ngNewInvocation: NgNewInvocation;

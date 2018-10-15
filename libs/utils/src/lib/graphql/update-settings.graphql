@@ -1,0 +1,11 @@
+mutation UpdateSettings($data: String!) {
+  updateSettings(data: $data) {
+    canCollectData
+    installNodeManually
+    recent {
+      path
+      name
+      favorite
+    }
+  }
+}

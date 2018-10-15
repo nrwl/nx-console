@@ -1,0 +1,7 @@
+query SchematicCollections {
+  schematicCollections
+    @NgModule(module: "../feature-workspaces.module#FeatureWorkspaces") {
+    name
+    description
+  }
+}

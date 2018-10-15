@@ -1,0 +1,8 @@
+mutation InstallNodeJs {
+  installNodeJs
+    @NgModule(
+      module: "../feature-install-node-js.module#FeatureInstallNodeJsModule"
+    ) {
+    cancelled
+  }
+}

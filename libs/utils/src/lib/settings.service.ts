@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { first, tap } from 'rxjs/operators';
+import { SettingsGQL, UpdateSettingsGQL } from './generated/graphql';
 
 export interface WorkspaceDescription {
   readonly path: string;
@@ -25,7 +24,10 @@ export class Settings {
     installNodeManually: false
   };
 
-  constructor(private readonly apollo: Apollo) {}
+  constructor(
+    private readonly settingsGQL: SettingsGQL,
+    private readonly updateSettingsGQL: UpdateSettingsGQL
+  ) {}
 
   getRecentWorkspaces(favorite?: boolean): WorkspaceDescription[] {
     const all: WorkspaceDescription[] = this.settings.recent || [];
@@ -79,48 +81,19 @@ export class Settings {
   }
 
   fetch() {
-    return this.apollo
-      .query({
-        query: gql`
-          {
-            settings {
-              canCollectData
-              installNodeManually
-              recent {
-                path
-                name
-                favorite
-              }
-            }
-          }
-        `
+    return this.settingsGQL.fetch().pipe(
+      first(),
+      tap(r => {
+        this.settings = (r.data as any).settings;
       })
-      .pipe(
-        first(),
-        tap(r => {
-          this.settings = (r.data as any).settings;
-        })
-      );
+    );
   }
 
   private store(v: SettingsData) {
     this.settings = v;
-    this.apollo
+    this.updateSettingsGQL
       .mutate({
-        mutation: gql`
-          mutation($data: String!) {
-            updateSettings(data: $data) {
-              canCollectData
-              installNodeManually
-              recent {
-                path
-                name
-                favorite
-              }
-            }
-          }
-        `,
-        variables: { data: JSON.stringify({ ...v }) }
+        data: JSON.stringify({ ...v })
       })
       .subscribe(r => {
         this.settings = (r.data as any).updateSettings;
