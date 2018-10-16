@@ -101,10 +101,8 @@ import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
 
-import { FeatureGenerateModule } from '../feature-generate.module';
-
 @Injectable({
-  providedIn: FeatureGenerateModule
+  providedIn: 'root'
 })
 export class GenerateGQL extends Apollo.Mutation<
   Generate.Mutation,
@@ -123,7 +121,7 @@ export class GenerateGQL extends Apollo.Mutation<
   `;
 }
 @Injectable({
-  providedIn: FeatureGenerateModule
+  providedIn: 'root'
 })
 export class SchematicCollectionsByNameGQL extends Apollo.Query<
   SchematicCollectionsByName.Query,
@@ -157,7 +155,7 @@ export class SchematicCollectionsByNameGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureGenerateModule
+  providedIn: 'root'
 })
 export class SchematicCollectionsGQL extends Apollo.Query<
   SchematicCollections.Query,

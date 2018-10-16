@@ -1,8 +1,5 @@
 query InstallNodeJsStatus {
-  installNodeJsStatus
-    @NgModule(
-      module: "../feature-install-node-js.module#FeatureInstallNodeJsModule"
-    ) {
+  installNodeJsStatus {
     downloadPercentage
     downloadSpeed
     success
