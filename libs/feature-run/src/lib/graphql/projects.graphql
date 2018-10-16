@@ -1,6 +1,5 @@
 query Projects($path: String!, $project: String!, $target: String!) {
-  workspace(path: $path)
-    @NgModule(module: "../feature-run.module#FeatureRunModule") {
+  workspace(path: $path) {
     projects(name: $project) {
       name
       root

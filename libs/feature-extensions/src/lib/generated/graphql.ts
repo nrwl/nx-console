@@ -87,10 +87,8 @@ import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
 
-import { FeatureExtensionsModule } from '../feature-extensions.module';
-
 @Injectable({
-  providedIn: FeatureExtensionsModule
+  providedIn: 'root'
 })
 export class NgAddGQL extends Apollo.Mutation<NgAdd.Mutation, NgAdd.Variables> {
   document: any = gql`
@@ -102,7 +100,7 @@ export class NgAddGQL extends Apollo.Mutation<NgAdd.Mutation, NgAdd.Variables> {
   `;
 }
 @Injectable({
-  providedIn: FeatureExtensionsModule
+  providedIn: 'root'
 })
 export class WorkspaceAndExtensionsByNameGQL extends Apollo.Query<
   WorkspaceAndExtensionsByName.Query,
@@ -124,7 +122,7 @@ export class WorkspaceAndExtensionsByNameGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureExtensionsModule
+  providedIn: 'root'
 })
 export class WorkspaceAndExtensionsGQL extends Apollo.Query<
   WorkspaceAndExtensions.Query,

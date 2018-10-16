@@ -1,6 +1,5 @@
 mutation NgAdd($path: String!, $name: String!) {
-  ngAdd(path: $path, name: $name)
-    @NgModule(module: "../feature-extensions.module#FeatureExtensionsModule") {
+  ngAdd(path: $path, name: $name) {
     id
   }
 }

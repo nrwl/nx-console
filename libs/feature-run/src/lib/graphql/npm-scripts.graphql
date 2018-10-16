@@ -1,6 +1,5 @@
 query NpmScripts($path: String!, $script: String!) {
-  workspace(path: $path)
-    @NgModule(module: "../feature-run.module#FeatureRunModule") {
+  workspace(path: $path) {
     npmScripts(name: $script) {
       name
       npmClient

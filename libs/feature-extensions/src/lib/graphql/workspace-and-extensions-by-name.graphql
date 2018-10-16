@@ -1,6 +1,5 @@
 query WorkspaceAndExtensionsByName($path: String!, $name: String!) {
-  workspace(path: $path)
-    @NgModule(module: "../feature-extensions.module#FeatureExtensionsModule") {
+  workspace(path: $path) {
     extensions {
       name
     }

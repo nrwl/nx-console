@@ -1,6 +1,5 @@
 query WorkspaceAndProjects($path: String!) {
-  workspace(path: $path)
-    @NgModule(module: "../feature-run.module#FeatureRunModule") {
+  workspace(path: $path) {
     npmScripts {
       name
     }

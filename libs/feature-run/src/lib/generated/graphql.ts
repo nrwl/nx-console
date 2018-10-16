@@ -168,10 +168,8 @@ import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
 
-import { FeatureRunModule } from '../feature-run.module';
-
 @Injectable({
-  providedIn: FeatureRunModule
+  providedIn: 'root'
 })
 export class NpmRunGQL extends Apollo.Mutation<
   NpmRun.Mutation,
@@ -190,7 +188,7 @@ export class NpmRunGQL extends Apollo.Mutation<
   `;
 }
 @Injectable({
-  providedIn: FeatureRunModule
+  providedIn: 'root'
 })
 export class NpmScriptsGQL extends Apollo.Query<
   NpmScripts.Query,
@@ -217,7 +215,7 @@ export class NpmScriptsGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureRunModule
+  providedIn: 'root'
 })
 export class ProjectsGQL extends Apollo.Query<
   Projects.Query,
@@ -252,7 +250,7 @@ export class ProjectsGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureRunModule
+  providedIn: 'root'
 })
 export class RunNgGQL extends Apollo.Mutation<RunNg.Mutation, RunNg.Variables> {
   document: any = gql`
@@ -264,7 +262,7 @@ export class RunNgGQL extends Apollo.Mutation<RunNg.Mutation, RunNg.Variables> {
   `;
 }
 @Injectable({
-  providedIn: FeatureRunModule
+  providedIn: 'root'
 })
 export class WorkspaceAndProjectsGQL extends Apollo.Query<
   WorkspaceAndProjects.Query,

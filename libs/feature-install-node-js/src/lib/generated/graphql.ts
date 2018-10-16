@@ -58,10 +58,8 @@ import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
 
-import { FeatureInstallNodeJsModule } from '../feature-install-node-js.module';
-
 @Injectable({
-  providedIn: FeatureInstallNodeJsModule
+  providedIn: 'root'
 })
 export class InstallNodeJsStatusGQL extends Apollo.Query<
   InstallNodeJsStatus.Query,
@@ -80,7 +78,7 @@ export class InstallNodeJsStatusGQL extends Apollo.Query<
   `;
 }
 @Injectable({
-  providedIn: FeatureInstallNodeJsModule
+  providedIn: 'root'
 })
 export class InstallNodeJsGQL extends Apollo.Mutation<
   InstallNodeJs.Mutation,
@@ -95,7 +93,7 @@ export class InstallNodeJsGQL extends Apollo.Mutation<
   `;
 }
 @Injectable({
-  providedIn: FeatureInstallNodeJsModule
+  providedIn: 'root'
 })
 export class IsNodejsInstalledGQL extends Apollo.Query<
   IsNodejsInstalled.Query,

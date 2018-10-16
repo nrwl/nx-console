@@ -1,6 +1,5 @@
 mutation Generate($path: String!, $genCommand: [String]!, $dryRun: Boolean!) {
-  generate(path: $path, genCommand: $genCommand, dryRun: $dryRun)
-    @NgModule(module: "../feature-generate.module#FeatureGenerateModule") {
+  generate(path: $path, genCommand: $genCommand, dryRun: $dryRun) {
     id
   }
 }
