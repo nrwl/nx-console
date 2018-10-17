@@ -74,6 +74,11 @@ export function availableExtensions() {
     },
     { name: '@progress/kendo-schematics', description: 'Kendo UI schematics' },
     {
+      name: '@schuchard/prettier',
+      description: 'Adds Prettier to your Angular project'
+    },
+
+    {
       name: 'ng-zorro-antd',
       description:
         'An enterprise-class UI components based on Ant Design and Angular'
