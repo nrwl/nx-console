@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
 import { filter, first, map, switchMap, takeWhile, tap } from 'rxjs/operators';
 import {
@@ -9,6 +7,11 @@ import {
   NODE_JS_INSTALL_POLLING,
   Settings
 } from '@angular-console/utils';
+import {
+  InstallNodeJsGQL,
+  InstallNodeJsStatusGQL,
+  IsNodejsInstalledGQL
+} from './generated/graphql';
 
 @Component({
   selector: 'angular-console-install-node-js',
@@ -20,75 +23,49 @@ export class InstallNodeJsComponent {
 
   constructor(
     private readonly messenger: Messenger,
-    private readonly apollo: Apollo,
     private readonly router: Router,
-    private readonly settings: Settings
+    private readonly settings: Settings,
+    private readonly installNodeJsGQL: InstallNodeJsGQL,
+    private readonly installNodeJsStatusGQL: InstallNodeJsStatusGQL,
+    private readonly isNodejsInstalledGQL: IsNodejsInstalledGQL
   ) {}
 
   installNodeJs() {
-    this.installNodeJsStatus$ = this.apollo
-      .mutate({
-        mutation: gql`
-          mutation {
-            installNodeJs {
-              cancelled
+    this.installNodeJsStatus$ = this.installNodeJsGQL.mutate().pipe(
+      switchMap(() => {
+        return this.installNodeJsStatusGQL
+          .watch(
+            {},
+            {
+              pollInterval: NODE_JS_INSTALL_POLLING
             }
-          }
-        `
+          )
+          .valueChanges.pipe(map(result => result.data.installNodeJsStatus));
+      }),
+      tap(({ success, error }: any) => {
+        if (success) {
+          this.router.navigate(['/workspaces']);
+        } else if (error) {
+          this.messenger.error(error);
+        }
+      }),
+      takeWhile(({ success, cancelled, error }: any) => {
+        return Boolean(!success && !cancelled && !error);
       })
-      .pipe(
-        switchMap(() => {
-          return this.apollo
-            .watchQuery({
-              pollInterval: NODE_JS_INSTALL_POLLING,
-              query: gql`
-                query {
-                  installNodeJsStatus {
-                    downloadPercentage
-                    downloadSpeed
-                    success
-                    cancelled
-                    error
-                  }
-                }
-              `
-            })
-            .valueChanges.pipe(
-              map((result: any) => result.data.installNodeJsStatus)
-            );
-        }),
-        tap(({ success, error }: any) => {
-          if (success) {
-            this.router.navigate(['/workspaces']);
-          } else if (error) {
-            this.messenger.error(error);
-          }
-        }),
-        takeWhile(({ success, cancelled, error }: any) => {
-          return Boolean(!success && !cancelled && !error);
-        })
-      );
+    );
   }
 
   installManually() {
     this.settings.setInstallManually(true);
 
     // wait for the settings to update
-    this.apollo
-      .watchQuery({
-        query: gql`
-          query {
-            isNodejsInstalled {
-              result
-            }
-          }
-        `
-      })
+    this.isNodejsInstalledGQL
+      .watch()
       .valueChanges.pipe(
         filter((v: any) => v.data.isNodejsInstalled.result),
         first()
       )
-      .subscribe(res => {
+      .subscribe(() => {
         this.router.navigate(['/workspaces']);
       });
   }

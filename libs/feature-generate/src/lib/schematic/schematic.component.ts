@@ -18,8 +18,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { BehaviorSubject, merge, Observable, of, Subject } from 'rxjs';
 import {
   debounceTime,
@@ -31,6 +29,10 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
+import {
+  GenerateGQL,
+  SchematicCollectionsByNameGQL
+} from '../generated/graphql';
 
 const DEBOUNCE_TIME = 300;
 
@@ -60,12 +62,13 @@ export class SchematicComponent implements OnInit {
   private readonly ngGenDisabled$ = new BehaviorSubject(true);
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly runner: CommandRunner,
     private readonly route: ActivatedRoute,
     private readonly serializer: Serializer,
     private readonly elementRef: ElementRef,
-    private readonly contextActionService: ContextualActionBarService
+    private readonly contextActionService: ContextualActionBarService,
+    private readonly generateGQL: GenerateGQL,
+    private readonly schematicCollectionsByNameGQL: SchematicCollectionsByNameGQL
   ) {}
 
   ngOnInit() {
@@ -96,31 +99,8 @@ export class SchematicComponent implements OnInit {
         if (this.out) {
           this.out.reset();
         }
-        return this.apollo.query({
-          query: gql`
-            query($path: String!, $collection: String!, $schematic: String!) {
-              workspace(path: $path) {
-                schematicCollections(name: $collection) {
-                  schematics(name: $schematic) {
-                    collection
-                    name
-                    description
-                    schema {
-                      name
-                      enum
-                      type
-                      description
-                      defaultValue
-                      required
-                      positional
-                    }
-                  }
-                }
-              }
-            }
-          `,
-          variables: p
-        });
+
+        return this.schematicCollectionsByNameGQL.fetch(p);
       }),
       map((r: any) => {
         if (!r) {
@@ -172,17 +152,11 @@ export class SchematicComponent implements OnInit {
         }
 
         return this.runner.runCommand(
-          gql`
-            mutation($path: String!, $genCommand: [String]!) {
-              generate(path: $path, genCommand: $genCommand, dryRun: true) {
-                id
-              }
-            }
-          `,
-          {
+          this.generateGQL.mutate({
             path: this.path(),
-            genCommand: c.commands
-          },
+            genCommand: c.commands,
+            dryRun: true
+          }),
           true
         );
       }),
@@ -199,17 +173,11 @@ export class SchematicComponent implements OnInit {
       switchMap(([_, c]) => {
         this.out.reset();
         return this.runner.runCommand(
-          gql`
-            mutation($path: String!, $genCommand: [String]!) {
-              generate(path: $path, genCommand: $genCommand, dryRun: false) {
-                id
-              }
-            }
-          `,
-          {
+          this.generateGQL.mutate({
             path: this.route.snapshot.params.path,
-            genCommand: c.commands
-          },
+            genCommand: c.commands,
+            dryRun: false
+          }),
           false
         );
       }),

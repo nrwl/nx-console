@@ -1,0 +1,7 @@
+query Commands($id: String) {
+  commands(id: $id) {
+    status
+    outChunk
+    detailedStatus
+  }
+}

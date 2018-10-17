@@ -17,8 +17,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import {
   map,
@@ -28,6 +26,7 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
+import { ProjectsGQL, RunNgGQL } from '../generated/graphql';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,11 +49,12 @@ export class TargetComponent implements OnInit {
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
 
   constructor(
-    private readonly apollo: Apollo,
     private readonly route: ActivatedRoute,
     private readonly runner: CommandRunner,
     private readonly serializer: Serializer,
-    private readonly contextActionService: ContextualActionBarService
+    private readonly contextActionService: ContextualActionBarService,
+    private readonly projectsGQL: ProjectsGQL,
+    private readonly runNgGQL: RunNgGQL
   ) {}
 
   ngOnInit() {
@@ -77,36 +77,8 @@ export class TargetComponent implements OnInit {
         if (this.out) {
           this.out.reset();
         }
-        return this.apollo.query({
-          query: gql`
-            query($path: String!, $project: String!, $target: String!) {
-              workspace(path: $path) {
-                projects(name: $project) {
-                  name
-                  root
-                  projectType
-                  architect(name: $target) {
-                    name
-                    builder
-                    configurations {
-                      name
-                    }
-                    schema {
-                      name
-                      enum
-                      type
-                      description
-                      defaultValue
-                      required
-                      positional
-                    }
-                  }
-                }
-              }
-            }
-          `,
-          variables: p
-        });
+
+        return this.projectsGQL.fetch(p);
       }),
       map((r: any) => {
         const project: Project = r.data.workspace.projects[0];
@@ -146,17 +118,10 @@ export class TargetComponent implements OnInit {
       switchMap(([_, c]) => {
         this.out.reset();
         return this.runner.runCommand(
-          gql`
-            mutation($path: String!, $runCommand: [String]!) {
-              runNg(path: $path, runCommand: $runCommand) {
-                id
-              }
-            }
-          `,
-          {
+          this.runNgGQL.mutate({
             path: this.path(),
             runCommand: c.commands
-          },
+          }),
           false
         );
       }),

@@ -1,0 +1,11 @@
+query WorkspaceAndExtensions($path: String!) {
+  workspace(path: $path) {
+    extensions {
+      name
+    }
+  }
+  availableExtensions {
+    name
+    description
+  }
+}

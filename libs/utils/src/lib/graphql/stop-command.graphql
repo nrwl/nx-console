@@ -1,0 +1,5 @@
+mutation StopCommand($id: String!) {
+  stopCommand(id: $id) {
+    result
+  }
+}
