@@ -73,7 +73,9 @@ export function availableExtensions() {
       description: 'Kendo UI Upload component'
     },
     { name: '@progress/kendo-schematics', description: 'Kendo UI schematics' },
-    { name: '@schuchard/prettier', description: 'Add Prettier to your Angular project' },
+    { 
+      name: '@schuchard/prettier', 
+      description: 'Add Prettier to your Angular project'
     {
       name: 'ng-zorro-antd',
       description:
