@@ -1,5 +1,9 @@
 import { Component, Input } from '@angular/core';
-
+import {
+  CommandStatus,
+  OpenInBrowserService,
+  ShowItemInFolderService
+} from '@angular-console/utils';
 export interface BuildStatus {
   buildStatus:
     | 'build_pending'
@@ -13,6 +17,9 @@ export interface BuildStatus {
   errors: string[];
   serverHost?: string;
   serverPort?: number;
+  isForProduction: boolean;
+  outputPath?: string;
+  indexFile?: string;
 }
 
 @Component({
@@ -21,7 +28,13 @@ export interface BuildStatus {
   styleUrls: ['./build-status.component.scss']
 })
 export class BuildStatusComponent {
+  @Input() commandStatus: CommandStatus;
   @Input() status: BuildStatus;
+
+  constructor(
+    private readonly openInBrowserService: OpenInBrowserService,
+    private readonly showItemInFolderService: ShowItemInFolderService
+  ) {}
 
   statusClassName() {
     if (!this.status) {
@@ -31,7 +44,23 @@ export class BuildStatusComponent {
     }
   }
 
-  errorTrackByFn(_: number, err: string) {
+  serverUrl() {
+    if (this.status && this.status.serverHost && this.status.serverPort) {
+      return `http://${this.status.serverHost}:${this.status.serverPort}`;
+    } else {
+      return '';
+    }
+  }
+
+  trackByError(_: number, err: string) {
     return err;
+  }
+
+  onServerOpen() {
+    this.openInBrowserService.openUrl(this.serverUrl());
+  }
+
+  showItemInFolder(item: string) {
+    this.showItemInFolderService.showItem(item);
   }
 }

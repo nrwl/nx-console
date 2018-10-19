@@ -43,7 +43,7 @@
           </ng-container>
 
           <span class="process-action" [ngSwitch]="action.status">
-            <button class="replay-button" *ngSwitchDefault mat-icon-button (click)="commandRunner.restartCommand(action.id); taskAvatar.freshlyToggled = true">
+            <button class="replay-button" *ngSwitchDefault mat-icon-button (click)="handleRestart(action); taskAvatar.freshlyToggled = true">
               <mat-icon [matTooltip]="'Restart ' + action.status + ' task'" matTooltipPosition="right">replay</mat-icon>
             </button>
             <button mat-icon-button *ngSwitchCase="CommandStatus.IN_PROGRESS" (click)="commandRunner.stopCommand(action.id); taskAvatar.freshlyToggled = true">

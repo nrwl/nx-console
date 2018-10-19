@@ -1,34 +1,45 @@
 <div class="container" fxLayout="row">
-  <div class="toggle-container">
-    <button class="mat-icon-button" matTooltip="Toggle terminal output">
+  <div class="toggle-container" fxLayout="column">
+    <button mat-icon-button matTooltip="Details" matTooltipPosition="right">
       <span class="mat-button-wrapper">
-      <mat-icon [ngClass]="rawOutputVisible ? 'output-icon-active' : ''"
-                svgIcon="console"
-                [matBadge]="hasUnreadResponse ? '*' : ''"
-                matBadgeColor="accent"
-                (click)="onRawOutputToggle()">
-      </mat-icon>
+        <mat-icon [ngClass]="(activeView$ | async) === 'details' ? 'output-icon-active' : ''"
+                  (click)="setActiveView('details')">
+          dashboard
+        </mat-icon>
+      </span>
+    </button>
+    <button mat-icon-button matTooltip="Output" matTooltipPosition="right">
+      <span class="mat-button-wrapper">
+        <mat-icon [ngClass]="(activeView$ | async) === 'terminal' ? 'output-icon-active' : ''"
+                  svgIcon="console"
+                  [matBadge]="(terminalOutputState$ | async)?.unread ? '*' : ''"
+                  matBadgeColor="accent"
+                  (click)="setActiveView('terminal')">
+        </mat-icon>
       </span>
     </button>
   </div>
   <mat-divider></mat-divider>
-  <div class="terminal-container" fxFlex>
-    <ui-terminal [command]="command" [outChunk]="commandResponse?.outChunk"></ui-terminal>
-  </div>
-  <div class="details-container" [@growShrink]="rawOutputVisible ? 'shrink' : 'grow'">
-    <div class="empty-container" *ngIf="isStopped()" fxLayout="row" fxLayoutAlign="center center">
-      <ng-container *ngIf="!emptyTemplate">
-        Task has not start yet
+  <div fxFlex>
+    <div class="details-container" *ngIf="(activeView$ | async) === 'details'">
+      <div class="empty-container" *ngIf="isStopped()" fxLayout="row" fxLayoutAlign="center center">
+        <ng-container *ngIf="!emptyTemplate">
+          Task has not start yet
+        </ng-container>
+        <ng-template [ngTemplateOutlet]="emptyTemplate"></ng-template>
+      </div>
+      <ng-container *ngIf="commandResponse?.status" [ngSwitch]="commandResponse?.detailedStatus?.type">
+        <ui-build-status [commandStatus]="commandResponse?.status" [status]="commandResponse?.detailedStatus" *ngSwitchCase="'build'"></ui-build-status>
+        <ui-test-status [commandStatus]="commandResponse?.status" [status]="commandResponse?.detailedStatus" *ngSwitchCase="'test'"></ui-test-status>
+        <ng-template [ngTemplateOutlet]="defaultContent" *ngIf="!commandResponse?.detailedStatus"></ng-template>
       </ng-container>
-      <ng-template [ngTemplateOutlet]="emptyTemplate"></ng-template>
     </div>
-    <ng-container *ngIf="commandResponse?.status" [ngSwitch]="commandResponse?.detailedStatus?.type">
-      <ui-build-status [status]="commandResponse?.detailedStatus" *ngSwitchCase="'build'"></ui-build-status>
-      <ui-test-status [status]="commandResponse?.detailedStatus" *ngSwitchCase="'test'"></ui-test-status>
-      <ng-template [ngTemplateOutlet]="defaultContent" *ngIf="!commandResponse?.detailedStatus"></ng-template>
-    </ng-container>
+    <div class="terminal-container" [ngClass]="(activeView$ | async) === 'terminal' ? 'terminal-is-active' : ''">
+      <ui-terminal [command]="command" [outChunk]="commandResponse?.outChunk"></ui-terminal>
+    </div>
   </div>
 </div>
+
 <ng-template #defaultContent>
   <mat-list role="list" [ngSwitch]="commandResponse?.status" [ngClass]="'status-' + commandResponse?.status">
     <mat-list-item *ngSwitchCase="'in-progress'">
@@ -41,7 +52,7 @@
     </mat-list-item>
     <mat-list-item *ngSwitchCase="'failed'">
       <mat-icon matListIcon>error</mat-icon>
-      Task failed. Please check&nbsp;<a (click)="onRawOutputToggle()">terminal output</a>&nbsp;for more details.
+      Task failed. Please check&nbsp;<a (click)="setActiveView('terminal')">terminal output</a>&nbsp;for more details.
     </mat-list-item>
   </mat-list>
 </ng-template>

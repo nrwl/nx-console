@@ -8,9 +8,9 @@
       <mat-step [stepControl]="control" *ngIf="ngNewForm.controls.path as control" [completed]="true">
         <ng-template matStepLabel>Select a parent directory</ng-template>
         <div>
-          <mat-form-field readonly="true" autofilled class="path-form-field" fxFlex appearance="outline">
+          <mat-form-field (click)="selectParentDirectory()" readonly="true" autofilled class="path-form-field" fxFlex appearance="outline">
             <mat-label>Parent directory</mat-label>
-            <input class="autofocus" (click)="selectParentDirectory()" readonly="true" matInput [formControl]="control"
+            <input class="autofocus" readonly="true" matInput [formControl]="control"
               name="parent-directory">
             <mat-icon matSuffix>folder</mat-icon>
             <mat-hint *ngIf="control.value">

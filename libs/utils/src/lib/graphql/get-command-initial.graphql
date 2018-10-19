@@ -1,11 +1,11 @@
-query GetCommand($id: String) {
+query GetCommandInitial($id: String) {
   commands(id: $id) {
     id
     type
     workspace
     command
     status
-    outChunk
+    out
     detailedStatus
   }
 }

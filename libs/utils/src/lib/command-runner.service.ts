@@ -1,17 +1,13 @@
 import { Injectable } from '@angular/core';
 import { FetchResult } from 'apollo-link';
-import { BehaviorSubject, interval, Observable, of } from 'rxjs';
-import {
-  concatMap,
-  distinctUntilChanged,
-  map,
-  takeWhile
-} from 'rxjs/operators';
+import { BehaviorSubject, interval, merge, Observable, of } from 'rxjs';
+import { concatMap, map, skip, take, takeWhile } from 'rxjs/operators';
 import { COMMANDS_POLLING } from './polling-constants';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import {
-  GetCommandGQL,
   CommandsGQL,
+  GetCommandGQL,
+  GetCommandInitialGQL,
   ListAllCommandsGQL,
   RemoveAllCommandsGQL,
   RemoveCommandGQL,
@@ -51,6 +47,7 @@ export class CommandRunner {
 
   constructor(
     private readonly getCommandGQL: GetCommandGQL,
+    private readonly getCommandInitialGQL: GetCommandInitialGQL,
     private readonly commandsGQL: CommandsGQL,
     private readonly listAllCommandsGQL: ListAllCommandsGQL,
     private readonly removeAllCommandsGQL: RemoveAllCommandsGQL,
@@ -101,21 +98,6 @@ export class CommandRunner {
               return of(c);
             }
           }),
-          distinctUntilChanged((a, b) => {
-            if ((a && !b) || (b && !a)) {
-              return false;
-            }
-
-            if (a.status !== b.status) {
-              return false;
-            }
-
-            if (a.outChunk !== b.outChunk) {
-              return false;
-            }
-
-            return true;
-          }),
           takeWhile(r => !!r)
         );
       })
@@ -129,16 +111,22 @@ export class CommandRunner {
   }
 
   getCommand(id: string): Observable<CommandResponse> {
-    // TODO: vsavkin refactor it such that we pull "out" once
-    return this.getCommandGQL.watch({ id }).valueChanges.pipe(
-      map((r: any) => {
-        const c = r.data.commands[0];
-        return {
-          ...c,
-          detailedStatus: c.detailedStatus ? JSON.parse(c.detailedStatus) : null
-        };
-      })
+    // Start initial `outChunk` with `out` so we can replay terminal output.
+    const initial$ = this.getCommandInitialGQL.watch({ id }).valueChanges.pipe(
+      map(withDetailedStatus),
+      map(r => ({
+        ...r,
+        outChunk: r.out
+      })),
+      take(1)
     );
+    const rest$ = this.getCommandGQL
+      .watch({ id }, { pollInterval: COMMANDS_POLLING })
+      .valueChanges.pipe(
+        map(withDetailedStatus),
+        skip(1)
+      );
+    return merge(initial$, rest$);
   }
 
   stopCommand(id: string) {
@@ -172,4 +160,14 @@ export class CommandRunner {
   stopActiveCommand() {
     this.stopCommand(this.activeCommandId);
   }
+}
+
+function withDetailedStatus(r: any) {
+  const c = r.data.commands[0];
+  return c
+    ? {
+        ...c,
+        detailedStatus: c.detailedStatus ? JSON.parse(c.detailedStatus) : null
+      }
+    : null;
 }

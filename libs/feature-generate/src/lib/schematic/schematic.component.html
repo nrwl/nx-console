@@ -8,10 +8,7 @@
   </ui-command-output>
 </ui-task-runner>
 <ng-template #emptyMessage>
-  <ng-container *ngIf="!(ngGenDisabled$ | async); else invalidFlags">
+  <ng-container>
     Click the Generate button to start this task.
   </ng-container>
-</ng-template>
-<ng-template #invalidFlags>
-  Command is missing required fields.
 </ng-template>

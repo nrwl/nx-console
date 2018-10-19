@@ -40,7 +40,7 @@ export namespace Editors {
   };
 }
 
-export namespace GetCommand {
+export namespace GetCommandInitial {
   export type Variables = {
     id?: string | null;
   };
@@ -58,6 +58,27 @@ export namespace GetCommand {
     command: string;
     status: string;
     out: string;
+    detailedStatus?: string | null;
+  };
+}
+
+export namespace GetCommand {
+  export type Variables = {
+    id?: string | null;
+  };
+
+  export type Query = {
+    __typename?: 'Query';
+    commands?: (Commands | null)[] | null;
+  };
+
+  export type Commands = {
+    __typename?: 'CommandResponse';
+    id: string;
+    type: string;
+    workspace?: string | null;
+    command: string;
+    status: string;
     outChunk: string;
     detailedStatus?: string | null;
   };
@@ -117,6 +138,22 @@ export namespace ListFiles {
     __typename?: 'FileListType';
     name: string;
     type: FileType;
+  };
+}
+
+export namespace OpenInBrowser {
+  export type Variables = {
+    url: string;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+    openInBrowser?: OpenInBrowser | null;
+  };
+
+  export type OpenInBrowser = {
+    __typename?: 'OpenInBrowserResult';
+    result: boolean;
   };
 }
 
@@ -206,6 +243,22 @@ export namespace Settings {
   };
 }
 
+export namespace ShowItemInFolder {
+  export type Variables = {
+    item: string;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+    showItemInFolder?: ShowItemInFolder | null;
+  };
+
+  export type ShowItemInFolder = {
+    __typename?: 'ShowItemInFolderResult';
+    result: boolean;
+  };
+}
+
 export namespace StopCommand {
   export type Variables = {
     id: string;
@@ -287,6 +340,27 @@ export class EditorsGQL extends Apollo.Query<Editors.Query, Editors.Variables> {
 @Injectable({
   providedIn: 'root'
 })
+export class GetCommandInitialGQL extends Apollo.Query<
+  GetCommandInitial.Query,
+  GetCommandInitial.Variables
+> {
+  document: any = gql`
+    query GetCommandInitial($id: String) {
+      commands(id: $id) {
+        id
+        type
+        workspace
+        command
+        status
+        out
+        detailedStatus
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
 export class GetCommandGQL extends Apollo.Query<
   GetCommand.Query,
   GetCommand.Variables
@@ -299,7 +373,6 @@ export class GetCommandGQL extends Apollo.Query<
         workspace
         command
         status
-        out
         outChunk
         detailedStatus
       }
@@ -356,6 +429,21 @@ export class ListFilesGQL extends Apollo.Query<
           name
           type
         }
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class OpenInBrowserGQL extends Apollo.Mutation<
+  OpenInBrowser.Mutation,
+  OpenInBrowser.Variables
+> {
+  document: any = gql`
+    mutation OpenInBrowser($url: String!) {
+      openInBrowser(url: $url) {
+        result
       }
     }
   `;
@@ -437,6 +525,21 @@ export class SettingsGQL extends Apollo.Query<
           name
           favorite
         }
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class ShowItemInFolderGQL extends Apollo.Mutation<
+  ShowItemInFolder.Mutation,
+  ShowItemInFolder.Variables
+> {
+  document: any = gql`
+    mutation ShowItemInFolder($item: String!) {
+      showItemInFolder(item: $item) {
+        result
       }
     }
   `;

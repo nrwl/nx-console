@@ -53,7 +53,13 @@ export class Commands {
       if (c.status === 'in-progress') {
         this.stopCommands([c]);
       }
-      const restarted = { ...c, out: '', outChunk: '' };
+      const restarted = {
+        ...c,
+        status: 'in-progress',
+        out: '',
+        outChunk: '',
+        commandRunning: c.factory()
+      };
       this.insertIntoHistory(restarted);
       this.insertIntoRecent(restarted);
       restarted.detailedStatusCalculator.reset();

@@ -2,12 +2,12 @@
   <div class="inner-container">
     <mat-list role="list">
       <div class="status-build_success">
-        <mat-list-item *ngIf="status?.serverHost && status?.serverPort">
+        <mat-list-item *ngIf="serverUrl()">
           <mat-icon matListIcon>check_circle</mat-icon>
           <div class="status-content">
             <div fxFill fxLayout="row" fxLayoutAlign="start center">
               <div fxFlex>Server started</div>
-              <a target="_blank" [href]="'http://' + (status?.serverHost || '') + ':' + (status?.serverPort || '')">
+              <a target="_blank" (click)="onServerOpen()" matTooltip="Open in browser" matTooltipPosition="left">
                 <mat-icon>launch</mat-icon>
               </a>
             </div>
@@ -26,28 +26,41 @@
           <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
           Running build... ({{ status?.progress }}%)
         </mat-list-item>
-        <mat-list-item *ngSwitchCase="'build_success'">
-          <mat-icon matListIcon>check_circle</mat-icon>
-          <div class="status-content">
-            <div fxFill fxLayout="row" fxLayoutAlign="start center">
-              <div fxFlex>Build successful</div>
-              <div class="hint"
-                   matTooltip="Total build time">
-                {{ status?.time }}
-              </div>
+        <ng-container *ngSwitchCase="'build_success'">
+          <mat-list-item>
+            <mat-icon matListIcon>check_circle</mat-icon>
+            <div class="status-content">
+              Build successful!
             </div>
-          </div>
-        </mat-list-item>
+          </mat-list-item>
+          <mat-list-item *ngIf="serverUrl()">
+            <mat-icon class="info" matListIcon>info</mat-icon>
+            <div class="status-content">
+              You can now view your <a (click)="onServerOpen()">application</a> in the browser.
+            </div>
+          </mat-list-item>
+          <mat-list-item *ngIf="status?.outputPath as outputPath">
+            <mat-icon class="info" matListIcon>info</mat-icon>
+            <div class="status-content">
+              <ng-container *ngIf="status?.isForProduction; else devBuiltMessage">
+                The application <a (click)="showItemInFolder(outputPath)">folder</a> is ready to be deployed.
+              </ng-container>
+            </div>
+            <ng-template #devBuiltMessage>
+              <p>The application <a (click)="showItemInFolder(outputPath)">folder</a> is ready. Note that this is a development build and not meant to be deployed to production.
+            </ng-template>
+          </mat-list-item>
+          <mat-list-item *ngIf="commandStatus === 'in-progress'">
+            <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
+            <div class="status-content">
+              Watching for changes...
+            </div>
+          </mat-list-item>
+        </ng-container>
         <mat-list-item *ngSwitchCase="'build_failure'">
           <mat-icon matListIcon>error</mat-icon>
           <div class="status-content">
-            <div fxFill fxLayout="row" fxLayoutAlign="start center">
-              <div fxFlex>Build failed</div>
-              <div class="hint"
-                   matTooltip="Total build time">
-                {{ status?.time }}
-              </div>
-            </div>
+            Build failed
           </div>
         </mat-list-item>
       </div>
@@ -56,20 +69,10 @@
         <h3 matSubheader>
           Errors
         </h3>
-        <mat-list-item class="build-error" *ngFor="let error of status?.errors; trackBy: errorTrackByFn">
+        <mat-list-item class="build-error" *ngFor="let error of status?.errors; trackBy: trackByError">
           {{ error }}
         </mat-list-item>
       </ng-container>
-      <h3 matSubheader *ngIf="status?.chunks.length > 0">
-        Assets
-      </h3>
-      <mat-list-item role="listitem" *ngFor="let chunk of status?.chunks">
-        <mat-divider></mat-divider>
-        <div fxFill fxLayout="row" fxLayoutAlign="start center">
-          <div fxFlex>{{ chunk.name }}</div>
-          <div class="hint" matTooltip="Asset size">{{ chunk.size }}</div>
-        </div>
-      </mat-list-item>
     </mat-list>
   </div>
 </div>
