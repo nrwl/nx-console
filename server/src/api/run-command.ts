@@ -1,7 +1,7 @@
 import { Commands } from './commands';
 import { readJsonFile } from '../utils';
 import { createDetailedStatusCalculator } from './detailed-status-calculator';
-import { normalizeCommands } from '../builder-utils';
+import { normalizeCommands } from '../architect-utils';
 
 // noinspection TsLint
 const spawn = require('node-pty-prebuilt').spawn;

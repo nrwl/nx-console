@@ -1,0 +1,5 @@
+mutation ShowItemInFolder($item: String!) {
+  showItemInFolder(item: $item) {
+    result
+  }
+}

@@ -120,6 +120,22 @@ export namespace ListFiles {
   };
 }
 
+export namespace OpenInBrowser {
+  export type Variables = {
+    url: string;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+    openInBrowser?: OpenInBrowser | null;
+  };
+
+  export type OpenInBrowser = {
+    __typename?: 'OpenInBrowserResult';
+    result: boolean;
+  };
+}
+
 export namespace OpenInEditor {
   export type Variables = {
     editor: string;
@@ -203,6 +219,22 @@ export namespace Settings {
     path: string;
     name: string;
     favorite?: boolean | null;
+  };
+}
+
+export namespace ShowItemInFolder {
+  export type Variables = {
+    item: string;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+    showItemInFolder?: ShowItemInFolder | null;
+  };
+
+  export type ShowItemInFolder = {
+    __typename?: 'ShowItemInFolderResult';
+    result: boolean;
   };
 }
 
@@ -363,6 +395,21 @@ export class ListFilesGQL extends Apollo.Query<
 @Injectable({
   providedIn: 'root'
 })
+export class OpenInBrowserGQL extends Apollo.Mutation<
+  OpenInBrowser.Mutation,
+  OpenInBrowser.Variables
+> {
+  document: any = gql`
+    mutation OpenInBrowser($url: String!) {
+      openInBrowser(url: $url) {
+        result
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
 export class OpenInEditorGQL extends Apollo.Mutation<
   OpenInEditor.Mutation,
   OpenInEditor.Variables
@@ -437,6 +484,21 @@ export class SettingsGQL extends Apollo.Query<
           name
           favorite
         }
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class ShowItemInFolderGQL extends Apollo.Mutation<
+  ShowItemInFolder.Mutation,
+  ShowItemInFolder.Variables
+> {
+  document: any = gql`
+    mutation ShowItemInFolder($item: String!) {
+      showItemInFolder(item: $item) {
+        result
       }
     }
   `;

@@ -184,7 +184,11 @@ describe('detailedStatusCalculator', () => {
     });
 
     function createCalculator() {
-      return new BuildDetailedStatusCalculator();
+      return new BuildDetailedStatusCalculator({
+        cwd: '',
+        isForProduction: false,
+        architectOptions: null
+      });
     }
   });
 

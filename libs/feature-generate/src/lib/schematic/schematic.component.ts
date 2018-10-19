@@ -7,7 +7,8 @@ import {
 import {
   IncrementalCommandOutput,
   CommandRunner,
-  Serializer
+  Serializer,
+  CommandStatus
 } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
@@ -146,6 +147,15 @@ export class SchematicComponent implements OnInit {
 
         this.out.reset();
         if (!c.valid) {
+          // cannot use change detection because the operation isn't idempotent
+          this.out.commandResponse = {
+            id: '',
+            command: '',
+            out: '',
+            detailedStatus: null,
+            status: CommandStatus.TERMINATED,
+            outChunk: 'Command is missing required fields'
+          };
           return of();
         }
 

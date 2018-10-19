@@ -120,6 +120,10 @@ export const typeDefs = gql`
     result: Boolean!
   }
 
+  type ShowItemInFolderResult {
+    result: Boolean!
+  }
+
   type Mutation {
     ngAdd(path: String!, name: String!): CommandStarted
     ngNew(path: String!, name: String!, collection: String!): CommandStarted
@@ -147,6 +151,7 @@ export const typeDefs = gql`
       dialogButtonLabel: String!
       angularWorkspace: Boolean!
     ): SelectDirectoryResult
+    showItemInFolder(item: String!): ShowItemInFolderResult
   }
 
   type SelectDirectoryResult {
