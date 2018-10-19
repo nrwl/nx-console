@@ -1,22 +1,23 @@
 import {
+  animate,
   state,
   style,
-  trigger,
   transition,
-  animate
+  trigger
 } from '@angular/animations';
-import { Component, ViewChildren, QueryList } from '@angular/core';
+import { Component, QueryList, ViewChildren } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import {
+  distinctUntilChanged,
   map,
   shareReplay,
-  tap,
-  distinctUntilChanged,
-  startWith
+  startWith,
+  switchMap,
+  tap
 } from 'rxjs/operators';
 import {
-  CommandRunner,
   CommandResponse,
+  CommandRunner,
   CommandStatus
 } from '@angular-console/utils';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
@@ -116,6 +117,8 @@ export class ActionBarComponent {
     })
   );
 
+  commandRun$ = new BehaviorSubject<void>(undefined);
+
   // Show/hide a particular items terminal output.
   toggleItemExpansion(actionId: string) {
     if (this.expandedAction && actionId === this.expandedAction.id) {
@@ -123,7 +126,11 @@ export class ActionBarComponent {
     } else {
       this.expandedAction = {
         id: actionId,
-        command: this.commandRunner.getCommand(actionId).pipe(shareReplay())
+        command: this.commandRun$.pipe(
+          switchMap(() =>
+            this.commandRunner.getCommand(actionId).pipe(shareReplay())
+          )
+        )
       };
     }
   }
@@ -157,5 +164,13 @@ export class ActionBarComponent {
       .subscribe(height => {
         this.terminalHeight = height;
       });
+  }
+
+  handleRestart(cmd: CommandResponse) {
+    if (this.activeTerminals && this.activeTerminals.first) {
+      this.activeTerminals.first.reset();
+    }
+    this.commandRunner.restartCommand(cmd.id);
+    this.commandRun$.next(undefined);
   }
 }

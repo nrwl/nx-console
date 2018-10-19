@@ -12,6 +12,10 @@ describe('detailedStatusCalculator', () => {
         type: StatusType.BUILD,
         buildStatus: 'build_inprogress',
         progress: 0,
+        indexFile: undefined,
+        isForProduction: false,
+        outputPath: undefined,
+        serverHost: undefined,
         date: '',
         time: '',
         chunks: [],
@@ -55,6 +59,10 @@ describe('detailedStatusCalculator', () => {
         type: StatusType.BUILD,
         buildStatus: 'build_success',
         progress: 100,
+        indexFile: undefined,
+        isForProduction: false,
+        outputPath: undefined,
+        serverHost: undefined,
         date: '2018-09-23T19:46:04.026Z',
         time: '16477ms',
         chunks: [
@@ -96,6 +104,10 @@ describe('detailedStatusCalculator', () => {
         progress: 100,
         date: '',
         time: '',
+        indexFile: undefined,
+        isForProduction: false,
+        outputPath: undefined,
+        serverHost: undefined,
         chunks: [
           { name: 'main', file: 'main.js', size: '381 kB', type: 'initial' }
         ],
@@ -114,6 +126,11 @@ describe('detailedStatusCalculator', () => {
         type: StatusType.BUILD,
         buildStatus: 'build_success',
         progress: 100,
+        indexFile: undefined,
+        isForProduction: false,
+        outputPath: undefined,
+        serverHost: undefined,
+        serverPort: undefined,
         date: '',
         time: '',
         chunks: [
@@ -131,6 +148,10 @@ describe('detailedStatusCalculator', () => {
         type: StatusType.BUILD,
         buildStatus: 'build_failure',
         progress: 100,
+        indexFile: undefined,
+        isForProduction: false,
+        outputPath: undefined,
+        serverHost: undefined,
         date: '',
         time: '',
         chunks: [
@@ -184,7 +205,11 @@ describe('detailedStatusCalculator', () => {
     });
 
     function createCalculator() {
-      return new BuildDetailedStatusCalculator();
+      return new BuildDetailedStatusCalculator({
+        cwd: '',
+        isForProduction: false,
+        architectOptions: null
+      });
     }
   });
 

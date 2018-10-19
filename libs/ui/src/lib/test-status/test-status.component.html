@@ -48,7 +48,7 @@
         </h3>
         <mat-divider></mat-divider>
         <mat-accordion>
-          <mat-expansion-panel *ngFor="let error of status?.errors; trackBy: errorTrackByFn">
+          <mat-expansion-panel *ngFor="let error of status?.errors; trackBy: trackByErrorLabel">
             <mat-expansion-panel-header>
               <mat-panel-title class="error-label">
                 {{ error.label }}

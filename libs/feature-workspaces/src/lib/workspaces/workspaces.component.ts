@@ -9,9 +9,6 @@ import {
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { map, tap, first } from 'rxjs/operators';
-
-import { GetDirectoryPathGQL, GetDirectoryPath } from '../generated/graphql';
 import { NewWorkspaceComponent } from '../new-workspace/new-workspace.component';
 import { WorkspacesService } from '../workspaces.service';
 

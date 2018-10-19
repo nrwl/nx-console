@@ -309,18 +309,32 @@ const Mutation: MutationResolvers.Resolvers = {
   },
   async stopCommand(_root: any, args: any) {
     try {
-      commands.stopCommands([
-        commands.findMatchingCommand(args.id, commands.recent)
-      ]);
-      return { result: true };
+      const c = commands.findMatchingCommand(args.id, commands.recent);
+      if (c) {
+        commands.stopCommands([c]);
+        return { result: true };
+      } else {
+        return { result: false };
+      }
     } catch (e) {
       console.log(e);
       throw new Error(`Error when stopping commands. Message: "${e.message}"`);
     }
   },
-  async openInBrowser(_root: any, args: any) {
-    shell.openExternal(args.url);
-    return { result: true };
+  async openInBrowser(_root: any, { url }: any) {
+    if (url) {
+      shell.openExternal(url);
+      return { result: true };
+    } else {
+      return { result: false };
+    }
+  },
+  async showItemInFolder(_root: any, { item }: any) {
+    if (item) {
+      return { result: shell.showItemInFolder(item) };
+    } else {
+      return { result: false };
+    }
   },
   async removeCommand(_root: any, args: any) {
     try {

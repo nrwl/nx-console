@@ -203,6 +203,7 @@ export interface Mutation {
   installNodeJs?: InstallNodeJsStatus | null;
   openInBrowser?: OpenInBrowserResult | null;
   selectDirectory?: SelectDirectoryResult | null;
+  showItemInFolder?: ShowItemInFolderResult | null;
 }
 
 export interface CommandStarted {
@@ -228,6 +229,10 @@ export interface OpenInBrowserResult {
 export interface SelectDirectoryResult {
   selectedDirectoryPath?: string | null;
   error?: string | null;
+}
+
+export interface ShowItemInFolderResult {
+  result: boolean;
 }
 export interface WorkspaceDatabaseArgs {
   path: string;
@@ -316,6 +321,9 @@ export interface SelectDirectoryMutationArgs {
   dialogTitle: string;
   dialogButtonLabel: string;
   angularWorkspace: boolean;
+}
+export interface ShowItemInFolderMutationArgs {
+  item: string;
 }
 
 export enum FileType {
@@ -1150,6 +1158,11 @@ export namespace MutationResolvers {
       any,
       Context
     >;
+    showItemInFolder?: ShowItemInFolderResolver<
+      ShowItemInFolderResult | null,
+      any,
+      Context
+    >;
   }
 
   export type NgAddResolver<
@@ -1280,6 +1293,15 @@ export namespace MutationResolvers {
     dialogButtonLabel: string;
     angularWorkspace: boolean;
   }
+
+  export type ShowItemInFolderResolver<
+    R = ShowItemInFolderResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, ShowItemInFolderArgs>;
+  export interface ShowItemInFolderArgs {
+    item: string;
+  }
 }
 
 export namespace CommandStartedResolvers {
@@ -1359,6 +1381,18 @@ export namespace SelectDirectoryResultResolvers {
   > = Resolver<R, Parent, Context>;
   export type ErrorResolver<
     R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace ShowItemInFolderResultResolvers {
+  export interface Resolvers<Context = any> {
+    result?: ResultResolver<boolean, any, Context>;
+  }
+
+  export type ResultResolver<
+    R = boolean,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

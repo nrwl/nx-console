@@ -2,6 +2,8 @@
 @include mat-core();
 
 $hint-palette: mat-palette($mat-blue-gray, 800);
+$action-palette: mat-palette($mat-blue);
+$info-palette: mat-palette($mat-light-blue);
 $failure-palette: mat-palette($mat-red);
 $success-palette: mat-palette($mat-green);
 
@@ -16,11 +18,24 @@ $success-palette: mat-palette($mat-green);
   h3 mat-icon {
     margin: 0 4px;
   }
+
+  a mat-icon {
+    cursor: pointer;
+  }
+
+  a {
+    color: mat-color($action-palette);
+    cursor: pointer;
+  }
 }
 
 .inner-container {
   height: 100%;
   overflow: auto;
+
+  mat-icon.info {
+    color: mat-color($info-palette);
+  }
 }
 
 .status-build_success mat-icon {

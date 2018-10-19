@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { CommandStatus } from '@angular-console/utils';
 
 interface TestError {
   label: string;
@@ -24,6 +25,7 @@ export interface TestStatus {
   styleUrls: ['./test-status.component.scss']
 })
 export class TestStatusComponent {
+  @Input() commandStatus: CommandStatus;
   @Input() status: TestStatus;
 
   statusClassName() {
@@ -34,7 +36,7 @@ export class TestStatusComponent {
     }
   }
 
-  errorTrackByFn(_: number, err: TestError) {
+  trackByErrorLabel(_: number, err: TestError) {
     return err.label;
   }
 }
