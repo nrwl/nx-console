@@ -17,7 +17,7 @@ After that, run `yarn start dev.prepare`. Every time you add or remove dependenc
 
 After this, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200. 
 
-You can also run the electron app by running `yarn start mac.start-electron` or `yarn start win.start-electron`.
+You can also run the electron app by running `yarn start mac.start-electron`, `yarn start win.start-electron` or `yarn start linux.start-electron`.
 
 
 ## Running Unit Tests
