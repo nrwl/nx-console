@@ -1,0 +1,5 @@
+mutation OpenInBrowser($url: String!) {
+  openInBrowser(url: $url) {
+    result
+  }
+}

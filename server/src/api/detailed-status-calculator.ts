@@ -2,8 +2,9 @@ import { readJsonFile } from '../utils';
 import {
   SUPPORTED_NG_BUILD_BUILDERS,
   SUPPORTED_KARMA_TEST_BUILDERS,
-  getProjectBuilder
-} from '../builder-utils';
+  getProjectArchitect
+} from '../architect-utils';
+import { join } from 'path';
 
 export enum StatusType {
   BUILD = 'build',
@@ -14,14 +15,24 @@ export function createDetailedStatusCalculator(cwd: string, cmds: string[]) {
   const operationName = cmds[0];
   const project = cmds[1];
   const { json: angularJson } = readJsonFile('./angular.json', cwd);
-  const builder = getProjectBuilder(project, operationName, angularJson);
+  const architect = getProjectArchitect(project, operationName, angularJson);
+  const builder = architect.builder;
+
   if (SUPPORTED_KARMA_TEST_BUILDERS.includes(builder)) {
     return new TestDetailedStatusCalculator();
-  } else if (SUPPORTED_NG_BUILD_BUILDERS.includes(builder)) {
-    return new BuildDetailedStatusCalculator();
-  } else {
-    return new EmptyDetailedStatusCalculator();
   }
+
+  if (SUPPORTED_NG_BUILD_BUILDERS.includes(builder)) {
+    const isForProduction = cmds.includes('--configuration=production');
+    const options = architect.options;
+    return new BuildDetailedStatusCalculator({
+      isForProduction,
+      architectOptions: options,
+      cwd
+    });
+  }
+
+  return new EmptyDetailedStatusCalculator();
 }
 
 export interface DetailedStatusCalculator<T> {
@@ -59,26 +70,59 @@ export interface BuildDetailedStatus {
   errors: string[];
   serverHost?: string;
   serverPort?: number;
+  isForProduction?: boolean;
+  outputPath?: string;
+  indexFile?: string;
+}
+
+interface BuildArchitectOpts {
+  outputPath: string;
+  index: string;
+  main: string;
+  polyfills: string;
+  tsConfig: string;
+  assets: string[];
 }
 
 export class BuildDetailedStatusCalculator
   implements DetailedStatusCalculator<BuildDetailedStatus> {
   detailedStatus: BuildDetailedStatus;
   chunks: { [k: string]: Chunk } = {};
+  isForProduction: boolean;
+  architectOptions: null | BuildArchitectOpts;
+  cwd: string;
 
-  constructor() {
+  constructor(opts: {
+    isForProduction: boolean;
+    architectOptions: null | BuildArchitectOpts;
+    cwd: string;
+  }) {
+    this.isForProduction = opts.isForProduction;
+    this.architectOptions = opts.architectOptions;
+    this.cwd = opts.cwd;
     this.reset();
   }
 
   reset() {
+    const outputPath =
+      this.architectOptions && this.architectOptions.outputPath
+        ? join(this.cwd, this.architectOptions.outputPath)
+        : undefined;
+    const indexFile =
+      this.architectOptions && this.architectOptions.index
+        ? join(this.cwd, this.architectOptions.index)
+        : undefined;
     this.detailedStatus = {
+      outputPath,
+      indexFile,
       type: StatusType.BUILD,
       buildStatus: 'build_inprogress',
       progress: 0,
       date: '',
       time: '',
       chunks: [] as Chunk[],
-      errors: []
+      errors: [],
+      isForProduction: this.isForProduction
     };
   }
 
@@ -241,7 +285,7 @@ function getNextBuildState(
 
   if (value.indexOf('chunk') > -1 && value.indexOf('Hash:') > -1) {
     value
-      .split('\n')
+      .split(/[\n\r]/)
       .map(v => v.trim())
       .forEach(line => {
         const chunkRegExp = /chunk {(\w+)}\s*([\w|.]+)[^)]*\)\s*([^[]*)\[(\w+)/g;
@@ -272,7 +316,7 @@ function getNextBuildState(
   if (value.indexOf('ERROR in') > -1) {
     errors = value
       .substring(value.indexOf('ERROR in') + 8)
-      .split('\n')
+      .split(/[\n\r]/)
       .map(v => v.trim())
       .filter(v => v.length > 0);
   }

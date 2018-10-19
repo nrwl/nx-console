@@ -16,7 +16,8 @@ export function normalizeCommands(cwd: string, cmds: string[]): string[] {
   const operationName = cmds[0];
   const project = cmds[1];
   const { json: angularJson } = readJsonFile('./angular.json', cwd);
-  const builder = getProjectBuilder(project, operationName, angularJson);
+  const builder = getProjectArchitect(project, operationName, angularJson)
+    .builder;
 
   if (SUPPORTED_KARMA_TEST_BUILDERS.includes(builder)) {
     const projectRoot = angularJson.projects[cmds[1]].root;
@@ -32,14 +33,14 @@ export function normalizeCommands(cwd: string, cmds: string[]): string[] {
   return cmds;
 }
 
-export function getProjectBuilder(
+export function getProjectArchitect(
   project: string,
   operation: string,
   angularJson: any
-): string {
+): any {
   try {
-    return angularJson.projects[project].architect[operation].builder;
+    return angularJson.projects[project].architect[operation];
   } catch (err) {
-    return '';
+    return {};
   }
 }
