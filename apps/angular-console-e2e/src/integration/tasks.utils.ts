@@ -27,7 +27,7 @@ export function checkSingleRecentTask(task: Task) {
 
     expect(
       tasks
-        .find('.command')
+        .find('.command-text')
         .get(0)
         .textContent.trim()
     ).to.equal(task.command);
@@ -64,7 +64,7 @@ export function checkMultipleRecentTasks(options: {
       options.tasks.forEach((task, index) => {
         const taskElement = taskElements[index];
         expect(
-          taskElement.querySelector('.command').textContent.trim()
+          taskElement.querySelector('.command-text').textContent.trim()
         ).to.equal(task.command);
 
         expect(taskElement.querySelector(`.task-avatar.${task.status}`)).not.to

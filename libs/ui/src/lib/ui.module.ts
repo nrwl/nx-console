@@ -26,14 +26,14 @@ import {
   MatTooltipModule,
   MatTreeModule,
   MatProgressBarModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
+  MatStepperModule
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 
 import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
 import { DataCollectionComponent } from './data-collection/data-collection.component';
-import { DirectorySelectorComponent } from './directory-selector/directory-selector.component';
 import { FlagsComponent } from './flags/flags.component';
 import { NormalizePathPipe } from './normalize-path.pipe';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
@@ -44,84 +44,73 @@ import { CommandOutputComponent } from './command-output/command-output.componen
 import { TestStatusComponent } from './test-status/test-status.component';
 
 const IMPORTS = [
-  MatProgressSpinnerModule,
-  MatProgressBarModule,
-  MatMenuModule,
+  CdkTreeModule,
   CdkTreeModule,
   CommonModule,
   FlexLayoutModule,
   MatAutocompleteModule,
+  MatAutocompleteModule,
   MatBadgeModule,
   MatButtonModule,
-  MatCardModule,
-  MatDividerModule,
-  MatExpansionModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatOptionModule,
-  MatRadioModule,
-  MatRippleModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSlideToggleModule,
-  MatProgressSpinnerModule,
-  MatTabsModule,
-  MatToolbarModule,
-  MatTooltipModule,
-  MatTreeModule,
-  CdkTreeModule,
-  MatAutocompleteModule,
   MatButtonModule,
   MatCardModule,
+  MatCardModule,
+  MatDividerModule,
   MatDividerModule,
   MatExpansionModule,
+  MatExpansionModule,
+  MatIconModule,
   MatIconModule,
   MatInputModule,
+  MatInputModule,
   MatListModule,
+  MatListModule,
+  MatMenuModule,
   MatOptionModule,
+  MatOptionModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
   MatRadioModule,
   MatRippleModule,
+  MatRippleModule,
+  MatSelectModule,
   MatSelectModule,
   MatSidenavModule,
+  MatSidenavModule,
   MatSlideToggleModule,
+  MatSlideToggleModule,
+  MatStepperModule,
+  MatTabsModule,
   MatTabsModule,
   MatToolbarModule,
+  MatToolbarModule,
   MatTooltipModule,
+  MatTooltipModule,
+  MatTreeModule,
   MatTreeModule,
   ReactiveFormsModule,
   RouterModule
 ];
 
+const PUBLIC_DECLARATIONS = [
+  BuildStatusComponent,
+  CommandOutputComponent,
+  ContextualActionBarComponent,
+  DataCollectionComponent,
+  FlagsComponent,
+  NormalizePathPipe,
+  TaskRunnerComponent,
+  TaskSelectorComponent,
+  TerminalComponent,
+  TestStatusComponent
+];
+
 @NgModule({
   imports: IMPORTS,
-  declarations: [
-    FlagsComponent,
-    TerminalComponent,
-    TaskRunnerComponent,
-    TaskSelectorComponent,
-    ContextualActionBarComponent,
-    DirectorySelectorComponent,
-    NormalizePathPipe,
-    DataCollectionComponent,
-    BuildStatusComponent,
-    CommandOutputComponent,
-    TestStatusComponent
-  ],
-  exports: [
-    ...IMPORTS,
-    ContextualActionBarComponent,
-    DirectorySelectorComponent,
-    FlagsComponent,
-    TaskRunnerComponent,
-    TaskSelectorComponent,
-    TerminalComponent,
-    NormalizePathPipe,
-    DataCollectionComponent,
-    BuildStatusComponent,
-    CommandOutputComponent,
-    TestStatusComponent
-  ]
+  declarations: [...PUBLIC_DECLARATIONS],
+  exports: [...IMPORTS, ...PUBLIC_DECLARATIONS]
 })
 export class UiModule {
   constructor(

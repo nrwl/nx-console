@@ -1,44 +1,42 @@
-import { DynamicFlatNode } from '@angular-console/ui';
+import { Directory } from '@angular-console/schema';
+import {
+  CommandRunner,
+  Finder,
+  IncrementalCommandOutput,
+  CommandStatus
+} from '@angular-console/utils';
 import {
   Component,
-  OnInit,
-  QueryList,
-  ViewChildren,
+  ElementRef,
+  ViewChild,
   ViewEncapsulation
 } from '@angular/core';
 import {
-  AsyncValidatorFn,
-  ValidationErrors,
   AbstractControl,
-  FormControl,
+  AsyncValidatorFn,
+  FormBuilder,
   FormGroup,
+  ValidationErrors,
   Validators
 } from '@angular/forms';
-import { MatDialog, MatExpansionPanel } from '@angular/material';
-import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import {
-  BehaviorSubject,
-  Observable,
-  Subject,
-  OperatorFunction,
-  of
-} from 'rxjs';
+  MatDialogRef,
+  MatSelectionListChange,
+  MatVerticalStepper
+} from '@angular/material';
+import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
 import {
-  filter,
   map,
   publishReplay,
   refCount,
   switchMap,
-  take
+  take,
+  tap
 } from 'rxjs/operators';
-import { SchematicCollectionsGQL } from '../generated/graphql';
 
-import {
-  NewWorkspaceDialogComponent,
-  NgNewInvocation
-} from './new-workspace-dialog.component';
-import { Directory } from '@angular-console/schema';
-import { Finder } from '@angular-console/utils';
+import { NgNew, NgNewGQL, SchematicCollectionsGQL } from '../generated/graphql';
+import { WorkspacesService } from '../workspaces.service';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -51,129 +49,96 @@ interface SchematicCollectionForNgNew {
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.scss']
 })
-export class NewWorkspaceComponent implements OnInit {
-  @ViewChildren(MatExpansionPanel)
-  matExpansionPanels: QueryList<MatExpansionPanel>;
-  schematicCollectionsForNgNew$: Observable<any>;
-  ngNewForm$ = new BehaviorSubject<FormGroup | null>(null);
+export class NewWorkspaceComponent {
+  @ViewChild(MatVerticalStepper) verticalStepper: MatVerticalStepper;
+  commandOutput$?: Observable<IncrementalCommandOutput>;
 
-  selectedNode: DynamicFlatNode | null = null;
+  command?: string;
 
-  private readonly createNewWorkspace$ = new Subject<void>();
+  ngNewForm = this.fb.group({
+    path: this.fb.control(null, Validators.required),
+    name: this.fb.control(
+      null,
+      Validators.required,
+      makeNameAvailableValidator(this.finderService)
+    ),
+    collection: this.fb.control(null, Validators.required)
+  });
+
+  schematicCollectionsForNgNew$ = this.schematicCollectionsGQL.fetch().pipe(
+    map(r => r.data.schematicCollections),
+    publishReplay(1),
+    refCount()
+  );
+
+  autofocusInput() {
+    const autofocus = (this.elementRef
+      .nativeElement as HTMLElement).querySelectorAll('.autofocus')[
+      this.verticalStepper.selectedIndex
+    ] as any;
+
+    autofocus.focus();
+  }
 
   constructor(
-    private readonly contextActionService: ContextualActionBarService,
-    private readonly matDialog: MatDialog,
+    private readonly elementRef: ElementRef,
+    private readonly router: Router,
+    private readonly dialogRef: MatDialogRef<NewWorkspaceComponent>,
+    private readonly fb: FormBuilder,
     private readonly finderService: Finder,
-    private readonly schematicCollectionsGQL: SchematicCollectionsGQL
+    private readonly schematicCollectionsGQL: SchematicCollectionsGQL,
+    private readonly workspacesService: WorkspacesService,
+    private readonly ngNewGQL: NgNewGQL,
+    private readonly commandRunner: CommandRunner
   ) {}
 
-  private static newFormGroup(finderService: Finder): FormGroup {
-    return new FormGroup({
-      path: new FormControl(null, Validators.required),
-      name: new FormControl(
-        null,
-        Validators.required,
-        makeNameAvailableValidator(finderService)
-      ),
-      collection: new FormControl(null, Validators.required)
-    });
+  handleSelection(event: MatSelectionListChange) {
+    // Workaround for https://github.com/angular/material2/issues/7157
+    if (event.option.selected) {
+      event.source.deselectAll();
+      event.option._setSelected(true);
+      this.ngNewForm.controls.collection.setValue(event.option.value);
+    } else {
+      this.ngNewForm.controls.collection.setValue(null);
+    }
   }
 
-  ngOnInit() {
-    this.contextActionService.contextualActions$.subscribe(actions => {
-      if (!actions) {
-        this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
-          panel.close();
-        });
-        this.selectedNode = null;
-        this.ngNewForm$.next(
-          NewWorkspaceComponent.newFormGroup(this.finderService)
-        );
-      }
-    });
+  selectParentDirectory() {
+    this.workspacesService
+      .selectDirectoryForNewWorkspace()
+      .subscribe(result => {
+        if (result && result.selectedDirectoryPath) {
+          this.ngNewForm.controls.path.setValue(result.selectedDirectoryPath);
+          this.verticalStepper.next();
+        }
+      });
+  }
 
-    this.schematicCollectionsForNgNew$ = this.schematicCollectionsGQL
-      .fetch()
-      .pipe(
-        map(r => r.data.schematicCollections),
-        publishReplay(1),
-        refCount()
-      );
-
-    this.schematicCollectionsForNgNew$.subscribe(() => {
-      this.ngNewForm$.next(
-        NewWorkspaceComponent.newFormGroup(this.finderService)
-      );
-    });
-
-    this.createNewWorkspace$.subscribe(() => {
-      const form = this.ngNewForm$.value;
-      if (form) {
-        this.createNewWorkspace(form.value as NgNewInvocation);
-      }
-    });
-
-    this.ngNewForm$
-      .pipe(
-        filter(form => Boolean(form)) as OperatorFunction<
-          FormGroup | null,
-          FormGroup
-        >,
-        switchMap((form: FormGroup) => form.statusChanges)
-      )
-      .subscribe((formStatus: any) => {
-        this.contextActionService.contextualActions$.next({
-          contextTitle: 'Create a New Angular Workspace',
-          actions: [
-            {
-              name: 'Create',
-              disabled: new BehaviorSubject(formStatus !== 'VALID'),
-              invoke: this.createNewWorkspace$
+  createNewWorkspace() {
+    if (this.ngNewForm.valid) {
+      const ngNewInvocation: NgNew.Variables = this.ngNewForm.value;
+      this.command = `ng new ${name} --collection=${
+        ngNewInvocation.collection
+      }`;
+      this.commandOutput$ = this.commandRunner
+        .runCommand(this.ngNewGQL.mutate(ngNewInvocation), false)
+        .pipe(
+          tap(command => {
+            if (command.status === CommandStatus.SUCCESSFUL) {
+              this.dialogRef.close();
+              this.router.navigate([
+                '/workspace',
+                `${ngNewInvocation.path}/${ngNewInvocation.name}`,
+                'projects'
+              ]);
             }
-          ]
-        });
-      });
-  }
-
-  createNewWorkspace(ngNewInvocation: NgNewInvocation) {
-    this.matDialog
-      .open(NewWorkspaceDialogComponent, {
-        disableClose: true,
-        width: 'calc(100vw - 39px)',
-        height: 'calc(100vh - 128px)',
-        panelClass: 'create-new-workspace-dialog',
-        maxWidth: '95vw',
-        data: { ngNewInvocation }
-      })
-      .beforeClose()
-      .subscribe(() => {
-        this.contextActionService.contextualActions$.next(null);
-      });
+          })
+        );
+    }
   }
 
   trackByName(_: number, collection: SchematicCollectionForNgNew) {
     return collection.name;
-  }
-
-  setPathField(node: DynamicFlatNode) {
-    const form = this.ngNewForm$.value;
-    if (!form) {
-      return;
-    }
-
-    const field = form.get('path');
-    if (!field) {
-      return;
-    }
-
-    if (this.selectedNode === node) {
-      this.selectedNode = null;
-      field.setValue(null);
-    } else {
-      this.selectedNode = node;
-      field.setValue(node.path);
-    }
   }
 }
 
@@ -181,9 +146,10 @@ export function makeNameAvailableValidator(
   finderService: Finder
 ): AsyncValidatorFn {
   return (control: AbstractControl): Observable<ValidationErrors | null> => {
-    const form = control.parent;
-    const pathCtrl = form.get('path');
-    const nameCtrl = form.get('name');
+    const form = control.parent as FormGroup;
+    const pathCtrl = form.controls.path;
+    const nameCtrl = form.controls.name;
+
     return of(
       nameCtrl && pathCtrl ? `${pathCtrl.value}/${nameCtrl.value}` : null
     ).pipe(

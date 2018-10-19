@@ -11,6 +11,106 @@ mat-list-item {
   overflow: hidden;
 }
 
+mat-nav-list {
+  margin-bottom: 24px;
+}
+
+$largeScreen: 1800px;
+@media (max-width: $largeScreen) {
+  mat-nav-list {
+    width: 66.66%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+$mediumScreen: 1260px;
+@media (max-width: 1260px) {
+  mat-nav-list {
+    width: 840px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+$smallScreen: 920px;
+@media (max-width: $smallScreen) {
+  mat-nav-list {
+    width: auto;
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+}
+
+.workspace-item-container {
+  background: white;
+  box-shadow: 0 -1px 0 #e0e0e0, 0 0 2px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.24);
+  margin: 4px;
+}
+
+.mat-subheader {
+  margin-top: 8px !important;
+  font-size: 13px !important;
+  line-height: 24px !important;
+  margin-bottom: 0 !important;
+  padding-left: 24px;
+}
+
+.add-workspace-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+
+  padding: 24px;
+  padding-left: 48px;
+  padding-top: 48px;
+  z-index: 2;
+
+  .add-workspace-fab {
+    .create-icon {
+      position: absolute;
+      opacity: 0;
+      transform: rotate(-90deg);
+    }
+
+    .add-icon {
+      opacity: 1;
+      transform: rotate(0);
+    }
+
+    .create-icon,
+    .add-icon {
+      transition: all 0.2s ease-in-out;
+    }
+  }
+
+  .import-workspace-fab {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease-in-out;
+  }
+
+  &:hover {
+    .add-workspace-fab {
+      .create-icon {
+        opacity: 1;
+        transform: rotate(0);
+      }
+
+      .add-icon {
+        opacity: 0;
+        transform: rotate(90deg);
+      }
+    }
+    .import-workspace-fab {
+      opacity: 1;
+      transform: scale(1);
+      transition-delay: 0.1s;
+    }
+  }
+}
+
 mat-list-item mat-icon {
   cursor: pointer;
   color: rgb(128, 128, 128);

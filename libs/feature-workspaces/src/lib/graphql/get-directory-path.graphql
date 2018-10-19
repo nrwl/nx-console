@@ -1,0 +1,14 @@
+mutation GetDirectoryPath(
+  $dialogTitle: String!
+  $dialogButtonLabel: String!
+  $angularWorkspace: Boolean!
+) {
+  selectDirectory(
+    dialogTitle: $dialogTitle
+    dialogButtonLabel: $dialogButtonLabel
+    angularWorkspace: $angularWorkspace
+  ) {
+    selectedDirectoryPath
+    error
+  }
+}

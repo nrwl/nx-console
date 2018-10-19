@@ -23,6 +23,25 @@ export namespace BasicWorkspace {
   };
 }
 
+export namespace GetDirectoryPath {
+  export type Variables = {
+    dialogTitle: string;
+    dialogButtonLabel: string;
+    angularWorkspace: boolean;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+    selectDirectory?: SelectDirectory | null;
+  };
+
+  export type SelectDirectory = {
+    __typename?: 'SelectDirectoryResult';
+    selectedDirectoryPath?: string | null;
+    error?: string | null;
+  };
+}
+
 export namespace NgNew {
   export type Variables = {
     path: string;
@@ -128,6 +147,30 @@ export class BasicWorkspaceGQL extends Apollo.Query<
       workspace(path: $path) {
         path
         name
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class GetDirectoryPathGQL extends Apollo.Mutation<
+  GetDirectoryPath.Mutation,
+  GetDirectoryPath.Variables
+> {
+  document: any = gql`
+    mutation GetDirectoryPath(
+      $dialogTitle: String!
+      $dialogButtonLabel: String!
+      $angularWorkspace: Boolean!
+    ) {
+      selectDirectory(
+        dialogTitle: $dialogTitle
+        dialogButtonLabel: $dialogButtonLabel
+        angularWorkspace: $angularWorkspace
+      ) {
+        selectedDirectoryPath
+        error
       }
     }
   `;

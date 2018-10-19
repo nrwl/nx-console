@@ -44,7 +44,7 @@ export class Settings {
   toggleFavorite(w: WorkspaceDescription): void {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
     const favorite: WorkspaceDescription = { ...w, favorite: !w.favorite };
-    this.store({ ...this.settings, recent: [favorite, ...r] });
+    this.store({ ...this.settings, recent: [...r, favorite] });
   }
 
   addRecent(w: WorkspaceDescription): void {

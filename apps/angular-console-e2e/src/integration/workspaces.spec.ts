@@ -1,6 +1,5 @@
 import {
   checkButtonIsDisabled,
-  expandFolder,
   selectFolder,
   uniqName,
   whitelistGraphql
@@ -12,50 +11,49 @@ describe('Workspaces', () => {
   beforeEach(() => {
     whitelistGraphql();
     cy.visit('/workspaces');
+    cy.get('.add-workspace-container').trigger('mouseover');
   });
 
   it('creates new workspaces', () => {
-    cy.get('a[href="/create-workspace"]').click();
-    cy.get('div.title').contains('Create Workspace');
+    cy.get('.add-workspace-fab').click({ force: true });
     checkButtonIsDisabled('Create', true);
 
-    cy.get('mat-expansion-panel.directory-selector').click();
-    selectFolder('tmp');
+    selectFolder();
     checkButtonIsDisabled('Create', true);
 
-    cy.get('mat-expansion-panel.name-selector').click();
-    cy.get('input[name="name"]').type(name);
+    // Should autofocus input
+    cy.focused().type(name + '{enter}');
     checkButtonIsDisabled('Create', true);
 
-    cy.get('mat-expansion-panel.collection-selector').click();
-    cy.get('mat-radio-button[ng-reflect-value="@schematics/angular"]').should(
-      $p => {
-        ($p[0].querySelector('label.mat-radio-label') as any).click();
-      }
-    );
+    cy.wait(800);
+    cy.focused().type('{enter}');
+    cy.wait(800);
+    cy.focused().type('{enter}');
+    cy.wait(800);
     checkButtonIsDisabled('Create', false);
 
     cy.get('button')
       .contains('Create')
       .click();
 
-    cy.get('div.title', { timeout: 120000 }).contains('Projects');
+    cy.contains('div.title', 'Projects', { timeout: 120000 });
 
     cy.get('div.title').contains(name);
   });
 
-  it('opens a workspace', () => {
-    cy.get('a[href="/open-workspace"]').click();
-    cy.get('div.title').contains('Open Workspace');
-    checkButtonIsDisabled('Create', true);
-    expandFolder('tmp');
-    selectFolder(name);
-    cy.get('div.context-title').contains(`Selected Workspace: ${name}`);
+  // TODO(mrmeku): re-enable this test after figuring out how to mock graphql requests.
+  // it('opens a workspace', () => {
+  //   cy.get('a[href="/open-workspace"]').click();
+  //   cy.get('div.title').contains('Open Workspace');
+  //   checkButtonIsDisabled('Create', true);
+  //   expandFolder('tmp');
+  //   selectFolder(name);
+  //   cy.get('div.context-title').contains(`Selected Workspace: ${name}`);
 
-    cy.get('button')
-      .contains('Open')
-      .click();
+  //   cy.get('button')
+  //     .contains('Open')
+  //     .click();
 
-    cy.get('div.title').contains('Projects');
-  });
+  //   cy.get('div.title').contains('Projects');
+  // });
 });

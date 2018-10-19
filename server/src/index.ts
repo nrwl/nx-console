@@ -15,7 +15,7 @@ const fixPath = require('fix-path');
 const getPort = require('get-port');
 const Store = require('electron-store');
 
-let win: any;
+export let mainWindow: any;
 const store = new Store();
 
 fixPath();
@@ -96,14 +96,14 @@ function createMenu() {
 function createWindow() {
   try {
     const bounds = JSON.parse(store.get('windowBounds'));
-    win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
       width: bounds.width,
       height: bounds.height,
       icon: path.join(__dirname, '/assets/icons/build/icon.png'),
       show: false
     });
   } catch {
-    win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
       width: 800,
       height: 1400,
       icon: path.join(__dirname, '/assets/icons/build/icon.png'),
@@ -111,21 +111,21 @@ function createWindow() {
     });
   }
 
-  win.on('ready-to-show', () => {
-    win.show();
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show();
   });
 
   getPort({ port: 7777 }).then((port: number) => {
     try {
       startServer(port);
       if (fileExists(path.join(currentDirectory, 'angular.json'))) {
-        win.loadURL(
+        mainWindow.loadURL(
           `http://localhost:${port}/workspace/${encodeURIComponent(
             currentDirectory
           )}/projects`
         );
       } else {
-        win.loadURL(`http://localhost:${port}`);
+        mainWindow.loadURL(`http://localhost:${port}`);
       }
     } catch (e) {
       showCloseDialog(`Error when starting Angular Console: ${e.message}`);
@@ -133,7 +133,7 @@ function createWindow() {
     }
   });
 
-  win.on('close', () => {
+  mainWindow.on('close', () => {
     saveWindowInfo();
     quit();
   });
@@ -216,16 +216,16 @@ function startSession() {
 }
 
 function quit() {
-  if (win) {
-    win = null;
+  if (mainWindow) {
+    mainWindow = null;
     app.quit();
   }
 }
 
 function saveWindowInfo() {
-  if (win) {
+  if (mainWindow) {
     try {
-      store.set('windowBounds', JSON.stringify(win.getBounds()));
+      store.set('windowBounds', JSON.stringify(mainWindow.getBounds()));
     } catch (e) {
       reportException(`Saving window bounds failed: ${e.message}`);
     }

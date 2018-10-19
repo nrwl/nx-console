@@ -2,6 +2,10 @@ angular-console-workspace {
   display: block;
   overflow: hidden;
 
+  .outlet-container {
+    transform: translateZ(0);
+  }
+
   .content {
     position: relative;
 

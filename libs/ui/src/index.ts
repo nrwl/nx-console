@@ -7,4 +7,3 @@ export * from './lib/command-output/command-output.component';
 export * from './lib/flags/flags.component';
 export * from './lib/animations/fade-in';
 export * from './lib/animations/grow-shink';
-export * from './lib/directory-selector/directory-data-source';

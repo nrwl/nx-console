@@ -150,37 +150,12 @@ export function clickOnTask(
   waitForAnimation();
 }
 
-export function expandFolder(name: string) {
-  cy.get('button.directory').should(($p: any) => {
-    let found = false;
-    for (let i = 0; i < $p.length; ++i) {
-      if ($p[i].innerText.indexOf(name) > -1) {
-        found = true;
-        $p[i].querySelector('mat-icon.expand-icon').click();
-      }
-    }
-
-    if (!found) {
-      throw new Error(`Didn't find ${name}`);
-    }
-  });
-}
-
-export function selectFolder(name: string) {
-  cy.get('button.directory').should(($p: any) => {
-    let found = false;
-
-    for (let i = 0; i < $p.length; ++i) {
-      if ($p[i].innerText.indexOf(name) > -1) {
-        found = true;
-        $p[i].click();
-      }
-    }
-
-    if (!found) {
-      throw new Error(`Didn't find ${name}`);
-    }
-  });
+export function selectFolder() {
+  cy.wait(300);
+  // TODO(mrmeku): Ideally this should mock a graphql request.
+  cy.get('.path-form-field input').type('/tmp');
+  cy.get('.name-your-workspace-header').click();
+  cy.wait(500);
 }
 
 export function waitForAnimation() {

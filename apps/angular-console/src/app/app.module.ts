@@ -1,3 +1,4 @@
+import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
 import {
   FeatureWorkspacesModule,
   workspaceRoutes
@@ -12,7 +13,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import {
   MatIconModule,
-  MatIconRegistry,
   MatListModule,
   MatSidenavModule,
   MatSnackBarModule
@@ -30,7 +30,6 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
 
 import { AppComponent } from './app.component';
-import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
 
 export function initApollo(
   analytics: AnalyticsCollector,
@@ -116,8 +115,4 @@ export function initApollo(
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-  constructor(matIconRegistry: MatIconRegistry) {
-    matIconRegistry.setDefaultFontSetClass('material-icons-extended');
-  }
-}
+export class AppModule {}

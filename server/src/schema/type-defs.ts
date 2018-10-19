@@ -142,6 +142,16 @@ export const typeDefs = gql`
     updateSettings(data: String!): Settings!
     installNodeJs: InstallNodeJsStatus
     openInBrowser(url: String!): OpenInBrowserResult
+    selectDirectory(
+      dialogTitle: String!
+      dialogButtonLabel: String!
+      angularWorkspace: Boolean!
+    ): SelectDirectoryResult
+  }
+
+  type SelectDirectoryResult {
+    selectedDirectoryPath: String
+    error: String
   }
 
   type NpmScript {
