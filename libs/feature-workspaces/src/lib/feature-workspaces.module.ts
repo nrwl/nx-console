@@ -13,8 +13,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material';
 import { Route, RouterModule } from '@angular/router';
 
-import { OpenWorkspaceComponent } from './open-workspace/open-workspace.component';
-import { NewWorkspaceDialogComponent } from './new-workspace/new-workspace-dialog.component';
 import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
 import { ProjectsComponent } from './projects/projects.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
@@ -23,12 +21,10 @@ import { WorkspacesComponent } from './workspaces/workspaces.component';
 export type FeatureWorkspaceRouteState =
   | 'workspaces'
   | 'create-workspace'
-  | 'open-workspace'
   | 'workspace';
 
 export const WORKSPACES: FeatureWorkspaceRouteState = 'workspaces';
 export const CREATE_WORKSPACE: FeatureWorkspaceRouteState = 'create-workspace';
-export const IMPORT_WORKSPACE: FeatureWorkspaceRouteState = 'open-workspace';
 export const WORKSPACE: FeatureWorkspaceRouteState = 'workspace';
 
 export const workspaceRoutes: Route[] = [
@@ -41,11 +37,6 @@ export const workspaceRoutes: Route[] = [
     path: 'create-workspace',
     component: NewWorkspaceComponent,
     data: { state: CREATE_WORKSPACE }
-  },
-  {
-    path: 'open-workspace',
-    component: OpenWorkspaceComponent,
-    data: { state: IMPORT_WORKSPACE }
   },
   {
     path: 'workspace/:path',
@@ -86,11 +77,9 @@ export const workspaceRoutes: Route[] = [
   declarations: [
     ProjectsComponent,
     NewWorkspaceComponent,
-    OpenWorkspaceComponent,
     WorkspaceComponent,
-    WorkspacesComponent,
-    NewWorkspaceDialogComponent
+    WorkspacesComponent
   ],
-  entryComponents: [NewWorkspaceDialogComponent]
+  entryComponents: [NewWorkspaceComponent]
 })
 export class FeatureWorkspacesModule {}

@@ -50,11 +50,11 @@ mat-list {
     cursor: pointer;
     z-index: 2;
 
-    .command {
+    .command-text {
       font-family: 'Roboto Mono', monospace;
       padding-right: 16px !important;
       font-size: 16px;
-      color: #000000de;
+      color: #000000de !important;
       line-height: 20px;
     }
 

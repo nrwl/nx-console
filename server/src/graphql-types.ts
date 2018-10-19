@@ -202,6 +202,7 @@ export interface Mutation {
   updateSettings: Settings;
   installNodeJs?: InstallNodeJsStatus | null;
   openInBrowser?: OpenInBrowserResult | null;
+  selectDirectory?: SelectDirectoryResult | null;
 }
 
 export interface CommandStarted {
@@ -222,6 +223,11 @@ export interface OpenInEditor {
 
 export interface OpenInBrowserResult {
   result: boolean;
+}
+
+export interface SelectDirectoryResult {
+  selectedDirectoryPath?: string | null;
+  error?: string | null;
 }
 export interface WorkspaceDatabaseArgs {
   path: string;
@@ -305,6 +311,11 @@ export interface UpdateSettingsMutationArgs {
 }
 export interface OpenInBrowserMutationArgs {
   url: string;
+}
+export interface SelectDirectoryMutationArgs {
+  dialogTitle: string;
+  dialogButtonLabel: string;
+  angularWorkspace: boolean;
 }
 
 export enum FileType {
@@ -1134,6 +1145,11 @@ export namespace MutationResolvers {
       any,
       Context
     >;
+    selectDirectory?: SelectDirectoryResolver<
+      SelectDirectoryResult | null,
+      any,
+      Context
+    >;
   }
 
   export type NgAddResolver<
@@ -1253,6 +1269,17 @@ export namespace MutationResolvers {
   export interface OpenInBrowserArgs {
     url: string;
   }
+
+  export type SelectDirectoryResolver<
+    R = SelectDirectoryResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, SelectDirectoryArgs>;
+  export interface SelectDirectoryArgs {
+    dialogTitle: string;
+    dialogButtonLabel: string;
+    angularWorkspace: boolean;
+  }
 }
 
 export namespace CommandStartedResolvers {
@@ -1310,6 +1337,28 @@ export namespace OpenInBrowserResultResolvers {
 
   export type ResultResolver<
     R = boolean,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace SelectDirectoryResultResolvers {
+  export interface Resolvers<Context = any> {
+    selectedDirectoryPath?: SelectedDirectoryPathResolver<
+      string | null,
+      any,
+      Context
+    >;
+    error?: ErrorResolver<string | null, any, Context>;
+  }
+
+  export type SelectedDirectoryPathResolver<
+    R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type ErrorResolver<
+    R = string | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

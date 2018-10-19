@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { shell } from 'electron';
+import { shell, dialog } from 'electron';
 
 import { commands, runCommand } from '../api/run-command';
 import {
@@ -44,6 +44,7 @@ import {
   findExecutable,
   readJsonFile
 } from '../utils';
+import { mainWindow } from '..';
 
 const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
@@ -358,6 +359,17 @@ const Mutation: MutationResolvers.Resolvers = {
       console.log(e);
       throw new Error(`Error when opening an editor. Message: "${e.message}"`);
     }
+  },
+  selectDirectory(root: any, args: any) {
+    const directoryPath = dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory'],
+      buttonLabel: args.dialogButtonLabel,
+      title: args.dialogTitle
+    });
+
+    return {
+      selectedDirectoryPath: directoryPath ? directoryPath[0] : null
+    };
   },
   updateSettings(_root: any, args: any) {
     storeSettings(JSON.parse(args.data));

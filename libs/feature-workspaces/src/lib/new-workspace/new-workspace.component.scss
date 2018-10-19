@@ -1,77 +1,33 @@
 angular-console-new-workspace {
-  width: 100%;
-  overflow: hidden;
-
-  .error {
-    background-color: red;
+  .mat-vertical-content {
+    padding-bottom: 0 !important;
   }
 
-  .ui-flags {
-    background: white;
-    overflow: auto;
+  .path-form-field,
+  .path-form-field input {
+    cursor: pointer;
+  }
 
-    .name {
-      padding: 24px;
-      font-size: 20px;
-      font-weight: 500;
+  $selectedBackgroundColor: #dcdcdc;
+  .selected-schematic {
+    background: $selectedBackgroundColor !important;
+  }
+
+  mat-selection-list {
+    padding-top: 0 !important;
+    padding-bottom: 28px;
+  }
+
+  .ui-terminal-container {
+    background: black;
+    padding-bottom: 8px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    height: 100%;
+
+    ui-terminal {
+      display: block;
+      height: 100%;
     }
-
-    .description {
-      padding: 24px;
-    }
-  }
-
-  .submit-button-container {
-    margin: 40px 20px;
-  }
-
-  .mat-expansion-panel-content {
-    max-height: calc(100vh - 278px) !important;
-
-    overflow: auto !important;
-  }
-
-  .expand .mat-expansion-panel-content {
-    max-height: calc(100vh - 230px) !important;
-  }
-
-  .mat-expanded mat-expansion-panel-header {
-    z-index: 1;
-    position: relative;
-  }
-
-  mat-expansion-panel-header {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: rgba(0, 0, 0, 0);
-    transition: border-bottom-color 0.1s ease-in-out;
-
-    &.mat-expanded {
-      border-bottom-color: rgba(0, 0, 0, 0.12);
-    }
-  }
-
-  .mat-expansion-panel-content {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  }
-
-  .mat-expansion-panel-body {
-    padding-top: 16px;
-  }
-
-  .directory-selector .mat-expansion-panel-body {
-    padding: 0 !important;
-  }
-}
-
-.create-new-workspace-dialog mat-dialog-container {
-  background: black !important;
-  overflow: hidden;
-  padding-bottom: 0 !important;
-  padding-right: 0 !important;
-  border-radius: 4px;
-
-  .terminal-container {
-    height: 100% !important;
   }
 }

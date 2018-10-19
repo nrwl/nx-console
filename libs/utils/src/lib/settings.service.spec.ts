@@ -5,16 +5,20 @@ describe('Settings', () => {
   let settings: Settings;
 
   beforeEach(() => {
-    settings = new Settings({
-      query() {
-        return of({
-          data: { settings: { canCollectData: false, recent: [] } }
-        });
-      },
-      mutate() {
-        return of();
-      }
-    } as any);
+    settings = new Settings(
+      {
+        fetch() {
+          return of({
+            data: { settings: { canCollectData: false, recent: [] } }
+          });
+        }
+      } as any,
+      {
+        mutate() {
+          return of();
+        }
+      } as any
+    );
 
     settings.fetch().subscribe();
   });

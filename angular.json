@@ -44,6 +44,14 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true
+            },
+            "cypress": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/angular-console/src/environments/environment.ts",
+                  "with": "apps/angular-console/src/environments/environment.cypress.ts"
+                }
+              ]
             }
           }
         },
@@ -56,6 +64,9 @@
           "configurations": {
             "production": {
               "browserTarget": "angular-console:build:production"
+            },
+            "cypress": {
+              "browserTarget": "angular-console:build:cypress"
             }
           }
         },

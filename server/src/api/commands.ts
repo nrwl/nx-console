@@ -51,7 +51,7 @@ export class Commands {
     const c = this.findMatchingCommand(id, this.recent);
     if (c) {
       if (c.status === 'in-progress') {
-        this.stopCommands([this.findMatchingCommand(id, this.recent)]);
+        this.stopCommands([c]);
       }
       const restarted = { ...c, out: '', outChunk: '' };
       this.insertIntoHistory(restarted);
@@ -76,9 +76,11 @@ export class Commands {
   }
 
   startCommand(id: string) {
-    const c = this.findMatchingCommand(id, this.recent);
-    c.commandRunning = c.factory();
-    c.status = 'in-progress';
+    const command = this.findMatchingCommand(id, this.recent);
+    if (command) {
+      command.commandRunning = command.factory();
+      command.status = 'in-progress';
+    }
   }
 
   addOut(id: string, out: string) {
@@ -122,7 +124,10 @@ export class Commands {
   }
 
   removeCommand(id: string) {
-    this.stopCommands([this.findMatchingCommand(id, this.recent)]);
+    const command = this.findMatchingCommand(id, this.recent);
+    if (command) {
+      this.stopCommands([command]);
+    }
     this.recent = this.withoutCommandWithId(id, this.recent);
   }
 
@@ -134,9 +139,6 @@ export class Commands {
 
   findMatchingCommand(id: string, commands: CommandInformation[]) {
     const matchingCommand = commands.find(c => c.id === id);
-    if (!matchingCommand) {
-      throw new Error(`Cannot find matching command: ${id}`);
-    }
     return matchingCommand;
   }
 

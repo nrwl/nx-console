@@ -1,57 +1,69 @@
-<div class="ui-flags" *ngIf="ngNewForm$|async as form" [class.expand]="form.get('path').value">
-  <form [formGroup]="form" *ngIf="schematicCollectionsForNgNew$|async as schematicCollectionsForNgNew">
-    <mat-accordion [multi]="false" displayMode="flat">
-      <mat-expansion-panel class="directory-selector">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            1. Select a&nbsp;
-            <b>parent directory</b>&nbsp;for your new workspace {{ (form.get('path')?.value ? ' - ' + form.get('path')?.value : '') | normalizePath }}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
+<h2 mat-dialog-title><span fxFlex>Create a new workspace</span></h2>
+<mat-dialog-content>
+  <div *ngIf="commandOutput$" class="ui-terminal-container">
+    <ui-terminal [command]="command" [outChunk]="(commandOutput$|async)?.outChunk"></ui-terminal>
+  </div>
+  <form [formGroup]="ngNewForm" *ngIf="!commandOutput$">
+    <mat-vertical-stepper [linear]="true" #stepper (animationDone)="autofocusInput()">
+      <mat-step [stepControl]="control" *ngIf="ngNewForm.controls.path as control" [completed]="true">
+        <ng-template matStepLabel>Select a parent directory</ng-template>
+        <div>
+          <mat-form-field readonly="true" autofilled class="path-form-field" fxFlex appearance="outline">
+            <mat-label>Parent directory</mat-label>
+            <input class="autofocus" (click)="selectParentDirectory()" readonly="true" matInput [formControl]="control"
+              name="parent-directory">
+            <mat-icon matSuffix>folder</mat-icon>
+            <mat-hint *ngIf="control.value">
+              Choose a different directory by clicking above
+            </mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-step>
+      <mat-step *ngIf="ngNewForm.controls.name as control" [stepControl]="control">
+        <ng-template matStepLabel><span class="name-your-workspace-header">Name your new workspace</span></ng-template>
+        <div>
+          <mat-form-field class="workspace-name-form-field" fxFlex appearance="outline">
+            <mat-label>Workspace Name</mat-label>
+            <input class="autofocus" (keyup.enter)="stepper.next()" #workspaceNameInput matInput placeholder="my-new-workspace" [formControl]="control"
+              name="value">
+            <mat-error *ngIf="control.invalid && control.errors.nameTaken">
+              {{ ngNewForm.value.path }}/{{ control.value }} already exists
+            </mat-error>
+            <mat-icon matSuffix>create_new_folder</mat-icon>
+            <mat-hint *ngIf="control.value">
+              Workspace path will be {{ ngNewForm.value.path }}/{{ control.value }}
+            </mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-step>
+      <mat-step *ngIf="ngNewForm.controls.collection as control" [stepControl]="control">
+        <ng-template matStepLabel>Choose a schematic set</ng-template>
+        <div>
+          <mat-selection-list (selectionChange)="handleSelection($event)">
+            <mat-list-option [class.autofocus]="first" [value]="n.name" [class.selected-schematic]="control.value === n.name"
+              *ngFor="let n of schematicCollectionsForNgNew$ | async;
+                      let first = first;
+                      trackBy: trackByName">
+              <h4 mat-line>{{ n.name }}</h4>
+              <p mat-line> {{ n.description }} </p>
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
+      </mat-step>
+      <mat-step [optional]="true" *ngIf="ngNewForm.controls.collectionOptions as control" [stepControl]="control"
+        fxFlex>
+        <ng-template matStepLabel>Set schematic options (coming soon!)</ng-template>
+        <div class="last-option" fxLayout="row" fxLayout="end end" fxFlex>
+          <!-- TODO(mrmeku): Read ng new schematic for collection and render form  -->
 
-        <input [hidden]="true" formControlName="path" required>
-        <ui-directory-selector [selectedNode]="selectedNode" (toggleNodeSelection)="setPathField($event)"></ui-directory-selector>
-
-      </mat-expansion-panel>
-
-      <mat-expansion-panel class="name-selector" [disabled]="form.get('path').invalid">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            2. Set a&nbsp;
-            <b>name</b>&nbsp;for your new workspace {{ form.get('name')?.value ? ' - ' + form.get('name')?.value : '' }}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <mat-form-field class="workspace-name-form-field" fxFlex>
-          <mat-label>Workspace Name</mat-label>
-          <input matInput placeholder="MyNewWorkspace" required formControlName="name" name="name" autocomplete="off">
-          <mat-error *ngIf="form.get('name').invalid && form.get('name').errors.nameTaken">
-            This name is already taken
-          </mat-error>
-        </mat-form-field>
-      </mat-expansion-panel>
-
-      <mat-expansion-panel class="collection-selector" [disabled]="form.get('path').invalid || form.get('name').invalid">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            3. Choose which&nbsp;
-            <b>schematics</b>&nbsp;you would like to use {{ form.get('collection')?.value ? ' - ' + form.get('collection')?.value
-            : '' }}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <mat-radio-group fxLayout="column" fxLayoutGap="8px" fxFlex formControlName="collection">
-          <div *ngFor="let n of schematicCollectionsForNgNew; trackBy: trackByName">
-            <mat-radio-button fxFlex [value]="n.name">
-              <div fxFlex fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
-                <span fxFlex>{{ n.name }}</span>
-                <span>-</span>
-                <span>{{ n.description }}</span>
-              </div>
-            </mat-radio-button>
-          </div>
-        </mat-radio-group>
-      </mat-expansion-panel>
-    </mat-accordion>
+        </div>
+      </mat-step>
+    </mat-vertical-stepper>
   </form>
-</div>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="end end">
+  <button mat-button mat-dialog-close>
+    Close
+  </button>
+  <button (click)="createNewWorkspace()" mat-raised-button color="accent" [disabled]="!ngNewForm.valid || commandOutput$">Create</button>
+</mat-dialog-actions>

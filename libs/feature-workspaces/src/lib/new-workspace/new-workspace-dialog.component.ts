@@ -1,4 +1,4 @@
-import { CommandRunner } from '@angular-console/utils';
+import { CommandRunner, CommandStatus } from '@angular-console/utils';
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Router } from '@angular/router';
@@ -27,7 +27,7 @@ export class NewWorkspaceDialogComponent {
     .runCommand(this.ngNewGQL.mutate(this.data.ngNewInvocation), false)
     .pipe(
       tap(command => {
-        if (command.status === 'successful') {
+        if (command.status === CommandStatus.SUCCESSFUL) {
           this.dialogRef.close();
           this.router.navigate([
             '/workspace',
