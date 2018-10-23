@@ -93,8 +93,8 @@ ui-flags {
         position: absolute;
         z-index: 1;
         overflow: hidden;
-        right: -4px;
-        top: -7px;
+        right: 0;
+        top: 7px;
         cursor: pointer;
         background: #6a6a6a;
         color: white;
@@ -108,74 +108,9 @@ ui-flags {
         font-weight: bold;
       }
     }
-
-    &.boolean {
-      min-height: 48px;
-      border-radius: $border-radius;
-      margin-bottom: 44px;
-
-      .boolean-ripple {
-        position: absolute;
-        border-radius: $border-radius;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 2;
-        cursor: pointer;
-      }
-
-      .boolean-field-name {
-        padding-left: 16px;
-      }
-
-      .boolean-field-container {
-        position: relative;
-        padding: 0 $input-padding-horizontal;
-        transition: background 0.3s ease-in-out;
-        background: rgba(0, 0, 0, 0);
-        border: 1px solid rgb(176, 176, 176);
-        border-radius: $border-radius;
-        color: rgb(176, 176, 176);
-
-        & .on {
-          color: rgba(0, 0, 0, 0.87);
-        }
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.04);
-        }
-      }
-    }
-
-    &.text {
-      .mat-form-field-can-float:not(.mat-form-field-should-float) {
-        input {
-          position: relative;
-          top: -10px;
-        }
-      }
-
-      .mat-form-field-can-float:not(.mat-focused) {
-        .mat-form-field-empty.mat-form-field-label {
-          transform: translateY(-10px) perspective(100px);
-        }
-      }
-    }
   }
 
   .mat-form-field-underline {
     display: none;
-  }
-
-  .mat-form-field-flex {
-    border: 1px solid rgb(176, 176, 176);
-    border-radius: $border-radius;
-    padding: 0 $input-padding-horizontal;
-    padding-top: 8px;
-
-    input {
-      margin-right: 24px;
-    }
   }
 }
