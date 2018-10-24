@@ -109,6 +109,21 @@ const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
   }
 };
 
+function serializeCommand(c) {
+  return {
+    id: c.id,
+    type: c.id,
+    workspace: c.workspace,
+    command: c.command,
+    status: c.status,
+    out: c.out,
+    outChunk: c.outChunk,
+    detailedStatus: c.detailedStatusCalculator.detailedStatus
+      ? JSON.stringify(c.detailedStatusCalculator.detailedStatus)
+      : null
+  };
+}
+
 const Database: DatabaseResolvers.Resolvers = {
   isNodejsInstalled() {
     return {
@@ -189,25 +204,15 @@ const Database: DatabaseResolvers.Resolvers = {
   },
   commands(_root: any, args: any) {
     try {
-      return filterById(
-        commands.recent.map(c => {
-          const r = {
-            id: c.id,
-            type: c.id,
-            workspace: c.workspace,
-            command: c.command,
-            status: c.status,
-            out: c.out,
-            outChunk: c.outChunk,
-            detailedStatus: c.detailedStatusCalculator.detailedStatus
-              ? JSON.stringify(c.detailedStatusCalculator.detailedStatus)
-              : null
-          };
-          c.outChunk = '';
-          return r;
-        }),
-        args
-      );
+      if (args.id) {
+        const c = commands.recent.find(c => c.id === args.id);
+        if (!c) throw new Error(`Cannot find command ${args.id}`);
+        const r = serializeCommand(c);
+        c.outChunk = '';
+        return [r];
+      } else {
+        return commands.recent.map(c => serializeCommand(c));
+      }
     } catch (e) {
       console.log(e);
       throw new Error(`Error when reading commands. Message: "${e.message}"`);
