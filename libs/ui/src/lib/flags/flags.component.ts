@@ -71,8 +71,8 @@ export class FlagsComponent {
     return this._fields;
   }
   set fields(f: Field[]) {
-    this._fields = f;
-    this.fieldGroups = this.toFieldGroups(f);
+    this._fields = this.sortByBooleanTypes(f);
+    this.fieldGroups = this.toFieldGroups(this._fields);
     this.setForm();
   }
 
@@ -120,7 +120,13 @@ export class FlagsComponent {
     }
   }
 
+  private sortByBooleanTypes(fields: Array<Field>): Array<Field> {
+    const booleanFields = fields.filter(field => field.type === 'boolean');
+    return [...fields.filter(f => f.type !== 'boolean'), ...booleanFields];
+  }
+
   private toFieldGroups(fields: Array<Field>): Array<FieldGrouping> {
+
     const importantFields: FieldGrouping = {
       type: 'important',
       fields: fields.filter(f => f.important),

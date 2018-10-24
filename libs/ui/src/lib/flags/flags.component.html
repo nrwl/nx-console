@@ -27,23 +27,25 @@
         fxLayout="row" fxLayoutGap="16px" [class.boolean]="field.type === 'boolean'" [class.text]="field.type !== 'boolean'">
         
         <ng-container *ngIf="field.type === 'boolean' && field.defaultValue !== null">
-          <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon>
-          <div fxFlex class="boolean-field-container" fxLayout="column" fxLayoutAlign="space-between start">
+          <!-- <mat-icon [svgIcon]="field.defaultValue ? 'toggle_on' : 'toggle_off'"></mat-icon> -->
+          <div fxFlex class="boolean-field-container" fxLayout="row">
 
-            <mat-form-field appearance="outline">
-              <mat-label>{{ field.name }}</mat-label>
-              <mat-select placeholder="Tristate booleans" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">
+            <!-- <mat-form-field appearance="outline"> -->
+              <!-- <mat-label>{{ field.name }}</mat-label> -->
+              <!-- <mat-checkbox [attr.name]="field.name">{{field.name}}</mat-checkbox> -->
+
+              <!-- <mat-select placeholder="Tristate booleans" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name">
                 <mat-option [value]="null">--</mat-option>
                 <mat-option [value]="true">True</mat-option>
                 <mat-option [value]="false">False</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-hint>
+              </mat-select> -->
+            <!-- </mat-form-field> -->
+            
+            <mat-checkbox [attr.name]="field.name">
               {{ field.description }}
               <ng-container *ngIf="field.required">Required. </ng-container>
               <ng-container *ngIf="field.defaultValue !== null">(Default: {{ field.defaultValue ? 'true' : 'false' }})</ng-container>
-            </mat-hint>
-
+            </mat-checkbox>
           </div>
         </ng-container>
 

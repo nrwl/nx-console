@@ -27,7 +27,8 @@ import {
   MatTreeModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
-  MatStepperModule
+  MatStepperModule,
+  MatCheckboxModule
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
@@ -90,6 +91,7 @@ const IMPORTS = [
   MatTooltipModule,
   MatTreeModule,
   MatTreeModule,
+  MatCheckboxModule,
   ReactiveFormsModule,
   RouterModule
 ];

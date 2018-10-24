@@ -17,6 +17,10 @@ ui-flags {
     }
   }
 
+  mat-hint {
+    margin-top: -20px;
+  }
+
   mat-expansion-panel {
     .mat-expanded {
       .mat-expansion-indicator {
@@ -107,6 +111,10 @@ ui-flags {
         height: 20px;
         font-weight: bold;
       }
+    }
+
+    .boolean-field-container {
+      padding-left: 40px;
     }
   }
 
