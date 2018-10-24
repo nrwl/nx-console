@@ -34,7 +34,7 @@
         <ng-template [ngTemplateOutlet]="defaultContent" *ngIf="!commandResponse?.detailedStatus"></ng-template>
       </ng-container>
     </div>
-    <div class="terminal-container" [ngClass]="(activeView$ | async) === 'terminal' ? 'terminal-is-active' : ''">
+    <div class="output-container" [ngClass]="(activeView$ | async) === 'terminal' ? 'terminal-is-active' : ''">
       <ui-terminal [command]="command" [outChunk]="commandResponse?.outChunk"></ui-terminal>
     </div>
   </div>
