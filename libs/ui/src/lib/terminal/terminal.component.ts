@@ -89,7 +89,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
       if (!renderer) {
         return;
       }
-      renderer.clear();
       const height = (this.code.nativeElement as HTMLElement).clientHeight;
       const width =
         (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
@@ -98,7 +97,9 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
         Math.floor(width / renderer.dimensions.actualCellWidth)
       );
       const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
+      // If dimensions did not change, no need to reset.
       if (this.term.rows !== rows || this.term.cols !== cols) {
+        renderer.clear();
         this.term.reset();
         this.term.resize(cols, rows);
         this.writeFullCachedOutput();
