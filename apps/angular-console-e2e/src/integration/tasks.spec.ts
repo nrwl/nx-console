@@ -156,5 +156,74 @@ describe('Tasks', () => {
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
+
+    clearAllRecentTasks();
+  });
+
+  it('shows detailed test status', () => {
+    clickOnTask('proj', 'test');
+
+    cy.get('div.context-title').contains('ng test proj');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.get('div.js-status-build-success', { timeout: 20000 }).contains(
+      'Build successful'
+    );
+    cy.get('div.js-status-tests-success', { timeout: 20000 }).contains(
+      'tests passed'
+    );
+
+    goBack();
+    clearAllRecentTasks();
+  });
+
+  it('shows detailed build status', () => {
+    clickOnTask('proj', 'build');
+
+    cy.get('div.context-title').contains('ng build proj');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.get('div.js-status-build-success', { timeout: 20000 }).contains(
+      'Build successful'
+    );
+    cy.get('div.js-status-build-folder', { timeout: 20000 }).contains(
+      'is ready'
+    );
+
+    goBack();
+    clearAllRecentTasks();
+  });
+
+  it('shows detailed serve status', () => {
+    clickOnTask('proj', 'serve');
+
+    cy.get('div.context-title').contains('ng serve proj');
+
+    cy.get('mat-panel-title.js-group-optional').click();
+
+    cy.wait(800);
+
+    cy.get('input.js-input-optional-port')
+      .scrollIntoView()
+      .clear()
+      .type('9999');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.get('div.js-status-build-success', { timeout: 20000 }).contains(
+      'Build successful'
+    );
+    cy.get('div.js-status-server-url', { timeout: 20000 }).contains('browser');
+
+    goBack();
+    clearAllRecentTasks();
   });
 });

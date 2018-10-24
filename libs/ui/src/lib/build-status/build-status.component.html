@@ -4,7 +4,7 @@
       <div class="status-build_success">
         <mat-list-item *ngIf="serverUrl()">
           <mat-icon matListIcon>check_circle</mat-icon>
-          <div class="status-content">
+          <div class="status-content js-status-server-started">
             <div fxFill fxLayout="row" fxLayoutAlign="start center">
               <div fxFlex>Server started</div>
               <a target="_blank" (click)="onServerOpen()" matTooltip="Open in browser" matTooltipPosition="left">
@@ -29,19 +29,19 @@
         <ng-container *ngSwitchCase="'build_success'">
           <mat-list-item>
             <mat-icon matListIcon>check_circle</mat-icon>
-            <div class="status-content">
+            <div class="status-content js-status-build-success">
               Build successful!
             </div>
           </mat-list-item>
           <mat-list-item *ngIf="serverUrl()">
             <mat-icon class="info" matListIcon>info</mat-icon>
-            <div class="status-content">
+            <div class="status-content js-status-server-url">
               You can now view your <a (click)="onServerOpen()">application</a> in the browser.
             </div>
           </mat-list-item>
           <mat-list-item *ngIf="status?.outputPath as outputPath">
             <mat-icon class="info" matListIcon>info</mat-icon>
-            <div class="status-content">
+            <div class="status-content js-status-build-folder">
               <ng-container *ngIf="status?.isForProduction; else devBuiltMessage">
                 The application <a (click)="showItemInFolder(outputPath)">folder</a> is ready to be deployed.
               </ng-container>
@@ -59,7 +59,7 @@
         </ng-container>
         <mat-list-item *ngSwitchCase="'build_failure'">
           <mat-icon matListIcon>error</mat-icon>
-          <div class="status-content">
+          <div class="status-content js-status-build-error">
             Build failed
           </div>
         </mat-list-item>

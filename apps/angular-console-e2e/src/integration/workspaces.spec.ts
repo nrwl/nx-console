@@ -22,13 +22,14 @@ describe('Workspaces', () => {
     checkButtonIsDisabled('Create', true);
 
     // Should autofocus input
-    cy.focused().type(name + '{enter}');
+    cy.wait(800);
+    cy.focused().type(name);
     checkButtonIsDisabled('Create', true);
 
+    cy.get('.js-step-choose-schematic').click();
     cy.wait(800);
-    cy.focused().type('{enter}');
-    cy.wait(800);
-    cy.focused().type('{enter}');
+    // cy.focused().type('{enter}');
+    cy.focused().click();
     cy.wait(800);
     checkButtonIsDisabled('Create', false);
 

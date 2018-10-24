@@ -14,7 +14,7 @@
   <mat-accordion [multi]="true" displayMode="flat">
     <mat-expansion-panel *ngFor="let fieldGroup of fieldGroups" [expanded]="fieldGroup.expanded" (opened)="resizeFlags.emit()" (closed)="resizeFlags.emit()">
       <mat-expansion-panel-header>
-        <mat-panel-title *ngIf="fieldGroups.length > 1" [ngSwitch]="fieldGroup.type">
+        <mat-panel-title *ngIf="fieldGroups.length > 1" [ngSwitch]="fieldGroup.type" [ngClass]="'js-group-' + fieldGroup.type">
           <ng-container *ngSwitchCase="'important'">Important fields</ng-container>
           <ng-container *ngSwitchCase="'optional'">Optional fields</ng-container>
         </mat-panel-title>
@@ -30,7 +30,9 @@
           <div fxFlex class="boolean-field-container" fxLayout="row" fxLayoutAlign="space-between center">
             <div class="boolean-ripple" mat-ripple (click)="toggleBooleanField(field)"></div>
             <span [class.on]="toggle.checked">{{ field.name }} {{ field.required ? '*' : '' }}</span>
-            <mat-slide-toggle #toggle color="primary" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name"></mat-slide-toggle>
+            <mat-slide-toggle #toggle color="primary" [formControlName]="field.name" [required]="field.required" [attr.name]="field.name"
+                              [ngClass]="'js-input-' + fieldGroup.type + '-' + field.name">
+            </mat-slide-toggle>
             <span class="boolean-field-hint field-hint">
               {{ field.description }}
               <ng-container *ngIf="field.required">Required. </ng-container>
@@ -44,7 +46,8 @@
           <div fxLayout="column" fxFlex class="text-field-container">
             <mat-form-field>
               <input #input fxFlex type="text" matInput [placeholder]="field.name " [attr.name]="field.name" [required]="field.required "
-                [formControlName]="field.name" [matAutocomplete]="auto">
+                [formControlName]="field.name" [matAutocomplete]="auto"
+                [ngClass]="'js-input-' + fieldGroup.type + '-' + field.name">
               <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
               <mat-autocomplete #auto="matAutocomplete">
                 <mat-option (click)="input.blur()" *ngFor="let completionValue of [{display: '--', value: null}, {value: true}, {value: false}]"
@@ -66,7 +69,8 @@
           <div fxLayout="column" fxFlex class="text-field-container">
             <mat-form-field>
               <input #input fxFlex type="text" matInput [placeholder]="field.name" [attr.name]="field.name" [required]="field.required "
-                [formControlName]="field.name" [matAutocomplete]="auto" (input)="triggerValueUpdate(field.name, input.value)">
+                [formControlName]="field.name" [matAutocomplete]="auto" (input)="triggerValueUpdate(field.name, input.value)"
+                [ngClass]="'js-input-' + fieldGroup.type + '-' + field.name">
               <mat-icon @fadeInOut *ngIf="input.value " class="clear-text-field " (click)="clearFormField(field) ">close_outline</mat-icon>
               <mat-autocomplete #auto="matAutocomplete">
                 <mat-option (click)="input.blur()" *ngFor="let completionValue of field.completionValues | async" [value]="completionValue.value">
