@@ -20,11 +20,11 @@
         </div>
       </mat-step>
       <mat-step *ngIf="ngNewForm.controls.name as control" [stepControl]="control">
-        <ng-template matStepLabel><span class="name-your-workspace-header">Name your new workspace</span></ng-template>
+        <ng-template matStepLabel><span class="js-step-name-workspace">Name your new workspace</span></ng-template>
         <div>
           <mat-form-field class="workspace-name-form-field" fxFlex appearance="outline">
             <mat-label>Workspace Name</mat-label>
-            <input class="autofocus" (keyup.enter)="stepper.next()" #workspaceNameInput matInput placeholder="my-new-workspace" [formControl]="control"
+            <input class="autofocus" (keydown.enter)="stepper.next()" #workspaceNameInput matInput placeholder="my-new-workspace" [formControl]="control"
               name="value">
             <mat-error *ngIf="control.invalid && control.errors.nameTaken">
               {{ ngNewForm.value.path }}/{{ control.value }} already exists
@@ -37,9 +37,9 @@
         </div>
       </mat-step>
       <mat-step *ngIf="ngNewForm.controls.collection as control" [stepControl]="control">
-        <ng-template matStepLabel>Choose a schematic set</ng-template>
+        <ng-template matStepLabel><span class="js-step-choose-schematic">Choose a schematic set</span></ng-template>
         <div>
-          <mat-selection-list (selectionChange)="handleSelection($event)">
+          <mat-selection-list (selectionChange)="handleSelection($event)" class="js-select-schematic">
             <mat-list-option [class.autofocus]="first" [value]="n.name" [class.selected-schematic]="control.value === n.name"
               *ngFor="let n of schematicCollectionsForNgNew$ | async;
                       let first = first;

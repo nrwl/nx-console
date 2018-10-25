@@ -4,9 +4,9 @@
       <div class="status-test_success">
         <mat-list-item *ngIf="status?.buildProgress === 100">
           <mat-icon matListIcon>check_circle</mat-icon>
-          <div class="status-content">
+          <div class="status-content js-status-build-success">
             <div fxFill fxLayout="row" fxLayoutAlign="start center">
-              <div fxFlex>Build successful</div>
+              <div fxFlex>Build completed</div>
             </div>
           </div>
         </mat-list-item>
@@ -26,18 +26,27 @@
         </mat-list-item>
         <mat-list-item *ngSwitchCase="'test_success'">
           <mat-icon matListIcon>check_circle</mat-icon>
-          <div class="status-content">
-            <div fxFill fxLayout="row" fxLayoutAlign="start center">
-              <div fxFlex>All tests passed</div>
-            </div>
+          <div class="status-content js-status-tests-success">
+            All tests passed
           </div>
         </mat-list-item>
         <mat-list-item *ngSwitchCase="'test_failure'">
           <mat-icon matListIcon>error</mat-icon>
+          <div class="status-content js-status-tests-failed">
+            {{ status?.failure }} failed, {{ status?.success }} passed
+          </div>
+        </mat-list-item>
+        <mat-list-item *ngSwitchCase="'test_cancelled'">
+          <mat-icon matListIcon>warning</mat-icon>
           <div class="status-content">
-            <div fxFill fxLayout="row" fxLayoutAlign="start center">
-              <div fxFlex>{{ status?.failure }} failed, {{ status?.success }} passed</div>
-            </div>
+            Test cancelled ({{ status?.failure }} failed, {{ status?.success }} passed)
+          </div>
+        </mat-list-item>
+        <mat-list-item
+          *ngIf="['test_failure', 'test_success'].includes(status?.testStatus) && commandStatus === 'in-progress'">
+          <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
+          <div class="status-content">
+            Watching for changes...
           </div>
         </mat-list-item>
       </div>

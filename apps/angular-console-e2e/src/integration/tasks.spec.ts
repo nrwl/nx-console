@@ -1,6 +1,5 @@
 import {
   checkDisplayedCommand,
-  checkMessage,
   checkFileExists,
   clickOnTask,
   goBack,
@@ -156,5 +155,172 @@ describe('Tasks', () => {
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
+
+    clearAllRecentTasks();
+  });
+
+  it('runs test task', () => {
+    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', FAILING_TESTS);
+    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+
+    clickOnTask('proj', 'test');
+
+    cy.get('div.context-title').contains('ng test proj');
+
+    cy.get('mat-panel-title.js-group-optional').click();
+
+    cy.wait(800);
+
+    cy.get('input.js-input-important-watch')
+      .scrollIntoView()
+      .clear()
+      .type('false');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.get('div.js-status-tests-failed', { timeout: 120000 }).contains(
+      'failed'
+    );
+
+    goBack();
+    clearAllRecentTasks();
+
+    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
+  });
+
+  it('runs build task', () => {
+    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
+
+    clickOnTask('proj', 'build');
+
+    cy.get('div.context-title').contains('ng build proj');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.get('div.js-status-build-success', { timeout: 120000 }).contains(
+      'Build completed'
+    );
+    cy.get('div.js-status-build-folder', { timeout: 120000 }).contains(
+      'is ready'
+    );
+
+    goBack();
+    clearAllRecentTasks();
+  });
+
+  // TODO(jack): This seems to be causing memory issues in CI.
+  // it('runs serve task', () => {
+  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+  //   cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
+  //
+  //   clickOnTask('proj', 'serve');
+  //
+  //   cy.get('div.context-title').contains('ng serve proj');
+  //
+  //   cy.get('mat-panel-title.js-group-optional').click();
+  //
+  //   cy.wait(800);
+  //
+  //   cy.get('input.js-input-optional-port')
+  //     .scrollIntoView()
+  //     .clear()
+  //     .type('9999');
+  //
+  //   cy.get('button')
+  //     .contains('Run')
+  //     .click();
+  //
+  //   cy.get('div.js-status-build-success', { timeout: 120000 }).contains(
+  //     'Build completed'
+  //   );
+  //   cy.get('div.js-status-server-url', { timeout: 120000 }).contains('browser');
+  //
+  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', BAD_CMP);
+  //
+  //   cy.get('div.js-status-build-error', { timeout: 120000 }).contains(
+  //     'Build failed'
+  //   );
+  //
+  //   goBack();
+  //   clearAllRecentTasks();
+  //
+  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+  // });
+});
+
+const PASSING_TESTS = `
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+
+  it(\`should have as title 'proj'\`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('proj');
+  });
+  
+  it('should do stuff', () => {
+    expect(true).toBe(true);
   });
 });
+`;
+const FAILING_TESTS = `
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+
+  it(\`should have as title 'proj'\`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('NOPE');
+  });
+  
+  it('should do stuff', () => {
+    expect(true).toBe(true);
+  });
+});
+`;
+
+const GOOD_CMP = `
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'proj';
+}
+`;
+const BAD_CMP = `
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent oops!
+`;

@@ -3,6 +3,7 @@
 
 $gray-palette: mat-palette($mat-gray, 200);
 $failure-palette: mat-palette($mat-red);
+$warning-palette: mat-palette($mat-orange);
 $success-palette: mat-palette($mat-green);
 
 .container {
@@ -37,6 +38,10 @@ $success-palette: mat-palette($mat-green);
 
 .status-test_failure mat-icon {
   color: mat-color($failure-palette);
+}
+
+.status-test_cancelled mat-icon {
+  color: mat-color($warning-palette);
 }
 
 .status-content {
