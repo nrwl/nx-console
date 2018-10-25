@@ -30,7 +30,8 @@ interface Schematic {
 export function readAllSchematicCollections(basedir: string) {
   const nodeModulesDir = path.join(basedir, 'node_modules');
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
-  const schematicCollections = packages.filter(p => {
+  const relativeRootPath = './..';
+  const schematicCollections = [relativeRootPath, ...packages].filter(p => {
     try {
       return !!readJsonFile(path.join(p, 'package.json'), nodeModulesDir).json
         .schematics;
@@ -47,12 +48,13 @@ export function readAllSchematicCollections(basedir: string) {
     }
   });
   return schematicCollections
-    .map(c => readSchematicCollections(nodeModulesDir, c))
+    .map(c => readSchematicCollections(nodeModulesDir, relativeRootPath, c))
     .filter(collection => !!collection && collection.schematics.length > 0);
 }
 
 function readSchematicCollections(
   basedir: string,
+  rootCollection: string,
   collectionName: string
 ): SchematicCollection {
   try {
@@ -64,8 +66,12 @@ function readSchematicCollections(
       packageJson.json.schematics,
       path.dirname(packageJson.path)
     );
+    const name =
+      collectionName === rootCollection
+        ? packageJson.json.name
+        : collectionName;
     const schematicCollection = {
-      name: collectionName,
+      name,
       schematics: [] as Schematic[]
     };
     Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
@@ -77,7 +83,7 @@ function readSchematicCollections(
 
         schematicCollection.schematics.push({
           name: k,
-          collection: collectionName,
+          collection: name,
           schema: normalizeSchema(schematicSchema.json),
           description: v.description
         });
