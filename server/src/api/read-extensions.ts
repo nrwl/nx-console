@@ -86,6 +86,11 @@ export function availableExtensions() {
     {
       name: 'ngcli-wallaby',
       description: 'A schematic to add wallabyJS config to Angular project'
+    },
+    {
+      name: 'schematics-docker',
+      description:
+        'A schematic to NGINX-based Dockerfile to your Angular project'
     }
   ];
 }
