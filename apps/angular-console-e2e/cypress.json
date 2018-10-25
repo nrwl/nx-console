@@ -3,6 +3,7 @@
   "fileServerFolder": "../../dist/apps/angular-console-e2e",
   "fixturesFolder": "../../dist/apps/angular-console-e2e/fixtures",
   "integrationFolder": "../../dist/apps/angular-console-e2e/integration",
+  "ignoreTestFiles": ["*.hot-update.js", "*utils.js"],
   "pluginsFile": "../../dist/apps/angular-console-e2e/plugins/index.js",
   "video": true,
   "videosFolder": "../../dist/apps/angular-console-e2e/video",

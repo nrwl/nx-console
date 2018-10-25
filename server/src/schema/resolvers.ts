@@ -380,15 +380,22 @@ const Mutation: MutationResolvers.Resolvers = {
     }
   },
   selectDirectory(root: any, args: any) {
-    const directoryPath = dialog.showOpenDialog(mainWindow, {
-      properties: ['openDirectory'],
-      buttonLabel: args.dialogButtonLabel,
-      title: args.dialogTitle
-    });
+    // TODO(jack): This stub is needed because e2e tests that bring up the dialog will block entire electron main thread.
+    if (process.env.CI === 'true') {
+      return {
+        selectedDirectoryPath: '/tmp'
+      };
+    } else {
+      const directoryPath = dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory'],
+        buttonLabel: args.dialogButtonLabel,
+        title: args.dialogTitle
+      });
 
-    return {
-      selectedDirectoryPath: directoryPath ? directoryPath[0] : null
-    };
+      return {
+        selectedDirectoryPath: directoryPath ? directoryPath[0] : null
+      };
+    }
   },
   updateSettings(_root: any, args: any) {
     storeSettings(JSON.parse(args.data));

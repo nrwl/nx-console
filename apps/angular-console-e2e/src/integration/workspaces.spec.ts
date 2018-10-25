@@ -21,14 +21,14 @@ describe('Workspaces', () => {
     selectFolder();
     checkButtonIsDisabled('Create', true);
 
-    // Should autofocus input
+    cy.wait(800);
     cy.focused().type(name + '{enter}');
+    cy.wait(800);
     checkButtonIsDisabled('Create', true);
-
     cy.wait(800);
-    cy.focused().type('{enter}');
-    cy.wait(800);
-    cy.focused().type('{enter}');
+    cy.get('.js-select-schematic .mat-pseudo-checkbox')
+      .first()
+      .click({ force: true });
     cy.wait(800);
     checkButtonIsDisabled('Create', false);
 

@@ -22,7 +22,7 @@
   <mat-divider></mat-divider>
   <div fxFlex>
     <div class="details-container" *ngIf="(activeView$ | async) === 'details'">
-      <div class="empty-container" *ngIf="isStopped()" fxLayout="row" fxLayoutAlign="center center">
+      <div class="empty-container" *ngIf="!commandResponse" fxLayout="row" fxLayoutAlign="center center">
         <ng-container *ngIf="!emptyTemplate">
           Task has not start yet
         </ng-container>

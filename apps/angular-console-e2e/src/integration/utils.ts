@@ -39,7 +39,7 @@ export function toggleBoolean(field: string) {
 }
 
 export function checkButtonIsDisabled(text: string, disabled: boolean) {
-  cy.get('button').should($p => {
+  cy.get('button', { timeout: 1000 }).should(($p: any) => {
     for (let i = 0; i < $p.length; ++i) {
       if ($p[i].innerText.indexOf(text) > -1) {
         expect($p[i].hasAttribute('disabled')).to.equal(disabled);
@@ -154,7 +154,7 @@ export function selectFolder() {
   cy.wait(300);
   // TODO(mrmeku): Ideally this should mock a graphql request.
   cy.get('.path-form-field input').type('/tmp');
-  cy.get('.name-your-workspace-header').click();
+  cy.get('.js-step-name-workspace').click();
   cy.wait(500);
 }
 
@@ -192,12 +192,12 @@ export function uniqName(prefix: string): string {
 }
 
 export function els($p: any): any {
-  return $p.map((i, el) => Cypress.$(el));
+  return $p.map((i: any, el: any) => Cypress.$(el));
 }
 
 export function texts($p: any): string[] {
   return els($p)
-    .map((i, el) => el.text())
+    .map((i: any, el: any) => el.text())
     .toArray();
 }
 

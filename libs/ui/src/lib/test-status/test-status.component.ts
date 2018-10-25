@@ -11,7 +11,8 @@ export interface TestStatus {
     | 'test_pending'
     | 'test_inprogress'
     | 'test_success'
-    | 'test_failure';
+    | 'test_failure'
+    | 'test_cancelled';
   buildProgress: number;
   total: number;
   failure: number;

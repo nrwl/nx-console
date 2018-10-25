@@ -181,6 +181,24 @@ describe('detailedStatusCalculator', () => {
       expect(c.detailedStatus.buildStatus).toEqual('build_failure');
     });
 
+    it('clears errors when build restarts', () => {
+      const c = createCalculator();
+
+      c.addOut(`
+        ERROR in apps/myproject/src/app/app.module.ts(6,40): error TS2307: Cannot find module './reduc1ers'.
+        apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.   
+      `);
+
+      c.addOut(`
+        10% building modules 3/3 modules 0 active
+        10% building modules 10/15 modules 0 active
+        11% building modules 23/37 modules 0 active
+        15% building modules 30/37 modules 0 active
+      `);
+
+      expect(c.detailedStatus.errors).toEqual([]);
+    });
+
     it('stores server information', () => {
       const c = createCalculator();
       c.addOut(`
@@ -200,6 +218,7 @@ describe('detailedStatusCalculator', () => {
         getaddrinfo ENOTFOUND localhost1
       `);
       expect(c.detailedStatus.errors).toEqual([
+        'Port 4200 is already in use',
         'getaddrinfo ENOTFOUND localhost1'
       ]);
     });
@@ -242,7 +261,7 @@ describe('detailedStatusCalculator', () => {
       const c = createCalculator();
 
       c.addOut(`
-TOTAL: 1 FAILED, 3 SUCCESS
+Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 4 of 4 (1 FAILED) (4.149 secs / 4.122 secs)
 `);
       expect(c.detailedStatus.failure).toEqual(1);
       expect(c.detailedStatus.success).toEqual(3);
@@ -250,7 +269,7 @@ TOTAL: 1 FAILED, 3 SUCCESS
       expect(c.detailedStatus.testStatus).toEqual('test_failure');
 
       c.addOut(`
-TOTAL: 4 SUCCESS
+Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 4 of 4 (4.149 secs / 4.122 secs)
 `);
       expect(c.detailedStatus.failure).toEqual(0);
       expect(c.detailedStatus.success).toEqual(4);
@@ -274,7 +293,6 @@ Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 1 of 4 SUCCESS (0 secs / 0.005 sec
 Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 2 of 4 SUCCESS (0 secs / 0.005 secs)
 Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 3 of 4 (1 FAILED) (0 secs / 4.104 secs)
 Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 4 of 4 (1 FAILED) (4.149 secs / 4.122 secs)
-TOTAL: 1 FAILED, 3 SUCCESS
 `);
       expect(c.detailedStatus.testStatus).toEqual('test_failure');
       expect(c.detailedStatus.total).toEqual(4);
@@ -282,7 +300,7 @@ TOTAL: 1 FAILED, 3 SUCCESS
       expect(c.detailedStatus.failure).toEqual(1);
     });
 
-    it('collects unique errors', () => {
+    it('collects assertion errors', () => {
       const c = createCalculator();
       c.addOut(`Chrome 69.0.3497 (Mac OS X 10.13.6) AppComponent should render title in a h1 tag FAILED
 \tExpected 'Hello!' to contain 'Hellos!'.
@@ -303,9 +321,6 @@ Chrome 69.0.3497 (Mac OS X 10.13.6) AppComponent should render title in a h1 tag
       c.addOut(
         `Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 4 of 4 (1 FAILED) (4.25 secs / 4.187 secs)`
       );
-      c.addOut(`TOTAL: 1 FAILED, 3 SUCCESS
-TOTAL: 1 FAILED, 3 SUCCESS
-`);
 
       expect(c.detailedStatus.testStatus).toEqual('test_failure');
       expect(c.detailedStatus.errors).toEqual([
@@ -321,6 +336,127 @@ Expected 'Hello!' to contain 'Hellos!'.
   at step (webpack:///./src/app/app.component.spec.ts?:32:23)
   at Object.eval [as next] (webpack:///./src/app/app.component.spec.ts?:13:53)
   at fulfilled (webpack:///./src/app/app.component.spec.ts?:4:58)
+`
+        }
+      ]);
+    });
+
+    it('collects compile errors', () => {
+      const c = createCalculator();
+      c.addOut(`Chrome 69.0.3497 (Mac OS X 10.13.6) AppComponent should render title in a h1 tag FAILED
+\t'haha' is not a known element:
+\t1. If 'haha' is an Angular component, then verify that it is part of this module.
+\t2. To allow any element add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component. ("
+\t  <h1>Hello!</h1>
+\t  <example-hello></example-hello>
+\t  [ERROR ->]<haha></haha>
+\t</div>
+\t"): ng:///DynamicTestModule/AppComponent.html@4:2
+\tError: Template parse errors:
+\t    at syntaxError (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1275:17)
+\t    at TemplateParser.parse (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:15084:19)
+\t    at JitCompiler._parseTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24272:37)
+\t    at JitCompiler._compileTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24259:23)
+\t    at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:62)
+\t    at Set.forEach (<anonymous>)
+\t    at JitCompiler._compileComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:19)
+\t    at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24120:19)
+\t    at Object.then (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1266:77)
+\t    at JitCompiler._compileModuleAndAllComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24118:26)
+\t'haha' is not a known element:
+\t1. If 'haha' is an Angular component, then verify that it is part of this module.
+\t2. To allow any element add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component. ("
+\t  <h1>Hello!</h1>
+\t  <example-hello></example-hello>
+\t  [ERROR ->]<haha></haha>
+\t</div>
+\t"): ng:///DynamicTestModule/AppComponent.html@4:2
+\tError: Template parse errors:
+\t'haha' is not a known element:
+\t1. If 'haha' is an Angular component, then verify that it is part of this module.
+\t2. To allow any element add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component. ("
+\t  <h1>Hello!</h1>
+\t  <example-hello></example-hello>
+\t  [ERROR ->]<haha></haha>
+\t</div>
+\t"): ng:///DynamicTestModule/AppComponent.html@4:2
+\t    at syntaxError (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1275:17)
+\t    at TemplateParser.parse (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:15084:19)
+\t    at JitCompiler._parseTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24272:37)
+\t    at JitCompiler._compileTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24259:23)
+\t    at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:62)
+\t    at Set.forEach (<anonymous>)
+\t    at JitCompiler._compileComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:19)
+\t    at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24120:19)
+\t    at Object.then (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1266:77)
+\t    at JitCompiler._compileModuleAndAllComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24118:26)
+\tError: Uncaught (in promise): Error: Template parse errors:
+\t    at resolvePromise (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:813:31)
+\t    at new ZoneAwarePromise (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:893:17)
+\t    at __awaiter (webpack:///./src/app/app.component.spec.ts?:3:12)
+\t    at UserContext.eval (webpack:///./src/app/app.component.spec.ts?:72:80)
+\t    at ZoneDelegate.invoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:387:26)
+\t    at AsyncTestZoneSpec.onInvoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone-testing.js?:712:39)
+\t    at ProxyZoneSpec.onInvoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone-testing.js?:284:39)
+\t    at ZoneDelegate.invoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:386:32)
+\t    at Zone.runGuarded (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:150:47)
+\t    at runInTestZone (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone-testing.js?:840:29)
+Chrome 69.0.3497 (Mac OS X 10.13.6): Executed 4 of 4 (1 FAILED) (0 secs / 0.089 secs)
+`);
+
+      expect(c.detailedStatus.testStatus).toEqual('test_failure');
+      expect(c.detailedStatus.errors).toEqual([
+        {
+          label: 'AppComponent should render title in a h1 tag',
+          details: `'haha' is not a known element:
+1. If 'haha' is an Angular component, then verify that it is part of this module.
+2. To allow any element add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component. (\"
+  <h1>Hello!</h1>
+  <example-hello></example-hello>
+  [ERROR ->]<haha></haha>
+</div>
+\"): ng:///DynamicTestModule/AppComponent.html@4:2
+Error: Template parse errors:
+  at syntaxError (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1275:17)
+  at TemplateParser.parse (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:15084:19)
+  at JitCompiler._parseTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24272:37)
+  at JitCompiler._compileTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24259:23)
+  at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:62)
+  at Set.forEach (<anonymous>)
+  at JitCompiler._compileComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:19)
+  at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24120:19)
+  at Object.then (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1266:77)
+  at JitCompiler._compileModuleAndAllComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24118:26)
+'haha' is not a known element:
+1. If 'haha' is an Angular component, then verify that it is part of this module.
+2. To allow any element add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component. (\"
+  <h1>Hello!</h1>
+  <example-hello></example-hello>
+  [ERROR ->]<haha></haha>
+</div>
+\"): ng:///DynamicTestModule/AppComponent.html@4:2
+Error: Template parse errors:
+  at syntaxError (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1275:17)
+  at TemplateParser.parse (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:15084:19)
+  at JitCompiler._parseTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24272:37)
+  at JitCompiler._compileTemplate (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24259:23)
+  at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:62)
+  at Set.forEach (<anonymous>)
+  at JitCompiler._compileComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24202:19)
+  at eval (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24120:19)
+  at Object.then (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:1266:77)
+  at JitCompiler._compileModuleAndAllComponents (webpack:////Users/jack/projects/example/node_modules/@angular/compiler/fesm5/compiler.js?:24118:26)
+Error: Uncaught (in promise): Error: Template parse errors:
+  at resolvePromise (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:813:31)
+  at new ZoneAwarePromise (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:893:17)
+  at __awaiter (webpack:///./src/app/app.component.spec.ts?:3:12)
+  at UserContext.eval (webpack:///./src/app/app.component.spec.ts?:72:80)
+  at ZoneDelegate.invoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:387:26)
+  at AsyncTestZoneSpec.onInvoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone-testing.js?:712:39)
+  at ProxyZoneSpec.onInvoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone-testing.js?:284:39)
+  at ZoneDelegate.invoke (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:386:32)
+  at Zone.runGuarded (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone.js?:150:47)
+  at runInTestZone (webpack:////Users/jack/projects/example/node_modules/zone.js/dist/zone-testing.js?:840:29)
 `
         }
       ]);
