@@ -206,7 +206,7 @@ const Database: DatabaseResolvers.Resolvers = {
     try {
       if (args.id) {
         const c = commands.recent.find(c => c.id === args.id);
-        if (!c) throw new Error(`Cannot find command ${args.id}`);
+        if (!c) return [];
         const r = serializeCommand(c);
         c.outChunk = '';
         return [r];

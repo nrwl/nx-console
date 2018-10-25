@@ -17,8 +17,8 @@ function withPlatform(command) {
   return `${platform}.${command}`;
 }
 
-function electronBuilder(dashP) {
-  return `electron-builder --mac --win --linux -p ${dashP} --config.win.certificateSubjectName="Narwhal Technologies Inc."`
+function electronBuilder(platform, dashP) {
+  return `electron-builder ${platform} -p ${dashP} --config.win.certificateSubjectName="Narwhal Technologies Inc."`
 }
 
 module.exports = {
@@ -91,10 +91,14 @@ module.exports = {
       'dist': npsUtils.series.nps('dev.prepare', withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
     },
     publish: {
-      'builder-prerelease': electronBuilder('never'),
-      'builder-publish': electronBuilder('always'),
-      'prerelease': npsUtils.series.nps('dev.prepare', 'publish.builder-prerelease'),
-      'publish': npsUtils.series.nps('dev.prepare', 'publish.builder-publish')
+      'win-builder-prerelease': electronBuilder('--win', 'never'),
+      'win-builder-publish': electronBuilder('--win', 'always'),
+      'mac-builder-prerelease': electronBuilder('--mac --linux', 'never'),
+      'mac-builder-publish': electronBuilder('--mac --linux', 'always'),
+      'win-prerelease': npsUtils.series.nps('dev.prepare', 'publish.win-builder-prerelease'),
+      'win-publish': npsUtils.series.nps('dev.prepare', 'publish.win-builder-publish'),
+      'mac-prerelease': npsUtils.series.nps('dev.prepare', 'publish.mac-builder-prerelease'),
+      'mac-publish': npsUtils.series.nps('dev.prepare', 'publish.mac-builder-publish')
     },
     e2e: {
       'compile': 'tsc -p apps/angular-console-e2e/tsconfig.json',
