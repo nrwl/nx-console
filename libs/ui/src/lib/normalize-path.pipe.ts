@@ -5,9 +5,20 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class NormalizePathPipe implements PipeTransform {
   transform(value: string, args?: any): any {
-    const firstPart = value.split('/')[0];
-    if (!firstPart) return value;
-    if (!firstPart.endsWith(':')) return value;
+    const firstPartIfWin = value.split('\\')[0];
+    if (firstPartIfWin && firstPartIfWin.endsWith(':')) {
+      return this.toWin(value);
+    }
+
+    const firstPartIfUnix = value.split('/')[0];
+    if (firstPartIfUnix && firstPartIfUnix.endsWith(':')) {
+      return this.toWin(value);
+    }
+
+    return value;
+  }
+
+  private toWin(value: string) {
     return value
       .replace(new RegExp('/', 'g'), '\\')
       .split('\\')
