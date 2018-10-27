@@ -18,5 +18,6 @@ describe('NormalizePathPipe', () => {
     expect(pipe.transform('C:')).toEqual('C:');
     expect(pipe.transform('C://')).toEqual('C:');
     expect(pipe.transform('C://one/two')).toEqual('C:\\one\\two');
+    expect(pipe.transform('C:\\one/two')).toEqual('C:\\one\\two');
   });
 });

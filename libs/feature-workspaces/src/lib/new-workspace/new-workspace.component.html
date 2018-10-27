@@ -27,11 +27,11 @@
             <input class="autofocus" (keydown.enter)="stepper.next()" #workspaceNameInput matInput placeholder="my-new-workspace" [formControl]="control"
               name="value">
             <mat-error *ngIf="control.invalid && control.errors.nameTaken">
-              {{ ngNewForm.value.path }}/{{ control.value }} already exists
+              {{ ngNewForm.value.path + "/" + control.value | normalizePath }} already exists
             </mat-error>
             <mat-icon matSuffix>create_new_folder</mat-icon>
             <mat-hint *ngIf="control.value">
-              Workspace path will be {{ ngNewForm.value.path }}/{{ control.value }}
+              Workspace path will be {{ ngNewForm.value.path + "/" + control.value | normalizePath }}
             </mat-hint>
           </mat-form-field>
         </div>
