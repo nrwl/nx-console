@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Project } from '@angular-console/schema';
-import { Observable } from 'rxjs';
+import { Observable, Subscription, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { PROJECTS_POLLING } from '@angular-console/utils';
-import { WorkspaceGQL } from '../generated/graphql';
+import { PROJECTS_POLLING, Settings } from '@angular-console/utils';
+import { WorkspaceGQL, WorkspaceDocsGQL } from '../generated/graphql';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,10 +14,20 @@ import { WorkspaceGQL } from '../generated/graphql';
 })
 export class ProjectsComponent implements OnInit {
   workspace$: Observable<any>;
+  docs$ = this.settings.showDocs
+    ? this.route.params.pipe(
+        switchMap(p => this.workspaceDocsGQL.fetch({ path: p.path })),
+        map(p => p.data.workspace.docs.workspaceDocs)
+      )
+    : of([]);
+
+  docsSubscription: Subscription;
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly workspaceGQL: WorkspaceGQL
+    private readonly workspaceGQL: WorkspaceGQL,
+    private readonly settings: Settings,
+    private readonly workspaceDocsGQL: WorkspaceDocsGQL
   ) {}
 
   ngOnInit() {

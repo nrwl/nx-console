@@ -67,6 +67,7 @@ export interface Workspace {
   schematicCollections?: (SchematicCollection | null)[] | null;
   npmScripts?: (NpmScript | null)[] | null;
   projects?: (Project | null)[] | null;
+  docs: Docs;
   completions?: CompletionsTypes | null;
 }
 
@@ -138,6 +139,17 @@ export interface ArchitectConfigurations {
   name: string;
 }
 
+export interface Docs {
+  workspaceDocs: Doc[];
+  schematicDocs: Doc[];
+}
+
+export interface Doc {
+  prop?: string | null;
+  description?: string | null;
+  id: string;
+}
+
 export interface CompletionsTypes {
   files?: (CompletionResultType | null)[] | null;
   projects?: (CompletionResultType | null)[] | null;
@@ -205,6 +217,7 @@ export interface Mutation {
   openInBrowser?: OpenInBrowserResult | null;
   selectDirectory?: SelectDirectoryResult | null;
   showItemInFolder?: ShowItemInFolderResult | null;
+  openDoc?: OpenDocResult | null;
 }
 
 export interface CommandStarted {
@@ -235,6 +248,10 @@ export interface SelectDirectoryResult {
 export interface ShowItemInFolderResult {
   result: boolean;
 }
+
+export interface OpenDocResult {
+  result: boolean;
+}
 export interface WorkspaceDatabaseArgs {
   path: string;
 }
@@ -263,6 +280,11 @@ export interface SchematicsSchematicCollectionArgs {
 }
 export interface ArchitectProjectArgs {
   name?: string | null;
+}
+export interface SchematicDocsDocsArgs {
+  collectionName: string;
+  collectionVersion?: string | null;
+  name: string;
 }
 export interface FilesCompletionsTypesArgs {
   input?: string | null;
@@ -325,6 +347,9 @@ export interface SelectDirectoryMutationArgs {
 }
 export interface ShowItemInFolderMutationArgs {
   item: string;
+}
+export interface OpenDocMutationArgs {
+  id: string;
 }
 
 export enum FileType {
@@ -537,6 +562,7 @@ export namespace WorkspaceResolvers {
     >;
     npmScripts?: NpmScriptsResolver<(NpmScript | null)[] | null, any, Context>;
     projects?: ProjectsResolver<(Project | null)[] | null, any, Context>;
+    docs?: DocsResolver<Docs, any, Context>;
     completions?: CompletionsResolver<CompletionsTypes | null, any, Context>;
   }
 
@@ -587,6 +613,11 @@ export namespace WorkspaceResolvers {
     name?: string | null;
   }
 
+  export type DocsResolver<R = Docs, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type CompletionsResolver<
     R = CompletionsTypes | null,
     Parent = any,
@@ -896,6 +927,53 @@ export namespace ArchitectConfigurationsResolvers {
   >;
 }
 
+export namespace DocsResolvers {
+  export interface Resolvers<Context = any> {
+    workspaceDocs?: WorkspaceDocsResolver<Doc[], any, Context>;
+    schematicDocs?: SchematicDocsResolver<Doc[], any, Context>;
+  }
+
+  export type WorkspaceDocsResolver<
+    R = Doc[],
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type SchematicDocsResolver<
+    R = Doc[],
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, SchematicDocsArgs>;
+  export interface SchematicDocsArgs {
+    collectionName: string;
+    collectionVersion?: string | null;
+    name: string;
+  }
+}
+
+export namespace DocResolvers {
+  export interface Resolvers<Context = any> {
+    prop?: PropResolver<string | null, any, Context>;
+    description?: DescriptionResolver<string | null, any, Context>;
+    id?: IdResolver<string, any, Context>;
+  }
+
+  export type PropResolver<
+    R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type DescriptionResolver<
+    R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+}
+
 export namespace CompletionsTypesResolvers {
   export interface Resolvers<Context = any> {
     files?: FilesResolver<(CompletionResultType | null)[] | null, any, Context>;
@@ -1174,6 +1252,7 @@ export namespace MutationResolvers {
       any,
       Context
     >;
+    openDoc?: OpenDocResolver<OpenDocResult | null, any, Context>;
   }
 
   export type NgAddResolver<
@@ -1313,6 +1392,15 @@ export namespace MutationResolvers {
   export interface ShowItemInFolderArgs {
     item: string;
   }
+
+  export type OpenDocResolver<
+    R = OpenDocResult | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, OpenDocArgs>;
+  export interface OpenDocArgs {
+    id: string;
+  }
 }
 
 export namespace CommandStartedResolvers {
@@ -1398,6 +1486,18 @@ export namespace SelectDirectoryResultResolvers {
 }
 
 export namespace ShowItemInFolderResultResolvers {
+  export interface Resolvers<Context = any> {
+    result?: ResultResolver<boolean, any, Context>;
+  }
+
+  export type ResultResolver<
+    R = boolean,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace OpenDocResultResolvers {
   export interface Resolvers<Context = any> {
     result?: ResultResolver<boolean, any, Context>;
   }

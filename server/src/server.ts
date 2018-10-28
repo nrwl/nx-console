@@ -2,21 +2,25 @@ import * as express from 'express';
 import * as path from 'path';
 import { ApolloServer, mergeSchemas } from 'apollo-server-express';
 import { schema } from './schema';
-import { createSchema } from '@nrwl/angular-console-enterprise-electron';
+import {
+  createSchema,
+  registerPlugin
+} from '@nrwl/angular-console-enterprise-electron';
 import { commands } from './api/run-command';
 import { readSettings } from './api/read-settings';
 import { telemetry } from './telemetry';
+import { docs } from './api/docs';
+
+const context = {
+  readSettings,
+  commands,
+  docs,
+  telemetry
+};
 
 const apollo = new ApolloServer({
   schema: mergeSchemas({
-    schemas: [
-      schema,
-      createSchema({
-        readSettings,
-        commands,
-        telemetry
-      })
-    ]
+    schemas: [schema, createSchema(context)]
   }),
   rootValue: global
 });
@@ -42,8 +46,5 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 export function start(port: number) {
   app.listen(port ? port : 7777);
-}
-
-if (process.argv[2]) {
-  start(+process.argv[2]);
+  registerPlugin(context);
 }

@@ -8,14 +8,16 @@ import {
   IncrementalCommandOutput,
   CommandRunner,
   Serializer,
-  CommandStatus
+  CommandStatus,
+  Settings
 } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
   OnInit,
-  ViewChild
+  ViewChild,
+  OnDestroy
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
@@ -32,7 +34,8 @@ import {
 } from 'rxjs/operators';
 import {
   GenerateGQL,
-  SchematicCollectionsByNameGQL
+  SchematicCollectionsByNameGQL,
+  SchematicDocsGQL
 } from '../generated/graphql';
 
 const DEBOUNCE_TIME = 300;
@@ -59,6 +62,8 @@ export class SchematicComponent implements OnInit {
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
 
+  docs: Observable<any[]>;
+
   private readonly ngGen$ = new Subject<void>();
   readonly ngGenDisabled$ = new BehaviorSubject(true);
 
@@ -69,6 +74,8 @@ export class SchematicComponent implements OnInit {
     private readonly elementRef: ElementRef,
     private readonly contextActionService: ContextualActionBarService,
     private readonly generateGQL: GenerateGQL,
+    private readonly schematicDocsGQL: SchematicDocsGQL,
+    private readonly settings: Settings,
     private readonly schematicCollectionsByNameGQL: SchematicCollectionsByNameGQL
   ) {}
 
@@ -221,6 +228,31 @@ export class SchematicComponent implements OnInit {
         );
       })
     );
+
+    if (this.settings.showDocs) {
+      this.docs = schematicDescription$.pipe(
+        switchMap(d => {
+          if (d === null) {
+            return of(null);
+          } else {
+            return this.schematicDocsGQL.fetch({
+              path: d.path,
+              collectionName: d.collection,
+              name: d.schematic
+            });
+          }
+        }),
+        map(r => {
+          if (!r) {
+            return [];
+          } else {
+            return r.data.workspace.docs.schematicDocs;
+          }
+        })
+      );
+    } else {
+      this.docs = of([]);
+    }
   }
 
   getContextTitle(schematic: Schematic) {
