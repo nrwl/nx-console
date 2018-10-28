@@ -7,7 +7,8 @@ import {
 import {
   IncrementalCommandOutput,
   CommandRunner,
-  Serializer
+  Serializer,
+  Settings
 } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
@@ -26,7 +27,7 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { ProjectsGQL, RunNgGQL } from '../generated/graphql';
+import { ProjectsGQL, RunNgGQL, SchematicDocsGQL } from '../generated/graphql';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,6 +46,9 @@ export class TargetComponent implements OnInit {
   @ViewChild(CommandOutputComponent) out: CommandOutputComponent;
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
+
+  docs: Observable<any[]>;
+
   private readonly ngRun$ = new Subject<any>();
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
 
@@ -54,7 +58,9 @@ export class TargetComponent implements OnInit {
     private readonly serializer: Serializer,
     private readonly contextActionService: ContextualActionBarService,
     private readonly projectsGQL: ProjectsGQL,
-    private readonly runNgGQL: RunNgGQL
+    private readonly runNgGQL: RunNgGQL,
+    private readonly settings: Settings,
+    private readonly schematicDocsGQL: SchematicDocsGQL
   ) {}
 
   ngOnInit() {
@@ -132,6 +138,32 @@ export class TargetComponent implements OnInit {
     this.command$ = this.commandArray$.pipe(
       map(c => `ng ${this.serializer.argsToString(c.commands)}`)
     );
+
+    if (this.settings.showDocs) {
+      this.docs = targetDescription$.pipe(
+        switchMap(d => {
+          if (d === null) {
+            return of(null);
+          } else {
+            const [collectionName, name] = d.target.split(':');
+            return this.schematicDocsGQL.fetch({
+              path: d.path,
+              collectionName,
+              name
+            });
+          }
+        }),
+        map(p => {
+          if (!p) {
+            return [];
+          } else {
+            return p.data.workspace.docs.schematicDocs;
+          }
+        })
+      );
+    } else {
+      this.docs = of([]);
+    }
   }
 
   getContextTitle(project: Project) {

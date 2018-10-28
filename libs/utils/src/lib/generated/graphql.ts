@@ -141,6 +141,22 @@ export namespace ListFiles {
   };
 }
 
+export namespace OpenDoc {
+  export type Variables = {
+    id: string;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+    openDoc?: OpenDoc | null;
+  };
+
+  export type OpenDoc = {
+    __typename?: 'OpenDocResult';
+    result: boolean;
+  };
+}
+
 export namespace OpenInBrowser {
   export type Variables = {
     url: string;
@@ -431,6 +447,21 @@ export class ListFilesGQL extends Apollo.Query<
           name
           type
         }
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class OpenDocGQL extends Apollo.Mutation<
+  OpenDoc.Mutation,
+  OpenDoc.Variables
+> {
+  document: any = gql`
+    mutation OpenDoc($id: String!) {
+      openDoc(id: $id) {
+        result
       }
     }
   `;

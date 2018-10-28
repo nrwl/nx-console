@@ -91,6 +91,34 @@ export namespace SchematicCollections {
   };
 }
 
+export namespace WorkspaceDocs {
+  export type Variables = {
+    path: string;
+  };
+
+  export type Query = {
+    __typename?: 'Query';
+    workspace: Workspace;
+  };
+
+  export type Workspace = {
+    __typename?: 'Workspace';
+    docs: Docs;
+  };
+
+  export type Docs = {
+    __typename?: 'Docs';
+    workspaceDocs: WorkspaceDocs[];
+  };
+
+  export type WorkspaceDocs = {
+    __typename?: 'Doc';
+    id: string;
+    description?: string | null;
+    prop?: string | null;
+  };
+}
+
 export namespace Workspace {
   export type Variables = {
     path: string;
@@ -214,6 +242,27 @@ export class SchematicCollectionsGQL extends Apollo.Query<
       schematicCollections {
         name
         description
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class WorkspaceDocsGQL extends Apollo.Query<
+  WorkspaceDocs.Query,
+  WorkspaceDocs.Variables
+> {
+  document: any = gql`
+    query WorkspaceDocs($path: String!) {
+      workspace(path: $path) {
+        docs {
+          workspaceDocs {
+            id
+            description
+            prop
+          }
+        }
       }
     }
   `;

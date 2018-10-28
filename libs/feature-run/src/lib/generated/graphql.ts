@@ -126,6 +126,36 @@ export namespace RunNg {
   };
 }
 
+export namespace SchematicDocs {
+  export type Variables = {
+    path: string;
+    collectionName: string;
+    name: string;
+  };
+
+  export type Query = {
+    __typename?: 'Query';
+    workspace: Workspace;
+  };
+
+  export type Workspace = {
+    __typename?: 'Workspace';
+    docs: Docs;
+  };
+
+  export type Docs = {
+    __typename?: 'Docs';
+    schematicDocs: SchematicDocs[];
+  };
+
+  export type SchematicDocs = {
+    __typename?: 'Doc';
+    id: string;
+    description?: string | null;
+    prop?: string | null;
+  };
+}
+
 export namespace WorkspaceAndProjects {
   export type Variables = {
     path: string;
@@ -257,6 +287,31 @@ export class RunNgGQL extends Apollo.Mutation<RunNg.Mutation, RunNg.Variables> {
     mutation RunNg($path: String!, $runCommand: [String]!) {
       runNg(path: $path, runCommand: $runCommand) {
         id
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class SchematicDocsGQL extends Apollo.Query<
+  SchematicDocs.Query,
+  SchematicDocs.Variables
+> {
+  document: any = gql`
+    query SchematicDocs(
+      $path: String!
+      $collectionName: String!
+      $name: String!
+    ) {
+      workspace(path: $path) {
+        docs {
+          schematicDocs(collectionName: $collectionName, name: $name) {
+            id
+            description
+            prop
+          }
+        }
       }
     }
   `;

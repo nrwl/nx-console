@@ -1,0 +1,11 @@
+query WorkspaceDocs($path: String!) {
+  workspace(path: $path) {
+    docs {
+      workspaceDocs {
+        id
+        description
+        prop
+      }
+    }
+  }
+}

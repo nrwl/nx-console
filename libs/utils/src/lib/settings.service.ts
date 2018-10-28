@@ -73,7 +73,11 @@ export class Settings {
     return this.settings.enableDetailedStatus;
   }
 
-  showConnectPlugin(): boolean | undefined {
+  showConnectPlugin(): boolean {
+    return true;
+  }
+
+  showDocs(): boolean | undefined {
     return true;
   }
 

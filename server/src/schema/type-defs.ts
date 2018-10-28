@@ -124,6 +124,10 @@ export const typeDefs = gql`
     result: Boolean!
   }
 
+  type OpenDocResult {
+    result: Boolean!
+  }
+
   type Mutation {
     ngAdd(path: String!, name: String!): CommandStarted
     ngNew(path: String!, name: String!, collection: String!): CommandStarted
@@ -152,6 +156,7 @@ export const typeDefs = gql`
       angularWorkspace: Boolean!
     ): SelectDirectoryResult
     showItemInFolder(item: String!): ShowItemInFolderResult
+    openDoc(id: String!): OpenDocResult
   }
 
   type SelectDirectoryResult {
@@ -233,6 +238,22 @@ export const typeDefs = gql`
     schematicCollections(name: String): [SchematicCollection]
     npmScripts(name: String): [NpmScript]
     projects(name: String): [Project]
+    docs: Docs!
     completions: CompletionsTypes
+  }
+
+  type Docs {
+    workspaceDocs: [Doc!]!
+    schematicDocs(
+      collectionName: String!
+      collectionVersion: String
+      name: String!
+    ): [Doc!]!
+  }
+
+  type Doc {
+    prop: String
+    description: String
+    id: String!
   }
 `;

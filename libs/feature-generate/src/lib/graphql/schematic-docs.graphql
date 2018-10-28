@@ -1,0 +1,11 @@
+query SchematicDocs($path: String!, $collectionName: String!, $name: String!) {
+  workspace(path: $path) {
+    docs {
+      schematicDocs(collectionName: $collectionName, name: $name) {
+        id
+        description
+        prop
+      }
+    }
+  }
+}

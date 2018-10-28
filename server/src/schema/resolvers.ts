@@ -32,7 +32,8 @@ import {
   NpmScriptResolvers,
   ProjectResolvers,
   SchematicCollectionResolvers,
-  WorkspaceResolvers
+  WorkspaceResolvers,
+  DocsResolvers
 } from '../graphql-types';
 import {
   cacheFiles,
@@ -47,6 +48,7 @@ import {
 } from '../utils';
 import { CommandInformation } from '../api/commands';
 import { mainWindow } from '..';
+import { docs } from '../api/docs';
 
 const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
   schematics(collection: any, args: any) {
@@ -93,6 +95,9 @@ const Workspace: WorkspaceResolvers.Resolvers = {
   },
   completions(workspace: any) {
     return workspace;
+  },
+  docs(workspace: any) {
+    return workspace;
   }
 };
 
@@ -108,6 +113,21 @@ const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
   },
   absoluteModules(workspace: any, args: any) {
     return completeAbsoluteModules(files, workspace, args.input);
+  }
+};
+
+const Docs: DocsResolvers.Resolvers = {
+  workspaceDocs(workspace: any, args: any, context: any) {
+    const deps = {
+      ...context.packageJson.dependencies,
+      ...context.packageJson.devDependencies
+    };
+    return docs.workspaceDocs(deps).toPromise();
+  },
+
+  schematicDocs(workspace: any, args: any, context: any) {
+    // TODO: vsavkin read the version from node_modules and provide here instead of null
+    return docs.schematicDocs(args.collectionName, null, args.name).toPromise();
   }
 };
 
@@ -151,16 +171,20 @@ const Database: DatabaseResolvers.Resolvers = {
       if (!files[args.path]) {
         cacheFiles(args.path);
       }
-      context.path = args.path;
       const packageJson = readJsonFile('./package.json', args.path).json;
       const angularJson = readJsonFile('./angular.json', args.path).json;
+      context.path = args.path;
+      context.packageJson = packageJson;
+      context.angularJson = angularJson;
+
       return {
         name: packageJson.name,
         path: args.path,
         dependencies: readDependencies(packageJson),
         extensions: readExtensions(packageJson),
         projects: readProjects(args.path, angularJson.projects),
-        npmScripts: readNpmScripts(args.path, packageJson)
+        npmScripts: readNpmScripts(args.path, packageJson),
+        docs: {} as any
       };
     } catch (e) {
       console.log(e);
@@ -417,6 +441,10 @@ const Mutation: MutationResolvers.Resolvers = {
   updateSettings(_root: any, args: any) {
     storeSettings(JSON.parse(args.data));
     return readSettings();
+  },
+  async openDoc(root: any, args: any) {
+    const result = await docs.openDoc(args.id).toPromise();
+    return { result };
   }
 };
 
@@ -441,6 +469,7 @@ export const resolvers = {
   NpmScript,
   Workspace,
   CompletionsTypes,
+  Docs,
   Database,
   Mutation
 };
