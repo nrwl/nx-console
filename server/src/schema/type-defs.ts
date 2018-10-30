@@ -221,6 +221,7 @@ export const typeDefs = gql`
     canCollectData: Boolean!
     showSupportPlugin: Boolean
     installNodeManually: Boolean
+    enableDetailedStatus: Boolean
     recent: [WorkspaceDefinition]
   }
 

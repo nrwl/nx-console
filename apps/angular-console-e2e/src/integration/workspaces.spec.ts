@@ -18,7 +18,9 @@ describe('Workspaces', () => {
     cy.get('.add-workspace-fab').click({ force: true });
     checkButtonIsDisabled('Create', true);
 
-    selectFolder();
+    // The corresponding response is mocked in the backend. (See: resolvers.ts `selectDirectory`)
+    cy.get('input[name="parent-directory"]').click();
+
     checkButtonIsDisabled('Create', true);
 
     cy.wait(800);

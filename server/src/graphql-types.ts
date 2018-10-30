@@ -44,6 +44,7 @@ export interface Settings {
   canCollectData: boolean;
   showSupportPlugin?: boolean | null;
   installNodeManually?: boolean | null;
+  enableDetailedStatus?: boolean | null;
   recent?: (WorkspaceDefinition | null)[] | null;
 }
 
@@ -438,6 +439,11 @@ export namespace SettingsResolvers {
       any,
       Context
     >;
+    enableDetailedStatus?: EnableDetailedStatusResolver<
+      boolean | null,
+      any,
+      Context
+    >;
     recent?: RecentResolver<
       (WorkspaceDefinition | null)[] | null,
       any,
@@ -456,6 +462,11 @@ export namespace SettingsResolvers {
     Context = any
   > = Resolver<R, Parent, Context>;
   export type InstallNodeManuallyResolver<
+    R = boolean | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type EnableDetailedStatusResolver<
     R = boolean | null,
     Parent = any,
     Context = any

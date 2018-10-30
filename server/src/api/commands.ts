@@ -1,7 +1,7 @@
 import * as os from 'os';
 import { DetailedStatusCalculator } from './detailed-status-calculator';
 
-interface CommandInformation {
+export interface CommandInformation {
   id: string;
   type: string;
   workspace: string;

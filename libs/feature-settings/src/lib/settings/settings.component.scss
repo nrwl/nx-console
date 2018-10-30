@@ -1,0 +1,50 @@
+@import '../../../../ui/src/lib/variables';
+
+h3 {
+  color: mat-color($grey-dark);
+  font-weight: 100;
+}
+
+h4 {
+  font-weight: 600;
+  color: mat-color($grey-darker);
+  margin: 6px 0 0 0;
+}
+
+p {
+  margin: 0;
+  color: mat-color($grey-dark);
+  padding-bottom: 20px;
+}
+
+mat-form-field {
+  width: 33.33%;
+  min-width: 250px;
+  max-width: 350px;
+  margin-bottom: 0;
+}
+
+@media (max-width: $largeScreen) {
+  .container {
+    width: 66.66%;
+    max-width: 810px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 1260px) {
+  .container {
+    width: 840px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: $smallScreen) {
+  .container {
+    width: auto;
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+}

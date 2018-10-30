@@ -117,9 +117,9 @@ export class NewWorkspaceComponent {
   createNewWorkspace() {
     if (this.ngNewForm.valid) {
       const ngNewInvocation: NgNew.Variables = this.ngNewForm.value;
-      this.command = `ng new ${name} --collection=${
-        ngNewInvocation.collection
-      }`;
+      this.command = `ng new ${ngNewInvocation.name} --directory=${
+        ngNewInvocation.name
+      } --collection=${ngNewInvocation.collection}`;
       this.commandOutput$ = this.commandRunner
         .runCommand(this.ngNewGQL.mutate(ngNewInvocation), false)
         .pipe(

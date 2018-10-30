@@ -38,12 +38,12 @@ import {
   directoryExists,
   exists,
   files,
-  filterById,
   filterByName,
   findClosestNg,
   findExecutable,
   readJsonFile
 } from '../utils';
+import { CommandInformation } from '../api/commands';
 import { mainWindow } from '..';
 
 const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
@@ -109,7 +109,7 @@ const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
   }
 };
 
-function serializeCommand(c) {
+function serializeCommand(c: any, includeDetailedStatus: boolean) {
   return {
     id: c.id,
     type: c.id,
@@ -118,9 +118,10 @@ function serializeCommand(c) {
     status: c.status,
     out: c.out,
     outChunk: c.outChunk,
-    detailedStatus: c.detailedStatusCalculator.detailedStatus
-      ? JSON.stringify(c.detailedStatusCalculator.detailedStatus)
-      : null
+    detailedStatus:
+      includeDetailedStatus && c.detailedStatusCalculator.detailedStatus
+        ? JSON.stringify(c.detailedStatusCalculator.detailedStatus)
+        : null
   };
 }
 
@@ -204,14 +205,20 @@ const Database: DatabaseResolvers.Resolvers = {
   },
   commands(_root: any, args: any) {
     try {
+      const settings = readSettings();
+      const includeDetailedStatus = settings.enableDetailedStatus;
       if (args.id) {
-        const c = commands.recent.find(c => c.id === args.id);
+        const c = commands.recent.find(
+          (c: CommandInformation) => c.id === args.id
+        );
         if (!c) return [];
-        const r = serializeCommand(c);
+        const r = serializeCommand(c, includeDetailedStatus);
         c.outChunk = '';
         return [r];
       } else {
-        return commands.recent.map(c => serializeCommand(c));
+        return commands.recent.map(c =>
+          serializeCommand(c, includeDetailedStatus)
+        );
       }
     } catch (e) {
       console.log(e);
@@ -380,7 +387,7 @@ const Mutation: MutationResolvers.Resolvers = {
     }
   },
   selectDirectory(root: any, args: any) {
-    // TODO(jack): This stub is needed because e2e tests that bring up the dialog will block entire electron main thread.
+    // TODO(jack): This mocked value is needed because e2e tests that bring up the dialog will block entire electron main thread.
     if (process.env.CI === 'true') {
       return {
         selectedDirectoryPath: '/tmp'

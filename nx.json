@@ -25,6 +25,9 @@
     "feature-generate": {
       "tags": []
     },
+    "feature-settings": {
+      "tags": []
+    },
     "utils": {
       "tags": []
     },

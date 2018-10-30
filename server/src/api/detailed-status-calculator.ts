@@ -265,6 +265,7 @@ type TestStatus =
   | 'test_pending'
   | 'test_building'
   | 'test_inprogress'
+  | 'build_failure'
   | 'test_failure'
   | 'test_success'
   | 'test_cancelled';
@@ -277,6 +278,7 @@ export interface TestDetailedStatus {
   failure: number;
   success: number;
   errors: TestError[];
+  buildErrors: string[];
 }
 
 export class TestDetailedStatusCalculator
@@ -295,6 +297,7 @@ export class TestDetailedStatusCalculator
       total: 0,
       failure: 0,
       success: 0,
+      buildErrors: [],
       errors: []
     };
   }
@@ -312,21 +315,26 @@ export class TestDetailedStatusCalculator
       failure,
       success,
       testStatus,
-      errors
+      errors,
+      buildErrors
     } = TestDetailedStatusCalculator.updateDetailedStatus(
       this.detailedStatus,
       value
     );
 
-    const nextStatus =
-      testStatus === 'test_pending' && buildProgress > 0
-        ? 'test_building'
-        : testStatus;
+    let nextStatus = testStatus;
+
+    if (buildErrors.length > 0) {
+      nextStatus = 'build_failure';
+    } else if (testStatus === 'test_pending' && buildProgress > 0) {
+      nextStatus = 'test_building';
+    }
 
     this.detailedStatus = {
       type: StatusType.TEST,
       buildProgress,
       errors,
+      buildErrors,
       total,
       failure,
       success,
@@ -341,14 +349,29 @@ export class TestDetailedStatusCalculator
     value: string
   ): TestDetailedStatus {
     let _errors = s.errors;
+    let buildErrors = s.buildErrors;
+
     if (value.indexOf('Executed 0') > -1) {
       _errors = [];
+      buildErrors = [];
+    }
+
+    if (value.indexOf('ERROR in') > -1) {
+      buildErrors = buildErrors.concat(
+        value
+          .substring(value.indexOf('ERROR in') + 8)
+          .split(/[\n\r]/)
+          .map(v => v.trim())
+          .filter(v => v.length > 0)
+      );
     }
 
     const errors = getNextTestErrorState(_errors, value);
+
     const match = value.match(
       TestDetailedStatusCalculator.TEST_PROGRESS_REGEXP
     );
+
     if (match) {
       const total = Number(match[2]);
       const soFar = Number(match[1]);
@@ -357,6 +380,7 @@ export class TestDetailedStatusCalculator
 
       return {
         ...s,
+        buildErrors,
         errors,
         total: total,
         testStatus:
@@ -371,6 +395,7 @@ export class TestDetailedStatusCalculator
     } else {
       return {
         ...s,
+        buildErrors,
         errors
       };
     }
@@ -382,7 +407,9 @@ export class TestDetailedStatusCalculator
     this.detailedStatus = {
       ...this.detailedStatus,
       testStatus: !allRan
-        ? 'test_cancelled'
+        ? this.detailedStatus.buildErrors.length > 0
+          ? 'build_failure'
+          : 'test_cancelled'
         : failure > 0
           ? 'test_failure'
           : 'test_success'

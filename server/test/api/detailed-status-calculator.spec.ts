@@ -462,6 +462,20 @@ Error: Uncaught (in promise): Error: Template parse errors:
       ]);
     });
 
+    it('captures compile errors', () => {
+      const c = createCalculator();
+      c.addOut(`
+[./src/polyfills.ts] ./apps/example3/src/polyfills.ts 0 bytes {polyfills} [built]
+[./src/styles.css] ./apps/example3/src/styles.css 1.25 KiB {styles} [built]
+[./src/test.ts] ./apps/example3/src/test.ts 0 bytes {main} [built]
+
+ERROR in apps/example3/src/app/app.component.ts(9,1): error TS1005: '{' expected.
+
+30 10 2018 11:51:38.409:INFO [Chrome 69.0.3497 (Mac OS X 10.13.6)]: Connected on socket gFyQfESFrdxOxY_jAAAA with id 55160968`);
+
+      expect(c.detailedStatus.testStatus).toEqual('build_failure');
+    });
+
     function createCalculator() {
       return new TestDetailedStatusCalculator();
     }
