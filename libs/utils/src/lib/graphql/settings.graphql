@@ -2,6 +2,7 @@ query Settings {
   settings {
     canCollectData
     installNodeManually
+    enableDetailedStatus
     recent {
       path
       name

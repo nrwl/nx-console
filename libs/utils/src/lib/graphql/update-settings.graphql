@@ -2,6 +2,7 @@ mutation UpdateSettings($data: String!) {
   updateSettings(data: $data) {
     canCollectData
     installNodeManually
+    enableDetailedStatus
     recent {
       path
       name

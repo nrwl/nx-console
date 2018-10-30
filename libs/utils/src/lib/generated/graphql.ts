@@ -232,6 +232,7 @@ export namespace Settings {
     __typename?: 'Settings';
     canCollectData: boolean;
     installNodeManually?: boolean | null;
+    enableDetailedStatus?: boolean | null;
     recent?: (Recent | null)[] | null;
   };
 
@@ -289,6 +290,7 @@ export namespace UpdateSettings {
     __typename?: 'Settings';
     canCollectData: boolean;
     installNodeManually?: boolean | null;
+    enableDetailedStatus?: boolean | null;
     recent?: (Recent | null)[] | null;
   };
 
@@ -520,6 +522,7 @@ export class SettingsGQL extends Apollo.Query<
       settings {
         canCollectData
         installNodeManually
+        enableDetailedStatus
         recent {
           path
           name
@@ -571,6 +574,7 @@ export class UpdateSettingsGQL extends Apollo.Mutation<
       updateSettings(data: $data) {
         canCollectData
         installNodeManually
+        enableDetailedStatus
         recent {
           path
           name

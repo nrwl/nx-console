@@ -1,0 +1,15 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$grey-lightest: mat-palette($mat-grey, 50);
+$grey-lighter: mat-palette($mat-grey, 100);
+$grey-light: mat-palette($mat-grey, 200);
+$grey-medium: mat-palette($mat-grey, 400);
+$grey-dark: mat-palette($mat-grey, 600);
+$grey-darker: mat-palette($mat-grey, 800);
+$grey-darkest: mat-palette($mat-grey, 900);
+
+// For media queries
+$largeScreen: 1800px;
+$mediumScreen: 1260px;
+$smallScreen: 920px;

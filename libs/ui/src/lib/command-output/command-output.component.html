@@ -9,6 +9,7 @@
     <button class="console-button" mat-icon-button matTooltip="Console Output" matTooltipPosition="right">
         <mat-icon [ngClass]="(activeView$ | async) === 'terminal' ? 'output-icon-active' : ''"
                   svgIcon="console"
+                  matBadgeSize="small"
                   [matBadge]="(terminalOutputState$ | async)?.unread ? '*' : ''"
                   matBadgeColor="accent"
                   (click)="setActiveView('terminal')">

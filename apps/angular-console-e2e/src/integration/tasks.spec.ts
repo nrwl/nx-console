@@ -63,8 +63,12 @@ describe('Tasks', () => {
     });
   });
 
-  it('runs a task', () => {
+  it('runs build task', () => {
+    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
+
     clickOnTask('proj', 'build');
+
     cy.get('div.context-title').contains('ng build proj');
 
     checkDisplayedCommand('$ ng build proj');
@@ -82,6 +86,13 @@ describe('Tasks', () => {
     cy.get('button')
       .contains('Run')
       .click();
+
+    cy.get('div.js-status-build-success', { timeout: 120000 }).contains(
+      'Build completed'
+    );
+    cy.get('div.js-status-build-folder', { timeout: 120000 }).contains(
+      'is ready'
+    );
 
     waitForActionToComplete();
     checkFileExists(`dist/proj/main.js`);
@@ -190,29 +201,6 @@ describe('Tasks', () => {
 
   //   cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
   // });
-
-  it('runs build task', () => {
-    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
-    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
-
-    clickOnTask('proj', 'build');
-
-    cy.get('div.context-title').contains('ng build proj');
-
-    cy.get('button')
-      .contains('Run')
-      .click();
-
-    cy.get('div.js-status-build-success', { timeout: 120000 }).contains(
-      'Build completed'
-    );
-    cy.get('div.js-status-build-folder', { timeout: 120000 }).contains(
-      'is ready'
-    );
-
-    goBack();
-    clearAllRecentTasks();
-  });
 
   // TODO(jack): This seems to be causing memory issues in CI.
   // it('runs serve task', () => {

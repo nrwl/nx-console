@@ -1,3 +1,5 @@
+@import '../../../../ui/src/lib/variables';
+
 p {
   color: rgba(0, 0, 0, 0.54);
 }
@@ -15,7 +17,6 @@ mat-nav-list {
   margin-bottom: 24px;
 }
 
-$largeScreen: 1800px;
 @media (max-width: $largeScreen) {
   mat-nav-list {
     width: 66.66%;
@@ -24,7 +25,6 @@ $largeScreen: 1800px;
   }
 }
 
-$mediumScreen: 1260px;
 @media (max-width: 1260px) {
   mat-nav-list {
     width: 840px;
@@ -33,7 +33,6 @@ $mediumScreen: 1260px;
   }
 }
 
-$smallScreen: 920px;
 @media (max-width: $smallScreen) {
   mat-nav-list {
     width: auto;

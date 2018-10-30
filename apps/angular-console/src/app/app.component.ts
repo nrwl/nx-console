@@ -58,7 +58,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   sidenavLinks: SidenavLink[] = [
-    { icon: 'view_list', route: '/workspaces', text: 'Workspaces' }
+    { icon: 'view_list', route: '/workspaces', text: 'Workspaces' },
+    { icon: 'settings', route: '/settings', text: 'Settings' }
   ];
 
   constructor(

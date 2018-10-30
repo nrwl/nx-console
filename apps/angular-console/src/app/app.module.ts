@@ -3,6 +3,10 @@ import {
   FeatureWorkspacesModule,
   workspaceRoutes
 } from '@angular-console/feature-workspaces';
+import {
+  settingsRoutes,
+  FeatureSettingsModule
+} from '@angular-console/feature-settings';
 import { UiModule } from '@angular-console/ui';
 import {
   AnalyticsCollector,
@@ -71,6 +75,7 @@ export function initApollo(
   declarations: [AppComponent],
   imports: [
     FeatureActionBarModule,
+    FeatureSettingsModule,
     MatSidenavModule,
     MatListModule,
     MatIconModule,
@@ -99,7 +104,8 @@ export function initApollo(
         {
           path: 'connect',
           children: connectRoutes
-        }
+        },
+        { path: 'settings', children: settingsRoutes }
       ],
       { paramsInheritanceStrategy: 'always' }
     )
