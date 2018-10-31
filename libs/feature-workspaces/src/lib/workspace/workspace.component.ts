@@ -77,7 +77,7 @@ export class WorkspaceComponent implements OnDestroy {
   readonly routes: Array<Route> = [
     { icon: 'view_list', url: 'projects', title: 'Projects' },
     { icon: 'code', url: 'generate', title: 'Generate Code' },
-    { svgIcon: 'terminal', url: 'tasks', title: 'Run Tasks' },
+    { svgIcon: 'console', url: 'tasks', title: 'Run Tasks' },
     {
       icon: 'extension',
       url: 'extensions',

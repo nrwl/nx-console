@@ -20,14 +20,15 @@ angular-console-new-workspace {
 
   .ui-terminal-container {
     background: black;
-    padding-bottom: 8px;
     border-radius: 8px;
     box-sizing: border-box;
-    height: 100%;
+    max-height: 65vh;
+    padding-bottom: 16px;
+    position: relative;
 
     ui-terminal {
       display: block;
-      height: 100%;
+      box-sizing: border-box;
     }
   }
 }

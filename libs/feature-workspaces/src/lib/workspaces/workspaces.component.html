@@ -30,7 +30,7 @@
     </ng-container>
   </mat-nav-list>
 
-  <div class="add-workspace-container" fxLayout="column" fxLayoutAlign="end center" fxLayoutGap="12px">
+  <div [class.action-bar-showing]="(commands$ | async)?.length > 0" class="add-workspace-container" fxLayout="column" fxLayoutAlign="end center" fxLayoutGap="12px">
     <button (click)="importExistingWorkspace()" matTooltipClass="add-workspace-tooltip" matTooltipPosition="left"
       matTooltip="Open an existing workspace" class="import-workspace-fab" mat-mini-fab color="primary">
       <mat-icon>folder_open</mat-icon>

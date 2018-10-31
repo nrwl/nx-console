@@ -68,3 +68,8 @@ $button-size: 28px;
 .output-icon-active {
   color: mat-color($accent-palette);
 }
+
+.mat-icon-button mat-icon {
+  position: relative !important;
+  top: -1px !important;
+}

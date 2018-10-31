@@ -21,8 +21,8 @@
 
   <!-- Task list -->
   <mat-list [@growShrink]="(showActionList$ | async) ? 'expand' : 'contract'">
-    <ng-container *ngFor="let action of actions; trackBy: trackByCommandId" [ngSwitch]="action.status">
-      <mat-list-item class="action-bar-title" @growShrink matRipple #itemRipple="matRipple" (click)="itemRipple.disabled ? '' : toggleItemExpansion(action.id)">
+    <ng-container *ngFor="let action of actions; let last = last; trackBy: trackByCommandId" [ngSwitch]="action.status">
+      <mat-list-item [class.expanded]="expandedAction?.id === action.id" class="action-bar-title" @growShrink matRipple #itemRipple="matRipple" (click)="itemRipple.disabled ? '' : toggleItemExpansion(action.id)">
 
         <!-- Task avatar -->
         <span class="task-avatar" #taskAvatar matListAvatar fxLayout="row" fxLayoutAlign="center center" [ngSwitch]="action.status"
@@ -80,7 +80,7 @@
         </ui-command-output>
       </div>
 
-      <mat-divider></mat-divider>
+      <mat-divider *ngIf="!last"></mat-divider>
     </ng-container>
   </mat-list>
 </div>
