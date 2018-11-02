@@ -32,12 +32,6 @@ export function goBack() {
     .click();
 }
 
-export function toggleBoolean(field: string) {
-  fieldOperation(field, el => {
-    el.querySelector('div.boolean-ripple').click();
-  });
-}
-
 export function checkButtonIsDisabled(text: string, disabled: boolean) {
   cy.get('button', { timeout: 1000 }).should(($p: any) => {
     for (let i = 0; i < $p.length; ++i) {

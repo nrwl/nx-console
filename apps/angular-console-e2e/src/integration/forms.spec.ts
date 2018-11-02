@@ -8,7 +8,6 @@ import {
   openProject,
   projectPath,
   texts,
-  toggleBoolean,
   uniqName,
   waitForAutocomplete,
   whitelistGraphql
@@ -85,12 +84,14 @@ describe('Forms', () => {
       '$ ng generate @schematics/angular:component cmp --dry-run'
     );
 
-    toggleBoolean('export');
+    cy.get('mat-select[name="export"]').click();
+    cy.contains('.mat-select-content .mat-option', 'true').click();
     checkDisplayedCommand(
       '$ ng generate @schematics/angular:component cmp --export --dry-run'
     );
 
-    toggleBoolean('export');
+    cy.get('mat-select[name="export"]').click();
+    cy.contains('.mat-select-content .mat-option', 'false').click();
     checkDisplayedCommand(
       '$ ng generate @schematics/angular:component cmp --dry-run'
     );

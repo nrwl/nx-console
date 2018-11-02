@@ -17,6 +17,10 @@ ui-flags {
     }
   }
 
+  mat-hint {
+    margin-top: -20px;
+  }
+
   mat-expansion-panel {
     .mat-expanded {
       .mat-expansion-indicator {
@@ -45,30 +49,6 @@ ui-flags {
     }
   }
 
-  .field-hint {
-    color: rgb(102, 102, 102);
-    font-size: 12px;
-    z-index: 1;
-    height: 20px;
-    width: calc(100% - $input-padding-horizontal);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-
-    &.boolean-field-hint {
-      position: absolute;
-      bottom: -22px;
-      left: $input-padding-horizontal;
-      right: $input-padding-horizontal;
-    }
-
-    &.text-field-hint {
-      margin-top: -16px;
-      margin-left: $input-padding-horizontal;
-      margin-right: $input-padding-horizontal;
-    }
-  }
-
   .text-field-container {
     width: 100%;
     overflow: hidden;
@@ -80,7 +60,7 @@ ui-flags {
 
     & > mat-icon {
       position: relative;
-      top: 12px;
+      top: 16px;
       color: rgb(117, 117, 117);
     }
 
@@ -88,94 +68,27 @@ ui-flags {
       margin-bottom: 0;
     }
 
-    &.text {
-      .clear-text-field {
-        position: absolute;
-        z-index: 1;
-        overflow: hidden;
-        right: -4px;
-        top: -7px;
-        cursor: pointer;
-        background: #6a6a6a;
-        color: white;
-        border-radius: 50%;
-        font-size: 16px;
-        line-height: 20px;
-        padding-left: 2px;
-        box-sizing: border-box;
-        width: 20px;
-        height: 20px;
-        font-weight: bold;
-      }
-    }
-
-    &.boolean {
-      min-height: 48px;
-      border-radius: $border-radius;
-      margin-bottom: 44px;
-
-      .boolean-ripple {
-        position: absolute;
-        border-radius: $border-radius;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 2;
-        cursor: pointer;
-      }
-
-      .boolean-field-name {
-        padding-left: 16px;
-      }
-
-      .boolean-field-container {
-        position: relative;
-        padding: 0 $input-padding-horizontal;
-        transition: background 0.3s ease-in-out;
-        background: rgba(0, 0, 0, 0);
-        border: 1px solid rgb(176, 176, 176);
-        border-radius: $border-radius;
-        color: rgb(176, 176, 176);
-
-        & .on {
-          color: rgba(0, 0, 0, 0.87);
-        }
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.04);
-        }
-      }
-    }
-
-    &.text {
-      .mat-form-field-can-float:not(.mat-form-field-should-float) {
-        input {
-          position: relative;
-          top: -10px;
-        }
-      }
-
-      .mat-form-field-can-float:not(.mat-focused) {
-        .mat-form-field-empty.mat-form-field-label {
-          transform: translateY(-10px) perspective(100px);
-        }
-      }
+    .clear-text-field {
+      position: absolute;
+      z-index: 1;
+      overflow: hidden;
+      right: 0;
+      top: 7px;
+      cursor: pointer;
+      background: #6a6a6a;
+      color: white;
+      border-radius: 50%;
+      font-size: 16px;
+      line-height: 20px;
+      padding-left: 2px;
+      box-sizing: border-box;
+      width: 20px;
+      height: 20px;
+      font-weight: bold;
     }
   }
 
   .mat-form-field-underline {
     display: none;
-  }
-
-  .mat-form-field-flex {
-    border: 1px solid rgb(176, 176, 176);
-    border-radius: $border-radius;
-    padding: 0 $input-padding-horizontal;
-    padding-top: 8px;
-
-    input {
-      margin-right: 24px;
-    }
   }
 }
