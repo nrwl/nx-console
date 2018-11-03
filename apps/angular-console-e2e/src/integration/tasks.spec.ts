@@ -159,36 +159,37 @@ describe('Tasks', () => {
     clearAllRecentTasks();
   });
 
-  it('runs test task', () => {
-    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', FAILING_TESTS);
-    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+  // TODO(vsavkin): This seems to be causing memory issues in CI.
+  // it('runs test task', () => {
+  //   cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', FAILING_TESTS);
+  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
 
-    clickOnTask('proj', 'test');
+  //   clickOnTask('proj', 'test');
 
-    cy.get('div.context-title').contains('ng test proj');
+  //   cy.get('div.context-title').contains('ng test proj');
 
-    cy.get('mat-panel-title.js-group-optional').click();
+  //   cy.get('mat-panel-title.js-group-optional').click();
 
-    cy.wait(800);
+  //   cy.wait(800);
 
-    cy.get('input.js-input-important-watch')
-      .scrollIntoView()
-      .clear()
-      .type('false');
+  //   cy.get('input.js-input-important-watch')
+  //     .scrollIntoView()
+  //     .clear()
+  //     .type('false');
 
-    cy.get('button')
-      .contains('Run')
-      .click();
+  //   cy.get('button')
+  //     .contains('Run')
+  //     .click();
 
-    cy.get('div.js-status-tests-failed', { timeout: 120000 }).contains(
-      'failed'
-    );
+  //   cy.get('div.js-status-tests-failed', { timeout: 120000 }).contains(
+  //     'failed'
+  //   );
 
-    goBack();
-    clearAllRecentTasks();
+  //   goBack();
+  //   clearAllRecentTasks();
 
-    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
-  });
+  //   cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
+  // });
 
   it('runs build task', () => {
     cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);

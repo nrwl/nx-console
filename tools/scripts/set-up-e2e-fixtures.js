@@ -3,7 +3,8 @@ const shell = require('shelljs');
 const tmp = shell.tempdir();
 const path = require('path');
 
-console.log('setting up fixtures');
+console.log(`setting up fixtures`);
+
 shell.rm('-rf', 'tmp');
 shell.mkdir('tmp');
 
