@@ -30,7 +30,7 @@ export namespace Editors {
 
   export type Query = {
     __typename?: 'Query';
-    editors?: (Editors | null)[] | null;
+    editors: Editors[];
   };
 
   export type Editors = {
