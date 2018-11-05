@@ -1,4 +1,8 @@
-import { Settings, WorkspaceDescription } from '@angular-console/utils';
+import {
+  Settings,
+  WorkspaceDescription,
+  CommandRunner
+} from '@angular-console/utils';
 import {
   animate,
   state,
@@ -11,6 +15,7 @@ import { MatDialog } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { NewWorkspaceComponent } from '../new-workspace/new-workspace.component';
 import { WorkspacesService } from '../workspaces.service';
+import { startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'angular-console-workspaces',
@@ -26,11 +31,14 @@ import { WorkspacesService } from '../workspaces.service';
   ]
 })
 export class WorkspacesComponent implements OnInit {
+  readonly commands$ = this.commandRunner.listAllCommands();
+
   constructor(
     readonly settings: Settings,
     readonly workspacesService: WorkspacesService,
     private readonly contextualActionBarService: ContextualActionBarService,
-    private readonly matDialog: MatDialog
+    private readonly matDialog: MatDialog,
+    private readonly commandRunner: CommandRunner
   ) {}
 
   trackByPath(_: number, w: WorkspaceDescription) {
@@ -54,7 +62,7 @@ export class WorkspacesComponent implements OnInit {
   createNewWorkspace() {
     this.matDialog.open(NewWorkspaceComponent, {
       disableClose: true,
-      width: '560px',
+      width: '760px',
       panelClass: 'new-workspace-dialog',
       autoFocus: false
     });

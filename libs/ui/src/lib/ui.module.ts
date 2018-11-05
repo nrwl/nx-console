@@ -124,7 +124,6 @@ export class UiModule {
     this.addIcon('vscode', 'vscode.svg');
     this.addIcon('webstorm', 'webstorm.svg');
     this.addIcon('intellij', 'intellij.svg');
-    this.addIcon('terminal', 'terminal.svg');
     this.addIcon('console', 'console.svg');
   }
 

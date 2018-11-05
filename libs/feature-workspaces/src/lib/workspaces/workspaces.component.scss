@@ -67,6 +67,12 @@ $smallScreen: 920px;
   padding-top: 48px;
   z-index: 2;
 
+  transition: all 0.3s ease-in-out;
+
+  &.action-bar-showing {
+    bottom: 48px;
+  }
+
   .add-workspace-fab {
     .create-icon {
       position: absolute;

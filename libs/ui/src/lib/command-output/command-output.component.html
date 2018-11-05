@@ -1,22 +1,18 @@
 <div class="container" fxLayout="row">
   <div class="toggle-container" fxLayout="column">
-    <button mat-icon-button matTooltip="Details" matTooltipPosition="right">
-      <span class="mat-button-wrapper">
+    <button mat-icon-button matTooltip="Structured Output" matTooltipPosition="right">
         <mat-icon [ngClass]="(activeView$ | async) === 'details' ? 'output-icon-active' : ''"
                   (click)="setActiveView('details')">
-          dashboard
+          list_alt
         </mat-icon>
-      </span>
     </button>
-    <button mat-icon-button matTooltip="Output" matTooltipPosition="right">
-      <span class="mat-button-wrapper">
+    <button class="console-button" mat-icon-button matTooltip="Console Output" matTooltipPosition="right">
         <mat-icon [ngClass]="(activeView$ | async) === 'terminal' ? 'output-icon-active' : ''"
                   svgIcon="console"
                   [matBadge]="(terminalOutputState$ | async)?.unread ? '*' : ''"
                   matBadgeColor="accent"
                   (click)="setActiveView('terminal')">
         </mat-icon>
-      </span>
     </button>
   </div>
   <mat-divider></mat-divider>
