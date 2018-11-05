@@ -11,8 +11,11 @@ export function readSettings() {
   if (settings.recent === undefined) {
     settings.recent = [];
   }
-  if (!settings.installNodeManually) {
+  if (settings.installNodeManually === undefined) {
     settings.installNodeManually = false;
+  }
+  if (settings.enableDetailedStatus === undefined) {
+    settings.enableDetailedStatus = true;
   }
   return settings;
 }

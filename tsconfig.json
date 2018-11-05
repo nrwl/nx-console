@@ -57,6 +57,9 @@
       ],
       "@angular-console/feature-action-bar": [
         "libs/feature-action-bar/src/index.ts"
+      ],
+      "@angular-console/feature-settings": [
+        "libs/feature-settings/src/index.ts"
       ]
     }
   },

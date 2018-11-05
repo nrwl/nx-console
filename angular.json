@@ -346,6 +346,25 @@
           }
         }
       }
+    },
+    "feature-settings": {
+      "root": "libs/feature-settings",
+      "sourceRoot": "libs/feature-settings/src",
+      "projectType": "library",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/feature-settings/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {

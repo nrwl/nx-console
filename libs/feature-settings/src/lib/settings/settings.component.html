@@ -1,0 +1,28 @@
+<div class="container">
+  <div fxLayout="column" fxLayoutGap="16px">
+    <h3>General settings</h3>
+    <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
+      <div fxFlex>
+        <h4 mat-line>
+          Send anonymous usage data
+        </h4>
+        <p mat-line>
+          Help make Angular Console better by sending anonymous usage data to the Angular Console team.
+        </p>
+      </div>
+      <mat-slide-toggle (change)="toggleDataCollection($event.checked)" [checked]="canCollectionData()"></mat-slide-toggle>
+    </div>
+    <h3>Features</h3>
+    <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
+      <div fxFlex>
+        <h4 mat-line>
+          Use detailed status
+        </h4>
+        <p mat-line>
+          Enables visual status for certain tasks (e.g. build, test, etc.).
+        </p>
+      </div>
+      <mat-slide-toggle (change)="toggleDetailedStatus($event.checked)" [checked]="enableDetailedStatus()"></mat-slide-toggle>
+    </div>
+  </div>
+</div>

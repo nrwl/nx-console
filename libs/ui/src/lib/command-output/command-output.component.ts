@@ -9,7 +9,7 @@ import {
 import { TerminalComponent } from '../terminal/terminal.component';
 import { CommandResponse } from '@angular-console/utils';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
-import { filter, map, scan, skip, take } from 'rxjs/operators';
+import { map, scan, take } from 'rxjs/operators';
 
 type View = 'details' | 'terminal';
 const INITIAL_VIEW: View = 'details';

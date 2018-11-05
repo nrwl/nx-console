@@ -42,6 +42,12 @@
             Test cancelled ({{ status?.failure }} failed, {{ status?.success }} passed)
           </div>
         </mat-list-item>
+        <mat-list-item *ngSwitchCase="'build_failure'" class="status-test_failure">
+          <mat-icon matListIcon>error</mat-icon>
+          <div class="status-content">
+            Build failed
+          </div>
+        </mat-list-item>
         <mat-list-item
           *ngIf="['test_failure', 'test_success'].includes(status?.testStatus) && commandStatus === 'in-progress'">
           <mat-progress-spinner mode="indeterminate" [diameter]="18"></mat-progress-spinner>
@@ -50,6 +56,15 @@
           </div>
         </mat-list-item>
       </div>
+      <ng-container *ngIf="status?.buildErrors.length > 0">
+        <mat-divider></mat-divider>
+        <h3 matSubheader>
+          Errors
+        </h3>
+        <mat-list-item *ngFor="let error of status?.buildErrors" class="error-label">
+          {{ error }}
+        </mat-list-item>
+      </ng-container>
       <ng-container *ngIf="status?.errors.length > 0">
         <mat-divider></mat-divider>
         <h3 matSubheader>

@@ -12,16 +12,18 @@ interface SettingsData {
   readonly recent: WorkspaceDescription[];
   readonly canCollectData: boolean;
   readonly installNodeManually: boolean;
+  readonly enableDetailedStatus: boolean;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class Settings {
-  private settings: SettingsData = {
+  settings: SettingsData = {
     recent: [],
     canCollectData: false,
-    installNodeManually: false
+    installNodeManually: false,
+    enableDetailedStatus: true
   };
 
   constructor(
@@ -51,7 +53,10 @@ export class Settings {
     if (
       this.getRecentWorkspaces().filter(rr => rr.path === w.path).length === 0
     ) {
-      this.store({ ...this.settings, recent: [w, ...this.settings.recent] });
+      this.store({
+        ...this.settings,
+        recent: [w, ...this.settings.recent]
+      });
     }
   }
 
@@ -64,12 +69,12 @@ export class Settings {
     return this.settings.canCollectData;
   }
 
-  showConnectPlugin(): boolean | undefined {
-    return true;
+  enableDetailedStatus() {
+    return this.settings.enableDetailedStatus;
   }
 
-  showBackgroundTasks(): boolean | undefined {
-    return false;
+  showConnectPlugin(): boolean | undefined {
+    return true;
   }
 
   setCanCollectData(canCollectData: boolean): void {
@@ -78,6 +83,10 @@ export class Settings {
 
   setInstallManually(installNodeManually: boolean): void {
     this.store({ ...this.settings, installNodeManually });
+  }
+
+  setEnableDetailedStatus(enableDetailedStatus: boolean): void {
+    this.store({ ...this.settings, enableDetailedStatus });
   }
 
   fetch() {

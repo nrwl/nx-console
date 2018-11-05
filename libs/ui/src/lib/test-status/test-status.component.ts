@@ -18,6 +18,7 @@ export interface TestStatus {
   failure: number;
   success: number;
   errors: TestError[];
+  buildErrors: string[];
 }
 
 @Component({
