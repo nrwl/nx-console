@@ -19,6 +19,22 @@ describe('Commands', () => {
       expect(c.command).toEqual('command');
     });
 
+    it('should not store the record in recent when addToRecent if false', () => {
+      const r = new Commands(1, 1);
+      r.addCommand(
+        'type',
+        'id',
+        'workspace',
+        'command',
+        () => {},
+        createStatusCalculator(),
+        false
+      );
+
+      expect(r.history[0]).toBeDefined();
+      expect(r.recent[0]).toBeUndefined();
+    });
+
     it('should store the same record in history', () => {
       const r = new Commands(1, 1);
       r.addCommand(

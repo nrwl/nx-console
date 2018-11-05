@@ -32,7 +32,7 @@ export interface Database {
   settings: Settings;
   schematicCollections?: (SchematicCollectionForNgNew | null)[] | null;
   workspace: Workspace;
-  editors?: (EditorSupport | null)[] | null;
+  editors: EditorSupport[];
   availableExtensions?: (Extension | null)[] | null;
   installNodeJsStatus?: InstallNodeJsStatus | null;
   isNodejsInstalled?: IsNodeInstalledResult | null;
@@ -341,7 +341,7 @@ export namespace DatabaseResolvers {
       Context
     >;
     workspace?: WorkspaceResolver<Workspace, any, Context>;
-    editors?: EditorsResolver<(EditorSupport | null)[] | null, any, Context>;
+    editors?: EditorsResolver<EditorSupport[], any, Context>;
     availableExtensions?: AvailableExtensionsResolver<
       (Extension | null)[] | null,
       any,
@@ -385,7 +385,7 @@ export namespace DatabaseResolvers {
   }
 
   export type EditorsResolver<
-    R = (EditorSupport | null)[] | null,
+    R = EditorSupport[],
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

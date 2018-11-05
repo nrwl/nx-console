@@ -29,7 +29,8 @@ export class Commands {
     workspace: string,
     command: string,
     factory: any,
-    detailedStatusCalculator: DetailedStatusCalculator<any>
+    detailedStatusCalculator: DetailedStatusCalculator<any>,
+    addToRecent: boolean = true
   ) {
     const item = {
       id,
@@ -44,7 +45,9 @@ export class Commands {
       commandRunning: null
     };
     this.insertIntoHistory(item);
-    this.insertIntoRecent(item);
+    if (addToRecent) {
+      this.insertIntoRecent(item);
+    }
   }
 
   restartCommand(id: string) {
@@ -82,7 +85,7 @@ export class Commands {
   }
 
   startCommand(id: string) {
-    const command = this.findMatchingCommand(id, this.recent);
+    const command = this.findMatchingCommand(id, this.history);
     if (command) {
       command.commandRunning = command.factory();
       command.status = 'in-progress';
@@ -90,7 +93,7 @@ export class Commands {
   }
 
   addOut(id: string, out: string) {
-    const c = this.findMatchingCommand(id, this.recent);
+    const c = this.findMatchingCommand(id, this.history);
     if (c) {
       c.out += out;
       c.outChunk += out;
@@ -107,7 +110,7 @@ export class Commands {
 
   // TOOD: vsavkin should convert status into an enum
   setFinalStatus(id: string, status: string) {
-    const c = this.findMatchingCommand(id, this.recent);
+    const c = this.findMatchingCommand(id, this.history);
     if (c && (c.status === 'in-progress' || c.status === 'waiting')) {
       this.setStatus(id, status);
     }
@@ -115,7 +118,7 @@ export class Commands {
 
   // TOOD: vsavkin should convert status into an enum
   setStatus(id: string, status: string) {
-    const c = this.findMatchingCommand(id, this.recent);
+    const c = this.findMatchingCommand(id, this.history);
     if (c) {
       c.status = status;
       try {
@@ -144,8 +147,7 @@ export class Commands {
   }
 
   findMatchingCommand(id: string, commands: CommandInformation[]) {
-    const matchingCommand = commands.find(c => c.id === id);
-    return matchingCommand;
+    return [...commands].reverse().find(c => c.id === id);
   }
 
   private insertIntoRecent(c: CommandInformation) {

@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { shell, dialog } from 'electron';
+import * as semver from 'semver';
 
 import { commands, runCommand } from '../api/run-command';
 import {
@@ -37,6 +38,7 @@ import {
   cacheFiles,
   directoryExists,
   exists,
+  fileExistsSync,
   files,
   filterById,
   filterByName,
@@ -205,7 +207,7 @@ const Database: DatabaseResolvers.Resolvers = {
   commands(_root: any, args: any) {
     try {
       if (args.id) {
-        const c = commands.recent.find(c => c.id === args.id);
+        const c = commands.history.find(cc => cc.id === args.id);
         if (!c) return [];
         const r = serializeCommand(c);
         c.outChunk = '';
@@ -259,7 +261,8 @@ const Mutation: MutationResolvers.Resolvers = {
         'new',
         args.name,
         `--directory=${args.name}`,
-        `--collection=${args.collection}`
+        `--collection=${args.collection}`,
+        '--no-interactive'
       ]);
     } catch (e) {
       console.log(e);
@@ -269,11 +272,19 @@ const Mutation: MutationResolvers.Resolvers = {
   async generate(_root: any, args: any) {
     try {
       const dryRun = args.dryRun ? ['--dry-run'] : [];
-      return runCommand('generate', args.path, 'ng', findClosestNg(args.path), [
+      return runCommand(
         'generate',
-        ...args.genCommand,
-        ...dryRun
-      ]);
+        args.path,
+        'ng',
+        findClosestNg(args.path),
+        [
+          'generate',
+          ...args.genCommand,
+          ...dryRun,
+          ...disableInteractivePrompts(args.path)
+        ],
+        !args.dryRun
+      );
     } catch (e) {
       console.log(e);
       throw new Error(
@@ -402,6 +413,20 @@ const Mutation: MutationResolvers.Resolvers = {
     return readSettings();
   }
 };
+
+function disableInteractivePrompts(p: string) {
+  try {
+    const version = readJsonFile(
+      path.join(`@angular`, 'cli', 'package.json'),
+      path.join(p, 'node_modules')
+    ).json.version;
+    return semver.gte(version, '7.0.0') ? ['--no-interactive'] : [];
+  } catch (e) {
+    console.log('cannot parse cli version', e.message);
+    // don't recognize the version => assume it's greater than 7
+    return ['--no-interactive'];
+  }
+}
 
 export const resolvers = {
   SchematicCollection,

@@ -112,7 +112,8 @@ export class SchematicComponent implements OnInit {
 
         return this.serializer.normalizeSchematic(schematic);
       }),
-      tap((schematic: Schematic) => {
+      tap((schematic: Schematic | null) => {
+        if (!schematic) return;
         const uiFlags = (this.elementRef
           .nativeElement as HTMLElement).querySelector('.ui-flags-container');
 

@@ -4,6 +4,7 @@ import { createDetailedStatusCalculator } from './detailed-status-calculator';
 import { normalizeCommands } from '../architect-utils';
 
 // noinspection TsLint
+// tslint:disable-next-line:no-var-requires
 const spawn = require('node-pty-prebuilt').spawn;
 
 let commandRunIndex = 0;
@@ -15,7 +16,8 @@ export function runCommand(
   cwd: string,
   programName: string,
   program: string,
-  cmds: string[]
+  cmds: string[],
+  addToRecent: boolean = true
 ) {
   const workspace =
     type === 'new' ? null : readJsonFile('./package.json', cwd).json.name;
@@ -24,7 +26,15 @@ export function runCommand(
   const factory = createExecutableCommand(id, cwd, program, cmds);
   const statusCalculator = createDetailedStatusCalculator(cwd, cmds);
 
-  commands.addCommand(type, id, workspace, command, factory, statusCalculator);
+  commands.addCommand(
+    type,
+    id,
+    workspace,
+    command,
+    factory,
+    statusCalculator,
+    addToRecent
+  );
   commands.startCommand(id);
   return { id };
 }

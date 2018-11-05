@@ -67,7 +67,7 @@ export const typeDefs = gql`
     settings: Settings!
     schematicCollections: [SchematicCollectionForNgNew]
     workspace(path: String!): Workspace!
-    editors: [EditorSupport]
+    editors: [EditorSupport!]!
     availableExtensions(name: String): [Extension]
     installNodeJsStatus: InstallNodeJsStatus
     isNodejsInstalled: IsNodeInstalledResult
