@@ -5,7 +5,7 @@ import { filter } from 'rxjs/operators';
 declare var global: any;
 
 @Injectable()
-export class AnalyticsCollector {
+export class Telemetry {
   private readonly ipc: any;
 
   constructor(private readonly router: Router) {
@@ -37,6 +37,12 @@ export class AnalyticsCollector {
   reportDataCollectionEvent(value: boolean) {
     if (this.ipc) {
       this.ipc.send('dataCollectionEvent', { value });
+    }
+  }
+
+  reportEvent(category: string, action: string, label: string, value: string) {
+    if (this.ipc) {
+      this.ipc.send('event', { category, action, label, value });
     }
   }
 

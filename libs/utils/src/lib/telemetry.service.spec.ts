@@ -1,6 +1,6 @@
-import { cleanUpUrl } from './analytics-collector.service';
+import { cleanUpUrl } from './telemetry.service';
 
-describe('AnalyticsCollector', () => {
+describe('Telemetry', () => {
   it('should remove workspace path from the url', () => {
     expect(cleanUpUrl('/workspace/secret/aa/bb')).toEqual(
       '/workspace/PATH/aa/bb'

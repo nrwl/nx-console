@@ -5,6 +5,7 @@ import { schema } from './schema';
 import { createSchema } from '@nrwl/angular-console-enterprise-electron';
 import { commands } from './api/run-command';
 import { readSettings } from './api/read-settings';
+import { telemetry } from './telemetry';
 
 const apollo = new ApolloServer({
   schema: mergeSchemas({
@@ -12,7 +13,8 @@ const apollo = new ApolloServer({
       schema,
       createSchema({
         readSettings,
-        commands
+        commands,
+        telemetry
       })
     ]
   }),
