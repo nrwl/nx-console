@@ -9,12 +9,12 @@ import {
 } from '@angular-console/feature-settings';
 import { UiModule } from '@angular-console/ui';
 import {
-  AnalyticsCollector,
+  Telemetry,
   IsNodeJsInstalledGuard,
   Messenger
 } from '@angular-console/utils';
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { NgModule, Inject } from '@angular/core';
 import {
   MatIconModule,
   MatListModule,
@@ -36,27 +36,27 @@ import { onError } from 'apollo-link-error';
 import { AppComponent } from './app.component';
 
 export function initApollo(
-  analytics: AnalyticsCollector,
+  telemetry: Telemetry,
   messenger: Messenger,
   httpLink: HttpLink
 ) {
-  analytics.setUpRouterLogging();
+  telemetry.setUpRouterLogging();
 
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       graphQLErrors.forEach(({ message }) => {
         messenger.error(message);
-        analytics.reportException(message);
+        telemetry.reportException(message);
       });
     } else if (networkError) {
       const n: any = networkError;
       if (n.error && n.error.errors && n.error.errors.length > 0) {
         const message = n.error.errors[0].message;
         messenger.error(message);
-        analytics.reportException(message);
+        telemetry.reportException(message);
       } else {
         messenger.error(n.message);
-        analytics.reportException(n.message);
+        telemetry.reportException(n.message);
       }
     }
   });
@@ -112,11 +112,14 @@ export function initApollo(
   ],
   providers: [
     IsNodeJsInstalledGuard,
-    AnalyticsCollector,
+    {
+      provide: 'telemetry',
+      useClass: Telemetry
+    },
     {
       provide: APOLLO_OPTIONS,
       useFactory: initApollo,
-      deps: [AnalyticsCollector, Messenger, HttpLink]
+      deps: [[new Inject('telemetry')], Messenger, HttpLink]
     }
   ],
   bootstrap: [AppComponent]

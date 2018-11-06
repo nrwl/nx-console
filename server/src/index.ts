@@ -5,11 +5,9 @@ import * as path from 'path';
 import { statSync } from 'fs';
 import * as os from 'os';
 import { autoUpdater } from 'electron-updater';
-import {
-  reportEvent,
-  reportException,
-  setupEvents
-} from './analytics_and_settings';
+import { telemetry } from './telemetry';
+
+import { ipcMain } from 'electron';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');
@@ -20,6 +18,22 @@ const store = new Store();
 
 fixPath();
 const currentDirectory = process.cwd();
+
+function setupEvents() {
+  process.env.trackingID = 'UA-88380372-8';
+  ipcMain.on('event', (event: any, arg: any) =>
+    telemetry.reportEvent(arg.category, arg.action, arg.label, arg.value)
+  );
+  ipcMain.on('dataCollectionEvent', (event: any, arg: any) =>
+    telemetry.dataCollectionEvent(arg.value)
+  );
+  ipcMain.on('reportPageView', (event: any, arg: any) =>
+    telemetry.reportPageView(arg.path)
+  );
+  ipcMain.on('reportException', (event: any, arg: any) =>
+    telemetry.reportException(arg.description)
+  );
+}
 
 function createMenu() {
   let menu = [];
@@ -129,7 +143,7 @@ function createWindow() {
       }
     } catch (e) {
       showCloseDialog(`Error when starting Angular Console: ${e.message}`);
-      reportException(`Start failed: ${e.message}`);
+      telemetry.reportException(`Start failed: ${e.message}`);
     }
   });
 
@@ -145,7 +159,7 @@ function startServer(port: number) {
     const { start } = require('./server');
     start(port);
   } catch (e) {
-    reportException(`Start Server: ${e.message}`);
+    telemetry.reportException(`Start Server: ${e.message}`);
     throw e;
   }
 }
@@ -181,7 +195,7 @@ function showRestartDialog() {
   dialog.showMessageBox(dialogOptions, i => {
     if (i === 0) {
       // Restart
-      reportEvent('Lifecycle', 'QuitAndInstall');
+      telemetry.reportLifecycleEvent('QuitAndInstall');
       autoUpdater.quitAndInstall();
     }
   });
@@ -205,14 +219,14 @@ function checkForUpdates() {
           console.log('checkForUpdates is called. downloadPromise is null.');
         }
       } catch (e) {
-        reportException(e);
+        telemetry.reportException(e);
       }
     }
   }, 0);
 }
 
 function startSession() {
-  reportEvent('Lifecycle', 'StartSession');
+  telemetry.reportLifecycleEvent('StartSession');
 }
 
 function quit() {
@@ -227,7 +241,7 @@ function saveWindowInfo() {
     try {
       store.set('windowBounds', JSON.stringify(mainWindow.getBounds()));
     } catch (e) {
-      reportException(`Saving window bounds failed: ${e.message}`);
+      telemetry.reportException(`Saving window bounds failed: ${e.message}`);
     }
   }
 }

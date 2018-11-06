@@ -6,6 +6,8 @@
     "sourceMap": false,
     "declaration": false,
     "moduleResolution": "node",
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "target": "es2017",
     "types": ["jasmine"],
     "typeRoots": ["../node_modules/@types"],

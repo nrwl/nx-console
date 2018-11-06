@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { AnalyticsCollector, Settings } from '@angular-console/utils';
+import { Component, Inject } from '@angular/core';
+import { Telemetry, Settings } from '@angular-console/utils';
 
 @Component({
   selector: 'ui-data-collection',
@@ -8,7 +8,7 @@ import { AnalyticsCollector, Settings } from '@angular-console/utils';
 })
 export class DataCollectionComponent {
   constructor(
-    private readonly analytics: AnalyticsCollector,
+    @Inject('telemetry') private readonly telemetry: Telemetry,
     private readonly settings: Settings
   ) {}
 
@@ -18,6 +18,6 @@ export class DataCollectionComponent {
 
   close(value: boolean) {
     this.settings.setCanCollectData(value);
-    this.analytics.reportDataCollectionEvent(value);
+    this.telemetry.reportDataCollectionEvent(value);
   }
 }

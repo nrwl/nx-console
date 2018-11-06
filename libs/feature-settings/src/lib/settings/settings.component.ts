@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { AnalyticsCollector, Settings } from '@angular-console/utils';
+import { Telemetry, Settings } from '@angular-console/utils';
 
 @Component({
   selector: 'angular-console-settings',
@@ -11,7 +11,7 @@ export class SettingsComponent implements OnInit {
   constructor(
     private readonly contextActionService: ContextualActionBarService,
     private readonly settingsService: Settings,
-    private readonly analytics: AnalyticsCollector
+    @Inject('telemetry') private readonly telemetry: Telemetry
   ) {}
 
   ngOnInit() {
@@ -24,7 +24,7 @@ export class SettingsComponent implements OnInit {
 
   toggleDataCollection(x: boolean) {
     this.settingsService.setCanCollectData(x);
-    this.analytics.reportDataCollectionEvent(x);
+    this.telemetry.reportDataCollectionEvent(x);
   }
 
   enableDetailedStatus() {
