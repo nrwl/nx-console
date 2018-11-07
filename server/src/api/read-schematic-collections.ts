@@ -68,7 +68,7 @@ function readSchematicCollections(
     );
     const name =
       collectionName === rootCollection
-        ? packageJson.json.name
+        ? `.${packageJson.json.name}`
         : collectionName;
     const schematicCollection = {
       name,
