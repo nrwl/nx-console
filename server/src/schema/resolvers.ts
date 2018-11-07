@@ -253,7 +253,8 @@ const Mutation: MutationResolvers.Resolvers = {
     try {
       return runCommand('add', args.path, 'ng', findClosestNg(args.path), [
         'add',
-        args.name
+        args.name,
+        ...disableInteractivePrompts(args.path)
       ]);
     } catch (e) {
       console.log(e);
