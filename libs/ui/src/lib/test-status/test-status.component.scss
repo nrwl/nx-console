@@ -19,11 +19,13 @@ $success-palette: mat-palette($mat-green);
   }
 
   pre {
+    font-family: 'Roboto Mono';
     background-color: mat-color($gray-palette);
     width: 100%;
     overflow-x: auto;
     padding: 10px;
     box-sizing: border-box;
+    white-space: pre-wrap;
   }
 }
 

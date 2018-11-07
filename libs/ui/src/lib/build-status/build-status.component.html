@@ -79,12 +79,11 @@
       </mat-list-item>
       <ng-container *ngIf="status?.errors.length > 0">
         <mat-divider></mat-divider>
-        <h3 matSubheader>Errors</h3>
-        <mat-list-item
-          class="build-error"
-          *ngFor="let error of status?.errors; trackBy: trackByError"
-        >
-          {{ error }}
+        <h3 matSubheader>
+          Errors
+        </h3>
+        <mat-list-item>
+          <pre>{{ status?.errors.join('\n') }}</pre>
         </mat-list-item>
       </ng-container>
     </mat-list>
