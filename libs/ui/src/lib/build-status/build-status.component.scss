@@ -6,6 +6,7 @@ $action-palette: mat-palette($mat-blue);
 $info-palette: mat-palette($mat-light-blue);
 $failure-palette: mat-palette($mat-red);
 $success-palette: mat-palette($mat-green);
+$gray-palette: mat-palette($mat-gray, 200);
 
 .container {
   height: 100%;
@@ -26,6 +27,16 @@ $success-palette: mat-palette($mat-green);
   a {
     color: mat-color($action-palette);
     cursor: pointer;
+  }
+
+  pre {
+    font-family: 'Roboto Mono';
+    background-color: mat-color($gray-palette);
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    white-space: pre-wrap;
   }
 }
 

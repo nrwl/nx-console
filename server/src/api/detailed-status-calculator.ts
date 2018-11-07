@@ -285,11 +285,20 @@ export class TestDetailedStatusCalculator
   implements DetailedStatusCalculator<TestDetailedStatus> {
   detailedStatus: TestDetailedStatus;
 
+  // For compilation errors, we will see output of:
+  //   Executed 0 of 0 SUCCESS
+  //   Executed 0 of 0 ERROR
+  // When we see the first `Executed 0 of 0 SUCCESS`, we reset errors,
+  // however if we see the second output right after, we should set the buildErrors backs.
+  // There might be a better way to handle this case, but it works for now.
+  lastBuildErrors: string[];
+
   constructor() {
     this.reset();
   }
 
   reset() {
+    this.lastBuildErrors = [];
     this.detailedStatus = {
       type: StatusType.TEST,
       testStatus: 'test_pending',
@@ -316,11 +325,14 @@ export class TestDetailedStatusCalculator
       success,
       testStatus,
       errors,
-      buildErrors
+      buildErrors,
+      lastBuildErrors
     } = TestDetailedStatusCalculator.updateDetailedStatus(
-      this.detailedStatus,
+      { ...this.detailedStatus, lastBuildErrors: this.lastBuildErrors },
       value
     );
+
+    this.lastBuildErrors = lastBuildErrors;
 
     let nextStatus = testStatus;
 
@@ -343,17 +355,25 @@ export class TestDetailedStatusCalculator
   }
 
   static TEST_PROGRESS_REGEXP = /[\s\S]*Executed\s+(\d+)\s+of\s+(\d+)\s+(SUCCESS\s+|\((\d+)\s+FAILED\))?[\s\S]*/;
+  static RUN_BEGIN_REGEXP = /Executed\s+0\s+of\s+\d+\s+SUCCESS/;
+  static COMPILE_ERROR_REGEXP = /Executed\s+0\s+of\s+\d+\s+ERROR/;
 
   static updateDetailedStatus(
-    s: TestDetailedStatus,
+    s: TestDetailedStatus & { lastBuildErrors: string[] },
     value: string
-  ): TestDetailedStatus {
+  ): TestDetailedStatus & { lastBuildErrors: string[] } {
     let _errors = s.errors;
+    let lastBuildErrors = s.lastBuildErrors;
     let buildErrors = s.buildErrors;
 
-    if (value.indexOf('Executed 0') > -1) {
+    if (TestDetailedStatusCalculator.RUN_BEGIN_REGEXP.test(value)) {
       _errors = [];
+      lastBuildErrors = buildErrors;
       buildErrors = [];
+    }
+
+    if (TestDetailedStatusCalculator.COMPILE_ERROR_REGEXP.test(value)) {
+      buildErrors = lastBuildErrors;
     }
 
     if (value.indexOf('ERROR in') > -1) {
@@ -380,6 +400,7 @@ export class TestDetailedStatusCalculator
 
       return {
         ...s,
+        lastBuildErrors,
         buildErrors,
         errors,
         total: total,
@@ -396,6 +417,7 @@ export class TestDetailedStatusCalculator
       return {
         ...s,
         buildErrors,
+        lastBuildErrors,
         errors
       };
     }

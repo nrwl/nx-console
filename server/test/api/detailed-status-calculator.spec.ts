@@ -476,6 +476,29 @@ ERROR in apps/example3/src/app/app.component.ts(9,1): error TS1005: '{' expected
       expect(c.detailedStatus.testStatus).toEqual('build_failure');
     });
 
+    it('resets errors when new run begins', () => {
+      const c = createCalculator();
+
+      c.addOut(
+        `ERROR in apps/example3/src/app/app.component.ts(9,1): error TS1005: '{' expected.`
+      );
+      c.addOut(`Executed 0 of 4 SUCCESS`);
+
+      expect(c.detailedStatus.buildErrors).toEqual([]);
+
+      c.addOut(
+        `ERROR in apps/example3/src/app/app.component.ts(9,1): error TS1005: '{' expected.`
+      );
+      c.addOut(`
+        Executed 0 of 0 SUCCESS
+        Executed 0 of 0 ERROR
+      `);
+
+      expect(c.detailedStatus.buildErrors).toEqual([
+        "apps/example3/src/app/app.component.ts(9,1): error TS1005: '{' expected."
+      ]);
+    });
+
     function createCalculator() {
       return new TestDetailedStatusCalculator();
     }
