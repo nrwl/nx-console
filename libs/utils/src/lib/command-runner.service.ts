@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FetchResult } from 'apollo-link';
-import { BehaviorSubject, interval, merge, Observable, of } from 'rxjs';
+import { BehaviorSubject, interval, merge, Observable, of, concat } from 'rxjs';
 import { concatMap, map, skip, take, takeWhile } from 'rxjs/operators';
 import { COMMANDS_POLLING } from './polling-constants';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
@@ -126,7 +126,7 @@ export class CommandRunner {
         map(withDetailedStatus),
         skip(1)
       );
-    return merge(initial$, rest$);
+    return concat(initial$, rest$);
   }
 
   stopCommand(id: string) {

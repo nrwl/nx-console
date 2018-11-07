@@ -38,11 +38,10 @@ export class WorkspacesService {
         angularWorkspace: false
       })
       .pipe(
-        map(
-          r =>
-            r.data
-              ? (r.data.selectDirectory as GetDirectoryPath.SelectDirectory)
-              : null
+        map(r =>
+          r.data
+            ? (r.data.selectDirectory as GetDirectoryPath.SelectDirectory)
+            : null
         ),
         first()
       );
@@ -56,11 +55,10 @@ export class WorkspacesService {
         angularWorkspace: true
       })
       .pipe(
-        map(
-          r =>
-            r.data
-              ? (r.data.selectDirectory as GetDirectoryPath.SelectDirectory)
-              : null
+        map(r =>
+          r.data
+            ? (r.data.selectDirectory as GetDirectoryPath.SelectDirectory)
+            : null
         ),
         first()
       );

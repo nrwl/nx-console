@@ -210,7 +210,7 @@ const Database: DatabaseResolvers.Resolvers = {
       const settings = readSettings();
       const includeDetailedStatus = settings.enableDetailedStatus;
       if (args.id) {
-        const c = commands.history.find(cc => cc.id === args.id);
+        const c = commands.findMatchingCommand(args.id, commands.history);
         if (!c) return [];
         const r = serializeCommand(c, includeDetailedStatus);
         c.outChunk = '';

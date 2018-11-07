@@ -15,7 +15,7 @@ import { MatDialog } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { NewWorkspaceComponent } from '../new-workspace/new-workspace.component';
 import { WorkspacesService } from '../workspaces.service';
-import { startWith } from 'rxjs/operators';
+import { startWith, shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'angular-console-workspaces',
@@ -31,7 +31,7 @@ import { startWith } from 'rxjs/operators';
   ]
 })
 export class WorkspacesComponent implements OnInit {
-  readonly commands$ = this.commandRunner.listAllCommands();
+  readonly commands$ = this.commandRunner.listAllCommands().pipe(shareReplay());
 
   constructor(
     readonly settings: Settings,

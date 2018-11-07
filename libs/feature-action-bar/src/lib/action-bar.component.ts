@@ -127,9 +127,7 @@ export class ActionBarComponent {
       this.expandedAction = {
         id: actionId,
         command: this.commandRun$.pipe(
-          switchMap(() =>
-            this.commandRunner.getCommand(actionId).pipe(shareReplay())
-          )
+          switchMap(() => this.commandRunner.getCommand(actionId))
         )
       };
     }
