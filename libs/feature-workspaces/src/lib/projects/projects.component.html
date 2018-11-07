@@ -1,5 +1,5 @@
-<div *ngIf="workspace$|async as workspace">
-  <mat-list *ngIf="workspace.projects.length > 0; else empty">
+<div *ngIf="(workspace$ | async) as workspace">
+  <mat-list *ngIf="workspace.projects.length > 0; else: empty">
     <ng-container *ngFor="let p of workspace.projects">
       <mat-list-item [ngClass]="p.projectType" [disableRipple]="true">
         <div class="project-type" mat-line>{{ p.projectType }}</div>
@@ -8,8 +8,18 @@
           <mat-icon>folder_open</mat-icon>
           {{ p.root }}
         </div>
-        <div fxLayoutWrap fxFlex="shrink" fxLayout="row" fxLayoutGap="12px" fxLayoutAlign="end center">
-          <button *ngFor="let a of p.actions" mat-stroked-button [routerLink]="a.link">
+        <div
+          fxLayoutWrap
+          fxFlex="shrink"
+          fxLayout="row"
+          fxLayoutGap="12px"
+          fxLayoutAlign="end center"
+        >
+          <button
+            *ngFor="let a of p.actions"
+            mat-stroked-button
+            [routerLink]="a.link"
+          >
             {{ a.actionDescription }}
           </button>
         </div>

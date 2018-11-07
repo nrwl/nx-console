@@ -1,82 +1,169 @@
-<div class="action-bar-spacer" [@growShrink]="(showActionBar$ | async) ? 'expand' : 'contract'"></div>
+<div
+  class="action-bar-spacer"
+  [@growShrink]="(showActionBar$ | async) ? 'expand' : 'contract'"
+></div>
 
-<div class="action-bar-container" *ngIf="commands$ | async as actions">
-
+<div class="action-bar-container" *ngIf="(commands$ | async) as actions">
   <!-- Show tasks toolbar -->
-  <mat-toolbar matRipple (click)="actionsExpanded.next(!actionsExpanded.value)"
-  [@growShrink]="(showActionToolbar$ | async) ? 'expand' : 'contract'"
-    class="action-bar">
-    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" *ngIf="actions.length > 1" fxFlex>
+  <mat-toolbar
+    matRipple
+    (click)="actionsExpanded.next(!actionsExpanded.value)"
+    [@growShrink]="(showActionToolbar$ | async) ? 'expand' : 'contract'"
+    class="action-bar"
+  >
+    <div
+      fxLayout="row"
+      fxLayoutGap="16px"
+      fxLayoutAlign="start center"
+      *ngIf="actions.length > 1"
+      fxFlex
+    >
       <button mat-icon-button [disableRipple]="true">
-        <mat-icon>{{ actionsExpanded ? 'expand_more' : 'expand_less' }}</mat-icon>
+        <mat-icon>{{
+          actionsExpanded ? 'expand_more' : 'expand_less'
+        }}</mat-icon>
       </button>
-      <span fxFlex class="num-tasks">
-        {{ actions.length }} Tasks
-      </span>
-      <button mat-icon-button *ngIf="(actionsExpanded | async)" (click)="commandRunner.removeAllCommands()" class="remove-all-tasks-button">
-        <mat-icon matTooltip="Remove all tasks" matTooltipPosition="left">delete_sweep</mat-icon>
+      <span fxFlex class="num-tasks"> {{ actions.length }} Tasks </span>
+      <button
+        mat-icon-button
+        *ngIf="(actionsExpanded | async)"
+        (click)="commandRunner.removeAllCommands()"
+        class="remove-all-tasks-button"
+      >
+        <mat-icon matTooltip="Remove all tasks" matTooltipPosition="left"
+          >delete_sweep</mat-icon
+        >
       </button>
     </div>
   </mat-toolbar>
 
   <!-- Task list -->
   <mat-list [@growShrink]="(showActionList$ | async) ? 'expand' : 'contract'">
-    <ng-container *ngFor="let action of actions; let last = last; trackBy: trackByCommandId" [ngSwitch]="action.status">
-      <mat-list-item [class.expanded]="expandedAction?.id === action.id" class="action-bar-title" @growShrink matRipple #itemRipple="matRipple" (click)="itemRipple.disabled ? '' : toggleItemExpansion(action.id)">
-
+    <ng-container
+      *ngFor="let action of actions; let last = last; trackBy: trackByCommandId"
+      [ngSwitch]="action.status"
+    >
+      <mat-list-item
+        [class.expanded]="expandedAction?.id === action.id"
+        class="action-bar-title"
+        @growShrink
+        matRipple
+        #itemRipple="matRipple"
+        (click)="itemRipple.disabled ? '' : toggleItemExpansion(action.id)"
+      >
         <!-- Task avatar -->
-        <span class="task-avatar" #taskAvatar matListAvatar fxLayout="row" fxLayoutAlign="center center" [ngSwitch]="action.status"
-          [ngClass]="action.status" [class.freshly-toggled]="taskAvatar.freshlyToggled" (mouseenter)="itemRipple.disabled = true"
-          (mouseleave)="taskAvatar.freshlyToggled = false; itemRipple.disabled = false">
-          <mat-icon class="task-status" *ngSwitchCase="CommandStatus.SUCCESSFUL">
+        <span
+          class="task-avatar"
+          #taskAvatar
+          matListAvatar
+          fxLayout="row"
+          fxLayoutAlign="center center"
+          [ngSwitch]="action.status"
+          [ngClass]="action.status"
+          [class.freshly-toggled]="taskAvatar.freshlyToggled"
+          (mouseenter)="itemRipple.disabled = true"
+          (mouseleave)="
+            taskAvatar.freshlyToggled = false; itemRipple.disabled = false
+          "
+        >
+          <mat-icon
+            class="task-status"
+            *ngSwitchCase="CommandStatus.SUCCESSFUL"
+          >
             done
           </mat-icon>
           <mat-icon class="task-status" *ngSwitchCase="CommandStatus.FAILED">
             error
           </mat-icon>
-          <mat-icon class="task-status clear-icon" *ngSwitchCase="CommandStatus.TERMINATED">
+          <mat-icon
+            class="task-status clear-icon"
+            *ngSwitchCase="CommandStatus.TERMINATED"
+          >
             clear
           </mat-icon>
           <ng-container *ngSwitchCase="CommandStatus.IN_PROGRESS">
-            <mat-spinner *ngIf="showActionList$ | async" class="task-status" diameter=36>
+            <mat-spinner
+              *ngIf="(showActionList$ | async)"
+              class="task-status"
+              diameter="36"
+            >
             </mat-spinner>
           </ng-container>
 
           <span class="process-action" [ngSwitch]="action.status">
-            <button class="replay-button" *ngSwitchDefault mat-icon-button (click)="handleRestart(action); taskAvatar.freshlyToggled = true">
-              <mat-icon [matTooltip]="'Restart ' + action.status + ' task'" matTooltipPosition="right">replay</mat-icon>
+            <button
+              class="replay-button"
+              *ngSwitchDefault
+              mat-icon-button
+              (click)="handleRestart(action); taskAvatar.freshlyToggled = true"
+            >
+              <mat-icon
+                [matTooltip]="'Restart ' + action.status + ' task'"
+                matTooltipPosition="right"
+                >replay</mat-icon
+              >
             </button>
-            <button mat-icon-button *ngSwitchCase="CommandStatus.IN_PROGRESS" (click)="commandRunner.stopCommand(action.id); taskAvatar.freshlyToggled = true">
-              <mat-icon class="clear-icon" matTooltip="Stop task" matTooltipPosition="right">clear</mat-icon>
+            <button
+              mat-icon-button
+              *ngSwitchCase="CommandStatus.IN_PROGRESS"
+              (click)="
+                commandRunner.stopCommand(action.id);
+                taskAvatar.freshlyToggled = true
+              "
+            >
+              <mat-icon
+                class="clear-icon"
+                matTooltip="Stop task"
+                matTooltipPosition="right"
+                >clear</mat-icon
+              >
             </button>
           </span>
         </span>
 
-        <h3 matLine class="command-text">
-          {{ action.command }}
-        </h3>
+        <h3 matLine class="command-text">{{ action.command }}</h3>
 
         <p matLine class="second-line">
-          <!-- TODO(mrmeku): Re-enable this line when workspaces are assoicated with colors -->
-          <!-- <span class="workspace-indicator" [style.background]="getColorForWorkspace(action.workspacePath)"></span> -->
+          <!--
+            TODO(mrmeku): Re-enable this line when workspaces are assoicated with colors
+          -->
+          <!--
+            <span class="workspace-indicator" [style.background]="getColorForWorkspace(action.workspacePath)"></span>
+          -->
           <span class="workspace-name">{{ action.workspace }}</span>
         </p>
 
-        <button class="task-action" mat-icon-button (click)="commandRunner.removeCommand(action.id)" (mouseenter)="itemRipple.disabled = true"
-          (mouseleave)="itemRipple.disabled = false" class="remove-task-button">
-          <mat-icon matTooltip="Remove task" matTooltipPosition="left">delete_outline</mat-icon>
+        <button
+          class="task-action"
+          mat-icon-button
+          (click)="commandRunner.removeCommand(action.id)"
+          (mouseenter)="itemRipple.disabled = true"
+          (mouseleave)="itemRipple.disabled = false"
+          class="remove-task-button"
+        >
+          <mat-icon matTooltip="Remove task" matTooltipPosition="left"
+            >delete_outline</mat-icon
+          >
         </button>
       </mat-list-item>
 
       <!-- Terminal output -->
-      <div class="output-container" #terminalContainer [@growShrinkTerminal]="{value: terminalHeight, params: {terminalHeight:
-          terminalHeight}}"
-        *ngIf="expandedAction?.id === action.id" (@growShrinkTerminal.done)="terminalContainer.expanded = true">
+      <div
+        class="output-container"
+        #terminalContainer
+        [@growShrinkTerminal]="{
+          value: terminalHeight,
+          params: { terminalHeight: terminalHeight }
+        }"
+        *ngIf="expandedAction?.id === action.id"
+        (@growShrinkTerminal.done)="terminalContainer.expanded = true"
+      >
         <ui-command-output
           #terminal
           *ngIf="terminalContainer.expanded"
           [command]="(expandedAction?.command | async)?.command"
-          [commandResponse]="expandedAction?.command | async">
+          [commandResponse]="expandedAction?.command | async"
+        >
         </ui-command-output>
       </div>
 

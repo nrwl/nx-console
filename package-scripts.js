@@ -31,9 +31,9 @@ module.exports = {
         prod: 'ng serve angular-console --prod'
       },
       format: {
-        default: 'nx format:write',
-        write: 'nx format:write',
-        check: 'nx format:check'
+        default: 'prettier **/*.ts **/*.css **/*.scss **/*.html --write',
+        write: 'prettier **/*.ts **/*.css **/*.scss **/*.html --write',
+        check: 'prettier --list-different **/*.ts **/*.css **/*.scss **/*.html --write'
       },
       lint: npsUtils.series('nx lint', 'nx affected:lint --base=master --parallel'),
       test: 'nx affected:test --base=master'

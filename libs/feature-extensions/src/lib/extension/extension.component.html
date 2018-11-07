@@ -1,28 +1,24 @@
-<ng-container *ngIf="extension$ | async as extension">
+<ng-container *ngIf="(extension$ | async) as extension">
   <ng-template [ngIf]="!extension.installed" [ngIfElse]="alreadyInstalled">
     <ui-task-runner terminalWindowTitle="Task output">
-        <div class="ui-flags">
-          <ng-container *ngTemplateOutlet="alreadyInstalled"></ng-container>
-        </div>
-        <ui-command-output
-          [emptyTemplate]="emptyMessage"
-          [command]="command$ | async"
-          [commandResponse]="commandOutput$ | async">
-        </ui-command-output>
+      <div class="ui-flags">
+        <ng-container *ngTemplateOutlet="alreadyInstalled"></ng-container>
+      </div>
+      <ui-command-output
+        [emptyTemplate]="emptyMessage"
+        [command]="command$ | async"
+        [commandResponse]="commandOutput$ | async"
+      >
+      </ui-command-output>
     </ui-task-runner>
   </ng-template>
   <ng-template #emptyMessage>
     Click the Add button to install this extension.
-
   </ng-template>
   <ng-template #alreadyInstalled>
     <div class="ui-flags">
-      <div class="name">
-        {{ extension.name }}
-      </div>
-      <div class="description">
-        {{ extension.description }}
-      </div>
+      <div class="name">{{ extension.name }}</div>
+      <div class="description">{{ extension.description }}</div>
     </div>
   </ng-template>
 </ng-container>

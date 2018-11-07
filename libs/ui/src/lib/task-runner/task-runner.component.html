@@ -1,15 +1,32 @@
-<div class="outer-container" fxLayout="column" fxLayoutAlign="space-between" fxFlex>
+<div
+  class="outer-container"
+  fxLayout="column"
+  fxLayoutAlign="space-between"
+  fxFlex
+>
   <div class="ui-flags-container">
     <ng-content select="ui-flags,.ui-flags"></ng-content>
   </div>
 
-  <div class="ui-terminal-container" fxFlex [@growShrink]="terminalAnimationState | async">
+  <div
+    class="ui-terminal-container"
+    fxFlex
+    [@growShrink]="terminalAnimationState | async"
+  >
     <mat-divider></mat-divider>
-      <div class="window-chrome" fxLayout="row" fxLayoutAlign="end center">
-      <div class="window-header" fxFlex fxLayout="row" fxLayoutAlign="center center">
+    <div class="window-chrome" fxLayout="row" fxLayoutAlign="end center">
+      <div
+        class="window-header"
+        fxFlex
+        fxLayout="row"
+        fxLayoutAlign="center center"
+      >
         {{ terminalWindowTitle }}
       </div>
-      <button mat-button (click)="this.terminalVisible$.next(!this.terminalVisible$.value)">
+      <button
+        mat-button
+        (click)="this.terminalVisible$.next(!this.terminalVisible$.value)"
+      >
         {{ (terminalVisible$ | async) ? 'Hide' : 'Show' }}
       </button>
     </div>

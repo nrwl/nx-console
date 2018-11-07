@@ -1,11 +1,20 @@
 <mat-sidenav-container id="navigationSidenavContainer">
-  <mat-sidenav #sidenav mode="over" [opened]="showSiteMenu" (closedStart)="showSiteMenu = false">
+  <mat-sidenav
+    #sidenav
+    mode="over"
+    [opened]="showSiteMenu"
+    (closedStart)="showSiteMenu = false"
+  >
     <mat-nav-list>
-      <a routerLinkActive="active-link" mat-list-item (click)="showSiteMenu = false" [routerLink]="link.route" *ngFor="let link of sidenavLinks">
+      <a
+        routerLinkActive="active-link"
+        mat-list-item
+        (click)="showSiteMenu = false"
+        [routerLink]="link.route"
+        *ngFor="let link of sidenavLinks"
+      >
         <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
-          <mat-icon>
-            {{ link.icon }}
-          </mat-icon>
+          <mat-icon> {{ link.icon }} </mat-icon>
           <span>{{ link.text }}</span>
         </div>
       </a>
@@ -13,9 +22,15 @@
   </mat-sidenav>
   <mat-sidenav-content id="navigationSidenavContent">
     <div fxLayout="column" fxFlex class="content-container">
-      <ui-contextual-action-bar (hamburgerClicked)="showSiteMenu = true"></ui-contextual-action-bar>
+      <ui-contextual-action-bar
+        (hamburgerClicked)="showSiteMenu = true"
+      ></ui-contextual-action-bar>
 
-      <div fxFlex class="outlet-container" [@routerTransition]="routerTransition | async">
+      <div
+        fxFlex
+        class="outlet-container"
+        [@routerTransition]="routerTransition | async"
+      >
         <router-outlet></router-outlet>
       </div>
 

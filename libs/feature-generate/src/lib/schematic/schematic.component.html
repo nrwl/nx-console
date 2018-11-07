@@ -1,14 +1,21 @@
-<ui-task-runner *ngIf="schematic$ | async as schematic" [terminalWindowTitle]="schematic.collection + ' - ' + schematic.name">
-  <ui-flags [prefix]="getPrefix(schematic)" [fields]="schematic.schema" (value)="onFlagsChange($event)"
-    [init]="initValues$ | async" [path]="path()"></ui-flags>
-  <ui-command-output [command]="command$|async"
-                     [commandResponse]="combinedOutput$ | async"
-                     [emptyTemplate]="emptyMessage">
-
+<ui-task-runner
+  *ngIf="(schematic$ | async) as schematic"
+  [terminalWindowTitle]="schematic.collection + ' - ' + schematic.name"
+>
+  <ui-flags
+    [prefix]="getPrefix(schematic)"
+    [fields]="schematic.schema"
+    (value)="onFlagsChange($event)"
+    [init]="initValues$ | async"
+    [path]="path()"
+  ></ui-flags>
+  <ui-command-output
+    [command]="command$ | async"
+    [commandResponse]="combinedOutput$ | async"
+    [emptyTemplate]="emptyMessage"
+  >
   </ui-command-output>
 </ui-task-runner>
 <ng-template #emptyMessage>
-  <ng-container>
-    Click the Generate button to start this task.
-  </ng-container>
+  <ng-container> Click the Generate button to start this task. </ng-container>
 </ng-template>

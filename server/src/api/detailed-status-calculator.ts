@@ -411,8 +411,8 @@ export class TestDetailedStatusCalculator
           ? 'build_failure'
           : 'test_cancelled'
         : failure > 0
-          ? 'test_failure'
-          : 'test_success'
+        ? 'test_failure'
+        : 'test_success'
     };
   }
 }
