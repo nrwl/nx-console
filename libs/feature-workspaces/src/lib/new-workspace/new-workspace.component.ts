@@ -157,8 +157,8 @@ export function makeNameAvailableValidator(
         (workspacePath: null | string): Observable<null | Directory> =>
           workspacePath ? finderService.listFiles(workspacePath) : of(null)
       ),
-      map(
-        (d: null | Directory) => (!d || !d.exists ? null : { nameTaken: true })
+      map((d: null | Directory) =>
+        !d || !d.exists ? null : { nameTaken: true }
       ),
       take(1)
     );

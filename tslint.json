@@ -32,7 +32,7 @@
     "no-string-literal": true,
     "no-object-literal-type-assertion": true,
 
-    "angular-whitespace": [true, "check-interpolation", "check-semicolon"],
+    "angular-whitespace": [false, "check-interpolation", "check-semicolon"],
     "banana-in-box": true,
     "templates-no-negated-async": false,
     "max-inline-declarations": false,
