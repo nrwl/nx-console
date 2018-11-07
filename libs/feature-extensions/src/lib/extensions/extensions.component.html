@@ -1,3 +1,7 @@
-<ui-task-selector [taskCollections$]="taskCollections$" [filterPlaceholder]="'Filter extensions'" (selectionChange)="navigateToSelectedExtension($event)">
+<ui-task-selector
+  [taskCollections$]="taskCollections$"
+  [filterPlaceholder]="'Filter extensions'"
+  (selectionChange)="navigateToSelectedExtension($event)"
+>
   <router-outlet></router-outlet>
 </ui-task-selector>

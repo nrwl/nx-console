@@ -1,9 +1,19 @@
-<ui-task-runner *ngIf="script$ | async as script" terminalWindowTitle="Task output">
-  <ui-flags [fields]="script.schema" [prefix]="['run', script.name]"
-    (value)="onFlagsChange($event)" (action)="onRun()" [path]="path()"></ui-flags>
-  <ui-command-output [command]="command$ | async"
-                     [commandResponse]="commandOutput$ | async"
-                     [emptyTemplate]="emptyMessage">
+<ui-task-runner
+  *ngIf="(script$ | async) as script"
+  terminalWindowTitle="Task output"
+>
+  <ui-flags
+    [fields]="script.schema"
+    [prefix]="['run', script.name]"
+    (value)="onFlagsChange($event)"
+    (action)="onRun()"
+    [path]="path()"
+  ></ui-flags>
+  <ui-command-output
+    [command]="command$ | async"
+    [commandResponse]="commandOutput$ | async"
+    [emptyTemplate]="emptyMessage"
+  >
   </ui-command-output>
 </ui-task-runner>
 <ng-template #emptyMessage>

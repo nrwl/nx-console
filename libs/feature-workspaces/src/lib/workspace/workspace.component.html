@@ -1,18 +1,51 @@
 <div fxFlex fxLayout="column">
   <div class="content" fxLayout="row" fxFlex>
-    <div class="routes-side-nav-container" [@growShrink]="sideNavAnimationState$ | async">
-      <div fxLayoutGap="4px" class="routes-side-nav" fxLayout="column" fxLayoutAlign="start center">
-        <button class="route-button" [routerLink]="route.url" routerLinkActive="active" mat-icon-button fxLayout="column" fxLayoutAlign="center"
-          *ngFor="let route of routes" #routeButton [id]="'go-to-' + route.url">
-          <mat-icon *ngIf="route.icon" class="route-icon" [id]="route.icon" [matTooltip]="route.title"
-          matTooltipPosition="right">{{ route.icon }}</mat-icon>
-          <mat-icon *ngIf="route.svgIcon" [svgIcon]="route.svgIcon" class="route-icon" [id]="route.svgIcon" [matTooltip]="route.title"
-          matTooltipPosition="right"></mat-icon>
+    <div
+      class="routes-side-nav-container"
+      [@growShrink]="sideNavAnimationState$ | async"
+    >
+      <div
+        fxLayoutGap="4px"
+        class="routes-side-nav"
+        fxLayout="column"
+        fxLayoutAlign="start center"
+      >
+        <button
+          class="route-button"
+          [routerLink]="route.url"
+          routerLinkActive="active"
+          mat-icon-button
+          fxLayout="column"
+          fxLayoutAlign="center"
+          *ngFor="let route of routes"
+          #routeButton
+          [id]="'go-to-' + route.url"
+        >
+          <mat-icon
+            *ngIf="route.icon"
+            class="route-icon"
+            [id]="route.icon"
+            [matTooltip]="route.title"
+            matTooltipPosition="right"
+            >{{ route.icon }}</mat-icon
+          >
+          <mat-icon
+            *ngIf="route.svgIcon"
+            [svgIcon]="route.svgIcon"
+            class="route-icon"
+            [id]="route.svgIcon"
+            [matTooltip]="route.title"
+            matTooltipPosition="right"
+          ></mat-icon>
         </button>
         <span fxFlex></span>
       </div>
     </div>
-    <div fxFlex class="outlet-container" [@routerTransition]="outlet.activatedRouteData.state">
+    <div
+      fxFlex
+      class="outlet-container"
+      [@routerTransition]="outlet.activatedRouteData.state"
+    >
       <router-outlet #outlet="outlet"></router-outlet>
     </div>
   </div>
