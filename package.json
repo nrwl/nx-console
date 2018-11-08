@@ -19,6 +19,7 @@
     "productName": "Angular Console",
     "copyright": "Copyright © 2018 Narwhal Technologies Inc",
     "asar": false,
+    "files": ["dist/server/assets/**/*"],
     "removePackageScripts": false,
     "directories": {
       "app": "dist/server",
@@ -27,18 +28,15 @@
     },
     "npmRebuild": true,
     "mac": {
-      "category": "public.app-category.developer-tools",
-      "icon": "icon.png"
+      "category": "public.app-category.developer-tools"
     },
     "win": {
-      "target": "nsis",
-      "icon": "icon.ico"
+      "target": "nsis"
     },
     "linux": {
-      "icon": "icon.png",
       "target": [
-        "AppImage",
         "deb",
+        "rpm",
         "tar.gz"
       ],
       "synopsis": "Angular Console",
