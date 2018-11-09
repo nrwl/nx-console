@@ -235,7 +235,11 @@ export class SchematicComponent implements OnInit {
   }
 
   getPrefix(schematic: Schematic) {
-    return [`${schematic.collection}:${schematic.name}`];
+    return [
+      `${schematic.collection.startsWith('.') ? '.' : schematic.collection}:${
+        schematic.name
+      }`
+    ];
   }
 
   path() {
