@@ -85,13 +85,13 @@ describe('Forms', () => {
     );
 
     cy.get('mat-select[name="export"]').click();
-    cy.contains('.mat-select-content .mat-option', 'true').click();
+    cy.contains('.mat-select-panel .mat-option', 'true').click();
     checkDisplayedCommand(
       '$ ng generate @schematics/angular:component cmp --export --dry-run'
     );
 
     cy.get('mat-select[name="export"]').click();
-    cy.contains('.mat-select-content .mat-option', 'false').click();
+    cy.contains('.mat-select-panel .mat-option', 'false').click();
     checkDisplayedCommand(
       '$ ng generate @schematics/angular:component cmp --dry-run'
     );

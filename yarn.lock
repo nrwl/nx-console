@@ -148,11 +148,20 @@
   dependencies:
     tslib "^1.9.0"
 
+<<<<<<< HEAD
 "@angular/cdk@6.4.7":
   version "6.4.7"
   resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-6.4.7.tgz#1549b304dd412e82bd854cc55a7d5c6772ee0411"
+=======
+"@angular/cdk@7.0.3":
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-7.0.3.tgz#6f6ca3203470dfa91858a421d72c8e41765644e5"
+  integrity sha512-QT7U2tOBVfwn8Q71Nyh0UjlyXfZNKdanq3+b8GJ/+IB/d8mVdMRTXBGQ4PqY7CP+wpkgm+wbbUt3urZF1AqdmQ==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     tslib "^1.7.1"
+  optionalDependencies:
+    parse5 "^5.0.0"
 
 "@angular/cli@7.0.4":
   version "7.0.4"
@@ -175,11 +184,18 @@
   dependencies:
     tslib "^1.9.0"
 
+<<<<<<< HEAD
 "@angular/compiler-cli@^7.0.2":
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-7.0.3.tgz#5d2567056251a8417ad0154de5d6757fa502f837"
+=======
+"@angular/compiler-cli@7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-7.0.2.tgz#ddfcc6ebeca46bc490fa953a1accc26a7ed93a05"
+  integrity sha512-xGXJ3MHn1LOYrvM9ix5sRp7r6dYsjLj+okUMDcNeYYEQyT7S/qEFZomhdrPydoXSUitjmXbskSUpGzZ6mzBBXQ==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
-    canonical-path "1.0.0"
+    canonical-path "0.0.2"
     chokidar "^1.4.2"
     convert-source-map "^1.5.1"
     dependency-graph "^0.7.2"
@@ -202,9 +218,16 @@
   dependencies:
     tslib "^1.9.0"
 
+<<<<<<< HEAD
 "@angular/flex-layout@6.0.0-beta.18":
   version "6.0.0-beta.18"
   resolved "https://registry.yarnpkg.com/@angular/flex-layout/-/flex-layout-6.0.0-beta.18.tgz#fdf9d17a45989d0bf0dd1ad466eea503da618276"
+=======
+"@angular/flex-layout@7.0.0-beta.19":
+  version "7.0.0-beta.19"
+  resolved "https://registry.yarnpkg.com/@angular/flex-layout/-/flex-layout-7.0.0-beta.19.tgz#f8aa46dd1290adba512a15e762938d6a1d71bcd5"
+  integrity sha512-MXq+zZ6/s5/+GsL9fZ42mKL0LjZ/+L0sVU5FaQuSAJ57soLl5QAGWvdxVmROtqcHd3Htp35R49nKSZBJ0nfAjg==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     tslib "^1.7.1"
 
@@ -218,13 +241,18 @@
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-7.0.3.tgz#e43512ad801f7ecfd5625c34e50d27ce245a32ce"
 
+<<<<<<< HEAD
 "@angular/material@6.4.7":
   version "6.4.7"
   resolved "https://registry.yarnpkg.com/@angular/material/-/material-6.4.7.tgz#3c8f2d6a6a7904d97be29e06a84ffb62a8da6c16"
+=======
+"@angular/material@7.0.3":
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-7.0.3.tgz#81df814ab4da7df4f0f7241852950795936d3cd5"
+  integrity sha512-acJ2zU44k/rsd4OeTdAMVP0R3te8aXwfubDQGc8YI1CdRVW1XqMSvAWkToYDVaGvnZV53zQt/iSi1XWaSXYf1Q==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     tslib "^1.7.1"
-  optionalDependencies:
-    parse5 "^5.0.0"
 
 "@angular/platform-browser-dynamic@7.0.2":
   version "7.0.2"
@@ -372,6 +400,15 @@
   dependencies:
     moment "2.22.2"
     winston "3.0.0"
+
+"@graphql-modules/logger@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@graphql-modules/logger/-/logger-0.2.0.tgz#7e665b1227e5dd6c033a241ad8d071dd1677b078"
+  integrity sha512-7ndnfbeaKV9yHrLTHl+P5SL8bLt3fvD/kx6gjWdXikp3NoCFjdBVb0jb7APCpvJKupigDrdWnRu+K7h0M1yWYw==
+  dependencies:
+    moment "2.22.2"
+    tslib "1.9.3"
+    winston "3.1.0"
 
 "@ngtools/json-schema@^1.1.0":
   version "1.1.0"
@@ -968,7 +1005,17 @@ ajv@^5.0.0, ajv@^5.1.0, ajv@^5.3.0:
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.3.0"
 
-ajv@^6.1.0, ajv@^6.5.2:
+ajv@^6.1.0:
+  version "6.5.4"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.5.4.tgz#247d5274110db653706b550fcc2b797ca28cfc59"
+  integrity sha512-4Wyjt8+t6YszqaXnLDfMmG/8AlO5Zbcsy3ATHncCzjW/NoPzAId8AK6749Ybjmdt+kUY1gP60fCu46oDxPv/mg==
+  dependencies:
+    fast-deep-equal "^2.0.1"
+    fast-json-stable-stringify "^2.0.0"
+    json-schema-traverse "^0.4.1"
+    uri-js "^4.2.2"
+
+ajv@^6.5.2:
   version "6.5.5"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.5.5.tgz#cf97cdade71c6399a92c6d6c4177381291b781a1"
   dependencies:
@@ -1068,6 +1115,7 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
+<<<<<<< HEAD
 apollo-angular-link-http-common@~1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/apollo-angular-link-http-common/-/apollo-angular-link-http-common-1.3.0.tgz#5a3cc36f0ab9070f2932c66683a8a63bcc6ddd62"
@@ -1077,13 +1125,33 @@ apollo-angular-link-http-common@~1.3.0:
 apollo-angular-link-http@1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/apollo-angular-link-http/-/apollo-angular-link-http-1.3.1.tgz#186e840485e4146bb3900f44a6130526c29a5444"
+=======
+apollo-angular-link-http-common@~1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/apollo-angular-link-http-common/-/apollo-angular-link-http-common-1.4.0.tgz#9e361f481562fad9151f95c43ccafc10ba728426"
+  integrity sha512-VAneRp1YYwaggOKgbMGVSuLMpYroLL6tEgS5WH3iNBg4P7cBcubo3uajWRih7E4pZlzX+bCJ5GNqNDJ6xMFT7Q==
   dependencies:
-    apollo-angular-link-http-common "~1.3.0"
     tslib "^1.9.0"
 
+apollo-angular-link-http@1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/apollo-angular-link-http/-/apollo-angular-link-http-1.4.0.tgz#6ae499b3ed44e2201a31f41efef1771580b14069"
+  integrity sha512-YMtk4ZmmQ32kvQVnKNhkqk4QQQ+xb5aaq5XVxLv7AX6S7jDfHDLi18Hc25C4c8revM6gLoGV2Xj9ijvyGGbRCg==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
+  dependencies:
+    apollo-angular-link-http-common "~1.4.0"
+    tslib "^1.9.0"
+
+<<<<<<< HEAD
 apollo-angular@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/apollo-angular/-/apollo-angular-1.4.1.tgz#cd97242acbfd459840057ecdfbd9ef68b1ed50b9"
+=======
+apollo-angular@1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/apollo-angular/-/apollo-angular-1.5.0.tgz#da653b76189fb72ea801c51996ea87fe19aa064f"
+  integrity sha512-zAyMev+bU7cdqRm2AbAH0hJqJOVRN/PpllJ+eqqA0O9dV570RUs2sGehn3dtOcwPHNRof/qrCRoWBEwGrP6hog==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     semver "^5.5.1"
     tslib "^1.9.0"
@@ -1534,16 +1602,23 @@ autoprefixer@9.1.5:
     postcss "^7.0.2"
     postcss-value-parser "^3.2.3"
 
+<<<<<<< HEAD
 autoprefixer@^8.0.0:
   version "8.6.5"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-8.6.5.tgz#343f3d193ed568b3208e00117a1b96eb691d4ee9"
+=======
+autoprefixer@^9.0.0:
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-9.3.1.tgz#71b622174de2b783d5fd99f9ad617b7a3c78443e"
+  integrity sha512-DY9gOh8z3tnCbJ13JIWaeQsoYncTGdsrgCceBaQSIL4nvdrLxgbRSBPevg2XbX7u4QCSfLheSJEEIUUSlkbx6Q==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
-    browserslist "^3.2.8"
-    caniuse-lite "^1.0.30000864"
+    browserslist "^4.3.3"
+    caniuse-lite "^1.0.30000898"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
-    postcss "^6.0.23"
-    postcss-value-parser "^3.2.3"
+    postcss "^7.0.5"
+    postcss-value-parser "^3.3.1"
 
 aws-sign2@~0.6.0:
   version "0.6.0"
@@ -2013,6 +2088,7 @@ browserify-zlib@^0.2.0:
   dependencies:
     pako "~1.0.5"
 
+<<<<<<< HEAD
 browserslist@^3.0.0, browserslist@^3.2.8:
   version "3.2.8"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-3.2.8.tgz#b0005361d6471f0f5952797a76fc985f1f978fc6"
@@ -2021,6 +2097,9 @@ browserslist@^3.0.0, browserslist@^3.2.8:
     electron-to-chromium "^1.3.47"
 
 browserslist@^4.1.0:
+=======
+browserslist@^4.0.0, browserslist@^4.1.0, browserslist@^4.3.3:
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.3.4.tgz#4477b737db6a1b07077275b24791e680d4300425"
   dependencies:
@@ -2249,13 +2328,25 @@ camelcase@^4.0.0, camelcase@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-4.1.0.tgz#d545635be1e33c542649c69173e5de6acfae34dd"
 
-caniuse-lite@^1.0.30000844, caniuse-lite@^1.0.30000864, caniuse-lite@^1.0.30000884, caniuse-lite@^1.0.30000899:
+caniuse-lite@^1.0.30000884, caniuse-lite@^1.0.30000899:
+  version "1.0.30000904"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000904.tgz#4445d00da859a0e0ae6dbb2876c545f3324f6c74"
+  integrity sha512-M4sXvogCoY5Fp6fuXIaQG/MIexlEFQ3Lgwban+KlqiQUbUIkSmjAB8ZJIP79aj2cdqz2F1Lb+Z+5GwHvCrbLtg==
+
+caniuse-lite@^1.0.30000898:
   version "1.0.30000907"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000907.tgz#0b9899bde53fb1c30e214fb12402361e02ff5c42"
 
+<<<<<<< HEAD
 canonical-path@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/canonical-path/-/canonical-path-1.0.0.tgz#fcb470c23958def85081856be7a86e904f180d1d"
+=======
+canonical-path@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/canonical-path/-/canonical-path-0.0.2.tgz#e31eb937a8c93ee2a01df1839794721902874574"
+  integrity sha1-4x65N6jJPuKgHfGDl5RyGQKHRXQ=
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
 
 capture-exit@^1.2.0:
   version "1.2.0"
@@ -2406,7 +2497,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-clean-css@4.2.1, clean-css@^4.x:
+clean-css@4.2.1, clean-css@^4.1.11:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.2.1.tgz#2d411ef76b8569b6d0c84068dabe85b0aa5e5c17"
   dependencies:
@@ -2480,9 +2571,16 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
+<<<<<<< HEAD
 codelyzer@4.4.4:
   version "4.4.4"
   resolved "https://registry.yarnpkg.com/codelyzer/-/codelyzer-4.4.4.tgz#29b7dbb51ba9ecc45c7300d61280a6564765d402"
+=======
+codelyzer@4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/codelyzer/-/codelyzer-4.5.0.tgz#a65ddeeeca2894653253a89bfa229118ff9f59b1"
+  integrity sha512-oO6vCkjqsVrEsmh58oNlnJkRXuA30hF8cdNAQV9DytEalDwyOFRvHMnlKFzmOStNerOmPGZU9GAHnBo4tGvtiQ==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     app-root-path "^2.1.0"
     css-selector-tokenizer "^0.7.0"
@@ -3554,9 +3652,16 @@ electron-store@2.0.0:
   dependencies:
     conf "^2.0.0"
 
+<<<<<<< HEAD
 electron-to-chromium@^1.3.47, electron-to-chromium@^1.3.82:
   version "1.3.84"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.84.tgz#2e55df59e818f150a9f61b53471ebf4f0feecc65"
+=======
+electron-to-chromium@^1.3.82:
+  version "1.3.83"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.83.tgz#74584eb0972bb6777811c5d68d988c722f5e6666"
+  integrity sha512-DqJoDarxq50dcHsOOlMLNoy+qQitlMNbYb6wwbE0oUw2veHdRkpNrhmngiUYKMErdJ8SJ48rpJsZTQgy5SoEAA==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
 
 electron-updater@3.1.2:
   version "3.1.2"
@@ -4431,7 +4536,7 @@ fs-extra@^5.0.0:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
-fs-extra@^6.0.0, fs-extra@^6.0.1:
+fs-extra@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-6.0.1.tgz#8abc128f7946e310135ddc93b98bddb410e7a34b"
   dependencies:
@@ -5917,9 +6022,16 @@ jasmine-core@~2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.8.0.tgz#bcc979ae1f9fd05701e45e52e65d3a5d63f1a24e"
 
+<<<<<<< HEAD
 jasmine-marbles@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/jasmine-marbles/-/jasmine-marbles-0.3.1.tgz#ef65edecb41b8dd62fc6bda40448222042e32043"
+=======
+jasmine-marbles@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/jasmine-marbles/-/jasmine-marbles-0.4.0.tgz#de72331d189d4968e4b1e78b638e51654040c755"
+  integrity sha512-fV8fXz5K3p6LUYyElkmXDMZmtxe9c1/8nmD5H9r2TDix/sJAhd/PFoPXym1c7gZCXByx7tfoiVVyc2t/AxtS6Q==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     lodash "^4.5.0"
 
@@ -6538,7 +6650,15 @@ less-loader@4.1.0:
     loader-utils "^1.1.0"
     pify "^3.0.0"
 
-less@3.8.1, less@^3.0.0:
+less-plugin-npm-import@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/less-plugin-npm-import/-/less-plugin-npm-import-2.1.0.tgz#823e6986c93318a98171ca858848b6bead55bf3e"
+  integrity sha1-gj5phskzGKmBccqFiEi2vq1Vvz4=
+  dependencies:
+    promise "~7.0.1"
+    resolve "~1.1.6"
+
+less@3.8.1, less@^3.8.0:
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/less/-/less-3.8.1.tgz#f31758598ef5a1930dd4caefa9e4340641e71e1d"
   dependencies:
@@ -7282,32 +7402,41 @@ netmask@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-1.0.6.tgz#20297e89d86f6f6400f250d9f4f6b4c1945fcd35"
 
+<<<<<<< HEAD
 ng-packagr@3.0.6:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-3.0.6.tgz#0257993244616e2a7ce8dabbc7f4e65cef6a137c"
+=======
+ng-packagr@4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-4.4.0.tgz#b868a829b5743870c6392491de3faf4e4cec6f4d"
+  integrity sha512-dLpC/kmQsdbkL96ZclGjNRhq/J4MwpPKwPYNom74lvXqFC2jbbT/fnwmxX9WKXjvE8MEGsg2D2x8MsRURiNscg==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     "@ngtools/json-schema" "^1.1.0"
-    autoprefixer "^8.0.0"
-    browserslist "^3.0.0"
+    autoprefixer "^9.0.0"
+    browserslist "^4.0.0"
     chalk "^2.3.1"
+    chokidar "^2.0.3"
+    clean-css "^4.1.11"
     commander "^2.12.0"
-    fs-extra "^6.0.0"
+    fs-extra "^7.0.0"
     glob "^7.1.2"
     injection-js "^2.2.1"
-    less "^3.0.0"
-    node-sass "^4.5.3"
+    less "^3.8.0"
+    less-plugin-npm-import "^2.1.0"
+    node-sass "^4.9.3"
     node-sass-tilde-importer "^1.0.0"
-    postcss "^6.0.2"
-    postcss-clean "^1.1.0"
-    postcss-url "^7.3.0"
-    read-pkg-up "^3.0.0"
+    postcss "^7.0.0"
+    postcss-url "^8.0.0"
+    read-pkg-up "^4.0.0"
     rimraf "^2.6.1"
-    rollup "^0.59.0"
+    rollup "^0.66.0"
     rollup-plugin-commonjs "^9.1.3"
+    rollup-plugin-json "^3.1.0"
     rollup-plugin-node-resolve "^3.0.0"
     rollup-plugin-sourcemaps "^0.4.2"
     rxjs "^6.0.0"
-    strip-bom "^3.0.0"
     stylus "^0.54.5"
     uglify-js "^3.0.7"
     update-notifier "^2.3.0"
@@ -7452,7 +7581,7 @@ node-sass@4.9.3:
     stdout-stream "^1.4.0"
     "true-case-path" "^1.0.2"
 
-node-sass@^4.5.3:
+node-sass@^4.9.3:
   version "4.10.0"
   resolved "https://registry.yarnpkg.com/node-sass/-/node-sass-4.10.0.tgz#dcc2b364c0913630945ccbf7a2bbf1f926effca4"
   dependencies:
@@ -8279,6 +8408,7 @@ posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
 
+<<<<<<< HEAD
 postcss-clean@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/postcss-clean/-/postcss-clean-1.1.0.tgz#c2d61d5d8caf19a585adba16897726c2674c4207"
@@ -8286,6 +8416,8 @@ postcss-clean@^1.1.0:
     clean-css "^4.x"
     postcss "^6.x"
 
+=======
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
 postcss-import@12.0.0:
   version "12.0.0"
   resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-12.0.0.tgz#149f96a4ef0b27525c419784be8517ebd17e92c5"
@@ -8311,21 +8443,28 @@ postcss-loader@3.0.0:
     postcss-load-config "^2.0.0"
     schema-utils "^1.0.0"
 
+<<<<<<< HEAD
 postcss-url@^7.3.0:
   version "7.3.2"
   resolved "https://registry.yarnpkg.com/postcss-url/-/postcss-url-7.3.2.tgz#5fea273807fb84b38c461c3c9a9e8abd235f7120"
+=======
+postcss-url@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/postcss-url/-/postcss-url-8.0.0.tgz#7b10059bd12929cdbb1971c60f61a0e5af86b4ca"
+  integrity sha512-E2cbOQ5aii2zNHh8F6fk1cxls7QVFZjLPSrqvmiza8OuXLzIpErij8BDS5Y3STPfJgpIMNCPEr8JlKQWEoozUw==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
-    mime "^1.4.1"
+    mime "^2.3.1"
     minimatch "^3.0.4"
     mkdirp "^0.5.0"
-    postcss "^6.0.1"
+    postcss "^7.0.2"
     xxhashjs "^0.2.1"
 
-postcss-value-parser@^3.2.3:
+postcss-value-parser@^3.2.3, postcss-value-parser@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-3.3.1.tgz#9ff822547e2893213cf1c30efa51ac5fd1ba8281"
 
-postcss@7.0.5, postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.2:
+postcss@7.0.5, postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.2, postcss@^7.0.5:
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.5.tgz#70e6443e36a6d520b0fd4e7593fcca3635ee9f55"
   dependencies:
@@ -8333,6 +8472,7 @@ postcss@7.0.5, postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.2:
     source-map "^0.6.1"
     supports-color "^5.5.0"
 
+<<<<<<< HEAD
 postcss@^6.0.1, postcss@^6.0.2, postcss@^6.0.23, postcss@^6.x:
   version "6.0.23"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.23.tgz#61c82cc328ac60e677645f979054eb98bc0e3324"
@@ -8341,6 +8481,8 @@ postcss@^6.0.1, postcss@^6.0.2, postcss@^6.0.23, postcss@^6.x:
     source-map "^0.6.1"
     supports-color "^5.4.0"
 
+=======
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
 prebuild-install@^2.4.1:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-2.5.3.tgz#9f65f242782d370296353710e9bc843490c19f69"
@@ -8468,6 +8610,13 @@ promise@~1.3.0:
   resolved "https://registry.yarnpkg.com/promise/-/promise-1.3.0.tgz#e5cc9a4c8278e4664ffedc01c7da84842b040175"
   dependencies:
     is-promise "~1"
+
+promise@~7.0.1:
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/promise/-/promise-7.0.4.tgz#363e84a4c36c8356b890fed62c91ce85d02ed539"
+  integrity sha1-Nj6EpMNsg1a4kP7WLJHOhdAu1Tk=
+  dependencies:
+    asap "~2.0.3"
 
 promisify-call@^2.0.2:
   version "2.0.4"
@@ -8755,11 +8904,18 @@ read-pkg-up@^2.0.0:
     find-up "^2.0.0"
     read-pkg "^2.0.0"
 
+<<<<<<< HEAD
 read-pkg-up@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/read-pkg-up/-/read-pkg-up-3.0.0.tgz#3ed496685dba0f8fe118d0691dc51f4a1ff96f07"
+=======
+read-pkg-up@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/read-pkg-up/-/read-pkg-up-4.0.0.tgz#1b221c6088ba7799601c808f91161c66e58f8978"
+  integrity sha512-6etQSH7nJGsK0RbG/2TeDzZFa8shjQ1um+SwQQ5cwKy0dhSXdOncEhb1CPpvQG4h7FyOV6EB6YlV0yJvZQNAkA==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
-    find-up "^2.0.0"
+    find-up "^3.0.0"
     read-pkg "^3.0.0"
 
 read-pkg@^1.0.0:
@@ -9112,7 +9268,7 @@ resolve-url@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/resolve-url/-/resolve-url-0.2.1.tgz#2c637fe77c893afd2a663fe21aa9080068e2052a"
 
-resolve@1.1.7, resolve@1.1.x:
+resolve@1.1.7, resolve@1.1.x, resolve@~1.1.6:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.1.7.tgz#203114d82ad2c5ed9e8e0411b3932875e889e97b"
 
@@ -9170,6 +9326,13 @@ rollup-plugin-commonjs@^9.1.3:
     resolve "^1.8.1"
     rollup-pluginutils "^2.3.3"
 
+rollup-plugin-json@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-json/-/rollup-plugin-json-3.1.0.tgz#7c1daf60c46bc21021ea016bd00863561a03321b"
+  integrity sha512-BlYk5VspvGpjz7lAwArVzBXR60JK+4EKtPkCHouAWg39obk9S61hZYJDBfMK+oitPdoe11i69TlxKlMQNFC/Uw==
+  dependencies:
+    rollup-pluginutils "^2.3.1"
+
 rollup-plugin-node-resolve@^3.0.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/rollup-plugin-node-resolve/-/rollup-plugin-node-resolve-3.4.0.tgz#908585eda12e393caac7498715a01e08606abc89"
@@ -9185,16 +9348,23 @@ rollup-plugin-sourcemaps@^0.4.2:
     rollup-pluginutils "^2.0.1"
     source-map-resolve "^0.5.0"
 
-rollup-pluginutils@^2.0.1, rollup-pluginutils@^2.3.3:
+rollup-pluginutils@^2.0.1, rollup-pluginutils@^2.3.1, rollup-pluginutils@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/rollup-pluginutils/-/rollup-pluginutils-2.3.3.tgz#3aad9b1eb3e7fe8262820818840bf091e5ae6794"
   dependencies:
     estree-walker "^0.5.2"
     micromatch "^2.3.11"
 
+<<<<<<< HEAD
 rollup@^0.59.0:
   version "0.59.4"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.59.4.tgz#6f80f7017c22667ff1bf3e62adf8624a44cc44aa"
+=======
+rollup@^0.66.0:
+  version "0.66.6"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.66.6.tgz#ce7d6185beb7acea644ce220c25e71ae03275482"
+  integrity sha512-J7/SWanrcb83vfIHqa8+aVVGzy457GcjA6GVZEnD0x2u4OnOd0Q1pCrEoNe8yLwM6z6LZP02zBT2uW0yh5TqOw==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     "@types/estree" "0.0.39"
     "@types/node" "*"
@@ -10552,9 +10722,16 @@ ts-node@7.0.1:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
+<<<<<<< HEAD
 tsickle@0.33.0:
   version "0.33.0"
   resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.33.0.tgz#337a8a1abdbc8c9586010a566daf0cd135496fa7"
+=======
+tsickle@0.33.1:
+  version "0.33.1"
+  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.33.1.tgz#eee4ebabeda3bcd8afc32cee34c822cbe3e839ec"
+  integrity sha512-SpW2G3PvDGs4a5sMXPlWnCWHWRviWjSlI3U0734e3fU3U39VAE0NPr8M3W1cuL/OU/YXheYipGeEwtIJ5k0NHQ==
+>>>>>>> feat(tasks): Kill tasks via ctrl-c
   dependencies:
     minimist "^1.2.0"
     mkdirp "^0.5.1"

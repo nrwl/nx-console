@@ -14,6 +14,7 @@ import {
   RestartCommandGQL,
   StopCommandGQL
 } from './generated/graphql';
+import { MatSnackBar } from '@angular/material';
 
 export enum CommandStatus {
   SUCCESSFUL = 'successful',
@@ -54,6 +55,7 @@ export class CommandRunner {
     private readonly removeCommandGQL: RemoveCommandGQL,
     private readonly restartCommandGQL: RestartCommandGQL,
     private readonly stopCommandGQL: StopCommandGQL,
+    private readonly snackbar: MatSnackBar,
     contextualActionBarService: ContextualActionBarService
   ) {
     contextualActionBarService.contextualActions$.subscribe(
@@ -135,6 +137,14 @@ export class CommandRunner {
         id
       })
       .subscribe(() => {});
+  }
+
+  stopCommandViaCtrlC(id: string) {
+    this.stopCommand(id).add(() => {
+      this.snackbar.open('Command has been terminated via ctrl-c', undefined, {
+        duration: 1500
+      });
+    });
   }
 
   removeAllCommands() {
