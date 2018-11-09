@@ -4,12 +4,14 @@ import {
   Input,
   OnDestroy,
   TemplateRef,
-  ViewChild
+  ViewChild,
+  HostListener
 } from '@angular/core';
 import { TerminalComponent } from '../terminal/terminal.component';
-import { CommandResponse } from '@angular-console/utils';
+import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
 import { map, scan, take } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material';
 
 type View = 'details' | 'terminal';
 const INITIAL_VIEW: View = 'details';
@@ -49,6 +51,18 @@ export class CommandOutputComponent implements OnDestroy {
   }
   @Input() emptyTemplate?: TemplateRef<void>;
 
+  @HostListener('document:keypress', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (
+      event.ctrlKey &&
+      event.key === 'c' &&
+      this.commandResponse &&
+      this.commandResponse.status === 'in-progress'
+    ) {
+      this.commandRunner.stopCommandViaCtrlC(this.commandResponse.id);
+    }
+  }
+
   private readonly outputValue$ = new Subject<string>();
   private readonly detailedStatus$ = new Subject<any>();
   readonly activeView$ = new BehaviorSubject<View>(INITIAL_VIEW);
@@ -82,6 +96,8 @@ export class CommandOutputComponent implements OnDestroy {
 
   _commandResponse: CommandResponse;
   hasUnreadResponse = false;
+
+  constructor(private readonly commandRunner: CommandRunner) {}
 
   ngOnDestroy() {
     this.switchToTerminalSubscription.unsubscribe();

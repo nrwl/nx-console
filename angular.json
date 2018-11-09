@@ -344,6 +344,14 @@
               "**/node_modules/**"
             ]
           }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "libs/feature-action-bar/src/test.ts",
+            "tsConfig": "libs/feature-action-bar/tsconfig.spec.json",
+            "karmaConfig": "libs/feature-action-bar/karma.conf.js"
+          }
         }
       }
     },

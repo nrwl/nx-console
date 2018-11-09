@@ -1,3 +1,9 @@
+import { CommandOutputComponent } from '@angular-console/ui';
+import {
+  CommandResponse,
+  CommandRunner,
+  CommandStatus
+} from '@angular-console/utils';
 import {
   animate,
   state,
@@ -5,7 +11,13 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { Component, QueryList, ViewChildren } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  QueryList,
+  ViewChildren
+} from '@angular/core';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -13,15 +25,9 @@ import {
   shareReplay,
   startWith,
   switchMap,
+  take,
   tap
 } from 'rxjs/operators';
-import {
-  CommandResponse,
-  CommandRunner,
-  CommandStatus
-} from '@angular-console/utils';
-import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { CommandOutputComponent } from '@angular-console/ui';
 
 const TERMINAL_PADDING = 44;
 const COMMAND_HEIGHT = 64;
@@ -135,6 +141,17 @@ export class ActionBarComponent {
 
   trackByCommandId(_: number, command: CommandResponse) {
     return command.id;
+  }
+
+  @HostListener('document:keypress', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (!this.actionsExpanded.value && event.ctrlKey && event.key === 'c') {
+      this.commands$.pipe(take(1)).subscribe(commands => {
+        if (commands.length === 1 && commands[0].status === 'in-progress') {
+          this.commandRunner.stopCommandViaCtrlC(commands[0].id);
+        }
+      });
+    }
   }
 
   constructor(

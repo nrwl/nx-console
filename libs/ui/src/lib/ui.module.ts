@@ -42,8 +42,10 @@ import { TerminalComponent } from './terminal/terminal.component';
 import { BuildStatusComponent } from './build-status/build-status.component';
 import { CommandOutputComponent } from './command-output/command-output.component';
 import { TestStatusComponent } from './test-status/test-status.component';
+import { HttpClientModule } from '@angular/common/http';
 
 const IMPORTS = [
+  HttpClientModule,
   CdkTreeModule,
   CdkTreeModule,
   CommonModule,

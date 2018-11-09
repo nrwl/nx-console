@@ -62,7 +62,7 @@ describe('Extensions', () => {
     goToGenerate();
     cy.wait(300); // Needed to de-flake this test
     taskListHeaders($p => {
-      expect(texts($p)[0]).to.equal('@angular/material');
+      expect(texts($p)[1]).to.equal('@angular/material');
     });
   });
 
