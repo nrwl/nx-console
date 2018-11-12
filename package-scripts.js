@@ -84,7 +84,7 @@ module.exports = {
       'builder-dist': 'electron-builder --win -p never'
     },
     dev: {
-      'patch-clid': 'node ./tools/scripts/patch-cli.js',
+      'patch-cli': 'node ./tools/scripts/patch-cli.js',
       'compile-server': npsUtils.series.nps('server.compile', withPlatform('copy-assets')),
       'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server', 'frontend.build', withPlatform('copy-frontend'), withPlatform('pack'), 'dev.patch-cli'),
       'server': npsUtils.series.nps('dev.compile-server', withPlatform('start-server')),
