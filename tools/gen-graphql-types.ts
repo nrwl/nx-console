@@ -1,13 +1,22 @@
 import { generate } from 'graphql-code-generator';
 import { resolve } from 'path';
 
+const schema = resolve(__dirname, '../server/src/schema/schema.ts');
+const output = resolve(__dirname, '../server/src/graphql-types.ts');
+
 generate(
   {
     require: ['ts-node/register/transpile-only'],
-    schema: resolve(__dirname, '../server/src/schema/schema.ts'),
-    template: 'graphql-codegen-typescript-template',
-    out: resolve(__dirname, '../server/src/graphql-types.ts'),
-    overwrite: true
+    schema,
+    overwrite: true,
+    generates: {
+      [output]: {
+        plugins: [
+          'typescript-common',
+          'typescript-server'
+        ]
+      },
+    }
   },
   true
 )
