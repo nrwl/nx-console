@@ -73,8 +73,8 @@
     "request": "2.88.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.10.0",
-    "@angular-devkit/build-ng-packagr": "~0.10.0",
+    "@angular-devkit/build-angular": "0.10.5",
+    "@angular-devkit/build-ng-packagr": "0.10.5",
     "@angular-devkit/core": "0.8.5",
     "@angular-devkit/schematics": "0.8.5",
     "@angular/animations": "7.0.2",
@@ -86,7 +86,7 @@
     "@angular/core": "7.0.2",
     "@angular/flex-layout": "7.0.0-beta.19",
     "@angular/forms": "7.0.2",
-    "@angular/language-service": "^7.0.2",
+    "@angular/language-service": "7.0.3",
     "@angular/material": "7.0.3",
     "@angular/platform-browser": "7.0.2",
     "@angular/platform-browser-dynamic": "7.0.2",
@@ -111,7 +111,7 @@
     "apollo-link-error": "1.1.0",
     "apollo-server-express": "2.1.0",
     "codelyzer": "4.5.0",
-    "core-js": "^2.5.7",
+    "core-js": "2.5.7",
     "cypress": "3.1.0",
     "drivelist": "6.3.0",
     "electron": "2.0.8",
