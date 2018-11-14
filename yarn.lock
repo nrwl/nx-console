@@ -23,7 +23,7 @@
     "@angular-devkit/core" "7.0.5"
     rxjs "6.3.3"
 
-"@angular-devkit/build-angular@~0.10.0":
+"@angular-devkit/build-angular@0.10.5":
   version "0.10.5"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-angular/-/build-angular-0.10.5.tgz#9de17f1015137cb25ccedd4928a935d179b50b10"
   integrity sha512-I32FrMnYO5XU33ifOwhefO0tVCD+xHcTcAIprv5MFbSl3sGXI/CVsh9DGjWfyHlUaMlLUOpHQ+VcgeFGTcCVpA==
@@ -77,7 +77,7 @@
   optionalDependencies:
     node-sass "4.9.3"
 
-"@angular-devkit/build-ng-packagr@~0.10.0":
+"@angular-devkit/build-ng-packagr@0.10.5":
   version "0.10.5"
   resolved "https://registry.yarnpkg.com/@angular-devkit/build-ng-packagr/-/build-ng-packagr-0.10.5.tgz#755c0f757e8ee315d0f8a37312dbb3dfbff44732"
   integrity sha512-0ZOiQIUP2dxNNFIgeVnrRVpd2eTTEaOUrrY3oKPIgv4r0PZ2IKZTs3cIC2xE73d/rLXknIevPEe8fw0dgJ2rrg==
@@ -237,7 +237,7 @@
   dependencies:
     tslib "^1.9.0"
 
-"@angular/language-service@^7.0.2":
+"@angular/language-service@7.0.3":
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-7.0.3.tgz#e43512ad801f7ecfd5625c34e50d27ce245a32ce"
   integrity sha512-a8S/kTK/f7QaA7Nwm0KmfR+e7p4ZJ1keotfQD8r9Zq73+DD6yS+DSc+NBikmHui9mn9zY1C08C4SJQ5/5HtVhA==
@@ -3223,7 +3223,7 @@ copy-webpack-plugin@4.5.4:
     p-limit "^1.0.0"
     serialize-javascript "^1.4.0"
 
-core-js@^2.2.0, core-js@^2.4.0, core-js@^2.5.0, core-js@^2.5.7:
+core-js@2.5.7, core-js@^2.2.0, core-js@^2.4.0, core-js@^2.5.0, core-js@^2.5.7:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
   integrity sha512-RszJCAxg/PP6uzXVXL6BsxSXx/B05oJAQ2vkJRjyjrEcNVycaqOmNb5OTxZPE3xa5gwZduqza6L9JOCenh/Ecw==
