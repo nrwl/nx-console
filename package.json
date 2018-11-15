@@ -117,7 +117,7 @@
     "electron": "2.0.13",
     "electron-builder": "20.28.4",
     "electron-installer-dmg": "1.0.0",
-    "electron-packager": "12.1.0",
+    "electron-packager": "12.2.0",
     "electron-store": "2.0.0",
     "electron-updater": "3.1.2",
     "express": "4.16.4",
