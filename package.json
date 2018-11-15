@@ -75,7 +75,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "0.10.6",
     "@angular-devkit/build-ng-packagr": "0.10.6",
-    "@angular-devkit/core": "0.8.7",
+    "@angular-devkit/core": "7.0.6",
     "@angular-devkit/schematics": "0.8.7",
     "@angular/animations": "7.0.4",
     "@angular/cdk": "7.0.4",
