@@ -121,7 +121,7 @@
     "electron-store": "2.0.0",
     "electron-updater": "3.2.3",
     "express": "4.16.4",
-    "express-graphql": "0.6.12",
+    "express-graphql": "0.7.1",
     "fix-path": "2.1.0",
     "get-port": "3.2.0",
     "graphql": "0.13.2",
