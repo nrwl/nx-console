@@ -15,7 +15,7 @@
     "@types/tmp": "0.0.33",
     "apollo-server-express": "2.2.2",
     "dotenv": "6.1.0",
-    "drivelist": "6.3.0",
+    "drivelist": "6.4.3",
     "electron-store": "2.0.0",
     "electron-updater": "3.2.3",
     "express": "4.16.4",
