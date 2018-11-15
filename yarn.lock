@@ -784,10 +784,10 @@
     "@types/chai" "*"
     "@types/sinon" "*"
 
-"@types/sinon-chai@2.7.31":
-  version "2.7.31"
-  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-2.7.31.tgz#d6cd5369bbf533d31e0bdf1fe55175e998f62757"
-  integrity sha512-zkomXNjoc+vK2RZUn3NwnIaJ3oqGNZwZtyYjGhW8BJ9whJGAdfqAKjObgLNbp9QCYlkgHlbJK/u9+yTQoGog+w==
+"@types/sinon-chai@2.7.33":
+  version "2.7.33"
+  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-2.7.33.tgz#28899cee7246755cdb3a4371af9f5b7e9774edd0"
+  integrity sha512-NiLSxS6KXOO4jwUhgF9aaXFAn7MsVTEgA0oj0xE/m/eZaHZC6hgrCrW6VeWfDYjRt6XfQxwS4DY4R6oI5MukmQ==
   dependencies:
     "@types/chai" "*"
     "@types/sinon" "*"
