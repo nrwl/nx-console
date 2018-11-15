@@ -148,7 +148,7 @@
     "resolve": "1.8.1",
     "rxjs": "6.3.3",
     "rxjs-compat": "6.3.3",
-    "shelljs": "0.8.2",
+    "shelljs": "0.8.3",
     "strip-json-comments": "2.0.1",
     "ts-jest": "23.10.4",
     "ts-node": "7.0.1",
