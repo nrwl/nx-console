@@ -5581,13 +5581,13 @@ graphql-code-generator@0.13.0:
     request "2.88.0"
     valid-url "1.0.9"
 
-graphql-codegen-apollo-angular-template@0.12.6:
-  version "0.12.6"
-  resolved "https://registry.yarnpkg.com/graphql-codegen-apollo-angular-template/-/graphql-codegen-apollo-angular-template-0.12.6.tgz#1e1e4f489c5535f5e55b5a4fa26e15642edfa991"
-  integrity sha512-AoGPkQvhchSYaCyS5dqnREVwAMWlioVN7XAM1R2MOTFypsbXMVKa+kJc+Zmd1D6eNk5uI2iupdi2xoBamYVc4w==
+graphql-codegen-apollo-angular-template@0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-apollo-angular-template/-/graphql-codegen-apollo-angular-template-0.13.0.tgz#455b03f3396ce98658119335d0fd331badb4a20a"
+  integrity sha512-qMkc+YU5kzPdLf7v6MlBzSV4a2q2HgLNlloWykdE71qWDZP9Bsxvrk/JgdIhMhHal8PUYlP9XlaodmnyVTrczA==
   dependencies:
     dependency-graph "~0.7.2"
-    graphql-codegen-typescript-template "0.12.6"
+    graphql-codegen-typescript-template "0.13.0"
 
 graphql-codegen-compiler@0.13.0:
   version "0.13.0"
@@ -5618,6 +5618,11 @@ graphql-codegen-typescript-template@0.12.6:
   version "0.12.6"
   resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-template/-/graphql-codegen-typescript-template-0.12.6.tgz#3120089a7aea93373261377b0e0f89792c8bb5ad"
   integrity sha512-Qn0EvuFwOmUy4drNEugczNdSmpNtFjJ3oJAdvLW1nnM54GNMlm+9LJLmZfifjG1uB4nvKORV9+v3dY2fKrxaKQ==
+
+graphql-codegen-typescript-template@0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-template/-/graphql-codegen-typescript-template-0.13.0.tgz#41398687cbf279f1d97d8cfb8aa7c412bf0e7192"
+  integrity sha512-EYLd4v8toD+dpWHJsJliViaE52novhF9zbayFmY8IgLeHmYPVk2TfyS6CVvHmCoa0HTxOawvTY8a7UIgtnpw2w==
 
 graphql-config@2.2.1:
   version "2.2.1"

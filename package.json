@@ -126,7 +126,7 @@
     "get-port": "3.2.0",
     "graphql": "0.13.2",
     "graphql-code-generator": "0.13.0",
-    "graphql-codegen-apollo-angular-template": "0.12.6",
+    "graphql-codegen-apollo-angular-template": "0.13.0",
     "graphql-codegen-typescript-template": "0.12.6",
     "graphql-tag": "2.10.0",
     "jasmine-core": "3.2.1",
