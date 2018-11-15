@@ -140,7 +140,7 @@
     "karma-jasmine": "1.1.2",
     "karma-jasmine-html-reporter": "1.4.0",
     "ng-packagr": "4.4.0",
-    "node-pty-prebuilt": "0.7.3",
+    "node-pty-prebuilt": "0.7.6",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "prettier": "1.15.2",
