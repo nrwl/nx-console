@@ -10647,10 +10647,10 @@ rx@2.3.24:
   resolved "https://registry.yarnpkg.com/rx/-/rx-2.3.24.tgz#14f950a4217d7e35daa71bbcbe58eff68ea4b2b7"
   integrity sha1-FPlQpCF9fjXapxu8vljv9o6ksrc=
 
-rxjs-compat@6.2.2:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/rxjs-compat/-/rxjs-compat-6.2.2.tgz#3c0fcdb46130cc70aa55412c2b1147905ab4680a"
-  integrity sha512-h113JzEXnqBd6JQ8TYg33oDuM3baZ9WKS49rtbMX0gBW2Kz0z4wDZ0/pCA0T9sRJM1HkZT6mt45gpYOJ2MqWYQ==
+rxjs-compat@6.3.3:
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/rxjs-compat/-/rxjs-compat-6.3.3.tgz#2ab3b9ac0dac0c073749d55fef9c03ea1df2045c"
+  integrity sha512-caGN7ixiabHpOofginKEquuHk7GgaCrC7UpUQ9ZqGp80tMc68msadOeP/2AKy2R4YJsT1+TX5GZCtxO82qWkyA==
 
 rxjs@6.3.3, rxjs@^6.0.0, rxjs@^6.1.0:
   version "6.3.3"
