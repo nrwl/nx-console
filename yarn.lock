@@ -696,7 +696,7 @@
   dependencies:
     "@types/jasmine" "*"
 
-"@types/jquery@*":
+"@types/jquery@*", "@types/jquery@3.3.22":
   version "3.3.22"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.22.tgz#cde55dc8f83207dffd16205b05f97ce824581735"
   integrity sha512-a4JDcIhJhHYnoWCkG3xT2CZxXZeA92JeREESorg0DMQ3ZsjuKF48h7XK4l5Gl2GRa/ItGRpKMT0pyK88yRgqXQ==
@@ -707,11 +707,6 @@
   version "3.2.16"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.2.16.tgz#04419c404a3194350e7d3f339a90e72c88db3111"
   integrity sha512-q2WC02YxQoX2nY1HRKlYGHpGP1saPmD7GN0pwCDlTz35a4eOtJG+aHRlXyjCuXokUukSrR2aXyBhSW3j+jPc0A==
-
-"@types/jquery@3.3.6":
-  version "3.3.6"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.6.tgz#5932ead926307ca21e5b36808257f7c926b06565"
-  integrity sha512-403D4wN95Mtzt2EoQHARf5oe/jEPhzBOBNrunk+ydQGW8WmkQ/E8rViRAEB1qEt/vssfGfNVD6ujP4FVeegrLg==
 
 "@types/lodash@4.14.87":
   version "4.14.87"

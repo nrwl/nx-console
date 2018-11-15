@@ -160,7 +160,7 @@
     "uuid": "3.3.2",
     "xterm": "3.4.1",
     "zone.js": "0.8.26",
-    "@types/jquery": "3.3.6"
+    "@types/jquery": "3.3.22"
   },
   "jest": {
     "moduleFileExtensions": [
