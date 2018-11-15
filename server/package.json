@@ -23,7 +23,7 @@
     "fix-path": "2.1.0",
     "get-port": "3.2.0",
     "graphql": "0.13.2",
-    "node-pty-prebuilt": "0.7.3",
+    "node-pty-prebuilt": "0.7.6",
     "progress-stream": "2.0.0",
     "request": "2.88.0",
     "resolve": "1.8.1",
