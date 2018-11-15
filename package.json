@@ -129,7 +129,7 @@
     "graphql-codegen-apollo-angular-template": "0.12.6",
     "graphql-codegen-typescript-template": "0.12.6",
     "graphql-tag": "2.10.0",
-    "jasmine-core": "3.2.1",
+    "jasmine-core": "3.3.0",
     "jasmine-marbles": "0.4.0",
     "jasmine-spec-reporter": "4.2.1",
     "jest": "23.4.2",
