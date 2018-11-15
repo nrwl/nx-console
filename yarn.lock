@@ -3989,7 +3989,7 @@ electron-download@^3.0.1:
     semver "^5.3.0"
     sumchecker "^1.2.0"
 
-electron-download@^4.0.0:
+electron-download@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/electron-download/-/electron-download-4.1.1.tgz#02e69556705cc456e520f9e035556ed5a015ebe8"
   integrity sha512-FjEWG9Jb/ppK/2zToP+U5dds114fM1ZOJqMAR4aXXL5CvyPE9fiqBK/9YcwC9poIFQTEJk/EM/zyRwziziRZrg==
@@ -4043,14 +4043,14 @@ electron-osx-sign@^0.4.1:
     minimist "^1.2.0"
     plist "^3.0.1"
 
-electron-packager@12.1.0:
-  version "12.1.0"
-  resolved "https://registry.yarnpkg.com/electron-packager/-/electron-packager-12.1.0.tgz#048dd4ff3848be19c5873c315b5b312df6215328"
-  integrity sha1-BI3U/zhIvhnFhzwxW1sxLfYhUyg=
+electron-packager@12.2.0:
+  version "12.2.0"
+  resolved "https://registry.yarnpkg.com/electron-packager/-/electron-packager-12.2.0.tgz#e38e0702a12e5f62a00a03aabd0b9ad28aebab4b"
+  integrity sha512-T5W/FIK4VXhYIOWxkehmz6zXt2S/sA9JZ3AL+/jeKCicQY6QVQ0K8B7W801L+GPTwbgTPycHjO+iqEf1BhZ+Iw==
   dependencies:
     asar "^0.14.0"
     debug "^3.0.0"
-    electron-download "^4.0.0"
+    electron-download "^4.1.1"
     electron-osx-sign "^0.4.1"
     extract-zip "^1.0.3"
     fs-extra "^5.0.0"
