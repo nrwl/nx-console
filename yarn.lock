@@ -1170,10 +1170,10 @@ amqplib@^0.5.2:
     readable-stream "1.x >=1.1.9"
     safe-buffer "^5.0.1"
 
-angular-playground@5.1.5:
-  version "5.1.5"
-  resolved "https://registry.yarnpkg.com/angular-playground/-/angular-playground-5.1.5.tgz#1044773aa79ee838f667d37aa45b9e250b65195a"
-  integrity sha512-FhFkWfb4DHBXVl1H/uKJV7t/j1nX98wiBtaUOXBBAJ0lgRs2SH5bqCl3F907fgb5B42e9k9pY+ZhEBgaJxY0/w==
+angular-playground@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/angular-playground/-/angular-playground-5.2.0.tgz#b8b2448f0ddef32d0b5e19d874b6a0ae2942b0db"
+  integrity sha512-/tcAMhwC5xmRzzkxlT34Xi5Av7Lv2cuY0wGbpvGAwdRhxSDu1JUFQbRE+N/x+jCIVkb9BHoB/BJKYisSyqv18Q==
   dependencies:
     "@angular-devkit/core" "^0.7.3"
     "@angular-devkit/schematics" "^0.7.3"
