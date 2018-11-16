@@ -7366,10 +7366,10 @@ karma-jasmine-html-reporter@1.4.0:
   resolved "https://registry.yarnpkg.com/karma-jasmine-html-reporter/-/karma-jasmine-html-reporter-1.4.0.tgz#1abbd30d4509a8c82b96707ae7d2fa4da459ca19"
   integrity sha512-0wxhwA8PLPpICZ4o2GRnPi67hf3JhfQm5WCB8nElh4qsE6wRNOTtrqooyBPNqI087Xr2SBhxLg5fU+BJ/qxRrw==
 
-karma-jasmine@1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-1.1.2.tgz#394f2b25ffb4a644b9ada6f22d443e2fd08886c3"
-  integrity sha1-OU8rJf+0pkS5rabyLUQ+L9CIhsM=
+karma-jasmine@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-2.0.0.tgz#07f688a18c679a07983acd3a2e3973c51aa4e0c7"
+  integrity sha512-MxgbjgIkm+BFPoMkkaXb/2zAgRaeSe+ZWI6n+vpx4eisokHsHiZt9WGFj2qPrLXG2qrzEOyorCl8g/nqNXtBgA==
 
 karma-source-map-support@1.3.0:
   version "1.3.0"
