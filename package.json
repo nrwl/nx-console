@@ -137,7 +137,7 @@
     "karma": "2.0.5",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage-istanbul-reporter": "2.0.4",
-    "karma-jasmine": "1.1.2",
+    "karma-jasmine": "2.0.0",
     "karma-jasmine-html-reporter": "1.4.0",
     "ng-packagr": "4.4.0",
     "node-pty-prebuilt": "0.7.6",
