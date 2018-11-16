@@ -123,7 +123,7 @@
     "express": "4.16.4",
     "express-graphql": "0.7.1",
     "fix-path": "2.1.0",
-    "get-port": "3.2.0",
+    "get-port": "4.0.0",
     "graphql": "0.13.2",
     "graphql-code-generator": "0.13.0",
     "graphql-codegen-apollo-angular-template": "0.13.0",
