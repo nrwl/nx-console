@@ -801,10 +801,10 @@
     "@types/chai" "*"
     "@types/sinon" "*"
 
-"@types/sinon-chai@2.7.33":
-  version "2.7.33"
-  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-2.7.33.tgz#28899cee7246755cdb3a4371af9f5b7e9774edd0"
-  integrity sha512-NiLSxS6KXOO4jwUhgF9aaXFAn7MsVTEgA0oj0xE/m/eZaHZC6hgrCrW6VeWfDYjRt6XfQxwS4DY4R6oI5MukmQ==
+"@types/sinon-chai@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-3.2.0.tgz#58abf70d8d002d2292ce656425431d873f2c77bc"
+  integrity sha512-VpsC3L8/ynicaLJB/aVvLCFn+c2tjo5jJ5MGiy7keoN431LSAKv9xhLO9dhx9vSVJHG8cjfshdqU4+W8Occf7w==
   dependencies:
     "@types/chai" "*"
     "@types/sinon" "*"
