@@ -450,19 +450,19 @@
     tree-kill "1.2.0"
     webpack-sources "1.2.0"
 
-"@nrwl/angular-console-enterprise-electron@0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.0.16.tgz#f70f62ec27704fb6f46b847d8cc9b5ba63bd9b0c"
-  integrity sha512-jJ+9mkVayOMu85M7DL9EM16lsunvL1bgCsqEndyyyZWjIaVdMdHQp/WAGRj/PvT/oqfgvrAZHB2awsXXp2Gy+g==
+"@nrwl/angular-console-enterprise-electron@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.0.17.tgz#0920b8d3bf8ce57fb01030fe1b6e4147aa6393f6"
+  integrity sha512-ncx6zXSSEAF7qEO3esj9N21+1fF2AgY60GDWx22GLfPLjvvUQemw1QuEX/zvUdOaQvCeFa563vSchMr20uiMxg==
   dependencies:
     jszip "3.1.5"
     request "2.88.0"
     tslib "^1.9.0"
 
-"@nrwl/angular-console-enterprise-frontend@0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-frontend/-/angular-console-enterprise-frontend-0.0.16.tgz#0441225e4ca85c95abf214a58b9a4e83b2f218d6"
-  integrity sha512-4U/ewHSteAfVSLeBtWx+wAUoT4EK1Z1MFXzB0Arlu1UGX2pAcIucju4zvZkCOzuPp9gtrtiKLUzOpbR1xoDlOw==
+"@nrwl/angular-console-enterprise-frontend@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-frontend/-/angular-console-enterprise-frontend-0.0.17.tgz#20f57fa8402c4c83d3c2fa17fb13f1db9cf492bc"
+  integrity sha512-QtvwMPtO/YWBcK8WovIHcQLqjhcqHc3t2+/Alp9UVGH5KXcB9HNw/MyOf3J1Q5IlhlkIvGHQkQrYRrsZDU+POg==
   dependencies:
     trix "^1.0.0"
     tslib "^1.9.0"

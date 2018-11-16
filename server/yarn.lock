@@ -74,10 +74,10 @@
     core-js "^2.5.7"
     regenerator-runtime "^0.12.0"
 
-"@nrwl/angular-console-enterprise-electron@0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.0.16.tgz#f70f62ec27704fb6f46b847d8cc9b5ba63bd9b0c"
-  integrity sha512-jJ+9mkVayOMu85M7DL9EM16lsunvL1bgCsqEndyyyZWjIaVdMdHQp/WAGRj/PvT/oqfgvrAZHB2awsXXp2Gy+g==
+"@nrwl/angular-console-enterprise-electron@0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.0.17.tgz#0920b8d3bf8ce57fb01030fe1b6e4147aa6393f6"
+  integrity sha512-ncx6zXSSEAF7qEO3esj9N21+1fF2AgY60GDWx22GLfPLjvvUQemw1QuEX/zvUdOaQvCeFa563vSchMr20uiMxg==
   dependencies:
     jszip "3.1.5"
     request "2.88.0"
