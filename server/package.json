@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@angular/cli": "7.0.6",
-    "@nrwl/angular-console-enterprise-electron": "0.0.16",
+    "@nrwl/angular-console-enterprise-electron": "0.0.17",
     "@nrwl/schematics": "7.0.2",
     "@types/tmp": "0.0.33",
     "apollo-server-express": "2.2.2",
