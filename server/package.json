@@ -17,7 +17,7 @@
     "dotenv": "6.1.0",
     "drivelist": "6.4.3",
     "electron-store": "2.0.0",
-    "electron-updater": "3.2.3",
+    "electron-updater": "4.0.4",
     "express": "4.16.4",
     "express-graphql": "0.7.1",
     "fix-path": "2.1.0",
