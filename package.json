@@ -156,7 +156,7 @@
     "tslib": "1.9.3",
     "tslint": "5.11.0",
     "typescript": "3.1.6",
-    "universal-analytics": "0.4.17",
+    "universal-analytics": "0.4.20",
     "uuid": "3.3.2",
     "xterm": "3.8.0",
     "zone.js": "0.8.26",

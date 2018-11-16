@@ -28,7 +28,7 @@
     "request": "2.88.0",
     "resolve": "1.8.1",
     "strip-json-comments": "2.0.1",
-    "universal-analytics": "0.4.17",
+    "universal-analytics": "0.4.20",
     "uuid": "3.3.2"
   },
   "devDependencies": {
