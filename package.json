@@ -116,7 +116,7 @@
     "drivelist": "6.4.3",
     "electron": "2.0.13",
     "electron-builder": "20.36.2",
-    "electron-installer-dmg": "1.0.0",
+    "electron-installer-dmg": "2.0.0",
     "electron-packager": "12.2.0",
     "electron-store": "2.0.0",
     "electron-updater": "3.2.3",

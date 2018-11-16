@@ -1527,12 +1527,13 @@ app-root-path@^2.0.1, app-root-path@^2.1.0:
   resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.1.0.tgz#98bf6599327ecea199309866e8140368fd2e646a"
   integrity sha1-mL9lmTJ+zqGZMJhm6BQDaP0uZGo=
 
-appdmg@^0.4.5:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/appdmg/-/appdmg-0.4.5.tgz#47a827865b8a0be48abb3522567e3493d2f1b838"
-  integrity sha1-R6gnhluKC+SKuzUiVn40k9LxuDg=
+appdmg@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/appdmg/-/appdmg-0.5.2.tgz#85732299b508f040473fa43ab6f6bce8b7eadc98"
+  integrity sha512-i9ajRl1SscJgH63TmDpm/KLSCom7jCs2a2riT0onDFLNNO/h/lYmJHa2k3Ywn8jxhiv7jyhYR+Hofk+EiKXtPg==
   dependencies:
     async "^1.4.2"
+    buffer-alloc "^1.1.0"
     cp-file "^3.1.0"
     ds-store "^0.1.5"
     execa "^0.4.0"
@@ -2385,7 +2386,7 @@ buffer-alloc-unsafe@^1.1.0:
   resolved "https://registry.yarnpkg.com/buffer-alloc-unsafe/-/buffer-alloc-unsafe-1.1.0.tgz#bd7dc26ae2972d0eda253be061dba992349c19f0"
   integrity sha512-TEM2iMIEQdJ2yjPJoSIsldnleVaAk1oW3DBVUykyOLsEsFmEc9kn+SFFPz+gl54KQNxlDnAwCXosOS9Okx2xAg==
 
-buffer-alloc@^1.2.0:
+buffer-alloc@^1.1.0, buffer-alloc@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/buffer-alloc/-/buffer-alloc-1.2.0.tgz#890dd90d923a873e08e10e5fd51a57e5b7cce0ec"
   integrity sha512-CFsHQgjtW1UChdXgbyJGtnm+O/uLQeZdtbDo8mfUgYXCHSM1wgrVxXm6bSyrUuErEb+4sYVGCzASBRot7zyrow==
@@ -4079,15 +4080,16 @@ electron-download@^4.1.1:
     semver "^5.4.1"
     sumchecker "^2.0.2"
 
-electron-installer-dmg@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/electron-installer-dmg/-/electron-installer-dmg-1.0.0.tgz#ee587449dfbdad0ba2695572bb50b6385bfdc07e"
-  integrity sha512-mqcrDB1XHMtQpWp1kMBIAeLP445vMQube1cWzMjJrHyf6YHvnswY7GKRzWOmqyAhCEXBOgoK1yuUS0uljC66Jw==
+electron-installer-dmg@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/electron-installer-dmg/-/electron-installer-dmg-2.0.0.tgz#a38916476261e0b3a3bc318d5dcc8a80e634dedf"
+  integrity sha512-0i8VUwv5lax4wpeVfm//Iu438ScRf4YNZdn9kah17nFViqH0Vtoc2vy+iifYv0F3rBqBowR01MMJN2vwQ+eWxQ==
   dependencies:
-    debug "^2.2.0"
+    debug "^3.1.0"
+    fs-extra "^6.0.1"
     minimist "^1.1.1"
   optionalDependencies:
-    appdmg "^0.4.5"
+    appdmg "^0.5.2"
 
 electron-is-dev@^0.3.0:
   version "0.3.0"
@@ -5138,6 +5140,15 @@ fs-extra@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-5.0.0.tgz#414d0110cdd06705734d055652c5411260c31abd"
   integrity sha512-66Pm4RYbjzdyeuqudYqhFiNBbCIuI9kgRqLPSHIlXHidW8NIQtVdkM1yeZ4lXwuhbTETv3EUGMNHAAw6hiundQ==
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
+
+fs-extra@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-6.0.1.tgz#8abc128f7946e310135ddc93b98bddb410e7a34b"
+  integrity sha512-GnyIkKhhzXZUWFCaJzvyDLEEgDkPfb4/TPvJCJVuS8MWZgoSsErf++QpiAlDnKFcqhRlm+tIOcencCjyJE6ZCA==
   dependencies:
     graceful-fs "^4.1.2"
     jsonfile "^4.0.0"
