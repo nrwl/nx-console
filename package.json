@@ -96,7 +96,7 @@
     "@nrwl/schematics": "7.0.2",
     "@types/express": "4.16.0",
     "@types/graphql": "0.13.4",
-    "@types/jasmine": "2.8.11",
+    "@types/jasmine": "3.0.0",
     "@types/jasminewd2": "2.0.6",
     "@types/node": "8.10.38",
     "@types/sinon": "5.0.5",
