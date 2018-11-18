@@ -99,7 +99,7 @@
     "@types/jasmine": "2.8.11",
     "@types/jasminewd2": "2.0.6",
     "@types/node": "8.10.38",
-    "@types/sinon": "5.0.5",
+    "@types/sinon": "5.0.6",
     "@types/sinon-chai": "3.2.0",
     "@types/universal-analytics": "0.4.2",
     "angular-playground": "5.2.0",
