@@ -8,6 +8,7 @@ import { autoUpdater } from 'electron-updater';
 import { telemetry } from './telemetry';
 
 import { ipcMain } from 'electron';
+import { readSettings, storeSettings } from './api/read-settings';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');
@@ -203,6 +204,7 @@ function showRestartDialog() {
 
 function checkForUpdates() {
   setTimeout(async () => {
+    autoUpdater.channel = getUpdateChannel();
     if (process.env.NODE_ENV !== 'development') {
       try {
         const r = await autoUpdater.checkForUpdates();
@@ -223,6 +225,20 @@ function checkForUpdates() {
       }
     }
   }, 0);
+}
+
+function getUpdateChannel() {
+  const settings = readSettings();
+  const token = store.get('access_token');
+  if (settings.channel === undefined) {
+    const channel = token ? 'beta' : 'latest';
+    storeSettings({ ...settings, channel });
+    return channel;
+  } else if (token && settings.channel === 'latest') {
+    return 'beta';
+  } else {
+    return settings.channel;
+  }
 }
 
 function startSession() {

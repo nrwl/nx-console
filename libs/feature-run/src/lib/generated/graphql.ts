@@ -1,10 +1,26 @@
 /* tslint:disable */
 
+// ====================================================
+// START: Typescript template
+// ====================================================
+
+// ====================================================
+// Enums
+// ====================================================
+
 export enum FileType {
   file = 'file',
   directory = 'directory',
   angularDirectory = 'angularDirectory'
 }
+
+// ====================================================
+// END: Typescript template
+// ====================================================
+
+// ====================================================
+// Documents
+// ====================================================
 
 export namespace NpmRun {
   export type Variables = {
@@ -15,11 +31,13 @@ export namespace NpmRun {
 
   export type Mutation = {
     __typename?: 'Mutation';
+
     runNpm?: RunNpm | null;
   };
 
   export type RunNpm = {
     __typename?: 'CommandStarted';
+
     id: string;
   };
 }
@@ -32,29 +50,41 @@ export namespace NpmScripts {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     npmScripts?: (NpmScripts | null)[] | null;
   };
 
   export type NpmScripts = {
     __typename?: 'NpmScript';
+
     name: string;
+
     npmClient: string;
+
     schema?: (Schema | null)[] | null;
   };
 
   export type Schema = {
     __typename?: 'ArchitectSchema';
+
     name: string;
+
     enum?: (string | null)[] | null;
+
     type: string;
+
     description?: string | null;
+
     defaultValue?: string | null;
+
     required: boolean;
+
     positional: boolean;
   };
 }
@@ -68,43 +98,61 @@ export namespace Projects {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     projects?: (Projects | null)[] | null;
   };
 
   export type Projects = {
     __typename?: 'Project';
+
     name: string;
+
     root: string;
+
     projectType: string;
+
     architect?: (Architect | null)[] | null;
   };
 
   export type Architect = {
     __typename?: 'Architect';
+
     name: string;
+
     builder: string;
+
     configurations?: (Configurations | null)[] | null;
+
     schema?: (Schema | null)[] | null;
   };
 
   export type Configurations = {
     __typename?: 'ArchitectConfigurations';
+
     name: string;
   };
 
   export type Schema = {
     __typename?: 'ArchitectSchema';
+
     name: string;
+
     enum?: (string | null)[] | null;
+
     type: string;
+
     description?: string | null;
+
     defaultValue?: string | null;
+
     required: boolean;
+
     positional: boolean;
   };
 }
@@ -117,11 +165,13 @@ export namespace RunNg {
 
   export type Mutation = {
     __typename?: 'Mutation';
+
     runNg?: RunNg | null;
   };
 
   export type RunNg = {
     __typename?: 'CommandStarted';
+
     id: string;
   };
 }
@@ -135,23 +185,29 @@ export namespace SchematicDocs {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     docs: Docs;
   };
 
   export type Docs = {
     __typename?: 'Docs';
+
     schematicDocs: SchematicDocs[];
   };
 
   export type SchematicDocs = {
     __typename?: 'Doc';
+
     id: string;
+
     description?: string | null;
+
     prop?: string | null;
   };
 }
@@ -163,40 +219,58 @@ export namespace WorkspaceAndProjects {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     npmScripts?: (NpmScripts | null)[] | null;
+
     projects?: (Projects | null)[] | null;
   };
 
   export type NpmScripts = {
     __typename?: 'NpmScript';
+
     name: string;
   };
 
   export type Projects = {
     __typename?: 'Project';
+
     name: string;
+
     root: string;
+
     projectType: string;
+
     architect?: (Architect | null)[] | null;
   };
 
   export type Architect = {
     __typename?: 'Architect';
+
     name: string;
+
     project: string;
   };
 }
+
+// ====================================================
+// START: Apollo Angular template
+// ====================================================
 
 import { Injectable } from '@angular/core';
 
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
+
+// ====================================================
+// Apollo Services
+// ====================================================
 
 @Injectable({
   providedIn: 'root'
@@ -342,3 +416,7 @@ export class WorkspaceAndProjectsGQL extends Apollo.Query<
     }
   `;
 }
+
+// ====================================================
+// END: Apollo Angular template
+// ====================================================

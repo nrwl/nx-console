@@ -3,6 +3,7 @@ query Settings {
     canCollectData
     installNodeManually
     enableDetailedStatus
+    channel
     recent {
       path
       name
