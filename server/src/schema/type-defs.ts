@@ -1,11 +1,6 @@
 import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
-  schema {
-    query: Database
-    mutation: Mutation
-  }
-
   type Architect {
     name: String!
     project: String!
@@ -227,6 +222,7 @@ export const typeDefs = gql`
     showSupportPlugin: Boolean
     installNodeManually: Boolean
     enableDetailedStatus: Boolean
+    channel: String
     recent: [WorkspaceDefinition]
   }
 
@@ -255,5 +251,10 @@ export const typeDefs = gql`
     prop: String
     description: String
     id: String!
+  }
+
+  schema {
+    query: Database
+    mutation: Mutation
   }
 `;

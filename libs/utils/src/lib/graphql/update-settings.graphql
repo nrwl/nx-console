@@ -3,6 +3,7 @@ mutation UpdateSettings($data: String!) {
     canCollectData
     installNodeManually
     enableDetailedStatus
+    channel
     recent {
       path
       name

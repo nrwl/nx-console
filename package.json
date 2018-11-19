@@ -29,6 +29,7 @@
       }
     ],
     "removePackageScripts": false,
+    "generateUpdatesFilesForAllChannels": true,
     "directories": {
       "app": "dist/server",
       "buildResources": "dist/server/assets/icons/build",

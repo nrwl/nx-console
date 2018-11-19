@@ -34,4 +34,12 @@ export class SettingsComponent implements OnInit {
   toggleDetailedStatus(x: boolean) {
     this.settingsService.setEnableDetailedStatus(x);
   }
+
+  setChannel(channel: 'latest' | 'beta' | 'alpha') {
+    this.settingsService.setChannel(channel);
+  }
+
+  getChannel() {
+    return this.settingsService.getChannel();
+  }
 }
