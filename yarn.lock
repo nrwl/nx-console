@@ -4053,10 +4053,10 @@ electron-updater@4.0.4:
     semver "^5.6.0"
     source-map-support "^0.5.9"
 
-electron@2.0.13:
-  version "2.0.13"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.13.tgz#db3949cf4d9d4569be0cec010624746793a406c9"
-  integrity sha512-8ouYaLsp0F4sPI7QKgJkkJhrwj1JPSnBwbz6HHA9l6u7WofEt94lV+gHw71KJrDl7UaIkFwlSjyhIjG8lIZqxw==
+electron@2.0.14:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.14.tgz#fad6766645e7c0cd10b4ae822d3167959735a870"
+  integrity sha512-8HLVZuscZxVhoMUL6RlF5kMcwGUAMWw5HNwrEmRgzZyBIBbdCO4aMo9z0qknnPTUDROz8xXZFNhFvBXDu61g5Q==
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"

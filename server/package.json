@@ -32,6 +32,6 @@
     "uuid": "3.3.2"
   },
   "devDependencies": {
-    "electron": "2.0.13"
+    "electron": "2.0.14"
   }
 }
