@@ -467,15 +467,15 @@
     trix "^1.0.0"
     tslib "^1.9.0"
 
-"@nrwl/nx@7.0.2":
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/nx/-/nx-7.0.2.tgz#06b05dc14a6c5e42b2466f71384d345b769fa9b4"
-  integrity sha512-S7PC3Ldqx/8Yqs72ITKczJgFSs8P6EKcbUJ0csZrGiwd+A5e/T8+Vta4BJ2fjhiSqGnUq39MrCV9kanQgqMDrw==
+"@nrwl/nx@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@nrwl/nx/-/nx-7.1.0.tgz#daecc32e293906aab6faf47e700425d81a4e326d"
+  integrity sha512-u8OkLBwgKwxnInWIqNEkIkLAZVx+JBMIkxV9ffWcBRhLC3tOUWbIRFbYcMS+UWkMGgR8OKgS3Q2fKgyxPUMLoA==
 
-"@nrwl/schematics@7.0.2":
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/@nrwl/schematics/-/schematics-7.0.2.tgz#1e873f30ea1dde27ad3e8c0162dd46abe36e23ef"
-  integrity sha512-kPoNd8fh812DE2cJTGh/7lIcLa7oh8s3sX8ZWTQvKN+SlG6DvA1dpvx+7QMTyam1kFuFl6inlHmA9jVtv6j5pw==
+"@nrwl/schematics@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@nrwl/schematics/-/schematics-7.1.0.tgz#6777445b93db6ea1a85c34634f237f536fba057f"
+  integrity sha512-6cv+0vwtpgyptTF7BTYoOVJvAbZgkpd/Di/VGjV3/Ex/lCPJG4vftGke9PkyRwPJ4dGc92qmth2d65y7oBvrjA==
   dependencies:
     "@types/yargs" "^11.0.0"
     app-root-path "^2.0.1"
