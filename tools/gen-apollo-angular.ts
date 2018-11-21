@@ -17,7 +17,7 @@ function generateLib(lib: string) {
   return {
     output: resolve(__dirname, `../libs/${lib}/src/lib/generated/graphql.ts`),
     config: {
-      documents: `libs/${lib}/src/lib/graphql/**/*.graphql`,
+      documents: `./libs/${lib}/src/lib/graphql/**/*.graphql`,
       plugins: [
         'typescript-common',
         'typescript-client',
@@ -25,25 +25,6 @@ function generateLib(lib: string) {
       ]
     }
   };
-  // require: ['ts-node/register/transpile-only'],
-  // schema: resolve(__dirname, '../server/src/schema/schema.ts'),
-  // skipSchema: true,
-  // template: 'graphql-codegen-apollo-angular-template',
-  // out: resolve(__dirname, `../libs/${lib}/src/lib/generated/graphql.ts`),
-  // overwrite: true,
-  // args: [`libs/${lib}/src/lib/graphql/**/*.graphql`]
-  // return generate(
-  //   {
-  //     require: ['ts-node/register/transpile-only'],
-  //     schema: resolve(__dirname, '../server/src/schema/schema.ts'),
-  //     skipSchema: true,
-  //     template: 'graphql-codegen-apollo-angular-template',
-  //     out: resolve(__dirname, `../libs/${lib}/src/lib/generated/graphql.ts`),
-  //     overwrite: true,
-  //     args: [`libs/${lib}/src/lib/graphql/**/*.graphql`]
-  //   },
-  //   true
-  // );
 }
 
 async function run() {
@@ -52,7 +33,7 @@ async function run() {
   try {
     const config: Types.Config = {
       require: ['ts-node/register/transpile-only'],
-      schema: resolve(__dirname, '../server/src/schema/schema.ts'),
+      schema: resolve(__dirname, '../server/src/schema/schema.graphql'),
       overwrite: true,
       generates: {}
     };
@@ -70,4 +51,5 @@ async function run() {
     process.exit(1);
   }
 }
+
 run();

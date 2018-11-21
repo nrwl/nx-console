@@ -1,10 +1,12 @@
-/* tslint:disable */
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
+
+// ====================================================
+// Documents
+// ====================================================
 
 export namespace NgAdd {
   export type Variables = {
@@ -14,11 +16,13 @@ export namespace NgAdd {
 
   export type Mutation = {
     __typename?: 'Mutation';
-    ngAdd?: NgAdd | null;
+
+    ngAdd: NgAdd | null;
   };
 
   export type NgAdd = {
     __typename?: 'CommandStarted';
+
     id: string;
   };
 }
@@ -31,25 +35,32 @@ export namespace WorkspaceAndExtensionsByName {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
-    availableExtensions?: (AvailableExtensions | null)[] | null;
+
+    availableExtensions: (AvailableExtensions | null)[] | null;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
-    extensions?: (Extensions | null)[] | null;
+
+    extensions: (Extensions | null)[] | null;
   };
 
   export type Extensions = {
     __typename?: 'Extension';
+
     name: string;
   };
 
   export type AvailableExtensions = {
     __typename?: 'Extension';
+
     name: string;
-    description?: string | null;
-    detailedDescription?: string | null;
+
+    description: string | null;
+
+    detailedDescription: string | null;
   };
 }
 
@@ -60,32 +71,45 @@ export namespace WorkspaceAndExtensions {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
-    availableExtensions?: (AvailableExtensions | null)[] | null;
+
+    availableExtensions: (AvailableExtensions | null)[] | null;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
-    extensions?: (Extensions | null)[] | null;
+
+    extensions: (Extensions | null)[] | null;
   };
 
   export type Extensions = {
     __typename?: 'Extension';
+
     name: string;
   };
 
   export type AvailableExtensions = {
     __typename?: 'Extension';
+
     name: string;
-    description?: string | null;
+
+    description: string | null;
   };
 }
 
-import { Injectable } from '@angular/core';
+// ====================================================
+// START: Apollo Angular template
+// ====================================================
 
+import { Injectable } from '@angular/core';
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
+
+// ====================================================
+// Apollo Services
+// ====================================================
 
 @Injectable({
   providedIn: 'root'
@@ -142,3 +166,7 @@ export class WorkspaceAndExtensionsGQL extends Apollo.Query<
     }
   `;
 }
+
+// ====================================================
+// END: Apollo Angular template
+// ====================================================

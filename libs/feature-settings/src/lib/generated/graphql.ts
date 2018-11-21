@@ -1,13 +1,5 @@
-/* tslint:disable */
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
-
-import { Injectable } from '@angular/core';
-
-import * as Apollo from 'apollo-angular';
-
-import gql from 'graphql-tag';

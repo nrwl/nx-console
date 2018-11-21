@@ -1,10 +1,12 @@
-/* tslint:disable */
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
+
+// ====================================================
+// Documents
+// ====================================================
 
 export namespace BasicWorkspace {
   export type Variables = {
@@ -13,12 +15,15 @@ export namespace BasicWorkspace {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     path: string;
+
     name: string;
   };
 }
@@ -32,13 +37,16 @@ export namespace GetDirectoryPath {
 
   export type Mutation = {
     __typename?: 'Mutation';
-    selectDirectory?: SelectDirectory | null;
+
+    selectDirectory: SelectDirectory | null;
   };
 
   export type SelectDirectory = {
     __typename?: 'SelectDirectoryResult';
-    selectedDirectoryPath?: string | null;
-    error?: string | null;
+
+    selectedDirectoryPath: string | null;
+
+    error: string | null;
   };
 }
 
@@ -51,11 +59,13 @@ export namespace NgNew {
 
   export type Mutation = {
     __typename?: 'Mutation';
-    ngNew?: NgNew | null;
+
+    ngNew: NgNew | null;
   };
 
   export type NgNew = {
     __typename?: 'CommandStarted';
+
     id: string;
   };
 }
@@ -67,11 +77,13 @@ export namespace OpenWorkspace {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     name: string;
   };
 }
@@ -81,12 +93,15 @@ export namespace SchematicCollections {
 
   export type Query = {
     __typename?: 'Query';
-    schematicCollections?: (SchematicCollections | null)[] | null;
+
+    schematicCollections: (SchematicCollections | null)[] | null;
   };
 
   export type SchematicCollections = {
     __typename?: 'SchematicCollectionForNgNew';
+
     name: string;
+
     description: string;
   };
 }
@@ -98,24 +113,30 @@ export namespace WorkspaceDocs {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     docs: Docs;
   };
 
   export type Docs = {
     __typename?: 'Docs';
+
     workspaceDocs: WorkspaceDocs[];
   };
 
   export type WorkspaceDocs = {
     __typename?: 'Doc';
+
     id: string;
-    description?: string | null;
-    prop?: string | null;
+
+    description: string | null;
+
+    prop: string | null;
   };
 }
 
@@ -126,42 +147,61 @@ export namespace Workspace {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     name: string;
+
     path: string;
-    dependencies?: (Dependencies | null)[] | null;
-    projects?: (Projects | null)[] | null;
+
+    dependencies: (Dependencies | null)[] | null;
+
+    projects: (Projects | null)[] | null;
   };
 
   export type Dependencies = {
     __typename?: 'Dependencies';
+
     name: string;
+
     version: string;
   };
 
   export type Projects = {
     __typename?: 'Project';
+
     name: string;
+
     root: string;
+
     projectType: string;
-    architect?: (Architect | null)[] | null;
+
+    architect: (Architect | null)[] | null;
   };
 
   export type Architect = {
     __typename?: 'Architect';
+
     name: string;
   };
 }
 
-import { Injectable } from '@angular/core';
+// ====================================================
+// START: Apollo Angular template
+// ====================================================
 
+import { Injectable } from '@angular/core';
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
+
+// ====================================================
+// Apollo Services
+// ====================================================
 
 @Injectable({
   providedIn: 'root'
@@ -295,3 +335,7 @@ export class WorkspaceGQL extends Apollo.Query<
     }
   `;
 }
+
+// ====================================================
+// END: Apollo Angular template
+// ====================================================

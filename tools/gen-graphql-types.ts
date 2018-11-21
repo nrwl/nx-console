@@ -1,7 +1,7 @@
 import { generate } from 'graphql-code-generator';
 import { resolve } from 'path';
 
-const schema = resolve(__dirname, '../server/src/schema/schema.ts');
+const schema = resolve(__dirname, '../server/src/schema/schema.graphql');
 const output = resolve(__dirname, '../server/src/graphql-types.ts');
 
 generate(
@@ -13,9 +13,10 @@ generate(
       [output]: {
         plugins: [
           'typescript-common',
-          'typescript-server'
+          'typescript-server',
+          'typescript-resolvers'
         ]
-      },
+      }
     }
   },
   true
@@ -24,6 +25,6 @@ generate(
     process.exit(0);
   })
   .catch(e => {
-    console.log(e);
+    console.error(e.details || e);
     process.exit(1);
   });

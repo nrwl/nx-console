@@ -1,10 +1,12 @@
-/* tslint:disable */
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
+
+// ====================================================
+// Documents
+// ====================================================
 
 export namespace Generate {
   export type Variables = {
@@ -15,11 +17,13 @@ export namespace Generate {
 
   export type Mutation = {
     __typename?: 'Mutation';
-    generate?: Generate | null;
+
+    generate: Generate | null;
   };
 
   export type Generate = {
     __typename?: 'CommandStarted';
+
     id: string;
   };
 }
@@ -33,35 +37,49 @@ export namespace SchematicCollectionsByName {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
-    schematicCollections?: (SchematicCollections | null)[] | null;
+
+    schematicCollections: (SchematicCollections | null)[] | null;
   };
 
   export type SchematicCollections = {
     __typename?: 'SchematicCollection';
-    schematics?: (Schematics | null)[] | null;
+
+    schematics: (Schematics | null)[] | null;
   };
 
   export type Schematics = {
     __typename?: 'Schematic';
+
     collection: string;
+
     name: string;
-    description?: string | null;
-    schema?: (Schema | null)[] | null;
+
+    description: string | null;
+
+    schema: (Schema | null)[] | null;
   };
 
   export type Schema = {
     __typename?: 'SchematicSchema';
+
     name: string;
-    enum?: (string | null)[] | null;
+
+    enum: (string | null)[] | null;
+
     type: string;
-    description?: string | null;
-    defaultValue?: string | null;
+
+    description: string | null;
+
+    defaultValue: string | null;
+
     required: boolean;
+
     positional: boolean;
   };
 }
@@ -75,24 +93,30 @@ export namespace SchematicDocs {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
+
     docs: Docs;
   };
 
   export type Docs = {
     __typename?: 'Docs';
+
     schematicDocs: SchematicDocs[];
   };
 
   export type SchematicDocs = {
     __typename?: 'Doc';
+
     id: string;
-    description?: string | null;
-    prop?: string | null;
+
+    description: string | null;
+
+    prop: string | null;
   };
 }
 
@@ -103,33 +127,47 @@ export namespace SchematicCollections {
 
   export type Query = {
     __typename?: 'Query';
+
     workspace: Workspace;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
-    schematicCollections?: (SchematicCollections | null)[] | null;
+
+    schematicCollections: (SchematicCollections | null)[] | null;
   };
 
   export type SchematicCollections = {
     __typename?: 'SchematicCollection';
+
     name: string;
-    schematics?: (Schematics | null)[] | null;
+
+    schematics: (Schematics | null)[] | null;
   };
 
   export type Schematics = {
     __typename?: 'Schematic';
+
     name: string;
-    description?: string | null;
+
+    description: string | null;
+
     collection: string;
   };
 }
 
-import { Injectable } from '@angular/core';
+// ====================================================
+// START: Apollo Angular template
+// ====================================================
 
+import { Injectable } from '@angular/core';
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
+
+// ====================================================
+// Apollo Services
+// ====================================================
 
 @Injectable({
   providedIn: 'root'
@@ -231,3 +269,7 @@ export class SchematicCollectionsGQL extends Apollo.Query<
     }
   `;
 }
+
+// ====================================================
+// END: Apollo Angular template
+// ====================================================
