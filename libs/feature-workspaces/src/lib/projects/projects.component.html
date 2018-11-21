@@ -29,3 +29,19 @@
     </ng-container>
   </mat-list>
 </div>
+
+<ng-template #empty>
+  <ui-dialog>
+      <img src="assets/code-icon.svg" height="180px">
+      <div class="headline">Empty Project!</div>
+      <div class="sub-headline">
+        Your project is empty. Create a new Angular application.
+      </div>
+      <button mat-raised-button color="primary" routerLink="../generate">
+        <div fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon>code</mat-icon>
+            <div>Create a new application</div>
+        </div>
+      </button>
+  </ui-dialog>
+</ng-template>

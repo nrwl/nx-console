@@ -5,5 +5,6 @@ export * from './lib/contextual-action-bar/contextual-action-bar.component';
 export * from './lib/task-runner/task-runner.component';
 export * from './lib/command-output/command-output.component';
 export * from './lib/flags/flags.component';
+export * from './lib/ui-dialog/ui-dialog.component';
 export * from './lib/animations/fade-in';
 export * from './lib/animations/grow-shink';
