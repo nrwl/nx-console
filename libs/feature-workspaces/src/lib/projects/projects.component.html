@@ -32,16 +32,16 @@
 
 <ng-template #empty>
   <ui-dialog>
-      <img src="assets/code-icon.svg" height="180px">
-      <div class="headline">Your workspace is empty!</div>
-      <div class="sub-headline">
-        Your workspace seems to be empty. Let's create a new Angular application.
+    <img src="assets/code-icon.svg" height="180px" />
+    <div class="headline">Your workspace is empty!</div>
+    <div class="sub-headline">
+      Your workspace seems to be empty. Let's create a new Angular application.
+    </div>
+    <button mat-raised-button color="primary" routerLink="../generate">
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon>code</mat-icon>
+        <div>Create a new application</div>
       </div>
-      <button mat-raised-button color="primary" routerLink="../generate">
-        <div fxLayout="row" fxLayoutAlign="center center">
-            <mat-icon>code</mat-icon>
-            <div>Create a new application</div>
-        </div>
-      </button>
+    </button>
   </ui-dialog>
 </ng-template>

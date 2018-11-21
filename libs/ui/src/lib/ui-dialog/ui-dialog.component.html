@@ -1,14 +1,25 @@
-<div fxFlex class="empty-container" fxFlex fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="48px">
-    <mat-card fxLayout="column">
-        <div class="code-image-container" fxLayout="row" fxLayoutAlign="center center">
-        <ng-content select="img"></ng-content>
-        </div>
-        <mat-card-content fxLayout="column">
-        <ng-content select=".headline"></ng-content>
-        <ng-content select=".sub-headline"></ng-content>
-        <div class="action-container" fxLayout="row" fxLayoutAlign="space-evenly">
-            <ng-content select="button"></ng-content>
-        </div>
-        </mat-card-content>
-    </mat-card>
+<div
+  fxFlex
+  class="empty-container"
+  fxFlex
+  fxLayout="column"
+  fxLayoutAlign="center center"
+  fxLayoutGap="48px"
+>
+  <mat-card fxLayout="column">
+    <div
+      class="code-image-container"
+      fxLayout="row"
+      fxLayoutAlign="center center"
+    >
+      <ng-content select="img"></ng-content>
+    </div>
+    <mat-card-content fxLayout="column">
+      <ng-content select=".headline"></ng-content>
+      <ng-content select=".sub-headline"></ng-content>
+      <div class="action-container" fxLayout="row" fxLayoutAlign="space-evenly">
+        <ng-content select="button"></ng-content>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>
