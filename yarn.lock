@@ -137,14 +137,6 @@
     "@angular-devkit/core" "0.7.5"
     rxjs "^6.0.0"
 
-"@angular-devkit/schematics@0.8.7":
-  version "0.8.7"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-0.8.7.tgz#1fb2af08cc594a4d5493196090950314689004ac"
-  integrity sha512-Xu49OH0tpfqKLMdLy0ghbMwsYVHLlnjsKm8JQKkDah9oYMnj94ZoqESi1xVorYVHHJ1Jbi9Xm3ZY3QGF+x0j7g==
-  dependencies:
-    "@angular-devkit/core" "0.8.7"
-    rxjs "~6.2.0"
-
 "@angular-devkit/schematics@7.0.6":
   version "7.0.6"
   resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-7.0.6.tgz#97fca028bd937e2319d9d34c12b82e8d1d99de23"
