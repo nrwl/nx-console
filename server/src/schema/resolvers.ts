@@ -1,3 +1,4 @@
+// tslint:disable:typedef
 import * as path from 'path';
 import { shell, dialog } from 'electron';
 import * as semver from 'semver';
@@ -39,25 +40,23 @@ import {
   cacheFiles,
   directoryExists,
   exists,
-  fileExistsSync,
   files,
   filterByName,
   findClosestNg,
   findExecutable,
   readJsonFile
 } from '../utils';
-import { CommandInformation } from '../api/commands';
 import { mainWindow } from '..';
 import { docs } from '../api/docs';
 
 const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
-  schematics(collection: any, args: any) {
+  schematics(collection, args) {
     return filterByName(collection.schematics, args);
   }
 };
 
 const Architect: ArchitectResolvers.Resolvers = {
-  schema(a: any, _: any, context: any) {
+  schema(a, _, context) {
     if (!directoryExists(path.join(context.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
     }
@@ -66,13 +65,13 @@ const Architect: ArchitectResolvers.Resolvers = {
 };
 
 const Project: ProjectResolvers.Resolvers = {
-  architect(project: any, args: any) {
+  architect(project, args) {
     return filterByName(project.architect, args);
   }
 };
 
 const NpmScript: NpmScriptResolvers.Resolvers = {
-  schema(a: any, _: any, context: any) {
+  schema(a, _, context) {
     if (!directoryExists(path.join(context.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
     }
@@ -81,43 +80,43 @@ const NpmScript: NpmScriptResolvers.Resolvers = {
 };
 
 const Workspace: WorkspaceResolvers.Resolvers = {
-  schematicCollections(workspace: any, args: any, context: any) {
+  schematicCollections(workspace, args, context) {
     if (!directoryExists(path.join(context.path, 'node_modules'))) {
       throw new Error(`node_modules is not found`);
     }
     return filterByName(readAllSchematicCollections(context.path), args);
   },
-  npmScripts(workspace: any, args: any) {
+  npmScripts(workspace, args) {
     return filterByName(workspace.npmScripts, args);
   },
-  projects(workspace: any, args: any) {
+  projects(workspace, args) {
     return filterByName(workspace.projects, args);
   },
-  completions(workspace: any) {
+  completions(workspace) {
     return workspace;
   },
-  docs(workspace: any) {
+  docs(workspace) {
     return workspace;
   }
 };
 
 const CompletionsTypes: CompletionsTypesResolvers.Resolvers = {
-  files(workspace: any, args: any) {
+  files(workspace, args) {
     return completeFiles(files, workspace, args.input);
   },
-  projects(workspace: any, args: any) {
+  projects(workspace, args) {
     return completeProjects(workspace, args.input);
   },
-  localModules(workspace: any, args: any) {
+  localModules(workspace, args) {
     return completeLocalModules(files, workspace, args.input);
   },
-  absoluteModules(workspace: any, args: any) {
+  absoluteModules(workspace, args) {
     return completeAbsoluteModules(files, workspace, args.input);
   }
 };
 
 const Docs: DocsResolvers.Resolvers = {
-  workspaceDocs(workspace: any, args: any, context: any) {
+  workspaceDocs(workspace, args, context) {
     const deps = {
       ...context.packageJson.dependencies,
       ...context.packageJson.devDependencies
@@ -125,7 +124,7 @@ const Docs: DocsResolvers.Resolvers = {
     return docs.workspaceDocs(deps).toPromise();
   },
 
-  schematicDocs(workspace: any, args: any, context: any) {
+  schematicDocs(workspace, args, context) {
     // TODO: vsavkin read the version from node_modules and provide here instead of null
     return docs.schematicDocs(args.collectionName, null, args.name).toPromise();
   }
@@ -166,7 +165,7 @@ const Database: DatabaseResolvers.Resolvers = {
       );
     }
   },
-  async workspace(_root: any, args: any, context: any) {
+  async workspace(_root, args, context) {
     try {
       if (!files[args.path]) {
         cacheFiles(args.path);
@@ -196,7 +195,7 @@ const Database: DatabaseResolvers.Resolvers = {
   editors() {
     return readEditors();
   },
-  availableExtensions(_: any, args: any) {
+  availableExtensions(_, args) {
     try {
       return filterByName(availableExtensions(), args);
     } catch (e) {
@@ -206,7 +205,7 @@ const Database: DatabaseResolvers.Resolvers = {
       );
     }
   },
-  installNodeJsStatus(_root: any, args: any): InstallNodeJsStatus {
+  installNodeJsStatus(_root): InstallNodeJsStatus {
     try {
       if (readSettings().installNodeManually || exists('node')) {
         return { success: true };
@@ -229,7 +228,7 @@ const Database: DatabaseResolvers.Resolvers = {
       );
     }
   },
-  commands(_root: any, args: any) {
+  commands(_root, args) {
     try {
       const settings = readSettings();
       const includeDetailedStatus = settings.enableDetailedStatus;
@@ -249,7 +248,7 @@ const Database: DatabaseResolvers.Resolvers = {
       throw new Error(`Error when reading commands. Message: "${e.message}"`);
     }
   },
-  async directory(_: any, args: any) {
+  async directory(_, args) {
     try {
       // XXX: any? Because TS throws an error that string doesn't match Enum
       const v: any = await readDirectory(
@@ -273,7 +272,7 @@ const Database: DatabaseResolvers.Resolvers = {
 };
 
 const Mutation: MutationResolvers.Resolvers = {
-  async ngAdd(_root: any, args: any) {
+  async ngAdd(_root, args) {
     try {
       return runCommand('add', args.path, 'ng', findClosestNg(args.path), [
         'add',
@@ -285,7 +284,7 @@ const Mutation: MutationResolvers.Resolvers = {
       throw new Error(`Error when running 'ng add'. Message: "${e.message}"`);
     }
   },
-  async ngNew(_root: any, args: any) {
+  async ngNew(_root, args) {
     try {
       return runCommand('new', args.path, 'ng', findClosestNg(__dirname), [
         'new',
@@ -299,7 +298,7 @@ const Mutation: MutationResolvers.Resolvers = {
       throw new Error(`Error when running 'ng new'. Message: "${e.message}"`);
     }
   },
-  async generate(_root: any, args: any) {
+  async generate(_root, args) {
     try {
       const dryRun = args.dryRun ? ['--dry-run'] : [];
       return runCommand(
@@ -322,7 +321,7 @@ const Mutation: MutationResolvers.Resolvers = {
       );
     }
   },
-  async runNg(_root: any, args: any) {
+  async runNg(_root, args) {
     try {
       return runCommand(
         'ng',
@@ -336,7 +335,7 @@ const Mutation: MutationResolvers.Resolvers = {
       throw new Error(`Error when running 'ng ...'. Message: "${e.message}"`);
     }
   },
-  async runNpm(_root: any, args: any) {
+  async runNpm(_root, args) {
     try {
       return runCommand(
         'npm',
@@ -353,7 +352,7 @@ const Mutation: MutationResolvers.Resolvers = {
   async installNodeJs() {
     return installNodeJs();
   },
-  async stopCommand(_root: any, args: any) {
+  async stopCommand(_root, args) {
     try {
       const c = commands.findMatchingCommand(args.id, commands.recent);
       if (c) {
@@ -367,7 +366,7 @@ const Mutation: MutationResolvers.Resolvers = {
       throw new Error(`Error when stopping commands. Message: "${e.message}"`);
     }
   },
-  async openInBrowser(_root: any, { url }: any) {
+  async openInBrowser(_root, { url }) {
     if (url) {
       shell.openExternal(url);
       return { result: true };
@@ -375,14 +374,14 @@ const Mutation: MutationResolvers.Resolvers = {
       return { result: false };
     }
   },
-  async showItemInFolder(_root: any, { item }: any) {
+  async showItemInFolder(_root, { item }) {
     if (item) {
       return { result: shell.showItemInFolder(item) };
     } else {
       return { result: false };
     }
   },
-  async removeCommand(_root: any, args: any) {
+  async removeCommand(_root, args) {
     try {
       commands.removeCommand(args.id);
       return { result: true };
@@ -391,7 +390,7 @@ const Mutation: MutationResolvers.Resolvers = {
       throw new Error(`Error when removing commands. Message: "${e.message}"`);
     }
   },
-  async removeAllCommands(_root: any, args: any) {
+  async removeAllCommands(_root, args) {
     try {
       commands.removeAllCommands();
       return { result: true };
@@ -400,7 +399,7 @@ const Mutation: MutationResolvers.Resolvers = {
       throw new Error(`Error when removing commands. Message: "${e.message}"`);
     }
   },
-  async restartCommand(_root: any, args: any) {
+  async restartCommand(_root, args) {
     try {
       commands.restartCommand(args.id);
       return { result: true };
@@ -411,7 +410,7 @@ const Mutation: MutationResolvers.Resolvers = {
       );
     }
   },
-  openInEditor(_root: any, args: any) {
+  openInEditor(_root, args) {
     try {
       openInEditor(args.editor, args.path);
       return { response: 'successful' };
@@ -420,7 +419,7 @@ const Mutation: MutationResolvers.Resolvers = {
       throw new Error(`Error when opening an editor. Message: "${e.message}"`);
     }
   },
-  selectDirectory(root: any, args: any) {
+  selectDirectory(root, args) {
     // TODO(jack): This mocked value is needed because e2e tests that bring up the dialog will block entire electron main thread.
     if (process.env.CI === 'true') {
       return {
@@ -438,11 +437,11 @@ const Mutation: MutationResolvers.Resolvers = {
       };
     }
   },
-  updateSettings(_root: any, args: any) {
+  updateSettings(_root, args) {
     storeSettings(JSON.parse(args.data));
     return readSettings();
   },
-  async openDoc(root: any, args: any) {
+  async openDoc(root, args) {
     const result = await docs.openDoc(args.id).toPromise();
     return { result };
   }

@@ -11,6 +11,12 @@ generate(
     overwrite: true,
     generates: {
       [output]: {
+        config: {
+          // a type of GraphQL Context
+          contextType: 'any',
+          // a type of every resolver's parent
+          defaultMapper: 'any'
+        },
         plugins: [
           'typescript-common',
           'typescript-server',

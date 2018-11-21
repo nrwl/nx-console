@@ -477,94 +477,92 @@ export type SubscriptionResolver<
   | ISubscriptionResolverObject<Result, Parent, Context, Args>;
 
 export namespace DatabaseResolvers {
-  export interface Resolvers<Context = {}, TypeParent = {}> {
-    settings?: SettingsResolver<Settings, TypeParent, Context>;
+  export interface Resolvers<Context = any, TypeParent = {}> {
+    settings?: SettingsResolver<any, TypeParent, Context>;
 
     schematicCollections?: SchematicCollectionsResolver<
-      (SchematicCollectionForNgNew | null)[] | null,
+      (any | null)[] | null,
       TypeParent,
       Context
     >;
 
-    workspace?: WorkspaceResolver<Workspace, TypeParent, Context>;
+    workspace?: WorkspaceResolver<any, TypeParent, Context>;
 
-    editors?: EditorsResolver<EditorSupport[], TypeParent, Context>;
+    editors?: EditorsResolver<any[], TypeParent, Context>;
 
     availableExtensions?: AvailableExtensionsResolver<
-      (Extension | null)[] | null,
+      (any | null)[] | null,
       TypeParent,
       Context
     >;
 
     installNodeJsStatus?: InstallNodeJsStatusResolver<
-      InstallNodeJsStatus | null,
+      any | null,
       TypeParent,
       Context
     >;
 
     isNodejsInstalled?: IsNodejsInstalledResolver<
-      IsNodeInstalledResult | null,
+      any | null,
       TypeParent,
       Context
     >;
 
-    directory?: DirectoryResolver<FilesType, TypeParent, Context>;
+    directory?: DirectoryResolver<any, TypeParent, Context>;
 
-    commands?: CommandsResolver<
-      (CommandResponse | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    commands?: CommandsResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
-  export type SettingsResolver<
-    R = Settings,
-    Parent = {},
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type SettingsResolver<R = any, Parent = {}, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type SchematicCollectionsResolver<
-    R = (SchematicCollectionForNgNew | null)[] | null,
+    R = (any | null)[] | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context>;
-  export type WorkspaceResolver<
-    R = Workspace,
-    Parent = {},
-    Context = {}
-  > = Resolver<R, Parent, Context, WorkspaceArgs>;
+  export type WorkspaceResolver<R = any, Parent = {}, Context = any> = Resolver<
+    R,
+    Parent,
+    Context,
+    WorkspaceArgs
+  >;
   export interface WorkspaceArgs {
     path: string;
   }
 
-  export type EditorsResolver<
-    R = EditorSupport[],
-    Parent = {},
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type EditorsResolver<R = any[], Parent = {}, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type AvailableExtensionsResolver<
-    R = (Extension | null)[] | null,
+    R = (any | null)[] | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, AvailableExtensionsArgs>;
   export interface AvailableExtensionsArgs {
     name?: string | null;
   }
 
   export type InstallNodeJsStatusResolver<
-    R = InstallNodeJsStatus | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type IsNodejsInstalledResolver<
-    R = IsNodeInstalledResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context>;
-  export type DirectoryResolver<
-    R = FilesType,
-    Parent = {},
-    Context = {}
-  > = Resolver<R, Parent, Context, DirectoryArgs>;
+  export type DirectoryResolver<R = any, Parent = {}, Context = any> = Resolver<
+    R,
+    Parent,
+    Context,
+    DirectoryArgs
+  >;
   export interface DirectoryArgs {
     path?: string | null;
 
@@ -574,9 +572,9 @@ export namespace DatabaseResolvers {
   }
 
   export type CommandsResolver<
-    R = (CommandResponse | null)[] | null,
+    R = (any | null)[] | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, CommandsArgs>;
   export interface CommandsArgs {
     id?: string | null;
@@ -584,7 +582,7 @@ export namespace DatabaseResolvers {
 }
 
 export namespace SettingsResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Settings> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     canCollectData?: CanCollectDataResolver<boolean, TypeParent, Context>;
 
     showSupportPlugin?: ShowSupportPluginResolver<
@@ -605,42 +603,38 @@ export namespace SettingsResolvers {
       Context
     >;
 
-    recent?: RecentResolver<
-      (WorkspaceDefinition | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    recent?: RecentResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
   export type CanCollectDataResolver<
     R = boolean,
-    Parent = Settings,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type ShowSupportPluginResolver<
     R = boolean | null,
-    Parent = Settings,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type InstallNodeManuallyResolver<
     R = boolean | null,
-    Parent = Settings,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type EnableDetailedStatusResolver<
     R = boolean | null,
-    Parent = Settings,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type RecentResolver<
-    R = (WorkspaceDefinition | null)[] | null,
-    Parent = Settings,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace WorkspaceDefinitionResolvers {
-  export interface Resolvers<Context = {}, TypeParent = WorkspaceDefinition> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     path?: PathResolver<string, TypeParent, Context>;
 
     name?: NameResolver<string, TypeParent, Context>;
@@ -648,166 +642,151 @@ export namespace WorkspaceDefinitionResolvers {
     favorite?: FavoriteResolver<boolean | null, TypeParent, Context>;
   }
 
-  export type PathResolver<
-    R = string,
-    Parent = WorkspaceDefinition,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
-  export type NameResolver<
-    R = string,
-    Parent = WorkspaceDefinition,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type FavoriteResolver<
     R = boolean | null,
-    Parent = WorkspaceDefinition,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace SchematicCollectionForNgNewResolvers {
-  export interface Resolvers<
-    Context = {},
-    TypeParent = SchematicCollectionForNgNew
-  > {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     description?: DescriptionResolver<string, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = SchematicCollectionForNgNew,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DescriptionResolver<
     R = string,
-    Parent = SchematicCollectionForNgNew,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace WorkspaceResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Workspace> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     path?: PathResolver<string, TypeParent, Context>;
 
     dependencies?: DependenciesResolver<
-      (Dependencies | null)[] | null,
+      (any | null)[] | null,
       TypeParent,
       Context
     >;
 
-    extensions?: ExtensionsResolver<
-      (Extension | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    extensions?: ExtensionsResolver<(any | null)[] | null, TypeParent, Context>;
 
     schematicCollections?: SchematicCollectionsResolver<
-      (SchematicCollection | null)[] | null,
+      (any | null)[] | null,
       TypeParent,
       Context
     >;
 
-    npmScripts?: NpmScriptsResolver<
-      (NpmScript | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    npmScripts?: NpmScriptsResolver<(any | null)[] | null, TypeParent, Context>;
 
-    projects?: ProjectsResolver<(Project | null)[] | null, TypeParent, Context>;
+    projects?: ProjectsResolver<(any | null)[] | null, TypeParent, Context>;
 
-    docs?: DocsResolver<Docs, TypeParent, Context>;
+    docs?: DocsResolver<any, TypeParent, Context>;
 
-    completions?: CompletionsResolver<
-      CompletionsTypes | null,
-      TypeParent,
-      Context
-    >;
+    completions?: CompletionsResolver<any | null, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = Workspace,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
-  export type PathResolver<
-    R = string,
-    Parent = Workspace,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DependenciesResolver<
-    R = (Dependencies | null)[] | null,
-    Parent = Workspace,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type ExtensionsResolver<
-    R = (Extension | null)[] | null,
-    Parent = Workspace,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type SchematicCollectionsResolver<
-    R = (SchematicCollection | null)[] | null,
-    Parent = Workspace,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, SchematicCollectionsArgs>;
   export interface SchematicCollectionsArgs {
     name?: string | null;
   }
 
   export type NpmScriptsResolver<
-    R = (NpmScript | null)[] | null,
-    Parent = Workspace,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, NpmScriptsArgs>;
   export interface NpmScriptsArgs {
     name?: string | null;
   }
 
   export type ProjectsResolver<
-    R = (Project | null)[] | null,
-    Parent = Workspace,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, ProjectsArgs>;
   export interface ProjectsArgs {
     name?: string | null;
   }
 
-  export type DocsResolver<
-    R = Docs,
-    Parent = Workspace,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type DocsResolver<R = any, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type CompletionsResolver<
-    R = CompletionsTypes | null,
-    Parent = Workspace,
-    Context = {}
+    R = any | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace DependenciesResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Dependencies> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     version?: VersionResolver<string, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = Dependencies,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type VersionResolver<
     R = string,
-    Parent = Dependencies,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace ExtensionResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Extension> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     description?: DescriptionResolver<string | null, TypeParent, Context>;
@@ -819,43 +798,39 @@ export namespace ExtensionResolvers {
     >;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = Extension,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DescriptionResolver<
     R = string | null,
-    Parent = Extension,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type DetailedDescriptionResolver<
     R = string | null,
-    Parent = Extension,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace SchematicCollectionResolvers {
-  export interface Resolvers<Context = {}, TypeParent = SchematicCollection> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
-    schematics?: SchematicsResolver<
-      (Schematic | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    schematics?: SchematicsResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = SchematicCollection,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type SchematicsResolver<
-    R = (Schematic | null)[] | null,
-    Parent = SchematicCollection,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, SchematicsArgs>;
   export interface SchematicsArgs {
     name?: string | null;
@@ -863,44 +838,40 @@ export namespace SchematicCollectionResolvers {
 }
 
 export namespace SchematicResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Schematic> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     collection?: CollectionResolver<string, TypeParent, Context>;
 
     name?: NameResolver<string, TypeParent, Context>;
 
     description?: DescriptionResolver<string | null, TypeParent, Context>;
 
-    schema?: SchemaResolver<
-      (SchematicSchema | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    schema?: SchemaResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
   export type CollectionResolver<
     R = string,
-    Parent = Schematic,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
-  export type NameResolver<
-    R = string,
-    Parent = Schematic,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DescriptionResolver<
     R = string | null,
-    Parent = Schematic,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type SchemaResolver<
-    R = (SchematicSchema | null)[] | null,
-    Parent = Schematic,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace SchematicSchemaResolvers {
-  export interface Resolvers<Context = {}, TypeParent = SchematicSchema> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     type?: TypeResolver<string, TypeParent, Context>;
@@ -916,75 +887,71 @@ export namespace SchematicSchemaResolvers {
     enum?: EnumResolver<(string | null)[] | null, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = SchematicSchema,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
-  export type TypeResolver<
-    R = string,
-    Parent = SchematicSchema,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type TypeResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DescriptionResolver<
     R = string | null,
-    Parent = SchematicSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type DefaultValueResolver<
     R = string | null,
-    Parent = SchematicSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type RequiredResolver<
     R = boolean,
-    Parent = SchematicSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type PositionalResolver<
     R = boolean,
-    Parent = SchematicSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type EnumResolver<
     R = (string | null)[] | null,
-    Parent = SchematicSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace NpmScriptResolvers {
-  export interface Resolvers<Context = {}, TypeParent = NpmScript> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     npmClient?: NpmClientResolver<string, TypeParent, Context>;
 
-    schema?: SchemaResolver<
-      (ArchitectSchema | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    schema?: SchemaResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = NpmScript,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type NpmClientResolver<
     R = string,
-    Parent = NpmScript,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type SchemaResolver<
-    R = (ArchitectSchema | null)[] | null,
-    Parent = NpmScript,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace ArchitectSchemaResolvers {
-  export interface Resolvers<Context = {}, TypeParent = ArchitectSchema> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     type?: TypeResolver<string, TypeParent, Context>;
@@ -1000,77 +967,73 @@ export namespace ArchitectSchemaResolvers {
     enum?: EnumResolver<(string | null)[] | null, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = ArchitectSchema,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
-  export type TypeResolver<
-    R = string,
-    Parent = ArchitectSchema,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type TypeResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DescriptionResolver<
     R = string | null,
-    Parent = ArchitectSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type DefaultValueResolver<
     R = string | null,
-    Parent = ArchitectSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type RequiredResolver<
     R = boolean,
-    Parent = ArchitectSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type PositionalResolver<
     R = boolean,
-    Parent = ArchitectSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type EnumResolver<
     R = (string | null)[] | null,
-    Parent = ArchitectSchema,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace ProjectResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Project> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     root?: RootResolver<string, TypeParent, Context>;
 
     projectType?: ProjectTypeResolver<string, TypeParent, Context>;
 
-    architect?: ArchitectResolver<
-      (Architect | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    architect?: ArchitectResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = Project,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
-  export type RootResolver<
-    R = string,
-    Parent = Project,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type RootResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type ProjectTypeResolver<
     R = string,
-    Parent = Project,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type ArchitectResolver<
-    R = (Architect | null)[] | null,
-    Parent = Project,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, ArchitectArgs>;
   export interface ArchitectArgs {
     name?: string | null;
@@ -1078,7 +1041,7 @@ export namespace ProjectResolvers {
 }
 
 export namespace ArchitectResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Architect> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     project?: ProjectResolver<string, TypeParent, Context>;
@@ -1086,76 +1049,69 @@ export namespace ArchitectResolvers {
     builder?: BuilderResolver<string, TypeParent, Context>;
 
     configurations?: ConfigurationsResolver<
-      (ArchitectConfigurations | null)[] | null,
+      (any | null)[] | null,
       TypeParent,
       Context
     >;
 
-    schema?: SchemaResolver<
-      (ArchitectSchema | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    schema?: SchemaResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = Architect,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type ProjectResolver<
     R = string,
-    Parent = Architect,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type BuilderResolver<
     R = string,
-    Parent = Architect,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type ConfigurationsResolver<
-    R = (ArchitectConfigurations | null)[] | null,
-    Parent = Architect,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type SchemaResolver<
-    R = (ArchitectSchema | null)[] | null,
-    Parent = Architect,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace ArchitectConfigurationsResolvers {
-  export interface Resolvers<
-    Context = {},
-    TypeParent = ArchitectConfigurations
-  > {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = ArchitectConfigurations,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace DocsResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Docs> {
-    workspaceDocs?: WorkspaceDocsResolver<Doc[], TypeParent, Context>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    workspaceDocs?: WorkspaceDocsResolver<any[], TypeParent, Context>;
 
-    schematicDocs?: SchematicDocsResolver<Doc[], TypeParent, Context>;
+    schematicDocs?: SchematicDocsResolver<any[], TypeParent, Context>;
   }
 
   export type WorkspaceDocsResolver<
-    R = Doc[],
-    Parent = Docs,
-    Context = {}
+    R = any[],
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type SchematicDocsResolver<
-    R = Doc[],
-    Parent = Docs,
-    Context = {}
+    R = any[],
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, SchematicDocsArgs>;
   export interface SchematicDocsArgs {
     collectionName: string;
@@ -1167,7 +1123,7 @@ export namespace DocsResolvers {
 }
 
 export namespace DocResolvers {
-  export interface Resolvers<Context = {}, TypeParent = Doc> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     prop?: PropResolver<string | null, TypeParent, Context>;
 
     description?: DescriptionResolver<string | null, TypeParent, Context>;
@@ -1177,15 +1133,15 @@ export namespace DocResolvers {
 
   export type PropResolver<
     R = string | null,
-    Parent = Doc,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type DescriptionResolver<
     R = string | null,
-    Parent = Doc,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
-  export type IdResolver<R = string, Parent = Doc, Context = {}> = Resolver<
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
     Context
@@ -1193,63 +1149,55 @@ export namespace DocResolvers {
 }
 
 export namespace CompletionsTypesResolvers {
-  export interface Resolvers<Context = {}, TypeParent = CompletionsTypes> {
-    files?: FilesResolver<
-      (CompletionResultType | null)[] | null,
-      TypeParent,
-      Context
-    >;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    files?: FilesResolver<(any | null)[] | null, TypeParent, Context>;
 
-    projects?: ProjectsResolver<
-      (CompletionResultType | null)[] | null,
-      TypeParent,
-      Context
-    >;
+    projects?: ProjectsResolver<(any | null)[] | null, TypeParent, Context>;
 
     localModules?: LocalModulesResolver<
-      (CompletionResultType | null)[] | null,
+      (any | null)[] | null,
       TypeParent,
       Context
     >;
 
     absoluteModules?: AbsoluteModulesResolver<
-      (CompletionResultType | null)[] | null,
+      (any | null)[] | null,
       TypeParent,
       Context
     >;
   }
 
   export type FilesResolver<
-    R = (CompletionResultType | null)[] | null,
-    Parent = CompletionsTypes,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, FilesArgs>;
   export interface FilesArgs {
     input?: string | null;
   }
 
   export type ProjectsResolver<
-    R = (CompletionResultType | null)[] | null,
-    Parent = CompletionsTypes,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, ProjectsArgs>;
   export interface ProjectsArgs {
     input?: string | null;
   }
 
   export type LocalModulesResolver<
-    R = (CompletionResultType | null)[] | null,
-    Parent = CompletionsTypes,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, LocalModulesArgs>;
   export interface LocalModulesArgs {
     input?: string | null;
   }
 
   export type AbsoluteModulesResolver<
-    R = (CompletionResultType | null)[] | null,
-    Parent = CompletionsTypes,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context, AbsoluteModulesArgs>;
   export interface AbsoluteModulesArgs {
     input?: string | null;
@@ -1257,45 +1205,45 @@ export namespace CompletionsTypesResolvers {
 }
 
 export namespace CompletionResultTypeResolvers {
-  export interface Resolvers<Context = {}, TypeParent = CompletionResultType> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     value?: ValueResolver<string, TypeParent, Context>;
 
     display?: DisplayResolver<string | null, TypeParent, Context>;
   }
 
-  export type ValueResolver<
-    R = string,
-    Parent = CompletionResultType,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type ValueResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DisplayResolver<
     R = string | null,
-    Parent = CompletionResultType,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace EditorSupportResolvers {
-  export interface Resolvers<Context = {}, TypeParent = EditorSupport> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     icon?: IconResolver<string, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = EditorSupport,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
-  export type IconResolver<
-    R = string,
-    Parent = EditorSupport,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type IconResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace InstallNodeJsStatusResolvers {
-  export interface Resolvers<Context = {}, TypeParent = InstallNodeJsStatus> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     downloadPercentage?: DownloadPercentageResolver<
       number | null,
       TypeParent,
@@ -1313,90 +1261,90 @@ export namespace InstallNodeJsStatusResolvers {
 
   export type DownloadPercentageResolver<
     R = number | null,
-    Parent = InstallNodeJsStatus,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type DownloadSpeedResolver<
     R = number | null,
-    Parent = InstallNodeJsStatus,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type SuccessResolver<
     R = boolean | null,
-    Parent = InstallNodeJsStatus,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type CancelledResolver<
     R = boolean | null,
-    Parent = InstallNodeJsStatus,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type ErrorResolver<
     R = string | null,
-    Parent = InstallNodeJsStatus,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace IsNodeInstalledResultResolvers {
-  export interface Resolvers<Context = {}, TypeParent = IsNodeInstalledResult> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
-    Parent = IsNodeInstalledResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace FilesTypeResolvers {
-  export interface Resolvers<Context = {}, TypeParent = FilesType> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     path?: PathResolver<string, TypeParent, Context>;
 
     exists?: ExistsResolver<boolean, TypeParent, Context>;
 
-    files?: FilesResolver<(FileListType | null)[] | null, TypeParent, Context>;
+    files?: FilesResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
-  export type PathResolver<
-    R = string,
-    Parent = FilesType,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type ExistsResolver<
     R = boolean,
-    Parent = FilesType,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type FilesResolver<
-    R = (FileListType | null)[] | null,
-    Parent = FilesType,
-    Context = {}
+    R = (any | null)[] | null,
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace FileListTypeResolvers {
-  export interface Resolvers<Context = {}, TypeParent = FileListType> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
 
     type?: TypeResolver<FileType, TypeParent, Context>;
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = FileListType,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type TypeResolver<
     R = FileType,
-    Parent = FileListType,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace CommandResponseResolvers {
-  export interface Resolvers<Context = {}, TypeParent = CommandResponse> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     type?: TypeResolver<string, TypeParent, Context>;
 
     id?: IdResolver<string, TypeParent, Context>;
@@ -1414,119 +1362,95 @@ export namespace CommandResponseResolvers {
     out?: OutResolver<string, TypeParent, Context>;
   }
 
-  export type TypeResolver<
-    R = string,
-    Parent = CommandResponse,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
-  export type IdResolver<
-    R = string,
-    Parent = CommandResponse,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type TypeResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type WorkspaceResolver<
     R = string | null,
-    Parent = CommandResponse,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type CommandResolver<
     R = string,
-    Parent = CommandResponse,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type StatusResolver<
     R = string,
-    Parent = CommandResponse,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type DetailedStatusResolver<
     R = string | null,
-    Parent = CommandResponse,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type OutChunkResolver<
     R = string,
-    Parent = CommandResponse,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
-  export type OutResolver<
-    R = string,
-    Parent = CommandResponse,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type OutResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace MutationResolvers {
-  export interface Resolvers<Context = {}, TypeParent = {}> {
-    ngAdd?: NgAddResolver<CommandStarted | null, TypeParent, Context>;
+  export interface Resolvers<Context = any, TypeParent = {}> {
+    ngAdd?: NgAddResolver<any | null, TypeParent, Context>;
 
-    ngNew?: NgNewResolver<CommandStarted | null, TypeParent, Context>;
+    ngNew?: NgNewResolver<any | null, TypeParent, Context>;
 
-    generate?: GenerateResolver<CommandStarted | null, TypeParent, Context>;
+    generate?: GenerateResolver<any | null, TypeParent, Context>;
 
-    runNg?: RunNgResolver<CommandStarted | null, TypeParent, Context>;
+    runNg?: RunNgResolver<any | null, TypeParent, Context>;
 
-    runNpm?: RunNpmResolver<CommandStarted | null, TypeParent, Context>;
+    runNpm?: RunNpmResolver<any | null, TypeParent, Context>;
 
-    stopCommand?: StopCommandResolver<StopResult | null, TypeParent, Context>;
+    stopCommand?: StopCommandResolver<any | null, TypeParent, Context>;
 
-    removeCommand?: RemoveCommandResolver<
-      RemoveResult | null,
-      TypeParent,
-      Context
-    >;
+    removeCommand?: RemoveCommandResolver<any | null, TypeParent, Context>;
 
     removeAllCommands?: RemoveAllCommandsResolver<
-      RemoveResult | null,
+      any | null,
       TypeParent,
       Context
     >;
 
-    restartCommand?: RestartCommandResolver<
-      RemoveResult | null,
-      TypeParent,
-      Context
-    >;
+    restartCommand?: RestartCommandResolver<any | null, TypeParent, Context>;
 
-    openInEditor?: OpenInEditorResolver<
-      OpenInEditor | null,
-      TypeParent,
-      Context
-    >;
+    openInEditor?: OpenInEditorResolver<any | null, TypeParent, Context>;
 
-    updateSettings?: UpdateSettingsResolver<Settings, TypeParent, Context>;
+    updateSettings?: UpdateSettingsResolver<any, TypeParent, Context>;
 
-    installNodeJs?: InstallNodeJsResolver<
-      InstallNodeJsStatus | null,
-      TypeParent,
-      Context
-    >;
+    installNodeJs?: InstallNodeJsResolver<any | null, TypeParent, Context>;
 
-    openInBrowser?: OpenInBrowserResolver<
-      OpenInBrowserResult | null,
-      TypeParent,
-      Context
-    >;
+    openInBrowser?: OpenInBrowserResolver<any | null, TypeParent, Context>;
 
-    selectDirectory?: SelectDirectoryResolver<
-      SelectDirectoryResult | null,
-      TypeParent,
-      Context
-    >;
+    selectDirectory?: SelectDirectoryResolver<any | null, TypeParent, Context>;
 
     showItemInFolder?: ShowItemInFolderResolver<
-      ShowItemInFolderResult | null,
+      any | null,
       TypeParent,
       Context
     >;
 
-    openDoc?: OpenDocResolver<OpenDocResult | null, TypeParent, Context>;
+    openDoc?: OpenDocResolver<any | null, TypeParent, Context>;
   }
 
   export type NgAddResolver<
-    R = CommandStarted | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, NgAddArgs>;
   export interface NgAddArgs {
     path: string;
@@ -1535,9 +1459,9 @@ export namespace MutationResolvers {
   }
 
   export type NgNewResolver<
-    R = CommandStarted | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, NgNewArgs>;
   export interface NgNewArgs {
     path: string;
@@ -1548,9 +1472,9 @@ export namespace MutationResolvers {
   }
 
   export type GenerateResolver<
-    R = CommandStarted | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, GenerateArgs>;
   export interface GenerateArgs {
     path: string;
@@ -1561,9 +1485,9 @@ export namespace MutationResolvers {
   }
 
   export type RunNgResolver<
-    R = CommandStarted | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, RunNgArgs>;
   export interface RunNgArgs {
     path: string;
@@ -1572,9 +1496,9 @@ export namespace MutationResolvers {
   }
 
   export type RunNpmResolver<
-    R = CommandStarted | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, RunNpmArgs>;
   export interface RunNpmArgs {
     path: string;
@@ -1585,41 +1509,41 @@ export namespace MutationResolvers {
   }
 
   export type StopCommandResolver<
-    R = StopResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, StopCommandArgs>;
   export interface StopCommandArgs {
     id: string;
   }
 
   export type RemoveCommandResolver<
-    R = RemoveResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, RemoveCommandArgs>;
   export interface RemoveCommandArgs {
     id: string;
   }
 
   export type RemoveAllCommandsResolver<
-    R = RemoveResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type RestartCommandResolver<
-    R = RemoveResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, RestartCommandArgs>;
   export interface RestartCommandArgs {
     id: string;
   }
 
   export type OpenInEditorResolver<
-    R = OpenInEditor | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, OpenInEditorArgs>;
   export interface OpenInEditorArgs {
     editor: string;
@@ -1628,32 +1552,32 @@ export namespace MutationResolvers {
   }
 
   export type UpdateSettingsResolver<
-    R = Settings,
+    R = any,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, UpdateSettingsArgs>;
   export interface UpdateSettingsArgs {
     data: string;
   }
 
   export type InstallNodeJsResolver<
-    R = InstallNodeJsStatus | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type OpenInBrowserResolver<
-    R = OpenInBrowserResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, OpenInBrowserArgs>;
   export interface OpenInBrowserArgs {
     url: string;
   }
 
   export type SelectDirectoryResolver<
-    R = SelectDirectoryResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, SelectDirectoryArgs>;
   export interface SelectDirectoryArgs {
     dialogTitle: string;
@@ -1664,18 +1588,18 @@ export namespace MutationResolvers {
   }
 
   export type ShowItemInFolderResolver<
-    R = ShowItemInFolderResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, ShowItemInFolderArgs>;
   export interface ShowItemInFolderArgs {
     item: string;
   }
 
   export type OpenDocResolver<
-    R = OpenDocResult | null,
+    R = any | null,
     Parent = {},
-    Context = {}
+    Context = any
   > = Resolver<R, Parent, Context, OpenDocArgs>;
   export interface OpenDocArgs {
     id: string;
@@ -1683,67 +1607,67 @@ export namespace MutationResolvers {
 }
 
 export namespace CommandStartedResolvers {
-  export interface Resolvers<Context = {}, TypeParent = CommandStarted> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     id?: IdResolver<string, TypeParent, Context>;
   }
 
-  export type IdResolver<
-    R = string,
-    Parent = CommandStarted,
-    Context = {}
-  > = Resolver<R, Parent, Context>;
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace StopResultResolvers {
-  export interface Resolvers<Context = {}, TypeParent = StopResult> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     result?: ResultResolver<boolean | null, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean | null,
-    Parent = StopResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace RemoveResultResolvers {
-  export interface Resolvers<Context = {}, TypeParent = RemoveResult> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     result?: ResultResolver<boolean | null, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean | null,
-    Parent = RemoveResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace OpenInEditorResolvers {
-  export interface Resolvers<Context = {}, TypeParent = OpenInEditor> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     response?: ResponseResolver<string, TypeParent, Context>;
   }
 
   export type ResponseResolver<
     R = string,
-    Parent = OpenInEditor,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace OpenInBrowserResultResolvers {
-  export interface Resolvers<Context = {}, TypeParent = OpenInBrowserResult> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
-    Parent = OpenInBrowserResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace SelectDirectoryResultResolvers {
-  export interface Resolvers<Context = {}, TypeParent = SelectDirectoryResult> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     selectedDirectoryPath?: SelectedDirectoryPathResolver<
       string | null,
       TypeParent,
@@ -1755,39 +1679,36 @@ export namespace SelectDirectoryResultResolvers {
 
   export type SelectedDirectoryPathResolver<
     R = string | null,
-    Parent = SelectDirectoryResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
   export type ErrorResolver<
     R = string | null,
-    Parent = SelectDirectoryResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace ShowItemInFolderResultResolvers {
-  export interface Resolvers<
-    Context = {},
-    TypeParent = ShowItemInFolderResult
-  > {
+  export interface Resolvers<Context = any, TypeParent = any> {
     result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
-    Parent = ShowItemInFolderResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
 
 export namespace OpenDocResultResolvers {
-  export interface Resolvers<Context = {}, TypeParent = OpenDocResult> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
-    Parent = OpenDocResult,
-    Context = {}
+    Parent = any,
+    Context = any
   > = Resolver<R, Parent, Context>;
 }
