@@ -178,7 +178,7 @@ const Database: DatabaseResolvers.Resolvers = {
       context.angularJson = angularJson;
 
       return {
-        name: packageJson.name,
+        name: packageJson.name || path.basename(args.path),
         path: args.path,
         dependencies: readDependencies(packageJson),
         extensions: readExtensions(packageJson),
