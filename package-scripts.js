@@ -48,8 +48,8 @@ module.exports = {
       },
       test: 'node ./tools/scripts/test ./server/test',
       'move-graphql': 'cp server/src/schema/schema.graphql dist/server/src/schema/schema.graphql',
-      'gen-graphql-types': 'ts-node tools/gen-graphql-types.ts',
-      'gen-apollo-angular': 'ts-node tools/gen-apollo-angular.ts'
+      'gen-graphql-types': 'gql-gen --config codegen-server.yml',
+      'gen-apollo-angular': 'gql-gen --config codegen-client.js'
     },
     mac: {
       'clean': 'rm -rf dist',
