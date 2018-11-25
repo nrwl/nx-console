@@ -441,7 +441,7 @@ export interface OpenDocMutationArgs {
   id: string;
 }
 
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLScalarTypeConfig } from 'graphql';
 
 export type Resolver<Result, Parent = {}, Context = {}, Args = {}> = (
   parent: Parent,
@@ -475,6 +475,24 @@ export type SubscriptionResolver<
       ...args: any[]
     ) => ISubscriptionResolverObject<Result, Parent, Context, Args>)
   | ISubscriptionResolverObject<Result, Parent, Context, Args>;
+
+type Maybe<T> = T | null | undefined;
+
+export type TypeResolveFn<Types, Parent = {}, Context = {}> = (
+  parent: Parent,
+  context: Context,
+  info: GraphQLResolveInfo
+) => Maybe<Types>;
+
+export type NextResolverFn<T> = () => Promise<T>;
+
+export type DirectiveResolverFn<TResult, TArgs = {}, TContext = {}> = (
+  next: NextResolverFn<TResult>,
+  source: any,
+  args: TArgs,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => TResult | Promise<TResult>;
 
 export namespace DatabaseResolvers {
   export interface Resolvers<Context = any, TypeParent = {}> {
@@ -1711,4 +1729,37 @@ export namespace OpenDocResultResolvers {
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
+}
+
+/** Directs the executor to skip this field or fragment when the `if` argument is true. */
+export type SkipDirectiveResolver<Result> = DirectiveResolverFn<
+  Result,
+  SkipDirectiveArgs,
+  any
+>;
+export interface SkipDirectiveArgs {
+  /** Skipped when true. */
+  if: boolean;
+}
+
+/** Directs the executor to include this field or fragment only when the `if` argument is true. */
+export type IncludeDirectiveResolver<Result> = DirectiveResolverFn<
+  Result,
+  IncludeDirectiveArgs,
+  any
+>;
+export interface IncludeDirectiveArgs {
+  /** Included when true. */
+  if: boolean;
+}
+
+/** Marks an element of a GraphQL schema as no longer supported. */
+export type DeprecatedDirectiveResolver<Result> = DirectiveResolverFn<
+  Result,
+  DeprecatedDirectiveArgs,
+  any
+>;
+export interface DeprecatedDirectiveArgs {
+  /** Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted in [Markdown](https://daringfireball.net/projects/markdown/). */
+  reason?: string | null;
 }
