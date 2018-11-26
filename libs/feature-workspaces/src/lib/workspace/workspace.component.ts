@@ -9,7 +9,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostBinding,
-  OnDestroy,
+  OnDestroy, OnInit,
   ViewEncapsulation
 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -51,7 +51,7 @@ interface Route {
     ])
   ]
 })
-export class WorkspaceComponent implements OnDestroy {
+export class WorkspaceComponent implements OnInit, OnDestroy {
   @HostBinding('@.disabled') animationsDisabled = false;
 
   readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
@@ -64,7 +64,7 @@ export class WorkspaceComponent implements OnDestroy {
 
       const url = firstChild.url[0].path;
 
-      const route = this.routes.find(r => url.indexOf(r.url) > -1);
+      const route = this.routes.find(r => r.url.startsWith(url));
       if (!route) {
         throw new Error('This should never happen');
       }
@@ -74,7 +74,7 @@ export class WorkspaceComponent implements OnDestroy {
     shareReplay(1)
   );
 
-  readonly routes: Array<Route> = [
+  routes: Array<Route> = [
     { icon: 'view_list', url: 'projects', title: 'Projects' },
     { icon: 'code', url: 'generate', title: 'Generate Code' },
     { svgIcon: 'console', url: 'tasks', title: 'Run Tasks' },
@@ -163,7 +163,20 @@ export class WorkspaceComponent implements OnDestroy {
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly editorSupport: EditorSupport,
     private readonly basicWorkspaceGQL: BasicWorkspaceGQL
-  ) {}
+  ) {
+  }
+
+  ngOnInit(): void {
+    this.settings.fetch().subscribe(() => {
+      if (this.settings.showConnectPlugin()) {
+        this.routes = [
+          this.routes[0],
+          { icon: 'timeline', url: 'connect/affected-projects', title: 'Affected Projects' },
+          ...this.routes.slice(1)
+        ];
+      }
+    });
+  }
 
   ngOnDestroy(): void {
     this.contextualActionBarService.nonContextualActions$.next([]);
