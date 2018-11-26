@@ -109,8 +109,15 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
             } else {
               return {
                 collectionName: collection.collectionName,
-                tasks: collection.tasks.filter(task =>
-                  task.taskName.toLowerCase().includes(lowerCaseFilterValue)
+                tasks: collection.tasks.filter(
+                  task =>
+                    task.taskName
+                      .toLowerCase()
+                      .includes(lowerCaseFilterValue) ||
+                    (task.taskDescription &&
+                      task.taskDescription
+                        .toLowerCase()
+                        .includes(lowerCaseFilterValue))
                 )
               };
             }
