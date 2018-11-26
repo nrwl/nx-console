@@ -25,8 +25,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import {
-  AngularConsoleEnterpriseFrontendModule,
-  connectRoutes
+  AngularConsoleEnterpriseFrontendModule, connectRootRoutes
 } from '@nrwl/angular-console-enterprise-frontend';
 import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
@@ -103,7 +102,7 @@ export function initApollo(
         },
         {
           path: 'connect',
-          children: connectRoutes
+          children: connectRootRoutes
         },
         { path: 'settings', children: settingsRoutes }
       ],
