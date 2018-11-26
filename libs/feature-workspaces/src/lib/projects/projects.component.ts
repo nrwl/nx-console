@@ -3,7 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Project } from '@angular-console/schema';
 import { Observable, Subscription, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { PROJECTS_POLLING, Settings } from '@angular-console/utils';
+import {
+  PROJECTS_POLLING,
+  Settings
+} from '@angular-console/utils';
 import { WorkspaceGQL, WorkspaceDocsGQL } from '../generated/graphql';
 
 @Component({

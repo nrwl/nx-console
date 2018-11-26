@@ -17,6 +17,9 @@ export function readSettings() {
   if (settings.enableDetailedStatus === undefined) {
     settings.enableDetailedStatus = true;
   }
+  if (settings.enableNotifications === undefined) {
+    settings.enableDetailedStatus = false;
+  }
   if (settings.channel === undefined) {
     settings.channel = 'latest';
   }

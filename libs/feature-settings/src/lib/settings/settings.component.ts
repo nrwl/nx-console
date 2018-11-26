@@ -35,6 +35,18 @@ export class SettingsComponent implements OnInit {
     this.settingsService.setEnableDetailedStatus(x);
   }
 
+  toggleNotifications(x: boolean) {
+    this.settingsService.setEnableNotifications(x);
+  }
+
+  enableNotifications() {
+    return this.settingsService.enableNotifications();
+  }
+
+  toggleStatus(x: boolean) {
+    this.settingsService.setEnableNotifications(x);
+  }
+
   setChannel(channel: 'latest' | 'beta' | 'alpha') {
     this.settingsService.setChannel(channel);
   }

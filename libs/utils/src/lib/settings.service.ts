@@ -14,6 +14,7 @@ interface SettingsData {
   readonly installNodeManually: boolean;
   readonly enableDetailedStatus: boolean;
   readonly channel: 'latest' | 'beta' | 'alpha';
+  readonly enableNotifications: boolean;
 }
 
 @Injectable({
@@ -24,6 +25,7 @@ export class Settings {
     recent: [],
     canCollectData: false,
     installNodeManually: false,
+    enableNotifications: false
     enableDetailedStatus: true,
     channel: 'latest'
   };
@@ -75,6 +77,10 @@ export class Settings {
     return this.settings.enableDetailedStatus;
   }
 
+  enableNotifications() {
+    return this.settings.enableNotifications;
+  }
+
   getChannel() {
     return this.settings.channel;
   }
@@ -97,6 +103,10 @@ export class Settings {
 
   setEnableDetailedStatus(enableDetailedStatus: boolean): void {
     this.store({ ...this.settings, enableDetailedStatus });
+  }
+
+  setEnableNotifications(enableNotifications: boolean): void {
+    this.store({ ...this.settings, enableNotifications });
   }
 
   setChannel(channel: 'latest' | 'beta' | 'alpha'): void {

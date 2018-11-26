@@ -1,3 +1,4 @@
+export * from './lib/notification.service';
 export * from './lib/telemetry.service';
 export * from './lib/completion.service';
 export * from './lib/command-runner.service';
