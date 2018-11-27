@@ -37,6 +37,8 @@ export interface Settings {
 
   enableDetailedStatus?: boolean | null;
 
+  channel?: string | null;
+
   recent?: (WorkspaceDefinition | null)[] | null;
 }
 
@@ -621,6 +623,8 @@ export namespace SettingsResolvers {
       Context
     >;
 
+    channel?: ChannelResolver<string | null, TypeParent, Context>;
+
     recent?: RecentResolver<(any | null)[] | null, TypeParent, Context>;
   }
 
@@ -641,6 +645,11 @@ export namespace SettingsResolvers {
   > = Resolver<R, Parent, Context>;
   export type EnableDetailedStatusResolver<
     R = boolean | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type ChannelResolver<
+    R = string | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

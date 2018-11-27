@@ -1,8 +1,3 @@
-schema {
-  query: Database
-  mutation: Mutation
-}
-
 type Architect {
   name: String!
   project: String!
@@ -224,6 +219,7 @@ type Settings {
   showSupportPlugin: Boolean
   installNodeManually: Boolean
   enableDetailedStatus: Boolean
+  channel: String
   recent: [WorkspaceDefinition]
 }
 
@@ -252,4 +248,9 @@ type Doc {
   prop: String
   description: String
   id: String!
+}
+
+schema {
+  query: Database
+  mutation: Mutation
 }

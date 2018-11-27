@@ -306,6 +306,8 @@ export namespace Settings {
 
     enableDetailedStatus: boolean | null;
 
+    channel: string | null;
+
     recent: (Recent | null)[] | null;
   };
 
@@ -375,6 +377,8 @@ export namespace UpdateSettings {
     installNodeManually: boolean | null;
 
     enableDetailedStatus: boolean | null;
+
+    channel: string | null;
 
     recent: (Recent | null)[] | null;
   };
@@ -633,6 +637,7 @@ export class SettingsGQL extends Apollo.Query<
         canCollectData
         installNodeManually
         enableDetailedStatus
+        channel
         recent {
           path
           name
@@ -685,6 +690,7 @@ export class UpdateSettingsGQL extends Apollo.Mutation<
         canCollectData
         installNodeManually
         enableDetailedStatus
+        channel
         recent {
           path
           name

@@ -95,3 +95,14 @@ The following folks from the Angular team at Google are working with the Angular
 Alex Eagle | Stephen Fluin | Matias Niemelä
 ------------ | ------------- | -------------
 ![Alex Eagle](https://github.com/nrwl/angular-console/blob/master/static/alex_eagle_pic.jpg) | ![Stephen Fluin](https://github.com/nrwl/angular-console/blob/master/static/stephen_pic.jpg) | ![Matias Niemelä](https://github.com/nrwl/angular-console/blob/master/static/matias_pic.jpg)
+
+<p align="center">
+  <a href="https://go.nrwl.io/nrwl-connect-live-angular-ivy?utm_campaign=Connect&utm_content=80290241&utm_medium=github&utm_source=angular-console" target="_blank">  
+    <img 
+         width="728" 
+         height="90" 
+         src="https://images.ctfassets.net/8eyogtwep6d2/13DzHPGgyYKMyaOsyoewCg/08887f39154c37e7839484119cb391fe/connect-live-banner.png" 
+         srcset="https://images.ctfassets.net/8eyogtwep6d2/6NwJhSjhsc0cwkKAOc6KCc/e46f885a0ec3c25c22fe695123d5a4e5/connect-live-banner_2x.png 2x" 
+         alt="December 13th, join our online broadcast: Connect Live: Preparing for Angular Ivy. Click to register">
+  </a>
+</p>

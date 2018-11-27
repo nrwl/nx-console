@@ -14,6 +14,26 @@
         [checked]="canCollectionData()"
       ></mat-slide-toggle>
     </div>
+    <div fxLayout="row wrap" fxFill fxLayoutAlign="start top">
+      <div fxFlex>
+        <h4 mat-line>Auto Update Channel</h4>
+        <p mat-line>
+          Try new features before everyone else by switching to the beta and
+          alpha channels.
+        </p>
+      </div>
+
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-select
+          (selectionChange)="setChannel($event.value)"
+          [value]="getChannel()"
+        >
+          <mat-option value="latest"> Latest </mat-option>
+          <mat-option value="beta">Beta </mat-option>
+          <mat-option value="alpha"> Alpha </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
     <h3>Features</h3>
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
       <div fxFlex>

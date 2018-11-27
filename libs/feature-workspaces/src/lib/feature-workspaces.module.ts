@@ -17,6 +17,7 @@ import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
 import { ProjectsComponent } from './projects/projects.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
 import { WorkspacesComponent } from './workspaces/workspaces.component';
+import { connectWorkspaceRoutes } from '@nrwl/angular-console-enterprise-frontend';
 
 export type FeatureWorkspaceRouteState =
   | 'workspaces'
@@ -59,7 +60,11 @@ export const workspaceRoutes: Route[] = [
         path: 'generate',
         children: generateRoutes
       },
-      { data: { state: 'tasks' }, path: 'tasks', children: runRoutes }
+      { data: { state: 'tasks' }, path: 'tasks', children: runRoutes },
+      {
+        path: 'connect',
+        children: connectWorkspaceRoutes
+      }
     ]
   }
 ];

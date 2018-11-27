@@ -7,7 +7,8 @@ import {
   MatFormFieldModule,
   MatSlideToggleModule,
   MatListModule,
-  MatInputModule
+  MatInputModule,
+  MatSelectModule
 } from '@angular/material';
 import { SettingsComponent } from './settings/settings.component';
 
@@ -17,6 +18,7 @@ export const settingsRoutes: Route[] = [
     component: SettingsComponent
   }
 ];
+
 @NgModule({
   imports: [
     CommonModule,
@@ -24,6 +26,7 @@ export const settingsRoutes: Route[] = [
     MatSlideToggleModule,
     MatInputModule,
     MatListModule,
+    MatSelectModule,
     MatFormFieldModule,
     ReactiveFormsModule
   ],
