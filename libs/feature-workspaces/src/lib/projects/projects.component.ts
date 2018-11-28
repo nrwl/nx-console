@@ -21,8 +21,6 @@ export class ProjectsComponent implements OnInit {
       )
     : of([]);
 
-  docsSubscription: Subscription;
-
   constructor(
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
