@@ -9,7 +9,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostBinding,
-  OnDestroy, OnInit,
+  OnDestroy,
+  OnInit,
   ViewEncapsulation
 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -163,15 +164,18 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly editorSupport: EditorSupport,
     private readonly basicWorkspaceGQL: BasicWorkspaceGQL
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     this.settings.fetch().subscribe(() => {
       if (this.settings.showConnectPlugin()) {
         this.routes = [
           this.routes[0],
-          { icon: 'timeline', url: 'connect/affected-projects', title: 'Affected Projects' },
+          {
+            icon: 'timeline',
+            url: 'connect/affected-projects',
+            title: 'Affected Projects'
+          },
           ...this.routes.slice(1)
         ];
       }

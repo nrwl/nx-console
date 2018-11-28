@@ -1,3 +1,7 @@
+<ui-entity-docs
+  [docs]="docs$ | async"
+  style="margin-left: 15px"
+></ui-entity-docs>
 <ui-task-runner
   *ngIf="(project$ | async) as project"
   terminalWindowTitle="Task output"

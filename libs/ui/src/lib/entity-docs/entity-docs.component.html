@@ -1,0 +1,14 @@
+<mat-card
+  style="margin: 10px 10px; background-color: #ebebeb; color: #8d8d8d"
+  *ngIf="docs !== null && docs.length > 0"
+>
+  <p *ngFor="let d of docs">
+    {{ d.description }}
+    <a
+      href="#"
+      (click)="openDoc(d)"
+      style="color: #2196f3; text-decoration: none"
+      >read more...</a
+    >
+  </p>
+</mat-card>

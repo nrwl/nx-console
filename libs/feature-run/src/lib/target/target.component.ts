@@ -47,7 +47,7 @@ export class TargetComponent implements OnInit {
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
 
-  docs: Observable<any[]>;
+  docs$: Observable<any[]>;
 
   private readonly ngRun$ = new Subject<any>();
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
@@ -140,7 +140,7 @@ export class TargetComponent implements OnInit {
     );
 
     if (this.settings.showDocs) {
-      this.docs = targetDescription$.pipe(
+      this.docs$ = targetDescription$.pipe(
         switchMap(d => {
           if (d === null) {
             return of(null);
@@ -162,7 +162,7 @@ export class TargetComponent implements OnInit {
         })
       );
     } else {
-      this.docs = of([]);
+      this.docs$ = of([]);
     }
   }
 

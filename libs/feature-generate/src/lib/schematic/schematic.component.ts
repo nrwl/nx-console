@@ -62,7 +62,7 @@ export class SchematicComponent implements OnInit {
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
 
-  docs: Observable<any[]>;
+  docs$: Observable<any[]>;
 
   private readonly ngGen$ = new Subject<void>();
   readonly ngGenDisabled$ = new BehaviorSubject(true);
@@ -230,7 +230,7 @@ export class SchematicComponent implements OnInit {
     );
 
     if (this.settings.showDocs) {
-      this.docs = schematicDescription$.pipe(
+      this.docs$ = schematicDescription$.pipe(
         switchMap(d => {
           if (d === null) {
             return of(null);
@@ -251,7 +251,7 @@ export class SchematicComponent implements OnInit {
         })
       );
     } else {
-      this.docs = of([]);
+      this.docs$ = of([]);
     }
   }
 

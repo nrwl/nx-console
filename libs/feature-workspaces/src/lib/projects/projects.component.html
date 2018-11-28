@@ -1,4 +1,5 @@
 <div *ngIf="(workspace$ | async) as workspace">
+  <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
   <mat-list *ngIf="workspace.projects.length > 0; else: empty">
     <ng-container *ngFor="let p of workspace.projects">
       <mat-list-item [ngClass]="p.projectType" [disableRipple]="true">

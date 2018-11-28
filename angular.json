@@ -276,7 +276,6 @@
       "root": "libs/ui",
       "sourceRoot": "libs/ui/src",
       "projectType": "library",
-      "prefix": "nxlibs/ui",
       "architect": {
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
