@@ -28,6 +28,12 @@ export function availableExtensions() {
     },
     { name: '@clr/angular', description: 'Clarity components' },
     {
+      name: '@ionic/angular',
+      description: '@ionic/angular support',
+      detailedDescription:
+        '@ionic/angular is the free and open source mobile SDK for developing native and progressive web apps, all with the same codebase.'
+    },
+    {
       name: '@nativescript/schematics',
       description: 'NativeScript Support'
     },
