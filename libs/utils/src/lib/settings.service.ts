@@ -25,7 +25,7 @@ export class Settings {
     recent: [],
     canCollectData: false,
     installNodeManually: false,
-    enableNotifications: false
+    enableNotifications: false,
     enableDetailedStatus: true,
     channel: 'latest'
   };
