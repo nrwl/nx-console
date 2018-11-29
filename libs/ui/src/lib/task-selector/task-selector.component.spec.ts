@@ -1,14 +1,18 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
-import { of, Subject, Observable } from 'rxjs';
-import {
-  TaskCollections,
-  TaskSelectorComponent
-} from './task-selector.component';
+import { Observable, of, Subject } from 'rxjs';
+import { TaskCollections, TaskSelectorComponent } from './task-selector.component';
 
-const TASKS: Observable<TaskCollections<Task>> = of({
+interface Task {
+  name: string;
+  description: string;
+  collection: string;
+  __typename: string;
+}
+
+const TASKS: Observable<TaskCollections<Task | {}>> = of({
   "selectedTask": null,
   "taskCollections": [
     {
@@ -159,23 +163,17 @@ const TASKS: Observable<TaskCollections<Task>> = of({
   ]
 });
 
-interface Task {
-  name: string;
-  description: string;
-  collection: string;
-  __typename: string;
-}
 const activatedRoute: any = {
   params: new Subject<any>(),
   parent: { params: new Subject<any>() },
   queryParams: new Subject<any>()
 };
 
-fdescribe('TaskSelectorComponent', () => {
+describe('TaskSelectorComponent', () => {
   let component: TaskSelectorComponent<Task | {}>;
   let debugElement: HTMLElement;
   let fixture: ComponentFixture<TaskSelectorComponent<Task | {}>>;
-  const taskCollections: Observable<TaskCollections<Task>> = TASKS;
+  const taskCollections = TASKS;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -265,7 +263,7 @@ fdescribe('TaskSelectorComponent', () => {
   }));
 
 
-  fit('should show an empty collection of tasks when query param is filter=xxx', fakeAsync(() => {
+  it('should show an empty collection of tasks when query param is filter=xxx', fakeAsync(() => {
     activatedRoute.queryParams.next({ filter: 'xxx' });
     fixture.detectChanges();
 
