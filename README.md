@@ -97,10 +97,10 @@ Pick one of the issues from the [good first issue](https://github.com/nrwl/angul
 
 ## Core Team
 
-Dan Muller | Victor Savkin | Jack Hsu | Wassim Chegham
------------- | ------------- | ------------- | -------------
-![Dan Muller](https://github.com/nrwl/angular-console/blob/master/static/dan_pic.jpg) | ![Victor Savkin](https://github.com/nrwl/angular-console/blob/master/static/victor_pic.jpg) | ![Jack Hsu](https://github.com/nrwl/angular-console/blob/master/static/jack_pic.jpg) | ![Wassim Chegham](https://github.com/nrwl/angular-console/blob/master/static/wassim_pic.jpg)
-[mrmeku](https://github.com/mrmeku)|[vsavkin](https://github.com/vsavkin)|[jaysoo](https://github.com/jaysoo)|[manekinekko](https://github.com/manekinekko)
+Dan Muller | Victor Savkin | Jack Hsu | Wassim Chegham | Kamil Kisiela
+------------ | ------------- | ------------- | ------------- | -------------
+![Dan Muller](https://github.com/nrwl/angular-console/blob/master/static/dan_pic.jpg) | ![Victor Savkin](https://github.com/nrwl/angular-console/blob/master/static/victor_pic.jpg) | ![Jack Hsu](https://github.com/nrwl/angular-console/blob/master/static/jack_pic.jpg) | ![Wassim Chegham](https://github.com/nrwl/angular-console/blob/master/static/wassim_pic.jpg) | ![Kamil Kisiela](https://avatars1.githubusercontent.com/u/8167190?s=150&v=4)
+[mrmeku](https://github.com/mrmeku)|[vsavkin](https://github.com/vsavkin)|[jaysoo](https://github.com/jaysoo)|[manekinekko](https://github.com/manekinekko)|[kamilkisiela](https://github.com/kamilkisiela)
 
 The following folks from the Angular team at Google are working with the Angular Console team.
 
