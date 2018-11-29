@@ -96,54 +96,27 @@
 </ng-container>
 
 <ng-template #empty>
-  <div
-    fxFlex
-    class="empty-container"
-    fxFlex
-    fxLayout="column"
-    fxLayoutAlign="center center"
-    fxLayoutGap="48px"
-  >
-    <mat-card fxLayout="column">
-      <div
-        class="code-image-container"
-        fxLayout="row"
-        fxLayoutAlign="center center"
-      >
-        <img src="assets/code-icon.svg" height="180px" />
+  <ui-dialog>
+    <img src="assets/code-icon.svg" height="180px" />
+    <div class="headline">Let's Get Started</div>
+    <div class="sub-headline">
+      Create a new Angular workspace or continue working on an existing one.
+    </div>
+    <button mat-raised-button color="primary" (click)="createNewWorkspace()">
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon>create_new_folder</mat-icon>
+        <div>Create</div>
       </div>
-      <mat-card-content fxLayout="column">
-        <div class="headline">Let's Get Started</div>
-        <div class="sub-headline">
-          Create a new Angular workspace or continue working on an existing one.
-        </div>
-        <div
-          class="action-container"
-          fxLayout="row"
-          fxLayoutAlign="space-evenly"
-        >
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="createNewWorkspace()"
-          >
-            <div fxLayout="row" fxLayoutAlign="center center">
-              <mat-icon>create_new_folder</mat-icon>
-              <div>Create</div>
-            </div>
-          </button>
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="importExistingWorkspace()"
-          >
-            <div fxLayout="row" fxLayoutAlign="center center">
-              <mat-icon>folder_open</mat-icon>
-              <div>Open</div>
-            </div>
-          </button>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="importExistingWorkspace()"
+    >
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon>folder_open</mat-icon>
+        <div>Open</div>
+      </div>
+    </button>
+  </ui-dialog>
 </ng-template>

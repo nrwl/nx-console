@@ -18,6 +18,7 @@ import { FormControl } from '@angular/forms';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { map, startWith, take } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 export interface Task<T> {
   taskName: string;
@@ -77,7 +78,8 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   );
 
   constructor(
-    private readonly contextActionService: ContextualActionBarService
+    private readonly contextActionService: ContextualActionBarService,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -87,6 +89,14 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
       } else {
         this.taskAnimationState$.next('expand');
       }
+
+      this.route.queryParams.subscribe(params => {
+        if (params.filter && typeof params.filter === 'string') {
+          // the filter value should be set after we got all the tasks,
+          // otherwise the .valueChanges stream won't be triggered on time!
+          this.taskFilterFormControl.setValue(params.filter);
+        }
+      });
     });
 
     this.filteredTaskCollections$ = combineLatest(
