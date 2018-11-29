@@ -1,0 +1,13 @@
+overwrite: true
+schema: ./server/src/schema/schema.graphql
+generates:
+  ./server/src/graphql-types.ts:
+    config:
+      # a type of GraphQL Context
+      contextType: 'any'
+      # a type of every resolver's parent
+      defaultMapper: 'any'
+    plugins:
+      - typescript-common
+      - typescript-server
+      - typescript-resolvers

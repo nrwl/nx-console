@@ -1,22 +1,8 @@
-/* tslint:disable */
-
-// ====================================================
-// START: Typescript template
-// ====================================================
-
-// ====================================================
-// Enums
-// ====================================================
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
-
-// ====================================================
-// END: Typescript template
-// ====================================================
 
 // ====================================================
 // Documents
@@ -32,7 +18,7 @@ export namespace NpmRun {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    runNpm?: RunNpm | null;
+    runNpm: RunNpm | null;
   };
 
   export type RunNpm = {
@@ -57,7 +43,7 @@ export namespace NpmScripts {
   export type Workspace = {
     __typename?: 'Workspace';
 
-    npmScripts?: (NpmScripts | null)[] | null;
+    npmScripts: (NpmScripts | null)[] | null;
   };
 
   export type NpmScripts = {
@@ -67,7 +53,7 @@ export namespace NpmScripts {
 
     npmClient: string;
 
-    schema?: (Schema | null)[] | null;
+    schema: (Schema | null)[] | null;
   };
 
   export type Schema = {
@@ -75,13 +61,13 @@ export namespace NpmScripts {
 
     name: string;
 
-    enum?: (string | null)[] | null;
+    enum: (string | null)[] | null;
 
     type: string;
 
-    description?: string | null;
+    description: string | null;
 
-    defaultValue?: string | null;
+    defaultValue: string | null;
 
     required: boolean;
 
@@ -105,7 +91,7 @@ export namespace Projects {
   export type Workspace = {
     __typename?: 'Workspace';
 
-    projects?: (Projects | null)[] | null;
+    projects: (Projects | null)[] | null;
   };
 
   export type Projects = {
@@ -117,7 +103,7 @@ export namespace Projects {
 
     projectType: string;
 
-    architect?: (Architect | null)[] | null;
+    architect: (Architect | null)[] | null;
   };
 
   export type Architect = {
@@ -127,9 +113,9 @@ export namespace Projects {
 
     builder: string;
 
-    configurations?: (Configurations | null)[] | null;
+    configurations: (Configurations | null)[] | null;
 
-    schema?: (Schema | null)[] | null;
+    schema: (Schema | null)[] | null;
   };
 
   export type Configurations = {
@@ -143,13 +129,13 @@ export namespace Projects {
 
     name: string;
 
-    enum?: (string | null)[] | null;
+    enum: (string | null)[] | null;
 
     type: string;
 
-    description?: string | null;
+    description: string | null;
 
-    defaultValue?: string | null;
+    defaultValue: string | null;
 
     required: boolean;
 
@@ -166,7 +152,7 @@ export namespace RunNg {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    runNg?: RunNg | null;
+    runNg: RunNg | null;
   };
 
   export type RunNg = {
@@ -206,9 +192,9 @@ export namespace SchematicDocs {
 
     id: string;
 
-    description?: string | null;
+    description: string | null;
 
-    prop?: string | null;
+    prop: string | null;
   };
 }
 
@@ -226,9 +212,9 @@ export namespace WorkspaceAndProjects {
   export type Workspace = {
     __typename?: 'Workspace';
 
-    npmScripts?: (NpmScripts | null)[] | null;
+    npmScripts: (NpmScripts | null)[] | null;
 
-    projects?: (Projects | null)[] | null;
+    projects: (Projects | null)[] | null;
   };
 
   export type NpmScripts = {
@@ -246,7 +232,7 @@ export namespace WorkspaceAndProjects {
 
     projectType: string;
 
-    architect?: (Architect | null)[] | null;
+    architect: (Architect | null)[] | null;
   };
 
   export type Architect = {
@@ -263,7 +249,6 @@ export namespace WorkspaceAndProjects {
 // ====================================================
 
 import { Injectable } from '@angular/core';
-
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';

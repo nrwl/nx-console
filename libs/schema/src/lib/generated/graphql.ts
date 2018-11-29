@@ -1,19 +1,5 @@
-/* tslint:disable */
-
-// ====================================================
-// START: Typescript template
-// ====================================================
-
-// ====================================================
-// Enums
-// ====================================================
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
-
-// ====================================================
-// END: Typescript template
-// ====================================================

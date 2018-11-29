@@ -1,22 +1,8 @@
-/* tslint:disable */
-
-// ====================================================
-// START: Typescript template
-// ====================================================
-
-// ====================================================
-// Enums
-// ====================================================
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
-
-// ====================================================
-// END: Typescript template
-// ====================================================
 
 // ====================================================
 // Documents
@@ -32,7 +18,7 @@ export namespace Generate {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    generate?: Generate | null;
+    generate: Generate | null;
   };
 
   export type Generate = {
@@ -58,13 +44,13 @@ export namespace SchematicCollectionsByName {
   export type Workspace = {
     __typename?: 'Workspace';
 
-    schematicCollections?: (SchematicCollections | null)[] | null;
+    schematicCollections: (SchematicCollections | null)[] | null;
   };
 
   export type SchematicCollections = {
     __typename?: 'SchematicCollection';
 
-    schematics?: (Schematics | null)[] | null;
+    schematics: (Schematics | null)[] | null;
   };
 
   export type Schematics = {
@@ -74,9 +60,9 @@ export namespace SchematicCollectionsByName {
 
     name: string;
 
-    description?: string | null;
+    description: string | null;
 
-    schema?: (Schema | null)[] | null;
+    schema: (Schema | null)[] | null;
   };
 
   export type Schema = {
@@ -84,13 +70,13 @@ export namespace SchematicCollectionsByName {
 
     name: string;
 
-    enum?: (string | null)[] | null;
+    enum: (string | null)[] | null;
 
     type: string;
 
-    description?: string | null;
+    description: string | null;
 
-    defaultValue?: string | null;
+    defaultValue: string | null;
 
     required: boolean;
 
@@ -128,9 +114,9 @@ export namespace SchematicDocs {
 
     id: string;
 
-    description?: string | null;
+    description: string | null;
 
-    prop?: string | null;
+    prop: string | null;
   };
 }
 
@@ -148,7 +134,7 @@ export namespace SchematicCollections {
   export type Workspace = {
     __typename?: 'Workspace';
 
-    schematicCollections?: (SchematicCollections | null)[] | null;
+    schematicCollections: (SchematicCollections | null)[] | null;
   };
 
   export type SchematicCollections = {
@@ -156,7 +142,7 @@ export namespace SchematicCollections {
 
     name: string;
 
-    schematics?: (Schematics | null)[] | null;
+    schematics: (Schematics | null)[] | null;
   };
 
   export type Schematics = {
@@ -164,7 +150,7 @@ export namespace SchematicCollections {
 
     name: string;
 
-    description?: string | null;
+    description: string | null;
 
     collection: string;
   };
@@ -175,7 +161,6 @@ export namespace SchematicCollections {
 // ====================================================
 
 import { Injectable } from '@angular/core';
-
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';

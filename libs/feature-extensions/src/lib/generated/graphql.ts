@@ -1,22 +1,8 @@
-/* tslint:disable */
-
-// ====================================================
-// START: Typescript template
-// ====================================================
-
-// ====================================================
-// Enums
-// ====================================================
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
-
-// ====================================================
-// END: Typescript template
-// ====================================================
 
 // ====================================================
 // Documents
@@ -31,7 +17,7 @@ export namespace NgAdd {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    ngAdd?: NgAdd | null;
+    ngAdd: NgAdd | null;
   };
 
   export type NgAdd = {
@@ -52,13 +38,13 @@ export namespace WorkspaceAndExtensionsByName {
 
     workspace: Workspace;
 
-    availableExtensions?: (AvailableExtensions | null)[] | null;
+    availableExtensions: (AvailableExtensions | null)[] | null;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
 
-    extensions?: (Extensions | null)[] | null;
+    extensions: (Extensions | null)[] | null;
   };
 
   export type Extensions = {
@@ -72,9 +58,9 @@ export namespace WorkspaceAndExtensionsByName {
 
     name: string;
 
-    description?: string | null;
+    description: string | null;
 
-    detailedDescription?: string | null;
+    detailedDescription: string | null;
   };
 }
 
@@ -88,13 +74,13 @@ export namespace WorkspaceAndExtensions {
 
     workspace: Workspace;
 
-    availableExtensions?: (AvailableExtensions | null)[] | null;
+    availableExtensions: (AvailableExtensions | null)[] | null;
   };
 
   export type Workspace = {
     __typename?: 'Workspace';
 
-    extensions?: (Extensions | null)[] | null;
+    extensions: (Extensions | null)[] | null;
   };
 
   export type Extensions = {
@@ -108,7 +94,7 @@ export namespace WorkspaceAndExtensions {
 
     name: string;
 
-    description?: string | null;
+    description: string | null;
   };
 }
 
@@ -117,7 +103,6 @@ export namespace WorkspaceAndExtensions {
 // ====================================================
 
 import { Injectable } from '@angular/core';
-
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';

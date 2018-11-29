@@ -1,22 +1,8 @@
-/* tslint:disable */
-
-// ====================================================
-// START: Typescript template
-// ====================================================
-
-// ====================================================
-// Enums
-// ====================================================
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
-
-// ====================================================
-// END: Typescript template
-// ====================================================
 
 // ====================================================
 // Documents
@@ -30,7 +16,7 @@ export namespace Commands {
   export type Query = {
     __typename?: 'Query';
 
-    commands?: (Commands | null)[] | null;
+    commands: (Commands | null)[] | null;
   };
 
   export type Commands = {
@@ -42,7 +28,7 @@ export namespace Commands {
 
     outChunk: string;
 
-    detailedStatus?: string | null;
+    detailedStatus: string | null;
   };
 }
 
@@ -72,7 +58,7 @@ export namespace GetCommandInitial {
   export type Query = {
     __typename?: 'Query';
 
-    commands?: (Commands | null)[] | null;
+    commands: (Commands | null)[] | null;
   };
 
   export type Commands = {
@@ -82,7 +68,7 @@ export namespace GetCommandInitial {
 
     type: string;
 
-    workspace?: string | null;
+    workspace: string | null;
 
     command: string;
 
@@ -90,7 +76,7 @@ export namespace GetCommandInitial {
 
     out: string;
 
-    detailedStatus?: string | null;
+    detailedStatus: string | null;
   };
 }
 
@@ -102,7 +88,7 @@ export namespace GetCommand {
   export type Query = {
     __typename?: 'Query';
 
-    commands?: (Commands | null)[] | null;
+    commands: (Commands | null)[] | null;
   };
 
   export type Commands = {
@@ -112,7 +98,7 @@ export namespace GetCommand {
 
     type: string;
 
-    workspace?: string | null;
+    workspace: string | null;
 
     command: string;
 
@@ -120,7 +106,7 @@ export namespace GetCommand {
 
     outChunk: string;
 
-    detailedStatus?: string | null;
+    detailedStatus: string | null;
   };
 }
 
@@ -130,7 +116,7 @@ export namespace IsNodejsInstalled {
   export type Query = {
     __typename?: 'Query';
 
-    isNodejsInstalled?: IsNodejsInstalled | null;
+    isNodejsInstalled: IsNodejsInstalled | null;
   };
 
   export type IsNodejsInstalled = {
@@ -146,7 +132,7 @@ export namespace ListAllCommands {
   export type Query = {
     __typename?: 'Query';
 
-    commands?: (Commands | null)[] | null;
+    commands: (Commands | null)[] | null;
   };
 
   export type Commands = {
@@ -158,7 +144,7 @@ export namespace ListAllCommands {
 
     status: string;
 
-    workspace?: string | null;
+    workspace: string | null;
 
     command: string;
   };
@@ -183,7 +169,7 @@ export namespace ListFiles {
 
     exists: boolean;
 
-    files?: (Files | null)[] | null;
+    files: (Files | null)[] | null;
   };
 
   export type Files = {
@@ -203,7 +189,7 @@ export namespace OpenDoc {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    openDoc?: OpenDoc | null;
+    openDoc: OpenDoc | null;
   };
 
   export type OpenDoc = {
@@ -221,7 +207,7 @@ export namespace OpenInBrowser {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    openInBrowser?: OpenInBrowser | null;
+    openInBrowser: OpenInBrowser | null;
   };
 
   export type OpenInBrowser = {
@@ -240,7 +226,7 @@ export namespace OpenInEditor {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    openInEditor?: OpenInEditor | null;
+    openInEditor: OpenInEditor | null;
   };
 
   export type OpenInEditor = {
@@ -256,13 +242,13 @@ export namespace RemoveAllCommands {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    removeAllCommands?: RemoveAllCommands | null;
+    removeAllCommands: RemoveAllCommands | null;
   };
 
   export type RemoveAllCommands = {
     __typename?: 'RemoveResult';
 
-    result?: boolean | null;
+    result: boolean | null;
   };
 }
 
@@ -274,13 +260,13 @@ export namespace RemoveCommand {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    removeCommand?: RemoveCommand | null;
+    removeCommand: RemoveCommand | null;
   };
 
   export type RemoveCommand = {
     __typename?: 'RemoveResult';
 
-    result?: boolean | null;
+    result: boolean | null;
   };
 }
 
@@ -292,13 +278,13 @@ export namespace RestartCommand {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    restartCommand?: RestartCommand | null;
+    restartCommand: RestartCommand | null;
   };
 
   export type RestartCommand = {
     __typename?: 'RemoveResult';
 
-    result?: boolean | null;
+    result: boolean | null;
   };
 }
 
@@ -316,13 +302,13 @@ export namespace Settings {
 
     canCollectData: boolean;
 
-    installNodeManually?: boolean | null;
+    installNodeManually: boolean | null;
 
-    enableDetailedStatus?: boolean | null;
+    enableDetailedStatus: boolean | null;
 
-    channel?: string | null;
+    channel: string | null;
 
-    recent?: (Recent | null)[] | null;
+    recent: (Recent | null)[] | null;
   };
 
   export type Recent = {
@@ -332,7 +318,7 @@ export namespace Settings {
 
     name: string;
 
-    favorite?: boolean | null;
+    favorite: boolean | null;
   };
 }
 
@@ -344,7 +330,7 @@ export namespace ShowItemInFolder {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    showItemInFolder?: ShowItemInFolder | null;
+    showItemInFolder: ShowItemInFolder | null;
   };
 
   export type ShowItemInFolder = {
@@ -362,13 +348,13 @@ export namespace StopCommand {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    stopCommand?: StopCommand | null;
+    stopCommand: StopCommand | null;
   };
 
   export type StopCommand = {
     __typename?: 'StopResult';
 
-    result?: boolean | null;
+    result: boolean | null;
   };
 }
 
@@ -388,13 +374,13 @@ export namespace UpdateSettings {
 
     canCollectData: boolean;
 
-    installNodeManually?: boolean | null;
+    installNodeManually: boolean | null;
 
-    enableDetailedStatus?: boolean | null;
+    enableDetailedStatus: boolean | null;
 
-    channel?: string | null;
+    channel: string | null;
 
-    recent?: (Recent | null)[] | null;
+    recent: (Recent | null)[] | null;
   };
 
   export type Recent = {
@@ -404,7 +390,7 @@ export namespace UpdateSettings {
 
     name: string;
 
-    favorite?: boolean | null;
+    favorite: boolean | null;
   };
 }
 
@@ -413,7 +399,6 @@ export namespace UpdateSettings {
 // ====================================================
 
 import { Injectable } from '@angular/core';
-
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';

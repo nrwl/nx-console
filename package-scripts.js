@@ -39,7 +39,7 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
-      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.gen-apollo-angular', 'server.compile-only'),
+      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.gen-apollo-angular', 'server.compile-only', 'server.move-graphql'),
       'compile-only': 'tsc -p server/tsconfig.json',
       format: {
         default: npsUtils.series.nps('server.format.write'),
@@ -47,8 +47,9 @@ module.exports = {
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
       test: 'node ./tools/scripts/test ./server/test',
-      'gen-graphql-types': 'ts-node tools/gen-graphql-types.ts',
-      'gen-apollo-angular': 'ts-node tools/gen-apollo-angular.ts'
+      'move-graphql': 'cp server/src/schema/schema.graphql dist/server/src/schema/schema.graphql',
+      'gen-graphql-types': 'gql-gen --config codegen-server.yml',
+      'gen-apollo-angular': 'gql-gen --config codegen-client.js'
     },
     mac: {
       'clean': 'rm -rf dist',

@@ -1,22 +1,8 @@
-/* tslint:disable */
-
-// ====================================================
-// START: Typescript template
-// ====================================================
-
-// ====================================================
-// Enums
-// ====================================================
-
 export enum FileType {
-  file = 'file',
-  directory = 'directory',
-  angularDirectory = 'angularDirectory'
+  File = 'file',
+  Directory = 'directory',
+  AngularDirectory = 'angularDirectory'
 }
-
-// ====================================================
-// END: Typescript template
-// ====================================================
 
 // ====================================================
 // Documents
@@ -52,15 +38,15 @@ export namespace GetDirectoryPath {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    selectDirectory?: SelectDirectory | null;
+    selectDirectory: SelectDirectory | null;
   };
 
   export type SelectDirectory = {
     __typename?: 'SelectDirectoryResult';
 
-    selectedDirectoryPath?: string | null;
+    selectedDirectoryPath: string | null;
 
-    error?: string | null;
+    error: string | null;
   };
 }
 
@@ -74,7 +60,7 @@ export namespace NgNew {
   export type Mutation = {
     __typename?: 'Mutation';
 
-    ngNew?: NgNew | null;
+    ngNew: NgNew | null;
   };
 
   export type NgNew = {
@@ -108,7 +94,7 @@ export namespace SchematicCollections {
   export type Query = {
     __typename?: 'Query';
 
-    schematicCollections?: (SchematicCollections | null)[] | null;
+    schematicCollections: (SchematicCollections | null)[] | null;
   };
 
   export type SchematicCollections = {
@@ -148,9 +134,9 @@ export namespace WorkspaceDocs {
 
     id: string;
 
-    description?: string | null;
+    description: string | null;
 
-    prop?: string | null;
+    prop: string | null;
   };
 }
 
@@ -172,9 +158,9 @@ export namespace Workspace {
 
     path: string;
 
-    dependencies?: (Dependencies | null)[] | null;
+    dependencies: (Dependencies | null)[] | null;
 
-    projects?: (Projects | null)[] | null;
+    projects: (Projects | null)[] | null;
   };
 
   export type Dependencies = {
@@ -194,7 +180,7 @@ export namespace Workspace {
 
     projectType: string;
 
-    architect?: (Architect | null)[] | null;
+    architect: (Architect | null)[] | null;
   };
 
   export type Architect = {
@@ -209,7 +195,6 @@ export namespace Workspace {
 // ====================================================
 
 import { Injectable } from '@angular/core';
-
 import * as Apollo from 'apollo-angular';
 
 import gql from 'graphql-tag';
