@@ -43,7 +43,6 @@ import { TerminalComponent } from './terminal/terminal.component';
 import { BuildStatusComponent } from './build-status/build-status.component';
 import { CommandOutputComponent } from './command-output/command-output.component';
 import { TestStatusComponent } from './test-status/test-status.component';
-import { HttpClientModule } from '@angular/common/http';
 import { EntityDocsComponent } from './entity-docs/entity-docs.component';
 import { DialogComponent } from './ui-dialog/ui-dialog.component';
 
@@ -89,10 +88,9 @@ const PUBLIC_DECLARATIONS = [
   TaskRunnerComponent,
   TaskSelectorComponent,
   TerminalComponent,
-  EntityDocsComponent
+  EntityDocsComponent,
   TestStatusComponent,
   DialogComponent
-  TestStatusComponent,
 ];
 
 @NgModule({
