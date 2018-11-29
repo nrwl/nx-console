@@ -47,7 +47,7 @@ export class TargetComponent implements OnInit {
   @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent) flags: FlagsComponent;
 
-  docs$: Observable<any[]>;
+  docs$: Observable<any[]> = of();
 
   private readonly ngRun$ = new Subject<any>();
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
@@ -138,32 +138,6 @@ export class TargetComponent implements OnInit {
     this.command$ = this.commandArray$.pipe(
       map(c => `ng ${this.serializer.argsToString(c.commands)}`)
     );
-
-    if (this.settings.showDocs) {
-      this.docs$ = targetDescription$.pipe(
-        switchMap(d => {
-          if (d === null) {
-            return of(null);
-          } else {
-            const [collectionName, name] = d.target.split(':');
-            return this.schematicDocsGQL.fetch({
-              path: d.path,
-              collectionName,
-              name
-            });
-          }
-        }),
-        map(p => {
-          if (!p) {
-            return [];
-          } else {
-            return p.data.workspace.docs.schematicDocs;
-          }
-        })
-      );
-    } else {
-      this.docs$ = of([]);
-    }
   }
 
   getContextTitle(project: Project) {
