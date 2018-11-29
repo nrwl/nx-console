@@ -1,5 +1,5 @@
 const { resolve, join, relative } = require('path');
-const { lstatSync, readdirSync } = require('fs');
+const { lstatSync, readdirSync, existsSync, mkdirSync } = require('fs');
 
 function listLibs() {
   const libs = resolve(__dirname, 'libs');
@@ -12,6 +12,10 @@ function listLibs() {
 }
 
 function generateLib(lib) {
+  const generatedDirPath = `libs/${lib}/src/lib/generated`;
+  if (!existsSync(generatedDirPath)) {
+    mkdirSync(generatedDirPath);
+  }
   return {
     output: resolve(__dirname, `libs/${lib}/src/lib/generated/graphql.ts`),
     config: {

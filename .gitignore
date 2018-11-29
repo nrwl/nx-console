@@ -47,3 +47,4 @@ Thumbs.db
 
 #Environment
 .env
+**/generated/*
