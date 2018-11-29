@@ -67,7 +67,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
       const route = this.routes.find(r => r.url.startsWith(url));
       if (!route) {
-        throw new Error('This should never happen');
+        return '';
       }
 
       return route.title;
