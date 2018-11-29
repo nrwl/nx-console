@@ -770,10 +770,10 @@
     tree-kill "1.2.0"
     webpack-sources "1.2.0"
 
-"@nrwl/angular-console-enterprise-electron@0.0.31":
-  version "0.0.31"
-  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.0.31.tgz#d6ff6035a573491bffa8d3c48e2ed8a0f94c4290"
-  integrity sha512-3NbTxFzVqjYYmf264WJljyrefz5/6ozFpfJ8EqYvdkYFgvKRo8Mxi/Xeum1qgyPor3rYx+nQEdm0CnztA/4hJQ==
+"@nrwl/angular-console-enterprise-electron@0.0.32":
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.0.32.tgz#f2fb51d9b0c06b53e43cfc0c8375943d92bdd78e"
+  integrity sha512-UNeH+cfJa9Pv2xahG4vws1iI3E3ynOY+Zz2UnLeZrw4czBgNITJTUuddjc2DO9qnr4WUscazOBNhZjOY5d5MuQ==
   dependencies:
     apollo-cache-inmemory "1.3.10"
     apollo-client "^2.3.5"
@@ -784,10 +784,10 @@
     request "2.88.0"
     tslib "^1.9.0"
 
-"@nrwl/angular-console-enterprise-frontend@0.0.31":
-  version "0.0.31"
-  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-frontend/-/angular-console-enterprise-frontend-0.0.31.tgz#752144e7cfec84300704c27739197a75f87c71f0"
-  integrity sha512-tAqLHsBrNVZZL87jpU0qUAkzbZpI4P0bHEV1I1ZMBl4wb92uO940WcopVrf4WZglliVFz85A2ulgJt7TSZGX4A==
+"@nrwl/angular-console-enterprise-frontend@0.0.32":
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-frontend/-/angular-console-enterprise-frontend-0.0.32.tgz#1a69d17a97a87f4de0e71ace30b768b1d99d6e8b"
+  integrity sha512-rU5eIBzntkZQJNQelXntqJoEbaiOVv/EWOUS8Z4Q5g8haSI9LUKy3gzOf1DfLoyhq/l9o026EkEZWoO3wnascQ==
   dependencies:
     d3-ease "^1.0.5"
     d3-format "^1.3.2"
