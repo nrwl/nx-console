@@ -163,7 +163,7 @@ const TASKS: Observable<TaskCollections<Task | {}>> = of({
   ]
 });
 
-const activatedRoute: any = {
+const activatedRoute = {
   params: new Subject<any>(),
   parent: { params: new Subject<any>() },
   queryParams: new Subject<any>()
