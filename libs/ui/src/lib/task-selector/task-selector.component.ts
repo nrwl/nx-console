@@ -83,7 +83,6 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-
     this.taskCollections$.pipe(take(1)).subscribe(taskCollections => {
       if (taskCollections.selectedTask) {
         this.taskAnimationState$.next('collapse');
@@ -92,7 +91,7 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
       }
 
       this.route.queryParams.subscribe(params => {
-        if (params.filter) {
+        if (params.filter && typeof params.filter === 'string') {
           // the filter value should be set after we got all the tasks,
           // otherwise the .valueChanges stream won't be triggered on time!
           this.taskFilterFormControl.setValue(params.filter);
