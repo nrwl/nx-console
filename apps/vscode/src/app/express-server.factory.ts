@@ -3,8 +3,6 @@ import { join } from 'path';
 import { start, SelectDirectory } from '@angular-console/server';
 import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 
-const getPort = require('get-port');
-
 const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
   return await window
     .showOpenDialog({
@@ -23,6 +21,7 @@ const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
 };
 
 export async function startServer(context: ExtensionContext) {
+  const getPort = require('get-port');
   const port = await getPort({ port: 8888 });
 
   const staticResourcePath = join(context.extensionPath, 'assets', 'public');

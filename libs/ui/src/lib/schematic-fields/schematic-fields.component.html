@@ -1,0 +1,91 @@
+<div
+  class="field"
+  [class.error]="
+    formGroup.hasError('required', field.name) &&
+    formGroup.get(field.name)?.touched
+  "
+  fxLayout="row"
+  fxLayoutGap="16px"
+  [formGroup]="formGroup"
+>
+  <ng-container *ngIf="field.type === 'boolean'">
+    <mat-icon class="boolean-icon" svgIcon="toggle_on"></mat-icon>
+    <div fxLayout="column" fxFlex class="text-field-container">
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-label>{{ field.name }}</mat-label>
+
+        <mat-select
+          [formControlName]="field.name"
+          [placeholder]="field.name"
+          [attr.name]="field.name"
+          [required]="field.required"
+        >
+          <mat-option *ngIf="field.defaultValue === null" [value]="null">
+            --
+          </mat-option>
+          <mat-option [value]="true"> true </mat-option>
+          <mat-option [value]="false"> false </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-hint>
+        {{ field.description }}
+        <ng-container *ngIf="field.required">Required. </ng-container>
+        <ng-container *ngIf="field.defaultValue !== null"
+          >(Default: {{ field.defaultValue }})</ng-container
+        >
+      </mat-hint>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="field.type !== 'boolean'">
+    <mat-icon
+      [class.search-icon]="field.completionValues"
+      [class.text-icon]="!field.completionValues"
+      >{{ field.completionValues ? 'search' : 'create' }}</mat-icon
+    >
+    <div fxLayout="column" fxFlex class="text-field-container">
+      <mat-form-field appearance="outline" floatLabel="auto">
+        <mat-label>{{ field.name }}</mat-label>
+
+        <input
+          #input
+          fxFlex
+          type="text"
+          matInput
+          [placeholder]="field.name"
+          [attr.name]="field.name"
+          [required]="field.required"
+          [formControlName]="field.name"
+          [matAutocomplete]="auto"
+          (input)="triggerValueUpdate(field.name, input.value)"
+        />
+
+        <mat-icon
+          @fadeInOut
+          *ngIf="input.value"
+          class="clear-text-field "
+          (click)="clearFormField(field)"
+          >close_outline</mat-icon
+        >
+
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option
+            (click)="input.blur()"
+            *ngFor="let completionValue of (field.completionValues | async)"
+            [value]="completionValue.value"
+          >
+            {{ completionValue.display || completionValue.value }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-hint>
+        {{ field.description }}
+        <ng-container *ngIf="field.required">Required. </ng-container>
+        <ng-container *ngIf="field.defaultValue"
+          >(Default: {{ field.defaultValue }})</ng-container
+        >
+      </mat-hint>
+    </div>
+  </ng-container>
+</div>

@@ -34,7 +34,10 @@ module.exports = {
   scripts: {
     frontend: {
       build: 'ng build angular-console --prod',
-      serve: 'ng serve angular-console'
+      serve: {
+        default: 'ng serve angular-console',
+        cypress: 'ng serve angular-console --configuration=cypress'
+      }
     },
     server: {
       gen: nps.series.nps(
@@ -144,10 +147,15 @@ module.exports = {
       ),
       gen: nps.series.nps(withPlatform('copy-schema.electron'), 'server.gen'),
       server: nps.series.nps(
+        'server.gen-and-build.electron',
         'server.buildForServe',
+        withPlatform('copy-schema.electron'),
         withPlatform('start-server')
       ),
-      up: nps.concurrent.nps('dev.server', 'frontend.serve')
+      up: {
+        default: nps.concurrent.nps('dev.server', 'frontend.serve'),
+        cypress: nps.concurrent.nps('dev.server', 'frontend.serve.cypress')
+      }
     },
     package: {
       // NOTE: This command should be run on a mac with Parallels installed

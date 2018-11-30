@@ -34,6 +34,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
 
 import { AppComponent } from './app.component';
+import { environment } from '../environments/environment';
 
 export function initApollo(
   telemetry: Telemetry,
@@ -107,6 +108,7 @@ export function initApollo(
     )
   ],
   providers: [
+    ...environment.providers,
     IsNodeJsInstalledGuard,
     {
       provide: 'telemetry',

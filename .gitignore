@@ -46,3 +46,4 @@ Thumbs.db
 #Environment
 .env
 **/generated/*
+server/src/graphql-types.ts

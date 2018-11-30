@@ -1,3 +1,4 @@
+export * from './lib/schematic-fields/schematic-fields.component';
 export * from './lib/ui.module';
 export * from './lib/terminal/terminal.component';
 export * from './lib/task-selector/task-selector.component';

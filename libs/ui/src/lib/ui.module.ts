@@ -1,5 +1,6 @@
 import { CdkTreeModule } from '@angular/cdk/tree';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -16,34 +17,34 @@ import {
   MatListModule,
   MatMenuModule,
   MatOptionModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
   MatRadioModule,
   MatRippleModule,
   MatSelectModule,
   MatSidenavModule,
   MatSlideToggleModule,
+  MatStepperModule,
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
-  MatTreeModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatStepperModule
+  MatTreeModule
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 
+import { BuildStatusComponent } from './build-status/build-status.component';
+import { CommandOutputComponent } from './command-output/command-output.component';
 import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
 import { DataCollectionComponent } from './data-collection/data-collection.component';
+import { EntityDocsComponent } from './entity-docs/entity-docs.component';
 import { FlagsComponent } from './flags/flags.component';
 import { NormalizePathPipe } from './normalize-path.pipe';
+import { SchematicFieldsComponent } from './schematic-fields/schematic-fields.component';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
-import { BuildStatusComponent } from './build-status/build-status.component';
-import { CommandOutputComponent } from './command-output/command-output.component';
 import { TestStatusComponent } from './test-status/test-status.component';
-import { HttpClientModule } from '@angular/common/http';
-import { EntityDocsComponent } from './entity-docs/entity-docs.component';
 import { TerminalFactory } from './terminal/terminal.factory';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
@@ -97,8 +98,8 @@ const PUBLIC_DECLARATIONS = [
 @NgModule({
   imports: IMPORTS,
   providers: [TerminalFactory],
-  declarations: [...PUBLIC_DECLARATIONS],
-  exports: [...IMPORTS, ...PUBLIC_DECLARATIONS]
+  declarations: [...PUBLIC_DECLARATIONS, SchematicFieldsComponent],
+  exports: [...IMPORTS, ...PUBLIC_DECLARATIONS, SchematicFieldsComponent]
 })
 export class UiModule {
   constructor(

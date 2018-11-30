@@ -1,7 +1,7 @@
 import * as path from 'path';
+
 import {
   directoryExists,
-  fileExists,
   fileExistsSync,
   listFiles,
   listOfUnnestedNpmPackages,

@@ -1,0 +1,54 @@
+mat-hint {
+  margin-top: -20px;
+}
+
+:host {
+  display: block;
+  overflow: hidden;
+  width: 100%;
+}
+
+.text-field-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.field-viewport {
+  position: relative;
+  left: 22px;
+}
+
+.field {
+  position: relative;
+  margin-bottom: 24px;
+  padding-right: 60px;
+
+  & > mat-icon {
+    position: relative;
+    top: 16px;
+    color: rgb(117, 117, 117);
+  }
+
+  .clear-text-field {
+    position: absolute;
+    z-index: 1;
+    overflow: hidden;
+    right: 0;
+    top: 7px;
+    cursor: pointer;
+    background: #6a6a6a;
+    color: white;
+    border-radius: 50%;
+    font-size: 16px;
+    line-height: 20px;
+    padding-left: 2px;
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    font-weight: bold;
+  }
+}
+
+.mat-form-field-underline {
+  display: none;
+}

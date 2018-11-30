@@ -6,6 +6,14 @@ ui-flags {
     overflow: hidden !important;
   }
 
+  .mat-expansion-panel-body {
+    padding-right: 0 !important;
+  }
+
+  .flags-container {
+    overflow: auto;
+  }
+
   background: white;
 
   .headline-container {
@@ -19,10 +27,6 @@ ui-flags {
       line-height: 32px;
       color: rgba(0, 0, 0, 0.87) !important;
     }
-  }
-
-  mat-hint {
-    margin-top: -20px;
   }
 
   mat-expansion-panel {
@@ -53,52 +57,5 @@ ui-flags {
     .mat-expansion-panel-header-title {
       color: rgba(0, 0, 0, 0.87) !important;
     }
-  }
-
-  .text-field-container {
-    width: 100%;
-    overflow: hidden;
-  }
-
-  .field-viewport {
-    position: relative;
-    left: 22px;
-  }
-
-  .field {
-    max-height: 78px;
-    min-height: 78px;
-    position: relative;
-    margin-bottom: 24px;
-    padding-right: 60px;
-
-    & > mat-icon {
-      position: relative;
-      top: 16px;
-      color: rgb(117, 117, 117);
-    }
-
-    .clear-text-field {
-      position: absolute;
-      z-index: 1;
-      overflow: hidden;
-      right: 0;
-      top: 7px;
-      cursor: pointer;
-      background: #6a6a6a;
-      color: white;
-      border-radius: 50%;
-      font-size: 16px;
-      line-height: 20px;
-      padding-left: 2px;
-      box-sizing: border-box;
-      width: 20px;
-      height: 20px;
-      font-weight: bold;
-    }
-  }
-
-  .mat-form-field-underline {
-    display: none;
   }
 }
