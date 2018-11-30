@@ -220,6 +220,7 @@ type Settings {
   installNodeManually: Boolean
   enableDetailedStatus: Boolean
   channel: String
+  isConnectUser: Boolean!
   recent: [WorkspaceDefinition]
 }
 

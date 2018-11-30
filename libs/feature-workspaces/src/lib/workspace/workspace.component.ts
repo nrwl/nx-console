@@ -168,7 +168,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.settings.fetch().subscribe(() => {
-      if (this.settings.showConnectPlugin()) {
+      if (this.settings.isConnectUser()) {
         this.routes = [
           this.routes[0],
           {

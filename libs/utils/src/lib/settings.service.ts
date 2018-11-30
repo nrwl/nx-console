@@ -13,6 +13,7 @@ interface SettingsData {
   readonly canCollectData: boolean;
   readonly installNodeManually: boolean;
   readonly enableDetailedStatus: boolean;
+  readonly isConnectUser: boolean;
   readonly channel: 'latest' | 'beta' | 'alpha';
 }
 
@@ -25,6 +26,7 @@ export class Settings {
     canCollectData: false,
     installNodeManually: false,
     enableDetailedStatus: true,
+    isConnectUser: false,
     channel: 'latest'
   };
 
@@ -81,6 +83,10 @@ export class Settings {
 
   showConnectPlugin(): boolean {
     return true;
+  }
+
+  isConnectUser(): boolean {
+    return this.settings.isConnectUser;
   }
 
   showDocs(): boolean | undefined {

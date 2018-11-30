@@ -4,6 +4,7 @@ query Settings {
     installNodeManually
     enableDetailedStatus
     channel
+    isConnectUser
     recent {
       path
       name

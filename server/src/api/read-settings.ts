@@ -1,5 +1,4 @@
 /* tslint:disable */
-
 const Store = require('electron-store');
 const store = new Store();
 
@@ -20,6 +19,9 @@ export function readSettings() {
   if (settings.channel === undefined) {
     settings.channel = 'latest';
   }
+  const authUtils = require('@nrwl/angular-console-enterprise-electron')
+    .authUtils;
+  settings.isConnectUser = !!authUtils.getIdTokenFromStore();
   return settings;
 }
 
