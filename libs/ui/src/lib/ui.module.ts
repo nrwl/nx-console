@@ -31,7 +31,6 @@ import {
 } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 
 import { ContextualActionBarComponent } from './contextual-action-bar/contextual-action-bar.component';
 import { DataCollectionComponent } from './data-collection/data-collection.component';
@@ -43,8 +42,8 @@ import { TerminalComponent } from './terminal/terminal.component';
 import { BuildStatusComponent } from './build-status/build-status.component';
 import { CommandOutputComponent } from './command-output/command-output.component';
 import { TestStatusComponent } from './test-status/test-status.component';
+import { HttpClientModule } from '@angular/common/http';
 import { EntityDocsComponent } from './entity-docs/entity-docs.component';
-import { DialogComponent } from './ui-dialog/ui-dialog.component';
 
 const IMPORTS = [
   HttpClientModule,
@@ -88,9 +87,8 @@ const PUBLIC_DECLARATIONS = [
   TaskRunnerComponent,
   TaskSelectorComponent,
   TerminalComponent,
-  EntityDocsComponent,
   TestStatusComponent,
-  DialogComponent
+  EntityDocsComponent
 ];
 
 @NgModule({
