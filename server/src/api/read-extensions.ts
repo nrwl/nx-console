@@ -31,6 +31,10 @@ export function availableExtensions() {
       name: '@nativescript/schematics',
       description: 'NativeScript Support'
     },
+    {
+      name: '@ngrx/schematics',
+      description: 'NgRx state management generators'
+    },
     { name: '@ngrx/effects', description: 'NgRx side effect management' },
     {
       name: '@ngrx/store',
