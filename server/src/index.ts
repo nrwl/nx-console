@@ -114,14 +114,14 @@ function createWindow() {
     mainWindow = new BrowserWindow({
       width: bounds.width,
       height: bounds.height,
-      icon: path.join(__dirname, '/assets/icons/build/icon.png'),
+      icon: path.join(__dirname, '/assets/build/icons/icon.png'),
       show: false
     });
   } catch {
     mainWindow = new BrowserWindow({
       width: 800,
       height: 1400,
-      icon: path.join(__dirname, '/assets/icons/build/icon.png'),
+      icon: path.join(__dirname, '/assets/build/icons/icon.png'),
       show: false
     });
   }
