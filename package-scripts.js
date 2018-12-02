@@ -99,10 +99,14 @@ module.exports = {
       'win-builder-publish': electronBuilder('--win', 'always'),
       'mac-builder-prerelease': electronBuilder('--mac --linux', 'never'),
       'mac-builder-publish': electronBuilder('--mac --linux', 'always'),
+      'linux-builder-prerelease': electronBuilder('--linux --linux', 'never'),
+      'linux-builder-publish': electronBuilder('--linux --linux', 'always'),
       'win-prerelease': npsUtils.series.nps('dev.prepare', 'publish.win-builder-prerelease'),
       'win-publish': npsUtils.series.nps('dev.prepare', 'publish.win-builder-publish'),
       'mac-prerelease': npsUtils.series.nps('dev.prepare', 'publish.mac-builder-prerelease'),
-      'mac-publish': npsUtils.series.nps('dev.prepare', 'publish.mac-builder-publish')
+      'mac-publish': npsUtils.series.nps('dev.prepare', 'publish.mac-builder-publish'),
+      'linux-prerelease': npsUtils.series.nps('dev.prepare', 'publish.linux-builder-prerelease'),
+      'linux-publish': npsUtils.series.nps('dev.prepare', 'publish.linux-builder-publish')
     },
     e2e: {
       'compile': 'tsc -p apps/angular-console-e2e/tsconfig.json',

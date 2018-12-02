@@ -2,7 +2,7 @@
 	<img
 		width="150"
 		alt="Logo"
-		src="server/assets/icons/build/icon.png">
+		src="server/assets/build/icons/icon.png">
     </br>
     <div>Angular Console</div>
     </br>

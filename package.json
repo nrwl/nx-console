@@ -32,7 +32,7 @@
     "generateUpdatesFilesForAllChannels": true,
     "directories": {
       "app": "dist/server",
-      "buildResources": "dist/server/assets/icons/build",
+      "buildResources": "dist/server/assets/build",
       "output": "dist/packages"
     },
     "npmRebuild": true,
