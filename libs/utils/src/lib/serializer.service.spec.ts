@@ -30,6 +30,7 @@ describe('Serializer', () => {
   });
 
   describe('normalizeSchematic', () => {
+    serializer = new Serializer();
     const schematic: Schematic = {
       collection: '@nrwl/testing',
       name: 'normalized',
@@ -67,9 +68,8 @@ describe('Serializer', () => {
         }
       ]
     };
-    let normalized: Schematic;
+    const normalized: Schematic = serializer.normalizeSchematic(schematic);
     it('should normalize the schematic, removing periods from the end of description', () => {
-      normalized = serializer.normalizeSchematic(schematic);
       expect(normalized.description.lastIndexOf('.')).toBeLessThan(
         normalized.description.length
       );
@@ -84,6 +84,12 @@ describe('Serializer', () => {
           case 'ignoreImportant':
             expect(field.important).toEqual(false);
             break;
+          default:
+            throw new Error(
+              `Unexpected field name '${
+                field.name
+              }' in normalizeSchematic test cases`
+            );
         }
       });
     });
