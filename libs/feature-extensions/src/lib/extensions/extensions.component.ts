@@ -11,7 +11,10 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
-import { EXTENSIONS_POLLING } from '@angular-console/utils';
+import {
+  EXTENSIONS_POLLING,
+  RouterNavigationService
+} from '@angular-console/utils';
 import { WorkspaceAndExtensionsGQL } from '../generated/graphql';
 
 interface ExtensionId {
@@ -101,7 +104,8 @@ export class ExtensionsComponent {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly workspaceAndExtensionsGQL: WorkspaceAndExtensionsGQL
+    private readonly workspaceAndExtensionsGQL: WorkspaceAndExtensionsGQL,
+    private readonly locationExt: RouterNavigationService
   ) {}
 
   navigateToSelectedExtension(s: Extension | null) {
@@ -110,7 +114,9 @@ export class ExtensionsComponent {
         relativeTo: this.route
       });
     } else {
-      this.router.navigate(['.'], { relativeTo: this.route });
+      this.locationExt.goBackOrNavigateToFallback(['.'], {
+        relativeTo: this.route
+      });
     }
   }
 

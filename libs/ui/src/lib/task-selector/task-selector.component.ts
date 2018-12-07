@@ -69,9 +69,7 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
     actions => {
       if (actions === null) {
         this.taskAnimationState$.next('expand');
-        setTimeout(() => {
-          this.selectionChange.next(null);
-        }, ANIMATION_MILLIS);
+        this.selectionChange.next(null);
       }
     }
   );
@@ -128,8 +126,8 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.selectTask(null);
     this.contextActionCloseSubscription.unsubscribe();
+    this.selectTask(null);
   }
 
   trackByCollectionName(_: number, taskCollection: TaskCollection<T>) {
