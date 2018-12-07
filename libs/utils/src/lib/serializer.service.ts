@@ -10,12 +10,13 @@ export class Serializer {
       ...f,
       important:
         f.positional ||
+        f.required ||
         this.importantSchematicField(schematic.collection, f.name),
       completion: this.completionSchematicType(schematic.collection, f.name)
     }));
     const normal = {
       ...schematic,
-      schema: this.reoderFields(schema)
+      schema: this.reorderFields(schema)
     };
     if (normal.description.endsWith('.')) {
       normal.description = normal.description.slice(
@@ -27,7 +28,7 @@ export class Serializer {
   }
 
   normalizeTarget(builder: string, schema: Field[]): Field[] {
-    return this.reoderFields(
+    return this.reorderFields(
       schema.map(f => ({
         ...f,
         required: false,
@@ -37,7 +38,7 @@ export class Serializer {
     );
   }
 
-  reoderFields(fields: Field[]): Field[] {
+  reorderFields(fields: Field[]): Field[] {
     return [
       ...fields.filter(r => r.positional),
       ...fields.filter(r => !r.positional && r.important),
@@ -114,15 +115,19 @@ export class Serializer {
   }
 
   private completionSchematicType(collection: string, name: string): any {
-    if (collection === '@nrwl/schematics' && name === 'module') {
-      return 'absoluteModules';
-    }
-    if (
-      collection === '@schematics/angular' ||
-      collection === '@ngrx/schematics'
-    ) {
-      if (name === 'project') return 'projects';
-      if (name === 'module') return 'localModules';
+    switch (collection) {
+      case '@nrwl/schematics':
+        if (name === 'module' || name === 'parentModule') {
+          return 'absoluteModules';
+        }
+        break;
+      case '@schematics/angular':
+      case '@angular/material':
+      case '@angular/cdk':
+      case '@ngrx/schematics':
+        if (name === 'project') return 'projects';
+        if (name === 'module') return 'localModules';
+        break;
     }
     return undefined;
   }
