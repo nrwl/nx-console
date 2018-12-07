@@ -37,10 +37,9 @@ export function availableExtensions() {
       name: '@nativescript/schematics',
       description: 'NativeScript Support'
     },
-    { name: '@ngrx/effects', description: 'NgRx side effect management' },
     {
-      name: '@ngrx/store',
-      description: 'NgRx state management'
+      name: '@ngrx/schematics',
+      description: 'NgRx state management generators'
     },
     {
       name: '@progress/kendo-angular-conversational-ui',
