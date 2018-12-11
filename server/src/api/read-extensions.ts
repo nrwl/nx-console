@@ -42,6 +42,10 @@ export function availableExtensions() {
       description: 'NgRx state management generators'
     },
     {
+      name: '@ngxs/schematics',
+      description: 'Ngxs state management schematics'
+    },
+    {
       name: '@progress/kendo-angular-conversational-ui',
       description: 'Kendo UI Conversational components'
     },
