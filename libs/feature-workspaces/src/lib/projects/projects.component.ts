@@ -1,10 +1,11 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Project } from '@angular-console/schema';
-import { Observable, Subscription, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
+import { map, startWith, switchMap } from 'rxjs/operators';
 import { PROJECTS_POLLING, Settings } from '@angular-console/utils';
-import { WorkspaceGQL, WorkspaceDocsGQL } from '../generated/graphql';
+import { WorkspaceDocsGQL, WorkspaceGQL } from '../generated/graphql';
+import { FormControl } from '@angular/forms';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,13 +14,16 @@ import { WorkspaceGQL, WorkspaceDocsGQL } from '../generated/graphql';
   styleUrls: ['./projects.component.scss']
 })
 export class ProjectsComponent implements OnInit {
-  workspace$: Observable<any>;
+  projects$: Observable<any>;
+  filteredProjects$: Observable<any>;
   docs$ = this.settings.showDocs
     ? this.route.params.pipe(
         switchMap(p => this.workspaceDocsGQL.fetch({ path: p.path })),
         map(p => p.data.workspace.docs.workspaceDocs)
       )
     : of([]);
+
+  projectFilterFormControl = new FormControl();
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -29,7 +33,7 @@ export class ProjectsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.workspace$ = this.route.params.pipe(
+    this.projects$ = this.route.params.pipe(
       map(m => m.path),
       switchMap(path => {
         return this.workspaceGQL.watch(
@@ -44,18 +48,35 @@ export class ProjectsComponent implements OnInit {
       map((r: any) => {
         const w = r.data.workspace;
         const projects = w.projects.map((p: any) => {
-          const actions = [
-            ...createLinkForTask(p, 'serve', 'Serve'),
-            ...createLinkForTask(p, 'test', 'Test'),
-            ...createLinkForTask(p, 'build', 'Build'),
-            ...createLinkForTask(p, 'e2e', 'E2E'),
-            ...createLinkForCoreSchematic(p, 'component', 'Generate Component')
-          ] as any[];
-          return { ...p, actions };
+          return { ...p, actions: this.createActions(p) };
         });
-        return { ...w, projects };
+        return projects;
       })
     );
+
+    this.filteredProjects$ = combineLatest(
+      this.projectFilterFormControl.valueChanges.pipe(
+        startWith(''),
+        map(value => value.toLowerCase())
+      ),
+      this.projects$
+    ).pipe(
+      map(([lowerCaseFilterValue, projects]) =>
+        projects.filter((project: any) =>
+          project.name.includes(lowerCaseFilterValue)
+        )
+      )
+    );
+  }
+
+  private createActions(p: any) {
+    return [
+      ...createLinkForTask(p, 'serve', 'Serve'),
+      ...createLinkForTask(p, 'test', 'Test'),
+      ...createLinkForTask(p, 'build', 'Build'),
+      ...createLinkForTask(p, 'e2e', 'E2E'),
+      ...createLinkForCoreSchematic(p, 'component', 'Generate Component')
+    ] as any[];
   }
 
   trackByName(p: any) {

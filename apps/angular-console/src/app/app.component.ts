@@ -3,7 +3,7 @@ import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 import {
   Breadcrumb,
   ContextualActionBarService
@@ -65,7 +65,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private readonly settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
-    private readonly titleService: Title
+    private readonly titleService: Title,
+    private readonly router: Router
   ) {}
 
   private readonly titleSubscription = this.contextualActionBarService.breadcrumbs$
