@@ -3,7 +3,7 @@
     "node_modules/codelyzer",
     "node_modules/@nrwl/schematics/src/tslint"
   ],
-  "extends": ["codelyzer"],
+  "extends": ["codelyzer", "tslint-no-unused-expression-chai"],
   "rules": {
     "adjacent-overload-signatures": true,
     "member-access": [true, "no-public"],
@@ -84,7 +84,6 @@
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": false,
     "no-unnecessary-initializer": true,
-    "no-unused-expression": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,

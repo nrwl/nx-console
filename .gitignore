@@ -25,7 +25,6 @@
 
 # IDE - VSCode
 .vscode/*l
-!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
@@ -48,3 +47,4 @@ Thumbs.db
 #Environment
 .env
 **/generated/*
+apps/vscode/src/assets/schema.graphql

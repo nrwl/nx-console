@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { Terminal } from 'xterm';
+import { TerminalFactory } from './terminal.factory';
 
 const DEBOUNCE_TIME = 300;
 const SCROLL_BAR_WIDTH = 48;
@@ -28,7 +28,10 @@ const MIN_TERMINAL_WIDTH = 20;
 })
 export class TerminalComponent implements AfterViewInit, OnDestroy {
   private output = '';
-  private readonly term = new Terminal({ disableStdin: true, fontSize: 14 });
+  private readonly term = this.terminalFactory.new({
+    disableStdin: true,
+    fontSize: 14
+  });
   private readonly resizeSubscription = fromEvent(window, 'resize')
     .pipe(debounceTime(DEBOUNCE_TIME))
     .subscribe(() => {
@@ -54,6 +57,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     this.output = s;
     this.writeOutput(s);
   }
+
+  constructor(private readonly terminalFactory: TerminalFactory) {}
 
   ngAfterViewInit(): void {
     this.term.open(this.code.nativeElement);

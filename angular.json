@@ -76,32 +76,15 @@
             "browserTarget": "angular-console:build"
           }
         },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "apps/angular-console/src/test.ts",
-            "polyfills": "apps/angular-console/src/polyfills.ts",
-            "tsConfig": "apps/angular-console/tsconfig.spec.json",
-            "karmaConfig": "apps/angular-console/karma.conf.js",
-            "styles": [
-              "apps/angular-console/src/styles.scss"
-            ],
-            "scripts": [],
-            "assets": [
-              "apps/angular-console/src/favicon.ico",
-              "apps/angular-console/src/assets"
-            ]
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "apps/angular-console/tsconfig.app.json",
-              "apps/angular-console/tsconfig.spec.json"
+              "apps/angular-console/tsconfig.app.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         }
@@ -126,7 +109,8 @@
               "libs/feature-install-node-js/tsconfig.lib.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         }
@@ -138,23 +122,15 @@
       "projectType": "library",
       "prefix": "angular-console",
       "architect": {
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "libs/feature-workspaces/src/test.ts",
-            "tsConfig": "libs/feature-workspaces/tsconfig.spec.json",
-            "karmaConfig": "libs/feature-workspaces/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/feature-workspaces/tsconfig.lib.json",
-              "libs/feature-workspaces/tsconfig.spec.json"
+              "libs/feature-workspaces/tsconfig.lib.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         }
@@ -166,23 +142,15 @@
       "projectType": "library",
       "prefix": "angular-console",
       "architect": {
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "libs/feature-extensions/src/test.ts",
-            "tsConfig": "libs/feature-extensions/tsconfig.spec.json",
-            "karmaConfig": "libs/feature-extensions/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/feature-extensions/tsconfig.lib.json",
-              "libs/feature-extensions/tsconfig.spec.json"
+              "libs/feature-extensions/tsconfig.lib.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         }
@@ -194,23 +162,15 @@
       "projectType": "library",
       "prefix": "angular-console",
       "architect": {
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "libs/feature-generate/src/test.ts",
-            "tsConfig": "libs/feature-generate/tsconfig.spec.json",
-            "karmaConfig": "libs/feature-generate/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/feature-generate/tsconfig.lib.json",
-              "libs/feature-generate/tsconfig.spec.json"
+              "libs/feature-generate/tsconfig.lib.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         }
@@ -222,14 +182,6 @@
       "projectType": "library",
       "prefix": "angular-console",
       "architect": {
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "libs/utils/src/test.ts",
-            "tsConfig": "libs/utils/tsconfig.spec.json",
-            "karmaConfig": "libs/utils/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -238,8 +190,17 @@
               "libs/utils/tsconfig.spec.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/builders:jest",
+          "options": {
+            "jestConfig": "libs/utils/jest.config.js",
+            "tsConfig": "libs/utils/tsconfig.spec.json",
+            "setupFile": "libs/utils/src/test-setup.ts"
           }
         }
       }
@@ -250,23 +211,15 @@
       "projectType": "library",
       "prefix": "angular-console",
       "architect": {
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "libs/feature-run/src/test.ts",
-            "tsConfig": "libs/feature-run/tsconfig.spec.json",
-            "karmaConfig": "libs/feature-run/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/feature-run/tsconfig.lib.json",
-              "libs/feature-run/tsconfig.spec.json"
+              "libs/feature-run/tsconfig.lib.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         }
@@ -277,14 +230,6 @@
       "sourceRoot": "libs/ui/src",
       "projectType": "library",
       "architect": {
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "libs/ui/src/test.ts",
-            "tsConfig": "libs/ui/tsconfig.spec.json",
-            "karmaConfig": "libs/ui/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -293,8 +238,17 @@
               "libs/ui/tsconfig.spec.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/builders:jest",
+          "options": {
+            "jestConfig": "libs/ui/jest.config.js",
+            "tsConfig": "libs/ui/tsconfig.spec.json",
+            "setupFile": "libs/ui/src/test-setup.ts"
           }
         }
       }
@@ -305,23 +259,15 @@
       "projectType": "library",
       "prefix": "angular-console",
       "architect": {
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "libs/schema/src/test.ts",
-            "tsConfig": "libs/schema/tsconfig.spec.json",
-            "karmaConfig": "libs/schema/karma.conf.js"
-          }
-        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/schema/tsconfig.lib.json",
-              "libs/schema/tsconfig.spec.json"
+              "libs/schema/tsconfig.lib.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         }
@@ -337,19 +283,21 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/feature-action-bar/tsconfig.lib.json"
+              "libs/feature-action-bar/tsconfig.lib.json",
+              "libs/feature-action-bar/tsconfig.spec.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@nrwl/builders:jest",
           "options": {
-            "main": "libs/feature-action-bar/src/test.ts",
+            "jestConfig": "libs/feature-action-bar/jest.config.js",
             "tsConfig": "libs/feature-action-bar/tsconfig.spec.json",
-            "karmaConfig": "libs/feature-action-bar/karma.conf.js"
+            "setupFile": "libs/feature-action-bar/src/test-setup.ts"
           }
         }
       }
@@ -367,8 +315,133 @@
               "libs/feature-settings/tsconfig.lib.json"
             ],
             "exclude": [
-              "**/node_modules/**"
+              "**/node_modules/**",
+              "**/generated/**"
             ]
+          }
+        }
+      }
+    },
+    "vscode": {
+      "root": "apps/vscode",
+      "sourceRoot": "apps/vscode/src",
+      "projectType": "application",
+      "prefix": "vscode",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/builders:node-build",
+          "options": {
+            "outputPath": "dist/apps/vscode",
+            "main": "apps/vscode/src/main.ts",
+            "tsConfig": "apps/vscode/tsconfig.app.json",
+            "assets": [
+              "apps/vscode/src/package.json",
+              "apps/vscode/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "fileReplacements": [
+                {
+                  "replace": "apps/vscode/src/environments/environment.ts",
+                  "with": "apps/vscode/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/vscode/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "**/generated/**"
+            ]
+          }
+        }
+      }
+    },
+    "electron": {
+      "root": "apps/electron",
+      "sourceRoot": "apps/electron/src",
+      "projectType": "application",
+      "prefix": "electron",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/builders:node-build",
+          "options": {
+            "outputPath": "dist/apps/electron",
+            "main": "apps/electron/src/main.ts",
+            "tsConfig": "apps/electron/tsconfig.app.json",
+            "assets": [
+              "apps/electron/src/package.json",
+              "apps/electron/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "fileReplacements": [
+                {
+                  "replace": "apps/electron/src/environments/environment.ts",
+                  "with": "apps/electron/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/builders:node-execute",
+          "options": {
+            "buildTarget": "electron:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/electron/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "**/generated/**"
+            ]
+          }
+        }
+      }
+    },
+    "server": {
+      "root": "libs/server",
+      "sourceRoot": "libs/server/src",
+      "projectType": "library",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/server/tsconfig.lib.json",
+              "libs/server/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "**/generated/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/builders:jest",
+          "options": {
+            "jestConfig": "libs/server/jest.config.js",
+            "tsConfig": "libs/server/tsconfig.spec.json"
           }
         }
       }

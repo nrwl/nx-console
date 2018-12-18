@@ -44,6 +44,7 @@ import { CommandOutputComponent } from './command-output/command-output.componen
 import { TestStatusComponent } from './test-status/test-status.component';
 import { HttpClientModule } from '@angular/common/http';
 import { EntityDocsComponent } from './entity-docs/entity-docs.component';
+import { TerminalFactory } from './terminal/terminal.factory';
 
 const IMPORTS = [
   HttpClientModule,
@@ -93,6 +94,7 @@ const PUBLIC_DECLARATIONS = [
 
 @NgModule({
   imports: IMPORTS,
+  providers: [TerminalFactory],
   declarations: [...PUBLIC_DECLARATIONS],
   exports: [...IMPORTS, ...PUBLIC_DECLARATIONS]
 })
