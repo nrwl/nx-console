@@ -37,7 +37,8 @@
     },
     "npmRebuild": true,
     "mac": {
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "artifactName": "AngularConsole-${version}.${ext}"
     },
     "win": {
       "target": "nsis"
@@ -45,7 +46,6 @@
     "linux": {
       "target": [
         "deb",
-        "rpm",
         "tar.gz"
       ],
       "synopsis": "Angular Console",
@@ -116,11 +116,11 @@
     "cypress": "3.1.1",
     "drivelist": "6.4.3",
     "electron": "2.0.14",
-    "electron-builder": "20.36.2",
+    "electron-builder": "20.28.4",
     "electron-installer-dmg": "2.0.0",
     "electron-packager": "12.2.0",
     "electron-store": "2.0.0",
-    "electron-updater": "4.0.4",
+    "electron-updater": "3.1.2",
     "express": "4.16.4",
     "express-graphql": "0.7.1",
     "fix-path": "2.1.0",
