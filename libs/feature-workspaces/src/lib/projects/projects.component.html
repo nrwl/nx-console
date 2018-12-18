@@ -1,7 +1,26 @@
-<div *ngIf="(workspace$ | async) as workspace">
+<div *ngIf="(filteredProjects$ | async) as projects">
   <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
-  <mat-list *ngIf="workspace.projects.length > 0; else: empty">
-    <ng-container *ngFor="let p of workspace.projects">
+  <div
+    class="project-filter-container"
+    fxLayout="row"
+    fxLayoutAlign="start center"
+  >
+    <input
+      placeholder="Filter projects..."
+      #projectFilter
+      fxFlex
+      [formControl]="projectFilterFormControl"
+      id="filter"
+    />
+    <mat-icon
+      class="filter-icon"
+      (click)="projectFilterFormControl.setValue(''); projectFilter.select()"
+    >
+      {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
+    </mat-icon>
+  </div>
+  <mat-list *ngIf="projects.length > 0; else: empty">
+    <ng-container *ngFor="let p of projects">
       <mat-list-item [ngClass]="p.projectType" [disableRipple]="true">
         <div class="project-type" mat-line>{{ p.projectType }}</div>
         <div class="project-name" mat-line>{{ p.name }}</div>

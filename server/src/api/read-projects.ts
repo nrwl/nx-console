@@ -3,14 +3,20 @@ import { Project, Architect } from '../graphql-types';
 import * as path from 'path';
 
 export function readProjects(basedir: string, json: any): Project[] {
-  return Object.entries(json).map(([key, value]: [string, any]) => {
-    return {
-      name: key,
-      root: value.root,
-      projectType: value.projectType,
-      architect: readArchitect(key, basedir, value.architect)
-    };
-  });
+  return Object.entries(json)
+    .map(([key, value]: [string, any]) => {
+      return {
+        name: key,
+        root: value.root,
+        projectType: value.projectType,
+        architect: readArchitect(key, basedir, value.architect)
+      };
+    })
+    .sort(compareProjects);
+}
+
+function compareProjects(a: Project, b: Project) {
+  return a.root.localeCompare(b.root);
 }
 
 function readArchitect(
@@ -30,11 +36,6 @@ function readArchitect(
       builder: value.builder
     };
   });
-}
-
-export function readDescription(basedir: string, builder: string) {
-  const [npmPackage, builderName] = builder.split(':');
-  return readBuildersFile(basedir, npmPackage)[builderName].description;
 }
 
 export function readSchema(basedir: string, builder: string) {

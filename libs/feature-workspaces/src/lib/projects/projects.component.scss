@@ -82,3 +82,30 @@
   overflow: hidden;
   text-transform: uppercase;
 }
+
+.project-filter-container {
+  background-color: white;
+  height: 55px;
+  min-height: 55px;
+  max-height: 55px;
+
+  input {
+    background: none;
+    background-color: none;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    padding: 0 16px;
+  }
+
+  .filter-icon {
+    cursor: pointer;
+    margin-right: 12px;
+    color: rgba(0, 0, 0, 0.87);
+    height: 28px;
+    width: 28px;
+    font-size: 28px;
+    position: relative;
+    top: -1px;
+  }
+}
