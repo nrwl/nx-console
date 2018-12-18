@@ -1,28 +1,31 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import {
-  CommandStatus,
+  CommandResponse,
   CommandRunner,
-  CommandResponse
+  CommandStatus
 } from '@angular-console/utils';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Subject } from 'rxjs';
+
 import { ActionBarComponent } from './action-bar.component';
 import { FeatureActionBarModule } from './feature-action-bar.module';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ActionBarComponent', () => {
   let component: ActionBarComponent;
   let fixture: ComponentFixture<ActionBarComponent>;
-  let mockCommandRunner: jasmine.SpyObj<CommandRunner>;
+  let mockCommandRunner: {
+    listAllCommands: jest.Mock<{}>;
+    stopCommandViaCtrlC: jest.Mock<{}>;
+  };
   let mockCommands: Subject<CommandResponse[]>;
 
   beforeEach(async(() => {
     mockCommands = new Subject<CommandResponse[]>();
-    mockCommandRunner = jasmine.createSpyObj<CommandRunner>('CommandRunner', [
-      'stopCommandViaCtrlC',
-      'listAllCommands'
-    ]);
-    mockCommandRunner.listAllCommands.and.returnValue(mockCommands);
+    mockCommandRunner = {
+      listAllCommands: jest.fn(),
+      stopCommandViaCtrlC: jest.fn()
+    };
+    mockCommandRunner.listAllCommands.mockReturnValue(mockCommands);
     TestBed.configureTestingModule({
       imports: [NoopAnimationsModule, FeatureActionBarModule],
       providers: [{ provide: CommandRunner, useValue: mockCommandRunner }]
