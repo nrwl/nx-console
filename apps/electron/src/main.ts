@@ -282,18 +282,21 @@ if (app) {
     if (process.argv[2] === '--server') {
       let port = 8888;
       /**
-       * This is our heuristic for knowing whether or not a developer is running the frontend
-       * application in a browser (instead of running the full electron app).
+       * This is our heuristic for knowing whether or not a developer is running
+       * the frontend application in a browser (instead of running the full
+       * electron app).
        *
-       * We need to know this in order to orchestrate the auth window creation. If the frontend
-       * is running in the browser, there is no existing electron window, so when the auth one
-       * is created it will be the only one. When you close the only electron window, the process
-       * dies automatically, so this makes for an awful dev experience.
+       * We need to know this in order to orchestrate the auth window creation.
+       * If the frontend is running in the browser, there is no existing
+       * electron window, so when the auth one is created it will be the only
+       * one. When you close the only electron window, the process dies
+       * automatically, so this makes for an awful dev experience.
        *
-       * As a workaround, when the frontend is running in the browser, we create a transpart parent
-       * window first, and then create the authWinodow as a child of it. That way there will still
-       * be at least one electron window open even after the authWindow is closed, and the server
-       * process will not die.
+       * As a workaround, when the frontend is running in the browser, we create
+       * a transpart parent window first, and then create the authWinodow as a
+       * child of it. That way there will still be at least one electron window
+       * open even after the authWindow is closed, and the server process will
+       * not die.
        */
       parentWindow = new BrowserWindow({
         width: 800,

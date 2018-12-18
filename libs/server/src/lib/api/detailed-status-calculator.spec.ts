@@ -2,7 +2,7 @@ import {
   StatusType,
   BuildDetailedStatusCalculator,
   TestDetailedStatusCalculator
-} from '../../src/api/detailed-status-calculator';
+} from './detailed-status-calculator';
 
 describe('detailedStatusCalculator', () => {
   describe('BuildDetailedStatusCalculator', () => {
@@ -52,7 +52,7 @@ describe('detailedStatusCalculator', () => {
         chunk {polyfills} polyfills.js, polyfills.js.map (polyfills) 237 kB [initial] [rendered]
         chunk {runtime} runtime.js, runtime.js.map (runtime) 5.22 kB [entry] [rendered]
         chunk {styles} styles.js, styles.js.map (styles) 86 kB [initial] [rendered]
-        chunk {vendor} vendor.js, vendor.js.map (vendor) 7.57 MB [initial] [rendered]      
+        chunk {vendor} vendor.js, vendor.js.map (vendor) 7.57 MB [initial] [rendered]
       `);
 
       expect(c.detailedStatus).toEqual({
@@ -93,9 +93,9 @@ describe('detailedStatusCalculator', () => {
 
     it('should handle ansi characters', () => {
       const c = createCalculator();
-      c.addOut(`      
+      c.addOut(`
         Hash: a47cd7d40c3a7f374b97
-        chunk \u001b[30m{main} main.js, main.js.map (main) 381 kB [initial] [rendered]    
+        chunk \u001b[30m{main} main.js, main.js.map (main) 381 kB [initial] [rendered]
       `);
 
       expect(c.detailedStatus).toEqual({
@@ -117,9 +117,9 @@ describe('detailedStatusCalculator', () => {
 
     it('should set the errors when build is not successful', () => {
       const c = createCalculator();
-      c.addOut(`      
+      c.addOut(`
         Hash: a47cd7d40c3a7f374b97
-        chunk {main} main.js, main.js.map (main) 381 kB [initial] [rendered]    
+        chunk {main} main.js, main.js.map (main) 381 kB [initial] [rendered]
       `);
 
       expect(c.detailedStatus).toEqual({
@@ -141,7 +141,7 @@ describe('detailedStatusCalculator', () => {
 
       c.addOut(`
         ERROR in apps/myproject/src/app/app.module.ts(6,40): error TS2307: Cannot find module './reduc1ers'.
-        apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.   
+        apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.
       `);
 
       expect(c.detailedStatus).toEqual({
@@ -169,7 +169,7 @@ describe('detailedStatusCalculator', () => {
 
       c.addOut(`
         ERROR in apps/myproject/src/app/app.module.ts(6,40): error TS2307: Cannot find module './reduc1ers'.
-        apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.   
+        apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.
       `);
 
       c.addOut(`
@@ -186,7 +186,7 @@ describe('detailedStatusCalculator', () => {
 
       c.addOut(`
         ERROR in apps/myproject/src/app/app.module.ts(6,40): error TS2307: Cannot find module './reduc1ers'.
-        apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.   
+        apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.
       `);
 
       c.addOut(`
@@ -251,7 +251,7 @@ describe('detailedStatusCalculator', () => {
       c.addOut(`
  73% basic module optimization
  95% emitting CopyPlugin
- 
+
  12 10 2018 09:38:46.582:INFO [Chrome 69.0.3497 (Mac OS X 10.13.6)]: Connected on socket Ixaj7Z6_OEy0UWM0AAAA with id 19077706
 `);
       expect(c.detailedStatus.buildProgress).toEqual(100);

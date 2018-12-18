@@ -1,4 +1,4 @@
-import { Commands } from '../../src/api/commands';
+import { Commands } from './commands';
 
 describe('Commands', () => {
   describe('add command', () => {

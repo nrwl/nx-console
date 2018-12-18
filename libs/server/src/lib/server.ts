@@ -1,50 +1,76 @@
-import * as express from 'express';
-import * as path from 'path';
-import { ApolloServer, mergeSchemas } from 'apollo-server-express';
-import { schema } from './schema';
 import {
   createSchema,
-  registerPlugin
+  registerPlugin,
+  authUtils,
+  Store
 } from '@nrwl/angular-console-enterprise-electron';
-import { commands } from './api/run-command';
-import { readSettings } from './api/read-settings';
-import { telemetry } from './telemetry';
+import {
+  ApolloServer,
+  mergeSchemas,
+  makeExecutableSchema
+} from 'apollo-server-express';
+import * as express from 'express';
+
 import { docs } from './api/docs';
-
-const context = {
-  readSettings,
-  commands,
-  docs,
-  telemetry
-};
-
-const apollo = new ApolloServer({
-  schema: mergeSchemas({
-    schemas: [schema, createSchema(context)]
-  }),
-  rootValue: global
-});
+import { readSettings } from './api/read-settings';
+import { commands } from './api/run-command';
+import { Telemetry } from './telemetry';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import { getResolvers } from './resolvers';
 
 export const app: express.Express = express();
 
-apollo.applyMiddleware({
-  app,
-  path: '/graphql',
-  bodyParserConfig: true
-});
-
-app.get('/workspaces', (req, res) => {
-  res.sendFile('index.html', { root: path.join(__dirname, 'public') });
-});
-
-app.get('/workspace/*', (req, res) => {
-  res.sendFile('index.html', { root: path.join(__dirname, 'public') });
-});
-
 // workspaces
-app.use(express.static(path.join(__dirname, 'public')));
 
-export function start(port: number) {
-  app.listen(port ? port : 7777);
-  registerPlugin(context);
+export function start(options: {
+  port: number;
+  store: Store;
+  authenticatorFactory: () => authUtils.AuthenticatorFactory;
+  mainWindow: any;
+  staticResourcePath: string;
+}) {
+  const context = {
+    readSettings,
+    commands,
+    docs,
+    telemetry: new Telemetry(options.store)
+  };
+
+  const schema = makeExecutableSchema({
+    resolvers: getResolvers(options.mainWindow, options.store),
+    typeDefs: readFileSync(resolve(__dirname, './assets/schema.graphql'), {
+      encoding: 'utf-8'
+    })
+  } as any);
+
+  const apollo = new ApolloServer({
+    schema: mergeSchemas({
+      schemas: [
+        schema,
+        createSchema(context, options.store, options.authenticatorFactory)
+      ]
+    }),
+    rootValue: global
+  });
+
+  apollo.applyMiddleware({
+    app,
+    path: '/graphql',
+    bodyParserConfig: true
+  });
+
+  app.get('/workspaces', (req, res) => {
+    res.sendFile('index.html', { root: options.staticResourcePath });
+  });
+
+  app.get('/workspace/*', (req, res) => {
+    res.sendFile('index.html', { root: options.staticResourcePath });
+  });
+
+  app.use(express.static(options.staticResourcePath));
+
+  registerPlugin(context, options.store);
+
+  return app.listen(options.port);
 }
