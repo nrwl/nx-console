@@ -42,15 +42,20 @@ module.exports = {
     },
     mac: {
       clean: 'rm -rf dist',
-      'vsce-package': 'cd dist/apps/vscode && yarn && vsce package',
+      'vsce-package':
+        'cd dist/apps/vscode && yarn && rm -rf node_modules/node-pty-prebuilt/build && vsce package',
       'copy-frontend': {
         default:
           'cp -r dist/apps/angular-console dist/apps/electron/assets/public',
         vscode:
           'cp -r dist/apps/angular-console dist/apps/vscode/assets/angular-console'
       },
-      'copy-schema-to-vscode':
-        'cp apps/electron/src/assets/schema.graphql apps/vscode/src/assets/schema.graphql',
+      'copy-schema': {
+        default:
+          'cp libs/server/src/schema/schema.graphql apps/electron/src/assets/schema.graphql',
+        vscode:
+          'cp libs/server/src/schema/schema.graphql apps/vscode/src/assets/schema.graphql'
+      },
       'electron-pack': 'electron-builder --mac --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
       'start-server': 'electron dist/apps/electron --server --inspect=9229',
@@ -61,6 +66,10 @@ module.exports = {
       clean: 'rm -rf dist',
       'vsce-package': 'mac.vsce-package',
       'copy-frontend': {
+        default: nps.series.nps('mac.copy-frontend'),
+        vscode: nps.series.nps('mac.copy-frontend.vscode')
+      },
+      'copy-schema': {
         default: nps.series.nps('mac.copy-frontend'),
         vscode: nps.series.nps('mac.copy-frontend.vscode')
       },
@@ -80,8 +89,12 @@ module.exports = {
         vscode:
           'robocopy dist\\apps\\angular-console dist\\apps\\vscode\\assets\\angular-console /e || echo 0'
       },
-      'copy-schema-to-vscode':
-        'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql',
+      'copy-schema': {
+        default:
+          'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\electron\\src\\assets\\schema.graphql',
+        vscode:
+          'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql'
+      },
       'electron-pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'start-server': 'electron dist\\apps\\electron --server --inspect=9229',
@@ -102,13 +115,14 @@ module.exports = {
         withPlatform('clean'),
         'server.gen-graphql-types',
         'server.gen-apollo-angular',
-        withPlatform('copy-schema-to-vscode'),
+        withPlatform('copy-schema.vscode'),
         'server.build.vscode',
         'frontend.build',
         withPlatform('copy-frontend.vscode'),
         withPlatform('vsce-package')
       ),
       server: nps.series.nps(
+        withPlatform('copy-schema'),
         'server.gen-and-build',
         withPlatform('start-server')
       ),

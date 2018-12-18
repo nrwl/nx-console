@@ -47,4 +47,5 @@ Thumbs.db
 #Environment
 .env
 **/generated/*
+apps/electron/src/assets/schema.graphql
 apps/vscode/src/assets/schema.graphql

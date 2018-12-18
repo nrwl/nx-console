@@ -5,13 +5,12 @@ import {
   storeSettings,
   Telemetry
 } from '@angular-console/server';
-import { authUtils } from '@nrwl/angular-console-enterprise-electron';
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { statSync } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { getAuthenticatorFactory } from './app/authenticator';
+import { Store } from '@nrwl/angular-console-enterprise-electron';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');
@@ -158,15 +157,15 @@ function createWindow() {
   });
 }
 
-function startServer(port: number, parentWindow?: BrowserWindow) {
-  const Store = require('electron-store');
+function startServer(port: number) {
+  const ElectronStore = require('electron-store');
+  const store: Store = new ElectronStore();
   console.log('starting server on port', port);
   try {
     start({
       port,
       mainWindow,
-      authenticatorFactory: getAuthenticatorFactory(parentWindow),
-      store: new Store(),
+      store,
       staticResourcePath: path.join(__dirname, './assets/public')
     });
   } catch (e) {
@@ -277,35 +276,15 @@ if (app) {
   store = new Store();
   telemetry = new Telemetry(store);
 
-  app.on('ready', () => {
-    let parentWindow = undefined;
+  app.on('ready', async () => {
     if (process.argv[2] === '--server') {
-      let port = 8888;
-      /**
-       * This is our heuristic for knowing whether or not a developer is running the frontend
-       * application in a browser (instead of running the full electron app).
-       *
-       * We need to know this in order to orchestrate the auth window creation. If the frontend
-       * is running in the browser, there is no existing electron window, so when the auth one
-       * is created it will be the only one. When you close the only electron window, the process
-       * dies automatically, so this makes for an awful dev experience.
-       *
-       * As a workaround, when the frontend is running in the browser, we create a transpart parent
-       * window first, and then create the authWinodow as a child of it. That way there will still
-       * be at least one electron window open even after the authWindow is closed, and the server
-       * process will not die.
-       */
-      parentWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        transparent: true,
-        alwaysOnTop: false,
-        resizable: false
-      });
+      let port;
       if (process.argv[3] === '--port') {
         port = parseInt(process.argv[4], 10);
+      } else {
+        port = await getPort({ port: 8888 });
       }
-      startServer(port, parentWindow);
+      startServer(port);
     } else {
       setupEvents();
       startSession();

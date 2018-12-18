@@ -8,28 +8,39 @@ import { Server } from 'http';
 import * as path from 'path';
 import {
   commands,
+  Disposable,
   ExtensionContext,
   Uri,
   ViewColumn,
   WebviewPanel,
   window,
-  workspace,
-  Disposable
+  workspace
 } from 'vscode';
-import { authUtils } from '@nrwl/angular-console-enterprise-electron';
-import { Subject } from 'rxjs';
-
-const IFRAME_URL_SET = 'iframe-url-set';
-const IFRAME_ID = 'iframe';
+import { fork } from 'child_process';
 
 let server: Server | undefined;
 let activePanel: WebviewPanel | undefined;
-let lastIframeUrl = '';
 
 export function activate(context: ExtensionContext) {
+  let updatedNodePty = false;
+  const buildNodePty = fork(
+    context.asAbsolutePath('node_modules/node-pty-prebuilt/scripts/install.js'),
+    undefined,
+    {}
+  );
+
+  buildNodePty.on('close', () => {
+    updatedNodePty = true;
+  });
+
   const disposable = commands.registerCommand(
     'extension.angularConsole',
     async () => {
+      if (!updatedNodePty) {
+        return window.showInformationMessage(
+          'Angular Console is updatating Node.pty for you version of VS Code. Please wait and launch again.'
+        );
+      }
       const primaryWorkspacePath =
         workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
@@ -56,14 +67,6 @@ export function activate(context: ExtensionContext) {
         activePanel.onDidDispose(() => {
           activePanel = undefined;
         });
-        activePanel.webview.onDidReceiveMessage(
-          (message: { command: string; payload: any }) => {
-            switch (message.command) {
-              case IFRAME_URL_SET:
-                lastIframeUrl = message.payload;
-            }
-          }
-        );
         activePanel.webview.html = getHtml(
           `http://localhost:${
             server.address().port
@@ -115,7 +118,6 @@ async function startServer(context: ExtensionContext) {
     port,
     store,
     mainWindow: null,
-    authenticatorFactory: getAuthenticator,
     staticResourcePath: path.join(
       context.extensionPath,
       'assets',
@@ -128,43 +130,6 @@ async function startServer(context: ExtensionContext) {
   return s;
 }
 
-function getAuthenticator(): authUtils.AuthenticatorFactory {
-  return (url: string) => {
-    activePanel = activePanel || createWebViewPanel();
-
-    const panel = activePanel;
-    const urlToRestore = lastIframeUrl;
-    const redirectSubject = new Subject<string>();
-
-    panel.onDidDispose(() => {
-      if (!redirectSubject.isStopped) {
-        redirectSubject.error(new Error('User terminated authentication'));
-      }
-    });
-
-    redirectSubject.subscribe(
-      () => {},
-      () => {},
-      () => {
-        panel.webview.html = getHtml(urlToRestore);
-        disposable.dispose();
-      }
-    );
-
-    panel.webview.html = getHtml(url);
-    const disposable = panel.webview.onDidReceiveMessage(
-      (message: { command: string; payload: any }) => {
-        switch (message.command) {
-          case IFRAME_URL_SET:
-            redirectSubject.next(message.payload);
-        }
-      }
-    );
-
-    return redirectSubject;
-  };
-}
-
 function getHtml(iframeUrl: string) {
   return `
   <!DOCTYPE html>
@@ -173,6 +138,7 @@ function getHtml(iframeUrl: string) {
       <meta charset="utf-8" />
       <title>Angular Console</title>
       <base href="/" />
+      <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <style>
@@ -196,21 +162,9 @@ function getHtml(iframeUrl: string) {
     </head>
     <body>
       <iframe
-        id="${IFRAME_ID}"
         src="${iframeUrl}"
         frameborder="0"
       ></iframe>
-
-      <script>
-        const vscode = acquireVsCodeApi();
-        const iframe = document.getElementById('${IFRAME_ID}');
-        iframe.onload= function() {
-          vscode.postMessage({
-            command: '${IFRAME_URL_SET}',
-            payload: iframe.src
-          });
-        }
-      </script>
     </body>
   </html>
 `;

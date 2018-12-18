@@ -216,6 +216,7 @@ type WorkspaceDefinition {
 
 type Settings {
   canCollectData: Boolean!
+  isConnectUser: Boolean
   showSupportPlugin: Boolean
   installNodeManually: Boolean
   enableDetailedStatus: Boolean

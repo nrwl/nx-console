@@ -1,4 +1,4 @@
-import { Docs } from '../../src/api/docs';
+import { Docs } from './docs';
 import { readFirst } from '@nrwl/nx/testing';
 import { of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
