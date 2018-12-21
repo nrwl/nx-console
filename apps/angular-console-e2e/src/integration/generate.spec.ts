@@ -58,7 +58,14 @@ describe('Generate', () => {
 
     const name = uniqName('example');
     cy.get('input[name="name"]').type(name);
-    cy.get('input[name="project"]').type('proj');
+    cy.get('input[name="project"]').type('proj{esc}');
+
+    cy.contains('Optional fields').click();
+    cy.get('mat-select[name="flat"]')
+      .contains('false')
+      .click();
+    cy.contains('mat-option', 'true').click();
+    cy.get('mat-select[name="flat"]').contains('true');
 
     cy.wait(100);
 
@@ -69,7 +76,7 @@ describe('Generate', () => {
     cy.wait(100);
 
     checkDisplayedCommand(
-      `ng generate @schematics/angular:service ${name} --project=proj`
+      `ng generate @schematics/angular:service ${name} --project=proj --flat`
     );
     checkFileExists(`src/app/${name}.service.ts`);
     checkFileExists(`src/app/${name}.service.spec.ts`);

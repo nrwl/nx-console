@@ -6,7 +6,8 @@ import {
   listFiles,
   listOfUnnestedNpmPackages,
   normalizeSchema,
-  readJsonFile
+  readJsonFile,
+  SchematicDefaults
 } from '../utils';
 
 interface SchematicCollection {
@@ -14,6 +15,11 @@ interface SchematicCollection {
   schematics: Schematic[];
 }
 
+interface SchematicCollectionDefaults {
+  [collectionName: string]: {
+    [schematicName: string]: SchematicDefaults;
+  };
+}
 interface Schematic {
   collection: string;
   name: string;
@@ -58,6 +64,21 @@ export function readAllSchematicCollections(
   );
 }
 
+function readAngularJsonDefaults(basedir: string): SchematicCollectionDefaults {
+  const defaults = readJsonFile('angular.json', basedir).json.schematics;
+  const collectionDefaults: SchematicCollectionDefaults = Object.keys(
+    defaults
+  ).reduce((collectionDefaultsMap: SchematicCollectionDefaults, key) => {
+    const [collectionName, schematicName] = key.split(':');
+    if (!collectionDefaultsMap[collectionName]) {
+      collectionDefaultsMap[collectionName] = {};
+    }
+    collectionDefaultsMap[collectionName][schematicName] = defaults[key];
+    return collectionDefaultsMap;
+  }, {});
+  return collectionDefaults;
+}
+
 function readSchematicCollectionsFromNodeModules(basedir: string) {
   const nodeModulesDir = path.join(basedir, 'node_modules');
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
@@ -77,7 +98,11 @@ function readSchematicCollectionsFromNodeModules(basedir: string) {
       }
     }
   });
-  return schematicCollections.map(c => readCollection(nodeModulesDir, c));
+  const defaults = readAngularJsonDefaults(basedir);
+
+  return schematicCollections.map(c =>
+    readCollection(nodeModulesDir, c, defaults)
+  );
 }
 
 function readWorkspaceSchematicsCollection(
@@ -90,10 +115,13 @@ function readWorkspaceSchematicsCollection(
   const collectionName = 'Workspace Schematics';
   if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
     const collection = readJsonFile('collection.json', collectionDir);
+    const defaults = readAngularJsonDefaults(basedir);
+
     return readCollectionSchematics(
       collectionName,
       collection.path,
-      collection.json
+      collection.json,
+      defaults
     );
   } else {
     const schematics = listFiles(collectionDir)
@@ -115,7 +143,8 @@ function readWorkspaceSchematicsCollection(
 
 function readCollection(
   basedir: string,
-  collectionName: string
+  collectionName: string,
+  defaults?: any
 ): SchematicCollection | null {
   try {
     const packageJson = readJsonFile(
@@ -129,7 +158,8 @@ function readCollection(
     return readCollectionSchematics(
       collectionName,
       collection.path,
-      collection.json
+      collection.json,
+      defaults
     );
   } catch (e) {
     // this happens when package is misconfigured. We decided to ignore such a case.
@@ -140,7 +170,8 @@ function readCollection(
 function readCollectionSchematics(
   collectionName: string,
   collectionPath: string,
-  collectionJson: any
+  collectionJson: any,
+  defaults?: any
 ) {
   const schematicCollection = {
     name: collectionName,
@@ -153,11 +184,13 @@ function readCollectionSchematics(
           v.schema,
           path.dirname(collectionPath)
         );
+        const projectDefaults =
+          defaults && defaults[collectionName] && defaults[collectionName][k];
 
         schematicCollection.schematics.push({
           name: k,
           collection: collectionName,
-          schema: normalizeSchema(schematicSchema.json),
+          schema: normalizeSchema(schematicSchema.json, projectDefaults),
           description: v.description,
           npmClient: null,
           npmScript: null
