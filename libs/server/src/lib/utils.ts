@@ -6,6 +6,10 @@ import { bindNodeCallback, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as stripJsonComments from 'strip-json-comments';
 
+export interface SchematicDefaults {
+  [name: string]: string;
+}
+
 export const files: { [path: string]: string[] } = {};
 export let fileContents: { [path: string]: any } = {};
 
@@ -191,10 +195,13 @@ export function readJsonFile(
   }
 }
 
-export function normalizeSchema(p: {
-  properties: { [k: string]: any };
-  required: string[];
-}): any[] {
+export function normalizeSchema(
+  p: {
+    properties: { [k: string]: any };
+    required: string[];
+  },
+  projectDefaults?: SchematicDefaults
+): any[] {
   try {
     const res = [] as any[];
     Object.entries(p.properties).forEach(([k, v]: [string, any]) => {
@@ -202,11 +209,13 @@ export function normalizeSchema(p: {
         const d = getDefault(v);
         const r = (p.required && p.required.indexOf(k) > -1) || hasSource(v);
 
+        const workspaceDefault = projectDefaults && projectDefaults[k];
+
         res.push({
           name: k,
           type: v.type || 'string',
           description: v.description,
-          defaultValue: d,
+          defaultValue: workspaceDefault === undefined ? d : workspaceDefault,
           required: r,
           positional: isPositional(v),
           enum: v.enum

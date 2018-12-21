@@ -1,11 +1,12 @@
-import { canAdd } from '../../src/api/read-schematic-collections';
+import { canAdd } from './read-schematic-collections';
 
 describe('readAllSchematicCollections', () => {
   describe('canAdd', () => {
     const VALID_SCHEMATIC_TO_ADD = {
       private: false,
       hidden: false,
-      schema: 'schema'
+      schema: 'schema',
+      extends: false
     };
 
     it('should include a valid schematic', () => {
