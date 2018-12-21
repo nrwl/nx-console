@@ -53,6 +53,7 @@
             <p *ngIf="t.taskDescription" matLine>
               <span>{{ t.taskDescription }}</span>
             </p>
+            <p *ngIf="t.task.installed">Installed</p>
           </mat-list-item>
         </ng-container>
       </mat-nav-list>

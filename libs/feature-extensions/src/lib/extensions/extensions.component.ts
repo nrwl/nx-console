@@ -47,7 +47,6 @@ export class ExtensionsComponent {
         const i = installed.filter(ii => ii.name === a.name).length > 0;
         return {
           ...a,
-          description: i ? `[Installed] ${a.description}` : a.description,
           installed: i
         };
       });
