@@ -91,6 +91,10 @@ export function availableExtensions() {
       description: 'Adds AngularFire to your Angular project'
     },
     {
+      name: 'devextreme-angular',
+      description: 'DevExtreme UI components'
+    },
+    {
       name: 'ng-zorro-antd',
       description:
         'An enterprise-class UI components based on Ant Design and Angular'
