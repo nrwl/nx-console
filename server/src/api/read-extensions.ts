@@ -86,7 +86,10 @@ export function availableExtensions() {
       name: '@schuchard/prettier',
       description: 'Adds Prettier to your Angular project'
     },
-
+    {
+      name: 'devextreme-angular',
+      description: 'DevExtreme UI components'
+    },
     {
       name: 'ng-zorro-antd',
       description:
