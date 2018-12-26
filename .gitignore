@@ -9,9 +9,7 @@
 /cypress
 
 # dependencies
-/node_modules
-/server/node_modules
-/electron/node_modules
+**/node_modules
 
 # IDEs and editors
 /.idea
@@ -49,3 +47,6 @@ Thumbs.db
 **/generated/*
 apps/electron/src/assets/schema.graphql
 apps/vscode/src/assets/schema.graphql
+apps/vscode/src/yarn.lock
+apps/electron/src/yarn.lock
+apps/vscode/src/README.md

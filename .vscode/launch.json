@@ -13,7 +13,10 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
-      "outFiles": ["${workspaceFolder}/dist/apps/vscode/**/*.js"],
+      "trace": "false",
+      "sourceMaps": false,
+      "stopOnEntry": false,
+      "outFiles": ["${workspaceFolder}/dist/apps/vscode/**/*"],
       "preLaunchTask": "npm: build-vs-code"
     }
   ]

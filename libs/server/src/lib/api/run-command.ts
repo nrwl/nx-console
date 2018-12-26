@@ -13,13 +13,30 @@ export function runCommand(
   programName: string,
   program: string,
   cmds: string[],
+  spawn: PseudoTerminalFactory,
   addToRecent: boolean = true
 ) {
   const workspace =
     type === 'new' ? null : readJsonFile('./package.json', cwd).json.name;
   const id = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
   const command = `${programName} ${cmds.join(' ')}`;
-  const factory = createExecutableCommand(id, cwd, program, cmds);
+
+  const factory = () => {
+    const commandRunning = spawn({
+      name: id,
+      command: program,
+      args: normalizeCommands(cwd, cmds),
+      cwd
+    });
+    commandRunning.onDidWriteData(data => {
+      commands.addOut(id, data);
+    });
+    commandRunning.onExit(code => {
+      commands.setFinalStatus(id, code === 0 ? 'successful' : 'failed');
+    });
+    return commandRunning;
+  };
+
   const statusCalculator = createDetailedStatusCalculator(cwd, cmds);
 
   commands.addCommand(
@@ -35,27 +52,22 @@ export function runCommand(
   return { id };
 }
 
-function createExecutableCommand(
-  id: string,
-  cwd: string,
-  program: string,
-  cmds: string[]
-) {
-  return () => {
-    const commandRunning = require('node-pty-prebuilt').spawn(
-      program,
-      normalizeCommands(cwd, cmds),
-      {
-        cwd,
-        cols: 80
-      }
-    );
-    commandRunning.on('data', (data: any) => {
-      commands.addOut(id, data.toString());
-    });
-    commandRunning.on('exit', (code: any) => {
-      commands.setFinalStatus(id, code === 0 ? 'successful' : 'failed');
-    });
-    return commandRunning;
-  };
+export interface PseudoTerminal {
+  onDidWriteData(callback: (data: string) => void): void;
+
+  onExit(callback: (code: number) => void): void;
+
+  kill(): void;
 }
+
+export interface PseudoTerminalConfig {
+  /** Human-readable string which will be used to represent the terminal in the UI. */
+  name: string;
+  command: string;
+  args: string[];
+  cwd: string;
+}
+
+export type PseudoTerminalFactory = (
+  config: PseudoTerminalConfig
+) => PseudoTerminal;

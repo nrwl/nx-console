@@ -337,6 +337,8 @@
             "tsConfig": "apps/vscode/tsconfig.app.json",
             "assets": [
               "apps/vscode/src/package.json",
+              "apps/vscode/src/README.md",
+              "apps/vscode/src/yarn.lock",
               "apps/vscode/src/assets"
             ]
           },
@@ -382,6 +384,7 @@
             "tsConfig": "apps/electron/tsconfig.app.json",
             "assets": [
               "apps/electron/src/package.json",
+              "apps/electron/src/yarn.lock",
               "apps/electron/src/assets"
             ]
           },

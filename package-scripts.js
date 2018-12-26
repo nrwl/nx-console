@@ -28,11 +28,11 @@ module.exports = {
       serve: 'ng serve angular-console'
     },
     server: {
-      'gen-and-build': nps.series.nps(
+      'gen-all': nps.concurrent.nps(
         'server.gen-graphql-types',
-        'server.gen-apollo-angular',
-        'server.build'
+        'server.gen-apollo-angular'
       ),
+      'gen-and-build': nps.series.nps('server.gen-all', 'server.build'),
       build: {
         default: 'ng build electron --prod --maxWorkers=4',
         vscode: 'ng build vscode --prod --maxWorkers=4'
@@ -43,7 +43,7 @@ module.exports = {
     mac: {
       clean: 'rm -rf dist',
       'vsce-package':
-        'cd dist/apps/vscode && yarn && rm -rf node_modules/node-pty-prebuilt/build && vsce package',
+        'cd dist/apps/vscode && yarn install --production --pure-lockfile --ignore-optional --no-bin-links --non-interactive && vsce package',
       'copy-frontend': {
         default:
           'cp -r dist/apps/angular-console dist/apps/electron/assets/public',
@@ -56,11 +56,19 @@ module.exports = {
         vscode:
           'cp libs/server/src/schema/schema.graphql apps/vscode/src/assets/schema.graphql'
       },
+      'copy-yarn-lock': {
+        default: 'cp yarn.lock apps/electron/src/yarn.lock',
+        vscode: 'cp yarn.lock apps/vscode/src/yarn.lock'
+      },
+      'copy-readme': {
+        vscode: 'cp README.md apps/vscode/src/README.md'
+      },
       'electron-pack': 'electron-builder --mac --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
       'start-server': 'electron dist/apps/electron --server --inspect=9229',
       'start-electron': 'NODE_ENV=development electron dist/apps/electron',
-      'electron-dist': 'electron-builder --mac -p never'
+      'builder-prerelease': electronBuilder('--mac', 'never'),
+      'builder-publish': electronBuilder('--mac', 'always')
     },
     linux: {
       clean: 'rm -rf dist',
@@ -73,16 +81,24 @@ module.exports = {
         default: nps.series.nps('mac.copy-frontend'),
         vscode: nps.series.nps('mac.copy-frontend.vscode')
       },
-      'copy-schema-to-vscode': nps.series.nps('mac.copy-schema'),
+      'copy-yarn-lock': {
+        default: nps.series.nps('mac.copy-yarn-lock'),
+        vscode: nps.series.nps('mac.copy-yarn-lock.vscode')
+      },
+      'copy-readme': {
+        vscode: nps.series.nps('mac.copy-readme.vscode')
+      },
       'electron-pack': 'electron-builder --linux --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/linux',
       'start-server': nps.series.nps('mac.start-server'),
       'start-electron': nps.series.nps('mac.start-electron'),
-      'electron-dist': 'electron-builder --linux -p never'
+      'builder-prerelease': electronBuilder('--linux', 'never'),
+      'builder-publish': electronBuilder('--linux', 'always')
     },
     win: {
       clean: 'if exist dist rmdir dist /s /q',
-      'vsce-package': 'cd dist\\apps\\vscode && yarn && vsce package',
+      'vsce-package':
+        'cd dist\\apps\\vscode && yarn install --production --pure-lockfile --ignore-optional --no-bin-links --non-interactive && vsce package',
       'copy-frontend': {
         default:
           'robocopy dist\\apps\\angular-console dist\\apps\\electron\\assets\\public /e || echo 0',
@@ -95,74 +111,72 @@ module.exports = {
         vscode:
           'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql'
       },
+      'copy-yarn-lock': {
+        default: 'robocopy yarn.lock apps\\electron\\src\\yarn.lock',
+        vscode: 'robocopy yarn.lock apps\\vscode\\src\\yarn.lock'
+      },
+      'copy-readme': {
+        vscode: 'robocopy README.md apps\\vscode\\src\\README.md'
+      },
       'electron-pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'start-server': 'electron dist\\apps\\electron --server --inspect=9229',
       'start-electron': 'electron dist\\apps\\electron',
-      'electron-dist': 'electron-builder --win -p never'
+      'builder-prerelease': electronBuilder('--win', 'never'),
+      'builder-publish': electronBuilder('--win', 'always')
     },
     dev: {
       'patch-cli': 'node ./tools/scripts/patch-cli.js',
-      prepare: nps.series.nps(
-        withPlatform('clean'),
-        'server.gen-and-build',
-        'frontend.build',
-        withPlatform('copy-frontend'),
-        withPlatform('electron-pack'),
-        'dev.patch-cli'
-      ),
-      'package-vscode': nps.series.nps(
-        withPlatform('clean'),
-        'server.gen-graphql-types',
-        'server.gen-apollo-angular',
-        withPlatform('copy-schema.vscode'),
-        'server.build.vscode',
-        'frontend.build',
-        withPlatform('copy-frontend.vscode'),
-        withPlatform('vsce-package')
-      ),
+      prepare: {
+        default: nps.series.nps(
+          withPlatform('clean'),
+          withPlatform('copy-yarn-lock'),
+          'build-electron',
+          withPlatform('copy-frontend'),
+          withPlatform('electron-pack'),
+          'dev.patch-cli'
+        ),
+        vscode: nps.series.nps(
+          'server.gen-all',
+          withPlatform('copy-schema.vscode'),
+          withPlatform('copy-yarn-lock.vscode'),
+          withPlatform('copy-readme.vscode'),
+          'dev.build.vscode',
+          'dev.patch-cli',
+          withPlatform('copy-frontend.vscode')
+        )
+      },
+      build: {
+        default: nps.concurrent.nps('server.gen-and-build', 'frontend.build'),
+        vscode: nps.concurrent.nps('server.build.vscode', 'frontend.build')
+      },
       server: nps.series.nps(
         withPlatform('copy-schema'),
         'server.gen-and-build',
         withPlatform('start-server')
       ),
-      up: nps.concurrent.nps('dev.server', 'frontend.serve'),
-      'electron-dist': nps.series.nps(
+      up: nps.concurrent.nps('dev.server', 'frontend.serve')
+    },
+    package: {
+      default: nps.series.nps(
         'dev.prepare',
-        withPlatform('electron-dist'),
+        withPlatform('builder-prerelease'),
         withPlatform('copy-to-osbuilds')
+      ),
+      vscode: nps.series.nps(
+        withPlatform('clean'),
+        'dev.prepare.vscode',
+        withPlatform('vsce-package')
       )
     },
     publish: {
-      'win-builder-prerelease': electronBuilder('--win', 'never'),
-      'win-builder-publish': electronBuilder('--win', 'always'),
-      'mac-builder-prerelease': electronBuilder('--mac', 'never'),
-      'mac-builder-publish': electronBuilder('--mac', 'always'),
-      'linux-builder-prerelease': electronBuilder('--linux', 'never'),
-      'linux-builder-publish': electronBuilder('--linux', 'always'),
-      'win-prerelease': nps.series.nps(
+      prerelease: nps.series.nps(
         'dev.prepare',
-        'publish.win-builder-prerelease'
+        withPlatform('builder-prerelease')
       ),
-      'win-publish': nps.series.nps(
+      release: nps.series.nps(
         'dev.prepare',
-        'publish.win-builder-publish'
-      ),
-      'linux-prerelease': nps.series.nps(
-        'dev.prepare',
-        'publish.linux-builder-prerelease'
-      ),
-      'linux-publish': nps.series.nps(
-        'dev.prepare',
-        'publish.linux-builder-publish'
-      ),
-      'mac-prerelease': nps.series.nps(
-        'dev.prepare',
-        'publish.mac-builder-prerelease'
-      ),
-      'mac-publish': nps.series.nps(
-        'dev.prepare',
-        'publish.mac-builder-publish'
+        withPlatform('publish.builder-publish')
       )
     },
     e2e: {

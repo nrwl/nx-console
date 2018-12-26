@@ -21,7 +21,7 @@ import { readNpmScripts, readNpmScriptSchema } from './api/read-npm-scripts';
 import { readProjects, readSchema } from './api/read-projects';
 import { readAllSchematicCollections } from './api/read-schematic-collections';
 import { readSettings, storeSettings } from './api/read-settings';
-import { commands, runCommand } from './api/run-command';
+import { commands, runCommand, PseudoTerminalFactory } from './api/run-command';
 import {
   ArchitectResolvers,
   CompletionsTypesResolvers,
@@ -44,8 +44,35 @@ import {
   findExecutable,
   readJsonFile
 } from './utils';
+import { exec } from 'child_process';
 
-export const getResolvers = (mainWindow: any, store: any) => {
+export type SelectDirectory = (
+  options: { title: string; buttonLabel: string }
+) => Promise<string | undefined>;
+
+function openURL(url: string) {
+  let opener;
+
+  switch (process.platform) {
+    case 'darwin':
+      opener = 'open';
+      break;
+    case 'win32':
+      opener = 'start';
+      break;
+    default:
+      opener = 'xdg-open';
+      break;
+  }
+
+  return exec(`${opener} "${url.replace(/"/g, '\\"')}"`);
+}
+
+export const getResolvers = (
+  selectDirectory: SelectDirectory,
+  store: any,
+  psedoTerminalFactory: PseudoTerminalFactory
+) => {
   const SchematicCollection: SchematicCollectionResolvers.Resolvers = {
     schematics(collection: any, args: any) {
       return filterByName(collection.schematics, args);
@@ -252,11 +279,14 @@ export const getResolvers = (mainWindow: any, store: any) => {
   const Mutation: MutationResolvers.Resolvers = {
     async ngAdd(_root: any, args: any) {
       try {
-        return runCommand('add', args.path, 'ng', findClosestNg(args.path), [
+        return runCommand(
           'add',
-          args.name,
-          ...disableInteractivePrompts(args.path)
-        ]);
+          args.path,
+          'ng',
+          findClosestNg(args.path),
+          ['add', args.name, ...disableInteractivePrompts(args.path)],
+          psedoTerminalFactory
+        );
       } catch (e) {
         console.log(e);
         throw new Error(`Error when running 'ng add'. Message: "${e.message}"`);
@@ -264,13 +294,20 @@ export const getResolvers = (mainWindow: any, store: any) => {
     },
     async ngNew(_root: any, args: any) {
       try {
-        return runCommand('new', args.path, 'ng', findClosestNg(__dirname), [
+        return runCommand(
           'new',
-          args.name,
-          `--directory=${args.name}`,
-          `--collection=${args.collection}`,
-          '--no-interactive'
-        ]);
+          args.path,
+          'ng',
+          findClosestNg(__dirname),
+          [
+            'new',
+            args.name,
+            `--directory=${args.name}`,
+            `--collection=${args.collection}`,
+            '--no-interactive'
+          ],
+          psedoTerminalFactory
+        );
       } catch (e) {
         console.log(e);
         throw new Error(`Error when running 'ng new'. Message: "${e.message}"`);
@@ -290,6 +327,7 @@ export const getResolvers = (mainWindow: any, store: any) => {
             ...dryRun,
             ...disableInteractivePrompts(args.path)
           ],
+          psedoTerminalFactory,
           !args.dryRun
         );
       } catch (e) {
@@ -306,7 +344,8 @@ export const getResolvers = (mainWindow: any, store: any) => {
           args.path,
           'ng',
           findClosestNg(args.path),
-          args.runCommand
+          args.runCommand,
+          psedoTerminalFactory
         );
       } catch (e) {
         console.log(e);
@@ -320,7 +359,8 @@ export const getResolvers = (mainWindow: any, store: any) => {
           args.path,
           args.npmClient,
           findExecutable(args.npmClient, args.path),
-          args.runCommand
+          args.runCommand,
+          psedoTerminalFactory
         );
       } catch (e) {
         console.log(e);
@@ -350,7 +390,7 @@ export const getResolvers = (mainWindow: any, store: any) => {
     },
     async openInBrowser(_root: any, { url }: any) {
       if (url) {
-        require('electron').shell.openExternal(url);
+        openURL(url);
         return { result: true };
       } else {
         return { result: false };
@@ -358,7 +398,8 @@ export const getResolvers = (mainWindow: any, store: any) => {
     },
     async showItemInFolder(_root: any, { item }: any) {
       if (item) {
-        return { result: require('electron').shell.showItemInFolder(item) };
+        openURL(item);
+        return { result: true };
       } else {
         return { result: false };
       }
@@ -407,29 +448,25 @@ export const getResolvers = (mainWindow: any, store: any) => {
         );
       }
     },
-    selectDirectory(root: any, args: any) {
+    async selectDirectory(root: any, args: any) {
       // TODO(jack): This mocked value is needed because e2e tests that bring up the dialog will block entire electron main thread.
       if (process.env.CI === 'true') {
         return {
           selectedDirectoryPath: '/tmp'
         };
       } else {
-        const directoryPath = require('electron').dialog.showOpenDialog(
-          mainWindow,
-          {
-            properties: ['openDirectory'],
-            buttonLabel: args.dialogButtonLabel,
-            title: args.dialogTitle
-          }
-        );
+        const directoryPath = await selectDirectory({
+          buttonLabel: args.dialogButtonLabel,
+          title: args.dialogTitle
+        });
 
         return {
-          selectedDirectoryPath: directoryPath ? directoryPath[0] : null
+          selectedDirectoryPath: directoryPath || null
         };
       }
     },
     updateSettings(_root: any, args: any) {
-      storeSettings(JSON.parse(args.data), store);
+      storeSettings(store, JSON.parse(args.data));
       return readSettings(store);
     },
     async openDoc(root: any, args: any) {

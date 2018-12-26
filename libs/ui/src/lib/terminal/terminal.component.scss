@@ -9,9 +9,11 @@ $command-height: 40px;
   max-width: 100%;
   height: calc(100% - #{$command-height});
   box-sizing: border-box;
+
   > div {
     box-sizing: border-box;
     padding: 0 12px;
+    padding-right: 0;
     height: 100%;
   }
 }
@@ -20,8 +22,9 @@ $command-height: 40px;
   color: white;
   font-family: monospace;
   height: $command-height;
-  font-size: 14px;
+  font-size: 13px;
   padding: 12px;
+  padding-bottom: 0;
   box-sizing: border-box;
 }
 

@@ -4,18 +4,16 @@ import {
   Component,
   ElementRef,
   Input,
+  NgZone,
   OnDestroy,
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import { fromEvent } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-import { TerminalFactory } from './terminal.factory';
+import { fromEvent, Subscription } from 'rxjs';
 
-const DEBOUNCE_TIME = 300;
+import { TerminalFactory } from './terminal.factory';
 const SCROLL_BAR_WIDTH = 48;
 const MIN_TERMINAL_WIDTH = 20;
-
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-terminal',
@@ -32,11 +30,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     disableStdin: true,
     fontSize: 14
   });
-  private readonly resizeSubscription = fromEvent(window, 'resize')
-    .pipe(debounceTime(DEBOUNCE_TIME))
-    .subscribe(() => {
-      this.resizeTerminal();
-    });
+  private resizeSubscription?: Subscription;
 
   @ViewChild('code', { read: ElementRef })
   private readonly code: ElementRef;
@@ -58,15 +52,26 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     this.writeOutput(s);
   }
 
-  constructor(private readonly terminalFactory: TerminalFactory) {}
+  constructor(
+    private readonly terminalFactory: TerminalFactory,
+    private readonly ngZone: NgZone
+  ) {}
 
   ngAfterViewInit(): void {
-    this.term.open(this.code.nativeElement);
-    this.resizeTerminal();
+    this.ngZone.runOutsideAngular(() => {
+      this.term.open(this.code.nativeElement);
+      this.resizeTerminal();
+
+      this.resizeSubscription = fromEvent(window, 'resize').subscribe(() => {
+        this.ngZone.runOutsideAngular(() => this.resizeTerminal());
+      });
+    });
   }
 
   ngOnDestroy() {
-    this.resizeSubscription.unsubscribe();
+    if (this.resizeSubscription) {
+      this.resizeSubscription.unsubscribe();
+    }
   }
 
   private writeOutput(output: string) {
@@ -89,26 +94,24 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   }
 
   resizeTerminal() {
-    setTimeout(() => {
-      const renderer = (this.term as any).renderer;
-      if (!renderer) {
-        return;
-      }
-      const height = (this.code.nativeElement as HTMLElement).clientHeight;
-      const width =
-        (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
-      const cols = Math.max(
-        MIN_TERMINAL_WIDTH,
-        Math.floor(width / renderer.dimensions.actualCellWidth)
-      );
-      const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
-      // If dimensions did not change, no need to reset.
-      if (this.term.rows !== rows || this.term.cols !== cols) {
-        renderer.clear();
-        this.term.reset();
-        this.term.resize(cols, rows);
-        this.writeFullCachedOutput();
-      }
-    });
+    const renderer = (this.term as any)._core.renderer;
+    if (!renderer) {
+      return;
+    }
+
+    const height = (this.code.nativeElement as HTMLElement).clientHeight;
+    const width =
+      (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
+
+    const cols = Math.max(
+      MIN_TERMINAL_WIDTH,
+      Math.floor(width / renderer.dimensions.actualCellWidth)
+    );
+    const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
+
+    // If dimensions did not change, no need to reset.
+    if (this.term.cols !== cols || this.term.rows !== rows) {
+      this.term.resize(cols, rows);
+    }
   }
 }

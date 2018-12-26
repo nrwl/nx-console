@@ -1,4 +1,4 @@
-<ng-container *ngIf="settings.getRecentWorkspaces().length > 0; else: empty">
+<ng-container *ngIf="settings.getRecentWorkspaces().length > 0; else empty">
   <mat-nav-list>
     <ng-container *ngIf="settings.getRecentWorkspaces(true) as workspaces">
       <div class="recents-container" @growShrink *ngIf="workspaces.length">

@@ -1,11 +1,12 @@
 /* tslint:disable */
 import {
+  PseudoTerminalFactory,
   readSettings,
   start,
   storeSettings,
   Telemetry
 } from '@angular-console/server';
-import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { statSync } from 'fs';
 import * as os from 'os';
@@ -157,16 +158,53 @@ function createWindow() {
   });
 }
 
+const pseudoTerminalFactory: PseudoTerminalFactory = ({
+  command,
+  args,
+  cwd
+}) => {
+  const commandRunning = require('node-pty-prebuilt').spawn(command, args, {
+    cols: 80,
+    cwd
+  });
+
+  return {
+    onDidWriteData: callback => {
+      commandRunning.on('data', callback);
+    },
+    onExit: callback => {
+      commandRunning.on('exit', callback);
+    },
+    kill: () => {
+      if (os.platform() === 'win32') {
+        commandRunning.kill();
+      } else {
+        commandRunning.kill('SIGKILL');
+      }
+    }
+  };
+};
+
 function startServer(port: number) {
   const ElectronStore = require('electron-store');
   const store: Store = new ElectronStore();
   console.log('starting server on port', port);
+
   try {
     start({
       port,
-      mainWindow,
+      selectDirectory: args => {
+        const selection = dialog.showOpenDialog(mainWindow, {
+          properties: ['openDirectory'],
+          buttonLabel: args.buttonLabel,
+          title: args.title
+        });
+
+        return Promise.resolve(selection[0]);
+      },
       store,
-      staticResourcePath: path.join(__dirname, './assets/public')
+      staticResourcePath: path.join(__dirname, './assets/public'),
+      pseudoTerminalFactory
     });
   } catch (e) {
     telemetry.reportException(`Start Server: ${e.message}`);

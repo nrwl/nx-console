@@ -17,17 +17,17 @@
     <mat-card-content
       *ngIf="
         (installNodeJsStatus$ | async) as installNodeJsStatus;
-        else: welcome
+        else welcome
       "
       class="install-progress"
       fxLayout="column"
       fxLayoutAlign="center center"
     >
-      <ng-container *ngIf="!installNodeJsStatus.cancelled; else: cancelled">
+      <ng-container *ngIf="!installNodeJsStatus.cancelled; else cancelled">
         <mat-progress-bar
           *ngIf="
             installNodeJsStatus.downloadPercentage !== null;
-            else: installing
+            else installing
           "
           [value]="installNodeJsStatus.downloadPercentage"
           mode="determinate"

@@ -1,7 +1,6 @@
 import {
   createSchema,
   registerPlugin,
-  authUtils,
   Store
 } from '@nrwl/angular-console-enterprise-electron';
 import {
@@ -13,11 +12,11 @@ import * as express from 'express';
 
 import { docs } from './api/docs';
 import { readSettings } from './api/read-settings';
-import { commands } from './api/run-command';
+import { commands, PseudoTerminalFactory } from './api/run-command';
 import { Telemetry } from './telemetry';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { getResolvers } from './resolvers';
+import { getResolvers, SelectDirectory } from './resolvers';
 
 export const app: express.Express = express();
 
@@ -26,7 +25,8 @@ export const app: express.Express = express();
 export function start(options: {
   port: number;
   store: Store;
-  mainWindow: any;
+  selectDirectory: SelectDirectory;
+  pseudoTerminalFactory: PseudoTerminalFactory;
   staticResourcePath: string;
 }) {
   const context = {
@@ -37,7 +37,11 @@ export function start(options: {
   };
 
   const schema = makeExecutableSchema({
-    resolvers: getResolvers(options.mainWindow, options.store),
+    resolvers: getResolvers(
+      options.selectDirectory,
+      options.store,
+      options.pseudoTerminalFactory
+    ),
     typeDefs: readFileSync(resolve(__dirname, './assets/schema.graphql'), {
       encoding: 'utf-8'
     })
@@ -45,7 +49,7 @@ export function start(options: {
 
   const apollo = new ApolloServer({
     schema: mergeSchemas({
-      schemas: [schema, createSchema(context, options.store)]
+      schemas: [createSchema(context, options.store), schema]
     }),
     rootValue: global
   });

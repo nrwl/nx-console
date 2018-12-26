@@ -1,5 +1,6 @@
 import * as os from 'os';
 import { DetailedStatusCalculator } from './detailed-status-calculator';
+import { PseudoTerminal } from './run-command';
 
 export interface CommandInformation {
   id: string;
@@ -10,7 +11,7 @@ export interface CommandInformation {
   outChunk: string;
   out: string;
   factory: Function;
-  commandRunning: any;
+  commandRunning: PseudoTerminal | null;
   detailedStatusCalculator: DetailedStatusCalculator<any>;
 }
 
@@ -74,12 +75,12 @@ export class Commands {
       if (c.status === 'in-progress') {
         c.status = 'terminated';
         c.detailedStatusCalculator.setStatus('terminated');
-        if (os.platform() === 'win32') {
-          c.commandRunning.kill();
-        } else {
-          c.commandRunning.kill('SIGKILL');
+        if (c.commandRunning) {
+          if (os.platform() === 'win32') {
+            c.commandRunning.kill();
+          }
+          c.commandRunning = null;
         }
-        c.commandRunning = null;
       }
     });
   }
