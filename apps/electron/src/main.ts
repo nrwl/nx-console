@@ -170,7 +170,16 @@ const pseudoTerminalFactory: PseudoTerminalFactory = ({
 
   return {
     onDidWriteData: callback => {
+      const humanReadableCommand = `${command} ${args.join(' ')}\n\n`;
+      callback(humanReadableCommand);
       commandRunning.on('data', callback);
+      commandRunning.on('exit', (exitCode: number) => {
+        if (exitCode === 0) {
+          callback('\nProcess completed 🙏');
+        } else {
+          callback('\nProcess failed 🐳');
+        }
+      });
     },
     onExit: callback => {
       commandRunning.on('exit', callback);

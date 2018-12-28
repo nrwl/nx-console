@@ -14,9 +14,10 @@ export function getPseudoTerminalFactory(
     const terminal = window.createTerminal(name);
     context.subscriptions.push(terminal);
 
+    const humanReadableCommand = `${command} ${args.join(' ')}`;
     const fullCommand =
       `cd ${cwd} &&` +
-      `${command} ${args.join(' ')} && echo "\n${AC_SUCCESS}"` +
+      `${humanReadableCommand} && echo "\n${AC_SUCCESS}"` +
       ` || echo "\n${AC_FAILURE}"`;
 
     terminal.sendText(fullCommand);
@@ -34,6 +35,13 @@ export function getPseudoTerminalFactory(
         if (!whaleSpotted) {
           if (data.includes('🐳')) {
             whaleSpotted = true;
+            if (onDidWriteData) {
+              onDidWriteData(
+                `${humanReadableCommand}\n${data.slice(
+                  data.indexOf('🐳') + '🐳"'.length
+                )}`
+              );
+            }
           }
           return;
         }

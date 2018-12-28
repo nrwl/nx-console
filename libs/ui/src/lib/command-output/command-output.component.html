@@ -73,10 +73,7 @@
         (activeView$ | async) === 'terminal' ? 'terminal-is-active' : ''
       "
     >
-      <ui-terminal
-        [command]="command"
-        [outChunk]="commandResponse?.outChunk"
-      ></ui-terminal>
+      <ui-terminal [outChunk]="commandResponse?.outChunk"></ui-terminal>
     </div>
   </div>
 </div>
