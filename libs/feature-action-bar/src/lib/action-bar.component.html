@@ -161,7 +161,6 @@
         <ui-command-output
           #terminal
           *ngIf="terminalContainer.expanded"
-          [command]="(expandedAction?.command | async)?.command"
           [commandResponse]="expandedAction?.command | async"
         >
         </ui-command-output>

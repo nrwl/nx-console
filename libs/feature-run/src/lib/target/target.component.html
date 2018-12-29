@@ -4,7 +4,7 @@
 ></ui-entity-docs>
 <ui-task-runner
   *ngIf="(project$ | async) as project"
-  terminalWindowTitle="Task output"
+  [terminalWindowTitle]="(command$ | async) || 'Task output'"
 >
   <ui-flags
     [configurations]="project.architect[0].configurations"
@@ -15,7 +15,6 @@
     [path]="path()"
   ></ui-flags>
   <ui-command-output
-    [command]="command$ | async"
     [commandResponse]="commandOutput$ | async"
     [emptyTemplate]="emptyMessage"
   >

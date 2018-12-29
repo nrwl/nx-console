@@ -28,8 +28,6 @@
     <mat-expansion-panel
       *ngFor="let fieldGroup of fieldGroups"
       [expanded]="fieldGroup.expanded"
-      (opened)="resizeFlags.emit()"
-      (closed)="resizeFlags.emit()"
     >
       <mat-expansion-panel-header>
         <mat-panel-title
@@ -53,7 +51,7 @@
         *ngFor="let field of fieldGroup.fields"
         [class.error]="
           formGroup.hasError('required', field.name) &&
-          formGroup.get(field.name).touched
+          formGroup.get(field.name)?.touched
         "
         fxLayout="row"
         fxLayoutGap="16px"

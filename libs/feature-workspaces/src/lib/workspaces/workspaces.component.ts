@@ -10,7 +10,7 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { NewWorkspaceComponent } from '../new-workspace/new-workspace.component';
@@ -18,6 +18,7 @@ import { WorkspacesService } from '../workspaces.service';
 import { shareReplay } from 'rxjs/operators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-workspaces',
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.scss'],

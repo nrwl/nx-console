@@ -1,7 +1,13 @@
 import { FADE_IN } from '@angular-console/ui';
 import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterOutlet, Router } from '@angular/router';
 import {
@@ -18,12 +24,13 @@ interface SidenavLink {
 }
 
 const DEFAULT_TITLE = 'Angular Console';
-const TITLE_SEPARATOR = ' - ';
+const TITLE_SEPARATOR = ' | ';
 
 @Component({
   selector: 'angular-console-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('routerTransition', [
       transition('void => *', []),
@@ -85,6 +92,5 @@ function makeTitle(tabs: Breadcrumb[]) {
       },
       [] as string[]
     )
-    .concat([DEFAULT_TITLE])
     .join(TITLE_SEPARATOR);
 }

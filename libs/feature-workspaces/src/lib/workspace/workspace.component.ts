@@ -120,13 +120,13 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     editors => {
       this.contextualActionBarService.nonContextualActions$.next([
         {
-          name: 'Open',
+          name: 'Open in...',
           description: 'Open workspace in another program',
           icon: 'open_in_browser',
           options: editors.map(
             (editor): MenuOption => {
               return {
-                name: `Open in ${editor.name}`,
+                name: `${editor.name}`,
                 image: editor.icon,
                 invoke: () => {
                   this.workspace$

@@ -44,19 +44,20 @@ export function initApollo(
 
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
-      graphQLErrors.forEach(({ message }) => {
-        messenger.error(message);
-        telemetry.reportException(message);
+      graphQLErrors.forEach(error => {
+        messenger.error(error.message);
+        telemetry.reportException(error.message);
       });
     } else if (networkError) {
       const n: any = networkError;
+      messenger.error('Angular Console Server was shutdown');
       if (n.error && n.error.errors && n.error.errors.length > 0) {
         const message = n.error.errors[0].message;
-        messenger.error(message);
         telemetry.reportException(message);
+        console.error(message);
       } else {
-        messenger.error(n.message);
         telemetry.reportException(n.message);
+        console.error(n.message);
       }
     }
   });

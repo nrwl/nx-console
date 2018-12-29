@@ -114,7 +114,7 @@ export class CommandRunner {
 
   getCommand(id: string): Observable<CommandResponse> {
     // Start initial `outChunk` with `out` so we can replay terminal output.
-    const initial$ = this.getCommandInitialGQL.watch({ id }).valueChanges.pipe(
+    const initial$ = this.getCommandInitialGQL.fetch({ id }).pipe(
       map(withDetailedStatus),
       map(r => ({
         ...r,
@@ -126,7 +126,8 @@ export class CommandRunner {
       .watch({ id }, { pollInterval: COMMANDS_POLLING })
       .valueChanges.pipe(
         map(withDetailedStatus),
-        skip(1)
+        skip(1),
+        takeWhile(r => !!r)
       );
     return concat(initial$, rest$);
   }

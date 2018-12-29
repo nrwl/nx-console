@@ -162,7 +162,9 @@ export class SchematicComponent implements OnInit {
             out: '',
             detailedStatus: null,
             status: CommandStatus.TERMINATED,
-            outChunk: 'Command is missing required fields'
+            outChunk: `${c.commands.join(
+              `\n\s`
+            )}\n\n\sCommand is missing required fields\n\s`
           };
           return of();
         }

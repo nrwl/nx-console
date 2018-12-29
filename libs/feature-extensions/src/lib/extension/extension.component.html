@@ -1,12 +1,11 @@
 <ng-container *ngIf="(extension$ | async) as extension">
   <ng-template [ngIf]="!extension.installed" [ngIfElse]="alreadyInstalled">
-    <ui-task-runner terminalWindowTitle="Task output">
+    <ui-task-runner [terminalWindowTitle]="(command$ | async) || 'Task output'">
       <div class="ui-flags">
         <ng-container *ngTemplateOutlet="alreadyInstalled"></ng-container>
       </div>
       <ui-command-output
         [emptyTemplate]="emptyMessage"
-        [command]="command$ | async"
         [commandResponse]="commandOutput$ | async"
       >
       </ui-command-output>

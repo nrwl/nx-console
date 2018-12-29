@@ -14,7 +14,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { BehaviorSubject, merge, Subscription, EMPTY } from 'rxjs';
-import { map, delay } from 'rxjs/operators';
+import { map, delay, tap } from 'rxjs/operators';
 import { FlagsComponent } from '../flags/flags.component';
 import { CommandOutputComponent } from '../command-output/command-output.component';
 
@@ -37,7 +37,7 @@ const ANIMATION_DURATION = 300;
     ])
   ]
 })
-export class TaskRunnerComponent implements AfterContentInit, OnDestroy {
+export class TaskRunnerComponent {
   @Input() terminalWindowTitle: string;
 
   @ContentChild(FlagsComponent) flagsComponent: FlagsComponent | undefined;
@@ -48,27 +48,4 @@ export class TaskRunnerComponent implements AfterContentInit, OnDestroy {
   terminalAnimationState = this.terminalVisible$.pipe(
     map(visible => (visible ? 'grow' : 'shrink'))
   );
-  resizeSubscription: Subscription | undefined;
-
-  ngAfterContentInit() {
-    const TIME_BUFFER = 50;
-    const DELAY = ANIMATION_DURATION + TIME_BUFFER;
-    const flagsComponentResize$ = this.flagsComponent
-      ? this.flagsComponent.resizeFlags.pipe(delay(DELAY))
-      : EMPTY;
-    this.resizeSubscription = merge(
-      flagsComponentResize$,
-      this.terminalVisible$.pipe(delay(DELAY))
-    ).subscribe(() => {
-      if (this.statusComponent) {
-        this.statusComponent.resizeTerminal();
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.resizeSubscription) {
-      this.resizeSubscription.unsubscribe();
-    }
-  }
 }

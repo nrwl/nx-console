@@ -43,7 +43,7 @@
             <mat-icon class="info" matListIcon>info</mat-icon>
             <div class="status-content js-status-build-folder">
               <ng-container
-                *ngIf="status?.isForProduction; else: devBuiltMessage"
+                *ngIf="status?.isForProduction; else devBuiltMessage"
               >
                 The application
                 <a (click)="showItemInFolder(outputPath)">folder</a> is ready to

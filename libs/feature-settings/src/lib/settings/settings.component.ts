@@ -1,8 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Telemetry, Settings } from '@angular-console/utils';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']

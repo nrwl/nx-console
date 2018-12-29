@@ -1,7 +1,6 @@
 import { Directory } from '@angular-console/schema';
 import {
   CommandRunner,
-  Finder,
   IncrementalCommandOutput,
   CommandStatus
 } from '@angular-console/utils';
@@ -60,7 +59,7 @@ export class NewWorkspaceComponent {
     name: this.fb.control(
       null,
       Validators.required,
-      makeNameAvailableValidator(this.finderService)
+      makeNameAvailableValidator()
     ),
     collection: this.fb.control(null, Validators.required)
   });
@@ -85,7 +84,6 @@ export class NewWorkspaceComponent {
     private readonly router: Router,
     private readonly dialogRef: MatDialogRef<NewWorkspaceComponent>,
     private readonly fb: FormBuilder,
-    private readonly finderService: Finder,
     private readonly schematicCollectionsGQL: SchematicCollectionsGQL,
     private readonly workspacesService: WorkspacesService,
     private readonly ngNewGQL: NgNewGQL,
@@ -142,9 +140,7 @@ export class NewWorkspaceComponent {
   }
 }
 
-export function makeNameAvailableValidator(
-  finderService: Finder
-): AsyncValidatorFn {
+export function makeNameAvailableValidator(): AsyncValidatorFn {
   return (control: AbstractControl): Observable<ValidationErrors | null> => {
     const form = control.parent as FormGroup;
     const pathCtrl = form.controls.path;
@@ -154,8 +150,8 @@ export function makeNameAvailableValidator(
       nameCtrl && pathCtrl ? `${pathCtrl.value}/${nameCtrl.value}` : null
     ).pipe(
       switchMap(
-        (workspacePath: null | string): Observable<null | Directory> =>
-          workspacePath ? finderService.listFiles(workspacePath) : of(null)
+        // TODO(mrmeku): Recompute this with a less expensive call.
+        (workspacePath: null | string): Observable<null | Directory> => of(null)
       ),
       map((d: null | Directory) =>
         !d || !d.exists ? null : { nameTaken: true }

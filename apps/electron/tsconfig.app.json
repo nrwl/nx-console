@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc/apps/electron",
+    "module": "commonjs",
+    "types": ["node"],
+    "sourceMap": false,
+    "declaration": false,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "target": "es2017",
+    "typeRoots": ["../node_modules/@types"],
+    "lib": ["dom", "es2017", "esnext.asynciterable"]
+  },
+  "exclude": ["**/*.spec.ts"],
+  "include": ["**/*.ts"]
+}

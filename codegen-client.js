@@ -30,9 +30,10 @@ function generateLib(lib) {
 }
 
 module.exports = {
-  schema: resolve(__dirname, 'server/src/schema/schema.graphql'),
+  schema: resolve(__dirname, 'libs/server/src/schema/schema.graphql'),
   overwrite: true,
   generates: listLibs()
+    .filter(lib => lib !== 'server')
     .map(generateLib)
     .reduce(
       (generates, lib) => ({

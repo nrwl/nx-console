@@ -1,4 +1,4 @@
-const npsUtils = require('nps-utils');
+const nps = require('nps-utils');
 const os = require('os');
 
 function withPlatform(command) {
@@ -18,114 +18,185 @@ function withPlatform(command) {
 }
 
 function electronBuilder(platform, dashP) {
-  return `electron-builder ${platform} -p ${dashP} --config.win.certificateSubjectName="Narwhal Technologies Inc."`
+  return `electron-builder ${platform} -p ${dashP} --config.win.certificateSubjectName="Narwhal Technologies Inc."`;
 }
 
 module.exports = {
   scripts: {
     frontend: {
-      ng: 'ng',
       build: 'ng build angular-console --prod',
-      serve: {
-        default: 'ng serve angular-console',
-        prod: 'ng serve angular-console --prod'
-      },
-      format: {
-        default: 'prettier **/*.ts **/*.css **/*.scss **/*.html --write',
-        write: 'prettier **/*.ts **/*.css **/*.scss **/*.html --write',
-        check: 'prettier --list-different **/*.ts **/*.css **/*.scss **/*.html --write'
-      },
-      lint: npsUtils.series('nx lint', 'nx affected:lint --base=master --parallel'),
-      test: 'nx affected:test --base=master'
+      serve: 'ng serve angular-console'
     },
     server: {
-      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.gen-apollo-angular', 'server.compile-only', withPlatform('move-graphql')),
-      'compile-only': 'tsc -p server/tsconfig.json',
-      format: {
-        default: npsUtils.series.nps('server.format.write'),
-        write: 'prettier --write \"./server/**/*.ts\"',
-        check: 'prettier --list-different \"./server/**/*.ts\"'
+      'gen-all': nps.concurrent.nps(
+        'server.gen-graphql-types',
+        'server.gen-apollo-angular'
+      ),
+      'gen-and-build': nps.series.nps('server.gen-all', 'server.build'),
+      build: {
+        default: 'ng build electron --prod --maxWorkers=4',
+        vscode: 'ng build vscode --prod --maxWorkers=4'
       },
-      test: 'node ./tools/scripts/test ./server/test',
       'gen-graphql-types': 'gql-gen --config codegen-server.yml',
       'gen-apollo-angular': 'gql-gen --config codegen-client.js'
     },
     mac: {
-      'clean': 'rm -rf dist',
-      'copy-assets': 'cp server/package.json dist/server/package.json && cp -r server/assets dist/server',
-      'install-node-modules': 'cd dist/server && yarn',
-      'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
-      'pack': 'electron-builder --mac --dir -p never',
+      clean: 'rm -rf dist',
+      'vsce-package':
+        'cd dist/apps/vscode && yarn install --production --pure-lockfile --ignore-optional --no-bin-links --non-interactive && vsce package',
+      'copy-frontend': {
+        default:
+          'cp -r dist/apps/angular-console dist/apps/electron/assets/public',
+        vscode:
+          'cp -r dist/apps/angular-console dist/apps/vscode/assets/angular-console'
+      },
+      'copy-schema': {
+        default:
+          'cp libs/server/src/schema/schema.graphql apps/electron/src/assets/schema.graphql',
+        vscode:
+          'cp libs/server/src/schema/schema.graphql apps/vscode/src/assets/schema.graphql'
+      },
+      'copy-yarn-lock': {
+        default: 'cp yarn.lock apps/electron/src/yarn.lock',
+        vscode: 'cp yarn.lock apps/vscode/src/yarn.lock'
+      },
+      'copy-readme': {
+        vscode: 'cp README.md apps/vscode/src/README.md'
+      },
+      'electron-pack': 'electron-builder --mac --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/mac',
-      'start-server': 'electron dist/server --server --inspect=9229',
-      'start-electron': 'NODE_ENV=development electron dist/server',
-      'builder-dist': 'electron-builder --mac -p never',
-      'move-graphql': 'cp server/src/schema/schema.graphql dist/server/src/schema/schema.graphql'
+      'start-server': 'electron dist/apps/electron --server --inspect=9229',
+      'start-electron': 'NODE_ENV=development electron dist/apps/electron',
+      'builder-prerelease': electronBuilder('--mac', 'never'),
+      'builder-publish': electronBuilder('--mac', 'always')
     },
     linux: {
-      'clean': 'rm -rf dist',
-      'copy-assets': 'cp server/package.json dist/server/package.json && cp -r server/assets dist/server',
-      'install-node-modules': 'cd dist/server && yarn',
-      'copy-frontend': 'cp -r dist/apps/angular-console dist/server/src/public',
-      'pack': 'electron-builder --linux --dir -p never',
+      clean: 'rm -rf dist',
+      'vsce-package': 'mac.vsce-package',
+      'copy-frontend': {
+        default: nps.series.nps('mac.copy-frontend'),
+        vscode: nps.series.nps('mac.copy-frontend.vscode')
+      },
+      'copy-schema': {
+        default: nps.series.nps('mac.copy-frontend'),
+        vscode: nps.series.nps('mac.copy-frontend.vscode')
+      },
+      'copy-yarn-lock': {
+        default: nps.series.nps('mac.copy-yarn-lock'),
+        vscode: nps.series.nps('mac.copy-yarn-lock.vscode')
+      },
+      'copy-readme': {
+        vscode: nps.series.nps('mac.copy-readme.vscode')
+      },
+      'electron-pack': 'electron-builder --linux --dir -p never',
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/linux',
-      'start-server': 'electron dist/server --server --inspect=9229',
-      'start-electron': 'NODE_ENV=development electron dist/server',
-      'builder-dist': 'electron-builder --linux -p never',
-      'move-graphql': 'cp server/src/schema/schema.graphql dist/server/src/schema/schema.graphql'
+      'start-server': nps.series.nps('mac.start-server'),
+      'start-electron': nps.series.nps('mac.start-electron'),
+      'builder-prerelease': electronBuilder('--linux', 'never'),
+      'builder-publish': electronBuilder('--linux', 'always')
     },
     win: {
-      'clean': 'if exist dist rmdir dist /s /q',
-      'copy-assets': 'copy server\\package.json dist\\server\\package.json && (robocopy server\\assets dist\\server\\assets /e || echo 0)',
-      'install-node-modules': 'cd dist\\server && yarn',
-      'copy-frontend': 'robocopy dist\\apps\\angular-console dist\\server\\src\\public /e || echo 0',
-      'pack': 'electron-builder --win --dir -p never',
+      clean: 'if exist dist rmdir dist /s /q',
+      'vsce-package':
+        'cd dist\\apps\\vscode && yarn install --production --pure-lockfile --ignore-optional --no-bin-links --non-interactive && vsce package',
+      'copy-frontend': {
+        default:
+          'robocopy dist\\apps\\angular-console dist\\apps\\electron\\assets\\public /e || echo 0',
+        vscode:
+          'robocopy dist\\apps\\angular-console dist\\apps\\vscode\\assets\\angular-console /e || echo 0'
+      },
+      'copy-schema': {
+        default:
+          'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\electron\\src\\assets\\schema.graphql',
+        vscode:
+          'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql'
+      },
+      'copy-yarn-lock': {
+        default: 'robocopy yarn.lock apps\\electron\\src\\yarn.lock',
+        vscode: 'robocopy yarn.lock apps\\vscode\\src\\yarn.lock'
+      },
+      'copy-readme': {
+        vscode: 'robocopy README.md apps\\vscode\\src\\README.md'
+      },
+      'electron-pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
-      'start-server': 'electron dist\\server --server --inspect=9229',
-      'start-electron': 'electron dist\\server',
-      'builder-dist': 'electron-builder --win -p never',
-      'move-graphql': 'copy server\\src\\schema\\schema.graphql dist\\server\\src\\schema\\schema.graphql'
+      'start-server': 'electron dist\\apps\\electron --server --inspect=9229',
+      'start-electron': 'electron dist\\apps\\electron',
+      'builder-prerelease': electronBuilder('--win', 'never'),
+      'builder-publish': electronBuilder('--win', 'always')
     },
     dev: {
       'patch-cli': 'node ./tools/scripts/patch-cli.js',
-      'compile-server': npsUtils.series.nps('server.compile', withPlatform('copy-assets')),
-      'prepare': npsUtils.series.nps(withPlatform('clean'), 'dev.compile-server', 'frontend.build', withPlatform('copy-frontend'), withPlatform('pack'), 'dev.patch-cli'),
-      'server': npsUtils.series.nps('dev.compile-server', withPlatform('start-server')),
-      'up': npsUtils.concurrent.nps('dev.server', 'frontend.serve'),
-      'dist': npsUtils.series.nps('dev.prepare', withPlatform('builder-dist'), withPlatform('copy-to-osbuilds'))
+      prepare: {
+        default: nps.series.nps(
+          withPlatform('clean'),
+          withPlatform('copy-yarn-lock'),
+          'dev.build',
+          withPlatform('copy-frontend'),
+          'dev.patch-cli'
+        ),
+        vscode: nps.series.nps(
+          withPlatform('clean'),
+          'server.gen-all',
+          withPlatform('copy-schema.vscode'),
+          withPlatform('copy-yarn-lock.vscode'),
+          withPlatform('copy-readme.vscode'),
+          'dev.build.vscode',
+          'dev.patch-cli',
+          withPlatform('copy-frontend.vscode')
+        )
+      },
+      build: {
+        default: nps.concurrent.nps('server.gen-and-build', 'frontend.build'),
+        vscode: nps.concurrent.nps('server.build.vscode', 'frontend.build')
+      },
+      server: nps.series.nps(
+        withPlatform('copy-schema'),
+        'server.gen-and-build',
+        withPlatform('start-server')
+      ),
+      up: nps.concurrent.nps('dev.server', 'frontend.serve')
+    },
+    package: {
+      // NOTE: This command should be run on a mac with Parallels installed
+      default: nps.series.nps(
+        'dev.prepare',
+        'mac.builder-prerelease',
+        'win.builder-prerelease',
+        'linux.builder-prerelease'
+      ),
+      vscode: nps.series.nps('dev.prepare.vscode', withPlatform('vsce-package'))
     },
     publish: {
-      'win-builder-prerelease': electronBuilder('--win', 'never'),
-      'win-builder-publish': electronBuilder('--win', 'always'),
-      'mac-builder-prerelease': electronBuilder('--mac --linux', 'never'),
-      'mac-builder-publish': electronBuilder('--mac --linux', 'always'),
-      'linux-builder-prerelease': electronBuilder('--linux --linux', 'never'),
-      'linux-builder-publish': electronBuilder('--linux --linux', 'always'),
-      'win-prerelease': npsUtils.series.nps('dev.prepare', 'publish.win-builder-prerelease'),
-      'win-publish': npsUtils.series.nps('dev.prepare', 'publish.win-builder-publish'),
-      'mac-prerelease': npsUtils.series.nps('dev.prepare', 'publish.mac-builder-prerelease'),
-      'mac-publish': npsUtils.series.nps('dev.prepare', 'publish.mac-builder-publish'),
-      'linux-prerelease': npsUtils.series.nps('dev.prepare', 'publish.linux-builder-prerelease'),
-      'linux-publish': npsUtils.series.nps('dev.prepare', 'publish.linux-builder-publish')
+      // NOTE: This command should be run on a mac with Parallels installed
+      default: nps.series.nps(
+        'dev.prepare',
+        'mac.builder-publish',
+        'win.builder-publish',
+        'linux.builder-publish'
+      )
     },
     e2e: {
-      'compile': 'tsc -p apps/angular-console-e2e/tsconfig.json',
+      compile: 'tsc -p apps/angular-console-e2e/tsconfig.json',
       'compile-watch': 'tsc -p apps/angular-console-e2e/tsconfig.json --watch',
-      'fixtures': 'node ./tools/scripts/set-up-e2e-fixtures.js',
-      'cypress': `cypress run --project ./apps/angular-console-e2e --env projectsRoot=${__dirname + '/tmp'} --record`,
-      'open-cypress': `cypress open --project ./apps/angular-console-e2e --env projectsRoot=${__dirname + '/tmp'}`,
-      'run': 'node ./tools/scripts/run-e2e.js',
-      'up': npsUtils.concurrent.nps('dev.up', 'e2e.compile-watch', 'e2e.open-cypress')
+      fixtures: 'node ./tools/scripts/set-up-e2e-fixtures.js',
+      cypress: `cypress run --project ./apps/angular-console-e2e --env projectsRoot=${__dirname +
+        '/tmp'} --record`,
+      'open-cypress': `cypress open --project ./apps/angular-console-e2e --env projectsRoot=${__dirname +
+        '/tmp'}`,
+      run: 'node ./tools/scripts/run-e2e.js',
+      up: nps.concurrent.nps('dev.up', 'e2e.compile-watch', 'e2e.open-cypress')
     },
     format: {
-      default: npsUtils.series.nps('format.write'),
-      check: npsUtils.concurrent.nps('frontend.format.check', 'server.format.check'),
-      write: npsUtils.concurrent.nps('frontend.format.write', 'server.format.write')
+      default: nps.series.nps('format.write'),
+      write: 'prettier {apps,libs}/**/*.{ts,css,scss,html} --write',
+      check: 'prettier --list-different {apps,libs}/**/*.{ts,css,scss,html}'
     },
-    lint: {
-      default: npsUtils.concurrent.nps('frontend.lint'),
-      fix: npsUtils.concurrent.nps('frontend.lint.fix')
-    },
-    test: npsUtils.concurrent.nps('frontend.test', 'server.test')
+    lint: nps.concurrent({
+      formatCheck: 'nps format.check',
+      nxLint: 'nx lint',
+      tsLint: 'tslint .'
+    }),
+    test: 'nx affected:test --base=origin/master --parallel'
   }
 };

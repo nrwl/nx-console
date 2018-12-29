@@ -21,6 +21,78 @@ import {
   clearAllRecentTasks
 } from './tasks.utils';
 
+const PASSING_TESTS = `
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+
+  it(\`should have as title 'proj'\`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('proj');
+  });
+
+  it('should do stuff', () => {
+    expect(true).toBe(true);
+  });
+});
+`;
+const FAILING_TESTS = `
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+
+  it(\`should have as title 'proj'\`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('NOPE');
+  });
+
+  it('should do stuff', () => {
+    expect(true).toBe(true);
+  });
+});
+`;
+
+const GOOD_CMP = `
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'proj';
+}
+`;
+const BAD_CMP = `
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent oops!
+`;
+
 describe('Tasks', () => {
   beforeEach(() => {
     whitelistGraphql();
@@ -241,75 +313,3 @@ describe('Tasks', () => {
   //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
   // });
 });
-
-const PASSING_TESTS = `
-import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-
-describe('AppComponent', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-    }).compileComponents();
-  }));
-
-  it(\`should have as title 'proj'\`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('proj');
-  });
-  
-  it('should do stuff', () => {
-    expect(true).toBe(true);
-  });
-});
-`;
-const FAILING_TESTS = `
-import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-
-describe('AppComponent', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-    }).compileComponents();
-  }));
-
-  it(\`should have as title 'proj'\`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('NOPE');
-  });
-  
-  it('should do stuff', () => {
-    expect(true).toBe(true);
-  });
-});
-`;
-
-const GOOD_CMP = `
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  title = 'proj';
-}
-`;
-const BAD_CMP = `
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent oops!
-`;

@@ -4,18 +4,17 @@ import {
   Component,
   ElementRef,
   Input,
+  NgZone,
   OnDestroy,
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import { fromEvent } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import ResizeObserver from 'resize-observer-polyfill';
+
+import { TerminalFactory } from './terminal.factory';
 import { Terminal } from 'xterm';
-
-const DEBOUNCE_TIME = 300;
-const SCROLL_BAR_WIDTH = 48;
-const MIN_TERMINAL_WIDTH = 20;
-
+const SCROLL_BAR_WIDTH = 36;
+const MIN_TERMINAL_WIDTH = 80;
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-terminal',
@@ -28,12 +27,8 @@ const MIN_TERMINAL_WIDTH = 20;
 })
 export class TerminalComponent implements AfterViewInit, OnDestroy {
   private output = '';
-  private readonly term = new Terminal({ disableStdin: true, fontSize: 14 });
-  private readonly resizeSubscription = fromEvent(window, 'resize')
-    .pipe(debounceTime(DEBOUNCE_TIME))
-    .subscribe(() => {
-      this.resizeTerminal();
-    });
+  private term: Terminal;
+  private resizeObserver?: ResizeObserver;
 
   @ViewChild('code', { read: ElementRef })
   private readonly code: ElementRef;
@@ -42,67 +37,99 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   set outChunk(s: string) {
-    if (!s) {
-      return;
-    }
-    this.output += s;
-    this.writeOutput(s);
+    this.ngZone.runOutsideAngular(() => {
+      if (!s) {
+        return;
+      }
+      this.output += s;
+      this.writeOutput(s);
+    });
   }
 
   @Input()
   set out(s: string) {
-    this.output = s;
-    this.writeOutput(s);
+    this.ngZone.runOutsideAngular(() => {
+      this.output = s;
+      this.writeOutput(s);
+    });
+  }
+
+  constructor(
+    private readonly terminalFactory: TerminalFactory,
+    private readonly elementRef: ElementRef,
+    private readonly ngZone: NgZone
+  ) {
+    ngZone.runOutsideAngular(() => {
+      this.term = this.terminalFactory.new({
+        disableStdin: true,
+        fontSize: 14,
+        cursorStyle: 'underline',
+        enableBold: true,
+        cursorBlink: false,
+        fontFamily: 'Roboto Mono',
+        theme: {
+          cursor: 'rgb(0, 0, 0)'
+        }
+      });
+    });
   }
 
   ngAfterViewInit(): void {
-    this.term.open(this.code.nativeElement);
-    this.resizeTerminal();
+    this.ngZone.runOutsideAngular(() => {
+      this.term.open(this.code.nativeElement);
+      this.resizeTerminal();
+
+      this.resizeObserver = new ResizeObserver(() => {
+        this.resizeTerminal();
+      });
+
+      this.resizeObserver.observe(this.elementRef.nativeElement);
+    });
   }
 
   ngOnDestroy() {
-    this.resizeSubscription.unsubscribe();
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   private writeOutput(output: string) {
-    if (!this.output || !this.code) {
-      return;
-    }
-    this.term.write(output);
-  }
+    this.ngZone.runOutsideAngular(() => {
+      if (!this.output || !this.code) {
+        return;
+      }
 
-  private writeFullCachedOutput() {
-    if (!this.output || !this.code) {
-      return;
-    }
-    this.term.write(this.output);
+      this.term.write(output);
+    });
   }
 
   reset() {
-    this.output = '';
-    this.term.reset();
+    this.ngZone.runOutsideAngular(() => {
+      this.output = '';
+      this.term.reset();
+    });
   }
 
-  resizeTerminal() {
-    setTimeout(() => {
-      const renderer = (this.term as any).renderer;
+  private resizeTerminal() {
+    this.ngZone.runOutsideAngular(() => {
+      const renderer = (this.term as any)._core.renderer;
       if (!renderer) {
         return;
       }
+
       const height = (this.code.nativeElement as HTMLElement).clientHeight;
       const width =
         (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
+
       const cols = Math.max(
         MIN_TERMINAL_WIDTH,
         Math.floor(width / renderer.dimensions.actualCellWidth)
       );
       const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
+
       // If dimensions did not change, no need to reset.
-      if (this.term.rows !== rows || this.term.cols !== cols) {
-        renderer.clear();
-        this.term.reset();
+      if (this.term.cols !== cols || this.term.rows !== rows) {
         this.term.resize(cols, rows);
-        this.writeFullCachedOutput();
       }
     });
   }

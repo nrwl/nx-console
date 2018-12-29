@@ -1,17 +1,17 @@
+import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
   Component,
+  HostListener,
   Input,
   OnDestroy,
   TemplateRef,
-  ViewChild,
-  HostListener
+  ViewChild
 } from '@angular/core';
-import { TerminalComponent } from '../terminal/terminal.component';
-import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
 import { map, scan, take } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material';
+
+import { TerminalComponent } from '../terminal/terminal.component';
 
 type View = 'details' | 'terminal';
 const INITIAL_VIEW: View = 'details';
@@ -35,7 +35,6 @@ interface TerminalOutputValue {
 })
 export class CommandOutputComponent implements OnDestroy {
   @ViewChild(TerminalComponent) terminal: TerminalComponent;
-  @Input() command: string;
   @Input()
   set commandResponse(x: CommandResponse) {
     // Guard against initial empty responses.
@@ -108,12 +107,6 @@ export class CommandOutputComponent implements OnDestroy {
       this.terminal.reset();
     }
     this.hasUnreadResponse = false;
-  }
-
-  resizeTerminal() {
-    if (this.terminal) {
-      this.terminal.resizeTerminal();
-    }
   }
 
   setActiveView(view: View) {

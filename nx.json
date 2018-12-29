@@ -42,6 +42,15 @@
     },
     "feature-action-bar": {
       "tags": []
+    },
+    "vscode": {
+      "tags": []
+    },
+    "electron": {
+      "tags": []
+    },
+    "server": {
+      "tags": []
     }
   }
 }

@@ -12,12 +12,18 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          name: Restore Global Yarn Package Cache
-          key: yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run: yarn install
-      - run: yarn start format.check
+          keys:
+            - yarn-dependencies-{{ checksum "yarn.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - yarn-dependencies-
+      - run: yarn install --frozen-lockfile --non-interactive
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+            - ./node_modules
+            - /home/circleci/.cache/Cypress
+          key: yarn-dependencies-{{ checksum "yarn.lock" }}
       - run: yarn start lint
-      - run: yarn start server.compile
       - run: yarn start test
       - run: yarn start e2e.fixtures
       - run:
@@ -25,10 +31,3 @@ jobs:
           no_output_timeout: 20m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
-            - ./node_modules
-            - /home/circleci/.cache/Cypress

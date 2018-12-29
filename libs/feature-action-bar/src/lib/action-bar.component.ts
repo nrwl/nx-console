@@ -15,7 +15,8 @@ import {
   Component,
   HostListener,
   QueryList,
-  ViewChildren
+  ViewChildren,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
@@ -36,6 +37,7 @@ const COMMAND_HEIGHT = 64;
   selector: 'angular-console-action-bar',
   templateUrl: './action-bar.component.html',
   styleUrls: ['./action-bar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('growShrink', [
       state('void', style({ height: 0, opacity: 0 })),
@@ -167,13 +169,6 @@ export class ActionBarComponent {
           return `calc(100vh - ${TERMINAL_PADDING +
             actionBarHeight +
             COMMAND_HEIGHT * numCommands}px)`;
-        }),
-        tap(() => {
-          setTimeout(() => {
-            if (this.activeTerminals && this.activeTerminals.first) {
-              this.activeTerminals.first.resizeTerminal();
-            }
-          }, 250);
         })
       )
       .subscribe(height => {
