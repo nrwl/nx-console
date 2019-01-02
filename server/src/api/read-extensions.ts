@@ -86,7 +86,10 @@ export function availableExtensions() {
       name: '@schuchard/prettier',
       description: 'Adds Prettier to your Angular project'
     },
-
+    {
+      name: 'angular-fire-schematics',
+      description: 'Adds AngularFire to your Angular project'
+    },
     {
       name: 'ng-zorro-antd',
       description:
