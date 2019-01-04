@@ -19,10 +19,13 @@ angular-console-new-workspace {
   }
 
   .ui-terminal-container {
+    overflow: hidden !important;
     background: black;
     border-radius: 8px;
     box-sizing: border-box;
+    height: 65vh;
     max-height: 65vh;
+    min-height: 65vh;
     padding-bottom: 16px;
     position: relative;
 

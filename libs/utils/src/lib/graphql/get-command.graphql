@@ -1,5 +1,5 @@
-query GetCommand($id: String) {
-  commands(id: $id) {
+query GetCommand($id: String!, $cols: Int!) {
+  commands(id: $id, cols: $cols) {
     id
     type
     workspace

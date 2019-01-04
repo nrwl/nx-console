@@ -1,22 +1,16 @@
-<div
-  class="outer-container"
-  fxLayout="column"
-  fxLayoutAlign="space-between"
-  fxFlex
->
-  <div class="ui-flags-container">
+<div class="outer-container" fxLayout="column" fxLayoutAlign="space-between">
+  <div class="ui-flags-container" #uiFlagsContainer>
     <ng-content select="ui-flags,.ui-flags"></ng-content>
   </div>
 
   <div
     class="ui-terminal-container"
-    fxFlex
     [@growShrink]="terminalAnimationState | async"
   >
     <mat-divider></mat-divider>
     <div class="window-chrome" fxLayout="row" fxLayoutAlign="end center">
       <div
-        class="window-header"
+        class="window-header command"
         fxFlex
         fxLayout="row"
         fxLayoutAlign="center center"
@@ -24,10 +18,30 @@
         {{ terminalWindowTitle }}
       </div>
       <button
-        mat-button
+        mat-icon-button
+        (click)="statusComponent.toggleActiveView()"
+        *ngIf="statusComponent as statusComponent"
+      >
+        <mat-icon
+          *ngIf="statusComponent.activeView === 'details'"
+          matTooltip="Structured Output"
+        >
+          list_alt
+        </mat-icon>
+        <mat-icon
+          svgIcon="console"
+          matTooltip="Terminal Output"
+          *ngIf="statusComponent.activeView === 'terminal'"
+        ></mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
         (click)="this.terminalVisible$.next(!this.terminalVisible$.value)"
       >
-        {{ (terminalVisible$ | async) ? 'Hide' : 'Show' }}
+        <mat-icon>
+          {{ (terminalVisible$ | async) ? 'expand_less' : 'expand_more' }}
+        </mat-icon>
       </button>
     </div>
     <mat-divider></mat-divider>

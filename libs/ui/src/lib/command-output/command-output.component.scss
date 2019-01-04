@@ -8,8 +8,13 @@ $failure-palette: mat-palette($mat-red);
 $success-palette: mat-palette($mat-green);
 $button-size: 28px;
 
+:host {
+  overflow: hidden;
+}
+
 .container {
   height: 100%;
+  overflow: hidden;
 
   .mat-progress-spinner {
     display: inline-block;
@@ -49,9 +54,7 @@ $button-size: 28px;
 }
 
 .details-container {
-  background: white;
   height: 100%;
-  overflow: auto;
 }
 
 .output-container {

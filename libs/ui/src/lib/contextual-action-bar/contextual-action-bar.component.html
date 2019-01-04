@@ -12,11 +12,18 @@
       fxLayoutAlign="start center"
     >
       <button
+        [ngSwitch]="showMenuButton | async"
         class="hamburger-button"
         mat-icon-button
-        (click)="hamburgerClicked.next()"
+        [disabled]="!(showMenuButton | async)"
+        (click)="router.navigate(['/workspaces'])"
       >
-        <mat-icon>menu</mat-icon>
+        <mat-icon *ngSwitchCase="true">menu</mat-icon>
+        <img
+          class="angular-logo"
+          *ngSwitchCase="false"
+          src="/assets/angular-console.png"
+        />
       </button>
 
       <div class="title" fxFlex fxLayout="row" fxLayoutGap="16px">

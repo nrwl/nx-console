@@ -27,7 +27,7 @@
       *ngIf="(filteredTaskCollections$ | async) as filteredTaskCollections"
     >
       <mat-nav-list
-        *ngIf="filteredTaskCollections.taskCollections.length > 0; else: empty"
+        *ngIf="filteredTaskCollections.taskCollections.length > 0; else empty"
         class="task-list"
         (selectionChange)="
           selectTask($event.option.selected ? $event.option.value : null)

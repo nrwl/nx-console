@@ -19,7 +19,7 @@
       {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
     </mat-icon>
   </div>
-  <mat-list *ngIf="projects.length > 0; else: empty">
+  <mat-list *ngIf="projects.length > 0; else empty">
     <ng-container *ngFor="let p of projects">
       <mat-list-item [ngClass]="p.projectType" [disableRipple]="true">
         <div class="project-type" mat-line>{{ p.projectType }}</div>

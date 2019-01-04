@@ -21,13 +21,84 @@ import {
   clearAllRecentTasks
 } from './tasks.utils';
 
+const PASSING_TESTS = `
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+
+  it(\`should have as title 'proj'\`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('proj');
+  });
+
+  it('should do stuff', () => {
+    expect(true).toBe(true);
+  });
+});
+`;
+const FAILING_TESTS = `
+import { TestBed, async } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+
+  it(\`should have as title 'proj'\`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    expect(app.title).toEqual('NOPE');
+  });
+
+  it('should do stuff', () => {
+    expect(true).toBe(true);
+  });
+});
+`;
+
+const GOOD_CMP = `
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'proj';
+}
+`;
+const BAD_CMP = `
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent oops!
+`;
+
 describe('Tasks', () => {
   beforeEach(() => {
     whitelistGraphql();
-    cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToTasks();
-    cy.get('div.title').contains('Run Tasks');
+    cy.get('div.title').contains('Tasks');
   });
 
   it('filters tasks', () => {
@@ -71,17 +142,17 @@ describe('Tasks', () => {
 
     cy.get('div.context-title').contains('ng build proj');
 
-    checkDisplayedCommand('$ ng build proj');
+    checkDisplayedCommand('ng build proj');
 
     cy.get('mat-radio-button')
       .contains('Production')
       .click();
-    checkDisplayedCommand('$ ng build proj --configuration=production');
+    checkDisplayedCommand('ng build proj --configuration=production');
 
     cy.get('mat-radio-button')
       .contains('Default')
       .click();
-    checkDisplayedCommand('$ ng build proj');
+    checkDisplayedCommand('ng build proj');
 
     cy.get('button')
       .contains('Run')
@@ -100,7 +171,7 @@ describe('Tasks', () => {
 
     goBack();
 
-    cy.get('div.title').contains('Run Tasks');
+    cy.get('div.title').contains('Tasks');
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
@@ -115,7 +186,7 @@ describe('Tasks', () => {
     clickOnTask('proj', 'test');
     cy.get('div.context-title').contains('ng test proj');
 
-    checkDisplayedCommand('$ ng test proj');
+    checkDisplayedCommand('ng test proj');
 
     cy.get('button')
       .contains('Run')
@@ -127,7 +198,7 @@ describe('Tasks', () => {
 
     goBack();
 
-    cy.get('div.title').contains('Run Tasks');
+    cy.get('div.title').contains('Tasks');
 
     checkMultipleRecentTasks({
       numTasks: 2,
@@ -154,7 +225,7 @@ describe('Tasks', () => {
     clickOnTask('package.json scripts', 'build');
     cy.get('div.context-title').contains('run build');
 
-    checkDisplayedCommand('$ yarn run build');
+    checkDisplayedCommand('yarn run build');
 
     cy.get('button')
       .contains('Run')
@@ -162,7 +233,7 @@ describe('Tasks', () => {
 
     goBack();
 
-    cy.get('div.title').contains('Run Tasks');
+    cy.get('div.title').contains('Tasks');
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
@@ -241,75 +312,3 @@ describe('Tasks', () => {
   //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
   // });
 });
-
-const PASSING_TESTS = `
-import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-
-describe('AppComponent', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-    }).compileComponents();
-  }));
-
-  it(\`should have as title 'proj'\`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('proj');
-  });
-  
-  it('should do stuff', () => {
-    expect(true).toBe(true);
-  });
-});
-`;
-const FAILING_TESTS = `
-import { TestBed, async } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-
-describe('AppComponent', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-    }).compileComponents();
-  }));
-
-  it(\`should have as title 'proj'\`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('NOPE');
-  });
-  
-  it('should do stuff', () => {
-    expect(true).toBe(true);
-  });
-});
-`;
-
-const GOOD_CMP = `
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  title = 'proj';
-}
-`;
-const BAD_CMP = `
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent oops!
-`;

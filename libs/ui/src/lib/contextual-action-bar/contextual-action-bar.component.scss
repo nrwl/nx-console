@@ -21,6 +21,13 @@ mat-toolbar.title-bar {
     }
   }
 
+  .angular-logo {
+    width: 38px;
+    height: 38px;
+    position: relative;
+    top: -2px;
+  }
+
   .exit-action {
     cursor: pointer;
     margin-left: 4px;

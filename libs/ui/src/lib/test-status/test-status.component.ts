@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommandStatus } from '@angular-console/utils';
 
 interface TestError {
@@ -22,6 +22,7 @@ export interface TestStatus {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-test-status',
   templateUrl: './test-status.component.html',
   styleUrls: ['./test-status.component.scss']

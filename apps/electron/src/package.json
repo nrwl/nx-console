@@ -1,0 +1,34 @@
+{
+  "name": "angular-console",
+  "description": "Angular Console",
+  "version": "7.2.0-alpha.6",
+  "author": {
+    "name": "Narwhal Technologies Inc",
+    "email": "hello@nrwl.io"
+  },
+  "main": "main.js",
+  "license": "MIT",
+  "dependencies": {
+    "@angular/cli": "7.1.4",
+    "@nrwl/angular-console-enterprise-electron": "file:../../../../nrwl-connect/dist/libs/angular-console-extensions/electron",
+    "@nrwl/schematics": "7.1.1",
+    "apollo-server-express": "2.3.1",
+    "dotenv": "6.2.0",
+    "electron-store": "2.0.0",
+    "electron-updater": "3.1.2",
+    "express": "4.16.4",
+    "fix-path": "2.1.0",
+    "get-port": "4.1.0",
+    "graphql": "^0.13.1",
+    "node-pty-prebuilt": "0.7.6",
+    "progress-stream": "2.0.0",
+    "request": "2.88.0",
+    "resolve": "1.9.0",
+    "strip-json-comments": "2.0.1",
+    "universal-analytics": "0.4.20",
+    "uuid": "3.3.2"
+  },
+  "devDependencies": {
+    "electron": "2.0.14"
+  }
+}

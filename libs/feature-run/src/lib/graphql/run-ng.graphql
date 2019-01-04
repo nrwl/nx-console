@@ -1,4 +1,4 @@
-mutation RunNg($path: String!, $runCommand: [String]!) {
+mutation RunNg($path: String!, $runCommand: [String!]!) {
   runNg(path: $path, runCommand: $runCommand) {
     id
   }

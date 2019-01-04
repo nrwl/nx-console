@@ -1,7 +1,13 @@
 import { FADE_IN } from '@angular-console/ui';
 import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterOutlet, Router } from '@angular/router';
 import {
@@ -18,12 +24,13 @@ interface SidenavLink {
 }
 
 const DEFAULT_TITLE = 'Angular Console';
-const TITLE_SEPARATOR = ' - ';
+const TITLE_SEPARATOR = ' | ';
 
 @Component({
   selector: 'angular-console-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('routerTransition', [
       transition('void => *', []),
@@ -38,15 +45,6 @@ export class AppComponent implements OnInit, OnDestroy {
   showSiteMenu = false;
 
   ngOnInit() {
-    this.settings.fetch().subscribe(() => {
-      if (this.settings.showConnectPlugin()) {
-        this.sidenavLinks.push({
-          icon: 'question_answer',
-          route: '/connect',
-          text: 'Nrwl Connect'
-        });
-      }
-    });
     this.contextualActionBarService.contextualTabs$.next(null);
     this.routerTransition = this.routerOutlet.activateEvents.pipe(
       map(() => this.routerOutlet.activatedRouteData.state)
@@ -57,17 +55,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.titleSubscription.unsubscribe();
   }
 
-  sidenavLinks: SidenavLink[] = [
-    { icon: 'view_list', route: '/workspaces', text: 'Workspaces' },
-    { icon: 'settings', route: '/settings', text: 'Settings' }
-  ];
-
   constructor(
-    private readonly settings: Settings,
+    settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
-    private readonly titleService: Title,
-    private readonly router: Router
-  ) {}
+    private readonly titleService: Title
+  ) {
+    settings.fetch().subscribe();
+  }
 
   private readonly titleSubscription = this.contextualActionBarService.breadcrumbs$
     .pipe(map(makeTitle))
@@ -85,6 +79,5 @@ function makeTitle(tabs: Breadcrumb[]) {
       },
       [] as string[]
     )
-    .concat([DEFAULT_TITLE])
     .join(TITLE_SEPARATOR);
 }

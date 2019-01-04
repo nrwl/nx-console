@@ -6,17 +6,26 @@ import {
   trigger
 } from '@angular/animations';
 import {
-  AfterContentInit,
   ChangeDetectionStrategy,
   Component,
   ContentChild,
   Input,
-  OnDestroy
+  AfterContentChecked,
+  ViewChild,
+  ElementRef,
+  NgZone,
+  OnDestroy,
+  ContentChildren,
+  QueryList
 } from '@angular/core';
-import { BehaviorSubject, merge, Subscription, EMPTY } from 'rxjs';
-import { map, delay } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { map, startWith, tap } from 'rxjs/operators';
+
+import {
+  CommandOutputComponent,
+  StatusComponentView
+} from '../command-output/command-output.component';
 import { FlagsComponent } from '../flags/flags.component';
-import { CommandOutputComponent } from '../command-output/command-output.component';
 
 const ANIMATION_DURATION = 300;
 
@@ -27,48 +36,92 @@ const ANIMATION_DURATION = 300;
   styleUrls: ['./task-runner.component.scss'],
   animations: [
     trigger('growShrink', [
-      state('void', style({ flex: '0 0', 'min-height': '45px' })),
-      state('shrink', style({ flex: '0 0', 'min-height': '45px' })),
-      state('grow', style({ flex: '1 1', 'min-height': '240px' })),
-      transition(
-        `shrink <=> grow`,
-        animate(`${ANIMATION_DURATION}ms ease-in-out`)
-      )
+      state('void', style({ height: '45px', 'min-height': '45px' })),
+      state('shrink', style({ height: '45px', 'min-height': '45px' })),
+      state('flag-open', style({ height: '30vh' })),
+      state('grow-one-flag', style({ height: 'calc(100vh - 114px)' })),
+      state('grow-two-flag', style({ height: 'calc(100vh - 164px)' })),
+      transition(`* <=> void`, []),
+      transition(`* <=> *`, animate(`${ANIMATION_DURATION}ms ease-in-out`))
     ])
   ]
 })
-export class TaskRunnerComponent implements AfterContentInit, OnDestroy {
+export class TaskRunnerComponent implements AfterContentChecked {
   @Input() terminalWindowTitle: string;
 
-  @ContentChild(FlagsComponent) flagsComponent: FlagsComponent | undefined;
+  @ContentChild(FlagsComponent) flagsComponent: FlagsComponent;
   @ContentChild(CommandOutputComponent)
   statusComponent: CommandOutputComponent | undefined;
 
-  terminalVisible$ = new BehaviorSubject(true);
-  terminalAnimationState = this.terminalVisible$.pipe(
-    map(visible => (visible ? 'grow' : 'shrink'))
-  );
-  resizeSubscription: Subscription | undefined;
-
-  ngAfterContentInit() {
-    const TIME_BUFFER = 50;
-    const DELAY = ANIMATION_DURATION + TIME_BUFFER;
-    const flagsComponentResize$ = this.flagsComponent
-      ? this.flagsComponent.resizeFlags.pipe(delay(DELAY))
-      : EMPTY;
-    this.resizeSubscription = merge(
-      flagsComponentResize$,
-      this.terminalVisible$.pipe(delay(DELAY))
-    ).subscribe(() => {
-      if (this.statusComponent) {
-        this.statusComponent.resizeTerminal();
-      }
-    });
+  @Input() set terminalVisible(visible: boolean) {
+    this.terminalVisible$.next(visible);
   }
 
-  ngOnDestroy() {
-    if (this.resizeSubscription) {
-      this.resizeSubscription.unsubscribe();
+  terminalVisible$ = new BehaviorSubject(true);
+  terminalAnimationState: Observable<string>;
+
+  toggleActiveView() {
+    if (this.statusComponent) {
+      const activeView = this.statusComponent.activeView;
+      this.statusComponent.activeView =
+        activeView === 'terminal' ? 'details' : 'terminal';
     }
+  }
+
+  constructor() {}
+
+  ngAfterContentChecked() {
+    // Wait until the flags component has rendered its expansion panels.
+    if (
+      this.terminalAnimationState ||
+      !this.flagsComponent ||
+      !this.flagsComponent.matExpansionPanels
+    ) {
+      return;
+    }
+
+    const flagsVisible$ = combineLatest(
+      ...this.flagsComponent.matExpansionPanels.map(p =>
+        p.expandedChange.pipe(startWith(p.expanded))
+      )
+    ).pipe(
+      startWith(this.flagsComponent.matExpansionPanels.map(p => p.expanded)),
+      map(values => values.some(v => v))
+    );
+
+    this.terminalAnimationState = combineLatest(
+      this.terminalVisible$,
+      flagsVisible$
+    ).pipe(
+      map(([terminalVisible, flagsVisible]) => {
+        if (!terminalVisible) return 'shrink';
+        if (flagsVisible) return 'flags-visible';
+        const numFlags = this.flagsComponent.matExpansionPanels.length;
+        if (numFlags === 1) {
+          return 'grow-one-flag';
+        } else {
+          return 'grow-two-flag';
+        }
+      }),
+      tap(v => {
+        const numFlags = this.flagsComponent.matExpansionPanels.length;
+        const expansionPanelHeaderHeight = `${numFlags * 50 + 124}px`;
+        switch (v) {
+          case 'flags-visible':
+            this.flagsComponent.viewportHeight.next(
+              `calc(70vh - ${expansionPanelHeaderHeight})`
+            );
+            break;
+          case 'grow-one-flag':
+            this.flagsComponent.viewportHeight.next('0');
+            break;
+          case 'shrink':
+            this.flagsComponent.viewportHeight.next(
+              `calc(100vh - ${expansionPanelHeaderHeight})`
+            );
+            break;
+        }
+      })
+    );
   }
 }

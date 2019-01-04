@@ -1,5 +1,5 @@
-const path = require("path");
-const fs = require("fs");
+const path = require('path');
+const fs = require('fs');
 
 const cp = require('child_process');
 let frontend;
@@ -21,7 +21,9 @@ function runE2eTests() {
 
 try {
   frontend = cp.spawn(findInPath('yarn'), ['start', 'frontend.serve']);
-  server = cp.spawn(findInPath('yarn'), ['start', 'dev.server'], {stdio: [0,1,2]});
+  server = cp.spawn(findInPath('yarn'), ['start', 'dev.server'], {
+    stdio: [0, 1, 2]
+  });
   frontend.stdout.on('data', data => {
     console.log(data.toString());
     if (data.toString().indexOf('Compiled successfully') > -1) {

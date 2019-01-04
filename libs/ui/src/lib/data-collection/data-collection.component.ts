@@ -1,7 +1,8 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { Telemetry, Settings } from '@angular-console/utils';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-data-collection',
   templateUrl: './data-collection.component.html',
   styleUrls: ['./data-collection.component.scss']

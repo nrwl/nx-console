@@ -117,7 +117,8 @@ export class ExtensionComponent implements OnInit {
             path: this.path(),
             name: a.name
           }),
-          false
+          false,
+          this.out.terminal.currentCols
         );
       }),
       publishReplay(1),

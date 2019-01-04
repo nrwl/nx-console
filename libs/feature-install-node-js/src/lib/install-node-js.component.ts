@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter, first, map, switchMap, takeWhile, tap } from 'rxjs/operators';
@@ -14,6 +14,7 @@ import {
 } from './generated/graphql';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-install-node-js',
   templateUrl: './install-node-js.component.html',
   styleUrls: ['./install-node-js.component.scss']

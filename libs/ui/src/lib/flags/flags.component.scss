@@ -22,6 +22,8 @@ ui-flags {
   }
 
   mat-expansion-panel {
+    box-shadow: none !important;
+
     .mat-expanded {
       .mat-expansion-indicator {
         position: relative;
@@ -40,8 +42,8 @@ ui-flags {
     }
 
     .mat-expansion-panel-body {
-      padding-top: 12px;
-      padding-bottom: 12px;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .mat-expansion-panel-header-title {
@@ -54,18 +56,22 @@ ui-flags {
     overflow: hidden;
   }
 
+  .field-viewport {
+    position: relative;
+    left: 22px;
+  }
+
   .field {
+    max-height: 78px;
+    min-height: 78px;
     position: relative;
     margin-bottom: 24px;
+    padding-right: 60px;
 
     & > mat-icon {
       position: relative;
       top: 16px;
       color: rgb(117, 117, 117);
-    }
-
-    &:last-child {
-      margin-bottom: 0;
     }
 
     .clear-text-field {

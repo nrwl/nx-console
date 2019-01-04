@@ -107,7 +107,6 @@ export class NpmScriptComponent implements OnInit {
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$, this.script$),
       tap(() => {
-        this.flags.hideFields();
         this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c, s]) => {
@@ -118,7 +117,8 @@ export class NpmScriptComponent implements OnInit {
             npmClient: s.npmClient,
             runCommand: c.commands
           }),
-          false
+          false,
+          this.out.terminal.currentCols
         );
       }),
       publishReplay(1),

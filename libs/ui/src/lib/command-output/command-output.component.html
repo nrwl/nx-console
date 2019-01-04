@@ -1,83 +1,41 @@
-<div class="container" fxLayout="row">
-  <div class="toggle-container" fxLayout="column">
-    <button
-      mat-icon-button
-      matTooltip="Structured Output"
-      matTooltipPosition="right"
-    >
-      <mat-icon
-        [ngClass]="
-          (activeView$ | async) === 'details' ? 'output-icon-active' : ''
-        "
-        (click)="setActiveView('details')"
-      >
-        list_alt
-      </mat-icon>
-    </button>
-    <button
-      class="console-button"
-      mat-icon-button
-      matTooltip="Console Output"
-      matTooltipPosition="right"
-    >
-      <mat-icon
-        [ngClass]="
-          (activeView$ | async) === 'terminal' ? 'output-icon-active' : ''
-        "
-        svgIcon="console"
-        matBadgeSize="small"
-        [matBadge]="(terminalOutputState$ | async)?.unread ? '*' : ''"
-        matBadgeColor="accent"
-        (click)="setActiveView('terminal')"
-      >
-      </mat-icon>
-    </button>
-  </div>
-  <mat-divider></mat-divider>
-  <div fxFlex>
-    <div class="details-container" *ngIf="(activeView$ | async) === 'details'">
-      <div
-        class="empty-container"
-        *ngIf="!commandResponse"
-        fxLayout="row"
-        fxLayoutAlign="center center"
-      >
-        <ng-container *ngIf="!emptyTemplate">
-          Task has not start yet
-        </ng-container>
-        <ng-template [ngTemplateOutlet]="emptyTemplate"></ng-template>
-      </div>
-      <ng-container
-        *ngIf="commandResponse?.status"
-        [ngSwitch]="commandResponse?.detailedStatus?.type"
-      >
-        <ui-build-status
-          [commandStatus]="commandResponse?.status"
-          [status]="commandResponse?.detailedStatus"
-          *ngSwitchCase="'build'"
-        ></ui-build-status>
-        <ui-test-status
-          [commandStatus]="commandResponse?.status"
-          [status]="commandResponse?.detailedStatus"
-          *ngSwitchCase="'test'"
-        ></ui-test-status>
-        <ng-template
-          [ngTemplateOutlet]="defaultContent"
-          *ngIf="!commandResponse?.detailedStatus"
-        ></ng-template>
-      </ng-container>
-    </div>
+<div class="container" fxLayout="column">
+  <div class="details-container" *ngIf="(activeView$ | async) === 'details'">
     <div
-      class="output-container"
-      [ngClass]="
-        (activeView$ | async) === 'terminal' ? 'terminal-is-active' : ''
-      "
+      class="empty-container"
+      *ngIf="!commandResponse"
+      fxLayout="row"
+      fxLayoutAlign="center center"
     >
-      <ui-terminal
-        [command]="command"
-        [outChunk]="commandResponse?.outChunk"
-      ></ui-terminal>
+      <ng-container *ngIf="!emptyTemplate">
+        Task has not start yet
+      </ng-container>
+      <ng-template [ngTemplateOutlet]="emptyTemplate"></ng-template>
     </div>
+    <ng-container
+      *ngIf="commandResponse?.status"
+      [ngSwitch]="commandResponse?.detailedStatus?.type"
+    >
+      <ui-build-status
+        [commandStatus]="commandResponse?.status"
+        [status]="commandResponse?.detailedStatus"
+        *ngSwitchCase="'build'"
+      ></ui-build-status>
+      <ui-test-status
+        [commandStatus]="commandResponse?.status"
+        [status]="commandResponse?.detailedStatus"
+        *ngSwitchCase="'test'"
+      ></ui-test-status>
+      <ng-template
+        [ngTemplateOutlet]="defaultContent"
+        *ngIf="!commandResponse?.detailedStatus"
+      ></ng-template>
+    </ng-container>
+  </div>
+  <div
+    class="output-container"
+    [ngClass]="(activeView$ | async) === 'terminal' ? 'terminal-is-active' : ''"
+  >
+    <ui-terminal [outChunk]="commandResponse?.outChunk"></ui-terminal>
   </div>
 </div>
 
@@ -100,7 +58,7 @@
     </mat-list-item>
     <mat-list-item *ngSwitchCase="'failed'">
       <mat-icon matListIcon>error</mat-icon>
-      Task failed. Please check&nbsp;<a (click)="setActiveView('terminal')"
+      Task failed. Please check&nbsp;<a (click)="activeView = 'terminal'"
         >terminal output</a
       >&nbsp;for more details.
     </mat-list-item>

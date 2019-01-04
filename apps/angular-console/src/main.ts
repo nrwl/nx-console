@@ -3,7 +3,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
-import { WebFrame } from 'electron';
 
 /**
  * @jeffbcross: The following disables pinch zooming,
@@ -17,7 +16,7 @@ import { WebFrame } from 'electron';
  * resolve the import.
  */
 declare var global: any;
-let webFrame: WebFrame;
+let webFrame: any;
 if (typeof global !== 'undefined' && global.require) {
   try {
     webFrame = global.require('electron').webFrame;

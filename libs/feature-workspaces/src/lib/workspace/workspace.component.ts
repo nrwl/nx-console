@@ -4,7 +4,7 @@ import {
   EditorSupport,
   Settings
 } from '@angular-console/utils';
-import { style, transition, trigger } from '@angular/animations';
+import { style, transition, trigger, group } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -37,6 +37,11 @@ interface Route {
   title: string;
 }
 
+const TASK_RUNNER_GHOST_STYLE = style({
+  'background-color': '#F5F5F5',
+  background: 'linear-gradient(to bottom,  #ffffff 55px,#F5F5F5 2%)'
+});
+
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-workspace',
@@ -47,8 +52,10 @@ interface Route {
     GROW_SHRINK,
     trigger('routerTransition', [
       transition('void => *', []),
-      transition('* => projects', FADE_IN),
-      transition('* => *', [style({ background: '#F5F5F5' }), FADE_IN])
+      transition('* => tasks', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
+      transition('* => generate', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
+      transition('* => extensions', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
+      transition('* => *', FADE_IN)
     ])
   ]
 })
@@ -78,12 +85,13 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   routes: Array<Route> = [
     { icon: 'view_list', url: 'projects', title: 'Projects' },
     { icon: 'code', url: 'generate', title: 'Generate Code' },
-    { svgIcon: 'console', url: 'tasks', title: 'Run Tasks' },
+    { svgIcon: 'console', url: 'tasks', title: 'Tasks' },
     {
       icon: 'extension',
       url: 'extensions',
       title: 'Add CLI Extensions'
-    }
+    },
+    { icon: 'settings', url: 'settings', title: 'Settings' }
   ];
 
   readonly sideNavAnimationState$ = this.contextualActionBarService.contextualActions$.pipe(
@@ -120,13 +128,13 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     editors => {
       this.contextualActionBarService.nonContextualActions$.next([
         {
-          name: 'Open',
+          name: 'Open in...',
           description: 'Open workspace in another program',
           icon: 'open_in_browser',
           options: editors.map(
             (editor): MenuOption => {
               return {
-                name: `Open in ${editor.name}`,
+                name: `${editor.name}`,
                 image: editor.icon,
                 invoke: () => {
                   this.workspace$
@@ -164,7 +172,17 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly editorSupport: EditorSupport,
     private readonly basicWorkspaceGQL: BasicWorkspaceGQL
-  ) {}
+  ) {
+    settings.fetch().subscribe(() => {
+      if (this.settings.showConnectPlugin()) {
+        this.routes.splice(this.routes.length - 2, 0, {
+          icon: 'question_answer',
+          url: 'connect',
+          title: 'Connect'
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.settings.fetch().subscribe(() => {
@@ -173,7 +191,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           this.routes[0],
           {
             icon: 'timeline',
-            url: 'connect/affected-projects',
+            url: 'affected-projects',
             title: 'Affected Projects'
           },
           ...this.routes.slice(1)

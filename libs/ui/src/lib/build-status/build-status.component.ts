@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import {
   CommandStatus,
   OpenInBrowserService,
@@ -23,6 +23,7 @@ export interface BuildStatus {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-build-status',
   templateUrl: './build-status.component.html',
   styleUrls: ['./build-status.component.scss']

@@ -1,4 +1,4 @@
-mutation NpmRun($path: String!, $npmClient: String!, $runCommand: [String]!) {
+mutation NpmRun($path: String!, $npmClient: String!, $runCommand: [String!]!) {
   runNpm(path: $path, npmClient: $npmClient, runCommand: $runCommand) {
     id
   }

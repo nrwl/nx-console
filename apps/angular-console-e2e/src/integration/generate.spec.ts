@@ -17,7 +17,6 @@ import { clearRecentTask } from './tasks.utils';
 describe('Generate', () => {
   beforeEach(() => {
     whitelistGraphql();
-    cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToGenerate();
     cy.get('div.title').contains('Generate Code');
@@ -55,7 +54,7 @@ describe('Generate', () => {
 
   it('runs a schematic', () => {
     clickOnTask('@schematics/angular', 'service');
-    cy.get('div.context-title').contains('Create an Angular service');
+    cy.get('div.context-title').contains('@schematics/angular - service');
 
     const name = uniqName('example');
     cy.get('input[name="name"]').type(name);
@@ -70,7 +69,7 @@ describe('Generate', () => {
     cy.wait(100);
 
     checkDisplayedCommand(
-      `$ ng generate @schematics/angular:service ${name} --project=proj`
+      `ng generate @schematics/angular:service ${name} --project=proj`
     );
     checkFileExists(`src/app/${name}.service.ts`);
     checkFileExists(`src/app/${name}.service.spec.ts`);

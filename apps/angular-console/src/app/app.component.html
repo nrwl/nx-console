@@ -1,41 +1,14 @@
-<mat-sidenav-container id="navigationSidenavContainer">
-  <mat-sidenav
-    #sidenav
-    mode="over"
-    [opened]="showSiteMenu"
-    (closedStart)="showSiteMenu = false"
+<div fxLayout="column" fxFlex class="content-container">
+  <ui-contextual-action-bar></ui-contextual-action-bar>
+
+  <div
+    fxFlex
+    class="outlet-container"
+    [@routerTransition]="routerTransition | async"
   >
-    <mat-nav-list>
-      <a
-        routerLinkActive="active-link"
-        mat-list-item
-        (click)="showSiteMenu = false"
-        [routerLink]="link.route"
-        *ngFor="let link of sidenavLinks"
-      >
-        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px">
-          <mat-icon> {{ link.icon }} </mat-icon>
-          <span>{{ link.text }}</span>
-        </div>
-      </a>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content id="navigationSidenavContent">
-    <div fxLayout="column" fxFlex class="content-container">
-      <ui-contextual-action-bar
-        (hamburgerClicked)="showSiteMenu = true"
-      ></ui-contextual-action-bar>
+    <router-outlet></router-outlet>
+  </div>
 
-      <div
-        fxFlex
-        class="outlet-container"
-        [@routerTransition]="routerTransition | async"
-      >
-        <router-outlet></router-outlet>
-      </div>
-
-      <angular-console-action-bar></angular-console-action-bar>
-      <ui-data-collection></ui-data-collection>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  <angular-console-action-bar></angular-console-action-bar>
+  <ui-data-collection></ui-data-collection>
+</div>

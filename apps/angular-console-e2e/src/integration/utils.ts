@@ -67,10 +67,10 @@ function fieldOperation(field: string, operation: (el: any) => void) {
 }
 
 export function checkDisplayedCommand(s: string) {
-  cy.get('div.command').should($p => {
+  cy.get('div.command.window-header').should($p => {
     const t = texts($p);
     expect(t.length).to.equal(1);
-    expect(t[0]).to.equal(s);
+    expect(t[0].trim()).to.equal(s.trim());
   });
 }
 
