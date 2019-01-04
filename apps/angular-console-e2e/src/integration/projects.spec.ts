@@ -10,7 +10,6 @@ import {
 describe('Projects', () => {
   beforeEach(() => {
     whitelistGraphql();
-    cy.visit('/workspaces');
     openProject(projectPath('proj'));
     cy.get('div.title').contains('Projects');
   });
@@ -29,7 +28,7 @@ describe('Projects', () => {
   //   cy.get('button')
   //     .contains('Generate Service')
   //     .click();
-  //   cy.get('div.context-title').contains('Create an Angular service');
+  //   cy.get('div.context-title').contains('@schematics/angular - service');
   //   cy.get('input[name="project"]').should(($p: any) => {
   //     expect($p[0].value).to.equal('proj');
   //   });

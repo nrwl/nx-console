@@ -1,7 +1,7 @@
 overwrite: true
-schema: ./server/src/schema/schema.graphql
+schema: ./libs/server/src/schema/schema.graphql
 generates:
-  ./server/src/graphql-types.ts:
+  ./libs/server/src/lib/generated/graphql-types.ts:
     config:
       # a type of GraphQL Context
       contextType: 'any'

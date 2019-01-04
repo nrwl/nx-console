@@ -35,6 +35,7 @@ angular-console-workspace {
         transition: all 0.3s ease-in-out;
 
         &.active {
+          pointer-events: none;
           .route-icon {
             color: rgb(67, 118, 197) !important;
           }

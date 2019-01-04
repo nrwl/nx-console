@@ -4,7 +4,9 @@
 ></ui-entity-docs>
 <ui-task-runner
   *ngIf="(schematic$ | async) as schematic"
-  [terminalWindowTitle]="schematic.collection + ' - ' + schematic.name"
+  [terminalWindowTitle]="
+    (command$ | async) || schematic.collection + ' - ' + schematic.name
+  "
 >
   <ui-flags
     [prefix]="getPrefix(schematic)"
@@ -14,7 +16,6 @@
     [path]="path()"
   ></ui-flags>
   <ui-command-output
-    [command]="command$ | async"
     [commandResponse]="combinedOutput$ | async"
     [emptyTemplate]="emptyMessage"
   >

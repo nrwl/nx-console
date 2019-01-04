@@ -2,7 +2,6 @@ export * from './lib/telemetry.service';
 export * from './lib/completion.service';
 export * from './lib/command-runner.service';
 export * from './lib/editor-support.service';
-export * from './lib/finder.service';
 export * from './lib/is-node-js-installed.guard';
 export * from './lib/messenger.service';
 export * from './lib/open-in-browser.service';

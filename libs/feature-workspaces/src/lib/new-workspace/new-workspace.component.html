@@ -14,7 +14,7 @@
     >
       <mat-step
         [stepControl]="control"
-        *ngIf="ngNewForm.controls.path as control"
+        *ngIf="ngNewForm.get('path') as control"
         [completed]="true"
       >
         <ng-template matStepLabel>Select a parent directory</ng-template>
@@ -43,7 +43,7 @@
         </div>
       </mat-step>
       <mat-step
-        *ngIf="ngNewForm.controls.name as control"
+        *ngIf="ngNewForm.get('name') as control"
         [stepControl]="control"
       >
         <ng-template matStepLabel
@@ -82,7 +82,7 @@
         </div>
       </mat-step>
       <mat-step
-        *ngIf="ngNewForm.controls.collection as control"
+        *ngIf="ngNewForm.get('collection') as control"
         [stepControl]="control"
       >
         <ng-template matStepLabel
@@ -113,7 +113,7 @@
       </mat-step>
       <mat-step
         [optional]="true"
-        *ngIf="ngNewForm.controls.collectionOptions as control"
+        *ngIf="ngNewForm.get('collectionOptions') as control"
         [stepControl]="control"
         fxFlex
       >

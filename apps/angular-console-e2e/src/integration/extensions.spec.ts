@@ -18,7 +18,6 @@ import { clearAllRecentTasks } from './tasks.utils';
 describe('Extensions', () => {
   beforeEach(() => {
     whitelistGraphql();
-    cy.visit('/workspaces');
     openProject(projectPath('proj-extensions'));
     goToExtensions();
     cy.get('div.title').contains('Add CLI Extensions');
@@ -46,7 +45,7 @@ describe('Extensions', () => {
       .contains('Add')
       .click();
 
-    checkDisplayedCommand(`$ ng add @angular/material`);
+    checkDisplayedCommand(`ng add @angular/material`);
 
     waitForActionToComplete();
 

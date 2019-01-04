@@ -16,13 +16,12 @@ import {
 describe('Forms', () => {
   beforeEach(() => {
     whitelistGraphql();
-    cy.visit('/workspaces');
     openProject(projectPath('proj'));
     goToGenerate();
     cy.get('div.title').contains('Generate Code');
 
     clickOnTask('@schematics/angular', 'component');
-    cy.get('div.context-title').contains('Create an Angular component');
+    cy.get('div.context-title').contains('@schematics/angular - component');
   });
 
   it('supports basic validations', () => {
@@ -76,24 +75,26 @@ describe('Forms', () => {
 
   it('updates the command in the terminal', () => {
     checkDisplayedCommand(
-      '$ ng generate @schematics/angular:component --dry-run'
+      'ng generate @schematics/angular:component --dry-run'
     );
 
     cy.get('input[name="name"]').type('cmp');
     checkDisplayedCommand(
-      '$ ng generate @schematics/angular:component cmp --dry-run'
+      'ng generate @schematics/angular:component cmp --dry-run'
     );
 
     cy.get('mat-select[name="export"]').click();
-    cy.contains('.mat-select-panel .mat-option', 'true').click();
+    cy.contains('.mat-select-panel .mat-option', 'true').click({ force: true });
     checkDisplayedCommand(
-      '$ ng generate @schematics/angular:component cmp --export --dry-run'
+      'ng generate @schematics/angular:component cmp --export --dry-run'
     );
 
     cy.get('mat-select[name="export"]').click();
-    cy.contains('.mat-select-panel .mat-option', 'false').click();
+    cy.contains('.mat-select-panel .mat-option', 'false').click({
+      force: true
+    });
     checkDisplayedCommand(
-      '$ ng generate @schematics/angular:component cmp --dry-run'
+      'ng generate @schematics/angular:component cmp --dry-run'
     );
   });
 });

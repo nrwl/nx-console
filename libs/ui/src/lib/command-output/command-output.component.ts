@@ -1,29 +1,31 @@
+import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
   Component,
+  HostListener,
   Input,
   OnDestroy,
   TemplateRef,
   ViewChild,
-  HostListener
+  Output,
+  EventEmitter
 } from '@angular/core';
-import { TerminalComponent } from '../terminal/terminal.component';
-import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
 import { map, scan, take } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material';
 
-type View = 'details' | 'terminal';
-const INITIAL_VIEW: View = 'details';
+import { TerminalComponent } from '../terminal/terminal.component';
+
+export type StatusComponentView = 'details' | 'terminal';
+const INITIAL_VIEW: StatusComponentView = 'details';
 
 interface TerminalOutputState {
-  view: View;
+  view: StatusComponentView;
   unread: boolean;
   out: string;
 }
 
 interface TerminalOutputValue {
-  view: View;
+  view: StatusComponentView;
   out: string;
 }
 
@@ -35,14 +37,12 @@ interface TerminalOutputValue {
 })
 export class CommandOutputComponent implements OnDestroy {
   @ViewChild(TerminalComponent) terminal: TerminalComponent;
-  @Input() command: string;
   @Input()
   set commandResponse(x: CommandResponse) {
     // Guard against initial empty responses.
     if (!x) {
       return;
     }
-    this.outputValue$.next(x.outChunk);
     this.detailedStatus$.next(x.detailedStatus);
     this._commandResponse = x;
   }
@@ -62,26 +62,18 @@ export class CommandOutputComponent implements OnDestroy {
       this.commandRunner.stopCommandViaCtrlC(this.commandResponse.id);
     }
   }
+  @Input() set activeView(view: StatusComponentView) {
+    this.activeView$.next(view);
+    this.activeViewSet.next(view);
+  }
+  get activeView() {
+    return this.activeView$.value;
+  }
 
-  private readonly outputValue$ = new Subject<string>();
+  @Output() readonly activeViewSet = new EventEmitter<StatusComponentView>();
+
   private readonly detailedStatus$ = new Subject<any>();
-  readonly activeView$ = new BehaviorSubject<View>(INITIAL_VIEW);
-
-  // This is used to determine if there are unread terminal output.
-  readonly terminalOutputState$ = combineLatest(
-    this.activeView$,
-    this.outputValue$
-  ).pipe(
-    map(([view, out]) => ({
-      view,
-      out
-    })),
-    scan<TerminalOutputValue, TerminalOutputState>(terminalOutputReducer, {
-      view: INITIAL_VIEW,
-      unread: false,
-      out: ''
-    })
-  );
+  readonly activeView$ = new BehaviorSubject<StatusComponentView>(INITIAL_VIEW);
 
   switchToTerminalSubscription = this.detailedStatus$
     .pipe(
@@ -90,7 +82,7 @@ export class CommandOutputComponent implements OnDestroy {
     )
     .subscribe(x => {
       if (x) {
-        this.activeView$.next('terminal');
+        this.activeView = 'terminal';
       }
     });
 
@@ -103,6 +95,11 @@ export class CommandOutputComponent implements OnDestroy {
     this.switchToTerminalSubscription.unsubscribe();
   }
 
+  toggleActiveView() {
+    const activeView = this.activeView;
+    this.activeView = activeView === 'terminal' ? 'details' : 'terminal';
+  }
+
   reset() {
     if (this.terminal) {
       this.terminal.reset();
@@ -110,29 +107,8 @@ export class CommandOutputComponent implements OnDestroy {
     this.hasUnreadResponse = false;
   }
 
-  resizeTerminal() {
-    if (this.terminal) {
-      this.terminal.resizeTerminal();
-    }
-  }
-
-  setActiveView(view: View) {
-    this.activeView$.next(view);
-  }
-
   isStopped() {
     const commandResponse = this.commandResponse;
     return commandResponse ? commandResponse.status === 'terminated' : true;
   }
-}
-
-function terminalOutputReducer(
-  s: TerminalOutputState,
-  { view, out }: TerminalOutputValue
-) {
-  return {
-    view,
-    out,
-    unread: view === 'terminal' ? false : s.unread || out !== s.out
-  };
 }

@@ -9,9 +9,7 @@
 /cypress
 
 # dependencies
-/node_modules
-/server/node_modules
-/electron/node_modules
+**/node_modules
 
 # IDEs and editors
 /.idea
@@ -25,7 +23,6 @@
 
 # IDE - VSCode
 .vscode/*l
-!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json

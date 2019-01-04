@@ -134,6 +134,28 @@
         </p>
 
         <button
+          mat-icon-button
+          (mouseenter)="itemRipple.disabled = true"
+          (mouseleave)="itemRipple.disabled = false"
+          (click)="activeTerminals?.first.toggleActiveView()"
+          [style.visibility]="
+            activeTerminals?.first?.commandResponse?.id === action.id
+              ? 'visible'
+              : 'hidden'
+          "
+          [ngSwitch]="actionIdToActiveView[action.id]"
+        >
+          <mat-icon *ngSwitchCase="'terminal'" matTooltip="Structured Output">
+            list_alt
+          </mat-icon>
+          <mat-icon
+            svgIcon="console"
+            matTooltip="Terminal Output"
+            *ngSwitchDefault
+          ></mat-icon>
+        </button>
+
+        <button
           class="task-action"
           mat-icon-button
           (click)="commandRunner.removeCommand(action.id)"
@@ -156,13 +178,20 @@
           params: { terminalHeight: terminalHeight }
         }"
         *ngIf="expandedAction?.id === action.id"
+        [style.background]="
+          actionIdToActiveView[action.id] === 'terminal' ? 'black' : 'white'
+        "
         (@growShrinkTerminal.done)="terminalContainer.expanded = true"
       >
         <ui-command-output
           #terminal
-          *ngIf="terminalContainer.expanded"
-          [command]="(expandedAction?.command | async)?.command"
-          [commandResponse]="expandedAction?.command | async"
+          [activeView]="actionIdToActiveView[action.id] || 'details'"
+          (activeViewSet)="actionIdToActiveView[action.id] = $event"
+          [commandResponse]="
+            terminalContainer.expanded
+              ? (expandedAction?.command | async)
+              : undefined
+          "
         >
         </ui-command-output>
       </div>

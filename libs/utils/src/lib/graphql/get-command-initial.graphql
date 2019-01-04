@@ -1,5 +1,5 @@
-query GetCommandInitial($id: String) {
-  commands(id: $id) {
+query GetCommandInitial($id: String!, $cols: Int!) {
+  commands(id: $id, cols: $cols) {
     id
     type
     workspace

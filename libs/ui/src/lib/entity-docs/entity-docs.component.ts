@@ -1,7 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { OpenDocGQL } from '@angular-console/utils';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-entity-docs',
   templateUrl: './entity-docs.component.html',
   styleUrls: ['./entity-docs.component.scss']

@@ -1,22 +1,23 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Telemetry, Settings } from '@angular-console/utils';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent {
   constructor(
-    private readonly contextActionService: ContextualActionBarService,
     private readonly settingsService: Settings,
     @Inject('telemetry') private readonly telemetry: Telemetry
   ) {}
-
-  ngOnInit() {
-    this.contextActionService.breadcrumbs$.next([{ title: 'Settings' }]);
-  }
 
   canCollectionData() {
     return this.settingsService.canCollectData();

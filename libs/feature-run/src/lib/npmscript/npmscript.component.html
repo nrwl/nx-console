@@ -1,6 +1,6 @@
 <ui-task-runner
   *ngIf="(script$ | async) as script"
-  terminalWindowTitle="Task output"
+  [terminalWindowTitle]="(command$ | async) || 'Task output'"
 >
   <ui-flags
     [fields]="script.schema"
@@ -10,12 +10,11 @@
     [path]="path()"
   ></ui-flags>
   <ui-command-output
-    [command]="command$ | async"
     [commandResponse]="commandOutput$ | async"
     [emptyTemplate]="emptyMessage"
   >
   </ui-command-output>
 </ui-task-runner>
 <ng-template #emptyMessage>
-  Click the Run button to start this task.
+  Click the Run button to start this task
 </ng-template>

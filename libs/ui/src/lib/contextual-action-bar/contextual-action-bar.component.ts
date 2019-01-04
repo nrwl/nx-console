@@ -6,16 +6,14 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Output
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import {
   ContextualActionBarService,
   ContextualTab
 } from '@nrwl/angular-console-enterprise-frontend';
+import { ReplaySubject } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,13 +35,23 @@ import {
   ]
 })
 export class ContextualActionBarComponent {
-  @Output() readonly hamburgerClicked = new EventEmitter();
+  showMenuButton = new ReplaySubject<boolean>();
 
   constructor(
     readonly contextualActionBarService: ContextualActionBarService,
     readonly commandRunner: CommandRunner,
-    readonly messenger: Messenger
-  ) {}
+    readonly messenger: Messenger,
+    readonly router: Router
+  ) {
+    router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        map(e => e.urlAfterRedirects)
+      )
+      .subscribe(url => {
+        this.showMenuButton.next(url !== '/workspaces');
+      });
+  }
 
   trackByName(_: number, tab: ContextualTab) {
     return tab.name;

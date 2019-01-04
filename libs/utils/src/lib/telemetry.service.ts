@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 declare var global: any;
 
 @Injectable()
+// TODO: Make a VSCode version of this class and move this implementation to apps/electron.
 export class Telemetry {
   private readonly ipc: any;
 

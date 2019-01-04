@@ -4,17 +4,30 @@ import {
   Component,
   ElementRef,
   Input,
+  NgZone,
   OnDestroy,
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import { fromEvent } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import * as FontFaceObserver from 'fontfaceobserver';
+import ResizeObserver from 'resize-observer-polyfill';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { first, debounceTime } from 'rxjs/operators';
 import { Terminal } from 'xterm';
 
-const DEBOUNCE_TIME = 300;
-const SCROLL_BAR_WIDTH = 48;
-const MIN_TERMINAL_WIDTH = 20;
+import { TerminalFactory } from './terminal.factory';
+
+const SCROLL_BAR_WIDTH = 36;
+const MIN_TERMINAL_WIDTH = 80;
+const TERMINAL_CONFIG = {
+  disableStdin: true,
+  fontSize: 14,
+  enableBold: true,
+  cursorBlink: false,
+  theme: {
+    cursor: 'rgb(0, 0, 0)'
+  }
+};
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,15 +41,13 @@ const MIN_TERMINAL_WIDTH = 20;
 })
 export class TerminalComponent implements AfterViewInit, OnDestroy {
   private output = '';
-  private readonly term = new Terminal({ disableStdin: true, fontSize: 14 });
-  private readonly resizeSubscription = fromEvent(window, 'resize')
-    .pipe(debounceTime(DEBOUNCE_TIME))
-    .subscribe(() => {
-      this.resizeTerminal();
-    });
+  private readonly term = new ReplaySubject<Terminal>();
+  private resizeObserver?: ResizeObserver;
 
   @ViewChild('code', { read: ElementRef })
   private readonly code: ElementRef;
+
+  currentCols = new BehaviorSubject<number>(80);
 
   @Input() command: string;
 
@@ -55,55 +66,100 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     this.writeOutput(s);
   }
 
+  constructor(
+    private readonly terminalFactory: TerminalFactory,
+    private readonly elementRef: ElementRef,
+    private readonly ngZone: NgZone
+  ) {
+    ngZone.runOutsideAngular(() => {
+      const robotoMono = new FontFaceObserver('Roboto Mono');
+      robotoMono
+        .load()
+        .then(() => {
+          this.term.next(
+            this.terminalFactory.new({
+              ...TERMINAL_CONFIG,
+              fontFamily: 'Roboto Mono'
+            })
+          );
+        })
+        .catch(() => {
+          this.term.next(this.terminalFactory.new(TERMINAL_CONFIG));
+        });
+    });
+  }
+
+  resizeTerminalSubject = new Subject<void>();
+
+  parentElement: HTMLElement;
   ngAfterViewInit(): void {
-    this.term.open(this.code.nativeElement);
-    this.resizeTerminal();
+    this.ngZone.runOutsideAngular(() => {
+      const nativeElement = this.elementRef.nativeElement as HTMLElement;
+      this.parentElement = nativeElement.parentElement || nativeElement;
+      this.term.pipe(first()).subscribe(term => {
+        this.resizeTerminalSubject
+          .asObservable()
+          .pipe(debounceTime(100))
+          .subscribe(() => {
+            this.resizeTerminal(term);
+          });
+        this.resizeTerminalSubject.next();
+
+        term.open(this.code.nativeElement);
+
+        this.resizeObserver = new ResizeObserver(() => {
+          this.resizeTerminalSubject.next();
+        });
+
+        this.resizeObserver.observe(this.parentElement);
+      });
+    });
   }
 
   ngOnDestroy() {
-    this.resizeSubscription.unsubscribe();
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   private writeOutput(output: string) {
-    if (!this.output || !this.code) {
-      return;
-    }
-    this.term.write(output);
-  }
+    this.ngZone.runOutsideAngular(() => {
+      if (!this.output || !this.code) {
+        return;
+      }
 
-  private writeFullCachedOutput() {
-    if (!this.output || !this.code) {
-      return;
-    }
-    this.term.write(this.output);
+      this.term.pipe(first()).subscribe(term => {
+        term.write(output);
+      });
+    });
   }
 
   reset() {
     this.output = '';
-    this.term.reset();
+    this.term.pipe(first()).subscribe(term => {
+      term.reset();
+    });
   }
 
-  resizeTerminal() {
-    setTimeout(() => {
-      const renderer = (this.term as any).renderer;
-      if (!renderer) {
-        return;
-      }
-      const height = (this.code.nativeElement as HTMLElement).clientHeight;
-      const width =
-        (this.code.nativeElement as HTMLElement).clientWidth - SCROLL_BAR_WIDTH;
-      const cols = Math.max(
-        MIN_TERMINAL_WIDTH,
-        Math.floor(width / renderer.dimensions.actualCellWidth)
-      );
-      const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
-      // If dimensions did not change, no need to reset.
-      if (this.term.rows !== rows || this.term.cols !== cols) {
-        renderer.clear();
-        this.term.reset();
-        this.term.resize(cols, rows);
-        this.writeFullCachedOutput();
-      }
-    });
+  private resizeTerminal(term: Terminal) {
+    const renderer = (term as any)._core.renderer;
+    if (!renderer) {
+      return;
+    }
+
+    const height = this.parentElement.clientHeight;
+    const width = this.parentElement.clientWidth - SCROLL_BAR_WIDTH;
+
+    const cols = Math.max(
+      MIN_TERMINAL_WIDTH,
+      Math.floor(width / renderer.dimensions.actualCellWidth)
+    );
+    const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
+
+    // If dimensions did not change, no need to reset.
+    if (term.cols !== cols || term.rows !== rows) {
+      term.resize(cols, rows);
+      this.currentCols.next(cols);
+    }
   }
 }

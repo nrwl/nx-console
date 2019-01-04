@@ -12,13 +12,14 @@ import {
   trigger
 } from '@angular/animations';
 import {
+  ChangeDetectionStrategy,
   Component,
   HostListener,
   QueryList,
   ViewChildren
 } from '@angular/core';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, BehaviorSubject } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
@@ -36,6 +37,7 @@ const COMMAND_HEIGHT = 64;
   selector: 'angular-console-action-bar',
   templateUrl: './action-bar.component.html',
   styleUrls: ['./action-bar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('growShrink', [
       state('void', style({ height: 0, opacity: 0 })),
@@ -68,6 +70,8 @@ const COMMAND_HEIGHT = 64;
 export class ActionBarComponent {
   @ViewChildren(CommandOutputComponent)
   activeTerminals?: QueryList<CommandOutputComponent>;
+
+  actionIdToActiveView = {};
 
   // For use within the action bar's template.
   CommandStatus = CommandStatus;
@@ -126,14 +130,16 @@ export class ActionBarComponent {
   commandRun$ = new BehaviorSubject<void>(undefined);
 
   // Show/hide a particular items terminal output.
-  toggleItemExpansion(actionId: string) {
+  toggleItemExpansion(actionId: string, cols: number = 80) {
     if (this.expandedAction && actionId === this.expandedAction.id) {
       this.expandedAction = undefined;
     } else {
       this.expandedAction = {
         id: actionId,
         command: this.commandRun$.pipe(
-          switchMap(() => this.commandRunner.getCommand(actionId))
+          switchMap(() =>
+            this.commandRunner.getCommand(actionId, new BehaviorSubject(cols))
+          )
         )
       };
     }
@@ -167,13 +173,6 @@ export class ActionBarComponent {
           return `calc(100vh - ${TERMINAL_PADDING +
             actionBarHeight +
             COMMAND_HEIGHT * numCommands}px)`;
-        }),
-        tap(() => {
-          setTimeout(() => {
-            if (this.activeTerminals && this.activeTerminals.first) {
-              this.activeTerminals.first.resizeTerminal();
-            }
-          }, 250);
         })
       )
       .subscribe(height => {

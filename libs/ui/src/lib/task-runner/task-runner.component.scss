@@ -5,14 +5,19 @@ $runner-container: mat-palette($mat-grey, 100);
 $window-chrome-height: 45px;
 
 .ui-flags-container {
-  overflow: auto;
+  overflow: hidden;
+}
+
+.outer-container {
+  height: calc(100vh - 64px);
 }
 
 .ui-terminal-container {
   background: mat-color($runner-container);
-  padding-right: 0;
   max-width: 100%;
   width: 100%;
+  height: 30vh;
+  min-height: 240px;
   box-sizing: border-box;
   overflow: hidden;
 
@@ -23,7 +28,13 @@ $window-chrome-height: 45px;
 
 .outer-container {
   width: 100%;
+  height: calc(100vh - 64px);
+  overflow: hidden;
   background-color: rgb(240, 240, 240);
+}
+
+ui-command-output {
+  overflow: hidden;
 }
 
 .content-container {
@@ -39,7 +50,11 @@ $window-chrome-height: 45px;
 .window-chrome {
   position: relative;
   height: $window-chrome-height;
-  padding: 0 12px;
+  padding: 0 8px;
+
+  mat-icon {
+    font-size: 20px;
+  }
 
   .window-header {
     font-size: 14px;

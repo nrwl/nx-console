@@ -162,7 +162,9 @@ export class SchematicComponent implements OnInit {
             out: '',
             detailedStatus: null,
             status: CommandStatus.TERMINATED,
-            outChunk: 'Command is missing required fields'
+            outChunk: `${c.commands.join(
+              `\n\r`
+            )}\n\n\rCommand is missing required fields\n\r`
           };
           return of();
         }
@@ -173,7 +175,8 @@ export class SchematicComponent implements OnInit {
             genCommand: c.commands,
             dryRun: true
           }),
-          true
+          true,
+          this.out.terminal.currentCols
         );
       }),
       publishReplay(1),
@@ -183,7 +186,6 @@ export class SchematicComponent implements OnInit {
     this.commandOutput$ = this.ngGen$.pipe(
       withLatestFrom(this.commandArray$),
       tap(() => {
-        this.flags.hideFields();
         this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c]) => {
@@ -194,7 +196,8 @@ export class SchematicComponent implements OnInit {
             genCommand: c.commands,
             dryRun: false
           }),
-          false
+          false,
+          this.out.terminal.currentCols
         );
       }),
       publishReplay(1),
@@ -256,8 +259,7 @@ export class SchematicComponent implements OnInit {
   }
 
   getContextTitle(schematic: Schematic) {
-    let contextTitle =
-      schematic.description || `${schematic.collection} - ${schematic.name}`;
+    let contextTitle = `${schematic.collection} - ${schematic.name}`;
 
     if (contextTitle.endsWith('.')) {
       contextTitle = contextTitle.slice(0, contextTitle.length - 1);

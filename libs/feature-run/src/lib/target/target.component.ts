@@ -118,7 +118,6 @@ export class TargetComponent implements OnInit {
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$),
       tap(() => {
-        this.flags.hideFields();
         this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c]) => {
@@ -128,7 +127,8 @@ export class TargetComponent implements OnInit {
             path: this.path(),
             runCommand: c.commands
           }),
-          false
+          false,
+          this.out.terminal.currentCols
         );
       }),
       publishReplay(1),

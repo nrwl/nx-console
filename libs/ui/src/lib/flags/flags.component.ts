@@ -1,3 +1,5 @@
+import { CompletetionValue, Field } from '@angular-console/schema';
+import { Completions, Serializer } from '@angular-console/utils';
 import {
   animate,
   state,
@@ -5,6 +7,7 @@ import {
   transition,
   trigger
 } from '@angular/animations';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -18,9 +21,7 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material';
-import { Completions, Serializer } from '@angular-console/utils';
-import { CompletetionValue, Field } from '@angular-console/schema';
-import { Subscription } from 'rxjs';
+import { Subscription, ReplaySubject } from 'rxjs';
 import {
   debounceTime,
   map,
@@ -39,11 +40,11 @@ interface FieldGrouping {
 const DEBOUNCE_TIME = 300;
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-flags',
   templateUrl: './flags.component.html',
   styleUrls: ['./flags.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('fadeInOut', [
       state('void', style({ opacity: 0 })),
@@ -57,6 +58,8 @@ export class FlagsComponent {
   private _fields: Field[];
   private subscription: Subscription;
 
+  @ViewChildren(CdkVirtualScrollViewport, { read: ElementRef })
+  virtualScrollViewport: QueryList<ElementRef>;
   @ViewChildren(MatExpansionPanel)
   matExpansionPanels: QueryList<MatExpansionPanel>;
 
@@ -78,7 +81,6 @@ export class FlagsComponent {
 
   @Output() readonly value = new EventEmitter();
   @Output() readonly action = new EventEmitter();
-  @Output() readonly resizeFlags = new EventEmitter();
 
   formGroup: FormGroup;
 
@@ -93,6 +95,8 @@ export class FlagsComponent {
       panel.close();
     });
   }
+
+  viewportHeight = new ReplaySubject<string>(1);
 
   fieldEnumOptions(field: Field) {
     if (field.defaultValue) {
@@ -233,7 +237,7 @@ export class FlagsComponent {
       ],
       valid: this.formGroup.valid
     });
-    const e = this.elementRef.nativeElement as HTMLElement;
+    const e = this.elementRef.nativeElement;
     if (e.scrollTo) {
       e.scrollTo({
         top: 0,
