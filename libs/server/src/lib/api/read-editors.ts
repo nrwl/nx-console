@@ -28,7 +28,6 @@ export function readEditors() {
   if (hasVsCode({ insiders: true })) {
     editors.push({ name: 'VS Code - Insiders', icon: 'vscode-insiders' });
   }
-  editors.push({ name: 'Default Browser', icon: 'angular-console' });
   return editors;
 }
 
@@ -40,8 +39,7 @@ export type Editor =
   | 'VS Code'
   | 'VS Code - Insiders'
   | 'WebStorm'
-  | 'IntelliJ IDEA'
-  | 'Default Browser';
+  | 'IntelliJ IDEA';
 
 export function openInEditor(
   editor: Editor,
@@ -65,8 +63,6 @@ export function openInEditor(
       return openInWebStorm(path);
     case 'IntelliJ IDEA':
       return openInIntelliJ(path);
-    case 'Default Browser':
-      return openURI(`${serverAddress}/workspace/${encodeURIComponent(path)}`);
     default:
       throw new Error(`Unknown editor: ${editor}`);
   }
