@@ -36,7 +36,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
-server/yarn.lock
+apps/electron/src/yarn.lock
+apps/vscode/src/yarn.lock
 
 # System Files
 .DS_Store

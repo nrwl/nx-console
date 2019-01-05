@@ -18,7 +18,7 @@ function withPlatform(command) {
 }
 
 function electronBuilder(platform, dashP, extraFlags) {
-  return `electron-builder ${platform} -p ${dashP} ${extraFlags}`;
+  return `electron-builder ${platform} -p ${dashP} ${extraFlags ? extraFlags : ''}`;
 }
 
 module.exports = {
@@ -41,13 +41,12 @@ module.exports = {
         vscode: 'ng build vscode --prod --maxWorkers=4'
       },
       'gen-graphql-types': 'gql-gen --config codegen-server.yml',
-      'gen-apollo-angular': 'gql-gen --config codegen-client.js'
+      'gen-apollo-angular': 'gql-gen --config codegen-client.js',
+      'vscode-yarn': 'node tools\\scripts\\vscode-yarn.js',
+      'vscode-vsce': 'node tools\\scripts\\vscode-vsce.js'
     },
     mac: {
       clean: 'rm -rf dist',
-      'vscode-yarn':
-        'cd dist/apps/vscode && yarn install --production --pure-lockfile --ignore-optional --no-bin-links --non-interactive',
-      'vsce-package': 'cd dist/apps/vscode && vsce package',
       'copy-ng-cmd': {
         electron: 'cp tools/win/.bin/ng.cmd dist/apps/electron/ng.cmd',
         vscode: 'cp tools/win/.bin/ng.cmd dist/apps/vscode/ng.cmd'
@@ -85,10 +84,6 @@ module.exports = {
     },
     win: {
       clean: 'if exist dist rmdir dist /s /q',
-      'vscode-yarn':
-        'cd cd dist\\apps\\vscode && yarn install --production --pure-lockfile --ignore-optional --no-bin-links --non-interactive && vsce package',
-      'vsce-package':
-        'cd dist\\apps\\vscode && yarn install --production --pure-lockfile && vsce package',
       'copy-ng-cmd': {
         electron:
           'copy tools\\win\\.bin\\ng.cmd dist\\apps\\electron\\assets\\ng.cmd',
@@ -107,21 +102,21 @@ module.exports = {
       },
       'copy-schema': {
         electron:
-          'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\electron\\src\\assets\\schema.graphql',
+          'copy libs\\server\\src\\schema\\schema.graphql apps\\electron\\src\\assets\\schema.graphql',
         vscode:
-          'robocopy apps\\electron\\src\\assets\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql'
+          'copy libs\\server\\src\\schema\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql'
       },
       'copy-yarn-lock': {
-        electron: 'robocopy yarn.lock apps\\electron\\src\\yarn.lock',
-        vscode: 'robocopy yarn.lock apps\\vscode\\src\\yarn.lock'
+        electron: 'copy yarn.lock dist\\apps\\electron\\yarn.lock',
+        vscode: 'copy yarn.lock dist\\apps\\vscode\\yarn.lock'
       },
       'copy-readme': {
-        vscode: 'robocopy README.md apps\\vscode\\src\\README.md'
+        vscode: 'copy README.md dist\\apps\\vscode\\README.md'
       },
       'electron-pack': 'electron-builder --win --dir -p never',
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'start-server':
-        'electron dist\\apps\\electron --server --port 7777 --inspect=9229',
+        'electron dist\\apps\\electron --server --port 4201 --inspect=9229',
       'start-electron': 'electron dist\\apps\\electron',
       'builder-prerelease': electronBuilder('--win', 'never'),
       'builder-publish': electronBuilder(
@@ -147,7 +142,7 @@ module.exports = {
           withPlatform('copy-yarn-lock.vscode'),
           withPlatform('copy-readme.vscode'),
           withPlatform('copy-frontend.vscode'),
-          withPlatform('vscode-yarn'),
+          'server.vscode-yarn',
           'dev.patch-cli'
         )
       },
@@ -180,7 +175,7 @@ module.exports = {
         'dev.prepare.vscode',
         withPlatform('copy-ng-cmd.vscode'),
         withPlatform('copy-node-pty-prebuilt.vscode'),
-        withPlatform('vsce-package')
+        'server.vscode-vsce'
       )
     },
     publish: {

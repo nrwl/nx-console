@@ -131,7 +131,7 @@
     "electron-packager": "13.0.1",
     "electron-rebuild": "^1.8.2",
     "electron-store": "2.0.0",
-    "electron-updater": "3.1.2",
+    "electron-updater": "^4.0.6",
     "express": "4.16.4",
     "fix-path": "2.1.0",
     "get-port": "4.0.0",
@@ -169,6 +169,7 @@
     "universal-analytics": "^0.4.20",
     "uuid": "^3.3.2",
     "vscode": "^1.1.26",
+    "vsce": "1.54.0",
     "xterm": "3.9.1",
     "zone.js": "0.8.26"
   },

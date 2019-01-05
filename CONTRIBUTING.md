@@ -13,11 +13,11 @@ We are trying to keep GitHub issues for bug reports and feature requests. Stack 
 
 After cloning the project run: `yarn`. 
 
-After that, run `yarn start dev.prepare`. Every time you add or remove dependencies in electron/package.json, you will need to rerun `dev.prepare`. 
+After that, run `yarn start dev.prepare.electron`. Every time you add or remove dependencies in electron/package.json, you will need to rerun `dev.prepare`. 
 
 After this, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200. 
 
-You can also run the electron app by running `yarn start mac.start-electron`, `yarn start win.start-electron` or `yarn start linux.start-electron`.
+You can also build the electron app by running `yarn start mac.electron-pack`, `yarn start win.electron-pack` or `yarn start linux.electron-pack` and then run it using `yarn start mac.start-electron`, `yarn start win.start-electron` or `yarn start linux.start-electron`.
 
 
 ## Running Unit Tests
