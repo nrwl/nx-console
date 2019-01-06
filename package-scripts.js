@@ -67,10 +67,6 @@ module.exports = {
         vscode:
           'cp libs/server/src/schema/schema.graphql apps/vscode/src/assets/schema.graphql'
       },
-      'copy-yarn-lock': {
-        electron: 'cp yarn.lock dist/apps/electron/yarn.lock',
-        vscode: 'cp yarn.lock dist/apps/vscode/yarn.lock'
-      },
       'copy-readme': {
         vscode: 'cp README.md dist/apps/vscode/README.md'
       },
@@ -91,8 +87,9 @@ module.exports = {
           'copy tools\\win\\.bin\\ng.cmd dist\\apps\\vscode\\assets\\ng.cmd'
       },
       'copy-node-pty-prebuilt': {
-        vscode:
-          'robocopy tools\\win\\node-pty-prebuilt\\build\\Release dist\\apps\\vscode\\node_modules\\node-pty-prebuilt\\build\\Release'
+        vscode: nps.series.nps('win.copy-node-pty-prebuilt.delete', 'win.copy-node-pty-prebuilt.copy'),
+        'delete': 'rmdir dist\\apps\\vscode\\node_modules\\node-pty-prebuilt\\build\\Release /s /q',
+        'copy': 'robocopy tools\\win\\node-pty-prebuilt\\build\\Release dist\\apps\\vscode\\node_modules\\node-pty-prebuilt\\build\\Release /e || echo 0',
       },
       'copy-frontend': {
         electron:
@@ -105,10 +102,6 @@ module.exports = {
           'copy libs\\server\\src\\schema\\schema.graphql apps\\electron\\src\\assets\\schema.graphql',
         vscode:
           'copy libs\\server\\src\\schema\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql'
-      },
-      'copy-yarn-lock': {
-        electron: 'copy yarn.lock dist\\apps\\electron\\yarn.lock',
-        vscode: 'copy yarn.lock dist\\apps\\vscode\\yarn.lock'
       },
       'copy-readme': {
         vscode: 'copy README.md dist\\apps\\vscode\\README.md'
@@ -131,7 +124,7 @@ module.exports = {
         electron: nps.series.nps(
           withPlatform('clean'),
           'dev.build.electron',
-          withPlatform('copy-yarn-lock.electron'),
+          withPlatform('electron-pack'),
           withPlatform('copy-frontend.electron'),
           'dev.patch-cli'
         ),
@@ -139,7 +132,6 @@ module.exports = {
           withPlatform('clean'),
           'dev.build.vscode',
           withPlatform('copy-schema.vscode'),
-          withPlatform('copy-yarn-lock.vscode'),
           withPlatform('copy-readme.vscode'),
           withPlatform('copy-frontend.vscode'),
           'server.vscode-yarn',
