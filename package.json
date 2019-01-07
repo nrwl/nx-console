@@ -23,7 +23,7 @@
     "appId": "io.nrwl.AngularConsole",
     "productName": "Angular Console",
     "copyright": "Copyright © 2018 Narwhal Technologies Inc",
-    "asar": true,
+    "asar": false,
     "extraResources": [
       {
         "from": "dist/apps/electron/assets",

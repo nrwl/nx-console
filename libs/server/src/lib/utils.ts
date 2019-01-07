@@ -287,7 +287,7 @@ export function normalizePath(value: string): string {
  * * the list of local files
  * * json files from node_modules we are likely to read
  *
- * both the data sets get updated every 30 seconds.
+ * both the data sets get updated every 60 seconds.
  */
 export function cacheFiles(p: string) {
   setTimeout(() => {
@@ -295,6 +295,6 @@ export function cacheFiles(p: string) {
     fileContents = cacheJsonFiles(p);
     setTimeout(() => {
       cacheFiles(p);
-    }, 30000);
+    }, 60000);
   }, 0);
 }

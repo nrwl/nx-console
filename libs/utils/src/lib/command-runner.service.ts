@@ -9,9 +9,10 @@ import {
   takeWhile,
   first,
   flatMap,
-  withLatestFrom
+  withLatestFrom,
+  switchMap
 } from 'rxjs/operators';
-import { COMMANDS_POLLING } from './polling-constants';
+import { COMMAND_LIST_POLLING, COMMANDS_POLLING } from './polling-constants';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import {
   CommandsGQL,
@@ -55,6 +56,7 @@ export interface CommandResponse {
 export class CommandRunner {
   readonly activeCommand$ = new BehaviorSubject(false);
   activeCommandId: string;
+  readonly refreshList$ = new BehaviorSubject(null);
 
   constructor(
     private readonly getCommandGQL: GetCommandGQL,
@@ -119,9 +121,13 @@ export class CommandRunner {
   }
 
   listAllCommands(): Observable<ListAllCommands.Commands[]> {
-    return this.listAllCommandsGQL
-      .watch({}, { pollInterval: COMMANDS_POLLING })
-      .valueChanges.pipe(map(r => r.data.commands));
+    return this.refreshList$.pipe(
+      switchMap(() => {
+        return this.listAllCommandsGQL
+          .watch({}, { pollInterval: COMMAND_LIST_POLLING })
+          .valueChanges.pipe(map(r => r.data.commands));
+      })
+    );
   }
 
   getCommand(
@@ -156,7 +162,9 @@ export class CommandRunner {
       .mutate({
         id
       })
-      .subscribe(() => {});
+      .subscribe(() => {
+        this.refreshList$.next(null);
+      });
   }
 
   stopCommandViaCtrlC(id: string) {
@@ -168,7 +176,9 @@ export class CommandRunner {
   }
 
   removeAllCommands() {
-    return this.removeAllCommandsGQL.mutate().subscribe(() => {});
+    return this.removeAllCommandsGQL.mutate().subscribe(() => {
+      this.refreshList$.next(null);
+    });
   }
 
   removeCommand(id: string) {
@@ -176,7 +186,9 @@ export class CommandRunner {
       .mutate({
         id
       })
-      .subscribe(() => {});
+      .subscribe(() => {
+        this.refreshList$.next(null);
+      });
   }
 
   restartCommand(id: string) {
@@ -184,7 +196,9 @@ export class CommandRunner {
       .mutate({
         id
       })
-      .subscribe(() => {});
+      .subscribe(() => {
+        this.refreshList$.next(null);
+      });
   }
 
   stopActiveCommand() {
