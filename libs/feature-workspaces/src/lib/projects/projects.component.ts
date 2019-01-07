@@ -2,8 +2,12 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Project } from '@angular-console/schema';
 import { combineLatest, Observable, of } from 'rxjs';
-import { map, startWith, switchMap } from 'rxjs/operators';
-import { PROJECTS_POLLING, Settings } from '@angular-console/utils';
+import { map, startWith, switchMap, shareReplay } from 'rxjs/operators';
+import {
+  PROJECTS_POLLING,
+  Settings,
+  CommandRunner
+} from '@angular-console/utils';
 import { WorkspaceDocsGQL, WorkspaceGQL } from '../generated/graphql';
 import { FormControl } from '@angular/forms';
 
@@ -25,11 +29,20 @@ export class ProjectsComponent implements OnInit {
 
   projectFilterFormControl = new FormControl();
 
+  viewportHeight$ = this.commandRunner.listAllCommands().pipe(
+    map(c => Boolean(c.length > 0)),
+    map(actionBarExpanded =>
+      actionBarExpanded ? 'calc(100vh - 194px)' : 'calc(100vh - 128px)'
+    ),
+    shareReplay()
+  );
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
     private readonly settings: Settings,
-    private readonly workspaceDocsGQL: WorkspaceDocsGQL
+    private readonly workspaceDocsGQL: WorkspaceDocsGQL,
+    private readonly commandRunner: CommandRunner
   ) {}
 
   ngOnInit() {

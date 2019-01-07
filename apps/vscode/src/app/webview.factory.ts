@@ -20,24 +20,6 @@ export function createWebViewPanel(
   );
   panel.webview.html = getIframeHtml(iframeUrl);
 
-  let terminalToRestore: Terminal | undefined = window.activeTerminal;
-  if (terminalToRestore) terminalToRestore.hide();
-  panel.onDidChangeViewState(e => {
-    if (e.webviewPanel.active) {
-      terminalToRestore = window.activeTerminal;
-      if (window.activeTerminal) window.activeTerminal.hide();
-    } else {
-      if (
-        terminalToRestore &&
-        (!window.activeTerminal ||
-          window.activeTerminal.processId === terminalToRestore.processId)
-      ) {
-        terminalToRestore.show();
-      }
-      terminalToRestore = undefined;
-    }
-  });
-
   return panel;
 }
 

@@ -23,15 +23,14 @@ export function getPseudoTerminalFactory(
 
 function vscodePseudoTerminalFactory(
   context: ExtensionContext,
-  { name, program, args, cwd }: PseudoTerminalConfig
+  { name, program, args, cwd, displayCommand }: PseudoTerminalConfig
 ): PseudoTerminal {
   const terminal = window.createTerminal(name);
   context.subscriptions.push(terminal);
 
-  const humanReadableCommand = `${program} ${args.join(' ')}`;
   const fullCommand =
     `cd ${cwd} &&` +
-    `${humanReadableCommand} && echo "\n\r${AC_SUCCESS}"` +
+    `${program} ${args.join(' ')} && echo "\n\r${AC_SUCCESS}"` +
     ` || echo "\n\r${AC_FAILURE}"`;
 
   terminal.sendText(fullCommand);
@@ -59,7 +58,7 @@ function vscodePseudoTerminalFactory(
         if (data.includes('🐳')) {
           whaleSpotted = true;
           if (onDidWriteData) {
-            onDidWriteData(`${humanReadableCommand}\n\r`);
+            onDidWriteData(`${displayCommand}\n\n\r`);
           }
         }
         return;

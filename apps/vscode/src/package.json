@@ -1,7 +1,8 @@
 {
   "name": "angular-console",
-  "description": "Angular Console",
-  "version": "7.2.0-alpha.6",
+  "displayName": "Angular Console",
+  "description": "Angular Console for Visual Studio Code. The user interface app for the Angular CLI",
+  "version": "7.2.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/angular-console"
@@ -15,7 +16,7 @@
   "icon": "assets/extension_icon.png",
   "galleryBanner": {
     "color": "#176BCC",
-    "theme": "light"
+    "theme": "dark"
   },
   "homepage": "https://angularconsole.com/",
   "bugs": {
@@ -40,12 +41,13 @@
     ]
   },
   "dependencies": {
+    "opn": "^5.4.0",
     "@angular/cli": "7.1.4",
-    "@nrwl/angular-console-enterprise-electron": "0.0.35",
+    "@nrwl/angular-console-enterprise-electron": "0.0.38",
     "@nrwl/schematics": "7.3.0",
     "apollo-server-express": "2.3.1",
     "express": "4.16.4",
-    "get-port": "4.1.0",
+    "get-port": "4.0.0",
     "graphql": "^0.13.1",
     "dotenv": "6.2.0",
     "node-pty-prebuilt": "0.7.6",

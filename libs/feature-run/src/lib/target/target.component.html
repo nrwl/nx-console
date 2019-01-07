@@ -1,11 +1,6 @@
-<ui-entity-docs
-  [docs]="docs$ | async"
-  style="margin-left: 15px"
-></ui-entity-docs>
 <ui-task-runner
   *ngIf="(project$ | async) as project"
   [terminalWindowTitle]="(command$ | async) || 'Task output'"
-  [terminalVisible]="false"
 >
   <ui-flags
     [configurations]="project.architect[0].configurations"
@@ -22,5 +17,10 @@
   </ui-command-output>
 </ui-task-runner>
 <ng-template #emptyMessage>
-  Click the Run button to start this task.
+  <ui-entity-docs
+    *ngIf="(docs$ | async) as docks; else noDocs"
+    [docs]="docs$ | async"
+    style="margin-left: 15px"
+  ></ui-entity-docs>
+  <ng-template #noDocs> Click the Run button to start this task. </ng-template>
 </ng-template>

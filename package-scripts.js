@@ -17,8 +17,17 @@ function withPlatform(command) {
   return `${platform}.${command}`;
 }
 
+function electronOrVscode(command) {
+  return {
+    electron: command.replace(/APPLICATION/g, 'electron'),
+    vscode: command.replace(/APPLICATION/g, 'vscode')
+  };
+}
+
 function electronBuilder(platform, dashP, extraFlags) {
-  return `electron-builder ${platform} -p ${dashP} ${extraFlags ? extraFlags : ''}`;
+  return `electron-builder ${platform} -p ${dashP} ${
+    extraFlags ? extraFlags : ''
+  }`;
 }
 
 module.exports = {
@@ -32,41 +41,28 @@ module.exports = {
         'server.gen-graphql-types',
         'server.gen-apollo-angular'
       ),
-      'gen-and-build': {
-        electron: nps.series.nps('server.gen-all', 'server.build.electron'),
-        vscode: nps.series.nps('server.gen-all', 'server.build.vscode')
-      },
-      build: {
-        electron: 'ng build electron --prod --maxWorkers=4',
-        vscode: 'ng build vscode --prod --maxWorkers=4'
-      },
+      'gen-and-build': electronOrVscode(
+        nps.series.nps('server.gen-all', 'server.build.APPLICATION')
+      ),
+      build: electronOrVscode('ng build APPLICATION --prod --maxWorkers=4'),
       'gen-graphql-types': 'gql-gen --config codegen-server.yml',
-      'gen-apollo-angular': 'gql-gen --config codegen-client.js',
-      'vscode-yarn': 'node tools\\scripts\\vscode-yarn.js',
-      'vscode-vsce': 'node tools\\scripts\\vscode-vsce.js'
+      'gen-apollo-angular': 'gql-gen --config codegen-client.js'
     },
     mac: {
       clean: 'rm -rf dist',
-      'copy-ng-cmd': {
-        electron: 'cp tools/win/.bin/ng.cmd dist/apps/electron/ng.cmd',
-        vscode: 'cp tools/win/.bin/ng.cmd dist/apps/vscode/ng.cmd'
-      },
+      'copy-ng-cmd': electronOrVscode(
+        'cp tools/win/.bin/ng.cmd dist/apps/APPLICATION/ng.cmd'
+      ),
       'copy-node-pty-prebuilt': {
         vscode:
           'rm -rf dist/apps/vscode/node_modules/node-pty-prebuilt/build/Release && cp -rf tools/win/node-pty-prebuilt/build/Release dist/apps/vscode/node_modules/node-pty-prebuilt/build/Release'
       },
-      'copy-frontend': {
-        electron:
-          'cp -rf dist/apps/angular-console dist/apps/electron/assets/public',
-        vscode:
-          'cp -rf dist/apps/angular-console dist/apps/vscode/assets/angular-console'
-      },
-      'copy-schema': {
-        electron:
-          'cp libs/server/src/schema/schema.graphql apps/electron/src/assets/schema.graphql',
-        vscode:
-          'cp libs/server/src/schema/schema.graphql apps/vscode/src/assets/schema.graphql'
-      },
+      'copy-frontend': electronOrVscode(
+        'cp -rf dist/apps/angular-console dist/apps/APPLICATION/assets/public'
+      ),
+      'copy-schema': electronOrVscode(
+        'cp libs/server/src/schema/schema.graphql apps/APPLICATION/src/assets/schema.graphql'
+      ),
       'copy-readme': {
         vscode: 'cp README.md dist/apps/vscode/README.md'
       },
@@ -76,20 +72,24 @@ module.exports = {
         'electron dist/apps/electron --server --port 4201 --inspect=9229',
       'start-electron': 'NODE_ENV=development electron dist/apps/electron',
       'builder-prerelease': electronBuilder('--mac', 'never'),
-      'builder-publish': electronBuilder('--mac', 'always')
+      'builder-publish': electronBuilder('--mac', 'always'),
+      'vscode-yarn': 'node tools/scripts/vscode-yarn.js',
+      'vscode-vsce': 'node tools/scripts/vscode-vsce.js'
     },
     win: {
       clean: 'if exist dist rmdir dist /s /q',
-      'copy-ng-cmd': {
-        electron:
-          'copy tools\\win\\.bin\\ng.cmd dist\\apps\\electron\\assets\\ng.cmd',
-        vscode:
-          'copy tools\\win\\.bin\\ng.cmd dist\\apps\\vscode\\assets\\ng.cmd'
-      },
+      'copy-ng-cmd': electronOrVscode(
+        'copy tools\\win\\.bin\\ng.cmd dist\\apps\\APPLICATION\\assets\\ng.cmd'
+      ),
       'copy-node-pty-prebuilt': {
-        vscode: nps.series.nps('win.copy-node-pty-prebuilt.delete', 'win.copy-node-pty-prebuilt.copy'),
-        'delete': 'rmdir dist\\apps\\vscode\\node_modules\\node-pty-prebuilt\\build\\Release /s /q',
-        'copy': 'robocopy tools\\win\\node-pty-prebuilt\\build\\Release dist\\apps\\vscode\\node_modules\\node-pty-prebuilt\\build\\Release /e || echo 0',
+        vscode: nps.series.nps(
+          'win.copy-node-pty-prebuilt.delete',
+          'win.copy-node-pty-prebuilt.copy'
+        ),
+        delete:
+          'rmdir dist\\apps\\vscode\\node_modules\\node-pty-prebuilt\\build\\Release /s /q',
+        copy:
+          'robocopy tools\\win\\node-pty-prebuilt\\build\\Release dist\\apps\\vscode\\node_modules\\node-pty-prebuilt\\build\\Release /e || echo 0'
       },
       'copy-frontend': {
         electron:
@@ -97,12 +97,9 @@ module.exports = {
         vscode:
           'robocopy dist\\apps\\angular-console dist\\apps\\vscode\\assets\\angular-console /e || echo 0'
       },
-      'copy-schema': {
-        electron:
-          'copy libs\\server\\src\\schema\\schema.graphql apps\\electron\\src\\assets\\schema.graphql',
-        vscode:
-          'copy libs\\server\\src\\schema\\schema.graphql apps\\vscode\\src\\assets\\schema.graphql'
-      },
+      'copy-schema': electronOrVscode(
+        'copy libs\\server\\src\\schema\\schema.graphql apps\\electron\\src\\assets\\schema.graphql'
+      ),
       'copy-readme': {
         vscode: 'copy README.md dist\\apps\\vscode\\README.md'
       },
@@ -116,7 +113,9 @@ module.exports = {
         '--win',
         'always',
         '--config.win.certificateSubjectName="Narwhal Technologies Inc."'
-      )
+      ),
+      'vscode-yarn': 'node tools\\scripts\\vscode-yarn.js',
+      'vscode-vsce': 'node tools\\scripts\\vscode-vsce.js'
     },
     dev: {
       'patch-cli': 'node ./tools/scripts/patch-cli.js',
@@ -134,20 +133,15 @@ module.exports = {
           withPlatform('copy-schema.vscode'),
           withPlatform('copy-readme.vscode'),
           withPlatform('copy-frontend.vscode'),
-          'server.vscode-yarn',
-          'dev.patch-cli'
+          withPlatform('vscode-yarn'),
+          'dev.patch-cli',
+          withPlatform('copy-ng-cmd.vscode'),
+          withPlatform('copy-node-pty-prebuilt.vscode')
         )
       },
-      build: {
-        electron: nps.concurrent.nps(
-          'server.gen-and-build.electron',
-          'frontend.build'
-        ),
-        vscode: nps.concurrent.nps(
-          'server.gen-and-build.vscode',
-          'frontend.build'
-        )
-      },
+      build: electronOrVscode(
+        nps.concurrent.nps('server.gen-and-build.APPLICATION', 'frontend.build')
+      ),
       server: nps.series.nps(
         withPlatform('copy-schema.electron'),
         'server.gen-and-build.electron',
@@ -163,12 +157,7 @@ module.exports = {
         'win.builder-prerelease',
         'linux.builder-prerelease'
       ),
-      vscode: nps.series.nps(
-        'dev.prepare.vscode',
-        withPlatform('copy-ng-cmd.vscode'),
-        withPlatform('copy-node-pty-prebuilt.vscode'),
-        'server.vscode-vsce'
-      )
+      vscode: nps.series.nps('dev.prepare.vscode', withPlatform('vscode-vsce'))
     },
     publish: {
       // NOTE: This command should be run on a mac with Parallels installed

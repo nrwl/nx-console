@@ -3,7 +3,7 @@ import { join } from 'path';
 import { start, SelectDirectory } from '@angular-console/server';
 import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 
-import getPort = require('get-port');
+const getPort = require('get-port');
 
 const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
   return await window

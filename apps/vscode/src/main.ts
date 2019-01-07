@@ -24,15 +24,6 @@ export function activate(context: ExtensionContext) {
 async function main(context: ExtensionContext) {
   if (!server) {
     server = await startServer(context);
-
-    context.subscriptions.push({
-      dispose() {
-        if (server) {
-          server.close();
-          server = undefined;
-        }
-      }
-    });
   }
 
   if (webViewPanel) {
@@ -61,4 +52,11 @@ function getWorkspaceRoute() {
   }
 
   return ''; // Use angular console's default route.
+}
+
+export function deactivate() {
+  if (server) {
+    server.close();
+    server = undefined;
+  }
 }
