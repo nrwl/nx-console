@@ -169,7 +169,8 @@ export class ActionBarComponent {
         map(commands => commands.length),
         distinctUntilChanged(),
         map(numCommands => {
-          const actionBarHeight = numCommands > 1 ? COMMAND_HEIGHT : 0;
+          const actionBarVisible = numCommands > 1;
+          const actionBarHeight = actionBarVisible ? COMMAND_HEIGHT : 0;
           return `calc(100vh - ${TERMINAL_PADDING +
             actionBarHeight +
             COMMAND_HEIGHT * numCommands}px)`;

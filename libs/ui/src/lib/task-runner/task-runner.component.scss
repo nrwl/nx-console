@@ -10,6 +10,7 @@ $window-chrome-height: 45px;
 
 .outer-container {
   height: calc(100vh - 64px);
+  overflow: hidden;
 }
 
 .ui-terminal-container {

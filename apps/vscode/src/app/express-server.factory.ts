@@ -3,7 +3,7 @@ import { join } from 'path';
 import { start, SelectDirectory } from '@angular-console/server';
 import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 
-import getPort = require('get-port');
+const getPort = require('get-port');
 
 const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
   return await window
@@ -25,11 +25,7 @@ const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
 export async function startServer(context: ExtensionContext) {
   const port = await getPort({ port: 8888 });
 
-  const staticResourcePath = join(
-    context.extensionPath,
-    'assets',
-    'angular-console'
-  );
+  const staticResourcePath = join(context.extensionPath, 'assets', 'public');
 
   const server = start({
     port,

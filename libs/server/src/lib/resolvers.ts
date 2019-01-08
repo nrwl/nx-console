@@ -42,11 +42,12 @@ import {
   filterByName,
   findClosestNg,
   findExecutable,
-  readJsonFile,
-  openURI
+  readJsonFile
 } from './utils';
 import { exec } from 'child_process';
 import { CommandInformation } from './api/commands';
+
+const opn = require('opn');
 
 export type SelectDirectory = (
   options: { title: string; buttonLabel: string }
@@ -382,7 +383,7 @@ export const getResolvers = (
     },
     async openInBrowser(_root, { url }) {
       if (url) {
-        openURI(url);
+        opn(url);
         return { result: true };
       } else {
         return { result: false };
@@ -390,7 +391,7 @@ export const getResolvers = (
     },
     async showItemInFolder(_root, { item }) {
       if (item) {
-        openURI(item);
+        opn(item);
         return { result: true };
       } else {
         return { result: false };

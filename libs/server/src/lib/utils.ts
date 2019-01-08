@@ -9,24 +9,6 @@ import * as stripJsonComments from 'strip-json-comments';
 export const files: { [path: string]: string[] } = {};
 export let fileContents: { [path: string]: any } = {};
 
-export function openURI(url: string) {
-  let opener;
-
-  switch (process.platform) {
-    case 'darwin':
-      opener = 'open';
-      break;
-    case 'win32':
-      opener = 'start';
-      break;
-    default:
-      opener = 'xdg-open';
-      break;
-  }
-
-  return exec(`${opener} "${url.replace(/"/g, '\\"')}"`);
-}
-
 export function exists(cmd: string): boolean {
   try {
     if (platform() === 'win32') {

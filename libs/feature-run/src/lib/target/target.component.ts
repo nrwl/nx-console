@@ -118,6 +118,7 @@ export class TargetComponent implements OnInit {
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$),
       tap(() => {
+        this.flags.hideFields();
         this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c]) => {
