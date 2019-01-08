@@ -42,6 +42,8 @@ export interface Schematic {
   name: string;
   description: string;
   schema: Field[];
+  npmClient: string | null;
+  npmScript: string | null;
 }
 
 export interface SchematicCollection {

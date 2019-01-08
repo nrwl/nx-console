@@ -7,6 +7,8 @@ interface Settings {
   enableDetailedStatus?: boolean;
   channel?: string;
   isConnectUser?: boolean;
+  workspaceSchematicsDirectory: string;
+  workspaceSchematicsNpmScript: string;
 }
 
 /* tslint:disable */
@@ -26,6 +28,12 @@ export function readSettings(store: Store) {
   }
   if (settings.channel === undefined) {
     settings.channel = 'latest';
+  }
+  if (settings.workspaceSchematicsDirectory === undefined) {
+    settings.workspaceSchematicsDirectory = 'tools/schematics';
+  }
+  if (settings.workspaceSchematicsNpmScript === undefined) {
+    settings.workspaceSchematicsNpmScript = 'workspace-schematic';
   }
   const authUtils = require('@nrwl/angular-console-enterprise-electron')
     .authUtils;

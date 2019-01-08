@@ -1,9 +1,11 @@
 {
+  "extends": "../../tsconfig.json",
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "../../dist/apps/angular-console-e2e",
     "baseUrl": "../../node_modules",
     "target": "es5",
+    "sourceMap": false,
     "lib": ["es2017", "dom", "esnext.asynciterable"],
     "typeRoots": [
       "../../node_modules/@types"

@@ -106,7 +106,6 @@ export class TaskRunnerComponent implements AfterContentChecked {
           numFlags === 1 ? `${129}px` : `${49 + 129}px`;
         const configurationsHeight =
           configurations && configurations.length > 1 ? '55px' : '0px';
-        console.log('configurationsHeight', configurationsHeight);
         switch (v) {
           case 'grow':
             this.flagsComponent.viewportHeight.next(

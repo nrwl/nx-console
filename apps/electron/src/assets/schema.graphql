@@ -128,6 +128,12 @@ type Mutation {
     genCommand: [String!]!
     dryRun: Boolean!
   ): CommandStarted
+  generateUsingNpm(
+    path: String!
+    npmClient: String!
+    genCommand: [String!]!
+    dryRun: Boolean!
+  ): CommandStarted
   runNg(path: String!, runCommand: [String!]!): CommandStarted
   runNpm(
     path: String!
@@ -177,6 +183,8 @@ type Schematic {
   collection: String!
   name: String!
   description: String
+  npmClient: String
+  npmScript: String
   schema: [SchematicSchema]
 }
 

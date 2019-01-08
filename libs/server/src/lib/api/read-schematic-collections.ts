@@ -1,6 +1,9 @@
 import * as path from 'path';
 import {
+  directoryExists,
+  fileExists,
   fileExistsSync,
+  listFiles,
   listOfUnnestedNpmPackages,
   normalizeSchema,
   readJsonFile
@@ -15,6 +18,8 @@ interface Schematic {
   collection: string;
   name: string;
   description: string;
+  npmClient: string | null;
+  npmScript: string | null;
   schema: {
     name: string;
     type: string;
@@ -27,7 +32,33 @@ interface Schematic {
   }[];
 }
 
-export function readAllSchematicCollections(basedir: string) {
+export function readAllSchematicCollections(
+  basedir: string,
+  workspaceSchematicsPath: string,
+  workspaceSchematicsNpmScript: string
+) {
+  const npmClient = fileExistsSync(path.join(basedir, 'yarn.lock'))
+    ? 'yarn'
+    : 'npm';
+
+  let collections = readSchematicCollectionsFromNodeModules(basedir);
+  if (directoryExists(path.join(basedir, workspaceSchematicsPath))) {
+    collections = [
+      readWorkspaceSchematicsCollection(
+        basedir,
+        workspaceSchematicsPath,
+        npmClient,
+        workspaceSchematicsNpmScript
+      ),
+      ...collections
+    ];
+  }
+  return collections.filter(
+    collection => !!collection && collection.schematics.length > 0
+  );
+}
+
+function readSchematicCollectionsFromNodeModules(basedir: string) {
   const nodeModulesDir = path.join(basedir, 'node_modules');
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
@@ -46,41 +77,90 @@ export function readAllSchematicCollections(basedir: string) {
       }
     }
   });
-  return schematicCollections
-    .map(c => readSchematicCollections(nodeModulesDir, c))
-    .filter(collection => !!collection && collection.schematics.length > 0);
+  return schematicCollections.map(c => readCollection(nodeModulesDir, c));
 }
 
-function readSchematicCollections(
+function readWorkspaceSchematicsCollection(
+  basedir: string,
+  workspaceSchematicsPath: string,
+  npmClient: string,
+  workspaceSchematicsNpmScript: string
+) {
+  const collectionDir = path.join(basedir, workspaceSchematicsPath);
+  const collectionName = 'Workspace Schematics';
+  if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
+    const collection = readJsonFile('collection.json', collectionDir);
+    return readCollectionSchematics(
+      collectionName,
+      collection.path,
+      collection.json
+    );
+  } else {
+    const schematics = listFiles(collectionDir)
+      .filter(f => path.basename(f) === 'schema.json')
+      .map(f => {
+        const schemaJson = readJsonFile(f, '');
+        return {
+          name: schemaJson.json.id,
+          collection: collectionName,
+          schema: normalizeSchema(schemaJson.json),
+          description: '',
+          npmClient,
+          npmScript: workspaceSchematicsNpmScript
+        };
+      });
+    return { name: collectionName, schematics };
+  }
+}
+
+function readCollection(
   basedir: string,
   collectionName: string
 ): SchematicCollection | null {
-  const packageJson = readJsonFile(
-    path.join(collectionName, 'package.json'),
-    basedir
-  );
-  const collection = readJsonFile(
-    packageJson.json.schematics,
-    path.dirname(packageJson.path)
-  );
+  try {
+    const packageJson = readJsonFile(
+      path.join(collectionName, 'package.json'),
+      basedir
+    );
+    const collection = readJsonFile(
+      packageJson.json.schematics,
+      path.dirname(packageJson.path)
+    );
+    return readCollectionSchematics(
+      collectionName,
+      collection.path,
+      collection.json
+    );
+  } catch (e) {
+    // this happens when package is misconfigured. We decided to ignore such a case.
+    return null;
+  }
+}
+
+function readCollectionSchematics(
+  collectionName: string,
+  collectionPath: string,
+  collectionJson: any
+) {
   const schematicCollection = {
     name: collectionName,
     schematics: [] as Schematic[]
   };
-
-  Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
+  Object.entries(collectionJson.schematics).forEach(([k, v]: [any, any]) => {
     try {
       if (canAdd(k, v)) {
         const schematicSchema = readJsonFile(
           v.schema,
-          path.dirname(collection.path)
+          path.dirname(collectionPath)
         );
 
         schematicCollection.schematics.push({
           name: k,
           collection: collectionName,
           schema: normalizeSchema(schematicSchema.json),
-          description: v.description
+          description: v.description,
+          npmClient: null,
+          npmScript: null
         });
       }
     } catch (e) {
@@ -89,7 +169,6 @@ function readSchematicCollections(
       );
     }
   });
-
   return schematicCollection;
 }
 

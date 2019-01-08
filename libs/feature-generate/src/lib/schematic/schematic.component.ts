@@ -34,6 +34,7 @@ import {
 } from 'rxjs/operators';
 import {
   GenerateGQL,
+  GenerateUsingNmpGQL,
   SchematicCollectionsByNameGQL,
   SchematicDocsGQL
 } from '../generated/graphql';
@@ -48,7 +49,12 @@ const DEBOUNCE_TIME = 300;
 })
 export class SchematicComponent implements OnInit {
   schematic$: Observable<Schematic | null>;
-  commandArray$ = new BehaviorSubject<{ commands: string[]; valid: boolean }>({
+  commandArray$ = new BehaviorSubject<{
+    commands: string[];
+    valid: boolean;
+    schematic: Schematic | null;
+  }>({
+    schematic: null,
     commands: [],
     valid: false
   });
@@ -74,6 +80,7 @@ export class SchematicComponent implements OnInit {
     private readonly elementRef: ElementRef,
     private readonly contextActionService: ContextualActionBarService,
     private readonly generateGQL: GenerateGQL,
+    private readonly generateUsingNpmGQL: GenerateUsingNmpGQL,
     private readonly schematicDocsGQL: SchematicDocsGQL,
     private readonly settings: Settings,
     private readonly schematicCollectionsByNameGQL: SchematicCollectionsByNameGQL
@@ -169,15 +176,7 @@ export class SchematicComponent implements OnInit {
           return of();
         }
 
-        return this.runner.runCommand(
-          this.generateGQL.mutate({
-            path: this.path(),
-            genCommand: c.commands,
-            dryRun: true
-          }),
-          true,
-          this.out.terminal.currentCols
-        );
+        return this.runCommand(c.schematic, c.commands, true);
       }),
       publishReplay(1),
       refCount()
@@ -191,15 +190,7 @@ export class SchematicComponent implements OnInit {
       }),
       switchMap(([_, c]) => {
         this.out.reset();
-        return this.runner.runCommand(
-          this.generateGQL.mutate({
-            path: this.route.snapshot.params.path,
-            genCommand: c.commands,
-            dryRun: false
-          }),
-          false,
-          this.out.terminal.currentCols
-        );
+        return this.runCommand(c.schematic, c.commands, false);
       }),
       publishReplay(1),
       refCount()
@@ -223,12 +214,19 @@ export class SchematicComponent implements OnInit {
     ).pipe(
       switchMap(() => {
         return this.commandArray$.pipe(
-          map(r => r.commands),
           withLatestFrom(isDryRun),
-          map(
-            c =>
-              `ng generate ${this.serializer.argsToString([...c[0], ...c[1]])}`
-          )
+          map(c => {
+            const args = this.serializer.argsToString([
+              ...c[0].commands,
+              ...c[1]
+            ]);
+            const schematic = c[0].schematic;
+            if (schematic && schematic.npmScript) {
+              return `${schematic.npmClient} ${args}`;
+            } else {
+              return `ng generate ${args}`;
+            }
+          })
         );
       })
     );
@@ -259,6 +257,33 @@ export class SchematicComponent implements OnInit {
     }
   }
 
+  private runCommand(
+    schematic: Schematic | null,
+    commands: string[],
+    dryRun: boolean
+  ) {
+    let mutation;
+    if (schematic && schematic.npmScript) {
+      mutation = this.generateUsingNpmGQL.mutate({
+        path: this.path(),
+        genCommand: commands,
+        dryRun,
+        npmClient: schematic.npmClient!
+      });
+    } else {
+      mutation = this.generateGQL.mutate({
+        path: this.path(),
+        genCommand: commands,
+        dryRun
+      });
+    }
+    return this.runner.runCommand(
+      mutation,
+      dryRun,
+      this.out.terminal.currentCols
+    );
+  }
+
   getContextTitle(schematic: Schematic) {
     let contextTitle = `${schematic.collection} - ${schematic.name}`;
 
@@ -270,15 +295,26 @@ export class SchematicComponent implements OnInit {
   }
 
   getPrefix(schematic: Schematic) {
-    return [`${schematic.collection}:${schematic.name}`];
+    if (schematic.npmScript) {
+      return ['run', schematic.npmScript, '--', schematic.name];
+    } else {
+      return [`${schematic.collection}:${schematic.name}`];
+    }
   }
 
   path() {
     return this.route.snapshot.params.path;
   }
 
-  onFlagsChange(e: { commands: string[]; valid: boolean }) {
-    this.commandArray$.next(e);
+  onFlagsChange(
+    schematic: Schematic,
+    e: { commands: string[]; valid: boolean }
+  ) {
+    this.commandArray$.next({
+      schematic: schematic,
+      commands: e.commands,
+      valid: e.valid
+    });
     this.ngGenDisabled$.next(!e.valid);
   }
 }

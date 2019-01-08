@@ -14,14 +14,14 @@ import {
   nodeInstallDone
 } from './api/install-nodejs';
 import { readDependencies } from './api/read-dependencies';
-import { openInEditor, readEditors, Editor } from './api/read-editors';
+import { Editor, openInEditor, readEditors } from './api/read-editors';
 import { availableExtensions, readExtensions } from './api/read-extensions';
 import { schematicCollectionsForNgNew } from './api/read-ngnews';
 import { readNpmScripts, readNpmScriptSchema } from './api/read-npm-scripts';
 import { readProjects, readSchema } from './api/read-projects';
 import { readAllSchematicCollections } from './api/read-schematic-collections';
 import { readSettings, storeSettings } from './api/read-settings';
-import { commands, runCommand, PseudoTerminalFactory } from './api/run-command';
+import { commands, PseudoTerminalFactory, runCommand } from './api/run-command';
 import {
   ArchitectResolvers,
   CompletionsTypesResolvers,
@@ -44,7 +44,6 @@ import {
   findExecutable,
   readJsonFile
 } from './utils';
-import { exec } from 'child_process';
 import { CommandInformation } from './api/commands';
 
 const opn = require('opn');
@@ -91,10 +90,18 @@ export const getResolvers = (
 
   const Workspace: WorkspaceResolvers.Resolvers = {
     schematicCollections(_, args, context) {
+      const settings = readSettings(store);
       if (!directoryExists(path.join(context.path, 'node_modules'))) {
         throw new Error(`node_modules is not found`);
       }
-      return filterByName(readAllSchematicCollections(context.path), args);
+      return filterByName(
+        readAllSchematicCollections(
+          context.path,
+          settings.workspaceSchematicsDirectory,
+          settings.workspaceSchematicsNpmScript
+        ),
+        args
+      );
     },
     npmScripts(workspace, args) {
       return filterByName(workspace.npmScripts, args);
@@ -327,6 +334,29 @@ export const getResolvers = (
         console.log(e);
         throw new Error(
           `Error when running 'ng generate'. Message: "${e.message}"`
+        );
+      }
+    },
+    async generateUsingNpm(_root, args) {
+      try {
+        const dryRun = args.dryRun ? ['--dry-run'] : [];
+        return runCommand(
+          'npm',
+          args.path,
+          args.npmClient,
+          findExecutable(args.npmClient, args.path),
+          [
+            ...args.genCommand,
+            ...dryRun,
+            ...disableInteractivePrompts(args.path)
+          ],
+          psedoTerminalFactory,
+          !args.dryRun
+        );
+      } catch (e) {
+        console.log(e);
+        throw new Error(
+          `Error when running npm script. Message: "${e.message}"`
         );
       }
     },

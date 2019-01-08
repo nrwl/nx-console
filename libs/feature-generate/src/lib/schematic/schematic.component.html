@@ -7,7 +7,7 @@
   <ui-flags
     [prefix]="getPrefix(schematic)"
     [fields]="schematic.schema"
-    (value)="onFlagsChange($event)"
+    (value)="onFlagsChange(schematic, $event)"
     [init]="initValues$ | async"
     [path]="path()"
   ></ui-flags>
