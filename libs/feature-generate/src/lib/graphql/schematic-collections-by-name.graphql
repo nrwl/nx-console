@@ -9,6 +9,8 @@ query SchematicCollectionsByName(
         collection
         name
         description
+        npmScript
+        npmClient
         schema {
           name
           enum

@@ -29,7 +29,7 @@ export function checkSingleRecentTask(task: Task) {
       tasks
         .find('.command-text')
         .get(0)
-        .textContent.trim()
+        .textContent!.trim()
     ).to.equal(task.command);
 
     expect(tasks.find(`.task-avatar.${task.status}`)).visible;
@@ -58,13 +58,12 @@ export function checkMultipleRecentTasks(options: {
     const taskElements = actionBar.get(0).querySelectorAll('mat-list-item');
 
     expect(taskElements.length).to.equal(options.numTasks);
-    expect(taskElements).visible;
 
     if (options.tasks) {
       options.tasks.forEach((task, index) => {
         const taskElement = taskElements[index];
         expect(
-          taskElement.querySelector('.command-text').textContent.trim()
+          taskElement.querySelector('.command-text')!.textContent!.trim()
         ).to.equal(task.command);
 
         expect(taskElement.querySelector(`.task-avatar.${task.status}`)).not.to

@@ -177,8 +177,8 @@ export function autocompletion(callback: (s: any) => void) {
   });
 }
 
-export function checkFileExists(f: string) {
-  return cy.readFile(path.join('./../../tmp/proj/', f));
+export function checkFileExists(f: string, projName: string = 'proj') {
+  return cy.readFile(path.join(`./../../tmp/${projName}/`, f));
 }
 
 export function uniqName(prefix: string): string {

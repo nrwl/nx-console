@@ -134,7 +134,7 @@ describe('Tasks', () => {
     });
   });
 
-  it('runs build task', () => {
+  it('runs build and show recent tasks', () => {
     cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
     cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
 
@@ -175,18 +175,16 @@ describe('Tasks', () => {
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
-  });
 
-  it('show the recent tasks bar after navigating away', () => {
     checkSingleRecentTask({
       command: 'ng build proj',
       status: CommandStatus.SUCCESSFUL
     });
 
-    clickOnTask('proj', 'test');
-    cy.get('div.context-title').contains('ng test proj');
+    clickOnTask('proj', 'lint');
+    cy.get('div.context-title').contains('ng lint proj');
 
-    checkDisplayedCommand('ng test proj');
+    checkDisplayedCommand('ng lint proj');
 
     cy.get('button')
       .contains('Run')
@@ -212,7 +210,7 @@ describe('Tasks', () => {
       isExpanded: true,
       tasks: [
         { command: 'ng build proj', status: CommandStatus.SUCCESSFUL },
-        { command: 'ng test proj', status: CommandStatus.IN_PROGRESS }
+        { command: 'ng lint proj', status: CommandStatus.IN_PROGRESS }
       ]
     });
 
