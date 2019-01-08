@@ -1,8 +1,8 @@
-<p align="center">
-    <img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-logo-with-text.png" alt="Image" width="256" style="background: rgba(255, 255, 255, 0.4); border-radius: 8px;" />
-</p>
-
 # The Power of the Angular CLI. The Convenience of an App.
+
+<p align="center">
+    <img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-logo-with-text.jpg" width="256"/>
+</p>
 
 ### Spend less time looking up command line arguments and more time shipping incredible products.
 
