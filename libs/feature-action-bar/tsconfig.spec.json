@@ -1,10 +1,18 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc/libs/feature-action-bar",
     "module": "commonjs",
-    "types": ["jest", "node"]
+    "types": [
+      "jest",
+      "node"
+    ]
   },
-  "files": ["src/test-setup.ts"],
-  "include": ["**/*.spec.ts", "**/*.d.ts"]
+  "files": [
+    "src/test-setup.ts"
+  ],
+  "include": [
+    "**/*.spec.ts",
+    "**/*.d.ts"
+  ]
 }

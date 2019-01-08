@@ -42,7 +42,7 @@
   "dependencies": {
     "@angular/cli": "7.1.4",
     "@nrwl/angular-console-enterprise-electron": "0.0.35",
-    "@nrwl/schematics": "7.1.1",
+    "@nrwl/schematics": "7.3.0",
     "apollo-server-express": "2.3.1",
     "express": "4.16.4",
     "get-port": "4.1.0",
