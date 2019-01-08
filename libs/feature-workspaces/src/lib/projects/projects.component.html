@@ -1,5 +1,4 @@
 <div *ngIf="(filteredProjects$ | async) as projects">
-  <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
   <div
     class="project-filter-container"
     fxLayout="row"
@@ -19,32 +18,40 @@
       {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
     </mat-icon>
   </div>
-  <mat-list *ngIf="projects.length > 0; else empty">
-    <ng-container *ngFor="let p of projects">
-      <mat-list-item [ngClass]="p.projectType" [disableRipple]="true">
-        <div class="project-type" mat-line>{{ p.projectType }}</div>
-        <div class="project-name" mat-line>{{ p.name }}</div>
-        <div class="project-root" mat-line *ngIf="p.root">
-          <mat-icon>folder_open</mat-icon>
-          {{ p.root }}
-        </div>
-        <div
-          fxLayoutWrap
-          fxFlex="shrink"
-          fxLayout="row"
-          fxLayoutGap="12px"
-          fxLayoutAlign="end center"
-        >
-          <button
-            *ngFor="let a of p.actions"
-            mat-stroked-button
-            [routerLink]="a.link"
+  <mat-list *ngIf="projects.length > 0">
+    <cdk-virtual-scroll-viewport
+      [style.height]="viewportHeight$ | async"
+      itemSize="88px"
+      class="field-viewport"
+    >
+      <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
+
+      <ng-container *cdkVirtualFor="let p of projects">
+        <mat-list-item [ngClass]="p.projectType" [disableRipple]="true">
+          <div class="project-type" mat-line>{{ p.projectType }}</div>
+          <div class="project-name" mat-line>{{ p.name }}</div>
+          <div class="project-root" mat-line *ngIf="p.root">
+            <mat-icon>folder_open</mat-icon>
+            {{ p.root }}
+          </div>
+          <div
+            fxLayoutWrap
+            fxFlex="shrink"
+            fxLayout="row"
+            fxLayoutGap="12px"
+            fxLayoutAlign="end center"
           >
-            {{ a.actionDescription }}
-          </button>
-        </div>
-      </mat-list-item>
-      <mat-divider></mat-divider>
-    </ng-container>
+            <button
+              *ngFor="let a of p.actions"
+              mat-stroked-button
+              [routerLink]="a.link"
+            >
+              {{ a.actionDescription }}
+            </button>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      </ng-container>
+    </cdk-virtual-scroll-viewport>
   </mat-list>
 </div>

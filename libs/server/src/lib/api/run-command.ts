@@ -23,6 +23,7 @@ export function runCommand(
 
   const factory = () => {
     const commandRunning = pseudoTerminalFactory({
+      displayCommand: command,
       name: id,
       program,
       args: normalizeCommands(cwd, cmds),
@@ -68,6 +69,7 @@ export interface PseudoTerminalConfig {
   program: string;
   args: string[];
   cwd: string;
+  displayCommand: string;
 }
 
 export type PseudoTerminalFactory = (
@@ -78,6 +80,7 @@ import { PseudoTerminalFactory } from '@angular-console/server';
 import { platform } from 'os';
 
 export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
+  displayCommand,
   program,
   args,
   cwd
@@ -96,7 +99,7 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
 
   return {
     onDidWriteData: callback => {
-      const humanReadableCommand = `${program} ${args.join(' ')}\n\n\r`;
+      const humanReadableCommand = `${displayCommand}\n\n\r`;
       callback(humanReadableCommand);
       commandRunning.on('data', callback);
       commandRunning.on('exit', (exitCode: number) => {

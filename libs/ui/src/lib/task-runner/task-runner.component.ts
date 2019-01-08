@@ -19,7 +19,7 @@ import {
   QueryList
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
+import { map, startWith, tap, shareReplay } from 'rxjs/operators';
 
 import {
   CommandOutputComponent,
@@ -36,13 +36,18 @@ const ANIMATION_DURATION = 300;
   styleUrls: ['./task-runner.component.scss'],
   animations: [
     trigger('growShrink', [
-      state('void', style({ height: '45px', 'min-height': '45px' })),
-      state('shrink', style({ height: '45px', 'min-height': '45px' })),
-      state('flag-open', style({ height: '30vh' })),
-      state('grow-one-flag', style({ height: 'calc(100vh - 114px)' })),
-      state('grow-two-flag', style({ height: 'calc(100vh - 164px)' })),
-      transition(`* <=> void`, []),
-      transition(`* <=> *`, animate(`${ANIMATION_DURATION}ms ease-in-out`))
+      state(
+        'shrink',
+        style({ flex: 'initial', height: '45px', 'min-height': '45px' })
+      ),
+      state(
+        'grow',
+        style({ flex: '1 1 1e-09px', height: '*', 'min-height': '30vh' })
+      ),
+      transition(
+        `shrink <=> grow`,
+        animate(`${ANIMATION_DURATION}ms ease-in-out`)
+      )
     ])
   ]
 })
@@ -52,10 +57,6 @@ export class TaskRunnerComponent implements AfterContentChecked {
   @ContentChild(FlagsComponent) flagsComponent: FlagsComponent;
   @ContentChild(CommandOutputComponent)
   statusComponent: CommandOutputComponent | undefined;
-
-  @Input() set terminalVisible(visible: boolean) {
-    this.terminalVisible$.next(visible);
-  }
 
   terminalVisible$ = new BehaviorSubject(true);
   terminalAnimationState: Observable<string>;
@@ -93,35 +94,35 @@ export class TaskRunnerComponent implements AfterContentChecked {
       this.terminalVisible$,
       flagsVisible$
     ).pipe(
-      map(([terminalVisible, flagsVisible]) => {
+      startWith([this.terminalVisible$.value, true]),
+      map(([terminalVisible]) => {
         if (!terminalVisible) return 'shrink';
-        if (flagsVisible) return 'flags-visible';
-        const numFlags = this.flagsComponent.matExpansionPanels.length;
-        if (numFlags === 1) {
-          return 'grow-one-flag';
-        } else {
-          return 'grow-two-flag';
-        }
+        return 'grow';
       }),
       tap(v => {
         const numFlags = this.flagsComponent.matExpansionPanels.length;
-        const expansionPanelHeaderHeight = `${numFlags * 50 + 124}px`;
+        const configurations = this.flagsComponent.configurations;
+        const expansionPanelHeaderHeight =
+          numFlags === 1 ? `${129}px` : `${49 + 129}px`;
+        const configurationsHeight =
+          configurations && configurations.length > 1 ? '55px' : '0px';
+        console.log('configurationsHeight', configurationsHeight);
         switch (v) {
-          case 'flags-visible':
+          case 'grow':
             this.flagsComponent.viewportHeight.next(
-              `calc(70vh - ${expansionPanelHeaderHeight})`
+              `calc(70vh - ${expansionPanelHeaderHeight} - ${configurationsHeight})`
             );
-            break;
-          case 'grow-one-flag':
-            this.flagsComponent.viewportHeight.next('0');
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
-              `calc(100vh - ${expansionPanelHeaderHeight})`
+              `calc(100vh - ${expansionPanelHeaderHeight} - 45px)`
             );
             break;
+          default:
+            this.flagsComponent.viewportHeight.next(`0`);
         }
-      })
+      }),
+      shareReplay()
     );
   }
 }

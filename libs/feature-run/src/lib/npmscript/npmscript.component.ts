@@ -107,6 +107,7 @@ export class NpmScriptComponent implements OnInit {
     this.commandOutput$ = this.ngRun$.pipe(
       withLatestFrom(this.commandArray$, this.script$),
       tap(() => {
+        this.flags.hideFields();
         this.taskRunner.terminalVisible$.next(true);
       }),
       switchMap(([_, c, s]) => {

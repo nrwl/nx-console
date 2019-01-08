@@ -1,7 +1,3 @@
-<ui-entity-docs
-  [docs]="docs$ | async"
-  style="margin-left: 15px"
-></ui-entity-docs>
 <ui-task-runner
   *ngIf="(schematic$ | async) as schematic"
   [terminalWindowTitle]="
@@ -22,5 +18,12 @@
   </ui-command-output>
 </ui-task-runner>
 <ng-template #emptyMessage>
-  <ng-container> Click the Generate button to start this task. </ng-container>
+  <ui-entity-docs
+    *ngIf="(docs$ | async) as docks; else noDocs"
+    [docs]="docs$ | async"
+    style="margin-left: 15px"
+  ></ui-entity-docs>
+  <ng-template #noDocs>
+    Click the Generate button to start this task.
+  </ng-template>
 </ng-template>
