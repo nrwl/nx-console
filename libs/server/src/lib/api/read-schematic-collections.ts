@@ -55,20 +55,21 @@ function readSchematicCollections(
   basedir: string,
   collectionName: string
 ): SchematicCollection | null {
-  try {
-    const packageJson = readJsonFile(
-      path.join(collectionName, 'package.json'),
-      basedir
-    );
-    const collection = readJsonFile(
-      packageJson.json.schematics,
-      path.dirname(packageJson.path)
-    );
-    const schematicCollection = {
-      name: collectionName,
-      schematics: [] as Schematic[]
-    };
-    Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
+  const packageJson = readJsonFile(
+    path.join(collectionName, 'package.json'),
+    basedir
+  );
+  const collection = readJsonFile(
+    packageJson.json.schematics,
+    path.dirname(packageJson.path)
+  );
+  const schematicCollection = {
+    name: collectionName,
+    schematics: [] as Schematic[]
+  };
+
+  Object.entries(collection.json.schematics).forEach(([k, v]: [any, any]) => {
+    try {
       if (canAdd(k, v)) {
         const schematicSchema = readJsonFile(
           v.schema,
@@ -82,17 +83,19 @@ function readSchematicCollections(
           description: v.description
         });
       }
-    });
-    return schematicCollection;
-  } catch (e) {
-    // this happens when package is misconfigured. We decided to ignore such a case.
-    return null;
-  }
+    } catch (e) {
+      console.error(
+        `Invalid package.json for schematic ${collectionName}:${k}`
+      );
+    }
+  });
+
+  return schematicCollection;
 }
 
-function canAdd(
+export function canAdd(
   name: string,
-  s: { hidden: boolean; extends: string; schema: string }
+  s: { hidden: boolean; private: boolean; schema: string; extends: boolean }
 ): boolean {
-  return !s.hidden && !s.extends && !!s.schema && name !== 'ng-add';
+  return !s.hidden && !s.private && !s.extends && name !== 'ng-add';
 }
