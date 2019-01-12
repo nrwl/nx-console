@@ -16,6 +16,8 @@ function generateLib(lib) {
   if (!existsSync(generatedDirPath)) {
     mkdirSync(generatedDirPath);
   }
+
+  console.log('generate', resolve(__dirname, `libs/${lib}/src/lib/generated/graphql.ts`))
   return {
     output: resolve(__dirname, `libs/${lib}/src/lib/generated/graphql.ts`),
     config: {

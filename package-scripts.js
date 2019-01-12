@@ -37,16 +37,17 @@ module.exports = {
       serve: 'ng serve angular-console'
     },
     server: {
-      'gen-all': nps.series.nps(
-        'server.gen-graphql-types',
-        'server.gen-apollo-angular'
+      'gen': nps.series.nps(
+        'server.gen-apollo-angular',
+        'server.gen-graphql-types'
       ),
-      'gen-and-build': electronOrVscode(
-        nps.series.nps('server.gen-all', 'server.build.APPLICATION')
-      ),
-      build: electronOrVscode('ng build APPLICATION --prod --maxWorkers=4'),
       'gen-graphql-types': 'gql-gen --config codegen-server.yml',
-      'gen-apollo-angular': 'gql-gen --config codegen-client.js'
+      'gen-apollo-angular': 'gql-gen --config codegen-client.js',
+      build: electronOrVscode('ng build APPLICATION --prod --maxWorkers=4'),
+      'gen-and-build': electronOrVscode(
+        nps.series.nps('server.gen', 'server.build.APPLICATION')
+      ),
+      buildForServe: 'ng build electron'
     },
     mac: {
       clean: 'rm -rf dist',
@@ -104,7 +105,6 @@ module.exports = {
         vscode: 'copy README.md dist\\apps\\vscode\\README.md'
       },
       'electron-pack': 'electron-builder --win --dir -p never',
-      'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'start-server':
         'electron dist\\apps\\electron --server --port 4201 --inspect=9229',
       'start-electron': 'electron dist\\apps\\electron',
@@ -142,11 +142,11 @@ module.exports = {
       build: electronOrVscode(
         nps.concurrent.nps('server.gen-and-build.APPLICATION', 'frontend.build')
       ),
-      server: nps.series.nps(
+      gen: nps.series.nps(
         withPlatform('copy-schema.electron'),
-        'server.gen-and-build.electron',
-        withPlatform('start-server')
+        'server.gen'
       ),
+      server: nps.series.nps('server.buildForServe', withPlatform('start-server')),
       up: nps.concurrent.nps('dev.server', 'frontend.serve')
     },
     package: {
@@ -169,15 +169,9 @@ module.exports = {
       )
     },
     e2e: {
-      compile: 'tsc -p apps/angular-console-e2e/tsconfig.json',
-      'compile-watch': 'tsc -p apps/angular-console-e2e/tsconfig.json --watch',
       fixtures: 'node ./tools/scripts/set-up-e2e-fixtures.js',
-      cypress: `cypress run --project ./apps/angular-console-e2e --env projectsRoot=${__dirname +
-        '/tmp'} --record`,
-      'open-cypress': `cypress open --project ./apps/angular-console-e2e --env projectsRoot=${__dirname +
-        '/tmp'}`,
-      run: 'node ./tools/scripts/run-e2e.js',
-      up: nps.concurrent.nps('dev.up', 'e2e.compile-watch', 'e2e.open-cypress')
+      up: 'node ./tools/scripts/e2e.js --watch',
+      run: 'node ./tools/scripts/e2e.js --headless --record',
     },
     format: {
       default: nps.series.nps('format.write'),
@@ -196,7 +190,6 @@ module.exports = {
 module.exports.scripts.linux = {
   ...module.exports.scripts.mac,
   'electron-pack': 'electron-builder --linux --dir -p never',
-  'copy-to-osbuilds': 'cp -r dist/packages osbuilds/linux',
   'builder-prerelease': electronBuilder('--linux', 'never'),
   'builder-publish': electronBuilder('--linux', 'always')
 };
