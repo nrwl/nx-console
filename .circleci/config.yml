@@ -24,6 +24,7 @@ jobs:
             - /home/circleci/.cache/Cypress
           key: yarn-dependencies-{{ checksum "yarn.lock" }}
       - run: yarn start server.gen-all
+      - run: node ./tools/scripts/check-format.js
       - run: yarn start lint
       - run: yarn start test
       - run: yarn start e2e.fixtures
