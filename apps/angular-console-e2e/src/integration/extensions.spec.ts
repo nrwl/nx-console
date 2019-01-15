@@ -20,7 +20,6 @@ describe('Extensions', () => {
     whitelistGraphql();
     openProject(projectPath('proj-extensions'));
     goToExtensions();
-    cy.get('div.title').contains('Add CLI Extensions');
   });
 
   it('filters extensions', () => {
@@ -39,11 +38,9 @@ describe('Extensions', () => {
 
   it('adds an extension', () => {
     clickOnTask('Available Extensions', '@angular/material', false);
-    cy.get('div.context-title').contains('@angular/material');
+    cy.contains('div.context-title', '@angular/material');
 
-    cy.get('button')
-      .contains('Add')
-      .click();
+    cy.contains('button', 'Add').click();
 
     checkDisplayedCommand(`ng add @angular/material`);
 
@@ -51,7 +48,7 @@ describe('Extensions', () => {
 
     goBack();
 
-    cy.get('div.title').contains('Add CLI Extensions');
+    cy.contains('div.title', 'Add CLI Extensions');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Available Extensions');
     });

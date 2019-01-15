@@ -19,7 +19,7 @@ describe('Generate', () => {
     whitelistGraphql();
     openProject(projectPath('proj'));
     goToGenerate();
-    cy.get('div.title').contains('Generate Code');
+    cy.contains('div.title', 'Generate Code');
   });
 
   it('filters schematics', () => {
@@ -54,19 +54,13 @@ describe('Generate', () => {
 
   it('runs a schematic', () => {
     clickOnTask('@schematics/angular', 'service');
-    cy.get('div.context-title').contains('@schematics/angular - service');
+    cy.contains('div.context-title', '@schematics/angular - service');
 
     const name = uniqName('example');
     cy.get('input[name="name"]').type(name);
     cy.get('input[name="project"]').type('proj');
 
-    cy.wait(100);
-
-    cy.get('button')
-      .contains('Generate')
-      .click();
-
-    cy.wait(100);
+    cy.contains('button', 'Generate').click();
 
     checkDisplayedCommand(
       `ng generate @schematics/angular:service ${name} --project=proj`
@@ -76,7 +70,7 @@ describe('Generate', () => {
 
     goBack();
 
-    cy.get('div.title').contains('Generate Code');
+    cy.contains('div.title', 'Generate Code');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('@schematics/angular');
     });

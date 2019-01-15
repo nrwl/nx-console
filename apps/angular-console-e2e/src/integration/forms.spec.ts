@@ -18,10 +18,10 @@ describe('Forms', () => {
     whitelistGraphql();
     openProject(projectPath('proj'));
     goToGenerate();
-    cy.get('div.title').contains('Generate Code');
+    cy.contains('div.title', 'Generate Code');
 
     clickOnTask('@schematics/angular', 'component');
-    cy.get('div.context-title').contains('@schematics/angular - component');
+    cy.contains('div.context-title', '@schematics/angular - component');
   });
 
   it('supports basic validations', () => {

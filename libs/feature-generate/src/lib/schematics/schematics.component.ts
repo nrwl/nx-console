@@ -9,7 +9,8 @@ import {
   map,
   shareReplay,
   startWith,
-  switchMap
+  switchMap,
+  tap
 } from 'rxjs/operators';
 import { SCHEMATICS_POLLING } from '@angular-console/utils';
 import { SchematicCollectionsGQL } from '../generated/graphql';
