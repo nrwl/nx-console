@@ -98,7 +98,7 @@ describe('Tasks', () => {
     whitelistGraphql();
     openProject(projectPath('proj'));
     goToTasks();
-    cy.get('div.title').contains('Tasks');
+    cy.contains('div.title', 'Tasks');
   });
 
   it('filters tasks', () => {
@@ -140,38 +140,29 @@ describe('Tasks', () => {
 
     clickOnTask('proj', 'build');
 
-    cy.get('div.context-title').contains('ng build proj');
+    cy.contains('div.context-title', 'ng build proj');
 
     checkDisplayedCommand('ng build proj');
 
-    cy.get('mat-radio-button')
-      .contains('Production')
-      .click();
+    cy.contains('mat-radio-button', 'Production').click();
     checkDisplayedCommand('ng build proj --configuration=production');
 
-    cy.get('mat-radio-button')
-      .contains('Default')
-      .click();
+    cy.contains('mat-radio-button', 'Default').click();
     checkDisplayedCommand('ng build proj');
 
-    cy.get('button')
-      .contains('Run')
-      .click();
+    cy.contains('button', 'Run').click();
 
-    cy.get('div.js-status-build-success', { timeout: 120000 }).contains(
-      'Build completed'
-    );
-    cy.get('div.js-status-build-folder', { timeout: 120000 }).contains(
-      'is ready'
-    );
+    cy.contains('div.js-status-build-success', 'Build completed', {
+      timeout: 120000
+    });
+    cy.contains('div.js-status-build-folder', 'is ready', { timeout: 120000 });
 
-    waitForActionToComplete();
     checkFileExists(`dist/proj/main.js`);
     checkActionBarHidden();
 
     goBack();
 
-    cy.get('div.title').contains('Tasks');
+    cy.contains('div.title', 'Tasks');
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
@@ -182,13 +173,11 @@ describe('Tasks', () => {
     });
 
     clickOnTask('proj', 'lint');
-    cy.get('div.context-title').contains('ng lint proj');
+    cy.contains('div.context-title', 'ng lint proj');
 
     checkDisplayedCommand('ng lint proj');
 
-    cy.get('button')
-      .contains('Run')
-      .click();
+    cy.contains('button', 'Run').click();
 
     checkActionBarHidden();
 
@@ -196,7 +185,7 @@ describe('Tasks', () => {
 
     goBack();
 
-    cy.get('div.title').contains('Tasks');
+    cy.contains('div.title', 'Tasks');
 
     checkMultipleRecentTasks({
       numTasks: 2,
@@ -221,17 +210,15 @@ describe('Tasks', () => {
 
   it('runs an npm script', () => {
     clickOnTask('package.json scripts', 'build');
-    cy.get('div.context-title').contains('run build');
+    cy.contains('div.context-title', 'run build');
 
     checkDisplayedCommand('yarn run build');
 
-    cy.get('button')
-      .contains('Run')
-      .click();
+    cy.contains('button', 'Run').click();
 
     goBack();
 
-    cy.get('div.title').contains('Tasks');
+    cy.contains('div.title', 'Tasks');
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });

@@ -11,7 +11,7 @@ describe('Projects', () => {
   beforeEach(() => {
     whitelistGraphql();
     openProject(projectPath('proj'));
-    cy.get('div.title').contains('Projects');
+    cy.contains('div.title', 'Projects');
   });
 
   it('shows projects screen', () => {
@@ -25,10 +25,9 @@ describe('Projects', () => {
   });
 
   // it('checks that hot actions work', () => {
-  //   cy.get('button')
-  //     .contains('Generate Service')
+  //   cy.contains('button', 'Generate Service')
   //     .click();
-  //   cy.get('div.context-title').contains('@schematics/angular - service');
+  //   cy.contains('div.context-title', '@schematics/angular - service');
   //   cy.get('input[name="project"]').should(($p: any) => {
   //     expect($p[0].value).to.equal('proj');
   //   });

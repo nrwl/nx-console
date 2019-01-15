@@ -17,9 +17,7 @@ export function whitelistGraphql() {
 }
 
 export function clickOnFieldGroup(group: string) {
-  cy.get('mat-expansion-panel-header')
-    .contains(group)
-    .click();
+  cy.contains('mat-expansion-panel-header', group).click();
 }
 
 export function checkMessage(error: string) {
@@ -27,9 +25,7 @@ export function checkMessage(error: string) {
 }
 
 export function goBack() {
-  cy.get('mat-icon')
-    .contains('clear')
-    .click();
+  cy.contains('mat-icon', 'clear').click();
 }
 
 export function checkButtonIsDisabled(text: string, disabled: boolean) {
@@ -89,21 +85,21 @@ export function projectNames(callback: (s: any) => void) {
 
 export function goToGenerate() {
   cy.get('button#go-to-generate').click({ force: true });
-  waitForAnimation();
+  cy.contains('.title', 'Generate Code');
 }
 
 export function goToExtensions() {
   cy.get('button#go-to-extensions').click({ force: true });
-  waitForAnimation();
+  cy.contains('.title', 'Add CLI Extensions');
 }
 
 export function goToTasks() {
   cy.get('button#go-to-tasks').click({ force: true });
-  waitForAnimation();
+  cy.contains('.title', 'Tasks');
 }
 
 export function taskListHeaders(callback: (s: any) => void) {
-  cy.get('mat-nav-list.task-list').within(() => {
+  cy.get('mat-nav-list.task-list', { timeout: 5000 }).within(() => {
     cy.root()
       .find('h3.mat-subheader', { timeout: 5000 })
       .should(callback);
@@ -141,7 +137,7 @@ export function clickOnTask(
       }
     }
   });
-  waitForAnimation();
+  cy.wait(400);
 }
 
 export function selectFolder() {
@@ -153,7 +149,7 @@ export function selectFolder() {
 }
 
 export function waitForAnimation() {
-  cy.wait(400);
+  cy.get('.ng-animating', { timeout: 3000 }).should('not.exist');
 }
 
 export function waitForAutocomplete() {
@@ -161,12 +157,10 @@ export function waitForAutocomplete() {
 }
 
 export function waitForActionToComplete() {
-  cy.wait(100); // this is to give the app time ot disable the button first
+  cy.get('button.action-button').should('be.disabled');
   cy.get('button.action-button:enabled[color="primary"]', {
     timeout: 120000
-  }).should($p => {
-    expect($p.length).to.equal(1);
-  });
+  }).should('have.length', 1);
 }
 
 export function autocompletion(callback: (s: any) => void) {
@@ -177,8 +171,12 @@ export function autocompletion(callback: (s: any) => void) {
   });
 }
 
-export function checkFileExists(f: string, projName: string = 'proj') {
-  return cy.readFile(path.join(`./../../tmp/${projName}/`, f));
+export function checkFileExists(
+  f: string,
+  projName: string = 'proj',
+  options?: Partial<Cypress.Timeoutable & Cypress.Loggable>
+) {
+  return cy.readFile(path.join(`./../../tmp/${projName}/`, f), options);
 }
 
 export function uniqName(prefix: string): string {
