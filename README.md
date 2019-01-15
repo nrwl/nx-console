@@ -10,6 +10,19 @@
 [![Build Status](https://circleci.com/gh/nrwl/angular-console/tree/master.png)](https://circleci.com/gh/nrwl/angular-console/tree/master)
 [![License](https://img.shields.io/npm/l/@nrwl/schematics.png)](https://opensource.org/licenses/MIT)
 
+<hr>
+<p align="center">
+  <a href="https://hubs.ly/H0g97pW0" style="display: block; padding: 1rem 0 2rem 0;" target="_blank">  
+    <img 
+         width="728" 
+         height="90" 
+         src="https://images.ctfassets.net/8eyogtwep6d2/77nvAJVU9yTDmbUj2zjqS5/3cae7d978f6502fffd0130a5644bb055/monorepo-book-banner_2x.jpg?w=728" 
+         srcset="https://images.ctfassets.net/8eyogtwep6d2/77nvAJVU9yTDmbUj2zjqS5/3cae7d978f6502fffd0130a5644bb055/monorepo-book-banner_2x.jpg 2x" 
+         alt="Our Newest Enterprise Angular Book">
+  </a>
+</p>
+<hr>
+
 # What is Angular Console?
 
 Angular CLI transformed the Angular ecosystem. We no longer have to spend time maintaining our webpack configurations, figuring out how to make tests run, fixing source maps — the CLI does this for us. It also helps us enforce consistent development practices by generating components, services, and state management modules. Since the CLI does so much, it can be intimidating and hard to learn. Most developers only use a fraction of the CLI's capabilities.
