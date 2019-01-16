@@ -19,7 +19,7 @@ function against(affectedCommand) {
 function electronBuilder(platform, dashP, extraFlags) {
   return `electron-builder ${platform} -p ${dashP} ${
     extraFlags ? extraFlags : ''
-  }`;
+    }`;
 }
 
 const ELECTRON_BUNDLE_PATH = join('dist', 'apps', 'electron');
@@ -56,14 +56,14 @@ module.exports = {
         nps.concurrent({
           'ng-cmd': `shx cp ${assetMappings['ng-cmd'].from} ${
             assetMappings['ng-cmd'].to
-          }`,
+            }`,
 
           schema: `shx cp ${assetMappings['schema'].from} ${
             assetMappings['schema'].to
-          }`,
+            }`,
           readme: `shx cp ${assetMappings['readme'].from} ${
             assetMappings['readme'].to
-          }`,
+            }`,
           cli: 'node ./tools/scripts/patch-cli.js'
         })
       ),
@@ -77,8 +77,8 @@ module.exports = {
         start: `electron ${ELECTRON_BUNDLE_PATH} --server --port 4201 --inspect=9229`,
         gen: electronOrVscode(
           nps.series(
-            'gql-gen --config codegen-server.yml',
-            'gql-gen --config codegen-client.js',
+            'gql-gen --config ./tools/scripts/codegen-server.yml',
+            'gql-gen --config ./tools/scripts/codegen-client.js',
             'ng build APPLICATION --prod --maxWorkers=4'
           )
         ),
@@ -122,7 +122,7 @@ module.exports = {
         `shx rm -rf ${assetMappings['node-pty-prebuilt'].to}]`,
         `shx cp -rf ${assetMappings['node-pty-prebuilt'].from} ${
           assetMappings['node-pty-prebuilt'].to
-        }`,
+          }`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
       )
     },
@@ -148,7 +148,7 @@ module.exports = {
       prepare: nps.concurrent.nps('e2e.build', 'e2e.fixtures'),
       up: 'node ./tools/scripts/e2e.js --watch',
       headless: 'node ./tools/scripts/e2e.js --headless',
-      ci: 'node ./tools/scripts/e2e.js --headless --record'
+      ci: 'node ./tools/scripts/e2e.js --headless'
     },
     format: {
       default: 'nx format:write',
@@ -189,7 +189,7 @@ module.exports = {
           : os.platform() === 'darwin'
           ? 'mac'
           : 'linux'
-      } --dir -p never`
+        } --dir -p never`
     }
   }
 };

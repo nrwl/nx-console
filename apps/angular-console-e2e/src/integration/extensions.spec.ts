@@ -36,35 +36,36 @@ describe('Extensions', () => {
     });
   });
 
-  it('adds an extension', () => {
-    clickOnTask('Available Extensions', '@angular/material', false);
-    cy.contains('div.context-title', '@angular/material');
+  // TODO reenable the test
+  // xit('adds an extension', () => {
+  //   clickOnTask('Available Extensions', '@angular/material', false);
+  //   cy.contains('div.context-title', '@angular/material');
+  //
+  //   cy.contains('button', 'Add').click();
+  //
+  //   checkDisplayedCommand(`ng add @angular/material`);
+  //
+  //   waitForActionToComplete();
+  //
+  //   goBack();
+  //
+  //   cy.contains('div.title', 'Add CLI Extensions');
+  //   taskListHeaders($p => {
+  //     expect(texts($p)[0]).to.equal('Available Extensions');
+  //   });
+  //   waitForAnimation();
+  //
+  //   // check that the schematics added by angular material are available
+  //   goToGenerate();
+  //   cy.wait(300); // Needed to de-flake this test
+  //   taskListHeaders($p => {
+  //     expect(texts($p)[1]).to.equal('@angular/material');
+  //   });
+  // });
 
-    cy.contains('button', 'Add').click();
-
-    checkDisplayedCommand(`ng add @angular/material`);
-
-    waitForActionToComplete();
-
-    goBack();
-
-    cy.contains('div.title', 'Add CLI Extensions');
-    taskListHeaders($p => {
-      expect(texts($p)[0]).to.equal('Available Extensions');
-    });
-    waitForAnimation();
-
-    // check that the schematics added by angular material are available
-    goToGenerate();
-    cy.wait(300); // Needed to de-flake this test
-    taskListHeaders($p => {
-      expect(texts($p)[1]).to.equal('@angular/material');
-    });
-  });
-
-  after(() => {
-    cy.visit('/workspaces');
-    openProject(projectPath('proj'));
-    clearAllRecentTasks();
-  });
+  // after(() => {
+  //   cy.visit('/workspaces');
+  //   openProject(projectPath('proj'));
+  //   clearAllRecentTasks();
+  // });
 });

@@ -1,4 +1,4 @@
-import { normalizeSchema, readJsonFile } from '../utils';
+import { normalizeSchema, readJsonFile } from '../utils/utils';
 import { Project, Architect } from '../generated/graphql-types';
 import * as path from 'path';
 

@@ -10,7 +10,7 @@ import {
   ViewColumn
 } from 'vscode';
 
-import { startServer } from './app/express-server.factory';
+import { startServer } from './app/start-server';
 import { createWebViewPanel } from './app/webview.factory';
 
 let server: Server | undefined;
@@ -45,7 +45,7 @@ async function main(
   webViewPanel = createWebViewPanel(
     context,
     viewColumn,
-    `http://localhost:${server.address().port}/${getWorkspaceRoute()}`
+    `http://localhost:${server!.address().port}/${getWorkspaceRoute()}`
   );
   context.subscriptions.push(webViewPanel);
   webViewPanel.onDidDispose(() => {

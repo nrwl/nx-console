@@ -1,7 +1,6 @@
 /* tslint:disable */
 import {
   readSettings,
-  start,
   storeSettings,
   Telemetry
 } from '@angular-console/server';
@@ -10,8 +9,7 @@ import { autoUpdater } from 'electron-updater';
 import { statSync } from 'fs';
 import * as path from 'path';
 import { platform } from 'os';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
-import { startServer } from './app/express-server.factory';
+import { startServer } from './app/start-server';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');

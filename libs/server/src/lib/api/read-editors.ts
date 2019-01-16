@@ -2,7 +2,7 @@ import { exec, execSync, spawn } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 
-import { exists, findExecutable, hasExecutable } from '../utils';
+import { exists, findExecutable, hasExecutable } from '../utils/utils';
 
 export function readEditors() {
   const editors: { name: Editor; icon: string }[] = [];

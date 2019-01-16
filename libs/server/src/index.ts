@@ -1,8 +1,8 @@
 export { readSettings, storeSettings } from './lib/api/read-settings';
 
-export { start } from './lib/server';
+export { createServerModule } from './lib/server.module';
 
-export { Telemetry } from './lib/telemetry';
+export { Telemetry } from './lib/utils/telemetry';
 
 export {
   PseudoTerminal,
@@ -10,4 +10,5 @@ export {
   PseudoTerminalFactory,
   nodePtyPseudoTerminalFactory
 } from './lib/api/run-command';
-export { SelectDirectory } from './lib/resolvers';
+
+export { SelectDirectory } from './lib/types';

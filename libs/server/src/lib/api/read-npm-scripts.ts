@@ -1,4 +1,4 @@
-import { fileExistsSync } from '../utils';
+import { fileExistsSync } from '../utils/utils';
 import * as path from 'path';
 
 export function readNpmScripts(
