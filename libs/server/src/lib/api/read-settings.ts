@@ -1,18 +1,8 @@
 import { Store } from '@nrwl/angular-console-enterprise-electron';
-
-interface Settings {
-  canCollectData?: boolean;
-  recent?: [];
-  installNodeManually?: boolean;
-  enableDetailedStatus?: boolean;
-  channel?: string;
-  isConnectUser?: boolean;
-  workspaceSchematicsDirectory: string;
-  workspaceSchematicsNpmScript: string;
-}
+import { Settings } from '../generated/graphql-types';
 
 /* tslint:disable */
-export function readSettings(store: Store) {
+export function readSettings(store: Store): Settings {
   const settings: Settings = store.get('settings') || {};
   if (settings.canCollectData === undefined) {
     settings.canCollectData = store.get('canCollectData', false);

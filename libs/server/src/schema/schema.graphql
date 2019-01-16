@@ -55,7 +55,7 @@ type InstallNodeJsStatus {
   error: String
 }
 
-type Database {
+type Query {
   settings: Settings!
   schematicCollections: [SchematicCollectionForNgNew!]!
   workspace(path: String!): Workspace!
@@ -236,6 +236,8 @@ type Settings {
   enableDetailedStatus: Boolean
   channel: String
   recent: [WorkspaceDefinition]
+  workspaceSchematicsDirectory: String
+  workspaceSchematicsNpmScript: String
 }
 
 type Workspace {
@@ -263,9 +265,4 @@ type Doc {
   prop: String
   description: String
   id: String!
-}
-
-schema {
-  query: Database
-  mutation: Mutation
 }

@@ -8,6 +8,7 @@ const path = require('path');
 
 patch(`./dist/apps/electron/node_modules/@angular/cli/lib/cli/index.js`);
 patch(`./dist/apps/vscode/node_modules/@angular/cli/lib/cli/index.js`);
+patch(`./node_modules/@angular/cli/lib/cli/index.js`);
 
 try {
   fs.readdirSync('./dist/packages').forEach(dir => {

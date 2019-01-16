@@ -1,9 +1,9 @@
-import { readJsonFile } from '../utils';
+import { readJsonFile } from '../utils/utils';
 import {
   getProjectArchitect,
   SUPPORTED_KARMA_TEST_BUILDERS,
   SUPPORTED_NG_BUILD_BUILDERS
-} from '../architect-utils';
+} from '../utils/architect-utils';
 import { join } from 'path';
 
 export enum StatusType {

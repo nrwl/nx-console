@@ -6,43 +6,15 @@ import {
   listFiles,
   listOfUnnestedNpmPackages,
   normalizeSchema,
-  readJsonFile,
-  SchematicDefaults
-} from '../utils';
-
-interface SchematicCollection {
-  name: string;
-  schematics: Schematic[];
-}
-
-interface SchematicCollectionDefaults {
-  [collectionName: string]: {
-    [schematicName: string]: SchematicDefaults;
-  };
-}
-interface Schematic {
-  collection: string;
-  name: string;
-  description: string;
-  npmClient: string | null;
-  npmScript: string | null;
-  schema: {
-    name: string;
-    type: string;
-    description: string;
-    defaultValue: string;
-    required: boolean;
-    positional: boolean;
-    enum: string[];
-    completion: 'module' | 'file' | 'project' | undefined;
-  }[];
-}
+  readJsonFile
+} from '../utils/utils';
+import { Schematic, SchematicCollection } from '../generated/graphql-types';
 
 export function readAllSchematicCollections(
   basedir: string,
   workspaceSchematicsPath: string,
   workspaceSchematicsNpmScript: string
-) {
+): SchematicCollection[] {
   const npmClient = fileExistsSync(path.join(basedir, 'yarn.lock'))
     ? 'yarn'
     : 'npm';
@@ -60,22 +32,23 @@ export function readAllSchematicCollections(
     ];
   }
   return collections.filter(
-    collection => !!collection && collection.schematics.length > 0
-  );
+    collection => !!collection && collection!.schematics!.length > 0
+  ) as any;
 }
 
-function readAngularJsonDefaults(basedir: string): SchematicCollectionDefaults {
+function readAngularJsonDefaults(basedir: string): any {
   const defaults = readJsonFile('angular.json', basedir).json.schematics;
-  const collectionDefaults: SchematicCollectionDefaults = Object.keys(
-    defaults
-  ).reduce((collectionDefaultsMap: SchematicCollectionDefaults, key) => {
-    const [collectionName, schematicName] = key.split(':');
-    if (!collectionDefaultsMap[collectionName]) {
-      collectionDefaultsMap[collectionName] = {};
-    }
-    collectionDefaultsMap[collectionName][schematicName] = defaults[key];
-    return collectionDefaultsMap;
-  }, {});
+  const collectionDefaults = Object.keys(defaults).reduce(
+    (collectionDefaultsMap: any, key) => {
+      const [collectionName, schematicName] = key.split(':');
+      if (!collectionDefaultsMap[collectionName]) {
+        collectionDefaultsMap[collectionName] = {};
+      }
+      collectionDefaultsMap[collectionName][schematicName] = defaults[key];
+      return collectionDefaultsMap;
+    },
+    {}
+  );
   return collectionDefaults;
 }
 

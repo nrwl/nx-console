@@ -1,7 +1,7 @@
 import { Commands } from './commands';
-import { readJsonFile } from '../utils';
+import { readJsonFile } from '../utils/utils';
 import { createDetailedStatusCalculator } from './detailed-status-calculator';
-import { normalizeCommands } from '../architect-utils';
+import { normalizeCommands } from '../utils/architect-utils';
 
 let commandRunIndex = 0;
 

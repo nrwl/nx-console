@@ -1,4 +1,4 @@
-import { normalizeSchema } from '../utils';
+import { normalizeSchema } from '../utils/utils';
 
 export function schematicCollectionsForNgNew() {
   return [
