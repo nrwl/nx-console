@@ -37,7 +37,7 @@ module.exports = {
       serve: 'ng serve angular-console'
     },
     server: {
-      'gen': nps.series.nps(
+      gen: nps.series.nps(
         'server.gen-apollo-angular',
         'server.gen-graphql-types'
       ),
@@ -62,7 +62,7 @@ module.exports = {
         'cp -rf dist/apps/angular-console dist/apps/APPLICATION/assets/public'
       ),
       'copy-schema': electronOrVscode(
-        'cp libs/server/src/schema/schema.graphql apps/APPLICATION/src/assets/schema.graphql'
+        'cp libs/server/src/schema/schema.graphql dist/apps/APPLICATION/assets/schema.graphql'
       ),
       'copy-readme': {
         vscode: 'cp README.md dist/apps/vscode/README.md'
@@ -99,7 +99,7 @@ module.exports = {
           'robocopy dist\\apps\\angular-console dist\\apps\\vscode\\assets\\angular-console /e || echo 0'
       },
       'copy-schema': electronOrVscode(
-        'copy libs\\server\\src\\schema\\schema.graphql apps\\electron\\src\\assets\\schema.graphql'
+        'copy libs\\server\\src\\schema\\schema.graphql dist\\apps\\APPLICATION\\assets\\schema.graphql'
       ),
       'copy-readme': {
         vscode: 'copy README.md dist\\apps\\vscode\\README.md'
@@ -142,11 +142,11 @@ module.exports = {
       build: electronOrVscode(
         nps.concurrent.nps('server.gen-and-build.APPLICATION', 'frontend.build')
       ),
-      gen: nps.series.nps(
-        withPlatform('copy-schema.electron'),
-        'server.gen'
+      gen: nps.series.nps(withPlatform('copy-schema.electron'), 'server.gen'),
+      server: nps.series.nps(
+        'server.buildForServe',
+        withPlatform('start-server')
       ),
-      server: nps.series.nps('server.buildForServe', withPlatform('start-server')),
       up: nps.concurrent.nps('dev.server', 'frontend.serve')
     },
     package: {
@@ -171,7 +171,7 @@ module.exports = {
     e2e: {
       fixtures: 'node ./tools/scripts/set-up-e2e-fixtures.js',
       up: 'node ./tools/scripts/e2e.js --watch',
-      run: 'node ./tools/scripts/e2e.js --headless --record',
+      run: 'node ./tools/scripts/e2e.js --headless --record'
     },
     format: {
       default: nps.series.nps('format.write'),

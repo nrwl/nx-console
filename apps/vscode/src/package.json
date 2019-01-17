@@ -30,13 +30,18 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.angular-console"
+    "onCommand:extension.angular-console",
+    "onCommand:extension.angular-console-active-panel"
   ],
   "contributes": {
     "commands": [
       {
         "command": "extension.angular-console",
-        "title": "Angular Console"
+        "title": "Angular Console (Side Panel)"
+      },
+      {
+        "command": "extension.angular-console-active-panel",
+        "title": "Angular Console (Active Panel)"
       }
     ]
   },
