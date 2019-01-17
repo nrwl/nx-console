@@ -1,10 +1,10 @@
 import {
   PseudoTerminalFactory,
   PseudoTerminalConfig,
-  nodePtyPseudoTerminalFactory,
+  nodePtyPseudoTerminalFactory as win32PseudoTerminalFactory,
   PseudoTerminal
 } from '@angular-console/server';
-import { ExtensionContext, window } from 'vscode';
+import { ExtensionContext, window, Terminal } from 'vscode';
 import { platform } from 'os';
 
 const AC_SUCCESS = 'Process completed 🙏';
@@ -15,23 +15,27 @@ export function getPseudoTerminalFactory(
 ): PseudoTerminalFactory {
   return config => {
     if (platform() === 'win32') {
-      return nodePtyPseudoTerminalFactory(config);
+      return win32PseudoTerminalFactory(config);
     }
-    return vscodePseudoTerminalFactory(context, config);
+    return unixPseudoTerminalFactory(context, config);
   };
 }
 
-function vscodePseudoTerminalFactory(
+function unixPseudoTerminalFactory(
   context: ExtensionContext,
   { name, program, args, cwd, displayCommand }: PseudoTerminalConfig
 ): PseudoTerminal {
-  const terminal = window.createTerminal(name);
-  context.subscriptions.push(terminal);
-
   const fullCommand =
     `cd ${cwd} &&` +
     `${program} ${args.join(' ')} && echo "\n\r${AC_SUCCESS}"` +
     ` || echo "\n\r${AC_FAILURE}"`;
+
+  const terminal = window.createTerminal(name, '/bin/bash', [
+    '-c',
+    fullCommand
+  ]);
+
+  context.subscriptions.push(terminal);
 
   terminal.sendText(fullCommand);
 
