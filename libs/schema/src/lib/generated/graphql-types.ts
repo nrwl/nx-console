@@ -56,6 +56,8 @@ export interface WorkspaceDefinition {
   name: string;
 
   favorite?: Maybe<boolean>;
+
+  pinnedProjectNames?: Maybe<string[]>;
 }
 
 export interface SchematicCollectionForNgNew {
@@ -715,6 +717,12 @@ export namespace WorkspaceDefinitionResolvers {
     name?: NameResolver<string, TypeParent, Context>;
 
     favorite?: FavoriteResolver<Maybe<boolean>, TypeParent, Context>;
+
+    pinnedProjectNames?: PinnedProjectNamesResolver<
+      Maybe<string[]>,
+      TypeParent,
+      Context
+    >;
   }
 
   export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
@@ -729,6 +737,11 @@ export namespace WorkspaceDefinitionResolvers {
   >;
   export type FavoriteResolver<
     R = Maybe<boolean>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type PinnedProjectNamesResolver<
+    R = Maybe<string[]>,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

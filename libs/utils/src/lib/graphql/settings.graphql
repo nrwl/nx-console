@@ -9,6 +9,7 @@ query Settings {
       path
       name
       favorite
+      pinnedProjectNames
     }
   }
 }
