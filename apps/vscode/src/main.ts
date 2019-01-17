@@ -6,7 +6,8 @@ import {
   ExtensionContext,
   WebviewPanel,
   window,
-  workspace
+  workspace,
+  ViewColumn
 } from 'vscode';
 
 import { startServer } from './app/express-server.factory';
@@ -19,19 +20,31 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand('extension.angular-console', () => main(context))
   );
+  context.subscriptions.push(
+    commands.registerCommand('extension.angular-console-active-panel', () =>
+      main(context, ViewColumn.Active)
+    )
+  );
 }
 
-async function main(context: ExtensionContext) {
+async function main(
+  context: ExtensionContext,
+  viewColumn: ViewColumn = ViewColumn.Beside
+) {
   if (!server) {
     server = await startServer(context);
   }
 
+  if (window.activeTerminal) {
+    window.activeTerminal.hide();
+  }
   if (webViewPanel) {
     return webViewPanel.reveal();
   }
 
   webViewPanel = createWebViewPanel(
     context,
+    viewColumn,
     `http://localhost:${server.address().port}/${getWorkspaceRoute()}`
   );
   context.subscriptions.push(webViewPanel);

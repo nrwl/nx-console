@@ -1,14 +1,15 @@
-import { ViewColumn, window, ExtensionContext, Uri, Terminal } from 'vscode';
+import { ViewColumn, window, ExtensionContext, Uri } from 'vscode';
 import { join } from 'path';
 
 export function createWebViewPanel(
   context: ExtensionContext,
+  viewColumn: ViewColumn,
   iframeUrl: string
 ) {
   const panel = window.createWebviewPanel(
     'angular-console', // Identifies the type of the webview. Used internally
     'Angular Console', // Title of the panel displayed to the user
-    ViewColumn.Beside, // Editor column to show the new webview panel in.
+    viewColumn, // Editor column to show the new webview panel in.
     {
       retainContextWhenHidden: true,
       enableScripts: true
