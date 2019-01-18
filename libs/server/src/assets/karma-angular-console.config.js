@@ -2,7 +2,7 @@
  * This configuration normalizes the one provided by user to ensure we can track the output correctly.
  */
 
-module.exports = function(config: any) {
+module.exports = function(config) {
   const originalConfigPath =
     process.env.ANGULAR_CONSOLE_ORIGINAL_KARMA_CONFIG_PATH;
   if (originalConfigPath) {
@@ -10,7 +10,7 @@ module.exports = function(config: any) {
 
     original(config);
 
-    const reporters: any[] = _getArrayValue('reporters', config);
+    const reporters = _getArrayValue('reporters', config);
     const filteredReporters = reporters.filter(r => r !== 'dots'); // Don't allow dots report to mess up reporting.
 
     config.set({
@@ -22,7 +22,7 @@ module.exports = function(config: any) {
   }
 };
 
-function _getArrayValue(name: string, config: any) {
+function _getArrayValue(name, config) {
   const value = config[name];
   return Array.isArray(value) ? value : (value || '').split(',');
 }

@@ -19,7 +19,7 @@ function against(affectedCommand) {
 function electronBuilder(platform, dashP, extraFlags) {
   return `electron-builder ${platform} -p ${dashP} ${
     extraFlags ? extraFlags : ''
-    }`;
+  }`;
 }
 
 const ELECTRON_BUNDLE_PATH = join('dist', 'apps', 'electron');
@@ -39,9 +39,9 @@ const assetMappings = {
       'Release'
     )
   },
-  schema: {
-    from: join('libs', 'server', 'src', 'schema', 'schema.graphql'),
-    to: join(APPLICATION_BUNDLE_PATH, 'assets', 'schema.graphql')
+  'server-assets': {
+    from: join('libs', 'server', 'src', 'assets', '*'),
+    to: join(APPLICATION_BUNDLE_PATH, 'assets')
   },
   readme: {
     from: 'README.md',
@@ -56,14 +56,13 @@ module.exports = {
         nps.concurrent({
           'ng-cmd': `shx cp ${assetMappings['ng-cmd'].from} ${
             assetMappings['ng-cmd'].to
-            }`,
-
-          schema: `shx cp ${assetMappings['schema'].from} ${
-            assetMappings['schema'].to
-            }`,
+          }`,
+          'server-assets': `shx cp -rf ${assetMappings['server-assets'].from} ${
+            assetMappings['server-assets'].to
+          }`,
           readme: `shx cp ${assetMappings['readme'].from} ${
             assetMappings['readme'].to
-            }`,
+          }`,
           cli: 'node ./tools/scripts/patch-cli.js'
         })
       ),
@@ -122,9 +121,13 @@ module.exports = {
         `shx rm -rf ${assetMappings['node-pty-prebuilt'].to}]`,
         `shx cp -rf ${assetMappings['node-pty-prebuilt'].from} ${
           assetMappings['node-pty-prebuilt'].to
-          }`,
+        }`.replace(/APPLICATION/g, 'vscode'),
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
-      )
+      ),
+      ci: nps.concurrent({
+        // electron: electronBuilder('--mac --linux', 'never'),
+        vscode: 'nps package.vscode'
+      })
     },
     publish: {
       // NOTE: This command should be run on a mac with Parallels installed
@@ -189,7 +192,7 @@ module.exports = {
           : os.platform() === 'darwin'
           ? 'mac'
           : 'linux'
-        } --dir -p never`
+      } --dir -p never`
     }
   }
 };
