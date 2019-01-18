@@ -38,7 +38,7 @@ export function readAllSchematicCollections(
 
 function readAngularJsonDefaults(basedir: string): any {
   const defaults = readJsonFile('angular.json', basedir).json.schematics;
-  const collectionDefaults = Object.keys(defaults).reduce(
+  const collectionDefaults = Object.keys(defaults ? defaults : {}).reduce(
     (collectionDefaultsMap: any, key) => {
       const [collectionName, schematicName] = key.split(':');
       if (!collectionDefaultsMap[collectionName]) {
