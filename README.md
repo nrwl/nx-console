@@ -66,12 +66,23 @@ Pick one of the issues from the [good first issue](https://github.com/nrwl/angul
 
 ## Core Team
 
-| Dan Muller                                                                                      | Victor Savkin                                                                                         | Jack Hsu                                                                                       | Wassim Chegham                                                                                         | Kamil Kisiela                                                                |
-| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| ![Dan Muller](https://raw.githubusercontent.com/nrwl/angular-console/master/static/dan_pic.jpg) | ![Victor Savkin](https://raw.githubusercontent.com/nrwl/angular-console/master/static/victor_pic.jpg) | ![Jack Hsu](https://raw.githubusercontent.com/nrwl/angular-console/master/static/jack_pic.jpg) | ![Wassim Chegham](https://raw.githubusercontent.com/nrwl/angular-console/master/static/wassim_pic.jpg) | ![Kamil Kisiela](https://avatars1.githubusercontent.com/u/8167190?s=150&v=4) |
-| [mrmeku](https://github.com/mrmeku)                                                             | [vsavkin](https://github.com/vsavkin)                                                                 | [jaysoo](https://github.com/jaysoo)                                                            | [manekinekko](https://github.com/manekinekko)                                                          | [kamilkisiela](https://github.com/kamilkisiela)                              |
+| Dan Muller | Victor Savkin | Jack Hsu | Wassim Chegham | Kamil Kisiela |
+| ---------- | ------------- | -------- | -------------- | ------------- |
+| ![Dan Muller][DM] | ![Victor Savkin][VS] | ![Jack Hsu][JH] | ![Wassim Chegham][WC] | ![Kamil Kisiela][KK] |
+| [mrmeku](https://github.com/mrmeku) | [vsavkin](https://github.com/vsavkin) | [jaysoo](https://github.com/jaysoo) | [manekinekko](https://github.com/manekinekko) | [kamilkisiela](https://github.com/kamilkisiela) |
+
+[DM]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/dan_pic.jpg
+[VS]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/victor_pic.jpg
+[JH]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/jack_pic.jpg
+[WC]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/wassim_pic.jpg
+[KK]: https://avatars1.githubusercontent.com/u/8167190?s=150&v=4
 
 The following folks from the Angular team at Google are working with the Angular Console team.
+
 | Alex Eagle | Stephen Fluin | Matias Niemelä |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| ![Alex Eagle](https://raw.githubusercontent.com/nrwl/angular-console/master/static/alex_eagle_pic.jpg) | ![Stephen Fluin](https://raw.githubusercontent.com/nrwl/angular-console/master/static/stephen_pic.jpg) | ![Matias Niemelä](https://raw.githubusercontent.com/nrwl/angular-console/master/static/matias_pic.jpg) |
+| ---------- | ------------- | -------------- |
+| ![Alex Eagle][AE] | ![Stephen Fluin][SF] | ![Matias Niemelä][MN] |
+
+[AE]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/alex_eagle_pic.jpg
+[SF]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/stephen_pic.jpg
+[MN]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/matias_pic.jpg
