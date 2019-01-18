@@ -23,13 +23,13 @@ jobs:
             - ./node_modules
             - /home/circleci/.cache/Cypress
           key: yarn-dependencies-{{ checksum "yarn.lock" }}
-      - run: yarn start server.gen
-      - run: node ./tools/scripts/check-format.js
-      - run: yarn start lint
-      - run: yarn start test
-      - run: yarn start e2e.fixtures
+      - run: yarn start format.check
+      - run: yarn start lint.against.origin-master
+      - run: yarn start dev.server.gen.electron
+      - run: yarn start test.against.origin-master
+      - run: yarn start e2e.prepare
       - run:
-          command: yarn start e2e.run
+          command: yarn start e2e.ci
           no_output_timeout: 20m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26

@@ -8,5 +8,5 @@
   "videosFolder": "../../dist/out-tsc/apps/angular-console-e2e/videos",
   "screenshotsFolder": "../../dist/out-tsc/apps/angular-console-e2e/screenshots",
   "chromeWebSecurity": false,
-  "baseUrl": "http://localhost:4200"
+  "baseUrl": "http://localhost:4201"
 }

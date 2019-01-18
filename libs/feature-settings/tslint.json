@@ -1,17 +1,17 @@
 {
-    "extends": "../../tslint.json",
-    "rules": {
-        "directive-selector": [
-            true,
-            "attribute",
-            "angular-console-settings",
-            "camelCase"
-        ],
-        "component-selector": [
-            true,
-            "element",
-            "angular-console-settings",
-            "kebab-case"
-        ]
-    }
+  "extends": "../../tslint.json",
+  "rules": {
+    "directive-selector": [
+      true,
+      "attribute",
+      "angular-console-settings",
+      "camelCase"
+    ],
+    "component-selector": [
+      true,
+      "element",
+      "angular-console-settings",
+      "kebab-case"
+    ]
+  }
 }

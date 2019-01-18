@@ -5,12 +5,6 @@
     "module": "es2015",
     "types": []
   },
-  "exclude": [
-    "src/test.ts",
-    "**/*.spec.ts"
-  ],
-  "include": [
-    "**/*.ts",
-    "../../libs/feature-install-node-js/src/index.ts"
-  ]
+  "exclude": ["src/test.ts", "**/*.spec.ts"],
+  "include": ["**/*.ts", "../../libs/feature-install-node-js/src/index.ts"]
 }
