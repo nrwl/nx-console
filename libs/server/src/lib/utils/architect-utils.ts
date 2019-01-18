@@ -26,7 +26,7 @@ export function normalizeCommands(cwd: string, cmds: string[]): string[] {
       process.env.ANGULAR_CONSOLE_ORIGINAL_KARMA_CONFIG_PATH = karmaConfigPath;
       return cmds.concat([
         '--karma-config',
-        join(__dirname, './config/karma-angular-console.config.js')
+        join(__dirname, 'assets', 'karma-angular-console.config.js')
       ]);
     }
   }

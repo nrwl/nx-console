@@ -33,3 +33,4 @@ jobs:
           no_output_timeout: 20m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
+      - run: yarn start package.ci
