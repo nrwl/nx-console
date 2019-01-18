@@ -13,7 +13,7 @@
     "no-magic-numbers": [false],
     "no-internal-module": true,
     "no-reference": true,
-    "no-unnecessary-type-assertion": true,
+    "no-unnecessary-type-assertion": false,
     "prefer-const": [true, { "destructuring": "all" }],
     "curly": [true, "ignore-same-line"],
     "typedef": [true, "parameter"],

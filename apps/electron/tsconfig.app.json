@@ -3,28 +3,16 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc/apps/electron",
     "module": "commonjs",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "sourceMap": false,
     "declaration": false,
     "moduleResolution": "node",
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "target": "es2017",
-    "typeRoots": [
-      "../node_modules/@types"
-    ],
-    "lib": [
-      "dom",
-      "es2017",
-      "esnext.asynciterable"
-    ]
+    "typeRoots": ["../node_modules/@types"],
+    "lib": ["dom", "es2017", "esnext.asynciterable"]
   },
-  "exclude": [
-    "**/*.spec.ts"
-  ],
-  "include": [
-    "**/*.ts"
-  ]
+  "exclude": ["**/*.spec.ts"],
+  "include": ["**/*.ts"]
 }

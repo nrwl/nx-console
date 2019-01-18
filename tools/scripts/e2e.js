@@ -24,10 +24,10 @@ function runE2eTests() {
 }
 
 try {
-  dev = cp.spawn(findInPath('yarn'), ['start', 'dev.up.cypress']);
+  dev = cp.spawn(findInPath('yarn'), ['start', 'dev.server.start']);
   dev.stdout.on('data', data => {
     console.log(data.toString());
-    if (data.toString().indexOf('Compiled successfully') > -1) {
+    if (data.toString().indexOf('starting server on port 4201') > -1) {
       runE2eTests();
     }
   });
