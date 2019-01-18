@@ -46,8 +46,6 @@ import {
 } from './utils';
 import { CommandInformation } from './api/commands';
 
-const opn = require('opn');
-
 export type SelectDirectory = (
   options: { title: string; buttonLabel: string }
 ) => Promise<string | undefined>;
@@ -413,6 +411,8 @@ export const getResolvers = (
     },
     async openInBrowser(_root, { url }) {
       if (url) {
+        const opn = require('opn');
+
         opn(url);
         return { result: true };
       } else {
@@ -421,6 +421,8 @@ export const getResolvers = (
     },
     async showItemInFolder(_root, { item }) {
       if (item) {
+        const opn = require('opn');
+
         opn(item);
         return { result: true };
       } else {

@@ -9,7 +9,10 @@ function runE2eTests() {
   try {
     cp.execSync(`ng e2e angular-console-e2e ${flags}`, {
       stdio: [0, 1, 2],
-      env: { ...process.env, CYPRESS_projectsRoot: path.join(__dirname, '../../tmp') }
+      env: {
+        ...process.env,
+        CYPRESS_projectsRoot: path.join(__dirname, '../../tmp')
+      }
     });
   } catch (e) {
     console.error(e);
@@ -21,7 +24,7 @@ function runE2eTests() {
 }
 
 try {
-  dev = cp.spawn(findInPath('yarn'), ['start', 'dev.up']);
+  dev = cp.spawn(findInPath('yarn'), ['start', 'dev.up.cypress']);
   dev.stdout.on('data', data => {
     console.log(data.toString());
     if (data.toString().indexOf('Compiled successfully') > -1) {
@@ -39,8 +42,7 @@ try {
 function findInPath(command) {
   const paths = process.env.PATH.split(path.delimiter);
   for (let pathEntry of paths) {
-    if (pathEntry.indexOf('Temp') > -1)
-      continue;
+    if (pathEntry.indexOf('Temp') > -1) continue;
     let fullPath;
     if (path.isAbsolute(pathEntry)) {
       fullPath = path.join(pathEntry, command);

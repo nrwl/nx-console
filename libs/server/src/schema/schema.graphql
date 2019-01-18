@@ -57,7 +57,7 @@ type InstallNodeJsStatus {
 
 type Database {
   settings: Settings!
-  schematicCollections: [SchematicCollectionForNgNew]
+  schematicCollections: [SchematicCollectionForNgNew!]!
   workspace(path: String!): Workspace!
   editors: [EditorSupport!]!
   availableExtensions(name: String): [Extension]
@@ -122,7 +122,12 @@ type OpenDocResult {
 
 type Mutation {
   ngAdd(path: String!, name: String!): CommandStarted
-  ngNew(path: String!, name: String!, collection: String!): CommandStarted
+  ngNew(
+    path: String!
+    name: String!
+    collection: String!
+    newCommand: [String!]!
+  ): CommandStarted
   generate(
     path: String!
     genCommand: [String!]!
@@ -196,6 +201,7 @@ type SchematicCollection {
 type SchematicCollectionForNgNew {
   name: String!
   description: String
+  schema: [SchematicSchema!]!
 }
 
 type SchematicSchema {

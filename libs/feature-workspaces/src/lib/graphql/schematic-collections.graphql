@@ -2,5 +2,14 @@ query SchematicCollections {
   schematicCollections {
     name
     description
+    schema {
+      name
+      enum
+      type
+      description
+      defaultValue
+      required
+      positional
+    }
   }
 }

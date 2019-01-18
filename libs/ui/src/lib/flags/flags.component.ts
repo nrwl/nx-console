@@ -1,12 +1,5 @@
-import { CompletetionValue, Field } from '@angular-console/schema';
+import { Field } from '@angular-console/schema';
 import { Completions, Serializer } from '@angular-console/utils';
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger
-} from '@angular/animations';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
   ChangeDetectionStrategy,
@@ -19,17 +12,12 @@ import {
   ViewChildren,
   ViewEncapsulation
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { MatExpansionPanel } from '@angular/material';
-import { Subscription, ReplaySubject } from 'rxjs';
-import {
-  debounceTime,
-  map,
-  publishReplay,
-  refCount,
-  startWith,
-  switchMap
-} from 'rxjs/operators';
+import { ReplaySubject, Subscription } from 'rxjs';
+import { startWith } from 'rxjs/operators';
+
+import { schematicFieldsToFormGroup } from '../schematic-fields/schematic-fields.component';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
@@ -44,15 +32,7 @@ const DEBOUNCE_TIME = 300;
   templateUrl: './flags.component.html',
   styleUrls: ['./flags.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('fadeInOut', [
-      state('void', style({ opacity: 0 })),
-      state('*', style({ opacity: 1 })),
-      transition(`:enter`, animate(`150ms ease-in-out`)),
-      transition(`:leave`, animate(`150ms ease-in-out`))
-    ])
-  ]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlagsComponent {
   private _fields: Field[];
@@ -96,33 +76,7 @@ export class FlagsComponent {
     });
   }
 
-  viewportHeight = new ReplaySubject<string>(1);
-
-  fieldEnumOptions(field: Field) {
-    if (field.defaultValue) {
-      return field.enum;
-    } else {
-      return [null, ...field.enum];
-    }
-  }
-
-  fieldOption(value: any) {
-    return value === null ? '--' : value;
-  }
-
-  clearFormField(f: Field) {
-    const formControl = this.formGroup.get(f.name);
-    if (formControl) {
-      formControl.reset();
-    }
-  }
-
-  toggleBooleanField(f: Field) {
-    const formControl = this.formGroup.get(f.name);
-    if (formControl) {
-      formControl.setValue(!formControl.value);
-    }
-  }
+  viewportHeight = new ReplaySubject<string>();
 
   private toFieldGroups(fields: Array<Field>): Array<FieldGrouping> {
     const importantFields: FieldGrouping = {
@@ -156,63 +110,13 @@ export class FlagsComponent {
   }
 
   private setForm() {
-    const children = this._fields.reduce(
-      (m, f) => {
-        const value =
-          this.init && this.init[f.name] ? this.init[f.name] : f.defaultValue;
-        const formControl = new FormControl(
-          value,
-          f.required ? Validators.required : null
-        );
-
-        if (f.completion) {
-          f.completionValues = formControl.valueChanges.pipe(
-            debounceTime(DEBOUNCE_TIME),
-            startWith(formControl.value),
-            switchMap((v: string | null) =>
-              this.completions.completionsFor(this.path, f, v || '')
-            ),
-            publishReplay(1),
-            refCount()
-          );
-        } else if (f.enum) {
-          const completionValues: CompletetionValue[] = this.fieldEnumOptions(
-            f
-          ).map(o => {
-            const completion: CompletetionValue = {
-              value: o,
-              display: o || '--'
-            };
-            return completion;
-          });
-          f.completionValues = formControl.valueChanges.pipe(
-            debounceTime(DEBOUNCE_TIME),
-            startWith(formControl.value),
-            map((v: string | null) => {
-              if (!v) {
-                return completionValues;
-              } else {
-                const lowercase = v.toLowerCase();
-                return completionValues.filter(
-                  c => c.value && c.value.indexOf(lowercase) !== -1
-                );
-              }
-            }),
-            publishReplay(1),
-            refCount()
-          );
-        }
-
-        m[f.name] = formControl;
-
-        return m;
-      },
-      {} as any
-    );
-    if (this.configurations && this.configurations.length > 0) {
-      children.configurations = new FormControl(null);
-    }
-    this.formGroup = new FormGroup(children);
+    this.formGroup = schematicFieldsToFormGroup({
+      fields: this._fields,
+      configurations: this.configurations && this.configurations.length > 0,
+      init: this.init,
+      getCompletions: (f, v) =>
+        this.completions.completionsFor(this.path, f, v || '')
+    });
 
     if (this.subscription) {
       this.subscription.unsubscribe();
@@ -244,12 +148,5 @@ export class FlagsComponent {
         behavior: 'instant'
       });
     }
-  }
-
-  // this is needed because of a bug in MatAutocomplete
-  triggerValueUpdate(name: string, value: string) {
-    (this.formGroup.get(name) as FormControl).setValue(value, {
-      emitEvent: true
-    });
   }
 }

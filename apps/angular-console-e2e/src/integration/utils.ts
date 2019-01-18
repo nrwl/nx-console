@@ -143,7 +143,7 @@ export function clickOnTask(
 export function selectFolder() {
   cy.wait(300);
   // TODO(mrmeku): Ideally this should mock a graphql request.
-  cy.get('.path-form-field input').type('/tmp');
+  cy.get('.path-form-field input').click();
   cy.get('.js-step-name-workspace').click();
   cy.wait(500);
 }

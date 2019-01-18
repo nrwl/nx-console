@@ -2,7 +2,8 @@ import { Directory } from '@angular-console/schema';
 import {
   CommandRunner,
   IncrementalCommandOutput,
-  CommandStatus
+  CommandStatus,
+  Serializer
 } from '@angular-console/utils';
 import {
   Component,
@@ -34,8 +35,14 @@ import {
   tap
 } from 'rxjs/operators';
 
-import { NgNew, NgNewGQL, SchematicCollectionsGQL } from '../generated/graphql';
+import {
+  NgNew,
+  NgNewGQL,
+  SchematicCollectionsGQL,
+  SchematicCollections
+} from '../generated/graphql';
 import { WorkspacesService } from '../workspaces.service';
+import { schematicFieldsToFormGroup } from '@angular-console/ui';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -65,7 +72,14 @@ export class NewWorkspaceComponent {
   });
 
   schematicCollectionsForNgNew$ = this.schematicCollectionsGQL.fetch().pipe(
-    map(r => r.data.schematicCollections),
+    map(r =>
+      r.data.schematicCollections.map(collection => ({
+        ...collection,
+        schema: collection.schema.filter(
+          s => s.name !== 'name' && s.name !== 'directory'
+        )
+      }))
+    ),
     publishReplay(1),
     refCount()
   );
@@ -76,7 +90,9 @@ export class NewWorkspaceComponent {
       this.verticalStepper.selectedIndex
     ] as any;
 
-    autofocus.focus();
+    if (autofocus && autofocus.focus) {
+      autofocus.focus();
+    }
   }
 
   constructor(
@@ -87,6 +103,7 @@ export class NewWorkspaceComponent {
     private readonly schematicCollectionsGQL: SchematicCollectionsGQL,
     private readonly workspacesService: WorkspacesService,
     private readonly ngNewGQL: NgNewGQL,
+    private readonly serializer: Serializer,
     private readonly commandRunner: CommandRunner
   ) {}
 
@@ -95,9 +112,23 @@ export class NewWorkspaceComponent {
     if (event.option.selected) {
       event.source.deselectAll();
       event.option._setSelected(true);
+
       this.ngNewForm.controls.collection.setValue(event.option.value);
+
+      const value: SchematicCollections.SchematicCollections | null =
+        event.option.value;
+      this.ngNewForm.removeControl('collectionOptions');
+
+      if (value && value.schema) {
+        const formGroup = schematicFieldsToFormGroup({
+          fields: value.schema as any
+        });
+
+        this.ngNewForm.addControl('collectionOptions', formGroup);
+      }
     } else {
       this.ngNewForm.controls.collection.setValue(null);
+      this.ngNewForm.removeControl('collectionOptions');
     }
   }
 
@@ -114,10 +145,21 @@ export class NewWorkspaceComponent {
 
   createNewWorkspace() {
     if (this.ngNewForm.valid) {
-      const ngNewInvocation: NgNew.Variables = this.ngNewForm.value;
+      const ngNewInvocation: NgNew.Variables = {
+        collection: this.ngNewForm.value.collection.name,
+        name: this.ngNewForm.value.name,
+        path: this.ngNewForm.value.path,
+        newCommand: this.serializer.serializeArgs(
+          this.ngNewForm.controls.collectionOptions.value,
+          this.ngNewForm.controls.collection.value.schema
+        )
+      };
+
       this.command = `ng new ${ngNewInvocation.name} --directory=${
         ngNewInvocation.name
-      } --collection=${ngNewInvocation.collection}`;
+      } --collection=${
+        ngNewInvocation.collection
+      } ${ngNewInvocation.newCommand.join(' ')}`;
       this.commandOutput$ = this.commandRunner
         .runCommand(
           this.ngNewGQL.mutate(ngNewInvocation),

@@ -97,8 +97,8 @@
           >
             <mat-list-option
               [class.autofocus]="first"
-              [value]="n.name"
-              [class.selected-schematic]="control.value === n.name"
+              [value]="n"
+              [class.selected-schematic]="control.value?.name === n.name"
               *ngFor="
                 let n of (schematicCollectionsForNgNew$ | async);
                 let first = first;
@@ -113,17 +113,17 @@
       </mat-step>
       <mat-step
         [optional]="true"
-        *ngIf="ngNewForm.get('collectionOptions') as control"
-        [stepControl]="control"
+        [stepControl]="ngNewForm.get('collectionOptions')"
         fxFlex
       >
-        <ng-template matStepLabel
-          >Set schematic options (coming soon!)</ng-template
-        >
+        <ng-template matStepLabel>Set schematic options</ng-template>
+
         <div class="last-option" fxLayout="row" fxLayout="end end" fxFlex>
-          <!--
-            TODO(mrmeku): Read ng new schematic for collection and render form
-          -->
+          <ui-schematic-field
+            *ngFor="let field of ngNewForm.get('collection')?.value?.schema"
+            [field]="field"
+            [formGroup]="ngNewForm.get('collectionOptions')"
+          ></ui-schematic-field>
         </div>
       </mat-step>
     </mat-vertical-stepper>

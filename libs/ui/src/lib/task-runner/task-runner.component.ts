@@ -109,12 +109,12 @@ export class TaskRunnerComponent implements AfterContentChecked {
         switch (v) {
           case 'grow':
             this.flagsComponent.viewportHeight.next(
-              `calc(70vh - ${expansionPanelHeaderHeight} - ${configurationsHeight})`
+              `calc(70vh - ${expansionPanelHeaderHeight} - ${configurationsHeight} - 65px)`
             );
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
-              `calc(100vh - ${expansionPanelHeaderHeight} - 45px)`
+              `calc(100vh - ${expansionPanelHeaderHeight} - 45px - 65px)`
             );
             break;
           default:

@@ -32,7 +32,7 @@ export interface Field {
   defaultValue: any;
   required: boolean;
   positional: boolean;
-  important: boolean;
+  important?: boolean;
   completion?: AutocompletionType;
   completionValues?: Observable<Array<CompletetionValue>>;
 }

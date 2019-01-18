@@ -1,5 +1,15 @@
-mutation NgNew($path: String!, $name: String!, $collection: String!) {
-  ngNew(path: $path, name: $name, collection: $collection) {
+mutation NgNew(
+  $path: String!
+  $name: String!
+  $collection: String!
+  $newCommand: [String!]!
+) {
+  ngNew(
+    path: $path
+    name: $name
+    collection: $collection
+    newCommand: $newCommand
+  ) {
     id
   }
 }
