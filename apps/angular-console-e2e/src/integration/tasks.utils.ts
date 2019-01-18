@@ -79,11 +79,15 @@ export function toggleRecentTasksExpansion() {
 }
 
 export function clearAllRecentTasks() {
-  cy.get(
-    'angular-console-action-bar .remove-all-tasks-button, angular-console-action-bar .remove-task-button'
-  ).then(buttons => {
-    if (buttons) {
-      cy.wrap(buttons).click({ force: true, multiple: true });
+  cy.get('button').then(buttons => {
+    for (let i = 0; i < buttons.length; ++i) {
+      const b = buttons[i];
+      if (
+        b.className.indexOf('remove-all-tasks-button') > -1 ||
+        b.className.indexOf('remove-task-button') > -1
+      ) {
+        b.click();
+      }
     }
   });
   cy.wait(500);

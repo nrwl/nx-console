@@ -24,12 +24,11 @@ describe('Projects', () => {
     });
   });
 
-  // it('checks that hot actions work', () => {
-  //   cy.contains('button', 'Generate Service')
-  //     .click();
-  //   cy.contains('div.context-title', '@schematics/angular - service');
-  //   cy.get('input[name="project"]').should(($p: any) => {
-  //     expect($p[0].value).to.equal('proj');
-  //   });
-  // });
+  it('checks that hot actions work', () => {
+    cy.contains('button', 'Generate Component').click();
+    cy.contains('div.context-title', '@schematics/angular - component');
+    cy.get('input[name="project"]').should(($p: any) => {
+      expect($p[0].value).to.equal('proj');
+    });
+  });
 });
