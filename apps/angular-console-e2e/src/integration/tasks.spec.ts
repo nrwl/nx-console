@@ -1,6 +1,7 @@
 import {
   checkDisplayedCommand,
   checkFileExists,
+  clickOnFieldGroup,
   clickOnTask,
   goBack,
   goToTasks,
@@ -235,71 +236,67 @@ describe('Tasks', () => {
     clearAllRecentTasks();
   });
 
-  // it('runs test task', () => {
-  //   cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', FAILING_TESTS);
-  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
-  //
-  //   clickOnTask('proj', 'test');
-  //
-  //   cy.get('div.context-title').contains('ng test proj');
-  //
-  //   waitForAnimation();
-  //
-  //   cy.get('input.js-input-important-watch')
-  //     .scrollIntoView()
-  //     .clear()
-  //     .type('false');
-  //
-  //   cy.get('button')
-  //     .contains('Run')
-  //     .click();
-  //
-  //   cy.get('div.js-status-tests-failed', { timeout: 120000 }).contains(
-  //     'failed'
-  //   );
-  //
-  //   goBack();
-  //   clearAllRecentTasks();
-  //
-  //   cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
-  // });
+  it('runs test task', () => {
+    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', FAILING_TESTS);
+    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
 
-  // TODO(jack): This seems to be causing memory issues in CI.
-  // it('runs serve task', () => {
-  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
-  //   cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
-  //
-  //   clickOnTask('proj', 'serve');
-  //
-  //   cy.get('div.context-title').contains('ng serve proj');
-  //
-  //   cy.get('mat-panel-title.js-group-optional').click();
-  //
-  //   cy.wait(800);
-  //
-  //   cy.get('input.js-input-optional-port')
-  //     .scrollIntoView()
-  //     .clear()
-  //     .type('9999');
-  //
-  //   cy.get('button')
-  //     .contains('Run')
-  //     .click();
-  //
-  //   cy.get('div.js-status-build-success', { timeout: 120000 }).contains(
-  //     'Build completed'
-  //   );
-  //   cy.get('div.js-status-server-url', { timeout: 120000 }).contains('browser');
-  //
-  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', BAD_CMP);
-  //
-  //   cy.get('div.js-status-build-error', { timeout: 120000 }).contains(
-  //     'Build failed'
-  //   );
-  //
-  //   goBack();
-  //   clearAllRecentTasks();
-  //
-  //   cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
-  // });
+    clickOnTask('proj', 'test');
+
+    cy.get('div.context-title').contains('ng test proj');
+
+    waitForAnimation();
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.get('div.js-status-tests-failed', { timeout: 220000 }).contains(
+      'failed'
+    );
+
+    cy.get('button')
+      .contains('Cancel')
+      .click();
+
+    goBack();
+    clearAllRecentTasks();
+
+    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
+  });
+
+  it('runs serve task', () => {
+    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+    cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
+
+    clickOnTask('proj', 'serve');
+
+    cy.get('div.context-title').contains('ng serve proj');
+
+    clickOnFieldGroup('Optional fields');
+
+    waitForAnimation();
+
+    cy.get('input[name="port"]')
+      .scrollIntoView()
+      .clear()
+      .type('9999');
+
+    cy.get('button')
+      .contains('Run')
+      .click();
+
+    cy.get('div.js-status-build-success', { timeout: 220000 }).contains(
+      'Build completed'
+    );
+    cy.get('div.js-status-server-url', { timeout: 220000 }).contains('browser');
+
+    cy.get('button')
+      .contains('Cancel')
+      .click();
+
+    goBack();
+    clearAllRecentTasks();
+
+    cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
+  });
 });
