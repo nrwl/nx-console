@@ -44,6 +44,14 @@ fs.writeFileSync(
   JSON.stringify(angularJson, null, 2)
 );
 
+const karma = fs
+  .readFileSync(path.join(tmp, 'proj', 'src', 'karma.conf.js'))
+  .toString();
+fs.writeFileSync(
+  path.join(tmp, 'proj', 'src', 'karma.conf.js'),
+  karma.replace('Chrome', 'ChromeHeadless')
+);
+
 shell.mv(path.join(tmp, 'proj'), './tmp/proj');
 
 cp.execSync(
