@@ -1,5 +1,5 @@
 import { FADE_IN } from '@angular-console/ui';
-import { Settings } from '@angular-console/utils';
+import { RouterNavigationService, Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
 import {
   Component,
@@ -9,7 +9,7 @@ import {
   ChangeDetectionStrategy
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { RouterOutlet, Router } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import {
   Breadcrumb,
   ContextualActionBarService
@@ -17,13 +17,6 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-interface SidenavLink {
-  icon: string;
-  route: string;
-  text: string;
-}
-
-const DEFAULT_TITLE = 'Angular Console';
 const TITLE_SEPARATOR = ' | ';
 
 @Component({
@@ -41,8 +34,6 @@ const TITLE_SEPARATOR = ' | ';
 export class AppComponent implements OnInit, OnDestroy {
   @ViewChild(RouterOutlet) routerOutlet: RouterOutlet;
   routerTransition: Observable<string>;
-  settingsLoaded: boolean;
-  showSiteMenu = false;
 
   ngOnInit() {
     this.contextualActionBarService.contextualTabs$.next(null);
@@ -58,7 +49,9 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
-    private readonly titleService: Title
+    private readonly titleService: Title,
+    // Ensures we allow location ext to listen on all router events no matter which route user enters into first.
+    private readonly routerNavService: RouterNavigationService
   ) {
     settings.fetch().subscribe();
   }

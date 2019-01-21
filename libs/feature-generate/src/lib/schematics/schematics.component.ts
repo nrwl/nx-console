@@ -12,8 +12,12 @@ import {
   switchMap,
   tap
 } from 'rxjs/operators';
-import { SCHEMATICS_POLLING } from '@angular-console/utils';
+import {
+  RouterNavigationService,
+  SCHEMATICS_POLLING
+} from '@angular-console/utils';
 import { SchematicCollectionsGQL } from '../generated/graphql';
+import { Location } from '@angular/common';
 
 interface SchematicId {
   collectionName: string | undefined;
@@ -103,7 +107,8 @@ export class SchematicsComponent {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly schematicCollectionsGQL: SchematicCollectionsGQL
+    private readonly schematicCollectionsGQL: SchematicCollectionsGQL,
+    private readonly locationExt: RouterNavigationService
   ) {}
 
   navigateToSelectedSchematic(s: Schematic | null) {
@@ -113,7 +118,9 @@ export class SchematicsComponent {
         { relativeTo: this.route }
       );
     } else {
-      this.router.navigate(['.'], { relativeTo: this.route });
+      this.locationExt.goBackOrNavigateToFallback(['.'], {
+        relativeTo: this.route
+      });
     }
   }
 
