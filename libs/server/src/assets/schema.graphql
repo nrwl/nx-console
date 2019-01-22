@@ -142,6 +142,12 @@ type Mutation {
   restartCommand(id: String!): RemoveResult
   openInEditor(editor: String!, path: String!): OpenInEditor
   updateSettings(data: String!): Settings!
+  saveRecentAction(
+    workspacePath: String!
+    projectName: String!
+    actionName: String!
+    schematicName: String
+  ): [RecentAction!]!
   installNodeJs: InstallNodeJsStatus
   openInBrowser(url: String!): OpenInBrowserResult
   selectDirectory(
@@ -173,6 +179,12 @@ type Project {
   root: String!
   projectType: String!
   architect(name: String): [Architect!]!
+  recentActions: [RecentAction!]!
+}
+
+type RecentAction {
+  actionName: String!
+  schematicName: String
 }
 
 type Schematic {

@@ -13,6 +13,10 @@ query Workspace($path: String!) {
       architect {
         name
       }
+      recentActions {
+        actionName
+        schematicName
+      }
     }
   }
 }

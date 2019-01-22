@@ -1,0 +1,16 @@
+mutation SaveRecentAction(
+  $workspacePath: String!
+  $projectName: String!
+  $actionName: String!
+  $schematicName: String
+) {
+  saveRecentAction(
+    workspacePath: $workspacePath
+    projectName: $projectName
+    actionName: $actionName
+    schematicName: $schematicName
+  ) {
+    actionName
+    schematicName
+  }
+}

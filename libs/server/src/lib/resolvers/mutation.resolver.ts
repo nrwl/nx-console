@@ -11,6 +11,10 @@ import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
 import { findClosestNg, findExecutable, readJsonFile } from '../utils/utils';
 import { platform } from 'os';
+import {
+  storeTriggeredAction,
+  readRecentActions
+} from '../api/read-recent-actions';
 
 function disableInteractivePrompts(p: string) {
   try {
@@ -287,6 +291,18 @@ export class MutationResolver {
   updateSettings(@Args('data') data: string) {
     storeSettings(this.store, JSON.parse(data));
     return readSettings(this.store);
+  }
+
+  @Mutation()
+  saveRecentAction(
+    @Args('workspacePath') workspacePath: string,
+    @Args('projectName') projectName: string,
+    @Args('actionName') actionName: string,
+    @Args('schematicName') schematicName: string
+  ) {
+    const key = `${workspacePath}/${projectName}`;
+    storeTriggeredAction(this.store, key, actionName, schematicName);
+    return readRecentActions(this.store, key);
   }
 
   @Mutation()

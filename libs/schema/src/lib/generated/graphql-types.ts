@@ -158,6 +158,8 @@ export interface Project {
   projectType: string;
 
   architect: Architect[];
+
+  recentActions: RecentAction[];
 }
 
 export interface Architect {
@@ -176,6 +178,12 @@ export interface Architect {
 
 export interface ArchitectConfigurations {
   name: string;
+}
+
+export interface RecentAction {
+  actionName: string;
+
+  schematicName?: Maybe<string>;
 }
 
 export interface Docs {
@@ -284,6 +292,8 @@ export interface Mutation {
   openInEditor?: Maybe<OpenInEditor>;
 
   updateSettings: Settings;
+
+  saveRecentAction: RecentAction[];
 
   installNodeJs?: Maybe<InstallNodeJsStatus>;
 
@@ -444,6 +454,15 @@ export interface OpenInEditorMutationArgs {
 }
 export interface UpdateSettingsMutationArgs {
   data: string;
+}
+export interface SaveRecentActionMutationArgs {
+  workspacePath: string;
+
+  projectName: string;
+
+  actionName: string;
+
+  schematicName?: Maybe<string>;
 }
 export interface OpenInBrowserMutationArgs {
   url: string;
@@ -1072,6 +1091,8 @@ export namespace ProjectResolvers {
     projectType?: ProjectTypeResolver<string, TypeParent, Context>;
 
     architect?: ArchitectResolver<any[], TypeParent, Context>;
+
+    recentActions?: RecentActionsResolver<any[], TypeParent, Context>;
   }
 
   export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
@@ -1097,6 +1118,12 @@ export namespace ProjectResolvers {
   export interface ArchitectArgs {
     name?: Maybe<string>;
   }
+
+  export type RecentActionsResolver<
+    R = any[],
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace ArchitectResolvers {
@@ -1156,6 +1183,25 @@ export namespace ArchitectConfigurationsResolvers {
     Parent,
     Context
   >;
+}
+
+export namespace RecentActionResolvers {
+  export interface Resolvers<Context = any, TypeParent = any> {
+    actionName?: ActionNameResolver<string, TypeParent, Context>;
+
+    schematicName?: SchematicNameResolver<Maybe<string>, TypeParent, Context>;
+  }
+
+  export type ActionNameResolver<
+    R = string,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type SchematicNameResolver<
+    R = Maybe<string>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace DocsResolvers {
@@ -1486,6 +1532,8 @@ export namespace MutationResolvers {
 
     updateSettings?: UpdateSettingsResolver<any, TypeParent, Context>;
 
+    saveRecentAction?: SaveRecentActionResolver<any[], TypeParent, Context>;
+
     installNodeJs?: InstallNodeJsResolver<Maybe<any>, TypeParent, Context>;
 
     openInBrowser?: OpenInBrowserResolver<Maybe<any>, TypeParent, Context>;
@@ -1629,6 +1677,21 @@ export namespace MutationResolvers {
   > = Resolver<R, Parent, Context, UpdateSettingsArgs>;
   export interface UpdateSettingsArgs {
     data: string;
+  }
+
+  export type SaveRecentActionResolver<
+    R = any[],
+    Parent = {},
+    Context = any
+  > = Resolver<R, Parent, Context, SaveRecentActionArgs>;
+  export interface SaveRecentActionArgs {
+    workspacePath: string;
+
+    projectName: string;
+
+    actionName: string;
+
+    schematicName?: Maybe<string>;
   }
 
   export type InstallNodeJsResolver<
@@ -1834,6 +1897,7 @@ export interface IResolvers<Context = any> {
   Project?: ProjectResolvers.Resolvers<Context>;
   Architect?: ArchitectResolvers.Resolvers<Context>;
   ArchitectConfigurations?: ArchitectConfigurationsResolvers.Resolvers<Context>;
+  RecentAction?: RecentActionResolvers.Resolvers<Context>;
   Docs?: DocsResolvers.Resolvers<Context>;
   Doc?: DocResolvers.Resolvers<Context>;
   CompletionsTypes?: CompletionsTypesResolvers.Resolvers<Context>;
