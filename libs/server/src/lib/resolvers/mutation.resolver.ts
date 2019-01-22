@@ -10,8 +10,29 @@ import { readSettings, storeSettings } from '../api/read-settings';
 import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
 import { platform } from 'os';
+<<<<<<< HEAD
 import { FileUtils } from '../utils/file-utils';
 import { readJsonFile } from '../utils/utils';
+=======
+import {
+  storeTriggeredAction,
+  readRecentActions
+} from '../api/read-recent-actions';
+
+function disableInteractivePrompts(p: string) {
+  try {
+    const version = readJsonFile(
+      path.join(`@angular`, 'cli', 'package.json'),
+      path.join(p, 'node_modules')
+    ).json.version;
+    return semver.gte(version, '7.0.0') ? ['--no-interactive'] : [];
+  } catch (e) {
+    console.log('cannot parse cli version', e.message);
+    // don't recognize the version => assume it's greater than 7
+    return ['--no-interactive'];
+  }
+}
+>>>>>>> feat: Show all actions from project view
 
 @Resolver()
 export class MutationResolver {
@@ -288,6 +309,18 @@ export class MutationResolver {
   updateSettings(@Args('data') data: string) {
     storeSettings(this.store, JSON.parse(data));
     return readSettings(this.store);
+  }
+
+  @Mutation()
+  saveRecentAction(
+    @Args('workspacePath') workspacePath: string,
+    @Args('projectName') projectName: string,
+    @Args('actionName') actionName: string,
+    @Args('schematicName') schematicName: string
+  ) {
+    const key = `${workspacePath}/${projectName}`;
+    storeTriggeredAction(this.store, key, actionName, schematicName);
+    return readRecentActions(this.store, key);
   }
 
   @Mutation()

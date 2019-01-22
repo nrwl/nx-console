@@ -1,0 +1,12 @@
+query WorkspaceSchematics($path: String!) {
+  workspace(path: $path) {
+    schematicCollections {
+      name
+      schematics {
+        name
+        description
+        collection
+      }
+    }
+  }
+}

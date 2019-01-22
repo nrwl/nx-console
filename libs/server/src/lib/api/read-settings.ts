@@ -3,13 +3,13 @@ import { Settings } from '@angular-console/schema';
 import { Subject } from 'rxjs';
 import { platform } from 'os';
 
-/* tslint:disable */
 export function readSettings(store: Store): Settings {
   const settings: Settings = store.get('settings') || {};
-
+  // tslint:disable-next-line
   if (settings.canCollectData === undefined) {
     settings.canCollectData = store.get('canCollectData', false);
   }
+  // tslint:disable-next-line
   if (settings.recent === undefined) {
     settings.recent = [];
   }

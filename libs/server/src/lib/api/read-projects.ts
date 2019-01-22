@@ -1,15 +1,25 @@
 import { normalizeSchema, readJsonFile } from '../utils/utils';
 import { Project, Architect } from '@angular-console/schema';
 import * as path from 'path';
+import { Store } from '@nrwl/angular-console-enterprise-electron';
+import { readRecentActions } from './read-recent-actions';
 
-export function readProjects(json: any): Project[] {
+export function readProjects(
+  json: any,
+  baseDir: string,
+  store: Store
+): Project[] {
   return Object.entries(json)
     .map(([key, value]: [string, any]) => {
       return {
         name: key,
         root: value.root,
         projectType: value.projectType,
-        architect: readArchitect(key, value.architect)
+        architect: readArchitect(key, value.architect),
+        recentActions: readRecentActions(
+          store,
+          path.join(baseDir, value.root, key)
+        )
       };
     })
     .sort(compareProjects);
