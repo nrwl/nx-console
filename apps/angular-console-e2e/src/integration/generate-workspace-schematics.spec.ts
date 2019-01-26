@@ -17,7 +17,7 @@ describe('Generate Workspace Schematics', () => {
     whitelistGraphql();
     openProject(projectPath('proj-nx'));
     goToGenerate();
-    cy.contains('div.title', 'Generate Code');
+    cy.contains('div.title', 'Generate');
   });
 
   it('runs a schematic', () => {
@@ -46,7 +46,7 @@ describe('Generate Workspace Schematics', () => {
     openProject(projectPath('proj-nx'));
     goToGenerate();
 
-    cy.contains('div.title', 'Generate Code');
+    cy.contains('div.title', 'Generate');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Workspace Schematics');
     });

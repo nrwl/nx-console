@@ -1,6 +1,6 @@
 import {
   Settings,
-  WorkspaceDescription,
+  SettingsModels,
   CommandRunner
 } from '@angular-console/utils';
 import {
@@ -42,7 +42,7 @@ export class WorkspacesComponent implements OnInit {
     private readonly commandRunner: CommandRunner
   ) {}
 
-  trackByPath(_: number, w: WorkspaceDescription) {
+  trackByPath(_: number, w: SettingsModels.Recent) {
     return w.path;
   }
 

@@ -235,9 +235,9 @@ type Settings {
   installNodeManually: Boolean
   enableDetailedStatus: Boolean
   channel: String
-  recent: [WorkspaceDefinition]
   workspaceSchematicsDirectory: String
   workspaceSchematicsNpmScript: String
+  recent: [WorkspaceDefinition!]!
 }
 
 type Workspace {

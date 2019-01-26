@@ -19,7 +19,7 @@ describe('Generate', () => {
     whitelistGraphql();
     openProject(projectPath('proj'));
     goToGenerate();
-    cy.contains('div.title', 'Generate Code');
+    cy.contains('div.title', 'Generate');
   });
 
   it('filters schematics', () => {
@@ -77,7 +77,7 @@ describe('Generate', () => {
 
     goBack();
 
-    cy.contains('div.title', 'Generate Code');
+    cy.contains('div.title', 'Generate');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('@schematics/angular');
     });

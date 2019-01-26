@@ -1,14 +1,35 @@
-import { ViewColumn, window, ExtensionContext, Uri } from 'vscode';
-import { join } from 'path';
+import { WorkspaceDefinition } from '@angular-console/server';
+import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
+
+import {
+  WorkspaceRoute,
+  WorkspaceRouteTitle
+} from './tree-item/workspace-route';
+
+const activeWebViews = new Map<string, WebviewPanel>();
 
 export function createWebViewPanel(
   context: ExtensionContext,
   viewColumn: ViewColumn,
-  iframeUrl: string
+  iframeUrl: string,
+  workspaceDef: WorkspaceDefinition | undefined,
+  route: WorkspaceRouteTitle | undefined
 ) {
+  const panelTitle = route
+    ? workspaceDef && workspaceDef.name
+      ? `${workspaceDef.name} | ${route}`
+      : route
+    : 'Angular Console';
+
+  const activePanel = activeWebViews.get(panelTitle);
+  if (activePanel) {
+    activePanel.reveal();
+    return activePanel;
+  }
+
   const panel = window.createWebviewPanel(
     'angular-console', // Identifies the type of the webview. Used internally
-    'Angular Console', // Title of the panel displayed to the user
+    panelTitle, // Title of the panel displayed to the user
     viewColumn, // Editor column to show the new webview panel in.
     {
       retainContextWhenHidden: true,
@@ -16,15 +37,23 @@ export function createWebViewPanel(
     }
   );
 
-  panel.iconPath = Uri.file(
-    join(context.extensionPath, 'assets', 'extension_icon.png')
+  activeWebViews.set(panelTitle, panel);
+  panel.onDidDispose(() => {
+    if (activeWebViews.get(panelTitle) === panel) {
+      activeWebViews.delete(panelTitle);
+    }
+  });
+
+  panel.iconPath = WorkspaceRoute.getIconUriForRoute(
+    context.extensionPath,
+    route
   );
   panel.webview.html = getIframeHtml(iframeUrl);
 
   return panel;
 }
 
-function getIframeHtml(iframeUrl: string) {
+export function getIframeHtml(iframeUrl: string) {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -40,24 +69,37 @@ function getIframeHtml(iframeUrl: string) {
           body {
             margin: 0;
             padding: 0;
+            border-radius: 4px;
+            height: 100vh;
+            width: 100vw;
+            background: transparent;
             overflow: hidden;
           }
 
           iframe {
-            height: 100vh;
-            width: 100vw;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            height: 120vh;
+            width: 120vw;
+            transform: scale(calc(100 / 120));
+            transform-origin: 0 0;
+            opacity: 0;
+            transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+          }
+
+          iframe.fade-in {
+            opacity: 1;
           }
         </style>
+        <script>
+          function onIframeLoad() {
+            document.body.querySelector('iframe').classList.add('fade-in');
+          }
+        </script>
       </head>
       <body>
         <iframe
           src="${iframeUrl}"
           frameborder="0"
+          onload="onIframeLoad()"
         ></iframe>
       </body>
     </html>

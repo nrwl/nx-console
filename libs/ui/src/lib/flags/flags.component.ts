@@ -25,8 +25,6 @@ interface FieldGrouping {
   expanded: boolean;
 }
 
-const DEBOUNCE_TIME = 300;
-
 @Component({
   selector: 'ui-flags',
   templateUrl: './flags.component.html',

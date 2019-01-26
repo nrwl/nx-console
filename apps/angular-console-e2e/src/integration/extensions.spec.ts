@@ -48,7 +48,7 @@ describe('Extensions', () => {
 
     goBack();
 
-    cy.contains('div.title', 'Add CLI Extensions');
+    cy.contains('div.title', 'Extensions');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Available Extensions');
     });
