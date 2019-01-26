@@ -10,9 +10,9 @@ export async function startServer(context: ExtensionContext) {
   const port = await getPort({ port: 8888 });
   const store = {
     get: (key: string, defaultValue: any) =>
-      context.workspaceState.get(key) || defaultValue,
-    set: (key: string, value: any) => context.workspaceState.update(key, value),
-    delete: (key: string) => context.workspaceState.update(key, undefined)
+      context.globalState.get(key) || defaultValue,
+    set: (key: string, value: any) => context.globalState.update(key, value),
+    delete: (key: string) => context.globalState.update(key, undefined)
   };
 
   const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
@@ -56,7 +56,10 @@ export async function startServer(context: ExtensionContext) {
 
   const app = await NestFactory.create(createServerModule(exports, providers));
   app.useStaticAssets(assetsPath);
-  return await app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-  });
+  return {
+    server: await app.listen(port, () => {
+      console.log(`Listening on port ${port}`);
+    }),
+    store
+  };
 }

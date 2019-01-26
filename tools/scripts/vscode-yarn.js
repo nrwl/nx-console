@@ -1,6 +1,8 @@
 const shell = require('shelljs');
 
 shell.exec(
-  'yarn install --production --pure-lockfile --ignore-optional --no-bin-links --non-interactive',
-  { cwd: 'dist/apps/vscode' }
+  'yarn install --prod --ignore-platform --ignore-engines --ignore-optional --no-audit --no-bin-link',
+  {
+    cwd: 'dist/apps/vscode'
+  }
 );

@@ -1,19 +1,26 @@
+import { ENVIRONMENT, Environment } from '@angular-console/environment';
 import { FADE_IN, GROW_SHRINK } from '@angular-console/ui';
 import {
   BASIC_WORKSPACE_POLLING,
   EditorSupport,
   Settings
 } from '@angular-console/utils';
-import { style, transition, trigger, group } from '@angular/animations';
+import { style, transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
   HostBinding,
+  Inject,
   OnDestroy,
   OnInit,
   ViewEncapsulation
 } from '@angular/core';
+import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import {
+  ContextualActionBarService,
+  MenuOption
+} from '@nrwl/angular-console-enterprise-frontend';
 import { combineLatest, Observable } from 'rxjs';
 import {
   filter,
@@ -24,10 +31,7 @@ import {
   shareReplay,
   switchMap
 } from 'rxjs/operators';
-import {
-  ContextualActionBarService,
-  MenuOption
-} from '@nrwl/angular-console-enterprise-frontend';
+
 import { BasicWorkspaceGQL } from '../generated/graphql';
 
 interface Route {
@@ -84,12 +88,12 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   routes: Array<Route> = [
     { icon: 'view_list', url: 'projects', title: 'Projects' },
-    { icon: 'code', url: 'generate', title: 'Generate Code' },
+    { icon: 'code', url: 'generate', title: 'Generate' },
     { svgIcon: 'console', url: 'tasks', title: 'Tasks' },
     {
       icon: 'extension',
       url: 'extensions',
-      title: 'Add CLI Extensions'
+      title: 'Extensions'
     },
     { icon: 'settings', url: 'settings', title: 'Settings' }
   ];
@@ -124,32 +128,38 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     refCount()
   );
 
-  private readonly editorSubscription = this.editorSupport.editors.subscribe(
-    editors => {
-      this.contextualActionBarService.nonContextualActions$.next([
-        {
-          name: 'Open in...',
-          description: 'Open workspace in another program',
-          icon: 'open_in_browser',
-          options: editors.map(
-            (editor): MenuOption => {
-              return {
-                name: `${editor.name}`,
-                image: editor.icon,
-                invoke: () => {
-                  this.workspace$
-                    .pipe(first())
-                    .subscribe(w =>
-                      this.editorSupport.openInEditor(editor.name, w.path)
-                    );
-                }
-              };
-            }
-          )
-        }
-      ]);
+  private readonly editorSubscription = combineLatest(
+    this.editorSupport.editors,
+    this.mediaObserver.media$
+  ).subscribe(([editors, mediaChange]) => {
+    switch (mediaChange.mqAlias) {
+      case 'xs':
+        this.contextualActionBarService.nonContextualActions$.next([]);
+        return;
     }
-  );
+    this.contextualActionBarService.nonContextualActions$.next([
+      {
+        name: 'Open in...',
+        description: 'Open workspace in another program',
+        icon: 'open_in_browser',
+        options: editors.map(
+          (editor): MenuOption => {
+            return {
+              name: `${editor.name}`,
+              image: editor.icon,
+              invoke: () => {
+                this.workspace$
+                  .pipe(first())
+                  .subscribe(w =>
+                    this.editorSupport.openInEditor(editor.name, w.path)
+                  );
+              }
+            };
+          }
+        )
+      }
+    ]);
+  });
 
   private readonly workplaceSubscription = combineLatest(
     this.workspace$,
@@ -162,13 +172,17 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   });
 
   private readonly subscription = this.workspace$.subscribe(w => {
-    this.settings.addRecent({ name: w.name, path: w.path });
+    this.settings.addRecent({ name: w.name, path: w.path, favorite: false });
   });
 
+  readonly isElectron = this.environment.application === 'electron';
+
   constructor(
+    @Inject(ENVIRONMENT) private readonly environment: Environment,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly settings: Settings,
+    private readonly mediaObserver: MediaObserver,
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly editorSupport: EditorSupport,
     private readonly basicWorkspaceGQL: BasicWorkspaceGQL

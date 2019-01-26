@@ -1,75 +1,148 @@
-import { existsSync } from 'fs';
+import {
+  readSettings,
+  Settings,
+  WorkspaceDefinition
+} from '@angular-console/server';
+import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { Server } from 'http';
-import { join } from 'path';
 import {
   commands,
   ExtensionContext,
-  WebviewPanel,
+  TreeView,
+  ViewColumn,
   window,
-  workspace,
-  ViewColumn
+  workspace
 } from 'vscode';
 
 import { startServer } from './app/start-server';
+import { Workspace } from './app/tree-item/workspace';
+import {
+  getWorkspaceRoute,
+  RevealWorkspaceRoute,
+  WorkspaceRoute,
+  WorkspaceRouteTitle
+} from './app/tree-item/workspace-route';
+import { CurrentWorkspaceTreeProvider } from './app/tree-view/current-workspace-tree-provider';
+import { RecentWorkspacesTreeProvider } from './app/tree-view/recent-workspaces-tree-provider';
 import { createWebViewPanel } from './app/webview.factory';
 
-let server: Server | undefined;
-let webViewPanel: WebviewPanel | undefined;
+let server: { server: Server; store: Store };
+let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
+let favoriteWorkspaces: TreeView<Workspace | WorkspaceRoute>;
+let recentWorkspaces: TreeView<Workspace | WorkspaceRoute>;
 
-export function activate(context: ExtensionContext) {
-  context.subscriptions.push(
-    commands.registerCommand('extension.angular-console', () => main(context))
-  );
-  context.subscriptions.push(
-    commands.registerCommand('extension.angular-console-active-panel', () =>
-      main(context, ViewColumn.Active)
+export async function activate(context: ExtensionContext) {
+  server = await startServer(context);
+  const settings = readSettings(server.store) as Settings;
+
+  const workspacePath =
+    workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
+
+  currentWorkspace = window.createTreeView('angularConsole', {
+    treeDataProvider: CurrentWorkspaceTreeProvider.create(
+      workspacePath,
+      context.extensionPath
     )
+  });
+  favoriteWorkspaces = window.createTreeView(
+    'angularConsoleFavoriteWorkspaces',
+    {
+      treeDataProvider: RecentWorkspacesTreeProvider.create(
+        settings.recent,
+        context.extensionPath,
+        true
+      )
+    }
   );
-}
+  recentWorkspaces = window.createTreeView('angularConsoleRecentWorkspaces', {
+    treeDataProvider: RecentWorkspacesTreeProvider.create(
+      settings.recent,
+      context.extensionPath,
+      false
+    )
+  });
 
-async function main(
-  context: ExtensionContext,
-  viewColumn: ViewColumn = ViewColumn.Beside
-) {
-  if (!server) {
-    server = await startServer(context);
-  }
-
-  if (window.activeTerminal) {
-    window.activeTerminal.hide();
-  }
-  if (webViewPanel) {
-    return webViewPanel.reveal();
-  }
-
-  webViewPanel = createWebViewPanel(
-    context,
-    viewColumn,
-    `http://localhost:${server!.address().port}/${getWorkspaceRoute()}`
+  context.subscriptions.push(
+    currentWorkspace,
+    favoriteWorkspaces,
+    recentWorkspaces
   );
-  context.subscriptions.push(webViewPanel);
-  webViewPanel.onDidDispose(() => {
-    webViewPanel = undefined;
+
+  [
+    {
+      command: 'extension.angularConsoleSidePanel',
+      viewColumn: ViewColumn.Beside
+    },
+    {
+      command: 'extension.angularConsoleActivePanel',
+      viewColumn: ViewColumn.Active
+    }
+  ].forEach(({ command, viewColumn }) => {
+    context.subscriptions.push(
+      commands.registerCommand(
+        command,
+        (
+          workspaceDef: WorkspaceDefinition | undefined,
+          workspaceRouteTitle: WorkspaceRouteTitle | undefined,
+          onRevealWorkspaceItem: RevealWorkspaceRoute
+        ) =>
+          main({
+            context,
+            workspaceDef,
+            viewColumn,
+            workspaceRouteTitle,
+            revealWorkspaceRoute: onRevealWorkspaceItem
+          })
+      )
+    );
   });
 }
 
-function getWorkspaceRoute() {
-  const primaryWorkspacePath =
-    workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
-
-  if (
-    primaryWorkspacePath &&
-    existsSync(join(primaryWorkspacePath, 'angular.json'))
-  ) {
-    return `workspace/${encodeURIComponent(primaryWorkspacePath)}/projects`;
+export async function deactivate() {
+  if (server) {
+    server.server.close();
   }
-
-  return ''; // Use angular console's default route.
 }
 
-export function deactivate() {
-  if (server) {
-    server.close();
-    server = undefined;
+async function main(config: {
+  context: ExtensionContext;
+  viewColumn: ViewColumn;
+  workspaceDef: WorkspaceDefinition | undefined;
+  workspaceRouteTitle: WorkspaceRouteTitle | undefined;
+  revealWorkspaceRoute: RevealWorkspaceRoute;
+}) {
+  const {
+    context,
+    viewColumn,
+    workspaceDef,
+    workspaceRouteTitle,
+    revealWorkspaceRoute
+  } = config;
+  if (window.activeTerminal) {
+    window.activeTerminal.hide();
   }
+
+  const webViewPanel = createWebViewPanel(
+    context,
+    viewColumn,
+    `http://localhost:${server.server.address().port}/${getWorkspaceRoute(
+      workspaceDef,
+      workspaceRouteTitle
+    )}`,
+    workspaceDef,
+    workspaceRouteTitle
+  );
+  context.subscriptions.push(webViewPanel);
+
+  webViewPanel.onDidChangeViewState(e => {
+    if (e.webviewPanel.visible) {
+      revealWorkspaceRoute(
+        currentWorkspace,
+        favoriteWorkspaces,
+        recentWorkspaces
+      );
+    }
+  });
+
+  return webViewPanel;
 }

@@ -1,7 +1,7 @@
 import { Environment } from '@angular-console/environment';
 
 export const environment: Environment = {
-  production: false,
+  production: true,
   providers: [],
-  application: 'electron'
+  application: 'vscode'
 };

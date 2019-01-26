@@ -30,41 +30,52 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.angular-console",
-    "onCommand:extension.angular-console-active-panel"
+    "onView:angularConsole",
+    "onView:angularConsoleFavoriteWorkspaces",
+    "onView:angularConsoleRecentWorkspaces",
+    "onCommand:extension.angularConsoleSidePanel",
+    "onCommand:extension.angularConsoleActivePanel"
   ],
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "angular-console",
+          "title": "Angular Console",
+          "icon": "tree-view-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "angular-console": [
+        {
+          "id": "angularConsole",
+          "name": "Angular Console"
+        },
+        {
+          "id": "angularConsoleFavoriteWorkspaces",
+          "name": "Favorite Workspaces"
+        },
+        {
+          "id": "angularConsoleRecentWorkspaces",
+          "name": "Recent Workspaces"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "extension.angular-console",
+        "command": "extension.angularConsoleSidePanel",
         "title": "Angular Console (Side Panel)"
       },
       {
-        "command": "extension.angular-console-active-panel",
+        "command": "extension.angularConsoleActivePanel",
         "title": "Angular Console (Active Panel)"
       }
     ]
   },
   "dependencies": {
-    "@angular/cli": "7.2.2",
-    "@nrwl/angular-console-enterprise-electron": "0.0.40",
-    "@nrwl/schematics": "7.4.0",
-    "apollo-server-express": "2.3.1",
-    "dotenv": "6.2.0",
-    "@nestjs/common": "5.5.0",
-    "@nestjs/core": "5.5.0",
-    "@nestjs/graphql": "5.5.0",
-    "get-port": "4.0.0",
-    "graphql": "14.0.2",
-    "node-pty-prebuilt": "0.7.6",
-    "opn": "^5.4.0",
-    "progress-stream": "2.0.0",
-    "request": "2.88.0",
-    "resolve": "1.9.0",
-    "strip-json-comments": "2.0.1",
-    "universal-analytics": "0.4.20",
-    "uuid": "3.3.2",
-    "vscode": "^1.1.26",
-    "reflect-metadata": "^0.1.13"
+    "@angular/cli": "7.2.3",
+    "@nrwl/schematics": "7.5.0",
+    "node-pty-prebuilt": "0.7.6"
   }
 }

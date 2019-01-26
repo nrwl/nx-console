@@ -1,20 +1,18 @@
+import { ENVIRONMENT, Environment } from '@angular-console/environment';
 import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
+import { FeatureSettingsModule } from '@angular-console/feature-settings';
 import {
   FeatureWorkspacesModule,
   workspaceRoutes
 } from '@angular-console/feature-workspaces';
-import {
-  settingsRoutes,
-  FeatureSettingsModule
-} from '@angular-console/feature-settings';
 import { UiModule } from '@angular-console/ui';
 import {
-  Telemetry,
   IsNodeJsInstalledGuard,
-  Messenger
+  Messenger,
+  Telemetry
 } from '@angular-console/utils';
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule, Inject } from '@angular/core';
+import { Inject, NgModule } from '@angular/core';
 import {
   MatIconModule,
   MatListModule,
@@ -24,17 +22,14 @@ import {
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import {
-  AngularConsoleEnterpriseFrontendModule,
-  connectRootRoutes
-} from '@nrwl/angular-console-enterprise-frontend';
+import { AngularConsoleEnterpriseFrontendModule } from '@nrwl/angular-console-enterprise-frontend';
 import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { onError } from 'apollo-link-error';
 
-import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
+import { AppComponent } from './app.component';
 
 export function initApollo(
   telemetry: Telemetry,
@@ -102,7 +97,8 @@ export function initApollo(
           path: 'install-nodejs',
           loadChildren:
             '@angular-console/feature-install-node-js#FeatureInstallNodeJsModule'
-        }
+        },
+        { path: '**', redirectTo: '/workspaces' }
       ],
       { paramsInheritanceStrategy: 'always' }
     )
@@ -118,7 +114,8 @@ export function initApollo(
       provide: APOLLO_OPTIONS,
       useFactory: initApollo,
       deps: [[new Inject('telemetry')], Messenger, HttpLink]
-    }
+    },
+    { provide: ENVIRONMENT, useValue: environment as Environment }
   ],
   bootstrap: [AppComponent]
 })

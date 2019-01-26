@@ -18,7 +18,7 @@ describe('Forms', () => {
     whitelistGraphql();
     openProject(projectPath('proj'));
     goToGenerate();
-    cy.contains('div.title', 'Generate Code');
+    cy.contains('div.title', 'Generate');
 
     clickOnTask('@schematics/angular', 'component');
     cy.contains('div.context-title', '@schematics/angular - component');

@@ -5,13 +5,8 @@ import * as path from 'path';
 export class DefaultController {
   constructor(@Inject('assetsPath') private readonly assetsPath: string) {}
 
-  @Get('workspace*')
+  @Get('*')
   workspace(@Res() res: any) {
-    res.sendFile(path.join(this.assetsPath, 'index.html'));
-  }
-
-  @Get('workspaces')
-  workspaces(@Res() res: any) {
     res.sendFile(path.join(this.assetsPath, 'index.html'));
   }
 }

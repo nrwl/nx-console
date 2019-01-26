@@ -22,6 +22,10 @@ $window-chrome-height: 45px;
   box-sizing: border-box;
   overflow: hidden;
 
+  .content-container {
+    overflow: hidden;
+  }
+
   button {
     margin: 0;
   }

@@ -36,17 +36,17 @@ const assetMappings = {
       APPLICATION_BUNDLE_PATH,
       'node_modules',
       'node-pty-prebuilt',
-      'build',
-      'Release'
+      'build'
     )
   },
   'extensions-schema': {
-    from: join('./node_modules', '@nrwl', 'angular-console-enterprise-electron', 'schema.graphql'),
-    to: join(
-      APPLICATION_BUNDLE_PATH,
-      'assets',
-      'extensions-schema.graphql'
-    )
+    from: join(
+      './node_modules',
+      '@nrwl',
+      'angular-console-enterprise-electron',
+      'schema.graphql'
+    ),
+    to: join(APPLICATION_BUNDLE_PATH, 'assets', 'extensions-schema.graphql')
   },
   'server-assets': {
     from: join('libs', 'server', 'src', 'assets', '*'),
@@ -55,6 +55,19 @@ const assetMappings = {
   readme: {
     from: 'README.md',
     to: join(APPLICATION_BUNDLE_PATH, 'README.md')
+  },
+  schema: {
+    from: join(
+      'node_modules',
+      '@nrwl',
+      'angular-console-enterprise-electron',
+      'schema.graphql'
+    ),
+    to: join(
+      APPLICATION_BUNDLE_PATH,
+      'assets',
+      'angular-console-enterprise-electron-schema.graphql'
+    )
   }
 };
 
@@ -63,6 +76,9 @@ module.exports = {
     dev: {
       'copy-assets': electronOrVscode(
         nps.concurrent({
+          schema: `shx cp ${assetMappings['schema'].from} ${
+            assetMappings['schema'].to
+          }`,
           'ng-cmd': `shx cp ${assetMappings['ng-cmd'].from} ${
             assetMappings['ng-cmd'].to
           }`,
@@ -72,9 +88,9 @@ module.exports = {
           readme: `shx cp ${assetMappings['readme'].from} ${
             assetMappings['readme'].to
           }`,
-          'extensions-schema': `shx cp ${assetMappings['extensions-schema'].from} ${
-            assetMappings['extensions-schema'].to
-          }`,
+          'extensions-schema': `shx cp ${
+            assetMappings['extensions-schema'].from
+          } ${assetMappings['extensions-schema'].to}`,
           cli: 'node ./tools/scripts/patch-cli.js'
         })
       ),
@@ -89,13 +105,13 @@ module.exports = {
           nps.series(
             'gql-gen --config ./tools/scripts/codegen-server.yml',
             'gql-gen --config ./tools/scripts/codegen-client.js',
-            'ng build APPLICATION --prod --maxWorkers=4'
+            'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap'
           )
         ),
         'gen-and-build': electronOrVscode(
           nps.series(
             'nps dev.server.gen.APPLICATION',
-            'ng build APPLICATION --prod --maxWorkers=4'
+            'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap'
           )
         )
       },
@@ -107,12 +123,14 @@ module.exports = {
         cypress: nps.concurrent({
           server: 'nps dev.server',
           frontend: 'ng run angular-console:serve:cypress'
-        }),
+        })
       }
     },
+    clean: 'shx rm -rf dist/',
     prepare: {
       ...electronOrVscode(
         nps.series.nps(
+          'clean',
           'build.APPLICATION',
           'install-dependencies.APPLICATION',
           'dev.copy-assets.APPLICATION'
@@ -127,7 +145,7 @@ module.exports = {
       ),
       electronWin: nps.series(
         'nps prepare.electron',
-        electronBuilder('--win', 'never'),
+        electronBuilder('--win', 'never')
       ),
       vscode: nps.series(
         'nps prepare.vscode',
@@ -135,6 +153,7 @@ module.exports = {
         `shx cp -rf ${assetMappings['node-pty-prebuilt'].from} ${
           assetMappings['node-pty-prebuilt'].to
         }`.replace(/APPLICATION/g, 'vscode'),
+        `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
       )
     },

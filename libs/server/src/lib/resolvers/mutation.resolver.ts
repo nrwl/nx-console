@@ -1,14 +1,15 @@
 import { Inject } from '@nestjs/common';
-import { commands, runCommand } from '../api/run-command';
-import { findClosestNg, findExecutable, readJsonFile } from '../utils/utils';
-import { installNodeJs } from '../api/install-nodejs';
-import { Editor, openInEditor } from '../api/read-editors';
-import { readSettings, storeSettings } from '../api/read-settings';
-import { docs } from '../api/docs';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import * as path from 'path';
 import * as semver from 'semver';
+
+import { docs } from '../api/docs';
+import { installNodeJs } from '../api/install-nodejs';
+import { Editor, openInEditor } from '../api/read-editors';
+import { readSettings, storeSettings } from '../api/read-settings';
+import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
+import { findClosestNg, findExecutable, readJsonFile } from '../utils/utils';
 
 function disableInteractivePrompts(p: string) {
   try {
@@ -56,7 +57,8 @@ export class MutationResolver {
   async ngNew(
     @Args('path') p: string,
     @Args('name') name: string,
-    @Args('collection') collection: string
+    @Args('collection') collection: string,
+    @Args('newCommand') newCommand: string[]
   ) {
     try {
       return runCommand(
@@ -69,7 +71,8 @@ export class MutationResolver {
           name,
           `--directory=${name}`,
           `--collection=${collection}`,
-          '--no-interactive'
+          '--no-interactive',
+          ...newCommand
         ],
         this.pseudoTerminalFactory
       );

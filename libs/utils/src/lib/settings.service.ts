@@ -1,27 +1,18 @@
 import { Injectable } from '@angular/core';
 import { first, tap } from 'rxjs/operators';
-import { SettingsGQL, UpdateSettingsGQL } from './generated/graphql';
+import {
+  SettingsGQL,
+  UpdateSettingsGQL,
+  Settings as SettingsModels
+} from './generated/graphql';
 
-export interface WorkspaceDescription {
-  readonly path: string;
-  readonly name: string;
-  readonly favorite?: boolean;
-}
-
-interface SettingsData {
-  readonly recent: WorkspaceDescription[];
-  readonly canCollectData: boolean;
-  readonly installNodeManually: boolean;
-  readonly enableDetailedStatus: boolean;
-  readonly isConnectUser: boolean;
-  readonly channel: 'latest' | 'beta' | 'alpha';
-}
+export { Settings as SettingsModels } from './generated/graphql';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Settings {
-  settings: SettingsData = {
+  settings: SettingsModels.Settings = {
     recent: [],
     canCollectData: false,
     installNodeManually: false,
@@ -35,8 +26,8 @@ export class Settings {
     private readonly updateSettingsGQL: UpdateSettingsGQL
   ) {}
 
-  getRecentWorkspaces(favorite?: boolean): WorkspaceDescription[] {
-    const all: WorkspaceDescription[] = this.settings.recent || [];
+  getRecentWorkspaces(favorite?: boolean): SettingsModels.Recent[] {
+    const all: SettingsModels.Recent[] = this.settings.recent || [];
     switch (favorite) {
       case undefined:
         return all;
@@ -47,13 +38,13 @@ export class Settings {
     }
   }
 
-  toggleFavorite(w: WorkspaceDescription): void {
+  toggleFavorite(w: SettingsModels.Recent): void {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
-    const favorite: WorkspaceDescription = { ...w, favorite: !w.favorite };
+    const favorite: SettingsModels.Recent = { ...w, favorite: !w.favorite };
     this.store({ ...this.settings, recent: [...r, favorite] });
   }
 
-  addRecent(w: WorkspaceDescription): void {
+  addRecent(w: SettingsModels.Recent): void {
     if (
       this.getRecentWorkspaces().filter(rr => rr.path === w.path).length === 0
     ) {
@@ -64,7 +55,7 @@ export class Settings {
     }
   }
 
-  removeRecent(w: WorkspaceDescription): void {
+  removeRecent(w: SettingsModels.Recent): void {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
     this.store({ ...this.settings, recent: [...r] });
   }
@@ -86,7 +77,7 @@ export class Settings {
   }
 
   isConnectUser(): boolean {
-    return this.settings.isConnectUser;
+    return this.settings.isConnectUser || false;
   }
 
   showDocs(): boolean | undefined {
@@ -118,7 +109,7 @@ export class Settings {
     );
   }
 
-  private store(v: SettingsData) {
+  private store(v: SettingsModels.Settings) {
     this.settings = v;
     this.updateSettingsGQL
       .mutate({

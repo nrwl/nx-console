@@ -6,28 +6,17 @@ import {
   trigger
 } from '@angular/animations';
 import {
+  AfterContentChecked,
   ChangeDetectionStrategy,
   Component,
   ContentChild,
-  Input,
-  AfterContentChecked,
-  ViewChild,
-  ElementRef,
-  NgZone,
-  OnDestroy,
-  ContentChildren,
-  QueryList
+  Input
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map, startWith, tap, shareReplay } from 'rxjs/operators';
+import { map, shareReplay, startWith, tap } from 'rxjs/operators';
 
-import {
-  CommandOutputComponent,
-  StatusComponentView
-} from '../command-output/command-output.component';
+import { CommandOutputComponent } from '../command-output/command-output.component';
 import { FlagsComponent } from '../flags/flags.component';
-
-const ANIMATION_DURATION = 300;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,15 +27,15 @@ const ANIMATION_DURATION = 300;
     trigger('growShrink', [
       state(
         'shrink',
-        style({ flex: 'initial', height: '45px', 'min-height': '45px' })
+        style({ flex: '0 0 0', height: '45px', 'min-height': '45px' })
       ),
       state(
         'grow',
-        style({ flex: '1 1 1e-09px', height: '*', 'min-height': '30vh' })
+        style({ flex: '1 1 0', height: '*', 'min-height': '30vh' })
       ),
       transition(
         `shrink <=> grow`,
-        animate(`${ANIMATION_DURATION}ms ease-in-out`)
+        animate(`600ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
       )
     ])
   ]
@@ -102,19 +91,21 @@ export class TaskRunnerComponent implements AfterContentChecked {
       tap(v => {
         const numFlags = this.flagsComponent.matExpansionPanels.length;
         const configurations = this.flagsComponent.configurations;
-        const expansionPanelHeaderHeight =
-          numFlags === 1 ? `${129}px` : `${49 + 129}px`;
+        const expansionPanelHeaderHeight = numFlags === 1 ? 129 : 49 + 129;
+        const toolbarHeight = 64;
         const configurationsHeight =
-          configurations && configurations.length > 1 ? '55px' : '0px';
+          configurations && configurations.length > 1 ? 55 : 0;
         switch (v) {
           case 'grow':
             this.flagsComponent.viewportHeight.next(
-              `calc(70vh - ${expansionPanelHeaderHeight} - ${configurationsHeight} - 65px)`
+              `calc(70vh - ${expansionPanelHeaderHeight +
+                configurationsHeight +
+                toolbarHeight}px)`
             );
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
-              `calc(100vh - ${expansionPanelHeaderHeight} - 45px - 65px)`
+              `calc(100vh - ${expansionPanelHeaderHeight + toolbarHeight}px)`
             );
             break;
           default:

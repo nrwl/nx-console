@@ -1,6 +1,7 @@
 <div fxFlex fxLayout="column">
   <div class="content" fxLayout="row" fxFlex>
     <div
+      *ngIf="isElectron"
       class="routes-side-nav-container"
       [@growShrink]="sideNavAnimationState$ | async"
     >
@@ -44,7 +45,7 @@
     <div
       fxFlex
       class="outlet-container"
-      [@routerTransition]="outlet.activatedRouteData.state"
+      [@routerTransition]="outlet?.activatedRouteData.state"
     >
       <router-outlet #outlet="outlet"></router-outlet>
     </div>

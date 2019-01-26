@@ -1,3 +1,4 @@
+import { ENVIRONMENT, Environment } from '@angular-console/environment';
 import { CommandRunner, Messenger } from '@angular-console/utils';
 import {
   animate,
@@ -6,7 +7,7 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import {
   ContextualActionBarService,
@@ -38,6 +39,7 @@ export class ContextualActionBarComponent {
   showMenuButton = new ReplaySubject<boolean>();
 
   constructor(
+    @Inject(ENVIRONMENT) readonly environment: Environment,
     readonly contextualActionBarService: ContextualActionBarService,
     readonly commandRunner: CommandRunner,
     readonly messenger: Messenger,

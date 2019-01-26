@@ -47,7 +47,7 @@
               "fileReplacements": [
                 {
                   "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.prod.ts"
+                  "with": "apps/angular-console/src/environments/environment.electron.ts"
                 }
               ],
               "outputPath": "dist/apps/electron/assets/public",
@@ -65,7 +65,7 @@
               "fileReplacements": [
                 {
                   "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.prod.ts"
+                  "with": "apps/angular-console/src/environments/environment.vscode.ts"
                 }
               ],
               "outputPath": "dist/apps/vscode/assets/public",
@@ -152,8 +152,14 @@
           "options": {
             "outputPath": "dist/apps/vscode",
             "main": "apps/vscode/src/main.ts",
+            "sourceMaps": false,
+            "externalDependencies": ["vscode"],
             "tsConfig": "apps/vscode/tsconfig.app.json",
-            "assets": ["apps/vscode/src/package.json", "apps/vscode/src/assets"]
+            "assets": [
+              "apps/vscode/src/package.json",
+              "apps/vscode/src/tree-view-icon.svg",
+              "apps/vscode/src/assets"
+            ]
           },
           "configurations": {
             "production": {
@@ -413,6 +419,22 @@
           }
         }
       }
+    },
+    "environment": {
+      "root": "libs/environment",
+      "sourceRoot": "libs/environment/src",
+      "projectType": "library",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["libs/environment/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**"]
+          }
+        }
+      },
+      "schematics": {}
     }
   },
   "cli": {

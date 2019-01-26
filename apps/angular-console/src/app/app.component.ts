@@ -1,21 +1,21 @@
 import { FADE_IN } from '@angular-console/ui';
-import { RouterNavigationService, Settings } from '@angular-console/utils';
+import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
 import {
+  ChangeDetectionStrategy,
   Component,
   OnDestroy,
   OnInit,
-  ViewChild,
-  ChangeDetectionStrategy
+  ViewChild
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import {
   Breadcrumb,
   ContextualActionBarService
 } from '@nrwl/angular-console-enterprise-frontend';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
 const TITLE_SEPARATOR = ' | ';
 
@@ -50,10 +50,25 @@ export class AppComponent implements OnInit, OnDestroy {
     settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly titleService: Title,
-    // Ensures we allow location ext to listen on all router events no matter which route user enters into first.
-    private readonly routerNavService: RouterNavigationService
+    router: Router
   ) {
     settings.fetch().subscribe();
+
+    router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(e => {
+        if (e.urlAfterRedirects === '/connect') {
+          // TODO: This logic belong within angular-console-enterprise-frontend
+          this.contextualActionBarService.breadcrumbs$.next([
+            { title: 'Connect' }
+          ]);
+        } else if (e.urlAfterRedirects === '/settings') {
+          // TODO: This logic belong within the settings component after electron redesign.
+          this.contextualActionBarService.breadcrumbs$.next([
+            { title: 'Settings' }
+          ]);
+        }
+      });
   }
 
   private readonly titleSubscription = this.contextualActionBarService.breadcrumbs$

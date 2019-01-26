@@ -10,8 +10,18 @@
       *ngIf="(contextualActionBarService.contextualActions$ | async) === null"
       fxLayout="row"
       fxLayoutAlign="start center"
+      [ngSwitch]="environment.application"
     >
       <button
+        *ngSwitchCase="'vscode'"
+        disabled
+        class="hamburger-button"
+        mat-icon-button
+      >
+        <img class="angular-logo" src="/assets/angular-console.png" />
+      </button>
+      <button
+        *ngSwitchCase="'electron'"
         [ngSwitch]="showMenuButton | async"
         class="hamburger-button"
         mat-icon-button

@@ -84,17 +84,17 @@ export function projectNames(callback: (s: any) => void) {
 }
 
 export function goToGenerate() {
-  cy.get('button#go-to-generate').click({ force: true });
-  cy.contains('.title', 'Generate Code');
+  cy.get('button#go-to-generate').click({ force: true, timeout: 5000 });
+  cy.contains('.title', 'Generate');
 }
 
 export function goToExtensions() {
-  cy.get('button#go-to-extensions').click({ force: true });
-  cy.contains('.title', 'Add CLI Extensions');
+  cy.get('button#go-to-extensions').click({ force: true, timeout: 5000 });
+  cy.contains('.title', 'Extensions');
 }
 
 export function goToTasks() {
-  cy.get('button#go-to-tasks').click({ force: true });
+  cy.get('button#go-to-tasks').click({ force: true, timeout: 5000 });
   cy.contains('.title', 'Tasks');
 }
 
