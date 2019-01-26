@@ -17,7 +17,9 @@
     "electron-store": "2.0.0",
     "opn": "^5.4.0",
     "electron-updater": "3.1.2",
-    "express": "4.16.4",
+    "@nestjs/common": "5.5.0",
+    "@nestjs/core": "5.5.0",
+    "@nestjs/graphql": "5.5.0",
     "fix-path": "2.1.0",
     "get-port": "4.0.0",
     "graphql": "^14.0.2",
@@ -27,7 +29,8 @@
     "resolve": "1.9.0",
     "strip-json-comments": "2.0.1",
     "universal-analytics": "0.4.20",
-    "uuid": "3.3.2"
+    "uuid": "3.3.2",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "electron": "2.0.14"

@@ -51,7 +51,9 @@
     "@nrwl/schematics": "7.4.0",
     "apollo-server-express": "2.3.1",
     "dotenv": "6.2.0",
-    "express": "4.16.4",
+    "@nestjs/common": "5.5.0",
+    "@nestjs/core": "5.5.0",
+    "@nestjs/graphql": "5.5.0",
     "get-port": "4.0.0",
     "graphql": "14.0.2",
     "node-pty-prebuilt": "0.7.6",
@@ -62,6 +64,7 @@
     "strip-json-comments": "2.0.1",
     "universal-analytics": "0.4.20",
     "uuid": "3.3.2",
-    "vscode": "^1.1.26"
+    "vscode": "^1.1.26",
+    "reflect-metadata": "^0.1.13"
   }
 }
