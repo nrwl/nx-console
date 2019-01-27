@@ -85,6 +85,7 @@ function hasVsCode(config: { insiders: boolean } = { insiders: false }) {
       const appName = insiders
         ? 'Visual Studio Code - Insiders.app'
         : 'Visual Studio Code.app';
+
       return apps.indexOf(appName) > -1;
     } catch (e) {
       return false;

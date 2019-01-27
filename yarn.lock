@@ -9265,7 +9265,14 @@ no-case@^2.2.0, no-case@^2.3.2:
   dependencies:
     lower-case "^1.1.1"
 
-node-abi@^2.0.0, node-abi@^2.2.0:
+node-abi@^2.0.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.6.0.tgz#3adc69b28b334a0556fbadca378c7d18b8c82397"
+  integrity sha512-kCnEh6af6Z6DB7RFI/7LHNwqRjvJW7rgrv3lhIFoQ/+XhLPI/lJYwsk5vzvkldPWWgqnAMcuPF5S8/jj56kVOA==
+  dependencies:
+    semver "^5.4.1"
+
+node-abi@^2.2.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.5.1.tgz#bb17288fc3b2f68fea0ed9897c66979fd754ed47"
   integrity sha512-oDbFc7vCFx0RWWCweTer3hFm1u+e60N5FtGnmRV6QqvgATGFH/XRR6vqWIeBVosCYCqt6YdIr2L0exLZuEdVcQ==

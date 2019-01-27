@@ -8,7 +8,6 @@ jobs:
     docker:
       - image: circleci/node:8.12.0-stretch-browsers
     working_directory: ~/repo
-
     steps:
       - checkout
       - restore_cache:
@@ -23,14 +22,15 @@ jobs:
             - ./node_modules
             - /home/circleci/.cache/Cypress
           key: yarn-dependencies-{{ checksum "yarn.lock" }}
+# we should use- run: yarn start e2e.prepare
+      - run: yarn start build.electron
+      - run: yarn start dev.copy-assets.electron
+      - run: yarn start e2e.fixtures
       - run: yarn start format.check
-      - run: yarn start lint.against.origin-master
-      - run: yarn start dev.server.gen.electron
-      - run: yarn start test.against.origin-master
-      - run: yarn start e2e.prepare
+      - run: yarn start lint.affected.origin-master
+      - run: yarn start test.affected.origin-master
       - run:
           command: yarn start e2e.ci
-          no_output_timeout: 20m
+          no_output_timeout: 5m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
-      - run: yarn start package.ci

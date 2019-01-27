@@ -3,7 +3,7 @@ const fs = require('fs');
 const cp = require('child_process');
 let dev;
 
-const flags = process.argv.slice(2).join(' ');
+let flags = process.argv.slice(2).join(' ');
 
 function runE2eTests() {
   try {
@@ -24,10 +24,10 @@ function runE2eTests() {
 }
 
 try {
-  dev = cp.spawn(findInPath('yarn'), ['start', 'dev.server.start']);
+  dev = cp.spawn(findInPath('yarn'), ['start', 'dev.up.cypress']);
   dev.stdout.on('data', data => {
     console.log(data.toString());
-    if (data.toString().indexOf('starting server on port 4201') > -1) {
+    if (data.toString().indexOf('Listening on port 4201') > -1) {
       runE2eTests();
     }
   });

@@ -46,10 +46,7 @@ export function createServerModule(exports: string[], providers: Provider[]) {
       GraphQLModule.forRoot({
         typePaths: [
           path.join(__dirname, 'assets/schema.graphql'),
-          path.join(
-            __dirname,
-            './node_modules/@nrwl/angular-console-enterprise-electron/schema.graphql'
-          )
+          path.join(__dirname, 'assets/extensions-schema.graphql')
         ],
         bodyParserConfig: true
       })
