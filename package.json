@@ -24,6 +24,10 @@
     "productName": "Angular Console",
     "copyright": "Copyright © 2018 Narwhal Technologies Inc",
     "asar": false,
+    "files": [
+      "**/*",
+      "!**/node_modules/@schematics/**"
+    ],
     "extraResources": [
       {
         "from": "dist/apps/electron/assets",
@@ -46,7 +50,8 @@
       "artifactName": "AngularConsole-${version}.${ext}"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "icons/icon.ico"
     },
     "linux": {
       "target": [
@@ -128,9 +133,9 @@
     "electron-builder": "20.28.4",
     "electron-installer-dmg": "2.0.0",
     "electron-packager": "13.0.1",
-    "electron-rebuild": "^1.8.2",
     "electron-store": "2.0.0",
     "electron-updater": "3.1.2",
+    "electron-rebuild": "^1.8.2",
     "express": "4.16.4",
     "fix-path": "2.1.0",
     "fontfaceobserver": "^2.1.0",

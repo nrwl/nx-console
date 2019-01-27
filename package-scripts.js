@@ -9,7 +9,7 @@ function electronOrVscode(command) {
   };
 }
 
-function against(affectedCommand) {
+function affected(affectedCommand) {
   return {
     'origin-master': `nx affected:${affectedCommand} --base=origin/master --parallel`,
     'upstream-master': `nx affected:${affectedCommand} --base=upstream/master --parallel`
@@ -24,6 +24,7 @@ function electronBuilder(platform, dashP, extraFlags) {
 
 const ELECTRON_BUNDLE_PATH = join('dist', 'apps', 'electron');
 const APPLICATION_BUNDLE_PATH = join('dist', 'apps', 'APPLICATION');
+
 const assetMappings = {
   'ng-cmd': {
     from: join('tools', 'win', '.bin', 'ng.cmd'),
@@ -37,6 +38,14 @@ const assetMappings = {
       'node-pty-prebuilt',
       'build',
       'Release'
+    )
+  },
+  'extensions-schema': {
+    from: join('./node_modules', '@nrwl', 'angular-console-enterprise-electron', 'schema.graphql'),
+    to: join(
+      APPLICATION_BUNDLE_PATH,
+      'assets',
+      'extensions-schema.graphql'
     )
   },
   'server-assets': {
@@ -63,10 +72,12 @@ module.exports = {
           readme: `shx cp ${assetMappings['readme'].from} ${
             assetMappings['readme'].to
           }`,
+          'extensions-schema': `shx cp ${assetMappings['extensions-schema'].from} ${
+            assetMappings['extensions-schema'].to
+          }`,
           cli: 'node ./tools/scripts/patch-cli.js'
         })
       ),
-      'start-electron': `NODE_ENV=development electron ${ELECTRON_BUNDLE_PATH}`,
       server: {
         default: nps.series.nps(
           'dev.server.gen-and-build.electron',
@@ -95,8 +106,8 @@ module.exports = {
         }),
         cypress: nps.concurrent({
           server: 'nps dev.server',
-          frontend: 'ng serve angular-console --configuration cypress'
-        })
+          frontend: 'ng run angular-console:serve:cypress'
+        }),
       }
     },
     prepare: {
@@ -109,12 +120,14 @@ module.exports = {
       )
     },
     package: {
-      // NOTE: This command should be run on a mac with Parallels installed
-      electron: nps.series.nps(
-        'prepare.electron',
+      electronMac: nps.series(
+        'nps prepare.electron',
         electronBuilder('--mac', 'never'),
-        electronBuilder('--win', 'never'),
         electronBuilder('--linux', 'never')
+      ),
+      electronWin: nps.series(
+        'nps prepare.electron',
+        electronBuilder('--win', 'never'),
       ),
       vscode: nps.series(
         'nps prepare.vscode',
@@ -123,35 +136,23 @@ module.exports = {
           assetMappings['node-pty-prebuilt'].to
         }`.replace(/APPLICATION/g, 'vscode'),
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
-      ),
-      ci: nps.concurrent({
-        // electron: electronBuilder('--mac --linux', 'never'),
-        vscode: 'nps package.vscode'
-      })
+      )
     },
     publish: {
-      // NOTE: This command should be run on a mac with Parallels installed
-      electron: nps.series.nps(
-        'dev.prepare',
-        electronBuilder('--mac', 'always'),
+      electronWin: nps.series.nps(
+        'prepare.electron',
         electronBuilder(
           '--win',
           'always',
           '--config.win.certificateSubjectName="Narwhal Technologies Inc."'
-        ),
-        electronBuilder('--linux', 'always')
+        )
       )
     },
     e2e: {
-      build: nps.series.nps(
-        'build.electron.cypress',
-        'dev.copy-assets.electron'
-      ),
       fixtures: 'node ./tools/scripts/set-up-e2e-fixtures.js',
-      prepare: nps.concurrent.nps('e2e.build', 'e2e.fixtures'),
+      prepare: nps.concurrent.nps('prepare.electron', 'e2e.fixtures'),
       up: 'node ./tools/scripts/e2e.js --watch',
-      headless: 'node ./tools/scripts/e2e.js --headless',
-      ci: 'node ./tools/scripts/e2e.js --headless'
+      ci: 'node ./tools/scripts/e2e.js --headless --record'
     },
     format: {
       default: 'nx format:write',
@@ -164,25 +165,25 @@ module.exports = {
         nxLint: 'nx lint',
         tsLint: 'nx affected:lint --all --parallel'
       }),
-      against: against('lint'),
+      affected: affected('lint'),
       fix: {
         default: 'nx affected:lint --all --parallel --fix',
-        against: against('lint --fix')
+        affected: affected('lint --fix')
       }
     },
     build: {
       default: 'nx affected:build --all --parallel',
-      against: against('build'),
+      affected: affected('build'),
       ...electronOrVscode(
-        nps.concurrent({
-          server: 'nps dev.server.gen-and-build.APPLICATION',
-          frontend: 'ng build angular-console --configuration=APPLICATION'
-        })
+        nps.series(
+          'nps dev.server.gen-and-build.APPLICATION',
+          'ng build angular-console --configuration=APPLICATION'
+        )
       )
     },
     test: {
       default: 'nx affected:test --all --parallel',
-      against: against('test')
+      affected: affected('test')
     },
     'install-dependencies': {
       vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,

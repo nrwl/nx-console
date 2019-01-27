@@ -7,6 +7,8 @@
   "video": true,
   "videosFolder": "../../dist/out-tsc/apps/angular-console-e2e/videos",
   "screenshotsFolder": "../../dist/out-tsc/apps/angular-console-e2e/screenshots",
+  "projectId": "x2ebye",
   "chromeWebSecurity": false,
-  "baseUrl": "http://localhost:4201"
+  "numTestsKeptInMemory": 5,
+  "baseUrl": "http://localhost:4200"
 }
