@@ -1,6 +1,6 @@
 import { Commands } from './commands';
 import { createDetailedStatusCalculator } from './detailed-status-calculator';
-import { normalizeCommands } from '../utils/architect-utils';
+import { normalizeCommands } from '../utils/architect';
 import { PseudoTerminalFactory } from '@angular-console/server';
 import { platform } from 'os';
 import { FileUtils } from '../utils/file-utils';

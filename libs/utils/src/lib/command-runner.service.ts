@@ -35,7 +35,6 @@ export enum CommandStatus {
 export interface IncrementalCommandOutput {
   status: CommandStatus;
   outChunk: string;
-
   detailedStatus: any;
 }
 
