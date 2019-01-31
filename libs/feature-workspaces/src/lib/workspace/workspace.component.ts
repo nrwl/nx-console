@@ -137,28 +137,30 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         this.contextualActionBarService.nonContextualActions$.next([]);
         return;
     }
-    this.contextualActionBarService.nonContextualActions$.next([
-      {
-        name: 'Open in...',
-        description: 'Open workspace in another program',
-        icon: 'open_in_browser',
-        options: editors.map(
-          (editor): MenuOption => {
-            return {
-              name: `${editor.name}`,
-              image: editor.icon,
-              invoke: () => {
-                this.workspace$
-                  .pipe(first())
-                  .subscribe(w =>
-                    this.editorSupport.openInEditor(editor.name, w.path)
-                  );
-              }
-            };
-          }
-        )
-      }
-    ]);
+    if (this.isElectron) {
+      this.contextualActionBarService.nonContextualActions$.next([
+        {
+          name: 'Open in...',
+          description: 'Open workspace in another program',
+          icon: 'open_in_browser',
+          options: editors.map(
+            (editor): MenuOption => {
+              return {
+                name: `${editor.name}`,
+                image: editor.icon,
+                invoke: () => {
+                  this.workspace$
+                    .pipe(first())
+                    .subscribe(w =>
+                      this.editorSupport.openInEditor(editor.name, w.path)
+                    );
+                }
+              };
+            }
+          )
+        }
+      ]);
+    }
   });
 
   private readonly workplaceSubscription = combineLatest(

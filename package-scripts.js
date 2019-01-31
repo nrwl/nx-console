@@ -19,7 +19,7 @@ function affected(affectedCommand) {
 function electronBuilder(platform, dashP, extraFlags) {
   return `electron-builder ${platform} -p ${dashP} ${
     extraFlags ? extraFlags : ''
-  }`;
+    }`;
 }
 
 const ELECTRON_BUNDLE_PATH = join('dist', 'apps', 'electron');
@@ -74,23 +74,33 @@ const assetMappings = {
 module.exports = {
   scripts: {
     dev: {
-      'copy-assets': electronOrVscode(
+      'copy-assets': {
+        electron: nps.series.nps('dev.copy-assets-base.electron'),
+        vscode: nps.series(
+          'nps dev.copy-assets-base.vscode',
+          `shx rm -rf ${assetMappings['node-pty-prebuilt'].to}]`,
+          `shx cp -rf ${assetMappings['node-pty-prebuilt'].from} ${
+            assetMappings['node-pty-prebuilt'].to
+            }`.replace(/APPLICATION/g, 'vscode')
+        )
+      },
+      'copy-assets-base': electronOrVscode(
         nps.concurrent({
           schema: `shx cp ${assetMappings['schema'].from} ${
             assetMappings['schema'].to
-          }`,
+            }`,
           'ng-cmd': `shx cp ${assetMappings['ng-cmd'].from} ${
             assetMappings['ng-cmd'].to
-          }`,
+            }`,
           'server-assets': `shx cp -rf ${assetMappings['server-assets'].from} ${
             assetMappings['server-assets'].to
-          }`,
+            }`,
           readme: `shx cp ${assetMappings['readme'].from} ${
             assetMappings['readme'].to
-          }`,
+            }`,
           'extensions-schema': `shx cp ${
             assetMappings['extensions-schema'].from
-          } ${assetMappings['extensions-schema'].to}`,
+            } ${assetMappings['extensions-schema'].to}`,
           cli: 'node ./tools/scripts/patch-cli.js'
         })
       ),
@@ -149,10 +159,6 @@ module.exports = {
       ),
       vscode: nps.series(
         'nps prepare.vscode',
-        `shx rm -rf ${assetMappings['node-pty-prebuilt'].to}]`,
-        `shx cp -rf ${assetMappings['node-pty-prebuilt'].from} ${
-          assetMappings['node-pty-prebuilt'].to
-        }`.replace(/APPLICATION/g, 'vscode'),
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
       )
@@ -212,7 +218,7 @@ module.exports = {
           : os.platform() === 'darwin'
           ? 'mac'
           : 'linux'
-      } --dir -p never`
+        } --dir -p never`
     }
   }
 };

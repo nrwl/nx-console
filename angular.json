@@ -153,7 +153,7 @@
             "outputPath": "dist/apps/vscode",
             "main": "apps/vscode/src/main.ts",
             "sourceMap": false,
-            "externalDependencies": ["vscode"],
+            "externalDependencies": ["vscode", "node-pty-prebuilt"],
             "tsConfig": "apps/vscode/tsconfig.app.json",
             "assets": [
               "apps/vscode/src/package.json",

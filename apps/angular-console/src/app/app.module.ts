@@ -7,6 +7,7 @@ import {
 } from '@angular-console/feature-workspaces';
 import { UiModule } from '@angular-console/ui';
 import {
+  LocationExt,
   IsNodeJsInstalledGuard,
   Messenger,
   Telemetry
@@ -119,4 +120,8 @@ export function initApollo(
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+  constructor(location: LocationExt) {
+    location.init();
+  }
+}

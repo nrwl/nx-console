@@ -11,10 +11,7 @@ import {
   switchMap
 } from 'rxjs/operators';
 import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
-import {
-  EXTENSIONS_POLLING,
-  RouterNavigationService
-} from '@angular-console/utils';
+import { EXTENSIONS_POLLING, LocationExt } from '@angular-console/utils';
 import { WorkspaceAndExtensionsGQL } from '../generated/graphql';
 
 interface ExtensionId {
@@ -105,7 +102,7 @@ export class ExtensionsComponent {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly workspaceAndExtensionsGQL: WorkspaceAndExtensionsGQL,
-    private readonly locationExt: RouterNavigationService
+    private readonly locationExt: LocationExt
   ) {}
 
   navigateToSelectedExtension(s: Extension | null) {

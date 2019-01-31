@@ -10,10 +10,7 @@ import {
   startWith,
   distinctUntilChanged
 } from 'rxjs/operators';
-import {
-  RouterNavigationService,
-  TARGET_POLLING
-} from '@angular-console/utils';
+import { LocationExt, TARGET_POLLING } from '@angular-console/utils';
 import { WorkspaceAndProjectsGQL } from '../generated/graphql';
 import { Location } from '@angular/common';
 
@@ -139,7 +136,7 @@ export class TargetsComponent {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly workspaceAndProjectsGQL: WorkspaceAndProjectsGQL,
-    private readonly locationExt: RouterNavigationService
+    private readonly locationExt: LocationExt
   ) {}
 
   navigateToSelectedTarget(target: Target | null) {
