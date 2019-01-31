@@ -18,8 +18,8 @@ body {
 }
 
 * {
-  font-smooth: always;
-  -webkit-font-smoothing: antialiased;
+  font-smooth: always !important;
+  -webkit-font-smoothing: antialiased !important;
 }
 
 .outlet-container {

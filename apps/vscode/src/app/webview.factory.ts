@@ -76,8 +76,13 @@ export function getIframeHtml(iframeUrl: string) {
           }
 
           iframe {
-            height: 100vh;
-            width: 100vw;
+            height: 120vh;
+            width: 120vw;
+            transform: scale(calc(100 / 120)) perspective(1px) translateZ(0);
+            backface-visibility: hidden;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            transform-origin: 0 0;
             opacity: 0;
             transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
           }
