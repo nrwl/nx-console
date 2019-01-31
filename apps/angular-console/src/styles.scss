@@ -17,6 +17,11 @@ body {
   background: white;
 }
 
+* {
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+}
+
 .outlet-container {
   position: relative;
   height: 100%;
