@@ -53,12 +53,11 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
   getChildren() {
     return Promise.resolve(
       [
-        'Workspaces',
-        'Connect',
-        'Settings',
         ...(this.currentWorkspace
           ? ['Projects', 'Generate', 'Tasks', 'Extensions']
-          : [])
+          : []),
+        'Connect',
+        'Settings'
       ].map(
         route =>
           new WorkspaceRoute(

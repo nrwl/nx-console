@@ -50,15 +50,7 @@
       "angular-console": [
         {
           "id": "angularConsole",
-          "name": "Angular Console"
-        },
-        {
-          "id": "angularConsoleFavoriteWorkspaces",
-          "name": "Favorite Workspaces"
-        },
-        {
-          "id": "angularConsoleRecentWorkspaces",
-          "name": "Recent Workspaces"
+          "name": "Navigation"
         }
       ]
     },

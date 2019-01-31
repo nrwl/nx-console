@@ -1,8 +1,4 @@
-import {
-  readSettings,
-  Settings,
-  WorkspaceDefinition
-} from '@angular-console/server';
+import { WorkspaceDefinition } from '@angular-console/server';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { Server } from 'http';
 import {
@@ -23,17 +19,13 @@ import {
   WorkspaceRouteTitle
 } from './app/tree-item/workspace-route';
 import { CurrentWorkspaceTreeProvider } from './app/tree-view/current-workspace-tree-provider';
-import { RecentWorkspacesTreeProvider } from './app/tree-view/recent-workspaces-tree-provider';
 import { createWebViewPanel } from './app/webview.factory';
 
 let server: { server: Server; store: Store };
 let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
-let favoriteWorkspaces: TreeView<Workspace | WorkspaceRoute>;
-let recentWorkspaces: TreeView<Workspace | WorkspaceRoute>;
 
 export async function activate(context: ExtensionContext) {
   server = await startServer(context);
-  const settings = readSettings(server.store) as Settings;
 
   const workspacePath =
     workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
@@ -44,29 +36,8 @@ export async function activate(context: ExtensionContext) {
       context.extensionPath
     )
   });
-  favoriteWorkspaces = window.createTreeView(
-    'angularConsoleFavoriteWorkspaces',
-    {
-      treeDataProvider: RecentWorkspacesTreeProvider.create(
-        settings.recent,
-        context.extensionPath,
-        true
-      )
-    }
-  );
-  recentWorkspaces = window.createTreeView('angularConsoleRecentWorkspaces', {
-    treeDataProvider: RecentWorkspacesTreeProvider.create(
-      settings.recent,
-      context.extensionPath,
-      false
-    )
-  });
 
-  context.subscriptions.push(
-    currentWorkspace,
-    favoriteWorkspaces,
-    recentWorkspaces
-  );
+  context.subscriptions.push(currentWorkspace);
 
   [
     {
@@ -136,11 +107,7 @@ async function main(config: {
 
   webViewPanel.onDidChangeViewState(e => {
     if (e.webviewPanel.visible) {
-      revealWorkspaceRoute(
-        currentWorkspace,
-        favoriteWorkspaces,
-        recentWorkspaces
-      );
+      revealWorkspaceRoute(currentWorkspace);
     }
   });
 

@@ -29,21 +29,11 @@ const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
 ]);
 
 export class WorkspaceRoute extends TreeItem {
-  revealWorkspaceRoute: RevealWorkspaceRoute = (
-    currentWorkspace,
-    favoriteWorkspaces,
-    recentWorkspaces
-  ) => {
-    revealWorkspaceRouteIfVisible(currentWorkspace, this)
-      .then(
-        () => {},
-        () => revealWorkspaceRouteIfVisible(favoriteWorkspaces, this)
-      )
-      .then(
-        () => {},
-        () => revealWorkspaceRouteIfVisible(recentWorkspaces, this)
-      )
-      .then(() => {}, () => {}); // Explicitly handle rejection
+  revealWorkspaceRoute: RevealWorkspaceRoute = currentWorkspace => {
+    revealWorkspaceRouteIfVisible(currentWorkspace, this).then(
+      () => {},
+      () => {}
+    ); // Explicitly handle rejection
   };
 
   command = {
@@ -82,9 +72,7 @@ export class WorkspaceRoute extends TreeItem {
 }
 
 export type RevealWorkspaceRoute = (
-  currentWorkspace: TreeView<Workspace | WorkspaceRoute>,
-  favoriteWorkspaces: TreeView<Workspace | WorkspaceRoute>,
-  recentWorkspaces: TreeView<Workspace | WorkspaceRoute>
+  currentWorkspace: TreeView<Workspace | WorkspaceRoute>
 ) => void;
 
 export function revealWorkspaceRouteIfVisible(

@@ -152,7 +152,7 @@
           "options": {
             "outputPath": "dist/apps/vscode",
             "main": "apps/vscode/src/main.ts",
-            "sourceMaps": false,
+            "sourceMap": false,
             "externalDependencies": ["vscode"],
             "tsConfig": "apps/vscode/tsconfig.app.json",
             "assets": [

@@ -15,11 +15,10 @@ export function createWebViewPanel(
   workspaceDef: WorkspaceDefinition | undefined,
   route: WorkspaceRouteTitle | undefined
 ) {
-  const panelTitle = route
-    ? workspaceDef && workspaceDef.name
-      ? `${workspaceDef.name} | ${route}`
-      : route
-    : 'Angular Console';
+  let panelTitle = route || 'Angular Console';
+  if (workspaceDef && workspaceDef.name) {
+    panelTitle = `${workspaceDef.name} | ${route}`;
+  }
 
   const activePanel = activeWebViews.get(panelTitle);
   if (activePanel) {
@@ -77,10 +76,8 @@ export function getIframeHtml(iframeUrl: string) {
           }
 
           iframe {
-            height: 120vh;
-            width: 120vw;
-            transform: scale(calc(100 / 120));
-            transform-origin: 0 0;
+            height: 100vh;
+            width: 100vw;
             opacity: 0;
             transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
           }
