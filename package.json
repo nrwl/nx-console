@@ -47,7 +47,8 @@
     "npmRebuild": true,
     "mac": {
       "category": "public.app-category.developer-tools",
-      "artifactName": "AngularConsole-${version}.${ext}"
+      "artifactName": "AngularConsole-${version}.${ext}",
+      "icon": "icons/icon.icns"
     },
     "win": {
       "target": "nsis",
@@ -59,7 +60,8 @@
         "tar.gz"
       ],
       "synopsis": "Angular Console",
-      "category": "Development"
+      "category": "Development",
+      "icon": "icons/icon.png"
     },
     "nsis": {
       "createDesktopShortcut": "always",
