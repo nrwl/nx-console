@@ -1,5 +1,5 @@
 import { fakeAsync, getTestBed, TestBed } from '@angular/core/testing';
-import { RouterNavigationService } from './router-navigation.service';
+import { LocationExt } from './location-ext.service';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting
@@ -25,7 +25,7 @@ const testRoutes: Routes = [
   }
 ];
 
-describe('RouterNavigationService', () => {
+describe('LocationExt', () => {
   beforeEach(() => {
     TestBed.resetTestEnvironment();
 
@@ -33,15 +33,13 @@ describe('RouterNavigationService', () => {
       BrowserDynamicTestingModule,
       platformBrowserDynamicTesting()
     ).configureTestingModule({
-      providers: [RouterNavigationService],
+      providers: [LocationExt],
       imports: [TestSharedModule, RouterTestingModule.withRoutes(testRoutes)]
     });
   });
 
   it('navigates to fallback route if unable to go back', fakeAsync(async () => {
-    const service: RouterNavigationService = TestBed.get(
-      RouterNavigationService
-    );
+    const service: LocationExt = TestBed.get(LocationExt);
 
     const injector = getTestBed();
     const router = injector.get(Router);

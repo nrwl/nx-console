@@ -8,6 +8,6 @@ export * from './lib/open-in-browser.service';
 export * from './lib/polling-constants';
 export * from './lib/serializer.service';
 export * from './lib/settings.service';
-export * from './lib/router-navigation.service';
+export * from './lib/location-ext.service';
 export * from './lib/show-item-in-folder.service';
 export { OpenDocGQL } from './lib/generated/graphql';
