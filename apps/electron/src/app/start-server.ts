@@ -22,7 +22,11 @@ export async function startServer(
         buttonLabel: args.buttonLabel,
         title: args.title
       });
-      return selection[0];
+      if (selection && selection.length > 0) {
+        return selection[0];
+      } else {
+        return undefined;
+      }
     };
 
     const exports = [
