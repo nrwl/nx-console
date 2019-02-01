@@ -62,13 +62,13 @@ export class MutationResolver {
     try {
       return runCommand(
         'new',
-        p,
+        __dirname,
         'ng',
         findClosestNg(__dirname),
         [
           'new',
           name,
-          `--directory=${name}`,
+          `--directory=${p}/${name}`,
           `--collection=${collection}`,
           '--no-interactive',
           ...newCommand
