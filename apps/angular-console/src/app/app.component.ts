@@ -6,7 +6,8 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  ViewChild
+  ViewChild,
+  HostBinding
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -16,13 +17,14 @@ import {
 } from '@nrwl/angular-console-enterprise-frontend';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 const TITLE_SEPARATOR = ' | ';
 
 @Component({
   selector: 'angular-console-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('routerTransition', [
@@ -32,6 +34,9 @@ const TITLE_SEPARATOR = ' | ';
   ]
 })
 export class AppComponent implements OnInit, OnDestroy {
+  @HostBinding('class.vscode') readonly isVsocde =
+    environment.application === 'vscode';
+
   @ViewChild(RouterOutlet) routerOutlet: RouterOutlet;
   routerTransition: Observable<string>;
 
