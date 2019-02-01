@@ -31,6 +31,8 @@ if (environment.production) {
   enableProdMode();
 }
 
+document.body.classList.add(environment.application);
+
 platformBrowserDynamic()
   .bootstrapModule(AppModule)
   .catch(err => console.log(err));

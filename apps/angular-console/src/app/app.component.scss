@@ -2,6 +2,10 @@
   display: block;
   height: 100vh;
   overflow: hidden;
+
+  &.vscode {
+    height: 125vh;
+  }
 }
 
 .content-container {

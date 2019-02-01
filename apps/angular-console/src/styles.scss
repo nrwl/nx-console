@@ -15,11 +15,10 @@ body {
   margin: 0;
   padding: 0;
   background: white;
-}
 
-* {
-  font-smooth: always;
-  -webkit-font-smoothing: antialiased;
+  &.vscode {
+    zoom: 0.8;
+  }
 }
 
 .outlet-container {
