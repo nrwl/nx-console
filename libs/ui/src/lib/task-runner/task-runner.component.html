@@ -1,4 +1,9 @@
-<div class="outer-container" fxLayout="column" fxLayoutAlign="space-between">
+<div
+  class="outer-container"
+  [class.vscode]="isVscode"
+  fxLayout="column"
+  fxLayoutAlign="space-between"
+>
   <div class="ui-flags-container" #uiFlagsContainer>
     <ng-content select="ui-flags,.ui-flags"></ng-content>
   </div>

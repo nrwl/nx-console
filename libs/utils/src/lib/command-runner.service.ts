@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FetchResult } from 'apollo-link';
-import { BehaviorSubject, interval, merge, Observable, of, concat } from 'rxjs';
+import { BehaviorSubject, interval, Observable, of, concat } from 'rxjs';
 import {
   concatMap,
   map,
@@ -16,7 +16,6 @@ import { COMMAND_LIST_POLLING, COMMANDS_POLLING } from './polling-constants';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import {
   CommandsGQL,
-  GetCommandGQL,
   GetCommandInitialGQL,
   ListAllCommandsGQL,
   RemoveAllCommandsGQL,
@@ -59,7 +58,6 @@ export class CommandRunner {
   readonly refreshList$ = new BehaviorSubject(null);
 
   constructor(
-    private readonly getCommandGQL: GetCommandGQL,
     private readonly getCommandInitialGQL: GetCommandInitialGQL,
     private readonly commandsGQL: CommandsGQL,
     private readonly listAllCommandsGQL: ListAllCommandsGQL,

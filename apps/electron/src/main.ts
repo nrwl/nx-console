@@ -24,16 +24,16 @@ const currentDirectory = process.cwd();
 
 function setupEvents() {
   process.env.trackingID = 'UA-88380372-8';
-  ipcMain.on('event', (event: any, arg: any) =>
+  ipcMain.on('event', (_: any, arg: any) =>
     telemetry.reportEvent(arg.category, arg.action, arg.label, arg.value)
   );
-  ipcMain.on('dataCollectionEvent', (event: any, arg: any) =>
+  ipcMain.on('dataCollectionEvent', (_: any, arg: any) =>
     telemetry.dataCollectionEvent(arg.value)
   );
-  ipcMain.on('reportPageView', (event: any, arg: any) =>
+  ipcMain.on('reportPageView', (_: any, arg: any) =>
     telemetry.reportPageView(arg.path)
   );
-  ipcMain.on('reportException', (event: any, arg: any) =>
+  ipcMain.on('reportException', (_: any, arg: any) =>
     telemetry.reportException(arg.description)
   );
 }

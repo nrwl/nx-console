@@ -3,7 +3,6 @@ import { CommandOutputComponent } from './command-output.component';
 import { UiModule } from '../ui.module';
 import { CommandStatus, CommandRunner } from '@angular-console/utils';
 import { TerminalFactory } from '../terminal/terminal.factory';
-import { Terminal } from 'xterm';
 
 describe('CommandOutputComponent', () => {
   let component: CommandOutputComponent;

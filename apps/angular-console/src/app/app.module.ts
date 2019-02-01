@@ -1,4 +1,8 @@
-import { ENVIRONMENT, Environment } from '@angular-console/environment';
+import {
+  ENVIRONMENT,
+  Environment,
+  IS_VSCODE
+} from '@angular-console/environment';
 import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
 import { FeatureSettingsModule } from '@angular-console/feature-settings';
 import {
@@ -116,7 +120,8 @@ export function initApollo(
       useFactory: initApollo,
       deps: [[new Inject('telemetry')], Messenger, HttpLink]
     },
-    { provide: ENVIRONMENT, useValue: environment as Environment }
+    { provide: ENVIRONMENT, useValue: environment as Environment },
+    { provide: IS_VSCODE, useValue: environment.application === 'vscode' }
   ],
   bootstrap: [AppComponent]
 })

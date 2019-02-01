@@ -32,8 +32,7 @@ export class MutationResolver {
     @Inject('pseudoTerminalFactory')
     private readonly pseudoTerminalFactory: any,
     @Inject('selectDirectory')
-    private readonly selectDirectoryImpl: SelectDirectory,
-    @Inject('serverAddress') private readonly serverAddress: string
+    private readonly selectDirectoryImpl: SelectDirectory
   ) {}
 
   @Mutation()
@@ -250,7 +249,7 @@ export class MutationResolver {
   @Mutation()
   openInEditor(@Args('editor') editor: Editor, @Args('path') p: string) {
     try {
-      openInEditor(editor, p, this.serverAddress);
+      openInEditor(editor, p);
       return { response: 'successful' };
     } catch (e) {
       console.log(e);

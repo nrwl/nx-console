@@ -9,12 +9,10 @@ import {
   map,
   shareReplay,
   startWith,
-  switchMap,
-  tap
+  switchMap
 } from 'rxjs/operators';
 import { LocationExt, SCHEMATICS_POLLING } from '@angular-console/utils';
 import { SchematicCollectionsGQL } from '../generated/graphql';
-import { Location } from '@angular/common';
 
 interface SchematicId {
   collectionName: string | undefined;

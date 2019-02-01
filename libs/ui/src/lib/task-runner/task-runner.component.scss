@@ -11,6 +11,13 @@ $window-chrome-height: 45px;
 .outer-container {
   height: calc(100vh - 64px);
   overflow: hidden;
+  width: 100%;
+  overflow: hidden;
+  background-color: rgb(240, 240, 240);
+
+  &.vscode {
+    height: calc(125vh - 64px);
+  }
 }
 
 .ui-terminal-container {
@@ -29,13 +36,6 @@ $window-chrome-height: 45px;
   button {
     margin: 0;
   }
-}
-
-.outer-container {
-  width: 100%;
-  height: calc(100vh - 64px);
-  overflow: hidden;
-  background-color: rgb(240, 240, 240);
 }
 
 ui-command-output {

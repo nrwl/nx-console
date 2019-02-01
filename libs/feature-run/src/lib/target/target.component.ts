@@ -7,8 +7,7 @@ import {
 import {
   IncrementalCommandOutput,
   CommandRunner,
-  Serializer,
-  Settings
+  Serializer
 } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
@@ -27,7 +26,7 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { ProjectsGQL, RunNgGQL, SchematicDocsGQL } from '../generated/graphql';
+import { ProjectsGQL, RunNgGQL } from '../generated/graphql';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,9 +57,7 @@ export class TargetComponent implements OnInit {
     private readonly serializer: Serializer,
     private readonly contextActionService: ContextualActionBarService,
     private readonly projectsGQL: ProjectsGQL,
-    private readonly runNgGQL: RunNgGQL,
-    private readonly settings: Settings,
-    private readonly schematicDocsGQL: SchematicDocsGQL
+    private readonly runNgGQL: RunNgGQL
   ) {}
 
   ngOnInit() {

@@ -4,7 +4,7 @@ import {
   nodePtyPseudoTerminalFactory as win32PseudoTerminalFactory,
   PseudoTerminal
 } from '@angular-console/server';
-import { ExtensionContext, window, Terminal } from 'vscode';
+import { ExtensionContext, window } from 'vscode';
 import { platform } from 'os';
 
 const AC_SUCCESS = 'Process completed 🙏';

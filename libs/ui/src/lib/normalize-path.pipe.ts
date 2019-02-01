@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'normalizePath'
 })
 export class NormalizePathPipe implements PipeTransform {
-  transform(value: string, args?: any): any {
+  transform(value: string, _?: any): any {
     const firstPartIfWin = value.split('\\')[0];
     if (firstPartIfWin && firstPartIfWin.endsWith(':')) {
       return this.toWin(value);

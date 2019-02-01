@@ -13,19 +13,19 @@ export interface DocsProvider {
 }
 
 class EmptyDocsProvider implements DocsProvider {
-  workspaceDocs(dependencies: { [p: string]: string }): Observable<Doc[]> {
+  workspaceDocs(_dependencies: { [p: string]: string }): Observable<Doc[]> {
     return of([]);
   }
 
   schematicDocs(
-    collectionName: string,
-    collectionVersion: string | null,
-    name: string
+    _collectionName: string,
+    _collectionVersion: string | null,
+    _name: string
   ): Observable<Doc[]> {
     return of([]);
   }
 
-  openDoc(id: string): Observable<boolean> {
+  openDoc(_id: string): Observable<boolean> {
     return of(false);
   }
 }
@@ -64,7 +64,7 @@ export class Docs implements DocsProvider {
         )
       ),
       takeWhile(r => !r),
-      reduce((m, c) => c, false)
+      reduce((_, c) => c, false)
     );
   }
 

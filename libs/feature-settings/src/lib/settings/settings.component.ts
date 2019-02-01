@@ -1,10 +1,4 @@
-import {
-  Component,
-  Inject,
-  OnInit,
-  ChangeDetectionStrategy
-} from '@angular/core';
-import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { Telemetry, Settings } from '@angular-console/utils';
 
 @Component({

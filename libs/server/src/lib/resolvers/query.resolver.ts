@@ -66,7 +66,7 @@ export class QueryResolver {
         path: p,
         dependencies: readDependencies(packageJson),
         extensions: readExtensions(packageJson),
-        projects: readProjects(p, angularJson.projects),
+        projects: readProjects(angularJson.projects),
         npmScripts: readNpmScripts(p, packageJson),
         docs: {} as any,
         schematicCollections: [] as any
