@@ -10,24 +10,13 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
-import { map, scan, take } from 'rxjs/operators';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
 import { TerminalComponent } from '../terminal/terminal.component';
 
 export type StatusComponentView = 'details' | 'terminal';
 const INITIAL_VIEW: StatusComponentView = 'details';
-
-interface TerminalOutputState {
-  view: StatusComponentView;
-  unread: boolean;
-  out: string;
-}
-
-interface TerminalOutputValue {
-  view: StatusComponentView;
-  out: string;
-}
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

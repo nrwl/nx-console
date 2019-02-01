@@ -1,4 +1,4 @@
-import { execSync, exec } from 'child_process';
+import { execSync } from 'child_process';
 import { existsSync, stat, statSync, readdirSync, readFileSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
@@ -130,7 +130,7 @@ function cacheJsonFiles(basedir: string) {
     const packages = listOfUnnestedNpmPackages(nodeModulesDir);
 
     const res: any = {};
-    const schematicCollections = packages.forEach(p => {
+    packages.forEach(p => {
       const filePath = path.join(nodeModulesDir, p, 'package.json');
       if (!fileExistsSync(filePath)) return;
       res[filePath] = readAndParseJson(

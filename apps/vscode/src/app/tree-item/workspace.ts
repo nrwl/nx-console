@@ -1,4 +1,4 @@
-import { Uri, TreeItemCollapsibleState, TreeItem, WebviewPanel } from 'vscode';
+import { Uri, TreeItemCollapsibleState, TreeItem } from 'vscode';
 import { join } from 'path';
 import { WorkspaceDefinition } from '@angular-console/server';
 

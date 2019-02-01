@@ -20,8 +20,8 @@ export interface DetailedStatusCalculator<T> {
 
 class EmptyDetailedStatusCalculator implements DetailedStatusCalculator<null> {
   detailedStatus = null;
-  addOut(value: string) {}
-  setStatus(value: 'successful' | 'failed' | 'terminated') {}
+  addOut(_: string) {}
+  setStatus(_: 'successful' | 'failed' | 'terminated') {}
   reset() {}
 }
 
@@ -399,7 +399,7 @@ export class TestDetailedStatusCalculator
     }
   }
 
-  setStatus(value: 'successful' | 'failed' | 'terminated') {
+  setStatus(_: 'successful' | 'failed' | 'terminated') {
     const { failure, success, total } = this.detailedStatus;
     const allRan = total > 0 && failure + success === total;
     this.detailedStatus = {

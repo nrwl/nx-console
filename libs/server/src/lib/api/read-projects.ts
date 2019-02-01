@@ -2,14 +2,14 @@ import { normalizeSchema, readJsonFile } from '../utils/utils';
 import { Project, Architect } from '../generated/graphql-types';
 import * as path from 'path';
 
-export function readProjects(basedir: string, json: any): Project[] {
+export function readProjects(json: any): Project[] {
   return Object.entries(json)
     .map(([key, value]: [string, any]) => {
       return {
         name: key,
         root: value.root,
         projectType: value.projectType,
-        architect: readArchitect(key, basedir, value.architect)
+        architect: readArchitect(key, value.architect)
       };
     })
     .sort(compareProjects);
@@ -19,11 +19,7 @@ function compareProjects(a: Project, b: Project) {
   return a.root.localeCompare(b.root);
 }
 
-function readArchitect(
-  project: string,
-  basedir: string,
-  architect: any
-): Architect[] {
+function readArchitect(project: string, architect: any): Architect[] {
   if (!architect) return [];
   return Object.entries(architect).map(([key, value]: [string, any]) => {
     const configurations = value.configurations

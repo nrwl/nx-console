@@ -1,12 +1,7 @@
-import {
-  checkButtonIsDisabled,
-  selectFolder,
-  uniqName,
-  whitelistGraphql
-} from './utils';
+import { whitelistGraphql } from './utils';
 
 describe('Workspaces', () => {
-  const name = uniqName('workspace');
+  // const name = uniqName('workspace');
 
   beforeEach(() => {
     whitelistGraphql();

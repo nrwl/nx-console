@@ -41,11 +41,7 @@ export type Editor =
   | 'WebStorm'
   | 'IntelliJ IDEA';
 
-export function openInEditor(
-  editor: Editor,
-  path: string,
-  serverAddress: string
-) {
+export function openInEditor(editor: Editor, path: string) {
   switch (editor) {
     case 'Finder':
       return openInFinder(path);

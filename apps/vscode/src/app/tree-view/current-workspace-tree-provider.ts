@@ -46,7 +46,7 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
     super();
   }
 
-  getParent(element: WorkspaceRoute) {
+  getParent(_: WorkspaceRoute) {
     return null;
   }
 

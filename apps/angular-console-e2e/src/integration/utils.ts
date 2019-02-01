@@ -184,12 +184,12 @@ export function uniqName(prefix: string): string {
 }
 
 export function els($p: any): any {
-  return $p.map((i: any, el: any) => Cypress.$(el));
+  return $p.map((_: any, el: any) => Cypress.$(el));
 }
 
 export function texts($p: any): string[] {
   return els($p)
-    .map((i: any, el: any) => el.text())
+    .map((_: any, el: any) => el.text())
     .toArray();
 }
 

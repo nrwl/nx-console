@@ -15,8 +15,8 @@ export function readNpmScripts(
 
 // TODO: add support for custom schemas
 export function readNpmScriptSchema(
-  workspacePath: string,
-  scriptName: string
+  _workspacePath: string,
+  _scriptName: string
 ): any {
   return [
     {

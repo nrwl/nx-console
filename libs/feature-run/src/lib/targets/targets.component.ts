@@ -12,7 +12,6 @@ import {
 } from 'rxjs/operators';
 import { LocationExt, TARGET_POLLING } from '@angular-console/utils';
 import { WorkspaceAndProjectsGQL } from '../generated/graphql';
-import { Location } from '@angular/common';
 
 interface Target {
   projectName: string;

@@ -197,7 +197,7 @@ export function makeNameAvailableValidator(): AsyncValidatorFn {
     ).pipe(
       switchMap(
         // TODO(mrmeku): Recompute this with a less expensive call.
-        (workspacePath: null | string): Observable<null | Directory> => of(null)
+        (_: null | string): Observable<null | Directory> => of(null)
       ),
       map((d: null | Directory) =>
         !d || !d.exists ? null : { nameTaken: true }

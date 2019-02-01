@@ -11,7 +11,7 @@ import {
 @Resolver('Docs')
 export class DocsResolver {
   @ResolveProperty()
-  workspaceDocs(@Parent() workspace: Workspace, @Context() context: any) {
+  workspaceDocs(@Parent() _: Workspace, @Context() context: any) {
     const deps = {
       ...context.packageJson.dependencies,
       ...context.packageJson.devDependencies
@@ -21,7 +21,7 @@ export class DocsResolver {
 
   @ResolveProperty()
   schematicDocs(
-    @Parent() workspace: Workspace,
+    @Parent() _: Workspace,
     @Args('collectionName') collectionName: string,
     @Args('collectionName') name: string
   ) {

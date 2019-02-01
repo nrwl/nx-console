@@ -30,6 +30,6 @@ export class EditorSupport {
         editor,
         path
       })
-      .subscribe(e => {});
+      .subscribe(() => {});
   }
 }

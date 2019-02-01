@@ -1,6 +1,5 @@
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { Settings } from '../generated/graphql-types';
-import { EventEmitter } from 'events';
 import { Subject } from 'rxjs';
 
 /* tslint:disable */

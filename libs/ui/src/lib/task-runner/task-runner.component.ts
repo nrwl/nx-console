@@ -10,13 +10,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   ContentChild,
-  Input
+  Input,
+  Inject
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map, shareReplay, startWith, tap } from 'rxjs/operators';
 
 import { CommandOutputComponent } from '../command-output/command-output.component';
 import { FlagsComponent } from '../flags/flags.component';
+import { IS_VSCODE } from '@angular-console/environment';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,7 +60,7 @@ export class TaskRunnerComponent implements AfterContentChecked {
     }
   }
 
-  constructor() {}
+  constructor(@Inject(IS_VSCODE) readonly isVscode: boolean) {}
 
   ngAfterContentChecked() {
     // Wait until the flags component has rendered its expansion panels.
@@ -98,14 +100,18 @@ export class TaskRunnerComponent implements AfterContentChecked {
         switch (v) {
           case 'grow':
             this.flagsComponent.viewportHeight.next(
-              `calc(70vh - ${expansionPanelHeaderHeight +
+              `calc(${
+                this.isVscode ? '90vh' : '70vh'
+              } - ${expansionPanelHeaderHeight +
                 configurationsHeight +
                 toolbarHeight}px)`
             );
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
-              `calc(100vh - ${expansionPanelHeaderHeight + toolbarHeight}px)`
+              `calc(${
+                this.isVscode ? '125vh' : '100vh'
+              } - ${expansionPanelHeaderHeight + toolbarHeight}px)`
             );
             break;
           default:

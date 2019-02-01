@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Inject
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Project } from '@angular-console/schema';
 import { combineLatest, Observable, of } from 'rxjs';
@@ -10,6 +15,7 @@ import {
 } from '@angular-console/utils';
 import { WorkspaceDocsGQL, WorkspaceGQL } from '../generated/graphql';
 import { FormControl } from '@angular/forms';
+import { IS_VSCODE } from '@angular-console/environment';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,13 +37,17 @@ export class ProjectsComponent implements OnInit {
 
   viewportHeight$ = this.commandRunner.listAllCommands().pipe(
     map(c => Boolean(c.length > 0)),
-    map(actionBarExpanded =>
-      actionBarExpanded ? 'calc(100vh - 194px)' : 'calc(100vh - 128px)'
-    ),
+    map(actionBarExpanded => {
+      const viewportHeight = this.isVscode ? '125vh' : '100vh';
+      return actionBarExpanded
+        ? `calc(${viewportHeight} - 194px)`
+        : `calc(${viewportHeight} - 128px)`;
+    }),
     shareReplay()
   );
 
   constructor(
+    @Inject(IS_VSCODE) readonly isVscode: boolean,
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
     private readonly settings: Settings,

@@ -16,8 +16,7 @@ import {
   Component,
   ElementRef,
   OnInit,
-  ViewChild,
-  OnDestroy
+  ViewChild
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
