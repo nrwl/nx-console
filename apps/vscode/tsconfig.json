@@ -1,9 +1,6 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "removeComments": true,
-    "stripInternal": true,
     "types": ["node"]
   }
 }
