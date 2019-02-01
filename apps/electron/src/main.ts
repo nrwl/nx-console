@@ -196,6 +196,7 @@ function showRestartDialog() {
 function checkForUpdates() {
   setTimeout(async () => {
     autoUpdater.channel = getUpdateChannel();
+    autoUpdater.allowDowngrade = false;
     if (process.env.NODE_ENV !== 'development') {
       try {
         const r = await autoUpdater.checkForUpdates();
