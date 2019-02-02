@@ -10,7 +10,6 @@
 >
   <!-- Show tasks toolbar -->
   <mat-toolbar
-    matRipple
     (click)="actionsExpanded.next(!actionsExpanded.value)"
     [@growShrink]="(showActionToolbar$ | async) ? 'expand' : 'contract'"
     class="action-bar"
@@ -21,6 +20,7 @@
       fxLayoutAlign="start center"
       *ngIf="actions.length > 1"
       fxFlex
+      matRipple
     >
       <button mat-icon-button [disableRipple]="true">
         <mat-icon>{{
