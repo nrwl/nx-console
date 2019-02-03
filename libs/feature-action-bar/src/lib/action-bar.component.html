@@ -185,17 +185,16 @@
         [style.background]="
           actionIdToActiveView[action.id] === 'terminal' ? 'black' : 'white'
         "
-        (@growShrinkTerminal.done)="terminalContainer.expanded = true"
+        (@growShrinkTerminal.done)="
+          terminalContainer.expanded = terminalHeight !== '0'
+        "
       >
         <ui-command-output
           #terminal
           [activeView]="actionIdToActiveView[action.id] || 'details'"
           (activeViewSet)="actionIdToActiveView[action.id] = $event"
-          [commandResponse]="
-            terminalContainer.expanded
-              ? (expandedAction?.command | async)
-              : undefined
-          "
+          *ngIf="terminalContainer.expanded"
+          [commandResponse]="expandedAction?.command | async"
         >
         </ui-command-output>
       </div>

@@ -15,10 +15,17 @@ body {
   margin: 0;
   padding: 0;
   background: white;
+  overflow: hidden;
 
   &.vscode {
-    zoom: 0.8;
+    transform: scale(0.8);
+    width: 125vw;
+    transform-origin: 0 0;
   }
+}
+
+* {
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .outlet-container {
