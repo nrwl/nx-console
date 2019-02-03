@@ -12,7 +12,7 @@ import {
 import * as FontFaceObserver from 'fontfaceobserver';
 import ResizeObserver from 'resize-observer-polyfill';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
-import { first, debounceTime } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 import { Terminal } from 'xterm';
 
 import { TerminalFactory } from './terminal.factory';
@@ -97,12 +97,9 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
       const nativeElement = this.elementRef.nativeElement as HTMLElement;
       this.parentElement = nativeElement.parentElement || nativeElement;
       this.term.pipe(first()).subscribe(term => {
-        this.resizeTerminalSubject
-          .asObservable()
-          .pipe(debounceTime(100))
-          .subscribe(() => {
-            this.resizeTerminal(term);
-          });
+        this.resizeTerminalSubject.asObservable().subscribe(() => {
+          this.resizeTerminal(term);
+        });
         this.resizeTerminalSubject.next();
 
         term.open(this.code.nativeElement);

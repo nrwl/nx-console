@@ -15,6 +15,7 @@ $button-size: 28px;
 .container {
   height: 100%;
   overflow: hidden;
+  position: relative;
 
   .mat-progress-spinner {
     display: inline-block;
@@ -54,7 +55,12 @@ $button-size: 28px;
 }
 
 .details-container {
-  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
 }
 
 .output-container {
