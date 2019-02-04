@@ -91,6 +91,10 @@ export function availableExtensions() {
       description: 'Adds AngularFire to your Angular project'
     },
     {
+      name: 'ng-bootstrap',
+      description: 'Angular version of Angular UI Bootstrap library'
+    },
+    {
       name: 'ng-zorro-antd',
       description:
         'An enterprise-class UI components based on Ant Design and Angular'
