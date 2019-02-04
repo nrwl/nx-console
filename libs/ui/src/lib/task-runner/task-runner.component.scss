@@ -14,10 +14,6 @@ $window-chrome-height: 45px;
   width: 100%;
   overflow: hidden;
   background-color: rgb(240, 240, 240);
-
-  &.vscode {
-    height: calc(125vh - 64px);
-  }
 }
 
 .ui-terminal-container {

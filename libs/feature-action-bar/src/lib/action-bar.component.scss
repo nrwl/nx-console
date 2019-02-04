@@ -21,10 +21,6 @@
   z-index: 10;
   max-height: calc(100vh - 24px);
   overflow-y: hidden;
-
-  &.vscode {
-    max-height: calc(125vh - 24px);
-  }
 }
 
 .action-bar {

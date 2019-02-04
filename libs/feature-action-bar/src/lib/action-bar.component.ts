@@ -16,8 +16,7 @@ import {
   Component,
   HostListener,
   QueryList,
-  ViewChildren,
-  Inject
+  ViewChildren
 } from '@angular/core';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { combineLatest, Observable, BehaviorSubject } from 'rxjs';
@@ -30,7 +29,6 @@ import {
   take,
   tap
 } from 'rxjs/operators';
-import { IS_VSCODE } from '@angular-console/environment';
 
 const TERMINAL_PADDING = 44;
 const COMMAND_HEIGHT = 64;
@@ -163,7 +161,6 @@ export class ActionBarComponent {
   }
 
   constructor(
-    @Inject(IS_VSCODE) readonly isVscode: boolean,
     readonly commandRunner: CommandRunner,
     private readonly contextualActionBarService: ContextualActionBarService
   ) {
@@ -174,8 +171,7 @@ export class ActionBarComponent {
         map(numCommands => {
           const actionBarVisible = numCommands > 1;
           const actionBarHeight = actionBarVisible ? COMMAND_HEIGHT : 0;
-          const viewportHeight = this.isVscode ? '125vh' : '100vh';
-          return `calc(${viewportHeight} - ${TERMINAL_PADDING +
+          return `calc(100vh - ${TERMINAL_PADDING +
             actionBarHeight +
             COMMAND_HEIGHT * numCommands}px)`;
         })
