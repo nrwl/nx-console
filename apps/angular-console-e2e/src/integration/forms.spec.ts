@@ -4,8 +4,7 @@ import {
   checkDisplayedCommand,
   checkFieldHasClass,
   clickOnTask,
-  goToGenerate,
-  openProject,
+  openWorkspace,
   projectPath,
   texts,
   uniqName,
@@ -16,10 +15,7 @@ import {
 describe('Forms', () => {
   beforeEach(() => {
     whitelistGraphql();
-    openProject(projectPath('proj'));
-    goToGenerate();
-    cy.contains('div.title', 'Generate');
-
+    openWorkspace(projectPath('proj'), 'generate');
     clickOnTask('@schematics/angular', 'component');
     cy.contains('div.context-title', '@schematics/angular - component');
   });

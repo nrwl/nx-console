@@ -2,9 +2,8 @@ import {
   checkDisplayedCommand,
   clickOnTask,
   goBack,
-  goToExtensions,
   goToGenerate,
-  openProject,
+  openWorkspace,
   projectPath,
   taskListHeaders,
   tasks,
@@ -18,8 +17,7 @@ import { clearAllRecentTasks } from './tasks.utils';
 describe('Extensions', () => {
   beforeEach(() => {
     whitelistGraphql();
-    openProject(projectPath('proj-extensions'));
-    goToExtensions();
+    openWorkspace(projectPath('proj-extensions'), 'extensions');
   });
 
   it('filters extensions', () => {
@@ -46,9 +44,8 @@ describe('Extensions', () => {
 
     waitForActionToComplete();
 
-    goBack();
+    goBack('Extensions');
 
-    cy.contains('div.title', 'Extensions');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Available Extensions');
     });
@@ -63,8 +60,7 @@ describe('Extensions', () => {
   });
 
   after(() => {
-    cy.visit('/workspaces');
-    openProject(projectPath('proj'));
+    openWorkspace(projectPath('proj-extensions'));
     clearAllRecentTasks();
   });
 });
