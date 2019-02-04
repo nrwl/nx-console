@@ -4,8 +4,7 @@ import {
   clickOnFieldGroup,
   clickOnTask,
   goBack,
-  goToTasks,
-  openProject,
+  openWorkspace,
   projectPath,
   taskListHeaders,
   tasks,
@@ -87,8 +86,7 @@ export class AppComponent {
 describe('Tasks', () => {
   beforeEach(() => {
     whitelistGraphql();
-    openProject(projectPath('proj'), 'tasks');
-    cy.contains('div.title', 'Tasks');
+    openWorkspace(projectPath('proj'), 'tasks');
   });
 
   it('filters tasks', () => {
@@ -152,9 +150,8 @@ describe('Tasks', () => {
     checkFileExists(`dist/proj/main.js`);
     checkActionBarHidden();
 
-    goBack();
+    goBack('Tasks');
 
-    cy.contains('div.title', 'Tasks');
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
@@ -177,9 +174,7 @@ describe('Tasks', () => {
 
     cy.wait(100);
 
-    goBack();
-
-    cy.contains('div.title', 'Tasks');
+    goBack('Tasks');
 
     waitForAnimation();
 
@@ -214,9 +209,8 @@ describe('Tasks', () => {
 
     cy.contains('button', 'Run').click();
 
-    goBack();
+    goBack('Tasks');
 
-    cy.contains('div.title', 'Tasks');
     taskListHeaders($p => {
       expect(texts($p).filter(r => r === 'proj').length).to.equal(1);
     });
@@ -246,7 +240,7 @@ describe('Tasks', () => {
       .contains('Cancel')
       .click();
 
-    goBack();
+    goBack('Tasks');
     clearAllRecentTasks();
 
     cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
@@ -282,7 +276,7 @@ describe('Tasks', () => {
       .contains('Cancel')
       .click();
 
-    goBack();
+    goBack('Tasks');
     clearAllRecentTasks();
 
     cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);

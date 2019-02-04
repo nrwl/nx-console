@@ -3,8 +3,7 @@ import {
   checkFileExists,
   clickOnTask,
   goBack,
-  goToGenerate,
-  openProject,
+  openWorkspace,
   projectPath,
   taskListHeaders,
   tasks,
@@ -17,9 +16,7 @@ import { clearRecentTask } from './tasks.utils';
 describe('Generate', () => {
   beforeEach(() => {
     whitelistGraphql();
-    openProject(projectPath('proj'));
-    goToGenerate();
-    cy.contains('div.title', 'Generate');
+    openWorkspace(projectPath('proj'), 'generate');
   });
 
   it('filters schematics', () => {
@@ -75,17 +72,15 @@ describe('Generate', () => {
     checkFileExists(`src/app/${name}.service.ts`);
     checkFileExists(`src/app/${name}.service.spec.ts`);
 
-    goBack();
+    goBack('Generate');
 
-    cy.contains('div.title', 'Generate');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('@schematics/angular');
     });
   });
 
   after(() => {
-    cy.visit('/workspaces');
-    openProject(projectPath('proj'));
+    openWorkspace(projectPath('proj'));
     clearRecentTask();
   });
 });

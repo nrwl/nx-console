@@ -1,5 +1,5 @@
 import {
-  openProject,
+  openWorkspace,
   projectNames,
   projectPath,
   texts,
@@ -9,7 +9,7 @@ import {
 describe('Projects', () => {
   beforeEach(() => {
     whitelistGraphql();
-    openProject(projectPath('proj'));
+    openWorkspace(projectPath('proj'));
     cy.contains('div.title', 'Projects');
   });
 

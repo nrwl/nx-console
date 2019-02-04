@@ -3,7 +3,7 @@ import {
   checkFileExists,
   clickOnTask,
   goToGenerate,
-  openProject,
+  openWorkspace,
   projectPath,
   taskListHeaders,
   texts,
@@ -15,9 +15,7 @@ import { clearRecentTask } from './tasks.utils';
 describe('Generate Workspace Schematics', () => {
   beforeEach(() => {
     whitelistGraphql();
-    openProject(projectPath('proj-nx'));
-    goToGenerate();
-    cy.contains('div.title', 'Generate');
+    openWorkspace(projectPath('proj-nx'), 'generate');
   });
 
   it('runs a schematic', () => {
@@ -43,10 +41,9 @@ describe('Generate Workspace Schematics', () => {
       { timeout: 5000 }
     );
 
-    openProject(projectPath('proj-nx'));
+    openWorkspace(projectPath('proj-nx'));
     goToGenerate();
 
-    cy.contains('div.title', 'Generate');
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Workspace Schematics');
     });
@@ -65,8 +62,7 @@ describe('Generate Workspace Schematics', () => {
   });
 
   after(() => {
-    cy.visit('/workspaces');
-    openProject(projectPath('proj-nx'));
+    openWorkspace(projectPath('proj-nx'));
     clearRecentTask();
   });
 });

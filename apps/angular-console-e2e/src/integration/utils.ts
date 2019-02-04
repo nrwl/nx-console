@@ -24,8 +24,9 @@ export function checkMessage(error: string) {
   cy.get('simple-snack-bar').contains(error);
 }
 
-export function goBack() {
+export function goBack(expectedTitle: string) {
   cy.contains('mat-icon', 'clear').click();
+  cy.contains('div.title', expectedTitle);
 }
 
 export function checkButtonIsDisabled(text: string, disabled: boolean) {
@@ -70,13 +71,9 @@ export function checkDisplayedCommand(s: string) {
   });
 }
 
-export function openProject(proj: string, route: string = 'projects') {
-  // TODO: Create a directory autocomplete bar and re-enable below logic.
-  // cy.get('.mat-tab-link:nth-of-type(3)').click();
-  // waitForAnimation();
-  // cy.get('input').type(p);
-  // cy.get('button#open-workspace').click();
+export function openWorkspace(proj: string, route: string = 'projects') {
   cy.visit(`workspace/${encodeURIComponent(proj)}/${route}`);
+  cy.contains('div.title', route.slice(0, 1).toUpperCase() + route.slice(1));
 }
 
 export function projectNames(callback: (s: any) => void) {
@@ -142,7 +139,6 @@ export function clickOnTask(
 
 export function selectFolder() {
   cy.wait(300);
-  // TODO(mrmeku): Ideally this should mock a graphql request.
   cy.get('.path-form-field input').click();
   cy.get('.js-step-name-workspace').click();
   cy.wait(500);
