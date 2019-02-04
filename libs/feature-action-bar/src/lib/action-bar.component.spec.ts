@@ -9,7 +9,6 @@ import { Subject } from 'rxjs';
 
 import { ActionBarComponent } from './action-bar.component';
 import { FeatureActionBarModule } from './feature-action-bar.module';
-import { IS_VSCODE } from '@angular-console/environment';
 
 describe('ActionBarComponent', () => {
   let component: ActionBarComponent;
@@ -29,10 +28,7 @@ describe('ActionBarComponent', () => {
     mockCommandRunner.listAllCommands.mockReturnValue(mockCommands);
     TestBed.configureTestingModule({
       imports: [NoopAnimationsModule, FeatureActionBarModule],
-      providers: [
-        { provide: CommandRunner, useValue: mockCommandRunner },
-        { provide: IS_VSCODE, useValue: false }
-      ]
+      providers: [{ provide: CommandRunner, useValue: mockCommandRunner }]
     }).compileComponents();
   }));
 

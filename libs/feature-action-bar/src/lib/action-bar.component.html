@@ -3,11 +3,7 @@
   [@growShrink]="(showActionBar$ | async) ? 'expand' : 'contract'"
 ></div>
 
-<div
-  class="action-bar-container"
-  [class.vscode]="isVscode"
-  *ngIf="(commands$ | async) as actions"
->
+<div class="action-bar-container" *ngIf="(commands$ | async) as actions">
   <!-- Show tasks toolbar -->
   <mat-toolbar
     (click)="actionsExpanded.next(!actionsExpanded.value)"

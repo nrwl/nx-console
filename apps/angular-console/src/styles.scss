@@ -16,12 +16,6 @@ body {
   padding: 0;
   background: white;
   overflow: hidden;
-
-  &.vscode {
-    transform: scale(0.8);
-    width: 125vw;
-    transform-origin: 0 0;
-  }
 }
 
 * {
