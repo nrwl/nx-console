@@ -87,8 +87,7 @@ export class AppComponent {
 describe('Tasks', () => {
   beforeEach(() => {
     whitelistGraphql();
-    openProject(projectPath('proj'));
-    goToTasks();
+    openProject(projectPath('proj'), 'tasks');
     cy.contains('div.title', 'Tasks');
   });
 

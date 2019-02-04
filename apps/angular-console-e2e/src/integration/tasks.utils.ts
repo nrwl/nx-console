@@ -41,36 +41,34 @@ export function checkMultipleRecentTasks(options: {
   isExpanded: boolean;
   numTasks: number;
 }) {
-  cy.get('angular-console-action-bar').should(actionBar => {
-    expect(
-      actionBar
-        .find('.num-tasks')
-        .text()
-        .trim()
-    ).to.equal(`${options.numTasks} Tasks`);
+  cy.contains(
+    'angular-console-action-bar .num-tasks',
+    `${options.numTasks} Tasks`
+  );
 
-    if (!options.isExpanded) {
-      expect(actionBar.find('.remove-all-tasks-button').length).to.equal(0);
-    } else {
-      expect(actionBar.find('.remove-all-tasks-button').length).to.equal(1);
-    }
+  if (!options.isExpanded) {
+    cy.get('angular-console-action-bar .remove-all-tasks-button').should(
+      'have.length',
+      0
+    );
+  } else {
+    cy.get('angular-console-action-bar .remove-all-tasks-button').should(
+      'have.length',
+      1
+    );
+  }
 
-    const taskElements = actionBar.get(0).querySelectorAll('mat-list-item');
+  cy.get('angular-console-action-bar mat-list-item').should(
+    'have.length',
+    options.numTasks
+  );
 
-    expect(taskElements.length).to.equal(options.numTasks);
-
-    if (options.tasks) {
-      options.tasks.forEach((task, index) => {
-        const taskElement = taskElements[index];
-        expect(
-          taskElement.querySelector('.command-text')!.textContent!.trim()
-        ).to.equal(task.command);
-
-        expect(taskElement.querySelector(`.task-avatar.${task.status}`)).not.to
-          .be.null;
-      });
-    }
-  });
+  if (options.tasks) {
+    options.tasks.forEach(task => {
+      cy.contains('mat-list-item .command-text', task.command);
+      cy.get(`.task-avatar.${task.status}`).should('not.be.undefined');
+    });
+  }
 }
 
 export function toggleRecentTasksExpansion() {

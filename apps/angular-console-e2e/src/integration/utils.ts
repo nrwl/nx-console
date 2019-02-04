@@ -70,13 +70,13 @@ export function checkDisplayedCommand(s: string) {
   });
 }
 
-export function openProject(proj: string) {
+export function openProject(proj: string, route: string = 'projects') {
   // TODO: Create a directory autocomplete bar and re-enable below logic.
   // cy.get('.mat-tab-link:nth-of-type(3)').click();
   // waitForAnimation();
   // cy.get('input').type(p);
   // cy.get('button#open-workspace').click();
-  cy.visit(`workspace/${encodeURIComponent(proj)}/projects`);
+  cy.visit(`workspace/${encodeURIComponent(proj)}/${route}`);
 }
 
 export function projectNames(callback: (s: any) => void) {
