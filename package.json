@@ -58,6 +58,7 @@
         "deb",
         "tar.gz"
       ],
+      "artifactName": "AngularConsole-${version}.${ext}",
       "synopsis": "Angular Console",
       "category": "Development",
       "icon": "icons/icon.png"
