@@ -19,17 +19,13 @@ function affected(affectedCommand) {
 function electronBuilder(platform, dashP, extraFlags) {
   return `electron-builder ${platform} -p ${dashP} ${
     extraFlags ? extraFlags : ''
-    }`;
+  }`;
 }
 
 const ELECTRON_BUNDLE_PATH = join('dist', 'apps', 'electron');
 const APPLICATION_BUNDLE_PATH = join('dist', 'apps', 'APPLICATION');
 
 const assetMappings = {
-  'ng-cmd': {
-    from: join('tools', 'win', '.bin', 'ng.cmd'),
-    to: join(APPLICATION_BUNDLE_PATH, 'ng.cmd')
-  },
   'node-pty-prebuilt': {
     from: join('tools', 'win', 'node-pty-prebuilt', 'build', 'Release'),
     to: join(
@@ -75,32 +71,38 @@ module.exports = {
   scripts: {
     dev: {
       'copy-assets': {
-        electron: nps.series.nps('dev.copy-assets-base.electron'),
+        electron: nps.series(
+          'nps dev.copy-assets-base.electron',
+          `shx chmod 0755 ${join(
+            'dist',
+            'apps',
+            'electron',
+            'assets',
+            'new-workspace'
+          )}`
+        ),
         vscode: nps.series(
           'nps dev.copy-assets-base.vscode',
           `shx rm -rf ${assetMappings['node-pty-prebuilt'].to}]`,
           `shx cp -rf ${assetMappings['node-pty-prebuilt'].from} ${
             assetMappings['node-pty-prebuilt'].to
-            }`.replace(/APPLICATION/g, 'vscode')
+          }`.replace(/APPLICATION/g, 'vscode')
         )
       },
       'copy-assets-base': electronOrVscode(
         nps.concurrent({
           schema: `shx cp ${assetMappings['schema'].from} ${
             assetMappings['schema'].to
-            }`,
-          'ng-cmd': `shx cp ${assetMappings['ng-cmd'].from} ${
-            assetMappings['ng-cmd'].to
-            }`,
+          }`,
           'server-assets': `shx cp -rf ${assetMappings['server-assets'].from} ${
             assetMappings['server-assets'].to
-            }`,
+          }`,
           readme: `shx cp ${assetMappings['readme'].from} ${
             assetMappings['readme'].to
-            }`,
+          }`,
           'extensions-schema': `shx cp ${
             assetMappings['extensions-schema'].from
-            } ${assetMappings['extensions-schema'].to}`,
+          } ${assetMappings['extensions-schema'].to}`,
           cli: 'node ./tools/scripts/patch-cli.js'
         })
       ),
@@ -218,7 +220,7 @@ module.exports = {
           : os.platform() === 'darwin'
           ? 'mac'
           : 'linux'
-        } --dir -p never`
+      } --dir -p never`
     }
   }
 };
