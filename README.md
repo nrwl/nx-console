@@ -2,7 +2,7 @@
     <img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-logo-with-text.jpg" width="256"/>
 </p>
 
-### Spend less time looking up command line arguments and more time shipping incredible products.
+# The UI for the Angular CLI
 
 [![Angular Console Website](https://img.shields.io/badge/Angular-Console-blue.png)](https://angularconsole.org/)
 [![Build Status](https://circleci.com/gh/nrwl/angular-console/tree/master.png)](https://circleci.com/gh/nrwl/angular-console/tree/master)
@@ -22,36 +22,55 @@
 </p>
 <hr>
 
-# The Power of the Angular CLI. The Convenience of an App.
-
-Angular CLI transformed the Angular ecosystem. We no longer have to spend time maintaining our webpack configurations, figuring out how to make tests run, fixing source maps — the CLI does this for us. It also helps us enforce consistent development practices by generating components, services, and state management modules. Since the CLI does so much, it can be intimidating and hard to learn. Most developers only use a fraction of the CLI's capabilities.
-
-**Angular Console is the user interface for the Angular CLI**.
-
-At [Nrwl](https://nrwl.io/) we realized that most developers don't need more sophisticated commands — they need a more approachable way to use what the Angular CLI already does. And that's what Angular Console is.
-Using Angular Console you can create new projects, install extensions, generate artifacts, build, test, and deploy your projects. Anything you can do with the Angular CLI, you can do with Angular Console. It also gives you a visual overview of your projects.
+### Spend less time looking up command line arguments and more time shipping incredible products.
 
 <img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-plugin.gif">
 
-### Download Angular Console at [angularconsole.com](https://angularconsole.com/).
-### Get VSCode plugin [here](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console).
+Angular CLI transformed the Angular ecosystem. With it, you can get a full-stack application up and running in minutes, no need to figure out source maps, webpack, test runners. It all works out of the box. Angular CLI also helps you enforce consistent development practices by generating components, services, and state management modules.
 
-## Useful to Experts
+## Why Angular Console? 
 
-Angular Console is a robust tool that can do everything the Angular CLI can do — it's the UI for the CLI. Every command you can run in the terminal, you can run via Angular Console. Except you no longer have to remember all the flags, names, or paths — Angular Console will help you by providing autocompletion and validating your inputs.
+Professional developers use both command-line tools and user interfaces. They commit in the terminal, but resolve conflicts in VSCode or WebStorm. They use the right tool for the job.
+
+Angular CLI is a command-line tool, which works great when you want to serve an application or generate a simple component. But it falls short once you start doing advanced things.
+
+For instance:
+
+* Exploring custom schematic collections is hard in the terminal, but it's easy using Angular Console.
+* Using rarely-used flags is challenging. Do you pass absolute or relative paths? You don't have to remember any flags, names, or paths -- Angular Console will help you by providing autocompletion and validating your inputs.
+* Finding the right Angular CLI extension can take a long time. When using Angular Console, you can find and install an extension in minutes.
 
 
-## Beginner Friendly
+Angular Console does more than that:
 
-At the same time, we aim to make Angular Console a great tool for developers who are new to Angular or Angular CLI. You can create projects, interact with your editor, run generators and commands, install extensions without ever touching the terminal or having to install any node packages globally. If you get a new laptop, you can install Angular Console and start building Angular apps. Also, Angular Console highlights the properties you are likely to use for build-in generators and commands . So if you haven't used the CLI, you don't get overwhelmed.
+* It visualizes the results of a build or a test run.
+* It visualizes how different projects in your workspace depend on each other.
+* It shows dry run results as you create your command
+* It shows remembers you most recent cli commands and saves their output for your reference
+* ...
+
+
+## Download 
+
+* If you are a VSCode user, the best way to try Angular Console is by installing the [Angular Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console).
+
+* If you aren't a VSCode user, download a standalone desktop application at [angularconsole.com](https://angularconsole.com).
+
+
+
+## True UI for the Angular CLI
+
+Angular Console is a generic UI for the Angular CLI. It will work for any schematic or any architect commands. Angular Console does not have a specific UI for, say, generating a component. Instead, Angular Console does what the command-line version of the Angular CLI does--it analyzes the same meta information to create the needed UI. This means that anything you can do with the Angular CLI, you can do with Angular Console. After all, Angular Console is the UI for the Angular CLI.
+
+
+## Useful for Both Experts and Beginners
+
+Even though we started building Angular Console as a tool for expert, we also aimed to make Angular Console a great tool for developers who are new to Angular or Angular CLI. You can create projects, interact with your editor, run generators and commands, install extensions without ever touching the terminal or having to install any node packages globally. If you get a new laptop, you can install Angular Console and start building Angular apps. Also, Angular Console highlights the properties you are likely to use for build-in generators and commands . So if you haven't used the CLI, you don't get overwhelmed.
 
 ## Great for Windows Users
 
 A lot of Windows users are terminal shy and cannot take full advantage of tools like the Angular CLI and [Nrwl Nx](http://nrwl.io/nx). By using Angular Console, Windows users can start using the powerful capabilities these tools provide via an easy-to-use UI. They can create new projects, generate components, build, test, deploy Angular apps without having to even open the terminal.
 
-# True UI for the Angular CLI
-
-Angular Console is a generic UI for the Angular CLI. It will work for any schematic or any architect commands. Angular Console does not have a specific UI for, say, generating a component. Instead, Angular Console does what the command-line version of the Angular CLI does--it analyzes the same meta information to create the needed UI. This means that anything you can do with the Angular CLI, you can do with Angular Console. After all, Angular Console is the UI for the Angular CLI.
 
 # Learn More
 
