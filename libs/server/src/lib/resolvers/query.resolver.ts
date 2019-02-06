@@ -139,13 +139,15 @@ export class QueryResolver {
       if (id) {
         const c = commands.findMatchingCommand(id, commands.history);
         if (!c) return [];
-        const r = serializeCommand(c, cols || 80, includeDetailedStatus);
+        const r = serializeIndividualCommand(
+          c,
+          cols || 80,
+          includeDetailedStatus
+        );
         c.outChunk = '';
         return [r];
       } else {
-        return commands.recent.map(c =>
-          serializeCommand(c, cols || 80, includeDetailedStatus)
-        );
+        return commands.recent.map(serializeCommandInList);
       }
     } catch (e) {
       console.log(e);
@@ -154,7 +156,7 @@ export class QueryResolver {
   }
 }
 
-function serializeCommand(
+function serializeIndividualCommand(
   c: CommandInformation,
   cols: number,
   includeDetailedStatus: boolean
@@ -164,7 +166,6 @@ function serializeCommand(
   }
   return {
     id: c.id,
-    type: c.id,
     workspace: c.workspace,
     command: c.command,
     status: c.status,
@@ -174,5 +175,14 @@ function serializeCommand(
       includeDetailedStatus && c.detailedStatusCalculator.detailedStatus
         ? JSON.stringify(c.detailedStatusCalculator.detailedStatus)
         : null
+  };
+}
+
+function serializeCommandInList(c: CommandInformation): any {
+  return {
+    id: c.id,
+    workspace: c.workspace,
+    command: c.command,
+    status: c.status
   };
 }
