@@ -166,8 +166,8 @@ module.exports = {
       )
     },
     publish: {
-      electronWin: nps.series.nps(
-        'prepare.electron',
+      electronWin: nps.series(
+        'nps prepare.electron',
         electronBuilder(
           '--win',
           'always',
