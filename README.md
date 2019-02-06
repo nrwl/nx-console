@@ -1,6 +1,3 @@
-# The Power of the Angular CLI. The Convenience of an App.
-
-
 <p align="center">
     <img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-logo-with-text.jpg" width="256"/>
 </p>
@@ -25,22 +22,24 @@
 </p>
 <hr>
 
-# What is Angular Console?
+# The Power of the Angular CLI. The Convenience of an App.
 
 Angular CLI transformed the Angular ecosystem. We no longer have to spend time maintaining our webpack configurations, figuring out how to make tests run, fixing source maps — the CLI does this for us. It also helps us enforce consistent development practices by generating components, services, and state management modules. Since the CLI does so much, it can be intimidating and hard to learn. Most developers only use a fraction of the CLI's capabilities.
+
 **Angular Console is the user interface for the Angular CLI**.
+
 At [Nrwl](https://nrwl.io/) we realized that most developers don't need more sophisticated commands — they need a more approachable way to use what the Angular CLI already does. And that's what Angular Console is.
 Using Angular Console you can create new projects, install extensions, generate artifacts, build, test, and deploy your projects. Anything you can do with the Angular CLI, you can do with Angular Console. It also gives you a visual overview of your projects.
 
-### You can download Angular Console at [angularconsole.com](https://angularconsole.com/).
+<img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-plugin.gif">
 
-We provide distributions for Windows, Mac, Linux, and the VS Code plugin.
+### Download Angular Console at [angularconsole.com](https://angularconsole.com/).
+### Get VSCode plugin [here](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console).
 
 ## Useful to Experts
 
 Angular Console is a robust tool that can do everything the Angular CLI can do — it's the UI for the CLI. Every command you can run in the terminal, you can run via Angular Console. Except you no longer have to remember all the flags, names, or paths — Angular Console will help you by providing autocompletion and validating your inputs.
 
-<img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/vscode-screenshot.png">
 
 ## Beginner Friendly
 
