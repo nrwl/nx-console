@@ -1,8 +1,0 @@
-query Commands($id: String!, $cols: Int!) {
-  commands(id: $id, cols: $cols) {
-    command
-    status
-    outChunk
-    detailedStatus
-  }
-}

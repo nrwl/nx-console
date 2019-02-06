@@ -1,28 +1,27 @@
 import { Injectable } from '@angular/core';
 import { FetchResult } from 'apollo-link';
-import { BehaviorSubject, interval, Observable, of, concat } from 'rxjs';
+import { BehaviorSubject, concat, interval, Observable, of } from 'rxjs';
 import {
   concatMap,
+  first,
   map,
   skip,
+  switchMap,
   take,
   takeWhile,
-  first,
-  flatMap,
-  withLatestFrom,
-  switchMap
+  withLatestFrom
 } from 'rxjs/operators';
 import { COMMAND_LIST_POLLING, COMMANDS_POLLING } from './polling-constants';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import {
-  CommandsGQL,
+  GetCommandGQL,
   GetCommandInitialGQL,
+  ListAllCommands,
   ListAllCommandsGQL,
   RemoveAllCommandsGQL,
   RemoveCommandGQL,
   RestartCommandGQL,
-  StopCommandGQL,
-  ListAllCommands
+  StopCommandGQL
 } from './generated/graphql';
 import { MatSnackBar } from '@angular/material';
 
@@ -59,7 +58,7 @@ export class CommandRunner {
 
   constructor(
     private readonly getCommandInitialGQL: GetCommandInitialGQL,
-    private readonly commandsGQL: CommandsGQL,
+    private readonly getCommandGQL: GetCommandGQL,
     private readonly listAllCommandsGQL: ListAllCommandsGQL,
     private readonly removeAllCommandsGQL: RemoveAllCommandsGQL,
     private readonly removeCommandGQL: RemoveCommandGQL,
@@ -94,7 +93,7 @@ export class CommandRunner {
 
         return interval(COMMANDS_POLLING).pipe(
           withLatestFrom(cols$),
-          concatMap(([_, cols]) => this.commandsGQL.fetch({ id, cols })),
+          concatMap(([_, cols]) => this.getCommandGQL.fetch({ id, cols })),
           map((r: any) => r.data.commands[0]),
           concatMap(cc => {
             const c = {
@@ -135,7 +134,7 @@ export class CommandRunner {
     // Start initial `outChunk` with `out` so we can replay terminal output.
     const initial$ = cols$.pipe(
       first(),
-      flatMap(cols => this.getCommandInitialGQL.fetch({ id, cols })),
+      concatMap(cols => this.getCommandInitialGQL.fetch({ id, cols })),
       map(withDetailedStatus),
       map(r => ({
         ...r,
@@ -146,7 +145,7 @@ export class CommandRunner {
 
     const rest$ = interval(COMMANDS_POLLING).pipe(
       withLatestFrom(cols$),
-      flatMap(([_, cols]) => this.getCommandInitialGQL.fetch({ id, cols })),
+      concatMap(([_, cols]) => this.getCommandGQL.fetch({ id, cols })),
       map(withDetailedStatus),
       skip(1),
       takeWhile(r => !!r)

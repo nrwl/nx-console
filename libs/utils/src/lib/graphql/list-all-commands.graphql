@@ -1,7 +1,6 @@
 query ListAllCommands {
   commands {
     id
-    type
     status
     workspace
     command

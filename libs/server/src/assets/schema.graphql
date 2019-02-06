@@ -21,7 +21,6 @@ type ArchitectSchema {
 }
 
 type CommandResponse {
-  type: String!
   id: String!
   workspace: String
   command: String!
