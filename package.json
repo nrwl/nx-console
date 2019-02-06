@@ -67,7 +67,6 @@
       "installerIcon": "icons/icon.ico",
       "artifactName": "AngularConsole-Setup-${version}.${ext}"
     },
-    "afterPack": "./tools/scripts/after-pack.js",
     "publish": [
       {
         "provider": "github",
@@ -77,12 +76,14 @@
     ]
   },
   "dependencies": {
-    "@angular/cli": "7.3.0",
-    "@schematics/angular": "7.3.0",
-    "@nrwl/schematics": "7.5.1",
+    "semver": "5.6.0",
+    "tmp": "0.0.33",
     "node-pty-prebuilt": "0.7.6"
   },
   "devDependencies": {
+    "@angular/cli": "7.3.0",
+    "@schematics/angular": "7.3.0",
+    "@nrwl/schematics": "7.5.1",
     "@angular-devkit/build-angular": "0.11.4",
     "@angular-devkit/build-ng-packagr": "0.11.4",
     "@angular/animations": "7.2.0",
@@ -106,7 +107,6 @@
     "@nrwl/angular-console-enterprise-frontend": "0.0.40",
     "@nrwl/builders": "7.5.1",
     "@nrwl/nx": "7.5.1",
-    "@nrwl/schematics": "7.5.1",
     "@types/electron-store": "^1.3.0",
     "@types/fontfaceobserver": "^0.0.6",
     "@types/get-port": "^4.0.1",

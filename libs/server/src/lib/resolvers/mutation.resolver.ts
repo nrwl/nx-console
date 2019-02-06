@@ -10,6 +10,7 @@ import { readSettings, storeSettings } from '../api/read-settings';
 import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
 import { findClosestNg, findExecutable, readJsonFile } from '../utils/utils';
+import { platform } from 'os';
 
 function disableInteractivePrompts(p: string) {
   try {
@@ -62,16 +63,19 @@ export class MutationResolver {
     try {
       return runCommand(
         'new',
-        __dirname,
-        'ng',
-        findClosestNg(__dirname),
+        p,
+        'new-workspace',
+        path.join(
+          __dirname,
+          'assets',
+          platform() === 'win32' ? 'new-workspace.cmd' : 'new-workspace'
+        ),
         [
-          'new',
           name,
-          `--directory=${p}/${name}`,
+          `--directory=${name}`,
           `--collection=${collection}`,
-          '--no-interactive',
-          ...newCommand
+          ...newCommand,
+          '--no-interactive'
         ],
         this.pseudoTerminalFactory
       );
