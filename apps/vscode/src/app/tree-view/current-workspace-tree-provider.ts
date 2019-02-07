@@ -1,5 +1,5 @@
 import { WorkspaceDefinition } from '@angular-console/server';
-import { existsSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import { TreeDataProvider } from 'vscode';
 
@@ -13,13 +13,11 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
   WorkspaceRoute
 > {
   static create(
-    workspacePath: string | undefined,
+    workspacePath: string,
     extensionPath: string
   ): TreeDataProvider<WorkspaceRoute> {
-    const isAngularCliWorkspace =
-      workspacePath && existsSync(join(workspacePath, 'angular.json'));
     let name = '';
-    if (workspacePath && isAngularCliWorkspace) {
+    if (workspacePath) {
       try {
         name = JSON.parse(
           readFileSync(join(workspacePath, 'angular.json'), 'utf8')
@@ -29,18 +27,16 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
       }
     }
     return new CurrentWorkspaceTreeProvider(
-      workspacePath && isAngularCliWorkspace
-        ? {
-            path: workspacePath,
-            name
-          }
-        : undefined,
+      {
+        path: workspacePath,
+        name
+      },
       extensionPath
     );
   }
 
   private constructor(
-    private readonly currentWorkspace: WorkspaceDefinition | undefined,
+    private readonly currentWorkspace: WorkspaceDefinition,
     private readonly extensionPath: string
   ) {
     super();
@@ -53,9 +49,10 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
   getChildren() {
     return Promise.resolve(
       [
-        ...(this.currentWorkspace
-          ? ['Projects', 'Generate', 'Tasks', 'Extensions']
-          : []),
+        'Projects',
+        'Generate',
+        'Tasks',
+        'Extensions',
         'Connect',
         'Settings'
       ].map(

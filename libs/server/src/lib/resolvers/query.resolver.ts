@@ -145,7 +145,7 @@ export class QueryResolver {
           includeDetailedStatus
         );
         c.outChunk = '';
-        return [r];
+        return [r as any];
       } else {
         return commands.recent.map(serializeCommandInList);
       }
