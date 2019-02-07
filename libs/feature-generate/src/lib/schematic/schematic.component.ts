@@ -154,29 +154,31 @@ export class SchematicComponent implements OnInit {
 
     this.dryRunResult$ = this.commandArray$.pipe(
       debounceTime(DEBOUNCE_TIME),
-      switchMap(c => {
-        if (this.runner.activeCommand$.value) {
-          return of();
-        }
+      switchMap(
+        (c): Observable<IncrementalCommandOutput> => {
+          if (this.runner.activeCommand$.value) {
+            return of();
+          }
 
-        this.out.reset();
-        if (!c.valid) {
-          // cannot use change detection because the operation isn't idempotent
-          this.out.commandResponse = {
-            id: '',
-            command: '',
-            out: '',
-            detailedStatus: null,
-            status: CommandStatus.TERMINATED,
-            outChunk: `${c.commands.join(
-              `\n\r`
-            )}\n\n\rCommand is missing required fields\n\r`
-          };
-          return of();
-        }
+          this.out.reset();
+          if (!c.valid) {
+            // cannot use change detection because the operation isn't idempotent
+            this.out.commandResponse = {
+              id: '',
+              command: '',
+              out: '',
+              detailedStatus: null,
+              status: CommandStatus.TERMINATED,
+              outChunk: `${c.commands.join(
+                `\n\r`
+              )}\n\n\rCommand is missing required fields\n\r`
+            };
+            return of();
+          }
 
-        return this.runCommand(c.schematic, c.commands, true);
-      }),
+          return this.runCommand(c.schematic, c.commands, true);
+        }
+      ),
       publishReplay(1),
       refCount()
     );
