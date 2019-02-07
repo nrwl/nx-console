@@ -13,6 +13,7 @@ import { Workspace } from './workspace';
 export type WorkspaceRouteTitle =
   | 'Workspaces'
   | 'Projects'
+  | 'Affected Projects'
   | 'Generate'
   | 'Tasks'
   | 'Connect'
@@ -21,6 +22,7 @@ export type WorkspaceRouteTitle =
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Projects', 'angular-logo.svg'],
+  ['Affected Projects', 'affected-projects.svg'],
   ['Generate', 'computing.svg'],
   ['Tasks', 'running_process2.svg'],
   ['Connect', 'Nrwl_ColorIcon.svg'],
@@ -99,6 +101,7 @@ export function getWorkspaceRoute(
     case 'Projects':
     case 'Extensions':
     case 'Tasks':
+    case 'Affected Projects':
     case 'Settings':
     case 'Generate':
       const workspacePath = workspaceDef
@@ -109,7 +112,7 @@ export function getWorkspaceRoute(
       if (workspacePath) {
         return `workspace/${encodeURIComponent(
           workspacePath
-        )}/${workspaceRouteTitle.toLowerCase()}`;
+        )}/${workspaceRouteTitle.replace(/ /g, '-').toLowerCase()}`;
       }
   }
 
