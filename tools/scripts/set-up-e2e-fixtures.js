@@ -20,8 +20,8 @@ shell.mkdir(path.join(tmp, 'proj-nx'));
 
 shell.rm('-rf', path.join(tmp, 'ng'));
 shell.mkdir(path.join(tmp, 'ng'));
-cp.execSync('yarn add @angular/cli@7.1.4', { cwd: path.join(tmp, 'ng') });
-cp.execSync('yarn add @nrwl/schematics@7.3.0', { cwd: path.join(tmp, 'ng') });
+cp.execSync('yarn add @angular/cli@7.3.0', { cwd: path.join(tmp, 'ng') });
+cp.execSync('yarn add @nrwl/schematics@7.5.1', { cwd: path.join(tmp, 'ng') });
 
 cp.execSync('ng config -g cli.packageManager yarn');
 cp.execSync(
