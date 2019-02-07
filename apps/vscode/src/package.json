@@ -30,11 +30,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:angularConsole",
-    "onView:angularConsoleFavoriteWorkspaces",
-    "onView:angularConsoleRecentWorkspaces",
-    "onCommand:extension.angularConsoleSidePanel",
-    "onCommand:extension.angularConsoleActivePanel"
+    "workspaceContains:angular.json"
   ],
   "contributes": {
     "viewsContainers": {
@@ -50,20 +46,11 @@
       "angular-console": [
         {
           "id": "angularConsole",
-          "name": "Navigation"
+          "name": "Navigation",
+          "when": "isAngularWorkspace"
         }
       ]
-    },
-    "commands": [
-      {
-        "command": "extension.angularConsoleSidePanel",
-        "title": "Angular Console (Side Panel)"
-      },
-      {
-        "command": "extension.angularConsoleActivePanel",
-        "title": "Angular Console (Active Panel)"
-      }
-    ]
+    }
   },
   "dependencies": {
     "semver": "5.6.0",
