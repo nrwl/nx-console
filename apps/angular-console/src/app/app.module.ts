@@ -25,7 +25,10 @@ import {
   MatSnackBarModule
 } from '@angular/material';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {
+  BrowserAnimationsModule,
+  NoopAnimationsModule
+} from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { AngularConsoleEnterpriseFrontendModule } from '@nrwl/angular-console-enterprise-frontend';
 import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
@@ -83,7 +86,9 @@ export function initApollo(
     MatIconModule,
     MatSnackBarModule,
     BrowserModule,
-    BrowserAnimationsModule,
+    environment.disableAnimations
+      ? NoopAnimationsModule
+      : BrowserAnimationsModule,
     ApolloModule,
     HttpLinkModule,
     HttpClientModule,

@@ -9,7 +9,8 @@ import {
   tasks,
   texts,
   uniqName,
-  whitelistGraphql
+  whitelistGraphql,
+  elementContainsText
 } from './utils';
 import { clearRecentTask } from './tasks.utils';
 
@@ -51,7 +52,7 @@ describe('Generate', () => {
 
   it('runs a schematic', () => {
     clickOnTask('@schematics/angular', 'service');
-    cy.contains('div.context-title', '@schematics/angular - service');
+    elementContainsText('div.context-title', '@schematics/angular - service');
 
     const name = uniqName('example');
     cy.get('input[name="name"]').type(name);
@@ -61,10 +62,10 @@ describe('Generate', () => {
     cy.get('mat-select[name="flat"]')
       .contains('false')
       .click();
-    cy.contains('mat-option', 'true').click();
+    elementContainsText('mat-option', 'true').click();
     cy.get('mat-select[name="flat"]').contains('true');
 
-    cy.contains('button', 'Generate').click();
+    elementContainsText('button', 'Generate').click();
 
     checkDisplayedCommand(
       `ng generate @schematics/angular:service ${name} --project=proj --flat`

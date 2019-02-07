@@ -18,6 +18,7 @@ class MockGetDirectoryPathGQL extends GetDirectoryPathGQL {
 export const environment: Environment = {
   production: false,
   application: 'electron',
+  disableAnimations: true,
   providers: [
     { provide: GetDirectoryPathGQL, useClass: MockGetDirectoryPathGQL }
   ]

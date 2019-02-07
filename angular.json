@@ -205,6 +205,7 @@
             "tsConfig": "apps/electron/tsconfig.app.json",
             "assets": [
               "apps/electron/src/package.json",
+              "apps/electron/src/.yarnrc",
               "apps/electron/src/assets/new-workspace",
               "apps/electron/src/assets/new-workspace.cmd",
               "apps/electron/src/assets"

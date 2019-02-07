@@ -3,14 +3,15 @@ import {
   projectNames,
   projectPath,
   texts,
-  whitelistGraphql
+  whitelistGraphql,
+  elementContainsText
 } from './utils';
 
 describe('Projects', () => {
   beforeEach(() => {
     whitelistGraphql();
     openWorkspace(projectPath('proj'));
-    cy.contains('div.title', 'Projects');
+    elementContainsText('div.title', 'Projects');
   });
 
   it('shows projects screen', () => {
@@ -24,8 +25,8 @@ describe('Projects', () => {
   });
 
   it('checks that hot actions work', () => {
-    cy.contains('button', 'Generate Component').click();
-    cy.contains('div.context-title', '@schematics/angular - component');
+    elementContainsText('button', 'Generate Component').click();
+    elementContainsText('div.context-title', '@schematics/angular - component');
     cy.get('input[name="project"]').should(($p: any) => {
       expect($p[0].value).to.equal('proj');
     });

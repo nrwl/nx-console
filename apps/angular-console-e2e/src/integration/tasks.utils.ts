@@ -1,3 +1,5 @@
+import { elementContainsText } from './utils';
+
 interface Task {
   command: string;
   status: CommandStatus;
@@ -41,32 +43,32 @@ export function checkMultipleRecentTasks(options: {
   isExpanded: boolean;
   numTasks: number;
 }) {
-  cy.contains(
+  elementContainsText(
     'angular-console-action-bar .num-tasks',
     `${options.numTasks} Tasks`
   );
 
   if (!options.isExpanded) {
-    cy.get('angular-console-action-bar .remove-all-tasks-button').should(
-      'have.length',
-      0
-    );
+    cy.get('angular-console-action-bar .remove-all-tasks-button', {
+      timeout: 1000
+    }).should('have.length', 0);
   } else {
-    cy.get('angular-console-action-bar .remove-all-tasks-button').should(
-      'have.length',
-      1
-    );
+    cy.get('angular-console-action-bar .remove-all-tasks-button', {
+      timeout: 1000
+    }).should('have.length', 1);
   }
 
-  cy.get('angular-console-action-bar mat-list-item').should(
+  cy.get('angular-console-action-bar mat-list-item', { timeout: 1000 }).should(
     'have.length',
     options.numTasks
   );
 
   if (options.tasks) {
     options.tasks.forEach(task => {
-      cy.contains('mat-list-item .command-text', task.command);
-      cy.get(`.task-avatar.${task.status}`).should('not.be.undefined');
+      elementContainsText('mat-list-item .command-text', task.command);
+      cy.get(`.task-avatar.${task.status}`, { timeout: 1000 }).should(
+        'not.be.undefined'
+      );
     });
   }
 }
