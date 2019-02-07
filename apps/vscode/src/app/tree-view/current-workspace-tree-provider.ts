@@ -1,4 +1,8 @@
-import { WorkspaceDefinition } from '@angular-console/server';
+import {
+  settingsChange$,
+  WorkspaceDefinition,
+  Settings
+} from '@angular-console/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { TreeDataProvider } from 'vscode';
@@ -13,6 +17,7 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
   WorkspaceRoute
 > {
   static create(
+    settings: Settings,
     workspacePath: string,
     extensionPath: string
   ): TreeDataProvider<WorkspaceRoute> {
@@ -27,6 +32,7 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
       }
     }
     return new CurrentWorkspaceTreeProvider(
+      settings,
       {
         path: workspacePath,
         name
@@ -36,10 +42,16 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
   }
 
   private constructor(
+    private settings: Settings,
     private readonly currentWorkspace: WorkspaceDefinition,
     private readonly extensionPath: string
   ) {
     super();
+
+    settingsChange$.subscribe(s => {
+      this.settings = s;
+      this.refresh();
+    });
   }
 
   getParent(_: WorkspaceRoute) {
@@ -50,6 +62,7 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
     return Promise.resolve(
       [
         'Projects',
+        ...(this.settings.isConnectUser ? ['Affected Projects'] : []),
         'Generate',
         'Tasks',
         'Extensions',

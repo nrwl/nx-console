@@ -32,10 +32,10 @@ export function readSettings(store: Store): Settings {
   return settings;
 }
 
-const storeSettingsSubject = new Subject<any>();
+const storeSettingsSubject = new Subject<Settings>();
 export const settingsChange$ = storeSettingsSubject.asObservable();
 
-export function storeSettings(store: Store, value: any) {
+export function storeSettings(store: Store, value: Settings) {
   store.set('settings', value);
   storeSettingsSubject.next(value);
 }

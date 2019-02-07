@@ -1,4 +1,4 @@
-import { WorkspaceDefinition } from '@angular-console/server';
+import { WorkspaceDefinition, readSettings } from '@angular-console/server';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { Server } from 'http';
 import {
@@ -45,6 +45,7 @@ export async function activate(context: ExtensionContext) {
   if (workspacePath && isAngularWorkspace) {
     currentWorkspace = window.createTreeView('angularConsole', {
       treeDataProvider: CurrentWorkspaceTreeProvider.create(
+        readSettings(server.store),
         workspacePath,
         context.extensionPath
       )
