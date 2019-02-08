@@ -104,9 +104,6 @@ async function main(config: {
     workspaceRouteTitle,
     revealWorkspaceRoute
   } = config;
-  if (window.activeTerminal) {
-    window.activeTerminal.hide();
-  }
 
   const address = server.server.address();
   if (typeof address === 'string') {

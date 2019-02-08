@@ -103,9 +103,9 @@ export function taskListHeaders(callback: (s: any) => void) {
 }
 
 export function tasks(callback: (s: any) => void) {
-  cy.get('mat-nav-list.task-list').within(() => {
+  cy.get('mat-nav-list.task-list', { timeout: 5000 }).within(() => {
     cy.root()
-      .find('mat-list-item')
+      .find('mat-list-item', { timeout: 5000 })
       .should(callback);
   });
 }
