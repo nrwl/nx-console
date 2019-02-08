@@ -115,7 +115,7 @@ export function clickOnTask(
   name: string,
   exact: boolean = true
 ) {
-  cy.get('mat-nav-list.task-list', { timeout: 1000 }).should(($p: any) => {
+  cy.get('mat-nav-list.task-list', { timeout: 5000 }).should(($p: any) => {
     const children = $p.get()[0].children;
     let insideGroup = false;
     for (let i = 0; i < children.length; ++i) {

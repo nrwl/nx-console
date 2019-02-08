@@ -140,6 +140,17 @@ module.exports = {
     },
     clean: 'shx rm -rf dist/',
     prepare: {
+      and: {
+        e2e: {
+          up: nps.series.nps('prepare.e2e', 'e2e.up'),
+          headless: nps.series.nps('prepare.e2e', 'e2e.headless')
+        },
+        package: {
+          ...electronOrVscode(
+            nps.series.nps('prepare.APPLICATION', 'package.APPLICATION')
+          )
+        }
+      },
       e2e: nps.concurrent.nps('prepare.electron', 'e2e.fixtures'),
       ...electronOrVscode(
         nps.series.nps(
@@ -152,16 +163,11 @@ module.exports = {
     },
     package: {
       electronMac: nps.series(
-        'nps prepare.electron',
         electronBuilder('--mac', 'never'),
         electronBuilder('--linux', 'never')
       ),
-      electronWin: nps.series(
-        'nps prepare.electron',
-        electronBuilder('--win', 'never')
-      ),
+      electronWin: nps.series(electronBuilder('--win', 'never')),
       vscode: nps.series(
-        'nps prepare.vscode',
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
       )
@@ -179,7 +185,10 @@ module.exports = {
     e2e: {
       fixtures: 'node ./tools/scripts/set-up-e2e-fixtures.js',
       up: 'node ./tools/scripts/e2e.js --watch',
-      headless: 'node ./tools/scripts/e2e.js --headless',
+      headless: {
+        default: 'node ./tools/scripts/e2e.js --headless',
+        'new-fixtures': nps.series.nps('prepare.e2e', 'e2e.headless')
+      },
       ci: 'node ./tools/scripts/e2e.js --headless --record'
     },
     format: {
