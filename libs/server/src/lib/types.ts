@@ -1,3 +1,4 @@
-export type SelectDirectory = (
-  options: { title: string; buttonLabel: string }
-) => Promise<string | undefined>;
+export type SelectDirectory = (options: {
+  title: string;
+  buttonLabel: string;
+}) => Promise<string | undefined>;

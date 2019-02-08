@@ -7,7 +7,8 @@ class MockGetDirectoryPathGQL extends GetDirectoryPathGQL {
     return of({
       data: {
         selectDirectory: {
-          selectedDirectoryPath: '/tmp'
+          selectedDirectoryPath: '/tmp',
+          error: null
         }
       }
     });
