@@ -23,7 +23,7 @@ jobs:
           paths:
             - ~/.cache
       - run: yarn start format.check
-      - run: yarn start lint.affected.origin-master
+      - run: npx tslint -p tsconfig.json -e **/generated/* -c tslint.json
       - run: yarn start e2e.prepare
       - run: yarn start test.affected.origin-master
       - run:
