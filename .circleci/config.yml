@@ -24,7 +24,7 @@ jobs:
             - ~/.cache
       - run: yarn start format.check
       - run: npx tslint -p tsconfig.json -e **/generated/* -c tslint.json
-      - run: yarn start e2e.prepare
+      - run: yarn start prepare.e2e
       - run: yarn start test.affected.origin-master
       - run:
           command: yarn start e2e.ci

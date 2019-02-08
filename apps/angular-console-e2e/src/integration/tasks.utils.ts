@@ -86,6 +86,7 @@ export function clearAllRecentTasks() {
         b.className.indexOf('remove-all-tasks-button') > -1 ||
         b.className.indexOf('remove-task-button') > -1
       ) {
+        cy.wait(300);
         b.click();
       }
     }
