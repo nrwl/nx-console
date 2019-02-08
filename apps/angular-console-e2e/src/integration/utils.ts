@@ -30,7 +30,7 @@ export function goBack(expectedTitle: string) {
 }
 
 export function checkButtonIsDisabled(text: string, disabled: boolean) {
-  cy.get('button', { timeout: 1000 }).should(($p: any) => {
+  cy.get('button', { timeout: 2000 }).should(($p: any) => {
     for (let i = 0; i < $p.length; ++i) {
       if ($p[i].innerText.indexOf(text) > -1) {
         expect($p[i].hasAttribute('disabled')).to.equal(disabled);

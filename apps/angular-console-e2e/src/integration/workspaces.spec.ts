@@ -1,7 +1,12 @@
-import { whitelistGraphql } from './utils';
+import {
+  whitelistGraphql,
+  checkButtonIsDisabled,
+  selectFolder,
+  uniqName
+} from './utils';
 
 describe('Workspaces', () => {
-  // const name = uniqName('workspace');
+  const name = uniqName('workspace');
 
   beforeEach(() => {
     whitelistGraphql();
@@ -9,33 +14,29 @@ describe('Workspaces', () => {
     cy.get('.add-workspace-container').trigger('mouseover');
   });
 
-  // TODO(mrmeku): re-enable this test after figuring out how to mock graphql requests.
-  // it('creates new workspaces', () => {
-  //   cy.get('.add-workspace-fab').click({ force: true });
-  //   checkButtonIsDisabled('Create', true);
-  //
-  //   selectFolder();
-  //   checkButtonIsDisabled('Create', true);
-  //
-  //   cy.wait(800);
-  //   cy.focused().type(name + '{enter}');
-  //   cy.wait(800);
-  //   checkButtonIsDisabled('Create', true);
-  //   cy.wait(800);
-  //   cy.get('.js-select-schematic .mat-pseudo-checkbox')
-  //     .first()
-  //     .click({ force: true });
-  //   cy.wait(800);
-  //   checkButtonIsDisabled('Create', false);
-  //
-  //   cy.get('button')
-  //     .contains('Create')
-  //     .click();
-  //
-  //   cy.contains('div.title', 'Projects', { timeout: 120000 });
-  //
-  //   cy.get('div.title').contains(name);
-  // });
+  it('creates new workspaces', () => {
+    cy.get('.add-workspace-fab').click({ force: true });
+    selectFolder();
+    checkButtonIsDisabled('Create', true);
+    cy.wait(800);
+    cy.focused().type(name + '{enter}');
+    cy.wait(800);
+    checkButtonIsDisabled('Create', true);
+    cy.wait(800);
+    cy.get('.js-select-schematic .mat-pseudo-checkbox')
+      .first()
+      .click({ force: true });
+    cy.wait(800);
+    checkButtonIsDisabled('Create', false);
+
+    cy.get('button')
+      .contains('Create')
+      .click();
+
+    cy.contains('div.title', 'Projects', { timeout: 120000 });
+
+    cy.get('div.title').contains(name);
+  });
 
   // it('opens a workspace', () => {
   //   cy.get('a[href="/open-workspace"]').click();
