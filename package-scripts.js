@@ -133,7 +133,7 @@ module.exports = {
           frontend: 'ng serve angular-console'
         }),
         cypress: nps.concurrent({
-          server: 'nps dev.server',
+          server: 'nps dev.server.start',
           frontend: 'ng run angular-console:serve:cypress'
         })
       }
@@ -214,13 +214,7 @@ module.exports = {
     },
     'install-dependencies': {
       vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
-      electron: `electron-builder --${
-        os.platform() === 'win32'
-          ? 'win'
-          : os.platform() === 'darwin'
-          ? 'mac'
-          : 'linux'
-      } --dir -p never`
+      electron: `node ${join('tools', 'scripts', 'electron-yarn.js')}`
     }
   }
 };

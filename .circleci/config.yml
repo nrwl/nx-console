@@ -12,22 +12,19 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-dependencies-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-v6-{{ .Branch }}-
             # fallback to using the latest cache if no exact match is found
-            - yarn-dependencies-
+            - yarn-dependencies-v6-
       - run: yarn install --frozen-lockfile --non-interactive
+      - run: npx cypress verify
       - save_cache:
+          key: yarn-dependencies-v6-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
-            - ~/.cache/yarn
-            - ./node_modules
-            - /home/circleci/.cache/Cypress
-          key: yarn-dependencies-{{ checksum "yarn.lock" }}
-# we should use- run: yarn start e2e.prepare
-      - run: yarn start build.electron
-      - run: yarn start dev.copy-assets.electron
-      - run: yarn start e2e.fixtures
+            - ~/.cache
       - run: yarn start format.check
       - run: yarn start lint.affected.origin-master
+      - run: yarn start e2e.prepare
       - run: yarn start test.affected.origin-master
       - run:
           command: yarn start e2e.ci
