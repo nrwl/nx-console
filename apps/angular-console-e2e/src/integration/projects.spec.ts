@@ -32,8 +32,7 @@ describe('Projects', () => {
     });
   });
 
-  // TODO: Re-enable when we app routes back to projects page
-  xit('provides navigation to and from command runners', () => {
+  it('provides navigation to and from command runners', () => {
     cy.contains('Generate Component').click();
     cy.get('.exit-action').click();
 

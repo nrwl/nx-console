@@ -122,7 +122,7 @@ describe('Tasks', () => {
     });
   });
 
-  it('runs build and show recent tasks', () => {
+  xit('runs build and show recent tasks', () => {
     cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
     cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
 
