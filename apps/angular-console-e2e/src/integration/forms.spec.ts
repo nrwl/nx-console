@@ -8,7 +8,8 @@ import {
   projectPath,
   texts,
   uniqName,
-  whitelistGraphql
+  whitelistGraphql,
+  elementContainsText
 } from './utils';
 
 describe('Forms', () => {
@@ -16,7 +17,7 @@ describe('Forms', () => {
     whitelistGraphql();
     openWorkspace(projectPath('proj'), 'generate');
     clickOnTask('@schematics/angular', 'component');
-    cy.contains('div.context-title', '@schematics/angular - component');
+    elementContainsText('div.context-title', '@schematics/angular - component');
   });
 
   it('supports basic validations', () => {
@@ -75,13 +76,15 @@ describe('Forms', () => {
     );
 
     cy.get('mat-select[name="export"]').click();
-    cy.contains('.mat-select-panel .mat-option', 'true').click({ force: true });
+    elementContainsText('.mat-select-panel .mat-option', 'true').click({
+      force: true
+    });
     checkDisplayedCommand(
       'ng generate @schematics/angular:component cmp --export --dry-run'
     );
 
     cy.get('mat-select[name="export"]').click();
-    cy.contains('.mat-select-panel .mat-option', 'false').click({
+    elementContainsText('.mat-select-panel .mat-option', 'false').click({
       force: true
     });
     checkDisplayedCommand(

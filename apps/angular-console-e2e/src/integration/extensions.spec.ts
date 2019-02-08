@@ -9,8 +9,8 @@ import {
   tasks,
   texts,
   waitForActionToComplete,
-  waitForAnimation,
-  whitelistGraphql
+  whitelistGraphql,
+  elementContainsText
 } from './utils';
 import { clearAllRecentTasks } from './tasks.utils';
 
@@ -36,9 +36,9 @@ describe('Extensions', () => {
 
   it('adds an extension', () => {
     clickOnTask('Available Extensions', '@angular/material', false);
-    cy.contains('div.context-title', '@angular/material');
+    elementContainsText('div.context-title', '@angular/material');
 
-    cy.contains('button', 'Add').click();
+    elementContainsText('button', 'Add').click();
 
     checkDisplayedCommand(`ng add @angular/material`);
 
@@ -49,9 +49,9 @@ describe('Extensions', () => {
     taskListHeaders($p => {
       expect(texts($p)[0]).to.equal('Available Extensions');
     });
-    waitForAnimation();
 
     // check that the schematics added by angular material are available
+    cy.wait(300); // Needed to de-flake this test
     goToGenerate();
     cy.wait(300); // Needed to de-flake this test
     taskListHeaders($p => {

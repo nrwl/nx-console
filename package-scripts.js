@@ -179,6 +179,7 @@ module.exports = {
       fixtures: 'node ./tools/scripts/set-up-e2e-fixtures.js',
       prepare: nps.concurrent.nps('prepare.electron', 'e2e.fixtures'),
       up: 'node ./tools/scripts/e2e.js --watch',
+      headless: 'node ./tools/scripts/e2e.js --headless',
       ci: 'node ./tools/scripts/e2e.js --headless --record'
     },
     format: {

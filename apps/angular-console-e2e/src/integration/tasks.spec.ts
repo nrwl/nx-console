@@ -9,8 +9,8 @@ import {
   taskListHeaders,
   tasks,
   texts,
-  waitForAnimation,
-  whitelistGraphql
+  whitelistGraphql,
+  elementContainsText
 } from './utils';
 import {
   checkMultipleRecentTasks,
@@ -130,22 +130,24 @@ describe('Tasks', () => {
 
     clickOnTask('proj', 'build');
 
-    cy.contains('div.context-title', 'ng build proj');
+    elementContainsText('div.context-title', 'ng build proj');
 
     checkDisplayedCommand('ng build proj');
 
-    cy.contains('mat-radio-button', 'Production').click();
+    elementContainsText('mat-radio-button', 'Production').click();
     checkDisplayedCommand('ng build proj --configuration=production');
 
-    cy.contains('mat-radio-button', 'Default').click();
+    elementContainsText('mat-radio-button', 'Default').click();
     checkDisplayedCommand('ng build proj');
 
-    cy.contains('button', 'Run').click();
+    elementContainsText('button', 'Run').click();
 
-    cy.contains('div.js-status-build-success', 'Build completed', {
-      timeout: 180000
-    });
-    cy.contains('div.js-status-build-folder', 'is ready', { timeout: 180000 });
+    elementContainsText(
+      'div.js-status-build-success',
+      'Build completed',
+      180000
+    );
+    elementContainsText('div.js-status-build-folder', 'is ready', 180000);
 
     checkFileExists(`dist/proj/main.js`);
     checkActionBarHidden();
@@ -161,14 +163,16 @@ describe('Tasks', () => {
       status: CommandStatus.SUCCESSFUL
     });
 
-    waitForAnimation();
+    cy.wait(1000);
 
     clickOnTask('proj', 'lint');
-    cy.contains('div.context-title', 'ng lint proj');
 
-    checkDisplayedCommand('ng lint proj');
+    cy.wait(1000);
 
-    cy.contains('button', 'Run').click();
+    elementContainsText('div.context-title', 'ng lint proj', 5000);
+    checkDisplayedCommand('ng lint proj', 5000);
+
+    elementContainsText('button', 'Run').click();
 
     checkActionBarHidden();
 
@@ -176,16 +180,12 @@ describe('Tasks', () => {
 
     goBack('Tasks');
 
-    waitForAnimation();
-
     checkMultipleRecentTasks({
       numTasks: 2,
       isExpanded: false
     });
 
     toggleRecentTasksExpansion();
-
-    waitForAnimation();
 
     checkMultipleRecentTasks({
       numTasks: 2,
@@ -203,11 +203,11 @@ describe('Tasks', () => {
 
   it('runs an npm script', () => {
     clickOnTask('package.json scripts', 'build');
-    cy.contains('div.context-title', 'run build');
+    elementContainsText('div.context-title', 'run build');
 
     checkDisplayedCommand('yarn run build');
 
-    cy.contains('button', 'Run').click();
+    elementContainsText('button', 'Run').click();
 
     goBack('Tasks');
 
@@ -225,8 +225,6 @@ describe('Tasks', () => {
     clickOnTask('proj', 'test');
 
     cy.get('div.context-title').contains('ng test proj');
-
-    waitForAnimation();
 
     cy.get('button')
       .contains('Run')
@@ -255,8 +253,6 @@ describe('Tasks', () => {
     cy.get('div.context-title').contains('ng serve proj');
 
     clickOnFieldGroup('Optional fields');
-
-    waitForAnimation();
 
     cy.get('input[name="port"]')
       .scrollIntoView()

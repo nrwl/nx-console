@@ -8,7 +8,8 @@ import {
   taskListHeaders,
   texts,
   uniqName,
-  whitelistGraphql
+  whitelistGraphql,
+  elementContainsText
 } from './utils';
 import { clearRecentTask } from './tasks.utils';
 
@@ -20,14 +21,17 @@ describe('Generate Workspace Schematics', () => {
 
   it('runs a schematic', () => {
     clickOnTask('@nrwl/schematics', 'workspace-schematic');
-    cy.contains('div.context-title', '@nrwl/schematics - workspace-schematic');
+    elementContainsText(
+      'div.context-title',
+      '@nrwl/schematics - workspace-schematic'
+    );
 
     const schematicName = uniqName('schematic-name');
     cy.get('input[name="name"]').type(schematicName);
 
     cy.wait(100);
 
-    cy.contains('button', 'Generate').click();
+    elementContainsText('button', 'Generate').click();
 
     cy.wait(100);
 
@@ -49,12 +53,15 @@ describe('Generate Workspace Schematics', () => {
     });
 
     clickOnTask('Workspace Schematics', schematicName);
-    cy.contains('div.context-title', `Workspace Schematics - ${schematicName}`);
+    elementContainsText(
+      'div.context-title',
+      `Workspace Schematics - ${schematicName}`
+    );
 
     const libName = uniqName('lib-name');
     cy.get('input[name="name"]').type(libName);
 
-    cy.contains('button', 'Generate').click();
+    elementContainsText('button', 'Generate').click();
 
     checkFileExists(`libs/${libName}/tsconfig.json`, 'proj-nx', {
       timeout: 15000

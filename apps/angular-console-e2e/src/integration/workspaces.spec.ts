@@ -18,15 +18,14 @@ describe('Workspaces', () => {
     cy.get('.add-workspace-fab').click({ force: true });
     selectFolder();
     checkButtonIsDisabled('Create', true);
-    cy.wait(800);
-    cy.focused().type(name + '{enter}');
-    cy.wait(800);
+
+    cy.get('.workspace-name-form-field input')
+      .click({ force: true })
+      .type(name + '{enter}');
     checkButtonIsDisabled('Create', true);
-    cy.wait(800);
     cy.get('.js-select-schematic .mat-pseudo-checkbox')
       .first()
       .click({ force: true });
-    cy.wait(800);
     checkButtonIsDisabled('Create', false);
 
     cy.get('button')
@@ -37,19 +36,4 @@ describe('Workspaces', () => {
 
     cy.get('div.title').contains(name);
   });
-
-  // it('opens a workspace', () => {
-  //   cy.get('a[href="/open-workspace"]').click();
-  //   cy.get('div.title').contains('Open Workspace');
-  //   checkButtonIsDisabled('Create', true);
-  //   expandFolder('tmp');
-  //   selectFolder(name);
-  //   cy.get('div.context-title').contains(`Selected Workspace: ${name}`);
-
-  //   cy.get('button')
-  //     .contains('Open')
-  //     .click();
-
-  //   cy.get('div.title').contains('Projects');
-  // });
 });

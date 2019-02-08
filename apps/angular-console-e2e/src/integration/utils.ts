@@ -17,7 +17,7 @@ export function whitelistGraphql() {
 }
 
 export function clickOnFieldGroup(group: string) {
-  cy.contains('mat-expansion-panel-header', group).click();
+  elementContainsText('mat-expansion-panel-header', group).click();
 }
 
 export function checkMessage(error: string) {
@@ -25,8 +25,8 @@ export function checkMessage(error: string) {
 }
 
 export function goBack(expectedTitle: string) {
-  cy.contains('mat-icon', 'clear').click();
-  cy.contains('div.title', expectedTitle);
+  elementContainsText('mat-icon', 'clear').click();
+  elementContainsText('div.title', expectedTitle);
 }
 
 export function checkButtonIsDisabled(text: string, disabled: boolean) {
@@ -63,17 +63,16 @@ function fieldOperation(field: string, operation: (el: any) => void) {
   });
 }
 
-export function checkDisplayedCommand(s: string) {
-  cy.get('div.command.window-header').should($p => {
-    const t = texts($p);
-    expect(t.length).to.equal(1);
-    expect(t[0].trim()).to.equal(s.trim());
-  });
+export function checkDisplayedCommand(s: string, timeout: number = 3000) {
+  elementContainsText('div.command.window-header', s, timeout);
 }
 
 export function openWorkspace(proj: string, route: string = 'projects') {
   cy.visit(`workspace/${encodeURIComponent(proj)}/${route}`);
-  cy.contains('div.title', route.slice(0, 1).toUpperCase() + route.slice(1));
+  elementContainsText(
+    'div.title',
+    route.slice(0, 1).toUpperCase() + route.slice(1)
+  );
 }
 
 export function projectNames(callback: (s: any) => void) {
@@ -82,17 +81,17 @@ export function projectNames(callback: (s: any) => void) {
 
 export function goToGenerate() {
   cy.get('button#go-to-generate').click({ force: true, timeout: 5000 });
-  cy.contains('.title', 'Generate');
+  elementContainsText('ui-contextual-action-bar .title', 'Generate', 5000);
 }
 
 export function goToExtensions() {
   cy.get('button#go-to-extensions').click({ force: true, timeout: 5000 });
-  cy.contains('.title', 'Extensions');
+  elementContainsText('ui-contextual-action-bar .title', 'Extensions');
 }
 
 export function goToTasks() {
   cy.get('button#go-to-tasks').click({ force: true, timeout: 5000 });
-  cy.contains('.title', 'Tasks');
+  elementContainsText('ui-contextual-action-bar .title', 'Tasks');
 }
 
 export function taskListHeaders(callback: (s: any) => void) {
@@ -116,7 +115,7 @@ export function clickOnTask(
   name: string,
   exact: boolean = true
 ) {
-  cy.get('mat-nav-list.task-list').should(($p: any) => {
+  cy.get('mat-nav-list.task-list', { timeout: 1000 }).should(($p: any) => {
     const children = $p.get()[0].children;
     let insideGroup = false;
     for (let i = 0; i < children.length; ++i) {
@@ -131,10 +130,10 @@ export function clickOnTask(
           : c.innerText.trim().indexOf(name) > -1)
       ) {
         c.click();
+        break;
       }
     }
   });
-  cy.wait(400);
 }
 
 export function selectFolder() {
@@ -142,10 +141,6 @@ export function selectFolder() {
   cy.get('.path-form-field input').click();
   cy.get('.js-step-name-workspace').click();
   cy.wait(500);
-}
-
-export function waitForAnimation() {
-  cy.get('.ng-animating', { timeout: 3000 }).should('not.exist');
 }
 
 export function waitForActionToComplete() {
@@ -161,6 +156,14 @@ export function autocompletion(callback: (s: any) => void) {
       .find('mat-option', { timeout: 3000 })
       .should(callback);
   });
+}
+
+export function elementContainsText(
+  selector: string,
+  text: string,
+  timeout: number = 3000
+) {
+  return cy.contains(selector, text, { timeout });
 }
 
 export function checkFileExists(
