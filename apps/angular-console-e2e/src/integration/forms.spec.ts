@@ -8,7 +8,6 @@ import {
   projectPath,
   texts,
   uniqName,
-  waitForAutocomplete,
   whitelistGraphql
 } from './utils';
 
@@ -35,7 +34,6 @@ describe('Forms', () => {
 
   it('supports project autocompletion', () => {
     cy.get('input[name="project"]').type('e2e');
-    waitForAutocomplete();
 
     autocompletion($p => {
       expect(texts($p)[0]).to.contain('proj-e2e');
@@ -43,7 +41,6 @@ describe('Forms', () => {
 
     cy.get('input[name="project"]').clear();
     cy.get('input[name="project"]').type('proj');
-    waitForAutocomplete();
 
     autocompletion($p => {
       expect(texts($p)[0]).to.contain('proj');
@@ -53,7 +50,6 @@ describe('Forms', () => {
 
   it('supports module autocompletion', () => {
     cy.get('input[name="module"]').type('nothing');
-    waitForAutocomplete();
 
     autocompletion($p => {
       expect($p.length).to.equal(0);
@@ -61,7 +57,6 @@ describe('Forms', () => {
 
     cy.get('input[name="module"]').clear();
     cy.get('input[name="module"]').type('app');
-    waitForAutocomplete();
 
     autocompletion($p => {
       expect($p.length).to.equal(1);

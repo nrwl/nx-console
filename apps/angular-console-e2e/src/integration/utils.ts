@@ -148,10 +148,6 @@ export function waitForAnimation() {
   cy.get('.ng-animating', { timeout: 3000 }).should('not.exist');
 }
 
-export function waitForAutocomplete() {
-  cy.wait(700);
-}
-
 export function waitForActionToComplete() {
   cy.get('button.action-button').should('be.disabled');
   cy.get('button.action-button:enabled[color="primary"]', {
@@ -162,7 +158,7 @@ export function waitForActionToComplete() {
 export function autocompletion(callback: (s: any) => void) {
   cy.get('div.mat-autocomplete-panel').within(() => {
     cy.root()
-      .find('mat-option')
+      .find('mat-option', { timeout: 3000 })
       .should(callback);
   });
 }
