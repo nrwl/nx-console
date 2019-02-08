@@ -108,10 +108,15 @@ async function main(config: {
     window.activeTerminal.hide();
   }
 
+  const address = server.server.address();
+  if (typeof address === 'string') {
+    throw new Error(`Server address format is unsupported: ${address}`);
+  }
+
   const webViewPanel = createWebViewPanel(
     context,
     viewColumn,
-    `http://localhost:${server.server.address().port}/${getWorkspaceRoute(
+    `http://localhost:${address.port}/${getWorkspaceRoute(
       workspaceDef,
       workspaceRouteTitle
     )}`,

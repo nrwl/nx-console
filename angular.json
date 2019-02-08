@@ -51,7 +51,7 @@
                 }
               ],
               "outputPath": "dist/apps/electron/assets/public",
-              "optimization": true,
+              "optimization": false,
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
@@ -69,7 +69,7 @@
                 }
               ],
               "outputPath": "dist/apps/vscode/assets/public",
-              "optimization": true,
+              "optimization": false,
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
