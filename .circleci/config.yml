@@ -3,8 +3,31 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
+orbs:
+  # use Cypress orb from CircleCI registry
+  cypress: cypress-io/cypress@1.3.0
 jobs:
   build:
+    jobs:
+      # checks out code and installs dependencies once
+      - prepare_e2e:
+          build: yarn start prepare.e2e
+      - e2e_run_ci:
+          # name this job because we are running "cypress/run" several times
+          # with different parameters
+          name: 'angular-console-e2e 3 machines'
+          # job will use workspace with code and dependencies
+          # installed by the "install" job
+          requires:
+            - prepare-e2e
+          record: true # record results on Cypress dashboard
+          parallel: true # load balance all tests
+          parallelism: 3 # across 3 machines
+          group: 'angular-console-e2e' # name this group
+          start: 'yarn start e2e.ci' # start server before running tests
+          no_output_timeout: 5m
+          environment:
+            CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
     docker:
       - image: circleci/node:8.12.0-stretch-browsers
     working_directory: ~/repo
@@ -24,10 +47,6 @@ jobs:
             - ~/.cache
       - run: yarn start format.check
       - run: npx tslint -p tsconfig.json -e **/generated/* -c tslint.json
-      - run: yarn start prepare.e2e
+      - prepare-e2e:
+          build: yarn start prepare.e2e
       - run: yarn start test.affected.origin-master
-      - run:
-          command: yarn start e2e.ci
-          no_output_timeout: 5m
-          environment:
-            CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
