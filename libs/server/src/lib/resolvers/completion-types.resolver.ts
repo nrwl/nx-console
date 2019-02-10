@@ -1,4 +1,4 @@
-import { Workspace } from '../generated/graphql-types';
+import { Workspace } from '@angular-console/schema';
 import {
   completeAbsoluteModules,
   completeFiles,

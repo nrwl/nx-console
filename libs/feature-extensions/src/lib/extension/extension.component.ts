@@ -89,7 +89,7 @@ export class ExtensionComponent implements OnInit {
       }),
       tap((extension: Extension) => {
         const contextTitle = this.getContextTitle(extension);
-        this.ngAddDisabled$.next(extension.installed);
+        this.ngAddDisabled$.next(Boolean(extension.installed));
         this.contextActionService.contextualActions$.next({
           contextTitle,
           actions: [

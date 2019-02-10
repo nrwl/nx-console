@@ -4,7 +4,7 @@ import { platform } from 'os';
 import * as request from 'request';
 import { dirSync } from 'tmp';
 
-import { InstallNodeJsStatus } from '../generated/graphql-types';
+import { InstallNodeJsStatus } from '@angular-console/schema';
 
 export interface Progress extends fs.WriteStream {
   progress(): {

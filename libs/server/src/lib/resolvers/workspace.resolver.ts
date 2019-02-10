@@ -4,7 +4,7 @@ import {
   Project,
   SchematicCollection,
   Workspace
-} from '../generated/graphql-types';
+} from '@angular-console/schema';
 import { readSettings } from '../api/read-settings';
 import { directoryExists, filterByName } from '../utils/utils';
 import * as path from 'path';

@@ -2,22 +2,13 @@ type Architect {
   name: String!
   project: String!
   builder: String!
-  configurations: [ArchitectConfigurations]
-  schema: [ArchitectSchema]
+  description: String!
+  configurations: [ArchitectConfigurations!]!
+  schema: [Schema!]!
 }
 
 type ArchitectConfigurations {
   name: String!
-}
-
-type ArchitectSchema {
-  name: String!
-  type: String!
-  description: String
-  defaultValue: String
-  required: Boolean!
-  positional: Boolean!
-  enum: [String]
 }
 
 type CommandResponse {
@@ -40,10 +31,10 @@ type CompletionResultType {
 }
 
 type CompletionsTypes {
-  files(input: String!): [CompletionResultType]
-  projects(input: String!): [CompletionResultType]
-  localModules(input: String!): [CompletionResultType]
-  absoluteModules(input: String!): [CompletionResultType]
+  files(input: String!): [CompletionResultType!]!
+  projects(input: String!): [CompletionResultType!]!
+  localModules(input: String!): [CompletionResultType!]!
+  absoluteModules(input: String!): [CompletionResultType!]!
 }
 
 type InstallNodeJsStatus {
@@ -59,7 +50,7 @@ type Query {
   schematicCollections: [SchematicCollectionForNgNew!]!
   workspace(path: String!): Workspace!
   editors: [EditorSupport!]!
-  availableExtensions(name: String): [Extension]
+  availableExtensions(name: String): [Extension!]!
   installNodeJsStatus: InstallNodeJsStatus
   isNodejsInstalled: IsNodeInstalledResult
   directory(
@@ -82,8 +73,9 @@ type EditorSupport {
 
 type Extension {
   name: String!
-  description: String
+  description: String!
   detailedDescription: String
+  installed: Boolean
 }
 
 type FileListType {
@@ -94,7 +86,7 @@ type FileListType {
 type FilesType {
   path: String!
   exists: Boolean!
-  files: [FileListType]
+  files: [FileListType!]!
 }
 
 enum FileType {
@@ -134,14 +126,14 @@ type Mutation {
   ): CommandStarted
   generateUsingNpm(
     path: String!
-    npmClient: String!
+    npmClient: String
     genCommand: [String!]!
     dryRun: Boolean!
   ): CommandStarted
   runNg(path: String!, runCommand: [String!]!): CommandStarted
   runNpm(
     path: String!
-    npmClient: String!
+    npmClient: String
     runCommand: [String!]!
   ): CommandStarted
   stopCommand(id: String!): StopResult
@@ -168,8 +160,8 @@ type SelectDirectoryResult {
 
 type NpmScript {
   name: String!
-  npmClient: String!
-  schema: [ArchitectSchema]
+  npmClient: String
+  schema: [Schema!]!
 }
 
 type OpenInEditor {
@@ -180,37 +172,39 @@ type Project {
   name: String!
   root: String!
   projectType: String!
-  architect(name: String): [Architect]
+  architect(name: String): [Architect!]!
 }
 
 type Schematic {
   collection: String!
   name: String!
-  description: String
+  description: String!
   npmClient: String
   npmScript: String
-  schema: [SchematicSchema]
+  schema: [Schema!]!
 }
 
 type SchematicCollection {
   name: String!
-  schematics(name: String): [Schematic]
+  schematics(name: String): [Schematic!]!
 }
 
 type SchematicCollectionForNgNew {
   name: String!
-  description: String
-  schema: [SchematicSchema!]!
+  description: String!
+  schema: [Schema!]!
 }
 
-type SchematicSchema {
+type Schema {
   name: String!
   type: String!
-  description: String
+  description: String!
   defaultValue: String
+  important: Boolean
+  completion: String
   required: Boolean!
   positional: Boolean!
-  enum: [String]
+  enum: [String!]
 }
 
 type StopResult {

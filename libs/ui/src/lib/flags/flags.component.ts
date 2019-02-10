@@ -1,4 +1,3 @@
-import { Field } from '@angular-console/schema';
 import { Completions, Serializer } from '@angular-console/utils';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
@@ -18,10 +17,11 @@ import { ReplaySubject, Subscription } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 
 import { schematicFieldsToFormGroup } from '../schematic-fields/schematic-fields.component';
+import { Schema } from '@angular-console/schema';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
-  fields: Array<Field>;
+  fields: Array<Schema>;
   expanded: boolean;
 }
 
@@ -33,7 +33,7 @@ interface FieldGrouping {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlagsComponent {
-  private _fields: Field[];
+  private _fields: Schema[];
   private subscription: Subscription;
 
   @ViewChildren(CdkVirtualScrollViewport, { read: ElementRef })
@@ -51,7 +51,7 @@ export class FlagsComponent {
   get fields() {
     return this._fields;
   }
-  set fields(f: Field[]) {
+  set fields(f: Schema[]) {
     this._fields = f;
     this.fieldGroups = this.toFieldGroups(f);
     this.setForm();
@@ -76,7 +76,7 @@ export class FlagsComponent {
 
   viewportHeight = new ReplaySubject<string>();
 
-  private toFieldGroups(fields: Array<Field>): Array<FieldGrouping> {
+  private toFieldGroups(fields: Array<Schema>): Array<FieldGrouping> {
     const importantFields: FieldGrouping = {
       type: 'important',
       fields: fields.filter(f => f.important),

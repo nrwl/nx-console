@@ -1,4 +1,4 @@
-import { SchematicCollection } from '../generated/graphql-types';
+import { SchematicCollection } from '@angular-console/schema';
 import { filterByName } from '../utils/utils';
 import { Args, Parent, ResolveProperty, Resolver } from '@nestjs/graphql';
 

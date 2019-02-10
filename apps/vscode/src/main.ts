@@ -1,4 +1,5 @@
-import { WorkspaceDefinition, readSettings } from '@angular-console/server';
+import { WorkspaceDefinition } from '@angular-console/schema';
+import { readSettings } from '@angular-console/server';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { Server } from 'http';
 import {

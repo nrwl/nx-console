@@ -14,5 +14,3 @@ export {
 } from './lib/api/run-command';
 
 export { SelectDirectory } from './lib/types';
-
-export * from './lib/generated/graphql-types';

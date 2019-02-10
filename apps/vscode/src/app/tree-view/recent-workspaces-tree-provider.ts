@@ -1,4 +1,6 @@
-import { settingsChange$, WorkspaceDefinition } from '@angular-console/server';
+import { WorkspaceDefinition } from '@angular-console/schema';
+import { settingsChange$ } from '@angular-console/server';
+
 import { TreeDataProvider } from 'vscode';
 
 import { Workspace } from '../tree-item/workspace';

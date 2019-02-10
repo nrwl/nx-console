@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Extension, ExtensionGroup } from '@angular-console/schema';
+import { Extension } from '@angular-console/schema';
 import { combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -16,6 +16,11 @@ import { WorkspaceAndExtensionsGQL } from '../generated/graphql';
 
 interface ExtensionId {
   name: string | undefined;
+}
+
+export interface ExtensionGroup {
+  name: string;
+  extensions: Extension[];
 }
 
 @Component({

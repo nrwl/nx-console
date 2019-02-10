@@ -8,7 +8,7 @@ import {
   normalizeSchema,
   readJsonFile
 } from '../utils/utils';
-import { Schematic, SchematicCollection } from '../generated/graphql-types';
+import { Schematic, SchematicCollection } from '@angular-console/schema';
 
 export function readAllSchematicCollections(
   basedir: string,

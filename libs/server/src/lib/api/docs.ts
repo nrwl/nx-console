@@ -1,4 +1,4 @@
-import { Doc } from '../generated/graphql-types';
+import { Doc } from '@angular-console/schema';
 import { Observable, of } from 'rxjs';
 import { catchError, concatMap, reduce, takeWhile } from 'rxjs/operators';
 

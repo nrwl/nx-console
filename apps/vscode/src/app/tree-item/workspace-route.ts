@@ -1,4 +1,4 @@
-import { WorkspaceDefinition } from '@angular-console/server';
+import { WorkspaceDefinition } from '@angular-console/schema';
 import { join } from 'path';
 import {
   TreeItem,
