@@ -68,7 +68,9 @@
               name="value"
             />
             <mat-error *ngIf="control.invalid && control.errors.nameTaken">
-              {{ ngNewForm.value.path + '/' + control.value | normalizePath }}
+              {{
+                ngNewForm.value.path + '/' + control.value | normalizePath
+              }}
               already exists
             </mat-error>
             <mat-icon matSuffix>create_new_folder</mat-icon>
