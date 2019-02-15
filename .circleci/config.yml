@@ -12,17 +12,16 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-dependencies-v7-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-dependencies-v7-{{ .Branch }}-
+            - yarn-dependencies-v8-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-v8-{{ .Branch }}-
             # fallback to using the latest cache if no exact match is found
-            - yarn-dependencies-v7-
+            - yarn-dependencies-v8-
       - run: yarn install --frozen-lockfile --non-interactive
-      - run: npx cypress verify
-      - run: yarn start prepare.e2e.and.check-formatting
       - save_cache:
-          key: yarn-dependencies-v7-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-dependencies-v8-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache
+      - run: yarn start prepare.e2e.and.check-formatting
       - run: yarn start test.affected.origin-master
       - run:
           command: yarn start e2e.ci
