@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Field, CompletetionValue } from '@angular-console/schema';
+import { Schema, CompletionResultType } from '@angular-console/schema';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { Observable } from 'rxjs';
@@ -13,9 +13,9 @@ export class Completions {
 
   completionsFor(
     path: string,
-    field: Field,
+    field: Schema,
     input: string
-  ): Observable<Array<CompletetionValue>> {
+  ): Observable<Array<CompletionResultType>> {
     return this.apollo
       .query({
         query: gql`

@@ -1,8 +1,5 @@
-import {
-  settingsChange$,
-  WorkspaceDefinition,
-  Settings
-} from '@angular-console/server';
+import { WorkspaceDefinition, Settings } from '@angular-console/schema';
+import { settingsChange$ } from '@angular-console/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { TreeDataProvider } from 'vscode';

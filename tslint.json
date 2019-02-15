@@ -3,6 +3,9 @@
     "node_modules/codelyzer",
     "node_modules/@nrwl/schematics/src/tslint"
   ],
+  "linterOptions": {
+    "exclude": ["**/generated/*"]
+  },
   "extends": ["codelyzer", "tslint-no-unused-expression-chai"],
   "rules": {
     "adjacent-overload-signatures": true,

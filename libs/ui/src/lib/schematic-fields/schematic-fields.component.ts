@@ -4,7 +4,7 @@ import {
   ChangeDetectionStrategy,
   Input
 } from '@angular/core';
-import { Field, CompletetionValue } from '@angular-console/schema';
+import { Schema, CompletionResultType } from '@angular-console/schema';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import {
   refCount,
@@ -23,20 +23,24 @@ import {
 } from '@angular/animations';
 import { Observable } from 'rxjs';
 
-function fieldEnumOptions(field: Field) {
+function fieldEnumOptions(field: Schema) {
   if (field.defaultValue) {
-    return field.enum;
+    return field.enum || [];
   } else {
     return [null, ...field.enum];
   }
 }
 
+export interface AutocompleteSchema extends Schema {
+  completionValues?: Observable<CompletionResultType[]>;
+}
+
 export interface Payload {
-  fields: Array<Field>;
+  fields: Array<AutocompleteSchema>;
   getCompletions?: (
-    f: Field,
+    f: Schema,
     v: string | null
-  ) => Observable<CompletetionValue[]>;
+  ) => Observable<CompletionResultType[]>;
   init?: { [k: string]: any };
   configurations?: boolean;
 }
@@ -68,15 +72,15 @@ export const schematicFieldsToFormGroup = (payload: Payload): FormGroup => {
           refCount()
         );
       } else if (f.enum) {
-        const completionValues: CompletetionValue[] = fieldEnumOptions(f).map(
-          o => {
-            const completion: CompletetionValue = {
-              value: o,
-              display: o || '--'
-            };
-            return completion;
-          }
-        );
+        const completionValues: CompletionResultType[] = fieldEnumOptions(
+          f
+        ).map(o => {
+          const completion: CompletionResultType = {
+            value: o || '',
+            display: o || '--'
+          };
+          return completion;
+        });
         f.completionValues = formControl.valueChanges.pipe(
           debounceTime(300),
           startWith(formControl.value),
@@ -127,7 +131,7 @@ export class SchematicFieldsComponent implements OnInit {
 
   ngOnInit() {}
 
-  @Input() field: Field;
+  @Input() field: Schema;
   @Input() formGroup: FormGroup;
 
   // this is needed because of a bug in MatAutocomplete
@@ -137,14 +141,14 @@ export class SchematicFieldsComponent implements OnInit {
     });
   }
 
-  clearFormField(f: Field) {
+  clearFormField(f: Schema) {
     const formControl = this.formGroup.get(f.name);
     if (formControl) {
       formControl.reset();
     }
   }
 
-  fieldEnumOptions(field: Field) {
+  fieldEnumOptions(field: Schema) {
     if (field.defaultValue) {
       return field.enum;
     } else {
@@ -156,7 +160,7 @@ export class SchematicFieldsComponent implements OnInit {
     return value === null ? '--' : value;
   }
 
-  toggleBooleanField(f: Field) {
+  toggleBooleanField(f: Schema) {
     const formControl = this.formGroup.get(f.name);
     if (formControl) {
       formControl.setValue(!formControl.value);

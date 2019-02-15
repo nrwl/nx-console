@@ -1,5 +1,5 @@
 import { Store } from '@nrwl/angular-console-enterprise-electron';
-import { Settings } from '../generated/graphql-types';
+import { Settings } from '@angular-console/schema';
 import { Subject } from 'rxjs';
 
 /* tslint:disable */

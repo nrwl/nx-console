@@ -113,12 +113,9 @@ module.exports = {
           'dev.server.start'
         ),
         start: `electron ${ELECTRON_BUNDLE_PATH} --server --port 4201 --inspect=9229`,
-        gen: electronOrVscode(
-          nps.series(
-            'gql-gen --config ./tools/scripts/codegen-server.yml',
-            'gql-gen --config ./tools/scripts/codegen-client.js',
-            'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap'
-          )
+        gen: nps.series(
+          'gql-gen --config ./tools/scripts/codegen-server.yml',
+          'gql-gen --config ./tools/scripts/codegen-client.js'
         ),
         'gen-and-build': electronOrVscode(
           nps.series(

@@ -1,6 +1,6 @@
 import { Uri, TreeItemCollapsibleState, TreeItem } from 'vscode';
 import { join } from 'path';
-import { WorkspaceDefinition } from '@angular-console/server';
+import { WorkspaceDefinition } from '@angular-console/schema';
 
 export class Workspace extends TreeItem {
   iconPath = Uri.file(join(this.extensionPath, 'assets', 'extension_icon.png'));

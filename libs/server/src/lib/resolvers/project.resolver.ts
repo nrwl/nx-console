@@ -1,4 +1,4 @@
-import { Project } from '../generated/graphql-types';
+import { Project } from '@angular-console/schema';
 import { filterByName } from '../utils/utils';
 import { Args, Resolver, ResolveProperty, Parent } from '@nestjs/graphql';
 

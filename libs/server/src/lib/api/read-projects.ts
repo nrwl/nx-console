@@ -1,5 +1,5 @@
 import { normalizeSchema, readJsonFile } from '../utils/utils';
-import { Project, Architect } from '../generated/graphql-types';
+import { Project, Architect } from '@angular-console/schema';
 import * as path from 'path';
 
 export function readProjects(json: any): Project[] {
@@ -30,6 +30,7 @@ function readArchitect(project: string, architect: any): Architect[] {
       configurations,
       name: key,
       project,
+      description: value.description,
       builder: value.builder
     };
   });

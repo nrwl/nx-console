@@ -1,4 +1,4 @@
-import { Schematic, Field } from '@angular-console/schema';
+import { Schematic, Schema } from '@angular-console/schema';
 import { Serializer } from './serializer.service';
 
 describe('Serializer', () => {
@@ -75,7 +75,7 @@ describe('Serializer', () => {
       );
     });
     it('should recognize positional and required fields as important but ignore previous values of important', () => {
-      normalized.schema.forEach((field: Field) => {
+      normalized.schema.forEach((field: Schema) => {
         switch (field.name) {
           case 'required':
           case 'positional':

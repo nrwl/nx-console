@@ -24,7 +24,6 @@ import {
   MatSidenavModule,
   MatSnackBarModule
 } from '@angular/material';
-import { BrowserModule } from '@angular/platform-browser';
 import {
   BrowserAnimationsModule,
   NoopAnimationsModule
@@ -85,7 +84,6 @@ export function initApollo(
     MatListModule,
     MatIconModule,
     MatSnackBarModule,
-    BrowserModule,
     environment.disableAnimations
       ? NoopAnimationsModule
       : BrowserAnimationsModule,

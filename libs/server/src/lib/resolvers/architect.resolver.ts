@@ -1,4 +1,4 @@
-import { Architect } from '../generated/graphql-types';
+import { Architect } from '@angular-console/schema';
 import { directoryExists } from '../utils/utils';
 import * as path from 'path';
 import { readSchema } from '../api/read-projects';

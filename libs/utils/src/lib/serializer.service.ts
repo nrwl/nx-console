@@ -1,4 +1,4 @@
-import { AutocompletionType, Field, Schematic } from '@angular-console/schema';
+import { AutocompletionType, Schema, Schematic } from '@angular-console/schema';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -27,7 +27,7 @@ export class Serializer {
     return normal;
   }
 
-  normalizeTarget(builder: string, schema: Field[]): Field[] {
+  normalizeTarget(builder: string, schema: Schema[]): Schema[] {
     return this.reorderFields(
       schema.map(f => ({
         ...f,
@@ -38,24 +38,24 @@ export class Serializer {
     );
   }
 
-  reorderFields(fields: Field[]): Field[] {
+  reorderFields(fields: Schema[]): Schema[] {
     return [
       ...fields.filter(r => r.positional),
       ...fields.filter(r => !r.positional && r.important),
       ...fields.filter(r => !r.positional && !r.important)
     ].map(f => {
-      let d = f.defaultValue;
+      let d = f.defaultValue as any;
       if (f.type === 'boolean' && f.defaultValue === 'false') {
-        d = f.defaultValue = false;
+        d = (f as any).defaultValue = false;
       }
       if (f.type === 'boolean' && f.defaultValue === 'true') {
-        d = f.defaultValue = true;
+        d = (f as any).defaultValue = true;
       }
       return { ...f, defaultValue: d };
     });
   }
 
-  serializeArgs(value: { [p: string]: any }, schema: Field[]): string[] {
+  serializeArgs(value: { [p: string]: any }, schema: Schema[]): string[] {
     const fields = schema.filter(
       s =>
         value[s.name] !== undefined &&

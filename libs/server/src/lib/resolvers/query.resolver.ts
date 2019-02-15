@@ -8,7 +8,7 @@ import {
   SchematicCollectionForNgNew,
   Settings,
   Workspace
-} from '../generated/graphql-types';
+} from '@angular-console/schema';
 import { schematicCollectionsForNgNew } from '../api/read-ngnews';
 import {
   cacheFiles,

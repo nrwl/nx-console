@@ -1,15 +1,16 @@
 import { fileExistsSync } from '../utils/utils';
 import * as path from 'path';
+import { NpmScript } from '@angular-console/schema';
 
 export function readNpmScripts(
   workspacePath: string,
   packageJson: any
-): { name: string; npmClient: string }[] {
+): NpmScript[] {
   const npmClient = fileExistsSync(path.join(workspacePath, 'yarn.lock'))
     ? 'yarn'
     : 'npm';
   return Object.keys(packageJson.scripts || {}).map(name => {
-    return { name, npmClient };
+    return { name, npmClient, schema: [] };
   });
 }
 
