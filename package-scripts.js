@@ -106,23 +106,18 @@ module.exports = {
           cli: 'node ./tools/scripts/patch-cli.js'
         })
       ),
+      'gen-graphql': nps.series(
+        'gql-gen --config ./tools/scripts/codegen-server.yml',
+        'gql-gen --config ./tools/scripts/codegen-client.js'
+      ),
       server: {
-        default: nps.series.nps(
-          'dev.server.gen-and-build.electron',
-          'dev.copy-assets.electron',
-          'dev.server.start'
+        default: nps.series(
+          'nps dev.gen-graphql',
+          'ng build electron --prod --maxWorkers=2 --noSourceMap',
+          'nps dev.copy-assets.electron',
+          'nps dev.server.start'
         ),
-        start: `electron ${ELECTRON_BUNDLE_PATH} --server --port 4201 --inspect=9229`,
-        gen: nps.series(
-          'gql-gen --config ./tools/scripts/codegen-server.yml',
-          'gql-gen --config ./tools/scripts/codegen-client.js'
-        ),
-        'gen-and-build': electronOrVscode(
-          nps.series(
-            'nps dev.server.gen.APPLICATION',
-            'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap'
-          )
-        )
+        start: `electron ${ELECTRON_BUNDLE_PATH} --server --port 4201 --inspect=9229`
       },
       up: {
         default: nps.concurrent({
@@ -148,7 +143,15 @@ module.exports = {
           )
         }
       },
-      e2e: nps.concurrent.nps('prepare.electron', 'e2e.fixtures'),
+      e2e: {
+        default: nps.concurrent.nps('prepare.electron', 'e2e.fixtures'),
+        and: {
+          'check-formatting': nps.concurrent.nps(
+            'prepare.e2e',
+            'format.and.lint.check'
+          )
+        }
+      },
       ...electronOrVscode(
         nps.series.nps(
           'clean',
@@ -190,28 +193,31 @@ module.exports = {
     },
     format: {
       default: 'nx format:write',
+      and: {
+        lint: {
+          check: nps.concurrent.nps('format.check', 'lint')
+        }
+      },
       write: 'nx format:write',
       check: 'nx format:check'
     },
     lint: {
       default: nps.concurrent({
-        formatCheck: 'nps format.check',
         nxLint: 'nx lint',
-        tsLint: 'nx affected:lint --all --parallel'
+        tsLint: 'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json'
       }),
-      affected: affected('lint'),
-      fix: {
-        default: 'nx affected:lint --all --parallel --fix',
-        affected: affected('lint --fix')
-      }
+      fix: 'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json --fix'
     },
     build: {
       default: 'nx affected:build --all --parallel',
       affected: affected('build'),
       ...electronOrVscode(
         nps.series(
-          'nps dev.server.gen-and-build.APPLICATION',
-          'ng build angular-console --configuration=APPLICATION'
+          'nps dev.gen-graphql',
+          nps.concurrent({
+            server: 'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap',
+            client: 'ng build angular-console --configuration=APPLICATION'
+          })
         )
       )
     },
