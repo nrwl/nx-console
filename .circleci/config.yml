@@ -3,11 +3,16 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
+
+defaults: &defaults
+  parallelism: 2
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:8.12.0-stretch-browsers
+
 jobs:
   build:
-    docker:
-      - image: circleci/node:8.12.0-stretch-browsers
-    working_directory: ~/repo
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
@@ -23,9 +28,38 @@ jobs:
           key: yarn-dependencies-v7-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - .cache
+            - repo
+
+  unit-tests:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
       - run: yarn start test.affected.origin-master
+
+  cypress:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
       - run:
           command: yarn start e2e.ci
           no_output_timeout: 5m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - unit-tests:
+          requires:
+            - build
+      - cypress:
+          requires:
+            - build
