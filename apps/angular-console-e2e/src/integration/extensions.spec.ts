@@ -11,8 +11,8 @@ import {
   waitForActionToComplete,
   whitelistGraphql,
   elementContainsText
-} from './utils';
-import { clearAllRecentTasks } from './tasks.utils';
+} from '../support/utils';
+import { clearAllRecentTasks } from '../support/tasks.utils';
 
 describe('Extensions', () => {
   beforeEach(() => {

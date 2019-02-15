@@ -6,6 +6,11 @@ const fs = require('fs');
 
 console.log(`setting up fixtures`);
 
+let flags = process.argv.slice(2);
+
+if (flags.includes('--ci-1')) {
+}
+
 shell.rm('-rf', 'tmp');
 shell.mkdir('tmp');
 
@@ -19,48 +24,36 @@ cp.execSync('yarn add @angular/cli@7.3.1', { cwd: path.join(tmp, 'ng') });
 cp.execSync('yarn add @nrwl/schematics@7.5.2', { cwd: path.join(tmp, 'ng') });
 cp.execSync('ng config -g cli.packageManager yarn');
 
-cp.exec(
+cp.execSync(
   `${path.join(
     tmp,
     'ng'
   )}/node_modules/.bin/ng new proj --collection=@schematics/angular --directory=proj --skip-git --no-interactive`,
-  { cwd: tmp, stdio: [0, 1, 2] },
-  () => {
-    const angularJson = JSON.parse(
-      fs.readFileSync(path.join(tmp, 'proj', 'angular.json')).toString()
-    );
-    angularJson.schematics = {
-      '@schematics/angular:service': {
-        flat: false
-      }
-    };
-    fs.writeFileSync(
-      path.join(tmp, 'proj', 'angular.json'),
-      JSON.stringify(angularJson, null, 2)
-    );
-
-    const karma = fs
-      .readFileSync(path.join(tmp, 'proj', 'src', 'karma.conf.js'))
-      .toString();
-    fs.writeFileSync(
-      path.join(tmp, 'proj', 'src', 'karma.conf.js'),
-      karma.replace('Chrome', 'ChromeHeadless')
-    );
-
-    shell.mv(path.join(tmp, 'proj'), './tmp/proj');
-  }
+  { cwd: tmp, stdio: [0, 1, 2] }
 );
 
-cp.exec(
-  `${path.join(
-    tmp,
-    'ng'
-  )}/node_modules/.bin/ng new proj-extensions --collection=@schematics/angular --directory=proj-extensions --skip-git --no-interactive`,
-  { cwd: tmp, stdio: [0, 1, 2] },
-  () => {
-    shell.mv(path.join(tmp, 'proj-extensions'), './tmp/proj-extensions');
-  }
+const angularJson = JSON.parse(
+  fs.readFileSync(path.join(tmp, 'proj', 'angular.json')).toString()
 );
+angularJson.schematics = {
+  '@schematics/angular:service': {
+    flat: false
+  }
+};
+fs.writeFileSync(
+  path.join(tmp, 'proj', 'angular.json'),
+  JSON.stringify(angularJson, null, 2)
+);
+
+const karma = fs
+  .readFileSync(path.join(tmp, 'proj', 'src', 'karma.conf.js'))
+  .toString();
+fs.writeFileSync(
+  path.join(tmp, 'proj', 'src', 'karma.conf.js'),
+  karma.replace('Chrome', 'ChromeHeadless')
+);
+
+shell.mv(path.join(tmp, 'proj'), './tmp/proj');
 
 cp.exec(
   `${path.join(
@@ -76,13 +69,21 @@ cp.exec(
   }
 );
 
-cp.exec(
+cp.execSync(
   `${path.join(
     tmp,
     'ng'
-  )}/node_modules/.bin/ng new proj-nx --collection=@nrwl/schematics --directory=proj-nx --skip-git --no-interactive`,
-  { cwd: tmp, stdio: [0, 1, 2] },
-  () => {
-    shell.mv(path.join(tmp, 'proj-nx'), './tmp/proj-nx');
-  }
+  )}/node_modules/.bin/ng new proj-extensions --collection=@schematics/angular --directory=proj-extensions --skip-git --no-interactive`,
+  { cwd: tmp, stdio: [0, 1, 2] }
 );
+shell.mv(path.join(tmp, 'proj-extensions'), './tmp/proj-extensions');
+
+cp.execSync(
+  `${path.join(
+    tmp,
+    'ng'
+  )}/node_modules/.bin/ng new proj-nx --minimal --collection=@nrwl/schematics --directory=proj-nx --skip-git --no-interactive`,
+  { cwd: tmp, stdio: [0, 1, 2] }
+);
+
+shell.mv(path.join(tmp, 'proj-nx'), './tmp/proj-nx');

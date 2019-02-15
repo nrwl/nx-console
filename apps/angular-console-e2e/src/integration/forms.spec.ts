@@ -10,7 +10,7 @@ import {
   uniqName,
   whitelistGraphql,
   elementContainsText
-} from './utils';
+} from '../support/utils';
 
 describe('Forms', () => {
   beforeEach(() => {

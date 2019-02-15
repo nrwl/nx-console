@@ -10,8 +10,8 @@ import {
   uniqName,
   whitelistGraphql,
   elementContainsText
-} from './utils';
-import { clearRecentTask } from './tasks.utils';
+} from '../support/utils';
+import { clearRecentTask } from '../support/tasks.utils';
 
 describe('Generate Workspace Schematics', () => {
   beforeEach(() => {
