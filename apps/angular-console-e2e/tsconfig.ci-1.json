@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": false,
+    "outDir": "../../dist/out-tsc/apps/angular-console-e2e/src",
+    "lib": ["es2015", "dom"],
+    "types": ["cypress", "node"]
+  },
+  "exclude": ["src/integration/*.spec.ts"],
+  "files": [
+    "src/integration/extensions.spec.ts",
+    "src/integration/generate-workspace-schematics.spec.ts",
+    "src/integration/generate.spec.ts"
+  ]
+}

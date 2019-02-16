@@ -3,7 +3,7 @@ import {
   checkButtonIsDisabled,
   selectFolder,
   uniqName
-} from './utils';
+} from '../support/utils';
 
 describe('Workspaces', () => {
   const name = uniqName('workspace');

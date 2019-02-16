@@ -1,4 +1,4 @@
-import { elementContainsText } from './utils';
+import { elementContainsText } from '../support/utils';
 
 interface Task {
   command: string;

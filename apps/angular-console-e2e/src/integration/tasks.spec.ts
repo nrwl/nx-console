@@ -11,7 +11,7 @@ import {
   texts,
   whitelistGraphql,
   elementContainsText
-} from './utils';
+} from '../support/utils';
 import {
   checkMultipleRecentTasks,
   checkSingleRecentTask,
@@ -19,7 +19,7 @@ import {
   toggleRecentTasksExpansion,
   checkActionBarHidden,
   clearAllRecentTasks
-} from './tasks.utils';
+} from '../support/tasks.utils';
 
 const PASSING_TESTS = `
 import { TestBed, async } from '@angular/core/testing';

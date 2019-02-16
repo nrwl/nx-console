@@ -129,6 +129,20 @@
           "options": {
             "cypressConfig": "apps/angular-console-e2e/cypress.json",
             "tsConfig": "apps/angular-console-e2e/tsconfig.e2e.json"
+          },
+          "configurations": {
+            "ci1": {
+              "cypressConfig": "apps/angular-console-e2e/cypress.json",
+              "tsConfig": "apps/angular-console-e2e/tsconfig.ci-1.json"
+            },
+            "ci2": {
+              "cypressConfig": "apps/angular-console-e2e/cypress.json",
+              "tsConfig": "apps/angular-console-e2e/tsconfig.ci-2.json"
+            },
+            "ci3": {
+              "cypressConfig": "apps/angular-console-e2e/cypress.json",
+              "tsConfig": "apps/angular-console-e2e/tsconfig.ci-3.json"
+            }
           }
         },
         "lint": {

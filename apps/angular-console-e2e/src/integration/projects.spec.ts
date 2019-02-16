@@ -5,7 +5,7 @@ import {
   texts,
   whitelistGraphql,
   elementContainsText
-} from './utils';
+} from '../support/utils';
 
 describe('Projects', () => {
   beforeEach(() => {
