@@ -58,8 +58,7 @@
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
+              "vendorChunk": false
             },
             "vscode": {
               "fileReplacements": [
@@ -70,14 +69,12 @@
               ],
               "outputPath": "dist/apps/vscode/assets/public",
               "optimization": false,
-              "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
+              "vendorChunk": false
             },
             "cypress": {
               "fileReplacements": [
@@ -167,10 +164,7 @@
             "outputPath": "dist/apps/vscode",
             "main": "apps/vscode/src/main.ts",
             "sourceMap": false,
-            "externalDependencies": [
-              "vscode",
-              "node-pty-prebuilt"
-            ],
+            "externalDependencies": ["vscode", "node-pty-prebuilt"],
             "tsConfig": "apps/vscode/tsconfig.app.json",
             "assets": [
               "apps/vscode/src/package.json",
@@ -210,10 +204,7 @@
         "build": {
           "builder": "@nrwl/builders:node-build",
           "options": {
-            "externalDependencies": [
-              "electron",
-              "node-pty-prebuilt"
-            ],
+            "externalDependencies": ["electron", "node-pty-prebuilt"],
             "outputPath": "dist/apps/electron",
             "main": "apps/electron/src/main.ts",
             "tsConfig": "apps/electron/tsconfig.app.json",

@@ -10,6 +10,7 @@
   "files": [
     "src/integration/no_node_modules.spec.ts",
     "src/integration/projects.spec.ts",
-    "src/integration/workspaces.spec.ts"
+    "src/integration/workspaces.spec.ts",
+    "src/integration/tasks.spec.ts"
   ]
 }
