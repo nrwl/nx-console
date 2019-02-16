@@ -16,34 +16,18 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-dependencies-v9-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-dependencies-v9-{{ .Branch }}-
+            - yarn-dependencies-v10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-v10-{{ .Branch }}-
             # fallback to using the latest cache if no exact match is found
-            - yarn-dependencies-v9-
+            - yarn-dependencies-v10-
       - run: yarn install --frozen-lockfile --non-interactive
-      - run: yarn start format.and.lint.check
       - save_cache:
-          key: yarn-dependencies-v9-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-dependencies-v10-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache
-      - run: yarn start dev.gen-graphql
-      - run: yarn start test.affected.origin-master
-      - run: rm -rf node-modules/
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - repo
-
-  cypress-1:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/
-      - restore_cache:
-          keys:
-            - yarn-dependencies-v9-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run: yarn install --frozen-lockfile --non-interactive
+      - run: yarn start format.and.lint.check
       - run: yarn start prepare.e2e
+      - run: yarn start test.affected.origin-master
       - run:
           command: yarn start e2e.ci1
           no_output_timeout: 5m
@@ -53,31 +37,17 @@ jobs:
   cypress-2:
     <<: *defaults
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - restore_cache:
           keys:
-            - yarn-dependencies-v9-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-v10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-v10-{{ .Branch }}-
+            # fallback to using the latest cache if no exact match is found
+            - yarn-dependencies-v10-
       - run: yarn install --frozen-lockfile --non-interactive
       - run: yarn start prepare.e2e
       - run:
           command: yarn start e2e.ci2
-          no_output_timeout: 5m
-          environment:
-            CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
-
-  cypress-3:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/
-      - restore_cache:
-          keys:
-            - yarn-dependencies-v9-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run: yarn install --frozen-lockfile --non-interactive
-      - run: yarn start prepare.e2e
-      - run:
-          command: yarn start e2e.ci3
           no_output_timeout: 5m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
@@ -87,12 +57,4 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - cypress-1:
-          requires:
-            - build
-      - cypress-2:
-          requires:
-            - build
-      - cypress-3:
-          requires:
-            - build
+      - cypress-2
