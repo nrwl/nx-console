@@ -207,7 +207,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           this.routes[0],
           {
             icon: 'timeline',
-            url: 'affected-projects',
+            url: 'connect/affected-projects',
             title: 'Affected Projects'
           },
           ...this.routes.slice(1)
