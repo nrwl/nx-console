@@ -13,13 +13,17 @@ export enum CommandStatus {
 }
 
 export function checkActionBarHidden() {
-  cy.get('angular-console-action-bar .action-bar').should($el => {
-    expect($el).to.have.css('height', '0px');
-  });
+  cy.get('angular-console-action-bar .action-bar', { timeout: 3000 }).should(
+    $el => {
+      expect($el).to.have.css('height', '0px');
+    }
+  );
 
-  cy.get('angular-console-action-bar mat-list').should($el => {
-    expect($el).to.have.css('height', '0px');
-  });
+  cy.get('angular-console-action-bar mat-list', { timeout: 3000 }).should(
+    $el => {
+      expect($el).to.have.css('height', '0px');
+    }
+  );
 }
 
 export function checkSingleRecentTask(task: Task) {

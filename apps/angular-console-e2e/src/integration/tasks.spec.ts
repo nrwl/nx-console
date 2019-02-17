@@ -122,7 +122,7 @@ describe('Tasks', () => {
     });
   });
 
-  xit('runs build and show recent tasks', () => {
+  it('runs build and show recent tasks', () => {
     cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
     cy.writeFile('../../tmp/proj/src/app/app.component.spec.ts', PASSING_TESTS);
 
@@ -163,11 +163,7 @@ describe('Tasks', () => {
       status: CommandStatus.SUCCESSFUL
     });
 
-    cy.wait(1000);
-
     clickOnTask('proj', 'lint');
-
-    cy.wait(1000);
 
     elementContainsText('div.context-title', 'ng lint proj', 5000);
     checkDisplayedCommand('ng lint proj', 5000);
@@ -175,8 +171,6 @@ describe('Tasks', () => {
     elementContainsText('button', 'Run').click();
 
     checkActionBarHidden();
-
-    cy.wait(100);
 
     goBack('Tasks');
 
