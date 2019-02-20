@@ -213,7 +213,7 @@ function createLinkForTask(
   name: string,
   actionDescription: string
 ) {
-  if ((project.architect || []).find(a => a !== null && a.name === name)) {
+  if ((project.architect || []).find(a => a.name === name)) {
     return { actionDescription, name, link: ['../tasks', name, project.name] };
   } else {
     return undefined;
@@ -252,7 +252,7 @@ function createLinkForSchematic(
   if (
     (project.projectType === 'application' ||
       project.projectType === 'library') &&
-    !(project.architect || []).find(a => a !== null && a.name === 'e2e')
+    !(project.architect || []).find(a => a.name === 'e2e')
   ) {
     return {
       name,

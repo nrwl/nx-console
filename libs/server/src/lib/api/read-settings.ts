@@ -8,6 +8,7 @@ export function readSettings(store: Store): Settings {
   if (settings.canCollectData === undefined) {
     settings.canCollectData = store.get('canCollectData', false);
   }
+  // tslint:disable-next-line
   if (settings.recent === undefined) {
     settings.recent = [];
   }
