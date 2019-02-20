@@ -219,7 +219,7 @@ type WorkspaceDefinition {
   path: String!
   name: String!
   favorite: Boolean
-  pinnedProjectNames: [String!]
+  pinnedProjectNames: [String!]!
 }
 
 type Settings {

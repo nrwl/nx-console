@@ -77,7 +77,6 @@ export class ProjectsComponent implements OnInit {
           return {
             ...p,
             actions: this.createActions(p)
-            // pinned: this.pinnedProjectNames.includes(p.name)
           };
         });
         return projects;

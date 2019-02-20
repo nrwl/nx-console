@@ -34,7 +34,13 @@ export class Settings {
   ) {}
 
   getRecentWorkspaces(favorite?: boolean): SettingsModels.Recent[] {
-    const all: SettingsModels.Recent[] = this.settings.recent || [];
+    const all: SettingsModels.Recent[] =
+      this.settings.recent.map(w => {
+        if (!w.pinnedProjectNames) {
+          w.pinnedProjectNames = [];
+        }
+        return w;
+      }) || [];
     switch (favorite) {
       case undefined:
         return all;
