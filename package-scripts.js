@@ -189,11 +189,11 @@ module.exports = {
         default: 'node ./tools/scripts/e2e.js --headless',
         'new-fixtures': nps.series.nps('prepare.e2e', 'e2e.headless')
       },
-      ci1:
+      ci: 'node ./tools/scripts/e2e.js --headless --record',
+      'ci-shard11':
         'node ./tools/scripts/e2e.js --headless --record --configuration=ci1',
-      ci2:
-        'node ./tools/scripts/e2e.js --headless --record --configuration=ci2',
-      ci3: 'node ./tools/scripts/e2e.js --headless --record --configuration=ci3'
+      'ci-shard2':
+        'node ./tools/scripts/e2e.js --headless --record --configuration=ci2'
     },
     format: {
       default: 'nx format:write',

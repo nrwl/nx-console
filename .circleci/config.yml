@@ -29,7 +29,7 @@ jobs:
       - run: yarn start prepare.e2e
       - run: yarn start test.affected.origin-master
       - run:
-          command: yarn start e2e.ci1
+          command: yarn start e2e.ciShard11
           no_output_timeout: 5m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
@@ -47,7 +47,21 @@ jobs:
       - run: yarn install --frozen-lockfile --non-interactive
       - run: yarn start prepare.e2e
       - run:
-          command: yarn start e2e.ci2
+          command: yarn start e2e.ciShard2
+          no_output_timeout: 5m
+          environment:
+            CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
+
+  windows-server:
+    working_directory: ~/repo
+    docker:
+      - image: stefanscherer/node-windows:8-build-tools
+    steps:
+      - checkout
+      - run: yarn install --force --frozen-lockfile --non-interactive
+      - run: yarn start prepare.e2e
+      - run:
+          command: yarn start e2e
           no_output_timeout: 5m
           environment:
             CYPRESS_RECORD_KEY: b8ec9ad7-505f-48bb-9990-e8d5627bac26
@@ -56,5 +70,4 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
-      - cypress-2
+      - windows-server
