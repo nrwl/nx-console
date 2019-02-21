@@ -16,6 +16,7 @@ import { commands } from './api/run-command';
 import { Telemetry } from './utils/telemetry';
 import { docs } from './api/docs';
 import { DefaultController } from './default.controller';
+import { FileUtils } from './utils/file-utils';
 
 export function createServerModule(exports: string[], providers: Provider[]) {
   @Global()
@@ -60,7 +61,8 @@ export function createServerModule(exports: string[], providers: Provider[]) {
       NpmScriptResolver,
       CompletionsTypesResolver,
       DocsResolver,
-      MutationResolver
+      MutationResolver,
+      FileUtils
     ],
     controllers: [DefaultController]
   })

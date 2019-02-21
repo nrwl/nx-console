@@ -1,6 +1,7 @@
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { Settings } from '@angular-console/schema';
 import { Subject } from 'rxjs';
+import { platform } from 'os';
 
 /* tslint:disable */
 export function readSettings(store: Store): Settings {
@@ -25,6 +26,9 @@ export function readSettings(store: Store): Settings {
   }
   if (settings.workspaceSchematicsNpmScript === undefined) {
     settings.workspaceSchematicsNpmScript = 'workspace-schematic';
+  }
+  if (settings.isWsl === undefined || platform() !== 'win32') {
+    settings.isWsl = false;
   }
   const authUtils = require('@nrwl/angular-console-enterprise-electron')
     .authUtils;
