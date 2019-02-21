@@ -18,7 +18,8 @@ export class Settings {
     installNodeManually: false,
     enableDetailedStatus: true,
     isConnectUser: false,
-    channel: 'latest'
+    channel: 'latest',
+    isWsl: false
   };
 
   constructor(
@@ -98,6 +99,14 @@ export class Settings {
 
   setChannel(channel: 'latest' | 'beta' | 'alpha'): void {
     this.store({ ...this.settings, channel });
+  }
+
+  isWsl(): boolean {
+    return !!this.settings.isWsl;
+  }
+
+  setIsWsl(isWsl: boolean): void {
+    this.store({ ...this.settings, isWsl });
   }
 
   fetch() {

@@ -231,6 +231,7 @@ type Settings {
   workspaceSchematicsDirectory: String
   workspaceSchematicsNpmScript: String
   recent: [WorkspaceDefinition!]!
+  isWsl: Boolean
 }
 
 type Workspace {

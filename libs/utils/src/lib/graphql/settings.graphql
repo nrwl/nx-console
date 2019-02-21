@@ -1,5 +1,6 @@
 query Settings {
   settings {
+    isWsl
     canCollectData
     installNodeManually
     enableDetailedStatus

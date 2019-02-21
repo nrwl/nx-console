@@ -1,8 +1,8 @@
 import {
-  PseudoTerminalFactory,
-  PseudoTerminalConfig,
   nodePtyPseudoTerminalFactory as win32PseudoTerminalFactory,
-  PseudoTerminal
+  PseudoTerminal,
+  PseudoTerminalConfig,
+  PseudoTerminalFactory
 } from '@angular-console/server';
 import { ExtensionContext, window } from 'vscode';
 import { platform } from 'os';
