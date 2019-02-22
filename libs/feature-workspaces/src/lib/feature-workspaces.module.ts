@@ -64,10 +64,12 @@ export const workspaceRoutes: Route[] = [
         path: 'extensions',
         children: extensionsRoutes
       },
-      // TODO: Remove connect routes from workspace after electron redesign.
       {
         path: 'connect',
-        children: connectRootRoutes
+        children: [
+          ...connectWorkspaceRoutes,
+          ...connectRootRoutes // TODO: Remove connect routes from workspace after electron redesign.
+        ]
       },
       {
         data: { state: 'generate' },
@@ -76,8 +78,7 @@ export const workspaceRoutes: Route[] = [
       },
       { data: { state: 'tasks' }, path: 'tasks', children: runRoutes },
       // TODO: Remove settings routes from workspace after electron redesign.
-      { path: 'settings', children: settingsRoutes },
-      ...connectWorkspaceRoutes
+      { path: 'settings', children: settingsRoutes }
     ]
   }
 ];

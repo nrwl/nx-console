@@ -93,22 +93,28 @@ export function getWorkspaceRoute(
   workspaceDef: WorkspaceDefinition | undefined,
   workspaceRouteTitle: WorkspaceRouteTitle = 'Projects'
 ): string {
+  const workspacePath = workspaceDef
+    ? workspaceDef.path
+    : workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
+
   switch (workspaceRouteTitle) {
     case 'Workspaces':
       return 'workspaces';
     case 'Connect':
       return 'connect';
+    case 'Affected Projects':
+      if (workspacePath) {
+        return `workspace/${encodeURIComponent(
+          workspacePath
+        )}/connect/affected-projects`;
+      } else {
+        return 'workspaces';
+      }
     case 'Projects':
     case 'Extensions':
     case 'Tasks':
-    case 'Affected Projects':
     case 'Settings':
     case 'Generate':
-      const workspacePath = workspaceDef
-        ? workspaceDef.path
-        : workspace.workspaceFolders &&
-          workspace.workspaceFolders[0].uri.fsPath;
-
       if (workspacePath) {
         return `workspace/${encodeURIComponent(
           workspacePath
