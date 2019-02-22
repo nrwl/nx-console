@@ -7,6 +7,13 @@ import {
 } from './generated/graphql';
 
 export { Settings as SettingsModels } from './generated/graphql';
+import { Project } from '@angular-console/schema';
+
+export function toggleItemInArray<T>(array: T[], item: T): T[] {
+  return array.includes(item)
+    ? array.filter(value => value !== item)
+    : [...array, item];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +35,13 @@ export class Settings {
   ) {}
 
   getRecentWorkspaces(favorite?: boolean): SettingsModels.Recent[] {
-    const all: SettingsModels.Recent[] = this.settings.recent || [];
+    const all: SettingsModels.Recent[] =
+      this.settings.recent.map(w => {
+        if (!w.pinnedProjectNames) {
+          w.pinnedProjectNames = [];
+        }
+        return w;
+      }) || [];
     switch (favorite) {
       case undefined:
         return all;
@@ -39,10 +52,31 @@ export class Settings {
     }
   }
 
+  getWorkspace(path: string): SettingsModels.Recent | undefined {
+    return (this.settings.recent || []).find(w => w.path === path);
+  }
+
   toggleFavorite(w: SettingsModels.Recent): void {
     const r = this.getRecentWorkspaces().filter(rr => rr.path !== w.path);
     const favorite: SettingsModels.Recent = { ...w, favorite: !w.favorite };
     this.store({ ...this.settings, recent: [...r, favorite] });
+  }
+
+  toggleProjectPin(path: string, project: Project): void {
+    const workspace = this.getWorkspace(path);
+    if (!workspace) {
+      console.warn('No workspace found at path: ', path);
+      return;
+    }
+    const r = this.getRecentWorkspaces().filter(rr => rr.path !== path);
+    const modifiedWorkspace: SettingsModels.Recent = {
+      ...workspace,
+      pinnedProjectNames: toggleItemInArray(
+        workspace.pinnedProjectNames || [],
+        project.name
+      )
+    };
+    this.store({ ...this.settings, recent: [...r, modifiedWorkspace] });
   }
 
   addRecent(w: SettingsModels.Recent): void {

@@ -42,4 +42,17 @@ describe('Projects', () => {
       expect(texts($p)[1]).to.contain('proj-e2e');
     });
   });
+  it('should pin and unpin projects', () => {
+    cy.get('.favorite-icon.favorited').should('not.exist');
+    cy.get('.favorite-icon:not(.favorited)')
+      .should('have.length', 2)
+      .first()
+      .click();
+    cy.get('.favorite-icon:not(.favorited)').should('have.length', 1);
+    cy.get('.favorite-icon.favorited')
+      .should('have.length', 1)
+      .click();
+    cy.get('.favorite-icon.favorited').should('not.exist');
+    cy.get('.favorite-icon:not(.favorited)').should('have.length', 2);
+  });
 });
