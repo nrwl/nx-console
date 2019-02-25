@@ -11,6 +11,7 @@ import {
   MatCardModule,
   MatDividerModule,
   MatExpansionModule,
+  MatGridListModule,
   MatIconModule,
   MatIconRegistry,
   MatInputModule,
@@ -47,6 +48,7 @@ import { TerminalComponent } from './terminal/terminal.component';
 import { TestStatusComponent } from './test-status/test-status.component';
 import { TerminalFactory } from './terminal/terminal.factory';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { FormatFileSizePipe } from './format-file-size.pipe';
 
 const IMPORTS = [
   HttpClientModule,
@@ -60,6 +62,7 @@ const IMPORTS = [
   MatCardModule,
   MatDividerModule,
   MatExpansionModule,
+  MatGridListModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
@@ -98,7 +101,11 @@ const PUBLIC_DECLARATIONS = [
 @NgModule({
   imports: IMPORTS,
   providers: [TerminalFactory],
-  declarations: [...PUBLIC_DECLARATIONS, SchematicFieldsComponent],
+  declarations: [
+    ...PUBLIC_DECLARATIONS,
+    SchematicFieldsComponent,
+    FormatFileSizePipe
+  ],
   exports: [...IMPORTS, ...PUBLIC_DECLARATIONS, SchematicFieldsComponent]
 })
 export class UiModule {

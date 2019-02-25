@@ -4,6 +4,29 @@ import {
   OpenInBrowserService,
   ShowItemInFolderService
 } from '@angular-console/utils';
+import { SPEEDS } from './speed-constants';
+import { Subject, BehaviorSubject, combineLatest, ReplaySubject } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
+import { MatSelectChange } from '@angular/material';
+import { GROW_SHRINK_VERT } from '../animations/grow-shink';
+
+interface Summary {
+  parsed: number;
+  gzipped: number;
+}
+
+interface Stats {
+  chunks: any[];
+  assets: any[];
+  errors: string[];
+  warnings: string[];
+  summary: {
+    assets: Summary;
+    modules: Summary;
+    dependencies: Summary;
+  };
+}
+
 export interface BuildStatus {
   buildStatus:
     | 'build_pending'
@@ -20,48 +43,343 @@ export interface BuildStatus {
   isForProduction: boolean;
   outputPath?: string;
   indexFile?: string;
+  stats: Stats;
 }
+
+enum SizeGroup {
+  Gzipped = 'gzipped',
+  Parsed = 'parsed'
+}
+
+const GROUP_LABELS = {
+  [SizeGroup.Gzipped]: 'Gzipped',
+  [SizeGroup.Parsed]: 'Parsed'
+};
+
+const DISPLAY_ASSET_SPEEDS = ['4g', '3gf', '3gs'];
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-build-status',
   templateUrl: './build-status.component.html',
-  styleUrls: ['./build-status.component.scss']
+  styleUrls: ['./build-status.component.scss'],
+  animations: [GROW_SHRINK_VERT]
 })
 export class BuildStatusComponent {
-  @Input() commandStatus: CommandStatus;
-  @Input() status: BuildStatus;
+  @Input()
+  commandStatus: CommandStatus;
+
+  @Input()
+  set status(s: BuildStatus) {
+    this.allStatus$.next(s);
+  }
+
+  readonly sizeGroups = Object.values(SizeGroup);
+  readonly displayAssetSpeeds = DISPLAY_ASSET_SPEEDS;
+
+  // This status is set at a polling interval
+  private readonly allStatus$: Subject<BuildStatus> = new ReplaySubject(1);
+  // So we double-check that it indeed does have meaningful changes
+  readonly status$ = this.allStatus$.pipe(
+    distinctUntilChanged(
+      (a, b) =>
+        typeof a === typeof b &&
+        a.buildStatus === b.buildStatus &&
+        a.progress === b.progress &&
+        a.date === b.date &&
+        a.time === b.time
+    )
+  );
+
+  readonly currentSizeGroup$: Subject<SizeGroup> = new BehaviorSubject(
+    SizeGroup.Gzipped
+  );
+
+  readonly sizeGroupHelpText$ = combineLatest(
+    this.currentSizeGroup$,
+    this.status$
+  ).pipe(
+    map(([c, s]) => {
+      switch (c) {
+        case SizeGroup.Gzipped:
+          return s && s.serverHost
+            ? 'Gzipped stats not available for serve task'
+            : 'Display the size of gzipped files';
+        case SizeGroup.Parsed:
+          return 'Display the size of files before gzip';
+        default:
+          return '';
+      }
+    })
+  );
+
+  readonly errors$ = this.status$.pipe(
+    map(status => {
+      if (status) {
+        const statsErrors = status.stats ? status.stats.errors : [];
+        const otherErrors = status.errors;
+        const errors = statsErrors.length > 0 ? statsErrors : otherErrors;
+        // Only show unique values
+        return errors.filter((x, idx, ary) => ary.indexOf(x) === idx);
+      } else {
+        return null;
+      }
+    })
+  );
+
+  readonly warnings$ = this.status$.pipe(
+    map(status => (status && status.stats ? status.stats.warnings : null))
+  );
+
+  readonly problemsAnimationState$ = combineLatest(
+    this.errors$,
+    this.warnings$
+  ).pipe(
+    map(([es, ws]) => {
+      return (es && es.length > 0) || (ws && ws.length > 0)
+        ? 'expand'
+        : 'collapse';
+    })
+  );
+
+  readonly summary$ = this.status$.pipe(
+    map(status => (status && status.stats ? status.stats.summary : null))
+  );
+
+  readonly summaryAssetsSize$ = combineLatest(
+    this.summary$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([summary, sizeGroup]) => (summary ? summary.assets[sizeGroup] : null))
+  );
+
+  readonly summaryModulesSize$ = combineLatest(
+    this.summary$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([summary, sizeGroup]) => (summary ? summary.modules[sizeGroup] : null))
+  );
+
+  readonly summaryDependenciesSize$ = combineLatest(
+    this.summary$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([summary, sizeGroup]) =>
+      summary ? summary.dependencies[sizeGroup] : null
+    )
+  );
+
+  readonly openableOutputPath$ = this.status$.pipe(
+    map(status =>
+      status.buildStatus === 'build_success' ? status.outputPath : null
+    )
+  );
+
+  readonly dependencyPercentage$ = combineLatest(
+    this.status$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([status, currentSizeGroup]) => {
+      if (status && status.stats) {
+        const { dependencies, modules } = status.stats.summary;
+        const depSize = dependencies[currentSizeGroup];
+        const moduleSize = modules[currentSizeGroup];
+        return moduleSize > 0 ? ((depSize / moduleSize) * 100).toFixed(1) : '0';
+      } else {
+        return '0';
+      }
+    })
+  );
+
+  readonly sizeGroupLabel$ = this.currentSizeGroup$.pipe(
+    map(s => this.getSizeGroupLabel(s))
+  );
+
+  readonly serverUrl$ = this.status$.pipe(
+    map(status => {
+      if (
+        status.progress === 100 &&
+        status &&
+        status.serverHost &&
+        status.serverPort
+      ) {
+        return `http://${status.serverHost}:${status.serverPort}`;
+      } else {
+        return '';
+      }
+    })
+  );
+
+  readonly buildStatusIcon$ = this.status$.pipe(
+    map(status => {
+      if (!status) {
+        return 'build';
+      } else if (status.buildStatus === 'build_success') {
+        return 'check_circle';
+      } else if (status.buildStatus === 'build_failure') {
+        return 'error';
+      } else {
+        return 'build';
+      }
+    })
+  );
+
+  readonly buildStatusClass$ = this.status$.pipe(
+    map(status => {
+      if (!status) {
+        return 'pending';
+      } else if (status.buildStatus === 'build_success') {
+        return 'success';
+      } else if (status.buildStatus === 'build_failure') {
+        return 'failure';
+      } else {
+        return 'pending';
+      }
+    })
+  );
+
+  readonly buildStatus$ = combineLatest(this.status$, this.serverUrl$).pipe(
+    map(([status, serverUrl]) => {
+      if (!status) {
+        return 'Idle';
+      } else if (
+        status.buildStatus === 'build_inprogress' ||
+        status.buildStatus === 'build_pending'
+      ) {
+        return 'Running';
+      } else {
+        return serverUrl ? 'Started' : 'Done';
+      }
+    })
+  );
+
+  readonly detailedBuildStatus$ = this.status$.pipe(
+    map(status => {
+      if (!status) {
+        return 'Not started';
+      }
+      switch (status.buildStatus) {
+        case 'build_pending': {
+          return 'Starting...';
+        }
+        case 'build_inprogress': {
+          return `Building... (${status.progress}%)`;
+        }
+        case 'build_success': {
+          return `Completed`;
+        }
+        case 'build_failure': {
+          return 'Failed';
+        }
+      }
+    })
+  );
+
+  readonly networkSpeeds$ = combineLatest(
+    this.summary$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([summary, currentSizeGroup]) => {
+      if (summary) {
+        const size = summary.assets[currentSizeGroup];
+        const sizeInMB = size / 1000 / 1000;
+        return Object.keys(SPEEDS).map(k => {
+          const speed = SPEEDS[k];
+          const rttInSeconds = speed.rtt / 1000;
+          const speedInMBps = speed.mbps / 8;
+          return {
+            ...speed,
+            key: k,
+            downloadTime:
+              sizeInMB > 0
+                ? `${(sizeInMB / speedInMBps + rttInSeconds).toFixed(2)}s`
+                : '–'
+          };
+        });
+      } else {
+        return null;
+      }
+    })
+  );
+
+  readonly displayAssets$ = combineLatest(
+    this.status$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([status, currentSizeGroup]) => {
+      if (status && status.stats) {
+        const sorted = status.stats.assets.sort((a, b) => {
+          const aSize = a.sizes[currentSizeGroup];
+          const bSize = b.sizes[currentSizeGroup];
+          if (aSize > bSize) {
+            return -1;
+          } else if (aSize < bSize) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+
+        return sorted.map(asset => {
+          const size = asset.sizes[currentSizeGroup];
+          return {
+            ...asset,
+            size: size,
+            speeds: DISPLAY_ASSET_SPEEDS.map(key => {
+              const speed = SPEEDS[key];
+              const sizeInMB = size / 1000 / 1000;
+              const rttInSeconds = speed.rtt / 1000;
+              const speedInMBps = speed.mbps / 8;
+              return {
+                key,
+                sizeGroup: GROUP_LABELS[currentSizeGroup],
+                downloadTime: sizeInMB
+                  ? `${(sizeInMB / speedInMBps + rttInSeconds).toFixed(2)}s`
+                  : '–'
+              };
+            })
+          };
+        });
+      } else {
+        return null;
+      }
+    })
+  );
 
   constructor(
     private readonly openInBrowserService: OpenInBrowserService,
     private readonly showItemInFolderService: ShowItemInFolderService
   ) {}
 
-  statusClassName() {
-    if (!this.status) {
-      return '';
-    } else {
-      return `status-${this.status.buildStatus}`;
-    }
+  getSpeedLabel(key: string) {
+    return SPEEDS[key] ? SPEEDS[key].label : '';
   }
 
-  serverUrl() {
-    if (this.status && this.status.serverHost && this.status.serverPort) {
-      return `http://${this.status.serverHost}:${this.status.serverPort}`;
-    } else {
-      return '';
-    }
+  getSizeGroupLabel(s: SizeGroup) {
+    return GROUP_LABELS[s];
   }
 
   trackByError(_: number, err: string) {
     return err;
   }
 
-  onServerOpen() {
-    this.openInBrowserService.openUrl(this.serverUrl());
+  trackBySpeedKey(_: number, speed: any) {
+    return speed.key;
+  }
+
+  trackByAsset(_: number, asset: any) {
+    return asset.name;
+  }
+
+  onServerOpen(url: string) {
+    this.openInBrowserService.openUrl(url);
   }
 
   showItemInFolder(item: string) {
     this.showItemInFolderService.showItem(item);
+  }
+
+  handleSizeGroupSelection(event: MatSelectChange) {
+    this.currentSizeGroup$.next(event.value);
   }
 }

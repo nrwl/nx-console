@@ -95,9 +95,4 @@ export class CommandOutputComponent implements OnDestroy {
     }
     this.hasUnreadResponse = false;
   }
-
-  isStopped() {
-    const commandResponse = this.commandResponse;
-    return commandResponse ? commandResponse.status === 'terminated' : true;
-  }
 }

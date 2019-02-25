@@ -115,7 +115,7 @@ export class NpmScriptComponent implements OnInit {
         return this.runner.runCommand(
           this.npmRunGQL.mutate({
             path: this.path(),
-            npmClient: s.npmClient,
+            npmClient: s.npmClient || '',
             runCommand: c.commands
           }),
           false,

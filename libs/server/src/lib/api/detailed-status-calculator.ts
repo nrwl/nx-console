@@ -1,10 +1,12 @@
 import { readJsonFile } from '../utils/utils';
+import { Chunk, parseStats, calculateStatsFromChunks } from '../utils/stats';
 import {
   getProjectArchitect,
   SUPPORTED_KARMA_TEST_BUILDERS,
   SUPPORTED_NG_BUILD_BUILDERS
-} from '../utils/architect-utils';
+} from '../utils/architect';
 import { join } from 'path';
+import { existsSync, readFileSync } from 'fs';
 
 export enum StatusType {
   BUILD = 'build',
@@ -25,13 +27,6 @@ class EmptyDetailedStatusCalculator implements DetailedStatusCalculator<null> {
   reset() {}
 }
 
-export interface Chunk {
-  name: string;
-  file: string;
-  size: string;
-  type: string;
-}
-
 export interface BuildDetailedStatus {
   type: StatusType.BUILD;
   buildStatus:
@@ -49,6 +44,7 @@ export interface BuildDetailedStatus {
   isForProduction?: boolean;
   outputPath?: string;
   indexFile?: string;
+  stats?: any;
 }
 
 interface BuildArchitectOpts {
@@ -108,7 +104,7 @@ export class BuildDetailedStatusCalculator
       ''
     );
 
-    const {
+    let {
       processedChunks,
       ...newValue
     } = BuildDetailedStatusCalculator.updateDetailedStatus(
@@ -119,10 +115,13 @@ export class BuildDetailedStatusCalculator
       _value
     );
 
+    // Don't override chunks unless it has changed or else we will have to keep calling Object.values.
     if (this.processedChunks !== processedChunks) {
       newValue.chunks = Object.values(processedChunks);
       this.processedChunks = processedChunks;
     }
+
+    newValue = this.addStats(newValue);
 
     this.detailedStatus = newValue;
   }
@@ -134,6 +133,29 @@ export class BuildDetailedStatusCalculator
     };
   }
 
+  addStats(nextStatus: BuildDetailedStatus) {
+    const justCompleted =
+      nextStatus.progress === 100 && this.detailedStatus.progress < 100;
+
+    if (justCompleted && this.architectOptions) {
+      const statsPath = `${this.cwd}/${
+        this.architectOptions.outputPath
+      }/stats.json`;
+
+      if (existsSync(statsPath)) {
+        const statsJson = JSON.parse(readFileSync(statsPath).toString());
+        nextStatus.stats = parseStats(
+          statsJson,
+          join(this.cwd, this.architectOptions.outputPath)
+        );
+      } else {
+        nextStatus.stats = calculateStatsFromChunks(nextStatus.chunks);
+      }
+    }
+
+    return nextStatus;
+  }
+
   static updateDetailedStatus(
     state: BuildDetailedStatus & { processedChunks: { [k: string]: Chunk } },
     value: string
@@ -142,8 +164,8 @@ export class BuildDetailedStatusCalculator
     const newErrors = [] as string[];
     let _state = state;
     let processedChunks = _state.processedChunks as any;
-    let date = '';
-    let time = '';
+    let date = state.date || '';
+    let time = state.time || '';
     let progress = _state.progress;
     let buildStatus = _state.buildStatus;
 
@@ -190,7 +212,7 @@ export class BuildDetailedStatusCalculator
           const timeRegExp = /Time: ([^\s)]+)/g;
           const timeMatch = timeRegExp.exec(line);
           if (timeMatch) {
-            time = timeMatch[1];
+            time = parseTime(timeMatch[1]);
           }
         });
     }
@@ -526,4 +548,14 @@ function collectPreviousErrorsFrom(idx: number, lines: string[]): string[] {
   }
 
   return xs;
+}
+
+function parseTime(s: string) {
+  if (s.endsWith('ms')) {
+    const x = Number(s.slice(0, s.length - 2));
+    if (Number.isInteger(x)) {
+      return `${(x / 1000).toFixed(2)}s`;
+    }
+  }
+  return s;
 }

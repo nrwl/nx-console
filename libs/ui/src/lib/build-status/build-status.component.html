@@ -1,89 +1,227 @@
 <div class="container">
-  <div class="inner-container">
-    <mat-list role="list">
-      <div class="status-build_success">
-        <ng-container *ngIf="serverUrl()">
-          <mat-list-item>
-            <mat-icon matListIcon>check_circle</mat-icon>
-            <div class="status-content"><div fxFlex>Server started</div></div>
-          </mat-list-item>
-          <mat-list-item>
-            <mat-icon class="info" matListIcon>info</mat-icon>
-            <div class="status-content js-status-server-url">
-              You can view your <a (click)="onServerOpen()">application</a> in
-              the browser.
-            </div>
-          </mat-list-item>
-        </ng-container>
+  <div class="row" fxLayout="row" fxLayoutGap="20px">
+    <mat-card fxFlex>
+      <div class="header" fxLayout="row" fxLayoutAlign="center">
+        <div fxFlex>
+          <h3>Summary</h3>
+        </div>
+        <div class="actions" fxLayout="row" fxLayoutGap="20px">
+          <mat-select
+            matRipple
+            fxFlex
+            [value]="currentSizeGroup$ | async"
+            (selectionChange)="handleSizeGroupSelection($event)"
+          >
+            <mat-option *ngFor="let group of sizeGroups" [value]="group">{{
+              getSizeGroupLabel(group)
+            }}</mat-option>
+          </mat-select>
+          <mat-icon [matTooltip]="sizeGroupHelpText$ | async">help</mat-icon>
+        </div>
       </div>
-      <mat-list-item *ngIf="!status"> Not started </mat-list-item>
-      <div [ngSwitch]="status?.buildStatus" [ngClass]="statusClassName()">
-        <mat-list-item *ngSwitchCase="'build_pending'">
-          <mat-progress-spinner
-            mode="indeterminate"
-            [diameter]="18"
-          ></mat-progress-spinner>
-          Starting build...
-        </mat-list-item>
-        <mat-list-item *ngSwitchCase="'build_inprogress'">
-          <mat-progress-spinner
-            mode="indeterminate"
-            [diameter]="18"
-          ></mat-progress-spinner>
-          Running build... ({{ status?.progress }}%)
-        </mat-list-item>
-        <ng-container *ngSwitchCase="'build_success'">
-          <mat-list-item>
-            <mat-icon matListIcon>check_circle</mat-icon>
-            <div class="status-content js-status-build-success">
-              Build completed
-            </div>
-          </mat-list-item>
-          <mat-list-item *ngIf="status?.outputPath as outputPath">
-            <mat-icon class="info" matListIcon>info</mat-icon>
-            <div class="status-content js-status-build-folder">
-              <ng-container
-                *ngIf="status?.isForProduction; else devBuiltMessage"
-              >
-                The application
-                <a (click)="showItemInFolder(outputPath)">folder</a> is ready to
-                be deployed.
-              </ng-container>
-            </div>
-            <ng-template #devBuiltMessage>
-              <p>
-                The application
-                <a (click)="showItemInFolder(outputPath)">folder</a> is ready.
-                Note that this is a development build and not meant to be
-                deployed to production.
-              </p></ng-template
+      <div class="summary grid grid-3-columns">
+        <div>
+          <div class="title">Status</div>
+          <div class="content">
+            {{ buildStatus$ | async }}
+            <small *ngIf="(status$ | async)?.time as time">({{ time }})</small>
+          </div>
+        </div>
+        <div>
+          <div class="title">Errors</div>
+          <div class="content">
+            <ng-container *ngIf="(errors$ | async) as errors; else noErrors">
+              {{ errors.length }}
+            </ng-container>
+            <ng-template #noErrors>
+              0
+            </ng-template>
+          </div>
+        </div>
+        <div>
+          <div class="title">Warnings</div>
+          <div class="content">
+            <ng-container
+              *ngIf="(warnings$ | async) as warnings; else noWarnings"
             >
-          </mat-list-item>
-        </ng-container>
-        <mat-list-item *ngSwitchCase="'build_failure'">
-          <mat-icon matListIcon>error</mat-icon>
-          <div class="status-content js-status-build-error">Build failed</div>
-        </mat-list-item>
+              {{ warnings.length }}
+            </ng-container>
+            <ng-template #noWarnings>
+              0
+            </ng-template>
+          </div>
+        </div>
+        <div>
+          <div class="title">Assets</div>
+          <div class="content">
+            {{ summaryAssetsSize$ | async | formatFileSize: '–' }}
+            <small>({{ sizeGroupLabel$ | async }})</small>
+          </div>
+        </div>
+        <div>
+          <div class="title">Modules</div>
+          <div class="content">
+            {{ summaryModulesSize$ | async | formatFileSize: '–' }}
+            <small>({{ sizeGroupLabel$ | async }})</small>
+          </div>
+        </div>
+        <div>
+          <div class="title">Dependencies</div>
+          <div class="content">
+            {{ summaryDependenciesSize$ | async | formatFileSize: '–' }}
+            <small matTooltip="Percentage of modules that are dependencies"
+              >{{ dependencyPercentage$ | async }}%</small
+            >
+          </div>
+        </div>
       </div>
-      <mat-list-item
-        *ngIf="
-          ['build_failure', 'build_success'].includes(status?.buildStatus) &&
-          commandStatus === 'in-progress'
-        "
-      >
-        <mat-progress-spinner
-          mode="indeterminate"
-          [diameter]="18"
-        ></mat-progress-spinner>
-        <div class="status-content">Watching for changes...</div>
-      </mat-list-item>
-      <ng-container *ngIf="status?.errors.length > 0">
-        <mat-divider></mat-divider>
-        <h3 matSubheader>Errors</h3>
-        <mat-list-item>
-          <pre>{{ status?.errors.join('\n') }}</pre>
-        </mat-list-item>
+    </mat-card>
+    <mat-card class="build-status">
+      <ng-container *ngIf="(serverUrl$ | async) as serverUrl; else buildResult">
+        <div class="status-icon-container">
+          <mat-icon class="success">check_circle</mat-icon>
+        </div>
+        <div class="build-status-content">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onServerOpen(serverUrl)"
+          >
+            <mat-icon>launch</mat-icon>
+            Open App
+          </button>
+        </div>
       </ng-container>
-    </mat-list>
+      <ng-template #buildResult>
+        <div class="status-icon-container">
+          <mat-icon [ngClass]="buildStatusClass$ | async">{{
+            buildStatusIcon$ | async
+          }}</mat-icon>
+        </div>
+        <div class="build-status-content">
+          <ng-container
+            *ngIf="
+              (openableOutputPath$ | async) as outputPath;
+              else buildStatus
+            "
+          >
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="showItemInFolder(outputPath)"
+            >
+              <mat-icon>folder_open</mat-icon>
+              Open Folder
+            </button>
+          </ng-container>
+          <ng-template #buildStatus>
+            {{ detailedBuildStatus$ | async }}
+          </ng-template>
+        </div>
+      </ng-template>
+    </mat-card>
+  </div>
+  <div
+    [ngClass]="'row ' + (problemsAnimationState$ | async)"
+    [@growShrinkVert]="problemsAnimationState$ | async"
+  >
+    <mat-card>
+      <div class="header" fxLayout="row" fxLayoutAlign="center">
+        <div fxFlex>
+          <h3>Problems</h3>
+        </div>
+      </div>
+      <ng-container *ngIf="(errors$ | async) as errors">
+        <mat-list *ngFor="let error of errors" class="errors-list">
+          <mat-list-item>
+            <mat-icon mat-list-icon>error</mat-icon>
+            {{ error }}
+          </mat-list-item>
+        </mat-list>
+      </ng-container>
+      <ng-container *ngIf="(warnings$ | async) as warnings">
+        <mat-list *ngFor="let warning of warnings" class="warnings-list">
+          <mat-list-item>
+            <mat-icon mat-list-icon>warning</mat-icon>
+            {{ warning }}
+          </mat-list-item>
+        </mat-list>
+      </ng-container>
+    </mat-card>
+  </div>
+  <div class="row">
+    <mat-card>
+      <div class="header" fxLayout="row" fxLayoutAlign="center">
+        <div fxFlex>
+          <h3>Speed Stats</h3>
+        </div>
+      </div>
+      <ng-container
+        *ngIf="(networkSpeeds$ | async) as speedStats; else noSpeedStats"
+      >
+        <div class="grid grid-4-columns">
+          <div *ngFor="let stat of speedStats; trackBy: trackBySpeedKey">
+            <div class="title">
+              {{ stat.label }}
+            </div>
+            <div class="content">
+              {{ stat.downloadTime }}
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noSpeedStats>
+        <mat-icon class="pending large">more_horiz</mat-icon>
+      </ng-template>
+    </mat-card>
+  </div>
+  <div class="row">
+    <mat-card>
+      <div class="header" fxLayout="row" fxLayoutAlign="center">
+        <div fxFlex>
+          <h3>Assets</h3>
+        </div>
+      </div>
+      <mat-grid-list cols="6" rowHeight="28px">
+        <mat-grid-tile class="title" colspan="2"></mat-grid-tile>
+        <mat-grid-tile class="title" colspan="1">{{
+          sizeGroupLabel$ | async
+        }}</mat-grid-tile>
+        <mat-grid-tile
+          class="title"
+          colspan="1"
+          *ngFor="let key of displayAssetSpeeds"
+        >
+          {{ getSpeedLabel(key) }}
+        </mat-grid-tile>
+      </mat-grid-list>
+      <ng-container
+        *ngIf="(displayAssets$ | async) as displayAssets; else noDisplayAssets"
+      >
+        <mat-grid-list
+          cols="6"
+          rowHeight="28px"
+          *ngFor="let asset of displayAssets; trackBy: trackByAsset"
+        >
+          <mat-grid-tile colspan="2">
+            <div fxFlex fxLayoutAlign="start center" class="content">
+              {{ asset.name }}
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile colspan="1">
+            <div class="content">{{ asset.size | formatFileSize: '–' }}</div>
+          </mat-grid-tile>
+          <mat-grid-tile
+            colspan="1"
+            *ngFor="let speedStat of asset.speeds; trackBy: trackBySpeedKey"
+          >
+            <div class="content">{{ speedStat.downloadTime }}</div>
+          </mat-grid-tile>
+        </mat-grid-list>
+      </ng-container>
+      <ng-template #noDisplayAssets>
+        <mat-icon class="pending large">more_horiz</mat-icon>
+      </ng-template>
+    </mat-card>
   </div>
 </div>
