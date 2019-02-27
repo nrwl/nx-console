@@ -117,8 +117,14 @@ export class BuildStatusComponent {
     map(status => {
       if (status) {
         const statsErrors = status.stats ? status.stats.errors : [];
-        const otherErrors = status.errors;
-        const errors = statsErrors.length > 0 ? statsErrors : otherErrors;
+        // If we don't see stats errors then return errors read from terminal output.
+        const errorsFromTerminalOutput = status.errors;
+        const errors =
+          statsErrors.length > 0
+            ? statsErrors
+            : errorsFromTerminalOutput.length > 0
+            ? [errorsFromTerminalOutput.join('\n')]
+            : [];
         // Only show unique values
         return errors.filter((x, idx, ary) => ary.indexOf(x) === idx);
       } else {

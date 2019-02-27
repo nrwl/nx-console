@@ -32,100 +32,137 @@ small {
   color: mat-color($hint-palette);
 }
 
+h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
 .container {
   overflow: auto;
   height: 100%;
+}
 
-  h3 {
-    font-weight: 500;
-    margin: 0;
+.grid {
+  display: grid;
+  box-sizing: border-box;
+  grid-gap: 20px;
+}
+
+.grid-3-columns {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4-columns {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.row {
+  margin: 20px;
+}
+// Prevent collapsed row from taking up extra margins.
+.row.collapse {
+  margin-bottom: -20px;
+}
+
+.header {
+  margin-bottom: 20px;
+
+  mat-icon {
+    font-size: 18px;
   }
 
-  .grid {
-    display: grid;
-    box-sizing: border-box;
-    grid-gap: 20px;
+  .actions {
+    width: 200px;
   }
+}
 
-  .grid-3-columns {
-    grid-template-columns: repeat(3, 1fr);
+.title {
+  text-align: center;
+  font-weight: 100;
+  font-size: 14px;
+  color: mat-color($hint-palette);
+}
+
+.content {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 100;
+}
+
+.summary {
+  .title {
+    font-size: 18px;
   }
+  .content {
+    font-size: 24px;
 
-  .grid-4-columns {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .row {
-    margin: 20px;
-  }
-  // Prevent collapsed row from taking up extra margins.
-  .row.collapse {
-    margin-bottom: -20px;
-  }
-
-  .header {
-    margin-bottom: 20px;
-
-    mat-icon {
-      font-size: 18px;
+    small {
+      font-size: 14px;
     }
+  }
+}
 
-    .actions {
-      width: 200px;
-    }
+.build-status {
+  width: 20vw;
+  max-width: 200px;
+  min-width: 100px;
+  text-align: center;
+
+  .status-icon-container mat-icon {
+    margin: 0 auto;
+    font-size: $build-icon-size;
+    display: block;
+    height: $build-icon-size;
+    width: $build-icon-size;
   }
 
+  .build-status-content {
+    margin-top: 20px;
+  }
+}
+
+.problem-list {
+  white-space: pre;
+  width: 100%;
+  overflow-x: auto;
+
+  .problem-list-item {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    font-weight: 100;
+    color: mat-color($failure-palette);
+  }
+}
+
+.asset-name {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+@media (max-width: $smallScreen) {
   .title {
     text-align: center;
     font-weight: 100;
-    font-size: 14px;
+    font-size: 12px;
     color: mat-color($hint-palette);
   }
 
   .content {
     text-align: center;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 100;
   }
 
   .summary {
     .title {
-      font-size: 18px;
+      font-size: 14px;
     }
     .content {
-      font-size: 24px;
-
-      small {
-        font-size: 14px;
-      }
-    }
-  }
-
-  .build-status {
-    width: 200px;
-    text-align: center;
-
-    .status-icon-container mat-icon {
-      margin: 0 auto;
-      font-size: $build-icon-size;
-      display: block;
-      height: $build-icon-size;
-      width: $build-icon-size;
-    }
-
-    .build-status-content {
-      margin-top: 20px;
-    }
-  }
-
-  .errors-list {
-    .mat-list-item {
-      font-size: 18px;
-      font-weight: 100;
-      color: mat-color($failure-palette);
-    }
-    .mat-icon {
-      color: mat-color($failure-palette);
+      font-size: 20px;
     }
   }
 }

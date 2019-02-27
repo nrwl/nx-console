@@ -132,20 +132,18 @@
         </div>
       </div>
       <ng-container *ngIf="(errors$ | async) as errors">
-        <mat-list *ngFor="let error of errors" class="errors-list">
-          <mat-list-item>
-            <mat-icon mat-list-icon>error</mat-icon>
+        <div class="problem-list">
+          <div class="problem-list-item" *ngFor="let error of errors">
             {{ error }}
-          </mat-list-item>
-        </mat-list>
+          </div>
+        </div>
       </ng-container>
       <ng-container *ngIf="(warnings$ | async) as warnings">
-        <mat-list *ngFor="let warning of warnings" class="warnings-list">
-          <mat-list-item>
-            <mat-icon mat-list-icon>warning</mat-icon>
+        <div class="problem-list">
+          <div class="problem-list-item" *ngFor="let warning of warnings">
             {{ warning }}
-          </mat-list-item>
-        </mat-list>
+          </div>
+        </div>
       </ng-container>
     </mat-card>
   </div>
@@ -204,9 +202,7 @@
           *ngFor="let asset of displayAssets; trackBy: trackByAsset"
         >
           <mat-grid-tile colspan="2">
-            <div fxFlex fxLayoutAlign="start center" class="content">
-              {{ asset.name }}
-            </div>
+            <div class="asset-name">{{ asset.name }}</div>
           </mat-grid-tile>
           <mat-grid-tile colspan="1">
             <div class="content">{{ asset.size | formatFileSize: '–' }}</div>
