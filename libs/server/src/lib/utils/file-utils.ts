@@ -80,9 +80,17 @@ export class FileUtils {
           command
         );
       }
-      if (existsSync(fullPath + '.exe')) {
+      if (
+        existsSync(fullPath + '.exe') &&
+        platform() === 'win32' &&
+        !this.isWsl()
+      ) {
         return fullPath + '.exe';
-      } else if (existsSync(fullPath + '.cmd')) {
+      } else if (
+        existsSync(fullPath + '.cmd') &&
+        platform() === 'win32' &&
+        !this.isWsl()
+      ) {
         return fullPath + '.cmd';
       } else if (existsSync(fullPath)) {
         return fullPath;
