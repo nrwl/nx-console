@@ -7,9 +7,9 @@ import {
   switchMap,
   shareReplay,
   filter,
-  catchError
+  catchError,
+  tap
 } from 'rxjs/operators';
-import { tap } from 'rxjs/operators';
 import {
   PROJECTS_POLLING,
   Settings,
