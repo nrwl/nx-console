@@ -48,6 +48,8 @@ export interface Settings {
   workspaceSchematicsNpmScript?: Maybe<string>;
 
   recent: WorkspaceDefinition[];
+
+  isWsl?: Maybe<boolean>;
 }
 
 export interface WorkspaceDefinition {
@@ -661,6 +663,8 @@ export namespace SettingsResolvers {
     >;
 
     recent?: RecentResolver<any[], TypeParent, Context>;
+
+    isWsl?: IsWslResolver<Maybe<boolean>, TypeParent, Context>;
   }
 
   export type CanCollectDataResolver<
@@ -708,6 +712,11 @@ export namespace SettingsResolvers {
     Parent,
     Context
   >;
+  export type IsWslResolver<
+    R = Maybe<boolean>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace WorkspaceDefinitionResolvers {
