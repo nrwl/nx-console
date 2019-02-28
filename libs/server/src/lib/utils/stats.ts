@@ -36,7 +36,7 @@ export function parseStats(
 ) {
   const outputPath = stats.outputPath;
   // grouped by index as id since webpack ids are sequential numbers
-  const modulesByChunkId: ModuleData[][] = [];
+  const modulesByChunkId: { [key: string]: ModuleData[] } = {};
   const summary = {
     assets: createSizeData(),
     modules: createSizeData(),
@@ -54,7 +54,7 @@ export function parseStats(
     if (asset.name.endsWith('.map')) {
       return;
     }
-    const sizes = fileSizeGetter.read(asset.name, cwd);
+    const sizes = fileSizeGetter.read(asset.name, outputPath);
     summary.assets.parsed += sizes.parsed;
     summary.assets.gzipped += sizes.gzipped;
     assets.push({
@@ -63,6 +63,7 @@ export function parseStats(
       sizes: sizes
     });
   });
+  const pathPrefixRegexp = new RegExp(`^(\./|${cwd}/)`);
 
   stats.chunks.forEach((chunk: any) => {
     const chunkData = getChunkData(chunk);
@@ -73,23 +74,40 @@ export function parseStats(
     chunkData.sizes.gzipped = chunkSizes.gzipped;
     chunks.push(chunkData);
 
+    chunk.modules = flattenMultiModules(chunk.modules);
+    chunk.modules = chunk.modules.filter(
+      (m: Module) => !m.name.startsWith('multi')
+    );
+
     walkModules(chunk.modules, module => {
-      if (module.path.startsWith('multi')) return;
-      if (isBundle(module)) return;
-      const moduleSizes = fileSizeGetter.read(module.path);
+      try {
+        const moduleSizes = fileSizeGetter.read(module.path);
 
-      module.sizes.parsed = moduleSizes.parsed;
-      module.sizes.gzipped = moduleSizes.gzipped;
+        module.sizes.parsed = moduleSizes.parsed;
+        module.sizes.gzipped = moduleSizes.gzipped;
 
-      summary.modules.parsed += module.sizes.parsed;
-      summary.modules.gzipped += module.sizes.gzipped;
+        summary.modules.parsed += module.sizes.parsed;
+        summary.modules.gzipped += module.sizes.gzipped;
 
-      if (module.isDep) {
-        summary.dependencies.parsed += module.sizes.parsed;
-        summary.dependencies.gzipped += module.sizes.gzipped;
+        if (module.isDep) {
+          summary.dependencies.parsed += module.sizes.parsed;
+          summary.dependencies.gzipped += module.sizes.gzipped;
+        }
+
+        // Strip out cwd from module name and path.
+        module.path = module.name = module.path
+          .split(pathPrefixRegexp)
+          .slice(2)
+          .join('');
+
+        modules.push(module);
+      } catch (err) {
+        if (err.code === 'ENOENT') {
+          // File may not exist when read, so we ca ignore it.
+        } else {
+          throw err;
+        }
       }
-
-      modules.push(module);
     });
 
     modulesByChunkId[chunkData.id] = modules;
@@ -116,7 +134,7 @@ export function calculateStatsFromChunks(cs: Chunk[]) {
 
   cs.forEach((c, idx) => {
     const chunkData = {
-      id: idx,
+      id: String(idx),
       file: c.file,
       name: c.name,
       sizes: createSizeData()
@@ -147,7 +165,7 @@ export function calculateStatsFromChunks(cs: Chunk[]) {
 /* ------------------------------------------------------------------------------------------------------------------ */
 
 interface ChunkData {
-  id: number;
+  id: string;
   name: string;
   file: string;
   sizes: SizeData;
@@ -159,15 +177,14 @@ interface SizeData {
 }
 
 interface Module {
-  id: number;
   identifier: string;
   name: string;
   size: number;
   chunks: any[];
+  modules: Module[];
 }
 
 interface ModuleData {
-  id: number;
   identifier: string;
   name: string;
   size: number;
@@ -178,6 +195,21 @@ interface ModuleData {
 
 function createSizeData(): SizeData {
   return { gzipped: 0, parsed: 0 };
+}
+
+const BUNDLED_MODULE_REGEXP = /(.*)\s+\+\s+\d+\smodules$/;
+
+function flattenMultiModules(modules: Module[]) {
+  let flattened = [] as Module[];
+  modules.forEach(module => {
+    const matched = module.name.match(BUNDLED_MODULE_REGEXP);
+    if (matched) {
+      flattened = flattened.concat(module.modules);
+      module.name = matched[1];
+    }
+    flattened.push(module);
+  });
+  return flattened;
 }
 
 function walkModules(
@@ -192,17 +224,13 @@ function walkModules(
     const isDep = path.indexOf('node_modules') !== -1;
     const sizes = createSizeData();
     const mm: ModuleData = {
-      id: m.id,
-      name: m.name,
+      name: path,
       identifier: m.identifier,
       size: m.size,
       path,
       isDep,
       sizes
     };
-
-    if (isDep) {
-    }
 
     if (!shouldInclude(mm)) return;
     if (seen.has(mm.path)) return;
@@ -217,10 +245,6 @@ function getModulePath(m: Module) {
   return m.identifier.replace(/.*!/, '').replace(/\\/g, '/');
 }
 
-function isBundle(m: ModuleData) {
-  return /^.* [a-zA-Z0-9]+$/.test(m.path);
-}
-
 function shouldInclude(m: ModuleData) {
   return (
     m.identifier.indexOf('(webpack)') === -1 &&
@@ -230,7 +254,7 @@ function shouldInclude(m: ModuleData) {
 
 function getChunkData(chunk: any): ChunkData {
   return {
-    id: chunk.id,
+    id: String(chunk.id),
     name: chunk.names[0],
     file: chunk.files[0],
     sizes: createSizeData()

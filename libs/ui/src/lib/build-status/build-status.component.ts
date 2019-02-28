@@ -6,7 +6,7 @@ import {
 } from '@angular-console/utils';
 import { SPEEDS } from './speed-constants';
 import { Subject, BehaviorSubject, combineLatest, ReplaySubject } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { MatSelectChange } from '@angular/material';
 import { GROW_SHRINK_VERT } from '../animations/grow-shink';
 
@@ -20,6 +20,7 @@ interface Stats {
   assets: any[];
   errors: string[];
   warnings: string[];
+  modulesByChunkId: any;
   summary: {
     assets: Summary;
     modules: Summary;
@@ -95,6 +96,10 @@ export class BuildStatusComponent {
     SizeGroup.Gzipped
   );
 
+  readonly currentChunkId$: Subject<void | string> = new BehaviorSubject<
+    void | string
+  >(undefined);
+
   readonly sizeGroupHelpText$ = combineLatest(
     this.currentSizeGroup$,
     this.status$
@@ -120,11 +125,7 @@ export class BuildStatusComponent {
         // If we don't see stats errors then return errors read from terminal output.
         const errorsFromTerminalOutput = status.errors;
         const errors =
-          statsErrors.length > 0
-            ? statsErrors
-            : errorsFromTerminalOutput.length > 0
-            ? [errorsFromTerminalOutput.join('\n')]
-            : [];
+          statsErrors.length > 0 ? statsErrors : errorsFromTerminalOutput;
         // Only show unique values
         return errors.filter((x, idx, ary) => ary.indexOf(x) === idx);
       } else {
@@ -259,6 +260,74 @@ export class BuildStatusComponent {
     })
   );
 
+  readonly chunks$ = this.status$.pipe(
+    map(status => {
+      if (status && status.stats && status.stats.chunks) {
+        return status.stats.chunks;
+      } else {
+        return [];
+      }
+    }),
+    tap(chunks => {
+      const defaultChunk = chunks.find(x => /main/.test(x.name)) || chunks[0];
+      if (defaultChunk) {
+        this.currentChunkId$.next(defaultChunk.id);
+      }
+    })
+  );
+
+  readonly currentChunk$ = combineLatest(
+    this.chunks$,
+    this.currentChunkId$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([chunks, id, sizeGroup]) => {
+      const c = chunks.find(x => x.id === id);
+      if (c) {
+        return {
+          id: c.id,
+          name: c.name,
+          file: c.file,
+          size: c.sizes[sizeGroup]
+        };
+      } else {
+        return null;
+      }
+    })
+  );
+
+  readonly modulesForCurrentChunk$ = combineLatest(
+    this.status$,
+    this.currentChunkId$
+  ).pipe(
+    map(([status, currentChunkId]) => {
+      if (!currentChunkId || !status) {
+        return null;
+      }
+      return (
+        status.stats &&
+        status.stats.modulesByChunkId &&
+        status.stats.modulesByChunkId[currentChunkId]
+      );
+    })
+  );
+
+  readonly viewingModules$ = combineLatest(
+    this.modulesForCurrentChunk$,
+    this.currentSizeGroup$
+  ).pipe(
+    map(([modules, sizeGroup]) => {
+      if (!modules) {
+        return null;
+      }
+      return modules.map((m: any) => [m.name, m.sizes[sizeGroup]]);
+    })
+  );
+
+  readonly analyzeAnimationState$ = this.viewingModules$.pipe(
+    map(modules => (modules ? 'expand' : 'collapse'))
+  );
+
   readonly detailedBuildStatus$ = this.status$.pipe(
     map(status => {
       if (!status) {
@@ -275,7 +344,8 @@ export class BuildStatusComponent {
           return `Completed`;
         }
         case 'build_failure': {
-          return 'Failed';
+          // TODO(jack): There's a bug in vscode-only where the build is marked as a failure even though it succeeded.
+          return status.stats ? 'Completed' : 'Failed';
         }
       }
     })
@@ -365,8 +435,12 @@ export class BuildStatusComponent {
     return GROUP_LABELS[s];
   }
 
-  trackByError(_: number, err: string) {
-    return err;
+  trackByString(_: number, x: string) {
+    return x;
+  }
+
+  trackById(_: number, x: { id: string }) {
+    return x;
   }
 
   trackBySpeedKey(_: number, speed: any) {
@@ -387,5 +461,9 @@ export class BuildStatusComponent {
 
   handleSizeGroupSelection(event: MatSelectChange) {
     this.currentSizeGroup$.next(event.value);
+  }
+
+  handleChunkFileSelection(event: MatSelectChange) {
+    this.currentChunkId$.next(event.value);
   }
 }

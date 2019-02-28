@@ -144,10 +144,7 @@ export class BuildDetailedStatusCalculator
 
       if (existsSync(statsPath)) {
         const statsJson = JSON.parse(readFileSync(statsPath).toString());
-        nextStatus.stats = parseStats(
-          statsJson,
-          join(this.cwd, this.architectOptions.outputPath)
-        );
+        nextStatus.stats = parseStats(statsJson, this.cwd);
       } else {
         nextStatus.stats = calculateStatsFromChunks(nextStatus.chunks);
       }
@@ -181,7 +178,7 @@ export class BuildDetailedStatusCalculator
 
     progress = getNextProgress(progress, value);
 
-    if (value.indexOf('chunk') > -1 && value.indexOf('Hash:') > -1) {
+    if (value.indexOf('Hash:') > -1) {
       buildStatus =
         buildStatus !== 'build_failure' ? 'build_success' : 'build_failure';
       progress = 100;

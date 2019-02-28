@@ -49,6 +49,7 @@ import { TestStatusComponent } from './test-status/test-status.component';
 import { TerminalFactory } from './terminal/terminal.factory';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { FormatFileSizePipe } from './format-file-size.pipe';
+import { ModulesGraphComponent } from './modules-graph/modules-graph.component';
 
 const IMPORTS = [
   HttpClientModule,
@@ -100,13 +101,19 @@ const PUBLIC_DECLARATIONS = [
 
 @NgModule({
   imports: IMPORTS,
-  providers: [TerminalFactory],
+  providers: [TerminalFactory, FormatFileSizePipe],
   declarations: [
     ...PUBLIC_DECLARATIONS,
     SchematicFieldsComponent,
-    FormatFileSizePipe
+    FormatFileSizePipe,
+    ModulesGraphComponent
   ],
-  exports: [...IMPORTS, ...PUBLIC_DECLARATIONS, SchematicFieldsComponent]
+  exports: [
+    ...IMPORTS,
+    ...PUBLIC_DECLARATIONS,
+    SchematicFieldsComponent,
+    ModulesGraphComponent
+  ]
 })
 export class UiModule {
   constructor(

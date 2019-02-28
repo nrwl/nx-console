@@ -1,5 +1,5 @@
 <div class="container">
-  <div class="row" fxLayout="row" fxLayoutGap="20px">
+  <div class="row summary" fxLayout="row" fxLayoutGap="20px">
     <mat-card fxFlex>
       <div class="header" fxLayout="row" fxLayoutAlign="center">
         <div fxFlex>
@@ -12,14 +12,16 @@
             [value]="currentSizeGroup$ | async"
             (selectionChange)="handleSizeGroupSelection($event)"
           >
-            <mat-option *ngFor="let group of sizeGroups" [value]="group">{{
-              getSizeGroupLabel(group)
-            }}</mat-option>
+            <mat-option
+              *ngFor="let group of sizeGroups; trackBy: trackByString"
+              [value]="group"
+              >{{ getSizeGroupLabel(group) }}</mat-option
+            >
           </mat-select>
           <mat-icon [matTooltip]="sizeGroupHelpText$ | async">help</mat-icon>
         </div>
       </div>
-      <div class="summary grid grid-3-columns">
+      <div class="grid grid-3-columns">
         <div>
           <div class="title">Status</div>
           <div class="content">
@@ -133,18 +135,66 @@
       </div>
       <ng-container *ngIf="(errors$ | async) as errors">
         <div class="problem-list">
-          <div class="problem-list-item" *ngFor="let error of errors">
+          <div
+            class="problem-list-item"
+            *ngFor="let error of errors; trackBy: trackByString"
+          >
             {{ error }}
           </div>
         </div>
       </ng-container>
       <ng-container *ngIf="(warnings$ | async) as warnings">
         <div class="problem-list">
-          <div class="problem-list-item" *ngFor="let warning of warnings">
+          <div
+            class="problem-list-item"
+            *ngFor="let warning of warnings; trackBy: trackByString"
+          >
             {{ warning }}
           </div>
         </div>
       </ng-container>
+    </mat-card>
+  </div>
+  <div
+    class="row"
+    [ngClass]="'row ' + (analyzeAnimationState$ | async)"
+    [@growShrinkVert]="analyzeAnimationState$ | async"
+  >
+    <mat-card>
+      <div class="header" fxLayout="row" fxLayoutAlign="center">
+        <div fxFlex>
+          <h3>Analyze</h3>
+        </div>
+        <div class="actions" fxLayout="row" fxLayoutGap="20px">
+          <mat-select
+            matRipple
+            fxFlex
+            [value]="currentChunkId$ | async"
+            (selectionChange)="handleChunkFileSelection($event)"
+          >
+            <mat-option
+              *ngFor="let chunk of (chunks$ | async); trackBy: trackById"
+              [value]="chunk.id"
+            >
+              {{ chunk.file }}
+            </mat-option>
+          </mat-select>
+        </div>
+      </div>
+      <ng-container
+        *ngIf="
+          (viewingModules$ | async) as viewingModules;
+          else noViewingModules
+        "
+      >
+        <ui-modules-graph
+          [chunk]="currentChunk$ | async"
+          [data]="viewingModules"
+        ></ui-modules-graph>
+      </ng-container>
+      <ng-template #noViewingModules>
+        <mat-icon class="pending large">more_horiz</mat-icon>
+      </ng-template>
     </mat-card>
   </div>
   <div class="row">
@@ -188,7 +238,7 @@
         <mat-grid-tile
           class="title"
           colspan="1"
-          *ngFor="let key of displayAssetSpeeds"
+          *ngFor="let key of displayAssetSpeeds; trackBy: trackByString"
         >
           {{ getSpeedLabel(key) }}
         </mat-grid-tile>

@@ -101,7 +101,6 @@ export class FileUtils {
 
   findClosestNg(d: string): string {
     const dir = this.convertToWslPath(d);
-    console.log('normalized dir', d, dir);
     if (this.directoryExists(this.joinForCommandRun(dir, 'node_modules'))) {
       if (platform() === 'win32' && !this.isWsl()) {
         if (this.fileExistsSync(this.joinForCommandRun(dir, 'ng.cmd'))) {
