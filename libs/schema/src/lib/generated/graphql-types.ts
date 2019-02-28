@@ -48,6 +48,8 @@ export interface Settings {
   workspaceSchematicsNpmScript?: Maybe<string>;
 
   recent: WorkspaceDefinition[];
+
+  isWsl?: Maybe<boolean>;
 }
 
 export interface WorkspaceDefinition {
@@ -56,6 +58,8 @@ export interface WorkspaceDefinition {
   name: string;
 
   favorite?: Maybe<boolean>;
+
+  pinnedProjectNames: string[];
 }
 
 export interface SchematicCollectionForNgNew {
@@ -678,6 +682,8 @@ export namespace SettingsResolvers {
     >;
 
     recent?: RecentResolver<any[], TypeParent, Context>;
+
+    isWsl?: IsWslResolver<Maybe<boolean>, TypeParent, Context>;
   }
 
   export type CanCollectDataResolver<
@@ -725,6 +731,11 @@ export namespace SettingsResolvers {
     Parent,
     Context
   >;
+  export type IsWslResolver<
+    R = Maybe<boolean>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace WorkspaceDefinitionResolvers {
@@ -734,6 +745,12 @@ export namespace WorkspaceDefinitionResolvers {
     name?: NameResolver<string, TypeParent, Context>;
 
     favorite?: FavoriteResolver<Maybe<boolean>, TypeParent, Context>;
+
+    pinnedProjectNames?: PinnedProjectNamesResolver<
+      string[],
+      TypeParent,
+      Context
+    >;
   }
 
   export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
@@ -748,6 +765,11 @@ export namespace WorkspaceDefinitionResolvers {
   >;
   export type FavoriteResolver<
     R = Maybe<boolean>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type PinnedProjectNamesResolver<
+    R = string[],
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;

@@ -1,7 +1,10 @@
 import { Commands } from './commands';
-import { readJsonFile } from '../utils/utils';
 import { createDetailedStatusCalculator } from './detailed-status-calculator';
 import { normalizeCommands } from '../utils/architect-utils';
+import { PseudoTerminalFactory } from '@angular-console/server';
+import { platform } from 'os';
+import { FileUtils } from '../utils/file-utils';
+import { readJsonFile } from '../utils/utils';
 
 let commandRunIndex = 0;
 
@@ -14,6 +17,7 @@ export function runCommand(
   program: string,
   cmds: string[],
   pseudoTerminalFactory: PseudoTerminalFactory,
+  fileUtils: FileUtils,
   addToRecent: boolean = true
 ) {
   const workspace =
@@ -27,7 +31,8 @@ export function runCommand(
       name: id,
       program,
       args: normalizeCommands(cwd, cmds),
-      cwd
+      cwd,
+      isWsl: fileUtils.isWsl()
     });
     commandRunning.onDidWriteData(data => {
       commands.addOut(id, data);
@@ -70,29 +75,32 @@ export interface PseudoTerminalConfig {
   args: string[];
   cwd: string;
   displayCommand: string;
+  isWsl: boolean;
 }
 
 export type PseudoTerminalFactory = (
   config: PseudoTerminalConfig
 ) => PseudoTerminal;
 
-import { PseudoTerminalFactory } from '@angular-console/server';
-import { platform } from 'os';
-
 export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
   displayCommand,
   program,
   args,
-  cwd
+  cwd,
+  isWsl
 }) => {
   const DEFAULT_ROWS = 24;
   const DEFAULT_COLS = 80;
-
-  const commandRunning = require('node-pty-prebuilt').spawn(program, args, {
+  const opts = {
     cols: DEFAULT_COLS,
     rows: DEFAULT_ROWS,
     cwd
-  });
+  };
+
+  const nodePtyPrebilt = require('node-pty-prebuilt');
+  const commandRunning = isWsl
+    ? nodePtyPrebilt.spawn('wsl.exe', ['-e', program, ...args], opts)
+    : nodePtyPrebilt.spawn(program, args, opts);
 
   let currentCols = DEFAULT_COLS;
   let terminated = false;

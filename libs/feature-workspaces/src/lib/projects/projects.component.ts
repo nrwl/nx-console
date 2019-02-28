@@ -9,10 +9,12 @@ import {
   filter,
   catchError
 } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import {
   PROJECTS_POLLING,
   Settings,
-  CommandRunner
+  CommandRunner,
+  toggleItemInArray
 } from '@angular-console/utils';
 import {
   WorkspaceDocsGQL,
@@ -41,9 +43,12 @@ export interface ProjectActionMap {
   styleUrls: ['./projects.component.scss']
 })
 export class ProjectsComponent implements OnInit {
-  workspacePath$: Observable<string>;
+  workspacePath: string;
+  pinnedProjectNames: string[];
   projects$: Observable<Workspace.Projects[]>;
   filteredProjects$: Observable<Workspace.Projects[]>;
+  filteredPinnedProjects$: Observable<Workspace.Projects[]>;
+  filteredUnpinnedProjects$: Observable<Workspace.Projects[]>;
   docs$ = this.settings.showDocs
     ? this.route.params.pipe(
         switchMap(p => this.workspaceDocsGQL.fetch({ path: p.path })),
@@ -64,9 +69,9 @@ export class ProjectsComponent implements OnInit {
   recentActions$: Observable<ProjectActionMap>;
 
   constructor(
+    readonly settings: Settings,
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
-    private readonly settings: Settings,
     private readonly workspaceDocsGQL: WorkspaceDocsGQL,
     private readonly saveRecentActionGQL: SaveRecentActionGQL,
     private readonly commandRunner: CommandRunner,
@@ -76,6 +81,9 @@ export class ProjectsComponent implements OnInit {
   ngOnInit() {
     const workspace$ = this.route.params.pipe(
       map(m => m.path),
+      tap(path => {
+        this.workspacePath = path;
+      }),
       switchMap(path => {
         return combineLatest(
           this.workspaceGQL.watch(
@@ -109,11 +117,13 @@ export class ProjectsComponent implements OnInit {
         };
       })
     );
-    this.workspacePath$ = workspace$.pipe(
-      map(({ workspace }) => workspace.path)
-    );
     this.projects$ = workspace$.pipe(
       map(({ workspace, schematicCollections }) => {
+        const workspaceSettings = this.settings.getWorkspace(
+          this.workspacePath
+        );
+        this.pinnedProjectNames =
+          (workspaceSettings && workspaceSettings.pinnedProjectNames) || [];
         const projects = workspace.projects.map((p: any) => {
           return {
             ...p,
@@ -165,6 +175,20 @@ export class ProjectsComponent implements OnInit {
         );
       })
     );
+    this.filteredPinnedProjects$ = this.filteredProjects$.pipe(
+      map(projects =>
+        projects.filter(project =>
+          this.pinnedProjectNames.includes(project.name)
+        )
+      )
+    );
+    this.filteredUnpinnedProjects$ = this.filteredProjects$.pipe(
+      map(projects =>
+        projects.filter(
+          project => !this.pinnedProjectNames.includes(project.name)
+        )
+      )
+    );
   }
 
   onActionTriggered(
@@ -203,7 +227,18 @@ export class ProjectsComponent implements OnInit {
     ];
   }
 
-  trackByName(p: any) {
+  onPinClick(p: Workspace.Projects) {
+    this.pinnedProjectNames = toggleItemInArray(
+      this.pinnedProjectNames || [],
+      p.name
+    );
+    this.projectFilterFormControl.setValue(
+      this.projectFilterFormControl.value || ''
+    );
+    this.settings.toggleProjectPin(this.workspacePath, p);
+  }
+
+  trackByName(p: Workspace.Projects) {
     return p.name;
   }
 }

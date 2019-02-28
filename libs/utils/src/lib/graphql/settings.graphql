@@ -1,5 +1,6 @@
 query Settings {
   settings {
+    isWsl
     canCollectData
     installNodeManually
     enableDetailedStatus
@@ -9,6 +10,7 @@ query Settings {
       path
       name
       favorite
+      pinnedProjectNames
     }
   }
 }

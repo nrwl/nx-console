@@ -77,4 +77,17 @@ describe('Projects', () => {
       'not.exist'
     );
   });
+  it('should pin and unpin projects', () => {
+    cy.get('.favorite-icon.favorited').should('not.exist');
+    cy.get('.favorite-icon:not(.favorited)')
+      .should('have.length', 2)
+      .first()
+      .click();
+    cy.get('.favorite-icon:not(.favorited)').should('have.length', 1);
+    cy.get('.favorite-icon.favorited')
+      .should('have.length', 1)
+      .click();
+    cy.get('.favorite-icon.favorited').should('not.exist');
+    cy.get('.favorite-icon:not(.favorited)').should('have.length', 2);
+  });
 });

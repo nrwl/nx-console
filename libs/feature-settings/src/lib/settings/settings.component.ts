@@ -37,4 +37,12 @@ export class SettingsComponent {
   getChannel() {
     return this.settingsService.getChannel();
   }
+
+  isWsl() {
+    return this.settingsService.isWsl();
+  }
+
+  toggleIsWsl(x: boolean) {
+    this.settingsService.setIsWsl(x);
+  }
 }

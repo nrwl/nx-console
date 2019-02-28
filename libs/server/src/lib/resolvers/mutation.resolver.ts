@@ -9,26 +9,13 @@ import { Editor, openInEditor } from '../api/read-editors';
 import { readSettings, storeSettings } from '../api/read-settings';
 import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
-import { findClosestNg, findExecutable, readJsonFile } from '../utils/utils';
 import { platform } from 'os';
+import { FileUtils } from '../utils/file-utils';
+import { readJsonFile } from '../utils/utils';
 import {
   storeTriggeredAction,
   readRecentActions
 } from '../api/read-recent-actions';
-
-function disableInteractivePrompts(p: string) {
-  try {
-    const version = readJsonFile(
-      path.join(`@angular`, 'cli', 'package.json'),
-      path.join(p, 'node_modules')
-    ).json.version;
-    return semver.gte(version, '7.0.0') ? ['--no-interactive'] : [];
-  } catch (e) {
-    console.log('cannot parse cli version', e.message);
-    // don't recognize the version => assume it's greater than 7
-    return ['--no-interactive'];
-  }
-}
 
 @Resolver()
 export class MutationResolver {
@@ -37,7 +24,8 @@ export class MutationResolver {
     @Inject('pseudoTerminalFactory')
     private readonly pseudoTerminalFactory: any,
     @Inject('selectDirectory')
-    private readonly selectDirectoryImpl: SelectDirectory
+    private readonly selectDirectoryImpl: SelectDirectory,
+    private readonly fileUtils: FileUtils
   ) {}
 
   @Mutation()
@@ -47,9 +35,10 @@ export class MutationResolver {
         'add',
         p,
         'ng',
-        findClosestNg(p),
-        ['add', name, ...disableInteractivePrompts(p)],
-        this.pseudoTerminalFactory
+        this.fileUtils.findClosestNg(p),
+        ['add', name, ...this.disableInteractivePrompts(p)],
+        this.pseudoTerminalFactory,
+        this.fileUtils
       );
     } catch (e) {
       console.log(e);
@@ -72,7 +61,9 @@ export class MutationResolver {
         path.join(
           __dirname,
           'assets',
-          platform() === 'win32' ? 'new-workspace.cmd' : 'new-workspace'
+          platform() === 'win32' && !this.fileUtils.isWsl()
+            ? 'new-workspace.cmd'
+            : 'new-workspace'
         ),
         [
           name,
@@ -81,7 +72,8 @@ export class MutationResolver {
           ...newCommand,
           '--no-interactive'
         ],
-        this.pseudoTerminalFactory
+        this.pseudoTerminalFactory,
+        this.fileUtils
       );
     } catch (e) {
       console.log(e);
@@ -101,9 +93,15 @@ export class MutationResolver {
         'generate',
         p,
         'ng',
-        findClosestNg(p),
-        ['generate', ...genCommand, ...dryRun, ...disableInteractivePrompts(p)],
+        this.fileUtils.findClosestNg(p),
+        [
+          'generate',
+          ...genCommand,
+          ...dryRun,
+          ...this.disableInteractivePrompts(p)
+        ],
         this.pseudoTerminalFactory,
+        this.fileUtils,
         !dr
       );
     } catch (e) {
@@ -127,9 +125,10 @@ export class MutationResolver {
         'npm',
         p,
         npmClient,
-        findExecutable(npmClient, p),
-        [...genCommand, ...dryRun, ...disableInteractivePrompts(p)],
+        this.fileUtils.findExecutable(npmClient, p),
+        [...genCommand, ...dryRun, ...this.disableInteractivePrompts(p)],
         this.pseudoTerminalFactory,
+        this.fileUtils,
         !dr
       );
     } catch (e) {
@@ -145,9 +144,10 @@ export class MutationResolver {
         'ng',
         p,
         'ng',
-        findClosestNg(p),
+        this.fileUtils.findClosestNg(p),
         rc,
-        this.pseudoTerminalFactory
+        this.pseudoTerminalFactory,
+        this.fileUtils
       );
     } catch (e) {
       console.log(e);
@@ -166,9 +166,10 @@ export class MutationResolver {
         'npm',
         p,
         npmClient,
-        findExecutable(npmClient, p),
+        this.fileUtils.findExecutable(npmClient, p),
         rc,
-        this.pseudoTerminalFactory
+        this.pseudoTerminalFactory,
+        this.fileUtils
       );
     } catch (e) {
       console.log(e);
@@ -309,5 +310,19 @@ export class MutationResolver {
   async openDoc(@Args('id') id: string) {
     const result = await docs.openDoc(id).toPromise();
     return { result };
+  }
+
+  disableInteractivePrompts(p: string) {
+    try {
+      const version = readJsonFile(
+        path.join(`@angular`, 'cli', 'package.json'),
+        path.join(p, 'node_modules')
+      ).json.version;
+      return semver.gte(version, '7.0.0') ? ['--no-interactive'] : [];
+    } catch (e) {
+      console.log('cannot parse cli version', e.message);
+      // don't recognize the version => assume it's greater than 7
+      return ['--no-interactive'];
+    }
   }
 }

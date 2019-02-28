@@ -174,7 +174,12 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   });
 
   private readonly subscription = this.workspace$.subscribe(w => {
-    this.settings.addRecent({ name: w.name, path: w.path, favorite: false });
+    this.settings.addRecent({
+      name: w.name,
+      path: w.path,
+      favorite: false,
+      pinnedProjectNames: []
+    });
   });
 
   readonly isElectron = this.environment.application === 'electron';
@@ -207,7 +212,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           this.routes[0],
           {
             icon: 'timeline',
-            url: 'affected-projects',
+            url: 'connect/affected-projects',
             title: 'Affected Projects'
           },
           ...this.routes.slice(1)

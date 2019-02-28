@@ -24,14 +24,24 @@ describe('Settings', () => {
   });
 
   it('should not add the same project twice', () => {
-    settings.addRecent({ name: 'one', path: 'one', favorite: true });
+    settings.addRecent({
+      name: 'one',
+      path: 'one',
+      favorite: true,
+      pinnedProjectNames: []
+    });
     expect(settings.getRecentWorkspaces()).toEqual([
-      { name: 'one', path: 'one', favorite: true }
+      { name: 'one', path: 'one', favorite: true, pinnedProjectNames: [] }
     ]);
 
-    settings.addRecent({ name: 'one', path: 'one' });
+    settings.addRecent({
+      name: 'one',
+      path: 'one',
+      favorite: true,
+      pinnedProjectNames: []
+    });
     expect(settings.getRecentWorkspaces()).toEqual([
-      { name: 'one', path: 'one', favorite: true }
+      { name: 'one', path: 'one', favorite: true, pinnedProjectNames: [] }
     ]);
   });
 });
