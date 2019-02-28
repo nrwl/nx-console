@@ -4,8 +4,9 @@
 >
   <ui-flags
     [configurations]="project.architect[0].configurations"
-    [prefix]="[project.architect[0].name, project.name]"
+    [prefix]="getPrefix(project.architect[0].name, project.name)"
     [fields]="project.architect[0].schema"
+    [runSyntax]="runSyntax(project.architect[0].name)"
     (value)="onFlagsChange($event)"
     (action)="onRun()"
     [path]="path()"

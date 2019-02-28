@@ -139,7 +139,26 @@ export class TargetComponent implements OnInit {
   }
 
   getContextTitle(project: Project) {
-    return `ng ${project.architect[0].name} ${project.name}`;
+    const prefix = this.getPrefix(project.architect[0].name, project.name);
+    return `ng ${prefix.join(' ')}`;
+  }
+
+  getPrefix(targetName: string, projectName: string) {
+    if (this.runSyntax(targetName)) {
+      return ['run', `${projectName}:${targetName}`];
+    } else {
+      return [targetName, projectName];
+    }
+  }
+
+  runSyntax(targetName: string) {
+    return !(
+      targetName === 'build' ||
+      targetName === 'serve' ||
+      targetName === 'e2e' ||
+      targetName === 'test' ||
+      targetName === 'lint'
+    );
   }
 
   path() {
