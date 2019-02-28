@@ -286,4 +286,20 @@ describe('Tasks', () => {
 
     cy.writeFile('../../tmp/proj/src/app/app.component.ts', GOOD_CMP);
   });
+
+  it('runs custom tasks', () => {
+    clickOnTask('proj', 'custom');
+
+    cy.get('div.context-title').contains('ng run proj:custom');
+
+    elementContainsText('button', 'Run').click();
+
+    cy.wait(100);
+
+    cy.get('button')
+      .contains('Cancel')
+      .click();
+
+    goBack('Tasks');
+  });
 });
