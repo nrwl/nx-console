@@ -55,40 +55,47 @@ describe('detailedStatusCalculator', () => {
         chunk {vendor} vendor.js, vendor.js.map (vendor) 7.57 MB [initial] [rendered]
       `);
 
-      expect(c.detailedStatus).toEqual({
-        type: StatusType.BUILD,
-        buildStatus: 'build_success',
-        progress: 100,
-        indexFile: undefined,
-        isForProduction: false,
-        outputPath: undefined,
-        serverHost: undefined,
-        date: '2018-09-23T19:46:04.026Z',
-        time: '16477ms',
-        chunks: [
-          { name: 'main', file: 'main.js', size: '381 kB', type: 'initial' },
-          {
-            name: 'polyfills',
-            file: 'polyfills.js',
-            size: '237 kB',
-            type: 'initial'
-          },
-          {
-            name: 'runtime',
-            file: 'runtime.js',
-            size: '5.22 kB',
-            type: 'entry'
-          },
-          { name: 'styles', file: 'styles.js', size: '86 kB', type: 'initial' },
-          {
-            name: 'vendor',
-            file: 'vendor.js',
-            size: '7.57 MB',
-            type: 'initial'
-          }
-        ],
-        errors: []
-      });
+      expect(c.detailedStatus).toEqual(
+        expect.objectContaining({
+          type: StatusType.BUILD,
+          buildStatus: 'build_success',
+          progress: 100,
+          indexFile: undefined,
+          isForProduction: false,
+          outputPath: undefined,
+          serverHost: undefined,
+          date: '2018-09-23T19:46:04.026Z',
+          time: '16.48s',
+          chunks: [
+            { name: 'main', file: 'main.js', size: '381 kB', type: 'initial' },
+            {
+              name: 'polyfills',
+              file: 'polyfills.js',
+              size: '237 kB',
+              type: 'initial'
+            },
+            {
+              name: 'runtime',
+              file: 'runtime.js',
+              size: '5.22 kB',
+              type: 'entry'
+            },
+            {
+              name: 'styles',
+              file: 'styles.js',
+              size: '86 kB',
+              type: 'initial'
+            },
+            {
+              name: 'vendor',
+              file: 'vendor.js',
+              size: '7.57 MB',
+              type: 'initial'
+            }
+          ],
+          errors: []
+        })
+      );
     });
 
     it('should handle ansi characters', () => {

@@ -50,14 +50,6 @@ export class TaskRunnerComponent implements AfterContentChecked {
   terminalVisible$ = new BehaviorSubject(true);
   terminalAnimationState: Observable<string>;
 
-  toggleActiveView() {
-    if (this.statusComponent) {
-      const activeView = this.statusComponent.activeView;
-      this.statusComponent.activeView =
-        activeView === 'terminal' ? 'details' : 'terminal';
-    }
-  }
-
   ngAfterContentChecked() {
     // Wait until the flags component has rendered its expansion panels.
     if (

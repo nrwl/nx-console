@@ -263,10 +263,19 @@ describe('Tasks', () => {
       .contains('Run')
       .click();
 
-    cy.get('div.js-status-build-success', { timeout: 220000 }).contains(
-      'Build completed'
-    );
-    cy.get('div.js-status-server-url', { timeout: 220000 }).contains('browser');
+    cy.contains('button', 'Open App', { timeout: 220000 });
+
+    cy.contains('.summary .content', 'Started', { timeout: 220000 });
+
+    cy.get('.header .mat-select-trigger').click({ force: true });
+
+    cy.get('.mat-option-text')
+      .contains('Parsed')
+      .click();
+
+    cy.contains('.summary .content', /[0-9.]+(k|m|g)?b/i, { timeout: 220000 });
+
+    cy.contains('mat-grid-tile', /^.+\.js/);
 
     cy.get('button')
       .contains('Cancel')

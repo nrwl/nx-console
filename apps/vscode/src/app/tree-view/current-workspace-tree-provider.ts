@@ -32,6 +32,7 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
       settings,
       {
         path: workspacePath,
+        pinnedProjectNames: [],
         name
       },
       extensionPath

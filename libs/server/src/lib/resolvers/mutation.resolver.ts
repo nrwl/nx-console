@@ -213,7 +213,7 @@ export class MutationResolver {
   async showItemInFolder(@Args('item') item: string) {
     if (item) {
       const opn = require('opn');
-      opn(item);
+      opn(item).catch((err: any) => console.error(err));
       return { result: true };
     } else {
       return { result: false };

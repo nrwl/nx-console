@@ -1,9 +1,7 @@
 import { execSync } from 'child_process';
-import { existsSync, stat, statSync, readdirSync, readFileSync } from 'fs';
+import { existsSync, statSync, readdirSync, readFileSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
-import { bindNodeCallback, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import * as stripJsonComments from 'strip-json-comments';
 
 export interface SchematicDefaults {
@@ -159,11 +157,6 @@ export function fileExistsSync(filePath: string): boolean {
   }
 }
 
-const observableStat = bindNodeCallback(stat);
-export function fileExists(filePath: string): Observable<boolean> {
-  return observableStat(filePath).pipe(map(s => s.isFile()));
-}
-
 function readAndParseJson(fullFilePath: string): any {
   return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
 }
@@ -255,10 +248,6 @@ function hasSource(prop: any): any {
 
 export function filterByName<T>(t: T[], args: { name?: string | null }): T[] {
   return args.name ? t.filter((s: any) => s.name === args.name) : t;
-}
-
-export function filterById<T>(t: T[], args: { id?: string }): T[] {
-  return args.id ? t.filter((s: any) => s.id === args.id) : t;
 }
 
 export function normalizePath(value: string): string {

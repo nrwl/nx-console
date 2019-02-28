@@ -1,75 +1,168 @@
 @import '~@angular/material/theming';
+@import '../../../../ui/src/lib/variables';
 @include mat-core();
 
-$hint-palette: mat-palette($mat-blue-gray, 800);
-$action-palette: mat-palette($mat-blue);
+$hint-palette: mat-palette($mat-gray, 500);
 $info-palette: mat-palette($mat-light-blue);
 $failure-palette: mat-palette($mat-red);
 $success-palette: mat-palette($mat-green);
-$gray-palette: mat-palette($mat-gray, 200);
+$build-icon-size: 90px;
 
-.container {
-  height: 100%;
-
-  .mat-progress-spinner {
-    display: inline-block;
-    margin: 0 4px;
-  }
-
-  h3 mat-icon {
-    margin: 0 4px;
-  }
-
-  a mat-icon {
-    cursor: pointer;
-  }
-
-  a {
-    color: mat-color($action-palette);
-    cursor: pointer;
-  }
-
-  pre {
-    font-family: 'Roboto Mono';
-    background-color: mat-color($gray-palette);
-    width: 100%;
-    overflow-x: auto;
-    padding: 10px;
-    box-sizing: border-box;
-    white-space: pre-wrap;
-  }
-}
-
-.inner-container {
-  height: 100%;
-  overflow: auto;
-
-  mat-icon.info {
-    color: mat-color($info-palette);
-  }
-}
-
-.status-build_success mat-icon {
+mat-icon.success {
   color: mat-color($success-palette);
 }
 
-.status-build_failure mat-icon {
+mat-icon.failure {
   color: mat-color($failure-palette);
 }
 
-.status-content {
-  width: 100%;
+mat-icon.pending {
+  color: mat-color($hint-palette);
+}
+
+mat-icon.large {
+  margin: 20px auto;
+  display: block;
+  height: $icon-size-large;
+  width: $icon-size-large;
+  font-size: $icon-size-large;
+}
+
+small {
+  color: mat-color($hint-palette);
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.container {
+  overflow: auto;
+  height: 100%;
+}
+
+.grid {
+  display: grid;
+  box-sizing: border-box;
+  grid-gap: 20px;
+}
+
+.grid-3-columns {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4-columns {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.row {
+  margin: 20px;
+}
+// Prevent collapsed row from taking up extra margins.
+.row.collapse {
+  margin-bottom: -20px;
+}
+
+.header {
+  margin-bottom: 20px;
 
   mat-icon {
-    color: mat-color($hint-palette);
+    font-size: 18px;
+  }
+
+  .actions {
+    width: 200px;
   }
 }
 
-.build-error {
-  color: mat-color($failure-palette);
+.title {
+  text-align: center;
+  font-weight: 100;
+  font-size: 14px;
+  color: mat-color($hint-palette);
 }
 
-.hint {
-  color: mat-color($hint-palette);
-  font-size: 12px;
+.content {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 100;
+}
+
+.summary {
+  .title {
+    font-size: 18px;
+  }
+  .content {
+    font-size: 24px;
+
+    small {
+      font-size: 14px;
+    }
+  }
+}
+
+.build-status {
+  width: 20vw;
+  max-width: 200px;
+  min-width: 100px;
+  text-align: center;
+
+  .status-icon-container mat-icon {
+    margin: 0 auto;
+    font-size: $build-icon-size;
+    display: block;
+    height: $build-icon-size;
+    width: $build-icon-size;
+  }
+
+  .build-status-content {
+    margin-top: 20px;
+  }
+}
+
+.problem-list {
+  white-space: pre;
+  width: 100%;
+  overflow-x: auto;
+
+  .problem-list-item {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    font-weight: 100;
+    color: mat-color($failure-palette);
+  }
+}
+
+.asset-name {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+@media (max-width: $smallScreen) {
+  .title {
+    text-align: center;
+    font-weight: 100;
+    font-size: 12px;
+    color: mat-color($hint-palette);
+  }
+
+  .content {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 100;
+  }
+
+  .summary {
+    .title {
+      font-size: 14px;
+    }
+    .content {
+      font-size: 20px;
+    }
+  }
 }
