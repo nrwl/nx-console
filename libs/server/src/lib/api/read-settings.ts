@@ -6,12 +6,20 @@ import { platform } from 'os';
 /* tslint:disable */
 export function readSettings(store: Store): Settings {
   const settings: Settings = store.get('settings') || {};
+
   if (settings.canCollectData === undefined) {
     settings.canCollectData = store.get('canCollectData', false);
   }
   if (settings.recent === undefined) {
     settings.recent = [];
   }
+
+  settings.recent.forEach(t => {
+    if (t.pinnedProjectNames === undefined) {
+      t.pinnedProjectNames = [];
+    }
+  });
+
   if (settings.installNodeManually === undefined) {
     settings.installNodeManually = false;
   }
