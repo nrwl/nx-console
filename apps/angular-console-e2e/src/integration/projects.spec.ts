@@ -59,7 +59,7 @@ describe('Projects', () => {
     cy.contains('angular-console-projects button', 'Extract-i18n')
       .first()
       .click();
-    cy.contains('div.context-title', 'ng extract-i18n proj');
+    cy.contains('div.context-title', 'ng run proj:extract-i18n');
     cy.get('.exit-action').click();
     cy.contains('angular-console-projects button', 'Test')
       .first()
