@@ -47,6 +47,8 @@ export class FlagsComponent {
   @Input() configurations: { name: string }[];
   @Input() prefix: string[];
   @Input() init: { [k: string]: any };
+  @Input() runSyntax = false;
+
   @Input()
   get fields() {
     return this._fields;
@@ -127,18 +129,35 @@ export class FlagsComponent {
   }
 
   private emitNext(value: { [p: string]: any }) {
-    const configuration =
-      this.configurations && value.configurations
-        ? [`--configuration=${value.configurations}`]
-        : [];
-    this.value.next({
-      commands: [
-        ...this.prefix,
-        ...configuration,
-        ...this.serializer.serializeArgs(value, this._fields)
-      ],
-      valid: this.formGroup.valid
-    });
+    if (this.runSyntax) {
+      const configuration =
+        this.configurations && value.configurations
+          ? `:${value.configurations}`
+          : ``;
+
+      this.value.next({
+        commands: [
+          this.prefix[0],
+          `${this.prefix[1]}${configuration}`,
+          ...this.serializer.serializeArgs(value, this._fields)
+        ],
+        valid: this.formGroup.valid
+      });
+    } else {
+      const configuration =
+        this.configurations && value.configurations
+          ? [`--configuration=${value.configurations}`]
+          : [];
+      this.value.next({
+        commands: [
+          ...this.prefix,
+          ...configuration,
+          ...this.serializer.serializeArgs(value, this._fields)
+        ],
+        valid: this.formGroup.valid
+      });
+    }
+
     const e = this.elementRef.nativeElement;
     if (e.scrollTo) {
       e.scrollTo({

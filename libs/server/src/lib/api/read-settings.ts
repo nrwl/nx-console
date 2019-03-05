@@ -5,6 +5,7 @@ import { platform } from 'os';
 
 export function readSettings(store: Store): Settings {
   const settings: Settings = store.get('settings') || {};
+
   // tslint:disable-next-line
   if (settings.canCollectData === undefined) {
     settings.canCollectData = store.get('canCollectData', false);
@@ -13,6 +14,14 @@ export function readSettings(store: Store): Settings {
   if (settings.recent === undefined) {
     settings.recent = [];
   }
+
+  settings.recent.forEach(t => {
+    // tslint:disable-next-line
+    if (t.pinnedProjectNames === undefined) {
+      t.pinnedProjectNames = [];
+    }
+  });
+
   if (settings.installNodeManually === undefined) {
     settings.installNodeManually = false;
   }

@@ -1,6 +1,6 @@
 const cp = require('child_process');
 const shell = require('shelljs');
-const tmp = shell.tempdir();
+const tmp = require('tmp').dirSync().name;
 const path = require('path');
 const fs = require('fs');
 
@@ -51,6 +51,17 @@ const karma = fs
 fs.writeFileSync(
   path.join(tmp, 'proj', 'src', 'karma.conf.js'),
   karma.replace('Chrome', 'ChromeHeadless')
+);
+
+// add a custom task that will invoke lint
+const parsedAngularJson = JSON.parse(
+  fs.readFileSync(path.join(tmp, 'proj', 'angular.json')).toString()
+);
+const configForProj = parsedAngularJson.projects.proj;
+configForProj.architect.custom = configForProj.architect.lint;
+fs.writeFileSync(
+  path.join(tmp, 'proj', 'angular.json'),
+  JSON.stringify(parsedAngularJson, null, 2)
 );
 
 shell.mv(path.join(tmp, 'proj'), './tmp/proj');
