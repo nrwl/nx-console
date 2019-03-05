@@ -7,7 +7,6 @@ import {
 } from './generated/graphql';
 
 export { Settings as SettingsModels } from './generated/graphql';
-import { Project } from '@angular-console/schema';
 
 export function toggleItemInArray<T>(array: T[], item: T): T[] {
   return array.includes(item)
@@ -62,7 +61,7 @@ export class Settings {
     this.store({ ...this.settings, recent: [...r, favorite] });
   }
 
-  toggleProjectPin(path: string, project: Project): void {
+  toggleProjectPin(path: string, project: { name: string }): void {
     const workspace = this.getWorkspace(path);
     if (!workspace) {
       console.warn('No workspace found at path: ', path);

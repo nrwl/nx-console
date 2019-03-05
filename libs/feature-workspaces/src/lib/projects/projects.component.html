@@ -17,7 +17,7 @@
     {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
   </mat-icon>
 </div>
-<mat-list>
+<mat-list *ngIf="(filteredProjects$ | async) as projects">
   <cdk-virtual-scroll-viewport
     [style.height]="viewportHeight$ | async"
     itemSize="88px"
@@ -84,12 +84,35 @@
             fxLayoutAlign="end center"
           >
             <button
-              *ngFor="let a of p.actions"
+              *ngFor="let a of ((recentActions$ | async) || {})[p.name]"
               mat-stroked-button
+              (click)="onActionTriggered(workspacePath, p, a)"
               [routerLink]="a.link"
             >
-              {{ a.actionDescription }}
+              {{ a.actionDescription | titlecase }}
             </button>
+            <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+            <mat-menu #actionsMenu>
+              <ng-container *ngFor="let a of p.actions">
+                <ng-container *ngIf="!a.link">
+                  <mat-divider></mat-divider>
+                  <span mat-menu-item [disabled]="true">
+                    {{ a.actionDescription }}
+                  </span>
+                  <mat-divider></mat-divider>
+                </ng-container>
+                <button
+                  mat-menu-item
+                  [routerLink]="a.link"
+                  *ngIf="a.link"
+                  (click)="onActionTriggered(workspacePath, p, a)"
+                >
+                  {{ a.actionDescription | titlecase }}
+                </button>
+              </ng-container>
+            </mat-menu>
           </div>
         </mat-list-item>
         <mat-divider></mat-divider>

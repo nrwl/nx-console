@@ -25,15 +25,18 @@ describe('Projects', () => {
   });
 
   it('checks that hot actions work', () => {
-    elementContainsText('button', 'Generate Component').click();
-    elementContainsText('div.context-title', '@schematics/angular - component');
+    cy.contains('angular-console-projects button', 'Component').should(
+      'not.exist'
+    );
+
+    cy.contains('mat-icon', 'more_horiz')
+      .first()
+      .click();
+    cy.contains('.cdk-overlay-pane button', 'Component').click();
+    cy.contains('div.context-title', '@schematics/angular - component');
     cy.get('input[name="project"]').should(($p: any) => {
       expect($p[0].value).to.equal('proj');
     });
-  });
-
-  it('provides navigation to and from command runners', () => {
-    cy.contains('Generate Component').click();
     cy.get('.exit-action').click();
 
     projectNames($p => {
@@ -41,6 +44,38 @@ describe('Projects', () => {
       expect(texts($p)[0]).to.contain('proj');
       expect(texts($p)[1]).to.contain('proj-e2e');
     });
+    cy.contains('angular-console-projects button', 'Component');
+
+    cy.contains('angular-console-projects button', 'Build')
+      .first()
+      .click();
+    cy.contains('div.context-title', 'ng build proj');
+    cy.get('.exit-action').click();
+    cy.contains('angular-console-projects button', 'Serve')
+      .first()
+      .click();
+    cy.contains('div.context-title', 'ng serve proj');
+    cy.get('.exit-action').click();
+    cy.contains('angular-console-projects button', 'Extract-i18n')
+      .first()
+      .click();
+    cy.contains('div.context-title', 'ng run proj:extract-i18n');
+    cy.get('.exit-action').click();
+    cy.contains('angular-console-projects button', 'Test')
+      .first()
+      .click();
+    cy.contains('div.context-title', 'ng test proj');
+    cy.get('.exit-action').click();
+    cy.contains('mat-icon', 'more_horiz')
+      .first()
+      .click();
+    cy.contains('.cdk-overlay-pane button', 'Lint').click();
+    cy.contains('div.context-title', 'ng lint proj');
+    cy.get('.exit-action').click();
+
+    cy.contains('angular-console-projects button', 'Component').should(
+      'not.exist'
+    );
   });
   it('should pin and unpin projects', () => {
     cy.get('.favorite-icon.favorited').should('not.exist');

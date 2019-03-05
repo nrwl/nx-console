@@ -12,6 +12,10 @@ import { SelectDirectory } from '../types';
 import { platform } from 'os';
 import { FileUtils } from '../utils/file-utils';
 import { readJsonFile } from '../utils/utils';
+import {
+  storeTriggeredAction,
+  readRecentActions
+} from '../api/read-recent-actions';
 
 @Resolver()
 export class MutationResolver {
@@ -288,6 +292,18 @@ export class MutationResolver {
   updateSettings(@Args('data') data: string) {
     storeSettings(this.store, JSON.parse(data));
     return readSettings(this.store);
+  }
+
+  @Mutation()
+  saveRecentAction(
+    @Args('workspacePath') workspacePath: string,
+    @Args('projectName') projectName: string,
+    @Args('actionName') actionName: string,
+    @Args('schematicName') schematicName: string
+  ) {
+    const key = `${workspacePath}/${projectName}`;
+    storeTriggeredAction(this.store, key, actionName, schematicName);
+    return readRecentActions(this.store, key);
   }
 
   @Mutation()
