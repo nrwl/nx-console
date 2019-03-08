@@ -24,26 +24,16 @@ mat-form-field {
   margin-bottom: 0;
 }
 
-@media (max-width: $largeScreen) {
-  .container {
-    width: 66.66%;
-    max-width: 810px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
+.container {
+  margin-left: auto;
+  margin-right: auto;
 
-@media (max-width: 1260px) {
-  .container {
-    width: 840px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
+  // Set the max-width to an absoulte value to avoid a weird layout on even wider screens
+  max-width: 840px;
 
-@media (max-width: $smallScreen) {
-  .container {
+  @media (max-width: $smallScreen) {
     width: auto;
+    max-width: initial;
     margin-left: 40px;
     margin-right: 40px;
   }
