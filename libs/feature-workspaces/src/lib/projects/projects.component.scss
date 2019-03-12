@@ -12,6 +12,34 @@
   color: rgba(0, 0, 0, 0.54);
 }
 
+mat-list-item mat-icon {
+  cursor: pointer;
+  color: rgb(128, 128, 128);
+  transform: scale(1);
+  transition: all 0.1s ease-in-out;
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.87);
+    transform: scale(1.05);
+  }
+
+  &.favorite-icon:hover {
+    color: #a53339;
+  }
+
+  &.favorited {
+    color: #bb3a3f;
+  }
+}
+
+.field-viewport {
+  position: relative;
+}
+
+mat-list {
+  padding: 0 !important;
+}
+
 .project-card {
   padding: 16px !important;
   padding-bottom: 24px !important;
@@ -88,6 +116,8 @@
   height: 55px;
   min-height: 55px;
   max-height: 55px;
+  position: relative;
+  z-index: 2;
 
   input {
     background: none;
