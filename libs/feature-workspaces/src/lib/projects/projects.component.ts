@@ -145,10 +145,19 @@ export class ProjectsComponent implements OnInit {
         projects.filter((project: any) =>
           project.name.includes(lowerCaseFilterValue)
         )
-      )
+      ),
+      map(projects => {
+        const pinned = projects.filter(project =>
+          this.pinnedProjectNames.includes(project.name)
+        );
+        const unpinned = projects.filter(
+          project => !this.pinnedProjectNames.includes(project.name)
+        );
+        return [...pinned, ...unpinned];
+      })
     );
 
-    const MAX_RECENT_ACTIONS = 5;
+    const MAX_RECENT_ACTIONS = 4;
     this.recentActions$ = this.projects$.pipe(
       map(projects => {
         return projects.reduce<ProjectActionMap>(
@@ -168,27 +177,19 @@ export class ProjectsComponent implements OnInit {
                 (action: ProjectAction) =>
                   action.link !== undefined && !recentActions.includes(action)
               )
-            ].slice(0, MAX_RECENT_ACTIONS);
+            ]
+              .slice(0, MAX_RECENT_ACTIONS)
+              .reverse();
             return projectActions;
           },
           {}
         );
       })
     );
-    this.filteredPinnedProjects$ = this.filteredProjects$.pipe(
-      map(projects =>
-        projects.filter(project =>
-          this.pinnedProjectNames.includes(project.name)
-        )
-      )
-    );
-    this.filteredUnpinnedProjects$ = this.filteredProjects$.pipe(
-      map(projects =>
-        projects.filter(
-          project => !this.pinnedProjectNames.includes(project.name)
-        )
-      )
-    );
+  }
+
+  trackByProjectRoot(_: number, project: Workspace.Projects) {
+    return project.root;
   }
 
   onActionTriggered(

@@ -61,11 +61,7 @@ describe('Projects', () => {
       .click();
     cy.contains('div.context-title', 'ng run proj:extract-i18n');
     cy.get('.exit-action').click();
-    cy.contains('angular-console-projects button', 'Test')
-      .first()
-      .click();
-    cy.contains('div.context-title', 'ng test proj');
-    cy.get('.exit-action').click();
+
     cy.contains('mat-icon', 'more_horiz')
       .first()
       .click();
@@ -78,16 +74,16 @@ describe('Projects', () => {
     );
   });
   it('should pin and unpin projects', () => {
-    cy.get('.favorite-icon.favorited').should('not.exist');
-    cy.get('.favorite-icon:not(.favorited)')
+    cy.get('mat-icon.favorite-icon.favorited').should('not.exist');
+    cy.get('mat-icon.favorite-icon:not(.favorited)')
       .should('have.length', 2)
       .first()
       .click();
-    cy.get('.favorite-icon:not(.favorited)').should('have.length', 1);
-    cy.get('.favorite-icon.favorited')
+    cy.get('mat-icon.favorite-icon:not(.favorited)').should('have.length', 1);
+    cy.get('mat-icon.favorite-icon.favorited')
       .should('have.length', 1)
       .click();
-    cy.get('.favorite-icon.favorited').should('not.exist');
-    cy.get('.favorite-icon:not(.favorited)').should('have.length', 2);
+    cy.get('mat-icon.favorite-icon.favorited').should('not.exist');
+    cy.get('mat-icon.favorite-icon:not(.favorited)').should('have.length', 2);
   });
 });
