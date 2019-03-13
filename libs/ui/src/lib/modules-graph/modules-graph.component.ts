@@ -14,14 +14,17 @@ import { FormatFileSizePipe } from '../format-file-size.pipe';
 
 interface Chunk {
   id: string;
-  name: string;
+  name: undefined | string;
   path: string;
+  file: string;
 }
 
 // Mapping of step names to colors.
 const Colors: any = {
+  apps: '#d15d89',
+  libs: '#e4bb43',
   src: '#4663d1',
-  node_modules: '#e4bb43',
+  node_modules: '#51d140',
   other: '#8e8e8e'
 };
 
@@ -48,14 +51,12 @@ export class ModulesGraphComponent implements OnInit {
   @Input()
   set data(data: any) {
     this._data = data;
-    this.updateHierachy();
+    this.updateHierarchy();
     this.render();
   }
 
   @ViewChild('svg') private readonly svgEl: ElementRef | null = null;
   @ViewChild('container') private readonly container: ElementRef | null = null;
-  @ViewChild('svgContainer')
-  private readonly svgContainer: ElementRef | null = null;
 
   private width = MIN_WIDTH;
   private height = MIN_HEIGHT;
@@ -108,7 +109,7 @@ export class ModulesGraphComponent implements OnInit {
   showDefaultExplanation() {
     select(this.fileSizeEl).text(this.formatFileSize.transform(this.totalSize));
     select(this.percentageEl).text('100%');
-    select(this.moduleNameEl).text(this.chunk.name);
+    select(this.moduleNameEl).text(this.chunk.name || this.chunk.file);
   }
 
   createVisualization(json: object) {
@@ -171,21 +172,14 @@ export class ModulesGraphComponent implements OnInit {
       .attr('stroke', 'white')
       .attr('stroke-width', 1)
       .style('opacity', INACTIVE_OPACITY)
-      .on('mouseover', this.handleMouseover);
-
-    // Add the handleMouseleave handler to the bounding circle.
-    if (this.svgContainer) {
-      select(this.svgContainer.nativeElement.querySelector('svg')).on(
-        'mouseleave',
-        this.handleMouseleave
-      );
-    }
+      .on('mouseover', this.handleMouseover)
+      .on('mouseleave', this.handleMouseleave);
 
     // Get total size of the tree = value of root node from partition.
     this.totalSize = path.datum().value;
   }
 
-  updateHierachy() {
+  updateHierarchy() {
     if (!this._data) {
       return null;
     }
@@ -202,7 +196,7 @@ export class ModulesGraphComponent implements OnInit {
         // e.g. if this is a header row
         continue;
       }
-      const parts = sequence.split('/');
+      const parts = sequence.split(/[/\\]/);
       let currentNode = root;
       const initialSegment = parts[0];
 
@@ -238,7 +232,6 @@ export class ModulesGraphComponent implements OnInit {
   }
 
   handleResize() {
-    console.log('resize');
     this.updateDimensions();
     this.render();
   }
@@ -259,7 +252,6 @@ export class ModulesGraphComponent implements OnInit {
     sequenceArray.shift(); // remove root node from the array
 
     selectAll('path').style('opacity', INACTIVE_OPACITY);
-
     this.vis
       .selectAll('path')
       .filter((node: any) => sequenceArray.indexOf(node) >= 0)

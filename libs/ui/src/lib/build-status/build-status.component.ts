@@ -224,7 +224,7 @@ export class BuildStatusComponent {
       } else if (status.buildStatus === 'build_success') {
         return 'check_circle';
       } else if (status.buildStatus === 'build_failure') {
-        return 'error';
+        return status.stats ? 'check_circle' : 'error';
       } else {
         return 'build';
       }
@@ -238,7 +238,7 @@ export class BuildStatusComponent {
       } else if (status.buildStatus === 'build_success') {
         return 'success';
       } else if (status.buildStatus === 'build_failure') {
-        return 'failure';
+        return status.stats ? 'success' : 'failure';
       } else {
         return 'pending';
       }
@@ -344,7 +344,6 @@ export class BuildStatusComponent {
           return `Completed`;
         }
         case 'build_failure': {
-          // TODO(jack): There's a bug in vscode-only where the build is marked as a failure even though it succeeded.
           return status.stats ? 'Completed' : 'Failed';
         }
       }
