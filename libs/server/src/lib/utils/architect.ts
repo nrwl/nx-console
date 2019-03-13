@@ -26,16 +26,13 @@ export function normalizeCommands(cwd: string, cmds: string[]): string[] {
   const builder = getProjectArchitect(project, operationName, angularJson)
     .builder;
 
-  // Extend the karma configuration so we can get the output needed.
+  // Make sure we use progress reporter so that we can parse the output consistently.
   if (SUPPORTED_KARMA_TEST_BUILDERS.includes(builder)) {
     const projectRoot = angularJson.projects[cmds[1]].root;
     const karmaConfigPath = join(cwd, projectRoot, 'karma.conf.js');
-    if (existsSync(karmaConfigPath)) {
-      process.env.ANGULAR_CONSOLE_ORIGINAL_KARMA_CONFIG_PATH = karmaConfigPath;
-      return cmds.concat([
-        '--karma-config',
-        join(__dirname, 'assets', 'karma-angular-console.config.js')
-      ]);
+    const isUsingKarma = existsSync(karmaConfigPath);
+    if (isUsingKarma) {
+      return cmds.concat(['--reporters', 'progress']);
     }
   }
 
