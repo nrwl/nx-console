@@ -267,7 +267,7 @@ describe('Tasks', () => {
 
     cy.contains('.summary .content', 'Started', { timeout: 220000 });
 
-    cy.get('.header .mat-select-trigger').click({ force: true });
+    cy.get('.summary .header .mat-select-trigger').click({ force: true });
 
     cy.get('.mat-option-text')
       .contains('Parsed')

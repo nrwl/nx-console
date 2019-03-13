@@ -33,7 +33,7 @@ describe('stats utils', () => {
 
       expect(result.chunks[0].file).toEqual('runtime.a5dd35324ddfd942bef1.js');
 
-      expect(result.modulesByChunkId.length).toEqual(5);
+      expect(Object.keys(result.modulesByChunkId).length).toEqual(5);
       expect(result.modulesByChunkId[0].length).toEqual(0);
       expect(result.modulesByChunkId[1].length).toEqual(234);
 

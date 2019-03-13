@@ -8,10 +8,13 @@ export const SUPPORTED_KARMA_TEST_BUILDERS = [
 ];
 export const SUPPORTED_NG_BUILD_BUILDERS = [
   '@angular-devkit/build-angular:dev-server',
-  '@angular-devkit/build-angular:browser'
+  '@angular-devkit/build-angular:browser',
+  '@nrwl/builders:web-build',
+  '@nrwl/builders:web-dev-server'
 ];
 export const SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS = [
-  '@angular-devkit/build-angular:browser'
+  '@angular-devkit/build-angular:browser',
+  '@nrwl/builders:web-build'
 ];
 
 // For some operations we need to add additional flags or configuration

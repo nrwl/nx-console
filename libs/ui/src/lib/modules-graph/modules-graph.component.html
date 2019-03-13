@@ -1,0 +1,15 @@
+<div #container class="container">
+  <div class="explanation">
+    <p>
+      <span class="module-name"></span>
+    </p>
+    <p><span class="file-size"></span> (<span class="percentage"></span>)</p>
+  </div>
+  <div #svgContainer class="svg-container">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      #svg
+      (window:resize)="handleResize()"
+    ></svg>
+  </div>
+</div>
