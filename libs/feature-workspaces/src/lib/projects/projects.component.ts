@@ -264,7 +264,7 @@ function createLinksForCollection(
     .map(schematic =>
       createLinkForSchematic(
         project,
-        '@schematics/angular',
+        collection.name,
         schematic ? schematic.name : '',
         schematic ? schematic.name : ''
       )
