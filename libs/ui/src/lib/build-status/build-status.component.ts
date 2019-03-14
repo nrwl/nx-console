@@ -23,8 +23,8 @@ interface Stats {
   modulesByChunkId: any;
   summary: {
     assets: Summary;
-    modules: Summary;
-    dependencies: Summary;
+    modules: number;
+    dependencies: number;
   };
 }
 
@@ -80,6 +80,7 @@ export class BuildStatusComponent {
 
   // This status is set at a polling interval
   private readonly allStatus$: Subject<BuildStatus> = new ReplaySubject(1);
+
   // So we double-check that it indeed does have meaningful changes
   readonly status$ = this.allStatus$.pipe(
     distinctUntilChanged(
@@ -91,32 +92,9 @@ export class BuildStatusComponent {
         a.time === b.time
     )
   );
-
-  readonly currentSizeGroup$: Subject<SizeGroup> = new BehaviorSubject(
-    SizeGroup.Gzipped
-  );
-
   readonly currentChunkId$: Subject<void | string> = new BehaviorSubject<
     void | string
   >(undefined);
-
-  readonly sizeGroupHelpText$ = combineLatest(
-    this.currentSizeGroup$,
-    this.status$
-  ).pipe(
-    map(([c, s]) => {
-      switch (c) {
-        case SizeGroup.Gzipped:
-          return s && s.serverHost
-            ? 'Gzipped stats not available for serve task'
-            : 'Display the size of gzipped files';
-        case SizeGroup.Parsed:
-          return 'Display the size of files before gzip';
-        default:
-          return '';
-      }
-    })
-  );
 
   readonly errors$ = this.status$.pipe(
     map(status => {
@@ -153,53 +131,21 @@ export class BuildStatusComponent {
     map(status => (status && status.stats ? status.stats.summary : null))
   );
 
-  readonly summaryAssetsSize$ = combineLatest(
-    this.summary$,
-    this.currentSizeGroup$
-  ).pipe(
-    map(([summary, sizeGroup]) => (summary ? summary.assets[sizeGroup] : null))
-  );
-
-  readonly summaryModulesSize$ = combineLatest(
-    this.summary$,
-    this.currentSizeGroup$
-  ).pipe(
-    map(([summary, sizeGroup]) => (summary ? summary.modules[sizeGroup] : null))
-  );
-
-  readonly summaryDependenciesSize$ = combineLatest(
-    this.summary$,
-    this.currentSizeGroup$
-  ).pipe(
-    map(([summary, sizeGroup]) =>
-      summary ? summary.dependencies[sizeGroup] : null
-    )
-  );
-
   readonly openableOutputPath$ = this.status$.pipe(
     map(status =>
       status.buildStatus === 'build_success' ? status.outputPath : null
     )
   );
 
-  readonly dependencyPercentage$ = combineLatest(
-    this.status$,
-    this.currentSizeGroup$
-  ).pipe(
-    map(([status, currentSizeGroup]) => {
+  readonly dependencyPercentage$ = this.status$.pipe(
+    map(status => {
       if (status && status.stats) {
         const { dependencies, modules } = status.stats.summary;
-        const depSize = dependencies[currentSizeGroup];
-        const moduleSize = modules[currentSizeGroup];
-        return moduleSize > 0 ? ((depSize / moduleSize) * 100).toFixed(1) : '0';
+        return modules > 0 ? ((dependencies / modules) * 100).toFixed(1) : '0';
       } else {
         return '0';
       }
     })
-  );
-
-  readonly sizeGroupLabel$ = this.currentSizeGroup$.pipe(
-    map(s => this.getSizeGroupLabel(s))
   );
 
   readonly serverUrl$ = this.status$.pipe(
@@ -278,17 +224,16 @@ export class BuildStatusComponent {
 
   readonly currentChunk$ = combineLatest(
     this.chunks$,
-    this.currentChunkId$,
-    this.currentSizeGroup$
+    this.currentChunkId$
   ).pipe(
-    map(([chunks, id, sizeGroup]) => {
+    map(([chunks, id]) => {
       const c = chunks.find(x => x.id === id);
       if (c) {
         return {
           id: c.id,
           name: c.name,
           file: c.file,
-          size: c.sizes[sizeGroup]
+          size: c.size
         };
       } else {
         return null;
@@ -312,15 +257,12 @@ export class BuildStatusComponent {
     })
   );
 
-  readonly viewingModules$ = combineLatest(
-    this.modulesForCurrentChunk$,
-    this.currentSizeGroup$
-  ).pipe(
-    map(([modules, sizeGroup]) => {
+  readonly viewingModules$ = this.modulesForCurrentChunk$.pipe(
+    map(modules => {
       if (!modules) {
         return null;
       }
-      return modules.map((m: any) => [m.name, m.sizes[sizeGroup]]);
+      return modules.map((m: any) => [m.file, m.size]);
     })
   );
 
@@ -350,13 +292,10 @@ export class BuildStatusComponent {
     })
   );
 
-  readonly networkSpeeds$ = combineLatest(
-    this.summary$,
-    this.currentSizeGroup$
-  ).pipe(
-    map(([summary, currentSizeGroup]) => {
+  readonly networkSpeeds$ = this.summary$.pipe(
+    map(summary => {
       if (summary) {
-        const size = summary.assets[currentSizeGroup];
+        const size = summary.assets.gzipped;
         const sizeInMB = size / 1000 / 1000;
         return Object.keys(SPEEDS).map(k => {
           const speed = SPEEDS[k];
@@ -377,15 +316,12 @@ export class BuildStatusComponent {
     })
   );
 
-  readonly displayAssets$ = combineLatest(
-    this.status$,
-    this.currentSizeGroup$
-  ).pipe(
-    map(([status, currentSizeGroup]) => {
+  readonly displayAssets$ = this.status$.pipe(
+    map(status => {
       if (status && status.stats) {
         const sorted = status.stats.assets.sort((a, b) => {
-          const aSize = a.sizes[currentSizeGroup];
-          const bSize = b.sizes[currentSizeGroup];
+          const aSize = a.sizes.gzipped;
+          const bSize = b.sizes.gzipped;
           if (aSize > bSize) {
             return -1;
           } else if (aSize < bSize) {
@@ -396,10 +332,10 @@ export class BuildStatusComponent {
         });
 
         return sorted.map(asset => {
-          const size = asset.sizes[currentSizeGroup];
+          const size = asset.sizes.gzipped;
           return {
             ...asset,
-            size: size,
+            sizes: asset.sizes,
             speeds: DISPLAY_ASSET_SPEEDS.map(key => {
               const speed = SPEEDS[key];
               const sizeInMB = size / 1000 / 1000;
@@ -407,7 +343,7 @@ export class BuildStatusComponent {
               const speedInMBps = speed.mbps / 8;
               return {
                 key,
-                sizeGroup: GROUP_LABELS[currentSizeGroup],
+                sizeGroup: 'Gzipped',
                 downloadTime: sizeInMB
                   ? `${(sizeInMB / speedInMBps + rttInSeconds).toFixed(2)}s`
                   : '–'
@@ -456,10 +392,6 @@ export class BuildStatusComponent {
 
   showItemInFolder(item: string) {
     this.showItemInFolderService.showItem(item);
-  }
-
-  handleSizeGroupSelection(event: MatSelectChange) {
-    this.currentSizeGroup$.next(event.value);
   }
 
   handleChunkFileSelection(event: MatSelectChange) {

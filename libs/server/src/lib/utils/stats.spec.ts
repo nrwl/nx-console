@@ -1,3 +1,8 @@
+(global as any).__non_webpack_require__ = () => {
+  return () => {
+    throw new Error();
+  };
+};
 import { parseStats, calculateStatsFromChunks } from './stats';
 import { join } from 'path';
 
@@ -31,24 +36,10 @@ describe('stats utils', () => {
         })
       );
 
-      expect(result.chunks[0].file).toEqual('runtime.a5dd35324ddfd942bef1.js');
-
-      expect(Object.keys(result.modulesByChunkId).length).toEqual(5);
-      expect(result.modulesByChunkId[0].length).toEqual(0);
-      expect(result.modulesByChunkId[1].length).toEqual(234);
+      expect(result.chunks[0].file).toEqual('runtime.b57bf819d5bdce77f1c7.js');
 
       expect(result.summary.assets.gzipped).toBeDefined();
       expect(result.summary.assets.parsed).toBeDefined();
-      expect(result.summary.modules.gzipped).toBeDefined();
-      expect(result.summary.modules.parsed).toBeDefined();
-      expect(result.summary.dependencies.gzipped).toBeDefined();
-      expect(result.summary.dependencies.parsed).toBeDefined();
-      expect(
-        result.summary.modules.parsed >= result.summary.dependencies.parsed
-      ).toBe(true);
-      expect(
-        result.summary.modules.gzipped >= result.summary.dependencies.gzipped
-      ).toBe(true);
     });
   });
 
@@ -69,9 +60,7 @@ describe('stats utils', () => {
       expect(results.summary.assets.parsed).toEqual(
         1000000 + 200000 + 5000 + 500
       );
-      expect(results.summary.modules.parsed).toEqual(
-        1000000 + 200000 + 5000 + 500
-      );
+      expect(results.summary.modules).toEqual(1000000 + 200000 + 5000 + 500);
     });
   });
 });

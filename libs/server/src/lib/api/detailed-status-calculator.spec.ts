@@ -1,3 +1,8 @@
+(global as any).__non_webpack_require__ = () => {
+  return () => {
+    throw new Error();
+  };
+};
 import {
   StatusType,
   BuildDetailedStatusCalculator,

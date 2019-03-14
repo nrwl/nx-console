@@ -12,9 +12,12 @@ export const SUPPORTED_NG_BUILD_BUILDERS = [
   '@nrwl/builders:web-build',
   '@nrwl/builders:web-dev-server'
 ];
-export const SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS = [
+export const SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS_AND_SOURCE_MAP = [
   '@angular-devkit/build-angular:browser',
   '@nrwl/builders:web-build'
+];
+export const SUPPORTED_NG_BUILD_BUILDERS_WITH_VENDOR_SOURCE_MAP = [
+  '@angular-devkit/build-angular:browser'
 ];
 
 // For some operations we need to add additional flags or configuration
@@ -26,21 +29,28 @@ export function normalizeCommands(cwd: string, cmds: string[]): string[] {
   const builder = getProjectArchitect(project, operationName, angularJson)
     .builder;
 
+  let normalized = cmds;
+
   // Make sure we use progress reporter so that we can parse the output consistently.
   if (SUPPORTED_KARMA_TEST_BUILDERS.includes(builder)) {
     const projectRoot = angularJson.projects[cmds[1]].root;
     const karmaConfigPath = join(cwd, projectRoot, 'karma.conf.js');
     const isUsingKarma = existsSync(karmaConfigPath);
     if (isUsingKarma) {
-      return cmds.concat(['--reporters', 'progress']);
+      normalized = cmds.concat(['--reporters', 'progress']);
     }
   }
 
   // Make sure we generate stats data so we can parse it later.
-  if (SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS.includes(builder)) {
-    return cmds.concat(['--stats-json']);
+  if (SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS_AND_SOURCE_MAP.includes(builder)) {
+    normalized = normalized.concat(['--stats-json', '--source-map']);
   }
-  return cmds;
+  // This option is deprecated in 7.2, so we need another way to get vendor source maps.
+  if (SUPPORTED_NG_BUILD_BUILDERS_WITH_VENDOR_SOURCE_MAP.includes(builder)) {
+    normalized = normalized.concat(['--vendor-source-map']);
+  }
+
+  return normalized;
 }
 
 export function getProjectArchitect(
