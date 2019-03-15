@@ -12,12 +12,9 @@ export const SUPPORTED_NG_BUILD_BUILDERS = [
   '@nrwl/builders:web-build',
   '@nrwl/builders:web-dev-server'
 ];
-export const SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS_AND_SOURCE_MAP = [
+export const SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS = [
   '@angular-devkit/build-angular:browser',
   '@nrwl/builders:web-build'
-];
-export const SUPPORTED_NG_BUILD_BUILDERS_WITH_VENDOR_SOURCE_MAP = [
-  '@angular-devkit/build-angular:browser'
 ];
 
 // For some operations we need to add additional flags or configuration
@@ -42,12 +39,8 @@ export function normalizeCommands(cwd: string, cmds: string[]): string[] {
   }
 
   // Make sure we generate stats data so we can parse it later.
-  if (SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS_AND_SOURCE_MAP.includes(builder)) {
-    normalized = normalized.concat(['--stats-json', '--source-map']);
-  }
-  // This option is deprecated in 7.2, so we need another way to get vendor source maps.
-  if (SUPPORTED_NG_BUILD_BUILDERS_WITH_VENDOR_SOURCE_MAP.includes(builder)) {
-    normalized = normalized.concat(['--vendor-source-map']);
+  if (SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS.includes(builder)) {
+    normalized = normalized.concat(['--stats-json']);
   }
 
   return normalized;

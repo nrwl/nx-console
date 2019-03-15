@@ -1,4 +1,8 @@
 <div #container class="container">
+  <div class="warning" *ngIf="showWarning">
+    <p><strong>Source maps</strong> may be required to see more data.</p>
+    <p>Try setting <code>sourceMap</code> field to <code>true</code>.</p>
+  </div>
   <div class="explanation">
     <p>
       <span class="module-name"></span>

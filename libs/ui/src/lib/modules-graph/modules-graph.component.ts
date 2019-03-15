@@ -19,6 +19,14 @@ interface Chunk {
   file: string;
 }
 
+interface VizNode {
+  name: string;
+  nodeName: string;
+  size: number;
+  initialSegment: string;
+  children?: VizNode[];
+}
+
 // Mapping of step names to colors.
 const Colors: any = {
   '<unmapped>': '#CCCCCC',
@@ -59,10 +67,12 @@ export class ModulesGraphComponent implements OnInit {
   @ViewChild('svg') private readonly svgEl: ElementRef | null = null;
   @ViewChild('container') private readonly container: ElementRef | null = null;
 
+  showWarning = false;
+
   private width = MIN_WIDTH;
   private height = MIN_HEIGHT;
   private vis: any;
-  private hierarchicalData: object | null = null;
+  private hierarchicalData: VizNode | null = null;
   private totalSize: number;
   private percentageEl: Element;
   private fileSizeEl: Element;
@@ -92,6 +102,7 @@ export class ModulesGraphComponent implements OnInit {
       }
 
       this.reset();
+      this.renderWarning();
       this.createVisualization(this.hierarchicalData);
       this.showDefaultExplanation();
     });
@@ -111,6 +122,23 @@ export class ModulesGraphComponent implements OnInit {
     select(this.fileSizeEl).text(this.formatFileSize.transform(this.totalSize));
     select(this.percentageEl).text('100%');
     select(this.moduleNameEl).text(this.chunk.name || this.chunk.file);
+  }
+
+  renderWarning() {
+    if (!this.hierarchicalData) {
+      this.showWarning = false;
+      return;
+    }
+    console.log(this.hierarchicalData);
+    // Show a message to user to enable sourceMap to see more visualization.
+    if (
+      this.hierarchicalData.children &&
+      this.hierarchicalData.children.length === 1
+    ) {
+      this.showWarning = true;
+    } else {
+      this.showWarning = false;
+    }
   }
 
   createVisualization(json: object) {
@@ -187,7 +215,9 @@ export class ModulesGraphComponent implements OnInit {
 
     const root = {
       name: 'root',
-      children: [],
+      nodeName: 'root',
+      children: [] as VizNode[],
+      size: 0,
       initialSegment: 'other'
     };
     for (let i = 0; i < this._data.length; i++) {
