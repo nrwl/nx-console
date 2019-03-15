@@ -5,7 +5,8 @@ import { PseudoTerminalFactory } from '@angular-console/server';
 import { platform } from 'os';
 import { FileUtils } from '../utils/file-utils';
 import { readJsonFile } from '../utils/utils';
-
+import { existsSync } from 'fs';
+import { join } from 'path';
 let commandRunIndex = 0;
 
 export const commands = new Commands(5, 15);
@@ -23,7 +24,11 @@ export function runCommand(
   const workspace =
     type === 'new' ? null : readJsonFile('./package.json', cwd).json.name;
   const id = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
-  const command = `${programName} ${cmds.join(' ')}`;
+  let command = `${programName} ${cmds.join(' ')}`;
+  if (fileUtils.hasExecutable('nvm', cwd) || existsSync(join(cwd, '.nvmrc'))) {
+    const nvm = fileUtils.findClosestNvm(cwd);
+    command = `${nvm} exec ${command}`;
+  }
 
   const factory = () => {
     const commandRunning = pseudoTerminalFactory({
