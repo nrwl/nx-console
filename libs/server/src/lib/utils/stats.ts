@@ -2,6 +2,8 @@ import { readFileSync } from 'fs';
 import { gzipSync } from 'zlib';
 import { join } from 'path';
 
+import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
+
 // @ts-ignore
 const exploreSourceMap = __non_webpack_require__('source-map-explorer');
 
@@ -29,6 +31,28 @@ class FileSystemFileSizeGetter implements FileSizeGetter {
       parsed: file.length,
       gzipped: gzipSync(file).length
     };
+  }
+}
+
+class FileNameNormalizer {
+  cwdPrefixRegexp: RegExp;
+
+  constructor(cwd: string) {
+    this.cwdPrefixRegexp = new RegExp(
+      `^[\/]*(${cwd.replace(/^\//, '')})?[\/]*(.*)`
+    );
+  }
+
+  normalize(s: string) {
+    const match = this.cwdPrefixRegexp.exec(s);
+    const file = match ? match[2] : s;
+
+    for (const k of Object.keys(SPECIAL_SOURCE_FILE_MAPPINGS)) {
+      if (file.startsWith(k)) {
+        return file.replace(k, SPECIAL_SOURCE_FILE_MAPPINGS[k]);
+      }
+    }
+    return file;
   }
 }
 
@@ -69,10 +93,7 @@ export function parseStats(
 
   // Windows path uses '\', but webpack and sourcemap contain '/'.
   const normalizedCwd = cwd.replace(/\\/g, '/');
-
-  const pathPrefixRegexp = new RegExp(
-    `^[\/]*(${normalizedCwd.replace(/^\//, '')})?[\/]*(.*)`
-  );
+  const fileNormalizer = new FileNameNormalizer(normalizedCwd);
 
   stats.chunks.forEach((chunk: any) => {
     const chunkData = getChunkData(chunk);
@@ -97,8 +118,7 @@ export function parseStats(
             isDep: false
           });
         } else {
-          const match = pathPrefixRegexp.exec(_file);
-          const file = match ? match[2] : _file;
+          const file = fileNormalizer.normalize(_file);
           const isDep = /node_modules/.test(file);
 
           if (isDep) {
@@ -113,7 +133,9 @@ export function parseStats(
         }
       });
     } catch (e) {
-      // If sourcemap parsing errors, just return stats that we already have.
+      // If we fail to parse sourcemaps it either does not exist, or explorer cannot parse it.
+      // Return the chunk as the only module.
+      summary.modules += chunkData.sizes.parsed;
       modules.push({
         size: chunkData.sizes.parsed,
         file: chunkData.file,
