@@ -29,11 +29,7 @@
     <ng-container *ngIf="(filteredProjects$ | async) as projects">
       <div cdkVirtualScrollContent>
         <ng-container
-          *cdkVirtualFor="
-            let p of projects;
-            trackBy: trackByProjectRoot;
-            templateCacheSize: 0
-          "
+          *cdkVirtualFor="let p of projects; trackBy: trackByProjectRoot"
         >
           <mat-list-item
             class="favorite-icon"

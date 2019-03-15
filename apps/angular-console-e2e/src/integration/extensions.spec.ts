@@ -51,9 +51,9 @@ describe('Extensions', () => {
     });
 
     // check that the schematics added by angular material are available
-    cy.wait(300); // Needed to de-flake this test
+    cy.wait(1000); // Needed to de-flake this test
     goToGenerate();
-    cy.wait(300); // Needed to de-flake this test
+    cy.wait(1000); // Needed to de-flake this test
     taskListHeaders($p => {
       expect(texts($p)[1]).to.equal('@angular/material');
     });
