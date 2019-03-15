@@ -21,14 +21,15 @@ interface Chunk {
 
 // Mapping of step names to colors.
 const Colors: any = {
-  apps: '#d15d89',
-  libs: '#e4bb43',
-  src: '#4663d1',
-  node_modules: '#51d140',
-  other: '#8e8e8e'
+  '<unmapped>': '#CCCCCC',
+  src: '#F2D03B',
+  node_modules: '#003056',
+  apps: '#00A1D9',
+  libs: '#04518C',
+  other: '#47D9BF'
 };
 
-const INACTIVE_OPACITY = 0.5;
+const INACTIVE_OPACITY = 0.7;
 const ACTIVE_OPACITY = 1;
 
 const MIN_WIDTH = 400;

@@ -2,6 +2,9 @@ import { readFileSync } from 'fs';
 import { gzipSync } from 'zlib';
 import { join } from 'path';
 
+// @ts-ignore
+const exploreSourceMap = __non_webpack_require__('source-map-explorer');
+
 export interface Chunk {
   name: string;
   file: string;
@@ -39,8 +42,8 @@ export function parseStats(
   const modulesByChunkId: { [key: string]: ModuleData[] } = {};
   const summary = {
     assets: createSizeData(),
-    modules: createSizeData(),
-    dependencies: createSizeData()
+    modules: 0,
+    dependencies: 0
   };
   const assets: any[] = [];
   const chunks: ChunkData[] = [];
@@ -63,7 +66,13 @@ export function parseStats(
       sizes: sizes
     });
   });
-  const pathPrefixRegexp = new RegExp(`^(\./|${cwd}/)`);
+
+  // Windows path uses '\', but webpack and sourcemap contain '/'.
+  const normalizedCwd = cwd.replace(/\\/g, '/');
+
+  const pathPrefixRegexp = new RegExp(
+    `^[\/]*(${normalizedCwd.replace(/^\//, '')})?[\/]*(.*)`
+  );
 
   stats.chunks.forEach((chunk: any) => {
     const chunkData = getChunkData(chunk);
@@ -74,41 +83,43 @@ export function parseStats(
     chunkData.sizes.gzipped = chunkSizes.gzipped;
     chunks.push(chunkData);
 
-    chunk.modules = flattenMultiModules(chunk.modules);
-    chunk.modules = chunk.modules.filter(
-      (m: Module) => !m.name.startsWith('multi')
-    );
+    try {
+      const sourceMapData = exploreSourceMap(join(outputPath, chunkData.file));
 
-    walkModules(chunk.modules, module => {
-      try {
-        const moduleSizes = fileSizeGetter.read(module.path);
+      Object.keys(sourceMapData.files).forEach(_file => {
+        const size = sourceMapData.files[_file];
+        summary.modules += size;
 
-        module.sizes.parsed = moduleSizes.parsed;
-        module.sizes.gzipped = moduleSizes.gzipped;
-
-        summary.modules.parsed += module.sizes.parsed;
-        summary.modules.gzipped += module.sizes.gzipped;
-
-        if (module.isDep) {
-          summary.dependencies.parsed += module.sizes.parsed;
-          summary.dependencies.gzipped += module.sizes.gzipped;
-        }
-
-        // Strip out cwd from module name and path.
-        module.path = module.name = module.path
-          .split(pathPrefixRegexp)
-          .slice(2)
-          .join('');
-
-        modules.push(module);
-      } catch (err) {
-        if (err.code === 'ENOENT') {
-          // File may not exist when read, so we ca ignore it.
+        if (_file === '<unmapped>') {
+          modules.push({
+            size,
+            file: _file,
+            isDep: false
+          });
         } else {
-          throw err;
+          const match = pathPrefixRegexp.exec(_file);
+          const file = match ? match[2] : _file;
+          const isDep = /node_modules/.test(file);
+
+          if (isDep) {
+            summary.dependencies += size;
+          }
+
+          modules.push({
+            size,
+            file,
+            isDep
+          });
         }
-      }
-    });
+      });
+    } catch (e) {
+      // If sourcemap parsing errors, just return stats that we already have.
+      modules.push({
+        size: chunkData.sizes.parsed,
+        file: chunkData.file,
+        isDep: false
+      });
+    }
 
     modulesByChunkId[chunkData.id] = modules;
   });
@@ -127,8 +138,8 @@ export function calculateStatsFromChunks(cs: Chunk[]) {
   const assets: any[] = [];
   const summary = {
     assets: createSizeData(),
-    modules: createSizeData(),
-    dependencies: createSizeData()
+    modules: 0,
+    dependencies: 0
   };
   const chunks: ChunkData[] = [];
 
@@ -143,7 +154,7 @@ export function calculateStatsFromChunks(cs: Chunk[]) {
 
     chunkData.sizes.parsed = size;
     summary.assets.parsed += size;
-    summary.modules.parsed += size;
+    summary.modules += size;
 
     chunks.push(chunkData);
     assets.push({
@@ -176,80 +187,14 @@ interface SizeData {
   parsed: number;
 }
 
-interface Module {
-  identifier: string;
-  name: string;
-  size: number;
-  chunks: any[];
-  modules: Module[];
-}
-
 interface ModuleData {
-  identifier: string;
-  name: string;
+  file: string;
   size: number;
-  path: string;
   isDep: boolean;
-  sizes: SizeData;
 }
 
 function createSizeData(): SizeData {
   return { gzipped: 0, parsed: 0 };
-}
-
-const BUNDLED_MODULE_REGEXP = /(.*)\s+\+\s+\d+\smodules$/;
-
-function flattenMultiModules(modules: Module[]) {
-  let flattened = [] as Module[];
-  modules.forEach(module => {
-    const matched = module.name.match(BUNDLED_MODULE_REGEXP);
-    if (matched) {
-      flattened = flattened.concat(module.modules);
-      module.name = matched[1];
-    }
-    flattened.push(module);
-  });
-  return flattened;
-}
-
-function walkModules(
-  modules: Module[],
-  visitor: (module: ModuleData) => void,
-  seen: Set<string> = new Set<string>()
-) {
-  if (!modules) return;
-
-  modules.forEach(m => {
-    const path = getModulePath(m);
-    const isDep = path.indexOf('node_modules') !== -1;
-    const sizes = createSizeData();
-    const mm: ModuleData = {
-      name: path,
-      identifier: m.identifier,
-      size: m.size,
-      path,
-      isDep,
-      sizes
-    };
-
-    if (!shouldInclude(mm)) return;
-    if (seen.has(mm.path)) return;
-
-    seen.add(mm.path);
-
-    visitor(mm);
-  });
-}
-
-function getModulePath(m: Module) {
-  return m.identifier.replace(/.*!/, '').replace(/\\/g, '/');
-}
-
-function shouldInclude(m: ModuleData) {
-  return (
-    m.identifier.indexOf('(webpack)') === -1 &&
-    m.path.indexOf('$$_lazy_route_resource') === -1
-  );
 }
 
 function getChunkData(chunk: any): ChunkData {
