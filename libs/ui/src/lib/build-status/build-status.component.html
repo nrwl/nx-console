@@ -2,9 +2,7 @@
   <div class="row summary" fxLayout="row" fxLayoutGap="20px">
     <mat-card fxFlex>
       <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex>
-          <h3>Summary</h3>
-        </div>
+        <div fxFlex><h3>Summary</h3></div>
         <div class="actions" fxLayout="row" fxLayoutGap="20px">
           <mat-select
             matRipple
@@ -35,9 +33,7 @@
             <ng-container *ngIf="(errors$ | async) as errors; else noErrors">
               {{ errors.length }}
             </ng-container>
-            <ng-template #noErrors>
-              0
-            </ng-template>
+            <ng-template #noErrors> 0 </ng-template>
           </div>
         </div>
         <div>
@@ -48,9 +44,7 @@
             >
               {{ warnings.length }}
             </ng-container>
-            <ng-template #noWarnings>
-              0
-            </ng-template>
+            <ng-template #noWarnings> 0 </ng-template>
           </div>
         </div>
         <div>
@@ -129,9 +123,7 @@
   >
     <mat-card>
       <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex>
-          <h3>Problems</h3>
-        </div>
+        <div fxFlex><h3>Problems</h3></div>
       </div>
       <ng-container *ngIf="(errors$ | async) as errors">
         <div class="problem-list">
@@ -162,9 +154,7 @@
   >
     <mat-card>
       <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex>
-          <h3>Analyze</h3>
-        </div>
+        <div fxFlex><h3>Analyze</h3></div>
         <div class="actions" fxLayout="row" fxLayoutGap="20px">
           <mat-select
             matRipple
@@ -200,21 +190,15 @@
   <div class="row">
     <mat-card>
       <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex>
-          <h3>Speed Stats</h3>
-        </div>
+        <div fxFlex><h3>Speed Stats</h3></div>
       </div>
       <ng-container
         *ngIf="(networkSpeeds$ | async) as speedStats; else noSpeedStats"
       >
         <div class="grid grid-4-columns">
           <div *ngFor="let stat of speedStats; trackBy: trackBySpeedKey">
-            <div class="title">
-              {{ stat.label }}
-            </div>
-            <div class="content">
-              {{ stat.downloadTime }}
-            </div>
+            <div class="title">{{ stat.label }}</div>
+            <div class="content">{{ stat.downloadTime }}</div>
           </div>
         </div>
       </ng-container>
@@ -226,9 +210,7 @@
   <div class="row">
     <mat-card>
       <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex>
-          <h3>Assets</h3>
-        </div>
+        <div fxFlex><h3>Assets</h3></div>
       </div>
       <mat-grid-list cols="6" rowHeight="28px">
         <mat-grid-tile class="title" colspan="2"></mat-grid-tile>
