@@ -7,8 +7,18 @@ query Projects($path: String!, $project: String!, $target: String!) {
       architect(name: $target) {
         name
         builder
+        options {
+          defaultValues {
+            name
+            defaultValue
+          }
+        }
         configurations {
           name
+          defaultValues {
+            name
+            defaultValue
+          }
         }
         schema {
           name

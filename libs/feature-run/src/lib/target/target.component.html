@@ -4,6 +4,7 @@
 >
   <ui-flags
     [configurations]="project.architect[0].configurations"
+    [options]="project.architect[0].options"
     [prefix]="getPrefix(project.architect[0].name, project.name)"
     [fields]="project.architect[0].schema"
     [runSyntax]="runSyntax(project.architect[0].name)"

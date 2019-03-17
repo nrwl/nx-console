@@ -3,12 +3,18 @@ type Architect {
   project: String!
   builder: String!
   description: String!
+  options: Options!,
   configurations: [ArchitectConfigurations!]!
   schema: [Schema!]!
 }
 
+type Options {
+  defaultValues: [FieldValue!]!
+}
+
 type ArchitectConfigurations {
   name: String!
+  defaultValues: [FieldValue!]!
 }
 
 type CommandResponse {
@@ -205,6 +211,11 @@ type SchematicCollectionForNgNew {
   name: String!
   description: String!
   schema: [Schema!]!
+}
+
+type FieldValue {
+  name: String!
+  defaultValue: String
 }
 
 type Schema {

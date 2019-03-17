@@ -45,14 +45,21 @@ export class Serializer {
       ...fields.filter(r => !r.positional && !r.important)
     ].map(f => {
       let d = f.defaultValue as any;
-      if (f.type === 'boolean' && f.defaultValue === 'false') {
-        d = (f as any).defaultValue = false;
-      }
-      if (f.type === 'boolean' && f.defaultValue === 'true') {
-        d = (f as any).defaultValue = true;
-      }
+      d = (f as any).defaultValue = this.normalizeDefaultValue(f.type, d);
       return { ...f, defaultValue: d };
     });
+  }
+
+  normalizeDefaultValue(type: string, defaultValue: string): any {
+    if (type === 'boolean' && defaultValue === 'false') {
+      return false;
+    } else if (type === 'boolean' && defaultValue === 'true') {
+      return true;
+    } else if (type === 'number') {
+      return Number(defaultValue);
+    } else {
+      return defaultValue;
+    }
   }
 
   serializeArgs(value: { [p: string]: any }, schema: Schema[]): string[] {

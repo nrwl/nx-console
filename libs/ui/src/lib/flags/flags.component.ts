@@ -33,6 +33,7 @@ interface FieldGrouping {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlagsComponent {
+  private _rawFields: Schema[];
   private _fields: Schema[];
   private subscription: Subscription;
 
@@ -44,7 +45,11 @@ export class FlagsComponent {
   fieldGroups: Array<FieldGrouping> = [];
 
   @Input() path: string;
-  @Input() configurations: { name: string }[];
+  @Input() options: { defaultValues: { name: string; defaultValue: string }[] };
+  @Input() configurations: {
+    name: string;
+    defaultValues: { name: string; defaultValue: string }[];
+  }[];
   @Input() prefix: string[];
   @Input() init: { [k: string]: any };
   @Input() runSyntax = false;
@@ -54,9 +59,8 @@ export class FlagsComponent {
     return this._fields;
   }
   set fields(f: Schema[]) {
-    this._fields = f;
-    this.fieldGroups = this.toFieldGroups(f);
-    this.setForm();
+    this._rawFields = f;
+    this.createFormUsingConfiguration(null);
   }
 
   @Output() readonly value = new EventEmitter();
@@ -109,13 +113,14 @@ export class FlagsComponent {
     }
   }
 
-  private setForm() {
+  private setForm(configuration: string | null) {
     this.formGroup = schematicFieldsToFormGroup({
       fields: this._fields,
       configurations: this.configurations && this.configurations.length > 0,
       init: this.init,
       getCompletions: (f, v) =>
-        this.completions.completionsFor(this.path, f, v || '')
+        this.completions.completionsFor(this.path, f, v || ''),
+      selectedConfiguration: configuration
     });
 
     if (this.subscription) {
@@ -165,5 +170,35 @@ export class FlagsComponent {
         behavior: 'instant'
       });
     }
+  }
+
+  createFormUsingConfiguration(configuration: string | null) {
+    this._fields = this.withConfigurationValues(configuration, this._rawFields);
+
+    this.fieldGroups = this.toFieldGroups(this._fields);
+    this.setForm(configuration);
+  }
+
+  private withConfigurationValues(configuration: string | null, f: Schema[]) {
+    const selectedConfiguration =
+      this.configurations &&
+      this.configurations.find(c => c.name === configuration);
+    const selectedOptions = selectedConfiguration
+      ? selectedConfiguration
+      : this.options;
+    return f.map(ff => {
+      const defaultFromOptions =
+        selectedOptions &&
+        selectedOptions.defaultValues.find(v => v.name === ff.name);
+      if (defaultFromOptions) {
+        const defaultValue = this.serializer.normalizeDefaultValue(
+          ff.type,
+          defaultFromOptions.defaultValue
+        );
+        return { ...ff, defaultValue };
+      } else {
+        return ff;
+      }
+    });
   }
 }

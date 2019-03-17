@@ -121,7 +121,8 @@ export class NewWorkspaceComponent {
 
       if (value && value.schema) {
         const formGroup = schematicFieldsToFormGroup({
-          fields: value.schema as any
+          fields: value.schema as any,
+          selectedConfiguration: null
         });
 
         this.ngNewForm.addControl('collectionOptions', formGroup);

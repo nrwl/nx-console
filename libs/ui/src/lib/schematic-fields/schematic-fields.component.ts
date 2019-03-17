@@ -43,6 +43,7 @@ export interface Payload {
   ) => Observable<CompletionResultType[]>;
   init?: { [k: string]: any };
   configurations?: boolean;
+  selectedConfiguration: string | null;
 }
 
 export const schematicFieldsToFormGroup = (payload: Payload): FormGroup => {
@@ -106,7 +107,9 @@ export const schematicFieldsToFormGroup = (payload: Payload): FormGroup => {
     {} as any
   );
   if (configurations) {
-    children.configurations = new FormControl(null);
+    children.configurations = new FormControl(
+      payload.selectedConfiguration ? payload.selectedConfiguration : null
+    );
   }
 
   return new FormGroup(children);
