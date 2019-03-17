@@ -173,4 +173,8 @@ export class TargetComponent implements OnInit {
     setTimeout(() => this.commandArray$.next(e), 0);
     this.ngRunDisabled$.next(!e.valid);
   }
+
+  initSourceMapAnsStatsJson() {
+    return { sourceMap: true, statsJson: true };
+  }
 }

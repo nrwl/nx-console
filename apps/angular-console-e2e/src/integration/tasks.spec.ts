@@ -133,9 +133,11 @@ describe('Tasks', () => {
     elementContainsText('div.context-title', 'ng build proj');
 
     checkDisplayedCommand('ng build proj');
+    cy.get('mat-select[name="aot"]').contains('false');
 
     elementContainsText('mat-radio-button', 'Production').click();
     checkDisplayedCommand('ng build proj --configuration=production');
+    cy.get('mat-select[name="aot"]').contains('true');
 
     elementContainsText('mat-radio-button', 'Default').click();
     checkDisplayedCommand('ng build proj');

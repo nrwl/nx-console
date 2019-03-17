@@ -39,14 +39,13 @@ class FileNameNormalizer {
 
   constructor(cwd: string) {
     this.cwdPrefixRegexp = new RegExp(
-      `^[\/]*(${cwd.replace(/^\//, '')})?[\/]*(.*)`
+      `^[\/]*(${cwd.toLowerCase().replace(/^\//, '')})?[\/]*(.*)`
     );
   }
 
   normalize(s: string) {
-    const match = this.cwdPrefixRegexp.exec(s);
-    const file = match ? match[2] : s;
-
+    const match = this.cwdPrefixRegexp.exec(s.toLowerCase());
+    const file = match ? match[2] : s.toLowerCase();
     for (const k of Object.keys(SPECIAL_SOURCE_FILE_MAPPINGS)) {
       if (file.startsWith(k)) {
         return file.replace(k, SPECIAL_SOURCE_FILE_MAPPINGS[k]);
