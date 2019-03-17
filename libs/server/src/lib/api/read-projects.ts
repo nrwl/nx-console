@@ -1,5 +1,9 @@
-import { normalizeSchema, readJsonFile } from '../utils/utils';
-import { Project, Architect } from '@angular-console/schema';
+import {
+  getPrimitiveValue,
+  normalizeSchema,
+  readJsonFile
+} from '../utils/utils';
+import { Architect, Project } from '@angular-console/schema';
 import * as path from 'path';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { readRecentActions } from './read-recent-actions';
@@ -32,11 +36,23 @@ function compareProjects(a: Project, b: Project) {
 function readArchitect(project: string, architect: any): Architect[] {
   if (!architect) return [];
   return Object.entries(architect).map(([key, value]: [string, any]) => {
+    const options = {
+      defaultValues: serializeDefaultsForConfig(value.options)
+    };
     const configurations = value.configurations
-      ? Object.keys(value.configurations).map(name => ({ name }))
+      ? Object.keys(value.configurations).map(name => ({
+          name,
+          defaultValues: readDefaultValues(
+            value.options,
+            value.configurations,
+            name
+          )
+        }))
       : [];
+
     return {
       schema: [],
+      options,
       configurations,
       name: key,
       project,
@@ -44,6 +60,18 @@ function readArchitect(project: string, architect: any): Architect[] {
       builder: value.builder
     };
   });
+}
+
+function readDefaultValues(options: any, configurations: any, name: string) {
+  return serializeDefaultsForConfig({ ...options, ...configurations[name] });
+}
+
+function serializeDefaultsForConfig(config: any) {
+  if (!config) return [];
+  return Object.keys(config).reduce(
+    (m, k) => [...m, { name: k, defaultValue: getPrimitiveValue(config[k]) }],
+    [] as any[]
+  );
 }
 
 export function readSchema(basedir: string, builder: string) {

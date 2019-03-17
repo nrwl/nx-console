@@ -175,13 +175,27 @@ export interface Architect {
 
   description: string;
 
+  options: Options;
+
   configurations: ArchitectConfigurations[];
 
   schema: Schema[];
 }
 
+export interface Options {
+  defaultValues: FieldValue[];
+}
+
+export interface FieldValue {
+  name: string;
+
+  defaultValue?: Maybe<string>;
+}
+
 export interface ArchitectConfigurations {
   name: string;
+
+  defaultValues: FieldValue[];
 }
 
 export interface RecentAction {
@@ -1158,6 +1172,8 @@ export namespace ArchitectResolvers {
 
     description?: DescriptionResolver<string, TypeParent, Context>;
 
+    options?: OptionsResolver<any, TypeParent, Context>;
+
     configurations?: ConfigurationsResolver<any[], TypeParent, Context>;
 
     schema?: SchemaResolver<any[], TypeParent, Context>;
@@ -1183,6 +1199,11 @@ export namespace ArchitectResolvers {
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
+  export type OptionsResolver<R = any, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type ConfigurationsResolver<
     R = any[],
     Parent = any,
@@ -1195,9 +1216,23 @@ export namespace ArchitectResolvers {
   >;
 }
 
-export namespace ArchitectConfigurationsResolvers {
+export namespace OptionsResolvers {
+  export interface Resolvers<Context = any, TypeParent = any> {
+    defaultValues?: DefaultValuesResolver<any[], TypeParent, Context>;
+  }
+
+  export type DefaultValuesResolver<
+    R = any[],
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace FieldValueResolvers {
   export interface Resolvers<Context = any, TypeParent = any> {
     name?: NameResolver<string, TypeParent, Context>;
+
+    defaultValue?: DefaultValueResolver<Maybe<string>, TypeParent, Context>;
   }
 
   export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
@@ -1205,6 +1240,30 @@ export namespace ArchitectConfigurationsResolvers {
     Parent,
     Context
   >;
+  export type DefaultValueResolver<
+    R = Maybe<string>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace ArchitectConfigurationsResolvers {
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
+
+    defaultValues?: DefaultValuesResolver<any[], TypeParent, Context>;
+  }
+
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
+  export type DefaultValuesResolver<
+    R = any[],
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace RecentActionResolvers {
@@ -1918,6 +1977,8 @@ export interface IResolvers<Context = any> {
   NpmScript?: NpmScriptResolvers.Resolvers<Context>;
   Project?: ProjectResolvers.Resolvers<Context>;
   Architect?: ArchitectResolvers.Resolvers<Context>;
+  Options?: OptionsResolvers.Resolvers<Context>;
+  FieldValue?: FieldValueResolvers.Resolvers<Context>;
   ArchitectConfigurations?: ArchitectConfigurationsResolvers.Resolvers<Context>;
   RecentAction?: RecentActionResolvers.Resolvers<Context>;
   Docs?: DocsResolvers.Resolvers<Context>;

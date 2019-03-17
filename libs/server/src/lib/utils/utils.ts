@@ -222,6 +222,19 @@ export function normalizeSchema(
   }
 }
 
+export function getPrimitiveValue(value: any) {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    value === null
+  ) {
+    return value.toString();
+  } else {
+    return undefined;
+  }
+}
+
 function getDefault(prop: any): any {
   if (prop.default === undefined && prop.$default === undefined) {
     return undefined;

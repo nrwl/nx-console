@@ -12,6 +12,7 @@
       name="configurations"
       fxLayout="row"
       fxLayoutGap="16px"
+      (change)="createFormUsingConfiguration($event.value)"
     >
       <mat-radio-button [value]="null">Default</mat-radio-button>
       <mat-radio-button
