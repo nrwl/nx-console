@@ -12,10 +12,6 @@ export const SUPPORTED_NG_BUILD_BUILDERS = [
   '@nrwl/builders:web-build',
   '@nrwl/builders:web-dev-server'
 ];
-export const SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS = [
-  '@angular-devkit/build-angular:browser',
-  '@nrwl/builders:web-build'
-];
 
 // For some operations we need to add additional flags or configuration
 // in order to make sure we get the expected output.
@@ -36,11 +32,6 @@ export function normalizeCommands(cwd: string, cmds: string[]): string[] {
     if (isUsingKarma) {
       normalized = cmds.concat(['--reporters', 'progress']);
     }
-  }
-
-  // Make sure we generate stats data so we can parse it later.
-  if (SUPPORTED_NG_BUILD_BUILDERS_WITH_STATS.includes(builder)) {
-    normalized = normalized.concat(['--stats-json']);
   }
 
   return normalized;
