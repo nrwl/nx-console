@@ -166,7 +166,10 @@ export class BuildDetailedStatusCalculator
     let progress = _state.progress;
     let buildStatus = _state.buildStatus;
 
-    if (value.indexOf('0% compiling') > -1) {
+    const angularServeStarting = value.indexOf('0% compiling') > -1;
+    const webpackServeStarting = value.indexOf('｢wdm｣: Compiling...') > -1;
+
+    if (angularServeStarting || webpackServeStarting) {
       progress = 0;
       buildStatus = 'build_inprogress';
       _state = { ..._state, errors: [] };
