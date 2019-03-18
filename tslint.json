@@ -11,7 +11,7 @@
     "adjacent-overload-signatures": true,
     "member-access": [true, "no-public"],
     "no-empty-interface": true,
-    "no-parameter-reassignment": true,
+    "no-parameter-reassignment": false,
     "no-namespace": true,
     "no-magic-numbers": [false],
     "no-internal-module": true,

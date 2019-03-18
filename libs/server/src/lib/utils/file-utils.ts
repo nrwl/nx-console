@@ -44,6 +44,20 @@ export class FileUtils {
     }
   }
 
+  wslSupportsNvm() {
+    if (this.isWsl()) {
+      const p = execSync('wsl -e bash -l -i -c printenv')
+        .toString()
+        .split('\n')
+        .filter(v => v.startsWith('NVM_DIR='))[0]
+        .trim();
+
+      return Boolean(p);
+    }
+
+    return false;
+  }
+
   convertToWslPath(p: string) {
     if (this.isWsl() && !p.startsWith('/')) {
       return execSync(`wsl -e wslpath -u ${p}`)
@@ -132,44 +146,6 @@ export class FileUtils {
         throw new Error(`Cannot find 'ng'`);
       }
       return this.findClosestNg(parent);
-    }
-  }
-
-  findClosestNvm(d: string): string {
-    if (this.hasExecutable('nvm', d)) {
-      return 'nvm';
-    }
-    const dir = this.convertToWslPath(d);
-    if (this.directoryExists(this.joinForCommandRun(dir, 'node_modules'))) {
-      if (platform() === 'win32' && !this.isWsl()) {
-        if (this.fileExistsSync(this.joinForCommandRun(dir, 'nvm.cmd'))) {
-          return this.joinForCommandRun(dir, 'nvm.cmd');
-        } else {
-          return this.joinForCommandRun(dir, 'node_modules', '.bin', 'nvm.cmd');
-        }
-      } else {
-        if (
-          this.fileExistsSync(
-            this.joinForCommandRun(dir, 'node_modules', '.bin', 'nvm')
-          )
-        ) {
-          return this.joinForCommandRun(dir, 'node_modules', '.bin', 'nvm');
-        } else {
-          return this.joinForCommandRun(
-            dir,
-            'node_modules',
-            'nvm',
-            'bin',
-            'nvm'
-          );
-        }
-      }
-    } else {
-      const parent = path.dirname(dir);
-      if (parent === dir) {
-        throw new Error(`Cannot find 'nvm'`);
-      }
-      return this.findClosestNvm(parent);
     }
   }
 

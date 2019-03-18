@@ -25,9 +25,16 @@ export function runCommand(
     type === 'new' ? null : readJsonFile('./package.json', cwd).json.name;
   const id = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
   let command = `${programName} ${cmds.join(' ')}`;
-  if (fileUtils.hasExecutable('nvm', cwd) || existsSync(join(cwd, '.nvmrc'))) {
-    const nvm = fileUtils.findClosestNvm(cwd);
-    command = `${nvm} exec ${command}`;
+
+  const supportsNVM = fileUtils.isWsl()
+    ? fileUtils.wslSupportsNvm()
+    : Boolean(process.env.NVM_DIR);
+
+  // We currently don't suppor the windows implementation of NVM.
+  if (supportsNVM && existsSync(join(cwd, '.nvmrc'))) {
+    command = `nvm exec ${command}`;
+    cmds = ['exec', program, ...cmds];
+    program = 'nvm';
   }
 
   const factory = () => {
@@ -104,7 +111,11 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
 
   const nodePtyPrebilt = require('node-pty-prebuilt');
   const commandRunning = isWsl
-    ? nodePtyPrebilt.spawn('wsl.exe', ['-e', program, ...args], opts)
+    ? nodePtyPrebilt.spawn(
+        'wsl.exe',
+        ['-e', 'bash', '-l', '-i', '-c', `${program} ${args.join(' ')}`],
+        opts
+      )
     : nodePtyPrebilt.spawn(program, args, opts);
 
   let currentCols = DEFAULT_COLS;
