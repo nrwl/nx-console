@@ -12,27 +12,27 @@
             <small *ngIf="(status$ | async)?.time as time">({{ time }})</small>
           </div>
         </div>
-        <div>
+        <div class="summary-errors">
           <div class="title">Errors</div>
           <div class="content">
             <ng-container *ngIf="(errors$ | async) as errors; else noErrors">
-              {{ errors.length }}
+              {{ errors.length > 0 ? 'Present' : 'None' }}
             </ng-container>
             <ng-template #noErrors>
-              0
+              None
             </ng-template>
           </div>
         </div>
-        <div>
+        <div class="summary-warnings">
           <div class="title">Warnings</div>
           <div class="content">
             <ng-container
               *ngIf="(warnings$ | async) as warnings; else noWarnings"
             >
-              {{ warnings.length }}
+              {{ warnings.length > 0 ? 'Present' : 'None' }}
             </ng-container>
             <ng-template #noWarnings>
-              0
+              None
             </ng-template>
           </div>
         </div>
@@ -218,32 +218,34 @@
       <ng-container
         *ngIf="(displayAssets$ | async) as displayAssets; else noDisplayAssets"
       >
-        <mat-grid-list
-          cols="6"
-          rowHeight="28px"
-          *ngFor="let asset of displayAssets; trackBy: trackByAsset"
-        >
-          <mat-grid-tile colspan="2">
-            <div class="asset-name">{{ asset.name }}</div>
-          </mat-grid-tile>
-          <mat-grid-tile colspan="1">
-            <div
-              class="content"
-              matTooltipPosition="right"
-              matTooltip="{{
-                asset.sizes.parsed | formatFileSize: '-'
-              }} (Parsed)"
-            >
-              {{ asset.sizes.gzipped | formatFileSize: '–' }}
-            </div>
-          </mat-grid-tile>
-          <mat-grid-tile
-            colspan="1"
-            *ngFor="let speedStat of asset.speeds; trackBy: trackBySpeedKey"
+        <ng-container *ngIf="displayAssets.length > 0; else noDisplayAssets"
+          ><mat-grid-list
+            cols="6"
+            rowHeight="28px"
+            *ngFor="let asset of displayAssets; trackBy: trackByAsset"
           >
-            <div class="content">{{ speedStat.downloadTime }}</div>
-          </mat-grid-tile>
-        </mat-grid-list>
+            <mat-grid-tile colspan="2">
+              <div class="asset-name">{{ asset.name }}</div>
+            </mat-grid-tile>
+            <mat-grid-tile colspan="1">
+              <div
+                class="content"
+                matTooltipPosition="right"
+                matTooltip="{{
+                  asset.sizes.parsed | formatFileSize: '-'
+                }} (Parsed)"
+              >
+                {{ asset.sizes.gzipped | formatFileSize: '–' }}
+              </div>
+            </mat-grid-tile>
+            <mat-grid-tile
+              colspan="1"
+              *ngFor="let speedStat of asset.speeds; trackBy: trackBySpeedKey"
+            >
+              <div class="content">{{ speedStat.downloadTime }}</div>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </ng-container>
       </ng-container>
       <ng-template #noDisplayAssets>
         <mat-icon class="pending large">more_horiz</mat-icon>
