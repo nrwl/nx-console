@@ -190,6 +190,7 @@
             "tsConfig": "apps/vscode/tsconfig.app.json",
             "assets": [
               "apps/vscode/src/package.json",
+              "apps/vscode/src/.yarnrc",
               "apps/vscode/src/tree-view-icon.svg",
               "apps/vscode/src/assets"
             ]
@@ -540,7 +541,15 @@
       "styleext": "scss"
     },
     "@nrwl/schematics:library": {
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "framework": "angular"
+    },
+    "@nrwl/schematics:application": {
+      "unitTestRunner": "karma",
+      "e2eTestRunner": "protractor"
+    },
+    "@nrwl/schematics:node-application": {
+      "framework": "express"
     }
   }
 }

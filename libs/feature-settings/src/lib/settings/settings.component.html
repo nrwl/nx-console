@@ -39,9 +39,7 @@
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
       <div fxFlex>
         <h4 mat-line>Disable Animations</h4>
-        <p mat-line>
-          Disable all animations for a snappier feel
-        </p>
+        <p mat-line>Disable all animations for a snappier feel</p>
       </div>
       <mat-slide-toggle
         (change)="settings.setDisableAnimations($event.checked)"
@@ -63,9 +61,7 @@
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
       <div fxFlex>
         <h4 mat-line>Use WSL (Windows users only)</h4>
-        <p mat-line>
-          Runs tasks using WSL
-        </p>
+        <p mat-line>Runs tasks using WSL</p>
       </div>
       <mat-slide-toggle
         (change)="settings.setIsWsl($event.checked)"
@@ -75,9 +71,7 @@
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
       <div fxFlex>
         <h4 mat-line>Use NVM (Supports OS X, Linux and WSL)</h4>
-        <p mat-line>
-          Runs tasks using Node Version Manager
-        </p>
+        <p mat-line>Runs tasks using Node Version Manager</p>
       </div>
       <mat-slide-toggle
         (change)="settings.setUseNvm($event.checked)"

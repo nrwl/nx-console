@@ -35,6 +35,8 @@ describe('Serializer', () => {
       collection: '@nrwl/testing',
       name: 'normalized',
       description: 'a schematic to be normalized.',
+      npmClient: '',
+      npmScript: '',
       schema: [
         {
           type: 'arguments',
