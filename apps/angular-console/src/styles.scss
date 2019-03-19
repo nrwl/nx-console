@@ -20,6 +20,8 @@ body {
 
 * {
   -webkit-font-smoothing: subpixel-antialiased;
+  transform: translateZ(0);
+  transition-delay: 0;
 }
 
 .outlet-container {
