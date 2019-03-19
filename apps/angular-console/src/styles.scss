@@ -20,8 +20,15 @@ body {
 
 * {
   -webkit-font-smoothing: subpixel-antialiased;
+}
+
+*:not(img):not(svg):not(g) {
   transform: translateZ(0);
   transition-delay: 0;
+}
+
+mat-toolbar.mat-toolbar-single-row {
+  height: 56px;
 }
 
 .outlet-container {
