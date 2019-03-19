@@ -70,7 +70,6 @@ export function installNodeJs(): InstallNodeJsStatus {
         )
           .pipe(nodeDownloadProgress)
           .pipe(msi);
-
         return {};
       default:
         return {

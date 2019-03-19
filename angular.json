@@ -465,7 +465,15 @@
       "styleext": "scss"
     },
     "@nrwl/schematics:library": {
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "framework": "angular"
+    },
+    "@nrwl/schematics:application": {
+      "unitTestRunner": "karma",
+      "e2eTestRunner": "protractor"
+    },
+    "@nrwl/schematics:node-application": {
+      "framework": "express"
     }
   }
 }

@@ -77,14 +77,17 @@
     ]
   },
   "dependencies": {
-    "@nrwl/nx": "7.5.2",
+    "@nrwl/nx": "7.7.2",
     "node-pty-prebuilt": "0.7.6",
     "semver": "5.6.0",
     "source-map-explorer": "^1.7.0",
-    "tmp": "0.0.33"
+    "tmp": "0.0.33",
+    "@ngrx/effects": "7.2.0",
+    "@ngrx/router-store": "7.2.0",
+    "@ngrx/store": "7.2.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "0.13.1",
+    "@angular-devkit/build-angular": "~0.13.1",
     "@angular-devkit/build-ng-packagr": "0.13.1",
     "@angular/animations": "7.2.4",
     "@angular/cdk": "7.3.1",
@@ -106,8 +109,8 @@
     "@nestjs/graphql": "5.5.1",
     "@nrwl/angular-console-enterprise-electron": "0.0.40",
     "@nrwl/angular-console-enterprise-frontend": "0.0.40",
-    "@nrwl/builders": "7.5.2",
-    "@nrwl/schematics": "7.5.2",
+    "@nrwl/builders": "7.7.2",
+    "@nrwl/schematics": "7.7.2",
     "@schematics/angular": "7.3.1",
     "@types/d3-hierarchy": "^1.1.6",
     "@types/d3-selection": "^1.4.1",
@@ -117,7 +120,7 @@
     "@types/fontfaceobserver": "^0.0.6",
     "@types/get-port": "^4.0.1",
     "@types/graphql": "14.0.5",
-    "@types/jest": "^24.0.0",
+    "@types/jest": "24.0.9",
     "@types/node": "^10.12.21",
     "@types/opn": "^5.1.0",
     "@types/request": "^2.48.1",
@@ -163,10 +166,10 @@
     "graphql-tag": "2.10.1",
     "graphql-tools": "4.0.4",
     "husky": "^1.3.1",
-    "jasmine-marbles": "0.4.1",
-    "jest": "^23.6.0",
+    "jasmine-marbles": "0.4.0",
+    "jest": "24.1.0",
     "jest-jasmine2": "23.6.0",
-    "jest-preset-angular": "6.0.2",
+    "jest-preset-angular": "7.0.0",
     "ng-packagr": "4.7.0",
     "node-pty-prebuilt": "0.7.6",
     "nps": "5.9.3",
@@ -183,7 +186,7 @@
     "shelljs": "0.8.3",
     "shx": "^0.3.2",
     "strip-json-comments": "2.0.1",
-    "ts-jest": "23.10.5",
+    "ts-jest": "24.0.0",
     "ts-node": "8.0.2",
     "tsickle": "0.34.3",
     "tslib": "1.9.3",
@@ -196,7 +199,9 @@
     "vscode": "^1.1.29",
     "xterm": "3.11.0",
     "zlib": "^1.0.5",
-    "zone.js": "0.8.29"
+    "zone.js": "0.8.29",
+    "@ngrx/schematics": "7.2.0",
+    "@ngrx/store-devtools": "7.2.0"
   },
   "jest": {
     "moduleFileExtensions": [

@@ -32,6 +32,8 @@ describe('Serializer', () => {
   describe('normalizeSchematic', () => {
     serializer = new Serializer();
     const schematic: Schematic = {
+      npmClient: '',
+      npmScript: '',
       collection: '@nrwl/testing',
       name: 'normalized',
       description: 'a schematic to be normalized.',
