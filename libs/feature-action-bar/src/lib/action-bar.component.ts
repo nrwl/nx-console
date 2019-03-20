@@ -19,7 +19,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { combineLatest, Observable, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
@@ -30,8 +30,8 @@ import {
   tap
 } from 'rxjs/operators';
 
-const TERMINAL_PADDING = 44;
-const COMMAND_HEIGHT = 64;
+const TERMINAL_PADDING = 16;
+const COMMAND_HEIGHT = 56;
 
 @Component({
   selector: 'angular-console-action-bar',

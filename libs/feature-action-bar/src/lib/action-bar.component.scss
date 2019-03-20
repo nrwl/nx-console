@@ -1,5 +1,5 @@
 .action-bar-spacer {
-  height: 64px;
+  height: 56px;
 }
 
 .action-bar-container {
@@ -19,7 +19,7 @@
   overflow: hidden;
   background: white;
   z-index: 10;
-  max-height: calc(100vh - 24px);
+  max-height: calc(100vh - 16px);
   overflow-y: hidden;
 }
 
@@ -50,7 +50,7 @@ mat-list {
   padding: 0;
 
   mat-list-item {
-    height: 64px !important;
+    height: 56px !important;
     position: relative;
     cursor: pointer;
     z-index: 2;

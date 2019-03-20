@@ -1,30 +1,31 @@
+import {
+  CommandRunner,
+  PROJECTS_POLLING,
+  Settings,
+  toggleItemInArray
+} from '@angular-console/utils';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, Observable, of } from 'rxjs';
 import {
+  catchError,
+  filter,
   map,
+  shareReplay,
   startWith,
   switchMap,
-  shareReplay,
-  filter,
-  catchError,
   tap
 } from 'rxjs/operators';
+
 import {
-  PROJECTS_POLLING,
-  Settings,
-  CommandRunner,
-  toggleItemInArray
-} from '@angular-console/utils';
-import {
+  SaveRecentActionGQL,
+  Workspace,
   WorkspaceDocsGQL,
   WorkspaceGQL,
-  SaveRecentActionGQL,
-  WorkspaceSchematicsGQL,
   WorkspaceSchematics,
-  Workspace
+  WorkspaceSchematicsGQL
 } from '../generated/graphql';
-import { FormControl } from '@angular/forms';
 
 export interface ProjectAction {
   name: string;
@@ -61,7 +62,7 @@ export class ProjectsComponent implements OnInit {
   viewportHeight$ = this.commandRunner.listAllCommands().pipe(
     map(c => Boolean(c.length > 0)),
     map(actionBarExpanded => {
-      return actionBarExpanded ? `calc(100vh - 194px)` : `calc(100vh - 128px)`;
+      return actionBarExpanded ? `calc(100vh - 180px)` : `calc(100vh - 128px)`;
     }),
     shareReplay()
   );
