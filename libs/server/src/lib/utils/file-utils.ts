@@ -1,9 +1,9 @@
+import { readSettings } from '@angular-console/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { execSync } from 'child_process';
-import * as path from 'path';
 import { existsSync, statSync } from 'fs';
 import { platform } from 'os';
-import { readSettings } from '@angular-console/server';
+import * as path from 'path';
 
 @Injectable()
 export class FileUtils {
@@ -11,6 +11,10 @@ export class FileUtils {
 
   isWsl(): boolean {
     return !!readSettings(this.store).isWsl;
+  }
+
+  useNvm(): boolean {
+    return !!readSettings(this.store).useNvm;
   }
 
   findExecutable(command: string, cwd: string): string {

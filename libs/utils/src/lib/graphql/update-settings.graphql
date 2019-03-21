@@ -3,6 +3,8 @@ mutation UpdateSettings($data: String!) {
     canCollectData
     installNodeManually
     enableDetailedStatus
+    isWsl
+    useNvm
     channel
     recent {
       path

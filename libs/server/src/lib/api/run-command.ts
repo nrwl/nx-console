@@ -1,12 +1,11 @@
-import { Commands } from './commands';
-import { createDetailedStatusCalculator } from './detailed-status-calculator';
-import { normalizeCommands } from '../utils/architect';
-import { PseudoTerminalFactory } from '@angular-console/server';
 import { platform } from 'os';
+
+import { normalizeCommands } from '../utils/architect';
 import { FileUtils } from '../utils/file-utils';
 import { readJsonFile } from '../utils/utils';
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { Commands } from './commands';
+import { createDetailedStatusCalculator } from './detailed-status-calculator';
+
 let commandRunIndex = 0;
 
 export const commands = new Commands(5, 15);
@@ -31,7 +30,7 @@ export function runCommand(
     : Boolean(process.env.NVM_DIR);
 
   // We currently don't suppor the windows implementation of NVM.
-  if (supportsNVM && existsSync(join(cwd, '.nvmrc'))) {
+  if (supportsNVM && fileUtils.useNvm()) {
     command = `nvm exec ${command}`;
     cmds = ['exec', program, ...cmds];
     program = 'nvm';
