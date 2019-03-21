@@ -1,5 +1,5 @@
-import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { Telemetry, Settings } from '@angular-console/utils';
+import { Settings, Telemetry } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +40,14 @@ export class SettingsComponent {
 
   isWsl() {
     return this.settingsService.isWsl();
+  }
+
+  useNvm() {
+    return this.settingsService.useNvm();
+  }
+
+  toggleUseNvm(x: boolean) {
+    this.settingsService.setUseNvm(x);
   }
 
   toggleIsWsl(x: boolean) {

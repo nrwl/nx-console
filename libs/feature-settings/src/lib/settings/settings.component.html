@@ -60,5 +60,17 @@
         [checked]="isWsl()"
       ></mat-slide-toggle>
     </div>
+    <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
+      <div fxFlex>
+        <h4 mat-line>Use NVM (Supports OS X, Linux and WSL)</h4>
+        <p mat-line>
+          Runs tasks using Node Version Manager
+        </p>
+      </div>
+      <mat-slide-toggle
+        (change)="toggleUseNvm($event.checked)"
+        [checked]="useNvm()"
+      ></mat-slide-toggle>
+    </div>
   </div>
 </div>

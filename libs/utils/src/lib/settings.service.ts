@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { first, tap } from 'rxjs/operators';
+
 import {
+  Settings as SettingsModels,
   SettingsGQL,
-  UpdateSettingsGQL,
-  Settings as SettingsModels
+  UpdateSettingsGQL
 } from './generated/graphql';
 
 export { Settings as SettingsModels } from './generated/graphql';
@@ -25,7 +26,8 @@ export class Settings {
     enableDetailedStatus: true,
     isConnectUser: false,
     channel: 'latest',
-    isWsl: false
+    isWsl: false,
+    useNvm: false
   };
 
   constructor(
@@ -138,8 +140,16 @@ export class Settings {
     return !!this.settings.isWsl;
   }
 
+  useNvm(): boolean {
+    return Boolean(this.settings.useNvm);
+  }
+
   setIsWsl(isWsl: boolean): void {
     this.store({ ...this.settings, isWsl });
+  }
+
+  setUseNvm(useNvm: boolean): void {
+    this.store({ ...this.settings, useNvm });
   }
 
   fetch() {
