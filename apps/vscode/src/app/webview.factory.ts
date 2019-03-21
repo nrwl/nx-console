@@ -62,7 +62,7 @@ export function getIframeHtml(iframeUrl: string) {
         <base href="/" />
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
-        <meta name="viewport" content="width=device-width, initial-scale=0.8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
           html,
           body {
@@ -76,10 +76,8 @@ export function getIframeHtml(iframeUrl: string) {
           }
 
           iframe {
-            height: 111.11111vh;
-            width: 111.11111vw;
-            transform: scale(0.9);
-            transform-origin: 0 0;
+            width: 100vw;
+            height: 100vh;
             opacity: 0;
             transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
           }

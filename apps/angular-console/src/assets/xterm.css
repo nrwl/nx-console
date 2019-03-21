@@ -36,7 +36,8 @@
  */
 
 .xterm {
-  font-family: 'Roboto Mono', monospace;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, 'Roboto Mono',
+    Courier, monospace;
   font-feature-settings: 'liga' 0;
   position: relative;
   user-select: none;

@@ -20,17 +20,21 @@ angular-console-workspace {
 
     .routes-side-nav {
       height: 100%;
-      width: 56px;
-      max-width: 56px;
-      min-width: 56px;
-      padding-top: 4px;
-      padding-top: 8px;
+      width: 52px;
+      max-width: 52px;
+      min-width: 52px;
       padding-bottom: 8px;
 
       .mat-icon-button {
-        width: 48px;
-        height: 48px;
-        margin: 4px;
+        width: 44px;
+        height: 44px;
+
+        mat-icon {
+          height: 32px;
+          width: 32px;
+          line-height: 32px;
+        }
+        margin: 6px 4px;
 
         transition: all 0.3s ease-in-out;
 
@@ -64,10 +68,10 @@ angular-console-workspace {
 
       .route-icon {
         color: rgba(0, 0, 0, 0.54);
-        width: 32px;
-        height: 32px;
-        font-size: 32px;
-        line-height: 32px;
+        width: 28px;
+        height: 28px;
+        font-size: 28px;
+        line-height: 28px;
       }
     }
   }

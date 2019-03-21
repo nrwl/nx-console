@@ -61,11 +61,9 @@ mat-list {
 .project-name {
   font-size: 16px !important;
   line-height: unset !important;
-  padding-top: 3px !important;
   font-weight: 400 !important;
   letter-spacing: 0.01em !important;
   color: rgba(0, 0, 0, 0.87) !important;
-  padding-bottom: 5px !important;
 }
 
 .project-root {
@@ -112,9 +110,9 @@ mat-list {
 
 .project-filter-container {
   background-color: white;
-  height: 55px;
-  min-height: 55px;
-  max-height: 55px;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
   position: relative;
   z-index: 2;
 

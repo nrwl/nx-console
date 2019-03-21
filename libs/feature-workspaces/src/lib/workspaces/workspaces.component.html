@@ -1,5 +1,5 @@
 <ng-container *ngIf="settings.getRecentWorkspaces().length > 0; else empty">
-  <mat-nav-list>
+  <mat-nav-list dense>
     <ng-container *ngIf="settings.getRecentWorkspaces(true) as workspaces">
       <div class="recents-container" @growShrink *ngIf="workspaces.length">
         <h3 mat-subheader>Favorite Workspaces</h3>
@@ -50,7 +50,7 @@
               class="favorite-icon"
               >favorite_border</mat-icon
             >
-            <h4 mat-line>{{ w.name }}</h4>
+            <h4 mat-line class="workspace-name">{{ w.name }}</h4>
             <p mat-line>{{ w.path | normalizePath }}</p>
             <mat-icon
               (click)="settings.removeRecent(w); $event.stopPropagation()"
