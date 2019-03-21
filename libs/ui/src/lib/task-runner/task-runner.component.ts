@@ -1,3 +1,4 @@
+import { CONTEXTUAL_ACTION_BAR_HEIGHT } from '@angular-console/ui';
 import {
   animate,
   state,
@@ -81,8 +82,7 @@ export class TaskRunnerComponent implements AfterContentChecked {
       tap(v => {
         const numFlags = this.flagsComponent.matExpansionPanels.length;
         const configurations = this.flagsComponent.configurations;
-        const expansionPanelHeaderHeight = numFlags === 1 ? 129 : 49 + 129;
-        const toolbarHeight = 64;
+        const expansionPanelHeaderHeight = numFlags === 1 ? 110 : 49 + 110;
         const configurationsHeight =
           configurations && configurations.length > 1 ? 55 : 0;
         switch (v) {
@@ -90,12 +90,13 @@ export class TaskRunnerComponent implements AfterContentChecked {
             this.flagsComponent.viewportHeight.next(
               `calc(70vh - ${expansionPanelHeaderHeight +
                 configurationsHeight +
-                toolbarHeight}px)`
+                CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
             );
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
-              `calc(100vh - ${expansionPanelHeaderHeight + toolbarHeight}px)`
+              `calc(100vh - ${expansionPanelHeaderHeight +
+                CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
             );
             break;
           default:

@@ -1,4 +1,7 @@
-import { CommandOutputComponent } from '@angular-console/ui';
+import {
+  CommandOutputComponent,
+  CONTEXTUAL_ACTION_BAR_HEIGHT
+} from '@angular-console/ui';
 import {
   CommandResponse,
   CommandRunner,
@@ -31,7 +34,6 @@ import {
 } from 'rxjs/operators';
 
 const TERMINAL_PADDING = 16;
-const COMMAND_HEIGHT = 56;
 
 @Component({
   selector: 'angular-console-action-bar',
@@ -170,10 +172,12 @@ export class ActionBarComponent {
         distinctUntilChanged(),
         map(numCommands => {
           const actionBarVisible = numCommands > 1;
-          const actionBarHeight = actionBarVisible ? COMMAND_HEIGHT : 0;
+          const actionBarHeight = actionBarVisible
+            ? CONTEXTUAL_ACTION_BAR_HEIGHT
+            : 0;
           return `calc(100vh - ${TERMINAL_PADDING +
             actionBarHeight +
-            COMMAND_HEIGHT * numCommands}px)`;
+            CONTEXTUAL_ACTION_BAR_HEIGHT * numCommands}px)`;
         })
       )
       .subscribe(height => {
