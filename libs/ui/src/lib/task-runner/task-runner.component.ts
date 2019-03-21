@@ -1,4 +1,3 @@
-import { CONTEXTUAL_ACTION_BAR_HEIGHT } from '@angular-console/ui';
 import {
   animate,
   state,
@@ -17,6 +16,7 @@ import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { map, shareReplay, startWith, tap } from 'rxjs/operators';
 
 import { CommandOutputComponent } from '../command-output/command-output.component';
+import { CONTEXTUAL_ACTION_BAR_HEIGHT } from '../contextual-action-bar/contextual-action-bar.component';
 import { FlagsComponent } from '../flags/flags.component';
 
 @Component({
