@@ -62,7 +62,7 @@ export class ProjectsComponent implements OnInit {
   viewportHeight$ = this.commandRunner.listAllCommands().pipe(
     map(c => Boolean(c.length > 0)),
     map(actionBarExpanded => {
-      return actionBarExpanded ? `calc(100vh - 180px)` : `calc(100vh - 116px)`;
+      return actionBarExpanded ? `calc(100vh - 172px)` : `calc(100vh - 116px)`;
     }),
     shareReplay()
   );
