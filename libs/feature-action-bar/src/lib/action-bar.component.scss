@@ -1,5 +1,9 @@
 .action-bar-spacer {
-  height: 56px;
+  height: 52px;
+}
+
+mat-list {
+  padding: 0 !important;
 }
 
 .action-bar-container {
@@ -50,7 +54,7 @@ mat-list {
   padding: 0;
 
   mat-list-item {
-    height: 56px !important;
+    height: 52px !important;
     position: relative;
     cursor: pointer;
     z-index: 2;
@@ -65,7 +69,6 @@ mat-list {
 
     .replay-button mat-icon {
       position: relative;
-      top: 2px !important;
     }
 
     .task-avatar {

@@ -1,5 +1,4 @@
 @import '~@angular/material/theming';
-@include mat-core();
 
 $primary: mat-palette($mat-blue, 700, 100, 800);
 $accent: mat-palette($mat-red, 700, 600, 800);
@@ -7,15 +6,47 @@ $warn: mat-palette($mat-red);
 
 $theme: mat-light-theme($primary, $accent, $warn);
 
+$custom-typography: mat-typography-config(
+  $font-family:
+    "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+  'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif,
+  Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol"
+);
+
+@include mat-core($custom-typography);
 @include angular-material-theme($theme);
 
 body {
-  font-family: Roboto, 'Helvetica Neue Light', 'Helvetica Neue', Helvetica,
-    Arial, 'Lucida Grande', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   margin: 0;
   padding: 0;
   background: white;
   overflow: hidden;
+}
+
+button.mat-button,
+button.mat-raised-button,
+button.mat-stroked-button,
+button.mat-icon-button {
+  line-height: 28px;
+  height: 34px;
+}
+
+button.mat-icon-button {
+  width: 32px;
+}
+
+mat-toolbar,
+mat-toolbar * {
+  line-height: 28px;
+}
+
+.mat-list-base .mat-list-item,
+.mat-list-base .mat-list-option {
+  height: 40px;
+  font-size: 14px;
 }
 
 * {
@@ -28,7 +59,7 @@ body {
 }
 
 mat-toolbar.mat-toolbar-single-row {
-  height: 56px;
+  height: 52px;
 }
 
 .outlet-container {

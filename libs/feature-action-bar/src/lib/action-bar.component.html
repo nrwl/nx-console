@@ -38,7 +38,10 @@
   </mat-toolbar>
 
   <!-- Task list -->
-  <mat-list [@growShrink]="(showActionList$ | async) ? 'expand' : 'contract'">
+  <mat-list
+    dense
+    [@growShrink]="(showActionList$ | async) ? 'expand' : 'contract'"
+  >
     <ng-container
       *ngFor="let action of actions; let last = last; trackBy: trackByCommandId"
       [ngSwitch]="action.status"
@@ -85,7 +88,7 @@
             <mat-spinner
               *ngIf="(showActionList$ | async)"
               class="task-status"
-              diameter="36"
+              diameter="32"
             >
             </mat-spinner>
           </ng-container>

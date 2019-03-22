@@ -1,8 +1,8 @@
 .task-list {
   padding: 0;
   overflow: auto;
-  max-height: calc(100% - 56px);
-  min-width: calc(100vw - 56px);
+  max-height: calc(100% - 52px);
+  min-width: calc(100vw - 52px);
 }
 
 .mat-nav-list .mat-list-item:first-of-type {
@@ -46,15 +46,15 @@
   color: rgba(0, 0, 0, 0.54);
   font-weight: 400;
   letter-spacing: 0.01em;
-  font-size: 16px;
-  line-height: 24px;
+  height: 44px;
+  font-size: 15px;
 }
 
 .task-filter-container {
   background-color: white;
-  height: 55px;
-  min-height: 55px;
-  max-height: 55px;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
 
   input {
     background: none;

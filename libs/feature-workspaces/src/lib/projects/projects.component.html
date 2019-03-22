@@ -17,11 +17,11 @@
     {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
   </mat-icon>
 </div>
-<mat-list *ngIf="(filteredProjects$ | async) as projects">
+<mat-list dense *ngIf="(filteredProjects$ | async) as projects">
   <cdk-virtual-scroll-viewport
     *ngIf="(viewportHeight$ | async) as viewportHeight"
     [style.height]="viewportHeight"
-    itemSize="88"
+    itemSize="76"
     class="field-viewport"
   >
     <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
@@ -69,6 +69,7 @@
                 mat-stroked-button
                 (click)="onActionTriggered(workspacePath, p, a)"
                 [routerLink]="a.link"
+                class="route-button"
               >
                 {{ a.actionDescription | titlecase }}
               </button>

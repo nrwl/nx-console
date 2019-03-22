@@ -16,7 +16,7 @@ import {
 import { ReplaySubject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
-export const CONTEXTUAL_ACTION_BAR_HEIGHT = 56;
+export const CONTEXTUAL_ACTION_BAR_HEIGHT = 52;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
