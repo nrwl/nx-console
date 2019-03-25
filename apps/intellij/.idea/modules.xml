@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io.nrwl.ide.console.iml" filepath="$PROJECT_DIR$/.idea/modules/io.nrwl.ide.console.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io.nrwl.ide.console.main.iml" filepath="$PROJECT_DIR$/.idea/modules/io.nrwl.ide.console.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io.nrwl.ide.console.test.iml" filepath="$PROJECT_DIR$/.idea/modules/io.nrwl.ide.console.test.iml" />
+    </modules>
+  </component>
+</project>
