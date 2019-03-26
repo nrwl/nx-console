@@ -114,8 +114,6 @@ I broke down the things which needs to be done into these specific tasks (areas)
 
   ✅ \* Plus if we integrate `JavaScriptLanguage` support into this plugin I see there is some functionality to work with
   npm
-    
-
 
 **Update**
 
@@ -129,9 +127,6 @@ I broke down the things which needs to be done into these specific tasks (areas)
 
 - I moved start & stop functionality into the Project component as we dont really want to start the NG server if we area working
   with non-angular app.
-    
-    
-
 
 * ❌ Understand in detail how `Angular Console` _(need assistance)_
   - How things are build for different distribution
@@ -151,8 +146,8 @@ I broke down the things which needs to be done into these specific tasks (areas)
 
 **Wizard**
 
-![Current Progress](./docs/wizard-1.png)
-=
+# ![Current Progress](./docs/wizard-1.png)
+
 ![Current Progress](./docs/wizard-2.png) -
 ![Current Progress](./docs/wizard-3.png)
 
