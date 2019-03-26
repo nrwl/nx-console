@@ -1,8 +1,18 @@
 import * as rcpNode from 'ij-rpc-client';
-import * as express from 'express';
+
+import { startServer } from './app/start-server';
+
+const fixPath = require('fix-path');
+const getPort = require('get-port');
+
+async function bootstrap(publicDir: string, port: number) {
+  fixPath();
+
+  port = port || (await getPort({ port: 8888 }));
+  startServer(port, publicDir);
+}
 
 const DOMAIN = 'ngConsoleServer';
-let app = express();
 
 // Port number passed from Intellij.
 const rpcPort: number = parseInt(process.argv[process.argv.length - 1], 10);
@@ -12,8 +22,7 @@ try {
       start: (publicDir: string, port: number) => {
         console.log('starting server with following dir: ', publicDir);
 
-        app.use(express.static(publicDir));
-        app.listen(port);
+        bootstrap(publicDir, port);
 
         rpcServer.send(DOMAIN, 'serverStarted');
       },

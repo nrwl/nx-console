@@ -1,9 +1,10 @@
-import { readSettings } from '@angular-console/server';
 import { Inject, Injectable } from '@nestjs/common';
 import { execSync } from 'child_process';
 import { existsSync, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
+
+import { readSettings } from '../api/read-settings';
 
 @Injectable()
 export class FileUtils {
