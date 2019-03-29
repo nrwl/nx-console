@@ -26,6 +26,7 @@ export class Settings {
     enableDetailedStatus: true,
     isConnectUser: false,
     channel: 'latest',
+    disableAnimations: true,
     isWsl: false,
     useNvm: false
   };
@@ -106,6 +107,14 @@ export class Settings {
 
   getChannel() {
     return this.settings.channel;
+  }
+
+  setDisableAnimations(disableAnimations: boolean): void {
+    this.store({ ...this.settings, disableAnimations });
+  }
+
+  useDisableAnimations() {
+    return this.settings.disableAnimations;
   }
 
   showConnectPlugin(): boolean {

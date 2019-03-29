@@ -9,48 +9,12 @@ import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 })
 export class SettingsComponent {
   constructor(
-    private readonly settingsService: Settings,
+    readonly settings: Settings,
     @Inject('telemetry') private readonly telemetry: Telemetry
   ) {}
 
-  canCollectionData() {
-    return this.settingsService.canCollectData();
-  }
-
   toggleDataCollection(x: boolean) {
-    this.settingsService.setCanCollectData(x);
+    this.settings.setCanCollectData(x);
     this.telemetry.reportDataCollectionEvent(x);
-  }
-
-  enableDetailedStatus() {
-    return this.settingsService.enableDetailedStatus();
-  }
-
-  toggleDetailedStatus(x: boolean) {
-    this.settingsService.setEnableDetailedStatus(x);
-  }
-
-  setChannel(channel: 'latest' | 'beta' | 'alpha') {
-    this.settingsService.setChannel(channel);
-  }
-
-  getChannel() {
-    return this.settingsService.getChannel();
-  }
-
-  isWsl() {
-    return this.settingsService.isWsl();
-  }
-
-  useNvm() {
-    return this.settingsService.useNvm();
-  }
-
-  toggleUseNvm(x: boolean) {
-    this.settingsService.setUseNvm(x);
-  }
-
-  toggleIsWsl(x: boolean) {
-    this.settingsService.setIsWsl(x);
   }
 }

@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    settings: Settings,
+    readonly settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly titleService: Title,
     router: Router

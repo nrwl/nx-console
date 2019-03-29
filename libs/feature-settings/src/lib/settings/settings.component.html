@@ -11,7 +11,7 @@
       </div>
       <mat-slide-toggle
         (change)="toggleDataCollection($event.checked)"
-        [checked]="canCollectionData()"
+        [checked]="settings.canCollectData()"
       ></mat-slide-toggle>
     </div>
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start top">
@@ -25,8 +25,8 @@
 
       <mat-form-field appearance="outline" floatLabel="auto">
         <mat-select
-          (selectionChange)="setChannel($event.value)"
-          [value]="getChannel()"
+          (selectionChange)="settings.setChannel($event.value)"
+          [value]="settings.getChannel()"
         >
           <mat-option value="latest"> Latest </mat-option>
           <mat-option value="beta">Beta </mat-option>
@@ -38,14 +38,26 @@
     <h3>Features</h3>
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
       <div fxFlex>
+        <h4 mat-line>Disable Animations</h4>
+        <p mat-line>
+          Disable all animations for a snappier feel
+        </p>
+      </div>
+      <mat-slide-toggle
+        (change)="settings.setDisableAnimations($event.checked)"
+        [checked]="settings.useDisableAnimations()"
+      ></mat-slide-toggle>
+    </div>
+    <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
+      <div fxFlex>
         <h4 mat-line>Use detailed status</h4>
         <p mat-line>
           Enables visual status for certain tasks (e.g. build, test, etc.).
         </p>
       </div>
       <mat-slide-toggle
-        (change)="toggleDetailedStatus($event.checked)"
-        [checked]="enableDetailedStatus()"
+        (change)="settings.setEnableDetailedStatus($event.checked)"
+        [checked]="settings.enableDetailedStatus()"
       ></mat-slide-toggle>
     </div>
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
@@ -56,8 +68,8 @@
         </p>
       </div>
       <mat-slide-toggle
-        (change)="toggleIsWsl($event.checked)"
-        [checked]="isWsl()"
+        (change)="settings.setIsWsl($event.checked)"
+        [checked]="settings.isWsl()"
       ></mat-slide-toggle>
     </div>
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
@@ -68,8 +80,8 @@
         </p>
       </div>
       <mat-slide-toggle
-        (change)="toggleUseNvm($event.checked)"
-        [checked]="useNvm()"
+        (change)="settings.setUseNvm($event.checked)"
+        [checked]="settings.useNvm()"
       ></mat-slide-toggle>
     </div>
   </div>

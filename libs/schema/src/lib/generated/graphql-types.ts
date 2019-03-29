@@ -35,6 +35,8 @@ export interface Settings {
 
   isConnectUser?: Maybe<boolean>;
 
+  disableAnimations?: Maybe<boolean>;
+
   showSupportPlugin?: Maybe<boolean>;
 
   installNodeManually?: Maybe<boolean>;
@@ -665,6 +667,12 @@ export namespace SettingsResolvers {
 
     isConnectUser?: IsConnectUserResolver<Maybe<boolean>, TypeParent, Context>;
 
+    disableAnimations?: DisableAnimationsResolver<
+      Maybe<boolean>,
+      TypeParent,
+      Context
+    >;
+
     showSupportPlugin?: ShowSupportPluginResolver<
       Maybe<boolean>,
       TypeParent,
@@ -710,6 +718,11 @@ export namespace SettingsResolvers {
     Context = any
   > = Resolver<R, Parent, Context>;
   export type IsConnectUserResolver<
+    R = Maybe<boolean>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type DisableAnimationsResolver<
     R = Maybe<boolean>,
     Parent = any,
     Context = any

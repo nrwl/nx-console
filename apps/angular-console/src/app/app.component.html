@@ -1,4 +1,9 @@
-<div fxLayout="column" fxFlex class="content-container">
+<div
+  fxLayout="column"
+  fxFlex
+  class="content-container"
+  [@.disabled]="settings.useDisableAnimations()"
+>
   <ui-contextual-action-bar></ui-contextual-action-bar>
 
   <div
