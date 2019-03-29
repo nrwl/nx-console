@@ -6,6 +6,7 @@ query Settings {
     installNodeManually
     enableDetailedStatus
     channel
+    disableAnimations
     isConnectUser
     recent {
       path
