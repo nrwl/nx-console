@@ -13,8 +13,8 @@
                     anchor="right"
                     factoryClass="io.nrwl.ide.console.ui.NgToolWindowFactory"/>
 
-        <projectTemplatesFactory implementation="io.nrwl.ide.console.ui.wizard.ProjectTemplateFactory"/>
-        <directoryProjectGenerator implementation="io.nrwl.ide.console.ui.wizard.NgConsoleProjectGenerator"/>
+        <!--<projectTemplatesFactory implementation="io.nrwl.ide.console.ui.wizard.ProjectTemplateFactory"/>-->
+        <!--<directoryProjectGenerator implementation="io.nrwl.ide.console.ui.wizard.NgConsoleProjectGenerator"/>-->
 
         <applicationService serviceInterface="io.nrwl.ide.console.state.NgConsoleState"
                         serviceImplementation="io.nrwl.ide.console.state.NgConsoleState"/>

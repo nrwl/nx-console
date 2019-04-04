@@ -1,0 +1,118 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+
+    }
+
+    dependencies {
+        classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.4"
+    }
+}
+plugins {
+    id 'java'
+    id "org.jetbrains.intellij" version "0.4.4"
+}
+
+
+
+apply plugin: 'org.jetbrains.intellij'
+
+group 'io.nrwl.ide'
+version '1.0.1'
+
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/java'
+        }
+        resources {
+            srcDirs 'src/resources'
+        }
+    }
+    test {
+        java {
+            srcDirs 'test'
+        }
+    }
+}
+
+intellij {
+    version 'IU-2018.3.5'
+    pluginName 'Angular Console'
+    downloadSources false
+    updateSinceUntilBuild false
+    plugins = ['JavaScriptLanguage']
+}
+patchPluginXml {
+    changeNotes """
+      Initial release 
+      """
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+project.afterEvaluate {
+    buildPlugin.doLast {
+
+        def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
+        def distApps = "$angularConsoleRoot/dist/apps/intellij/"
+        print("it.destinationDir:" + distApps )
+
+        delete {
+          delete file("$project.projectDir/gen/ngConsoleCli")
+        }
+
+        copy {
+            from ("$distApps") {
+              exclude ('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
+            }
+            into "$project.projectDir/gen/ngConsoleCli"
+        }
+
+        def libraries = "$it.destinationDir/$intellij.pluginName/ngConsoleCli/"
+        copy {
+          from ("$project.projectDir/gen/ngConsoleCli")
+          into libraries
+  
+        }
+    }
+
+    prepareSandbox.doLast {
+
+      def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
+      def distApps = "$angularConsoleRoot/dist/apps/intellij/"
+
+      delete {
+        delete file("$project.projectDir/gen/ngConsoleCli")
+      }
+
+      copy {
+        from ("$distApps") {
+          exclude ('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
+        }
+        into "$project.projectDir/gen/ngConsoleCli"
+      }
+
+      def libraries = "$it.destinationDir/$intellij.pluginName/ngConsoleCli/"
+
+
+      delete {
+        delete file("$libraries")
+      }
+      copy {
+        from ("$project.projectDir/gen/ngConsoleCli")
+        into libraries
+
+      }
+    }
+}
