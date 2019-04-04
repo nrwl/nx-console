@@ -29,15 +29,17 @@ public class RPCHandlerListener {
     LOG.info("RPCHandlerListener: serverStarted on port: " + port);
     NgConsoleUI consoleUI = ServiceManager.getService(NgConsoleUI.class);
 
-    String encodedPath = URLEncoder.encode(myServer.geProjectDir());
-    consoleUI.goToUrl("http://localhost:" + port + "/workspace/" + encodedPath);
+    String encodedPath = URLEncoder.encode(myServer.getProjectDir());
+    consoleUI.goToUrl(port, encodedPath);
 
     NgConsoleUtil.notify("NgConsole has been started", INFORMATION);
+
+    myServer.setState(NgConsoleServer.State.STARED);
   }
 
   public void serverStopped() {
     LOG.info("RPCHandlerListener: serverStopped");
-
+    myServer.setState(NgConsoleServer.State.STOPPED);
   }
 
 

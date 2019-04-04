@@ -26,13 +26,13 @@
 
     <application-components>
         <component>
-            <implementation-class>io.nrwl.ide.console.AngularConsolePlugin</implementation-class>
+            <implementation-class>io.nrwl.ide.console.NgConsoleAppLifecycle</implementation-class>
         </component>
     </application-components>
 
     <project-components>
         <component>
-            <implementation-class>io.nrwl.ide.console.AngularConsoleStarter</implementation-class>
+            <implementation-class>io.nrwl.ide.console.NgConsoleProjectLifecycle</implementation-class>
         </component>
     </project-components>
 

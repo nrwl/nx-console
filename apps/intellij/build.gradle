@@ -47,7 +47,7 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      Initial release 
+       Initial release 
       """
 }
 
@@ -83,7 +83,7 @@ project.afterEvaluate {
         copy {
           from ("$project.projectDir/gen/ngConsoleCli")
           into libraries
-  
+
         }
     }
 

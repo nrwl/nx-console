@@ -1,0 +1,17 @@
+const shell = require('shelljs');
+const os = require('os');
+
+const SOURCE = './apps/intellij/';
+const DIST = 'dist/apps/intellij/';
+
+shell.rm('-rf', `${DIST}*`);
+shell.cd(`${SOURCE}`);
+
+if (os.platform() === 'win32') {
+  shell.exec(`.\\gradlew.bat buildPlugin`);
+} else {
+  shell.exec('./gradlew buildPlugin');
+}
+shell.cd('../../');
+
+shell.cp(`${SOURCE}/build/distributions/*.zip`, `${DIST}`);

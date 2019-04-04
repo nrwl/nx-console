@@ -172,7 +172,7 @@ module.exports = {
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
       ),
-      intellij: 'echo Not yet implemented'
+      intellij: `node ${join('tools', 'scripts', 'intellij-package.js')}`
     },
     publish: {
       electronWin: nps.series(

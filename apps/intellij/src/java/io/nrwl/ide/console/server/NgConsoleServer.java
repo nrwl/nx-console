@@ -33,7 +33,8 @@ import java.nio.file.Paths;
 import static com.intellij.openapi.util.NotNullLazyValue.createConstantValue;
 
 /**
- * NgConsoleServer represent
+ * NgConsoleServer class is the representation of the NGConsole node process and manages all the states. It can
+ * exchange RPC  based messages with the server
  */
 public class NgConsoleServer {
   @NonNls
@@ -47,14 +48,20 @@ public class NgConsoleServer {
   private File myWorkingDir;
   private String myProjectDir;
 
+  private State myCurrentState = State.IDLE;
 
-  public NgConsoleServer(String projectDir) throws Exception {
+
+  public NgConsoleServer() {
+    // init with default dir
+    this(System.getProperty("user.home"));
+  }
+
+  public NgConsoleServer(String projectDir) {
     myProjectDir = projectDir;
     myWorkingDir = JSLanguageServiceUtil.getPluginDirectory(this.getClass(), "ngConsoleCli");
 
-    LOG.info("Getting getRpcServerInstance for the Java2Js RPC process");
     myRpcServer = RpcBinaryRequestHandler.getRpcServerInstance();
-    LOG.info("Getting getRpcServerInstance for the Java2Js RPC process: " + myRpcServer);
+    LOG.debug("Getting getRpcServerInstance for the Java2Js RPC process: " + myRpcServer);
   }
 
   public void start() {
@@ -65,8 +72,9 @@ public class NgConsoleServer {
       ApplicationManager.getApplication().executeOnPooledThread(() -> {
         LOG.debug(commandLine.toString());
         try {
-          this.myNgConsoleProcessHandler = createProcess();
+          myCurrentState = State.STARTING;
 
+          this.myNgConsoleProcessHandler = createProcess();
           myOutLogger = new ProcessOutputLogger(myNgConsoleProcessHandler);
           myOutLogger.startNotify();
 
@@ -110,6 +118,11 @@ public class NgConsoleServer {
     } else {
       action.run();
     }
+  }
+
+
+  public boolean isStarted() {
+    return myCurrentState == State.STARED;
   }
 
   private SilentKillableProcessHandler createProcess() {
@@ -161,10 +174,22 @@ public class NgConsoleServer {
     return myWorkingDir;
   }
 
-  String geProjectDir() {
+  String getProjectDir() {
     return myProjectDir;
   }
 
+
+  public void setProjectDir(String dir) {
+    this.myProjectDir = dir;
+  }
+
+  public State getState() {
+    return myCurrentState;
+  }
+
+  public void setState(State myCurrentState) {
+    this.myCurrentState = myCurrentState;
+  }
 
   private static class SilentKillableProcessHandler extends KillableProcessHandler {
 
@@ -192,6 +217,13 @@ public class NgConsoleServer {
     protected BaseOutputReader.Options readerOptions() {
       return BaseOutputReader.Options.forMostlySilentProcess();
     }
+  }
 
+  public enum State {
+    IDLE,
+    STARTING,
+    STARED,
+    STOPPED,
+    ERROR
   }
 }

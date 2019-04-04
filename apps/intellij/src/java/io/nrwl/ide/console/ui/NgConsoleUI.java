@@ -2,6 +2,7 @@ package io.nrwl.ide.console.ui;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserContext;
@@ -12,6 +13,8 @@ import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.teamdev.jxbrowser.chromium.BrowserPreferences.getDefaultChromiumDir;
 
@@ -23,6 +26,9 @@ import static com.teamdev.jxbrowser.chromium.BrowserPreferences.getDefaultChromi
  * But JxBrowser seems to work pretty well.
  */
 public class NgConsoleUI {
+  private static final Logger LOG = Logger.getInstance(NgConsoleUI.class);
+
+
   /**
    * Object representing a Browser build on top of Chromium
    */
@@ -32,14 +38,19 @@ public class NgConsoleUI {
    * Layout container to place a webview into the CENTER zone
    */
   private final JPanel myPanel = new JPanel(new BorderLayout());
-  ;
+
+  private Map<String, String> myRouteMapping = new HashMap<>();
+
+  private Route myMode = Route.Generate;
 
 
   public NgConsoleUI() {
+    myRouteMapping.put(Route.Workspace.name(), "http://localhost:%s/workspace/%s");
   }
 
 
-  public void initWebView() {
+  public void initWebView(Route mode) {
+    this.myMode = mode;
     doInitWebView();
   }
 
@@ -64,9 +75,16 @@ public class NgConsoleUI {
   }
 
 
-  public void goToUrl(final String url) {
+  /**
+   * Make sure first param is port
+   *
+   */
+  public void goToUrl(final String... params) {
     ApplicationManager.getApplication()
       .invokeLater(() -> {
+        String url = String.format(myRouteMapping.get(myMode.name()), (Object[])params);
+
+        LOG.info("Switching to new URL : " + url);
         myBrowser.loadURL(url);
       });
   }
@@ -88,6 +106,13 @@ public class NgConsoleUI {
         BrowserView view = new BrowserView(myBrowser);
         myPanel.add(view, BorderLayout.CENTER);
       });
+  }
+
+
+  public enum Route {
+    NewWorkspace,
+    Generate,
+    Workspace
   }
 
 
