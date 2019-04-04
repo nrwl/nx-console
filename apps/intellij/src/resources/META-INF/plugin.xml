@@ -1,0 +1,93 @@
+<idea-plugin>
+  <id>io.nrwl.ide.console</id>
+  <name>Angular Console</name>
+  <version>1.0</version>
+  <vendor email="frantisek@kolar.pro" url="http://www.nrwl.io/">nrwl</vendor>
+  <description>Angular UI Console based implementation for Webstorm IDE</description>
+
+
+  <depends>JavaScript</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="Angular Console"
+                icon="NgIcons.TOOL_WINDOW"
+                anchor="right"
+                factoryClass="io.nrwl.ide.console.ui.NgToolWindowFactory"/>
+
+    <!--<projectTemplatesFactory implementation="io.nrwl.ide.console.ui.wizard.ProjectTemplateFactory"/>-->
+    <!--<directoryProjectGenerator implementation="io.nrwl.ide.console.ui.wizard.NgConsoleProjectGenerator"/>-->
+
+    <applicationService serviceInterface="io.nrwl.ide.console.state.NgConsoleState"
+                        serviceImplementation="io.nrwl.ide.console.state.NgConsoleState"/>
+
+    <applicationService serviceInterface="io.nrwl.ide.console.ui.NgConsoleUI"
+                        serviceImplementation="io.nrwl.ide.console.ui.NgConsoleUI"/>
+
+  </extensions>
+
+  <application-components>
+    <component>
+      <implementation-class>io.nrwl.ide.console.NgConsoleAppLifecycle</implementation-class>
+    </component>
+  </application-components>
+
+  <project-components>
+    <component>
+      <implementation-class>io.nrwl.ide.console.NgConsoleProjectLifecycle</implementation-class>
+    </component>
+  </project-components>
+
+
+  <actions>
+    <action class="io.nrwl.ide.console.ui.actions.GoToAction"
+            id="NGConsole.Projects"
+            text="Projects"
+            description="Shows available projects"
+            icon="NgIcons.ACTION_PROJECT">
+    </action>
+    <action class="io.nrwl.ide.console.ui.actions.GoToAction"
+            id="NGConsole.Generate"
+            text="Generate"
+            description="Select and run ng generate command"
+            icon="NgIcons.ACTION_GENERATE">
+    </action>
+    <action class="io.nrwl.ide.console.ui.actions.GoToAction"
+            id="NGConsole.Tasks"
+            text="Tasks"
+            description="Select and run package.json task"
+            icon="NgIcons.ACTION_TASKS">
+    </action>
+
+    <action class="io.nrwl.ide.console.ui.actions.GoToAction"
+            id="NGConsole.Extensions"
+            text="Extensions"
+            description="Inspect and add NG schematics"
+            icon="NgIcons.ACTION_EXTENSIONS">
+    </action>
+
+    <action class="io.nrwl.ide.console.ui.actions.GoToAction"
+            id="NGConsole.Connect"
+            text="Connect"
+            description="Nrwl Connect - changes how developers access Angular support"
+            icon="NgIcons.ACTION_CONNECT">
+    </action>
+
+    <action class="io.nrwl.ide.console.ui.actions.GoToAction"
+            id="NGConsole.Settings"
+            text="Settings"
+            description="Access Angular Console Settings"
+            icon="NgIcons.ACTION_SETTINGS">
+    </action>
+
+
+    <group id="NGConsole.UI.Toolbar">
+      <reference ref="NGConsole.Projects"/>
+      <reference ref="NGConsole.Generate"/>
+      <reference ref="NGConsole.Tasks"/>
+      <reference ref="NGConsole.Extensions"/>
+      <separator/>
+      <reference ref="NGConsole.Connect"/>
+      <reference ref="NGConsole.Settings"/>
+    </group>
+  </actions>
+</idea-plugin>

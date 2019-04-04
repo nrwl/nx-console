@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc/apps/intellij",
+    "module": "commonjs",
+    "types": ["jest", "node"]
+  },
+
+  "include": ["**/*.spec.ts", "**/*.d.ts"]
+}

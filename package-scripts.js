@@ -2,9 +2,10 @@ const nps = require('nps-utils');
 const os = require('os');
 const { join } = require('path');
 
-function electronOrVscode(command) {
+function forEachApplication(command) {
   return {
     electron: command.replace(/APPLICATION/g, 'electron'),
+    intellij: command.replace(/APPLICATION/g, 'intellij'),
     vscode: command.replace(/APPLICATION/g, 'vscode')
   };
 }
@@ -89,7 +90,7 @@ module.exports = {
           }`.replace(/APPLICATION/g, 'vscode')
         )
       },
-      'copy-assets-base': electronOrVscode(
+      'copy-assets-base': forEachApplication(
         nps.concurrent({
           schema: `shx cp ${assetMappings['schema'].from} ${
             assetMappings['schema'].to
@@ -138,7 +139,7 @@ module.exports = {
           headless: nps.series.nps('prepare.e2e', 'e2e.headless')
         },
         package: {
-          ...electronOrVscode(
+          ...forEachApplication(
             nps.series.nps('prepare.APPLICATION', 'package.APPLICATION')
           )
         }
@@ -152,7 +153,7 @@ module.exports = {
           )
         }
       },
-      ...electronOrVscode(
+      ...forEachApplication(
         nps.series.nps(
           'clean',
           'build.APPLICATION',
@@ -170,7 +171,8 @@ module.exports = {
       vscode: nps.series(
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
-      )
+      ),
+      intellij: `node ${join('tools', 'scripts', 'intellij-package.js')}`
     },
     publish: {
       electronWin: nps.series(
@@ -215,7 +217,7 @@ module.exports = {
     build: {
       default: 'nx affected:build --all --parallel',
       affected: affected('build'),
-      ...electronOrVscode(
+      ...forEachApplication(
         nps.series(
           'nps dev.gen-graphql',
           nps.concurrent({
@@ -231,7 +233,8 @@ module.exports = {
     },
     'install-dependencies': {
       vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
-      electron: `node ${join('tools', 'scripts', 'electron-yarn.js')}`
+      electron: `node ${join('tools', 'scripts', 'electron-yarn.js')}`,
+      intellij: `node ${join('tools', 'scripts', 'intellij-yarn.js')}`
     }
   }
 };

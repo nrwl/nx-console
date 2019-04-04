@@ -48,3 +48,13 @@ Thumbs.db
 .env
 **/generated/*
 server/src/graphql-types.ts
+
+
+# Intellij
+apps/intellij/gen/ngConsoleCli/*
+apps/intellij/build/*
+apps/intellij/.gradle/*
+apps/intellij/.idea/*
+
+
+
