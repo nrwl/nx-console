@@ -1,118 +1,116 @@
 buildscript {
-    repositories {
-        mavenCentral()
-        maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+  repositories {
+    mavenCentral()
+    maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
 
-    }
+  }
 
-    dependencies {
-        classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.4"
-    }
+  dependencies {
+    classpath "gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.4"
+  }
 }
 plugins {
-    id 'java'
-    id "org.jetbrains.intellij" version "0.4.4"
+  id 'java'
+  id "org.jetbrains.intellij" version "0.4.4"
 }
-
 
 
 apply plugin: 'org.jetbrains.intellij'
 
 group 'io.nrwl.ide'
-version '1.0.1'
+version '7.4.6'
 
 
 sourceSets {
-    main {
-        java {
-            srcDirs 'src/java'
-        }
-        resources {
-            srcDirs 'src/resources'
-        }
+  main {
+    java {
+      srcDirs 'src/java'
     }
-    test {
-        java {
-            srcDirs 'test'
-        }
+    resources {
+      srcDirs 'src/resources'
     }
+  }
+  test {
+    java {
+      srcDirs 'test'
+    }
+  }
 }
 
 intellij {
-    version 'IU-2018.3.5'
-    pluginName 'Angular Console'
-    downloadSources false
-    updateSinceUntilBuild false
-    plugins = ['JavaScriptLanguage']
+  version 'IU-2018.3.5'
+  pluginName 'Angular Console'
+  downloadSources false
+  updateSinceUntilBuild true
+  plugins = ['JavaScriptLanguage']
 }
 patchPluginXml {
-    changeNotes """
-       Initial release 
-      """
+  sinceBuild '180'
+  description 'Angular Console for IDEA Editors. The user interface app for the Angular CLI'
 }
 
 
 repositories {
-    mavenCentral()
+  mavenCentral()
+  maven { url 'http://maven.teamdev.com/repository/products' }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+  compile fileTree(dir: 'libs', include: '*.jar')
+  compile 'com.teamdev.jxbrowser:jxbrowser-cross-platform:6.22'
+  testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 project.afterEvaluate {
-    buildPlugin.doLast {
+  buildPlugin.doLast {
+    def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
+    def distApps = "$angularConsoleRoot/dist/apps/intellij/"
 
-        def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
-        def distApps = "$angularConsoleRoot/dist/apps/intellij/"
-        print("it.destinationDir:" + distApps )
-
-        delete {
-          delete file("$project.projectDir/gen/ngConsoleCli")
-        }
-
-        copy {
-            from ("$distApps") {
-              exclude ('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
-            }
-            into "$project.projectDir/gen/ngConsoleCli"
-        }
-
-        def libraries = "$it.destinationDir/$intellij.pluginName/ngConsoleCli/"
-        copy {
-          from ("$project.projectDir/gen/ngConsoleCli")
-          into libraries
-
-        }
+    delete {
+      delete file("$project.projectDir/gen/ngConsoleCli")
     }
 
-    prepareSandbox.doLast {
-
-      def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
-      def distApps = "$angularConsoleRoot/dist/apps/intellij/"
-
-      delete {
-        delete file("$project.projectDir/gen/ngConsoleCli")
+    copy {
+      from("$distApps") {
+        exclude('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
       }
-
-      copy {
-        from ("$distApps") {
-          exclude ('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
-        }
-        into "$project.projectDir/gen/ngConsoleCli"
-      }
-
-      def libraries = "$it.destinationDir/$intellij.pluginName/ngConsoleCli/"
-
-
-      delete {
-        delete file("$libraries")
-      }
-      copy {
-        from ("$project.projectDir/gen/ngConsoleCli")
-        into libraries
-
-      }
+      into "$project.projectDir/gen/ngConsoleCli"
     }
+
+    def libraries = "$it.destinationDir/$intellij.pluginName/ngConsoleCli/"
+    copy {
+      from("$project.projectDir/gen/ngConsoleCli")
+      into libraries
+
+    }
+  }
+
+  prepareSandbox.doLast {
+
+    def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
+    def distApps = "$angularConsoleRoot/dist/apps/intellij/"
+
+    delete {
+      delete file("$project.projectDir/gen/ngConsoleCli")
+    }
+
+    copy {
+      from("$distApps") {
+        exclude('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
+      }
+      into "$project.projectDir/gen/ngConsoleCli"
+    }
+
+    def libraries = "$it.destinationDir/$intellij.pluginName/ngConsoleCli/"
+
+
+    delete {
+      delete file("$libraries")
+    }
+    copy {
+      from("$project.projectDir/gen/ngConsoleCli")
+      into libraries
+
+    }
+  }
 }

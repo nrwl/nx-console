@@ -8,9 +8,9 @@ shell.rm('-rf', `${DIST}*`);
 shell.cd(`${SOURCE}`);
 
 if (os.platform() === 'win32') {
-  shell.exec(`.\\gradlew.bat buildPlugin`);
+  shell.exec(`.\\gradlew.bat --rerun-tasks buildPlugin`);
 } else {
-  shell.exec('./gradlew buildPlugin');
+  shell.exec('./gradlew --rerun-tasks buildPlugin');
 }
 shell.cd('../../');
 
