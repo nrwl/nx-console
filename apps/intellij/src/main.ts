@@ -1,9 +1,8 @@
 import { close, connect } from 'ij-rpc-client';
-
 import { startServer } from './app/start-server';
 
-const fixPath = require('fix-path');
-const getPort = require('get-port');
+const fixPath = require('fix-path'); // tslint:disable-line
+const getPort = require('get-port'); // tslint:disable-line
 
 const DOMAIN = 'ngConsoleServer';
 let rpcServer: any = null;
