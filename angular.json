@@ -506,8 +506,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "apps/intellij/tsconfig.app.json",
-              "apps/intellij/tsconfig.spec.json"
+              "apps/intellij/tsconfig.app.json"
             ],
             "exclude": ["**/node_modules/**"]
           }
