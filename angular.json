@@ -511,13 +511,6 @@
             ],
             "exclude": ["**/node_modules/**"]
           }
-        },
-        "test": {
-          "builder": "@nrwl/builders:jest",
-          "options": {
-            "jestConfig": "apps/intellij/jest.config.js",
-            "tsConfig": "apps/intellij/tsconfig.spec.json"
-          }
         }
       }
     }

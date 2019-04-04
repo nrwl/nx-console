@@ -30,11 +30,6 @@ sourceSets {
       srcDirs 'src/resources'
     }
   }
-  test {
-    java {
-      srcDirs 'test'
-    }
-  }
 }
 
 intellij {
