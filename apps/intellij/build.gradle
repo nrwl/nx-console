@@ -68,7 +68,7 @@ project.afterEvaluate {
 
     copy {
       from("$distApps") {
-        exclude('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
+        exclude('**/*.ts', '**/*.zip', '**/*.md', 'app', 'java', 'resources', 'environments')
       }
       into "$project.projectDir/gen/ngConsoleCli"
     }
@@ -92,7 +92,7 @@ project.afterEvaluate {
 
     copy {
       from("$distApps") {
-        exclude('**/*.ts', '**/*.md', 'app', 'java', 'resources', 'environments')
+        exclude('**/*.ts', '**/*.zip', '**/*.md', 'app', 'java', 'resources', 'environments')
       }
       into "$project.projectDir/gen/ngConsoleCli"
     }
