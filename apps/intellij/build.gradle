@@ -41,6 +41,7 @@ intellij {
 }
 patchPluginXml {
   sinceBuild '180'
+  untilBuild '999'
   description 'Angular Console for IDEA Editors. The user interface app for the Angular CLI'
 }
 
