@@ -4,7 +4,6 @@ const os = require('os');
 const SOURCE = './apps/intellij/';
 const DIST = 'dist/apps/intellij/';
 
-shell.rm('-rf', `${DIST}*`);
 shell.cd(`${SOURCE}`);
 
 if (os.platform() === 'win32') {
