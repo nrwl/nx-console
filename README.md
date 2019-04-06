@@ -11,11 +11,11 @@
 <hr>
 
 <p align="center">
-  <a href="https://hubs.ly/H0g97pW0" target="_blank">  
-      <img 
-           width="728" 
-           height="auto" 
-           src="https://images.ctfassets.net/8eyogtwep6d2/40ASb6l6MR7V0w5ntqZ2yi/b4d439fcf56e50085d1f76df1bee41af/monorepo-banner-angularconsole.png"  
+  <a href="https://hubs.ly/H0g97pW0" target="_blank">
+      <img
+           width="728"
+           height="auto"
+           src="https://images.ctfassets.net/8eyogtwep6d2/40ASb6l6MR7V0w5ntqZ2yi/b4d439fcf56e50085d1f76df1bee41af/monorepo-banner-angularconsole.png"
            alt="Our Newest Enterprise Angular Book">
     </a>
 </p>
@@ -27,7 +27,7 @@
 
 Angular CLI transformed the Angular ecosystem. With it, you can get a full-stack application up and running in minutes, no need to figure out source maps, webpack, test runners. It all works out of the box. Angular CLI also helps you enforce consistent development practices by generating components, services, and state management modules.
 
-## Why Angular Console? 
+## Why Angular Console?
 
 Professional developers use both command-line tools and user interfaces. They commit in the terminal, but resolve conflicts in VSCode or WebStorm. They use the right tool for the job.
 
@@ -49,7 +49,7 @@ Angular Console does more than that:
 * ...
 
 
-## Download 
+## Download
 
 * If you are a VSCode user, the best way to try Angular Console is by installing the [Angular Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console).
 
@@ -85,15 +85,15 @@ Pick one of the issues from the [good first issue](https://github.com/nrwl/angul
 
 ## Core Team
 
-| Dan Muller | Victor Savkin | Jack Hsu | Wassim Chegham | Kamil Kisiela |
+| Dan Muller | Victor Savkin | Jack Hsu | Frantisek Kolar | Kamil Kisiela |
 | ---------- | ------------- | -------- | -------------- | ------------- |
-| ![Dan Muller][DM] | ![Victor Savkin][VS] | ![Jack Hsu][JH] | ![Wassim Chegham][WC] | ![Kamil Kisiela][KK] |
+| ![Dan Muller][DM] | ![Victor Savkin][VS] | ![Jack Hsu][JH] | ![Frantisek Kolar][FK] | ![Kamil Kisiela][KK] |
 | [mrmeku](https://github.com/mrmeku) | [vsavkin](https://github.com/vsavkin) | [jaysoo](https://github.com/jaysoo) | [manekinekko](https://github.com/manekinekko) | [kamilkisiela](https://github.com/kamilkisiela) |
 
 [DM]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/dan_pic.jpg
 [VS]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/victor_pic.jpg
 [JH]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/jack_pic.jpg
-[WC]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/wassim_pic.jpg
+[FK]: https://avatars0.githubusercontent.com/u/17149942?s=150&v=4
 [KK]: https://avatars1.githubusercontent.com/u/8167190?s=150&v=4
 
 The following folks from the Angular team at Google are working with the Angular Console team.
