@@ -4,7 +4,12 @@ import {
   Settings,
   toggleItemInArray
 } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Inject
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, Observable, of } from 'rxjs';
@@ -26,6 +31,7 @@ import {
   WorkspaceSchematics,
   WorkspaceSchematicsGQL
 } from '../generated/graphql';
+import { IS_INTELLIJ } from '@angular-console/environment';
 
 export interface ProjectAction {
   name: string;
@@ -76,7 +82,8 @@ export class ProjectsComponent implements OnInit {
     private readonly workspaceDocsGQL: WorkspaceDocsGQL,
     private readonly saveRecentActionGQL: SaveRecentActionGQL,
     private readonly commandRunner: CommandRunner,
-    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL
+    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL,
+    @Inject(IS_INTELLIJ) readonly isIntellij: boolean
   ) {}
 
   ngOnInit() {
@@ -158,7 +165,7 @@ export class ProjectsComponent implements OnInit {
       })
     );
 
-    const MAX_RECENT_ACTIONS = 4;
+    const MAX_RECENT_ACTIONS = this.isIntellij ? 3 : 4;
     this.recentActions$ = this.projects$.pipe(
       map(projects => {
         return projects.reduce<ProjectActionMap>(

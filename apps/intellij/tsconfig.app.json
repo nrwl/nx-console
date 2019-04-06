@@ -2,6 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc/apps/intellij",
+    "target": "es2017",
+    "removeComments": true,
+    "stripInternal": true,
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts"],

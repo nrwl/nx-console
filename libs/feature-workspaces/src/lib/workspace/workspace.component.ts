@@ -1,4 +1,4 @@
-import { ENVIRONMENT, Environment } from '@angular-console/environment';
+import { IS_ELECTRON, IS_INTELLIJ } from '@angular-console/environment';
 import { FADE_IN, GROW_SHRINK } from '@angular-console/ui';
 import {
   BASIC_WORKSPACE_POLLING,
@@ -182,10 +182,9 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     });
   });
 
-  readonly isElectron = this.environment.application === 'electron';
-
   constructor(
-    @Inject(ENVIRONMENT) private readonly environment: Environment,
+    @Inject(IS_ELECTRON) readonly isElectron: boolean,
+    @Inject(IS_INTELLIJ) readonly isIntellij: boolean,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly settings: Settings,
