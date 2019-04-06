@@ -1,7 +1,9 @@
 import {
   ENVIRONMENT,
   Environment,
-  IS_VSCODE
+  IS_VSCODE,
+  IS_INTELLIJ,
+  IS_ELECTRON
 } from '@angular-console/environment';
 import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
 import { FeatureSettingsModule } from '@angular-console/feature-settings';
@@ -124,7 +126,9 @@ export function initApollo(
       deps: [[new Inject('telemetry')], Messenger, HttpLink]
     },
     { provide: ENVIRONMENT, useValue: environment as Environment },
-    { provide: IS_VSCODE, useValue: environment.application === 'vscode' }
+    { provide: IS_VSCODE, useValue: environment.application === 'vscode' },
+    { provide: IS_INTELLIJ, useValue: environment.application === 'intellij' },
+    { provide: IS_ELECTRON, useValue: environment.application === 'electron' }
   ],
   bootstrap: [AppComponent]
 })
