@@ -1,8 +1,3 @@
-(global as any).__non_webpack_require__ = () => {
-  return () => {
-    throw new Error();
-  };
-};
 import { parseStats, calculateStatsFromChunks } from './stats';
 import { join } from 'path';
 

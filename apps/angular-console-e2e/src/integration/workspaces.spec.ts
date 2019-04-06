@@ -11,7 +11,7 @@ describe('Workspaces', () => {
   beforeEach(() => {
     whitelistGraphql();
     cy.visit('/workspaces');
-    cy.get('.add-workspace-container').trigger('mouseover');
+    cy.get('.add-workspace-container').trigger('mouseover', { force: true });
   });
 
   it('creates new workspaces', () => {

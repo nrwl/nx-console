@@ -5,7 +5,7 @@ import { join } from 'path';
 import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
 
 // @ts-ignore
-const exploreSourceMap = __non_webpack_require__('source-map-explorer');
+import * as exploreSourceMap from 'source-map-explorer';
 
 export interface Chunk {
   name: string;
