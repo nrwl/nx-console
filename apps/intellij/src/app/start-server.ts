@@ -4,20 +4,28 @@ import {
 } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
-import * as path from 'path';
+import { join } from 'path';
+import { existsSync, writeFile } from 'fs';
 
 export async function startServer(port: number, publicDir: string) {
   try {
-    const storeMap = new Map();
+    const settingsPath = join(__dirname, 'settings.json');
+    const settingsExist = existsSync(settingsPath);
+    if (!settingsExist) {
+      writeFile(settingsPath, '{}', () => {});
+    }
+
+    const storeMap: { [key: string]: any } = {};
     const store: Store = {
       get(key: string, defaultValue: any) {
-        return storeMap.has(key) ? storeMap.get(key) : defaultValue;
+        return storeMap[key] || defaultValue;
       },
       set(key: string, value: any) {
-        storeMap.set(key, value);
+        storeMap[key] = value;
+        writeFile(settingsPath, JSON.stringify(storeMap, null, 2), () => {});
       },
       delete(key: string) {
-        storeMap.delete(key);
+        delete storeMap[key];
       }
     };
 
@@ -33,7 +41,7 @@ export async function startServer(port: number, publicDir: string) {
       'assetsPath'
     ];
 
-    const assetsPath = path.join(publicDir, 'assets/public');
+    const assetsPath = join(publicDir, 'assets/public');
     const providers = [
       { provide: 'serverAddress', useValue: `http://localhost:${port}` },
       { provide: 'store', useValue: store },
