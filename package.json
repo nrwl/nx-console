@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.29.1"
+    "vscode": "^1.33.0"
   },
   "scripts": {
     "nx": "nx",
@@ -119,7 +119,7 @@
     "@types/get-port": "^4.0.1",
     "@types/graphql": "14.0.5",
     "@types/jest": "^24.0.0",
-    "@types/node": "^10.12.21",
+    "@types/node": "11.13.0",
     "@types/opn": "^5.1.0",
     "@types/request": "^2.48.1",
     "@types/semver": "^5.5.0",
@@ -194,7 +194,7 @@
     "universal-analytics": "0.4.20",
     "uuid": "3.3.2",
     "vsce": "^1.59.0",
-    "vscode": "^1.1.29",
+    "vscode": "^1.1.33",
     "xterm": "3.11.0",
     "zlib": "^1.0.5",
     "zone.js": "0.8.29"
