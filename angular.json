@@ -180,7 +180,13 @@
             "outputPath": "dist/apps/vscode",
             "main": "apps/vscode/src/main.ts",
             "sourceMap": false,
-            "externalDependencies": ["vscode", "node-pty-prebuilt"],
+            "externalDependencies": [
+              "vscode",
+              "source-map-explorer",
+              "semver",
+              "tmp",
+              "node-pty-prebuilt"
+            ],
             "tsConfig": "apps/vscode/tsconfig.app.json",
             "assets": [
               "apps/vscode/src/package.json",
@@ -220,7 +226,13 @@
         "build": {
           "builder": "@nrwl/builders:node-build",
           "options": {
-            "externalDependencies": ["electron", "node-pty-prebuilt"],
+            "externalDependencies": [
+              "electron",
+              "source-map-explorer",
+              "semver",
+              "tmp",
+              "node-pty-prebuilt"
+            ],
             "outputPath": "dist/apps/electron",
             "main": "apps/electron/src/main.ts",
             "tsConfig": "apps/electron/tsconfig.app.json",
@@ -267,7 +279,12 @@
             "outputPath": "dist/apps/intellij",
             "main": "apps/intellij/src/main.ts",
             "sourceMap": false,
-            "externalDependencies": ["node-pty-prebuilt"],
+            "externalDependencies": [
+              "source-map-explorer",
+              "semver",
+              "tmp",
+              "node-pty-prebuilt"
+            ],
             "tsConfig": "apps/intellij/tsconfig.app.json",
             "assets": [
               "apps/intellij/src/package.json",
