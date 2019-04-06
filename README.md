@@ -88,7 +88,7 @@ Pick one of the issues from the [good first issue](https://github.com/nrwl/angul
 | Dan Muller | Victor Savkin | Jack Hsu | Frantisek Kolar | Kamil Kisiela |
 | ---------- | ------------- | -------- | -------------- | ------------- |
 | ![Dan Muller][DM] | ![Victor Savkin][VS] | ![Jack Hsu][JH] | ![Frantisek Kolar][FK] | ![Kamil Kisiela][KK] |
-| [mrmeku](https://github.com/mrmeku) | [vsavkin](https://github.com/vsavkin) | [jaysoo](https://github.com/jaysoo) | [manekinekko](https://github.com/manekinekko) | [kamilkisiela](https://github.com/kamilkisiela) |
+| [mrmeku](https://github.com/mrmeku) | [vsavkin](https://github.com/vsavkin) | [jaysoo](https://github.com/jaysoo) | [fkolar](https://github.com/fkolar) | [kamilkisiela](https://github.com/kamilkisiela) |
 
 [DM]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/dan_pic.jpg
 [VS]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/victor_pic.jpg
