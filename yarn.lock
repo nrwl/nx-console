@@ -13271,10 +13271,10 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
-vsce@^1.57.0:
-  version "1.57.0"
-  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.57.0.tgz#6a80e478a3df99e9ec74b9440e2b38cc265f0881"
-  integrity sha512-ULiWDQBt0XZAA5PI7XL0TxeKZ6cXk3e3ZH/lL9xk93WeckqWzR79D3xNsf0GRacOGYU+UmbhXWRtP8C6wnDNmg==
+vsce@^1.59.0:
+  version "1.59.0"
+  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.59.0.tgz#921362828d6c54b6d8d5b98fc01dcaa853f02f31"
+  integrity sha512-tkB97885k5ce25Brbe9AZTCAXAkBh7oa5EOzY0BCJQ51W/mfRaQuCluCd9gZpWdgiU4AbPvwxtoVKKsenlSt8w==
   dependencies:
     chalk "^2.4.2"
     cheerio "^1.0.0-rc.1"
