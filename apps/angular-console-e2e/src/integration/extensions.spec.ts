@@ -23,11 +23,11 @@ describe('Extensions', () => {
   it('filters extensions', () => {
     tasks($p => {
       const t = texts($p);
-      expect(t[0].indexOf('@nrwl/schematics') > -1).to.equal(true);
+      expect(t[0].indexOf('@angular-toolkit/serverless') > -1).to.equal(false);
     });
 
     // filter by item
-    cy.get('input#filter').type('serverless');
+    cy.get('input#filter').type('@angular-toolkit/serverless');
     tasks($p => {
       const t = texts($p);
       expect(t[0].indexOf('@angular-toolkit/serverless') > -1).to.equal(true);
