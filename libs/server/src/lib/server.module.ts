@@ -18,7 +18,10 @@ import { docs } from './api/docs';
 import { DefaultController } from './default.controller';
 import { FileUtils } from './utils/file-utils';
 
-export function createServerModule(exports: string[], providers: Provider[]) {
+export function createServerModule(
+  exports: string[],
+  providers: Provider[]
+): any {
   @Global()
   @Module({
     providers: [

@@ -1,5 +1,5 @@
 import { Settings } from '@angular-console/schema';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
+import { Store, authUtils } from '@nrwl/angular-console-enterprise-electron';
 import { platform } from 'os';
 import { Subject } from 'rxjs';
 
@@ -43,8 +43,6 @@ export function readSettings(store: Store): Settings {
   if (settings.useNvm === undefined) {
     settings.useNvm = false;
   }
-  const authUtils = require('@nrwl/angular-console-enterprise-electron')
-    .authUtils;
   settings.isConnectUser = !!authUtils.getIdTokenFromStore();
   return settings;
 }

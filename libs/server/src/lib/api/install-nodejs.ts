@@ -47,9 +47,10 @@ export function installNodeJs(): InstallNodeJsStatus {
 
         nodeDownload = request(
           'http://nodejs.org/dist/v8.12.0/node-v8.12.0.pkg'
-        )
-          .pipe(nodeDownloadProgress)
-          .pipe(pkg);
+        ).pipe(
+          nodeDownloadProgress,
+          pkg as any
+        );
         return {};
       case 'win32':
         nodeDownloadProgress = require('progress-stream')({
@@ -67,9 +68,10 @@ export function installNodeJs(): InstallNodeJsStatus {
 
         nodeDownload = request(
           'http://nodejs.org/dist/v8.12.0/node-v8.12.0-x64.msi'
-        )
-          .pipe(nodeDownloadProgress)
-          .pipe(msi);
+        ).pipe(
+          nodeDownloadProgress,
+          msi as any
+        );
 
         return {};
       default:
