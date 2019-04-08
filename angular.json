@@ -242,11 +242,13 @@
               "apps/electron/src/assets/new-workspace",
               "apps/electron/src/assets/new-workspace.cmd",
               "apps/electron/src/assets"
-            ]
+            ],
+            "webpackConfig": "apps/electron/webpack.conf.js"
           },
           "configurations": {
             "production": {
-              "optimization": true,
+              "optimization": false,
+              "sourceMap": false,
               "extractLicenses": true,
               "fileReplacements": [
                 {
@@ -525,6 +527,50 @@
         }
       },
       "schematics": {}
+    },
+    "intellij": {
+      "root": "apps/intellij",
+      "sourceRoot": "apps/intellij/src",
+      "projectType": "application",
+      "prefix": "intellij",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/builders:node-build",
+          "options": {
+            "outputPath": "dist/apps/intellij",
+            "main": "apps/intellij/src/main.ts",
+            "tsConfig": "apps/intellij/tsconfig.app.json",
+            "assets": ["apps/intellij/src"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/intellij/src/environments/environment.ts",
+                  "with": "apps/intellij/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/builders:node-execute",
+          "options": {
+            "buildTarget": "intellij:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["apps/intellij/tsconfig.app.json"],
+            "exclude": ["**/node_modules/**"]
+          }
+        }
+      }
     }
   },
   "cli": {
@@ -540,7 +586,15 @@
       "styleext": "scss"
     },
     "@nrwl/schematics:library": {
-      "unitTestRunner": "jest"
+      "unitTestRunner": "jest",
+      "framework": "angular"
+    },
+    "@nrwl/schematics:application": {
+      "unitTestRunner": "karma",
+      "e2eTestRunner": "protractor"
+    },
+    "@nrwl/schematics:node-application": {
+      "framework": "express"
     }
   }
 }
