@@ -1,8 +1,8 @@
 <div class="container">
-  <div class="row summary" fxLayout="row" fxLayoutGap="20px">
-    <mat-card fxFlex>
-      <div class="header"><h3>Summary</h3></div>
-      <div class="grid grid-3-columns">
+  <div class="row summary">
+    <div class="header"><h3>Summary</h3></div>
+    <div fxLayout="row" fxLayoutGap="20px">
+      <div class="grid grid-3-columns" fxFlex>
         <div>
           <div class="title">Status</div>
           <div class="content">
@@ -45,193 +45,189 @@
           </div>
         </div>
       </div>
-    </mat-card>
-    <mat-card class="build-status">
-      <ng-container *ngIf="(serverUrl$ | async) as serverUrl; else buildResult">
-        <div class="status-icon-container">
-          <mat-icon class="success">check_circle</mat-icon>
-        </div>
-        <div class="build-status-content">
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="onServerOpen(serverUrl)"
-          >
-            <mat-icon>launch</mat-icon>
-            Open App
-          </button>
-        </div>
-      </ng-container>
-      <ng-template #buildResult>
-        <div class="status-icon-container">
-          <mat-icon [ngClass]="buildStatusClass$ | async">{{
-            buildStatusIcon$ | async
-          }}</mat-icon>
-        </div>
-        <div class="build-status-content">
-          <ng-container
-            *ngIf="
-              (openableOutputPath$ | async) as outputPath;
-              else buildStatus
-            "
-          >
+      <div class="build-status">
+        <ng-container
+          *ngIf="(serverUrl$ | async) as serverUrl; else buildResult"
+        >
+          <div class="status-icon-container">
+            <mat-icon class="success">check_circle</mat-icon>
+          </div>
+          <div class="build-status-content">
             <button
               mat-raised-button
               color="primary"
-              (click)="showItemInFolder(outputPath)"
+              (click)="onServerOpen(serverUrl)"
             >
-              <mat-icon>folder_open</mat-icon>
-              Open Folder
+              <mat-icon>launch</mat-icon>
+              Open App
             </button>
-          </ng-container>
-          <ng-template #buildStatus>
-            {{ detailedBuildStatus$ | async }}
-          </ng-template>
-        </div>
-      </ng-template>
-    </mat-card>
+          </div>
+        </ng-container>
+        <ng-template #buildResult>
+          <div class="status-icon-container">
+            <mat-icon [ngClass]="buildStatusClass$ | async">{{
+              buildStatusIcon$ | async
+            }}</mat-icon>
+          </div>
+          <div class="build-status-content">
+            <ng-container
+              *ngIf="
+                (openableOutputPath$ | async) as outputPath;
+                else buildStatus
+              "
+            >
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="showItemInFolder(outputPath)"
+              >
+                <mat-icon>folder_open</mat-icon>
+                Open Folder
+              </button>
+            </ng-container>
+            <ng-template #buildStatus>
+              {{ detailedBuildStatus$ | async }}
+            </ng-template>
+          </div>
+        </ng-template>
+      </div>
+    </div>
   </div>
   <div
     [ngClass]="'row ' + (problemsAnimationState$ | async)"
     [@growShrinkVert]="problemsAnimationState$ | async"
   >
-    <mat-card>
-      <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex><h3>Problems</h3></div>
+    <div class="header" fxLayout="row" fxLayoutAlign="center">
+      <div fxFlex><h3>Problems</h3></div>
+    </div>
+    <ng-container *ngIf="(errors$ | async) as errors">
+      <div class="problem-list">
+        <div
+          class="problem-list-item"
+          *ngFor="let error of errors; trackBy: trackByString"
+        >
+          {{ error }}
+        </div>
       </div>
-      <ng-container *ngIf="(errors$ | async) as errors">
-        <div class="problem-list">
-          <div
-            class="problem-list-item"
-            *ngFor="let error of errors; trackBy: trackByString"
-          >
-            {{ error }}
-          </div>
+    </ng-container>
+    <ng-container *ngIf="(warnings$ | async) as warnings">
+      <div class="problem-list">
+        <div
+          class="problem-list-item"
+          *ngFor="let warning of warnings; trackBy: trackByString"
+        >
+          {{ warning }}
         </div>
-      </ng-container>
-      <ng-container *ngIf="(warnings$ | async) as warnings">
-        <div class="problem-list">
-          <div
-            class="problem-list-item"
-            *ngFor="let warning of warnings; trackBy: trackByString"
-          >
-            {{ warning }}
-          </div>
-        </div>
-      </ng-container>
-    </mat-card>
+      </div>
+    </ng-container>
   </div>
   <div
     class="row"
     [ngClass]="'row ' + (analyzeAnimationState$ | async)"
     [@growShrinkVert]="analyzeAnimationState$ | async"
   >
-    <mat-card>
-      <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex><h3>Analyze</h3></div>
-        <div class="actions" fxLayout="row" fxLayoutGap="20px">
-          <mat-select
-            matRipple
-            fxFlex
-            [value]="currentChunkId$ | async"
-            (selectionChange)="handleChunkFileSelection($event)"
-          >
-            <mat-option
-              *ngFor="let chunk of (chunks$ | async); trackBy: trackById"
-              [value]="chunk.id"
-            >
-              {{ chunk.file }}
-            </mat-option>
-          </mat-select>
-        </div>
-      </div>
-      <ng-container
-        *ngIf="
-          (viewingModules$ | async) as viewingModules;
-          else noViewingModules
-        "
+    <div class="header"><h3>Analyze Bundles</h3></div>
+    <div class="actions">
+      <mat-select
+        matRipple
+        [value]="selectedBundleFile$ | async"
+        (selectionChange)="handleChunkFileSelection($event)"
       >
-        <ui-modules-graph
-          [chunk]="currentChunk$ | async"
-          [data]="viewingModules"
-        ></ui-modules-graph>
-      </ng-container>
-      <ng-template #noViewingModules>
-        <mat-icon class="pending large">more_horiz</mat-icon>
-      </ng-template>
-    </mat-card>
-  </div>
-  <div class="row">
-    <mat-card>
-      <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex><h3>Speed Stats</h3></div>
-      </div>
-      <ng-container
-        *ngIf="(networkSpeeds$ | async) as speedStats; else noSpeedStats"
-      >
-        <div class="grid grid-4-columns">
-          <div *ngFor="let stat of speedStats; trackBy: trackBySpeedKey">
-            <div class="title">{{ stat.label }}</div>
-            <div class="content">{{ stat.downloadTime }}</div>
-          </div>
-        </div>
-      </ng-container>
-      <ng-template #noSpeedStats>
-        <mat-icon class="pending large">more_horiz</mat-icon>
-      </ng-template>
-    </mat-card>
-  </div>
-  <div class="row">
-    <mat-card>
-      <div class="header" fxLayout="row" fxLayoutAlign="center">
-        <div fxFlex><h3>Assets</h3></div>
-      </div>
-      <mat-grid-list cols="6" rowHeight="28px">
-        <mat-grid-tile class="title" colspan="2"></mat-grid-tile>
-        <mat-grid-tile class="title" colspan="1">Gzipped</mat-grid-tile>
-        <mat-grid-tile
-          class="title"
-          colspan="1"
-          *ngFor="let key of displayAssetSpeeds; trackBy: trackByString"
+        <mat-option
+          *ngFor="let bundle of (bundles$ | async); trackBy: trackByFile"
+          [value]="bundle.file"
         >
-          {{ getSpeedLabel(key) }}
-        </mat-grid-tile>
-      </mat-grid-list>
-      <ng-container
-        *ngIf="(displayAssets$ | async) as displayAssets; else noDisplayAssets"
+          {{ bundle.file }}
+        </mat-option>
+      </mat-select>
+    </div>
+    <ng-container
+      *ngIf="(viewingModules$ | async) as viewingModules; else noViewingModules"
+    >
+      <ui-modules-graph
+        [bundle]="currentBundle$ | async"
+        [data]="viewingModules"
+      ></ui-modules-graph>
+
+      <p>
+        <small>
+          <strong>Note:</strong> The module sizes displayed in this graph are
+          the parsed sizes, not gzipped. Gzipped file size is only relevant for
+          the bundle as a whole.
+        </small>
+      </p>
+    </ng-container>
+    <ng-template #noViewingModules>
+      <mat-icon class="pending large">more_horiz</mat-icon>
+    </ng-template>
+  </div>
+  <div class="row">
+    <div class="header" fxLayout="row" fxLayoutAlign="center">
+      <div fxFlex><h3>Speed Stats</h3></div>
+    </div>
+    <ng-container
+      *ngIf="(networkSpeeds$ | async) as speedStats; else noSpeedStats"
+    >
+      <div class="grid grid-4-columns">
+        <div *ngFor="let stat of speedStats; trackBy: trackBySpeedKey">
+          <div class="title">{{ stat.label }}</div>
+          <div class="content">{{ stat.downloadTime }}</div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #noSpeedStats>
+      <mat-icon class="pending large">more_horiz</mat-icon>
+    </ng-template>
+  </div>
+  <div class="row">
+    <div class="header" fxLayout="row" fxLayoutAlign="center">
+      <div fxFlex><h3>Assets</h3></div>
+    </div>
+    <mat-grid-list cols="6" rowHeight="28px">
+      <mat-grid-tile class="title" colspan="2"></mat-grid-tile>
+      <mat-grid-tile class="title" colspan="1">Gzipped</mat-grid-tile>
+      <mat-grid-tile
+        class="title"
+        colspan="1"
+        *ngFor="let key of displayAssetSpeeds; trackBy: trackByString"
       >
-        <ng-container *ngIf="displayAssets.length > 0; else noDisplayAssets"
-          ><mat-grid-list
-            cols="6"
-            rowHeight="28px"
-            *ngFor="let asset of displayAssets; trackBy: trackByAsset"
-          >
-            <mat-grid-tile colspan="2">
-              <div class="asset-name">{{ asset.name }}</div>
-            </mat-grid-tile>
-            <mat-grid-tile colspan="1">
-              <div
-                class="content"
-                matTooltipPosition="right"
-                matTooltip="{{
-                  asset.sizes.parsed | formatFileSize: '-'
-                }} (Parsed)"
-              >
-                {{ asset.sizes.gzipped | formatFileSize: '–' }}
-              </div>
-            </mat-grid-tile>
-            <mat-grid-tile
-              colspan="1"
-              *ngFor="let speedStat of asset.speeds; trackBy: trackBySpeedKey"
+        {{ getSpeedLabel(key) }}
+      </mat-grid-tile>
+    </mat-grid-list>
+    <ng-container
+      *ngIf="(displayAssets$ | async) as displayAssets; else noDisplayAssets"
+    >
+      <ng-container *ngIf="displayAssets.length > 0; else noDisplayAssets"
+        ><mat-grid-list
+          cols="6"
+          rowHeight="28px"
+          *ngFor="let asset of displayAssets; trackBy: trackByAsset"
+        >
+          <mat-grid-tile colspan="2">
+            <div class="asset-name">{{ asset.file }}</div>
+          </mat-grid-tile>
+          <mat-grid-tile colspan="1">
+            <div
+              class="content"
+              matTooltipPosition="right"
+              matTooltip="{{
+                asset.sizes.parsed | formatFileSize: '-'
+              }} (Parsed)"
             >
-              <div class="content">{{ speedStat.downloadTime }}</div>
-            </mat-grid-tile>
-          </mat-grid-list>
-        </ng-container>
+              {{ asset.sizes.gzipped | formatFileSize: '–' }}
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile
+            colspan="1"
+            *ngFor="let speedStat of asset.speeds; trackBy: trackBySpeedKey"
+          >
+            <div class="content">{{ speedStat.downloadTime }}</div>
+          </mat-grid-tile>
+        </mat-grid-list>
       </ng-container>
-      <ng-template #noDisplayAssets>
-        <mat-icon class="pending large">more_horiz</mat-icon>
-      </ng-template>
-    </mat-card>
+    </ng-container>
+    <ng-template #noDisplayAssets>
+      <mat-icon class="pending large">more_horiz</mat-icon>
+    </ng-template>
   </div>
 </div>

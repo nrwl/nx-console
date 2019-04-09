@@ -1,9 +1,14 @@
 import { readJsonFile } from '../utils/utils';
-import { Chunk, parseStats, calculateStatsFromChunks } from '../utils/stats';
+import {
+  Module,
+  calculateStatsFromChunks,
+  generateStats
+} from '../utils/stats';
 import {
   getProjectArchitect,
+  SUPPORTED_BUILD_BUILDERS,
   SUPPORTED_KARMA_TEST_BUILDERS,
-  SUPPORTED_NG_BUILD_BUILDERS
+  SUPPORTED_SERVE_BUILDERS
 } from '../utils/architect';
 import { join } from 'path';
 import { existsSync, readFileSync } from 'fs';
@@ -37,14 +42,16 @@ export interface BuildDetailedStatus {
   progress: number;
   date: string;
   time: string;
-  chunks: Chunk[];
+  chunks: Module[];
   errors: string[];
+  warnings: string[];
   serverHost?: string;
   serverPort?: number;
   isForProduction?: boolean;
   outputPath?: string;
   indexFile?: string;
   stats?: any;
+  processedChunks?: { [k: string]: Module };
 }
 
 interface BuildArchitectOpts {
@@ -59,16 +66,19 @@ interface BuildArchitectOpts {
 export class BuildDetailedStatusCalculator
   implements DetailedStatusCalculator<BuildDetailedStatus> {
   detailedStatus: BuildDetailedStatus;
-  processedChunks: { [k: string]: Chunk } = {};
+  processedChunks: { [k: string]: Module } = {};
   isForProduction: boolean;
   architectOptions: null | BuildArchitectOpts;
   cwd: string;
+  isServe: boolean;
 
   constructor(opts: {
+    isServe: boolean;
     isForProduction: boolean;
     architectOptions: null | BuildArchitectOpts;
     cwd: string;
   }) {
+    this.isServe = opts.isServe;
     this.isForProduction = opts.isForProduction;
     this.architectOptions = opts.architectOptions;
     this.cwd = opts.cwd;
@@ -92,8 +102,9 @@ export class BuildDetailedStatusCalculator
       progress: 0,
       date: '',
       time: '',
-      chunks: [] as Chunk[],
+      chunks: [] as Module[],
       errors: [],
+      warnings: [],
       isForProduction: this.isForProduction
     };
   }
@@ -116,7 +127,7 @@ export class BuildDetailedStatusCalculator
     );
 
     // Don't override chunks unless it has changed or else we will have to keep calling Object.values.
-    if (this.processedChunks !== processedChunks) {
+    if (this.processedChunks !== processedChunks && processedChunks) {
       newValue.chunks = Object.values(processedChunks);
       this.processedChunks = processedChunks;
     }
@@ -137,16 +148,33 @@ export class BuildDetailedStatusCalculator
     const justCompleted =
       nextStatus.progress === 100 && this.detailedStatus.progress < 100;
 
-    if (justCompleted && this.architectOptions) {
-      const statsPath = `${this.cwd}/${
-        this.architectOptions.outputPath
-      }/stats.json`;
+    if (!justCompleted && nextStatus.buildStatus !== 'build_success') {
+      return nextStatus;
+    }
 
-      if (existsSync(statsPath)) {
-        const statsJson = JSON.parse(readFileSync(statsPath).toString());
-        nextStatus.stats = parseStats(statsJson, this.cwd);
-      } else {
+    if (!nextStatus.stats) {
+      if (this.isServe) {
         nextStatus.stats = calculateStatsFromChunks(nextStatus.chunks);
+      } else {
+        nextStatus.stats =
+          this.architectOptions && this.architectOptions.outputPath
+            ? generateStats(this.architectOptions.outputPath, this.cwd)
+            : null;
+      }
+    }
+
+    const statsJsonPath =
+      this.architectOptions && this.architectOptions.outputPath
+        ? join(this.cwd, this.architectOptions.outputPath, 'stats.json')
+        : null;
+
+    if (statsJsonPath && existsSync(statsJsonPath)) {
+      try {
+        const webpackStats = JSON.parse(readFileSync(statsJsonPath).toString());
+        nextStatus.errors = nextStatus.errors.concat(webpackStats.errors);
+        nextStatus.warnings = nextStatus.warnings.concat(webpackStats.warnings);
+      } catch (err) {
+        nextStatus.errors.push(String(err));
       }
     }
 
@@ -154,9 +182,9 @@ export class BuildDetailedStatusCalculator
   }
 
   static updateDetailedStatus(
-    state: BuildDetailedStatus & { processedChunks: { [k: string]: Chunk } },
+    state: BuildDetailedStatus,
     value: string
-  ): BuildDetailedStatus & { processedChunks: { [k: string]: Chunk } } {
+  ): BuildDetailedStatus {
     const serverErrorRegExp = /(Port \d+ is already in use)|(getaddrinfo ENOTFOUND .*)/;
     const newErrors = [] as string[];
     let _state = state;
@@ -437,30 +465,6 @@ export class TestDetailedStatusCalculator
   }
 }
 
-export function createDetailedStatusCalculator(cwd: string, cmds: string[]) {
-  const operationName = cmds[0];
-  const project = cmds[1];
-  const { json: angularJson } = readJsonFile('./angular.json', cwd);
-  const architect = getProjectArchitect(project, operationName, angularJson);
-  const builder = architect.builder;
-
-  if (SUPPORTED_KARMA_TEST_BUILDERS.includes(builder)) {
-    return new TestDetailedStatusCalculator();
-  }
-
-  if (SUPPORTED_NG_BUILD_BUILDERS.includes(builder)) {
-    const isForProduction = cmds.includes('--configuration=production');
-    const options = architect.options;
-    return new BuildDetailedStatusCalculator({
-      isForProduction,
-      architectOptions: options,
-      cwd
-    });
-  }
-
-  return new EmptyDetailedStatusCalculator();
-}
-
 const COLOR_OUTPUT_REGEXP = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
 
 function sanitize(value: string) {
@@ -558,4 +562,40 @@ function parseTime(s: string) {
     }
   }
   return s;
+}
+
+export function createDetailedStatusCalculator(cwd: string, cmds: string[]) {
+  const operationName = cmds[0];
+  const project = cmds[1];
+  const { json: angularJson } = readJsonFile('./angular.json', cwd);
+  const architect = getProjectArchitect(project, operationName, angularJson);
+  const builder = architect.builder;
+
+  if (SUPPORTED_KARMA_TEST_BUILDERS.includes(builder)) {
+    return new TestDetailedStatusCalculator();
+  }
+
+  if (SUPPORTED_BUILD_BUILDERS.includes(builder)) {
+    const isForProduction = cmds.includes('--configuration=production');
+    const options = architect.options;
+    return new BuildDetailedStatusCalculator({
+      isServe: false,
+      isForProduction,
+      architectOptions: options,
+      cwd
+    });
+  }
+
+  if (SUPPORTED_SERVE_BUILDERS.includes(builder)) {
+    const isForProduction = cmds.includes('--configuration=production');
+    const options = architect.options;
+    return new BuildDetailedStatusCalculator({
+      isServe: true,
+      isForProduction,
+      architectOptions: options,
+      cwd
+    });
+  }
+
+  return new EmptyDetailedStatusCalculator();
 }

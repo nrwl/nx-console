@@ -35,6 +35,7 @@ small {
 
 h3 {
   font-size: 18px;
+  text-align: center;
   font-weight: 500;
   margin: 0;
 }
@@ -42,12 +43,13 @@ h3 {
 .container {
   overflow: auto;
   height: 100%;
+  background-color: #fff;
 }
 
 .grid {
   display: grid;
   box-sizing: border-box;
-  grid-gap: 20px;
+  grid-gap: 24px;
 }
 
 .grid-3-columns {
@@ -59,21 +61,26 @@ h3 {
 }
 
 .row {
-  margin: 20px;
+  margin: 36px 24px;
+  position: relative;
 }
 // Prevent collapsed row from taking up extra margins.
 .row.collapse {
-  margin-bottom: -20px;
+  margin-bottom: -36px;
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   mat-icon {
     font-size: 18px;
   }
+}
 
-  .actions {
+.actions {
+  text-align: right;
+
+  mat-select {
     width: 200px;
   }
 }
@@ -120,7 +127,7 @@ h3 {
   }
 
   .build-status-content {
-    margin-top: 20px;
+    margin-top: 24px;
   }
 }
 

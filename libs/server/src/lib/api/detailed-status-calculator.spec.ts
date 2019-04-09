@@ -19,7 +19,8 @@ describe('detailedStatusCalculator', () => {
         date: '',
         time: '',
         chunks: [],
-        errors: []
+        errors: [],
+        warnings: []
       });
     });
 
@@ -93,7 +94,8 @@ describe('detailedStatusCalculator', () => {
               type: 'initial'
             }
           ],
-          errors: []
+          errors: [],
+          warnings: []
         })
       );
     });
@@ -111,6 +113,7 @@ describe('detailedStatusCalculator', () => {
         progress: 100,
         date: '',
         time: '',
+        stats: null,
         indexFile: undefined,
         isForProduction: false,
         outputPath: undefined,
@@ -118,7 +121,8 @@ describe('detailedStatusCalculator', () => {
         chunks: [
           { name: 'main', file: 'main.js', size: '381 kB', type: 'initial' }
         ],
-        errors: []
+        errors: [],
+        warnings: []
       });
     });
 
@@ -138,12 +142,14 @@ describe('detailedStatusCalculator', () => {
         outputPath: undefined,
         serverHost: undefined,
         serverPort: undefined,
+        stats: null,
         date: '',
         time: '',
         chunks: [
           { name: 'main', file: 'main.js', size: '381 kB', type: 'initial' }
         ],
-        errors: []
+        errors: [],
+        warnings: []
       });
 
       c.addOut(`
@@ -159,6 +165,8 @@ describe('detailedStatusCalculator', () => {
         isForProduction: false,
         outputPath: undefined,
         serverHost: undefined,
+        serverPort: undefined,
+        stats: null,
         date: '',
         time: '',
         chunks: [
@@ -167,7 +175,8 @@ describe('detailedStatusCalculator', () => {
         errors: [
           `apps/myproject/src/app/app.module.ts(6,40): error TS2307: Cannot find module './reduc1ers'.`,
           `apps/myproject/src/main.ts(4,1): error TS2304: Cannot find name 'require'.`
-        ]
+        ],
+        warnings: []
       });
     });
 
@@ -232,6 +241,7 @@ describe('detailedStatusCalculator', () => {
 
     function createCalculator() {
       return new BuildDetailedStatusCalculator({
+        isServe: false,
         cwd: '',
         isForProduction: false,
         architectOptions: null
