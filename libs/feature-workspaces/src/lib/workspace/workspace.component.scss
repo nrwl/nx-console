@@ -34,12 +34,13 @@ angular-console-workspace {
           width: 32px;
           line-height: 32px;
         }
-        margin: 6px 4px;
 
+        margin: 6px 4px;
         transition: all 0.3s ease-in-out;
 
         &.active {
           pointer-events: none;
+
           .route-icon {
             color: rgb(67, 118, 197) !important;
           }

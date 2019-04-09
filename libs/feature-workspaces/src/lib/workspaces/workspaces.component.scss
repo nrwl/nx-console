@@ -65,12 +65,10 @@ mat-nav-list {
   position: fixed;
   bottom: 0;
   right: 0;
-
   padding: 24px;
   padding-left: 48px;
   padding-top: 48px;
   z-index: 2;
-
   transition: all 0.3s ease-in-out;
 
   &.action-bar-showing {
@@ -113,6 +111,7 @@ mat-nav-list {
         transform: rotate(90deg);
       }
     }
+
     .import-workspace-fab {
       opacity: 1;
       transform: scale(1);

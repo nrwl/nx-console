@@ -82,6 +82,8 @@
     "node-pty-prebuilt": "0.7.6",
     "semver": "5.6.0",
     "source-map-explorer": "^1.7.0",
+    "stylelint": "^9.10.1",
+    "stylelint-config-standard": "^18.2.0",
     "tmp": "^0.1.0"
   },
   "devDependencies": {
