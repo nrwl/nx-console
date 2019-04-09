@@ -1,4 +1,5 @@
 @import '~@angular/material/theming';
+
 @include mat-core();
 
 $gray-palette: mat-palette($mat-gray, 200);

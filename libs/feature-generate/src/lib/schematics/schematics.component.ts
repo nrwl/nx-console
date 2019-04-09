@@ -22,8 +22,7 @@ interface SchematicId {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-generate',
-  templateUrl: './schematics.component.html',
-  styleUrls: ['./schematics.component.scss']
+  templateUrl: './schematics.component.html'
 })
 export class SchematicsComponent {
   private readonly schematicCollections$: Observable<

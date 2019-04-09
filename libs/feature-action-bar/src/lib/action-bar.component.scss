@@ -2,24 +2,15 @@
   height: 52px;
 }
 
-mat-list {
-  padding: 0 !important;
-}
-
 .action-bar-container {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
     0 1px 10px 0 rgba(0, 0, 0, 0.12);
-  bottom: 0;
-  left: 0;
-  right: 0;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  position: absolute;
   overflow: hidden;
   background: white;
   z-index: 10;
@@ -51,7 +42,7 @@ mat-list {
 }
 
 mat-list {
-  padding: 0;
+  padding: 0 !important;
 
   mat-list-item {
     height: 52px !important;
@@ -73,7 +64,6 @@ mat-list {
 
     .task-avatar {
       line-height: 40px;
-
       text-align: center;
       color: white;
       position: relative;
@@ -81,6 +71,14 @@ mat-list {
 
       &:hover:not(.freshly-toggled) {
         background: rgba(0, 0, 0, 0.87);
+
+        .task-status {
+          opacity: 0;
+        }
+
+        .process-action {
+          opacity: 1;
+        }
       }
 
       .process-action mat-icon {
@@ -114,16 +112,6 @@ mat-list {
 
         .process-action {
           pointer-events: none;
-        }
-      }
-
-      &:hover:not(.freshly-toggled) {
-        .task-status {
-          opacity: 0;
-        }
-
-        .process-action {
-          opacity: 1;
         }
       }
 
@@ -164,6 +152,7 @@ mat-list {
           color: rgba(0, 0, 0, 0.87);
         }
       }
+
       mat-icon {
         transition: color 0.15s ease-in-out;
         color: rgba(0, 0, 0, 0.54);
@@ -171,7 +160,7 @@ mat-list {
     }
 
     .workspace-name {
-      color: #00000099;
+      color: #0009;
     }
 
     .second-line {

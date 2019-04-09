@@ -1,5 +1,6 @@
 @import '~@angular/material/theming';
 @import '../../../../ui/src/lib/variables';
+
 @include mat-core();
 
 $hint-palette: mat-palette($mat-gray, 500);
@@ -94,6 +95,7 @@ h3 {
   .title {
     font-size: 18px;
   }
+
   .content {
     font-size: 24px;
 
@@ -162,6 +164,7 @@ h3 {
     .title {
       font-size: 14px;
     }
+
     .content {
       font-size: 20px;
     }

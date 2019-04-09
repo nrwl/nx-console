@@ -210,9 +210,15 @@ module.exports = {
     lint: {
       default: nps.concurrent({
         nxLint: 'nx lint',
-        tsLint: 'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json'
+        tsLint: 'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json',
+        stylelint: 'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc'
       }),
-      fix: 'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json --fix'
+      fix: nps.concurrent({
+        tslint:
+          'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json --fix',
+        stylelint:
+          'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc --fix'
+      })
     },
     build: {
       default: 'nx affected:build --all --parallel',

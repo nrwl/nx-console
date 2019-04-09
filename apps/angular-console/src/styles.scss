@@ -8,9 +8,7 @@ $theme: mat-light-theme($primary, $accent, $warn);
 
 $custom-typography: mat-typography-config(
   $font-family:
-    "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-  'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif,
-  Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol"
+    "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol"
 );
 
 @include mat-core($custom-typography);
