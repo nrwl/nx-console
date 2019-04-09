@@ -1,4 +1,5 @@
 @import '~@angular/material/theming';
+@import '../../../libs/ui/src/lib/variables';
 
 $primary: mat-palette($mat-blue, 700, 100, 800);
 $accent: mat-palette($mat-red, 700, 600, 800);
@@ -20,7 +21,7 @@ body {
     Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   margin: 0;
   padding: 0;
-  background: white;
+  background: $white;
   overflow: hidden;
 }
 

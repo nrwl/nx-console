@@ -1,11 +1,11 @@
 @import '../../../../ui/src/lib/variables';
 
 p {
-  color: rgba(0, 0, 0, 0.54);
+  color: $black-half-transparent;
 }
 
 h4 {
-  color: rgba(0, 0, 0, 0.87);
+  color: $black-semi-transparent;
 }
 
 .recents-container,
@@ -47,7 +47,7 @@ mat-nav-list {
 }
 
 .workspace-item-container {
-  background: white;
+  background: $white;
   box-shadow: 0 -1px 0 #e0e0e0, 0 0 2px rgba(0, 0, 0, 0.12),
     0 2px 4px rgba(0, 0, 0, 0.24);
   margin: 4px;
@@ -127,16 +127,16 @@ mat-list-item mat-icon {
   transition: all 0.1s ease-in-out;
 
   &:hover {
-    color: rgba(0, 0, 0, 0.87);
+    color: $black-semi-transparent;
     transform: scale(1.05);
   }
 
   &.favorite-icon:hover {
-    color: #a53339;
+    color: $favorite-icon-hover;
   }
 
   &.favorited {
-    color: #bb3a3f;
+    color: $favorite-icon;
   }
 }
 
@@ -181,7 +181,7 @@ mat-divider {
     letter-spacing: 0.01em;
     font-size: 16px;
     line-height: 24px;
-    color: rgba(0, 0, 0, 0.87);
+    color: $black-semi-transparent;
     margin-top: 16px;
     text-align: center;
   }
@@ -192,13 +192,13 @@ mat-divider {
     line-height: 20px;
     font-weight: 400;
     letter-spacing: 0.01em;
-    color: rgba(0, 0, 0, 0.54);
+    color: $black-half-transparent;
     text-align: center;
     margin-bottom: 16px;
   }
 
   button mat-icon {
-    color: white;
+    color: $white;
     margin-right: 8px;
   }
 

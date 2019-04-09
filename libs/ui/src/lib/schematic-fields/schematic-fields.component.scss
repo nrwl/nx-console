@@ -1,3 +1,5 @@
+@import '../../../../ui/src/lib/variables';
+
 mat-hint {
   margin-top: -20px;
 }
@@ -26,7 +28,7 @@ mat-hint {
   & > mat-icon {
     position: relative;
     top: 16px;
-    color: rgb(117, 117, 117);
+    color: $white-half-transparent;
   }
 
   .clear-text-field {
@@ -37,7 +39,7 @@ mat-hint {
     top: 7px;
     cursor: pointer;
     background: #6a6a6a;
-    color: white;
+    color: $white;
     border-radius: 50%;
     font-size: 16px;
     line-height: 20px;

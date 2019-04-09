@@ -1,3 +1,5 @@
+@import '../../../../ui/src/lib/variables';
+
 .task-list {
   padding: 0;
   overflow: auto;
@@ -19,7 +21,7 @@
   height: 100%;
   z-index: 3;
   overflow-x: hidden;
-  background-color: rgb(245, 245, 245);
+  background-color: $off-white;
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
@@ -37,12 +39,12 @@
 .collection-name {
   position: sticky;
   top: 0;
-  background: rgb(240, 240, 240);
+  background: $off-off-white;
   z-index: 3;
 }
 
 .collection-name h3 {
-  color: rgba(0, 0, 0, 0.54);
+  color: $black-half-transparent;
   font-weight: 400;
   letter-spacing: 0.01em;
   height: 44px;
@@ -50,14 +52,14 @@
 }
 
 .task-filter-container {
-  background-color: white;
+  background-color: $white;
   height: 48px;
   min-height: 48px;
   max-height: 48px;
 
   input {
-    background: none;
-    background-color: none;
+    background: $none;
+    background-color: $none;
     outline: none;
     border: none;
     font-size: 16px;
@@ -67,7 +69,7 @@
   .filter-icon {
     cursor: pointer;
     margin-right: 12px;
-    color: rgba(0, 0, 0, 0.87);
+    color: $black-semi-transparent;
     height: 28px;
     width: 28px;
     font-size: 28px;
@@ -81,7 +83,7 @@
 }
 
 .no-tasks-container {
-  color: rgba(0, 0, 0, 0.54);
+  color: $black-half-transparent;
 
   .empty-filter-icon {
     user-select: none;
@@ -91,6 +93,6 @@
     width: 72px;
     font-size: 72px;
     line-height: 72px;
-    color: rgba(0, 0, 0, 0.54);
+    color: $black-half-transparent;
   }
 }

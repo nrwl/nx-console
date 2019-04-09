@@ -1,3 +1,5 @@
+@import '../../../ui/src/lib/variables';
+
 .empty-container {
   padding: 48px;
 
@@ -27,7 +29,7 @@
   }
 
   .code-image-container {
-    background-color: #333;
+    background-color: $black-semi-transparent;
     padding: 48px;
   }
 
@@ -36,7 +38,7 @@
     letter-spacing: 0.01em;
     font-size: 16px;
     line-height: 24px;
-    color: rgba(0, 0, 0, 0.87);
+    color: $black-semi-transparent;
     margin-top: 16px;
     text-align: center;
   }
@@ -47,13 +49,13 @@
     line-height: 20px;
     font-weight: 400;
     letter-spacing: 0.01em;
-    color: rgba(0, 0, 0, 0.54);
+    color: $black-half-transparent;
     text-align: center;
     margin-bottom: 16px;
   }
 
   button mat-icon {
-    color: white;
+    color: $white;
     margin-right: 8px;
   }
 }

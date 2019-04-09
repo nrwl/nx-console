@@ -39,7 +39,7 @@ mat-toolbar.title-bar {
   }
 
   &.actionable {
-    color: rgb(255, 255, 255);
+    color: $white;
     background: rgb(33, 33, 33);
   }
 
@@ -58,6 +58,6 @@ mat-toolbar.title-bar {
 
   // tslint:disable-next-line
   .action-button[disabled] {
-    color: rgb(185, 185, 185);
+    color: $disabled-color;
   }
 }

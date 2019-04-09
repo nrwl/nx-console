@@ -1,20 +1,22 @@
+@import '../../../../ui/src/lib/variables';
+
 mat-list-item mat-icon {
   cursor: pointer;
-  color: rgb(128, 128, 128);
+  color: $white-half-transparent;
   transform: scale(1);
   transition: all 0.1s ease-in-out;
 
   &:hover {
-    color: rgba(0, 0, 0, 0.87);
+    color: $black-semi-transparent;
     transform: scale(1.05);
   }
 
   &.favorite-icon:hover {
-    color: #a53339;
+    color: $favorite-icon-hover;
   }
 
   &.favorited {
-    color: #bb3a3f;
+    color: $favorite-icon;
   }
 }
 
@@ -37,7 +39,7 @@ mat-list {
 
 .project-type {
   text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.54);
+  color: $black-half-transparent;
   font-size: 12px !important;
   line-height: unset !important;
   letter-spacing: 2px !important;
@@ -49,11 +51,11 @@ mat-list {
   line-height: unset !important;
   font-weight: 400 !important;
   letter-spacing: 0.01em !important;
-  color: rgba(0, 0, 0, 0.87) !important;
+  color: $black-semi-transparent !important;
 }
 
 .project-root {
-  color: rgba(0, 0, 0, 0.54) !important;
+  color: $black-half-transparent !important;
   font-size: 14px !important;
   line-height: 20px !important;
   font-weight: 400 !important;
@@ -75,7 +77,7 @@ mat-list {
 
 .application {
   .project-type {
-    color: #bb3a3f;
+    color: $favorite-icon;
   }
 
   .project-name {
@@ -88,14 +90,14 @@ mat-list {
   width: 48px;
   line-height: 48px;
   background: rgba(0, 0, 0, 0.27);
-  color: white;
+  color: $white;
   border-radius: 50%;
   overflow: hidden;
   text-transform: uppercase;
 }
 
 .project-filter-container {
-  background-color: white;
+  background-color: $white;
   height: 48px;
   min-height: 48px;
   max-height: 48px;
@@ -103,8 +105,8 @@ mat-list {
   z-index: 2;
 
   input {
-    background: none;
-    background-color: none;
+    background: $none;
+    background-color: $none;
     outline: none;
     border: none;
     font-size: 16px;
@@ -114,7 +116,7 @@ mat-list {
   .filter-icon {
     cursor: pointer;
     margin-right: 12px;
-    color: rgba(0, 0, 0, 0.87);
+    color: $black-semi-transparent;
     height: 28px;
     width: 28px;
     font-size: 28px;

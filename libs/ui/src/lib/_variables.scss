@@ -1,0 +1,32 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+// Colors
+$primary-blue: mat-palette($mat-blue, 700);
+
+$grey-dark: mat-palette($mat-grey, 600);
+$grey-darker: mat-palette($mat-grey, 800);
+
+$off-white: rgb(245, 245, 245);
+$off-off-white: rgb(240, 240, 240);
+
+$favorite-icon-hover: #a53339;
+$favorite-icon: #bb3a3f;
+
+$white-half-transparent: rgba(255, 255, 255, 0.54);
+$white-semi-transparent: rgba(255, 255, 255, 0.87);
+$white: white;
+
+$disabled-color: rgb(185, 185, 185);
+
+$none: none;
+
+$black-half-transparent: rgba(0, 0, 0, 0.54);
+$black-semi-transparent: rgba(0, 0, 0, 0.87);
+
+$icon-size-large: 45px;
+
+// For media queries
+$largeScreen: 1800px;
+$smallScreen: 920px;

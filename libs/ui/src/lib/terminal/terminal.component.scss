@@ -1,3 +1,5 @@
+@import '../../../../ui/src/lib/variables';
+
 ui-terminal {
   display: block;
   height: 100%;
@@ -31,11 +33,11 @@ ui-terminal {
 
     &::-webkit-scrollbar-thumb {
       min-height: 20px;
-      background-color: rgba(255, 255, 255, 0.54);
+      background-color: $white-half-transparent;
       transition: background-color 300ms ease-in-out;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.87);
+        background-color: $white-semi-transparent;
       }
     }
   }

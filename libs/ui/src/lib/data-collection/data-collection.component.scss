@@ -1,3 +1,5 @@
+@import '../../../../ui/src/lib/variables';
+
 #data-collection {
   position: absolute;
   width: 400px;
@@ -5,12 +7,12 @@
   margin: 20px;
   bottom: 0;
   right: 0;
-  background-color: rgb(242, 242, 242);
+  background-color: $off-off-white;
   border: 1px solid rgb(200, 200, 200);
 
   p {
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.54) !important;
+    color: $black-half-transparent !important;
   }
 
   button {

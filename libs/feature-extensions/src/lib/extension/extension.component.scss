@@ -1,9 +1,11 @@
+@import '../../../../ui/src/lib/variables';
+
 :host {
   width: 100%;
 }
 
 .ui-flags {
-  background: white;
+  background: $white;
   overflow: auto;
 
   .name {

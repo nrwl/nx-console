@@ -13,7 +13,7 @@ $window-chrome-height: 45px;
   height: calc(100vh - 52px);
   width: 100%;
   overflow: hidden;
-  background-color: rgb(240, 240, 240);
+  background-color: $off-off-white;
 }
 
 .ui-terminal-container {

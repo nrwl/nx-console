@@ -1,3 +1,5 @@
+@import '../../../ui/src/lib/variables';
+
 .action-bar-spacer {
   height: 52px;
 }
@@ -12,7 +14,7 @@
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   overflow: hidden;
-  background: white;
+  background: $white;
   z-index: 10;
   max-height: calc(100vh - 16px);
   overflow-y: hidden;
@@ -30,7 +32,7 @@
 }
 
 .action-bar-title {
-  background: white;
+  background: $white;
   transition: box-shadow 0.3s ease-in-out;
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0), 0 4px 5px 0 rgba(0, 0, 0, 0),
     0 1px 10px 0 rgba(0, 0, 0, 0);
@@ -54,7 +56,7 @@ mat-list {
       font-family: 'Roboto Mono', monospace;
       padding-right: 16px !important;
       font-size: 16px;
-      color: #000000de !important;
+      color: $black-semi-transparent !important;
       line-height: 20px;
     }
 
@@ -65,12 +67,12 @@ mat-list {
     .task-avatar {
       line-height: 40px;
       text-align: center;
-      color: white;
+      color: $white;
       position: relative;
-      background: rgba(0, 0, 0, 0.54);
+      background: $black-half-transparent;
 
       &:hover:not(.freshly-toggled) {
-        background: rgba(0, 0, 0, 0.87);
+        background: $black-semi-transparent;
 
         .task-status {
           opacity: 0;
@@ -87,7 +89,7 @@ mat-list {
       }
 
       &.in-progress {
-        background: none;
+        background: $none;
 
         .process-action mat-icon {
           top: 1px;
@@ -123,14 +125,14 @@ mat-list {
         right: 0;
         opacity: 0;
         z-index: 11;
-        color: #4275c6;
+        color: $primary-blue;
       }
 
       mat-icon {
         height: 28px;
         width: 28px;
         font-size: 28px;
-        color: white;
+        color: $white;
       }
     }
 
@@ -149,18 +151,18 @@ mat-list {
     .task-action {
       &:hover {
         mat-icon {
-          color: rgba(0, 0, 0, 0.87);
+          color: $black-semi-transparent;
         }
       }
 
       mat-icon {
         transition: color 0.15s ease-in-out;
-        color: rgba(0, 0, 0, 0.54);
+        color: $black-half-transparent;
       }
     }
 
     .workspace-name {
-      color: #0009;
+      color: $black-semi-transparent;
     }
 
     .second-line {
