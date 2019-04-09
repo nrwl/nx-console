@@ -4,6 +4,8 @@
   mat-card-content {
     height: 120px;
     width: 680px;
+    padding-left: 36px;
+    padding-right: 36px;
 
     mat-progress-bar {
       padding-top: 24px;
@@ -25,7 +27,7 @@
   }
 
   .code-image-container {
-    background-color: #333333;
+    background-color: #333;
     padding: 48px;
   }
 
@@ -53,10 +55,5 @@
   button mat-icon {
     color: white;
     margin-right: 8px;
-  }
-
-  mat-card-content {
-    padding-left: 36px;
-    padding-right: 36px;
   }
 }

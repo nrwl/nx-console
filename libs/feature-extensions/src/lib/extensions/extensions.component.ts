@@ -26,8 +26,7 @@ export interface ExtensionGroup {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-extensions',
-  templateUrl: './extensions.component.html',
-  styleUrls: ['./extensions.component.scss']
+  templateUrl: './extensions.component.html'
 })
 export class ExtensionsComponent {
   private readonly extensions$: Observable<

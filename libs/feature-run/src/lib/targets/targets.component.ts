@@ -21,8 +21,7 @@ interface Target {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-targets',
-  templateUrl: './targets.component.html',
-  styleUrls: ['./targets.component.scss']
+  templateUrl: './targets.component.html'
 })
 export class TargetsComponent {
   private readonly projectsAndNpmScripts$: Observable<
