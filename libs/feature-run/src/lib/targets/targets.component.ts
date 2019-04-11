@@ -10,7 +10,7 @@ import {
   startWith,
   distinctUntilChanged
 } from 'rxjs/operators';
-import { LocationExt, TARGET_POLLING } from '@angular-console/utils';
+import { RouterNavigation, TARGET_POLLING } from '@angular-console/utils';
 import { WorkspaceAndProjectsGQL } from '../generated/graphql';
 
 interface Target {
@@ -134,7 +134,7 @@ export class TargetsComponent {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly workspaceAndProjectsGQL: WorkspaceAndProjectsGQL,
-    private readonly locationExt: LocationExt
+    private readonly locationExt: RouterNavigation
   ) {}
 
   navigateToSelectedTarget(target: Target | null) {
@@ -151,7 +151,7 @@ export class TargetsComponent {
         { relativeTo: this.route }
       );
     } else {
-      this.locationExt.goBackOrNavigateToFallback(['.'], {
+      this.locationExt.navigateToPrevious(['.'], {
         relativeTo: this.route
       });
     }
