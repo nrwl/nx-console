@@ -12,11 +12,9 @@ import { hierarchy, partition } from 'd3-hierarchy';
 import 'd3-transition';
 import { FormatFileSizePipe } from '../format-file-size.pipe';
 
-interface Chunk {
-  id: string;
-  name: undefined | string;
-  path: string;
+interface Bundle {
   file: string;
+  sizes: { parsed: number; gzipped: number };
 }
 
 interface VizNode {
@@ -55,7 +53,7 @@ export class ModulesGraphComponent implements OnInit {
   y: any;
   _data: any;
 
-  @Input() chunk: Chunk;
+  @Input() bundle: Bundle;
 
   @Input()
   set data(data: any) {
@@ -85,12 +83,14 @@ export class ModulesGraphComponent implements OnInit {
 
   ngOnInit() {
     this.updateDimensions();
+    this.render();
   }
 
   updateDimensions() {
     if (!this.container) {
       return;
     }
+
     this.width = this.container.nativeElement.offsetWidth;
     this.height = this.container.nativeElement.offsetHeight;
   }
@@ -120,8 +120,10 @@ export class ModulesGraphComponent implements OnInit {
 
   showDefaultExplanation() {
     select(this.fileSizeEl).text(this.formatFileSize.transform(this.totalSize));
-    select(this.percentageEl).text('100%');
-    select(this.moduleNameEl).text(this.chunk.name || this.chunk.file);
+    select(this.percentageEl).text(
+      `${this.formatFileSize.transform(this.bundle.sizes.gzipped)} Gzipped`
+    );
+    select(this.moduleNameEl).text(this.bundle.file);
   }
 
   renderWarning() {
