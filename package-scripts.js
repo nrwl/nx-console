@@ -1,5 +1,4 @@
 const nps = require('nps-utils');
-const os = require('os');
 const { join } = require('path');
 
 function forEachApplication(command) {
@@ -114,7 +113,7 @@ module.exports = {
       server: {
         default: nps.series(
           'nps dev.gen-graphql',
-          'ng build electron --prod --maxWorkers=2 --noSourceMap',
+          'ng build electron --prod --maxWorkers=6 --noSourceMap',
           'nps dev.copy-assets.electron',
           'nps dev.server.start'
         ),
@@ -222,12 +221,18 @@ module.exports = {
     },
     build: {
       default: 'nx affected:build --all --parallel',
+      ssr: {
+        electron: '',
+        intellij: '',
+        vscode: 'ng build angular-console --configuration=vscode-ssr'
+      },
       affected: affected('build'),
       ...forEachApplication(
         nps.series(
           'nps dev.gen-graphql',
+          'nps build.ssr.APPLICATION',
           nps.concurrent({
-            server: 'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap',
+            server: 'ng build APPLICATION --prod --maxWorkers=6 --noSourceMap',
             client: 'ng build angular-console --configuration=APPLICATION'
           })
         )

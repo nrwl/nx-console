@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { Global, Module, Provider } from '@nestjs/common';
+import { Global, Module, Provider, DynamicModule } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { QueryResolver } from './resolvers/query.resolver';
 import { MutationResolver } from './resolvers/mutation.resolver';
@@ -20,7 +20,8 @@ import { FileUtils } from './utils/file-utils';
 
 export function createServerModule(
   exports: string[],
-  providers: Provider[]
+  providers: Provider[],
+  modules: DynamicModule[] = []
 ): any {
   @Global()
   @Module({
@@ -45,6 +46,7 @@ export function createServerModule(
 
   @Module({
     imports: [
+      ...modules,
       CoreModule,
       AngularConsoleExtensionsModule,
       GraphQLModule.forRoot({

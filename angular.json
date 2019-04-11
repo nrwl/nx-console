@@ -76,6 +76,22 @@
               "extractLicenses": true,
               "vendorChunk": false
             },
+            "vscode-ssr": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/angular-console/src/environments/environment.ts",
+                  "with": "apps/angular-console/src/environments/environment.vscode.ts"
+                }
+              ],
+              "main": "apps/angular-console/src/main.server.ts",
+              "optimization": false,
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false
+            },
             "intellij": {
               "fileReplacements": [
                 {

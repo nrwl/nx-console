@@ -3,6 +3,7 @@ import { createServerModule, SelectDirectory } from '@angular-console/server';
 import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 import { NestFactory } from '@nestjs/core';
 import * as path from 'path';
+import { AngularUniversalModule } from '@nestjs/ng-universal';
 
 const getPort = require('get-port'); // tslint:disable-line
 
@@ -54,12 +55,23 @@ export async function startServer(context: ExtensionContext) {
 
   console.log('starting server on port', port);
 
-  const app = await NestFactory.create(createServerModule(exports, providers));
+  const app = await NestFactory.create(
+    createServerModule(exports, providers, [
+      AngularUniversalModule.forRoot({
+        viewsPath: assetsPath,
+        rootStaticPath: assetsPath,
+        bundle: require('../../../../dist/apps/angular-console/main.js')
+      })
+    ])
+  );
   app.useStaticAssets(assetsPath);
+
+  const server = await app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+  });
+
   return {
-    server: await app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
-    }),
+    server,
     store
   };
 }

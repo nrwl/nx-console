@@ -1,5 +1,6 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
 import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
+import * as request from 'request-promise';
 
 import {
   WorkspaceRoute,
@@ -11,7 +12,7 @@ const activeWebViews = new Map<string, WebviewPanel>();
 export function createWebViewPanel(
   context: ExtensionContext,
   viewColumn: ViewColumn,
-  iframeUrl: string,
+  ssrUrl: string,
   workspaceDef: WorkspaceDefinition | undefined,
   route: WorkspaceRouteTitle | undefined
 ) {
@@ -47,7 +48,10 @@ export function createWebViewPanel(
     context.extensionPath,
     route
   );
-  panel.webview.html = getIframeHtml(iframeUrl);
+
+  request(ssrUrl).then((htmlString: string) => {
+    panel.webview.html = htmlString;
+  });
 
   return panel;
 }
