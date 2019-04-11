@@ -1,4 +1,9 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  Input,
+  ChangeDetectionStrategy,
+  OnDestroy
+} from '@angular/core';
 import {
   CommandStatus,
   OpenInBrowserService,
@@ -6,7 +11,7 @@ import {
 } from '@angular-console/utils';
 import { SPEEDS } from './speed-constants';
 import { Subject, BehaviorSubject, combineLatest, ReplaySubject } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { MatSelectChange } from '@angular/material';
 import { GROW_SHRINK_VERT } from '../animations/grow-shink';
 
@@ -16,11 +21,11 @@ interface Summary {
 }
 
 interface Stats {
-  chunks: any[];
+  bundles: any[];
   assets: any[];
   errors: string[];
   warnings: string[];
-  modulesByChunkId: any;
+  modulesByBundle: any;
   summary: {
     assets: Summary;
     modules: number;
@@ -37,7 +42,6 @@ export interface BuildStatus {
   progress: number;
   date: string;
   time: string;
-  chunks: { name: string; file: string; size: string; type: string }[];
   errors: string[];
   serverHost?: string;
   serverPort?: number;
@@ -46,16 +50,6 @@ export interface BuildStatus {
   indexFile?: string;
   stats: Stats;
 }
-
-enum SizeGroup {
-  Gzipped = 'gzipped',
-  Parsed = 'parsed'
-}
-
-const GROUP_LABELS = {
-  [SizeGroup.Gzipped]: 'Gzipped',
-  [SizeGroup.Parsed]: 'Parsed'
-};
 
 const DISPLAY_ASSET_SPEEDS = ['4g', '3gf', '3gs'];
 
@@ -66,7 +60,7 @@ const DISPLAY_ASSET_SPEEDS = ['4g', '3gf', '3gs'];
   styleUrls: ['./build-status.component.scss'],
   animations: [GROW_SHRINK_VERT]
 })
-export class BuildStatusComponent {
+export class BuildStatusComponent implements OnDestroy {
   @Input()
   commandStatus: CommandStatus;
 
@@ -75,7 +69,6 @@ export class BuildStatusComponent {
     this.allStatus$.next(s);
   }
 
-  readonly sizeGroups = Object.values(SizeGroup);
   readonly displayAssetSpeeds = DISPLAY_ASSET_SPEEDS;
 
   // This status is set at a polling interval
@@ -92,20 +85,14 @@ export class BuildStatusComponent {
         a.time === b.time
     )
   );
-  readonly currentChunkId$: Subject<void | string> = new BehaviorSubject<
-    void | string
-  >(undefined);
+
+  readonly selectedBundleFile$ = new BehaviorSubject<string>('');
 
   readonly errors$ = this.status$.pipe(
     map(status => {
       if (status) {
-        const statsErrors = status.stats ? status.stats.errors : [];
-        // If we don't see stats errors then return errors read from terminal output.
-        const errorsFromTerminalOutput = status.errors;
-        const errors =
-          statsErrors.length > 0 ? statsErrors : errorsFromTerminalOutput;
         // Only show unique values
-        return errors.filter((x, idx, ary) => ary.indexOf(x) === idx);
+        return status.errors.filter((x, idx, ary) => ary.indexOf(x) === idx);
       } else {
         return null;
       }
@@ -135,17 +122,6 @@ export class BuildStatusComponent {
     map(status =>
       status.buildStatus === 'build_success' ? status.outputPath : null
     )
-  );
-
-  readonly dependencyPercentage$ = this.status$.pipe(
-    map(status => {
-      if (status && status.stats) {
-        const { dependencies, modules } = status.stats.summary;
-        return modules > 0 ? ((dependencies / modules) * 100).toFixed(1) : '0';
-      } else {
-        return '0';
-      }
-    })
   );
 
   readonly serverUrl$ = this.status$.pipe(
@@ -206,34 +182,33 @@ export class BuildStatusComponent {
     })
   );
 
-  readonly chunks$ = this.status$.pipe(
+  readonly bundles$ = this.status$.pipe(
     map(status => {
-      if (status && status.stats && status.stats.chunks) {
-        return status.stats.chunks;
+      if (status && status.stats && status.stats.bundles) {
+        return status.stats.bundles;
       } else {
         return [];
-      }
-    }),
-    tap(chunks => {
-      const defaultChunk = chunks.find(x => /main/.test(x.name)) || chunks[0];
-      if (defaultChunk) {
-        this.currentChunkId$.next(defaultChunk.id);
       }
     })
   );
 
-  readonly currentChunk$ = combineLatest(
-    this.chunks$,
-    this.currentChunkId$
+  bundlesSubscription = this.bundles$.subscribe(bundles => {
+    const defaultBundle = bundles.find(x => /main/.test(x.file)) || bundles[0];
+    if (defaultBundle) {
+      this.selectedBundleFile$.next(defaultBundle.file);
+    }
+  });
+
+  readonly currentBundle$ = combineLatest(
+    this.bundles$,
+    this.selectedBundleFile$
   ).pipe(
-    map(([chunks, id]) => {
-      const c = chunks.find(x => x.id === id);
+    map(([bundles, selected]) => {
+      const c = bundles.find(x => x.file === selected);
       if (c) {
         return {
-          id: c.id,
-          name: c.name,
           file: c.file,
-          size: c.size
+          sizes: c.sizes
         };
       } else {
         return null;
@@ -241,23 +216,23 @@ export class BuildStatusComponent {
     })
   );
 
-  readonly modulesForCurrentChunk$ = combineLatest(
+  readonly modulesForCurrentBundle$ = combineLatest(
     this.status$,
-    this.currentChunkId$
+    this.selectedBundleFile$
   ).pipe(
-    map(([status, currentChunkId]) => {
-      if (!currentChunkId || !status) {
+    map(([status, currentBundle]) => {
+      if (!currentBundle || !status) {
         return null;
       }
       return (
         status.stats &&
-        status.stats.modulesByChunkId &&
-        status.stats.modulesByChunkId[currentChunkId]
+        status.stats.modulesByBundle &&
+        status.stats.modulesByBundle[currentBundle]
       );
     })
   );
 
-  readonly viewingModules$ = this.modulesForCurrentChunk$.pipe(
+  readonly viewingModules$ = this.modulesForCurrentBundle$.pipe(
     map(modules => {
       if (!modules) {
         return null;
@@ -362,20 +337,20 @@ export class BuildStatusComponent {
     private readonly showItemInFolderService: ShowItemInFolderService
   ) {}
 
-  getSpeedLabel(key: string) {
-    return SPEEDS[key] ? SPEEDS[key].label : '';
+  ngOnDestroy() {
+    this.bundlesSubscription.unsubscribe();
   }
 
-  getSizeGroupLabel(s: SizeGroup) {
-    return GROUP_LABELS[s];
+  getSpeedLabel(key: string) {
+    return SPEEDS[key] ? SPEEDS[key].label : '';
   }
 
   trackByString(_: number, x: string) {
     return x;
   }
 
-  trackById(_: number, x: { id: string }) {
-    return x;
+  trackByFile(_: number, x: { file: string }) {
+    return x.file;
   }
 
   trackBySpeedKey(_: number, speed: any) {
@@ -395,6 +370,6 @@ export class BuildStatusComponent {
   }
 
   handleChunkFileSelection(event: MatSelectChange) {
-    this.currentChunkId$.next(event.value);
+    this.selectedBundleFile$.next(event.value);
   }
 }
