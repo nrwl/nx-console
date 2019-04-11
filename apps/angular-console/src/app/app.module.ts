@@ -1,9 +1,9 @@
 import {
   ENVIRONMENT,
   Environment,
-  IS_VSCODE,
+  IS_ELECTRON,
   IS_INTELLIJ,
-  IS_ELECTRON
+  IS_VSCODE
 } from '@angular-console/environment';
 import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
 import { FeatureSettingsModule } from '@angular-console/feature-settings';
@@ -13,9 +13,9 @@ import {
 } from '@angular-console/feature-workspaces';
 import { UiModule } from '@angular-console/ui';
 import {
-  LocationExt,
   IsNodeJsInstalledGuard,
   Messenger,
+  RouterNavigation,
   Telemetry
 } from '@angular-console/utils';
 import { HttpClientModule } from '@angular/common/http';
@@ -114,7 +114,6 @@ export function initApollo(
     )
   ],
   providers: [
-    ...environment.providers,
     IsNodeJsInstalledGuard,
     {
       provide: 'telemetry',
@@ -128,12 +127,13 @@ export function initApollo(
     { provide: ENVIRONMENT, useValue: environment as Environment },
     { provide: IS_VSCODE, useValue: environment.application === 'vscode' },
     { provide: IS_INTELLIJ, useValue: environment.application === 'intellij' },
-    { provide: IS_ELECTRON, useValue: environment.application === 'electron' }
+    { provide: IS_ELECTRON, useValue: environment.application === 'electron' },
+    ...environment.providers
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(location: LocationExt) {
+  constructor(location: RouterNavigation) {
     location.init();
   }
 }
