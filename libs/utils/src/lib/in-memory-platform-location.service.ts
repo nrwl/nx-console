@@ -1,5 +1,5 @@
 import { LocationChangeListener, PlatformLocation } from '@angular/common';
-import { Inject, Injectable, Optional } from '@angular/core';
+import { Injectable } from '@angular/core';
 import * as url from 'url';
 
 function parseUrl(
@@ -13,17 +13,16 @@ function parseUrl(
   };
 }
 
+declare const window: Window | null;
+
 @Injectable()
 export class InMemoryPlatformLocation implements PlatformLocation {
-  readonly pathname: string = '/';
+  readonly pathname: string =
+    window && window.location ? window.location.pathname : '/';
   readonly search: string = '';
   readonly hash: string = '';
 
-  constructor(@Optional() @Inject('INITIAL_PATHNAME') pathname: string) {
-    if (pathname) {
-      (this as { pathname: string }).pathname = pathname;
-    }
-  }
+  constructor() {}
 
   getBaseHrefFromDOM(): string {
     // Always return the same base href since we will never set it in document.
