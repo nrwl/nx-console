@@ -13,3 +13,10 @@ export const environment: Environment = {
   ],
   application: 'vscode'
 };
+
+Object.defineProperty(document, 'cookie', {
+  get() {
+    return null;
+  },
+  set() {}
+});
