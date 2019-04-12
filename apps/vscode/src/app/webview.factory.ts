@@ -11,7 +11,8 @@ const activeWebViews = new Map<string, WebviewPanel>();
 export function createWebViewPanel(
   context: ExtensionContext,
   viewColumn: ViewColumn,
-  iframeUrl: string,
+  serverUrl: string,
+  routePath: string,
   workspaceDef: WorkspaceDefinition | undefined,
   route: WorkspaceRouteTitle | undefined
 ) {
@@ -47,58 +48,57 @@ export function createWebViewPanel(
     context.extensionPath,
     route
   );
-  panel.webview.html = getIframeHtml(iframeUrl);
+  panel.webview.html = getIframeHtml(serverUrl, routePath);
 
   return panel;
 }
 
-export function getIframeHtml(iframeUrl: string) {
+export function getIframeHtml(serverUrl: string, routePath: string) {
   return `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8" />
-        <title>Angular Console</title>
-        <base href="/" />
-        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <base href="${serverUrl}" />
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          html,
-          body {
-            margin: 0;
-            padding: 0;
-            border-radius: 4px;
-            height: 100vh;
-            width: 100vw;
-            background: transparent;
-            overflow: hidden;
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="icon" type="image/x-icon" href="favicon.ico" />
+      <link rel="stylesheet" type="text/css" href="assets/xterm.css" />
+      <link rel="stylesheet" href="styles.css">
+      <style>
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+          border-radius: 4px;
+          background: transparent;
+        }
+        body {
+          opacity: 1;
+          transition: all 150ms cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        body.loading {
+          opacity: 0;
+        }
+        angular-console-root {
+          display: block;
+          background: white;
+        }
+      </style>
+      <script>
+        window.INITIAL_ROUTE = '${routePath}';
+        document.addEventListener('readystatechange', event => {
+          if (event.target.readyState === 'complete') {
+            document.body.classList.remove('loading');
           }
+        });
+      </script>
+    </head>
 
-          iframe {
-            width: 100vw;
-            height: 100vh;
-            opacity: 0;
-            transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-          }
-
-          iframe.fade-in {
-            opacity: 1;
-          }
-        </style>
-        <script>
-          function onIframeLoad() {
-            document.body.querySelector('iframe').classList.add('fade-in');
-          }
-        </script>
-      </head>
-      <body>
-        <iframe
-          src="${iframeUrl}"
-          frameborder="0"
-          onload="onIframeLoad()"
-        ></iframe>
+    <body class="loading">
+      <angular-console-root></angular-console-root>
+      <script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="main.js"></script>
       </body>
-    </html>
+  </html>
   `;
 }

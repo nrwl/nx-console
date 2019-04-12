@@ -16,7 +16,7 @@
       "trace": "false",
       "sourceMaps": false,
       "stopOnEntry": false,
-      "outFiles": ["${workspaceFolder}/dist/apps/vscode/**/*"],
+      "outFiles": ["${workspaceFolder}/**/*"],
       "preLaunchTask": "npm: build-vs-code"
     }
   ]

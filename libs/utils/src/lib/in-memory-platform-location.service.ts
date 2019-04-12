@@ -18,7 +18,8 @@ declare const window: Window | null;
 @Injectable()
 export class InMemoryPlatformLocation implements PlatformLocation {
   readonly pathname: string =
-    window && window.location ? window.location.pathname : '/';
+    (window || ({} as any)).INITIAL_ROUTE ||
+    (window && window.location ? window.location.pathname : '/');
   readonly search: string = '';
   readonly hash: string = '';
 

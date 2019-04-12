@@ -54,8 +54,11 @@ export async function startServer(context: ExtensionContext) {
 
   console.log('starting server on port', port);
 
-  const app = await NestFactory.create(createServerModule(exports, providers));
+  const app = await NestFactory.create(createServerModule(exports, providers), {
+    cors: true
+  });
   app.useStaticAssets(assetsPath);
+
   return {
     server: await app.listen(port, () => {
       console.log(`Listening on port ${port}`);
