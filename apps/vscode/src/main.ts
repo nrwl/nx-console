@@ -114,10 +114,8 @@ async function main(config: {
   const webViewPanel = createWebViewPanel(
     context,
     viewColumn,
-    `http://localhost:${address!.port}/${getWorkspaceRoute(
-      workspaceDef,
-      workspaceRouteTitle
-    )}`,
+    `http://localhost:${address!.port}/`,
+    getWorkspaceRoute(workspaceDef, workspaceRouteTitle),
     workspaceDef,
     workspaceRouteTitle
   );

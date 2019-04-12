@@ -180,13 +180,7 @@
             "outputPath": "dist/apps/vscode",
             "main": "apps/vscode/src/main.ts",
             "sourceMap": false,
-            "externalDependencies": [
-              "vscode",
-              "source-map-explorer",
-              "semver",
-              "tmp",
-              "node-pty-prebuilt"
-            ],
+
             "tsConfig": "apps/vscode/tsconfig.app.json",
             "assets": [
               "apps/vscode/src/package.json",
@@ -197,6 +191,13 @@
           },
           "configurations": {
             "production": {
+              "externalDependencies": [
+                "vscode",
+                "source-map-explorer",
+                "semver",
+                "tmp",
+                "node-pty-prebuilt"
+              ],
               "optimization": true,
               "extractLicenses": true,
               "fileReplacements": [
