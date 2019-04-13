@@ -3,10 +3,8 @@ package io.nrwl.ide.console.server;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import io.nrwl.ide.console.NgConsoleUtil;
-import io.nrwl.ide.console.ui.NgConsoleUI;
+import io.nrwl.ide.console.NgWorkspaceMonitor;
 import org.jetbrains.io.jsonRpc.JsonRpcServer;
-
-import java.net.URLEncoder;
 
 import static com.intellij.notification.NotificationType.ERROR;
 import static com.intellij.notification.NotificationType.INFORMATION;
@@ -16,43 +14,55 @@ public class RPCHandlerListener {
   private static final Logger LOG = Logger.getInstance(NgConsoleServer.class);
 
   private JsonRpcServer myRpcServer;
-  private NgConsoleServer myServer;
 
 
-  public RPCHandlerListener(JsonRpcServer rpcServer, NgConsoleServer ngConsoleServer) {
+  public RPCHandlerListener(JsonRpcServer rpcServer) {
     myRpcServer = rpcServer;
-    myServer = ngConsoleServer;
   }
 
 
+  @SuppressWarnings("deprecation")
   public void serverStarted(String port) {
     LOG.info("RPCHandlerListener: serverStarted on port: " + port);
-    NgConsoleUI consoleUI = ServiceManager.getService(NgConsoleUI.class);
-
-    String encodedPath = URLEncoder.encode(myServer.getProjectDir());
-    consoleUI.goToUrl(port, encodedPath);
-
     NgConsoleUtil.notify("NgConsole has been started", INFORMATION);
 
-    myServer.setState(NgConsoleServer.State.STARED);
+    NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
+    NgConsoleServer server = ngMonitor.getServer();
+
+    if (server != null) {
+      server.setState(NgConsoleServer.State.STARTED);
+      server.setNodeProcessPort(Integer.valueOf(port));
+    }
+
+    ngMonitor.onServerStarted();
   }
 
   public void serverStopped() {
     LOG.info("RPCHandlerListener: serverStopped");
-    myServer.setState(NgConsoleServer.State.STOPPED);
+    NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
+    NgConsoleServer server = ngMonitor.getServer();
+
+    if (server != null) {
+      server.setState(NgConsoleServer.State.STOPPED);
+    }
+
+    ngMonitor.onServerStopped();
   }
 
 
   public void rpcInitialized() {
     LOG.info("JS RPC sub-system is initialized");
-    String pathToPlugin = myServer.getServerDir().getAbsolutePath();
+    NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
+
+    String pathToPlugin = ngMonitor.getServer().getServerDir().getAbsolutePath();
     myRpcServer.send(NgConsoleServer.DOMAIN, "start", toSystemDependentName(pathToPlugin));
   }
 
   public void error(String msg) {
     LOG.info("RPCHandlerListener: error = " + msg);
-
     NgConsoleUtil.notify("NgConsole error: " + msg, ERROR);
 
+    NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
+    ngMonitor.onServerStopped();
   }
 }

@@ -1,11 +1,9 @@
 package io.nrwl.ide.console;
 
-import com.intellij.ide.wizard.AbstractWizard;
 import com.intellij.javascript.nodejs.interpreter.local.NodeJsLocalInterpreter;
 import com.intellij.javascript.nodejs.interpreter.local.NodeJsLocalInterpreterManager;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
+import com.intellij.notification.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -15,39 +13,20 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.lang.reflect.Method;
 import java.util.List;
 
-import static icons.NgIcons.TOOL_WINDOW;
-
 public class NgConsoleUtil {
+  static final NotificationGroup GROUP_NOTIFICATION = new NotificationGroup("AngularConsole",
+    NotificationDisplayType.NONE, true);
   @NonNls
   private static final Logger LOG = Logger.getInstance(NgConsoleUtil.class);
-
   @NonNls
   private static final String ANGULAR_JSON_NAME = "angular.json";
-
   /**
    * Need to keep reference to the started server as we need to make sure that when whole Application shutdown
    * there are not open node processes
    */
   private static NgConsoleServer ourServer;
-
-
-  public static JButton getNextButton(AbstractWizard wizard) {
-    JButton button = null;
-
-    try {
-      Method getNextButton = AbstractWizard.class.getDeclaredMethod("getNextButton");
-      if (getNextButton != null) {
-        getNextButton.setAccessible(true);
-        button = (JButton) getNextButton.invoke(wizard);
-      }
-    } catch (Exception e) {
-    }
-    return button;
-  }
 
 
   public static NodeJsLocalInterpreter getDefaultNodeInterpreter() throws Exception {
@@ -103,21 +82,15 @@ public class NgConsoleUtil {
     return null;
   }
 
-  public static NgConsoleServer getServer() {
-    return ourServer;
-  }
-
-
-  public static void setServer(NgConsoleServer server) {
-    ourServer = server;
-  }
-
 
   public static void notify(String message, NotificationType type) {
-    Notification notification = new Notification("AngularConsole", TOOL_WINDOW,
-      type);
-    notification.setTitle("Angular Console");
-    notification.setContent(message);
-    Notifications.Bus.notify(notification);
+    ApplicationManager.getApplication().invokeLater(() -> {
+      Notification notification = GROUP_NOTIFICATION.createNotification(type);
+      notification.setTitle("Angular Console");
+      notification.setContent(message);
+      Notifications.Bus.notify(notification);
+    });
+
+
   }
 }
