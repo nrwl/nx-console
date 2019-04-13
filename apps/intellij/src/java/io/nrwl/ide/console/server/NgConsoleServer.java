@@ -10,9 +10,11 @@ import com.intellij.execution.process.ScriptRunnerUtil;
 import com.intellij.javascript.nodejs.NodeCommandLineUtil;
 import com.intellij.javascript.nodejs.interpreter.local.NodeJsLocalInterpreter;
 import com.intellij.lang.javascript.service.JSLanguageServiceUtil;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.EnvironmentUtil;
 import com.intellij.util.io.BaseOutputReader;
@@ -36,35 +38,32 @@ import static com.intellij.openapi.util.NotNullLazyValue.createConstantValue;
  * NgConsoleServer class is the representation of the NGConsole node process and manages all the states. It can
  * exchange RPC  based messages with the server
  */
-public class NgConsoleServer {
+public class NgConsoleServer implements Disposable {
+  protected static final String DOMAIN = "ngConsoleServer";
   @NonNls
   private static final Logger LOG = Logger.getInstance(NgConsoleServer.class);
-  protected static final String DOMAIN = "ngConsoleServer";
-
   private KillableProcessHandler myNgConsoleProcessHandler;
   private ProcessOutputLogger myOutLogger;
 
   private JsonRpcServer myRpcServer;
   private File myWorkingDir;
-  private String myProjectDir;
-
   private State myCurrentState = State.IDLE;
 
+  private int myNodeProcessPort = -1;
+
+  private Disposable mySrvDisposer = () -> {
+  };
 
   public NgConsoleServer() {
-    // init with default dir
-    this(System.getProperty("user.home"));
   }
 
-  public NgConsoleServer(String projectDir) {
-    myProjectDir = projectDir;
-    myWorkingDir = JSLanguageServiceUtil.getPluginDirectory(this.getClass(), "ngConsoleCli");
-
-    myRpcServer = RpcBinaryRequestHandler.getRpcServerInstance();
-    LOG.debug("Getting getRpcServerInstance for the Java2Js RPC process: " + myRpcServer);
-  }
 
   public void start() {
+    myWorkingDir = JSLanguageServiceUtil.getPluginDirectory(this.getClass(), "ngConsoleCli");
+    myRpcServer = RpcBinaryRequestHandler.getRpcServerInstance();
+
+    LOG.debug("Getting getRpcServerInstance for the Java2Js RPC process: " + myRpcServer);
+    Disposer.register(this, mySrvDisposer);
 
     try {
       GeneralCommandLine commandLine = createCommandLine();
@@ -78,18 +77,21 @@ public class NgConsoleServer {
           myOutLogger = new ProcessOutputLogger(myNgConsoleProcessHandler);
           myOutLogger.startNotify();
 
-          LOG.info("Ng Console started successfully: " + myNgConsoleProcessHandler.getCommandLine());
+          LOG.info("Starting Ng Angular Console: " + myNgConsoleProcessHandler.getCommandLine());
 
           myNgConsoleProcessHandler.addProcessListener(new ProcessAdapter() {
             @Override
             public void processTerminated(@NotNull ProcessEvent event) {
-              LOG.info("Ng Console server terminated with exit code " + event.getExitCode());
+              LOG.info("Ng Console server" + DOMAIN + "terminated with exit code " + event.getExitCode());
+
+              Disposer.dispose(NgConsoleServer.this);
+
             }
           });
 
           myRpcServer.registerDomain(DOMAIN,
-            createConstantValue(new RPCHandlerListener(myRpcServer, this)),
-            false, null);
+            createConstantValue(new RPCHandlerListener(myRpcServer)),
+            true, mySrvDisposer);
         } catch (Exception e) {
           LOG.warn(e);
         }
@@ -99,30 +101,30 @@ public class NgConsoleServer {
     }
   }
 
-  public void shutdown(boolean async) {
 
-    Runnable action = () -> {
-      if (!myNgConsoleProcessHandler.isProcessTerminated()) {
+  public void shutdown() {
+    ApplicationManager.getApplication().invokeLater(() -> {
+      if (myNgConsoleProcessHandler != null && !myNgConsoleProcessHandler.isProcessTerminated()) {
         if (myRpcServer != null) {
           myRpcServer.send(DOMAIN, "shutdown");
 
-          myRpcServer = null;
         }
         ScriptRunnerUtil.terminateProcessHandler(myNgConsoleProcessHandler,
           1000, null);
       }
-    };
-
-    if (async) {
-      ApplicationManager.getApplication().invokeLater(action);
-    } else {
-      action.run();
-    }
+    });
   }
 
+  @Override
+  public void dispose() {
+
+    this.myOutLogger = null;
+    this.myRpcServer = null;
+    myNgConsoleProcessHandler = null;
+  }
 
   public boolean isStarted() {
-    return myCurrentState == State.STARED;
+    return myCurrentState == State.STARTED && !myNgConsoleProcessHandler.isProcessTerminated();
   }
 
   private SilentKillableProcessHandler createProcess() {
@@ -174,14 +176,6 @@ public class NgConsoleServer {
     return myWorkingDir;
   }
 
-  String getProjectDir() {
-    return myProjectDir;
-  }
-
-
-  public void setProjectDir(String dir) {
-    this.myProjectDir = dir;
-  }
 
   public State getState() {
     return myCurrentState;
@@ -189,6 +183,23 @@ public class NgConsoleServer {
 
   public void setState(State myCurrentState) {
     this.myCurrentState = myCurrentState;
+  }
+
+
+  public int getNodeProcessPort() {
+    return myNodeProcessPort;
+  }
+
+  public void setNodeProcessPort(int myNodeProcessPort) {
+    this.myNodeProcessPort = myNodeProcessPort;
+  }
+
+  public enum State {
+    IDLE,
+    STARTING,
+    STARTED,
+    STOPPED,
+    ERROR
   }
 
   private static class SilentKillableProcessHandler extends KillableProcessHandler {
@@ -217,13 +228,5 @@ public class NgConsoleServer {
     protected BaseOutputReader.Options readerOptions() {
       return BaseOutputReader.Options.forMostlySilentProcess();
     }
-  }
-
-  public enum State {
-    IDLE,
-    STARTING,
-    STARED,
-    STOPPED,
-    ERROR
   }
 }

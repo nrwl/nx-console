@@ -14,21 +14,21 @@ import io.nrwl.ide.console.ui.NgConsoleUI;
 public class GoToAction extends AnAction {
 
 
-    /**
-     * Todo: Adjust action logic once I know more about routing in ng console..
-     */
-    @Override
-    public void actionPerformed(AnActionEvent e) {
-        ActionManagerEx actionManager = (ActionManagerEx) e.getActionManager();
-        String actionIdPath = actionManager.getLastPreformedActionId();
-        String actionId = actionIdPath.replace("NGConsole.", "");
+  /**
+   * Todo: Adjust action logic once I know more about routing in ng console..
+   */
+  @Override
+  public void actionPerformed(AnActionEvent e) {
+    ActionManagerEx actionManager = (ActionManagerEx) e.getActionManager();
+    String actionIdPath = actionManager.getLastPreformedActionId();
+    String actionId = actionIdPath.replace("NGConsole.", "");
 
-      ApplicationManager.getApplication()
-        .invokeLater(() -> {
-          NgConsoleUI consoleUI = ServiceManager.getService(NgConsoleUI.class);
-          consoleUI.goToUrl("http://localhost:8888/workspace/%2FUsers%2Ffkolar%2FDesktop%2Fdecorators/projects");
-        });
-    }
+    ApplicationManager.getApplication()
+      .invokeLater(() -> {
+        NgConsoleUI consoleUI = ServiceManager.getService(NgConsoleUI.class);
+        consoleUI.goToUrl("http://localhost:8888/workspace/%2FUsers%2Ffkolar%2FDesktop%2Fdecorators/projects");
+      });
+  }
 
 
 }
