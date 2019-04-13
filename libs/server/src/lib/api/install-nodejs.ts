@@ -83,7 +83,7 @@ export function installNodeJs(): InstallNodeJsStatus {
   } catch (e) {
     nodeInstallDone = true;
 
-    console.log(e);
+    console.error(e);
     return {
       cancelled: true,
       error: e.message
