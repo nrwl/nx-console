@@ -5,16 +5,13 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import io.nrwl.ide.console.server.NgConsoleServer;
 import io.nrwl.ide.console.ui.NgConsoleUI;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.notification.NotificationType.ERROR;
-import static io.nrwl.ide.console.NgConsoleUtil.getServer;
 
 /**
- * We want start NGConsole Server only if its Angular based project and if its not already started during wizard
- * process (create new project), otherwise shut it down and clean up.
+ * We want start NGConsole Server only if its Angular based project and if its not already started as
  */
 public class NgConsoleProjectLifecycle implements ProjectComponent {
   private static final Logger LOG = Logger.getInstance(NgConsoleProjectLifecycle.class);
@@ -31,17 +28,15 @@ public class NgConsoleProjectLifecycle implements ProjectComponent {
   public void projectOpened() {
     VirtualFile baseDir = myProject.getBaseDir();
 
-    NgConsoleServer defaultServer = getServer();
-    if (NgConsoleUtil.isAngularWorkspace(myProject, baseDir) && !defaultServer.isStarted()) {
+    if (NgConsoleUtil.isAngularWorkspace(myProject, baseDir)) {
       try {
-        NgConsoleUI consoleUI = ServiceManager.getService(NgConsoleUI.class);
-        consoleUI.initWebView(NgConsoleUI.Route.Workspace);
-
         LOG.info("Starting NgConsole Server for project directory:" + baseDir.getCanonicalPath());
 
-        defaultServer.setProjectDir(baseDir.getCanonicalPath());
-        defaultServer.start();
+        NgConsoleUI consoleUI = ServiceManager.getService(myProject, NgConsoleUI.class);
+        consoleUI.initWebView(NgConsoleUI.Route.Workspace, myProject.getName());
 
+        NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
+        ngMonitor.init(myProject);
       } catch (Exception e) {
         LOG.error("Problem starting Ng Console Server ", e);
 
@@ -49,10 +44,6 @@ public class NgConsoleProjectLifecycle implements ProjectComponent {
           e.getLocalizedMessage(), ERROR);
 
       }
-    } else {
-      // double check that we shutdown the server if we are not dealing with angular project and server might have
-      //  been started
-      this.projectClosed();
     }
   }
 
@@ -64,16 +55,18 @@ public class NgConsoleProjectLifecycle implements ProjectComponent {
   @SuppressWarnings("deprecation")
   public void projectClosed() {
     VirtualFile baseDir = myProject.getBaseDir();
-    if (NgConsoleUtil.isAngularWorkspace(myProject, baseDir) || getServer().isStarted()) {
-      LOG.info("Shutting down NgConsole Server for project directory:" + baseDir.getCanonicalPath());
-      getServer().shutdown(true);
+    if (NgConsoleUtil.isAngularWorkspace(myProject, baseDir)) {
+      LOG.info("Sending shutdown to the NgWorkspaceMonitor. Project directory:" + baseDir.getCanonicalPath());
+
+      NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
+      ngMonitor.release(myProject);
     }
   }
 
   @NotNull
   @Override
   public String getComponentName() {
-    return NgConsoleProjectLifecycle.class.getSimpleName();
+    return this.myProject.getName();
   }
 
 
