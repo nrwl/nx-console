@@ -1,6 +1,9 @@
 package io.nrwl.ide.console.ui;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
@@ -51,7 +54,11 @@ public class NgConsoleUI implements Disposable {
 
   public NgConsoleUI() {
     myRouteMapping.put(Route.Workspace.name(), "http://localhost:%s/workspace/%s");
-    LOG.info("NGConsoleUI = " + System.identityHashCode(this));
+    myRouteMapping.put(Route.Generate.name(), "http://localhost:%s/workspace/%s/generate");
+    myRouteMapping.put(Route.Tasks.name(), "http://localhost:%s/workspace/%s/tasks");
+    myRouteMapping.put(Route.Connect.name(), "http://localhost:%s/workspace/%s/connect");
+    myRouteMapping.put(Route.Extensions.name(), "http://localhost:%s/workspace/%s/extensions");
+    myRouteMapping.put(Route.Settings.name(), "http://localhost:%s/workspace/%s/settings");
   }
 
 
@@ -72,12 +79,11 @@ public class NgConsoleUI implements Disposable {
    */
   public SimpleToolWindowPanel getToolWindowContent() {
     SimpleToolWindowPanel toolPanel = new SimpleToolWindowPanel(true, true);
-//    ActionManager actionManager = ActionManager.getInstance();
-//    ActionToolbar actionToolbar = actionManager.createActionToolbar(
-//      "toolbar",
-//      (ActionGroup) actionManager.getAction("NGConsole.UI.Toolbar"),
-//      true);
-//    toolPanel.setToolbar(actionToolbar.getComponent());
+    ActionManager actionManager = ActionManager.getInstance();
+    ActionToolbar actionToolbar = actionManager.createActionToolbar("toolbar",
+      (ActionGroup) actionManager.getAction("NGConsole.UI.Toolbar"),
+      true);
+    toolPanel.setToolbar(actionToolbar.getComponent());
     toolPanel.setContent(getContent());
 
     return toolPanel;
@@ -100,8 +106,25 @@ public class NgConsoleUI implements Disposable {
   }
 
 
+  /**
+   * Make sure first param is port
+   */
+  public void goToUrl(Route route, final String... params) {
+    myRoute = route;
+    final String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
+    LOG.info("Switching to new URL : " + url);
+
+    while (!loadAndWait(url)) {
+      try {
+        Thread.sleep(800);
+      } catch (InterruptedException e) {
+      }
+    }
+  }
+
+
   private synchronized boolean loadAndWait(String url) {
-    boolean success = false;
+    boolean success;
 
     CountDownLatch countDown = new CountDownLatch(1);
     ErrorAwareLoader loader = new ErrorAwareLoader(countDown);
@@ -146,7 +169,7 @@ public class NgConsoleUI implements Disposable {
               });
           }
         } catch (IOException e) {
-//          System.out.println("e = " + e);
+          LOG.error("Problem cleaning up jxBrowser cache: ", e);
         }
 
         BrowserContextParams bcp = new BrowserContextParams(dataDir.getAbsolutePath());
@@ -169,10 +192,14 @@ public class NgConsoleUI implements Disposable {
   }
 
 
-  public enum Route {
+  public static enum Route {
     NewWorkspace,
+    Workspace,
     Generate,
-    Workspace
+    Tasks,
+    Extensions,
+    Connect,
+    Settings
   }
 
   private static class ErrorAwareLoader extends LoadAdapter {

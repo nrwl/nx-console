@@ -122,7 +122,7 @@ public class NgWorkspaceMonitor implements Disposable {
           NgConsoleUI consoleUI = ServiceManager.getService(project, NgConsoleUI.class);
           String encodedPath = URLEncoder.encode(project.getBasePath(), StandardCharsets.UTF_8.toString());
 
-          consoleUI.goToUrl(String.valueOf(this.myServer.getNodeProcessPort()), encodedPath);
+          consoleUI.goToUrl(String.valueOf(myServer.getNodeProcessPort()), encodedPath);
           registerToolWindow(project, consoleUI);
 
         } catch (Exception e) {
@@ -130,6 +130,19 @@ public class NgWorkspaceMonitor implements Disposable {
         }
       }
     });
+  }
+
+  public void changeRoute(Project project, String action) {
+    try {
+      String encodedPath = URLEncoder.encode(project.getBasePath(), StandardCharsets.UTF_8.toString());
+
+      NgConsoleUI.Route route = NgConsoleUI.Route.valueOf(action);
+      NgConsoleUI consoleUI = ServiceManager.getService(project, NgConsoleUI.class);
+      consoleUI.goToUrl(route, String.valueOf(myServer.getNodeProcessPort()), encodedPath);
+
+    } catch (Exception e) {
+      LOG.error("Problem while switching route:", e);
+    }
 
   }
 
