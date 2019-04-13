@@ -1,9 +1,12 @@
 package io.nrwl.ide.console;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
@@ -17,12 +20,16 @@ import icons.NgIcons;
 import io.nrwl.ide.console.server.NgConsoleServer;
 import io.nrwl.ide.console.ui.NgConsoleUI;
 
+import javax.swing.*;
+import java.awt.event.InputEvent;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.intellij.openapi.wm.ToolWindowAnchor.RIGHT;
+import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
+import static java.awt.event.KeyEvent.VK_C;
 
 /**
  * Application based service in order to record currently opened angular workspaces with ability to start
@@ -31,7 +38,7 @@ import static com.intellij.openapi.wm.ToolWindowAnchor.RIGHT;
 public class NgWorkspaceMonitor implements Disposable {
   private static final Logger LOG = Logger.getInstance(NgWorkspaceMonitor.class);
   private static final String TOOL_WINDOW_ID = "Angular Console";
-  private static final String ACTION_ID = "ActivateAngular ConsoleToolWindow";
+  private static final String ACTION_ID = "ActivateAngularConsoleToolWindow";
 
   private Map<String, Project> myProjects;
   private NgConsoleServer myServer;
@@ -177,6 +184,10 @@ public class NgWorkspaceMonitor implements Disposable {
       ngToolWindow.getContentManager().setSelectedContent(cnt);
       twEx.stretchWidth(700 - width);
 
+      Keymap activeKeymap = KeymapManager.getInstance().getActiveKeymap();
+      KeyStroke keyStroke = KeyStroke.getKeyStroke(VK_C, CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK,
+        false);
+      activeKeymap.addShortcut(ACTION_ID, new KeyboardShortcut(keyStroke, null));
     });
   }
 
@@ -191,12 +202,4 @@ public class NgWorkspaceMonitor implements Disposable {
     myProjects = null;
   }
 
-//    private void setActiveToolWindow() {
-//    for (Keymap keymap: KeymapManagerEx.getInstanceEx().getAllKeymaps()) {
-//      KeyboardShortcut shortcut = removeFirstKeyboardShortcut(keymap, TODO_TOOLWINDOW_ACTION_ID);
-//      if (shortcut != null) {
-//        keymap.addShortcut(ANDROID_TOOLWINDOW_ACTION_ID, shortcut);
-//      }
-//    }
-//  }
 }

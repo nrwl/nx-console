@@ -34,18 +34,21 @@
             text="Projects"
             description="Shows available projects"
             icon="NgIcons.ACTION_PROJECT">
+      <keyboard-shortcut first-keystroke="alt 1" keymap="$default" />
     </action>
     <action class="io.nrwl.ide.console.ui.actions.GoToAction"
             id="NGConsole.Generate"
             text="Generate"
             description="Select and run ng generate command"
             icon="NgIcons.ACTION_GENERATE">
+      <keyboard-shortcut first-keystroke="alt 2"  keymap="$default" />
     </action>
     <action class="io.nrwl.ide.console.ui.actions.GoToAction"
             id="NGConsole.Tasks"
             text="Tasks"
             description="Select and run package.json task"
             icon="NgIcons.ACTION_TASKS">
+      <keyboard-shortcut first-keystroke="alt 3"  keymap="$default" />
     </action>
 
     <action class="io.nrwl.ide.console.ui.actions.GoToAction"
@@ -53,6 +56,7 @@
             text="Extensions"
             description="Inspect and add NG schematics"
             icon="NgIcons.ACTION_EXTENSIONS">
+      <keyboard-shortcut first-keystroke="alt 4"  keymap="$default" />
     </action>
 
     <action class="io.nrwl.ide.console.ui.actions.GoToAction"
@@ -60,6 +64,7 @@
             text="Connect"
             description="Nrwl Connect - changes how developers access Angular support"
             icon="NgIcons.ACTION_CONNECT">
+      <keyboard-shortcut first-keystroke="alt 5"  keymap="$default" />
     </action>
 
     <action class="io.nrwl.ide.console.ui.actions.GoToAction"
@@ -67,6 +72,8 @@
             text="Settings"
             description="Access Angular Console Settings"
             icon="NgIcons.ACTION_SETTINGS">
+      <keyboard-shortcut first-keystroke="alt 6"  keymap="$default" />
+
     </action>
 
 
