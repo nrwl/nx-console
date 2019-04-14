@@ -1,10 +1,6 @@
-<div
-  class="project-filter-container mat-elevation-z1"
-  fxLayout="row"
-  fxLayoutAlign="start center"
->
+<div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
   <input
-    placeholder="Filter projects..."
+    placeholder="Filter projects"
     #projectFilter
     fxFlex
     [formControl]="projectFilterFormControl"
@@ -58,49 +54,29 @@
               {{ p.root }}
             </div>
             <div
-              fxLayoutWrap
-              fxFlex="shrink"
-              fxLayout="row"
+              fxFlex="grow"
+              fxLayout="row wrap"
               fxLayoutGap="12px"
-              fxLayoutAlign="end center"
+              fxLayoutAlign="end"
+              class="project-action-button-container"
             >
               <button
-                *ngFor="let a of ((recentActions$ | async) || {})[p.name]"
+                *ngFor="let a of p.actions"
                 mat-stroked-button
-                (click)="onActionTriggered(workspacePath, p, a)"
                 [routerLink]="a.link"
                 class="route-button"
               >
                 {{ a.actionDescription | titlecase }}
               </button>
               <button
-                mat-icon-button
+                mat-stroked-button
                 #actionsMenuTrigger="matMenuTrigger"
                 [matMenuTriggerFor]="actionsMenu"
+                [matMenuTriggerData]="{ project: p }"
+                [disabled]="!p.supportsGenerate"
               >
-                <mat-icon>more_horiz</mat-icon>
+                Generate
               </button>
-              <mat-menu #actionsMenu>
-                <ng-container *ngIf="actionsMenuTrigger.menuOpen">
-                  <ng-container *ngFor="let a of p.actions">
-                    <ng-container *ngIf="!a.link">
-                      <mat-divider></mat-divider>
-                      <span mat-menu-item [disabled]="true">
-                        {{ a.actionDescription }}
-                      </span>
-                      <mat-divider></mat-divider>
-                    </ng-container>
-                    <button
-                      mat-menu-item
-                      [routerLink]="a.link"
-                      *ngIf="a.link"
-                      (click)="onActionTriggered(workspacePath, p, a)"
-                    >
-                      {{ a.actionDescription | titlecase }}
-                    </button>
-                  </ng-container>
-                </ng-container>
-              </mat-menu>
             </div>
           </mat-list-item>
           <mat-divider></mat-divider>
@@ -109,3 +85,41 @@
     </ng-container>
   </cdk-virtual-scroll-viewport>
 </mat-list>
+
+<mat-menu #actionsMenu>
+  <ng-template matMenuContent let-p="project">
+    <div
+      class="filter-container"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      (click)="$event.stopPropagation()"
+      (keydown)="$event.stopPropagation()"
+    >
+      <input
+        placeholder="Filter schematics"
+        #schematicFilter
+        fxFlex
+        [formControl]="schematicFilterFormControl"
+        id="filter"
+      />
+      <mat-icon
+        class="filter-icon"
+        (click)="
+          schematicFilterFormControl.setValue(''); schematicFilter.select()
+        "
+      >
+        {{ schematicFilterFormControl.value ? 'clear' : 'filter_list' }}
+      </mat-icon>
+    </div>
+    <ng-container *ngFor="let a of (p.links$ | async)">
+      <ng-container *ngIf="!a.link">
+        <mat-divider></mat-divider>
+        <span mat-menu-item [disabled]="true"> {{ a.actionDescription }} </span>
+        <mat-divider></mat-divider>
+      </ng-container>
+      <button mat-menu-item [routerLink]="a.link" *ngIf="a.link">
+        {{ a.actionDescription | titlecase }}
+      </button>
+    </ng-container>
+  </ng-template>
+</mat-menu>

@@ -29,10 +29,10 @@ describe('Projects', () => {
       'not.exist'
     );
 
-    cy.contains('mat-icon', 'more_horiz')
+    cy.contains('button.mat-stroked-button', 'Generate')
       .first()
-      .click();
-    cy.contains('.cdk-overlay-pane button', 'Component').click();
+      .click({ force: true });
+    cy.contains('.cdk-overlay-pane button', 'Component').click({ force: true });
     cy.contains('div.context-title', '@schematics/angular - component');
     cy.get('input[name="project"]').should(($p: any) => {
       expect($p[0].value).to.equal('proj');
@@ -44,8 +44,9 @@ describe('Projects', () => {
       expect(texts($p)[0]).to.contain('proj');
       expect(texts($p)[1]).to.contain('proj-e2e');
     });
-    cy.contains('angular-console-projects button', 'Component');
-
+    cy.contains('angular-console-projects button', 'Lint');
+    cy.contains('angular-console-projects button', 'E2e');
+    cy.contains('angular-console-projects button', 'Extract-i18n');
     cy.contains('angular-console-projects button', 'Build')
       .first()
       .click();
@@ -62,10 +63,9 @@ describe('Projects', () => {
     cy.contains('div.context-title', 'ng run proj:extract-i18n');
     cy.get('.exit-action').click();
 
-    cy.contains('mat-icon', 'more_horiz')
+    cy.contains('button.mat-stroked-button', 'Lint')
       .first()
       .click();
-    cy.contains('.cdk-overlay-pane button', 'Lint').click();
     cy.contains('div.context-title', 'ng lint proj');
     cy.get('.exit-action').click();
 

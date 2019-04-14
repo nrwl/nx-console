@@ -32,6 +32,15 @@ button.mat-icon-button {
   height: 34px;
 }
 
+body mat-list,
+body mat-nav-list {
+  background-color: transparent;
+}
+
+.mat-menu-content {
+  padding: 0 !important;
+}
+
 button.mat-icon-button {
   width: 32px;
 }

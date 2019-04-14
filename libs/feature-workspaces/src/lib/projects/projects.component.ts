@@ -4,12 +4,7 @@ import {
   Settings,
   toggleItemInArray
 } from '@angular-console/utils';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  Inject
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, Observable, of } from 'rxjs';
@@ -24,14 +19,12 @@ import {
 } from 'rxjs/operators';
 
 import {
-  SaveRecentActionGQL,
   Workspace,
   WorkspaceDocsGQL,
   WorkspaceGQL,
   WorkspaceSchematics,
   WorkspaceSchematicsGQL
 } from '../generated/graphql';
-import { IS_INTELLIJ } from '@angular-console/environment';
 
 export interface ProjectAction {
   name: string;
@@ -53,6 +46,7 @@ export class ProjectsComponent implements OnInit {
   workspacePath: string;
   pinnedProjectNames: string[];
   projects$: Observable<Workspace.Projects[]>;
+  filteredCollections$: Observable<WorkspaceSchematics.SchematicCollections[]>;
   filteredProjects$: Observable<Workspace.Projects[]>;
   filteredPinnedProjects$: Observable<Workspace.Projects[]>;
   filteredUnpinnedProjects$: Observable<Workspace.Projects[]>;
@@ -63,7 +57,8 @@ export class ProjectsComponent implements OnInit {
       )
     : of([]);
 
-  projectFilterFormControl = new FormControl();
+  projectFilterFormControl = new FormControl('');
+  schematicFilterFormControl = new FormControl('');
 
   viewportHeight$ = this.commandRunner.listAllCommands().pipe(
     map(c => Boolean(c.length > 0)),
@@ -73,17 +68,13 @@ export class ProjectsComponent implements OnInit {
     shareReplay()
   );
 
-  recentActions$: Observable<ProjectActionMap>;
-
   constructor(
     readonly settings: Settings,
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
     private readonly workspaceDocsGQL: WorkspaceDocsGQL,
-    private readonly saveRecentActionGQL: SaveRecentActionGQL,
     private readonly commandRunner: CommandRunner,
-    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL,
-    @Inject(IS_INTELLIJ) readonly isIntellij: boolean
+    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL
   ) {}
 
   ngOnInit() {
@@ -125,17 +116,56 @@ export class ProjectsComponent implements OnInit {
         };
       })
     );
+    this.filteredCollections$ = combineLatest(
+      workspace$,
+      this.schematicFilterFormControl.valueChanges.pipe(
+        startWith(this.schematicFilterFormControl.value)
+      )
+    ).pipe(
+      map(([workspace, filterValue]) => {
+        if (!filterValue) {
+          return workspace.schematicCollections;
+        }
+
+        filterValue = filterValue.toLowerCase();
+
+        return workspace.schematicCollections
+          .map(collection => {
+            const filteredSchematics = collection.name.includes(filterValue)
+              ? collection.schematics
+              : collection.schematics.filter(schematic =>
+                  schematic.name.includes(filterValue)
+                );
+
+            return {
+              ...collection,
+              schematics: filteredSchematics
+            };
+          })
+          .filter(collection => Boolean(collection.schematics.length));
+      }),
+      shareReplay(1)
+    );
+
+    // Make collection hot to remove jank on initial render.
+    this.filteredCollections$.subscribe().unsubscribe();
+
     this.projects$ = workspace$.pipe(
-      map(({ workspace, schematicCollections }) => {
+      map(({ workspace }) => {
         const workspaceSettings = this.settings.getWorkspace(
           this.workspacePath
         );
         this.pinnedProjectNames =
           (workspaceSettings && workspaceSettings.pinnedProjectNames) || [];
-        const projects = workspace.projects.map((p: any) => {
+        const projects = workspace.projects.map(p => {
           return {
             ...p,
-            actions: this.createActions(p, schematicCollections)
+            actions: this.createActions(p),
+            links$: this.getLinksForProject(p),
+            supportsGenerate:
+              (p.projectType === 'application' ||
+                p.projectType === 'library') &&
+              !(p.architect || []).find(a => a.name === 'e2e')
           };
         });
         return projects;
@@ -164,63 +194,32 @@ export class ProjectsComponent implements OnInit {
         return [...pinned, ...unpinned];
       })
     );
-
-    const MAX_RECENT_ACTIONS = this.isIntellij ? 3 : 4;
-    this.recentActions$ = this.projects$.pipe(
-      map(projects => {
-        return projects.reduce<ProjectActionMap>(
-          (projectActions, nextProject) => {
-            const recentActions = nextProject.recentActions
-              .map(recentAction =>
-                (nextProject as any).actions.find(
-                  (action: ProjectAction) =>
-                    action.name === recentAction.actionName &&
-                    action.schematicName === recentAction.schematicName
-                )
-              )
-              .filter(action => action !== undefined);
-            projectActions[nextProject.name] = [
-              ...recentActions,
-              ...(nextProject as any).actions.filter(
-                (action: ProjectAction) =>
-                  action.link !== undefined && !recentActions.includes(action)
-              )
-            ]
-              .slice(0, MAX_RECENT_ACTIONS)
-              .reverse();
-            return projectActions;
-          },
-          {}
-        );
-      })
-    );
   }
 
   trackByProjectRoot(_: number, project: Workspace.Projects) {
     return project.root;
   }
 
-  onActionTriggered(
-    workspacePath: string,
-    project: Workspace.Projects,
-    action: ProjectAction
-  ) {
-    this.saveRecentActionGQL
-      .mutate({
-        workspacePath: workspacePath,
-        projectName: project.name,
-        schematicName: action.schematicName,
-        actionName: action.name
-      })
-      .subscribe();
+  trackByProjectLink(_: number, action: ProjectAction) {
+    return action.link;
   }
 
-  private createActions(
-    p: Workspace.Projects,
-    schematicCollections: WorkspaceSchematics.SchematicCollections[]
-  ) {
+  getLinksForProject(project: Workspace.Projects) {
+    return this.filteredCollections$.pipe(
+      map(collections =>
+        collections.reduce(
+          (allLinks, collection) => [
+            ...allLinks,
+            ...createLinksForCollection(project, collection)
+          ],
+          [] as ProjectAction[]
+        )
+      )
+    );
+  }
+
+  private createActions(p: Workspace.Projects) {
     return [
-      { actionDescription: 'Tasks' },
       ...(p.architect || [])
         .map(task => {
           if (!task) {
@@ -228,11 +227,7 @@ export class ProjectsComponent implements OnInit {
           }
           return createLinkForTask(p, task.name, task.name);
         })
-        .filter(isDefinedProjectAction),
-      ...schematicCollections.reduce<any[]>((links, collection) => {
-        links.push(...createLinksForCollection(p, collection));
-        return links;
-      }, [])
+        .filter(isDefinedProjectAction)
     ];
   }
 
