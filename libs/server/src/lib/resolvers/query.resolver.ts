@@ -42,7 +42,7 @@ export class QueryResolver {
     try {
       return schematicCollectionsForNgNew();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(
         `Error when reading the collection list. Message: "${e.message}"`
       );
@@ -72,7 +72,7 @@ export class QueryResolver {
         schematicCollections: [] as any
       };
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(
         `Error when reading the workspace data. Message: "${e.message}"`
       );
@@ -89,7 +89,7 @@ export class QueryResolver {
     try {
       return filterByName(availableExtensions(), { name });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(
         `Error when reading the list of extensions. Message: "${e.message}"`
       );
@@ -114,7 +114,7 @@ export class QueryResolver {
         return {};
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(
         `Error when reading the command status. Message: "${e.message}"`
       );
@@ -150,7 +150,7 @@ export class QueryResolver {
         return commands.recent.map(serializeCommandInList);
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when reading commands. Message: "${e.message}"`);
     }
   }
