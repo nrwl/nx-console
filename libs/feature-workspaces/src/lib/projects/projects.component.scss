@@ -26,6 +26,13 @@ mat-list {
   padding: 0 !important;
 }
 
+.project-action-button-container {
+  height: 34px;
+  max-height: 34px;
+  min-height: 34px;
+  overflow: hidden;
+}
+
 .project-card {
   padding: 16px !important;
   padding-bottom: 24px !important;
@@ -94,12 +101,14 @@ mat-list {
   text-transform: uppercase;
 }
 
-.project-filter-container {
+.filter-container {
   background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   height: 48px;
   min-height: 48px;
   max-height: 48px;
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 2;
 
   input {

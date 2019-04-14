@@ -41,7 +41,7 @@ export class MutationResolver {
         this.fileUtils
       );
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when running 'ng add'. Message: "${e.message}"`);
     }
   }
@@ -76,7 +76,7 @@ export class MutationResolver {
         this.fileUtils
       );
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when running 'ng new'. Message: "${e.message}"`);
     }
   }
@@ -105,7 +105,7 @@ export class MutationResolver {
         !dr
       );
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(
         `Error when running 'ng generate'. Message: "${e.message}"`
       );
@@ -132,7 +132,7 @@ export class MutationResolver {
         !dr
       );
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when running npm script. Message: "${e.message}"`);
     }
   }
@@ -150,7 +150,7 @@ export class MutationResolver {
         this.fileUtils
       );
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when running 'ng ...'. Message: "${e.message}"`);
     }
   }
@@ -172,7 +172,7 @@ export class MutationResolver {
         this.fileUtils
       );
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when running npm script. Message:"${e.message}"`);
     }
   }
@@ -193,7 +193,7 @@ export class MutationResolver {
         return { result: false };
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when stopping commands. Message: "${e.message}"`);
     }
   }
@@ -226,7 +226,7 @@ export class MutationResolver {
       commands.removeCommand(id);
       return { result: true };
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when removing commands. Message: "${e.message}"`);
     }
   }
@@ -237,7 +237,7 @@ export class MutationResolver {
       commands.removeAllCommands();
       return { result: true };
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when removing commands. Message: "${e.message}"`);
     }
   }
@@ -248,7 +248,7 @@ export class MutationResolver {
       commands.restartCommand(id);
       return { result: true };
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(
         `Error when restarting commands. Message: "${e.message}"`
       );
@@ -261,7 +261,7 @@ export class MutationResolver {
       openInEditor(editor, p);
       return { response: 'successful' };
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(`Error when opening an editor. Message: "${e.message}"`);
     }
   }
