@@ -16,7 +16,7 @@
     "ng": "ng",
     "start": "nps",
     "format": "nps format.write",
-    "build-vs-code": "ng build vscode --maxWorkers=2",
+    "build-vs-code": "ng build vscode --maxWorkers=4",
     "postinstall": "node ./tools/scripts/postinstall.js"
   },
   "build": {
