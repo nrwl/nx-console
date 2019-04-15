@@ -1,20 +1,24 @@
-mat-list-item mat-icon {
-  cursor: pointer;
-  color: rgb(128, 128, 128);
-  transform: scale(1);
-  transition: all 0.1s ease-in-out;
+mat-list-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 
-  &:hover {
-    color: rgba(0, 0, 0, 0.87);
-    transform: scale(1.05);
-  }
+  mat-icon {
+    cursor: pointer;
+    color: rgb(128, 128, 128);
+    transform: scale(1);
+    transition: all 0.1s ease-in-out;
 
-  &.favorite-icon:hover {
-    color: #a53339;
-  }
+    &:hover {
+      color: rgba(0, 0, 0, 0.87);
+      transform: scale(1.05);
+    }
 
-  &.favorited {
-    color: #bb3a3f;
+    &.favorite-icon:hover {
+      color: #a53339;
+    }
+
+    &.favorited {
+      color: #bb3a3f;
+    }
   }
 }
 
@@ -22,7 +26,7 @@ mat-list-item mat-icon {
   position: relative;
 }
 
-mat-list {
+mat-list[dense] {
   padding: 0 !important;
 }
 

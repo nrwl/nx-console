@@ -13,6 +13,16 @@
     {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
   </mat-icon>
 </div>
+
+<mat-menu #actionsMenu>
+  <ng-template matMenuContent let-p="project">
+    <angular-console-filter-menu
+      [filterFormControl]="schematicFilterFormControl"
+      [links$]="p.links$"
+    ></angular-console-filter-menu>
+  </ng-template>
+</mat-menu>
+
 <mat-list dense *ngIf="(filteredProjects$ | async) as projects">
   <cdk-virtual-scroll-viewport
     *ngIf="(viewportHeight$ | async) as viewportHeight"
@@ -66,7 +76,7 @@
                 [routerLink]="a.link"
                 class="route-button"
               >
-                {{ a.actionDescription | titlecase }}
+                {{ a.displayText | titlecase }}
               </button>
               <button
                 mat-stroked-button
@@ -79,47 +89,8 @@
               </button>
             </div>
           </mat-list-item>
-          <mat-divider></mat-divider>
         </ng-container>
       </div>
     </ng-container>
   </cdk-virtual-scroll-viewport>
 </mat-list>
-
-<mat-menu #actionsMenu>
-  <ng-template matMenuContent let-p="project">
-    <div
-      class="filter-container"
-      fxLayout="row"
-      fxLayoutAlign="start center"
-      (click)="$event.stopPropagation()"
-      (keydown)="$event.stopPropagation()"
-    >
-      <input
-        placeholder="Filter schematics"
-        #schematicFilter
-        fxFlex
-        [formControl]="schematicFilterFormControl"
-        id="filter"
-      />
-      <mat-icon
-        class="filter-icon"
-        (click)="
-          schematicFilterFormControl.setValue(''); schematicFilter.select()
-        "
-      >
-        {{ schematicFilterFormControl.value ? 'clear' : 'filter_list' }}
-      </mat-icon>
-    </div>
-    <ng-container *ngFor="let a of (p.links$ | async)">
-      <ng-container *ngIf="!a.link">
-        <mat-divider></mat-divider>
-        <span mat-menu-item [disabled]="true"> {{ a.actionDescription }} </span>
-        <mat-divider></mat-divider>
-      </ng-container>
-      <button mat-menu-item [routerLink]="a.link" *ngIf="a.link">
-        {{ a.actionDescription | titlecase }}
-      </button>
-    </ng-container>
-  </ng-template>
-</mat-menu>

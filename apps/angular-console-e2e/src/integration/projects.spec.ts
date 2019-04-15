@@ -31,8 +31,9 @@ describe('Projects', () => {
 
     cy.contains('button.mat-stroked-button', 'Generate')
       .first()
-      .click({ force: true });
-    cy.contains('.cdk-overlay-pane button', 'Component').click({ force: true });
+      .click();
+    cy.get('#filter-schematics', { timeout: 500 }).type('com');
+    cy.contains('angular-console-filter-menu button', 'component').click();
     cy.contains('div.context-title', '@schematics/angular - component');
     cy.get('input[name="project"]').should(($p: any) => {
       expect($p[0].value).to.equal('proj');
