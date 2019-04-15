@@ -124,8 +124,8 @@ export const schematicFieldsToFormGroup = (payload: Payload): FormGroup => {
     trigger('fadeInOut', [
       state('void', style({ opacity: 0 })),
       state('*', style({ opacity: 1 })),
-      transition(`:enter`, animate(`150ms ease-in-out`)),
-      transition(`:leave`, animate(`150ms ease-in-out`))
+      transition(`:enter`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)),
+      transition(`:leave`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ])
   ]
 })

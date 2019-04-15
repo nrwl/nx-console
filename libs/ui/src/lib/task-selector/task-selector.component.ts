@@ -50,7 +50,7 @@ const ROUTE_CHANGE_DELAY = 300;
       state('expand', style({ width: '*' })),
       transition(
         `collapse <=> expand`,
-        animate(`${ANIMATION_MILLIS}ms ease-in-out`)
+        animate(`${ANIMATION_MILLIS}ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
       )
     ])
   ]
