@@ -27,13 +27,13 @@ export const CONTEXTUAL_ACTION_BAR_HEIGHT = 52;
     trigger('fadeIn', [
       state('void', style({ opacity: 0 })),
       state('*', style({ opacity: 1 })),
-      transition(`:enter`, animate(`500ms ease-in-out`))
+      transition(`:enter`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ]),
     trigger('growShrink', [
       state('void', style({ height: 0 })),
       state('*', style({ height: '48px' })),
-      transition(`:enter`, animate(`250ms ease-in-out`)),
-      transition(`:leave`, animate(`250ms ease-in-out`))
+      transition(`:enter`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)),
+      transition(`:leave`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ])
   ]
 })

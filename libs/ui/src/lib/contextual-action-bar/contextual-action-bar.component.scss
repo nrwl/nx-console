@@ -1,5 +1,5 @@
 mat-toolbar.title-bar {
-  transition: all 0 0.5s ease-in-out;
+  transition: all 0 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   min-height: unset !important;
   z-index: 1;

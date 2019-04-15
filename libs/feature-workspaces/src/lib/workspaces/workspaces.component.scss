@@ -69,7 +69,7 @@ mat-nav-list {
   padding-left: 48px;
   padding-top: 48px;
   z-index: 2;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.action-bar-showing {
     bottom: 48px;
@@ -89,14 +89,14 @@ mat-nav-list {
 
     .create-icon,
     .add-icon {
-      transition: all 0.2s ease-in-out;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
   .import-workspace-fab {
     opacity: 0;
     transform: scale(0.8);
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   &:hover {
@@ -124,7 +124,7 @@ mat-list-item mat-icon {
   cursor: pointer;
   color: rgb(128, 128, 128);
   transform: scale(1);
-  transition: all 0.1s ease-in-out;
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     color: rgba(0, 0, 0, 0.87);
