@@ -36,7 +36,7 @@ import { FlagsComponent } from '../flags/flags.component';
       ),
       transition(
         `shrink <=> grow`,
-        animate(`600ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
+        animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
       )
     ])
   ]
