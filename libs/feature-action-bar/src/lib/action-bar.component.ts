@@ -45,9 +45,12 @@ const TERMINAL_PADDING = 16;
       state('void', style({ height: 0, opacity: 0 })),
       state('contract', style({ height: 0, opacity: 0 })),
       state('*', style({ height: '*', opacity: 1 })),
-      transition(`contract <=> *`, animate(`250ms ease-in-out`)),
-      transition(`:enter`, animate(`250ms ease-in-out`)),
-      transition(`:leave`, animate(`250ms ease-in-out`))
+      transition(
+        `contract <=> *`,
+        animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
+      ),
+      transition(`:enter`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)),
+      transition(`:leave`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ]),
     trigger('growShrinkTerminal', [
       state(
@@ -65,7 +68,7 @@ const TERMINAL_PADDING = 16;
         }),
         { params: { terminalHeight: '0' } }
       ),
-      transition(`* <=> *`, animate(`250ms ease-in-out`))
+      transition(`* <=> *`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ])
   ]
 })

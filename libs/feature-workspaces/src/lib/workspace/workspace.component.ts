@@ -1,11 +1,17 @@
 import { IS_ELECTRON, IS_INTELLIJ } from '@angular-console/environment';
-import { FADE_IN, GROW_SHRINK } from '@angular-console/ui';
+import { FADE_IN } from '@angular-console/ui';
 import {
   BASIC_WORKSPACE_POLLING,
   EditorSupport,
   Settings
 } from '@angular-console/utils';
-import { style, transition, trigger } from '@angular/animations';
+import {
+  style,
+  transition,
+  trigger,
+  state,
+  animate
+} from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -53,7 +59,15 @@ const TASK_RUNNER_GHOST_STYLE = style({
   styleUrls: ['./workspace.component.scss'],
   encapsulation: ViewEncapsulation.None,
   animations: [
-    GROW_SHRINK,
+    trigger('growShrink', [
+      state('void', style({ width: '0' })),
+      state('collapse', style({ width: '0', position: 'absolute' })),
+      state('expand', style({ width: '*' })),
+      transition(
+        `expand <=> collapse`,
+        animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
+      )
+    ]),
     trigger('routerTransition', [
       transition('void => *', []),
       transition('* => tasks', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
