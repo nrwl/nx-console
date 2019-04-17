@@ -163,6 +163,15 @@ public class NgWorkspaceMonitor implements Disposable {
   }
 
 
+  /**
+   * Intellij provides two way how to register a window:
+   * - Use of Factory that is defined inside the plugin.xml
+   * - Programmatically, which gives us a change to add the NgConsole ToolWindow only after node process is started
+   * <p>
+   * <p>
+   * In our case we need to use the second option as we dont want show or let user access the ToolWindow before
+   * server is completly up.
+   */
   private void registerToolWindow(final Project project, final NgConsoleUI consoleUI) {
     final ToolWindowManagerEx projectTw = (ToolWindowManagerEx) ToolWindowManager.getInstance(project);
 
@@ -176,6 +185,14 @@ public class NgWorkspaceMonitor implements Disposable {
       SimpleToolWindowPanel toolWindowContent = consoleUI.getToolWindowContent();
       ToolWindowEx twEx = (ToolWindowEx) ngToolWindow;
 
+
+      /**
+       * To be able to set a width of the ToolWindow dynamically during a startup time to some desired width
+       * we are using the stretchWidth method. It might not be the best solution but we needs to set  minimal
+       * AngularConsole App can fit in.
+       *
+       * Todo: Revisit this once again to see if we need to change this to some other value or make it less hard-coded
+       */
       int width = twEx.getComponent().getWidth();
 
       ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();

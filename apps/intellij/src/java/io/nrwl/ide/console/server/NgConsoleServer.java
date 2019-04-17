@@ -36,7 +36,8 @@ import static com.intellij.openapi.util.NotNullLazyValue.createConstantValue;
 
 /**
  * NgConsoleServer class is the representation of the NGConsole node process and manages all the states. It can
- * exchange RPC  based messages with the server
+ * exchange RPC based messages with the server in order to react to different start / stop stages of the node
+ * process
  */
 public class NgConsoleServer implements Disposable {
   protected static final String DOMAIN = "ngConsoleServer";
@@ -143,7 +144,7 @@ public class NgConsoleServer implements Disposable {
   }
 
   /**
-   * This  the main piece where we assemble commandline along with the system npm interpreter in order to start
+   * This the main piece where we assemble commandline along with the system npm interpreter in order to start
    * NODE process. We are setting current workingDirectory which is in our case plugin path and the port for the RPC
    * which we use to communicate with the NODE process
    */
