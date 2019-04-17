@@ -11,10 +11,10 @@ async function bootstrap(publicDir: string) {
   fixPath();
 
   const port = await getPort({ port: 8888 });
-  startServer(port, publicDir);
-
-  console.log('Sending back to JAVA current angular-console port', publicDir);
-  rpcServer.send(DOMAIN, 'serverStarted', port.toString());
+  startServer(port, publicDir).then(() => {
+    console.log('Sending back to JAVA current angular-console port', publicDir);
+    rpcServer.send(DOMAIN, 'serverStarted', port.toString());
+  });
 }
 
 // Port number passed from Intellij.
