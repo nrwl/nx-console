@@ -160,7 +160,16 @@ module.exports = {
           'install-dependencies.APPLICATION',
           'dev.copy-assets.APPLICATION'
         )
-      )
+      ),
+      dev: {
+        ...forEachApplication(
+          nps.series.nps(
+            'clean',
+            'build.APPLICATION.dev',
+            'dev.copy-assets-base.APPLICATION'
+          )
+        )
+      }
     },
     package: {
       electronMac: nps.series(
@@ -231,7 +240,18 @@ module.exports = {
             client: 'ng build angular-console --configuration=APPLICATION'
           })
         )
-      )
+      ),
+      dev: {
+        ...forEachApplication(
+          nps.series(
+            'nps dev.gen-graphql',
+            nps.concurrent({
+              server: 'ng build APPLICATION --maxWorkers=4',
+              client: 'ng build angular-console --configuration=APPLICATION'
+            })
+          )
+        )
+      }
     },
     test: {
       default: 'nx affected:test --all --parallel',
