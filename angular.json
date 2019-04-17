@@ -529,50 +529,6 @@
         }
       },
       "schematics": {}
-    },
-    "intellij": {
-      "root": "apps/intellij",
-      "sourceRoot": "apps/intellij/src",
-      "projectType": "application",
-      "prefix": "intellij",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@nrwl/builders:node-build",
-          "options": {
-            "outputPath": "dist/apps/intellij",
-            "main": "apps/intellij/src/main.ts",
-            "tsConfig": "apps/intellij/tsconfig.app.json",
-            "assets": ["apps/intellij/src"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/intellij/src/environments/environment.ts",
-                  "with": "apps/intellij/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "builder": "@nrwl/builders:node-execute",
-          "options": {
-            "buildTarget": "intellij:build"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["apps/intellij/tsconfig.app.json"],
-            "exclude": ["**/node_modules/**"]
-          }
-        }
-      }
     }
   },
   "cli": {
