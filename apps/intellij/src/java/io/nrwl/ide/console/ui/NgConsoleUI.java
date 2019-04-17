@@ -25,8 +25,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static com.teamdev.jxbrowser.chromium.BrowserPreferences.getDefaultChromiumDir;
 
@@ -90,65 +88,29 @@ public class NgConsoleUI implements Disposable {
   }
 
 
-  /**
-   * Make sure first param is port
-   */
   public void goToUrl(final String... params) {
-    final String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
-    LOG.info("Switching to new URL : " + url);
+    ApplicationManager.getApplication()
+      .invokeAndWait(() -> {
+        String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
 
-    while (!loadAndWait(url)) {
-      try {
-        Thread.sleep(800);
-      } catch (InterruptedException e) {
-      }
-    }
+        LOG.info("Switching to new URL : " + url);
+        myBrowser.loadURL(url);
+      });
   }
 
 
   /**
-   * Make sure first param is port
+   * Make sure first param of the[params] is port.
    */
   public void goToUrl(Route route, final String... params) {
     myRoute = route;
-    final String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
-    LOG.info("Switching to new URL : " + url);
+    ApplicationManager.getApplication()
+      .invokeAndWait(() -> {
+        String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
 
-    while (!loadAndWait(url)) {
-      try {
-        Thread.sleep(800);
-      } catch (InterruptedException e) {
-      }
-    }
-  }
-
-
-  private synchronized boolean loadAndWait(String url) {
-    boolean success;
-
-    CountDownLatch countDown = new CountDownLatch(1);
-    ErrorAwareLoader loader = new ErrorAwareLoader(countDown);
-
-    myBrowser.addLoadListener(loader);
-
-    try {
-      myBrowser.loadURL(url);
-      try {
-        if (!countDown.await((long) 20, TimeUnit.SECONDS)) {
-          throw new RuntimeException(new TimeoutException());
-        }
-      } catch (InterruptedException var7) {
-        Thread.currentThread().interrupt();
-      }
-
-      success = !loader.hasError();
-    } finally {
-      if (myBrowser != null) {
-        myBrowser.removeLoadListener(loader);
-      }
-
-    }
-    return success;
+        LOG.info("Switching to new URL : " + url);
+        myBrowser.loadURL(url);
+      });
   }
 
 

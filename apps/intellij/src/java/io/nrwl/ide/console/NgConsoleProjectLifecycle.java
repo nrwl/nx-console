@@ -11,7 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import static com.intellij.notification.NotificationType.ERROR;
 
 /**
- * We want start NGConsole Server only if its Angular based project and if its not already started as
+ * We want start NGConsole Server only if its Angular based project and if it hasn't been started already by
+ * previously opened IDE instance.
+ * <p>
+ * We are using NgWorkspaceMonitor that has complete control over the process. When the project is opened we
+ * initialize ngMonitor for it, which check if there is already running node process and if yes, then it just
+ * registers current Project instance and initializes UI for it otherwise it start new node process.
  */
 public class NgConsoleProjectLifecycle implements ProjectComponent {
   private static final Logger LOG = Logger.getInstance(NgConsoleProjectLifecycle.class);
