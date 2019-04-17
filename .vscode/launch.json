@@ -17,7 +17,6 @@
       "sourceMaps": false,
       "stopOnEntry": false,
       "outFiles": ["${workspaceFolder}/**/*"],
-      "preLaunchTask": "npm: build-vs-code"
     }
   ]
 }
