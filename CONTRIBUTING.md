@@ -42,13 +42,13 @@ You can build the electron app by running `yarn start package.electronMac` or `y
 
 ## Building VSCode Plugin
 
-You can build the vscode extension by running `yarn start package.vscode`.
+You can build the vscode extension by running `yarn start prepare.and.package.vscode`.
 You can install it by running `code --install-extension dist/apps/vscode/angular-console.vsix`
 Reload the vscode window to use the newly installed build of the extension.
 
 If you are working on the plugin, run:
 
-- `yarn start prepare.vscode`
+- `yarn start prepare.dev.vscode`
 - Hit F5
 
 ## Submitting a PR
