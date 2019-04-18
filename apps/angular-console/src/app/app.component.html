@@ -2,7 +2,7 @@
   fxLayout="column"
   fxFlex
   class="content-container"
-  [@.disabled]="settings.useDisableAnimations()"
+  [@.disabled]="settings.disabledAnimations$ | async"
 >
   <ui-contextual-action-bar></ui-contextual-action-bar>
 
