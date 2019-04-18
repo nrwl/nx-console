@@ -15,7 +15,6 @@ import {
 import {
   ChangeDetectionStrategy,
   Component,
-  HostBinding,
   Inject,
   OnDestroy,
   OnInit,
@@ -78,8 +77,6 @@ const TASK_RUNNER_GHOST_STYLE = style({
   ]
 })
 export class WorkspaceComponent implements OnInit, OnDestroy {
-  @HostBinding('@.disabled') animationsDisabled = false;
-
   readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
     map(() => {
@@ -239,9 +236,5 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.workplaceSubscription.unsubscribe();
     this.subscription.unsubscribe();
     this.editorSubscription.unsubscribe();
-  }
-
-  toggleAnimations() {
-    this.animationsDisabled = !this.animationsDisabled;
   }
 }
