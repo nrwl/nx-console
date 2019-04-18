@@ -47,6 +47,8 @@
     "no-attribute-parameter-decorator": true,
     "no-output-named-after-standard-event": true,
     "no-forward-ref": true,
+    "no-unused-variable": true,
+    "no-unused-expression": true,
     "no-unused-css": false,
     "contextual-life-cycle": true,
     "trackBy-function": false,
