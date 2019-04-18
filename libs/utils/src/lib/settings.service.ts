@@ -174,12 +174,14 @@ export class Settings {
       first(),
       tap(r => {
         this.settings = (r.data as any).settings;
+        this.disabledAnimationsSubject.next(this.settings.disableAnimations);
       })
     );
   }
 
   private store(v: SettingsModels.Settings) {
     this.settings = v;
+    this.disabledAnimationsSubject.next(this.settings.disableAnimations);
     this.updateSettingsGQL
       .mutate({
         data: JSON.stringify({ ...v })
