@@ -4,8 +4,10 @@ import { first, tap } from 'rxjs/operators';
 import {
   Settings as SettingsModels,
   SettingsGQL,
-  UpdateSettingsGQL
+  UpdateSettingsGQL,
+  Maybe
 } from './generated/graphql';
+import { BehaviorSubject } from 'rxjs';
 
 export { Settings as SettingsModels } from './generated/graphql';
 
@@ -109,8 +111,14 @@ export class Settings {
     return this.settings.channel;
   }
 
+  private readonly disabledAnimationsSubject = new BehaviorSubject<
+    Maybe<boolean>
+  >(this.settings.disableAnimations);
+  readonly disabledAnimations$ = this.disabledAnimationsSubject.asObservable();
+
   setDisableAnimations(disableAnimations: boolean): void {
     this.store({ ...this.settings, disableAnimations });
+    this.disabledAnimationsSubject.next(disableAnimations);
   }
 
   useDisableAnimations() {

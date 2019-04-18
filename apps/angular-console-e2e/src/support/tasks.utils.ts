@@ -25,7 +25,7 @@ export function checkActionBarHidden() {
 export function checkSingleRecentTask(task: Task) {
   cy.get('angular-console-action-bar mat-list-item').should(tasks => {
     expect(tasks.length).to.equal(1);
-    expect(tasks).visible;
+    expect(tasks).visible();
 
     expect(
       tasks
@@ -34,7 +34,7 @@ export function checkSingleRecentTask(task: Task) {
         .textContent!.trim()
     ).to.equal(task.command);
 
-    expect(tasks.find(`.task-avatar.${task.status}`)).visible;
+    expect(tasks.find(`.task-avatar.${task.status}`)).visible();
   });
 }
 
