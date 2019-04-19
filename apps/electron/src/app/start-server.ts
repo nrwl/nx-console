@@ -58,7 +58,7 @@ export async function startServer(
       createServerModule(exports, providers)
     );
     app.useStaticAssets(assetsPath);
-    await app.listen(port, () => {
+    return await app.listen(port, () => {
       console.log(`Listening on port ${port}`);
     });
   } catch (e) {

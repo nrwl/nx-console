@@ -134,16 +134,17 @@ function createWindow() {
 
   getPort({ port: 7777 }).then((port: number) => {
     try {
-      startServer(port, telemetry, mainWindow);
-      if (fileExists(path.join(currentDirectory, 'angular.json'))) {
-        mainWindow.loadURL(
-          `http://localhost:${port}/workspace/${encodeURIComponent(
-            currentDirectory
-          )}/projects`
-        );
-      } else {
-        mainWindow.loadURL(`http://localhost:${port}`);
-      }
+      startServer(port, telemetry, mainWindow).then(() => {
+        if (fileExists(path.join(currentDirectory, 'angular.json'))) {
+          mainWindow.loadURL(
+            `http://localhost:${port}/workspace/${encodeURIComponent(
+              currentDirectory
+            )}/projects`
+          );
+        } else {
+          mainWindow.loadURL(`http://localhost:${port}`);
+        }
+      });
     } catch (e) {
       showCloseDialog(`Error when starting Angular Console: ${e.message}`);
       telemetry.reportException(`Start failed: ${e.message}`);
