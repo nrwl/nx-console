@@ -13,7 +13,6 @@ import {
   animate
 } from '@angular/animations';
 import {
-  ChangeDetectionStrategy,
   Component,
   Inject,
   OnDestroy,
@@ -52,7 +51,6 @@ const TASK_RUNNER_GHOST_STYLE = style({
 });
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],

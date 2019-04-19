@@ -2,6 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { NavigationEnd, NavigationExtras, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,14 @@ export class RouterNavigation implements OnDestroy {
 
   navSubscription: Subscription;
 
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly contextualActionBarService: ContextualActionBarService
+  ) {}
 
   init() {
+    (window as any).ANGULAR_CONSOLE_ROUTER = this.router;
+    (window as any).ANGULAR_CONSOLE_CONTEXTUAL_ACTION_BAR_SERVICE = this.contextualActionBarService;
     this.navSubscription = this.router.events
       .pipe(
         filter(
