@@ -6,7 +6,7 @@ import {
   WorkspaceRouteTitle
 } from './tree-item/workspace-route';
 
-const activeWebViews = new Map<string, WebviewPanel>();
+let webviewPanel: WebviewPanel | undefined;
 
 export function createWebViewPanel(
   context: ExtensionContext,
@@ -21,36 +21,34 @@ export function createWebViewPanel(
     panelTitle = `${workspaceDef.name} | ${route}`;
   }
 
-  const activePanel = activeWebViews.get(panelTitle);
-  if (activePanel) {
-    activePanel.reveal();
-    return activePanel;
+  if (webviewPanel) {
+    webviewPanel.title = panelTitle;
+    webviewPanel.webview.postMessage({ routePath });
+    webviewPanel.reveal();
+  } else {
+    webviewPanel = window.createWebviewPanel(
+      'angular-console', // Identifies the type of the webview. Used internally
+      panelTitle, // Title of the panel displayed to the user
+      viewColumn, // Editor column to show the new webview panel in.
+      {
+        retainContextWhenHidden: true,
+        enableScripts: true
+      }
+    );
+
+    webviewPanel.webview.html = getIframeHtml(serverUrl, routePath);
   }
 
-  const panel = window.createWebviewPanel(
-    'angular-console', // Identifies the type of the webview. Used internally
-    panelTitle, // Title of the panel displayed to the user
-    viewColumn, // Editor column to show the new webview panel in.
-    {
-      retainContextWhenHidden: true,
-      enableScripts: true
-    }
-  );
-
-  activeWebViews.set(panelTitle, panel);
-  panel.onDidDispose(() => {
-    if (activeWebViews.get(panelTitle) === panel) {
-      activeWebViews.delete(panelTitle);
-    }
+  webviewPanel.onDidDispose(() => {
+    webviewPanel = undefined;
   });
 
-  panel.iconPath = WorkspaceRoute.getIconUriForRoute(
+  webviewPanel.iconPath = WorkspaceRoute.getIconUriForRoute(
     context.extensionPath,
     route
   );
-  panel.webview.html = getIframeHtml(serverUrl, routePath);
 
-  return panel;
+  return webviewPanel;
 }
 
 export function getIframeHtml(serverUrl: string, routePath: string) {
@@ -90,6 +88,13 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
         document.addEventListener('readystatechange', event => {
           if (event.target.readyState === 'complete') {
             document.body.classList.remove('loading');
+          }
+        });
+        window.addEventListener('message', (event) => {
+          const routePath = event.data.routePath;
+          if (routePath && window.ANGULAR_CONSOLE_ROUTER) {
+            window.ANGULAR_CONSOLE_CONTEXTUAL_ACTION_BAR_SERVICE.contextualActions$.next(null);
+            window.ANGULAR_CONSOLE_ROUTER.navigateByUrl(routePath);
           }
         });
       </script>
