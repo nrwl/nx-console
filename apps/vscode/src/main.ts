@@ -1,7 +1,8 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
 import { readSettings } from '@angular-console/server';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
+import { existsSync } from 'fs';
 import { Server } from 'http';
+import { join } from 'path';
 import {
   commands,
   ExtensionContext,
@@ -11,7 +12,7 @@ import {
   workspace
 } from 'vscode';
 
-import { startServer } from './app/start-server';
+import { getStoreForContext, startServer } from './app/start-server';
 import { Workspace } from './app/tree-item/workspace';
 import {
   getWorkspaceRoute,
@@ -21,13 +22,11 @@ import {
 } from './app/tree-item/workspace-route';
 import { CurrentWorkspaceTreeProvider } from './app/tree-view/current-workspace-tree-provider';
 import { createWebViewPanel } from './app/webview.factory';
-import { existsSync } from 'fs';
-import { join } from 'path';
 
-let server: { server: Server; store: Store };
+let server: Promise<Server>;
 let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
 
-export async function activate(context: ExtensionContext) {
+export function activate(context: ExtensionContext) {
   const workspacePath =
     workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
@@ -35,10 +34,7 @@ export async function activate(context: ExtensionContext) {
     workspacePath && existsSync(join(workspacePath, 'angular.json'))
   );
 
-  server = await startServer(
-    context,
-    isAngularWorkspace ? workspacePath : undefined
-  );
+  server = startServer(context, isAngularWorkspace ? workspacePath : undefined);
 
   commands.executeCommand(
     'setContext',
@@ -49,7 +45,7 @@ export async function activate(context: ExtensionContext) {
   if (workspacePath && isAngularWorkspace) {
     currentWorkspace = window.createTreeView('angularConsole', {
       treeDataProvider: CurrentWorkspaceTreeProvider.create(
-        readSettings(server.store),
+        readSettings(getStoreForContext(context)),
         workspacePath,
         context.extensionPath
       )
@@ -90,7 +86,7 @@ export async function activate(context: ExtensionContext) {
 
 export async function deactivate() {
   if (server) {
-    server.server.close();
+    (await server).close();
   }
 }
 
@@ -109,7 +105,7 @@ async function main(config: {
     revealWorkspaceRoute
   } = config;
 
-  const address = server.server.address();
+  const address = (await server).address();
   if (typeof address === 'string') {
     throw new Error(`Server address format is unsupported: ${address}`);
   }
