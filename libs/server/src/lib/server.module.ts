@@ -65,7 +65,8 @@ export function createServerModule(
       CompletionsTypesResolver,
       DocsResolver,
       MutationResolver,
-      FileUtils
+      FileUtils,
+      ...providers
     ],
     controllers: [DefaultController]
   })
