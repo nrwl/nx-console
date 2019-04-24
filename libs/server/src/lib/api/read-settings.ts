@@ -43,7 +43,11 @@ export function readSettings(store: Store): Settings {
   if (settings.useNvm === undefined) {
     settings.useNvm = false;
   }
-  settings.isConnectUser = !!authUtils.getIdTokenFromStore();
+  try {
+    settings.isConnectUser = !!authUtils.getIdTokenFromStore();
+  } catch {
+    settings.isConnectUser = false;
+  }
   return settings;
 }
 
