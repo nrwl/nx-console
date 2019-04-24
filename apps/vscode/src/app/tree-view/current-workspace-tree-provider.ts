@@ -1,7 +1,5 @@
-import { WorkspaceDefinition, Settings } from '@angular-console/schema';
+import { Settings, WorkspaceDefinition } from '@angular-console/schema';
 import { settingsChange$ } from '@angular-console/server';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { TreeDataProvider } from 'vscode';
 
 import {
@@ -18,22 +16,12 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
     workspacePath: string,
     extensionPath: string
   ): TreeDataProvider<WorkspaceRoute> {
-    let name = '';
-    if (workspacePath) {
-      try {
-        name = JSON.parse(
-          readFileSync(join(workspacePath, 'angular.json'), 'utf8')
-        ).name;
-      } catch (e) {
-        console.error('Could not parse angular.json', e);
-      }
-    }
     return new CurrentWorkspaceTreeProvider(
       settings,
       {
         path: workspacePath,
         pinnedProjectNames: [],
-        name
+        name: ''
       },
       extensionPath
     );

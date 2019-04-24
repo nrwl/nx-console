@@ -10,17 +10,21 @@ import * as path from 'path';
 
 const getPort = require('get-port'); // tslint:disable-line
 
-export async function startServer(
-  context: ExtensionContext,
-  workspacePath?: string
-) {
-  const port = await getPort({ port: 8888 });
-  const store = {
+export function getStoreForContext(context: ExtensionContext) {
+  return {
     get: (key: string, defaultValue: any) =>
       context.globalState.get(key) || defaultValue,
     set: (key: string, value: any) => context.globalState.update(key, value),
     delete: (key: string) => context.globalState.update(key, undefined)
   };
+}
+
+export async function startServer(
+  context: ExtensionContext,
+  workspacePath?: string
+) {
+  const port = await getPort({ port: 8888 });
+  const store = getStoreForContext(context);
 
   const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
     return await window
@@ -74,10 +78,7 @@ export async function startServer(
   });
   app.useStaticAssets(assetsPath);
 
-  return {
-    server: await app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
-    }),
-    store
-  };
+  return await app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+  });
 }
