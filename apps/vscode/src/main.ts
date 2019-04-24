@@ -28,13 +28,16 @@ let server: { server: Server; store: Store };
 let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
 
 export async function activate(context: ExtensionContext) {
-  server = await startServer(context);
-
   const workspacePath =
     workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
   const isAngularWorkspace = Boolean(
     workspacePath && existsSync(join(workspacePath, 'angular.json'))
+  );
+
+  server = await startServer(
+    context,
+    isAngularWorkspace ? workspacePath : undefined
   );
 
   commands.executeCommand(
