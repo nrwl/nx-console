@@ -1,12 +1,19 @@
 import { ExtensionContext, window } from 'vscode';
-import { createServerModule, SelectDirectory } from '@angular-console/server';
+import {
+  createServerModule,
+  SelectDirectory,
+  QueryResolver
+} from '@angular-console/server';
 import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 import { NestFactory } from '@nestjs/core';
 import * as path from 'path';
 
 const getPort = require('get-port'); // tslint:disable-line
 
-export async function startServer(context: ExtensionContext) {
+export async function startServer(
+  context: ExtensionContext,
+  workspacePath?: string
+) {
   const port = await getPort({ port: 8888 });
   const store = {
     get: (key: string, defaultValue: any) =>
@@ -44,7 +51,15 @@ export async function startServer(context: ExtensionContext) {
 
   const assetsPath = path.join(context.extensionPath, 'assets', 'public');
 
+  const queryResolver = new QueryResolver(store);
+
+  // Pre-warm cache for workspace.
+  if (workspacePath) {
+    queryResolver.workspace(workspacePath, {});
+  }
+
   const providers = [
+    { provide: QueryResolver, useValue: queryResolver },
     { provide: 'serverAddress', useValue: `http://localhost:${port}` },
     { provide: 'store', useValue: store },
     { provide: 'selectDirectory', useValue: selectDirectory },

@@ -1,3 +1,5 @@
+export { QueryResolver } from './lib/resolvers/query.resolver';
+
 export { settingsChange$ } from './lib/api/read-settings';
 
 export { readSettings, storeSettings } from './lib/api/read-settings';
