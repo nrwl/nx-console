@@ -59,6 +59,21 @@ function createMenu() {
     {
       label: 'View',
       submenu: [
+        { role: 'resetzoom' },
+        { role: 'zoomin' },
+        {
+          role: 'zoomin',
+          accelerator: 'CommandOrControl+=',
+          visible: false,
+          enabled: true
+        },
+        { role: 'zoomout' },
+        {
+          role: 'zoomout',
+          accelerator: 'CommandOrControl-=',
+          visible: false,
+          enabled: true
+        },
         { role: 'reload' },
         { role: 'forcereload' },
         { role: 'toggledevtools' },
