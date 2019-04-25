@@ -123,7 +123,7 @@ module.exports = {
       up: {
         default: nps.concurrent({
           server: 'nps dev.server',
-          frontend: 'ng serve angular-console'
+          frontend: 'ng serve angular-console --configuration=dev'
         }),
         cypress: nps.concurrent({
           server: 'nps dev.server.start',
