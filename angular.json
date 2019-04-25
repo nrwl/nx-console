@@ -25,7 +25,7 @@
             "styles": ["apps/angular-console/src/styles.scss"],
             "scripts": [],
             "optimization": true,
-            "outputHashing": "all",
+
             "sourceMap": false,
             "extractCss": true,
             "namedChunks": false,
