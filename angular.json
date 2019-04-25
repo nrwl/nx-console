@@ -23,26 +23,18 @@
               "apps/angular-console/src/assets"
             ],
             "styles": ["apps/angular-console/src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "optimization": true,
+            "outputHashing": "all",
+            "sourceMap": false,
+            "extractCss": true,
+            "namedChunks": false,
+            "aot": true,
+            "extractLicenses": true,
+            "vendorChunk": false,
+            "buildOptimizer": true
           },
           "configurations": {
-            "production": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.prod.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
-            },
             "electron": {
               "fileReplacements": [
                 {
@@ -50,15 +42,7 @@
                   "with": "apps/angular-console/src/environments/environment.electron.ts"
                 }
               ],
-              "outputPath": "dist/apps/electron/assets/public",
-              "optimization": false,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false
+              "outputPath": "dist/apps/electron/assets/public"
             },
             "vscode": {
               "fileReplacements": [
@@ -67,14 +51,7 @@
                   "with": "apps/angular-console/src/environments/environment.vscode.ts"
                 }
               ],
-              "outputPath": "dist/apps/vscode/assets/public",
-              "optimization": false,
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false
+              "outputPath": "dist/apps/vscode/assets/public"
             },
             "intellij": {
               "fileReplacements": [
@@ -83,14 +60,18 @@
                   "with": "apps/angular-console/src/environments/environment.intellij.ts"
                 }
               ],
-              "outputPath": "dist/apps/intellij/assets/public",
+              "outputPath": "dist/apps/intellij/assets/public"
+            },
+            "dev": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/angular-console/src/environments/environment.ts",
+                  "with": "apps/angular-console/src/environments/environment.electron.ts"
+                }
+              ],
               "optimization": false,
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false
+              "aot": false,
+              "buildOptimizer": false
             },
             "cypress": {
               "fileReplacements": [
@@ -98,7 +79,10 @@
                   "replace": "apps/angular-console/src/environments/environment.ts",
                   "with": "apps/angular-console/src/environments/environment.cypress.ts"
                 }
-              ]
+              ],
+              "optimization": false,
+              "aot": false,
+              "buildOptimizer": false
             }
           }
         },
@@ -109,8 +93,8 @@
             "proxyConfig": "apps/angular-console/proxy.conf.js"
           },
           "configurations": {
-            "production": {
-              "browserTarget": "angular-console:build:production"
+            "dev": {
+              "browserTarget": "angular-console:build:dev"
             },
             "cypress": {
               "browserTarget": "angular-console:build:cypress"
@@ -247,7 +231,7 @@
                 "tmp",
                 "node-pty-prebuilt"
               ],
-              "optimization": false,
+              "optimization": true,
               "extractLicenses": true,
               "fileReplacements": [
                 {
