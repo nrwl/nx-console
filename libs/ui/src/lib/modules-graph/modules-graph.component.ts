@@ -4,7 +4,8 @@ import {
   Input,
   NgZone,
   OnInit,
-  ViewChild
+  ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { select, selectAll } from 'd3-selection';
 import { arc } from 'd3-shape';
@@ -42,6 +43,7 @@ const MIN_WIDTH = 400;
 const MIN_HEIGHT = 400;
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ui-modules-graph',
   templateUrl: './modules-graph.component.html',
   styleUrls: ['./modules-graph.component.scss']
