@@ -67,6 +67,9 @@ const TASK_RUNNER_GHOST_STYLE = style({
     ]),
     trigger('routerTransition', [
       transition('void => *', []),
+      transition('generate <=> tasks', []),
+      transition('extensions <=> tasks', []),
+      transition('generate <=> extensions', []),
       transition('* => tasks', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
       transition('* => generate', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
       transition('* => extensions', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
