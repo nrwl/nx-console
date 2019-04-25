@@ -9,7 +9,8 @@ import {
   Component,
   ElementRef,
   ViewChild,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {
   AbstractControl,
@@ -50,6 +51,7 @@ interface SchematicCollectionForNgNew {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   selector: 'angular-console-new-workspace',
   templateUrl: './new-workspace.component.html',
