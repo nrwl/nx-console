@@ -19,7 +19,7 @@ The two versions of Angular Console share most of the code, but they are bundled
 
 After cloning the project run: `yarn`.
 
-After that, run `yarn start prepare.electron`. Every time you add or remove dependencies in electron/package.json, you will need to rerun `prepare.electron`.
+After that, run `yarn start electron.prepare`. Every time you add or remove dependencies in electron/package.json, you will need to rerun `electron.prepare`.
 
 After this, run `yarn start dev.up` to start the dev environment. The application will start the process listening on port 4200. The development is done in the browser, but the server uses electron.
 
@@ -38,7 +38,7 @@ Cypress, which we use to run e2e tests, records the videos of the tests ran on C
 
 ## Building Electron App
 
-You can build the electron app by running `yarn start package.electronMac` or `yarn start package.electronWin`. Usually, you only need to do it locally if you change something related to electron-builder.
+You can build the electron app by running `yarn start electron.package`. Usually, you only need to do it locally if you change something related to electron-builder.
 
 ## Building VSCode Plugin
 
@@ -48,7 +48,7 @@ Reload the vscode window to use the newly installed build of the extension.
 
 If you are working on the plugin, run:
 
-- `yarn start prepare.dev.vscode`
+- `yarn start vscode.prepare.dev`
 - Hit F5
 
 ## Submitting a PR

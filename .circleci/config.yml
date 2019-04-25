@@ -26,7 +26,7 @@ jobs:
           paths:
             - ~/.cache
       - run: yarn start format.and.lint.check
-      - run: yarn start prepare.e2e
+      - run: yarn start e2e.prepare
       - run: yarn start test.affected.origin-master
       - run:
           command: yarn start e2e.ci1
@@ -45,7 +45,7 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - yarn-dependencies-12.2.0-
       - run: yarn install --frozen-lockfile --non-interactive
-      - run: yarn start prepare.e2e
+      - run: yarn start e2e.prepare
       - run:
           command: yarn start e2e.ci2
           no_output_timeout: 5m
