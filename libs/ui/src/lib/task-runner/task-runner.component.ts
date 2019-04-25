@@ -27,6 +27,10 @@ import { FlagsComponent } from '../flags/flags.component';
   animations: [
     trigger('growShrink', [
       state(
+        'void',
+        style({ flex: '1 1 0', height: '*', 'min-height': '30vh' })
+      ),
+      state(
         'shrink',
         style({ flex: '0 0 0', height: '45px', 'min-height': '45px' })
       ),
