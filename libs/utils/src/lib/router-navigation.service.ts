@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, NgZone } from '@angular/core';
 import { NavigationEnd, NavigationExtras, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
@@ -17,12 +17,17 @@ export class RouterNavigation implements OnDestroy {
 
   constructor(
     private readonly router: Router,
-    private readonly contextualActionBarService: ContextualActionBarService
+    private readonly contextualActionBarService: ContextualActionBarService,
+    private readonly ngZone: NgZone
   ) {}
 
   init() {
-    (window as any).ANGULAR_CONSOLE_ROUTER = this.router;
-    (window as any).ANGULAR_CONSOLE_CONTEXTUAL_ACTION_BAR_SERVICE = this.contextualActionBarService;
+    (window as any).ANGULAR_CONSOLE_NAVIGATE_BY_URL = (url: string) => {
+      this.ngZone.run(() => {
+        this.contextualActionBarService.contextualActions$.next(null);
+        this.router.navigateByUrl(url);
+      });
+    };
     this.navSubscription = this.router.events
       .pipe(
         filter(
