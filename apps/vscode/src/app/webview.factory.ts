@@ -92,9 +92,8 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
         });
         window.addEventListener('message', (event) => {
           const routePath = event.data.routePath;
-          if (routePath && window.ANGULAR_CONSOLE_ROUTER) {
-            window.ANGULAR_CONSOLE_CONTEXTUAL_ACTION_BAR_SERVICE.contextualActions$.next(null);
-            window.ANGULAR_CONSOLE_ROUTER.navigateByUrl(routePath);
+          if (routePath && window.ANGULAR_CONSOLE_NAVIGATE_BY_URL) {
+            window.ANGULAR_CONSOLE_NAVIGATE_BY_URL(routePath);
           }
         });
       </script>

@@ -6,19 +6,18 @@ import {
   Settings
 } from '@angular-console/utils';
 import {
+  animate,
+  state,
   style,
   transition,
-  trigger,
-  state,
-  animate
+  trigger
 } from '@angular/animations';
 import {
   Component,
   Inject,
   OnDestroy,
   OnInit,
-  ViewEncapsulation,
-  ChangeDetectionStrategy
+  ViewEncapsulation
 } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -52,7 +51,6 @@ const TASK_RUNNER_GHOST_STYLE = style({
 });
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
