@@ -80,7 +80,11 @@
                 fxLayoutAlign="start center"
                 fxLayoutGap="8px"
               >
-                <img height="24px" [src]="'/assets/' + option.image + '.png'" />
+                <img
+                  height="24px"
+                  [src]="'/assets/' + option.image + '.png'"
+                  *ngIf="option.image"
+                />
                 <span>{{ option.name }}</span>
               </div>
             </button>

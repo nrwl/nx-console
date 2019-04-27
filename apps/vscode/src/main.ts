@@ -1,5 +1,4 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
-import { readSettings } from '@angular-console/server';
 import { existsSync } from 'fs';
 import { Server } from 'http';
 import { join } from 'path';
@@ -12,7 +11,7 @@ import {
   workspace
 } from 'vscode';
 
-import { getStoreForContext, startServer } from './app/start-server';
+import { startServer } from './app/start-server';
 import { Workspace } from './app/tree-item/workspace';
 import {
   getWorkspaceRoute,
@@ -45,7 +44,6 @@ export function activate(context: ExtensionContext) {
   if (workspacePath && isAngularWorkspace) {
     currentWorkspace = window.createTreeView('angularConsole', {
       treeDataProvider: CurrentWorkspaceTreeProvider.create(
-        readSettings(getStoreForContext(context)),
         workspacePath,
         context.extensionPath
       )
