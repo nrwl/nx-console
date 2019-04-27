@@ -12,13 +12,7 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import {
-  Component,
-  Inject,
-  OnDestroy,
-  OnInit,
-  ViewEncapsulation
-} from '@angular/core';
+import { Component, Inject, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
@@ -77,7 +71,7 @@ const TASK_RUNNER_GHOST_STYLE = style({
     ])
   ]
 })
-export class WorkspaceComponent implements OnInit, OnDestroy {
+export class WorkspaceComponent implements OnDestroy {
   readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
     map(() => {
@@ -106,6 +100,16 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       icon: 'extension',
       url: 'extensions',
       title: 'Extensions'
+    },
+    {
+      icon: 'timeline',
+      url: 'connect/affected-projects',
+      title: 'Dependency Diagram'
+    },
+    {
+      icon: 'question_answer',
+      url: 'connect/support',
+      title: 'Connect'
     },
     { icon: 'settings', url: 'settings', title: 'Settings' }
   ];
@@ -204,33 +208,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly editorSupport: EditorSupport,
     private readonly basicWorkspaceGQL: BasicWorkspaceGQL
-  ) {
-    settings.fetch().subscribe(() => {
-      if (this.settings.showConnectPlugin()) {
-        this.routes.splice(this.routes.length - 2, 0, {
-          icon: 'question_answer',
-          url: 'connect',
-          title: 'Connect'
-        });
-      }
-    });
-  }
-
-  ngOnInit(): void {
-    this.settings.fetch().subscribe(() => {
-      if (this.settings.isConnectUser()) {
-        this.routes = [
-          this.routes[0],
-          {
-            icon: 'timeline',
-            url: 'connect/affected-projects',
-            title: 'Affected Projects'
-          },
-          ...this.routes.slice(1)
-        ];
-      }
-    });
-  }
+  ) {}
 
   ngOnDestroy(): void {
     this.contextualActionBarService.nonContextualActions$.next([]);

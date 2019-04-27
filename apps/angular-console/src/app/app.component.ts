@@ -57,7 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
     router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => {
-        if (e.urlAfterRedirects === '/connect') {
+        if (e.urlAfterRedirects === '/connect/support') {
           // TODO: This logic belong within angular-console-enterprise-frontend
           this.contextualActionBarService.breadcrumbs$.next([
             { title: 'Connect' }
