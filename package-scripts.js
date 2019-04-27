@@ -111,15 +111,6 @@ module.exports = {
         'gql-gen --config ./tools/scripts/codegen-server.yml',
         'gql-gen --config ./tools/scripts/codegen-client.js'
       ),
-      electron: {
-        default: nps.series(
-          'nps dev.gen-graphql',
-          'ng build electron --maxWorkers=4 --noSourceMap',
-          'nps dev.copy-assets.electron',
-          'nps dev.electron.start'
-        ),
-        start: `electron ${ELECTRON_BUNDLE_PATH} --port 4201 --inspect=9229`
-      },
       server: {
         default: nps.series(
           'nps dev.gen-graphql',
