@@ -47,7 +47,7 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
         'Generate',
         'Tasks',
         'Extensions',
-        'Dependency Diagram',
+        // 'Dependency Diagram',
         'Connect',
         'Settings'
       ].map(

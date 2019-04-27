@@ -101,11 +101,11 @@ export class WorkspaceComponent implements OnDestroy {
       url: 'extensions',
       title: 'Extensions'
     },
-    {
-      icon: 'timeline',
-      url: 'connect/affected-projects',
-      title: 'Dependency Diagram'
-    },
+    // {
+    //   icon: 'timeline',
+    //   url: 'connect/affected-projects',
+    //   title: 'Dependency Diagram'
+    // },
     {
       icon: 'question_answer',
       url: 'connect/support',
