@@ -8,7 +8,7 @@ import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 import { NestFactory } from '@nestjs/core';
 import * as path from 'path';
 
-const getPort = require('get-port'); // tslint:disable-line
+// const getPort = require('get-port'); // tslint:disable-line
 
 export function getStoreForContext(context: ExtensionContext) {
   return {
@@ -23,7 +23,7 @@ export async function startServer(
   context: ExtensionContext,
   workspacePath?: string
 ) {
-  const port = await getPort({ port: 8888 });
+  const port = 9999; //await getPort({ port: 8888 });
   const store = getStoreForContext(context);
 
   const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
