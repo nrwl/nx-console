@@ -266,6 +266,7 @@
             "tsConfig": "apps/intellij/tsconfig.app.json",
             "assets": [
               "apps/intellij/src/package.json",
+              "apps/intellij/src/LICENSE",
               "apps/intellij/src/assets"
             ]
           },
