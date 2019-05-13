@@ -279,6 +279,7 @@
                 "source-map-explorer",
                 "semver",
                 "tmp",
+                "ij-rpc-client",
                 "node-pty-prebuilt"
               ],
               "fileReplacements": [
