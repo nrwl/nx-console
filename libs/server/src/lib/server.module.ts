@@ -1,5 +1,15 @@
 import * as path from 'path';
-import { Global, Module, Provider } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  Global,
+  HttpException,
+  Inject,
+  Module,
+  NotFoundException,
+  Provider
+} from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { QueryResolver } from './resolvers/query.resolver';
 import { MutationResolver } from './resolvers/mutation.resolver';
@@ -15,8 +25,8 @@ import { readSettings } from './api/read-settings';
 import { commands } from './api/run-command';
 import { Telemetry } from './utils/telemetry';
 import { docs } from './api/docs';
-import { DefaultController } from './default.controller';
 import { FileUtils } from './utils/file-utils';
+import { APP_FILTER } from '@nestjs/core';
 
 export function createServerModule(
   exports: string[],
@@ -43,6 +53,16 @@ export function createServerModule(
   })
   class CoreModule {}
 
+  @Catch(NotFoundException)
+  class RenderIndex implements ExceptionFilter {
+    constructor(@Inject('assetsPath') private readonly assetsPath: string) {}
+    catch(_exception: HttpException, host: ArgumentsHost) {
+      const ctx = host.switchToHttp();
+      const res = ctx.getResponse();
+      res.sendFile(path.join(this.assetsPath, 'index.html'));
+    }
+  }
+
   @Module({
     imports: [
       CoreModule,
@@ -66,9 +86,13 @@ export function createServerModule(
       DocsResolver,
       MutationResolver,
       FileUtils,
+      {
+        provide: APP_FILTER,
+        useClass: RenderIndex
+      },
       ...providers
     ],
-    controllers: [DefaultController]
+    controllers: []
   })
   class ServerModule {}
 
