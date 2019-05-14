@@ -178,6 +178,7 @@
                 "source-map-explorer",
                 "semver",
                 "tmp",
+                "fast-glob",
                 "node-pty-prebuilt"
               ],
               "optimization": true,
