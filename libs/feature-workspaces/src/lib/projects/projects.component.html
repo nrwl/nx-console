@@ -71,21 +71,21 @@
               class="project-action-button-container"
             >
               <button
+                mat-stroked-button
+                #actionsMenuTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="actionsMenu"
+                [matMenuTriggerData]="{ project: p }"
+                *ngIf="p.supportsGenerate"
+              >
+                Gen
+              </button>
+              <button
                 *ngFor="let a of p.actions"
                 mat-stroked-button
                 [routerLink]="a.link"
                 class="route-button"
               >
                 {{ a.displayText | titlecase }}
-              </button>
-              <button
-                mat-stroked-button
-                #actionsMenuTrigger="matMenuTrigger"
-                [matMenuTriggerFor]="actionsMenu"
-                [matMenuTriggerData]="{ project: p }"
-                [disabled]="!p.supportsGenerate"
-              >
-                Generate
               </button>
             </div>
           </mat-list-item>
