@@ -29,7 +29,7 @@ describe('Projects', () => {
       'not.exist'
     );
 
-    cy.contains('button.mat-stroked-button', 'Generate')
+    cy.contains('button.mat-stroked-button', 'Gen')
       .first()
       .click();
     cy.get('#filter-schematics', { timeout: 500 }).type('com');

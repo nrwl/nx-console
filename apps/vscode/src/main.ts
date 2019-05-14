@@ -1,5 +1,4 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
-import { existsSync } from 'fs';
 import { Server } from 'http';
 import { join } from 'path';
 import {
@@ -21,7 +20,8 @@ import {
 } from './app/tree-item/workspace-route';
 import { CurrentWorkspaceTreeProvider } from './app/tree-view/current-workspace-tree-provider';
 import { createWebViewPanel } from './app/webview.factory';
-
+import { stream } from 'fast-glob';
+import { existsSync } from 'fs';
 let server: Promise<Server>;
 let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
 
@@ -29,57 +29,69 @@ export function activate(context: ExtensionContext) {
   const workspacePath =
     workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
-  const isAngularWorkspace = Boolean(
-    workspacePath && existsSync(join(workspacePath, 'angular.json'))
-  );
-
-  server = startServer(context, isAngularWorkspace ? workspacePath : undefined);
-
-  commands.executeCommand(
-    'setContext',
-    'isAngularWorkspace',
-    isAngularWorkspace
-  );
-
-  if (workspacePath && isAngularWorkspace) {
-    currentWorkspace = window.createTreeView('angularConsole', {
-      treeDataProvider: CurrentWorkspaceTreeProvider.create(
-        workspacePath,
-        context.extensionPath
-      )
-    });
-
-    context.subscriptions.push(currentWorkspace);
-
-    [
-      {
-        command: 'extension.angularConsoleSidePanel',
-        viewColumn: ViewColumn.Beside
-      },
-      {
-        command: 'extension.angularConsoleActivePanel',
-        viewColumn: ViewColumn.Active
-      }
-    ].forEach(({ command, viewColumn }) => {
-      context.subscriptions.push(
-        commands.registerCommand(
-          command,
-          (
-            workspaceDef: WorkspaceDefinition | undefined,
-            workspaceRouteTitle: WorkspaceRouteTitle | undefined,
-            onRevealWorkspaceItem: RevealWorkspaceRoute
-          ) =>
-            main({
-              context,
-              workspaceDef,
-              viewColumn,
-              workspaceRouteTitle,
-              revealWorkspaceRoute: onRevealWorkspaceItem
-            })
-        )
-      );
-    });
+  if (!workspacePath) {
+    throw new Error('Could not find VsCode workspace path');
   }
+
+  if (existsSync(join(workspacePath, 'angular.json'))) {
+    return setAngularWorkspace(context, workspacePath);
+  }
+
+  const angularJsonStream = stream(join('**', 'angular.json'), {
+    cwd: workspacePath,
+    deep: 4,
+    onlyFiles: true,
+    absolute: true,
+    stats: false
+  }).on('data', (angularJsonPath: string) => {
+    angularJsonStream.pause();
+
+    setAngularWorkspace(context, join(angularJsonPath, '..'));
+  });
+}
+
+function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
+  server = startServer(context, workspacePath);
+
+  commands.executeCommand('setContext', 'isAngularWorkspace', true);
+
+  currentWorkspace = window.createTreeView('angularConsole', {
+    treeDataProvider: CurrentWorkspaceTreeProvider.create(
+      workspacePath,
+      context.extensionPath
+    )
+  });
+
+  context.subscriptions.push(currentWorkspace);
+
+  [
+    {
+      command: 'extension.angularConsoleSidePanel',
+      viewColumn: ViewColumn.Beside
+    },
+    {
+      command: 'extension.angularConsoleActivePanel',
+      viewColumn: ViewColumn.Active
+    }
+  ].forEach(({ command, viewColumn }) => {
+    context.subscriptions.push(
+      commands.registerCommand(
+        command,
+        (
+          workspaceDef: WorkspaceDefinition | undefined,
+          workspaceRouteTitle: WorkspaceRouteTitle | undefined,
+          onRevealWorkspaceItem: RevealWorkspaceRoute
+        ) =>
+          main({
+            context,
+            workspaceDef,
+            viewColumn,
+            workspaceRouteTitle,
+            revealWorkspaceRoute: onRevealWorkspaceItem
+          })
+      )
+    );
+  });
 }
 
 export async function deactivate() {

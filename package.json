@@ -153,6 +153,7 @@
     "electron-store": "2.0.0",
     "electron-updater": "3.1.2",
     "express": "4.16.4",
+    "fast-glob": "^2.2.6",
     "fix-path": "2.1.0",
     "fontfaceobserver": "^2.1.0",
     "get-port": "4.1.0",
@@ -195,13 +196,11 @@
     "typescript": "3.2.4",
     "universal-analytics": "0.4.20",
     "uuid": "3.3.2",
-    "vsce": "^1.59.0",
+    "vsce": "^1.61.0",
     "vscode": "^1.1.33",
     "xterm": "3.11.0",
     "zlib": "^1.0.5",
-    "zone.js": "0.8.29",
-    "@ngrx/schematics": "7.2.0",
-    "@ngrx/store-devtools": "7.2.0"
+    "zone.js": "0.8.29"
   },
   "jest": {
     "moduleFileExtensions": [
