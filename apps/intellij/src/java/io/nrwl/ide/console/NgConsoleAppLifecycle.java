@@ -1,14 +1,13 @@
 package io.nrwl.ide.console;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
-import io.nrwl.ide.console.server.NgConsoleServer;
-import org.jetbrains.annotations.NotNull;
-
-import static io.nrwl.ide.console.NgConsoleUtil.getServer;
-import static io.nrwl.ide.console.NgConsoleUtil.setServer;
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.util.Disposer;
 
 /**
- * Listens for application lifecycle
+ * Listens for application lifecycle and make sure that NG AngularConsole node process was really shutdown with
+ * the last closed angular project.
  */
 @SuppressWarnings({"deprecation"})
 public class NgConsoleAppLifecycle implements ApplicationComponent {
@@ -16,23 +15,14 @@ public class NgConsoleAppLifecycle implements ApplicationComponent {
 
   @Override
   public void initComponent() {
-    // Init idle default server when application start ups
-    setServer(new NgConsoleServer());
+    NgWorkspaceMonitor registry = ServiceManager.getService(NgWorkspaceMonitor.class);
+
+    /**
+     * Force shutdown NgConsoleServer when all is disposed.
+     *
+     */
+    Disposer.register(ApplicationManager.getApplication(), registry);
   }
 
-  @Override
-  public void disposeComponent() {
-    // make sure that is no unclosed process
 
-    if (getServer() != null) {
-      getServer().shutdown(false);
-      setServer(null);
-    }
-  }
-
-  @NotNull
-  @Override
-  public String getComponentName() {
-    return NgConsoleAppLifecycle.class.getSimpleName();
-  }
 }

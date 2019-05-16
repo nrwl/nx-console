@@ -11,22 +11,22 @@ import org.jetbrains.annotations.NotNull;
  * Right now used only for logging but in case I need some output processing I might use it more.
  */
 public class ProcessOutputLogger {
-    private static final Logger LOG = Logger.getInstance(ProcessOutputLogger.class);
+  private static final Logger LOG = Logger.getInstance(ProcessOutputLogger.class);
 
-    private final ProcessHandler myProcessHandler;
+  private final ProcessHandler myProcessHandler;
 
-    public ProcessOutputLogger(@NotNull ProcessHandler processHandler) {
-        myProcessHandler = processHandler;
-    }
+  public ProcessOutputLogger(@NotNull ProcessHandler processHandler) {
+    myProcessHandler = processHandler;
+  }
 
 
-    public void startNotify() {
-        myProcessHandler.addProcessListener(new ProcessAdapter() {
-            @Override
-            public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
-                LOG.info( event.getText());
-            }
-        });
-        myProcessHandler.startNotify();
-    }
+  public void startNotify() {
+    myProcessHandler.addProcessListener(new ProcessAdapter() {
+      @Override
+      public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
+        LOG.info(event.getText());
+      }
+    });
+    myProcessHandler.startNotify();
+  }
 }

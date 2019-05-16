@@ -42,7 +42,7 @@ intellij {
 patchPluginXml {
   sinceBuild '180'
   untilBuild '999'
-  description 'Angular Console for IDEA Editors. The user interface app for the Angular CLI'
+  pluginDescription 'Angular Console for IDEA Editors. The user interface app for the Angular CLI.'
 }
 
 
@@ -53,7 +53,7 @@ repositories {
 
 dependencies {
   compile fileTree(dir: 'libs', include: '*.jar')
-  compile 'com.teamdev.jxbrowser:jxbrowser-cross-platform:6.22'
+  compile 'com.teamdev.jxbrowser:jxbrowser-cross-platform:6.22.2'
   testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 

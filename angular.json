@@ -276,6 +276,7 @@
               "externalDependencies": [
                 "source-map-explorer",
                 "tmp",
+                "ij-rpc-client",
                 "node-pty-prebuilt"
               ],
               "fileReplacements": [
