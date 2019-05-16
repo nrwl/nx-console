@@ -7,7 +7,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: circleci/node:11.13.0-stretch-browsers
+    - image: circleci/node:12.2.0-stretch-browsers
 
 jobs:
   build:
@@ -16,13 +16,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-dependencies-11.13.0-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-dependencies-11.13.0-{{ .Branch }}-
+            - yarn-dependencies-12.2.0-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-12.2.0-{{ .Branch }}-
             # fallback to using the latest cache if no exact match is found
-            - yarn-dependencies-11.13.0-
+            - yarn-dependencies-12.2.0-
       - run: yarn install --frozen-lockfile --non-interactive
       - save_cache:
-          key: yarn-dependencies-11.13.0-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-dependencies-12.2.0-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache
       - run: yarn start format.and.lint.check
@@ -40,10 +40,10 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - yarn-dependencies-11.13.0-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-dependencies-11.13.0-{{ .Branch }}-
+            - yarn-dependencies-12.2.0-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-dependencies-12.2.0-{{ .Branch }}-
             # fallback to using the latest cache if no exact match is found
-            - yarn-dependencies-11.13.0-
+            - yarn-dependencies-12.2.0-
       - run: yarn install --frozen-lockfile --non-interactive
       - run: yarn start prepare.e2e
       - run:
