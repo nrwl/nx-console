@@ -1,10 +1,6 @@
 import { IS_ELECTRON, IS_INTELLIJ } from '@angular-console/environment';
 import { FADE_IN } from '@angular-console/ui';
-import {
-  BASIC_WORKSPACE_POLLING,
-  EditorSupport,
-  Settings
-} from '@angular-console/utils';
+import { EditorSupport, Settings } from '@angular-console/utils';
 import {
   animate,
   state,
@@ -130,14 +126,9 @@ export class WorkspaceComponent implements OnDestroy {
   }> = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.basicWorkspaceGQL.watch(
-        {
-          path
-        },
-        {
-          pollInterval: BASIC_WORKSPACE_POLLING
-        }
-      ).valueChanges;
+      return this.basicWorkspaceGQL.fetch({
+        path
+      });
     }),
     map((r: any) => r.data.workspace),
     publishReplay(1),

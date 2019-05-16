@@ -176,7 +176,6 @@
               "externalDependencies": [
                 "vscode",
                 "source-map-explorer",
-                "semver",
                 "tmp",
                 "fast-glob",
                 "node-pty-prebuilt"
@@ -228,7 +227,6 @@
               "externalDependencies": [
                 "electron",
                 "source-map-explorer",
-                "semver",
                 "tmp",
                 "node-pty-prebuilt"
               ],
@@ -277,7 +275,6 @@
               "extractLicenses": true,
               "externalDependencies": [
                 "source-map-explorer",
-                "semver",
                 "tmp",
                 "node-pty-prebuilt"
               ],
