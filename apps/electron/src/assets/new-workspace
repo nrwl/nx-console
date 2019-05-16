@@ -3,7 +3,6 @@
 
 const { execSync } = require('child_process');
 const { dirSync } = require('tmp');
-const { lt } = require('semver');
 const path = require('path');
 
 const ngNewArgs = process.argv.slice(2);
@@ -15,12 +14,6 @@ const collection = (
 try {
   // check the correct version of the NPM is installed
   const output = execSync('npm --version').toString();
-  if (lt(output, '5.0.0')) {
-    console.error(
-      'To create a workspace you must have NPM >= 5.0.0 installed.'
-    );
-    process.exit(1);
-  }
 } catch (e) {
   throw new Error('Cannot find npm. Do you have node installed?');
 }

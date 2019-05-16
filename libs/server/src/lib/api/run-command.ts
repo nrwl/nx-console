@@ -108,14 +108,14 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
     cwd
   };
 
-  const nodePtyPrebilt = require('node-pty-prebuilt');
+  const nodePty = require('node-pty-prebuilt');
   const commandRunning = isWsl
-    ? nodePtyPrebilt.spawn(
+    ? nodePty.spawn(
         'wsl.exe',
         ['-e', 'bash', '-l', '-i', '-c', `${program} ${args.join(' ')}`],
         opts
       )
-    : nodePtyPrebilt.spawn(program, args, opts);
+    : nodePty.spawn(program, args, opts);
 
   let currentCols = DEFAULT_COLS;
   let terminated = false;

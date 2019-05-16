@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Schematic, SchematicCollection } from '@angular-console/schema';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
-import { SchematicCollection, Schematic } from '@angular-console/schema';
+import { RouterNavigation } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -11,7 +12,7 @@ import {
   startWith,
   switchMap
 } from 'rxjs/operators';
-import { RouterNavigation, SCHEMATICS_POLLING } from '@angular-console/utils';
+
 import { SchematicCollectionsGQL } from '../generated/graphql';
 
 interface SchematicId {
@@ -30,14 +31,9 @@ export class SchematicsComponent {
   > = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.schematicCollectionsGQL.watch(
-        {
-          path
-        },
-        {
-          pollInterval: SCHEMATICS_POLLING
-        }
-      ).valueChanges;
+      return this.schematicCollectionsGQL.fetch({
+        path
+      });
     }),
     map(r => {
       const collections: Array<SchematicCollection> = (r as any).data.workspace

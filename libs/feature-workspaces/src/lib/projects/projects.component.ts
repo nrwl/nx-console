@@ -52,10 +52,8 @@ export class ProjectsComponent implements OnInit {
       return combineLatest(
         this.workspaceGQL.watch({ path }, POLLING).valueChanges,
         this.workspaceSchematicsGQL
-          .watch({ path }, POLLING)
-          .valueChanges.pipe(
-            catchError(() => SCHEMATIC_COLLECTION_ERROR_RESPONSE)
-          )
+          .fetch({ path })
+          .pipe(catchError(() => SCHEMATIC_COLLECTION_ERROR_RESPONSE))
       );
     }),
     filter(([r1, r2]) => Boolean(r1 && r2)),

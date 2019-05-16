@@ -13,13 +13,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
+    "allowUnusedLabels": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictFunctionTypes": true,
     "typeRoots": [
       "node_modules/@types",
-      "node_modules/node-pty-prebuilt/typings"
+      "node_modules/node-pty/typings"
     ],
     "downlevelIteration": true,
     "lib": ["es2017", "dom", "esnext.asynciterable"],

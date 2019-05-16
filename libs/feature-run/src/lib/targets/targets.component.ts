@@ -1,16 +1,17 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
 import { NpmScripts, Project } from '@angular-console/schema';
-import { Observable, combineLatest } from 'rxjs';
+import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
+import { RouterNavigation } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { combineLatest, Observable } from 'rxjs';
 import {
-  map,
-  switchMap,
+  distinctUntilChanged,
   filter,
+  map,
   startWith,
-  distinctUntilChanged
+  switchMap
 } from 'rxjs/operators';
-import { RouterNavigation, TARGET_POLLING } from '@angular-console/utils';
+
 import { WorkspaceAndProjectsGQL } from '../generated/graphql';
 
 interface Target {
@@ -29,14 +30,9 @@ export class TargetsComponent {
   > = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.workspaceAndProjectsGQL.watch(
-        {
-          path
-        },
-        {
-          pollInterval: TARGET_POLLING
-        }
-      ).valueChanges;
+      return this.workspaceAndProjectsGQL.fetch({
+        path
+      });
     }),
     map(r => {
       const sortedProjects = (r as any).data.workspace.projects

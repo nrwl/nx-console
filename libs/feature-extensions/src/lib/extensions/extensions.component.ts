@@ -1,6 +1,8 @@
+import { Extension } from '@angular-console/schema';
+import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
+import { RouterNavigation } from '@angular-console/utils';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Extension } from '@angular-console/schema';
 import { combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -10,8 +12,7 @@ import {
   startWith,
   switchMap
 } from 'rxjs/operators';
-import { TaskCollection, TaskCollections, Task } from '@angular-console/ui';
-import { EXTENSIONS_POLLING, RouterNavigation } from '@angular-console/utils';
+
 import { WorkspaceAndExtensionsGQL } from '../generated/graphql';
 
 interface ExtensionId {
@@ -34,14 +35,9 @@ export class ExtensionsComponent {
   > = this.route.params.pipe(
     map(m => m.path),
     switchMap(path => {
-      return this.workspaceAndExtensionsGQL.watch(
-        {
-          path
-        },
-        {
-          pollInterval: EXTENSIONS_POLLING
-        }
-      ).valueChanges;
+      return this.workspaceAndExtensionsGQL.fetch({
+        path
+      });
     }),
     map(r => {
       const availableExtensions: Array<Extension> = (r as any).data
