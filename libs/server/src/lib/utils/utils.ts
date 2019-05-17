@@ -206,11 +206,11 @@ export function normalizeSchema(
 
         res.push({
           name: k,
-          type: v.type || 'string',
+          type: String(v.type || 'string'),
           description: v.description,
           defaultValue: workspaceDefault === undefined ? d : workspaceDefault,
-          required: r,
-          positional: isPositional(v),
+          required: Boolean(r),
+          positional: Boolean(isPositional(v)),
           enum: v.enum
         });
       }
