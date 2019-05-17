@@ -75,7 +75,7 @@ export class ExtensionsComponent {
 
   readonly taskCollections$: Observable<
     TaskCollections<Extension>
-  > = combineLatest(this.extensions$, this.selectedExtensionId$).pipe(
+  > = combineLatest([this.extensions$, this.selectedExtensionId$]).pipe(
     map(([extensions, selectedId]) => {
       const collections: Array<TaskCollection<Extension>> = extensions.map(
         group => ({

@@ -96,10 +96,10 @@ export class ActionBarComponent {
   // The user's list of recently run commands.
   commands$ = this.commandRunner.listAllCommands().pipe(shareReplay());
 
-  showActionBar$ = combineLatest(
+  showActionBar$ = combineLatest([
     this.commands$,
     this.contextualActionBarService.contextualActions$.pipe(startWith(null))
-  ).pipe(
+  ]).pipe(
     map(([commands, contextualActions]) => {
       if (contextualActions) {
         return false;
@@ -114,17 +114,20 @@ export class ActionBarComponent {
     shareReplay()
   );
 
-  showActionToolbar$ = combineLatest(this.showActionBar$, this.commands$).pipe(
+  showActionToolbar$ = combineLatest([
+    this.showActionBar$,
+    this.commands$
+  ]).pipe(
     map(([showActionBar, commands]) => {
       return Boolean(showActionBar && commands.length > 1);
     })
   );
 
-  showActionList$ = combineLatest(
+  showActionList$ = combineLatest([
     this.showActionBar$,
     this.commands$,
     this.actionsExpanded
-  ).pipe(
+  ]).pipe(
     map(([showActionBar, commands, actionsExpanded]) => {
       return Boolean(
         showActionBar && (actionsExpanded || commands.length === 1)

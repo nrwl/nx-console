@@ -69,7 +69,10 @@ export class SchematicsComponent {
 
   readonly taskCollections$: Observable<
     TaskCollections<Schematic>
-  > = combineLatest(this.schematicCollections$, this.selectedSchematicId$).pipe(
+  > = combineLatest([
+    this.schematicCollections$,
+    this.selectedSchematicId$
+  ]).pipe(
     map(([schematicCollections, selectedSchematicId]) => {
       const collections: Array<
         TaskCollection<Schematic>

@@ -135,10 +135,10 @@ export class WorkspaceComponent implements OnDestroy {
     refCount()
   );
 
-  private readonly editorSubscription = combineLatest(
+  private readonly editorSubscription = combineLatest([
     this.editorSupport.editors,
     this.mediaObserver.media$
-  ).subscribe(([editors, mediaChange]) => {
+  ]).subscribe(([editors, mediaChange]) => {
     switch (mediaChange.mqAlias) {
       case 'xs':
         this.contextualActionBarService.nonContextualActions$.next([]);
@@ -170,10 +170,10 @@ export class WorkspaceComponent implements OnDestroy {
     }
   });
 
-  private readonly workplaceSubscription = combineLatest(
+  private readonly workplaceSubscription = combineLatest([
     this.workspace$,
     this.activeRouteTitle$
-  ).subscribe(([workspace, routeTitle]) => {
+  ]).subscribe(([workspace, routeTitle]) => {
     this.contextualActionBarService.breadcrumbs$.next([
       { title: workspace.name },
       { title: routeTitle }
