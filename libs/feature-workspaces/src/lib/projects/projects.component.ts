@@ -25,7 +25,6 @@ import {
   WorkspaceSchematicsGQL
 } from '../generated/graphql';
 import {
-  POLLING,
   ProjectAction,
   createLinksForCollection,
   isDefinedProjectAction,
@@ -49,12 +48,12 @@ export class ProjectsComponent implements OnInit {
       this.workspacePath = path;
     }),
     switchMap(path => {
-      return combineLatest(
-        this.workspaceGQL.watch({ path }, POLLING).valueChanges,
+      return combineLatest([
+        this.workspaceGQL.fetch({ path }),
         this.workspaceSchematicsGQL
           .fetch({ path })
           .pipe(catchError(() => SCHEMATIC_COLLECTION_ERROR_RESPONSE))
-      );
+      ]);
     }),
     filter(([r1, r2]) => Boolean(r1 && r2)),
     map(([r1, r2]) => {
@@ -79,12 +78,12 @@ export class ProjectsComponent implements OnInit {
 
   readonly filteredCollections$: Observable<
     WorkspaceSchematics.SchematicCollections[]
-  > = combineLatest(
+  > = combineLatest([
     this.workspace$,
     this.schematicFilterFormControl.valueChanges.pipe(
       startWith(this.schematicFilterFormControl.value)
     )
-  ).pipe(
+  ]).pipe(
     map(([workspace, filterValue]) => {
       if (!filterValue) {
         return workspace.schematicCollections;
@@ -129,13 +128,13 @@ export class ProjectsComponent implements OnInit {
     })
   );
 
-  readonly filteredProjects$: Observable<Workspace.Projects[]> = combineLatest(
+  readonly filteredProjects$: Observable<Workspace.Projects[]> = combineLatest([
     this.projectFilterFormControl.valueChanges.pipe(
       startWith(''),
       map(value => value.toLowerCase())
     ),
     this.projects$
-  ).pipe(
+  ]).pipe(
     map(([lowerCaseFilterValue, projects]) =>
       projects.filter((project: any) =>
         project.name.includes(lowerCaseFilterValue)

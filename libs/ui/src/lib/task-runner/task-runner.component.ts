@@ -66,7 +66,7 @@ export class TaskRunnerComponent implements AfterContentChecked {
     }
 
     const flagsVisible$ = combineLatest(
-      ...this.flagsComponent.matExpansionPanels.map(p =>
+      this.flagsComponent.matExpansionPanels.map(p =>
         p.expandedChange.pipe(startWith(p.expanded))
       )
     ).pipe(
@@ -74,10 +74,10 @@ export class TaskRunnerComponent implements AfterContentChecked {
       map(values => values.some(v => v))
     );
 
-    this.terminalAnimationState = combineLatest(
+    this.terminalAnimationState = combineLatest([
       this.terminalVisible$,
       flagsVisible$
-    ).pipe(
+    ]).pipe(
       startWith([this.terminalVisible$.value, true]),
       map(([terminalVisible]) => {
         if (!terminalVisible) return 'shrink';

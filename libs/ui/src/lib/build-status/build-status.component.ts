@@ -103,10 +103,10 @@ export class BuildStatusComponent implements OnDestroy {
     map(status => (status && status.stats ? status.stats.warnings : null))
   );
 
-  readonly problemsAnimationState$ = combineLatest(
+  readonly problemsAnimationState$ = combineLatest([
     this.errors$,
     this.warnings$
-  ).pipe(
+  ]).pipe(
     map(([es, ws]) => {
       return (es && es.length > 0) || (ws && ws.length > 0)
         ? 'expand'
@@ -167,7 +167,7 @@ export class BuildStatusComponent implements OnDestroy {
     })
   );
 
-  readonly buildStatus$ = combineLatest(this.status$, this.serverUrl$).pipe(
+  readonly buildStatus$ = combineLatest([this.status$, this.serverUrl$]).pipe(
     map(([status, serverUrl]) => {
       if (!status) {
         return 'Idle';
@@ -199,10 +199,10 @@ export class BuildStatusComponent implements OnDestroy {
     }
   });
 
-  readonly currentBundle$ = combineLatest(
+  readonly currentBundle$ = combineLatest([
     this.bundles$,
     this.selectedBundleFile$
-  ).pipe(
+  ]).pipe(
     map(([bundles, selected]) => {
       const c = bundles.find(x => x.file === selected);
       if (c) {
@@ -216,10 +216,10 @@ export class BuildStatusComponent implements OnDestroy {
     })
   );
 
-  readonly modulesForCurrentBundle$ = combineLatest(
+  readonly modulesForCurrentBundle$ = combineLatest([
     this.status$,
     this.selectedBundleFile$
-  ).pipe(
+  ]).pipe(
     map(([status, currentBundle]) => {
       if (!currentBundle || !status) {
         return null;

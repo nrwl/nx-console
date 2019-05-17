@@ -1,4 +1,3 @@
-import { PROJECTS_POLLING } from '@angular-console/utils';
 import { Observable, of } from 'rxjs';
 
 import { Workspace, WorkspaceSchematics } from '../generated/graphql';
@@ -78,10 +77,6 @@ export function isDefinedProjectAction(
 ): action is ProjectAction {
   return action !== undefined;
 }
-
-export const POLLING = {
-  pollInterval: PROJECTS_POLLING
-};
 
 export const SCHEMATIC_COLLECTION_ERROR_RESPONSE = of({
   data: {

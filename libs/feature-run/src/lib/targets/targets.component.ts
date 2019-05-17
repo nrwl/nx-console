@@ -85,7 +85,7 @@ export class TargetsComponent {
 
   readonly taskCollections$: Observable<
     TaskCollections<Target>
-  > = combineLatest(this.projectsAndNpmScripts$, this.selectedTargetId$).pipe(
+  > = combineLatest([this.projectsAndNpmScripts$, this.selectedTargetId$]).pipe(
     map(([projects, target]) => {
       const collections: Array<TaskCollection<Target>> = projects.map(
         projectOrScripts => {

@@ -87,13 +87,13 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
       }
     });
 
-    this.filteredTaskCollections$ = combineLatest(
+    this.filteredTaskCollections$ = combineLatest([
       this.taskFilterFormControl.valueChanges.pipe(
         startWith(''),
         map(value => value.toLowerCase())
       ),
       this.taskCollections$
-    ).pipe(
+    ]).pipe(
       map(([lowerCaseFilterValue, taskCollections]) => ({
         selectedTask: taskCollections.selectedTask,
         taskCollections: taskCollections.taskCollections
