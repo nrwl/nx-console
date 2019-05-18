@@ -10,7 +10,6 @@ import {
   workspace
 } from 'vscode';
 
-import { startServer } from './app/start-server';
 import { Workspace } from './app/tree-item/workspace';
 import {
   getWorkspaceRoute,
@@ -39,7 +38,7 @@ export function activate(context: ExtensionContext) {
 
   const angularJsonStream = stream(join('**', 'angular.json'), {
     cwd: workspacePath,
-    deep: 4,
+    deep: 3,
     onlyFiles: true,
     absolute: true,
     stats: false
@@ -51,46 +50,35 @@ export function activate(context: ExtensionContext) {
 }
 
 function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
-  server = startServer(context, workspacePath);
-
   commands.executeCommand('setContext', 'isAngularWorkspace', true);
-
   currentWorkspace = window.createTreeView('angularConsole', {
     treeDataProvider: CurrentWorkspaceTreeProvider.create(
       workspacePath,
       context.extensionPath
     )
   });
-
   context.subscriptions.push(currentWorkspace);
 
-  [
-    {
-      command: 'extension.angularConsoleSidePanel',
-      viewColumn: ViewColumn.Beside
-    },
-    {
-      command: 'extension.angularConsoleActivePanel',
-      viewColumn: ViewColumn.Active
-    }
-  ].forEach(({ command, viewColumn }) => {
-    context.subscriptions.push(
-      commands.registerCommand(
-        command,
-        (
-          workspaceDef: WorkspaceDefinition | undefined,
-          workspaceRouteTitle: WorkspaceRouteTitle | undefined,
-          onRevealWorkspaceItem: RevealWorkspaceRoute
-        ) =>
-          main({
-            context,
-            workspaceDef,
-            viewColumn,
-            workspaceRouteTitle,
-            revealWorkspaceRoute: onRevealWorkspaceItem
-          })
-      )
-    );
+  context.subscriptions.push(
+    commands.registerCommand(
+      'extension.angularConsoleActivePanel',
+      (
+        workspaceDef: WorkspaceDefinition | undefined,
+        workspaceRouteTitle: WorkspaceRouteTitle | undefined,
+        onRevealWorkspaceItem: RevealWorkspaceRoute
+      ) =>
+        main({
+          context,
+          workspaceDef,
+          viewColumn: ViewColumn.Active,
+          workspaceRouteTitle,
+          revealWorkspaceRoute: onRevealWorkspaceItem
+        })
+    )
+  );
+
+  import('./app/start-server').then(({ startServer }) => {
+    server = startServer(context, workspacePath);
   });
 }
 

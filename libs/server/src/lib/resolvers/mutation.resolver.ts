@@ -1,7 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import * as path from 'path';
-import * as semver from 'semver';
 
 import { docs } from '../api/docs';
 import { installNodeJs } from '../api/install-nodejs';
@@ -11,7 +10,6 @@ import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
 import { platform } from 'os';
 import { FileUtils } from '../utils/file-utils';
-import { readJsonFile } from '../utils/utils';
 import {
   storeTriggeredAction,
   readRecentActions
@@ -36,7 +34,7 @@ export class MutationResolver {
         p,
         'ng',
         this.fileUtils.findClosestNg(p),
-        ['add', name, ...this.disableInteractivePrompts(p)],
+        ['add', name, '--no-interactive'],
         this.pseudoTerminalFactory,
         this.fileUtils
       );
@@ -94,12 +92,7 @@ export class MutationResolver {
         p,
         'ng',
         this.fileUtils.findClosestNg(p),
-        [
-          'generate',
-          ...genCommand,
-          ...dryRun,
-          ...this.disableInteractivePrompts(p)
-        ],
+        ['generate', ...genCommand, ...dryRun, '--no-interactive'],
         this.pseudoTerminalFactory,
         this.fileUtils,
         !dr
@@ -126,7 +119,7 @@ export class MutationResolver {
         p,
         npmClient,
         this.fileUtils.findExecutable(npmClient, p),
-        [...genCommand, ...dryRun, ...this.disableInteractivePrompts(p)],
+        [...genCommand, ...dryRun, '--no-interactive'],
         this.pseudoTerminalFactory,
         this.fileUtils,
         !dr
@@ -310,19 +303,5 @@ export class MutationResolver {
   async openDoc(@Args('id') id: string) {
     const result = await docs.openDoc(id).toPromise();
     return { result };
-  }
-
-  disableInteractivePrompts(p: string) {
-    try {
-      const version = readJsonFile(
-        path.join(`@angular`, 'cli', 'package.json'),
-        path.join(p, 'node_modules')
-      ).json.version;
-      return semver.gte(version, '7.0.0') ? ['--no-interactive'] : [];
-    } catch (e) {
-      console.log('cannot parse cli version', e.message);
-      // don't recognize the version => assume it's greater than 7
-      return ['--no-interactive'];
-    }
   }
 }

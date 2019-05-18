@@ -27,7 +27,7 @@ function fieldEnumOptions(field: Schema) {
   if (field.defaultValue) {
     return field.enum || [];
   } else {
-    return [null, ...field.enum];
+    return [null, ...(field.enum || [])];
   }
 }
 
@@ -155,7 +155,7 @@ export class SchematicFieldsComponent implements OnInit {
     if (field.defaultValue) {
       return field.enum;
     } else {
-      return [null, ...field.enum];
+      return [null, ...(field.enum || [])];
     }
   }
 

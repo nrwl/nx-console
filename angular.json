@@ -25,7 +25,6 @@
             "styles": ["apps/angular-console/src/styles.scss"],
             "scripts": [],
             "optimization": true,
-
             "sourceMap": false,
             "extractCss": true,
             "namedChunks": false,
@@ -176,10 +175,10 @@
               "externalDependencies": [
                 "vscode",
                 "source-map-explorer",
-                "tmp",
                 "fast-glob",
                 "node-pty-prebuilt"
               ],
+              "sourceMap": false,
               "optimization": true,
               "extractLicenses": true,
               "fileReplacements": [
@@ -230,6 +229,7 @@
                 "tmp",
                 "node-pty-prebuilt"
               ],
+              "sourceMap": false,
               "optimization": true,
               "extractLicenses": true,
               "fileReplacements": [
@@ -273,9 +273,9 @@
             "production": {
               "optimization": true,
               "extractLicenses": true,
+              "sourceMap": false,
               "externalDependencies": [
                 "source-map-explorer",
-                "tmp",
                 "ij-rpc-client",
                 "node-pty-prebuilt"
               ],

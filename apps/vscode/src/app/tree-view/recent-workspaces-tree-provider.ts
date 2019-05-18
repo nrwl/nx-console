@@ -1,5 +1,4 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
-import { settingsChange$ } from '@angular-console/server';
 
 import { TreeDataProvider } from 'vscode';
 
@@ -28,16 +27,11 @@ export class RecentWorkspacesTreeProvider extends AbstractTreeProvider<
   workspaces: Array<Workspace> = [];
 
   private constructor(
-    private recent: WorkspaceDefinition[],
+    private readonly recent: WorkspaceDefinition[],
     private readonly extensionPath: string,
     private readonly showFavorites: boolean
   ) {
     super();
-    settingsChange$.subscribe(settings => {
-      this.recent = settings.recent;
-
-      this.refresh();
-    });
   }
 
   getParent(element: Workspace | WorkspaceRoute) {

@@ -12,7 +12,6 @@
   "main": "main.js",
   "license": "MIT",
   "dependencies": {
-    "semver": "5.6.0",
     "tmp": "^0.1.0",
     "ij-rpc-client": "^0.3.2",
     "node-pty-prebuilt": "0.7.6",
