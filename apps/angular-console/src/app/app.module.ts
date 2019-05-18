@@ -128,6 +128,7 @@ export function initApollo(
     { provide: IS_VSCODE, useValue: environment.application === 'vscode' },
     { provide: IS_INTELLIJ, useValue: environment.application === 'intellij' },
     { provide: IS_ELECTRON, useValue: environment.application === 'electron' },
+    { provide: 'messenger', useExisting: Messenger },
     ...environment.providers
   ],
   bootstrap: [AppComponent]
