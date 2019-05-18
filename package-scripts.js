@@ -173,6 +173,7 @@ module.exports = {
     },
     package: {
       electronMac: nps.series(
+        'echo "${CSC_LINK:?Need to set CSC_LINK non-empty}" > /dev/null',
         electronBuilder('--mac', 'never'),
         electronBuilder('--linux', 'never')
       ),
