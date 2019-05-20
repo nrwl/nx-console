@@ -1,19 +1,18 @@
 import { Inject } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { platform } from 'os';
 import * as path from 'path';
 
 import { docs } from '../api/docs';
-import { installNodeJs } from '../api/install-nodejs';
 import { Editor, openInEditor } from '../api/read-editors';
+import {
+  readRecentActions,
+  storeTriggeredAction
+} from '../api/read-recent-actions';
 import { readSettings, storeSettings } from '../api/read-settings';
 import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
-import { platform } from 'os';
 import { FileUtils } from '../utils/file-utils';
-import {
-  storeTriggeredAction,
-  readRecentActions
-} from '../api/read-recent-actions';
 
 @Resolver()
 export class MutationResolver {
@@ -168,11 +167,6 @@ export class MutationResolver {
       console.error(e);
       throw new Error(`Error when running npm script. Message:"${e.message}"`);
     }
-  }
-
-  @Mutation()
-  async installNodeJs() {
-    return installNodeJs();
   }
 
   @Mutation()

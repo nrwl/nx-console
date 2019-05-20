@@ -14,89 +14,30 @@
     >
       <img src="assets/node_js_logo.svg" height="160px" />
     </div>
-    <mat-card-content
-      *ngIf="
-        (installNodeJsStatus$ | async) as installNodeJsStatus;
-        else welcome
-      "
-      class="install-progress"
-      fxLayout="column"
-      fxLayoutAlign="center center"
-    >
-      <ng-container *ngIf="!installNodeJsStatus.cancelled; else cancelled">
-        <mat-progress-bar
-          *ngIf="
-            installNodeJsStatus.downloadPercentage !== null;
-            else installing
-          "
-          [value]="installNodeJsStatus.downloadPercentage"
-          mode="determinate"
-        ></mat-progress-bar>
-        <div class="sub-headline">
-          {{
-            installNodeJsStatus.downloadPercentage !== null
-              ? 'Downloading Node...'
-              : 'Running Installer...'
-          }}
-        </div>
-      </ng-container>
-      <ng-template #cancelled>
-        <div class="headline">Node JS installation not successful</div>
-        <div class="sub-headline">
-          The installation did not finish successfully. Would you like to try
-          again?
-        </div>
-        <div
-          class="action-container"
-          fxLayout="row"
-          fxLayoutAlign="space-evenly"
-        >
+    <mat-card-content fxLayout="column">
+      <div class="headline">Just a little set up</div>
+      <div class="sub-headline">
+        Angular Console requires that Node JS be installed on your computer.
+      </div>
+      <div class="action-container" fxLayout="row" fxLayoutAlign="space-evenly">
+        <a href="https://nodejs.org/en/">
           <button mat-raised-button color="primary">
-            <div
-              fxLayout="row"
-              fxLayoutAlign="center center"
-              (click)="installNodeJs()"
-            >
-              <mat-icon>refresh</mat-icon>
-              <div>Try again</div>
-            </div>
-          </button>
-        </div>
-      </ng-template>
-    </mat-card-content>
-    <ng-template #welcome>
-      <mat-card-content fxLayout="column">
-        <div class="headline">Just a little set up</div>
-        <div class="sub-headline">
-          Angular Console requires that Node JS be installed on your computer.
-          We can help you do that!
-        </div>
-        <div
-          class="action-container"
-          fxLayout="row"
-          fxLayoutAlign="space-evenly"
-        >
-          <button mat-raised-button color="primary">
-            <div
-              fxLayout="row"
-              fxLayoutAlign="center center"
-              (click)="installNodeJs()"
-            >
+            <div fxLayout="row" fxLayoutAlign="center center">
               <mat-icon>cloud_download</mat-icon>
               <div>Get Node JS</div>
             </div>
           </button>
-          <button mat-raised-button>
-            <div
-              fxLayout="row"
-              fxLayoutAlign="center center"
-              (click)="installManually()"
-            >
-              <div>Install Manually</div>
-            </div>
-          </button>
-        </div>
-      </mat-card-content>
-    </ng-template>
+        </a>
+        <button mat-raised-button>
+          <div
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            (click)="installManually()"
+          >
+            <div>Install Manually</div>
+          </div>
+        </button>
+      </div>
+    </mat-card-content>
   </mat-card>
 </div>

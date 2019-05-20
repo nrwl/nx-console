@@ -43,27 +43,13 @@ type CompletionsTypes {
   absoluteModules(input: String!): [CompletionResultType!]!
 }
 
-type InstallNodeJsStatus {
-  downloadPercentage: Float
-  downloadSpeed: Float
-  success: Boolean
-  cancelled: Boolean
-  error: String
-}
-
 type Query {
   settings: Settings!
   schematicCollections: [SchematicCollectionForNgNew!]!
   workspace(path: String!): Workspace!
   editors: [EditorSupport!]!
   availableExtensions(name: String): [Extension!]!
-  installNodeJsStatus: InstallNodeJsStatus
   isNodejsInstalled: IsNodeInstalledResult
-  directory(
-    path: String
-    onlyDirectories: Boolean
-    showHidden: Boolean
-  ): FilesType!
   commands(id: String, cols: Int): [CommandResponse!]!
 }
 
@@ -84,22 +70,6 @@ type Extension {
   installed: Boolean
 }
 
-type FileListType {
-  name: String!
-  type: FileType!
-}
-
-type FilesType {
-  path: String!
-  exists: Boolean!
-  files: [FileListType!]!
-}
-
-enum FileType {
-  file
-  directory
-  angularDirectory
-}
 
 type IsNodeInstalledResult {
   result: Boolean!
@@ -154,7 +124,6 @@ type Mutation {
     actionName: String!
     schematicName: String
   ): [RecentAction!]!
-  installNodeJs: InstallNodeJsStatus
   openInBrowser(url: String!): OpenInBrowserResult
   selectDirectory(
     dialogTitle: String!

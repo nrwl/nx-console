@@ -1,8 +1,2 @@
 export const COMMANDS_POLLING = 250;
 export const COMMAND_LIST_POLLING = 1000;
-export const NODE_JS_INSTALL_POLLING = 250;
-export const BASIC_WORKSPACE_POLLING = 5000;
-export const PROJECTS_POLLING = 15000;
-export const TARGET_POLLING = 30000;
-export const SCHEMATICS_POLLING = 30000;
-export const EXTENSIONS_POLLING = 30000;

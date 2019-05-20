@@ -3,7 +3,6 @@ import {
   CommandResponse,
   EditorSupport,
   Extension,
-  InstallNodeJsStatus,
   IsNodeInstalledResult,
   SchematicCollectionForNgNew,
   Settings,
@@ -22,7 +21,6 @@ import { availableExtensions, readExtensions } from '../api/read-extensions';
 import { readProjects } from '../api/read-projects';
 import { readNpmScripts } from '../api/read-npm-scripts';
 import { readEditors } from '../api/read-editors';
-import { nodeDownloadProgress, nodeInstallDone } from '../api/install-nodejs';
 import { commands } from '../api/run-command';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { CommandInformation } from '../api/commands';
@@ -92,31 +90,6 @@ export class QueryResolver {
       console.error(e);
       throw new Error(
         `Error when reading the list of extensions. Message: "${e.message}"`
-      );
-    }
-  }
-
-  @Query()
-  installNodeJsStatus(): InstallNodeJsStatus {
-    try {
-      if (readSettings(this.store).installNodeManually || exists('node')) {
-        return { success: true };
-      }
-      if (nodeInstallDone) {
-        return { cancelled: true };
-      } else if (nodeDownloadProgress) {
-        const { percentage, speed } = nodeDownloadProgress.progress();
-        return {
-          downloadPercentage: percentage,
-          downloadSpeed: speed
-        };
-      } else {
-        return {};
-      }
-    } catch (e) {
-      console.error(e);
-      throw new Error(
-        `Error when reading the command status. Message: "${e.message}"`
       );
     }
   }

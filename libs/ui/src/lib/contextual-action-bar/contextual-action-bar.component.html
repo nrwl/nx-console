@@ -1,13 +1,18 @@
 <mat-toolbar
   class="title-bar"
   color="primary"
-  [class.actionable]="contextualActionBarService.contextualActions$ | async"
+  [@growShrink]="
+    (contextualActions$ | async)
+      ? 'contextual-actions'
+      : environment.application
+  "
+  [class.actionable]="contextualActions$ | async"
 >
   <mat-toolbar-row>
     <div
       fxFlex
       @fadeIn
-      *ngIf="(contextualActionBarService.contextualActions$ | async) === null"
+      *ngIf="(contextualActions$ | async) === null"
       fxLayout="row"
       fxLayoutAlign="start center"
       [ngSwitch]="environment.application"
@@ -94,18 +99,14 @@
     </div>
     <div
       @fadeIn
-      *ngIf="
-        (contextualActionBarService.contextualActions$
-          | async) as contextualActions
-      "
+      *ngIf="(contextualActions$ | async) as contextualActions"
       fxLayout="row"
+      [ngClass]="environment.application"
       fxLayoutGap="16px"
       fxLayoutAlign="start center"
       fxFlex
     >
-      <mat-icon
-        (click)="contextualActionBarService.contextualActions$.next(null)"
-        class="exit-action"
+      <mat-icon (click)="contextualActions$.next(null)" class="exit-action"
         >clear</mat-icon
       >
       <div class="context-title" fxFlex>
@@ -163,7 +164,7 @@
     class="tabs-container"
     @growShrink
     *ngIf="
-      !(contextualActionBarService.contextualActions$ | async) &&
+      !(contextualActions$ | async) &&
       (contextualActionBarService.contextualTabs$ | async)?.tabs as tabs
     "
   >

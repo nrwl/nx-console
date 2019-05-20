@@ -125,6 +125,10 @@ module.exports = {
           server: 'nps dev.server',
           frontend: 'ng serve angular-console --configuration=dev'
         }),
+        start: nps.concurrent({
+          server: 'nps dev.server.start',
+          frontend: 'ng serve angular-console --configuration=dev'
+        }),
         cypress: nps.concurrent({
           server: 'nps dev.server.start',
           frontend: 'ng run angular-console:serve:cypress'

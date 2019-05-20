@@ -14,7 +14,7 @@ import {
   ContextualTab
 } from '@nrwl/angular-console-enterprise-frontend';
 import { ReplaySubject } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, shareReplay } from 'rxjs/operators';
 
 export const CONTEXTUAL_ACTION_BAR_HEIGHT = 52;
 
@@ -31,14 +31,24 @@ export const CONTEXTUAL_ACTION_BAR_HEIGHT = 52;
     ]),
     trigger('growShrink', [
       state('void', style({ height: 0 })),
-      state('*', style({ height: '48px' })),
-      transition(`:enter`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)),
-      transition(`:leave`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
+      state('electron', style({ height: '*' })),
+      state('contextual-actions', style({ height: '*' })),
+      state('*', style({ height: '0' })),
+      transition(`void <=> *`, []),
+      transition(`void => contextual-actions`, []),
+      transition(`* <=> electron`, []),
+      transition(`* <=> *`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ])
   ]
 })
 export class ContextualActionBarComponent {
   showMenuButton = new ReplaySubject<boolean>();
+
+  readonly isElectron = this.environment.application === 'electron';
+
+  readonly contextualActions$ = this.contextualActionBarService.contextualActions$.pipe(
+    shareReplay(1)
+  );
 
   constructor(
     @Inject(ENVIRONMENT) readonly environment: Environment,

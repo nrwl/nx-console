@@ -48,13 +48,18 @@
         </mat-panel-title>
       </mat-expansion-panel-header>
 
-      <div class="flags-container" [style.max-height]="viewportHeight | async">
-        <ui-schematic-field
-          *ngFor="let field of fieldGroup.fields"
-          [field]="field"
-          [formGroup]="formGroup"
-        ></ui-schematic-field>
-      </div>
+      <ng-template matExpansionPanelContent>
+        <div
+          class="flags-container"
+          [style.max-height]="viewportHeight | async"
+        >
+          <ui-schematic-field
+            *ngFor="let field of fieldGroup.fields"
+            [field]="field"
+            [formGroup]="formGroup"
+          ></ui-schematic-field>
+        </div>
+      </ng-template>
     </mat-expansion-panel>
   </mat-accordion>
 </form>

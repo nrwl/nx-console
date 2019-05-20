@@ -3,7 +3,12 @@ import {
   Settings,
   toggleItemInArray
 } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  Inject
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, Observable, of } from 'rxjs';
@@ -31,9 +36,9 @@ import {
   createLinkForTask,
   SCHEMATIC_COLLECTION_ERROR_RESPONSE
 } from './projects.constants';
+import { IS_ELECTRON } from '@angular-console/environment';
 
 const ACTION_BAR_HEIGHT_PX = 52;
-const VIEWPORT_OFFSET_PX = 102;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +47,7 @@ const VIEWPORT_OFFSET_PX = 102;
   styleUrls: ['./projects.component.scss']
 })
 export class ProjectsComponent implements OnInit {
+  private readonly viewportOffsetPx = this.isElectron ? 102 : 48;
   private readonly workspace$ = this.route.params.pipe(
     map(m => m.path),
     tap(path => {
@@ -154,7 +160,7 @@ export class ProjectsComponent implements OnInit {
   viewportHeight$ = this.commandRunner.listAllCommands().pipe(
     map(c => Boolean(c.length > 0)),
     map(actionBarExpanded => {
-      return `calc(100vh - ${VIEWPORT_OFFSET_PX +
+      return `calc(100vh - ${this.viewportOffsetPx +
         (actionBarExpanded ? ACTION_BAR_HEIGHT_PX : 0)}px)`;
     }),
     shareReplay()
@@ -166,7 +172,8 @@ export class ProjectsComponent implements OnInit {
     private readonly workspaceGQL: WorkspaceGQL,
     private readonly workspaceDocsGQL: WorkspaceDocsGQL,
     private readonly commandRunner: CommandRunner,
-    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL
+    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL,
+    @Inject(IS_ELECTRON) private readonly isElectron: boolean
   ) {}
 
   ngOnInit() {

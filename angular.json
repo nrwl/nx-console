@@ -62,15 +62,13 @@
               "outputPath": "dist/apps/intellij/assets/public"
             },
             "dev": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.electron.ts"
-                }
-              ],
               "optimization": false,
               "aot": false,
-              "buildOptimizer": false
+              "buildOptimizer": false,
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": false
             },
             "cypress": {
               "fileReplacements": [
