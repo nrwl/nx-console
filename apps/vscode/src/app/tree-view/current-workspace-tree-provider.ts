@@ -1,5 +1,4 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
-import { settingsChange$ } from '@angular-console/server';
 import { TreeDataProvider } from 'vscode';
 
 import {
@@ -30,10 +29,6 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
     private readonly extensionPath: string
   ) {
     super();
-
-    settingsChange$.subscribe(() => {
-      this.refresh();
-    });
   }
 
   getParent(_: WorkspaceRoute) {

@@ -4,7 +4,7 @@
     "outDir": "../../dist/out-tsc/apps/intellij",
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "es2017",
+    "target": "esnext",
     "removeComments": true,
     "stripInternal": true,
     "types": ["node"]
