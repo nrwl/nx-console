@@ -52,7 +52,7 @@ export class TaskRunnerComponent implements AfterContentChecked {
   @ContentChild(CommandOutputComponent)
   statusComponent: CommandOutputComponent | undefined;
 
-  terminalVisible$ = new BehaviorSubject(true);
+  terminalVisible$ = new BehaviorSubject(false);
   terminalAnimationState: Observable<string>;
 
   ngAfterContentChecked() {

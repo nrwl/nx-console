@@ -47,11 +47,12 @@ const TASK_RUNNER_GHOST_STYLE = style({
   encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('growShrink', [
-      state('void', style({ width: '0' })),
-      state('collapse', style({ width: '0', position: 'absolute' })),
+      state('void', style({ width: 0 })),
+      state('collapse', style({ width: 0 })),
       state('expand', style({ width: '*' })),
+      transition(`expand => collapse`, []),
       transition(
-        `expand <=> collapse`,
+        `collapse => expand`,
         animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
       )
     ]),

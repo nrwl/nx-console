@@ -69,6 +69,8 @@ export class SchematicComponent implements OnInit {
 
   docs$: Observable<any[]>;
 
+  hasNeverBeenValid = true;
+
   private readonly ngGen$ = new Subject<void>();
   readonly ngGenDisabled$ = new BehaviorSubject(true);
 
@@ -174,6 +176,9 @@ export class SchematicComponent implements OnInit {
               )}\n\n\rCommand is missing required fields\n\r`
             };
             return of();
+          } else if (this.hasNeverBeenValid) {
+            this.taskRunner.terminalVisible$.next(true);
+            this.hasNeverBeenValid = false;
           }
 
           return this.runCommand(c.schematic, c.commands, true);

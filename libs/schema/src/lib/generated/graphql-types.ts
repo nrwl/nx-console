@@ -1,11 +1,5 @@
 export type Maybe<T> = T | null;
 
-export enum FileType {
-  File = 'file',
-  Directory = 'directory',
-  AngularDirectory = 'angularDirectory'
-}
-
 // ====================================================
 // Types
 // ====================================================
@@ -21,11 +15,7 @@ export interface Query {
 
   availableExtensions: Extension[];
 
-  installNodeJsStatus?: Maybe<InstallNodeJsStatus>;
-
   isNodejsInstalled?: Maybe<IsNodeInstalledResult>;
-
-  directory: FilesType;
 
   commands: CommandResponse[];
 }
@@ -244,34 +234,8 @@ export interface EditorSupport {
   icon: string;
 }
 
-export interface InstallNodeJsStatus {
-  downloadPercentage?: Maybe<number>;
-
-  downloadSpeed?: Maybe<number>;
-
-  success?: Maybe<boolean>;
-
-  cancelled?: Maybe<boolean>;
-
-  error?: Maybe<string>;
-}
-
 export interface IsNodeInstalledResult {
   result: boolean;
-}
-
-export interface FilesType {
-  path: string;
-
-  exists: boolean;
-
-  files: FileListType[];
-}
-
-export interface FileListType {
-  name: string;
-
-  type: FileType;
 }
 
 export interface CommandResponse {
@@ -316,8 +280,6 @@ export interface Mutation {
   updateSettings: Settings;
 
   saveRecentAction: RecentAction[];
-
-  installNodeJs?: Maybe<InstallNodeJsStatus>;
 
   openInBrowser?: Maybe<OpenInBrowserResult>;
 
@@ -371,13 +333,6 @@ export interface WorkspaceQueryArgs {
 }
 export interface AvailableExtensionsQueryArgs {
   name?: Maybe<string>;
-}
-export interface DirectoryQueryArgs {
-  path?: Maybe<string>;
-
-  onlyDirectories?: Maybe<boolean>;
-
-  showHidden?: Maybe<boolean>;
 }
 export interface CommandsQueryArgs {
   id?: Maybe<string>;
@@ -574,19 +529,11 @@ export namespace QueryResolvers {
       Context
     >;
 
-    installNodeJsStatus?: InstallNodeJsStatusResolver<
-      Maybe<any>,
-      TypeParent,
-      Context
-    >;
-
     isNodejsInstalled?: IsNodejsInstalledResolver<
       Maybe<any>,
       TypeParent,
       Context
     >;
-
-    directory?: DirectoryResolver<any, TypeParent, Context>;
 
     commands?: CommandsResolver<any[], TypeParent, Context>;
   }
@@ -625,30 +572,11 @@ export namespace QueryResolvers {
     name?: Maybe<string>;
   }
 
-  export type InstallNodeJsStatusResolver<
-    R = Maybe<any>,
-    Parent = {},
-    Context = any
-  > = Resolver<R, Parent, Context>;
   export type IsNodejsInstalledResolver<
     R = Maybe<any>,
     Parent = {},
     Context = any
   > = Resolver<R, Parent, Context>;
-  export type DirectoryResolver<R = any, Parent = {}, Context = any> = Resolver<
-    R,
-    Parent,
-    Context,
-    DirectoryArgs
-  >;
-  export interface DirectoryArgs {
-    path?: Maybe<string>;
-
-    onlyDirectories?: Maybe<boolean>;
-
-    showHidden?: Maybe<boolean>;
-  }
-
   export type CommandsResolver<
     R = any[],
     Parent = {},
@@ -1446,50 +1374,6 @@ export namespace EditorSupportResolvers {
   >;
 }
 
-export namespace InstallNodeJsStatusResolvers {
-  export interface Resolvers<Context = any, TypeParent = any> {
-    downloadPercentage?: DownloadPercentageResolver<
-      Maybe<number>,
-      TypeParent,
-      Context
-    >;
-
-    downloadSpeed?: DownloadSpeedResolver<Maybe<number>, TypeParent, Context>;
-
-    success?: SuccessResolver<Maybe<boolean>, TypeParent, Context>;
-
-    cancelled?: CancelledResolver<Maybe<boolean>, TypeParent, Context>;
-
-    error?: ErrorResolver<Maybe<string>, TypeParent, Context>;
-  }
-
-  export type DownloadPercentageResolver<
-    R = Maybe<number>,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type DownloadSpeedResolver<
-    R = Maybe<number>,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type SuccessResolver<
-    R = Maybe<boolean>,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type CancelledResolver<
-    R = Maybe<boolean>,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type ErrorResolver<
-    R = Maybe<string>,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-}
-
 export namespace IsNodeInstalledResultResolvers {
   export interface Resolvers<Context = any, TypeParent = any> {
     result?: ResultResolver<boolean, TypeParent, Context>;
@@ -1497,51 +1381,6 @@ export namespace IsNodeInstalledResultResolvers {
 
   export type ResultResolver<
     R = boolean,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-}
-
-export namespace FilesTypeResolvers {
-  export interface Resolvers<Context = any, TypeParent = any> {
-    path?: PathResolver<string, TypeParent, Context>;
-
-    exists?: ExistsResolver<boolean, TypeParent, Context>;
-
-    files?: FilesResolver<any[], TypeParent, Context>;
-  }
-
-  export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
-    R,
-    Parent,
-    Context
-  >;
-  export type ExistsResolver<
-    R = boolean,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type FilesResolver<R = any[], Parent = any, Context = any> = Resolver<
-    R,
-    Parent,
-    Context
-  >;
-}
-
-export namespace FileListTypeResolvers {
-  export interface Resolvers<Context = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, Context>;
-
-    type?: TypeResolver<FileType, TypeParent, Context>;
-  }
-
-  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
-    R,
-    Parent,
-    Context
-  >;
-  export type TypeResolver<
-    R = FileType,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
@@ -1636,8 +1475,6 @@ export namespace MutationResolvers {
     updateSettings?: UpdateSettingsResolver<any, TypeParent, Context>;
 
     saveRecentAction?: SaveRecentActionResolver<any[], TypeParent, Context>;
-
-    installNodeJs?: InstallNodeJsResolver<Maybe<any>, TypeParent, Context>;
 
     openInBrowser?: OpenInBrowserResolver<Maybe<any>, TypeParent, Context>;
 
@@ -1797,11 +1634,6 @@ export namespace MutationResolvers {
     schematicName?: Maybe<string>;
   }
 
-  export type InstallNodeJsResolver<
-    R = Maybe<any>,
-    Parent = {},
-    Context = any
-  > = Resolver<R, Parent, Context>;
   export type OpenInBrowserResolver<
     R = Maybe<any>,
     Parent = {},
@@ -2008,10 +1840,7 @@ export interface IResolvers<Context = any> {
   CompletionsTypes?: CompletionsTypesResolvers.Resolvers<Context>;
   CompletionResultType?: CompletionResultTypeResolvers.Resolvers<Context>;
   EditorSupport?: EditorSupportResolvers.Resolvers<Context>;
-  InstallNodeJsStatus?: InstallNodeJsStatusResolvers.Resolvers<Context>;
   IsNodeInstalledResult?: IsNodeInstalledResultResolvers.Resolvers<Context>;
-  FilesType?: FilesTypeResolvers.Resolvers<Context>;
-  FileListType?: FileListTypeResolvers.Resolvers<Context>;
   CommandResponse?: CommandResponseResolvers.Resolvers<Context>;
   Mutation?: MutationResolvers.Resolvers<Context>;
   CommandStarted?: CommandStartedResolvers.Resolvers<Context>;
