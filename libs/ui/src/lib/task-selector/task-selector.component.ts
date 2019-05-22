@@ -35,7 +35,7 @@ export interface TaskCollections<T> {
   selectedTask: Task<T> | null;
 }
 
-const ANIMATION_MILLIS = 300;
+const ANIMATION_MILLIS = 450;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,7 +49,7 @@ const ANIMATION_MILLIS = 300;
       state('expand', style({ width: '*' })),
       transition(
         `collapse <=> expand`,
-        animate(`${ANIMATION_MILLIS}ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
+        animate(`${ANIMATION_MILLIS}ms 150ms  cubic-bezier(0.4, 0.0, 0.2, 1)`)
       )
     ])
   ]

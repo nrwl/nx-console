@@ -74,14 +74,10 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
         }
         body {
           opacity: 1;
-          transition: all 150ms cubic-bezier(0.4, 0.0, 0.2, 1);
+          transition: all 300ms 150ms cubic-bezier(0.4, 0.0, 0.2, 1);
         }
         body.loading {
           opacity: 0;
-        }
-        angular-console-root {
-          display: block;
-          background: white;
         }
       </style>
       <script>
