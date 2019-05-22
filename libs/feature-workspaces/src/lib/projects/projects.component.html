@@ -1,96 +1,116 @@
-<div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
-  <input
-    placeholder="Filter projects"
-    #projectFilter
-    fxFlex
-    [formControl]="projectFilterFormControl"
-    id="filter"
-  />
-  <mat-icon
-    class="filter-icon"
-    (click)="projectFilterFormControl.setValue(''); projectFilter.select()"
-  >
-    {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
-  </mat-icon>
+<div class="projects-container" [@fadeIn]="animationState | async">
+  <div class="filter-container" fxLayout="row" fxLayoutAlign="start center">
+    <input
+      placeholder="Filter projects"
+      #projectFilter
+      fxFlex
+      [formControl]="projectFilterFormControl"
+      id="filter"
+    />
+    <mat-icon
+      class="filter-icon"
+      (click)="projectFilterFormControl.setValue(''); projectFilter.select()"
+    >
+      {{ projectFilterFormControl.value ? 'clear' : 'filter_list' }}
+    </mat-icon>
+  </div>
+
+  <mat-menu #generateMenu>
+    <ng-template matMenuContent let-p="project">
+      <angular-console-filter-menu
+        [filterFormControl]="schematicFilterFormControl"
+        [links$]="p.links$"
+      ></angular-console-filter-menu>
+    </ng-template>
+  </mat-menu>
+
+  <mat-menu #runMenu>
+    <ng-template matMenuContent let-p="project">
+      <button
+        mat-menu-item
+        [routerLink]="a.link"
+        class="route-button"
+        *ngFor="let a of p.actions"
+      >
+        {{ a.displayText }}
+      </button>
+    </ng-template>
+  </mat-menu>
+
+  <mat-list dense *ngIf="(filteredProjects$ | async) as projects">
+    <cdk-virtual-scroll-viewport
+      *ngIf="(viewportHeight$ | async) as viewportHeight"
+      [style.height]="viewportHeight"
+      itemSize="76"
+      class="field-viewport"
+    >
+      <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
+
+      <ng-container *ngIf="(filteredProjects$ | async) as projects">
+        <div cdkVirtualScrollContent>
+          <ng-container
+            *cdkVirtualFor="let p of projects; trackBy: trackByProjectRoot"
+          >
+            <mat-list-item
+              class="favorite-icon"
+              [ngClass]="p.projectType"
+              [disableRipple]="true"
+            >
+              <mat-icon
+                (click)="onPinClick(p); $event.stopPropagation()"
+                mat-list-icon
+                *ngIf="!pinnedProjectNames.includes(p.name)"
+                class="favorite-icon"
+              >
+                favorite_border
+              </mat-icon>
+              <mat-icon
+                (click)="onPinClick(p); $event.stopPropagation()"
+                mat-list-icon
+                *ngIf="pinnedProjectNames.includes(p.name)"
+                class="favorite-icon favorited"
+                >favorite</mat-icon
+              >
+              <div class="project-type" mat-line>{{ p.projectType }}</div>
+              <div class="project-name" mat-line>{{ p.name }}</div>
+              <div class="project-root" mat-line *ngIf="p.root">
+                <mat-icon>folder_open</mat-icon>
+                {{ p.root }}
+              </div>
+              <div
+                fxFlex="grow"
+                fxLayout="row wrap"
+                fxLayoutGap="12px"
+                fxLayoutAlign="end"
+                class="project-action-button-container"
+              >
+                <button
+                  mat-stroked-button
+                  #generateMenuTrigger="matMenuTrigger"
+                  [matMenuTriggerFor]="generateMenu"
+                  [matMenuTriggerData]="{ project: p }"
+                  *ngIf="p.supportsGenerate"
+                >
+                  Generate
+                </button>
+                <button
+                  mat-stroked-button
+                  #runMenuTrigger="matMenuTrigger"
+                  [matMenuTriggerFor]="runMenu"
+                  [matMenuTriggerData]="{ project: p }"
+                  *ngIf="p.actions.length"
+                >
+                  Run
+                </button>
+              </div>
+            </mat-list-item>
+          </ng-container>
+        </div>
+      </ng-container>
+    </cdk-virtual-scroll-viewport>
+  </mat-list>
 </div>
 
-<mat-menu #actionsMenu>
-  <ng-template matMenuContent let-p="project">
-    <angular-console-filter-menu
-      [filterFormControl]="schematicFilterFormControl"
-      [links$]="p.links$"
-    ></angular-console-filter-menu>
-  </ng-template>
-</mat-menu>
-
-<mat-list dense *ngIf="(filteredProjects$ | async) as projects">
-  <cdk-virtual-scroll-viewport
-    *ngIf="(viewportHeight$ | async) as viewportHeight"
-    [style.height]="viewportHeight"
-    itemSize="76"
-    class="field-viewport"
-  >
-    <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
-
-    <ng-container *ngIf="(filteredProjects$ | async) as projects">
-      <div cdkVirtualScrollContent>
-        <ng-container
-          *cdkVirtualFor="let p of projects; trackBy: trackByProjectRoot"
-        >
-          <mat-list-item
-            class="favorite-icon"
-            [ngClass]="p.projectType"
-            [disableRipple]="true"
-          >
-            <mat-icon
-              (click)="onPinClick(p); $event.stopPropagation()"
-              mat-list-icon
-              *ngIf="!pinnedProjectNames.includes(p.name)"
-              class="favorite-icon"
-            >
-              favorite_border
-            </mat-icon>
-            <mat-icon
-              (click)="onPinClick(p); $event.stopPropagation()"
-              mat-list-icon
-              *ngIf="pinnedProjectNames.includes(p.name)"
-              class="favorite-icon favorited"
-              >favorite</mat-icon
-            >
-            <div class="project-type" mat-line>{{ p.projectType }}</div>
-            <div class="project-name" mat-line>{{ p.name }}</div>
-            <div class="project-root" mat-line *ngIf="p.root">
-              <mat-icon>folder_open</mat-icon>
-              {{ p.root }}
-            </div>
-            <div
-              fxFlex="grow"
-              fxLayout="row wrap"
-              fxLayoutGap="12px"
-              fxLayoutAlign="end"
-              class="project-action-button-container"
-            >
-              <button
-                mat-stroked-button
-                #actionsMenuTrigger="matMenuTrigger"
-                [matMenuTriggerFor]="actionsMenu"
-                [matMenuTriggerData]="{ project: p }"
-                *ngIf="p.supportsGenerate"
-              >
-                Gen
-              </button>
-              <button
-                *ngFor="let a of p.actions"
-                mat-stroked-button
-                [routerLink]="a.link"
-                class="route-button"
-              >
-                {{ a.displayText | titlecase }}
-              </button>
-            </div>
-          </mat-list-item>
-        </ng-container>
-      </div>
-    </ng-container>
-  </cdk-virtual-scroll-viewport>
-</mat-list>
+<div class="nested-outlet-container" @fadeIn>
+  <router-outlet></router-outlet>
+</div>

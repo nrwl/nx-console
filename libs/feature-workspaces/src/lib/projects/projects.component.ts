@@ -7,11 +7,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  Inject
+  Inject,
+  OnDestroy
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { combineLatest, Observable, of } from 'rxjs';
+import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
+import { combineLatest, Observable, of, Subject } from 'rxjs';
 import {
   catchError,
   filter,
@@ -37,6 +38,15 @@ import {
   SCHEMATIC_COLLECTION_ERROR_RESPONSE
 } from './projects.constants';
 import { IS_ELECTRON } from '@angular-console/environment';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
+import {
+  trigger,
+  state,
+  transition,
+  animate,
+  style
+} from '@angular/animations';
+import { FADE_IN } from '@angular-console/ui';
 
 const ACTION_BAR_HEIGHT_PX = 52;
 
@@ -44,9 +54,19 @@ const ACTION_BAR_HEIGHT_PX = 52;
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-projects',
   templateUrl: './projects.component.html',
-  styleUrls: ['./projects.component.scss']
+  styleUrls: ['./projects.component.scss'],
+  animations: [
+    trigger('fadeIn', [
+      state('hide', style({ opacity: 0, 'z-index': '-1' })),
+      state('reveal', style({ opacity: 1, 'z-index': '2' })),
+      transition(`hide <=> reveal`, [
+        animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`),
+        FADE_IN
+      ])
+    ])
+  ]
 })
-export class ProjectsComponent implements OnInit {
+export class ProjectsComponent implements OnInit, OnDestroy {
   private readonly viewportOffsetPx = this.isElectron ? 102 : 48;
   private readonly workspace$ = this.route.params.pipe(
     map(m => m.path),
@@ -69,6 +89,8 @@ export class ProjectsComponent implements OnInit {
       };
     })
   );
+
+  readonly animationState = new Subject<'reveal' | 'hide'>();
 
   workspacePath: string;
   pinnedProjectNames: string[];
@@ -166,7 +188,19 @@ export class ProjectsComponent implements OnInit {
     shareReplay()
   );
 
+  private readonly contextActionCloseSubscription = this.contextActionService.contextualActions$.subscribe(
+    actions => {
+      if (actions === null) {
+        this.router.navigate(['./'], { relativeTo: this.activatedRoute });
+        this.animationState.next('reveal');
+      }
+    }
+  );
+
   constructor(
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
+    private readonly contextActionService: ContextualActionBarService,
     readonly settings: Settings,
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
@@ -179,6 +213,21 @@ export class ProjectsComponent implements OnInit {
   ngOnInit() {
     // Make collection hot to remove jank on initial render.
     this.filteredCollections$.subscribe().unsubscribe();
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationStart => e instanceof NavigationStart),
+        map(e => e.url),
+        startWith(this.router.url)
+      )
+      .subscribe(url => {
+        if (!url.endsWith('projects')) {
+          this.animationState.next('hide');
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.contextActionCloseSubscription.unsubscribe();
   }
 
   trackByProjectRoot(_: number, project: Workspace.Projects) {

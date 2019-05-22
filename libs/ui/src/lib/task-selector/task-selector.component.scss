@@ -5,6 +5,10 @@
   min-width: calc(100vw - 52px);
 }
 
+:host {
+  background: #f0f0f0;
+}
+
 .mat-nav-list .mat-list-item:first-of-type {
   margin-top: 8px;
 }

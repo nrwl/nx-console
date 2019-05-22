@@ -8,7 +8,13 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { Component, Inject, OnDestroy, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnDestroy,
+  ViewEncapsulation,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import {
@@ -45,16 +51,13 @@ const TASK_RUNNER_GHOST_STYLE = style({
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('growShrink', [
-      state('void', style({ width: 0 })),
-      state('collapse', style({ width: 0 })),
-      state('expand', style({ width: '*' })),
-      transition(`expand => collapse`, []),
-      transition(
-        `collapse => expand`,
-        animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`)
-      )
+      state('void', style({ overflow: 'hidden', width: 0 })),
+      state('collapse', style({ overflow: 'hidden', width: 0 })),
+      state('expand', style({ overflow: 'hidden', width: '*' })),
+      transition(`* <=> *`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ]),
     trigger('routerTransition', [
       transition('void => *', []),

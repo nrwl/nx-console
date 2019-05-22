@@ -66,10 +66,11 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
       <style>
         html,
         body {
-          margin: 0;
-          padding: 0;
-          border-radius: 4px;
-          background: transparent;
+          margin: 0 !important;
+          padding: 0 !important;
+          border-radius: 4px !important;
+          background: transparent !important;
+          overflow: hidden !important;
         }
         body {
           opacity: 1;
@@ -85,11 +86,6 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
       </style>
       <script>
         window.INITIAL_ROUTE = '${routePath}';
-        document.addEventListener('readystatechange', event => {
-          if (event.target.readyState === 'complete') {
-            document.body.classList.remove('loading');
-          }
-        });
         window.addEventListener('message', (event) => {
           const routePath = event.data.routePath;
           if (routePath && window.ANGULAR_CONSOLE_NAVIGATE_BY_URL) {
@@ -102,6 +98,9 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
     <body class="loading">
       <angular-console-root></angular-console-root>
       <script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="main.js"></script>
+      <script>
+        document.body.classList.remove('loading');
+      </script>
       </body>
   </html>
   `;
