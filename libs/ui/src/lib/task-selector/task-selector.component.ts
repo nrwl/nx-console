@@ -35,8 +35,7 @@ export interface TaskCollections<T> {
   selectedTask: Task<T> | null;
 }
 
-const ANIMATION_MILLIS = 200;
-const ROUTE_CHANGE_DELAY = 300;
+const ANIMATION_MILLIS = 300;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,8 +67,9 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   private readonly contextActionCloseSubscription = this.contextActionService.contextualActions$.subscribe(
     actions => {
       if (actions === null) {
-        this.taskAnimationState$.next('expand');
         this.selectionChange.next(null);
+
+        this.taskAnimationState$.next('expand');
       }
     }
   );
@@ -141,9 +141,7 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   selectTask(task: Task<T> | null) {
     if (task) {
       this.selectionChange.next(task.task);
-      setTimeout(() => {
-        this.taskAnimationState$.next('collapse');
-      }, ROUTE_CHANGE_DELAY);
+      this.taskAnimationState$.next('collapse');
     } else {
       this.contextActionService.contextualActions$.next(null);
     }

@@ -4,9 +4,14 @@ import {
 } from '@angular-console/feature-extensions';
 import {
   FeatureGenerateModule,
-  generateRoutes
+  generateRoutes,
+  SchematicComponent
 } from '@angular-console/feature-generate';
-import { FeatureRunModule, runRoutes } from '@angular-console/feature-run';
+import {
+  FeatureRunModule,
+  runRoutes,
+  TargetComponent
+} from '@angular-console/feature-run';
 import { settingsRoutes } from '@angular-console/feature-settings';
 import { UiModule } from '@angular-console/ui';
 import { NgModule } from '@angular/core';
@@ -57,7 +62,17 @@ export const workspaceRoutes: Route[] = [
       {
         data: { state: 'projects' },
         path: 'projects',
-        component: ProjectsComponent
+        component: ProjectsComponent,
+        children: [
+          {
+            path: 'generate/:collection/:schematic',
+            component: SchematicComponent
+          },
+          {
+            path: 'task/:target/:project',
+            component: TargetComponent
+          }
+        ]
       },
       { path: '', pathMatch: 'full', redirectTo: 'projects' },
       {

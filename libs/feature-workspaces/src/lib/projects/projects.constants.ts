@@ -16,7 +16,7 @@ export function createLinkForTask(
   displayText: string
 ) {
   if ((project.architect || []).find(a => a.name === name)) {
-    return { displayText, name, link: ['../tasks', name, project.name] };
+    return { displayText, name, link: ['./task', name, project.name] };
   } else {
     return undefined;
   }
@@ -61,7 +61,7 @@ export function createLinkForSchematic(
       schematicName,
       displayText: displayText,
       link: [
-        '../generate',
+        './generate',
         decodeURIComponent(schematicName),
         name,
         { project: project.name }

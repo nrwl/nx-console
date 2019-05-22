@@ -29,7 +29,7 @@ describe('Projects', () => {
       'not.exist'
     );
 
-    cy.contains('button.mat-stroked-button', 'Gen')
+    cy.contains('button.mat-stroked-button', 'Generate')
       .first()
       .click();
     cy.get('#filter-schematics', { timeout: 500 }).type('com');
@@ -45,28 +45,37 @@ describe('Projects', () => {
       expect(texts($p)[0]).to.contain('proj');
       expect(texts($p)[1]).to.contain('proj-e2e');
     });
-    cy.contains('angular-console-projects button', 'Lint');
-    cy.contains('angular-console-projects button', 'E2e');
-    cy.contains('angular-console-projects button', 'Extract-i18n');
-    cy.contains('angular-console-projects button', 'Build')
+    cy.contains('button.mat-stroked-button', 'Run')
+      .first()
+      .click();
+    cy.contains('button.route-button', 'build');
+    cy.contains('button.route-button', 'serve');
+    cy.contains('button.route-button', 'test');
+    cy.contains('button.route-button', 'lint');
+    cy.contains('button.route-button', 'extract-i18n');
+    cy.contains('button.route-button', 'custom');
+    cy.contains('button.route-button', 'build')
       .first()
       .click();
     cy.contains('div.context-title', 'ng build proj');
     cy.get('.exit-action').click();
-    cy.contains('angular-console-projects button', 'Serve')
+    cy.contains('button.mat-stroked-button', 'Run')
       .first()
       .click();
+    cy.contains('button.route-button', 'serve').click();
     cy.contains('div.context-title', 'ng serve proj');
     cy.get('.exit-action').click();
-    cy.contains('angular-console-projects button', 'Extract-i18n')
+    cy.contains('button.mat-stroked-button', 'Run')
       .first()
       .click();
+    cy.contains('button.route-button', 'extract-i18n').click();
     cy.contains('div.context-title', 'ng run proj:extract-i18n');
     cy.get('.exit-action').click();
 
-    cy.contains('button.mat-stroked-button', 'Lint')
+    cy.contains('button.mat-stroked-button', 'Run')
       .first()
       .click();
+    cy.contains('button.route-button', 'lint').click();
     cy.contains('div.context-title', 'ng lint proj');
     cy.get('.exit-action').click();
 

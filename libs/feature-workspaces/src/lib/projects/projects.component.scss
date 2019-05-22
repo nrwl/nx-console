@@ -1,5 +1,11 @@
 :host {
   background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.route-button {
+  text-transform: capitalize;
 }
 
 mat-list-item {
@@ -30,6 +36,13 @@ mat-list-item {
   position: relative;
 }
 
+.projects-container {
+  z-index: 1;
+  position: relative;
+  overflow: hidden;
+  background: white;
+}
+
 mat-list[dense] {
   padding: 0 !important;
 }
@@ -39,6 +52,16 @@ mat-list[dense] {
   max-height: 34px;
   min-height: 34px;
   overflow: hidden;
+}
+
+.nested-outlet-container {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
 }
 
 .project-card {

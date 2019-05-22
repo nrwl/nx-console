@@ -1,11 +1,8 @@
 <mat-toolbar
   class="title-bar"
   color="primary"
-  [@growShrink]="
-    (contextualActions$ | async)
-      ? 'contextual-actions'
-      : environment.application
-  "
+  *ngIf="isElectron || (contextualActions$ | async)"
+  @growShrink
   [class.actionable]="contextualActions$ | async"
 >
   <mat-toolbar-row>

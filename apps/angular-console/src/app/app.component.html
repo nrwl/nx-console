@@ -1,16 +1,10 @@
 <div
-  fxLayout="column"
-  fxFlex
   class="content-container"
   [@.disabled]="settings.disabledAnimations$ | async"
 >
   <ui-contextual-action-bar></ui-contextual-action-bar>
 
-  <div
-    fxFlex
-    class="outlet-container"
-    [@routerTransition]="routerTransition | async"
-  >
+  <div class="outlet-container" [@routerTransition]="routerTransition | async">
     <router-outlet></router-outlet>
   </div>
 
