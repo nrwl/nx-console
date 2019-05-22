@@ -159,7 +159,6 @@ module.exports = {
       },
       ...forEachApplication(
         nps.series.nps(
-          'clean',
           'build.APPLICATION',
           'install-dependencies.APPLICATION',
           'dev.copy-assets.APPLICATION'
@@ -168,7 +167,6 @@ module.exports = {
       dev: {
         ...forEachApplication(
           nps.series.nps(
-            'clean',
             'build.APPLICATION.dev',
             'dev.copy-assets-base.APPLICATION'
           )
