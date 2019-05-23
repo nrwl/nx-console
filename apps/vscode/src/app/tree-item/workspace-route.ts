@@ -40,7 +40,7 @@ export class WorkspaceRoute extends TreeItem {
 
   command = {
     title: this.route,
-    command: 'extension.angularConsoleActivePanel',
+    command: 'extension.angularConsole',
     tooltip: '',
     arguments: [
       this.workspaceDefinition,

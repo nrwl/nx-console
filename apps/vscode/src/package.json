@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Angular Console",
   "description": "Angular Console for Visual Studio Code. The user interface app for the Angular CLI",
-  "version": "7.4.28",
+  "version": "7.4.29",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/angular-console"
@@ -61,7 +61,6 @@
   },
   "dependencies": {
     "node-pty-prebuilt": "0.7.6",
-    "fast-glob": "^2.2.6",
     "source-map-explorer": "1.8.0"
   }
 }

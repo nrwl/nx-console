@@ -41,11 +41,9 @@
     <cdk-virtual-scroll-viewport
       *ngIf="(viewportHeight$ | async) as viewportHeight"
       [style.height]="viewportHeight"
-      itemSize="76"
+      itemSize="77"
       class="field-viewport"
     >
-      <ui-entity-docs [docs]="docs$ | async"></ui-entity-docs>
-
       <ng-container *ngIf="(filteredProjects$ | async) as projects">
         <div cdkVirtualScrollContent>
           <ng-container
