@@ -61,7 +61,7 @@ function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
 
   context.subscriptions.push(
     commands.registerCommand(
-      'extension.angularConsoleActivePanel',
+      'extension.angularConsole',
       (
         workspaceDef: WorkspaceDefinition | undefined,
         workspaceRouteTitle: WorkspaceRouteTitle | undefined,

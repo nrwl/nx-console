@@ -1,7 +1,9 @@
 <mat-toolbar
   class="title-bar"
   color="primary"
-  *ngIf="isElectron || (contextualActions$ | async)"
+  *ngIf="
+    isElectron || (contextualActions$ | async) || (isConnectSupport$ | async)
+  "
   @growShrink
   [class.actionable]="contextualActions$ | async"
 >

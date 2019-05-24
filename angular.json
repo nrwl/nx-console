@@ -173,7 +173,6 @@
               "externalDependencies": [
                 "vscode",
                 "source-map-explorer",
-                "fast-glob",
                 "node-pty-prebuilt"
               ],
               "sourceMap": false,

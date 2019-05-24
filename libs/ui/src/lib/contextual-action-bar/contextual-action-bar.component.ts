@@ -45,6 +45,12 @@ export class ContextualActionBarComponent {
     shareReplay(1)
   );
 
+  readonly isConnectSupport$ = this.router.events.pipe(
+    filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+    map(e => e.urlAfterRedirects),
+    map(url => url.endsWith('/connect/support'))
+  );
+
   constructor(
     @Inject(ENVIRONMENT) readonly environment: Environment,
     readonly contextualActionBarService: ContextualActionBarService,
