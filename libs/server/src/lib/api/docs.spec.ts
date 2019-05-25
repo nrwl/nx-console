@@ -1,5 +1,5 @@
 import { Docs } from './docs';
-import { readFirst } from '@nrwl/nx/testing';
+import { readFirst } from '@nrwl/angular/testing';
 import { of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 

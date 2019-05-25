@@ -25,7 +25,7 @@ const INITIAL_VIEW: StatusComponentView = 'details';
   styleUrls: ['./command-output.component.scss']
 })
 export class CommandOutputComponent implements OnDestroy {
-  @ViewChild(TerminalComponent) terminal: TerminalComponent;
+  @ViewChild(TerminalComponent, { static: false }) terminal: TerminalComponent;
   @Input()
   set commandResponse(x: CommandResponse) {
     // Guard against initial empty responses.

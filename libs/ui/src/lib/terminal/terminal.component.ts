@@ -44,7 +44,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   private readonly term = new ReplaySubject<Terminal>();
   private resizeObserver?: ResizeObserver;
 
-  @ViewChild('code', { read: ElementRef })
+  @ViewChild('code', { read: ElementRef, static: false })
   private readonly code: ElementRef;
 
   currentCols = new BehaviorSubject<number>(80);

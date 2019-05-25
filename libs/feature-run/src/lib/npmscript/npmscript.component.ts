@@ -42,9 +42,11 @@ export class NpmScriptComponent implements OnInit {
   });
   command$: Observable<string>;
   commandOutput$: Observable<IncrementalCommandOutput>;
-  @ViewChild(CommandOutputComponent) out: CommandOutputComponent;
-  @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
-  @ViewChild(FlagsComponent) flags: FlagsComponent;
+  @ViewChild(CommandOutputComponent, { static: false })
+  out: CommandOutputComponent;
+  @ViewChild(TaskRunnerComponent, { static: false })
+  taskRunner: TaskRunnerComponent;
+  @ViewChild(FlagsComponent, { static: false }) flags: FlagsComponent;
   private readonly ngRun$ = new Subject<any>();
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
 

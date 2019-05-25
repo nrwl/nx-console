@@ -58,7 +58,8 @@ interface SchematicCollectionForNgNew {
   styleUrls: ['./new-workspace.component.scss']
 })
 export class NewWorkspaceComponent {
-  @ViewChild(MatVerticalStepper) verticalStepper: MatVerticalStepper;
+  @ViewChild(MatVerticalStepper, { static: false })
+  verticalStepper: MatVerticalStepper;
   commandOutput$?: Observable<IncrementalCommandOutput>;
 
   command?: string;

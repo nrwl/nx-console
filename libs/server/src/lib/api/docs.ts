@@ -64,7 +64,7 @@ export class Docs implements DocsProvider {
         )
       ),
       takeWhile(r => !r),
-      reduce((_, c) => c, false)
+      reduce((_, c) => c, false as boolean)
     );
   }
 

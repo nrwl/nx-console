@@ -63,9 +63,11 @@ export class SchematicComponent implements OnInit {
   initValues$: Observable<any>;
 
   combinedOutput$: Observable<IncrementalCommandOutput>;
-  @ViewChild(CommandOutputComponent) out: CommandOutputComponent;
-  @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
-  @ViewChild(FlagsComponent) flags: FlagsComponent;
+  @ViewChild(CommandOutputComponent, { static: false })
+  out: CommandOutputComponent;
+  @ViewChild(TaskRunnerComponent, { static: false })
+  taskRunner: TaskRunnerComponent;
+  @ViewChild(FlagsComponent, { static: false }) flags: FlagsComponent;
 
   docs$: Observable<any[]>;
 
@@ -239,7 +241,7 @@ export class SchematicComponent implements OnInit {
 
     if (this.settings.showDocs) {
       this.docs$ = schematicDescription$.pipe(
-        switchMap(d => {
+        switchMap((d: any) => {
           if (d === null) {
             return of(null);
           } else {

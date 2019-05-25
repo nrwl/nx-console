@@ -39,8 +39,10 @@ export class ExtensionComponent implements OnInit {
   extension$: Observable<Extension>;
   command$: Observable<string>;
   commandOutput$: Observable<IncrementalCommandOutput>;
-  @ViewChild(CommandOutputComponent) out: CommandOutputComponent;
-  @ViewChild(TaskRunnerComponent) taskRunner: TaskRunnerComponent;
+  @ViewChild(CommandOutputComponent, { static: false })
+  out: CommandOutputComponent;
+  @ViewChild(TaskRunnerComponent, { static: false })
+  taskRunner: TaskRunnerComponent;
 
   private readonly ngAdd$ = new Subject<any>();
   private readonly ngAddDisabled$ = new BehaviorSubject(true);

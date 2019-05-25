@@ -8,10 +8,10 @@ export function schematicCollectionsForNgNew() {
       schema: normalizeSchema(require('@schematics/angular/ng-new/schema.json'))
     },
     {
-      name: '@nrwl/schematics',
-      description: 'Enterprise-ready Angular CLI workspace',
+      name: '@nrwl/workspace',
+      description: 'Angular CLI power-ups for modern development',
       schema: normalizeSchema(
-        require('@nrwl/schematics/src/collection/ng-new/schema.json')
+        require('@nrwl/workspace/src/schematics/ng-new/schema.json')
       )
     }
   ];
