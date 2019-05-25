@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc/apps/intellij",
+    "outDir": "../../dist/out-tsc",
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "esnext",

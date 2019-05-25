@@ -64,8 +64,10 @@ export class ModulesGraphComponent implements OnInit {
     this.render();
   }
 
-  @ViewChild('svg') private readonly svgEl: ElementRef | null = null;
-  @ViewChild('container') private readonly container: ElementRef | null = null;
+  @ViewChild('svg', { static: false })
+  private readonly svgEl: ElementRef | null = null;
+  @ViewChild('container', { static: false })
+  private readonly container: ElementRef | null = null;
 
   showWarning = false;
 

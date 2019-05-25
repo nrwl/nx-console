@@ -48,8 +48,9 @@ import { FlagsComponent } from '../flags/flags.component';
 export class TaskRunnerComponent implements AfterContentChecked {
   @Input() terminalWindowTitle: string;
 
-  @ContentChild(FlagsComponent) flagsComponent: FlagsComponent;
-  @ContentChild(CommandOutputComponent)
+  @ContentChild(FlagsComponent, { static: false })
+  flagsComponent: FlagsComponent;
+  @ContentChild(CommandOutputComponent, { static: false })
   statusComponent: CommandOutputComponent | undefined;
 
   terminalVisible$ = new BehaviorSubject(false);
@@ -65,6 +66,7 @@ export class TaskRunnerComponent implements AfterContentChecked {
       return;
     }
 
+    // tslint:disable-next-line
     const flagsVisible$ = combineLatest(
       this.flagsComponent.matExpansionPanels.map(p =>
         p.expandedChange.pipe(startWith(p.expanded))

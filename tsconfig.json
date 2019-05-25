@@ -17,10 +17,7 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictFunctionTypes": true,
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules/node-pty/typings"
-    ],
+    "typeRoots": ["node_modules/@types", "node_modules/node-pty/typings"],
     "downlevelIteration": true,
     "lib": ["es2017", "dom", "esnext.asynciterable"],
     "types": ["node", "jest"],
@@ -52,7 +49,8 @@
       "@angular-console/server": ["libs/server/src/index.ts"],
       "@angular-console/environment": ["libs/environment/src/index.ts"]
     },
-    "module": "es2015"
+    "module": "es2015",
+    "rootDir": "."
   },
   "exclude": ["node_modules", "tmp"]
 }

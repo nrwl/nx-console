@@ -59,4 +59,13 @@ export class InMemoryPlatformLocation implements PlatformLocation {
   back() {
     throw new Error('Not implemented (just use Router.navigate())');
   }
+
+  readonly hostname: string;
+  readonly href: string;
+  readonly port: string;
+  readonly protocol: string;
+
+  getState(): unknown {
+    return undefined;
+  }
 }

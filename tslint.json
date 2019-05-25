@@ -1,7 +1,7 @@
 {
   "rulesDirectory": [
     "node_modules/codelyzer",
-    "node_modules/@nrwl/schematics/src/tslint"
+    "node_modules/@nrwl/workspace/src/tslint"
   ],
   "linterOptions": {
     "exclude": ["**/generated/*"]
@@ -17,7 +17,12 @@
     "no-internal-module": true,
     "no-reference": true,
     "no-unnecessary-type-assertion": false,
-    "prefer-const": [true, { "destructuring": "all" }],
+    "prefer-const": [
+      true,
+      {
+        "destructuring": "all"
+      }
+    ],
     "curly": [true, "ignore-same-line"],
     "typedef": [true, "parameter"],
     "no-var-requires": true,
@@ -34,7 +39,6 @@
     "no-this-assignment": true,
     "no-string-literal": true,
     "no-object-literal-type-assertion": true,
-
     "angular-whitespace": [false, "check-interpolation", "check-semicolon"],
     "banana-in-box": true,
     "templates-no-negated-async": false,
@@ -107,13 +111,15 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-
     "nx-enforce-module-boundaries": [
       true,
       {
         "allow": [],
         "depConstraints": [
-          { "sourceTag": "*", "onlyDependOnLibsWithTags": ["*"] }
+          {
+            "sourceTag": "*",
+            "onlyDependOnLibsWithTags": ["*"]
+          }
         ]
       }
     ]

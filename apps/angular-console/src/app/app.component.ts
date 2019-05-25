@@ -32,7 +32,7 @@ const TITLE_SEPARATOR = ' | ';
   ]
 })
 export class AppComponent implements OnInit, OnDestroy {
-  @ViewChild(RouterOutlet) routerOutlet: RouterOutlet;
+  @ViewChild(RouterOutlet, { static: true }) routerOutlet: RouterOutlet;
   routerTransition: Observable<string>;
 
   ngOnInit() {

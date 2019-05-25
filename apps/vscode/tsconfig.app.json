@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc/apps/vscode",
+    "outDir": "../../dist/out-tsc",
     "module": "esnext",
     "moduleResolution": "node",
     "target": "esnext",
