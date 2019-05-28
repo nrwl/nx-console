@@ -657,10 +657,10 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
-"@nrwl/angular-console-enterprise-electron@0.3.507":
-  version "0.3.507"
-  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.3.507.tgz#bd64d4cac7e03fa18dbd99754852eb207916e78f"
-  integrity sha512-Ka/SnsE2k8sK4mEEiLGaODqMl75XOIiIeK2Vg3kK63aasiyjbEB9ACUOVopC+rTCV/5A87mJ14wU9+3RvcyDJg==
+"@nrwl/angular-console-enterprise-electron@0.3.532":
+  version "0.3.532"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-electron/-/angular-console-enterprise-electron-0.3.532.tgz#a56957fa92dd8e59f02871dc6ddc8824e15dee89"
+  integrity sha512-WJAIs0KapPEX+uPEDZP9CJb1amyS00ivZW54kt59i4zRCLaEWrAQOtsm7vym9dQqq7tNaOHkauYwnZ9fYyRoyg==
   dependencies:
     apollo-cache-inmemory "1.3.10"
     apollo-client "^2.3.5"
@@ -670,10 +670,10 @@
     node-fetch "2.3.0"
     request "2.88.0"
 
-"@nrwl/angular-console-enterprise-frontend@0.3.507":
-  version "0.3.507"
-  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-frontend/-/angular-console-enterprise-frontend-0.3.507.tgz#6f0f87700b5879703347bb2a8fc4a41fc7c04e07"
-  integrity sha512-vBfbbk75kER2vJbxrALdrgIocIfobW8M1dhKYGmrmzRti2xWuL3SZ4pkAjeapXTqx9/w51NsHsVgETzeNTn84A==
+"@nrwl/angular-console-enterprise-frontend@0.3.532":
+  version "0.3.532"
+  resolved "https://registry.yarnpkg.com/@nrwl/angular-console-enterprise-frontend/-/angular-console-enterprise-frontend-0.3.532.tgz#54de54059fa7419a32a32a7f6ac0ecff00b9e3d6"
+  integrity sha512-V9R3MXB7/eebnySmXss7FVoeFHnW0QQd+iG9/pGCIl2sQbxBvvx6QTuJFD2kQzyzCl4X+Oj0zLWQ2f9nBAOxig==
   dependencies:
     d3-ease "^1.0.5"
     d3-format "^1.3.2"

@@ -1,6 +1,6 @@
 {
   "name": "angular-console",
-  "version": "7.4.24",
+  "version": "0.0.1",
   "private": true,
   "publisher": "nrwl",
   "author": {
@@ -112,8 +112,8 @@
     "@nestjs/common": "5.7.0",
     "@nestjs/core": "5.7.0",
     "@nestjs/graphql": "5.5.1",
-    "@nrwl/angular-console-enterprise-electron": "0.3.507",
-    "@nrwl/angular-console-enterprise-frontend": "0.3.507",
+    "@nrwl/angular-console-enterprise-electron": "0.3.532",
+    "@nrwl/angular-console-enterprise-frontend": "0.3.532",
     "@schematics/angular": "7.3.1",
     "@types/d3-hierarchy": "^1.1.6",
     "@types/d3-selection": "^1.4.1",
