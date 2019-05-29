@@ -3,10 +3,11 @@ import { join } from 'path';
 
 describe('stats utils', () => {
   describe('generateStats', () => {
-    it('returns stats with sourcemap and stats.json', () => {
+    it('returns stats with sourcemap', () => {
       const result = generateStats(
         'dist/apps/example',
-        join(__dirname, 'fixtures')
+        join(__dirname, 'fixtures'),
+        new Date(1970, 1, 1).getTime()
       );
       expect(result.assets[0]).toEqual(
         expect.objectContaining({
@@ -43,7 +44,8 @@ describe('stats utils', () => {
     it('returns stats without sourcemap or stats.json', () => {
       const result = generateStats(
         'dist/apps/no-stats',
-        join(__dirname, 'fixtures')
+        join(__dirname, 'fixtures'),
+        new Date(1970, 1, 1).getTime()
       );
       expect(result.summary.modules).toBeGreaterThan(0);
       expect(result.summary.dependencies).toEqual(0);

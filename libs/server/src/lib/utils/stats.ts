@@ -51,7 +51,11 @@ class FileNameNormalizer {
   }
 }
 
-export function generateStats(_outputPath: string, cwd: string) {
+export function generateStats(
+  _outputPath: string,
+  cwd: string,
+  earliestTimeStamp: number
+) {
   const outputPath = join(cwd, _outputPath);
   const fileSizeGetter = new FileSystemFileSizeGetter();
   // grouped by index as id since webpack ids are sequential numbers
@@ -62,7 +66,7 @@ export function generateStats(_outputPath: string, cwd: string) {
     dependencies: 0
   };
 
-  const outputAssets = getAssets(outputPath);
+  const outputAssets = getAssets(outputPath, earliestTimeStamp);
   const assets: AssetData[] = [];
   const bundles: AssetData[] = [];
   // Windows path uses '\', but webpack and sourcemap contain '/'.
@@ -191,11 +195,7 @@ function createSizeData(): SizeData {
 
 const EXCLUDED_FILES_REGEXP = /^(stats\.json|.*\.map)$/;
 
-// Expected maximum time between first asset generated and last asset generated when building.
-// This is how we determine what assets are in the current build versus old assets.
-const FILE_CREATE_THRESHOLD_IN_MS = 500;
-
-function getAssets(p: string) {
+function getAssets(p: string, earliestTimeStamp: number) {
   const files = ls('-lR', p).filter((f: any) => {
     if (!f.isFile() || EXCLUDED_FILES_REGEXP.test(f.name)) {
       return false;
@@ -204,13 +204,8 @@ function getAssets(p: string) {
     return true;
   });
 
-  const newestTime = files.reduce(
-    (acc, f: any) => (f.mtimeMs > acc ? f.mtimeMs : acc),
-    0
-  );
-
   return files
-    .filter((f: any) => newestTime - f.mtimeMs <= FILE_CREATE_THRESHOLD_IN_MS)
+    .filter((f: any) => f.mtimeMs >= earliestTimeStamp)
     .map((f: any) => f.name);
 }
 

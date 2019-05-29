@@ -12,6 +12,7 @@ import {
 } from '../utils/architect';
 import { join } from 'path';
 import { existsSync, readFileSync } from 'fs';
+import { Stats } from '@angular-console/schema';
 
 export enum StatusType {
   BUILD = 'build',
@@ -50,7 +51,7 @@ export interface BuildDetailedStatus {
   isForProduction?: boolean;
   outputPath?: string;
   indexFile?: string;
-  stats?: any;
+  stats: null | Stats;
   processedChunks?: { [k: string]: Module };
 }
 
@@ -71,6 +72,7 @@ export class BuildDetailedStatusCalculator
   architectOptions: null | BuildArchitectOpts;
   cwd: string;
   isServe: boolean;
+  startTime: number;
 
   constructor(opts: {
     isServe: boolean;
@@ -94,6 +96,7 @@ export class BuildDetailedStatusCalculator
       this.architectOptions && this.architectOptions.index
         ? join(this.cwd, this.architectOptions.index)
         : undefined;
+    this.startTime = Date.now();
     this.detailedStatus = {
       outputPath,
       indexFile,
@@ -105,6 +108,7 @@ export class BuildDetailedStatusCalculator
       chunks: [] as Module[],
       errors: [],
       warnings: [],
+      stats: null,
       isForProduction: this.isForProduction
     };
   }
@@ -115,7 +119,7 @@ export class BuildDetailedStatusCalculator
       ''
     );
 
-    let {
+    const {
       processedChunks,
       ...newValue
     } = BuildDetailedStatusCalculator.updateDetailedStatus(
@@ -132,53 +136,52 @@ export class BuildDetailedStatusCalculator
       this.processedChunks = processedChunks;
     }
 
-    newValue = this.addStats(newValue);
+    if (this.isServe) {
+      newValue.stats = calculateStatsFromChunks(newValue.chunks);
+    }
 
     this.detailedStatus = newValue;
   }
 
   setStatus(value: 'successful' | 'failed' | 'terminated') {
-    this.detailedStatus = {
-      ...this.detailedStatus,
-      buildStatus: value === 'failed' ? 'build_failure' : 'build_success'
-    };
+    this.detailedStatus.buildStatus =
+      value === 'failed' ? 'build_failure' : 'build_success';
+    this.addAssetStats();
+    this.addWebpackStats();
   }
 
-  addStats(nextStatus: BuildDetailedStatus) {
-    const justCompleted =
-      nextStatus.progress === 100 && this.detailedStatus.progress < 100;
+  addAssetStats() {
+    this.detailedStatus.stats =
+      this.architectOptions && this.architectOptions.outputPath
+        ? generateStats(
+            this.architectOptions.outputPath,
+            this.cwd,
+            this.startTime
+          )
+        : null;
+  }
 
-    if (!justCompleted && nextStatus.buildStatus !== 'build_success') {
-      return nextStatus;
-    }
-
-    if (!nextStatus.stats) {
-      if (this.isServe) {
-        nextStatus.stats = calculateStatsFromChunks(nextStatus.chunks);
-      } else {
-        nextStatus.stats =
-          this.architectOptions && this.architectOptions.outputPath
-            ? generateStats(this.architectOptions.outputPath, this.cwd)
-            : null;
-      }
-    }
-
+  addWebpackStats() {
     const statsJsonPath =
       this.architectOptions && this.architectOptions.outputPath
         ? join(this.cwd, this.architectOptions.outputPath, 'stats.json')
         : null;
 
-    if (statsJsonPath && existsSync(statsJsonPath)) {
-      try {
-        const webpackStats = JSON.parse(readFileSync(statsJsonPath).toString());
-        nextStatus.errors = nextStatus.errors.concat(webpackStats.errors);
-        nextStatus.warnings = nextStatus.warnings.concat(webpackStats.warnings);
-      } catch (err) {
-        nextStatus.errors.push(String(err));
-      }
+    if (!statsJsonPath || !existsSync(statsJsonPath)) {
+      return;
     }
 
-    return nextStatus;
+    try {
+      const webpackStats = JSON.parse(readFileSync(statsJsonPath).toString());
+      if (Array.isArray(webpackStats.errors)) {
+        this.detailedStatus.errors.push(...webpackStats.errors);
+      }
+      if (Array.isArray(webpackStats.warnings)) {
+        this.detailedStatus.warnings.push(...webpackStats.warnings);
+      }
+    } catch (err) {
+      this.detailedStatus.errors.push(String(err));
+    }
   }
 
   static updateDetailedStatus(
