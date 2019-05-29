@@ -36,3 +36,21 @@ export interface NpmScripts {
   name: string;
   scripts: NpmScript[];
 }
+
+export interface StatsSummary {
+  parsed: number;
+  gzipped: number;
+}
+
+export interface Stats {
+  bundles: any[];
+  assets: any[];
+  errors?: string[];
+  warnings?: string[];
+  modulesByBundle: any;
+  summary: {
+    assets: StatsSummary;
+    modules: number;
+    dependencies: number;
+  };
+}

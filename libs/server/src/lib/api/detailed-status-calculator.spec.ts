@@ -17,6 +17,7 @@ describe('detailedStatusCalculator', () => {
         outputPath: undefined,
         serverHost: undefined,
         date: '',
+        stats: null,
         time: '',
         chunks: [],
         errors: [],
@@ -106,6 +107,7 @@ describe('detailedStatusCalculator', () => {
         Hash: a47cd7d40c3a7f374b97
         chunk \u001b[30m{main} main.js, main.js.map (main) 381 kB [initial] [rendered]
       `);
+      c.setStatus('successful');
 
       expect(c.detailedStatus).toEqual({
         type: StatusType.BUILD,
@@ -118,6 +120,7 @@ describe('detailedStatusCalculator', () => {
         isForProduction: false,
         outputPath: undefined,
         serverHost: undefined,
+        serverPort: undefined,
         chunks: [
           { name: 'main', file: 'main.js', size: '381 kB', type: 'initial' }
         ],
@@ -132,6 +135,7 @@ describe('detailedStatusCalculator', () => {
         Hash: a47cd7d40c3a7f374b97
         chunk {main} main.js, main.js.map (main) 381 kB [initial] [rendered]
       `);
+      c.setStatus('successful');
 
       expect(c.detailedStatus).toEqual({
         type: StatusType.BUILD,
