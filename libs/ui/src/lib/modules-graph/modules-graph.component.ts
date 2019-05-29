@@ -3,9 +3,9 @@ import {
   ElementRef,
   Input,
   NgZone,
-  OnInit,
   ViewChild,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  AfterViewInit
 } from '@angular/core';
 import { select, selectAll } from 'd3-selection';
 import { arc } from 'd3-shape';
@@ -48,7 +48,7 @@ const MIN_HEIGHT = 400;
   templateUrl: './modules-graph.component.html',
   styleUrls: ['./modules-graph.component.scss']
 })
-export class ModulesGraphComponent implements OnInit {
+export class ModulesGraphComponent implements AfterViewInit {
   svg: any;
   g: any;
   x: any;
@@ -85,7 +85,7 @@ export class ModulesGraphComponent implements OnInit {
     private readonly zone: NgZone
   ) {}
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.updateDimensions();
     this.render();
   }
