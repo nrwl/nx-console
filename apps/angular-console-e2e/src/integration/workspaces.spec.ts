@@ -5,7 +5,8 @@ import {
   uniqName
 } from '../support/utils';
 
-describe('Workspaces', () => {
+// TODO reenable this test
+xdescribe('Workspaces', () => {
   const name = uniqName('workspace');
 
   beforeEach(() => {

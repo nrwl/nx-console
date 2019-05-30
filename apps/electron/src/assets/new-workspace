@@ -34,6 +34,12 @@ if (collection !== '@schematics/angular') {
     cwd: tmpDir,
     stdio: [0, 1, 2]
   });
+
+  console.log(`npm install typescript@3.4.5`);
+  execSync(`npm install typescript@3.4.5`, {
+    cwd: tmpDir,
+    stdio: [0, 1, 2]
+  });
 }
 
 console.log(`ng new ${ngNewArgs.join(' ')}`);
