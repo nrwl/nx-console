@@ -149,6 +149,15 @@ export class NewWorkspaceComponent {
 
   createNewWorkspace() {
     if (this.ngNewForm.valid) {
+      console.log(
+        this.serializer.serializeArgs(
+          this.ngNewForm.controls.collectionOptions.value,
+          this.ngNewForm.controls.collection.value.schema
+        )
+      );
+      console.log(this.ngNewForm.controls.collectionOptions.value);
+      console.log(this.ngNewForm.controls.collection.value.schema);
+      console.log('----');
       const ngNewInvocation: NgNew.Variables = {
         collection: this.ngNewForm.value.collection.name,
         name: this.ngNewForm.value.name,
