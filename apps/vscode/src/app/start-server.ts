@@ -1,4 +1,4 @@
-import { ExtensionContext, window } from 'vscode';
+import { commands, ExtensionContext, window } from 'vscode';
 import {
   createServerModule,
   SelectDirectory,
@@ -43,6 +43,27 @@ export async function startServer(
       });
   };
 
+  const showNotification = (
+    message: string,
+    notificationCommands: { label: string; action: any }[]
+  ) => {
+    window
+      .showInformationMessage(
+        message,
+        ...notificationCommands.map(c => c.label)
+      )
+      .then(res => {
+        const selectedCommand = notificationCommands.find(n => n.label === res);
+        if (selectedCommand) {
+          commands.executeCommand(
+            selectedCommand.action.extension,
+            undefined,
+            selectedCommand.action.route
+          );
+        }
+      });
+  };
+
   const pseudoTerminalFactory = getPseudoTerminalFactory(context);
 
   const exports = [
@@ -50,7 +71,8 @@ export async function startServer(
     'store',
     'selectDirectory',
     'pseudoTerminalFactory',
-    'assetsPath'
+    'assetsPath',
+    'showNotification'
   ];
 
   const assetsPath = path.join(context.extensionPath, 'assets', 'public');
@@ -68,7 +90,8 @@ export async function startServer(
     { provide: 'store', useValue: store },
     { provide: 'selectDirectory', useValue: selectDirectory },
     { provide: 'pseudoTerminalFactory', useValue: pseudoTerminalFactory },
-    { provide: 'assetsPath', useValue: assetsPath }
+    { provide: 'assetsPath', useValue: assetsPath },
+    { provide: 'showNotification', useValue: showNotification }
   ];
 
   console.log('starting server on port', port);

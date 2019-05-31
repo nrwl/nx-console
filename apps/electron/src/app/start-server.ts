@@ -34,8 +34,13 @@ export async function startServer(
       'store',
       'selectDirectory',
       'pseudoTerminalFactory',
-      'assetsPath'
+      'assetsPath',
+      'showNotification'
     ];
+
+    const showNotification = () => {
+      // todo, implement this
+    };
 
     const assetsPath = path.join(__dirname, 'assets/public');
     const providers = [
@@ -49,6 +54,10 @@ export async function startServer(
       {
         provide: 'assetsPath',
         useValue: assetsPath
+      },
+      {
+        provide: 'showNotification',
+        useValue: showNotification
       }
     ];
 
