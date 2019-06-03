@@ -4,9 +4,11 @@
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "esnext",
+    "target": "es2015",
     "removeComments": true,
     "stripInternal": true,
+    "importHelpers": true,
+    "esModuleInterop": true,
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts"],
