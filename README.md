@@ -5,7 +5,6 @@
 # The UI for the Angular CLI
 
 [![Angular Console Website](https://img.shields.io/badge/Angular-Console-blue.png)](https://angularconsole.org/)
-[![Build Status](https://circleci.com/gh/nrwl/angular-console/tree/master.png)](https://circleci.com/gh/nrwl/angular-console/tree/master)
 [![License](https://img.shields.io/npm/l/@nrwl/schematics.png)](https://opensource.org/licenses/MIT)
 
 <hr>
@@ -35,32 +34,27 @@ Angular CLI is a command-line tool, which works great when you want to serve an 
 
 For instance:
 
-* Exploring custom schematic collections is hard in the terminal, but it's easy using Angular Console.
-* Using rarely-used flags is challenging. Do you pass absolute or relative paths? You don't have to remember any flags, names, or paths -- Angular Console will help you by providing autocompletion and validating your inputs.
-* Finding the right Angular CLI extension can take a long time. When using Angular Console, you can find and install an extension in minutes.
-
+- Exploring custom schematic collections is hard in the terminal, but it's easy using Angular Console.
+- Using rarely-used flags is challenging. Do you pass absolute or relative paths? You don't have to remember any flags, names, or paths -- Angular Console will help you by providing autocompletion and validating your inputs.
+- Finding the right Angular CLI extension can take a long time. When using Angular Console, you can find and install an extension in minutes.
 
 Angular Console does more than that:
 
-* It visualizes the results of a build or a test run.
-* It visualizes how different projects in your workspace depend on each other.
-* It shows dry run results as you create your command
-* It shows remembers you most recent cli commands and saves their output for your reference
-* ...
-
+- It visualizes the results of a build or a test run.
+- It visualizes how different projects in your workspace depend on each other.
+- It shows dry run results as you create your command
+- It shows remembers you most recent cli commands and saves their output for your reference
+- ...
 
 ## Download
 
-* If you are a VSCode user, the best way to try Angular Console is by installing the [Angular Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console).
+- If you are a VSCode user, the best way to try Angular Console is by installing the [Angular Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console).
 
-* If you aren't a VSCode user, download a standalone desktop application at [angularconsole.com](https://angularconsole.com).
-
-
+- If you aren't a VSCode user, download a standalone desktop application at [angularconsole.com](https://angularconsole.com).
 
 ## True UI for the Angular CLI
 
 Angular Console is a generic UI for the Angular CLI. It will work for any schematic or any architect commands. Angular Console does not have a specific UI for, say, generating a component. Instead, Angular Console does what the command-line version of the Angular CLI does--it analyzes the same meta information to create the needed UI. This means that anything you can do with the Angular CLI, you can do with Angular Console. After all, Angular Console is the UI for the Angular CLI.
-
 
 ## Useful for Both Experts and Beginners
 
@@ -69,7 +63,6 @@ Even though we started building Angular Console as a tool for expert, we also ai
 ## Great for Windows Users
 
 A lot of Windows users are terminal shy and cannot take full advantage of tools like the Angular CLI and [Nrwl Nx](http://nrwl.io/nx). By using Angular Console, Windows users can start using the powerful capabilities these tools provide via an easy-to-use UI. They can create new projects, generate components, build, test, deploy Angular apps without having to even open the terminal.
-
 
 # Learn More
 
@@ -85,23 +78,23 @@ Pick one of the issues from the [good first issue](https://github.com/nrwl/angul
 
 ## Core Team
 
-| Dan Muller | Victor Savkin | Jack Hsu | Frantisek Kolar | Kamil Kisiela |
-| ---------- | ------------- | -------- | -------------- | ------------- |
-| ![Dan Muller][DM] | ![Victor Savkin][VS] | ![Jack Hsu][JH] | ![Frantisek Kolar][FK] | ![Kamil Kisiela][KK] |
+| Dan Muller                          | Victor Savkin                         | Jack Hsu                            | Frantisek Kolar                     | Kamil Kisiela                                   |
+| ----------------------------------- | ------------------------------------- | ----------------------------------- | ----------------------------------- | ----------------------------------------------- |
+| ![Dan Muller][dm]                   | ![Victor Savkin][vs]                  | ![Jack Hsu][jh]                     | ![Frantisek Kolar][fk]              | ![Kamil Kisiela][kk]                            |
 | [mrmeku](https://github.com/mrmeku) | [vsavkin](https://github.com/vsavkin) | [jaysoo](https://github.com/jaysoo) | [fkolar](https://github.com/fkolar) | [kamilkisiela](https://github.com/kamilkisiela) |
 
-[DM]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/dan_pic.jpg
-[VS]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/victor_pic.jpg
-[JH]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/jack_pic.jpg
-[FK]: https://avatars0.githubusercontent.com/u/17149942?s=150&v=4
-[KK]: https://avatars1.githubusercontent.com/u/8167190?s=150&v=4
+[dm]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/dan_pic.jpg
+[vs]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/victor_pic.jpg
+[jh]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/jack_pic.jpg
+[fk]: https://avatars0.githubusercontent.com/u/17149942?s=150&v=4
+[kk]: https://avatars1.githubusercontent.com/u/8167190?s=150&v=4
 
 The following folks from the Angular team at Google are working with the Angular Console team.
 
-| Alex Eagle | Stephen Fluin | Matias Niemelä |
-| ---------- | ------------- | -------------- |
-| ![Alex Eagle][AE] | ![Stephen Fluin][SF] | ![Matias Niemelä][MN] |
+| Alex Eagle        | Stephen Fluin        | Matias Niemelä        |
+| ----------------- | -------------------- | --------------------- |
+| ![Alex Eagle][ae] | ![Stephen Fluin][sf] | ![Matias Niemelä][mn] |
 
-[AE]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/alex_eagle_pic.jpg
-[SF]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/stephen_pic.jpg
-[MN]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/matias_pic.jpg
+[ae]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/alex_eagle_pic.jpg
+[sf]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/stephen_pic.jpg
+[mn]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/matias_pic.jpg
