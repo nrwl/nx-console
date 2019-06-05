@@ -55,11 +55,16 @@ export async function startServer(
       .then(res => {
         const selectedCommand = notificationCommands.find(n => n.label === res);
         if (selectedCommand) {
-          commands.executeCommand(
-            selectedCommand.action.extension,
-            undefined,
-            selectedCommand.action.route
-          );
+          if (selectedCommand.action.url) {
+            const opn = require('opn');
+            opn(selectedCommand.action.url);
+          } else {
+            commands.executeCommand(
+              selectedCommand.action.extension,
+              undefined,
+              selectedCommand.action.route
+            );
+          }
         }
       });
   };
