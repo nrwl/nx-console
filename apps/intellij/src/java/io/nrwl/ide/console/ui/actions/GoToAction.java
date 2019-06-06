@@ -15,7 +15,6 @@ public class GoToAction extends AnAction {
   private static final Logger LOG = Logger.getInstance(GoToAction.class);
 
 
-
   @Override
   public void actionPerformed(AnActionEvent e) {
     ActionManagerEx actionManager = (ActionManagerEx) e.getActionManager();
