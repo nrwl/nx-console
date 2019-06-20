@@ -37,7 +37,7 @@ intellij {
   pluginName 'Angular Console'
   downloadSources false
   updateSinceUntilBuild true
-  plugins = ['JavaScriptLanguage']
+  plugins = ['JavaScriptLanguage', 'Terminal']
 }
 patchPluginXml {
   sinceBuild '180'
@@ -47,24 +47,22 @@ patchPluginXml {
 
 
 repositories {
-  mavenCentral()
-  maven { url 'http://maven.teamdev.com/repository/products' }
+  jcenter()
+  maven { url "https://jitpack.io" }
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: '*.jar')
-  compile 'com.teamdev.jxbrowser:jxbrowser-cross-platform:6.22.2'
+  compile 'com.github.codebrig:journey:0.2.17-offline'
   testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 project.afterEvaluate {
+
   buildPlugin.doLast {
     def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
     def distApps = "$angularConsoleRoot/dist/apps/intellij/"
 
-    delete {
-      delete file("$project.projectDir/gen/ngConsoleCli")
-    }
+    project.delete("$project.projectDir/gen/ngConsoleCli")
 
     copy {
       from("$distApps") {
@@ -86,9 +84,7 @@ project.afterEvaluate {
     def angularConsoleRoot = file("$project.projectDir").parentFile.parentFile
     def distApps = "$angularConsoleRoot/dist/apps/intellij/"
 
-    delete {
-      delete file("$project.projectDir/gen/ngConsoleCli")
-    }
+    project.delete("$project.projectDir/gen/ngConsoleCli")
 
     copy {
       from("$distApps") {

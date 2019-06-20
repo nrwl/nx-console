@@ -34,6 +34,8 @@ import static java.awt.event.KeyEvent.VK_C;
 /**
  * Application based service in order to record currently opened angular workspaces with ability to start
  * NGConsoleServer with first based angular project and close with last one.
+ *
+ * We need to make sure we start only one instance of Angular Console server
  */
 public class NgWorkspaceMonitor implements Disposable {
   private static final Logger LOG = Logger.getInstance(NgWorkspaceMonitor.class);
@@ -129,8 +131,11 @@ public class NgWorkspaceMonitor implements Disposable {
           NgConsoleUI consoleUI = ServiceManager.getService(project, NgConsoleUI.class);
           String encodedPath = URLEncoder.encode(project.getBasePath(), StandardCharsets.UTF_8.toString());
 
-          consoleUI.goToUrl(String.valueOf(myServer.getNodeProcessPort()), encodedPath);
+          consoleUI.initWebView(NgConsoleUI.Route.Workspace, String.valueOf(myServer.getNodeProcessPort()),
+            encodedPath);
+
           registerToolWindow(project, consoleUI);
+          consoleUI.goToUrl(String.valueOf(myServer.getNodeProcessPort()), encodedPath);
 
         } catch (Exception e) {
           LOG.error("Problem initWebView when trying to init toolWindow:", e);
@@ -160,6 +165,16 @@ public class NgWorkspaceMonitor implements Disposable {
 
   public void onServerStopped() {
     // some logic here ..
+  }
+
+
+  /**
+   * Todo: Find better way how to refresh Project File trees
+   */
+  public void onTerminalCmdFinished() {
+    myProjects.forEach((name, project) -> {
+      project.getProjectFile().refresh(true, true);
+    });
   }
 
 

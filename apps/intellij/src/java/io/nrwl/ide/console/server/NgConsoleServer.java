@@ -17,7 +17,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.EnvironmentUtil;
-import com.intellij.util.io.BaseOutputReader;
 import io.nrwl.ide.console.NgConsoleUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +26,6 @@ import org.jetbrains.io.jsonRpc.socket.RpcBinaryRequestHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -144,7 +142,7 @@ public class NgConsoleServer implements Disposable {
   }
 
   /**
-   * This the main piece where we assemble commandline along with the system npm interpreter in order to start
+   * This is the main piece where we assemble commandline along with the system npm interpreter in order to start
    * NODE process. We are setting current workingDirectory which is in our case plugin path and the port for the RPC
    * which we use to communicate with the NODE process
    */
@@ -201,33 +199,5 @@ public class NgConsoleServer implements Disposable {
     STARTED,
     STOPPED,
     ERROR
-  }
-
-  private static class SilentKillableProcessHandler extends KillableProcessHandler {
-
-    public SilentKillableProcessHandler(@NotNull GeneralCommandLine commandLine)
-      throws ExecutionException {
-      super(commandLine);
-    }
-
-    public SilentKillableProcessHandler(@NotNull GeneralCommandLine commandLine,
-                                        boolean withMediator) throws ExecutionException {
-      super(commandLine, withMediator);
-    }
-
-    public SilentKillableProcessHandler(@NotNull Process process, String commandLine) {
-      super(process, commandLine);
-    }
-
-    public SilentKillableProcessHandler(@NotNull Process process, String commandLine,
-                                        @NotNull Charset charset) {
-      super(process, commandLine, charset);
-    }
-
-    @NotNull
-    @Override
-    protected BaseOutputReader.Options readerOptions() {
-      return BaseOutputReader.Options.forMostlySilentProcess();
-    }
   }
 }

@@ -37,9 +37,6 @@ public class NgConsoleProjectLifecycle implements ProjectComponent {
       try {
         LOG.info("Starting NgConsole Server for project directory:" + baseDir.getCanonicalPath());
 
-        NgConsoleUI consoleUI = ServiceManager.getService(myProject, NgConsoleUI.class);
-        consoleUI.initWebView(NgConsoleUI.Route.Workspace, myProject.getName());
-
         NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
         ngMonitor.init(myProject);
       } catch (Exception e) {

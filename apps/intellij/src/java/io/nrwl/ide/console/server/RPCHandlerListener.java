@@ -1,10 +1,15 @@
 package io.nrwl.ide.console.server;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import io.nrwl.ide.console.NgConsoleUtil;
 import io.nrwl.ide.console.NgWorkspaceMonitor;
 import org.jetbrains.io.jsonRpc.JsonRpcServer;
+
+import java.util.ArrayList;
 
 import static com.intellij.notification.NotificationType.ERROR;
 import static com.intellij.notification.NotificationType.INFORMATION;
@@ -14,6 +19,7 @@ public class RPCHandlerListener {
   private static final Logger LOG = Logger.getInstance(NgConsoleServer.class);
 
   private JsonRpcServer myRpcServer;
+  private TerminalRunner terminalRunner;
 
 
   public RPCHandlerListener(JsonRpcServer rpcServer) {
@@ -64,5 +70,25 @@ public class RPCHandlerListener {
 
     NgWorkspaceMonitor ngMonitor = ServiceManager.getService(NgWorkspaceMonitor.class);
     ngMonitor.onServerStopped();
+  }
+
+
+  public void terminalExec(String serializedObject) {
+    JsonObject parsedObj = (JsonObject) new JsonParser().parse(serializedObject);
+    String cwd = parsedObj.get("cwd").getAsString();
+    String program = parsedObj.get("program").getAsString();
+    Gson googleJson = new Gson();
+    ArrayList args = googleJson.fromJson(parsedObj.get("args").getAsJsonArray(), ArrayList.class);
+
+    if (terminalRunner != null) {
+      terminalRunner.kill();
+    }
+    terminalRunner = null;
+    terminalRunner = new TerminalRunner(myRpcServer);
+    terminalRunner.exec(cwd, program, args);
+  }
+
+  public void terminalKill() {
+    terminalRunner.kill();
   }
 }

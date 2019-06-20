@@ -1,5 +1,6 @@
 package io.nrwl.ide.console.ui;
 
+import com.codebrig.journey.JourneyBrowserView;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -7,33 +8,19 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.teamdev.jxbrowser.chromium.Browser;
-import com.teamdev.jxbrowser.chromium.BrowserContext;
-import com.teamdev.jxbrowser.chromium.BrowserContextParams;
-import com.teamdev.jxbrowser.chromium.BrowserType;
-import com.teamdev.jxbrowser.chromium.events.FinishLoadingEvent;
-import com.teamdev.jxbrowser.chromium.events.LoadAdapter;
-import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
-import static com.teamdev.jxbrowser.chromium.BrowserPreferences.getDefaultChromiumDir;
 
 /**
- * Main JPanel used for rendering the NGConsoleUI (the WebView). It uses JxBrowser which is a
- * solution built on top of chromium, pretty fast compared JavaFX which I we tried but there
- * is allot of issues with loading svgs, fonts, etcs.
+ * Main JPanel used for rendering the NGConsoleUI (the WebView). It uses JCEF chromium implementations which is a
+ * pretty fast compared JavaFX which I we tried but there is allot of issues with loading svgs, fonts, etcs.
  * <p>
- * But JxBrowser seems to work pretty well.
+ *
+ * Please see https://github.com/CodeBrig/Journey project
  */
 public class NgConsoleUI implements Disposable {
   private static final Logger LOG = Logger.getInstance(NgConsoleUI.class);
@@ -42,9 +29,9 @@ public class NgConsoleUI implements Disposable {
    */
   private final JPanel myPanel = new JPanel(new BorderLayout());
   /**
-   * Object representing a Browser build on top of Chromium
+   * Object representing a JCEF based Browser build on top of Chromium
    */
-  private Browser myBrowser;
+  private JourneyBrowserView myBrowser;
   private Map<String, String> myRouteMapping = new HashMap<>();
 
   private Route myRoute = Route.Generate;
@@ -61,11 +48,12 @@ public class NgConsoleUI implements Disposable {
 
 
   /**
-   * We are using project name to have unique JxBrowser BrowserContext lock file
+   * First time initiation of the WebView called once Angular Console is started. Here we need to set initial
+   * URL, otherwise user sees blank page.
    */
-  public void initWebView(Route mode, String name) {
+  public void initWebView(Route mode, String port, String path) {
     this.myRoute = mode;
-    doInitWebView(name);
+    doInitWebView(port, path);
   }
 
   public JComponent getContent() {
@@ -90,12 +78,14 @@ public class NgConsoleUI implements Disposable {
 
   public void goToUrl(final String... params) {
     ApplicationManager.getApplication()
-      .invokeAndWait(() -> {
+      .invokeLater(() -> {
         String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
 
         LOG.info("Switching to new URL : " + url);
-        myBrowser.loadURL(url);
+        myBrowser.getBrowser().loadURL(url);
       });
+
+    myBrowser.getBrowser().reloadIgnoreCache();
   }
 
 
@@ -106,48 +96,37 @@ public class NgConsoleUI implements Disposable {
     myRoute = route;
     ApplicationManager.getApplication()
       .invokeAndWait(() -> {
-        String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
+        String url = url((Object[]) params);
 
         LOG.info("Switching to new URL : " + url);
-        myBrowser.loadURL(url);
+        myBrowser.getBrowser().loadURL(url);
       });
   }
 
 
-  private void doInitWebView(String name) {
-
+  private void doInitWebView(final String port, final String path) {
     ApplicationManager.getApplication()
       .invokeAndWait(() -> {
-        File dataDir = null;
+
         try {
-          dataDir = new File(getDefaultChromiumDir(), "data-" + name);
-          if (dataDir.exists()) {
-            Path path = dataDir.toPath();
-            Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile)
-              .forEach(file -> {
-                if (file != null && file.exists()) {
-                  file.delete();
-                }
-              });
-          }
-        } catch (IOException e) {
-          LOG.error("Problem cleaning up jxBrowser cache: ", e);
+          myBrowser = new JourneyBrowserView(url(port, path));
+          myPanel.add(myBrowser, BorderLayout.CENTER);
+        } catch (Exception e) {
+          LOG.error("Error while initialing WebView. ", e);
         }
-
-        BrowserContextParams bcp = new BrowserContextParams(dataDir.getAbsolutePath());
-        BrowserContext bc = new BrowserContext(bcp);
-
-        myBrowser = new Browser(BrowserType.LIGHTWEIGHT, bc);
-        BrowserView view = new BrowserView(myBrowser);
-        myPanel.add(view, BorderLayout.CENTER);
       });
   }
+
+  public String url(Object... args) {
+    return String.format(myRouteMapping.get(myRoute.name()), args);
+  }
+
 
   @Override
   public void dispose() {
     if (myBrowser != null) {
       ApplicationManager.getApplication().invokeAndWait(() -> {
-        myBrowser.dispose();
+        myBrowser.getCefApp().dispose();
         myBrowser = null;
       });
     }
@@ -163,28 +142,4 @@ public class NgConsoleUI implements Disposable {
     Connect,
     Settings
   }
-
-  private static class ErrorAwareLoader extends LoadAdapter {
-    private CountDownLatch myLatch;
-    private boolean error = false;
-
-    public ErrorAwareLoader(CountDownLatch latch) {
-      super();
-      myLatch = latch;
-    }
-
-    @Override
-    public void onFinishLoadingFrame(FinishLoadingEvent event) {
-      if (event.isMainFrame()) {
-        error = event.getValidatedURL().contains("chrome-error:");
-        this.myLatch.countDown();
-      }
-    }
-
-    public boolean hasError() {
-      return error;
-    }
-  }
-
-
 }

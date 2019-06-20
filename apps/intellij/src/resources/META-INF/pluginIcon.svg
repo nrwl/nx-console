@@ -1,1082 +1,1083 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   id="svg315"
-   version="1.1"
-   viewBox="0 0 1024 1024"
-   height="1024px"
-   width="1024px">
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:cc="http://creativecommons.org/ns#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  id="svg315"
+  version="1.1"
+  viewBox="0 0 1024 1024"
+  height="1024px"
+  width="1024px">
   <metadata
-     id="metadata319">
+    id="metadata319">
     <rdf:RDF>
       <cc:Work
-         rdf:about="">
+        rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+          rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
   <title
-     id="title2">CONSOLE_ColorTypeIcon</title>
+    id="title2">CONSOLE_ColorTypeIcon
+  </title>
   <desc
-     id="desc4">Created with Sketch.</desc>
+    id="desc4">Created with Sketch.
+  </desc>
   <defs
-     id="defs180">
+    id="defs180">
     <filter
-       id="filter-1"
-       filterUnits="objectBoundingBox"
-       height="106.2%"
-       width="106.2%"
-       y="-1.6%"
-       x="-3.1%">
+      id="filter-1"
+      filterUnits="objectBoundingBox"
+      height="106.2%"
+      width="106.2%"
+      y="-1.6%"
+      x="-3.1%">
       <feOffset
-         id="feOffset6"
-         result="shadowOffsetOuter1"
-         in="SourceAlpha"
-         dy="16"
-         dx="0" />
+        id="feOffset6"
+        result="shadowOffsetOuter1"
+        in="SourceAlpha"
+        dy="16"
+        dx="0"/>
       <feGaussianBlur
-         id="feGaussianBlur8"
-         result="shadowBlurOuter1"
-         in="shadowOffsetOuter1"
-         stdDeviation="8" />
+        id="feGaussianBlur8"
+        result="shadowBlurOuter1"
+        in="shadowOffsetOuter1"
+        stdDeviation="8"/>
       <feColorMatrix
-         id="feColorMatrix10"
-         result="shadowMatrixOuter1"
-         in="shadowBlurOuter1"
-         type="matrix"
-         values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.24 0" />
+        id="feColorMatrix10"
+        result="shadowMatrixOuter1"
+        in="shadowBlurOuter1"
+        type="matrix"
+        values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.24 0"/>
       <feMerge
-         id="feMerge16">
+        id="feMerge16">
         <feMergeNode
-           id="feMergeNode12"
-           in="shadowMatrixOuter1" />
+          id="feMergeNode12"
+          in="shadowMatrixOuter1"/>
         <feMergeNode
-           id="feMergeNode14"
-           in="SourceGraphic" />
+          id="feMergeNode14"
+          in="SourceGraphic"/>
       </feMerge>
     </filter>
     <rect
-       rx="64"
-       height="800"
-       width="800"
-       y="0"
-       x="0"
-       id="path-2" />
+      rx="64"
+      height="800"
+      width="800"
+      y="0"
+      x="0"
+      id="path-2"/>
     <radialGradient
-       id="radialGradient-4"
-       gradientTransform="translate(0.275201,0.500000),scale(0.535058,1.000000),rotate(0.000000),translate(-0.275201,-0.500000)"
-       r="125.744849%"
-       fy="50%"
-       fx="27.5201229%"
-       cy="50%"
-       cx="27.5201229%">
+      id="radialGradient-4"
+      gradientTransform="translate(0.275201,0.500000),scale(0.535058,1.000000),rotate(0.000000),translate(-0.275201,-0.500000)"
+      r="125.744849%"
+      fy="50%"
+      fx="27.5201229%"
+      cy="50%"
+      cx="27.5201229%">
       <stop
-         id="stop20"
-         offset="0%"
-         stop-opacity="0.2"
-         stop-color="#1A237E" />
+        id="stop20"
+        offset="0%"
+        stop-opacity="0.2"
+        stop-color="#1A237E"/>
       <stop
-         id="stop22"
-         offset="100%"
-         stop-opacity="0"
-         stop-color="#1A237E" />
+        id="stop22"
+        offset="100%"
+        stop-opacity="0"
+        stop-color="#1A237E"/>
     </radialGradient>
     <rect
-       height="24"
-       width="672"
-       y="44"
-       x="0"
-       id="path-5" />
+      height="24"
+      width="672"
+      y="44"
+      x="0"
+      id="path-5"/>
     <filter
-       id="filter-6"
-       filterUnits="objectBoundingBox"
-       height="116.7%"
-       width="100.6%"
-       y="-8.3%"
-       x="-0.3%">
+      id="filter-6"
+      filterUnits="objectBoundingBox"
+      height="116.7%"
+      width="100.6%"
+      y="-8.3%"
+      x="-0.3%">
       <feOffset
-         id="feOffset26"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-4"
-         dx="0" />
+        id="feOffset26"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-4"
+        dx="0"/>
       <feComposite
-         id="feComposite28"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite28"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix30"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix30"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
     </filter>
     <rect
-       height="24"
-       width="136"
-       y="44"
-       x="0"
-       id="path-7" />
+      height="24"
+      width="136"
+      y="44"
+      x="0"
+      id="path-7"/>
     <filter
-       id="filter-8"
-       filterUnits="objectBoundingBox"
-       height="116.7%"
-       width="102.9%"
-       y="-8.3%"
-       x="-1.5%">
+      id="filter-8"
+      filterUnits="objectBoundingBox"
+      height="116.7%"
+      width="102.9%"
+      y="-8.3%"
+      x="-1.5%">
       <feOffset
-         id="feOffset34"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-4"
-         dx="0" />
+        id="feOffset34"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-4"
+        dx="0"/>
       <feComposite
-         id="feComposite36"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite36"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix38"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix38"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
     </filter>
     <circle
-       r="56"
-       cy="56"
-       cx="56"
-       id="path-9" />
+      r="56"
+      cy="56"
+      cx="56"
+      id="path-9"/>
     <filter
-       id="filter-10"
-       filterUnits="objectBoundingBox"
-       height="128.6%"
-       width="128.6%"
-       y="-7.1%"
-       x="-14.3%">
+      id="filter-10"
+      filterUnits="objectBoundingBox"
+      height="128.6%"
+      width="128.6%"
+      y="-7.1%"
+      x="-14.3%">
       <feOffset
-         id="feOffset42"
-         result="shadowOffsetOuter1"
-         in="SourceAlpha"
-         dy="8"
-         dx="0" />
+        id="feOffset42"
+        result="shadowOffsetOuter1"
+        in="SourceAlpha"
+        dy="8"
+        dx="0"/>
       <feGaussianBlur
-         id="feGaussianBlur44"
-         result="shadowBlurOuter1"
-         in="shadowOffsetOuter1"
-         stdDeviation="4" />
+        id="feGaussianBlur44"
+        result="shadowBlurOuter1"
+        in="shadowOffsetOuter1"
+        stdDeviation="4"/>
       <feColorMatrix
-         id="feColorMatrix46"
-         in="shadowBlurOuter1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0" />
+        id="feColorMatrix46"
+        in="shadowBlurOuter1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0"/>
     </filter>
     <filter
-       id="filter-11"
-       filterUnits="objectBoundingBox"
-       height="120.5%"
-       width="120.5%"
-       y="-3.1%"
-       x="-10.3%">
+      id="filter-11"
+      filterUnits="objectBoundingBox"
+      height="120.5%"
+      width="120.5%"
+      y="-3.1%"
+      x="-10.3%">
       <feOffset
-         id="feOffset49"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-7"
-         dx="0" />
+        id="feOffset49"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-7"
+        dx="0"/>
       <feComposite
-         id="feComposite51"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite51"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix53"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0" />
-    </filter>
-    <rect
-       height="24"
-       width="672"
-       y="44"
-       x="0"
-       id="path-12" />
-    <filter
-       id="filter-13"
-       filterUnits="objectBoundingBox"
-       height="116.7%"
-       width="100.6%"
-       y="-8.3%"
-       x="-0.3%">
-      <feOffset
-         id="feOffset57"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-4"
-         dx="0" />
-      <feComposite
-         id="feComposite59"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
-      <feColorMatrix
-         id="feColorMatrix61"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix53"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0"/>
     </filter>
     <rect
-       height="24"
-       width="312"
-       y="44"
-       x="0"
-       id="path-14" />
+      height="24"
+      width="672"
+      y="44"
+      x="0"
+      id="path-12"/>
     <filter
-       id="filter-15"
-       filterUnits="objectBoundingBox"
-       height="116.7%"
-       width="101.3%"
-       y="-8.3%"
-       x="-0.6%">
+      id="filter-13"
+      filterUnits="objectBoundingBox"
+      height="116.7%"
+      width="100.6%"
+      y="-8.3%"
+      x="-0.3%">
       <feOffset
-         id="feOffset65"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-4"
-         dx="0" />
+        id="feOffset57"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-4"
+        dx="0"/>
       <feComposite
-         id="feComposite67"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite59"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix69"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix61"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
+    </filter>
+    <rect
+      height="24"
+      width="312"
+      y="44"
+      x="0"
+      id="path-14"/>
+    <filter
+      id="filter-15"
+      filterUnits="objectBoundingBox"
+      height="116.7%"
+      width="101.3%"
+      y="-8.3%"
+      x="-0.6%">
+      <feOffset
+        id="feOffset65"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-4"
+        dx="0"/>
+      <feComposite
+        id="feComposite67"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
+      <feColorMatrix
+        id="feColorMatrix69"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
     </filter>
     <circle
-       r="56"
-       cy="56"
-       cx="56"
-       id="path-16" />
+      r="56"
+      cy="56"
+      cx="56"
+      id="path-16"/>
     <filter
-       id="filter-17"
-       filterUnits="objectBoundingBox"
-       height="128.6%"
-       width="128.6%"
-       y="-7.1%"
-       x="-14.3%">
+      id="filter-17"
+      filterUnits="objectBoundingBox"
+      height="128.6%"
+      width="128.6%"
+      y="-7.1%"
+      x="-14.3%">
       <feOffset
-         id="feOffset73"
-         result="shadowOffsetOuter1"
-         in="SourceAlpha"
-         dy="8"
-         dx="0" />
+        id="feOffset73"
+        result="shadowOffsetOuter1"
+        in="SourceAlpha"
+        dy="8"
+        dx="0"/>
       <feGaussianBlur
-         id="feGaussianBlur75"
-         result="shadowBlurOuter1"
-         in="shadowOffsetOuter1"
-         stdDeviation="4" />
+        id="feGaussianBlur75"
+        result="shadowBlurOuter1"
+        in="shadowOffsetOuter1"
+        stdDeviation="4"/>
       <feColorMatrix
-         id="feColorMatrix77"
-         in="shadowBlurOuter1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0" />
+        id="feColorMatrix77"
+        in="shadowBlurOuter1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0"/>
     </filter>
     <filter
-       id="filter-18"
-       filterUnits="objectBoundingBox"
-       height="120.5%"
-       width="120.5%"
-       y="-3.1%"
-       x="-10.3%">
+      id="filter-18"
+      filterUnits="objectBoundingBox"
+      height="120.5%"
+      width="120.5%"
+      y="-3.1%"
+      x="-10.3%">
       <feOffset
-         id="feOffset80"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-7"
-         dx="0" />
+        id="feOffset80"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-7"
+        dx="0"/>
       <feComposite
-         id="feComposite82"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite82"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix84"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0" />
-    </filter>
-    <rect
-       height="24"
-       width="672"
-       y="44"
-       x="0"
-       id="path-19" />
-    <filter
-       id="filter-20"
-       filterUnits="objectBoundingBox"
-       height="116.7%"
-       width="100.6%"
-       y="-8.3%"
-       x="-0.3%">
-      <feOffset
-         id="feOffset88"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-4"
-         dx="0" />
-      <feComposite
-         id="feComposite90"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
-      <feColorMatrix
-         id="feColorMatrix92"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix84"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0"/>
     </filter>
     <rect
-       height="24"
-       width="488"
-       y="44"
-       x="0"
-       id="path-21" />
+      height="24"
+      width="672"
+      y="44"
+      x="0"
+      id="path-19"/>
     <filter
-       id="filter-22"
-       filterUnits="objectBoundingBox"
-       height="116.7%"
-       width="100.8%"
-       y="-8.3%"
-       x="-0.4%">
+      id="filter-20"
+      filterUnits="objectBoundingBox"
+      height="116.7%"
+      width="100.6%"
+      y="-8.3%"
+      x="-0.3%">
       <feOffset
-         id="feOffset96"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-4"
-         dx="0" />
+        id="feOffset88"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-4"
+        dx="0"/>
       <feComposite
-         id="feComposite98"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite90"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix100"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix92"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
+    </filter>
+    <rect
+      height="24"
+      width="488"
+      y="44"
+      x="0"
+      id="path-21"/>
+    <filter
+      id="filter-22"
+      filterUnits="objectBoundingBox"
+      height="116.7%"
+      width="100.8%"
+      y="-8.3%"
+      x="-0.4%">
+      <feOffset
+        id="feOffset96"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-4"
+        dx="0"/>
+      <feComposite
+        id="feComposite98"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
+      <feColorMatrix
+        id="feColorMatrix100"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
     </filter>
     <circle
-       r="56"
-       cy="56"
-       cx="56"
-       id="path-23" />
+      r="56"
+      cy="56"
+      cx="56"
+      id="path-23"/>
     <filter
-       id="filter-24"
-       filterUnits="objectBoundingBox"
-       height="128.6%"
-       width="128.6%"
-       y="-7.1%"
-       x="-14.3%">
+      id="filter-24"
+      filterUnits="objectBoundingBox"
+      height="128.6%"
+      width="128.6%"
+      y="-7.1%"
+      x="-14.3%">
       <feOffset
-         id="feOffset104"
-         result="shadowOffsetOuter1"
-         in="SourceAlpha"
-         dy="8"
-         dx="0" />
+        id="feOffset104"
+        result="shadowOffsetOuter1"
+        in="SourceAlpha"
+        dy="8"
+        dx="0"/>
       <feGaussianBlur
-         id="feGaussianBlur106"
-         result="shadowBlurOuter1"
-         in="shadowOffsetOuter1"
-         stdDeviation="4" />
+        id="feGaussianBlur106"
+        result="shadowBlurOuter1"
+        in="shadowOffsetOuter1"
+        stdDeviation="4"/>
       <feColorMatrix
-         id="feColorMatrix108"
-         in="shadowBlurOuter1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0" />
+        id="feColorMatrix108"
+        in="shadowBlurOuter1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0"/>
     </filter>
     <filter
-       id="filter-25"
-       filterUnits="objectBoundingBox"
-       height="120.5%"
-       width="120.5%"
-       y="-3.1%"
-       x="-10.3%">
+      id="filter-25"
+      filterUnits="objectBoundingBox"
+      height="120.5%"
+      width="120.5%"
+      y="-3.1%"
+      x="-10.3%">
       <feOffset
-         id="feOffset111"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="-7"
-         dx="0" />
+        id="feOffset111"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="-7"
+        dx="0"/>
       <feComposite
-         id="feComposite113"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite113"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix115"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0" />
+        id="feColorMatrix115"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.2 0"/>
     </filter>
     <rect
-       height="175"
-       width="873"
-       y="5.68434189e-14"
-       x="0"
-       id="path-26" />
+      height="175"
+      width="873"
+      y="5.68434189e-14"
+      x="0"
+      id="path-26"/>
     <filter
-       id="filter-28"
-       filterUnits="objectBoundingBox"
-       height="109.1%"
-       width="100.9%"
-       y="-2.3%"
-       x="-0.5%">
+      id="filter-28"
+      filterUnits="objectBoundingBox"
+      height="109.1%"
+      width="100.9%"
+      y="-2.3%"
+      x="-0.5%">
       <feOffset
-         id="feOffset119"
-         result="shadowOffsetOuter1"
-         in="SourceAlpha"
-         dy="8"
-         dx="0" />
+        id="feOffset119"
+        result="shadowOffsetOuter1"
+        in="SourceAlpha"
+        dy="8"
+        dx="0"/>
       <feColorMatrix
-         id="feColorMatrix121"
-         in="shadowOffsetOuter1"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix121"
+        in="shadowOffsetOuter1"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
     </filter>
     <radialGradient
-       id="radialGradient-29"
-       gradientTransform="translate(0.500000,-0.058156),scale(1.000000,0.240000),rotate(90.000000),translate(-0.500000,0.058156)"
-       r="242.671972%"
-       fy="-5.8155778%"
-       fx="50%"
-       cy="-5.8155778%"
-       cx="50%">
+      id="radialGradient-29"
+      gradientTransform="translate(0.500000,-0.058156),scale(1.000000,0.240000),rotate(90.000000),translate(-0.500000,0.058156)"
+      r="242.671972%"
+      fy="-5.8155778%"
+      fx="50%"
+      cy="-5.8155778%"
+      cx="50%">
       <stop
-         id="stop124"
-         offset="0%"
-         stop-opacity="0.12"
-         stop-color="#1A237E" />
+        id="stop124"
+        offset="0%"
+        stop-opacity="0.12"
+        stop-color="#1A237E"/>
       <stop
-         id="stop126"
-         offset="100%"
-         stop-opacity="0"
-         stop-color="#1A237E" />
+        id="stop126"
+        offset="100%"
+        stop-opacity="0"
+        stop-color="#1A237E"/>
     </radialGradient>
     <radialGradient
-       id="radialGradient-30"
-       r="100.445949%"
-       fy="71.0260116%"
-       fx="71.0260116%"
-       cy="71.0260116%"
-       cx="71.0260116%">
+      id="radialGradient-30"
+      r="100.445949%"
+      fy="71.0260116%"
+      fx="71.0260116%"
+      cy="71.0260116%"
+      cx="71.0260116%">
       <stop
-         id="stop129"
-         offset="0%"
-         stop-opacity="0"
-         stop-color="#FFFFFF" />
+        id="stop129"
+        offset="0%"
+        stop-opacity="0"
+        stop-color="#FFFFFF"/>
       <stop
-         id="stop131"
-         offset="100%"
-         stop-opacity="0.1"
-         stop-color="#FFFFFF" />
+        id="stop131"
+        offset="100%"
+        stop-opacity="0.1"
+        stop-color="#FFFFFF"/>
     </radialGradient>
     <rect
-       rx="64"
-       height="800"
-       width="800"
-       y="0"
-       x="0"
-       id="path-31" />
+      rx="64"
+      height="800"
+      width="800"
+      y="0"
+      x="0"
+      id="path-31"/>
     <filter
-       id="filter-32"
-       filterUnits="objectBoundingBox"
-       height="101.0%"
-       width="101.0%"
-       y="-0.5%"
-       x="-0.5%">
+      id="filter-32"
+      filterUnits="objectBoundingBox"
+      height="101.0%"
+      width="101.0%"
+      y="-0.5%"
+      x="-0.5%">
       <feOffset
-         id="feOffset135"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="8"
-         dx="0" />
+        id="feOffset135"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="8"
+        dx="0"/>
       <feComposite
-         id="feComposite137"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite137"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix139"
-         result="shadowMatrixInner1"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.3 0" />
+        id="feColorMatrix139"
+        result="shadowMatrixInner1"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.3 0"/>
       <feOffset
-         id="feOffset141"
-         result="shadowOffsetInner2"
-         in="SourceAlpha"
-         dy="-8"
-         dx="0" />
+        id="feOffset141"
+        result="shadowOffsetInner2"
+        in="SourceAlpha"
+        dy="-8"
+        dx="0"/>
       <feComposite
-         id="feComposite143"
-         result="shadowInnerInner2"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner2" />
+        id="feComposite143"
+        result="shadowInnerInner2"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner2"/>
       <feColorMatrix
-         id="feColorMatrix145"
-         result="shadowMatrixInner2"
-         in="shadowInnerInner2"
-         type="matrix"
-         values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0" />
+        id="feColorMatrix145"
+        result="shadowMatrixInner2"
+        in="shadowInnerInner2"
+        type="matrix"
+        values="0 0 0 0 0.101960784   0 0 0 0 0.137254902   0 0 0 0 0.494117647  0 0 0 0.24 0"/>
       <feMerge
-         id="feMerge151">
+        id="feMerge151">
         <feMergeNode
-           id="feMergeNode147"
-           in="shadowMatrixInner1" />
+          id="feMergeNode147"
+          in="shadowMatrixInner1"/>
         <feMergeNode
-           id="feMergeNode149"
-           in="shadowMatrixInner2" />
+          id="feMergeNode149"
+          in="shadowMatrixInner2"/>
       </feMerge>
     </filter>
     <circle
-       r="192"
-       cy="192"
-       cx="192"
-       id="path-33" />
+      r="192"
+      cy="192"
+      cx="192"
+      id="path-33"/>
     <radialGradient
-       id="radialGradient-35"
-       r="80.0807862%"
-       fy="85.1796875%"
-       fx="80.8203125%"
-       cy="85.1796875%"
-       cx="80.8203125%">
+      id="radialGradient-35"
+      r="80.0807862%"
+      fy="85.1796875%"
+      fx="80.8203125%"
+      cy="85.1796875%"
+      cx="80.8203125%">
       <stop
-         id="stop155"
-         offset="0%"
-         stop-opacity="0"
-         stop-color="#FFFFFF" />
+        id="stop155"
+        offset="0%"
+        stop-opacity="0"
+        stop-color="#FFFFFF"/>
       <stop
-         id="stop157"
-         offset="100%"
-         stop-opacity="0.1"
-         stop-color="#FFFFFF" />
+        id="stop157"
+        offset="100%"
+        stop-opacity="0.1"
+        stop-color="#FFFFFF"/>
     </radialGradient>
     <circle
-       r="192"
-       cy="192"
-       cx="192"
-       id="path-36" />
+      r="192"
+      cy="192"
+      cx="192"
+      id="path-36"/>
     <filter
-       id="filter-38"
-       filterUnits="objectBoundingBox"
-       height="102.1%"
-       width="102.1%"
-       y="-1.0%"
-       x="-1.0%">
+      id="filter-38"
+      filterUnits="objectBoundingBox"
+      height="102.1%"
+      width="102.1%"
+      y="-1.0%"
+      x="-1.0%">
       <feOffset
-         id="feOffset161"
-         result="shadowOffsetInner1"
-         in="SourceAlpha"
-         dy="8"
-         dx="0" />
+        id="feOffset161"
+        result="shadowOffsetInner1"
+        in="SourceAlpha"
+        dy="8"
+        dx="0"/>
       <feComposite
-         id="feComposite163"
-         result="shadowInnerInner1"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner1" />
+        id="feComposite163"
+        result="shadowInnerInner1"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner1"/>
       <feColorMatrix
-         id="feColorMatrix165"
-         result="shadowMatrixInner1"
-         in="shadowInnerInner1"
-         type="matrix"
-         values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.2 0" />
+        id="feColorMatrix165"
+        result="shadowMatrixInner1"
+        in="shadowInnerInner1"
+        type="matrix"
+        values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.2 0"/>
       <feOffset
-         id="feOffset167"
-         result="shadowOffsetInner2"
-         in="SourceAlpha"
-         dy="-8"
-         dx="0" />
+        id="feOffset167"
+        result="shadowOffsetInner2"
+        in="SourceAlpha"
+        dy="-8"
+        dx="0"/>
       <feComposite
-         id="feComposite169"
-         result="shadowInnerInner2"
-         k3="1"
-         k2="-1"
-         operator="arithmetic"
-         in2="SourceAlpha"
-         in="shadowOffsetInner2" />
+        id="feComposite169"
+        result="shadowInnerInner2"
+        k3="1"
+        k2="-1"
+        operator="arithmetic"
+        in2="SourceAlpha"
+        in="shadowOffsetInner2"/>
       <feColorMatrix
-         id="feColorMatrix171"
-         result="shadowMatrixInner2"
-         in="shadowInnerInner2"
-         type="matrix"
-         values="0 0 0 0 0.417304422   0 0 0 0 0.0251018226   0 0 0 0 0.0251018226  0 0 0 0.2 0" />
+        id="feColorMatrix171"
+        result="shadowMatrixInner2"
+        in="shadowInnerInner2"
+        type="matrix"
+        values="0 0 0 0 0.417304422   0 0 0 0 0.0251018226   0 0 0 0 0.0251018226  0 0 0 0.2 0"/>
       <feMerge
-         id="feMerge177">
+        id="feMerge177">
         <feMergeNode
-           id="feMergeNode173"
-           in="shadowMatrixInner1" />
+          id="feMergeNode173"
+          in="shadowMatrixInner1"/>
         <feMergeNode
-           id="feMergeNode175"
-           in="shadowMatrixInner2" />
+          id="feMergeNode175"
+          in="shadowMatrixInner2"/>
       </feMerge>
     </filter>
   </defs>
   <g
-     fill-rule="evenodd"
-     fill="none"
-     stroke-width="1"
-     stroke="none"
-     id="CONSOLE_ColorTypeIcon">
+    fill-rule="evenodd"
+    fill="none"
+    stroke-width="1"
+    stroke="none"
+    id="CONSOLE_ColorTypeIcon">
     <g
-       filter="url(#filter-1)"
-       id="icon">
+      filter="url(#filter-1)"
+      id="icon">
       <rect
-         height="1024"
-         width="1024"
-         y="0"
-         x="0"
-         id="Rectangle-12" />
+        height="1024"
+        width="1024"
+        y="0"
+        x="0"
+        id="Rectangle-12"/>
       <g
-         transform="translate(505.649122, 505.649122) rotate(-9.000000) translate(-505.649122, -505.649122) translate(105.649122, 105.649122)"
-         id="Window">
+        transform="translate(505.649122, 505.649122) rotate(-9.000000) translate(-505.649122, -505.649122) translate(105.649122, 105.649122)"
+        id="Window">
         <mask
-           fill="white"
-           id="mask-3">
+          fill="white"
+          id="mask-3">
           <use
-             id="use183"
-             xlink:href="#path-2" />
+            id="use183"
+            xlink:href="#path-2"/>
         </mask>
         <use
-           id="use186"
-           xlink:href="#path-2"
-           fill="#5490F8" />
+          id="use186"
+          xlink:href="#path-2"
+          fill="#5490F8"/>
         <rect
-           height="208"
-           width="800"
-           y="368"
-           x="0"
-           mask="url(#mask-3)"
-           fill="#3167C4"
-           id="Rectangle-9" />
+          height="208"
+          width="800"
+          y="368"
+          x="0"
+          mask="url(#mask-3)"
+          fill="#3167C4"
+          id="Rectangle-9"/>
         <rect
-           height="224"
-           width="800"
-           y="144"
-           x="0"
-           mask="url(#mask-3)"
-           fill="#4788F8"
-           id="rect189" />
+          height="224"
+          width="800"
+          y="144"
+          x="0"
+          mask="url(#mask-3)"
+          fill="#4788F8"
+          id="rect189"/>
         <rect
-           height="224"
-           width="800"
-           y="576"
-           x="0"
-           mask="url(#mask-3)"
-           fill="#7EA8F4"
-           id="rect191" />
+          height="224"
+          width="800"
+          y="576"
+          x="0"
+          mask="url(#mask-3)"
+          fill="#7EA8F4"
+          id="rect191"/>
         <rect
-           height="566.8772"
-           width="1059.4684"
-           y="11.5613998"
-           x="21.2658018"
-           transform="translate(551.000000, 295.000000) rotate(45.000000) translate(-551.000000, -295.000000) "
-           mask="url(#mask-3)"
-           fill="url(#radialGradient-4)"
-           id="Rectangle-10" />
+          height="566.8772"
+          width="1059.4684"
+          y="11.5613998"
+          x="21.2658018"
+          transform="translate(551.000000, 295.000000) rotate(45.000000) translate(-551.000000, -295.000000) "
+          mask="url(#mask-3)"
+          fill="url(#radialGradient-4)"
+          id="Rectangle-10"/>
         <g
-           mask="url(#mask-3)"
-           id="optionBar3">
+          mask="url(#mask-3)"
+          id="optionBar3">
           <g
-             id="g215"
-             transform="translate(64.000000, 632.000000)">
+            id="g215"
+            transform="translate(64.000000, 632.000000)">
             <g
-               id="Rectangle-7">
+              id="Rectangle-7">
               <use
-                 id="use194"
-                 xlink:href="#path-5"
-                 fill-rule="evenodd"
-                 fill="#396DC6" />
+                id="use194"
+                xlink:href="#path-5"
+                fill-rule="evenodd"
+                fill="#396DC6"/>
               <use
-                 id="use196"
-                 xlink:href="#path-5"
-                 filter="url(#filter-6)"
-                 fill-opacity="1"
-                 fill="black" />
+                id="use196"
+                xlink:href="#path-5"
+                filter="url(#filter-6)"
+                fill-opacity="1"
+                fill="black"/>
             </g>
             <g
-               id="g203">
+              id="g203">
               <use
-                 id="use199"
-                 xlink:href="#path-7"
-                 fill-rule="evenodd"
-                 fill="#FFFFFF" />
+                id="use199"
+                xlink:href="#path-7"
+                fill-rule="evenodd"
+                fill="#FFFFFF"/>
               <use
-                 id="use201"
-                 xlink:href="#path-7"
-                 filter="url(#filter-8)"
-                 fill-opacity="1"
-                 fill="black" />
+                id="use201"
+                xlink:href="#path-7"
+                filter="url(#filter-8)"
+                fill-opacity="1"
+                fill="black"/>
             </g>
             <g
-               transform="translate(80.000000, 0.000000)"
-               fill-rule="evenodd"
-               stroke-width="1"
-               id="Group">
+              transform="translate(80.000000, 0.000000)"
+              fill-rule="evenodd"
+              stroke-width="1"
+              id="Group">
               <g
-                 id="Oval-4">
+                id="Oval-4">
                 <use
-                   id="use205"
-                   xlink:href="#path-9"
-                   filter="url(#filter-10)"
-                   fill-opacity="1"
-                   fill="black" />
+                  id="use205"
+                  xlink:href="#path-9"
+                  filter="url(#filter-10)"
+                  fill-opacity="1"
+                  fill="black"/>
                 <use
-                   id="use207"
-                   xlink:href="#path-9"
-                   fill-rule="evenodd"
-                   fill="#FFFFFF" />
+                  id="use207"
+                  xlink:href="#path-9"
+                  fill-rule="evenodd"
+                  fill="#FFFFFF"/>
                 <use
-                   id="use209"
-                   xlink:href="#path-9"
-                   filter="url(#filter-11)"
-                   fill-opacity="1"
-                   fill="black" />
+                  id="use209"
+                  xlink:href="#path-9"
+                  filter="url(#filter-11)"
+                  fill-opacity="1"
+                  fill="black"/>
               </g>
               <circle
-                 r="24"
-                 cy="56"
-                 cx="56"
-                 fill="#3F51B5"
-                 id="circle212" />
+                r="24"
+                cy="56"
+                cx="56"
+                fill="#3F51B5"
+                id="circle212"/>
             </g>
           </g>
         </g>
         <g
-           mask="url(#mask-3)"
-           id="optionBar2">
+          mask="url(#mask-3)"
+          id="optionBar2">
           <g
-             id="g242"
-             transform="translate(64.000000, 416.000000)">
+            id="g242"
+            transform="translate(64.000000, 416.000000)">
             <g
-               id="g222">
+              id="g222">
               <use
-                 id="use218"
-                 xlink:href="#path-12"
-                 fill-rule="evenodd"
-                 fill="#0D47A1" />
+                id="use218"
+                xlink:href="#path-12"
+                fill-rule="evenodd"
+                fill="#0D47A1"/>
               <use
-                 id="use220"
-                 xlink:href="#path-12"
-                 filter="url(#filter-13)"
-                 fill-opacity="1"
-                 fill="black" />
+                id="use220"
+                xlink:href="#path-12"
+                filter="url(#filter-13)"
+                fill-opacity="1"
+                fill="black"/>
             </g>
             <g
-               id="g228">
+              id="g228">
               <use
-                 id="use224"
-                 xlink:href="#path-14"
-                 fill-rule="evenodd"
-                 fill="#FFFFFF" />
+                id="use224"
+                xlink:href="#path-14"
+                fill-rule="evenodd"
+                fill="#FFFFFF"/>
               <use
-                 id="use226"
-                 xlink:href="#path-14"
-                 filter="url(#filter-15)"
-                 fill-opacity="1"
-                 fill="black" />
+                id="use226"
+                xlink:href="#path-14"
+                filter="url(#filter-15)"
+                fill-opacity="1"
+                fill="black"/>
             </g>
             <g
-               transform="translate(256.000000, 0.000000)"
-               fill-rule="evenodd"
-               stroke-width="1"
-               id="g240">
+              transform="translate(256.000000, 0.000000)"
+              fill-rule="evenodd"
+              stroke-width="1"
+              id="g240">
               <g
-                 id="g236">
+                id="g236">
                 <use
-                   id="use230"
-                   xlink:href="#path-16"
-                   filter="url(#filter-17)"
-                   fill-opacity="1"
-                   fill="black" />
+                  id="use230"
+                  xlink:href="#path-16"
+                  filter="url(#filter-17)"
+                  fill-opacity="1"
+                  fill="black"/>
                 <use
-                   id="use232"
-                   xlink:href="#path-16"
-                   fill-rule="evenodd"
-                   fill="#FFFFFF" />
+                  id="use232"
+                  xlink:href="#path-16"
+                  fill-rule="evenodd"
+                  fill="#FFFFFF"/>
                 <use
-                   id="use234"
-                   xlink:href="#path-16"
-                   filter="url(#filter-18)"
-                   fill-opacity="1"
-                   fill="black" />
+                  id="use234"
+                  xlink:href="#path-16"
+                  filter="url(#filter-18)"
+                  fill-opacity="1"
+                  fill="black"/>
               </g>
               <circle
-                 r="24"
-                 cy="56"
-                 cx="56"
-                 fill="#2F3FA1"
-                 id="circle238" />
+                r="24"
+                cy="56"
+                cx="56"
+                fill="#2F3FA1"
+                id="circle238"/>
             </g>
           </g>
         </g>
         <g
-           mask="url(#mask-3)"
-           id="optionBar1">
+          mask="url(#mask-3)"
+          id="optionBar1">
           <g
-             id="g269"
-             transform="translate(64.000000, 200.000000)">
+            id="g269"
+            transform="translate(64.000000, 200.000000)">
             <g
-               id="g249">
+              id="g249">
               <use
-                 id="use245"
-                 xlink:href="#path-19"
-                 fill-rule="evenodd"
-                 fill="#3949AB" />
+                id="use245"
+                xlink:href="#path-19"
+                fill-rule="evenodd"
+                fill="#3949AB"/>
               <use
-                 id="use247"
-                 xlink:href="#path-19"
-                 filter="url(#filter-20)"
-                 fill-opacity="1"
-                 fill="black" />
+                id="use247"
+                xlink:href="#path-19"
+                filter="url(#filter-20)"
+                fill-opacity="1"
+                fill="black"/>
             </g>
             <g
-               id="g255">
+              id="g255">
               <use
-                 id="use251"
-                 xlink:href="#path-21"
-                 fill-rule="evenodd"
-                 fill="#FFFFFF" />
+                id="use251"
+                xlink:href="#path-21"
+                fill-rule="evenodd"
+                fill="#FFFFFF"/>
               <use
-                 id="use253"
-                 xlink:href="#path-21"
-                 filter="url(#filter-22)"
-                 fill-opacity="1"
-                 fill="black" />
+                id="use253"
+                xlink:href="#path-21"
+                filter="url(#filter-22)"
+                fill-opacity="1"
+                fill="black"/>
             </g>
             <g
-               transform="translate(432.000000, 0.000000)"
-               fill-rule="evenodd"
-               stroke-width="1"
-               id="g267">
+              transform="translate(432.000000, 0.000000)"
+              fill-rule="evenodd"
+              stroke-width="1"
+              id="g267">
               <g
-                 id="g263">
+                id="g263">
                 <use
-                   id="use257"
-                   xlink:href="#path-23"
-                   filter="url(#filter-24)"
-                   fill-opacity="1"
-                   fill="black" />
+                  id="use257"
+                  xlink:href="#path-23"
+                  filter="url(#filter-24)"
+                  fill-opacity="1"
+                  fill="black"/>
                 <use
-                   id="use259"
-                   xlink:href="#path-23"
-                   fill-rule="evenodd"
-                   fill="#FFFFFF" />
+                  id="use259"
+                  xlink:href="#path-23"
+                  fill-rule="evenodd"
+                  fill="#FFFFFF"/>
                 <use
-                   id="use261"
-                   xlink:href="#path-23"
-                   filter="url(#filter-25)"
-                   fill-opacity="1"
-                   fill="black" />
+                  id="use261"
+                  xlink:href="#path-23"
+                  filter="url(#filter-25)"
+                  fill-opacity="1"
+                  fill="black"/>
               </g>
               <circle
-                 r="24"
-                 cy="56"
-                 cx="56"
-                 fill="#3949AB"
-                 id="circle265" />
+                r="24"
+                cy="56"
+                cx="56"
+                fill="#3949AB"
+                id="circle265"/>
             </g>
           </g>
         </g>
         <g
-           mask="url(#mask-3)"
-           id="TopBar">
+          mask="url(#mask-3)"
+          id="TopBar">
           <g
-             id="g287"
-             transform="translate(-29.000000, -31.000000)">
+            id="g287"
+            transform="translate(-29.000000, -31.000000)">
             <mask
-               fill="white"
-               id="mask-27">
+              fill="white"
+              id="mask-27">
               <use
-                 id="use272"
-                 xlink:href="#path-26" />
+                id="use272"
+                xlink:href="#path-26"/>
             </mask>
             <g
-               fill="none"
-               stroke="none"
-               id="g279">
+              fill="none"
+              stroke="none"
+              id="g279">
               <use
-                 id="use275"
-                 xlink:href="#path-26"
-                 filter="url(#filter-28)"
-                 fill-opacity="1"
-                 fill="black" />
+                id="use275"
+                xlink:href="#path-26"
+                filter="url(#filter-28)"
+                fill-opacity="1"
+                fill="black"/>
               <use
-                 id="use277"
-                 xlink:href="#path-26"
-                 fill-rule="evenodd"
-                 fill="#C6C6C6" />
+                id="use277"
+                xlink:href="#path-26"
+                fill-rule="evenodd"
+                fill="#C6C6C6"/>
             </g>
             <rect
-               height="200"
-               width="48"
-               y="74.6812409"
-               x="164.681241"
-               transform="translate(188.681241, 174.681241) rotate(-45.000000) translate(-188.681241, -174.681241) "
-               mask="url(#mask-27)"
-               fill-rule="evenodd"
-               fill="url(#radialGradient-29)"
-               stroke="none"
-               id="Rectangle-8" />
+              height="200"
+              width="48"
+              y="74.6812409"
+              x="164.681241"
+              transform="translate(188.681241, 174.681241) rotate(-45.000000) translate(-188.681241, -174.681241) "
+              mask="url(#mask-27)"
+              fill-rule="evenodd"
+              fill="url(#radialGradient-29)"
+              stroke="none"
+              id="Rectangle-8"/>
             <rect
-               height="200"
-               width="48"
-               y="74.6812409"
-               x="260.681241"
-               transform="translate(284.681241, 174.681241) rotate(-45.000000) translate(-284.681241, -174.681241) "
-               mask="url(#mask-27)"
-               fill-rule="evenodd"
-               fill="url(#radialGradient-29)"
-               stroke="none"
-               id="rect282" />
+              height="200"
+              width="48"
+              y="74.6812409"
+              x="260.681241"
+              transform="translate(284.681241, 174.681241) rotate(-45.000000) translate(-284.681241, -174.681241) "
+              mask="url(#mask-27)"
+              fill-rule="evenodd"
+              fill="url(#radialGradient-29)"
+              stroke="none"
+              id="rect282"/>
             <circle
-               r="24"
-               cy="103"
-               cx="117"
-               mask="url(#mask-27)"
-               fill-rule="evenodd"
-               fill="#EFEFEF"
-               stroke="none"
-               id="Oval" />
+              r="24"
+              cy="103"
+              cx="117"
+              mask="url(#mask-27)"
+              fill-rule="evenodd"
+              fill="#EFEFEF"
+              stroke="none"
+              id="Oval"/>
             <circle
-               r="24"
-               cy="103"
-               cx="213"
-               mask="url(#mask-27)"
-               fill-rule="evenodd"
-               fill="#EFEFEF"
-               stroke="none"
-               id="circle285" />
+              r="24"
+              cy="103"
+              cx="213"
+              mask="url(#mask-27)"
+              fill-rule="evenodd"
+              fill="#EFEFEF"
+              stroke="none"
+              id="circle285"/>
           </g>
         </g>
         <g
-           mask="url(#mask-3)"
-           id="Window-Copy">
+          mask="url(#mask-3)"
+          id="Window-Copy">
           <use
-             id="use290"
-             xlink:href="#path-31"
-             fill-rule="evenodd"
-             fill="url(#radialGradient-30)" />
+            id="use290"
+            xlink:href="#path-31"
+            fill-rule="evenodd"
+            fill="url(#radialGradient-30)"/>
           <use
-             id="use292"
-             xlink:href="#path-31"
-             filter="url(#filter-32)"
-             fill-opacity="1"
-             fill="black" />
+            id="use292"
+            xlink:href="#path-31"
+            filter="url(#filter-32)"
+            fill-opacity="1"
+            fill="black"/>
         </g>
       </g>
       <g
-         transform="translate(608.000000, 576.000000)"
-         id="Badge">
+        transform="translate(608.000000, 576.000000)"
+        id="Badge">
         <mask
-           fill="white"
-           id="mask-34">
+          fill="white"
+          id="mask-34">
           <use
-             id="use296"
-             xlink:href="#path-33" />
+            id="use296"
+            xlink:href="#path-33"/>
         </mask>
         <use
-           id="use299"
-           xlink:href="#path-33"
-           fill="#DD0031" />
+          id="use299"
+          xlink:href="#path-33"
+          fill="#DD0031"/>
         <rect
-           height="384"
-           width="192"
-           y="0"
-           x="192"
-           mask="url(#mask-34)"
-           fill="#C3002F"
-           id="Rectangle-11" />
+          height="384"
+          width="192"
+          y="0"
+          x="192"
+          mask="url(#mask-34)"
+          fill="#C3002F"
+          id="Rectangle-11"/>
         <rect
-           height="384"
-           width="4"
-           y="0"
-           x="192"
-           mask="url(#mask-34)"
-           fill="#B71C1C"
-           fill-opacity="0.4"
-           id="Rectangle-3" />
+          height="384"
+          width="4"
+          y="0"
+          x="192"
+          mask="url(#mask-34)"
+          fill="#B71C1C"
+          fill-opacity="0.4"
+          id="Rectangle-3"/>
         <path
-           mask="url(#mask-34)"
-           fill-rule="nonzero"
-           fill="#F5F5F5"
-           id="Shape"
-           d="M192.179002,56 L88,296 L126.843373,296 L147.786575,242.298851 L236.213425,242.298851 L257.156627,296 L296,296 L192.179002,56 Z M222.609294,209.195402 L161.748709,209.195402 L192.179002,133.977011 L222.609294,209.195402 Z" />
+          mask="url(#mask-34)"
+          fill-rule="nonzero"
+          fill="#F5F5F5"
+          id="Shape"
+          d="M192.179002,56 L88,296 L126.843373,296 L147.786575,242.298851 L236.213425,242.298851 L257.156627,296 L296,296 L192.179002,56 Z M222.609294,209.195402 L161.748709,209.195402 L192.179002,133.977011 L222.609294,209.195402 Z"/>
         <mask
-           fill="white"
-           id="mask-37">
+          fill="white"
+          id="mask-37">
           <use
-             id="use304"
-             xlink:href="#path-36" />
+            id="use304"
+            xlink:href="#path-36"/>
         </mask>
         <g
-           id="Badge-Copy">
+          id="Badge-Copy">
           <use
-             id="use307"
-             xlink:href="#path-36"
-             fill-rule="evenodd"
-             fill="url(#radialGradient-35)" />
+            id="use307"
+            xlink:href="#path-36"
+            fill-rule="evenodd"
+            fill="url(#radialGradient-35)"/>
           <use
-             id="use309"
-             xlink:href="#path-36"
-             filter="url(#filter-38)"
-             fill-opacity="1"
-             fill="black" />
+            id="use309"
+            xlink:href="#path-36"
+            filter="url(#filter-38)"
+            fill-opacity="1"
+            fill="black"/>
         </g>
       </g>
     </g>
