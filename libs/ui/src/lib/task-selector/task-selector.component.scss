@@ -1,7 +1,7 @@
 .task-list {
   padding: 0;
   overflow: auto;
-  max-height: calc(100% - 52px);
+  max-height: calc(100% - 2 * 52px);
   min-width: calc(100vw - 52px);
 }
 
