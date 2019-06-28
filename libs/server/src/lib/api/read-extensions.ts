@@ -1,24 +1,41 @@
+// Based primarily off of https://github.com/JetBrains/intellij-plugins/blob/17ec63d95e875b5e2459d570821401596b678f0a/AngularJS/resources/org/angularjs/cli/ng-packages.json
 export const EXTENSTIONS: { [key: string]: string } = {
   '@a.grisevich/ng-zorro-antd':
     'An enterprise-class UI components based on Ant Design and Angular',
+  '@alyle/ui': 'Minimal Design, a set of components for Angular',
   '@angular-buddies/prettier':
     'Your buddy who knows how to make your code pretty using Prettier.',
   '@angular-extensions/model':
     'Angular Model - Simple state management with minimalistic API, one way data flow, multiple model support and immutable data exposed as RxJS Observable.',
+  '@angular-material-extensions/core':
+    'Set of components, directives and services to boost the app development with angular material 2',
   '@angular-toolkit/serverless':
     'Angular Universal PWA boilerplate for serverless environment.',
   '@angular/cdk': 'Angular Material Component Development Kit',
   '@angular/elements':
     'Angular - library for using Angular Components as Custom Elements',
+  '@angular/fire': 'The official library for Firebase and Angular',
   '@angular/material': 'Angular Material',
   '@angular/pwa': 'PWA schematics for Angular',
+  '@augury/schematics': 'Schematics for Augury Labs',
+  '@azure/ng-deploy':
+    '@azure/ng-deploy - Deploy Angular apps to Azure using the Angular CLI',
   '@balticcode/ngx-hotkeys': 'An Angular module providing hotkey support.',
+  '@briebug/cypress-schematic': 'Add cypress to an Angular CLI project',
   '@briebug/jest': 'Add jest to an Angular CLI project',
   '@briebug/jest-schematic': 'Add jest to an Angular CLI project',
+  '@briebug/mat-dialog-schematic':
+    'A schematic for generating mat dialog components',
   '@briebug/ngrx-entity-schematic':
     'An Angular schematic for quickly scaffolding NgRx Entities with actions, effects, reducer, model, service, and passing specs.',
+  '@cameltec-ng/schematics': 'A set of schematics for Angular',
+  '@capacitor/angular': 'Schematics for capacitor/angular apps.',
   '@clr/angular': 'Angular components for Clarity',
+  '@css_christianscharr/ngx-build-plus':
+    'Extensible Builder for the Angular CLI suitable not only for Angular Elements.',
   '@datorama/akita': 'State Management Tailored-Made for JS Applications',
+  '@datorama/akita-experimental':
+    'State Management Tailored-Made for JS Applications',
   '@davinkevin/jest':
     'Angular Schematics which add Jest to your original setup',
   '@devoto13/angular-fontawesome': 'Angular Fontawesome, an Angular library',
@@ -31,16 +48,25 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'An essentials schematics for new Angular applications',
   '@gngt/core':
     'Gnucoop Angular Toolkit \u003d\u003d\u003d\u003d\u003d\u003d\u003d',
+  '@ibm-wch-sdk/wrtp': 'A schematics to enable an application for WRTP',
   '@ionic/angular': 'Angular specific wrappers for @ionic/core',
   '@itrulia/jest-schematic': 'Jest schematics for the @angular/cli',
   '@jarmee/schematics': 'A collection of schematics',
+  '@kai1015/serverless':
+    'Angular Universal PWA boilerplate for serverless environment.',
+  '@kamiazya/ngx-speech-recognition':
+    'Angular 5+ speech recognition service (based on browser implementation such as Chrome).',
   '@kentan-official/schematics':
     'Schematics for @kentan-official/core automating creation of sketches',
   '@mace/prettier-schematics': 'Add Prettier to your Angular CLI projects.',
   '@materia/schematics-universal':
     'Add Angular Universal support to your angular cli project',
+  '@momentum-ui/angular':
+    'The Cisco Momentum UI Icons library allows developers to easily incorporate Webex Icons and CSS into any application.',
+  '@mxth/entity': 'Common utilities for entity reducers',
   '@nativescript/schematics': 'Schematics for NativeScript Angular apps.',
   '@nebular/theme': '@nebular/theme',
+  '@netbasal/spectator': 'Angular tests made easy',
   '@ng-bootstrap/schematics':
     'ng-bootstrap schematics collection for angular-cli',
   '@ng-toolkit/firebug': 'Add Firebug lite to your Angular project.',
@@ -51,21 +77,36 @@ export const EXTENSTIONS: { [key: string]: string } = {
   '@ng-toolkit/universal':
     'Adds Angular Universal support for any Angular CLI project',
   '@ngqp/core': 'Synchronizing form controls with the URL for Angular',
+  '@ngrx/data': 'API management for NgRx',
   '@ngrx/effects': 'Side effect model for @ngrx/store',
+  '@ngrx/entity': 'Common utilities for entity reducers',
+  '@ngrx/router-store': 'Bindings to connect @angular/router to @ngrx/store',
+  '@ngrx/schematics': 'NgRx Schematics for Angular',
   '@ngrx/store': 'RxJS powered Redux for Angular apps',
   '@ngrx/store-devtools': 'Developer tools for @ngrx/store',
   '@nguniversal/express-engine':
     'Express Engine for running Server Angular Apps',
+  '@nguniversal/hapi-engine': 'Hapi Engine for running Server Angular Apps',
   '@ngx-formly/schematics':
     'ngx-formly is an Angular 2 module which has a Components to help customize and render JavaScript/JSON configured forms. The formly-form Component and the FormlyConfig service are very powerful and bring unmatched maintainability to your application\u0027s form',
   '@ngx-i18nsupport/tooling':
     'Schematics to add the tooling to be used with the Angular 2 i18n workflow',
-  '@ngx-kit/core':
-    'Toolkit and collection of Schematics for generating UI components',
+  '@ngx-kit/core': 'ngx-kit - core module',
   '@ngx-kit/sula': 'Sula — Angular UI components',
   '@ngxs/schematics': 'NGXS schematics for Angular',
+  '@notadd/ng-material-pro': 'Angular material2 Extension Components ..',
   '@notadd/ng-material2': 'Angular material2 Extension Components ..',
-  '@nrwl/schematics': 'Nrwl Extensions for Angular: Schematics',
+  '@nrwl/angular': 'Angular Plugin for Nx',
+  '@nrwl/cypress': 'Cypress plugin for Nx',
+  '@nrwl/express': 'Express Plugin for Nx',
+  '@nrwl/jest': 'Jest plugin for Nx',
+  '@nrwl/nest': 'Nest Plugin for Nx',
+  '@nrwl/node': 'Node Plugin for Nx',
+  '@nrwl/react': 'React Plugin for Nx',
+  '@nrwl/schematics':
+    'Angular CLI power-ups for modern Web development: Schematics',
+  '@nrwl/web': 'Web Plugin for Nx',
+  '@nrwl/workspace': 'Power-ups for Angular CLI',
   '@nstudio/schematics': 'Cross-platform (xplat) tools for Nx workspaces.',
   '@ockilson/local-schematics':
     'Setup project specific schematics without bundling npm packages',
@@ -74,6 +115,9 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'Setup project specific schematics without bundling npm packages',
   '@ockilson/schematics':
     'Schematic to run through default setup of angular app (very opinionated)',
+  '@oktadev/schematics': 'Schematics for Okta Auth',
+  '@pascaliske/schematics':
+    'Angular schematics collection for integrating setup tools like prettier and storybook.',
   '@paultaku/angular-schematics': 'A blank schematics',
   '@progress/kendo-angular-conversational-ui':
     'Kendo UI for Angular Conversational UI components',
@@ -92,7 +136,8 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'A schematics to add @angular/language-service',
   '@schuchard/prettier': 'An Angular schematic for adding prettier',
   '@slupekdev/vscode':
-    'A schematic to add recommended extensions and configuration to debug an application generated by the Angular CLI.',
+    'Add recommended extensions and configuration to an Angular CLI project',
+  '@supine/sofa': 'Angular sofa',
   '@syncfusion/ej2-angular-base':
     'A common package of Essential JS 2 base Angular libraries, methods and class definitions',
   '@syncfusion/ej2-angular-buttons':
@@ -109,6 +154,9 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'Feature-rich document editor control with built-in support for context menu, options pane and dialogs. for Angular',
   '@syncfusion/ej2-angular-dropdowns':
     'Essential JS 2 DropDown Components for Angular',
+  '@syncfusion/ej2-angular-filemanager':
+    'Essential JS 2 FileManager Component for Angular',
+  '@syncfusion/ej2-angular-gantt': 'Essential JS 2 Gantt Component for Angular',
   '@syncfusion/ej2-angular-grids':
     'Feature-rich JavaScript datagrid (datatable) control with built-in support for editing, filtering, grouping, paging, sorting, and exporting to Excel. for Angular',
   '@syncfusion/ej2-angular-heatmap':
@@ -153,17 +201,25 @@ export const EXTENSTIONS: { [key: string]: string } = {
   '@willh/hmr':
     'Enabling Hot Module Replacement (HMR) feature in your Angular CLI v6 project',
   'angular-fire-schematics': 'AngularFire Schematics',
+  'angular-karma-gwt':
+    'Schematics to update the default karma config file created by the Angluar Cli to integrate jasmine-given and mocha-reporter.',
   'angular-made-with-love':
     '🚀 An experimental project which demonstrates an Angular Package which contains Angular Elements and Schematics',
   'angular-playground':
     'A drop in app module for working on Angular components in isolation (aka Scenario Driven Development).',
   'angular-popper':
     'Popover component for Angular 2+ based on Popper.js library.',
+  'angular-vscode': 'Useful VSCode plugins for Angular Development',
+  'ant-reset-private':
+    'An enterprise-class UI components based on Ant Design and Angular',
   'apollo-angular':
     'Use your GraphQL data in your Angular app, with the Apollo Client',
+  'at-ng': '',
   'bootstrap-schematics': 'Bootstrap Options Schema',
   'devblabla-schem-test2':
     'DevExtreme schematics are workflow tools you can use in an Angular application created with [DevExtreme CLI](https://github.com/devexpress/DevExtreme-CLI) to add DevExtreme libraries or views and perform other DevExtreme-related tasks. Read [this article]',
+  'guozhiqing-momentum':
+    'Momentum is an Angular Schematic developed by the Bottle Rocket Web Team to build best-in-class web applications faster.',
   'hmr-enabled':
     'Enabling Hot Module Replacement (HMR) feature in your Angular CLI v6 project',
   'host-antd':
@@ -172,6 +228,9 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'An enterprise-class UI components based on Ant Design and Angular',
   'igniteui-angular':
     'Ignite UI for Angular is a dependency-free Angular toolkit for building modern web apps',
+  'json-server-schematics':
+    'Angular schematics for adding json-server to an Angular workspace',
+  narik: 'Framework to create angular application',
   'nebular-schematics-test-theme': 'nebular-schematics-test-theme',
   'ng-cli-pug-loader':
     'An schematic to add support for .pug files on Angular projects',
@@ -185,6 +244,8 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'Momentum is an Angular Schematic developed by the Bottle Rocket Web Team to build best-in-class web applications faster.',
   'ng-universal-k8s':
     'Angular schematic to add Kubernetes functionality to Angular Universal',
+  'ng-z-atsale':
+    'An enterprise-class UI components based on Ant Design and Angular',
   'ng-zorro-antd':
     'An enterprise-class UI components based on Ant Design and Angular',
   'ng-zorro-antd-mobile':
@@ -195,22 +256,38 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'An enterprise-class UI components based on Ant Design and Angular',
   'ng-zorro-antd-xinhai':
     'An enterprise-class UI components based on Ant Design and Angular',
+  'ng-zorro-antd-yj':
+    'An enterprise-class UI components based on Ant Design and Angular',
   'ngcli-wallaby': 'A schematic to add wallabyJS config to Angular project',
+  'ngx-agora':
+    'Angular 7 wrapper for Agora RTC client (https://www.agora.io/en/)',
+  'ngx-animated-gradient':
+    'Angular Directive that animated the gradient background',
+  'ngx-auth-firebaseui':
+    'Open Source Library for Angular Web Apps to integrate a material user interface for firebase authentication',
   'ngx-bootstrap': 'Native Angular Bootstrap Components',
+  'ngx-bootstrap-ci': 'Native Angular Bootstrap Components',
   'ngx-bootstrap-th': 'Native Angular Bootstrap Components',
-  'ngx-build-plus':
-    'Extensible Builder for the Angular CLI suitable not only for Angular Elements.',
-  'ngx-weui': 'weui for angular',
+  'ngx-build-modern':
+    'Turnkey solution for differential serving in Angular. Serve fewer bytes -\u003e increase performance',
+  'ngx-build-plus': "Extends the Angular CLI's build process!",
+  'ngx-face-api-js':
+    'Angular directives for face detection and face recognition in the browser. It is a wrapper for face-api.js, so it is not dependent on the browser implementation.',
+  'ngx-onesignal': 'angular 7+ OneSignal Service',
+  'ngx-weui': 'WeUI for angular',
   'primeng-schematics': 'Schematics for Prime NG',
   'puppeteer-schematic':
     'An Angular Schematic to add Chrome Headless instead of PhantomJS',
   'pz-nz-component':
     'An enterprise-class UI components based on Ant Design and Angular',
+  'rocky-schematics': 'rocky-schematics collections for angular-cli',
   'shallow-render-schematics': 'Shallow rendering test utility for Angular',
   'testowa-libka':
     '🚀 An experimental project which demonstrates an Angular Package which contains Angular Elements and Schematics',
   'typewiz-angular':
     'An Angular Schematic that automatically adds types to TypeScript code using [TypeWiz](https://www.npmjs.com/package/typewiz-core)',
+  'ui-jar-schematics':
+    'Schematics that add an ui-jar project in an Angular workspace for making documentation',
   'yang-schematics': 'Yet Another Angular Generator'
 };
 
