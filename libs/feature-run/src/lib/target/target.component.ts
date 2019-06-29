@@ -1,4 +1,4 @@
-import { Project } from '@angular-console/schema';
+import { Architect, Project } from '@angular-console/schema';
 import {
   FlagsComponent,
   TaskRunnerComponent,
@@ -176,7 +176,14 @@ export class TargetComponent implements OnInit {
     this.ngRunDisabled$.next(!e.valid);
   }
 
-  initSourceMapAnsStatsJson() {
-    return { sourceMap: true, statsJson: true };
+  initSourceMapAnsStatsJson(architect: Architect) {
+    const defaultValues = architect.configurations[0].defaultValues;
+    const sourceMap = defaultValues.find(value => value.name === 'sourceMap');
+    const statsJson = defaultValues.find(value => value.name === 'statsJson');
+
+    return {
+      sourceMap: sourceMap ? sourceMap.defaultValue : true,
+      statsJson: statsJson ? statsJson.defaultValue : true
+    };
   }
 }
