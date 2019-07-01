@@ -1,7 +1,7 @@
 <div fxFlex fxLayout="column">
   <div class="content" fxLayout="row" fxFlex>
     <div
-      *ngIf="isElectron || isIntellij"
+      *ngIf="isElectron"
       class="routes-side-nav-container"
       [@growShrink]="sideNavAnimationState$ | async"
     >

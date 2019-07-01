@@ -13,4 +13,5 @@ public interface NgIcons {
   Icon ACTION_TASKS = IconLoader.getIcon("/icons/actions/tasks.svg");
   Icon ACTION_EXTENSIONS = IconLoader.getIcon("/icons/actions/extensions.svg");
   Icon ACTION_CONNECT = IconLoader.getIcon("/icons/actions/connect.svg");
+  Icon ACTION_AFFECTED_PROJECTS = IconLoader.getIcon("/icons/actions/affected_projects.svg");
 }
