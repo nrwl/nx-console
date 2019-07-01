@@ -5,8 +5,8 @@
   <vendor email="frantisek@kolar.pro" url="http://www.nrwl.io/">nrwl</vendor>
   <description>Angular Console for IDEA Editors. The user interface app for the Angular CLI.</description>
 
-
   <depends>JavaScript</depends>
+  <depends>NodeJS</depends>
   <depends>org.jetbrains.plugins.terminal</depends>
   <depends>com.intellij.modules.lang</depends>
   <extensions defaultExtensionNs="com.intellij">
@@ -69,6 +69,14 @@
     </action>
 
     <action class="io.nrwl.ide.console.ui.actions.GoToAction"
+            id="NGConsole.AffectedProjects"
+            text="Affected Projects"
+            description="See which projects are affected by your changes"
+            icon="NgIcons.ACTION_AFFECTED_PROJECTS">
+      <keyboard-shortcut first-keystroke="alt 7" keymap="$default"/>
+    </action>
+
+    <action class="io.nrwl.ide.console.ui.actions.GoToAction"
             id="NGConsole.Settings"
             text="Settings"
             description="Access Angular Console Settings"
@@ -84,6 +92,7 @@
       <reference ref="NGConsole.Tasks"/>
       <reference ref="NGConsole.Extensions"/>
       <separator/>
+      <reference ref="NGConsole.AffectedProjects"/>
       <reference ref="NGConsole.Connect"/>
       <reference ref="NGConsole.Settings"/>
     </group>

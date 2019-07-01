@@ -12,12 +12,14 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Output
+  Output,
+  Inject
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { map, startWith, take } from 'rxjs/operators';
+import { ENVIRONMENT, Environment } from '@angular-console/environment';
 
 export interface Task<T> {
   taskName: string;
@@ -57,12 +59,13 @@ const ANIMATION_MILLIS = 450;
 export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   @Input() taskCollections$: Observable<TaskCollections<T>>;
   @Input() filterPlaceholder: string;
+  filteredTaskCollections$: Observable<TaskCollections<T>>;
 
   @Output() readonly selectionChange = new EventEmitter<T | null>();
 
-  taskFilterFormControl = new FormControl();
-  filteredTaskCollections$: Observable<TaskCollections<T>>;
-  taskAnimationState$ = new Subject<'collapse' | 'expand'>();
+  readonly taskFilterFormControl = new FormControl();
+  readonly taskAnimationState$ = new Subject<'collapse' | 'expand'>();
+  readonly application = this.environment.application;
 
   private readonly contextActionCloseSubscription = this.contextActionService.contextualActions$.subscribe(
     actions => {
@@ -75,7 +78,8 @@ export class TaskSelectorComponent<T> implements OnInit, OnDestroy {
   );
 
   constructor(
-    private readonly contextActionService: ContextualActionBarService
+    private readonly contextActionService: ContextualActionBarService,
+    @Inject(ENVIRONMENT) private readonly environment: Environment
   ) {}
 
   ngOnInit() {

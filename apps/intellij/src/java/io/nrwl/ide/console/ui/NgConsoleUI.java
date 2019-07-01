@@ -41,7 +41,8 @@ public class NgConsoleUI implements Disposable {
     myRouteMapping.put(Route.Workspace.name(), "http://localhost:%s/workspace/%s");
     myRouteMapping.put(Route.Generate.name(), "http://localhost:%s/workspace/%s/generate");
     myRouteMapping.put(Route.Tasks.name(), "http://localhost:%s/workspace/%s/tasks");
-    myRouteMapping.put(Route.Connect.name(), "http://localhost:%s/workspace/%s/connect");
+    myRouteMapping.put(Route.Connect.name(), "http://localhost:%s/connect/support");
+    myRouteMapping.put(Route.AffectedProjects.name(),  "http://localhost:%s/workspace/%s/connect/affected-projects");
     myRouteMapping.put(Route.Extensions.name(), "http://localhost:%s/workspace/%s/extensions");
     myRouteMapping.put(Route.Settings.name(), "http://localhost:%s/workspace/%s/settings");
   }
@@ -140,6 +141,7 @@ public class NgConsoleUI implements Disposable {
     Tasks,
     Extensions,
     Connect,
+    AffectedProjects,
     Settings
   }
 }
