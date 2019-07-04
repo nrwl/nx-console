@@ -73,6 +73,7 @@ public class RPCHandlerListener {
   }
 
 
+  @SuppressWarnings("unchecked")
   public void terminalExec(String serializedObject) {
     JsonObject parsedObj = (JsonObject) new JsonParser().parse(serializedObject);
     String cwd = parsedObj.get("cwd").getAsString();

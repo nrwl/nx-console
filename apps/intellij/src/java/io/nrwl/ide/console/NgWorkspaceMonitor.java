@@ -2,11 +2,11 @@ package io.nrwl.ide.console;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
@@ -34,7 +34,7 @@ import static java.awt.event.KeyEvent.VK_C;
 /**
  * Application based service in order to record currently opened angular workspaces with ability to start
  * NGConsoleServer with first based angular project and close with last one.
- *
+ * <p>
  * We need to make sure we start only one instance of Angular Console server
  */
 public class NgWorkspaceMonitor implements Disposable {
@@ -121,26 +121,33 @@ public class NgWorkspaceMonitor implements Disposable {
    * <p>
    * We dont register tool window with plugin.xml but manually here only when process is up and its
    * angular based project
+   *
+   * <p>
+   *
+   * We are using DumbService to make sure we dont initialize and register ToolWindow while indexing is in progress
+   *
    */
   public void initWebView() {
     myProjects.forEach((name, project) -> {
-      final ToolWindowManagerEx projectTw = (ToolWindowManagerEx) ToolWindowManager.getInstance(project);
 
-      if (!project.isDisposed() && projectTw.getToolWindow(TOOL_WINDOW_ID) == null) {
-        try {
-          NgConsoleUI consoleUI = ServiceManager.getService(project, NgConsoleUI.class);
-          String encodedPath = URLEncoder.encode(project.getBasePath(), StandardCharsets.UTF_8.toString());
+      DumbService.getInstance(project).smartInvokeLater(() -> {
+        final ToolWindowManagerEx projectTw = (ToolWindowManagerEx) ToolWindowManager.getInstance(project);
+        if (!project.isDisposed() && projectTw.getToolWindow(TOOL_WINDOW_ID) == null) {
+          try {
+            NgConsoleUI consoleUI = ServiceManager.getService(project, NgConsoleUI.class);
+            String encodedPath = URLEncoder.encode(project.getBasePath(), StandardCharsets.UTF_8.toString());
 
-          consoleUI.initWebView(NgConsoleUI.Route.Workspace, String.valueOf(myServer.getNodeProcessPort()),
-            encodedPath);
+            consoleUI.initWebView(NgConsoleUI.Route.Workspace, String.valueOf(myServer.getNodeProcessPort()),
+              encodedPath);
 
-          registerToolWindow(project, consoleUI);
-          consoleUI.goToUrl(String.valueOf(myServer.getNodeProcessPort()), encodedPath);
+            registerToolWindow(project, consoleUI);
+            consoleUI.goToUrl(String.valueOf(myServer.getNodeProcessPort()), encodedPath);
 
-        } catch (Exception e) {
-          LOG.error("Problem initWebView when trying to init toolWindow:", e);
+          } catch (Exception e) {
+            LOG.error("Problem initWebView when trying to init toolWindow:", e);
+          }
         }
-      }
+      });
     });
   }
 
@@ -190,37 +197,35 @@ public class NgWorkspaceMonitor implements Disposable {
   private void registerToolWindow(final Project project, final NgConsoleUI consoleUI) {
     final ToolWindowManagerEx projectTw = (ToolWindowManagerEx) ToolWindowManager.getInstance(project);
 
-    ApplicationManager.getApplication().invokeAndWait(() -> {
-      ToolWindow ngToolWindow = projectTw.registerToolWindow(TOOL_WINDOW_ID, false, RIGHT, project,
-        false);
+    ToolWindow ngToolWindow = projectTw.registerToolWindow(TOOL_WINDOW_ID, false, RIGHT, project,
+      false);
 
-      ngToolWindow.setIcon(NgIcons.TOOL_WINDOW);
-      projectTw.hideToolWindow(TOOL_WINDOW_ID, true);
+    ngToolWindow.setIcon(NgIcons.TOOL_WINDOW);
+    projectTw.hideToolWindow(TOOL_WINDOW_ID, true);
 
-      SimpleToolWindowPanel toolWindowContent = consoleUI.getToolWindowContent();
-      ToolWindowEx twEx = (ToolWindowEx) ngToolWindow;
+    SimpleToolWindowPanel toolWindowContent = consoleUI.getToolWindowContent();
+    ToolWindowEx twEx = (ToolWindowEx) ngToolWindow;
 
 
-      /**
-       * To be able to set a width of the ToolWindow dynamically during a startup time to some desired width
-       * we are using the stretchWidth method. It might not be the best solution but we needs to set  minimal
-       * AngularConsole App can fit in.
-       *
-       * Todo: Revisit this once again to see if we need to change this to some other value or make it less hard-coded
-       */
-      int width = twEx.getComponent().getWidth();
+    /**
+     * To be able to set a width of the ToolWindow dynamically during a startup time to some desired width
+     * we are using the stretchWidth method. It might not be the best solution but we needs to set  minimal
+     * AngularConsole App can fit in.
+     *
+     * Todo: Revisit this once again to see if we need to change this to some other value or make it less hard-coded
+     */
+    int width = twEx.getComponent().getWidth();
 
-      ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-      Content cnt = contentFactory.createContent(toolWindowContent, "", false);
-      ngToolWindow.getContentManager().addContent(cnt);
-      ngToolWindow.getContentManager().setSelectedContent(cnt);
-      twEx.stretchWidth(700 - width);
+    ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+    Content cnt = contentFactory.createContent(toolWindowContent, "", false);
+    ngToolWindow.getContentManager().addContent(cnt);
+    ngToolWindow.getContentManager().setSelectedContent(cnt);
+    twEx.stretchWidth(700 - width);
 
-      Keymap activeKeymap = KeymapManager.getInstance().getActiveKeymap();
-      KeyStroke keyStroke = KeyStroke.getKeyStroke(VK_C, CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK,
-        false);
-      activeKeymap.addShortcut(ACTION_ID, new KeyboardShortcut(keyStroke, null));
-    });
+    Keymap activeKeymap = KeymapManager.getInstance().getActiveKeymap();
+    KeyStroke keyStroke = KeyStroke.getKeyStroke(VK_C, CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK,
+      false);
+    activeKeymap.addShortcut(ACTION_ID, new KeyboardShortcut(keyStroke, null));
   }
 
   public NgConsoleServer getServer() {
