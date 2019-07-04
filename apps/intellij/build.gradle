@@ -52,7 +52,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.github.codebrig:journey:0.2.17-offline'
+  compile 'com.github.codebrig:journey:0.2.18-offline'
   testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 

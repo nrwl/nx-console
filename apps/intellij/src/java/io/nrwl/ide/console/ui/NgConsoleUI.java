@@ -19,7 +19,6 @@ import java.util.Map;
  * Main JPanel used for rendering the NGConsoleUI (the WebView). It uses JCEF chromium implementations which is a
  * pretty fast compared JavaFX which I we tried but there is allot of issues with loading svgs, fonts, etcs.
  * <p>
- *
  * Please see https://github.com/CodeBrig/Journey project
  */
 public class NgConsoleUI implements Disposable {
@@ -42,7 +41,7 @@ public class NgConsoleUI implements Disposable {
     myRouteMapping.put(Route.Generate.name(), "http://localhost:%s/workspace/%s/generate");
     myRouteMapping.put(Route.Tasks.name(), "http://localhost:%s/workspace/%s/tasks");
     myRouteMapping.put(Route.Connect.name(), "http://localhost:%s/connect/support");
-    myRouteMapping.put(Route.AffectedProjects.name(),  "http://localhost:%s/workspace/%s/connect/affected-projects");
+    myRouteMapping.put(Route.AffectedProjects.name(), "http://localhost:%s/workspace/%s/connect/affected-projects");
     myRouteMapping.put(Route.Extensions.name(), "http://localhost:%s/workspace/%s/extensions");
     myRouteMapping.put(Route.Settings.name(), "http://localhost:%s/workspace/%s/settings");
   }
@@ -83,10 +82,10 @@ public class NgConsoleUI implements Disposable {
         String url = String.format(myRouteMapping.get(myRoute.name()), (Object[]) params);
 
         LOG.info("Switching to new URL : " + url);
-        myBrowser.getBrowser().loadURL(url);
+        myBrowser.getCefBrowser().loadURL(url);
       });
 
-    myBrowser.getBrowser().reloadIgnoreCache();
+    myBrowser.getCefBrowser().reloadIgnoreCache();
   }
 
 
@@ -100,22 +99,23 @@ public class NgConsoleUI implements Disposable {
         String url = url((Object[]) params);
 
         LOG.info("Switching to new URL : " + url);
-        myBrowser.getBrowser().loadURL(url);
+        myBrowser.getCefBrowser().loadURL(url);
       });
   }
 
 
+  /**
+   *
+   * Executed from NgWorkspaceMonitor inside the DumbService.getInstance(project).runReadActionInSmartMode
+   *
+   */
   private void doInitWebView(final String port, final String path) {
-    ApplicationManager.getApplication()
-      .invokeAndWait(() -> {
-
-        try {
-          myBrowser = new JourneyBrowserView(url(port, path));
-          myPanel.add(myBrowser, BorderLayout.CENTER);
-        } catch (Exception e) {
-          LOG.error("Error while initialing WebView. ", e);
-        }
-      });
+    try {
+      myBrowser = new JourneyBrowserView(url(port, path));
+      myPanel.add(myBrowser, BorderLayout.CENTER);
+    } catch (Exception e) {
+      LOG.error("Error while initialing WebView. ", e);
+    }
   }
 
   public String url(Object... args) {
