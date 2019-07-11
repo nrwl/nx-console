@@ -1,4 +1,10 @@
-import { Event, EventEmitter, TreeDataProvider, TreeItem } from 'vscode';
+import {
+  Event,
+  EventEmitter,
+  TreeDataProvider,
+  TreeItem,
+  ProviderResult
+} from 'vscode';
 
 export abstract class AbstractTreeProvider<Item extends TreeItem>
   implements TreeDataProvider<Item> {
@@ -18,5 +24,5 @@ export abstract class AbstractTreeProvider<Item extends TreeItem>
 
   abstract getParent(element: Item): Item | null | undefined;
 
-  abstract getChildren(element?: Item): Promise<Item[]>;
+  abstract getChildren(element?: Item): ProviderResult<Item[]>;
 }

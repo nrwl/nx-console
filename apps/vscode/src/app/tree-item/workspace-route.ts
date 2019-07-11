@@ -13,7 +13,7 @@ import { Workspace } from './workspace';
 export type WorkspaceRouteTitle =
   | 'Workspaces'
   | 'Projects'
-  | 'Dependency Diagram'
+  | 'Dependency diagram'
   | 'Generate'
   | 'Tasks'
   | 'Connect'
@@ -25,7 +25,7 @@ const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Generate', 'computing.svg'],
   ['Tasks', 'running_process2.svg'],
   ['Extensions', 'plugin.svg'],
-  ['Dependency Diagram', 'affected-projects.svg'],
+  ['Dependency diagram', 'affected-projects.svg'],
   ['Connect', 'Nrwl_ColorIcon.svg'],
   ['Settings', 'gear.svg']
 ]);
@@ -102,7 +102,7 @@ export function getWorkspaceRoute(
       return 'workspaces';
     case 'Connect':
       return 'connect/support';
-    case 'Dependency Diagram':
+    case 'Dependency diagram':
       if (workspacePath) {
         return `workspace/${encodeURIComponent(
           workspacePath
