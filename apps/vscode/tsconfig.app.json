@@ -2,9 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "esnext",
     "moduleResolution": "node",
-    "target": "esnext",
     "removeComments": true,
     "stripInternal": true,
     "types": ["node"]
