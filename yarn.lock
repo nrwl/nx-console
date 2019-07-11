@@ -4493,6 +4493,11 @@ dicer@0.3.0:
   dependencies:
     streamsearch "0.1.2"
 
+didyoumean@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/didyoumean/-/didyoumean-1.2.1.tgz#e92edfdada6537d484d73c0172fd1eba0c4976ff"
+  integrity sha1-6S7f2tplN9SE1zwBcv0eugxJdv8=
+
 diff-sequences@^24.3.0:
   version "24.3.0"
   resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-24.3.0.tgz#0f20e8a1df1abddaf4d9c226680952e64118b975"
@@ -14422,16 +14427,17 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
-vsce@^1.62.0:
-  version "1.62.0"
-  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.62.0.tgz#dbcc241721cb05e1d0ff4bc6eb14f81808d006a8"
-  integrity sha512-KXtPBsdC0K27hmDksINyjoRl9BiuTB+ntmoJEDbbO3GIc+L3wfOclaSy8iYqddnpSA33YDkhKzKXhT0JGzrG/A==
+vsce@^1.65.0:
+  version "1.65.0"
+  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.65.0.tgz#8aa4ef92fdd7f57495e074e54caea404ed29ccb2"
+  integrity sha512-1bGyeoaxjhNVz9fVAqUzGWc1e5CxsxZFpVSnS/anRVyZju0y4DJCPi685WkBsRYU/lfp3AI1smpatuSfb2Lllg==
   dependencies:
     azure-devops-node-api "^7.2.0"
     chalk "^2.4.2"
     cheerio "^1.0.0-rc.1"
     commander "^2.8.1"
     denodeify "^1.2.1"
+    didyoumean "^1.2.1"
     glob "^7.0.6"
     lodash "^4.17.10"
     markdown-it "^8.3.1"

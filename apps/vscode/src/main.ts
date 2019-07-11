@@ -70,7 +70,7 @@ export function activate(context: ExtensionContext) {
           })
           .then(value => {
             if (value && value[0]) {
-              return setAngularWorkspace(context, join(value[0].path, '..'));
+              return setAngularWorkspace(context, join(value[0].fsPath, '..'));
             }
           });
       }

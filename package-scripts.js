@@ -114,7 +114,7 @@ module.exports = {
       server: {
         default: nps.series(
           'nps dev.gen-graphql',
-          'ng build electron --maxWorkers=4 --noSourceMap',
+          'ng build electron --maxWorkers=6 --noSourceMap',
           'nps dev.copy-assets.electron',
           'nps dev.server.start'
         ),
@@ -237,7 +237,7 @@ module.exports = {
         nps.series(
           'nps dev.gen-graphql',
           nps.concurrent({
-            server: 'ng build APPLICATION --prod --maxWorkers=4 --noSourceMap',
+            server: 'ng build APPLICATION --prod --maxWorkers=6 --noSourceMap',
             client: 'ng build angular-console --configuration=APPLICATION'
           })
         )
@@ -247,7 +247,7 @@ module.exports = {
           nps.series(
             'nps dev.gen-graphql',
             nps.concurrent({
-              server: 'ng build APPLICATION --maxWorkers=4',
+              server: 'ng build APPLICATION --maxWorkers=6',
               client: 'ng build angular-console --configuration=APPLICATION'
             })
           )
