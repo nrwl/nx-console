@@ -1,21 +1,18 @@
-import {
-  nodePtyPseudoTerminalFactory,
-  createServerModule,
-  Telemetry
-} from '@angular-console/server';
-import { BrowserWindow, dialog } from 'electron';
+import { createServerModule, Telemetry } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
+import { BrowserWindow, dialog } from 'electron';
+import * as ElectronStore from 'electron-store';
 import * as path from 'path';
+
+import { nodePtyPseudoTerminalFactory } from './pseudo-terminal.factory';
 
 export async function startServer(
   port: number,
   telemetry: Telemetry,
+  store: ElectronStore<any>,
   mainWindow: BrowserWindow
 ) {
   try {
-    const ElectronStore = require('electron-store');
-    const store = new ElectronStore();
-
     const selectDirectory = async (args: any) => {
       const selection = dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory'],

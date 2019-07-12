@@ -8,11 +8,6 @@ export { createServerModule } from './lib/server.module';
 
 export { Telemetry } from './lib/utils/telemetry';
 
-export {
-  PseudoTerminal,
-  PseudoTerminalConfig,
-  PseudoTerminalFactory,
-  nodePtyPseudoTerminalFactory
-} from './lib/api/run-command';
+export * from './lib/api/run-command';
 
 export { SelectDirectory } from './lib/types';

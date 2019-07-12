@@ -1,20 +1,12 @@
-import {
-  Component,
-  Input,
-  ChangeDetectionStrategy,
-  OnDestroy
-} from '@angular/core';
-import {
-  CommandStatus,
-  OpenInBrowserService,
-  ShowItemInFolderService
-} from '@angular-console/utils';
-import { SPEEDS } from './speed-constants';
-import { Subject, BehaviorSubject, combineLatest, ReplaySubject } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
-import { MatSelectChange } from '@angular/material';
-import { GROW_SHRINK_VERT } from '../animations/grow-shink';
 import { Stats } from '@angular-console/schema';
+import { CommandStatus, OpenInBrowserService, ShowItemInFolderService } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
+import { MatSelectChange } from '@angular/material';
+import { BehaviorSubject, combineLatest, ReplaySubject, Subject } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
+
+import { GROW_SHRINK_VERT } from '../animations/grow-shink';
+import { SPEEDS } from './speed-constants';
 
 export interface BuildStatus {
   buildStatus:
@@ -87,10 +79,10 @@ export class BuildStatusComponent implements OnDestroy {
     map(status => (status && status.stats ? status.stats.warnings : null))
   );
 
-  readonly problemsAnimationState$ = combineLatest(
+  readonly problemsAnimationState$ = combineLatest([
     this.errors$,
     this.warnings$
-  ).pipe(
+  ]).pipe(
     map(([es, ws]) => {
       return (es && es.length > 0) || (ws && ws.length > 0)
         ? 'expand'
@@ -151,7 +143,7 @@ export class BuildStatusComponent implements OnDestroy {
     })
   );
 
-  readonly buildStatus$ = combineLatest(this.status$, this.serverUrl$).pipe(
+  readonly buildStatus$ = combineLatest([this.status$, this.serverUrl$]).pipe(
     map(([status, serverUrl]) => {
       if (!status) {
         return 'Idle';
@@ -183,10 +175,10 @@ export class BuildStatusComponent implements OnDestroy {
     }
   });
 
-  readonly currentBundle$ = combineLatest(
+  readonly currentBundle$ = combineLatest([
     this.bundles$,
     this.selectedBundleFile$
-  ).pipe(
+  ]).pipe(
     map(([bundles, selected]) => {
       const c = bundles.find(x => x.file === selected);
       if (c) {
@@ -200,10 +192,10 @@ export class BuildStatusComponent implements OnDestroy {
     })
   );
 
-  readonly modulesForCurrentBundle$ = combineLatest(
+  readonly modulesForCurrentBundle$ = combineLatest([
     this.status$,
     this.selectedBundleFile$
-  ).pipe(
+  ]).pipe(
     map(([status, currentBundle]) => {
       if (!currentBundle || !status) {
         return null;

@@ -1,13 +1,8 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
-import {
-  Settings as SettingsModels,
-  SettingsGQL,
-  UpdateSettingsGQL,
-  Maybe
-} from './generated/graphql';
-import { BehaviorSubject } from 'rxjs';
+import { Maybe, Settings as SettingsModels, SettingsGQL, UpdateSettingsGQL } from './generated/graphql';
 
 export { Settings as SettingsModels } from './generated/graphql';
 
@@ -30,6 +25,7 @@ export class Settings {
     channel: 'latest',
     disableAnimations: true,
     isWsl: false,
+    isWindows: false,
     useNvm: false
   };
 
@@ -107,8 +103,8 @@ export class Settings {
     return this.settings.enableDetailedStatus;
   }
 
-  getChannel() {
-    return this.settings.channel;
+  isWindows() {
+    return this.settings.isWindows;
   }
 
   private readonly disabledAnimationsSubject = new BehaviorSubject<

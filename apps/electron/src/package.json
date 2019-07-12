@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "tmp": "0.1.0",
-    "node-pty-prebuilt": "0.7.6",
+    "node-pty": "0.8.1",
     "source-map-explorer": "1.8.0"
   }
 }

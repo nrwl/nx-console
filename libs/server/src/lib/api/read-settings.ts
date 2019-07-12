@@ -1,10 +1,12 @@
 import { Settings } from '@angular-console/schema';
-import { Store, authUtils } from '@nrwl/angular-console-enterprise-electron';
+import { authUtils, Store } from '@nrwl/angular-console-enterprise-electron';
 import { platform } from 'os';
 import { Subject } from 'rxjs';
 
 export function readSettings(store: Store): Settings {
   const settings: Settings = store.get('settings') || {};
+
+  settings.isWindows = platform() === 'win32';
 
   // tslint:disable-next-line
   if (settings.canCollectData === undefined) {

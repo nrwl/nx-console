@@ -43,6 +43,8 @@ export interface Settings {
 
   isWsl?: Maybe<boolean>;
 
+  isWindows?: Maybe<boolean>;
+
   useNvm?: Maybe<boolean>;
 }
 
@@ -637,6 +639,8 @@ export namespace SettingsResolvers {
 
     isWsl?: IsWslResolver<Maybe<boolean>, TypeParent, Context>;
 
+    isWindows?: IsWindowsResolver<Maybe<boolean>, TypeParent, Context>;
+
     useNvm?: UseNvmResolver<Maybe<boolean>, TypeParent, Context>;
   }
 
@@ -691,6 +695,11 @@ export namespace SettingsResolvers {
     Context
   >;
   export type IsWslResolver<
+    R = Maybe<boolean>,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type IsWindowsResolver<
     R = Maybe<boolean>,
     Parent = any,
     Context = any

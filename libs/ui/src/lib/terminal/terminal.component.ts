@@ -1,13 +1,16 @@
+import { IS_ELECTRON } from '@angular-console/environment';
+import { Settings } from '@angular-console/utils';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  Inject,
   Input,
   NgZone,
   OnDestroy,
   ViewChild,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 import * as FontFaceObserver from 'fontfaceobserver';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -53,6 +56,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   set outChunk(s: string) {
+    console.log(s);
+
     if (!s) {
       return;
     }
@@ -62,6 +67,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
 
   @Input()
   set out(s: string) {
+    console.log(s);
     this.output = s;
     this.writeOutput(s);
   }
@@ -69,8 +75,16 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly terminalFactory: TerminalFactory,
     private readonly elementRef: ElementRef,
+    @Inject(IS_ELECTRON) readonly isElectron: boolean,
+    private readonly settings: Settings,
     private readonly ngZone: NgZone
   ) {
+    console.log(
+      'isWindows',
+      Boolean(
+        !this.isElectron && this.settings.isWindows() && !this.settings.isWsl()
+      )
+    );
     ngZone.runOutsideAngular(() => {
       const robotoMono = new FontFaceObserver('Roboto Mono');
       robotoMono
@@ -79,7 +93,12 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
           this.term.next(
             this.terminalFactory.new({
               ...TERMINAL_CONFIG,
-              fontFamily: 'Roboto Mono'
+              fontFamily: 'Roboto Mono',
+              windowsMode: Boolean(
+                !this.isElectron &&
+                  this.settings.isWindows() &&
+                  !this.settings.isWsl()
+              )
             })
           );
         })
