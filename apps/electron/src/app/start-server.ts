@@ -1,11 +1,9 @@
-import {
-  nodePtyPseudoTerminalFactory,
-  createServerModule,
-  Telemetry
-} from '@angular-console/server';
-import { BrowserWindow, dialog } from 'electron';
+import { createServerModule, Telemetry } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
+import { BrowserWindow, dialog } from 'electron';
 import * as path from 'path';
+
+import { nodePtyPseudoTerminalFactory } from './pseudo-terminal.factory';
 
 export async function startServer(
   port: number,

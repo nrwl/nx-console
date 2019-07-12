@@ -10,7 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "ij-rpc-client": "^0.3.2",
-    "node-pty-prebuilt": "0.7.6",
     "source-map-explorer": "1.8.0"
   }
 }

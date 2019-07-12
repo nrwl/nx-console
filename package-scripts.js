@@ -27,15 +27,6 @@ const ELECTRON_BUNDLE_PATH = join('dist', 'apps', 'electron');
 const APPLICATION_BUNDLE_PATH = join('dist', 'apps', 'APPLICATION');
 
 const assetMappings = {
-  'node-pty-prebuilt': {
-    from: join('tools', 'win', 'node-pty-prebuilt', 'build', 'Release'),
-    to: join(
-      APPLICATION_BUNDLE_PATH,
-      'node_modules',
-      'node-pty-prebuilt',
-      'build'
-    )
-  },
   'extensions-schema': {
     from: join(
       './node_modules',
@@ -82,13 +73,7 @@ module.exports = {
             'new-workspace'
           )}`
         ),
-        vscode: nps.series(
-          'nps dev.copy-assets-base.vscode',
-          `shx rm -rf ${assetMappings['node-pty-prebuilt'].to}]`,
-          `shx cp -rf ${assetMappings['node-pty-prebuilt'].from} ${
-            assetMappings['node-pty-prebuilt'].to
-          }`.replace(/APPLICATION/g, 'vscode')
-        )
+        vscode: nps.series('nps dev.copy-assets-base.vscode')
       },
       'copy-assets-base': forEachApplication(
         nps.concurrent({

@@ -79,7 +79,9 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
           this.term.next(
             this.terminalFactory.new({
               ...TERMINAL_CONFIG,
-              fontFamily: 'Roboto Mono'
+              fontFamily: 'Roboto Mono',
+              // TODO: windowsMode: Boolean(isWindows && !isWsl)
+              windowsMode: true
             })
           );
         })
