@@ -1,8 +1,10 @@
+import { CommandRunner, CommandStatus } from '@angular-console/utils';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { CommandOutputComponent } from './command-output.component';
-import { UiModule } from '../ui.module';
-import { CommandStatus, CommandRunner } from '@angular-console/utils';
+import { ApolloModule } from 'apollo-angular';
+
 import { TerminalFactory } from '../terminal/terminal.factory';
+import { UiModule } from '../ui.module';
+import { CommandOutputComponent } from './command-output.component';
 
 describe('CommandOutputComponent', () => {
   let component: CommandOutputComponent;
@@ -23,7 +25,7 @@ describe('CommandOutputComponent', () => {
       stopCommandViaCtrlC: jest.fn()
     };
     TestBed.configureTestingModule({
-      imports: [UiModule],
+      imports: [UiModule, ApolloModule],
       providers: [
         { provide: CommandRunner, useValue: mockCommandRunner },
         {

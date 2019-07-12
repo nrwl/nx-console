@@ -1,18 +1,28 @@
+import { IS_ELECTRON } from '@angular-console/environment';
+import { FADE_IN } from '@angular-console/ui';
 import {
   CommandRunner,
   Settings,
   toggleItemInArray
 } from '@angular-console/utils';
 import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger
+} from '@angular/animations';
+import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   Inject,
-  OnDestroy
+  OnDestroy,
+  OnInit
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
-import { combineLatest, Observable, of, Subject } from 'rxjs';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
+import { combineLatest, Observable, of, ReplaySubject } from 'rxjs';
 import {
   catchError,
   filter,
@@ -31,22 +41,12 @@ import {
   WorkspaceSchematicsGQL
 } from '../generated/graphql';
 import {
-  ProjectAction,
+  createLinkForTask,
   createLinksForCollection,
   isDefinedProjectAction,
-  createLinkForTask,
+  ProjectAction,
   SCHEMATIC_COLLECTION_ERROR_RESPONSE
 } from './projects.constants';
-import { IS_ELECTRON } from '@angular-console/environment';
-import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import {
-  trigger,
-  state,
-  transition,
-  animate,
-  style
-} from '@angular/animations';
-import { FADE_IN } from '@angular-console/ui';
 
 const ACTION_BAR_HEIGHT_PX = 52;
 
@@ -90,7 +90,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     })
   );
 
-  readonly animationState = new Subject<'reveal' | 'hide'>();
+  readonly animationState = new ReplaySubject<'reveal' | 'hide'>();
 
   workspacePath: string;
   pinnedProjectNames: string[];

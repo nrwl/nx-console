@@ -1,6 +1,5 @@
 <div class="container">
   <div fxLayout="column" fxLayoutGap="16px">
-    <h3>General settings</h3>
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
       <div fxFlex>
         <h4 mat-line>Send anonymous usage data</h4>
@@ -14,28 +13,6 @@
         [checked]="settings.canCollectData()"
       ></mat-slide-toggle>
     </div>
-    <div fxLayout="row wrap" fxFill fxLayoutAlign="start top">
-      <div fxFlex>
-        <h4 mat-line>Auto Update Channel</h4>
-        <p mat-line>
-          Try new features before everyone else by switching to the beta and
-          alpha channels.
-        </p>
-      </div>
-
-      <mat-form-field appearance="outline" floatLabel="auto">
-        <mat-select
-          (selectionChange)="settings.setChannel($event.value)"
-          [value]="settings.getChannel()"
-        >
-          <mat-option value="latest"> Latest </mat-option>
-          <mat-option value="beta">Beta </mat-option>
-          <mat-option value="alpha"> Alpha </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <h3>Features</h3>
     <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
       <div fxFlex>
         <h4 mat-line>Disable Animations</h4>
@@ -58,9 +35,14 @@
         [checked]="settings.enableDetailedStatus()"
       ></mat-slide-toggle>
     </div>
-    <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
+    <div
+      *ngIf="settings.isWindows()"
+      fxLayout="row wrap"
+      fxFill
+      fxLayoutAlign="start center"
+    >
       <div fxFlex>
-        <h4 mat-line>Use WSL (Windows users only)</h4>
+        <h4 mat-line>Use WSL</h4>
         <p mat-line>Runs tasks using WSL</p>
       </div>
       <mat-slide-toggle
@@ -68,9 +50,14 @@
         [checked]="settings.isWsl()"
       ></mat-slide-toggle>
     </div>
-    <div fxLayout="row wrap" fxFill fxLayoutAlign="start center">
+    <div
+      *ngIf="!settings.isWindows() || settings.isWsl()"
+      fxLayout="row wrap"
+      fxFill
+      fxLayoutAlign="start center"
+    >
       <div fxFlex>
-        <h4 mat-line>Use NVM (Supports OS X, Linux and WSL)</h4>
+        <h4 mat-line>Use NVM</h4>
         <p mat-line>Runs tasks using Node Version Manager</p>
       </div>
       <mat-slide-toggle

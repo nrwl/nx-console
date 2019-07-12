@@ -1,47 +1,128 @@
 import {
-  nodePtyPseudoTerminalFactory as win32PseudoTerminalFactory,
   PseudoTerminal,
   PseudoTerminalConfig,
-  PseudoTerminalFactory
+  PseudoTerminalFactory,
+  readSettings
 } from '@angular-console/server';
-import { ExtensionContext, window } from 'vscode';
 import { platform } from 'os';
+import { ExtensionContext, Terminal, window } from 'vscode';
 
-const AC_SUCCESS = 'Process completed 🙏';
-const AC_FAILURE = 'Process failed 🐳';
+import { getStoreForContext } from './start-server';
 
 export function getPseudoTerminalFactory(
   context: ExtensionContext
 ): PseudoTerminalFactory {
+  const store = getStoreForContext(context);
+
   return config => {
     if (platform() === 'win32') {
-      return win32PseudoTerminalFactory(config);
+      const isWsl = readSettings(store).isWsl;
+      if (isWsl) {
+        return wslPseudoTerminalFactory(context, config);
+      } else {
+        return win32PseudoTerminalFactory(context, config);
+      }
     }
     return unixPseudoTerminalFactory(context, config);
   };
+}
+
+// TODO: Handle WSL Mode
+function win32PseudoTerminalFactory(
+  context: ExtensionContext,
+  { name, program, args, cwd, displayCommand }: PseudoTerminalConfig
+): PseudoTerminal {
+  const successMessage = 'Process completed #woot';
+  const failureMessage = 'Process failed #failwhale';
+  const fullCommand = [
+    `Try {`,
+    `& '${program}' ${args.join(' ')};`,
+    `if($?) { echo '\n\r${successMessage}' };`,
+    `if(!$?) { echo '\n\r${failureMessage}' };`,
+    `} Catch { `,
+    `echo '\n\r${failureMessage}'`,
+    `}`
+  ].join(' ');
+
+  const terminal = window.createTerminal({
+    name,
+    cwd,
+    shellPath: 'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
+    shellArgs: `-Sta -NoLogo -NonInteractive -C "& {${fullCommand}}"`
+  });
+
+  return renderVsCodeTerminal(
+    context,
+    terminal,
+    displayCommand,
+    successMessage,
+    failureMessage
+  );
+}
+
+function wslPseudoTerminalFactory(
+  context: ExtensionContext,
+  { name, program, args, cwd, displayCommand }: PseudoTerminalConfig
+): PseudoTerminal {
+  const successMessage = 'Process completed #woot';
+  const failureMessage = 'Process failed #failwhale';
+  const fullCommand =
+    `${program} ${args.join(' ')} && echo "\n\r${successMessage}"` +
+    ` || echo "\n\r${failureMessage}"`;
+
+  const terminal = window.createTerminal({
+    name,
+    cwd,
+    shellPath: 'C:\\Windows\\System32\\wsl.exe',
+    shellArgs: ['-e', 'bash', '-l', '-i', '-c', fullCommand]
+  });
+
+  return renderVsCodeTerminal(
+    context,
+    terminal,
+    displayCommand,
+    successMessage,
+    failureMessage
+  );
 }
 
 function unixPseudoTerminalFactory(
   context: ExtensionContext,
   { name, program, args, cwd, displayCommand }: PseudoTerminalConfig
 ): PseudoTerminal {
+  const successMessage = 'Process completed 🙏';
+  const failureMessage = 'Process failed 🐳';
   const fullCommand =
-    `cd ${cwd} &&` +
-    `${program} ${args.join(' ')} && echo "\n\r${AC_SUCCESS}"` +
-    ` || echo "\n\r${AC_FAILURE}"`;
+    `${program} ${args.join(' ')} && echo "\n\r${successMessage}"` +
+    ` || echo "\n\r${failureMessage}"`;
 
-  const terminal = window.createTerminal(name, '/bin/bash', [
-    '-c',
-    fullCommand
-  ]);
+  const terminal = window.createTerminal({
+    name,
+    cwd,
+    shellPath: '/bin/bash',
+    shellArgs: ['-c', fullCommand]
+  });
 
+  return renderVsCodeTerminal(
+    context,
+    terminal,
+    displayCommand,
+    successMessage,
+    failureMessage
+  );
+}
+
+function renderVsCodeTerminal(
+  context: ExtensionContext,
+  terminal: Terminal,
+  displayCommand: string,
+  successMessage: string,
+  failureMessage: string
+): PseudoTerminal {
   context.subscriptions.push(terminal);
-
-  terminal.sendText(fullCommand);
 
   let onDidWriteData: ((data: string) => void) | undefined;
   let onExit: ((code: number) => void) | undefined;
-  let whaleSpotted = false;
 
   const disposeTerminal = (code: number) => {
     onDidWriteData = undefined;
@@ -54,38 +135,16 @@ function unixPseudoTerminalFactory(
 
   context.subscriptions.push(
     (<any>terminal).onDidWriteData((data: string) => {
-      // Skip printing fullCommand to the pseudo terminal since parts of the
-      // command are for internal use only. The last printed character of
-      // fullCommand is 🐳.so we watch for the first whale sighting before
-      // calling onDidWriteData.
-      if (!whaleSpotted) {
-        if (data.includes('🐳')) {
-          whaleSpotted = true;
-          if (onDidWriteData) {
-            onDidWriteData(`${displayCommand}\n\n\r`);
-          }
-        }
-        return;
-      }
-
       if (onDidWriteData) {
         onDidWriteData(data);
       }
 
-      // Screen scrape for AC_SUCCESS or AC_FAILURE as the signal that the
+      // Screen scrape for successMessage or failureMessage as the signal that the
       // process has exited.
-      const success = data.includes(AC_SUCCESS);
-      const failed = data.includes(AC_FAILURE);
+      const success = data.includes(successMessage);
+      const failed = data.includes(failureMessage);
       if (success || failed) {
         disposeTerminal(success ? 0 : 1);
-      }
-    })
-  );
-
-  context.subscriptions.push(
-    window.onDidCloseTerminal(t => {
-      if (t.processId === terminal.processId) {
-        disposeTerminal(1);
       }
     })
   );
@@ -93,11 +152,15 @@ function unixPseudoTerminalFactory(
   return {
     onDidWriteData: callback => {
       onDidWriteData = callback;
+      callback(`${displayCommand}\n\n\r`);
     },
     onExit: callback => {
       onExit = callback;
     },
     kill: () => {
+      if (onDidWriteData) {
+        onDidWriteData(`\r\n${failureMessage}`);
+      }
       disposeTerminal(1);
     },
     setCols: () => {

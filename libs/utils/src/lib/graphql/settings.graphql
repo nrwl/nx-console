@@ -1,6 +1,7 @@
 query Settings {
   settings {
     isWsl
+    isWindows
     useNvm
     canCollectData
     installNodeManually
