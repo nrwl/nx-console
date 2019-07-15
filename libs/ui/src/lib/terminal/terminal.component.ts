@@ -15,11 +15,10 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { Terminal } from 'xterm';
+import { fit } from 'xterm/lib/addons/fit/fit';
 
 import { TerminalFactory } from './terminal.factory';
 
-const SCROLL_BAR_WIDTH = 36;
-const MIN_TERMINAL_WIDTH = 80;
 const TERMINAL_CONFIG = {
   disableStdin: true,
   fontSize: 14,
@@ -45,7 +44,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   private readonly term = new ReplaySubject<Terminal>();
   private resizeObserver?: ResizeObserver;
 
-  @ViewChild('code', { read: ElementRef, static: false })
+  @ViewChild('code', { read: ElementRef, static: true })
   private readonly code: ElementRef;
 
   currentCols = new BehaviorSubject<number>(80);
@@ -69,7 +68,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
 
   constructor(
     private readonly terminalFactory: TerminalFactory,
-    private readonly elementRef: ElementRef,
     private readonly settings: Settings,
     private readonly ngZone: NgZone
   ) {
@@ -99,21 +97,14 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   parentElement: HTMLElement;
   ngAfterViewInit(): void {
     this.ngZone.runOutsideAngular(() => {
-      const nativeElement = this.elementRef.nativeElement as HTMLElement;
-      this.parentElement = nativeElement.parentElement || nativeElement;
       this.term.pipe(first()).subscribe(term => {
-        this.resizeTerminalSubject.asObservable().subscribe(() => {
-          this.resizeTerminal(term);
-        });
-        this.resizeTerminalSubject.next();
-
         term.open(this.code.nativeElement);
 
         this.resizeObserver = new ResizeObserver(() => {
-          this.resizeTerminalSubject.next();
+          fit(term);
         });
 
-        this.resizeObserver.observe(this.parentElement);
+        this.resizeObserver.observe(this.code.nativeElement);
       });
     });
   }
@@ -141,27 +132,5 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
     this.term.pipe(first()).subscribe(term => {
       term.reset();
     });
-  }
-
-  private resizeTerminal(term: Terminal) {
-    const renderer = (term as any)._core.renderer;
-    if (!renderer) {
-      return;
-    }
-
-    const height = this.parentElement.clientHeight;
-    const width = this.parentElement.clientWidth - SCROLL_BAR_WIDTH;
-
-    const cols = Math.max(
-      MIN_TERMINAL_WIDTH,
-      Math.floor(width / renderer.dimensions.actualCellWidth)
-    );
-    const rows = Math.floor(height / renderer.dimensions.actualCellHeight);
-
-    // If dimensions did not change, no need to reset.
-    if (term.cols !== cols || term.rows !== rows) {
-      term.resize(cols, rows);
-      this.currentCols.next(cols);
-    }
   }
 }
