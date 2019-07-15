@@ -226,6 +226,7 @@ type Settings {
   workspaceSchematicsNpmScript: String
   recent: [WorkspaceDefinition!]!
   isWsl: Boolean
+  isWindows: Boolean
   useNvm: Boolean
 }
 

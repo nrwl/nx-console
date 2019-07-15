@@ -1,10 +1,5 @@
 @import '../../../../ui/src/lib/variables';
 
-h3 {
-  color: mat-color($grey-dark);
-  font-weight: 100;
-}
-
 h4 {
   font-weight: 600;
   color: mat-color($grey-darker);
@@ -27,6 +22,7 @@ mat-form-field {
 .container {
   margin-left: auto;
   margin-right: auto;
+  margin-top: 24px;
 
   // Set the max-width to an absoulte value to avoid a weird layout on even wider screens
   max-width: 840px;
@@ -34,7 +30,7 @@ mat-form-field {
   @media (max-width: $smallScreen) {
     width: auto;
     max-width: initial;
-    margin-left: 40px;
-    margin-right: 40px;
+    margin-left: 24px;
+    margin-right: 24px;
   }
 }

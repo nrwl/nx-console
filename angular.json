@@ -170,11 +170,7 @@
           },
           "configurations": {
             "production": {
-              "externalDependencies": [
-                "vscode",
-                "source-map-explorer",
-                "node-pty-prebuilt"
-              ],
+              "externalDependencies": ["vscode", "source-map-explorer"],
               "sourceMap": false,
               "optimization": true,
               "extractLicenses": true,
@@ -224,7 +220,7 @@
                 "electron",
                 "source-map-explorer",
                 "tmp",
-                "node-pty-prebuilt"
+                "node-pty"
               ],
               "sourceMap": false,
               "optimization": true,
@@ -271,11 +267,7 @@
               "optimization": true,
               "extractLicenses": true,
               "sourceMap": false,
-              "externalDependencies": [
-                "source-map-explorer",
-                "ij-rpc-client",
-                "node-pty-prebuilt"
-              ],
+              "externalDependencies": ["source-map-explorer", "ij-rpc-client"],
               "fileReplacements": [
                 {
                   "replace": "apps/intellij/src/environments/environment.ts",

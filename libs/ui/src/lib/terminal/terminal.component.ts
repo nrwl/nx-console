@@ -1,3 +1,4 @@
+import { Settings } from '@angular-console/utils';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -69,6 +70,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly terminalFactory: TerminalFactory,
     private readonly elementRef: ElementRef,
+    private readonly settings: Settings,
     private readonly ngZone: NgZone
   ) {
     ngZone.runOutsideAngular(() => {
@@ -79,7 +81,10 @@ export class TerminalComponent implements AfterViewInit, OnDestroy {
           this.term.next(
             this.terminalFactory.new({
               ...TERMINAL_CONFIG,
-              fontFamily: 'Roboto Mono'
+              fontFamily: 'Roboto Mono',
+              windowsMode: Boolean(
+                this.settings.isWindows() && !this.settings.isWsl()
+              )
             })
           );
         })

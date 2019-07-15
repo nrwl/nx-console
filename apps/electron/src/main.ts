@@ -5,17 +5,19 @@ import {
   Telemetry
 } from '@angular-console/server';
 import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
+import * as ElectronStore from 'electron-store';
 import { autoUpdater } from 'electron-updater';
 import { statSync } from 'fs';
-import * as path from 'path';
 import { platform } from 'os';
+import * as path from 'path';
+
 import { startServer } from './app/start-server';
 
 const fixPath = require('fix-path');
 const getPort = require('get-port');
 
-let store: any;
-let telemetry: Telemetry;
+const store = new ElectronStore();
+const telemetry = new Telemetry(store);
 
 export let mainWindow: BrowserWindow;
 
@@ -112,7 +114,7 @@ function createMenu() {
 
 function createWindow() {
   try {
-    const bounds = JSON.parse(store.get('windowBounds'));
+    const bounds = JSON.parse(store.get('windowBounds') as string);
     mainWindow = new BrowserWindow({
       width: bounds.width,
       height: bounds.height,
@@ -134,7 +136,7 @@ function createWindow() {
 
   getPort({ port: 7777 }).then((port: number) => {
     try {
-      startServer(port, telemetry, mainWindow).then(() => {
+      startServer(port, telemetry, store, mainWindow).then(() => {
         if (fileExists(path.join(currentDirectory, 'angular.json'))) {
           mainWindow.loadURL(
             `http://localhost:${port}/workspace/${encodeURIComponent(
@@ -248,10 +250,6 @@ function saveWindowInfo() {
   }
 }
 
-const Store = require('electron-store');
-store = new Store();
-telemetry = new Telemetry(store);
-
 app.on('ready', async () => {
   if (process.argv[2] === '--server') {
     let port;
@@ -260,7 +258,7 @@ app.on('ready', async () => {
     } else {
       port = await getPort({ port: 8888 });
     }
-    startServer(port, telemetry, mainWindow);
+    startServer(port, telemetry, store, mainWindow);
   } else {
     setupEvents();
     telemetry.reportLifecycleEvent('StartSession');
