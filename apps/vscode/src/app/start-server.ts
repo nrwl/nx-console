@@ -1,23 +1,16 @@
-import { commands, ExtensionContext, window } from 'vscode';
 import {
   createServerModule,
-  SelectDirectory,
-  QueryResolver
+  QueryResolver,
+  SelectDirectory
 } from '@angular-console/server';
-import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 import { NestFactory } from '@nestjs/core';
 import * as path from 'path';
+import { commands, ExtensionContext, window } from 'vscode';
+
+import { getStoreForContext } from './get-store-for-context';
+import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 
 const getPort = require('get-port'); // tslint:disable-line
-
-export function getStoreForContext(context: ExtensionContext) {
-  return {
-    get: (key: string, defaultValue: any) =>
-      context.globalState.get(key) || defaultValue,
-    set: (key: string, value: any) => context.globalState.update(key, value),
-    delete: (key: string) => context.globalState.update(key, undefined)
-  };
-}
 
 export async function startServer(
   context: ExtensionContext,
@@ -104,7 +97,7 @@ export async function startServer(
   const app = await NestFactory.create(createServerModule(exports, providers), {
     cors: true
   });
-  app.useStaticAssets(assetsPath);
+  (app as any).useStaticAssets(assetsPath);
 
   return await app.listen(port, () => {
     console.log(`Listening on port ${port}`);

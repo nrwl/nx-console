@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CdkTreeModule } from '@angular/cdk/tree';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -40,16 +41,15 @@ import { ContextualActionBarComponent } from './contextual-action-bar/contextual
 import { DataCollectionComponent } from './data-collection/data-collection.component';
 import { EntityDocsComponent } from './entity-docs/entity-docs.component';
 import { FlagsComponent } from './flags/flags.component';
+import { FormatFileSizePipe } from './format-file-size.pipe';
+import { ModulesGraphComponent } from './modules-graph/modules-graph.component';
 import { NormalizePathPipe } from './normalize-path.pipe';
 import { SchematicFieldsComponent } from './schematic-fields/schematic-fields.component';
 import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
-import { TestStatusComponent } from './test-status/test-status.component';
 import { TerminalFactory } from './terminal/terminal.factory';
-import { ScrollingModule } from '@angular/cdk/scrolling';
-import { FormatFileSizePipe } from './format-file-size.pipe';
-import { ModulesGraphComponent } from './modules-graph/modules-graph.component';
+import { TestStatusComponent } from './test-status/test-status.component';
 
 const IMPORTS = [
   HttpClientModule,
@@ -121,7 +121,6 @@ export class UiModule {
     private readonly domSanitizer: DomSanitizer
   ) {
     this.addIcon('toggle_on', 'baseline-toggle_on-24px.svg');
-    this.addIcon('toggle_off', 'baseline-toggle_off-24px.svg');
     this.addIcon('finder', 'finder.svg');
     this.addIcon('explorer', 'explorer.svg');
     this.addIcon('vscode', 'vscode.svg');

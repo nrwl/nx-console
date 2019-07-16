@@ -1,31 +1,12 @@
 import { Architect, Project } from '@angular-console/schema';
-import {
-  FlagsComponent,
-  TaskRunnerComponent,
-  CommandOutputComponent
-} from '@angular-console/ui';
-import {
-  IncrementalCommandOutput,
-  CommandRunner,
-  Serializer
-} from '@angular-console/utils';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { CommandOutputComponent, FlagsComponent, TaskRunnerComponent } from '@angular-console/ui';
+import { CommandRunner, IncrementalCommandOutput, Serializer } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import {
-  map,
-  publishReplay,
-  refCount,
-  switchMap,
-  tap,
-  withLatestFrom
-} from 'rxjs/operators';
+import { map, publishReplay, refCount, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+
 import { ProjectsGQL, RunNgGQL } from '../generated/graphql';
 
 @Component({
@@ -176,8 +157,10 @@ export class TargetComponent implements OnInit {
     this.ngRunDisabled$.next(!e.valid);
   }
 
-  initSourceMapAnsStatsJson(architect: Architect) {
-    const defaultValues = architect.configurations[0].defaultValues;
+  initSourceMapAndStatsJson(architect: Architect) {
+    const defaultValues = architect.configurations[0]
+      ? architect.configurations[0].defaultValues
+      : [];
     const sourceMap = defaultValues.find(value => value.name === 'sourceMap');
     const statsJson = defaultValues.find(value => value.name === 'statsJson');
 

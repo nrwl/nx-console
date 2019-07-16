@@ -7,7 +7,7 @@
     [options]="project.architect[0].options"
     [prefix]="getPrefix(project.architect[0].name, project.name)"
     [fields]="project.architect[0].schema"
-    [init]="initSourceMapAnsStatsJson(project.architect[0])"
+    [init]="initSourceMapAndStatsJson(project.architect[0])"
     [runSyntax]="runSyntax(project.architect[0].name)"
     (value)="onFlagsChange($event)"
     (action)="onRun()"

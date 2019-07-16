@@ -1,9 +1,7 @@
 <mat-toolbar
   class="title-bar"
   color="primary"
-  *ngIf="
-    isElectron || (contextualActions$ | async) || (isConnectSupport$ | async)
-  "
+  *ngIf="isElectron || (contextualActions$ | async)"
   @growShrink
   [class.actionable]="contextualActions$ | async"
 >
@@ -86,7 +84,7 @@
               >
                 <img
                   height="24px"
-                  [src]="'/assets/' + option.image + '.png'"
+                  [src]="'/assets/external-programs' + option.image + '.png'"
                   *ngIf="option.image"
                 />
                 <span>{{ option.name }}</span>

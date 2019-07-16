@@ -56,7 +56,7 @@ describe('CommandOutputComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should kill running commands via ctrl-c', () => {
+  xit('should kill running commands via ctrl-c', () => {
     component.commandResponse = {
       id: 'commandId',
       out: '',

@@ -2,9 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
-    "target": "es2015",
+    "target": "es2019",
     "removeComments": true,
     "stripInternal": true,
     "importHelpers": true,
