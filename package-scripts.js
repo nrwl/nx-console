@@ -99,7 +99,7 @@ module.exports = {
       server: {
         default: nps.series(
           'nps dev.gen-graphql',
-          'ng build electron --maxWorkers=2 --noSourceMap',
+          'ng build electron --maxWorkers=4 --noSourceMap',
           'nps dev.copy-assets.electron',
           'nps dev.server.start'
         ),
