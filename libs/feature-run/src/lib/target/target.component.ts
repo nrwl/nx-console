@@ -1,11 +1,31 @@
 import { Architect, Project } from '@angular-console/schema';
-import { CommandOutputComponent, FlagsComponent, TaskRunnerComponent } from '@angular-console/ui';
-import { CommandRunner, IncrementalCommandOutput, Serializer } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  CommandOutputComponent,
+  FlagsComponent,
+  TaskRunnerComponent
+} from '@angular-console/ui';
+import {
+  CommandRunner,
+  IncrementalCommandOutput,
+  Serializer
+} from '@angular-console/utils';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { map, publishReplay, refCount, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import {
+  map,
+  publishReplay,
+  refCount,
+  switchMap,
+  tap,
+  withLatestFrom
+} from 'rxjs/operators';
 
 import { ProjectsGQL, RunNgGQL } from '../generated/graphql';
 
@@ -158,6 +178,10 @@ export class TargetComponent implements OnInit {
   }
 
   initSourceMapAndStatsJson(architect: Architect) {
+    if (architect.name !== 'build') {
+      return;
+    }
+
     const defaultValues = architect.configurations[0]
       ? architect.configurations[0].defaultValues
       : [];
