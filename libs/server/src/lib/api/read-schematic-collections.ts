@@ -1,3 +1,4 @@
+import { Schematic, SchematicCollection } from '@angular-console/schema';
 import * as path from 'path';
 
 import {
@@ -8,7 +9,6 @@ import {
   normalizeSchema,
   readJsonFile
 } from '../utils/utils';
-import { Schematic, SchematicCollection } from '@angular-console/schema';
 
 export function readAllSchematicCollections(
   basedir: string,
@@ -164,7 +164,7 @@ function readCollectionSchematics(
           name: k,
           collection: collectionName,
           schema: normalizeSchema(schematicSchema.json, projectDefaults),
-          description: v.description,
+          description: v.description || '',
           npmClient: null,
           npmScript: null
         });

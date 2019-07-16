@@ -92,14 +92,10 @@ export async function startServer(
     { provide: 'showNotification', useValue: showNotification }
   ];
 
-  console.log('starting server on port', port);
-
   const app = await NestFactory.create(createServerModule(exports, providers), {
     cors: true
   });
-  (app as any).useStaticAssets(assetsPath);
+  app.useStaticAssets(assetsPath);
 
-  return await app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-  });
+  return await app.listen(port, () => {});
 }

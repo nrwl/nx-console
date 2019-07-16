@@ -76,12 +76,12 @@ export class Docs implements DocsProvider {
         try {
           return callback(d).pipe(
             catchError(e => {
-              console.log(`error`, e.message);
+              console.error(`error`, e.message);
               return [];
             })
           );
         } catch (e) {
-          console.log(`error`, e.message);
+          console.error(`error`, e.message);
           return of([]);
         }
       }),

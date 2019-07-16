@@ -1,12 +1,9 @@
 import { readFileSync } from 'fs';
-import { gzipSync } from 'zlib';
 import { join } from 'path';
 import { ls } from 'shelljs';
+import { gzipSync } from 'zlib';
 
 import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
-
-// @ts-ignore
-import * as exploreSourceMap from 'source-map-explorer';
 
 export interface Module {
   file: string;
@@ -85,7 +82,9 @@ export function generateStats(
       bundles.push({ file: asset, sizes });
 
       try {
-        const sourceMapData = exploreSourceMap(join(outputPath, asset));
+        const sourceMapData = require('source-map-explorer')(
+          join(outputPath, asset)
+        );
 
         Object.keys(sourceMapData.files).forEach(_file => {
           const size = sourceMapData.files[_file];
@@ -210,7 +209,6 @@ function getAssets(p: string, earliestTimeStamp: number) {
 }
 
 function parseSizeFromBuildOutput(s: string) {
-  console.log(s);
   const matched = s.match(/([\d.]+)\s*(kb|b|mb)/i);
   if (matched) {
     const x = Number(matched[1]);
