@@ -1,12 +1,12 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { ls } from 'shelljs';
+// @ts-ignore
 import * as exploreSourceMap from 'source-map-explorer';
 import { gzipSync } from 'zlib';
 
 import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
 
-// @ts-ignore
 export interface Module {
   file: string;
   size: string;
