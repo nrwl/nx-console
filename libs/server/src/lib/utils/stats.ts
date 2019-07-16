@@ -1,10 +1,12 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { ls } from 'shelljs';
+import * as exploreSourceMap from 'source-map-explorer';
 import { gzipSync } from 'zlib';
 
 import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
 
+// @ts-ignore
 export interface Module {
   file: string;
   size: string;
@@ -82,9 +84,7 @@ export function generateStats(
       bundles.push({ file: asset, sizes });
 
       try {
-        const sourceMapData = require('source-map-explorer')(
-          join(outputPath, asset)
-        );
+        const sourceMapData = exploreSourceMap(join(outputPath, asset));
 
         Object.keys(sourceMapData.files).forEach(_file => {
           const size = sourceMapData.files[_file];

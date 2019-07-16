@@ -11,7 +11,7 @@ export const commands = new Commands(5, 15);
 export function runCommand(
   type: string,
   cwd: string,
-  programName: string,
+  displayCommand: string,
   program: string,
   cmds: string[],
   pseudoTerminalFactory: PseudoTerminalFactory,
@@ -21,22 +21,21 @@ export function runCommand(
   const workspace =
     type === 'new' ? null : readJsonFile('./package.json', cwd).json.name;
   const id = `${program} ${cmds.join(' ')} ${commandRunIndex++}`;
-  let command = `${programName} ${cmds.join(' ')}`;
 
   const supportsNVM = fileUtils.isWsl()
     ? fileUtils.wslSupportsNvm()
     : Boolean(process.env.NVM_DIR);
 
-  // We currently don't suppor the windows implementation of NVM.
+  // We currently don't support the windows implementation of NVM.
   if (supportsNVM && fileUtils.useNvm()) {
-    command = `nvm exec ${command}`;
-    cmds = ['exec', program, ...cmds];
+    displayCommand = `nvm exec -- ${displayCommand}`;
+    cmds = ['exec', '--', program, ...cmds];
     program = 'nvm';
   }
 
   const factory = () => {
     const commandRunning = pseudoTerminalFactory({
-      displayCommand: command,
+      displayCommand: displayCommand,
       name: id,
       program,
       args: normalizeCommands(cwd, cmds),
@@ -58,7 +57,7 @@ export function runCommand(
     type,
     id,
     workspace,
-    command,
+    displayCommand,
     factory,
     statusCalculator,
     addToRecent
