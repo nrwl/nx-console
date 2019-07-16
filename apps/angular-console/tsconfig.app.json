@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "es2015",
+    "module": "esnext",
     "types": []
   },
   "exclude": ["src/test.ts", "**/*.spec.ts"],

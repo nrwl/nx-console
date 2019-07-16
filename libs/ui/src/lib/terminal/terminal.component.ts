@@ -34,10 +34,7 @@ const TERMINAL_CONFIG = {
   selector: 'ui-terminal',
   templateUrl: './terminal.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: [
-    'terminal.component.scss',
-    '../../../../../node_modules/xterm/dist/xterm.css'
-  ]
+  styleUrls: ['terminal.component.scss']
 })
 export class TerminalComponent implements AfterViewInit, OnDestroy {
   private output = '';

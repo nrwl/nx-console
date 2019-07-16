@@ -7,7 +7,7 @@ import {
 import { platform } from 'os';
 import { ExtensionContext, Terminal, window } from 'vscode';
 
-import { getStoreForContext } from './start-server';
+import { getStoreForContext } from './get-store-for-context';
 
 export function getPseudoTerminalFactory(
   context: ExtensionContext

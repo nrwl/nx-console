@@ -129,7 +129,11 @@ module.exports = {
         },
         package: {
           ...forEachApplication(
-            nps.series.nps('prepare.APPLICATION', 'package.APPLICATION')
+            nps.series.nps(
+              'clean',
+              'prepare.APPLICATION',
+              'package.APPLICATION'
+            )
           )
         }
       },
@@ -166,7 +170,20 @@ module.exports = {
       ),
       electronWin: nps.series(electronBuilder('--win', 'never')),
       vscode: nps.series(
+        `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*-es5.js')}`,
+        `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.md')}`,
+        `shx rm -rf ${join(
+          'dist',
+          'apps',
+          'vscode',
+          'assets',
+          'public',
+          'assets',
+          'external-programs'
+        )}`,
+
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
+
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
       ),
       intellij: `node ${join('tools', 'scripts', 'intellij-package.js')}`
@@ -244,7 +261,7 @@ module.exports = {
       affected: affected('test')
     },
     'install-dependencies': {
-      vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
+      vscode: ``,
       electron: `node ${join('tools', 'scripts', 'electron-yarn.js')}`,
       intellij: `node ${join('tools', 'scripts', 'intellij-yarn.js')}`
     }

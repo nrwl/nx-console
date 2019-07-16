@@ -1,10 +1,7 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
 import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 
-import {
-  WorkspaceRoute,
-  WorkspaceRouteTitle
-} from './tree-item/workspace-route';
+import { WorkspaceRoute, WorkspaceRouteTitle } from './tree-item/workspace-route';
 
 let webviewPanel: WebviewPanel | undefined;
 
@@ -61,7 +58,6 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
 
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="icon" type="image/x-icon" href="favicon.ico" />
-      <link rel="stylesheet" type="text/css" href="assets/xterm.css" />
       <link rel="stylesheet" href="styles.css">
       <style>
         html,
