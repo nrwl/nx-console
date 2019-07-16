@@ -2,6 +2,7 @@ import { createServerModule, Telemetry } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { BrowserWindow, dialog } from 'electron';
+import { static as staticAssets } from 'express';
 import * as path from 'path';
 
 import { nodePtyPseudoTerminalFactory } from './pseudo-terminal.factory';
@@ -63,7 +64,8 @@ export async function startServer(
     const app = await NestFactory.create(
       createServerModule(exports, providers)
     );
-    app.useStaticAssets(assetsPath);
+    app.use(staticAssets(assetsPath));
+
     return await app.listen(port, () => {
       console.log(`Listening on port ${port}`);
     });
