@@ -31,7 +31,7 @@ export class MutationResolver {
       return runCommand(
         'add',
         p,
-        `ng add ${name}`,
+        'ng',
         this.fileUtils.findClosestNg(p),
         ['add', name, '--no-interactive'],
         this.pseudoTerminalFactory,
@@ -54,7 +54,7 @@ export class MutationResolver {
       return runCommand(
         'new',
         p,
-        `new-workspace --collection=${collection} ${newCommand.join(' ')}`,
+        'new-workspace',
         path.join(
           __dirname,
           'assets',
@@ -89,7 +89,7 @@ export class MutationResolver {
       return runCommand(
         'generate',
         p,
-        `ng generate ${[...genCommand, ...dryRun].join(' ')}`,
+        'ng',
         this.fileUtils.findClosestNg(p),
         ['generate', ...genCommand, ...dryRun, '--no-interactive'],
         this.pseudoTerminalFactory,
@@ -116,7 +116,7 @@ export class MutationResolver {
       return runCommand(
         'npm',
         p,
-        `${npmClient} ${[...genCommand, ...dryRun].join(' ')}`,
+        npmClient,
         this.fileUtils.findExecutable(npmClient, p),
         [...genCommand, ...dryRun, '--no-interactive'],
         this.pseudoTerminalFactory,
@@ -135,9 +135,9 @@ export class MutationResolver {
       return runCommand(
         'ng',
         p,
-        `ng ${rc.join(' ')}`,
-        'node',
-        ['--max-old-space-size=4048', this.fileUtils.findClosestNg(p), ...rc],
+        'ng',
+        this.fileUtils.findClosestNg(p),
+        rc,
         this.pseudoTerminalFactory,
         this.fileUtils
       );
@@ -157,7 +157,7 @@ export class MutationResolver {
       return runCommand(
         'npm',
         p,
-        `${npmClient} ${rc.join(' ')}`,
+        npmClient,
         this.fileUtils.findExecutable(npmClient, p),
         rc,
         this.pseudoTerminalFactory,
