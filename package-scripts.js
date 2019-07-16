@@ -171,7 +171,6 @@ module.exports = {
       electronWin: nps.series(electronBuilder('--win', 'never')),
       vscode: nps.series(
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*-es5.js')}`,
-        `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.md')}`,
         `shx rm -rf ${join(
           'dist',
           'apps',
@@ -249,8 +248,9 @@ module.exports = {
           nps.series(
             'nps dev.gen-graphql',
             nps.concurrent({
-              server: 'ng build APPLICATION --maxWorkers=2',
-              client: 'ng build angular-console --configuration=APPLICATION'
+              server: 'ng build APPLICATION --watch',
+              client:
+                'ng build angular-console --configuration=APPLICATION --watch --aot=false --buildOptimizer=false'
             })
           )
         )

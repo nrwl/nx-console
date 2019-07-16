@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { existsSync, statSync, readdirSync, readFileSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
 
@@ -208,7 +208,7 @@ export function normalizeSchema(
         res.push({
           name: k,
           type: String(v.type || 'string'),
-          description: v.description,
+          description: v.description || '',
           defaultValue: workspaceDefault === undefined ? d : workspaceDefault,
           required: Boolean(r),
           positional: Boolean(isPositional(v)),

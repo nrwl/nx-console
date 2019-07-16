@@ -21,7 +21,7 @@ import { TerminalFactory } from './terminal.factory';
 
 const TERMINAL_CONFIG = {
   disableStdin: true,
-  fontSize: 14,
+  fontSize: (window as any).TERMINAL_FONT_SIZE || 14,
   enableBold: true,
   cursorBlink: false,
   theme: {

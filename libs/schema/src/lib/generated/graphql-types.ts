@@ -462,24 +462,24 @@ export interface OpenDocMutationArgs {
 
 import { GraphQLResolveInfo } from 'graphql';
 
-export type Resolver<Result, Parent = {}, TContext = {}, Args = {}> = (
+export type Resolver<Result, Parent = {}, Context = {}, Args = {}> = (
   parent: Parent,
   args: Args,
-  context: TContext,
+  context: Context,
   info: GraphQLResolveInfo
 ) => Promise<Result> | Result;
 
-export interface ISubscriptionResolverObject<Result, Parent, TContext, Args> {
+export interface ISubscriptionResolverObject<Result, Parent, Context, Args> {
   subscribe<R = Result, P = Parent>(
     parent: P,
     args: Args,
-    context: TContext,
+    context: Context,
     info: GraphQLResolveInfo
   ): AsyncIterator<R | Result> | Promise<AsyncIterator<R | Result>>;
   resolve?<R = Result, P = Parent>(
     parent: P,
     args: Args,
-    context: TContext,
+    context: Context,
     info: GraphQLResolveInfo
   ): R | Result | Promise<R | Result>;
 }
@@ -487,17 +487,17 @@ export interface ISubscriptionResolverObject<Result, Parent, TContext, Args> {
 export type SubscriptionResolver<
   Result,
   Parent = {},
-  TContext = {},
+  Context = {},
   Args = {}
 > =
   | ((
       ...args: any[]
-    ) => ISubscriptionResolverObject<Result, Parent, TContext, Args>)
-  | ISubscriptionResolverObject<Result, Parent, TContext, Args>;
+    ) => ISubscriptionResolverObject<Result, Parent, Context, Args>)
+  | ISubscriptionResolverObject<Result, Parent, Context, Args>;
 
-export type TypeResolveFn<Types, Parent = {}, TContext = {}> = (
+export type TypeResolveFn<Types, Parent = {}, Context = {}> = (
   parent: Parent,
-  context: TContext,
+  context: Context,
   info: GraphQLResolveInfo
 ) => Maybe<Types>;
 
@@ -512,63 +512,64 @@ export type DirectiveResolverFn<TResult, TArgs = {}, TContext = {}> = (
 ) => TResult | Promise<TResult>;
 
 export namespace QueryResolvers {
-  export interface Resolvers<TContext = any, TypeParent = {}> {
-    settings?: SettingsResolver<any, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = {}> {
+    settings?: SettingsResolver<any, TypeParent, Context>;
 
     schematicCollections?: SchematicCollectionsResolver<
       any[],
       TypeParent,
-      TContext
+      Context
     >;
 
-    workspace?: WorkspaceResolver<any, TypeParent, TContext>;
+    workspace?: WorkspaceResolver<any, TypeParent, Context>;
 
-    editors?: EditorsResolver<any[], TypeParent, TContext>;
+    editors?: EditorsResolver<any[], TypeParent, Context>;
 
     availableExtensions?: AvailableExtensionsResolver<
       any[],
       TypeParent,
-      TContext
+      Context
     >;
 
     isNodejsInstalled?: IsNodejsInstalledResolver<
       Maybe<any>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    commands?: CommandsResolver<any[], TypeParent, TContext>;
+    commands?: CommandsResolver<any[], TypeParent, Context>;
   }
 
-  export type SettingsResolver<R = any, Parent = {}, TContext = any> = Resolver<
+  export type SettingsResolver<R = any, Parent = {}, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type SchematicCollectionsResolver<
     R = any[],
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type WorkspaceResolver<
-    R = any,
-    Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, WorkspaceArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type WorkspaceResolver<R = any, Parent = {}, Context = any> = Resolver<
+    R,
+    Parent,
+    Context,
+    WorkspaceArgs
+  >;
   export interface WorkspaceArgs {
     path: string;
   }
 
-  export type EditorsResolver<
-    R = any[],
-    Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+  export type EditorsResolver<R = any[], Parent = {}, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type AvailableExtensionsResolver<
     R = any[],
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, AvailableExtensionsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, AvailableExtensionsArgs>;
   export interface AvailableExtensionsArgs {
     name?: Maybe<string>;
   }
@@ -576,13 +577,13 @@ export namespace QueryResolvers {
   export type IsNodejsInstalledResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type CommandsResolver<
     R = any[],
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, CommandsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, CommandsArgs>;
   export interface CommandsArgs {
     id?: Maybe<string>;
 
@@ -591,306 +592,306 @@ export namespace QueryResolvers {
 }
 
 export namespace SettingsResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    canCollectData?: CanCollectDataResolver<boolean, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    canCollectData?: CanCollectDataResolver<boolean, TypeParent, Context>;
 
-    isConnectUser?: IsConnectUserResolver<Maybe<boolean>, TypeParent, TContext>;
+    isConnectUser?: IsConnectUserResolver<Maybe<boolean>, TypeParent, Context>;
 
     disableAnimations?: DisableAnimationsResolver<
       Maybe<boolean>,
       TypeParent,
-      TContext
+      Context
     >;
 
     showSupportPlugin?: ShowSupportPluginResolver<
       Maybe<boolean>,
       TypeParent,
-      TContext
+      Context
     >;
 
     installNodeManually?: InstallNodeManuallyResolver<
       Maybe<boolean>,
       TypeParent,
-      TContext
+      Context
     >;
 
     enableDetailedStatus?: EnableDetailedStatusResolver<
       Maybe<boolean>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    channel?: ChannelResolver<Maybe<string>, TypeParent, TContext>;
+    channel?: ChannelResolver<Maybe<string>, TypeParent, Context>;
 
     workspaceSchematicsDirectory?: WorkspaceSchematicsDirectoryResolver<
       Maybe<string>,
       TypeParent,
-      TContext
+      Context
     >;
 
     workspaceSchematicsNpmScript?: WorkspaceSchematicsNpmScriptResolver<
       Maybe<string>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    recent?: RecentResolver<any[], TypeParent, TContext>;
+    recent?: RecentResolver<any[], TypeParent, Context>;
 
-    isWsl?: IsWslResolver<Maybe<boolean>, TypeParent, TContext>;
+    isWsl?: IsWslResolver<Maybe<boolean>, TypeParent, Context>;
 
-    isWindows?: IsWindowsResolver<Maybe<boolean>, TypeParent, TContext>;
+    isWindows?: IsWindowsResolver<Maybe<boolean>, TypeParent, Context>;
 
-    useNvm?: UseNvmResolver<Maybe<boolean>, TypeParent, TContext>;
+    useNvm?: UseNvmResolver<Maybe<boolean>, TypeParent, Context>;
   }
 
   export type CanCollectDataResolver<
     R = boolean,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type IsConnectUserResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type DisableAnimationsResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type ShowSupportPluginResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type InstallNodeManuallyResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type EnableDetailedStatusResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type ChannelResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type WorkspaceSchematicsDirectoryResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type WorkspaceSchematicsNpmScriptResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type RecentResolver<
-    R = any[],
-    Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type RecentResolver<R = any[], Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type IsWslResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type IsWindowsResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type UseNvmResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace WorkspaceDefinitionResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    path?: PathResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    path?: PathResolver<string, TypeParent, Context>;
 
-    name?: NameResolver<string, TypeParent, TContext>;
+    name?: NameResolver<string, TypeParent, Context>;
 
-    favorite?: FavoriteResolver<Maybe<boolean>, TypeParent, TContext>;
+    favorite?: FavoriteResolver<Maybe<boolean>, TypeParent, Context>;
 
     pinnedProjectNames?: PinnedProjectNamesResolver<
       string[],
       TypeParent,
-      TContext
+      Context
     >;
   }
 
-  export type PathResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type FavoriteResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type PinnedProjectNamesResolver<
     R = string[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace SchematicCollectionForNgNewResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    description?: DescriptionResolver<string, TypeParent, TContext>;
+    description?: DescriptionResolver<string, TypeParent, Context>;
 
-    schema?: SchemaResolver<any[], TypeParent, TContext>;
+    schema?: SchemaResolver<any[], TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type DescriptionResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type SchemaResolver<
-    R = any[],
-    Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type SchemaResolver<R = any[], Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace SchemaResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    type?: TypeResolver<string, TypeParent, TContext>;
+    type?: TypeResolver<string, TypeParent, Context>;
 
-    description?: DescriptionResolver<string, TypeParent, TContext>;
+    description?: DescriptionResolver<string, TypeParent, Context>;
 
-    defaultValue?: DefaultValueResolver<Maybe<string>, TypeParent, TContext>;
+    defaultValue?: DefaultValueResolver<Maybe<string>, TypeParent, Context>;
 
-    important?: ImportantResolver<Maybe<boolean>, TypeParent, TContext>;
+    important?: ImportantResolver<Maybe<boolean>, TypeParent, Context>;
 
-    completion?: CompletionResolver<Maybe<string>, TypeParent, TContext>;
+    completion?: CompletionResolver<Maybe<string>, TypeParent, Context>;
 
-    required?: RequiredResolver<boolean, TypeParent, TContext>;
+    required?: RequiredResolver<boolean, TypeParent, Context>;
 
-    positional?: PositionalResolver<boolean, TypeParent, TContext>;
+    positional?: PositionalResolver<boolean, TypeParent, Context>;
 
-    enum?: EnumResolver<Maybe<string[]>, TypeParent, TContext>;
+    enum?: EnumResolver<Maybe<string[]>, TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
-  export type TypeResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type TypeResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type DescriptionResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type DefaultValueResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type ImportantResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type CompletionResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type RequiredResolver<
     R = boolean,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type PositionalResolver<
     R = boolean,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type EnumResolver<
     R = Maybe<string[]>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace WorkspaceResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    path?: PathResolver<string, TypeParent, TContext>;
+    path?: PathResolver<string, TypeParent, Context>;
 
-    dependencies?: DependenciesResolver<any[], TypeParent, TContext>;
+    dependencies?: DependenciesResolver<any[], TypeParent, Context>;
 
-    extensions?: ExtensionsResolver<any[], TypeParent, TContext>;
+    extensions?: ExtensionsResolver<any[], TypeParent, Context>;
 
     schematicCollections?: SchematicCollectionsResolver<
       any[],
       TypeParent,
-      TContext
+      Context
     >;
 
-    npmScripts?: NpmScriptsResolver<any[], TypeParent, TContext>;
+    npmScripts?: NpmScriptsResolver<any[], TypeParent, Context>;
 
-    projects?: ProjectsResolver<any[], TypeParent, TContext>;
+    projects?: ProjectsResolver<any[], TypeParent, Context>;
 
-    docs?: DocsResolver<any, TypeParent, TContext>;
+    docs?: DocsResolver<any, TypeParent, Context>;
 
-    completions?: CompletionsResolver<Maybe<any>, TypeParent, TContext>;
+    completions?: CompletionsResolver<Maybe<any>, TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
-  export type PathResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type PathResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type DependenciesResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type ExtensionsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type SchematicCollectionsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, SchematicCollectionsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, SchematicCollectionsArgs>;
   export interface SchematicCollectionsArgs {
     name?: Maybe<string>;
   }
@@ -898,8 +899,8 @@ export namespace WorkspaceResolvers {
   export type NpmScriptsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, NpmScriptsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, NpmScriptsArgs>;
   export interface NpmScriptsArgs {
     name?: Maybe<string>;
   }
@@ -907,208 +908,208 @@ export namespace WorkspaceResolvers {
   export type ProjectsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, ProjectsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, ProjectsArgs>;
   export interface ProjectsArgs {
     name?: Maybe<string>;
   }
 
-  export type DocsResolver<R = any, Parent = any, TContext = any> = Resolver<
+  export type DocsResolver<R = any, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type CompletionsResolver<
     R = Maybe<any>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace DependenciesResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    version?: VersionResolver<string, TypeParent, TContext>;
+    version?: VersionResolver<string, TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type VersionResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace ExtensionResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    description?: DescriptionResolver<string, TypeParent, TContext>;
+    description?: DescriptionResolver<string, TypeParent, Context>;
 
     detailedDescription?: DetailedDescriptionResolver<
       Maybe<string>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    installed?: InstalledResolver<Maybe<boolean>, TypeParent, TContext>;
+    installed?: InstalledResolver<Maybe<boolean>, TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type DescriptionResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type DetailedDescriptionResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type InstalledResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace SchematicCollectionResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    schematics?: SchematicsResolver<any[], TypeParent, TContext>;
+    schematics?: SchematicsResolver<any[], TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type SchematicsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, SchematicsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, SchematicsArgs>;
   export interface SchematicsArgs {
     name?: Maybe<string>;
   }
 }
 
 export namespace SchematicResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    collection?: CollectionResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    collection?: CollectionResolver<string, TypeParent, Context>;
 
-    name?: NameResolver<string, TypeParent, TContext>;
+    name?: NameResolver<string, TypeParent, Context>;
 
-    description?: DescriptionResolver<string, TypeParent, TContext>;
+    description?: DescriptionResolver<string, TypeParent, Context>;
 
-    npmClient?: NpmClientResolver<Maybe<string>, TypeParent, TContext>;
+    npmClient?: NpmClientResolver<Maybe<string>, TypeParent, Context>;
 
-    npmScript?: NpmScriptResolver<Maybe<string>, TypeParent, TContext>;
+    npmScript?: NpmScriptResolver<Maybe<string>, TypeParent, Context>;
 
-    schema?: SchemaResolver<any[], TypeParent, TContext>;
+    schema?: SchemaResolver<any[], TypeParent, Context>;
   }
 
   export type CollectionResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type DescriptionResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type NpmClientResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type NpmScriptResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type SchemaResolver<
-    R = any[],
-    Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type SchemaResolver<R = any[], Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace NpmScriptResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    npmClient?: NpmClientResolver<Maybe<string>, TypeParent, TContext>;
+    npmClient?: NpmClientResolver<Maybe<string>, TypeParent, Context>;
 
-    schema?: SchemaResolver<any[], TypeParent, TContext>;
+    schema?: SchemaResolver<any[], TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type NpmClientResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type SchemaResolver<
-    R = any[],
-    Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type SchemaResolver<R = any[], Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace ProjectResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    root?: RootResolver<string, TypeParent, TContext>;
+    root?: RootResolver<string, TypeParent, Context>;
 
-    projectType?: ProjectTypeResolver<string, TypeParent, TContext>;
+    projectType?: ProjectTypeResolver<string, TypeParent, Context>;
 
-    architect?: ArchitectResolver<any[], TypeParent, TContext>;
+    architect?: ArchitectResolver<any[], TypeParent, Context>;
 
-    recentActions?: RecentActionsResolver<any[], TypeParent, TContext>;
+    recentActions?: RecentActionsResolver<any[], TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
-  export type RootResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type RootResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type ProjectTypeResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type ArchitectResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, ArchitectArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, ArchitectArgs>;
   export interface ArchitectArgs {
     name?: Maybe<string>;
   }
@@ -1116,150 +1117,150 @@ export namespace ProjectResolvers {
   export type RecentActionsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace ArchitectResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    project?: ProjectResolver<string, TypeParent, TContext>;
+    project?: ProjectResolver<string, TypeParent, Context>;
 
-    builder?: BuilderResolver<string, TypeParent, TContext>;
+    builder?: BuilderResolver<string, TypeParent, Context>;
 
-    description?: DescriptionResolver<string, TypeParent, TContext>;
+    description?: DescriptionResolver<string, TypeParent, Context>;
 
-    options?: OptionsResolver<any, TypeParent, TContext>;
+    options?: OptionsResolver<any, TypeParent, Context>;
 
-    configurations?: ConfigurationsResolver<any[], TypeParent, TContext>;
+    configurations?: ConfigurationsResolver<any[], TypeParent, Context>;
 
-    schema?: SchemaResolver<any[], TypeParent, TContext>;
+    schema?: SchemaResolver<any[], TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type ProjectResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type BuilderResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type DescriptionResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type OptionsResolver<R = any, Parent = any, TContext = any> = Resolver<
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type OptionsResolver<R = any, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type ConfigurationsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type SchemaResolver<
-    R = any[],
-    Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type SchemaResolver<R = any[], Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
 }
 
 export namespace OptionsResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    defaultValues?: DefaultValuesResolver<any[], TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    defaultValues?: DefaultValuesResolver<any[], TypeParent, Context>;
   }
 
   export type DefaultValuesResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace FieldValueResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    defaultValue?: DefaultValueResolver<Maybe<string>, TypeParent, TContext>;
+    defaultValue?: DefaultValueResolver<Maybe<string>, TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type DefaultValueResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace ArchitectConfigurationsResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    defaultValues?: DefaultValuesResolver<any[], TypeParent, TContext>;
+    defaultValues?: DefaultValuesResolver<any[], TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type DefaultValuesResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace RecentActionResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    actionName?: ActionNameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    actionName?: ActionNameResolver<string, TypeParent, Context>;
 
-    schematicName?: SchematicNameResolver<Maybe<string>, TypeParent, TContext>;
+    schematicName?: SchematicNameResolver<Maybe<string>, TypeParent, Context>;
   }
 
   export type ActionNameResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type SchematicNameResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace DocsResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    workspaceDocs?: WorkspaceDocsResolver<any[], TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    workspaceDocs?: WorkspaceDocsResolver<any[], TypeParent, Context>;
 
-    schematicDocs?: SchematicDocsResolver<any[], TypeParent, TContext>;
+    schematicDocs?: SchematicDocsResolver<any[], TypeParent, Context>;
   }
 
   export type WorkspaceDocsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type SchematicDocsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, SchematicDocsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, SchematicDocsArgs>;
   export interface SchematicDocsArgs {
     collectionName: string;
 
@@ -1270,46 +1271,46 @@ export namespace DocsResolvers {
 }
 
 export namespace DocResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    prop?: PropResolver<Maybe<string>, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    prop?: PropResolver<Maybe<string>, TypeParent, Context>;
 
-    description?: DescriptionResolver<Maybe<string>, TypeParent, TContext>;
+    description?: DescriptionResolver<Maybe<string>, TypeParent, Context>;
 
-    id?: IdResolver<string, TypeParent, TContext>;
+    id?: IdResolver<string, TypeParent, Context>;
   }
 
   export type PropResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type DescriptionResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type IdResolver<R = string, Parent = any, TContext = any> = Resolver<
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
 }
 
 export namespace CompletionsTypesResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    files?: FilesResolver<any[], TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    files?: FilesResolver<any[], TypeParent, Context>;
 
-    projects?: ProjectsResolver<any[], TypeParent, TContext>;
+    projects?: ProjectsResolver<any[], TypeParent, Context>;
 
-    localModules?: LocalModulesResolver<any[], TypeParent, TContext>;
+    localModules?: LocalModulesResolver<any[], TypeParent, Context>;
 
-    absoluteModules?: AbsoluteModulesResolver<any[], TypeParent, TContext>;
+    absoluteModules?: AbsoluteModulesResolver<any[], TypeParent, Context>;
   }
 
-  export type FilesResolver<R = any[], Parent = any, TContext = any> = Resolver<
+  export type FilesResolver<R = any[], Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext,
+    Context,
     FilesArgs
   >;
   export interface FilesArgs {
@@ -1319,8 +1320,8 @@ export namespace CompletionsTypesResolvers {
   export type ProjectsResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, ProjectsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, ProjectsArgs>;
   export interface ProjectsArgs {
     input: string;
   }
@@ -1328,8 +1329,8 @@ export namespace CompletionsTypesResolvers {
   export type LocalModulesResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, LocalModulesArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, LocalModulesArgs>;
   export interface LocalModulesArgs {
     input: string;
   }
@@ -1337,175 +1338,171 @@ export namespace CompletionsTypesResolvers {
   export type AbsoluteModulesResolver<
     R = any[],
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext, AbsoluteModulesArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, AbsoluteModulesArgs>;
   export interface AbsoluteModulesArgs {
     input: string;
   }
 }
 
 export namespace CompletionResultTypeResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    value?: ValueResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    value?: ValueResolver<string, TypeParent, Context>;
 
-    display?: DisplayResolver<Maybe<string>, TypeParent, TContext>;
+    display?: DisplayResolver<Maybe<string>, TypeParent, Context>;
   }
 
-  export type ValueResolver<
-    R = string,
-    Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+  export type ValueResolver<R = string, Parent = any, Context = any> = Resolver<
+    R,
+    Parent,
+    Context
+  >;
   export type DisplayResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace EditorSupportResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    name?: NameResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    name?: NameResolver<string, TypeParent, Context>;
 
-    icon?: IconResolver<string, TypeParent, TContext>;
+    icon?: IconResolver<string, TypeParent, Context>;
   }
 
-  export type NameResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type NameResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
-  export type IconResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type IconResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
 }
 
 export namespace IsNodeInstalledResultResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    result?: ResultResolver<boolean, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace CommandResponseResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    id?: IdResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    id?: IdResolver<string, TypeParent, Context>;
 
-    workspace?: WorkspaceResolver<Maybe<string>, TypeParent, TContext>;
+    workspace?: WorkspaceResolver<Maybe<string>, TypeParent, Context>;
 
-    command?: CommandResolver<string, TypeParent, TContext>;
+    command?: CommandResolver<string, TypeParent, Context>;
 
-    status?: StatusResolver<string, TypeParent, TContext>;
+    status?: StatusResolver<string, TypeParent, Context>;
 
-    detailedStatus?: DetailedStatusResolver<
-      Maybe<string>,
-      TypeParent,
-      TContext
-    >;
+    detailedStatus?: DetailedStatusResolver<Maybe<string>, TypeParent, Context>;
 
-    outChunk?: OutChunkResolver<string, TypeParent, TContext>;
+    outChunk?: OutChunkResolver<string, TypeParent, Context>;
 
-    out?: OutResolver<string, TypeParent, TContext>;
+    out?: OutResolver<string, TypeParent, Context>;
   }
 
-  export type IdResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
   export type WorkspaceResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type CommandResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type StatusResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type DetailedStatusResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type OutChunkResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
-  export type OutResolver<R = string, Parent = any, TContext = any> = Resolver<
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type OutResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
 }
 
 export namespace MutationResolvers {
-  export interface Resolvers<TContext = any, TypeParent = {}> {
-    ngAdd?: NgAddResolver<Maybe<any>, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = {}> {
+    ngAdd?: NgAddResolver<Maybe<any>, TypeParent, Context>;
 
-    ngNew?: NgNewResolver<Maybe<any>, TypeParent, TContext>;
+    ngNew?: NgNewResolver<Maybe<any>, TypeParent, Context>;
 
-    generate?: GenerateResolver<Maybe<any>, TypeParent, TContext>;
+    generate?: GenerateResolver<Maybe<any>, TypeParent, Context>;
 
     generateUsingNpm?: GenerateUsingNpmResolver<
       Maybe<any>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    runNg?: RunNgResolver<Maybe<any>, TypeParent, TContext>;
+    runNg?: RunNgResolver<Maybe<any>, TypeParent, Context>;
 
-    runNpm?: RunNpmResolver<Maybe<any>, TypeParent, TContext>;
+    runNpm?: RunNpmResolver<Maybe<any>, TypeParent, Context>;
 
-    stopCommand?: StopCommandResolver<Maybe<any>, TypeParent, TContext>;
+    stopCommand?: StopCommandResolver<Maybe<any>, TypeParent, Context>;
 
-    removeCommand?: RemoveCommandResolver<Maybe<any>, TypeParent, TContext>;
+    removeCommand?: RemoveCommandResolver<Maybe<any>, TypeParent, Context>;
 
     removeAllCommands?: RemoveAllCommandsResolver<
       Maybe<any>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    restartCommand?: RestartCommandResolver<Maybe<any>, TypeParent, TContext>;
+    restartCommand?: RestartCommandResolver<Maybe<any>, TypeParent, Context>;
 
-    openInEditor?: OpenInEditorResolver<Maybe<any>, TypeParent, TContext>;
+    openInEditor?: OpenInEditorResolver<Maybe<any>, TypeParent, Context>;
 
-    updateSettings?: UpdateSettingsResolver<any, TypeParent, TContext>;
+    updateSettings?: UpdateSettingsResolver<any, TypeParent, Context>;
 
-    saveRecentAction?: SaveRecentActionResolver<any[], TypeParent, TContext>;
+    saveRecentAction?: SaveRecentActionResolver<any[], TypeParent, Context>;
 
-    openInBrowser?: OpenInBrowserResolver<Maybe<any>, TypeParent, TContext>;
+    openInBrowser?: OpenInBrowserResolver<Maybe<any>, TypeParent, Context>;
 
-    selectDirectory?: SelectDirectoryResolver<Maybe<any>, TypeParent, TContext>;
+    selectDirectory?: SelectDirectoryResolver<Maybe<any>, TypeParent, Context>;
 
     showItemInFolder?: ShowItemInFolderResolver<
       Maybe<any>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    openDoc?: OpenDocResolver<Maybe<any>, TypeParent, TContext>;
+    openDoc?: OpenDocResolver<Maybe<any>, TypeParent, Context>;
   }
 
   export type NgAddResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, NgAddArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, NgAddArgs>;
   export interface NgAddArgs {
     path: string;
 
@@ -1515,8 +1512,8 @@ export namespace MutationResolvers {
   export type NgNewResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, NgNewArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, NgNewArgs>;
   export interface NgNewArgs {
     path: string;
 
@@ -1530,8 +1527,8 @@ export namespace MutationResolvers {
   export type GenerateResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, GenerateArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, GenerateArgs>;
   export interface GenerateArgs {
     path: string;
 
@@ -1543,8 +1540,8 @@ export namespace MutationResolvers {
   export type GenerateUsingNpmResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, GenerateUsingNpmArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, GenerateUsingNpmArgs>;
   export interface GenerateUsingNpmArgs {
     path: string;
 
@@ -1558,8 +1555,8 @@ export namespace MutationResolvers {
   export type RunNgResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, RunNgArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, RunNgArgs>;
   export interface RunNgArgs {
     path: string;
 
@@ -1569,8 +1566,8 @@ export namespace MutationResolvers {
   export type RunNpmResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, RunNpmArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, RunNpmArgs>;
   export interface RunNpmArgs {
     path: string;
 
@@ -1582,8 +1579,8 @@ export namespace MutationResolvers {
   export type StopCommandResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, StopCommandArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, StopCommandArgs>;
   export interface StopCommandArgs {
     id: string;
   }
@@ -1591,8 +1588,8 @@ export namespace MutationResolvers {
   export type RemoveCommandResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, RemoveCommandArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, RemoveCommandArgs>;
   export interface RemoveCommandArgs {
     id: string;
   }
@@ -1600,13 +1597,13 @@ export namespace MutationResolvers {
   export type RemoveAllCommandsResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type RestartCommandResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, RestartCommandArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, RestartCommandArgs>;
   export interface RestartCommandArgs {
     id: string;
   }
@@ -1614,8 +1611,8 @@ export namespace MutationResolvers {
   export type OpenInEditorResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, OpenInEditorArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, OpenInEditorArgs>;
   export interface OpenInEditorArgs {
     editor: string;
 
@@ -1625,8 +1622,8 @@ export namespace MutationResolvers {
   export type UpdateSettingsResolver<
     R = any,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, UpdateSettingsArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, UpdateSettingsArgs>;
   export interface UpdateSettingsArgs {
     data: string;
   }
@@ -1634,8 +1631,8 @@ export namespace MutationResolvers {
   export type SaveRecentActionResolver<
     R = any[],
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, SaveRecentActionArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, SaveRecentActionArgs>;
   export interface SaveRecentActionArgs {
     workspacePath: string;
 
@@ -1649,8 +1646,8 @@ export namespace MutationResolvers {
   export type OpenInBrowserResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, OpenInBrowserArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, OpenInBrowserArgs>;
   export interface OpenInBrowserArgs {
     url: string;
   }
@@ -1658,8 +1655,8 @@ export namespace MutationResolvers {
   export type SelectDirectoryResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, SelectDirectoryArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, SelectDirectoryArgs>;
   export interface SelectDirectoryArgs {
     dialogTitle: string;
 
@@ -1671,8 +1668,8 @@ export namespace MutationResolvers {
   export type ShowItemInFolderResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, ShowItemInFolderArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, ShowItemInFolderArgs>;
   export interface ShowItemInFolderArgs {
     item: string;
   }
@@ -1680,118 +1677,118 @@ export namespace MutationResolvers {
   export type OpenDocResolver<
     R = Maybe<any>,
     Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, OpenDocArgs>;
+    Context = any
+  > = Resolver<R, Parent, Context, OpenDocArgs>;
   export interface OpenDocArgs {
     id: string;
   }
 }
 
 export namespace CommandStartedResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    id?: IdResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    id?: IdResolver<string, TypeParent, Context>;
   }
 
-  export type IdResolver<R = string, Parent = any, TContext = any> = Resolver<
+  export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
     R,
     Parent,
-    TContext
+    Context
   >;
 }
 
 export namespace StopResultResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    result?: ResultResolver<Maybe<boolean>, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    result?: ResultResolver<Maybe<boolean>, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace RemoveResultResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    result?: ResultResolver<Maybe<boolean>, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    result?: ResultResolver<Maybe<boolean>, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = Maybe<boolean>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace OpenInEditorResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    response?: ResponseResolver<string, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    response?: ResponseResolver<string, TypeParent, Context>;
   }
 
   export type ResponseResolver<
     R = string,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace OpenInBrowserResultResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    result?: ResultResolver<boolean, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace SelectDirectoryResultResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
+  export interface Resolvers<Context = any, TypeParent = any> {
     selectedDirectoryPath?: SelectedDirectoryPathResolver<
       Maybe<string>,
       TypeParent,
-      TContext
+      Context
     >;
 
-    error?: ErrorResolver<Maybe<string>, TypeParent, TContext>;
+    error?: ErrorResolver<Maybe<string>, TypeParent, Context>;
   }
 
   export type SelectedDirectoryPathResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
   export type ErrorResolver<
     R = Maybe<string>,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace ShowItemInFolderResultResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    result?: ResultResolver<boolean, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 export namespace OpenDocResultResolvers {
-  export interface Resolvers<TContext = any, TypeParent = any> {
-    result?: ResultResolver<boolean, TypeParent, TContext>;
+  export interface Resolvers<Context = any, TypeParent = any> {
+    result?: ResultResolver<boolean, TypeParent, Context>;
   }
 
   export type ResultResolver<
     R = boolean,
     Parent = any,
-    TContext = any
-  > = Resolver<R, Parent, TContext>;
+    Context = any
+  > = Resolver<R, Parent, Context>;
 }
 
 /** Directs the executor to skip this field or fragment when the `if` argument is true. */
@@ -1827,48 +1824,46 @@ export interface DeprecatedDirectiveArgs {
   reason?: string;
 }
 
-export type IResolvers<TContext = any> = {
-  Query?: QueryResolvers.Resolvers<TContext>;
-  Settings?: SettingsResolvers.Resolvers<TContext>;
-  WorkspaceDefinition?: WorkspaceDefinitionResolvers.Resolvers<TContext>;
+export interface IResolvers<Context = any> {
+  Query?: QueryResolvers.Resolvers<Context>;
+  Settings?: SettingsResolvers.Resolvers<Context>;
+  WorkspaceDefinition?: WorkspaceDefinitionResolvers.Resolvers<Context>;
   SchematicCollectionForNgNew?: SchematicCollectionForNgNewResolvers.Resolvers<
-    TContext
+    Context
   >;
-  Schema?: SchemaResolvers.Resolvers<TContext>;
-  Workspace?: WorkspaceResolvers.Resolvers<TContext>;
-  Dependencies?: DependenciesResolvers.Resolvers<TContext>;
-  Extension?: ExtensionResolvers.Resolvers<TContext>;
-  SchematicCollection?: SchematicCollectionResolvers.Resolvers<TContext>;
-  Schematic?: SchematicResolvers.Resolvers<TContext>;
-  NpmScript?: NpmScriptResolvers.Resolvers<TContext>;
-  Project?: ProjectResolvers.Resolvers<TContext>;
-  Architect?: ArchitectResolvers.Resolvers<TContext>;
-  Options?: OptionsResolvers.Resolvers<TContext>;
-  FieldValue?: FieldValueResolvers.Resolvers<TContext>;
-  ArchitectConfigurations?: ArchitectConfigurationsResolvers.Resolvers<
-    TContext
-  >;
-  RecentAction?: RecentActionResolvers.Resolvers<TContext>;
-  Docs?: DocsResolvers.Resolvers<TContext>;
-  Doc?: DocResolvers.Resolvers<TContext>;
-  CompletionsTypes?: CompletionsTypesResolvers.Resolvers<TContext>;
-  CompletionResultType?: CompletionResultTypeResolvers.Resolvers<TContext>;
-  EditorSupport?: EditorSupportResolvers.Resolvers<TContext>;
-  IsNodeInstalledResult?: IsNodeInstalledResultResolvers.Resolvers<TContext>;
-  CommandResponse?: CommandResponseResolvers.Resolvers<TContext>;
-  Mutation?: MutationResolvers.Resolvers<TContext>;
-  CommandStarted?: CommandStartedResolvers.Resolvers<TContext>;
-  StopResult?: StopResultResolvers.Resolvers<TContext>;
-  RemoveResult?: RemoveResultResolvers.Resolvers<TContext>;
-  OpenInEditor?: OpenInEditorResolvers.Resolvers<TContext>;
-  OpenInBrowserResult?: OpenInBrowserResultResolvers.Resolvers<TContext>;
-  SelectDirectoryResult?: SelectDirectoryResultResolvers.Resolvers<TContext>;
-  ShowItemInFolderResult?: ShowItemInFolderResultResolvers.Resolvers<TContext>;
-  OpenDocResult?: OpenDocResultResolvers.Resolvers<TContext>;
-} & { [typeName: string]: never };
+  Schema?: SchemaResolvers.Resolvers<Context>;
+  Workspace?: WorkspaceResolvers.Resolvers<Context>;
+  Dependencies?: DependenciesResolvers.Resolvers<Context>;
+  Extension?: ExtensionResolvers.Resolvers<Context>;
+  SchematicCollection?: SchematicCollectionResolvers.Resolvers<Context>;
+  Schematic?: SchematicResolvers.Resolvers<Context>;
+  NpmScript?: NpmScriptResolvers.Resolvers<Context>;
+  Project?: ProjectResolvers.Resolvers<Context>;
+  Architect?: ArchitectResolvers.Resolvers<Context>;
+  Options?: OptionsResolvers.Resolvers<Context>;
+  FieldValue?: FieldValueResolvers.Resolvers<Context>;
+  ArchitectConfigurations?: ArchitectConfigurationsResolvers.Resolvers<Context>;
+  RecentAction?: RecentActionResolvers.Resolvers<Context>;
+  Docs?: DocsResolvers.Resolvers<Context>;
+  Doc?: DocResolvers.Resolvers<Context>;
+  CompletionsTypes?: CompletionsTypesResolvers.Resolvers<Context>;
+  CompletionResultType?: CompletionResultTypeResolvers.Resolvers<Context>;
+  EditorSupport?: EditorSupportResolvers.Resolvers<Context>;
+  IsNodeInstalledResult?: IsNodeInstalledResultResolvers.Resolvers<Context>;
+  CommandResponse?: CommandResponseResolvers.Resolvers<Context>;
+  Mutation?: MutationResolvers.Resolvers<Context>;
+  CommandStarted?: CommandStartedResolvers.Resolvers<Context>;
+  StopResult?: StopResultResolvers.Resolvers<Context>;
+  RemoveResult?: RemoveResultResolvers.Resolvers<Context>;
+  OpenInEditor?: OpenInEditorResolvers.Resolvers<Context>;
+  OpenInBrowserResult?: OpenInBrowserResultResolvers.Resolvers<Context>;
+  SelectDirectoryResult?: SelectDirectoryResultResolvers.Resolvers<Context>;
+  ShowItemInFolderResult?: ShowItemInFolderResultResolvers.Resolvers<Context>;
+  OpenDocResult?: OpenDocResultResolvers.Resolvers<Context>;
+}
 
-export type IDirectiveResolvers<Result> = {
+export interface IDirectiveResolvers<Result> {
   skip?: SkipDirectiveResolver<Result>;
   include?: IncludeDirectiveResolver<Result>;
   deprecated?: DeprecatedDirectiveResolver<Result>;
-} & { [directiveName: string]: never };
+}

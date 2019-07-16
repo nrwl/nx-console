@@ -1,11 +1,12 @@
+import { Architect, Project } from '@angular-console/schema';
+import { Store } from '@nrwl/angular-console-enterprise-electron';
+import * as path from 'path';
+
 import {
   getPrimitiveValue,
   normalizeSchema,
   readJsonFile
 } from '../utils/utils';
-import { Architect, Project } from '@angular-console/schema';
-import * as path from 'path';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
 import { readRecentActions } from './read-recent-actions';
 
 export function readProjects(
@@ -56,7 +57,7 @@ function readArchitect(project: string, architect: any): Architect[] {
       configurations,
       name: key,
       project,
-      description: value.description,
+      description: value.description || '',
       builder: value.builder
     };
   });
@@ -100,7 +101,7 @@ function readBuildersFile(basedir: string, npmPackage: string): any {
     builders[k] = {
       name: k,
       schema: normalizeSchema(builderSchema.json),
-      description: v.description
+      description: v.description || ''
     };
   });
 

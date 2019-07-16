@@ -124,6 +124,7 @@ export class Serializer {
   private completionSchematicType(collection: string, name: string): any {
     switch (collection) {
       case '@nrwl/schematics':
+      case '@nrwl/angular':
         if (name === 'module' || name === 'parentModule') {
           return 'absoluteModules';
         }

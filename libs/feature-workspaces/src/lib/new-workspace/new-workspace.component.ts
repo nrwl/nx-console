@@ -1,16 +1,17 @@
 import { Directory } from '@angular-console/schema';
+import { schematicFieldsToFormGroup } from '@angular-console/ui';
 import {
   CommandRunner,
-  IncrementalCommandOutput,
   CommandStatus,
+  IncrementalCommandOutput,
   Serializer
 } from '@angular-console/utils';
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   ViewChild,
-  ViewEncapsulation,
-  ChangeDetectionStrategy
+  ViewEncapsulation
 } from '@angular/core';
 import {
   AbstractControl,
@@ -26,7 +27,7 @@ import {
   MatVerticalStepper
 } from '@angular/material';
 import { Router } from '@angular/router';
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import {
   map,
   publishReplay,
@@ -39,11 +40,10 @@ import {
 import {
   NgNew,
   NgNewGQL,
-  SchematicCollectionsGQL,
-  SchematicCollections
+  SchematicCollections,
+  SchematicCollectionsGQL
 } from '../generated/graphql';
 import { WorkspacesService } from '../workspaces.service';
-import { schematicFieldsToFormGroup } from '@angular-console/ui';
 
 interface SchematicCollectionForNgNew {
   name: string;
@@ -149,15 +149,6 @@ export class NewWorkspaceComponent {
 
   createNewWorkspace() {
     if (this.ngNewForm.valid) {
-      console.log(
-        this.serializer.serializeArgs(
-          this.ngNewForm.controls.collectionOptions.value,
-          this.ngNewForm.controls.collection.value.schema
-        )
-      );
-      console.log(this.ngNewForm.controls.collectionOptions.value);
-      console.log(this.ngNewForm.controls.collection.value.schema);
-      console.log('----');
       const ngNewInvocation: NgNew.Variables = {
         collection: this.ngNewForm.value.collection.name,
         name: this.ngNewForm.value.name,
