@@ -9,7 +9,7 @@ import {
   readRecentActions,
   storeTriggeredAction
 } from '../api/read-recent-actions';
-import { readSettings, storeSettings } from '../api/read-settings';
+import { storeSettings } from '../api/read-settings';
 import { commands, runCommand } from '../api/run-command';
 import { SelectDirectory } from '../types';
 import { FileUtils } from '../utils/file-utils';
@@ -278,7 +278,7 @@ export class MutationResolver {
   @Mutation()
   updateSettings(@Args('data') data: string) {
     storeSettings(this.store, JSON.parse(data));
-    return readSettings(this.store);
+    return true;
   }
 
   @Mutation()

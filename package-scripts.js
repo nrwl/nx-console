@@ -232,13 +232,13 @@ module.exports = {
       })
     },
     build: {
-      default: 'nx affected:build --all --parallel',
-      affected: affected('build'),
+      default: 'nx affected:build --all --parallel --noSourceMap',
+      affected: affected('build --noSourceMap'),
       ...forEachApplication(
         nps.series(
           'nps dev.gen-graphql',
           nps.concurrent({
-            server: 'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap',
+            server: 'ng build APPLICATION --prod --maxWorkers=4 --noSourceMap',
             client: 'ng build angular-console --configuration=APPLICATION'
           })
         )

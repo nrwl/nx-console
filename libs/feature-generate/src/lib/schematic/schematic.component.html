@@ -18,11 +18,6 @@
   </ui-command-output>
 </ui-task-runner>
 <ng-template #emptyMessage>
-  <ui-entity-docs
-    *ngIf="(docs$ | async) as docks; else noDocs"
-    [docs]="docs$ | async"
-    style="margin-left: 15px"
-  ></ui-entity-docs>
   <ng-template #noDocs>
     Click the Generate button to start this task.
   </ng-template>

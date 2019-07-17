@@ -49,8 +49,6 @@ export class TargetComponent implements OnInit {
   taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent, { static: false }) flags: FlagsComponent;
 
-  docs$: Observable<any[]> = of();
-
   private readonly ngRun$ = new Subject<any>();
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
 

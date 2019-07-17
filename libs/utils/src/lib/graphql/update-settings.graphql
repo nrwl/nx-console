@@ -1,16 +1,3 @@
 mutation UpdateSettings($data: String!) {
-  updateSettings(data: $data) {
-    canCollectData
-    installNodeManually
-    enableDetailedStatus
-    isWsl
-    useNvm
-    channel
-    recent {
-      path
-      name
-      favorite
-      pinnedProjectNames
-    }
-  }
+  updateSettings(data: $data)
 }

@@ -1,11 +1,14 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
+import { stream } from 'fast-glob';
+import { existsSync } from 'fs';
 import { Server } from 'http';
-import { join, parse, dirname } from 'path';
+import { dirname, join, parse } from 'path';
 import {
   commands,
   ExtensionContext,
   TreeView,
   ViewColumn,
+  WebviewPanel,
   window,
   workspace
 } from 'vscode';
@@ -22,11 +25,11 @@ import {
   LOCATE_YOUR_WORKSPACE
 } from './app/tree-view/current-workspace-tree-provider';
 import { createWebViewPanel } from './app/webview.factory';
-import { stream } from 'fast-glob';
-import { existsSync } from 'fs';
+
 let server: Promise<Server>;
 let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
 let treeDataProvider: CurrentWorkspaceTreeProvider;
+let webViewPanel: WebviewPanel | undefined;
 
 export function activate(context: ExtensionContext) {
   treeDataProvider = CurrentWorkspaceTreeProvider.create({
@@ -112,6 +115,9 @@ export function activate(context: ExtensionContext) {
 }
 
 function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
+  if (webViewPanel) {
+    webViewPanel.dispose();
+  }
   treeDataProvider.setWorkspacePath(workspacePath);
   import('./app/start-server').then(({ startServer }) => {
     server = startServer(context, workspacePath);
@@ -144,7 +150,7 @@ async function main(config: {
     throw new Error(`Server address format is unsupported: ${address}`);
   }
 
-  const webViewPanel = createWebViewPanel(
+  webViewPanel = createWebViewPanel(
     context,
     viewColumn,
     `http://localhost:${address!.port}/`,
@@ -153,6 +159,10 @@ async function main(config: {
     workspaceRouteTitle
   );
   context.subscriptions.push(webViewPanel);
+
+  webViewPanel.onDidDispose(() => {
+    webViewPanel = undefined;
+  });
 
   webViewPanel.onDidChangeViewState(e => {
     if (e.webviewPanel.visible) {

@@ -3,7 +3,7 @@ type Architect {
   project: String!
   builder: String!
   description: String!
-  options: Options!,
+  options: Options!
   configurations: [ArchitectConfigurations!]!
   schema: [Schema!]!
 }
@@ -70,7 +70,6 @@ type Extension {
   installed: Boolean
 }
 
-
 type IsNodeInstalledResult {
   result: Boolean!
 }
@@ -117,7 +116,7 @@ type Mutation {
   removeAllCommands: RemoveResult
   restartCommand(id: String!): RemoveResult
   openInEditor(editor: String!, path: String!): OpenInEditor
-  updateSettings(data: String!): Settings!
+  updateSettings(data: String!): Boolean
   saveRecentAction(
     workspacePath: String!
     projectName: String!
@@ -215,12 +214,13 @@ type WorkspaceDefinition {
 }
 
 type Settings {
-  canCollectData: Boolean!
+  canCollectData: Boolean
   isConnectUser: Boolean
   disableAnimations: Boolean
   showSupportPlugin: Boolean
   installNodeManually: Boolean
   enableDetailedStatus: Boolean
+  showRoutesSideNav: Boolean
   channel: String
   workspaceSchematicsDirectory: String
   workspaceSchematicsNpmScript: String

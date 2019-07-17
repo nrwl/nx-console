@@ -1,15 +1,14 @@
 import { Schematic } from '@angular-console/schema';
 import {
+  CommandOutputComponent,
   FlagsComponent,
-  TaskRunnerComponent,
-  CommandOutputComponent
+  TaskRunnerComponent
 } from '@angular-console/ui';
 import {
-  IncrementalCommandOutput,
   CommandRunner,
-  Serializer,
   CommandStatus,
-  Settings
+  IncrementalCommandOutput,
+  Serializer
 } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
@@ -31,11 +30,11 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
+
 import {
   GenerateGQL,
   GenerateUsingNmpGQL,
-  SchematicCollectionsByNameGQL,
-  SchematicDocsGQL
+  SchematicCollectionsByNameGQL
 } from '../generated/graphql';
 
 const DEBOUNCE_TIME = 300;
@@ -69,8 +68,6 @@ export class SchematicComponent implements OnInit {
   taskRunner: TaskRunnerComponent;
   @ViewChild(FlagsComponent, { static: false }) flags: FlagsComponent;
 
-  docs$: Observable<any[]>;
-
   hasNeverBeenValid = true;
 
   private readonly ngGen$ = new Subject<void>();
@@ -84,8 +81,6 @@ export class SchematicComponent implements OnInit {
     private readonly contextActionService: ContextualActionBarService,
     private readonly generateGQL: GenerateGQL,
     private readonly generateUsingNpmGQL: GenerateUsingNmpGQL,
-    private readonly schematicDocsGQL: SchematicDocsGQL,
-    private readonly settings: Settings,
     private readonly schematicCollectionsByNameGQL: SchematicCollectionsByNameGQL
   ) {}
 
@@ -238,31 +233,6 @@ export class SchematicComponent implements OnInit {
         );
       })
     );
-
-    if (this.settings.showDocs) {
-      this.docs$ = schematicDescription$.pipe(
-        switchMap((d: any) => {
-          if (d === null) {
-            return of(null);
-          } else {
-            return this.schematicDocsGQL.fetch({
-              path: d.path,
-              collectionName: d.collection,
-              name: d.schematic
-            });
-          }
-        }),
-        map(r => {
-          if (!r) {
-            return [];
-          } else {
-            return r.data.workspace.docs.schematicDocs;
-          }
-        })
-      );
-    } else {
-      this.docs$ = of([]);
-    }
   }
 
   private runCommand(

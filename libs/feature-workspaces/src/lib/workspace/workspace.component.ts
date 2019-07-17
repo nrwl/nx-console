@@ -9,11 +9,11 @@ import {
   trigger
 } from '@angular/animations';
 import {
+  ChangeDetectionStrategy,
   Component,
   Inject,
   OnDestroy,
-  ViewEncapsulation,
-  ChangeDetectionStrategy
+  ViewEncapsulation
 } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -196,9 +196,9 @@ export class WorkspaceComponent implements OnDestroy {
   constructor(
     @Inject(IS_ELECTRON) readonly isElectron: boolean,
     @Inject(IS_INTELLIJ) readonly isIntellij: boolean,
+    readonly settings: Settings,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly settings: Settings,
     private readonly mediaObserver: MediaObserver,
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly editorSupport: EditorSupport,

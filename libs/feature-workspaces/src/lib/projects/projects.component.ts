@@ -22,7 +22,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { combineLatest, Observable, of, ReplaySubject } from 'rxjs';
+import { combineLatest, Observable, ReplaySubject } from 'rxjs';
 import {
   catchError,
   filter,
@@ -35,7 +35,6 @@ import {
 
 import {
   Workspace,
-  WorkspaceDocsGQL,
   WorkspaceGQL,
   WorkspaceSchematics,
   WorkspaceSchematicsGQL
@@ -94,12 +93,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
 
   workspacePath: string;
   pinnedProjectNames: string[];
-  docs$ = this.settings.showDocs
-    ? this.route.params.pipe(
-        switchMap(p => this.workspaceDocsGQL.fetch({ path: p.path })),
-        map(p => p.data.workspace.docs.workspaceDocs)
-      )
-    : of([]);
 
   readonly projectFilterFormControl = new FormControl('');
   readonly schematicFilterFormControl = new FormControl('');
@@ -202,7 +195,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     readonly settings: Settings,
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
-    private readonly workspaceDocsGQL: WorkspaceDocsGQL,
     private readonly commandRunner: CommandRunner,
     private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL,
     @Inject(IS_ELECTRON) private readonly isElectron: boolean

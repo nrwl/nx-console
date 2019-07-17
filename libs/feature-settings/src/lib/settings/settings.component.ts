@@ -1,3 +1,4 @@
+import { IS_ELECTRON } from '@angular-console/environment';
 import { Settings, Telemetry } from '@angular-console/utils';
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -15,6 +16,7 @@ export class SettingsComponent implements OnDestroy {
 
   constructor(
     readonly settings: Settings,
+    @Inject(IS_ELECTRON) readonly isElectron: boolean,
     @Inject('telemetry') private readonly telemetry: Telemetry,
     private readonly contextualActionBarService: ContextualActionBarService,
     router: Router

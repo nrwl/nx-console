@@ -1,12 +1,12 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
+import { join } from 'path';
+import { TreeItem } from 'vscode';
 
 import {
   WorkspaceRoute,
   WorkspaceRouteTitle
 } from '../tree-item/workspace-route';
 import { AbstractTreeProvider } from './abstract-tree-provider';
-import { TreeItem } from 'vscode';
-import { join } from 'path';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Angular Workspace...'
@@ -87,7 +87,7 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
       }
     }
 
-    return Promise.resolve([
+    return [
       ...[
         'Projects',
         'Generate',
@@ -105,6 +105,6 @@ export class CurrentWorkspaceTreeProvider extends AbstractTreeProvider<
           )
       ),
       SELECT_A_DIFFERENT_WORKSPACE
-    ]);
+    ];
   }
 }

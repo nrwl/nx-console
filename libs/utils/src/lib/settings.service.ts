@@ -29,6 +29,7 @@ export class Settings {
     isConnectUser: false,
     channel: 'latest',
     disableAnimations: true,
+    showRoutesSideNav: false,
     isWsl: false,
     isWindows: false,
     useNvm: false
@@ -100,7 +101,7 @@ export class Settings {
     this.store({ ...this.settings, recent: [...r] });
   }
 
-  canCollectData(): boolean | undefined {
+  canCollectData(): Maybe<boolean> {
     return this.settings.canCollectData;
   }
 
@@ -123,19 +124,19 @@ export class Settings {
   }
 
   useDisableAnimations() {
-    return this.settings.disableAnimations;
-  }
-
-  showConnectPlugin(): boolean {
-    return true;
+    return Boolean(this.disabledAnimationsSubject.value);
   }
 
   isConnectUser(): boolean {
     return this.settings.isConnectUser || false;
   }
 
-  showDocs(): boolean | undefined {
-    return true;
+  showRoutesSideNav() {
+    return Boolean(this.settings.showRoutesSideNav);
+  }
+
+  setShowRoutesSideNav(showRoutesSideNav: boolean) {
+    this.store({ ...this.settings, showRoutesSideNav });
   }
 
   setCanCollectData(canCollectData: boolean): void {
@@ -155,7 +156,7 @@ export class Settings {
   }
 
   isWsl(): boolean {
-    return !!this.settings.isWsl;
+    return Boolean(this.settings.isWsl);
   }
 
   useNvm(): boolean {
@@ -185,10 +186,8 @@ export class Settings {
     this.disabledAnimationsSubject.next(this.settings.disableAnimations);
     this.updateSettingsGQL
       .mutate({
-        data: JSON.stringify({ ...v })
+        data: JSON.stringify(v)
       })
-      .subscribe(r => {
-        this.settings = (r.data as any).updateSettings;
-      });
+      .subscribe();
   }
 }

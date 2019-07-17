@@ -7,6 +7,7 @@ query Settings {
     installNodeManually
     enableDetailedStatus
     channel
+    showRoutesSideNav
     disableAnimations
     isConnectUser
     recent {
