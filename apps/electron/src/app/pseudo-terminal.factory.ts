@@ -12,9 +12,13 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
   const DEFAULT_ROWS = 24;
   const DEFAULT_COLS = 80;
   const opts = {
+    cwd,
     cols: DEFAULT_COLS,
     rows: DEFAULT_ROWS,
-    cwd
+    env: {
+      ...process.env,
+      CI: 'true'
+    }
   };
 
   let commandRunning: IPty;
