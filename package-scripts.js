@@ -88,8 +88,7 @@ module.exports = {
           }`,
           'extensions-schema': `shx cp ${
             assetMappings['extensions-schema'].from
-          } ${assetMappings['extensions-schema'].to}`,
-          cli: 'node ./tools/scripts/patch-cli.js'
+          } ${assetMappings['extensions-schema'].to}`
         })
       ),
       'gen-graphql': nps.series(
@@ -134,15 +133,6 @@ module.exports = {
               'prepare.APPLICATION',
               'package.APPLICATION'
             )
-          )
-        }
-      },
-      e2e: {
-        default: nps.concurrent.nps('prepare.electron', 'e2e.fixtures'),
-        and: {
-          'check-formatting': nps.concurrent.nps(
-            'prepare.e2e',
-            'format.and.lint.check'
           )
         }
       },
@@ -198,15 +188,23 @@ module.exports = {
       )
     },
     e2e: {
-      fixtures: 'node ./tools/scripts/set-up-e2e-fixtures.js',
-      up: 'node ./tools/scripts/e2e.js --watch',
-      headless: {
-        default: 'node ./tools/scripts/e2e.js --headless',
-        'new-fixtures': nps.series.nps('prepare.e2e', 'e2e.headless')
+      headless: nps.series.nps(
+        'prepare.e2e',
+        'e2e.ci1.fixtures',
+        'e2e.ci1',
+        'e2e.ci2.fixtures',
+        'e2e.ci2'
+      ),
+      ci1: {
+        default: 'node ./tools/scripts/e2e.js electron-e2e-ci1 --headless',
+        fixtures: 'node ./tools/scripts/electron-e2e-ci1-fixtures.js',
+        up: 'node ./tools/scripts/e2e.js electron-e2e-ci1 --headless --watch'
       },
-      ci1: 'node ./tools/scripts/e2e.js --headless --configuration=ci1',
-      ci2: 'node ./tools/scripts/e2e.js --headless --configuration=ci2',
-      ci3: 'node ./tools/scripts/e2e.js --headless --configuration=ci3'
+      ci2: {
+        default: 'node ./tools/scripts/e2e.js electron-e2e-ci2 --headless',
+        fixtures: 'node ./tools/scripts/electron-e2e-ci2-fixtures.js',
+        up: 'node ./tools/scripts/e2e.js electron-e2e-ci2 --headless --watch'
+      }
     },
     format: {
       default: 'nx format:write',
@@ -238,7 +236,7 @@ module.exports = {
         nps.series(
           'nps dev.gen-graphql',
           nps.concurrent({
-            server: 'ng build APPLICATION --prod --maxWorkers=2 --noSourceMap',
+            server: 'ng build APPLICATION --prod --maxWorkers=4 --noSourceMap',
             client: 'ng build angular-console --configuration=APPLICATION'
           })
         )

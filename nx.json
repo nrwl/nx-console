@@ -10,7 +10,10 @@
     "angular-console": {
       "tags": []
     },
-    "angular-console-e2e": {
+    "electron-e2e-ci1": {
+      "tags": []
+    },
+    "electron-e2e-ci2": {
       "tags": []
     },
     "feature-install-node-js": {
@@ -56,6 +59,12 @@
       "tags": []
     },
     "intellij": {
+      "tags": []
+    },
+    "vscode-e2e": {
+      "tags": []
+    },
+    "cypress": {
       "tags": []
     }
   }

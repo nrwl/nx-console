@@ -113,36 +113,43 @@
         }
       }
     },
-    "angular-console-e2e": {
-      "root": "apps/angular-console-e2e",
+    "electron-e2e-ci1": {
+      "root": "apps/electron-e2e-ci1",
       "projectType": "application",
       "prefix": "",
       "architect": {
         "e2e": {
           "builder": "@nrwl/cypress:cypress",
           "options": {
-            "cypressConfig": "apps/angular-console-e2e/cypress.json",
-            "tsConfig": "apps/angular-console-e2e/tsconfig.e2e.json"
-          },
-          "configurations": {
-            "ci1": {
-              "cypressConfig": "apps/angular-console-e2e/cypress.json",
-              "tsConfig": "apps/angular-console-e2e/tsconfig.ci-1.json"
-            },
-            "ci2": {
-              "cypressConfig": "apps/angular-console-e2e/cypress.json",
-              "tsConfig": "apps/angular-console-e2e/tsconfig.ci-2.json"
-            },
-            "ci3": {
-              "cypressConfig": "apps/angular-console-e2e/cypress.json",
-              "tsConfig": "apps/angular-console-e2e/tsconfig.ci-3.json"
-            }
+            "cypressConfig": "apps/electron-e2e-ci1/cypress.json",
+            "tsConfig": "apps/electron-e2e-ci1/tsconfig.e2e.json"
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": "apps/angular-console-e2e/tsconfig.e2e.json",
+            "tsConfig": "apps/electron-e2e-ci1/tsconfig.e2e.json",
+            "exclude": ["**/node_modules/**"]
+          }
+        }
+      }
+    },
+    "electron-e2e-ci2": {
+      "root": "apps/electron-e2e-ci2",
+      "projectType": "application",
+      "prefix": "",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/electron-e2e-ci2/cypress.json",
+            "tsConfig": "apps/electron-e2e-ci2/tsconfig.e2e.json"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "apps/electron-e2e-ci2/tsconfig.e2e.json",
             "exclude": ["**/node_modules/**"]
           }
         }
@@ -457,26 +464,7 @@
     "server": {
       "root": "libs/server",
       "sourceRoot": "libs/server/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/server/tsconfig.lib.json",
-              "libs/server/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/server/jest.config.js",
-            "tsConfig": "libs/server/tsconfig.spec.json"
-          }
-        }
-      }
+      "projectType": "library"
     },
     "environment": {
       "root": "libs/environment",
@@ -493,6 +481,42 @@
         }
       },
       "schematics": {}
+    },
+    "vscode-e2e": {
+      "root": "apps/vscode-e2e",
+      "sourceRoot": "apps/vscode-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/vscode-e2e/cypress.json",
+            "tsConfig": "apps/vscode-e2e/tsconfig.e2e.json"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "apps/vscode-e2e/tsconfig.e2e.json",
+            "exclude": ["**/node_modules/**", "!apps/vscode-e2e/**"]
+          }
+        }
+      }
+    },
+    "cypress": {
+      "root": "libs/cypress",
+      "sourceRoot": "libs/cypress/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["libs/cypress/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/cypress/**"]
+          }
+        }
+      }
     }
   },
   "cli": {
@@ -511,12 +535,15 @@
       "unitTestRunner": "jest",
       "framework": "angular"
     },
-    "@nrwl/schematics:application": {
-      "unitTestRunner": "karma",
-      "e2eTestRunner": "protractor"
-    },
     "@nrwl/schematics:node-application": {
       "framework": "express"
+    },
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "none"
     }
   }
 }
