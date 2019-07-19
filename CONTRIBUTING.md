@@ -48,8 +48,12 @@ Reload the vscode window to use the newly installed build of the extension.
 
 If you are working on the plugin, run:
 
-- `yarn start prepare.dev.vscode`
+- `yarn start build.dev.vscode` (This builds the client/server in watch mode)
+- Wait for both client and server to be built.
 - Hit F5
+
+Now you can make changes to your code and the client/server builds will trigger.
+When you want to see those reflected in VSCode, click the refresh button or hit F5 again.
 
 ## Submitting a PR
 
