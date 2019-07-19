@@ -7,7 +7,7 @@ let flags = process.argv.slice(2).join(' ');
 
 function runE2eTests() {
   try {
-    cp.execSync(`ng e2e ${flags}`, {
+    cp.execSync(`ng e2e electron-e2e-ci1 ${flags}`, {
       stdio: [0, 1, 2],
       env: {
         ...process.env,

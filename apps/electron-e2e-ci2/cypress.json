@@ -1,0 +1,13 @@
+{
+  "fileServerFolder": "./",
+  "integrationFolder": "./src/integration",
+  "pluginsFile": "./src/plugins/index.js",
+  "supportFile": false,
+  "video": true,
+  "videosFolder": "../../dist/out-tsc/apps/electron-e2e-ci2-ci1/videos",
+  "screenshotsFolder": "../../dist/out-tsc/apps/electron-e2e-ci2-ci1/screenshots",
+  "projectId": "5mfaxt",
+  "chromeWebSecurity": false,
+  "numTestsKeptInMemory": 5,
+  "baseUrl": "http://localhost:4200"
+}
