@@ -1,0 +1,9 @@
+steps:
+  - script: yarn start prepare.electron
+    displayName: build electron
+
+  - script: yarn start e2e.ci2.fixtures
+    displayName: e2e fixtures (ci2)
+
+  - script: yarn start e2e.ci2
+    displayName: e2e tests (ci2)
