@@ -1,0 +1,3 @@
+steps:
+  - script: yarn start prepare.electron
+    displayName: build electron
