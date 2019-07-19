@@ -64,7 +64,7 @@ module.exports = {
     dev: {
       'copy-assets': {
         electron: nps.series(
-          'nps dev.copy-assets.electron',
+          'nps dev.copy-assets.base.electron',
           `shx chmod 0755 ${join(
             'dist',
             'apps',
@@ -89,7 +89,7 @@ module.exports = {
             } ${assetMappings['extensions-schema'].to}`
           })
         ),
-        vscode: nps.series.nps('dev.copy-assets.base')
+        vscode: nps.series.nps('dev.copy-assets.base.vscode')
       },
 
       'gen-graphql': nps.series(
