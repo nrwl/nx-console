@@ -1,12 +1,27 @@
 jobs:
-- job: ci1_electron
+- job: linux_shard_1
+  variables:
+    System.PullRequest.IsFork: false
+    CypressBinaryLocation: ~/.cache/Cypress
   pool:
     vmImage: ubuntu-16.04
   steps:
   - template: build/ci1.electron.yml
 
-- job: ci2_electron
+- job: linux_shard_2
+  variables:
+    System.PullRequest.IsFork: false
+    CypressBinaryLocation: ~/.cache/Cypress
   pool:
     vmImage: ubuntu-16.04
+  steps:
+  - template: build/ci2.electron.yml
+
+- job: windows
+  variables:
+    System.PullRequest.IsFork: false
+    CypressBinaryLocation: /AppData/Local/Cypress/Cache
+  pool:
+    vmImage: vs2017-win2016
   steps:
   - template: build/ci2.electron.yml

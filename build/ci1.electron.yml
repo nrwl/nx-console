@@ -4,12 +4,12 @@ steps:
     inputs:
       versionSpec: '12.x'
 
-  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreCacheV1.RestoreCache@1
     displayName: download cache
     inputs:
       keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
-      targetfolder: '**/node_modules, !**/node_modules/**/node_modules, ~/.cache/Cypress'
-      vstsFeed: 'angular-console-ubuntu-16.04'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules, $(CypressBinaryLocation)'
+      vstsFeed: 'angular-console'
 
   - script: |
       yarn install --ignore-engines --frozen-lockfile
@@ -20,8 +20,8 @@ steps:
     displayName: 'save cache'
     inputs:
       keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
-      targetfolder: '**/node_modules, !**/node_modules/**/node_modules, ~/.cache/Cypress'
-      vstsFeed: 'angular-console-ubuntu-16.04'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules, $(CypressBinaryLocation)'
+      vstsFeed: 'angular-console'
       condition: ne(variables['CacheRestored'], 'true')
 
   - script: yarn start format.and.lint.check
