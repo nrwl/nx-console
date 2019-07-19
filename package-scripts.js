@@ -64,7 +64,7 @@ module.exports = {
     dev: {
       'copy-assets': {
         electron: nps.series(
-          'nps dev.copy-assets-base.electron',
+          'nps dev.copy-assets.electron',
           `shx chmod 0755 ${join(
             'dist',
             'apps',
@@ -73,24 +73,25 @@ module.exports = {
             'new-workspace'
           )}`
         ),
-        vscode: nps.series('nps dev.copy-assets-base.vscode')
+        base: forEachApplication(
+          nps.concurrent({
+            schema: `shx cp ${assetMappings['schema'].from} ${
+              assetMappings['schema'].to
+            }`,
+            'server-assets': `shx cp -rf ${
+              assetMappings['server-assets'].from
+            } ${assetMappings['server-assets'].to}`,
+            readme: `shx cp ${assetMappings['readme'].from} ${
+              assetMappings['readme'].to
+            }`,
+            'extensions-schema': `shx cp ${
+              assetMappings['extensions-schema'].from
+            } ${assetMappings['extensions-schema'].to}`
+          })
+        ),
+        vscode: nps.series.nps('dev.copy-assets.base')
       },
-      'copy-assets-base': forEachApplication(
-        nps.concurrent({
-          schema: `shx cp ${assetMappings['schema'].from} ${
-            assetMappings['schema'].to
-          }`,
-          'server-assets': `shx cp -rf ${assetMappings['server-assets'].from} ${
-            assetMappings['server-assets'].to
-          }`,
-          readme: `shx cp ${assetMappings['readme'].from} ${
-            assetMappings['readme'].to
-          }`,
-          'extensions-schema': `shx cp ${
-            assetMappings['extensions-schema'].from
-          } ${assetMappings['extensions-schema'].to}`
-        })
-      ),
+
       'gen-graphql': nps.series(
         'gql-gen --config ./tools/scripts/codegen-server.yml',
         'gql-gen --config ./tools/scripts/codegen-client.js'
@@ -131,24 +132,18 @@ module.exports = {
             nps.series.nps(
               'clean',
               'prepare.APPLICATION',
+              'install-dependencies.APPLICATION',
               'package.APPLICATION'
             )
           )
         }
       },
       ...forEachApplication(
-        nps.series.nps(
-          'build.APPLICATION',
-          'install-dependencies.APPLICATION',
-          'dev.copy-assets.APPLICATION'
-        )
+        nps.series.nps('build.APPLICATION', 'dev.copy-assets.APPLICATION')
       ),
       dev: {
         ...forEachApplication(
-          nps.series.nps(
-            'build.APPLICATION.dev',
-            'dev.copy-assets-base.APPLICATION'
-          )
+          nps.series.nps('build.APPLICATION.dev', 'dev.copy-assets.APPLICATION')
         )
       }
     },

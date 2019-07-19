@@ -1,3 +1,4 @@
 libs/server/src/lib/utils/fixtures
 apps/intellij/build
 apps/intellij/gen
+azure-pipelines.yml
