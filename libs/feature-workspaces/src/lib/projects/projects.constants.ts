@@ -51,11 +51,7 @@ export function createLinkForSchematic(
   name: string,
   displayText: string
 ): ProjectAction | undefined {
-  if (
-    (project.projectType === 'application' ||
-      project.projectType === 'library') &&
-    !(project.architect || []).find(a => a.name === 'e2e')
-  ) {
+  {
     return {
       name,
       schematicName,
@@ -67,8 +63,6 @@ export function createLinkForSchematic(
         { project: project.name }
       ]
     };
-  } else {
-    return undefined;
   }
 }
 

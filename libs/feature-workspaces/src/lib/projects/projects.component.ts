@@ -147,7 +147,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
           ...p,
           actions: this.createActions(p),
           links$: this.getLinksForProject(p),
-          supportsGenerate: true
+          supportsGenerate: !(p.architect || []).find(a => a.name === 'e2e')
         };
       });
       return projects;
