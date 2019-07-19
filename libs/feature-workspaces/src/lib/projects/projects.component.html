@@ -87,7 +87,7 @@
                   #generateMenuTrigger="matMenuTrigger"
                   [matMenuTriggerFor]="generateMenu"
                   [matMenuTriggerData]="{ project: p }"
-                  *ngIf="p.supportsGenerate"
+                  [disabled]="!p.supportsGenerate"
                 >
                   Generate
                 </button>
@@ -96,7 +96,7 @@
                   #runMenuTrigger="matMenuTrigger"
                   [matMenuTriggerFor]="runMenu"
                   [matMenuTriggerData]="{ project: p }"
-                  *ngIf="p.actions.length"
+                  [disabled]="!p.actions.length"
                 >
                   Run
                 </button>
