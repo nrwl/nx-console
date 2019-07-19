@@ -1,0 +1,45 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - master
+
+pool:
+  vmImage: VS2017-Win2016
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '12.x'
+    displayName: 'install node'
+
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreAndSaveCacheV1.RestoreAndSaveCache@1
+    inputs:
+      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+      vstsFeed: 'angular-console'
+      displayName: 'download cache'
+
+  - script: |
+      yarn install --ignore-engines --frozen-lockfile
+      displayName: 'yarn install'
+      condition: ne(variables['CacheRestored'], 'true')
+
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
+    inputs:
+      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock, !**/.*/**/yarn.lock'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules'
+      vstsFeed: 'angular-console'
+      displayName: 'save cache'
+      condition: ne(variables['CacheRestored'], 'true')
+
+  - script: yarn start prepare.electron
+    displayName: 'build electron'
+
+  - script: yarn start test.affected.origin-master
+    displayName: 'affected unit-tests'
+
+  - script: yarn start e2e.ci1.fixtures | yarn start e2e.ci1
+    displayName: 'e2e-tests (ci1)'
