@@ -26,12 +26,18 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
     commandRunning = isWsl
       ? spawn(
           'wsl.exe',
-          ['-e', 'bash', '-l', '-i', '-c', `${program} ${args.join(' ')}`],
+          [
+            '-e',
+            'bash',
+            '-l',
+            '-c',
+            `echo '${displayCommand}\n\n'; ${program} ${args.join(' ')}`
+          ],
           opts
         )
       : spawn(
           'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
-          `-Sta -NoLogo -NonInteractive -C "& {& '${program}' ${args.join(
+          `-Sta -NoLogo -NonInteractive -C "& {& 'echo '${displayCommand}\n\n'; ${program}' ${args.join(
             ' '
           )}}"`,
           opts
@@ -39,7 +45,11 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
   } else {
     commandRunning = spawn(
       '/bin/bash',
-      ['-l', '-i', '-c', `${program} ${args.join(' ')}`],
+      [
+        '-l',
+        '-c',
+        `echo '${displayCommand}\n\n'; ${program} ${args.join(' ')}`
+      ],
       opts
     );
   }
@@ -49,7 +59,6 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
 
   return {
     onDidWriteData: callback => {
-      callback(`${displayCommand}\n\n\r`);
       commandRunning.on('data', callback);
       commandRunning.on('exit', (exitCode: number) => {
         if (exitCode === 0) {

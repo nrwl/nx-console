@@ -20,7 +20,7 @@
     >
       <button mat-icon-button [disableRipple]="true">
         <mat-icon>{{
-          actionsExpanded ? 'expand_more' : 'expand_less'
+          (actionsExpanded | async) ? 'expand_more' : 'expand_less'
         }}</mat-icon>
       </button>
       <span fxFlex class="num-tasks"> {{ actions.length }} Tasks </span>

@@ -25,7 +25,11 @@
 
   <mat-divider></mat-divider>
 
-  <mat-accordion [multi]="false" displayMode="flat">
+  <mat-accordion
+    [multi]="false"
+    displayMode="flat"
+    hideToggle="!isElectron && fieldGroups.length < 2"
+  >
     <mat-expansion-panel
       #panel
       *ngFor="let fieldGroup of fieldGroups"

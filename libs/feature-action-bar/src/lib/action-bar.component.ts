@@ -21,19 +21,22 @@ import {
   QueryList,
   ViewChildren
 } from '@angular/core';
-import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
+import {
+  ContextualActionBarService,
+  ContextualActions
+} from '@nrwl/angular-console-enterprise-frontend';
+import { ListAllCommands } from 'libs/utils/src/lib/generated/graphql';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
+  pairwise,
   shareReplay,
   startWith,
   switchMap,
   take,
   tap
 } from 'rxjs/operators';
-
-const TERMINAL_PADDING = 16;
 
 @Component({
   selector: 'angular-console-action-bar',
@@ -100,17 +103,20 @@ export class ActionBarComponent {
     this.commands$,
     this.contextualActionBarService.contextualActions$.pipe(startWith(null))
   ]).pipe(
-    map(([commands, contextualActions]) => {
-      if (contextualActions) {
-        return false;
+    startWith([[], null] as [
+      ListAllCommands.Commands[],
+      ContextualActions | null
+    ]),
+    pairwise(),
+    tap(([[pCommands], [commands]]) => {
+      if (pCommands.length < commands.length) {
+        this.actionsExpanded.next(true);
       }
-      return commands.length > 0;
-    }),
-    tap(show => {
-      if (!show) {
+      if (commands.length === 0) {
         this.actionsExpanded.next(false);
       }
     }),
+
     shareReplay()
   );
 
@@ -181,8 +187,7 @@ export class ActionBarComponent {
           const actionBarHeight = actionBarVisible
             ? CONTEXTUAL_ACTION_BAR_HEIGHT
             : 0;
-          return `calc(100vh - ${TERMINAL_PADDING +
-            actionBarHeight +
+          return `calc(100vh - ${actionBarHeight +
             CONTEXTUAL_ACTION_BAR_HEIGHT * numCommands}px)`;
         })
       )

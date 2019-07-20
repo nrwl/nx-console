@@ -27,7 +27,6 @@ export function getPseudoTerminalFactory(
   };
 }
 
-// TODO: Handle WSL Mode
 function win32PseudoTerminalFactory(
   context: ExtensionContext,
   { name, program, args, cwd, displayCommand }: PseudoTerminalConfig
@@ -41,7 +40,7 @@ function win32PseudoTerminalFactory(
     `if(!$?) { echo '\n\r${failureMessage}' };`,
     `} Catch { `,
     `echo '\n\r${failureMessage}'`,
-    `}`
+    '}; $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown");'
   ].join(' ');
 
   const terminal = window.createTerminal({
@@ -54,7 +53,6 @@ function win32PseudoTerminalFactory(
   return renderVsCodeTerminal(
     context,
     terminal,
-    displayCommand,
     successMessage,
     failureMessage
   );
@@ -67,20 +65,21 @@ function wslPseudoTerminalFactory(
   const successMessage = 'Process completed #woot';
   const failureMessage = 'Process failed #failwhale';
   const fullCommand =
-    `${program} ${args.join(' ')} && echo "\n\r${successMessage}"` +
-    ` || echo "\n\r${failureMessage}"`;
+    `echo "${displayCommand}\n" && ${program} ${args.join(
+      ' '
+    )} && read -n 1 -s -r -p $"\n\n${successMessage}\n"` +
+    `  || read -n 1 -s -r -p $"\n\n${failureMessage}\n"`;
 
   const terminal = window.createTerminal({
     name,
     cwd,
     shellPath: 'C:\\Windows\\System32\\wsl.exe',
-    shellArgs: ['-e', 'bash', '-l', '-i', '-c', fullCommand]
+    shellArgs: ['-e', 'bash', '-c', 'l', fullCommand]
   });
 
   return renderVsCodeTerminal(
     context,
     terminal,
-    displayCommand,
     successMessage,
     failureMessage
   );
@@ -93,20 +92,22 @@ function unixPseudoTerminalFactory(
   const successMessage = 'Process completed 🙏';
   const failureMessage = 'Process failed 🐳';
   const fullCommand =
-    `${program} ${args.join(' ')} && echo "\n\r${successMessage}"` +
-    ` || echo "\n\r${failureMessage}"`;
+    `echo "${displayCommand}\n" && ${program} ${args.join(
+      ' '
+    )} && read -n 1 -s -r -p $"\n\n${successMessage}\n"` +
+    `  || read -n 1 -s -r -p $"\n\n${failureMessage}\n"`;
 
+  console.log(fullCommand);
   const terminal = window.createTerminal({
     name,
     cwd,
     shellPath: '/bin/bash',
-    shellArgs: ['-c', fullCommand]
+    shellArgs: ['-l', '-i', '-c', fullCommand]
   });
 
   return renderVsCodeTerminal(
     context,
     terminal,
-    displayCommand,
     successMessage,
     failureMessage
   );
@@ -115,10 +116,10 @@ function unixPseudoTerminalFactory(
 function renderVsCodeTerminal(
   context: ExtensionContext,
   terminal: Terminal,
-  displayCommand: string,
   successMessage: string,
   failureMessage: string
 ): PseudoTerminal {
+  terminal.show();
   context.subscriptions.push(terminal);
 
   let onDidWriteData: ((data: string) => void) | undefined;
@@ -130,7 +131,6 @@ function renderVsCodeTerminal(
       onExit(code);
       onExit = undefined;
     }
-    terminal.dispose();
   };
 
   context.subscriptions.push(
@@ -152,7 +152,6 @@ function renderVsCodeTerminal(
   return {
     onDidWriteData: callback => {
       onDidWriteData = callback;
-      callback(`${displayCommand}\n\n\r`);
     },
     onExit: callback => {
       onExit = callback;
