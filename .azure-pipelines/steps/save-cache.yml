@@ -1,8 +1,0 @@
-steps:
-  - task: 1ESLighthouseEng.PipelineArtifactCaching.SaveCacheV1.SaveCache@1
-    displayName: 'save cache'
-    condition: ne(variables['CacheRestored'], 'true')
-    inputs:
-      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock'
-      targetfolder: '**/node_modules, !**/node_modules/**/node_modules, /AppData/Local/Cypress/Cache'
-      vstsFeed: 'angular-console'

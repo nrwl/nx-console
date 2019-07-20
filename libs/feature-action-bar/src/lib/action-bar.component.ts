@@ -5,7 +5,8 @@ import {
 import {
   CommandResponse,
   CommandRunner,
-  CommandStatus
+  CommandStatus,
+  ListAllCommands
 } from '@angular-console/utils';
 import {
   animate,
@@ -17,23 +18,25 @@ import {
 import {
   ChangeDetectionStrategy,
   Component,
-  HostListener,
+  OnDestroy,
   QueryList,
   ViewChildren
 } from '@angular/core';
-import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import {
+  ContextualActionBarService,
+  ContextualActions
+} from '@nrwl/angular-console-enterprise-frontend';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
+  pairwise,
   shareReplay,
   startWith,
   switchMap,
-  take,
+  takeUntil,
   tap
 } from 'rxjs/operators';
-
-const TERMINAL_PADDING = 16;
 
 @Component({
   selector: 'angular-console-action-bar',
@@ -72,17 +75,16 @@ const TERMINAL_PADDING = 16;
     ])
   ]
 })
-export class ActionBarComponent {
+export class ActionBarComponent implements OnDestroy {
   @ViewChildren(CommandOutputComponent)
   activeTerminals?: QueryList<CommandOutputComponent>;
-
   actionIdToActiveView = {};
-
-  // For use within the action bar's template.
   CommandStatus = CommandStatus;
+  destroyed$ = new Subject();
 
   // Whether to show list of actions If there are multiple actions,
-  actionsExpanded = new BehaviorSubject(false);
+  readonly actionsExpandedSubject = new BehaviorSubject(false);
+  readonly actionsExpanded$ = this.actionsExpandedSubject.asObservable();
 
   // The action showing its terminal output if one exists.
   expandedAction?: {
@@ -100,17 +102,20 @@ export class ActionBarComponent {
     this.commands$,
     this.contextualActionBarService.contextualActions$.pipe(startWith(null))
   ]).pipe(
-    map(([commands, contextualActions]) => {
-      if (contextualActions) {
-        return false;
+    startWith([[], null] as [
+      ListAllCommands.Commands[],
+      ContextualActions | null
+    ]),
+    pairwise(),
+    tap(([[pCommands], [commands]]) => {
+      if (pCommands.length < commands.length) {
+        this.actionsExpandedSubject.next(true);
       }
-      return commands.length > 0;
-    }),
-    tap(show => {
-      if (!show) {
-        this.actionsExpanded.next(false);
+      if (commands.length === 0) {
+        this.actionsExpandedSubject.next(false);
       }
     }),
+
     shareReplay()
   );
 
@@ -126,7 +131,7 @@ export class ActionBarComponent {
   showActionList$ = combineLatest([
     this.showActionBar$,
     this.commands$,
-    this.actionsExpanded
+    this.actionsExpandedSubject
   ]).pipe(
     map(([showActionBar, commands, actionsExpanded]) => {
       return Boolean(
@@ -157,23 +162,13 @@ export class ActionBarComponent {
     return command.id;
   }
 
-  @HostListener('document:keypress', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    if (!this.actionsExpanded.value && event.ctrlKey && event.key === 'c') {
-      this.commands$.pipe(take(1)).subscribe(commands => {
-        if (commands.length === 1 && commands[0].status === 'in-progress') {
-          this.commandRunner.stopCommandViaCtrlC(commands[0].id);
-        }
-      });
-    }
-  }
-
   constructor(
     readonly commandRunner: CommandRunner,
     private readonly contextualActionBarService: ContextualActionBarService
   ) {
     this.commands$
       .pipe(
+        takeUntil(this.destroyed$),
         map(commands => commands.length),
         distinctUntilChanged(),
         map(numCommands => {
@@ -181,8 +176,7 @@ export class ActionBarComponent {
           const actionBarHeight = actionBarVisible
             ? CONTEXTUAL_ACTION_BAR_HEIGHT
             : 0;
-          return `calc(100vh - ${TERMINAL_PADDING +
-            actionBarHeight +
+          return `calc(100vh - ${actionBarHeight +
             CONTEXTUAL_ACTION_BAR_HEIGHT * numCommands}px)`;
         })
       )
@@ -197,5 +191,10 @@ export class ActionBarComponent {
     }
     this.commandRunner.restartCommand(cmd.id);
     this.commandRun$.next(undefined);
+  }
+
+  ngOnDestroy() {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 }

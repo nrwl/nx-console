@@ -2,18 +2,13 @@ jobs:
 - job: linux_shard_1
   pool:
     vmImage: ubuntu-16.04
-  variables:
-    CypressCacheLocation: ~/.cache/Cypress
   steps:
   - template: .azure-pipelines/steps/install-dependencies.yml
-  - template: .azure-pipelines/steps/save-cache.yml
   - template: .azure-pipelines/jobs/ci1.linux.yml
 
 - job: linux_shard_2
   pool:
     vmImage: ubuntu-16.04
-  variables:
-    CypressCacheLocation: ~/.cache/Cypress
   steps:
   - template: .azure-pipelines/steps/install-dependencies.yml
   - template: .azure-pipelines/jobs/ci2.linux.yml
@@ -21,9 +16,6 @@ jobs:
 - job: windows
   pool:
     vmImage: vs2017-win2016
-  variables:
-    CypressCacheLocation: /AppData/Local/Cypress/Cache
   steps:
   - template: .azure-pipelines/steps/install-dependencies.yml
-  - template: .azure-pipelines/steps/save-cache.yml
   - template: .azure-pipelines/jobs/windows.yml

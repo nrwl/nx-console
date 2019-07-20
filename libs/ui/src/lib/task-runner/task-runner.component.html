@@ -4,6 +4,7 @@
   </div>
 
   <div
+    *ngIf="isElectron"
     class="ui-terminal-container"
     fxFlex
     [@growShrink]="terminalAnimationState | async"

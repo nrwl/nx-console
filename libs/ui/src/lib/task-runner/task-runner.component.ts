@@ -1,3 +1,4 @@
+import { IS_ELECTRON } from '@angular-console/environment';
 import {
   animate,
   state,
@@ -10,6 +11,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ContentChild,
+  Inject,
   Input
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
@@ -55,6 +57,8 @@ export class TaskRunnerComponent implements AfterContentChecked {
 
   terminalVisible$ = new BehaviorSubject(false);
   terminalAnimationState: Observable<string>;
+
+  constructor(@Inject(IS_ELECTRON) readonly isElectron: boolean) {}
 
   ngAfterContentChecked() {
     // Wait until the flags component has rendered its expansion panels.
