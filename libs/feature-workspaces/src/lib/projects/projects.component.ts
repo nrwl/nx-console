@@ -3,7 +3,8 @@ import { FADE_IN } from '@angular-console/ui';
 import {
   CommandRunner,
   Settings,
-  toggleItemInArray
+  toggleItemInArray,
+  Telemetry
 } from '@angular-console/utils';
 import {
   animate,
@@ -200,6 +201,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly contextActionService: ContextualActionBarService,
     readonly settings: Settings,
+    private readonly telemetry: Telemetry,
     private readonly route: ActivatedRoute,
     private readonly workspaceGQL: WorkspaceGQL,
     private readonly workspaceDocsGQL: WorkspaceDocsGQL,
@@ -210,6 +212,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Make collection hot to remove jank on initial render.
+    this.telemetry.screenViewed('Projects');
     this.filteredCollections$.subscribe().unsubscribe();
     this.router.events
       .pipe(

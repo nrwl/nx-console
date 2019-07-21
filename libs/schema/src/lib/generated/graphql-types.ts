@@ -277,6 +277,10 @@ export interface Mutation {
 
   restartCommand?: Maybe<RemoveResult>;
 
+  screenViewed?: Maybe<boolean>;
+
+  exceptionOccured?: Maybe<boolean>;
+
   openInEditor?: Maybe<OpenInEditor>;
 
   updateSettings: Settings;
@@ -425,6 +429,12 @@ export interface RemoveCommandMutationArgs {
 }
 export interface RestartCommandMutationArgs {
   id: string;
+}
+export interface ScreenViewedMutationArgs {
+  screen: string;
+}
+export interface ExceptionOccuredMutationArgs {
+  error: string;
 }
 export interface OpenInEditorMutationArgs {
   editor: string;
@@ -1482,6 +1492,14 @@ export namespace MutationResolvers {
 
     restartCommand?: RestartCommandResolver<Maybe<any>, TypeParent, TContext>;
 
+    screenViewed?: ScreenViewedResolver<Maybe<boolean>, TypeParent, TContext>;
+
+    exceptionOccured?: ExceptionOccuredResolver<
+      Maybe<boolean>,
+      TypeParent,
+      TContext
+    >;
+
     openInEditor?: OpenInEditorResolver<Maybe<any>, TypeParent, TContext>;
 
     updateSettings?: UpdateSettingsResolver<any, TypeParent, TContext>;
@@ -1609,6 +1627,24 @@ export namespace MutationResolvers {
   > = Resolver<R, Parent, TContext, RestartCommandArgs>;
   export interface RestartCommandArgs {
     id: string;
+  }
+
+  export type ScreenViewedResolver<
+    R = Maybe<boolean>,
+    Parent = {},
+    TContext = any
+  > = Resolver<R, Parent, TContext, ScreenViewedArgs>;
+  export interface ScreenViewedArgs {
+    screen: string;
+  }
+
+  export type ExceptionOccuredResolver<
+    R = Maybe<boolean>,
+    Parent = {},
+    TContext = any
+  > = Resolver<R, Parent, TContext, ExceptionOccuredArgs>;
+  export interface ExceptionOccuredArgs {
+    error: string;
   }
 
   export type OpenInEditorResolver<

@@ -1,7 +1,7 @@
 import { Extension } from '@angular-console/schema';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
-import { RouterNavigation } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterNavigation, Telemetry } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { combineLatest, Observable } from 'rxjs';
 import {
@@ -29,7 +29,7 @@ export interface ExtensionGroup {
   selector: 'angular-console-extensions',
   templateUrl: './extensions.component.html'
 })
-export class ExtensionsComponent {
+export class ExtensionsComponent implements OnInit {
   private readonly extensions$: Observable<
     Array<ExtensionGroup>
   > = this.route.params.pipe(
@@ -99,11 +99,16 @@ export class ExtensionsComponent {
   );
 
   constructor(
+    private readonly telemetry: Telemetry,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly workspaceAndExtensionsGQL: WorkspaceAndExtensionsGQL,
     private readonly locationExt: RouterNavigation
   ) {}
+
+  ngOnInit() {
+    this.telemetry.screenViewed('Extensions');
+  }
 
   navigateToSelectedExtension(s: Extension | null) {
     if (s) {

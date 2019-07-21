@@ -1,10 +1,11 @@
 import { DetailedStatusCalculator } from './detailed-status-calculator';
-import { PseudoTerminal } from './run-command';
+import { PseudoTerminal } from './executable';
+import { Injectable } from '@nestjs/common';
 
 export interface CommandInformation {
   id: string;
   type: string;
-  workspace: string;
+  workspace: string | null;
   command: string;
   status: string; // TOOD: vsavkin should convert status into an enum
   outChunk: string;
@@ -14,6 +15,7 @@ export interface CommandInformation {
   detailedStatusCalculator: DetailedStatusCalculator<any>;
 }
 
+@Injectable()
 export class Commands {
   recent = [] as CommandInformation[];
   history = [] as CommandInformation[];
@@ -26,7 +28,7 @@ export class Commands {
   addCommand(
     type: string,
     id: string,
-    workspace: string,
+    workspace: string | null,
     command: string,
     factory: any,
     detailedStatusCalculator: DetailedStatusCalculator<any>,

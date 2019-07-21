@@ -115,6 +115,8 @@ type Mutation {
   removeCommand(id: String!): RemoveResult
   removeAllCommands: RemoveResult
   restartCommand(id: String!): RemoveResult
+  screenViewed(screen: String!): Boolean
+  exceptionOccured(error: String!): Boolean
   openInEditor(editor: String!, path: String!): OpenInEditor
   updateSettings(data: String!): Settings!
   saveRecentAction(

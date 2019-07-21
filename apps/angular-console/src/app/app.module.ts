@@ -19,7 +19,7 @@ import {
   Telemetry
 } from '@angular-console/utils';
 import { HttpClientModule } from '@angular/common/http';
-import { Inject, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import {
   MatIconModule,
   MatListModule,
@@ -45,23 +45,21 @@ export function initApollo(
   messenger: Messenger,
   httpLink: HttpLink
 ) {
-  telemetry.setUpRouterLogging();
-
   const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       graphQLErrors.forEach(error => {
         messenger.error(error.message);
-        telemetry.reportException(error.message);
+        telemetry.exceptionOccured(error.message);
       });
     } else if (networkError) {
       const n: any = networkError;
       messenger.error('Angular Console Server was shutdown');
       if (n.error && n.error.errors && n.error.errors.length > 0) {
         const message = n.error.errors[0].message;
-        telemetry.reportException(message);
+        telemetry.exceptionOccured(message);
         console.error(message);
       } else {
-        telemetry.reportException(n.message);
+        telemetry.exceptionOccured(n.message);
         console.error(n.message);
       }
     }
@@ -116,13 +114,9 @@ export function initApollo(
   providers: [
     IsNodeJsInstalledGuard,
     {
-      provide: 'telemetry',
-      useClass: Telemetry
-    },
-    {
       provide: APOLLO_OPTIONS,
       useFactory: initApollo,
-      deps: [[new Inject('telemetry')], Messenger, HttpLink]
+      deps: [Telemetry, Messenger, HttpLink]
     },
     { provide: ENVIRONMENT, useValue: environment as Environment },
     { provide: IS_VSCODE, useValue: environment.application === 'vscode' },

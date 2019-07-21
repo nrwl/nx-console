@@ -10,8 +10,9 @@ export { readSettings, storeSettings } from './lib/api/read-settings';
 
 export { createServerModule } from './lib/server.module';
 
-export { Telemetry } from './lib/utils/telemetry';
+export { Telemetry } from './lib/telemetry';
+export { Commands } from './lib/api/commands';
 
-export * from './lib/api/run-command';
+export * from './lib/api/executable';
 
 export { SelectDirectory } from './lib/types';

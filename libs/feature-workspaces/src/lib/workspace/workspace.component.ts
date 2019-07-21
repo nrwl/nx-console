@@ -1,6 +1,6 @@
 import { IS_ELECTRON, IS_INTELLIJ } from '@angular-console/environment';
 import { FADE_IN } from '@angular-console/ui';
-import { EditorSupport, Settings } from '@angular-console/utils';
+import { EditorSupport, Settings, Telemetry } from '@angular-console/utils';
 import {
   animate,
   state,
@@ -13,7 +13,8 @@ import {
   Component,
   Inject,
   OnDestroy,
-  ViewEncapsulation
+  ViewEncapsulation,
+  OnInit
 } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -70,7 +71,7 @@ const TASK_RUNNER_GHOST_STYLE = style({
     ])
   ]
 })
-export class WorkspaceComponent implements OnDestroy {
+export class WorkspaceComponent implements OnDestroy, OnInit {
   readonly activeRouteTitle$: Observable<string> = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
     map(() => {
@@ -198,6 +199,7 @@ export class WorkspaceComponent implements OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly settings: Settings,
+    private readonly telemetry: Telemetry,
     private readonly mediaObserver: MediaObserver,
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly editorSupport: EditorSupport,
@@ -209,5 +211,9 @@ export class WorkspaceComponent implements OnDestroy {
     this.workplaceSubscription.unsubscribe();
     this.subscription.unsubscribe();
     this.editorSubscription.unsubscribe();
+  }
+
+  ngOnInit(): void {
+    this.telemetry.screenViewed('Workspace');
   }
 }

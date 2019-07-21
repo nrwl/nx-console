@@ -8,17 +8,7 @@ import {
   Workspace
 } from '@angular-console/schema';
 import { Inject } from '@nestjs/common';
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-
-import { CommandInformation } from '../api/commands';
-import { readDependencies } from '../api/read-dependencies';
-import { readEditors } from '../api/read-editors';
-import { availableExtensions, readExtensions } from '../api/read-extensions';
 import { schematicCollectionsForNgNew } from '../api/read-ngnews';
-import { readNpmScripts } from '../api/read-npm-scripts';
-import { readProjects } from '../api/read-projects';
-import { readSettings } from '../api/read-settings';
-import { commands } from '../api/run-command';
 import {
   cacheFiles,
   exists,
@@ -26,10 +16,21 @@ import {
   filterByName,
   readJsonFile
 } from '../utils/utils';
+import { readDependencies } from '../api/read-dependencies';
+import { availableExtensions, readExtensions } from '../api/read-extensions';
+import { readProjects } from '../api/read-projects';
+import { readNpmScripts } from '../api/read-npm-scripts';
+import { readEditors } from '../api/read-editors';
+import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { CommandInformation, Commands } from '../api/commands';
+import { readSettings } from '../api/read-settings';
 
 @Resolver()
 export class QueryResolver {
-  constructor(@Inject('store') private readonly store: any) {}
+  constructor(
+    @Inject('store') private readonly store: any,
+    @Inject('commands') private readonly commandsController: Commands
+  ) {}
 
   @Query()
   settings(): Settings {
@@ -111,7 +112,10 @@ export class QueryResolver {
       const settings = readSettings(this.store);
       const includeDetailedStatus = settings.enableDetailedStatus || false;
       if (id) {
-        const c = commands.findMatchingCommand(id, commands.history);
+        const c = this.commandsController.findMatchingCommand(
+          id,
+          this.commandsController.history
+        );
         if (!c) return [];
         const r = serializeIndividualCommand(
           c,
@@ -121,7 +125,7 @@ export class QueryResolver {
         c.outChunk = '';
         return [r as any];
       } else {
-        return commands.recent.map(serializeCommandInList);
+        return this.commandsController.recent.map(serializeCommandInList);
       }
     } catch (e) {
       console.error(e);

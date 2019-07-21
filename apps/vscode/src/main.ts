@@ -13,8 +13,6 @@ import {
   window,
   workspace
 } from 'vscode';
-
-import { getStoreForContext } from './app/get-store-for-context';
 import { NgTaskProvider } from './app/ng-task-provider/ng-task-provider';
 import { Workspace } from './app/tree-item/workspace';
 import {
@@ -33,6 +31,7 @@ import {
 } from './app/tree-view/projects-tree-provider';
 import { createWebViewPanel } from './app/webview.factory';
 import { registerNgCliCommands } from './app/ng-cli-commands';
+import { VSCodeStorage } from './app/vscode-storage';
 
 let server: Promise<Server>;
 
@@ -48,8 +47,9 @@ export function activate(context: ExtensionContext) {
   currentWorkspaceTreeProvider = CurrentWorkspaceTreeProvider.create({
     extensionPath: context.extensionPath
   });
+  const store = VSCodeStorage.fromContext(context);
 
-  taskProvider = new NgTaskProvider(new FileUtils(getStoreForContext(context)));
+  taskProvider = new NgTaskProvider(new FileUtils(store));
   tasks.registerTaskProvider('ng', taskProvider);
 
   registerNgCliCommands(context, taskProvider);

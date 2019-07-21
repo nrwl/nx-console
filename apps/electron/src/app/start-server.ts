@@ -43,6 +43,7 @@ export async function startServer(
     const assetsPath = path.join(__dirname, 'assets/public');
     const providers = [
       { provide: 'serverAddress', useValue: `http://localhost:${port}` },
+      { provide: 'telemetry', useValue: telemetry },
       { provide: 'store', useValue: store },
       { provide: 'selectDirectory', useValue: selectDirectory },
       {
@@ -70,7 +71,7 @@ export async function startServer(
       console.log(`Listening on port ${port}`);
     });
   } catch (e) {
-    telemetry.reportException(`Start Server: ${e.message}`);
+    telemetry.exceptionOccured(`Start Server: ${e.message}`);
     throw e;
   }
 }

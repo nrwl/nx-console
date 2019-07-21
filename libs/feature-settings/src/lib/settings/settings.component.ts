@@ -1,5 +1,5 @@
 import { Settings, Telemetry } from '@angular-console/utils';
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { Subject } from 'rxjs';
@@ -10,12 +10,12 @@ import { filter, takeUntil } from 'rxjs/operators';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnDestroy {
+export class SettingsComponent implements OnDestroy, OnInit {
   destroyed$ = new Subject();
 
   constructor(
+    private readonly telemetry: Telemetry,
     readonly settings: Settings,
-    @Inject('telemetry') private readonly telemetry: Telemetry,
     private readonly contextualActionBarService: ContextualActionBarService,
     router: Router
   ) {
@@ -34,6 +34,10 @@ export class SettingsComponent implements OnDestroy {
       });
   }
 
+  ngOnInit() {
+    this.telemetry.screenViewed('Settings');
+  }
+
   ngOnDestroy() {
     this.destroyed$.next();
     this.destroyed$.complete();
@@ -41,6 +45,5 @@ export class SettingsComponent implements OnDestroy {
 
   toggleDataCollection(x: boolean) {
     this.settings.setCanCollectData(x);
-    this.telemetry.reportDataCollectionEvent(x);
   }
 }

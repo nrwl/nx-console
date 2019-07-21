@@ -1,7 +1,7 @@
 import { NpmScripts, Project } from '@angular-console/schema';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
-import { RouterNavigation } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterNavigation, Telemetry } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { combineLatest, Observable } from 'rxjs';
 import {
@@ -24,7 +24,7 @@ interface Target {
   selector: 'angular-console-targets',
   templateUrl: './targets.component.html'
 })
-export class TargetsComponent {
+export class TargetsComponent implements OnInit {
   private readonly projectsAndNpmScripts$: Observable<
     Array<Project | NpmScripts>
   > = this.route.params.pipe(
@@ -127,11 +127,16 @@ export class TargetsComponent {
   );
 
   constructor(
+    private readonly telemetry: Telemetry,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly workspaceAndProjectsGQL: WorkspaceAndProjectsGQL,
     private readonly locationExt: RouterNavigation
   ) {}
+
+  ngOnInit() {
+    this.telemetry.screenViewed('Run Targets');
+  }
 
   navigateToSelectedTarget(target: Target | null) {
     if (target && isNpmScript(target)) {
