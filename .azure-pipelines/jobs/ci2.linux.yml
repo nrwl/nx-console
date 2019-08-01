@@ -1,9 +1,12 @@
 steps:
-  - script: npx nps prepare.electron
+  - script: yarn start prepare.electron
     displayName: build electron
 
-  - script: npx nps e2e.ci2.fixtures
+  - script: yarn start test.affected.origin-master
+    displayName: 'affected unit-tests'
+
+  - script: yarn start e2e.ci2.fixtures
     displayName: e2e fixtures (ci2)
 
-  - script: npx nps e2e.ci2
+  - script: yarn start e2e.ci2
     displayName: e2e tests (ci2)

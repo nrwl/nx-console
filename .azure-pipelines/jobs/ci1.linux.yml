@@ -1,15 +1,12 @@
 steps:
-  - script: npx nps format.and.lint.check
+  - script: yarn start format.and.lint.check
     displayName: 'format and lint check'
 
-  - script: npx nps prepare.electron
+  - script: yarn start prepare.electron
     displayName: 'build electron'
 
-  - script: npx nps test.affected.origin-master
-    displayName: 'affected unit-tests'
-
-  - script: npx nps e2e.ci1.fixtures
+  - script: yarn start e2e.ci1.fixtures
     displayName: 'e2e fixtures (ci1)'
 
-  - script: npx nps e2e.ci1
+  - script: yarn start e2e.ci1
     displayName: 'e2e tests (ci1)'

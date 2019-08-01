@@ -4,6 +4,13 @@ steps:
     inputs:
       versionSpec: '12.x'
 
+  - task: 1ESLighthouseEng.PipelineArtifactCaching.RestoreCacheV1.RestoreCache@1
+    displayName: restore cache
+    inputs:
+      keyfile: '**/yarn.lock, !**/node_modules/**/yarn.lock'
+      targetfolder: '**/node_modules, !**/node_modules/**/node_modules, $(CypressCacheLocation)'
+      vstsFeed: 'angular-console'
+
   - script: |
       yarn install --ignore-engines --frozen-lockfile --ignore-optional
     displayName: yarn install

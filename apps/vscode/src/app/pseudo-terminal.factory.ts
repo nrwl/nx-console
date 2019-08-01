@@ -9,6 +9,11 @@ import { ExtensionContext, Terminal, window } from 'vscode';
 
 import { getStoreForContext } from './get-store-for-context';
 
+let terminalsToReuse: Array<Terminal> = [];
+window.onDidCloseTerminal(e => {
+  terminalsToReuse = terminalsToReuse.filter(t => t.processId !== e.processId);
+});
+
 export function getPseudoTerminalFactory(
   context: ExtensionContext
 ): PseudoTerminalFactory {
@@ -54,7 +59,8 @@ function win32PseudoTerminalFactory(
     context,
     terminal,
     successMessage,
-    failureMessage
+    failureMessage,
+    ''
   );
 }
 
@@ -81,7 +87,8 @@ function wslPseudoTerminalFactory(
     context,
     terminal,
     successMessage,
-    failureMessage
+    failureMessage,
+    ''
   );
 }
 
@@ -91,11 +98,12 @@ function unixPseudoTerminalFactory(
 ): PseudoTerminal {
   const successMessage = 'Process completed 🙏';
   const failureMessage = 'Process failed 🐳';
+  const disposeMessage = 'Press any key to close this terminal';
   const fullCommand =
     `echo "${displayCommand}\n" && ${program} ${args.join(
       ' '
-    )} && read -n 1 -s -r -p $"\n\n${successMessage}\n"` +
-    `  || read -n 1 -s -r -p $"\n\n${failureMessage}\n"`;
+    )} && read -n 1 -s -r -p $"\n\n${successMessage}\n\n${disposeMessage}"` +
+    `  || read -n 1 -s -r -p $"\n\n${failureMessage}\n\n${disposeMessage}"`;
 
   const terminal = window.createTerminal({
     name,
@@ -108,7 +116,8 @@ function unixPseudoTerminalFactory(
     context,
     terminal,
     successMessage,
-    failureMessage
+    failureMessage,
+    disposeMessage
   );
 }
 
@@ -116,8 +125,14 @@ function renderVsCodeTerminal(
   context: ExtensionContext,
   terminal: Terminal,
   successMessage: string,
-  failureMessage: string
+  failureMessage: string,
+  disposeMessage: string
 ): PseudoTerminal {
+  const reusableTerminal = terminalsToReuse.pop();
+  if (reusableTerminal) {
+    reusableTerminal.dispose();
+  }
+
   terminal.show();
   context.subscriptions.push(terminal);
 
@@ -134,16 +149,18 @@ function renderVsCodeTerminal(
 
   context.subscriptions.push(
     (<any>terminal).onDidWriteData((data: string) => {
-      if (onDidWriteData) {
-        onDidWriteData(data);
-      }
-
       // Screen scrape for successMessage or failureMessage as the signal that the
       // process has exited.
       const success = data.includes(successMessage);
       const failed = data.includes(failureMessage);
       if (success || failed) {
+        if (onDidWriteData) {
+          onDidWriteData(data.replace(disposeMessage, ''));
+        }
+
         disposeTerminal(success ? 0 : 1);
+      } else if (onDidWriteData) {
+        onDidWriteData(data);
       }
     })
   );
@@ -153,7 +170,10 @@ function renderVsCodeTerminal(
       onDidWriteData = callback;
     },
     onExit: callback => {
-      onExit = callback;
+      onExit = code => {
+        terminalsToReuse.push(terminal);
+        callback(code);
+      };
     },
     kill: () => {
       if (onDidWriteData) {
