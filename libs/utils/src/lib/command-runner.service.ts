@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { FetchResult } from 'apollo-link';
 import { BehaviorSubject, concat, interval, Observable, of } from 'rxjs';
 import {
@@ -11,8 +13,7 @@ import {
   takeWhile,
   withLatestFrom
 } from 'rxjs/operators';
-import { COMMAND_LIST_POLLING, COMMANDS_POLLING } from './polling-constants';
-import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
+
 import {
   GetCommandGQL,
   GetCommandInitialGQL,
@@ -23,8 +24,9 @@ import {
   RestartCommandGQL,
   StopCommandGQL
 } from './generated/graphql';
-import { MatSnackBar } from '@angular/material';
+import { COMMAND_LIST_POLLING, COMMANDS_POLLING } from './polling-constants';
 
+export { ListAllCommands };
 export enum CommandStatus {
   SUCCESSFUL = 'successful',
   FAILED = 'failed',

@@ -1,8 +1,4 @@
-import {
-  CommandResponse,
-  CommandRunner,
-  CommandStatus
-} from '@angular-console/utils';
+import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Subject } from 'rxjs';
@@ -40,79 +36,5 @@ describe('ActionBarComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  describe('ctrl-c', () => {
-    it('should not kill multiple commands', () => {
-      const commandResponse: CommandResponse = {
-        id: 'commandId',
-        out: '',
-        outChunk: '',
-        detailedStatus: {},
-        status: CommandStatus.IN_PROGRESS,
-        command: ''
-      };
-      mockCommands.next([commandResponse, commandResponse]);
-
-      // Dont call if multiple events
-      document.dispatchEvent(
-        new KeyboardEvent('keypress', { ctrlKey: true, key: 'c' })
-      );
-      expect(mockCommandRunner.stopCommandViaCtrlC).not.toHaveBeenCalled();
-    });
-
-    it('should not kill an opened command', () => {
-      const commandResponse: CommandResponse = {
-        id: 'commandId',
-        out: '',
-        outChunk: '',
-        detailedStatus: {},
-        status: CommandStatus.IN_PROGRESS,
-        command: ''
-      };
-      mockCommands.next([commandResponse]);
-
-      component.actionsExpanded.next(true);
-      mockCommands.next([commandResponse]);
-      document.dispatchEvent(
-        new KeyboardEvent('keypress', { ctrlKey: true, key: 'c' })
-      );
-      expect(mockCommandRunner.stopCommandViaCtrlC).not.toHaveBeenCalled();
-    });
-
-    it('should kill a single command', () => {
-      const commandResponse: CommandResponse = {
-        id: 'commandId',
-        out: '',
-        outChunk: '',
-        detailedStatus: {},
-        status: CommandStatus.IN_PROGRESS,
-        command: ''
-      };
-      mockCommands.next([commandResponse]);
-
-      document.dispatchEvent(
-        new KeyboardEvent('keypress', { ctrlKey: true, key: 'c' })
-      );
-      expect(mockCommandRunner.stopCommandViaCtrlC).toHaveBeenCalledWith(
-        commandResponse.id
-      );
-    });
-
-    it('should only kill running events', () => {
-      const commandResponse: CommandResponse = {
-        id: 'commandId',
-        out: '',
-        outChunk: '',
-        detailedStatus: {},
-        status: CommandStatus.TERMINATED,
-        command: ''
-      };
-      mockCommands.next([commandResponse]);
-      document.dispatchEvent(
-        new KeyboardEvent('keypress', { ctrlKey: true, key: 'c' })
-      );
-      expect(mockCommandRunner.stopCommandViaCtrlC).not.toHaveBeenCalled();
-    });
   });
 });

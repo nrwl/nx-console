@@ -1,3 +1,5 @@
+import { IS_ELECTRON } from '@angular-console/environment';
+import { Schema } from '@angular-console/schema';
 import { Completions, Serializer } from '@angular-console/utils';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
@@ -5,6 +7,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  Inject,
   Input,
   Output,
   QueryList,
@@ -17,7 +20,6 @@ import { ReplaySubject, Subscription } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 
 import { schematicFieldsToFormGroup } from '../schematic-fields/schematic-fields.component';
-import { Schema } from '@angular-console/schema';
 
 interface FieldGrouping {
   type: 'important' | 'optional';
@@ -71,10 +73,14 @@ export class FlagsComponent {
   constructor(
     private readonly serializer: Serializer,
     private readonly elementRef: ElementRef,
-    private readonly completions: Completions
+    private readonly completions: Completions,
+    @Inject(IS_ELECTRON) readonly isElectron: boolean
   ) {}
 
   hideFields() {
+    if (!this.isElectron) {
+      return;
+    }
     this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
       panel.close();
     });
