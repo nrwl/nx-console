@@ -37,7 +37,7 @@ intellij {
   pluginName 'Angular Console'
   downloadSources false
   updateSinceUntilBuild true
-  plugins = ['JavaScriptLanguage', 'Terminal']
+  plugins = ['JavaScriptLanguage', 'terminal']
 }
 patchPluginXml {
   sinceBuild '180'
