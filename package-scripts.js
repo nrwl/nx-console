@@ -62,35 +62,22 @@ const assetMappings = {
 module.exports = {
   scripts: {
     dev: {
-      'copy-assets': {
-        electron: nps.series(
-          'nps dev.copy-assets.base.electron',
-          `shx chmod 0755 ${join(
-            'dist',
-            'apps',
-            'electron',
-            'assets',
-            'new-workspace'
-          )}`
-        ),
-        base: forEachApplication(
-          nps.concurrent({
-            schema: `shx cp ${assetMappings['schema'].from} ${
-              assetMappings['schema'].to
-            }`,
-            'server-assets': `shx cp -rf ${
-              assetMappings['server-assets'].from
-            } ${assetMappings['server-assets'].to}`,
-            readme: `shx cp ${assetMappings['readme'].from} ${
-              assetMappings['readme'].to
-            }`,
-            'extensions-schema': `shx cp ${
-              assetMappings['extensions-schema'].from
-            } ${assetMappings['extensions-schema'].to}`
-          })
-        ),
-        vscode: nps.series.nps('dev.copy-assets.base.vscode')
-      },
+      'copy-assets': forEachApplication(
+        nps.concurrent({
+          schema: `shx cp ${assetMappings['schema'].from} ${
+            assetMappings['schema'].to
+          }`,
+          'server-assets': `shx cp -rf ${assetMappings['server-assets'].from} ${
+            assetMappings['server-assets'].to
+          }`,
+          readme: `shx cp ${assetMappings['readme'].from} ${
+            assetMappings['readme'].to
+          }`,
+          'extensions-schema': `shx cp ${
+            assetMappings['extensions-schema'].from
+          } ${assetMappings['extensions-schema'].to}`
+        })
+      ),
 
       'gen-graphql': nps.series(
         'gql-gen --config ./tools/scripts/codegen-server.yml',
