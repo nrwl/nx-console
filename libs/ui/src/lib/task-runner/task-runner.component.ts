@@ -12,10 +12,11 @@ import {
   Component,
   ContentChild,
   Inject,
-  Input
+  Input,
+  OnDestroy
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map, shareReplay, startWith, tap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
+import { map, shareReplay, startWith, tap, takeUntil } from 'rxjs/operators';
 
 import { CommandOutputComponent } from '../command-output/command-output.component';
 import { CONTEXTUAL_ACTION_BAR_HEIGHT } from '../contextual-action-bar/contextual-action-bar.component';
@@ -47,7 +48,7 @@ import { FlagsComponent } from '../flags/flags.component';
     ])
   ]
 })
-export class TaskRunnerComponent implements AfterContentChecked {
+export class TaskRunnerComponent implements AfterContentChecked, OnDestroy {
   @Input() terminalWindowTitle: string;
 
   @ContentChild(FlagsComponent, { static: false })
@@ -57,9 +58,13 @@ export class TaskRunnerComponent implements AfterContentChecked {
 
   terminalVisible$ = new BehaviorSubject(false);
   terminalAnimationState: Observable<string>;
+  destroyed$ = new Subject();
 
   constructor(@Inject(IS_ELECTRON) readonly isElectron: boolean) {}
-
+  ngOnDestroy() {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
   ngAfterContentChecked() {
     // Wait until the flags component has rendered its expansion panels.
     if (
@@ -92,20 +97,23 @@ export class TaskRunnerComponent implements AfterContentChecked {
       tap(v => {
         const numFlags = this.flagsComponent.matExpansionPanels.length;
         const configurations = this.flagsComponent.configurations;
-        const expansionPanelHeaderHeight = numFlags === 1 ? 110 : 49 + 110;
+        const expansionPanelHeaderHeight = numFlags === 1 ? 62 : 49 + 62;
         const configurationsHeight =
           configurations && configurations.length > 1 ? 55 : 0;
+        const terminalChromeHeight = this.isElectron ? 48 : 0;
         switch (v) {
           case 'grow':
             this.flagsComponent.viewportHeight.next(
               `calc(70vh - ${expansionPanelHeaderHeight +
                 configurationsHeight +
+                terminalChromeHeight +
                 CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
             );
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
               `calc(100vh - ${expansionPanelHeaderHeight +
+                terminalChromeHeight +
                 CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
             );
             break;
@@ -115,5 +123,9 @@ export class TaskRunnerComponent implements AfterContentChecked {
       }),
       shareReplay()
     );
+
+    if (!this.isElectron) {
+      this.terminalAnimationState.pipe(takeUntil(this.destroyed$)).subscribe();
+    }
   }
 }
