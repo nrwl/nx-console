@@ -12,7 +12,9 @@ export class Serializer {
         f.positional ||
         f.required ||
         this.importantSchematicField(schematic.collection, f.name),
-      completion: f.completion || this.completionSchematicType(schematic.collection, f.name)
+      completion:
+        f.completion || 
+        this.completionSchematicType(schematic.collection, f.name)
     }));
     const normal = {
       ...schematic,
