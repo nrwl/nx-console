@@ -12,7 +12,7 @@ export class Serializer {
         f.positional ||
         f.required ||
         this.importantSchematicField(schematic.collection, f.name),
-      completion: this.completionSchematicType(schematic.collection, f.name)
+      completion: f.completion || this.completionSchematicType(schematic.collection, f.name)
     }));
     const normal = {
       ...schematic,
@@ -33,7 +33,7 @@ export class Serializer {
         ...f,
         required: false,
         important: f.positional || this.importantBuilderField(builder, f.name),
-        completion: this.completionBuilderType(builder, f.name)
+        completion: f.completion || this.completionBuilderType(builder, f.name)
       }))
     );
   }
