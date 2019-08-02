@@ -42,18 +42,9 @@ You can build the electron app by running `nps package.electronMac` or `nps pack
 
 ## Building VSCode Plugin
 
-You can build the vscode extension by running `nps prepare.and.package.vscode`.
-You can install it by running `code --install-extension dist/apps/vscode/angular-console.vsix`
-Reload the vscode window to use the newly installed build of the extension.
+You can build the vscode extension and run it in development mode by opening up this repo in Visual Studio code and hitting the f5 function key. This will launch `nps build.dev.vscode` in the background and spawn an extension development host version of VSCode so that you can try out your code.
 
-If you are working on the plugin, run:
-
-- `nps build.dev.vscode` (This builds the client/server in watch mode)
-- Wait for both client and server to be built.
-- Hit F5
-
-Now you can make changes to your code and the client/server builds will trigger.
-When you want to see those reflected in VSCode, click the refresh button or hit F5 again.
+When you want to update the extension with a new set of changes, go back to the editor you launched the extension host from and click the refresh button (its green and looks like a browser refresh icon).
 
 ## Submitting a PR
 

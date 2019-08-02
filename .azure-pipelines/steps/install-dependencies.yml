@@ -5,5 +5,5 @@ steps:
       versionSpec: '12.x'
 
   - script: |
-      yarn install --ignore-engines --frozen-lockfile --ignore-optional
+      yarn install --frozen-lockfile
     displayName: yarn install

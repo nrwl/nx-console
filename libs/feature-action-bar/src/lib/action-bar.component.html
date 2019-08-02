@@ -6,7 +6,7 @@
 <div class="action-bar-container" *ngIf="(commands$ | async) as actions">
   <!-- Show tasks toolbar -->
   <mat-toolbar
-    (click)="actionsExpanded.next(!actionsExpanded.value)"
+    (click)="actionsExpandedSubject.next(!actionsExpandedSubject.value)"
     [@growShrink]="(showActionToolbar$ | async) ? 'expand' : 'contract'"
     class="action-bar"
     matRipple

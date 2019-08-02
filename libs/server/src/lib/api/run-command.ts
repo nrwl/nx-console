@@ -72,7 +72,7 @@ export interface PseudoTerminal {
 
   onExit(callback: (code: number) => void): void;
 
-  setCols(cols: number): void;
+  setCols?(cols: number): void;
 
   kill(): void;
 }

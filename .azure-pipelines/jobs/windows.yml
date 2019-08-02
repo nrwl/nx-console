@@ -1,3 +1,6 @@
 steps:
   - script: npx nps prepare.electron
-    displayName: build electron
+    displayName: prepare electron
+
+  - script: npx nps package.electronWin
+    displayName: package electron

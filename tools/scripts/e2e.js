@@ -7,19 +7,19 @@ let flags = process.argv.slice(2).join(' ');
 
 function runE2eTests() {
   try {
-    cp.execSync(`ng e2e ${flags}`, {
+    const x = cp.execSync(`ng e2e ${flags}`, {
       stdio: [0, 1, 2],
       env: {
         ...process.env,
         CYPRESS_projectsRoot: path.join(__dirname, '../../tmp')
       }
     });
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  } finally {
     dev.kill();
     process.exit(0);
+  } catch (e) {
+    console.error(e);
+    dev.kill('SIGKILL');
+    process.exit(1);
   }
 }
 
@@ -34,7 +34,7 @@ try {
 } catch (e) {
   console.error(e);
   if (dev) {
-    dev.kill();
+    dev.kill('SIGKILL');
   }
   process.exit(1);
 }

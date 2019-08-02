@@ -1,5 +1,5 @@
 steps:
-  - script: npx nps prepare.electron
+  - script: npx nps build.ci.electron
     displayName: build electron
 
   - script: npx nps e2e.ci2.fixtures

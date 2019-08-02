@@ -6,7 +6,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Extension",
+      "name": "Run Extension In Dev Mode",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -14,9 +14,8 @@
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
       "trace": "false",
-      "sourceMaps": false,
-      "stopOnEntry": false,
       "outFiles": ["${workspaceFolder}/**/*"],
+      "preLaunchTask": "npm: build-vs-code"
     }
   ]
 }

@@ -1,4 +1,3 @@
-import { Inject } from '@nestjs/common';
 import {
   CommandResponse,
   EditorSupport,
@@ -8,7 +7,18 @@ import {
   Settings,
   Workspace
 } from '@angular-console/schema';
+import { Inject } from '@nestjs/common';
+import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+
+import { CommandInformation } from '../api/commands';
+import { readDependencies } from '../api/read-dependencies';
+import { readEditors } from '../api/read-editors';
+import { availableExtensions, readExtensions } from '../api/read-extensions';
 import { schematicCollectionsForNgNew } from '../api/read-ngnews';
+import { readNpmScripts } from '../api/read-npm-scripts';
+import { readProjects } from '../api/read-projects';
+import { readSettings } from '../api/read-settings';
+import { commands } from '../api/run-command';
 import {
   cacheFiles,
   exists,
@@ -16,15 +26,6 @@ import {
   filterByName,
   readJsonFile
 } from '../utils/utils';
-import { readDependencies } from '../api/read-dependencies';
-import { availableExtensions, readExtensions } from '../api/read-extensions';
-import { readProjects } from '../api/read-projects';
-import { readNpmScripts } from '../api/read-npm-scripts';
-import { readEditors } from '../api/read-editors';
-import { commands } from '../api/run-command';
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { CommandInformation } from '../api/commands';
-import { readSettings } from '../api/read-settings';
 
 @Resolver()
 export class QueryResolver {
@@ -134,7 +135,7 @@ function serializeIndividualCommand(
   cols: number,
   includeDetailedStatus: boolean
 ) {
-  if (c.commandRunning) {
+  if (c.commandRunning && c.commandRunning.setCols) {
     c.commandRunning.setCols(cols);
   }
   return {
