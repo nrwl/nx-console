@@ -12,8 +12,8 @@ function forEachApplication(command) {
 
 function affected(affectedCommand) {
   return {
-    'origin-master': `nx affected:${affectedCommand} --base=origin/master --parallel`,
-    'upstream-master': `nx affected:${affectedCommand} --base=upstream/master --parallel`
+    'origin-master': `nx affected:${affectedCommand} --base=origin/master --parallel --silent --ci`,
+    'upstream-master': `nx affected:${affectedCommand} --base=upstream/master --parallel --silent --ci`
   };
 }
 
@@ -236,6 +236,18 @@ module.exports = {
           })
         )
       ),
+      ci: {
+        ...forEachApplication(
+          nps.series(
+            'nps dev.gen-graphql',
+            nps.concurrent({
+              server: 'ng build APPLICATION --noSourceMap',
+              client:
+                'ng build angular-console --configuration=APPLICATION --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false'
+            })
+          )
+        )
+      },
       dev: {
         ...forEachApplication(
           nps.series(

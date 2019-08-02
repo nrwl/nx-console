@@ -71,13 +71,13 @@ export class Commands {
 
   stopCommands(commands: CommandInformation[]) {
     commands.forEach(c => {
+      if (c.commandRunning) {
+        c.commandRunning.kill();
+        c.commandRunning = null;
+      }
       if (c.status === 'in-progress') {
         c.status = 'terminated';
         c.detailedStatusCalculator.setStatus('terminated');
-        if (c.commandRunning) {
-          c.commandRunning.kill();
-          c.commandRunning = null;
-        }
       }
     });
   }

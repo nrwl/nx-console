@@ -6,8 +6,8 @@ import {
 } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
-import { join } from 'path';
 import { existsSync, writeFile } from 'fs';
+import { join } from 'path';
 
 export interface IntellijTerminal {
   onDataWrite(callback: (data: string) => void): void;
@@ -49,9 +49,6 @@ function wsPseudoTerminalFactory(
     },
     kill: () => {
       terminal.kill();
-    },
-    setCols: () => {
-      // No-op, we defer to vscode so as to match its display
     }
   };
 }
