@@ -112,7 +112,6 @@ export class Serializer {
       return false;
     }
   }
-  
   private importantBuilderField(builder: string, name: string) {
     if (
       builder.startsWith('@angular-devkit/build-angular') ||
