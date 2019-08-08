@@ -2,12 +2,13 @@ $border-radius: 24px;
 $input-padding-horizontal: 24px;
 
 ui-flags {
-  .mat-expansion-panel-body {
-    padding-right: 0 !important;
+  .flags-form {
+    overflow: auto;
+    max-height: calc(100vh - 54px);
   }
 
-  .flags-container {
-    overflow: auto;
+  .mat-expansion-panel-body {
+    padding-right: 0 !important;
   }
 
   background: white;
@@ -25,7 +26,6 @@ ui-flags {
   }
 
   mat-expansion-panel {
-    overflow: hidden !important;
     box-shadow: none !important;
 
     .mat-expanded {

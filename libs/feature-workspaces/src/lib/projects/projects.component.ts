@@ -178,7 +178,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   );
 
   viewportHeight$ = this.commandRunner.listAllCommands().pipe(
-    map(c => Boolean(c.length > 0)),
+    map(c => this.isElectron && Boolean(c.length > 0)),
     map(actionBarExpanded => {
       return `calc(100vh - ${this.viewportOffsetPx +
         (actionBarExpanded ? ACTION_BAR_HEIGHT_PX : 0)}px)`;

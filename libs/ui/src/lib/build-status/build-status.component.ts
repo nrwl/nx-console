@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { MatSelectChange } from '@angular/material';
 import { BehaviorSubject, combineLatest, ReplaySubject, Subject } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, map, filter } from 'rxjs/operators';
 
 import { GROW_SHRINK_VERT } from '../animations/grow-shink';
 import { SPEEDS } from './speed-constants';
@@ -60,6 +60,7 @@ export class BuildStatusComponent implements OnDestroy {
 
   // So we double-check that it indeed does have meaningful changes
   readonly status$ = this.allStatus$.pipe(
+    filter(a => Boolean(a)),
     distinctUntilChanged(
       (a, b) =>
         typeof a === typeof b &&
@@ -240,7 +241,11 @@ export class BuildStatusComponent implements OnDestroy {
           return 'Starting...';
         }
         case 'build_inprogress': {
-          return `Building... (${status.progress}%)`;
+          if (status.progress) {
+            return `Building... (${status.progress}%)`;
+          } else {
+            return `Building...`;
+          }
         }
         case 'build_success': {
           return `Completed`;

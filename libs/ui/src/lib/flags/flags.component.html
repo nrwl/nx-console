@@ -1,4 +1,8 @@
-<form [formGroup]="formGroup">
+<form
+  [formGroup]="formGroup"
+  class="flags-form"
+  [style.max-height]="viewportHeight | async"
+>
   <div
     class="headline-container"
     fxLayout="row"
@@ -49,16 +53,21 @@
       </mat-expansion-panel-header>
 
       <ng-template matExpansionPanelContent>
-        <div
-          class="flags-container"
-          [style.max-height]="viewportHeight | async"
-        >
-          <ui-schematic-field
-            *ngFor="let field of fieldGroup.fields"
-            [field]="field"
-            [formGroup]="formGroup"
-          ></ui-schematic-field>
-        </div>
+        <ui-schematic-field
+          *ngFor="let field of fieldGroup.fields"
+          [field]="field"
+          [formGroup]="formGroup"
+        ></ui-schematic-field>
+      </ng-template>
+    </mat-expansion-panel>
+    <mat-expansion-panel *ngIf="showOutput">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ outputTitle || 'Output' }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <ng-template matExpansionPanelContent>
+        <ng-content></ng-content>
       </ng-template>
     </mat-expansion-panel>
   </mat-accordion>

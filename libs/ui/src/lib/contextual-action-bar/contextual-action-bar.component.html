@@ -117,7 +117,10 @@
       >
         <button
           class="action-button"
-          *ngIf="(commandRunner.activeCommand$ | async) as activeCommand"
+          *ngIf="
+            isElectron &&
+            (commandRunner.activeCommand$ | async) as activeCommand
+          "
           (click)="stopCommand()"
           title="Cancel the command"
           mat-raised-button

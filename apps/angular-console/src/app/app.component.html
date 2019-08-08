@@ -8,6 +8,6 @@
     <router-outlet></router-outlet>
   </div>
 
-  <angular-console-action-bar></angular-console-action-bar>
+  <angular-console-action-bar *ngIf="isElectron"></angular-console-action-bar>
   <ui-data-collection></ui-data-collection>
 </div>

@@ -1,4 +1,3 @@
-import { normalizeCommands } from '../utils/architect';
 import { FileUtils } from '../utils/file-utils';
 import { readJsonFile } from '../utils/utils';
 import { Commands } from './commands';
@@ -39,13 +38,16 @@ export function runCommand(
       displayCommand: command,
       name: id,
       program,
-      args: normalizeCommands(cwd, cmds),
+      args: cmds,
       cwd,
+      isDryRun: !addToRecent,
       isWsl: fileUtils.isWsl()
     });
-    commandRunning.onDidWriteData(data => {
-      commands.addOut(id, data);
-    });
+    if (commandRunning.onDidWriteData) {
+      commandRunning.onDidWriteData(data => {
+        commands.addOut(id, data);
+      });
+    }
     commandRunning.onExit(code => {
       commands.setFinalStatus(id, code === 0 ? 'successful' : 'failed');
     });
@@ -68,7 +70,7 @@ export function runCommand(
 }
 
 export interface PseudoTerminal {
-  onDidWriteData(callback: (data: string) => void): void;
+  onDidWriteData?(callback: (data: string) => void): void;
 
   onExit(callback: (code: number) => void): void;
 
@@ -83,6 +85,7 @@ export interface PseudoTerminalConfig {
   program: string;
   args: string[];
   cwd: string;
+  isDryRun?: boolean;
   displayCommand: string;
   isWsl: boolean;
 }

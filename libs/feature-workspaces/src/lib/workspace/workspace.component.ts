@@ -9,11 +9,11 @@ import {
   trigger
 } from '@angular/animations';
 import {
+  ChangeDetectionStrategy,
   Component,
   Inject,
   OnDestroy,
-  ViewEncapsulation,
-  ChangeDetectionStrategy
+  ViewEncapsulation
 } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -54,9 +54,8 @@ const TASK_RUNNER_GHOST_STYLE = style({
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('growShrink', [
-      state('void', style({ overflow: 'hidden', width: 0 })),
-      state('collapse', style({ overflow: 'hidden', width: 0 })),
-      state('expand', style({ overflow: 'hidden', width: '*' })),
+      state('collapse', style({ width: '0' })),
+      state('expand', style({ width: '52px' })),
       transition(`* <=> *`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
     ]),
     trigger('routerTransition', [

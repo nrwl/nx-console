@@ -15336,10 +15336,10 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
-vsce@^1.65.0:
-  version "1.65.0"
-  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.65.0.tgz#8aa4ef92fdd7f57495e074e54caea404ed29ccb2"
-  integrity sha512-1bGyeoaxjhNVz9fVAqUzGWc1e5CxsxZFpVSnS/anRVyZju0y4DJCPi685WkBsRYU/lfp3AI1smpatuSfb2Lllg==
+vsce@^1.66.0:
+  version "1.66.0"
+  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.66.0.tgz#8cf1d64a4825d5d0523ea5efd0bf41e2c6829565"
+  integrity sha512-Zf4+WD4PhEcOr7jkU08SI9lwFqDhmhk73YOCGQ/tNLaBy+PnnX4eSdqj9LdzDLuI2dsyomJLXzDSNgxuaInxCQ==
   dependencies:
     azure-devops-node-api "^7.2.0"
     chalk "^2.4.2"

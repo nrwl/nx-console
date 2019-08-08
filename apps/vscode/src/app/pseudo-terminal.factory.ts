@@ -1,29 +1,35 @@
 import {
   PseudoTerminal,
   PseudoTerminalConfig,
-  PseudoTerminalFactory,
-  readSettings
+  PseudoTerminalFactory
 } from '@angular-console/server';
 import { platform } from 'os';
-import { Disposable, ExtensionContext, Terminal, window } from 'vscode';
-
-import { getStoreForContext } from './get-store-for-context';
+import {
+  Disposable,
+  ShellExecution,
+  Task,
+  TaskDefinition,
+  TaskExecution,
+  TaskPanelKind,
+  tasks,
+  TaskScope,
+  Terminal,
+  window,
+  TaskRevealKind
+} from 'vscode';
 
 let terminalsToReuse: Array<Terminal> = [];
 window.onDidCloseTerminal(e => {
   terminalsToReuse = terminalsToReuse.filter(t => t.processId !== e.processId);
 });
 
-const DISPOSE_MESSAGE = 'Press any key to close this terminal';
+const activeTaskNames = new Set<string>();
+let currentDryRun: TaskExecution | undefined;
 
-export function getPseudoTerminalFactory(
-  context: ExtensionContext
-): PseudoTerminalFactory {
-  const store = getStoreForContext(context);
-
+export function getPseudoTerminalFactory(): PseudoTerminalFactory {
   return config => {
     if (platform() === 'win32') {
-      const isWsl = readSettings(store).isWsl;
+      const isWsl = config.isWsl;
       if (isWsl) {
         return wslPseudoTerminalFactory(config);
       } else {
@@ -34,154 +40,136 @@ export function getPseudoTerminalFactory(
   };
 }
 
-function win32PseudoTerminalFactory({
-  name,
-  program,
-  args,
-  cwd,
-  displayCommand
-}: PseudoTerminalConfig): PseudoTerminal {
-  const successMessage = 'Process completed #woot';
-  const failureMessage = 'Process failed #failwhale';
-  const fullCommand = [
-    `echo '${displayCommand}\n'; Try {`,
-    `& '${program}' ${args.join(' ')};`,
-    `if($?) { echo '\n\n${successMessage}\n\n${DISPOSE_MESSAGE}' };`,
-    `if(!$?) { echo '\n\n${failureMessage}\n\n${DISPOSE_MESSAGE}' };`,
-    `} Catch { `,
-    `echo '\n\r${failureMessage}'`,
-    `}; $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');`
-  ].join(' ');
-
-  const terminal = window.createTerminal({
-    name,
-    cwd,
-    shellPath: 'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
-    shellArgs: `-Sta -NoLogo -NonInteractive -C "& {${fullCommand}}"`
+function win32PseudoTerminalFactory(
+  config: PseudoTerminalConfig
+): PseudoTerminal {
+  const execution = new ShellExecution(config.displayCommand, {
+    cwd: config.cwd,
+    executable:
+      'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
+    shellArgs: [
+      `-Sta -NoLogo -NonInteractive -C "& {${config.program} ${config.args.join(
+        ' '
+      )}}"`
+    ]
   });
 
-  return renderVsCodeTerminal(terminal, successMessage, failureMessage);
+  return executeTask(config, execution);
 }
 
 function wslPseudoTerminalFactory(
   config: PseudoTerminalConfig
 ): PseudoTerminal {
-  const successMessage = 'Process completed #woot';
-  const failureMessage = 'Process failed #failwhale';
-
-  const terminal = window.createTerminal({
-    name,
+  const execution = new ShellExecution(config.displayCommand, {
     cwd: config.cwd,
-    shellPath: 'C:\\Windows\\System32\\wsl.exe',
+    executable: 'C:\\Windows\\System32\\wsl.exe',
     shellArgs: [
       '-e',
       'bash',
       '-l',
       '-c',
-      getBashScriptForCommand(config, successMessage, failureMessage)
+      `${config.program} ${config.args.join(' ')}`
     ]
   });
 
-  return renderVsCodeTerminal(terminal, successMessage, failureMessage);
+  return executeTask(config, execution);
 }
 
 function unixPseudoTerminalFactory(
   config: PseudoTerminalConfig
 ): PseudoTerminal {
-  const successMessage = 'Process completed 🙏';
-  const failureMessage = 'Process failed 🐳';
-
-  const terminal = window.createTerminal({
-    name,
+  const execution = new ShellExecution(config.displayCommand, {
     cwd: config.cwd,
-    shellPath: '/bin/bash',
-    shellArgs: [
-      '-l',
-      '-i',
-      '-c',
-      getBashScriptForCommand(config, successMessage, failureMessage)
-    ]
+    executable: '/bin/bash',
+    shellArgs: ['-l', '-c', `${config.program} ${config.args.join(' ')}`]
   });
 
-  return renderVsCodeTerminal(terminal, successMessage, failureMessage);
+  return executeTask(config, execution);
 }
 
-function getBashScriptForCommand(
+function executeTask(
   config: PseudoTerminalConfig,
-  successMessage: string,
-  failureMessage: string
-) {
-  const { displayCommand, program, args } = config;
-  return (
-    `echo "${displayCommand}\n" && ${program} ${args.join(
-      ' '
-    )} && read -n 1 -s -r -p $"\n\n${successMessage}\n\n${DISPOSE_MESSAGE}"` +
-    `  || read -n 1 -s -r -p $"\n\n${failureMessage}\n\n${DISPOSE_MESSAGE}"`
-  );
-}
-
-function renderVsCodeTerminal(
-  terminal: Terminal,
-  successMessage: string,
-  failureMessage: string
+  execution: ShellExecution
 ): PseudoTerminal {
-  const reusableTerminal = terminalsToReuse.pop();
-  if (reusableTerminal) {
-    reusableTerminal.dispose();
+  let onExit: (code: number) => void;
+  let taskExecution: TaskExecution;
+  let disposeOnDidEndTaskProcess: Disposable | undefined;
+
+  let taskId = 'Angular Console';
+  if (config.isDryRun) {
+    if (currentDryRun) {
+      currentDryRun.terminate();
+    }
+    taskId = 'Dry Run';
+  } else {
+    let index = 1;
+    while (activeTaskNames.has(taskId)) {
+      index++;
+      taskId = `Angular Console ${index}`;
+    }
   }
 
-  terminal.show();
+  const taskDefinition: TaskDefinition = { type: taskId };
 
-  let onDidWriteData: ((data: string) => void) | undefined;
-  let onExit: ((code: number) => void) | undefined;
+  const task = new Task(
+    taskDefinition,
+    TaskScope.Workspace,
+    taskId,
+    config.displayCommand,
+    execution
+  );
 
-  let disposeOnDidWriteData: Disposable | undefined;
-  const disposeTerminal = (code: number) => {
-    if (onExit) {
-      onExit(code);
-    }
-    if (disposeOnDidWriteData) {
-      disposeOnDidWriteData.dispose();
-    }
-    onExit = undefined;
-    onDidWriteData = undefined;
-    disposeOnDidWriteData = undefined;
+  task.presentationOptions = {
+    showReuseMessage: true,
+    clear: false,
+    reveal: TaskRevealKind.Always,
+    panel: TaskPanelKind.Dedicated,
+    focus: true
   };
 
-  disposeOnDidWriteData = (<any>terminal).onDidWriteData((data: string) => {
-    // Screen scrape for successMessage or failureMessage as the signal that the
-    // process has exited.
-    const success = data.includes(successMessage);
-    const failed = data.includes(failureMessage);
-    if (success || failed) {
-      if (onDidWriteData) {
-        onDidWriteData(data.replace(DISPOSE_MESSAGE, ''));
-      }
+  if (config.isDryRun) {
+    task.presentationOptions.showReuseMessage = false;
+    task.presentationOptions.focus = false;
+    task.presentationOptions.clear = true;
+    task.presentationOptions.panel = TaskPanelKind.Shared;
+  }
 
-      disposeTerminal(success ? 0 : 1);
-    } else if (onDidWriteData) {
-      onDidWriteData(data);
+  tasks.executeTask(task).then(
+    t => {
+      if (config.isDryRun) {
+        currentDryRun = t;
+      } else {
+        activeTaskNames.add(task.name);
+      }
+      taskExecution = t;
+      disposeOnDidEndTaskProcess = tasks.onDidEndTaskProcess(e => {
+        if (e.execution.task === task) {
+          onExit(e.exitCode);
+
+          if (e.execution === currentDryRun) {
+            currentDryRun = undefined;
+          }
+        }
+      });
+    },
+    () => {
+      onExit(1);
     }
-  });
+  );
 
   return {
-    onDidWriteData: callback => {
-      onDidWriteData = callback;
-    },
-    onExit: callback => {
-      onExit = code => {
-        terminalsToReuse.push(terminal);
-        callback(code);
-      };
-    },
     kill: () => {
-      if (onDidWriteData) {
-        onDidWriteData(`\r\n${failureMessage}`);
-      }
-      if (terminal) {
-        terminal.dispose();
-      }
-      disposeTerminal(1);
+      taskExecution.terminate();
+      onExit(1);
+    },
+    onExit: o => {
+      onExit = (exitCode: number) => {
+        o(exitCode);
+        activeTaskNames.delete(task.name);
+        if (disposeOnDidEndTaskProcess) {
+          disposeOnDidEndTaskProcess.dispose();
+        }
+      };
     }
   };
 }

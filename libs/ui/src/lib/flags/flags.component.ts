@@ -47,6 +47,8 @@ export class FlagsComponent {
   fieldGroups: Array<FieldGrouping> = [];
 
   @Input() path: string;
+  @Input() showOutput: boolean;
+  @Input() outputTitle: string;
   @Input() options: { defaultValues: { name: string; defaultValue: string }[] };
   @Input() configurations: {
     name: string;
@@ -78,12 +80,21 @@ export class FlagsComponent {
   ) {}
 
   hideFields() {
-    if (!this.isElectron) {
-      return;
+    if (this.isElectron) {
+      this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
+        panel.close();
+      });
+    } else if (this.showOutput) {
+      this.matExpansionPanels.forEach(
+        (panel: MatExpansionPanel, index: number) => {
+          if (index < this.matExpansionPanels.length - 1) {
+            panel.close();
+          } else {
+            panel.open();
+          }
+        }
+      );
     }
-    this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
-      panel.close();
-    });
   }
 
   viewportHeight = new ReplaySubject<string>();
