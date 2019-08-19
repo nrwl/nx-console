@@ -97,5 +97,5 @@ export async function startServer(
   });
   app.useStaticAssets(assetsPath);
 
-  return await app.listen(port, () => {});
+  return await app.listen(port, 'localhost', () => {});
 }
