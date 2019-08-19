@@ -14,7 +14,12 @@
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
       "trace": "false",
-      "outFiles": ["${workspaceFolder}/**/*"],
+      "internalConsoleOptions": "openOnFirstSessionStart",
+      "outFiles": [
+        "${workspaceFolder}/dist/apps/vscode",
+        "${workspaceFolder}/dist/apps/vscode/assets/public",
+        "${workspaceFolder}/node_modules"
+      ],
       "preLaunchTask": "npm: build-vs-code"
     }
   ]

@@ -2,7 +2,7 @@ steps:
   - script: npx nps format.and.lint.check
     displayName: 'format and lint check'
 
-  - script: npx nps build.ci.electron
+  - script: npx nps prepare.ci.electron
     displayName: 'build electron'
 
   - script: npx nx affected:test --base=origin/master --ci

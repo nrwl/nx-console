@@ -37,8 +37,6 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
-apps/electron/src/yarn.lock
-apps/vscode/src/yarn.lock
 
 # System Files
 .DS_Store
@@ -46,8 +44,6 @@ Thumbs.db
 
 #Environment
 .env
-**/generated/*
-server/src/graphql-types.ts
 
 
 # Intellij

@@ -171,7 +171,18 @@
             "assets": [
               "apps/vscode/src/package.json",
               "apps/vscode/src/tree-view-icon.svg",
-              "apps/vscode/src/assets"
+              "apps/vscode/src/assets",
+              {
+                "glob": "schema.graphql",
+                "input": "node_modules/@nrwl/angular-console-enterprise-electron",
+                "output": "/assets/"
+              },
+              { "glob": "README.md", "input": "./", "output": "/assets/" },
+              {
+                "glob": "**/*",
+                "input": "libs/server/src/assets",
+                "output": "/assets/"
+              }
             ],
             "webpackConfig": "apps/electron/webpack.conf.js"
           },
@@ -217,7 +228,18 @@
               "apps/electron/src/.yarnrc",
               "apps/electron/src/assets/new-workspace",
               "apps/electron/src/assets/new-workspace.cmd",
-              "apps/electron/src/assets"
+              "apps/electron/src/assets",
+              {
+                "glob": "schema.graphql",
+                "input": "node_modules/@nrwl/angular-console-enterprise-electron",
+                "output": "/assets/"
+              },
+              { "glob": "README.md", "input": "./", "output": "/assets/" },
+              {
+                "glob": "**/*",
+                "input": "libs/server/src/assets",
+                "output": "/assets/"
+              }
             ],
             "webpackConfig": "apps/electron/webpack.conf.js"
           },
@@ -261,7 +283,18 @@
             "assets": [
               "apps/intellij/src/package.json",
               "apps/intellij/src/LICENSE",
-              "apps/intellij/src/assets"
+              "apps/intellij/src/assets",
+              {
+                "glob": "schema.graphql",
+                "input": "node_modules/@nrwl/angular-console-enterprise-electron",
+                "output": "/assets/"
+              },
+              { "glob": "README.md", "input": "./", "output": "/assets/" },
+              {
+                "glob": "**/*",
+                "input": "libs/server/src/assets",
+                "output": "/assets/"
+              }
             ]
           },
           "configurations": {

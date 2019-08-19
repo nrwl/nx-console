@@ -1,5 +1,5 @@
 overwrite: true
-schema: ./libs/server/src/assets/schema.graphql
+schema: ./libs/server/src/assets/angular-console-server-schema.graphql
 generates:
   ./libs/schema/src/lib/generated/graphql-types.ts:
     config:

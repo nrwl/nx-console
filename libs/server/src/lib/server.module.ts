@@ -69,8 +69,8 @@ export function createServerModule(
       AngularConsoleExtensionsModule,
       GraphQLModule.forRoot({
         typePaths: [
-          path.join(__dirname, 'assets/schema.graphql'),
-          path.join(__dirname, 'assets/extensions-schema.graphql')
+          path.join(__dirname, 'assets/angular-console-server-schema.graphql'),
+          path.join(__dirname, 'assets/schema.graphql')
         ],
         bodyParserConfig: true
       })
