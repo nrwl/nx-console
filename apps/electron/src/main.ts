@@ -134,7 +134,7 @@ function createWindow() {
     mainWindow.show();
   });
 
-  getPort({ port: 7777 }).then((port: number) => {
+  getPort({ port: 7968 }).then((port: number) => {
     try {
       startServer(port, telemetry, store, mainWindow).then(() => {
         if (fileExists(path.join(currentDirectory, 'angular.json'))) {
