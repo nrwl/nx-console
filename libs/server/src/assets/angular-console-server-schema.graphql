@@ -3,7 +3,7 @@ type Architect {
   project: String!
   builder: String!
   description: String!
-  options: Options!,
+  options: Options!
   configurations: [ArchitectConfigurations!]!
   schema: [Schema!]!
 }
@@ -69,7 +69,6 @@ type Extension {
   detailedDescription: String
   installed: Boolean
 }
-
 
 type IsNodeInstalledResult {
   result: Boolean!

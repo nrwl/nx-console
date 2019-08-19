@@ -27,67 +27,22 @@ const ELECTRON_BUNDLE_PATH = join('dist', 'apps', 'electron');
 const APPLICATION_BUNDLE_PATH = join('dist', 'apps', 'APPLICATION');
 
 const assetMappings = {
-  'extensions-schema': {
-    from: join(
-      './node_modules',
-      '@nrwl',
-      'angular-console-enterprise-electron',
-      'schema.graphql'
-    ),
-    to: join(APPLICATION_BUNDLE_PATH, 'assets', 'extensions-schema.graphql')
-  },
-  'server-assets': {
-    from: join('libs', 'server', 'src', 'assets', '*'),
-    to: join(APPLICATION_BUNDLE_PATH, 'assets')
-  },
   readme: {
     from: 'README.md',
     to: join(APPLICATION_BUNDLE_PATH, 'README.md')
-  },
-  schema: {
-    from: join(
-      'node_modules',
-      '@nrwl',
-      'angular-console-enterprise-electron',
-      'schema.graphql'
-    ),
-    to: join(
-      APPLICATION_BUNDLE_PATH,
-      'assets',
-      'angular-console-enterprise-electron-schema.graphql'
-    )
   }
 };
 
 module.exports = {
   scripts: {
     dev: {
-      'copy-assets': forEachApplication(
-        nps.concurrent({
-          schema: `shx cp ${assetMappings['schema'].from} ${
-            assetMappings['schema'].to
-          }`,
-          'server-assets': `shx cp -rf ${assetMappings['server-assets'].from} ${
-            assetMappings['server-assets'].to
-          }`,
-          readme: `shx cp ${assetMappings['readme'].from} ${
-            assetMappings['readme'].to
-          }`,
-          'extensions-schema': `shx cp ${
-            assetMappings['extensions-schema'].from
-          } ${assetMappings['extensions-schema'].to}`
-        })
-      ),
-
       'gen-graphql': nps.series(
         'gql-gen --config ./tools/scripts/codegen-server.yml',
         'gql-gen --config ./tools/scripts/codegen-client.js'
       ),
       server: {
         default: nps.series(
-          'nps dev.gen-graphql',
           'ng build electron --noSourceMap',
-          'nps dev.copy-assets.electron',
           'nps dev.server.start'
         ),
         start: `electron ${ELECTRON_BUNDLE_PATH} --server --port 4201 --inspect=9229`
@@ -126,11 +81,27 @@ module.exports = {
         }
       },
       ...forEachApplication(
-        nps.series.nps('build.APPLICATION', 'dev.copy-assets.APPLICATION')
+        nps.concurrent({
+          server: 'ng build APPLICATION --prod --noSourceMap',
+          client: 'ng build angular-console --configuration=APPLICATION'
+        })
       ),
+      ci: {
+        ...forEachApplication(
+          nps.concurrent({
+            server: 'ng build APPLICATION --noSourceMap',
+            client:
+              'ng build angular-console --configuration=APPLICATION --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false'
+          })
+        )
+      },
       dev: {
         ...forEachApplication(
-          nps.series.nps('build.APPLICATION.dev', 'dev.copy-assets.APPLICATION')
+          nps.concurrent({
+            server: 'ng build APPLICATION --watch',
+            client:
+              'ng build angular-console --configuration=APPLICATION --watch --aot=false --buildOptimizer=false'
+          })
         )
       }
     },
@@ -210,43 +181,6 @@ module.exports = {
         stylelint:
           'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc --fix'
       })
-    },
-    build: {
-      default: 'nx affected:build --all --parallel',
-      affected: affected('build'),
-      ...forEachApplication(
-        nps.series(
-          'nps dev.gen-graphql',
-          nps.concurrent({
-            server: 'ng build APPLICATION --prod --noSourceMap',
-            client: 'ng build angular-console --configuration=APPLICATION'
-          })
-        )
-      ),
-      ci: {
-        ...forEachApplication(
-          nps.series(
-            'nps dev.gen-graphql',
-            nps.concurrent({
-              server: 'ng build APPLICATION --noSourceMap',
-              client:
-                'ng build angular-console --configuration=APPLICATION --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false'
-            })
-          )
-        )
-      },
-      dev: {
-        ...forEachApplication(
-          nps.series(
-            'nps dev.gen-graphql',
-            nps.concurrent({
-              server: 'ng build APPLICATION --watch',
-              client:
-                'ng build angular-console --configuration=APPLICATION --watch --aot=false --buildOptimizer=false'
-            })
-          )
-        )
-      }
     },
     test: {
       default: 'nx affected:test --all --parallel',

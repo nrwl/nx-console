@@ -42,7 +42,7 @@ You can build the electron app by running `nps package.electronMac` or `nps pack
 
 ## Building VSCode Plugin
 
-You can build the vscode extension and run it in development mode by opening up this repo in Visual Studio code and hitting the f5 function key. This will launch `nps build.dev.vscode` in the background and spawn an extension development host version of VSCode so that you can try out your code.
+You can build the vscode extension and run it in development mode by opening up this repo in Visual Studio code and hitting the f5 function key. This will launch `nps prepare.dev.vscode` in the background and spawn an extension development host version of VSCode so that you can try out your code.
 
 When you want to update the extension with a new set of changes, go back to the editor you launched the extension host from and click the refresh button (its green and looks like a browser refresh icon).
 

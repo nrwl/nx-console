@@ -44,7 +44,10 @@ function generateLib(lib) {
 }
 
 module.exports = {
-  schema: resolve(__dirname, '../../libs/server/src/assets/schema.graphql'),
+  schema: resolve(
+    __dirname,
+    '../../libs/server/src/assets/angular-console-server-schema.graphql'
+  ),
   overwrite: true,
   generates: listLibs()
     .filter(lib => lib !== 'server')
