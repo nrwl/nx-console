@@ -49,7 +49,6 @@ import { TaskRunnerComponent } from './task-runner/task-runner.component';
 import { TaskSelectorComponent } from './task-selector/task-selector.component';
 import { TerminalComponent } from './terminal/terminal.component';
 import { TerminalFactory } from './terminal/terminal.factory';
-import { TestStatusComponent } from './test-status/test-status.component';
 
 const IMPORTS = [
   HttpClientModule,
@@ -95,7 +94,6 @@ const PUBLIC_DECLARATIONS = [
   TaskRunnerComponent,
   TaskSelectorComponent,
   TerminalComponent,
-  TestStatusComponent,
   EntityDocsComponent
 ];
 

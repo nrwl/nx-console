@@ -1,9 +1,11 @@
+import { IS_ELECTRON } from '@angular-console/environment';
 import { FADE_IN } from '@angular-console/ui';
 import { Settings } from '@angular-console/utils';
 import { transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
+  Inject,
   OnDestroy,
   OnInit,
   ViewChild
@@ -47,6 +49,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   constructor(
+    @Inject(IS_ELECTRON) readonly isElectron: boolean,
     readonly settings: Settings,
     private readonly contextualActionBarService: ContextualActionBarService,
     private readonly titleService: Title

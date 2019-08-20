@@ -1,16 +1,18 @@
+import { IS_ELECTRON } from '@angular-console/environment';
 import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   HostListener,
+  Inject,
   Input,
   OnDestroy,
-  TemplateRef,
-  ViewChild,
   Output,
-  EventEmitter
+  TemplateRef,
+  ViewChild
 } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { TerminalComponent } from '../terminal/terminal.component';
@@ -64,24 +66,33 @@ export class CommandOutputComponent implements OnDestroy {
   private readonly detailedStatus$ = new Subject<any>();
   readonly activeView$ = new BehaviorSubject<StatusComponentView>(INITIAL_VIEW);
 
-  switchToTerminalSubscription = this.detailedStatus$
-    .pipe(
-      map(status => !status),
-      take(1) // Only do this the first time so the UI does not keep changing without user intent.
-    )
-    .subscribe(x => {
-      if (x) {
-        this.activeView = 'terminal';
-      }
-    });
+  switchToTerminalSubscription?: Subscription;
 
   _commandResponse: CommandResponse;
   hasUnreadResponse = false;
 
-  constructor(private readonly commandRunner: CommandRunner) {}
+  constructor(
+    private readonly commandRunner: CommandRunner,
+    @Inject(IS_ELECTRON) readonly isElectron: boolean
+  ) {
+    if (!isElectron) {
+      this.switchToTerminalSubscription = this.detailedStatus$
+        .pipe(
+          map(status => !status),
+          take(1) // Only do this the first time so the UI does not keep changing without user intent.
+        )
+        .subscribe(x => {
+          if (x) {
+            this.activeView = 'terminal';
+          }
+        });
+    }
+  }
 
   ngOnDestroy() {
-    this.switchToTerminalSubscription.unsubscribe();
+    if (this.switchToTerminalSubscription) {
+      this.switchToTerminalSubscription.unsubscribe();
+    }
   }
 
   toggleActiveView() {

@@ -20,11 +20,6 @@
         [status]="commandResponse?.detailedStatus"
         *ngSwitchCase="'build'"
       ></ui-build-status>
-      <ui-test-status
-        [commandStatus]="commandResponse?.status"
-        [status]="commandResponse?.detailedStatus"
-        *ngSwitchCase="'test'"
-      ></ui-test-status>
       <ng-template
         [ngTemplateOutlet]="defaultContent"
         *ngIf="!commandResponse?.detailedStatus"

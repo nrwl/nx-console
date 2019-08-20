@@ -198,7 +198,7 @@
     "typescript": "3.4.5",
     "universal-analytics": "0.4.20",
     "uuid": "3.3.2",
-    "vsce": "^1.65.0",
+    "vsce": "^1.66.0",
     "vscode": "^1.1.35",
     "xterm": "3.14.5",
     "zlib": "^1.0.5",

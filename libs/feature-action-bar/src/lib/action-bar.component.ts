@@ -5,8 +5,7 @@ import {
 import {
   CommandResponse,
   CommandRunner,
-  CommandStatus,
-  ListAllCommands
+  CommandStatus
 } from '@angular-console/utils';
 import {
   animate,
@@ -22,20 +21,15 @@ import {
   QueryList,
   ViewChildren
 } from '@angular/core';
-import {
-  ContextualActionBarService,
-  ContextualActions
-} from '@nrwl/angular-console-enterprise-frontend';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import {
   distinctUntilChanged,
   map,
-  pairwise,
   shareReplay,
   startWith,
   switchMap,
-  takeUntil,
-  tap
+  takeUntil
 } from 'rxjs/operators';
 
 @Component({
@@ -102,21 +96,7 @@ export class ActionBarComponent implements OnDestroy {
     this.commands$,
     this.contextualActionBarService.contextualActions$.pipe(startWith(null))
   ]).pipe(
-    startWith([[], null] as [
-      ListAllCommands.Commands[],
-      ContextualActions | null
-    ]),
-    pairwise(),
-    tap(([[pCommands], [commands]]) => {
-      if (pCommands.length < commands.length) {
-        this.actionsExpandedSubject.next(true);
-      }
-      if (commands.length === 0) {
-        this.actionsExpandedSubject.next(false);
-      }
-    }),
-
-    shareReplay()
+    map(([pCommands, actions]) => Boolean(actions === null && pCommands.length))
   );
 
   showActionToolbar$ = combineLatest([

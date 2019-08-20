@@ -62,8 +62,6 @@ export async function startServer(
       });
   };
 
-  const pseudoTerminalFactory = getPseudoTerminalFactory(context);
-
   const exports = [
     'serverAddress',
     'store',
@@ -87,7 +85,7 @@ export async function startServer(
     { provide: 'serverAddress', useValue: `http://localhost:${port}` },
     { provide: 'store', useValue: store },
     { provide: 'selectDirectory', useValue: selectDirectory },
-    { provide: 'pseudoTerminalFactory', useValue: pseudoTerminalFactory },
+    { provide: 'pseudoTerminalFactory', useValue: getPseudoTerminalFactory() },
     { provide: 'assetsPath', useValue: assetsPath },
     { provide: 'showNotification', useValue: showNotification }
   ];

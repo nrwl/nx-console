@@ -7,7 +7,6 @@ import {
 import {
   getProjectArchitect,
   SUPPORTED_BUILD_BUILDERS,
-  SUPPORTED_KARMA_TEST_BUILDERS,
   SUPPORTED_SERVE_BUILDERS
 } from '../utils/architect';
 import { join } from 'path';
@@ -573,10 +572,6 @@ export function createDetailedStatusCalculator(cwd: string, cmds: string[]) {
   const { json: angularJson } = readJsonFile('./angular.json', cwd);
   const architect = getProjectArchitect(project, operationName, angularJson);
   const builder = architect.builder;
-
-  if (SUPPORTED_KARMA_TEST_BUILDERS.includes(builder)) {
-    return new TestDetailedStatusCalculator();
-  }
 
   if (SUPPORTED_BUILD_BUILDERS.includes(builder)) {
     const isForProduction = cmds.includes('--configuration=production');
