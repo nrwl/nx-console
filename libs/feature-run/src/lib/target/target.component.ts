@@ -139,7 +139,7 @@ export class TargetComponent implements OnInit {
           this.out.terminal.currentCols
         );
       }),
-      publishReplay(1),
+      publishReplay(),
       refCount()
     );
 

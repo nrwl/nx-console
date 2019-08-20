@@ -187,8 +187,6 @@ export class Settings {
       .mutate({
         data: JSON.stringify({ ...v })
       })
-      .subscribe(r => {
-        this.settings = (r.data as any).updateSettings;
-      });
+      .subscribe();
   }
 }

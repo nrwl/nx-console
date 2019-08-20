@@ -90,23 +90,16 @@ export class TaskRunnerComponent implements AfterContentChecked {
         return 'grow';
       }),
       tap(v => {
-        const numFlags = this.flagsComponent.matExpansionPanels.length;
-        const configurations = this.flagsComponent.configurations;
-        const expansionPanelHeaderHeight = numFlags === 1 ? 110 : 49 + 110;
-        const configurationsHeight =
-          configurations && configurations.length > 1 ? 55 : 0;
+        const terminalChromeHeight = this.isElectron ? 45 : 0;
         switch (v) {
           case 'grow':
             this.flagsComponent.viewportHeight.next(
-              `calc(70vh - ${expansionPanelHeaderHeight +
-                configurationsHeight +
-                CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
+              `calc(70vh - ${CONTEXTUAL_ACTION_BAR_HEIGHT}px - ${terminalChromeHeight}px)`
             );
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
-              `calc(100vh - ${expansionPanelHeaderHeight +
-                CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
+              `calc(100vh - ${CONTEXTUAL_ACTION_BAR_HEIGHT}px - ${terminalChromeHeight}px)`
             );
             break;
           default:
