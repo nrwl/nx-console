@@ -216,8 +216,8 @@ export const EXTENSTIONS: { [key: string]: string } = {
     'Use your GraphQL data in your Angular app, with the Apollo Client',
   'at-ng': '',
   'bootstrap-schematics': 'Bootstrap Options Schema',
-  'devblabla-schem-test2':
-    'DevExtreme schematics are workflow tools you can use in an Angular application created with [DevExtreme CLI](https://github.com/devexpress/DevExtreme-CLI) to add DevExtreme libraries or views and perform other DevExtreme-related tasks. Read [this article]',
+  'devextreme-schematics':
+    'DevExtreme schematics are tools that you can use to add DevExtreme sources, views, and layout templates to Angular applications.',
   'guozhiqing-momentum':
     'Momentum is an Angular Schematic developed by the Bottle Rocket Web Team to build best-in-class web applications faster.',
   'hmr-enabled':
