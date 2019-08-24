@@ -1,11 +1,5 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
-import {
-  ExtensionContext,
-  ViewColumn,
-  WebviewPanel,
-  window,
-  workspace
-} from 'vscode';
+import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 
 import {
   WorkspaceRoute,
@@ -87,9 +81,7 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
       </style>
       <script>
         window.INITIAL_ROUTE = '${routePath}';
-        window.TERMINAL_FONT_SIZE = '${workspace
-          .getConfiguration('terminal.integrated')
-          .get('fontSize')}';
+
         window.addEventListener('message', (event) => {
           const routePath = event.data.routePath;
           if (routePath && window.ANGULAR_CONSOLE_NAVIGATE_BY_URL) {

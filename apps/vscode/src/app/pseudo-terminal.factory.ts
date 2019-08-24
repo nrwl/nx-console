@@ -8,14 +8,13 @@ import {
   Disposable,
   ShellExecution,
   Task,
-  TaskDefinition,
   TaskExecution,
   TaskPanelKind,
+  TaskRevealKind,
   tasks,
   TaskScope,
   Terminal,
-  window,
-  TaskRevealKind
+  window
 } from 'vscode';
 
 let terminalsToReuse: Array<Terminal> = [];
@@ -25,6 +24,7 @@ window.onDidCloseTerminal(e => {
 
 const activeTaskNames = new Set<string>();
 let currentDryRun: TaskExecution | undefined;
+let deferredDryRun: ShellExecution | undefined;
 
 export function getPseudoTerminalFactory(): PseudoTerminalFactory {
   return config => {
@@ -87,19 +87,9 @@ function unixPseudoTerminalFactory(
   return executeTask(config, execution);
 }
 
-function executeTask(
-  config: PseudoTerminalConfig,
-  execution: ShellExecution
-): PseudoTerminal {
-  let onExit: (code: number) => void;
-  let taskExecution: TaskExecution;
-  let disposeOnDidEndTaskProcess: Disposable | undefined;
-
+function getTaskId(isDryRun?: boolean): string {
   let taskId = 'Angular Console';
-  if (config.isDryRun) {
-    if (currentDryRun) {
-      currentDryRun.terminate();
-    }
+  if (isDryRun) {
     taskId = 'Dry Run';
   } else {
     let index = 1;
@@ -108,11 +98,30 @@ function executeTask(
       taskId = `Angular Console ${index}`;
     }
   }
+  return taskId;
+}
 
-  const taskDefinition: TaskDefinition = { type: taskId };
+function executeTask(
+  config: PseudoTerminalConfig,
+  execution: ShellExecution
+): PseudoTerminal {
+  // Terminating a task shifts editor focus so we wait until the
+  // current dry run finishes before starting the next one.
+  if (config.isDryRun && currentDryRun) {
+    deferredDryRun = execution;
+    return {
+      kill: () => {},
+      onExit: () => {}
+    };
+  }
 
+  let onExit: (code: number) => void;
+  let taskExecution: TaskExecution;
+  let disposeOnDidEndTaskProcess: Disposable | undefined;
+
+  const taskId = getTaskId(config.isDryRun);
   const task = new Task(
-    taskDefinition,
+    { type: taskId },
     TaskScope.Workspace,
     taskId,
     config.displayCommand,
@@ -128,10 +137,12 @@ function executeTask(
   };
 
   if (config.isDryRun) {
-    task.presentationOptions.showReuseMessage = false;
-    task.presentationOptions.focus = false;
-    task.presentationOptions.clear = true;
-    task.presentationOptions.panel = TaskPanelKind.Shared;
+    task.presentationOptions = {
+      ...task.presentationOptions,
+      showReuseMessage: false,
+      clear: true,
+      focus: false
+    };
   }
 
   tasks.executeTask(task).then(
@@ -144,10 +155,17 @@ function executeTask(
       taskExecution = t;
       disposeOnDidEndTaskProcess = tasks.onDidEndTaskProcess(e => {
         if (e.execution.task === task) {
-          onExit(e.exitCode);
-
           if (e.execution === currentDryRun) {
+            currentDryRun.terminate();
             currentDryRun = undefined;
+
+            if (deferredDryRun) {
+              const d = deferredDryRun;
+              deferredDryRun = undefined;
+              executeTask(config, d).onExit(onExit);
+            }
+          } else {
+            onExit(e.exitCode);
           }
         }
       });
