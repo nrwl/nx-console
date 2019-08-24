@@ -1,3 +1,7 @@
+export { FileUtils } from './lib/utils/file-utils';
+
+export { readJsonFile } from './lib/utils/utils';
+
 export { QueryResolver } from './lib/resolvers/query.resolver';
 
 export { settingsChange$ } from './lib/api/read-settings';
