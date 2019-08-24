@@ -75,18 +75,16 @@ export class CommandOutputComponent implements OnDestroy {
     private readonly commandRunner: CommandRunner,
     @Inject(IS_ELECTRON) readonly isElectron: boolean
   ) {
-    if (!isElectron) {
-      this.switchToTerminalSubscription = this.detailedStatus$
-        .pipe(
-          map(status => !status),
-          take(1) // Only do this the first time so the UI does not keep changing without user intent.
-        )
-        .subscribe(x => {
-          if (x) {
-            this.activeView = 'terminal';
-          }
-        });
-    }
+    this.switchToTerminalSubscription = this.detailedStatus$
+      .pipe(
+        map(status => !status),
+        take(1) // Only do this the first time so the UI does not keep changing without user intent.
+      )
+      .subscribe(x => {
+        if (x) {
+          this.activeView = 'terminal';
+        }
+      });
   }
 
   ngOnDestroy() {

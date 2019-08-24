@@ -103,6 +103,8 @@ export class Commands {
         // Console must remain working after their failure.
         console.error('detailedStatusCalculator.addOut failed', e.message);
       }
+    } else {
+      console.error('Could not find command with id', id);
     }
   }
 
@@ -127,6 +129,8 @@ export class Commands {
         // Console must remain working after their failure.
         console.error('detailedStatusCalculator.setStatus failed', e);
       }
+    } else {
+      console.error('Could not find command with ID', id);
     }
   }
 

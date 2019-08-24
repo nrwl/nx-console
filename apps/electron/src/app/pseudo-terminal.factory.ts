@@ -1,5 +1,5 @@
 import { PseudoTerminalFactory } from '@angular-console/server';
-import { IPty, spawn } from 'node-pty';
+import { IPty, spawn, IPtyForkOptions } from 'node-pty';
 import { platform } from 'os';
 
 export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
@@ -11,12 +11,12 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
 }) => {
   const DEFAULT_ROWS = 24;
   const DEFAULT_COLS = 80;
-  const opts = {
+  const opts: IPtyForkOptions = {
     cwd,
     cols: DEFAULT_COLS,
     rows: DEFAULT_ROWS,
     env: {
-      ...process.env,
+      ...(process.env as { [key: string]: string }),
       CI: 'true'
     }
   };
@@ -30,7 +30,7 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
           opts
         )
       : spawn(
-          'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
+          'powershell.exe',
           `-Sta -NoLogo -NonInteractive -C "& {& '${program}' ${args.join(
             ' '
           )}}"`,
@@ -38,7 +38,7 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
         );
   } else {
     commandRunning = spawn(
-      '/bin/bash',
+      'bash',
       ['-l', '-i', '-c', `${program} ${args.join(' ')}`],
       opts
     );
@@ -49,8 +49,10 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
 
   return {
     onDidWriteData: callback => {
-      callback(`${displayCommand}\n\n\r`);
-      commandRunning.on('data', callback);
+      callback(`${displayCommand}\n\n`);
+      commandRunning.on('data', data => {
+        callback(data);
+      });
       commandRunning.on('exit', (exitCode: number) => {
         if (exitCode === 0) {
           callback('\nProcess completed 🙏');
@@ -71,7 +73,7 @@ export const nodePtyPseudoTerminalFactory: PseudoTerminalFactory = ({
           commandRunning.resize(cols, DEFAULT_ROWS);
           currentCols = cols;
         } catch (e) {
-          console.error(e);
+          console.error('Error setting columns', e);
         }
       }
     },
