@@ -40,6 +40,47 @@
     "*"
   ],
   "contributes": {
+    "problemMatchers": [
+      {
+        "name": "webpack-builder",
+        "label": "TypeScript + Webpack Problem Matcher",
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": "absolute",
+        "severity": "error",
+        "pattern": [
+          {
+            "regexp": "\\[tsl\\] ERROR in (.*)?\\((\\d+),(\\d+)\\)",
+            "file": 1,
+            "line": 2,
+            "column": 3
+          },
+          {
+            "regexp": "\\s*TS\\d+:\\s*(.*)",
+            "message": 1
+          }
+        ]
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "ng",
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "projectName": {
+            "type": "string",
+            "description": "The Angular CLI project to run a command on"
+          },
+          "architectName": {
+            "type": "string",
+            "description": "The name of the architect command to run on the selected project"
+          }
+        }
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {

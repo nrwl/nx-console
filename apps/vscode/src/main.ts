@@ -7,7 +7,8 @@ import {
   TreeView,
   ViewColumn,
   window,
-  workspace
+  workspace,
+  tasks
 } from 'vscode';
 
 import { Workspace } from './app/tree-item/workspace';
@@ -24,14 +25,21 @@ import {
 import { createWebViewPanel } from './app/webview.factory';
 import { stream } from 'fast-glob';
 import { existsSync } from 'fs';
+import { NgTaskProvider } from './app/ng-task-provider/ng-task-provider';
+import { FileUtils } from '@angular-console/server';
+import { getStoreForContext } from './app/get-store-for-context';
 let server: Promise<Server>;
 let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
 let treeDataProvider: CurrentWorkspaceTreeProvider;
+let taskProvider: NgTaskProvider;
 
 export function activate(context: ExtensionContext) {
   treeDataProvider = CurrentWorkspaceTreeProvider.create({
     extensionPath: context.extensionPath
   });
+  taskProvider = new NgTaskProvider(new FileUtils(getStoreForContext(context)));
+  tasks.registerTaskProvider('ng', taskProvider);
+
   currentWorkspace = window.createTreeView('angularConsole', {
     treeDataProvider
   }) as TreeView<Workspace | WorkspaceRoute>;
@@ -113,6 +121,8 @@ export function activate(context: ExtensionContext) {
 
 function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
   treeDataProvider.setWorkspacePath(workspacePath);
+  taskProvider.setWorkspacePath(workspacePath);
+
   import('./app/start-server').then(({ startServer }) => {
     server = startServer(context, workspacePath);
   });

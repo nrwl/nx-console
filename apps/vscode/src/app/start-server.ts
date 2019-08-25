@@ -9,6 +9,7 @@ import { commands, ExtensionContext, window } from 'vscode';
 
 import { getStoreForContext } from './get-store-for-context';
 import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
+import { environment } from '../environments/environment';
 
 const getPort = require('get-port'); // tslint:disable-line
 
@@ -16,7 +17,7 @@ export async function startServer(
   context: ExtensionContext,
   workspacePath?: string
 ) {
-  const port = await getPort({ port: 8888 });
+  const port = await getPort({ port: environment.production ? 8888 : 8889 });
   const store = getStoreForContext(context);
 
   const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
