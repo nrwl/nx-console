@@ -9,16 +9,10 @@ import {
   TaskExecution,
   TaskRevealKind,
   tasks,
-  TaskScope,
-  Terminal,
-  window
+  TaskScope
 } from 'vscode';
-import { getShellExecutionForConfig } from './ng-task-provider/shell-execution';
 
-let terminalsToReuse: Array<Terminal> = [];
-window.onDidCloseTerminal(e => {
-  terminalsToReuse = terminalsToReuse.filter(t => t.processId !== e.processId);
-});
+import { getShellExecutionForConfig } from './ng-task-provider/shell-execution';
 
 const activeTaskNames = new Set<string>();
 let currentDryRun: TaskExecution | undefined;
@@ -42,7 +36,7 @@ export function getTaskId(isDryRun?: boolean): string {
   return taskId;
 }
 
-function executeTask(config: PseudoTerminalConfig): PseudoTerminal {
+export function executeTask(config: PseudoTerminalConfig): PseudoTerminal {
   const execution = getShellExecutionForConfig(config);
 
   // Terminating a task shifts editor focus so we wait until the

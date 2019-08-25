@@ -1,4 +1,4 @@
-import { NgTaskDefinition } from './interfaces';
+import { NgTaskDefinition } from './ng-task-definition';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
 import { FileUtils } from '@angular-console/server';
@@ -15,7 +15,19 @@ export class NgTask extends Task {
       ? `${projectName}:${architectName}:${configuration}`
       : `${projectName}:${architectName}`;
 
-    const displayCommand = `ng run ${runTarget}`;
+    let displayCommand = `ng run ${runTarget}`;
+    switch (architectName) {
+      case 'build':
+      case 'lint':
+      case 'deploy':
+      case 'e2e':
+      case 'serve':
+      case 'test':
+      case 'xi18n':
+        displayCommand = configuration
+          ? `ng ${architectName} ${projectName} --configuration=${configuration}`
+          : `ng ${architectName} ${projectName}`;
+    }
 
     const task = new NgTask(
       definition,
@@ -24,7 +36,7 @@ export class NgTask extends Task {
       displayCommand,
       getShellExecutionForConfig({
         isDryRun: false,
-        isWsl: false,
+        isWsl: fileUtils.isWsl(),
         displayCommand,
         args: ['run', runTarget],
         cwd: workspacePath,

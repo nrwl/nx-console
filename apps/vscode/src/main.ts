@@ -1,16 +1,21 @@
 import { WorkspaceDefinition } from '@angular-console/schema';
+import { FileUtils } from '@angular-console/server';
+import { stream } from 'fast-glob';
+import { existsSync } from 'fs';
 import { Server } from 'http';
-import { join, parse, dirname } from 'path';
+import { dirname, join, parse } from 'path';
 import {
   commands,
   ExtensionContext,
+  tasks,
   TreeView,
   ViewColumn,
   window,
-  workspace,
-  tasks
+  workspace
 } from 'vscode';
 
+import { getStoreForContext } from './app/get-store-for-context';
+import { NgTaskProvider } from './app/ng-task-provider/ng-task-provider';
 import { Workspace } from './app/tree-item/workspace';
 import {
   getWorkspaceRoute,
@@ -22,28 +27,43 @@ import {
   CurrentWorkspaceTreeProvider,
   LOCATE_YOUR_WORKSPACE
 } from './app/tree-view/current-workspace-tree-provider';
+import {
+  AngularJsonTreeItem,
+  AngularJsonTreeProvider as ProjectsTreeProvider
+} from './app/tree-view/projects-tree-provider';
 import { createWebViewPanel } from './app/webview.factory';
-import { stream } from 'fast-glob';
-import { existsSync } from 'fs';
-import { NgTaskProvider } from './app/ng-task-provider/ng-task-provider';
-import { FileUtils } from '@angular-console/server';
-import { getStoreForContext } from './app/get-store-for-context';
+import { registerNgCliCommands } from './app/ng-cli-commands';
+
 let server: Promise<Server>;
-let currentWorkspace: TreeView<Workspace | WorkspaceRoute>;
-let treeDataProvider: CurrentWorkspaceTreeProvider;
+
+let currentWorkspaceTreeView: TreeView<Workspace | WorkspaceRoute>;
+let projectsTreeView: TreeView<AngularJsonTreeItem>;
+
+let currentWorkspaceTreeProvider: CurrentWorkspaceTreeProvider;
+let projectsTreeProvider: ProjectsTreeProvider;
+
 let taskProvider: NgTaskProvider;
 
 export function activate(context: ExtensionContext) {
-  treeDataProvider = CurrentWorkspaceTreeProvider.create({
+  currentWorkspaceTreeProvider = CurrentWorkspaceTreeProvider.create({
     extensionPath: context.extensionPath
   });
+
   taskProvider = new NgTaskProvider(new FileUtils(getStoreForContext(context)));
   tasks.registerTaskProvider('ng', taskProvider);
 
-  currentWorkspace = window.createTreeView('angularConsole', {
-    treeDataProvider
+  registerNgCliCommands(context, taskProvider);
+
+  currentWorkspaceTreeView = window.createTreeView('angularConsole', {
+    treeDataProvider: currentWorkspaceTreeProvider
   }) as TreeView<Workspace | WorkspaceRoute>;
-  context.subscriptions.push(currentWorkspace);
+  context.subscriptions.push(currentWorkspaceTreeView);
+
+  projectsTreeProvider = new ProjectsTreeProvider(taskProvider);
+  projectsTreeView = window.createTreeView('angularConsoleJson', {
+    treeDataProvider: projectsTreeProvider
+  }) as TreeView<AngularJsonTreeItem>;
+  context.subscriptions.push(projectsTreeView);
 
   context.subscriptions.push(
     commands.registerCommand(
@@ -115,12 +135,12 @@ export function activate(context: ExtensionContext) {
       setAngularWorkspace(context, join(angularJsonPath, '..'));
     })
     .on('end', () => {
-      treeDataProvider.endScan();
+      currentWorkspaceTreeProvider.endScan();
     });
 }
 
 function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
-  treeDataProvider.setWorkspacePath(workspacePath);
+  currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
   taskProvider.setWorkspacePath(workspacePath);
 
   import('./app/start-server').then(({ startServer }) => {
@@ -166,7 +186,7 @@ async function main(config: {
 
   webViewPanel.onDidChangeViewState(e => {
     if (e.webviewPanel.visible) {
-      revealWorkspaceRoute(currentWorkspace);
+      revealWorkspaceRoute(currentWorkspaceTreeView);
     }
   });
 

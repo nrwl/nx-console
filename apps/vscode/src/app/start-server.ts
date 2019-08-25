@@ -1,15 +1,20 @@
 import {
   createServerModule,
   QueryResolver,
-  SelectDirectory
+  SelectDirectory,
+  PseudoTerminalFactory
 } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
 import * as path from 'path';
 import { commands, ExtensionContext, window } from 'vscode';
 
 import { getStoreForContext } from './get-store-for-context';
-import { getPseudoTerminalFactory } from './pseudo-terminal.factory';
 import { environment } from '../environments/environment';
+import { executeTask } from './pseudo-terminal.factory';
+
+function getPseudoTerminalFactory(): PseudoTerminalFactory {
+  return config => executeTask(config);
+}
 
 const getPort = require('get-port'); // tslint:disable-line
 

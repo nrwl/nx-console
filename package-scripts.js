@@ -187,7 +187,7 @@ module.exports = {
       affected: affected('test')
     },
     'install-dependencies': {
-      vscode: ``,
+      vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
       electron: `node ${join('tools', 'scripts', 'electron-yarn.js')}`,
       intellij: `node ${join('tools', 'scripts', 'intellij-yarn.js')}`
     }
