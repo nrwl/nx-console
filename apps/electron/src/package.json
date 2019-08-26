@@ -1,6 +1,7 @@
 {
   "name": "angular-console",
   "description": "Angular Console",
+  "homepage": "https://angularconsole.com",
   "version": "8.0.0",
   "author": {
     "name": "Narwhal Technologies Inc",

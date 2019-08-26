@@ -1,7 +1,7 @@
 import { Schematic, SchematicCollection } from '@angular-console/schema';
 import { Task, TaskCollection, TaskCollections } from '@angular-console/ui';
-import { RouterNavigation } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterNavigation, Telemetry } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { combineLatest, Observable } from 'rxjs';
 import {
@@ -25,7 +25,7 @@ interface SchematicId {
   selector: 'angular-console-generate',
   templateUrl: './schematics.component.html'
 })
-export class SchematicsComponent {
+export class SchematicsComponent implements OnInit {
   private readonly schematicCollections$: Observable<
     Array<SchematicCollection>
   > = this.route.params.pipe(
@@ -98,11 +98,16 @@ export class SchematicsComponent {
   );
 
   constructor(
+    private readonly telemetry: Telemetry,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly schematicCollectionsGQL: SchematicCollectionsGQL,
     private readonly locationExt: RouterNavigation
   ) {}
+
+  ngOnInit() {
+    this.telemetry.screenViewed('Generate');
+  }
 
   navigateToSelectedSchematic(s: Schematic | null) {
     if (s) {

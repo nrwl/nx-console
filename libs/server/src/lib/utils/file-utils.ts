@@ -63,6 +63,18 @@ export class FileUtils {
     return false;
   }
 
+  supportsNvm(): boolean {
+    let supportsNVM;
+
+    if (this.isWsl()) {
+      supportsNVM = this.wslSupportsNvm();
+    } else {
+      supportsNVM = Boolean(process.env.NVM_DIR);
+    }
+
+    return supportsNVM;
+  }
+
   convertToWslPath(p: string) {
     if (this.isWsl() && !p.startsWith('/')) {
       return execSync(`wsl -e wslpath -u ${p}`)
@@ -152,6 +164,16 @@ export class FileUtils {
       }
       return this.findClosestNg(parent);
     }
+  }
+
+  newWorkspacePath(): string {
+    return path.join(
+      __dirname,
+      'assets',
+      platform() === 'win32' && !this.isWsl()
+        ? 'new-workspace.cmd'
+        : 'new-workspace'
+    );
   }
 
   joinForCommandRun(...p: string[]) {

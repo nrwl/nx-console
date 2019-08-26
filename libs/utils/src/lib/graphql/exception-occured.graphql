@@ -1,0 +1,3 @@
+mutation ExceptionOccured($error: String!) {
+  exceptionOccured(error: $error)
+}

@@ -4,14 +4,16 @@ import {
   CommandRunner,
   CommandStatus,
   IncrementalCommandOutput,
-  Serializer
+  Serializer,
+  Telemetry
 } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
   ViewChild,
-  ViewEncapsulation
+  ViewEncapsulation,
+  OnInit
 } from '@angular/core';
 import {
   AbstractControl,
@@ -57,7 +59,7 @@ interface SchematicCollectionForNgNew {
   templateUrl: './new-workspace.component.html',
   styleUrls: ['./new-workspace.component.scss']
 })
-export class NewWorkspaceComponent {
+export class NewWorkspaceComponent implements OnInit {
   @ViewChild(MatVerticalStepper, { static: false })
   verticalStepper: MatVerticalStepper;
   commandOutput$?: Observable<IncrementalCommandOutput>;
@@ -99,6 +101,7 @@ export class NewWorkspaceComponent {
   }
 
   constructor(
+    private readonly telemetry: Telemetry,
     private readonly elementRef: ElementRef,
     private readonly router: Router,
     private readonly dialogRef: MatDialogRef<NewWorkspaceComponent>,
@@ -109,6 +112,10 @@ export class NewWorkspaceComponent {
     private readonly serializer: Serializer,
     private readonly commandRunner: CommandRunner
   ) {}
+
+  ngOnInit() {
+    this.telemetry.screenViewed('New Workspace');
+  }
 
   handleSelection(event: MatSelectionListChange) {
     // Workaround for https://github.com/angular/material2/issues/7157

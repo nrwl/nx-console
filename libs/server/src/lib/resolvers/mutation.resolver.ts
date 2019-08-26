@@ -1,8 +1,5 @@
 import { Inject } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { platform } from 'os';
-import * as path from 'path';
-
 import { docs } from '../api/docs';
 import { Editor, openInEditor } from '../api/read-editors';
 import {
@@ -10,36 +7,66 @@ import {
   storeTriggeredAction
 } from '../api/read-recent-actions';
 import { readSettings, storeSettings } from '../api/read-settings';
-import { commands, runCommand } from '../api/run-command';
+import { Executable, ExecutableType as Type } from '../api/executable';
 import { SelectDirectory } from '../types';
 import { FileUtils } from '../utils/file-utils';
+import { Telemetry } from '../telemetry';
+import { Commands } from '../api/commands';
 
 @Resolver()
 export class MutationResolver {
+  private readonly ng: Executable;
+  private readonly npm: Executable;
+  private readonly newWorkspace: Executable;
+
   constructor(
     @Inject('store') private readonly store: any,
     @Inject('pseudoTerminalFactory')
-    private readonly pseudoTerminalFactory: any,
+    pseudoTerminalFactory: any,
     @Inject('selectDirectory')
     private readonly selectDirectoryImpl: SelectDirectory,
-    private readonly fileUtils: FileUtils
-  ) {}
+    @Inject('commands')
+    private readonly commands: Commands,
+    private readonly fileUtils: FileUtils,
+    @Inject('telemetry')
+    private readonly telemetry: Telemetry
+  ) {
+    // TODO(matt) this should all be moved into DI
+    this.ng = new Executable(
+      'ng',
+      telemetry,
+      pseudoTerminalFactory,
+      fileUtils,
+      commands
+    );
+
+    this.npm = new Executable(
+      'npm',
+      telemetry,
+      pseudoTerminalFactory,
+      fileUtils,
+      commands
+    );
+
+    this.newWorkspace = new Executable(
+      'new-workspace',
+      telemetry,
+      pseudoTerminalFactory,
+      fileUtils,
+      commands
+    );
+
+    this.configureNewWorkspace();
+  }
 
   @Mutation()
   async ngAdd(@Args('path') p: string, @Args('name') name: string) {
     try {
-      return runCommand(
-        'add',
-        p,
-        'ng',
-        this.fileUtils.findClosestNg(p),
-        ['add', name, '--no-interactive'],
-        this.pseudoTerminalFactory,
-        this.fileUtils
-      );
+      this.telemetry.featureUsed('NG Add');
+      this.configureNg(p);
+      return this.ng.run(Type.add, p, ['add', name, '--no-interactive']);
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when running 'ng add'. Message: "${e.message}"`);
+      this.handleError("running 'ng add'", e);
     }
   }
 
@@ -51,30 +78,16 @@ export class MutationResolver {
     @Args('newCommand') newCommand: string[]
   ) {
     try {
-      return runCommand(
-        'new',
-        p,
-        'new-workspace',
-        path.join(
-          __dirname,
-          'assets',
-          platform() === 'win32' && !this.fileUtils.isWsl()
-            ? 'new-workspace.cmd'
-            : 'new-workspace'
-        ),
-        [
-          name,
-          `--directory=${name}`,
-          `--collection=${collection}`,
-          ...newCommand,
-          '--no-interactive'
-        ],
-        this.pseudoTerminalFactory,
-        this.fileUtils
-      );
+      this.telemetry.featureUsed('New Workspace');
+      return this.newWorkspace.run(Type.new, p, [
+        name,
+        `--directory=${name}`,
+        `--collection=${collection}`,
+        ...newCommand,
+        '--no-interactive'
+      ]);
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when running 'ng new'. Message: "${e.message}"`);
+      this.handleError("running 'ng new'", e);
     }
   }
 
@@ -85,22 +98,17 @@ export class MutationResolver {
     @Args('genCommand') genCommand: string[]
   ) {
     try {
+      this.telemetry.featureUsed('Generate');
       const dryRun = dr ? ['--dry-run'] : [];
-      return runCommand(
-        'generate',
+      this.configureNg(p);
+      return this.ng.run(
+        Type.generate,
         p,
-        'ng',
-        this.fileUtils.findClosestNg(p),
         ['generate', ...genCommand, ...dryRun, '--no-interactive'],
-        this.pseudoTerminalFactory,
-        this.fileUtils,
         !dr
       );
     } catch (e) {
-      console.error(e);
-      throw new Error(
-        `Error when running 'ng generate'. Message: "${e.message}"`
-      );
+      this.handleError("running 'ng generate'", e);
     }
   }
 
@@ -112,38 +120,29 @@ export class MutationResolver {
     @Args('genCommand') genCommand: string[]
   ) {
     try {
+      this.telemetry.featureUsed('Generate With NPM');
       const dryRun = dr ? ['--dry-run'] : [];
-      return runCommand(
-        'npm',
+
+      this.configureNpmClient(npmClient, p);
+      return this.npm.run(
+        Type.npm,
         p,
-        npmClient,
-        this.fileUtils.findExecutable(npmClient, p),
         [...genCommand, ...dryRun, '--no-interactive'],
-        this.pseudoTerminalFactory,
-        this.fileUtils,
         !dr
       );
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when running npm script. Message: "${e.message}"`);
+      this.handleError('running npm script', e);
     }
   }
 
   @Mutation()
   async runNg(@Args('path') p: string, @Args('runCommand') rc: string[]) {
     try {
-      return runCommand(
-        'ng',
-        p,
-        'ng',
-        this.fileUtils.findClosestNg(p),
-        rc,
-        this.pseudoTerminalFactory,
-        this.fileUtils
-      );
+      this.telemetry.featureUsed('Run Custom NG Command');
+      this.configureNg(p);
+      this.ng.run(Type.ng, p, rc);
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when running 'ng ...'. Message: "${e.message}"`);
+      this.handleError("running 'ng ...'", e);
     }
   }
 
@@ -154,39 +153,35 @@ export class MutationResolver {
     @Args('npmClient') npmClient: string
   ) {
     try {
-      return runCommand(
-        'npm',
-        p,
-        npmClient,
-        this.fileUtils.findExecutable(npmClient, p),
-        rc,
-        this.pseudoTerminalFactory,
-        this.fileUtils
-      );
+      this.telemetry.featureUsed('Run Custom NPM Command');
+      this.configureNpmClient(npmClient, p);
+      this.npm.run(Type.npm, p, rc);
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when running npm script. Message:"${e.message}"`);
+      this.handleError('running npm script', e);
     }
   }
 
   @Mutation()
   async stopCommand(@Args('id') id: string) {
     try {
-      const c = commands.findMatchingCommand(id, commands.recent);
+      this.telemetry.featureUsed('Stop Command');
+      const c = this.commands.findMatchingCommand(id, this.commands.recent);
+      let result = false;
+
       if (c) {
-        commands.stopCommands([c]);
-        return { result: true };
-      } else {
-        return { result: false };
+        this.commands.stopCommands([c]);
+        result = true;
       }
+
+      return { result };
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when stopping commands. Message: "${e.message}"`);
+      this.handleError('stopping commands', e);
     }
   }
 
   @Mutation()
   async openInBrowser(@Args('url') url: string) {
+    this.telemetry.featureUsed('Open In Browser');
     if (url) {
       const opn = require('opn');
       opn(url);
@@ -198,6 +193,7 @@ export class MutationResolver {
 
   @Mutation()
   async showItemInFolder(@Args('item') item: string) {
+    this.telemetry.featureUsed('Show Item In Folder');
     if (item) {
       const opn = require('opn');
       opn(item).catch((err: any) => console.error(err));
@@ -210,46 +206,54 @@ export class MutationResolver {
   @Mutation()
   async removeCommand(@Args('id') id: string) {
     try {
-      commands.removeCommand(id);
+      this.telemetry.featureUsed('Remove Command');
+      this.commands.removeCommand(id);
       return { result: true };
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when removing commands. Message: "${e.message}"`);
+      this.handleError('removing commands', e);
     }
+  }
+
+  @Mutation()
+  async exceptionOccured(@Args('error') error: string) {
+    this.telemetry.exceptionOccured(error);
+  }
+
+  @Mutation()
+  async screenViewed(@Args('screen') screen: string) {
+    this.telemetry.screenViewed(screen);
   }
 
   @Mutation()
   async removeAllCommands() {
     try {
-      commands.removeAllCommands();
+      this.telemetry.featureUsed('Remove All Commands');
+      this.commands.removeAllCommands();
       return { result: true };
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when removing commands. Message: "${e.message}"`);
+      this.handleError('removing all commands', e);
     }
   }
 
   @Mutation()
   async restartCommand(@Args('id') id: string) {
     try {
-      commands.restartCommand(id);
+      this.telemetry.featureUsed('Restart Commands');
+      this.commands.restartCommand(id);
       return { result: true };
     } catch (e) {
-      console.error(e);
-      throw new Error(
-        `Error when restarting commands. Message: "${e.message}"`
-      );
+      this.handleError('restarting commands', e);
     }
   }
 
   @Mutation()
   openInEditor(@Args('editor') editor: Editor, @Args('path') p: string) {
     try {
+      this.telemetry.featureUsed('Open in Editor');
       openInEditor(editor, p);
       return { response: 'successful' };
     } catch (e) {
-      console.error(e);
-      throw new Error(`Error when opening an editor. Message: "${e.message}"`);
+      this.handleError('opening an editor', e);
     }
   }
 
@@ -277,7 +281,16 @@ export class MutationResolver {
 
   @Mutation()
   updateSettings(@Args('data') data: string) {
-    storeSettings(this.store, JSON.parse(data));
+    this.telemetry.featureUsed('Settings Update');
+    const changes = JSON.parse(data);
+    storeSettings(this.store, changes);
+
+    if (changes.hasOwnProperty('canCollectData')) {
+      changes.canCollectData
+        ? this.telemetry.startedTracking()
+        : this.telemetry.stoppedTracking();
+    }
+
     return readSettings(this.store);
   }
 
@@ -297,5 +310,27 @@ export class MutationResolver {
   async openDoc(@Args('id') id: string) {
     const result = await docs.openDoc(id).toPromise();
     return { result };
+  }
+
+  configureNg(cwd: string): void {
+    const path = this.fileUtils.findClosestNg(cwd);
+    this.ng.path = path;
+  }
+
+  configureNpmClient(name: string, cwd: string): void {
+    const path = this.fileUtils.findExecutable(name, cwd);
+    this.npm.name = name;
+    this.npm.path = path;
+  }
+
+  configureNewWorkspace() {
+    this.newWorkspace.path = this.fileUtils.newWorkspacePath();
+  }
+
+  handleError(action: string, err: Error): void {
+    const msg = `Error when ${action}. Message: "${err.message}"`;
+    console.error(msg);
+    this.telemetry.exceptionOccured(msg);
+    throw new Error(msg);
   }
 }

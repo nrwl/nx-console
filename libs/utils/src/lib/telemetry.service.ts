@@ -1,65 +1,49 @@
-import { Injectable } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { Injectable, Inject } from '@angular/core';
+import { ExceptionOccuredGQL, ScreenViewedGQL } from './generated/graphql';
+import { Observable } from 'rxjs';
+import { ENVIRONMENT, Environment } from '@angular-console/environment';
+import { timeout, take } from 'rxjs/operators';
 
-declare var global: any;
-
-@Injectable()
-// TODO: Make a VSCode version of this class and move this implementation to apps/electron.
+@Injectable({
+  providedIn: 'root'
+})
 export class Telemetry {
-  private readonly ipc: any;
+  constructor(
+    @Inject(ENVIRONMENT)
+    private readonly environment: Environment,
+    private readonly exceptionOccuredGQL: ExceptionOccuredGQL,
+    private readonly screenViewedGQL: ScreenViewedGQL
+  ) {}
 
-  constructor(private readonly router: Router) {
-    if (typeof global !== 'undefined' && global.require) {
-      try {
-        this.ipc = global.require('electron').ipcRenderer;
-      } catch (e) {
-        console.error(
-          'Could not get a hold of ipcRenderer to log to analytics'
-        );
-      }
-    }
+  get isDev() {
+    return !this.environment.production;
   }
 
-  setUpRouterLogging() {
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(event =>
-        this.reportPageView(cleanUpUrl((event as NavigationEnd).url))
+  exceptionOccured(error: string): void {
+    this.send(this.exceptionOccuredGQL.mutate({ error }), 'ExceptionOccured');
+  }
+
+  screenViewed(screen: string): void {
+    this.send(this.screenViewedGQL.mutate({ screen }), 'ScreenViewed');
+  }
+
+  send(req: Observable<any>, name: string): void {
+    req
+      .pipe(
+        timeout(2000),
+        take(1)
+      )
+      .subscribe(
+        () => {
+          if (this.isDev) {
+            console.log(`[Telemetry Written: ${name}]`);
+          }
+        },
+        () => {
+          if (this.isDev) {
+            console.error(`[Telemetry Failed: ${name}]`);
+          }
+        }
       );
-  }
-
-  reportException(description: string) {
-    if (this.ipc) {
-      this.ipc.send('reportException', { description });
-    }
-  }
-
-  reportDataCollectionEvent(value: boolean) {
-    if (this.ipc) {
-      this.ipc.send('dataCollectionEvent', { value });
-    }
-  }
-
-  reportEvent(category: string, action: string, label: string, value: string) {
-    if (this.ipc) {
-      this.ipc.send('event', { category, action, label, value });
-    }
-  }
-
-  private reportPageView(path: string) {
-    if (this.ipc) {
-      this.ipc.send('reportPageView', { path });
-    }
-  }
-}
-
-export function cleanUpUrl(url: string): string {
-  if (url.startsWith('/workspace/')) {
-    const parts = url.split('/');
-    // tslint:disable-next-line
-    return [parts[0], parts[1], 'PATH', ...parts.slice(3)].join('/');
-  } else {
-    return url;
   }
 }

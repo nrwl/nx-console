@@ -275,6 +275,13 @@ export function normalizePath(value: string): string {
     .join('\\');
 }
 
+export function seconds<T>(fn: Function): [number, T] {
+  const start = process.hrtime();
+  const result = fn();
+  const end = process.hrtime(start);
+  return [end[0], result];
+}
+
 /**
  * To improve performance angular console pre-processes
  *

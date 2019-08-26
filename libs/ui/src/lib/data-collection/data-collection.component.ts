@@ -1,5 +1,5 @@
-import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
-import { Telemetry, Settings } from '@angular-console/utils';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Settings } from '@angular-console/utils';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -8,10 +8,7 @@ import { Telemetry, Settings } from '@angular-console/utils';
   styleUrls: ['./data-collection.component.scss']
 })
 export class DataCollectionComponent {
-  constructor(
-    @Inject('telemetry') private readonly telemetry: Telemetry,
-    private readonly settings: Settings
-  ) {}
+  constructor(private readonly settings: Settings) {}
 
   get showMessage() {
     return this.settings.canCollectData() === undefined;
@@ -19,6 +16,5 @@ export class DataCollectionComponent {
 
   close(value: boolean) {
     this.settings.setCanCollectData(value);
-    this.telemetry.reportDataCollectionEvent(value);
   }
 }

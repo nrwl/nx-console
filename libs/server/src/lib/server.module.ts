@@ -22,11 +22,13 @@ import { WorkspaceResolver } from './resolvers/workspace.resolver';
 import { ArchitectResolver } from './resolvers/architect.resolver';
 import { AngularConsoleExtensionsModule } from '@nrwl/angular-console-enterprise-electron';
 import { readSettings } from './api/read-settings';
-import { commands } from './api/run-command';
 import { Telemetry } from './utils/telemetry';
 import { docs } from './api/docs';
 import { FileUtils } from './utils/file-utils';
 import { APP_FILTER } from '@nestjs/core';
+import { Commands } from './api/commands';
+
+const commands = new Commands(5, 15);
 
 export function createServerModule(
   exports: string[],

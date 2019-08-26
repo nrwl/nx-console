@@ -1,0 +1,3 @@
+mutation ScreenViewed($screen: String!) {
+  screenViewed(screen: $screen)
+}

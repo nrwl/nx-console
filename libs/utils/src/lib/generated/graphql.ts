@@ -22,6 +22,18 @@ export namespace Editors {
   };
 }
 
+export namespace ExceptionOccured {
+  export type Variables = {
+    error: string;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+
+    exceptionOccured: Maybe<boolean>;
+  };
+}
+
 export namespace GetCommandInitial {
   export type Variables = {
     id: string;
@@ -225,6 +237,18 @@ export namespace RestartCommand {
   };
 }
 
+export namespace ScreenViewed {
+  export type Variables = {
+    screen: string;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+
+    screenViewed: Maybe<boolean>;
+  };
+}
+
 export namespace Settings {
   export type Variables = {};
 
@@ -372,6 +396,19 @@ export class EditorsGQL extends Apollo.Query<Editors.Query, Editors.Variables> {
         name
         icon
       }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class ExceptionOccuredGQL extends Apollo.Mutation<
+  ExceptionOccured.Mutation,
+  ExceptionOccured.Variables
+> {
+  document: any = gql`
+    mutation ExceptionOccured($error: String!) {
+      exceptionOccured(error: $error)
     }
   `;
 }
@@ -535,6 +572,19 @@ export class RestartCommandGQL extends Apollo.Mutation<
       restartCommand(id: $id) {
         result
       }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class ScreenViewedGQL extends Apollo.Mutation<
+  ScreenViewed.Mutation,
+  ScreenViewed.Variables
+> {
+  document: any = gql`
+    mutation ScreenViewed($screen: String!) {
+      screenViewed(screen: $screen)
     }
   `;
 }

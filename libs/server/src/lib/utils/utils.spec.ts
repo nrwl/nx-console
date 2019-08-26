@@ -1,4 +1,4 @@
-import { normalizeSchema } from './utils';
+import { normalizeSchema, seconds } from './utils';
 
 describe('utils', () => {
   describe('normalizeSchema', () => {
@@ -16,6 +16,14 @@ describe('utils', () => {
         required: []
       });
       expect(r[0].required).toBeTruthy();
+    });
+
+    it('measures seconds', () => {
+      const returns = 'result';
+      const [elapsed, result] = seconds(() => returns);
+
+      expect(elapsed).toEqual(0);
+      expect(result).toEqual(returns);
     });
 
     it('should not mark fields as required otherwise', () => {

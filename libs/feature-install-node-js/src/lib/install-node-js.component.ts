@@ -1,5 +1,5 @@
-import { Settings } from '@angular-console/utils';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Settings, Telemetry } from '@angular-console/utils';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { filter, first } from 'rxjs/operators';
 
@@ -11,12 +11,17 @@ import { IsNodejsInstalledGQL } from './generated/graphql';
   templateUrl: './install-node-js.component.html',
   styleUrls: ['./install-node-js.component.scss']
 })
-export class InstallNodeJsComponent {
+export class InstallNodeJsComponent implements OnInit {
   constructor(
+    private readonly telemetry: Telemetry,
     private readonly router: Router,
     private readonly settings: Settings,
     private readonly isNodejsInstalledGQL: IsNodejsInstalledGQL
   ) {}
+
+  ngOnInit() {
+    this.telemetry.screenViewed('Install Node');
+  }
 
   installManually() {
     this.settings.setInstallManually(true);

@@ -1,7 +1,8 @@
 import {
   Settings,
   SettingsModels,
-  CommandRunner
+  CommandRunner,
+  Telemetry
 } from '@angular-console/utils';
 import {
   animate,
@@ -35,6 +36,7 @@ export class WorkspacesComponent implements OnInit {
   readonly commands$ = this.commandRunner.listAllCommands().pipe(shareReplay());
 
   constructor(
+    private readonly telemetry: Telemetry,
     readonly settings: Settings,
     readonly workspacesService: WorkspacesService,
     private readonly contextualActionBarService: ContextualActionBarService,
@@ -47,6 +49,7 @@ export class WorkspacesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.telemetry.screenViewed('Workspaces');
     if (this.settings.getRecentWorkspaces().length === 0) {
       this.contextualActionBarService.breadcrumbs$.next([
         { title: 'Welcome to Angular Console!' }

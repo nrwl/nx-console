@@ -4,8 +4,9 @@ import {
   storeSettings,
   Telemetry
 } from '@angular-console/server';
-import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow, dialog, Menu } from 'electron';
 import * as ElectronStore from 'electron-store';
+import { environment } from './environments/environment';
 import { autoUpdater } from 'electron-updater';
 import { statSync } from 'fs';
 import { platform } from 'os';
@@ -13,32 +14,20 @@ import * as path from 'path';
 
 import { startServer } from './app/start-server';
 
+const start = process.hrtime();
 const fixPath = require('fix-path');
 const getPort = require('get-port');
 
 const store = new ElectronStore();
-const telemetry = new Telemetry(store);
+
+const telemetry = environment.disableTelemetry
+  ? Telemetry.withLogger(store)
+  : Telemetry.withGoogleAnalytics(store, 'electron');
 
 export let mainWindow: BrowserWindow;
 
 fixPath();
 const currentDirectory = process.cwd();
-
-function setupEvents() {
-  process.env.trackingID = 'UA-88380372-8';
-  ipcMain.on('event', (_: any, arg: any) =>
-    telemetry.reportEvent(arg.category, arg.action, arg.label, arg.value)
-  );
-  ipcMain.on('dataCollectionEvent', (_: any, arg: any) =>
-    telemetry.dataCollectionEvent(arg.value)
-  );
-  ipcMain.on('reportPageView', (_: any, arg: any) =>
-    telemetry.reportPageView(arg.path)
-  );
-  ipcMain.on('reportException', (_: any, arg: any) =>
-    telemetry.reportException(arg.description)
-  );
-}
 
 function createMenu() {
   let menu = [];
@@ -149,7 +138,7 @@ function createWindow() {
       });
     } catch (e) {
       showCloseDialog(`Error when starting Angular Console: ${e.message}`);
-      telemetry.reportException(`Start failed: ${e.message}`);
+      telemetry.exceptionOccured(`Start failed: ${e.message}`);
     }
   });
 
@@ -190,7 +179,6 @@ function showRestartDialog() {
   dialog.showMessageBox(dialogOptions, i => {
     if (i === 0) {
       // Restart
-      telemetry.reportLifecycleEvent('QuitAndInstall');
       autoUpdater.quitAndInstall();
     }
   });
@@ -200,7 +188,7 @@ function checkForUpdates() {
   setTimeout(async () => {
     autoUpdater.channel = getUpdateChannel();
     autoUpdater.allowDowngrade = false;
-    if (process.env.NODE_ENV !== 'development') {
+    if (!environment.production) {
       try {
         const r = await autoUpdater.checkForUpdates();
         if (r.downloadPromise) {
@@ -216,7 +204,7 @@ function checkForUpdates() {
           console.log('checkForUpdates is called. downloadPromise is null.');
         }
       } catch (e) {
-        telemetry.reportException(e);
+        telemetry.exceptionOccured(e.message);
       }
     }
   }, 0);
@@ -245,7 +233,7 @@ function saveWindowInfo() {
     try {
       store.set('windowBounds', JSON.stringify(mainWindow.getBounds()));
     } catch (e) {
-      telemetry.reportException(`Saving window bounds failed: ${e.message}`);
+      telemetry.exceptionOccured(`Saving window bounds failed: ${e.message}`);
     }
   }
 }
@@ -260,10 +248,10 @@ app.on('ready', async () => {
     }
     startServer(port, telemetry, store, mainWindow);
   } else {
-    setupEvents();
-    telemetry.reportLifecycleEvent('StartSession');
     createMenu();
     createWindow();
     checkForUpdates();
+    const time = process.hrtime(start);
+    telemetry.appLoaded(time[0]);
   }
 });
