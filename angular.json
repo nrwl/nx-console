@@ -188,7 +188,7 @@
           },
           "configurations": {
             "production": {
-              "externalDependencies": ["vscode"],
+              "externalDependencies": ["vscode", "jsonc-parser"],
               "sourceMap": false,
               "optimization": true,
               "extractLicenses": true,

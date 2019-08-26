@@ -1,0 +1,189 @@
+import { JSONVisitor, visit } from 'jsonc-parser';
+import { join } from 'path';
+import {
+  commands,
+  ProviderResult,
+  Selection,
+  TextDocument,
+  TreeItem,
+  TreeItemCollapsibleState,
+  Uri,
+  window,
+  workspace
+} from 'vscode';
+
+import { NgTaskProvider } from '../ng-task-provider/ng-task-provider';
+import { AbstractTreeProvider } from './abstract-tree-provider';
+
+export class AngularJsonTreeItem extends TreeItem {
+  constructor(
+    public angularJsonLabel: AngularJsonLabel,
+    treeItemLabel: string,
+    collapsibleState?: TreeItemCollapsibleState | undefined
+  ) {
+    super(treeItemLabel, collapsibleState);
+  }
+}
+
+export class AngularJsonTreeProvider extends AbstractTreeProvider<
+  AngularJsonTreeItem
+> {
+  constructor(private readonly ngTaskProvider: NgTaskProvider) {
+    super();
+
+    commands.registerCommand(
+      'angularConsole.editAngularJson',
+      this.editAngularJson,
+      this
+    );
+  }
+
+  getParent(
+    _element: AngularJsonTreeItem
+  ): AngularJsonTreeItem | null | undefined {
+    return;
+  }
+
+  createAngularJsonTreeItem(
+    angularJsonLabel: AngularJsonLabel,
+    treeItemLabel: string,
+    hasChildren?: boolean
+  ) {
+    const item = new AngularJsonTreeItem(
+      angularJsonLabel,
+      treeItemLabel,
+      hasChildren
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
+    );
+    item.command = {
+      title: 'Edit angular.json',
+      command: 'angularConsole.editAngularJson',
+      arguments: [item]
+    };
+
+    return item;
+  }
+
+  getChildren(
+    parent?: AngularJsonTreeItem
+  ): ProviderResult<AngularJsonTreeItem[]> {
+    if (!parent) {
+      const projects = this.ngTaskProvider.getProjectEntries();
+      return projects.map(
+        ([name, def]): AngularJsonTreeItem =>
+          this.createAngularJsonTreeItem(
+            { project: name },
+            name,
+            Boolean(def.architect)
+          )
+      );
+    }
+
+    const { angularJsonLabel } = parent;
+    const { architect, project } = angularJsonLabel;
+    const projectDef = this.ngTaskProvider.getProjects()[project];
+
+    if (!architect) {
+      if (projectDef.architect) {
+        return Object.keys(projectDef.architect).map(
+          (name): AngularJsonTreeItem =>
+            this.createAngularJsonTreeItem(
+              { architect: { name }, project },
+              name,
+              Boolean(projectDef.architect![name].configurations)
+            )
+        );
+      }
+    } else {
+      const { configuration } = architect;
+
+      if (configuration || !projectDef.architect) {
+        return;
+      }
+
+      const configurations =
+        projectDef.architect[architect.name].configurations;
+      if (!configurations) {
+        return;
+      }
+
+      return Object.keys(configurations).map(name => {
+        const item = this.createAngularJsonTreeItem(
+          { architect: { ...architect, configuration: name }, project },
+          name
+        );
+
+        return item;
+      });
+    }
+  }
+
+  private findLabel(
+    document: TextDocument,
+    { project, architect }: AngularJsonLabel
+  ): number {
+    let scriptOffset = 0;
+    let inProjects = false;
+    let inProject = false;
+    let inArchitects = false;
+    let inArchitect = false;
+
+    const visitor: JSONVisitor = {
+      onError() {
+        return scriptOffset;
+      },
+      onObjectEnd() {},
+      onObjectProperty(property: string, offset: number) {
+        if (scriptOffset) {
+          return;
+        }
+
+        if (property === 'projects') {
+          inProjects = true;
+        } else if (inProjects && property === project) {
+          inProject = true;
+          if (!architect) {
+            scriptOffset = offset;
+          }
+        } else if (inProject && property === 'architect') {
+          inArchitects = true;
+        } else if (inArchitects && architect) {
+          if (property === architect.name) {
+            inArchitect = true;
+            if (!architect.configuration) {
+              scriptOffset = offset;
+            }
+          } else if (inArchitect && property === architect.configuration) {
+            scriptOffset = offset;
+          }
+        }
+      }
+    };
+    visit(document.getText(), visitor);
+
+    return scriptOffset;
+  }
+
+  private async editAngularJson(selection: AngularJsonTreeItem) {
+    const angularJson = Uri.file(
+      join(this.ngTaskProvider.getWorkspacePath()!, 'angular.json')
+    );
+    const document: TextDocument = await workspace.openTextDocument(
+      angularJson
+    );
+    const offset = this.findLabel(document, selection.angularJsonLabel);
+    const position = document.positionAt(offset);
+    await window.showTextDocument(document, {
+      selection: new Selection(position, position)
+    });
+  }
+}
+
+interface AngularJsonLabel {
+  project: string;
+  architect?: {
+    name: string;
+    configuration?: string;
+  };
+}

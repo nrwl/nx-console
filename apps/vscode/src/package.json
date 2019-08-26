@@ -39,7 +39,47 @@
   "activationEvents": [
     "*"
   ],
+  "dependencies": {
+    "jsonc-parser": "^2.1.1"
+  },
   "contributes": {
+    "commands": [
+      {
+        "category": "ng",
+        "title": "lint",
+        "command": "ng-console.lint"
+      },
+      {
+        "category": "ng",
+        "title": "build",
+        "command": "ng-console.build"
+      },
+      {
+        "category": "ng",
+        "title": "deploy",
+        "command": "ng-console.deploy"
+      },
+      {
+        "category": "ng",
+        "title": "e2e",
+        "command": "ng-console.e2e"
+      },
+      {
+        "category": "ng",
+        "title": "serve",
+        "command": "ng-console.serve"
+      },
+      {
+        "category": "ng",
+        "title": "test",
+        "command": "ng-console.test"
+      },
+      {
+        "category": "ng",
+        "title": "xi18n",
+        "command": "ng-console.xi18n"
+      }
+    ],
     "problemMatchers": [
       {
         "name": "webpack-builder",
@@ -95,6 +135,10 @@
         {
           "id": "angularConsole",
           "name": "Navigation"
+        },
+        {
+          "id": "angularConsoleJson",
+          "name": "Angular JSON"
         }
       ]
     }

@@ -87,6 +87,7 @@
     "core-js": "2.6.9",
     "fontfaceobserver": "^2.1.0",
     "ij-rpc-client": "^0.3.2",
+    "jsonc-parser": "^2.1.1",
     "node-pty": "^0.8.1",
     "pretty-quick": "^1.11.1",
     "source-map-explorer": "^1.8.0",
