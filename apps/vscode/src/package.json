@@ -43,7 +43,37 @@
     "jsonc-parser": "^2.1.1"
   },
   "contributes": {
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "angularConsole.revealInExplorer",
+          "when": "view == angularConsoleJson && viewItem == project",
+          "group": "inline"
+        },
+        {
+          "command": "angularConsole.runTask",
+          "when": "view == angularConsoleJson && viewItem == task",
+          "group": "inline"
+        }
+      ]
+    },
     "commands": [
+      {
+        "command": "angularConsole.revealInExplorer",
+        "title": "Reveal in Explorer",
+        "icon": {
+          "light": "assets/folder-light.svg",
+          "dark": "assets/folder-dark.svg"
+        }
+      },
+      {
+        "command": "angularConsole.runTask",
+        "title": "Execute task",
+        "icon": {
+          "light": "assets/continue-light.svg",
+          "dark": "assets/continue-dark.svg"
+        }
+      },
       {
         "category": "ng",
         "title": "lint",

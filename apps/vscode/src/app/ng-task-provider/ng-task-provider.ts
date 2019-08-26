@@ -1,14 +1,14 @@
-import { TaskProvider, ProviderResult, Task } from 'vscode';
-import { readJsonFile, FileUtils } from '@angular-console/server';
-import { getTaskId } from '../pseudo-terminal.factory';
+import { FileUtils, readJsonFile } from '@angular-console/server';
+import { ProviderResult, Task, TaskProvider } from 'vscode';
+
+import { NgTask } from './ng-task';
 import {
-  NgTaskDefinition,
   AngularJson,
   getArchitectTaskDefintions,
-  Projects,
-  ProjectDef
+  NgTaskDefinition,
+  ProjectDef,
+  Projects
 } from './ng-task-definition';
-import { NgTask } from './ng-task';
 
 export class NgTaskProvider implements TaskProvider {
   private workspacePath?: string;
@@ -39,11 +39,10 @@ export class NgTaskProvider implements TaskProvider {
           return [];
         }
 
-        const type = getTaskId();
         return Object.entries(project.architect).flatMap(
           ([architectName, architectDef]) =>
             getArchitectTaskDefintions(
-              { architectName, projectName, type },
+              { architectName, projectName, type: 'shell' },
               architectDef
             )
         );
@@ -62,15 +61,12 @@ export class NgTaskProvider implements TaskProvider {
       task.definition.architectName &&
       task.definition.projectName
     ) {
-      return NgTask.create(
-        {
-          ...(task.definition as NgTaskDefinition),
-          type: getTaskId()
-        },
-        this.workspacePath,
-        this.fileUtils
-      );
+      return this.createTask(task.definition as NgTaskDefinition);
     }
+  }
+
+  createTask(definition: NgTaskDefinition) {
+    return NgTask.create(definition, this.workspacePath || '', this.fileUtils);
   }
 
   getProjects(): Projects {

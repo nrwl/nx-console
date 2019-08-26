@@ -1,5 +1,5 @@
 export interface NgTaskDefinition {
-  type: string;
+  type: 'shell';
   projectName: string;
   architectName: string;
   configuration?: string;

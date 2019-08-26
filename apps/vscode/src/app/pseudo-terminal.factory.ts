@@ -55,7 +55,7 @@ export function executeTask(config: PseudoTerminalConfig): PseudoTerminal {
 
   const taskId = getTaskId(config.isDryRun);
   const task = new Task(
-    { type: taskId },
+    { type: 'shell' },
     TaskScope.Workspace,
     taskId,
     config.displayCommand,

@@ -1,14 +1,6 @@
-import {
-  commands,
-  ExtensionContext,
-  Task,
-  tasks,
-  window,
-  TaskScope
-} from 'vscode';
+import { commands, ExtensionContext, tasks, window } from 'vscode';
 
 import { NgTaskProvider } from './ng-task-provider/ng-task-provider';
-import { NgTaskDefinition } from './ng-task-provider/ng-task-definition';
 
 let ngTaskProvider: NgTaskProvider;
 export function registerNgCliCommands(
@@ -50,18 +42,15 @@ function runNgCliCommand(command: string) {
       }
 
       const [projectName, configuration] = selection.split(' --configuration=');
-      const taskDef: NgTaskDefinition = {
-        type: 'ng',
-        projectName,
-        configuration,
-        architectName: command
-      };
-      const task = ngTaskProvider.resolveTask(
-        new Task(taskDef, TaskScope.Workspace, 'n/a', 'n/a')
+
+      tasks.executeTask(
+        ngTaskProvider.createTask({
+          type: 'shell',
+          projectName,
+          configuration,
+          architectName: command
+        })
       );
-      if (task) {
-        tasks.executeTask(task);
-      }
     });
   };
 }
