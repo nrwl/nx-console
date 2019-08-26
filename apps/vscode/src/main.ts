@@ -59,7 +59,8 @@ export function activate(context: ExtensionContext) {
   }) as TreeView<Workspace | WorkspaceRoute>;
   context.subscriptions.push(currentWorkspaceTreeView);
 
-  projectsTreeProvider = new ProjectsTreeProvider(taskProvider);
+  projectsTreeProvider = new ProjectsTreeProvider(context, taskProvider);
+
   projectsTreeView = window.createTreeView('angularConsoleJson', {
     treeDataProvider: projectsTreeProvider
   }) as TreeView<AngularJsonTreeItem>;

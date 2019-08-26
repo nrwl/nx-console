@@ -4,12 +4,14 @@ import {
   commands,
   ProviderResult,
   Selection,
+  tasks,
   TextDocument,
   TreeItem,
   TreeItemCollapsibleState,
   Uri,
   window,
-  workspace
+  workspace,
+  ExtensionContext
 } from 'vscode';
 
 import { NgTaskProvider } from '../ng-task-provider/ng-task-provider';
@@ -28,13 +30,26 @@ export class AngularJsonTreeItem extends TreeItem {
 export class AngularJsonTreeProvider extends AbstractTreeProvider<
   AngularJsonTreeItem
 > {
-  constructor(private readonly ngTaskProvider: NgTaskProvider) {
+  constructor(
+    context: ExtensionContext,
+    private readonly ngTaskProvider: NgTaskProvider
+  ) {
     super();
 
-    commands.registerCommand(
-      'angularConsole.editAngularJson',
-      this.editAngularJson,
-      this
+    ([
+      ['editAngularJson', this.editAngularJson],
+      ['revealInExplorer', this.revealInExplorer],
+      ['runTask', this.runTask]
+    ] as [string, (item: AngularJsonTreeItem) => Promise<any>][]).forEach(
+      ([commandSuffix, callback]) => {
+        context.subscriptions.push(
+          commands.registerCommand(
+            `angularConsole.${commandSuffix}`,
+            callback,
+            this
+          )
+        );
+      }
     );
   }
 
@@ -61,6 +76,17 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       command: 'angularConsole.editAngularJson',
       arguments: [item]
     };
+    if (!angularJsonLabel.architect) {
+      const projectDef = this.ngTaskProvider.getProjects()[
+        angularJsonLabel.project
+      ];
+      item.resourceUri = Uri.file(
+        join(this.ngTaskProvider.getWorkspacePath()!, projectDef.root)
+      );
+      item.contextValue = 'project';
+    } else {
+      item.contextValue = 'task';
+    }
 
     return item;
   }
@@ -163,6 +189,28 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     visit(document.getText(), visitor);
 
     return scriptOffset;
+  }
+
+  private async runTask(selection: AngularJsonTreeItem) {
+    const { architect, project } = selection.angularJsonLabel;
+    if (!architect) {
+      return;
+    }
+
+    return tasks.executeTask(
+      this.ngTaskProvider.createTask({
+        architectName: architect.name,
+        projectName: project,
+        configuration: architect.configuration,
+        type: 'shell'
+      })
+    );
+  }
+
+  private async revealInExplorer(selection: AngularJsonTreeItem) {
+    if (selection.resourceUri) {
+      commands.executeCommand('revealInExplorer', selection.resourceUri);
+    }
   }
 
   private async editAngularJson(selection: AngularJsonTreeItem) {

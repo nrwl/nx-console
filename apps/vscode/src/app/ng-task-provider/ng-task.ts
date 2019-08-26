@@ -2,6 +2,7 @@ import { NgTaskDefinition } from './ng-task-definition';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
 import { FileUtils } from '@angular-console/server';
+import { getTaskId } from '../pseudo-terminal.factory';
 
 export class NgTask extends Task {
   static create(
@@ -9,7 +10,7 @@ export class NgTask extends Task {
     workspacePath: string,
     fileUtils: FileUtils
   ): NgTask {
-    const { type, projectName, architectName, configuration } = definition;
+    const { projectName, architectName, configuration } = definition;
 
     const runTarget = configuration
       ? `${projectName}:${architectName}:${configuration}`
@@ -32,7 +33,7 @@ export class NgTask extends Task {
     const task = new NgTask(
       definition,
       TaskScope.Workspace,
-      type,
+      getTaskId(),
       displayCommand,
       getShellExecutionForConfig({
         isDryRun: false,
