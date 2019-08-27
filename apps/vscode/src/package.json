@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Angular Console",
   "description": "Angular Console for Visual Studio Code. The user interface app for the Angular CLI",
-  "version": "8.1.0",
+  "version": "8.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/angular-console"
@@ -69,6 +69,7 @@
       {
         "command": "angularConsole.runTask",
         "title": "Execute task",
+        "when": "isAngularWorkspace",
         "icon": {
           "light": "assets/continue-light.svg",
           "dark": "assets/continue-dark.svg"
@@ -77,37 +78,44 @@
       {
         "category": "ng",
         "title": "lint",
-        "command": "ng-console.lint"
+        "command": "ng-console.lint",
+        "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "build",
-        "command": "ng-console.build"
+        "command": "ng-console.build",
+        "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "deploy",
-        "command": "ng-console.deploy"
+        "command": "ng-console.deploy",
+        "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "e2e",
-        "command": "ng-console.e2e"
+        "command": "ng-console.e2e",
+        "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "serve",
-        "command": "ng-console.serve"
+        "command": "ng-console.serve",
+        "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "test",
-        "command": "ng-console.test"
+        "command": "ng-console.test",
+        "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "xi18n",
-        "command": "ng-console.xi18n"
+        "command": "ng-console.xi18n",
+        "when": "isAngularWorkspace"
       }
     ],
     "problemMatchers": [
@@ -168,7 +176,8 @@
         },
         {
           "id": "angularConsoleJson",
-          "name": "Angular JSON"
+          "name": "Angular JSON",
+          "when": "isAngularWorkspace"
         }
       ]
     }

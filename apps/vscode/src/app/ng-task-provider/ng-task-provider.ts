@@ -19,6 +19,7 @@ export class NgTaskProvider implements TaskProvider {
   getWorkspacePath() {
     return this.workspacePath;
   }
+
   setWorkspacePath(path: string) {
     this.workspacePath = path;
     this.ngTasksPromise = undefined;

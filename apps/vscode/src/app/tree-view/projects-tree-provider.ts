@@ -53,6 +53,10 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     );
   }
 
+  setWorkspacePath(_workspacePath: string) {
+    this.refresh();
+  }
+
   getParent(
     _element: AngularJsonTreeItem
   ): AngularJsonTreeItem | null | undefined {
@@ -150,6 +154,7 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     { project, architect }: AngularJsonLabel
   ): number {
     let scriptOffset = 0;
+    let nestingLevel = 0;
     let inProjects = false;
     let inProject = false;
     let inArchitects = false;
@@ -159,28 +164,41 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       onError() {
         return scriptOffset;
       },
-      onObjectEnd() {},
+      onObjectEnd() {
+        nestingLevel--;
+      },
+      onObjectBegin() {
+        nestingLevel++;
+      },
       onObjectProperty(property: string, offset: number) {
         if (scriptOffset) {
           return;
         }
 
-        if (property === 'projects') {
+        if (property === 'projects' && nestingLevel === 1) {
           inProjects = true;
-        } else if (inProjects && property === project) {
+        } else if (inProjects && nestingLevel === 2 && property === project) {
           inProject = true;
           if (!architect) {
             scriptOffset = offset;
           }
-        } else if (inProject && property === 'architect') {
+        } else if (
+          inProject &&
+          nestingLevel === 3 &&
+          property === 'architect'
+        ) {
           inArchitects = true;
         } else if (inArchitects && architect) {
-          if (property === architect.name) {
+          if (property === architect.name && nestingLevel === 4) {
             inArchitect = true;
             if (!architect.configuration) {
               scriptOffset = offset;
             }
-          } else if (inArchitect && property === architect.configuration) {
+          } else if (
+            inArchitect &&
+            nestingLevel === 5 &&
+            property === architect.configuration
+          ) {
             scriptOffset = offset;
           }
         }

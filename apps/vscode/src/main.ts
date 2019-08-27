@@ -141,8 +141,11 @@ export function activate(context: ExtensionContext) {
 }
 
 function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
+  commands.executeCommand('setContext', 'isAngularWorkspace', true);
+
   currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
   taskProvider.setWorkspacePath(workspacePath);
+  projectsTreeProvider.setWorkspacePath(workspacePath);
 
   import('./app/start-server').then(({ startServer }) => {
     server = startServer(context, workspacePath);
