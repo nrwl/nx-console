@@ -140,7 +140,7 @@ export class MutationResolver {
     try {
       this.telemetry.featureUsed('Run Custom NG Command');
       this.configureNg(p);
-      this.ng.run(Type.ng, p, rc);
+      return this.ng.run(Type.ng, p, rc);
     } catch (e) {
       this.handleError("running 'ng ...'", e);
     }
@@ -155,7 +155,7 @@ export class MutationResolver {
     try {
       this.telemetry.featureUsed('Run Custom NPM Command');
       this.configureNpmClient(npmClient, p);
-      this.npm.run(Type.npm, p, rc);
+      return this.npm.run(Type.npm, p, rc);
     } catch (e) {
       this.handleError('running npm script', e);
     }

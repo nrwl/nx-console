@@ -87,30 +87,30 @@ type OpenDocResult {
 }
 
 type Mutation {
-  ngAdd(path: String!, name: String!): CommandStarted
+  ngAdd(path: String!, name: String!): CommandStarted!
   ngNew(
     path: String!
     name: String!
     collection: String!
     newCommand: [String!]!
-  ): CommandStarted
+  ): CommandStarted!
   generate(
     path: String!
     genCommand: [String!]!
     dryRun: Boolean!
-  ): CommandStarted
+  ): CommandStarted!
   generateUsingNpm(
     path: String!
     npmClient: String
     genCommand: [String!]!
     dryRun: Boolean!
-  ): CommandStarted
-  runNg(path: String!, runCommand: [String!]!): CommandStarted
+  ): CommandStarted!
+  runNg(path: String!, runCommand: [String!]!): CommandStarted!
   runNpm(
     path: String!
     npmClient: String
     runCommand: [String!]!
-  ): CommandStarted
+  ): CommandStarted!
   stopCommand(id: String!): StopResult
   removeCommand(id: String!): RemoveResult
   removeAllCommands: RemoveResult
