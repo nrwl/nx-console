@@ -87,8 +87,8 @@ export class CommandRunner {
       this.activeCommand$.next(true);
     }
     return mutation.pipe(
-      concatMap((res: any) => {
-        const id = (Object.entries(res.data)[0][1] as any).id;
+      concatMap(res => {
+        const id = Object.entries(res.data || {})[0][1].id;
 
         this.activeCommandId = id;
 
