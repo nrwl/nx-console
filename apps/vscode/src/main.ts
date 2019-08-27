@@ -60,6 +60,9 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(currentWorkspaceTreeView);
 
   projectsTreeProvider = new ProjectsTreeProvider(context, taskProvider);
+  commands.registerCommand('angularConsole.refreshProjects', () =>
+    projectsTreeProvider.refresh()
+  );
 
   projectsTreeView = window.createTreeView('angularConsoleJson', {
     treeDataProvider: projectsTreeProvider

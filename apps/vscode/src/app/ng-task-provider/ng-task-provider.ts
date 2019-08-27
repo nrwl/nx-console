@@ -82,6 +82,6 @@ export class NgTaskProvider implements TaskProvider {
   }
 
   getProjectEntries(): [string, ProjectDef][] {
-    return Object.entries(this.getProjects() || {});
+    return Object.entries(this.getProjects() || {}) as [string, ProjectDef][];
   }
 }

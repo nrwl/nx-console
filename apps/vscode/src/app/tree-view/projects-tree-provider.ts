@@ -53,14 +53,30 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     );
   }
 
-  setWorkspacePath(_workspacePath: string) {
+  setWorkspacePath(workspacePath: string) {
+    if (this.ngTaskProvider.getWorkspacePath() !== workspacePath) {
+      this.ngTaskProvider.setWorkspacePath(workspacePath);
+    }
     this.refresh();
   }
 
   getParent(
-    _element: AngularJsonTreeItem
+    element: AngularJsonTreeItem
   ): AngularJsonTreeItem | null | undefined {
-    return;
+    const { project, architect } = element.angularJsonLabel;
+
+    if (architect) {
+      if (architect.configuration) {
+        return this.createAngularJsonTreeItem(
+          { project, architect: { name: architect.name } },
+          architect.name
+        );
+      } else {
+        return this.createAngularJsonTreeItem({ project }, project);
+      }
+    } else {
+      return null;
+    }
   }
 
   createAngularJsonTreeItem(
@@ -84,9 +100,11 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       const projectDef = this.ngTaskProvider.getProjects()[
         angularJsonLabel.project
       ];
-      item.resourceUri = Uri.file(
-        join(this.ngTaskProvider.getWorkspacePath()!, projectDef.root)
-      );
+      if (projectDef) {
+        item.resourceUri = Uri.file(
+          join(this.ngTaskProvider.getWorkspacePath()!, projectDef.root)
+        );
+      }
       item.contextValue = 'project';
     } else {
       item.contextValue = 'task';
@@ -114,6 +132,10 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     const { architect, project } = angularJsonLabel;
     const projectDef = this.ngTaskProvider.getProjects()[project];
 
+    if (!projectDef) {
+      return;
+    }
+
     if (!architect) {
       if (projectDef.architect) {
         return Object.keys(projectDef.architect).map(
@@ -132,8 +154,9 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
         return;
       }
 
-      const configurations =
-        projectDef.architect[architect.name].configurations;
+      const configurations = projectDef.architect
+        ? projectDef.architect[architect.name].configurations
+        : undefined;
       if (!configurations) {
         return;
       }
