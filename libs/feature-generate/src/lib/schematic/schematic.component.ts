@@ -1,14 +1,13 @@
 import { Schematic } from '@angular-console/schema';
 import {
+  CommandOutputComponent,
   FlagsComponent,
-  TaskRunnerComponent,
-  CommandOutputComponent
+  TaskRunnerComponent
 } from '@angular-console/ui';
 import {
-  IncrementalCommandOutput,
   CommandRunner,
+  IncrementalCommandOutput,
   Serializer,
-  CommandStatus,
   Settings
 } from '@angular-console/utils';
 import {
@@ -29,8 +28,10 @@ import {
   startWith,
   switchMap,
   tap,
-  withLatestFrom
+  withLatestFrom,
+  skip
 } from 'rxjs/operators';
+
 import {
   GenerateGQL,
   GenerateUsingNmpGQL,
@@ -38,7 +39,7 @@ import {
   SchematicDocsGQL
 } from '../generated/graphql';
 
-const DEBOUNCE_TIME = 300;
+const DEBOUNCE_TIME = 500;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,8 +71,6 @@ export class SchematicComponent implements OnInit {
   @ViewChild(FlagsComponent, { static: false }) flags: FlagsComponent;
 
   docs$: Observable<any[]>;
-
-  hasNeverBeenValid = true;
 
   private readonly ngGen$ = new Subject<void>();
   readonly ngGenDisabled$ = new BehaviorSubject(true);
@@ -157,6 +156,7 @@ export class SchematicComponent implements OnInit {
     );
 
     this.dryRunResult$ = this.commandArray$.pipe(
+      skip(1),
       debounceTime(DEBOUNCE_TIME),
       switchMap(
         (c): Observable<IncrementalCommandOutput> => {
@@ -165,23 +165,6 @@ export class SchematicComponent implements OnInit {
           }
 
           this.out.reset();
-          if (!c.valid) {
-            // cannot use change detection because the operation isn't idempotent
-            this.out.commandResponse = {
-              id: '',
-              command: '',
-              out: '',
-              detailedStatus: null,
-              status: CommandStatus.TERMINATED,
-              outChunk: `${c.commands.join(
-                `\n\r`
-              )}\n\n\rCommand is missing required fields\n\r`
-            };
-            return of();
-          } else if (this.hasNeverBeenValid) {
-            this.taskRunner.terminalVisible$.next(true);
-            this.hasNeverBeenValid = false;
-          }
 
           return this.runCommand(c.schematic, c.commands, true);
         }

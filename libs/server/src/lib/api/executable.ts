@@ -89,7 +89,7 @@ export class Executable {
         program: this.path,
         args: cmds,
         cwd,
-        isDryRun: false,
+        isDryRun: !addToRecent,
         isWsl: this.fileUtils.isWsl()
       });
 

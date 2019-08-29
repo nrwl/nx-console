@@ -3,14 +3,7 @@ import {
   PseudoTerminalConfig,
   PseudoTerminalFactory
 } from '@angular-console/server';
-import {
-  Disposable,
-  Task,
-  TaskExecution,
-  TaskRevealKind,
-  tasks,
-  TaskScope
-} from 'vscode';
+import { Task, TaskExecution, TaskRevealKind, tasks, TaskScope } from 'vscode';
 
 import { getShellExecutionForConfig } from './ng-task-provider/shell-execution';
 
@@ -51,7 +44,6 @@ export function executeTask(config: PseudoTerminalConfig): PseudoTerminal {
 
   let onExit: (code: number) => void;
   let taskExecution: TaskExecution;
-  let disposeOnDidEndTaskProcess: Disposable | undefined;
 
   const taskId = getTaskId(config.isDryRun);
   const task = new Task(
@@ -86,7 +78,8 @@ export function executeTask(config: PseudoTerminalConfig): PseudoTerminal {
         activeTaskNames.add(task.name);
       }
       taskExecution = t;
-      disposeOnDidEndTaskProcess = tasks.onDidEndTaskProcess(e => {
+
+      const disposeOnDidEndTaskProcess = tasks.onDidEndTaskProcess(e => {
         if (e.execution.task === task) {
           if (e.execution === currentDryRun) {
             currentDryRun = undefined;
@@ -98,6 +91,8 @@ export function executeTask(config: PseudoTerminalConfig): PseudoTerminal {
           } else {
             onExit(e.exitCode);
           }
+
+          disposeOnDidEndTaskProcess.dispose();
         }
       });
     },
@@ -115,9 +110,6 @@ export function executeTask(config: PseudoTerminalConfig): PseudoTerminal {
       onExit = (exitCode: number) => {
         o(exitCode);
         activeTaskNames.delete(task.name);
-        if (disposeOnDidEndTaskProcess) {
-          disposeOnDidEndTaskProcess.dispose();
-        }
       };
     }
   };
