@@ -19,7 +19,7 @@ export interface ProjectDef {
 }
 
 export interface Projects {
-  [projectName: string]: ProjectDef;
+  [projectName: string]: ProjectDef | undefined;
 }
 
 export interface AngularJson {

@@ -44,6 +44,13 @@
   },
   "contributes": {
     "menus": {
+      "view/title": [
+        {
+          "command": "angularConsole.refreshProjects",
+          "when": "view == angularConsoleJson",
+          "group": "navigation"
+        }
+      ],
       "view/item/context": [
         {
           "command": "angularConsole.revealInExplorer",
@@ -58,6 +65,14 @@
       ]
     },
     "commands": [
+      {
+        "command": "angularConsole.refreshProjects",
+        "title": "Refresh",
+        "icon": {
+          "light": "assets/refresh-light.svg",
+          "dark": "assets/refresh-dark.svg"
+        }
+      },
       {
         "command": "angularConsole.revealInExplorer",
         "title": "Reveal in Explorer",
@@ -78,43 +93,43 @@
       {
         "category": "ng",
         "title": "lint",
-        "command": "ng-console.lint",
+        "command": "angularConsole.lint",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "build",
-        "command": "ng-console.build",
+        "command": "angularConsole.build",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "deploy",
-        "command": "ng-console.deploy",
+        "command": "angularConsole.deploy",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "e2e",
-        "command": "ng-console.e2e",
+        "command": "angularConsole.e2e",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "serve",
-        "command": "ng-console.serve",
+        "command": "angularConsole.serve",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "test",
-        "command": "ng-console.test",
+        "command": "angularConsole.test",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "xi18n",
-        "command": "ng-console.xi18n",
+        "command": "angularConsole.xi18n",
         "when": "isAngularWorkspace"
       }
     ],

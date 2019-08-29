@@ -13,7 +13,7 @@ export function registerNgCliCommands(
     command => {
       context.subscriptions.push(
         commands.registerCommand(
-          `ng-console.${command}`,
+          `angularConsole.${command}`,
           runNgCliCommand(command)
         )
       );
