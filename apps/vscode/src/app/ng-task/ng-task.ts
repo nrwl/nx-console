@@ -10,13 +10,11 @@ export class NgTask extends Task {
     workspacePath: string,
     fileUtils: FileUtils
   ): NgTask {
-    const { projectName, architectName, configuration } = definition;
+    const { projectName, architectName, flags } = definition;
 
-    const runTarget = configuration
-      ? `${projectName}:${architectName}:${configuration}`
-      : `${projectName}:${architectName}`;
+    const runTarget = `${projectName}:${architectName}`;
 
-    let displayCommand = `ng run ${runTarget}`;
+    let args = ['run', runTarget];
     switch (architectName) {
       case 'build':
       case 'lint':
@@ -25,11 +23,15 @@ export class NgTask extends Task {
       case 'serve':
       case 'test':
       case 'xi18n':
-        displayCommand = configuration
-          ? `ng ${architectName} ${projectName} --configuration=${configuration}`
-          : `ng ${architectName} ${projectName}`;
+        args = [architectName];
+        if (projectName) args.push(projectName);
     }
 
+    if (flags) {
+      args = [...args, ...flags.trim().split(/\s+/)];
+    }
+
+    const displayCommand = `ng ${args.join(' ')}`;
     const task = new NgTask(
       definition,
       TaskScope.Workspace,
@@ -39,7 +41,7 @@ export class NgTask extends Task {
         isDryRun: false,
         isWsl: fileUtils.isWsl(),
         displayCommand,
-        args: ['run', runTarget],
+        args,
         cwd: workspacePath,
         name: displayCommand,
         program: fileUtils.findClosestNg(workspacePath)

@@ -11,12 +11,12 @@ import { autoUpdater } from 'electron-updater';
 import { statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
+import * as getPort from 'get-port';
 
 import { startServer } from './app/start-server';
 
 const start = process.hrtime();
 const fixPath = require('fix-path');
-const getPort = require('get-port');
 
 const store = new ElectronStore();
 

@@ -5,7 +5,7 @@ import {
 } from '@angular-console/server';
 import { Task, TaskExecution, TaskRevealKind, tasks, TaskScope } from 'vscode';
 
-import { getShellExecutionForConfig } from './ng-task-provider/shell-execution';
+import { getShellExecutionForConfig } from './ng-task/shell-execution';
 
 const activeTaskNames = new Set<string>();
 let currentDryRun: TaskExecution | undefined;

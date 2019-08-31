@@ -4,7 +4,6 @@ import { ProviderResult, Task, TaskProvider } from 'vscode';
 import { NgTask } from './ng-task';
 import {
   AngularJson,
-  getArchitectTaskDefintions,
   NgTaskDefinition,
   ProjectDef,
   Projects
@@ -35,19 +34,19 @@ export class NgTaskProvider implements TaskProvider {
     }
 
     this.ngTasksPromise = this.getProjectEntries()
-      .flatMap(([projectName, project]) => {
-        if (!project.architect) {
-          return [];
-        }
+      .flatMap(
+        ([projectName, project]): NgTaskDefinition[] => {
+          if (!project.architect) {
+            return [];
+          }
 
-        return Object.entries(project.architect).flatMap(
-          ([architectName, architectDef]) =>
-            getArchitectTaskDefintions(
-              { architectName, projectName, type: 'shell' },
-              architectDef
-            )
-        );
-      })
+          return Object.keys(project.architect).map(architectName => ({
+            architectName,
+            projectName,
+            type: 'shell'
+          }));
+        }
+      )
       .map(taskDef =>
         NgTask.create(taskDef, this.workspacePath as string, this.fileUtils)
       );
@@ -79,6 +78,10 @@ export class NgTaskProvider implements TaskProvider {
       .json as AngularJson;
 
     return projects;
+  }
+
+  getProjectNames(): string[] {
+    return Object.keys(this.getProjects() || {});
   }
 
   getProjectEntries(): [string, ProjectDef][] {

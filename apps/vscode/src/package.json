@@ -46,7 +46,7 @@
     "menus": {
       "view/title": [
         {
-          "command": "angularConsole.refreshProjects",
+          "command": "angularConsole.refreshAngularJsonTree",
           "when": "view == angularConsoleJson",
           "group": "navigation"
         }
@@ -66,7 +66,7 @@
     },
     "commands": [
       {
-        "command": "angularConsole.refreshProjects",
+        "command": "angularConsole.refreshAngularJsonTree",
         "title": "Refresh",
         "icon": {
           "light": "assets/refresh-light.svg",
@@ -104,12 +104,6 @@
       },
       {
         "category": "ng",
-        "title": "deploy",
-        "command": "angularConsole.deploy",
-        "when": "isAngularWorkspace"
-      },
-      {
-        "category": "ng",
         "title": "e2e",
         "command": "angularConsole.e2e",
         "when": "isAngularWorkspace"
@@ -130,6 +124,42 @@
         "category": "ng",
         "title": "xi18n",
         "command": "angularConsole.xi18n",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "lint (ui)",
+        "command": "angularConsole.lint.ui",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "build (ui)",
+        "command": "angularConsole.build.ui",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "e2e (ui)",
+        "command": "angularConsole.e2e.ui",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "serve (ui)",
+        "command": "angularConsole.serve.ui",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "test (ui)",
+        "command": "angularConsole.test.ui",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "xi18n (ui)",
+        "command": "angularConsole.xi18n.ui",
         "when": "isAngularWorkspace"
       }
     ],

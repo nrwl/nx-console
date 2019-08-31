@@ -1,4 +1,3 @@
-import { WorkspaceDefinition } from '@angular-console/schema';
 import { FileUtils } from '@angular-console/server';
 import { stream } from 'fast-glob';
 import { existsSync } from 'fs';
@@ -13,121 +12,120 @@ import {
   window,
   workspace
 } from 'vscode';
-import { NgTaskProvider } from './app/ng-task-provider/ng-task-provider';
-import { Workspace } from './app/tree-item/workspace';
-import {
-  getWorkspaceRoute,
-  RevealWorkspaceRoute,
-  WorkspaceRoute,
-  WorkspaceRouteTitle
-} from './app/tree-item/workspace-route';
-import {
-  CurrentWorkspaceTreeProvider,
-  LOCATE_YOUR_WORKSPACE
-} from './app/tree-view/current-workspace-tree-provider';
-import {
-  AngularJsonTreeItem,
-  AngularJsonTreeProvider as ProjectsTreeProvider
-} from './app/tree-view/projects-tree-provider';
-import { createWebViewPanel } from './app/webview.factory';
-import { registerNgCliCommands } from './app/ng-cli-commands';
+
+import { AngularJsonTreeItem } from './app/angular-json-tree/angular-json-tree-item';
+import { AngularJsonTreeProvider } from './app/angular-json-tree/angular-json-tree-provider';
+import { registerNgTaskCommands } from './app/ng-task/ng-task-commands';
+import { NgTaskProvider } from './app/ng-task/ng-task-provider';
 import { VSCodeStorage } from './app/vscode-storage';
+import { revealWebViewPanel } from './app/webview';
+import { WorkspaceTreeItem } from './app/workspace-tree/workspace-tree-item';
+import {
+  LOCATE_YOUR_WORKSPACE,
+  WorkspaceTreeProvider
+} from './app/workspace-tree/workspace-tree-provider';
 
 let server: Promise<Server>;
 
-let currentWorkspaceTreeView: TreeView<Workspace | WorkspaceRoute>;
-let projectsTreeView: TreeView<AngularJsonTreeItem>;
+let workspaceTreeView: TreeView<WorkspaceTreeItem>;
+let angularJsonTreeView: TreeView<AngularJsonTreeItem>;
 
-let currentWorkspaceTreeProvider: CurrentWorkspaceTreeProvider;
-let projectsTreeProvider: ProjectsTreeProvider;
+let currentWorkspaceTreeProvider: WorkspaceTreeProvider;
+let angularJsonTreeProvider: AngularJsonTreeProvider;
 
-let taskProvider: NgTaskProvider;
+let ngTaskProvider: NgTaskProvider;
+let context: ExtensionContext;
 
-export function activate(context: ExtensionContext) {
-  currentWorkspaceTreeProvider = CurrentWorkspaceTreeProvider.create({
+export function activate(c: ExtensionContext) {
+  context = c;
+  currentWorkspaceTreeProvider = WorkspaceTreeProvider.create({
     extensionPath: context.extensionPath
   });
   const store = VSCodeStorage.fromContext(context);
 
-  taskProvider = new NgTaskProvider(new FileUtils(store));
-  tasks.registerTaskProvider('ng', taskProvider);
+  ngTaskProvider = new NgTaskProvider(new FileUtils(store));
+  tasks.registerTaskProvider('ng', ngTaskProvider);
 
-  registerNgCliCommands(context, taskProvider);
+  registerNgTaskCommands(context, ngTaskProvider);
 
-  currentWorkspaceTreeView = window.createTreeView('angularConsole', {
+  workspaceTreeView = window.createTreeView('angularConsole', {
     treeDataProvider: currentWorkspaceTreeProvider
-  }) as TreeView<Workspace | WorkspaceRoute>;
-  context.subscriptions.push(currentWorkspaceTreeView);
+  }) as TreeView<WorkspaceTreeItem>;
+  context.subscriptions.push(workspaceTreeView);
 
-  projectsTreeProvider = new ProjectsTreeProvider(context, taskProvider);
-  commands.registerCommand('angularConsole.refreshProjects', () =>
-    projectsTreeProvider.refresh()
+  angularJsonTreeProvider = new AngularJsonTreeProvider(
+    context,
+    ngTaskProvider
   );
 
-  projectsTreeView = window.createTreeView('angularConsoleJson', {
-    treeDataProvider: projectsTreeProvider
+  angularJsonTreeView = window.createTreeView('angularConsoleJson', {
+    treeDataProvider: angularJsonTreeProvider
   }) as TreeView<AngularJsonTreeItem>;
-  context.subscriptions.push(projectsTreeView);
+  context.subscriptions.push(angularJsonTreeView);
 
   context.subscriptions.push(
     commands.registerCommand(
-      'extension.angularConsole',
-      (
-        workspaceDef: WorkspaceDefinition | undefined,
-        workspaceRouteTitle: WorkspaceRouteTitle | undefined,
-        onRevealWorkspaceItem: RevealWorkspaceRoute
-      ) =>
-        main({
+      'angularConsole.revealWebViewPanel',
+      async (workspaceTreeItem: WorkspaceTreeItem) => {
+        revealWebViewPanel({
+          workspaceTreeItem,
           context,
-          workspaceDef,
           viewColumn: ViewColumn.Active,
-          workspaceRouteTitle,
-          revealWorkspaceRoute: onRevealWorkspaceItem
-        })
+          getProjectEntries: () => ngTaskProvider.getProjectEntries(),
+          port: ((await server).address() as any).port,
+          workspaceTreeView
+        });
+      }
     )
   );
   context.subscriptions.push(
     commands.registerCommand(
       LOCATE_YOUR_WORKSPACE.command!.command,
       async () => {
-        return await window
-          .showOpenDialog({
-            canSelectFolders: false,
-            canSelectFiles: true,
-            canSelectMany: false,
-            filters: {
-              'Angular JSON': ['json']
-            },
-            openLabel: 'Select an angular.json file'
-          })
-          .then(value => {
-            if (value && value[0]) {
-              return setAngularWorkspace(context, join(value[0].fsPath, '..'));
-            }
-          });
+        return await locateAngularWorkspace();
       }
     )
   );
 
-  const workspacePath =
+  const vscodeWorkspacePath =
     workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
-  if (!workspacePath) {
-    throw new Error('Could not find VsCode workspace path');
+  if (vscodeWorkspacePath) {
+    scanForWorkspace(vscodeWorkspacePath);
   }
+}
 
-  let currentDirectory = workspacePath;
+function locateAngularWorkspace() {
+  return window
+    .showOpenDialog({
+      canSelectFolders: false,
+      canSelectFiles: true,
+      canSelectMany: false,
+      filters: {
+        'Angular JSON': ['json']
+      },
+      openLabel: 'Select angular.json'
+    })
+    .then(value => {
+      if (value && value[0]) {
+        return setAngularWorkspace(join(value[0].fsPath, '..'));
+      }
+    });
+}
 
-  const { root } = parse(workspacePath);
+function scanForWorkspace(vscodeWorkspacePath: string) {
+  let currentDirectory = vscodeWorkspacePath;
+
+  const { root } = parse(vscodeWorkspacePath);
   while (currentDirectory !== root) {
     if (existsSync(join(currentDirectory, 'angular.json'))) {
-      return setAngularWorkspace(context, currentDirectory);
+      return setAngularWorkspace(currentDirectory);
     }
     currentDirectory = dirname(currentDirectory);
   }
 
   const childAngularJsonStream = stream(join('**', 'angular.json'), {
-    cwd: workspacePath,
+    cwd: vscodeWorkspacePath,
     deep: 3,
     onlyFiles: true,
     absolute: true,
@@ -136,19 +134,19 @@ export function activate(context: ExtensionContext) {
     .on('data', (angularJsonPath: string) => {
       childAngularJsonStream.pause();
 
-      setAngularWorkspace(context, join(angularJsonPath, '..'));
+      setAngularWorkspace(join(angularJsonPath, '..'));
     })
     .on('end', () => {
       currentWorkspaceTreeProvider.endScan();
     });
 }
 
-function setAngularWorkspace(context: ExtensionContext, workspacePath: string) {
+function setAngularWorkspace(workspacePath: string) {
   commands.executeCommand('setContext', 'isAngularWorkspace', true);
 
   currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
-  taskProvider.setWorkspacePath(workspacePath);
-  projectsTreeProvider.setWorkspacePath(workspacePath);
+  ngTaskProvider.setWorkspacePath(workspacePath);
+  angularJsonTreeProvider.setWorkspacePath(workspacePath);
 
   import('./app/start-server').then(({ startServer }) => {
     server = startServer(context, workspacePath);
@@ -159,43 +157,4 @@ export async function deactivate() {
   if (server) {
     (await server).close();
   }
-}
-
-async function main(config: {
-  context: ExtensionContext;
-  viewColumn: ViewColumn;
-  workspaceDef: WorkspaceDefinition | undefined;
-  workspaceRouteTitle: WorkspaceRouteTitle | undefined;
-  revealWorkspaceRoute: RevealWorkspaceRoute;
-}) {
-  const {
-    context,
-    viewColumn,
-    workspaceDef,
-    workspaceRouteTitle,
-    revealWorkspaceRoute
-  } = config;
-
-  const address = (await server).address();
-  if (typeof address === 'string') {
-    throw new Error(`Server address format is unsupported: ${address}`);
-  }
-
-  const webViewPanel = createWebViewPanel(
-    context,
-    viewColumn,
-    `http://localhost:${address!.port}/`,
-    getWorkspaceRoute(workspaceDef, workspaceRouteTitle),
-    workspaceDef,
-    workspaceRouteTitle
-  );
-  context.subscriptions.push(webViewPanel);
-
-  webViewPanel.onDidChangeViewState(e => {
-    if (e.webviewPanel.visible) {
-      revealWorkspaceRoute(currentWorkspaceTreeView);
-    }
-  });
-
-  return webViewPanel;
 }
