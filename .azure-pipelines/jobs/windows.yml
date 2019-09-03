@@ -1,9 +1,0 @@
-steps:
-  - script: npx nx affected:build --all
-    displayName: build affected applications
-
-  - script: npx nps prepare.electron
-    displayName: prepare electron
-
-  - script: npx nps package.electronWin
-    displayName: package electron

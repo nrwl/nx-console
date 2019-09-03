@@ -166,8 +166,8 @@ module.exports = {
           check: nps.concurrent.nps('format.check', 'lint')
         }
       },
-      write: 'nx format:write',
-      check: 'nx format:check'
+      write: 'nx format:write --base=origin/master',
+      check: 'nx format:check --base=origin/master'
     },
     lint: {
       default: nps.concurrent({

@@ -1,0 +1,3 @@
+steps:
+  - script: npx nps prepare.and.package.vscode
+    displayName: prepare and package vscode

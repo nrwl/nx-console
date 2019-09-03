@@ -1,21 +1,14 @@
 jobs:
-- job: linux_shard_1
+- job: format_lint_test
   pool:
     vmImage: ubuntu-latest
   steps:
   - template: .azure-pipelines/steps/install-dependencies.yml
-  - template: .azure-pipelines/jobs/ci1.linux.yml
+  - template: .azure-pipelines/jobs/format-lint-test.yml
 
-- job: linux_shard_2
+- job: package
   pool:
     vmImage: ubuntu-latest
   steps:
   - template: .azure-pipelines/steps/install-dependencies.yml
-  - template: .azure-pipelines/jobs/ci2.linux.yml
-
-- job: windows
-  pool:
-    vmImage: vs2017-win2016
-  steps:
-  - template: .azure-pipelines/steps/install-dependencies.yml
-  - template: .azure-pipelines/jobs/windows.yml
+  - template: .azure-pipelines/jobs/package.yml

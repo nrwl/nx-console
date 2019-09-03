@@ -177,7 +177,11 @@
                 "input": "node_modules/@nrwl/angular-console-enterprise-electron",
                 "output": "/assets/"
               },
-              { "glob": "README.md", "input": "./", "output": "/assets/" },
+              {
+                "glob": "README.md",
+                "input": "./",
+                "output": "/assets/"
+              },
               {
                 "glob": "**/*",
                 "input": "libs/server/src/assets",
@@ -234,7 +238,11 @@
                 "input": "node_modules/@nrwl/angular-console-enterprise-electron",
                 "output": "/assets/"
               },
-              { "glob": "README.md", "input": "./", "output": "/assets/" },
+              {
+                "glob": "README.md",
+                "input": "./",
+                "output": "/assets/"
+              },
               {
                 "glob": "**/*",
                 "input": "libs/server/src/assets",
@@ -289,7 +297,11 @@
                 "input": "node_modules/@nrwl/angular-console-enterprise-electron",
                 "output": "/assets/"
               },
-              { "glob": "README.md", "input": "./", "output": "/assets/" },
+              {
+                "glob": "README.md",
+                "input": "./",
+                "output": "/assets/"
+              },
               {
                 "glob": "**/*",
                 "input": "libs/server/src/assets",
@@ -558,6 +570,164 @@
             "tsConfig": ["libs/cypress/tsconfig.lib.json"],
             "exclude": ["**/node_modules/**", "!libs/cypress/**"]
           }
+        }
+      }
+    },
+    "vscode-ui": {
+      "projectType": "application",
+      "schematics": {
+        "@nrwl/workspace:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/vscode-ui",
+      "sourceRoot": "apps/vscode-ui/src",
+      "prefix": "angular-console",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/vscode-ui",
+            "index": "apps/vscode-ui/src/index.html",
+            "main": "apps/vscode-ui/src/main.ts",
+            "polyfills": "apps/vscode-ui/src/polyfills.ts",
+            "tsConfig": "apps/vscode-ui/tsconfig.app.json",
+            "assets": [
+              "apps/vscode-ui/src/favicon.ico",
+              "apps/vscode-ui/src/assets"
+            ],
+            "styles": ["apps/vscode-ui/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/vscode-ui/src/environments/environment.ts",
+                  "with": "apps/vscode-ui/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "vscode-ui:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "vscode-ui:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "vscode-ui:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/vscode-ui/tsconfig.app.json",
+              "apps/vscode-ui/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/vscode-ui/**"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/vscode-ui/jest.config.js",
+            "tsConfig": "apps/vscode-ui/tsconfig.spec.json",
+            "setupFile": "apps/vscode-ui/src/test-setup.ts"
+          }
+        }
+      }
+    },
+    "vscode-ui-e2e": {
+      "root": "apps/vscode-ui-e2e",
+      "sourceRoot": "apps/vscode-ui-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/vscode-ui-e2e/cypress.json",
+            "tsConfig": "apps/vscode-ui-e2e/tsconfig.e2e.json",
+            "devServerTarget": "vscode-ui:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "vscode-ui:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": "apps/vscode-ui-e2e/tsconfig.e2e.json",
+            "exclude": ["**/node_modules/**", "!apps/vscode-ui-e2e/**"]
+          }
+        }
+      }
+    },
+    "vscode-ui-feature-task-execution-form": {
+      "projectType": "library",
+      "root": "libs/vscode-ui/feature-task-execution-form",
+      "sourceRoot": "libs/vscode-ui/feature-task-execution-form/src",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode-ui/feature-task-execution-form/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/vscode-ui/feature-task-execution-form/**"
+            ]
+          }
+        }
+      },
+      "schematics": {}
+    },
+    "vscode-ui-components": {
+      "projectType": "library",
+      "root": "libs/vscode-ui/components",
+      "sourceRoot": "libs/vscode-ui/components/src",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["libs/vscode-ui/components/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/vscode-ui/components/**"]
+          }
+        }
+      },
+      "schematics": {
+        "@nrwl/angular:component": {
+          "styleext": "scss"
         }
       }
     }

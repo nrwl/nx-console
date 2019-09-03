@@ -48,7 +48,13 @@
       ],
       "@angular-console/server": ["libs/server/src/index.ts"],
       "@angular-console/environment": ["libs/environment/src/index.ts"],
-      "@angular-console/cypress": ["libs/cypress/src/index.ts"]
+      "@angular-console/cypress": ["libs/cypress/src/index.ts"],
+      "@angular-console/vscode-ui/feature-task-execution-form": [
+        "libs/vscode-ui/feature-task-execution-form/src/index.ts"
+      ],
+      "@angular-console/vscode-ui/components": [
+        "libs/vscode-ui/components/src/index.ts"
+      ]
     },
     "module": "es2015",
     "rootDir": "."
