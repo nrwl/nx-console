@@ -66,6 +66,18 @@
     },
     "cypress": {
       "tags": []
+    },
+    "vscode-ui-e2e": {
+      "tags": []
+    },
+    "vscode-ui": {
+      "tags": []
+    },
+    "vscode-ui-feature-task-execution-form": {
+      "tags": []
+    },
+    "vscode-ui-components": {
+      "tags": []
     }
   }
 }
