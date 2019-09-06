@@ -24,6 +24,7 @@ import {
   LOCATE_YOUR_WORKSPACE,
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
+import { migrateSettings } from './app/migrate-settings';
 
 let server: Promise<Server>;
 
@@ -41,6 +42,7 @@ export function activate(c: ExtensionContext) {
   currentWorkspaceTreeProvider = WorkspaceTreeProvider.create({
     extensionPath: context.extensionPath
   });
+  migrateSettings(context);
   const store = VSCodeStorage.fromContext(context);
 
   ngTaskProvider = new NgTaskProvider(new FileUtils(store));
