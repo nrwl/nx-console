@@ -34,15 +34,6 @@
             "buildOptimizer": true
           },
           "configurations": {
-            "electron": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.electron.ts"
-                }
-              ],
-              "outputPath": "dist/apps/electron/assets/public"
-            },
             "vscode": {
               "fileReplacements": [
                 {
@@ -113,48 +104,6 @@
         }
       }
     },
-    "electron-e2e-ci1": {
-      "root": "apps/electron-e2e-ci1",
-      "projectType": "application",
-      "prefix": "",
-      "architect": {
-        "e2e": {
-          "builder": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/electron-e2e-ci1/cypress.json",
-            "tsConfig": "apps/electron-e2e-ci1/tsconfig.e2e.json"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "apps/electron-e2e-ci1/tsconfig.e2e.json",
-            "exclude": ["**/node_modules/**"]
-          }
-        }
-      }
-    },
-    "electron-e2e-ci2": {
-      "root": "apps/electron-e2e-ci2",
-      "projectType": "application",
-      "prefix": "",
-      "architect": {
-        "e2e": {
-          "builder": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/electron-e2e-ci2/cypress.json",
-            "tsConfig": "apps/electron-e2e-ci2/tsconfig.e2e.json"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "apps/electron-e2e-ci2/tsconfig.e2e.json",
-            "exclude": ["**/node_modules/**"]
-          }
-        }
-      }
-    },
     "vscode": {
       "root": "apps/vscode",
       "sourceRoot": "apps/vscode/src",
@@ -187,8 +136,7 @@
                 "input": "libs/server/src/assets",
                 "output": "/assets/"
               }
-            ],
-            "webpackConfig": "apps/electron/webpack.conf.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -209,67 +157,6 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": ["apps/vscode/tsconfig.app.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        }
-      }
-    },
-    "electron": {
-      "root": "apps/electron",
-      "sourceRoot": "apps/electron/src",
-      "projectType": "application",
-      "prefix": "electron",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "outputPath": "dist/apps/electron",
-            "main": "apps/electron/src/main.ts",
-            "tsConfig": "apps/electron/tsconfig.app.json",
-            "assets": [
-              "apps/electron/src/package.json",
-              "apps/electron/src/.yarnrc",
-              "apps/electron/src/assets/new-workspace",
-              "apps/electron/src/assets/new-workspace.cmd",
-              "apps/electron/src/assets",
-              {
-                "glob": "schema.graphql",
-                "input": "node_modules/@nrwl/angular-console-enterprise-electron",
-                "output": "/assets/"
-              },
-              {
-                "glob": "README.md",
-                "input": "./",
-                "output": "/assets/"
-              },
-              {
-                "glob": "**/*",
-                "input": "libs/server/src/assets",
-                "output": "/assets/"
-              }
-            ],
-            "webpackConfig": "apps/electron/webpack.conf.js"
-          },
-          "configurations": {
-            "production": {
-              "externalDependencies": ["electron", "tmp", "node-pty"],
-              "sourceMap": false,
-              "optimization": true,
-              "extractLicenses": true,
-              "fileReplacements": [
-                {
-                  "replace": "apps/electron/src/environments/environment.ts",
-                  "with": "apps/electron/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["apps/electron/tsconfig.app.json"],
             "exclude": ["**/node_modules/**", "**/generated/**"]
           }
         }
@@ -329,31 +216,6 @@
           "options": {
             "tsConfig": ["apps/intellij/tsconfig.app.json"],
             "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        }
-      }
-    },
-    "feature-action-bar": {
-      "root": "libs/feature-action-bar",
-      "sourceRoot": "libs/feature-action-bar/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/feature-action-bar/tsconfig.lib.json",
-              "libs/feature-action-bar/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/feature-action-bar/jest.config.js",
-            "tsConfig": "libs/feature-action-bar/tsconfig.spec.json",
-            "setupFile": "libs/feature-action-bar/src/test-setup.ts"
           }
         }
       }
@@ -536,42 +398,6 @@
         }
       },
       "schematics": {}
-    },
-    "vscode-e2e": {
-      "root": "apps/vscode-e2e",
-      "sourceRoot": "apps/vscode-e2e/src",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/vscode-e2e/cypress.json",
-            "tsConfig": "apps/vscode-e2e/tsconfig.e2e.json"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "apps/vscode-e2e/tsconfig.e2e.json",
-            "exclude": ["**/node_modules/**", "!apps/vscode-e2e/**"]
-          }
-        }
-      }
-    },
-    "cypress": {
-      "root": "libs/cypress",
-      "sourceRoot": "libs/cypress/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["libs/cypress/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/cypress/**"]
-          }
-        }
-      }
     },
     "vscode-ui": {
       "projectType": "application",

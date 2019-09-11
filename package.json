@@ -20,66 +20,6 @@
     "postinstall": "node ./tools/scripts/postinstall.js",
     "update": "ng update @nrwl/workspace"
   },
-  "build": {
-    "appId": "io.nrwl.AngularConsole",
-    "productName": "Angular Console",
-    "copyright": "Copyright © 2018 Narwhal Technologies Inc",
-    "asar": false,
-    "files": [
-      "**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "dist/apps/electron/assets",
-        "to": "app/assets",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "removePackageScripts": false,
-    "generateUpdatesFilesForAllChannels": true,
-    "directories": {
-      "app": "dist/apps/electron",
-      "buildResources": "dist/apps/electron/assets/build",
-      "output": "dist/packages"
-    },
-    "npmRebuild": true,
-    "mac": {
-      "category": "public.app-category.developer-tools",
-      "artifactName": "AngularConsole-${version}.${ext}",
-      "icon": "icons/icon.icns"
-    },
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ],
-      "icon": "icons/icon.ico"
-    },
-    "linux": {
-      "target": [
-        "deb",
-        "tar.gz"
-      ],
-      "artifactName": "AngularConsole-${version}.${ext}",
-      "synopsis": "Angular Console",
-      "category": "Development",
-      "icon": "icons/icon.png"
-    },
-    "nsis": {
-      "createDesktopShortcut": "always",
-      "installerIcon": "icons/icon.ico",
-      "artifactName": "AngularConsole-Setup-${version}.${ext}"
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "nrwl",
-        "repo": "angular-console"
-      }
-    ]
-  },
   "dependencies": {
     "@angular/core": "8.1.2",
     "@nrwl/angular": "8.2.0",
@@ -89,7 +29,6 @@
     "fontfaceobserver": "^2.1.0",
     "ij-rpc-client": "^0.3.2",
     "jsonc-parser": "^2.1.1",
-    "node-pty": "^0.8.1",
     "pretty-quick": "^1.11.1",
     "source-map-explorer": "^1.8.0",
     "stylelint": "^10.1.0",
@@ -99,7 +38,6 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.801.2",
-    "@angular-devkit/build-ng-packagr": "0.801.2",
     "@angular/animations": "8.1.2",
     "@angular/cdk": "8.1.1",
     "@angular/cli": "8.1.2",
@@ -108,7 +46,6 @@
     "@angular/compiler-cli": "8.1.2",
     "@angular/flex-layout": "8.0.0-beta.26",
     "@angular/forms": "8.1.2",
-    "@angular/language-service": "8.1.2",
     "@angular/material": "8.1.1",
     "@angular/platform-browser": "8.1.2",
     "@angular/platform-browser-dynamic": "8.1.2",
@@ -127,7 +64,6 @@
     "@types/d3-selection": "^1.4.1",
     "@types/d3-shape": "^1.3.1",
     "@types/d3-transition": "^1.1.4",
-    "@types/electron-store": "^3.2.0",
     "@types/graphql": "14.0.5",
     "@types/jest": "24.0.9",
     "@types/node": "11.13.0",
@@ -135,8 +71,6 @@
     "@types/request": "^2.48.1",
     "@types/semver": "^5.5.0",
     "@types/shelljs": "^0.8.2",
-    "@types/sinon": "7.0.13",
-    "@types/sinon-chai": "3.2.2",
     "@types/strip-json-comments": "^0.0.30",
     "@types/tmp": "^0.0.33",
     "@types/universal-analytics": "0.4.2",
@@ -154,14 +88,6 @@
     "d3-shape": "^1.3.4",
     "d3-transition": "^1.2.0",
     "dotenv": "6.2.0",
-    "electron": "4.2.6",
-    "electron-builder": "21.1.1",
-    "electron-installer-dmg": "3.0.0",
-    "electron-packager": "14.0.2",
-    "electron-ipc-mock": "^0.0.3",
-    "electron-rebuild": "^1.8.5",
-    "electron-store": "3.3.0",
-    "electron-updater": "4.1.2",
     "express": "4.17.1",
     "fast-glob": "3.0.4",
     "fix-path": "2.1.0",
@@ -180,7 +106,6 @@
     "jest": "24.1.0",
     "jest-jasmine2": "23.6.0",
     "jest-preset-angular": "7.0.0",
-    "ng-packagr": "5.2.0",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "opn": "^5.4.0",
@@ -206,6 +131,7 @@
     "uuid": "3.3.2",
     "vsce": "^1.66.0",
     "vscode": "^1.1.35",
+    "webpack-sources": "^1.4.3",
     "xterm": "3.14.5",
     "zlib": "^1.0.5",
     "zone.js": "0.9.1"

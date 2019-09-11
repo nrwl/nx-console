@@ -1,10 +1,9 @@
-import { IS_ELECTRON } from '@angular-console/environment';
 import { FADE_IN } from '@angular-console/ui';
 import {
   CommandRunner,
   Settings,
-  toggleItemInArray,
-  Telemetry
+  Telemetry,
+  toggleItemInArray
 } from '@angular-console/utils';
 import {
   animate,
@@ -16,7 +15,6 @@ import {
 import {
   ChangeDetectionStrategy,
   Component,
-  Inject,
   OnDestroy,
   OnInit
 } from '@angular/core';
@@ -49,8 +47,6 @@ import {
   SCHEMATIC_COLLECTION_ERROR_RESPONSE
 } from './projects.constants';
 
-const ACTION_BAR_HEIGHT_PX = 52;
-
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'angular-console-projects',
@@ -68,7 +64,7 @@ const ACTION_BAR_HEIGHT_PX = 52;
   ]
 })
 export class ProjectsComponent implements OnInit, OnDestroy {
-  private readonly viewportOffsetPx = this.isElectron ? 102 : 48;
+  private readonly viewportOffsetPx = 48;
   private readonly workspace$ = this.route.params.pipe(
     map(m => m.path),
     tap(path => {
@@ -179,10 +175,8 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   );
 
   viewportHeight$ = this.commandRunner.listAllCommands().pipe(
-    map(c => this.isElectron && Boolean(c.length > 0)),
-    map(actionBarExpanded => {
-      return `calc(100vh - ${this.viewportOffsetPx +
-        (actionBarExpanded ? ACTION_BAR_HEIGHT_PX : 0)}px)`;
+    map(() => {
+      return `calc(100vh - ${this.viewportOffsetPx}px)`;
     }),
     shareReplay()
   );
@@ -206,8 +200,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     private readonly workspaceGQL: WorkspaceGQL,
     private readonly workspaceDocsGQL: WorkspaceDocsGQL,
     private readonly commandRunner: CommandRunner,
-    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL,
-    @Inject(IS_ELECTRON) private readonly isElectron: boolean
+    private readonly workspaceSchematicsGQL: WorkspaceSchematicsGQL
   ) {}
 
   ngOnInit() {

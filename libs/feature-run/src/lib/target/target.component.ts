@@ -13,25 +13,23 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  ViewChild,
-  Inject
+  ViewChild
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import {
+  first,
   map,
   publishReplay,
   refCount,
+  shareReplay,
   switchMap,
   tap,
-  withLatestFrom,
-  first,
-  shareReplay
+  withLatestFrom
 } from 'rxjs/operators';
 
 import { ProjectsGQL, RunNgGQL } from '../generated/graphql';
-import { IS_ELECTRON } from '@angular-console/environment';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,7 +59,6 @@ export class TargetComponent implements OnInit {
   private readonly ngRunDisabled$ = new BehaviorSubject(true);
 
   constructor(
-    @Inject(IS_ELECTRON) readonly isElectron: boolean,
     private readonly route: ActivatedRoute,
     private readonly runner: CommandRunner,
     private readonly serializer: Serializer,
@@ -148,13 +145,11 @@ export class TargetComponent implements OnInit {
       shareReplay()
     );
 
-    this.showOutputInFlags$ = this.isElectron
-      ? of(false)
-      : this.commandArray$.pipe(
-          first(c => Boolean(c.commands.length)),
-          map(c => c.commands[0] === 'build'),
-          shareReplay()
-        );
+    this.showOutputInFlags$ = this.commandArray$.pipe(
+      first(c => Boolean(c.commands.length)),
+      map(c => c.commands[0] === 'build'),
+      shareReplay()
+    );
   }
 
   getContextTitle(project: Project) {

@@ -40,15 +40,11 @@
       "@angular-console/ui": ["libs/ui/src/index.ts"],
       "schema/*": ["dist/schema/*"],
       "@angular-console/schema": ["libs/schema/src/index.ts"],
-      "@angular-console/feature-action-bar": [
-        "libs/feature-action-bar/src/index.ts"
-      ],
       "@angular-console/feature-settings": [
         "libs/feature-settings/src/index.ts"
       ],
       "@angular-console/server": ["libs/server/src/index.ts"],
       "@angular-console/environment": ["libs/environment/src/index.ts"],
-      "@angular-console/cypress": ["libs/cypress/src/index.ts"],
       "@angular-console/vscode-ui/feature-task-execution-form": [
         "libs/vscode-ui/feature-task-execution-form/src/index.ts"
       ],

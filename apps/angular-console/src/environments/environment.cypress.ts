@@ -19,7 +19,7 @@ class MockGetDirectoryPathGQL extends GetDirectoryPathGQL {
 
 export const environment: Environment = {
   production: false,
-  application: 'electron',
+  application: 'vscode',
   disableAnimations: true,
   providers: [
     {

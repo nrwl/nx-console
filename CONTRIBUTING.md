@@ -10,20 +10,16 @@ We are trying to keep GitHub issues for bug reports and feature requests. Stack 
 
 Angular Console runs on two platforms:
 
-- Electron
 - VSCode
+- IntelliJ
 
-The two versions of Angular Console share most of the code, but they are bundled differently. The dev experience is set up around the electron version.
+The two versions of Angular Console share most of the code, but they are bundled differently.
 
-## Development
+## Building the VSCode Plugin
 
-After cloning the project run: `yarn`.
+You can build the vscode extension and run it in development mode by opening up this repo in Visual Studio code and hitting the f5 function key. This will launch `nps prepare.dev.vscode` in the background and spawn an extension development host version of VSCode so that you can try out your code.
 
-After that, run `nps prepare.electron`. Every time you add or remove dependencies in electron/package.json, you will need to rerun `nps prepare.electron`.
-
-After this, run `nps dev.up` to start the dev environment. The application will start the process listening on port 4200. The development is done in the browser, but the server uses electron. This is the most straight forward way of building new functionality.
-
-To test the electron app, if you go to `dist/apps/electron` and run `electron .` you can have the app running in the electron environment.
+When you want to update the extension with a new set of changes, go back to the editor you launched the extension host from and click the refresh button (its green and looks like a browser refresh icon).
 
 ### Running Unit Tests
 
@@ -37,28 +33,6 @@ To test the electron app, if you go to `dist/apps/electron` and run `electron .`
 - Run `nps e2e.headless` to serve the app and run cypress from the terminal. (The fixtures must be created). This is also useful for development.
 
 Cypress, which we use to run e2e tests, records the videos of the tests ran on CI. You can access them here: [https://dashboard.cypress.io/#/projects/x2ebye/runs](https://dashboard.cypress.io/#/projects/x2ebye/runs). This is very useful for troubleshooting.
-
-## Building Electron App
-
-Before starting, be sure that you have run `nps prepare.electron` at least once (as previously mentioned).
-
-Building the electron app requires a code signing certificate to be set. You can read more [here](https://www.electron.build/code-signing).
-
-On macOS, you can export your root certificate by following these steps:
-
-- Open "Keychain Access" using spotlight (or whatever)
-- In the "Keychains" side panel, choose "logins"
-- In the "Category" side panel, choose "My Certificates"
-- There should at least be one certificate in the main area. expand it by clicking the triangle to the right
-- Right click the key, and choose "Export"
-- Choose a location and password to save it in .p12 format
-
-Once you have a certificate saved, you can use it with:
-
-- Setting `CSC_LINK` environment variable to the path to the file
-- Setting `CSC_KEY_PASSWORD` environment variable to the password set (if any)
-
-You can build the electron app by running `nps package.electronMac` or `nps package.electronWin`. Usually, you only need to do it locally if you change something related to electron-builder.
 
 ## Building VSCode Plugin
 

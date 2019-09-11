@@ -1,6 +1,6 @@
-import { IS_ELECTRON, IS_INTELLIJ } from '@angular-console/environment';
+import { IS_INTELLIJ } from '@angular-console/environment';
 import { FADE_IN } from '@angular-console/ui';
-import { EditorSupport, Settings, Telemetry } from '@angular-console/utils';
+import { Settings, Telemetry } from '@angular-console/utils';
 import {
   animate,
   state,
@@ -13,19 +13,14 @@ import {
   Component,
   Inject,
   OnDestroy,
-  ViewEncapsulation,
-  OnInit
+  OnInit,
+  ViewEncapsulation
 } from '@angular/core';
-import { MediaObserver } from '@angular/flex-layout';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import {
-  ContextualActionBarService,
-  MenuOption
-} from '@nrwl/angular-console-enterprise-frontend';
+import { ContextualActionBarService } from '@nrwl/angular-console-enterprise-frontend';
 import { combineLatest, Observable } from 'rxjs';
 import {
   filter,
-  first,
   map,
   publishReplay,
   refCount,
@@ -139,41 +134,6 @@ export class WorkspaceComponent implements OnDestroy, OnInit {
     refCount()
   );
 
-  private readonly editorSubscription = combineLatest([
-    this.editorSupport.editors,
-    this.mediaObserver.media$
-  ]).subscribe(([editors, mediaChange]) => {
-    switch (mediaChange.mqAlias) {
-      case 'xs':
-        this.contextualActionBarService.nonContextualActions$.next([]);
-        return;
-    }
-    if (this.isElectron) {
-      this.contextualActionBarService.nonContextualActions$.next([
-        {
-          name: 'Open in...',
-          description: 'Open workspace in another program',
-          icon: 'open_in_browser',
-          options: editors.map(
-            (editor): MenuOption => {
-              return {
-                name: `${editor.name}`,
-                image: editor.icon,
-                invoke: () => {
-                  this.workspace$
-                    .pipe(first())
-                    .subscribe(w =>
-                      this.editorSupport.openInEditor(editor.name, w.path)
-                    );
-                }
-              };
-            }
-          )
-        }
-      ]);
-    }
-  });
-
   private readonly workplaceSubscription = combineLatest([
     this.workspace$,
     this.activeRouteTitle$
@@ -194,15 +154,12 @@ export class WorkspaceComponent implements OnDestroy, OnInit {
   });
 
   constructor(
-    @Inject(IS_ELECTRON) readonly isElectron: boolean,
     @Inject(IS_INTELLIJ) readonly isIntellij: boolean,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly settings: Settings,
     private readonly telemetry: Telemetry,
-    private readonly mediaObserver: MediaObserver,
     private readonly contextualActionBarService: ContextualActionBarService,
-    private readonly editorSupport: EditorSupport,
     private readonly basicWorkspaceGQL: BasicWorkspaceGQL
   ) {}
 
@@ -210,7 +167,6 @@ export class WorkspaceComponent implements OnDestroy, OnInit {
     this.contextualActionBarService.nonContextualActions$.next([]);
     this.workplaceSubscription.unsubscribe();
     this.subscription.unsubscribe();
-    this.editorSubscription.unsubscribe();
   }
 
   ngOnInit(): void {

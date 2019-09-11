@@ -3,10 +3,6 @@
   overflow: auto;
   max-height: calc(100% - 52px);
   min-width: calc(100vw - 52px);
-
-  &.electron {
-    max-height: calc(100% - 104px);
-  }
 }
 
 :host {

@@ -11,5 +11,5 @@ export const environment: Environment = {
       deps: [DOCUMENT]
     }
   ],
-  application: 'electron'
+  application: 'vscode'
 };
