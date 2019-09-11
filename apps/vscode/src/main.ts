@@ -1,6 +1,6 @@
 import { FileUtils } from '@angular-console/server';
 import { stream } from 'fast-glob';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { Server } from 'http';
 import { dirname, join, parse } from 'path';
 import {
@@ -141,16 +141,26 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
     });
 }
 
-function setAngularWorkspace(workspacePath: string) {
+async function setAngularWorkspace(workspacePath: string) {
+  try {
+    JSON.parse(readFileSync(join(workspacePath, 'angular.json')).toString());
+    const { startServer } = await import('./app/start-server');
+    server = startServer(context, workspacePath);
+  } catch (e) {
+    console.error('Invalid angular JSON', e);
+    commands.executeCommand('setContext', 'isAngularWorkspace', false);
+    window.showErrorMessage(
+      'Your angular.json file is invalid (see debug console)'
+    );
+    commands.executeCommand('setContext', 'isAngularWorkspace', false);
+    return;
+  }
+
   commands.executeCommand('setContext', 'isAngularWorkspace', true);
 
   currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
   ngTaskProvider.setWorkspacePath(workspacePath);
   angularJsonTreeProvider.setWorkspacePath(workspacePath);
-
-  import('./app/start-server').then(({ startServer }) => {
-    server = startServer(context, workspacePath);
-  });
 }
 
 export async function deactivate() {

@@ -26,9 +26,10 @@ function getWin32ShellExecution(config: PseudoTerminalConfig): ShellExecution {
     executable:
       'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
     shellArgs: [
-      `-Sta -NoLogo -NonInteractive -C "& {${config.program} ${config.args.join(
-        ' '
-      )}}"`
+      `-Sta -NoLogo -NonInteractive -C "& {${config.program.replace(
+        / /g,
+        '\\ '
+      )} ${config.args.join(' ')}}"`
     ]
   });
 }
@@ -42,7 +43,7 @@ function getWslShellExecution(config: PseudoTerminalConfig): ShellExecution {
       'bash',
       '-l',
       '-c',
-      `${config.program} ${config.args.join(' ')}`
+      `${config.program.replace(/ /g, '\\ ')} ${config.args.join(' ')}`
     ]
   });
 }
@@ -51,6 +52,10 @@ function getUnixShellExecution(config: PseudoTerminalConfig): ShellExecution {
   return new ShellExecution(config.displayCommand, {
     cwd: config.cwd,
     executable: '/bin/bash',
-    shellArgs: ['-l', '-c', `${config.program} ${config.args.join(' ')}`]
+    shellArgs: [
+      '-l',
+      '-c',
+      `${config.program.replace(/ /g, '\\ ')} ${config.args.join(' ')}`
+    ]
   });
 }

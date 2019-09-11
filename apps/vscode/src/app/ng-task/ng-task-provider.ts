@@ -1,5 +1,5 @@
 import { FileUtils, readJsonFile } from '@angular-console/server';
-import { ProviderResult, Task, TaskProvider } from 'vscode';
+import { ProviderResult, Task, TaskProvider, window } from 'vscode';
 
 import { NgTask } from './ng-task';
 import {
@@ -74,10 +74,17 @@ export class NgTaskProvider implements TaskProvider {
       return {};
     }
 
-    const { projects } = readJsonFile('angular.json', this.workspacePath)
-      .json as AngularJson;
+    try {
+      const { projects } = readJsonFile('angular.json', this.workspacePath)
+        .json as AngularJson;
 
-    return projects;
+      return projects;
+    } catch {
+      window.showErrorMessage(
+        'Your angular.json file is invalid (see debug console)'
+      );
+      return {};
+    }
   }
 
   getProjectNames(): string[] {
