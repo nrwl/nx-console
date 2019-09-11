@@ -235,10 +235,16 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       return;
     }
 
+    let flags;
+    if (architect.configuration) {
+      flags = `--configuration=${architect.configuration}`;
+    }
+
     return tasks.executeTask(
       this.ngTaskProvider.createTask({
         architectName: architect.name,
         projectName: project,
+        flags,
         type: 'shell'
       })
     );

@@ -2,6 +2,8 @@ jobs:
 - job: format_lint_test
   pool:
     vmImage: ubuntu-latest
+  variables:
+    CYPRESS_INSTALL_BINARY: 0
   steps:
   - template: .azure-pipelines/steps/install-dependencies.yml
   - template: .azure-pipelines/jobs/format-lint-test.yml
@@ -9,6 +11,8 @@ jobs:
 - job: package
   pool:
     vmImage: ubuntu-latest
+  variables:
+    CYPRESS_INSTALL_BINARY: 0
   steps:
   - template: .azure-pipelines/steps/install-dependencies.yml
   - template: .azure-pipelines/jobs/package.yml
