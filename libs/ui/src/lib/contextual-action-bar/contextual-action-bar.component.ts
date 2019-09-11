@@ -39,8 +39,6 @@ export const CONTEXTUAL_ACTION_BAR_HEIGHT = 52;
 export class ContextualActionBarComponent {
   showMenuButton = new ReplaySubject<boolean>();
 
-  readonly isElectron = this.environment.application === 'electron';
-
   readonly contextualActions$ = this.contextualActionBarService.contextualActions$.pipe(
     shareReplay(1)
   );

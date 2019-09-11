@@ -5,7 +5,6 @@ import { ApolloModule } from 'apollo-angular';
 import { TerminalFactory } from '../terminal/terminal.factory';
 import { UiModule } from '../ui.module';
 import { CommandOutputComponent } from './command-output.component';
-import { IS_ELECTRON } from '@angular-console/environment';
 
 describe('CommandOutputComponent', () => {
   let component: CommandOutputComponent;
@@ -29,7 +28,6 @@ describe('CommandOutputComponent', () => {
       imports: [UiModule, ApolloModule],
       providers: [
         { provide: CommandRunner, useValue: mockCommandRunner },
-        { provide: IS_ELECTRON, useValue: true },
         {
           provide: TerminalFactory,
           useValue: {

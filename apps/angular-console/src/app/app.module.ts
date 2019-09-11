@@ -1,11 +1,9 @@
 import {
   ENVIRONMENT,
   Environment,
-  IS_ELECTRON,
   IS_INTELLIJ,
   IS_VSCODE
 } from '@angular-console/environment';
-import { FeatureActionBarModule } from '@angular-console/feature-action-bar';
 import { FeatureSettingsModule } from '@angular-console/feature-settings';
 import {
   FeatureWorkspacesModule,
@@ -78,7 +76,6 @@ export function initApollo(
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    FeatureActionBarModule,
     FeatureSettingsModule,
     MatSidenavModule,
     MatListModule,
@@ -121,7 +118,6 @@ export function initApollo(
     { provide: ENVIRONMENT, useValue: environment as Environment },
     { provide: IS_VSCODE, useValue: environment.application === 'vscode' },
     { provide: IS_INTELLIJ, useValue: environment.application === 'intellij' },
-    { provide: IS_ELECTRON, useValue: environment.application === 'electron' },
     { provide: 'messenger', useExisting: Messenger },
     ...environment.providers
   ],

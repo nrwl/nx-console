@@ -16,17 +16,14 @@ import { settingsRoutes } from '@angular-console/feature-settings';
 import { UiModule } from '@angular-console/ui';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatDialogModule } from '@angular/material';
 import { Route, RouterModule } from '@angular/router';
 import {
   connectRootRoutes,
   connectWorkspaceRoutes
 } from '@nrwl/angular-console-enterprise-frontend';
 
-import { NewWorkspaceComponent } from './new-workspace/new-workspace.component';
 import { ProjectsComponent } from './projects/projects.component';
 import { WorkspaceComponent } from './workspace/workspace.component';
-import { WorkspacesComponent } from './workspaces/workspaces.component';
 import { FilterMenuComponent } from './projects/filter-menu/filter-menu.component';
 
 export type FeatureWorkspaceRouteState =
@@ -39,16 +36,6 @@ export const CREATE_WORKSPACE: FeatureWorkspaceRouteState = 'create-workspace';
 export const WORKSPACE: FeatureWorkspaceRouteState = 'workspace';
 
 export const workspaceRoutes: Route[] = [
-  {
-    path: 'workspaces',
-    component: WorkspacesComponent,
-    data: { state: WORKSPACES }
-  },
-  {
-    path: 'create-workspace',
-    component: NewWorkspaceComponent,
-    data: { state: CREATE_WORKSPACE }
-  },
   {
     path: 'connect',
     children: connectRootRoutes
@@ -82,10 +69,7 @@ export const workspaceRoutes: Route[] = [
       },
       {
         path: 'connect',
-        children: [
-          ...connectWorkspaceRoutes,
-          ...connectRootRoutes // TODO: Remove connect routes from workspace after electron redesign.
-        ]
+        children: [...connectWorkspaceRoutes, ...connectRootRoutes]
       },
       {
         data: { state: 'generate' },
@@ -93,7 +77,6 @@ export const workspaceRoutes: Route[] = [
         children: generateRoutes
       },
       { data: { state: 'tasks' }, path: 'tasks', children: runRoutes },
-      // TODO: Remove settings routes from workspace after electron redesign.
       { path: 'settings', children: settingsRoutes }
     ]
   }
@@ -101,7 +84,6 @@ export const workspaceRoutes: Route[] = [
 
 @NgModule({
   imports: [
-    MatDialogModule,
     RouterModule,
     FeatureExtensionsModule,
     FeatureGenerateModule,
@@ -109,13 +91,6 @@ export const workspaceRoutes: Route[] = [
     ReactiveFormsModule,
     UiModule
   ],
-  declarations: [
-    ProjectsComponent,
-    NewWorkspaceComponent,
-    WorkspaceComponent,
-    WorkspacesComponent,
-    FilterMenuComponent
-  ],
-  entryComponents: [NewWorkspaceComponent]
+  declarations: [ProjectsComponent, WorkspaceComponent, FilterMenuComponent]
 })
 export class FeatureWorkspacesModule {}

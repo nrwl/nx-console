@@ -262,7 +262,6 @@ export class MutationResolver {
     @Args('dialogButtonLabel') dialogButtonLabel: string,
     @Args('dialogTitle') dialogTitle: string
   ) {
-    // TODO(jack): This mocked value is needed because e2e tests that bring up the dialog will block entire electron main thread.
     if (process.env.CI === 'true') {
       return {
         selectedDirectoryPath: '/tmp'

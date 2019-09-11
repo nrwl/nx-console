@@ -10,12 +10,6 @@
     "angular-console": {
       "tags": []
     },
-    "electron-e2e-ci1": {
-      "tags": []
-    },
-    "electron-e2e-ci2": {
-      "tags": []
-    },
     "feature-install-node-js": {
       "tags": []
     },
@@ -43,13 +37,7 @@
     "schema": {
       "tags": []
     },
-    "feature-action-bar": {
-      "tags": []
-    },
     "vscode": {
-      "tags": []
-    },
-    "electron": {
       "tags": []
     },
     "server": {
@@ -59,12 +47,6 @@
       "tags": []
     },
     "intellij": {
-      "tags": []
-    },
-    "vscode-e2e": {
-      "tags": []
-    },
-    "cypress": {
       "tags": []
     },
     "vscode-ui-e2e": {

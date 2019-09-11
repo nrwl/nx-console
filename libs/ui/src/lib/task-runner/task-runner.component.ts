@@ -1,4 +1,3 @@
-import { IS_ELECTRON } from '@angular-console/environment';
 import {
   animate,
   state,
@@ -11,7 +10,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   ContentChild,
-  Inject,
   Input
 } from '@angular/core';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
@@ -58,7 +56,7 @@ export class TaskRunnerComponent implements AfterContentChecked {
   terminalVisible$ = new BehaviorSubject(false);
   terminalAnimationState: Observable<string>;
 
-  constructor(@Inject(IS_ELECTRON) readonly isElectron: boolean) {}
+  constructor() {}
 
   ngAfterContentChecked() {
     // Wait until the flags component has rendered its expansion panels.
@@ -90,16 +88,15 @@ export class TaskRunnerComponent implements AfterContentChecked {
         return 'grow';
       }),
       tap(v => {
-        const terminalChromeHeight = this.isElectron ? 45 : 0;
         switch (v) {
           case 'grow':
             this.flagsComponent.viewportHeight.next(
-              `calc(70vh - ${CONTEXTUAL_ACTION_BAR_HEIGHT}px - ${terminalChromeHeight}px)`
+              `calc(70vh - ${CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
             );
             break;
           case 'shrink':
             this.flagsComponent.viewportHeight.next(
-              `calc(100vh - ${CONTEXTUAL_ACTION_BAR_HEIGHT}px - ${terminalChromeHeight}px)`
+              `calc(100vh - ${CONTEXTUAL_ACTION_BAR_HEIGHT}px)`
             );
             break;
           default:

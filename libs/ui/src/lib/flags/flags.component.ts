@@ -1,4 +1,3 @@
-import { IS_ELECTRON } from '@angular-console/environment';
 import { Schema } from '@angular-console/schema';
 import { Completions, Serializer } from '@angular-console/utils';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
@@ -7,7 +6,6 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  Inject,
   Input,
   Output,
   QueryList,
@@ -75,16 +73,11 @@ export class FlagsComponent {
   constructor(
     private readonly serializer: Serializer,
     private readonly elementRef: ElementRef,
-    private readonly completions: Completions,
-    @Inject(IS_ELECTRON) readonly isElectron: boolean
+    private readonly completions: Completions
   ) {}
 
   hideFields() {
-    if (this.isElectron) {
-      this.matExpansionPanels.forEach((panel: MatExpansionPanel) => {
-        panel.close();
-      });
-    } else if (this.showOutput) {
+    if (this.showOutput) {
       this.matExpansionPanels.forEach(
         (panel: MatExpansionPanel, index: number) => {
           if (index < this.matExpansionPanels.length - 1) {

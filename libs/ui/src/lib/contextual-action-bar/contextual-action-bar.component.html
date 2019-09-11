@@ -1,7 +1,7 @@
 <mat-toolbar
   class="title-bar"
   color="primary"
-  *ngIf="isElectron || (contextualActions$ | async)"
+  *ngIf="(contextualActions$ | async)"
   @growShrink
   [class.actionable]="contextualActions$ | async"
 >
@@ -22,21 +22,6 @@
       >
         <img class="angular-logo" src="/assets/angular-console.png" />
       </button>
-      <button
-        *ngSwitchCase="'electron'"
-        [ngSwitch]="showMenuButton | async"
-        class="hamburger-button"
-        mat-icon-button
-        [disabled]="!(showMenuButton | async)"
-        (click)="router.navigate(['/workspaces'])"
-      >
-        <mat-icon *ngSwitchCase="true">menu</mat-icon>
-        <img
-          class="angular-logo"
-          *ngSwitchCase="false"
-          src="/assets/angular-console.png"
-        />
-      </button>
 
       <div class="title" fxFlex fxLayout="row" fxLayoutGap="16px">
         <ng-container
@@ -46,51 +31,6 @@
           "
         >
           <span>{{ breadcrumb.title }}</span> <span *ngIf="!last">|</span>
-        </ng-container>
-      </div>
-      <div
-        *ngIf="
-          (contextualActionBarService.nonContextualActions$
-            | async) as nonContextualActions
-        "
-        class="non-contextual-actions-container"
-        fxLayout="row"
-        fxLayoutAlign="end center"
-        fxLayoutGap="16px"
-      >
-        <ng-container *ngFor="let action of nonContextualActions">
-          <button
-            @fadeIn
-            [matMenuTriggerFor]="menu"
-            class="action-button"
-            mat-button
-            [matTooltip]="action.description"
-          >
-            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
-              <mat-icon>{{ action.icon }}</mat-icon>
-              <span>{{ action.name }}</span>
-            </div>
-          </button>
-          <mat-menu #menu="matMenu">
-            <button
-              (click)="option.invoke()"
-              mat-menu-item
-              *ngFor="let option of action.options"
-            >
-              <div
-                fxLayout="row"
-                fxLayoutAlign="start center"
-                fxLayoutGap="8px"
-              >
-                <img
-                  height="24px"
-                  [src]="'/assets/external-programs/' + option.image + '.png'"
-                  *ngIf="option.image"
-                />
-                <span>{{ option.name }}</span>
-              </div>
-            </button>
-          </mat-menu>
         </ng-container>
       </div>
     </div>
@@ -115,19 +55,6 @@
         fxLayoutAlign="end center"
         fxLayoutGap="16px"
       >
-        <button
-          class="action-button"
-          *ngIf="
-            isElectron &&
-            (commandRunner.activeCommand$ | async) as activeCommand
-          "
-          (click)="stopCommand()"
-          title="Cancel the command"
-          mat-raised-button
-        >
-          Cancel
-        </button>
-
         <ng-container
           *ngFor="let action of contextualActions.actions; let last = last"
         >

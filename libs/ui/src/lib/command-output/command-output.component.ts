@@ -1,11 +1,9 @@
-import { IS_ELECTRON } from '@angular-console/environment';
 import { CommandResponse, CommandRunner } from '@angular-console/utils';
 import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
   HostListener,
-  Inject,
   Input,
   OnDestroy,
   Output,
@@ -71,10 +69,7 @@ export class CommandOutputComponent implements OnDestroy {
   _commandResponse: CommandResponse;
   hasUnreadResponse = false;
 
-  constructor(
-    private readonly commandRunner: CommandRunner,
-    @Inject(IS_ELECTRON) readonly isElectron: boolean
-  ) {
+  constructor(private readonly commandRunner: CommandRunner) {
     this.switchToTerminalSubscription = this.detailedStatus$
       .pipe(
         map(status => !status),
