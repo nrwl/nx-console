@@ -12,12 +12,11 @@ import { commands, ExtensionContext, window } from 'vscode';
 import { environment } from '../environments/environment';
 import { executeTask } from './pseudo-terminal.factory';
 import { VSCodeStorage } from './vscode-storage';
+import * as getPort from 'get-port';
 
 function getPseudoTerminalFactory(): PseudoTerminalFactory {
   return config => executeTask(config);
 }
-
-const getPort = require('get-port'); // tslint:disable-line
 
 export async function startServer(
   context: ExtensionContext,

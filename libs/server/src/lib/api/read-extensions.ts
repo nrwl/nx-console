@@ -1,5 +1,5 @@
 // Based primarily off of https://github.com/JetBrains/intellij-plugins/blob/17ec63d95e875b5e2459d570821401596b678f0a/AngularJS/resources/org/angularjs/cli/ng-packages.json
-export const EXTENSTIONS: { [key: string]: string } = {
+export const EXTENSIONS: { [key: string]: string } = {
   '@a.grisevich/ng-zorro-antd':
     'An enterprise-class UI components based on Ant Design and Angular',
   '@alyle/ui': 'Minimal Design, a set of components for Angular',
@@ -304,10 +304,10 @@ export function availableExtensions(): Array<{
   name: string;
   description: string;
 }> {
-  return Object.keys(EXTENSTIONS)
+  return Object.keys(EXTENSIONS)
     .sort()
     .map(name => {
-      const description = EXTENSTIONS[name];
+      const description = EXTENSIONS[name];
       return {
         name,
         description

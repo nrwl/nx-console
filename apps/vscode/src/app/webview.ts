@@ -1,25 +1,76 @@
-import { WorkspaceDefinition } from '@angular-console/schema';
-import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
-
 import {
-  WorkspaceRoute,
-  WorkspaceRouteTitle
-} from './tree-item/workspace-route';
+  ExtensionContext,
+  TreeView,
+  ViewColumn,
+  WebviewPanel,
+  window
+} from 'vscode';
+
+import { ProjectDef } from './ng-task/ng-task-definition';
+import {
+  getWorkspaceRoute,
+  WorkspaceRouteTitle,
+  WorkspaceTreeItem
+} from './workspace-tree/workspace-tree-item';
 
 let webviewPanel: WebviewPanel | undefined;
+
+interface RevealWebViewPanelConfig {
+  context: ExtensionContext;
+  viewColumn: ViewColumn;
+  port: number;
+  workspaceTreeItem: WorkspaceTreeItem;
+  getProjectEntries(): [string, ProjectDef][];
+  workspaceTreeView: TreeView<WorkspaceTreeItem>;
+}
+
+export async function revealWebViewPanel({
+  context,
+  viewColumn,
+  port,
+  getProjectEntries,
+  workspaceTreeItem,
+  workspaceTreeView
+}: RevealWebViewPanelConfig) {
+  const { workspacePath, projectName, label } = workspaceTreeItem;
+
+  const workspaceRoute = await getWorkspaceRoute(
+    workspacePath,
+    getProjectEntries,
+    workspaceTreeItem.label,
+    projectName
+  );
+
+  if (!workspaceRoute) {
+    return;
+  }
+
+  const webViewPanel = createWebViewPanel(
+    context,
+    viewColumn,
+    `http://localhost:${port}/`,
+    workspaceRoute,
+    label
+  );
+  context.subscriptions.push(webViewPanel);
+
+  webViewPanel.onDidChangeViewState(e => {
+    if (e.webviewPanel.visible) {
+      workspaceTreeItem.revealWorkspaceRoute(workspaceTreeView);
+    }
+  });
+
+  return webViewPanel;
+}
 
 export function createWebViewPanel(
   context: ExtensionContext,
   viewColumn: ViewColumn,
   serverUrl: string,
   routePath: string,
-  workspaceDef: WorkspaceDefinition | undefined,
   route: WorkspaceRouteTitle | undefined
 ) {
-  let panelTitle = route || 'Angular Console';
-  if (workspaceDef && workspaceDef.name) {
-    panelTitle = `${workspaceDef.name} | ${route}`;
-  }
+  const panelTitle = route || 'Angular Console';
 
   if (webviewPanel) {
     webviewPanel.title = panelTitle;
@@ -43,7 +94,7 @@ export function createWebViewPanel(
     webviewPanel = undefined;
   });
 
-  webviewPanel.iconPath = WorkspaceRoute.getIconUriForRoute(
+  webviewPanel.iconPath = WorkspaceTreeItem.getIconUriForRoute(
     context.extensionPath,
     route
   );
@@ -62,23 +113,7 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <link rel="icon" type="image/x-icon" href="favicon.ico" />
       <link rel="stylesheet" href="styles.css">
-      <style>
-        html,
-        body {
-          margin: 0 !important;
-          padding: 0 !important;
-          border-radius: 4px !important;
-          background: transparent !important;
-          overflow: hidden !important;
-        }
-        body {
-          opacity: 1;
-          transition: all 300ms 150ms cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-        body.loading {
-          opacity: 0;
-        }
-      </style>
+
       <script>
         window.INITIAL_ROUTE = '${routePath}';
 
@@ -91,12 +126,9 @@ export function getIframeHtml(serverUrl: string, routePath: string) {
       </script>
     </head>
 
-    <body class="loading">
+    <body >
       <angular-console-root></angular-console-root>
       <script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="main.js"></script>
-      <script>
-        document.body.classList.remove('loading');
-      </script>
       </body>
   </html>
   `;

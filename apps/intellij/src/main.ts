@@ -1,8 +1,8 @@
 import { close, connect } from 'ij-rpc-client';
 import { IntellijTerminal, startServer } from './app/start-server';
+import * as getPort from 'get-port';
 
 const fixPath = require('fix-path'); // tslint:disable-line
-const getPort = require('get-port'); // tslint:disable-line
 
 const DOMAIN = 'ngConsoleServer';
 let terminal: TerminalProxy;

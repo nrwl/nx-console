@@ -1,8 +1,8 @@
 export interface NgTaskDefinition {
   type: 'shell';
-  projectName: string;
+  projectName?: string;
   architectName: string;
-  configuration?: string;
+  flags?: string;
 }
 
 export interface ArchitectDef {
@@ -24,19 +24,4 @@ export interface Projects {
 
 export interface AngularJson {
   projects: Projects;
-}
-
-export function getArchitectTaskDefintions(
-  defaultTaskDefinition: NgTaskDefinition,
-  architectDef: ArchitectDef
-) {
-  return [
-    defaultTaskDefinition,
-    ...Object.keys(architectDef.configurations || {}).map(
-      (configuration): NgTaskDefinition => ({
-        ...defaultTaskDefinition,
-        configuration
-      })
-    )
-  ];
 }

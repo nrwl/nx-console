@@ -32,8 +32,9 @@ export function readAllSchematicCollections(
     ];
   }
   return collections.filter(
-    collection => !!collection && collection!.schematics!.length > 0
-  ) as any;
+    (collection): collection is SchematicCollection =>
+      !!collection && collection!.schematics!.length > 0
+  );
 }
 
 function readAngularJsonDefaults(basedir: string): any {
@@ -52,7 +53,9 @@ function readAngularJsonDefaults(basedir: string): any {
   return collectionDefaults;
 }
 
-function readSchematicCollectionsFromNodeModules(basedir: string) {
+function readSchematicCollectionsFromNodeModules(
+  basedir: string
+): SchematicCollection[] {
   const nodeModulesDir = path.join(basedir, 'node_modules');
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
@@ -73,9 +76,9 @@ function readSchematicCollectionsFromNodeModules(basedir: string) {
   });
   const defaults = readAngularJsonDefaults(basedir);
 
-  return schematicCollections.map(c =>
-    readCollection(nodeModulesDir, c, defaults)
-  );
+  return schematicCollections
+    .map(c => readCollection(nodeModulesDir, c, defaults))
+    .filter((c): c is SchematicCollection => Boolean(c));
 }
 
 function readWorkspaceSchematicsCollection(

@@ -1,3 +1,9 @@
+export {
+  readAllSchematicCollections
+} from './lib/api/read-schematic-collections';
+
+export { EXTENSIONS } from './lib/api/read-extensions';
+
 export { FileUtils } from './lib/utils/file-utils';
 
 export { readJsonFile } from './lib/utils/utils';

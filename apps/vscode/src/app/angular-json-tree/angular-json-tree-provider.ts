@@ -2,30 +2,23 @@ import { JSONVisitor, visit } from 'jsonc-parser';
 import { join } from 'path';
 import {
   commands,
+  ExtensionContext,
   ProviderResult,
   Selection,
   tasks,
   TextDocument,
-  TreeItem,
   TreeItemCollapsibleState,
   Uri,
   window,
-  workspace,
-  ExtensionContext
+  workspace
 } from 'vscode';
 
-import { NgTaskProvider } from '../ng-task-provider/ng-task-provider';
-import { AbstractTreeProvider } from './abstract-tree-provider';
-
-export class AngularJsonTreeItem extends TreeItem {
-  constructor(
-    public angularJsonLabel: AngularJsonLabel,
-    treeItemLabel: string,
-    collapsibleState?: TreeItemCollapsibleState | undefined
-  ) {
-    super(treeItemLabel, collapsibleState);
-  }
-}
+import { NgTaskProvider } from '../ng-task/ng-task-provider';
+import { AbstractTreeProvider } from '../abstract-tree-provider';
+import {
+  AngularJsonLabel,
+  AngularJsonTreeItem
+} from './angular-json-tree-item';
 
 export class AngularJsonTreeProvider extends AbstractTreeProvider<
   AngularJsonTreeItem
@@ -35,6 +28,10 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     private readonly ngTaskProvider: NgTaskProvider
   ) {
     super();
+
+    commands.registerCommand('angularConsole.refreshAngularJsonTree', () =>
+      this.refresh()
+    );
 
     ([
       ['editAngularJson', this.editAngularJson],
@@ -242,7 +239,6 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       this.ngTaskProvider.createTask({
         architectName: architect.name,
         projectName: project,
-        configuration: architect.configuration,
         type: 'shell'
       })
     );
@@ -267,12 +263,4 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       selection: new Selection(position, position)
     });
   }
-}
-
-interface AngularJsonLabel {
-  project: string;
-  architect?: {
-    name: string;
-    configuration?: string;
-  };
 }
