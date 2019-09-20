@@ -163,6 +163,31 @@
         "when": "isAngularWorkspace"
       }
     ],
+    "configuration": {
+      "title": "Angular Console",
+      "properties": {
+        "angularConsole.enableTelemetry": {
+          "type": "boolean",
+          "default": false,
+          "description": "Help make Angular Console better by sending anonymous usage data to the Angular Console team."
+        },
+        "angularConsole.disableAnimations": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable all animations for a snappier feel"
+        },
+        "angularConsole.enableDetailedStatus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables visual status for certain tasks (e.g. build, test, etc.)."
+        },
+        "angularConsole.useNVM": {
+          "type": "boolean",
+          "default": false,
+          "description": "Runs tasks using Node Version Manager"
+        }
+      }
+    },
     "problemMatchers": [
       {
         "name": "webpack-builder",

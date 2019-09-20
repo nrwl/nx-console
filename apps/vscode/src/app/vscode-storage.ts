@@ -1,35 +1,56 @@
-import { ExtensionContext } from 'vscode';
+import { ConfigurationTarget, ExtensionContext, workspace } from 'vscode';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 
 export class VSCodeStorage implements Store {
+  static configurationSection = 'angularConsole';
+
   static fromContext(context: ExtensionContext): VSCodeStorage {
-    const store = new VSCodeStorage(context.globalState);
+    const config = workspace.getConfiguration(this.configurationSection);
+    const store = new VSCodeStorage(config, context.globalState);
     return store;
   }
 
-  constructor(private readonly state: VSCGlobalState) {}
+  constructor(
+    private readonly config: VSCState,
+    private readonly state: VSCState
+  ) {}
 
   get<T>(key: string, defaultValue?: T): T | null {
-    const value = this.state.get(key, defaultValue);
+    const value = this.storage(key).get(key, defaultValue);
     return value || defaultValue || null;
   }
 
   set<T>(key: string, value: T): void {
-    this.state.update(key, value);
+    this.storage(key).update(key, value, ConfigurationTarget.Global);
   }
 
   delete(key: string): void {
-    this.state.update(key, undefined);
+    this.storage(key).update(key, undefined, ConfigurationTarget.Global);
+  }
+
+  storage(key: string): VSCState {
+    return isConfig(key) ? this.config : this.state;
   }
 }
 
-export interface VSCGlobalState {
-  get<T>(key: string): T | undefined;
-  get<T>(key: string, defaultValue: T): T;
-  update(key: string, value: any): void;
+const ConfigKeys = [
+  'enableTelemetry',
+  'disableAnimations',
+  'enableDetailedStatus',
+  'useNVM'
+];
+
+function isConfig(key: string): boolean {
+  return ConfigKeys.includes(key);
 }
 
-export class SubstituteGlobalState implements VSCGlobalState {
+export interface VSCState {
+  get<T>(key: string): T | undefined;
+  get<T>(key: string, defaultValue: T): T;
+  update(key: string, value: any, target: ConfigurationTarget): void;
+}
+
+export class SubstituteState implements VSCState {
   state: { [key: string]: any } = {};
 
   get<T>(key: string, defaultValue?: T): T {

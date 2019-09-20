@@ -8,11 +8,12 @@ import {
 } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
 import * as path from 'path';
-import { commands, ExtensionContext, window } from 'vscode';
+import { commands, ExtensionContext, window, workspace } from 'vscode';
 import { environment } from '../environments/environment';
 import { executeTask } from './pseudo-terminal.factory';
 import { VSCodeStorage } from './vscode-storage';
 import * as getPort from 'get-port';
+import { Store } from '@nrwl/angular-console-enterprise-electron';
 
 function getPseudoTerminalFactory(): PseudoTerminalFactory {
   return config => executeTask(config);
@@ -27,6 +28,8 @@ export async function startServer(
   const telemetry = environment.disableTelemetry
     ? Telemetry.withLogger(store)
     : Telemetry.withGoogleAnalytics(store, 'vscode');
+
+  syncTelemetry(store, telemetry);
 
   const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
     return await window
@@ -109,4 +112,22 @@ export async function startServer(
   app.useStaticAssets(assetsPath);
 
   return await app.listen(port, 'localhost', () => {});
+}
+
+// using shared memory here is a shortcut, this should be an api call
+function syncTelemetry(store: Store, telemetry: Telemetry) {
+  const enableTelemetry = 'enableTelemetry';
+  const configurationSection = VSCodeStorage.configurationSection;
+  const telemetrySetting = `${configurationSection}.${enableTelemetry}`;
+
+  workspace.onDidChangeConfiguration(e => {
+    if (e.affectsConfiguration(telemetrySetting)) {
+      const enabled = store.get(enableTelemetry, false);
+      if (enabled) {
+        telemetry.startedTracking();
+      } else {
+        telemetry.stoppedTracking();
+      }
+    }
+  });
 }

@@ -27,7 +27,6 @@ export type WorkspaceRouteTitle =
   | 'Xi18n'
   | 'Dep-Graph'
   | 'Connect'
-  | 'Settings'
   | 'Select angular.json';
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
@@ -43,7 +42,6 @@ const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Xi18n', 'angular-cli.svg'],
   ['Dep-Graph', 'affected-projects.svg'],
   ['Connect', 'Nrwl_ColorIcon.svg'],
-  ['Settings', 'gear.svg'],
   ['Select angular.json', 'extension_icon.png']
 ]);
 
@@ -59,8 +57,7 @@ export const ROUTE_LIST = [
   'Test',
   'Xi18n',
   'Dep-Graph',
-  'Connect',
-  'Settings'
+  'Connect'
 ] as WorkspaceRouteTitle[];
 
 export class WorkspaceTreeItem extends TreeItem {
@@ -260,9 +257,5 @@ export async function getWorkspaceRoute(
                 : ''
             }`
         );
-    case 'Settings':
-      return `workspace/${encodeURIComponent(
-        workspacePath
-      )}/${workspaceRouteTitle.replace(/ /g, '-').toLowerCase()}`;
   }
 }
