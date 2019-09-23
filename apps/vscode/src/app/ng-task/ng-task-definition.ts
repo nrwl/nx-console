@@ -19,6 +19,10 @@ export interface ProjectDef {
   };
 }
 
+export interface NamedProject extends ProjectDef {
+  name: string;
+}
+
 export interface Projects {
   [projectName: string]: ProjectDef | undefined;
 }

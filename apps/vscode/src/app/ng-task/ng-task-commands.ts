@@ -34,19 +34,35 @@ export function registerNgTaskCommands(
       )
     );
   });
+
+  context.subscriptions.push(
+    commands.registerCommand(
+      'angularConsole.generate.explorer',
+      ({ fsPath }) => {
+        const project = n.projectForPath(fsPath);
+        selectNgCliCommandAndShowUi(
+          'generate',
+          n,
+          context.extensionPath,
+          project ? project.name : undefined
+        );
+      }
+    )
+  );
 }
 
 async function selectNgCliCommandAndShowUi(
   command: string,
   n: NgTaskProvider,
-  extensionPath: string
+  extensionPath: string,
+  projectName?: string
 ) {
-  const projectName = await selectNgCliCommand(command);
-  const workspacePath = n.getWorkspacePath();
   if (!projectName) {
-    return;
+    projectName = await selectNgCliCommand(command);
+    if (!projectName) return;
   }
 
+  const workspacePath = n.getWorkspacePath();
   if (!workspacePath) {
     window.showErrorMessage(
       'Angular Console requires a workspace be set to perform this action'

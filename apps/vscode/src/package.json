@@ -44,6 +44,13 @@
   },
   "contributes": {
     "menus": {
+      "explorer/context": [
+        {
+          "command": "angularConsole.generate.explorer",
+          "when": "isAngularWorkspace",
+          "group": "ng"
+        }
+      ],
       "view/title": [
         {
           "command": "angularConsole.refreshAngularJsonTree",
@@ -160,6 +167,12 @@
         "category": "ng",
         "title": "xi18n (ui)",
         "command": "angularConsole.xi18n.ui",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "ng generate",
+        "command": "angularConsole.generate.explorer",
         "when": "isAngularWorkspace"
       }
     ],
