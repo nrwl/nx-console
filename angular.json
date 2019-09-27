@@ -413,43 +413,32 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/apps/vscode-ui",
+            "outputPath": "dist/apps/vscode/assets/public",
             "index": "apps/vscode-ui/src/index.html",
             "main": "apps/vscode-ui/src/main.ts",
-            "polyfills": "apps/vscode-ui/src/polyfills.ts",
             "tsConfig": "apps/vscode-ui/tsconfig.app.json",
             "assets": [
               "apps/vscode-ui/src/favicon.ico",
               "apps/vscode-ui/src/assets"
             ],
             "styles": ["apps/vscode-ui/src/styles.scss"],
-            "scripts": [],
-            "stylePreprocessorOptions": {
-              "includePaths": ["libs/vscode-ui/styles/src/lib"]
-            }
+            "optimization": false,
+            "sourceMap": false,
+            "extractCss": true,
+            "namedChunks": false,
+            "aot": true,
+            "extractLicenses": true,
+            "vendorChunk": false,
+            "es5BrowserSupport": false
           },
           "configurations": {
             "production": {
+              "optimization": true,
+              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "apps/vscode-ui/src/environments/environment.ts",
                   "with": "apps/vscode-ui/src/environments/environment.prod.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
                 }
               ]
             }

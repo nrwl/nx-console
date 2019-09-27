@@ -1,6 +1,10 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Inject } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { MOCK_COMPONENT_ARCHITECT } from './mock-component-architect';
+import {
+  TASK_EXECUTION_SCHEMA,
+  TaskExecutionSchema
+} from './task-execution-form.schema';
 
 @Component({
   selector: 'vscode-ui-task-execution-form',
@@ -9,10 +13,12 @@ import { MOCK_COMPONENT_ARCHITECT } from './mock-component-architect';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskExecutionFormComponent {
-  architect = MOCK_COMPONENT_ARCHITECT;
   taskExecForm: FormGroup;
 
-  constructor(private readonly fb: FormBuilder) {
+  constructor(
+    private readonly fb: FormBuilder,
+    @Inject(TASK_EXECUTION_SCHEMA) readonly architect: TaskExecutionSchema
+  ) {
     this.buildForm();
   }
 

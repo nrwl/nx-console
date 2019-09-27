@@ -3,55 +3,49 @@ import {
   TreeView,
   ViewColumn,
   WebviewPanel,
-  window
+  window,
+  Uri
 } from 'vscode';
 
 import { ProjectDef } from './ng-task/ng-task-definition';
-import {
-  getWorkspaceRoute,
-  WorkspaceRouteTitle,
-  WorkspaceTreeItem
-} from './workspace-tree/workspace-tree-item';
+import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { TaskExecutionSchema } from '@angular-console/vscode-ui/feature-task-execution-form';
+import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 
 let webviewPanel: WebviewPanel | undefined;
+let indexHtml: string | undefined;
 
 interface RevealWebViewPanelConfig {
   context: ExtensionContext;
-  viewColumn: ViewColumn;
-  port: number;
   workspaceTreeItem: WorkspaceTreeItem;
   getProjectEntries(): [string, ProjectDef][];
   workspaceTreeView: TreeView<WorkspaceTreeItem>;
+  serverAddress: string;
 }
 
 export async function revealWebViewPanel({
   context,
-  viewColumn,
-  port,
   getProjectEntries,
   workspaceTreeItem,
-  workspaceTreeView
+  workspaceTreeView,
+  serverAddress
 }: RevealWebViewPanelConfig) {
   const { workspacePath, projectName, label } = workspaceTreeItem;
 
-  const workspaceRoute = await getWorkspaceRoute(
+  const schema = await getTaskExecutionSchema(
     workspacePath,
     getProjectEntries,
-    workspaceTreeItem.label,
+    label,
     projectName
   );
 
-  if (!workspaceRoute) {
+  if (!schema) {
     return;
   }
 
-  const webViewPanel = createWebViewPanel(
-    context,
-    viewColumn,
-    `http://localhost:${port}/`,
-    workspaceRoute,
-    label
-  );
+  const webViewPanel = createWebViewPanel(context, schema, serverAddress);
   context.subscriptions.push(webViewPanel);
 
   webViewPanel.onDidChangeViewState(e => {
@@ -65,71 +59,70 @@ export async function revealWebViewPanel({
 
 export function createWebViewPanel(
   context: ExtensionContext,
-  viewColumn: ViewColumn,
-  serverUrl: string,
-  routePath: string,
-  route: WorkspaceRouteTitle | undefined
+  schema: TaskExecutionSchema,
+  serverAddress: string
 ) {
-  const panelTitle = route || 'Angular Console';
-
   if (webviewPanel) {
-    webviewPanel.title = panelTitle;
-    webviewPanel.webview.postMessage({ routePath });
+    webviewPanel.title = schema.name;
     webviewPanel.reveal();
   } else {
     webviewPanel = window.createWebviewPanel(
       'angular-console', // Identifies the type of the webview. Used internally
-      panelTitle, // Title of the panel displayed to the user
-      viewColumn, // Editor column to show the new webview panel in.
+      schema.name, // Title of the panel displayed to the user
+      ViewColumn.Active, // Editor column to show the new webview panel in.
       {
         retainContextWhenHidden: true,
         enableScripts: true
       }
     );
-
-    webviewPanel.webview.html = getIframeHtml(serverUrl, routePath);
+    webviewPanel.onDidDispose(() => {
+      webviewPanel = undefined;
+    });
+    webviewPanel.iconPath = Uri.file(
+      join(context.extensionPath, 'assets', 'angular-console.png')
+    );
   }
 
-  webviewPanel.onDidDispose(() => {
-    webviewPanel = undefined;
-  });
-
-  webviewPanel.iconPath = WorkspaceTreeItem.getIconUriForRoute(
-    context.extensionPath,
-    route
-  );
+  webviewPanel.webview.html = getIframeHtml(context, schema, serverAddress);
 
   return webviewPanel;
 }
 
-export function getIframeHtml(serverUrl: string, routePath: string) {
-  return `
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <base href="${serverUrl}" />
+export function getIframeHtml(
+  context: ExtensionContext,
+  schema: TaskExecutionSchema,
+  serverAddress: string
+) {
+  if (!indexHtml) {
+    // Cache html and inline all styles and scripts.
+    indexHtml = readFileSync(
+      join(context.extensionPath, 'assets/public/index.html')
+    )
+      .toString()
+      .replace(
+        '<link rel="stylesheet" href="styles.css">',
+        `<style>${readFileSync(
+          join(context.extensionPath, 'assets/public/styles.css')
+        )}</style>`
+      )
+      .replace(
+        '<script src="runtime.js"></script>',
+        `<script>${readFileSync(
+          join(context.extensionPath, 'assets/public/runtime.js')
+        )}</script>`
+      )
+      .replace(
+        '<script src="main.js"></script>',
+        `<script>${readFileSync(
+          join(context.extensionPath, 'assets/public/main.js')
+        )}</script>`
+      );
+  }
 
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="icon" type="image/x-icon" href="favicon.ico" />
-      <link rel="stylesheet" href="styles.css">
-
-      <script>
-        window.INITIAL_ROUTE = '${routePath}';
-
-        window.addEventListener('message', (event) => {
-          const routePath = event.data.routePath;
-          if (routePath && window.ANGULAR_CONSOLE_NAVIGATE_BY_URL) {
-            window.ANGULAR_CONSOLE_NAVIGATE_BY_URL(routePath);
-          }
-        });
-      </script>
-    </head>
-
-    <body >
-      <angular-console-root></angular-console-root>
-      <script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="main.js"></script>
-      </body>
-  </html>
-  `;
+  return indexHtml
+    .replace(
+      'window.VSCODE_UI_SCHEMA = {};',
+      `window.VSCODE_UI_SCHEMA = ${JSON.stringify(schema)};`
+    )
+    .replace('<base href="/" />', `<base href="${serverAddress}" />`);
 }

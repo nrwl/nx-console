@@ -1,3 +1,5 @@
+export { readArchitectDef, readSchema } from './lib/api/read-projects';
+
 export {
   readAllSchematicCollections
 } from './lib/api/read-schematic-collections';

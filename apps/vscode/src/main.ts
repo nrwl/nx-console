@@ -8,7 +8,6 @@ import {
   ExtensionContext,
   tasks,
   TreeView,
-  ViewColumn,
   window,
   workspace
 } from 'vscode';
@@ -69,13 +68,13 @@ export function activate(c: ExtensionContext) {
     commands.registerCommand(
       'angularConsole.revealWebViewPanel',
       async (workspaceTreeItem: WorkspaceTreeItem) => {
+        const port = ((await server).address() as any).port;
         revealWebViewPanel({
           workspaceTreeItem,
           context,
-          viewColumn: ViewColumn.Active,
           getProjectEntries: () => ngTaskProvider.getProjectEntries(),
-          port: ((await server).address() as any).port,
-          workspaceTreeView
+          workspaceTreeView,
+          serverAddress: `http://localhost:${port}/`
         });
       }
     )
@@ -150,7 +149,6 @@ async function setAngularWorkspace(workspacePath: string) {
     server = startServer(context, workspacePath);
   } catch (e) {
     console.error('Invalid angular JSON', e);
-    commands.executeCommand('setContext', 'isAngularWorkspace', false);
     window.showErrorMessage(
       'Your angular.json file is invalid (see debug console)'
     );

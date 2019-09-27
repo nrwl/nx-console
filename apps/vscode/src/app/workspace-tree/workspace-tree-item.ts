@@ -1,18 +1,5 @@
-import {
-  EXTENSIONS,
-  readAllSchematicCollections
-} from '@angular-console/server';
 import { join } from 'path';
-import {
-  QuickPickItem,
-  TreeItem,
-  TreeItemCollapsibleState,
-  TreeView,
-  Uri,
-  window
-} from 'vscode';
-
-import { ProjectDef } from '../ng-task/ng-task-definition';
+import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 
 export type WorkspaceRouteTitle =
   | 'Add'
@@ -25,8 +12,6 @@ export type WorkspaceRouteTitle =
   | 'Serve'
   | 'Test'
   | 'Xi18n'
-  | 'Dep-Graph'
-  | 'Connect'
   | 'Select angular.json';
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
@@ -40,8 +25,6 @@ const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Serve', 'angular-cli.svg'],
   ['Test', 'angular-cli.svg'],
   ['Xi18n', 'angular-cli.svg'],
-  ['Dep-Graph', 'affected-projects.svg'],
-  ['Connect', 'Nrwl_ColorIcon.svg'],
   ['Select angular.json', 'extension_icon.png']
 ]);
 
@@ -55,18 +38,19 @@ export const ROUTE_LIST = [
   'Run',
   'Serve',
   'Test',
-  'Xi18n',
-  'Dep-Graph',
-  'Connect'
+  'Xi18n'
 ] as WorkspaceRouteTitle[];
 
 export class WorkspaceTreeItem extends TreeItem {
-  revealWorkspaceRoute: RevealWorkspaceRoute = currentWorkspace => {
-    revealWorkspaceRouteIfVisible(currentWorkspace, this).then(
-      () => {},
-      () => {}
-    ); // Explicitly handle rejection
-  };
+  revealWorkspaceRoute(currentWorkspace: TreeView<WorkspaceTreeItem>) {
+    (currentWorkspace.visible
+      ? currentWorkspace.reveal(this, {
+          select: true,
+          focus: true
+        })
+      : Promise.reject()
+    ).then(() => {}, () => {}); // Explicitly handle rejection
+  }
 
   command = {
     title: this.route,
@@ -97,165 +81,5 @@ export class WorkspaceTreeItem extends TreeItem {
   ): Uri | undefined {
     const icon = ROUTE_TO_ICON_MAP.get(route);
     return icon ? Uri.file(join(extensionPath, 'assets', icon)) : undefined;
-  }
-}
-
-export type RevealWorkspaceRoute = (
-  currentWorkspace: TreeView<WorkspaceTreeItem>
-) => void;
-
-export function revealWorkspaceRouteIfVisible(
-  treeView: TreeView<WorkspaceTreeItem>,
-  item: WorkspaceTreeItem
-): Thenable<void> {
-  return treeView.visible
-    ? treeView.reveal(item, {
-        select: true,
-        focus: true
-      })
-    : Promise.reject();
-}
-
-class NgTaskQuickPickItem implements QuickPickItem {
-  constructor(
-    readonly project: string,
-    readonly command: string,
-    readonly label: string
-  ) {}
-}
-
-export async function getWorkspaceRoute(
-  workspacePath: string,
-  getProjectEntries: () => [string, ProjectDef][],
-  workspaceRouteTitle: WorkspaceRouteTitle = 'Run',
-  projectName?: string
-): Promise<string | undefined> {
-  if (!workspacePath) {
-    return;
-  }
-
-  const command = workspaceRouteTitle.toLowerCase();
-  switch (workspaceRouteTitle) {
-    case 'Build':
-    case 'Deploy':
-    case 'E2e':
-    case 'Lint':
-    case 'Serve':
-    case 'Test':
-    case 'Xi18n':
-      const items = getProjectEntries()
-        .filter(([_, { architect }]) => Boolean(architect))
-        .flatMap(([project, { architect }]) => ({ project, architect }))
-        .filter(({ architect }) => Boolean(architect && architect[command]))
-        .map(
-          ({ project }) => new NgTaskQuickPickItem(project, command, project)
-        );
-
-      if (!items.length) {
-        window.showInformationMessage(
-          `None of your projects support ng ${command}`
-        );
-
-        return '';
-      }
-
-      if (!projectName) {
-        const selection = await window.showQuickPick(items);
-        if (!selection) return;
-
-        projectName = selection.project;
-      }
-
-      if (!projectName) return;
-
-      return `workspace/${encodeURIComponent(
-        workspacePath
-      )}/projects/task/${command}/${projectName}`;
-
-    case 'Run':
-      const runnableItems = getProjectEntries()
-        .filter(([_, { architect }]) => Boolean(architect))
-        .flatMap(([project, { architect }]) => ({ project, architect }))
-        .flatMap(({ project, architect }) => [
-          ...Object.keys(architect!).map(architectName => ({
-            project,
-            architectName
-          }))
-        ])
-        .map(
-          ({ project, architectName }) =>
-            new NgTaskQuickPickItem(
-              project,
-              architectName,
-              `${project}:${architectName}`
-            )
-        );
-
-      return window
-        .showQuickPick(runnableItems)
-        .then(selection =>
-          selection
-            ? `workspace/${encodeURIComponent(workspacePath)}/projects/task/${
-                selection.command
-              }/${selection.project}`
-            : ''
-        );
-    case 'Connect':
-      return 'connect/support';
-    case 'Dep-Graph':
-      return `workspace/${encodeURIComponent(
-        workspacePath
-      )}/connect/affected-projects`;
-    case 'Add':
-      const extensions = Object.entries(EXTENSIONS).map(
-        ([label, description]): QuickPickItem => ({
-          label,
-          description
-        })
-      );
-      return window
-        .showQuickPick(extensions)
-        .then(
-          (selection): string =>
-            `workspace/${encodeURIComponent(workspacePath)}/extensions${
-              selection ? `/${encodeURIComponent(selection.label)}` : ''
-            }`
-        );
-    case 'Generate':
-      interface GenerateQuickPickItem extends QuickPickItem {
-        collectionName: string;
-        schematicName: string;
-      }
-
-      const schematics = readAllSchematicCollections(
-        workspacePath,
-        'tools/schematics', // TODO: Make these values auto detectable / configurable
-        'workspace-schematic' // TODO: Make these values auto detectable / configurable
-      )
-        .map(
-          (c): GenerateQuickPickItem[] =>
-            c.schematics.map(
-              (s): GenerateQuickPickItem => ({
-                description: s.description,
-                label: `${c.name} - ${s.name}`,
-                collectionName: c.name,
-                schematicName: s.name
-              })
-            )
-        )
-        .flat();
-
-      return window
-        .showQuickPick(schematics)
-        .then(
-          (selection): string =>
-            `workspace/${encodeURIComponent(workspacePath)}/generate${
-              selection
-                ? `/${encodeURIComponent(
-                    selection.collectionName
-                  )}/${encodeURIComponent(selection.schematicName)}`
-                : ''
-            }`
-        );
   }
 }

@@ -43,7 +43,7 @@ module.exports = {
       ...forEachApplication(
         nps.concurrent({
           server: 'ng build APPLICATION --prod --noSourceMap',
-          client: 'ng build angular-console --configuration=APPLICATION'
+          client: 'ng build APPLICATION-ui'
         })
       ),
       ci: {
@@ -60,7 +60,7 @@ module.exports = {
           nps.concurrent({
             server: 'ng build APPLICATION --watch',
             client:
-              'ng build angular-console --configuration=APPLICATION --watch --aot=false --buildOptimizer=false'
+              'ng build APPLICATION-ui --watch --aot=false --buildOptimizer=false'
           })
         )
       }
