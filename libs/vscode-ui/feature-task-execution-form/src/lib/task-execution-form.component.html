@@ -1,3 +1,29 @@
-<p>
-  task-execution-form works!
-</p>
+<div class="monaco-workbench">
+  <form [formGroup]="taskExecForm">
+    <div class="settings-editor">
+      <div class="settings-body">
+        <div class="settings-tree-container">
+          <div class="monaco-list" role="tree">
+            <div class="monaco-scrollable-element" role="presentation">
+              <div class="monaco-list-rows">
+                <div
+                  *ngFor="let field of architect.schema"
+                  class="monaco-list-row"
+                  role="treeitem"
+                >
+                  <div class="monaco-tl-row">
+                    <angular-console-field
+                      *ngIf="taskExecForm.contains(field.name)"
+                      [field]="field"
+                      [formControlName]="field.name"
+                    ></angular-console-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

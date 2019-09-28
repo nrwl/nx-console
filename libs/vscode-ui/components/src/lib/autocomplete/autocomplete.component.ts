@@ -1,4 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Schema } from '@angular-console/schema';
+
+/**
+ * Not built yet - using a datalist temporarily to loosely mimic functionality
+ */
 
 @Component({
   selector: 'angular-console-autocomplete',
@@ -6,8 +11,6 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
   styleUrls: ['./autocomplete.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AutocompleteComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
+export class AutocompleteComponent {
+  @Input() field: Schema;
 }

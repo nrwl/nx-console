@@ -1,0 +1,35 @@
+<div class="monaco-tl-contents setting-item setting-item-enum">
+  <div class="setting-item-contents">
+    <div class="setting-item-title">
+      <div class="setting-item-cat-label-container">
+        <span class="setting-item-category"></span>
+        <span class="setting-item-label">
+          {{ field.name }}
+        </span>
+      </div>
+    </div>
+
+    <ng-container [ngSwitch]="field.type">
+      <angular-console-checkbox
+        *ngSwitchCase="'boolean'"
+        [field]="field"
+        [(value)]="value"
+        [descriptionId]="descriptionId"
+      ></angular-console-checkbox>
+
+      <angular-console-select
+        *ngSwitchCase="'enum'"
+        [field]="field"
+        [(value)]="value"
+        [descriptionId]="descriptionId"
+      ></angular-console-select>
+
+      <angular-console-input
+        *ngSwitchDefault
+        [field]="field"
+        [(value)]="value"
+        [descriptionId]="descriptionId"
+      ></angular-console-input>
+    </ng-container>
+  </div>
+</div>

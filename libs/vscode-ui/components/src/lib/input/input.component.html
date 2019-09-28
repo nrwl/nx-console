@@ -1,3 +1,28 @@
-<p>
-  input works!
-</p>
+<!-- description -->
+<div class="setting-item-description" [id]="descriptionId">
+  {{ field.description }}
+</div>
+
+<div class="setting-item-modified-indicator"></div>
+
+<div class="setting-item-value">
+  <div class="setting-item-control">
+    <div class="monaco-inputbox">
+      <input
+        (keyup)="updateValue($event.target.value)"
+        [value]="value"
+        class="input setting-control-focus-target"
+        type="text"
+        role="textbox"
+        [required]="field.required"
+        [attr.list]="field.enum ? field.name + '_enum' : null"
+        [attr.aria-labelledby]="descriptionId"
+      />
+    </div>
+
+    <angular-console-autocomplete
+      *ngIf="field.enum"
+      [field]="field"
+    ></angular-console-autocomplete>
+  </div>
+</div>

@@ -44,7 +44,7 @@
     "max-inline-declarations": false,
     "no-life-cycle-call": true,
     "prefer-output-readonly": true,
-    "no-forward-ref": true,
+    "no-forward-ref": false,
     "no-unused-variable": true,
     "no-unused-expression": true,
     "no-unused-css": false,
