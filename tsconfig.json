@@ -50,6 +50,9 @@
       ],
       "@angular-console/vscode-ui/components": [
         "libs/vscode-ui/components/src/index.ts"
+      ],
+      "@angular-console/vscode-ui/styles": [
+        "libs/vscode-ui/styles/src/index.ts"
       ]
     },
     "module": "es2015",
