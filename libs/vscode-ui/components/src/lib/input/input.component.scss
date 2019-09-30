@@ -1,0 +1,11 @@
+@import 'variables';
+
+input {
+  background-color: $bg-color-offset;
+  border-color: $input-border-color;
+  border-radius: $input-border-radius-size;
+  border-width: 1px;
+  color: $text-color;
+  width: 320px;
+  padding: 0.3rem 0.5rem;
+}

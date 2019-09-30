@@ -1,4 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
+import { Schema } from '@angular-console/schema';
 
 @Component({
   selector: 'angular-console-select',
@@ -6,8 +13,14 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
   styleUrls: ['./select.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SelectComponent implements OnInit {
-  constructor() {}
+export class SelectComponent {
+  @Input() field: Schema;
+  @Input() disabled = false;
+  @Input() value: string;
+  @Input() descriptionId: string;
+  @Output() readonly valueChange = new EventEmitter<string>();
 
-  ngOnInit() {}
+  updateValue(updated: string): void {
+    this.valueChange.emit(updated);
+  }
 }

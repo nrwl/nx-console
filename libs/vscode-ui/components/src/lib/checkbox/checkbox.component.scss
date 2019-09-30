@@ -1,0 +1,14 @@
+@import 'variables';
+
+.setting-value-checkbox {
+  background-color: $bg-color-offset;
+  border: solid 1px $input-border-color;
+  border-radius: $input-border-radius-size;
+  color: $text-color;
+  margin-right: 1rem;
+  margin-top: 0.2rem;
+
+  &.checked {
+    background-color: $bg-color-offset;
+  }
+}

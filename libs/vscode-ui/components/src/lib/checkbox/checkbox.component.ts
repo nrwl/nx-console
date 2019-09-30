@@ -1,4 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
+import { Schema } from '@angular-console/schema';
 
 @Component({
   selector: 'angular-console-checkbox',
@@ -6,8 +13,14 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
   styleUrls: ['./checkbox.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CheckboxComponent implements OnInit {
-  constructor() {}
+export class CheckboxComponent {
+  @Input() field: Schema;
+  @Input() disabled = false;
+  @Input() value: string;
+  @Input() descriptionId: string;
+  @Output() readonly valueChange = new EventEmitter<boolean>();
 
-  ngOnInit() {}
+  updateValue(updated: boolean): void {
+    this.valueChange.emit(updated);
+  }
 }

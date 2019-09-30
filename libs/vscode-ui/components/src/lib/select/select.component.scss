@@ -1,0 +1,8 @@
+@import 'variables';
+
+select {
+  background-color: $bg-color-offset;
+  border-color: $input-border-color;
+  border-radius: $input-border-radius-size;
+  color: $text-color;
+}

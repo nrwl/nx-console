@@ -1,0 +1,12 @@
+/** VScode sets the position of each of these
+elements manually, so I'm not sure if these are needed */
+.monaco-list-row {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.settings-tree-container {
+  height: calc(100vh - 20px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+}

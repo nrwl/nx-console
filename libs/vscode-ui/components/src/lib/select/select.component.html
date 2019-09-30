@@ -1,3 +1,28 @@
-<p>
-  select works!
-</p>
+<!-- description -->
+<div class="setting-item-description" [id]="descriptionId">
+  {{ field.description }}
+</div>
+
+<div class="setting-item-modified-indicator"></div>
+
+<div class="setting-item-value">
+  <div class="setting-item-control select-container">
+    <select
+      #selectControl
+      (change)="updateValue($event.target.value)"
+      class="monaco-select-box monaco-select-box-dropdown-padding setting-control-focus-target"
+      role="combobox"
+      [id]="field.name"
+      [required]="field.required"
+      [disabled]="disabled"
+      [attr.aria-labelledby]="descriptionId"
+    >
+      <option
+        *ngFor="let optionValue of field.enum"
+        [value]="optionValue"
+        [selected]="value === optionValue"
+        >{{ optionValue }}</option
+      >
+    </select>
+  </div>
+</div>

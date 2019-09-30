@@ -4,6 +4,7 @@ import { AutocompleteComponent } from './autocomplete/autocomplete.component';
 import { SelectComponent } from './select/select.component';
 import { InputComponent } from './input/input.component';
 import { CheckboxComponent } from './checkbox/checkbox.component';
+import { FieldComponent } from './field/field.component';
 
 @NgModule({
   imports: [CommonModule],
@@ -11,13 +12,15 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
     AutocompleteComponent,
     SelectComponent,
     InputComponent,
-    CheckboxComponent
+    CheckboxComponent,
+    FieldComponent
   ],
   exports: [
     AutocompleteComponent,
     SelectComponent,
     InputComponent,
-    CheckboxComponent
+    CheckboxComponent,
+    FieldComponent
   ]
 })
 export class VscodeUiComponentsModule {}

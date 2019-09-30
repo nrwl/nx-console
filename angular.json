@@ -423,7 +423,10 @@
               "apps/vscode-ui/src/assets"
             ],
             "styles": ["apps/vscode-ui/src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/vscode-ui/styles/src/lib"]
+            }
           },
           "configurations": {
             "production": {
@@ -556,6 +559,22 @@
           "styleext": "scss"
         }
       }
+    },
+    "vscode-ui-styles": {
+      "projectType": "library",
+      "root": "libs/vscode-ui/styles",
+      "sourceRoot": "libs/vscode-ui/styles/src",
+      "prefix": "angular-console",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": ["libs/vscode-ui/styles/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/vscode-ui/styles/**"]
+          }
+        }
+      },
+      "schematics": {}
     }
   },
   "cli": {
