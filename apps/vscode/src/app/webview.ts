@@ -97,26 +97,7 @@ export function getIframeHtml(
     // Cache html and inline all styles and scripts.
     indexHtml = readFileSync(
       join(context.extensionPath, 'assets/public/index.html')
-    )
-      .toString()
-      .replace(
-        '<link rel="stylesheet" href="styles.css">',
-        `<style>${readFileSync(
-          join(context.extensionPath, 'assets/public/styles.css')
-        )}</style>`
-      )
-      .replace(
-        '<script src="runtime.js"></script>',
-        `<script>${readFileSync(
-          join(context.extensionPath, 'assets/public/runtime.js')
-        )}</script>`
-      )
-      .replace(
-        '<script src="main.js"></script>',
-        `<script>${readFileSync(
-          join(context.extensionPath, 'assets/public/main.js')
-        )}</script>`
-      );
+    ).toString();
   }
 
   return indexHtml

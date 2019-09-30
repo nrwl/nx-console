@@ -429,6 +429,9 @@
             "aot": true,
             "extractLicenses": true,
             "vendorChunk": false,
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/vscode-ui/styles/src/lib"]
+            },
             "es5BrowserSupport": false
           },
           "configurations": {

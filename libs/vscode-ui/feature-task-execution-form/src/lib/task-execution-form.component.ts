@@ -1,6 +1,10 @@
-import { Component, ChangeDetectionStrategy, Inject } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  Inject,
+  OnInit
+} from '@angular/core';
 import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
-import { MOCK_COMPONENT_ARCHITECT } from './mock-component-architect';
 import {
   TASK_EXECUTION_SCHEMA,
   TaskExecutionSchema
@@ -12,13 +16,15 @@ import {
   styleUrls: ['./task-execution-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TaskExecutionFormComponent {
+export class TaskExecutionFormComponent implements OnInit {
   taskExecForm: FormGroup;
 
   constructor(
     private readonly fb: FormBuilder,
     @Inject(TASK_EXECUTION_SCHEMA) readonly architect: TaskExecutionSchema
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.buildForm();
   }
 
