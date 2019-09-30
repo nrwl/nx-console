@@ -7,8 +7,20 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <script>
+      // At runtime, VSCode server will replace this empty schema with the one to render.
+      window.VSCODE_UI_SCHEMA = {};
+
+      window.addEventListener('message', event => {
+        const taskExecutionSchema = event.data.taskExecutionSchema;
+        if (taskExecutionSchema && window.SET_TASK_EXECUTION_SCHEMA) {
+          window.SET_TASK_EXECUTION_SCHEMA(taskExecutionSchema);
+        }
+      });
+    </script>
   </head>
   <body>
-    <angular-console-root></angular-console-root>
+    <vscode-ui-task-execution-form></vscode-ui-task-execution-form>
   </body>
 </html>

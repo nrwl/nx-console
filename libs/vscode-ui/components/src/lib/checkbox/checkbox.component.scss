@@ -1,14 +1,19 @@
 @import 'variables';
 
-.setting-value-checkbox {
+.checkbox {
   background-color: $bg-color-offset;
-  border: solid 1px $input-border-color;
-  border-radius: $input-border-radius-size;
   color: $text-color;
-  margin-right: 1rem;
   margin-top: 0.2rem;
+  height: 18px;
+  width: 18px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  margin-right: 9px;
+  margin-left: 0;
+  padding: 0;
+  background-size: 16px !important;
 
   &.checked {
-    background-color: $bg-color-offset;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0…7.818-.574 2.978 4.24 8.052-9.506.762.646z' fill='%23C5C5C5'/%3E%3C/svg%3E");
   }
 }

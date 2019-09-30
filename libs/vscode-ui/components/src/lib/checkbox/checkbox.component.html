@@ -1,19 +1,19 @@
-<div class="setting-item-value-description">
-  <div class="setting-item-bool-control">
+<div class="value-description">
+  <div class="bool-control" fxLayout="row">
     <div
       (click)="updateValue(!value)"
       (keydown.enter)="updateValue(!value)"
-      class="monaco-custom-checkbox monaco-simple-checkbox setting-value-checkbox setting-control-focus-target"
+      class="checkbox"
       tabindex="0"
       role="checkbox"
       [attr.aria-checked]="value"
       [class.checked]="value"
       [attr.aria-labelledby]="descriptionId"
     ></div>
-    <div class="setting-item-description" [id]="descriptionId">
+    <div class="description" [id]="descriptionId">
       {{ field.description }}
     </div>
   </div>
 </div>
 
-<div class="setting-item-modified-indicator"></div>
+<div class="modified-indicator"></div>

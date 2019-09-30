@@ -1,4 +1,8 @@
-import { WorkspaceTreeItem, ROUTE_LIST } from './workspace-tree-item';
+import {
+  WorkspaceTreeItem,
+  ROUTE_LIST,
+  LEGACY_ROUTE_LIST
+} from './workspace-tree-item';
 import { AbstractTreeProvider } from '../abstract-tree-provider';
 import { TreeItem } from 'vscode';
 import { join } from 'path';
@@ -10,7 +14,7 @@ export const LOCATE_YOUR_WORKSPACE = new TreeItem('Select angular.json');
 LOCATE_YOUR_WORKSPACE.command = {
   tooltip: 'Select an angular.json file to open',
   title: 'Select angular.json',
-  command: 'angularConsole.revealWebViewPanel.selectWorkspaceManually'
+  command: 'angularConsole.selectWorkspaceManually'
 };
 
 export class WorkspaceTreeProvider extends AbstractTreeProvider<
@@ -69,6 +73,13 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     return [
       ...ROUTE_LIST.map(
         route => new WorkspaceTreeItem(workspacePath, route, this.extensionPath)
+      ),
+      ...LEGACY_ROUTE_LIST.map(route =>
+        WorkspaceTreeItem.createLegacyTreeItem(
+          workspacePath,
+          route,
+          this.extensionPath
+        )
       ),
       LOCATE_YOUR_WORKSPACE
     ];

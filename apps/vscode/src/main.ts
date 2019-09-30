@@ -1,4 +1,4 @@
-import { FileUtils } from '@angular-console/server';
+import { FileUtils, EXTENSIONS } from '@angular-console/server';
 import { stream } from 'fast-glob';
 import { existsSync, readFileSync } from 'fs';
 import { Server } from 'http';
@@ -8,9 +8,9 @@ import {
   ExtensionContext,
   tasks,
   TreeView,
-  ViewColumn,
   window,
-  workspace
+  workspace,
+  QuickPickItem
 } from 'vscode';
 
 import { AngularJsonTreeItem } from './app/angular-json-tree/angular-json-tree-item';
@@ -25,6 +25,7 @@ import {
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
 import { migrateSettings } from './app/migrate-settings';
+import { revealLegacyWebViewPanel } from './app/legacy-webview';
 
 let server: Promise<Server>;
 
@@ -69,11 +70,48 @@ export function activate(c: ExtensionContext) {
     commands.registerCommand(
       'angularConsole.revealWebViewPanel',
       async (workspaceTreeItem: WorkspaceTreeItem) => {
+        const port = ((await server).address() as any).port;
+
+        switch (workspaceTreeItem.route) {
+          case 'Add':
+            const extensions = Object.entries(EXTENSIONS).map(
+              ([label, description]): QuickPickItem => ({
+                label,
+                description
+              })
+            );
+            window.showQuickPick(extensions).then(selection => {
+              if (!selection) {
+                return;
+              }
+
+              tasks.executeTask(
+                ngTaskProvider.createTask({
+                  architectName: 'add',
+                  projectName: selection.label,
+                  type: 'shell'
+                })
+              );
+            });
+        }
+
         revealWebViewPanel({
           workspaceTreeItem,
           context,
-          viewColumn: ViewColumn.Active,
           getProjectEntries: () => ngTaskProvider.getProjectEntries(),
+          workspaceTreeView,
+          serverAddress: `http://localhost:${port}/`
+        });
+      }
+    )
+  );
+  context.subscriptions.push(
+    commands.registerCommand(
+      'angularConsole.revealLegacyWebViewPanel',
+      async (workspaceTreeItem: WorkspaceTreeItem) => {
+        revealLegacyWebViewPanel({
+          workspaceTreeItem,
+          context,
           port: ((await server).address() as any).port,
           workspaceTreeView
         });
@@ -150,7 +188,6 @@ async function setAngularWorkspace(workspacePath: string) {
     server = startServer(context, workspacePath);
   } catch (e) {
     console.error('Invalid angular JSON', e);
-    commands.executeCommand('setContext', 'isAngularWorkspace', false);
     window.showErrorMessage(
       'Your angular.json file is invalid (see debug console)'
     );

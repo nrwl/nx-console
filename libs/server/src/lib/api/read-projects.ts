@@ -34,32 +34,40 @@ function compareProjects(a: Project, b: Project) {
   return a.root.localeCompare(b.root);
 }
 
-function readArchitect(project: string, architect: any): Architect[] {
+export function readArchitectDef(
+  architectName: string,
+  architectDef: any,
+  project: string
+): Architect {
+  const options = {
+    defaultValues: serializeDefaultsForConfig(architectDef.options)
+  };
+  const configurations = architectDef.configurations
+    ? Object.keys(architectDef.configurations).map(name => ({
+        name,
+        defaultValues: readDefaultValues(
+          architectDef.options,
+          architectDef.configurations,
+          name
+        )
+      }))
+    : [];
+
+  return {
+    schema: [],
+    options,
+    configurations,
+    name: architectName,
+    project,
+    description: architectDef.description || '',
+    builder: architectDef.builder
+  };
+}
+
+export function readArchitect(project: string, architect: any): Architect[] {
   if (!architect) return [];
   return Object.entries(architect).map(([key, value]: [string, any]) => {
-    const options = {
-      defaultValues: serializeDefaultsForConfig(value.options)
-    };
-    const configurations = value.configurations
-      ? Object.keys(value.configurations).map(name => ({
-          name,
-          defaultValues: readDefaultValues(
-            value.options,
-            value.configurations,
-            name
-          )
-        }))
-      : [];
-
-    return {
-      schema: [],
-      options,
-      configurations,
-      name: key,
-      project,
-      description: value.description || '',
-      builder: value.builder
-    };
+    return readArchitectDef(key, value, project);
   });
 }
 
@@ -75,9 +83,13 @@ function serializeDefaultsForConfig(config: any) {
   );
 }
 
-export function readSchema(basedir: string, builder: string) {
+export function readBuilder(basedir: string, builder: string) {
   const [npmPackage, builderName] = builder.split(':');
-  return readBuildersFile(basedir, npmPackage)[builderName].schema;
+  return readBuildersFile(basedir, npmPackage)[builderName];
+}
+
+export function readSchema(basedir: string, builder: string) {
+  return readBuilder(basedir, builder).schema;
 }
 
 function readBuildersFile(basedir: string, npmPackage: string): any {

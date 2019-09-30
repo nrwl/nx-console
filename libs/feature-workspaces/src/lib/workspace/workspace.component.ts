@@ -1,5 +1,4 @@
 import { IS_INTELLIJ } from '@angular-console/environment';
-import { FADE_IN } from '@angular-console/ui';
 import { Settings, Telemetry } from '@angular-console/utils';
 import {
   animate,
@@ -37,11 +36,6 @@ interface Route {
   title: string;
 }
 
-const TASK_RUNNER_GHOST_STYLE = style({
-  'background-color': '#F5F5F5',
-  background: 'linear-gradient(to bottom,  #ffffff 55px,#F5F5F5 2%)'
-});
-
 @Component({
   selector: 'angular-console-workspace',
   templateUrl: './workspace.component.html',
@@ -53,16 +47,6 @@ const TASK_RUNNER_GHOST_STYLE = style({
       state('collapse', style({ width: '0' })),
       state('expand', style({ width: '52px' })),
       transition(`* <=> *`, animate(`300ms cubic-bezier(0.4, 0.0, 0.2, 1)`))
-    ]),
-    trigger('routerTransition', [
-      transition('void => *', []),
-      transition('generate <=> tasks', []),
-      transition('extensions <=> tasks', []),
-      transition('generate <=> extensions', []),
-      transition('* => tasks', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
-      transition('* => generate', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
-      transition('* => extensions', [TASK_RUNNER_GHOST_STYLE, FADE_IN]),
-      transition('* => *', FADE_IN)
     ])
   ]
 })

@@ -1,6 +1,4 @@
-import { FADE_IN } from '@angular-console/ui';
 import { Settings } from '@angular-console/utils';
-import { transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,13 +21,7 @@ const TITLE_SEPARATOR = ' | ';
   selector: 'angular-console-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('routerTransition', [
-      transition('void => *', []),
-      transition(`* => *`, FADE_IN)
-    ])
-  ]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit, OnDestroy {
   @ViewChild(RouterOutlet, { static: true }) routerOutlet: RouterOutlet;

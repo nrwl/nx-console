@@ -83,7 +83,7 @@ export async function startServer(
     'showNotification'
   ];
 
-  const assetsPath = path.join(context.extensionPath, 'assets', 'public');
+  const assetsPath = path.join(context.extensionPath, 'assets', 'legacy');
 
   const providers = [
     {

@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'variables';
+@import 'styles.prod';
 
 body {
   background-color: $bg-color;
