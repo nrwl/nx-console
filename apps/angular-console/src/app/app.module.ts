@@ -4,7 +4,6 @@ import {
   IS_INTELLIJ,
   IS_VSCODE
 } from '@angular-console/environment';
-import { FeatureSettingsModule } from '@angular-console/feature-settings';
 import {
   FeatureWorkspacesModule,
   workspaceRoutes
@@ -76,7 +75,7 @@ export function initApollo(
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    FeatureSettingsModule,
+    UiModule,
     MatSidenavModule,
     MatListModule,
     MatIconModule,
@@ -88,22 +87,13 @@ export function initApollo(
     HttpLinkModule,
     HttpClientModule,
     FeatureWorkspacesModule,
-    UiModule,
     AngularConsoleEnterpriseFrontendModule.forRoot(),
     RouterModule.forRoot(
       [
-        { path: '', pathMatch: 'full', redirectTo: '/workspaces' },
         {
           path: '',
-          children: workspaceRoutes,
-          canActivateChild: [IsNodeJsInstalledGuard]
-        },
-        {
-          path: 'install-nodejs',
-          loadChildren:
-            '@angular-console/feature-install-node-js#FeatureInstallNodeJsModule'
-        },
-        { path: '**', redirectTo: '/workspaces' }
+          children: workspaceRoutes
+        }
       ],
       { paramsInheritanceStrategy: 'always' }
     )

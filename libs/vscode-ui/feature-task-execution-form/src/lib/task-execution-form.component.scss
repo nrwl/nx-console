@@ -1,12 +1,37 @@
-/** VScode sets the position of each of these
-elements manually, so I'm not sure if these are needed */
-.monaco-list-row {
+@import 'variables';
+
+.list-row {
   position: relative;
   margin-bottom: 1rem;
 }
 
-.settings-tree-container {
-  height: calc(100vh - 20px);
+:host {
+  height: 100vh;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+.filter-container {
+  border-width: 1px;
+  border-style: solid;
+  background-color: $bg-color-offset;
+  border-color: $input-border-color;
+  border-radius: $input-border-radius-size;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0.3rem 0.5rem;
+  margin-bottom: 1rem;
+
+  input {
+    width: 100%;
+    line-height: 30px;
+    height: 20px;
+    margin: none;
+    box-sizing: border-box;
+    color: $text-color;
+    background: transparent;
+    border: none !important;
+    outline: none !important;
+    font-size: 13px;
+  }
 }

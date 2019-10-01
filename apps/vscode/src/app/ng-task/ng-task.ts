@@ -23,6 +23,7 @@ export class NgTask extends Task {
       case 'serve':
       case 'test':
       case 'xi18n':
+      case 'add':
         args = [architectName];
         if (projectName) args.push(projectName);
     }

@@ -10,25 +10,10 @@
     "angular-console": {
       "tags": []
     },
-    "feature-install-node-js": {
-      "tags": []
-    },
     "feature-workspaces": {
       "tags": []
     },
-    "feature-extensions": {
-      "tags": []
-    },
-    "feature-generate": {
-      "tags": []
-    },
-    "feature-settings": {
-      "tags": []
-    },
     "utils": {
-      "tags": []
-    },
-    "feature-run": {
       "tags": []
     },
     "ui": {

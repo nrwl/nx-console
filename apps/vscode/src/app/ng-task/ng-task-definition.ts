@@ -6,6 +6,7 @@ export interface NgTaskDefinition {
 }
 
 export interface ArchitectDef {
+  builder: string;
   configurations?: {
     [configuration: string]: {};
   };

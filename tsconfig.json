@@ -23,26 +23,12 @@
     "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
-      "@angular-console/feature-install-node-js": [
-        "libs/feature-install-node-js/src/index.ts"
-      ],
       "@angular-console/feature-workspaces": [
         "libs/feature-workspaces/src/index.ts"
       ],
-      "@angular-console/feature-extensions": [
-        "libs/feature-extensions/src/index.ts"
-      ],
-      "@angular-console/feature-generate": [
-        "libs/feature-generate/src/index.ts"
-      ],
-      "@angular-console/utils": ["libs/utils/src/index.ts"],
-      "@angular-console/feature-run": ["libs/feature-run/src/index.ts"],
       "@angular-console/ui": ["libs/ui/src/index.ts"],
-      "schema/*": ["dist/schema/*"],
+      "@angular-console/utils": ["libs/utils/src/index.ts"],
       "@angular-console/schema": ["libs/schema/src/index.ts"],
-      "@angular-console/feature-settings": [
-        "libs/feature-settings/src/index.ts"
-      ],
       "@angular-console/server": ["libs/server/src/index.ts"],
       "@angular-console/environment": ["libs/environment/src/index.ts"],
       "@angular-console/vscode-ui/feature-task-execution-form": [

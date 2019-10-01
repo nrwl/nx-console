@@ -1,0 +1,75 @@
+.fx-row,
+.fx-row-wrap {
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.fx-row-wrap {
+  flex-flow: row wrap;
+}
+
+.fx-column {
+  flex-direction: column;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.fx-align-start-center {
+  place-content: center flex-start;
+  align-items: center;
+}
+
+.fx-align-center-start {
+  place-content: flex-start center;
+  align-items: flex-start;
+}
+
+.fx-align-center-center {
+  place-content: center;
+  align-items: center;
+}
+
+.fx-align-space-between {
+  place-content: stretch space-between;
+  align-items: stretch;
+}
+
+.fx-align-space-between-center {
+  place-content: center space-between;
+  align-items: center;
+}
+
+.fx-align-space-around-center {
+  place-content: center space-around;
+  align-items: center;
+}
+
+.fx-align-left-top {
+  place-content: stretch flex-start;
+  align-items: stretch;
+}
+
+.fx-align-end-center {
+  place-content: center flex-end;
+  align-items: center;
+}
+
+.fx-align-option-start {
+  place-content: flex-start;
+  align-items: flex-start;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.fx-flex {
+  flex: 1 1 0;
+  box-sizing: border-box;
+}
+
+.fx-flex-100 {
+  box-sizing: border-box;
+  flex: 1 1 100%;
+  max-width: 100%;
+}

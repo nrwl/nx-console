@@ -1,29 +1,25 @@
-<div class="monaco-workbench">
-  <form [formGroup]="taskExecForm">
-    <div class="settings-editor">
-      <div class="settings-body">
-        <div class="settings-tree-container">
-          <div class="monaco-list" role="tree">
-            <div class="monaco-scrollable-element" role="presentation">
-              <div class="monaco-list-rows">
-                <div
-                  *ngFor="let field of architect.schema"
-                  class="monaco-list-row"
-                  role="treeitem"
-                >
-                  <div class="monaco-tl-row">
-                    <angular-console-field
-                      *ngIf="taskExecForm.contains(field.name)"
-                      [field]="field"
-                      [formControlName]="field.name"
-                    ></angular-console-field>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
+<div class="form-header">
+  <div class="filter-container fx-align-start-center fx-row">
+    <input
+      type="text"
+      placeholder="Search flags"
+      [formControl]="filterFieldsControl"
+    />
+  </div>
 </div>
+<form
+  [formGroup]="taskExecForm$ | async"
+  *ngIf="(filteredFields$ | async) as filteredFields"
+>
+  <div
+    *ngFor="let field of (architect$ | async)?.schema"
+    class="list-row"
+    role="treeitem"
+  >
+    <angular-console-field
+      [field]="field"
+      [formControlName]="field.name"
+      [style.display]="filteredFields[field.name] ? 'block' : 'none'"
+    ></angular-console-field>
+  </div>
+</form>

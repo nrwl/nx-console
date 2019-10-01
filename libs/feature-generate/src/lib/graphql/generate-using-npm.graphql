@@ -1,5 +1,0 @@
-mutation GenerateUsingNmp($path: String!, $genCommand: [String!]!, $dryRun: Boolean!, $npmClient: String!) {
-  generateUsingNpm(path: $path, genCommand: $genCommand, dryRun: $dryRun, npmClient: $npmClient) {
-    id
-  }
-}

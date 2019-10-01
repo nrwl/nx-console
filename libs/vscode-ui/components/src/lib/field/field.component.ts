@@ -15,6 +15,7 @@ import { Schema } from '@angular-console/schema';
   selector: 'angular-console-field',
   templateUrl: './field.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['field.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
