@@ -8,3 +8,15 @@ body {
   color: $text-color;
   font-family: $default-font;
 }
+
+::-webkit-scrollbar-thumb {
+  background-color: #484950;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: lighten(#484950, 10%);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: lighten(#484950, 20%);
+}

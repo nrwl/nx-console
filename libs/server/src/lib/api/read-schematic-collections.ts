@@ -88,7 +88,7 @@ function readWorkspaceSchematicsCollection(
   workspaceSchematicsNpmScript: string
 ) {
   const collectionDir = path.join(basedir, workspaceSchematicsPath);
-  const collectionName = 'Workspace Schematics';
+  const collectionName = '@nrwl/workspace';
   if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
     const collection = readJsonFile('collection.json', collectionDir);
     const defaults = readAngularJsonDefaults(basedir);

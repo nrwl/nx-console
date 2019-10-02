@@ -1,25 +1,52 @@
-<div class="form-header">
-  <div class="filter-container fx-align-start-center fx-row">
-    <input
-      type="text"
-      placeholder="Search flags"
-      [formControl]="filterFieldsControl"
-    />
+<ng-container *ngIf="(architect$ | async) as architect">
+  <div class="form-header">
+    <div
+      class="configuration-container"
+      *ngIf="architect.configurations && architect.configurations.length > 1"
+    >
+      Num configs: {{ architect.configurations.length }}
+    </div>
+    <div class="title-container fx-row">
+      <span class="fx-flex title">
+        {{ architect.name }}
+      </span>
+      <div class="run-button">
+        Run
+      </div>
+    </div>
+    <div class="filter-container fx-align-start-center fx-row">
+      <input
+        type="text"
+        placeholder="Search flags"
+        [formControl]="filterFieldsControl"
+      />
+    </div>
   </div>
-</div>
-<form
-  [formGroup]="taskExecForm$ | async"
-  *ngIf="(filteredFields$ | async) as filteredFields"
->
-  <div
-    *ngFor="let field of (architect$ | async)?.schema"
-    class="list-row"
-    role="treeitem"
-  >
-    <angular-console-field
-      [field]="field"
-      [formControlName]="field.name"
-      [style.display]="filteredFields[field.name] ? 'block' : 'none'"
-    ></angular-console-field>
+  <div class="scroll-container">
+    <div class="form-container">
+      <div class="flags-and-fields-container fx-row">
+        <vscode-ui-field-tree></vscode-ui-field-tree>
+        <form
+          class="fields"
+          [formGroup]="taskExecForm$ | async"
+          *ngIf="(filteredFields$ | async) as filteredFields"
+        >
+          <div
+            *ngFor="let field of architect.schema"
+            class="list-row"
+            role="treeitem"
+          >
+            <angular-console-field
+              [field]="field"
+              [formControlName]="field.name"
+              [style.display]="filteredFields[field.name] ? 'block' : 'none'"
+            ></angular-console-field>
+          </div>
+          <div class="run-button">
+            Run
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-</form>
+</ng-container>

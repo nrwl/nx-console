@@ -205,6 +205,14 @@ export function normalizeSchema(
 
         const workspaceDefault = projectDefaults && projectDefaults[k];
 
+        if (!v.type) {
+          if (v.enum && v.enum.length < 10) {
+            v.type = 'enum';
+          } else {
+            v.type = 'string';
+          }
+        }
+
         res.push({
           name: k,
           type: String(v.type || 'string'),

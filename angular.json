@@ -374,7 +374,7 @@
                 },
                 {
                   "replace": "apps/vscode-ui/src/styles.scss",
-                  "with": "apps/vscode-ui/src/styles.prod.scss"
+                  "with": "apps/vscode-ui/src/_styles.prod.scss"
                 }
               ]
             }

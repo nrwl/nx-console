@@ -1,0 +1,12 @@
+@import 'flex';
+@import 'variables';
+
+html,
+body {
+  overflow: hidden;
+  margin: 0;
+}
+
+::-webkit-scrollbar {
+  width: $scroll-bar-width !important;
+}

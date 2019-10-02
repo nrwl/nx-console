@@ -9,7 +9,7 @@
   </div>
   <ng-container [ngSwitch]="field.type">
     <angular-console-checkbox
-      *ngSwitchCase="'boolean'"
+      *ngIf="field.type === 'boolean'"
       [field]="field"
       [(value)]="value"
       [descriptionId]="descriptionId"
@@ -23,7 +23,9 @@
     ></angular-console-select>
 
     <angular-console-input
-      *ngSwitchDefault
+      *ngIf="
+        field.type === 'string' && (!field.enum || field.enum.length >= 10)
+      "
       [field]="field"
       [(value)]="value"
       [descriptionId]="descriptionId"
