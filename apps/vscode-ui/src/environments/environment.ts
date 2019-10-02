@@ -5,7 +5,7 @@ import { TASK_EXECUTION_SCHEMA } from '@angular-console/vscode-ui/feature-task-e
 // The list of file replacements can be found in `angular.json`.
 
 export const MOCK_COMPONENT_ARCHITECT = {
-  name: 'Component',
+  name: 'ng generate component',
   project: 'Project',
   builder: 'Builder',
   description: 'Description',

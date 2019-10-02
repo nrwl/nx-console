@@ -1,14 +1,76 @@
 @import 'variables';
 
+$title-offset: 46px;
+$filter-offset: 46px;
+$host-padding-top: 28px;
+$host-padding-left: 28px;
+$host-padding-right: 36px;
+$scrollbar-width: 14px;
+
+$offset-without-configurations: $title-offset + $filter-offset +
+  $host-padding-top;
+
 .list-row {
-  position: relative;
   margin-bottom: 1rem;
 }
 
 :host {
   height: 100vh;
+  overflow: hidden;
+  display: block;
+  padding-top: $host-padding-top;
+  padding-left: $host-padding-left;
+}
+
+.run-button {
+  width: 80px;
+  height: 30px;
+  background: $button-primary-color;
+  text-align: center;
+  line-height: 30px;
+  cursor: pointer;
+  transition: background ease-in-out 0.1s;
+
+  &:hover {
+    background: darken($button-primary-color, 10%);
+  }
+
+  .flags-and-fields-container & {
+    margin-top: $host-padding-top * 2;
+    margin-bottom: $host-padding-top * 3;
+  }
+}
+
+.flags-and-fields-container {
+  height: calc(100vh - #{$offset-without-configurations});
+
+  vscode-ui-field-tree {
+    height: 100%;
+  }
+}
+
+vscode-ui-field-tree {
+  overflow: auto;
+  position: fixed;
+  bottom: 0;
+  top: #{$offset-without-configurations};
+}
+
+form {
+  margin-left: 180px;
+  padding-right: $host-padding-right - $scrollbar-width;
+}
+
+.scroll-container {
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+.form-header,
+.form-container {
+  box-sizing: border-box;
+  max-width: 980px;
+  margin: auto;
 }
 
 .filter-container {
@@ -19,8 +81,8 @@
   border-radius: $input-border-radius-size;
   height: 30px;
   box-sizing: border-box;
-  padding: 0.3rem 0.5rem;
   margin-bottom: 1rem;
+  padding: 0.3rem 0.5rem;
 
   input {
     width: 100%;
@@ -33,5 +95,31 @@
     border: none !important;
     outline: none !important;
     font-size: 13px;
+  }
+}
+
+.form-header {
+  max-width: 996px;
+  padding-right: $host-padding-right;
+
+  .title-container {
+    .title {
+      font-weight: 500;
+      font-size: 22px;
+      line-height: 21px;
+      padding-left: 3px;
+    }
+
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  form {
+    margin-left: 0;
+  }
+
+  vscode-ui-field-tree {
+    display: none;
   }
 }
