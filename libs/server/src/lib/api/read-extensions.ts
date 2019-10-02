@@ -22,7 +22,6 @@ export const EXTENSIONS: { [key: string]: string } = {
     '@azure/ng-deploy - Deploy Angular apps to Azure using the Angular CLI',
   '@balticcode/ngx-hotkeys': 'An Angular module providing hotkey support.',
   '@briebug/cypress-schematic': 'Add cypress to an Angular CLI project',
-  '@briebug/jest': 'Add jest to an Angular CLI project',
   '@briebug/jest-schematic': 'Add jest to an Angular CLI project',
   '@briebug/mat-dialog-schematic':
     'A schematic for generating mat dialog components',
