@@ -1,19 +1,39 @@
 @import 'variables';
 
+.description {
+  color: $control-description-text-color;
+  margin: 0;
+  user-select: text;
+  white-space: normal;
+}
+
+.value-description {
+  display: flex;
+  cursor: pointer;
+  margin-top: 0.2rem;
+}
+
+.bool-control {
+  align-items: flex-start;
+  display: flex;
+}
+
+$checkbox-size: 1rem;
+
 .checkbox {
   background-color: $bg-color-offset;
+  background-size: $checkbox-size !important;
+  border: $input-border-width solid transparent;
+  border-radius: $input-border-radius-size;
   color: $text-color;
-  margin-top: 0.2rem;
-  height: 18px;
-  width: 18px;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  margin-right: 9px;
-  margin-left: 0;
+  height: $checkbox-size;
+  width: $checkbox-size;
+  margin: 0 0.5rem 0.2rem 0;
   padding: 0;
-  background-size: 16px !important;
 
   &.checked {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0…7.818-.574 2.978 4.24 8.052-9.506.762.646z' fill='%23C5C5C5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 3.763l-9.193 8.172-.721-.042L1 7.296l.763-.678 3.747 4.214L14.321 3l.679.763z' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-position: 50%;
+    background-repeat: no-repeat;
   }
 }

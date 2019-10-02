@@ -1,8 +1,19 @@
 @import 'variables';
 
+.description {
+  color: $control-description-text-color;
+  margin: 0 0 0.5rem 0;
+  user-select: text;
+  white-space: normal;
+}
+
 select {
   background-color: $bg-color-offset;
   border-color: $input-border-color;
   border-radius: $input-border-radius-size;
+  box-sizing: border-box;
   color: $text-color;
+  font: inherit;
+  height: $input-height;
+  width: $input-width;
 }
