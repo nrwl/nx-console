@@ -1,3 +1,28 @@
 :host {
   display: block;
 }
+
+/*** Task option content ***/
+.field-contents {
+  position: relative;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  white-space: normal;
+
+  .field-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+  }
+
+  .field-label {
+    font-weight: 600;
+    user-select: text;
+  }
+
+  .setting-item-value {
+    margin-top: 9px;
+    display: flex;
+  }
+}

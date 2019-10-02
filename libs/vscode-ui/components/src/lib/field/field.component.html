@@ -1,11 +1,9 @@
-<div class="setting-item-contents">
-  <div class="setting-item-title">
-    <div class="setting-item-cat-label-container">
-      <span class="setting-item-category"></span>
-      <span class="setting-item-label">
-        {{ field.name }}
-      </span>
-    </div>
+<div class="field-contents">
+  <div class="field-title">
+    <span class="field-category"></span>
+    <span class="field-label">
+      {{ field.name }}
+    </span>
   </div>
   <ng-container [ngSwitch]="field.type">
     <angular-console-checkbox
