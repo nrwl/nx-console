@@ -1,22 +1,24 @@
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   Inject,
+  NgZone,
   OnInit,
   ChangeDetectorRef
 } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { combineLatest, Observable, ReplaySubject } from 'rxjs';
+import {
+  distinctUntilChanged,
+  map,
+  shareReplay,
+  startWith
+} from 'rxjs/operators';
+
 import {
   TASK_EXECUTION_SCHEMA,
   TaskExecutionSchema
 } from './task-execution-form.schema';
-import { ReplaySubject, Observable, combineLatest } from 'rxjs';
-import {
-  map,
-  startWith,
-  distinctUntilChanged,
-  shareReplay
-} from 'rxjs/operators';
 
 declare global {
   interface Window {
@@ -82,6 +84,7 @@ export class TaskExecutionFormComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     @Inject(TASK_EXECUTION_SCHEMA) public initialSchema: TaskExecutionSchema,
+    private readonly ngZone: NgZone,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
 
@@ -89,8 +92,12 @@ export class TaskExecutionFormComponent implements OnInit {
     this.architectSubject.next(this.initialSchema);
 
     window.SET_TASK_EXECUTION_SCHEMA = schema => {
-      this.architectSubject.next(schema);
-      this.changeDetectorRef.detectChanges();
+      this.ngZone.run(() => {
+        this.architectSubject.next(schema);
+        setTimeout(() => {
+          this.changeDetectorRef.detectChanges();
+        }, 0);
+      });
     };
   }
 
