@@ -78,7 +78,8 @@ export async function getTaskExecutionSchema(
 
       return {
         ...readArchitectDef(command, selectedArchitectDef, projectName),
-        schema: readSchema(workspacePath, selectedArchitectDef.builder)
+        schema: readSchema(workspacePath, selectedArchitectDef.builder),
+        title: `ng ${command} ${projectName}`
       };
 
     case 'Run':
@@ -112,7 +113,8 @@ export async function getTaskExecutionSchema(
                 selection.command,
                 selection.projectName
               ),
-              schema: readSchema(workspacePath, selection.architectDef.builder)
+              schema: readSchema(workspacePath, selection.architectDef.builder),
+              title: `ng run ${selection.projectName}:${selection.command}`
             }
           : undefined
       );
@@ -142,7 +144,12 @@ export async function getTaskExecutionSchema(
 
       return window.showQuickPick(schematics).then(selection => {
         if (selection) {
-          return selection.schematic;
+          return {
+            ...selection.schematic,
+            title: `ng generate ${selection.schematic.collection}:${
+              selection.schematic.name
+            }`
+          };
         }
       });
   }

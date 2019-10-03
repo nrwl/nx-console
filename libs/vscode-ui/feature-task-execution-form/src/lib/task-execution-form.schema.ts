@@ -10,6 +10,7 @@ export const TASK_EXECUTION_SCHEMA = new InjectionToken(
 );
 
 export interface TaskExecutionSchema {
+  title: string;
   name: string;
   project?: string;
   builder?: string;

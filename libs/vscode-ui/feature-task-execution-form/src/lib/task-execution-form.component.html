@@ -1,77 +1,91 @@
 <ng-container *ngIf="(architect$ | async) as architect">
-  <div
-    [class.has-configurations]="
-      architect.configurations && architect.configurations.length > 0
-    "
-  >
-    <div class="form-header-container" #formHeaderContainer>
-      <div class="form-header">
-        <div class="filter-container fx-align-start-center fx-row">
-          <input
-            type="text"
-            placeholder="Search flags"
-            [formControl]="filterFieldsControl"
-          />
-        </div>
-        <div
-          class="configurations-container fx-row"
-          *ngIf="
-            (taskExecForm$ | async)?.get(
-              'configuration'
-            ) as configurationControl
-          "
-        >
-          <div
-            class="configuration"
-            [class.selected]="!configurationControl.value"
-            (click)="configurationControl.setValue()"
-          >
-            Default
+  <ng-container *ngIf="(taskExecForm$ | async) as taskExecForm">
+    <div
+      [class.has-configurations]="
+        architect.configurations && architect.configurations.length > 0
+      "
+    >
+      <div class="form-header-container" #formHeaderContainer>
+        <div class="form-header">
+          <div class="filter-container fx-align-start-center fx-row">
+            <input
+              type="text"
+              placeholder="Search flags"
+              [formControl]="filterFieldsControl"
+            />
           </div>
           <div
-            class="configuration"
-            [class.selected]="configurationControl.value === configuration.name"
-            *ngFor="let configuration of architect.configurations"
-            (click)="configurationControl.setValue(configuration.name)"
+            class="configurations-container fx-row"
+            *ngIf="taskExecForm.get('configuration') as configurationControl"
           >
-            {{ configuration.name | titlecase }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="scroll-container" #scrollContainer>
-      <div class="form-container flags-and-fields-container fx-row">
-        <vscode-ui-field-tree></vscode-ui-field-tree>
-        <form
-          class="fields"
-          [formGroup]="taskExecForm$ | async"
-          *ngIf="(filteredFields$ | async) as filteredFields"
-        >
-          <div class="title-container fx-row">
-            <span class="fx-flex title">
-              {{ architect.name }}
-            </span>
-            <div class="run-button">
-              Run
+            <div
+              class="configuration"
+              [class.selected]="!configurationControl.value"
+              (click)="configurationControl.setValue()"
+            >
+              Default
+            </div>
+            <div
+              class="configuration"
+              [class.selected]="
+                configurationControl.value === configuration.name
+              "
+              *ngFor="let configuration of architect.configurations"
+              (click)="configurationControl.setValue(configuration.name)"
+            >
+              {{ configuration.name | titlecase }}
             </div>
           </div>
-          <div
-            *ngFor="let field of architect.schema"
-            class="list-row"
-            role="treeitem"
+        </div>
+      </div>
+
+      <div class="scroll-container" #scrollContainer>
+        <div class="form-container flags-and-fields-container fx-row">
+          <vscode-ui-field-tree></vscode-ui-field-tree>
+          <form
+            class="fields"
+            [formGroup]="taskExecForm"
+            *ngIf="(filteredFields$ | async) as filteredFields"
           >
-            <angular-console-field
-              [field]="field"
-              [formControlName]="field.name"
-              [style.display]="filteredFields[field.name] ? 'block' : 'none'"
-            ></angular-console-field>
-          </div>
-          <div class="run-button bottom">
-            Run
-          </div>
-        </form>
+            <div class="title-container fx-row">
+              <span class="fx-flex title">
+                {{ architect.title }}
+                <ng-container
+                  *ngIf="
+                    taskExecForm.get('configuration')?.value as configuration
+                  "
+                >
+                  <ng-container
+                    *ngIf="configuration === 'production'; else otherConfig"
+                  >
+                    --prod
+                  </ng-container>
+                  <ng-template #otherConfig>
+                    --c={{ configuration }}
+                  </ng-template>
+                </ng-container>
+              </span>
+              <div class="run-button">
+                Run
+              </div>
+            </div>
+            <div
+              *ngFor="let field of architect.schema"
+              class="list-row"
+              role="treeitem"
+            >
+              <angular-console-field
+                [field]="field"
+                [formControlName]="field.name"
+                [style.display]="filteredFields[field.name] ? 'block' : 'none'"
+              ></angular-console-field>
+            </div>
+            <div class="run-button bottom">
+              Run
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
+  </ng-container>
 </ng-container>
