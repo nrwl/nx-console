@@ -7,6 +7,13 @@ export class AngularJsonTreeItem extends TreeItem {
     collapsibleState?: TreeItemCollapsibleState | undefined
   ) {
     super(treeItemLabel, collapsibleState);
+
+    if (collapsibleState) {
+      this.command = {
+        title: 'Expand/contract angular.json tree-item',
+        command: 'angularConsole.toggleTreeItem'
+      };
+    }
   }
 }
 

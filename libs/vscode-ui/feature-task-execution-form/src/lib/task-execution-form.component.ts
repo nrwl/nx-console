@@ -4,7 +4,10 @@ import {
   Inject,
   NgZone,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef,
+  AfterViewChecked
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { combineLatest, Observable, ReplaySubject } from 'rxjs';
@@ -32,7 +35,13 @@ declare global {
   styleUrls: ['./task-execution-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TaskExecutionFormComponent implements OnInit {
+export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
+  @ViewChild('scrollContainer', { static: false }) scrollContainer: ElementRef<
+    HTMLElement
+  >;
+  @ViewChild('formHeaderContainer', { static: false })
+  formHeaderContainer: ElementRef<HTMLElement>;
+
   private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
 
   readonly architect$ = this.architectSubject.asObservable();
@@ -101,8 +110,38 @@ export class TaskExecutionFormComponent implements OnInit {
     };
   }
 
+  ngAfterViewChecked() {
+    if (!this.scrollContainer || this.scrollContainer.nativeElement.onscroll) {
+      return;
+    }
+    this.ngZone.runOutsideAngular(() => {
+      const scrollElement = this.scrollContainer.nativeElement;
+      const formHeaderElement = this.formHeaderContainer.nativeElement;
+      scrollElement.onscroll = function() {
+        if (scrollElement.scrollTop > 0) {
+          formHeaderElement.classList.add('scrolled');
+        } else {
+          formHeaderElement.classList.remove('scrolled');
+        }
+      };
+    });
+  }
+
   buildForm(architect: TaskExecutionSchema): FormGroup {
     const taskExecForm = this.fb.group({});
+
+    if (architect.configurations && architect.configurations.length) {
+      const configurationFormControl = new FormControl();
+      taskExecForm.addControl('configuration', configurationFormControl);
+
+      configurationFormControl.registerOnChange(() => {
+        this.setConfiguration(
+          taskExecForm,
+          architect,
+          configurationFormControl.value
+        );
+      });
+    }
 
     architect.schema.forEach(schema => {
       taskExecForm.addControl(
@@ -112,5 +151,29 @@ export class TaskExecutionFormComponent implements OnInit {
     });
 
     return taskExecForm;
+  }
+
+  setConfiguration(
+    taskExecForm: FormGroup,
+    architect: TaskExecutionSchema,
+    configurationName?: string
+  ) {
+    const configurations = architect.configurations!;
+    if (configurationName) {
+      const configuration = configurations.find(
+        c => c.name === configurationName
+      )!;
+
+      const values: { [key: string]: string } = {};
+      configuration.defaultValues.forEach(value => {
+        values[value.name] = value.defaultValue || '';
+      });
+
+      taskExecForm.patchValue(values);
+    } else {
+      architect.schema.forEach(field => {
+        taskExecForm.get(field.name)!.setValue(field.defaultValue || '');
+      });
+    }
   }
 }

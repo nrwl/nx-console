@@ -1,13 +1,14 @@
+import { Schema } from '@angular-console/schema';
 import {
   Component,
-  ChangeDetectionStrategy,
+  forwardRef,
   Input,
-  SimpleChanges,
   OnChanges,
-  forwardRef
+  SimpleChanges,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Schema } from '@angular-console/schema';
 
 /* Wrapper for select, text input, checkbox, autocomplete */
 
@@ -26,7 +27,7 @@ import { Schema } from '@angular-console/schema';
 })
 export class FieldComponent implements ControlValueAccessor, OnChanges {
   @Input() field: Schema;
-  @Input() _value: string;
+  _value: string;
 
   disabled = false;
   descriptionId: string;
@@ -49,8 +50,8 @@ export class FieldComponent implements ControlValueAccessor, OnChanges {
   }
 
   writeValue(value: string): void {
-    this.onChange(value);
     this.value = value;
+    this.changeDetectorRef.detectChanges();
   }
 
   registerOnChange(fn: any): void {
@@ -64,4 +65,6 @@ export class FieldComponent implements ControlValueAccessor, OnChanges {
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }
+
+  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {}
 }

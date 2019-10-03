@@ -1,13 +1,16 @@
 <div class="value-description">
-  <div class="bool-control" fxLayout="row">
+  <div
+    class="bool-control"
+    fxLayout="row"
+    (click)="updateValue(value === 'true' ? 'false' : 'true')"
+  >
     <div
-      (click)="updateValue(!value)"
-      (keydown.enter)="updateValue(!value)"
+      (keydown.enter)="updateValue(value === 'true' ? 'false' : 'true')"
       class="checkbox"
       tabindex="0"
       role="checkbox"
-      [attr.aria-checked]="value"
-      [class.checked]="value"
+      [attr.aria-checked]="value === 'true'"
+      [class.checked]="value === 'true'"
       [attr.aria-labelledby]="descriptionId"
     ></div>
     <div class="description" [id]="descriptionId">
