@@ -216,7 +216,7 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
             }
           } else if (
             inArchitect &&
-            nestingLevel === 5 &&
+            nestingLevel === 6 &&
             property === architect.configuration
           ) {
             scriptOffset = offset;
