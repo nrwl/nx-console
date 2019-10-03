@@ -1,23 +1,25 @@
 @import 'variables';
 
-$title-offset: 46px;
 $filter-offset: 46px;
-$host-padding-top: 28px;
+$host-padding-top: 16px;
 $host-padding-left: 28px;
 $host-padding-right: 36px;
 $scrollbar-width: 14px;
+$configurations-offset: 46px;
 
-$offset-without-configurations: $title-offset + $filter-offset +
-  $host-padding-top;
+$offset-without-configurations: $filter-offset + $host-padding-top;
+$offset-with-configurations: $offset-without-configurations +
+  $configurations-offset;
 
 .list-row {
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 :host {
   height: 100vh;
   overflow: hidden;
   display: block;
+  box-sizing: border-box;
   padding-top: $host-padding-top;
   padding-left: $host-padding-left;
 }
@@ -35,14 +37,23 @@ $offset-without-configurations: $title-offset + $filter-offset +
     background: darken($button-primary-color, 10%);
   }
 
-  .flags-and-fields-container & {
-    margin-top: $host-padding-top * 2;
-    margin-bottom: $host-padding-top * 3;
+  .form-container &.bottom {
+    margin-top: $host-padding-top;
+    margin-bottom: $host-padding-top * 2;
   }
 }
 
-.flags-and-fields-container {
+.form-container,
+vscode-ui-field-tree {
+  padding-top: $host-padding-top * 2;
+}
+
+.form-container {
   height: calc(100vh - #{$offset-without-configurations});
+
+  .has-configurations & {
+    height: calc(100vh - #{$offset-with-configurations});
+  }
 
   vscode-ui-field-tree {
     height: 100%;
@@ -54,6 +65,10 @@ vscode-ui-field-tree {
   position: fixed;
   bottom: 0;
   top: #{$offset-without-configurations};
+
+  .has-configurations & {
+    top: #{$offset-with-configurations};
+  }
 }
 
 form {
@@ -81,7 +96,6 @@ form {
   border-radius: $input-border-radius-size;
   height: 30px;
   box-sizing: border-box;
-  margin-bottom: 1rem;
   padding: 0.3rem 0.5rem;
 
   input {
@@ -98,20 +112,32 @@ form {
   }
 }
 
-.form-header {
-  max-width: 996px;
-  padding-right: $host-padding-right;
+.form-header-container {
+  margin-left: $host-padding-left * -1;
+  padding-left: $host-padding-left;
+  transition: box-shadow ease-in-out 0.1s;
 
-  .title-container {
-    .title {
-      font-weight: 500;
-      font-size: 22px;
-      line-height: 21px;
-      padding-left: 3px;
-    }
-
-    margin-bottom: 1rem;
+  &.scrolled {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   }
+
+  .form-header {
+    max-width: 996px;
+    padding-right: $host-padding-right;
+    padding-bottom: $host-padding-top;
+  }
+}
+
+.title-container {
+  .title {
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 21px;
+    padding-left: 3px;
+  }
+
+  margin-bottom: 2rem;
 }
 
 @media (max-width: 600px) {
@@ -121,5 +147,18 @@ form {
 
   vscode-ui-field-tree {
     display: none;
+  }
+}
+
+.configurations-container {
+  margin-top: 24px;
+  height: $configurations-offset - 24px;
+
+  .configuration {
+    margin-right: 24px;
+
+    &.selected {
+      border-bottom: 2px solid white;
+    }
   }
 }

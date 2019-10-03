@@ -3,7 +3,7 @@
 .description {
   color: $control-description-text-color;
   margin: 0;
-  user-select: text;
+  user-select: none;
   white-space: normal;
 }
 
@@ -28,6 +28,8 @@ $checkbox-size: 1rem;
   color: $text-color;
   height: $checkbox-size;
   width: $checkbox-size;
+  min-height: $checkbox-size;
+  min-width: $checkbox-size;
   margin: 0 0.5rem 0.2rem 0;
   padding: 0;
 
