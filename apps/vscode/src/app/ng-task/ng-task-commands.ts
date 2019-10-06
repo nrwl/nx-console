@@ -5,6 +5,8 @@ import {
   WorkspaceTreeItem,
   WorkspaceRouteTitle
 } from '../workspace-tree/workspace-tree-item';
+import { getTaskExecutionSchema } from '../workspace-tree/get-task-execution-schema';
+import { Schema } from '@angular-console/schema';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -37,7 +39,7 @@ export function registerNgTaskCommands(
 
   context.subscriptions.push(
     commands.registerCommand(
-      'angularConsole.generate.explorer',
+      'angularConsole.generate.ui.explorer',
       ({ fsPath }) => {
         const project = n.projectForPath(fsPath);
         selectNgCliCommandAndShowUi(
@@ -49,6 +51,96 @@ export function registerNgTaskCommands(
       }
     )
   );
+
+  context.subscriptions.push(
+    commands.registerCommand(
+      'angularConsole.generate.explorer',
+      ({ fsPath }) => {
+        const project = n.projectForPath(fsPath);
+        ngGenerate(n, project ? project.name : undefined);
+      }
+    )
+  );
+}
+
+async function ngGenerate(provider: NgTaskProvider, projectName?: string) {
+  if (!projectName) {
+    projectName = await selectProject();
+    if (!projectName) return;
+  }
+
+  const project = provider.getProjects()[projectName];
+  if (!project) return;
+
+  const workspacePath = provider.getWorkspacePath();
+  if (!workspacePath) {
+    window.showErrorMessage(
+      'Angular Console requires a workspace be set to perform this action'
+    );
+    return;
+  }
+
+  const task = await getTaskExecutionSchema(
+    workspacePath,
+    () => provider.getProjectEntries(),
+    'Generate',
+    projectName
+  );
+  if (!task) return;
+
+  const required = task.schema.filter(s => s.required);
+  const flags = ['generate', `"${task.collection}:${task.name}"`];
+
+  for (const s of required) {
+    let flag;
+    if (s.name === 'project') {
+      flag = projectName;
+      continue;
+    } else {
+      flag = await promptForSchema(s);
+    }
+
+    if (flag) {
+      flags.push(s.positional ? flag : `${s.name} "${flag}"`);
+    } else {
+      return;
+    }
+  }
+
+  const optional = await window.showInputBox({
+    prompt: 'additional flags (optional)'
+  });
+  if (optional) flags.push(optional);
+
+  tasks.executeTask(
+    ngTaskProvider.createTask({
+      type: 'shell',
+      projectName: projectName,
+      architectName: 'generate',
+      flags: flags.join(' ')
+    })
+  );
+}
+
+async function promptForSchema(
+  s: Schema,
+  defaultValue?: string
+): Promise<string | undefined> {
+  const title = `${s.name}: ${s.description}`;
+  let flag: string | undefined;
+
+  if (s.enum) {
+    flag = await window.showQuickPick(s.enum, {
+      placeHolder: title
+    });
+  } else {
+    flag = await window.showInputBox({
+      prompt: title,
+      value: defaultValue
+    });
+  }
+
+  return flag;
 }
 
 async function selectNgCliCommandAndShowUi(
@@ -58,7 +150,7 @@ async function selectNgCliCommandAndShowUi(
   projectName?: string
 ) {
   if (!projectName) {
-    projectName = await selectNgCliCommand(command);
+    projectName = await selectProject();
     if (!projectName) return;
   }
 
@@ -121,4 +213,17 @@ function selectNgCliCommand(command: string, includeDefault?: boolean) {
   return window.showQuickPick(items, {
     placeHolder: `Project to ${command}`
   });
+}
+
+export async function selectProject() {
+  const items = ngTaskProvider.getProjectEntries().map(([name, def]) => ({
+    label: name,
+    detail: def.root
+  }));
+
+  const selected = await window.showQuickPick(items, {
+    placeHolder: 'Select Project'
+  });
+
+  return selected ? selected.label : undefined;
 }

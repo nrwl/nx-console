@@ -1,4 +1,4 @@
-import { FileUtils, EXTENSIONS } from '@angular-console/server';
+import { FileUtils, EXTENSIONS, readSettings } from '@angular-console/server';
 import { stream } from 'fast-glob';
 import { existsSync, readFileSync } from 'fs';
 import { Server } from 'http';
@@ -45,11 +45,12 @@ export function activate(c: ExtensionContext) {
   });
   migrateSettings(context);
   const store = VSCodeStorage.fromContext(context);
+  const settings = readSettings(store);
 
   ngTaskProvider = new NgTaskProvider(new FileUtils(store));
   tasks.registerTaskProvider('ng', ngTaskProvider);
 
-  registerNgTaskCommands(context, ngTaskProvider);
+  registerNgTaskCommands(context, ngTaskProvider, settings);
 
   workspaceTreeView = window.createTreeView('angularConsole', {
     treeDataProvider: currentWorkspaceTreeProvider

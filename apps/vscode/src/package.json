@@ -49,6 +49,11 @@
           "command": "angularConsole.generate.explorer",
           "when": "isAngularWorkspace",
           "group": "ng"
+        },
+        {
+          "command": "angularConsole.generate.ui.explorer",
+          "when": "isAngularWorkspace",
+          "group": "ng"
         }
       ],
       "view/title": [
@@ -173,6 +178,12 @@
         "category": "ng",
         "title": "ng generate",
         "command": "angularConsole.generate.explorer",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
+        "title": "ng generate (ui)",
+        "command": "angularConsole.generate.ui.explorer",
         "when": "isAngularWorkspace"
       }
     ],

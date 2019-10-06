@@ -14,6 +14,7 @@ export interface TaskExecutionSchema {
   name: string;
   project?: string;
   builder?: string;
+  collection?: string;
   description: string;
   options?: Options;
   configurations?: ArchitectConfigurations[];

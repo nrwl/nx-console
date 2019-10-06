@@ -26,6 +26,10 @@ export class NgTask extends Task {
       case 'add':
         args = [architectName];
         if (projectName) args.push(projectName);
+        break;
+      case 'generate':
+        args = [];
+        break;
     }
 
     if (flags) {
