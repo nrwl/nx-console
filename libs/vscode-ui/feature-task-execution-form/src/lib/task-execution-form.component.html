@@ -1,91 +1,102 @@
-<ng-container *ngIf="(architect$ | async) as architect">
-  <ng-container *ngIf="(taskExecForm$ | async) as taskExecForm">
-    <div
-      [class.has-configurations]="
-        architect.configurations && architect.configurations.length > 0
-      "
-    >
-      <div class="form-header-container" #formHeaderContainer>
-        <div class="form-header">
-          <div class="filter-container fx-align-start-center fx-row">
-            <input
-              type="text"
-              placeholder="Search flags"
-              [formControl]="filterFieldsControl"
-            />
+<ng-container *ngIf="(taskExecForm$ | async) as taskExecForm">
+  <div
+    [class.has-configurations]="
+      taskExecForm.architect.configurations &&
+      taskExecForm.architect.configurations.length > 0
+    "
+  >
+    <div class="form-header-container" #formHeaderContainer>
+      <div class="form-header">
+        <div class="filter-container fx-align-start-center fx-row">
+          <input
+            type="text"
+            placeholder="Search flags"
+            [formControl]="filterFieldsControl"
+          />
+        </div>
+        <div
+          class="configurations-container fx-row"
+          *ngIf="taskExecForm.form.get('configuration') as configurationControl"
+        >
+          <div
+            class="configuration"
+            [class.selected]="!configurationControl.value"
+            (click)="configurationControl.setValue()"
+          >
+            Default
           </div>
           <div
-            class="configurations-container fx-row"
-            *ngIf="taskExecForm.get('configuration') as configurationControl"
+            class="configuration"
+            [class.selected]="configurationControl.value === configuration.name"
+            *ngFor="let configuration of taskExecForm.architect.configurations"
+            (click)="configurationControl.setValue(configuration.name)"
           >
-            <div
-              class="configuration"
-              [class.selected]="!configurationControl.value"
-              (click)="configurationControl.setValue()"
-            >
-              Default
-            </div>
-            <div
-              class="configuration"
-              [class.selected]="
-                configurationControl.value === configuration.name
-              "
-              *ngFor="let configuration of architect.configurations"
-              (click)="configurationControl.setValue(configuration.name)"
-            >
-              {{ configuration.name | titlecase }}
-            </div>
+            {{ configuration.name | titlecase }}
           </div>
-        </div>
-      </div>
-
-      <div class="scroll-container" #scrollContainer>
-        <div class="form-container flags-and-fields-container fx-row">
-          <vscode-ui-field-tree></vscode-ui-field-tree>
-          <form
-            class="fields"
-            [formGroup]="taskExecForm"
-            *ngIf="(filteredFields$ | async) as filteredFields"
-          >
-            <div class="title-container fx-row">
-              <span class="fx-flex title">
-                {{ architect.title }}
-                <ng-container
-                  *ngIf="
-                    taskExecForm.get('configuration')?.value as configuration
-                  "
-                >
-                  <ng-container
-                    *ngIf="configuration === 'production'; else otherConfig"
-                  >
-                    --prod
-                  </ng-container>
-                  <ng-template #otherConfig>
-                    --c={{ configuration }}
-                  </ng-template>
-                </ng-container>
-              </span>
-              <div class="run-button">
-                Run
-              </div>
-            </div>
-            <div
-              *ngFor="let field of architect.schema"
-              class="list-row"
-              role="treeitem"
-            >
-              <angular-console-field
-                [field]="field"
-                [formControlName]="field.name"
-                [style.display]="filteredFields[field.name] ? 'block' : 'none'"
-              ></angular-console-field>
-            </div>
-            <div class="run-button bottom">
-              Run
-            </div>
-          </form>
         </div>
       </div>
     </div>
-  </ng-container>
+
+    <div class="scroll-container" #scrollContainer>
+      <div
+        class="form-container flags-and-fields-container fx-row"
+        *ngIf="(filteredFields$ | async) as filteredFields"
+      >
+        <vscode-ui-field-tree
+          [activeFieldName]="activeFieldName$ | async"
+          [fieldBins]="fieldBins$ | async"
+          [filteredFields]="filteredFields"
+        ></vscode-ui-field-tree>
+        <form class="fields fx-flex" [formGroup]="taskExecForm.form">
+          <div class="title-container fx-row">
+            <span class="fx-flex title">
+              {{ taskExecForm.architect.title }}
+              <ng-container
+                *ngIf="
+                  taskExecForm.form.get('configuration')?.value as configuration
+                "
+              >
+                {{
+                  configuration === 'production'
+                    ? '--prod'
+                    : '--c=' + configuration
+                }}
+              </ng-container>
+            </span>
+            <div class="run-button">
+              Run
+            </div>
+          </div>
+
+          <angular-console-field
+            [id]="field.name + '-angular-console-field'"
+            *ngFor="let field of taskExecForm.architect.schema"
+            class="list-row"
+            role="treeitem"
+            [class.changed-from-default]=""
+            [field]="field"
+            [formControlName]="field.name"
+            [style.display]="filteredFields.has(field.name) ? 'block' : 'none'"
+          ></angular-console-field>
+          <div
+            class="run-button bottom"
+            *ngIf="filteredFields.size > 0; else noMatch"
+          >
+            Run
+          </div>
+          <ng-template #noMatch>
+            <div>
+              No settings found -
+              <span
+                class="clear-search"
+                (click)="filterFieldsControl.setValue('')"
+              >
+                Clear search
+              </span>
+            </div>
+          </ng-template>
+        </form>
+      </div>
+    </div>
+  </div>
 </ng-container>

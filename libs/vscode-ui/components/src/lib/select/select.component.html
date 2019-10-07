@@ -1,5 +1,5 @@
 <!-- description -->
-<div class="description" [id]="descriptionId">
+<div class="description">
   {{ field.description }}
 </div>
 
@@ -13,7 +13,6 @@
     [id]="field.name"
     [required]="field.required"
     [disabled]="disabled"
-    [attr.aria-labelledby]="descriptionId"
   >
     <option
       *ngFor="let optionValue of field.enum"

@@ -5,6 +5,7 @@ import { TASK_EXECUTION_SCHEMA } from '@angular-console/vscode-ui/feature-task-e
 // The list of file replacements can be found in `angular.json`.
 
 export const NG_BUILD_ARCHITECT = {
+  title: 'ng build vscode-ui',
   schema: [
     {
       name: 'assets',
@@ -525,7 +526,8 @@ export const NG_BUILD_ARCHITECT = {
 };
 
 export const MOCK_COMPONENT_ARCHITECT = {
-  name: 'ng generate component',
+  title: 'ng generate component',
+  name: 'component',
   project: 'Project',
   builder: 'Builder',
   description: 'Description',
@@ -784,7 +786,7 @@ export const environment = {
   providers: [
     {
       provide: TASK_EXECUTION_SCHEMA,
-      useValue: MOCK_COMPONENT_ARCHITECT
+      useValue: NG_BUILD_ARCHITECT
     }
   ]
 };

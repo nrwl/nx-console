@@ -1,32 +1,25 @@
-<div class="field-contents">
-  <div class="field-title">
-    <span class="field-category"></span>
-    <span class="field-label">
-      {{ field.name }}
-    </span>
-  </div>
-  <ng-container [ngSwitch]="field.type">
-    <angular-console-checkbox
-      *ngIf="field.type === 'boolean'"
-      [field]="field"
-      [(value)]="value"
-      [descriptionId]="descriptionId"
-    ></angular-console-checkbox>
-
-    <angular-console-select
-      *ngSwitchCase="'enum'"
-      [field]="field"
-      [(value)]="value"
-      [descriptionId]="descriptionId"
-    ></angular-console-select>
-
-    <angular-console-input
-      *ngIf="
-        field.type === 'string' && (!field.enum || field.enum.length >= 10)
-      "
-      [field]="field"
-      [(value)]="value"
-      [descriptionId]="descriptionId"
-    ></angular-console-input>
-  </ng-container>
+<div class="field-title">
+  <span class="field-category"></span>
+  <span class="field-label">
+    {{ field.name }}
+  </span>
 </div>
+<ng-container [ngSwitch]="field.type">
+  <angular-console-checkbox
+    *ngIf="field.type === 'boolean'"
+    [field]="field"
+    [(value)]="value"
+  ></angular-console-checkbox>
+
+  <angular-console-select
+    *ngSwitchCase="'enum'"
+    [field]="field"
+    [(value)]="value"
+  ></angular-console-select>
+
+  <angular-console-input
+    *ngIf="field.type === 'string' && (!field.enum || field.enum.length >= 10)"
+    [field]="field"
+    [(value)]="value"
+  ></angular-console-input>
+</ng-container>

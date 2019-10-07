@@ -1,4 +1,38 @@
+@import 'variables';
+
 :host {
   display: block;
   width: 180px;
+}
+
+.tree-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 22px;
+  height: 22px;
+  font-size: 14px;
+  opacity: 0.9;
+  flex-shrink: 1;
+  font-weight: 300;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &:active,
+  &.active {
+    opacity: 1;
+    color: $primary-text-color;
+  }
+
+  &.indented {
+    margin-left: 32px;
+  }
+
+  &.selected {
+    font-weight: 700;
+    opacity: 1;
+  }
 }
