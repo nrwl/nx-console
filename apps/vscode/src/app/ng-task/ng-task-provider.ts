@@ -1,11 +1,13 @@
 import { FileUtils, readJsonFile } from '@angular-console/server';
 import { ProviderResult, Task, TaskProvider, window } from 'vscode';
+import * as path from 'path';
 
 import { NgTask } from './ng-task';
 import {
   AngularJson,
   NgTaskDefinition,
   ProjectDef,
+  NamedProject,
   Projects
 } from './ng-task-definition';
 
@@ -19,8 +21,8 @@ export class NgTaskProvider implements TaskProvider {
     return this.workspacePath;
   }
 
-  setWorkspacePath(path: string) {
-    this.workspacePath = path;
+  setWorkspacePath(workspacePath: string) {
+    this.workspacePath = workspacePath;
     this.ngTasksPromise = undefined;
   }
 
@@ -93,5 +95,15 @@ export class NgTaskProvider implements TaskProvider {
 
   getProjectEntries(): [string, ProjectDef][] {
     return Object.entries(this.getProjects() || {}) as [string, ProjectDef][];
+  }
+
+  projectForPath(selectedPath: string): NamedProject | null {
+    if (!this.workspacePath) return null;
+
+    const entry = this.getProjectEntries().find(([_, def]) =>
+      selectedPath.startsWith(path.join(this.workspacePath!, def.root))
+    );
+
+    return entry ? { name: entry[0], ...entry[1] } : null;
   }
 }
