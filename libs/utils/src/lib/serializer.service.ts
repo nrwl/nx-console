@@ -96,18 +96,17 @@ export class Serializer {
   }
 
   private importantSchematicField(collection: string, name: string) {
-    if (
-      collection === '@schematics/angular' ||
-      collection === '@ngrx/schematics' ||
-      collection === '@nrwl/schematics'
-    ) {
-      return (
-        name === 'export' ||
-        name === 'module' ||
-        name === 'project' ||
-        name === 'directory' ||
-        name === 'name'
-      );
+    const importantCollections = ['@angular', '@ngrx', '@nrwl'];
+    const importantNames = new Set([
+      'export',
+      'module',
+      'project',
+      'directory',
+      'name'
+    ]);
+
+    if (importantCollections.some(c => collection.startsWith(c))) {
+      return importantNames.has(name);
     } else {
       return false;
     }

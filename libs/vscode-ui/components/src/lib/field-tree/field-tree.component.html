@@ -1,3 +1,27 @@
-<p>
-  field-tree works!
-</p>
+<ng-container *ngFor="let bin of fieldBins">
+  <ng-container *ngIf="fieldBins.length > 1; else singleBin">
+    <div>{{ bin.title }}</div>
+    <div
+      class="indented tree-item"
+      *ngFor="let field of bin.fields"
+      (click)="scrollToField(field)"
+      [class.active]="activeFieldName === field"
+      [id]="field + '-field-tree-item'"
+      [style.display]="filteredFields.has(field) ? 'block' : 'none'"
+    >
+      {{ camelToTitle(field) }}
+    </div>
+  </ng-container>
+  <ng-template #singleBin>
+    <div
+      class="tree-item"
+      *ngFor="let field of bin.fields"
+      (click)="scrollToField(field)"
+      [class.active]="activeFieldName === field"
+      [id]="field + '-field-tree-item'"
+      [style.display]="filteredFields.has(field) ? 'block' : 'none'"
+    >
+      {{ camelToTitle(field) }}
+    </div>
+  </ng-template>
+</ng-container>

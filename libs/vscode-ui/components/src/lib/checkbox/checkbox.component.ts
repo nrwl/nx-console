@@ -16,11 +16,10 @@ import { Schema } from '@angular-console/schema';
 export class CheckboxComponent {
   @Input() field: Schema;
   @Input() disabled = false;
-  @Input() value: string;
-  @Input() descriptionId: string;
-  @Output() readonly valueChange = new EventEmitter<boolean>();
+  @Input() value: 'true' | 'false';
+  @Output() readonly valueChange = new EventEmitter<'true' | 'false'>();
 
-  updateValue(updated: boolean): void {
+  updateValue(updated: 'true' | 'false'): void {
     this.valueChange.emit(updated);
   }
 }

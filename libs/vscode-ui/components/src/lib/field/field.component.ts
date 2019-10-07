@@ -1,12 +1,10 @@
 import { Schema } from '@angular-console/schema';
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   forwardRef,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef
+  Input
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -25,20 +23,13 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     }
   ]
 })
-export class FieldComponent implements ControlValueAccessor, OnChanges {
+export class FieldComponent implements ControlValueAccessor {
   @Input() field: Schema;
   _value: string;
 
   disabled = false;
-  descriptionId: string;
   onChange: any = () => {};
   onTouched: any = () => {};
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.field && this.field) {
-      this.descriptionId = this.field.name + '_setting_description';
-    }
-  }
 
   get value(): string {
     return this._value;
@@ -67,4 +58,9 @@ export class FieldComponent implements ControlValueAccessor, OnChanges {
   }
 
   constructor(private readonly changeDetectorRef: ChangeDetectorRef) {}
+
+  camelToTitle(camelCase: string) {
+    const result = camelCase.replace(/([A-Z])/g, ' $1');
+    return result.charAt(0).toUpperCase() + result.slice(1);
+  }
 }

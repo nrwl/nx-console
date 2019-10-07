@@ -17,7 +17,6 @@ export class InputComponent {
   @Input() field: Schema;
   @Input() disabled = false;
   @Input() value: string;
-  @Input() descriptionId: string;
   @Output() readonly valueChange = new EventEmitter<string>();
 
   updateValue(updated: string): void {

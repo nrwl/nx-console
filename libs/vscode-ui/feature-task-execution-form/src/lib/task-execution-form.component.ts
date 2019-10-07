@@ -1,16 +1,22 @@
+import { FieldTreeBin } from '@angular-console/vscode-ui/components';
 import {
+  AfterViewChecked,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  ElementRef,
   Inject,
   NgZone,
   OnInit,
-  ChangeDetectorRef,
-  ViewChild,
-  ElementRef,
-  AfterViewChecked
+  ViewChild
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { combineLatest, Observable, ReplaySubject } from 'rxjs';
+import {
+  combineLatest,
+  Observable,
+  ReplaySubject,
+  BehaviorSubject
+} from 'rxjs';
 import {
   distinctUntilChanged,
   map,
@@ -42,12 +48,56 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   @ViewChild('formHeaderContainer', { static: false })
   formHeaderContainer: ElementRef<HTMLElement>;
 
+  private readonly activeFieldIdSubject = new BehaviorSubject<string>('');
+  readonly activeFieldName$ = this.activeFieldIdSubject.pipe(
+    distinctUntilChanged(),
+    map(field => field.replace('-angular-console-field', ''))
+  );
+
   private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
 
   readonly architect$ = this.architectSubject.asObservable();
 
-  readonly taskExecForm$: Observable<FormGroup> = this.architect$.pipe(
-    map(architect => this.buildForm(architect)),
+  readonly fieldBins$: Observable<FieldTreeBin[]> = this.architect$.pipe(
+    map(architect => {
+      return [
+        {
+          title: 'All fields',
+          fields: architect.schema.map(field => field.name)
+        }
+      ];
+    })
+  );
+
+  readonly taskExecForm$: Observable<{
+    form: FormGroup;
+    architect: TaskExecutionSchema;
+  }> = this.architect$.pipe(
+    map(architect => ({ form: this.buildForm(architect), architect })),
+    shareReplay()
+  );
+
+  readonly defaultValues$ = this.taskExecForm$.pipe(
+    map(({ architect, form }) => {
+      const configurationControl = form.get('configuration');
+
+      const configurations = architect.configurations!;
+      const defaultValues: { [key: string]: string } = {};
+      architect.schema.forEach(field => {
+        defaultValues[field.name] = field.defaultValue || '';
+      });
+      if (configurationControl && configurationControl.value) {
+        const configuration = configurations.find(
+          c => c.name === configurationControl.value
+        )!;
+
+        configuration.defaultValues.forEach(value => {
+          defaultValues[value.name] = value.defaultValue || '';
+        });
+      }
+
+      return defaultValues;
+    }),
     shareReplay()
   );
 
@@ -60,9 +110,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     distinctUntilChanged()
   );
 
-  readonly filteredFields$: Observable<{
-    [key: string]: boolean;
-  }> = combineLatest([
+  readonly filteredFields$: Observable<Set<string>> = combineLatest([
     this.architect$.pipe(
       map(architect => {
         return architect.schema.map(field => {
@@ -76,13 +124,12 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     this.filterValue$
   ]).pipe(
     map(([fields, filterValue]) => {
-      const filteredFields: {
-        [key: string]: boolean;
-      } = {};
+      const filteredFields = new Set<string>();
+
       fields.forEach(field => {
-        filteredFields[field.fieldName] = field.fieldNameLowerCase.includes(
-          filterValue
-        );
+        if (field.fieldNameLowerCase.includes(filterValue)) {
+          filteredFields.add(field.fieldName);
+        }
       });
 
       return filteredFields;
@@ -117,11 +164,32 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     this.ngZone.runOutsideAngular(() => {
       const scrollElement = this.scrollContainer.nativeElement;
       const formHeaderElement = this.formHeaderContainer.nativeElement;
-      scrollElement.onscroll = function() {
-        if (scrollElement.scrollTop > 0) {
-          formHeaderElement.classList.add('scrolled');
-        } else {
+      let scrolled = false;
+      scrollElement.onscroll = () => {
+        if (scrollElement.scrollTop === 0) {
           formHeaderElement.classList.remove('scrolled');
+          scrolled = false;
+        } else {
+          if (!scrolled) {
+            formHeaderElement.classList.add('scrolled');
+            scrolled = true;
+          }
+        }
+
+        const fields = Array.from(
+          scrollElement.querySelectorAll<HTMLElement>('angular-console-field')
+        );
+        const top =
+          Number(scrollElement.scrollTop) +
+          Number(scrollElement.offsetTop) -
+          24;
+        const activeField =
+          fields.find((e: HTMLElement) => e.offsetTop > top) || fields[0];
+
+        if (this.activeFieldIdSubject.value !== activeField.id) {
+          this.ngZone.run(() => {
+            this.activeFieldIdSubject.next(activeField.id);
+          });
         }
       };
     });
@@ -159,21 +227,20 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     configurationName?: string
   ) {
     const configurations = architect.configurations!;
+    const defaultValues: { [key: string]: string } = {};
+    architect.schema.forEach(field => {
+      defaultValues[field.name] = field.defaultValue || '';
+    });
     if (configurationName) {
       const configuration = configurations.find(
         c => c.name === configurationName
       )!;
 
-      const values: { [key: string]: string } = {};
       configuration.defaultValues.forEach(value => {
-        values[value.name] = value.defaultValue || '';
-      });
-
-      taskExecForm.patchValue(values);
-    } else {
-      architect.schema.forEach(field => {
-        taskExecForm.get(field.name)!.setValue(field.defaultValue || '');
+        defaultValues[value.name] = value.defaultValue || '';
       });
     }
+
+    taskExecForm.patchValue(defaultValues);
   }
 }

@@ -1,13 +1,14 @@
 @import 'variables';
 
-$filter-offset: 46px;
+$filter-offset: 30px;
 $host-padding-top: 16px;
 $host-padding-left: 28px;
 $host-padding-right: 36px;
 $scrollbar-width: 14px;
-$configurations-offset: 46px;
-
-$offset-without-configurations: $filter-offset + $host-padding-top;
+$configurations-offset: 54px;
+$form-header-padding-bottom: $host-padding-top;
+$offset-without-configurations: $filter-offset + $host-padding-top +
+  $form-header-padding-bottom;
 $offset-with-configurations: $offset-without-configurations +
   $configurations-offset;
 
@@ -43,28 +44,28 @@ $offset-with-configurations: $offset-without-configurations +
   }
 }
 
+.scroll-container,
 .form-container,
 vscode-ui-field-tree {
-  padding-top: $host-padding-top * 2;
-}
-
-.form-container {
-  height: calc(100vh - #{$offset-without-configurations});
+  box-sizing: border-box;
+  padding-top: $host-padding-top / 2;
+  max-height: calc(100vh - #{$offset-without-configurations});
 
   .has-configurations & {
-    height: calc(100vh - #{$offset-with-configurations});
-  }
-
-  vscode-ui-field-tree {
-    height: 100%;
+    max-height: calc(100vh - #{$offset-with-configurations});
   }
 }
 
 vscode-ui-field-tree {
-  overflow: auto;
+  overflow: hidden;
   position: fixed;
   bottom: 0;
+  z-index: 1;
   top: #{$offset-without-configurations};
+
+  &:hover {
+    overflow: auto;
+  }
 
   .has-configurations & {
     top: #{$offset-with-configurations};
@@ -72,7 +73,7 @@ vscode-ui-field-tree {
 }
 
 form {
-  margin-left: 180px;
+  margin-left: 206px;
   padding-right: $host-padding-right - $scrollbar-width;
 }
 
@@ -156,9 +157,15 @@ form {
 
   .configuration {
     margin-right: 24px;
+    cursor: pointer;
 
     &.selected {
       border-bottom: 2px solid white;
     }
   }
+}
+
+.clear-search {
+  cursor: pointer;
+  text-decoration: underline;
 }
