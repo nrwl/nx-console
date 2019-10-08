@@ -3,12 +3,6 @@
 @import 'variables';
 @import 'styles.prod';
 
-body {
-  background-color: $bg-color;
-  color: $text-color;
-  font-family: $default-font;
-}
-
 ::-webkit-scrollbar-thumb {
   background-color: #484950;
 }

@@ -1,20 +1,23 @@
 @import 'variables';
 
 .description {
-  color: $control-description-text-color;
   margin: 0 0 0.5rem 0;
   user-select: text;
   white-space: normal;
 }
 
 input {
-  background-color: $bg-color-offset;
-  border-color: $input-border-color;
-  border-radius: $input-border-radius-size;
+  background-color: var(--vscode-settings-textInputBackground, #eee);
+  border-color: var(--vscode-settings-textInputBorder);
+  border-style: solid;
   border-width: $input-border-width;
+  color: var(--vscode-settings-textInputForeground);
   box-sizing: border-box;
-  color: $text-color;
   font: inherit;
   padding: 0.3rem 0.5rem;
   width: $input-width;
+}
+
+.modified-indicator {
+  @include field-modified-indicator;
 }

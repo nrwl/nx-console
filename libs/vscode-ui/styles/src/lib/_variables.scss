@@ -1,16 +1,3 @@
-// Fonts
-$default-font: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Helvetica,
-  Arial, sans-serif;
-
-// Colors
-$bg-color: #263238;
-$bg-color-offset: #151d20;
-
-$text-color: #eff;
-$input-border-color: rgba(255, 255, 255, 0.1);
-$control-description-text-color: rgba(204, 204, 204, 0.9);
-
-// Sizes
 $input-border-width: 1px;
 $input-border-radius-size: 3px;
 $input-width: 320px;
@@ -19,3 +6,17 @@ $button-primary-color: #45bc98;
 $scroll-bar-width: 12px;
 
 $primary-text-color: #5c6bc0;
+
+/** Commented out until modified indicator functionality is implemented */
+@mixin field-modified-indicator {
+  // border-color: var(--vscode-settings-modifiedItemIndicator);
+  // border-left-width: 2px;
+  // border-left-style: solid;
+  // content: ' ';
+  // display: block;
+  // position: absolute;
+  // width: 6px;
+  // left: -9px;
+  // top: 10px;
+  // bottom: 5px;
+}

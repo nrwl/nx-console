@@ -24,7 +24,7 @@
   &:active,
   &.active {
     opacity: 1;
-    color: $primary-text-color;
+    color: var(--vscode-list-activeSelectionForeground, $primary-text-color);
   }
 
   &.indented {
