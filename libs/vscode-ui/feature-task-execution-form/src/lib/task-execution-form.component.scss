@@ -29,6 +29,7 @@ $offset-with-configurations: $offset-without-configurations +
   width: 80px;
   height: 30px;
   background: $button-primary-color;
+  color: #fff;
   text-align: center;
   line-height: 30px;
   cursor: pointer;
@@ -92,8 +93,8 @@ form {
 .filter-container {
   border-width: 1px;
   border-style: solid;
-  background-color: $bg-color-offset;
-  border-color: $input-border-color;
+  background-color: var(--vscode-settings-textInputBackground, #eee);
+  border-color: var(--vscode-settings-textInputBorder);
   border-radius: $input-border-radius-size;
   height: 30px;
   box-sizing: border-box;
@@ -105,7 +106,7 @@ form {
     height: 20px;
     margin: none;
     box-sizing: border-box;
-    color: $text-color;
+    color: var(--vscode-settings-textInputForeground);
     background: transparent;
     border: none !important;
     outline: none !important;

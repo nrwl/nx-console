@@ -3,7 +3,8 @@ import {
   ChangeDetectionStrategy,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
+  ViewEncapsulation
 } from '@angular/core';
 import { Schema } from '@angular-console/schema';
 
@@ -11,7 +12,8 @@ import { Schema } from '@angular-console/schema';
   selector: 'angular-console-checkbox',
   templateUrl: './checkbox.component.html',
   styleUrls: ['./checkbox.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class CheckboxComponent {
   @Input() field: Schema;

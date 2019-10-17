@@ -1,41 +1,53 @@
 @import 'variables';
 
-.description {
-  color: $control-description-text-color;
-  margin: 0;
-  user-select: none;
-  white-space: normal;
-}
-
-.value-description {
-  display: flex;
-  cursor: pointer;
-  margin-top: 0.2rem;
-}
-
-.bool-control {
-  align-items: flex-start;
-  display: flex;
-}
-
-$checkbox-size: 1rem;
-
-.checkbox {
-  background-color: $bg-color-offset;
-  background-size: $checkbox-size !important;
-  border: $input-border-width solid transparent;
-  border-radius: $input-border-radius-size;
-  color: $text-color;
-  height: $checkbox-size;
-  width: $checkbox-size;
-  min-height: $checkbox-size;
-  min-width: $checkbox-size;
-  margin: 0 0.5rem 0.2rem 0;
-  padding: 0;
-
-  &.checked {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 3.763l-9.193 8.172-.721-.042L1 7.296l.763-.678 3.747 4.214L14.321 3l.679.763z' fill='%23ffffff'/%3E%3C/svg%3E");
-    background-position: 50%;
-    background-repeat: no-repeat;
+angular-console-checkbox {
+  .description {
+    margin: 0;
+    user-select: none;
+    white-space: normal;
   }
+
+  .value-description {
+    display: flex;
+    cursor: pointer;
+    margin-top: 0.2rem;
+  }
+
+  .bool-control {
+    align-items: flex-start;
+    display: flex;
+  }
+
+  $checkbox-size: 1rem;
+
+  .checkbox {
+    background-color: var(--vscode-settings-checkboxBackground, #eee);
+    background-size: $checkbox-size !important;
+    border: solid $input-border-width
+      var(--vscode-settings-checkboxBorder, #000);
+    border-radius: $input-border-radius-size;
+    color: var(--vscode-settings-checkboxForeground);
+    height: $checkbox-size;
+    width: $checkbox-size;
+    min-height: $checkbox-size;
+    min-width: $checkbox-size;
+    margin: 0 0.5rem 0.2rem 0;
+    padding: 0;
+
+    &.checked {
+      // black check
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 3.763l-9.193 8.172-.721-.042L1 7.296l.763-.678 3.747 4.214L14.321 3l.679.763z' fill='%23000000'/%3E%3C/svg%3E");
+      background-position: 50%;
+      background-repeat: no-repeat;
+    }
+  }
+
+  .modified-indicator {
+    @include field-modified-indicator;
+  }
+}
+
+.vscode-dark .checkbox.checked {
+  // white check
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 3.763l-9.193 8.172-.721-.042L1 7.296l.763-.678 3.747 4.214L14.321 3l.679.763z' fill='%23ffffff'/%3E%3C/svg%3E");
 }
