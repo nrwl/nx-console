@@ -4,24 +4,26 @@
     <div
       class="indented tree-item"
       *ngFor="let field of bin.fields"
-      (click)="scrollToField(field)"
-      [class.active]="activeFieldName === field"
-      [id]="field + '-field-tree-item'"
-      [style.display]="filteredFields.has(field) ? 'block' : 'none'"
+      (click)="scrollToField(field.name)"
+      [class.active]="activeFieldName === field.name"
+      [id]="field.name + '-field-tree-item'"
+      [style.display]="filteredFields.has(field.name) ? 'block' : 'none'"
     >
-      {{ camelToTitle(field) }}
+      {{ camelToTitle(field.name) }}
+      <ng-container *ngIf="field.required">*</ng-container>
     </div>
   </ng-container>
   <ng-template #singleBin>
     <div
       class="tree-item"
       *ngFor="let field of bin.fields"
-      (click)="scrollToField(field)"
-      [class.active]="activeFieldName === field"
-      [id]="field + '-field-tree-item'"
-      [style.display]="filteredFields.has(field) ? 'block' : 'none'"
+      (click)="scrollToField(field.name)"
+      [class.active]="activeFieldName === field.name"
+      [id]="field.name + '-field-tree-item'"
+      [style.display]="filteredFields.has(field.name) ? 'block' : 'none'"
     >
-      {{ camelToTitle(field) }}
+      {{ camelToTitle(field.name) }}
+      <ng-container *ngIf="field.required">*</ng-container>
     </div>
   </ng-template>
 </ng-container>

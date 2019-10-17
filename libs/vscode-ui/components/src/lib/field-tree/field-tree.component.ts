@@ -5,10 +5,11 @@ import {
   SimpleChanges,
   OnChanges
 } from '@angular/core';
+import { Schema } from '@angular-console/schema';
 
 export interface FieldTreeBin {
   title: string;
-  fields: Array<string>;
+  fields: Array<Schema>;
 }
 
 @Component({
@@ -17,14 +18,20 @@ export interface FieldTreeBin {
   styleUrls: ['./field-tree.component.scss']
 })
 export class FieldTreeComponent implements OnChanges {
-  @Input() fieldBins: Array<{ title: string; fields: Array<string> }>;
+  @Input() fieldBins: Array<FieldTreeBin>;
   @Input() activeFieldName: string;
   @Input() filteredFields: Set<string>;
+
+  userSelectedField?: string;
 
   constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
   ngOnChanges(simpleChanges: SimpleChanges) {
     if (simpleChanges.activeFieldName) {
+      if (this.userSelectedField) {
+        this.activeFieldName = this.userSelectedField;
+        this.userSelectedField = undefined;
+      }
       const item = document.getElementById(
         this.activeFieldName + '-field-tree-item'
       );
@@ -35,7 +42,8 @@ export class FieldTreeComponent implements OnChanges {
 
       if (
         item &&
-        (item.offsetTop < parentTop || item.offsetTop > parentBottom)
+        (item.offsetTop < parentTop ||
+          item.offsetTop + item.offsetHeight > parentBottom)
       ) {
         item.scrollIntoView({
           block: 'nearest',
@@ -51,6 +59,8 @@ export class FieldTreeComponent implements OnChanges {
   }
 
   scrollToField(fieldName: string) {
+    this.activeFieldName = fieldName;
+    this.userSelectedField = fieldName;
     const element = document.getElementById(
       fieldName + '-angular-console-field'
     );
