@@ -1,0 +1,67 @@
+@import 'variables';
+
+angular-console-autocomplete {
+  .description {
+    margin: 0 0 0.5rem 0;
+    user-select: text;
+    white-space: normal;
+  }
+
+  .autocomplete-container {
+    position: relative;
+    width: $input-width - 2px;
+  }
+
+  input {
+    background-color: var(--vscode-settings-textInputBackground, #eee);
+    border-color: var(--vscode-settings-textInputBorder);
+    border-style: solid;
+    border-width: $input-border-width;
+    color: var(--vscode-settings-textInputForeground);
+    box-sizing: border-box;
+    font: inherit;
+    padding: 0.3rem 0.5rem;
+    width: $input-width;
+  }
+
+  .modified-indicator {
+    @include field-modified-indicator;
+  }
+
+  .autocomplete-panel {
+    background-color: var(--vscode-settings-dropdownBackground, #eee);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 30px;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .no-result {
+    pointer-events: none;
+  }
+
+  .option {
+    border-color: var(--vscode-settings-dropdownBorder);
+    box-sizing: border-box;
+    padding: 0.4rem 0.6rem;
+    font-size: 14px;
+    color: var(--vscode-settings-textInputForeground);
+    cursor: pointer;
+    display: block;
+    width: 100%;
+
+    &:hover,
+    &.selected {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+.vscode-dark .option {
+  &:hover,
+  &.selected {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}

@@ -5,22 +5,28 @@
     <ng-container *ngIf="field.required">*</ng-container>
   </span>
 </div>
-<ng-container [ngSwitch]="field.type">
-  <angular-console-checkbox
-    *ngIf="field.type === 'boolean'"
-    [field]="field"
-    [(value)]="value"
-  ></angular-console-checkbox>
 
-  <angular-console-select
-    *ngSwitchCase="'enum'"
-    [field]="field"
-    [(value)]="value"
-  ></angular-console-select>
+<angular-console-autocomplete
+  *ngIf="field.type === 'array'"
+  [field]="field"
+  [formControl]="control"
+  [options]="exampleOptions"
+></angular-console-autocomplete>
 
-  <angular-console-input
-    *ngIf="field.type === 'string' && (!field.enum || field.enum.length >= 10)"
-    [field]="field"
-    [(value)]="value"
-  ></angular-console-input>
-</ng-container>
+<angular-console-checkbox
+  *ngIf="field.type === 'boolean'"
+  [field]="field"
+  [(value)]="value"
+></angular-console-checkbox>
+
+<angular-console-select
+  *ngIf="field.type === 'enum'"
+  [field]="field"
+  [(value)]="value"
+></angular-console-select>
+
+<angular-console-input
+  *ngIf="field.type === 'string' && (!field.enum || field.enum.length >= 10)"
+  [field]="field"
+  [(value)]="value"
+></angular-console-input>

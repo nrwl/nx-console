@@ -1,4 +1,3 @@
-<!-- description -->
 <div class="description">
   {{ field.description }}
 </div>
@@ -16,8 +15,3 @@
     [attr.list]="field.enum ? field.name + '_enum' : undefined"
   />
 </div>
-
-<angular-console-autocomplete
-  *ngIf="field.enum"
-  [field]="field"
-></angular-console-autocomplete>
