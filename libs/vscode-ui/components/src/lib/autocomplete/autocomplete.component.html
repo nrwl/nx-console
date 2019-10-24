@@ -12,8 +12,6 @@
       class="text-input"
       type="text"
       role="textbox"
-      [required]="field.required"
-      [attr.list]="field.enum ? field.name + '_enum' : undefined"
     />
 
     <ng-container *ngIf="(isFocused$ | async)">

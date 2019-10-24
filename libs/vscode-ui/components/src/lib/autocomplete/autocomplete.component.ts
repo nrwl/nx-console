@@ -35,11 +35,13 @@ import {
 } from 'rxjs';
 import { Schema } from '@angular-console/schema';
 
-enum AutocompleteNavKeys {
+export enum AutocompleteNavKeys {
   Enter = 'Enter',
   ArrowUp = 'ArrowUp',
   ArrowDown = 'ArrowDown'
 }
+
+export const AUTOCOMPLETE_NAV_KEYS = new Set(['Enter', 'ArrowUp', 'ArrowDown']);
 
 @Component({
   selector: 'angular-console-autocomplete',
@@ -58,8 +60,7 @@ export class AutocompleteComponent
   implements OnInit, OnDestroy, OnChanges, ControlValueAccessor {
   @Input() field: Schema;
 
-  @Input() options: string[] = [];
-  private readonly _options$ = new BehaviorSubject<string[]>(this.options);
+  private readonly _options$ = new BehaviorSubject<string[]>([]);
   visibleOptions: Observable<string[]>;
   selectedOption$: Observable<number | null>;
 
@@ -67,7 +68,7 @@ export class AutocompleteComponent
   control: FormControl;
   isFocused$: Observable<boolean>;
 
-  private readonly _destroying$ = new Subject<void>();
+  private readonly destroying = new Subject<void>();
 
   constructor(private readonly _elementRef: ElementRef) {}
 
@@ -79,7 +80,7 @@ export class AutocompleteComponent
       this.visibleOptions = this._options$.pipe(
         switchMap(options =>
           this.control.valueChanges.pipe(
-            startWith(this.control.value),
+            startWith(''), // When panel is first opened, show the entire list
             map(formValue =>
               options.filter(option =>
                 option.toLowerCase().includes(formValue.toLowerCase())
@@ -94,13 +95,12 @@ export class AutocompleteComponent
   ngOnInit() {
     this.isFocused$ = merge(
       fromEvent(this._elementRef.nativeElement, 'focusin').pipe(
-        map(() => 'focus in')
+        map(() => true)
       ),
       fromEvent(this._elementRef.nativeElement, 'focusout').pipe(
-        map(() => 'focus out')
+        map(() => false)
       )
     ).pipe(
-      map(last => (last === 'focus in' ? true : false)),
       startWith(false),
       debounceTime(300),
       shareReplay(1)
@@ -114,11 +114,11 @@ export class AutocompleteComponent
                 visibleOptions.length
                   ? fromEvent<KeyboardEvent>(document, 'keyup').pipe(
                       map((event: KeyboardEvent) => event.key),
-                      filter(key => this.isNavigationKey(key)),
+                      filter(key => AUTOCOMPLETE_NAV_KEYS.has(key)),
                       scan(
                         ([index, _]: [number, string | null], key) =>
                           [
-                            this.updatedOptionIndex(
+                            updatedOptionIndex(
                               <AutocompleteNavKeys>key,
                               index || 0,
                               visibleOptions.length
@@ -149,53 +149,8 @@ export class AutocompleteComponent
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.options) {
-      this._options$.next(this.options);
-    }
-  }
-
-  /**
-   * Check if the input key is one relevant to autocomplete panel navigation
-   */
-  isNavigationKey = (key: KeyboardEvent['key']): boolean => {
-    return (
-      key === AutocompleteNavKeys.ArrowUp ||
-      key === AutocompleteNavKeys.ArrowDown ||
-      key === AutocompleteNavKeys.Enter
-    );
-  };
-
-  /**
-   * Updates the index of a selected option based on user input. If the new index
-   * is beyond the scope of the available indices, it should return an index on other
-   * side of the array (to loop around the list).
-   * @param key {AutocompleteNavKeys} KeyboardEvent.key value
-   * @param currentIndex {number} index before user input
-   * @param max {number} total number of options
-   * @returns new option index
-   */
-  updatedOptionIndex(
-    key: AutocompleteNavKeys,
-    currentIndex: number,
-    max: number
-  ): number {
-    let modifier: -1 | 0 | 1 = 0;
-
-    if (key === AutocompleteNavKeys.ArrowDown) {
-      modifier++;
-    }
-    if (key === AutocompleteNavKeys.ArrowUp) {
-      modifier--;
-    }
-
-    const temp = currentIndex + modifier;
-
-    if (temp < 0) {
-      return max - 1;
-    } else if (temp > max - 1) {
-      return 0;
-    } else {
-      return temp;
+    if (changes.field && this.field.enum) {
+      this._options$.next(this.field.enum);
     }
   }
 
@@ -208,7 +163,7 @@ export class AutocompleteComponent
     this.control.valueChanges
       .pipe(
         tap(fn),
-        takeUntil(this._destroying$)
+        takeUntil(this.destroying)
       )
       .subscribe();
   }
@@ -220,6 +175,40 @@ export class AutocompleteComponent
   }
 
   ngOnDestroy() {
-    this._destroying$.next();
+    this.destroying.next();
+  }
+}
+
+/**
+ * Updates the index of a selected option based on user input. If the new index
+ * is beyond the scope of the available indices, it should return an index on other
+ * side of the array (to loop around the list).
+ * @param key {AutocompleteNavKeys} KeyboardEvent.key value
+ * @param currentIndex {number} index before user input
+ * @param numOptions {number} total number of options
+ * @returns new option index
+ */
+function updatedOptionIndex(
+  key: AutocompleteNavKeys,
+  currentIndex: number,
+  numOptions: number
+): number {
+  let modifier: -1 | 0 | 1 = 0;
+
+  if (key === AutocompleteNavKeys.ArrowDown) {
+    modifier++;
+  }
+  if (key === AutocompleteNavKeys.ArrowUp) {
+    modifier--;
+  }
+
+  const selectedIndex = currentIndex + modifier;
+
+  if (selectedIndex < 0) {
+    return numOptions - 1;
+  } else if (selectedIndex > numOptions - 1) {
+    return 0;
+  } else {
+    return selectedIndex;
   }
 }

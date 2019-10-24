@@ -29,11 +29,14 @@ angular-console-autocomplete {
   }
 
   .autocomplete-panel {
+    border-color: var(--vscode-settings-dropdownBorder);
     background-color: var(--vscode-settings-dropdownBackground, #eee);
     position: absolute;
     left: 0;
     right: 0;
     top: 30px;
+    max-height: 150px;
+    overflow-y: scroll;
     width: 100%;
     z-index: 10;
   }

@@ -36,8 +36,6 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
 
   control = new FormControl('');
 
-  exampleOptions = ['Rhino', 'Armadillo', 'Okapi', 'Japanese spider crab'];
-
   disabled = false;
   onChange: any = () => {};
   onTouched: any = () => {};
