@@ -39,9 +39,7 @@ export function runCommand(
       name: id,
       program,
       args: cmds,
-      cwd,
-      isDryRun: !addToRecent,
-      isWsl: fileUtils.isWsl()
+      cwd
     });
     if (commandRunning.onDidWriteData) {
       commandRunning.onDidWriteData(data => {
@@ -85,9 +83,7 @@ export interface PseudoTerminalConfig {
   program: string;
   args: string[];
   cwd: string;
-  isDryRun?: boolean;
   displayCommand: string;
-  isWsl: boolean;
 }
 
 export type PseudoTerminalFactory = (

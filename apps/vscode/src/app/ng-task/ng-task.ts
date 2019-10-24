@@ -2,7 +2,6 @@ import { NgTaskDefinition } from './ng-task-definition';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
 import { FileUtils } from '@angular-console/server';
-import { getTaskId } from '../pseudo-terminal.factory';
 
 export class NgTask extends Task {
   static create(
@@ -10,37 +9,17 @@ export class NgTask extends Task {
     workspacePath: string,
     fileUtils: FileUtils
   ): NgTask {
-    const { projectName, architectName, flags } = definition;
+    const { positional, command, flags } = definition;
 
-    const runTarget = `${projectName}:${architectName}`;
-
-    let args = ['run', runTarget];
-    switch (architectName) {
-      case 'build':
-      case 'lint':
-      case 'deploy':
-      case 'e2e':
-      case 'serve':
-      case 'test':
-      case 'xi18n':
-      case 'add':
-        args = [architectName];
-        if (projectName) args.push(projectName);
-    }
-
-    if (flags) {
-      args = [...args, ...flags.trim().split(/\s+/)];
-    }
+    const args: Array<string> = [command, positional, ...flags];
 
     const displayCommand = `ng ${args.join(' ')}`;
     const task = new NgTask(
-      definition,
+      { ...definition, type: 'shell' },
       TaskScope.Workspace,
-      getTaskId(),
+      'angular-console',
       displayCommand,
       getShellExecutionForConfig({
-        isDryRun: false,
-        isWsl: fileUtils.isWsl(),
         displayCommand,
         args,
         cwd: workspacePath,
@@ -49,7 +28,7 @@ export class NgTask extends Task {
       })
     );
 
-    switch (architectName) {
+    switch (command) {
       case 'build':
         task.group = TaskGroup.Build;
         task.problemMatchers.push('$webpack-builder');

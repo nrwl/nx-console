@@ -1,8 +1,7 @@
 export interface NgTaskDefinition {
-  type: 'shell';
-  projectName?: string;
-  architectName: string;
-  flags?: string;
+  positional: string;
+  command: string;
+  flags: Array<string>;
 }
 
 export interface ArchitectDef {

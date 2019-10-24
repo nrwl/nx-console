@@ -1,18 +1,21 @@
 import {
-  ExtensionContext,
-  TreeView,
-  ViewColumn,
-  WebviewPanel,
-  window,
-  Uri
-} from 'vscode';
-
-import { ProjectDef } from './ng-task/ng-task-definition';
-import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
+  TaskExecutionSchema,
+  TaskExecutionMessage
+} from '@angular-console/vscode-ui/feature-task-execution-form';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { TaskExecutionSchema } from '@angular-console/vscode-ui/feature-task-execution-form';
+import {
+  ExtensionContext,
+  TreeView,
+  Uri,
+  ViewColumn,
+  WebviewPanel,
+  window
+} from 'vscode';
+
+import { NgTaskProvider } from './ng-task/ng-task-provider';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
+import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
 
 let webviewPanel: WebviewPanel | undefined;
 let indexHtml: string | undefined;
@@ -20,25 +23,24 @@ let indexHtml: string | undefined;
 interface RevealWebViewPanelConfig {
   context: ExtensionContext;
   workspaceTreeItem: WorkspaceTreeItem;
-  getProjectEntries(): [string, ProjectDef][];
+  ngTaskProvider: NgTaskProvider;
   workspaceTreeView: TreeView<WorkspaceTreeItem>;
   serverAddress: string;
 }
 
 export async function revealWebViewPanel({
   context,
-  getProjectEntries,
+  ngTaskProvider,
   workspaceTreeItem,
   workspaceTreeView,
   serverAddress
 }: RevealWebViewPanelConfig) {
-  const { workspacePath, projectName, label } = workspaceTreeItem;
+  const { workspacePath, label } = workspaceTreeItem;
 
   const schema = await getTaskExecutionSchema(
     workspacePath,
-    getProjectEntries,
-    label,
-    projectName
+    () => ngTaskProvider.getProjectEntries(),
+    label
   );
 
   if (!schema) {
@@ -49,7 +51,8 @@ export async function revealWebViewPanel({
     context,
     schema,
     serverAddress,
-    label
+    label,
+    ngTaskProvider
   );
   context.subscriptions.push(webViewPanel);
 
@@ -66,7 +69,8 @@ export function createWebViewPanel(
   context: ExtensionContext,
   schema: TaskExecutionSchema,
   serverAddress: string,
-  title: string
+  title: string,
+  ngTaskProvider: NgTaskProvider
 ) {
   if (webviewPanel) {
     webviewPanel.title = title;
@@ -90,6 +94,12 @@ export function createWebViewPanel(
     );
 
     webviewPanel.webview.html = getIframeHtml(context, schema, serverAddress);
+
+    webviewPanel.webview.onDidReceiveMessage(
+      (message: TaskExecutionMessage) => {
+        ngTaskProvider.executeTask(message);
+      }
+    );
   }
 
   return webviewPanel;

@@ -21,13 +21,16 @@ import {
   BehaviorSubject,
   combineLatest,
   Observable,
-  ReplaySubject
+  ReplaySubject,
+  Subscription
 } from 'rxjs';
 import {
+  debounceTime,
   distinctUntilChanged,
   map,
   shareReplay,
-  startWith
+  startWith,
+  tap
 } from 'rxjs/operators';
 
 import {
@@ -35,9 +38,19 @@ import {
   TaskExecutionSchema
 } from './task-execution-form.schema';
 
+export interface TaskExecutionMessage {
+  command: string;
+  positional: string;
+  flags: string[];
+}
+
 declare global {
   interface Window {
     SET_TASK_EXECUTION_SCHEMA: (schema: TaskExecutionSchema) => void;
+
+    vscode: {
+      postMessage: (message: TaskExecutionMessage) => void;
+    };
   }
 }
 
@@ -80,6 +93,20 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect: TaskExecutionSchema;
   }> = this.architect$.pipe(
     map(architect => ({ form: this.buildForm(architect), architect })),
+    tap(taskExecForm => {
+      if (this.dryRunSubscription) {
+        this.dryRunSubscription.unsubscribe();
+        this.dryRunSubscription = undefined;
+      }
+
+      if (taskExecForm.architect.command === 'generate') {
+        this.dryRunSubscription = taskExecForm.form.valueChanges
+          .pipe(debounceTime(500))
+          .subscribe(() => {
+            this.runCommand({ ...taskExecForm, dryRun: true });
+          });
+      }
+    }),
     shareReplay()
   );
 
@@ -135,6 +162,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     shareReplay()
   );
 
+  dryRunSubscription?: Subscription;
+
   constructor(
     private readonly fb: FormBuilder,
     @Inject(TASK_EXECUTION_SCHEMA) public initialSchema: TaskExecutionSchema,
@@ -148,6 +177,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     window.SET_TASK_EXECUTION_SCHEMA = schema => {
       this.ngZone.run(() => {
         this.architectSubject.next(schema);
+
         setTimeout(() => {
           this.changeDetectorRef.detectChanges();
         }, 0);
@@ -275,5 +305,53 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     }
 
     return defaultValues;
+  }
+
+  runCommand({
+    form,
+    architect,
+    dryRun
+  }: {
+    form: FormGroup;
+    architect: TaskExecutionSchema;
+    dryRun?: boolean;
+  }) {
+    const flags = this.serializeArgs(form.value, architect);
+    if (dryRun) {
+      flags.push('--dry-run');
+    }
+    window.vscode.postMessage({
+      command: architect.command,
+      positional: architect.positional,
+      flags
+    });
+  }
+
+  private serializeArgs(
+    value: { [p: string]: any },
+    architect: TaskExecutionSchema,
+    configurationName?: string
+  ): string[] {
+    const fields = architect.schema.filter(s => value[s.name]);
+    const defaultValues = this.getDefaultValuesForConfiguration(
+      architect,
+      configurationName
+    );
+
+    let args: string[] = [];
+    fields.forEach(f => {
+      if (defaultValues[f.name] === value[f.name]) return;
+      if (!defaultValues[f.name] && !value[f.name]) return;
+      if (f.positional) {
+        args.push(value[f.name]);
+      } else if (f.type === 'boolean') {
+        args.push(value[f.name] ? `--${f.name}` : `--no-${f.name}`);
+      } else if (f.type === 'arguments') {
+        args = [...args, ...value[f.name].split(' ').filter((r: any) => !!r)];
+      } else {
+        args.push(`--${f.name}=${value[f.name]}`);
+      }
+    });
+    return args;
   }
 }

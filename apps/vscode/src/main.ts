@@ -85,20 +85,18 @@ export function activate(c: ExtensionContext) {
                 return;
               }
 
-              tasks.executeTask(
-                ngTaskProvider.createTask({
-                  architectName: 'add',
-                  projectName: selection.label,
-                  type: 'shell'
-                })
-              );
+              ngTaskProvider.executeTask({
+                command: 'add',
+                positional: selection.label,
+                flags: []
+              });
             });
         }
 
         revealWebViewPanel({
           workspaceTreeItem,
           context,
-          getProjectEntries: () => ngTaskProvider.getProjectEntries(),
+          ngTaskProvider,
           workspaceTreeView,
           serverAddress: `http://localhost:${port}/`
         });

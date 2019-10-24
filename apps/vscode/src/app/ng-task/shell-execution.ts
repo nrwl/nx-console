@@ -7,12 +7,7 @@ export function getShellExecutionForConfig(
 ): ShellExecution {
   let execution: ShellExecution;
   if (platform() === 'win32') {
-    const isWsl = config.isWsl;
-    if (isWsl) {
-      execution = getWslShellExecution(config);
-    } else {
-      execution = getWin32ShellExecution(config);
-    }
+    execution = getWin32ShellExecution(config);
   } else {
     execution = getUnixShellExecution(config);
   }
@@ -30,20 +25,6 @@ function getWin32ShellExecution(config: PseudoTerminalConfig): ShellExecution {
         / /g,
         '\\ '
       )} ${config.args.join(' ')}}"`
-    ]
-  });
-}
-
-function getWslShellExecution(config: PseudoTerminalConfig): ShellExecution {
-  return new ShellExecution(config.displayCommand, {
-    cwd: config.cwd,
-    executable: 'C:\\Windows\\System32\\wsl.exe',
-    shellArgs: [
-      '-e',
-      'bash',
-      '-l',
-      '-c',
-      `${config.program.replace(/ /g, '\\ ')} ${config.args.join(' ')}`
     ]
   });
 }
