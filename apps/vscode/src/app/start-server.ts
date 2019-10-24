@@ -3,21 +3,15 @@ import {
   QueryResolver,
   SelectDirectory,
   Commands,
-  Telemetry,
-  PseudoTerminalFactory
+  Telemetry
 } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
 import * as path from 'path';
 import { commands, ExtensionContext, window, workspace } from 'vscode';
 import { environment } from '../environments/environment';
-import { executeTask } from './pseudo-terminal.factory';
 import { VSCodeStorage } from './vscode-storage';
 import * as getPort from 'get-port';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
-
-function getPseudoTerminalFactory(): PseudoTerminalFactory {
-  return config => executeTask(config);
-}
 
 export async function startServer(
   context: ExtensionContext,
@@ -101,7 +95,7 @@ export async function startServer(
     { provide: 'serverAddress', useValue: `http://localhost:${port}` },
     { provide: 'store', useValue: store },
     { provide: 'selectDirectory', useValue: selectDirectory },
-    { provide: 'pseudoTerminalFactory', useValue: getPseudoTerminalFactory() },
+    { provide: 'pseudoTerminalFactory', useValue: () => {} },
     { provide: 'assetsPath', useValue: assetsPath },
     { provide: 'showNotification', useValue: showNotification }
   ];

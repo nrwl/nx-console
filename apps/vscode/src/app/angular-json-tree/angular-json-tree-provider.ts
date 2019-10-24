@@ -5,7 +5,6 @@ import {
   ExtensionContext,
   ProviderResult,
   Selection,
-  tasks,
   TextDocument,
   TreeItemCollapsibleState,
   Uri,
@@ -13,8 +12,8 @@ import {
   workspace
 } from 'vscode';
 
-import { NgTaskProvider } from '../ng-task/ng-task-provider';
 import { AbstractTreeProvider } from '../abstract-tree-provider';
+import { NgTaskProvider } from '../ng-task/ng-task-provider';
 import {
   AngularJsonLabel,
   AngularJsonTreeItem
@@ -235,19 +234,16 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       return;
     }
 
-    let flags;
+    const flags = [];
     if (architect.configuration) {
-      flags = `--configuration=${architect.configuration}`;
+      flags.push(`--configuration=${architect.configuration}`);
     }
 
-    return tasks.executeTask(
-      this.ngTaskProvider.createTask({
-        architectName: architect.name,
-        projectName: project,
-        flags,
-        type: 'shell'
-      })
-    );
+    this.ngTaskProvider.executeTask({
+      command: architect.name,
+      positional: project,
+      flags
+    });
   }
 
   private async revealInExplorer(selection: AngularJsonTreeItem) {

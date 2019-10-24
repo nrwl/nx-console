@@ -50,7 +50,8 @@
         <form class="fields fx-flex" [formGroup]="taskExecForm.form">
           <div class="title-container fx-row">
             <span class="fx-flex title">
-              {{ taskExecForm.architect.title }}
+              ng {{ taskExecForm.architect.command }}
+              {{ taskExecForm.architect.positional }}
               <ng-container
                 *ngIf="
                   taskExecForm.form.get('configuration')?.value as configuration
@@ -63,7 +64,7 @@
                 }}
               </ng-container>
             </span>
-            <div class="run-button">
+            <div class="run-button" (click)="runCommand(taskExecForm)">
               Run
             </div>
           </div>
@@ -80,13 +81,14 @@
           ></angular-console-field>
           <div
             class="run-button bottom"
+            (click)="runCommand(taskExecForm)"
             *ngIf="filteredFields.size > 0; else noMatch"
           >
             Run
           </div>
           <ng-template #noMatch>
-            <div>
-              No settings found -
+            <div *ngIf="taskExecForm.architect.schema.length; else noFlags">
+              No flags found -
               <span
                 class="clear-search"
                 (click)="filterFieldsControl.setValue('')"
@@ -94,6 +96,10 @@
                 Clear search
               </span>
             </div>
+
+            <ng-template #noFlags>
+              This command has no flags to set
+            </ng-template>
           </ng-template>
         </form>
       </div>

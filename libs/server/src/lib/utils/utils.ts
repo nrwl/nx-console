@@ -224,7 +224,30 @@ export function normalizeSchema(
         });
       }
     });
-    return res;
+
+    return res.sort((a, b) => {
+      if (a.positional) {
+        return -1;
+      } else if (b.positional) {
+        return 1;
+      } else if (a.required) {
+        if (b.required) {
+          return a.name.localeCompare(b.name);
+        }
+        return -1;
+      } else if (b.required) {
+        return 1;
+      } else if (a.important) {
+        if (b.important) {
+          return a.name.localeCompare(b.name);
+        }
+        return -1;
+      } else if (b.important) {
+        return 1;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    });
   } catch (e) {
     console.error(`normalizeSchema error: '${e.message}'`);
     throw e;

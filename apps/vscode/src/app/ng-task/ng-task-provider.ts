@@ -1,5 +1,12 @@
 import { FileUtils, readJsonFile } from '@angular-console/server';
-import { ProviderResult, Task, TaskProvider, window } from 'vscode';
+import {
+  ProviderResult,
+  Task,
+  TaskProvider,
+  window,
+  tasks,
+  TaskExecution
+} from 'vscode';
 import * as path from 'path';
 
 import { NgTask } from './ng-task';
@@ -14,8 +21,20 @@ import {
 export class NgTaskProvider implements TaskProvider {
   private workspacePath?: string;
   private ngTasksPromise?: Task[];
+  private currentDryRun?: TaskExecution;
+  private deferredDryRun?: NgTaskDefinition;
 
-  constructor(private readonly fileUtils: FileUtils) {}
+  constructor(private readonly fileUtils: FileUtils) {
+    tasks.onDidEndTaskProcess(e => {
+      if (e.execution === this.currentDryRun) {
+        this.currentDryRun = undefined;
+      }
+      if (this.deferredDryRun) {
+        this.executeTask(this.deferredDryRun);
+        this.deferredDryRun = undefined;
+      }
+    });
+  }
 
   getWorkspacePath() {
     return this.workspacePath;
@@ -42,9 +61,10 @@ export class NgTaskProvider implements TaskProvider {
             return [];
           }
 
-          return Object.keys(project.architect).map(architectName => ({
-            architectName,
-            projectName,
+          return Object.keys(project.architect).map(command => ({
+            command,
+            positional: projectName,
+            flags: [],
             type: 'shell'
           }));
         }
@@ -63,12 +83,27 @@ export class NgTaskProvider implements TaskProvider {
       task.definition.architectName &&
       task.definition.projectName
     ) {
-      return this.createTask(task.definition as NgTaskDefinition);
+      return this.createTask((task.definition as unknown) as NgTaskDefinition);
     }
   }
 
   createTask(definition: NgTaskDefinition) {
     return NgTask.create(definition, this.workspacePath || '', this.fileUtils);
+  }
+
+  executeTask(definition: NgTaskDefinition) {
+    const isDryRun = definition.flags.includes('--dry-run');
+    if (isDryRun && this.currentDryRun) {
+      this.deferredDryRun = definition;
+      return;
+    }
+
+    const task = this.createTask(definition);
+    return tasks.executeTask(task).then(execution => {
+      if (isDryRun) {
+        this.currentDryRun = execution;
+      }
+    });
   }
 
   getProjects(): Projects {

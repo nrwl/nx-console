@@ -1,16 +1,18 @@
-import { commands, ExtensionContext, tasks, window } from 'vscode';
+import { commands, ExtensionContext, window } from 'vscode';
 
-import { NgTaskProvider } from './ng-task-provider';
+import { selectSchematic } from '../select-schematic';
 import {
-  WorkspaceTreeItem,
-  WorkspaceRouteTitle
+  WorkspaceRouteTitle,
+  WorkspaceTreeItem
 } from '../workspace-tree/workspace-tree-item';
+import { NgTaskProvider } from './ng-task-provider';
+import { NgTaskQuickPickItem } from './ng-task-quick-pick-item';
 
 const CLI_COMMAND_LIST = [
   'build',
-  'lint',
   'deploy',
   'e2e',
+  'lint',
   'serve',
   'test',
   'xi18n'
@@ -35,33 +37,23 @@ export function registerNgTaskCommands(
     );
   });
 
-  context.subscriptions.push(
-    commands.registerCommand(
-      'angularConsole.generate.explorer',
-      ({ fsPath }) => {
-        const project = n.projectForPath(fsPath);
-        selectNgCliCommandAndShowUi(
-          'generate',
-          n,
-          context.extensionPath,
-          project ? project.name : undefined
-        );
-      }
-    )
-  );
+  commands.registerCommand(`angularConsole.generate`, () =>
+    selectSchematicAndPromptForFlags(n.getWorkspacePath()!)
+  ),
+    commands.registerCommand(`angularConsole.generate.ui`, () =>
+      showUi('generate', n, context.extensionPath)
+    );
 }
 
 async function selectNgCliCommandAndShowUi(
   command: string,
   n: NgTaskProvider,
-  extensionPath: string,
-  projectName?: string
+  extensionPath: string
 ) {
-  if (!projectName) {
-    projectName = await selectNgCliCommand(command);
-    if (!projectName) return;
-  }
+  showUi(command, n, extensionPath);
+}
 
+function showUi(command: string, n: NgTaskProvider, extensionPath: string) {
   const workspacePath = n.getWorkspacePath();
   if (!workspacePath) {
     window.showErrorMessage(
@@ -73,8 +65,7 @@ async function selectNgCliCommandAndShowUi(
   const workspaceTreeItem = new WorkspaceTreeItem(
     workspacePath,
     `${command[0].toUpperCase()}${command.slice(1)}` as WorkspaceRouteTitle,
-    extensionPath,
-    projectName
+    extensionPath
   );
 
   commands.executeCommand(
@@ -84,7 +75,7 @@ async function selectNgCliCommandAndShowUi(
 }
 
 async function selectNgCliCommandAndPromptForFlags(command: string) {
-  const selection = await selectNgCliCommand(command, true);
+  const selection = await selectNgCliProject(command);
   if (!selection) {
     return;
   }
@@ -94,29 +85,51 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
   });
 
   if (typeof flags === 'string') {
-    tasks.executeTask(
-      ngTaskProvider.createTask({
-        type: 'shell',
-        projectName: selection === '--' ? undefined : selection,
-        architectName: command,
-        flags
-      })
-    );
+    ngTaskProvider.executeTask({
+      positional: selection.projectName,
+      command,
+      flags: flags.trim().split(/\s+/)
+    });
   }
 }
 
-function selectNgCliCommand(command: string, includeDefault?: boolean) {
-  const items = [
-    ...(includeDefault ? ['All Projects'] : []),
-    ...ngTaskProvider
-      .getProjectEntries()
-      .map(([projectName, { architect }]) => ({
-        projectName,
-        architectDef: architect && architect[command]
-      }))
-      .filter(({ architectDef }) => Boolean(architectDef))
-      .map(({ projectName }) => projectName)
-  ];
+async function selectSchematicAndPromptForFlags(workspacePath: string) {
+  const selection = await selectSchematic(workspacePath);
+  if (!selection) {
+    return;
+  }
+
+  const flags = await window.showInputBox({
+    placeHolder: 'Flags (optional)'
+  });
+
+  if (typeof flags === 'string') {
+    ngTaskProvider.executeTask({
+      positional: selection.positional,
+      command: 'generate',
+      flags: flags.trim().split(/\s+/)
+    });
+  }
+}
+
+export function selectNgCliProject(command: string) {
+  const items = ngTaskProvider
+    .getProjectEntries()
+    .filter(([_, { architect }]) => Boolean(architect))
+    .flatMap(([project, { architect }]) => ({ project, architect }))
+    .filter(({ architect }) => Boolean(architect && architect[command]))
+    .map(
+      ({ project, architect }) =>
+        new NgTaskQuickPickItem(project, architect![command]!, command, project)
+    );
+
+  if (!items.length) {
+    window.showInformationMessage(
+      `None of your projects support ng ${command}`
+    );
+
+    return;
+  }
 
   return window.showQuickPick(items, {
     placeHolder: `Project to ${command}`

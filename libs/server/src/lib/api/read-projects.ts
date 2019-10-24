@@ -89,26 +89,7 @@ export function readBuilder(basedir: string, builder: string) {
 }
 
 export function readSchema(basedir: string, builder: string) {
-  const schema = readBuilder(basedir, builder).schema as Array<Schema>;
-  return schema.sort((a, b) => {
-    if (a.required) {
-      if (b.required) {
-        return a.name.localeCompare(b.name);
-      }
-      return -1;
-    } else if (b.required) {
-      return 1;
-    } else if (a.important) {
-      if (b.important) {
-        return a.name.localeCompare(b.name);
-      }
-      return -1;
-    } else if (b.important) {
-      return 1;
-    } else {
-      return a.name.localeCompare(b.name);
-    }
-  });
+  return readBuilder(basedir, builder).schema as Array<Schema>;
 }
 
 function readBuildersFile(basedir: string, npmPackage: string): any {

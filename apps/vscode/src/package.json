@@ -44,13 +44,6 @@
   },
   "contributes": {
     "menus": {
-      "explorer/context": [
-        {
-          "command": "angularConsole.generate.explorer",
-          "when": "isAngularWorkspace",
-          "group": "ng"
-        }
-      ],
       "view/title": [
         {
           "command": "angularConsole.refreshAngularJsonTree",
@@ -117,6 +110,12 @@
       },
       {
         "category": "ng",
+        "title": "generate",
+        "command": "angularConsole.generate",
+        "when": "isAngularWorkspace"
+      },
+      {
+        "category": "ng",
         "title": "serve",
         "command": "angularConsole.serve",
         "when": "isAngularWorkspace"
@@ -171,8 +170,8 @@
       },
       {
         "category": "ng",
-        "title": "ng generate",
-        "command": "angularConsole.generate.explorer",
+        "title": "generate (ui)",
+        "command": "angularConsole.generate.ui",
         "when": "isAngularWorkspace"
       }
     ],

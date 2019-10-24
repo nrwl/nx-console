@@ -96,8 +96,7 @@ export class WorkspaceTreeItem extends TreeItem {
   constructor(
     readonly workspacePath: string,
     readonly route: WorkspaceRouteTitle,
-    readonly extensionPath: string,
-    readonly projectName?: string
+    readonly extensionPath: string
   ) {
     super(route, TreeItemCollapsibleState.None);
   }

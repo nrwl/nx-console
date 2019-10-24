@@ -8,7 +8,7 @@
       "script": "build-vs-code",
       "isBackground": true,
       "presentation": {
-        "reveal": "never"
+        "reveal": "always"
       },
       "group": {
         "kind": "build",

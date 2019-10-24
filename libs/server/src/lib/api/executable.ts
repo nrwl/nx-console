@@ -51,7 +51,7 @@ export class Executable {
     name: string,
     private readonly telemetry: Telemetry,
     private readonly buildTerminal: PseudoTerminalFactory,
-    private readonly fileUtils: FileUtils,
+    fileUtils: FileUtils,
     private readonly commands: Commands
   ) {
     this._name = name;
@@ -88,9 +88,7 @@ export class Executable {
         name: id,
         program: this.path,
         args: cmds,
-        cwd,
-        isDryRun: !addToRecent,
-        isWsl: this.fileUtils.isWsl()
+        cwd
       });
 
       if (commandRunning.onDidWriteData) {
@@ -152,10 +150,8 @@ export interface PseudoTerminalConfig {
   name: string;
   program: string;
   args: string[];
-  isDryRun: boolean;
   cwd: string;
   displayCommand: string;
-  isWsl: boolean;
 }
 
 export type PseudoTerminalFactory = (
