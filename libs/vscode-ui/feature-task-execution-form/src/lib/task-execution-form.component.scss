@@ -34,14 +34,10 @@ $offset-with-configurations: $offset-without-configurations +
   line-height: 30px;
   cursor: pointer;
   transition: background ease-in-out 0.1s;
+  margin-left: 1rem;
 
   &:hover {
     opacity: 0.8;
-  }
-
-  .form-container &.bottom {
-    margin-top: $host-padding-top;
-    margin-bottom: $host-padding-top * 2;
   }
 }
 
@@ -112,6 +108,14 @@ form {
     outline: none !important;
     font-size: 13px;
   }
+}
+
+angular-console-field.changed-from-default {
+  border-left: 2px solid red;
+}
+
+angular-console-field:last-of-type {
+  margin-bottom: 2rem;
 }
 
 .form-header-container {

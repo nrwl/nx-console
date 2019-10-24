@@ -51,6 +51,12 @@ export class FieldTreeComponent implements OnChanges {
         });
       }
     }
+
+    if (simpleChanges.fieldBins) {
+      this.elementRef.nativeElement.scrollTo({
+        top: 0
+      });
+    }
   }
 
   camelToTitle(camelCase: string) {

@@ -179,6 +179,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         this.architectSubject.next(schema);
 
         setTimeout(() => {
+          this.scrollToTop();
           this.changeDetectorRef.detectChanges();
         }, 0);
       });
@@ -277,6 +278,13 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       configurationName
     );
     taskExecForm.patchValue(defaultValues);
+    this.scrollToTop();
+  }
+
+  private scrollToTop() {
+    this.scrollContainer.nativeElement.scrollTo({
+      top: 0
+    });
   }
 
   private getDefaultValuesForConfiguration(
@@ -285,7 +293,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {
     const defaultValues: { [key: string]: string } = {};
     architect.schema.forEach(field => {
-      defaultValues[field.name] = field.defaultValue || '';
+      defaultValues[field.name] =
+        field.defaultValue || field.type === 'boolean' ? 'false' : '';
     });
 
     if (architect.options) {
