@@ -10,12 +10,18 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
+import {
+  BehaviorSubject,
   combineLatest,
   Observable,
-  ReplaySubject,
-  BehaviorSubject
+  ReplaySubject
 } from 'rxjs';
 import {
   distinctUntilChanged,
@@ -63,7 +69,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       return [
         {
           title: 'All fields',
-          fields: architect.schema.map(field => field.name)
+          fields: architect.schema
         }
       ];
     })
@@ -81,22 +87,14 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     map(({ architect, form }) => {
       const configurationControl = form.get('configuration');
 
-      const configurations = architect.configurations!;
-      const defaultValues: { [key: string]: string } = {};
-      architect.schema.forEach(field => {
-        defaultValues[field.name] = field.defaultValue || '';
-      });
-      if (configurationControl && configurationControl.value) {
-        const configuration = configurations.find(
-          c => c.name === configurationControl.value
-        )!;
+      const configurationName = configurationControl
+        ? configurationControl.value
+        : undefined;
 
-        configuration.defaultValues.forEach(value => {
-          defaultValues[value.name] = value.defaultValue || '';
-        });
-      }
-
-      return defaultValues;
+      return this.getDefaultValuesForConfiguration(
+        architect,
+        configurationName
+      );
     }),
     shareReplay()
   );
@@ -211,10 +209,28 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       });
     }
 
+    const defaultValues = this.getDefaultValuesForConfiguration(architect);
+
     architect.schema.forEach(schema => {
+      const validators: Array<ValidatorFn> = [];
+      if (schema.required) {
+        validators.push(Validators.required);
+      }
+      if (schema.enum) {
+        const validValueSet = new Set(schema.enum);
+        validators.push(control => {
+          if (!validValueSet.has(control.value)) {
+            return {
+              enum: 'Please select a value from the auto-completable list'
+            };
+          }
+
+          return null;
+        });
+      }
       taskExecForm.addControl(
         schema.name,
-        new FormControl(schema.defaultValue)
+        new FormControl(defaultValues[schema.name], validators)
       );
     });
 
@@ -226,13 +242,30 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect: TaskExecutionSchema,
     configurationName?: string
   ) {
-    const configurations = architect.configurations!;
+    const defaultValues = this.getDefaultValuesForConfiguration(
+      architect,
+      configurationName
+    );
+    taskExecForm.patchValue(defaultValues);
+  }
+
+  private getDefaultValuesForConfiguration(
+    architect: TaskExecutionSchema,
+    configurationName?: string
+  ) {
     const defaultValues: { [key: string]: string } = {};
     architect.schema.forEach(field => {
       defaultValues[field.name] = field.defaultValue || '';
     });
-    if (configurationName) {
-      const configuration = configurations.find(
+
+    if (architect.options) {
+      architect.options.defaultValues.forEach(fieldValue => {
+        defaultValues[fieldValue.name] = fieldValue.defaultValue || '';
+      });
+    }
+
+    if (configurationName && architect.configurations) {
+      const configuration = architect.configurations.find(
         c => c.name === configurationName
       )!;
 
@@ -241,6 +274,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       });
     }
 
-    taskExecForm.patchValue(defaultValues);
+    return defaultValues;
   }
 }

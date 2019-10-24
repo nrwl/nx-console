@@ -2,6 +2,7 @@
   <span class="field-category"></span>
   <span class="field-label">
     {{ field.name }}
+    <ng-container *ngIf="field.required">*</ng-container>
   </span>
 </div>
 <ng-container [ngSwitch]="field.type">

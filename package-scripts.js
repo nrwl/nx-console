@@ -79,14 +79,14 @@ module.exports = {
       intellij: `node ${join('tools', 'scripts', 'intellij-package.js')}`
     },
     format: {
-      default: 'nx format:write',
+      default: 'nx format:write --base=upstream/master',
       and: {
         lint: {
           check: nps.concurrent.nps('format.check', 'lint')
         }
       },
-      write: 'nx format:write --base=origin/master',
-      check: 'nx format:check --base=origin/master'
+      write: 'nx format:write --base=upstream/master',
+      check: 'nx format:check --base=upstream/master'
     },
     lint: {
       default: nps.concurrent({

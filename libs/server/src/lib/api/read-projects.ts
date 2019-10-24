@@ -1,4 +1,4 @@
-import { Architect, Project } from '@angular-console/schema';
+import { Architect, Project, Schema } from '@angular-console/schema';
 import { Store } from '@nrwl/angular-console-enterprise-electron';
 import * as path from 'path';
 
@@ -89,7 +89,26 @@ export function readBuilder(basedir: string, builder: string) {
 }
 
 export function readSchema(basedir: string, builder: string) {
-  return readBuilder(basedir, builder).schema;
+  const schema = readBuilder(basedir, builder).schema as Array<Schema>;
+  return schema.sort((a, b) => {
+    if (a.required) {
+      if (b.required) {
+        return a.name.localeCompare(b.name);
+      }
+      return -1;
+    } else if (b.required) {
+      return 1;
+    } else if (a.important) {
+      if (b.important) {
+        return a.name.localeCompare(b.name);
+      }
+      return -1;
+    } else if (b.important) {
+      return 1;
+    } else {
+      return a.name.localeCompare(b.name);
+    }
+  });
 }
 
 function readBuildersFile(basedir: string, npmPackage: string): any {
