@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { AutocompleteComponent } from './autocomplete/autocomplete.component';
 import { SelectComponent } from './select/select.component';
 import { InputComponent } from './input/input.component';
@@ -8,7 +9,7 @@ import { FieldComponent } from './field/field.component';
 import { FieldTreeComponent } from './field-tree/field-tree.component';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   declarations: [
     AutocompleteComponent,
     SelectComponent,

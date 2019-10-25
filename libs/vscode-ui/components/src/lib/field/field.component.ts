@@ -4,9 +4,15 @@ import {
   ChangeDetectorRef,
   Component,
   forwardRef,
-  Input
+  Input,
+  OnDestroy
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+  FormControl
+} from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 /* Wrapper for select, text input, checkbox, autocomplete */
 
@@ -23,9 +29,12 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     }
   ]
 })
-export class FieldComponent implements ControlValueAccessor {
+export class FieldComponent implements ControlValueAccessor, OnDestroy {
   @Input() field: Schema;
   _value: string;
+  valueChangeSub: Subscription;
+
+  control = new FormControl('');
 
   disabled = false;
   onChange: any = () => {};
@@ -57,10 +66,18 @@ export class FieldComponent implements ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {}
+  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {
+    this.valueChangeSub = this.control.valueChanges.subscribe(value => {
+      this.value = value;
+    });
+  }
 
   camelToTitle(camelCase: string) {
     const result = camelCase.replace(/([A-Z])/g, ' $1');
     return result.charAt(0).toUpperCase() + result.slice(1);
+  }
+
+  ngOnDestroy(): void {
+    this.valueChangeSub.unsubscribe();
   }
 }
