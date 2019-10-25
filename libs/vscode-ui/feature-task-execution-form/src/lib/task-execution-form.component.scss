@@ -5,7 +5,7 @@ $host-padding-top: 16px;
 $host-padding-left: 28px;
 $host-padding-right: 36px;
 $scrollbar-width: 14px;
-$configurations-offset: 54px;
+$configurations-offset: 48px;
 $form-header-padding-bottom: $host-padding-top;
 $offset-without-configurations: $filter-offset + $host-padding-top +
   $form-header-padding-bottom;
@@ -36,7 +36,7 @@ $offset-with-configurations: $offset-without-configurations +
   transition: background ease-in-out 0.1s;
 
   &:hover {
-    background: darken($button-primary-color, 10%);
+    opacity: 0.8;
   }
 
   .form-container &.bottom {
@@ -157,10 +157,11 @@ form {
 
   .configuration {
     margin-right: 24px;
+    user-select: none;
     cursor: pointer;
 
     &.selected {
-      border-bottom: 2px solid white;
+      border-bottom: 2px solid $primary-text-color;
     }
   }
 }

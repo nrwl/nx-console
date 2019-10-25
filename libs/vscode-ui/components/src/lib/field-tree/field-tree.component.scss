@@ -18,13 +18,14 @@
   user-select: none;
 
   &:hover {
-    opacity: 0.7;
+    color: $primary-text-color;
   }
 
   &:active,
   &.active {
     opacity: 1;
-    color: var(--vscode-list-activeSelectionForeground, $primary-text-color);
+    font-weight: bold;
+    color: $primary-text-color;
   }
 
   &.indented {

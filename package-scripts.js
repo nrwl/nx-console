@@ -63,9 +63,7 @@ module.exports = {
             // NOTE: To inline JS we must run terser over the bundle to strip comments
             // Some comments have html tags in them which would otherwise need special escaping
             client:
-              'ng build APPLICATION-ui --watch --aot=false --buildOptimizer=false --prod',
-            legacyClient:
-              'ng build angular-console --configuration=APPLICATION --aot=false --buildOptimizer=false'
+              'ng build APPLICATION-ui --watch --aot=false --buildOptimizer=false --prod'
           })
         )
       }
