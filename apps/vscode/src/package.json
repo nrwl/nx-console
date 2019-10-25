@@ -180,18 +180,8 @@
       "properties": {
         "angularConsole.enableTelemetry": {
           "type": "boolean",
-          "default": false,
-          "description": "Help make Angular Console better by sending anonymous usage data to the Angular Console team."
-        },
-        "angularConsole.disableAnimations": {
-          "type": "boolean",
-          "default": false,
-          "description": "Disable all animations for a snappier feel"
-        },
-        "angularConsole.enableDetailedStatus": {
-          "type": "boolean",
           "default": true,
-          "description": "Enables visual status for certain tasks (e.g. build, test, etc.)."
+          "description": "Help make Angular Console better by sending anonymous usage data to the Angular Console team."
         },
         "angularConsole.useNVM": {
           "type": "boolean",

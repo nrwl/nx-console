@@ -1,17 +1,17 @@
 import {
+  Commands,
   createServerModule,
   QueryResolver,
-  SelectDirectory,
-  Commands,
-  Telemetry
+  SelectDirectory
 } from '@angular-console/server';
 import { NestFactory } from '@nestjs/core';
-import * as path from 'path';
-import { commands, ExtensionContext, window, workspace } from 'vscode';
-import { environment } from '../environments/environment';
-import { VSCodeStorage } from './vscode-storage';
 import * as getPort from 'get-port';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
+import * as path from 'path';
+import { commands, ExtensionContext, window } from 'vscode';
+
+import { environment } from '../environments/environment';
+import { initTelemetry } from './telemetry';
+import { VSCodeStorage } from './vscode-storage';
 
 export async function startServer(
   context: ExtensionContext,
@@ -19,11 +19,7 @@ export async function startServer(
 ) {
   const port = await getPort({ port: environment.production ? 8888 : 8889 });
   const store = VSCodeStorage.fromContext(context);
-  const telemetry = environment.disableTelemetry
-    ? Telemetry.withLogger(store)
-    : Telemetry.withGoogleAnalytics(store, 'vscode');
-
-  syncTelemetry(store, telemetry);
+  const telemetry = initTelemetry(context, store);
 
   const selectDirectory: SelectDirectory = async ({ buttonLabel }) => {
     return await window
@@ -106,22 +102,4 @@ export async function startServer(
   app.useStaticAssets(assetsPath);
 
   return await app.listen(port, 'localhost', () => {});
-}
-
-// using shared memory here is a shortcut, this should be an api call
-function syncTelemetry(store: Store, telemetry: Telemetry) {
-  const enableTelemetry = 'enableTelemetry';
-  const configurationSection = VSCodeStorage.configurationSection;
-  const telemetrySetting = `${configurationSection}.${enableTelemetry}`;
-
-  workspace.onDidChangeConfiguration(e => {
-    if (e.affectsConfiguration(telemetrySetting)) {
-      const enabled = store.get(enableTelemetry, false);
-      if (enabled) {
-        telemetry.startedTracking();
-      } else {
-        telemetry.stoppedTracking();
-      }
-    }
-  });
 }

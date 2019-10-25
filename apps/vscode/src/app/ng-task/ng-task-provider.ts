@@ -17,6 +17,7 @@ import {
   NamedProject,
   Projects
 } from './ng-task-definition';
+import { getTelemetry } from '../telemetry';
 
 export class NgTaskProvider implements TaskProvider {
   private workspacePath?: string;
@@ -99,6 +100,10 @@ export class NgTaskProvider implements TaskProvider {
     }
 
     const task = this.createTask(definition);
+
+    const telemetry = getTelemetry();
+    telemetry.featureUsed(definition.command);
+
     return tasks.executeTask(task).then(execution => {
       if (isDryRun) {
         this.currentDryRun = execution;
