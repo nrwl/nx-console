@@ -16,6 +16,7 @@ import {
 import { NgTaskProvider } from './ng-task/ng-task-provider';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
+import { getTelemetry } from './telemetry';
 
 let webviewPanel: WebviewPanel | undefined;
 let indexHtml: string | undefined;
@@ -100,6 +101,9 @@ export function createWebViewPanel(
         ngTaskProvider.executeTask(message);
       }
     );
+
+    const telemetry = getTelemetry();
+    telemetry.screenViewed(title);
   }
 
   return webviewPanel;

@@ -33,12 +33,7 @@ export class VSCodeStorage implements Store {
   }
 }
 
-const ConfigKeys = [
-  'enableTelemetry',
-  'disableAnimations',
-  'enableDetailedStatus',
-  'useNVM'
-];
+const ConfigKeys = ['disableTelemetry', 'useNVM'];
 
 function isConfig(key: string): boolean {
   return ConfigKeys.includes(key);

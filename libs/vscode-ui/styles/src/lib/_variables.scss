@@ -2,10 +2,14 @@ $input-border-width: 1px;
 $input-border-radius-size: 3px;
 $input-width: 320px;
 $input-height: 26px;
-$button-primary-color: #45bc98;
+$button-primary-color: var(
+  --vscode-badge-background,
+  --vscode-progressBar-background,
+  --vscode-activityBar-background #45bc98
+);
 $scroll-bar-width: 12px;
 
-$primary-text-color: #5c6bc0;
+$primary-text-color: var(--vscode-settings-headerForeground);
 
 /** Commented out until modified indicator functionality is implemented */
 @mixin field-modified-indicator {
