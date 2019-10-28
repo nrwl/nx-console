@@ -29,7 +29,9 @@ import {
   map,
   shareReplay,
   startWith,
-  tap
+  tap,
+  flatMap,
+  mapTo
 } from 'rxjs/operators';
 
 import {
@@ -99,6 +101,16 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   );
 
   readonly defaultValues$ = this.taskExecForm$.pipe(
+    flatMap(taskExecForm => {
+      const configurationControl = taskExecForm.form.get('configuration');
+      if (configurationControl) {
+        return configurationControl.valueChanges.pipe(
+          startWith(taskExecForm),
+          mapTo(taskExecForm)
+        );
+      }
+      return [taskExecForm];
+    }),
     map(({ architect, form }) => {
       const configurationControl = form.get('configuration');
 

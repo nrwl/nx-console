@@ -37,10 +37,6 @@ angular-console-checkbox {
       background-repeat: no-repeat;
     }
   }
-
-  .modified-indicator {
-    @include field-modified-indicator;
-  }
 }
 
 .vscode-dark .checkbox.checked {

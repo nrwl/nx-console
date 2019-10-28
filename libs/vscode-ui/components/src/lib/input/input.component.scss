@@ -8,7 +8,7 @@
 
 input {
   background-color: var(--vscode-settings-textInputBackground, #eee);
-  border-color: var(--vscode-settings-textInputBorder);
+  border-color: transparent;
   border-style: solid;
   border-width: $input-border-width;
   color: var(--vscode-settings-textInputForeground);

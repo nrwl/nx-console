@@ -14,7 +14,7 @@ angular-console-autocomplete {
 
   input {
     background-color: var(--vscode-settings-textInputBackground, #eee);
-    border-color: var(--vscode-settings-textInputBorder);
+    border-color: transparent;
     border-style: solid;
     border-width: $input-border-width;
     color: var(--vscode-settings-textInputForeground);
@@ -22,10 +22,6 @@ angular-console-autocomplete {
     font: inherit;
     padding: 0.3rem 0.5rem;
     width: $input-width;
-  }
-
-  .modified-indicator {
-    @include field-modified-indicator;
   }
 
   .autocomplete-panel {
