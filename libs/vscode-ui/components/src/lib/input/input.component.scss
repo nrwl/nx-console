@@ -18,7 +18,3 @@ input {
   padding-bottom: 0.35rem;
   width: $input-width;
 }
-
-.modified-indicator {
-  @include field-modified-indicator;
-}

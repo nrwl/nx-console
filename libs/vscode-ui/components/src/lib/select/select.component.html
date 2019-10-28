@@ -2,22 +2,18 @@
   {{ field.description }}
 </div>
 
-<div class="modified-indicator"></div>
-
-<div class="control select-container">
-  <select
-    #selectControl
-    (change)="updateValue($event.target.value)"
-    role="combobox"
-    [id]="field.name"
-    [required]="field.required"
-    [disabled]="disabled"
+<select
+  #selectControl
+  (change)="updateValue($event.target.value)"
+  role="combobox"
+  [id]="field.name"
+  [required]="field.required"
+  [disabled]="disabled"
+>
+  <option
+    *ngFor="let optionValue of field.enum"
+    [value]="optionValue"
+    [selected]="value === optionValue"
+    >{{ optionValue }}</option
   >
-    <option
-      *ngFor="let optionValue of field.enum"
-      [value]="optionValue"
-      [selected]="value === optionValue"
-      >{{ optionValue }}</option
-    >
-  </select>
-</div>
+</select>

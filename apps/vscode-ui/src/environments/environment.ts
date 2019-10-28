@@ -786,7 +786,7 @@ export const environment = {
   providers: [
     {
       provide: TASK_EXECUTION_SCHEMA,
-      useValue: MOCK_COMPONENT_ARCHITECT
+      useValue: NG_BUILD_ARCHITECT
     }
   ]
 };

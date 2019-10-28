@@ -1,4 +1,3 @@
-import { FieldTreeBin } from '@angular-console/vscode-ui/components';
 import {
   AfterViewChecked,
   ChangeDetectionStrategy,
@@ -76,17 +75,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
 
   readonly architect$ = this.architectSubject.asObservable();
-
-  readonly fieldBins$: Observable<FieldTreeBin[]> = this.architect$.pipe(
-    map(architect => {
-      return [
-        {
-          title: 'All fields',
-          fields: architect.schema
-        }
-      ];
-    })
-  );
 
   readonly taskExecForm$: Observable<{
     form: FormGroup;
@@ -354,7 +342,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       if (f.positional) {
         args.push(value[f.name]);
       } else if (f.type === 'boolean') {
-        args.push(value[f.name] ? `--${f.name}` : `--no-${f.name}`);
+        args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else if (f.type === 'arguments') {
         args = [...args, ...value[f.name].split(' ').filter((r: any) => !!r)];
       } else {

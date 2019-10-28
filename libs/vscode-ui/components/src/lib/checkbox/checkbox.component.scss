@@ -7,15 +7,11 @@ angular-console-checkbox {
     white-space: normal;
   }
 
-  .value-description {
-    display: flex;
-    cursor: pointer;
-    margin-top: 0.2rem;
-  }
-
   .bool-control {
     align-items: flex-start;
     display: flex;
+    cursor: pointer;
+    margin-top: 0.2rem;
   }
 
   $checkbox-size: 1rem;

@@ -2,35 +2,31 @@
   {{ field.description }}
 </div>
 
-<div class="modified-indicator"></div>
+<div class="autocomplete-container">
+  <input
+    #textInput
+    [formControl]="control"
+    class="text-input"
+    type="text"
+    role="textbox"
+  />
 
-<div class="control">
-  <div class="autocomplete-container">
-    <input
-      #textInput
-      [formControl]="control"
-      class="text-input"
-      type="text"
-      role="textbox"
-    />
-
-    <ng-container *ngIf="(isFocused$ | async)">
-      <ng-container *ngIf="(visibleOptions | async) as result">
-        <div class="autocomplete-panel" role="listbox">
-          <div
-            *ngFor="let option of result; let i = index"
-            (click)="optionSelected(option)"
-            class="option"
-            role="option"
-            [class.selected]="(selectedOption$ | async) === i"
-          >
-            {{ option }}
-          </div>
-          <div *ngIf="!result.length" class="option no-result">
-            No matches for "{{ control.value }}"
-          </div>
+  <ng-container *ngIf="(isFocused$ | async)">
+    <ng-container *ngIf="(visibleOptions | async) as result">
+      <div class="autocomplete-panel" role="listbox">
+        <div
+          *ngFor="let option of result; let i = index"
+          (click)="optionSelected(option)"
+          class="option"
+          role="option"
+          [class.selected]="(selectedOption$ | async) === i"
+        >
+          {{ option }}
         </div>
-      </ng-container>
+        <div *ngIf="!result.length" class="option no-result">
+          No matches for "{{ control.value }}"
+        </div>
+      </div>
     </ng-container>
-  </div>
+  </ng-container>
 </div>

@@ -2,15 +2,11 @@
   {{ field.description }}
 </div>
 
-<div class="modified-indicator"></div>
-
-<div class="control">
-  <input
-    (keyup)="updateValue($event.target.value)"
-    [value]="value"
-    class="text-input"
-    type="text"
-    role="textbox"
-    [required]="field.required"
-  />
-</div>
+<input
+  (keyup)="updateValue($event.target.value)"
+  [value]="value"
+  class="text-input"
+  type="text"
+  role="textbox"
+  [required]="field.required"
+/>

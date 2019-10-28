@@ -49,7 +49,7 @@
       >
         <vscode-ui-field-tree
           [activeFieldName]="activeFieldName$ | async"
-          [fieldBins]="fieldBins$ | async"
+          [fields]="taskExecForm.architect.schema"
           [filteredFields]="filteredFields"
         ></vscode-ui-field-tree>
         <form class="fields fx-flex" [formGroup]="taskExecForm.form">
@@ -75,8 +75,6 @@
             <angular-console-field
               [id]="field.name + '-angular-console-field'"
               *ngFor="let field of taskExecForm.architect.schema"
-              class="list-row"
-              role="treeitem"
               [class.changed-from-default]="
                 defaultValues[field.name] !==
                 taskExecForm.form.value[field.name]
