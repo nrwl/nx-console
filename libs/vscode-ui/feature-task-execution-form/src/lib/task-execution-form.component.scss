@@ -2,7 +2,7 @@
 
 $filter-offset: 30px;
 $host-padding-top: 16px;
-$host-padding-left: 28px;
+$host-padding-left: 20px;
 $host-padding-right: 36px;
 $scrollbar-width: 14px;
 $configurations-offset: 48px;
@@ -11,10 +11,6 @@ $offset-without-configurations: $filter-offset + $host-padding-top +
   $form-header-padding-bottom;
 $offset-with-configurations: $offset-without-configurations +
   $configurations-offset;
-
-.list-row {
-  margin-bottom: 16px;
-}
 
 :host {
   height: 100vh;
@@ -34,14 +30,10 @@ $offset-with-configurations: $offset-without-configurations +
   line-height: 30px;
   cursor: pointer;
   transition: background ease-in-out 0.1s;
+  margin-left: 1rem;
 
   &:hover {
     opacity: 0.8;
-  }
-
-  .form-container &.bottom {
-    margin-top: $host-padding-top;
-    margin-bottom: $host-padding-top * 2;
   }
 }
 
@@ -80,7 +72,7 @@ form {
 
 .scroll-container {
   overflow-y: scroll;
-  overflow-x: hidden;
+  overflow-x: visible;
 }
 
 .form-header,
@@ -111,6 +103,21 @@ form {
     border: none !important;
     outline: none !important;
     font-size: 13px;
+  }
+}
+
+vscode-ui-field-tree,
+angular-console-field,
+.form-header,
+.title-container {
+  padding-left: 0.5rem;
+}
+
+angular-console-field {
+  border-left: 2px solid transparent;
+
+  &.changed-from-default {
+    border-left-color: $button-primary-color;
   }
 }
 

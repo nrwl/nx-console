@@ -1,21 +1,17 @@
-<div class="value-description">
+<div
+  class="bool-control"
+  fxLayout="row"
+  (click)="updateValue(value === 'true' ? 'false' : 'true')"
+>
   <div
-    class="bool-control"
-    fxLayout="row"
-    (click)="updateValue(value === 'true' ? 'false' : 'true')"
-  >
-    <div
-      (keydown.enter)="updateValue(value === 'true' ? 'false' : 'true')"
-      class="checkbox"
-      tabindex="0"
-      role="checkbox"
-      [attr.aria-checked]="value === 'true'"
-      [class.checked]="value === 'true'"
-    ></div>
-    <div class="description">
-      {{ field.description }}
-    </div>
+    (keydown.enter)="updateValue(value === 'true' ? 'false' : 'true')"
+    class="checkbox"
+    tabindex="0"
+    role="checkbox"
+    [attr.aria-checked]="value === 'true'"
+    [class.checked]="value === 'true'"
+  ></div>
+  <div class="description">
+    {{ field.description }}
   </div>
 </div>
-
-<div class="modified-indicator"></div>

@@ -8,7 +8,7 @@
 
 input {
   background-color: var(--vscode-settings-textInputBackground, #eee);
-  border-color: var(--vscode-settings-textInputBorder);
+  border-color: transparent;
   border-style: solid;
   border-width: $input-border-width;
   color: var(--vscode-settings-textInputForeground);
@@ -17,8 +17,4 @@ input {
   padding: 0.3rem 0.5rem;
   padding-bottom: 0.35rem;
   width: $input-width;
-}
-
-.modified-indicator {
-  @include field-modified-indicator;
 }

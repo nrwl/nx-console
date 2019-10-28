@@ -1,8 +1,8 @@
 :host {
   display: block;
   position: relative;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
   white-space: normal;
 
   .field-title {
@@ -10,9 +10,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
-  }
-
-  .field-label {
     font-weight: 600;
     user-select: text;
   }

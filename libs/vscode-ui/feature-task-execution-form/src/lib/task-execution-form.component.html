@@ -7,12 +7,17 @@
   >
     <div class="form-header-container" #formHeaderContainer>
       <div class="form-header">
-        <div class="filter-container fx-align-start-center fx-row">
-          <input
-            type="text"
-            placeholder="Search flags"
-            [formControl]="filterFieldsControl"
-          />
+        <div class="fx-align-start-center fx-row fx-flex">
+          <div class="filter-container fx-flex fx-align-start-center fx-row">
+            <input
+              type="text"
+              placeholder="Search flags"
+              [formControl]="filterFieldsControl"
+            />
+          </div>
+          <div class="run-button" (click)="runCommand(taskExecForm)">
+            Run
+          </div>
         </div>
         <div
           class="configurations-container fx-row"
@@ -44,7 +49,7 @@
       >
         <vscode-ui-field-tree
           [activeFieldName]="activeFieldName$ | async"
-          [fieldBins]="fieldBins$ | async"
+          [fields]="taskExecForm.architect.schema"
           [filteredFields]="filteredFields"
         ></vscode-ui-field-tree>
         <form class="fields fx-flex" [formGroup]="taskExecForm.form">
@@ -64,29 +69,25 @@
                 }}
               </ng-container>
             </span>
-            <div class="run-button" (click)="runCommand(taskExecForm)">
-              Run
-            </div>
           </div>
 
-          <angular-console-field
-            [id]="field.name + '-angular-console-field'"
-            *ngFor="let field of taskExecForm.architect.schema"
-            class="list-row"
-            role="treeitem"
-            [class.changed-from-default]=""
-            [field]="field"
-            [formControlName]="field.name"
-            [style.display]="filteredFields.has(field.name) ? 'block' : 'none'"
-          ></angular-console-field>
-          <div
-            class="run-button bottom"
-            (click)="runCommand(taskExecForm)"
-            *ngIf="filteredFields.size > 0; else noMatch"
-          >
-            Run
-          </div>
-          <ng-template #noMatch>
+          <ng-container *ngIf="(defaultValues$ | async) as defaultValues">
+            <angular-console-field
+              [id]="field.name + '-angular-console-field'"
+              *ngFor="let field of taskExecForm.architect.schema"
+              [class.changed-from-default]="
+                defaultValues[field.name] !==
+                taskExecForm.form.value[field.name]
+              "
+              [field]="field"
+              [formControlName]="field.name"
+              [style.display]="
+                filteredFields.has(field.name) ? 'block' : 'none'
+              "
+            ></angular-console-field>
+          </ng-container>
+
+          <ng-container *ngIf="filteredFields.size === 0" #noMatch>
             <div *ngIf="taskExecForm.architect.schema.length; else noFlags">
               No flags found -
               <span
@@ -100,7 +101,7 @@
             <ng-template #noFlags>
               This command has no flags to set
             </ng-template>
-          </ng-template>
+          </ng-container>
         </form>
       </div>
     </div>

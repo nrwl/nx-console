@@ -16,7 +16,3 @@ select {
   height: $input-height;
   width: $input-width;
 }
-
-.modified-indicator {
-  @include field-modified-indicator;
-}

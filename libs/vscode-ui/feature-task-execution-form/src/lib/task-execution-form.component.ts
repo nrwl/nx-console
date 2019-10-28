@@ -1,4 +1,3 @@
-import { FieldTreeBin } from '@angular-console/vscode-ui/components';
 import {
   AfterViewChecked,
   ChangeDetectionStrategy,
@@ -30,7 +29,9 @@ import {
   map,
   shareReplay,
   startWith,
-  tap
+  tap,
+  flatMap,
+  mapTo
 } from 'rxjs/operators';
 
 import {
@@ -77,17 +78,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
   readonly architect$ = this.architectSubject.asObservable();
 
-  readonly fieldBins$: Observable<FieldTreeBin[]> = this.architect$.pipe(
-    map(architect => {
-      return [
-        {
-          title: 'All fields',
-          fields: architect.schema
-        }
-      ];
-    })
-  );
-
   readonly taskExecForm$: Observable<{
     form: FormGroup;
     architect: TaskExecutionSchema;
@@ -111,6 +101,16 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   );
 
   readonly defaultValues$ = this.taskExecForm$.pipe(
+    flatMap(taskExecForm => {
+      const configurationControl = taskExecForm.form.get('configuration');
+      if (configurationControl) {
+        return configurationControl.valueChanges.pipe(
+          startWith(taskExecForm),
+          mapTo(taskExecForm)
+        );
+      }
+      return [taskExecForm];
+    }),
     map(({ architect, form }) => {
       const configurationControl = form.get('configuration');
 
@@ -179,6 +179,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         this.architectSubject.next(schema);
 
         setTimeout(() => {
+          this.scrollToTop();
           this.changeDetectorRef.detectChanges();
         }, 0);
       });
@@ -277,6 +278,13 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       configurationName
     );
     taskExecForm.patchValue(defaultValues);
+    this.scrollToTop();
+  }
+
+  private scrollToTop() {
+    this.scrollContainer.nativeElement.scrollTo({
+      top: 0
+    });
   }
 
   private getDefaultValuesForConfiguration(
@@ -285,7 +293,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {
     const defaultValues: { [key: string]: string } = {};
     architect.schema.forEach(field => {
-      defaultValues[field.name] = field.defaultValue || '';
+      defaultValues[field.name] =
+        field.defaultValue || field.type === 'boolean' ? 'false' : '';
     });
 
     if (architect.options) {
@@ -345,7 +354,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       if (f.positional) {
         args.push(value[f.name]);
       } else if (f.type === 'boolean') {
-        args.push(value[f.name] ? `--${f.name}` : `--no-${f.name}`);
+        args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else if (f.type === 'arguments') {
         args = [...args, ...value[f.name].split(' ').filter((r: any) => !!r)];
       } else {

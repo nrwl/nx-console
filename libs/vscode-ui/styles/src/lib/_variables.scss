@@ -3,24 +3,12 @@ $input-border-radius-size: 3px;
 $input-width: 320px;
 $input-height: 26px;
 $button-primary-color: var(
-  --vscode-badge-background,
-  --vscode-progressBar-background,
-  --vscode-activityBar-background #45bc98
+  --vscode-settings-modifiedItemIndicator,
+  --vscode-activityBarBadge-background,
+  --vscode-editorGutter-modifiedBackground,
+  --vscode-statusBarItem-remoteBackground,
+  #45bc98
 );
 $scroll-bar-width: 12px;
 
 $primary-text-color: var(--vscode-settings-headerForeground);
-
-/** Commented out until modified indicator functionality is implemented */
-@mixin field-modified-indicator {
-  // border-color: var(--vscode-settings-modifiedItemIndicator);
-  // border-left-width: 2px;
-  // border-left-style: solid;
-  // content: ' ';
-  // display: block;
-  // position: absolute;
-  // width: 6px;
-  // left: -9px;
-  // top: 10px;
-  // bottom: 5px;
-}

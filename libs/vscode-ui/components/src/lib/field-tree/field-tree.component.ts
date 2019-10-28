@@ -3,22 +3,19 @@ import {
   ElementRef,
   Input,
   SimpleChanges,
-  OnChanges
+  OnChanges,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { Schema } from '@angular-console/schema';
-
-export interface FieldTreeBin {
-  title: string;
-  fields: Array<Schema>;
-}
 
 @Component({
   selector: 'vscode-ui-field-tree',
   templateUrl: './field-tree.component.html',
-  styleUrls: ['./field-tree.component.scss']
+  styleUrls: ['./field-tree.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FieldTreeComponent implements OnChanges {
-  @Input() fieldBins: Array<FieldTreeBin>;
+  @Input() fields: Array<Schema>;
   @Input() activeFieldName: string;
   @Input() filteredFields: Set<string>;
 
@@ -50,6 +47,12 @@ export class FieldTreeComponent implements OnChanges {
           inline: 'nearest'
         });
       }
+    }
+
+    if (simpleChanges.fieldBins) {
+      this.elementRef.nativeElement.scrollTo({
+        top: 0
+      });
     }
   }
 

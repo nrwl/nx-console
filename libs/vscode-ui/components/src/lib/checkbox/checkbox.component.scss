@@ -7,15 +7,11 @@ angular-console-checkbox {
     white-space: normal;
   }
 
-  .value-description {
-    display: flex;
-    cursor: pointer;
-    margin-top: 0.2rem;
-  }
-
   .bool-control {
     align-items: flex-start;
     display: flex;
+    cursor: pointer;
+    margin-top: 0.2rem;
   }
 
   $checkbox-size: 1rem;
@@ -40,10 +36,6 @@ angular-console-checkbox {
       background-position: 50%;
       background-repeat: no-repeat;
     }
-  }
-
-  .modified-indicator {
-    @include field-modified-indicator;
   }
 }
 
