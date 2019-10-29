@@ -217,16 +217,22 @@
       {
         "type": "ng",
         "required": [
-          "task"
+          "task",
+          "project",
+          "command"
         ],
         "properties": {
-          "projectName": {
+          "project": {
             "type": "string",
             "description": "The Angular CLI project to run a command on"
           },
-          "architectName": {
+          "command": {
             "type": "string",
-            "description": "The name of the architect command to run on the selected project"
+            "description": "The Angular CLI command to run on the selected project"
+          },
+          "flags": {
+            "type": "array",
+            "description": "An array of flags to pass to the CLI"
           }
         }
       }

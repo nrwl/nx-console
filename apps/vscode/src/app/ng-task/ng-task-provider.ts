@@ -21,7 +21,6 @@ import { getTelemetry } from '../telemetry';
 
 export class NgTaskProvider implements TaskProvider {
   private workspacePath?: string;
-  private ngTasksPromise?: Task[];
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: NgTaskDefinition;
 
@@ -43,48 +42,26 @@ export class NgTaskProvider implements TaskProvider {
 
   setWorkspacePath(workspacePath: string) {
     this.workspacePath = workspacePath;
-    this.ngTasksPromise = undefined;
   }
 
   provideTasks(): ProviderResult<Task[]> {
-    if (!this.workspacePath) {
-      return null;
-    }
-
-    if (this.ngTasksPromise) {
-      return this.ngTasksPromise;
-    }
-
-    this.ngTasksPromise = this.getProjectEntries()
-      .flatMap(
-        ([projectName, project]): NgTaskDefinition[] => {
-          if (!project.architect) {
-            return [];
-          }
-
-          return Object.keys(project.architect).map(command => ({
-            command,
-            positional: projectName,
-            flags: [],
-            type: 'shell'
-          }));
-        }
-      )
-      .map(taskDef =>
-        NgTask.create(taskDef, this.workspacePath as string, this.fileUtils)
-      );
-
-    return this.ngTasksPromise;
+    return null;
   }
 
   resolveTask(task: Task): Task | undefined {
-    // Make sure that this looks like a NgTaskDefinition.
     if (
       this.workspacePath &&
-      task.definition.architectName &&
-      task.definition.projectName
+      task.definition.command &&
+      task.definition.project
     ) {
-      return this.createTask((task.definition as unknown) as NgTaskDefinition);
+      const ngTask = this.createTask({
+        command: task.definition.command,
+        positional: task.definition.project,
+        flags: Array.isArray(task.definition.flags) ? task.definition.flags : []
+      });
+      // resolveTask requires that the same definition object be used.
+      ngTask.definition = task.definition;
+      return ngTask;
     }
   }
 
