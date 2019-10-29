@@ -25,7 +25,6 @@ import {
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
 import { migrateSettings } from './app/migrate-settings';
-import { revealLegacyWebViewPanel } from './app/legacy-webview';
 
 let server: Promise<Server>;
 
@@ -99,19 +98,6 @@ export function activate(c: ExtensionContext) {
           ngTaskProvider,
           workspaceTreeView,
           serverAddress: `http://localhost:${port}/`
-        });
-      }
-    )
-  );
-  context.subscriptions.push(
-    commands.registerCommand(
-      'angularConsole.revealLegacyWebViewPanel',
-      async (workspaceTreeItem: WorkspaceTreeItem) => {
-        revealLegacyWebViewPanel({
-          workspaceTreeItem,
-          context,
-          port: ((await server).address() as any).port,
-          workspaceTreeView
         });
       }
     )

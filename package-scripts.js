@@ -1,13 +1,5 @@
 const nps = require('nps-utils');
-const os = require('os');
 const { join } = require('path');
-
-function forEachApplication(command) {
-  return {
-    intellij: command.replace(/APPLICATION/g, 'intellij'),
-    vscode: command.replace(/APPLICATION/g, 'vscode')
-  };
-}
 
 function affected(affectedCommand) {
   return {
@@ -30,42 +22,33 @@ module.exports = {
           headless: nps.series.nps('prepare.e2e', 'e2e.headless')
         },
         package: {
-          ...forEachApplication(
-            nps.series.nps(
-              'clean',
-              'prepare.APPLICATION',
-              'install-dependencies.APPLICATION',
-              'package.APPLICATION'
-            )
+          vscode: nps.series.nps(
+            'clean',
+            'prepare.vscode',
+            'install-dependencies.vscode',
+            'package.vscode'
           )
         }
       },
-      ...forEachApplication(
-        nps.concurrent({
-          server: 'ng build APPLICATION --prod --noSourceMap',
-          client: 'ng build APPLICATION-ui --prod',
-          legacyClient: 'ng build angular-console --configuration=APPLICATION'
-        })
-      ),
+      vscode: nps.concurrent({
+        server: 'ng build vscode --prod --noSourceMap',
+        client: 'ng build vscode-ui --prod'
+      }),
       ci: {
-        ...forEachApplication(
-          nps.concurrent({
-            server: 'ng build APPLICATION --noSourceMap',
-            client:
-              'ng build angular-console --configuration=APPLICATION --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false'
-          })
-        )
+        vscode: nps.concurrent({
+          server: 'ng build vscode --noSourceMap',
+          client:
+            'ng build angular-console --configuration=vscode --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false'
+        })
       },
       dev: {
-        ...forEachApplication(
-          nps.concurrent({
-            server: 'ng build APPLICATION --watch',
-            // NOTE: To inline JS we must run terser over the bundle to strip comments
-            // Some comments have html tags in them which would otherwise need special escaping
-            client:
-              'ng build APPLICATION-ui --watch --aot=false --buildOptimizer=false --prod'
-          })
-        )
+        vscode: nps.concurrent({
+          server: 'ng build vscode --watch',
+          // NOTE: To inline JS we must run terser over the bundle to strip comments
+          // Some comments have html tags in them which would otherwise need special escaping
+          client:
+            'ng build vscode-ui --watch --aot=false --buildOptimizer=false --prod'
+        })
       }
     },
     package: {
