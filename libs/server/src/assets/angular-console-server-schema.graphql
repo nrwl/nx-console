@@ -195,6 +195,7 @@ type Schema {
   defaultValue: String
   important: Boolean
   completion: String
+  deprecated: String
   required: Boolean!
   positional: Boolean!
   enum: [String!]

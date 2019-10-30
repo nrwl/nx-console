@@ -46,8 +46,7 @@ module.exports = {
           server: 'ng build vscode --watch',
           // NOTE: To inline JS we must run terser over the bundle to strip comments
           // Some comments have html tags in them which would otherwise need special escaping
-          client:
-            'ng build vscode-ui --watch --aot=false --buildOptimizer=false --prod'
+          client: 'ng build vscode-ui --watch --prod'
         })
       }
     },

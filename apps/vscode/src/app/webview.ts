@@ -26,15 +26,13 @@ interface RevealWebViewPanelConfig {
   workspaceTreeItem: WorkspaceTreeItem;
   ngTaskProvider: NgTaskProvider;
   workspaceTreeView: TreeView<WorkspaceTreeItem>;
-  serverAddress: string;
 }
 
 export async function revealWebViewPanel({
   context,
   ngTaskProvider,
   workspaceTreeItem,
-  workspaceTreeView,
-  serverAddress
+  workspaceTreeView
 }: RevealWebViewPanelConfig) {
   const { workspacePath, label } = workspaceTreeItem;
 
@@ -51,7 +49,6 @@ export async function revealWebViewPanel({
   const webViewPanel = createWebViewPanel(
     context,
     schema,
-    serverAddress,
     label,
     ngTaskProvider
   );
@@ -69,7 +66,6 @@ export async function revealWebViewPanel({
 export function createWebViewPanel(
   context: ExtensionContext,
   schema: TaskExecutionSchema,
-  serverAddress: string,
   title: string,
   ngTaskProvider: NgTaskProvider
 ) {
@@ -94,7 +90,7 @@ export function createWebViewPanel(
       join(context.extensionPath, 'assets', 'angular-console.png')
     );
 
-    webviewPanel.webview.html = getIframeHtml(context, schema, serverAddress);
+    webviewPanel.webview.html = getIframeHtml(context, schema);
 
     webviewPanel.webview.onDidReceiveMessage(
       (message: TaskExecutionMessage) => {
@@ -111,8 +107,7 @@ export function createWebViewPanel(
 
 export function getIframeHtml(
   context: ExtensionContext,
-  schema: TaskExecutionSchema,
-  serverAddress: string
+  schema: TaskExecutionSchema
 ) {
   if (!indexHtml) {
     // Cache html and inline all styles and scripts.
@@ -140,10 +135,8 @@ export function getIframeHtml(
       );
   }
 
-  return indexHtml
-    .replace(
-      'window.VSCODE_UI_SCHEMA = {};',
-      `window.VSCODE_UI_SCHEMA = ${JSON.stringify(schema)};`
-    )
-    .replace('<base href="/" />', `<base href="${serverAddress}" />`);
+  return indexHtml.replace(
+    'window.VSCODE_UI_SCHEMA = {};',
+    `window.VSCODE_UI_SCHEMA = ${JSON.stringify(schema)};`
+  );
 }

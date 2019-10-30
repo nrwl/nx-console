@@ -79,6 +79,25 @@ export async function getTaskExecutionSchema(
           : undefined
       );
     case 'Generate':
-      return selectSchematic(workspacePath);
+      return selectSchematic(workspacePath).then(schematic => {
+        if (!schematic) {
+          return;
+        }
+
+        schematic.schema.forEach(schema => {
+          if (schema.enum) {
+            return;
+          }
+
+          if (schema.name === 'project') {
+            schema.type = 'enum';
+            schema.enum = getProjectEntries()
+              .map(entry => entry[0])
+              .sort();
+          }
+        });
+
+        return schematic;
+      });
   }
 }

@@ -1,20 +1,20 @@
-import { FileUtils, EXTENSIONS } from '@angular-console/server';
+import { EXTENSIONS, FileUtils, cacheJsonFiles } from '@angular-console/server';
 import { stream } from 'fast-glob';
 import { existsSync, readFileSync } from 'fs';
-import { Server } from 'http';
 import { dirname, join, parse } from 'path';
 import {
   commands,
   ExtensionContext,
+  QuickPickItem,
   tasks,
   TreeView,
   window,
-  workspace,
-  QuickPickItem
+  workspace
 } from 'vscode';
 
 import { AngularJsonTreeItem } from './app/angular-json-tree/angular-json-tree-item';
 import { AngularJsonTreeProvider } from './app/angular-json-tree/angular-json-tree-provider';
+import { migrateSettings } from './app/migrate-settings';
 import { registerNgTaskCommands } from './app/ng-task/ng-task-commands';
 import { NgTaskProvider } from './app/ng-task/ng-task-provider';
 import { VSCodeStorage } from './app/vscode-storage';
@@ -24,9 +24,7 @@ import {
   LOCATE_YOUR_WORKSPACE,
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
-import { migrateSettings } from './app/migrate-settings';
-
-let server: Promise<Server>;
+import { initTelemetry } from './app/telemetry';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
 let angularJsonTreeView: TreeView<AngularJsonTreeItem>;
@@ -44,6 +42,7 @@ export function activate(c: ExtensionContext) {
   });
   migrateSettings(context);
   const store = VSCodeStorage.fromContext(context);
+  initTelemetry(context, store);
 
   ngTaskProvider = new NgTaskProvider(new FileUtils(store));
   tasks.registerTaskProvider('ng', ngTaskProvider);
@@ -69,8 +68,6 @@ export function activate(c: ExtensionContext) {
     commands.registerCommand(
       'angularConsole.revealWebViewPanel',
       async (workspaceTreeItem: WorkspaceTreeItem) => {
-        const port = ((await server).address() as any).port;
-
         switch (workspaceTreeItem.route) {
           case 'Add':
             const extensions = Object.entries(EXTENSIONS).map(
@@ -96,8 +93,7 @@ export function activate(c: ExtensionContext) {
           workspaceTreeItem,
           context,
           ngTaskProvider,
-          workspaceTreeView,
-          serverAddress: `http://localhost:${port}/`
+          workspaceTreeView
         });
       }
     )
@@ -168,8 +164,6 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
 async function setAngularWorkspace(workspacePath: string) {
   try {
     JSON.parse(readFileSync(join(workspacePath, 'angular.json')).toString());
-    const { startServer } = await import('./app/start-server');
-    server = startServer(context, workspacePath);
   } catch (e) {
     console.error('Invalid angular JSON', e);
     window.showErrorMessage(
@@ -179,6 +173,9 @@ async function setAngularWorkspace(workspacePath: string) {
     return;
   }
 
+  cacheJsonFiles(workspacePath);
+  setInterval(() => cacheJsonFiles(workspacePath), 60000);
+
   commands.executeCommand('setContext', 'isAngularWorkspace', true);
 
   currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
@@ -186,8 +183,4 @@ async function setAngularWorkspace(workspacePath: string) {
   angularJsonTreeProvider.setWorkspacePath(workspacePath);
 }
 
-export async function deactivate() {
-  if (server) {
-    (await server).close();
-  }
-}
+export async function deactivate() {}
