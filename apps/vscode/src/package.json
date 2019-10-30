@@ -217,7 +217,6 @@
       {
         "type": "ng",
         "required": [
-          "task",
           "project",
           "command"
         ],
