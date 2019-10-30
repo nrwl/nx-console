@@ -14,7 +14,7 @@ angular-console-autocomplete {
 
   input {
     background-color: var(--vscode-settings-textInputBackground, #eee);
-    border-color: transparent;
+    border-color: var(--vscode-settings-textInputBorder);
     border-style: solid;
     border-width: $input-border-width;
     color: var(--vscode-settings-textInputForeground);
