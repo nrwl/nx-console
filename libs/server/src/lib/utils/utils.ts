@@ -123,7 +123,7 @@ export function listFiles(dirName: string): string[] {
   return res;
 }
 
-function cacheJsonFiles(basedir: string) {
+export function cacheJsonFiles(basedir: string) {
   try {
     const nodeModulesDir = path.join(basedir, 'node_modules');
     const packages = listOfUnnestedNpmPackages(nodeModulesDir);
@@ -205,12 +205,8 @@ export function normalizeSchema(
 
         const workspaceDefault = projectDefaults && projectDefaults[k];
 
-        if (!v.type) {
-          if (v.enum && v.enum.length < 10) {
-            v.type = 'enum';
-          } else {
-            v.type = 'string';
-          }
+        if (v.enum) {
+          v.type = 'enum';
         }
 
         res.push({
@@ -219,6 +215,7 @@ export function normalizeSchema(
           description: v.description || '',
           defaultValue: workspaceDefault === undefined ? d : workspaceDefault,
           required: Boolean(r),
+          deprecated: v['x-deprecated'],
           positional: Boolean(isPositional(v)),
           enum: v.enum
         });

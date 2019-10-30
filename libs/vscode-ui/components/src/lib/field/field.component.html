@@ -1,6 +1,9 @@
 <div class="field-title">
   {{ field.name }}
   <ng-container *ngIf="field.required">*</ng-container>
+  <ng-container *ngIf="field.deprecated"
+    >(deprecated: {{ field.deprecated }})</ng-container
+  >
 </div>
 
 <ng-container [ngSwitch]="field.type">

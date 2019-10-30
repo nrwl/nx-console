@@ -1,3 +1,5 @@
+export { cacheJsonFiles } from './lib/utils/utils';
+
 export { readArchitectDef, readSchema } from './lib/api/read-projects';
 
 export {

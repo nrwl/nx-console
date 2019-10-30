@@ -93,9 +93,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         this.dryRunSubscription = taskExecForm.form.valueChanges
           .pipe(debounceTime(500))
           .subscribe(() => {
-            if (taskExecForm.form.valid) {
-              this.runCommand({ ...taskExecForm, dryRun: true });
-            }
+            this.runCommand({ ...taskExecForm, dryRun: true });
           });
       }
     }),
