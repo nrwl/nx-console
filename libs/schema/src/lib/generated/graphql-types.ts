@@ -79,6 +79,8 @@ export interface Schema {
 
   completion?: Maybe<string>;
 
+  deprecated?: Maybe<string>;
+
   required: boolean;
 
   positional: boolean;
@@ -257,17 +259,17 @@ export interface CommandResponse {
 }
 
 export interface Mutation {
-  ngAdd?: Maybe<CommandStarted>;
+  ngAdd: CommandStarted;
 
-  ngNew?: Maybe<CommandStarted>;
+  ngNew: CommandStarted;
 
-  generate?: Maybe<CommandStarted>;
+  generate: CommandStarted;
 
-  generateUsingNpm?: Maybe<CommandStarted>;
+  generateUsingNpm: CommandStarted;
 
-  runNg?: Maybe<CommandStarted>;
+  runNg: CommandStarted;
 
-  runNpm?: Maybe<CommandStarted>;
+  runNpm: CommandStarted;
 
   stopCommand?: Maybe<StopResult>;
 
@@ -797,6 +799,8 @@ export namespace SchemaResolvers {
 
     completion?: CompletionResolver<Maybe<string>, TypeParent, TContext>;
 
+    deprecated?: DeprecatedResolver<Maybe<string>, TypeParent, TContext>;
+
     required?: RequiredResolver<boolean, TypeParent, TContext>;
 
     positional?: PositionalResolver<boolean, TypeParent, TContext>;
@@ -830,6 +834,11 @@ export namespace SchemaResolvers {
     TContext = any
   > = Resolver<R, Parent, TContext>;
   export type CompletionResolver<
+    R = Maybe<string>,
+    Parent = any,
+    TContext = any
+  > = Resolver<R, Parent, TContext>;
+  export type DeprecatedResolver<
     R = Maybe<string>,
     Parent = any,
     TContext = any
@@ -1464,21 +1473,17 @@ export namespace CommandResponseResolvers {
 
 export namespace MutationResolvers {
   export interface Resolvers<TContext = any, TypeParent = {}> {
-    ngAdd?: NgAddResolver<Maybe<any>, TypeParent, TContext>;
+    ngAdd?: NgAddResolver<any, TypeParent, TContext>;
 
-    ngNew?: NgNewResolver<Maybe<any>, TypeParent, TContext>;
+    ngNew?: NgNewResolver<any, TypeParent, TContext>;
 
-    generate?: GenerateResolver<Maybe<any>, TypeParent, TContext>;
+    generate?: GenerateResolver<any, TypeParent, TContext>;
 
-    generateUsingNpm?: GenerateUsingNpmResolver<
-      Maybe<any>,
-      TypeParent,
-      TContext
-    >;
+    generateUsingNpm?: GenerateUsingNpmResolver<any, TypeParent, TContext>;
 
-    runNg?: RunNgResolver<Maybe<any>, TypeParent, TContext>;
+    runNg?: RunNgResolver<any, TypeParent, TContext>;
 
-    runNpm?: RunNpmResolver<Maybe<any>, TypeParent, TContext>;
+    runNpm?: RunNpmResolver<any, TypeParent, TContext>;
 
     stopCommand?: StopCommandResolver<Maybe<any>, TypeParent, TContext>;
 
@@ -1519,22 +1524,24 @@ export namespace MutationResolvers {
     openDoc?: OpenDocResolver<Maybe<any>, TypeParent, TContext>;
   }
 
-  export type NgAddResolver<
-    R = Maybe<any>,
-    Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, NgAddArgs>;
+  export type NgAddResolver<R = any, Parent = {}, TContext = any> = Resolver<
+    R,
+    Parent,
+    TContext,
+    NgAddArgs
+  >;
   export interface NgAddArgs {
     path: string;
 
     name: string;
   }
 
-  export type NgNewResolver<
-    R = Maybe<any>,
-    Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, NgNewArgs>;
+  export type NgNewResolver<R = any, Parent = {}, TContext = any> = Resolver<
+    R,
+    Parent,
+    TContext,
+    NgNewArgs
+  >;
   export interface NgNewArgs {
     path: string;
 
@@ -1545,11 +1552,12 @@ export namespace MutationResolvers {
     newCommand: string[];
   }
 
-  export type GenerateResolver<
-    R = Maybe<any>,
-    Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, GenerateArgs>;
+  export type GenerateResolver<R = any, Parent = {}, TContext = any> = Resolver<
+    R,
+    Parent,
+    TContext,
+    GenerateArgs
+  >;
   export interface GenerateArgs {
     path: string;
 
@@ -1559,7 +1567,7 @@ export namespace MutationResolvers {
   }
 
   export type GenerateUsingNpmResolver<
-    R = Maybe<any>,
+    R = any,
     Parent = {},
     TContext = any
   > = Resolver<R, Parent, TContext, GenerateUsingNpmArgs>;
@@ -1573,22 +1581,24 @@ export namespace MutationResolvers {
     dryRun: boolean;
   }
 
-  export type RunNgResolver<
-    R = Maybe<any>,
-    Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, RunNgArgs>;
+  export type RunNgResolver<R = any, Parent = {}, TContext = any> = Resolver<
+    R,
+    Parent,
+    TContext,
+    RunNgArgs
+  >;
   export interface RunNgArgs {
     path: string;
 
     runCommand: string[];
   }
 
-  export type RunNpmResolver<
-    R = Maybe<any>,
-    Parent = {},
-    TContext = any
-  > = Resolver<R, Parent, TContext, RunNpmArgs>;
+  export type RunNpmResolver<R = any, Parent = {}, TContext = any> = Resolver<
+    R,
+    Parent,
+    TContext,
+    RunNpmArgs
+  >;
   export interface RunNpmArgs {
     path: string;
 
