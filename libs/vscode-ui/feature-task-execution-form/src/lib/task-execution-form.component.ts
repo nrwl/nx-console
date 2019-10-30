@@ -93,7 +93,9 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         this.dryRunSubscription = taskExecForm.form.valueChanges
           .pipe(debounceTime(500))
           .subscribe(() => {
-            this.runCommand({ ...taskExecForm, dryRun: true });
+            if (taskExecForm.form.valid) {
+              this.runCommand({ ...taskExecForm, dryRun: true });
+            }
           });
       }
     }),
@@ -327,6 +329,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   }) {
     const flags = this.serializeArgs(form.value, architect);
     if (dryRun) {
+      flags.push('--no-interactive');
       flags.push('--dry-run');
     }
     window.vscode.postMessage({
