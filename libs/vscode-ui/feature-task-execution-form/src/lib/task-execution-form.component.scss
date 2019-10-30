@@ -25,6 +25,7 @@ $offset-with-configurations: $offset-without-configurations +
   width: 80px;
   height: 30px;
   background: $button-primary-color;
+  border: $input-border-width solid var(--vscode-settings-textInputBorder);
   color: #fff;
   text-align: center;
   line-height: 30px;
