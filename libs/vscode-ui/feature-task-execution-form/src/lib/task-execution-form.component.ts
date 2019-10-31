@@ -348,20 +348,30 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       configurationName
     );
 
-    let args: string[] = [];
+    const args: string[] = [];
     fields.forEach(f => {
       if (defaultValues[f.name] === value[f.name]) return;
       if (!defaultValues[f.name] && !value[f.name]) return;
       if (f.positional) {
-        args.push(value[f.name]);
+        args.push(sanitizeWhitespace(value[f.name]));
       } else if (f.type === 'boolean') {
         args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else if (f.type === 'arguments') {
-        args = [...args, ...value[f.name].split(' ').filter((r: any) => !!r)];
+        args.push(
+          ...value[f.name]
+            .split(' ')
+            .filter(Boolean)
+            .map(sanitizeWhitespace)
+        );
       } else {
-        args.push(`--${f.name}=${value[f.name]}`);
+        args.push(`--${f.name}=${sanitizeWhitespace(value[f.name])}`);
       }
     });
     return args;
   }
+}
+
+function sanitizeWhitespace(value: string) {
+  const trimmed = value.trim();
+  return /\s/.test(trimmed) ? `"${trimmed}"` : trimmed;
 }
