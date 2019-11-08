@@ -12,6 +12,7 @@ export type WorkspaceRouteTitle =
   | 'Serve'
   | 'Test'
   | 'Xi18n'
+  | 'Change workspace'
   | 'Select angular.json';
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
@@ -25,7 +26,8 @@ const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Serve', 'angular-cli.svg'],
   ['Test', 'angular-cli.svg'],
   ['Xi18n', 'angular-cli.svg'],
-  ['Select angular.json', 'extension_icon.png']
+  ['Select angular.json', 'angular-console.png'],
+  ['Change workspace', 'angular-console.png']
 ]);
 
 export const ROUTE_LIST = [

@@ -1,6 +1,0 @@
-query Editors {
-  editors {
-    name
-    icon
-  }
-}

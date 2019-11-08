@@ -1,12 +1,9 @@
 import { TelemetryType } from './record';
 import { Sink } from './sink';
-import { LoggerSink, GoogleAnalyticsSink } from './sinks';
+import { LoggerSink, GoogleAnalyticsSink, ApplicationPlatform } from './sinks';
 import { User, UserState } from './user';
-import { ApplicationPlatform } from '@angular-console/environment';
 import { TelemetryMessageBuilder } from './message-builder';
-import { seconds } from '../utils/utils';
-import { RunResult } from '../api/executable';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
+import { Store } from '@angular-console/server';
 
 export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];
@@ -82,12 +79,6 @@ export class Telemetry implements TelemetryMessageBuilder {
 
   commandRun(commandType: string, time: number): void {
     this.record('CommandRun', { commandType, time });
-  }
-
-  timedCommandRun(commandType: string, run: Function): RunResult {
-    const [time, result] = seconds(run);
-    this.commandRun(commandType, time);
-    return result;
   }
 
   exceptionOccured(error: string): void {

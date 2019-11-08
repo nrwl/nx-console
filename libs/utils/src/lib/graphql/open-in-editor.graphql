@@ -1,5 +1,0 @@
-mutation OpenInEditor($editor: String!, $path: String!) {
-  openInEditor(editor: $editor, path: $path) {
-    response
-  }
-}

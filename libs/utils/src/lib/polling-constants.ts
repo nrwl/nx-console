@@ -1,2 +1,0 @@
-export const COMMANDS_POLLING = 250;
-export const COMMAND_LIST_POLLING = 1000;

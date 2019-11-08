@@ -10,10 +10,6 @@ function affected(affectedCommand) {
 
 module.exports = {
   scripts: {
-    'gen-graphql': nps.series(
-      'gql-gen --config ./tools/scripts/codegen-server.yml',
-      'gql-gen --config ./tools/scripts/codegen-client.js'
-    ),
     clean: 'shx rm -rf dist/',
     prepare: {
       and: {
@@ -71,12 +67,11 @@ module.exports = {
     lint: {
       default: nps.concurrent({
         nxLint: 'nx lint',
-        tsLint: 'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json',
+        tsLint: 'ng lint',
         stylelint: 'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc'
       }),
       fix: nps.concurrent({
-        tslint:
-          'npx tslint -p tsconfig.json -e **/generated/* -c tslint.json --fix',
+        tslint: 'ng lint --fix',
         stylelint:
           'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc --fix'
       })
@@ -86,8 +81,7 @@ module.exports = {
       affected: affected('test')
     },
     'install-dependencies': {
-      vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
-      intellij: `node ${join('tools', 'scripts', 'intellij-yarn.js')}`
+      vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`
     }
   }
 };

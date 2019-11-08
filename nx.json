@@ -7,18 +7,6 @@
     "tslint.json": "*"
   },
   "projects": {
-    "angular-console": {
-      "tags": []
-    },
-    "feature-workspaces": {
-      "tags": []
-    },
-    "utils": {
-      "tags": []
-    },
-    "ui": {
-      "tags": []
-    },
     "schema": {
       "tags": []
     },
@@ -26,12 +14,6 @@
       "tags": []
     },
     "server": {
-      "tags": []
-    },
-    "environment": {
-      "tags": []
-    },
-    "intellij": {
       "tags": []
     },
     "vscode-ui-e2e": {

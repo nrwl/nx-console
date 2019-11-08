@@ -1,56 +1,61 @@
-import { Schema, NpmScript } from './lib/generated/graphql-types';
-
-export * from './lib/generated/graphql-types';
-
-export interface File {
+export interface Schema {
   name: string;
+  type: string;
+  description: string;
+  defaultValue?: string;
+  important?: boolean;
+  completion?: string;
+  deprecated?: string;
+  required: boolean;
+  positional: boolean;
+  enum?: string[];
 }
 
-export interface Directory {
-  path: string;
-  exists: boolean;
-  files: Array<File>;
+export interface SchematicCollectionForNgNew {
+  name: string;
+  description: string;
+  schema: Schema[];
 }
 
-export type AutocompletionType =
-  | 'localModules'
-  | 'absoluteModules'
-  | 'projects'
-  | 'file';
+export interface SchematicCollection {
+  name: string;
+  schematics: Schematic[];
+}
 
 export interface Schematic {
   collection: string;
   name: string;
   description: string;
   schema: Schema[];
-  npmClient: string | null;
-  npmScript: string | null;
 }
 
-export interface SchematicCollection {
+export interface Options {
+  defaultValues: FieldValue[];
+}
+
+export interface FieldValue {
   name: string;
-  schematics: Array<Schematic>;
+  defaultValue?: string;
 }
 
-export interface NpmScripts {
+export interface ArchitectConfigurations {
   name: string;
-  scripts: NpmScript[];
+  defaultValues: FieldValue[];
 }
 
-export interface StatsSummary {
-  parsed: number;
-  gzipped: number;
+export interface Project {
+  name: string;
+  root: string;
+  projectType: string;
+  architect: Architect[];
 }
 
-export interface Stats {
-  bundles: any[];
-  assets: any[];
-  errors?: string[];
-  warnings?: string[];
-  modulesByBundle: any;
-  summary: {
-    assets: StatsSummary;
-    modules: number;
-    dependencies: number;
-  };
+export interface Architect {
+  name: string;
+  project: string;
+  builder: string;
+  description: string;
+  options: Options;
+  configurations: ArchitectConfigurations[];
+  schema: Schema[];
 }
