@@ -12,6 +12,12 @@ LOCATE_YOUR_WORKSPACE.command = {
   title: 'Select angular.json',
   command: 'angularConsole.selectWorkspaceManually'
 };
+export const CHANGE_WORKSPACE = new TreeItem('Change workspace');
+CHANGE_WORKSPACE.command = {
+  tooltip: 'Select an angular.json file to open',
+  title: 'Change workspace',
+  command: 'angularConsole.selectWorkspaceManually'
+};
 
 export class WorkspaceTreeProvider extends AbstractTreeProvider<
   WorkspaceTreeItem | TreeItem
@@ -37,7 +43,12 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     LOCATE_YOUR_WORKSPACE.iconPath = join(
       extensionPath,
       'assets',
-      'extension_icon.png'
+      'angular-console.png'
+    );
+    CHANGE_WORKSPACE.iconPath = join(
+      extensionPath,
+      'assets',
+      'angular-console.png'
     );
   }
 
@@ -70,7 +81,7 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
       ...ROUTE_LIST.map(
         route => new WorkspaceTreeItem(workspacePath, route, this.extensionPath)
       ),
-      LOCATE_YOUR_WORKSPACE
+      CHANGE_WORKSPACE
     ];
   }
 }

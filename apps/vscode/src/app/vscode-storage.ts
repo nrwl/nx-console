@@ -1,5 +1,5 @@
 import { ConfigurationTarget, ExtensionContext, workspace } from 'vscode';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
+import { Store } from '@angular-console/server';
 
 export class VSCodeStorage implements Store {
   static configurationSection = 'angularConsole';

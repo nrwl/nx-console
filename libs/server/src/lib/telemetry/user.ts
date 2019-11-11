@@ -1,4 +1,4 @@
-import { authUtils, Store } from '@nrwl/angular-console-enterprise-electron';
+import { Store } from '@angular-console/server';
 
 export type UserState = 'untracked' | 'anonymous' | 'connected';
 
@@ -10,13 +10,8 @@ interface Settings {
 export type CheckConnection = () => boolean;
 export type OnChange = (user: User) => void;
 
-function isConnected(): boolean {
-  return !!authUtils.getIdTokenFromStore();
-}
-
 export class User {
   static fromStorage(store: Store): User {
-    authUtils.setStore(store);
     const settings: Settings | null = store.get('settings');
     let id: string | null = store.get('uuid');
     let state: UserState = 'anonymous';
@@ -26,17 +21,12 @@ export class User {
       store.set('uuid', id);
     }
 
-    const connected = authUtils.getIdTokenFromStore();
-    if (connected) {
-      state = 'connected';
-    }
-
     if (settings && !settings.canCollectData) {
       state = 'untracked';
     }
 
     // the cast here is to make windows build happy, it shouldn't be necessary
-    const user = new User(id as string, state, isConnected);
+    const user = new User(id as string, state);
     return user;
   }
 

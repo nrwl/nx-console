@@ -1,9 +1,8 @@
-import { Telemetry } from '@angular-console/server';
-import { workspace, window, ExtensionContext } from 'vscode';
+import { Store, Telemetry } from '@angular-console/server';
+import { ExtensionContext, window, workspace } from 'vscode';
 
 import { environment } from '../environments/environment';
 import { VSCodeStorage } from './vscode-storage';
-import { Store } from '@nrwl/angular-console-enterprise-electron';
 
 let telemetry: Telemetry;
 

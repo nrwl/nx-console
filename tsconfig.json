@@ -6,7 +6,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "target": "es2015",
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strictNullChecks": true,
@@ -19,18 +19,12 @@
     "strictFunctionTypes": true,
     "typeRoots": ["node_modules/@types", "node_modules/node-pty/typings"],
     "downlevelIteration": true,
-    "lib": ["es2017", "dom", "esnext.asynciterable"],
+    "lib": ["es2019", "dom", "esnext.asynciterable"],
     "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
-      "@angular-console/feature-workspaces": [
-        "libs/feature-workspaces/src/index.ts"
-      ],
-      "@angular-console/ui": ["libs/ui/src/index.ts"],
-      "@angular-console/utils": ["libs/utils/src/index.ts"],
       "@angular-console/schema": ["libs/schema/src/index.ts"],
       "@angular-console/server": ["libs/server/src/index.ts"],
-      "@angular-console/environment": ["libs/environment/src/index.ts"],
       "@angular-console/vscode-ui/feature-task-execution-form": [
         "libs/vscode-ui/feature-task-execution-form/src/index.ts"
       ],
@@ -41,7 +35,7 @@
         "libs/vscode-ui/styles/src/index.ts"
       ]
     },
-    "module": "es2015",
+    "module": "esnext",
     "rootDir": "."
   },
   "exclude": ["node_modules", "tmp"]

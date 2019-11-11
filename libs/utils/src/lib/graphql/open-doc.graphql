@@ -1,5 +1,0 @@
-mutation OpenDoc($id: String!) {
-  openDoc(id: $id) {
-    result
-  }
-}

@@ -126,26 +126,6 @@ describe('Telemetry', () => {
       });
     });
 
-    it('times and records command', () => {
-      const commandType = 'command';
-      const commandResult = 'result';
-      const time = 0;
-
-      const result = telemetry.timedCommandRun(
-        commandType,
-        () => commandResult
-      );
-
-      const written = sink.oneRecord();
-
-      expect(written).toEqual({
-        type: 'CommandRun',
-        data: { commandType, time }
-      });
-
-      expect(result).toEqual(commandResult);
-    });
-
     it('records exceptions', () => {
       const error = 'error';
 

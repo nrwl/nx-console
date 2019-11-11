@@ -1,13 +1,13 @@
 import { Sink } from '../sink';
 import { TelemetryType } from '../record';
 import { UserState } from '../user';
-import { ApplicationPlatform } from '@angular-console/environment';
 import { TelemetryMessageBuilder } from '../message-builder';
 
 // increment this if there is substancial changes to the schema,
 // and you want to create a new view that only has this data
 const ANALYTICS_VERSION = 2;
 const TRACKING_ID = 'UA-88380372-8';
+export type ApplicationPlatform = 'vscode';
 
 class TelemetryParams {
   constructor(readonly type: string, readonly data: any) {}

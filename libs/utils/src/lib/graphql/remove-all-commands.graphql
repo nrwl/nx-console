@@ -1,5 +1,0 @@
-mutation RemoveAllCommands {
-  removeAllCommands {
-    result
-  }
-}

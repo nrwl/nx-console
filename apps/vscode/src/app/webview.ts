@@ -111,28 +111,43 @@ export function getIframeHtml(
 ) {
   if (!indexHtml) {
     // Cache html and inline all styles and scripts.
-    indexHtml = readFileSync(
-      join(context.extensionPath, 'assets/public/index.html')
-    )
-      .toString()
-      .replace(
-        '<link rel="stylesheet" href="styles.css">',
-        `<style>${readFileSync(
-          join(context.extensionPath, 'assets/public/styles.css')
-        )}</style>`
-      )
-      .replace(
-        '<script src="runtime.js"></script>',
-        `<script>${readFileSync(
-          join(context.extensionPath, 'assets/public/runtime.js')
-        )}</script>`
-      )
-      .replace(
-        '<script src="main.js"></script>',
-        `<script>${readFileSync(
-          join(context.extensionPath, 'assets/public/main.js')
-        )}</script>`
-      );
+    indexHtml = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>VscodeUi</title>
+    <base href="/" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <script>
+      // At runtime, VSCode server will replace this empty schema with the one to render.
+      window.VSCODE_UI_SCHEMA = {};
+
+      window.addEventListener('message', event => {
+        const taskExecutionSchema = event.data.taskExecutionSchema;
+        if (taskExecutionSchema && window.SET_TASK_EXECUTION_SCHEMA) {
+          window.SET_TASK_EXECUTION_SCHEMA(taskExecutionSchema);
+        }
+      });
+
+      window.vscode = acquireVsCodeApi();
+    </script>
+    <style>${readFileSync(
+      join(context.extensionPath, 'assets/public/styles.css')
+    )}</style>
+  </head>
+  <body>
+    <vscode-ui-task-execution-form></vscode-ui-task-execution-form>
+    <script>
+      ${readFileSync(join(context.extensionPath, 'assets/public/runtime.js'))}
+    </script>
+    <script>
+      ${readFileSync(join(context.extensionPath, 'assets/public/main.js'))}
+    </script>
+  </body>
+</html>`;
   }
 
   return indexHtml.replace(

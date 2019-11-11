@@ -1,14 +1,10 @@
 import { NgTaskDefinition } from './ng-task-definition';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
-import { FileUtils } from '@angular-console/server';
+import { findClosestNg } from '@angular-console/server';
 
 export class NgTask extends Task {
-  static create(
-    definition: NgTaskDefinition,
-    workspacePath: string,
-    fileUtils: FileUtils
-  ): NgTask {
+  static create(definition: NgTaskDefinition, workspacePath: string): NgTask {
     const { positional, command, flags } = definition;
 
     const args: Array<string> = [command, positional, ...flags];
@@ -24,7 +20,7 @@ export class NgTask extends Task {
         args,
         cwd: workspacePath,
         name: displayCommand,
-        program: fileUtils.findClosestNg(workspacePath)
+        program: findClosestNg(workspacePath)
       })
     );
 

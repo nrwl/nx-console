@@ -1,8 +1,0 @@
-query ListAllCommands {
-  commands {
-    id
-    status
-    workspace
-    command
-  }
-}

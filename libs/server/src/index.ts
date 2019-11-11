@@ -1,28 +1,16 @@
+export { findClosestNg } from './lib/utils/utils';
+
 export { cacheJsonFiles } from './lib/utils/utils';
-
-export { readArchitectDef, readSchema } from './lib/api/read-projects';
-
-export {
-  readAllSchematicCollections
-} from './lib/api/read-schematic-collections';
-
-export { EXTENSIONS } from './lib/api/read-extensions';
-
-export { FileUtils } from './lib/utils/file-utils';
 
 export { readJsonFile } from './lib/utils/utils';
 
-export { QueryResolver } from './lib/resolvers/query.resolver';
-
-export { settingsChange$ } from './lib/api/read-settings';
-
-export { readSettings, storeSettings } from './lib/api/read-settings';
-
-export { createServerModule } from './lib/server.module';
-
 export { Telemetry } from './lib/telemetry';
-export { Commands } from './lib/api/commands';
+export * from './lib/extensions';
+export * from './lib/utils/read-scehmatic-collections';
+export * from './lib/utils/read-projects';
 
-export * from './lib/api/executable';
-
-export { SelectDirectory } from './lib/types';
+export interface Store {
+  get(key: string, defaultValue?: any): any;
+  set(key: string, value: any): void;
+  delete(key: string): void;
+}

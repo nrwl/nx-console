@@ -1,9 +1,17 @@
-import { PseudoTerminalConfig } from '@angular-console/server';
 import { ShellExecution } from 'vscode';
 import { platform } from 'os';
 
+export interface ShellConfig {
+  /** Human-readable string which will be used to represent the terminal in the UI. */
+  name: string;
+  program: string;
+  args: string[];
+  cwd: string;
+  displayCommand: string;
+}
+
 export function getShellExecutionForConfig(
-  config: PseudoTerminalConfig
+  config: ShellConfig
 ): ShellExecution {
   let execution: ShellExecution;
   if (platform() === 'win32') {
@@ -15,7 +23,7 @@ export function getShellExecutionForConfig(
   return execution;
 }
 
-function getWin32ShellExecution(config: PseudoTerminalConfig): ShellExecution {
+function getWin32ShellExecution(config: ShellConfig): ShellExecution {
   return new ShellExecution(config.displayCommand, {
     cwd: config.cwd,
     executable:
@@ -29,7 +37,7 @@ function getWin32ShellExecution(config: PseudoTerminalConfig): ShellExecution {
   });
 }
 
-function getUnixShellExecution(config: PseudoTerminalConfig): ShellExecution {
+function getUnixShellExecution(config: ShellConfig): ShellExecution {
   return new ShellExecution(config.displayCommand, {
     cwd: config.cwd,
     executable: '/bin/bash',

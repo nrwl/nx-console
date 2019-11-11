@@ -1,6 +1,0 @@
-query BasicWorkspace($path: String!) {
-  workspace(path: $path) {
-    path
-    name
-  }
-}

@@ -1,4 +1,4 @@
-import { EXTENSIONS, FileUtils, cacheJsonFiles } from '@angular-console/server';
+import { cacheJsonFiles, EXTENSIONS } from '@angular-console/server';
 import { stream } from 'fast-glob';
 import { existsSync, readFileSync } from 'fs';
 import { dirname, join, parse } from 'path';
@@ -14,7 +14,6 @@ import {
 
 import { AngularJsonTreeItem } from './app/angular-json-tree/angular-json-tree-item';
 import { AngularJsonTreeProvider } from './app/angular-json-tree/angular-json-tree-provider';
-import { migrateSettings } from './app/migrate-settings';
 import { registerNgTaskCommands } from './app/ng-task/ng-task-commands';
 import { NgTaskProvider } from './app/ng-task/ng-task-provider';
 import { VSCodeStorage } from './app/vscode-storage';
@@ -40,11 +39,10 @@ export function activate(c: ExtensionContext) {
   currentWorkspaceTreeProvider = WorkspaceTreeProvider.create({
     extensionPath: context.extensionPath
   });
-  migrateSettings(context);
   const store = VSCodeStorage.fromContext(context);
   initTelemetry(context, store);
 
-  ngTaskProvider = new NgTaskProvider(new FileUtils(store));
+  ngTaskProvider = new NgTaskProvider();
   tasks.registerTaskProvider('ng', ngTaskProvider);
 
   registerNgTaskCommands(context, ngTaskProvider);

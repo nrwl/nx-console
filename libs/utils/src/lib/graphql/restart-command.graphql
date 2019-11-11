@@ -1,5 +1,0 @@
-mutation RestartCommand($id: String!) {
-  restartCommand(id: $id) {
-    result
-  }
-}

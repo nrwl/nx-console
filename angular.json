@@ -3,107 +3,6 @@
   "version": 1,
   "newProjectRoot": "",
   "projects": {
-    "angular-console": {
-      "root": "apps/angular-console/",
-      "sourceRoot": "apps/angular-console/src",
-      "projectType": "application",
-      "prefix": "apps/angular-console",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist/apps/angular-console",
-            "index": "apps/angular-console/src/index.html",
-            "main": "apps/angular-console/src/main.ts",
-            "polyfills": "apps/angular-console/src/polyfills.ts",
-            "tsConfig": "apps/angular-console/tsconfig.app.json",
-            "assets": [
-              "apps/angular-console/src/favicon.ico",
-              "apps/angular-console/src/assets"
-            ],
-            "styles": ["apps/angular-console/src/styles.scss"],
-            "scripts": [],
-            "optimization": true,
-            "sourceMap": false,
-            "extractCss": true,
-            "namedChunks": false,
-            "aot": true,
-            "extractLicenses": true,
-            "vendorChunk": false,
-            "buildOptimizer": true
-          },
-          "configurations": {
-            "vscode": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.vscode.ts"
-                }
-              ],
-              "outputPath": "dist/apps/vscode/assets/legacy"
-            },
-            "intellij": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.intellij.ts"
-                }
-              ],
-              "outputPath": "dist/apps/intellij/assets/public"
-            },
-            "dev": {
-              "optimization": false,
-              "aot": false,
-              "buildOptimizer": false,
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "extractLicenses": false
-            },
-            "cypress": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/angular-console/src/environments/environment.ts",
-                  "with": "apps/angular-console/src/environments/environment.cypress.ts"
-                }
-              ],
-              "optimization": false,
-              "aot": false,
-              "buildOptimizer": false
-            }
-          }
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "angular-console:build",
-            "proxyConfig": "apps/angular-console/proxy.conf.js"
-          },
-          "configurations": {
-            "dev": {
-              "browserTarget": "angular-console:build:dev"
-            },
-            "cypress": {
-              "browserTarget": "angular-console:build:cypress"
-            }
-          }
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
-          "options": {
-            "browserTarget": "angular-console:build"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["apps/angular-console/tsconfig.app.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        }
-      }
-    },
     "vscode": {
       "root": "apps/vscode",
       "sourceRoot": "apps/vscode/src",
@@ -121,11 +20,6 @@
               "apps/vscode/src/package.json",
               "apps/vscode/src/tree-view-icon.svg",
               "apps/vscode/src/assets",
-              {
-                "glob": "schema.graphql",
-                "input": "node_modules/@nrwl/angular-console-enterprise-electron",
-                "output": "/assets/"
-              },
               {
                 "glob": "README.md",
                 "input": "./",
@@ -162,78 +56,6 @@
         }
       }
     },
-    "intellij": {
-      "root": "apps/intellij",
-      "sourceRoot": "apps/intellij/src",
-      "projectType": "application",
-      "prefix": "intellij",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "outputPath": "dist/apps/intellij",
-            "main": "apps/intellij/src/main.ts",
-            "tsConfig": "apps/intellij/tsconfig.app.json",
-            "assets": [
-              "apps/intellij/src/package.json",
-              "apps/intellij/src/LICENSE",
-              "apps/intellij/src/assets",
-              {
-                "glob": "schema.graphql",
-                "input": "node_modules/@nrwl/angular-console-enterprise-electron",
-                "output": "/assets/"
-              },
-              {
-                "glob": "README.md",
-                "input": "./",
-                "output": "/assets/"
-              },
-              {
-                "glob": "**/*",
-                "input": "libs/server/src/assets",
-                "output": "/assets/"
-              }
-            ]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "sourceMap": false,
-              "externalDependencies": ["ij-rpc-client"],
-              "fileReplacements": [
-                {
-                  "replace": "apps/intellij/src/environments/environment.ts",
-                  "with": "apps/intellij/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["apps/intellij/tsconfig.app.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        }
-      }
-    },
-    "feature-workspaces": {
-      "root": "libs/feature-workspaces",
-      "sourceRoot": "libs/feature-workspaces/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["libs/feature-workspaces/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        }
-      }
-    },
     "schema": {
       "root": "libs/schema",
       "sourceRoot": "libs/schema/src",
@@ -244,56 +66,6 @@
           "options": {
             "tsConfig": ["libs/schema/tsconfig.lib.json"],
             "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        }
-      }
-    },
-    "ui": {
-      "root": "libs/ui",
-      "sourceRoot": "libs/ui/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/ui/tsconfig.lib.json",
-              "libs/ui/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/ui/jest.config.js",
-            "tsConfig": "libs/ui/tsconfig.spec.json",
-            "setupFile": "libs/ui/src/test-setup.ts"
-          }
-        }
-      }
-    },
-    "utils": {
-      "root": "libs/utils",
-      "sourceRoot": "libs/utils/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/utils/tsconfig.lib.json",
-              "libs/utils/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/utils/jest.config.js",
-            "tsConfig": "libs/utils/tsconfig.spec.json",
-            "setupFile": "libs/utils/src/test-setup.ts"
           }
         }
       }
@@ -313,22 +85,6 @@
         }
       }
     },
-    "environment": {
-      "root": "libs/environment",
-      "sourceRoot": "libs/environment/src",
-      "projectType": "library",
-      "prefix": "angular-console",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["libs/environment/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**"]
-          }
-        }
-      },
-      "schematics": {}
-    },
     "vscode-ui": {
       "projectType": "application",
       "schematics": {
@@ -338,7 +94,6 @@
       },
       "root": "apps/vscode-ui",
       "sourceRoot": "apps/vscode-ui/src",
-      "prefix": "angular-console",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -448,7 +203,6 @@
       "projectType": "library",
       "root": "libs/vscode-ui/feature-task-execution-form",
       "sourceRoot": "libs/vscode-ui/feature-task-execution-form/src",
-      "prefix": "angular-console",
       "architect": {
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
@@ -469,7 +223,6 @@
       "projectType": "library",
       "root": "libs/vscode-ui/components",
       "sourceRoot": "libs/vscode-ui/components/src",
-      "prefix": "angular-console",
       "architect": {
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
@@ -489,7 +242,6 @@
       "projectType": "library",
       "root": "libs/vscode-ui/styles",
       "sourceRoot": "libs/vscode-ui/styles/src",
-      "prefix": "angular-console",
       "architect": {
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",

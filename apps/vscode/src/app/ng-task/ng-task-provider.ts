@@ -1,4 +1,4 @@
-import { FileUtils, readJsonFile } from '@angular-console/server';
+import { readJsonFile } from '@angular-console/server';
 import {
   ProviderResult,
   Task,
@@ -24,7 +24,7 @@ export class NgTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: NgTaskDefinition;
 
-  constructor(private readonly fileUtils: FileUtils) {
+  constructor() {
     tasks.onDidEndTaskProcess(e => {
       if (e.execution === this.currentDryRun) {
         this.currentDryRun = undefined;
@@ -66,7 +66,7 @@ export class NgTaskProvider implements TaskProvider {
   }
 
   createTask(definition: NgTaskDefinition) {
-    return NgTask.create(definition, this.workspacePath || '', this.fileUtils);
+    return NgTask.create(definition, this.workspacePath || '');
   }
 
   executeTask(definition: NgTaskDefinition) {
