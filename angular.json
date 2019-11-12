@@ -23,7 +23,7 @@
               {
                 "glob": "README.md",
                 "input": "./",
-                "output": "/assets/"
+                "output": "/"
               },
               {
                 "glob": "**/*",

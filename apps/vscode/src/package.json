@@ -5,7 +5,7 @@
   "version": "9.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nrwl/angular-console"
+    "url": "https://github.com/nrwl/angular-console.git"
   },
   "author": {
     "name": "Narwhal Technologies Inc",
