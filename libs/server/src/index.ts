@@ -1,3 +1,5 @@
+export { readAndParseJson } from './lib/utils/utils';
+
 export { findClosestNg } from './lib/utils/utils';
 
 export { cacheJsonFiles } from './lib/utils/utils';

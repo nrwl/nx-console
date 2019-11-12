@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
 
-const stripJsonComments = require('strip-json-comments'); // tslint:disable-line
+import * as stripJsonComments from 'strip-json-comments';
 
 export interface SchematicDefaults {
   [name: string]: string;
@@ -88,6 +88,10 @@ export function findClosestNg(dir: string): string {
 
 export function listOfUnnestedNpmPackages(nodeModulesDir: string): string[] {
   const res: string[] = [];
+  if (!existsSync(nodeModulesDir)) {
+    return res;
+  }
+
   readdirSync(nodeModulesDir).forEach(npmPackageOrScope => {
     if (npmPackageOrScope.startsWith('@')) {
       readdirSync(path.join(nodeModulesDir, npmPackageOrScope)).forEach(p => {
@@ -124,22 +128,18 @@ export function listFiles(dirName: string): string[] {
 }
 
 export function cacheJsonFiles(basedir: string) {
-  try {
-    const nodeModulesDir = path.join(basedir, 'node_modules');
-    const packages = listOfUnnestedNpmPackages(nodeModulesDir);
+  const nodeModulesDir = path.join(basedir, 'node_modules');
+  const packages = listOfUnnestedNpmPackages(nodeModulesDir);
 
-    const res: any = {};
-    packages.forEach(p => {
-      const filePath = path.join(nodeModulesDir, p, 'package.json');
-      if (!fileExistsSync(filePath)) return;
-      res[filePath] = readAndParseJson(
-        path.join(nodeModulesDir, p, 'package.json')
-      );
-    });
-    return res;
-  } catch (e) {
-    return {};
-  }
+  const res: any = {};
+  packages.forEach(p => {
+    const filePath = path.join(nodeModulesDir, p, 'package.json');
+    if (!fileExistsSync(filePath)) return;
+    res[filePath] = readAndParseJson(
+      path.join(nodeModulesDir, p, 'package.json')
+    );
+  });
+  return res;
 }
 
 export function directoryExists(filePath: string): boolean {
@@ -158,7 +158,7 @@ export function fileExistsSync(filePath: string): boolean {
   }
 }
 
-function readAndParseJson(fullFilePath: string): any {
+export function readAndParseJson(fullFilePath: string): any {
   return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
 }
 

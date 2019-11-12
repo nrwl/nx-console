@@ -1,23 +1,24 @@
-import { readJsonFile } from '@angular-console/server';
+import { readAndParseJson } from '@angular-console/server';
+import { existsSync } from 'fs';
+import { join } from 'path';
 import {
   ProviderResult,
   Task,
+  TaskExecution,
   TaskProvider,
-  window,
   tasks,
-  TaskExecution
+  window
 } from 'vscode';
-import * as path from 'path';
 
+import { getTelemetry } from '../telemetry';
 import { NgTask } from './ng-task';
 import {
   AngularJson,
+  NamedProject,
   NgTaskDefinition,
   ProjectDef,
-  NamedProject,
   Projects
 } from './ng-task-definition';
-import { getTelemetry } from '../telemetry';
 
 export class NgTaskProvider implements TaskProvider {
   private workspacePath?: string;
@@ -70,6 +71,16 @@ export class NgTaskProvider implements TaskProvider {
   }
 
   executeTask(definition: NgTaskDefinition) {
+    if (
+      !this.workspacePath ||
+      !existsSync(join(this.workspacePath, 'node_modules'))
+    ) {
+      window.showErrorMessage(
+        'Could not execute task since node_modules directory is missing. Run npm install.'
+      );
+      return;
+    }
+
     const isDryRun = definition.flags.includes('--dry-run');
     if (isDryRun && this.currentDryRun) {
       this.deferredDryRun = definition;
@@ -94,14 +105,12 @@ export class NgTaskProvider implements TaskProvider {
     }
 
     try {
-      const { projects } = readJsonFile('angular.json', this.workspacePath)
-        .json as AngularJson;
+      const { projects } = readAndParseJson(
+        join(this.workspacePath, 'angular.json')
+      ).json as AngularJson;
 
       return projects;
-    } catch {
-      window.showErrorMessage(
-        'Your angular.json file is invalid (see debug console)'
-      );
+    } catch (e) {
       return {};
     }
   }
@@ -118,7 +127,7 @@ export class NgTaskProvider implements TaskProvider {
     if (!this.workspacePath) return null;
 
     const entry = this.getProjectEntries().find(([_, def]) =>
-      selectedPath.startsWith(path.join(this.workspacePath!, def.root))
+      selectedPath.startsWith(join(this.workspacePath!, def.root))
     );
 
     return entry ? { name: entry[0], ...entry[1] } : null;
