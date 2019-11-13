@@ -94,14 +94,16 @@ export class NgTaskProvider implements TaskProvider {
   }
 
   getProjects(json?: AngularJson): Projects {
-    if (!json) {
+    if (json) {
+      return json.projects;
+    } else {
       const result = verifyAngularJson(this.workspacePath);
-      if (!result.validAngularJson || !json) {
+      if (!result.validAngularJson || !result.json) {
         return {};
+      } else {
+        return result.json.projects;
       }
-      return result.json;
     }
-    return json.projects;
   }
 
   getProjectNames(): string[] {
