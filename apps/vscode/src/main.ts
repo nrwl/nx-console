@@ -1,8 +1,4 @@
-import {
-  cacheJsonFiles,
-  EXTENSIONS,
-  readAndParseJson
-} from '@angular-console/server';
+import { cacheJsonFiles, EXTENSIONS } from '@angular-console/server';
 import { stream } from 'fast-glob';
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
@@ -20,7 +16,9 @@ import { AngularJsonTreeItem } from './app/angular-json-tree/angular-json-tree-i
 import { AngularJsonTreeProvider } from './app/angular-json-tree/angular-json-tree-provider';
 import { registerNgTaskCommands } from './app/ng-task/ng-task-commands';
 import { NgTaskProvider } from './app/ng-task/ng-task-provider';
+import { getOutputChannel } from './app/output-channel';
 import { getTelemetry, initTelemetry } from './app/telemetry';
+import { verifyAngularJson, verifyNodeModules } from './app/verifyWorkspace';
 import { VSCodeStorage } from './app/vscode-storage';
 import { revealWebViewPanel } from './app/webview';
 import { WorkspaceTreeItem } from './app/workspace-tree/workspace-tree-item';
@@ -28,7 +26,6 @@ import {
   LOCATE_YOUR_WORKSPACE,
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
-import { getOutputChannel } from './app/output-channel';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
 let angularJsonTreeView: TreeView<AngularJsonTreeItem>;
@@ -48,25 +45,10 @@ export function activate(c: ExtensionContext) {
     const store = VSCodeStorage.fromContext(context);
     initTelemetry(context, store);
 
-    ngTaskProvider = new NgTaskProvider();
-    tasks.registerTaskProvider('ng', ngTaskProvider);
-
-    registerNgTaskCommands(context, ngTaskProvider);
-
     workspaceTreeView = window.createTreeView('angularConsole', {
       treeDataProvider: currentWorkspaceTreeProvider
     }) as TreeView<WorkspaceTreeItem>;
     context.subscriptions.push(workspaceTreeView);
-
-    angularJsonTreeProvider = new AngularJsonTreeProvider(
-      context,
-      ngTaskProvider
-    );
-
-    angularJsonTreeView = window.createTreeView('angularConsoleJson', {
-      treeDataProvider: angularJsonTreeProvider
-    }) as TreeView<AngularJsonTreeItem>;
-    context.subscriptions.push(angularJsonTreeView);
 
     context.subscriptions.push(
       commands.registerCommand(
@@ -75,10 +57,12 @@ export function activate(c: ExtensionContext) {
           if (
             !existsSync(join(workspaceTreeItem.workspacePath, 'node_modules'))
           ) {
-            window.showErrorMessage(
-              'Angular Console requires your workspace have a node_modules directory. Run npm install.'
+            const { validNodeModules: hasNodeModules } = verifyNodeModules(
+              workspaceTreeItem.workspacePath
             );
-            return;
+            if (!hasNodeModules) {
+              return;
+            }
           }
           switch (workspaceTreeItem.route) {
             case 'Add':
@@ -184,19 +168,27 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
 }
 
 async function setAngularWorkspace(workspacePath: string) {
-  try {
-    readAndParseJson(join(workspacePath, 'angular.json'));
-  } catch (e) {
-    window.showErrorMessage(
-      'Invalid angular.json (see output panel for details)'
-    );
-    getOutputChannel().appendLine(
-      'Invalid angular JSON: ' + join(workspacePath, 'angular.json')
+  const { validAngularJson } = verifyAngularJson(workspacePath);
+  if (!validAngularJson) {
+    return;
+  }
+
+  if (!ngTaskProvider) {
+    ngTaskProvider = new NgTaskProvider(workspacePath);
+    tasks.registerTaskProvider('ng', ngTaskProvider);
+    registerNgTaskCommands(context, ngTaskProvider);
+
+    angularJsonTreeProvider = new AngularJsonTreeProvider(
+      context,
+      ngTaskProvider
     );
 
-    const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
-    getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exceptionOccured(stringifiedError);
+    angularJsonTreeView = window.createTreeView('angularConsoleJson', {
+      treeDataProvider: angularJsonTreeProvider
+    }) as TreeView<AngularJsonTreeItem>;
+    context.subscriptions.push(angularJsonTreeView);
+  } else {
+    ngTaskProvider.setWorkspacePath(workspacePath);
   }
 
   setTimeout(() => {
@@ -207,7 +199,6 @@ async function setAngularWorkspace(workspacePath: string) {
   commands.executeCommand('setContext', 'isAngularWorkspace', true);
 
   currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
-  ngTaskProvider.setWorkspacePath(workspacePath);
   angularJsonTreeProvider.setWorkspacePath(workspacePath);
 }
 

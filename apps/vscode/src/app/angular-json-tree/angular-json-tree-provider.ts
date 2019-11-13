@@ -18,6 +18,7 @@ import {
   AngularJsonLabel,
   AngularJsonTreeItem
 } from './angular-json-tree-item';
+import { verifyAngularJson } from '../verifyWorkspace';
 
 export class AngularJsonTreeProvider extends AbstractTreeProvider<
   AngularJsonTreeItem
@@ -253,8 +254,15 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
   }
 
   private async editAngularJson(selection: AngularJsonTreeItem) {
+    const { validAngularJson } = verifyAngularJson(
+      this.ngTaskProvider.getWorkspacePath()
+    );
+    if (!validAngularJson) {
+      return;
+    }
+
     const angularJson = Uri.file(
-      join(this.ngTaskProvider.getWorkspacePath()!, 'angular.json')
+      join(this.ngTaskProvider.getWorkspacePath(), 'angular.json')
     );
     const document: TextDocument = await workspace.openTextDocument(
       angularJson
