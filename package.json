@@ -41,6 +41,7 @@
     "@nrwl/node": "8.7.0",
     "@nrwl/workspace": "8.7.0",
     "@types/jest": "24.0.9",
+    "@types/mocha": "^5.2.7",
     "@types/node": "12.12.7",
     "@types/shelljs": "^0.8.2",
     "@types/strip-json-comments": "^0.0.30",
@@ -53,6 +54,7 @@
     "husky": "^3.0.9",
     "jest": "24.1.0",
     "jest-preset-angular": "7.0.0",
+    "mocha": "^6.2.2",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "prettier": "1.16.4",
@@ -77,6 +79,7 @@
     "uuid": "3.3.2",
     "vsce": "^1.66.0",
     "vscode": "^1.1.35",
+    "vscode-test": "^1.2.3",
     "zlib": "^1.0.5",
     "zone.js": "0.9.1"
   },

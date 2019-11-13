@@ -13,10 +13,6 @@ module.exports = {
     clean: 'shx rm -rf dist/',
     prepare: {
       and: {
-        e2e: {
-          up: nps.series.nps('prepare.e2e', 'e2e.up'),
-          headless: nps.series.nps('prepare.e2e', 'e2e.headless')
-        },
         package: {
           vscode: nps.series.nps(
             'clean',
@@ -79,6 +75,10 @@ module.exports = {
     test: {
       default: 'nx affected:test --all --parallel',
       affected: affected('test')
+    },
+    e2e: {
+      default: 'nx affected:e2e --all --parallel',
+      affected: affected('e2e')
     },
     'install-dependencies': {
       vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`

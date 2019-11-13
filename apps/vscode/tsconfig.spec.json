@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src/test",
+    "outDir": "../../dist/apps/vscode/src/test",
+    "module": "commonjs",
+    "target": "es5",
+    "moduleResolution": "node",
+    "types": ["node"]
+  },
+  "include": ["src/test/**/*.ts"]
+}

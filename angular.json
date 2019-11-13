@@ -47,6 +47,23 @@
             }
           }
         },
+        "e2e": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "parallel": false,
+            "commands": [
+              {
+                "command": "yarn nps prepare.vscode"
+              },
+              {
+                "command": "yarn tsc -p apps/vscode/tsconfig.spec.json"
+              },
+              {
+                "command": "node dist/apps/vscode/src/test/run-test"
+              }
+            ]
+          }
+        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
