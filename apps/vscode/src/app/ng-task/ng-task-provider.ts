@@ -1,16 +1,14 @@
-import { readAndParseJson } from '@angular-console/server';
-import { existsSync } from 'fs';
 import { join } from 'path';
 import {
   ProviderResult,
   Task,
   TaskExecution,
   TaskProvider,
-  tasks,
-  window
+  tasks
 } from 'vscode';
 
 import { getTelemetry } from '../telemetry';
+import { verifyAngularJson, verifyNodeModules } from '../verifyWorkspace';
 import { NgTask } from './ng-task';
 import {
   AngularJson,
@@ -21,11 +19,10 @@ import {
 } from './ng-task-definition';
 
 export class NgTaskProvider implements TaskProvider {
-  private workspacePath?: string;
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: NgTaskDefinition;
 
-  constructor() {
+  constructor(private workspacePath: string) {
     tasks.onDidEndTaskProcess(e => {
       if (e.execution === this.currentDryRun) {
         this.currentDryRun = undefined;
@@ -71,13 +68,10 @@ export class NgTaskProvider implements TaskProvider {
   }
 
   executeTask(definition: NgTaskDefinition) {
-    if (
-      !this.workspacePath ||
-      !existsSync(join(this.workspacePath, 'node_modules'))
-    ) {
-      window.showErrorMessage(
-        'Could not execute task since node_modules directory is missing. Run npm install.'
-      );
+    const { validNodeModules: hasNodeModules } = verifyNodeModules(
+      this.workspacePath
+    );
+    if (!hasNodeModules) {
       return;
     }
 
@@ -99,35 +93,34 @@ export class NgTaskProvider implements TaskProvider {
     });
   }
 
-  getProjects(): Projects {
-    if (!this.workspacePath) {
-      return {};
+  getProjects(json?: AngularJson): Projects {
+    if (!json) {
+      const result = verifyAngularJson(this.workspacePath);
+      if (!result.validAngularJson || !json) {
+        return {};
+      }
+      return result.json;
     }
-
-    try {
-      const { projects } = readAndParseJson(
-        join(this.workspacePath, 'angular.json')
-      ).json as AngularJson;
-
-      return projects;
-    } catch (e) {
-      return {};
-    }
+    return json.projects;
   }
 
   getProjectNames(): string[] {
     return Object.keys(this.getProjects() || {});
   }
 
-  getProjectEntries(): [string, ProjectDef][] {
-    return Object.entries(this.getProjects() || {}) as [string, ProjectDef][];
+  getProjectEntries(json?: AngularJson): [string, ProjectDef][] {
+    return Object.entries(this.getProjects(json) || {}) as [
+      string,
+      ProjectDef
+    ][];
   }
 
   projectForPath(selectedPath: string): NamedProject | null {
     if (!this.workspacePath) return null;
 
+    console.log(selectedPath);
     const entry = this.getProjectEntries().find(([_, def]) =>
-      selectedPath.startsWith(join(this.workspacePath!, def.root))
+      selectedPath.startsWith(join(this.workspacePath, def.root))
     );
 
     return entry ? { name: entry[0], ...entry[1] } : null;

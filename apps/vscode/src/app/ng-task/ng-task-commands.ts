@@ -7,6 +7,7 @@ import {
 } from '../workspace-tree/workspace-tree-item';
 import { NgTaskProvider } from './ng-task-provider';
 import { NgTaskQuickPickItem } from './ng-task-quick-pick-item';
+import { verifyAngularJson } from '../verifyWorkspace';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -113,8 +114,15 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
 }
 
 export function selectNgCliProject(command: string) {
+  const { validAngularJson, json } = verifyAngularJson(
+    ngTaskProvider.getWorkspacePath()
+  );
+  if (!validAngularJson) {
+    return;
+  }
+
   const items = ngTaskProvider
-    .getProjectEntries()
+    .getProjectEntries(json)
     .filter(([_, { architect }]) => Boolean(architect))
     .flatMap(([project, { architect }]) => ({ project, architect }))
     .filter(({ architect }) => Boolean(architect && architect[command]))
