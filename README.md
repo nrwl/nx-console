@@ -9,20 +9,9 @@
 
 <hr>
 
-<p align="center">
-  <a href="https://hubs.ly/H0hWwWd0" target="_blank">  
-    <img 
-         width="728"
-         src="https://images.ctfassets.net/8eyogtwep6d2/4FZPkA6lK3IEwJFlmfB47/4b5fef4738d4b23c41007329fca37ad0/nrwl-connect-banner-with-shadow.png?w=1024"  
-         alt="Nrwl Connect platform">
-  </a>
-</p>
-
-<hr>
-
 ### Spend less time looking up command line arguments and more time shipping incredible products.
 
-<img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-plugin.gif">
+![](./static/vscode-screenshot.png)
 
 Angular CLI transformed the Angular ecosystem. With it, you can get a full-stack application up and running in minutes, no need to figure out source maps, webpack, test runners. It all works out of the box. Angular CLI also helps you enforce consistent development practices by generating components, services, and state management modules.
 
@@ -38,23 +27,15 @@ For instance:
 - Using rarely-used flags is challenging. Do you pass absolute or relative paths? You don't have to remember any flags, names, or paths -- Angular Console will help you by providing autocompletion and validating your inputs.
 - Finding the right Angular CLI extension can take a long time. When using Angular Console, you can find and install an extension in minutes.
 
-Angular Console does more than that:
-
-- It visualizes the results of a build or a test run.
-- It visualizes how different projects in your workspace depend on each other.
-- It shows dry run results as you create your command
-- It shows remembers you most recent cli commands and saves their output for your reference
-- ...
+Angular Console does all that and more!
 
 ## Download
 
-- If you are a VSCode user, the best way to try Angular Console is by installing the [Angular Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console).
-
-- If you aren't a VSCode user, download a standalone desktop application at [angularconsole.com](https://angularconsole.com).
+For VSCode users, you can install the [Angular Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) from Marketplace.
 
 ## True UI for the Angular CLI
 
-Angular Console is a generic UI for the Angular CLI. It will work for any schematic or any architect commands. Angular Console does not have a specific UI for, say, generating a component. Instead, Angular Console does what the command-line version of the Angular CLI does--it analyzes the same meta information to create the needed UI. This means that anything you can do with the Angular CLI, you can do with Angular Console. After all, Angular Console is the UI for the Angular CLI.
+Angular Console is an UI for the Angular CLI. It will work for any schematic or any architect commands. Angular Console does not have a specific UI for, say, generating a component. Instead, Angular Console does what the command-line version of the Angular CLI does--it analyzes the same meta information to create the needed UI. This means that anything you can do with the Angular CLI, you can do with Angular Console. After all, Angular Console is the UI for the Angular CLI.
 
 ## Useful for Both Experts and Beginners
 
