@@ -69,6 +69,8 @@ function showUi(command: string, n: NgTaskProvider, extensionPath: string) {
     extensionPath
   );
 
+  console.log('workspaceTreeItem', workspaceTreeItem);
+
   commands.executeCommand(
     'angularConsole.revealWebViewPanel',
     workspaceTreeItem

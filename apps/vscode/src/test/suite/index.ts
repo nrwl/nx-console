@@ -5,7 +5,8 @@ import * as glob from 'fast-glob';
 export async function run(): Promise<void> {
   // Create the mocha test
   const mocha = new Mocha({
-    ui: 'tdd'
+    ui: 'tdd',
+    timeout: 120000
   });
   mocha.useColors(true);
 

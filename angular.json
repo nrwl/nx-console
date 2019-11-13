@@ -53,6 +53,9 @@
             "parallel": false,
             "commands": [
               {
+                "command": "node tools/scripts/set-up-e2e-fixtures"
+              },
+              {
                 "command": "yarn nps prepare.vscode"
               },
               {

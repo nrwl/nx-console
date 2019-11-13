@@ -1,8 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src/test",
-    "outDir": "../../dist/apps/vscode/src/test",
+    "rootDir": "src",
+    "outDir": "../../dist/apps/vscode/src",
     "module": "commonjs",
     "target": "es5",
     "moduleResolution": "node",
