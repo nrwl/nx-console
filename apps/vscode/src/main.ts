@@ -163,7 +163,7 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
     currentDirectory = dirname(currentDirectory);
   }
 
-  const childAngularJsonStream = stream(join('**', 'angular.json'), {
+  const childAngularJsonStream = stream('**/angular.json', {
     cwd: vscodeWorkspacePath,
     deep: 3,
     onlyFiles: true,

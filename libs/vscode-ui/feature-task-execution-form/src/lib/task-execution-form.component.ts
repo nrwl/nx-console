@@ -373,5 +373,5 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
 function sanitizeWhitespace(value: string) {
   const trimmed = value.trim();
-  return /\s/.test(trimmed) ? `"${trimmed}"` : trimmed;
+  return /\s/.test(trimmed) ? `'${trimmed}'` : trimmed; // NOTE: We use ' rather than " for powershell compatibility
 }
