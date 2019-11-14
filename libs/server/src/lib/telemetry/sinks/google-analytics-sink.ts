@@ -1,6 +1,6 @@
 import { Sink } from '../sink';
 import { TelemetryType } from '../record';
-import { UserState } from '../user';
+import { User } from '../user';
 import { TelemetryMessageBuilder } from '../message-builder';
 
 // increment this if there is substancial changes to the schema,
@@ -27,25 +27,21 @@ class TelemetryParams {
 
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   visitor = require('universal-analytics')(TRACKING_ID, {
-    uid: this.userId
+    uid: this.user.id
   });
 
   get enabled() {
-    return this.state !== 'untracked';
+    return this.user.state !== 'untracked';
   }
 
-  constructor(
-    readonly userId: string,
-    readonly platform: ApplicationPlatform,
-    public state: UserState
-  ) {
+  constructor(readonly user: User, readonly platform: ApplicationPlatform) {
     this.setPersistentParams();
   }
 
   setPersistentParams() {
-    this.visitor.set('uid', this.userId);
+    this.visitor.set('uid', this.user.id);
     this.visitor.set('ds', 'app');
-    this.visitor.set('cd1', this.state);
+    this.visitor.set('cd1', this.user.state);
     this.visitor.set('cd2', this.platform);
     this.visitor.set('cd3', ANALYTICS_VERSION);
   }
@@ -56,17 +52,14 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
 
     switch (type) {
       case 'UserStateChanged':
-        this.state = params.fetch('state');
+        this.user.state = params.fetch('state');
         this.setPersistentParams();
         break;
-      case 'AppLoaded':
-        this.appLoaded(params.fetch('time'));
+      case 'ExtensionActivated':
+        this.extensionActivated(params.fetch('time'));
         break;
-      case 'LoggedIn':
-        this.loggedIn();
-        break;
-      case 'LoggedOut':
-        this.loggedOut();
+      case 'ExtensionDeactivated':
+        this.extensionDeactivated(params.fetch('time'));
         break;
       case 'StartedTracking':
         this.startedTracking();
@@ -91,30 +84,22 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     }
   }
 
-  appLoaded(time: number): void {
+  extensionActivated(time: number): void {
     this.visitor
       .timing({
         utc: 'Application',
-        utv: 'Load Time',
+        utv: 'Activation Time',
         utt: time
       })
       .send();
   }
 
-  loggedIn(): void {
+  extensionDeactivated(time: number): void {
     this.visitor
-      .event({
-        ec: 'NRWL Connect',
-        ea: 'Connected'
-      })
-      .send();
-  }
-
-  loggedOut(): void {
-    this.visitor
-      .event({
-        ec: 'NRWL Connect',
-        ea: 'Disconnected'
+      .timing({
+        utc: 'Application',
+        utv: 'Deactivation Time',
+        utt: time
       })
       .send();
   }

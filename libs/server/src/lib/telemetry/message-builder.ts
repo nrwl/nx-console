@@ -1,7 +1,6 @@
 export interface TelemetryMessageBuilder {
-  appLoaded(time: number): void;
-  loggedIn(): void;
-  loggedOut(): void;
+  extensionActivated(time: number): void;
+  extensionDeactivated(time: number): void;
   startedTracking(): void;
   stoppedTracking(): void;
   screenViewed(screen: string): void;
