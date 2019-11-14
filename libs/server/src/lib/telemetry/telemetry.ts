@@ -15,7 +15,7 @@ export class Telemetry implements TelemetryMessageBuilder {
   ): Telemetry {
     const user = User.fromStorage(store);
     const instance = new Telemetry(user);
-    const sink = new GoogleAnalyticsSink(user.id, platform, user.state);
+    const sink = new GoogleAnalyticsSink(user, platform);
     instance.addSink(sink);
     return instance;
   }
@@ -38,20 +38,12 @@ export class Telemetry implements TelemetryMessageBuilder {
     this.sinks.forEach(s => s.record(type, data));
   }
 
-  appLoaded(time: number): void {
-    this.record('AppLoaded', { time });
+  extensionActivated(time: number): void {
+    this.record('ExtensionActivated', { time });
   }
 
-  loggedIn(): void {
-    this.user.loggedIn();
-    this.userStateChanged();
-    this.record('LoggedIn');
-  }
-
-  loggedOut(): void {
-    this.user.loggedOut();
-    this.userStateChanged();
-    this.record('LoggedOut');
+  extensionDeactivated(time: number): void {
+    this.record('ExtensionDeactivated', { time });
   }
 
   startedTracking(): void {

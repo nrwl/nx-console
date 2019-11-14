@@ -17,7 +17,11 @@ import { AngularJsonTreeProvider } from './app/angular-json-tree/angular-json-tr
 import { registerNgTaskCommands } from './app/ng-task/ng-task-commands';
 import { NgTaskProvider } from './app/ng-task/ng-task-provider';
 import { getOutputChannel } from './app/output-channel';
-import { getTelemetry, initTelemetry } from './app/telemetry';
+import {
+  getTelemetry,
+  initTelemetry,
+  teardownTelemetry
+} from './app/telemetry';
 import { verifyAngularJson, verifyNodeModules } from './app/verifyWorkspace';
 import { VSCodeStorage } from './app/vscode-storage';
 import { revealWebViewPanel } from './app/webview';
@@ -109,17 +113,26 @@ export function activate(c: ExtensionContext) {
     if (vscodeWorkspacePath) {
       scanForWorkspace(vscodeWorkspacePath);
     }
+
+    getTelemetry().extensionActivated(Date.now());
   } catch (e) {
     window.showErrorMessage(
       'Angular Console encountered an error when activating (see output panel)'
     );
-
     getOutputChannel().appendLine(
       'Angular Console encountered an error when activating'
     );
     getOutputChannel().appendLine(JSON.stringify(e));
+    getTelemetry().exceptionOccured(e.message);
   }
 }
+
+export async function deactivate() {
+  getTelemetry().extensionDeactivated(Date.now());
+  teardownTelemetry();
+}
+
+// -----------------------------------------------------------------------------
 
 function locateAngularWorkspace() {
   return window
@@ -201,8 +214,6 @@ async function setAngularWorkspace(workspacePath: string) {
   currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
   angularJsonTreeProvider.setWorkspacePath(workspacePath);
 }
-
-export async function deactivate() {}
 
 function cacheWorkspaceNodeModulesJsons(workspacePath: string) {
   if (!existsSync(join(workspacePath, 'node_modules'))) {

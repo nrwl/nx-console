@@ -1,10 +1,11 @@
 import { Store, Telemetry } from '@angular-console/server';
-import { ExtensionContext, window, workspace } from 'vscode';
+import { Disposable, ExtensionContext, window, workspace } from 'vscode';
 
 import { environment } from '../environments/environment';
 import { VSCodeStorage } from './vscode-storage';
 
 let telemetry: Telemetry;
+let disposer: Disposable | null = null;
 
 export function getTelemetry() {
   return telemetry;
@@ -28,10 +29,9 @@ export function initTelemetry(context: ExtensionContext, store: Store) {
   const configurationSection = VSCodeStorage.configurationSection;
   const telemetrySetting = `${configurationSection}.${enableTelemetry}`;
 
-  workspace.onDidChangeConfiguration(e => {
+  disposer = workspace.onDidChangeConfiguration(e => {
     if (e.affectsConfiguration(telemetrySetting)) {
-      const enabled = store.get(enableTelemetry, true);
-      if (enabled) {
+      if (store.get(enableTelemetry, true)) {
         telemetry.startedTracking();
       } else {
         telemetry.stoppedTracking();
@@ -40,4 +40,10 @@ export function initTelemetry(context: ExtensionContext, store: Store) {
   });
 
   return telemetry;
+}
+
+export function teardownTelemetry() {
+  if (disposer) {
+    disposer.dispose();
+  }
 }

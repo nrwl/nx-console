@@ -40,39 +40,11 @@ describe('Telemetry', () => {
     it('records loading times', () => {
       const time = 25;
 
-      telemetry.appLoaded(time);
+      telemetry.extensionActivated(time);
 
       const written = sink.oneRecord();
 
-      expect(written).toEqual({ type: 'AppLoaded', data: { time } });
-    });
-
-    it('records logged in events', () => {
-      telemetry.state = 'anonymous';
-      telemetry.loggedIn();
-
-      const loggedIn = sink.oneRecord('LoggedIn');
-      const stateChanged = sink.oneRecord('UserStateChanged');
-
-      expect(loggedIn).toEqual({ type: 'LoggedIn', data: {} });
-      expect(stateChanged).toEqual({
-        type: 'UserStateChanged',
-        data: { state: 'connected' }
-      });
-    });
-
-    it('records logged out events', () => {
-      telemetry.state = 'connected';
-      telemetry.loggedOut();
-
-      const loggedOut = sink.oneRecord('LoggedOut');
-      const stateChanged = sink.oneRecord('UserStateChanged');
-
-      expect(loggedOut).toEqual({ type: 'LoggedOut', data: {} });
-      expect(stateChanged).toEqual({
-        type: 'UserStateChanged',
-        data: { state: 'anonymous' }
-      });
+      expect(written).toEqual({ type: 'ExtensionActivated', data: { time } });
     });
 
     it('records starting telemetry tracking', () => {
@@ -85,12 +57,12 @@ describe('Telemetry', () => {
       expect(tracked).toEqual({ type: 'StartedTracking', data: {} });
       expect(stateChanged).toEqual({
         type: 'UserStateChanged',
-        data: { state: 'anonymous' }
+        data: { state: 'tracked' }
       });
     });
 
     it('records halting telemetry tracking', () => {
-      telemetry.state = 'anonymous';
+      telemetry.state = 'tracked';
       telemetry.stoppedTracking();
 
       const untracked = sink.oneRecord('StoppedTracking');

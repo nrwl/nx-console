@@ -1,7 +1,6 @@
 export type TelemetryType =
-  | 'AppLoaded'
-  | 'LoggedIn'
-  | 'LoggedOut'
+  | 'ExtensionActivated'
+  | 'ExtensionDeactivated'
   | 'StoppedTracking'
   | 'StartedTracking'
   | 'ScreenViewed'
@@ -12,9 +11,8 @@ export type TelemetryType =
 
 export function isTelemetryRecord(evt: string): evt is TelemetryType {
   return new Set([
-    'AppLoaded',
-    'LoggedIn',
-    'LoggedOut',
+    'ExtensionActivated',
+    'ExtensionDeactivated',
     'StoppedTracking',
     'StartedTracking',
     'ScreenViewed',

@@ -1,6 +1,6 @@
 import {
-  TaskExecutionSchema,
-  TaskExecutionMessage
+  TaskExecutionMessage,
+  TaskExecutionSchema
 } from '@angular-console/vscode-ui/feature-task-execution-form';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -97,10 +97,9 @@ export function createWebViewPanel(
         ngTaskProvider.executeTask(message);
       }
     );
-
-    const telemetry = getTelemetry();
-    telemetry.screenViewed(title);
   }
+
+  getTelemetry().screenViewed(title);
 
   return webviewPanel;
 }

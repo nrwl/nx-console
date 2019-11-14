@@ -6,8 +6,7 @@ export class VSCodeStorage implements Store {
 
   static fromContext(context: ExtensionContext): VSCodeStorage {
     const config = workspace.getConfiguration(this.configurationSection);
-    const store = new VSCodeStorage(config, context.globalState);
-    return store;
+    return new VSCodeStorage(config, context.globalState);
   }
 
   constructor(
