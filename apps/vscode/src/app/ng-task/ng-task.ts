@@ -5,9 +5,11 @@ import { findClosestNg } from '@angular-console/server';
 
 export class NgTask extends Task {
   static create(definition: NgTaskDefinition, workspacePath: string): NgTask {
-    const { positional, command, flags } = definition;
+    const { command } = definition;
 
-    const args: Array<string> = [command, positional, ...flags];
+    // Using `run [project]:[command]` is more backwards compatible in case different
+    // versions of CLI does not handle `[command] [project]` args.
+    const args = getArgs(definition);
 
     const displayCommand = `ng ${args.join(' ')}`;
     const task = new NgTask(
@@ -34,5 +36,21 @@ export class NgTask extends Task {
     }
 
     return task;
+  }
+}
+
+function getArgs(definition: NgTaskDefinition) {
+  const { positional, command, flags } = definition;
+  switch (command) {
+    case 'add':
+    case 'build':
+    case 'lint':
+    case 'generate':
+    case 'run':
+    case 'serve':
+    case 'test':
+      return [command, positional, ...flags];
+    default:
+      return ['run', `${positional}:${command}`, ...flags];
   }
 }
