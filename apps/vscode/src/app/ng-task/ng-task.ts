@@ -13,10 +13,11 @@ export class NgTask extends Task {
 
     const displayCommand = `ng ${args.join(' ')}`;
     const task = new NgTask(
-      { ...definition, type: 'ng' },
-      TaskScope.Workspace,
-      'angular-console',
-      displayCommand,
+      { ...definition, type: 'ng' }, // definition
+      TaskScope.Workspace, // scope
+      displayCommand, // name
+      'angular-console', // source
+      // execution
       getShellExecutionForConfig({
         displayCommand,
         args,
