@@ -31,7 +31,7 @@ function getWin32ShellExecution(config: ShellConfig): ShellExecution {
     shellArgs: [
       `-Sta -NoLogo -NonInteractive -C "& {${config.program.replace(
         / /g,
-        '\\ '
+        '` ' // NOTE: In powershell ` is the escape key.
       )} ${config.args.join(' ')}}"`
     ]
   });
