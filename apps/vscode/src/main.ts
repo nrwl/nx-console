@@ -1,4 +1,4 @@
-import { cacheJsonFiles, EXTENSIONS } from '@angular-console/server';
+import { EXTENSIONS } from '@angular-console/server';
 import { stream } from 'fast-glob';
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
@@ -204,35 +204,8 @@ async function setAngularWorkspace(workspacePath: string) {
     ngTaskProvider.setWorkspacePath(workspacePath);
   }
 
-  setTimeout(() => {
-    cacheWorkspaceNodeModulesJsons(workspacePath);
-  }, 0);
-  setInterval(() => cacheWorkspaceNodeModulesJsons(workspacePath), 60000);
-
   commands.executeCommand('setContext', 'isAngularWorkspace', true);
 
   currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
   angularJsonTreeProvider.setWorkspacePath(workspacePath);
-}
-
-function cacheWorkspaceNodeModulesJsons(workspacePath: string) {
-  if (!existsSync(join(workspacePath, 'node_modules'))) {
-    getOutputChannel().appendLine(
-      'Tried to cache node_modules but directory was not present. Run npm install'
-    );
-    return;
-  }
-
-  try {
-    cacheJsonFiles(workspacePath);
-  } catch (e) {
-    window.showErrorMessage(
-      'Angular Console encountered an error when scanning node_modules'
-    );
-    getOutputChannel().appendLine('Error parsing node_modules ');
-
-    const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
-    getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exceptionOccured(stringifiedError);
-  }
 }

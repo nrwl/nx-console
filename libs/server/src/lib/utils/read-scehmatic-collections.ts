@@ -3,7 +3,7 @@ import * as path from 'path';
 import {
   fileExistsSync,
   directoryExists,
-  readJsonFile,
+  readAndCacheJsonFile,
   listOfUnnestedNpmPackages,
   normalizeSchema,
   listFiles
@@ -37,7 +37,8 @@ export function readAllSchematicCollections(
 }
 
 function readAngularJsonDefaults(basedir: string): any {
-  const defaults = readJsonFile('angular.json', basedir).json.schematics;
+  const defaults = readAndCacheJsonFile('angular.json', basedir).json
+    .schematics;
   const collectionDefaults = Object.keys(defaults ? defaults : {}).reduce(
     (collectionDefaultsMap: any, key) => {
       const [collectionName, schematicName] = key.split(':');
@@ -59,8 +60,10 @@ function readSchematicCollectionsFromNodeModules(
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
     try {
-      return !!readJsonFile(path.join(p, 'package.json'), nodeModulesDir).json
-        .schematics;
+      return !!readAndCacheJsonFile(
+        path.join(p, 'package.json'),
+        nodeModulesDir
+      ).json.schematics;
     } catch (e) {
       if (
         e.message &&
@@ -89,7 +92,7 @@ function readWorkspaceSchematicsCollection(
   const collectionDir = path.join(basedir, workspaceSchematicsPath);
   const collectionName = '@nrwl/workspace';
   if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
-    const collection = readJsonFile('collection.json', collectionDir);
+    const collection = readAndCacheJsonFile('collection.json', collectionDir);
     const defaults = readAngularJsonDefaults(basedir);
 
     return readCollectionSchematics(
@@ -102,7 +105,7 @@ function readWorkspaceSchematicsCollection(
     const schematics = listFiles(collectionDir)
       .filter(f => path.basename(f) === 'schema.json')
       .map(f => {
-        const schemaJson = readJsonFile(f, '');
+        const schemaJson = readAndCacheJsonFile(f, '');
         return {
           name: schemaJson.json.id,
           collection: collectionName,
@@ -122,11 +125,11 @@ function readCollection(
   defaults?: any
 ): SchematicCollection | null {
   try {
-    const packageJson = readJsonFile(
+    const packageJson = readAndCacheJsonFile(
       path.join(collectionName, 'package.json'),
       basedir
     );
-    const collection = readJsonFile(
+    const collection = readAndCacheJsonFile(
       packageJson.json.schematics,
       path.dirname(packageJson.path)
     );
@@ -155,7 +158,7 @@ function readCollectionSchematics(
   Object.entries(collectionJson.schematics).forEach(([k, v]: [any, any]) => {
     try {
       if (canAdd(k, v)) {
-        const schematicSchema = readJsonFile(
+        const schematicSchema = readAndCacheJsonFile(
           v.schema,
           path.dirname(collectionPath)
         );

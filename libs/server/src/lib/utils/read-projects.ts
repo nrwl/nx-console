@@ -4,7 +4,7 @@ import * as path from 'path';
 import {
   getPrimitiveValue,
   normalizeSchema,
-  readJsonFile
+  readAndCacheJsonFile
 } from '../utils/utils';
 
 export function readProjects(json: any): Project[] {
@@ -83,20 +83,20 @@ export function readSchema(basedir: string, builder: string) {
 }
 
 function readBuildersFile(basedir: string, npmPackage: string): any {
-  const packageJson = readJsonFile(
+  const packageJson = readAndCacheJsonFile(
     path.join(npmPackage, 'package.json'),
     path.join(basedir, 'node_modules')
   );
   const b = packageJson.json.builders;
   const buildersPath = b.startsWith('.') ? b : `./${b}`;
-  const buildersJson = readJsonFile(
+  const buildersJson = readAndCacheJsonFile(
     buildersPath,
     path.dirname(packageJson.path)
   );
 
   const builders = {} as any;
   Object.entries(buildersJson.json.builders).forEach(([k, v]: [any, any]) => {
-    const builderSchema = readJsonFile(
+    const builderSchema = readAndCacheJsonFile(
       v.schema,
       path.dirname(buildersJson.path)
     );

@@ -127,21 +127,6 @@ export function listFiles(dirName: string): string[] {
   return res;
 }
 
-export function cacheJsonFiles(basedir: string) {
-  const nodeModulesDir = path.join(basedir, 'node_modules');
-  const packages = listOfUnnestedNpmPackages(nodeModulesDir);
-
-  const res: any = {};
-  packages.forEach(p => {
-    const filePath = path.join(nodeModulesDir, p, 'package.json');
-    if (!fileExistsSync(filePath)) return;
-    res[filePath] = readAndParseJson(
-      path.join(nodeModulesDir, p, 'package.json')
-    );
-  });
-  return res;
-}
-
 export function directoryExists(filePath: string): boolean {
   try {
     return statSync(filePath).isDirectory();
@@ -162,24 +147,19 @@ export function readAndParseJson(fullFilePath: string): any {
   return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
 }
 
-export function readJsonFile(
+export function readAndCacheJsonFile(
   filePath: string,
   basedir: string
 ): { path: string; json: any } {
   const fullFilePath = path.join(basedir, filePath);
 
-  // we can try to retrieve node_modules files from the cache because
-  // they don't change very often
-  const cache = basedir.endsWith('node_modules');
-  if (cache && fileContents[fullFilePath]) {
+  if (fileContents[fullFilePath] || existsSync(fullFilePath)) {
+    fileContents[fullFilePath] =
+      fileContents[fullFilePath] || readAndParseJson(fullFilePath);
+
     return {
       path: fullFilePath,
       json: fileContents[fullFilePath]
-    };
-  } else if (existsSync(fullFilePath)) {
-    return {
-      path: fullFilePath,
-      json: readAndParseJson(fullFilePath)
     };
   } else {
     return {
@@ -308,22 +288,4 @@ export function seconds<T>(fn: Function): [number, T] {
   const result = fn();
   const end = process.hrtime(start);
   return [end[0], result];
-}
-
-/**
- * To improve performance angular console pre-processes
- *
- * * the list of local files
- * * json files from node_modules we are likely to read
- *
- * both the data sets get updated every 60 seconds.
- */
-export function cacheFiles(p: string) {
-  setTimeout(() => {
-    files[p] = listFiles(p);
-    fileContents = cacheJsonFiles(p);
-    setTimeout(() => {
-      cacheFiles(p);
-    }, 60000);
-  }, 0);
 }
