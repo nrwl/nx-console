@@ -564,7 +564,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       type: 'enum',
       description:
         'The view encapsulation strategy to use in the new component.',
-      defaultValue: null,
+      defaultValue: 'ShadowDom',
       required: false,
       positional: false,
       __typename: 'Schema',

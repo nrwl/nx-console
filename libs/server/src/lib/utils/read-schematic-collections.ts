@@ -6,7 +6,8 @@ import {
   readAndCacheJsonFile,
   listOfUnnestedNpmPackages,
   normalizeSchema,
-  listFiles
+  listFiles,
+  readAndParseJson
 } from './utils';
 
 export function readAllSchematicCollections(
@@ -37,15 +38,26 @@ export function readAllSchematicCollections(
 }
 
 function readAngularJsonDefaults(basedir: string): any {
-  const defaults = readAndCacheJsonFile('angular.json', basedir).json
-    .schematics;
-  const collectionDefaults = Object.keys(defaults ? defaults : {}).reduce(
+  const defaults =
+    readAndParseJson(path.join(basedir, 'angular.json')).schematics || {};
+  const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
-      const [collectionName, schematicName] = key.split(':');
-      if (!collectionDefaultsMap[collectionName]) {
-        collectionDefaultsMap[collectionName] = {};
+      if (key.includes(':')) {
+        const [collectionName, schematicName] = key.split(':');
+        if (!collectionDefaultsMap[collectionName]) {
+          collectionDefaultsMap[collectionName] = {};
+        }
+        collectionDefaultsMap[collectionName][schematicName] = defaults[key];
+      } else {
+        const collectionName = key;
+        if (!collectionDefaultsMap[collectionName]) {
+          collectionDefaultsMap[collectionName] = {};
+        }
+        Object.keys(defaults[collectionName]).forEach(schematicName => {
+          collectionDefaultsMap[collectionName][schematicName] =
+            defaults[collectionName][schematicName];
+        });
       }
-      collectionDefaultsMap[collectionName][schematicName] = defaults[key];
       return collectionDefaultsMap;
     },
     {}
@@ -93,13 +105,11 @@ function readWorkspaceSchematicsCollection(
   const collectionName = '@nrwl/workspace';
   if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
     const collection = readAndCacheJsonFile('collection.json', collectionDir);
-    const defaults = readAngularJsonDefaults(basedir);
 
     return readCollectionSchematics(
       collectionName,
       collection.path,
-      collection.json,
-      defaults
+      collection.json
     );
   } else {
     const schematics = listFiles(collectionDir)

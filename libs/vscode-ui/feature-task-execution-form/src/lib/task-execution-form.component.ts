@@ -294,7 +294,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     const defaultValues: { [key: string]: string } = {};
     architect.schema.forEach(field => {
       defaultValues[field.name] =
-        field.defaultValue || field.type === 'boolean' ? 'false' : '';
+        field.defaultValue || (field.type === 'boolean' ? 'false' : '');
     });
 
     if (architect.options) {
