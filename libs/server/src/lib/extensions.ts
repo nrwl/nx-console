@@ -199,6 +199,8 @@ export const EXTENSIONS: { [key: string]: string } = {
   '@vendasta/material': 'Angular Material',
   '@willh/hmr':
     'Enabling Hot Module Replacement (HMR) feature in your Angular CLI v6 project',
+  'angular-cli-ghpages':
+    'Deploy your Angular app to GitHub pages directly from the Angular CLI',
   'angular-fire-schematics': 'AngularFire Schematics',
   'angular-karma-gwt':
     'Schematics to update the default karma config file created by the Angluar Cli to integrate jasmine-given and mocha-reporter.',
