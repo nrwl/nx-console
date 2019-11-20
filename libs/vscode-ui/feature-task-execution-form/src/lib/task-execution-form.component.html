@@ -1,4 +1,4 @@
-<ng-container *ngIf="(taskExecForm$ | async) as taskExecForm">
+<ng-container *ngIf="taskExecForm$ | async as taskExecForm">
   <div
     [class.has-configurations]="
       taskExecForm.architect.configurations &&
@@ -45,7 +45,7 @@
     <div class="scroll-container" #scrollContainer>
       <div
         class="form-container flags-and-fields-container fx-row"
-        *ngIf="(filteredFields$ | async) as filteredFields"
+        *ngIf="filteredFields$ | async as filteredFields"
       >
         <vscode-ui-field-tree
           [activeFieldName]="activeFieldName$ | async"
@@ -71,7 +71,7 @@
             </span>
           </div>
 
-          <ng-container *ngIf="(defaultValues$ | async) as defaultValues">
+          <ng-container *ngIf="defaultValues$ | async as defaultValues">
             <angular-console-field
               [id]="field.name + '-angular-console-field'"
               *ngFor="let field of taskExecForm.architect.schema"
