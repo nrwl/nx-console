@@ -2,9 +2,7 @@ export { readAndParseJson } from './lib/utils/utils';
 
 export { findClosestNg } from './lib/utils/utils';
 
-export { cacheJsonFiles } from './lib/utils/utils';
-
-export { readJsonFile } from './lib/utils/utils';
+export { readAndCacheJsonFile as readJsonFile } from './lib/utils/utils';
 
 export { Telemetry } from './lib/telemetry';
 export * from './lib/extensions';
