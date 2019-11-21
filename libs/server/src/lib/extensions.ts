@@ -273,6 +273,8 @@ export const EXTENSIONS: { [key: string]: string } = {
   'ngx-face-api-js':
     'Angular directives for face detection and face recognition in the browser. It is a wrapper for face-api.js, so it is not dependent on the browser implementation.',
   'ngx-onesignal': 'angular 7+ OneSignal Service',
+  'ngx-semantic-version':
+    'Add and configure commitlint, commitizen, husky and standard-version for creating conventional commits and automate your release and CHANGELOG generation respecting semver',
   'ngx-weui': 'WeUI for angular',
   'primeng-schematics': 'Schematics for Prime NG',
   'puppeteer-schematic':
