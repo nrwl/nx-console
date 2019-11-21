@@ -6,6 +6,7 @@
   #selectControl
   (change)="updateValue($event.target.value)"
   role="combobox"
+  [value]="value"
   [id]="field.name"
   [required]="field.required"
   [disabled]="disabled"
