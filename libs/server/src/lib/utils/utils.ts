@@ -2,8 +2,7 @@ import { execSync } from 'child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
-
-import * as stripJsonComments from 'strip-json-comments';
+import * as JSON5 from 'json5';
 
 export interface SchematicDefaults {
   [name: string]: string;
@@ -144,7 +143,7 @@ export function fileExistsSync(filePath: string): boolean {
 }
 
 export function readAndParseJson(fullFilePath: string): any {
-  return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
+  return JSON5.parse(readFileSync(fullFilePath).toString());
 }
 
 export function readAndCacheJsonFile(
