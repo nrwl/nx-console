@@ -1,13 +1,15 @@
+import { readSchema } from '@angular-console/server';
 import { commands, ExtensionContext, window } from 'vscode';
 
 import { selectSchematic } from '../select-schematic';
+import { verifyAngularJson } from '../verifyWorkspace';
 import {
   WorkspaceRouteTitle,
   WorkspaceTreeItem
 } from '../workspace-tree/workspace-tree-item';
 import { NgTaskProvider } from './ng-task-provider';
 import { NgTaskQuickPickItem } from './ng-task-quick-pick-item';
-import { verifyAngularJson } from '../verifyWorkspace';
+import { selectFlags } from './select-flags';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -33,29 +35,22 @@ export function registerNgTaskCommands(
         selectNgCliCommandAndPromptForFlags(command)
       ),
       commands.registerCommand(`angularConsole.${command}.ui`, () =>
-        selectNgCliCommandAndShowUi(command, n, context.extensionPath)
+        selectNgCliCommandAndShowUi(command, context.extensionPath)
       )
     );
   });
 
   commands.registerCommand(`angularConsole.generate`, () =>
     selectSchematicAndPromptForFlags(n.getWorkspacePath()!)
-  ),
-    commands.registerCommand(`angularConsole.generate.ui`, () =>
-      showUi('generate', n, context.extensionPath)
-    );
+  );
+
+  commands.registerCommand(`angularConsole.generate.ui`, () =>
+    selectNgCliCommandAndShowUi('generate', context.extensionPath)
+  );
 }
 
-async function selectNgCliCommandAndShowUi(
-  command: string,
-  n: NgTaskProvider,
-  extensionPath: string
-) {
-  showUi(command, n, extensionPath);
-}
-
-function showUi(command: string, n: NgTaskProvider, extensionPath: string) {
-  const workspacePath = n.getWorkspacePath();
+function selectNgCliCommandAndShowUi(command: string, extensionPath: string) {
+  const workspacePath = ngTaskProvider.getWorkspacePath();
   if (!workspacePath) {
     window.showErrorMessage(
       'Angular Console requires a workspace be set to perform this action'
@@ -76,22 +71,47 @@ function showUi(command: string, n: NgTaskProvider, extensionPath: string) {
 }
 
 async function selectNgCliCommandAndPromptForFlags(command: string) {
-  const selection = await selectNgCliProject(command);
+  const { validAngularJson, json } = verifyAngularJson(
+    ngTaskProvider.getWorkspacePath()
+  );
+
+  const selection = validAngularJson
+    ? await selectNgCliProject(command, json)
+    : undefined;
   if (!selection) {
-    return;
+    return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
-  const flags = await window.showInputBox({
-    placeHolder: 'Flags (optional)'
-  });
+  const builderSchema = getBuilderSchema(selection.projectName, command, json);
+  if (!builderSchema) {
+    return; // TODO: Show/log an error message if we detect builder is missing.
+  }
 
-  if (typeof flags === 'string') {
+  const flags = await selectFlags(
+    command,
+    selection.projectName,
+    builderSchema
+  );
+
+  if (flags !== undefined) {
     ngTaskProvider.executeTask({
       positional: selection.projectName,
       command,
-      flags: flags.trim().split(/\s+/)
+      flags
     });
   }
+}
+
+function getBuilderSchema(project: string, command: string, json: any) {
+  const projects = json.projects || {};
+  const projectDef = projects[project] || {};
+  const architectDef = projectDef.architect || {};
+  const commandDef = architectDef[command] || {};
+  const builder = commandDef.builder;
+
+  return builder
+    ? readSchema(ngTaskProvider.getWorkspacePath(), commandDef.builder)
+    : undefined;
 }
 
 async function selectSchematicAndPromptForFlags(workspacePath: string) {
@@ -100,27 +120,22 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
     return;
   }
 
-  const flags = await window.showInputBox({
-    placeHolder: 'Flags (optional)'
-  });
+  const flags = await selectFlags(
+    'generate',
+    selection.positional,
+    selection.schema
+  );
 
-  if (typeof flags === 'string') {
+  if (flags !== undefined) {
     ngTaskProvider.executeTask({
       positional: selection.positional,
       command: 'generate',
-      flags: flags.trim().split(/\s+/)
+      flags
     });
   }
 }
 
-export function selectNgCliProject(command: string) {
-  const { validAngularJson, json } = verifyAngularJson(
-    ngTaskProvider.getWorkspacePath()
-  );
-  if (!validAngularJson) {
-    return;
-  }
-
+export function selectNgCliProject(command: string, json: any) {
   const items = ngTaskProvider
     .getProjectEntries(json)
     .filter(([_, { architect }]) => Boolean(architect))
