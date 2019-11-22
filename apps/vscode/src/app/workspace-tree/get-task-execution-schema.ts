@@ -9,6 +9,7 @@ import { WorkspaceRouteTitle } from './workspace-tree-item';
 import { NgTaskQuickPickItem } from '../ng-task/ng-task-quick-pick-item';
 import { getOutputChannel } from '../output-channel';
 import { getTelemetry } from '../telemetry';
+import { verifyAngularJson } from '../verifyWorkspace';
 
 export async function getTaskExecutionSchema(
   workspacePath: string,
@@ -17,6 +18,11 @@ export async function getTaskExecutionSchema(
 ): Promise<TaskExecutionSchema | void> {
   try {
     if (!workspacePath) {
+      return;
+    }
+    const { validAngularJson, json } = verifyAngularJson(workspacePath);
+
+    if (!validAngularJson) {
       return;
     }
 
@@ -29,7 +35,7 @@ export async function getTaskExecutionSchema(
       case 'Serve':
       case 'Test':
       case 'Xi18n':
-        const selectedProject = await selectNgCliProject(command);
+        const selectedProject = await selectNgCliProject(command, json);
 
         if (!selectedProject) return;
 
