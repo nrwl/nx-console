@@ -1,8 +1,7 @@
-import { readSchema } from '@angular-console/server';
 import { commands, ExtensionContext, window } from 'vscode';
 
 import { selectSchematic } from '../select-schematic';
-import { verifyAngularJson } from '../verifyWorkspace';
+import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import {
   WorkspaceRouteTitle,
   WorkspaceTreeItem
@@ -10,6 +9,7 @@ import {
 import { NgTaskProvider } from './ng-task-provider';
 import { NgTaskQuickPickItem } from './ng-task-quick-pick-item';
 import { selectFlags } from './select-flags';
+import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -82,16 +82,16 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
     return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
-  const builderSchema = getBuilderSchema(selection.projectName, command, json);
-  if (!builderSchema) {
-    return; // TODO: Show/log an error message if we detect builder is missing.
+  const { validBuilder, schema } = verifyBuilderDefinition(
+    selection.projectName,
+    command,
+    json
+  );
+  if (!validBuilder) {
+    return;
   }
 
-  const flags = await selectFlags(
-    command,
-    selection.projectName,
-    builderSchema
-  );
+  const flags = await selectFlags(command, selection.projectName, schema);
 
   if (flags !== undefined) {
     ngTaskProvider.executeTask({
@@ -100,18 +100,6 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
       flags
     });
   }
-}
-
-function getBuilderSchema(project: string, command: string, json: any) {
-  const projects = json.projects || {};
-  const projectDef = projects[project] || {};
-  const architectDef = projectDef.architect || {};
-  const commandDef = architectDef[command] || {};
-  const builder = commandDef.builder;
-
-  return builder
-    ? readSchema(ngTaskProvider.getWorkspacePath(), commandDef.builder)
-    : undefined;
 }
 
 async function selectSchematicAndPromptForFlags(workspacePath: string) {

@@ -74,7 +74,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
         this.commandRun(params.fetch('commandType'), params.fetch('time'));
         break;
       case 'ExceptionOccurred':
-        this.exceptionOccured(params.fetch('error'));
+        this.exception(params.fetch('error'));
         break;
       case 'FeatureUsed':
         this.featureUsed(params.fetch('feature'));
@@ -141,7 +141,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       .send();
   }
 
-  exceptionOccured(error: string) {
+  exception(error: string) {
     this.visitor
       .exception({
         exd: error

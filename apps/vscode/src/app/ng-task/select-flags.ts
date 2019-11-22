@@ -43,7 +43,7 @@ async function promptForFlagToSet(
     {
       picked: true,
       alwaysShow: true,
-      label: `Execute: ${currentCommand})}`
+      label: `Execute: ${currentCommand}`
     },
     ...flagSchemas.map(
       schema =>
@@ -57,7 +57,7 @@ async function promptForFlagToSet(
   ];
 
   const selection = await window.showQuickPick(flagItems, {
-    placeHolder: 'Run command or set flags'
+    placeHolder: 'Execute command or set flags'
   });
 
   if (!selection) {
@@ -66,11 +66,11 @@ async function promptForFlagToSet(
 
   const flagSelected = Boolean((selection as any).schema);
   if (!flagSelected) {
+    return { execute: true };
+  } else {
     return {
       flag: selection as NgTaskFlagQuickPickItem
     };
-  } else {
-    return { execute: true };
   }
 }
 

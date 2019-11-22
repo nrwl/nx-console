@@ -18,7 +18,9 @@ import {
   AngularJsonLabel,
   AngularJsonTreeItem
 } from './angular-json-tree-item';
-import { verifyAngularJson } from '../verifyWorkspace';
+import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
+
+export let angularJsonTreeProvider: AngularJsonTreeProvider;
 
 export class AngularJsonTreeProvider extends AbstractTreeProvider<
   AngularJsonTreeItem
@@ -28,6 +30,8 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     private readonly ngTaskProvider: NgTaskProvider
   ) {
     super();
+
+    angularJsonTreeProvider = this;
 
     commands.registerCommand('angularConsole.refreshAngularJsonTree', () =>
       this.refresh()
@@ -245,6 +249,12 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       positional: project,
       flags
     });
+  }
+
+  revealAngularJsonLabel(angularJsonLabel: AngularJsonLabel) {
+    this.editAngularJson(
+      angularJsonTreeProvider.createAngularJsonTreeItem(angularJsonLabel, '')
+    );
   }
 
   private async revealInExplorer(selection: AngularJsonTreeItem) {

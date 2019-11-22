@@ -73,7 +73,7 @@ export class Telemetry implements TelemetryMessageBuilder {
     this.record('CommandRun', { commandType, time });
   }
 
-  exceptionOccured(error: string): void {
+  exception(error: string): void {
     this.record('ExceptionOccurred', { error });
   }
 

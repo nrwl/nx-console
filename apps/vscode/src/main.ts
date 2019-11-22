@@ -22,7 +22,6 @@ import {
   initTelemetry,
   teardownTelemetry
 } from './app/telemetry';
-import { verifyAngularJson, verifyNodeModules } from './app/verifyWorkspace';
 import { VSCodeStorage } from './app/vscode-storage';
 import { revealWebViewPanel } from './app/webview';
 import { WorkspaceTreeItem } from './app/workspace-tree/workspace-tree-item';
@@ -30,6 +29,8 @@ import {
   LOCATE_YOUR_WORKSPACE,
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
+import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
+import { verifyAngularJson } from './app/verify-workspace/verify-angular-json';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
 let angularJsonTreeView: TreeView<AngularJsonTreeItem>;
@@ -123,7 +124,7 @@ export function activate(c: ExtensionContext) {
       'Angular Console encountered an error when activating'
     );
     getOutputChannel().appendLine(JSON.stringify(e));
-    getTelemetry().exceptionOccured(e.message);
+    getTelemetry().exception(e.message);
   }
 }
 

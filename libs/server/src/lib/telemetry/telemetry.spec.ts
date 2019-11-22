@@ -101,7 +101,7 @@ describe('Telemetry', () => {
     it('records exceptions', () => {
       const error = 'error';
 
-      telemetry.exceptionOccured(error);
+      telemetry.exception(error);
 
       const written = sink.oneRecord();
 

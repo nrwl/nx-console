@@ -5,6 +5,6 @@ export interface TelemetryMessageBuilder {
   stoppedTracking(): void;
   screenViewed(screen: string): void;
   commandRun(commandType: string, time: number): void;
-  exceptionOccured(error: string): void;
+  exception(error: string): void;
   featureUsed(feature: string): void;
 }
