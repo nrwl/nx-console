@@ -53,9 +53,12 @@ export class Telemetry implements TelemetryMessageBuilder {
   }
 
   stoppedTracking(): void {
+    // Record event before disabling data collection.
+    // Otherwise we won't get the opt-out event.
+    this.record('StoppedTracking');
+
     this.user.untracked();
     this.userStateChanged();
-    this.record('StoppedTracking');
   }
 
   userStateChanged() {
