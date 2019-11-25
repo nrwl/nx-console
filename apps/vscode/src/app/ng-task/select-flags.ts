@@ -43,7 +43,7 @@ async function promptForFlagToSet(
     {
       picked: true,
       alwaysShow: true,
-      label: `Execute: ${currentCommand})}`
+      label: `Execute: ${currentCommand}`
     },
     ...flagSchemas.map(
       schema =>
@@ -65,7 +65,7 @@ async function promptForFlagToSet(
   }
 
   const flagSelected = Boolean((selection as any).schema);
-  if (!flagSelected) {
+  if (flagSelected) {
     return {
       flag: selection as NgTaskFlagQuickPickItem
     };
