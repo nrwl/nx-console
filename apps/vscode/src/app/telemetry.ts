@@ -11,6 +11,10 @@ export function getTelemetry() {
   return telemetry;
 }
 
+const enableTelemetry = 'enableTelemetry';
+const configurationSection = VSCodeStorage.configurationSection;
+const telemetrySetting = `${configurationSection}.${enableTelemetry}`;
+
 // using shared memory here is a shortcut, this should be an api call
 export function initTelemetry(context: ExtensionContext, store: Store) {
   telemetry = environment.disableTelemetry
@@ -25,21 +29,27 @@ export function initTelemetry(context: ExtensionContext, store: Store) {
     context.globalState.update('shownTelemetryPrompt', true);
   }
 
-  const enableTelemetry = 'enableTelemetry';
-  const configurationSection = VSCodeStorage.configurationSection;
-  const telemetrySetting = `${configurationSection}.${enableTelemetry}`;
-
   disposer = workspace.onDidChangeConfiguration(e => {
     if (e.affectsConfiguration(telemetrySetting)) {
-      if (store.get(enableTelemetry, true)) {
-        telemetry.startedTracking();
-      } else {
-        telemetry.stoppedTracking();
-      }
+      updateTelemetryTracking();
     }
   });
 
+  updateTelemetryTracking();
+
   return telemetry;
+}
+
+function updateTelemetryTracking() {
+  const configuration = workspace.getConfiguration(
+    VSCodeStorage.configurationSection
+  );
+  const enabled = configuration.get('enableTelemetry');
+  if (enabled === true || typeof enabled === 'undefined') {
+    telemetry.startedTracking();
+  } else {
+    telemetry.stoppedTracking();
+  }
 }
 
 export function teardownTelemetry() {
