@@ -9,7 +9,8 @@ import { WorkspaceRouteTitle } from './workspace-tree-item';
 import { NgTaskQuickPickItem } from '../ng-task/ng-task-quick-pick-item';
 import { getOutputChannel } from '../output-channel';
 import { getTelemetry } from '../telemetry';
-import { verifyAngularJson } from '../verifyWorkspace';
+import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
+import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
 
 export async function getTaskExecutionSchema(
   workspacePath: string,
@@ -39,6 +40,15 @@ export async function getTaskExecutionSchema(
 
         if (!selectedProject) return;
 
+        const { validBuilder, schema } = verifyBuilderDefinition(
+          selectedProject.projectName,
+          command,
+          json
+        );
+        if (!validBuilder) {
+          return;
+        }
+
         return {
           // TODO: Verify architect package is in node_modules
           ...readArchitectDef(
@@ -46,11 +56,7 @@ export async function getTaskExecutionSchema(
             selectedProject.architectDef,
             selectedProject.projectName
           ),
-          // TODO: Verify builder package is in node_modules
-          schema: readSchema(
-            workspacePath,
-            selectedProject.architectDef.builder
-          ),
+          schema,
           positional: selectedProject.projectName,
           command
         };
@@ -78,38 +84,45 @@ export async function getTaskExecutionSchema(
               )
           );
 
-        return window.showQuickPick(runnableItems).then(selection =>
-          selection
-            ? {
-                ...readArchitectDef(
-                  command,
-                  selection.command,
-                  selection.projectName
-                ),
-                command: 'run',
-                positional: `${selection.projectName}:${selection.command}`,
-                // TODO: Verify builder package is in node_modules
-                schema: readSchema(
-                  workspacePath,
-                  selection.architectDef.builder
-                )
-              }
-            : undefined
-        );
+        return window.showQuickPick(runnableItems).then(selection => {
+          if (!selection) {
+            return;
+          }
+
+          const schemaDef = readSchema(
+            workspacePath,
+            selection.architectDef.builder
+          );
+
+          if (!schemaDef) {
+            return;
+          }
+
+          return {
+            ...readArchitectDef(
+              command,
+              selection.command,
+              selection.projectName
+            ),
+            command: 'run',
+            positional: `${selection.projectName}:${selection.command}`,
+            schema: schemaDef
+          };
+        });
       case 'Generate':
         return selectSchematic(workspacePath).then(schematic => {
           if (!schematic) {
             return;
           }
 
-          schematic.schema.forEach(schema => {
-            if (schema.enum) {
+          schematic.schema.forEach(s => {
+            if (s.enum) {
               return;
             }
 
-            if (schema.name === 'project') {
-              schema.type = 'enum';
-              schema.enum = getProjectEntries()
+            if (s.name === 'project') {
+              s.type = 'enum';
+              s.enum = getProjectEntries()
                 .map(entry => entry[0])
                 .sort();
             }
@@ -121,7 +134,7 @@ export async function getTaskExecutionSchema(
   } catch (e) {
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
     getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exceptionOccured(stringifiedError);
+    getTelemetry().exception(stringifiedError);
 
     window
       .showErrorMessage(

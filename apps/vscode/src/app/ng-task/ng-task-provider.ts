@@ -8,7 +8,6 @@ import {
 } from 'vscode';
 
 import { getTelemetry } from '../telemetry';
-import { verifyAngularJson, verifyNodeModules } from '../verifyWorkspace';
 import { NgTask } from './ng-task';
 import {
   AngularJson,
@@ -17,12 +16,18 @@ import {
   ProjectDef,
   Projects
 } from './ng-task-definition';
+import { verifyNodeModules } from '../verify-workspace/verify-node-modules';
+import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
+
+export let ngTaskProvider: NgTaskProvider;
 
 export class NgTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: NgTaskDefinition;
 
   constructor(private workspacePath: string) {
+    ngTaskProvider = this;
+
     tasks.onDidEndTaskProcess(e => {
       if (e.execution === this.currentDryRun) {
         this.currentDryRun = undefined;

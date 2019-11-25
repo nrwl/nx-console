@@ -1,23 +1,9 @@
-import { existsSync } from 'fs';
-import { window } from 'vscode';
-import { join } from 'path';
 import { readAndParseJson } from '@angular-console/server';
-import { getOutputChannel } from './output-channel';
-import { getTelemetry } from './telemetry';
+import { join } from 'path';
+import { window } from 'vscode';
 
-export function verifyNodeModules(
-  workspacePath: string
-): { validNodeModules: boolean } {
-  if (!existsSync(join(workspacePath, 'node_modules'))) {
-    window.showErrorMessage(
-      'Could not execute task since node_modules directory is missing. Run npm install at: ' +
-        workspacePath
-    );
-    return { validNodeModules: false };
-  }
-
-  return { validNodeModules: true };
-}
+import { getOutputChannel } from '../output-channel';
+import { getTelemetry } from '../telemetry';
 
 export function verifyAngularJson(
   workspacePath: string
@@ -38,7 +24,7 @@ export function verifyAngularJson(
 
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
     getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exceptionOccured(stringifiedError);
+    getTelemetry().exception(stringifiedError);
 
     return { validAngularJson: false };
   }
