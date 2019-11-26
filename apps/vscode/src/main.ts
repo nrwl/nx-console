@@ -43,6 +43,7 @@ let context: ExtensionContext;
 
 export function activate(c: ExtensionContext) {
   try {
+    const startTime = Date.now();
     context = c;
     currentWorkspaceTreeProvider = WorkspaceTreeProvider.create({
       extensionPath: context.extensionPath
@@ -115,7 +116,7 @@ export function activate(c: ExtensionContext) {
       scanForWorkspace(vscodeWorkspacePath);
     }
 
-    getTelemetry().extensionActivated(Date.now());
+    getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
     window.showErrorMessage(
       'Angular Console encountered an error when activating (see output panel)'
@@ -129,7 +130,7 @@ export function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
-  getTelemetry().extensionDeactivated(Date.now());
+  getTelemetry().extensionDeactivated();
   teardownTelemetry();
 }
 

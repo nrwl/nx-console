@@ -59,7 +59,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
         this.extensionActivated(params.fetch('time'));
         break;
       case 'ExtensionDeactivated':
-        this.extensionDeactivated(params.fetch('time'));
+        this.extensionDeactivated();
         break;
       case 'StartedTracking':
         this.startedTracking();
@@ -86,6 +86,10 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
 
   extensionActivated(time: number): void {
     this.visitor
+      .event({
+        ec: 'Application',
+        ea: 'Activated'
+      })
       .timing({
         utc: 'Application',
         utv: 'Activation Time',
@@ -94,12 +98,11 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       .send();
   }
 
-  extensionDeactivated(time: number): void {
+  extensionDeactivated(): void {
     this.visitor
-      .timing({
-        utc: 'Application',
-        utv: 'Deactivation Time',
-        utt: time
+      .event({
+        ec: 'Application',
+        ea: 'Deactivated'
       })
       .send();
   }
