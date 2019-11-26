@@ -196,13 +196,16 @@ export function normalizeSchema(
           required: Boolean(r),
           deprecated: v['x-deprecated'],
           positional: Boolean(isPositional(v)),
+          index: getIndex(v),
           enum: v.enum
         });
       }
     });
 
     return res.sort((a, b) => {
-      if (a.positional) {
+      if (a.positional && b.positional) {
+        return a.index - b.index;
+      } else if (a.positional) {
         return -1;
       } else if (b.positional) {
         return 1;
@@ -257,6 +260,15 @@ function isPositional(prop: any): any {
   }
   const d = prop.default !== undefined ? prop.default : prop.$default;
   return d.$source === 'argv';
+}
+
+function getIndex(prop: any): number | undefined {
+  if (prop.default === undefined && prop.$default === undefined) {
+    return undefined;
+  } else {
+    const d = prop.default !== undefined ? prop.default : prop.$default;
+    return d.$source === 'argv' ? d.index : undefined;
+  }
 }
 
 function hasSource(prop: any): any {
