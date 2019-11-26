@@ -123,7 +123,7 @@ async function readWorkspaceSchematicsCollection(
           return {
             name: schemaJson.json.id,
             collection: collectionName,
-            schema: await normalizeSchema(schemaJson.json),
+            options: await normalizeSchema(schemaJson.json),
             description: '',
             npmClient,
             npmScript: workspaceSchematicsNpmScript
@@ -184,7 +184,7 @@ async function readCollectionSchematics(
           schematicCollection.schematics.push({
             name: k,
             collection: collectionName,
-            schema: await normalizeSchema(
+            options: await normalizeSchema(
               schematicSchema.json,
               projectDefaults
             ),

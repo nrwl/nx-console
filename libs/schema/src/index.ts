@@ -1,12 +1,20 @@
 import { Option } from '@angular/cli/models/interface';
+export { Option } from '@angular/cli/models/interface';
 
-// tslint:disable-next-line: no-empty-interface
-export interface Schema extends Option {}
+export interface TaskExecutionMessage {
+  command: string;
+  positional: string;
+  flags: string[];
+}
 
-export interface SchematicCollectionForNgNew {
+export interface TaskExecutionSchema {
   name: string;
+  command: string;
+  positional: string;
+  builder?: string;
   description: string;
-  schema: Schema[];
+  configurations?: ArchitectConfiguration[];
+  options: Option[];
 }
 
 export interface SchematicCollection {
@@ -18,21 +26,17 @@ export interface Schematic {
   collection: string;
   name: string;
   description: string;
-  schema: Schema[];
+  options: Option[];
 }
 
-export interface Options {
-  defaultValues: FieldValue[];
-}
-
-export interface FieldValue {
+export interface DefaultValue {
   name: string;
-  defaultValue?: string;
+  defaultValue: string | undefined;
 }
 
-export interface ArchitectConfigurations {
+export interface ArchitectConfiguration {
   name: string;
-  defaultValues: FieldValue[];
+  defaultValues: DefaultValue[];
 }
 
 export interface Project {
@@ -47,7 +51,6 @@ export interface Architect {
   project: string;
   builder: string;
   description: string;
-  options: Options;
-  configurations: ArchitectConfigurations[];
-  schema: Schema[];
+  configurations: ArchitectConfiguration[];
+  options: Option[];
 }

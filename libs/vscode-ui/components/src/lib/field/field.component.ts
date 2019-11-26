@@ -1,4 +1,4 @@
-import { Schema } from '@angular-console/schema';
+import { Option } from '@angular-console/schema';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -30,7 +30,7 @@ import { Subscription } from 'rxjs';
   ]
 })
 export class FieldComponent implements ControlValueAccessor, OnDestroy {
-  @Input() field: Schema;
+  @Input() field: Option;
   _value: string;
   valueChangeSub: Subscription;
 

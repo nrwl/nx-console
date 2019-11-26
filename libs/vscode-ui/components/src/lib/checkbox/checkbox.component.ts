@@ -6,7 +6,7 @@ import {
   EventEmitter,
   ViewEncapsulation
 } from '@angular/core';
-import { Schema } from '@angular-console/schema';
+import { Option } from '@angular-console/schema';
 
 @Component({
   selector: 'angular-console-checkbox',
@@ -16,7 +16,7 @@ import { Schema } from '@angular-console/schema';
   encapsulation: ViewEncapsulation.None
 })
 export class CheckboxComponent {
-  @Input() field: Schema;
+  @Input() field: Option;
   @Input() disabled = false;
   @Input() value: 'true' | 'false';
   @Output() readonly valueChange = new EventEmitter<'true' | 'false'>();

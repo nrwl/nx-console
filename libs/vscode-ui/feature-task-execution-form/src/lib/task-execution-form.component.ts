@@ -34,16 +34,11 @@ import {
   mapTo
 } from 'rxjs/operators';
 
+import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
-  TASK_EXECUTION_SCHEMA,
-  TaskExecutionSchema
-} from './task-execution-form.schema';
-
-export interface TaskExecutionMessage {
-  command: string;
-  positional: string;
-  flags: string[];
-}
+  TaskExecutionSchema,
+  TaskExecutionMessage
+} from '@angular-console/schema';
 
 declare global {
   interface Window {
@@ -138,7 +133,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   readonly filteredFields$: Observable<Set<string>> = combineLatest([
     this.architect$.pipe(
       map(architect => {
-        return architect.schema.map(field => {
+        return architect.options.map(field => {
           return {
             fieldName: field.name,
             fieldNameLowerCase: field.name.toLowerCase()
@@ -242,7 +237,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
     const defaultValues = this.getDefaultValuesForConfiguration(architect);
 
-    architect.schema.forEach(schema => {
+    architect.options.forEach(schema => {
       const validators: Array<ValidatorFn> = [];
       if (schema.required) {
         validators.push(Validators.required);
@@ -292,7 +287,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     configurationName?: string
   ) {
     const defaultValues: { [key: string]: string } = {};
-    architect.schema.forEach(field => {
+    architect.options.forEach(field => {
       if (field.default === undefined) {
         defaultValues[field.name] = '';
         return;
@@ -301,12 +296,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       defaultValues[field.name] =
         String(field.default) || (field.type === 'boolean' ? 'false' : '');
     });
-
-    if (architect.options) {
-      architect.options.defaultValues.forEach(fieldValue => {
-        defaultValues[fieldValue.name] = fieldValue.defaultValue || '';
-      });
-    }
 
     if (configurationName && architect.configurations) {
       const configuration = architect.configurations.find(
@@ -347,7 +336,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect: TaskExecutionSchema,
     configurationName?: string
   ): string[] {
-    const fields = architect.schema.filter(s => value[s.name]);
+    const fields = architect.options.filter(s => value[s.name]);
     const defaultValues = this.getDefaultValuesForConfiguration(
       architect,
       configurationName

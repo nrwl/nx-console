@@ -5,7 +5,7 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { Schema } from '@angular-console/schema';
+import { Option } from '@angular-console/schema';
 
 @Component({
   selector: 'angular-console-input',
@@ -14,7 +14,7 @@ import { Schema } from '@angular-console/schema';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InputComponent {
-  @Input() field: Schema;
+  @Input() field: Option;
   @Input() disabled = false;
   @Input() value: string;
   @Output() readonly valueChange = new EventEmitter<string>();

@@ -6,7 +6,7 @@ import {
   OnChanges,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { Schema } from '@angular-console/schema';
+import { Option } from '@angular-console/schema';
 
 @Component({
   selector: 'vscode-ui-field-tree',
@@ -15,7 +15,7 @@ import { Schema } from '@angular-console/schema';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FieldTreeComponent implements OnChanges {
-  @Input() fields: Array<Schema>;
+  @Input() fields: Array<Option>;
   @Input() activeFieldName: string;
   @Input() filteredFields: Set<string>;
 

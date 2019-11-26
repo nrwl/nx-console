@@ -4,10 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { VscodeUiComponentsModule } from '@angular-console/vscode-ui/components';
 
-import {
-  TASK_EXECUTION_SCHEMA,
-  TaskExecutionSchema
-} from './task-execution-form.schema';
+import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
+import { TaskExecutionSchema } from '@angular-console/schema';
 
 declare global {
   interface Window {
