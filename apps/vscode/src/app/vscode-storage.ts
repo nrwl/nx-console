@@ -5,18 +5,14 @@ export class VSCodeStorage implements Store {
   static configurationSection = 'angularConsole';
 
   static fromContext(context: ExtensionContext): VSCodeStorage {
-    const config = workspace.getConfiguration(this.configurationSection);
-    return new VSCodeStorage(config, context.globalState);
+    return new VSCodeStorage(context.globalState);
   }
 
-  constructor(
-    private readonly config: VSCState,
-    private readonly state: VSCState
-  ) {}
+  constructor(private readonly state: VSCState) {}
 
   get<T>(key: string, defaultValue?: T): T | null {
     const value = this.storage(key).get(key, defaultValue);
-    return value || defaultValue || null;
+    return typeof value === 'undefined' ? defaultValue || null : value;
   }
 
   set<T>(key: string, value: T): void {
@@ -30,9 +26,13 @@ export class VSCodeStorage implements Store {
   storage(key: string): VSCState {
     return isConfig(key) ? this.config : this.state;
   }
+
+  get config() {
+    return workspace.getConfiguration(VSCodeStorage.configurationSection);
+  }
 }
 
-const ConfigKeys = ['disableTelemetry', 'useNVM'];
+const ConfigKeys = ['enableTelemetry', 'useNVM'];
 
 function isConfig(key: string): boolean {
   return ConfigKeys.includes(key);
