@@ -4,30 +4,32 @@
   <span class="deprecated-warning" *ngIf="field.deprecated">(deprecated)</span>
 </div>
 
-<ng-container [ngSwitch]="field.type">
-  <angular-console-checkbox
-    *ngSwitchCase="'boolean'"
+<ng-container *ngIf="field.enum && field.enum.length; else nonEnum">
+  <angular-console-autocomplete
+    *ngIf="field.enum?.length > 10"
+    [field]="field"
+    [formControl]="control"
+  ></angular-console-autocomplete>
+
+  <angular-console-select
+    *ngIf="field.enum?.length <= 10"
     [field]="field"
     [(value)]="value"
-  ></angular-console-checkbox>
+  ></angular-console-select>
+</ng-container>
 
-  <ng-container *ngSwitchCase="'enum'">
-    <angular-console-autocomplete
-      *ngIf="field.enum?.length > 10"
-      [field]="field"
-      [formControl]="control"
-    ></angular-console-autocomplete>
-
-    <angular-console-select
-      *ngIf="field.enum?.length <= 10"
+<ng-template #nonEnum>
+  <ng-container [ngSwitch]="field.type">
+    <angular-console-checkbox
+      *ngSwitchCase="'boolean'"
       [field]="field"
       [(value)]="value"
-    ></angular-console-select>
-  </ng-container>
+    ></angular-console-checkbox>
 
-  <angular-console-input
-    *ngSwitchDefault
-    [field]="field"
-    [(value)]="value"
-  ></angular-console-input>
-</ng-container>
+    <angular-console-input
+      *ngSwitchDefault
+      [field]="field"
+      [(value)]="value"
+    ></angular-console-input>
+  </ng-container>
+</ng-template>

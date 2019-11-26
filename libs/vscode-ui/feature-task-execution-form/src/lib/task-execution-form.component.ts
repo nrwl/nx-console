@@ -293,8 +293,13 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {
     const defaultValues: { [key: string]: string } = {};
     architect.schema.forEach(field => {
+      if (field.default === undefined) {
+        defaultValues[field.name] = '';
+        return;
+      }
+
       defaultValues[field.name] =
-        field.defaultValue || (field.type === 'boolean' ? 'false' : '');
+        String(field.default) || (field.type === 'boolean' ? 'false' : '');
     });
 
     if (architect.options) {
@@ -356,13 +361,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         args.push(sanitizeWhitespace(value[f.name]));
       } else if (f.type === 'boolean') {
         args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
-      } else if (f.type === 'arguments') {
-        args.push(
-          ...value[f.name]
-            .split(' ')
-            .filter(Boolean)
-            .map(sanitizeWhitespace)
-        );
       } else {
         args.push(`--${f.name}=${sanitizeWhitespace(value[f.name])}`);
       }

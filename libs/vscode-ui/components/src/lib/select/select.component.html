@@ -11,6 +11,7 @@
   [required]="field.required"
   [disabled]="disabled"
 >
+  <option *ngIf="!field.default" value="" [selected]="!value"></option>
   <option
     *ngFor="let optionValue of field.enum"
     [value]="optionValue"

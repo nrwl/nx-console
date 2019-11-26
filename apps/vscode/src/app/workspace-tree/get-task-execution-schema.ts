@@ -1,4 +1,4 @@
-import { readArchitectDef, readSchema } from '@angular-console/server';
+import { readArchitectDef, readBuilderSchema } from '@angular-console/server';
 import { TaskExecutionSchema } from '@angular-console/vscode-ui/feature-task-execution-form';
 import { window } from 'vscode';
 
@@ -40,7 +40,7 @@ export async function getTaskExecutionSchema(
 
         if (!selectedProject) return;
 
-        const { validBuilder, schema } = verifyBuilderDefinition(
+        const { validBuilder, schema } = await verifyBuilderDefinition(
           selectedProject.projectName,
           command,
           json
@@ -84,12 +84,12 @@ export async function getTaskExecutionSchema(
               )
           );
 
-        return window.showQuickPick(runnableItems).then(selection => {
+        return window.showQuickPick(runnableItems).then(async selection => {
           if (!selection) {
             return;
           }
 
-          const schemaDef = readSchema(
+          const schemaDef = await readBuilderSchema(
             workspacePath,
             selection.architectDef.builder
           );
@@ -121,7 +121,6 @@ export async function getTaskExecutionSchema(
             }
 
             if (s.name === 'project') {
-              s.type = 'enum';
               s.enum = getProjectEntries()
                 .map(entry => entry[0])
                 .sort();

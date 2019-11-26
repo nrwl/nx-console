@@ -3,13 +3,27 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
 import * as JSON5 from 'json5';
-
+import { schema } from '@angular-devkit/core';
+import { standardFormats } from '@angular-devkit/schematics/src/formats';
+import { Option } from '@angular/cli/models/interface';
+import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
 export interface SchematicDefaults {
   [name: string]: string;
 }
 
 export const files: { [path: string]: string[] } = {};
 export let fileContents: { [path: string]: any } = {};
+
+const IMPORTANT_FIELD_NAMES = [
+  'name',
+  'project',
+  'module',
+  'watch',
+  'style',
+  'directory',
+  'port'
+];
+const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
 
 export function exists(cmd: string): boolean {
   try {
@@ -168,69 +182,59 @@ export function readAndCacheJsonFile(
   }
 }
 
-export function normalizeSchema(
-  p: {
+const registry = new schema.CoreSchemaRegistry(standardFormats);
+export async function normalizeSchema(
+  s: {
     properties: { [k: string]: any };
     required: string[];
   },
   projectDefaults?: SchematicDefaults
-): any[] {
-  try {
-    const res = [] as any[];
-    Object.entries(p.properties).forEach(([k, v]: [string, any]) => {
-      if (v.visible === undefined || v.visible) {
-        const d = getDefault(v);
-        const r = (p.required && p.required.indexOf(k) > -1) || hasSource(v);
+): Promise<Option[]> {
+  const options = await parseJsonSchemaToOptions(registry, s);
+  const requiredFields = new Set(s.required || []);
 
-        const workspaceDefault = projectDefaults && projectDefaults[k];
+  options.forEach(option => {
+    const workspaceDefault = projectDefaults && projectDefaults[option.name];
 
-        if (v.enum) {
-          v.type = 'enum';
-        }
+    if (workspaceDefault !== undefined) {
+      option.default = workspaceDefault;
+    }
 
-        res.push({
-          name: k,
-          type: String(v.type || 'string'),
-          description: v.description || '',
-          defaultValue: workspaceDefault === undefined ? d : workspaceDefault,
-          required: Boolean(r),
-          deprecated: v['x-deprecated'],
-          positional: Boolean(isPositional(v)),
-          index: getIndex(v),
-          enum: v.enum
-        });
-      }
-    });
+    if (requiredFields.has(option.name)) {
+      option.required = true;
+    }
+  });
 
-    return res.sort((a, b) => {
-      if (a.positional && b.positional) {
-        return a.index - b.index;
-      } else if (a.positional) {
-        return -1;
-      } else if (b.positional) {
-        return 1;
-      } else if (a.required) {
-        if (b.required) {
-          return a.name.localeCompare(b.name);
-        }
-        return -1;
-      } else if (b.required) {
-        return 1;
-      } else if (a.important) {
-        if (b.important) {
-          return a.name.localeCompare(b.name);
-        }
-        return -1;
-      } else if (b.important) {
-        return 1;
-      } else {
+  return options.sort((a, b) => {
+    if (typeof a.positional === 'number' && typeof b.positional === 'number') {
+      return a.positional - b.positional;
+    }
+
+    if (typeof a.positional === 'number') {
+      return -1;
+    } else if (typeof b.positional === 'number') {
+      return 1;
+    } else if (a.required) {
+      if (b.required) {
         return a.name.localeCompare(b.name);
       }
-    });
-  } catch (e) {
-    console.error(`normalizeSchema error: '${e.message}'`);
-    throw e;
-  }
+      return -1;
+    } else if (b.required) {
+      return 1;
+    } else if (IMPORTANT_FIELDS_SET.has(a.name)) {
+      if (IMPORTANT_FIELDS_SET.has(b.name)) {
+        return (
+          IMPORTANT_FIELD_NAMES.indexOf(a.name) -
+          IMPORTANT_FIELD_NAMES.indexOf(b.name)
+        );
+      }
+      return -1;
+    } else if (IMPORTANT_FIELDS_SET.has(b.name)) {
+      return 1;
+    } else {
+      return a.name.localeCompare(b.name);
+    }
+  });
 }
 
 export function getPrimitiveValue(value: any) {
@@ -244,39 +248,6 @@ export function getPrimitiveValue(value: any) {
   } else {
     return undefined;
   }
-}
-
-function getDefault(prop: any): any {
-  if (prop.default === undefined && prop.$default === undefined) {
-    return undefined;
-  }
-  const d = prop.default !== undefined ? prop.default : prop.$default;
-  return !d.$source ? d.toString() : undefined;
-}
-
-function isPositional(prop: any): any {
-  if (prop.default === undefined && prop.$default === undefined) {
-    return false;
-  }
-  const d = prop.default !== undefined ? prop.default : prop.$default;
-  return d.$source === 'argv';
-}
-
-function getIndex(prop: any): number | undefined {
-  if (prop.default === undefined && prop.$default === undefined) {
-    return undefined;
-  } else {
-    const d = prop.default !== undefined ? prop.default : prop.$default;
-    return d.$source === 'argv' ? d.index : undefined;
-  }
-}
-
-function hasSource(prop: any): any {
-  if (prop.default === undefined && prop.$default === undefined) {
-    return false;
-  }
-  const d = prop.default !== undefined ? prop.default : prop.$default;
-  return !!d.$source;
 }
 
 export function filterByName<T>(t: T[], args: { name?: string | null }): T[] {
