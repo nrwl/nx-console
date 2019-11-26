@@ -81,7 +81,7 @@ function promptForFlagValue(flagToSet: NgTaskFlagQuickPickItem) {
       placeHolder
     });
   } else if (flagToSet.schema.enum && flagToSet.schema.enum.length) {
-    return window.showQuickPick([...flagToSet.schema.enum], {
+    return window.showQuickPick([...flagToSet.schema.enum.map(String)], {
       placeHolder
     });
   } else {

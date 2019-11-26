@@ -6,7 +6,7 @@
   (keyup)="updateValue($event.target.value)"
   [value]="value"
   class="text-input"
-  type="text"
+  [type]="field.type === 'number' ? 'number' : 'text'"
   role="textbox"
   [required]="field.required"
 />

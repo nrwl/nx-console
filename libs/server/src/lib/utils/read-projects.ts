@@ -73,26 +73,11 @@ function serializeDefaultsForConfig(config: any) {
   );
 }
 
-export function readBuilder(
+export async function readBuilderSchema(
   basedir: string,
   builder: string
-): { schema: Array<Schema> } | undefined {
+): Promise<Schema[] | undefined> {
   const [npmPackage, builderName] = builder.split(':');
-  return readBuildersFile(basedir, npmPackage)[builderName];
-}
-
-export function readSchema(
-  basedir: string,
-  builder: string
-): Schema[] | undefined {
-  const builderDef = readBuilder(basedir, builder);
-  return builderDef ? builderDef.schema : undefined;
-}
-
-function readBuildersFile(
-  basedir: string,
-  npmPackage: string
-): { [key: string]: any } {
   const packageJson = readAndCacheJsonFile(
     path.join(npmPackage, 'package.json'),
     path.join(basedir, 'node_modules')
@@ -104,20 +89,11 @@ function readBuildersFile(
     path.dirname(packageJson.path)
   );
 
-  const builders = {} as any;
-  Object.entries(buildersJson.json.builders).forEach(([k, v]: [any, any]) => {
-    try {
-      const builderSchema = readAndCacheJsonFile(
-        v.schema,
-        path.dirname(buildersJson.path)
-      );
-      builders[k] = {
-        name: k,
-        schema: normalizeSchema(builderSchema.json),
-        description: v.description || ''
-      };
-    } catch (e) {}
-  });
+  const builderDef = buildersJson.json.builders[builderName];
+  const builderSchema = readAndCacheJsonFile(
+    builderDef.schema,
+    path.dirname(buildersJson.path)
+  );
 
-  return builders;
+  return await normalizeSchema(builderSchema.json);
 }

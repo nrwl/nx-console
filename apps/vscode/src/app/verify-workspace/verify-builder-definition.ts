@@ -1,15 +1,19 @@
 import { Schema } from '@angular-console/schema';
-import { readSchema } from '@angular-console/server';
+import { readBuilderSchema } from '@angular-console/server';
 import { window } from 'vscode';
 import { angularJsonTreeProvider } from '../angular-json-tree/angular-json-tree-provider';
 import { getTelemetry } from '../telemetry';
 import { ngTaskProvider } from '../ng-task/ng-task-provider';
 
-export function verifyBuilderDefinition(
+export async function verifyBuilderDefinition(
   project: string,
   command: string,
   angularJson: any
-): { validBuilder: boolean; builderName: string; schema: Array<Schema> } {
+): Promise<{
+  validBuilder: boolean;
+  builderName: string;
+  schema: Array<Schema>;
+}> {
   const projects = angularJson.projects || {};
   const projectDef = projects[project] || {};
   const architectDef = projectDef.architect || {};
@@ -40,7 +44,10 @@ export function verifyBuilderDefinition(
     };
   }
 
-  const schema = readSchema(ngTaskProvider.getWorkspacePath(), builderName);
+  const schema = await readBuilderSchema(
+    ngTaskProvider.getWorkspacePath(),
+    builderName
+  );
 
   if (!schema) {
     window

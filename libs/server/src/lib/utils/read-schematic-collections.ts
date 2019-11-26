@@ -10,19 +10,19 @@ import {
   readAndParseJson
 } from './utils';
 
-export function readAllSchematicCollections(
+export async function readAllSchematicCollections(
   basedir: string,
   workspaceSchematicsPath: string,
   workspaceSchematicsNpmScript: string
-): SchematicCollection[] {
+): Promise<SchematicCollection[]> {
   const npmClient = fileExistsSync(path.join(basedir, 'yarn.lock'))
     ? 'yarn'
     : 'npm';
 
-  let collections = readSchematicCollectionsFromNodeModules(basedir);
+  let collections = await readSchematicCollectionsFromNodeModules(basedir);
   if (directoryExists(path.join(basedir, workspaceSchematicsPath))) {
     collections = [
-      readWorkspaceSchematicsCollection(
+      await readWorkspaceSchematicsCollection(
         basedir,
         workspaceSchematicsPath,
         npmClient,
@@ -65,9 +65,9 @@ function readAngularJsonDefaults(basedir: string): any {
   return collectionDefaults;
 }
 
-function readSchematicCollectionsFromNodeModules(
+async function readSchematicCollectionsFromNodeModules(
   basedir: string
-): SchematicCollection[] {
+): Promise<SchematicCollection[]> {
   const nodeModulesDir = path.join(basedir, 'node_modules');
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
@@ -90,50 +90,55 @@ function readSchematicCollectionsFromNodeModules(
   });
   const defaults = readAngularJsonDefaults(basedir);
 
-  return schematicCollections
-    .map(c => readCollection(nodeModulesDir, c, defaults))
-    .filter((c): c is SchematicCollection => Boolean(c));
+  return (await Promise.all(
+    schematicCollections.map(c => readCollection(nodeModulesDir, c, defaults))
+  )).filter((c): c is SchematicCollection => Boolean(c));
 }
 
-function readWorkspaceSchematicsCollection(
+async function readWorkspaceSchematicsCollection(
   basedir: string,
   workspaceSchematicsPath: string,
   npmClient: string,
   workspaceSchematicsNpmScript: string
-) {
+): Promise<{
+  name: string;
+  schematics: Schematic[];
+}> {
   const collectionDir = path.join(basedir, workspaceSchematicsPath);
   const collectionName = '@nrwl/workspace';
   if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
     const collection = readAndCacheJsonFile('collection.json', collectionDir);
 
-    return readCollectionSchematics(
+    return await readCollectionSchematics(
       collectionName,
       collection.path,
       collection.json
     );
   } else {
-    const schematics = listFiles(collectionDir)
-      .filter(f => path.basename(f) === 'schema.json')
-      .map(f => {
-        const schemaJson = readAndCacheJsonFile(f, '');
-        return {
-          name: schemaJson.json.id,
-          collection: collectionName,
-          schema: normalizeSchema(schemaJson.json),
-          description: '',
-          npmClient,
-          npmScript: workspaceSchematicsNpmScript
-        };
-      });
+    const schematics = await Promise.all(
+      listFiles(collectionDir)
+        .filter(f => path.basename(f) === 'schema.json')
+        .map(async f => {
+          const schemaJson = readAndCacheJsonFile(f, '');
+          return {
+            name: schemaJson.json.id,
+            collection: collectionName,
+            schema: await normalizeSchema(schemaJson.json),
+            description: '',
+            npmClient,
+            npmScript: workspaceSchematicsNpmScript
+          };
+        })
+    );
     return { name: collectionName, schematics };
   }
 }
 
-function readCollection(
+async function readCollection(
   basedir: string,
   collectionName: string,
   defaults?: any
-): SchematicCollection | null {
+): Promise<SchematicCollection | null> {
   try {
     const packageJson = readAndCacheJsonFile(
       path.join(collectionName, 'package.json'),
@@ -155,7 +160,7 @@ function readCollection(
   }
 }
 
-function readCollectionSchematics(
+async function readCollectionSchematics(
   collectionName: string,
   collectionPath: string,
   collectionJson: any,
@@ -165,29 +170,35 @@ function readCollectionSchematics(
     name: collectionName,
     schematics: [] as Schematic[]
   };
-  Object.entries(collectionJson.schematics).forEach(([k, v]: [any, any]) => {
-    try {
-      if (canAdd(k, v)) {
-        const schematicSchema = readAndCacheJsonFile(
-          v.schema,
-          path.dirname(collectionPath)
-        );
-        const projectDefaults =
-          defaults && defaults[collectionName] && defaults[collectionName][k];
+  Object.entries(collectionJson.schematics).forEach(
+    async ([k, v]: [any, any]) => {
+      try {
+        if (canAdd(k, v)) {
+          const schematicSchema = readAndCacheJsonFile(
+            v.schema,
+            path.dirname(collectionPath)
+          );
+          const projectDefaults =
+            defaults && defaults[collectionName] && defaults[collectionName][k];
 
-        schematicCollection.schematics.push({
-          name: k,
-          collection: collectionName,
-          schema: normalizeSchema(schematicSchema.json, projectDefaults),
-          description: v.description || ''
-        });
+          schematicCollection.schematics.push({
+            name: k,
+            collection: collectionName,
+            schema: await normalizeSchema(
+              schematicSchema.json,
+              projectDefaults
+            ),
+            description: v.description || ''
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        console.error(
+          `Invalid package.json for schematic ${collectionName}:${k}`
+        );
       }
-    } catch (e) {
-      console.error(
-        `Invalid package.json for schematic ${collectionName}:${k}`
-      );
     }
-  });
+  );
   return schematicCollection;
 }
 

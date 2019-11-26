@@ -82,7 +82,7 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
     return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
-  const { validBuilder, schema } = verifyBuilderDefinition(
+  const { validBuilder, schema } = await verifyBuilderDefinition(
     selection.projectName,
     command,
     json

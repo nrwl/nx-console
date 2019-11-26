@@ -1,15 +1,7 @@
-export interface Schema {
-  name: string;
-  type: string;
-  description: string;
-  defaultValue?: string;
-  important?: boolean;
-  completion?: string;
-  deprecated?: string;
-  required: boolean;
-  positional: boolean;
-  enum?: string[];
-}
+import { Option } from '@angular/cli/models/interface';
+
+// tslint:disable-next-line: no-empty-interface
+export interface Schema extends Option {}
 
 export interface SchematicCollectionForNgNew {
   name: string;
