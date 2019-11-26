@@ -33,5 +33,17 @@ describe('utils', () => {
       });
       expect(r[0].required).toBeFalsy();
     });
+
+    it('should sort positional arguments by ascending order', () => {
+      const r = normalizeSchema({
+        properties: {
+          a: { $default: { $source: 'argv', index: 0 } },
+          b: { $default: { $source: 'argv', index: 2 } },
+          c: { $default: { $source: 'argv', index: 1 } }
+        },
+        required: []
+      });
+      expect(r.map(x => x.name)).toEqual(['a', 'c', 'b']);
+    });
   });
 });
