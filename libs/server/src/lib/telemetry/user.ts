@@ -12,7 +12,7 @@ export class User {
       store.set('uuid', id);
     }
 
-    if (store.get('disableTelemetry')) {
+    if (!store.get('enableTelemetry', true)) {
       state = 'untracked';
     }
 

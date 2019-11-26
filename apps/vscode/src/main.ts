@@ -48,7 +48,7 @@ export function activate(c: ExtensionContext) {
       extensionPath: context.extensionPath
     });
     const store = VSCodeStorage.fromContext(context);
-    initTelemetry(context, store);
+    initTelemetry(store);
 
     workspaceTreeView = window.createTreeView('angularConsole', {
       treeDataProvider: currentWorkspaceTreeProvider
