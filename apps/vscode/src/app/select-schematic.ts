@@ -11,8 +11,7 @@ export async function selectSchematic(workspacePath: string) {
 
   const schematics = (await readAllSchematicCollections(
     workspacePath,
-    join('tools', 'schematics'), // TODO: Make these values auto detectable / configurable
-    'workspace-schematic' // TODO: Make these values auto detectable / configurable
+    join('tools', 'schematics')
   ))
     .map((c): GenerateQuickPickItem[] =>
       c.schematics.map(

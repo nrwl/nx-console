@@ -45,6 +45,26 @@ export function findClosestNg(dir: string): string {
   }
 }
 
+export function findClosestNx(dir: string): string {
+  if (directoryExists(path.join(dir, 'node_modules'))) {
+    if (platform() === 'win32') {
+      if (fileExistsSync(path.join(dir, 'nx.cmd'))) {
+        return path.join(dir, 'nx.cmd');
+      } else {
+        return path.join(dir, 'node_modules', '.bin', 'nx.cmd');
+      }
+    } else {
+      if (fileExistsSync(path.join(dir, 'node_modules', '.bin', 'nx'))) {
+        return path.join(dir, 'node_modules', '.bin', 'nx');
+      } else {
+        return path.join(dir, 'node_modules', '@nrwl', 'cli', 'bin', 'nx.js');
+      }
+    }
+  } else {
+    return findClosestNx(path.dirname(dir));
+  }
+}
+
 export function listOfUnnestedNpmPackages(nodeModulesDir: string): string[] {
   const res: string[] = [];
   if (!existsSync(nodeModulesDir)) {

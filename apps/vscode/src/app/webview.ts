@@ -6,13 +6,15 @@ import {
   Uri,
   ViewColumn,
   WebviewPanel,
-  window
+  window,
+  tasks
 } from 'vscode';
 
 import { NgTaskProvider } from './ng-task/ng-task-provider';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
 import { getTelemetry } from './telemetry';
+import { NxTask } from './ng-task/nx-task';
 import {
   TaskExecutionSchema,
   TaskExecutionMessage
@@ -94,6 +96,26 @@ export function createWebViewPanel(
 
     webviewPanel.webview.onDidReceiveMessage(
       (message: TaskExecutionMessage) => {
+        if (
+          message.command === 'generate' &&
+          message.positional.startsWith('workspace-schematic:')
+        ) {
+          tasks.executeTask(
+            NxTask.create(
+              {
+                command: 'workspace-schematic',
+                positional: message.positional.replace(
+                  'workspace-schematic:',
+                  ''
+                ),
+                flags: message.flags
+              },
+              ngTaskProvider.getWorkspacePath()
+            )
+          );
+          return;
+        }
+
         ngTaskProvider.executeTask(message);
       }
     );

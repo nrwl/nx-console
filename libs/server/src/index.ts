@@ -1,6 +1,6 @@
 export { readAndParseJson } from './lib/utils/utils';
 
-export { findClosestNg } from './lib/utils/utils';
+export { findClosestNg, findClosestNx } from './lib/utils/utils';
 
 export { readAndCacheJsonFile as readJsonFile } from './lib/utils/utils';
 

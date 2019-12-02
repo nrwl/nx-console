@@ -12,22 +12,12 @@ import {
 
 export async function readAllSchematicCollections(
   basedir: string,
-  workspaceSchematicsPath: string,
-  workspaceSchematicsNpmScript: string
+  workspaceSchematicsPath: string
 ): Promise<SchematicCollection[]> {
-  const npmClient = fileExistsSync(path.join(basedir, 'yarn.lock'))
-    ? 'yarn'
-    : 'npm';
-
   let collections = await readSchematicCollectionsFromNodeModules(basedir);
   if (directoryExists(path.join(basedir, workspaceSchematicsPath))) {
     collections = [
-      await readWorkspaceSchematicsCollection(
-        basedir,
-        workspaceSchematicsPath,
-        npmClient,
-        workspaceSchematicsNpmScript
-      ),
+      await readWorkspaceSchematicsCollection(basedir, workspaceSchematicsPath),
       ...collections
     ];
   }
@@ -97,15 +87,13 @@ async function readSchematicCollectionsFromNodeModules(
 
 async function readWorkspaceSchematicsCollection(
   basedir: string,
-  workspaceSchematicsPath: string,
-  npmClient: string,
-  workspaceSchematicsNpmScript: string
+  workspaceSchematicsPath: string
 ): Promise<{
   name: string;
   schematics: Schematic[];
 }> {
   const collectionDir = path.join(basedir, workspaceSchematicsPath);
-  const collectionName = '@nrwl/workspace';
+  const collectionName = 'workspace-schematic';
   if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
     const collection = readAndCacheJsonFile('collection.json', collectionDir);
 
@@ -115,7 +103,7 @@ async function readWorkspaceSchematicsCollection(
       collection.json
     );
   } else {
-    const schematics = await Promise.all(
+    const schematics: Schematic[] = await Promise.all(
       listFiles(collectionDir)
         .filter(f => path.basename(f) === 'schema.json')
         .map(async f => {
@@ -124,9 +112,7 @@ async function readWorkspaceSchematicsCollection(
             name: schemaJson.json.id,
             collection: collectionName,
             options: await normalizeSchema(schemaJson.json),
-            description: '',
-            npmClient,
-            npmScript: workspaceSchematicsNpmScript
+            description: ''
           };
         })
     );
