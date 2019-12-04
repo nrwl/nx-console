@@ -38,12 +38,12 @@ export class Telemetry implements TelemetryMessageBuilder {
     this.sinks.forEach(s => s.record(type, data));
   }
 
-  extensionActivated(time: number): void {
-    this.record('ExtensionActivated', { time });
+  extensionActivated(timeInSeconds: number): void {
+    this.record('ExtensionActivated', { time: timeInSeconds });
   }
 
-  extensionDeactivated(time: number): void {
-    this.record('ExtensionDeactivated', { time });
+  extensionDeactivated(): void {
+    this.record('ExtensionDeactivated');
   }
 
   startedTracking(): void {
