@@ -33,7 +33,7 @@ import {
   merge,
   of
 } from 'rxjs';
-import { Schema } from '@angular-console/schema';
+import { Option } from '@angular-console/schema';
 
 export enum AutocompleteNavKeys {
   Enter = 'Enter',
@@ -58,7 +58,7 @@ export const AUTOCOMPLETE_NAV_KEYS = new Set(['Enter', 'ArrowUp', 'ArrowDown']);
 })
 export class AutocompleteComponent
   implements OnInit, OnDestroy, OnChanges, ControlValueAccessor {
-  @Input() field: Schema;
+  @Input() field: Option;
 
   private readonly _options$ = new BehaviorSubject<string[]>([]);
   visibleOptions: Observable<string[]>;

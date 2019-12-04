@@ -1,4 +1,4 @@
-import { Schema } from '@angular-console/schema';
+import { Option } from '@angular-console/schema';
 import { readBuilderSchema } from '@angular-console/server';
 import { window } from 'vscode';
 import { angularJsonTreeProvider } from '../angular-json-tree/angular-json-tree-provider';
@@ -12,7 +12,7 @@ export async function verifyBuilderDefinition(
 ): Promise<{
   validBuilder: boolean;
   builderName: string;
-  schema: Array<Schema>;
+  options: Array<Option>;
 }> {
   const projects = angularJson.projects || {};
   const projectDef = projects[project] || {};
@@ -40,16 +40,16 @@ export async function verifyBuilderDefinition(
     return {
       validBuilder: false,
       builderName: builderName,
-      schema: []
+      options: []
     };
   }
 
-  const schema = await readBuilderSchema(
+  const options = await readBuilderSchema(
     ngTaskProvider.getWorkspacePath(),
     builderName
   );
 
-  if (!schema) {
+  if (!options) {
     window
       .showErrorMessage(
         `Builder specified for ${project} ${command} was not found in your node_modules. Check that specified builder is correct and has a corresponding entry in package.json`,
@@ -70,13 +70,13 @@ export async function verifyBuilderDefinition(
     return {
       validBuilder: false,
       builderName,
-      schema: []
+      options: []
     };
   }
 
   return {
     validBuilder: true,
     builderName,
-    schema
+    options
   };
 }

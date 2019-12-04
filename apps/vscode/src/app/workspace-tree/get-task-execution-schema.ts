@@ -1,5 +1,4 @@
 import { readArchitectDef, readBuilderSchema } from '@angular-console/server';
-import { TaskExecutionSchema } from '@angular-console/vscode-ui/feature-task-execution-form';
 import { window } from 'vscode';
 
 import { selectNgCliProject } from '../ng-task/ng-task-commands';
@@ -11,6 +10,7 @@ import { getOutputChannel } from '../output-channel';
 import { getTelemetry } from '../telemetry';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
+import { TaskExecutionSchema } from '@angular-console/schema';
 
 export async function getTaskExecutionSchema(
   workspacePath: string,
@@ -40,7 +40,7 @@ export async function getTaskExecutionSchema(
 
         if (!selectedProject) return;
 
-        const { validBuilder, schema } = await verifyBuilderDefinition(
+        const { validBuilder, options } = await verifyBuilderDefinition(
           selectedProject.projectName,
           command,
           json
@@ -56,7 +56,7 @@ export async function getTaskExecutionSchema(
             selectedProject.architectDef,
             selectedProject.projectName
           ),
-          schema,
+          options,
           positional: selectedProject.projectName,
           command
         };
@@ -89,12 +89,12 @@ export async function getTaskExecutionSchema(
             return;
           }
 
-          const schemaDef = await readBuilderSchema(
+          const builderOptions = await readBuilderSchema(
             workspacePath,
             selection.architectDef.builder
           );
 
-          if (!schemaDef) {
+          if (!builderOptions) {
             return;
           }
 
@@ -106,7 +106,7 @@ export async function getTaskExecutionSchema(
             ),
             command: 'run',
             positional: `${selection.projectName}:${selection.command}`,
-            schema: schemaDef
+            options: builderOptions
           };
         });
       case 'Generate':
@@ -115,7 +115,7 @@ export async function getTaskExecutionSchema(
             return;
           }
 
-          schematic.schema.forEach(s => {
+          schematic.options.forEach(s => {
             if (s.enum) {
               return;
             }

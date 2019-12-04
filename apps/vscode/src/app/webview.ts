@@ -1,7 +1,3 @@
-import {
-  TaskExecutionMessage,
-  TaskExecutionSchema
-} from '@angular-console/vscode-ui/feature-task-execution-form';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
@@ -17,6 +13,10 @@ import { NgTaskProvider } from './ng-task/ng-task-provider';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
 import { getTelemetry } from './telemetry';
+import {
+  TaskExecutionSchema,
+  TaskExecutionMessage
+} from '@angular-console/schema';
 
 let webviewPanel: WebviewPanel | undefined;
 let indexHtml: string | undefined;

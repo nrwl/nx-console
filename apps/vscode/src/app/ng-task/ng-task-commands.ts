@@ -82,7 +82,7 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
     return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
-  const { validBuilder, schema } = await verifyBuilderDefinition(
+  const { validBuilder, options } = await verifyBuilderDefinition(
     selection.projectName,
     command,
     json
@@ -91,7 +91,7 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
     return;
   }
 
-  const flags = await selectFlags(command, selection.projectName, schema);
+  const flags = await selectFlags(command, selection.projectName, options);
 
   if (flags !== undefined) {
     ngTaskProvider.executeTask({
@@ -111,7 +111,7 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
   const flags = await selectFlags(
     'generate',
     selection.positional,
-    selection.schema
+    selection.options
   );
 
   if (flags !== undefined) {

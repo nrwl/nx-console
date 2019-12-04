@@ -1,11 +1,11 @@
-import { Schema } from '@angular-console/schema';
+import { Option } from '@angular-console/schema';
 import { QuickPickItem, window } from 'vscode';
 import { NgTaskFlagQuickPickItem } from './ng-task-flag-quick-pick-item';
 
 export async function selectFlags(
   command: string,
   positional: string,
-  flagSchemas: Schema[],
+  options: Option[],
   userSetFlags: { [key: string]: string } = {}
 ): Promise<string[] | undefined> {
   const flagArray = Object.entries(userSetFlags).map(
@@ -14,7 +14,7 @@ export async function selectFlags(
 
   const selection = await promptForFlagToSet(
     `ng ${command} ${positional} ${flagArray.join(' ')}`,
-    flagSchemas
+    options
   );
 
   if (!selection.flag) {
@@ -29,12 +29,12 @@ export async function selectFlags(
     delete userSetFlags[selection.flag.flagName];
   }
 
-  return selectFlags(command, positional, flagSchemas, userSetFlags);
+  return selectFlags(command, positional, options, userSetFlags);
 }
 
 async function promptForFlagToSet(
   currentCommand: string,
-  flagSchemas: Schema[]
+  options: Option[]
 ): Promise<{
   execute?: boolean;
   flag?: NgTaskFlagQuickPickItem;
@@ -45,13 +45,13 @@ async function promptForFlagToSet(
       alwaysShow: true,
       label: `Execute: ${currentCommand}`
     },
-    ...flagSchemas.map(
-      schema =>
+    ...options.map(
+      option =>
         new NgTaskFlagQuickPickItem(
-          schema.name,
-          schema.description || schema.type,
-          schema,
-          `${schema.name}`
+          option.name,
+          option.description || option.type,
+          option,
+          `${option.name}`
         )
     )
   ];
@@ -64,7 +64,7 @@ async function promptForFlagToSet(
     return { execute: false };
   }
 
-  const flagSelected = Boolean((selection as any).schema);
+  const flagSelected = Boolean((selection as NgTaskFlagQuickPickItem).option);
   if (!flagSelected) {
     return { execute: true };
   } else {
@@ -76,12 +76,12 @@ async function promptForFlagToSet(
 
 function promptForFlagValue(flagToSet: NgTaskFlagQuickPickItem) {
   const placeHolder = `--${flagToSet.flagName}=...`;
-  if (flagToSet.schema.type === 'boolean') {
+  if (flagToSet.option.type === 'boolean') {
     return window.showQuickPick(['true', 'false'], {
       placeHolder
     });
-  } else if (flagToSet.schema.enum && flagToSet.schema.enum.length) {
-    return window.showQuickPick([...flagToSet.schema.enum.map(String)], {
+  } else if (flagToSet.option.enum && flagToSet.option.enum.length) {
+    return window.showQuickPick([...flagToSet.option.enum.map(String)], {
       placeHolder
     });
   } else {

@@ -1,4 +1,10 @@
-import { Architect, Project, Schema } from '@angular-console/schema';
+import {
+  Architect,
+  Project,
+  Option,
+  DefaultValue,
+  ArchitectConfiguration
+} from '@angular-console/schema';
 import * as path from 'path';
 
 import {
@@ -9,19 +15,15 @@ import {
 
 export function readProjects(json: any): Project[] {
   return Object.entries(json)
-    .map(([key, value]: [string, any]) => {
-      return ({
+    .map(
+      ([key, value]: [string, any]): Project => ({
         name: key,
         root: value.root,
         projectType: value.projectType,
         architect: readArchitect(key, value.architect)
-      } as any) as Project;
-    })
-    .sort(compareProjects);
-}
-
-function compareProjects(a: Project, b: Project) {
-  return a.root.localeCompare(b.root);
+      })
+    )
+    .sort((a, b) => a.root.localeCompare(b.root));
 }
 
 export function readArchitectDef(
@@ -29,23 +31,15 @@ export function readArchitectDef(
   architectDef: any,
   project: string
 ): Architect {
-  const options = {
-    defaultValues: serializeDefaultsForConfig(architectDef.options)
-  };
-  const configurations = architectDef.configurations
+  const configurations: ArchitectConfiguration[] = architectDef.configurations
     ? Object.keys(architectDef.configurations).map(name => ({
         name,
-        defaultValues: readDefaultValues(
-          architectDef.options,
-          architectDef.configurations,
-          name
-        )
+        defaultValues: readDefaultValues(architectDef.configurations, name)
       }))
     : [];
 
   return {
-    schema: [],
-    options,
+    options: [],
     configurations,
     name: architectName,
     project,
@@ -61,22 +55,20 @@ export function readArchitect(project: string, architect: any): Architect[] {
   });
 }
 
-function readDefaultValues(options: any, configurations: any, name: string) {
-  return serializeDefaultsForConfig({ ...options, ...configurations[name] });
-}
-
-function serializeDefaultsForConfig(config: any) {
-  if (!config) return [];
+function readDefaultValues(configurations: any, name: string): DefaultValue[] {
+  const defaults: DefaultValue[] = [];
+  const config = configurations[name];
+  if (!config) return defaults;
   return Object.keys(config).reduce(
     (m, k) => [...m, { name: k, defaultValue: getPrimitiveValue(config[k]) }],
-    [] as any[]
+    defaults
   );
 }
 
 export async function readBuilderSchema(
   basedir: string,
   builder: string
-): Promise<Schema[] | undefined> {
+): Promise<Option[]> {
   const [npmPackage, builderName] = builder.split(':');
   const packageJson = readAndCacheJsonFile(
     path.join(npmPackage, 'package.json'),

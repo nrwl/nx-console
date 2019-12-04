@@ -1,12 +1,12 @@
-import { execSync } from 'child_process';
-import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
-import { platform } from 'os';
-import * as path from 'path';
-import * as JSON5 from 'json5';
 import { schema } from '@angular-devkit/core';
 import { standardFormats } from '@angular-devkit/schematics/src/formats';
 import { Option } from '@angular/cli/models/interface';
 import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
+import * as JSON5 from 'json5';
+import { platform } from 'os';
+import * as path from 'path';
+
 export interface SchematicDefaults {
   [name: string]: string;
 }
@@ -24,60 +24,6 @@ const IMPORTANT_FIELD_NAMES = [
   'port'
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
-
-export function exists(cmd: string): boolean {
-  try {
-    if (platform() === 'win32') {
-      execSync(`where ${cmd}`).toString();
-    } else {
-      execSync(`which ${cmd}`).toString();
-    }
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-export function findExecutable(command: string, cwd: string): string {
-  const paths = (process.env.PATH as string).split(path.delimiter);
-  if (paths === void 0 || paths.length === 0) {
-    return path.join(cwd, command);
-  }
-  const r = findInPath(command, cwd, paths);
-  return r ? r : path.join(cwd, command);
-}
-
-export function hasExecutable(command: string, cwd: string): boolean {
-  const paths = (process.env.PATH as string).split(path.delimiter);
-  if (paths === void 0 || paths.length === 0) {
-    return false;
-  } else {
-    return !!findInPath(command, cwd, paths);
-  }
-}
-
-function findInPath(
-  command: string,
-  cwd: string,
-  paths: string[]
-): string | undefined {
-  for (const pathEntry of paths) {
-    let fullPath: string;
-    if (path.isAbsolute(pathEntry)) {
-      fullPath = path.join(pathEntry, command);
-    } else {
-      fullPath = path.join(cwd, pathEntry, command);
-    }
-    if (existsSync(fullPath + '.exe')) {
-      return fullPath + '.exe';
-    } else if (existsSync(fullPath + '.cmd')) {
-      return fullPath + '.cmd';
-    } else if (existsSync(fullPath)) {
-      return fullPath;
-    }
-  }
-  return undefined;
-}
 
 export function findClosestNg(dir: string): string {
   if (directoryExists(path.join(dir, 'node_modules'))) {
@@ -237,37 +183,14 @@ export async function normalizeSchema(
   });
 }
 
-export function getPrimitiveValue(value: any) {
+export function getPrimitiveValue(value: any): string | undefined {
   if (
     typeof value === 'string' ||
     typeof value === 'number' ||
-    typeof value === 'boolean' ||
-    value === null
+    typeof value === 'boolean'
   ) {
     return value.toString();
   } else {
     return undefined;
   }
-}
-
-export function filterByName<T>(t: T[], args: { name?: string | null }): T[] {
-  return args.name ? t.filter((s: any) => s.name === args.name) : t;
-}
-
-export function normalizePath(value: string): string {
-  const firstPart = value.split('/')[0];
-  if (!firstPart) return value;
-  if (!firstPart.endsWith(':')) return value;
-  return value
-    .replace(new RegExp('/', 'g'), '\\')
-    .split('\\')
-    .filter(r => !!r)
-    .join('\\');
-}
-
-export function seconds<T>(fn: Function): [number, T] {
-  const start = process.hrtime();
-  const result = fn();
-  const end = process.hrtime(start);
-  return [end[0], result];
 }
