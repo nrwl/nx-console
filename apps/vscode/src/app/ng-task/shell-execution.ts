@@ -1,5 +1,6 @@
 import { ShellExecution } from 'vscode';
 import { platform } from 'os';
+import { execSync } from 'child_process';
 
 export interface ShellConfig {
   /** Human-readable string which will be used to represent the terminal in the UI. */
@@ -37,10 +38,21 @@ function getWin32ShellExecution(config: ShellConfig): ShellExecution {
   });
 }
 
+let bashPath: string;
 function getUnixShellExecution(config: ShellConfig): ShellExecution {
+  if (!bashPath) {
+    try {
+      bashPath =
+        execSync('which bash')
+          .toString()
+          .trim() || '/bin/bash';
+    } catch {
+      bashPath = '/bin/bash'; // Default to where bash is usually installed.
+    }
+  }
   return new ShellExecution(config.displayCommand, {
     cwd: config.cwd,
-    executable: '/bin/bash',
+    executable: bashPath,
     shellArgs: [
       '-l',
       '-c',
