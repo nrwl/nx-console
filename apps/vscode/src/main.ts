@@ -207,9 +207,6 @@ async function setWorkspaceJson(workspaceJsonPath: string) {
     workspaceJsonTreeView = window.createTreeView('angularConsoleJson', {
       treeDataProvider: workspaceJsonTreeProvider
     }) as TreeView<WorkspaceJsonTreeItem>;
-    workspaceJsonTreeView = window.createTreeView('workspaceJson', {
-      treeDataProvider: workspaceJsonTreeProvider
-    }) as TreeView<WorkspaceJsonTreeItem>;
     context.subscriptions.push(workspaceJsonTreeView);
   } else {
     cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);

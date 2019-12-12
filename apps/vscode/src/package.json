@@ -47,7 +47,11 @@
     "menus": {
       "view/title": [
         {
+<<<<<<< HEAD
           "command": "angularConsole.refreshWorkspaceJsonTree",
+=======
+          "command": "ng.refreshWorkspaceJsonTree",
+>>>>>>> feat(vscode): Support workspace.json for non Angular workspaces
           "when": "view == angularConsoleJson",
           "group": "navigation"
         },
@@ -59,12 +63,12 @@
       ],
       "view/item/context": [
         {
-          "command": "angularConsole.revealInExplorer",
+          "command": "ng.revealInExplorer",
           "when": "view == angularConsoleJson && viewItem == project",
           "group": "inline"
         },
         {
-          "command": "angularConsole.runTask",
+          "command": "ng.runTask",
           "when": "view == angularConsoleJson && viewItem == task",
           "group": "inline"
         },
@@ -82,7 +86,11 @@
     },
     "commands": [
       {
+<<<<<<< HEAD
         "command": "angularConsole.refreshWorkspaceJsonTree",
+=======
+        "command": "ng.refreshWorkspaceJsonTree",
+>>>>>>> feat(vscode): Support workspace.json for non Angular workspaces
         "title": "Refresh",
         "icon": {
           "light": "assets/refresh-light.svg",
@@ -90,7 +98,7 @@
         }
       },
       {
-        "command": "angularConsole.revealInExplorer",
+        "command": "ng.revealInExplorer",
         "title": "Reveal in Explorer",
         "icon": {
           "light": "assets/folder-light.svg",
@@ -98,7 +106,7 @@
         }
       },
       {
-        "command": "angularConsole.runTask",
+        "command": "ng.runTask",
         "title": "Execute task",
         "icon": {
           "light": "assets/continue-light.svg",
