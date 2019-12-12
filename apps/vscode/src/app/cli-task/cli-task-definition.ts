@@ -1,4 +1,4 @@
-export interface NgTaskDefinition {
+export interface CliTaskDefinition {
   positional: string;
   command: string;
   flags: Array<string>;
@@ -26,6 +26,6 @@ export interface Projects {
   [projectName: string]: ProjectDef | undefined;
 }
 
-export interface AngularJson {
+export interface WorkspaceJson {
   projects: Projects;
 }

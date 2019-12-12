@@ -1,20 +1,23 @@
 import { readAndParseJson } from '@angular-console/server';
-import { join } from 'path';
 import { window } from 'vscode';
 
 import { getOutputChannel } from '../output-channel';
 import { getTelemetry } from '../telemetry';
 
-export function verifyAngularJson(
-  workspacePath: string
-): { validAngularJson: boolean; json?: any } {
-  const jsonPath = join(workspacePath, 'angular.json');
+export function verifyWorkspaceJson(
+  jsonPath: string
+): {
+  validWorkspaceJson: boolean;
+  json?: any;
+  workspaceType: 'ng' | 'nx';
+} {
+  const workspaceType = jsonPath.endsWith('workspace.json') ? 'nx' : 'ng';
   try {
     const json = readAndParseJson(jsonPath);
 
-    return { validAngularJson: true, json };
+    return { validWorkspaceJson: true, json, workspaceType };
   } catch (e) {
-    const humanReadableError = 'Invalid angular.json: ' + jsonPath;
+    const humanReadableError = 'Invalid workspace json: ' + jsonPath;
     window.showErrorMessage(humanReadableError, 'Show Error').then(value => {
       if (value) {
         getOutputChannel().show();
@@ -26,6 +29,6 @@ export function verifyAngularJson(
     getOutputChannel().appendLine(stringifiedError);
     getTelemetry().exception(stringifiedError);
 
-    return { validAngularJson: false };
+    return { validWorkspaceJson: false, workspaceType };
   }
 }

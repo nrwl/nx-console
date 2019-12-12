@@ -12,10 +12,10 @@ import {
   workspace
 } from 'vscode';
 
-import { AngularJsonTreeItem } from './app/angular-json-tree/angular-json-tree-item';
-import { AngularJsonTreeProvider } from './app/angular-json-tree/angular-json-tree-provider';
-import { registerNgTaskCommands } from './app/ng-task/ng-task-commands';
-import { NgTaskProvider } from './app/ng-task/ng-task-provider';
+import { WorkspaceJsonTreeItem } from './app/workspace-json-tree/workspace-json-tree-item';
+import { WorkspaceJsonTreeProvider } from './app/workspace-json-tree/workspace-json-tree-provider';
+import { registerCliTaskCommands } from './app/cli-task/cli-task-commands';
+import { CliTaskProvider } from './app/cli-task/cli-task-provider';
 import { getOutputChannel } from './app/output-channel';
 import {
   getTelemetry,
@@ -30,15 +30,15 @@ import {
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
 import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
-import { verifyAngularJson } from './app/verify-workspace/verify-angular-json';
+import { verifyWorkspaceJson } from './app/verify-workspace/verify-angular-json';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
-let angularJsonTreeView: TreeView<AngularJsonTreeItem>;
+let workspaceJsonTreeView: TreeView<WorkspaceJsonTreeItem>;
 
 let currentWorkspaceTreeProvider: WorkspaceTreeProvider;
-let angularJsonTreeProvider: AngularJsonTreeProvider;
+let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
 
-let ngTaskProvider: NgTaskProvider;
+let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
 
 export function activate(c: ExtensionContext) {
@@ -61,10 +61,12 @@ export function activate(c: ExtensionContext) {
         'angularConsole.revealWebViewPanel',
         async (workspaceTreeItem: WorkspaceTreeItem) => {
           if (
-            !existsSync(join(workspaceTreeItem.workspacePath, 'node_modules'))
+            !existsSync(
+              join(workspaceTreeItem.workspaceJsonPath, '..', 'node_modules')
+            )
           ) {
             const { validNodeModules: hasNodeModules } = verifyNodeModules(
-              workspaceTreeItem.workspacePath
+              join(workspaceTreeItem.workspaceJsonPath, '..')
             );
             if (!hasNodeModules) {
               return;
@@ -83,7 +85,7 @@ export function activate(c: ExtensionContext) {
                   return;
                 }
 
-                ngTaskProvider.executeTask({
+                cliTaskProvider.executeTask({
                   command: 'add',
                   positional: selection.label,
                   flags: []
@@ -94,7 +96,7 @@ export function activate(c: ExtensionContext) {
           revealWebViewPanel({
             workspaceTreeItem,
             context,
-            ngTaskProvider,
+            cliTaskProvider,
             workspaceTreeView
           });
         }
@@ -104,7 +106,7 @@ export function activate(c: ExtensionContext) {
       commands.registerCommand(
         LOCATE_YOUR_WORKSPACE.command!.command,
         async () => {
-          return await locateAngularWorkspace();
+          return await locationWorkspaceDefinition();
         }
       )
     );
@@ -136,20 +138,20 @@ export async function deactivate() {
 
 // -----------------------------------------------------------------------------
 
-function locateAngularWorkspace() {
+function locationWorkspaceDefinition() {
   return window
     .showOpenDialog({
       canSelectFolders: false,
       canSelectFiles: true,
       canSelectMany: false,
       filters: {
-        'Angular JSON': ['json']
+        'Workspace json': ['json']
       },
-      openLabel: 'Select angular.json'
+      openLabel: 'Select workspace json'
     })
     .then(value => {
       if (value && value[0]) {
-        return setAngularWorkspace(join(value[0].fsPath, '..'));
+        return setWorkspaceJson(value[0].fsPath);
       }
     });
 }
@@ -160,54 +162,65 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
   const { root } = parse(vscodeWorkspacePath);
   while (currentDirectory !== root) {
     if (existsSync(join(currentDirectory, 'angular.json'))) {
-      return setAngularWorkspace(currentDirectory);
+      return setWorkspaceJson(join(currentDirectory, 'angular.json'));
+    }
+    if (existsSync(join(currentDirectory, 'workspace.json'))) {
+      return setWorkspaceJson(join(currentDirectory, 'workspace.json'));
     }
     currentDirectory = dirname(currentDirectory);
   }
 
-  const childAngularJsonStream = stream('**/angular.json', {
+  const childWorkspaceJsonStream = stream('**/{angular,workspace}.json', {
     cwd: vscodeWorkspacePath,
     deep: 3,
     onlyFiles: true,
     absolute: true,
     stats: false
   })
-    .on('data', (angularJsonPath: string) => {
-      childAngularJsonStream.pause();
+    .on('data', (workspaceJsonPath: string) => {
+      childWorkspaceJsonStream.pause();
 
-      setAngularWorkspace(join(angularJsonPath, '..'));
+      setWorkspaceJson(workspaceJsonPath);
     })
     .on('end', () => {
       currentWorkspaceTreeProvider.endScan();
     });
 }
 
-async function setAngularWorkspace(workspacePath: string) {
-  const { validAngularJson } = verifyAngularJson(workspacePath);
-  if (!validAngularJson) {
+async function setWorkspaceJson(workspaceJsonPath: string) {
+  const { validWorkspaceJson } = verifyWorkspaceJson(workspaceJsonPath);
+  if (!validWorkspaceJson) {
     return;
   }
 
-  if (!ngTaskProvider) {
-    ngTaskProvider = new NgTaskProvider(workspacePath);
-    tasks.registerTaskProvider('ng', ngTaskProvider);
-    registerNgTaskCommands(context, ngTaskProvider);
+  if (!cliTaskProvider) {
+    cliTaskProvider = new CliTaskProvider(workspaceJsonPath);
+    tasks.registerTaskProvider('ng', cliTaskProvider);
+    tasks.registerTaskProvider('nx', cliTaskProvider);
+    registerCliTaskCommands(context, cliTaskProvider);
 
-    angularJsonTreeProvider = new AngularJsonTreeProvider(
+    workspaceJsonTreeProvider = new WorkspaceJsonTreeProvider(
       context,
-      ngTaskProvider
+      cliTaskProvider
     );
 
-    angularJsonTreeView = window.createTreeView('angularConsoleJson', {
-      treeDataProvider: angularJsonTreeProvider
-    }) as TreeView<AngularJsonTreeItem>;
-    context.subscriptions.push(angularJsonTreeView);
+    workspaceJsonTreeView = window.createTreeView('angularConsoleJson', {
+      treeDataProvider: workspaceJsonTreeProvider
+    }) as TreeView<WorkspaceJsonTreeItem>;
+    context.subscriptions.push(workspaceJsonTreeView);
   } else {
-    ngTaskProvider.setWorkspacePath(workspacePath);
+    cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);
   }
 
-  commands.executeCommand('setContext', 'isAngularWorkspace', true);
+  const isNxWorkspace = workspaceJsonPath.endsWith('workspace.json');
+  const isAngularWorkspace = workspaceJsonPath.endsWith('angular.json');
+  commands.executeCommand(
+    'setContext',
+    'isAngularWorkspace',
+    isAngularWorkspace
+  );
+  commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
 
-  currentWorkspaceTreeProvider.setWorkspacePath(workspacePath);
-  angularJsonTreeProvider.setWorkspacePath(workspacePath);
+  currentWorkspaceTreeProvider.setWorkspaceJsonPath(workspaceJsonPath);
+  workspaceJsonTreeProvider.setWorkspaceJsonPathh(workspaceJsonPath);
 }

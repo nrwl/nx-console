@@ -1,8 +1,8 @@
 import { TreeItem, TreeItemCollapsibleState } from 'vscode';
 
-export class AngularJsonTreeItem extends TreeItem {
+export class WorkspaceJsonTreeItem extends TreeItem {
   constructor(
-    public angularJsonLabel: AngularJsonLabel,
+    public workspaceJsonLabel: WorkspaceJsonLabel,
     treeItemLabel: string,
     collapsibleState?: TreeItemCollapsibleState | undefined
   ) {
@@ -10,14 +10,14 @@ export class AngularJsonTreeItem extends TreeItem {
 
     if (collapsibleState) {
       this.command = {
-        title: 'Expand/contract angular.json tree-item',
+        title: 'Expand/contract item in workspace tree',
         command: 'angularConsole.toggleTreeItem'
       };
     }
   }
 }
 
-export interface AngularJsonLabel {
+export interface WorkspaceJsonLabel {
   project: string;
   architect?: {
     name: string;

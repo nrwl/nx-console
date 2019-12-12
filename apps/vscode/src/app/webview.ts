@@ -10,11 +10,11 @@ import {
   tasks
 } from 'vscode';
 
-import { NgTaskProvider } from './ng-task/ng-task-provider';
+import { CliTaskProvider } from './cli-task/cli-task-provider';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
 import { getTelemetry } from './telemetry';
-import { NxTask } from './ng-task/nx-task';
+import { NxTask } from './cli-task/nx-task';
 import {
   TaskExecutionSchema,
   TaskExecutionMessage
@@ -26,23 +26,19 @@ let indexHtml: string | undefined;
 interface RevealWebViewPanelConfig {
   context: ExtensionContext;
   workspaceTreeItem: WorkspaceTreeItem;
-  ngTaskProvider: NgTaskProvider;
+  cliTaskProvider: CliTaskProvider;
   workspaceTreeView: TreeView<WorkspaceTreeItem>;
 }
 
 export async function revealWebViewPanel({
   context,
-  ngTaskProvider,
+  cliTaskProvider,
   workspaceTreeItem,
   workspaceTreeView
 }: RevealWebViewPanelConfig) {
-  const { workspacePath, label } = workspaceTreeItem;
+  const { label } = workspaceTreeItem;
 
-  const schema = await getTaskExecutionSchema(
-    workspacePath,
-    () => ngTaskProvider.getProjectEntries(),
-    label
-  );
+  const schema = await getTaskExecutionSchema(cliTaskProvider, label);
 
   if (!schema) {
     return;
@@ -52,7 +48,7 @@ export async function revealWebViewPanel({
     context,
     schema,
     label,
-    ngTaskProvider
+    cliTaskProvider
   );
   context.subscriptions.push(webViewPanel);
 
@@ -69,7 +65,7 @@ export function createWebViewPanel(
   context: ExtensionContext,
   schema: TaskExecutionSchema,
   title: string,
-  ngTaskProvider: NgTaskProvider
+  cliTaskProvider: CliTaskProvider
 ) {
   if (webviewPanel) {
     webviewPanel.title = title;
@@ -110,13 +106,13 @@ export function createWebViewPanel(
                 ),
                 flags: message.flags
               },
-              ngTaskProvider.getWorkspacePath()
+              cliTaskProvider.getWorkspacePath()
             )
           );
           return;
         }
 
-        ngTaskProvider.executeTask(message);
+        cliTaskProvider.executeTask(message);
       }
     );
   }

@@ -13,7 +13,7 @@ export type WorkspaceRouteTitle =
   | 'Test'
   | 'Xi18n'
   | 'Change workspace'
-  | 'Select angular.json';
+  | 'Select workspace';
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Add', 'angular-cli.svg'],
@@ -26,7 +26,7 @@ const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Serve', 'angular-cli.svg'],
   ['Test', 'angular-cli.svg'],
   ['Xi18n', 'angular-cli.svg'],
-  ['Select angular.json', 'angular-console.png'],
+  ['Select workspace', 'angular-console.png'],
   ['Change workspace', 'angular-console.png']
 ]);
 
@@ -69,7 +69,7 @@ export class WorkspaceTreeItem extends TreeItem {
   label: WorkspaceRouteTitle;
 
   constructor(
-    readonly workspacePath: string,
+    readonly workspaceJsonPath: string,
     readonly route: WorkspaceRouteTitle,
     readonly extensionPath: string
   ) {

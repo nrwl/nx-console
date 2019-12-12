@@ -6,15 +6,15 @@ import { join } from 'path';
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Angular Workspace...'
 );
-export const LOCATE_YOUR_WORKSPACE = new TreeItem('Select angular.json');
+export const LOCATE_YOUR_WORKSPACE = new TreeItem('Select workspace json');
 LOCATE_YOUR_WORKSPACE.command = {
-  tooltip: 'Select an angular.json file to open',
-  title: 'Select angular.json',
+  tooltip: 'Select an workspace json file to open',
+  title: 'Select workspace json',
   command: 'angularConsole.selectWorkspaceManually'
 };
 export const CHANGE_WORKSPACE = new TreeItem('Change workspace');
 CHANGE_WORKSPACE.command = {
-  tooltip: 'Select an angular.json file to open',
+  tooltip: 'Select an workspace json file to open',
   title: 'Change workspace',
   command: 'angularConsole.selectWorkspaceManually'
 };
@@ -23,19 +23,19 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
   WorkspaceTreeItem | TreeItem
 > {
   static create(config: {
-    workspacePath?: string;
+    workspaceJsonPath?: string;
     extensionPath: string;
   }): WorkspaceTreeProvider {
     return new WorkspaceTreeProvider(
-      config.workspacePath,
+      config.workspaceJsonPath,
       config.extensionPath
     );
   }
 
-  private scanning = Boolean(this.workspacePath);
+  private scanning = Boolean(this.workspaceJsonPath);
 
   private constructor(
-    public workspacePath: string | undefined,
+    public workspaceJsonPath: string | undefined,
     readonly extensionPath: string
   ) {
     super();
@@ -61,15 +61,15 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     this.refresh();
   }
 
-  setWorkspacePath(workspacePath: string) {
-    this.workspacePath = workspacePath;
+  setWorkspaceJsonPath(workspaceJsonPath: string) {
+    this.workspaceJsonPath = workspaceJsonPath;
     this.refresh();
   }
 
   getChildren() {
-    const workspacePath = this.workspacePath;
+    const workspaceJsonPath = this.workspaceJsonPath;
 
-    if (!workspacePath) {
+    if (!workspaceJsonPath) {
       if (this.scanning) {
         return [SCANNING_FOR_WORKSPACE];
       } else {
@@ -79,7 +79,8 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
 
     return [
       ...ROUTE_LIST.map(
-        route => new WorkspaceTreeItem(workspacePath, route, this.extensionPath)
+        route =>
+          new WorkspaceTreeItem(workspaceJsonPath, route, this.extensionPath)
       ),
       CHANGE_WORKSPACE
     ];

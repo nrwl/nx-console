@@ -3,14 +3,14 @@ import { readAllSchematicCollections } from '@angular-console/server';
 import { QuickPickItem, window } from 'vscode';
 import { join } from 'path';
 
-export async function selectSchematic(workspacePath: string) {
+export async function selectSchematic(workspaceJsonPath: string) {
   interface GenerateQuickPickItem extends QuickPickItem {
     collectionName: string;
     schematic: Schematic;
   }
 
   const schematics = (await readAllSchematicCollections(
-    workspacePath,
+    workspaceJsonPath,
     join('tools', 'schematics')
   ))
     .map((c): GenerateQuickPickItem[] =>
