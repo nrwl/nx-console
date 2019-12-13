@@ -10,7 +10,8 @@ import { NgTaskProvider } from './ng-task-provider';
 import { NgTaskQuickPickItem } from './ng-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
-
+import { Option } from '@angular-console/schema';
+import { OptionType } from '@angular/cli/models/interface';
 const CLI_COMMAND_LIST = [
   'build',
   'deploy',
@@ -82,13 +83,25 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
     return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
-  const { validBuilder, options } = await verifyBuilderDefinition(
+  let { validBuilder, options, configurations } = await verifyBuilderDefinition(
     selection.projectName,
     command,
     json
   );
   if (!validBuilder) {
     return;
+  }
+
+  if (configurations.length) {
+    const configurationsOption: Option = {
+      name: 'configuration',
+      description:
+        'A named build target, as specified in the "configurations" section of angular.json.',
+      type: OptionType.String,
+      enum: configurations,
+      aliases: []
+    };
+    options = [configurationsOption, ...options];
   }
 
   const flags = await selectFlags(command, selection.projectName, options);

@@ -12,12 +12,14 @@ export async function verifyBuilderDefinition(
 ): Promise<{
   validBuilder: boolean;
   builderName: string;
+  configurations: string[];
   options: Array<Option>;
 }> {
   const projects = angularJson.projects || {};
   const projectDef = projects[project] || {};
   const architectDef = projectDef.architect || {};
   const commandDef = architectDef[command] || {};
+  const configurations = Object.keys(commandDef.configurations || {});
   const builderName = commandDef.builder;
 
   if (!builderName) {
@@ -39,6 +41,7 @@ export async function verifyBuilderDefinition(
     getTelemetry().exception('Builder part of architect definition not found');
     return {
       validBuilder: false,
+      configurations,
       builderName: builderName,
       options: []
     };
@@ -70,6 +73,7 @@ export async function verifyBuilderDefinition(
     return {
       validBuilder: false,
       builderName,
+      configurations,
       options: []
     };
   }
@@ -77,6 +81,7 @@ export async function verifyBuilderDefinition(
   return {
     validBuilder: true,
     builderName,
+    configurations,
     options
   };
 }
