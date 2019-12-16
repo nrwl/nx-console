@@ -47,27 +47,42 @@
     "menus": {
       "view/title": [
         {
-          "command": "ng.refreshWorkspaceJsonTree",
+          "command": "angularConsole.refreshWorkspaceJsonTree",
           "when": "view == angularConsoleJson",
+          "group": "navigation"
+        },
+        {
+          "command": "angularConsole.refreshWorkspaceJsonTree",
+          "when": "view == workspaceJson",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "ng.revealInExplorer",
+          "command": "angularConsole.revealInExplorer",
           "when": "view == angularConsoleJson && viewItem == project",
           "group": "inline"
         },
         {
-          "command": "ng.runTask",
+          "command": "angularConsole.runTask",
           "when": "view == angularConsoleJson && viewItem == task",
+          "group": "inline"
+        },
+        {
+          "command": "angularConsole.revealInExplorer",
+          "when": "view == workspaceJson && viewItem == project",
+          "group": "inline"
+        },
+        {
+          "command": "angularConsole.runTask",
+          "when": "view == workspaceJson && viewItem == task",
           "group": "inline"
         }
       ]
     },
     "commands": [
       {
-        "command": "ng.refreshWorkspaceJsonTree",
+        "command": "angularConsole.refreshWorkspaceJsonTree",
         "title": "Refresh",
         "icon": {
           "light": "assets/refresh-light.svg",
@@ -75,7 +90,7 @@
         }
       },
       {
-        "command": "ng.revealInExplorer",
+        "command": "angularConsole.revealInExplorer",
         "title": "Reveal in Explorer",
         "icon": {
           "light": "assets/folder-light.svg",
@@ -83,9 +98,8 @@
         }
       },
       {
-        "command": "ng.runTask",
+        "command": "angularConsole.runTask",
         "title": "Execute task",
-        "when": "isAngularWorkspace",
         "icon": {
           "light": "assets/continue-light.svg",
           "dark": "assets/continue-dark.svg"
@@ -349,6 +363,11 @@
           "id": "angularConsoleJson",
           "name": "Angular JSON",
           "when": "isAngularWorkspace"
+        },
+        {
+          "id": "workspaceJson",
+          "name": "Workspace JSON",
+          "when": "isNxWorkspace"
         }
       ]
     }
