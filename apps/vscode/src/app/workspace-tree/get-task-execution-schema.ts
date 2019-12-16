@@ -1,29 +1,30 @@
+import { TaskExecutionSchema } from '@angular-console/schema';
 import { readArchitectDef, readBuilderSchema } from '@angular-console/server';
 import { window } from 'vscode';
 
-import { selectNgCliProject } from '../ng-task/ng-task-commands';
-import { ProjectDef } from '../ng-task/ng-task-definition';
-import { selectSchematic } from '../select-schematic';
-import { WorkspaceRouteTitle } from './workspace-tree-item';
-import { NgTaskQuickPickItem } from '../ng-task/ng-task-quick-pick-item';
+import { selectCliProject } from '../cli-task/cli-task-commands';
+import { CliTaskProvider } from '../cli-task/cli-task-provider';
+import { CliTaskQuickPickItem } from '../cli-task/cli-task-quick-pick-item';
 import { getOutputChannel } from '../output-channel';
+import { selectSchematic } from '../select-schematic';
 import { getTelemetry } from '../telemetry';
+import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
-import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
-import { TaskExecutionSchema } from '@angular-console/schema';
+import { WorkspaceRouteTitle } from './workspace-tree-item';
 
 export async function getTaskExecutionSchema(
-  workspacePath: string,
-  getProjectEntries: () => [string, ProjectDef][],
+  cliTaskProvider: CliTaskProvider,
   workspaceRouteTitle: WorkspaceRouteTitle = 'Run'
 ): Promise<TaskExecutionSchema | void> {
   try {
-    if (!workspacePath) {
+    if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validAngularJson, json } = verifyAngularJson(workspacePath);
+    const { validWorkspaceJson, json } = verifyWorkspaceJson(
+      cliTaskProvider.getWorkspaceJsonPath()
+    );
 
-    if (!validAngularJson) {
+    if (!validWorkspaceJson) {
       return;
     }
 
@@ -36,7 +37,7 @@ export async function getTaskExecutionSchema(
       case 'Serve':
       case 'Test':
       case 'Xi18n':
-        const selectedProject = await selectNgCliProject(command, json);
+        const selectedProject = await selectCliProject(command, json);
 
         if (!selectedProject) return;
 
@@ -62,7 +63,8 @@ export async function getTaskExecutionSchema(
         };
 
       case 'Run':
-        const runnableItems = getProjectEntries()
+        const runnableItems = cliTaskProvider
+          .getProjectEntries()
           .filter(([_, { architect }]) => Boolean(architect))
           .flatMap(([project, { architect }]) => ({ project, architect }))
           .flatMap(({ project, architect }) => [
@@ -76,7 +78,7 @@ export async function getTaskExecutionSchema(
           ])
           .map(
             ({ project, architectName, architectDef }) =>
-              new NgTaskQuickPickItem(
+              new CliTaskQuickPickItem(
                 project,
                 architectDef,
                 architectName,
@@ -90,7 +92,7 @@ export async function getTaskExecutionSchema(
           }
 
           const builderOptions = await readBuilderSchema(
-            workspacePath,
+            cliTaskProvider.getWorkspacePath(),
             selection.architectDef.builder
           );
 
@@ -110,25 +112,28 @@ export async function getTaskExecutionSchema(
           };
         });
       case 'Generate':
-        return selectSchematic(workspacePath).then(schematic => {
-          if (!schematic) {
-            return;
-          }
-
-          schematic.options.forEach(s => {
-            if (s.enum) {
+        return selectSchematic(cliTaskProvider.getWorkspacePath()).then(
+          schematic => {
+            if (!schematic) {
               return;
             }
 
-            if (s.name === 'project') {
-              s.enum = getProjectEntries()
-                .map(entry => entry[0])
-                .sort();
-            }
-          });
+            schematic.options.forEach(s => {
+              if (s.enum) {
+                return;
+              }
 
-          return schematic;
-        });
+              if (s.name === 'project') {
+                s.enum = cliTaskProvider
+                  .getProjectEntries()
+                  .map(entry => entry[0])
+                  .sort();
+              }
+            });
+
+            return schematic;
+          }
+        );
     }
   } catch (e) {
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);

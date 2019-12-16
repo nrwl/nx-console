@@ -1,7 +1,7 @@
 import { Option } from '@angular-console/schema';
 import { QuickPickItem } from 'vscode';
 
-export class NgTaskFlagQuickPickItem implements QuickPickItem {
+export class CliTaskFlagQuickPickItem implements QuickPickItem {
   constructor(
     readonly flagName: string,
     readonly detail: string,

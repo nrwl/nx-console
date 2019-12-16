@@ -1,18 +1,31 @@
-import { NgTaskDefinition } from './ng-task-definition';
+import { CliTaskDefinition } from './cli-task-definition';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
-import { findClosestNg } from '@angular-console/server';
+import { findClosestNg, findClosestNx } from '@angular-console/server';
+import { join } from 'path';
 
-export class NgTask extends Task {
-  static create(definition: NgTaskDefinition, workspacePath: string): NgTask {
+export class CliTask extends Task {
+  static create(
+    definition: CliTaskDefinition,
+    workspaceJsonPath: string
+  ): CliTask {
+    const workspacePath = join(workspaceJsonPath, '..');
     const { command } = definition;
 
     // Using `run [project]:[command]` is more backwards compatible in case different
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
 
-    const displayCommand = `ng ${args.join(' ')}`;
-    const task = new NgTask(
+    const useNxCli = workspaceJsonPath.endsWith('workspace.json');
+    const program = useNxCli
+      ? findClosestNx(workspacePath)
+      : findClosestNg(workspacePath);
+
+    const displayCommand = useNxCli
+      ? `nx ${args.join(' ')}`
+      : `ng ${args.join(' ')}`;
+
+    const task = new CliTask(
       { ...definition, type: 'ng' }, // definition
       TaskScope.Workspace, // scope
       displayCommand, // name
@@ -23,7 +36,7 @@ export class NgTask extends Task {
         args,
         cwd: workspacePath,
         name: displayCommand,
-        program: findClosestNg(workspacePath)
+        program
       })
     );
 
@@ -40,7 +53,7 @@ export class NgTask extends Task {
   }
 }
 
-function getArgs(definition: NgTaskDefinition) {
+function getArgs(definition: CliTaskDefinition) {
   const { positional, command, flags } = definition;
   switch (command) {
     case 'add':

@@ -1,21 +1,21 @@
 import { Option } from '@angular-console/schema';
 import { readBuilderSchema } from '@angular-console/server';
 import { window } from 'vscode';
-import { angularJsonTreeProvider } from '../angular-json-tree/angular-json-tree-provider';
+import { workspaceJsonTreeProvider } from '../workspace-json-tree/workspace-json-tree-provider';
 import { getTelemetry } from '../telemetry';
-import { ngTaskProvider } from '../ng-task/ng-task-provider';
+import { cliTaskProvider } from '../cli-task/cli-task-provider';
 
 export async function verifyBuilderDefinition(
   project: string,
   command: string,
-  angularJson: any
+  workspaceJson: any
 ): Promise<{
   validBuilder: boolean;
   builderName: string;
   configurations: string[];
   options: Array<Option>;
 }> {
-  const projects = angularJson.projects || {};
+  const projects = workspaceJson.projects || {};
   const projectDef = projects[project] || {};
   const architectDef = projectDef.architect || {};
   const commandDef = architectDef[command] || {};
@@ -30,7 +30,7 @@ export async function verifyBuilderDefinition(
       )
       .then(value => {
         if (value) {
-          angularJsonTreeProvider.revealAngularJsonLabel({
+          workspaceJsonTreeProvider.revealWorkspaceJsonLabel({
             project: project,
             architect: {
               name: command
@@ -48,7 +48,7 @@ export async function verifyBuilderDefinition(
   }
 
   const options = await readBuilderSchema(
-    ngTaskProvider.getWorkspacePath(),
+    cliTaskProvider.getWorkspacePath(),
     builderName
   );
 
@@ -60,7 +60,7 @@ export async function verifyBuilderDefinition(
       )
       .then(value => {
         if (value) {
-          angularJsonTreeProvider.revealAngularJsonLabel({
+          workspaceJsonTreeProvider.revealWorkspaceJsonLabel({
             project: project,
             architect: {
               name: command

@@ -8,25 +8,25 @@ import {
 } from 'vscode';
 
 import { getTelemetry } from '../telemetry';
-import { NgTask } from './ng-task';
-import {
-  AngularJson,
-  NamedProject,
-  NgTaskDefinition,
-  ProjectDef,
-  Projects
-} from './ng-task-definition';
+import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
 import { verifyNodeModules } from '../verify-workspace/verify-node-modules';
-import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
+import { CliTask } from './cli-task';
+import {
+  CliTaskDefinition,
+  NamedProject,
+  ProjectDef,
+  Projects,
+  WorkspaceJson
+} from './cli-task-definition';
 
-export let ngTaskProvider: NgTaskProvider;
+export let cliTaskProvider: CliTaskProvider;
 
-export class NgTaskProvider implements TaskProvider {
+export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
-  private deferredDryRun?: NgTaskDefinition;
+  private deferredDryRun?: CliTaskDefinition;
 
-  constructor(private workspacePath: string) {
-    ngTaskProvider = this;
+  constructor(private workspaceJsonPath: string) {
+    cliTaskProvider = this;
 
     tasks.onDidEndTaskProcess(e => {
       if (e.execution === this.currentDryRun) {
@@ -40,11 +40,15 @@ export class NgTaskProvider implements TaskProvider {
   }
 
   getWorkspacePath() {
-    return this.workspacePath;
+    return join(this.workspaceJsonPath, '..');
   }
 
-  setWorkspacePath(workspacePath: string) {
-    this.workspacePath = workspacePath;
+  getWorkspaceJsonPath() {
+    return this.workspaceJsonPath;
+  }
+
+  setWorkspaceJsonPath(workspaceJsonPath: string) {
+    this.workspaceJsonPath = workspaceJsonPath;
   }
 
   provideTasks(): ProviderResult<Task[]> {
@@ -53,28 +57,28 @@ export class NgTaskProvider implements TaskProvider {
 
   resolveTask(task: Task): Task | undefined {
     if (
-      this.workspacePath &&
+      this.workspaceJsonPath &&
       task.definition.command &&
       task.definition.project
     ) {
-      const ngTask = this.createTask({
+      const cliTask = this.createTask({
         command: task.definition.command,
         positional: task.definition.project,
         flags: Array.isArray(task.definition.flags) ? task.definition.flags : []
       });
       // resolveTask requires that the same definition object be used.
-      ngTask.definition = task.definition;
-      return ngTask;
+      cliTask.definition = task.definition;
+      return cliTask;
     }
   }
 
-  createTask(definition: NgTaskDefinition) {
-    return NgTask.create(definition, this.workspacePath || '');
+  createTask(definition: CliTaskDefinition) {
+    return CliTask.create(definition, this.workspaceJsonPath);
   }
 
-  executeTask(definition: NgTaskDefinition) {
+  executeTask(definition: CliTaskDefinition) {
     const { validNodeModules: hasNodeModules } = verifyNodeModules(
-      this.workspacePath
+      this.getWorkspacePath()
     );
     if (!hasNodeModules) {
       return;
@@ -98,12 +102,12 @@ export class NgTaskProvider implements TaskProvider {
     });
   }
 
-  getProjects(json?: AngularJson): Projects {
+  getProjects(json?: WorkspaceJson): Projects {
     if (json) {
       return json.projects;
     } else {
-      const result = verifyAngularJson(this.workspacePath);
-      if (!result.validAngularJson || !result.json) {
+      const result = verifyWorkspaceJson(this.getWorkspaceJsonPath());
+      if (!result.validWorkspaceJson || !result.json) {
         return {};
       } else {
         return result.json.projects;
@@ -115,7 +119,7 @@ export class NgTaskProvider implements TaskProvider {
     return Object.keys(this.getProjects() || {});
   }
 
-  getProjectEntries(json?: AngularJson): [string, ProjectDef][] {
+  getProjectEntries(json?: WorkspaceJson): [string, ProjectDef][] {
     return Object.entries(this.getProjects(json) || {}) as [
       string,
       ProjectDef
@@ -123,11 +127,10 @@ export class NgTaskProvider implements TaskProvider {
   }
 
   projectForPath(selectedPath: string): NamedProject | null {
-    if (!this.workspacePath) return null;
+    if (!this.workspaceJsonPath) return null;
 
-    console.log(selectedPath);
     const entry = this.getProjectEntries().find(([_, def]) =>
-      selectedPath.startsWith(join(this.workspacePath, def.root))
+      selectedPath.startsWith(join(this.getWorkspacePath(), def.root))
     );
 
     return entry ? { name: entry[0], ...entry[1] } : null;

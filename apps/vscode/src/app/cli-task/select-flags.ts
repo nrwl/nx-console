@@ -1,11 +1,12 @@
 import { Option } from '@angular-console/schema';
 import { QuickPickItem, window } from 'vscode';
-import { NgTaskFlagQuickPickItem } from './ng-task-flag-quick-pick-item';
+import { CliTaskFlagQuickPickItem } from './cli-task-flag-quick-pick-item';
 
 export async function selectFlags(
   command: string,
   positional: string,
   options: Option[],
+  workspaceType: 'ng' | 'nx',
   userSetFlags: { [key: string]: string } = {}
 ): Promise<string[] | undefined> {
   const flagArray = Object.entries(userSetFlags).map(
@@ -13,7 +14,7 @@ export async function selectFlags(
   );
 
   const selection = await promptForFlagToSet(
-    `ng ${command} ${positional} ${flagArray.join(' ')}`,
+    `${workspaceType} ${command} ${positional} ${flagArray.join(' ')}`,
     options
   );
 
@@ -29,7 +30,7 @@ export async function selectFlags(
     delete userSetFlags[selection.flag.flagName];
   }
 
-  return selectFlags(command, positional, options, userSetFlags);
+  return selectFlags(command, positional, options, workspaceType, userSetFlags);
 }
 
 async function promptForFlagToSet(
@@ -37,9 +38,9 @@ async function promptForFlagToSet(
   options: Option[]
 ): Promise<{
   execute?: boolean;
-  flag?: NgTaskFlagQuickPickItem;
+  flag?: CliTaskFlagQuickPickItem;
 }> {
-  const flagItems: Array<QuickPickItem | NgTaskFlagQuickPickItem> = [
+  const flagItems: Array<QuickPickItem | CliTaskFlagQuickPickItem> = [
     {
       picked: true,
       alwaysShow: true,
@@ -47,7 +48,7 @@ async function promptForFlagToSet(
     },
     ...options.map(
       option =>
-        new NgTaskFlagQuickPickItem(
+        new CliTaskFlagQuickPickItem(
           option.name,
           option.description || option.type,
           option,
@@ -64,17 +65,17 @@ async function promptForFlagToSet(
     return { execute: false };
   }
 
-  const flagSelected = Boolean((selection as NgTaskFlagQuickPickItem).option);
+  const flagSelected = Boolean((selection as CliTaskFlagQuickPickItem).option);
   if (!flagSelected) {
     return { execute: true };
   } else {
     return {
-      flag: selection as NgTaskFlagQuickPickItem
+      flag: selection as CliTaskFlagQuickPickItem
     };
   }
 }
 
-function promptForFlagValue(flagToSet: NgTaskFlagQuickPickItem) {
+function promptForFlagValue(flagToSet: CliTaskFlagQuickPickItem) {
   const placeHolder = `--${flagToSet.flagName}=...`;
   if (flagToSet.option.type === 'boolean') {
     return window.showQuickPick(['true', 'false'], {

@@ -1,21 +1,25 @@
 import { Schematic, SchematicCollection } from '@angular-console/schema';
-import * as path from 'path';
+import { basename, dirname, join } from 'path';
+
 import {
-  fileExistsSync,
   directoryExists,
-  readAndCacheJsonFile,
+  fileExistsSync,
+  listFiles,
   listOfUnnestedNpmPackages,
   normalizeSchema,
-  listFiles,
+  readAndCacheJsonFile,
   readAndParseJson
 } from './utils';
 
 export async function readAllSchematicCollections(
-  basedir: string,
+  workspaceJsonPath: string,
   workspaceSchematicsPath: string
 ): Promise<SchematicCollection[]> {
-  let collections = await readSchematicCollectionsFromNodeModules(basedir);
-  if (directoryExists(path.join(basedir, workspaceSchematicsPath))) {
+  const basedir = join(workspaceJsonPath, '..');
+  let collections = await readSchematicCollectionsFromNodeModules(
+    workspaceJsonPath
+  );
+  if (directoryExists(join(basedir, workspaceSchematicsPath))) {
     collections = [
       await readWorkspaceSchematicsCollection(basedir, workspaceSchematicsPath),
       ...collections
@@ -27,9 +31,8 @@ export async function readAllSchematicCollections(
   );
 }
 
-function readAngularJsonDefaults(basedir: string): any {
-  const defaults =
-    readAndParseJson(path.join(basedir, 'angular.json')).schematics || {};
+function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
+  const defaults = readAndParseJson(workspaceJsonPath).schematics || {};
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {
@@ -56,16 +59,15 @@ function readAngularJsonDefaults(basedir: string): any {
 }
 
 async function readSchematicCollectionsFromNodeModules(
-  basedir: string
+  workspaceJsonPath: string
 ): Promise<SchematicCollection[]> {
-  const nodeModulesDir = path.join(basedir, 'node_modules');
+  const basedir = join(workspaceJsonPath, '..');
+  const nodeModulesDir = join(basedir, 'node_modules');
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
     try {
-      return !!readAndCacheJsonFile(
-        path.join(p, 'package.json'),
-        nodeModulesDir
-      ).json.schematics;
+      return !!readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir)
+        .json.schematics;
     } catch (e) {
       if (
         e.message &&
@@ -78,7 +80,7 @@ async function readSchematicCollectionsFromNodeModules(
       }
     }
   });
-  const defaults = readAngularJsonDefaults(basedir);
+  const defaults = readWorkspaceJsonDefaults(workspaceJsonPath);
 
   return (await Promise.all(
     schematicCollections.map(c => readCollection(nodeModulesDir, c, defaults))
@@ -92,9 +94,9 @@ async function readWorkspaceSchematicsCollection(
   name: string;
   schematics: Schematic[];
 }> {
-  const collectionDir = path.join(basedir, workspaceSchematicsPath);
+  const collectionDir = join(basedir, workspaceSchematicsPath);
   const collectionName = 'workspace-schematic';
-  if (fileExistsSync(path.join(collectionDir, 'collection.json'))) {
+  if (fileExistsSync(join(collectionDir, 'collection.json'))) {
     const collection = readAndCacheJsonFile('collection.json', collectionDir);
 
     return await readCollectionSchematics(
@@ -105,7 +107,7 @@ async function readWorkspaceSchematicsCollection(
   } else {
     const schematics: Schematic[] = await Promise.all(
       listFiles(collectionDir)
-        .filter(f => path.basename(f) === 'schema.json')
+        .filter(f => basename(f) === 'schema.json')
         .map(async f => {
           const schemaJson = readAndCacheJsonFile(f, '');
           return {
@@ -127,12 +129,12 @@ async function readCollection(
 ): Promise<SchematicCollection | null> {
   try {
     const packageJson = readAndCacheJsonFile(
-      path.join(collectionName, 'package.json'),
+      join(collectionName, 'package.json'),
       basedir
     );
     const collection = readAndCacheJsonFile(
       packageJson.json.schematics,
-      path.dirname(packageJson.path)
+      dirname(packageJson.path)
     );
     return readCollectionSchematics(
       collectionName,
@@ -162,7 +164,7 @@ async function readCollectionSchematics(
         if (canAdd(k, v)) {
           const schematicSchema = readAndCacheJsonFile(
             v.schema,
-            path.dirname(collectionPath)
+            dirname(collectionPath)
           );
           const projectDefaults =
             defaults && defaults[collectionName] && defaults[collectionName][k];

@@ -47,8 +47,13 @@
     "menus": {
       "view/title": [
         {
-          "command": "angularConsole.refreshAngularJsonTree",
+          "command": "angularConsole.refreshWorkspaceJsonTree",
           "when": "view == angularConsoleJson",
+          "group": "navigation"
+        },
+        {
+          "command": "angularConsole.refreshWorkspaceJsonTree",
+          "when": "view == workspaceJson",
           "group": "navigation"
         }
       ],
@@ -62,12 +67,22 @@
           "command": "angularConsole.runTask",
           "when": "view == angularConsoleJson && viewItem == task",
           "group": "inline"
+        },
+        {
+          "command": "angularConsole.revealInExplorer",
+          "when": "view == workspaceJson && viewItem == project",
+          "group": "inline"
+        },
+        {
+          "command": "angularConsole.runTask",
+          "when": "view == workspaceJson && viewItem == task",
+          "group": "inline"
         }
       ]
     },
     "commands": [
       {
-        "command": "angularConsole.refreshAngularJsonTree",
+        "command": "angularConsole.refreshWorkspaceJsonTree",
         "title": "Refresh",
         "icon": {
           "light": "assets/refresh-light.svg",
@@ -85,7 +100,6 @@
       {
         "command": "angularConsole.runTask",
         "title": "Execute task",
-        "when": "isAngularWorkspace",
         "icon": {
           "light": "assets/continue-light.svg",
           "dark": "assets/continue-dark.svg"
@@ -94,86 +108,158 @@
       {
         "category": "ng",
         "title": "lint",
-        "command": "angularConsole.lint",
+        "command": "ng.lint",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "build",
-        "command": "angularConsole.build",
+        "command": "ng.build",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "e2e",
-        "command": "angularConsole.e2e",
+        "command": "ng.e2e",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "generate",
-        "command": "angularConsole.generate",
+        "command": "ng.generate",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "serve",
-        "command": "angularConsole.serve",
+        "command": "ng.serve",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "test",
-        "command": "angularConsole.test",
-        "when": "isAngularWorkspace"
-      },
-      {
-        "category": "ng",
-        "title": "xi18n",
-        "command": "angularConsole.xi18n",
+        "command": "ng.test",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "lint (ui)",
-        "command": "angularConsole.lint.ui",
+        "command": "ng.lint.ui",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "build (ui)",
-        "command": "angularConsole.build.ui",
+        "command": "ng.build.ui",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "e2e (ui)",
-        "command": "angularConsole.e2e.ui",
+        "command": "ng.e2e.ui",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "serve (ui)",
-        "command": "angularConsole.serve.ui",
+        "command": "ng.serve.ui",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "test (ui)",
-        "command": "angularConsole.test.ui",
+        "command": "ng.test.ui",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "xi18n (ui)",
-        "command": "angularConsole.xi18n.ui",
+        "command": "ng.xi18n.ui",
         "when": "isAngularWorkspace"
       },
       {
         "category": "ng",
         "title": "generate (ui)",
-        "command": "angularConsole.generate.ui",
+        "command": "ng.generate.ui",
         "when": "isAngularWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "lint",
+        "command": "nx.lint",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "build",
+        "command": "nx.build",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "e2e",
+        "command": "nx.e2e",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "generate",
+        "command": "nx.generate",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "serve",
+        "command": "nx.serve",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "test",
+        "command": "nx.test",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "lint (ui)",
+        "command": "nx.lint.ui",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "build (ui)",
+        "command": "nx.build.ui",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "e2e (ui)",
+        "command": "nx.e2e.ui",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "serve (ui)",
+        "command": "nx.serve.ui",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "test (ui)",
+        "command": "nx.test.ui",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "xi18n (ui)",
+        "command": "nx.xi18n.ui",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "generate (ui)",
+        "command": "nx.generate.ui",
+        "when": "isNxWorkspace"
       }
     ],
     "configuration": {
@@ -235,6 +321,27 @@
             "description": "An array of flags to pass to the CLI"
           }
         }
+      },
+      {
+        "type": "nx",
+        "required": [
+          "project",
+          "command"
+        ],
+        "properties": {
+          "project": {
+            "type": "string",
+            "description": "The NX CLI project to run a command on"
+          },
+          "command": {
+            "type": "string",
+            "description": "The NX CLI command to run on the selected project"
+          },
+          "flags": {
+            "type": "array",
+            "description": "An array of flags to pass to the CLI"
+          }
+        }
       }
     ],
     "viewsContainers": {
@@ -256,6 +363,11 @@
           "id": "angularConsoleJson",
           "name": "Angular JSON",
           "when": "isAngularWorkspace"
+        },
+        {
+          "id": "workspaceJson",
+          "name": "Workspace JSON",
+          "when": "isNxWorkspace"
         }
       ]
     }

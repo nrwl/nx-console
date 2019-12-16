@@ -1,15 +1,15 @@
 import { commands, ExtensionContext, window } from 'vscode';
 
 import { selectSchematic } from '../select-schematic';
+import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import {
   WorkspaceRouteTitle,
   WorkspaceTreeItem
 } from '../workspace-tree/workspace-tree-item';
-import { NgTaskProvider } from './ng-task-provider';
-import { NgTaskQuickPickItem } from './ng-task-quick-pick-item';
+import { CliTaskProvider } from './cli-task-provider';
+import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
-import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
 import { Option } from '@angular-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 const CLI_COMMAND_LIST = [
@@ -22,36 +22,49 @@ const CLI_COMMAND_LIST = [
   'xi18n'
 ];
 
-let ngTaskProvider: NgTaskProvider;
+let cliTaskProvider: CliTaskProvider;
 
-export function registerNgTaskCommands(
+export function registerCliTaskCommands(
   context: ExtensionContext,
-  n: NgTaskProvider
+  n: CliTaskProvider
 ) {
-  ngTaskProvider = n;
+  cliTaskProvider = n;
 
   CLI_COMMAND_LIST.forEach(command => {
     context.subscriptions.push(
-      commands.registerCommand(`angularConsole.${command}`, () =>
-        selectNgCliCommandAndPromptForFlags(command)
+      commands.registerCommand(`ng.${command}`, () =>
+        selectCliCommandAndPromptForFlags(command)
       ),
-      commands.registerCommand(`angularConsole.${command}.ui`, () =>
-        selectNgCliCommandAndShowUi(command, context.extensionPath)
+      commands.registerCommand(`ng.${command}.ui`, () =>
+        selectCliCommandAndShowUi(command, context.extensionPath)
+      ),
+      commands.registerCommand(`nx.${command}`, () =>
+        selectCliCommandAndPromptForFlags(command)
+      ),
+      commands.registerCommand(`nx.${command}.ui`, () =>
+        selectCliCommandAndShowUi(command, context.extensionPath)
       )
     );
   });
 
-  commands.registerCommand(`angularConsole.generate`, () =>
+  commands.registerCommand(`ng.generate`, () =>
     selectSchematicAndPromptForFlags(n.getWorkspacePath()!)
   );
 
-  commands.registerCommand(`angularConsole.generate.ui`, () =>
-    selectNgCliCommandAndShowUi('generate', context.extensionPath)
+  commands.registerCommand(`ng.generate.ui`, () =>
+    selectCliCommandAndShowUi('generate', context.extensionPath)
+  );
+  commands.registerCommand(`nx.generate`, () =>
+    selectSchematicAndPromptForFlags(n.getWorkspacePath()!)
+  );
+
+  commands.registerCommand(`nx.generate.ui`, () =>
+    selectCliCommandAndShowUi('generate', context.extensionPath)
   );
 }
 
-function selectNgCliCommandAndShowUi(command: string, extensionPath: string) {
-  const workspacePath = ngTaskProvider.getWorkspacePath();
+function selectCliCommandAndShowUi(command: string, extensionPath: string) {
+  const workspacePath = cliTaskProvider.getWorkspacePath();
   if (!workspacePath) {
     window.showErrorMessage(
       'Angular Console requires a workspace be set to perform this action'
@@ -71,13 +84,13 @@ function selectNgCliCommandAndShowUi(command: string, extensionPath: string) {
   );
 }
 
-async function selectNgCliCommandAndPromptForFlags(command: string) {
-  const { validAngularJson, json } = verifyAngularJson(
-    ngTaskProvider.getWorkspacePath()
+async function selectCliCommandAndPromptForFlags(command: string) {
+  const { validWorkspaceJson, json, workspaceType } = verifyWorkspaceJson(
+    cliTaskProvider.getWorkspaceJsonPath()
   );
 
-  const selection = validAngularJson
-    ? await selectNgCliProject(command, json)
+  const selection = validWorkspaceJson
+    ? await selectCliProject(command, json)
     : undefined;
   if (!selection) {
     return; // Do not execute a command if user clicks out of VSCode UI.
@@ -104,10 +117,15 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
     options = [configurationsOption, ...options];
   }
 
-  const flags = await selectFlags(command, selection.projectName, options);
+  const flags = await selectFlags(
+    command,
+    selection.projectName,
+    options,
+    workspaceType
+  );
 
   if (flags !== undefined) {
-    ngTaskProvider.executeTask({
+    cliTaskProvider.executeTask({
       positional: selection.projectName,
       command,
       flags
@@ -116,6 +134,14 @@ async function selectNgCliCommandAndPromptForFlags(command: string) {
 }
 
 async function selectSchematicAndPromptForFlags(workspacePath: string) {
+  const { validWorkspaceJson, workspaceType } = verifyWorkspaceJson(
+    workspacePath
+  );
+
+  if (!validWorkspaceJson) {
+    return;
+  }
+
   const selection = await selectSchematic(workspacePath);
   if (!selection) {
     return;
@@ -124,11 +150,12 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
   const flags = await selectFlags(
     'generate',
     selection.positional,
-    selection.options
+    selection.options,
+    workspaceType
   );
 
   if (flags !== undefined) {
-    ngTaskProvider.executeTask({
+    cliTaskProvider.executeTask({
       positional: selection.positional,
       command: 'generate',
       flags
@@ -136,15 +163,20 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
   }
 }
 
-export function selectNgCliProject(command: string, json: any) {
-  const items = ngTaskProvider
+export function selectCliProject(command: string, json: any) {
+  const items = cliTaskProvider
     .getProjectEntries(json)
     .filter(([_, { architect }]) => Boolean(architect))
     .flatMap(([project, { architect }]) => ({ project, architect }))
     .filter(({ architect }) => Boolean(architect && architect[command]))
     .map(
       ({ project, architect }) =>
-        new NgTaskQuickPickItem(project, architect![command]!, command, project)
+        new CliTaskQuickPickItem(
+          project,
+          architect![command]!,
+          command,
+          project
+        )
     );
 
   if (!items.length) {

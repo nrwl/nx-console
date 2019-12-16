@@ -13,35 +13,35 @@ import {
 } from 'vscode';
 
 import { AbstractTreeProvider } from '../abstract-tree-provider';
-import { NgTaskProvider } from '../ng-task/ng-task-provider';
+import { CliTaskProvider } from '../cli-task/cli-task-provider';
 import {
-  AngularJsonLabel,
-  AngularJsonTreeItem
-} from './angular-json-tree-item';
-import { verifyAngularJson } from '../verify-workspace/verify-angular-json';
+  WorkspaceJsonLabel,
+  WorkspaceJsonTreeItem
+} from './workspace-json-tree-item';
+import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
 
-export let angularJsonTreeProvider: AngularJsonTreeProvider;
+export let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
 
-export class AngularJsonTreeProvider extends AbstractTreeProvider<
-  AngularJsonTreeItem
+export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
+  WorkspaceJsonTreeItem
 > {
   constructor(
     context: ExtensionContext,
-    private readonly ngTaskProvider: NgTaskProvider
+    private readonly cliTaskProvider: CliTaskProvider
   ) {
     super();
 
-    angularJsonTreeProvider = this;
+    workspaceJsonTreeProvider = this;
 
-    commands.registerCommand('angularConsole.refreshAngularJsonTree', () =>
+    commands.registerCommand('angularConsole.refreshWorkspaceJsonTree', () =>
       this.refresh()
     );
 
     ([
-      ['editAngularJson', this.editAngularJson],
+      ['editWorkspaceJson', this.editWorkspaceJson],
       ['revealInExplorer', this.revealInExplorer],
       ['runTask', this.runTask]
-    ] as [string, (item: AngularJsonTreeItem) => Promise<any>][]).forEach(
+    ] as [string, (item: WorkspaceJsonTreeItem) => Promise<any>][]).forEach(
       ([commandSuffix, callback]) => {
         context.subscriptions.push(
           commands.registerCommand(
@@ -54,56 +54,56 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     );
   }
 
-  setWorkspacePath(workspacePath: string) {
-    if (this.ngTaskProvider.getWorkspacePath() !== workspacePath) {
-      this.ngTaskProvider.setWorkspacePath(workspacePath);
+  setWorkspaceJsonPathh(workspaceJsonPath: string) {
+    if (this.cliTaskProvider.getWorkspaceJsonPath() !== workspaceJsonPath) {
+      this.cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);
     }
     this.refresh();
   }
 
   getParent(
-    element: AngularJsonTreeItem
-  ): AngularJsonTreeItem | null | undefined {
-    const { project, architect } = element.angularJsonLabel;
+    element: WorkspaceJsonTreeItem
+  ): WorkspaceJsonTreeItem | null | undefined {
+    const { project, architect } = element.workspaceJsonLabel;
 
     if (architect) {
       if (architect.configuration) {
-        return this.createAngularJsonTreeItem(
+        return this.createWorkspaceJsonTreeItem(
           { project, architect: { name: architect.name } },
           architect.name
         );
       } else {
-        return this.createAngularJsonTreeItem({ project }, project);
+        return this.createWorkspaceJsonTreeItem({ project }, project);
       }
     } else {
       return null;
     }
   }
 
-  createAngularJsonTreeItem(
-    angularJsonLabel: AngularJsonLabel,
+  createWorkspaceJsonTreeItem(
+    workspaceJsonLabel: WorkspaceJsonLabel,
     treeItemLabel: string,
     hasChildren?: boolean
   ) {
-    const item = new AngularJsonTreeItem(
-      angularJsonLabel,
+    const item = new WorkspaceJsonTreeItem(
+      workspaceJsonLabel,
       treeItemLabel,
       hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     );
     item.command = {
-      title: 'Edit angular.json',
-      command: 'angularConsole.editAngularJson',
+      title: 'Edit workspace definition',
+      command: 'angularConsole.editWorkspaceJson',
       arguments: [item]
     };
-    if (!angularJsonLabel.architect) {
-      const projectDef = this.ngTaskProvider.getProjects()[
-        angularJsonLabel.project
+    if (!workspaceJsonLabel.architect) {
+      const projectDef = this.cliTaskProvider.getProjects()[
+        workspaceJsonLabel.project
       ];
       if (projectDef) {
         item.resourceUri = Uri.file(
-          join(this.ngTaskProvider.getWorkspacePath()!, projectDef.root)
+          join(this.cliTaskProvider.getWorkspacePath()!, projectDef.root)
         );
       }
       item.contextValue = 'project';
@@ -115,13 +115,13 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
   }
 
   getChildren(
-    parent?: AngularJsonTreeItem
-  ): ProviderResult<AngularJsonTreeItem[]> {
+    parent?: WorkspaceJsonTreeItem
+  ): ProviderResult<WorkspaceJsonTreeItem[]> {
     if (!parent) {
-      const projects = this.ngTaskProvider.getProjectEntries();
+      const projects = this.cliTaskProvider.getProjectEntries();
       return projects.map(
-        ([name, def]): AngularJsonTreeItem =>
-          this.createAngularJsonTreeItem(
+        ([name, def]): WorkspaceJsonTreeItem =>
+          this.createWorkspaceJsonTreeItem(
             { project: name },
             name,
             Boolean(def.architect)
@@ -129,9 +129,9 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       );
     }
 
-    const { angularJsonLabel } = parent;
-    const { architect, project } = angularJsonLabel;
-    const projectDef = this.ngTaskProvider.getProjects()[project];
+    const { workspaceJsonLabel } = parent;
+    const { architect, project } = workspaceJsonLabel;
+    const projectDef = this.cliTaskProvider.getProjects()[project];
 
     if (!projectDef) {
       return;
@@ -140,8 +140,8 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     if (!architect) {
       if (projectDef.architect) {
         return Object.keys(projectDef.architect).map(
-          (name): AngularJsonTreeItem =>
-            this.createAngularJsonTreeItem(
+          (name): WorkspaceJsonTreeItem =>
+            this.createWorkspaceJsonTreeItem(
               { architect: { name }, project },
               name,
               Boolean(projectDef.architect![name].configurations)
@@ -163,7 +163,7 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       }
 
       return Object.keys(configurations).map(name => {
-        const item = this.createAngularJsonTreeItem(
+        const item = this.createWorkspaceJsonTreeItem(
           { architect: { ...architect, configuration: name }, project },
           name
         );
@@ -175,7 +175,7 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
 
   private findLabel(
     document: TextDocument,
-    { project, architect }: AngularJsonLabel
+    { project, architect }: WorkspaceJsonLabel
   ): number {
     let scriptOffset = 0;
     let nestingLevel = 0;
@@ -233,8 +233,8 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
     return scriptOffset;
   }
 
-  private async runTask(selection: AngularJsonTreeItem) {
-    const { architect, project } = selection.angularJsonLabel;
+  private async runTask(selection: WorkspaceJsonTreeItem) {
+    const { architect, project } = selection.workspaceJsonLabel;
     if (!architect) {
       return;
     }
@@ -244,40 +244,43 @@ export class AngularJsonTreeProvider extends AbstractTreeProvider<
       flags.push(`--configuration=${architect.configuration}`);
     }
 
-    this.ngTaskProvider.executeTask({
+    this.cliTaskProvider.executeTask({
       command: architect.name,
       positional: project,
       flags
     });
   }
 
-  revealAngularJsonLabel(angularJsonLabel: AngularJsonLabel) {
-    this.editAngularJson(
-      angularJsonTreeProvider.createAngularJsonTreeItem(angularJsonLabel, '')
+  revealWorkspaceJsonLabel(workspaceJsonLabel: WorkspaceJsonLabel) {
+    this.editWorkspaceJson(
+      workspaceJsonTreeProvider.createWorkspaceJsonTreeItem(
+        workspaceJsonLabel,
+        ''
+      )
     );
   }
 
-  private async revealInExplorer(selection: AngularJsonTreeItem) {
+  private async revealInExplorer(selection: WorkspaceJsonTreeItem) {
     if (selection.resourceUri) {
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }
 
-  private async editAngularJson(selection: AngularJsonTreeItem) {
-    const { validAngularJson } = verifyAngularJson(
-      this.ngTaskProvider.getWorkspacePath()
+  private async editWorkspaceJson(selection: WorkspaceJsonTreeItem) {
+    const { validWorkspaceJson } = verifyWorkspaceJson(
+      this.cliTaskProvider.getWorkspaceJsonPath()
     );
-    if (!validAngularJson) {
+    if (!validWorkspaceJson) {
       return;
     }
 
-    const angularJson = Uri.file(
-      join(this.ngTaskProvider.getWorkspacePath(), 'angular.json')
+    const workspaceJson = Uri.file(
+      join(this.cliTaskProvider.getWorkspaceJsonPath())
     );
     const document: TextDocument = await workspace.openTextDocument(
-      angularJson
+      workspaceJson
     );
-    const offset = this.findLabel(document, selection.angularJsonLabel);
+    const offset = this.findLabel(document, selection.workspaceJsonLabel);
     const position = document.positionAt(offset);
     await window.showTextDocument(document, {
       selection: new Selection(position, position)
