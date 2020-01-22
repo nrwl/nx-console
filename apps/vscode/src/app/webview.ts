@@ -15,10 +15,7 @@ import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-sche
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
 import { getTelemetry } from './telemetry';
 import { NxTask } from './cli-task/nx-task';
-import {
-  TaskExecutionSchema,
-  TaskExecutionMessage
-} from '@angular-console/schema';
+import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
 
 let webviewPanel: WebviewPanel | undefined;
 let indexHtml: string | undefined;
@@ -73,7 +70,7 @@ export function createWebViewPanel(
     webviewPanel.reveal();
   } else {
     webviewPanel = window.createWebviewPanel(
-      'angular-console', // Identifies the type of the webview. Used internally
+      'nx-console', // Identifies the type of the webview. Used internally
       title, // Title of the panel displayed to the user
       ViewColumn.Active, // Editor column to show the new webview panel in.
       {

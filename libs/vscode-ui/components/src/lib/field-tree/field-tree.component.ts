@@ -6,7 +6,7 @@ import {
   OnChanges,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 
 @Component({
   selector: 'vscode-ui-field-tree',
@@ -64,9 +64,7 @@ export class FieldTreeComponent implements OnChanges {
   scrollToField(fieldName: string) {
     this.activeFieldName = fieldName;
     this.userSelectedField = fieldName;
-    const element = document.getElementById(
-      fieldName + '-angular-console-field'
-    );
+    const element = document.getElementById(fieldName + '-nx-console-field');
     if (element) {
       element.scrollIntoView({
         block: 'start',

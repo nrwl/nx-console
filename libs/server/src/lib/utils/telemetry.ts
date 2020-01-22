@@ -61,7 +61,7 @@ export class Telemetry {
   reportPageView(path: string) {
     try {
       if (this.canCollectData()) {
-        this.visitor.pageview(path, 'Angular Console', '6.0.0').send();
+        this.visitor.pageview(path, 'Nx Console', '6.0.0').send();
       }
     } catch (e) {
       console.error('reportPageView', e);

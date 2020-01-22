@@ -1,4 +1,4 @@
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 import { QuickPickItem } from 'vscode';
 
 export class CliTaskFlagQuickPickItem implements QuickPickItem {

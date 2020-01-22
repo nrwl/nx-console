@@ -4,7 +4,7 @@ import {
   Option,
   DefaultValue,
   ArchitectConfiguration
-} from '@angular-console/schema';
+} from '@nx-console/schema';
 import * as path from 'path';
 
 import {

@@ -34,7 +34,7 @@ module.exports = {
         vscode: nps.concurrent({
           server: 'ng build vscode --noSourceMap',
           client:
-            'ng build angular-console --configuration=vscode --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false'
+            'ng build nx-console --configuration=vscode --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false'
         })
       },
       dev: {

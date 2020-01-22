@@ -1,5 +1,5 @@
-import { Option } from '@angular-console/schema';
-import { readBuilderSchema } from '@angular-console/server';
+import { Option } from '@nx-console/schema';
+import { readBuilderSchema } from '@nx-console/server';
 import { window } from 'vscode';
 import { workspaceJsonTreeProvider } from '../workspace-json-tree/workspace-json-tree-provider';
 import { getTelemetry } from '../telemetry';

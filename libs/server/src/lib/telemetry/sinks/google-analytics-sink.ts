@@ -128,7 +128,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   screenViewed(screen: string): void {
     this.visitor
       .screenview({
-        an: 'Angular Console',
+        an: 'Nx Console',
         cd: screen
       })
       .send();

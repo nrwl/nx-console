@@ -1,19 +1,19 @@
-## Contributing to Angular Console
+## Contributing to Nx Console
 
-We would love for you to contribute to Angular Console! Read this document to see how to do it.
+We would love for you to contribute to Nx Console! Read this document to see how to do it.
 
 ## Got a Question?
 
-We are trying to keep GitHub issues for bug reports and feature requests. Stack Overflow is a much better place to ask general questions about how to use Angular Console.
+We are trying to keep GitHub issues for bug reports and feature requests. Stack Overflow is a much better place to ask general questions about how to use Nx Console.
 
 ## Two Platforms
 
-Angular Console runs on two platforms:
+Nx Console runs on two platforms:
 
 - VSCode
 - IntelliJ
 
-The two versions of Angular Console share most of the code, but they are bundled differently.
+The two versions of Nx Console share most of the code, but they are bundled differently.
 
 ## Building the VSCode Plugin
 

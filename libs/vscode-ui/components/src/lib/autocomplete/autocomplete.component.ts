@@ -33,7 +33,7 @@ import {
   merge,
   of
 } from 'rxjs';
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 
 export enum AutocompleteNavKeys {
   Enter = 'Enter',
@@ -44,7 +44,7 @@ export enum AutocompleteNavKeys {
 export const AUTOCOMPLETE_NAV_KEYS = new Set(['Enter', 'ArrowUp', 'ArrowDown']);
 
 @Component({
-  selector: 'angular-console-autocomplete',
+  selector: 'nx-console-autocomplete',
   templateUrl: './autocomplete.component.html',
   styleUrls: ['./autocomplete.component.scss'],
   encapsulation: ViewEncapsulation.None,

@@ -1,5 +1,5 @@
 import { Task, TaskScope } from 'vscode';
-import { getShellExecutionForConfig } from './shell-execution';
+import { getShellExecutionForConfig } from '../cli-task/shell-execution';
 import { findClosestNx } from '@nx-console/server';
 
 export interface NxTaskDefinition {

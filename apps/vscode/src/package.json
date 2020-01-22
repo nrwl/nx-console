@@ -1,7 +1,7 @@
 {
   "name": "angular-console",
-  "displayName": "Angular Console",
-  "description": "Angular Console for Visual Studio Code. The user interface app for the Angular CLI",
+  "displayName": "Nx Console",
+  "description": "Nx Console for Visual Studio Code. The user interface app for the Angular CLI",
   "version": "10.0.0",
   "repository": {
     "type": "git",
@@ -47,34 +47,34 @@
     "menus": {
       "view/title": [
         {
-          "command": "angularConsole.refreshWorkspaceJsonTree",
-          "when": "view == angularConsoleJson",
+          "command": "nxConsole.refreshWorkspaceJsonTree",
+          "when": "view == nxConsoleJson",
           "group": "navigation"
         },
         {
-          "command": "angularConsole.refreshWorkspaceJsonTree",
+          "command": "nxConsole.refreshWorkspaceJsonTree",
           "when": "view == workspaceJson",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "angularConsole.revealInExplorer",
-          "when": "view == angularConsoleJson && viewItem == project",
+          "command": "nxConsole.revealInExplorer",
+          "when": "view == nxConsoleJson && viewItem == project",
           "group": "inline"
         },
         {
-          "command": "angularConsole.runTask",
-          "when": "view == angularConsoleJson && viewItem == task",
+          "command": "nxConsole.runTask",
+          "when": "view == nxConsoleJson && viewItem == task",
           "group": "inline"
         },
         {
-          "command": "angularConsole.revealInExplorer",
+          "command": "nxConsole.revealInExplorer",
           "when": "view == workspaceJson && viewItem == project",
           "group": "inline"
         },
         {
-          "command": "angularConsole.runTask",
+          "command": "nxConsole.runTask",
           "when": "view == workspaceJson && viewItem == task",
           "group": "inline"
         }
@@ -82,7 +82,7 @@
     },
     "commands": [
       {
-        "command": "angularConsole.refreshWorkspaceJsonTree",
+        "command": "nxConsole.refreshWorkspaceJsonTree",
         "title": "Refresh",
         "icon": {
           "light": "assets/refresh-light.svg",
@@ -90,7 +90,7 @@
         }
       },
       {
-        "command": "angularConsole.revealInExplorer",
+        "command": "nxConsole.revealInExplorer",
         "title": "Reveal in Explorer",
         "icon": {
           "light": "assets/folder-light.svg",
@@ -98,7 +98,7 @@
         }
       },
       {
-        "command": "angularConsole.runTask",
+        "command": "nxConsole.runTask",
         "title": "Execute task",
         "icon": {
           "light": "assets/continue-light.svg",
@@ -263,14 +263,14 @@
       }
     ],
     "configuration": {
-      "title": "Angular Console",
+      "title": "Nx Console",
       "properties": {
-        "angularConsole.enableTelemetry": {
+        "nxConsole.enableTelemetry": {
           "type": "boolean",
           "default": true,
-          "description": "Help make Angular Console better by sending anonymous usage data to the Angular Console team."
+          "description": "Help make Nx Console better by sending anonymous usage data to the Nx Console team."
         },
-        "angularConsole.useNVM": {
+        "nxConsole.useNVM": {
           "type": "boolean",
           "default": false,
           "description": "Runs tasks using Node Version Manager"
@@ -347,22 +347,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "angular-console",
-          "title": "Angular Console",
+          "id": "nx-console",
+          "title": "Nx Console",
           "icon": "tree-view-icon.svg"
         }
       ]
     },
     "views": {
-      "angular-console": [
+      "nx-console": [
         {
-          "id": "angularConsole",
-          "name": "Navigation"
-        },
-        {
-          "id": "angularConsoleJson",
-          "name": "Angular JSON",
-          "when": "isAngularWorkspace"
+          "id": "nxConsole",
+          "name": "UI"
         },
         {
           "id": "workspaceJson",

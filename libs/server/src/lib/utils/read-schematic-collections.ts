@@ -1,4 +1,4 @@
-import { Schematic, SchematicCollection } from '@angular-console/schema';
+import { Schematic, SchematicCollection } from '@nx-console/schema';
 import { basename, dirname, join } from 'path';
 
 import {

@@ -55,7 +55,8 @@
         <form class="fields fx-flex" [formGroup]="taskExecForm.form">
           <div class="title-container fx-row">
             <span class="fx-flex title">
-              ng {{ taskExecForm.architect.command }}
+              {{ taskExecForm.architect.cliName }}
+              {{ taskExecForm.architect.command }}
               {{ taskExecForm.architect.positional }}
               <ng-container
                 *ngIf="
@@ -72,8 +73,8 @@
           </div>
 
           <ng-container *ngIf="defaultValues$ | async as defaultValues">
-            <angular-console-field
-              [id]="field.name + '-angular-console-field'"
+            <nx-console-field
+              [id]="field.name + '-nx-console-field'"
               *ngFor="let field of taskExecForm.architect.options"
               [class.changed-from-default]="
                 defaultValues[field.name] !==
@@ -84,7 +85,7 @@
               [style.display]="
                 filteredFields.has(field.name) ? 'block' : 'none'
               "
-            ></angular-console-field>
+            ></nx-console-field>
           </ng-container>
 
           <div

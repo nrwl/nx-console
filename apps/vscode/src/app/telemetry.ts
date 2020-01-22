@@ -1,4 +1,4 @@
-import { Store, Telemetry } from '@angular-console/server';
+import { Store, Telemetry } from '@nx-console/server';
 import { Disposable, window, workspace } from 'vscode';
 
 import { environment } from '../environments/environment';
@@ -23,7 +23,7 @@ export function initTelemetry(store: Store) {
 
   if (!store.get('shownTelemetryPrompt')) {
     window.showInformationMessage(
-      'Help improve Angular Console by allowing us to collect data. To opt-out set angularConsole.enableTelemetry to false in settings.'
+      'Help improve Nx Console by allowing us to collect data. To opt-out set nxConsole.enableTelemetry to false in settings.'
     );
 
     store.set('shownTelemetryPrompt', true);

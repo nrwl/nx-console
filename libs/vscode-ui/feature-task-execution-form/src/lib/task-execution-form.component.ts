@@ -35,10 +35,7 @@ import {
 } from 'rxjs/operators';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
-import {
-  TaskExecutionSchema,
-  TaskExecutionMessage
-} from '@angular-console/schema';
+import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
 
 declare global {
   interface Window {
@@ -66,7 +63,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   private readonly activeFieldIdSubject = new BehaviorSubject<string>('');
   readonly activeFieldName$ = this.activeFieldIdSubject.pipe(
     distinctUntilChanged(),
-    map(field => field.replace('-angular-console-field', ''))
+    map(field => field.replace('-nx-console-field', ''))
   );
 
   private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
@@ -201,7 +198,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         }
 
         const fields = Array.from(
-          scrollElement.querySelectorAll<HTMLElement>('angular-console-field')
+          scrollElement.querySelectorAll<HTMLElement>('nx-console-field')
         );
         const top =
           Number(scrollElement.scrollTop) +
