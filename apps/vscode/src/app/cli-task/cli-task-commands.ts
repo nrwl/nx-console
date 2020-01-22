@@ -115,8 +115,7 @@ async function selectCliCommandAndPromptForFlags(command: string) {
   }
 
   const flags = await selectFlags(
-    command,
-    selection.projectName,
+    `${command} ${selection.projectName}`,
     options,
     workspaceType
   );
@@ -145,8 +144,7 @@ async function selectSchematicAndPromptForFlags(workspaceJsonPath: string) {
   }
 
   const flags = await selectFlags(
-    'generate',
-    selection.positional,
+    `generate ${selection.positional}`,
     selection.options,
     workspaceType
   );
