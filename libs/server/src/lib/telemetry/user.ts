@@ -1,4 +1,4 @@
-import { Store } from '@angular-console/server';
+import { Store } from '@nx-console/server';
 
 export type UserState = 'untracked' | 'tracked';
 

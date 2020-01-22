@@ -3,7 +3,7 @@ import { Sink } from './sink';
 import { LoggerSink, GoogleAnalyticsSink, ApplicationPlatform } from './sinks';
 import { User, UserState } from './user';
 import { TelemetryMessageBuilder } from './message-builder';
-import { Store } from '@angular-console/server';
+import { Store } from '@nx-console/server';
 
 export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];

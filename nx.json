@@ -1,5 +1,5 @@
 {
-  "npmScope": "angular-console",
+  "npmScope": "nx-console",
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": "*",

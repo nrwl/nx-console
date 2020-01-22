@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
-import { VscodeUiComponentsModule } from '@angular-console/vscode-ui/components';
+import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
-import { TaskExecutionSchema } from '@angular-console/schema';
+import { TaskExecutionSchema } from '@nx-console/schema';
 
 declare global {
   interface Window {

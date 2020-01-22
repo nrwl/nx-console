@@ -1,8 +1,8 @@
 import { ConfigurationTarget, ExtensionContext, workspace } from 'vscode';
-import { Store } from '@angular-console/server';
+import { Store } from '@nx-console/server';
 
 export class VSCodeStorage implements Store {
-  static configurationSection = 'angularConsole';
+  static configurationSection = 'nxConsole';
 
   static fromContext(context: ExtensionContext): VSCodeStorage {
     return new VSCodeStorage(context.globalState);

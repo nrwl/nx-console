@@ -23,17 +23,15 @@
     "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
-      "@angular-console/schema": ["libs/schema/src/index.ts"],
-      "@angular-console/server": ["libs/server/src/index.ts"],
-      "@angular-console/vscode-ui/feature-task-execution-form": [
+      "@nx-console/schema": ["libs/schema/src/index.ts"],
+      "@nx-console/server": ["libs/server/src/index.ts"],
+      "@nx-console/vscode-ui/feature-task-execution-form": [
         "libs/vscode-ui/feature-task-execution-form/src/index.ts"
       ],
-      "@angular-console/vscode-ui/components": [
+      "@nx-console/vscode-ui/components": [
         "libs/vscode-ui/components/src/index.ts"
       ],
-      "@angular-console/vscode-ui/styles": [
-        "libs/vscode-ui/styles/src/index.ts"
-      ]
+      "@nx-console/vscode-ui/styles": ["libs/vscode-ui/styles/src/index.ts"]
     },
     "module": "esnext",
     "rootDir": "."

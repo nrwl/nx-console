@@ -11,6 +11,7 @@ export interface TaskExecutionSchema {
   name: string;
   command: string;
   positional: string;
+  cliName: 'nx' | 'ng';
   builder?: string;
   description: string;
   configurations?: ArchitectConfiguration[];

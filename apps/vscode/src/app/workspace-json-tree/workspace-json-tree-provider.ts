@@ -33,7 +33,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
 
     workspaceJsonTreeProvider = this;
 
-    commands.registerCommand('angularConsole.refreshWorkspaceJsonTree', () =>
+    commands.registerCommand('nxConsole.refreshWorkspaceJsonTree', () =>
       this.refresh()
     );
 
@@ -44,11 +44,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
     ] as [string, (item: WorkspaceJsonTreeItem) => Promise<any>][]).forEach(
       ([commandSuffix, callback]) => {
         context.subscriptions.push(
-          commands.registerCommand(
-            `angularConsole.${commandSuffix}`,
-            callback,
-            this
-          )
+          commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
         );
       }
     );
@@ -94,7 +90,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
     );
     item.command = {
       title: 'Edit workspace definition',
-      command: 'angularConsole.editWorkspaceJson',
+      command: 'nxConsole.editWorkspaceJson',
       arguments: [item]
     };
     if (!workspaceJsonLabel.architect) {

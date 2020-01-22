@@ -5,31 +5,31 @@
 </div>
 
 <ng-container *ngIf="field.enum && field.enum.length; else nonEnum">
-  <angular-console-autocomplete
+  <nx-console-autocomplete
     *ngIf="field.enum?.length > 10"
     [field]="field"
     [formControl]="control"
-  ></angular-console-autocomplete>
+  ></nx-console-autocomplete>
 
-  <angular-console-select
+  <nx-console-select
     *ngIf="field.enum?.length <= 10"
     [field]="field"
     [(value)]="value"
-  ></angular-console-select>
+  ></nx-console-select>
 </ng-container>
 
 <ng-template #nonEnum>
   <ng-container [ngSwitch]="field.type">
-    <angular-console-checkbox
+    <nx-console-checkbox
       *ngSwitchCase="'boolean'"
       [field]="field"
       [(value)]="value"
-    ></angular-console-checkbox>
+    ></nx-console-checkbox>
 
-    <angular-console-input
+    <nx-console-input
       *ngSwitchDefault
       [field]="field"
       [(value)]="value"
-    ></angular-console-input>
+    ></nx-console-input>
   </ng-container>
 </ng-template>

@@ -1,5 +1,5 @@
-import { Schematic } from '@angular-console/schema';
-import { readAllSchematicCollections } from '@angular-console/server';
+import { Schematic } from '@nx-console/schema';
+import { readAllSchematicCollections } from '@nx-console/server';
 import { QuickPickItem, window } from 'vscode';
 import { join } from 'path';
 

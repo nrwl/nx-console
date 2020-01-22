@@ -1,7 +1,7 @@
 import { CliTaskDefinition } from './cli-task-definition';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
-import { findClosestNg, findClosestNx } from '@angular-console/server';
+import { findClosestNg, findClosestNx } from '@nx-console/server';
 import { join } from 'path';
 
 export class CliTask extends Task {
@@ -26,10 +26,10 @@ export class CliTask extends Task {
       : `ng ${args.join(' ')}`;
 
     const task = new CliTask(
-      { ...definition, type: 'ng' }, // definition
+      { ...definition, type: useNxCli ? 'nx' : 'ng' }, // definition
       TaskScope.Workspace, // scope
       displayCommand, // name
-      'angular-console', // source
+      'nx-console', // source
       // execution
       getShellExecutionForConfig({
         displayCommand,

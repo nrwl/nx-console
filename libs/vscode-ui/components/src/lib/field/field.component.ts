@@ -1,4 +1,4 @@
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
 /* Wrapper for select, text input, checkbox, autocomplete */
 
 @Component({
-  selector: 'angular-console-field',
+  selector: 'nx-console-field',
   templateUrl: './field.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['field.component.scss'],

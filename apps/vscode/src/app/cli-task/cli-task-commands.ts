@@ -10,7 +10,7 @@ import {
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 const CLI_COMMAND_LIST = [
   'build',
@@ -48,14 +48,14 @@ export function registerCliTaskCommands(
   });
 
   commands.registerCommand(`ng.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspacePath()!)
+    selectSchematicAndPromptForFlags(n.getWorkspaceJsonPath())
   );
 
   commands.registerCommand(`ng.generate.ui`, () =>
     selectCliCommandAndShowUi('generate', context.extensionPath)
   );
   commands.registerCommand(`nx.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspacePath()!)
+    selectSchematicAndPromptForFlags(n.getWorkspaceJsonPath())
   );
 
   commands.registerCommand(`nx.generate.ui`, () =>
@@ -67,7 +67,7 @@ function selectCliCommandAndShowUi(command: string, extensionPath: string) {
   const workspacePath = cliTaskProvider.getWorkspacePath();
   if (!workspacePath) {
     window.showErrorMessage(
-      'Angular Console requires a workspace be set to perform this action'
+      'Nx Console requires a workspace be set to perform this action'
     );
     return;
   }
@@ -78,10 +78,7 @@ function selectCliCommandAndShowUi(command: string, extensionPath: string) {
     extensionPath
   );
 
-  commands.executeCommand(
-    'angularConsole.revealWebViewPanel',
-    workspaceTreeItem
-  );
+  commands.executeCommand('nxConsole.revealWebViewPanel', workspaceTreeItem);
 }
 
 async function selectCliCommandAndPromptForFlags(command: string) {
@@ -133,16 +130,16 @@ async function selectCliCommandAndPromptForFlags(command: string) {
   }
 }
 
-async function selectSchematicAndPromptForFlags(workspacePath: string) {
+async function selectSchematicAndPromptForFlags(workspaceJsonPath: string) {
   const { validWorkspaceJson, workspaceType } = verifyWorkspaceJson(
-    workspacePath
+    workspaceJsonPath
   );
 
   if (!validWorkspaceJson) {
     return;
   }
 
-  const selection = await selectSchematic(workspacePath);
+  const selection = await selectSchematic(workspaceJsonPath);
   if (!selection) {
     return;
   }
@@ -181,7 +178,7 @@ export function selectCliProject(command: string, json: any) {
 
   if (!items.length) {
     window.showInformationMessage(
-      `None of your projects support ng ${command}`
+      `No projects have an architect command for ${command}`
     );
 
     return;

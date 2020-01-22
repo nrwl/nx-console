@@ -107,14 +107,14 @@ form {
 }
 
 vscode-ui-field-tree,
-angular-console-field,
+nx-console-field,
 .form-header,
 .filter-flags-message,
 .title-container {
   padding-left: 0.5rem;
 }
 
-angular-console-field {
+nx-console-field {
   border-left: 2px solid transparent;
 
   &.changed-from-default {

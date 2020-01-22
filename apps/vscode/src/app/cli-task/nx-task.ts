@@ -1,6 +1,6 @@
 import { Task, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
-import { findClosestNx } from '@angular-console/server';
+import { findClosestNx } from '@nx-console/server';
 
 export interface NxTaskDefinition {
   positional: string;
@@ -19,7 +19,7 @@ export class NxTask extends Task {
       { ...definition, type: 'nx' }, // definition
       TaskScope.Workspace, // scope
       displayCommand, // name
-      'angular-console', // source
+      'nx-console', // source
       // execution
       getShellExecutionForConfig({
         displayCommand,

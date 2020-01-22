@@ -5,10 +5,10 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 
 @Component({
-  selector: 'angular-console-select',
+  selector: 'nx-console-select',
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

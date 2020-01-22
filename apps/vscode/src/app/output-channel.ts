@@ -4,7 +4,7 @@ let _channel: OutputChannel;
 
 export function getOutputChannel(): OutputChannel {
   if (!_channel) {
-    _channel = window.createOutputChannel('Angular Console');
+    _channel = window.createOutputChannel('Nx Console');
   }
   return _channel;
 }

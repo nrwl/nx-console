@@ -1,4 +1,4 @@
-import { EXTENSIONS } from '@angular-console/server';
+import { EXTENSIONS } from '@nx-console/server';
 import { stream } from 'fast-glob';
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
@@ -51,14 +51,14 @@ export function activate(c: ExtensionContext) {
     const store = VSCodeStorage.fromContext(context);
     initTelemetry(store);
 
-    workspaceTreeView = window.createTreeView('angularConsole', {
+    workspaceTreeView = window.createTreeView('nxConsole', {
       treeDataProvider: currentWorkspaceTreeProvider
     }) as TreeView<WorkspaceTreeItem>;
     context.subscriptions.push(workspaceTreeView);
 
     context.subscriptions.push(
       commands.registerCommand(
-        'angularConsole.revealWebViewPanel',
+        'nxConsole.revealWebViewPanel',
         async (workspaceTreeItem: WorkspaceTreeItem) => {
           if (
             !existsSync(
@@ -121,10 +121,10 @@ export function activate(c: ExtensionContext) {
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
     window.showErrorMessage(
-      'Angular Console encountered an error when activating (see output panel)'
+      'Nx Console encountered an error when activating (see output panel)'
     );
     getOutputChannel().appendLine(
-      'Angular Console encountered an error when activating'
+      'Nx Console encountered an error when activating'
     );
     getOutputChannel().appendLine(JSON.stringify(e));
     getTelemetry().exception(e.message);
@@ -204,9 +204,6 @@ async function setWorkspaceJson(workspaceJsonPath: string) {
       cliTaskProvider
     );
 
-    workspaceJsonTreeView = window.createTreeView('angularConsoleJson', {
-      treeDataProvider: workspaceJsonTreeProvider
-    }) as TreeView<WorkspaceJsonTreeItem>;
     workspaceJsonTreeView = window.createTreeView('workspaceJson', {
       treeDataProvider: workspaceJsonTreeProvider
     }) as TreeView<WorkspaceJsonTreeItem>;

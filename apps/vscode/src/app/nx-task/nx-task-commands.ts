@@ -1,4 +1,4 @@
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 import { commands, ExtensionContext, window, tasks } from 'vscode';
 
@@ -54,7 +54,7 @@ async function promptForTarget(): Promise<string | undefined> {
 
   if (!validTargets.length) {
     window.showErrorMessage(
-      'None of your workspace projects have architect commands to run'
+      'None of your workspace projects have an architect command'
     );
     return;
   }

@@ -6,10 +6,10 @@ import {
   EventEmitter,
   ViewEncapsulation
 } from '@angular/core';
-import { Option } from '@angular-console/schema';
+import { Option } from '@nx-console/schema';
 
 @Component({
-  selector: 'angular-console-checkbox',
+  selector: 'nx-console-checkbox',
   templateUrl: './checkbox.component.html',
   styleUrls: ['./checkbox.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

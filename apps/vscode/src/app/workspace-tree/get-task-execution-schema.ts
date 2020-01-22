@@ -1,5 +1,5 @@
-import { TaskExecutionSchema } from '@angular-console/schema';
-import { readArchitectDef, readBuilderSchema } from '@angular-console/server';
+import { TaskExecutionSchema } from '@nx-console/schema';
+import { readArchitectDef, readBuilderSchema } from '@nx-console/server';
 import { window } from 'vscode';
 
 import { selectCliProject } from '../cli-task/cli-task-commands';
@@ -20,7 +20,7 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, json } = verifyWorkspaceJson(
+    const { validWorkspaceJson, json, workspaceType } = verifyWorkspaceJson(
       cliTaskProvider.getWorkspaceJsonPath()
     );
 
@@ -31,12 +31,10 @@ export async function getTaskExecutionSchema(
     const command = workspaceRouteTitle.toLowerCase();
     switch (workspaceRouteTitle) {
       case 'Build':
-      case 'Deploy':
       case 'E2e':
       case 'Lint':
       case 'Serve':
       case 'Test':
-      case 'Xi18n':
         const selectedProject = await selectCliProject(command, json);
 
         if (!selectedProject) return;
@@ -59,7 +57,8 @@ export async function getTaskExecutionSchema(
           ),
           options,
           positional: selectedProject.projectName,
-          command
+          command,
+          cliName: workspaceType
         };
 
       case 'Run':
@@ -108,11 +107,12 @@ export async function getTaskExecutionSchema(
             ),
             command: 'run',
             positional: `${selection.projectName}:${selection.command}`,
-            options: builderOptions
+            options: builderOptions,
+            cliName: workspaceType
           };
         });
       case 'Generate':
-        return selectSchematic(cliTaskProvider.getWorkspacePath()).then(
+        return selectSchematic(cliTaskProvider.getWorkspaceJsonPath()).then(
           schematic => {
             if (!schematic) {
               return;
@@ -131,7 +131,7 @@ export async function getTaskExecutionSchema(
               }
             });
 
-            return schematic;
+            return { ...schematic, cliName: workspaceType };
           }
         );
     }
@@ -142,7 +142,7 @@ export async function getTaskExecutionSchema(
 
     window
       .showErrorMessage(
-        'Angular Console encountered an error parsing your node modules',
+        'Nx Console encountered an error parsing your node modules',
         'See details'
       )
       .then(value => {

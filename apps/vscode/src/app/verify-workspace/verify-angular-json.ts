@@ -1,4 +1,4 @@
-import { readAndParseJson } from '@angular-console/server';
+import { readAndParseJson } from '@nx-console/server';
 import { window } from 'vscode';
 
 import { getOutputChannel } from '../output-channel';

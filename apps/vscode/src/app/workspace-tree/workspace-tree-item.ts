@@ -4,44 +4,36 @@ import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 export type WorkspaceRouteTitle =
   | 'Add'
   | 'Build'
-  | 'Deploy'
   | 'E2e'
   | 'Generate'
   | 'Lint'
   | 'Run'
   | 'Serve'
   | 'Test'
-  | 'Xi18n'
   | 'Change workspace'
   | 'Select workspace';
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Add', 'angular-cli.svg'],
   ['Build', 'angular-cli.svg'],
-  ['Deploy', 'angular-cli.svg'],
   ['E2e', 'angular-cli.svg'],
   ['Generate', 'angular-cli.svg'],
   ['Lint', 'angular-cli.svg'],
   ['Run', 'angular-cli.svg'],
   ['Serve', 'angular-cli.svg'],
-  ['Test', 'angular-cli.svg'],
-  ['Xi18n', 'angular-cli.svg'],
-  ['Select workspace', 'angular-console.png'],
-  ['Change workspace', 'angular-console.png']
+  ['Test', 'angular-cli.svg']
 ]);
 
-export const ROUTE_LIST = [
+export const ROUTE_LIST: WorkspaceRouteTitle[] = [
   'Add',
   'Build',
-  'Deploy',
   'E2e',
   'Generate',
   'Lint',
   'Run',
   'Serve',
-  'Test',
-  'Xi18n'
-] as WorkspaceRouteTitle[];
+  'Test'
+];
 
 export class WorkspaceTreeItem extends TreeItem {
   revealWorkspaceRoute(currentWorkspace: TreeView<WorkspaceTreeItem>) {
@@ -56,7 +48,7 @@ export class WorkspaceTreeItem extends TreeItem {
 
   command = {
     title: this.route,
-    command: 'angularConsole.revealWebViewPanel',
+    command: 'nxConsole.revealWebViewPanel',
     tooltip: '',
     arguments: [this]
   };
