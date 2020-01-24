@@ -8,7 +8,7 @@ import { CliTaskQuickPickItem } from '../cli-task/cli-task-quick-pick-item';
 import { getOutputChannel } from '../output-channel';
 import { selectSchematic } from '../select-schematic';
 import { getTelemetry } from '../telemetry';
-import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
+import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import { WorkspaceRouteTitle } from './workspace-tree-item';
 
@@ -20,8 +20,8 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, json, workspaceType } = verifyWorkspaceJson(
-      cliTaskProvider.getWorkspaceJsonPath()
+    const { validWorkspaceJson, json, workspaceType } = verifyWorkspace(
+      cliTaskProvider.getWorkspacePath()
     );
 
     if (!validWorkspaceJson) {

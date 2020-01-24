@@ -1,7 +1,7 @@
 import { commands, ExtensionContext, window } from 'vscode';
 
 import { selectSchematic } from '../select-schematic';
-import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
+import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import {
   WorkspaceRouteTitle,
@@ -48,14 +48,14 @@ export function registerCliTaskCommands(
   });
 
   commands.registerCommand(`ng.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspaceJsonPath())
+    selectSchematicAndPromptForFlags(n.getWorkspacePath())
   );
 
   commands.registerCommand(`ng.generate.ui`, () =>
     selectCliCommandAndShowUi('generate', context.extensionPath)
   );
   commands.registerCommand(`nx.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspaceJsonPath())
+    selectSchematicAndPromptForFlags(n.getWorkspacePath())
   );
 
   commands.registerCommand(`nx.generate.ui`, () =>
@@ -82,8 +82,8 @@ function selectCliCommandAndShowUi(command: string, extensionPath: string) {
 }
 
 async function selectCliCommandAndPromptForFlags(command: string) {
-  const { validWorkspaceJson, json, workspaceType } = verifyWorkspaceJson(
-    cliTaskProvider.getWorkspaceJsonPath()
+  const { validWorkspaceJson, json, workspaceType } = verifyWorkspace(
+    cliTaskProvider.getWorkspacePath()
   );
 
   const selection = validWorkspaceJson
@@ -129,16 +129,14 @@ async function selectCliCommandAndPromptForFlags(command: string) {
   }
 }
 
-async function selectSchematicAndPromptForFlags(workspaceJsonPath: string) {
-  const { validWorkspaceJson, workspaceType } = verifyWorkspaceJson(
-    workspaceJsonPath
-  );
+async function selectSchematicAndPromptForFlags(workspacePath: string) {
+  const { validWorkspaceJson, workspaceType } = verifyWorkspace(workspacePath);
 
   if (!validWorkspaceJson) {
     return;
   }
 
-  const selection = await selectSchematic(workspaceJsonPath);
+  const selection = await selectSchematic(workspacePath);
   if (!selection) {
     return;
   }

@@ -32,7 +32,7 @@ import {
   WorkspaceTreeProvider
 } from './app/workspace-tree/workspace-tree-provider';
 import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
-import { verifyWorkspaceJson } from './app/verify-workspace/verify-angular-json';
+import { verifyWorkspace } from './app/verify-workspace/verify-workspace';
 import { registerNxCommands } from './app/nx-task/nx-task-commands';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
@@ -145,17 +145,22 @@ export async function deactivate() {
 function locationWorkspaceDefinition() {
   return window
     .showOpenDialog({
-      canSelectFolders: false,
-      canSelectFiles: true,
+      canSelectFolders: true,
+      canSelectFiles: false,
       canSelectMany: false,
-      filters: {
-        'Workspace json': ['json']
-      },
-      openLabel: 'Select workspace json'
+      openLabel: 'Select workspace directory'
     })
     .then(value => {
       if (value && value[0]) {
-        return setWorkspaceJson(value[0].fsPath);
+        const selectedDirectory = value[0].fsPath;
+        return setWorkspace(
+          join(
+            selectedDirectory,
+            existsSync(join(selectedDirectory, 'angular.json'))
+              ? 'angular.json'
+              : 'workspace.json'
+          )
+        );
       }
     });
 }
@@ -166,10 +171,10 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
   const { root } = parse(vscodeWorkspacePath);
   while (currentDirectory !== root) {
     if (existsSync(join(currentDirectory, 'angular.json'))) {
-      return setWorkspaceJson(join(currentDirectory, 'angular.json'));
+      return setWorkspace(join(currentDirectory, 'angular.json'));
     }
     if (existsSync(join(currentDirectory, 'workspace.json'))) {
-      return setWorkspaceJson(join(currentDirectory, 'workspace.json'));
+      return setWorkspace(join(currentDirectory, 'workspace.json'));
     }
     currentDirectory = dirname(currentDirectory);
   }
@@ -184,15 +189,15 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
     .on('data', (workspaceJsonPath: string) => {
       childWorkspaceJsonStream.pause();
 
-      setWorkspaceJson(workspaceJsonPath);
+      setWorkspace(workspaceJsonPath);
     })
     .on('end', () => {
       currentWorkspaceTreeProvider.endScan();
     });
 }
 
-async function setWorkspaceJson(workspaceJsonPath: string) {
-  const { validWorkspaceJson } = verifyWorkspaceJson(workspaceJsonPath);
+async function setWorkspace(workspaceJsonPath: string) {
+  const { validWorkspaceJson } = verifyWorkspace(dirname(workspaceJsonPath));
   if (!validWorkspaceJson) {
     return;
   }

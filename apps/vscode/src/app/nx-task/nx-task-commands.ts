@@ -5,7 +5,7 @@ import { commands, ExtensionContext, window, tasks } from 'vscode';
 import { ProjectDef } from '../cli-task/cli-task-definition';
 import { CliTaskProvider } from '../cli-task/cli-task-provider';
 import { selectFlags } from '../cli-task/select-flags';
-import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
+import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { getTelemetry } from '../telemetry';
 import { NxTask } from './nx-task';
 
@@ -33,8 +33,8 @@ export function registerNxCommands(
 }
 
 async function promptForTarget(): Promise<string | undefined> {
-  const { validWorkspaceJson, json } = verifyWorkspaceJson(
-    cliTaskProvider.getWorkspaceJsonPath()
+  const { validWorkspaceJson, json } = verifyWorkspace(
+    cliTaskProvider.getWorkspacePath()
   );
 
   if (!validWorkspaceJson || !json) {
