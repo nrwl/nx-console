@@ -23,14 +23,11 @@ export function registerNxCommands(
       }
       promptForAffectedFlags(target);
     }),
-    commands.registerCommand(`nx.affected.test`, () =>
-      promptForAffectedFlags('test')
-    ),
-    commands.registerCommand(`nx.affected.e2e`, () =>
-      promptForAffectedFlags('e2e')
-    ),
-    commands.registerCommand(`nx.affected.lint`, () =>
-      promptForAffectedFlags('lint')
+    ...['apps', 'build', 'dep-graph', 'e2e', 'libs', 'lint', 'test'].map(
+      command =>
+        commands.registerCommand(`nx.affected.${command}`, () =>
+          promptForAffectedFlags(command)
+        )
     )
   );
 }
@@ -111,22 +108,31 @@ const AFFECTED_OPTIONS: Option[] = [
 ].map(v => ({ ...v, aliases: [] }));
 
 async function promptForAffectedFlags(target: string) {
-  const flags = await selectFlags(
-    'affected',
-    `--target=${target}`,
-    AFFECTED_OPTIONS,
-    'nx'
-  );
-
   const telemetry = getTelemetry();
   telemetry.featureUsed('affected-cli');
+
+  let positional: string | undefined;
+  let command: string;
+
+  switch (target) {
+    case 'apps':
+    case 'libs':
+    case 'dep-graph':
+      command = `affected:${target}`;
+      break;
+    default:
+      command = 'affected';
+      positional = `--target=${target}`;
+      await selectFlags(`affected ${positional}`, AFFECTED_OPTIONS, 'nx');
+  }
+  const flags = await selectFlags(command, AFFECTED_OPTIONS, 'nx');
 
   if (flags !== undefined) {
     const task = NxTask.create(
       {
-        command: 'affected',
+        command,
         flags,
-        positional: `--target=${target}`
+        positional
       },
       cliTaskProvider.getWorkspacePath()
     );

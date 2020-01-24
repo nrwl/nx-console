@@ -221,6 +221,54 @@
       },
       {
         "category": "nx",
+        "title": "affected",
+        "command": "nx.affected",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "affected test",
+        "command": "nx.affected.test",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "affected build",
+        "command": "nx.affected.build",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "affected e2e",
+        "command": "nx.affected.e2e",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "affected lint",
+        "command": "nx.affected.lint",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "affected apps",
+        "command": "nx.affected.apps",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "affected libs",
+        "command": "nx.affected.libs",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
+        "title": "affected dep-graph",
+        "command": "nx.affected.dep-graph",
+        "when": "isNxWorkspace"
+      },
+      {
+        "category": "nx",
         "title": "lint (ui)",
         "command": "nx.lint.ui",
         "when": "isNxWorkspace"
@@ -360,9 +408,14 @@
           "name": "UI"
         },
         {
+          "id": "nxAffected",
+          "name": "Nx Affected",
+          "when": "isNxWorkspace"
+        },
+        {
           "id": "workspaceJson",
           "name": "Workspace JSON",
-          "when": "isNxWorkspace"
+          "when": "isNxWorkspace || isAngularWorkspace"
         }
       ]
     }

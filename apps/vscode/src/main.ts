@@ -14,6 +14,8 @@ import {
 
 import { WorkspaceJsonTreeItem } from './app/workspace-json-tree/workspace-json-tree-item';
 import { WorkspaceJsonTreeProvider } from './app/workspace-json-tree/workspace-json-tree-provider';
+import { AffectedTreeItem } from './app/affected-tree/affected-tree-item';
+import { AffectedTreeProvider } from './app/affected-tree/affected-tree-provider';
 import { registerCliTaskCommands } from './app/cli-task/cli-task-commands';
 import { CliTaskProvider } from './app/cli-task/cli-task-provider';
 import { getOutputChannel } from './app/output-channel';
@@ -31,9 +33,11 @@ import {
 } from './app/workspace-tree/workspace-tree-provider';
 import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
 import { verifyWorkspaceJson } from './app/verify-workspace/verify-angular-json';
+import { registerNxCommands } from './app/nx-task/nx-task-commands';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
 let workspaceJsonTreeView: TreeView<WorkspaceJsonTreeItem>;
+let affectedTreeView: TreeView<AffectedTreeItem>;
 
 let currentWorkspaceTreeProvider: WorkspaceTreeProvider;
 let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
@@ -195,6 +199,7 @@ async function setWorkspaceJson(workspaceJsonPath: string) {
 
   if (!cliTaskProvider) {
     cliTaskProvider = new CliTaskProvider(workspaceJsonPath);
+    registerNxCommands(context, cliTaskProvider);
     tasks.registerTaskProvider('ng', cliTaskProvider);
     tasks.registerTaskProvider('nx', cliTaskProvider);
     registerCliTaskCommands(context, cliTaskProvider);
@@ -208,11 +213,18 @@ async function setWorkspaceJson(workspaceJsonPath: string) {
       treeDataProvider: workspaceJsonTreeProvider
     }) as TreeView<WorkspaceJsonTreeItem>;
     context.subscriptions.push(workspaceJsonTreeView);
+
+    const affectedTreeProvider = AffectedTreeProvider.create();
+
+    affectedTreeView = window.createTreeView('nxAffected', {
+      treeDataProvider: affectedTreeProvider
+    }) as TreeView<AffectedTreeItem>;
+    context.subscriptions.push(affectedTreeView);
   } else {
     cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);
   }
 
-  const isNxWorkspace = workspaceJsonPath.endsWith('workspace.json');
+  const isNxWorkspace = existsSync(join(workspaceJsonPath, '..', 'nx.json'));
   const isAngularWorkspace = workspaceJsonPath.endsWith('angular.json');
   commands.executeCommand(
     'setContext',
