@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Nx Console",
   "description": "Nx Console for Visual Studio Code. The user interface app for the Angular CLI",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/angular-console.git"
@@ -13,7 +13,7 @@
   },
   "publisher": "nrwl",
   "main": "main.js",
-  "icon": "assets/angular-console.png",
+  "icon": "assets/nx-console.png",
   "galleryBanner": {
     "color": "#176BCC",
     "theme": "dark"
@@ -31,7 +31,8 @@
     "Angular 2",
     "Angular 8",
     "CLI",
-    "Console"
+    "Console",
+    "Nx"
   ],
   "categories": [
     "Other"

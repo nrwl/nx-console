@@ -82,7 +82,7 @@ export function createWebViewPanel(
       webviewPanel = undefined;
     });
     webviewPanel.iconPath = Uri.file(
-      join(context.extensionPath, 'assets', 'angular-console.png')
+      join(context.extensionPath, 'assets', 'nx-console.svg')
     );
 
     webviewPanel.webview.html = getIframeHtml(context, schema);
