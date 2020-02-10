@@ -1,4 +1,5 @@
-import { TreeItem, TreeItemCollapsibleState } from 'vscode';
+import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+import { join } from 'path';
 
 export class AffectedTreeItem extends TreeItem {
   command = {
@@ -7,7 +8,12 @@ export class AffectedTreeItem extends TreeItem {
     tooltip: `Run nx ${this.affectedCommand}`
   };
 
-  constructor(readonly affectedCommand: string) {
+  iconPath = Uri.file(join(this.extensionPath, 'assets', 'nx-cli.svg'));
+
+  constructor(
+    readonly affectedCommand: string,
+    readonly extensionPath: string
+  ) {
     super(affectedCommand, TreeItemCollapsibleState.None);
   }
 }

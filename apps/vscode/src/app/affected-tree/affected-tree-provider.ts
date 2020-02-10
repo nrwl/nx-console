@@ -1,14 +1,15 @@
 import { AbstractTreeProvider } from '../abstract-tree-provider';
 import { AffectedTreeItem } from './affected-tree-item';
+import { ExtensionContext } from 'vscode';
 
 export class AffectedTreeProvider extends AbstractTreeProvider<
   AffectedTreeItem
 > {
-  static create(): AffectedTreeProvider {
-    return new AffectedTreeProvider();
+  static create(context: ExtensionContext): AffectedTreeProvider {
+    return new AffectedTreeProvider(context);
   }
 
-  private constructor() {
+  private constructor(private context: ExtensionContext) {
     super();
   }
 
@@ -26,6 +27,6 @@ export class AffectedTreeProvider extends AbstractTreeProvider<
       'affected:libs',
       'affected:lint',
       'affected:test'
-    ].map(c => new AffectedTreeItem(c));
+    ].map(c => new AffectedTreeItem(c, this.context.extensionPath));
   }
 }

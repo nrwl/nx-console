@@ -219,7 +219,7 @@ async function setWorkspace(workspaceJsonPath: string) {
     }) as TreeView<WorkspaceJsonTreeItem>;
     context.subscriptions.push(workspaceJsonTreeView);
 
-    const affectedTreeProvider = AffectedTreeProvider.create();
+    const affectedTreeProvider = AffectedTreeProvider.create(context);
 
     affectedTreeView = window.createTreeView('nxAffected', {
       treeDataProvider: affectedTreeProvider
