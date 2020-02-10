@@ -8,7 +8,7 @@ import {
 } from 'vscode';
 
 import { getTelemetry } from '../telemetry';
-import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
+import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { verifyNodeModules } from '../verify-workspace/verify-node-modules';
 import { CliTask } from './cli-task';
 import {
@@ -106,7 +106,7 @@ export class CliTaskProvider implements TaskProvider {
     if (json) {
       return json.projects;
     } else {
-      const result = verifyWorkspaceJson(this.getWorkspaceJsonPath());
+      const result = verifyWorkspace(this.getWorkspacePath());
       if (!result.validWorkspaceJson || !result.json) {
         return {};
       } else {

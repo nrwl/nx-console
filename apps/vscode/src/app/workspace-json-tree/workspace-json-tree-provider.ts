@@ -18,7 +18,7 @@ import {
   WorkspaceJsonLabel,
   WorkspaceJsonTreeItem
 } from './workspace-json-tree-item';
-import { verifyWorkspaceJson } from '../verify-workspace/verify-angular-json';
+import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 
 export let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
 
@@ -263,8 +263,8 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
   }
 
   private async editWorkspaceJson(selection: WorkspaceJsonTreeItem) {
-    const { validWorkspaceJson } = verifyWorkspaceJson(
-      this.cliTaskProvider.getWorkspaceJsonPath()
+    const { validWorkspaceJson } = verifyWorkspace(
+      this.cliTaskProvider.getWorkspacePath()
     );
     if (!validWorkspaceJson) {
       return;

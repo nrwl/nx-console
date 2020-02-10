@@ -1,4 +1,4 @@
-export { readAndParseJson } from './lib/utils/utils';
+export { readAndParseJson, fileExistsSync } from './lib/utils/utils';
 
 export { findClosestNg, findClosestNx } from './lib/utils/utils';
 
