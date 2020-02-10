@@ -14,14 +14,14 @@ export type WorkspaceRouteTitle =
   | 'Select workspace';
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
-  ['Add', 'angular-cli.svg'],
-  ['Build', 'angular-cli.svg'],
-  ['E2e', 'angular-cli.svg'],
-  ['Generate', 'angular-cli.svg'],
-  ['Lint', 'angular-cli.svg'],
-  ['Run', 'angular-cli.svg'],
-  ['Serve', 'angular-cli.svg'],
-  ['Test', 'angular-cli.svg']
+  ['Add', 'nx-cli.svg'],
+  ['Build', 'nx-cli.svg'],
+  ['E2e', 'nx-cli.svg'],
+  ['Generate', 'nx-cli.svg'],
+  ['Lint', 'nx-cli.svg'],
+  ['Run', 'nx-cli.svg'],
+  ['Serve', 'nx-cli.svg'],
+  ['Test', 'nx-cli.svg']
 ]);
 
 export const ROUTE_LIST: WorkspaceRouteTitle[] = [

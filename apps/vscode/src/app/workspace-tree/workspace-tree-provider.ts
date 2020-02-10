@@ -2,14 +2,15 @@ import { TreeItem } from 'vscode';
 
 import { AbstractTreeProvider } from '../abstract-tree-provider';
 import { ROUTE_LIST, WorkspaceTreeItem } from './workspace-tree-item';
+import { join } from 'path';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Angular Workspace...'
 );
-export const LOCATE_YOUR_WORKSPACE = new TreeItem('Select workspace json');
+export const LOCATE_YOUR_WORKSPACE = new TreeItem('Select workspace');
 LOCATE_YOUR_WORKSPACE.command = {
-  tooltip: 'Select an workspace json file to open',
-  title: 'Select workspace json',
+  tooltip: 'Select an workspace directory to open',
+  title: 'Select workspace',
   command: 'nxConsole.selectWorkspaceManually'
 };
 export const CHANGE_WORKSPACE = new TreeItem('Change workspace');
@@ -39,6 +40,12 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     readonly extensionPath: string
   ) {
     super();
+    LOCATE_YOUR_WORKSPACE.iconPath = join(
+      extensionPath,
+      'assets',
+      'nx-console.svg'
+    );
+    CHANGE_WORKSPACE.iconPath = join(extensionPath, 'assets', 'nx-console.svg');
   }
 
   getParent(_: WorkspaceTreeItem) {

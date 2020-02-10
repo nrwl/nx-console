@@ -34,7 +34,7 @@ export function verifyWorkspace(
       );
     }
   } catch (e) {
-    const humanReadableError = 'Invalid workspace json: ' + workspacePath;
+    const humanReadableError = 'Invalid workspace: ' + workspacePath;
     window.showErrorMessage(humanReadableError, 'Show Error').then(value => {
       if (value) {
         getOutputChannel().show();
