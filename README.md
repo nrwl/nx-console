@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console.svg" width="256"/>
+    <img src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console.png" width="500"/>
 </p>
 
 # The UI for the Angular CLI
