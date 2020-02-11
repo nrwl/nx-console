@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/nrwl/angular-console/master/static/angular-console-logo-with-text.jpg" width="256"/>
+    <img src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console.svg" width="256"/>
 </p>
 
 # The UI for the Angular CLI
@@ -54,8 +54,8 @@ A lot of Windows users are terminal shy and cannot take full advantage of tools 
 
 # Contribute
 
-Please read the [contributing](https://github.com/nrwl/angular-console/blob/master/CONTRIBUTING.md) guidelines.
-Pick one of the issues from the [good first issue](https://github.com/nrwl/angular-console/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) list to get started.
+Please read the [contributing](https://github.com/nrwl/nx-console/blob/master/CONTRIBUTING.md) guidelines.
+Pick one of the issues from the [good first issue](https://github.com/nrwl/nx-console/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) list to get started.
 
 ## Core Team
 
@@ -64,9 +64,9 @@ Pick one of the issues from the [good first issue](https://github.com/nrwl/angul
 | ![Dan Muller][dm]                   | ![Victor Savkin][vs]                  | ![Jack Hsu][jh]                     | ![Frantisek Kolar][fk]              | ![Kamil Kisiela][kk]                            |
 | [mrmeku](https://github.com/mrmeku) | [vsavkin](https://github.com/vsavkin) | [jaysoo](https://github.com/jaysoo) | [fkolar](https://github.com/fkolar) | [kamilkisiela](https://github.com/kamilkisiela) |
 
-[dm]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/dan_pic.jpg
-[vs]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/victor_pic.jpg
-[jh]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/jack_pic.jpg
+[dm]: https://raw.githubusercontent.com/nrwl/nx-console/master/static/dan_pic.jpg
+[vs]: https://raw.githubusercontent.com/nrwl/nx-console/master/static/victor_pic.jpg
+[jh]: https://raw.githubusercontent.com/nrwl/nx-console/master/static/jack_pic.jpg
 [fk]: https://avatars0.githubusercontent.com/u/17149942?s=150&v=4
 [kk]: https://avatars1.githubusercontent.com/u/8167190?s=150&v=4
 
@@ -76,6 +76,6 @@ The following folks from the Angular team at Google are working with the Nx Cons
 | ----------------- | -------------------- | --------------------- |
 | ![Alex Eagle][ae] | ![Stephen Fluin][sf] | ![Matias Niemelä][mn] |
 
-[ae]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/alex_eagle_pic.jpg
-[sf]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/stephen_pic.jpg
-[mn]: https://raw.githubusercontent.com/nrwl/angular-console/master/static/matias_pic.jpg
+[ae]: https://raw.githubusercontent.com/nrwl/nx-console/master/static/alex_eagle_pic.jpg
+[sf]: https://raw.githubusercontent.com/nrwl/nx-console/master/static/stephen_pic.jpg
+[mn]: https://raw.githubusercontent.com/nrwl/nx-console/master/static/matias_pic.jpg
