@@ -5,7 +5,7 @@
   "version": "11.1.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nrwl/angular-console.git"
+    "url": "https://github.com/nrwl/nx-console.git"
   },
   "author": {
     "name": "Narwhal Technologies Inc",
@@ -20,7 +20,7 @@
   },
   "homepage": "https://angularconsole.com/",
   "bugs": {
-    "url": "https://github.com/nrwl/angular-console/issues"
+    "url": "https://github.com/nrwl/nx-console/issues"
   },
   "license": "MIT",
   "engines": {
