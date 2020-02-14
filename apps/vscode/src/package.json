@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Nx Console",
   "description": "Nx Console for Visual Studio Code. The user interface app for the Angular CLI",
-  "version": "11.1.2",
+  "version": "11.1.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"
@@ -27,12 +27,11 @@
     "vscode": "^1.31.0"
   },
   "keywords": [
-    "Angular",
-    "Angular 2",
-    "Angular 8",
-    "CLI",
-    "Console",
-    "Nx"
+    "angular",
+    "react",
+    "cli",
+    "monorepo",
+    "nx"
   ],
   "categories": [
     "Other"
