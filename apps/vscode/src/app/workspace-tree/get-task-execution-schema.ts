@@ -47,7 +47,6 @@ export async function getTaskExecutionSchema(
         if (!validBuilder) {
           return;
         }
-
         return {
           // TODO: Verify architect package is in node_modules
           ...readArchitectDef(

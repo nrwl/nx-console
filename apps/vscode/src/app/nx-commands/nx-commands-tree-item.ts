@@ -1,7 +1,7 @@
 import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 import { join } from 'path';
 
-export class AffectedTreeItem extends TreeItem {
+export class NxCommandsTreeItem extends TreeItem {
   command = {
     title: this.affectedCommand,
     command: `nx.${this.affectedCommand.replace(':', '.')}`,

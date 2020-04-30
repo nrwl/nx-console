@@ -51,8 +51,7 @@ module.exports = {
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*-es5.js')}`,
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
-      ),
-      intellij: `node ${join('tools', 'scripts', 'intellij-package.js')}`
+      )
     },
     format: {
       default: 'nx format:write --base=upstream/master',

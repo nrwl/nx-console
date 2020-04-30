@@ -1,11 +1,8 @@
-import { EXTENSIONS } from '@nx-console/server';
-import { stream } from 'fast-glob';
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
   commands,
   ExtensionContext,
-  QuickPickItem,
   tasks,
   TreeView,
   window,
@@ -14,8 +11,8 @@ import {
 
 import { WorkspaceJsonTreeItem } from './app/workspace-json-tree/workspace-json-tree-item';
 import { WorkspaceJsonTreeProvider } from './app/workspace-json-tree/workspace-json-tree-provider';
-import { AffectedTreeItem } from './app/affected-tree/affected-tree-item';
-import { AffectedTreeProvider } from './app/affected-tree/affected-tree-provider';
+import { NxCommandsTreeItem } from './app/nx-commands/nx-commands-tree-item';
+import { NxCommandsTreeProvider } from './app/nx-commands/nx-commands-provider';
 import { registerCliTaskCommands } from './app/cli-task/cli-task-commands';
 import { CliTaskProvider } from './app/cli-task/cli-task-provider';
 import { getOutputChannel } from './app/output-channel';
@@ -37,7 +34,7 @@ import { registerNxCommands } from './app/nx-task/nx-task-commands';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
 let workspaceJsonTreeView: TreeView<WorkspaceJsonTreeItem>;
-let affectedTreeView: TreeView<AffectedTreeItem>;
+let affectedTreeView: TreeView<NxCommandsTreeItem>;
 
 let currentWorkspaceTreeProvider: WorkspaceTreeProvider;
 let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
@@ -76,27 +73,6 @@ export function activate(c: ExtensionContext) {
               return;
             }
           }
-          switch (workspaceTreeItem.route) {
-            case 'Add':
-              const extensions = Object.entries(EXTENSIONS).map(
-                ([label, description]): QuickPickItem => ({
-                  label,
-                  description
-                })
-              );
-              window.showQuickPick(extensions).then(selection => {
-                if (!selection) {
-                  return;
-                }
-
-                cliTaskProvider.executeTask({
-                  command: 'add',
-                  positional: selection.label,
-                  flags: []
-                });
-              });
-          }
-
           revealWebViewPanel({
             workspaceTreeItem,
             context,
@@ -110,11 +86,10 @@ export function activate(c: ExtensionContext) {
       commands.registerCommand(
         LOCATE_YOUR_WORKSPACE.command!.command,
         async () => {
-          return await locationWorkspaceDefinition();
+          return await manuallySelectWorkspaceDefinition();
         }
       )
     );
-
     const vscodeWorkspacePath =
       workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
@@ -142,27 +117,33 @@ export async function deactivate() {
 
 // -----------------------------------------------------------------------------
 
-function locationWorkspaceDefinition() {
-  return window
-    .showOpenDialog({
-      canSelectFolders: true,
-      canSelectFiles: false,
-      canSelectMany: false,
-      openLabel: 'Select workspace directory'
-    })
-    .then(value => {
-      if (value && value[0]) {
-        const selectedDirectory = value[0].fsPath;
-        return setWorkspace(
-          join(
-            selectedDirectory,
-            existsSync(join(selectedDirectory, 'angular.json'))
-              ? 'angular.json'
-              : 'workspace.json'
-          )
-        );
-      }
-    });
+function manuallySelectWorkspaceDefinition() {
+  if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
+    return window
+      .showOpenDialog({
+        canSelectFolders: true,
+        canSelectFiles: false,
+        canSelectMany: false,
+        openLabel: 'Select workspace directory'
+      })
+      .then(value => {
+        if (value && value[0]) {
+          const selectedDirectory = value[0].fsPath;
+          return setWorkspace(
+            join(
+              selectedDirectory,
+              existsSync(join(selectedDirectory, 'angular.json'))
+                ? 'angular.json'
+                : 'workspace.json'
+            )
+          );
+        }
+      });
+  } else {
+    window.showInformationMessage(
+      'Cannot select an Nx workspace when no folders are opened in the explorer'
+    );
+  }
 }
 
 function scanForWorkspace(vscodeWorkspacePath: string) {
@@ -178,22 +159,6 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
     }
     currentDirectory = dirname(currentDirectory);
   }
-
-  const childWorkspaceJsonStream = stream('**/{angular,workspace}.json', {
-    cwd: vscodeWorkspacePath,
-    deep: 3,
-    onlyFiles: true,
-    absolute: true,
-    stats: false
-  })
-    .on('data', (workspaceJsonPath: string) => {
-      childWorkspaceJsonStream.pause();
-
-      setWorkspace(workspaceJsonPath);
-    })
-    .on('end', () => {
-      currentWorkspaceTreeProvider.endScan();
-    });
 }
 
 async function setWorkspace(workspaceJsonPath: string) {
@@ -219,11 +184,11 @@ async function setWorkspace(workspaceJsonPath: string) {
     }) as TreeView<WorkspaceJsonTreeItem>;
     context.subscriptions.push(workspaceJsonTreeView);
 
-    const affectedTreeProvider = AffectedTreeProvider.create(context);
+    const affectedTreeProvider = NxCommandsTreeProvider.create(context);
 
-    affectedTreeView = window.createTreeView('nxAffected', {
+    affectedTreeView = window.createTreeView('nxCommands', {
       treeDataProvider: affectedTreeProvider
-    }) as TreeView<AffectedTreeItem>;
+    }) as TreeView<NxCommandsTreeItem>;
     context.subscriptions.push(affectedTreeView);
   } else {
     cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);

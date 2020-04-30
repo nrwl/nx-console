@@ -17,6 +17,7 @@
     "nx": "nx",
     "ng": "ng",
     "start": "nps",
+    "nps": "nps",
     "format": "nps format.write",
     "build-vs-code": "nps prepare.dev.vscode",
     "postinstall": "node ./tools/scripts/postinstall.js",

@@ -71,9 +71,15 @@ function selectCliCommandAndShowUi(command: string, extensionPath: string) {
     );
     return;
   }
-
+  const { validWorkspaceJson } = verifyWorkspace(
+    cliTaskProvider.getWorkspacePath()
+  );
+  if (!validWorkspaceJson) {
+    window.showErrorMessage('Invalid configuration file');
+    return;
+  }
   const workspaceTreeItem = new WorkspaceTreeItem(
-    workspacePath,
+    `${workspacePath}/workspace.json`,
     `${command[0].toUpperCase()}${command.slice(1)}` as WorkspaceRouteTitle,
     extensionPath
   );
@@ -136,7 +142,7 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
     return;
   }
 
-  const selection = await selectSchematic(workspacePath);
+  const selection = await selectSchematic(`${workspacePath}/workspace.json`);
   if (!selection) {
     return;
   }

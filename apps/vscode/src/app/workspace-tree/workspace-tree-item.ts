@@ -2,37 +2,34 @@ import { join } from 'path';
 import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 
 export type WorkspaceRouteTitle =
-  | 'Add'
-  | 'Build'
-  | 'E2e'
   | 'Generate'
-  | 'Lint'
   | 'Run'
+  | 'Build'
   | 'Serve'
   | 'Test'
+  | 'E2e'
+  | 'Lint'
   | 'Change workspace'
   | 'Select workspace';
 
 const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
-  ['Add', 'nx-cli.svg'],
-  ['Build', 'nx-cli.svg'],
-  ['E2e', 'nx-cli.svg'],
   ['Generate', 'nx-cli.svg'],
-  ['Lint', 'nx-cli.svg'],
   ['Run', 'nx-cli.svg'],
+  ['Build', 'nx-cli.svg'],
   ['Serve', 'nx-cli.svg'],
-  ['Test', 'nx-cli.svg']
+  ['Test', 'nx-cli.svg'],
+  ['E2e', 'nx-cli.svg'],
+  ['Lint', 'nx-cli.svg']
 ]);
 
 export const ROUTE_LIST: WorkspaceRouteTitle[] = [
-  'Add',
-  'Build',
-  'E2e',
   'Generate',
-  'Lint',
   'Run',
+  'Build',
   'Serve',
-  'Test'
+  'Test',
+  'E2e',
+  'Lint'
 ];
 
 export class WorkspaceTreeItem extends TreeItem {

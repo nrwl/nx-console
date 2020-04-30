@@ -30,6 +30,22 @@ export function registerNxCommands(
         )
     )
   );
+
+  context.subscriptions.push(
+    commands.registerCommand('nx.run-many', () => promptForRunMany())
+  );
+
+  context.subscriptions.push(
+    commands.registerCommand('nx.dep-graph', () => promptForDepGraph())
+  );
+
+  context.subscriptions.push(
+    commands.registerCommand('nx.list', () => promptForList())
+  );
+
+  context.subscriptions.push(
+    commands.registerCommand('nx.migrate', () => promptForMigrate())
+  );
 }
 
 async function promptForTarget(): Promise<string | undefined> {
@@ -104,6 +120,102 @@ const AFFECTED_OPTIONS: Option[] = [
     name: 'files',
     type: OptionType.Array,
     description: 'Manually specify changed files, delimited by commas'
+  },
+  {
+    name: 'skip-nx-cache',
+    type: OptionType.Boolean,
+    description:
+      'Rerun the tasks even when the results are available in the cache',
+    default: false
+  },
+  {
+    name: 'verbose',
+    type: OptionType.Boolean,
+    description: 'Print additional error stack trace on failure',
+    default: false
+  }
+].map(v => ({ ...v, aliases: [] }));
+
+const RUN_MANY_OPTIONS: Option[] = [
+  {
+    name: 'projects',
+    type: OptionType.Array,
+    description: 'Projects to run'
+  },
+  { name: 'all', type: OptionType.Boolean, description: 'All projects' },
+  {
+    name: 'parallel',
+    type: OptionType.Boolean,
+    description: 'Parallelize the command',
+    default: 'false'
+  },
+  {
+    name: 'maxParallel',
+    type: OptionType.Number,
+    description: 'Max number of parallel processes',
+    default: 3
+  },
+  {
+    name: 'only-failed',
+    type: OptionType.Boolean,
+    description: 'Isolate projects which previously failed',
+    default: 'false'
+  },
+  {
+    name: 'configuration',
+    type: OptionType.String,
+    description:
+      'This is the configuration to use when performing tasks on projects'
+  },
+  {
+    name: 'skip-nx-cache',
+    type: OptionType.Boolean,
+    description:
+      'Rerun the tasks even when the results are available in the cache',
+    default: false
+  },
+  {
+    name: 'with-deps',
+    type: OptionType.Boolean,
+    description:
+      'Include dependencies of specified projects when computing what to run',
+    default: false
+  },
+  {
+    name: 'exclude',
+    type: OptionType.String,
+    description: 'Exclude certain projects from being processed'
+  },
+  {
+    name: 'verbose',
+    type: OptionType.Boolean,
+    description: 'Print additional error stack trace on failure',
+    default: false
+  }
+].map(v => ({ ...v, aliases: [] }));
+
+const DEP_GRAPH_OPTIONS: Option[] = [
+  {
+    name: 'file',
+    type: OptionType.String,
+    description: 'output file (e.g. --file=output.json)'
+  },
+  {
+    name: 'filter',
+    type: OptionType.Array,
+    description:
+      'Use to limit the dependency graph to only show specific projects, list of projects delimited by commas.'
+  },
+  {
+    name: 'exclude',
+    type: OptionType.Array,
+    description:
+      'List of projects delimited by commas to exclude from the dependency graph.'
+  },
+  {
+    name: 'host',
+    type: OptionType.String,
+    description: 'Bind the dep graph server to a specific ip address.'
   }
 ].map(v => ({ ...v, aliases: [] }));
 
@@ -138,4 +250,72 @@ async function promptForAffectedFlags(target: string) {
     );
     tasks.executeTask(task);
   }
+}
+
+async function promptForRunMany() {
+  const telemetry = getTelemetry();
+  telemetry.featureUsed('affected-cli');
+
+  const target = await promptForTarget();
+  if (!target) {
+    return;
+  }
+
+  const flags = await selectFlags('run-many', RUN_MANY_OPTIONS, 'nx');
+
+  if (flags !== undefined) {
+    const task = NxTask.create(
+      {
+        command: 'run-many',
+        flags,
+        positional: `--target=${target}`
+      },
+      cliTaskProvider.getWorkspacePath()
+    );
+    tasks.executeTask(task);
+  }
+}
+
+async function promptForDepGraph() {
+  const telemetry = getTelemetry();
+  telemetry.featureUsed('affected-cli');
+
+  const flags = await selectFlags('dep-graph', DEP_GRAPH_OPTIONS, 'nx');
+
+  if (flags !== undefined) {
+    const task = NxTask.create(
+      {
+        command: 'dep-graph',
+        flags
+      },
+      cliTaskProvider.getWorkspacePath()
+    );
+    tasks.executeTask(task);
+  }
+}
+
+async function promptForList() {
+  const telemetry = getTelemetry();
+  telemetry.featureUsed('affected-cli');
+  const task = NxTask.create(
+    {
+      command: 'list',
+      flags: []
+    },
+    cliTaskProvider.getWorkspacePath()
+  );
+  tasks.executeTask(task);
+}
+
+async function promptForMigrate() {
+  const telemetry = getTelemetry();
+  telemetry.featureUsed('affected-cli');
+  const task = NxTask.create(
+    {
+      command: 'migrate',
+      flags: []
+    },
+    cliTaskProvider.getWorkspacePath()
+  );
+  tasks.executeTask(task);
 }
