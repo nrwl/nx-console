@@ -4,14 +4,13 @@
 
 # The UI for Nx
 
-[![Nx Console Website](https://img.shields.io/badge/Angular-Console-blue.png)](https://angularconsole.org/)
 [![License](https://img.shields.io/npm/l/@nrwl/schematics.png)](https://opensource.org/licenses/MIT)
 
 <hr>
 
 ### Spend less time looking up command line arguments and more time shipping incredible products.
 
-![](./static/vscode-screenshot.png)
+![](https://nx.dev/assets/content/shared/nx-console-screenshot.png)
 
 Nx transformed the Angular ecosystem. With it, you can get a full-stack application up and running in minutes, no need to figure out source maps, webpack, test runners. It all works out of the box. Nx also helps you enforce consistent development practices by generating components, services, and state management modules.
 
@@ -33,23 +32,17 @@ Nx Console does all that and more!
 
 For VSCode users, you can install the [Nx Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) from Marketplace.
 
-## True UI for Nx
+## True UI for Nxe
 
 Nx Console is an UI for Nx. It will work for any schematic or any architect commands. Nx Console does not have a specific UI for, say, generating a component. Instead, Nx Console does what the command-line version of Nx does--it analyzes the same meta information to create the needed UI. This means that anything you can do with Nx, you can do with Nx Console. After all, Nx Console is the UI for Nx.
 
 ## Useful for Both Experts and Beginners
 
-Even though we started building Nx Console as a tool for expert, we also aimed to make Nx Console a great tool for developers who are new to Angular or Nx. You can create projects, interact with your editor, run generators and commands, install extensions without ever touching the terminal or having to install any node packages globally. If you get a new laptop, you can install Nx Console and start building Angular apps. Also, Nx Console highlights the properties you are likely to use for build-in generators and commands . So if you haven't used the CLI, you don't get overwhelmed.
-
-## Great for Windows Users
-
-A lot of Windows users are terminal shy and cannot take full advantage of tools like Nx and [Nrwl Nx](http://nrwl.io/nx). By using Nx Console, Windows users can start using the powerful capabilities these tools provide via an easy-to-use UI. They can create new projects, generate components, build, test, deploy Angular apps without having to even open the terminal.
+Even though we started building Nx Console as a tool for expert, we also aimed to make Nx Console a great tool for developers who are new to Nx. You can create projects, interact with your editor, run generators and commands, install extensions without ever touching the terminal or having to install any node packages globally. If you get a new laptop, you can install Nx Console and start building apps. Also, Nx Console highlights the properties you are likely to use for build-in generators and commands . So if you haven't used the CLI, you don't get overwhelmed.
 
 # Learn More
 
-- [angularconsole.com](http://angularconsole.com) - the official site of the project
-- [Watch Nx Console 5-minute overview video by Angular Firebase folks](https://www.youtube.com/watch?time_continue=18&v=d2K2Cp8BJx0)
-- [Nx course by John Papa](https://www.pluralsight.com/courses/angular-cli) - Nx course by John Papa has a video on Nx Console
+- [nx.dev](http://nx.dev) - the official site of the project
 - [Learn more about the team at Nrwl](https://www.nrwl.io) - The team at Nrwl led the development of Nx Console, after working with many Enterprise clients.
 
 # Contribute

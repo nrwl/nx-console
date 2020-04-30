@@ -28,10 +28,8 @@ export class CliTaskProvider implements TaskProvider {
   constructor(private workspaceJsonPath: string) {
     cliTaskProvider = this;
 
-    tasks.onDidEndTaskProcess(e => {
-      if (e.execution === this.currentDryRun) {
-        this.currentDryRun = undefined;
-      }
+    tasks.onDidEndTaskProcess(() => {
+      this.currentDryRun = undefined;
       if (this.deferredDryRun) {
         this.executeTask(this.deferredDryRun);
         this.deferredDryRun = undefined;

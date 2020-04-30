@@ -80,7 +80,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         this.dryRunSubscription.unsubscribe();
         this.dryRunSubscription = undefined;
       }
-
       if (taskExecForm.architect.command === 'generate') {
         this.dryRunSubscription = taskExecForm.form.valueChanges
           .pipe(debounceTime(500))
@@ -321,6 +320,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       flags.push('--no-interactive');
       flags.push('--dry-run');
     }
+
     window.vscode.postMessage({
       command: architect.command,
       positional: architect.positional,

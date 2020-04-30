@@ -1,7 +1,7 @@
 {
   "name": "angular-console",
   "displayName": "Nx Console",
-  "description": "Nx Console for Visual Studio Code. The user interface app for the Angular CLI",
+  "description": "Nx Console for Visual Studio Code",
   "version": "11.1.3",
   "repository": {
     "type": "git",
@@ -78,6 +78,160 @@
           "when": "view == workspaceJson && viewItem == task",
           "group": "inline"
         }
+      ],
+      "commandPalette": [
+        {
+          "command": "ng.lint",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.build",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.e2e",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.generate",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.serve",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.test",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.lint.ui",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.build.ui",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.e2e.ui",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.serve.ui",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.test.ui",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.xi18n.ui",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.generate.ui",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "nx.lint",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.build",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.e2e",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.generate",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.serve",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.test",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.dep-graph",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.run-many",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected.test",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected.build",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected.e2e",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected.lint",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected.apps",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected.libs",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.affected.dep-graph",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.list",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.migrate",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.lint.ui",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.build.ui",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.e2e.ui",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.serve.ui",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.test.ui",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.xi18n.ui",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.generate.ui",
+          "when": "isNxWorkspace"
+        }
       ]
     },
     "commands": [
@@ -108,206 +262,192 @@
       {
         "category": "ng",
         "title": "lint",
-        "command": "ng.lint",
-        "when": "isAngularWorkspace"
+        "command": "ng.lint"
       },
       {
         "category": "ng",
         "title": "build",
-        "command": "ng.build",
-        "when": "isAngularWorkspace"
+        "command": "ng.build"
       },
       {
         "category": "ng",
         "title": "e2e",
-        "command": "ng.e2e",
-        "when": "isAngularWorkspace"
+        "command": "ng.e2e"
       },
       {
         "category": "ng",
         "title": "generate",
-        "command": "ng.generate",
-        "when": "isAngularWorkspace"
+        "command": "ng.generate"
       },
       {
         "category": "ng",
         "title": "serve",
-        "command": "ng.serve",
-        "when": "isAngularWorkspace"
+        "command": "ng.serve"
       },
       {
         "category": "ng",
         "title": "test",
-        "command": "ng.test",
-        "when": "isAngularWorkspace"
+        "command": "ng.test"
       },
       {
         "category": "ng",
         "title": "lint (ui)",
-        "command": "ng.lint.ui",
-        "when": "isAngularWorkspace"
+        "command": "ng.lint.ui"
       },
       {
         "category": "ng",
         "title": "build (ui)",
-        "command": "ng.build.ui",
-        "when": "isAngularWorkspace"
+        "command": "ng.build.ui"
       },
       {
         "category": "ng",
         "title": "e2e (ui)",
-        "command": "ng.e2e.ui",
-        "when": "isAngularWorkspace"
+        "command": "ng.e2e.ui"
       },
       {
         "category": "ng",
         "title": "serve (ui)",
-        "command": "ng.serve.ui",
-        "when": "isAngularWorkspace"
+        "command": "ng.serve.ui"
       },
       {
         "category": "ng",
         "title": "test (ui)",
-        "command": "ng.test.ui",
-        "when": "isAngularWorkspace"
+        "command": "ng.test.ui"
       },
       {
         "category": "ng",
         "title": "xi18n (ui)",
-        "command": "ng.xi18n.ui",
-        "when": "isAngularWorkspace"
+        "command": "ng.xi18n.ui"
       },
       {
         "category": "ng",
         "title": "generate (ui)",
-        "command": "ng.generate.ui",
-        "when": "isAngularWorkspace"
+        "command": "ng.generate.ui"
       },
       {
         "category": "nx",
         "title": "lint",
-        "command": "nx.lint",
-        "when": "isNxWorkspace"
+        "command": "nx.lint"
       },
       {
         "category": "nx",
         "title": "build",
-        "command": "nx.build",
-        "when": "isNxWorkspace"
+        "command": "nx.build"
       },
       {
         "category": "nx",
         "title": "e2e",
-        "command": "nx.e2e",
-        "when": "isNxWorkspace"
+        "command": "nx.e2e"
       },
       {
         "category": "nx",
         "title": "generate",
-        "command": "nx.generate",
-        "when": "isNxWorkspace"
+        "command": "nx.generate"
       },
       {
         "category": "nx",
         "title": "serve",
-        "command": "nx.serve",
-        "when": "isNxWorkspace"
+        "command": "nx.serve"
       },
       {
         "category": "nx",
         "title": "test",
-        "command": "nx.test",
-        "when": "isNxWorkspace"
+        "command": "nx.test"
+      },
+      {
+        "category": "nx",
+        "title": "dep-graph",
+        "command": "nx.dep-graph"
+      },
+      {
+        "category": "nx",
+        "title": "run-many",
+        "command": "nx.run-many"
       },
       {
         "category": "nx",
         "title": "affected",
-        "command": "nx.affected",
-        "when": "isNxWorkspace"
+        "command": "nx.affected"
       },
       {
         "category": "nx",
         "title": "affected test",
-        "command": "nx.affected.test",
-        "when": "isNxWorkspace"
+        "command": "nx.affected.test"
       },
       {
         "category": "nx",
         "title": "affected build",
-        "command": "nx.affected.build",
-        "when": "isNxWorkspace"
+        "command": "nx.affected.build"
       },
       {
         "category": "nx",
         "title": "affected e2e",
-        "command": "nx.affected.e2e",
-        "when": "isNxWorkspace"
+        "command": "nx.affected.e2e"
       },
       {
         "category": "nx",
         "title": "affected lint",
-        "command": "nx.affected.lint",
-        "when": "isNxWorkspace"
+        "command": "nx.affected.lint"
       },
       {
         "category": "nx",
         "title": "affected apps",
-        "command": "nx.affected.apps",
-        "when": "isNxWorkspace"
+        "command": "nx.affected.apps"
       },
       {
         "category": "nx",
         "title": "affected libs",
-        "command": "nx.affected.libs",
-        "when": "isNxWorkspace"
+        "command": "nx.affected.libs"
       },
       {
         "category": "nx",
         "title": "affected dep-graph",
-        "command": "nx.affected.dep-graph",
-        "when": "isNxWorkspace"
+        "command": "nx.affected.dep-graph"
+      },
+      {
+        "category": "nx",
+        "title": "list",
+        "command": "nx.list"
+      },
+      {
+        "category": "nx",
+        "title": "migrate",
+        "command": "nx.migrate"
       },
       {
         "category": "nx",
         "title": "lint (ui)",
-        "command": "nx.lint.ui",
-        "when": "isNxWorkspace"
+        "command": "nx.lint.ui"
       },
       {
         "category": "nx",
         "title": "build (ui)",
-        "command": "nx.build.ui",
-        "when": "isNxWorkspace"
+        "command": "nx.build.ui"
       },
       {
         "category": "nx",
         "title": "e2e (ui)",
-        "command": "nx.e2e.ui",
-        "when": "isNxWorkspace"
+        "command": "nx.e2e.ui"
       },
       {
         "category": "nx",
         "title": "serve (ui)",
-        "command": "nx.serve.ui",
-        "when": "isNxWorkspace"
+        "command": "nx.serve.ui"
       },
       {
         "category": "nx",
         "title": "test (ui)",
-        "command": "nx.test.ui",
-        "when": "isNxWorkspace"
+        "command": "nx.test.ui"
       },
       {
         "category": "nx",
         "title": "xi18n (ui)",
-        "command": "nx.xi18n.ui",
-        "when": "isNxWorkspace"
+        "command": "nx.xi18n.ui"
       },
       {
         "category": "nx",
         "title": "generate (ui)",
-        "command": "nx.generate.ui",
-        "when": "isNxWorkspace"
+        "command": "nx.generate.ui"
       }
     ],
     "configuration": {
@@ -405,11 +545,11 @@
       "nx-console": [
         {
           "id": "nxConsole",
-          "name": "UI"
+          "name": "Generate & Run Target"
         },
         {
-          "id": "nxAffected",
-          "name": "Nx Affected",
+          "id": "nxCommands",
+          "name": "Common Nx Commands",
           "when": "isNxWorkspace"
         },
         {

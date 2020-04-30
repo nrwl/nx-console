@@ -4,6 +4,47 @@ import { window } from 'vscode';
 import { workspaceJsonTreeProvider } from '../workspace-json-tree/workspace-json-tree-provider';
 import { getTelemetry } from '../telemetry';
 import { cliTaskProvider } from '../cli-task/cli-task-provider';
+import { OptionType } from '@angular/cli/models/interface';
+
+const RUN_ONE_OPTIONS = [
+  {
+    name: 'with-deps',
+    type: OptionType.Boolean,
+    description:
+      'Include dependencies of specified projects when computing what to run',
+    default: false
+  },
+  {
+    name: 'parallel',
+    type: OptionType.Boolean,
+    description: 'Parallelize the command',
+    default: 'false'
+  },
+  {
+    name: 'maxParallel',
+    type: OptionType.Number,
+    description: 'Max number of parallel processes',
+    default: 3
+  },
+  {
+    name: 'only-failed',
+    type: OptionType.Boolean,
+    description: 'Isolate projects which previously failed',
+    default: 'false'
+  },
+  {
+    name: 'skip-nx-cache',
+    type: OptionType.Boolean,
+    description:
+      'Rerun the tasks even when the results are available in the cache',
+    default: false
+  },
+  {
+    name: 'exclude',
+    type: OptionType.String,
+    description: 'Exclude certain projects from being processed'
+  }
+].map(v => ({ ...v, aliases: [] }));
 
 export async function verifyBuilderDefinition(
   project: string,
@@ -82,6 +123,6 @@ export async function verifyBuilderDefinition(
     validBuilder: true,
     builderName,
     configurations,
-    options
+    options: [...RUN_ONE_OPTIONS, ...options]
   };
 }
