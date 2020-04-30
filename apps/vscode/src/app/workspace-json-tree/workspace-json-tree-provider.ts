@@ -33,7 +33,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
 
     workspaceJsonTreeProvider = this;
 
-    commands.registerCommand('nxConsole.refreshWorkspaceJsonTree', () =>
+    commands.registerCommand('nxConsole.refreshNxProjectsTree', () =>
       this.refresh()
     );
 

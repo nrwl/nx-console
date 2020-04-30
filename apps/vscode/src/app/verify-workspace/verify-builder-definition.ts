@@ -5,6 +5,8 @@ import { workspaceJsonTreeProvider } from '../workspace-json-tree/workspace-json
 import { getTelemetry } from '../telemetry';
 import { cliTaskProvider } from '../cli-task/cli-task-provider';
 import { OptionType } from '@angular/cli/models/interface';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 const RUN_ONE_OPTIONS = [
   {
@@ -119,10 +121,13 @@ export async function verifyBuilderDefinition(
     };
   }
 
+  const isNxWorkspace = existsSync(
+    join(cliTaskProvider.getWorkspacePath(), 'nx.json')
+  );
   return {
     validBuilder: true,
     builderName,
     configurations,
-    options: [...RUN_ONE_OPTIONS, ...options]
+    options: isNxWorkspace ? [...RUN_ONE_OPTIONS, ...options] : options
   };
 }

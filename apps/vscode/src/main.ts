@@ -179,7 +179,7 @@ async function setWorkspace(workspaceJsonPath: string) {
       cliTaskProvider
     );
 
-    workspaceJsonTreeView = window.createTreeView('workspaceJson', {
+    workspaceJsonTreeView = window.createTreeView('nxProjects', {
       treeDataProvider: workspaceJsonTreeProvider
     }) as TreeView<WorkspaceJsonTreeItem>;
     context.subscriptions.push(workspaceJsonTreeView);

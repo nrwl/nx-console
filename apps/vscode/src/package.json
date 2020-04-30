@@ -47,13 +47,13 @@
     "menus": {
       "view/title": [
         {
-          "command": "nxConsole.refreshWorkspaceJsonTree",
+          "command": "nxConsole.refreshNxProjectsTree",
           "when": "view == nxConsoleJson",
           "group": "navigation"
         },
         {
-          "command": "nxConsole.refreshWorkspaceJsonTree",
-          "when": "view == workspaceJson",
+          "command": "nxConsole.refreshNxProjectsTree",
+          "when": "view == nxProjects",
           "group": "navigation"
         }
       ],
@@ -70,12 +70,12 @@
         },
         {
           "command": "nxConsole.revealInExplorer",
-          "when": "view == workspaceJson && viewItem == project",
+          "when": "view == nxProjects && viewItem == project",
           "group": "inline"
         },
         {
           "command": "nxConsole.runTask",
-          "when": "view == workspaceJson && viewItem == task",
+          "when": "view == nxProjects && viewItem == task",
           "group": "inline"
         }
       ],
@@ -236,7 +236,7 @@
     },
     "commands": [
       {
-        "command": "nxConsole.refreshWorkspaceJsonTree",
+        "command": "nxConsole.refreshNxProjectsTree",
         "title": "Refresh",
         "icon": {
           "light": "assets/refresh-light.svg",
@@ -553,8 +553,8 @@
           "when": "isNxWorkspace"
         },
         {
-          "id": "workspaceJson",
-          "name": "Workspace JSON",
+          "id": "nxProjects",
+          "name": "Projects",
           "when": "isNxWorkspace || isAngularWorkspace"
         }
       ]
