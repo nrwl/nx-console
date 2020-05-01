@@ -11,6 +11,7 @@ export function verifyWorkspace(
   validWorkspaceJson: boolean;
   json?: any;
   workspaceType: 'ng' | 'nx';
+  configuratoinFilePath: string;
 } {
   try {
     const workspaceJsonPath = join(workspacePath, 'workspace.json');
@@ -19,18 +20,20 @@ export function verifyWorkspace(
       return {
         validWorkspaceJson: true,
         json: readAndParseJson(workspaceJsonPath),
-        workspaceType: 'nx'
+        workspaceType: 'nx',
+        configuratoinFilePath: workspaceJsonPath
       };
     } else if (fileExistsSync(angularJsonPath)) {
       return {
         validWorkspaceJson: true,
         json: readAndParseJson(angularJsonPath),
-        workspaceType: 'ng'
+        workspaceType: 'ng',
+        configuratoinFilePath: angularJsonPath
       };
     } else {
       // Handles below along with other runtime errors.
       throw new Error(
-        `Could not find workspace.json in selected directory: ${workspacePath}`
+        `Could not find configuration file in selected directory: ${workspacePath}`
       );
     }
   } catch (e) {
@@ -47,6 +50,10 @@ export function verifyWorkspace(
     getTelemetry().exception(stringifiedError);
 
     // Default to nx workspace
-    return { validWorkspaceJson: false, workspaceType: 'nx' };
+    return {
+      validWorkspaceJson: false,
+      workspaceType: 'nx',
+      configuratoinFilePath: ''
+    };
   }
 }
