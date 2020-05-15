@@ -122,7 +122,10 @@ export async function getTaskExecutionSchema(
                 return;
               }
 
-              if (s.name === 'project') {
+              if (
+                s.name === 'project' ||
+                (s.$default && s.$default.$source === 'projectName')
+              ) {
                 s.enum = cliTaskProvider
                   .getProjectEntries()
                   .map(entry => entry[0])

@@ -166,6 +166,10 @@ export async function normalizeSchema(
       option.default = workspaceDefault;
     }
 
+    if (s.properties[option.name].$default) {
+      option.$default = s.properties[option.name].$default;
+    }
+
     if (requiredFields.has(option.name)) {
       option.required = true;
     }
