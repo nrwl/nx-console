@@ -25,6 +25,8 @@ export let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
 export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
   WorkspaceJsonTreeItem
 > {
+  loading = true;
+
   constructor(
     context: ExtensionContext,
     private readonly cliTaskProvider: CliTaskProvider
@@ -113,6 +115,15 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
   getChildren(
     parent?: WorkspaceJsonTreeItem
   ): ProviderResult<WorkspaceJsonTreeItem[]> {
+    if (this.loading) {
+      setTimeout(() => {
+        this.loading = false;
+        this.refresh();
+      });
+      return [
+        this.createWorkspaceJsonTreeItem({ project: 'Loading' }, 'Loading')
+      ];
+    }
     if (!parent) {
       const projects = this.cliTaskProvider.getProjectEntries();
       return projects.map(
