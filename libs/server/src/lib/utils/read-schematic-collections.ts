@@ -158,35 +158,42 @@ async function readCollectionSchematics(
     name: collectionName,
     schematics: [] as Schematic[]
   };
-  Object.entries(collectionJson.schematics).forEach(
-    async ([k, v]: [any, any]) => {
-      try {
-        if (canAdd(k, v)) {
-          const schematicSchema = readAndCacheJsonFile(
-            v.schema,
-            dirname(collectionPath)
-          );
-          const projectDefaults =
-            defaults && defaults[collectionName] && defaults[collectionName][k];
+  try {
+    Object.entries(collectionJson.schematics).forEach(
+      async ([k, v]: [any, any]) => {
+        try {
+          if (canAdd(k, v)) {
+            const schematicSchema = readAndCacheJsonFile(
+              v.schema,
+              dirname(collectionPath)
+            );
+            const projectDefaults =
+              defaults &&
+              defaults[collectionName] &&
+              defaults[collectionName][k];
 
-          schematicCollection.schematics.push({
-            name: k,
-            collection: collectionName,
-            options: await normalizeSchema(
-              schematicSchema.json,
-              projectDefaults
-            ),
-            description: v.description || ''
-          });
+            schematicCollection.schematics.push({
+              name: k,
+              collection: collectionName,
+              options: await normalizeSchema(
+                schematicSchema.json,
+                projectDefaults
+              ),
+              description: v.description || ''
+            });
+          }
+        } catch (e) {
+          console.error(e);
+          console.error(
+            `Invalid package.json for schematic ${collectionName}:${k}`
+          );
         }
-      } catch (e) {
-        console.error(e);
-        console.error(
-          `Invalid package.json for schematic ${collectionName}:${k}`
-        );
       }
-    }
-  );
+    );
+  } catch (e) {
+    console.error(e);
+    console.error(`Invalid package.json for schematic ${collectionName}`);
+  }
   return schematicCollection;
 }
 
