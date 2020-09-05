@@ -45,6 +45,13 @@
   },
   "contributes": {
     "menus": {
+      "explorer/context": [
+        {
+            "when": "isGenerateFromContextMenuEnabled",
+            "command": "nx.generate.ui.fileexplorer",
+            "group": "explorerContext"
+        }
+      ],
       "view/title": [
         {
           "command": "nxConsole.refreshNxProjectsTree",
@@ -448,6 +455,11 @@
         "category": "nx",
         "title": "generate (ui)",
         "command": "nx.generate.ui"
+      },
+      {
+        "category": "nx",
+        "title": "Nx generate (ui)",
+        "command": "nx.generate.ui.fileexplorer"
       }
     ],
     "configuration": {
@@ -462,6 +474,11 @@
           "type": "boolean",
           "default": false,
           "description": "Runs tasks using Node Version Manager"
+        },
+        "nxConsole.enableGenerateFromContextMenu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shows or hides Nx Generate ui option from the file explorer context menu."
         }
       }
     },

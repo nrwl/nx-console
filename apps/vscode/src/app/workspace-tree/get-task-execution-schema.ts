@@ -1,6 +1,6 @@
 import { TaskExecutionSchema } from '@nx-console/schema';
 import { readArchitectDef, readBuilderSchema } from '@nx-console/server';
-import { window } from 'vscode';
+import { window, Uri } from 'vscode';
 
 import { selectCliProject } from '../cli-task/cli-task-commands';
 import { CliTaskProvider } from '../cli-task/cli-task-provider';
@@ -14,7 +14,8 @@ import { WorkspaceRouteTitle } from './workspace-tree-item';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
-  workspaceRouteTitle: WorkspaceRouteTitle = 'Run'
+  workspaceRouteTitle: WorkspaceRouteTitle = 'Run',
+  contextMenuUri?: Uri | undefined
 ): Promise<TaskExecutionSchema | void> {
   try {
     if (!cliTaskProvider.getWorkspacePath()) {
@@ -130,7 +131,9 @@ export async function getTaskExecutionSchema(
               }
             });
 
-            return { ...schematic, cliName: workspaceType };
+            const contextValues = contextMenuUri ? getConfigValuesFromContextMenuUri(contextMenuUri, cliTaskProvider) : undefined;
+
+            return { ...schematic, cliName: workspaceType, contextValues };
           }
         );
     }
@@ -149,5 +152,18 @@ export async function getTaskExecutionSchema(
           getOutputChannel().show();
         }
       });
+  }
+}
+
+// Get information about where the user clicked if invoked through right click in the explorer context menu
+function getConfigValuesFromContextMenuUri(contextMenuUri: Uri | undefined, cliTaskProvider: CliTaskProvider): { path: string, project?: string } | undefined {
+  if (contextMenuUri) {
+    const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
+    const projectName = project && project.name || undefined;
+
+    return {
+      path: contextMenuUri.fsPath.replace(cliTaskProvider.getWorkspacePath(), '').replace(/\\/g, '/'),
+      project: projectName,
+    };
   }
 }

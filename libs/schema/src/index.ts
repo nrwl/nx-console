@@ -16,6 +16,7 @@ export interface TaskExecutionSchema {
   description: string;
   configurations?: ArchitectConfiguration[];
   options: Option[];
+  contextValues?: Record<string, string | number | boolean | undefined>;
 }
 
 export interface SchematicCollection {
