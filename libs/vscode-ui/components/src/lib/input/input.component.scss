@@ -7,11 +7,11 @@
 }
 
 input {
-  background-color: var(--vscode-settings-textInputBackground, #eee);
-  border-color: var(--vscode-settings-textInputBorder);
+  background-color: var(--vscode-input-background, #eee);
+  border-color: var(--vscode-input-foreground);
   border-style: solid;
   border-width: $input-border-width;
-  color: var(--vscode-settings-textInputForeground);
+  color: var(--vscode-input-foreground);
   box-sizing: border-box;
   font: inherit;
   padding: 0.3rem 0.5rem;
