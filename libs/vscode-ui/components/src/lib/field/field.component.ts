@@ -46,6 +46,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
 
   set value(value: string) {
     this._value = value;
+    this.control.setValue(value);
     this.onChange(this._value);
   }
 

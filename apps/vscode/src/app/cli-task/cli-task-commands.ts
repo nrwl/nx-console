@@ -1,4 +1,4 @@
-import { commands, ExtensionContext, window } from 'vscode';
+import { commands, ExtensionContext, window, Uri } from 'vscode';
 
 import { selectSchematic } from '../select-schematic';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
@@ -61,9 +61,12 @@ export function registerCliTaskCommands(
   commands.registerCommand(`nx.generate.ui`, () =>
     selectCliCommandAndShowUi('generate', context.extensionPath)
   );
+  commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) =>
+    selectCliCommandAndShowUi('generate', context.extensionPath, uri)
+  );
 }
 
-function selectCliCommandAndShowUi(command: string, extensionPath: string) {
+function selectCliCommandAndShowUi(command: string, extensionPath: string, uri?: Uri) {
   const workspacePath = cliTaskProvider.getWorkspacePath();
   if (!workspacePath) {
     window.showErrorMessage(
@@ -84,7 +87,7 @@ function selectCliCommandAndShowUi(command: string, extensionPath: string) {
     extensionPath
   );
 
-  commands.executeCommand('nxConsole.revealWebViewPanel', workspaceTreeItem);
+  commands.executeCommand('nxConsole.revealWebViewPanel', workspaceTreeItem, uri);
 }
 
 async function selectCliCommandAndPromptForFlags(command: string) {

@@ -252,7 +252,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       }
       taskExecForm.addControl(
         schema.name,
-        new FormControl(defaultValues[schema.name], validators)
+        new FormControl((architect.contextValues && architect.contextValues[schema.name]) || defaultValues[schema.name], validators)
       );
     });
 
@@ -277,6 +277,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       top: 0
     });
   }
+
 
   private getDefaultValuesForConfiguration(
     architect: TaskExecutionSchema,
