@@ -32,7 +32,7 @@ Nx Console does all that and more!
 
 For VSCode users, you can install the [Nx Console VSCode Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) from Marketplace.
 
-## True UI for Nxe
+## True UI for Nx
 
 Nx Console is an UI for Nx. It will work for any schematic or any architect commands. Nx Console does not have a specific UI for, say, generating a component. Instead, Nx Console does what the command-line version of Nx does--it analyzes the same meta information to create the needed UI. This means that anything you can do with Nx, you can do with Nx Console. After all, Nx Console is the UI for Nx.
 
