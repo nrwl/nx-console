@@ -22,4 +22,15 @@ export class SelectComponent {
   updateValue(updated: string): void {
     this.valueChange.emit(updated);
   }
+
+  getOptionTooltip(optionValue: string): string | null {
+    if (
+      this.field &&
+      this.field.itemTooltips &&
+      this.field.itemTooltips[optionValue]
+    ) {
+      return this.field.itemTooltips[optionValue];
+    }
+    return null;
+  }
 }

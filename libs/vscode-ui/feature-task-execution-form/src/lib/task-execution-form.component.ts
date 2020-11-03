@@ -252,7 +252,11 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       }
       taskExecForm.addControl(
         schema.name,
-        new FormControl((architect.contextValues && architect.contextValues[schema.name]) || defaultValues[schema.name], validators)
+        new FormControl(
+          (architect.contextValues && architect.contextValues[schema.name]) ||
+            defaultValues[schema.name],
+          validators
+        )
       );
     });
 
@@ -278,20 +282,22 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     });
   }
 
-
   private getDefaultValuesForConfiguration(
     architect: TaskExecutionSchema,
     configurationName?: string
   ) {
-    const defaultValues: { [key: string]: string } = {};
+    const defaultValues: { [key: string]: string | string[] } = {};
     architect.options.forEach(field => {
       if (field.default === undefined) {
         defaultValues[field.name] = '';
         return;
       }
-
-      defaultValues[field.name] =
-        String(field.default) || (field.type === 'boolean' ? 'false' : '');
+      if (Array.isArray(field.default)) {
+        defaultValues[field.name] = field.default.map(item => String(item));
+      } else {
+        defaultValues[field.name] =
+          String(field.default) || (field.type === 'boolean' ? 'false' : '');
+      }
     });
 
     if (configurationName && architect.configurations) {
@@ -349,7 +355,13 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       } else if (f.type === 'boolean') {
         args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else {
-        args.push(`--${f.name}=${sanitizeWhitespace(value[f.name])}`);
+        const fieldValue = value[f.name];
+        if (Array.isArray(fieldValue)) {
+          const values = fieldValue.map(v => sanitizeWhitespace(v));
+          args.push(`--${f.name}=${values.join(',')}`);
+        } else {
+          args.push(`--${f.name}=${sanitizeWhitespace(fieldValue)}`);
+        }
       }
     });
     return args;

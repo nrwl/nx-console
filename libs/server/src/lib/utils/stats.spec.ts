@@ -12,7 +12,7 @@ describe('stats utils', () => {
       expect(result.assets[0]).toEqual(
         expect.objectContaining({
           file: 'data.json',
-          sizes: { gzipped: 40, parsed: 20 }
+          sizes: { gzipped: 43, parsed: 23 }
         })
       );
 
@@ -31,7 +31,7 @@ describe('stats utils', () => {
       expect(result.modulesByBundle['no.sourcemap.js']).toEqual([
         {
           file: 'no.sourcemap.js',
-          size: 51,
+          size: 54,
           isDep: false
         }
       ]);

@@ -131,7 +131,12 @@ export async function getTaskExecutionSchema(
               }
             });
 
-            const contextValues = contextMenuUri ? getConfigValuesFromContextMenuUri(contextMenuUri, cliTaskProvider) : undefined;
+            const contextValues = contextMenuUri
+              ? getConfigValuesFromContextMenuUri(
+                  contextMenuUri,
+                  cliTaskProvider
+                )
+              : undefined;
 
             return { ...schematic, cliName: workspaceType, contextValues };
           }
@@ -156,14 +161,19 @@ export async function getTaskExecutionSchema(
 }
 
 // Get information about where the user clicked if invoked through right click in the explorer context menu
-function getConfigValuesFromContextMenuUri(contextMenuUri: Uri | undefined, cliTaskProvider: CliTaskProvider): { path: string, project?: string } | undefined {
+function getConfigValuesFromContextMenuUri(
+  contextMenuUri: Uri | undefined,
+  cliTaskProvider: CliTaskProvider
+): { path: string; project?: string } | undefined {
   if (contextMenuUri) {
     const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
-    const projectName = project && project.name || undefined;
+    const projectName = (project && project.name) || undefined;
 
     return {
-      path: contextMenuUri.fsPath.replace(cliTaskProvider.getWorkspacePath(), '').replace(/\\/g, '/'),
-      project: projectName,
+      path: contextMenuUri.fsPath
+        .replace(cliTaskProvider.getWorkspacePath(), '')
+        .replace(/\\/g, '/'),
+      project: projectName
     };
   }
 }

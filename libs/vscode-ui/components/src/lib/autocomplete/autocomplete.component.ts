@@ -149,8 +149,8 @@ export class AutocompleteComponent
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.field && this.field.enum) {
-      this._options$.next(this.field.enum.map(String));
+    if (changes.field && this.field.items) {
+      this._options$.next(this.field.items.map(String));
     }
   }
 

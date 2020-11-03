@@ -16,9 +16,6 @@
     "server": {
       "tags": []
     },
-    "vscode-ui-e2e": {
-      "tags": []
-    },
     "vscode-ui": {
       "tags": []
     },
@@ -30,6 +27,10 @@
     },
     "vscode-ui-styles": {
       "tags": []
+    },
+    "vscode-ui-feature-task-execution-form-e2e": {
+      "tags": [],
+      "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
     }
   }
 }

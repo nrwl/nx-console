@@ -13,8 +13,9 @@
 >
   <option *ngIf="!field.default" value="" [selected]="!value"></option>
   <option
-    *ngFor="let optionValue of field.enum"
+    *ngFor="let optionValue of field.items"
     [value]="optionValue"
+    [attr.title]="getOptionTooltip(optionValue)"
     [selected]="value === optionValue"
     >{{ optionValue }}</option
   >

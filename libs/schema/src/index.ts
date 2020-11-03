@@ -1,5 +1,36 @@
-import { Option } from '@angular/cli/models/interface';
-export { Option } from '@angular/cli/models/interface';
+import { Option as CliOption } from '@angular/cli/models/interface';
+
+export interface Option extends Omit<CliOption, 'default'> {
+  component?: OptionComponent;
+  tooltip?: string;
+  itemTooltips?: ItemTooltips;
+  items?: string[];
+  default?: string[] | string | number | boolean | undefined;
+}
+
+export interface ItemTooltips {
+  [itemValue: string]: string;
+}
+export enum OptionComponent {
+  Autocomplete = 'autocomplete',
+  Checkbox = 'checkBox',
+  Input = 'input',
+  Select = 'select',
+  MultiSelect = 'multiSelect'
+}
+
+export type XPrompt = string | LongFormXPrompt;
+export interface LongFormXPrompt {
+  message: string;
+  type: 'confirmation' | 'input' | 'list';
+  multiselect?: boolean;
+  items?: (string | OptionItemLabelValue)[];
+}
+
+export interface OptionItemLabelValue {
+  label: string;
+  value: string;
+}
 
 export interface TaskExecutionMessage {
   command: string;
@@ -54,5 +85,5 @@ export interface Architect {
   builder: string;
   description: string;
   configurations: ArchitectConfiguration[];
-  options: Option[];
+  options: CliOption[];
 }

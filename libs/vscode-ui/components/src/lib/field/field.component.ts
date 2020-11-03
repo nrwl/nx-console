@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/schema';
+import { Option, OptionComponent } from '@nx-console/schema';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -33,6 +33,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
   @Input() field: Option;
   _value: string;
   valueChangeSub: Subscription;
+  OptionComponent = OptionComponent;
 
   control = new FormControl('');
 

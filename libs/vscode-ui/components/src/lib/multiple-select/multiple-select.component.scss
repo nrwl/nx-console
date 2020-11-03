@@ -1,0 +1,18 @@
+@import 'variables';
+
+.description {
+  margin: 0 0 0.5rem 0;
+  user-select: text;
+  white-space: normal;
+}
+
+select {
+  background-color: var(--vscode-settings-dropdownBackground, #eee);
+  border-color: var(--vscode-settings-dropdownBorder);
+  border-radius: $input-border-radius-size;
+  box-sizing: border-box;
+  color: var(--vscode-settings-dropdownForeground);
+  font: inherit;
+  height: auto;
+  width: $input-width;
+}

@@ -16,6 +16,11 @@ When you want to update the extension with a new set of changes, go back to the 
 
 - Run `nps test` to run unit tests.
 
+### Running Storybook
+
+- Run `nps storybook` to launch the storybook instance
+- Run `nps storybook-e2e` to run the e2e tests on the storybook instance
+
 ## Submitting a PR
 
 Please follow the following guidelines:

@@ -75,6 +75,12 @@ module.exports = {
           'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc --fix'
       })
     },
+    storybook: {
+      default: 'ng run vscode-ui-feature-task-execution-form:storybook'
+    },
+    ['storybook-e2e']: {
+      default: 'ng run vscode-ui-feature-task-execution-form-e2e:e2e'
+    },
     test: {
       default: 'nx affected:test --all --parallel',
       affected: affected('test')

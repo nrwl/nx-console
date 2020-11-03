@@ -1,35 +1,38 @@
-<div class="field-title">
+<div class="field-title" [attr.title]="field.tooltip ? field.tooltip : null">
   {{ field.name }}
   <ng-container *ngIf="field.required">*</ng-container>
   <span class="deprecated-warning" *ngIf="field.deprecated">(deprecated)</span>
 </div>
 
-<ng-container *ngIf="field.enum && field.enum.length; else nonEnum">
+<ng-container [ngSwitch]="field.component">
   <nx-console-autocomplete
-    *ngIf="field.enum?.length > 10"
+    *ngSwitchCase="OptionComponent.Autocomplete"
     [field]="field"
     [formControl]="control"
   ></nx-console-autocomplete>
 
   <nx-console-select
-    *ngIf="field.enum?.length <= 10"
+    *ngSwitchCase="OptionComponent.Select"
+    multiple="true"
     [field]="field"
     [(value)]="value"
   ></nx-console-select>
+
+  <nx-console-multiple-select
+    [field]="field"
+    [(value)]="value"
+    *ngSwitchCase="OptionComponent.MultiSelect"
+  ></nx-console-multiple-select>
+
+  <nx-console-checkbox
+    *ngSwitchCase="OptionComponent.Checkbox"
+    [field]="field"
+    [(value)]="value"
+  ></nx-console-checkbox>
+
+  <nx-console-input
+    *ngSwitchCase="OptionComponent.Input"
+    [field]="field"
+    [(value)]="value"
+  ></nx-console-input>
 </ng-container>
-
-<ng-template #nonEnum>
-  <ng-container [ngSwitch]="field.type">
-    <nx-console-checkbox
-      *ngSwitchCase="'boolean'"
-      [field]="field"
-      [(value)]="value"
-    ></nx-console-checkbox>
-
-    <nx-console-input
-      *ngSwitchDefault
-      [field]="field"
-      [(value)]="value"
-    ></nx-console-input>
-  </ng-container>
-</ng-template>
