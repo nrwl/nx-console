@@ -12,7 +12,7 @@
 >
   <option *ngIf="!field.default" value="" [selected]="!value"></option>
   <option
-    *ngFor="let optionValue of field.items"
+    *ngFor="let optionValue of items"
     [value]="optionValue"
     [attr.title]="getOptionTooltip(optionValue)"
     >{{ optionValue }}</option

@@ -33,7 +33,7 @@ import {
   merge,
   of
 } from 'rxjs';
-import { Option } from '@nx-console/schema';
+import { ItemsWithEnum, Option } from '@nx-console/schema';
 
 export enum AutocompleteNavKeys {
   Enter = 'Enter',
@@ -149,9 +149,21 @@ export class AutocompleteComponent
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.field && this.field.items) {
-      this._options$.next(this.field.items.map(String));
+    if (changes.field) {
+      const items = changes.field.currentValue.items;
+      if (this.isItemsWithEnum(items)) {
+        this._options$.next(items.enum.map(String));
+      } else {
+        this._options$.next((items as string[]).map(String));
+      }
     }
+  }
+
+  private isItemsWithEnum(
+    items: string[] | ItemsWithEnum
+  ): items is ItemsWithEnum {
+    // tslint:disable-next-line: strict-type-predicates
+    return (items as ItemsWithEnum).enum !== undefined;
   }
 
   optionSelected(value: string) {

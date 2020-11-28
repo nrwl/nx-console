@@ -10,7 +10,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Option } from '@nx-console/schema';
+import { ItemsWithEnum, Option } from '@nx-console/schema';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -25,6 +25,8 @@ export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
   @Input() value: string[];
   @Output() readonly valueChange = new EventEmitter<string[]>();
   selectControl = new FormControl([]);
+  items: string[];
+
   private readonly subscriptioins = new Subscription();
 
   ngOnInit(): void {
@@ -33,6 +35,18 @@ export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
         this.valueChange.emit(value)
       )
     );
+    if (this.field.items) {
+      this.items = this.isItemsWithEnum(this.field.items)
+        ? this.field.items.enum
+        : this.field.items;
+    }
+  }
+
+  private isItemsWithEnum(
+    items: string[] | ItemsWithEnum
+  ): items is ItemsWithEnum {
+    // tslint:disable-next-line: strict-type-predicates
+    return (items as ItemsWithEnum).enum !== undefined;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -49,7 +49,7 @@ describe('utils', () => {
         enum: ['test']
       };
       const r = await getSchema([option]);
-      expect(r[0].items).toEqual([]);
+      expect(r[0].items).toEqual(['test']);
     });
 
     describe('fieldType', () => {
@@ -69,7 +69,7 @@ describe('utils', () => {
         const r = await getSchema([option]);
         expect(r[0].component).toBe(OptionComponent.Select);
       });
-      fit('should set field type as MultiSelect when x-prompt has options and multi is true', async () => {
+      it('should set field type as MultiSelect when x-prompt has options and multi is true', async () => {
         const xPrompt: LongFormXPrompt = {
           message: '',
           type: 'list',

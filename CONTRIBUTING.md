@@ -30,6 +30,7 @@ Run the following commands to make sure the linting and the tests pass.
 - `nps format.check`
 - `nps lint`
 - `nps test`
+- `nps storybook-e2e`
 
 If `nps format.check` fails, run `nps format`.
 

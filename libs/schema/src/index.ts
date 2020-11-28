@@ -1,16 +1,22 @@
-import { Option as CliOption } from '@angular/cli/models/interface';
+import { Option as CliOption, OptionType } from '@angular/cli/models/interface';
 
 export interface Option extends Omit<CliOption, 'default'> {
   component?: OptionComponent;
   tooltip?: string;
   itemTooltips?: ItemTooltips;
-  items?: string[];
+  items?: string[] | ItemsWithEnum;
   default?: string[] | string | number | boolean | undefined;
 }
 
 export interface ItemTooltips {
   [itemValue: string]: string;
 }
+
+export interface ItemsWithEnum {
+  enum: string[];
+  type: OptionType;
+}
+
 export enum OptionComponent {
   Autocomplete = 'autocomplete',
   Checkbox = 'checkBox',

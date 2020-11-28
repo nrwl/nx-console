@@ -74,6 +74,10 @@ const initialSchema: TaskExecutionSchema = {
       type: OptionType.Array,
       required: true,
       default: ['data-access', 'feature'],
+      items: {
+        enum: ['data-access', 'feature', 'shell', 'ui', 'util'],
+        type: OptionType.String
+      },
       aliases: ['l'],
       hidden: false,
       component: OptionComponent.MultiSelect,
@@ -86,8 +90,7 @@ const initialSchema: TaskExecutionSchema = {
         ui: 'ui - for dumb components',
         util:
           'util - for model files, constants, validators, pipes and any other miscellaneous items, e.g. shared functions.'
-      },
-      items: ['data-access', 'feature', 'shell', 'ui', 'util']
+      }
     },
     {
       name: 'style',
