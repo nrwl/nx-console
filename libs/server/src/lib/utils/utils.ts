@@ -1,11 +1,19 @@
 import { schema } from '@angular-devkit/core';
 import { standardFormats } from '@angular-devkit/schematics/src/formats';
-import { Option } from '@angular/cli/models/interface';
 import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import * as JSON5 from 'json5';
 import { platform } from 'os';
 import * as path from 'path';
+import {
+  OptionComponent,
+  Option,
+  XPrompt,
+  LongFormXPrompt,
+  ItemTooltips,
+  OptionItemLabelValue
+} from '@nx-console/schema';
+import { Option as CliOption, OptionType } from '@angular/cli/models/interface';
 
 export interface SchematicDefaults {
   [name: string]: string;
@@ -156,22 +164,46 @@ export async function normalizeSchema(
   },
   projectDefaults?: SchematicDefaults
 ): Promise<Option[]> {
-  const options = await parseJsonSchemaToOptions(registry, s);
+  const options: CliOption[] = await parseJsonSchemaToOptions(registry, s);
   const requiredFields = new Set(s.required || []);
 
-  options.forEach(option => {
-    const workspaceDefault = projectDefaults && projectDefaults[option.name];
+  const nxOptions = options.map(option => {
+    const xPrompt: XPrompt = s.properties[option.name]['x-prompt'];
+    const fieldType = getFieldType(option, xPrompt);
+    const nxOption: Option = {
+      ...option,
+      component: fieldType
+    };
+    if (option.enum) {
+      nxOption.items = option.enum.map(item => item.toString());
+    }
+    if (xPrompt) {
+      nxOption.tooltip = isLongFormXPrompt(xPrompt) ? xPrompt.message : xPrompt;
+      nxOption.itemTooltips = getEnumTooltips(xPrompt);
+      if (isLongFormXPrompt(xPrompt) && !nxOption.items) {
+        const items = (xPrompt.items || []).map(item =>
+          isOptionItemLabelValue(item) ? item.value : item
+        );
+        if (items.length > 0) {
+          nxOption.items = items;
+        }
+      }
+    }
+
+    const workspaceDefault = projectDefaults && projectDefaults[nxOption.name];
 
     if (workspaceDefault !== undefined) {
-      option.default = workspaceDefault;
+      nxOption.default = workspaceDefault;
     }
 
-    if (requiredFields.has(option.name)) {
-      option.required = true;
+    if (requiredFields.has(nxOption.name)) {
+      nxOption.required = true;
     }
+
+    return nxOption;
   });
 
-  return options.sort((a, b) => {
+  return nxOptions.sort((a, b) => {
     if (typeof a.positional === 'number' && typeof b.positional === 'number') {
       return a.positional - b.positional;
     }
@@ -201,6 +233,50 @@ export async function normalizeSchema(
       return a.name.localeCompare(b.name);
     }
   });
+}
+
+function getFieldType(option: CliOption, xPrompt: XPrompt): OptionComponent {
+  if (
+    !!xPrompt &&
+    isLongFormXPrompt(xPrompt) &&
+    xPrompt.type === 'list' &&
+    xPrompt.multiselect
+  ) {
+    return OptionComponent.MultiSelect;
+  }
+  if (option.enum) {
+    return option.enum.length > 10
+      ? OptionComponent.Autocomplete
+      : OptionComponent.Select;
+  } else if (option.type === OptionType.Boolean) {
+    return OptionComponent.Checkbox;
+  }
+  return OptionComponent.Input;
+}
+
+function isLongFormXPrompt(xPrompt: XPrompt): xPrompt is LongFormXPrompt {
+  return (xPrompt as Partial<LongFormXPrompt>).message !== undefined;
+}
+
+function getEnumTooltips(xPrompt: XPrompt): ItemTooltips {
+  const enumTooltips: ItemTooltips = {};
+  if (!!xPrompt && isLongFormXPrompt(xPrompt)) {
+    (xPrompt.items || []).forEach(item => {
+      if (isOptionItemLabelValue(item) && !!item.label) {
+        enumTooltips[item.value] = item.label;
+      }
+    });
+  }
+  return enumTooltips;
+}
+
+function isOptionItemLabelValue(
+  item: string | OptionItemLabelValue
+): item is OptionItemLabelValue {
+  return (
+    (item as Partial<OptionItemLabelValue>).value !== undefined ||
+    (item as Partial<OptionItemLabelValue>).label !== undefined
+  );
 }
 
 export function getPrimitiveValue(value: any): string | undefined {

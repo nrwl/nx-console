@@ -11,8 +11,8 @@
     role="textbox"
   />
 
-  <ng-container *ngIf="isFocused$ | async">
-    <ng-container *ngIf="visibleOptions | async as result">
+  <ng-container *ngIf="(isFocused$ | async)">
+    <ng-container *ngIf="(visibleOptions | async) as result">
       <div class="autocomplete-panel" role="listbox">
         <div
           *ngFor="let option of result; let i = index"

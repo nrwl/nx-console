@@ -1,0 +1,20 @@
+<div class="description">
+  {{ field.description }}
+</div>
+
+<select
+  [formControl]="selectControl"
+  multiple
+  role="combobox"
+  [id]="field.name"
+  [required]="field.required"
+  [disabled]="disabled"
+>
+  <option *ngIf="!field.default" value="" [selected]="!value"></option>
+  <option
+    *ngFor="let optionValue of items"
+    [value]="optionValue"
+    [attr.title]="getOptionTooltip(optionValue)"
+    >{{ optionValue }}</option
+  >
+</select>

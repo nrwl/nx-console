@@ -66,7 +66,11 @@ export function registerCliTaskCommands(
   );
 }
 
-function selectCliCommandAndShowUi(command: string, extensionPath: string, uri?: Uri) {
+function selectCliCommandAndShowUi(
+  command: string,
+  extensionPath: string,
+  uri?: Uri
+) {
   const workspacePath = cliTaskProvider.getWorkspacePath();
   if (!workspacePath) {
     window.showErrorMessage(
@@ -87,7 +91,11 @@ function selectCliCommandAndShowUi(command: string, extensionPath: string, uri?:
     extensionPath
   );
 
-  commands.executeCommand('nxConsole.revealWebViewPanel', workspaceTreeItem, uri);
+  commands.executeCommand(
+    'nxConsole.revealWebViewPanel',
+    workspaceTreeItem,
+    uri
+  );
 }
 
 async function selectCliCommandAndPromptForFlags(command: string) {

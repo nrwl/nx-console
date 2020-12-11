@@ -1,0 +1,12 @@
+{
+  "fileServerFolder": ".",
+  "integrationFolder": "./src/integration",
+  "pluginsFile": "./src/plugins/index",
+  "modifyObstructiveCode": false,
+  "supportFile": "./src/support/index.ts",
+  "video": true,
+  "videosFolder": "../../dist/cypress/apps/vscode-ui-feature-task-execution-form-e2e/videos",
+  "screenshotsFolder": "../../dist/cypress/apps/vscode-ui-feature-task-execution-form-e2e/screenshots",
+  "chromeWebSecurity": false,
+  "baseUrl": "http://localhost:4400"
+}

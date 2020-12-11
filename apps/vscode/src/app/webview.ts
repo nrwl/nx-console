@@ -36,12 +36,15 @@ export async function revealWebViewPanel({
   contextMenuUri
 }: RevealWebViewPanelConfig) {
   const { label } = workspaceTreeItem;
-  const schema = await getTaskExecutionSchema(cliTaskProvider, label, contextMenuUri);
+  const schema = await getTaskExecutionSchema(
+    cliTaskProvider,
+    label,
+    contextMenuUri
+  );
 
   if (!schema) {
     return;
   }
-
 
   const webViewPanel = createWebViewPanel(
     context,
@@ -59,7 +62,6 @@ export async function revealWebViewPanel({
 
   return webViewPanel;
 }
-
 
 export function createWebViewPanel(
   context: ExtensionContext,

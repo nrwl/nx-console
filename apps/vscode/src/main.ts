@@ -79,7 +79,7 @@ export function activate(c: ExtensionContext) {
             context,
             cliTaskProvider,
             workspaceTreeView,
-            contextMenuUri,
+            contextMenuUri
           });
         }
       )
@@ -199,8 +199,12 @@ async function setWorkspace(workspaceJsonPath: string) {
   const isNxWorkspace = existsSync(join(workspaceJsonPath, '..', 'nx.json'));
   const isAngularWorkspace = workspaceJsonPath.endsWith('angular.json');
   const store = VSCodeStorage.fromContext(context);
-  const enableGenerateFromContextMenuSetting = store.get('enableGenerateFromContextMenu');
-  const isGenerateFromContextMenuEnabled = enableGenerateFromContextMenuSetting && (isNxWorkspace || isAngularWorkspace);
+  const enableGenerateFromContextMenuSetting = store.get(
+    'enableGenerateFromContextMenu'
+  );
+  const isGenerateFromContextMenuEnabled =
+    enableGenerateFromContextMenuSetting &&
+    (isNxWorkspace || isAngularWorkspace);
 
   commands.executeCommand(
     'setContext',
@@ -208,7 +212,11 @@ async function setWorkspace(workspaceJsonPath: string) {
     isAngularWorkspace
   );
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
-  commands.executeCommand('setContext', 'isGenerateFromContextMenuEnabled', isGenerateFromContextMenuEnabled);
+  commands.executeCommand(
+    'setContext',
+    'isGenerateFromContextMenuEnabled',
+    isGenerateFromContextMenuEnabled
+  );
 
   currentWorkspaceTreeProvider.setWorkspaceJsonPath(workspaceJsonPath);
   workspaceJsonTreeProvider.setWorkspaceJsonPathh(workspaceJsonPath);
