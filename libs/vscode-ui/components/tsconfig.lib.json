@@ -20,8 +20,6 @@
     "src/test.ts",
     "**/*.spec.ts",
     "**/*.stories.ts",
-    "**/*.stories.ts",
-    "**/*.stories.ts",
     "**/*.stories.js"
   ]
 }
