@@ -19,7 +19,7 @@ export class WorkspaceJsonTreeItem extends TreeItem {
 
 export interface WorkspaceJsonLabel {
   project: string;
-  architect?: {
+  target?: {
     name: string;
     configuration?: string;
   };

@@ -11,11 +11,25 @@ export interface ArchitectDef {
   };
 }
 
+export interface ArchitectsDef {
+  [targetName: string]: ArchitectDef;
+}
+
+export interface TargetDef {
+  executor: string;
+  configurations?: {
+    [configuration: string]: {};
+  };
+}
+
+export interface TargetsDef {
+  [targetName: string]: TargetDef;
+}
+
 export interface ProjectDef {
   root: string;
-  architect?: {
-    [architectName: string]: ArchitectDef;
-  };
+  architect?: ArchitectsDef;
+  targets?: TargetsDef;
 }
 
 export interface NamedProject extends ProjectDef {

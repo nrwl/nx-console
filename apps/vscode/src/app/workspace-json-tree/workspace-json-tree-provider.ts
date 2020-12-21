@@ -62,13 +62,15 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
   getParent(
     element: WorkspaceJsonTreeItem
   ): WorkspaceJsonTreeItem | null | undefined {
-    const { project, architect } = element.workspaceJsonLabel;
+    const { project, target } = element.workspaceJsonLabel;
 
-    if (architect) {
-      if (architect.configuration) {
+    if (target) {
+      if (target && target.configuration) {
         return this.createWorkspaceJsonTreeItem(
-          { project, architect: { name: architect.name } },
-          architect.name
+          {
+            project, target: { name: target.name }
+          },
+          target.name
         );
       } else {
         return this.createWorkspaceJsonTreeItem({ project }, project);
@@ -95,7 +97,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
       command: 'nxConsole.editWorkspaceJson',
       arguments: [item]
     };
-    if (!workspaceJsonLabel.architect) {
+    if (!workspaceJsonLabel.target) {
       const projectDef = this.cliTaskProvider.getProjects()[
         workspaceJsonLabel.project
       ];
@@ -131,47 +133,49 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
           this.createWorkspaceJsonTreeItem(
             { project: name },
             name,
-            Boolean(def.architect)
+            Boolean(def.targets || def.architect)
           )
       );
     }
 
     const { workspaceJsonLabel } = parent;
-    const { architect, project } = workspaceJsonLabel;
+    const { target, project } = workspaceJsonLabel;
     const projectDef = this.cliTaskProvider.getProjects()[project];
 
     if (!projectDef) {
       return;
     }
 
-    if (!architect) {
-      if (projectDef.architect) {
-        return Object.keys(projectDef.architect).map(
+    if (!target) {
+      if (projectDef.targets || projectDef.architect) {
+        return Object.keys({...projectDef.targets, ...projectDef.architect}).map(
           (name): WorkspaceJsonTreeItem =>
             this.createWorkspaceJsonTreeItem(
-              { architect: { name }, project },
+              { target: { name }, project },
               name,
-              Boolean(projectDef.architect![name].configurations)
+              Boolean(
+                (projectDef.targets && projectDef.targets[name].configurations) ||
+                (projectDef.architect && projectDef.architect[name].configurations)
+              )
             )
         );
       }
     } else {
-      const { configuration } = architect;
+      const { configuration } = target;
 
-      if (configuration || !projectDef.architect) {
+      if (configuration || !(projectDef.targets || projectDef.architect)) {
         return;
       }
 
-      const configurations = projectDef.architect
-        ? projectDef.architect[architect.name].configurations
-        : undefined;
+      const configurations = target &&
+        (projectDef.targets![target.name]!.configurations || projectDef.architect![target.name]!.configurations);
       if (!configurations) {
         return;
       }
 
       return Object.keys(configurations).map(name => {
         const item = this.createWorkspaceJsonTreeItem(
-          { architect: { ...architect, configuration: name }, project },
+          { target: { ...target, configuration: name }, project },
           name
         );
 
@@ -182,14 +186,14 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
 
   private findLabel(
     document: TextDocument,
-    { project, architect }: WorkspaceJsonLabel
+    { project, target }: WorkspaceJsonLabel
   ): number {
     let scriptOffset = 0;
     let nestingLevel = 0;
     let inProjects = false;
     let inProject = false;
-    let inArchitects = false;
-    let inArchitect = false;
+    let inTargets = false;
+    let inTarget = false;
 
     const visitor: JSONVisitor = {
       onError() {
@@ -210,25 +214,25 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
           inProjects = true;
         } else if (inProjects && nestingLevel === 2 && property === project) {
           inProject = true;
-          if (!architect) {
+          if (!target) {
             scriptOffset = offset;
           }
         } else if (
           inProject &&
           nestingLevel === 3 &&
-          property === 'architect'
+          (property === 'targets' || property === 'architect')
         ) {
-          inArchitects = true;
-        } else if (inArchitects && architect) {
-          if (property === architect.name && nestingLevel === 4) {
-            inArchitect = true;
-            if (!architect.configuration) {
+          inTargets = true;
+        } else if (inTargets && target) {
+          if (property === target.name && nestingLevel === 4) {
+            inTarget = true;
+            if (!target.configuration) {
               scriptOffset = offset;
             }
           } else if (
-            inArchitect &&
+            inTarget &&
             nestingLevel === 6 &&
-            property === architect.configuration
+            property === target.configuration
           ) {
             scriptOffset = offset;
           }
@@ -241,18 +245,18 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
   }
 
   private async runTask(selection: WorkspaceJsonTreeItem) {
-    const { architect, project } = selection.workspaceJsonLabel;
-    if (!architect) {
+    const { target, project } = selection.workspaceJsonLabel;
+    if (!target) {
       return;
     }
 
     const flags = [];
-    if (architect.configuration) {
-      flags.push(`--configuration=${architect.configuration}`);
+    if (target.configuration) {
+      flags.push(`--configuration=${target.configuration}`);
     }
 
     this.cliTaskProvider.executeTask({
-      command: architect.name,
+      command: target.name,
       positional: project,
       flags
     });
