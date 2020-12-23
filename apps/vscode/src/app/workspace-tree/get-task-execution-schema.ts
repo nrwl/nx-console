@@ -1,5 +1,5 @@
 import { TaskExecutionSchema } from '@nx-console/schema';
-import { readArchitectDef, readBuilderSchema } from '@nx-console/server';
+import { readTargetDef, readBuilderSchema } from '@nx-console/server';
 import { window, Uri } from 'vscode';
 
 import { selectCliProject } from '../cli-task/cli-task-commands';
@@ -11,6 +11,7 @@ import { getTelemetry } from '../telemetry';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import { WorkspaceRouteTitle } from './workspace-tree-item';
+import { ArchitectDef, TargetDef } from '../cli-task/cli-task-definition';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
@@ -50,9 +51,9 @@ export async function getTaskExecutionSchema(
         }
         return {
           // TODO: Verify architect package is in node_modules
-          ...readArchitectDef(
+          ...readTargetDef(
             command,
-            selectedProject.architectDef,
+            selectedProject.targetDef,
             selectedProject.projectName
           ),
           options,
@@ -64,24 +65,24 @@ export async function getTaskExecutionSchema(
       case 'Run':
         const runnableItems = cliTaskProvider
           .getProjectEntries()
-          .filter(([_, { architect }]) => Boolean(architect))
-          .flatMap(([project, { architect }]) => ({ project, architect }))
-          .flatMap(({ project, architect }) => [
-            ...Object.entries(architect!).map(
-              ([architectName, architectDef]) => ({
+          .filter(([_, { architect, targets }]) => Boolean(architect || targets))
+          .flatMap(([project, { architect, targets }]) => ({ project, architect, targets }))
+          .flatMap(({ project, architect, targets }) => [
+            ...Object.entries({...architect, ...targets}).map(
+              ([targetName, targetDef]) => ({
                 project,
-                architectName,
-                architectDef
+                targetName,
+                targetDef
               })
             )
           ])
           .map(
-            ({ project, architectName, architectDef }) =>
+            ({ project, targetName, targetDef }) =>
               new CliTaskQuickPickItem(
                 project,
-                architectDef,
-                architectName,
-                `${project}:${architectName}`
+                targetDef,
+                targetName,
+                `${project}:${targetName}`
               )
           );
 
@@ -92,7 +93,7 @@ export async function getTaskExecutionSchema(
 
           const builderOptions = await readBuilderSchema(
             cliTaskProvider.getWorkspacePath(),
-            selection.architectDef.builder
+            (selection.targetDef as TargetDef).executor || (selection.targetDef as ArchitectDef).builder
           );
 
           if (!builderOptions) {
@@ -100,7 +101,7 @@ export async function getTaskExecutionSchema(
           }
 
           return {
-            ...readArchitectDef(
+            ...readTargetDef(
               command,
               selection.command,
               selection.projectName

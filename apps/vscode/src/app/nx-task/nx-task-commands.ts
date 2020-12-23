@@ -60,14 +60,14 @@ async function promptForTarget(): Promise<string | undefined> {
   const validTargets = Array.from(
     new Set(
       Object.entries<ProjectDef>(json.projects)
-        .map(([_, project]) => Object.keys(project.architect || {}))
+        .map(([_, project]) => Object.keys(project.targets || project.architect || {}))
         .flat()
     )
   ).sort();
 
   if (!validTargets.length) {
     window.showErrorMessage(
-      'None of your workspace projects have an architect command'
+      'None of your workspace projects have a target or architect command'
     );
     return;
   }

@@ -12,6 +12,7 @@ import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
+import { ProjectDef } from './cli-task-definition';
 const CLI_COMMAND_LIST = [
   'build',
   'deploy',
@@ -180,22 +181,22 @@ async function selectGeneratorAndPromptForFlags(workspacePath: string) {
 export function selectCliProject(command: string, json: any) {
   const items = cliTaskProvider
     .getProjectEntries(json)
-    .filter(([_, { architect }]) => Boolean(architect))
-    .flatMap(([project, { architect }]) => ({ project, architect }))
-    .filter(({ architect }) => Boolean(architect && architect[command]))
+    .filter(([_, { architect, targets }]) => Boolean(architect || targets))
+    .flatMap(([root, { architect, targets }]) => ({ root, architect, targets }))
+    .filter(({ architect, targets }) => Boolean((architect && architect[command]) || (targets && targets[command])))
     .map(
-      ({ project, architect }) =>
+      ({root, architect, targets}: ProjectDef) =>
         new CliTaskQuickPickItem(
-          project,
-          architect![command]!,
+          root,
+          targets![command]! || architect![command]!,
           command,
-          project
+          root
         )
     );
 
   if (!items.length) {
     window.showInformationMessage(
-      `No projects have an architect command for ${command}`
+      `No projects have a target or architect command for ${command}`
     );
 
     return;

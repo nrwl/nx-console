@@ -3,7 +3,8 @@ import {
   Project,
   Option,
   DefaultValue,
-  ArchitectConfiguration
+  Target,
+  TargetConfiguration
 } from '@nx-console/schema';
 import * as path from 'path';
 
@@ -20,38 +21,38 @@ export function readProjects(json: any): Project[] {
         name: key,
         root: value.root,
         projectType: value.projectType,
-        architect: readArchitect(key, value.architect)
+        target: readTarget(key, {...value.architect, ...value.targets})
       })
     )
     .sort((a, b) => a.root.localeCompare(b.root));
 }
 
-export function readArchitectDef(
-  architectName: string,
-  architectDef: any,
+export function readTargetDef(
+  targetName: string,
+  targetDef: any,
   project: string
-): Architect {
-  const configurations: ArchitectConfiguration[] = architectDef.configurations
-    ? Object.keys(architectDef.configurations).map(name => ({
+): Architect | Target {
+  const configurations: TargetConfiguration[] = targetDef.configurations
+    ? Object.keys(targetDef.configurations).map(name => ({
         name,
-        defaultValues: readDefaultValues(architectDef.configurations, name)
+        defaultValues: readDefaultValues(targetDef.configurations, name)
       }))
     : [];
 
   return {
     options: [],
     configurations,
-    name: architectName,
+    name: targetName,
     project,
-    description: architectDef.description || '',
-    builder: architectDef.builder
+    description: targetDef.description || '',
+    builder: targetDef.builder
   };
 }
 
-export function readArchitect(project: string, architect: any): Architect[] {
-  if (!architect) return [];
-  return Object.entries(architect).map(([key, value]: [string, any]) => {
-    return readArchitectDef(key, value, project);
+export function readTarget(project: string, target: any): (Architect | Target)[] {
+  if (!target) return [];
+  return Object.entries(target).map(([key, value]: [string, any]) => {
+    return readTargetDef(key, value, project);
   });
 }
 

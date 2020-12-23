@@ -44,7 +44,7 @@ export interface TaskExecutionMessage {
   flags: string[];
 }
 
-export interface TaskExecutionSchema {
+export interface ArchitectTaskExecutionSchema {
   name: string;
   command: string;
   positional: string;
@@ -56,12 +56,26 @@ export interface TaskExecutionSchema {
   contextValues?: Record<string, string | number | boolean | undefined>;
 }
 
-export interface SchematicCollection {
+export interface TargetTaskExecutionSchema {
   name: string;
-  schematics: Schematic[];
+  command: string;
+  positional: string;
+  cliName: 'nx' | 'ng';
+  executor?: string;
+  description: string;
+  configurations?: TargetConfiguration[];
+  options: Option[];
+  contextValues?: Record<string, string | number | boolean | undefined>;
 }
 
-export interface Schematic {
+export type TaskExecutionSchema = ArchitectTaskExecutionSchema | TargetTaskExecutionSchema;
+
+export interface GeneratorCollection {
+  name: string;
+  generators: Generator[];
+}
+
+export interface Generator {
   collection: string;
   name: string;
   description: string;
@@ -78,11 +92,13 @@ export interface ArchitectConfiguration {
   defaultValues: DefaultValue[];
 }
 
+export type TargetConfiguration = ArchitectConfiguration;
+
 export interface Project {
   name: string;
   root: string;
   projectType: string;
-  architect: Architect[];
+  target: (Architect | Target)[];
 }
 
 export interface Architect {
@@ -92,4 +108,13 @@ export interface Architect {
   description: string;
   configurations: ArchitectConfiguration[];
   options: CliOption[];
+}
+
+export interface Target {
+  name: string;
+  project: string;
+  executor: string;
+  description: string;
+  configurations: TargetConfiguration[];
+  options: Option[];
 }
