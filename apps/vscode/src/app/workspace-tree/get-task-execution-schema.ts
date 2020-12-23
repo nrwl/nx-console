@@ -1,5 +1,5 @@
 import { TaskExecutionSchema } from '@nx-console/schema';
-import { readTargetDef, readBuilderSchema } from '@nx-console/server';
+import { readTargetDef, readExecutorSchema } from '@nx-console/server';
 import { window, Uri } from 'vscode';
 
 import { selectCliProject } from '../cli-task/cli-task-commands';
@@ -9,7 +9,7 @@ import { getOutputChannel } from '../output-channel';
 import { selectGenerator } from '../select-generator';
 import { getTelemetry } from '../telemetry';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
-import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
+import { verifyExecutorDefinition } from '../verify-workspace/verify-executor-definition';
 import { WorkspaceRouteTitle } from './workspace-tree-item';
 import { ArchitectDef, TargetDef } from '../cli-task/cli-task-definition';
 
@@ -41,12 +41,12 @@ export async function getTaskExecutionSchema(
 
         if (!selectedProject) return;
 
-        const { validBuilder, options } = await verifyBuilderDefinition(
+        const { validExecutor, options } = await verifyExecutorDefinition(
           selectedProject.projectName,
           command,
           json
         );
-        if (!validBuilder) {
+        if (!validExecutor) {
           return;
         }
         return {
@@ -91,7 +91,7 @@ export async function getTaskExecutionSchema(
             return;
           }
 
-          const builderOptions = await readBuilderSchema(
+          const builderOptions = await readExecutorSchema(
             cliTaskProvider.getWorkspacePath(),
             (selection.targetDef as TargetDef).executor || (selection.targetDef as ArchitectDef).builder
           );

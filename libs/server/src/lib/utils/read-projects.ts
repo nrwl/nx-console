@@ -45,7 +45,7 @@ export function readTargetDef(
     name: targetName,
     project,
     description: targetDef.description || '',
-    builder: targetDef.builder
+    builder: targetDef.builder || targetDef.executor
   };
 }
 
@@ -66,27 +66,27 @@ function readDefaultValues(configurations: any, name: string): DefaultValue[] {
   );
 }
 
-export async function readBuilderSchema(
+export async function readExecutorSchema(
   basedir: string,
-  builder: string
+  executor: string
 ): Promise<Option[]> {
-  const [npmPackage, builderName] = builder.split(':');
+  const [npmPackage, executorName] = executor.split(':');
   const packageJson = readAndCacheJsonFile(
     path.join(npmPackage, 'package.json'),
     path.join(basedir, 'node_modules')
   );
-  const b = packageJson.json.builders;
-  const buildersPath = b.startsWith('.') ? b : `./${b}`;
-  const buildersJson = readAndCacheJsonFile(
-    buildersPath,
+  const e = packageJson.json.executors || packageJson.json.builders;
+  const executorsPath = e.startsWith('.') ? e : `./${e}`;
+  const executorsJson = readAndCacheJsonFile(
+    executorsPath,
     path.dirname(packageJson.path)
   );
 
-  const builderDef = buildersJson.json.builders[builderName];
-  const builderSchema = readAndCacheJsonFile(
-    builderDef.schema,
-    path.dirname(buildersJson.path)
+  const executorDef = executorsJson.json.builders[executorName];
+  const executorSchema = readAndCacheJsonFile(
+    executorDef.schema,
+    path.dirname(executorsJson.path)
   );
 
-  return await normalizeSchema(builderSchema.json);
+  return await normalizeSchema(executorSchema.json);
 }

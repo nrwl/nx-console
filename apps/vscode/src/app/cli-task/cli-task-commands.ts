@@ -2,7 +2,7 @@ import { commands, ExtensionContext, window, Uri } from 'vscode';
 
 import { selectGenerator } from '../select-generator';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
-import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
+import { verifyExecutorDefinition } from '../verify-workspace/verify-executor-definition';
 import {
   WorkspaceRouteTitle,
   WorkspaceTreeItem
@@ -111,12 +111,12 @@ async function selectCliCommandAndPromptForFlags(command: string) {
     return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
-  let { validBuilder, options, configurations } = await verifyBuilderDefinition(
+  let { validExecutor, options, configurations } = await verifyExecutorDefinition(
     selection.projectName,
     command,
     json
   );
-  if (!validBuilder) {
+  if (!validExecutor) {
     return;
   }
 

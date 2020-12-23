@@ -1,5 +1,5 @@
 import { Option } from '@nx-console/schema';
-import { readBuilderSchema } from '@nx-console/server';
+import { readExecutorSchema } from '@nx-console/server';
 import { window } from 'vscode';
 import { workspaceJsonTreeProvider } from '../workspace-json-tree/workspace-json-tree-provider';
 import { getTelemetry } from '../telemetry';
@@ -48,74 +48,74 @@ const RUN_ONE_OPTIONS = [
   }
 ].map(v => ({ ...v, aliases: [] }));
 
-export async function verifyBuilderDefinition(
+export async function verifyExecutorDefinition(
   project: string,
   command: string,
   workspaceJson: any
 ): Promise<{
-  validBuilder: boolean;
-  builderName: string;
+  validExecutor: boolean;
+  executorName: string;
   configurations: string[];
   options: Array<Option>;
 }> {
-  const projects = workspaceJson.projects || {};
+  const projects = workspaceJson.projects || {}; // TODO: projects is type any
   const projectDef = projects[project] || {};
-  const architectDef = projectDef.architect || {};
-  const commandDef = architectDef[command] || {};
+  const targetDef = projectDef.targets || projectDef.architect || {};
+  const commandDef = targetDef[command] || {};
   const configurations = Object.keys(commandDef.configurations || {});
-  const builderName = commandDef.builder;
+  const executorName = commandDef.executor || commandDef.builder;
 
-  if (!builderName) {
+  if (!executorName) {
     window
       .showErrorMessage(
-        `Please update ${project}'s ${command} definition to specify a builder.`,
+        `Please update ${project}'s ${command} definition to specify an executor or builder.`,
         'See definition'
       )
       .then(value => {
         if (value) {
           workspaceJsonTreeProvider.revealWorkspaceJsonLabel({
             project: project,
-            architect: {
+            target: {
               name: command
             }
           });
         }
       });
-    getTelemetry().exception('Builder part of architect definition not found');
+    getTelemetry().exception('Builder part of target or architect definition not found');
     return {
-      validBuilder: false,
+      validExecutor: false,
       configurations,
-      builderName: builderName,
+      executorName,
       options: []
     };
   }
 
-  const options = await readBuilderSchema(
+  const options = await readExecutorSchema(
     cliTaskProvider.getWorkspacePath(),
-    builderName
+    executorName
   );
 
   if (!options) {
     window
       .showErrorMessage(
-        `Builder specified for ${project} ${command} was not found in your node_modules. Check that specified builder is correct and has a corresponding entry in package.json`,
+        `Executor or builder specified for ${project} ${command} was not found in your node_modules. Check that specified executor or builder is correct and has a corresponding entry in package.json`,
         'Show definition'
       )
       .then(value => {
         if (value) {
           workspaceJsonTreeProvider.revealWorkspaceJsonLabel({
-            project: project,
-            architect: {
+            project,
+            target: {
               name: command
             }
           });
         }
       });
-    getTelemetry().exception('Specified builder not found in node_modules');
+    getTelemetry().exception('Specified executor or builder not found in node_modules');
 
     return {
-      validBuilder: false,
-      builderName,
+      validExecutor: false,
+      executorName,
       configurations,
       options: []
     };
@@ -125,8 +125,8 @@ export async function verifyBuilderDefinition(
     join(cliTaskProvider.getWorkspacePath(), 'nx.json')
   );
   return {
-    validBuilder: true,
-    builderName,
+    validExecutor: true,
+    executorName,
     configurations,
     options: isNxWorkspace ? [...RUN_ONE_OPTIONS, ...options] : options
   };
