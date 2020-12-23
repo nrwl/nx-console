@@ -6,7 +6,7 @@ import { selectCliProject } from '../cli-task/cli-task-commands';
 import { CliTaskProvider } from '../cli-task/cli-task-provider';
 import { CliTaskQuickPickItem } from '../cli-task/cli-task-quick-pick-item';
 import { getOutputChannel } from '../output-channel';
-import { selectSchematic } from '../select-schematic';
+import { selectGenerator } from '../select-generator';
 import { getTelemetry } from '../telemetry';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
@@ -112,13 +112,13 @@ export async function getTaskExecutionSchema(
           };
         });
       case 'Generate':
-        return selectSchematic(cliTaskProvider.getWorkspaceJsonPath()).then(
-          schematic => {
-            if (!schematic) {
+        return selectGenerator(cliTaskProvider.getWorkspaceJsonPath()).then(
+          generator => {
+            if (!generator) {
               return;
             }
 
-            schematic.options.forEach(s => {
+            generator.options.forEach(s => {
               if (s.enum) {
                 return;
               }
@@ -138,7 +138,7 @@ export async function getTaskExecutionSchema(
                 )
               : undefined;
 
-            return { ...schematic, cliName: workspaceType, contextValues };
+            return { ...generator, cliName: workspaceType, contextValues };
           }
         );
     }

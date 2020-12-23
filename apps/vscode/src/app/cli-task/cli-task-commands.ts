@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { selectSchematic } from '../select-schematic';
+import { selectGenerator } from '../select-generator';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import {
@@ -48,14 +48,14 @@ export function registerCliTaskCommands(
   });
 
   commands.registerCommand(`ng.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspacePath())
+    selectGeneratorAndPromptForFlags(n.getWorkspacePath())
   );
 
   commands.registerCommand(`ng.generate.ui`, () =>
     selectCliCommandAndShowUi('generate', context.extensionPath)
   );
   commands.registerCommand(`nx.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspacePath())
+    selectGeneratorAndPromptForFlags(n.getWorkspacePath())
   );
 
   commands.registerCommand(`nx.generate.ui`, () =>
@@ -146,7 +146,7 @@ async function selectCliCommandAndPromptForFlags(command: string) {
   }
 }
 
-async function selectSchematicAndPromptForFlags(workspacePath: string) {
+async function selectGeneratorAndPromptForFlags(workspacePath: string) {
   const {
     validWorkspaceJson,
     workspaceType,
@@ -157,7 +157,7 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
     return;
   }
 
-  const selection = await selectSchematic(configuratoinFilePath);
+  const selection = await selectGenerator(configurationFilePath);
   if (!selection) {
     return;
   }
