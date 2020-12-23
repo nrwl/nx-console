@@ -78,7 +78,7 @@ function selectCliCommandAndShowUi(
     );
     return;
   }
-  const { validWorkspaceJson, configuratoinFilePath } = verifyWorkspace(
+  const { validWorkspaceJson, configurationFilePath } = verifyWorkspace(
     cliTaskProvider.getWorkspacePath()
   );
   if (!validWorkspaceJson) {
@@ -86,7 +86,7 @@ function selectCliCommandAndShowUi(
     return;
   }
   const workspaceTreeItem = new WorkspaceTreeItem(
-    configuratoinFilePath,
+    configurationFilePath,
     `${command[0].toUpperCase()}${command.slice(1)}` as WorkspaceRouteTitle,
     extensionPath
   );
@@ -150,7 +150,7 @@ async function selectGeneratorAndPromptForFlags(workspacePath: string) {
   const {
     validWorkspaceJson,
     workspaceType,
-    configuratoinFilePath
+    configurationFilePath
   } = verifyWorkspace(workspacePath);
 
   if (!validWorkspaceJson) {

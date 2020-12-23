@@ -11,7 +11,7 @@ export function verifyWorkspace(
   validWorkspaceJson: boolean;
   json?: any;
   workspaceType: 'ng' | 'nx';
-  configuratoinFilePath: string;
+  configurationFilePath: string;
 } {
   try {
     const workspaceJsonPath = join(workspacePath, 'workspace.json');
@@ -21,14 +21,14 @@ export function verifyWorkspace(
         validWorkspaceJson: true,
         json: readAndParseJson(workspaceJsonPath),
         workspaceType: 'nx',
-        configuratoinFilePath: workspaceJsonPath
+        configurationFilePath: workspaceJsonPath
       };
     } else if (fileExistsSync(angularJsonPath)) {
       return {
         validWorkspaceJson: true,
         json: readAndParseJson(angularJsonPath),
         workspaceType: 'ng',
-        configuratoinFilePath: angularJsonPath
+        configurationFilePath: angularJsonPath
       };
     } else {
       // Handles below along with other runtime errors.
@@ -53,7 +53,7 @@ export function verifyWorkspace(
     return {
       validWorkspaceJson: false,
       workspaceType: 'nx',
-      configuratoinFilePath: ''
+      configurationFilePath: ''
     };
   }
 }
