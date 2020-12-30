@@ -290,3 +290,38 @@ export function getPrimitiveValue(value: any): string | undefined {
     return undefined;
   }
 }
+
+function renameProperty(obj: any, from: string, to: string) {
+  const copy = { ...obj };
+  Object.keys(obj).forEach((k) => {
+    delete obj[k];
+  });
+  Object.keys(copy).forEach((k) => {
+    if (k === from) {
+      obj[to] = copy[k];
+    } else {
+      obj[k] = copy[k];
+    }
+  });
+}
+
+export function toLegacyFormat(w: any) {
+  Object.values(w.projects || {}).forEach((project: any) => {
+    if (project.targets) {
+      renameProperty(project, 'targets', 'architect');
+    }
+    if (project.generators) {
+      renameProperty(project, 'generators', 'schematics');
+    }
+    Object.values(project.architect || {}).forEach((target: any) => {
+      if (target.executor) {
+        renameProperty(target, 'executor', 'builder');
+      }
+    });
+  });
+
+  if (w.generators) {
+    renameProperty(w, 'generators', 'schematics');
+  }
+  return w;
+}

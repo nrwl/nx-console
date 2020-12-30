@@ -10,6 +10,7 @@ import {
   readAndCacheJsonFile,
   readAndParseJson
 } from './utils';
+import { toLegacyFormat } from './utils';
 
 export async function readAllSchematicCollections(
   workspaceJsonPath: string,
@@ -32,7 +33,7 @@ export async function readAllSchematicCollections(
 }
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
-  const defaults = readAndParseJson(workspaceJsonPath).schematics || {};
+  const defaults = toLegacyFormat(readAndParseJson(workspaceJsonPath)).schematics || {};
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {

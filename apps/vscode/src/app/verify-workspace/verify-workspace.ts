@@ -1,4 +1,4 @@
-import { readAndParseJson, fileExistsSync } from '@nx-console/server';
+import { readAndParseJson, fileExistsSync, toLegacyFormat } from '@nx-console/server';
 import { window } from 'vscode';
 import { join } from 'path';
 
@@ -19,14 +19,14 @@ export function verifyWorkspace(
     if (fileExistsSync(workspaceJsonPath)) {
       return {
         validWorkspaceJson: true,
-        json: readAndParseJson(workspaceJsonPath),
+        json: toLegacyFormat(readAndParseJson(workspaceJsonPath)),
         workspaceType: 'nx',
         configuratoinFilePath: workspaceJsonPath
       };
     } else if (fileExistsSync(angularJsonPath)) {
       return {
         validWorkspaceJson: true,
-        json: readAndParseJson(angularJsonPath),
+        json: toLegacyFormat(readAndParseJson(angularJsonPath)),
         workspaceType: 'ng',
         configuratoinFilePath: angularJsonPath
       };

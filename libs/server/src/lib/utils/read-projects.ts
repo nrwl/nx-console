@@ -10,7 +10,8 @@ import * as path from 'path';
 import {
   getPrimitiveValue,
   normalizeSchema,
-  readAndCacheJsonFile
+  readAndCacheJsonFile,
+  toLegacyFormat
 } from '../utils/utils';
 
 export function readProjects(json: any): Project[] {
