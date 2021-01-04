@@ -292,15 +292,10 @@ export function getPrimitiveValue(value: any): string | undefined {
 }
 
 function renameProperty(obj: any, from: string, to: string) {
-  const copy = { ...obj };
   Object.keys(obj).forEach(k => {
-    delete obj[k];
-  });
-  Object.keys(copy).forEach(k => {
     if (k === from) {
-      obj[to] = copy[k];
-    } else {
-      obj[k] = copy[k];
+      obj[to] = obj[from];
+      delete obj[from];
     }
   });
 }
