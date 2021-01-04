@@ -67,8 +67,7 @@ async function readSchematicCollectionsFromNodeModules(
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
     try {
-      return !!readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir)
-        .json.schematics;
+      return !!toLegacyFormat(readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir).json).schematics;
     } catch (e) {
       if (
         e.message &&

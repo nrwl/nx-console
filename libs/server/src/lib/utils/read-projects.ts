@@ -75,7 +75,7 @@ export async function readBuilderSchema(
     path.join(npmPackage, 'package.json'),
     path.join(basedir, 'node_modules')
   );
-  const b = packageJson.json.builders;
+  const b = toLegacyFormat(packageJson.json).builders;
   const buildersPath = b.startsWith('.') ? b : `./${b}`;
   const buildersJson = readAndCacheJsonFile(
     buildersPath,
