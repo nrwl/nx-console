@@ -10,8 +10,7 @@ import * as path from 'path';
 import {
   getPrimitiveValue,
   normalizeSchema,
-  readAndCacheJsonFile,
-  toLegacyFormat
+  readAndCacheJsonFile
 } from '../utils/utils';
 
 export function readProjects(json: any): Project[] {
@@ -75,14 +74,14 @@ export async function readBuilderSchema(
     path.join(npmPackage, 'package.json'),
     path.join(basedir, 'node_modules')
   );
-  const b = toLegacyFormat(packageJson.json).builders;
+  const b = packageJson.json.builders || packageJson.json.executors;
   const buildersPath = b.startsWith('.') ? b : `./${b}`;
   const buildersJson = readAndCacheJsonFile(
     buildersPath,
     path.dirname(packageJson.path)
   );
 
-  const builderDef = toLegacyFormat(buildersJson.json).builders[builderName];
+  const builderDef = (buildersJson.json.builders || buildersJson.json.executors)[builderName];
   const builderSchema = readAndCacheJsonFile(
     builderDef.schema,
     path.dirname(buildersJson.path)

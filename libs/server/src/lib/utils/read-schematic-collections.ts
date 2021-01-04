@@ -10,7 +10,7 @@ import {
   readAndCacheJsonFile,
   readAndParseJson
 } from './utils';
-import { toLegacyFormat } from './utils';
+import { toLegacyWorkspaceFormat } from './utils';
 
 export async function readAllSchematicCollections(
   workspaceJsonPath: string,
@@ -34,7 +34,7 @@ export async function readAllSchematicCollections(
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
   const defaults =
-    toLegacyFormat(readAndParseJson(workspaceJsonPath)).schematics || {};
+    toLegacyWorkspaceFormat(readAndParseJson(workspaceJsonPath)).schematics || {};
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {
@@ -68,9 +68,8 @@ async function readSchematicCollectionsFromNodeModules(
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
     try {
-      return !!toLegacyFormat(
-        readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir).json
-      ).schematics;
+      const packageJson = readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir).json
+      return !!(packageJson.schematics || packageJson.generators);
     } catch (e) {
       if (
         e.message &&
@@ -105,7 +104,7 @@ async function readWorkspaceSchematicsCollection(
     return await readCollectionSchematics(
       collectionName,
       collection.path,
-      toLegacyFormat(collection.json)
+      collection.json
     );
   } else {
     const schematics: Schematic[] = await Promise.all(
@@ -136,13 +135,13 @@ async function readCollection(
       basedir
     );
     const collection = readAndCacheJsonFile(
-      toLegacyFormat(packageJson.json).schematics,
+      packageJson.json.schematics || packageJson.json.generators,
       dirname(packageJson.path)
     );
     return readCollectionSchematics(
       collectionName,
       collection.path,
-      toLegacyFormat(collection.json),
+      collection.json,
       defaults
     );
   } catch (e) {
@@ -162,7 +161,7 @@ async function readCollectionSchematics(
     schematics: [] as Schematic[]
   };
   try {
-    Object.entries(collectionJson.schematics).forEach(
+    Object.entries(collectionJson.schematics || collectionJson.generators).forEach(
       async ([k, v]: [any, any]) => {
         try {
           if (canAdd(k, v)) {

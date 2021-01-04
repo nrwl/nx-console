@@ -305,7 +305,7 @@ function renameProperty(obj: any, from: string, to: string) {
   });
 }
 
-export function toLegacyFormat(w: any) {
+export function toLegacyWorkspaceFormat(w: any) {
   Object.values(w.projects || {}).forEach((project: any) => {
     if (project.targets) {
       renameProperty(project, 'targets', 'architect');

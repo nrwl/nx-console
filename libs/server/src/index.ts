@@ -4,7 +4,7 @@ export { findClosestNg, findClosestNx } from './lib/utils/utils';
 
 export {
   readAndCacheJsonFile as readJsonFile,
-  toLegacyFormat
+  toLegacyWorkspaceFormat
 } from './lib/utils/utils';
 
 export { Telemetry } from './lib/telemetry';
