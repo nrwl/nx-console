@@ -82,7 +82,7 @@ export async function readBuilderSchema(
     path.dirname(packageJson.path)
   );
 
-  const builderDef = buildersJson.json.builders[builderName];
+  const builderDef = toLegacyFormat(buildersJson.json).builders[builderName];
   const builderSchema = readAndCacheJsonFile(
     builderDef.schema,
     path.dirname(buildersJson.path)
