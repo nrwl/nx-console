@@ -1,4 +1,8 @@
-import { readAndParseJson, fileExistsSync, toLegacyFormat } from '@nx-console/server';
+import {
+  readAndParseJson,
+  fileExistsSync,
+  toLegacyFormat
+} from '@nx-console/server';
 import { window } from 'vscode';
 import { join } from 'path';
 

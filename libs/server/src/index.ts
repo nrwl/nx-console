@@ -2,7 +2,10 @@ export { readAndParseJson, fileExistsSync } from './lib/utils/utils';
 
 export { findClosestNg, findClosestNx } from './lib/utils/utils';
 
-export { readAndCacheJsonFile as readJsonFile, toLegacyFormat } from './lib/utils/utils';
+export {
+  readAndCacheJsonFile as readJsonFile,
+  toLegacyFormat
+} from './lib/utils/utils';
 
 export { Telemetry } from './lib/telemetry';
 export * from './lib/extensions';

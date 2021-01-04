@@ -33,7 +33,8 @@ export async function readAllSchematicCollections(
 }
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
-  const defaults = toLegacyFormat(readAndParseJson(workspaceJsonPath)).schematics || {};
+  const defaults =
+    toLegacyFormat(readAndParseJson(workspaceJsonPath)).schematics || {};
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {
@@ -67,7 +68,9 @@ async function readSchematicCollectionsFromNodeModules(
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
     try {
-      return !!toLegacyFormat(readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir).json).schematics;
+      return !!toLegacyFormat(
+        readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir).json
+      ).schematics;
     } catch (e) {
       if (
         e.message &&
