@@ -102,7 +102,7 @@ async function readWorkspaceSchematicsCollection(
     return await readCollectionSchematics(
       collectionName,
       collection.path,
-      collection.json
+      toLegacyFormat(collection.json)
     );
   } else {
     const schematics: Schematic[] = await Promise.all(
@@ -133,13 +133,13 @@ async function readCollection(
       basedir
     );
     const collection = readAndCacheJsonFile(
-      packageJson.json.schematics,
+      toLegacyFormat(packageJson.json).schematics,
       dirname(packageJson.path)
     );
     return readCollectionSchematics(
       collectionName,
       collection.path,
-      collection.json,
+      toLegacyFormat(collection.json),
       defaults
     );
   } catch (e) {
