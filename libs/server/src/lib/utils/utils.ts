@@ -292,12 +292,8 @@ export function getPrimitiveValue(value: any): string | undefined {
 }
 
 function renameProperty(obj: any, from: string, to: string) {
-  Object.keys(obj).forEach(k => {
-    if (k === from) {
-      obj[to] = obj[from];
-      delete obj[from];
-    }
-  });
+  obj[to] = obj[from];
+  delete obj[from];
 }
 
 export function toLegacyWorkspaceFormat(w: any) {
