@@ -10,6 +10,7 @@ import {
   readAndCacheJsonFile,
   readAndParseJson
 } from './utils';
+import { toLegacyWorkspaceFormat } from './utils';
 
 export async function readAllSchematicCollections(
   workspaceJsonPath: string,
@@ -32,7 +33,9 @@ export async function readAllSchematicCollections(
 }
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
-  const defaults = readAndParseJson(workspaceJsonPath).schematics || {};
+  const defaults =
+    toLegacyWorkspaceFormat(readAndParseJson(workspaceJsonPath)).schematics ||
+    {};
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {
@@ -66,8 +69,11 @@ async function readSchematicCollectionsFromNodeModules(
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
   const schematicCollections = packages.filter(p => {
     try {
-      return !!readAndCacheJsonFile(join(p, 'package.json'), nodeModulesDir)
-        .json.schematics;
+      const packageJson = readAndCacheJsonFile(
+        join(p, 'package.json'),
+        nodeModulesDir
+      ).json;
+      return !!(packageJson.schematics || packageJson.generators);
     } catch (e) {
       if (
         e.message &&
@@ -133,7 +139,7 @@ async function readCollection(
       basedir
     );
     const collection = readAndCacheJsonFile(
-      packageJson.json.schematics,
+      packageJson.json.schematics || packageJson.json.generators,
       dirname(packageJson.path)
     );
     return readCollectionSchematics(
@@ -159,37 +165,35 @@ async function readCollectionSchematics(
     schematics: [] as Schematic[]
   };
   try {
-    Object.entries(collectionJson.schematics).forEach(
-      async ([k, v]: [any, any]) => {
-        try {
-          if (canAdd(k, v)) {
-            const schematicSchema = readAndCacheJsonFile(
-              v.schema,
-              dirname(collectionPath)
-            );
-            const projectDefaults =
-              defaults &&
-              defaults[collectionName] &&
-              defaults[collectionName][k];
-
-            schematicCollection.schematics.push({
-              name: k,
-              collection: collectionName,
-              options: await normalizeSchema(
-                schematicSchema.json,
-                projectDefaults
-              ),
-              description: v.description || ''
-            });
-          }
-        } catch (e) {
-          console.error(e);
-          console.error(
-            `Invalid package.json for schematic ${collectionName}:${k}`
+    Object.entries(
+      collectionJson.schematics || collectionJson.generators
+    ).forEach(async ([k, v]: [any, any]) => {
+      try {
+        if (canAdd(k, v)) {
+          const schematicSchema = readAndCacheJsonFile(
+            v.schema,
+            dirname(collectionPath)
           );
+          const projectDefaults =
+            defaults && defaults[collectionName] && defaults[collectionName][k];
+
+          schematicCollection.schematics.push({
+            name: k,
+            collection: collectionName,
+            options: await normalizeSchema(
+              schematicSchema.json,
+              projectDefaults
+            ),
+            description: v.description || ''
+          });
         }
+      } catch (e) {
+        console.error(e);
+        console.error(
+          `Invalid package.json for schematic ${collectionName}:${k}`
+        );
       }
-    );
+    });
   } catch (e) {
     console.error(e);
     console.error(`Invalid package.json for schematic ${collectionName}`);
