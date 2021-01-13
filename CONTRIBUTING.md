@@ -6,11 +6,16 @@ We would love for you to contribute to Nx Console! Read this document to see how
 
 We are trying to keep GitHub issues for bug reports and feature requests. Stack Overflow is a much better place to ask general questions about how to use Nx Console.
 
+## Prerequisites
+
+- Install yarn: https://classic.yarnpkg.com/en/docs/install
+- Run yarn install in the root directory
+
 ## Building the VSCode Plugin
 
 You can build the vscode extension and run it in development mode by opening up this repo in Visual Studio code and hitting the f5 function key. This will launch `nps prepare.dev.vscode` in the background and spawn an extension development host version of VSCode so that you can try out your code.
 
-When you want to update the extension with a new set of changes, go back to the editor you launched the extension host from and click the refresh button (its green and looks like a browser refresh icon).
+When you want to update the extension with a new set of changes, go back to the original editor you launched the extension host from and click the refresh button in the debug menubar (its green and looks like a browser refresh icon).
 
 ### Running Unit Tests
 
