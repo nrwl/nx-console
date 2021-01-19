@@ -1,7 +1,6 @@
 import { Schematic } from '@nx-console/schema';
 import { readAllSchematicCollections } from '@nx-console/server';
 import { QuickPickItem, window } from 'vscode';
-import { join } from 'path';
 
 export async function selectSchematic(workspaceJsonPath: string) {
   interface GenerateQuickPickItem extends QuickPickItem {
@@ -9,10 +8,7 @@ export async function selectSchematic(workspaceJsonPath: string) {
     schematic: Schematic;
   }
 
-  const schematics = (await readAllSchematicCollections(
-    workspaceJsonPath,
-    join('tools', 'schematics')
-  ))
+  const schematics = (await readAllSchematicCollections(workspaceJsonPath))
     .map(
       (c): GenerateQuickPickItem[] =>
         c.schematics.map(
