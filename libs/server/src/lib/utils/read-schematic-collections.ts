@@ -8,28 +8,45 @@ import {
   listOfUnnestedNpmPackages,
   normalizeSchema,
   readAndCacheJsonFile,
-  readAndParseJson
+  readAndParseJson,
+  toLegacyWorkspaceFormat
 } from './utils';
-import { toLegacyWorkspaceFormat } from './utils';
 
 export async function readAllSchematicCollections(
-  workspaceJsonPath: string,
-  workspaceSchematicsPath: string
+  workspaceJsonPath: string
 ): Promise<SchematicCollection[]> {
   const basedir = join(workspaceJsonPath, '..');
   let collections = await readSchematicCollectionsFromNodeModules(
     workspaceJsonPath
   );
-  if (directoryExists(join(basedir, workspaceSchematicsPath))) {
-    collections = [
-      await readWorkspaceSchematicsCollection(basedir, workspaceSchematicsPath),
-      ...collections
-    ];
-  }
+  collections = [
+    ...collections,
+    ...(await checkAndReadWorkspaceCollection(
+      basedir,
+      join('tools', 'schematics')
+    )),
+    ...(await checkAndReadWorkspaceCollection(
+      basedir,
+      join('tools', 'generators')
+    ))
+  ];
   return collections.filter(
     (collection): collection is SchematicCollection =>
       !!collection && collection!.schematics!.length > 0
   );
+}
+
+async function checkAndReadWorkspaceCollection(
+  basedir: string,
+  workspaceSchematicsPath: string
+) {
+  if (directoryExists(join(basedir, workspaceSchematicsPath))) {
+    return readWorkspaceSchematicsCollection(
+      basedir,
+      workspaceSchematicsPath
+    ).then(val => [val]);
+  }
+  return Promise.resolve([]);
 }
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
