@@ -35,7 +35,11 @@ import {
 } from 'rxjs/operators';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
-import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
+import {
+  TaskExecutionSchema,
+  TaskExecutionMessage,
+  ItemsWithEnum
+} from '@nx-console/schema';
 
 declare global {
   interface Window {
@@ -238,8 +242,12 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       if (schema.required) {
         validators.push(Validators.required);
       }
-      if (schema.enum) {
-        const validValueSet = new Set(schema.enum);
+      if (schema.enum || schema.items) {
+        const validValueSet = new Set(
+          schema.enum ||
+            (schema.items as ItemsWithEnum).enum ||
+            (schema.items as string[])
+        );
         validators.push(control => {
           if (!validValueSet.has(control.value)) {
             return {

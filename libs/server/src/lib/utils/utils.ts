@@ -235,7 +235,7 @@ export async function normalizeSchema(
   });
 }
 
-function getFieldType(option: CliOption, xPrompt: XPrompt): OptionComponent {
+function getFieldType(option: Option, xPrompt: XPrompt): OptionComponent {
   if (
     !!xPrompt &&
     isLongFormXPrompt(xPrompt) &&
@@ -244,8 +244,9 @@ function getFieldType(option: CliOption, xPrompt: XPrompt): OptionComponent {
   ) {
     return OptionComponent.MultiSelect;
   }
-  if (option.enum) {
-    return option.enum.length > 10
+  const values = option.enum || (xPrompt && (xPrompt as LongFormXPrompt).items);
+  if (values) {
+    return values.length > 10
       ? OptionComponent.Autocomplete
       : OptionComponent.Select;
   } else if (option.type === OptionType.Boolean) {
