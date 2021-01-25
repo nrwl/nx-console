@@ -93,3 +93,5 @@ export interface Architect {
   configurations: ArchitectConfiguration[];
   options: CliOption[];
 }
+
+export const WORKSPACE_GENERATOR_NAME_REGEX = /^workspace-(schematic|generator):(.+)/;
