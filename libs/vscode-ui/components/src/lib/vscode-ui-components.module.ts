@@ -8,6 +8,7 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
 import { FieldComponent } from './field/field.component';
 import { FieldTreeComponent } from './field-tree/field-tree.component';
 import { MultipleSelectComponent } from './multiple-select/multiple-select.component';
+import { FormatTaskPipe } from './format-task/format-task.pipe';
 
 @NgModule({
   imports: [CommonModule, ReactiveFormsModule],
@@ -18,7 +19,8 @@ import { MultipleSelectComponent } from './multiple-select/multiple-select.compo
     CheckboxComponent,
     FieldComponent,
     FieldTreeComponent,
-    MultipleSelectComponent
+    MultipleSelectComponent,
+    FormatTaskPipe
   ],
   exports: [
     AutocompleteComponent,
@@ -27,7 +29,8 @@ import { MultipleSelectComponent } from './multiple-select/multiple-select.compo
     CheckboxComponent,
     FieldComponent,
     FieldTreeComponent,
-    MultipleSelectComponent
+    MultipleSelectComponent,
+    FormatTaskPipe
   ]
 })
 export class VscodeUiComponentsModule {}
