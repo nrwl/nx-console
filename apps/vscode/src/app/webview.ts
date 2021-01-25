@@ -6,15 +6,13 @@ import {
   Uri,
   ViewColumn,
   WebviewPanel,
-  window,
-  tasks
+  window
 } from 'vscode';
 
 import { CliTaskProvider } from './cli-task/cli-task-provider';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
 import { getTelemetry } from './telemetry';
-import { NxTask } from './cli-task/nx-task';
 import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
 
 let webviewPanel: WebviewPanel | undefined;
@@ -92,30 +90,8 @@ export function createWebViewPanel(
 
     webviewPanel.webview.html = getIframeHtml(context, schema);
 
-    webviewPanel.webview.onDidReceiveMessage(
-      (message: TaskExecutionMessage) => {
-        if (
-          message.command === 'generate' &&
-          message.positional.startsWith('workspace-schematic:')
-        ) {
-          tasks.executeTask(
-            NxTask.create(
-              {
-                command: 'workspace-schematic',
-                positional: message.positional.replace(
-                  'workspace-schematic:',
-                  ''
-                ),
-                flags: message.flags
-              },
-              cliTaskProvider.getWorkspacePath()
-            )
-          );
-          return;
-        }
-
-        cliTaskProvider.executeTask(message);
-      }
+    webviewPanel.webview.onDidReceiveMessage((message: TaskExecutionMessage) =>
+      cliTaskProvider.executeTask(message)
     );
   }
 

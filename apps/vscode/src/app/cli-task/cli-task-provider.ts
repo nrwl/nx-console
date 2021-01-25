@@ -18,6 +18,8 @@ import {
   Projects,
   WorkspaceJson
 } from './cli-task-definition';
+import { NxTask } from './nx-task';
+import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/schema';
 
 export let cliTaskProvider: CliTaskProvider;
 
@@ -88,7 +90,26 @@ export class CliTaskProvider implements TaskProvider {
       return;
     }
 
-    const task = this.createTask(definition);
+    let task;
+    const positionals = definition.positional.match(
+      WORKSPACE_GENERATOR_NAME_REGEX
+    );
+    if (
+      definition.command === 'generate' &&
+      positionals &&
+      positionals.length > 2
+    ) {
+      task = NxTask.create(
+        {
+          command: `workspace-${positionals[1]}`,
+          positional: positionals[2],
+          flags: definition.flags
+        },
+        cliTaskProvider.getWorkspacePath()
+      );
+    } else {
+      task = this.createTask(definition);
+    }
 
     const telemetry = getTelemetry();
     telemetry.featureUsed(definition.command);
