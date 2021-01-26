@@ -1,9 +1,0 @@
-steps:
-  - script: npx nx format:check --base=origin/master
-    displayName: 'format'
-
-  - script: npx nps lint
-    displayName: 'lint'
-
-  - script: npx nx affected:test --base=origin/master --ci
-    displayName: 'test'
