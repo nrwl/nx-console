@@ -84,24 +84,24 @@ describe('utils', () => {
       });
       it('should set field type as Select when x-prompt has long form options', async () => {
         const xPrompt: LongFormXPrompt = {
-          "message": "This is the x-prompt message",
-          "type": "list",
-          "items": [
+          message: 'This is the x-prompt message',
+          type: 'list',
+          items: [
             {
-              "value": "css",
-              "label": "CSS"
+              value: 'css',
+              label: 'CSS'
             },
             {
-              "value": "scss",
-              "label": "SASS(.scss)  [ http://sass-lang.com   ]"
+              value: 'scss',
+              label: 'SASS(.scss)  [ http://sass-lang.com   ]'
             },
             {
-              "value": "styl",
-              "label": "Stylus(.styl)[ http://stylus-lang.com ]"
+              value: 'styl',
+              label: 'Stylus(.styl)[ http://stylus-lang.com ]'
             },
             {
-              "value": "less",
-              "label": "LESS         [ http://lesscss.org     ]"
+              value: 'less',
+              label: 'LESS         [ http://lesscss.org     ]'
             }
           ]
         };
