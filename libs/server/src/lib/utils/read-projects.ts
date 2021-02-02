@@ -20,7 +20,7 @@ export function readProjects(json: any): Project[] {
         name: key,
         root: value.root,
         projectType: value.projectType,
-        architect: readArchitect(key, value.architect)
+        architect: readArchitect(key, value.architect || value.targets)
       })
     )
     .sort((a, b) => a.root.localeCompare(b.root));
