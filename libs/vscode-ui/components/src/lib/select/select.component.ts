@@ -16,7 +16,6 @@ import { Option } from '@nx-console/schema';
 })
 export class SelectComponent {
   @Input() field: Option;
-  @Input() disabled = false;
   @Input() value: string;
   @Output() readonly valueChange = new EventEmitter<string>();
   parentFormGroup: FormGroup;

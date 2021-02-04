@@ -10,7 +10,6 @@
     [value]="value"
     [id]="field.name"
     [required]="field.required"
-    [disabled]="disabled"
     [formControlName]="field.name"
   >
     <option *ngIf="!field.default" value="" [selected]="!value"></option>

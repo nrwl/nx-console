@@ -21,7 +21,6 @@ import { Subscription } from 'rxjs';
 })
 export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
   @Input() field: Option;
-  @Input() disabled = false;
   @Input() value: string[];
   @Output() readonly valueChange = new EventEmitter<string[]>();
   selectControl = new FormControl([]);
