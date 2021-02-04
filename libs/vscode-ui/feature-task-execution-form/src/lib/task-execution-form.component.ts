@@ -331,8 +331,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     dryRun?: boolean;
   }) {
     const flags = this.serializeArgs(form.value, architect);
+    flags.push('--no-interactive');
     if (dryRun) {
-      flags.push('--no-interactive');
       flags.push('--dry-run');
     }
 
