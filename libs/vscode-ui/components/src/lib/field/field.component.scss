@@ -24,4 +24,9 @@
     margin-top: 9px;
     display: flex;
   }
+
+  .validation-error {
+    margin-top: 0.5rem;
+    color: $error-text-color;
+  }
 }

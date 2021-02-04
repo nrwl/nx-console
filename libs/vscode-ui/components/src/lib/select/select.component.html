@@ -2,21 +2,24 @@
   {{ field.description }}
 </div>
 
-<select
-  #selectControl
-  (change)="updateValue($event.target.value)"
-  role="combobox"
-  [value]="value"
-  [id]="field.name"
-  [required]="field.required"
-  [disabled]="disabled"
->
-  <option *ngIf="!field.default" value="" [selected]="!value"></option>
-  <option
-    *ngFor="let optionValue of field.items"
-    [value]="optionValue"
-    [attr.title]="getOptionTooltip(optionValue)"
-    [selected]="value === optionValue"
-    >{{ optionValue }}</option
+<div [formGroup]="parentFormGroup">
+  <select
+    #selectControl
+    (change)="updateValue($event.target.value)"
+    role="combobox"
+    [value]="value"
+    [id]="field.name"
+    [required]="field.required"
+    [disabled]="disabled"
+    [formControlName]="field.name"
   >
-</select>
+    <option *ngIf="!field.default" value="" [selected]="!value"></option>
+    <option
+      *ngFor="let optionValue of field.items"
+      [value]="optionValue"
+      [attr.title]="getOptionTooltip(optionValue)"
+      [selected]="value === optionValue"
+      >{{ optionValue }}</option
+    >
+  </select>
+</div>

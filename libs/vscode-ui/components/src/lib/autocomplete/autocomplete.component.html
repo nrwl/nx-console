@@ -2,7 +2,7 @@
   {{ field.description }}
 </div>
 
-<div class="autocomplete-container">
+<div class="autocomplete-container" [formGroup]="parentFormGroup">
   <input
     #textInput
     [formControl]="control"

@@ -8,9 +8,11 @@ import {
   OnDestroy
 } from '@angular/core';
 import {
+  ControlContainer,
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
-  FormControl
+  FormControl,
+  FormGroup
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -36,6 +38,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
   OptionComponent = OptionComponent;
 
   control = new FormControl('');
+  parentFormGroup: FormGroup;
 
   disabled = false;
   onChange: any = () => {};
@@ -70,10 +73,11 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     this.disabled = isDisabled;
   }
 
-  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {
+  constructor(private readonly changeDetectorRef: ChangeDetectorRef, private controlContainer: ControlContainer) {
     this.valueChangeSub = this.control.valueChanges.subscribe(value => {
       this.value = value;
     });
+    this.parentFormGroup = this.controlContainer.control as FormGroup;
   }
 
   camelToTitle(camelCase: string) {
@@ -83,5 +87,31 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
 
   ngOnDestroy(): void {
     this.valueChangeSub.unsubscribe();
+  }
+
+  hasErrors(fieldName: string): boolean {
+    const control = this.parentFormGroup.get(fieldName) as FormControl;
+    if (!control) {
+      return false;
+    }
+
+    return !!control.errors && (control.touched || control.dirty);
+  }
+
+  getErrors(fieldName: string): string[] {
+    const control = this.parentFormGroup.get(fieldName) as FormControl;
+    if (!control || !this.hasErrors(fieldName)) {
+      return [];
+    }
+
+    return Object.keys(control.errors as any).map(key => {
+      if (!!control.errors) {
+        if (key === 'required') {
+          return `${fieldName.slice(0, 1).toLocaleUpperCase()}${fieldName.slice(1)} is required`;
+        } else {
+          return control.errors[key];
+        }
+      }
+    }).filter(error => !!error);
   }
 }
