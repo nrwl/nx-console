@@ -169,14 +169,15 @@ export async function normalizeSchema(
 
   const nxOptions = options.map(option => {
     const xPrompt: XPrompt = s.properties[option.name]['x-prompt'];
-    const defaultValue = projectDefaults && projectDefaults[option.name];
+    const workspaceDefault = projectDefaults && projectDefaults[option.name];
     const $default = s.properties[option.name].$default;
 
     const nxOption: Option = {
       ...option,
       component: getFieldType(option, xPrompt, $default && $default.$source),
       required: isFieldRequired(requiredFields, option, xPrompt, $default),
-      ...(defaultValue && {default: defaultValue}),
+      ...(workspaceDefault && {default: workspaceDefault}),
+      $default,
       ...(option.enum && {items: option.enum.map(item => item.toString())}),
     };
 
@@ -252,7 +253,8 @@ function getFieldType(option: Option, xPrompt: XPrompt, $source: string): Option
   const values = option.enum ||
     (xPrompt && (xPrompt as LongFormXPrompt).items) ||
     // Properties where $default.$source is 'projectName' also have a list of items that come from the workspace config instead
-    ($source === 'projectName' && new Array(11));
+    // Some project properties (@ngrx) do not have $default.$source, but the items are set by the project entries
+    (($source === 'projectName' || option.name === 'project') && new Array(11));
   if (values) {
     return values.length > 10
       ? OptionComponent.Autocomplete
