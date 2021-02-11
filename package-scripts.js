@@ -49,6 +49,8 @@ module.exports = {
     package: {
       vscode: nps.series(
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*-es5.js')}`,
+        `shx mv ${join('dist', 'apps', 'vscode', 'assets', 'public', 'runtime-es2015.js')} ${join('dist', 'apps', 'vscode', 'assets', 'public', 'runtime.js')}`,
+        `shx mv ${join('dist', 'apps', 'vscode', 'assets', 'public', 'main-es2015.js')} ${join( 'dist', 'apps', 'vscode', 'assets', 'public', 'main.js')}`,
         `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*.ts')}`,
         `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
       )
