@@ -1,46 +1,67 @@
 {
   "migrations": [
     {
-      "version": "9.0.0-beta.1",
-      "description": "Update typescript to 3.6 and angular/cli to version 9",
-      "factory": "./src/migrations/update-9-0-0/update-9-0-0",
+      "version": "9.2.0-beta.1",
+      "description": "Add cacheable operations to nx.json",
+      "factory": "./src/migrations/update-9-2-0/update-9-2-0",
       "package": "@nrwl/workspace",
-      "name": "update-9-0-0"
+      "name": "update-9-2-0"
     },
     {
-      "version": "9.1.0-beta.1",
-      "description": "Update prettier to 1.19.1 with support for typescript 3.7; Update eslint and tslint",
-      "factory": "./src/migrations/update-9-1-0/update-9-1-0",
+      "version": "9.3.0-beta.1",
+      "description": "Update prettier to v2",
+      "factory": "./src/migrations/update-9-3-0/update-9-3-0",
       "package": "@nrwl/workspace",
-      "name": "update-9-1-0"
+      "name": "update-9-3-0"
     },
     {
-      "version": "9.1.0-beta.1",
-      "description": "Update eslint and tslint config to provide better IDE support",
-      "factory": "./src/migrations/update-9-1-0/update-lint-config",
+      "version": "9.4.0-beta.1",
+      "description": "Remove config builder option when using eslint to enable automatic detection",
+      "factory": "./src/migrations/update-9-4-0/update-eslint-config",
       "package": "@nrwl/workspace",
-      "name": "update-lint-config-9-1-0"
+      "name": "update-eslint-config"
     },
     {
-      "version": "9.0.0-beta.1",
-      "description": "Upgrades Angular and Angular CLI to 9.0.0",
-      "factory": "./src/migrations/update-9-0-0/update-9-0-0",
-      "package": "@nrwl/angular",
-      "name": "update-9-0-0"
+      "version": "9.4.0-beta.1",
+      "description": "Fix exclude patterns in tslint and eslint to ensure it does not break linting when a files option is defined",
+      "factory": "./src/migrations/update-9-4-0/update-linters-exclude",
+      "package": "@nrwl/workspace",
+      "name": "update-linters-exclude"
     },
     {
-      "version": "9.0.0-beta.1",
-      "description": "Upgrades jest-preset-angular to 8.0.0",
-      "factory": "./src/migrations/update-9-0-0/update-9-0-0",
+      "version": "9.4.0-beta.1",
+      "description": "Decorate cli to enable computation caching",
+      "factory": "./src/migrations/update-9-4-0/add-decorate-cli",
+      "package": "@nrwl/workspace",
+      "name": "add-decorate-cli"
+    },
+    {
+      "version": "9.4.0-beta.1",
+      "description": "Add Cypress ESLint plugin",
+      "factory": "./src/migrations/update-9-4-0/add-cypress-eslint-plugin-9-4-0",
+      "package": "@nrwl/cypress",
+      "name": "add-cypress-eslint-plugin-9.4.0"
+    },
+    {
+      "version": "9.2.0-beta.3",
+      "description": "Update jest to v25",
+      "factory": "./src/migrations/update-9-2-0/update-9-2-0",
       "package": "@nrwl/jest",
-      "name": "update-9.0.0"
+      "name": "update-9.2.0"
     },
     {
-      "version": "9.0.1-beta.1",
-      "description": "Correctly sets passWithNoTests option",
-      "factory": "./src/migrations/update-9-0-1/update-9-0-1",
-      "package": "@nrwl/jest",
-      "name": "update-9.0.1"
+      "version": "9.2.0-beta.1",
+      "description": "Set buildLibsFromSource property to true to not break existing projects.",
+      "factory": "./src/migrations/update-9-2-0/set-build-libs-from-source",
+      "package": "@nrwl/node",
+      "name": "set-build-libs-from-source"
+    },
+    {
+      "version": "9.2.0-beta.1",
+      "description": "Add build-storybook to cacheable operations",
+      "factory": "./src/migrations/update-9-2-0/update-9-2-0",
+      "package": "@nrwl/storybook",
+      "name": "update-9.2.0"
     }
   ]
 }

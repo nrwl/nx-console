@@ -77,7 +77,7 @@
               "apps/vscode-ui/tsconfig.app.json",
               "apps/vscode-ui/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/vscode-ui/**"]
+            "exclude": ["**/node_modules/**", "!apps/vscode-ui/**/*"]
           }
         },
         "test": {
@@ -118,7 +118,8 @@
                 "input": "libs/server/src/assets",
                 "output": "/assets/"
               }
-            ]
+            ],
+            "buildLibsFromSource": true
           },
           "configurations": {
             "production": {
@@ -187,7 +188,7 @@
             ],
             "exclude": [
               "**/node_modules/**",
-              "!libs/vscode-ui/feature-task-execution-form/**"
+              "!libs/vscode-ui/feature-task-execution-form/**/*"
             ]
           }
         },
@@ -233,7 +234,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": ["libs/vscode-ui/components/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/vscode-ui/components/**"]
+            "exclude": ["**/node_modules/**", "!libs/vscode-ui/components/**/*"]
           }
         }
       },
@@ -252,7 +253,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": ["libs/vscode-ui/styles/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/vscode-ui/styles/**"]
+            "exclude": ["**/node_modules/**", "!libs/vscode-ui/styles/**/*"]
           }
         }
       },
@@ -284,7 +285,7 @@
             ],
             "exclude": [
               "**/node_modules/**",
-              "!apps/vscode-ui-feature-task-execution-form-e2e/**"
+              "!apps/vscode-ui-feature-task-execution-form-e2e/**/*"
             ]
           }
         }
