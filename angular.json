@@ -85,7 +85,8 @@
           "options": {
             "jestConfig": "apps/vscode-ui/jest.config.js",
             "tsConfig": "apps/vscode-ui/tsconfig.spec.json",
-            "setupFile": "apps/vscode-ui/src/test-setup.ts"
+            "setupFile": "apps/vscode-ui/src/test-setup.ts",
+            "passWithNoTests": true
           }
         }
       }
@@ -167,7 +168,8 @@
           "options": {
             "jestConfig": "libs/server/jest.config.js",
             "tsConfig": "libs/server/tsconfig.spec.json",
-            "setupFile": "libs/server/src/test-setup.ts"
+            "setupFile": "libs/server/src/test-setup.ts",
+            "passWithNoTests": true
           }
         }
       }

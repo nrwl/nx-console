@@ -59,10 +59,10 @@ declare global {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
-  @ViewChild('scrollContainer', { static: false }) scrollContainer: ElementRef<
+  @ViewChild('scrollContainer') scrollContainer: ElementRef<
     HTMLElement
   >;
-  @ViewChild('formHeaderContainer', { static: false })
+  @ViewChild('formHeaderContainer')
   formHeaderContainer: ElementRef<HTMLElement>;
 
   private readonly activeFieldIdSubject = new BehaviorSubject<string>('');

@@ -1,0 +1,46 @@
+{
+  "migrations": [
+    {
+      "version": "9.0.0-beta.1",
+      "description": "Update typescript to 3.6 and angular/cli to version 9",
+      "factory": "./src/migrations/update-9-0-0/update-9-0-0",
+      "package": "@nrwl/workspace",
+      "name": "update-9-0-0"
+    },
+    {
+      "version": "9.1.0-beta.1",
+      "description": "Update prettier to 1.19.1 with support for typescript 3.7; Update eslint and tslint",
+      "factory": "./src/migrations/update-9-1-0/update-9-1-0",
+      "package": "@nrwl/workspace",
+      "name": "update-9-1-0"
+    },
+    {
+      "version": "9.1.0-beta.1",
+      "description": "Update eslint and tslint config to provide better IDE support",
+      "factory": "./src/migrations/update-9-1-0/update-lint-config",
+      "package": "@nrwl/workspace",
+      "name": "update-lint-config-9-1-0"
+    },
+    {
+      "version": "9.0.0-beta.1",
+      "description": "Upgrades Angular and Angular CLI to 9.0.0",
+      "factory": "./src/migrations/update-9-0-0/update-9-0-0",
+      "package": "@nrwl/angular",
+      "name": "update-9-0-0"
+    },
+    {
+      "version": "9.0.0-beta.1",
+      "description": "Upgrades jest-preset-angular to 8.0.0",
+      "factory": "./src/migrations/update-9-0-0/update-9-0-0",
+      "package": "@nrwl/jest",
+      "name": "update-9.0.0"
+    },
+    {
+      "version": "9.0.1-beta.1",
+      "description": "Correctly sets passWithNoTests option",
+      "factory": "./src/migrations/update-9-0-1/update-9-0-1",
+      "package": "@nrwl/jest",
+      "name": "update-9.0.1"
+    }
+  ]
+}
