@@ -26,7 +26,7 @@ export class NxTask extends Task {
         args,
         cwd: workspacePath,
         name: displayCommand,
-        program: findClosestNx(workspacePath)
+        program: findClosestNx(workspacePath),
       })
     );
 

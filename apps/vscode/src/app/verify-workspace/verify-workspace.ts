@@ -1,7 +1,7 @@
 import {
   readAndParseJson,
   fileExistsSync,
-  toLegacyWorkspaceFormat
+  toLegacyWorkspaceFormat,
 } from '@nx-console/server';
 import { window } from 'vscode';
 import { join } from 'path';
@@ -25,14 +25,14 @@ export function verifyWorkspace(
         validWorkspaceJson: true,
         json: toLegacyWorkspaceFormat(readAndParseJson(workspaceJsonPath)),
         workspaceType: 'nx',
-        configuratoinFilePath: workspaceJsonPath
+        configuratoinFilePath: workspaceJsonPath,
       };
     } else if (fileExistsSync(angularJsonPath)) {
       return {
         validWorkspaceJson: true,
         json: toLegacyWorkspaceFormat(readAndParseJson(angularJsonPath)),
         workspaceType: 'ng',
-        configuratoinFilePath: angularJsonPath
+        configuratoinFilePath: angularJsonPath,
       };
     } else {
       // Handles below along with other runtime errors.
@@ -42,7 +42,7 @@ export function verifyWorkspace(
     }
   } catch (e) {
     const humanReadableError = 'Invalid workspace: ' + workspacePath;
-    window.showErrorMessage(humanReadableError, 'Show Error').then(value => {
+    window.showErrorMessage(humanReadableError, 'Show Error').then((value) => {
       if (value) {
         getOutputChannel().show();
       }
@@ -57,7 +57,7 @@ export function verifyWorkspace(
     return {
       validWorkspaceJson: false,
       workspaceType: 'nx',
-      configuratoinFilePath: ''
+      configuratoinFilePath: '',
     };
   }
 }

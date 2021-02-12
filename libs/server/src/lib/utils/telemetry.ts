@@ -5,7 +5,7 @@ const uuidv4 = require('uuid/v4');
 
 export class Telemetry {
   private readonly visitor = new ua.Visitor('UA-88380372-8', this.getUuiId(), {
-    https: true
+    https: true,
   });
 
   constructor(private readonly store: any) {}

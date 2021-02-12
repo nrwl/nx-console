@@ -5,12 +5,12 @@ module.exports = async ({ config, mode }) => {
   // 'PRODUCTION' is used when building the static version of storybook.
 
   // Make whatever fine-grained changes you need
-  config.module.rules.forEach(rule => {
-    (rule.use || []).forEach(parser => {
+  config.module.rules.forEach((rule) => {
+    (rule.use || []).forEach((parser) => {
       if (parser.loader === 'ts-loader') {
         parser.options = {
           ...parser.options,
-          transpileOnly: false
+          transpileOnly: false,
         };
       }
     });

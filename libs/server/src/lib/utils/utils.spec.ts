@@ -8,7 +8,7 @@ describe('utils', () => {
       name: 'style',
       description: 'The file extension to be used for style files.',
       type: OptionType.String,
-      aliases: []
+      aliases: [],
     };
     const getSchema = async (
       options: any[],
@@ -16,7 +16,7 @@ describe('utils', () => {
     ): Promise<Option[]> => {
       const r = await normalizeSchema({
         properties: { ...options },
-        required
+        required,
       });
       return r;
     };
@@ -36,17 +36,17 @@ describe('utils', () => {
         properties: {
           a: { $default: { $source: 'argv', index: 0 } },
           b: { $default: { $source: 'argv', index: 2 } },
-          c: { $default: { $source: 'argv', index: 1 } }
+          c: { $default: { $source: 'argv', index: 1 } },
         },
-        required: []
+        required: [],
       });
-      expect(r.map(x => x.name)).toEqual(['a', 'c', 'b']);
+      expect(r.map((x) => x.name)).toEqual(['a', 'c', 'b']);
     });
 
     it('should set items when enum is provided', async () => {
       const option = {
         ...mockOption,
-        enum: ['test']
+        enum: ['test'],
       };
       const r = await getSchema([option]);
       expect(r[0].items).toEqual(['test']);
@@ -57,18 +57,18 @@ describe('utils', () => {
         { value: 'css', label: 'CSS' },
         {
           value: 'scss',
-          label: 'SASS(.scss) [http://sass-lang.com]'
+          label: 'SASS(.scss) [http://sass-lang.com]',
         },
         {
           value: 'less',
-          label: 'LESS        [http://lesscss.org]'
-        }
+          label: 'LESS        [http://lesscss.org]',
+        },
       ];
       it('should set tooltip when option has short form xPrompt', async () => {
         const xPromptMessage = 'test';
         const option = {
           ...mockOption,
-          'x-prompt': xPromptMessage
+          'x-prompt': xPromptMessage,
         };
         const r = await getSchema([option]);
         expect(r[0].tooltip).toBe(xPromptMessage);
@@ -77,12 +77,12 @@ describe('utils', () => {
       it('should set tooltip when option has long form xPrompt', async () => {
         const xPrompt: LongFormXPrompt = {
           message: 'test',
-          type: 'confirmation'
+          type: 'confirmation',
         };
         const option = {
           ...mockOption,
           enum: [...Array(11).keys()],
-          'x-prompt': xPrompt
+          'x-prompt': xPrompt,
         };
         const r = await getSchema([option]);
         expect(r[0].tooltip).toBe(xPrompt.message);
@@ -94,14 +94,14 @@ describe('utils', () => {
           'x-prompt': {
             message: 'Which stylesheet format would you like to use?',
             type: 'list',
-            items: xPromptItems
-          }
+            items: xPromptItems,
+          },
         };
         const r = await getSchema([option]);
         expect(r[0].itemTooltips).toEqual({
           css: xPromptItems[0].label,
           scss: xPromptItems[1].label,
-          less: xPromptItems[2].label
+          less: xPromptItems[2].label,
         });
       });
       it('should set items from xPrompt items with label and value when enum is not provided', async () => {
@@ -110,14 +110,14 @@ describe('utils', () => {
           'x-prompt': {
             message: 'Which stylesheet format would you like to use?',
             type: 'list',
-            items: xPromptItems
-          }
+            items: xPromptItems,
+          },
         };
         const r = await getSchema([option]);
         expect(r[0].items).toEqual([
           xPromptItems[0].value,
           xPromptItems[1].value,
-          xPromptItems[2].value
+          xPromptItems[2].value,
         ]);
       });
       it('should set items from xPrompt string items when enum is not provided', async () => {
@@ -126,8 +126,8 @@ describe('utils', () => {
           'x-prompt': {
             message: 'Which stylesheet format would you like to use?',
             type: 'list',
-            items: ['test']
-          }
+            items: ['test'],
+          },
         };
         const r = await getSchema([option]);
         expect(r[0].items).toEqual(['test']);

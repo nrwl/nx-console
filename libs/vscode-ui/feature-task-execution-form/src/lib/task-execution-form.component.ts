@@ -7,21 +7,21 @@ import {
   Inject,
   NgZone,
   OnInit,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
   FormGroup,
   ValidatorFn,
-  Validators
+  Validators,
 } from '@angular/forms';
 import {
   BehaviorSubject,
   combineLatest,
   Observable,
   ReplaySubject,
-  Subscription
+  Subscription,
 } from 'rxjs';
 import {
   debounceTime,
@@ -31,14 +31,14 @@ import {
   startWith,
   tap,
   flatMap,
-  mapTo
+  mapTo,
 } from 'rxjs/operators';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
   TaskExecutionSchema,
   TaskExecutionMessage,
-  ItemsWithEnum
+  ItemsWithEnum,
 } from '@nx-console/schema';
 import { Value } from '@angular/cli/models/interface';
 
@@ -56,19 +56,17 @@ declare global {
   selector: 'vscode-ui-task-execution-form',
   templateUrl: './task-execution-form.component.html',
   styleUrls: ['./task-execution-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
-  @ViewChild('scrollContainer') scrollContainer: ElementRef<
-    HTMLElement
-  >;
+  @ViewChild('scrollContainer') scrollContainer: ElementRef<HTMLElement>;
   @ViewChild('formHeaderContainer')
   formHeaderContainer: ElementRef<HTMLElement>;
 
   private readonly activeFieldIdSubject = new BehaviorSubject<string>('');
   readonly activeFieldName$ = this.activeFieldIdSubject.pipe(
     distinctUntilChanged(),
-    map(field => field.replace('-nx-console-field', ''))
+    map((field) => field.replace('-nx-console-field', ''))
   );
 
   private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
@@ -79,8 +77,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     form: FormGroup;
     architect: TaskExecutionSchema;
   }> = this.architect$.pipe(
-    map(architect => ({ form: this.buildForm(architect), architect })),
-    tap(taskExecForm => {
+    map((architect) => ({ form: this.buildForm(architect), architect })),
+    tap((taskExecForm) => {
       if (this.dryRunSubscription) {
         this.dryRunSubscription.unsubscribe();
         this.dryRunSubscription = undefined;
@@ -97,7 +95,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   );
 
   readonly defaultValues$ = this.taskExecForm$.pipe(
-    flatMap(taskExecForm => {
+    flatMap((taskExecForm) => {
       const configurationControl = taskExecForm.form.get('configuration');
       if (configurationControl) {
         return configurationControl.valueChanges.pipe(
@@ -127,27 +125,27 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   private readonly filterValue$ = (this.filterFieldsControl
     .valueChanges as Observable<string>).pipe(
     startWith(''),
-    map(filterValue => filterValue.toLowerCase()),
+    map((filterValue) => filterValue.toLowerCase()),
     distinctUntilChanged()
   );
 
   readonly filteredFields$: Observable<Set<string>> = combineLatest([
     this.architect$.pipe(
-      map(architect => {
-        return architect.options.map(field => {
+      map((architect) => {
+        return architect.options.map((field) => {
           return {
             fieldName: field.name,
-            fieldNameLowerCase: field.name.toLowerCase()
+            fieldNameLowerCase: field.name.toLowerCase(),
           };
         });
       })
     ),
-    this.filterValue$
+    this.filterValue$,
   ]).pipe(
     map(([fields, filterValue]) => {
       const filteredFields = new Set<string>();
 
-      fields.forEach(field => {
+      fields.forEach((field) => {
         if (field.fieldNameLowerCase.includes(filterValue)) {
           filteredFields.add(field.fieldName);
         }
@@ -170,7 +168,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ngOnInit() {
     this.architectSubject.next(this.initialSchema);
 
-    window.SET_TASK_EXECUTION_SCHEMA = schema => {
+    window.SET_TASK_EXECUTION_SCHEMA = (schema) => {
       this.ngZone.run(() => {
         this.architectSubject.next(schema);
 
@@ -238,7 +236,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
     const defaultValues = this.getDefaultValuesForConfiguration(architect);
 
-    architect.options.forEach(schema => {
+    architect.options.forEach((schema) => {
       const validators: Array<ValidatorFn> = [];
       if (schema.required) {
         validators.push(Validators.required);
@@ -249,7 +247,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
             (schema.items as ItemsWithEnum).enum ||
             (schema.items as string[])
         );
-        validators.push(control => {
+        validators.push((control) => {
           if (
             control.value &&
             !validValueSet.has(control.value) &&
@@ -258,7 +256,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
             !control.value.every((value: Value) => validValueSet.has(value))
           ) {
             return {
-              enum: 'Please select a value from the auto-completable list'
+              enum: 'Please select a value from the auto-completable list',
             };
           }
 
@@ -293,7 +291,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
   private scrollToTop() {
     this.scrollContainer.nativeElement.scrollTo({
-      top: 0
+      top: 0,
     });
   }
 
@@ -302,13 +300,13 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     configurationName?: string
   ) {
     const defaultValues: { [key: string]: string | string[] } = {};
-    architect.options.forEach(field => {
+    architect.options.forEach((field) => {
       if (field.default === undefined) {
         defaultValues[field.name] = '';
         return;
       }
       if (Array.isArray(field.default)) {
-        defaultValues[field.name] = field.default.map(item => String(item));
+        defaultValues[field.name] = field.default.map((item) => String(item));
       } else {
         defaultValues[field.name] =
           String(field.default) || (field.type === 'boolean' ? 'false' : '');
@@ -317,10 +315,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
     if (configurationName && architect.configurations) {
       const configuration = architect.configurations.find(
-        c => c.name === configurationName
+        (c) => c.name === configurationName
       )!;
 
-      configuration.defaultValues.forEach(value => {
+      configuration.defaultValues.forEach((value) => {
         defaultValues[value.name] = value.defaultValue || '';
       });
     }
@@ -331,7 +329,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   runCommand({
     form,
     architect,
-    dryRun
+    dryRun,
   }: {
     form: FormGroup;
     architect: TaskExecutionSchema;
@@ -348,7 +346,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     window.vscode.postMessage({
       command: architect.command,
       positional: architect.positional,
-      flags
+      flags,
     });
   }
 
@@ -357,14 +355,14 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect: TaskExecutionSchema,
     configurationName?: string
   ): string[] {
-    const fields = architect.options.filter(s => value[s.name]);
+    const fields = architect.options.filter((s) => value[s.name]);
     const defaultValues = this.getDefaultValuesForConfiguration(
       architect,
       configurationName
     );
 
     const args: string[] = [];
-    fields.forEach(f => {
+    fields.forEach((f) => {
       if (defaultValues[f.name] === value[f.name]) return;
       if (!defaultValues[f.name] && !value[f.name]) return;
       if (f.positional) {
@@ -374,7 +372,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       } else {
         const fieldValue = value[f.name];
         if (Array.isArray(fieldValue)) {
-          const values = fieldValue.map(v => sanitizeWhitespace(v));
+          const values = fieldValue.map((v) => sanitizeWhitespace(v));
           args.push(`--${f.name}=${values.join(',')}`);
         } else {
           args.push(`--${f.name}=${sanitizeWhitespace(fieldValue)}`);

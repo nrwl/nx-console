@@ -5,7 +5,7 @@ import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
 import {
   WorkspaceRouteTitle,
-  WorkspaceTreeItem
+  WorkspaceTreeItem,
 } from '../workspace-tree/workspace-tree-item';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
@@ -19,7 +19,7 @@ const CLI_COMMAND_LIST = [
   'lint',
   'serve',
   'test',
-  'xi18n'
+  'xi18n',
 ];
 
 let cliTaskProvider: CliTaskProvider;
@@ -30,7 +30,7 @@ export function registerCliTaskCommands(
 ) {
   cliTaskProvider = n;
 
-  CLI_COMMAND_LIST.forEach(command => {
+  CLI_COMMAND_LIST.forEach((command) => {
     context.subscriptions.push(
       commands.registerCommand(`ng.${command}`, () =>
         selectCliCommandAndPromptForFlags(command)
@@ -126,7 +126,7 @@ async function selectCliCommandAndPromptForFlags(command: string) {
         'A named build target, as specified in the "configurations" section of angular.json.',
       type: OptionType.String,
       enum: configurations,
-      aliases: []
+      aliases: [],
     };
     options = [configurationsOption, ...options];
   }
@@ -141,7 +141,7 @@ async function selectCliCommandAndPromptForFlags(command: string) {
     cliTaskProvider.executeTask({
       positional: selection.projectName,
       command,
-      flags
+      flags,
     });
   }
 }
@@ -150,7 +150,7 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
   const {
     validWorkspaceJson,
     workspaceType,
-    configuratoinFilePath
+    configuratoinFilePath,
   } = verifyWorkspace(workspacePath);
 
   if (!validWorkspaceJson) {
@@ -172,7 +172,7 @@ async function selectSchematicAndPromptForFlags(workspacePath: string) {
     cliTaskProvider.executeTask({
       positional: selection.positional,
       command: 'generate',
-      flags
+      flags,
     });
   }
 }
@@ -202,6 +202,6 @@ export function selectCliProject(command: string, json: any) {
   }
 
   return window.showQuickPick(items, {
-    placeHolder: `Project to ${command}`
+    placeHolder: `Project to ${command}`,
   });
 }

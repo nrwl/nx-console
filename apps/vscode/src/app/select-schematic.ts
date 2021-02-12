@@ -9,28 +9,25 @@ export async function selectSchematic(workspaceJsonPath: string) {
   }
 
   const schematics = (await readAllSchematicCollections(workspaceJsonPath))
-    .map(
-      (c): GenerateQuickPickItem[] =>
-        c.schematics.map(
-          (s): GenerateQuickPickItem => ({
-            description: s.description,
-            label: `${c.name} - ${s.name}`,
-            collectionName: c.name,
-            schematic: s
-          })
-        )
+    .map((c): GenerateQuickPickItem[] =>
+      c.schematics.map(
+        (s): GenerateQuickPickItem => ({
+          description: s.description,
+          label: `${c.name} - ${s.name}`,
+          collectionName: c.name,
+          schematic: s,
+        })
+      )
     )
     .flat();
 
-  return window.showQuickPick(schematics).then(selection => {
+  return window.showQuickPick(schematics).then((selection) => {
     if (selection) {
-      const schematic = `${selection.schematic.collection}:${
-        selection.schematic.name
-      }`;
+      const schematic = `${selection.schematic.collection}:${selection.schematic.name}`;
       return {
         ...selection.schematic,
         command: 'generate',
-        positional: schematic
+        positional: schematic,
       };
     }
   });

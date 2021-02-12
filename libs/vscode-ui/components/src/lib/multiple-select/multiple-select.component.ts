@@ -7,7 +7,7 @@ import {
   OnChanges,
   SimpleChanges,
   OnInit,
-  OnDestroy
+  OnDestroy,
 } from '@angular/core';
 import { ControlContainer, FormControl, FormGroup } from '@angular/forms';
 import { ItemsWithEnum, Option } from '@nx-console/schema';
@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
   selector: 'nx-console-multiple-select',
   templateUrl: './multiple-select.component.html',
   styleUrls: ['./multiple-select.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
   @Input() field: Option;
@@ -35,7 +35,7 @@ export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptioins.add(
-      this.selectControl.valueChanges.subscribe(value =>
+      this.selectControl.valueChanges.subscribe((value) =>
         this.valueChange.emit(value)
       )
     );

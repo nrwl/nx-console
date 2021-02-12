@@ -29,7 +29,7 @@ const IMPORTANT_FIELD_NAMES = [
   'watch',
   'style',
   'directory',
-  'port'
+  'port',
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
 
@@ -79,9 +79,9 @@ export function listOfUnnestedNpmPackages(nodeModulesDir: string): string[] {
     return res;
   }
 
-  readdirSync(nodeModulesDir).forEach(npmPackageOrScope => {
+  readdirSync(nodeModulesDir).forEach((npmPackageOrScope) => {
     if (npmPackageOrScope.startsWith('@')) {
-      readdirSync(path.join(nodeModulesDir, npmPackageOrScope)).forEach(p => {
+      readdirSync(path.join(nodeModulesDir, npmPackageOrScope)).forEach((p) => {
         res.push(`${npmPackageOrScope}/${p}`);
       });
     } else {
@@ -100,7 +100,7 @@ export function listFiles(dirName: string): string[] {
   // the try-catch here is intentional. It's only used in auto-completion.
   // If it doesn't work, we don't want the process to exit
   try {
-    readdirSync(dirName).forEach(c => {
+    readdirSync(dirName).forEach((c) => {
       const child = path.join(dirName, c);
       try {
         if (!statSync(child).isDirectory()) {
@@ -146,12 +146,12 @@ export function readAndCacheJsonFile(
 
     return {
       path: fullFilePath,
-      json: fileContents[fullFilePath]
+      json: fileContents[fullFilePath],
     };
   } else {
     return {
       path: fullFilePath,
-      json: {}
+      json: {},
     };
   }
 }
@@ -167,7 +167,7 @@ export async function normalizeSchema(
   const options: CliOption[] = await parseJsonSchemaToOptions(registry, s);
   const requiredFields = new Set(s.required || []);
 
-  const nxOptions = options.map(option => {
+  const nxOptions = options.map((option) => {
     const xPrompt: XPrompt = s.properties[option.name]['x-prompt'];
     const workspaceDefault = projectDefaults && projectDefaults[option.name];
     const $default = s.properties[option.name].$default;
@@ -188,7 +188,7 @@ export async function normalizeSchema(
       nxOption.tooltip = isLongFormXPrompt(xPrompt) ? xPrompt.message : xPrompt;
       nxOption.itemTooltips = getEnumTooltips(xPrompt);
       if (isLongFormXPrompt(xPrompt) && !nxOption.items) {
-        const items = (xPrompt.items || []).map(item =>
+        const items = (xPrompt.items || []).map((item) =>
           isOptionItemLabelValue(item) ? item.value : item
         );
         if (items.length > 0) {
@@ -266,7 +266,7 @@ function isLongFormXPrompt(xPrompt: XPrompt): xPrompt is LongFormXPrompt {
 function getEnumTooltips(xPrompt: XPrompt): ItemTooltips {
   const enumTooltips: ItemTooltips = {};
   if (!!xPrompt && isLongFormXPrompt(xPrompt)) {
-    (xPrompt.items || []).forEach(item => {
+    (xPrompt.items || []).forEach((item) => {
       if (isOptionItemLabelValue(item) && !!item.label) {
         enumTooltips[item.value] = item.label;
       }

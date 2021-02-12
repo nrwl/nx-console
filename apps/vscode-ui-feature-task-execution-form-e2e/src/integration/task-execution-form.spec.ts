@@ -43,9 +43,7 @@ describe('task-execution-form.spec', () => {
     });
     it('should update autocomplete to selected option', () => {
       cy.get('nx-console-autocomplete input').click();
-      cy.get('nx-console-autocomplete .option')
-        .eq(0)
-        .click();
+      cy.get('nx-console-autocomplete .option').eq(0).click();
       cy.get('[data-cy=color]').contains('AliceBlue');
     });
   });

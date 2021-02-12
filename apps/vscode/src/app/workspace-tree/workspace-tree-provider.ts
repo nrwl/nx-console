@@ -11,13 +11,13 @@ export const LOCATE_YOUR_WORKSPACE = new TreeItem('Select workspace');
 LOCATE_YOUR_WORKSPACE.command = {
   tooltip: 'Select an workspace directory to open',
   title: 'Select workspace',
-  command: 'nxConsole.selectWorkspaceManually'
+  command: 'nxConsole.selectWorkspaceManually',
 };
 export const CHANGE_WORKSPACE = new TreeItem('Change workspace');
 CHANGE_WORKSPACE.command = {
   tooltip: 'Select an workspace json file to open',
   title: 'Change workspace',
-  command: 'nxConsole.selectWorkspaceManually'
+  command: 'nxConsole.selectWorkspaceManually',
 };
 
 export class WorkspaceTreeProvider extends AbstractTreeProvider<
@@ -75,10 +75,10 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
 
     return [
       ...ROUTE_LIST.map(
-        route =>
+        (route) =>
           new WorkspaceTreeItem(workspaceJsonPath, route, this.extensionPath)
       ),
-      CHANGE_WORKSPACE
+      CHANGE_WORKSPACE,
     ];
   }
 }

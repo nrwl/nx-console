@@ -9,14 +9,14 @@ import {
   TreeItemCollapsibleState,
   Uri,
   window,
-  workspace
+  workspace,
 } from 'vscode';
 
 import { AbstractTreeProvider } from '../abstract-tree-provider';
 import { CliTaskProvider } from '../cli-task/cli-task-provider';
 import {
   WorkspaceJsonLabel,
-  WorkspaceJsonTreeItem
+  WorkspaceJsonTreeItem,
 } from './workspace-json-tree-item';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 
@@ -42,7 +42,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
     ([
       ['editWorkspaceJson', this.editWorkspaceJson],
       ['revealInExplorer', this.revealInExplorer],
-      ['runTask', this.runTask]
+      ['runTask', this.runTask],
     ] as [string, (item: WorkspaceJsonTreeItem) => Promise<any>][]).forEach(
       ([commandSuffix, callback]) => {
         context.subscriptions.push(
@@ -93,7 +93,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
     item.command = {
       title: 'Edit workspace definition',
       command: 'nxConsole.editWorkspaceJson',
-      arguments: [item]
+      arguments: [item],
     };
     if (!workspaceJsonLabel.architect) {
       const projectDef = this.cliTaskProvider.getProjects()[
@@ -121,7 +121,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
         this.refresh();
       });
       return [
-        this.createWorkspaceJsonTreeItem({ project: 'Loading' }, 'Loading')
+        this.createWorkspaceJsonTreeItem({ project: 'Loading' }, 'Loading'),
       ];
     }
     if (!parent) {
@@ -169,7 +169,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
         return;
       }
 
-      return Object.keys(configurations).map(name => {
+      return Object.keys(configurations).map((name) => {
         const item = this.createWorkspaceJsonTreeItem(
           { architect: { ...architect, configuration: name }, project },
           name
@@ -233,7 +233,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
             scriptOffset = offset;
           }
         }
-      }
+      },
     };
     visit(document.getText(), visitor);
 
@@ -254,7 +254,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
     this.cliTaskProvider.executeTask({
       command: architect.name,
       positional: project,
-      flags
+      flags,
     });
   }
 
@@ -290,7 +290,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
     const offset = this.findLabel(document, selection.workspaceJsonLabel);
     const position = document.positionAt(offset);
     await window.showTextDocument(document, {
-      selection: new Selection(position, position)
+      selection: new Selection(position, position),
     });
   }
 }

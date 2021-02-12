@@ -6,7 +6,7 @@ import {
   Component,
   forwardRef,
   Input,
-  OnDestroy
+  OnDestroy,
 } from '@angular/core';
 import {
   ControlContainer,
@@ -36,9 +36,9 @@ enum OptionComponent {
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => FieldComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class FieldComponent implements ControlValueAccessor, OnDestroy {
   @Input() field: Option;
@@ -86,7 +86,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private controlContainer: ControlContainer
   ) {
-    this.valueChangeSub = this.control.valueChanges.subscribe(value => {
+    this.valueChangeSub = this.control.valueChanges.subscribe((value) => {
       this.value = value;
     });
     this.parentFormGroup = this.controlContainer.control as FormGroup;

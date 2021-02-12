@@ -57,7 +57,7 @@ describe('Telemetry', () => {
       expect(tracked).toEqual({ type: 'StartedTracking', data: {} });
       expect(stateChanged).toEqual({
         type: 'UserStateChanged',
-        data: { state: 'tracked' }
+        data: { state: 'tracked' },
       });
     });
 
@@ -71,7 +71,7 @@ describe('Telemetry', () => {
       expect(untracked).toEqual({ type: 'StoppedTracking', data: {} });
       expect(stateChanged).toEqual({
         type: 'UserStateChanged',
-        data: { state: 'untracked' }
+        data: { state: 'untracked' },
       });
     });
 
@@ -94,7 +94,7 @@ describe('Telemetry', () => {
 
       expect(written).toEqual({
         type: 'CommandRun',
-        data: { commandType, time }
+        data: { commandType, time },
       });
     });
 
@@ -107,7 +107,7 @@ describe('Telemetry', () => {
 
       expect(written).toEqual({
         type: 'ExceptionOccurred',
-        data: { error }
+        data: { error },
       });
     });
 
@@ -120,7 +120,7 @@ describe('Telemetry', () => {
 
       expect(written).toEqual({
         type: 'FeatureUsed',
-        data: { feature }
+        data: { feature },
       });
     });
   });

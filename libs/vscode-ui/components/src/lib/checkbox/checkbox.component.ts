@@ -4,7 +4,7 @@ import {
   Input,
   Output,
   EventEmitter,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 import { Option } from '@nx-console/schema';
 
@@ -13,7 +13,7 @@ import { Option } from '@nx-console/schema';
   templateUrl: './checkbox.component.html',
   styleUrls: ['./checkbox.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class CheckboxComponent {
   @Input() field: Option;

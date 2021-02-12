@@ -11,7 +11,7 @@ describe('FormatTaskPipe', () => {
         description: '',
         options: [],
         command: 'generate',
-        positional: 'workspace-schematic:xyz-name'
+        positional: 'workspace-schematic:xyz-name',
       })
     ).toEqual('nx workspace-schematic xyz-name');
     expect(
@@ -21,7 +21,7 @@ describe('FormatTaskPipe', () => {
         description: '',
         options: [],
         command: 'generate',
-        positional: 'workspace-generator:xyz-name'
+        positional: 'workspace-generator:xyz-name',
       })
     ).toEqual('nx workspace-generator xyz-name');
     expect(
@@ -31,7 +31,7 @@ describe('FormatTaskPipe', () => {
         description: '',
         options: [],
         command: 'generate',
-        positional: '@nrwl/angular:library'
+        positional: '@nrwl/angular:library',
       })
     ).toEqual('ng generate @nrwl/angular:library');
   });

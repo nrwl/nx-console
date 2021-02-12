@@ -35,7 +35,7 @@ export class Telemetry implements TelemetryMessageBuilder {
   }
 
   record(type: TelemetryType, data: any = {}): void {
-    this.sinks.forEach(s => s.record(type, data));
+    this.sinks.forEach((s) => s.record(type, data));
   }
 
   extensionActivated(timeInSeconds: number): void {

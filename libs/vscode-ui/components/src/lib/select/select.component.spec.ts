@@ -12,7 +12,7 @@ const mockOption: Option = {
   type: OptionType.String,
   aliases: [],
   itemTooltips: {
-    test: 'testLabel'
+    test: 'testLabel',
   },
   items: [initialValue, 'other', 'values']
 };
@@ -43,7 +43,6 @@ describe('SelectComponent', () => {
       imports: [ReactiveFormsModule]
     }).compileComponents();
   }));
-
   beforeEach(() => {
     fixture = TestBed.createComponent(ParentFormComponent);
     parent = fixture.componentInstance;

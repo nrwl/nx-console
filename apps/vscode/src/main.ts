@@ -7,7 +7,7 @@ import {
   TreeView,
   window,
   workspace,
-  Uri
+  Uri,
 } from 'vscode';
 
 import { WorkspaceJsonTreeItem } from './app/workspace-json-tree/workspace-json-tree-item';
@@ -20,14 +20,14 @@ import { getOutputChannel } from './app/output-channel';
 import {
   getTelemetry,
   initTelemetry,
-  teardownTelemetry
+  teardownTelemetry,
 } from './app/telemetry';
 import { VSCodeStorage } from './app/vscode-storage';
 import { revealWebViewPanel } from './app/webview';
 import { WorkspaceTreeItem } from './app/workspace-tree/workspace-tree-item';
 import {
   LOCATE_YOUR_WORKSPACE,
-  WorkspaceTreeProvider
+  WorkspaceTreeProvider,
 } from './app/workspace-tree/workspace-tree-provider';
 import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
 import { verifyWorkspace } from './app/verify-workspace/verify-workspace';
@@ -48,13 +48,13 @@ export function activate(c: ExtensionContext) {
     const startTime = Date.now();
     context = c;
     currentWorkspaceTreeProvider = WorkspaceTreeProvider.create({
-      extensionPath: context.extensionPath
+      extensionPath: context.extensionPath,
     });
     const store = VSCodeStorage.fromContext(context);
     initTelemetry(store);
 
     workspaceTreeView = window.createTreeView('nxConsole', {
-      treeDataProvider: currentWorkspaceTreeProvider
+      treeDataProvider: currentWorkspaceTreeProvider,
     }) as TreeView<WorkspaceTreeItem>;
     context.subscriptions.push(workspaceTreeView);
 
@@ -79,7 +79,7 @@ export function activate(c: ExtensionContext) {
             context,
             cliTaskProvider,
             workspaceTreeView,
-            contextMenuUri
+            contextMenuUri,
           });
         }
       )
@@ -126,9 +126,9 @@ function manuallySelectWorkspaceDefinition() {
         canSelectFolders: true,
         canSelectFiles: false,
         canSelectMany: false,
-        openLabel: 'Select workspace directory'
+        openLabel: 'Select workspace directory',
       })
-      .then(value => {
+      .then((value) => {
         if (value && value[0]) {
           const selectedDirectory = value[0].fsPath;
           return setWorkspace(
@@ -182,14 +182,14 @@ async function setWorkspace(workspaceJsonPath: string) {
     );
 
     workspaceJsonTreeView = window.createTreeView('nxProjects', {
-      treeDataProvider: workspaceJsonTreeProvider
+      treeDataProvider: workspaceJsonTreeProvider,
     }) as TreeView<WorkspaceJsonTreeItem>;
     context.subscriptions.push(workspaceJsonTreeView);
 
     const affectedTreeProvider = NxCommandsTreeProvider.create(context);
 
     affectedTreeView = window.createTreeView('nxCommands', {
-      treeDataProvider: affectedTreeProvider
+      treeDataProvider: affectedTreeProvider,
     }) as TreeView<NxCommandsTreeItem>;
     context.subscriptions.push(affectedTreeView);
   } else {

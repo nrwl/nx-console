@@ -15,7 +15,7 @@ export class NxTask extends Task {
     const args: string[] = [
       command,
       ...(positional ? [positional] : []),
-      ...flags
+      ...flags,
     ];
 
     const displayCommand = `nx ${args.join(' ')}`;
@@ -30,7 +30,7 @@ export class NxTask extends Task {
         args,
         cwd: workspacePath,
         name: displayCommand,
-        program: findClosestNx(workspacePath)
+        program: findClosestNx(workspacePath),
       })
     );
 

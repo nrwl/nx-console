@@ -30,7 +30,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<
       'affected:lint',
       'affected:test',
       'list',
-      'migrate'
-    ].map(c => new NxCommandsTreeItem(c, this.context.extensionPath));
+      'migrate',
+    ].map((c) => new NxCommandsTreeItem(c, this.context.extensionPath));
   }
 }

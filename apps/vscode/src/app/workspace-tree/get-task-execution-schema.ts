@@ -58,7 +58,7 @@ export async function getTaskExecutionSchema(
           options,
           positional: selectedProject.projectName,
           command,
-          cliName: workspaceType
+          cliName: workspaceType,
         };
 
       case 'Run':
@@ -71,9 +71,9 @@ export async function getTaskExecutionSchema(
               ([architectName, architectDef]) => ({
                 project,
                 architectName,
-                architectDef
+                architectDef,
               })
-            )
+            ),
           ])
           .map(
             ({ project, architectName, architectDef }) =>
@@ -85,7 +85,7 @@ export async function getTaskExecutionSchema(
               )
           );
 
-        return window.showQuickPick(runnableItems).then(async selection => {
+        return window.showQuickPick(runnableItems).then(async (selection) => {
           if (!selection) {
             return;
           }
@@ -108,17 +108,17 @@ export async function getTaskExecutionSchema(
             command: 'run',
             positional: `${selection.projectName}:${selection.command}`,
             options: builderOptions,
-            cliName: workspaceType
+            cliName: workspaceType,
           };
         });
       case 'Generate':
         return selectSchematic(cliTaskProvider.getWorkspaceJsonPath()).then(
-          schematic => {
+          (schematic) => {
             if (!schematic) {
               return;
             }
 
-            schematic.options.forEach(s => {
+            schematic.options.forEach((s) => {
               // TODO: mixup between items and enum has been a source for recent bugs,
               //  util.ts normalizeSchema sets items from enum.
               if (s.enum) {
@@ -131,7 +131,7 @@ export async function getTaskExecutionSchema(
               ) {
                 s.enum = s.items = cliTaskProvider
                   .getProjectEntries()
-                  .map(entry => entry[0])
+                  .map((entry) => entry[0])
                   .sort();
               }
             });
@@ -157,7 +157,7 @@ export async function getTaskExecutionSchema(
         'Nx Console encountered an error parsing your node modules',
         'See details'
       )
-      .then(value => {
+      .then((value) => {
         if (value) {
           getOutputChannel().show();
         }
@@ -178,7 +178,7 @@ function getConfigValuesFromContextMenuUri(
       path: contextMenuUri.fsPath
         .replace(cliTaskProvider.getWorkspacePath(), '')
         .replace(/\\/g, '/'),
-      project: projectName
+      project: projectName,
     };
   }
 }
