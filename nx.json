@@ -3,8 +3,8 @@
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": "*",
-    "tsconfig.json": "*",
-    "tslint.json": "*"
+    "tslint.json": "*",
+    "tsconfig.base.json": "*"
   },
   "projects": {
     "schema": {
@@ -46,5 +46,8 @@
         ]
       }
     }
+  },
+  "affected": {
+    "defaultBase": "master"
   }
 }

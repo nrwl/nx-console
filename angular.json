@@ -32,7 +32,7 @@
             "stylePreprocessorOptions": {
               "includePaths": ["libs/vscode-ui/styles/src/lib"]
             },
-            "es5BrowserSupport": false
+            "allowedCommonJsDependencies": ["zone.js"]
           },
           "configurations": {
             "production": {
@@ -84,8 +84,6 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "apps/vscode-ui/jest.config.js",
-            "tsConfig": "apps/vscode-ui/tsconfig.spec.json",
-            "setupFile": "apps/vscode-ui/src/test-setup.ts",
             "passWithNoTests": true
           }
         }
@@ -168,8 +166,6 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/server/jest.config.js",
-            "tsConfig": "libs/server/tsconfig.spec.json",
-            "setupFile": "libs/server/src/test-setup.ts",
             "passWithNoTests": true
           }
         }

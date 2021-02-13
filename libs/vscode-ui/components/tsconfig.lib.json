@@ -21,5 +21,6 @@
     "**/*.spec.ts",
     "**/*.stories.ts",
     "**/*.stories.js"
-  ]
+  ],
+  "include": ["**/*.ts"]
 }
