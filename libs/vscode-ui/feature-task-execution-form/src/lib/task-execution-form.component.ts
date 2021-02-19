@@ -40,6 +40,7 @@ import {
   TaskExecutionMessage,
   ItemsWithEnum
 } from '@nx-console/schema';
+import { Value } from '@angular/cli/models/interface';
 
 declare global {
   interface Window {
@@ -249,9 +250,18 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
             (schema.items as string[])
         );
         validators.push(control => {
-          if (control.value && !validValueSet.has(control.value)) {
+          if (
+            control.value &&
+            !validValueSet.has(control.value) &&
+            // multiselect values are Array, check if all values are in Set
+            control.value.length &&
+            !control.value.every((value: Value) =>
+              validValueSet.has(value)
+            )
+          ) {
             return {
-              enum: 'Please select a value from the auto-completable list'
+              enum:
+                'Please select a value from the auto-completable list'
             };
           }
 
