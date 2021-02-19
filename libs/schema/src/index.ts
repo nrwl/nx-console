@@ -1,7 +1,6 @@
 import { Option as CliOption, OptionType } from '@angular/cli/models/interface';
 
 export interface Option extends Omit<CliOption, 'default'> {
-  component?: OptionComponent;
   tooltip?: string;
   itemTooltips?: ItemTooltips;
   items?: string[] | ItemsWithEnum;
