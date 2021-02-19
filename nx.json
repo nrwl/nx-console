@@ -4,7 +4,8 @@
     "angular.json": "*",
     "package.json": "*",
     "tslint.json": "*",
-    "tsconfig.base.json": "*"
+    "tsconfig.base.json": "*",
+    ".eslintrc.json": "*"
   },
   "projects": {
     "schema": {

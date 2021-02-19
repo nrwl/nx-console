@@ -24,15 +24,20 @@
               "apps/vscode-ui/src/favicon.ico",
               "apps/vscode-ui/src/assets"
             ],
-            "styles": ["apps/vscode-ui/src/styles.scss"],
-            "extractCss": true,
+            "styles": [
+              "apps/vscode-ui/src/styles.scss"
+            ],
             "namedChunks": false,
             "extractLicenses": true,
             "vendorChunk": false,
             "stylePreprocessorOptions": {
-              "includePaths": ["libs/vscode-ui/styles/src/lib"]
+              "includePaths": [
+                "libs/vscode-ui/styles/src/lib"
+              ]
             },
-            "allowedCommonJsDependencies": ["zone.js"]
+            "allowedCommonJsDependencies": [
+              "zone.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -44,14 +49,13 @@
                 {
                   "replace": "apps/vscode-ui/src/environments/environment.ts",
                   "with": "apps/vscode-ui/src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "apps/vscode-ui/src/styles.scss",
-                  "with": "apps/vscode-ui/src/_styles.prod.scss"
                 }
               ]
             }
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -77,7 +81,10 @@
               "apps/vscode-ui/tsconfig.app.json",
               "apps/vscode-ui/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/vscode-ui/**/*"]
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/vscode-ui/**/*"
+            ]
           }
         },
         "test": {
@@ -85,7 +92,10 @@
           "options": {
             "jestConfig": "apps/vscode-ui/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/apps/vscode-ui"
+          ]
         }
       }
     },
@@ -110,18 +120,17 @@
                 "glob": "README.md",
                 "input": "./",
                 "output": "/"
-              },
-              {
-                "glob": "**/*",
-                "input": "libs/server/src/assets",
-                "output": "/assets/"
               }
             ],
             "buildLibsFromSource": true
           },
           "configurations": {
             "production": {
-              "externalDependencies": ["vscode", "jsonc-parser", "json5"],
+              "externalDependencies": [
+                "vscode",
+                "jsonc-parser",
+                "json5"
+              ],
               "sourceMap": false,
               "optimization": true,
               "extractLicenses": true,
@@ -132,13 +141,21 @@
                 }
               ]
             }
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["apps/vscode/tsconfig.app.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
+            "tsConfig": [
+              "apps/vscode/tsconfig.app.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "**/generated/**"
+            ]
           }
         }
       }
@@ -151,8 +168,13 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["libs/schema/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
+            "tsConfig": [
+              "libs/schema/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "**/generated/**"
+            ]
           }
         }
       }
@@ -167,7 +189,10 @@
           "options": {
             "jestConfig": "libs/server/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/libs/server"
+          ]
         }
       }
     },
@@ -180,7 +205,8 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "libs/vscode-ui/feature-task-execution-form/tsconfig.lib.json"
+              "libs/vscode-ui/feature-task-execution-form/tsconfig.lib.json",
+              "libs/vscode-ui/feature-task-execution-form/.storybook/tsconfig.json"
             ],
             "exclude": [
               "**/node_modules/**",
@@ -216,7 +242,10 @@
             "ci": {
               "quiet": true
             }
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         }
       },
       "schematics": {}
@@ -229,8 +258,13 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["libs/vscode-ui/components/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/vscode-ui/components/**/*"]
+            "tsConfig": [
+              "libs/vscode-ui/components/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/vscode-ui/components/**/*"
+            ]
           }
         }
       },
@@ -248,8 +282,13 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["libs/vscode-ui/styles/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/vscode-ui/styles/**/*"]
+            "tsConfig": [
+              "libs/vscode-ui/styles/tsconfig.lib.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/vscode-ui/styles/**/*"
+            ]
           }
         }
       },
