@@ -1,8 +1,10 @@
 {
   "extends": "../tsconfig.base.json",
-  "exclude": ["../**/test.ts", "../**/*.spec.ts"],
-  "compilerOptions": {
-    "sourceMap": true
-  },
+  "exclude": [
+    "../**/*.spec.js",
+    "../**/*.spec.ts",
+    "../**/*.spec.tsx",
+    "../**/*.spec.jsx"
+  ],
   "include": ["../**/*"]
 }

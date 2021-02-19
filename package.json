@@ -47,8 +47,8 @@
     "@nrwl/storybook": "11.3.0",
     "@nrwl/tao": "11.3.0",
     "@nrwl/workspace": "11.3.0",
-    "@storybook/addon-knobs": "5.3.9",
-    "@storybook/angular": "5.3.9",
+    "@storybook/addon-knobs": "^6.1.11",
+    "@storybook/angular": "^6.1.11",
     "@types/jest": "26.0.8",
     "@types/node": "12.12.38",
     "@types/shelljs": "^0.8.2",
@@ -56,7 +56,7 @@
     "@types/uuid": "^3.4.5",
     "babel-loader": "8.0.6",
     "codelyzer": "6.0.1",
-    "cypress": "3.4.0",
+    "cypress": "6.5.0",
     "fast-glob": "3.0.4",
     "husky": "^3.0.9",
     "jest": "26.2.2",
@@ -83,27 +83,5 @@
     "vscode": "^1.1.35",
     "zlib": "^1.0.5",
     "zone.js": "0.10.3"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "modulePathIgnorePatterns": [
-      "dist",
-      "tmp"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsConfig": "tsconfig.json"
-      }
-    },
-    "testURL": "http://localhost",
-    "testMatch": [
-      "**/*.+(spec|test).(ts|js)"
-    ]
   }
 }
