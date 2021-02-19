@@ -4,7 +4,7 @@
   <span class="deprecated-warning" *ngIf="field.deprecated">(deprecated)</span>
 </div>
 
-<ng-container [ngSwitch]="field.component" [formGroup]="parentFormGroup">
+<ng-container [ngSwitch]="component" [formGroup]="parentFormGroup">
   <nx-console-autocomplete
     *ngSwitchCase="OptionComponent.Autocomplete"
     [field]="field"

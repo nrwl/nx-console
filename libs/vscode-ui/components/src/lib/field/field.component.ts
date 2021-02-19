@@ -1,4 +1,5 @@
 import { Option, OptionComponent } from '@nx-console/schema';
+import { OptionType } from '@angular/cli/models/interface';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -113,5 +114,31 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
         }
       }
     }).filter(error => !!error);
+  }
+
+  get hasItems(): boolean {
+    return !!this.field.items && (this.field.items as string[]).length > 0;
+  }
+
+  get items(): string[] {
+    return this.field.items as string[];
+  }
+
+  get component(): OptionComponent {
+    if (this.field.type === OptionType.Boolean) {
+      return OptionComponent.Checkbox;
+    } else if (this.field.type === OptionType.Array && this.hasItems) {
+      return OptionComponent.MultiSelect;
+    } else {
+      if (this.hasItems) {
+        if (this.items.length > 10) {
+          return OptionComponent.Autocomplete;
+        } else {
+          return OptionComponent.Select;
+        }
+      } else {
+        return OptionComponent.Input;
+      }
+    }
   }
 }
