@@ -36,5 +36,7 @@
     [(value)]="value"
   ></nx-console-input>
 
-  <div *ngFor="let error of getErrors(field.name)" class="validation-error">{{ error }}</div>
+  <div *ngFor="let error of getErrors(field.name)" class="validation-error">
+    {{ error }}
+  </div>
 </ng-container>

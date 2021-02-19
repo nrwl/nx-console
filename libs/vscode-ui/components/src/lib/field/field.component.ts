@@ -82,7 +82,10 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     this.disabled = isDisabled;
   }
 
-  constructor(private readonly changeDetectorRef: ChangeDetectorRef, private controlContainer: ControlContainer) {
+  constructor(
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private controlContainer: ControlContainer
+  ) {
     this.valueChangeSub = this.control.valueChanges.subscribe(value => {
       this.value = value;
     });
@@ -113,15 +116,19 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
       return [];
     }
 
-    return Object.keys(control.errors as any).map(key => {
-      if (!!control.errors) {
-        if (key === 'required') {
-          return `${fieldName.slice(0, 1).toLocaleUpperCase()}${fieldName.slice(1)} is required`;
-        } else {
-          return control.errors[key];
+    return Object.keys(control.errors as any)
+      .map(key => {
+        if (!!control.errors) {
+          if (key === 'required') {
+            return `${fieldName
+              .slice(0, 1)
+              .toLocaleUpperCase()}${fieldName.slice(1)} is required`;
+          } else {
+            return control.errors[key];
+          }
         }
-      }
-    }).filter(error => !!error);
+      })
+      .filter(error => !!error);
   }
 
   get hasItems(): boolean {

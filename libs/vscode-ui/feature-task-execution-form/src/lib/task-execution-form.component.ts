@@ -255,13 +255,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
             !validValueSet.has(control.value) &&
             // multiselect values are Array, check if all values are in Set
             control.value.length &&
-            !control.value.every((value: Value) =>
-              validValueSet.has(value)
-            )
+            !control.value.every((value: Value) => validValueSet.has(value))
           ) {
             return {
-              enum:
-                'Please select a value from the auto-completable list'
+              enum: 'Please select a value from the auto-completable list'
             };
           }
 

@@ -26,8 +26,9 @@ const mockOption: Option = {
 })
 class ParentFormComponent {
   field = mockOption;
-  formGroup = this.fb.group({[this.field.name]: initialValue});
-  @ViewChild(SelectComponent, {static: true}) selectComponent: SelectComponent;
+  formGroup = this.fb.group({ [this.field.name]: initialValue });
+  @ViewChild(SelectComponent, { static: true })
+  selectComponent: SelectComponent;
 
   constructor(private fb: FormBuilder) {}
 }

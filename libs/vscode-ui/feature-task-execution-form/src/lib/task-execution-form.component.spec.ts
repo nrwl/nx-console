@@ -12,7 +12,14 @@ describe('TaskExecutionFormComponent', () => {
     TestBed.configureTestingModule({
       declarations: [TaskExecutionFormComponent],
       providers: [
-        { provide: NgZone, useValue: { run(fn: Function): any { return fn(); } }}
+        {
+          provide: NgZone,
+          useValue: {
+            run(fn: Function): any {
+              return fn();
+            }
+          }
+        }
       ]
     }).compileComponents();
   }));
@@ -47,7 +54,9 @@ describe('TaskExecutionFormComponent', () => {
         }
       ]
     });
-    expect(formGroup.controls['long-form-x-prompt-without-enum'].validator).not.toBeUndefined();
+    expect(
+      formGroup.controls['long-form-x-prompt-without-enum'].validator
+    ).not.toBeUndefined();
     // TODO: get tests working on this vscode-ui-component target and finish testing this
   });
 });

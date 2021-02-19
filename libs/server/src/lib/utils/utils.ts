@@ -175,13 +175,13 @@ export async function normalizeSchema(
     const nxOption: Option = {
       ...option,
       required: isFieldRequired(requiredFields, option, xPrompt, $default),
-      ...(workspaceDefault && {default: workspaceDefault}),
-      ...($default && {$default}),
-      ...(option.enum && {items: option.enum.map(item => item.toString())}),
+      ...(workspaceDefault && { default: workspaceDefault }),
+      ...($default && { $default }),
+      ...(option.enum && { items: option.enum.map(item => item.toString()) }),
       // Strongly suspect items does not belong in the Option schema.
       //  Angular Option doesn't have the items property outside of x-prompt,
       //  but items is used in @schematics/angular - guard
-      ...(getItems(s.properties[option.name]))
+      ...getItems(s.properties[option.name])
     };
 
     if (xPrompt) {
@@ -232,18 +232,31 @@ export async function normalizeSchema(
   });
 }
 
-function isFieldRequired(requiredFields: Set<string>, nxOption: Option, xPrompt: XPrompt, $default: any): boolean {
+function isFieldRequired(
+  requiredFields: Set<string>,
+  nxOption: Option,
+  xPrompt: XPrompt,
+  $default: any
+): boolean {
   // checks schema.json requiredFields and xPrompt for required
-  return requiredFields.has(nxOption.name) ||
+  return (
+    requiredFields.has(nxOption.name) ||
     // makes xPrompt fields required so nx command can run with --no-interactive
     // - except properties with a default (also falsey, empty, null)
     // - except properties with a $default $source
     // - except boolean properties (should also have default of `true`)
-    (!!xPrompt && !nxOption.default && !$default && nxOption.type !== 'boolean');
+    (!!xPrompt && !nxOption.default && !$default && nxOption.type !== 'boolean')
+  );
 }
 
-function getItems(option: Option): {items: string[]} | undefined {
-  return option.items && {items: (option.items as ItemsWithEnum)!.enum || ((option.items as string[]).length && option.items)};
+function getItems(option: Option): { items: string[] } | undefined {
+  return (
+    option.items && {
+      items:
+        (option.items as ItemsWithEnum)!.enum ||
+        ((option.items as string[]).length && option.items)
+    }
+  );
 }
 
 function isLongFormXPrompt(xPrompt: XPrompt): xPrompt is LongFormXPrompt {
