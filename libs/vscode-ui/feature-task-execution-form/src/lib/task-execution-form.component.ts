@@ -249,7 +249,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
             (schema.items as string[])
         );
         validators.push(control => {
-          if (!validValueSet.has(control.value)) {
+          if (control.value && !validValueSet.has(control.value)) {
             return {
               enum: 'Please select a value from the auto-completable list'
             };
@@ -331,8 +331,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     dryRun?: boolean;
   }) {
     const flags = this.serializeArgs(form.value, architect);
+    flags.push('--no-interactive');
     if (dryRun) {
-      flags.push('--no-interactive');
       flags.push('--dry-run');
     }
 

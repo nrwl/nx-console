@@ -10,9 +10,11 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import {
+  ControlContainer,
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
-  FormControl
+  FormControl,
+  FormGroup
 } from '@angular/forms';
 import {
   map,
@@ -70,13 +72,17 @@ export class AutocompleteComponent
 
   private readonly destroying = new Subject<void>();
 
-  constructor(private readonly _elementRef: ElementRef) {}
+  parentFormGroup: FormGroup;
+
+  constructor(private readonly _elementRef: ElementRef, private controlContainer: ControlContainer) {
+    this.parentFormGroup = this.controlContainer.control as FormGroup;
+  }
 
   writeValue(value: string) {
     if (this.control) {
       this.control.setValue(value);
     } else {
-      this.control = new FormControl(value);
+      this.control = new FormControl(value, this.parentFormGroup.controls[this.field.name].validator);
       this.visibleOptions = this._options$.pipe(
         switchMap(options =>
           this.control.valueChanges.pipe(

@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Nx Console",
   "description": "Nx Console for Visual Studio Code",
-  "version": "16.0.2",
+  "version": "17.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"

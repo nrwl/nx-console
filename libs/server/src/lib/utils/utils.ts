@@ -169,14 +169,18 @@ export async function normalizeSchema(
 
   const nxOptions = options.map(option => {
     const xPrompt: XPrompt = s.properties[option.name]['x-prompt'];
-    const fieldType = getFieldType(option, xPrompt);
+    const workspaceDefault = projectDefaults && projectDefaults[option.name];
+    const $default = s.properties[option.name].$default;
+
     const nxOption: Option = {
       ...option,
-      component: fieldType
+      component: getFieldType(option, xPrompt, $default && $default.$source),
+      required: isFieldRequired(requiredFields, option, xPrompt, $default),
+      ...(workspaceDefault && {default: workspaceDefault}),
+      $default,
+      ...(option.enum && {items: option.enum.map(item => item.toString())}),
     };
-    if (option.enum) {
-      nxOption.items = option.enum.map(item => item.toString());
-    }
+
     if (xPrompt) {
       nxOption.tooltip = isLongFormXPrompt(xPrompt) ? xPrompt.message : xPrompt;
       nxOption.itemTooltips = getEnumTooltips(xPrompt);
@@ -188,16 +192,6 @@ export async function normalizeSchema(
           nxOption.items = items;
         }
       }
-    }
-
-    const workspaceDefault = projectDefaults && projectDefaults[nxOption.name];
-
-    if (workspaceDefault !== undefined) {
-      nxOption.default = workspaceDefault;
-    }
-
-    if (requiredFields.has(nxOption.name)) {
-      nxOption.required = true;
     }
 
     return nxOption;
@@ -235,7 +229,17 @@ export async function normalizeSchema(
   });
 }
 
-function getFieldType(option: Option, xPrompt: XPrompt): OptionComponent {
+function isFieldRequired(requiredFields: Set<string>, nxOption: Option, xPrompt: XPrompt, $default: any): boolean {
+  // checks schema.json requiredFields and xPrompt for required
+  return requiredFields.has(nxOption.name) ||
+    // makes xPrompt fields required so nx command can run with --no-interactive
+    // - except properties with a default (also falsey, empty, null)
+    // - except properties with a $default $source
+    // - except boolean properties (should also have default of `true`)
+    (!!xPrompt && !nxOption.default && !$default && nxOption.type !== 'boolean');
+}
+
+function getFieldType(option: Option, xPrompt: XPrompt, $source: string): OptionComponent {
   if (
     !!xPrompt &&
     isLongFormXPrompt(xPrompt) &&
@@ -244,7 +248,13 @@ function getFieldType(option: Option, xPrompt: XPrompt): OptionComponent {
   ) {
     return OptionComponent.MultiSelect;
   }
-  const values = option.enum || (xPrompt && (xPrompt as LongFormXPrompt).items);
+
+  // values can come from either enum or x-prompt values as string[] or LongForm items
+  const values = option.enum ||
+    (xPrompt && (xPrompt as LongFormXPrompt).items) ||
+    // Properties where $default.$source is 'projectName' also have a list of items that come from the workspace config instead
+    // Some project properties (@ngrx) do not have $default.$source, but the items are set by the project entries
+    (($source === 'projectName' || option.name === 'project') && new Array(11));
   if (values) {
     return values.length > 10
       ? OptionComponent.Autocomplete

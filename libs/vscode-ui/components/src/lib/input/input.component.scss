@@ -18,3 +18,7 @@ input {
   padding-bottom: 0.35rem;
   width: $input-width;
 }
+
+input.ng-invalid.ng-dirty, input.ng-invalid.ng-touched {
+  border-color: $error-border-color;
+}

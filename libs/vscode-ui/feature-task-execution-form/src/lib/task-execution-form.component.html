@@ -15,9 +15,11 @@
               [formControl]="filterFieldsControl"
             />
           </div>
-          <div class="run-button" (click)="runCommand(taskExecForm)">
+          <button class="run-button"
+            (click)="runCommand(taskExecForm)"
+            [disabled]="taskExecForm.form.invalid  && (taskExecForm.form.dirty || taskExecForm.form.touched)">
             Run
-          </div>
+          </button>
         </div>
         <div
           class="configurations-container fx-row"

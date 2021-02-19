@@ -1,4 +1,7 @@
+import { OptionType } from '@angular/cli/models/interface';
+import { NgZone } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { OptionComponent } from '@nx-console/schema';
 
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 
@@ -8,7 +11,10 @@ describe('TaskExecutionFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TaskExecutionFormComponent]
+      declarations: [TaskExecutionFormComponent],
+      providers: [
+        { provide: NgZone, useValue: { run(fn: Function): any { return fn(); } }}
+      ]
     }).compileComponents();
   }));
 
@@ -20,5 +26,30 @@ describe('TaskExecutionFormComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should set validator for valid options', () => {
+    const formGroup = component.buildForm({
+      name: 'long-form-x-prompt-without-enum',
+      command: 'generate',
+      positional: 'workspace-generator:long-form-x-prompt-without-enum',
+      cliName: 'ng',
+      description: 'LongFormXPrompt',
+      options: [
+        {
+          name: 'anOption',
+          type: OptionType.String,
+          aliases: [],
+          description: 'a long form select option',
+          component: OptionComponent.Select,
+          items: {
+            type: OptionType.String,
+            enum: ['css', 'scss', 'styl', 'less']
+          }
+        }
+      ]
+    });
+    expect(formGroup.controls['long-form-x-prompt-without-enum'].validator).not.toBeUndefined();
+    // TODO: get tests working on this vscode-ui-component target and finish testing this
   });
 });

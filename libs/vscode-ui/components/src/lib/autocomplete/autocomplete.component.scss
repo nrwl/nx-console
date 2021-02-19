@@ -24,6 +24,10 @@ nx-console-autocomplete {
     width: $input-width;
   }
 
+  input.ng-invalid.ng-dirty, input.ng-invalid.ng-touched {
+    border-color: $error-border-color;
+  }
+
   .autocomplete-panel {
     border-color: var(--vscode-settings-dropdownBorder);
     background-color: var(--vscode-settings-dropdownBackground, #eee);

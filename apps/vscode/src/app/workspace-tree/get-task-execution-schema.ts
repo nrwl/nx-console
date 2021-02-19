@@ -119,12 +119,17 @@ export async function getTaskExecutionSchema(
             }
 
             schematic.options.forEach(s => {
+              // TODO: mixup between items and enum has been a source for recent bugs,
+              //  util.ts normalizeSchema sets items from enum.
               if (s.enum) {
                 return;
               }
 
-              if (s.name === 'project') {
-                s.enum = cliTaskProvider
+              if (
+                s.name === 'project' ||
+                (s.$default && s.$default.$source === 'projectName')
+              ) {
+                s.enum = s.items = cliTaskProvider
                   .getProjectEntries()
                   .map(entry => entry[0])
                   .sort();

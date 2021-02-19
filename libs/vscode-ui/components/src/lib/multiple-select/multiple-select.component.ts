@@ -9,7 +9,7 @@ import {
   OnInit,
   OnDestroy
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { ControlContainer, FormControl, FormGroup } from '@angular/forms';
 import { ItemsWithEnum, Option } from '@nx-console/schema';
 import { Subscription } from 'rxjs';
 
@@ -21,11 +21,15 @@ import { Subscription } from 'rxjs';
 })
 export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
   @Input() field: Option;
-  @Input() disabled = false;
   @Input() value: string[];
   @Output() readonly valueChange = new EventEmitter<string[]>();
   selectControl = new FormControl([]);
   items: string[];
+  parentFormGroup: FormGroup;
+
+  constructor(private controlContainer: ControlContainer) {
+    this.parentFormGroup = this.controlContainer.control as FormGroup;
+  }
 
   private readonly subscriptioins = new Subscription();
 
