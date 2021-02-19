@@ -1,7 +1,6 @@
 import { OptionType } from '@angular/cli/models/interface';
 import { NgZone } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { OptionComponent } from '@nx-console/schema';
 
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 
@@ -41,7 +40,6 @@ describe('TaskExecutionFormComponent', () => {
           type: OptionType.String,
           aliases: [],
           description: 'a long form select option',
-          component: OptionComponent.Select,
           items: {
             type: OptionType.String,
             enum: ['css', 'scss', 'styl', 'less']

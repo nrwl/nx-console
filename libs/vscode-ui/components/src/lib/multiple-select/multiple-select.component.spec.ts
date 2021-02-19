@@ -1,5 +1,5 @@
 import { OptionType } from '@angular/cli/models/interface';
-import { Option, OptionComponent } from '@nx-console/schema';
+import { Option } from '@nx-console/schema';
 import { MultipleSelectComponent } from './multiple-select.component';
 
 describe('MultipleSelectComponent', () => {
@@ -8,7 +8,6 @@ describe('MultipleSelectComponent', () => {
     name: 'style',
     description: 'The file extension to be used for style files.',
     type: OptionType.String,
-    component: OptionComponent.Select,
     aliases: [],
     itemTooltips: {
       test: 'testLabel'

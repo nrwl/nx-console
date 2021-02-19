@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { OptionType } from '@angular/cli/models/interface';
-import { Option, OptionComponent } from '@nx-console/schema';
+import { Option } from '@nx-console/schema';
 import { SelectComponent } from './select.component';
 
 const initialValue = 'test';
@@ -10,7 +10,6 @@ const mockOption: Option = {
   name: 'style',
   description: 'The file extension to be used for style files.',
   type: OptionType.String,
-  component: OptionComponent.Select,
   aliases: [],
   itemTooltips: {
     test: 'testLabel'

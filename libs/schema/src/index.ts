@@ -16,14 +16,6 @@ export interface ItemsWithEnum {
   type: OptionType;
 }
 
-export enum OptionComponent {
-  Autocomplete = 'autocomplete',
-  Checkbox = 'checkBox',
-  Input = 'input',
-  Select = 'select',
-  MultiSelect = 'multiSelect'
-}
-
 export type XPrompt = string | LongFormXPrompt;
 export interface LongFormXPrompt {
   message: string;

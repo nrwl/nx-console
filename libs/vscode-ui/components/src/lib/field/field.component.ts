@@ -1,4 +1,4 @@
-import { Option, OptionComponent } from '@nx-console/schema';
+import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 import {
   ChangeDetectionStrategy,
@@ -16,6 +16,14 @@ import {
   FormGroup
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
+
+enum OptionComponent {
+  Autocomplete = 'autocomplete',
+  Checkbox = 'checkBox',
+  Input = 'input',
+  Select = 'select',
+  MultiSelect = 'multiSelect'
+}
 
 /* Wrapper for select, text input, checkbox, autocomplete */
 

@@ -1,6 +1,6 @@
 import { normalizeSchema } from './utils';
 import { OptionType } from '@angular/cli/models/interface';
-import { OptionComponent, LongFormXPrompt, Option } from '@nx-console/schema';
+import { LongFormXPrompt, Option } from '@nx-console/schema';
 
 describe('utils', () => {
   describe('normalizeSchema', () => {
@@ -50,80 +50,6 @@ describe('utils', () => {
       };
       const r = await getSchema([option]);
       expect(r[0].items).toEqual(['test']);
-    });
-
-    describe('fieldType', () => {
-      it('should set field type as Autocomplete when number of enum options is greater than 10', async () => {
-        const option = {
-          ...mockOption,
-          enum: [...Array(11).keys()]
-        };
-        const r = await getSchema([option]);
-        expect(r[0].component).toBe(OptionComponent.Autocomplete);
-      });
-      it('should set field type as Select when number of enum options is less than or equal to 10', async () => {
-        const option = {
-          ...mockOption,
-          enum: [...Array(10).keys()]
-        };
-        const r = await getSchema([option]);
-        expect(r[0].component).toBe(OptionComponent.Select);
-      });
-      it('should set field type as MultiSelect when x-prompt has options and multi is true', async () => {
-        const xPrompt: LongFormXPrompt = {
-          message: '',
-          type: 'list',
-          multiselect: true
-        };
-        const option = {
-          ...mockOption,
-          'x-prompt': xPrompt
-        };
-        const r = await getSchema([option]);
-        expect(r[0].component).toBe(OptionComponent.MultiSelect);
-      });
-      it('should set field type as Select when x-prompt has long form options', async () => {
-        const xPrompt: LongFormXPrompt = {
-          "message": "This is the x-prompt message",
-          "type": "list",
-          "items": [
-            {
-              "value": "css",
-              "label": "CSS"
-            },
-            {
-              "value": "scss",
-              "label": "SASS(.scss)  [ http://sass-lang.com   ]"
-            },
-            {
-              "value": "styl",
-              "label": "Stylus(.styl)[ http://stylus-lang.com ]"
-            },
-            {
-              "value": "less",
-              "label": "LESS         [ http://lesscss.org     ]"
-            }
-          ]
-        };
-        const option = {
-          ...mockOption,
-          'x-prompt': xPrompt
-        };
-        const r = await getSchema([option]);
-        expect(r[0].component).toBe(OptionComponent.Select);
-      });
-      it('should set field type as Checkbox when option type is boolean', async () => {
-        const option = {
-          ...mockOption,
-          type: OptionType.Boolean
-        };
-        const r = await getSchema([option]);
-        expect(r[0].component).toBe(OptionComponent.Checkbox);
-      });
-      it('should set field type as Input when option has no enum and type is not boolean', async () => {
-        const r = await getSchema([mockOption]);
-        expect(r[0].component).toBe(OptionComponent.Input);
-      });
     });
 
     describe('xPrompt', () => {
