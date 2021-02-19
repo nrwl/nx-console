@@ -49,10 +49,10 @@ describe('TaskExecutionFormComponent', () => {
           description: 'a long form select option',
           items: {
             type: OptionType.String,
-            enum: ['css', 'scss', 'styl', 'less']
-          }
-        }
-      ]
+            enum: ['css', 'scss', 'styl', 'less'],
+          },
+        },
+      ],
     });
     expect(
       formGroup.controls['long-form-x-prompt-without-enum'].validator

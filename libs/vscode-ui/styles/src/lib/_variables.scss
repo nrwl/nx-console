@@ -12,12 +12,6 @@ $button-primary-color: var(
 $scroll-bar-width: 12px;
 
 $primary-text-color: var(--vscode-settings-headerForeground);
-$error-text-color: var(
-  --vscode-errorForeground,
-  #f00
-);
+$error-text-color: var(--vscode-errorForeground, #f00);
 
-$error-border-color: var(
-  --vscode-inputValidation-errorBorder,
-  #f00
-);
+$error-border-color: var(--vscode-inputValidation-errorBorder, #f00);

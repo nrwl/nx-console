@@ -22,9 +22,7 @@ import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 
 export let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
 
-export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<
-  WorkspaceJsonTreeItem
-> {
+export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJsonTreeItem> {
   loading = true;
 
   constructor(

@@ -13,7 +13,7 @@ import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
   FormControl,
-  FormGroup
+  FormGroup,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 

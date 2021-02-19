@@ -74,7 +74,10 @@ export class AutocompleteComponent
 
   parentFormGroup: FormGroup;
 
-  constructor(private readonly _elementRef: ElementRef, private controlContainer: ControlContainer) {
+  constructor(
+    private readonly _elementRef: ElementRef,
+    private controlContainer: ControlContainer
+  ) {
     this.parentFormGroup = this.controlContainer.control as FormGroup;
   }
 
@@ -82,7 +85,10 @@ export class AutocompleteComponent
     if (this.control) {
       this.control.setValue(value);
     } else {
-      this.control = new FormControl(value, this.parentFormGroup.controls[this.field.name].validator);
+      this.control = new FormControl(
+        value,
+        this.parentFormGroup.controls[this.field.name].validator
+      );
       this.visibleOptions = this._options$.pipe(
         switchMap((options) =>
           this.control.valueChanges.pipe(
