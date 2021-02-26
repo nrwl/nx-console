@@ -43,6 +43,7 @@ describe('Telemetry: MemorySink', () => {
     sink.record(type, data);
 
     const records = sink.recordsByType(type);
+    expect(true).toBe(true);
 
     expect(records).toEqual([record]);
   });
