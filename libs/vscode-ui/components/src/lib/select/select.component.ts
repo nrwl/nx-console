@@ -20,7 +20,7 @@ export class SelectComponent {
   @Output() readonly valueChange = new EventEmitter<string>();
   parentFormGroup: FormGroup;
 
-  constructor(private controlContainer: ControlContainer) {
+  constructor(private readonly controlContainer: ControlContainer) {
     this.parentFormGroup = this.controlContainer.control as FormGroup;
   }
 

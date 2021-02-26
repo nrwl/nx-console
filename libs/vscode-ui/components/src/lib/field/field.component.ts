@@ -84,7 +84,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
 
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private controlContainer: ControlContainer
+    private readonly controlContainer: ControlContainer
   ) {
     this.valueChangeSub = this.control.valueChanges.subscribe((value) => {
       this.value = value;

@@ -27,7 +27,7 @@ export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
   items: string[];
   parentFormGroup: FormGroup;
 
-  constructor(private controlContainer: ControlContainer) {
+  constructor(private readonly controlContainer: ControlContainer) {
     this.parentFormGroup = this.controlContainer.control as FormGroup;
   }
 
