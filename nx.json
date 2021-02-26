@@ -31,12 +31,14 @@
     },
     "vscode-ui-feature-task-execution-form-e2e": {
       "tags": [],
-      "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
+      "implicitDependencies": [
+        "vscode-ui-feature-task-execution-form"
+      ]
     }
   },
   "tasksRunnerOptions": {
     "default": {
-      "runner": "@nrwl/workspace/tasks-runners/default",
+      "runner": "@nrwl/nx-cloud",
       "options": {
         "cacheableOperations": [
           "build",
@@ -44,7 +46,10 @@
           "test",
           "e2e",
           "build-storybook"
-        ]
+        ],
+        "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
+        "canTrackAnalytics": false,
+        "showUsageWarnings": true
       }
     }
   },
