@@ -36,10 +36,6 @@ $offset-with-configurations: $offset-without-configurations +
   &:hover {
     opacity: 0.8;
   }
-  &[disabled] {
-    background-color: $button-secondary-color;
-    opacity: 0.6;
-  }
 }
 
 .scroll-container,

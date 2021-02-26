@@ -1,7 +1,6 @@
 import { Option as CliOption, OptionType } from '@angular/cli/models/interface';
 
 export interface Option extends Omit<CliOption, 'default'> {
-  component?: OptionComponent;
   tooltip?: string;
   itemTooltips?: ItemTooltips;
   items?: string[] | ItemsWithEnum;
@@ -15,14 +14,6 @@ export interface ItemTooltips {
 export interface ItemsWithEnum {
   enum: string[];
   type: OptionType;
-}
-
-export enum OptionComponent {
-  Autocomplete = 'autocomplete',
-  Checkbox = 'checkBox',
-  Input = 'input',
-  Select = 'select',
-  MultiSelect = 'multiSelect'
 }
 
 export type XPrompt = string | LongFormXPrompt;

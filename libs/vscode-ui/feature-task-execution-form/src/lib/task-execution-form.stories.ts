@@ -1,5 +1,5 @@
 import { OptionType } from '@angular/cli/models/interface';
-import { OptionComponent, TaskExecutionSchema } from '@nx-console/schema';
+import { TaskExecutionSchema } from '@nx-console/schema';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiFeatureTaskExecutionFormModule } from './vscode-ui-feature-task-execution-form.module';
@@ -64,7 +64,6 @@ const initialSchema: TaskExecutionSchema = {
       required: true,
       aliases: ['a'],
       hidden: false,
-      component: OptionComponent.Input,
       tooltip: 'What application will the new domain libraries be under?',
       itemTooltips: {}
     },
@@ -80,7 +79,6 @@ const initialSchema: TaskExecutionSchema = {
       },
       aliases: ['l'],
       hidden: false,
-      component: OptionComponent.MultiSelect,
       tooltip: 'Which library types do you want to generate?',
       itemTooltips: {
         'data-access': 'data-access - for state management and services',
@@ -100,7 +98,6 @@ const initialSchema: TaskExecutionSchema = {
       required: false,
       aliases: ['s'],
       hidden: false,
-      component: OptionComponent.Select,
       tooltip: 'Which stylesheet format would you like to use?',
       itemTooltips: {
         css: 'CSS',
@@ -117,7 +114,6 @@ const initialSchema: TaskExecutionSchema = {
       required: false,
       aliases: [],
       hidden: false,
-      component: OptionComponent.Checkbox,
       tooltip: 'Add a cypress e2e app?',
       itemTooltips: {}
     },
@@ -129,7 +125,6 @@ const initialSchema: TaskExecutionSchema = {
       default: cssColorNames[5],
       aliases: [],
       hidden: false,
-      component: OptionComponent.Autocomplete,
       items: cssColorNames
     }
   ],

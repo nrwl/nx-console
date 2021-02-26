@@ -15,9 +15,7 @@
               [formControl]="filterFieldsControl"
             />
           </div>
-          <button class="run-button"
-            (click)="runCommand(taskExecForm)"
-            [disabled]="taskExecForm.form.invalid  && (taskExecForm.form.dirty || taskExecForm.form.touched)">
+          <button class="run-button" (click)="runCommand(taskExecForm)">
             Run
           </button>
         </div>

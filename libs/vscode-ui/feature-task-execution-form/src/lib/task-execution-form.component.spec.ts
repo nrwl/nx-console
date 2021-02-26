@@ -1,7 +1,6 @@
 import { OptionType } from '@angular/cli/models/interface';
 import { NgZone } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { OptionComponent } from '@nx-console/schema';
 
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 
@@ -13,7 +12,14 @@ describe('TaskExecutionFormComponent', () => {
     TestBed.configureTestingModule({
       declarations: [TaskExecutionFormComponent],
       providers: [
-        { provide: NgZone, useValue: { run(fn: Function): any { return fn(); } }}
+        {
+          provide: NgZone,
+          useValue: {
+            run(fn: Function): any {
+              return fn();
+            }
+          }
+        }
       ]
     }).compileComponents();
   }));
@@ -41,7 +47,6 @@ describe('TaskExecutionFormComponent', () => {
           type: OptionType.String,
           aliases: [],
           description: 'a long form select option',
-          component: OptionComponent.Select,
           items: {
             type: OptionType.String,
             enum: ['css', 'scss', 'styl', 'less']
@@ -49,7 +54,9 @@ describe('TaskExecutionFormComponent', () => {
         }
       ]
     });
-    expect(formGroup.controls['long-form-x-prompt-without-enum'].validator).not.toBeUndefined();
+    expect(
+      formGroup.controls['long-form-x-prompt-without-enum'].validator
+    ).not.toBeUndefined();
     // TODO: get tests working on this vscode-ui-component target and finish testing this
   });
 });
