@@ -1,16 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
-
+@import 'flex';
 @import 'variables';
-@import 'styles.prod';
 
-::-webkit-scrollbar-thumb {
-  background-color: #484950;
+html,
+body {
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: lighten(#484950, 10%);
-}
-
-::-webkit-scrollbar-thumb:active {
-  background-color: lighten(#484950, 20%);
+::-webkit-scrollbar {
+  width: $scroll-bar-width !important;
 }

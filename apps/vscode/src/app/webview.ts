@@ -6,7 +6,7 @@ import {
   Uri,
   ViewColumn,
   WebviewPanel,
-  window
+  window,
 } from 'vscode';
 
 import { CliTaskProvider } from './cli-task/cli-task-provider';
@@ -31,7 +31,7 @@ export async function revealWebViewPanel({
   cliTaskProvider,
   workspaceTreeItem,
   workspaceTreeView,
-  contextMenuUri
+  contextMenuUri,
 }: RevealWebViewPanelConfig) {
   const { label } = workspaceTreeItem;
   const schema = await getTaskExecutionSchema(
@@ -52,7 +52,7 @@ export async function revealWebViewPanel({
   );
   context.subscriptions.push(webViewPanel);
 
-  webViewPanel.onDidChangeViewState(e => {
+  webViewPanel.onDidChangeViewState((e) => {
     if (e.webviewPanel.visible) {
       workspaceTreeItem.revealWorkspaceRoute(workspaceTreeView);
     }
@@ -78,7 +78,7 @@ export function createWebViewPanel(
       ViewColumn.Active, // Editor column to show the new webview panel in.
       {
         retainContextWhenHidden: true,
-        enableScripts: true
+        enableScripts: true,
       }
     );
     webviewPanel.onDidDispose(() => {

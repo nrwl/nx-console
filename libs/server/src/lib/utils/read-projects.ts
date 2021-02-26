@@ -3,14 +3,14 @@ import {
   Project,
   Option,
   DefaultValue,
-  ArchitectConfiguration
+  ArchitectConfiguration,
 } from '@nx-console/schema';
 import * as path from 'path';
 
 import {
   getPrimitiveValue,
   normalizeSchema,
-  readAndCacheJsonFile
+  readAndCacheJsonFile,
 } from '../utils/utils';
 
 export function readProjects(json: any): Project[] {
@@ -20,7 +20,7 @@ export function readProjects(json: any): Project[] {
         name: key,
         root: value.root,
         projectType: value.projectType,
-        architect: readArchitect(key, value.architect)
+        architect: readArchitect(key, value.architect),
       })
     )
     .sort((a, b) => a.root.localeCompare(b.root));
@@ -32,9 +32,9 @@ export function readArchitectDef(
   project: string
 ): Architect {
   const configurations: ArchitectConfiguration[] = architectDef.configurations
-    ? Object.keys(architectDef.configurations).map(name => ({
+    ? Object.keys(architectDef.configurations).map((name) => ({
         name,
-        defaultValues: readDefaultValues(architectDef.configurations, name)
+        defaultValues: readDefaultValues(architectDef.configurations, name),
       }))
     : [];
 
@@ -44,7 +44,7 @@ export function readArchitectDef(
     name: architectName,
     project,
     description: architectDef.description || '',
-    builder: architectDef.builder
+    builder: architectDef.builder,
   };
 }
 

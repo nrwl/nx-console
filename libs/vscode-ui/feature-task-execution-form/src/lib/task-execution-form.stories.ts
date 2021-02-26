@@ -51,7 +51,7 @@ const cssColorNames = [
   'Violet',
   'Wheat',
   'White',
-  'Yellow'
+  'Yellow',
 ];
 const initialSchema: TaskExecutionSchema = {
   name: 'create',
@@ -65,7 +65,7 @@ const initialSchema: TaskExecutionSchema = {
       aliases: ['a'],
       hidden: false,
       tooltip: 'What application will the new domain libraries be under?',
-      itemTooltips: {}
+      itemTooltips: {},
     },
     {
       name: 'libraries',
@@ -75,7 +75,7 @@ const initialSchema: TaskExecutionSchema = {
       default: ['data-access', 'feature'],
       items: {
         enum: ['data-access', 'feature', 'shell', 'ui', 'util'],
-        type: OptionType.String
+        type: OptionType.String,
       },
       aliases: ['l'],
       hidden: false,
@@ -87,8 +87,8 @@ const initialSchema: TaskExecutionSchema = {
           'shell - for wrapping different libraries and exposing them as a single library. Also, for routing.',
         ui: 'ui - for dumb components',
         util:
-          'util - for model files, constants, validators, pipes and any other miscellaneous items, e.g. shared functions.'
-      }
+          'util - for model files, constants, validators, pipes and any other miscellaneous items, e.g. shared functions.',
+      },
     },
     {
       name: 'style',
@@ -102,9 +102,9 @@ const initialSchema: TaskExecutionSchema = {
       itemTooltips: {
         css: 'CSS',
         scss: 'SASS(.scss) [http://sass-lang.com]',
-        less: 'LESS        [http://lesscss.org]'
+        less: 'LESS        [http://lesscss.org]',
       },
-      items: ['css', 'scss', 'less']
+      items: ['css', 'scss', 'less'],
     },
     {
       name: 'addE2EProject',
@@ -115,7 +115,7 @@ const initialSchema: TaskExecutionSchema = {
       aliases: [],
       hidden: false,
       tooltip: 'Add a cypress e2e app?',
-      itemTooltips: {}
+      itemTooltips: {},
     },
     {
       name: 'color',
@@ -125,39 +125,39 @@ const initialSchema: TaskExecutionSchema = {
       default: cssColorNames[5],
       aliases: [],
       hidden: false,
-      items: cssColorNames
-    }
+      items: cssColorNames,
+    },
   ],
   description: 'schematic description',
   command: 'generate',
   positional: '@scope:schematic',
-  cliName: 'ng'
+  cliName: 'ng',
 };
 
 const schemaWithoutDefaults: TaskExecutionSchema = {
   ...initialSchema,
-  options: initialSchema.options.map(option => {
+  options: initialSchema.options.map((option) => {
     const optionWithoutDefault = { ...option };
     delete optionWithoutDefault.default;
     return optionWithoutDefault;
-  })
+  }),
 };
 
 // tslint:disable-next-line: no-default-export
 export default {
-  title: 'feature-task-execution-form'
+  title: 'feature-task-execution-form',
 };
 
 const moduleMetadata = {
   imports: [VscodeUiFeatureTaskExecutionFormModule],
-  providers: [{ provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema }]
+  providers: [{ provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema }],
 };
 
 const noDefaultsModuleMetadata = {
   imports: [VscodeUiFeatureTaskExecutionFormModule],
   providers: [
-    { provide: TASK_EXECUTION_SCHEMA, useValue: schemaWithoutDefaults }
-  ]
+    { provide: TASK_EXECUTION_SCHEMA, useValue: schemaWithoutDefaults },
+  ],
 };
 
 const baseConfig = {
@@ -169,14 +169,14 @@ const baseConfig = {
         <p [attr.data-cy]="item.key">{{item.value}}</p>
       </ng-container>
     </ng-container>
-  `
+  `,
 };
 export const DefaultValues = () => ({
   ...baseConfig,
-  moduleMetadata
+  moduleMetadata,
 });
 
 export const NoDefaultValues = () => ({
   ...baseConfig,
-  moduleMetadata: noDefaultsModuleMetadata
+  moduleMetadata: noDefaultsModuleMetadata,
 });

@@ -3,5 +3,8 @@
   "rules": {
     "directive-selector": [true, "attribute", "vscodeUi", "camelCase"],
     "component-selector": [true, "element", "vscode-ui", "kebab-case"]
+  },
+  "linterOptions": {
+    "exclude": ["!**/*"]
   }
 }

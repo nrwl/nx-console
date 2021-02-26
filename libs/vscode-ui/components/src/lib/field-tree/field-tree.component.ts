@@ -4,7 +4,7 @@ import {
   Input,
   SimpleChanges,
   OnChanges,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Option } from '@nx-console/schema';
 
@@ -12,7 +12,7 @@ import { Option } from '@nx-console/schema';
   selector: 'vscode-ui-field-tree',
   templateUrl: './field-tree.component.html',
   styleUrls: ['./field-tree.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FieldTreeComponent implements OnChanges {
   @Input() fields: Array<Option>;
@@ -44,14 +44,14 @@ export class FieldTreeComponent implements OnChanges {
       ) {
         item.scrollIntoView({
           block: 'nearest',
-          inline: 'nearest'
+          inline: 'nearest',
         });
       }
     }
 
     if (simpleChanges.fieldBins) {
       this.elementRef.nativeElement.scrollTo({
-        top: 0
+        top: 0,
       });
     }
   }
@@ -68,7 +68,7 @@ export class FieldTreeComponent implements OnChanges {
     if (element) {
       element.scrollIntoView({
         block: 'start',
-        inline: 'start'
+        inline: 'start',
       });
     }
   }

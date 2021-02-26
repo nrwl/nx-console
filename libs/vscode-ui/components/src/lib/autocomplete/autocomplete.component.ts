@@ -7,14 +7,14 @@ import {
   ViewChild,
   ElementRef,
   OnInit,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   ControlContainer,
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
   FormControl,
-  FormGroup
+  FormGroup,
 } from '@angular/forms';
 import {
   map,
@@ -25,7 +25,7 @@ import {
   scan,
   debounceTime,
   filter,
-  shareReplay
+  shareReplay,
 } from 'rxjs/operators';
 import {
   Subject,
@@ -33,14 +33,14 @@ import {
   Observable,
   fromEvent,
   merge,
-  of
+  of,
 } from 'rxjs';
 import { ItemsWithEnum, Option } from '@nx-console/schema';
 
 export enum AutocompleteNavKeys {
   Enter = 'Enter',
   ArrowUp = 'ArrowUp',
-  ArrowDown = 'ArrowDown'
+  ArrowDown = 'ArrowDown',
 }
 
 export const AUTOCOMPLETE_NAV_KEYS = new Set(['Enter', 'ArrowUp', 'ArrowDown']);
@@ -54,9 +54,9 @@ export const AUTOCOMPLETE_NAV_KEYS = new Set(['Enter', 'ArrowUp', 'ArrowDown']);
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: AutocompleteComponent,
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class AutocompleteComponent
   implements OnInit, OnDestroy, OnChanges, ControlValueAccessor {
@@ -74,7 +74,10 @@ export class AutocompleteComponent
 
   parentFormGroup: FormGroup;
 
-  constructor(private readonly _elementRef: ElementRef, private controlContainer: ControlContainer) {
+  constructor(
+    private readonly _elementRef: ElementRef,
+    private controlContainer: ControlContainer
+  ) {
     this.parentFormGroup = this.controlContainer.control as FormGroup;
   }
 
@@ -82,13 +85,16 @@ export class AutocompleteComponent
     if (this.control) {
       this.control.setValue(value);
     } else {
-      this.control = new FormControl(value, this.parentFormGroup.controls[this.field.name].validator);
+      this.control = new FormControl(
+        value,
+        this.parentFormGroup.controls[this.field.name].validator
+      );
       this.visibleOptions = this._options$.pipe(
-        switchMap(options =>
+        switchMap((options) =>
           this.control.valueChanges.pipe(
             startWith(''), // When panel is first opened, show the entire list
-            map(formValue =>
-              options.filter(option =>
+            map((formValue) =>
+              options.filter((option) =>
                 option.toLowerCase().includes(formValue.toLowerCase())
               )
             )
@@ -106,21 +112,17 @@ export class AutocompleteComponent
       fromEvent(this._elementRef.nativeElement, 'focusout').pipe(
         map(() => false)
       )
-    ).pipe(
-      startWith(false),
-      debounceTime(300),
-      shareReplay(1)
-    );
+    ).pipe(startWith(false), debounceTime(300), shareReplay(1));
 
     this.selectedOption$ = this.isFocused$.pipe(
-      switchMap(isFocused =>
+      switchMap((isFocused) =>
         isFocused
           ? this.visibleOptions.pipe(
-              switchMap(visibleOptions =>
+              switchMap((visibleOptions) =>
                 visibleOptions.length
                   ? fromEvent<KeyboardEvent>(document, 'keyup').pipe(
                       map((event: KeyboardEvent) => event.key),
-                      filter(key => AUTOCOMPLETE_NAV_KEYS.has(key)),
+                      filter((key) => AUTOCOMPLETE_NAV_KEYS.has(key)),
                       scan(
                         ([index, _]: [number, string | null], key) =>
                           [
@@ -129,7 +131,7 @@ export class AutocompleteComponent
                               index || 0,
                               visibleOptions.length
                             ),
-                            key
+                            key,
                           ] as [number, string | null],
                         [0, null] as [number, string | null]
                       ),
@@ -179,10 +181,7 @@ export class AutocompleteComponent
 
   registerOnChange(fn: any) {
     this.control.valueChanges
-      .pipe(
-        tap(fn),
-        takeUntil(this.destroying)
-      )
+      .pipe(tap(fn), takeUntil(this.destroying))
       .subscribe();
   }
 

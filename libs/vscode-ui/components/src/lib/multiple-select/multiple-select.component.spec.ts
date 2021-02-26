@@ -10,8 +10,8 @@ describe('MultipleSelectComponent', () => {
     type: OptionType.String,
     aliases: [],
     itemTooltips: {
-      test: 'testLabel'
-    }
+      test: 'testLabel',
+    },
   };
   beforeEach(() => {
     component = new MultipleSelectComponent();

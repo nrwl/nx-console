@@ -2,9 +2,7 @@ import { AbstractTreeProvider } from '../abstract-tree-provider';
 import { NxCommandsTreeItem } from './nx-commands-tree-item';
 import { ExtensionContext } from 'vscode';
 
-export class NxCommandsTreeProvider extends AbstractTreeProvider<
-  NxCommandsTreeItem
-> {
+export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeItem> {
   static create(context: ExtensionContext): NxCommandsTreeProvider {
     return new NxCommandsTreeProvider(context);
   }
@@ -30,7 +28,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<
       'affected:lint',
       'affected:test',
       'list',
-      'migrate'
-    ].map(c => new NxCommandsTreeItem(c, this.context.extensionPath));
+      'migrate',
+    ].map((c) => new NxCommandsTreeItem(c, this.context.extensionPath));
   }
 }

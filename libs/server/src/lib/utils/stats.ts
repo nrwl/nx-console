@@ -25,7 +25,7 @@ class FileSystemFileSizeGetter {
     const file = readFileSync(filePath);
     return {
       parsed: file.length,
-      gzipped: gzipSync(file).length
+      gzipped: gzipSync(file).length,
     };
   }
 }
@@ -63,7 +63,7 @@ export function generateStats(
   const summary = {
     assets: createSizeData(),
     modules: 0,
-    dependencies: 0
+    dependencies: 0,
   };
 
   const outputAssets = getAssets(outputPath, earliestTimeStamp);
@@ -87,7 +87,7 @@ export function generateStats(
       try {
         const sourceMapData = exploreSourceMap(join(outputPath, asset));
 
-        Object.keys(sourceMapData.files).forEach(_file => {
+        Object.keys(sourceMapData.files).forEach((_file) => {
           const size = sourceMapData.files[_file];
           summary.modules += size;
 
@@ -95,7 +95,7 @@ export function generateStats(
             modules.push({
               size,
               file: _file,
-              isDep: false
+              isDep: false,
             });
           } else {
             const file = fileNormalizer.normalize(_file);
@@ -108,7 +108,7 @@ export function generateStats(
             modules.push({
               size,
               file,
-              isDep
+              isDep,
             });
           }
         });
@@ -119,7 +119,7 @@ export function generateStats(
         modules.push({
           size: sizes.parsed,
           file: asset,
-          isDep: false
+          isDep: false,
         });
       }
     }
@@ -131,7 +131,7 @@ export function generateStats(
     assets,
     bundles,
     modulesByBundle,
-    summary
+    summary,
   };
 }
 
@@ -140,7 +140,7 @@ export function calculateStatsFromChunks(cs: Module[]) {
   const summary = {
     assets: createSizeData(),
     modules: 0,
-    dependencies: 0
+    dependencies: 0,
   };
   const bundles: AssetData[] = [];
 
@@ -148,7 +148,7 @@ export function calculateStatsFromChunks(cs: Module[]) {
     const chunkData = {
       id: String(idx),
       file: c.file,
-      sizes: createSizeData()
+      sizes: createSizeData(),
     };
     const size = parseSizeFromBuildOutput(c.size);
 
@@ -159,7 +159,7 @@ export function calculateStatsFromChunks(cs: Module[]) {
     bundles.push(chunkData);
     assets.push({
       file: c.file,
-      sizes: chunkData.sizes
+      sizes: chunkData.sizes,
     });
   });
 
@@ -167,7 +167,7 @@ export function calculateStatsFromChunks(cs: Module[]) {
     assets,
     bundles,
     modulesByBundle: {},
-    summary
+    summary,
   };
 }
 

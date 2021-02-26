@@ -9,7 +9,7 @@ export class MemorySink implements Sink {
   }
 
   recordsByType(type: TelemetryType): Record[] {
-    return this.records.filter(r => r.type === type);
+    return this.records.filter((r) => r.type === type);
   }
 
   oneRecord(type?: TelemetryType): Record {

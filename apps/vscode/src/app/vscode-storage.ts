@@ -35,7 +35,7 @@ export class VSCodeStorage implements Store {
 const ConfigKeys = [
   'enableTelemetry',
   'useNVM',
-  'enableGenerateFromContextMenu'
+  'enableGenerateFromContextMenu',
 ];
 
 function isConfig(key: string): boolean {

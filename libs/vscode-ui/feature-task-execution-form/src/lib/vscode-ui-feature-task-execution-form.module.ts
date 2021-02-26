@@ -24,8 +24,8 @@ export function getSchema() {
   providers: [
     {
       provide: TASK_EXECUTION_SCHEMA,
-      useFactory: getSchema
-    }
-  ]
+      useFactory: getSchema,
+    },
+  ],
 })
 export class VscodeUiFeatureTaskExecutionFormModule {}

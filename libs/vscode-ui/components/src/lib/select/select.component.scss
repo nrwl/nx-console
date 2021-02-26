@@ -17,6 +17,7 @@ select {
   width: $input-width;
 }
 
-select.ng-invalid.ng-dirty, select.ng-invalid.ng-touched {
+select.ng-invalid.ng-dirty,
+select.ng-invalid.ng-touched {
   border-color: $error-border-color;
 }

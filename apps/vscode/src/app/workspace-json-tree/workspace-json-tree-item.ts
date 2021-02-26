@@ -11,7 +11,7 @@ export class WorkspaceJsonTreeItem extends TreeItem {
     if (collapsibleState) {
       this.command = {
         title: 'Expand/contract item in workspace tree',
-        command: 'nxConsole.toggleTreeItem'
+        command: 'nxConsole.toggleTreeItem',
       };
     }
   }

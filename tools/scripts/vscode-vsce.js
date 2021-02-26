@@ -6,6 +6,6 @@ cp.execSync(
   )} package --yarn --out nx-console.vsix`,
   {
     stdio: [0, 1, 2],
-    cwd: path.normalize('dist/apps/vscode')
+    cwd: path.normalize('dist/apps/vscode'),
   }
 );

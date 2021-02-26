@@ -1,11 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import {
   TaskExecutionSchema,
-  WORKSPACE_GENERATOR_NAME_REGEX
+  WORKSPACE_GENERATOR_NAME_REGEX,
 } from '@nx-console/schema';
 
 @Pipe({
-  name: 'formatTask'
+  name: 'formatTask',
 })
 export class FormatTaskPipe implements PipeTransform {
   transform(architect: TaskExecutionSchema): string {
@@ -17,7 +17,7 @@ export class FormatTaskPipe implements PipeTransform {
         ...architect,
         cliName: 'nx',
         command: `workspace-${positionals[1]}`,
-        positional: positionals[2]
+        positional: positionals[2],
       };
     }
     return `${architect.cliName} ${architect.command} ${architect.positional}`;

@@ -13,7 +13,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'List of static application assets.',
       defaultValue: '',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'main',
@@ -21,7 +21,7 @@ export const NG_BUILD_ARCHITECT = {
       description:
         'The full path for the main entry point to the app, relative to the current workspace.',
       required: true,
-      positional: false
+      positional: false,
     },
     {
       name: 'polyfills',
@@ -29,7 +29,7 @@ export const NG_BUILD_ARCHITECT = {
       description:
         'The full path for the polyfills file, relative to the current workspace.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'tsConfig',
@@ -37,7 +37,7 @@ export const NG_BUILD_ARCHITECT = {
       description:
         'The full path for the TypeScript configuration file, relative to the current workspace.',
       required: true,
-      positional: false
+      positional: false,
     },
     {
       name: 'scripts',
@@ -45,7 +45,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Global scripts to be included in the build.',
       defaultValue: '',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'styles',
@@ -53,21 +53,21 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Global styles to be included in the build.',
       defaultValue: '',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'stylePreprocessorOptions',
       type: 'object',
       description: 'Options to pass to style preprocessors.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'optimization',
       type: 'string',
       description: 'Enables optimization of the build output.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'fileReplacements',
@@ -75,7 +75,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Replace files with other files in the build.',
       defaultValue: '',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'outputPath',
@@ -83,7 +83,7 @@ export const NG_BUILD_ARCHITECT = {
       description:
         'The full path for the new output directory, relative to the current workspace.\n\nBy default, writes output to a folder named dist/ in the current project.',
       required: true,
-      positional: false
+      positional: false,
     },
     {
       name: 'resourcesOutputPath',
@@ -92,7 +92,7 @@ export const NG_BUILD_ARCHITECT = {
         'The path where style resources will be placed, relative to outputPath.',
       defaultValue: '',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'aot',
@@ -100,7 +100,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Build using Ahead of Time compilation.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'sourceMap',
@@ -108,7 +108,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Output sourcemaps.',
       defaultValue: 'true',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'vendorSourceMap',
@@ -116,7 +116,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Resolve vendor packages sourcemaps.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'evalSourceMap',
@@ -124,7 +124,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Output in-file eval sourcemaps.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'vendorChunk',
@@ -132,7 +132,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Use a separate bundle containing only vendor libraries.',
       defaultValue: 'true',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'commonChunk',
@@ -141,21 +141,21 @@ export const NG_BUILD_ARCHITECT = {
         'Use a separate bundle containing code used across multiple bundles.',
       defaultValue: 'true',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'baseHref',
       type: 'string',
       description: 'Base url for the application being built.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'deployUrl',
       type: 'string',
       description: 'URL where files will be deployed.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'verbose',
@@ -163,21 +163,21 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Adds more details to output logging.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'progress',
       type: 'boolean',
       description: 'Log progress to the console while building.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'i18nFile',
       type: 'string',
       description: 'Localization file to use for i18n.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'i18nFormat',
@@ -185,21 +185,21 @@ export const NG_BUILD_ARCHITECT = {
       description:
         'Format of the localization file specified with --i18n-file.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'i18nLocale',
       type: 'string',
       description: 'Locale to use for i18n.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'i18nMissingTranslation',
       type: 'string',
       description: 'How to handle missing translations for i18n.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'extractCss',
@@ -208,7 +208,7 @@ export const NG_BUILD_ARCHITECT = {
         'Extract css from global styles into css files instead of js ones.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'watch',
@@ -216,7 +216,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Run build when files change.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'outputHashing',
@@ -225,7 +225,7 @@ export const NG_BUILD_ARCHITECT = {
       defaultValue: 'none',
       required: false,
       positional: false,
-      enum: ['none', 'all', 'media', 'bundles']
+      enum: ['none', 'all', 'media', 'bundles'],
     },
     {
       name: 'poll',
@@ -233,7 +233,7 @@ export const NG_BUILD_ARCHITECT = {
       description:
         'Enable and define the file watching poll time period in milliseconds.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'deleteOutputPath',
@@ -241,7 +241,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Delete the output path before building.',
       defaultValue: 'true',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'preserveSymlinks',
@@ -249,7 +249,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Do not use the real path when resolving modules.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'extractLicenses',
@@ -257,7 +257,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Extract all licenses in a separate file.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'showCircularDependencies',
@@ -265,7 +265,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Show circular dependency warnings on builds.',
       defaultValue: 'true',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'buildOptimizer',
@@ -274,7 +274,7 @@ export const NG_BUILD_ARCHITECT = {
         "Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option.",
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'namedChunks',
@@ -282,7 +282,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Use file name for lazy loaded chunks.',
       defaultValue: 'true',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'subresourceIntegrity',
@@ -290,7 +290,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Enables the use of subresource integrity validation.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'serviceWorker',
@@ -298,14 +298,14 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Generates a service worker config for production builds.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'ngswConfigPath',
       type: 'string',
       description: 'Path to ngsw-config.json.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'skipAppShell',
@@ -313,14 +313,14 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Flag to prevent building an app shell.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'index',
       type: 'string',
       description: 'The name of the index HTML file.',
       required: true,
-      positional: false
+      positional: false,
     },
     {
       name: 'statsJson',
@@ -329,7 +329,7 @@ export const NG_BUILD_ARCHITECT = {
         "Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'forkTypeChecker',
@@ -337,7 +337,7 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Run the TypeScript type checker in a forked process.',
       defaultValue: 'true',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'lazyModules',
@@ -346,7 +346,7 @@ export const NG_BUILD_ARCHITECT = {
         'List of additional NgModule files that will be lazy loaded. Lazy router modules will be discovered automatically.',
       defaultValue: '',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'budgets',
@@ -355,7 +355,7 @@ export const NG_BUILD_ARCHITECT = {
         'Budget thresholds to ensure parts of your application stay within boundaries which you set.',
       defaultValue: '',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'profile',
@@ -363,14 +363,14 @@ export const NG_BUILD_ARCHITECT = {
       description: 'Output profile events for Chrome profiler.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'es5BrowserSupport',
       type: 'boolean',
       description: 'Enables conditionally loaded ES2015 polyfills.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'rebaseRootRelativeCssUrls',
@@ -379,14 +379,14 @@ export const NG_BUILD_ARCHITECT = {
         'Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only for compatibility and transition. The behavior of this option is non-standard and will be removed in the next major release.',
       defaultValue: 'false',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'webWorkerTsConfig',
       type: 'string',
       description: 'TypeScript configuration for Web Worker modules.',
       required: false,
-      positional: false
+      positional: false,
     },
     {
       name: 'crossOrigin',
@@ -396,57 +396,57 @@ export const NG_BUILD_ARCHITECT = {
       defaultValue: 'none',
       required: false,
       positional: false,
-      enum: ['none', 'anonymous', 'use-credentials']
-    }
+      enum: ['none', 'anonymous', 'use-credentials'],
+    },
   ],
   options: {
     defaultValues: [
       {
         name: 'outputPath',
-        defaultValue: 'dist/apps/vscode/assets/public'
+        defaultValue: 'dist/apps/vscode/assets/public',
       },
       {
         name: 'index',
-        defaultValue: 'apps/vscode-ui/src/index.html'
+        defaultValue: 'apps/vscode-ui/src/index.html',
       },
       {
         name: 'main',
-        defaultValue: 'apps/vscode-ui/src/main.ts'
+        defaultValue: 'apps/vscode-ui/src/main.ts',
       },
       {
         name: 'tsConfig',
-        defaultValue: 'apps/vscode-ui/tsconfig.app.json'
+        defaultValue: 'apps/vscode-ui/tsconfig.app.json',
       },
       {
-        name: 'assets'
+        name: 'assets',
       },
       {
-        name: 'styles'
+        name: 'styles',
       },
       {
         name: 'extractCss',
-        defaultValue: 'true'
+        defaultValue: 'true',
       },
       {
         name: 'namedChunks',
-        defaultValue: 'false'
+        defaultValue: 'false',
       },
       {
         name: 'extractLicenses',
-        defaultValue: 'true'
+        defaultValue: 'true',
       },
       {
         name: 'vendorChunk',
-        defaultValue: 'false'
+        defaultValue: 'false',
       },
       {
-        name: 'stylePreprocessorOptions'
+        name: 'stylePreprocessorOptions',
       },
       {
         name: 'es5BrowserSupport',
-        defaultValue: 'false'
-      }
-    ]
+        defaultValue: 'false',
+      },
+    ],
   },
   configurations: [
     {
@@ -454,75 +454,75 @@ export const NG_BUILD_ARCHITECT = {
       defaultValues: [
         {
           name: 'outputPath',
-          defaultValue: 'prodpath'
+          defaultValue: 'prodpath',
         },
         {
           name: 'index',
-          defaultValue: 'apps/vscode-ui/src/index.html'
+          defaultValue: 'apps/vscode-ui/src/index.html',
         },
         {
           name: 'main',
-          defaultValue: 'apps/vscode-ui/src/main.ts'
+          defaultValue: 'apps/vscode-ui/src/main.ts',
         },
         {
           name: 'tsConfig',
-          defaultValue: 'apps/vscode-ui/tsconfig.app.json'
+          defaultValue: 'apps/vscode-ui/tsconfig.app.json',
         },
         {
-          name: 'assets'
+          name: 'assets',
         },
         {
-          name: 'styles'
+          name: 'styles',
         },
         {
           name: 'extractCss',
-          defaultValue: 'true'
+          defaultValue: 'true',
         },
         {
           name: 'namedChunks',
-          defaultValue: 'false'
+          defaultValue: 'false',
         },
         {
           name: 'extractLicenses',
-          defaultValue: 'true'
+          defaultValue: 'true',
         },
         {
           name: 'vendorChunk',
-          defaultValue: 'false'
+          defaultValue: 'false',
         },
         {
-          name: 'stylePreprocessorOptions'
+          name: 'stylePreprocessorOptions',
         },
         {
           name: 'es5BrowserSupport',
-          defaultValue: 'false'
+          defaultValue: 'false',
         },
         {
           name: 'sourceMap',
-          defaultValue: 'false'
+          defaultValue: 'false',
         },
         {
           name: 'aot',
-          defaultValue: 'true'
+          defaultValue: 'true',
         },
         {
           name: 'optimization',
-          defaultValue: 'true'
+          defaultValue: 'true',
         },
         {
           name: 'buildOptimizer',
-          defaultValue: 'true'
+          defaultValue: 'true',
         },
         {
-          name: 'fileReplacements'
-        }
-      ]
-    }
+          name: 'fileReplacements',
+        },
+      ],
+    },
   ],
   name: 'build',
   project: 'vscode-ui',
   description: '',
-  builder: '@angular-devkit/build-angular:browser'
+  builder: '@angular-devkit/build-angular:browser',
 };
 
 export const MOCK_COMPONENT_ARCHITECT = {
@@ -544,7 +544,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'inlineTemplate',
@@ -556,7 +556,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'viewEncapsulation',
@@ -577,10 +577,10 @@ export const MOCK_COMPONENT_ARCHITECT = {
             source: {
               _isScalar: false,
               source: { _isScalar: false },
-              operator: { concurrent: 1 }
+              operator: { concurrent: 1 },
             },
-            operator: {}
-          }
+            operator: {},
+          },
         },
         operator: {
           connectable: {
@@ -589,13 +589,13 @@ export const MOCK_COMPONENT_ARCHITECT = {
               source: {
                 _isScalar: false,
                 source: { _isScalar: false },
-                operator: { concurrent: 1 }
+                operator: { concurrent: 1 },
               },
-              operator: {}
-            }
-          }
-        }
-      }
+              operator: {},
+            },
+          },
+        },
+      },
     },
     {
       name: 'changeDetection',
@@ -615,10 +615,10 @@ export const MOCK_COMPONENT_ARCHITECT = {
             source: {
               _isScalar: false,
               source: { _isScalar: false },
-              operator: { concurrent: 1 }
+              operator: { concurrent: 1 },
             },
-            operator: {}
-          }
+            operator: {},
+          },
         },
         operator: {
           connectable: {
@@ -627,13 +627,13 @@ export const MOCK_COMPONENT_ARCHITECT = {
               source: {
                 _isScalar: false,
                 source: { _isScalar: false },
-                operator: { concurrent: 1 }
+                operator: { concurrent: 1 },
               },
-              operator: {}
-            }
-          }
-        }
-      }
+              operator: {},
+            },
+          },
+        },
+      },
     },
     {
       name: 'prefix',
@@ -644,7 +644,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'styleext',
@@ -655,7 +655,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'style',
@@ -675,10 +675,10 @@ export const MOCK_COMPONENT_ARCHITECT = {
             source: {
               _isScalar: false,
               source: { _isScalar: false },
-              operator: { concurrent: 1 }
+              operator: { concurrent: 1 },
             },
-            operator: {}
-          }
+            operator: {},
+          },
         },
         operator: {
           connectable: {
@@ -687,13 +687,13 @@ export const MOCK_COMPONENT_ARCHITECT = {
               source: {
                 _isScalar: false,
                 source: { _isScalar: false },
-                operator: { concurrent: 1 }
+                operator: { concurrent: 1 },
               },
-              operator: {}
-            }
-          }
-        }
-      }
+              operator: {},
+            },
+          },
+        },
+      },
     },
     {
       name: 'spec',
@@ -705,7 +705,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'skipTests',
@@ -717,7 +717,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'flat',
@@ -729,7 +729,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'skipImport',
@@ -741,7 +741,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'selector',
@@ -752,7 +752,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'entryComponent',
@@ -764,7 +764,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
+      important: false,
     },
     {
       name: 'lintFix',
@@ -776,9 +776,9 @@ export const MOCK_COMPONENT_ARCHITECT = {
       required: false,
       positional: false,
       __typename: 'Schema',
-      important: false
-    }
-  ]
+      important: false,
+    },
+  ],
 };
 
 export const environment = {
@@ -786,7 +786,7 @@ export const environment = {
   providers: [
     {
       provide: TASK_EXECUTION_SCHEMA,
-      useValue: MOCK_COMPONENT_ARCHITECT
-    }
-  ]
+      useValue: MOCK_COMPONENT_ARCHITECT,
+    },
+  ],
 };

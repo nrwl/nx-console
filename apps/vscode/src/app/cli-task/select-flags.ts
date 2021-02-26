@@ -43,21 +43,21 @@ async function promptForFlagToSet(
     {
       picked: true,
       alwaysShow: true,
-      label: `Execute: ${currentCommand}`
+      label: `Execute: ${currentCommand}`,
     },
     ...options.map(
-      option =>
+      (option) =>
         new CliTaskFlagQuickPickItem(
           option.name,
           option.description || option.type,
           option,
           `${option.name}`
         )
-    )
+    ),
   ];
 
   const selection = await window.showQuickPick(flagItems, {
-    placeHolder: 'Execute command or set flags'
+    placeHolder: 'Execute command or set flags',
   });
 
   if (!selection) {
@@ -69,7 +69,7 @@ async function promptForFlagToSet(
     return { execute: true };
   } else {
     return {
-      flag: selection as CliTaskFlagQuickPickItem
+      flag: selection as CliTaskFlagQuickPickItem,
     };
   }
 }
@@ -78,15 +78,15 @@ function promptForFlagValue(flagToSet: CliTaskFlagQuickPickItem) {
   const placeHolder = `--${flagToSet.flagName}=...`;
   if (flagToSet.option.type === 'boolean') {
     return window.showQuickPick(['true', 'false'], {
-      placeHolder
+      placeHolder,
     });
   } else if (flagToSet.option.enum && flagToSet.option.enum.length) {
     return window.showQuickPick([...flagToSet.option.enum.map(String)], {
-      placeHolder
+      placeHolder,
     });
   } else {
     return window.showInputBox({
-      placeHolder
+      placeHolder,
     });
   }
 }

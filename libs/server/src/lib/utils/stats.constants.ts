@@ -89,5 +89,5 @@ export const SPECIAL_SOURCE_FILE_MAPPINGS: { [k: string]: string } = {
   'src/lib/grid-list': 'node_modules/@angular/material/grid-list',
   'src/lib/flex': 'node_modules/@angular/flex-layout/flex',
   'src/lib/extended': 'node_modules/@angular/flex-layout/extended',
-  'src/lib/grid': 'node_modules/@angular/flex-layout/grid'
+  'src/lib/grid': 'node_modules/@angular/flex-layout/grid',
 };

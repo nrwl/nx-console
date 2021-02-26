@@ -3,7 +3,7 @@ import {
   ChangeDetectionStrategy,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
 } from '@angular/core';
 import { ControlContainer, FormGroup } from '@angular/forms';
 import { Option } from '@nx-console/schema';
@@ -12,7 +12,7 @@ import { Option } from '@nx-console/schema';
   selector: 'nx-console-input',
   templateUrl: './input.component.html',
   styleUrls: ['./input.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputComponent {
   @Input() field: Option;

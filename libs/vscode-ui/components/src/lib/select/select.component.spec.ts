@@ -12,9 +12,9 @@ const mockOption: Option = {
   type: OptionType.String,
   aliases: [],
   itemTooltips: {
-    test: 'testLabel'
+    test: 'testLabel',
   },
-  items: [initialValue, 'other', 'values']
+  items: [initialValue, 'other', 'values'],
 };
 
 @Component({
@@ -22,7 +22,7 @@ const mockOption: Option = {
     <form [formGroup]="formGroup">
       <nx-console-select [field]="field"></nx-console-select>
     </form>
-  `
+  `,
 })
 class ParentFormComponent {
   field = mockOption;
@@ -40,10 +40,9 @@ describe('SelectComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ParentFormComponent],
-      imports: [ReactiveFormsModule]
+      imports: [ReactiveFormsModule],
     }).compileComponents();
   }));
-
   beforeEach(() => {
     fixture = TestBed.createComponent(ParentFormComponent);
     parent = fixture.componentInstance;

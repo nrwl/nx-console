@@ -33,8 +33,8 @@ function getWin32ShellExecution(config: ShellConfig): ShellExecution {
       `-Sta -NoLogo -NonInteractive -C "& {${config.program.replace(
         / /g,
         '` ' // NOTE: In powershell ` is the escape key.
-      )} ${config.args.join(' ')}}"`
-    ]
+      )} ${config.args.join(' ')}}"`,
+    ],
   });
 }
 
@@ -42,10 +42,7 @@ let bashPath: string;
 function getUnixShellExecution(config: ShellConfig): ShellExecution {
   if (!bashPath) {
     try {
-      bashPath =
-        execSync('which bash')
-          .toString()
-          .trim() || '/bin/bash';
+      bashPath = execSync('which bash').toString().trim() || '/bin/bash';
     } catch {
       bashPath = '/bin/bash'; // Default to where bash is usually installed.
     }
@@ -56,7 +53,7 @@ function getUnixShellExecution(config: ShellConfig): ShellExecution {
     shellArgs: [
       '-l',
       '-c',
-      `${config.program.replace(/ /g, '\\ ')} ${config.args.join(' ')}`
-    ]
+      `${config.program.replace(/ /g, '\\ ')} ${config.args.join(' ')}`,
+    ],
   });
 }

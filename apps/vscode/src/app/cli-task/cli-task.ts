@@ -36,7 +36,7 @@ export class CliTask extends Task {
         args,
         cwd: workspacePath,
         name: displayCommand,
-        program
+        program,
       })
     );
 

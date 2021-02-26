@@ -291,11 +291,11 @@ export const EXTENSIONS: { [key: string]: string } = {
     'An Angular Schematic that automatically adds types to TypeScript code using [TypeWiz](https://www.npmjs.com/package/typewiz-core)',
   'ui-jar-schematics':
     'Schematics that add an ui-jar project in an Angular workspace for making documentation',
-  'yang-schematics': 'Yet Another Angular Generator'
+  'yang-schematics': 'Yet Another Angular Generator',
 };
 
 export function readExtensions(packageJson: any) {
-  return availableExtensions().filter(e => {
+  return availableExtensions().filter((e) => {
     const hasDep = packageJson.dependencies && packageJson.dependencies[e.name];
     const hasDevDep =
       packageJson.devDependencies && packageJson.devDependencies[e.name];
@@ -309,11 +309,11 @@ export function availableExtensions(): Array<{
 }> {
   return Object.keys(EXTENSIONS)
     .sort()
-    .map(name => {
+    .map((name) => {
       const description = EXTENSIONS[name];
       return {
         name,
-        description
+        description,
       };
     });
 }

@@ -27,7 +27,7 @@ class TelemetryParams {
 
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   visitor = require('universal-analytics')(TRACKING_ID, {
-    uid: this.user.id
+    uid: this.user.id,
   });
 
   get enabled() {
@@ -88,12 +88,12 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     this.visitor
       .event({
         ec: 'Application',
-        ea: 'Activated'
+        ea: 'Activated',
       })
       .timing({
         utc: 'Application',
         utv: 'Activation Time',
-        utt: time
+        utt: time,
       })
       .send();
   }
@@ -102,7 +102,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     this.visitor
       .event({
         ec: 'Application',
-        ea: 'Deactivated'
+        ea: 'Deactivated',
       })
       .send();
   }
@@ -111,7 +111,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     this.visitor
       .event({
         ec: 'Data Collection',
-        ea: 'Opt In'
+        ea: 'Opt In',
       })
       .send();
   }
@@ -120,7 +120,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     this.visitor
       .event({
         ec: 'Data Collection',
-        ea: 'Opt Out'
+        ea: 'Opt Out',
       })
       .send();
   }
@@ -129,7 +129,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     this.visitor
       .screenview({
         an: 'Nx Console',
-        cd: screen
+        cd: screen,
       })
       .send();
   }
@@ -139,7 +139,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       .timing({
         utc: 'Command',
         utv: commandType,
-        utt: time
+        utt: time,
       })
       .send();
   }
@@ -147,7 +147,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   exception(error: string) {
     this.visitor
       .exception({
-        exd: error
+        exd: error,
       })
       .send();
   }
@@ -156,7 +156,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     this.visitor
       .event({
         ec: 'Feature',
-        ea: feature
+        ea: feature,
       })
       .send();
   }

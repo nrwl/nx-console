@@ -19,6 +19,6 @@ export function isTelemetryRecord(evt: string): evt is TelemetryType {
     'CommandRun',
     'ExceptionOccurred',
     'FeatureUsed',
-    'UserStateChanged'
+    'UserStateChanged',
   ]).has(evt);
 }

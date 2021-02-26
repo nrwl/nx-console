@@ -6,14 +6,14 @@ import {
   Component,
   forwardRef,
   Input,
-  OnDestroy
+  OnDestroy,
 } from '@angular/core';
 import {
   ControlContainer,
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
   FormControl,
-  FormGroup
+  FormGroup,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -22,7 +22,7 @@ enum OptionComponent {
   Checkbox = 'checkBox',
   Input = 'input',
   Select = 'select',
-  MultiSelect = 'multiSelect'
+  MultiSelect = 'multiSelect',
 }
 
 /* Wrapper for select, text input, checkbox, autocomplete */
@@ -36,9 +36,9 @@ enum OptionComponent {
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => FieldComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class FieldComponent implements ControlValueAccessor, OnDestroy {
   @Input() field: Option;
@@ -86,7 +86,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private controlContainer: ControlContainer
   ) {
-    this.valueChangeSub = this.control.valueChanges.subscribe(value => {
+    this.valueChangeSub = this.control.valueChanges.subscribe((value) => {
       this.value = value;
     });
     this.parentFormGroup = this.controlContainer.control as FormGroup;
@@ -117,7 +117,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     }
 
     return Object.keys(control.errors as any)
-      .map(key => {
+      .map((key) => {
         if (!!control.errors) {
           if (key === 'required') {
             return `${fieldName
@@ -128,7 +128,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
           }
         }
       })
-      .filter(error => !!error);
+      .filter((error) => !!error);
   }
 
   get hasItems(): boolean {

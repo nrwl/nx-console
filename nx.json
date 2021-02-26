@@ -3,8 +3,9 @@
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": "*",
-    "tsconfig.json": "*",
-    "tslint.json": "*"
+    "tslint.json": "*",
+    "tsconfig.base.json": "*",
+    ".eslintrc.json": "*"
   },
   "projects": {
     "schema": {
@@ -32,5 +33,22 @@
       "tags": [],
       "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
     }
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e",
+          "build-storybook"
+        ]
+      }
+    }
+  },
+  "affected": {
+    "defaultBase": "master"
   }
 }

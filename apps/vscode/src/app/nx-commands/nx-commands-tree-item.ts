@@ -5,7 +5,7 @@ export class NxCommandsTreeItem extends TreeItem {
   command = {
     title: this.affectedCommand,
     command: `nx.${this.affectedCommand.replace(':', '.')}`,
-    tooltip: `Run nx ${this.affectedCommand}`
+    tooltip: `Run nx ${this.affectedCommand}`,
   };
 
   iconPath = Uri.file(join(this.extensionPath, 'assets', 'nx-cli.svg'));

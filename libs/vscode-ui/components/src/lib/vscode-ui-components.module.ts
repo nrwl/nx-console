@@ -20,7 +20,7 @@ import { FormatTaskPipe } from './format-task/format-task.pipe';
     FieldComponent,
     FieldTreeComponent,
     MultipleSelectComponent,
-    FormatTaskPipe
+    FormatTaskPipe,
   ],
   exports: [
     AutocompleteComponent,
@@ -30,7 +30,7 @@ import { FormatTaskPipe } from './format-task/format-task.pipe';
     FieldComponent,
     FieldTreeComponent,
     MultipleSelectComponent,
-    FormatTaskPipe
-  ]
+    FormatTaskPipe,
+  ],
 })
 export class VscodeUiComponentsModule {}

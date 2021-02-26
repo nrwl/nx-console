@@ -4,7 +4,7 @@ import {
   Task,
   TaskExecution,
   TaskProvider,
-  tasks
+  tasks,
 } from 'vscode';
 
 import { getTelemetry } from '../telemetry';
@@ -16,7 +16,7 @@ import {
   NamedProject,
   ProjectDef,
   Projects,
-  WorkspaceJson
+  WorkspaceJson,
 } from './cli-task-definition';
 import { NxTask } from './nx-task';
 import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/schema';
@@ -64,7 +64,9 @@ export class CliTaskProvider implements TaskProvider {
       const cliTask = this.createTask({
         command: task.definition.command,
         positional: task.definition.project,
-        flags: Array.isArray(task.definition.flags) ? task.definition.flags : []
+        flags: Array.isArray(task.definition.flags)
+          ? task.definition.flags
+          : [],
       });
       // resolveTask requires that the same definition object be used.
       cliTask.definition = task.definition;
@@ -103,7 +105,7 @@ export class CliTaskProvider implements TaskProvider {
         {
           command: `workspace-${positionals[1]}`,
           positional: positionals[2],
-          flags: definition.flags
+          flags: definition.flags,
         },
         cliTaskProvider.getWorkspacePath()
       );
@@ -114,7 +116,7 @@ export class CliTaskProvider implements TaskProvider {
     const telemetry = getTelemetry();
     telemetry.featureUsed(definition.command);
 
-    return tasks.executeTask(task).then(execution => {
+    return tasks.executeTask(task).then((execution) => {
       if (isDryRun) {
         this.currentDryRun = execution;
       }

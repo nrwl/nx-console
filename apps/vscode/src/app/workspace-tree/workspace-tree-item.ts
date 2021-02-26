@@ -19,7 +19,7 @@ const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
   ['Serve', 'nx-cli.svg'],
   ['Test', 'nx-cli.svg'],
   ['E2e', 'nx-cli.svg'],
-  ['Lint', 'nx-cli.svg']
+  ['Lint', 'nx-cli.svg'],
 ]);
 
 export const ROUTE_LIST: WorkspaceRouteTitle[] = [
@@ -29,7 +29,7 @@ export const ROUTE_LIST: WorkspaceRouteTitle[] = [
   'Serve',
   'Test',
   'E2e',
-  'Lint'
+  'Lint',
 ];
 
 export class WorkspaceTreeItem extends TreeItem {
@@ -37,17 +37,20 @@ export class WorkspaceTreeItem extends TreeItem {
     (currentWorkspace.visible
       ? currentWorkspace.reveal(this, {
           select: true,
-          focus: true
+          focus: true,
         })
       : Promise.reject()
-    ).then(() => {}, () => {}); // Explicitly handle rejection
+    ).then(
+      () => {},
+      () => {}
+    ); // Explicitly handle rejection
   }
 
   command = {
     title: this.route,
     command: 'nxConsole.revealWebViewPanel',
     tooltip: '',
-    arguments: [this]
+    arguments: [this],
   };
 
   iconPath = WorkspaceTreeItem.getIconUriForRoute(

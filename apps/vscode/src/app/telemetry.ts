@@ -29,7 +29,7 @@ export function initTelemetry(store: Store) {
     store.set('shownTelemetryPrompt', true);
   }
 
-  disposer = workspace.onDidChangeConfiguration(e => {
+  disposer = workspace.onDidChangeConfiguration((e) => {
     if (e.affectsConfiguration(telemetrySetting)) {
       if (store.get(enableTelemetry)) {
         telemetry.startedTracking();
