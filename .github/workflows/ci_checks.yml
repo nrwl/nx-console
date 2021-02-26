@@ -1,9 +1,5 @@
 name: CI Checks
-on:
-  pull_request:
-    branches: [master]
-  push:
-    branches: [master]
+on: [push, pull_request]
 
 jobs:
   setup:
@@ -29,7 +25,11 @@ jobs:
         run: yarn install --frozen-lockfile
   lint:
     runs-on: ${{ matrix.os }}
-
+    
+    env:
+      NX_BRANCH: ${{ github.event.number }}
+      NX_RUN_GROUP: ${{ github.run_id }}
+      
     needs: [setup]
     strategy:
       matrix:
@@ -53,7 +53,11 @@ jobs:
 
   build:
     runs-on: ${{ matrix.os }}
-
+    
+    env:
+      NX_BRANCH: ${{ github.event.number }}
+      NX_RUN_GROUP: ${{ github.run_id }}
+      
     needs: [setup]
 
     strategy:
@@ -79,6 +83,10 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
 
+    env:
+      NX_BRANCH: ${{ github.event.number }}
+      NX_RUN_GROUP: ${{ github.run_id }}
+      
     needs: [setup]
 
     strategy:
