@@ -25,8 +25,8 @@
     "update": "nx migrate latest"
   },
   "dependencies": {
-    "jsonc-parser": "^2.1.1",
-    "@ngrx/component-store": "11.0.0"
+    "@ngrx/component-store": "11.0.0",
+    "jsonc-parser": "^2.1.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.1102.1",
@@ -44,6 +44,7 @@
     "@nrwl/cypress": "11.4.0",
     "@nrwl/jest": "11.4.0",
     "@nrwl/node": "11.4.0",
+    "@nrwl/nx-cloud": "11.1.4",
     "@nrwl/storybook": "11.4.0",
     "@nrwl/tao": "11.4.0",
     "@nrwl/workspace": "11.4.0",
