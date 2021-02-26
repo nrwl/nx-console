@@ -17,10 +17,10 @@ describe('TaskExecutionFormComponent', () => {
           useValue: {
             run(fn: Function): any {
               return fn();
-            }
-          }
-        }
-      ]
+            },
+          },
+        },
+      ],
     }).compileComponents();
   }));
 

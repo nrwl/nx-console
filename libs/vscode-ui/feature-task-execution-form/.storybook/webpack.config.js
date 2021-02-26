@@ -10,12 +10,11 @@ module.exports = async ({ config, mode }) => {
 
   const tsPaths = new TsconfigPathsPlugin({
     configFile: './tsconfig.base.json',
-   });
+  });
 
   config.resolve.plugins
     ? config.resolve.plugins.push(tsPaths)
-    : (config.resolve.plugins = [tsPaths])
+    : (config.resolve.plugins = [tsPaths]);
 
-  
   return config;
 };

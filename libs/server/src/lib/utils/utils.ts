@@ -11,7 +11,7 @@ import {
   LongFormXPrompt,
   ItemTooltips,
   OptionItemLabelValue,
-  ItemsWithEnum
+  ItemsWithEnum,
 } from '@nx-console/schema';
 import { Option as CliOption } from '@angular/cli/models/interface';
 
@@ -177,11 +177,11 @@ export async function normalizeSchema(
       required: isFieldRequired(requiredFields, option, xPrompt, $default),
       ...(workspaceDefault && { default: workspaceDefault }),
       ...($default && { $default }),
-      ...(option.enum && { items: option.enum.map(item => item.toString()) }),
+      ...(option.enum && { items: option.enum.map((item) => item.toString()) }),
       // Strongly suspect items does not belong in the Option schema.
       //  Angular Option doesn't have the items property outside of x-prompt,
       //  but items is used in @schematics/angular - guard
-      ...getItems(s.properties[option.name])
+      ...getItems(s.properties[option.name]),
     };
 
     if (xPrompt) {
@@ -254,7 +254,7 @@ function getItems(option: Option): { items: string[] } | undefined {
     option.items && {
       items:
         (option.items as ItemsWithEnum)!.enum ||
-        ((option.items as string[]).length && option.items)
+        ((option.items as string[]).length && option.items),
     }
   );
 }

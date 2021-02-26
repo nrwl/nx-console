@@ -22,7 +22,7 @@ enum OptionComponent {
   Checkbox = 'checkBox',
   Input = 'input',
   Select = 'select',
-  MultiSelect = 'multiSelect'
+  MultiSelect = 'multiSelect',
 }
 
 /* Wrapper for select, text input, checkbox, autocomplete */
@@ -117,7 +117,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     }
 
     return Object.keys(control.errors as any)
-      .map(key => {
+      .map((key) => {
         if (!!control.errors) {
           if (key === 'required') {
             return `${fieldName
@@ -128,7 +128,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
           }
         }
       })
-      .filter(error => !!error);
+      .filter((error) => !!error);
   }
 
   get hasItems(): boolean {
