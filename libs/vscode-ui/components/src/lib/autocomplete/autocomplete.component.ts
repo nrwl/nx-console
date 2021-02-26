@@ -76,7 +76,7 @@ export class AutocompleteComponent
 
   constructor(
     private readonly _elementRef: ElementRef,
-    private controlContainer: ControlContainer
+    private readonly controlContainer: ControlContainer
   ) {
     this.parentFormGroup = this.controlContainer.control as FormGroup;
   }
