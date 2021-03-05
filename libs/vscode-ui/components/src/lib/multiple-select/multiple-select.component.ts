@@ -4,8 +4,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnChanges,
-  SimpleChanges,
   OnInit,
   OnDestroy,
 } from '@angular/core';
@@ -19,21 +17,23 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./multiple-select.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
+export class MultipleSelectComponent implements OnInit, OnDestroy {
   @Input() field: Option;
   @Input() value: string[];
   @Output() readonly valueChange = new EventEmitter<string[]>();
-  selectControl = new FormControl([]);
+  selectControl: FormControl;
   items: string[];
   parentFormGroup: FormGroup;
 
-  constructor(private readonly controlContainer: ControlContainer) {
-    this.parentFormGroup = this.controlContainer.control as FormGroup;
-  }
+  constructor(private readonly controlContainer: ControlContainer) {}
 
   private readonly subscriptioins = new Subscription();
 
   ngOnInit(): void {
+    this.parentFormGroup = this.controlContainer.control as FormGroup;
+    this.selectControl = this.parentFormGroup.get(
+      this.field.name
+    ) as FormControl;
     this.subscriptioins.add(
       this.selectControl.valueChanges.subscribe((value) =>
         this.valueChange.emit(value)
@@ -51,12 +51,6 @@ export class MultipleSelectComponent implements OnInit, OnChanges, OnDestroy {
   ): items is ItemsWithEnum {
     // tslint:disable-next-line: strict-type-predicates
     return (items as ItemsWithEnum).enum !== undefined;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.value) {
-      this.selectControl.setValue(changes.value.currentValue);
-    }
   }
 
   getOptionTooltip(optionValue: string): string | null {

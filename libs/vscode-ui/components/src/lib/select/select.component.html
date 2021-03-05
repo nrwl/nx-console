@@ -4,10 +4,8 @@
 
 <div [formGroup]="parentFormGroup">
   <select
-    #selectControl
     (change)="updateValue($event.target.value)"
     role="combobox"
-    [value]="value"
     [id]="field.name"
     [required]="field.required"
     [formControlName]="field.name"

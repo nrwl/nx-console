@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OptionType } from '@angular/cli/models/interface';
 import { Option } from '@nx-console/schema';
 import { SelectComponent } from './select.component';
@@ -20,44 +20,51 @@ const mockOption: Option = {
 @Component({
   template: `
     <form [formGroup]="formGroup">
-      <nx-console-select [field]="field"></nx-console-select>
+      <nx-console-select #select [field]="field"></nx-console-select>
     </form>
   `,
 })
 class ParentFormComponent {
   field = mockOption;
   formGroup = this.fb.group({ [this.field.name]: initialValue });
-  @ViewChild(SelectComponent, { static: true })
+  @ViewChild('select', { static: true })
   selectComponent: SelectComponent;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private readonly fb: FormBuilder) {}
 }
 describe('SelectComponent', () => {
   let fixture: ComponentFixture<ParentFormComponent>;
   let parent: ParentFormComponent;
-  let component: SelectComponent;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ParentFormComponent],
-      imports: [ReactiveFormsModule],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [ParentFormComponent, SelectComponent],
+        imports: [FormsModule, ReactiveFormsModule],
+      }).compileComponents();
+    })
+  );
   beforeEach(() => {
     fixture = TestBed.createComponent(ParentFormComponent);
     parent = fixture.componentInstance;
-    component = parent.selectComponent;
     fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(parent).toBeDefined();
+    expect(parent.selectComponent).toBeDefined();
   });
 
   describe('getOptionTooltip', () => {
     it('should get tooltip for option value', () => {
-      component.field = mockOption;
-      expect(component.getOptionTooltip('test')).toBe('testLabel');
+      parent.field = mockOption;
+      expect(parent.selectComponent.getOptionTooltip('test')).toBe('testLabel');
     });
     it('should return null when there is no tooltip for option value', () => {
-      component.field = mockOption;
-      expect(component.getOptionTooltip('noTooltipValue')).toBeNull();
+      parent.field = mockOption;
+      expect(
+        parent.selectComponent.getOptionTooltip('noTooltipValue')
+      ).toBeNull();
     });
   });
 });

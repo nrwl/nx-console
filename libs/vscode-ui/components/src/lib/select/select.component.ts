@@ -1,9 +1,10 @@
 import {
-  Component,
   ChangeDetectionStrategy,
-  Input,
-  Output,
+  Component,
   EventEmitter,
+  Input,
+  OnInit,
+  Output,
 } from '@angular/core';
 import { ControlContainer, FormGroup } from '@angular/forms';
 import { Option } from '@nx-console/schema';
@@ -14,13 +15,15 @@ import { Option } from '@nx-console/schema';
   styleUrls: ['./select.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SelectComponent {
+export class SelectComponent implements OnInit {
   @Input() field: Option;
   @Input() value: string;
   @Output() readonly valueChange = new EventEmitter<string>();
   parentFormGroup: FormGroup;
 
-  constructor(private readonly controlContainer: ControlContainer) {
+  constructor(private readonly controlContainer: ControlContainer) {}
+
+  ngOnInit() {
     this.parentFormGroup = this.controlContainer.control as FormGroup;
   }
 
