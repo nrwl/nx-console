@@ -169,15 +169,17 @@ export async function getTaskExecutionSchema(
 function getConfigValuesFromContextMenuUri(
   contextMenuUri: Uri | undefined,
   cliTaskProvider: CliTaskProvider
-): { path: string; project?: string } | undefined {
+): { path: string; directory: string; project?: string } | undefined {
   if (contextMenuUri) {
     const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
+    const path = contextMenuUri.fsPath
+      .replace(cliTaskProvider.getWorkspacePath(), '')
+      .replace(/\\/g, '/');
 
     return {
-      path: contextMenuUri.fsPath
-        .replace(cliTaskProvider.getWorkspacePath(), '')
-        .replace(/\\/g, '/'),
+      path,
+      directory: path,
       project: projectName,
     };
   }
