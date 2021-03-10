@@ -2,7 +2,6 @@ import { schema } from '@angular-devkit/core';
 import { standardFormats } from '@angular-devkit/schematics/src/formats';
 import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
-import * as JSON5 from 'json5';
 import { platform } from 'os';
 import * as path from 'path';
 import {
@@ -14,6 +13,7 @@ import {
   ItemsWithEnum,
 } from '@nx-console/schema';
 import { Option as CliOption } from '@angular/cli/models/interface';
+import * as stripJsonComments from 'strip-json-comments';
 
 export interface SchematicDefaults {
   [name: string]: string;
@@ -131,7 +131,7 @@ export function fileExistsSync(filePath: string): boolean {
 }
 
 export function readAndParseJson(fullFilePath: string): any {
-  return JSON5.parse(readFileSync(fullFilePath).toString());
+  return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
 }
 
 export function readAndCacheJsonFile(

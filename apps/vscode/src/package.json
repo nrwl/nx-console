@@ -24,7 +24,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.31.0"
+    "vscode": "^1.50.0"
   },
   "keywords": [
     "angular",
@@ -37,7 +37,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "workspaceContains:nx.json"
   ],
   "dependencies": {
     "jsonc-parser": "^2.1.1",

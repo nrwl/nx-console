@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.35.0"
+    "vscode": "^1.50.0"
   },
   "browserslist": [
     "last 2 Chrome versions"
@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "@ngrx/component-store": "11.0.0",
-    "jsonc-parser": "^2.1.1"
+    "jsonc-parser": "^2.1.1",
+    "strip-json-comments": "^3.1.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.1102.1",
@@ -62,7 +63,6 @@
     "husky": "^3.0.9",
     "jest": "26.2.2",
     "jest-preset-angular": "8.3.2",
-    "json5": "^2.1.1",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "prettier": "2.2.1",
