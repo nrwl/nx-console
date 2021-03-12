@@ -27,14 +27,14 @@ export class MultipleSelectComponent implements OnInit, OnDestroy {
 
   constructor(private readonly controlContainer: ControlContainer) {}
 
-  private readonly subscriptioins = new Subscription();
+  private readonly subscriptions = new Subscription();
 
   ngOnInit(): void {
     this.parentFormGroup = this.controlContainer.control as FormGroup;
     this.selectControl = this.parentFormGroup.get(
       this.field.name
     ) as FormControl;
-    this.subscriptioins.add(
+    this.subscriptions.add(
       this.selectControl.valueChanges.subscribe((value) =>
         this.valueChange.emit(value)
       )
@@ -65,6 +65,6 @@ export class MultipleSelectComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscriptioins.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 }
