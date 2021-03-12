@@ -130,13 +130,13 @@ export function fileExistsSync(filePath: string): boolean {
   }
 }
 
-export function readAndParseJson(fullFilePath: string): any {
+function readAndParseJson(fullFilePath: string): any {
   return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
 }
 
 export function readAndCacheJsonFile(
   filePath: string,
-  basedir: string
+  basedir: string = ''
 ): { path: string; json: any } {
   const fullFilePath = path.join(basedir, filePath);
 

@@ -8,7 +8,6 @@ import {
   listOfUnnestedNpmPackages,
   normalizeSchema,
   readAndCacheJsonFile,
-  readAndParseJson,
   toLegacyWorkspaceFormat,
 } from './utils';
 
@@ -51,8 +50,8 @@ async function checkAndReadWorkspaceCollection(
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
   const defaults =
-    toLegacyWorkspaceFormat(readAndParseJson(workspaceJsonPath)).schematics ||
-    {};
+    toLegacyWorkspaceFormat(readAndCacheJsonFile(workspaceJsonPath).json)
+      .schematics || {};
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {
