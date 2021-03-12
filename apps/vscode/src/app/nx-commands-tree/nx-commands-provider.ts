@@ -3,11 +3,7 @@ import { NxCommandsTreeItem } from './nx-commands-tree-item';
 import { ExtensionContext } from 'vscode';
 
 export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeItem> {
-  static create(context: ExtensionContext): NxCommandsTreeProvider {
-    return new NxCommandsTreeProvider(context);
-  }
-
-  private constructor(private readonly context: ExtensionContext) {
+  constructor(private readonly context: ExtensionContext) {
     super();
   }
 

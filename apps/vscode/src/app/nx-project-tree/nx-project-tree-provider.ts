@@ -14,15 +14,15 @@ import {
 
 import { AbstractTreeProvider } from '../abstract-tree-provider';
 import { CliTaskProvider } from '../cli-task/cli-task-provider';
-import {
-  WorkspaceJsonLabel,
-  WorkspaceJsonTreeItem,
-} from './workspace-json-tree-item';
+import { NxProjectLabel, NxProjectTreeItem } from './nx-project-tree-item';
 import { verifyWorkspace } from '../verify-workspace/verify-workspace';
 
-export let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
+export let nxProjectTreeProvider: NxProjectTreeProvider;
 
-export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJsonTreeItem> {
+/**
+ * Provides data for the "Projects" tree view
+ */
+export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeItem> {
   loading = true;
 
   constructor(
@@ -31,7 +31,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
   ) {
     super();
 
-    workspaceJsonTreeProvider = this;
+    nxProjectTreeProvider = this;
 
     commands.registerCommand('nxConsole.refreshNxProjectsTree', () =>
       this.refresh()
@@ -41,7 +41,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
       ['editWorkspaceJson', this.editWorkspaceJson],
       ['revealInExplorer', this.revealInExplorer],
       ['runTask', this.runTask],
-    ] as [string, (item: WorkspaceJsonTreeItem) => Promise<any>][]).forEach(
+    ] as [string, (item: NxProjectTreeItem) => Promise<any>][]).forEach(
       ([commandSuffix, callback]) => {
         context.subscriptions.push(
           commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
@@ -50,38 +50,36 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
     );
   }
 
-  setWorkspaceJsonPathh(workspaceJsonPath: string) {
+  setWorkspaceJsonPath(workspaceJsonPath: string) {
     if (this.cliTaskProvider.getWorkspaceJsonPath() !== workspaceJsonPath) {
       this.cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);
     }
     this.refresh();
   }
 
-  getParent(
-    element: WorkspaceJsonTreeItem
-  ): WorkspaceJsonTreeItem | null | undefined {
+  getParent(element: NxProjectTreeItem): NxProjectTreeItem | null | undefined {
     const { project, architect } = element.workspaceJsonLabel;
 
     if (architect) {
       if (architect.configuration) {
-        return this.createWorkspaceJsonTreeItem(
+        return this.createNxProjectTreeItem(
           { project, architect: { name: architect.name } },
           architect.name
         );
       } else {
-        return this.createWorkspaceJsonTreeItem({ project }, project);
+        return this.createNxProjectTreeItem({ project }, project);
       }
     } else {
       return null;
     }
   }
 
-  createWorkspaceJsonTreeItem(
-    workspaceJsonLabel: WorkspaceJsonLabel,
+  createNxProjectTreeItem(
+    workspaceJsonLabel: NxProjectLabel,
     treeItemLabel: string,
     hasChildren?: boolean
   ) {
-    const item = new WorkspaceJsonTreeItem(
+    const item = new NxProjectTreeItem(
       workspaceJsonLabel,
       treeItemLabel,
       hasChildren
@@ -110,23 +108,19 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
     return item;
   }
 
-  getChildren(
-    parent?: WorkspaceJsonTreeItem
-  ): ProviderResult<WorkspaceJsonTreeItem[]> {
+  getChildren(parent?: NxProjectTreeItem): ProviderResult<NxProjectTreeItem[]> {
     if (this.loading) {
       setTimeout(() => {
         this.loading = false;
         this.refresh();
       });
-      return [
-        this.createWorkspaceJsonTreeItem({ project: 'Loading' }, 'Loading'),
-      ];
+      return [this.createNxProjectTreeItem({ project: 'Loading' }, 'Loading')];
     }
     if (!parent) {
       const projects = this.cliTaskProvider.getProjectEntries();
       return projects.map(
-        ([name, def]): WorkspaceJsonTreeItem =>
-          this.createWorkspaceJsonTreeItem(
+        ([name, def]): NxProjectTreeItem =>
+          this.createNxProjectTreeItem(
             { project: name },
             name,
             Boolean(def.architect)
@@ -145,8 +139,8 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
     if (!architect) {
       if (projectDef.architect) {
         return Object.keys(projectDef.architect).map(
-          (name): WorkspaceJsonTreeItem =>
-            this.createWorkspaceJsonTreeItem(
+          (name): NxProjectTreeItem =>
+            this.createNxProjectTreeItem(
               { architect: { name }, project },
               name,
               Boolean(projectDef.architect![name].configurations)
@@ -168,7 +162,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
       }
 
       return Object.keys(configurations).map((name) => {
-        const item = this.createWorkspaceJsonTreeItem(
+        const item = this.createNxProjectTreeItem(
           { architect: { ...architect, configuration: name }, project },
           name
         );
@@ -180,7 +174,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
 
   private findLabel(
     document: TextDocument,
-    { project, architect }: WorkspaceJsonLabel
+    { project, architect }: NxProjectLabel
   ): number {
     let scriptOffset = 0;
     let nestingLevel = 0;
@@ -238,7 +232,7 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
     return scriptOffset;
   }
 
-  private async runTask(selection: WorkspaceJsonTreeItem) {
+  private async runTask(selection: NxProjectTreeItem) {
     const { architect, project } = selection.workspaceJsonLabel;
     if (!architect) {
       return;
@@ -256,22 +250,19 @@ export class WorkspaceJsonTreeProvider extends AbstractTreeProvider<WorkspaceJso
     });
   }
 
-  revealWorkspaceJsonLabel(workspaceJsonLabel: WorkspaceJsonLabel) {
+  revealNxProjectLabel(workspaceJsonLabel: NxProjectLabel) {
     this.editWorkspaceJson(
-      workspaceJsonTreeProvider.createWorkspaceJsonTreeItem(
-        workspaceJsonLabel,
-        ''
-      )
+      nxProjectTreeProvider.createNxProjectTreeItem(workspaceJsonLabel, '')
     );
   }
 
-  private async revealInExplorer(selection: WorkspaceJsonTreeItem) {
+  private async revealInExplorer(selection: NxProjectTreeItem) {
     if (selection.resourceUri) {
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }
 
-  private async editWorkspaceJson(selection: WorkspaceJsonTreeItem) {
+  private async editWorkspaceJson(selection: NxProjectTreeItem) {
     const { validWorkspaceJson } = verifyWorkspace(
       this.cliTaskProvider.getWorkspacePath()
     );

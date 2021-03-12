@@ -10,10 +10,6 @@ import {
   Uri,
 } from 'vscode';
 
-import { WorkspaceJsonTreeItem } from './app/workspace-json-tree/workspace-json-tree-item';
-import { WorkspaceJsonTreeProvider } from './app/workspace-json-tree/workspace-json-tree-provider';
-import { NxCommandsTreeItem } from './app/nx-commands/nx-commands-tree-item';
-import { NxCommandsTreeProvider } from './app/nx-commands/nx-commands-provider';
 import { registerCliTaskCommands } from './app/cli-task/cli-task-commands';
 import { CliTaskProvider } from './app/cli-task/cli-task-provider';
 import { getOutputChannel } from './app/output-channel';
@@ -32,13 +28,17 @@ import {
 import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
 import { verifyWorkspace } from './app/verify-workspace/verify-workspace';
 import { registerNxCommands } from './app/nx-task/nx-task-commands';
+import { NxCommandsTreeItem } from './app/nx-commands-tree/nx-commands-tree-item';
+import { NxProjectTreeProvider } from './app/nx-project-tree/nx-project-tree-provider';
+import { NxProjectTreeItem } from './app/nx-project-tree/nx-project-tree-item';
+import { NxCommandsTreeProvider } from './app/nx-commands-tree/nx-commands-provider';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
-let workspaceJsonTreeView: TreeView<WorkspaceJsonTreeItem>;
-let affectedTreeView: TreeView<NxCommandsTreeItem>;
+let nxProjectTreeView: TreeView<NxProjectTreeItem>;
+let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
 
 let currentWorkspaceTreeProvider: WorkspaceTreeProvider;
-let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
+let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
@@ -47,9 +47,10 @@ export function activate(c: ExtensionContext) {
   try {
     const startTime = Date.now();
     context = c;
-    currentWorkspaceTreeProvider = WorkspaceTreeProvider.create({
-      extensionPath: context.extensionPath,
-    });
+    currentWorkspaceTreeProvider = new WorkspaceTreeProvider(
+      undefined,
+      context.extensionPath
+    );
     const store = VSCodeStorage.fromContext(context);
     initTelemetry(store);
 
@@ -176,22 +177,22 @@ async function setWorkspace(workspaceJsonPath: string) {
     tasks.registerTaskProvider('nx', cliTaskProvider);
     registerCliTaskCommands(context, cliTaskProvider);
 
-    workspaceJsonTreeProvider = new WorkspaceJsonTreeProvider(
+    nxProjectsTreeProvider = new NxProjectTreeProvider(
       context,
       cliTaskProvider
     );
 
-    workspaceJsonTreeView = window.createTreeView('nxProjects', {
-      treeDataProvider: workspaceJsonTreeProvider,
-    }) as TreeView<WorkspaceJsonTreeItem>;
-    context.subscriptions.push(workspaceJsonTreeView);
+    nxProjectTreeView = window.createTreeView('nxProjects', {
+      treeDataProvider: nxProjectsTreeProvider,
+    });
+    context.subscriptions.push(nxProjectTreeView);
 
-    const affectedTreeProvider = NxCommandsTreeProvider.create(context);
+    const nxCommandsTreeProvider = new NxCommandsTreeProvider(context);
 
-    affectedTreeView = window.createTreeView('nxCommands', {
-      treeDataProvider: affectedTreeProvider,
-    }) as TreeView<NxCommandsTreeItem>;
-    context.subscriptions.push(affectedTreeView);
+    nxCommandsTreeView = window.createTreeView('nxCommands', {
+      treeDataProvider: nxCommandsTreeProvider,
+    });
+    context.subscriptions.push(nxCommandsTreeView);
   } else {
     cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);
   }
@@ -219,5 +220,5 @@ async function setWorkspace(workspaceJsonPath: string) {
   );
 
   currentWorkspaceTreeProvider.setWorkspaceJsonPath(workspaceJsonPath);
-  workspaceJsonTreeProvider.setWorkspaceJsonPathh(workspaceJsonPath);
+  nxProjectsTreeProvider.setWorkspaceJsonPath(workspaceJsonPath);
 }

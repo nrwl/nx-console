@@ -23,19 +23,12 @@ CHANGE_WORKSPACE.command = {
 export class WorkspaceTreeProvider extends AbstractTreeProvider<
   WorkspaceTreeItem | TreeItem
 > {
-  static create(config: {
-    workspaceJsonPath?: string;
-    extensionPath: string;
-  }): WorkspaceTreeProvider {
-    return new WorkspaceTreeProvider(
-      config.workspaceJsonPath,
-      config.extensionPath
-    );
-  }
-
   private scanning = Boolean(this.workspaceJsonPath);
 
-  private constructor(
+  /**
+   * Provides data for the "Generate & Run Target" view
+   */
+  constructor(
     public workspaceJsonPath: string | undefined,
     readonly extensionPath: string
   ) {

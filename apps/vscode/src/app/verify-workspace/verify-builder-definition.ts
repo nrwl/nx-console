@@ -1,12 +1,12 @@
 import { Option } from '@nx-console/schema';
 import { readBuilderSchema } from '@nx-console/server';
 import { window } from 'vscode';
-import { workspaceJsonTreeProvider } from '../workspace-json-tree/workspace-json-tree-provider';
 import { getTelemetry } from '../telemetry';
 import { cliTaskProvider } from '../cli-task/cli-task-provider';
 import { OptionType } from '@angular/cli/models/interface';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { nxProjectTreeProvider } from '../nx-project-tree/nx-project-tree-provider';
 
 const RUN_ONE_OPTIONS = [
   {
@@ -73,7 +73,7 @@ export async function verifyBuilderDefinition(
       )
       .then((value) => {
         if (value) {
-          workspaceJsonTreeProvider.revealWorkspaceJsonLabel({
+          nxProjectTreeProvider.revealNxProjectLabel({
             project: project,
             architect: {
               name: command,
@@ -103,7 +103,7 @@ export async function verifyBuilderDefinition(
       )
       .then((value) => {
         if (value) {
-          workspaceJsonTreeProvider.revealWorkspaceJsonLabel({
+          nxProjectsTreeProvider.revealNxProjectLabel({
             project: project,
             architect: {
               name: command,
