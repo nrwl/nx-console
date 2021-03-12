@@ -37,7 +37,7 @@
     "Other"
   ],
   "activationEvents": [
-    "workspaceContains:nx.json"
+    "*"
   ],
   "dependencies": {
     "jsonc-parser": "^2.1.1",
