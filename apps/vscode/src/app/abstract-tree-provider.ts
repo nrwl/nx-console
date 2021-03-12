@@ -15,7 +15,7 @@ export abstract class AbstractTreeProvider<Item extends TreeItem>
     ._onDidChangeTreeData.event;
 
   refresh(): void {
-    this._onDidChangeTreeData.fire();
+    this._onDidChangeTreeData.fire(undefined);
   }
 
   getTreeItem(element: Item): TreeItem {

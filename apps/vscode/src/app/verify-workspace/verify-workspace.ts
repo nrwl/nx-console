@@ -1,5 +1,5 @@
 import {
-  readAndParseJson,
+  readAndCacheJsonFile,
   fileExistsSync,
   toLegacyWorkspaceFormat,
 } from '@nx-console/server';
@@ -23,14 +23,18 @@ export function verifyWorkspace(
     if (fileExistsSync(workspaceJsonPath)) {
       return {
         validWorkspaceJson: true,
-        json: toLegacyWorkspaceFormat(readAndParseJson(workspaceJsonPath)),
+        json: toLegacyWorkspaceFormat(
+          readAndCacheJsonFile(workspaceJsonPath).json
+        ),
         workspaceType: 'nx',
         configuratoinFilePath: workspaceJsonPath,
       };
     } else if (fileExistsSync(angularJsonPath)) {
       return {
         validWorkspaceJson: true,
-        json: toLegacyWorkspaceFormat(readAndParseJson(angularJsonPath)),
+        json: toLegacyWorkspaceFormat(
+          readAndCacheJsonFile(angularJsonPath).json
+        ),
         workspaceType: 'ng',
         configuratoinFilePath: angularJsonPath,
       };
