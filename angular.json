@@ -183,6 +183,14 @@
             ]
           }
         },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/vscode-ui/feature-task-execution-form/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/vscode-ui/feature-task-execution-form"]
+        },
         "storybook": {
           "builder": "@nrwl/storybook:storybook",
           "options": {
@@ -228,6 +236,14 @@
             "tsConfig": ["libs/vscode-ui/components/tsconfig.lib.json"],
             "exclude": ["**/node_modules/**", "!libs/vscode-ui/components/**/*"]
           }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/vscode-ui/components/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/vscode-ui/components"]
         }
       },
       "schematics": {

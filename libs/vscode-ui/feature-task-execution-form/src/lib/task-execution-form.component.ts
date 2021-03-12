@@ -249,11 +249,12 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         );
         validators.push((control) => {
           if (
-            control.value &&
-            !validValueSet.has(control.value) &&
+            (control.value &&
+              !Array.isArray(control.value) &&
+              !validValueSet.has(control.value)) ||
             // multiselect values are Array, check if all values are in Set
-            control.value.length &&
-            !control.value.every((value: Value) => validValueSet.has(value))
+            (Array.isArray(control.value) &&
+              !control.value.every((value: Value) => validValueSet.has(value)))
           ) {
             return {
               enum: 'Please select a value from the auto-completable list',
