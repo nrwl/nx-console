@@ -1,0 +1,22 @@
+{
+  "packageFiles": ["apps/vscode/src/package.json"],
+  "bumpFiles": [
+    {
+      "filename": "apps/vscode/src/package.json",
+      "type": "json"
+    }
+  ],
+  "types": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "chore", "hidden": true },
+    { "type": "docs", "hidden": true },
+    { "type": "style", "hidden": true },
+    { "type": "refactor", "hidden": true },
+    { "type": "perf", "section": "Performance Improvements" },
+    { "type": "test", "hidden": true }
+  ],
+  "issueUrlFormat": "https://github.com/nrwl/nx-console/issues/{{id}}",
+  "commitUrlFormat": "https://github.com/nrwl/nx-console/commits/{{hash}}",
+  "compareUrlFormat": "https://github.com/nrwl/nx-console/compare/{{previousTag}}...{{currentTag}}"
+}
