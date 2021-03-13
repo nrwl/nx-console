@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        id: workspace-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ matrix.node-version }}-workspace-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node-version }}-workspace-
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: publish
+        run: |
+          yarn package
+          yarn vsce publish --packagePath dist/apps/vscode/nx-console.vsix -p ${{ secrets.VSCE_PAT }}
+      - name: generate changes
+        run: git show CHANGELOG.md | egrep "^\+" | tail +5 | sed -e 's/^\+//' > changelog.txt
+      - name: release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: changelog.txt
+          files: |
+            dist/apps/vscode/nx-console.vsix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}

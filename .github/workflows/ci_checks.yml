@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [12.x]
+        node-version: [14.x]
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
@@ -25,16 +25,16 @@ jobs:
         run: yarn install --frozen-lockfile
   lint:
     runs-on: ${{ matrix.os }}
-    
+
     env:
       NX_BRANCH: ${{ github.event.number || github.ref }}
       NX_RUN_GROUP: ${{ github.run_id }}
-      
+
     needs: [setup]
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [12.x]
+        node-version: [14.x]
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
@@ -53,17 +53,17 @@ jobs:
 
   build:
     runs-on: ${{ matrix.os }}
-    
+
     env:
       NX_BRANCH: ${{ github.event.number || github.ref }}
       NX_RUN_GROUP: ${{ github.run_id }}
-      
+
     needs: [setup]
 
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [12.x]
+        node-version: [14.x]
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
@@ -86,13 +86,13 @@ jobs:
     env:
       NX_BRANCH: ${{ github.event.number || github.ref }}
       NX_RUN_GROUP: ${{ github.run_id }}
-      
+
     needs: [setup]
 
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [12.x]
+        node-version: [14.x]
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
