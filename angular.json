@@ -122,6 +122,7 @@
               "sourceMap": false,
               "optimization": true,
               "extractLicenses": true,
+              "webpackConfig": "apps/vscode/webpack.prod.conf.js",
               "fileReplacements": [
                 {
                   "replace": "apps/vscode/src/environments/environment.ts",

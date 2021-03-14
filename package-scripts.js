@@ -21,7 +21,6 @@ module.exports = {
           vscode: nps.series.nps(
             'clean',
             'prepare.vscode.build',
-            'install-dependencies.vscode',
             'package.vscode'
           ),
         },
@@ -84,9 +83,6 @@ module.exports = {
     test: {
       default: 'nx affected:test --all --parallel',
       affected: affected('test'),
-    },
-    'install-dependencies': {
-      vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
     },
   },
 };
