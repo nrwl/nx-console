@@ -5,16 +5,14 @@ jobs:
   Checks:
     runs-on: ${{ matrix.os }}
     env:
-      BRANCH_NAME: ${GITHUB_REF#refs/*/}
+     BRANCH_NAME: ${GITHUB_REF#refs/*/}
+     NX_BRANCH: ${{ github.event.number || env.BRANCH_NAME }}
+     NX_RUN_GROUP: ${{ github.run_id }}
     strategy:
       matrix:
         os: [ubuntu-latest]
         node-version: [14.x]
     steps:
-      - name: Set Nx Cloud variables
-        env: 
-          NX_BRANCH: ${{ github.event.number || env.BRANCH_NAME }}
-          NX_RUN_GROUP: ${{ github.run_id }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:

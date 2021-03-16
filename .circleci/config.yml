@@ -23,10 +23,14 @@ commands:
           paths:
             - ~/.cache/yarn
 jobs:
-  unit-tests-lint-checks:
+  noop:
     executor: linux
     steps:
       - setup
       - run:
           name: Run Unit Tests
-          command: npx nx run-many --target=test --all --parallel
+          command: echo noop
+workflows:
+  build:
+    jobs:
+      - noop
