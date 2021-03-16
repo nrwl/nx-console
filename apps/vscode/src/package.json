@@ -37,7 +37,8 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "workspaceContains:**/workspace.json",
+    "workspaceContains:**/angular.json"
   ],
   "contributes": {
     "menus": {
