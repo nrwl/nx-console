@@ -12,7 +12,7 @@ import {
 import { CliTaskProvider } from './cli-task/cli-task-provider';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
-import { getTelemetry } from './telemetry';
+import { getTelemetry } from '@nx-console/server';
 import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
 
 let webviewPanel: WebviewPanel | undefined;

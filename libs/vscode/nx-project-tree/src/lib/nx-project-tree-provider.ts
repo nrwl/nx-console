@@ -12,10 +12,10 @@ import {
   workspace,
 } from 'vscode';
 
-import { AbstractTreeProvider } from '../abstract-tree-provider';
-import { CliTaskProvider } from '../cli-task/cli-task-provider';
+import { AbstractTreeProvider } from '@nx-console/server';
+import { CliTaskProvider } from '../../../../../apps/vscode/src/app/cli-task/cli-task-provider';
 import { NxProjectLabel, NxProjectTreeItem } from './nx-project-tree-item';
-import { verifyWorkspace } from '../verify-workspace/verify-workspace';
+import { verifyWorkspace } from '@nx-console/vscode/verify-workspace';
 
 export let nxProjectTreeProvider: NxProjectTreeProvider;
 

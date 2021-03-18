@@ -31,7 +31,16 @@
       "@nx-console/vscode-ui/components": [
         "libs/vscode-ui/components/src/index.ts"
       ],
-      "@nx-console/vscode-ui/styles": ["libs/vscode-ui/styles/src/index.ts"]
+      "@nx-console/vscode-ui/styles": ["libs/vscode-ui/styles/src/index.ts"],
+      "@nx-console/vscode/nx-project-tree": [
+        "libs/vscode/nx-project-tree/src/index.ts"
+      ],
+      "@nx-console/vscode/verify-workspace": [
+        "libs/vscode/verify-workspace/src/index.ts"
+      ],
+      "@nx-console/vscode/configuration": [
+        "libs/vscode/configuration/src/index.ts"
+      ]
     },
     "module": "esnext",
     "rootDir": "."

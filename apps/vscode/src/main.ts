@@ -12,26 +12,31 @@ import {
 
 import { registerCliTaskCommands } from './app/cli-task/cli-task-commands';
 import { CliTaskProvider } from './app/cli-task/cli-task-provider';
-import { getOutputChannel } from './app/output-channel';
 import {
+  getOutputChannel,
   getTelemetry,
   initTelemetry,
   teardownTelemetry,
-} from './app/telemetry';
-import { VSCodeStorage } from './app/vscode-storage';
+} from '@nx-console/server';
+import { NxConsoleConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealWebViewPanel } from './app/webview';
 import { WorkspaceTreeItem } from './app/workspace-tree/workspace-tree-item';
 import {
   LOCATE_YOUR_WORKSPACE,
   WorkspaceTreeProvider,
 } from './app/workspace-tree/workspace-tree-provider';
-import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
-import { verifyWorkspace } from './app/verify-workspace/verify-workspace';
+import {
+  verifyNodeModules,
+  verifyWorkspace,
+} from '@nx-console/vscode/verify-workspace';
 import { registerNxCommands } from './app/nx-task/nx-task-commands';
 import { NxCommandsTreeItem } from './app/nx-commands-tree/nx-commands-tree-item';
-import { NxProjectTreeProvider } from './app/nx-project-tree/nx-project-tree-provider';
-import { NxProjectTreeItem } from './app/nx-project-tree/nx-project-tree-item';
+import {
+  NxProjectTreeProvider,
+  NxProjectTreeItem,
+} from '@nx-console/vscode/nx-project-tree';
 import { NxCommandsTreeProvider } from './app/nx-commands-tree/nx-commands-provider';
+import { environment } from './environments/environment';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -47,12 +52,15 @@ export function activate(c: ExtensionContext) {
   try {
     const startTime = Date.now();
     context = c;
+
+    NxConsoleConfigurationStore.fromContext(context);
+
     currentWorkspaceTreeProvider = new WorkspaceTreeProvider(
       undefined,
       context.extensionPath
     );
-    const store = VSCodeStorage.fromContext(context);
-    initTelemetry(store);
+
+    initTelemetry(NxConsoleConfigurationStore.instance, environment.production);
 
     workspaceTreeView = window.createTreeView('nxConsole', {
       treeDataProvider: currentWorkspaceTreeProvider,
@@ -199,7 +207,7 @@ async function setWorkspace(workspaceJsonPath: string) {
 
   const isNxWorkspace = existsSync(join(workspaceJsonPath, '..', 'nx.json'));
   const isAngularWorkspace = workspaceJsonPath.endsWith('angular.json');
-  const store = VSCodeStorage.fromContext(context);
+  const store = NxConsoleConfigurationStore.instance;
   const enableGenerateFromContextMenuSetting = store.get(
     'enableGenerateFromContextMenu'
   );

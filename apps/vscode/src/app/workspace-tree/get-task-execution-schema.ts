@@ -1,15 +1,13 @@
 import { TaskExecutionSchema } from '@nx-console/schema';
-import { readArchitectDef, readBuilderSchema } from '@nx-console/server';
+import { readArchitectDef, readBuilderSchema, getOutputChannel } from '@nx-console/server';
 import { window, Uri } from 'vscode';
 
 import { selectCliProject } from '../cli-task/cli-task-commands';
 import { CliTaskProvider } from '../cli-task/cli-task-provider';
 import { CliTaskQuickPickItem } from '../cli-task/cli-task-quick-pick-item';
-import { getOutputChannel } from '../output-channel';
 import { selectSchematic } from '../select-schematic';
-import { getTelemetry } from '../telemetry';
-import { verifyWorkspace } from '../verify-workspace/verify-workspace';
-import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
+import { getTelemetry } from '../../../../../libs/server/src/lib/telemetry/init';
+import { verifyWorkspace, verifyBuilderDefinition } from '@nx-console/vscode/verify-workspace';
 import { WorkspaceRouteTitle } from './workspace-tree-item';
 
 export async function getTaskExecutionSchema(

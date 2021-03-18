@@ -303,6 +303,120 @@
           }
         }
       }
+    },
+    "vscode-nx-project-tree": {
+      "root": "libs/vscode/nx-project-tree",
+      "sourceRoot": "libs/vscode/nx-project-tree/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/nx-project-tree/tsconfig.lib.json",
+              "libs/vscode/nx-project-tree/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/vscode/nx-project-tree/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-project-tree"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-project-tree/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-project-tree",
+            "tsConfig": "libs/vscode/nx-project-tree/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-project-tree/package.json",
+            "main": "libs/vscode/nx-project-tree/src/index.ts",
+            "assets": ["libs/vscode/nx-project-tree/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-verify-workspace": {
+      "root": "libs/vscode/verify-workspace",
+      "sourceRoot": "libs/vscode/verify-workspace/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/verify-workspace/tsconfig.lib.json",
+              "libs/vscode/verify-workspace/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/vscode/verify-workspace/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/verify-workspace"],
+          "options": {
+            "jestConfig": "libs/vscode/verify-workspace/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/verify-workspace",
+            "tsConfig": "libs/vscode/verify-workspace/tsconfig.lib.json",
+            "packageJson": "libs/vscode/verify-workspace/package.json",
+            "main": "libs/vscode/verify-workspace/src/index.ts",
+            "assets": ["libs/vscode/verify-workspace/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-configuration": {
+      "root": "libs/vscode/configuration",
+      "sourceRoot": "libs/vscode/configuration/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/configuration/tsconfig.lib.json",
+              "libs/vscode/configuration/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/vscode/configuration/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/configuration"],
+          "options": {
+            "jestConfig": "libs/vscode/configuration/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/configuration",
+            "tsConfig": "libs/vscode/configuration/tsconfig.lib.json",
+            "packageJson": "libs/vscode/configuration/package.json",
+            "main": "libs/vscode/configuration/src/index.ts",
+            "assets": ["libs/vscode/configuration/*.md"]
+          }
+        }
+      }
     }
   },
   "cli": {

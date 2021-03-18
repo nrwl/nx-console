@@ -1,8 +1,8 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
 import { selectSchematic } from '../select-schematic';
-import { verifyWorkspace } from '../verify-workspace/verify-workspace';
-import { verifyBuilderDefinition } from '../verify-workspace/verify-builder-definition';
+import { verifyWorkspace } from '../../../../../libs/vscode/verify-workspace/src/lib/verify-workspace';
+import { verifyBuilderDefinition } from '../../../../../libs/vscode/verify-workspace/src/lib/verify-builder-definition';
 import {
   WorkspaceRouteTitle,
   WorkspaceTreeItem,

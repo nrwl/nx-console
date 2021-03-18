@@ -1,8 +1,7 @@
-import { Store, Telemetry } from '@nx-console/server';
+import { Telemetry } from '@nx-console/server';
 import { Disposable, window, workspace } from 'vscode';
 
-import { environment } from '../environments/environment';
-import { VSCodeStorage } from './vscode-storage';
+import { Store } from '../stores';
 
 let telemetry: Telemetry;
 let disposer: Disposable | null = null;
@@ -12,12 +11,11 @@ export function getTelemetry() {
 }
 
 const enableTelemetry = 'enableTelemetry';
-const configurationSection = VSCodeStorage.configurationSection;
-const telemetrySetting = `${configurationSection}.${enableTelemetry}`;
+const telemetrySetting = `nxConsole.${enableTelemetry}`;
 
 // using shared memory here is a shortcut, this should be an api call
-export function initTelemetry(store: Store) {
-  telemetry = environment.production
+export function initTelemetry(store: Store, production: boolean) {
+  telemetry = production
     ? Telemetry.withGoogleAnalytics(store, 'vscode')
     : Telemetry.withLogger(store);
 

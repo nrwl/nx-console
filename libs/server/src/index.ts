@@ -7,13 +7,12 @@ export {
   toLegacyWorkspaceFormat,
 } from './lib/utils/utils';
 
-export { Telemetry } from './lib/telemetry';
+export * from './lib/telemetry';
 export * from './lib/extensions';
 export * from './lib/utils/read-schematic-collections';
 export * from './lib/utils/read-projects';
+export * from './lib/utils/output-channel';
 
-export interface Store {
-  get(key: string, defaultValue?: any): any;
-  set(key: string, value: any): void;
-  delete(key: string): void;
-}
+export * from './lib/stores';
+
+export * from './lib/abstract-tree-provider';

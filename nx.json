@@ -8,33 +8,20 @@
     ".eslintrc.json": "*"
   },
   "projects": {
-    "schema": {
-      "tags": []
-    },
-    "vscode": {
-      "tags": []
-    },
-    "server": {
-      "tags": []
-    },
-    "vscode-ui": {
-      "tags": []
-    },
-    "vscode-ui-feature-task-execution-form": {
-      "tags": []
-    },
-    "vscode-ui-components": {
-      "tags": []
-    },
-    "vscode-ui-styles": {
-      "tags": []
-    },
+    "schema": { "tags": [] },
+    "vscode": { "tags": [] },
+    "server": { "tags": [] },
+    "vscode-ui": { "tags": [] },
+    "vscode-ui-feature-task-execution-form": { "tags": [] },
+    "vscode-ui-components": { "tags": [] },
+    "vscode-ui-styles": { "tags": [] },
     "vscode-ui-feature-task-execution-form-e2e": {
       "tags": [],
-      "implicitDependencies": [
-        "vscode-ui-feature-task-execution-form"
-      ]
-    }
+      "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
+    },
+    "vscode-nx-project-tree": { "tags": [] },
+    "vscode-verify-workspace": { "tags": [] },
+    "vscode-configuration": { "tags": [] }
   },
   "tasksRunnerOptions": {
     "default": {
@@ -53,7 +40,5 @@
       }
     }
   },
-  "affected": {
-    "defaultBase": "master"
-  }
+  "affected": { "defaultBase": "master" }
 }

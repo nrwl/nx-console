@@ -5,8 +5,8 @@ import { commands, ExtensionContext, window, tasks } from 'vscode';
 import { ProjectDef } from '../cli-task/cli-task-definition';
 import { CliTaskProvider } from '../cli-task/cli-task-provider';
 import { selectFlags } from '../cli-task/select-flags';
-import { verifyWorkspace } from '../verify-workspace/verify-workspace';
-import { getTelemetry } from '../telemetry';
+import { verifyWorkspace } from '@nx-console/vscode/verify-workspace';
+import { getTelemetry } from '@nx-console/server';
 import { NxTask } from './nx-task';
 
 let cliTaskProvider: CliTaskProvider;

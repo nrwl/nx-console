@@ -2,12 +2,11 @@ import {
   readAndCacheJsonFile,
   fileExistsSync,
   toLegacyWorkspaceFormat,
+  getOutputChannel,
+  getTelemetry,
 } from '@nx-console/server';
 import { window } from 'vscode';
 import { join } from 'path';
-
-import { getOutputChannel } from '../output-channel';
-import { getTelemetry } from '../telemetry';
 
 export function verifyWorkspace(
   workspacePath: string

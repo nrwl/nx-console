@@ -1,6 +1,6 @@
 import { TreeItem } from 'vscode';
 
-import { AbstractTreeProvider } from '../abstract-tree-provider';
+import { AbstractTreeProvider } from '../../../../../libs/server/src/lib/abstract-tree-provider';
 import { ROUTE_LIST, WorkspaceTreeItem } from './workspace-tree-item';
 import { join } from 'path';
 

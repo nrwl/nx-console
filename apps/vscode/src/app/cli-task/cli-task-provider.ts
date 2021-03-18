@@ -7,9 +7,11 @@ import {
   tasks,
 } from 'vscode';
 
-import { getTelemetry } from '../telemetry';
-import { verifyWorkspace } from '../verify-workspace/verify-workspace';
-import { verifyNodeModules } from '../verify-workspace/verify-node-modules';
+import { getTelemetry } from '@nx-console/server';
+import {
+  verifyWorkspace,
+  verifyNodeModules,
+} from '@nx-console/vscode/verify-workspace';
 import { CliTask } from './cli-task';
 import {
   CliTaskDefinition,
