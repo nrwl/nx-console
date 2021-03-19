@@ -12,14 +12,17 @@ export type WorkspaceRouteTitle =
   | 'Change workspace'
   | 'Select workspace';
 
-const ROUTE_TO_ICON_MAP = new Map<WorkspaceRouteTitle | undefined, string>([
-  ['Generate', 'nx-cli.svg'],
-  ['Run', 'nx-cli.svg'],
-  ['Build', 'nx-cli.svg'],
-  ['Serve', 'nx-cli.svg'],
-  ['Test', 'nx-cli.svg'],
-  ['E2e', 'nx-cli.svg'],
-  ['Lint', 'nx-cli.svg'],
+const ROUTE_TO_ICON_MAP = new Map<
+  WorkspaceRouteTitle | undefined,
+  { light: string; dark: string }
+>([
+  ['Generate', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
+  ['Run', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
+  ['Build', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
+  ['Serve', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
+  ['Test', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
+  ['E2e', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
+  ['Lint', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
 ]);
 
 export const ROUTE_LIST: WorkspaceRouteTitle[] = [
@@ -71,8 +74,13 @@ export class WorkspaceTreeItem extends TreeItem {
   static getIconUriForRoute(
     extensionPath: string,
     route?: WorkspaceRouteTitle
-  ): Uri | undefined {
+  ): { light: Uri; dark: Uri } | undefined {
     const icon = ROUTE_TO_ICON_MAP.get(route);
-    return icon ? Uri.file(join(extensionPath, 'assets', icon)) : undefined;
+    return icon
+      ? {
+          light: Uri.file(join(extensionPath, 'assets', icon.light)),
+          dark: Uri.file(join(extensionPath, 'assets', icon.dark)),
+        }
+      : undefined;
   }
 }

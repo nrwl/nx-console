@@ -84,9 +84,14 @@ export function createWebViewPanel(
     webviewPanel.onDidDispose(() => {
       webviewPanel = undefined;
     });
-    webviewPanel.iconPath = Uri.file(
-      join(context.extensionPath, 'assets', 'nx-console.svg')
-    );
+    webviewPanel.iconPath = {
+      light: Uri.file(
+        join(context.extensionPath, 'assets', 'nx-console-light.svg')
+      ),
+      dark: Uri.file(
+        join(context.extensionPath, 'assets', 'nx-console-dark.svg')
+      ),
+    };
 
     webviewPanel.webview.html = getIframeHtml(context, schema);
 
