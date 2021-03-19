@@ -7,10 +7,8 @@ export type WorkspaceRouteTitle =
   | 'Build'
   | 'Serve'
   | 'Test'
-  | 'E2e'
-  | 'Lint'
-  | 'Change workspace'
-  | 'Select workspace';
+  | 'E2E'
+  | 'Lint';
 
 const ROUTE_TO_ICON_MAP = new Map<
   WorkspaceRouteTitle | undefined,
@@ -21,7 +19,7 @@ const ROUTE_TO_ICON_MAP = new Map<
   ['Build', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
   ['Serve', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
   ['Test', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-  ['E2e', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
+  ['E2E', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
   ['Lint', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
 ]);
 
@@ -31,7 +29,7 @@ export const ROUTE_LIST: WorkspaceRouteTitle[] = [
   'Build',
   'Serve',
   'Test',
-  'E2e',
+  'E2E',
   'Lint',
 ];
 
@@ -49,6 +47,7 @@ export class WorkspaceTreeItem extends TreeItem {
     ); // Explicitly handle rejection
   }
 
+  // @ts-ignore
   command = {
     title: this.route,
     command: 'nxConsole.revealWebViewPanel',

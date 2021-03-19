@@ -9,5 +9,8 @@ module.exports = {
     '<rootDir>/libs/vscode/configuration',
     '<rootDir>/libs/vscode/cli-task',
     '<rootDir>/libs/vscode/nx-workspace',
+    '<rootDir>/libs/vscode/workspace-tree',
+    '<rootDir>/libs/vscode/nx-commands-tree',
+    '<rootDir>/libs/vscode/webview',
   ],
 };

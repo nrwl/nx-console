@@ -86,10 +86,7 @@ export async function verifyBuilderDefinition(
     };
   }
 
-  const options = await readBuilderSchema(
-    workspacePath(),
-    builderName
-  );
+  const options = await readBuilderSchema(workspacePath(), builderName);
 
   if (!options) {
     window
@@ -114,9 +111,7 @@ export async function verifyBuilderDefinition(
     };
   }
 
-  const isNxWorkspace = existsSync(
-    join(workspacePath(), 'nx.json')
-  );
+  const isNxWorkspace = existsSync(join(workspacePath(), 'nx.json'));
   return {
     validBuilder: true,
     builderName,
@@ -125,7 +120,8 @@ export async function verifyBuilderDefinition(
   };
 }
 
-
 function workspacePath() {
-  return dirname(WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', ''))
+  return dirname(
+    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+  );
 }

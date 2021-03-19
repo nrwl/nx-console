@@ -5,14 +5,14 @@ import {
   ExtensionContext,
   tasks,
   TreeView,
+  Uri,
   window,
   workspace,
-  Uri,
 } from 'vscode';
 
 import {
-  registerCliTaskCommands,
   CliTaskProvider,
+  registerCliTaskCommands,
   registerNxCommands,
 } from '@nx-console/vscode/tasks';
 import {
@@ -25,22 +25,21 @@ import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { revealWebViewPanel } from './app/webview';
-import { WorkspaceTreeItem } from './app/workspace-tree/workspace-tree-item';
+import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import {
   LOCATE_YOUR_WORKSPACE,
+  WorkspaceTreeItem,
   WorkspaceTreeProvider,
-} from './app/workspace-tree/workspace-tree-provider';
+} from '@nx-console/vscode/nx-workspace-tree';
+import { verifyNodeModules, verifyWorkspace } from '@nx-console/vscode/verify';
 import {
-  verifyNodeModules,
-  verifyWorkspace,
-} from '@nx-console/vscode/verify-workspace';
-import { NxCommandsTreeItem } from './app/nx-commands-tree/nx-commands-tree-item';
+  NxCommandsTreeItem,
+  NxCommandsTreeProvider,
+} from '@nx-console/vscode/nx-commands-tree';
 import {
-  NxProjectTreeProvider,
   NxProjectTreeItem,
+  NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-tree';
-import { NxCommandsTreeProvider } from './app/nx-commands-tree/nx-commands-provider';
 import { environment } from './environments/environment';
 
 let workspaceTreeView: TreeView<WorkspaceTreeItem>;

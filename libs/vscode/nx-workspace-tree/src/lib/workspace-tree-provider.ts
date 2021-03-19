@@ -1,12 +1,12 @@
 import { TreeItem } from 'vscode';
 
-import { AbstractTreeProvider } from '../../../../../libs/server/src/lib/abstract-tree-provider';
+import { AbstractTreeProvider } from '@nx-console/server';
 import { ROUTE_LIST, WorkspaceTreeItem } from './workspace-tree-item';
 import { join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
-  'Scanning for your Angular Workspace...'
+  'Scanning for your Nx Workspace...'
 );
 export const LOCATE_YOUR_WORKSPACE = new TreeItem('Select workspace');
 LOCATE_YOUR_WORKSPACE.command = {

@@ -20,10 +20,13 @@
       "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
     },
     "vscode-nx-project-tree": { "tags": [] },
-    "vscode-verify-workspace": { "tags": [] },
     "vscode-configuration": { "tags": [] },
     "vscode-tasks": { "tags": [] },
-    "vscode-nx-workspace": { "tags": [] }
+    "vscode-nx-workspace": { "tags": [] },
+    "vscode-verify": { "tags": [] },
+    "vscode-nx-commands-tree": { "tags": [] },
+    "vscode-nx-workspace-tree": { "tags": [] },
+    "vscode-webview": { "tags": [] }
   },
   "tasksRunnerOptions": {
     "default": {

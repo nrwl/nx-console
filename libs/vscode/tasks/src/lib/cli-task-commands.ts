@@ -1,14 +1,14 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { selectSchematic } from '../../../../../apps/vscode/src/app/select-schematic';
+import { selectSchematic } from '@nx-console/server';
 import {
   verifyWorkspace,
   verifyBuilderDefinition,
-} from '@nx-console/vscode/verify-workspace';
+} from '@nx-console/vscode/verify';
 import {
   WorkspaceRouteTitle,
   WorkspaceTreeItem,
-} from '../../../../../apps/vscode/src/app/workspace-tree/workspace-tree-item';
+} from '@nx-console/vscode/nx-workspace-tree';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';

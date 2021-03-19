@@ -343,45 +343,6 @@
         }
       }
     },
-    "vscode-verify-workspace": {
-      "root": "libs/vscode/verify-workspace",
-      "sourceRoot": "libs/vscode/verify-workspace/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "libs/vscode/verify-workspace/tsconfig.lib.json",
-              "libs/vscode/verify-workspace/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/vscode/verify-workspace/**/*"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/verify-workspace"],
-          "options": {
-            "jestConfig": "libs/vscode/verify-workspace/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/verify-workspace",
-            "tsConfig": "libs/vscode/verify-workspace/tsconfig.lib.json",
-            "packageJson": "libs/vscode/verify-workspace/package.json",
-            "main": "libs/vscode/verify-workspace/src/index.ts",
-            "assets": ["libs/vscode/verify-workspace/*.md"]
-          }
-        }
-      }
-    },
     "vscode-configuration": {
       "root": "libs/vscode/configuration",
       "sourceRoot": "libs/vscode/configuration/src",
@@ -486,6 +447,156 @@
             "packageJson": "libs/vscode/nx-workspace/package.json",
             "main": "libs/vscode/nx-workspace/src/index.ts",
             "assets": ["libs/vscode/nx-workspace/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-verify": {
+      "root": "libs/vscode/verify",
+      "sourceRoot": "libs/vscode/verify/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/verify/tsconfig.lib.json",
+              "libs/vscode/verify/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/vscode/verify/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/verify"],
+          "options": {
+            "jestConfig": "libs/vscode/verify/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/verify",
+            "tsConfig": "libs/vscode/verify/tsconfig.lib.json",
+            "packageJson": "libs/vscode/verify/package.json",
+            "main": "libs/vscode/verify/src/index.ts",
+            "assets": ["libs/vscode/verify/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-nx-commands-tree": {
+      "root": "libs/vscode/nx-commands-tree",
+      "sourceRoot": "libs/vscode/nx-commands-tree/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/nx-commands-tree/tsconfig.lib.json",
+              "libs/vscode/nx-commands-tree/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/vscode/nx-commands-tree/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-commands-tree"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-commands-tree/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-commands-tree",
+            "tsConfig": "libs/vscode/nx-commands-tree/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-commands-tree/package.json",
+            "main": "libs/vscode/nx-commands-tree/src/index.ts",
+            "assets": ["libs/vscode/nx-commands-tree/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-nx-workspace-tree": {
+      "root": "libs/vscode/nx-workspace-tree",
+      "sourceRoot": "libs/vscode/nx-workspace-tree/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/nx-workspace-tree/tsconfig.lib.json",
+              "libs/vscode/nx-workspace-tree/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/vscode/nx-workspace-tree/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-workspace-tree"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-workspace-tree/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-workspace-tree",
+            "tsConfig": "libs/vscode/nx-workspace-tree/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-workspace-tree/package.json",
+            "main": "libs/vscode/nx-workspace-tree/src/index.ts",
+            "assets": ["libs/vscode/nx-workspace-tree/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-webview": {
+      "root": "libs/vscode/webview",
+      "sourceRoot": "libs/vscode/webview/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/webview/tsconfig.lib.json",
+              "libs/vscode/webview/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/vscode/webview/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/webview"],
+          "options": {
+            "jestConfig": "libs/vscode/webview/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/webview",
+            "tsConfig": "libs/vscode/webview/tsconfig.lib.json",
+            "packageJson": "libs/vscode/webview/package.json",
+            "main": "libs/vscode/webview/src/index.ts",
+            "assets": ["libs/vscode/webview/*.md"]
           }
         }
       }

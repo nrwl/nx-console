@@ -1,28 +1,27 @@
 import { TaskExecutionSchema } from '@nx-console/schema';
 import {
-  readArchitectDef,
-  readBuilderSchema,
   getOutputChannel,
   getTelemetry,
+  readArchitectDef,
+  readBuilderSchema,
+  selectSchematic,
 } from '@nx-console/server';
-import { window, Uri } from 'vscode';
-
 import {
-  selectCliProject,
+  verifyBuilderDefinition,
+  verifyWorkspace,
+} from '@nx-console/vscode/verify';
+import { Uri, window } from 'vscode';
+import { WorkspaceRouteTitle } from '@nx-console/vscode/nx-workspace-tree';
+import {
   CliTaskProvider,
   CliTaskQuickPickItem,
+  selectCliProject,
 } from '@nx-console/vscode/tasks';
-import { selectSchematic } from '../select-schematic';
-import {
-  verifyWorkspace,
-  verifyBuilderDefinition,
-} from '@nx-console/vscode/verify-workspace';
-import { WorkspaceRouteTitle } from './workspace-tree-item';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
   workspaceRouteTitle: WorkspaceRouteTitle = 'Run',
-  contextMenuUri?: Uri | undefined
+  contextMenuUri?: Uri
 ): Promise<TaskExecutionSchema | void> {
   try {
     if (!cliTaskProvider.getWorkspacePath()) {
@@ -37,7 +36,7 @@ export async function getTaskExecutionSchema(
     const command = workspaceRouteTitle.toLowerCase();
     switch (workspaceRouteTitle) {
       case 'Build':
-      case 'E2e':
+      case 'E2E':
       case 'Lint':
       case 'Serve':
       case 'Test':

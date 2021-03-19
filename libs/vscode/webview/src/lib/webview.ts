@@ -10,10 +10,12 @@ import {
 } from 'vscode';
 
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
-import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
+import {
+  WorkspaceTreeItem,
+} from '@nx-console/vscode/nx-workspace-tree';
 import { getTelemetry } from '@nx-console/server';
 import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
+import { getTaskExecutionSchema } from './get-task-execution-schema';
 
 let webviewPanel: WebviewPanel | undefined;
 let indexHtml: string | undefined;

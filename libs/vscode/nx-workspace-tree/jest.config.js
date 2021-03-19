@@ -1,5 +1,5 @@
 module.exports = {
-  displayName: 'vscode-verify-workspace',
+  displayName: 'vscode-nx-workspace-tree',
   preset: '../../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -10,5 +10,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/verify-workspace',
+  coverageDirectory: '../../../coverage/libs/vscode/nx-workspace-tree',
 };

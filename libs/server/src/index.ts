@@ -16,3 +16,4 @@ export * from './lib/utils/output-channel';
 export * from './lib/stores';
 
 export * from './lib/abstract-tree-provider';
+export * from './lib/select-schematic';
