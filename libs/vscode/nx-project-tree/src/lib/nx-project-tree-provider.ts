@@ -1,22 +1,17 @@
-import { JSONVisitor, visit } from 'jsonc-parser';
 import { join } from 'path';
 import {
   commands,
   ExtensionContext,
   ProviderResult,
-  Selection,
-  TextDocument,
   TreeItemCollapsibleState,
   Uri,
-  window,
-  workspace,
 } from 'vscode';
 
 import { AbstractTreeProvider } from '@nx-console/server';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { NxProjectLabel, NxProjectTreeItem } from './nx-project-tree-item';
-import { verifyWorkspace } from '@nx-console/vscode/verify-workspace';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { NxProject, NxProjectTreeItem } from './nx-project-tree-item';
+
+import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 
 export let nxProjectTreeProvider: NxProjectTreeProvider;
 
@@ -51,18 +46,14 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     );
   }
 
-  setWorkspaceJsonPath() {
-    this.refresh();
-  }
-
   getParent(element: NxProjectTreeItem): NxProjectTreeItem | null | undefined {
-    const { project, architect } = element.workspaceJsonLabel;
+    const { project, target } = element.nxProject;
 
-    if (architect) {
-      if (architect.configuration) {
+    if (target) {
+      if (target.configuration) {
         return this.createNxProjectTreeItem(
-          { project, architect: { name: architect.name } },
-          architect.name
+          { project, target: { name: target.name } },
+          target.name
         );
       } else {
         return this.createNxProjectTreeItem({ project }, project);
@@ -73,7 +64,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   }
 
   createNxProjectTreeItem(
-    workspaceJsonLabel: NxProjectLabel,
+    workspaceJsonLabel: NxProject,
     treeItemLabel: string,
     hasChildren?: boolean
   ) {
@@ -89,7 +80,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
       command: 'nxConsole.editWorkspaceJson',
       arguments: [item],
     };
-    if (!workspaceJsonLabel.architect) {
+    if (!workspaceJsonLabel.target) {
       const projectDef = this.cliTaskProvider.getProjects()[
         workspaceJsonLabel.project
       ];
@@ -126,34 +117,34 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
       );
     }
 
-    const { workspaceJsonLabel } = parent;
-    const { architect, project } = workspaceJsonLabel;
+    const { nxProject } = parent;
+    const { target, project } = nxProject;
     const projectDef = this.cliTaskProvider.getProjects()[project];
 
     if (!projectDef) {
       return;
     }
 
-    if (!architect) {
+    if (!target) {
       if (projectDef.architect) {
         return Object.keys(projectDef.architect).map(
           (name): NxProjectTreeItem =>
             this.createNxProjectTreeItem(
-              { architect: { name }, project },
+              { target: { name }, project },
               name,
               Boolean(projectDef.architect![name].configurations)
             )
         );
       }
     } else {
-      const { configuration } = architect;
+      const { configuration } = target;
 
       if (configuration || !projectDef.architect) {
         return;
       }
 
       const configurations = projectDef.architect
-        ? projectDef.architect[architect.name].configurations
+        ? projectDef.architect[target.name].configurations
         : undefined;
       if (!configurations) {
         return;
@@ -161,7 +152,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
 
       return Object.keys(configurations).map((name) => {
         const item = this.createNxProjectTreeItem(
-          { architect: { ...architect, configuration: name }, project },
+          { target: { ...target, configuration: name }, project },
           name
         );
 
@@ -170,88 +161,22 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     }
   }
 
-  private findLabel(
-    document: TextDocument,
-    { project, architect }: NxProjectLabel
-  ): number {
-    let scriptOffset = 0;
-    let nestingLevel = 0;
-    let inProjects = false;
-    let inProject = false;
-    let inArchitects = false;
-    let inArchitect = false;
-
-    const visitor: JSONVisitor = {
-      onError() {
-        return scriptOffset;
-      },
-      onObjectEnd() {
-        nestingLevel--;
-      },
-      onObjectBegin() {
-        nestingLevel++;
-      },
-      onObjectProperty(property: string, offset: number) {
-        if (scriptOffset) {
-          return;
-        }
-
-        if (property === 'projects' && nestingLevel === 1) {
-          inProjects = true;
-        } else if (inProjects && nestingLevel === 2 && property === project) {
-          inProject = true;
-          if (!architect) {
-            scriptOffset = offset;
-          }
-        } else if (
-          inProject &&
-          nestingLevel === 3 &&
-          property === 'architect'
-        ) {
-          inArchitects = true;
-        } else if (inArchitects && architect) {
-          if (property === architect.name && nestingLevel === 4) {
-            inArchitect = true;
-            if (!architect.configuration) {
-              scriptOffset = offset;
-            }
-          } else if (
-            inArchitect &&
-            nestingLevel === 6 &&
-            property === architect.configuration
-          ) {
-            scriptOffset = offset;
-          }
-        }
-      },
-    };
-    visit(document.getText(), visitor);
-
-    return scriptOffset;
-  }
-
   private async runTask(selection: NxProjectTreeItem) {
-    const { architect, project } = selection.workspaceJsonLabel;
-    if (!architect) {
+    const { target, project } = selection.nxProject;
+    if (!target) {
       return;
     }
 
     const flags = [];
-    if (architect.configuration) {
-      flags.push(`--configuration=${architect.configuration}`);
+    if (target.configuration) {
+      flags.push(`--configuration=${target.configuration}`);
     }
 
     this.cliTaskProvider.executeTask({
-      command: architect.name,
+      command: target.name,
       positional: project,
       flags,
     });
-  }
-
-  revealNxProjectLabel(workspaceJsonLabel: NxProjectLabel) {
-    this.editWorkspaceJson(
-      nxProjectTreeProvider.createNxProjectTreeItem(workspaceJsonLabel, '')
-    );
   }
 
   private async revealInExplorer(selection: NxProjectTreeItem) {
@@ -261,21 +186,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   }
 
   private async editWorkspaceJson(selection: NxProjectTreeItem) {
-    const { validWorkspaceJson } = verifyWorkspace();
-    if (!validWorkspaceJson) {
-      return;
-    }
-
-    const workspaceJson = Uri.file(
-      join(WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', ''))
+    return revealNxProject(
+      selection.nxProject.project,
+      selection.nxProject.target
     );
-    const document: TextDocument = await workspace.openTextDocument(
-      workspaceJson
-    );
-    const offset = this.findLabel(document, selection.workspaceJsonLabel);
-    const position = document.positionAt(offset);
-    await window.showTextDocument(document, {
-      selection: new Selection(position, position),
-    });
   }
 }

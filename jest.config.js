@@ -8,5 +8,6 @@ module.exports = {
     '<rootDir>/libs/vscode/verify-workspace',
     '<rootDir>/libs/vscode/configuration',
     '<rootDir>/libs/vscode/cli-task',
+    '<rootDir>/libs/vscode/nx-workspace',
   ],
 };

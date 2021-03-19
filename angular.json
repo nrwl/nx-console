@@ -453,6 +453,42 @@
           }
         }
       }
+    },
+    "vscode-nx-workspace": {
+      "root": "libs/vscode/nx-workspace",
+      "sourceRoot": "libs/vscode/nx-workspace/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/vscode/nx-workspace/tsconfig.lib.json",
+              "libs/vscode/nx-workspace/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/vscode/nx-workspace/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-workspace"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-workspace/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-workspace",
+            "tsConfig": "libs/vscode/nx-workspace/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-workspace/package.json",
+            "main": "libs/vscode/nx-workspace/src/index.ts",
+            "assets": ["libs/vscode/nx-workspace/*.md"]
+          }
+        }
+      }
     }
   },
   "cli": {

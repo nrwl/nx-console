@@ -2,7 +2,7 @@ import { TreeItem, TreeItemCollapsibleState } from 'vscode';
 
 export class NxProjectTreeItem extends TreeItem {
   constructor(
-    public workspaceJsonLabel: NxProjectLabel,
+    public nxProject: NxProject,
     treeItemLabel: string,
     collapsibleState?: TreeItemCollapsibleState | undefined
   ) {
@@ -10,9 +10,9 @@ export class NxProjectTreeItem extends TreeItem {
   }
 }
 
-export interface NxProjectLabel {
+export interface NxProject {
   project: string;
-  architect?: {
+  target?: {
     name: string;
     configuration?: string;
   };

@@ -1,11 +1,11 @@
 import { Option } from '@nx-console/schema';
 import { readBuilderSchema, getTelemetry } from '@nx-console/server';
 import { window } from 'vscode';
-import { cliTaskProvider } from '@nx-console/vscode/tasks';
 import { OptionType } from '@angular/cli/models/interface';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { existsSync } from 'fs';
-import { nxProjectTreeProvider } from '@nx-console/vscode/nx-project-tree';
+import { revealNxProject } from '@nx-console/vscode/nx-workspace';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 const RUN_ONE_OPTIONS = [
   {
@@ -72,11 +72,8 @@ export async function verifyBuilderDefinition(
       )
       .then((value) => {
         if (value) {
-          nxProjectTreeProvider.revealNxProjectLabel({
-            project: project,
-            architect: {
-              name: command,
-            },
+          revealNxProject(project, {
+            name: command,
           });
         }
       });
@@ -90,7 +87,7 @@ export async function verifyBuilderDefinition(
   }
 
   const options = await readBuilderSchema(
-    cliTaskProvider.getWorkspacePath(),
+    workspacePath(),
     builderName
   );
 
@@ -102,11 +99,8 @@ export async function verifyBuilderDefinition(
       )
       .then((value) => {
         if (value) {
-          nxProjectTreeProvider.revealNxProjectLabel({
-            project: project,
-            architect: {
-              name: command,
-            },
+          revealNxProject(project, {
+            name: command,
           });
         }
       });
@@ -121,7 +115,7 @@ export async function verifyBuilderDefinition(
   }
 
   const isNxWorkspace = existsSync(
-    join(cliTaskProvider.getWorkspacePath(), 'nx.json')
+    join(workspacePath(), 'nx.json')
   );
   return {
     validBuilder: true,
@@ -129,4 +123,9 @@ export async function verifyBuilderDefinition(
     configurations,
     options: isNxWorkspace ? [...RUN_ONE_OPTIONS, ...options] : options,
   };
+}
+
+
+function workspacePath() {
+  return dirname(WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', ''))
 }
