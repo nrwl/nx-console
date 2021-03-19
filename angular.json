@@ -86,7 +86,7 @@
         }
       }
     },
-    "vscode-extension": {
+    "vscode-app": {
       "root": "apps/vscode",
       "sourceRoot": "apps/vscode/src",
       "projectType": "application",

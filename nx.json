@@ -11,7 +11,7 @@
     "schema": {
       "tags": []
     },
-    "vscode-extension": {
+    "vscode-app": {
       "tags": []
     },
     "server": {
