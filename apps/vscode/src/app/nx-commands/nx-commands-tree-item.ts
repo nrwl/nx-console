@@ -8,7 +8,10 @@ export class NxCommandsTreeItem extends TreeItem {
     tooltip: `Run nx ${this.affectedCommand}`,
   };
 
-  iconPath = Uri.file(join(this.extensionPath, 'assets', 'nx-cli.svg'));
+  iconPath = {
+    light: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-light.svg')),
+    dark: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-dark.svg')),
+  };
 
   constructor(
     readonly affectedCommand: string,

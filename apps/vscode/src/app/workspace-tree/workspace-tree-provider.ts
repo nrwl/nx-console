@@ -40,12 +40,14 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     readonly extensionPath: string
   ) {
     super();
-    LOCATE_YOUR_WORKSPACE.iconPath = join(
-      extensionPath,
-      'assets',
-      'nx-console.svg'
-    );
-    CHANGE_WORKSPACE.iconPath = join(extensionPath, 'assets', 'nx-console.svg');
+    LOCATE_YOUR_WORKSPACE.iconPath = {
+      light: join(extensionPath, 'assets', 'nx-console-light.svg'),
+      dark: join(extensionPath, 'assets', 'nx-console-dark.svg'),
+    };
+    CHANGE_WORKSPACE.iconPath = {
+      light: join(extensionPath, 'assets', 'nx-console-light.svg'),
+      dark: join(extensionPath, 'assets', 'nx-console-dark.svg'),
+    };
   }
 
   getParent(_: WorkspaceTreeItem) {
