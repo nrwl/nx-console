@@ -6,16 +6,18 @@ import {
   getTelemetry,
 } from '@nx-console/server';
 import { window } from 'vscode';
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
-export function verifyWorkspace(
-  workspacePath: string
-): {
+export function verifyWorkspace(): {
   validWorkspaceJson: boolean;
   json?: any;
   workspaceType: 'ng' | 'nx';
-  configuratoinFilePath: string;
+  configurationFilePath: string;
 } {
+  const workspacePath = dirname(
+    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+  );
   try {
     const workspaceJsonPath = join(workspacePath, 'workspace.json');
     const angularJsonPath = join(workspacePath, 'angular.json');
@@ -26,7 +28,7 @@ export function verifyWorkspace(
           readAndCacheJsonFile(workspaceJsonPath).json
         ),
         workspaceType: 'nx',
-        configuratoinFilePath: workspaceJsonPath,
+        configurationFilePath: workspaceJsonPath,
       };
     } else if (fileExistsSync(angularJsonPath)) {
       return {
@@ -35,7 +37,7 @@ export function verifyWorkspace(
           readAndCacheJsonFile(angularJsonPath).json
         ),
         workspaceType: 'ng',
-        configuratoinFilePath: angularJsonPath,
+        configurationFilePath: angularJsonPath,
       };
     } else {
       // Handles below along with other runtime errors.
@@ -60,7 +62,7 @@ export function verifyWorkspace(
     return {
       validWorkspaceJson: false,
       workspaceType: 'nx',
-      configuratoinFilePath: '',
+      configurationFilePath: '',
     };
   }
 }

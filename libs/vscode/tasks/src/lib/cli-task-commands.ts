@@ -1,12 +1,14 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { selectSchematic } from '../select-schematic';
-import { verifyWorkspace } from '../../../../../libs/vscode/verify-workspace/src/lib/verify-workspace';
-import { verifyBuilderDefinition } from '../../../../../libs/vscode/verify-workspace/src/lib/verify-builder-definition';
+import { selectSchematic } from '../../../../../apps/vscode/src/app/select-schematic';
+import {
+  verifyWorkspace,
+  verifyBuilderDefinition,
+} from '@nx-console/vscode/verify-workspace';
 import {
   WorkspaceRouteTitle,
   WorkspaceTreeItem,
-} from '../workspace-tree/workspace-tree-item';
+} from '../../../../../apps/vscode/src/app/workspace-tree/workspace-tree-item';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
@@ -48,14 +50,14 @@ export function registerCliTaskCommands(
   });
 
   commands.registerCommand(`ng.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspacePath())
+    selectSchematicAndPromptForFlags()
   );
 
   commands.registerCommand(`ng.generate.ui`, () =>
     selectCliCommandAndShowUi('generate', context.extensionPath)
   );
   commands.registerCommand(`nx.generate`, () =>
-    selectSchematicAndPromptForFlags(n.getWorkspacePath())
+    selectSchematicAndPromptForFlags()
   );
 
   commands.registerCommand(`nx.generate.ui`, () =>
@@ -78,15 +80,13 @@ function selectCliCommandAndShowUi(
     );
     return;
   }
-  const { validWorkspaceJson, configuratoinFilePath } = verifyWorkspace(
-    cliTaskProvider.getWorkspacePath()
-  );
+  const { validWorkspaceJson, configurationFilePath } = verifyWorkspace();
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
   }
   const workspaceTreeItem = new WorkspaceTreeItem(
-    configuratoinFilePath,
+    configurationFilePath,
     `${command[0].toUpperCase()}${command.slice(1)}` as WorkspaceRouteTitle,
     extensionPath
   );
@@ -99,9 +99,7 @@ function selectCliCommandAndShowUi(
 }
 
 async function selectCliCommandAndPromptForFlags(command: string) {
-  const { validWorkspaceJson, json, workspaceType } = verifyWorkspace(
-    cliTaskProvider.getWorkspacePath()
-  );
+  const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
 
   const selection = validWorkspaceJson
     ? await selectCliProject(command, json)
@@ -146,18 +144,18 @@ async function selectCliCommandAndPromptForFlags(command: string) {
   }
 }
 
-async function selectSchematicAndPromptForFlags(workspacePath: string) {
+async function selectSchematicAndPromptForFlags() {
   const {
     validWorkspaceJson,
     workspaceType,
-    configuratoinFilePath,
-  } = verifyWorkspace(workspacePath);
+    configurationFilePath,
+  } = verifyWorkspace();
 
   if (!validWorkspaceJson) {
     return;
   }
 
-  const selection = await selectSchematic(configuratoinFilePath);
+  const selection = await selectSchematic(configurationFilePath);
   if (!selection) {
     return;
   }

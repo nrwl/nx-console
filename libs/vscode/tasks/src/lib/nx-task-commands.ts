@@ -2,9 +2,9 @@ import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 import { commands, ExtensionContext, window, tasks } from 'vscode';
 
-import { ProjectDef } from '../cli-task/cli-task-definition';
-import { CliTaskProvider } from '../cli-task/cli-task-provider';
-import { selectFlags } from '../cli-task/select-flags';
+import { ProjectDef } from './cli-task-definition';
+import { CliTaskProvider } from './cli-task-provider';
+import { selectFlags } from './select-flags';
 import { verifyWorkspace } from '@nx-console/vscode/verify-workspace';
 import { getTelemetry } from '@nx-console/server';
 import { NxTask } from './nx-task';
@@ -56,9 +56,7 @@ export function registerNxCommands(
 }
 
 async function promptForTarget(): Promise<string | undefined> {
-  const { validWorkspaceJson, json } = verifyWorkspace(
-    cliTaskProvider.getWorkspacePath()
-  );
+  const { validWorkspaceJson, json } = verifyWorkspace();
 
   if (!validWorkspaceJson || !json) {
     return;

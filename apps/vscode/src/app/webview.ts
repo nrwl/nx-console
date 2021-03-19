@@ -9,7 +9,7 @@ import {
   window,
 } from 'vscode';
 
-import { CliTaskProvider } from './cli-task/cli-task-provider';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTaskExecutionSchema } from './workspace-tree/get-task-execution-schema';
 import { WorkspaceTreeItem } from './workspace-tree/workspace-tree-item';
 import { getTelemetry } from '@nx-console/server';

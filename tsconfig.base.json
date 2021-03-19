@@ -40,7 +40,8 @@
       ],
       "@nx-console/vscode/configuration": [
         "libs/vscode/configuration/src/index.ts"
-      ]
+      ],
+      "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"]
     },
     "module": "esnext",
     "rootDir": "."

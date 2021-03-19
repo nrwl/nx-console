@@ -13,9 +13,10 @@ import {
 } from 'vscode';
 
 import { AbstractTreeProvider } from '@nx-console/server';
-import { CliTaskProvider } from '../../../../../apps/vscode/src/app/cli-task/cli-task-provider';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { NxProjectLabel, NxProjectTreeItem } from './nx-project-tree-item';
 import { verifyWorkspace } from '@nx-console/vscode/verify-workspace';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 export let nxProjectTreeProvider: NxProjectTreeProvider;
 
@@ -50,10 +51,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     );
   }
 
-  setWorkspaceJsonPath(workspaceJsonPath: string) {
-    if (this.cliTaskProvider.getWorkspaceJsonPath() !== workspaceJsonPath) {
-      this.cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);
-    }
+  setWorkspaceJsonPath() {
     this.refresh();
   }
 
@@ -263,15 +261,13 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   }
 
   private async editWorkspaceJson(selection: NxProjectTreeItem) {
-    const { validWorkspaceJson } = verifyWorkspace(
-      this.cliTaskProvider.getWorkspacePath()
-    );
+    const { validWorkspaceJson } = verifyWorkspace();
     if (!validWorkspaceJson) {
       return;
     }
 
     const workspaceJson = Uri.file(
-      join(this.cliTaskProvider.getWorkspaceJsonPath())
+      join(WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', ''))
     );
     const document: TextDocument = await workspace.openTextDocument(
       workspaceJson

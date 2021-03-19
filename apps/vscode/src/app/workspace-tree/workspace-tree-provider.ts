@@ -3,6 +3,7 @@ import { TreeItem } from 'vscode';
 import { AbstractTreeProvider } from '../../../../../libs/server/src/lib/abstract-tree-provider';
 import { ROUTE_LIST, WorkspaceTreeItem } from './workspace-tree-item';
 import { join } from 'path';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Angular Workspace...'
@@ -23,15 +24,14 @@ CHANGE_WORKSPACE.command = {
 export class WorkspaceTreeProvider extends AbstractTreeProvider<
   WorkspaceTreeItem | TreeItem
 > {
-  private scanning = Boolean(this.workspaceJsonPath);
+  private scanning = Boolean(
+    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+  );
 
   /**
    * Provides data for the "Generate & Run Target" view
    */
-  constructor(
-    public workspaceJsonPath: string | undefined,
-    readonly extensionPath: string
-  ) {
+  constructor(readonly extensionPath: string) {
     super();
     LOCATE_YOUR_WORKSPACE.iconPath = {
       light: join(extensionPath, 'assets', 'nx-console-light.svg'),
@@ -52,13 +52,11 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     this.refresh();
   }
 
-  setWorkspaceJsonPath(workspaceJsonPath: string) {
-    this.workspaceJsonPath = workspaceJsonPath;
-    this.refresh();
-  }
-
   getChildren() {
-    const workspaceJsonPath = this.workspaceJsonPath;
+    const workspaceJsonPath = WorkspaceConfigurationStore.instance.get(
+      'nxWorkspaceJsonPath',
+      ''
+    );
 
     if (!workspaceJsonPath) {
       if (this.scanning) {

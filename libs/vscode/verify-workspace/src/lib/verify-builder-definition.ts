@@ -1,11 +1,11 @@
 import { Option } from '@nx-console/schema';
 import { readBuilderSchema, getTelemetry } from '@nx-console/server';
 import { window } from 'vscode';
-import { cliTaskProvider } from '../../../../../apps/vscode/src/app/cli-task/cli-task-provider';
+import { cliTaskProvider } from '@nx-console/vscode/tasks';
 import { OptionType } from '@angular/cli/models/interface';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { nxProjectTreeProvider } from '../../../nx-project-tree/src/lib/nx-project-tree-provider';
+import { nxProjectTreeProvider } from '@nx-console/vscode/nx-project-tree';
 
 const RUN_ONE_OPTIONS = [
   {

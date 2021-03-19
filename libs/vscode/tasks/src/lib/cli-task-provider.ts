@@ -22,6 +22,7 @@ import {
 } from './cli-task-definition';
 import { NxTask } from './nx-task';
 import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/schema';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 export let cliTaskProvider: CliTaskProvider;
 
@@ -29,7 +30,7 @@ export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: CliTaskDefinition;
 
-  constructor(private workspaceJsonPath: string) {
+  constructor() {
     cliTaskProvider = this;
 
     tasks.onDidEndTaskProcess(() => {
@@ -42,15 +43,11 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   getWorkspacePath() {
-    return join(this.workspaceJsonPath, '..');
+    return join(this.getWorkspaceJsonPath(), '..');
   }
 
   getWorkspaceJsonPath() {
-    return this.workspaceJsonPath;
-  }
-
-  setWorkspaceJsonPath(workspaceJsonPath: string) {
-    this.workspaceJsonPath = workspaceJsonPath;
+    return WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '');
   }
 
   provideTasks(): ProviderResult<Task[]> {
@@ -59,7 +56,7 @@ export class CliTaskProvider implements TaskProvider {
 
   resolveTask(task: Task): Task | undefined {
     if (
-      this.workspaceJsonPath &&
+      this.getWorkspaceJsonPath() &&
       task.definition.command &&
       task.definition.project
     ) {
@@ -77,7 +74,7 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   createTask(definition: CliTaskDefinition) {
-    return CliTask.create(definition, this.workspaceJsonPath);
+    return CliTask.create(definition, this.getWorkspaceJsonPath());
   }
 
   executeTask(definition: CliTaskDefinition) {
@@ -129,7 +126,7 @@ export class CliTaskProvider implements TaskProvider {
     if (json) {
       return json.projects;
     } else {
-      const result = verifyWorkspace(this.getWorkspacePath());
+      const result = verifyWorkspace();
       if (!result.validWorkspaceJson || !result.json) {
         return {};
       } else {
@@ -150,7 +147,7 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   projectForPath(selectedPath: string): NamedProject | null {
-    if (!this.workspaceJsonPath) return null;
+    if (!this.getWorkspaceJsonPath()) return null;
 
     const entry = this.getProjectEntries().find(([_, def]) =>
       selectedPath.startsWith(join(this.getWorkspacePath(), def.root))

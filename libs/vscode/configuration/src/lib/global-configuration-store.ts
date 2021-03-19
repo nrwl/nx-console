@@ -5,15 +5,15 @@ import {
   Memento,
 } from 'vscode';
 import { Store } from '@nx-console/server';
-import { CONFIG_KEYS, ConfigKeys } from './configuration-keys';
+import { GLOBAL_CONFIG_KEYS, GlobalConfigKeys } from './configuration-keys';
 
-let CONFIG_STORE: NxConsoleConfigurationStore;
+let CONFIG_STORE: GlobalConfigurationStore;
 
-export class NxConsoleConfigurationStore implements Store {
+export class GlobalConfigurationStore implements Store {
   static configurationSection = 'nxConsole';
 
-  static fromContext(context: ExtensionContext): NxConsoleConfigurationStore {
-    CONFIG_STORE = new NxConsoleConfigurationStore(context.globalState);
+  static fromContext(context: ExtensionContext): GlobalConfigurationStore {
+    CONFIG_STORE = new GlobalConfigurationStore(context.globalState);
     return CONFIG_STORE;
   }
 
@@ -28,32 +28,32 @@ export class NxConsoleConfigurationStore implements Store {
 
   private constructor(private readonly state: Memento) {}
 
-  get<T>(key: ConfigKeys, defaultValue?: T): T | null {
+  get<T>(key: GlobalConfigKeys, defaultValue?: T): T | null {
     const value = this.storage(key).get(key, defaultValue);
     return typeof value === 'undefined' ? defaultValue || null : value;
   }
 
-  set<T>(key: ConfigKeys, value: T): void {
+  set<T>(key: GlobalConfigKeys, value: T): void {
     this.storage(key).update(key, value);
   }
 
-  delete(key: ConfigKeys): void {
+  delete(key: GlobalConfigKeys): void {
     this.storage(key).update(key, undefined);
   }
 
-  storage(key: ConfigKeys): Memento {
+  storage(key: GlobalConfigKeys): Memento {
     return isConfig(key) ? this.config : this.state;
   }
 
   get config() {
     return workspace.getConfiguration(
-      NxConsoleConfigurationStore.configurationSection
+      GlobalConfigurationStore.configurationSection
     );
   }
 }
 
-function isConfig(key: ConfigKeys): boolean {
-  return CONFIG_KEYS.includes(key);
+function isConfig(key: GlobalConfigKeys): boolean {
+  return GLOBAL_CONFIG_KEYS.includes(key);
 }
 
 export interface VSCState {

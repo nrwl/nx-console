@@ -1,13 +1,22 @@
 import { TaskExecutionSchema } from '@nx-console/schema';
-import { readArchitectDef, readBuilderSchema, getOutputChannel } from '@nx-console/server';
+import {
+  readArchitectDef,
+  readBuilderSchema,
+  getOutputChannel,
+  getTelemetry,
+} from '@nx-console/server';
 import { window, Uri } from 'vscode';
 
-import { selectCliProject } from '../cli-task/cli-task-commands';
-import { CliTaskProvider } from '../cli-task/cli-task-provider';
-import { CliTaskQuickPickItem } from '../cli-task/cli-task-quick-pick-item';
+import {
+  selectCliProject,
+  CliTaskProvider,
+  CliTaskQuickPickItem,
+} from '@nx-console/vscode/tasks';
 import { selectSchematic } from '../select-schematic';
-import { getTelemetry } from '../../../../../libs/server/src/lib/telemetry/init';
-import { verifyWorkspace, verifyBuilderDefinition } from '@nx-console/vscode/verify-workspace';
+import {
+  verifyWorkspace,
+  verifyBuilderDefinition,
+} from '@nx-console/vscode/verify-workspace';
 import { WorkspaceRouteTitle } from './workspace-tree-item';
 
 export async function getTaskExecutionSchema(
@@ -19,9 +28,7 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, json, workspaceType } = verifyWorkspace(
-      cliTaskProvider.getWorkspacePath()
-    );
+    const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
 
     if (!validWorkspaceJson) {
       return;
