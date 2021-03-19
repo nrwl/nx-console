@@ -1,4 +1,4 @@
-import { Telemetry } from '@nx-console/server';
+import { Telemetry } from './telemetry';
 import { Disposable, window, workspace } from 'vscode';
 
 import { Store } from '../stores';
