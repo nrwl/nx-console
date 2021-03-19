@@ -1,6 +1,6 @@
 import { Schematic } from '@nx-console/schema';
-import { readAllSchematicCollections } from '@nx-console/server';
 import { QuickPickItem, window } from 'vscode';
+import { readAllSchematicCollections } from './utils/read-schematic-collections';
 
 export async function selectSchematic(workspaceJsonPath: string) {
   interface GenerateQuickPickItem extends QuickPickItem {

@@ -133,10 +133,9 @@
           "outputs": ["{options.outputPath}"]
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": ["apps/vscode/tsconfig.app.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
+            "lintFilePatterns": ["apps/vscode/**/*.ts"]
           }
         }
       }
@@ -147,10 +146,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": ["libs/schema/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "**/generated/**"]
+            "lintFilePatterns": ["libs/schema/**/*.ts"]
           }
         }
       }
@@ -310,16 +308,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/nx-project-tree/tsconfig.lib.json",
-              "libs/vscode/nx-project-tree/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/vscode/nx-project-tree/**/*"
-            ]
+            "lintFilePatterns": ["libs/vscode/nx-project-tree/**/*.ts"]
           }
         },
         "test": {
@@ -334,6 +325,7 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
+            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-project-tree",
             "tsConfig": "libs/vscode/nx-project-tree/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-project-tree/package.json",
@@ -349,13 +341,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/configuration/tsconfig.lib.json",
-              "libs/vscode/configuration/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!libs/vscode/configuration/**/*"]
+            "lintFilePatterns": ["libs/vscode/configuration/**/*.ts"]
           }
         },
         "test": {
@@ -385,13 +373,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/tasks/tsconfig.lib.json",
-              "libs/vscode/tasks/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!libs/vscode/tasks/**/*"]
+            "lintFilePatterns": ["libs/vscode/tasks/**/*.ts"]
           }
         },
         "test": {
@@ -406,6 +390,7 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
+            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/tasks",
             "tsConfig": "libs/vscode/tasks/tsconfig.lib.json",
             "packageJson": "libs/vscode/tasks/package.json",
@@ -421,13 +406,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/nx-workspace/tsconfig.lib.json",
-              "libs/vscode/nx-workspace/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!libs/vscode/nx-workspace/**/*"]
+            "lintFilePatterns": ["libs/vscode/nx-workspace/**/*.ts"]
           }
         },
         "test": {
@@ -442,6 +423,7 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
+            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-workspace",
             "tsConfig": "libs/vscode/nx-workspace/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-workspace/package.json",
@@ -457,13 +439,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/verify/tsconfig.lib.json",
-              "libs/vscode/verify/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!libs/vscode/verify/**/*"]
+            "lintFilePatterns": ["libs/vscode/verify/**/*.ts"]
           }
         },
         "test": {
@@ -478,6 +456,7 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
+            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/verify",
             "tsConfig": "libs/vscode/verify/tsconfig.lib.json",
             "packageJson": "libs/vscode/verify/package.json",
@@ -493,16 +472,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/nx-commands-tree/tsconfig.lib.json",
-              "libs/vscode/nx-commands-tree/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/vscode/nx-commands-tree/**/*"
-            ]
+            "lintFilePatterns": ["libs/vscode/nx-commands-tree/**/*.ts"]
           }
         },
         "test": {
@@ -517,6 +489,7 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
+            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-commands-tree",
             "tsConfig": "libs/vscode/nx-commands-tree/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-commands-tree/package.json",
@@ -532,16 +505,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/nx-workspace-tree/tsconfig.lib.json",
-              "libs/vscode/nx-workspace-tree/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/vscode/nx-workspace-tree/**/*"
-            ]
+            "lintFilePatterns": ["libs/vscode/nx-workspace-tree/**/*.ts"]
           }
         },
         "test": {
@@ -556,6 +522,7 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
+            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-workspace-tree",
             "tsConfig": "libs/vscode/nx-workspace-tree/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-workspace-tree/package.json",
@@ -571,13 +538,9 @@
       "projectType": "library",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode/webview/tsconfig.lib.json",
-              "libs/vscode/webview/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!libs/vscode/webview/**/*"]
+            "lintFilePatterns": ["libs/vscode/webview/**/*.ts"]
           }
         },
         "test": {
@@ -592,6 +555,7 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
+            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/webview",
             "tsConfig": "libs/vscode/webview/tsconfig.lib.json",
             "packageJson": "libs/vscode/webview/package.json",
