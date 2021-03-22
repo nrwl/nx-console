@@ -2,26 +2,24 @@
   "compileOnSave": false,
   "compilerOptions": {
     "sourceMap": true,
-    "declaration": false,
+    "importHelpers": true,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es2015",
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
     "strictNullChecks": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictFunctionTypes": true,
-    "typeRoots": ["node_modules/@types", "node_modules/node-pty/typings"],
     "downlevelIteration": true,
     "lib": ["es2019", "dom", "esnext.asynciterable"],
     "types": ["node", "jest"],
+    "module": "esnext",
     "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
       "@nx-console/schema": ["libs/schema/src/index.ts"],
       "@nx-console/server": ["libs/server/src/index.ts"],
@@ -50,9 +48,7 @@
         "libs/vscode/nx-workspace-tree/src/index.ts"
       ],
       "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"]
-    },
-    "module": "esnext",
-    "rootDir": "."
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
