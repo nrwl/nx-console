@@ -42,13 +42,16 @@ export class WorkspaceTreeItem extends TreeItem {
         })
       : Promise.reject()
     ).then(
-      () => {},
-      () => {}
+      () => {
+        // empty
+      },
+      () => {
+        // empty
+      }
     ); // Explicitly handle rejection
   }
 
-  // @ts-ignore
-  command = {
+  command: {title: string, command: string, tooltip: string, arguments: any } = {
     title: this.route,
     command: 'nxConsole.revealWebViewPanel',
     tooltip: '',

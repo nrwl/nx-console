@@ -39,7 +39,7 @@ export async function getTaskExecutionSchema(
       case 'E2E':
       case 'Lint':
       case 'Serve':
-      case 'Test':
+      case 'Test': {
         const selectedProject = await selectCliProject(command, json);
 
         if (!selectedProject) return;
@@ -64,8 +64,8 @@ export async function getTaskExecutionSchema(
           command,
           cliName: workspaceType,
         };
-
-      case 'Run':
+      }
+      case 'Run': {
         const runnableItems = cliTaskProvider
           .getProjectEntries()
           .filter(([_, { architect }]) => Boolean(architect))
@@ -115,7 +115,8 @@ export async function getTaskExecutionSchema(
             cliName: workspaceType,
           };
         });
-      case 'Generate':
+      }
+      case 'Generate': {
         return selectSchematic(cliTaskProvider.getWorkspaceJsonPath()).then(
           (schematic) => {
             if (!schematic) {
@@ -150,6 +151,7 @@ export async function getTaskExecutionSchema(
             return { ...schematic, cliName: workspaceType, contextValues };
           }
         );
+      }
     }
   } catch (e) {
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);

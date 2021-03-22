@@ -108,11 +108,13 @@ async function selectCliCommandAndPromptForFlags(command: string) {
     return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
-  let { validBuilder, options, configurations } = await verifyBuilderDefinition(
+  const builderDefinition = await verifyBuilderDefinition(
     selection.projectName,
     command,
     json
   );
+  const { validBuilder, options: builderDefinitionOptions, configurations } = builderDefinition;
+  let options = [...builderDefinitionOptions];
   if (!validBuilder) {
     return;
   }

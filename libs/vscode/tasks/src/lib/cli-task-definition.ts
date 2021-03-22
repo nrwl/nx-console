@@ -7,7 +7,7 @@ export interface CliTaskDefinition {
 export interface ArchitectDef {
   builder: string;
   configurations?: {
-    [configuration: string]: {};
+    [configuration: string]: any;
   };
 }
 
