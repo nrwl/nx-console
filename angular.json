@@ -150,6 +150,17 @@
           "options": {
             "lintFilePatterns": ["libs/schema/**/*.ts"]
           }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/schema",
+            "tsConfig": "libs/schema/tsconfig.lib.json",
+            "packageJson": "libs/schema/package.json",
+            "main": "libs/schema/src/index.ts",
+            "assets": ["libs/schema/*.md"]
+          }
         }
       }
     },
@@ -165,6 +176,17 @@
             "passWithNoTests": true
           },
           "outputs": ["coverage/libs/server"]
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/server",
+            "tsConfig": "libs/server/tsconfig.lib.json",
+            "packageJson": "libs/server/package.json",
+            "main": "libs/server/src/index.ts",
+            "assets": ["libs/server/*.md"]
+          }
         }
       }
     },
@@ -325,7 +347,6 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-project-tree",
             "tsConfig": "libs/vscode/nx-project-tree/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-project-tree/package.json",
@@ -390,7 +411,6 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/tasks",
             "tsConfig": "libs/vscode/tasks/tsconfig.lib.json",
             "packageJson": "libs/vscode/tasks/package.json",
@@ -423,7 +443,6 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-workspace",
             "tsConfig": "libs/vscode/nx-workspace/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-workspace/package.json",
@@ -456,7 +475,6 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/verify",
             "tsConfig": "libs/vscode/verify/tsconfig.lib.json",
             "packageJson": "libs/vscode/verify/package.json",
@@ -489,7 +507,6 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-commands-tree",
             "tsConfig": "libs/vscode/nx-commands-tree/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-commands-tree/package.json",
@@ -522,7 +539,6 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/nx-workspace-tree",
             "tsConfig": "libs/vscode/nx-workspace-tree/tsconfig.lib.json",
             "packageJson": "libs/vscode/nx-workspace-tree/package.json",
@@ -555,7 +571,6 @@
           "builder": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
-            "srcRootForCompilationRoot": ".",
             "outputPath": "dist/libs/vscode/webview",
             "tsConfig": "libs/vscode/webview/tsconfig.lib.json",
             "packageJson": "libs/vscode/webview/package.json",
