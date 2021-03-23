@@ -59,7 +59,7 @@
     "@types/shelljs": "^0.8.2",
     "@types/universal-analytics": "0.4.2",
     "@types/uuid": "^3.4.5",
-    "@types/vscode" : "1.50.0", 
+    "@types/vscode": "1.50.0",
     "@typescript-eslint/eslint-plugin": "4.3.0",
     "@typescript-eslint/parser": "4.3.0",
     "babel-loader": "8.0.6",

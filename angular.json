@@ -96,6 +96,8 @@
         "build": {
           "builder": "@nrwl/node:build",
           "options": {
+            "externalDependencies": ["vscode"],
+            "webpackConfig": "apps/vscode/webpack.config.js",
             "outputPath": "dist/apps/vscode",
             "main": "apps/vscode/src/main.ts",
             "tsConfig": "apps/vscode/tsconfig.app.json",
@@ -118,7 +120,6 @@
           },
           "configurations": {
             "production": {
-              "externalDependencies": ["vscode"],
               "sourceMap": false,
               "optimization": true,
               "extractLicenses": true,
