@@ -66,13 +66,8 @@
       ],
       "view/item/context": [
         {
-          "command": "nxConsole.revealInExplorer",
-          "when": "view == nxConsoleJson && viewItem == project",
-          "group": "inline"
-        },
-        {
-          "command": "nxConsole.runTask",
-          "when": "view == nxConsoleJson && viewItem == task",
+          "command": "nxConsole.editWorkspaceJson",
+          "when": "view == nxProjects",
           "group": "inline"
         },
         {
@@ -251,20 +246,19 @@
         }
       },
       {
+        "command": "nxConsole.editWorkspaceJson",
+        "title": "Edit workspace definition",
+        "icon": "$(go-to-file)"
+      },
+      {
         "command": "nxConsole.revealInExplorer",
         "title": "Reveal in Explorer",
-        "icon": {
-          "light": "assets/folder-light.svg",
-          "dark": "assets/folder-dark.svg"
-        }
+        "icon": "$(folder)"
       },
       {
         "command": "nxConsole.runTask",
         "title": "Execute task",
-        "icon": {
-          "light": "assets/continue-light.svg",
-          "dark": "assets/continue-dark.svg"
-        }
+        "icon": "$(play)"
       },
       {
         "category": "ng",
