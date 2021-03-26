@@ -28,19 +28,19 @@ module.exports = {
       },
       vscode: {
         build: nps.series.nps('prepare.vscode.server', 'prepare.vscode.client'),
-        server: 'ng build vscode --prod --noSourceMap',
+        server: 'ng build vscode-app --prod --noSourceMap',
         client: 'ng build vscode-ui --prod',
       },
       ci: {
         vscode: nps.concurrent({
-          server: 'ng build vscode --noSourceMap',
+          server: 'ng build vscode-app --noSourceMap',
           client:
             'ng build nx-console --configuration=vscode --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false',
         }),
       },
       dev: {
         vscode: nps.concurrent({
-          server: 'ng build vscode --watch',
+          server: 'ng build vscode-app --watch',
           // NOTE: To inline JS we must run terser over the bundle to strip comments
           // Some comments have html tags in them which would otherwise need special escaping
           client: 'ng build vscode-ui --watch --prod',

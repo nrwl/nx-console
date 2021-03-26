@@ -1,26 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "module": "commonjs",
     "outDir": "../../dist/out-tsc",
-    "target": "es2019",
-    "module": "esnext",
-    "moduleResolution": "node",
     "declaration": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "types": [],
-    "lib": ["dom", "es2018"]
+    "types": ["node"]
   },
-  "angularCompilerOptions": {
-    "annotateForClosureCompiler": true,
-    "skipTemplateCodegen": true,
-    "strictMetadataEmit": true,
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true,
-    "enableResourceInlining": true
-  },
-  "exclude": ["src/test-setup.ts", "**/*.spec.ts"]
+  "exclude": ["**/*.spec.ts"],
+  "include": ["**/*.ts"]
 }

@@ -1,15 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "types": ["node"]
-  },
   "files": [],
   "include": [],
   "references": [
     {
       "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
     }
   ]
 }

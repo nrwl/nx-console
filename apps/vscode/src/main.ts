@@ -5,40 +5,49 @@ import {
   ExtensionContext,
   tasks,
   TreeView,
+  Uri,
   window,
   workspace,
-  Uri,
 } from 'vscode';
 
-import { WorkspaceJsonTreeItem } from './app/workspace-json-tree/workspace-json-tree-item';
-import { WorkspaceJsonTreeProvider } from './app/workspace-json-tree/workspace-json-tree-provider';
-import { NxCommandsTreeItem } from './app/nx-commands/nx-commands-tree-item';
-import { NxCommandsTreeProvider } from './app/nx-commands/nx-commands-provider';
-import { registerCliTaskCommands } from './app/cli-task/cli-task-commands';
-import { CliTaskProvider } from './app/cli-task/cli-task-provider';
-import { getOutputChannel } from './app/output-channel';
 import {
+  CliTaskProvider,
+  registerCliTaskCommands,
+  registerNxCommands,
+} from '@nx-console/vscode/tasks';
+import {
+  getOutputChannel,
   getTelemetry,
   initTelemetry,
   teardownTelemetry,
-} from './app/telemetry';
-import { VSCodeStorage } from './app/vscode-storage';
-import { revealWebViewPanel } from './app/webview';
-import { WorkspaceTreeItem } from './app/workspace-tree/workspace-tree-item';
+} from '@nx-console/server';
+import {
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
+import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import {
   LOCATE_YOUR_WORKSPACE,
-  WorkspaceTreeProvider,
-} from './app/workspace-tree/workspace-tree-provider';
-import { verifyNodeModules } from './app/verify-workspace/verify-node-modules';
-import { verifyWorkspace } from './app/verify-workspace/verify-workspace';
-import { registerNxCommands } from './app/nx-task/nx-task-commands';
+  RunTargetTreeItem,
+  RunTargetTreeProvider,
+} from '@nx-console/vscode/nx-run-target-view';
+import { verifyNodeModules, verifyWorkspace } from '@nx-console/vscode/verify';
+import {
+  NxCommandsTreeItem,
+  NxCommandsTreeProvider,
+} from '@nx-console/vscode/nx-commands-view';
+import {
+  NxProjectTreeItem,
+  NxProjectTreeProvider,
+} from '@nx-console/vscode/nx-project-view';
+import { environment } from './environments/environment';
 
-let workspaceTreeView: TreeView<WorkspaceTreeItem>;
-let workspaceJsonTreeView: TreeView<WorkspaceJsonTreeItem>;
-let affectedTreeView: TreeView<NxCommandsTreeItem>;
+let runTargetTreeView: TreeView<RunTargetTreeItem>;
+let nxProjectTreeView: TreeView<NxProjectTreeItem>;
+let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
 
-let currentWorkspaceTreeProvider: WorkspaceTreeProvider;
-let workspaceJsonTreeProvider: WorkspaceJsonTreeProvider;
+let currentRunTargetTreeProvider: RunTargetTreeProvider;
+let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
@@ -47,38 +56,42 @@ export function activate(c: ExtensionContext) {
   try {
     const startTime = Date.now();
     context = c;
-    currentWorkspaceTreeProvider = WorkspaceTreeProvider.create({
-      extensionPath: context.extensionPath,
-    });
-    const store = VSCodeStorage.fromContext(context);
-    initTelemetry(store);
 
-    workspaceTreeView = window.createTreeView('nxConsole', {
-      treeDataProvider: currentWorkspaceTreeProvider,
-    }) as TreeView<WorkspaceTreeItem>;
-    context.subscriptions.push(workspaceTreeView);
+    GlobalConfigurationStore.fromContext(context);
+    WorkspaceConfigurationStore.fromContext(context);
+
+    currentRunTargetTreeProvider = new RunTargetTreeProvider(
+      context.extensionPath
+    );
+
+    initTelemetry(GlobalConfigurationStore.instance, environment.production);
+
+    runTargetTreeView = window.createTreeView('nxRunTarget', {
+      treeDataProvider: currentRunTargetTreeProvider,
+    }) as TreeView<RunTargetTreeItem>;
+    context.subscriptions.push(runTargetTreeView);
 
     context.subscriptions.push(
       commands.registerCommand(
         'nxConsole.revealWebViewPanel',
-        async (workspaceTreeItem: WorkspaceTreeItem, contextMenuUri?: Uri) => {
+        async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
           if (
             !existsSync(
-              join(workspaceTreeItem.workspaceJsonPath, '..', 'node_modules')
+              join(runTargetTreeItem.workspaceJsonPath, '..', 'node_modules')
             )
           ) {
             const { validNodeModules: hasNodeModules } = verifyNodeModules(
-              join(workspaceTreeItem.workspaceJsonPath, '..')
+              join(runTargetTreeItem.workspaceJsonPath, '..')
             );
             if (!hasNodeModules) {
               return;
             }
           }
           revealWebViewPanel({
-            workspaceTreeItem,
+            runTargetTreeItem,
             context,
             cliTaskProvider,
-            workspaceTreeView,
+            runTargetTreeView,
             contextMenuUri,
           });
         }
@@ -88,7 +101,7 @@ export function activate(c: ExtensionContext) {
       commands.registerCommand(
         LOCATE_YOUR_WORKSPACE.command!.command,
         async () => {
-          return await manuallySelectWorkspaceDefinition();
+          return manuallySelectWorkspaceDefinition();
         }
       )
     );
@@ -164,42 +177,49 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
 }
 
 async function setWorkspace(workspaceJsonPath: string) {
-  const { validWorkspaceJson } = verifyWorkspace(dirname(workspaceJsonPath));
+  WorkspaceConfigurationStore.instance.set(
+    'nxWorkspaceJsonPath',
+    workspaceJsonPath
+  );
+
+  const { validWorkspaceJson } = verifyWorkspace();
   if (!validWorkspaceJson) {
     return;
   }
 
   if (!cliTaskProvider) {
-    cliTaskProvider = new CliTaskProvider(workspaceJsonPath);
+    cliTaskProvider = new CliTaskProvider();
     registerNxCommands(context, cliTaskProvider);
     tasks.registerTaskProvider('ng', cliTaskProvider);
     tasks.registerTaskProvider('nx', cliTaskProvider);
     registerCliTaskCommands(context, cliTaskProvider);
 
-    workspaceJsonTreeProvider = new WorkspaceJsonTreeProvider(
+    nxProjectsTreeProvider = new NxProjectTreeProvider(
       context,
       cliTaskProvider
     );
 
-    workspaceJsonTreeView = window.createTreeView('nxProjects', {
-      treeDataProvider: workspaceJsonTreeProvider,
-    }) as TreeView<WorkspaceJsonTreeItem>;
-    context.subscriptions.push(workspaceJsonTreeView);
+    nxProjectTreeView = window.createTreeView('nxProjects', {
+      treeDataProvider: nxProjectsTreeProvider,
+    });
+    context.subscriptions.push(nxProjectTreeView);
 
-    const affectedTreeProvider = NxCommandsTreeProvider.create(context);
+    const nxCommandsTreeProvider = new NxCommandsTreeProvider(context);
 
-    affectedTreeView = window.createTreeView('nxCommands', {
-      treeDataProvider: affectedTreeProvider,
-    }) as TreeView<NxCommandsTreeItem>;
-    context.subscriptions.push(affectedTreeView);
+    nxCommandsTreeView = window.createTreeView('nxCommands', {
+      treeDataProvider: nxCommandsTreeProvider,
+    });
+    context.subscriptions.push(nxCommandsTreeView);
   } else {
-    cliTaskProvider.setWorkspaceJsonPath(workspaceJsonPath);
+    WorkspaceConfigurationStore.instance.set(
+      'nxWorkspaceJsonPath',
+      workspaceJsonPath
+    );
   }
 
   const isNxWorkspace = existsSync(join(workspaceJsonPath, '..', 'nx.json'));
   const isAngularWorkspace = workspaceJsonPath.endsWith('angular.json');
-  const store = VSCodeStorage.fromContext(context);
-  const enableGenerateFromContextMenuSetting = store.get(
+  const enableGenerateFromContextMenuSetting = GlobalConfigurationStore.instance.get(
     'enableGenerateFromContextMenu'
   );
   const isGenerateFromContextMenuEnabled =
@@ -218,6 +238,6 @@ async function setWorkspace(workspaceJsonPath: string) {
     isGenerateFromContextMenuEnabled
   );
 
-  currentWorkspaceTreeProvider.setWorkspaceJsonPath(workspaceJsonPath);
-  workspaceJsonTreeProvider.setWorkspaceJsonPathh(workspaceJsonPath);
+  currentRunTargetTreeProvider.refresh();
+  nxProjectsTreeProvider.refresh();
 }
