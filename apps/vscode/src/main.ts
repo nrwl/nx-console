@@ -165,6 +165,12 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
   let currentDirectory = vscodeWorkspacePath;
 
   const { root } = parse(vscodeWorkspacePath);
+
+  const workspaceJsonPath = WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '');
+  if (workspaceJsonPath) {
+    currentDirectory = dirname(workspaceJsonPath);
+  }
+
   while (currentDirectory !== root) {
     if (existsSync(join(currentDirectory, 'angular.json'))) {
       return setWorkspace(join(currentDirectory, 'angular.json'));
