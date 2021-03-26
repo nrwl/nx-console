@@ -2,7 +2,7 @@ import { TreeItem } from 'vscode';
 
 import { AbstractTreeProvider } from '@nx-console/server';
 import { ROUTE_LIST, RunTargetTreeItem } from './run-target-tree-item';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
@@ -43,7 +43,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
     };
   }
 
-  getParent(_: RunTargetTreeItem) {
+  getParent() {
     return null;
   }
 
@@ -65,6 +65,8 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
         return [LOCATE_YOUR_WORKSPACE];
       }
     }
+
+    CHANGE_WORKSPACE.description = "Current: " + dirname(workspaceJsonPath);
 
     return [
       ...ROUTE_LIST.map(
