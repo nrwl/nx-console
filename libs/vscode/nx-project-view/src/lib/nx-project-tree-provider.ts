@@ -75,11 +75,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     );
-    item.command = {
-      title: 'Edit workspace definition',
-      command: 'nxConsole.editWorkspaceJson',
-      arguments: [item],
-    };
     if (!workspaceJsonLabel.target) {
       const projectDef = this.cliTaskProvider.getProjects()[
         workspaceJsonLabel.project
