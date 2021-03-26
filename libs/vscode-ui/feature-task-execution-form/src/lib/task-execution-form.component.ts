@@ -32,6 +32,7 @@ import {
   tap,
   flatMap,
   mapTo,
+  filter,
 } from 'rxjs/operators';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
@@ -85,7 +86,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       }
       if (taskExecForm.architect.command === 'generate') {
         this.dryRunSubscription = taskExecForm.form.valueChanges
-          .pipe(debounceTime(500))
+          .pipe(
+            debounceTime(500),
+            filter(() => taskExecForm.form.valid)
+          )
           .subscribe(() => {
             this.runCommand({ ...taskExecForm, dryRun: true });
           });
