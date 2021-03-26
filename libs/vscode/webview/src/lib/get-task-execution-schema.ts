@@ -11,7 +11,7 @@ import {
   verifyWorkspace,
 } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
-import { WorkspaceRouteTitle } from '@nx-console/vscode/nx-workspace-tree';
+import { WorkspaceRouteTitle } from '@nx-console/vscode/nx-run-target-view';
 import {
   CliTaskProvider,
   CliTaskQuickPickItem,

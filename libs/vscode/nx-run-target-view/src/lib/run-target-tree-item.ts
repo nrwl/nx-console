@@ -33,8 +33,8 @@ export const ROUTE_LIST: WorkspaceRouteTitle[] = [
   'Lint',
 ];
 
-export class WorkspaceTreeItem extends TreeItem {
-  revealWorkspaceRoute(currentWorkspace: TreeView<WorkspaceTreeItem>) {
+export class RunTargetTreeItem extends TreeItem {
+  revealWorkspaceRoute(currentWorkspace: TreeView<RunTargetTreeItem>) {
     (currentWorkspace.visible
       ? currentWorkspace.reveal(this, {
           select: true,
@@ -51,14 +51,19 @@ export class WorkspaceTreeItem extends TreeItem {
     ); // Explicitly handle rejection
   }
 
-  command: {title: string, command: string, tooltip: string, arguments: any } = {
+  command: {
+    title: string;
+    command: string;
+    tooltip: string;
+    arguments: any;
+  } = {
     title: this.route,
     command: 'nxConsole.revealWebViewPanel',
     tooltip: '',
     arguments: [this],
   };
 
-  iconPath = WorkspaceTreeItem.getIconUriForRoute(
+  iconPath = RunTargetTreeItem.getIconUriForRoute(
     this.extensionPath,
     this.route
   );

@@ -1,12 +1,12 @@
 {
-  "extends": ["../../../.eslintrc.json"],
+  "extends": "../../../.eslintrc.json",
   "ignorePatterns": ["!**/*"],
   "rules": {},
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "parserOptions": {
-        "project": ["libs/vscode/nx-project-tree/tsconfig.*?.json"]
+        "project": ["libs/vscode/nx-workspace-tree/tsconfig.*?.json"]
       },
       "rules": {}
     },

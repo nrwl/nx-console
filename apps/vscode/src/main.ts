@@ -28,25 +28,25 @@ import {
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import {
   LOCATE_YOUR_WORKSPACE,
-  WorkspaceTreeItem,
-  WorkspaceTreeProvider,
-} from '@nx-console/vscode/nx-workspace-tree';
+  RunTargetTreeItem,
+  RunTargetTreeProvider,
+} from '@nx-console/vscode/nx-run-target-view';
 import { verifyNodeModules, verifyWorkspace } from '@nx-console/vscode/verify';
 import {
   NxCommandsTreeItem,
   NxCommandsTreeProvider,
-} from '@nx-console/vscode/nx-commands-tree';
+} from '@nx-console/vscode/nx-commands-view';
 import {
   NxProjectTreeItem,
   NxProjectTreeProvider,
-} from '@nx-console/vscode/nx-project-tree';
+} from '@nx-console/vscode/nx-project-view';
 import { environment } from './environments/environment';
 
-let workspaceTreeView: TreeView<WorkspaceTreeItem>;
+let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
 let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
 
-let currentWorkspaceTreeProvider: WorkspaceTreeProvider;
+let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let cliTaskProvider: CliTaskProvider;
@@ -60,38 +60,38 @@ export function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
-    currentWorkspaceTreeProvider = new WorkspaceTreeProvider(
+    currentRunTargetTreeProvider = new RunTargetTreeProvider(
       context.extensionPath
     );
 
     initTelemetry(GlobalConfigurationStore.instance, environment.production);
 
-    workspaceTreeView = window.createTreeView('nxConsole', {
-      treeDataProvider: currentWorkspaceTreeProvider,
-    }) as TreeView<WorkspaceTreeItem>;
-    context.subscriptions.push(workspaceTreeView);
+    runTargetTreeView = window.createTreeView('nxRunTarget', {
+      treeDataProvider: currentRunTargetTreeProvider,
+    }) as TreeView<RunTargetTreeItem>;
+    context.subscriptions.push(runTargetTreeView);
 
     context.subscriptions.push(
       commands.registerCommand(
         'nxConsole.revealWebViewPanel',
-        async (workspaceTreeItem: WorkspaceTreeItem, contextMenuUri?: Uri) => {
+        async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
           if (
             !existsSync(
-              join(workspaceTreeItem.workspaceJsonPath, '..', 'node_modules')
+              join(runTargetTreeItem.workspaceJsonPath, '..', 'node_modules')
             )
           ) {
             const { validNodeModules: hasNodeModules } = verifyNodeModules(
-              join(workspaceTreeItem.workspaceJsonPath, '..')
+              join(runTargetTreeItem.workspaceJsonPath, '..')
             );
             if (!hasNodeModules) {
               return;
             }
           }
           revealWebViewPanel({
-            workspaceTreeItem,
+            runTargetTreeItem,
             context,
             cliTaskProvider,
-            workspaceTreeView,
+            runTargetTreeView,
             contextMenuUri,
           });
         }
@@ -238,6 +238,6 @@ async function setWorkspace(workspaceJsonPath: string) {
     isGenerateFromContextMenuEnabled
   );
 
-  currentWorkspaceTreeProvider.refresh();
+  currentRunTargetTreeProvider.refresh();
   nxProjectsTreeProvider.refresh();
 }

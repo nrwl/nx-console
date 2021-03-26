@@ -7,8 +7,8 @@ import {
 } from '@nx-console/vscode/verify';
 import {
   WorkspaceRouteTitle,
-  WorkspaceTreeItem,
-} from '@nx-console/vscode/nx-workspace-tree';
+  RunTargetTreeItem,
+} from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
@@ -85,7 +85,7 @@ function selectCliCommandAndShowUi(
     window.showErrorMessage('Invalid configuration file');
     return;
   }
-  const workspaceTreeItem = new WorkspaceTreeItem(
+  const workspaceTreeItem = new RunTargetTreeItem(
     configurationFilePath,
     `${command[0].toUpperCase()}${command.slice(1)}` as WorkspaceRouteTitle,
     extensionPath
@@ -113,7 +113,11 @@ async function selectCliCommandAndPromptForFlags(command: string) {
     command,
     json
   );
-  const { validBuilder, options: builderDefinitionOptions, configurations } = builderDefinition;
+  const {
+    validBuilder,
+    options: builderDefinitionOptions,
+    configurations,
+  } = builderDefinition;
   let options = [...builderDefinitionOptions];
   if (!validBuilder) {
     return;

@@ -1,7 +1,7 @@
 import { TreeItem } from 'vscode';
 
 import { AbstractTreeProvider } from '@nx-console/server';
-import { ROUTE_LIST, WorkspaceTreeItem } from './workspace-tree-item';
+import { ROUTE_LIST, RunTargetTreeItem } from './run-target-tree-item';
 import { join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
@@ -21,8 +21,8 @@ CHANGE_WORKSPACE.command = {
   command: 'nxConsole.selectWorkspaceManually',
 };
 
-export class WorkspaceTreeProvider extends AbstractTreeProvider<
-  WorkspaceTreeItem | TreeItem
+export class RunTargetTreeProvider extends AbstractTreeProvider<
+  RunTargetTreeItem | TreeItem
 > {
   private scanning = Boolean(
     WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
@@ -43,7 +43,7 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     };
   }
 
-  getParent(_: WorkspaceTreeItem) {
+  getParent(_: RunTargetTreeItem) {
     return null;
   }
 
@@ -69,7 +69,7 @@ export class WorkspaceTreeProvider extends AbstractTreeProvider<
     return [
       ...ROUTE_LIST.map(
         (route) =>
-          new WorkspaceTreeItem(workspaceJsonPath, route, this.extensionPath)
+          new RunTargetTreeItem(workspaceJsonPath, route, this.extensionPath)
       ),
       CHANGE_WORKSPACE,
     ];

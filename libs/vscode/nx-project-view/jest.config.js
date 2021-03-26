@@ -1,5 +1,5 @@
 module.exports = {
-  displayName: 'vscode-nx-project-tree',
+  displayName: 'vscode-nx-project-view',
   preset: '../../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -10,5 +10,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/nx-project-tree',
+  coverageDirectory: '../../../coverage/libs/vscode/nx-project-view',
 };

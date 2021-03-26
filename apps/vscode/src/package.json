@@ -561,7 +561,7 @@
     "views": {
       "nx-console": [
         {
-          "id": "nxConsole",
+          "id": "nxRunTarget",
           "name": "Generate & Run Target"
         },
         {

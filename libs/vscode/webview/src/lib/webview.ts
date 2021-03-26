@@ -10,9 +10,7 @@ import {
 } from 'vscode';
 
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import {
-  WorkspaceTreeItem,
-} from '@nx-console/vscode/nx-workspace-tree';
+import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { getTelemetry } from '@nx-console/server';
 import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
 import { getTaskExecutionSchema } from './get-task-execution-schema';
@@ -22,20 +20,20 @@ let indexHtml: string | undefined;
 
 interface RevealWebViewPanelConfig {
   context: ExtensionContext;
-  workspaceTreeItem: WorkspaceTreeItem;
+  runTargetTreeItem: RunTargetTreeItem;
   cliTaskProvider: CliTaskProvider;
-  workspaceTreeView: TreeView<WorkspaceTreeItem>;
+  runTargetTreeView: TreeView<RunTargetTreeItem>;
   contextMenuUri?: Uri;
 }
 
 export async function revealWebViewPanel({
   context,
   cliTaskProvider,
-  workspaceTreeItem,
-  workspaceTreeView,
+  runTargetTreeItem,
+  runTargetTreeView,
   contextMenuUri,
 }: RevealWebViewPanelConfig) {
-  const { label } = workspaceTreeItem;
+  const { label } = runTargetTreeItem;
   const schema = await getTaskExecutionSchema(
     cliTaskProvider,
     label,
@@ -56,7 +54,7 @@ export async function revealWebViewPanel({
 
   webViewPanel.onDidChangeViewState((e) => {
     if (e.webviewPanel.visible) {
-      workspaceTreeItem.revealWorkspaceRoute(workspaceTreeView);
+      runTargetTreeItem.revealWorkspaceRoute(runTargetTreeView);
     }
   });
 
