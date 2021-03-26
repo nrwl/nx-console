@@ -181,6 +181,7 @@ function getConfigValuesFromContextMenuUri(
     const projectName = (project && project.name) || undefined;
     const path = contextMenuUri.fsPath
       .replace(cliTaskProvider.getWorkspacePath(), '')
+      .replace(/^\//, '')
       .replace(/\\/g, '/');
 
     return {
