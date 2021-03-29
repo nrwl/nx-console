@@ -50,8 +50,12 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
   parentFormGroup: FormGroup;
 
   disabled = false;
-  onChange: any = () => {};
-  onTouched: any = () => {};
+  onChange: any = () => {
+    // noop
+  };
+  onTouched: any = () => {
+    // noop
+  };
 
   get value(): string {
     return this._value;
@@ -118,7 +122,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
 
     return Object.keys(control.errors as any)
       .map((key) => {
-        if (!!control.errors) {
+        if (control.errors) {
           if (key === 'required') {
             return `${fieldName
               .slice(0, 1)

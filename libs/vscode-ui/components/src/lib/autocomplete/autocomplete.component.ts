@@ -185,14 +185,16 @@ export class AutocompleteComponent
       .subscribe();
   }
 
-  registerOnTouched() {}
+  registerOnTouched() {
+    // noop
+  }
 
   setDisabledState(isDisabled: boolean) {
     isDisabled ? this.control.disable() : this.control.enable();
   }
 
   ngOnDestroy() {
-    this.destroying.next();
+    this.destroying.next()
   }
 }
 

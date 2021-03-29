@@ -9,6 +9,7 @@ import {
 import { Option } from '@nx-console/schema';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'vscode-ui-field-tree',
   templateUrl: './field-tree.component.html',
   styleUrls: ['./field-tree.component.scss'],

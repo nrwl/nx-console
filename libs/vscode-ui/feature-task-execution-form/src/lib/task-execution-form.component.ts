@@ -319,6 +319,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     });
 
     if (configurationName && architect.configurations) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const configuration = architect.configurations.find(
         (c) => c.name === configurationName
       )!;

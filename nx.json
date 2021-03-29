@@ -1,5 +1,4 @@
 {
-  "npmScope": "nx-console",
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": "*",
@@ -7,57 +6,8 @@
     "tsconfig.base.json": "*",
     ".eslintrc.json": "*"
   },
-  "projects": {
-    "schema": {
-      "tags": []
-    },
-    "vscode-app": {
-      "tags": []
-    },
-    "server": {
-      "tags": []
-    },
-    "vscode-ui": {
-      "tags": []
-    },
-    "vscode-ui-feature-task-execution-form": {
-      "tags": []
-    },
-    "vscode-ui-components": {
-      "tags": []
-    },
-    "vscode-ui-styles": {
-      "tags": []
-    },
-    "vscode-ui-feature-task-execution-form-e2e": {
-      "tags": [],
-      "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
-    },
-    "vscode-configuration": {
-      "tags": []
-    },
-    "vscode-tasks": {
-      "tags": []
-    },
-    "vscode-nx-workspace": {
-      "tags": []
-    },
-    "vscode-verify": {
-      "tags": []
-    },
-    "vscode-webview": {
-      "tags": []
-    },
-    "vscode-nx-run-target-view": {
-      "tags": []
-    },
-    "vscode-nx-project-view": {
-      "tags": []
-    },
-    "vscode-nx-commands-view": {
-      "tags": []
-    }
-  },
+  "affected": { "defaultBase": "master" },
+  "npmScope": "nx-console",
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/nx-cloud",
@@ -75,7 +25,25 @@
       }
     }
   },
-  "affected": {
-    "defaultBase": "master"
+  "projects": {
+    "schema": { "tags": [] },
+    "vscode-app": { "tags": [] },
+    "server": { "tags": [] },
+    "vscode-ui": { "tags": [] },
+    "vscode-ui-feature-task-execution-form": { "tags": [] },
+    "vscode-ui-components": { "tags": [] },
+    "vscode-ui-styles": { "tags": [] },
+    "vscode-ui-feature-task-execution-form-e2e": {
+      "tags": [],
+      "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
+    },
+    "vscode-configuration": { "tags": [] },
+    "vscode-tasks": { "tags": [] },
+    "vscode-nx-workspace": { "tags": [] },
+    "vscode-verify": { "tags": [] },
+    "vscode-webview": { "tags": [] },
+    "vscode-nx-run-target-view": { "tags": [] },
+    "vscode-nx-project-view": { "tags": [] },
+    "vscode-nx-commands-view": { "tags": [] }
   }
 }
