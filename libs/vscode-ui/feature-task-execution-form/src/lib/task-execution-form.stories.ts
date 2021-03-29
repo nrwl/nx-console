@@ -143,7 +143,6 @@ const schemaWithoutDefaults: TaskExecutionSchema = {
   }),
 };
 
-// tslint:disable-next-line: no-default-export
 export default {
   title: 'feature-task-execution-form',
 };

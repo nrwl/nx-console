@@ -170,7 +170,6 @@ export class AutocompleteComponent
   private isItemsWithEnum(
     items: string[] | ItemsWithEnum
   ): items is ItemsWithEnum {
-    // tslint:disable-next-line: strict-type-predicates
     return (items as ItemsWithEnum).enum !== undefined;
   }
 

@@ -2,7 +2,6 @@
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": "*",
-    "tslint.json": "*",
     "tsconfig.base.json": "*",
     ".eslintrc.json": "*"
   },
