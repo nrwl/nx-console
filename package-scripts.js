@@ -63,18 +63,6 @@ module.exports = {
       write: 'nx format:write --base=upstream/master',
       check: 'nx format:check --base=upstream/master',
     },
-    lint: {
-      default: nps.concurrent({
-        nxLint: 'nx lint',
-        tsLint: 'ng lint',
-        stylelint: 'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc',
-      }),
-      fix: nps.concurrent({
-        tslint: 'ng lint --fix',
-        stylelint:
-          'stylelint "{apps,libs}/**/*.scss" --config .stylelintrc --fix',
-      }),
-    },
     storybook: {
       default: 'ng run vscode-ui-feature-task-execution-form:storybook',
     },

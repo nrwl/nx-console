@@ -170,7 +170,6 @@ export class AutocompleteComponent
   private isItemsWithEnum(
     items: string[] | ItemsWithEnum
   ): items is ItemsWithEnum {
-    // tslint:disable-next-line: strict-type-predicates
     return (items as ItemsWithEnum).enum !== undefined;
   }
 
@@ -185,14 +184,16 @@ export class AutocompleteComponent
       .subscribe();
   }
 
-  registerOnTouched() {}
+  registerOnTouched() {
+    // noop
+  }
 
   setDisabledState(isDisabled: boolean) {
     isDisabled ? this.control.disable() : this.control.enable();
   }
 
   ngOnDestroy() {
-    this.destroying.next();
+    this.destroying.next()
   }
 }
 

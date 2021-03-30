@@ -1,7 +1,32 @@
 {
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "newProjectRoot": "",
+  "cli": {
+    "warnings": {
+      "typescriptMismatch": false,
+      "versionMismatch": false
+    },
+    "packageManager": "yarn",
+    "defaultCollection": "@nrwl/angular"
+  },
+  "schematics": {
+    "@nrwl/schematics:component": {
+      "styleext": "scss"
+    },
+    "@nrwl/schematics:library": {
+      "unitTestRunner": "jest",
+      "framework": "angular"
+    },
+    "@nrwl/schematics:node-application": {
+      "framework": "express"
+    },
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "none"
+    }
+  },
   "projects": {
     "vscode-ui": {
       "projectType": "application",
@@ -67,13 +92,12 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "apps/vscode-ui/tsconfig.app.json",
-              "apps/vscode-ui/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!apps/vscode-ui/**/*"]
+            "lintFilePatterns": [
+              "apps/vscode-ui/src/**/*.ts",
+              "apps/vscode-ui/src/**/*.html"
+            ]
           }
         },
         "test": {
@@ -197,15 +221,11 @@
       "sourceRoot": "libs/vscode-ui/feature-task-execution-form/src",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "libs/vscode-ui/feature-task-execution-form/tsconfig.lib.json",
-              "libs/vscode-ui/feature-task-execution-form/.storybook/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!libs/vscode-ui/feature-task-execution-form/**/*"
+            "lintFilePatterns": [
+              "libs/vscode-ui/feature-task-execution-form/src/**/*.ts",
+              "libs/vscode-ui/feature-task-execution-form/src/**/*.html"
             ]
           }
         },
@@ -257,10 +277,12 @@
       "sourceRoot": "libs/vscode-ui/components/src",
       "architect": {
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": ["libs/vscode-ui/components/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/vscode-ui/components/**/*"]
+            "lintFilePatterns": [
+              "libs/vscode-ui/components/src/**/*.ts",
+              "libs/vscode-ui/components/src/**/*.html"
+            ]
           }
         },
         "test": {
@@ -282,15 +304,7 @@
       "projectType": "library",
       "root": "libs/vscode-ui/styles",
       "sourceRoot": "libs/vscode-ui/styles/src",
-      "architect": {
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": ["libs/vscode-ui/styles/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/vscode-ui/styles/**/*"]
-          }
-        }
-      },
+      "architect": {},
       "schematics": {}
     },
     "vscode-ui-feature-task-execution-form-e2e": {
@@ -312,14 +326,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@nrwl/linter:eslint",
           "options": {
-            "tsConfig": [
-              "apps/vscode-ui-feature-task-execution-form-e2e/tsconfig.e2e.json"
-            ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/vscode-ui-feature-task-execution-form-e2e/**/*"
+            "lintFilePatterns": [
+              "apps/vscode-ui-feature-task-execution-form-e2e/src/**/*.ts",
+              "apps/vscode-ui-feature-task-execution-form-e2e/src/**/*.html"
             ]
           }
         }
@@ -580,33 +591,6 @@
           }
         }
       }
-    }
-  },
-  "cli": {
-    "warnings": {
-      "typescriptMismatch": false,
-      "versionMismatch": false
-    },
-    "packageManager": "yarn",
-    "defaultCollection": "@nrwl/angular"
-  },
-  "schematics": {
-    "@nrwl/schematics:component": {
-      "styleext": "scss"
-    },
-    "@nrwl/schematics:library": {
-      "unitTestRunner": "jest",
-      "framework": "angular"
-    },
-    "@nrwl/schematics:node-application": {
-      "framework": "express"
-    },
-    "@nrwl/angular:application": {
-      "unitTestRunner": "jest",
-      "e2eTestRunner": "cypress"
-    },
-    "@nrwl/angular:library": {
-      "unitTestRunner": "none"
     }
   }
 }
