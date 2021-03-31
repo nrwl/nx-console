@@ -41,9 +41,7 @@ module.exports = {
       dev: {
         vscode: nps.concurrent({
           server: 'ng build vscode-app --watch',
-          // NOTE: To inline JS we must run terser over the bundle to strip comments
-          // Some comments have html tags in them which would otherwise need special escaping
-          client: 'ng build vscode-ui --watch --prod',
+          client: 'ng build vscode-ui --watch',
         }),
       },
     },
