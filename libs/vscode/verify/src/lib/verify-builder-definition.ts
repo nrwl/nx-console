@@ -1,7 +1,6 @@
-import { Option } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/schema';
 import { readBuilderSchema, getTelemetry } from '@nx-console/server';
 import { window } from 'vscode';
-import { OptionType } from '@angular/cli/models/interface';
 import { dirname, join } from 'path';
 import { existsSync } from 'fs';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';

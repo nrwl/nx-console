@@ -1,8 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { OptionType } from '@angular/cli/models/interface';
-import { Option } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/schema';
 import { SelectComponent } from './select.component';
 
 const initialValue = 'test';

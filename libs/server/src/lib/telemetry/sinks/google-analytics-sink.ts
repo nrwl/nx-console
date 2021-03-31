@@ -19,6 +19,7 @@ class TelemetryParams {
 
   require(key: string) {
     const msg = `Telemetry: ${this.type} is missing ${key}`;
+    // eslint-disable-next-line no-prototype-builtins
     if (!this.data.hasOwnProperty(key)) {
       throw new Error(msg);
     }
@@ -26,6 +27,7 @@ class TelemetryParams {
 }
 
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   visitor = require('universal-analytics')(TRACKING_ID, {
     uid: this.user.id,
   });

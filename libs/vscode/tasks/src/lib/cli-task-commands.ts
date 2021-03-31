@@ -12,8 +12,7 @@ import {
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
-import { Option } from '@nx-console/schema';
-import { OptionType } from '@angular/cli/models/interface';
+import { Option, OptionType } from '@nx-console/schema';
 const CLI_COMMAND_LIST = [
   'build',
   'deploy',

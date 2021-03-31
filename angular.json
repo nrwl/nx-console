@@ -213,6 +213,12 @@
             "main": "libs/server/src/index.ts",
             "assets": ["libs/server/*.md"]
           }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/server/**/*.ts"]
+          }
         }
       }
     },

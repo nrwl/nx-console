@@ -5,6 +5,7 @@ import { gzipSync } from 'zlib';
 
 import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as exploreSourceMap from 'source-map-explorer';
 
@@ -35,6 +36,7 @@ class FileNameNormalizer {
 
   constructor(cwd: string) {
     this.cwdPrefixRegexp = new RegExp(
+      // eslint-disable-next-line no-useless-escape
       `^[\/]*(${cwd.toLowerCase().replace(/^\//, '')})?[\/]*(.*)`
     );
   }

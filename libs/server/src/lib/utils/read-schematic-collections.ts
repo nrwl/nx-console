@@ -31,7 +31,7 @@ export async function readAllSchematicCollections(
   ];
   return collections.filter(
     (collection): collection is SchematicCollection =>
-      !!collection && collection!.schematics!.length > 0
+      !!collection && collection.schematics.length > 0
   );
 }
 

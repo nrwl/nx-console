@@ -1,6 +1,4 @@
-import { schema } from '@angular-devkit/core';
-import { standardFormats } from '@angular-devkit/schematics/src/formats';
-import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
+import { Schema } from '@nrwl/tao/src/shared/params';
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
@@ -11,8 +9,8 @@ import {
   ItemTooltips,
   OptionItemLabelValue,
   ItemsWithEnum,
+  CliOption,
 } from '@nx-console/schema';
-import { Option as CliOption } from '@angular/cli/models/interface';
 import * as stripJsonComments from 'strip-json-comments';
 
 export interface SchematicDefaults {
@@ -20,7 +18,7 @@ export interface SchematicDefaults {
 }
 
 export const files: { [path: string]: string[] } = {};
-export let fileContents: { [path: string]: any } = {};
+export const fileContents: { [path: string]: any } = {};
 
 const IMPORTANT_FIELD_NAMES = [
   'name',
@@ -108,9 +106,13 @@ export function listFiles(dirName: string): string[] {
         } else if (statSync(child).isDirectory()) {
           res.push(...listFiles(child));
         }
-      } catch (e) {}
+      } catch (e) {
+        // noop
+      }
     });
-  } catch (e) {}
+  } catch (e) {
+    // noop
+  }
   return res;
 }
 
@@ -136,7 +138,7 @@ function readAndParseJson(fullFilePath: string): any {
 
 export function readAndCacheJsonFile(
   filePath: string,
-  basedir: string = ''
+  basedir = ''
 ): { path: string; json: any } {
   const fullFilePath = path.join(basedir, filePath);
 
@@ -156,32 +158,29 @@ export function readAndCacheJsonFile(
   }
 }
 
-const registry = new schema.CoreSchemaRegistry(standardFormats);
 export async function normalizeSchema(
-  s: {
-    properties: { [k: string]: any };
-    required: string[];
-  },
+  s: Schema,
   projectDefaults?: SchematicDefaults
 ): Promise<Option[]> {
-  const options: CliOption[] = await parseJsonSchemaToOptions(registry, s);
+  const options = schemaToOptions(s);
   const requiredFields = new Set(s.required || []);
 
   const nxOptions = options.map((option) => {
-    const xPrompt: XPrompt = s.properties[option.name]['x-prompt'];
+    const xPrompt: XPrompt | undefined = option['x-prompt'];
     const workspaceDefault = projectDefaults && projectDefaults[option.name];
-    const $default = s.properties[option.name].$default;
+    const $default = option.$default;
 
     const nxOption: Option = {
       ...option,
       required: isFieldRequired(requiredFields, option, xPrompt, $default),
+      aliases: option.alias ? [option.alias] : [],
       ...(workspaceDefault && { default: workspaceDefault }),
       ...($default && { $default }),
       ...(option.enum && { items: option.enum.map((item) => item.toString()) }),
       // Strongly suspect items does not belong in the Option schema.
       //  Angular Option doesn't have the items property outside of x-prompt,
       //  but items is used in @schematics/angular - guard
-      ...getItems(s.properties[option.name]),
+      ...getItems(option),
     };
 
     if (xPrompt) {
@@ -234,8 +233,8 @@ export async function normalizeSchema(
 
 function isFieldRequired(
   requiredFields: Set<string>,
-  nxOption: Option,
-  xPrompt: XPrompt,
+  nxOption: CliOption,
+  xPrompt: XPrompt | undefined,
   $default: any
 ): boolean {
   // checks schema.json requiredFields and xPrompt for required
@@ -249,11 +248,11 @@ function isFieldRequired(
   );
 }
 
-function getItems(option: Option): { items: string[] } | undefined {
+function getItems(option: CliOption): { items: string[] } | undefined {
   return (
     option.items && {
       items:
-        (option.items as ItemsWithEnum)!.enum ||
+        (option.items as ItemsWithEnum).enum ||
         ((option.items as string[]).length && option.items),
     }
   );
@@ -320,4 +319,27 @@ export function toLegacyWorkspaceFormat(w: any) {
     renameProperty(w, 'generators', 'schematics');
   }
   return w;
+}
+
+function schemaToOptions(schema: Schema): CliOption[] {
+  return Object.keys(schema.properties).reduce<CliOption[]>((acc, curr) => {
+    const currentProperties = schema.properties[curr];
+    const $default = currentProperties.$default;
+    const $defaultIndex =
+      $default?.['$source'] === 'argv' ? $default['index'] : undefined;
+    const positional: number | undefined =
+      typeof $defaultIndex === 'number' ? $defaultIndex : undefined;
+
+    const visible = currentProperties.visible ?? true;
+    if (!visible || (currentProperties as any).hidden) {
+      return acc;
+    }
+
+    acc.push({
+      name: curr,
+      positional,
+      ...currentProperties,
+    });
+    return acc;
+  }, []);
 }

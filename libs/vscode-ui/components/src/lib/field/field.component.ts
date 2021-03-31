@@ -1,5 +1,4 @@
-import { Option } from '@nx-console/schema';
-import { OptionType } from '@angular/cli/models/interface';
+import { Option, OptionType } from '@nx-console/schema';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
