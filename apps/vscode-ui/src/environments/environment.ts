@@ -271,8 +271,7 @@ export const NG_BUILD_ARCHITECT = {
     {
       name: 'buildOptimizer',
       type: 'boolean',
-      description:
-        "Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option.",
+      description: `Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option.`,
       defaultValue: 'false',
       required: false,
       positional: false,
@@ -326,8 +325,7 @@ export const NG_BUILD_ARCHITECT = {
     {
       name: 'statsJson',
       type: 'boolean',
-      description:
-        "Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
+      description: `Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.`,
       defaultValue: 'false',
       required: false,
       positional: false,
@@ -701,7 +699,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       enum: null,
       type: 'boolean',
       description:
-        'When true (the default), generates a "spec.ts" test file for the new component.',
+        'When true (the default), generates a `spec.ts` test file for the new component.',
       defaultValue: true,
       required: false,
       positional: false,
@@ -713,7 +711,7 @@ export const MOCK_COMPONENT_ARCHITECT = {
       enum: null,
       type: 'boolean',
       description:
-        'When true, does not create "spec.ts" test files for the new component.',
+        'When true, does not create `spec.ts` test files for the new component.',
       defaultValue: false,
       required: false,
       positional: false,
