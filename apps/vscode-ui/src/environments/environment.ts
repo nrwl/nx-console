@@ -272,7 +272,7 @@ export const NG_BUILD_ARCHITECT = {
       name: 'buildOptimizer',
       type: 'boolean',
       description:
-        'Enables \'@angular-devkit/build-optimizer\' optimizations when using the \'aot\' option.',
+        "Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option.",
       defaultValue: 'false',
       required: false,
       positional: false,
@@ -327,7 +327,7 @@ export const NG_BUILD_ARCHITECT = {
       name: 'statsJson',
       type: 'boolean',
       description:
-        'Generates a \'stats.json\' file which can be analyzed using tools such as \'webpack-bundle-analyzer\'.',
+        "Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
       defaultValue: 'false',
       required: false,
       positional: false,
@@ -784,10 +784,5 @@ export const MOCK_COMPONENT_ARCHITECT = {
 
 export const environment = {
   production: false,
-  providers: [
-    {
-      provide: TASK_EXECUTION_SCHEMA,
-      useValue: MOCK_COMPONENT_ARCHITECT,
-    },
-  ],
+  providers: [],
 };

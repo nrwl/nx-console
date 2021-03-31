@@ -1,5 +1,6 @@
 import { join } from 'path';
 import {
+  commands,
   ExtensionContext,
   ExtensionMode,
   TreeView,
@@ -100,6 +101,9 @@ export function createWebViewPanel(
       watch(join(context.extensionPath, 'assets', 'public', 'main.js'), () => {
         if (webviewPanel) {
           setWebViewContent(webviewPanel, context, schema);
+          commands.executeCommand(
+            'workbench.action.webview.reloadWebviewAction'
+          );
         }
       });
     }
