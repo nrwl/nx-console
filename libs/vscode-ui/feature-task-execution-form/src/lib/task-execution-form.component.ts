@@ -44,9 +44,10 @@ import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
   TaskExecutionSchema,
   TaskExecutionMessage,
-  ItemsWithEnum
+  ItemsWithEnum,
+  OptionType,
+  Option,
 } from '@nx-console/schema';
-import { OptionType, Value } from '@angular/cli/models/interface';
 
 declare global {
   interface Window {
@@ -196,11 +197,26 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {}
 
   ngOnInit() {
-    this.architectSubject.next(this.initialSchema);
+    const optionFilter = (option: Option) =>
+      !(
+        option.type === OptionType.Array &&
+        option.items &&
+        (option.items as string[]).length === 0
+      );
+
+    this.architectSubject.next({
+      ...this.initialSchema,
+      // remove array options that have no items
+      // TODO: add support for these types of items in the form
+      options: this.initialSchema.options.filter(optionFilter),
+    });
 
     window.SET_TASK_EXECUTION_SCHEMA = (schema) => {
       this.ngZone.run(() => {
-        this.architectSubject.next(schema);
+        this.architectSubject.next({
+          ...schema,
+          options: schema.options.filter(optionFilter),
+        });
 
         setTimeout(() => {
           this.scrollToTop();
@@ -284,7 +300,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
               !validValueSet.has(control.value)) ||
             // multiselect values are Array, check if all values are in Set
             (Array.isArray(control.value) &&
-              !control.value.every((value: Value) => validValueSet.has(value)))
+              !control.value.every((value) => validValueSet.has(value)))
           ) {
             return {
               enum: 'Please select a value from the auto-completable list',

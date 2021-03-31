@@ -1,8 +1,7 @@
-import { OptionType } from '@angular/cli/models/interface';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TaskExecutionSchema } from '@nx-console/schema';
+import { OptionType, TaskExecutionSchema } from '@nx-console/schema';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
 import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';

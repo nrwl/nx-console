@@ -9,8 +9,7 @@ import {
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
-import { GeneratorType, Option } from '@nx-console/schema';
-import { OptionType } from '@angular/cli/models/interface';
+import { GeneratorType, Option, OptionType } from '@nx-console/schema';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { selectGenerator } from './select-generator';
 

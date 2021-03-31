@@ -12,6 +12,7 @@ export class TelemetryParameters {
   }
 
   require(key: string): void {
+    // eslint-disable-next-line no-prototype-builtins
     if (!this.params.hasOwnProperty(key)) {
       throw new Error(
         `Telemetry ${this.type} does not have a parameter of ${key}`

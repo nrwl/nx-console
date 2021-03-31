@@ -1,5 +1,4 @@
-import { OptionType } from '@angular/cli/models/interface';
-import { TaskExecutionSchema } from '@nx-console/schema';
+import { OptionType, TaskExecutionSchema } from '@nx-console/schema';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiFeatureTaskExecutionFormModule } from './vscode-ui-feature-task-execution-form.module';

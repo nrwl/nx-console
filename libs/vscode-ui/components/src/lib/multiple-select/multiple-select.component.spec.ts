@@ -2,8 +2,7 @@ import { Component, DebugElement, ViewChild } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { OptionType } from '@angular/cli/models/interface';
-import { Option } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/schema';
 import { MultipleSelectComponent } from './multiple-select.component';
 import { FieldItemsPipe } from '../field-items/field-items.pipe';
 
