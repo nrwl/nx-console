@@ -39,8 +39,9 @@
       "sourceRoot": "apps/vscode-ui/src",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "ngx-build-plus:browser",
           "options": {
+            "extraWebpackConfig": "apps/vscode-ui/webpack.dev.js",
             "outputPath": "dist/apps/vscode/assets/public",
             "index": "apps/vscode-ui/src/index.html",
             "main": "apps/vscode-ui/src/main.ts",

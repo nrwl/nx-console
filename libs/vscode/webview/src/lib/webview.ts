@@ -1,10 +1,11 @@
-import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
   ExtensionContext,
+  ExtensionMode,
   TreeView,
   Uri,
   ViewColumn,
+  Webview,
   WebviewPanel,
   window,
 } from 'vscode';
@@ -14,9 +15,9 @@ import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { getTelemetry } from '@nx-console/server';
 import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
 import { getTaskExecutionSchema } from './get-task-execution-schema';
+import { watch } from 'fs';
 
 let webviewPanel: WebviewPanel | undefined;
-let indexHtml: string | undefined;
 
 interface RevealWebViewPanelConfig {
   context: ExtensionContext;
@@ -93,7 +94,15 @@ export function createWebViewPanel(
       ),
     };
 
-    webviewPanel.webview.html = getIframeHtml(context, schema);
+    setWebViewContent(webviewPanel, context, schema);
+
+    if (context.extensionMode === ExtensionMode.Development) {
+      watch(join(context.extensionPath, 'assets', 'public', 'main.js'), () => {
+        if (webviewPanel) {
+          setWebViewContent(webviewPanel, context, schema);
+        }
+      });
+    }
 
     webviewPanel.webview.onDidReceiveMessage((message: TaskExecutionMessage) =>
       cliTaskProvider.executeTask(message)
@@ -105,13 +114,43 @@ export function createWebViewPanel(
   return webviewPanel;
 }
 
-export function getIframeHtml(
+function setWebViewContent(
+  webviewPanel: WebviewPanel,
   context: ExtensionContext,
   schema: TaskExecutionSchema
 ) {
-  if (!indexHtml) {
-    // Cache html and inline all styles and scripts.
-    indexHtml = `<!DOCTYPE html>
+  webviewPanel.webview.html = getIframeHtml(
+    webviewPanel.webview,
+    context,
+    schema
+  );
+}
+
+export function getIframeHtml(
+  webView: Webview,
+  context: ExtensionContext,
+  schema: TaskExecutionSchema
+) {
+  const stylePath = Uri.joinPath(
+    context.extensionUri,
+    'assets',
+    'public',
+    'styles.css'
+  );
+  const runtimePath = Uri.joinPath(
+    context.extensionUri,
+    'assets',
+    'public',
+    'runtime.js'
+  );
+  const mainPath = Uri.joinPath(
+    context.extensionUri,
+    'assets',
+    'public',
+    'main.js'
+  );
+
+  const indexHtml = `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -134,21 +173,14 @@ export function getIframeHtml(
 
       window.vscode = acquireVsCodeApi();
     </script>
-    <style>${readFileSync(
-      join(context.extensionPath, 'assets/public/styles.css')
-    )}</style>
+    <link href="${webView.asWebviewUri(stylePath)}" rel="stylesheet"/>
   </head>
   <body>
     <vscode-ui-task-execution-form></vscode-ui-task-execution-form>
-    <script>
-      ${readFileSync(join(context.extensionPath, 'assets/public/runtime.js'))}
-    </script>
-    <script>
-      ${readFileSync(join(context.extensionPath, 'assets/public/main.js'))}
-    </script>
+    <script src="${webView.asWebviewUri(runtimePath)}"></script>
+    <script src="${webView.asWebviewUri(mainPath)}"></script>
   </body>
 </html>`;
-  }
 
   return indexHtml.replace(
     'window.VSCODE_UI_SCHEMA = {};',
