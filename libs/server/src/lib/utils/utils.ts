@@ -134,6 +134,11 @@ function readAndParseJson(fullFilePath: string): any {
   return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
 }
 
+export function clearJsonCache(filePath: string, basedir = '') {
+  const fullFilePath = path.join(basedir, filePath);
+  return delete fileContents[fullFilePath];
+}
+
 export function readAndCacheJsonFile(
   filePath: string,
   basedir: string = ''
@@ -157,6 +162,7 @@ export function readAndCacheJsonFile(
 }
 
 const registry = new schema.CoreSchemaRegistry(standardFormats);
+
 export async function normalizeSchema(
   s: {
     properties: { [k: string]: any };

@@ -11,5 +11,7 @@ export {
   findClosestNg,
   findClosestNx,
   readAndCacheJsonFile,
+  clearJsonCache,
   toLegacyWorkspaceFormat,
 } from './lib/utils/utils';
+export { watchFile } from './lib/utils/watch-file';

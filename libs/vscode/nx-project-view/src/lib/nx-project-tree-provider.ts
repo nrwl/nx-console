@@ -7,13 +7,12 @@ import {
   Uri,
 } from 'vscode';
 
-import { AbstractTreeProvider } from '@nx-console/server';
+import { AbstractTreeProvider, clearJsonCache } from '@nx-console/server';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { NxProject, NxProjectTreeItem } from './nx-project-tree-item';
 
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
-
-export let nxProjectTreeProvider: NxProjectTreeProvider;
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 /**
  * Provides data for the "Projects" tree view
@@ -27,17 +26,12 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   ) {
     super();
 
-    nxProjectTreeProvider = this;
-
-    commands.registerCommand('nxConsole.refreshNxProjectsTree', () =>
-      this.refresh()
-    );
-
     ([
       ['editWorkspaceJson', this.editWorkspaceJson],
       ['revealInExplorer', this.revealInExplorer],
       ['runTask', this.runTask],
-    ] as [string, (item: NxProjectTreeItem) => Promise<any>][]).forEach(
+      ['refreshNxProjectsTree', this.refreshNxProjectsTree],
+    ] as [string, (item: NxProjectTreeItem) => Promise<unknown>][]).forEach(
       ([commandSuffix, callback]) => {
         context.subscriptions.push(
           commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
@@ -81,7 +75,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
       ];
       if (projectDef) {
         item.resourceUri = Uri.file(
-          join(this.cliTaskProvider.getWorkspacePath()!, projectDef.root)
+          join(this.cliTaskProvider.getWorkspacePath(), projectDef.root)
         );
       }
       item.contextValue = 'project';
@@ -127,7 +121,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
             this.createNxProjectTreeItem(
               { target: { name }, project },
               name,
-              Boolean(projectDef.architect![name].configurations)
+              Boolean(projectDef.architect?.[name].configurations)
             )
         );
       }
@@ -185,5 +179,15 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
       selection.nxProject.project,
       selection.nxProject.target
     );
+  }
+
+  private async refreshNxProjectsTree() {
+    const workspacePath = WorkspaceConfigurationStore.instance.get(
+      'nxWorkspaceJsonPath',
+      ''
+    );
+    clearJsonCache(workspacePath);
+
+    this.refresh();
   }
 }
