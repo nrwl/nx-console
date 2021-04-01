@@ -3,6 +3,7 @@ import { dirname, join, parse } from 'path';
 import {
   commands,
   ExtensionContext,
+  FileSystemWatcher,
   tasks,
   TreeView,
   Uri,
@@ -20,6 +21,7 @@ import {
   getTelemetry,
   initTelemetry,
   teardownTelemetry,
+  watchFile,
 } from '@nx-console/server';
 import {
   GlobalConfigurationStore,
@@ -51,6 +53,7 @@ let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
+let workspaceFileWatcher: FileSystemWatcher | undefined;
 
 export function activate(c: ExtensionContext) {
   try {
@@ -69,41 +72,37 @@ export function activate(c: ExtensionContext) {
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,
     }) as TreeView<RunTargetTreeItem>;
-    context.subscriptions.push(runTargetTreeView);
 
-    context.subscriptions.push(
-      commands.registerCommand(
-        'nxConsole.revealWebViewPanel',
-        async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-          if (
-            !existsSync(
-              join(runTargetTreeItem.workspaceJsonPath, '..', 'node_modules')
-            )
-          ) {
-            const { validNodeModules: hasNodeModules } = verifyNodeModules(
-              join(runTargetTreeItem.workspaceJsonPath, '..')
-            );
-            if (!hasNodeModules) {
-              return;
-            }
+    const revealWebViewPanelCommand = commands.registerCommand(
+      'nxConsole.revealWebViewPanel',
+      async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
+        if (
+          !existsSync(
+            join(runTargetTreeItem.workspaceJsonPath, '..', 'node_modules')
+          )
+        ) {
+          const { validNodeModules: hasNodeModules } = verifyNodeModules(
+            join(runTargetTreeItem.workspaceJsonPath, '..')
+          );
+          if (!hasNodeModules) {
+            return;
           }
-          revealWebViewPanel({
-            runTargetTreeItem,
-            context,
-            cliTaskProvider,
-            runTargetTreeView,
-            contextMenuUri,
-          });
         }
-      )
+        revealWebViewPanel({
+          runTargetTreeItem,
+          context,
+          cliTaskProvider,
+          runTargetTreeView,
+          contextMenuUri,
+        });
+      }
     );
-    context.subscriptions.push(
-      commands.registerCommand(
-        LOCATE_YOUR_WORKSPACE.command!.command,
-        async () => {
-          return manuallySelectWorkspaceDefinition();
-        }
-      )
+
+    const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
+      LOCATE_YOUR_WORKSPACE.command!.command,
+      async () => {
+        return manuallySelectWorkspaceDefinition();
+      }
     );
     const vscodeWorkspacePath =
       workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
@@ -111,6 +110,12 @@ export function activate(c: ExtensionContext) {
     if (vscodeWorkspacePath) {
       scanForWorkspace(vscodeWorkspacePath);
     }
+
+    context.subscriptions.push(
+      runTargetTreeView,
+      revealWebViewPanelCommand,
+      manuallySelectWorkspaceDefinitionCommand
+    );
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
@@ -166,7 +171,10 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
 
   const { root } = parse(vscodeWorkspacePath);
 
-  const workspaceJsonPath = WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '');
+  const workspaceJsonPath = WorkspaceConfigurationStore.instance.get(
+    'nxWorkspaceJsonPath',
+    ''
+  );
   if (workspaceJsonPath) {
     currentDirectory = dirname(workspaceJsonPath);
   }
@@ -204,18 +212,16 @@ async function setWorkspace(workspaceJsonPath: string) {
       context,
       cliTaskProvider
     );
-
     nxProjectTreeView = window.createTreeView('nxProjects', {
       treeDataProvider: nxProjectsTreeProvider,
     });
-    context.subscriptions.push(nxProjectTreeView);
 
     const nxCommandsTreeProvider = new NxCommandsTreeProvider(context);
-
     nxCommandsTreeView = window.createTreeView('nxCommands', {
       treeDataProvider: nxCommandsTreeProvider,
     });
-    context.subscriptions.push(nxCommandsTreeView);
+
+    context.subscriptions.push(nxCommandsTreeView, nxProjectTreeView);
   } else {
     WorkspaceConfigurationStore.instance.set(
       'nxWorkspaceJsonPath',
@@ -244,6 +250,23 @@ async function setWorkspace(workspaceJsonPath: string) {
     isGenerateFromContextMenuEnabled
   );
 
+  registerWorkspaceFileWatcher(context, workspaceJsonPath);
+
   currentRunTargetTreeProvider.refresh();
   nxProjectsTreeProvider.refresh();
+}
+
+function registerWorkspaceFileWatcher(
+  context: ExtensionContext,
+  workspaceJsonPath: string
+) {
+  if (workspaceFileWatcher) {
+    workspaceFileWatcher.dispose();
+  }
+
+  workspaceFileWatcher = watchFile(workspaceJsonPath, () => {
+    commands.executeCommand('nxConsole.refreshNxProjectsTree');
+  });
+
+  context.subscriptions.push(workspaceFileWatcher);
 }

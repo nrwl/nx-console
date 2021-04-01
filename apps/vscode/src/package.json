@@ -55,11 +55,6 @@
       "view/title": [
         {
           "command": "nxConsole.refreshNxProjectsTree",
-          "when": "view == nxConsoleJson",
-          "group": "navigation"
-        },
-        {
-          "command": "nxConsole.refreshNxProjectsTree",
           "when": "view == nxProjects",
           "group": "navigation"
         }
@@ -82,6 +77,10 @@
         }
       ],
       "commandPalette": [
+        {
+          "command": "nx.generate.ui.fileexplorer",
+          "when": "false"
+        },
         {
           "command": "ng.lint",
           "when": "isAngularWorkspace"
@@ -239,11 +238,9 @@
     "commands": [
       {
         "command": "nxConsole.refreshNxProjectsTree",
-        "title": "Refresh",
-        "icon": {
-          "light": "assets/refresh-light.svg",
-          "dark": "assets/refresh-dark.svg"
-        }
+        "title": "Refresh Projects",
+        "category": "Nx",
+        "icon": "$(refresh)"
       },
       {
         "command": "nxConsole.editWorkspaceJson",
@@ -326,132 +323,132 @@
         "command": "ng.generate.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "lint",
         "command": "nx.lint"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "build",
         "command": "nx.build"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "e2e",
         "command": "nx.e2e"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "generate",
         "command": "nx.generate"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "serve",
         "command": "nx.serve"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "test",
         "command": "nx.test"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "dep-graph",
         "command": "nx.dep-graph"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "run-many",
         "command": "nx.run-many"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected",
         "command": "nx.affected"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected test",
         "command": "nx.affected.test"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected build",
         "command": "nx.affected.build"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected e2e",
         "command": "nx.affected.e2e"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected lint",
         "command": "nx.affected.lint"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected apps",
         "command": "nx.affected.apps"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected libs",
         "command": "nx.affected.libs"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected dep-graph",
         "command": "nx.affected.dep-graph"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "list",
         "command": "nx.list"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "migrate",
         "command": "nx.migrate"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "lint (ui)",
         "command": "nx.lint.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "build (ui)",
         "command": "nx.build.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "e2e (ui)",
         "command": "nx.e2e.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "serve (ui)",
         "command": "nx.serve.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "test (ui)",
         "command": "nx.test.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "xi18n (ui)",
         "command": "nx.xi18n.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "generate (ui)",
         "command": "nx.generate.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "Nx generate (ui)",
         "command": "nx.generate.ui.fileexplorer"
       }
