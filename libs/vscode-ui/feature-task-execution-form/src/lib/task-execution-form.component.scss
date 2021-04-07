@@ -28,7 +28,6 @@ $offset-with-configurations: $offset-without-configurations +
   border: $input-border-width solid var(--vscode-settings-textInputBorder);
   color: #fff;
   text-align: center;
-  line-height: 30px;
   cursor: pointer;
   transition: background ease-in-out 0.1s;
   margin-left: 1rem;
@@ -66,7 +65,7 @@ vscode-ui-field-tree {
 }
 
 form {
-  margin-left: 206px;
+  margin-left: 190px;
   padding-right: $host-padding-right - $scrollbar-width;
 }
 

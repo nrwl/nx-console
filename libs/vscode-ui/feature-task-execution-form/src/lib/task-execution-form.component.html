@@ -7,8 +7,8 @@
   >
     <div class="form-header-container" #formHeaderContainer>
       <div class="form-header">
-        <div class="fx-align-start-center fx-row fx-flex">
-          <div class="filter-container fx-flex fx-align-start-center fx-row">
+        <div class="fx-align-start-center fx-row">
+          <div class="filter-container fx-align-start-center fx-flex">
             <input
               type="text"
               placeholder="Search flags"
@@ -51,10 +51,12 @@
           [activeFieldName]="activeFieldName$ | async"
           [fields]="taskExecForm.architect.options"
           [filteredFields]="filteredFields"
+          [validFields]="validFields$ | async"
+          [invalidFields]="invalidFields$ | async"
         ></vscode-ui-field-tree>
-        <form class="fields fx-flex" [formGroup]="taskExecForm.form">
-          <div class="title-container fx-row">
-            <span class="fx-flex title">
+        <form class="fields" [formGroup]="taskExecForm.form">
+          <div class="title-container">
+            <span class="title">
               {{ taskExecForm.architect | formatTask }}
               <ng-container
                 *ngIf="
@@ -69,41 +71,45 @@
               </ng-container>
             </span>
           </div>
+          <div class="fx-row">
+            <div>
+              <ng-container *ngIf="defaultValues$ | async as defaultValues">
+                <nx-console-field
+                  [id]="field.name + '-nx-console-field'"
+                  *ngFor="let field of taskExecForm.architect.options"
+                  [class.changed-from-default]="
+                    defaultValues[field.name] !==
+                    taskExecForm.form.value[field.name]
+                  "
+                  [field]="field"
+                  [formControlName]="field.name"
+                  [style.display]="
+                    filteredFields.has(field.name) ? 'block' : 'none'
+                  "
+                ></nx-console-field>
+              </ng-container>
 
-          <ng-container *ngIf="defaultValues$ | async as defaultValues">
-            <nx-console-field
-              [id]="field.name + '-nx-console-field'"
-              *ngFor="let field of taskExecForm.architect.options"
-              [class.changed-from-default]="
-                defaultValues[field.name] !==
-                taskExecForm.form.value[field.name]
-              "
-              [field]="field"
-              [formControlName]="field.name"
-              [style.display]="
-                filteredFields.has(field.name) ? 'block' : 'none'
-              "
-            ></nx-console-field>
-          </ng-container>
-
-          <div
-            class="filter-flags-message"
-            *ngIf="filteredFields.size === 0"
-            #noMatch
-          >
-            <div *ngIf="taskExecForm.architect.options.length; else noFlags">
-              No flags found -
-              <span
-                class="clear-search"
-                (click)="filterFieldsControl.setValue('')"
+              <div
+                class="filter-flags-message"
+                *ngIf="filteredFields.size === 0"
+                #noMatch
               >
-                Clear search
-              </span>
-            </div>
+                <div *ngIf="taskExecForm.architect.options.length; else noFlags">
+                  No flags found -
+                  <span
+                    class="clear-search"
+                    (click)="filterFieldsControl.setValue('')"
+                  >
+                    Clear search
+                  </span>
+                </div>
 
-            <ng-template #noFlags>
-              This command has no flags to set
-            </ng-template>
+                <ng-template #noFlags>
+                  This command has no flags to set
+                </ng-template>
+              </div>
+            </div>
+            <nx-console-argument-list [args]="runCommandArguments$ | async"></nx-console-argument-list>
           </div>
         </form>
       </div>

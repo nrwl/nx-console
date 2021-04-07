@@ -1,6 +1,7 @@
 $input-border-width: 1px;
 $input-border-radius-size: 3px;
 $input-width: 320px;
+$description-width: 340px;
 $input-height: 26px;
 $button-primary-color: var(
   --vscode-settings-modifiedItemIndicator,
@@ -12,6 +13,7 @@ $button-primary-color: var(
 $scroll-bar-width: 12px;
 
 $primary-text-color: var(--vscode-settings-headerForeground);
+$modified-text-color: var(--vscode-gitDecoration-modifiedResourceForeground, #e2c08d);
 $error-text-color: var(--vscode-errorForeground, #f00);
 
 $error-border-color: var(--vscode-inputValidation-errorBorder, #f00);

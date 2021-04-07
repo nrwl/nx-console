@@ -19,6 +19,7 @@ import {
 import {
   BehaviorSubject,
   combineLatest,
+  merge,
   Observable,
   ReplaySubject,
   Subscription,
@@ -32,7 +33,9 @@ import {
   tap,
   flatMap,
   mapTo,
+  mergeMap,
   filter,
+  withLatestFrom,
 } from 'rxjs/operators';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
@@ -159,6 +162,15 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     }),
     shareReplay()
   );
+
+  runCommandArguments$ = this.taskExecForm$.pipe(
+    mergeMap((taskExecForm) => taskExecForm.form.valueChanges.pipe(map(() => taskExecForm))),
+    map(({ architect, form }) => this.serializeArgs(form.value, architect))
+  );
+
+  validFields$ = this.getValidFields$(true);
+
+  invalidFields$ = this.getValidFields$(false);
 
   dryRunSubscription?: Subscription;
 
@@ -356,7 +368,44 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  getValidFields$(
+    valid: boolean
+  ): Observable<{ [name: string]: string[] | string | number | boolean }> {
+    return this.taskExecForm$.pipe(
+      mergeMap((taskExecForm) =>
+        merge(
+          taskExecForm.form.valueChanges,
+          taskExecForm.form.statusChanges
+        ).pipe(
+          startWith(taskExecForm),
+          map(() => taskExecForm)
+        )
+      ),
+      withLatestFrom(this.defaultValues$),
+      map(([{ form, architect }, defaultValues]) => {
+        return architect.options
+          .filter((option) => {
+            const control = form.controls[option.name];
+            return (
+              (valid &&
+                control.valid &&
+                // touched is not working with checkbox, so ignore touched and just check !== defaultValue
+                // control.touched &&
+                control.value !== defaultValues[option.name]) ||
+              // invalid and touched (checkbox is always valid as true/false)
+              (!valid && control.touched && control.invalid)
+            );
+          })
+          .reduce((options, option) => ({
+            ...options,
+            [option.name]: form.controls[option.name].value,
+          }), {});
+      })
+    );
+  }
+
   private serializeArgs(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: { [p: string]: any },
     architect: TaskExecutionSchema,
     configurationName?: string
