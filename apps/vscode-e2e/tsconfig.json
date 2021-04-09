@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "files": ["src/test/runTest.ts"],
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    "outDir": "../../dist",
+    "types": ["node"],
+    "module": "commonjs"
+  }
+}

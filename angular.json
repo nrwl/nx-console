@@ -166,6 +166,37 @@
         }
       }
     },
+    "vscode-e2e": {
+      "root": "apps/vscode-e2e",
+      "sourceRoot": "apps/vscode-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": ["tsc -p apps/vscode-e2e"]
+          }
+        },
+        "e2e": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "nx build vscode-app",
+              "nx build vscode-ui",
+              "nx build vscode-e2e",
+              "node ./dist/apps/vscode-e2e/src/test/runTest.js"
+            ],
+            "parallel": false
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/vscode-e2e/**/*.ts"]
+          }
+        }
+      }
+    },
     "schema": {
       "root": "libs/schema",
       "sourceRoot": "libs/schema/src",

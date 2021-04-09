@@ -58,6 +58,7 @@
     "@storybook/addon-knobs": "^6.1.11",
     "@storybook/angular": "^6.1.11",
     "@types/jest": "26.0.8",
+    "@types/mocha": "^8.2.2",
     "@types/node": "14.14.33",
     "@types/shelljs": "^0.8.2",
     "@types/universal-analytics": "0.4.2",
@@ -73,6 +74,7 @@
     "husky": "^3.0.9",
     "jest": "26.2.2",
     "jest-preset-angular": "8.3.2",
+    "mocha": "^8.3.2",
     "ngx-build-plus": "11.0.0",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
@@ -92,6 +94,7 @@
     "typescript": "4.0.7",
     "universal-analytics": "0.4.20",
     "vsce": "^1.69.0",
+    "vscode-test": "^1.5.2",
     "zlib": "^1.0.5",
     "zone.js": "0.10.3"
   }
