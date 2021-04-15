@@ -24,10 +24,6 @@ export class InputComponent {
     return this.controlContainer.control as FormGroup;
   }
 
-  get control(): FormControl {
-    return this.parentFormGroup?.get(this.field?.name) as FormControl;
-  }
-
   constructor(private readonly controlContainer: ControlContainer) {}
 
   updateValue(updated: string): void {
