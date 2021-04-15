@@ -95,7 +95,7 @@ export class AutocompleteComponent implements OnInit, ControlValueAccessor {
     this.visibleOptions = this._options$.pipe(
       switchMap((options) =>
         this.control.valueChanges.pipe(
-          startWith(''), // When panel is first opened, show the entire list
+          startWith(this.control.value || ''), // When panel is first opened, show the entire list
           map(
             (formValue) =>
               options &&
