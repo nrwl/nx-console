@@ -1,16 +1,22 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, DebugElement, ViewChild } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { OptionType } from '@angular/cli/models/interface';
 import { Option } from '@nx-console/schema';
 import { MultipleSelectComponent } from './multiple-select.component';
+import { FieldItemsPipe } from '../field-items/field-items.pipe';
 
 const initialValue = 'test';
 const mockOption: Option = {
   name: 'style',
   description: 'The file extension to be used for style files.',
-  type: OptionType.String,
+  type: OptionType.Array,
   aliases: [],
+  items: {
+    type: OptionType.String,
+    enum: ['test', 'noTooltipValue'],
+  },
   itemTooltips: {
     test: 'testLabel',
   },
@@ -27,8 +33,15 @@ const mockOption: Option = {
   `,
 })
 class ParentFormComponent {
-  field = mockOption;
-  formGroup = this.fb.group({ [this.field.name]: initialValue });
+  formGroup = this.fb.group({ [mockOption.name]: initialValue });
+  _field = mockOption;
+  get field(): Option {
+    return this._field;
+  }
+  set field(field: Option) {
+    this._field = field;
+    this.formGroup = this.fb.group({ [field.name]: '' });
+  }
   @ViewChild('select')
   selectComponent: MultipleSelectComponent;
 
@@ -37,11 +50,12 @@ class ParentFormComponent {
 describe('MultipleSelectComponent', () => {
   let fixture: ComponentFixture<ParentFormComponent>;
   let parent: ParentFormComponent;
+  let options: DebugElement[];
 
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [ParentFormComponent, MultipleSelectComponent],
+        declarations: [ParentFormComponent, MultipleSelectComponent, FieldItemsPipe],
         imports: [ReactiveFormsModule],
       }).compileComponents();
     })
@@ -50,6 +64,7 @@ describe('MultipleSelectComponent', () => {
     fixture = TestBed.createComponent(ParentFormComponent);
     parent = fixture.componentInstance;
     fixture.detectChanges();
+    options = fixture.debugElement.queryAll(By.css('option'));
   });
 
   it('should create', () => {
@@ -57,16 +72,22 @@ describe('MultipleSelectComponent', () => {
     expect(parent.selectComponent).toBeDefined();
   });
 
-  describe('getOptionTooltip', () => {
+  describe('option tooltips', () => {
     it('should get tooltip for option value', () => {
-      parent.field = mockOption;
-      expect(parent.selectComponent.getOptionTooltip('test')).toBe('testLabel');
+      const testOption = options.find(
+        (opt) => opt.nativeElement.textContent.trim() === 'test'
+      );
+      expect(testOption).toBeDefined();
+      expect(testOption?.nativeElement.getAttribute('title')).toEqual(
+        mockOption.itemTooltips && mockOption.itemTooltips['test']
+      );
     });
-    it('should return null when there is no tooltip for option value', () => {
-      parent.field = mockOption;
-      expect(
-        parent.selectComponent.getOptionTooltip('noTooltipValue')
-      ).toBeNull();
+    it('should ignore when there is no tooltip for option value', () => {
+      const noTooltipOption = options.find(
+        (opt) => opt.nativeElement.textContent.trim() === 'noTooltipValue'
+      );
+      expect(noTooltipOption).toBeDefined();
+      expect(noTooltipOption?.nativeElement.getAttribute('title')).toBeNull();
     });
   });
 });
