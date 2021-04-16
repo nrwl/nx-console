@@ -2,6 +2,9 @@ import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';
 
+import * as tsConfig  from '../../../../../tsconfig.base.json';
+import * as tsConfigPaths from 'tsconfig-paths';
+
 export function run(): Promise<void> {
 	// Create the mocha test
 	const mocha = new Mocha({
@@ -9,7 +12,9 @@ export function run(): Promise<void> {
 		color: true
 	});
 
-	const testsRoot = path.resolve(__dirname, '..');
+	// const testsRoot = path.resolve(__dirname, '..');
+  const testsRoot = path.resolve('./dist/apps/vscode-e2e/src/test');
+  console.log('testsRoot', testsRoot);
 
 	return new Promise((c, e) => {
 		glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
@@ -20,7 +25,17 @@ export function run(): Promise<void> {
 			// Add files to the test suite
 			files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
+      // register tsconfig paths
+      const baseUrl = './';
+      console.log('baseUrl', path.resolve(baseUrl));
+      let cleanup;
+
 			try {
+        cleanup = tsConfigPaths.register({
+          baseUrl,
+          paths: tsConfig.compilerOptions.paths
+        });
+
 				// Run the mocha test
 				mocha.run(failures => {
 					if (failures > 0) {
@@ -32,7 +47,10 @@ export function run(): Promise<void> {
 			} catch (err) {
 				console.error(err);
 				e(err);
-			}
+			} finally {
+        // When path registration is no longer needed
+        cleanup && cleanup();
+      }
 		});
 	});
 }

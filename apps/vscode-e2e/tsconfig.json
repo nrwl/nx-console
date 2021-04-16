@@ -5,6 +5,7 @@
   "compilerOptions": {
     "outDir": "../../dist",
     "types": ["node"],
-    "module": "commonjs"
+    "module": "commonjs",
+    "resolveJsonModule": true
   }
 }
