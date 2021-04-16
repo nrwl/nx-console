@@ -9,6 +9,7 @@ import { FieldComponent } from './field/field.component';
 import { FieldTreeComponent } from './field-tree/field-tree.component';
 import { MultipleSelectComponent } from './multiple-select/multiple-select.component';
 import { FormatTaskPipe } from './format-task/format-task.pipe';
+import { FieldItemsPipe } from './field-items/field-items.pipe';
 
 @NgModule({
   imports: [CommonModule, ReactiveFormsModule],
@@ -21,6 +22,7 @@ import { FormatTaskPipe } from './format-task/format-task.pipe';
     FieldTreeComponent,
     MultipleSelectComponent,
     FormatTaskPipe,
+    FieldItemsPipe,
   ],
   exports: [
     AutocompleteComponent,

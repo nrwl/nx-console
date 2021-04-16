@@ -31,6 +31,16 @@ const initialSchema: TaskExecutionSchema = {
       description: 'a multiselect option',
       items: ['one', 'two', 'three', 'four'],
     },
+    {
+      name: 'a-long-form-multiselect-option',
+      type: OptionType.Array,
+      aliases: [],
+      description: 'a long form multiselect option',
+      items: {
+        type: OptionType.String,
+        enum: ['five', 'six', 'seven', 'eight'],
+      },
+    },
   ],
 };
 
@@ -62,21 +72,32 @@ describe('TaskExecutionFormComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should set validator for valid options', () => {
-    const formControl = formGroup.get('option-items-with-enum') as FormControl;
-    expect(formControl?.validator).toBeDefined();
-    formControl.setValue('not a valid option');
-    expect(formControl.invalid).toBeTruthy();
-    formControl.setValue('scss');
-    expect(formControl.valid).toBeTruthy();
-  });
+  describe('validators', () => {
+    it('should set validator for valid options', () => {
+      const formControl = formGroup.get('option-items-with-enum') as FormControl;
+      expect(formControl?.validator).toBeDefined();
+      formControl.setValue('not a valid option');
+      expect(formControl.invalid).toBeTruthy();
+      formControl.setValue('scss');
+      expect(formControl.valid).toBeTruthy();
+    });
 
-  it('should set validator for Array type multiselect options', () => {
-    const formControl = formGroup.get('a-multiselect-option') as FormControl;
-    expect(formControl?.validator).toBeDefined();
-    formControl.setValue(['not valid']);
-    expect(formControl.invalid).toBeTruthy();
-    formControl.setValue(['one', 'three']);
-    expect(formControl.valid).toBeTruthy();
+    it('should set validator for Array type multiselect options', () => {
+      const formControl = formGroup.get('a-multiselect-option') as FormControl;
+      expect(formControl?.validator).toBeDefined();
+      formControl.setValue(['not valid']);
+      expect(formControl.invalid).toBeTruthy();
+      formControl.setValue(['one', 'three']);
+      expect(formControl.valid).toBeTruthy();
+    });
+
+    it('should set validator for long form options', () => {
+      const formControl = formGroup.get('a-long-form-multiselect-option') as FormControl;
+      expect(formControl?.validator).toBeDefined();
+      formControl.setValue(['not valid']);
+      expect(formControl.invalid).toBeTruthy();
+      formControl.setValue(['five', 'six']);
+      expect(formControl.valid).toBeTruthy();
+    });
   });
 });
