@@ -266,14 +266,19 @@ async function promptForRunMany() {
     return;
   }
 
-  const flags = await selectFlags('run-many', RUN_MANY_OPTIONS, 'nx');
+  const projects = validProjectsForTarget(target);
+  const projectsOption = RUN_MANY_OPTIONS.find(opt => opt.name === 'projects');
+  if (projectsOption && projects && projects.length) {
+    projectsOption.enum = projects;
+  }
+
+  const flags = await selectFlags('run-many', RUN_MANY_OPTIONS, 'nx', {target});
 
   if (flags !== undefined) {
     const task = NxTask.create(
       {
         command: 'run-many',
         flags,
-        positional: `--target=${target}`,
       },
       cliTaskProvider.getWorkspacePath()
     );
@@ -323,4 +328,20 @@ async function promptForMigrate() {
     cliTaskProvider.getWorkspacePath()
   );
   tasks.executeTask(task);
+}
+
+function validProjectsForTarget(target: string): string[] | undefined {
+  const { validWorkspaceJson, json } = verifyWorkspace();
+
+  if (!validWorkspaceJson || !json) {
+    return;
+  }
+
+  return Array.from(
+    new Set(
+      Object.entries<ProjectDef>(json.projects)
+        .filter(([_, project]) => project.architect && project.architect[target])
+        .map(([project]) => project)
+    )
+  ).sort();
 }
