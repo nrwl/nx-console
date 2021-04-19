@@ -142,11 +142,6 @@ const AFFECTED_OPTIONS: Option[] = [
 ].map((v) => ({ ...v, aliases: [] }));
 
 const RUN_MANY_OPTIONS: Option[] = [
-  {
-    name: 'projects',
-    type: OptionType.Array,
-    description: 'Projects to run',
-  },
   { name: 'all', type: OptionType.Boolean, description: 'All projects' },
   {
     name: 'parallel',
@@ -266,13 +261,22 @@ async function promptForRunMany() {
     return;
   }
 
+  let options = RUN_MANY_OPTIONS;
   const projects = validProjectsForTarget(target);
-  const projectsOption = RUN_MANY_OPTIONS.find(opt => opt.name === 'projects');
-  if (projectsOption && projects && projects.length) {
-    projectsOption.enum = projects;
+  if (projects && projects.length) {
+    options = [
+      {
+        name: 'projects',
+        type: OptionType.Array,
+        description: 'Projects to run',
+        aliases: [],
+        enum: projects,
+      },
+      ...RUN_MANY_OPTIONS,
+    ];
   }
 
-  const flags = await selectFlags('run-many', RUN_MANY_OPTIONS, 'nx', {target});
+  const flags = await selectFlags('run-many', options, 'nx', { target });
 
   if (flags !== undefined) {
     const task = NxTask.create(
@@ -340,7 +344,9 @@ function validProjectsForTarget(target: string): string[] | undefined {
   return Array.from(
     new Set(
       Object.entries<ProjectDef>(json.projects)
-        .filter(([_, project]) => project.architect && project.architect[target])
+        .filter(
+          ([_, project]) => project.architect && project.architect[target]
+        )
         .map(([project]) => project)
     )
   ).sort();
