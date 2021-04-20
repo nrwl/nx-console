@@ -49,6 +49,10 @@ export function registerCliTaskCommands(
     );
   });
 
+  commands.registerCommand('nx.run', () =>
+    selectCliCommandAndPromptForFlags('run')
+  );
+
   commands.registerCommand(`ng.generate`, () =>
     selectSchematicAndPromptForFlags()
   );
@@ -108,9 +112,18 @@ async function selectCliCommandAndPromptForFlags(command: string) {
     return; // Do not execute a command if user clicks out of VSCode UI.
   }
 
+  let target = command;
+  const isRunCommand = command === 'run';
+  if (isRunCommand) {
+    target = (await selectCliTarget(Object.keys(json.projects[selection.projectName].architect || {}))) as string;
+    if (!target) {
+      return;
+    }
+  }
+
   const builderDefinition = await verifyBuilderDefinition(
     selection.projectName,
-    command,
+    target,
     json
   );
   const {
@@ -136,14 +149,18 @@ async function selectCliCommandAndPromptForFlags(command: string) {
   }
 
   const flags = await selectFlags(
-    `${command} ${selection.projectName}`,
+    isRunCommand
+      ? `${command} ${selection.projectName}:${target}`
+      : `${command} ${selection.projectName}`,
     options,
     workspaceType
   );
 
   if (flags !== undefined) {
     cliTaskProvider.executeTask({
-      positional: selection.projectName,
+      positional: isRunCommand
+        ? `${selection.projectName}:${target}`
+        : selection.projectName,
       command,
       flags,
     });
@@ -186,7 +203,10 @@ export function selectCliProject(command: string, json: any) {
     .getProjectEntries(json)
     .filter(([_, { architect }]) => Boolean(architect))
     .flatMap(([project, { architect }]) => ({ project, architect }))
-    .filter(({ architect }) => Boolean(architect && architect[command]))
+    .filter(
+      ({ architect }) =>
+        Boolean(architect && architect[command]) || command === 'run'
+    )
     .map(
       ({ project, architect }) =>
         new CliTaskQuickPickItem(
@@ -207,5 +227,13 @@ export function selectCliProject(command: string, json: any) {
 
   return window.showQuickPick(items, {
     placeHolder: `Project to ${command}`,
+  });
+}
+
+async function selectCliTarget(
+  targets: string[]
+): Promise<string | undefined> {
+  return window.showQuickPick(targets, {
+    placeHolder: 'Target to run',
   });
 }

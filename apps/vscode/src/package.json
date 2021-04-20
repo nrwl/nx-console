@@ -166,6 +166,10 @@
           "when": "isNxWorkspace"
         },
         {
+          "command": "nx.run",
+          "when": "isNxWorkspace"
+        },
+        {
           "command": "nx.affected",
           "when": "isNxWorkspace"
         },
@@ -361,6 +365,11 @@
         "category": "Nx",
         "title": "run-many",
         "command": "nx.run-many"
+      },
+      {
+        "category": "Nx",
+        "title": "run",
+        "command": "nx.run"
       },
       {
         "category": "Nx",
