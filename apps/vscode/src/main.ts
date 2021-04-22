@@ -231,12 +231,6 @@ async function setWorkspace(workspaceJsonPath: string) {
 
   const isNxWorkspace = existsSync(join(workspaceJsonPath, '..', 'nx.json'));
   const isAngularWorkspace = workspaceJsonPath.endsWith('angular.json');
-  const enableGenerateFromContextMenuSetting = GlobalConfigurationStore.instance.get(
-    'enableGenerateFromContextMenu'
-  );
-  const isGenerateFromContextMenuEnabled =
-    enableGenerateFromContextMenuSetting &&
-    (isNxWorkspace || isAngularWorkspace);
 
   commands.executeCommand(
     'setContext',
@@ -244,11 +238,6 @@ async function setWorkspace(workspaceJsonPath: string) {
     isAngularWorkspace
   );
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
-  commands.executeCommand(
-    'setContext',
-    'isGenerateFromContextMenuEnabled',
-    isGenerateFromContextMenuEnabled
-  );
 
   registerWorkspaceFileWatcher(context, workspaceJsonPath);
 
