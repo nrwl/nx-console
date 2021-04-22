@@ -50,6 +50,11 @@
           "when": "isGenerateFromContextMenuEnabled",
           "command": "nx.generate.ui.fileexplorer",
           "group": "explorerContext"
+        },
+        {
+          "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "nx.run.fileexplorer",
+          "group": "explorerContext"
         }
       ],
       "view/title": [
@@ -79,6 +84,10 @@
       "commandPalette": [
         {
           "command": "nx.generate.ui.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.run.fileexplorer",
           "when": "false"
         },
         {
@@ -460,6 +469,11 @@
         "category": "Nx",
         "title": "Nx generate (ui)",
         "command": "nx.generate.ui.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx run",
+        "command": "nx.run.fileexplorer"
       }
     ],
     "configuration": {

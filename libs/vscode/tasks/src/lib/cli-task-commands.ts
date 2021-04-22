@@ -52,6 +52,9 @@ export function registerCliTaskCommands(
   commands.registerCommand('nx.run', () =>
     selectCliCommandAndPromptForFlags('run')
   );
+  commands.registerCommand(`nx.run.fileexplorer`, (uri: Uri) =>
+    selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
+  );
 
   commands.registerCommand(`ng.generate`, () =>
     selectSchematicAndPromptForFlags()
@@ -102,27 +105,30 @@ function selectCliCommandAndShowUi(
   );
 }
 
-async function selectCliCommandAndPromptForFlags(command: string) {
+async function selectCliCommandAndPromptForFlags(command: string, projectName?: string) {
   const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
 
-  const selection = validWorkspaceJson
-    ? await selectCliProject(command, json)
-    : undefined;
-  if (!selection) {
-    return; // Do not execute a command if user clicks out of VSCode UI.
+  if (!projectName) {
+    const selection = validWorkspaceJson
+      ? await selectCliProject(command, json)
+      : undefined;
+    if (!selection) {
+      return; // Do not execute a command if user clicks out of VSCode UI.
+    }
+    projectName = selection.projectName;
   }
 
   let target = command;
   const isRunCommand = command === 'run';
   if (isRunCommand) {
-    target = (await selectCliTarget(Object.keys(json.projects[selection.projectName].architect || {}))) as string;
+    target = (await selectCliTarget(Object.keys(json.projects[projectName].architect || {}))) as string;
     if (!target) {
       return;
     }
   }
 
   const builderDefinition = await verifyBuilderDefinition(
-    selection.projectName,
+    projectName,
     target,
     json
   );
@@ -150,8 +156,8 @@ async function selectCliCommandAndPromptForFlags(command: string) {
 
   const flags = await selectFlags(
     isRunCommand
-      ? `${command} ${selection.projectName}:${target}`
-      : `${command} ${selection.projectName}`,
+      ? `${command} ${projectName}:${target}`
+      : `${command} ${projectName}`,
     options,
     workspaceType
   );
@@ -159,8 +165,8 @@ async function selectCliCommandAndPromptForFlags(command: string) {
   if (flags !== undefined) {
     cliTaskProvider.executeTask({
       positional: isRunCommand
-        ? `${selection.projectName}:${target}`
-        : selection.projectName,
+        ? `${projectName}:${target}`
+        : projectName,
       command,
       flags,
     });
@@ -196,6 +202,11 @@ async function selectSchematicAndPromptForFlags() {
       flags,
     });
   }
+}
+
+export function getCliProjectFromUri(uri: Uri): string | undefined {
+  const project = cliTaskProvider.projectForPath(uri.fsPath);
+  return project?.name;
 }
 
 export function selectCliProject(command: string, json: any) {
