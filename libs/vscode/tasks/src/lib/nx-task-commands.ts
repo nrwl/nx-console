@@ -142,11 +142,6 @@ const AFFECTED_OPTIONS: Option[] = [
 ].map((v) => ({ ...v, aliases: [] }));
 
 const RUN_MANY_OPTIONS: Option[] = [
-  {
-    name: 'projects',
-    type: OptionType.Array,
-    description: 'Projects to run',
-  },
   { name: 'all', type: OptionType.Boolean, description: 'All projects' },
   {
     name: 'parallel',
@@ -266,14 +261,28 @@ async function promptForRunMany() {
     return;
   }
 
-  const flags = await selectFlags('run-many', RUN_MANY_OPTIONS, 'nx');
+  let options = RUN_MANY_OPTIONS;
+  const projects = validProjectsForTarget(target);
+  if (projects && projects.length) {
+    options = [
+      {
+        name: 'projects',
+        type: OptionType.Array,
+        description: 'Projects to run',
+        aliases: [],
+        enum: projects,
+      },
+      ...RUN_MANY_OPTIONS,
+    ];
+  }
+
+  const flags = await selectFlags('run-many', options, 'nx', { target });
 
   if (flags !== undefined) {
     const task = NxTask.create(
       {
         command: 'run-many',
         flags,
-        positional: `--target=${target}`,
       },
       cliTaskProvider.getWorkspacePath()
     );
@@ -323,4 +332,22 @@ async function promptForMigrate() {
     cliTaskProvider.getWorkspacePath()
   );
   tasks.executeTask(task);
+}
+
+function validProjectsForTarget(target: string): string[] | undefined {
+  const { validWorkspaceJson, json } = verifyWorkspace();
+
+  if (!validWorkspaceJson || !json) {
+    return;
+  }
+
+  return Array.from(
+    new Set(
+      Object.entries<ProjectDef>(json.projects)
+        .filter(
+          ([_, project]) => project.architect && project.architect[target]
+        )
+        .map(([project]) => project)
+    )
+  ).sort();
 }

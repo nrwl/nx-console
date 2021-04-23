@@ -23,7 +23,7 @@ export async function selectFlags(
 
   const flagValue = await promptForFlagValue(selection.flag);
 
-  if (flagValue) {
+  if (flagValue && flagValue.length > 0) {
     userSetFlags[selection.flag.flagName] = flagValue;
   } else {
     delete userSetFlags[selection.flag.flagName];
@@ -83,6 +83,7 @@ function promptForFlagValue(flagToSet: CliTaskFlagQuickPickItem) {
   } else if (flagToSet.option.enum && flagToSet.option.enum.length) {
     return window.showQuickPick([...flagToSet.option.enum.map(String)], {
       placeHolder,
+      canPickMany: flagToSet.option.type === 'array'
     });
   } else {
     return window.showInputBox({
