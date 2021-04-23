@@ -50,6 +50,11 @@
           "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu || isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.generate.ui.fileexplorer",
           "group": "explorerContext"
+        },
+        {
+          "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "nx.run.fileexplorer",
+          "group": "explorerContext"
         }
       ],
       "view/title": [
@@ -79,6 +84,10 @@
       "commandPalette": [
         {
           "command": "nx.generate.ui.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.run.fileexplorer",
           "when": "false"
         },
         {
@@ -163,6 +172,10 @@
         },
         {
           "command": "nx.run-many",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.run",
           "when": "isNxWorkspace"
         },
         {
@@ -364,6 +377,11 @@
       },
       {
         "category": "Nx",
+        "title": "run",
+        "command": "nx.run"
+      },
+      {
+        "category": "Nx",
         "title": "affected",
         "command": "nx.affected"
       },
@@ -451,6 +469,11 @@
         "category": "Nx",
         "title": "Nx generate (ui)",
         "command": "nx.generate.ui.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx run",
+        "command": "nx.run.fileexplorer"
       }
     ],
     "configuration": {
