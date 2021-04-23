@@ -71,7 +71,8 @@
               </ng-container>
             </span>
           </div>
-          <div class="fx-row">
+          <div class="fx-row-reverse">
+            <nx-console-argument-list [args]="runCommandArguments$ | async"></nx-console-argument-list>
             <div>
               <ng-container *ngIf="defaultValues$ | async as defaultValues">
                 <nx-console-field
@@ -109,7 +110,6 @@
                 </ng-template>
               </div>
             </div>
-            <nx-console-argument-list [args]="runCommandArguments$ | async"></nx-console-argument-list>
           </div>
         </form>
       </div>
