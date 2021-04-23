@@ -47,7 +47,7 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "isGenerateFromContextMenuEnabled",
+          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu || isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.generate.ui.fileexplorer",
           "group": "explorerContext"
         }
