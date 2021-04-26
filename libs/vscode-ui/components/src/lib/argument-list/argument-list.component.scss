@@ -1,3 +1,5 @@
 div {
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  margin-left: 1em;
+  text-indent: -1em;
 }
