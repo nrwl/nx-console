@@ -166,7 +166,12 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   );
 
   runCommandArguments$ = this.taskExecForm$.pipe(
-    mergeMap((taskExecForm) => taskExecForm.form.valueChanges.pipe(map(() => taskExecForm))),
+    mergeMap((taskExecForm) =>
+      taskExecForm.form.valueChanges.pipe(
+        startWith(taskExecForm.form.value),
+        map(() => taskExecForm)
+      )
+    ),
     map(({ architect, form }) => this.serializeArgs(form.value, architect))
   );
 
