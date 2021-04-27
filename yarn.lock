@@ -170,6 +170,15 @@
   dependencies:
     eslint-scope "^5.1.0"
 
+"@angular/cdk@11.2.1":
+  version "11.2.1"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-11.2.1.tgz#c06aa5b0ac76706240a4851ff704d70cbc6f3bf5"
+  integrity sha512-d+ERvvWqGykBm5ooWG8TmMjL6q6aOpUd13ha1sx960EfKJqNyideYUfPMp6xprTyxmUIUZ/G9AQ/pxnzrLGnsA==
+  dependencies:
+    tslib "^2.0.0"
+  optionalDependencies:
+    parse5 "^5.0.0"
+
 "@angular/cli@11.2.1":
   version "11.2.1"
   resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-11.2.1.tgz#5b7d1b3608c63b6a08b66275a830798d36613ff5"
@@ -12297,7 +12306,7 @@ parse5-sax-parser@^6.0.1:
   dependencies:
     parse5 "^6.0.1"
 
-parse5@5.1.1:
+parse5@5.1.1, parse5@^5.0.0:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-5.1.1.tgz#f68e4e5ba1852ac2cadc00f4555fff6c2abb6178"
   integrity sha512-ugq4DFI0Ptb+WWjAdOK16+u/nHfiIrcE+sh8kZMaM0WllQKLI9rOUq6c2b7cwPkXdzfQESqvoqK6ug7U/Yyzug==
@@ -16592,6 +16601,11 @@ vsce@^1.69.0:
     url-join "^1.1.0"
     yauzl "^2.3.1"
     yazl "^2.2.2"
+
+vscode-codicons@^0.0.16:
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/vscode-codicons/-/vscode-codicons-0.0.16.tgz#0bef18bfc0e9378ceb77213326495960cb53561f"
+  integrity sha512-OUijQNEJ78cmipWUR/LlUeTF9xAUW3/23YhgF3fNOKXKbajGTctUL8+sarVY1dZzv1ii7ilHXYkSJwh/d90XuA==
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"

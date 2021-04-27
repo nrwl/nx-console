@@ -35,6 +35,7 @@
     "@angular-eslint/eslint-plugin": "~1.0.0",
     "@angular-eslint/eslint-plugin-template": "~1.0.0",
     "@angular-eslint/template-parser": "~1.0.0",
+    "@angular/cdk": "11.2.1",
     "@angular/cli": "11.2.1",
     "@angular/common": "11.2.1",
     "@angular/compiler": "11.2.1",
@@ -92,6 +93,7 @@
     "typescript": "4.0.7",
     "universal-analytics": "0.4.20",
     "vsce": "^1.69.0",
+    "vscode-codicons": "^0.0.16",
     "zlib": "^1.0.5",
     "zone.js": "0.10.3"
   }

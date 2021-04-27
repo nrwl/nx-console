@@ -145,6 +145,18 @@ nx-console-field {
     line-height: 21px;
   }
 
+  button {
+    background-color: $button-secondary-color;
+    color: $secondary-text-color;
+    padding: 2px 2px 1px 2px;
+    border: none;
+    margin-left: 0.5em;
+
+    &:hover, &:focus {
+      background-color: $button-secondary-hover-color;
+    }
+  }
+
   margin-bottom: 1rem;
 }
 

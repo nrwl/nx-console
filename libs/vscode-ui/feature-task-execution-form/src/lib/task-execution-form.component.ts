@@ -9,6 +9,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { Clipboard } from '@angular/cdk/clipboard';
 import {
   FormBuilder,
   FormControl,
@@ -37,6 +38,7 @@ import {
   filter,
   withLatestFrom,
 } from 'rxjs/operators';
+import { formatTask } from './format-task/format-task';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
@@ -178,7 +180,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     private readonly fb: FormBuilder,
     @Inject(TASK_EXECUTION_SCHEMA) public initialSchema: TaskExecutionSchema,
     private readonly ngZone: NgZone,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly clipboard: Clipboard
   ) {}
 
   ngOnInit() {
@@ -435,6 +438,17 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       }
     });
     return args;
+  }
+
+  copyCommandToClipboard(form: FormGroup, architect: TaskExecutionSchema) {
+    const configuration = form.get('configuration')?.value;
+    this.clipboard.copy(
+      `${formatTask(architect)} ${this.serializeArgs(
+        form.value,
+        architect,
+        configuration
+      ).join(' ')}`
+    );
   }
 }
 

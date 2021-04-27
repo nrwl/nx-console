@@ -5,6 +5,8 @@ import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TaskExecutionSchema } from '@nx-console/schema';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
+import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
+import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 
 const initialSchema: TaskExecutionSchema = {
@@ -52,8 +54,8 @@ describe('TaskExecutionFormComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TaskExecutionFormComponent],
-        imports: [ReactiveFormsModule, VscodeUiComponentsModule],
+        declarations: [TaskExecutionFormComponent, FormatTaskPipe],
+        imports: [ReactiveFormsModule, VscodeUiComponentsModule, ArgumentListModule],
         providers: [
           { provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema },
         ],

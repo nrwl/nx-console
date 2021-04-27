@@ -10,9 +10,12 @@ $button-primary-color: var(
   --vscode-statusBarItem-remoteBackground,
   #45bc98
 );
+$button-secondary-color: var(--vscode-button-secondaryBackground);
+$button-secondary-hover-color: var(--vscode-button-secondaryHoverBackground);
 $scroll-bar-width: 12px;
 
 $primary-text-color: var(--vscode-settings-headerForeground);
+$secondary-text-color: var(--vscode-button-secondaryForeground);
 $modified-text-color: var(--vscode-gitDecoration-modifiedResourceForeground, #e2c08d);
 $error-text-color: var(--vscode-errorForeground, #f00);
 

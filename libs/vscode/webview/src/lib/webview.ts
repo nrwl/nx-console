@@ -154,6 +154,13 @@ export function getIframeHtml(
     'main.js'
   );
 
+  const codiconsPath = Uri.joinPath(
+    context.extensionUri,
+    'assets',
+    'public',
+    'codicon.css'
+  );
+
   const indexHtml = `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -178,6 +185,7 @@ export function getIframeHtml(
       window.vscode = acquireVsCodeApi();
     </script>
     <link href="${webView.asWebviewUri(stylePath)}" rel="stylesheet"/>
+    <link href="${webView.asWebviewUri(codiconsPath)}" rel="stylesheet" />
   </head>
   <body>
     <vscode-ui-task-execution-form></vscode-ui-task-execution-form>

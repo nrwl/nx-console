@@ -70,6 +70,9 @@
                 }}
               </ng-container>
             </span>
+            <button (click)="copyCommandToClipboard(taskExecForm.form, taskExecForm.architect)" title="Copy to clipboard">
+              <i class="codicon codicon-clippy"></i>
+            </button>
           </div>
           <div class="fx-row-reverse">
             <nx-console-argument-list [args]="runCommandArguments$ | async"></nx-console-argument-list>
