@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
+import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { TaskExecutionSchema } from '@nx-console/schema';
@@ -18,7 +19,12 @@ export function getSchema() {
 }
 
 @NgModule({
-  imports: [CommonModule, VscodeUiComponentsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    VscodeUiComponentsModule,
+    ArgumentListModule,
+  ],
   declarations: [TaskExecutionFormComponent],
   exports: [TaskExecutionFormComponent],
   providers: [

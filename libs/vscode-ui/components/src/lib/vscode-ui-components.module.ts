@@ -10,7 +10,6 @@ import { FieldTreeComponent } from './field-tree/field-tree.component';
 import { MultipleSelectComponent } from './multiple-select/multiple-select.component';
 import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { FieldItemsPipe } from './field-items/field-items.pipe';
-import { ArgumentListComponent } from './argument-list/argument-list.component';
 
 @NgModule({
   imports: [CommonModule, ReactiveFormsModule],
@@ -24,7 +23,6 @@ import { ArgumentListComponent } from './argument-list/argument-list.component';
     MultipleSelectComponent,
     FormatTaskPipe,
     FieldItemsPipe,
-    ArgumentListComponent,
   ],
   exports: [
     AutocompleteComponent,
@@ -35,7 +33,6 @@ import { ArgumentListComponent } from './argument-list/argument-list.component';
     FieldTreeComponent,
     MultipleSelectComponent,
     FormatTaskPipe,
-    ArgumentListComponent,
   ],
 })
 export class VscodeUiComponentsModule {}

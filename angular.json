@@ -20,11 +20,18 @@
       "framework": "express"
     },
     "@nrwl/angular:application": {
+      "style": "scss",
+      "linter": "eslint",
       "unitTestRunner": "jest",
       "e2eTestRunner": "cypress"
     },
     "@nrwl/angular:library": {
-      "unitTestRunner": "none"
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest"
+    },
+    "@nrwl/angular:component": {
+      "style": "scss"
     }
   },
   "projects": {
@@ -50,7 +57,10 @@
               "apps/vscode-ui/src/favicon.ico",
               "apps/vscode-ui/src/assets"
             ],
-            "styles": ["apps/vscode-ui/src/styles.scss"],
+            "styles": [
+              "apps/vscode-ui/src/styles.scss",
+              "node_modules/vscode-codicons/dist/codicon.css"
+            ],
             "namedChunks": false,
             "extractLicenses": true,
             "vendorChunk": false,
@@ -272,6 +282,31 @@
       },
       "schematics": {}
     },
+    "vscode-ui-argument-list": {
+      "projectType": "library",
+      "root": "libs/vscode-ui/argument-list",
+      "sourceRoot": "libs/vscode-ui/argument-list/src",
+      "prefix": "nx-console",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/vscode-ui/argument-list/src/**/*.ts",
+              "libs/vscode-ui/argument-list/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode-ui/argument-list"],
+          "options": {
+            "jestConfig": "libs/vscode-ui/argument-list/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "vscode-ui-components": {
       "projectType": "library",
       "root": "libs/vscode-ui/components",
@@ -293,11 +328,6 @@
             "passWithNoTests": true
           },
           "outputs": ["coverage/libs/vscode-ui/components"]
-        }
-      },
-      "schematics": {
-        "@nrwl/angular:component": {
-          "styleext": "scss"
         }
       }
     },
