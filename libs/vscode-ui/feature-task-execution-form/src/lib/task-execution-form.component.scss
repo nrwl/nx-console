@@ -152,7 +152,8 @@ nx-console-field {
     border: none;
     margin-left: 0.5em;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background-color: $button-secondary-hover-color;
     }
   }

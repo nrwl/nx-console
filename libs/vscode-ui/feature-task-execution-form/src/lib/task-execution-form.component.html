@@ -70,12 +70,22 @@
                 }}
               </ng-container>
             </span>
-            <button (click)="copyCommandToClipboard(taskExecForm.form, taskExecForm.architect)" title="Copy to clipboard">
+            <button
+              (click)="
+                copyCommandToClipboard(
+                  taskExecForm.form,
+                  taskExecForm.architect
+                )
+              "
+              title="Copy to clipboard"
+            >
               <i class="codicon codicon-clippy"></i>
             </button>
           </div>
           <div class="fx-row-reverse">
-            <nx-console-argument-list [args]="runCommandArguments$ | async"></nx-console-argument-list>
+            <nx-console-argument-list
+              [args]="runCommandArguments$ | async"
+            ></nx-console-argument-list>
             <div>
               <ng-container *ngIf="defaultValues$ | async as defaultValues">
                 <nx-console-field
@@ -98,7 +108,9 @@
                 *ngIf="filteredFields.size === 0"
                 #noMatch
               >
-                <div *ngIf="taskExecForm.architect.options.length; else noFlags">
+                <div
+                  *ngIf="taskExecForm.architect.options.length; else noFlags"
+                >
                   No flags found -
                   <span
                     class="clear-search"

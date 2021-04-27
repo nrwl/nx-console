@@ -16,7 +16,10 @@ $scroll-bar-width: 12px;
 
 $primary-text-color: var(--vscode-settings-headerForeground);
 $secondary-text-color: var(--vscode-button-secondaryForeground);
-$modified-text-color: var(--vscode-gitDecoration-modifiedResourceForeground, #e2c08d);
+$modified-text-color: var(
+  --vscode-gitDecoration-modifiedResourceForeground,
+  #e2c08d
+);
 $error-text-color: var(--vscode-errorForeground, #f00);
 
 $error-border-color: var(--vscode-inputValidation-errorBorder, #f00);

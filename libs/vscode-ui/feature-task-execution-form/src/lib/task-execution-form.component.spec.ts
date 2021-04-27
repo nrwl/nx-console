@@ -55,7 +55,11 @@ describe('TaskExecutionFormComponent', () => {
     waitForAsync(() => {
       TestBed.configureTestingModule({
         declarations: [TaskExecutionFormComponent, FormatTaskPipe],
-        imports: [ReactiveFormsModule, VscodeUiComponentsModule, ArgumentListModule],
+        imports: [
+          ReactiveFormsModule,
+          VscodeUiComponentsModule,
+          ArgumentListModule,
+        ],
         providers: [
           { provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema },
         ],
@@ -76,7 +80,9 @@ describe('TaskExecutionFormComponent', () => {
 
   describe('validators', () => {
     it('should set validator for valid options', () => {
-      const formControl = formGroup.get('option-items-with-enum') as FormControl;
+      const formControl = formGroup.get(
+        'option-items-with-enum'
+      ) as FormControl;
       expect(formControl?.validator).toBeDefined();
       formControl.setValue('not a valid option');
       expect(formControl.invalid).toBeTruthy();
@@ -94,7 +100,9 @@ describe('TaskExecutionFormComponent', () => {
     });
 
     it('should set validator for long form options', () => {
-      const formControl = formGroup.get('a-long-form-multiselect-option') as FormControl;
+      const formControl = formGroup.get(
+        'a-long-form-multiselect-option'
+      ) as FormControl;
       expect(formControl?.validator).toBeDefined();
       formControl.setValue(['not valid']);
       expect(formControl.invalid).toBeTruthy();

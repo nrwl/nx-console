@@ -19,15 +19,17 @@ export class ArgumentListComponent {
     return this._formattedArgs;
   }
   set args(values: string[]) {
-    this._formattedArgs = values && values.map(
-      (value) =>
-        this.domSanitizer.sanitize(
-          SecurityContext.HTML,
-          this.domSanitizer.bypassSecurityTrustHtml(
-            value.replace('=', '=<wbr>')
-          )
-        ) || ''
-    );
+    this._formattedArgs =
+      values &&
+      values.map(
+        (value) =>
+          this.domSanitizer.sanitize(
+            SecurityContext.HTML,
+            this.domSanitizer.bypassSecurityTrustHtml(
+              value.replace('=', '=<wbr>')
+            )
+          ) || ''
+      );
   }
 
   constructor(private readonly domSanitizer: DomSanitizer) {}

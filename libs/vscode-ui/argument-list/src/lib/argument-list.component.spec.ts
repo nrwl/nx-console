@@ -8,9 +8,8 @@ describe('ArgumentListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ArgumentListComponent ]
-    })
-    .compileComponents();
+      declarations: [ArgumentListComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -24,8 +23,12 @@ describe('ArgumentListComponent', () => {
   });
 
   it('should format arguments for multiline break-word', () => {
-    component.args = ['--some-arg=withalistofoptions,that-may-not-fit-on-a-single-line'];
+    component.args = [
+      '--some-arg=withalistofoptions,that-may-not-fit-on-a-single-line',
+    ];
     fixture.detectChanges();
-    expect(component.args).toEqual(['--some-arg=<wbr>withalistofoptions,that-may-not-fit-on-a-single-line']);
-  })
+    expect(component.args).toEqual([
+      '--some-arg=<wbr>withalistofoptions,that-may-not-fit-on-a-single-line',
+    ]);
+  });
 });
