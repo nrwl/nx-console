@@ -57,10 +57,7 @@
               "apps/vscode-ui/src/favicon.ico",
               "apps/vscode-ui/src/assets"
             ],
-            "styles": [
-              "apps/vscode-ui/src/styles.scss",
-              "node_modules/vscode-codicons/dist/codicon.css"
-            ],
+            "styles": ["apps/vscode-ui/src/styles.scss"],
             "namedChunks": false,
             "extractLicenses": true,
             "vendorChunk": false,

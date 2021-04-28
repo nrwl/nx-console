@@ -156,8 +156,9 @@ export function getIframeHtml(
 
   const codiconsPath = Uri.joinPath(
     context.extensionUri,
-    'assets',
-    'public',
+    'node_modules',
+    'vscode-codicons',
+    'dist',
     'codicon.css'
   );
 
