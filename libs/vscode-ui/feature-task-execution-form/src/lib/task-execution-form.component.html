@@ -86,7 +86,7 @@
             <nx-console-argument-list
               [args]="runCommandArguments$ | async"
             ></nx-console-argument-list>
-            <div>
+            <div class ="fields-container">
               <ng-container *ngIf="defaultValues$ | async as defaultValues">
                 <nx-console-field
                   [id]="field.name + '-nx-console-field'"

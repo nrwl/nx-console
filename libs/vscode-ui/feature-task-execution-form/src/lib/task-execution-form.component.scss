@@ -81,6 +81,15 @@ form {
   margin: auto;
 }
 
+nx-console-argument-list {
+  flex: 1 1 140px;
+  padding-left: $host-padding-left;
+}
+
+.fields-container {
+  flex: 1 1 $input-width;
+}
+
 .filter-container {
   border-width: 1px;
   border-style: solid;
