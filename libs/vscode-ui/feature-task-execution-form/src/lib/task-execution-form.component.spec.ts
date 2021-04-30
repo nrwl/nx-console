@@ -5,6 +5,8 @@ import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TaskExecutionSchema } from '@nx-console/schema';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
+import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
+import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 
 const initialSchema: TaskExecutionSchema = {
@@ -52,8 +54,12 @@ describe('TaskExecutionFormComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [TaskExecutionFormComponent],
-        imports: [ReactiveFormsModule, VscodeUiComponentsModule],
+        declarations: [TaskExecutionFormComponent, FormatTaskPipe],
+        imports: [
+          ReactiveFormsModule,
+          VscodeUiComponentsModule,
+          ArgumentListModule,
+        ],
         providers: [
           { provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema },
         ],
@@ -74,7 +80,9 @@ describe('TaskExecutionFormComponent', () => {
 
   describe('validators', () => {
     it('should set validator for valid options', () => {
-      const formControl = formGroup.get('option-items-with-enum') as FormControl;
+      const formControl = formGroup.get(
+        'option-items-with-enum'
+      ) as FormControl;
       expect(formControl?.validator).toBeDefined();
       formControl.setValue('not a valid option');
       expect(formControl.invalid).toBeTruthy();
@@ -92,7 +100,9 @@ describe('TaskExecutionFormComponent', () => {
     });
 
     it('should set validator for long form options', () => {
-      const formControl = formGroup.get('a-long-form-multiselect-option') as FormControl;
+      const formControl = formGroup.get(
+        'a-long-form-multiselect-option'
+      ) as FormControl;
       expect(formControl?.validator).toBeDefined();
       formControl.setValue(['not valid']);
       expect(formControl.invalid).toBeTruthy();

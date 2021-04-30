@@ -3,6 +3,8 @@
   *ngFor="let field of fields"
   (click)="scrollToField(field.name)"
   [class.active]="activeFieldName === field.name"
+  [class.valid]="isFieldValid(field.name)"
+  [class.error]="isFieldInvalid(field.name)"
   [id]="field.name + '-field-tree-item'"
   [style.display]="filteredFields.has(field.name) ? 'block' : 'none'"
 >

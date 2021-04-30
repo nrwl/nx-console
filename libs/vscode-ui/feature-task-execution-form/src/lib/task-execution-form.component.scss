@@ -28,7 +28,6 @@ $offset-with-configurations: $offset-without-configurations +
   border: $input-border-width solid var(--vscode-settings-textInputBorder);
   color: #fff;
   text-align: center;
-  line-height: 30px;
   cursor: pointer;
   transition: background ease-in-out 0.1s;
   margin-left: 1rem;
@@ -66,7 +65,7 @@ vscode-ui-field-tree {
 }
 
 form {
-  margin-left: 206px;
+  margin-left: 190px;
   padding-right: $host-padding-right - $scrollbar-width;
 }
 
@@ -80,6 +79,15 @@ form {
   box-sizing: border-box;
   max-width: 980px;
   margin: auto;
+}
+
+nx-console-argument-list {
+  flex: 1 1 140px;
+  padding-left: $host-padding-left;
+}
+
+.fields-container {
+  flex: 1 1 $input-width;
 }
 
 .filter-container {
@@ -146,6 +154,19 @@ nx-console-field {
     line-height: 21px;
   }
 
+  button {
+    background-color: $button-secondary-color;
+    color: $secondary-text-color;
+    padding: 2px 2px 1px 2px;
+    border: none;
+    margin-left: 0.5em;
+
+    &:hover,
+    &:focus {
+      background-color: $button-secondary-hover-color;
+    }
+  }
+
   margin-bottom: 1rem;
 }
 
@@ -155,6 +176,9 @@ nx-console-field {
   }
 
   vscode-ui-field-tree {
+    display: none;
+  }
+  nx-console-argument-list {
     display: none;
   }
 }

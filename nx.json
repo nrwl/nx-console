@@ -30,6 +30,7 @@
     "server": { "tags": [] },
     "vscode-ui": { "tags": [] },
     "vscode-ui-feature-task-execution-form": { "tags": [] },
+    "vscode-ui-argument-list": { "tags": [] },
     "vscode-ui-components": { "tags": [] },
     "vscode-ui-styles": { "tags": [] },
     "vscode-ui-feature-task-execution-form-e2e": {

@@ -26,6 +26,9 @@
       "@nx-console/vscode-ui/feature-task-execution-form": [
         "libs/vscode-ui/feature-task-execution-form/src/index.ts"
       ],
+      "@nx-console/vscode-ui/argument-list": [
+        "libs/vscode-ui/argument-list/src/index.ts"
+      ],
       "@nx-console/vscode-ui/components": [
         "libs/vscode-ui/components/src/index.ts"
       ],

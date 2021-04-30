@@ -8,7 +8,6 @@ import { CheckboxComponent } from './checkbox/checkbox.component';
 import { FieldComponent } from './field/field.component';
 import { FieldTreeComponent } from './field-tree/field-tree.component';
 import { MultipleSelectComponent } from './multiple-select/multiple-select.component';
-import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { FieldItemsPipe } from './field-items/field-items.pipe';
 
 @NgModule({
@@ -21,7 +20,6 @@ import { FieldItemsPipe } from './field-items/field-items.pipe';
     FieldComponent,
     FieldTreeComponent,
     MultipleSelectComponent,
-    FormatTaskPipe,
     FieldItemsPipe,
   ],
   exports: [
@@ -32,7 +30,6 @@ import { FieldItemsPipe } from './field-items/field-items.pipe';
     FieldComponent,
     FieldTreeComponent,
     MultipleSelectComponent,
-    FormatTaskPipe,
   ],
 })
 export class VscodeUiComponentsModule {}

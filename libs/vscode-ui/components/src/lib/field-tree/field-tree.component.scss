@@ -36,4 +36,11 @@
     font-weight: 700;
     opacity: 1;
   }
+
+  &.valid {
+    color: $modified-text-color;
+  }
+  &.error {
+    color: $error-text-color;
+  }
 }

@@ -1,18 +1,27 @@
 .fx-row,
-.fx-row-wrap {
-  flex-direction: row;
+.fx-row-wrap,
+.fx-row-reverse,
+.fx-column {
   box-sizing: border-box;
   display: flex;
+}
+
+.fx-row,
+.fx-row-wrap {
+  flex-direction: row;
 }
 
 .fx-row-wrap {
   flex-flow: row wrap;
 }
 
+.fx-row-reverse {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
 .fx-column {
   flex-direction: column;
-  box-sizing: border-box;
-  display: flex;
 }
 
 .fx-align-start-center {
