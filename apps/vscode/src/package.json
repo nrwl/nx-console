@@ -41,8 +41,7 @@
   ],
   "dependencies": {
     "jsonc-parser": "^2.1.1",
-    "json5": "2.1.1",
-    "vscode-codicons": "^0.0.16"
+    "json5": "2.1.1"
   },
   "contributes": {
     "menus": {
