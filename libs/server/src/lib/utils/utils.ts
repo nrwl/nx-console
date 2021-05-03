@@ -181,7 +181,7 @@ export async function normalizeSchema(
     const nxOption: Option = {
       ...option,
       required: isFieldRequired(requiredFields, option, xPrompt, $default),
-      ...(workspaceDefault && { default: workspaceDefault }),
+      ...(workspaceDefault !== undefined && { default: workspaceDefault }),
       ...($default && { $default }),
       ...(option.enum && { items: option.enum.map((item) => item.toString()) }),
       // Strongly suspect items does not belong in the Option schema.
