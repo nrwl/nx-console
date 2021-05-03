@@ -35,4 +35,17 @@ describe('FormatTaskPipe', () => {
       })
     ).toEqual('ng generate @nrwl/angular:library');
   });
+
+  it('should optionally include configuration flag', () => {
+    expect(
+      pipe.transform({
+        name: '',
+        cliName: 'nx',
+        description: '',
+        options: [],
+        command: 'build',
+        positional: 'the-project',
+      }, 'production')
+    ).toEqual('nx build the-project --prod');
+  })
 });

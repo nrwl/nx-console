@@ -38,15 +38,15 @@ import {
   filter,
   withLatestFrom,
 } from 'rxjs/operators';
-import { formatTask } from './format-task/format-task';
+import { getConfigurationFlag, formatTask } from './format-task/format-task';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
   TaskExecutionSchema,
   TaskExecutionMessage,
-  ItemsWithEnum,
+  ItemsWithEnum
 } from '@nx-console/schema';
-import { Value } from '@angular/cli/models/interface';
+import { OptionType, Value } from '@angular/cli/models/interface';
 
 declare global {
   interface Window {
@@ -172,7 +172,13 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         map(() => taskExecForm)
       )
     ),
-    map(({ architect, form }) => this.serializeArgs(form.value, architect))
+    map(({ architect, form }) =>
+      this.serializeArgs(
+        form.value,
+        architect,
+        form.get('configuration')?.value
+      )
+    )
   );
 
   validFields$ = this.getValidFields$(true);
@@ -334,7 +340,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         defaultValues[field.name] = field.default.map((item) => String(item));
       } else {
         defaultValues[field.name] =
-          String(field.default) || (field.type === 'boolean' ? 'false' : '');
+          String(field.default) || (field.type === OptionType.Boolean ? 'false' : '');
       }
     });
 
@@ -361,7 +367,14 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect: TaskExecutionSchema;
     dryRun?: boolean;
   }) {
-    const flags = this.serializeArgs(form.value, architect);
+    const configuration = form.get('configuration')?.value;
+    const args = this.serializeArgs(form.value, architect, configuration);
+    const flags = configuration
+      ? [
+          getConfigurationFlag(configuration),
+          ...args,
+        ]
+      : args;
     if (architect.command === 'generate') {
       flags.push('--no-interactive');
     }
@@ -395,11 +408,18 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
           .filter((option) => {
             const control = form.controls[option.name];
             return (
+              // ** VALID fields **
               (valid &&
                 control.valid &&
                 // touched is not working with checkbox, so ignore touched and just check !== defaultValue
                 // control.touched &&
-                control.value !== defaultValues[option.name]) ||
+                ((option.type !== OptionType.Array && control.value !== defaultValues[option.name]) ||
+                  (option.type === OptionType.Array &&
+                    control.value &&
+                    control.value.join(',') !== ((defaultValues[option.name] || []) as string[]).join(',')
+                  )
+                )) ||
+              // ** INVALID fields **
               // invalid and touched (checkbox is always valid as true/false)
               (!valid && control.touched && control.invalid)
             );
@@ -428,9 +448,15 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     fields.forEach((f) => {
       if (defaultValues[f.name] === value[f.name]) return;
       if (!defaultValues[f.name] && !value[f.name]) return;
+      if (
+        Array.isArray(defaultValues[f.name]) &&
+        (defaultValues[f.name] as string[]).join(',') === value[f.name].join(',')
+      )
+        return;
+
       if (f.positional) {
         args.push(sanitizeWhitespace(value[f.name]));
-      } else if (f.type === 'boolean') {
+      } else if (f.type === OptionType.Boolean) {
         args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else {
         const fieldValue = value[f.name];
@@ -448,7 +474,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   copyCommandToClipboard(form: FormGroup, architect: TaskExecutionSchema) {
     const configuration = form.get('configuration')?.value;
     this.clipboard.copy(
-      `${formatTask(architect)} ${this.serializeArgs(
+      `${formatTask(architect, configuration)} ${this.serializeArgs(
         form.value,
         architect,
         configuration

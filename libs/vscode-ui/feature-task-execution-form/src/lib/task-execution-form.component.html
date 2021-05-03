@@ -57,18 +57,7 @@
         <form class="fields" [formGroup]="taskExecForm.form">
           <div class="title-container">
             <span class="title">
-              {{ taskExecForm.architect | formatTask }}
-              <ng-container
-                *ngIf="
-                  taskExecForm.form.get('configuration')?.value as configuration
-                "
-              >
-                {{
-                  configuration === 'production'
-                    ? '--prod'
-                    : '--c=' + configuration
-                }}
-              </ng-container>
+              {{ taskExecForm.architect | formatTask: taskExecForm.form.get('configuration')?.value }}
             </span>
             <button
               (click)="
