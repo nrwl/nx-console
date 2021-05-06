@@ -86,7 +86,11 @@ export async function verifyBuilderDefinition(
     };
   }
 
-  const options = await readBuilderSchema(workspacePath(), builderName);
+  const options = await readBuilderSchema(
+    workspacePath(),
+    builderName,
+    commandDef.options
+  );
 
   if (!options) {
     window

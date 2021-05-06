@@ -20,7 +20,7 @@ export interface SchematicDefaults {
 }
 
 export const files: { [path: string]: string[] } = {};
-export let fileContents: { [path: string]: any } = {};
+export const fileContents: { [path: string]: any } = {};
 
 const IMPORTANT_FIELD_NAMES = [
   'name',
@@ -108,9 +108,13 @@ export function listFiles(dirName: string): string[] {
         } else if (statSync(child).isDirectory()) {
           res.push(...listFiles(child));
         }
-      } catch (e) {}
+      } catch (e) {
+        // noop
+      }
     });
-  } catch (e) {}
+  } catch (e) {
+    // noop
+  }
   return res;
 }
 
@@ -141,7 +145,7 @@ export function clearJsonCache(filePath: string, basedir = '') {
 
 export function readAndCacheJsonFile(
   filePath: string,
-  basedir: string = ''
+  basedir = ''
 ): { path: string; json: any } {
   const fullFilePath = path.join(basedir, filePath);
 
@@ -181,7 +185,7 @@ export async function normalizeSchema(
     const nxOption: Option = {
       ...option,
       required: isFieldRequired(requiredFields, option, xPrompt, $default),
-      ...(workspaceDefault && { default: workspaceDefault }),
+      ...(workspaceDefault !== undefined && { default: workspaceDefault }),
       ...($default && { $default }),
       ...(option.enum && { items: option.enum.map((item) => item.toString()) }),
       // Strongly suspect items does not belong in the Option schema.
@@ -259,7 +263,7 @@ function getItems(option: Option): { items: string[] } | undefined {
   return (
     option.items && {
       items:
-        (option.items as ItemsWithEnum)!.enum ||
+        (option.items as ItemsWithEnum)?.enum ||
         ((option.items as string[]).length && option.items),
     }
   );

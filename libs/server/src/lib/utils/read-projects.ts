@@ -67,7 +67,8 @@ function readDefaultValues(configurations: any, name: string): DefaultValue[] {
 
 export async function readBuilderSchema(
   basedir: string,
-  builder: string
+  builder: string,
+  projectDefaults?: { [name: string]: string }
 ): Promise<Option[]> {
   const [npmPackage, builderName] = builder.split(':');
   const packageJson = readAndCacheJsonFile(
@@ -88,5 +89,5 @@ export async function readBuilderSchema(
     path.dirname(buildersJson.path)
   );
 
-  return await normalizeSchema(builderSchema.json);
+  return await normalizeSchema(builderSchema.json, projectDefaults);
 }
