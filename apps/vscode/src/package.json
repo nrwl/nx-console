@@ -621,6 +621,16 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "nxConsole.views.welcome",
+        "contents": "Nx Console - The UI for Nx"
+      },
+      {
+        "view": "nxConsole.views.welcome",
+        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vs-code)"
+      }
+    ],
     "views": {
       "nx-console": [
         {
@@ -636,7 +646,15 @@
           "id": "nxProjects",
           "name": "Projects",
           "when": "isNxWorkspace || isAngularWorkspace"
-        }
+        },
+        {
+					"id": "nxConsole.views.welcome",
+					"name": "Welcome",
+					"when": "!isNxWorkspace && !isAngularWorkspace",
+					"contextualTitle": "Nx Console Getting Started",
+					"icon": "assets/nx-console.png",
+					"visibility": "visible"
+				}
       ]
     },
     "jsonValidation": [
