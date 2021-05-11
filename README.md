@@ -16,7 +16,7 @@ Nx transformed the Angular ecosystem. With it, you can get a full-stack applicat
 
 ## Why Nx Console?
 
-Professional developers use both command-line tools and user interfaces. They commit in the terminal, but resolve conflicts in VSCode or WebStorm. They use the right tool for the job.
+Developers use both command-line tools and user interfaces. They commit in the terminal, but resolve conflicts in VSCode or WebStorm. They use the right tool for the job.
 
 Nx is a command-line tool, which works great when you want to serve an application or generate a simple component. But it falls short once you start doing advanced things.
 
@@ -34,11 +34,11 @@ For VSCode users, you can install the [Nx Console VSCode Plugin](https://marketp
 
 ## True UI for Nx
 
-Nx Console is an UI for Nx. It will work for any schematic or any architect commands. Nx Console does not have a specific UI for, say, generating a component. Instead, Nx Console does what the command-line version of Nx does--it analyzes the same meta information to create the needed UI. This means that anything you can do with Nx, you can do with Nx Console. After all, Nx Console is the UI for Nx.
+Nx Console is the UI for Nx. It will work for any schematic or any architect commands. Nx Console does not have a specific UI for, say, generating a component. Instead, Nx Console does what the command-line version of Nx does--it analyzes the same meta information to create the needed UI. This means that anything you can do with Nx, you can do with Nx Console. After all, Nx Console is the UI for Nx.
 
 ## Useful for Both Experts and Beginners
 
-Even though we started building Nx Console as a tool for expert, we also aimed to make Nx Console a great tool for developers who are new to Nx. You can create projects, interact with your editor, run generators and commands, install extensions without ever touching the terminal or having to install any node packages globally. If you get a new laptop, you can install Nx Console and start building apps. Also, Nx Console highlights the properties you are likely to use for build-in generators and commands . So if you haven't used the CLI, you don't get overwhelmed.
+Even though we started building Nx Console as a tool for experts, we also aimed to make Nx Console a great tool for developers who are new to to development or Nx. You can create projects, interact with your editor, run generators and commands, install extensions without ever touching the terminal or having to install any node packages globally. Also, Nx Console highlights the properties you are likely to use for build-in generators and commands, so if you haven't used the CLI, you don't get overwhelmed.
 
 # Learn More
 
