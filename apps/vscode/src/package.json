@@ -535,6 +535,10 @@
             "type": "string",
             "description": "The Angular CLI command to run on the selected project"
           },
+          "positional": {
+            "type": "string",
+            "description": "The project to run the command against"
+          },
           "flags": {
             "type": "array",
             "description": "An array of flags to pass to the CLI"
@@ -555,6 +559,10 @@
           "command": {
             "type": "string",
             "description": "The NX CLI command to run on the selected project"
+          },
+          "positional": {
+            "type": "string",
+            "description": "The project to run the command against"
           },
           "flags": {
             "type": "array",
