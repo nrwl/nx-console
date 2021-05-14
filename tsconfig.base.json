@@ -50,7 +50,8 @@
       ],
       "@nx-console/vscode/nx-commands-view": [
         "libs/vscode/nx-commands-view/src/index.ts"
-      ]
+      ],
+      "@nx-console/vscode/json-schema": ["libs/vscode/json-schema/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

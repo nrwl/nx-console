@@ -44,6 +44,7 @@
     "vscode-webview": { "tags": [] },
     "vscode-nx-run-target-view": { "tags": [] },
     "vscode-nx-project-view": { "tags": [] },
-    "vscode-nx-commands-view": { "tags": [] }
+    "vscode-nx-commands-view": { "tags": [] },
+    "vscode-json-schema": { "tags": [] }
   }
 }

@@ -619,6 +619,38 @@
           }
         }
       }
+    },
+    "vscode-json-schema": {
+      "root": "libs/vscode/json-schema",
+      "sourceRoot": "libs/vscode/json-schema/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/json-schema/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/json-schema"],
+          "options": {
+            "jestConfig": "libs/vscode/json-schema/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/json-schema",
+            "tsConfig": "libs/vscode/json-schema/tsconfig.lib.json",
+            "packageJson": "libs/vscode/json-schema/package.json",
+            "main": "libs/vscode/json-schema/src/index.ts",
+            "assets": ["libs/vscode/json-schema/*.md"]
+          }
+        }
+      }
     }
   }
 }

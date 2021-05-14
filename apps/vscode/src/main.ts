@@ -51,6 +51,8 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import { environment } from './environments/environment';
 
+import { vscodeJsonSchema } from '@nx-console/vscode/json-schema';
+
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
 let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
@@ -126,6 +128,7 @@ export function activate(c: ExtensionContext) {
 
     // registers itself as a CodeLensProvider and watches config to dispose/re-register
     new WorkspaceCodeLensProvider(context);
+    vscodeJsonSchema(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
