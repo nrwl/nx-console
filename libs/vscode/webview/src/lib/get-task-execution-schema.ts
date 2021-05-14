@@ -3,7 +3,6 @@ import {
   getOutputChannel,
   getTelemetry,
   readArchitectDef,
-  readBuilderSchema,
   selectSchematic,
 } from '@nx-console/server';
 import {
@@ -71,7 +70,7 @@ export async function getTaskExecutionSchema(
           .filter(([_, { architect }]) => Boolean(architect))
           .flatMap(([project, { architect }]) => ({ project, architect }))
           .flatMap(({ project, architect }) => [
-            ...Object.entries(architect!).map(
+            ...Object.entries(architect || {}).map(
               ([architectName, architectDef]) => ({
                 project,
                 architectName,
@@ -94,24 +93,24 @@ export async function getTaskExecutionSchema(
             return;
           }
 
-          const builderOptions = await readBuilderSchema(
-            cliTaskProvider.getWorkspacePath(),
-            selection.architectDef.builder
+          const { validBuilder, options } = await verifyBuilderDefinition(
+            selection.projectName,
+            selection.command,
+            json
           );
-
-          if (!builderOptions) {
+          if (!validBuilder) {
             return;
           }
 
           return {
             ...readArchitectDef(
-              command,
               selection.command,
+              selection.architectDef,
               selection.projectName
             ),
             command: 'run',
             positional: `${selection.projectName}:${selection.command}`,
-            options: builderOptions,
+            options,
             cliName: workspaceType,
           };
         });
