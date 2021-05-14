@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.3.1](https://github.com/nrwl/nx-console/compare/v17.3.0...v17.3.1) (2021-05-14)
+
+
+### Features
+
+* load workspace defaults into Run executor form ([#1068](https://github.com/nrwl/nx-console/issues/1068)) ([3bb13fe](https://github.com/nrwl/nx-console/commits/3bb13fe299d39a4c4c4cdf698c3b0e9bd9732562))
+
+
+### Bug Fixes
+
+* add positional to taskDefinitions, fixes task already active ([#1071](https://github.com/nrwl/nx-console/issues/1071)) ([a1afd23](https://github.com/nrwl/nx-console/commits/a1afd23ef23c7bf6f40115661aa3d0800c639740))
+
 ## [17.3.0](https://github.com/nrwl/nx-console/compare/v17.2.0...v17.3.0) (2021-05-06)
 
 
