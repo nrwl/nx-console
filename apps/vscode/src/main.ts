@@ -4,6 +4,7 @@ import {
   commands,
   ExtensionContext,
   FileSystemWatcher,
+  languages,
   tasks,
   TreeView,
   Uri,
@@ -42,6 +43,7 @@ import {
   NxProjectTreeItem,
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
+import { WorkspaceCodeLensProvider } from '@nx-console/vscode/nx-workspace';
 import { environment } from './environments/environment';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
@@ -99,7 +101,7 @@ export function activate(c: ExtensionContext) {
     );
 
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
-      LOCATE_YOUR_WORKSPACE.command!.command,
+      LOCATE_YOUR_WORKSPACE.command?.command || '',
       async () => {
         return manuallySelectWorkspaceDefinition();
       }
@@ -111,10 +113,16 @@ export function activate(c: ExtensionContext) {
       scanForWorkspace(vscodeWorkspacePath);
     }
 
+    const codeLensProvider = languages.registerCodeLensProvider(
+      { pattern: '**/{workspace,angular}.json' },
+      new WorkspaceCodeLensProvider(cliTaskProvider)
+    );
+
     context.subscriptions.push(
       runTargetTreeView,
       revealWebViewPanelCommand,
-      manuallySelectWorkspaceDefinitionCommand
+      manuallySelectWorkspaceDefinitionCommand,
+      codeLensProvider
     );
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);

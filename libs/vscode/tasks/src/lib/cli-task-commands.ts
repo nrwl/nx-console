@@ -49,8 +49,10 @@ export function registerCliTaskCommands(
     );
   });
 
-  commands.registerCommand('nx.run', () =>
-    selectCliCommandAndPromptForFlags('run')
+  commands.registerCommand(
+    'nx.run',
+    (project?: string, target?: string, configuration?: string) =>
+      selectCliCommandAndPromptForFlags('run', project, target, configuration)
   );
   commands.registerCommand(`nx.run.fileexplorer`, (uri: Uri) =>
     selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
@@ -105,7 +107,12 @@ function selectCliCommandAndShowUi(
   );
 }
 
-async function selectCliCommandAndPromptForFlags(command: string, projectName?: string) {
+async function selectCliCommandAndPromptForFlags(
+  command: string,
+  projectName?: string,
+  target?: string,
+  configurationArg?: string
+) {
   const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
 
   if (!projectName) {
@@ -118,12 +125,17 @@ async function selectCliCommandAndPromptForFlags(command: string, projectName?: 
     projectName = selection.projectName;
   }
 
-  let target = command;
   const isRunCommand = command === 'run';
-  if (isRunCommand) {
-    target = (await selectCliTarget(Object.keys(json.projects[projectName].architect || {}))) as string;
-    if (!target) {
-      return;
+  if (!target) {
+    if (isRunCommand) {
+      target = (await selectCliTarget(
+        Object.keys(json.projects[projectName].architect || {})
+      )) as string;
+      if (!target) {
+        return;
+      }
+    } else {
+      target = command;
     }
   }
 
@@ -142,7 +154,7 @@ async function selectCliCommandAndPromptForFlags(command: string, projectName?: 
     return;
   }
 
-  if (configurations.length) {
+  if (!configurationArg && configurations.length) {
     const configurationsOption: Option = {
       name: 'configuration',
       description:
@@ -154,19 +166,20 @@ async function selectCliCommandAndPromptForFlags(command: string, projectName?: 
     options = [configurationsOption, ...options];
   }
 
-  const flags = await selectFlags(
-    isRunCommand
-      ? `${command} ${projectName}:${target}`
-      : `${command} ${projectName}`,
-    options,
-    workspaceType
-  );
+  let commandArgs = isRunCommand
+    ? `${command} ${projectName}:${target}`
+    : `${command} ${projectName}`;
+  if (configurationArg) {
+    commandArgs += configurationArg;
+  }
+  const flags = [
+    ...((await selectFlags(commandArgs, options, workspaceType)) || []),
+    ...((configurationArg && [configurationArg]) || []),
+  ];
 
   if (flags !== undefined) {
     cliTaskProvider.executeTask({
-      positional: isRunCommand
-        ? `${projectName}:${target}`
-        : projectName,
+      positional: isRunCommand ? `${projectName}:${target}` : projectName,
       command,
       flags,
     });
@@ -241,9 +254,7 @@ export function selectCliProject(command: string, json: any) {
   });
 }
 
-async function selectCliTarget(
-  targets: string[]
-): Promise<string | undefined> {
+async function selectCliTarget(targets: string[]): Promise<string | undefined> {
   return window.showQuickPick(targets, {
     placeHolder: 'Target to run',
   });
