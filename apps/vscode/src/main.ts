@@ -113,17 +113,20 @@ export function activate(c: ExtensionContext) {
       scanForWorkspace(vscodeWorkspacePath);
     }
 
-    const codeLensProvider = languages.registerCodeLensProvider(
-      { pattern: '**/{workspace,angular}.json' },
-      new WorkspaceCodeLensProvider(cliTaskProvider)
-    );
-
     context.subscriptions.push(
       runTargetTreeView,
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand,
-      codeLensProvider
     );
+
+    // TODO: only enable for Nx workspaces
+    if (GlobalConfigurationStore.instance.get('enableWorkspaceConfigCodeLens')) {
+      const codeLensProvider = languages.registerCodeLensProvider(
+        { pattern: '**/{workspace,angular}.json' },
+        new WorkspaceCodeLensProvider(cliTaskProvider)
+      );
+      context.subscriptions.push(codeLensProvider);
+    }
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {

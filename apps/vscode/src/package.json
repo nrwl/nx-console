@@ -493,6 +493,11 @@
           "type": "boolean",
           "default": true,
           "description": "Shows or hides Nx Generate ui option from the file explorer context menu."
+        },
+        "nxConsole.enableWorkspaceConfigCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shows or hides CodeLens for running targets from the Nx workspace config file."
         }
       }
     },

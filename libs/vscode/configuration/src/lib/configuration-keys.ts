@@ -2,6 +2,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'enableTelemetry',
   'useNVM',
   'enableGenerateFromContextMenu',
+  'enableWorkspaceConfigCodeLens',
 ] as const;
 
 /**
