@@ -2,7 +2,7 @@ import { CodeLens, CodeLensProvider, Command, Range } from 'vscode';
 import { CancellationToken, TextDocument } from 'vscode';
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { findWorkspaceJsonTargetAsync } from './find-workspace-json-target';
+import { getProjectLocations } from './find-workspace-json-target';
 
 export class ProjectCodeLens extends CodeLens {
   constructor(
@@ -20,40 +20,37 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
   async provideCodeLenses(document: TextDocument): Promise<CodeLens[]> {
     const lens: CodeLens[] = [];
 
-    for (const [
-      project,
-      projectDef,
-    ] of this.cliTaskProvider.getProjectEntries()) {
-      const architect = projectDef.architect || {};
-      for (const target in architect) {
-        const targetDef = architect[target];
-        const configurations = Object.keys(targetDef?.configurations || {});
-        const position = document.positionAt(
-          await findWorkspaceJsonTargetAsync(document, project, {
-            name: target,
-          })
-        );
+    const projectLocations = getProjectLocations(document);
+
+    for (const projectName in projectLocations) {
+      const project = projectLocations[projectName];
+      for (const target in project) {
+        const position = document.positionAt(project[target].position);
 
         lens.push(
-          new ProjectCodeLens(new Range(position, position), project, target)
+          new ProjectCodeLens(
+            new Range(position, position),
+            projectName,
+            target
+          )
         );
+        const configurations = project[target].configurations;
+        if (configurations) {
+          for (const configuration in configurations) {
+            const configTarget = configurations[configuration];
+            const configurationPosition = document.positionAt(
+              configTarget.position
+            );
 
-        // configurations
-        for (const configuration of configurations) {
-          const configurationPosition = document.positionAt(
-            await findWorkspaceJsonTargetAsync(document, project, {
-              name: target,
-              configuration,
-            })
-          );
-          lens.push(
-            new ProjectCodeLens(
-              new Range(configurationPosition, configurationPosition),
-              project,
-              target,
-              configuration
-            )
-          );
+            lens.push(
+              new ProjectCodeLens(
+                new Range(configurationPosition, configurationPosition),
+                projectName,
+                target,
+                configuration
+              )
+            );
+          }
         }
       }
     }
