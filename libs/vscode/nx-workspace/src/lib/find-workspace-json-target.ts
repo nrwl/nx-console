@@ -61,3 +61,9 @@ export function findWorkspaceJsonTarget(
 
   return scriptOffset;
 }
+
+export function findWorkspaceJsonTargetAsync( document: TextDocument,
+  project: string,
+  target?: { name: string; configuration?: string }) {
+  return Promise.resolve(findWorkspaceJsonTarget(document, project, target));
+}
