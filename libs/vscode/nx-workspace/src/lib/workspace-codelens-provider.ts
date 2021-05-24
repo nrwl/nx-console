@@ -1,7 +1,6 @@
 import { CodeLens, CodeLensProvider, Command, Range } from 'vscode';
 import { TextDocument } from 'vscode';
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import { verifyWorkspace } from '@nx-console/vscode/verify';
+import { verifyWorkspace } from './verify-workspace';
 import { getProjectLocations } from './find-workspace-json-target';
 // import { getConfigurationFlag } from '@nx-console/vscode-ui/feature-task-execution-form';
 

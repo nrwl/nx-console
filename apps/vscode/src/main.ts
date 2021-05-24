@@ -34,7 +34,7 @@ import {
   RunTargetTreeItem,
   RunTargetTreeProvider,
 } from '@nx-console/vscode/nx-run-target-view';
-import { verifyNodeModules, verifyWorkspace } from '@nx-console/vscode/verify';
+import { verifyNodeModules } from '@nx-console/vscode/verify';
 import {
   NxCommandsTreeItem,
   NxCommandsTreeProvider,
@@ -43,7 +43,7 @@ import {
   NxProjectTreeItem,
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
-import { WorkspaceCodeLensProvider } from '@nx-console/vscode/nx-workspace';
+import { verifyWorkspace, WorkspaceCodeLensProvider } from '@nx-console/vscode/nx-workspace';
 import { environment } from './environments/environment';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;

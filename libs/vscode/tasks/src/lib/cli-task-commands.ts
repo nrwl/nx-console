@@ -1,11 +1,8 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
 import { selectSchematic } from '@nx-console/server';
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import {
-  verifyWorkspace,
-  verifyBuilderDefinition,
-} from '@nx-console/vscode/verify';
+import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import {
   WorkspaceRouteTitle,
   RunTargetTreeItem,
