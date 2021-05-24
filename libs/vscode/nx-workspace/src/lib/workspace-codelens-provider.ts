@@ -2,7 +2,6 @@ import { CodeLens, CodeLensProvider, Command, Range } from 'vscode';
 import { TextDocument } from 'vscode';
 import { verifyWorkspace } from './verify-workspace';
 import { getProjectLocations } from './find-workspace-json-target';
-// import { getConfigurationFlag } from '@nx-console/vscode-ui/feature-task-execution-form';
 
 export class ProjectCodeLens extends CodeLens {
   constructor(

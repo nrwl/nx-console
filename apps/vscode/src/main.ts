@@ -284,24 +284,18 @@ function registerWorkspaceCodeLensProvider(context: ExtensionContext) {
 function watchWorkspaceCodeLensConfigChange(context: ExtensionContext) {
   context.subscriptions.push(
     workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
+      // if the `nxConsole` config changes, check enableWorkspaceConfigCodeLens and register or dispose
       if (
         event.affectsConfiguration(
           GlobalConfigurationStore.configurationSection
         )
       ) {
-        if (
-          GlobalConfigurationStore.instance.get(
-            'enableWorkspaceConfigCodeLens'
-          ) &&
-          !codeLensProvider
-        ) {
+        const enableWorkspaceConfigCodeLens = GlobalConfigurationStore.instance.get(
+          'enableWorkspaceConfigCodeLens'
+        );
+        if (enableWorkspaceConfigCodeLens && !codeLensProvider) {
           registerWorkspaceCodeLensProvider(context);
-        } else if (
-          !GlobalConfigurationStore.instance.get(
-            'enableWorkspaceConfigCodeLens'
-          ) &&
-          codeLensProvider
-        ) {
+        } else if (!enableWorkspaceConfigCodeLens && codeLensProvider) {
           codeLensProvider.dispose();
           codeLensProvider = null;
         }
