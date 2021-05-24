@@ -78,8 +78,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       const command: Command = {
         command: 'nx.run',
         title: lens.configuration
-          // TODO: --prod
-          ? `${lens.workspaceType} run ${lens.project}:${lens.target} -c ${lens.configuration}`
+          ? `${lens.workspaceType} run ${lens.project}:${lens.target}:${lens.configuration}`
           : `${lens.workspaceType} run ${lens.project}:${lens.target}`,
         arguments: [lens.project, lens.target, lens.configuration],
       };
