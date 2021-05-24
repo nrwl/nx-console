@@ -8,6 +8,7 @@ import {
 } from 'vscode';
 
 import { getTelemetry } from '@nx-console/server';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { verifyWorkspace, verifyNodeModules } from '@nx-console/vscode/verify';
 import { CliTask } from './cli-task';
 import {

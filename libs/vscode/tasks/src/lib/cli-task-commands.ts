@@ -1,6 +1,7 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
 import { selectSchematic } from '@nx-console/server';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {
   verifyWorkspace,
   verifyBuilderDefinition,
@@ -52,7 +53,8 @@ export function registerCliTaskCommands(
   commands.registerCommand(
     'nx.run',
     (project?: string, target?: string, configuration?: string) =>
-      selectCliCommandAndPromptForFlags('run', project, target, configuration)
+      // TODO: --prod
+      selectCliCommandAndPromptForFlags('run', project, target, [`-c ${configuration}`])
   );
   commands.registerCommand(`nx.run.fileexplorer`, (uri: Uri) =>
     selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
@@ -111,7 +113,7 @@ async function selectCliCommandAndPromptForFlags(
   command: string,
   projectName?: string,
   target?: string,
-  configurationArg?: string
+  flags?: string[]
 ) {
   const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
 
@@ -154,28 +156,23 @@ async function selectCliCommandAndPromptForFlags(
     return;
   }
 
-  if (!configurationArg && configurations.length) {
-    const configurationsOption: Option = {
-      name: 'configuration',
-      description:
-        'A named build target, as specified in the "configurations" section of angular.json.',
-      type: OptionType.String,
-      enum: configurations,
-      aliases: [],
-    };
-    options = [configurationsOption, ...options];
-  }
+  if (!flags) {
+    if (configurations.length) {
+      const configurationsOption: Option = {
+        name: 'configuration',
+        description:
+          'A named build target, as specified in the "configurations" section of angular.json.',
+        type: OptionType.String,
+        enum: configurations,
+        aliases: [],
+      };
+      options = [configurationsOption, ...options];
+    }
 
-  let commandArgs = isRunCommand
-    ? `${command} ${projectName}:${target}`
-    : `${command} ${projectName}`;
-  if (configurationArg) {
-    commandArgs += configurationArg;
+    flags = await selectFlags(isRunCommand
+        ? `${command} ${projectName}:${target}`
+        : `${command} ${projectName}`, options, workspaceType);
   }
-  const flags = [
-    ...((await selectFlags(commandArgs, options, workspaceType)) || []),
-    ...((configurationArg && [configurationArg]) || []),
-  ];
 
   if (flags !== undefined) {
     cliTaskProvider.executeTask({

@@ -1,12 +1,14 @@
 import { CodeLens, CodeLensProvider, Command, Range } from 'vscode';
-import { CancellationToken, TextDocument } from 'vscode';
+import { TextDocument } from 'vscode';
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { verifyWorkspace } from '@nx-console/vscode/verify';
 import { getProjectLocations } from './find-workspace-json-target';
+// import { getConfigurationFlag } from '@nx-console/vscode-ui/feature-task-execution-form';
 
 export class ProjectCodeLens extends CodeLens {
   constructor(
     range: Range,
+    public workspaceType: 'nx'|'ng',
     public project: string,
     public target: string,
     public configuration?: string
@@ -15,12 +17,20 @@ export class ProjectCodeLens extends CodeLens {
   }
 }
 export class WorkspaceCodeLensProvider implements CodeLensProvider {
-  constructor(private readonly cliTaskProvider: CliTaskProvider) {}
 
-  async provideCodeLenses(document: TextDocument): Promise<CodeLens[]> {
+  /**
+   * Provides a CodeLens set for a matched document
+   * @param document a document matched by the pattern passed to registerCodeLensProvider
+   * @returns ProjectCodeLens Range locations and properties for the document
+   */
+  provideCodeLenses(document: TextDocument): CodeLens[] | undefined {
     const lens: CodeLens[] = [];
 
     const projectLocations = getProjectLocations(document);
+    const { validWorkspaceJson, workspaceType } = verifyWorkspace();
+    if (!validWorkspaceJson) {
+      return;
+    }
 
     for (const projectName in projectLocations) {
       const project = projectLocations[projectName];
@@ -30,6 +40,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
         lens.push(
           new ProjectCodeLens(
             new Range(position, position),
+            workspaceType,
             projectName,
             target
           )
@@ -37,14 +48,14 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
         const configurations = project[target].configurations;
         if (configurations) {
           for (const configuration in configurations) {
-            const configTarget = configurations[configuration];
             const configurationPosition = document.positionAt(
-              configTarget.position
+              configurations[configuration].position
             );
 
             lens.push(
               new ProjectCodeLens(
                 new Range(configurationPosition, configurationPosition),
+                workspaceType,
                 projectName,
                 target,
                 configuration
@@ -57,20 +68,20 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     return lens;
   }
 
-  // TODO: https://code.visualstudio.com/api/references/vscode-api#CodeLensProvider.resolveCodeLens
-  // provideCodeLenses should return as fast as possible and if computing the commands is expensive
-  //  implementors should only return code lens objects with the range set and implement resolve.
+  /**
+   * Resolves and sets the command on visible CodeLens
+   * @param lens lens to be resolve
+   * @returns ProjectCodeLens with command
+   */
   // https://github.com/microsoft/vscode-extension-samples/blob/main/codelens-sample/src/CodelensProvider.ts
-  resolveCodeLens(
-    lens: CodeLens,
-    token: CancellationToken
-  ): CodeLens | Promise<CodeLens> | null {
+  resolveCodeLens(lens: CodeLens): CodeLens | Promise<CodeLens> | null {
     if (lens instanceof ProjectCodeLens) {
       const command: Command = {
         command: 'nx.run',
         title: lens.configuration
-          ? `nx run ${lens.project}:${lens.target} -c ${lens.configuration}`
-          : `nx run ${lens.project}:${lens.target}`,
+          // TODO: --prod
+          ? `${lens.workspaceType} run ${lens.project}:${lens.target} -c ${lens.configuration}`
+          : `${lens.workspaceType} run ${lens.project}:${lens.target}`,
         arguments: [lens.project, lens.target, lens.configuration],
       };
       lens.command = command;

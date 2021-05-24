@@ -4,6 +4,7 @@ import { window } from 'vscode';
 import { OptionType } from '@angular/cli/models/interface';
 import { dirname, join } from 'path';
 import { existsSync } from 'fs';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 

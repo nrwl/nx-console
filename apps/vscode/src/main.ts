@@ -119,11 +119,10 @@ export function activate(c: ExtensionContext) {
       manuallySelectWorkspaceDefinitionCommand,
     );
 
-    // TODO: only enable for Nx workspaces
     if (GlobalConfigurationStore.instance.get('enableWorkspaceConfigCodeLens')) {
       const codeLensProvider = languages.registerCodeLensProvider(
         { pattern: '**/{workspace,angular}.json' },
-        new WorkspaceCodeLensProvider(cliTaskProvider)
+        new WorkspaceCodeLensProvider()
       );
       context.subscriptions.push(codeLensProvider);
     }
