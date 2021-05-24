@@ -2,6 +2,8 @@ import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
   commands,
+  ConfigurationChangeEvent,
+  Disposable,
   ExtensionContext,
   FileSystemWatcher,
   languages,
@@ -43,7 +45,10 @@ import {
   NxProjectTreeItem,
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
-import { verifyWorkspace, WorkspaceCodeLensProvider } from '@nx-console/vscode/nx-workspace';
+import {
+  verifyWorkspace,
+  WorkspaceCodeLensProvider,
+} from '@nx-console/vscode/nx-workspace';
 import { environment } from './environments/environment';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
@@ -116,16 +121,11 @@ export function activate(c: ExtensionContext) {
     context.subscriptions.push(
       runTargetTreeView,
       revealWebViewPanelCommand,
-      manuallySelectWorkspaceDefinitionCommand,
+      manuallySelectWorkspaceDefinitionCommand
     );
 
-    if (GlobalConfigurationStore.instance.get('enableWorkspaceConfigCodeLens')) {
-      const codeLensProvider = languages.registerCodeLensProvider(
-        { pattern: '**/{workspace,angular}.json' },
-        new WorkspaceCodeLensProvider()
-      );
-      context.subscriptions.push(codeLensProvider);
-    }
+    registerWorkspaceCodeLensProvider(context);
+    watchWorkspaceCodeLensConfigChange(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
@@ -268,4 +268,44 @@ function registerWorkspaceFileWatcher(
   });
 
   context.subscriptions.push(workspaceFileWatcher);
+}
+
+let codeLensProvider: Disposable | null;
+function registerWorkspaceCodeLensProvider(context: ExtensionContext) {
+  if (GlobalConfigurationStore.instance.get('enableWorkspaceConfigCodeLens')) {
+    codeLensProvider = languages.registerCodeLensProvider(
+      { pattern: '**/{workspace,angular}.json' },
+      new WorkspaceCodeLensProvider()
+    );
+    context.subscriptions.push(codeLensProvider);
+  }
+}
+
+function watchWorkspaceCodeLensConfigChange(context: ExtensionContext) {
+  context.subscriptions.push(
+    workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
+      if (
+        event.affectsConfiguration(
+          GlobalConfigurationStore.configurationSection
+        )
+      ) {
+        if (
+          GlobalConfigurationStore.instance.get(
+            'enableWorkspaceConfigCodeLens'
+          ) &&
+          !codeLensProvider
+        ) {
+          registerWorkspaceCodeLensProvider(context);
+        } else if (
+          !GlobalConfigurationStore.instance.get(
+            'enableWorkspaceConfigCodeLens'
+          ) &&
+          codeLensProvider
+        ) {
+          codeLensProvider.dispose();
+          codeLensProvider = null;
+        }
+      }
+    })
+  );
 }
