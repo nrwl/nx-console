@@ -49,9 +49,16 @@ export function registerCliTaskCommands(
 
   commands.registerCommand(
     'nx.run',
-    (project?: string, target?: string, configuration?: string) =>
-      // TODO: --prod
-      selectCliCommandAndPromptForFlags('run', project, target, [`-c ${configuration}`])
+    (project?: string, target?: string, configuration?: string) => {
+      let flags;
+      if (configuration) {
+        flags = [`-c ${configuration}`];
+      } else if (project && target) {
+        // don't prompt for flags when project and target are already specified
+        flags = [];
+      }
+      selectCliCommandAndPromptForFlags('run', project, target, flags)
+    }
   );
   commands.registerCommand(`nx.run.fileexplorer`, (uri: Uri) =>
     selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
