@@ -47,40 +47,30 @@ export function registerCliTaskCommands(
     );
   });
 
-  commands.registerCommand(
-    'nx.run',
-    (project?: string, target?: string, configuration?: string) => {
-      let flags;
-      if (configuration) {
-        flags = [`-c ${configuration}`];
-      } else if (project && target) {
-        // don't prompt for flags when project and target are already specified
-        flags = [];
+  ['ng', 'nx'].forEach(cli => {
+    commands.registerCommand(
+      `${cli}.run`,
+      (project?: string, target?: string, configuration?: string) => {
+        selectCliCommandAndPromptForFlags('run', project, target, configuration)
       }
-      selectCliCommandAndPromptForFlags('run', project, target, flags)
-    }
-  );
-  commands.registerCommand(`nx.run.fileexplorer`, (uri: Uri) =>
-    selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
-  );
+    );
+    commands.registerCommand(`${cli}.run.fileexplorer`, (uri: Uri) =>
+      selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
+    );
 
-  commands.registerCommand(`ng.generate`, () =>
-    selectSchematicAndPromptForFlags()
-  );
+    commands.registerCommand(`${cli}.generate`, () =>
+      selectSchematicAndPromptForFlags()
+    );
 
-  commands.registerCommand(`ng.generate.ui`, () =>
-    selectCliCommandAndShowUi('generate', context.extensionPath)
-  );
-  commands.registerCommand(`nx.generate`, () =>
-    selectSchematicAndPromptForFlags()
-  );
+    commands.registerCommand(`${cli}.generate.ui`, () =>
+      selectCliCommandAndShowUi('generate', context.extensionPath)
+    );
 
-  commands.registerCommand(`nx.generate.ui`, () =>
-    selectCliCommandAndShowUi('generate', context.extensionPath)
-  );
-  commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) =>
-    selectCliCommandAndShowUi('generate', context.extensionPath, uri)
-  );
+    commands.registerCommand(`${cli}.generate.ui.fileexplorer`, (uri: Uri) =>
+      selectCliCommandAndShowUi('generate', context.extensionPath, uri)
+    );
+  })
+
 }
 
 function selectCliCommandAndShowUi(
@@ -117,8 +107,15 @@ async function selectCliCommandAndPromptForFlags(
   command: string,
   projectName?: string,
   target?: string,
-  flags?: string[]
+  configuration?: string
 ) {
+  let flags: string[] | undefined;
+  if (configuration) {
+    flags = [`--configuration=${configuration}`];
+  } else if (projectName && target) {
+    // don't prompt for flags when project and target are already specified
+    flags = [];
+  }
   const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
 
   if (!projectName) {

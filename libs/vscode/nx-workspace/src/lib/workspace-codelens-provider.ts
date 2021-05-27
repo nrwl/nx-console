@@ -100,7 +100,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
   resolveCodeLens(lens: CodeLens): CodeLens | Promise<CodeLens> | null {
     if (lens instanceof ProjectCodeLens) {
       const command: Command = {
-        command: 'nx.run',
+        command: `${lens.workspaceType}.run`,
         title: lens.configuration
           ? `${lens.workspaceType} run ${lens.project}:${lens.target}:${lens.configuration}`
           : `${lens.workspaceType} run ${lens.project}:${lens.target}`,
