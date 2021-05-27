@@ -124,8 +124,8 @@ export function activate(c: ExtensionContext) {
       manuallySelectWorkspaceDefinitionCommand
     );
 
-    registerWorkspaceCodeLensProvider(context);
-    watchWorkspaceCodeLensConfigChange(context);
+    // registers itself as a CodeLensProvider and watches config to dispose/re-register
+    new WorkspaceCodeLensProvider(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
@@ -268,38 +268,4 @@ function registerWorkspaceFileWatcher(
   });
 
   context.subscriptions.push(workspaceFileWatcher);
-}
-
-let codeLensProvider: Disposable | null;
-function registerWorkspaceCodeLensProvider(context: ExtensionContext) {
-  if (GlobalConfigurationStore.instance.get('enableWorkspaceConfigCodeLens')) {
-    codeLensProvider = languages.registerCodeLensProvider(
-      { pattern: '**/{workspace,angular}.json' },
-      new WorkspaceCodeLensProvider()
-    );
-    context.subscriptions.push(codeLensProvider);
-  }
-}
-
-function watchWorkspaceCodeLensConfigChange(context: ExtensionContext) {
-  context.subscriptions.push(
-    workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
-      // if the `nxConsole` config changes, check enableWorkspaceConfigCodeLens and register or dispose
-      if (
-        event.affectsConfiguration(
-          GlobalConfigurationStore.configurationSection
-        )
-      ) {
-        const enableWorkspaceConfigCodeLens = GlobalConfigurationStore.instance.get(
-          'enableWorkspaceConfigCodeLens'
-        );
-        if (enableWorkspaceConfigCodeLens && !codeLensProvider) {
-          registerWorkspaceCodeLensProvider(context);
-        } else if (!enableWorkspaceConfigCodeLens && codeLensProvider) {
-          codeLensProvider.dispose();
-          codeLensProvider = null;
-        }
-      }
-    })
-  );
 }

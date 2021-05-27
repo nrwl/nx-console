@@ -1,12 +1,23 @@
-import { CodeLens, CodeLensProvider, Command, Range } from 'vscode';
+import {
+  CodeLens,
+  CodeLensProvider,
+  Command,
+  ConfigurationChangeEvent,
+  Disposable,
+  ExtensionContext,
+  languages,
+  Range,
+  workspace,
+} from 'vscode';
 import { TextDocument } from 'vscode';
 import { verifyWorkspace } from './verify-workspace';
 import { getProjectLocations } from './find-workspace-json-target';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 
 export class ProjectCodeLens extends CodeLens {
   constructor(
     range: Range,
-    public workspaceType: 'nx'|'ng',
+    public workspaceType: 'nx' | 'ng',
     public project: string,
     public target: string,
     public configuration?: string
@@ -15,6 +26,20 @@ export class ProjectCodeLens extends CodeLens {
   }
 }
 export class WorkspaceCodeLensProvider implements CodeLensProvider {
+  /**
+   * CodeLensProvider is disposed and re-registered on setting changes
+   */
+  codeLensProvider: Disposable | null;
+
+  /**
+   * The WorkspaceCodeLensProvider adds clickable nx run targets in the workspace config file.
+   * It is enabled by default and can be disabled with the `enableWorkspaceConfigCodeLens` setting.
+   * @param context instance of ExtensionContext from activate
+   */
+  constructor(private readonly context: ExtensionContext) {
+    this.registerWorkspaceCodeLensProvider(context);
+    this.watchWorkspaceCodeLensConfigChange(context);
+  }
 
   /**
    * Provides a CodeLens set for a matched document
@@ -85,5 +110,48 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       return lens;
     }
     return null;
+  }
+
+  /**
+   * Checks the enableWorkspaceConfigCodeLens setting and registers this as a CodeLensProvider.
+   * @param context instance of ExtensionContext from activate
+   */
+  registerWorkspaceCodeLensProvider(context: ExtensionContext) {
+    const enableWorkspaceConfigCodeLens = GlobalConfigurationStore.instance.get(
+      'enableWorkspaceConfigCodeLens'
+    );
+    if (enableWorkspaceConfigCodeLens) {
+      this.codeLensProvider = languages.registerCodeLensProvider(
+        { pattern: '**/{workspace,angular}.json' },
+        this
+      );
+      context.subscriptions.push(this.codeLensProvider);
+    }
+  }
+
+  /**
+   * Watches for settings/configuration changes and enables/disables the CodeLensProvider
+   * @param context instance of ExtensionContext from activate
+   */
+  watchWorkspaceCodeLensConfigChange(context: ExtensionContext) {
+    context.subscriptions.push(
+      workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
+        // if the `nxConsole` config changes, check enableWorkspaceConfigCodeLens and register or dispose
+        const affectsNxConsoleConfig = event.affectsConfiguration(
+          GlobalConfigurationStore.configurationSection
+        );
+        if (affectsNxConsoleConfig) {
+          const enableWorkspaceConfigCodeLens = GlobalConfigurationStore.instance.get(
+            'enableWorkspaceConfigCodeLens'
+          );
+          if (enableWorkspaceConfigCodeLens && !this.codeLensProvider) {
+            this.registerWorkspaceCodeLensProvider(this.context);
+          } else if (!enableWorkspaceConfigCodeLens && this.codeLensProvider) {
+            this.codeLensProvider.dispose();
+            this.codeLensProvider = null;
+          }
+        }
+      })
+    );
   }
 }
