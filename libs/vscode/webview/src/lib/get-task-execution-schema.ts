@@ -5,10 +5,8 @@ import {
   readArchitectDef,
   selectSchematic,
 } from '@nx-console/server';
-import {
-  verifyBuilderDefinition,
-  verifyWorkspace,
-} from '@nx-console/vscode/verify';
+import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
 import { WorkspaceRouteTitle } from '@nx-console/vscode/nx-run-target-view';
 import {

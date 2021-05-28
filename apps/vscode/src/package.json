@@ -47,7 +47,17 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu || isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "ng.generate.ui.fileexplorer",
+          "group": "explorerContext"
+        },
+        {
+          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "ng.run.fileexplorer",
+          "group": "explorerContext"
+        },
+        {
+          "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.generate.ui.fileexplorer",
           "group": "explorerContext"
         },
@@ -83,6 +93,14 @@
       ],
       "commandPalette": [
         {
+          "command": "ng.generate.ui.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "ng.run.fileexplorer",
+          "when": "false"
+        },
+        {
           "command": "nx.generate.ui.fileexplorer",
           "when": "false"
         },
@@ -112,6 +130,10 @@
         },
         {
           "command": "ng.test",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.run",
           "when": "isAngularWorkspace"
         },
         {
@@ -302,6 +324,11 @@
       },
       {
         "category": "ng",
+        "title": "run",
+        "command": "ng.run"
+      },
+      {
+        "category": "ng",
         "title": "lint (ui)",
         "command": "ng.lint.ui"
       },
@@ -334,6 +361,16 @@
         "category": "ng",
         "title": "generate (ui)",
         "command": "ng.generate.ui"
+      },
+      {
+        "category": "ng",
+        "title": "ng generate (ui)",
+        "command": "ng.generate.ui.fileexplorer"
+      },
+      {
+        "category": "ng",
+        "title": "ng run",
+        "command": "ng.run.fileexplorer"
       },
       {
         "category": "Nx",
@@ -493,6 +530,11 @@
           "type": "boolean",
           "default": true,
           "description": "Shows or hides Nx Generate ui option from the file explorer context menu."
+        },
+        "nxConsole.enableWorkspaceConfigCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shows or hides CodeLens for running targets from the Nx workspace config file."
         }
       }
     },

@@ -1,10 +1,8 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
 import { selectSchematic } from '@nx-console/server';
-import {
-  verifyWorkspace,
-  verifyBuilderDefinition,
-} from '@nx-console/vscode/verify';
+import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import {
   WorkspaceRouteTitle,
   RunTargetTreeItem,
@@ -49,30 +47,30 @@ export function registerCliTaskCommands(
     );
   });
 
-  commands.registerCommand('nx.run', () =>
-    selectCliCommandAndPromptForFlags('run')
-  );
-  commands.registerCommand(`nx.run.fileexplorer`, (uri: Uri) =>
-    selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
-  );
+  ['ng', 'nx'].forEach(cli => {
+    commands.registerCommand(
+      `${cli}.run`,
+      (project?: string, target?: string, configuration?: string) => {
+        selectCliCommandAndPromptForFlags('run', project, target, configuration)
+      }
+    );
+    commands.registerCommand(`${cli}.run.fileexplorer`, (uri: Uri) =>
+      selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
+    );
 
-  commands.registerCommand(`ng.generate`, () =>
-    selectSchematicAndPromptForFlags()
-  );
+    commands.registerCommand(`${cli}.generate`, () =>
+      selectSchematicAndPromptForFlags()
+    );
 
-  commands.registerCommand(`ng.generate.ui`, () =>
-    selectCliCommandAndShowUi('generate', context.extensionPath)
-  );
-  commands.registerCommand(`nx.generate`, () =>
-    selectSchematicAndPromptForFlags()
-  );
+    commands.registerCommand(`${cli}.generate.ui`, () =>
+      selectCliCommandAndShowUi('generate', context.extensionPath)
+    );
 
-  commands.registerCommand(`nx.generate.ui`, () =>
-    selectCliCommandAndShowUi('generate', context.extensionPath)
-  );
-  commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) =>
-    selectCliCommandAndShowUi('generate', context.extensionPath, uri)
-  );
+    commands.registerCommand(`${cli}.generate.ui.fileexplorer`, (uri: Uri) =>
+      selectCliCommandAndShowUi('generate', context.extensionPath, uri)
+    );
+  })
+
 }
 
 function selectCliCommandAndShowUi(
@@ -105,7 +103,19 @@ function selectCliCommandAndShowUi(
   );
 }
 
-async function selectCliCommandAndPromptForFlags(command: string, projectName?: string) {
+async function selectCliCommandAndPromptForFlags(
+  command: string,
+  projectName?: string,
+  target?: string,
+  configuration?: string
+) {
+  let flags: string[] | undefined;
+  if (configuration) {
+    flags = [`--configuration=${configuration}`];
+  } else if (projectName && target) {
+    // don't prompt for flags when project and target are already specified
+    flags = [];
+  }
   const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
 
   if (!projectName) {
@@ -118,12 +128,17 @@ async function selectCliCommandAndPromptForFlags(command: string, projectName?: 
     projectName = selection.projectName;
   }
 
-  let target = command;
   const isRunCommand = command === 'run';
-  if (isRunCommand) {
-    target = (await selectCliTarget(Object.keys(json.projects[projectName].architect || {}))) as string;
-    if (!target) {
-      return;
+  if (!target) {
+    if (isRunCommand) {
+      target = (await selectCliTarget(
+        Object.keys(json.projects[projectName].architect || {})
+      )) as string;
+      if (!target) {
+        return;
+      }
+    } else {
+      target = command;
     }
   }
 
@@ -142,31 +157,27 @@ async function selectCliCommandAndPromptForFlags(command: string, projectName?: 
     return;
   }
 
-  if (configurations.length) {
-    const configurationsOption: Option = {
-      name: 'configuration',
-      description:
-        'A named build target, as specified in the "configurations" section of angular.json.',
-      type: OptionType.String,
-      enum: configurations,
-      aliases: [],
-    };
-    options = [configurationsOption, ...options];
-  }
+  if (!flags) {
+    if (configurations.length) {
+      const configurationsOption: Option = {
+        name: 'configuration',
+        description:
+          'A named build target, as specified in the "configurations" section of angular.json.',
+        type: OptionType.String,
+        enum: configurations,
+        aliases: [],
+      };
+      options = [configurationsOption, ...options];
+    }
 
-  const flags = await selectFlags(
-    isRunCommand
-      ? `${command} ${projectName}:${target}`
-      : `${command} ${projectName}`,
-    options,
-    workspaceType
-  );
+    flags = await selectFlags(isRunCommand
+        ? `${command} ${projectName}:${target}`
+        : `${command} ${projectName}`, options, workspaceType);
+  }
 
   if (flags !== undefined) {
     cliTaskProvider.executeTask({
-      positional: isRunCommand
-        ? `${projectName}:${target}`
-        : projectName,
+      positional: isRunCommand ? `${projectName}:${target}` : projectName,
       command,
       flags,
     });
@@ -241,9 +252,7 @@ export function selectCliProject(command: string, json: any) {
   });
 }
 
-async function selectCliTarget(
-  targets: string[]
-): Promise<string | undefined> {
+async function selectCliTarget(targets: string[]): Promise<string | undefined> {
   return window.showQuickPick(targets, {
     placeHolder: 'Target to run',
   });

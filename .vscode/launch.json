@@ -6,15 +6,25 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
+      ],
+      "name": "Launch Extension",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "request": "launch",
+      "type": "pwa-extensionHost"
+    },
+    {
       "name": "Run Extension In Dev Mode",
-      "type": "extensionHost",
+      "type": "pwa-extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
-      "trace": "false",
+      "trace": false,
       "internalConsoleOptions": "openOnFirstSessionStart",
       "outFiles": [
         "${workspaceFolder}/dist/apps/vscode",

@@ -2,8 +2,11 @@ import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
   commands,
+  ConfigurationChangeEvent,
+  Disposable,
   ExtensionContext,
   FileSystemWatcher,
+  languages,
   tasks,
   TreeView,
   Uri,
@@ -33,7 +36,7 @@ import {
   RunTargetTreeItem,
   RunTargetTreeProvider,
 } from '@nx-console/vscode/nx-run-target-view';
-import { verifyNodeModules, verifyWorkspace } from '@nx-console/vscode/verify';
+import { verifyNodeModules } from '@nx-console/vscode/verify';
 import {
   NxCommandsTreeItem,
   NxCommandsTreeProvider,
@@ -42,6 +45,10 @@ import {
   NxProjectTreeItem,
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
+import {
+  verifyWorkspace,
+  WorkspaceCodeLensProvider,
+} from '@nx-console/vscode/nx-workspace';
 import { environment } from './environments/environment';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
@@ -99,7 +106,7 @@ export function activate(c: ExtensionContext) {
     );
 
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
-      LOCATE_YOUR_WORKSPACE.command!.command,
+      LOCATE_YOUR_WORKSPACE.command?.command || '',
       async () => {
         return manuallySelectWorkspaceDefinition();
       }
@@ -116,6 +123,9 @@ export function activate(c: ExtensionContext) {
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand
     );
+
+    // registers itself as a CodeLensProvider and watches config to dispose/re-register
+    new WorkspaceCodeLensProvider(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
