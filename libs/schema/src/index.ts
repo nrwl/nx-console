@@ -56,7 +56,7 @@ export interface Schematic {
   collection: string;
   name: string;
   description: string;
-  options: Option[];
+  options?: Option[];
 }
 
 export interface DefaultValue {

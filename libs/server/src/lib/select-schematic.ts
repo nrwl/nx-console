@@ -1,17 +1,24 @@
 import { Schematic } from '@nx-console/schema';
+import { TaskExecutionSchema } from '@nx-console/schema';
 import { QuickPickItem, window } from 'vscode';
-import { readAllSchematicCollections } from './utils/read-schematic-collections';
+import {
+  readAllSchematicCollections,
+  readSchematicOptions,
+} from './utils/read-schematic-collections';
 
-export async function selectSchematic(workspaceJsonPath: string) {
+export async function selectSchematic(
+  workspaceJsonPath: string
+): Promise<TaskExecutionSchema | undefined> {
   interface GenerateQuickPickItem extends QuickPickItem {
     collectionName: string;
     schematic: Schematic;
   }
 
   const schematics = (await readAllSchematicCollections(workspaceJsonPath))
+    .filter((c) => c && c.schematics.length)
     .map((c): GenerateQuickPickItem[] =>
       c.schematics.map(
-        (s): GenerateQuickPickItem => ({
+        (s: Schematic): GenerateQuickPickItem => ({
           description: s.description,
           label: `${c.name} - ${s.name}`,
           collectionName: c.name,
@@ -21,14 +28,24 @@ export async function selectSchematic(workspaceJsonPath: string) {
     )
     .flat();
 
-  return window.showQuickPick(schematics).then((selection) => {
+  if (schematics) {
+    const selection = await window.showQuickPick(schematics);
     if (selection) {
-      const schematic = `${selection.schematic.collection}:${selection.schematic.name}`;
+      const options =
+        selection.schematic.options ||
+        (await readSchematicOptions(
+          workspaceJsonPath,
+          selection.collectionName,
+          selection.schematic.name
+        ));
+      const positional = `${selection.collectionName}:${selection.schematic.name}`;
       return {
         ...selection.schematic,
+        options,
         command: 'generate',
-        positional: schematic,
+        positional,
+        cliName: 'nx',
       };
     }
-  });
+  }
 }
