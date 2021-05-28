@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.4.1](https://github.com/nrwl/nx-console/compare/v17.4.0...v17.4.1) (2021-05-28)
+
+
+### Bug Fixes
+
+* don't show ng menus for nx workspaces ([#1076](https://github.com/nrwl/nx-console/issues/1076)) ([152fc20](https://github.com/nrwl/nx-console/commits/152fc20430444c6d65a4e1ce6fc3e465d582aaa4))
+
 ## [17.4.0](https://github.com/nrwl/nx-console/compare/v17.3.1...v17.4.0) (2021-05-28)
 
 
