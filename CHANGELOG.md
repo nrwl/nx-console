@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.4.0](https://github.com/nrwl/nx-console/compare/v17.3.1...v17.4.0) (2021-05-28)
+
+
+### Features
+
+* workspace codelens ([#1075](https://github.com/nrwl/nx-console/issues/1075)) ([3e18e99](https://github.com/nrwl/nx-console/commits/3e18e994f489708e86c4dacd8a618322390da728))
+
+
+### Bug Fixes
+
+* only reads and normalizes selected schematic options ([#1074](https://github.com/nrwl/nx-console/issues/1074)) ([d2c4bd4](https://github.com/nrwl/nx-console/commits/d2c4bd42d290d934920c445cac6481abd28e09fc))
+
 ### [17.3.1](https://github.com/nrwl/nx-console/compare/v17.3.0...v17.3.1) (2021-05-14)
 
 
