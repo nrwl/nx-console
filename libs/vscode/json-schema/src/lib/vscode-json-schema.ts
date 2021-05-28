@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { Worker } from 'worker_threads';
 
 export function vscodeJsonSchema(context: vscode.ExtensionContext) {
   // return new Promise((resolve, reject) => {
@@ -13,31 +12,63 @@ export function vscodeJsonSchema(context: vscode.ExtensionContext) {
 
   const contents = `
   {
-    "title": "JSON schema for JSHint configuration files",
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "https://json.schemastore.org/jshintrc",
+    "title": "JSON schema for Nx workspaces",
+    "id": "https://nx.dev",
     "type": "object",
     "properties": {
-      "bitwise": {
-        "description": "Prohibit the use of bitwise operators (&, |, ^, etc.)",
-        "type": "boolean",
-        "default": false
+      "version": {
+        "type": "number",
+        "enum": [1, 2]
       },
-      "curly": {
-        "description": "Requires you to always put curly braces around blocks in loops and conditionals",
-        "type": "boolean",
-        "default": false
-      },
-      "eqeqeq": {
-        "description": "Prohibits the use of",
-        "type": "boolean",
-        "default": false
-      },
-      "esversion": {
-        "description": "The ECMAScript version to which the code must adhere",
-        "type": "integer",
-        "default": 5,
-        "enum": [3, 5, 6, 7, 8, 9]
+      "projects": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "architect": {
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "builder": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": { "builder": { "const": "@nrwl/node:build" } }
+                    },
+                    "then": {
+                      "properties": { 
+                        "options": {
+                          "$ref": "/Users/jon/Dev/nx-console/node_modules/@nrwl/node/src/executors/build/schema.json"
+                        }
+                      }
+                    }
+                  }, 
+                  {
+                    "if": {
+                      "properties": { "builder": { "const": "@nrwl/temp" } }
+                    },
+                    "then": {
+                      "properties": { 
+                        "options": { 
+                           "properties": {
+                              "port": {"type":"number"},
+                              "additionalProperties": false
+                           }
+                        }
+                      }
+                    } 
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     }
   }`;
