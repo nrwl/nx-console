@@ -47,12 +47,12 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "ng.generate.ui.fileexplorer",
           "group": "explorerContext"
         },
         {
-          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "ng.run.fileexplorer",
           "group": "explorerContext"
         },
