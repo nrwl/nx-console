@@ -36,6 +36,7 @@ function readExecutorCollectionsFromNodeModules(
         join(p, 'package.json'),
         nodeModulesDir
       ).json;
+      // TODO: to add support for schematics, we can change this to include schematics/generators
       return !!(packageJson.builders || packageJson.executors);
     } catch (e) {
       if (
