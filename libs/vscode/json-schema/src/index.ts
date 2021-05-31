@@ -1,1 +1,1 @@
-export * from './lib/vscode-json-schema';
+export * from './lib/workspace-json-schema';

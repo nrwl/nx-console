@@ -207,7 +207,8 @@ export async function readSchematicOptions(
     nodeModulesDir
   );
   const collectionJson = readAndCacheJsonFile(
-    collectionPackageJson.json.schematics || collectionPackageJson.json.generators,
+    collectionPackageJson.json.schematics ||
+      collectionPackageJson.json.generators,
     dirname(collectionPackageJson.path)
   );
   const schematicSchema = readAndCacheJsonFile(

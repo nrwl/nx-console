@@ -13,5 +13,6 @@ export {
   readAndCacheJsonFile,
   clearJsonCache,
   toLegacyWorkspaceFormat,
+  listOfUnnestedNpmPackages,
 } from './lib/utils/utils';
 export { watchFile } from './lib/utils/watch-file';

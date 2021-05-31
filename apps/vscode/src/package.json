@@ -642,7 +642,11 @@
     },
     "jsonValidation": [
       {
-        "fileMatch": "test.json",
+        "fileMatch": "workspace.json",
+        "url": "./workspace-schema.json"
+      },
+      {
+        "fileMatch": "angular.json",
         "url": "./workspace-schema.json"
       }
     ]
