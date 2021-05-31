@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { readAndCacheJsonFile } from '@nx-console/server';
+import { clearJsonCache, readAndCacheJsonFile } from '@nx-console/server';
 import { dirname, join } from 'path';
 
 export interface ExecutorInfo {
@@ -7,15 +7,27 @@ export interface ExecutorInfo {
   path: string;
 }
 
-export function getAllExecutors(workspaceJsonPath: string): ExecutorInfo[] {
-  return readExecutorCollectionsFromNodeModules(workspaceJsonPath);
+export function getAllExecutors(
+  workspaceJsonPath: string,
+  clearPackageJsonCache: boolean
+): ExecutorInfo[] {
+  return readExecutorCollectionsFromNodeModules(
+    workspaceJsonPath,
+    clearPackageJsonCache
+  );
 }
 
 function readExecutorCollectionsFromNodeModules(
-  workspaceJsonPath: string
+  workspaceJsonPath: string,
+  clearPackageJsonCache: boolean
 ): ExecutorInfo[] {
   const basedir = join(workspaceJsonPath, '..');
   const nodeModulesDir = join(basedir, 'node_modules');
+
+  if (clearPackageJsonCache) {
+    clearJsonCache('package.json', basedir);
+  }
+
   const packages: { [packageName: string]: string } =
     readAndCacheJsonFile('package.json', basedir).json.devDependencies || {};
   const executorCollections = Object.keys(packages).filter((p) => {

@@ -24,7 +24,7 @@ export class WorkspaceJsonSchema {
     FILE_WATCHER = watchFile(
       join(dirname(workspacePath), 'package.json'),
       () => {
-        this.setupSchema(workspacePath, context.extensionUri);
+        this.setupSchema(workspacePath, context.extensionUri, true);
       }
     );
     context.subscriptions.push(FILE_WATCHER);
@@ -32,11 +32,14 @@ export class WorkspaceJsonSchema {
     this.setupSchema(workspacePath, context.extensionUri);
   }
 
-  setupSchema(workspacePath: string, extensionUri: vscode.Uri) {
+  setupSchema(
+    workspacePath: string,
+    extensionUri: vscode.Uri,
+    clearPackageJsonCache = false
+  ) {
     const filePath = vscode.Uri.joinPath(extensionUri, 'workspace-schema.json');
-    const collections = getAllExecutors(workspacePath);
+    const collections = getAllExecutors(workspacePath, clearPackageJsonCache);
     const contents = getWorkspaceJsonSchema(collections);
-
     vscode.workspace.fs.writeFile(
       filePath,
       new Uint8Array(Buffer.from(contents, 'utf8'))
