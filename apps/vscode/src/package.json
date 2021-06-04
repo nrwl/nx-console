@@ -639,6 +639,16 @@
           "when": "isNxWorkspace || isAngularWorkspace"
         }
       ]
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "workspace.json",
+        "url": "./workspace-schema.json"
+      },
+      {
+        "fileMatch": "angular.json",
+        "url": "./workspace-schema.json"
+      }
+    ]
   }
 }

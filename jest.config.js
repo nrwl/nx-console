@@ -13,5 +13,6 @@ module.exports = {
     '<rootDir>/libs/vscode/nx-run-target-view',
     '<rootDir>/libs/vscode/nx-commands-view',
     '<rootDir>/libs/vscode/webview',
+    '<rootDir>/libs/vscode/json-schema',
   ],
 };
