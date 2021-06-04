@@ -68,6 +68,12 @@ function createBuildersAndExecutorsSchema(
     "properties": { 
       "options": {
         "$ref": "${collection.path}"
+      }, 
+      "configurations": {
+        "additionalProperties": {
+          "$ref": "${collection.path}",
+          "required": []
+        }
       }
     }
   }
@@ -88,6 +94,12 @@ function createBuildersAndExecutorsSchema(
     "properties": { 
       "options": {
         "$ref": "${collection.path}"
+      },
+      "configurations": {
+        "additionalProperties": {
+          "$ref": "${collection.path}",
+          "required": []
+        }
       }
     }
   }
@@ -133,6 +145,11 @@ function createJsonSchema(builders: string, executors: string) {
                         },
                         "options": {
                           "type": "object"
+                        },
+                        "configurations": {
+                          "additionalProperties": {
+                            "type": "object"
+                          }
                         }
                       },
                       "allOf": [
@@ -167,6 +184,11 @@ function createJsonSchema(builders: string, executors: string) {
                         },
                         "options": {
                           "type": "object"
+                        },
+                        "configurations": {
+                          "additionalProperties": {
+                            "type": "object"
+                          }
                         }
                       },
                       "allOf": [
