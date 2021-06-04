@@ -130,6 +130,7 @@ function createJsonSchema(builders: string, executors: string) {
           "required": ["version"]
         },
         "then": {
+          "description": "Read more about this workspace file at https://nx.dev/latest/angular/getting-started/configuration",
           "properties": { 
             "projects": {
               "type": "object",
@@ -137,16 +138,19 @@ function createJsonSchema(builders: string, executors: string) {
                 "type": "object",
                 "properties": {
                   "architect": {
+                    "description": "Configures all the targets which define what tasks you can run against the project",
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
                         "builder": {
+                          "description": "The function that Nx will invoke when you run this architect",
                           "type": "string"
                         },
                         "options": {
                           "type": "object"
                         },
                         "configurations": {
+                          "description": "provides extra sets of values that will be merged into the options map",
                           "additionalProperties": {
                             "type": "object"
                           }
@@ -169,6 +173,7 @@ function createJsonSchema(builders: string, executors: string) {
           "required": ["version"]
         },
         "then": {
+          "description": "Read more about this workspace file at https://nx.dev/latest/react/getting-started/configuration",
           "properties": { 
             "projects": {
               "type": "object",
@@ -176,16 +181,19 @@ function createJsonSchema(builders: string, executors: string) {
                 "type": "object",
                 "properties": {
                   "targets": {
+                    "description": "Configures all the targets which define what tasks you can run against the project",
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
                         "executor": {
+                          "description": "The function that Nx will invoke when you run this target",
                           "type": "string"
                         },
                         "options": {
                           "type": "object"
                         },
                         "configurations": {
+                          "description": "provides extra sets of values that will be merged into the options map",
                           "additionalProperties": {
                             "type": "object"
                           }
