@@ -11,7 +11,11 @@
         "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
       ],
       "name": "Launch Extension",
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": [
+        "${workspaceFolder}/dist/apps/vscode",
+        "${workspaceFolder}/dist/apps/vscode/assets/public",
+        "${workspaceFolder}/node_modules"
+      ],
       "request": "launch",
       "type": "pwa-extensionHost"
     },
