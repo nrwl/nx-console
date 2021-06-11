@@ -211,8 +211,9 @@ export async function readSchematicOptions(
       collectionPackageJson.json.generators,
     dirname(collectionPackageJson.path)
   );
+  const schematics =  collectionJson.json.schematics || collectionJson.json.generators;
   const schematicSchema = readAndCacheJsonFile(
-    collectionJson.json.schematics[schematicName].schema,
+    schematics[schematicName].schema,
     dirname(collectionJson.path)
   );
   const workspaceDefaults = readWorkspaceJsonDefaults(workspaceJsonPath);
