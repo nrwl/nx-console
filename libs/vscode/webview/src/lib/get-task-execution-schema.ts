@@ -2,6 +2,7 @@ import { TaskExecutionSchema } from '@nx-console/schema';
 import {
   getOutputChannel,
   getTelemetry,
+  readAndCacheJsonFile,
   readArchitectDef,
   selectSchematic,
 } from '@nx-console/server';
@@ -140,6 +141,7 @@ export async function getTaskExecutionSchema(
 
             const contextValues = contextMenuUri
               ? getConfigValuesFromContextMenuUri(
+                  schematic,
                   contextMenuUri,
                   cliTaskProvider
                 )
@@ -170,21 +172,37 @@ export async function getTaskExecutionSchema(
 
 // Get information about where the user clicked if invoked through right click in the explorer context menu
 function getConfigValuesFromContextMenuUri(
+  schematic: TaskExecutionSchema,
   contextMenuUri: Uri | undefined,
   cliTaskProvider: CliTaskProvider
-): { path: string; directory: string; project?: string } | undefined {
+): { path: string; directory: string; project?: string, projectName?: string } | undefined {
   if (contextMenuUri) {
     const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
-    const path = contextMenuUri.fsPath
-      .replace(cliTaskProvider.getWorkspacePath(), '')
+
+    const workspacePath = cliTaskProvider.getWorkspacePath();
+    let path = contextMenuUri.fsPath
+      .replace(workspacePath, '')
       .replace(/\\/g, '/')
       .replace(/^\//, '');
+
+    const nxConfig = readAndCacheJsonFile('nx.json', workspacePath);
+    const appsDir = nxConfig.json.workspaceLayout?.appsDir ?? 'apps';
+    const libsDir = nxConfig.json.workspaceLayout?.libsDir ?? 'libs';
+    if (appsDir && schematic.name === 'application' || schematic.name === 'app') {
+      path = path.replace(appsDir, '')
+        .replace(/^\//, '');
+    }
+    if (libsDir && schematic.name === 'library' || schematic.name === 'lib') {
+      path = path.replace(libsDir, '')
+        .replace(/^\//, '');
+    }
 
     return {
       path,
       directory: path,
       project: projectName,
+      projectName,
     };
   }
 }
