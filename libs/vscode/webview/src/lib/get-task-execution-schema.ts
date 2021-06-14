@@ -1,4 +1,4 @@
-import { TaskExecutionSchema } from '@nx-console/schema';
+import { Option, TaskExecutionSchema } from '@nx-console/schema';
 import {
   getOutputChannel,
   getTelemetry,
@@ -121,18 +121,15 @@ export async function getTaskExecutionSchema(
               return;
             }
 
-            schematic.options.forEach((s) => {
+            schematic.options.forEach((option) => {
               // TODO: mixup between items and enum has been a source for recent bugs,
               //  util.ts normalizeSchema sets items from enum.
-              if (s.enum) {
+              if (option.enum) {
                 return;
               }
 
-              if (
-                s.name === 'project' ||
-                (s.$default && s.$default.$source === 'projectName')
-              ) {
-                s.enum = s.items = cliTaskProvider
+              if (isProjectOption(option)) {
+                option.enum = option.items = cliTaskProvider
                   .getProjectEntries()
                   .map((entry) => entry[0])
                   .sort();
@@ -175,7 +172,7 @@ function getConfigValuesFromContextMenuUri(
   schematic: TaskExecutionSchema,
   contextMenuUri: Uri | undefined,
   cliTaskProvider: CliTaskProvider
-): { path: string; directory: string; project?: string, projectName?: string } | undefined {
+): { path?: string; directory?: string; project?: string, projectName?: string } | undefined {
   if (contextMenuUri) {
     const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
@@ -198,11 +195,23 @@ function getConfigValuesFromContextMenuUri(
         .replace(/^\//, '');
     }
 
-    return {
-      path,
-      directory: path,
-      project: projectName,
-      projectName,
-    };
+    if (projectName && schematic.options.some(isProjectOption)) {
+      return {
+        project: projectName,
+        projectName,
+      }
+    } else {
+      return {
+        path,
+        directory: path,
+      };
+    }
   }
+}
+
+function isProjectOption(option: Option) {
+  return (
+    option.name === 'project' || option.name === 'projectName' ||
+    (option.$default && option.$default.$source === 'projectName')
+  );
 }
