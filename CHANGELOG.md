@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.5.0](https://github.com/nrwl/nx-console/compare/v17.4.1...v17.5.0) (2021-06-14)
+
+
+### Features
+
+* add json schema support for configurations, and also provide descriptions ([#1078](https://github.com/nrwl/nx-console/issues/1078)) ([e9e1d15](https://github.com/nrwl/nx-console/commits/e9e1d15f6773e811d1de3ef0e6036cd68f2faf1b))
+* provide json schema for workspace.json ([#1077](https://github.com/nrwl/nx-console/issues/1077)) ([ae35ec5](https://github.com/nrwl/nx-console/commits/ae35ec5dd85a38ce44de2797911dffe7806e2a3b))
+
+
+### Bug Fixes
+
+* nx generator schemas form ([#1081](https://github.com/nrwl/nx-console/issues/1081)) ([c43f9cc](https://github.com/nrwl/nx-console/commits/c43f9cc0fbfacb43a6fe170aa9faaedd88dbf046))
+* strip appsDir and libsDir from path if app|application or lib|library ([#1082](https://github.com/nrwl/nx-console/issues/1082)) ([7db8b08](https://github.com/nrwl/nx-console/commits/7db8b084e2842cd39b17e393066cb0377c0944d9))
+
 ### [17.4.1](https://github.com/nrwl/nx-console/compare/v17.4.0...v17.4.1) (2021-05-28)
 
 
