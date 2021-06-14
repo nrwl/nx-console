@@ -1,7 +1,8 @@
-import { TaskExecutionSchema } from '@nx-console/schema';
+import { Option, TaskExecutionSchema } from '@nx-console/schema';
 import {
   getOutputChannel,
   getTelemetry,
+  readAndCacheJsonFile,
   readArchitectDef,
   selectSchematic,
 } from '@nx-console/server';
@@ -120,18 +121,15 @@ export async function getTaskExecutionSchema(
               return;
             }
 
-            schematic.options.forEach((s) => {
+            schematic.options.forEach((option) => {
               // TODO: mixup between items and enum has been a source for recent bugs,
               //  util.ts normalizeSchema sets items from enum.
-              if (s.enum) {
+              if (option.enum) {
                 return;
               }
 
-              if (
-                s.name === 'project' ||
-                (s.$default && s.$default.$source === 'projectName')
-              ) {
-                s.enum = s.items = cliTaskProvider
+              if (isProjectOption(option)) {
+                option.enum = option.items = cliTaskProvider
                   .getProjectEntries()
                   .map((entry) => entry[0])
                   .sort();
@@ -140,6 +138,7 @@ export async function getTaskExecutionSchema(
 
             const contextValues = contextMenuUri
               ? getConfigValuesFromContextMenuUri(
+                  schematic,
                   contextMenuUri,
                   cliTaskProvider
                 )
@@ -170,21 +169,49 @@ export async function getTaskExecutionSchema(
 
 // Get information about where the user clicked if invoked through right click in the explorer context menu
 function getConfigValuesFromContextMenuUri(
+  schematic: TaskExecutionSchema,
   contextMenuUri: Uri | undefined,
   cliTaskProvider: CliTaskProvider
-): { path: string; directory: string; project?: string } | undefined {
+): { path?: string; directory?: string; project?: string, projectName?: string } | undefined {
   if (contextMenuUri) {
     const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
-    const path = contextMenuUri.fsPath
-      .replace(cliTaskProvider.getWorkspacePath(), '')
+
+    const workspacePath = cliTaskProvider.getWorkspacePath();
+    let path = contextMenuUri.fsPath
+      .replace(workspacePath, '')
       .replace(/\\/g, '/')
       .replace(/^\//, '');
 
-    return {
-      path,
-      directory: path,
-      project: projectName,
-    };
+    const nxConfig = readAndCacheJsonFile('nx.json', workspacePath);
+    const appsDir = nxConfig.json.workspaceLayout?.appsDir ?? 'apps';
+    const libsDir = nxConfig.json.workspaceLayout?.libsDir ?? 'libs';
+    if (appsDir && schematic.name === 'application' || schematic.name === 'app') {
+      path = path.replace(appsDir, '')
+        .replace(/^\//, '');
+    }
+    if (libsDir && schematic.name === 'library' || schematic.name === 'lib') {
+      path = path.replace(libsDir, '')
+        .replace(/^\//, '');
+    }
+
+    if (projectName && schematic.options.some(isProjectOption)) {
+      return {
+        project: projectName,
+        projectName,
+      }
+    } else {
+      return {
+        path,
+        directory: path,
+      };
+    }
   }
+}
+
+function isProjectOption(option: Option) {
+  return (
+    option.name === 'project' || option.name === 'projectName' ||
+    (option.$default && option.$default.$source === 'projectName')
+  );
 }
