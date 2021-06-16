@@ -91,7 +91,7 @@ function getBuilderPaths(
   )) {
     builders.push({
       name: `${collectionName}:${key}`,
-      path: join(baseDir, value.schema),
+      path: join(baseDir, value.schema).replace(/\\/g, '/'),
     });
   }
 
