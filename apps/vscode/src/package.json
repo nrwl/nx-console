@@ -37,12 +37,9 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "workspaceContains:**/workspace.json",
+    "workspaceContains:**/angular.json"
   ],
-  "dependencies": {
-    "jsonc-parser": "^2.1.1",
-    "json5": "2.1.1"
-  },
   "contributes": {
     "menus": {
       "explorer/context": [
