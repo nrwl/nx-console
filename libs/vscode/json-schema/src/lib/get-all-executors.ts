@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { clearJsonCache, readAndCacheJsonFile } from '@nx-console/server';
 import { dirname, join } from 'path';
+import { platform } from 'os';
 
 export interface ExecutorInfo {
   name: string;
@@ -89,9 +90,16 @@ function getBuilderPaths(
   for (const [key, value] of Object.entries<any>(
     json.builders || json.executors
   )) {
+    let path = '';
+    if (platform() === 'win32') {
+      path = `file:///${join(baseDir, value.schema).replace(/\\/g, '/')}`
+    } else {
+      path = join(baseDir, value.schema);
+    }
+
     builders.push({
       name: `${collectionName}:${key}`,
-      path: join(baseDir, value.schema),
+      path,
     });
   }
 
