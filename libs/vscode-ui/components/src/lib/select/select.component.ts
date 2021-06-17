@@ -5,7 +5,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { ControlContainer, FormControl, FormGroup } from '@angular/forms';
+import { ControlContainer, FormGroup } from '@angular/forms';
 import { Option } from '@nx-console/schema';
 
 @Component({

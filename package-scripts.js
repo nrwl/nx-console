@@ -28,20 +28,20 @@ module.exports = {
       },
       vscode: {
         build: nps.series.nps('prepare.vscode.server', 'prepare.vscode.client'),
-        server: 'ng build vscode-app --prod --noSourceMap',
-        client: 'ng build vscode-ui --prod',
+        server: 'nx build vscode-app --prod --noSourceMap',
+        client: 'nx build vscode-ui --prod',
       },
       ci: {
         vscode: nps.concurrent({
-          server: 'ng build vscode-app --noSourceMap',
+          server: 'nx build vscode-app --noSourceMap',
           client:
-            'ng build nx-console --configuration=vscode --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false',
+            'nx build nx-console --configuration=vscode --noSourceMap --optimization=false --noCommonChunk --aot=false --buildOptimizer=false',
         }),
       },
       dev: {
         vscode: nps.concurrent({
-          server: 'ng build vscode-app --watch',
-          client: 'ng build vscode-ui --watch',
+          server: 'nx build vscode-app --watch',
+          client: 'nx build vscode-ui --watch',
         }),
       },
     },
@@ -62,10 +62,10 @@ module.exports = {
       check: 'nx format:check --base=upstream/master',
     },
     storybook: {
-      default: 'ng run vscode-ui-feature-task-execution-form:storybook',
+      default: 'nx run vscode-ui-feature-task-execution-form:storybook',
     },
     ['storybook-e2e']: {
-      default: 'ng run vscode-ui-feature-task-execution-form-e2e:e2e',
+      default: 'nx run vscode-ui-feature-task-execution-form-e2e:e2e',
     },
     test: {
       default: 'nx affected:test --all --parallel',
