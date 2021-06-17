@@ -13,7 +13,11 @@ import {
   ItemsWithEnum,
 } from '@nx-console/schema';
 import { Option as CliOption } from '@angular/cli/models/interface';
-import * as stripJsonComments from 'strip-json-comments';
+import {
+  parse as parseJson,
+  printParseErrorCode,
+  ParseError,
+} from 'jsonc-parser';
 
 export interface SchematicDefaults {
   [name: string]: string;
@@ -108,11 +112,11 @@ export function listFiles(dirName: string): string[] {
         } else if (statSync(child).isDirectory()) {
           res.push(...listFiles(child));
         }
-      } catch (e) {
+      } catch {
         // noop
       }
     });
-  } catch (e) {
+  } catch {
     // noop
   }
   return res;
@@ -121,7 +125,7 @@ export function listFiles(dirName: string): string[] {
 export function directoryExists(filePath: string): boolean {
   try {
     return statSync(filePath).isDirectory();
-  } catch (err) {
+  } catch {
     return false;
   }
 }
@@ -129,13 +133,28 @@ export function directoryExists(filePath: string): boolean {
 export function fileExistsSync(filePath: string): boolean {
   try {
     return statSync(filePath).isFile();
-  } catch (err) {
+  } catch {
     return false;
   }
 }
 
-function readAndParseJson(fullFilePath: string): any {
-  return JSON.parse(stripJsonComments(readFileSync(fullFilePath).toString()));
+function readAndParseJson(filePath: string) {
+  const content = readFileSync(filePath, 'utf-8');
+  try {
+    return JSON.parse(content);
+  } catch {
+    const errors: ParseError[] = [];
+    const result = parseJson(content, errors);
+
+    if (errors.length > 0) {
+      const { error, offset } = errors[0];
+      throw new Error(
+        `${printParseErrorCode(error)} in JSON at position ${offset}`
+      );
+    }
+
+    return result;
+  }
 }
 
 export function clearJsonCache(filePath: string, basedir = '') {
@@ -150,8 +169,7 @@ export function readAndCacheJsonFile(
   const fullFilePath = path.join(basedir, filePath);
 
   if (fileContents[fullFilePath] || existsSync(fullFilePath)) {
-    fileContents[fullFilePath] =
-      fileContents[fullFilePath] || readAndParseJson(fullFilePath);
+    fileContents[fullFilePath] ||= readAndParseJson(fullFilePath);
 
     return {
       path: fullFilePath,

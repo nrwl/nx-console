@@ -40,8 +40,7 @@
     "*"
   ],
   "dependencies": {
-    "jsonc-parser": "^2.1.1",
-    "json5": "2.1.1"
+    "jsonc-parser": "^3.0.0"
   },
   "contributes": {
     "menus": {
