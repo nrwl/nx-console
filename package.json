@@ -94,7 +94,6 @@
     "universal-analytics": "0.4.20",
     "vsce": "^1.69.0",
     "vscode-codicons": "^0.0.16",
-    "zlib": "^1.0.5",
     "zone.js": "0.10.3"
   }
 }
