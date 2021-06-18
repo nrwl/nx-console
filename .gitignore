@@ -52,5 +52,5 @@ apps/intellij/build/*
 apps/intellij/.gradle/*
 apps/intellij/.idea/*
 
-
-
+# Nx
+migrations.json
