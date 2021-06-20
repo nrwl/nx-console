@@ -3,7 +3,8 @@
     "angular.json": "*",
     "package.json": "*",
     "tsconfig.base.json": "*",
-    ".eslintrc.json": "*"
+    ".eslintrc.json": "*",
+    ".stylelintrc.json": "*"
   },
   "affected": { "defaultBase": "master" },
   "npmScope": "nx-console",
@@ -16,7 +17,8 @@
           "lint",
           "test",
           "e2e",
-          "build-storybook"
+          "build-storybook",
+          "stylelint"
         ],
         "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
         "canTrackAnalytics": false,

@@ -8,27 +8,27 @@ nx-console-checkbox {
   }
 
   .bool-control {
-    align-items: flex-start;
     display: flex;
-    cursor: pointer;
+    align-items: flex-start;
     margin-top: 0.2rem;
+    cursor: pointer;
   }
 
   $checkbox-size: 1rem;
 
   .checkbox {
-    background-color: var(--vscode-settings-checkboxBackground, #eee);
-    background-size: $checkbox-size !important;
+    width: $checkbox-size;
+    min-width: $checkbox-size;
+    height: $checkbox-size;
+    min-height: $checkbox-size;
+    padding: 0;
     border: solid $input-border-width
       var(--vscode-settings-checkboxBorder, #000);
+    margin: 0 0.5rem 0.2rem 0;
+    background-color: var(--vscode-settings-checkboxBackground, #eee);
+    background-size: $checkbox-size !important;
     border-radius: $input-border-radius-size;
     color: var(--vscode-settings-checkboxForeground);
-    height: $checkbox-size;
-    width: $checkbox-size;
-    min-height: $checkbox-size;
-    min-width: $checkbox-size;
-    margin: 0 0.5rem 0.2rem 0;
-    padding: 0;
 
     &.checked {
       // black check

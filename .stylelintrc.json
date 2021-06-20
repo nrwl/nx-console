@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-idiomatic-order",
+    "stylelint-config-prettier"
+  ],
+  "ignoreFiles": ["node_modules/**", "dist/**"],
+  "rules": {
+    "order/properties-alphabetical-order": null,
+    "no-descending-specificity": null
+  }
+}

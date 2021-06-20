@@ -13,9 +13,9 @@ $offset-with-configurations: $offset-without-configurations +
   $configurations-offset;
 
 :host {
-  height: 100vh;
-  overflow: hidden;
   display: block;
+  overflow: hidden;
+  height: 100vh;
   box-sizing: border-box;
   padding-top: $host-padding-top;
   padding-left: $host-padding-left;
@@ -24,13 +24,13 @@ $offset-with-configurations: $offset-without-configurations +
 .run-button {
   width: 80px;
   height: 30px;
-  background: $button-primary-color;
   border: $input-border-width solid var(--vscode-settings-textInputBorder);
-  color: #fff;
-  text-align: center;
-  cursor: pointer;
-  transition: background ease-in-out 0.1s;
   margin-left: 1rem;
+  background: $button-primary-color;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  transition: background ease-in-out 0.1s;
 
   &:hover {
     opacity: 0.8;
@@ -39,9 +39,9 @@ $offset-with-configurations: $offset-without-configurations +
 
 .scroll-container,
 vscode-ui-field-tree {
+  max-height: calc(100vh - #{$offset-without-configurations});
   box-sizing: border-box;
   padding-top: $host-padding-top / 2;
-  max-height: calc(100vh - #{$offset-without-configurations});
 
   .has-configurations & {
     max-height: calc(100vh - #{$offset-with-configurations});
@@ -49,11 +49,11 @@ vscode-ui-field-tree {
 }
 
 vscode-ui-field-tree {
-  overflow: hidden;
   position: fixed;
-  bottom: 0;
   z-index: 1;
   top: #{$offset-without-configurations};
+  bottom: 0;
+  overflow: hidden;
 
   &:hover {
     overflow: auto;
@@ -65,19 +65,19 @@ vscode-ui-field-tree {
 }
 
 form {
-  margin-left: 190px;
   padding-right: $host-padding-right - $scrollbar-width;
+  margin-left: 190px;
 }
 
 .scroll-container {
-  overflow-y: scroll;
   overflow-x: visible;
+  overflow-y: scroll;
 }
 
 .form-header,
 .form-container {
-  box-sizing: border-box;
   max-width: 980px;
+  box-sizing: border-box;
   margin: auto;
 }
 
@@ -91,26 +91,26 @@ nx-console-argument-list {
 }
 
 .filter-container {
-  border-width: 1px;
-  border-style: solid;
-  background-color: var(--vscode-settings-textInputBackground, #eee);
-  border-color: var(--vscode-settings-textInputBorder);
-  border-radius: $input-border-radius-size;
   height: 30px;
   box-sizing: border-box;
   padding: 0.3rem 0.5rem;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--vscode-settings-textInputBorder);
+  background-color: var(--vscode-settings-textInputBackground, #eee);
+  border-radius: $input-border-radius-size;
 
   input {
     width: 100%;
-    line-height: 30px;
     height: 20px;
-    margin: none;
     box-sizing: border-box;
-    color: var(--vscode-settings-textInputForeground);
-    background: transparent;
     border: none !important;
-    outline: none !important;
+    margin: none;
+    background: transparent;
+    color: var(--vscode-settings-textInputForeground);
     font-size: 13px;
+    line-height: 30px;
+    outline: none !important;
   }
 }
 
@@ -131,8 +131,8 @@ nx-console-field {
 }
 
 .form-header-container {
-  margin-left: $host-padding-left * -1;
   padding-left: $host-padding-left;
+  margin-left: $host-padding-left * -1;
   transition: box-shadow ease-in-out 0.1s;
 
   &.scrolled {
@@ -149,17 +149,17 @@ nx-console-field {
 
 .title-container {
   .title {
-    font-weight: 500;
     font-size: 20px;
+    font-weight: 500;
     line-height: 21px;
   }
 
   button {
-    background-color: $button-secondary-color;
-    color: $secondary-text-color;
     padding: 2px 2px 1px 2px;
     border: none;
     margin-left: 0.5em;
+    background-color: $button-secondary-color;
+    color: $secondary-text-color;
 
     &:hover,
     &:focus {
@@ -184,13 +184,13 @@ nx-console-field {
 }
 
 .configurations-container {
-  margin-top: 24px;
   height: $configurations-offset - 24px;
+  margin-top: 24px;
 
   .configuration {
     margin-right: 24px;
-    user-select: none;
     cursor: pointer;
+    user-select: none;
 
     &.selected {
       border-bottom: 2px solid $primary-text-color;

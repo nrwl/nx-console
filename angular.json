@@ -115,6 +115,16 @@
             "passWithNoTests": true
           },
           "outputs": ["coverage/apps/vscode-ui"]
+        },
+        "stylelint": {
+          "builder": "nx-stylelint:lint",
+          "options": {
+            "config": "apps/vscode-ui/.stylelintrc.json",
+            "lintFilePatterns": [
+              "apps/vscode-ui/**/*.css",
+              "apps/vscode-ui/**/*.scss"
+            ]
+          }
         }
       }
     },
@@ -275,6 +285,16 @@
             }
           },
           "outputs": ["{options.outputPath}"]
+        },
+        "stylelint": {
+          "builder": "nx-stylelint:lint",
+          "options": {
+            "config": "libs/vscode-ui/feature-task-execution-form/.stylelintrc.json",
+            "lintFilePatterns": [
+              "libs/vscode-ui/feature-task-execution-form/**/*.css",
+              "libs/vscode-ui/feature-task-execution-form/**/*.scss"
+            ]
+          }
         }
       },
       "schematics": {}
@@ -301,6 +321,16 @@
             "jestConfig": "libs/vscode-ui/argument-list/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "stylelint": {
+          "builder": "nx-stylelint:lint",
+          "options": {
+            "config": "libs/vscode-ui/argument-list/.stylelintrc.json",
+            "lintFilePatterns": [
+              "libs/vscode-ui/argument-list/**/*.css",
+              "libs/vscode-ui/argument-list/**/*.scss"
+            ]
+          }
         }
       }
     },
@@ -325,6 +355,16 @@
             "passWithNoTests": true
           },
           "outputs": ["coverage/libs/vscode-ui/components"]
+        },
+        "stylelint": {
+          "builder": "nx-stylelint:lint",
+          "options": {
+            "config": "libs/vscode-ui/components/.stylelintrc.json",
+            "lintFilePatterns": [
+              "libs/vscode-ui/components/**/*.css",
+              "libs/vscode-ui/components/**/*.scss"
+            ]
+          }
         }
       }
     },
@@ -332,7 +372,18 @@
       "projectType": "library",
       "root": "libs/vscode-ui/styles",
       "sourceRoot": "libs/vscode-ui/styles/src",
-      "architect": {},
+      "architect": {
+        "stylelint": {
+          "builder": "nx-stylelint:lint",
+          "options": {
+            "config": "libs/vscode-ui/styles/.stylelintrc.json",
+            "lintFilePatterns": [
+              "libs/vscode-ui/styles/**/*.css",
+              "libs/vscode-ui/styles/**/*.scss"
+            ]
+          }
+        }
+      },
       "schematics": {}
     },
     "vscode-ui-feature-task-execution-form-e2e": {
