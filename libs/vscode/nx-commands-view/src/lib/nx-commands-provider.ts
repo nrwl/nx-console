@@ -7,6 +7,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     super();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getParent(_: NxCommandsTreeItem) {
     return null;
   }

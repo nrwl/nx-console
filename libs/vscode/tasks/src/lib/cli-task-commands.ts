@@ -12,6 +12,8 @@ import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
+import { WorkspaceJson } from './cli-task-definition';
+
 const CLI_COMMAND_LIST = [
   'build',
   'deploy',
@@ -47,11 +49,16 @@ export function registerCliTaskCommands(
     );
   });
 
-  ['ng', 'nx'].forEach(cli => {
+  ['ng', 'nx'].forEach((cli) => {
     commands.registerCommand(
       `${cli}.run`,
       (project?: string, target?: string, configuration?: string) => {
-        selectCliCommandAndPromptForFlags('run', project, target, configuration)
+        selectCliCommandAndPromptForFlags(
+          'run',
+          project,
+          target,
+          configuration
+        );
       }
     );
     commands.registerCommand(`${cli}.run.fileexplorer`, (uri: Uri) =>
@@ -69,8 +76,7 @@ export function registerCliTaskCommands(
     commands.registerCommand(`${cli}.generate.ui.fileexplorer`, (uri: Uri) =>
       selectCliCommandAndShowUi('generate', context.extensionPath, uri)
     );
-  })
-
+  });
 }
 
 function selectCliCommandAndShowUi(
@@ -170,9 +176,13 @@ async function selectCliCommandAndPromptForFlags(
       options = [configurationsOption, ...options];
     }
 
-    flags = await selectFlags(isRunCommand
+    flags = await selectFlags(
+      isRunCommand
         ? `${command} ${projectName}:${target}`
-        : `${command} ${projectName}`, options, workspaceType);
+        : `${command} ${projectName}`,
+      options,
+      workspaceType
+    );
   }
 
   if (flags !== undefined) {
@@ -220,10 +230,10 @@ export function getCliProjectFromUri(uri: Uri): string | undefined {
   return project?.name;
 }
 
-export function selectCliProject(command: string, json: any) {
+export function selectCliProject(command: string, json: WorkspaceJson) {
   const items = cliTaskProvider
     .getProjectEntries(json)
-    .filter(([_, { architect }]) => Boolean(architect))
+    .filter(([, { architect }]) => Boolean(architect))
     .flatMap(([project, { architect }]) => ({ project, architect }))
     .filter(
       ({ architect }) =>

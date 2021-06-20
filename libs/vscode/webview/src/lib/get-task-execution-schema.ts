@@ -66,7 +66,7 @@ export async function getTaskExecutionSchema(
       case 'Run': {
         const runnableItems = cliTaskProvider
           .getProjectEntries()
-          .filter(([_, { architect }]) => Boolean(architect))
+          .filter(([, { architect }]) => Boolean(architect))
           .flatMap(([project, { architect }]) => ({ project, architect }))
           .flatMap(({ project, architect }) => [
             ...Object.entries(architect || {}).map(
@@ -172,7 +172,14 @@ function getConfigValuesFromContextMenuUri(
   schematic: TaskExecutionSchema,
   contextMenuUri: Uri | undefined,
   cliTaskProvider: CliTaskProvider
-): { path?: string; directory?: string; project?: string, projectName?: string } | undefined {
+):
+  | {
+      path?: string;
+      directory?: string;
+      project?: string;
+      projectName?: string;
+    }
+  | undefined {
   if (contextMenuUri) {
     const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
@@ -186,20 +193,21 @@ function getConfigValuesFromContextMenuUri(
     const nxConfig = readAndCacheJsonFile('nx.json', workspacePath);
     const appsDir = nxConfig.json.workspaceLayout?.appsDir ?? 'apps';
     const libsDir = nxConfig.json.workspaceLayout?.libsDir ?? 'libs';
-    if (appsDir && schematic.name === 'application' || schematic.name === 'app') {
-      path = path.replace(appsDir, '')
-        .replace(/^\//, '');
+    if (
+      (appsDir && schematic.name === 'application') ||
+      schematic.name === 'app'
+    ) {
+      path = path.replace(appsDir, '').replace(/^\//, '');
     }
-    if (libsDir && schematic.name === 'library' || schematic.name === 'lib') {
-      path = path.replace(libsDir, '')
-        .replace(/^\//, '');
+    if ((libsDir && schematic.name === 'library') || schematic.name === 'lib') {
+      path = path.replace(libsDir, '').replace(/^\//, '');
     }
 
     if (projectName && schematic.options.some(isProjectOption)) {
       return {
         project: projectName,
         projectName,
-      }
+      };
     } else {
       return {
         path,
@@ -211,7 +219,8 @@ function getConfigValuesFromContextMenuUri(
 
 function isProjectOption(option: Option) {
   return (
-    option.name === 'project' || option.name === 'projectName' ||
+    option.name === 'project' ||
+    option.name === 'projectName' ||
     (option.$default && option.$default.$source === 'projectName')
   );
 }
