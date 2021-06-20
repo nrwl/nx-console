@@ -60,7 +60,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   get control(): FormControl {
-    return this.parentFormGroup?.get(this.field?.name) as FormControl
+    return this.parentFormGroup?.get(this.field?.name) as FormControl;
   }
 
   get value(): string {
@@ -113,7 +113,9 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
       return false;
     }
 
-    return !!this.control.errors && (this.control.touched || this.control.dirty);
+    return (
+      !!this.control.errors && (this.control.touched || this.control.dirty)
+    );
   }
 
   getErrors(fieldName: string): string[] {
@@ -121,7 +123,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
       return [];
     }
 
-    return Object.keys(this.control.errors as any)
+    return Object.keys(this.control.errors ?? {})
       .map((key) => {
         if (this.control.errors) {
           if (key === 'required') {
@@ -141,7 +143,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     if (this.field.type === OptionType.Boolean) {
       return OptionComponent.Checkbox;
     } else if (items) {
-      if (this.field.type === OptionType.Array ) {
+      if (this.field.type === OptionType.Array) {
         return OptionComponent.MultiSelect;
       } else if (items.length > 10) {
         return OptionComponent.Autocomplete;

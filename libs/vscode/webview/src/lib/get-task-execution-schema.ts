@@ -66,7 +66,7 @@ export async function getTaskExecutionSchema(
       case 'Run': {
         const runnableItems = cliTaskProvider
           .getProjectEntries()
-          .filter(([_, { architect }]) => Boolean(architect))
+          .filter(([, { architect }]) => Boolean(architect))
           .flatMap(([project, { architect }]) => ({ project, architect }))
           .flatMap(({ project, architect }) => [
             ...Object.entries(architect || {}).map(

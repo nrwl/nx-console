@@ -65,7 +65,7 @@ async function promptForTarget(): Promise<string | undefined> {
   const validTargets = Array.from(
     new Set(
       Object.entries<ProjectDef>(json.projects)
-        .map(([_, project]) => Object.keys(project.architect || {}))
+        .map(([, project]) => Object.keys(project.architect || {}))
         .flat()
     )
   ).sort();
@@ -349,9 +349,7 @@ function validProjectsForTarget(target: string): string[] | undefined {
   return Array.from(
     new Set(
       Object.entries<ProjectDef>(json.projects)
-        .filter(
-          ([_, project]) => project.architect && project.architect[target]
-        )
+        .filter(([, project]) => project.architect && project.architect[target])
         .map(([project]) => project)
     )
   ).sort();

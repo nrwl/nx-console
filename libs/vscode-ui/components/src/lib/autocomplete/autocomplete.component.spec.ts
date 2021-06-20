@@ -117,12 +117,12 @@ describe('AutocompleteComponent', () => {
         .pipe(
           withLatestFrom(parent.autocompleteComponent.control.valueChanges),
           filter(
-            ([_, autocompleteValue]) =>
+            ([, autocompleteValue]) =>
               autocompleteValue && autocompleteValue === enteredValue
           ),
           take(1)
         )
-        .subscribe(([visibleOptions, _]) => {
+        .subscribe(([visibleOptions]) => {
           receivedVisibleOptions = visibleOptions;
         });
     });
@@ -145,10 +145,7 @@ describe('AutocompleteComponent', () => {
       expect(
         fixture.debugElement.query(By.css('.autocomplete-panel'))
       ).toBeDefined();
-      expect(
-        fixture.debugElement.queryAll(By.css('.option'))
-          .length
-      ).toEqual(
+      expect(fixture.debugElement.queryAll(By.css('.option')).length).toEqual(
         receivedVisibleOptions?.filter((opt) => opt.indexOf(enteredValue) > -1)
           .length
       );
@@ -171,7 +168,7 @@ describe('AutocompleteComponent', () => {
     ])
       .pipe(
         // check items on autocomplete value entered
-        filter(([value, _]) => value === enteredValue)
+        filter(([value]) => value === enteredValue)
       )
       .subscribe(([value, index]) => {
         receivedIndex = index;

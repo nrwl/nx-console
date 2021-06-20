@@ -2,11 +2,8 @@ import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
   commands,
-  ConfigurationChangeEvent,
-  Disposable,
   ExtensionContext,
   FileSystemWatcher,
-  languages,
   RelativePattern,
   tasks,
   TreeView,
