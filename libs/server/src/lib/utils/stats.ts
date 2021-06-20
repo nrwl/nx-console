@@ -1,6 +1,5 @@
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { ls } from 'shelljs';
 import { gzipSync } from 'zlib';
 
 import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
@@ -35,7 +34,7 @@ class FileNameNormalizer {
 
   constructor(cwd: string) {
     this.cwdPrefixRegexp = new RegExp(
-      `^[\/]*(${cwd.toLowerCase().replace(/^\//, '')})?[\/]*(.*)`
+      `^[/]*(${cwd.toLowerCase().replace(/^\//, '')})?[/]*(.*)`
     );
   }
 
@@ -195,18 +194,25 @@ function createSizeData(): SizeData {
 
 const EXCLUDED_FILES_REGEXP = /^(stats\.json|.*\.map)$/;
 
-function getAssets(p: string, earliestTimeStamp: number) {
-  const files = ls('-lR', p).filter((f: any) => {
-    if (!f.isFile() || EXCLUDED_FILES_REGEXP.test(f.name)) {
-      return false;
-    }
+function getFiles(path: string) {
+  const entries = readdirSync(path, { withFileTypes: true });
+  const files = entries
+    .filter((file) => !file.isDirectory())
+    .map((f) => ({ file: f, path: join(path, f.name) }));
 
-    return true;
-  });
+  for (const folder of entries.filter((folder) => folder.isDirectory()))
+    files.push(...getFiles(join(path, folder.name)));
 
-  return files
-    .filter((f: any) => f.mtimeMs >= earliestTimeStamp)
-    .map((f: any) => f.name);
+  return files;
+}
+
+function getAssets(path: string, earliestTimeStamp: number) {
+  return getFiles(path)
+    .filter((f) => !EXCLUDED_FILES_REGEXP.test(f.file.name))
+    .filter((f) => {
+      statSync(f.path).mtimeMs >= earliestTimeStamp;
+    })
+    .map((f) => f.file.name);
 }
 
 function parseSizeFromBuildOutput(s: string) {
