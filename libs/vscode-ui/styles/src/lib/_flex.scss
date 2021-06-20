@@ -2,8 +2,8 @@
 .fx-row-wrap,
 .fx-row-reverse,
 .fx-column {
-  box-sizing: border-box;
   display: flex;
+  box-sizing: border-box;
 }
 
 .fx-row,
@@ -25,60 +25,60 @@
 }
 
 .fx-align-start-center {
-  place-content: center flex-start;
   align-items: center;
+  place-content: center flex-start;
 }
 
 .fx-align-center-start {
-  place-content: flex-start center;
   align-items: flex-start;
+  place-content: flex-start center;
 }
 
 .fx-align-center-center {
-  place-content: center;
   align-items: center;
+  place-content: center;
 }
 
 .fx-align-space-between {
-  place-content: stretch space-between;
   align-items: stretch;
+  place-content: stretch space-between;
 }
 
 .fx-align-space-between-center {
-  place-content: center space-between;
   align-items: center;
+  place-content: center space-between;
 }
 
 .fx-align-space-around-center {
-  place-content: center space-around;
   align-items: center;
+  place-content: center space-around;
 }
 
 .fx-align-left-top {
-  place-content: stretch flex-start;
   align-items: stretch;
+  place-content: stretch flex-start;
 }
 
 .fx-align-end-center {
-  place-content: center flex-end;
   align-items: center;
+  place-content: center flex-end;
 }
 
 .fx-align-option-start {
-  place-content: flex-start;
-  align-items: flex-start;
-  flex-direction: row;
-  box-sizing: border-box;
   display: flex;
+  box-sizing: border-box;
+  flex-direction: row;
+  align-items: flex-start;
+  place-content: flex-start;
 }
 
 .fx-flex {
-  flex: 1 1 0;
   box-sizing: border-box;
+  flex: 1 1 0;
 }
 
 .fx-flex-100 {
+  max-width: 100%;
   box-sizing: border-box;
   flex: 1 1 100%;
-  max-width: 100%;
 }

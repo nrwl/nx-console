@@ -7,14 +7,14 @@
 
 .tree-item {
   overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 22px;
   height: 22px;
-  font-size: 14px;
-  opacity: 0.9;
   flex-shrink: 1;
-  font-weight: 300;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 22px;
+  opacity: 0.9;
+  text-overflow: ellipsis;
   user-select: none;
 
   &:hover {
@@ -23,9 +23,9 @@
 
   &:active,
   &.active {
-    opacity: 1;
-    font-weight: bold;
     color: $primary-text-color;
+    font-weight: bold;
+    opacity: 1;
   }
 
   &.indented {

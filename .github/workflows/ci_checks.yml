@@ -35,6 +35,8 @@ jobs:
 
       - name: Lint
         run: yarn nx run-many --all --parallel --target=lint
+      - name: Stylelint
+        run: yarn nx run-many --all --parallel --target=stylelint
       - name: Test
         run: yarn nx run-many --all --parallel --target=test
       - name: Build

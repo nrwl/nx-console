@@ -1,19 +1,19 @@
 @import 'variables';
 
 :host {
-  display: block;
   position: relative;
+  display: block;
   margin-bottom: 1rem;
   white-space: normal;
 
   .field-title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     display: inline-block;
+    overflow: hidden;
     font-weight: 600;
-    user-select: text;
     line-height: 1.4rem;
+    text-overflow: ellipsis;
+    user-select: text;
+    white-space: nowrap;
   }
 
   .deprecated-warning {
@@ -21,8 +21,8 @@
   }
 
   .setting-item-value {
-    margin-top: 9px;
     display: flex;
+    margin-top: 9px;
   }
 
   .validation-error {

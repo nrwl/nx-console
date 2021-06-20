@@ -7,16 +7,16 @@
 }
 
 input {
-  background-color: var(--vscode-input-background, #eee);
-  border-color: var(--vscode-input-foreground);
-  border-style: solid;
-  border-width: $input-border-width;
-  color: var(--vscode-input-foreground);
+  width: $input-width;
   box-sizing: border-box;
-  font: inherit;
   padding: 0.3rem 0.5rem;
   padding-bottom: 0.35rem;
-  width: $input-width;
+  border-width: $input-border-width;
+  border-style: solid;
+  border-color: var(--vscode-input-foreground);
+  background-color: var(--vscode-input-background, #eee);
+  color: var(--vscode-input-foreground);
+  font: inherit;
 }
 
 input.ng-invalid.ng-dirty,

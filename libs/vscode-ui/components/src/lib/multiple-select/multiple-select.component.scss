@@ -7,14 +7,14 @@
 }
 
 select {
-  background-color: var(--vscode-settings-dropdownBackground, #eee);
-  border-color: var(--vscode-settings-dropdownBorder);
-  border-radius: $input-border-radius-size;
+  width: $input-width;
+  height: auto;
   box-sizing: border-box;
+  border-color: var(--vscode-settings-dropdownBorder);
+  background-color: var(--vscode-settings-dropdownBackground, #eee);
+  border-radius: $input-border-radius-size;
   color: var(--vscode-settings-dropdownForeground);
   font: inherit;
-  height: auto;
-  width: $input-width;
 }
 
 select.ng-invalid.ng-dirty,
