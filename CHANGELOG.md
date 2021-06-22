@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.5.2](https://github.com/nrwl/nx-console/compare/v17.5.1...v17.5.2) (2021-06-22)
+
+
+### Bug Fixes
+
+* read package.json dependencies when getting builders/executors ([#1100](https://github.com/nrwl/nx-console/issues/1100)) ([187f1f2](https://github.com/nrwl/nx-console/commits/187f1f2f4b6c9bdd3f2026516289fbfb7c75535d))
+
 ### [17.5.1](https://github.com/nrwl/nx-console/compare/v17.5.0...v17.5.1) (2021-06-16)
 
 
