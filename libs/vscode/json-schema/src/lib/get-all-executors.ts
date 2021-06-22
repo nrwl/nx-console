@@ -22,15 +22,17 @@ function readExecutorCollectionsFromNodeModules(
   workspaceJsonPath: string,
   clearPackageJsonCache: boolean
 ): ExecutorInfo[] {
-  const basedir = join(workspaceJsonPath, '..');
+  const basedir = dirname(workspaceJsonPath);
   const nodeModulesDir = join(basedir, 'node_modules');
 
   if (clearPackageJsonCache) {
     clearJsonCache('package.json', basedir);
   }
-
-  const packages: { [packageName: string]: string } =
-    readAndCacheJsonFile('package.json', basedir).json.devDependencies || {};
+  const packageJson = readAndCacheJsonFile('package.json', basedir).json;
+  const packages: { [packageName: string]: string } = {
+    ...(packageJson.devDependencies || {}),
+    ...(packageJson.dependencies || {}),
+  };
   const executorCollections = Object.keys(packages).filter((p) => {
     try {
       const packageJson = readAndCacheJsonFile(
@@ -92,7 +94,7 @@ function getBuilderPaths(
   )) {
     let path = '';
     if (platform() === 'win32') {
-      path = `file:///${join(baseDir, value.schema).replace(/\\/g, '/')}`
+      path = `file:///${join(baseDir, value.schema).replace(/\\/g, '/')}`;
     } else {
       path = join(baseDir, value.schema);
     }
