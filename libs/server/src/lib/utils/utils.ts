@@ -18,6 +18,7 @@ import {
   printParseErrorCode,
   ParseError,
 } from 'jsonc-parser';
+import { getOutputChannel } from './output-channel';
 
 export interface SchematicDefaults {
   [name: string]: string;
@@ -147,10 +148,13 @@ function readAndParseJson(filePath: string) {
     const result = parseJson(content, errors);
 
     if (errors.length > 0) {
-      const { error, offset } = errors[0];
-      throw new Error(
-        `${printParseErrorCode(error)} in JSON at position ${offset}`
-      );
+      for (const { error, offset } of errors) {
+        getOutputChannel().appendLine(
+          `${printParseErrorCode(
+            error
+          )} in JSON at position ${offset} in ${filePath}`
+        );
+      }
     }
 
     return result;
