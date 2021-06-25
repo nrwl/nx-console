@@ -65,10 +65,10 @@ function createBuildersAndExecutorsSchema(
     "required": ["builder"]
   },
   "then": {
-    "properties": { 
+    "properties": {
       "options": {
         "$ref": "${collection.path}"
-      }, 
+      },
       "configurations": {
         "additionalProperties": {
           "$ref": "${collection.path}",
@@ -85,13 +85,13 @@ function createBuildersAndExecutorsSchema(
   const executors = collections
     .map(
       (collection) => `
-{   
+{
   "if": {
     "properties": { "executor": { "const": "${collection.name}" } },
     "required": ["executor"]
   },
   "then": {
-    "properties": { 
+    "properties": {
       "options": {
         "$ref": "${collection.path}"
       },
@@ -131,20 +131,17 @@ function createJsonSchema(builders: string, executors: string) {
         },
         "then": {
           "description": "Read more about this workspace file at https://nx.dev/latest/angular/getting-started/configuration",
-          "properties": { 
+          "properties": {
             "projects": {
-              "oneOf": [
-                { 
-                  "type": "object", 
-                  "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "oneOf": [
+                  {
                     "type": "string"
-                  } 
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object",
-                    "properties": {
+                  },
+                  {
+                   "type": "object",
+                   "properties": {
                       "architect": {
                         "description": "Configures all the targets which define what tasks you can run against the project",
                         "additionalProperties": {
@@ -165,18 +162,18 @@ function createJsonSchema(builders: string, executors: string) {
                             }
                           },
                           "allOf": [
-                           ${builders} 
+                           ${builders}
                           ]
                         }
                       }
                     }
                   }
-                }
-              ]
+                ]
+              }
             }
           }
         }
-      }, 
+      },
       {
         "if": {
           "properties": { "version": { "const": 2 } },
@@ -184,20 +181,17 @@ function createJsonSchema(builders: string, executors: string) {
         },
         "then": {
           "description": "Read more about this workspace file at https://nx.dev/latest/react/getting-started/configuration",
-          "properties": { 
-            "projects": {
-              "oneOf": [
-                { 
-                  "type": "object", 
-                  "additionalProperties": {
+          "properties": {
+           "projects": {
+              "type": "object",
+              "additionalProperties": {
+                "oneOf": [
+                  {
                     "type": "string"
-                  } 
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object",
-                    "properties": {
+                  },
+                  {
+                   "type": "object",
+                   "properties": {
                       "targets": {
                         "description": "Configures all the targets which define what tasks you can run against the project",
                         "additionalProperties": {
@@ -218,14 +212,14 @@ function createJsonSchema(builders: string, executors: string) {
                             }
                           },
                           "allOf": [
-                           ${executors} 
+                           ${executors}
                           ]
                         }
                       }
                     }
                   }
-                }
-              ]
+                ]
+              }
             }
           }
         }
