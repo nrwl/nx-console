@@ -4,10 +4,12 @@ import {
   toLegacyWorkspaceFormat,
   getOutputChannel,
   getTelemetry,
+  cacheJson,
 } from '@nx-console/server';
 import { window } from 'vscode';
 import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { getNxWorkspacePackage } from './get-nx-workspace-package';
 
 export function verifyWorkspace(): {
   validWorkspaceJson: boolean;
@@ -18,13 +20,34 @@ export function verifyWorkspace(): {
   const workspacePath = dirname(
     WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
   );
+
+  const workspaceJsonPath = join(workspacePath, 'workspace.json');
+  const angularJsonPath = join(workspacePath, 'angular.json');
+
+  // try and use the workspace version of nx
   try {
-    const workspaceJsonPath = join(workspacePath, 'workspace.json');
-    const angularJsonPath = join(workspacePath, 'angular.json');
+    const cachedWorkspaceJson = cacheJson(workspaceJsonPath).json;
+    if (!cachedWorkspaceJson) {
+      const workspace = getNxWorkspacePackage().readWorkspaceConfig({
+        format: 'nx',
+        path: workspacePath,
+      } as any);
+      cacheJson(workspaceJsonPath, '', workspace);
+    }
+  } catch (e) {
+    // noop - use old way
+  }
+
+  try {
     if (fileExistsSync(workspaceJsonPath)) {
       return {
         validWorkspaceJson: true,
+        // TODO(cammisuli): change all instances to use the new version - basically reverse this to the new format
         json: toLegacyWorkspaceFormat(
+          /**
+           * We would get the value from the `readWorkspaceConfig` call if that was successful.
+           * Otherwise, we manually read the workspace.json file
+           */
           readAndCacheJsonFile(workspaceJsonPath).json
         ),
         workspaceType: 'nx',

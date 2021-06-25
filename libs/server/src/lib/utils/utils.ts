@@ -139,7 +139,7 @@ export function fileExistsSync(filePath: string): boolean {
   }
 }
 
-function readAndParseJson(filePath: string) {
+export function readAndParseJson(filePath: string) {
   const content = readFileSync(filePath, 'utf-8');
   try {
     return JSON.parse(content);
@@ -164,6 +164,27 @@ function readAndParseJson(filePath: string) {
 export function clearJsonCache(filePath: string, basedir = '') {
   const fullFilePath = path.join(basedir, filePath);
   return delete fileContents[fullFilePath];
+}
+
+/**
+ * Caches already created json contents to a file path
+ */
+export function cacheJson(filePath: string, basedir = '', content?: any) {
+  const fullFilePath = path.join(basedir, filePath);
+  if (fileContents[fullFilePath]) {
+    return {
+      json: fileContents[fullFilePath],
+      path: fullFilePath,
+    };
+  }
+
+  if (content) {
+    fileContents[fullFilePath] = content;
+  }
+  return {
+    json: content,
+    path: fullFilePath,
+  };
 }
 
 export function readAndCacheJsonFile(

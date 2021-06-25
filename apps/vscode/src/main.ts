@@ -7,6 +7,7 @@ import {
   ExtensionContext,
   FileSystemWatcher,
   languages,
+  RelativePattern,
   tasks,
   TreeView,
   Uri,
@@ -270,9 +271,14 @@ function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  workspaceFileWatcher = watchFile(workspaceJsonPath, () => {
-    commands.executeCommand('nxConsole.refreshNxProjectsTree');
-  });
+  const workspaceDir = dirname(workspaceJsonPath);
+
+  workspaceFileWatcher = watchFile(
+    new RelativePattern(workspaceDir, '**/{workspace,angular,project}.json'),
+    () => {
+      commands.executeCommand('nxConsole.refreshNxProjectsTree');
+    }
+  );
 
   context.subscriptions.push(workspaceFileWatcher);
 }
