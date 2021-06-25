@@ -1,4 +1,4 @@
-import { workspace, FileSystemWatcher } from 'vscode';
+import { workspace, FileSystemWatcher, GlobPattern } from 'vscode';
 
 /**
  * Watch a file and execute the callback on changes.
@@ -8,7 +8,10 @@ import { workspace, FileSystemWatcher } from 'vscode';
  * @param filePath
  * @param callback
  */
-export function watchFile(filePath: string, callback: () => unknown) {
+export function watchFile(
+  filePath: GlobPattern,
+  callback: (...args: any[]) => unknown
+) {
   const filewatcher = workspace.createFileSystemWatcher(filePath);
   filewatcher.onDidChange(callback);
   return filewatcher;

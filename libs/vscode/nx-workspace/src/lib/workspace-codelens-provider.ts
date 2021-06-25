@@ -58,15 +58,14 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     if (document.uri.path.endsWith('project.json')) {
       const { rawWorkspace } = getRawWorkspace();
       for (const [key, project] of Object.entries(rawWorkspace.projects)) {
-        if (typeof project === 'string') {
-          if (
-            document.uri.path
-              .replace(/\\/g, '/')
-              .endsWith(`${project}/project.json`)
-          ) {
-            projectName = key;
-            break;
-          }
+        if (
+          typeof project === 'string' &&
+          document.uri.path
+            .replace(/\\/g, '/')
+            .endsWith(`${project}/project.json`)
+        ) {
+          projectName = key;
+          break;
         }
       }
     }
