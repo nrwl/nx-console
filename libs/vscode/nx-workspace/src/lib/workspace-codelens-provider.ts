@@ -13,6 +13,7 @@ import { TextDocument } from 'vscode';
 import { verifyWorkspace } from './verify-workspace';
 import { getProjectLocations } from './find-workspace-json-target';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { getRawWorkspace } from './get-raw-workspace';
 
 export class ProjectCodeLens extends CodeLens {
   constructor(
@@ -49,7 +50,28 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
   provideCodeLenses(document: TextDocument): CodeLens[] | undefined {
     const lens: CodeLens[] = [];
 
-    const projectLocations = getProjectLocations(document);
+    let projectName = '';
+
+    /**
+     * Find the project name of the corresponding project.json file
+     */
+    if (document.uri.path.endsWith('project.json')) {
+      const { rawWorkspace } = getRawWorkspace();
+      for (const [key, project] of Object.entries(rawWorkspace.projects)) {
+        if (typeof project === 'string') {
+          if (
+            document.uri.path
+              .replace(/\\/g, '/')
+              .endsWith(`${project}/project.json`)
+          ) {
+            projectName = key;
+            break;
+          }
+        }
+      }
+    }
+
+    const projectLocations = getProjectLocations(document, projectName);
     const { validWorkspaceJson, workspaceType } = verifyWorkspace();
     if (!validWorkspaceJson) {
       return;
@@ -57,8 +79,9 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
 
     for (const projectName in projectLocations) {
       const project = projectLocations[projectName];
-      for (const target in project) {
-        const position = document.positionAt(project[target].position);
+      const projectTargets = project.targets;
+      for (const target in projectTargets) {
+        const position = document.positionAt(projectTargets[target].position);
 
         lens.push(
           new ProjectCodeLens(
@@ -68,7 +91,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
             target
           )
         );
-        const configurations = project[target].configurations;
+        const configurations = projectTargets[target].configurations;
         if (configurations) {
           for (const configuration in configurations) {
             const configurationPosition = document.positionAt(
@@ -122,7 +145,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     );
     if (enableWorkspaceConfigCodeLens) {
       this.codeLensProvider = languages.registerCodeLensProvider(
-        { pattern: '**/{workspace,angular}.json' },
+        { pattern: '**/{workspace,angular,project}.json' },
         this
       );
       context.subscriptions.push(this.codeLensProvider);
