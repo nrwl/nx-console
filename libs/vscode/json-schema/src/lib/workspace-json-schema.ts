@@ -131,38 +131,38 @@ function createJsonSchema(builders: string, executors: string) {
         },
         "then": {
           "description": "Read more about this workspace file at https://nx.dev/latest/angular/getting-started/configuration",
-          "properties": {
+          "properties": { 
             "projects": {
               "type": "object",
               "additionalProperties": {
                 "type": "object",
                 "properties": {
-                   "architect": {
-                     "description": "Configures all the targets which define what tasks you can run against the project",
-                     "additionalProperties": {
-                       "type": "object",
-                       "properties": {
-                         "builder": {
-                           "description": "The function that Nx will invoke when you run this architect",
-                           "type": "string"
-                         },
-                         "options": {
-                           "type": "object"
-                         },
-                         "configurations": {
-                           "description": "provides extra sets of values that will be merged into the options map",
-                           "additionalProperties": {
-                             "type": "object"
-                           }
-                         }
-                       },
-                       "allOf": [
-                        ${builders}
-                       ]
-                     }
-                   }
-                 }
-               } 
+                  "architect": {
+                    "description": "Configures all the targets which define what tasks you can run against the project",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "builder": {
+                          "description": "The function that Nx will invoke when you run this architect",
+                          "type": "string"
+                        },
+                        "options": {
+                          "type": "object"
+                        },
+                        "configurations": {
+                          "description": "provides extra sets of values that will be merged into the options map",
+                          "additionalProperties": {
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "allOf": [
+                       ${builders} 
+                      ]
+                    }
+                  }
+                }
+              }
             }
           }
         }
