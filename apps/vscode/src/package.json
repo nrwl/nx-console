@@ -647,6 +647,10 @@
       {
         "fileMatch": "angular.json",
         "url": "./workspace-schema.json"
+      },
+      {
+        "fileMatch": "project.json",
+        "url": "./project-schema.json"
       }
     ]
   }

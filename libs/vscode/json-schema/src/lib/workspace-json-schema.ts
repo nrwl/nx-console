@@ -65,10 +65,10 @@ function createBuildersAndExecutorsSchema(
     "required": ["builder"]
   },
   "then": {
-    "properties": { 
+    "properties": {
       "options": {
         "$ref": "${collection.path}"
-      }, 
+      },
       "configurations": {
         "additionalProperties": {
           "$ref": "${collection.path}",
@@ -85,13 +85,13 @@ function createBuildersAndExecutorsSchema(
   const executors = collections
     .map(
       (collection) => `
-{   
+{
   "if": {
     "properties": { "executor": { "const": "${collection.name}" } },
     "required": ["executor"]
   },
   "then": {
-    "properties": { 
+    "properties": {
       "options": {
         "$ref": "${collection.path}"
       },
@@ -166,7 +166,7 @@ function createJsonSchema(builders: string, executors: string) {
             }
           }
         }
-      }, 
+      },
       {
         "if": {
           "properties": { "version": { "const": 2 } },
@@ -174,37 +174,44 @@ function createJsonSchema(builders: string, executors: string) {
         },
         "then": {
           "description": "Read more about this workspace file at https://nx.dev/latest/react/getting-started/configuration",
-          "properties": { 
-            "projects": {
+          "properties": {
+           "projects": {
               "type": "object",
               "additionalProperties": {
-                "type": "object",
-                "properties": {
-                  "targets": {
-                    "description": "Configures all the targets which define what tasks you can run against the project",
-                    "additionalProperties": {
-                      "type": "object",
-                      "properties": {
-                        "executor": {
-                          "description": "The function that Nx will invoke when you run this target",
-                          "type": "string"
-                        },
-                        "options": {
-                          "type": "object"
-                        },
-                        "configurations": {
-                          "description": "provides extra sets of values that will be merged into the options map",
-                          "additionalProperties": {
-                            "type": "object"
-                          }
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                   "type": "object",
+                   "properties": {
+                      "targets": {
+                        "description": "Configures all the targets which define what tasks you can run against the project",
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "executor": {
+                              "description": "The function that Nx will invoke when you run this target",
+                              "type": "string"
+                            },
+                            "options": {
+                              "type": "object"
+                            },
+                            "configurations": {
+                              "description": "provides extra sets of values that will be merged into the options map",
+                              "additionalProperties": {
+                                "type": "object"
+                              }
+                            }
+                          },
+                          "allOf": [
+                           ${executors}
+                          ]
                         }
-                      },
-                      "allOf": [
-                       ${executors} 
-                      ]
+                      }
                     }
                   }
-                }
+                ]
               }
             }
           }
