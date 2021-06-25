@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.6.0](https://github.com/nrwl/nx-console/compare/v17.5.2...v17.6.0) (2021-06-25)
+
+
+### Features
+
+* support for project.json schema ([#1101](https://github.com/nrwl/nx-console/issues/1101)) ([6341a77](https://github.com/nrwl/nx-console/commits/6341a775a0fa342d52b4ff8c5458d7a01e37ca9d))
+* support split nx projects ([#1102](https://github.com/nrwl/nx-console/issues/1102)) ([2f58b00](https://github.com/nrwl/nx-console/commits/2f58b0028c8e0b1bb685618fd1a61644da4cffc9))
+
 ### [17.5.2](https://github.com/nrwl/nx-console/compare/v17.5.1...v17.5.2) (2021-06-22)
 
 
