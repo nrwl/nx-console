@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.6.1](https://github.com/nrwl/nx-console/compare/v17.6.0...v17.6.1) (2021-06-28)
+
+
+### Bug Fixes
+
+* read and combine both schematics and generators ([#1103](https://github.com/nrwl/nx-console/issues/1103)) ([b275bdc](https://github.com/nrwl/nx-console/commits/b275bdcefb19319d61d0f9e611d9367391103f5c))
+
 ## [17.6.0](https://github.com/nrwl/nx-console/compare/v17.5.2...v17.6.0) (2021-06-25)
 
 
