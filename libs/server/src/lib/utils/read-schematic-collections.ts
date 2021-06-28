@@ -165,17 +165,15 @@ async function readCollectionSchematics(
   collectionName: string,
   collectionJson: any
 ) {
-  const schematicCollection = {
-    name: collectionName,
-    schematics: [] as Schematic[],
-  };
+  const generators = new Set<Schematic>();
+
   try {
     Object.entries(
-      collectionJson.schematics || collectionJson.generators
+      Object.assign({}, collectionJson.schematics, collectionJson.generators)
     ).forEach(async ([k, v]: [any, any]) => {
       try {
         if (canAdd(k, v)) {
-          schematicCollection.schematics.push({
+          generators.add({
             name: k,
             collection: collectionName,
             description: v.description || '',
@@ -192,7 +190,10 @@ async function readCollectionSchematics(
     console.error(e);
     console.error(`Invalid package.json for schematic ${collectionName}`);
   }
-  return schematicCollection;
+  return {
+    name: collectionName,
+    schematics: Array.from(generators),
+  };
 }
 
 export async function readSchematicOptions(
@@ -211,7 +212,12 @@ export async function readSchematicOptions(
       collectionPackageJson.json.generators,
     dirname(collectionPackageJson.path)
   );
-  const schematics =  collectionJson.json.schematics || collectionJson.json.generators;
+  const schematics = Object.assign(
+    {},
+    collectionJson.json.schematics,
+    collectionJson.json.generators
+  );
+
   const schematicSchema = readAndCacheJsonFile(
     schematics[schematicName].schema,
     dirname(collectionJson.path)
