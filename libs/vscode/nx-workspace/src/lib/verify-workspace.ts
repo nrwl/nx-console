@@ -24,22 +24,9 @@ export function verifyWorkspace(): {
   const workspaceJsonPath = join(workspacePath, 'workspace.json');
   const angularJsonPath = join(workspacePath, 'angular.json');
 
-  // try and use the workspace version of nx
-  try {
-    const cachedWorkspaceJson = cacheJson(workspaceJsonPath).json;
-    if (!cachedWorkspaceJson) {
-      const workspace = getNxWorkspacePackage().readWorkspaceConfig({
-        format: 'nx',
-        path: workspacePath,
-      } as any);
-      cacheJson(workspaceJsonPath, '', workspace);
-    }
-  } catch (e) {
-    // noop - use old way
-  }
-
   try {
     if (fileExistsSync(workspaceJsonPath)) {
+      readNxWorkspaceConfig(workspacePath, workspaceJsonPath);
       return {
         validWorkspaceJson: true,
         // TODO(cammisuli): change all instances to use the new version - basically reverse this to the new format
@@ -54,6 +41,7 @@ export function verifyWorkspace(): {
         configurationFilePath: workspaceJsonPath,
       };
     } else if (fileExistsSync(angularJsonPath)) {
+      readNxWorkspaceConfig(workspacePath, angularJsonPath);
       return {
         validWorkspaceJson: true,
         json: toLegacyWorkspaceFormat(
@@ -87,5 +75,21 @@ export function verifyWorkspace(): {
       workspaceType: 'nx',
       configurationFilePath: '',
     };
+  }
+}
+
+function readNxWorkspaceConfig(basedir: string, workspaceJsonPath: string) {
+  // try and use the workspace version of nx
+  try {
+    const cachedWorkspaceJson = cacheJson(workspaceJsonPath).json;
+    if (!cachedWorkspaceJson) {
+      const workspace = getNxWorkspacePackage().readWorkspaceConfig({
+        format: 'nx',
+        path: basedir,
+      } as any);
+      cacheJson(workspaceJsonPath, '', workspace);
+    }
+  } catch (e) {
+    // noop - will use the old way
   }
 }
