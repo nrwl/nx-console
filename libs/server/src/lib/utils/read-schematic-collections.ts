@@ -130,7 +130,7 @@ async function readWorkspaceSchematicsCollection(
         .map(async (f) => {
           const schemaJson = readAndCacheJsonFile(f, '');
           return {
-            name: schemaJson.json.id,
+            name: schemaJson.json.id || schemaJson.json.$id,
             collection: collectionName,
             options: await normalizeSchema(schemaJson.json),
             description: '',
