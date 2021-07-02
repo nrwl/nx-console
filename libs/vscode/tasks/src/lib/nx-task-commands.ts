@@ -196,6 +196,11 @@ const RUN_MANY_OPTIONS: Option[] = [
 
 const DEP_GRAPH_OPTIONS: Option[] = [
   {
+    name: 'watch',
+    type: OptionType.Boolean,
+    description: 'Watch for changes to dep graph and update in-browser',
+  },
+  {
     name: 'file',
     type: OptionType.String,
     description: 'output file (e.g. --file=output.json)',
