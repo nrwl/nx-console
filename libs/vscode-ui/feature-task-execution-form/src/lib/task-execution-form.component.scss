@@ -41,9 +41,11 @@ $offset-with-configurations: $offset-without-configurations +
 vscode-ui-field-tree {
   box-sizing: border-box;
   padding-top: $host-padding-top / 2;
+  min-height: calc(100vh - #{$offset-without-configurations});
   max-height: calc(100vh - #{$offset-without-configurations});
 
   .has-configurations & {
+    min-height: calc(100vh - #{$offset-without-configurations});
     max-height: calc(100vh - #{$offset-with-configurations});
   }
 }
