@@ -4,13 +4,21 @@ import type * as NxWorkspacePackage from '@nrwl/workspace';
 /**
  * Get the local installed version of @nrwl/workspace
  */
-export function getNxWorkspacePackage(): typeof NxWorkspacePackage {
+export function getNxWorkspacePackageFileUtils(): typeof NxWorkspacePackage {
   const workspacePath = dirname(
     WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
   );
 
   // webpack hacks..
   return eval('require')(
-    join(workspacePath, 'node_modules', '@nrwl', 'workspace')
+    join(
+      workspacePath,
+      'node_modules',
+      '@nrwl',
+      'workspace',
+      'src',
+      'core',
+      'file-utils'
+    )
   );
 }
