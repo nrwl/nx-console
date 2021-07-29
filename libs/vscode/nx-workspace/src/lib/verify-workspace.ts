@@ -9,7 +9,7 @@ import {
 import { window } from 'vscode';
 import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { getNxWorkspacePackage } from './get-nx-workspace-package';
+import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
 
 export function verifyWorkspace(): {
   validWorkspaceJson: boolean;
@@ -83,7 +83,7 @@ function readNxWorkspaceConfig(basedir: string, workspaceJsonPath: string) {
   try {
     const cachedWorkspaceJson = cacheJson(workspaceJsonPath).json;
     if (!cachedWorkspaceJson) {
-      const workspace = getNxWorkspacePackage().readWorkspaceConfig({
+      const workspace = getNxWorkspacePackageFileUtils().readWorkspaceConfig({
         format: 'nx',
         path: basedir,
       } as any);
