@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.7.0](https://github.com/nrwl/nx-console/compare/v17.6.1...v17.7.0) (2021-07-30)
+
+
+### Features
+
+* support dep-graph watch option ([#1106](https://github.com/nrwl/nx-console/issues/1106)) ([5e78c4d](https://github.com/nrwl/nx-console/commits/5e78c4d3f98c6c567cc5584d39cd54562f102135))
+
+
+### Bug Fixes
+
+* add min-height to scroll container so at least 100vh ([#1110](https://github.com/nrwl/nx-console/issues/1110)) ([2ce72a8](https://github.com/nrwl/nx-console/commits/2ce72a811765e8866091ed45b8f2a67a137a0731))
+* ensure project path is not just a partial match ([#1108](https://github.com/nrwl/nx-console/issues/1108)) ([7e7705a](https://github.com/nrwl/nx-console/commits/7e7705a17307405af61f81fc70566df7d50aec70))
+* include path with project but not directory ([#1112](https://github.com/nrwl/nx-console/issues/1112)) ([6cb987d](https://github.com/nrwl/nx-console/commits/6cb987da18bb4bf4a3953fc3937a6d2d405d583d))
+* json schema update for $id ([#1107](https://github.com/nrwl/nx-console/issues/1107)) ([d97db50](https://github.com/nrwl/nx-console/commits/d97db50e2e3efc35e9bc77845dc9742b44b6b30c))
+* load workspace file utils directly ([#1113](https://github.com/nrwl/nx-console/issues/1113)) ([a351990](https://github.com/nrwl/nx-console/commits/a35199082992b4bfc081abde169092d51e3924a1))
+* support angular.json (v2) having split project.json files ([#1105](https://github.com/nrwl/nx-console/issues/1105)) ([22b685c](https://github.com/nrwl/nx-console/commits/22b685c5c931b1efc60b0f97aa46fe42d052c078))
+
 ### [17.6.1](https://github.com/nrwl/nx-console/compare/v17.6.0...v17.6.1) (2021-06-28)
 
 
