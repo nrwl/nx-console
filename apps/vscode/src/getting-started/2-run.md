@@ -1,6 +1,6 @@
 ## Run
 
-The _Run_ action allows you to choose an executor command and then opens a form listing out all the options for that builder. The frequently used executor commands build, serve, test, e2e and lint also have their own dedicated actions.
+The `Run` action allows you to choose an executor command and then opens a form listing out all the options for that builder. The frequently used executor commands `build`, `serve`, `test`, `e2e` and `lint` also have their own dedicated actions.
 
 ### From the Command Palette
 

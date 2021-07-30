@@ -2,11 +2,11 @@
 
 If you find yourself running the same command many times, here are few tips to save yourself some key strokes.
 
-Rerun Last Task
+### Rerun Last Task
 
-If you want to rerun the last task with all the same options specified, bring up the Command Palette (⇧⌘P) and choose Rerun Last Task.
+If you want to rerun the last task with all the same options specified, bring up the Command Palette (`⇧⌘P`) and choose `Rerun Last Task`.
 
-Keyboard Shortcuts
+### Keyboard Shortcuts
 
 You can also set up custom tasks and assign keyboard shortcuts to them. In .vscode/tasks.json add a task like this:
 
@@ -29,5 +29,3 @@ Then from the Command Palette (`⇧⌘P`) choose `Preferences: Open Keyboard Sho
 ```
 
 Now, pressing `^⌘T` will run `nx affected --target=test`.
-
-Here is more information on [VSCode tasks](https://code.visualstudio.com/docs/editor/tasks) and [keyboard shortcuts](https://code.visualstudio.com/docs/getstarted/keybindings).
