@@ -7,3 +7,5 @@ Clicking the ![Refresh](https://raw.githubusercontent.com/nrwl/nx-console/ba40a1
 Clicking the ![Folder](https://raw.githubusercontent.com/nrwl/nx-console/ba40a1c4a53d48b89a05a2f0d77a4139f9de6cc2/apps/vscode/src/assets/folder-light.svg) Folder icon next to a project will reveal that project's folder in the VSCode Explorer pane.
 
 Clicking the ![Execute](https://raw.githubusercontent.com/nrwl/nx-console/ba40a1c4a53d48b89a05a2f0d77a4139f9de6cc2/apps/vscode/src/assets/continue-light.svg) Execute icon next to an executor command will execute that command without prompting for options.
+
+[See the Demo](https://youtu.be/ve_N3unDqAg)

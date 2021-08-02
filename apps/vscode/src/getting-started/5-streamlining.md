@@ -29,3 +29,5 @@ Then from the Command Palette (`⇧⌘P`) choose `Preferences: Open Keyboard Sho
 ```
 
 Now, pressing `^⌘T` will run `nx affected --target=test`.
+
+Here is more information on [VSCode tasks](https://code.visualstudio.com/docs/editor/tasks) and [keyboard shortcuts](https://code.visualstudio.com/docs/getstarted/keybindings).
