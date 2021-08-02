@@ -628,7 +628,7 @@
       },
       {
         "view": "nxConsole.views.welcome",
-        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vs-code)"
+        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vscode)"
       }
     ],
     "walkthroughs": [
