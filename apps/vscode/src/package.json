@@ -636,14 +636,13 @@
         "id": "nxConsole",
         "title": "Getting Started with Nx Console",
         "description": "Interacting with your Nx Workspace",
-        "primary": true,
         "steps": [
           {
             "id": "nxConsole.generate",
             "title": "Generate",
             "description": "",
             "media": {
-              "path": "getting-started/1-generate.md"
+              "markdown": "getting-started/1-generate.md"
             }
           },
           {
@@ -651,7 +650,7 @@
             "title": "Run",
             "description": "",
             "media": {
-              "path": "getting-started/2-run.md"
+              "markdown": "getting-started/2-run.md"
             }
           },
           {
@@ -659,7 +658,7 @@
             "title": "Common Nx Commands",
             "description": "",
             "media": {
-              "path": "getting-started/3-common-nx-commands.md"
+              "markdown": "getting-started/3-common-nx-commands.md"
             }
           },
           {
@@ -667,7 +666,7 @@
             "title": "Projects",
             "description": "",
             "media": {
-              "path": "getting-started/4-projects.md"
+              "markdown": "getting-started/4-projects.md"
             }
           },
           {
@@ -675,7 +674,7 @@
             "title": "Streamlining",
             "description": "",
             "media": {
-              "path": "getting-started/5-streamlining.md"
+              "markdown": "getting-started/5-streamlining.md"
             }
           }
         ]
