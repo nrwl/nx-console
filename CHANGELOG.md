@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.8.0](https://github.com/nrwl/nx-console/compare/v17.7.0...v17.8.0) (2021-08-06)
+
+
+### Features
+
+* welcome view and getting started walkthrough ([#1069](https://github.com/nrwl/nx-console/issues/1069)) ([7281905](https://github.com/nrwl/nx-console/commits/7281905c7c4625426c291dd6618fb9043cf829f0))
+
+
+### Bug Fixes
+
+* configurations tabs overflow ([#1118](https://github.com/nrwl/nx-console/issues/1118)) ([2c8bd85](https://github.com/nrwl/nx-console/commits/2c8bd85487e03c75aa8afc377eff909ee1c39032))
+* menu scroll hides Run and Search bar header ([#1117](https://github.com/nrwl/nx-console/issues/1117)) ([1f1f888](https://github.com/nrwl/nx-console/commits/1f1f8889650fe2eddfc756888a56eadacbff5279))
+
 ## [17.7.0](https://github.com/nrwl/nx-console/compare/v17.6.1...v17.7.0) (2021-07-30)
 
 
