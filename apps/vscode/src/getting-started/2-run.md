@@ -6,6 +6,8 @@ The `Run` action allows you to choose an executor command and then opens a form 
 
 [See the Demo](https://youtu.be/rNImFxo9gYs)
 
+&nbsp;
+
 ## From the Command Palette
 
 You can also construct the executor command options while staying entirely within the Command Palette. Use `⇧⌘P` to open the Command Palette, then select `nx: test`. After choosing a project, select any of the listed options to modify the executor command options. When you're satisfied with the constructed command, choose the `Execute` command at the top of the list.

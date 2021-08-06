@@ -6,6 +6,8 @@ The `Generate` action allows you to choose a generator and then opens a form lis
 
 [See the Demo](https://youtu.be/-nUr66MWRiE)
 
+&nbsp;
+
 ## From the Command Palette
 
 You can also launch the `Generate` action from the Command Palette (`⇧⌘P`) by selecting `nx: generate (ui)`.
