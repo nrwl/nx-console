@@ -1,4 +1,6 @@
-## Projects
+&nbsp;
+
+# Projects
 
 Clicking on the name of any project will navigate to that project's definition in the `workspace.json` (or `angular.json`) file. Clicking on the name of any builder command will navigate to that builder command's definition in the `workspace.json` (or `angular.json`) file.
 

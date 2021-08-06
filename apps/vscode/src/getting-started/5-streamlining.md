@@ -1,12 +1,14 @@
-## Streamlining
+&nbsp;
+
+# Streamlining
 
 If you find yourself running the same command many times, here are few tips to save yourself some key strokes.
 
-### Rerun Last Task
+## Rerun Last Task
 
 If you want to rerun the last task with all the same options specified, bring up the Command Palette (`⇧⌘P`) and choose `Rerun Last Task`.
 
-### Keyboard Shortcuts
+## Keyboard Shortcuts
 
 You can also set up custom tasks and assign keyboard shortcuts to them. In .vscode/tasks.json add a task like this:
 
