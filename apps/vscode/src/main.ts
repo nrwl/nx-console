@@ -261,6 +261,17 @@ async function setWorkspace(workspaceJsonPath: string) {
 
   currentRunTargetTreeProvider.refresh();
   nxProjectsTreeProvider.refresh();
+
+  let workspaceType: 'nx' | 'angular' | 'angularWithNx' = 'nx';
+  if (isNxWorkspace && isAngularWorkspace) {
+    workspaceType = 'angularWithNx';
+  } else if (isNxWorkspace && !isAngularWorkspace) {
+    workspaceType = 'nx';
+  } else if (!isNxWorkspace && isAngularWorkspace) {
+    workspaceType = 'angular';
+  }
+
+  getTelemetry().record('WorkspaceType', { workspaceType });
 }
 
 function registerWorkspaceFileWatcher(
