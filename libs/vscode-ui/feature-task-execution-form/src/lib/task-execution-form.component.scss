@@ -45,7 +45,7 @@ vscode-ui-field-tree {
   max-height: calc(100vh - #{$offset-without-configurations});
 
   .has-configurations & {
-    min-height: calc(100vh - #{$offset-without-configurations});
+    min-height: calc(100vh - #{$offset-with-configurations});
     max-height: calc(100vh - #{$offset-with-configurations});
   }
 }
