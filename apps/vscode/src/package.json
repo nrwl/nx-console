@@ -683,6 +683,14 @@
     "views": {
       "nx-console": [
         {
+          "id": "nxConsole.views.welcome",
+          "name": "Welcome",
+          "when": "!isNxWorkspace && !isAngularWorkspace",
+          "contextualTitle": "Nx Console Getting Started",
+          "icon": "assets/nx-console.png",
+          "visibility": "visible"
+        },
+        {
           "id": "nxRunTarget",
           "name": "Generate & Run Target"
         },
@@ -695,14 +703,6 @@
           "id": "nxProjects",
           "name": "Projects",
           "when": "isNxWorkspace || isAngularWorkspace"
-        },
-        {
-          "id": "nxConsole.views.welcome",
-          "name": "Welcome",
-          "when": "!isNxWorkspace && !isAngularWorkspace",
-          "contextualTitle": "Nx Console Getting Started",
-          "icon": "assets/nx-console.png",
-          "visibility": "visible"
         }
       ]
     },
