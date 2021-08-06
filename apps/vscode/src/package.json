@@ -621,8 +621,75 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "nxConsole.views.welcome",
+        "contents": "Nx Console - The UI for Nx"
+      },
+      {
+        "view": "nxConsole.views.welcome",
+        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vscode)"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "nxConsole",
+        "title": "Getting Started with Nx Console",
+        "description": "Interacting with your Nx Workspace",
+        "steps": [
+          {
+            "id": "nxConsole.generate",
+            "title": "Generate",
+            "description": "Use Nx Console to scaffold different files with [Generate](command:nx.generate.ui)",
+            "media": {
+              "markdown": "getting-started/1-generate.md"
+            }
+          },
+          {
+            "id": "nxConsole.run",
+            "title": "Run",
+            "description": "[Run](command:nx.run) Nx commands with selected options",
+            "media": {
+              "markdown": "getting-started/2-run.md"
+            }
+          },
+          {
+            "id": "nxConsole.commonNxCommands",
+            "title": "Common Nx Commands",
+            "description": "Open the [dep-graph](command:nx.dep-graph), run a task for [affected](command:nx.affected) projects, or [run-many](command:nx.run-many) on selected projects",
+            "media": {
+              "markdown": "getting-started/3-common-nx-commands.md"
+            }
+          },
+          {
+            "id": "nxConsole.projects",
+            "title": "Projects",
+            "description": "See all the [projects](command:nxProjects.focus) in your workspace",
+            "media": {
+              "markdown": "getting-started/4-projects.md"
+            }
+          },
+          {
+            "id": "nxConsole.streamlining",
+            "title": "Streamlining",
+            "description": "[Rerun Last Task](command:workbench.action.tasks.reRunTask) or set up custom tasks and [keybindings](command:workbench.action.openGlobalKeybindings)",
+            "media": {
+              "markdown": "getting-started/5-streamlining.md"
+            }
+          }
+        ]
+      }
+    ],
     "views": {
       "nx-console": [
+        {
+          "id": "nxConsole.views.welcome",
+          "name": "Welcome",
+          "when": "!isNxWorkspace && !isAngularWorkspace",
+          "contextualTitle": "Nx Console Getting Started",
+          "icon": "assets/nx-console.png",
+          "visibility": "visible"
+        },
         {
           "id": "nxRunTarget",
           "name": "Generate & Run Target"
