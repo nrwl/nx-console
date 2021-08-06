@@ -19,6 +19,7 @@ class TelemetryParams {
 
   require(key: string) {
     const msg = `Telemetry: ${this.type} is missing ${key}`;
+    // eslint-disable-next-line no-prototype-builtins
     if (!this.data.hasOwnProperty(key)) {
       throw new Error(msg);
     }
@@ -26,6 +27,7 @@ class TelemetryParams {
 }
 
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   visitor = require('universal-analytics')(TRACKING_ID, {
     uid: this.user.id,
   });
@@ -78,6 +80,9 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
         break;
       case 'FeatureUsed':
         this.featureUsed(params.fetch('feature'));
+        break;
+      case 'WorkspaceType':
+        this.workspaceType(params.fetch('workspaceType'));
         break;
       default:
         throw new Error(`Unknown Telemetry type: ${type}`);
@@ -157,6 +162,16 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       .event({
         ec: 'Feature',
         ea: feature,
+      })
+      .send();
+  }
+
+  workspaceType(workspaceType: string) {
+    this.visitor
+      .event({
+        ec: 'WorkspaceType',
+        ea: workspaceType,
+        ev: 1,
       })
       .send();
   }

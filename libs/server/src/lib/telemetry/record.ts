@@ -7,7 +7,8 @@ export type TelemetryType =
   | 'CommandRun'
   | 'ExceptionOccurred'
   | 'FeatureUsed'
-  | 'UserStateChanged';
+  | 'UserStateChanged'
+  | 'WorkspaceType';
 
 export function isTelemetryRecord(evt: string): evt is TelemetryType {
   return new Set([
