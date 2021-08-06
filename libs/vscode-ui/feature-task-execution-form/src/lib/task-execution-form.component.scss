@@ -188,6 +188,9 @@ nx-console-field {
 .configurations-container {
   margin-top: 24px;
   height: $configurations-offset - 24px;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
 
   .configuration {
     margin-right: 24px;
