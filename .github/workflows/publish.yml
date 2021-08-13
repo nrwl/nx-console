@@ -34,6 +34,7 @@ jobs:
         run: |
           yarn package
           yarn vsce publish --packagePath dist/apps/vscode/nx-console.vsix -p ${{ secrets.VSCE_PAT }}
+          yarn ovsx publish dist/apps/vscode/nx-console.vsix -p ${{ secrets.OVSX_PAT }}
       - name: generate changes
         run: git show CHANGELOG.md | egrep "^\+" | tail +5 | sed -e 's/^\+//' > changelog.txt
       - name: release
