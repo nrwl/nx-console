@@ -10,7 +10,7 @@ import { window } from 'vscode';
 import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
-import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { WorkspaceJsonConfiguration, NxJsonConfiguration } from '@nrwl/devkit';
 
 export function verifyWorkspace(): {
   validWorkspaceJson: boolean;
@@ -80,7 +80,10 @@ export function verifyWorkspace(): {
   }
 }
 
-function readNxWorkspaceConfig(basedir: string, workspaceJsonPath: string) {
+export function readNxWorkspaceConfig(
+  basedir: string,
+  workspaceJsonPath: string
+) {
   // try and use the workspace version of nx
   try {
     const cachedWorkspaceJson = cacheJson(workspaceJsonPath).json;
@@ -93,5 +96,34 @@ function readNxWorkspaceConfig(basedir: string, workspaceJsonPath: string) {
     }
   } catch (e) {
     // noop - will use the old way
+  }
+}
+
+export function getNxConfig(baseDir: string): NxJsonConfiguration {
+  const nxConfig = readAndCacheJsonFile('nx.json', baseDir).json;
+
+  return {
+    ...readNxJsonExtends(nxConfig, baseDir),
+    ...nxConfig,
+  };
+}
+
+function readNxJsonExtends(nxJson: { extends?: string }, baseDir: string) {
+  if (nxJson.extends) {
+    let extendsPath = nxJson.extends;
+    try {
+      if (extendsPath.startsWith('.')) {
+        extendsPath = join(baseDir, extendsPath);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      return readAndCacheJsonFile(require(extendsPath)).json;
+    } catch (e) {
+      getOutputChannel().appendLine(
+        `Unable to resolve nx.json extends. Error: ${e.message}`
+      );
+      return null;
+    }
+  } else {
+    return null;
   }
 }

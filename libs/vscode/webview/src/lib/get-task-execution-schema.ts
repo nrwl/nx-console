@@ -2,11 +2,10 @@ import { Option, TaskExecutionSchema } from '@nx-console/schema';
 import {
   getOutputChannel,
   getTelemetry,
-  readAndCacheJsonFile,
   readTargetDef,
   selectSchematic,
 } from '@nx-console/server';
-import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
 import { WorkspaceRouteTitle } from '@nx-console/vscode/nx-run-target-view';
@@ -187,10 +186,9 @@ function getConfigValuesFromContextMenuUri(
       .replace(workspacePath, '')
       .replace(/\\/g, '/')
       .replace(/^\//, '');
-
-    const nxConfig = readAndCacheJsonFile('nx.json', workspacePath);
-    const appsDir = nxConfig.json.workspaceLayout?.appsDir ?? 'apps';
-    const libsDir = nxConfig.json.workspaceLayout?.libsDir ?? 'libs';
+    const nxConfig = getNxConfig(workspacePath);
+    const appsDir = nxConfig.workspaceLayout?.appsDir ?? 'apps';
+    const libsDir = nxConfig.workspaceLayout?.libsDir ?? 'libs';
     if (
       (appsDir && schematic.name === 'application') ||
       schematic.name === 'app'
