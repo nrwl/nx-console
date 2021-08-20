@@ -18,6 +18,7 @@ export class GlobalConfigurationStore implements Store {
   }
 
   static get instance() {
+    console.log('hello');
     if (!CONFIG_STORE) {
       throw Error(
         'Please create a configuration store with `fromContext` first'

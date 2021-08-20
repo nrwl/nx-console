@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "defaultProject": "vscode-ui",
   "cli": {
     "warnings": {
       "typescriptMismatch": false,
@@ -35,6 +36,336 @@
     }
   },
   "projects": {
+    "schema": {
+      "root": "libs/schema",
+      "sourceRoot": "libs/schema/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/schema/**/*.ts"]
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/schema",
+            "tsConfig": "libs/schema/tsconfig.lib.json",
+            "packageJson": "libs/schema/package.json",
+            "main": "libs/schema/src/index.ts",
+            "assets": ["libs/schema/*.md"]
+          }
+        }
+      }
+    },
+    "server": {
+      "root": "libs/server",
+      "sourceRoot": "libs/server/src",
+      "projectType": "library",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/server/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/server"]
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/server",
+            "tsConfig": "libs/server/tsconfig.lib.json",
+            "packageJson": "libs/server/package.json",
+            "main": "libs/server/src/index.ts",
+            "assets": ["libs/server/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-app": {
+      "root": "apps/vscode",
+      "sourceRoot": "apps/vscode/src",
+      "projectType": "application",
+      "prefix": "vscode",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "externalDependencies": ["vscode", "tslint"],
+            "webpackConfig": "apps/vscode/webpack.config.js",
+            "outputPath": "dist/apps/vscode",
+            "main": "apps/vscode/src/main.ts",
+            "tsConfig": "apps/vscode/tsconfig.app.json",
+            "assets": [
+              "apps/vscode/src/package.json",
+              "apps/vscode/src/tree-view-icon.svg",
+              "apps/vscode/src/assets",
+              "apps/vscode/src/getting-started",
+              {
+                "glob": "README.md",
+                "input": "./",
+                "output": "/"
+              },
+              {
+                "glob": "CHANGELOG.md",
+                "input": "./",
+                "output": "/"
+              }
+            ],
+            "buildLibsFromSource": true
+          },
+          "configurations": {
+            "production": {
+              "sourceMap": false,
+              "optimization": true,
+              "extractLicenses": true,
+              "fileReplacements": [
+                {
+                  "replace": "apps/vscode/src/environments/environment.ts",
+                  "with": "apps/vscode/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          },
+          "outputs": ["{options.outputPath}"]
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/vscode/**/*.ts"]
+          }
+        }
+      }
+    },
+    "vscode-configuration": {
+      "root": "libs/vscode/configuration",
+      "sourceRoot": "libs/vscode/configuration/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/configuration/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/configuration"],
+          "options": {
+            "jestConfig": "libs/vscode/configuration/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/configuration",
+            "tsConfig": "libs/vscode/configuration/tsconfig.lib.json",
+            "packageJson": "libs/vscode/configuration/package.json",
+            "main": "libs/vscode/configuration/src/index.ts",
+            "assets": ["libs/vscode/configuration/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-json-schema": {
+      "root": "libs/vscode/json-schema",
+      "sourceRoot": "libs/vscode/json-schema/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/json-schema/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/json-schema"],
+          "options": {
+            "jestConfig": "libs/vscode/json-schema/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/json-schema",
+            "tsConfig": "libs/vscode/json-schema/tsconfig.lib.json",
+            "packageJson": "libs/vscode/json-schema/package.json",
+            "main": "libs/vscode/json-schema/src/index.ts",
+            "assets": ["libs/vscode/json-schema/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-nx-commands-view": {
+      "root": "libs/vscode/nx-commands-view",
+      "sourceRoot": "libs/vscode/nx-commands-view/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/nx-commands-view/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-commands-view"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-commands-view/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-commands-view",
+            "tsConfig": "libs/vscode/nx-commands-view/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-commands-view/package.json",
+            "main": "libs/vscode/nx-commands-view/src/index.ts",
+            "assets": ["libs/vscode/nx-commands-view/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-nx-project-view": {
+      "root": "libs/vscode/nx-project-view",
+      "sourceRoot": "libs/vscode/nx-project-view/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/nx-project-view/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-project-view"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-project-view/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-project-view",
+            "tsConfig": "libs/vscode/nx-project-view/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-project-view/package.json",
+            "main": "libs/vscode/nx-project-view/src/index.ts",
+            "assets": ["libs/vscode/nx-project-view/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-nx-run-target-view": {
+      "root": "libs/vscode/nx-run-target-view",
+      "sourceRoot": "libs/vscode/nx-run-target-view/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/nx-run-target-view/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-run-target-view"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-run-target-view/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-run-target-view",
+            "tsConfig": "libs/vscode/nx-run-target-view/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-run-target-view/package.json",
+            "main": "libs/vscode/nx-run-target-view/src/index.ts",
+            "assets": ["libs/vscode/nx-run-target-view/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-nx-workspace": {
+      "root": "libs/vscode/nx-workspace",
+      "sourceRoot": "libs/vscode/nx-workspace/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/nx-workspace/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/nx-workspace"],
+          "options": {
+            "jestConfig": "libs/vscode/nx-workspace/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/nx-workspace",
+            "tsConfig": "libs/vscode/nx-workspace/tsconfig.lib.json",
+            "packageJson": "libs/vscode/nx-workspace/package.json",
+            "main": "libs/vscode/nx-workspace/src/index.ts",
+            "assets": ["libs/vscode/nx-workspace/*.md"]
+          }
+        }
+      }
+    },
+    "vscode-tasks": {
+      "root": "libs/vscode/tasks",
+      "sourceRoot": "libs/vscode/tasks/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/vscode/tasks/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode/tasks"],
+          "options": {
+            "jestConfig": "libs/vscode/tasks/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/vscode/tasks",
+            "tsConfig": "libs/vscode/tasks/tsconfig.lib.json",
+            "packageJson": "libs/vscode/tasks/package.json",
+            "main": "libs/vscode/tasks/src/index.ts",
+            "assets": ["libs/vscode/tasks/*.md"]
+          }
+        }
+      }
+    },
     "vscode-ui": {
       "projectType": "application",
       "schematics": {
@@ -118,109 +449,52 @@
         }
       }
     },
-    "vscode-app": {
-      "root": "apps/vscode",
-      "sourceRoot": "apps/vscode/src",
-      "projectType": "application",
-      "prefix": "vscode",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "externalDependencies": ["vscode"],
-            "webpackConfig": "apps/vscode/webpack.config.js",
-            "outputPath": "dist/apps/vscode",
-            "main": "apps/vscode/src/main.ts",
-            "tsConfig": "apps/vscode/tsconfig.app.json",
-            "assets": [
-              "apps/vscode/src/package.json",
-              "apps/vscode/src/tree-view-icon.svg",
-              "apps/vscode/src/assets",
-              "apps/vscode/src/getting-started",
-              {
-                "glob": "README.md",
-                "input": "./",
-                "output": "/"
-              },
-              {
-                "glob": "CHANGELOG.md",
-                "input": "./",
-                "output": "/"
-              }
-            ],
-            "buildLibsFromSource": true
-          },
-          "configurations": {
-            "production": {
-              "sourceMap": false,
-              "optimization": true,
-              "extractLicenses": true,
-              "fileReplacements": [
-                {
-                  "replace": "apps/vscode/src/environments/environment.ts",
-                  "with": "apps/vscode/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          },
-          "outputs": ["{options.outputPath}"]
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/vscode/**/*.ts"]
-          }
-        }
-      }
-    },
-    "schema": {
-      "root": "libs/schema",
-      "sourceRoot": "libs/schema/src",
+    "vscode-ui-argument-list": {
       "projectType": "library",
+      "root": "libs/vscode-ui/argument-list",
+      "sourceRoot": "libs/vscode-ui/argument-list/src",
+      "prefix": "nx-console",
       "architect": {
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["libs/schema/**/*.ts"]
+            "lintFilePatterns": [
+              "libs/vscode-ui/argument-list/src/**/*.ts",
+              "libs/vscode-ui/argument-list/src/**/*.html"
+            ]
           }
         },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/vscode-ui/argument-list"],
           "options": {
-            "outputPath": "dist/libs/schema",
-            "tsConfig": "libs/schema/tsconfig.lib.json",
-            "packageJson": "libs/schema/package.json",
-            "main": "libs/schema/src/index.ts",
-            "assets": ["libs/schema/*.md"]
+            "jestConfig": "libs/vscode-ui/argument-list/jest.config.js",
+            "passWithNoTests": true
           }
         }
       }
     },
-    "server": {
-      "root": "libs/server",
-      "sourceRoot": "libs/server/src",
+    "vscode-ui-components": {
       "projectType": "library",
+      "root": "libs/vscode-ui/components",
+      "sourceRoot": "libs/vscode-ui/components/src",
       "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/vscode-ui/components/src/**/*.ts",
+              "libs/vscode-ui/components/src/**/*.html"
+            ]
+          }
+        },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
-            "jestConfig": "libs/server/jest.config.js",
+            "jestConfig": "libs/vscode-ui/components/jest.config.js",
             "passWithNoTests": true
           },
-          "outputs": ["coverage/libs/server"]
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/server",
-            "tsConfig": "libs/server/tsconfig.lib.json",
-            "packageJson": "libs/server/package.json",
-            "main": "libs/server/src/index.ts",
-            "assets": ["libs/server/*.md"]
-          }
+          "outputs": ["coverage/libs/vscode-ui/components"]
         }
       }
     },
@@ -280,62 +554,6 @@
       },
       "schematics": {}
     },
-    "vscode-ui-argument-list": {
-      "projectType": "library",
-      "root": "libs/vscode-ui/argument-list",
-      "sourceRoot": "libs/vscode-ui/argument-list/src",
-      "prefix": "nx-console",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "libs/vscode-ui/argument-list/src/**/*.ts",
-              "libs/vscode-ui/argument-list/src/**/*.html"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode-ui/argument-list"],
-          "options": {
-            "jestConfig": "libs/vscode-ui/argument-list/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "vscode-ui-components": {
-      "projectType": "library",
-      "root": "libs/vscode-ui/components",
-      "sourceRoot": "libs/vscode-ui/components/src",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "libs/vscode-ui/components/src/**/*.ts",
-              "libs/vscode-ui/components/src/**/*.html"
-            ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/vscode-ui/components/jest.config.js",
-            "passWithNoTests": true
-          },
-          "outputs": ["coverage/libs/vscode-ui/components"]
-        }
-      }
-    },
-    "vscode-ui-styles": {
-      "projectType": "library",
-      "root": "libs/vscode-ui/styles",
-      "sourceRoot": "libs/vscode-ui/styles/src",
-      "architect": {},
-      "schematics": {}
-    },
     "vscode-ui-feature-task-execution-form-e2e": {
       "root": "apps/vscode-ui-feature-task-execution-form-e2e",
       "sourceRoot": "apps/vscode-ui-feature-task-execution-form-e2e/src",
@@ -365,101 +583,12 @@
         }
       }
     },
-    "vscode-configuration": {
-      "root": "libs/vscode/configuration",
-      "sourceRoot": "libs/vscode/configuration/src",
+    "vscode-ui-styles": {
       "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/vscode/configuration/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/configuration"],
-          "options": {
-            "jestConfig": "libs/vscode/configuration/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/configuration",
-            "tsConfig": "libs/vscode/configuration/tsconfig.lib.json",
-            "packageJson": "libs/vscode/configuration/package.json",
-            "main": "libs/vscode/configuration/src/index.ts",
-            "assets": ["libs/vscode/configuration/*.md"]
-          }
-        }
-      }
-    },
-    "vscode-tasks": {
-      "root": "libs/vscode/tasks",
-      "sourceRoot": "libs/vscode/tasks/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/vscode/tasks/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/tasks"],
-          "options": {
-            "jestConfig": "libs/vscode/tasks/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/tasks",
-            "tsConfig": "libs/vscode/tasks/tsconfig.lib.json",
-            "packageJson": "libs/vscode/tasks/package.json",
-            "main": "libs/vscode/tasks/src/index.ts",
-            "assets": ["libs/vscode/tasks/*.md"]
-          }
-        }
-      }
-    },
-    "vscode-nx-workspace": {
-      "root": "libs/vscode/nx-workspace",
-      "sourceRoot": "libs/vscode/nx-workspace/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/vscode/nx-workspace/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/nx-workspace"],
-          "options": {
-            "jestConfig": "libs/vscode/nx-workspace/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/nx-workspace",
-            "tsConfig": "libs/vscode/nx-workspace/tsconfig.lib.json",
-            "packageJson": "libs/vscode/nx-workspace/package.json",
-            "main": "libs/vscode/nx-workspace/src/index.ts",
-            "assets": ["libs/vscode/nx-workspace/*.md"]
-          }
-        }
-      }
+      "root": "libs/vscode-ui/styles",
+      "sourceRoot": "libs/vscode-ui/styles/src",
+      "architect": {},
+      "schematics": {}
     },
     "vscode-verify": {
       "root": "libs/vscode/verify",
@@ -521,134 +650,6 @@
             "packageJson": "libs/vscode/webview/package.json",
             "main": "libs/vscode/webview/src/index.ts",
             "assets": ["libs/vscode/webview/*.md"]
-          }
-        }
-      }
-    },
-    "vscode-nx-run-target-view": {
-      "root": "libs/vscode/nx-run-target-view",
-      "sourceRoot": "libs/vscode/nx-run-target-view/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/vscode/nx-run-target-view/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/nx-run-target-view"],
-          "options": {
-            "jestConfig": "libs/vscode/nx-run-target-view/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/nx-run-target-view",
-            "tsConfig": "libs/vscode/nx-run-target-view/tsconfig.lib.json",
-            "packageJson": "libs/vscode/nx-run-target-view/package.json",
-            "main": "libs/vscode/nx-run-target-view/src/index.ts",
-            "assets": ["libs/vscode/nx-run-target-view/*.md"]
-          }
-        }
-      }
-    },
-    "vscode-nx-project-view": {
-      "root": "libs/vscode/nx-project-view",
-      "sourceRoot": "libs/vscode/nx-project-view/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/vscode/nx-project-view/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/nx-project-view"],
-          "options": {
-            "jestConfig": "libs/vscode/nx-project-view/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/nx-project-view",
-            "tsConfig": "libs/vscode/nx-project-view/tsconfig.lib.json",
-            "packageJson": "libs/vscode/nx-project-view/package.json",
-            "main": "libs/vscode/nx-project-view/src/index.ts",
-            "assets": ["libs/vscode/nx-project-view/*.md"]
-          }
-        }
-      }
-    },
-    "vscode-nx-commands-view": {
-      "root": "libs/vscode/nx-commands-view",
-      "sourceRoot": "libs/vscode/nx-commands-view/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/vscode/nx-commands-view/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/nx-commands-view"],
-          "options": {
-            "jestConfig": "libs/vscode/nx-commands-view/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/nx-commands-view",
-            "tsConfig": "libs/vscode/nx-commands-view/tsconfig.lib.json",
-            "packageJson": "libs/vscode/nx-commands-view/package.json",
-            "main": "libs/vscode/nx-commands-view/src/index.ts",
-            "assets": ["libs/vscode/nx-commands-view/*.md"]
-          }
-        }
-      }
-    },
-    "vscode-json-schema": {
-      "root": "libs/vscode/json-schema",
-      "sourceRoot": "libs/vscode/json-schema/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/vscode/json-schema/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/vscode/json-schema"],
-          "options": {
-            "jestConfig": "libs/vscode/json-schema/jest.config.js",
-            "passWithNoTests": true
-          }
-        },
-        "build": {
-          "builder": "@nrwl/node:package",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/libs/vscode/json-schema",
-            "tsConfig": "libs/vscode/json-schema/tsconfig.lib.json",
-            "packageJson": "libs/vscode/json-schema/package.json",
-            "main": "libs/vscode/json-schema/src/index.ts",
-            "assets": ["libs/vscode/json-schema/*.md"]
           }
         }
       }

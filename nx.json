@@ -5,7 +5,9 @@
     "tsconfig.base.json": "*",
     ".eslintrc.json": "*"
   },
-  "affected": { "defaultBase": "master" },
+  "affected": {
+    "defaultBase": "master"
+  },
   "npmScope": "nx-console",
   "tasksRunnerOptions": {
     "default": {
@@ -25,26 +27,68 @@
     }
   },
   "projects": {
-    "schema": { "tags": [] },
-    "vscode-app": { "tags": [] },
-    "server": { "tags": [] },
-    "vscode-ui": { "tags": [] },
-    "vscode-ui-feature-task-execution-form": { "tags": [] },
-    "vscode-ui-argument-list": { "tags": [] },
-    "vscode-ui-components": { "tags": [] },
-    "vscode-ui-styles": { "tags": [] },
+    "schema": {
+      "tags": []
+    },
+    "server": {
+      "tags": []
+    },
+    "vscode-app": {
+      "tags": []
+    },
+    "vscode-configuration": {
+      "tags": []
+    },
+    "vscode-json-schema": {
+      "tags": []
+    },
+    "vscode-nx-commands-view": {
+      "tags": []
+    },
+    "vscode-nx-project-view": {
+      "tags": []
+    },
+    "vscode-nx-run-target-view": {
+      "tags": []
+    },
+    "vscode-nx-workspace": {
+      "tags": []
+    },
+    "vscode-tasks": {
+      "tags": []
+    },
+    "vscode-ui": {
+      "tags": []
+    },
+    "vscode-ui-argument-list": {
+      "tags": []
+    },
+    "vscode-ui-components": {
+      "tags": []
+    },
+    "vscode-ui-feature-task-execution-form": {
+      "tags": []
+    },
     "vscode-ui-feature-task-execution-form-e2e": {
       "tags": [],
       "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
     },
-    "vscode-configuration": { "tags": [] },
-    "vscode-tasks": { "tags": [] },
-    "vscode-nx-workspace": { "tags": [] },
-    "vscode-verify": { "tags": [] },
-    "vscode-webview": { "tags": [] },
-    "vscode-nx-run-target-view": { "tags": [] },
-    "vscode-nx-project-view": { "tags": [] },
-    "vscode-nx-commands-view": { "tags": [] },
-    "vscode-json-schema": { "tags": [] }
+    "vscode-ui-styles": {
+      "tags": []
+    },
+    "vscode-verify": {
+      "tags": []
+    },
+    "vscode-webview": {
+      "tags": []
+    }
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
   }
 }
