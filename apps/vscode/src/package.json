@@ -37,7 +37,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onView:nx-console"
   ],
   "dependencies": {
     "jsonc-parser": "^3.0.0"
