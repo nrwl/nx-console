@@ -12,7 +12,6 @@ export function getAllExecutors(
   workspaceJsonPath: string,
   clearPackageJsonCache: boolean
 ): ExecutorInfo[] {
-  console.log('hello');
   return readExecutorCollectionsFromNodeModules(
     workspaceJsonPath,
     clearPackageJsonCache
