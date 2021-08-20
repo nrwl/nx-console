@@ -1,6 +1,7 @@
 import { schema } from '@angular-devkit/core';
 import { standardFormats } from '@angular-devkit/schematics/src/formats';
 import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
+import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { platform } from 'os';
 import * as path from 'path';
@@ -354,7 +355,7 @@ function renameProperty(obj: any, from: string, to: string) {
   delete obj[from];
 }
 
-export function toLegacyWorkspaceFormat(w: any) {
+export function toLegacyWorkspaceFormat(w: WorkspaceJsonConfiguration) {
   Object.values(w.projects || {}).forEach((project: any) => {
     if (project.targets) {
       renameProperty(project, 'targets', 'architect');
@@ -371,6 +372,27 @@ export function toLegacyWorkspaceFormat(w: any) {
 
   if (w.generators) {
     renameProperty(w, 'generators', 'schematics');
+  }
+  return w;
+}
+
+export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
+  Object.values(w.projects || {}).forEach((project: any) => {
+    if (project.architect) {
+      renameProperty(project, 'architect', 'targets');
+    }
+    if (project.schematics) {
+      renameProperty(project, 'schematics', 'generators');
+    }
+    Object.values(project.targets || {}).forEach((target: any) => {
+      if (target.builder) {
+        renameProperty(target, 'builder', 'executor');
+      }
+    });
+  });
+
+  if (w.schematics) {
+    renameProperty(w, 'schematics', 'generators');
   }
   return w;
 }

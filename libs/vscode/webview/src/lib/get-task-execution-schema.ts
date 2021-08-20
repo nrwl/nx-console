@@ -3,7 +3,7 @@ import {
   getOutputChannel,
   getTelemetry,
   readAndCacheJsonFile,
-  readArchitectDef,
+  readTargetDef,
   selectSchematic,
 } from '@nx-console/server';
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
@@ -52,9 +52,9 @@ export async function getTaskExecutionSchema(
         }
         return {
           // TODO: Verify architect package is in node_modules
-          ...readArchitectDef(
+          ...readTargetDef(
             command,
-            selectedProject.architectDef,
+            selectedProject.targetDef,
             selectedProject.projectName
           ),
           options,
@@ -66,24 +66,22 @@ export async function getTaskExecutionSchema(
       case 'Run': {
         const runnableItems = cliTaskProvider
           .getProjectEntries()
-          .filter(([, { architect }]) => Boolean(architect))
-          .flatMap(([project, { architect }]) => ({ project, architect }))
-          .flatMap(({ project, architect }) => [
-            ...Object.entries(architect || {}).map(
-              ([architectName, architectDef]) => ({
-                project,
-                architectName,
-                architectDef,
-              })
-            ),
+          .filter(([, { targets }]) => Boolean(targets))
+          .flatMap(([project, { targets }]) => ({ project, targets }))
+          .flatMap(({ project, targets }) => [
+            ...Object.entries(targets || {}).map(([targetName, targetDef]) => ({
+              project,
+              targetName,
+              targetDef,
+            })),
           ])
           .map(
-            ({ project, architectName, architectDef }) =>
+            ({ project, targetName, targetDef }) =>
               new CliTaskQuickPickItem(
                 project,
-                architectDef,
-                architectName,
-                `${project}:${architectName}`
+                targetDef,
+                targetName,
+                `${project}:${targetName}`
               )
           );
 
@@ -102,9 +100,9 @@ export async function getTaskExecutionSchema(
           }
 
           return {
-            ...readArchitectDef(
+            ...readTargetDef(
               selection.command,
-              selection.architectDef,
+              selection.targetDef,
               selection.projectName
             ),
             command: 'run',

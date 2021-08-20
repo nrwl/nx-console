@@ -26,18 +26,18 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   ) {
     super();
 
-    ([
-      ['editWorkspaceJson', this.editWorkspaceJson],
-      ['revealInExplorer', this.revealInExplorer],
-      ['runTask', this.runTask],
-      ['refreshNxProjectsTree', this.refreshNxProjectsTree],
-    ] as [string, (item: NxProjectTreeItem) => Promise<unknown>][]).forEach(
-      ([commandSuffix, callback]) => {
-        context.subscriptions.push(
-          commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
-        );
-      }
-    );
+    (
+      [
+        ['editWorkspaceJson', this.editWorkspaceJson],
+        ['revealInExplorer', this.revealInExplorer],
+        ['runTask', this.runTask],
+        ['refreshNxProjectsTree', this.refreshNxProjectsTree],
+      ] as [string, (item: NxProjectTreeItem) => Promise<unknown>][]
+    ).forEach(([commandSuffix, callback]) => {
+      context.subscriptions.push(
+        commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
+      );
+    });
   }
 
   getParent(element: NxProjectTreeItem): NxProjectTreeItem | null | undefined {
@@ -70,9 +70,8 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         : TreeItemCollapsibleState.None
     );
     if (!workspaceJsonLabel.target) {
-      const projectDef = this.cliTaskProvider.getProjects()[
-        workspaceJsonLabel.project
-      ];
+      const projectDef =
+        this.cliTaskProvider.getProjects()[workspaceJsonLabel.project];
       if (projectDef) {
         item.resourceUri = Uri.file(
           join(this.cliTaskProvider.getWorkspacePath(), projectDef.root)
@@ -101,7 +100,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
           this.createNxProjectTreeItem(
             { project: name },
             name,
-            Boolean(def.architect)
+            Boolean(def.targets)
           )
       );
     }
@@ -115,25 +114,25 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     }
 
     if (!target) {
-      if (projectDef.architect) {
-        return Object.keys(projectDef.architect).map(
+      if (projectDef.targets) {
+        return Object.keys(projectDef.targets).map(
           (name): NxProjectTreeItem =>
             this.createNxProjectTreeItem(
               { target: { name }, project },
               name,
-              Boolean(projectDef.architect?.[name].configurations)
+              Boolean(projectDef.targets?.[name].configurations)
             )
         );
       }
     } else {
       const { configuration } = target;
 
-      if (configuration || !projectDef.architect) {
+      if (configuration || !projectDef.targets) {
         return;
       }
 
-      const configurations = projectDef.architect
-        ? projectDef.architect[target.name].configurations
+      const configurations = projectDef.targets
+        ? projectDef.targets[target.name].configurations
         : undefined;
       if (!configurations) {
         return;

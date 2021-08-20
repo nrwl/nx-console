@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "defaultProject": "vscode-ui",
   "cli": {
     "warnings": {
@@ -9,7 +9,7 @@
     "packageManager": "yarn",
     "defaultCollection": "@nrwl/angular"
   },
-  "schematics": {
+  "generators": {
     "@nrwl/schematics:component": {
       "styleext": "scss"
     },
@@ -40,15 +40,15 @@
       "root": "libs/schema",
       "sourceRoot": "libs/schema/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/schema/**/*.ts"]
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/schema",
@@ -64,9 +64,9 @@
       "root": "libs/server",
       "sourceRoot": "libs/server/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/server/jest.config.js",
             "passWithNoTests": true
@@ -74,7 +74,7 @@
           "outputs": ["coverage/libs/server"]
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/server",
@@ -91,10 +91,10 @@
       "sourceRoot": "apps/vscode/src",
       "projectType": "application",
       "prefix": "vscode",
-      "schematics": {},
-      "architect": {
+      "generators": {},
+      "targets": {
         "build": {
-          "builder": "@nrwl/node:build",
+          "executor": "@nrwl/node:build",
           "options": {
             "externalDependencies": ["vscode", "tslint"],
             "webpackConfig": "apps/vscode/webpack.config.js",
@@ -135,7 +135,7 @@
           "outputs": ["{options.outputPath}"]
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/vscode/**/*.ts"]
           }
@@ -146,15 +146,15 @@
       "root": "libs/vscode/configuration",
       "sourceRoot": "libs/vscode/configuration/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/configuration/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/configuration"],
           "options": {
             "jestConfig": "libs/vscode/configuration/jest.config.js",
@@ -162,7 +162,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/configuration",
@@ -178,15 +178,15 @@
       "root": "libs/vscode/json-schema",
       "sourceRoot": "libs/vscode/json-schema/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/json-schema/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/json-schema"],
           "options": {
             "jestConfig": "libs/vscode/json-schema/jest.config.js",
@@ -194,7 +194,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/json-schema",
@@ -210,15 +210,15 @@
       "root": "libs/vscode/nx-commands-view",
       "sourceRoot": "libs/vscode/nx-commands-view/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/nx-commands-view/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/nx-commands-view"],
           "options": {
             "jestConfig": "libs/vscode/nx-commands-view/jest.config.js",
@@ -226,7 +226,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/nx-commands-view",
@@ -242,15 +242,15 @@
       "root": "libs/vscode/nx-project-view",
       "sourceRoot": "libs/vscode/nx-project-view/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/nx-project-view/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/nx-project-view"],
           "options": {
             "jestConfig": "libs/vscode/nx-project-view/jest.config.js",
@@ -258,7 +258,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/nx-project-view",
@@ -274,15 +274,15 @@
       "root": "libs/vscode/nx-run-target-view",
       "sourceRoot": "libs/vscode/nx-run-target-view/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/nx-run-target-view/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/nx-run-target-view"],
           "options": {
             "jestConfig": "libs/vscode/nx-run-target-view/jest.config.js",
@@ -290,7 +290,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/nx-run-target-view",
@@ -306,15 +306,15 @@
       "root": "libs/vscode/nx-workspace",
       "sourceRoot": "libs/vscode/nx-workspace/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/nx-workspace/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/nx-workspace"],
           "options": {
             "jestConfig": "libs/vscode/nx-workspace/jest.config.js",
@@ -322,7 +322,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/nx-workspace",
@@ -338,15 +338,15 @@
       "root": "libs/vscode/tasks",
       "sourceRoot": "libs/vscode/tasks/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/tasks/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/tasks"],
           "options": {
             "jestConfig": "libs/vscode/tasks/jest.config.js",
@@ -354,7 +354,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/tasks",
@@ -368,16 +368,16 @@
     },
     "vscode-ui": {
       "projectType": "application",
-      "schematics": {
+      "generators": {
         "@nrwl/workspace:component": {
           "style": "scss"
         }
       },
       "root": "apps/vscode-ui",
       "sourceRoot": "apps/vscode-ui/src",
-      "architect": {
+      "targets": {
         "build": {
-          "builder": "ngx-build-plus:browser",
+          "executor": "ngx-build-plus:browser",
           "options": {
             "extraWebpackConfig": "apps/vscode-ui/webpack.dev.js",
             "outputPath": "dist/apps/vscode/assets/public",
@@ -414,7 +414,7 @@
           "outputs": ["{options.outputPath}"]
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "executor": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "vscode-ui:build"
           },
@@ -425,13 +425,13 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "executor": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "browserTarget": "vscode-ui:build"
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": [
               "apps/vscode-ui/src/**/*.ts",
@@ -440,7 +440,7 @@
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "apps/vscode-ui/jest.config.js",
             "passWithNoTests": true
@@ -454,9 +454,9 @@
       "root": "libs/vscode-ui/argument-list",
       "sourceRoot": "libs/vscode-ui/argument-list/src",
       "prefix": "nx-console",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": [
               "libs/vscode-ui/argument-list/src/**/*.ts",
@@ -465,7 +465,7 @@
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode-ui/argument-list"],
           "options": {
             "jestConfig": "libs/vscode-ui/argument-list/jest.config.js",
@@ -478,9 +478,9 @@
       "projectType": "library",
       "root": "libs/vscode-ui/components",
       "sourceRoot": "libs/vscode-ui/components/src",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": [
               "libs/vscode-ui/components/src/**/*.ts",
@@ -489,7 +489,7 @@
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/vscode-ui/components/jest.config.js",
             "passWithNoTests": true
@@ -502,9 +502,9 @@
       "projectType": "library",
       "root": "libs/vscode-ui/feature-task-execution-form",
       "sourceRoot": "libs/vscode-ui/feature-task-execution-form/src",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": [
               "libs/vscode-ui/feature-task-execution-form/src/**/*.ts",
@@ -513,7 +513,7 @@
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/vscode-ui/feature-task-execution-form/jest.config.js",
             "passWithNoTests": true
@@ -521,7 +521,7 @@
           "outputs": ["coverage/libs/vscode-ui/feature-task-execution-form"]
         },
         "storybook": {
-          "builder": "@nrwl/storybook:storybook",
+          "executor": "@nrwl/storybook:storybook",
           "options": {
             "uiFramework": "@storybook/angular",
             "port": 4400,
@@ -536,7 +536,7 @@
           }
         },
         "build-storybook": {
-          "builder": "@nrwl/storybook:build",
+          "executor": "@nrwl/storybook:build",
           "options": {
             "uiFramework": "@storybook/angular",
             "outputPath": "dist/storybook/vscode-ui-feature-task-execution-form",
@@ -552,15 +552,15 @@
           "outputs": ["{options.outputPath}"]
         }
       },
-      "schematics": {}
+      "generators": {}
     },
     "vscode-ui-feature-task-execution-form-e2e": {
       "root": "apps/vscode-ui-feature-task-execution-form-e2e",
       "sourceRoot": "apps/vscode-ui-feature-task-execution-form-e2e/src",
       "projectType": "application",
-      "architect": {
+      "targets": {
         "e2e": {
-          "builder": "@nrwl/cypress:cypress",
+          "executor": "@nrwl/cypress:cypress",
           "options": {
             "cypressConfig": "apps/vscode-ui-feature-task-execution-form-e2e/cypress.json",
             "tsConfig": "apps/vscode-ui-feature-task-execution-form-e2e/tsconfig.e2e.json",
@@ -573,7 +573,7 @@
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": [
               "apps/vscode-ui-feature-task-execution-form-e2e/src/**/*.ts",
@@ -587,22 +587,22 @@
       "projectType": "library",
       "root": "libs/vscode-ui/styles",
       "sourceRoot": "libs/vscode-ui/styles/src",
-      "architect": {},
-      "schematics": {}
+      "targets": {},
+      "generators": {}
     },
     "vscode-verify": {
       "root": "libs/vscode/verify",
       "sourceRoot": "libs/vscode/verify/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/verify/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/verify"],
           "options": {
             "jestConfig": "libs/vscode/verify/jest.config.js",
@@ -610,7 +610,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/verify",
@@ -626,15 +626,15 @@
       "root": "libs/vscode/webview",
       "sourceRoot": "libs/vscode/webview/src",
       "projectType": "library",
-      "architect": {
+      "targets": {
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "executor": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/vscode/webview/**/*.ts"]
           }
         },
         "test": {
-          "builder": "@nrwl/jest:jest",
+          "executor": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/vscode/webview"],
           "options": {
             "jestConfig": "libs/vscode/webview/jest.config.js",
@@ -642,7 +642,7 @@
           }
         },
         "build": {
-          "builder": "@nrwl/node:package",
+          "executor": "@nrwl/node:package",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/libs/vscode/webview",

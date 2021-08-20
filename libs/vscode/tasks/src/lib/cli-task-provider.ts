@@ -11,16 +11,11 @@ import { getTelemetry } from '@nx-console/server';
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyNodeModules } from '@nx-console/vscode/verify';
 import { CliTask } from './cli-task';
-import {
-  CliTaskDefinition,
-  NamedProject,
-  ProjectDef,
-  Projects,
-  WorkspaceJson,
-} from './cli-task-definition';
+import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
 import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/schema';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 
 export let cliTaskProvider: CliTaskProvider;
 
@@ -120,7 +115,7 @@ export class CliTaskProvider implements TaskProvider {
     });
   }
 
-  getProjects(json?: WorkspaceJson): Projects {
+  getProjects(json?: WorkspaceJsonConfiguration) {
     if (json) {
       return json.projects;
     } else {
@@ -137,14 +132,11 @@ export class CliTaskProvider implements TaskProvider {
     return Object.keys(this.getProjects() || {});
   }
 
-  getProjectEntries(json?: WorkspaceJson): [string, ProjectDef][] {
-    return Object.entries(this.getProjects(json) || {}) as [
-      string,
-      ProjectDef
-    ][];
+  getProjectEntries(json?: WorkspaceJsonConfiguration) {
+    return Object.entries(this.getProjects(json) || {});
   }
 
-  projectForPath(selectedPath: string): NamedProject | null {
+  projectForPath(selectedPath: string) {
     if (!this.getWorkspaceJsonPath()) return null;
 
     const entry = this.getProjectEntries().find(([, def]) => {

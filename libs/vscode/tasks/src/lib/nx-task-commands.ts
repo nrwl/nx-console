@@ -2,7 +2,6 @@ import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 import { commands, ExtensionContext, window, tasks } from 'vscode';
 
-import { ProjectDef } from './cli-task-definition';
 import { CliTaskProvider } from './cli-task-provider';
 import { selectFlags } from './select-flags';
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
@@ -23,18 +22,11 @@ export function registerNxCommands(
       }
       promptForAffectedFlags(target);
     }),
-    ...[
-      'apps',
-      'build',
-      'dep-graph',
-      'e2e',
-      'libs',
-      'lint',
-      'test',
-    ].map((command) =>
-      commands.registerCommand(`nx.affected.${command}`, () =>
-        promptForAffectedFlags(command)
-      )
+    ...['apps', 'build', 'dep-graph', 'e2e', 'libs', 'lint', 'test'].map(
+      (command) =>
+        commands.registerCommand(`nx.affected.${command}`, () =>
+          promptForAffectedFlags(command)
+        )
     )
   );
 
@@ -64,15 +56,15 @@ async function promptForTarget(): Promise<string | undefined> {
 
   const validTargets = Array.from(
     new Set(
-      Object.entries<ProjectDef>(json.projects)
-        .map(([, project]) => Object.keys(project.architect || {}))
+      Object.entries(json.projects)
+        .map(([, project]) => Object.keys(project.targets || {}))
         .flat()
     )
   ).sort();
 
   if (!validTargets.length) {
     window.showErrorMessage(
-      'None of your workspace projects have an architect command'
+      'None of your workspace projects have an architect or targets command'
     );
     return;
   }
@@ -348,8 +340,8 @@ function validProjectsForTarget(target: string): string[] | undefined {
 
   return Array.from(
     new Set(
-      Object.entries<ProjectDef>(json.projects)
-        .filter(([, project]) => project.architect && project.architect[target])
+      Object.entries(json.projects)
+        .filter(([, project]) => project.targets && project.targets[target])
         .map(([project]) => project)
     )
   ).sort();

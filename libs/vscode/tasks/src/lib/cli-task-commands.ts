@@ -12,7 +12,7 @@ import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
-import { WorkspaceJson } from './cli-task-definition';
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -138,7 +138,7 @@ async function selectCliCommandAndPromptForFlags(
   if (!target) {
     if (isRunCommand) {
       target = (await selectCliTarget(
-        Object.keys(json.projects[projectName].architect || {})
+        Object.keys(json.projects[projectName].targets || {})
       )) as string;
       if (!target) {
         return;
@@ -195,11 +195,8 @@ async function selectCliCommandAndPromptForFlags(
 }
 
 async function selectSchematicAndPromptForFlags() {
-  const {
-    validWorkspaceJson,
-    workspaceType,
-    configurationFilePath,
-  } = verifyWorkspace();
+  const { validWorkspaceJson, workspaceType, configurationFilePath } =
+    verifyWorkspace();
 
   if (!validWorkspaceJson) {
     return;
@@ -230,28 +227,25 @@ export function getCliProjectFromUri(uri: Uri): string | undefined {
   return project?.name;
 }
 
-export function selectCliProject(command: string, json: WorkspaceJson) {
+export function selectCliProject(
+  command: string,
+  json: WorkspaceJsonConfiguration
+) {
   const items = cliTaskProvider
     .getProjectEntries(json)
-    .filter(([, { architect }]) => Boolean(architect))
-    .flatMap(([project, { architect }]) => ({ project, architect }))
+    .filter(([, { targets }]) => Boolean(targets))
+    .flatMap(([project, { targets }]) => ({ project, targets }))
     .filter(
-      ({ architect }) =>
-        Boolean(architect && architect[command]) || command === 'run'
+      ({ targets }) => Boolean(targets && targets[command]) || command === 'run'
     )
     .map(
-      ({ project, architect }) =>
-        new CliTaskQuickPickItem(
-          project,
-          architect![command]!,
-          command,
-          project
-        )
+      ({ project, targets }) =>
+        new CliTaskQuickPickItem(project, targets![command]!, command, project)
     );
 
   if (!items.length) {
     window.showInformationMessage(
-      `No projects have an architect command for ${command}`
+      `No projects have an target command for ${command}`
     );
 
     return;

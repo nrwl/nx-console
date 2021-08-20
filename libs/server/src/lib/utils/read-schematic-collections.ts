@@ -9,6 +9,7 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
   toLegacyWorkspaceFormat,
+  toWorkspaceFormat,
 } from './utils';
 
 export async function readAllSchematicCollections(
@@ -50,8 +51,8 @@ async function checkAndReadWorkspaceCollection(
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
   const defaults =
-    toLegacyWorkspaceFormat(readAndCacheJsonFile(workspaceJsonPath).json)
-      .schematics || {};
+    toWorkspaceFormat(readAndCacheJsonFile(workspaceJsonPath).json)
+      .generators || {};
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {

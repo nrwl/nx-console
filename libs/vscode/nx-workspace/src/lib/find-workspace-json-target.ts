@@ -1,5 +1,11 @@
 import { TextDocument } from 'vscode';
-import * as typescript from 'typescript';
+import type * as typescript from 'typescript';
+import {
+  isObjectLiteralExpression,
+  isPropertyAssignment,
+  isStringLiteral,
+  parseJsonText,
+} from 'typescript';
 
 export interface ProjectLocations {
   [projectName: string]: {
@@ -16,7 +22,7 @@ export interface ProjectTargetLocation {
 
 export function getProjectLocations(document: TextDocument, projectName = '') {
   const projectLocations: ProjectLocations = {};
-  const json = typescript.parseJsonText('workspace.json', document.getText());
+  const json = parseJsonText('workspace.json', document.getText());
   const statement = json.statements[0];
   const projects = getProperties(statement.expression)?.find(
     (property) => getPropertyName(property) === 'projects'
@@ -48,18 +54,15 @@ export function getProjectLocations(document: TextDocument, projectName = '') {
 function getProperties(
   objectLiteral: typescript.Node
 ): typescript.NodeArray<typescript.ObjectLiteralElementLike> | undefined {
-  if (typescript.isObjectLiteralExpression(objectLiteral)) {
+  if (isObjectLiteralExpression(objectLiteral)) {
     return objectLiteral.properties;
-  } else if (typescript.isPropertyAssignment(objectLiteral)) {
+  } else if (isPropertyAssignment(objectLiteral)) {
     return getProperties(objectLiteral.initializer);
   }
 }
 
 function getPropertyName(property: typescript.ObjectLiteralElementLike) {
-  if (
-    typescript.isPropertyAssignment(property) &&
-    typescript.isStringLiteral(property.name)
-  ) {
+  if (isPropertyAssignment(property) && isStringLiteral(property.name)) {
     return property.name.text;
   }
 }
