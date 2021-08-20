@@ -6,6 +6,7 @@ import { dirname, join } from 'path';
 import { existsSync } from 'fs';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 
 const RUN_ONE_OPTIONS = [
   {
@@ -50,7 +51,7 @@ const RUN_ONE_OPTIONS = [
 export async function verifyBuilderDefinition(
   project: string,
   command: string,
-  workspaceJson: any
+  workspaceJson: WorkspaceJsonConfiguration
 ): Promise<{
   validBuilder: boolean;
   builderName: string;
@@ -59,12 +60,12 @@ export async function verifyBuilderDefinition(
 }> {
   const projects = workspaceJson.projects || {};
   const projectDef = projects[project] || {};
-  const architectDef = projectDef.architect || {};
-  const commandDef = architectDef[command] || {};
+  const targetDef = projectDef.targets || {};
+  const commandDef = targetDef[command] || {};
   const configurations = Object.keys(commandDef.configurations || {});
-  const builderName = commandDef.builder;
+  const executorName = commandDef.executor;
 
-  if (!builderName) {
+  if (!executorName) {
     window
       .showErrorMessage(
         `Please update ${project}'s ${command} definition to specify a builder.`,
@@ -81,14 +82,14 @@ export async function verifyBuilderDefinition(
     return {
       validBuilder: false,
       configurations,
-      builderName: builderName,
+      builderName: executorName,
       options: [],
     };
   }
 
   const options = await readBuilderSchema(
     workspacePath(),
-    builderName,
+    executorName,
     commandDef.options
   );
 
@@ -109,7 +110,7 @@ export async function verifyBuilderDefinition(
 
     return {
       validBuilder: false,
-      builderName,
+      builderName: executorName,
       configurations,
       options: [],
     };
@@ -118,7 +119,7 @@ export async function verifyBuilderDefinition(
   const isNxWorkspace = existsSync(join(workspacePath(), 'nx.json'));
   return {
     validBuilder: true,
-    builderName,
+    builderName: executorName,
     configurations,
     options: isNxWorkspace ? [...RUN_ONE_OPTIONS, ...options] : options,
   };

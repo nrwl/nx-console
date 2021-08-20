@@ -1,19 +1,20 @@
 import {
-  readAndCacheJsonFile,
   fileExistsSync,
-  toLegacyWorkspaceFormat,
   getOutputChannel,
   getTelemetry,
   cacheJson,
+  readAndCacheJsonFile,
+  toWorkspaceFormat,
 } from '@nx-console/server';
 import { window } from 'vscode';
 import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 
 export function verifyWorkspace(): {
   validWorkspaceJson: boolean;
-  json?: any;
+  json: WorkspaceJsonConfiguration;
   workspaceType: 'ng' | 'nx';
   configurationFilePath: string;
 } {
@@ -29,8 +30,7 @@ export function verifyWorkspace(): {
       readNxWorkspaceConfig(workspacePath, workspaceJsonPath);
       return {
         validWorkspaceJson: true,
-        // TODO(cammisuli): change all instances to use the new version - basically reverse this to the new format
-        json: toLegacyWorkspaceFormat(
+        json: toWorkspaceFormat(
           /**
            * We would get the value from the `readWorkspaceConfig` call if that was successful.
            * Otherwise, we manually read the workspace.json file
@@ -44,9 +44,7 @@ export function verifyWorkspace(): {
       readNxWorkspaceConfig(workspacePath, angularJsonPath);
       return {
         validWorkspaceJson: true,
-        json: toLegacyWorkspaceFormat(
-          readAndCacheJsonFile(angularJsonPath).json
-        ),
+        json: toWorkspaceFormat(readAndCacheJsonFile(angularJsonPath).json),
         workspaceType: 'ng',
         configurationFilePath: angularJsonPath,
       };
@@ -73,6 +71,10 @@ export function verifyWorkspace(): {
     return {
       validWorkspaceJson: false,
       workspaceType: 'nx',
+      json: {
+        projects: {},
+        version: 2,
+      },
       configurationFilePath: '',
     };
   }
