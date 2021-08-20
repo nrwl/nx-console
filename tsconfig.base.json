@@ -23,35 +23,37 @@
     "paths": {
       "@nx-console/schema": ["libs/schema/src/index.ts"],
       "@nx-console/server": ["libs/server/src/index.ts"],
-      "@nx-console/vscode-ui/feature-task-execution-form": [
-        "libs/vscode-ui/feature-task-execution-form/src/index.ts"
-      ],
       "@nx-console/vscode-ui/argument-list": [
         "libs/vscode-ui/argument-list/src/index.ts"
       ],
       "@nx-console/vscode-ui/components": [
         "libs/vscode-ui/components/src/index.ts"
       ],
+      "@nx-console/vscode-ui/feature-task-execution-form": [
+        "libs/vscode-ui/feature-task-execution-form/src/index.ts"
+      ],
       "@nx-console/vscode-ui/styles": ["libs/vscode-ui/styles/src/index.ts"],
       "@nx-console/vscode/configuration": [
         "libs/vscode/configuration/src/index.ts"
       ],
-      "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"],
-      "@nx-console/vscode/nx-workspace": [
-        "libs/vscode/nx-workspace/src/index.ts"
-      ],
-      "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
-      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"],
-      "@nx-console/vscode/nx-run-target-view": [
-        "libs/vscode/nx-run-target-view/src/index.ts"
-      ],
-      "@nx-console/vscode/nx-project-view": [
-        "libs/vscode/nx-project-view/src/index.ts"
+      "@nx-console/vscode/json-schema": [
+        "libs/vscode/json-schema/src/index.ts"
       ],
       "@nx-console/vscode/nx-commands-view": [
         "libs/vscode/nx-commands-view/src/index.ts"
       ],
-      "@nx-console/vscode/json-schema": ["libs/vscode/json-schema/src/index.ts"]
+      "@nx-console/vscode/nx-project-view": [
+        "libs/vscode/nx-project-view/src/index.ts"
+      ],
+      "@nx-console/vscode/nx-run-target-view": [
+        "libs/vscode/nx-run-target-view/src/index.ts"
+      ],
+      "@nx-console/vscode/nx-workspace": [
+        "libs/vscode/nx-workspace/src/index.ts"
+      ],
+      "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"],
+      "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
+      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

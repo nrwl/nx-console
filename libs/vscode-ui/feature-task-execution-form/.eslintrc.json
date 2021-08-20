@@ -8,12 +8,9 @@
         "plugin:@nrwl/nx/angular",
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
-      "parserOptions": {
-        "project": [
-          "libs/vscode-ui/feature-task-execution-form/tsconfig.*?.json"
-        ]
-      },
       "rules": {
+        // This linting rule seems to not be working correctly, so we'll disable it for now.
+        "@angular-eslint/use-pipe-transform-interface": "off",
         "@angular-eslint/directive-selector": [
           "error",
           {

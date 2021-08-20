@@ -102,7 +102,7 @@ export class AutocompleteComponent implements OnInit, ControlValueAccessor {
               options.filter((option) =>
                 option.toLowerCase().includes(formValue.toLowerCase())
               )
-          ),
+          )
         )
       )
     );
@@ -117,7 +117,7 @@ export class AutocompleteComponent implements OnInit, ControlValueAccessor {
                       map((event: KeyboardEvent) => event.key),
                       filter((key) => AUTOCOMPLETE_NAV_KEYS.has(key)),
                       scan(
-                        ([index, _]: [number, string | null], key) =>
+                        ([index]: [number, string | null], key) =>
                           [
                             updatedOptionIndex(
                               <AutocompleteNavKeys>key,

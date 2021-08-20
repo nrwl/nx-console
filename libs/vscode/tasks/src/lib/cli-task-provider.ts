@@ -147,7 +147,7 @@ export class CliTaskProvider implements TaskProvider {
   projectForPath(selectedPath: string): NamedProject | null {
     if (!this.getWorkspaceJsonPath()) return null;
 
-    const entry = this.getProjectEntries().find(([_, def]) => {
+    const entry = this.getProjectEntries().find(([, def]) => {
       const fullProjectPath = join(this.getWorkspacePath(), def.root);
       return (
         selectedPath.startsWith(fullProjectPath) &&
