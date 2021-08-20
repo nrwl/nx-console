@@ -37,7 +37,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "dependencies": {
     "jsonc-parser": "^3.0.0"
