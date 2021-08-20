@@ -153,7 +153,7 @@ describe('AutocompleteComponent', () => {
   });
 
   it('selects option with keyboard', fakeAsync(() => {
-    spyOn(parent.autocompleteComponent, 'optionSelected');
+    jest.spyOn(parent.autocompleteComponent, 'optionSelected');
 
     // dispatch event to set isFocused$ = true
     focusEvent('focusin');
