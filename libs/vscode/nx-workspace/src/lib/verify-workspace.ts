@@ -2,15 +2,13 @@ import {
   fileExistsSync,
   getOutputChannel,
   getTelemetry,
-  cacheJson,
-  readAndCacheJsonFile,
   toWorkspaceFormat,
 } from '@nx-console/server';
 import { window } from 'vscode';
 import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
-import { WorkspaceJsonConfiguration, NxJsonConfiguration } from '@nrwl/devkit';
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 
 export function verifyWorkspace(): {
   validWorkspaceJson: boolean;
@@ -27,24 +25,21 @@ export function verifyWorkspace(): {
 
   try {
     if (fileExistsSync(workspaceJsonPath)) {
-      readNxWorkspaceConfig(workspacePath, workspaceJsonPath);
       return {
         validWorkspaceJson: true,
+        // TODO(cammisuli): change all instances to use the new version - basically reverse this to the new format
         json: toWorkspaceFormat(
-          /**
-           * We would get the value from the `readWorkspaceConfig` call if that was successful.
-           * Otherwise, we manually read the workspace.json file
-           */
-          readAndCacheJsonFile(workspaceJsonPath).json
+          getNxWorkspaceConfig(workspacePath, angularJsonPath)
         ),
         workspaceType: 'nx',
         configurationFilePath: workspaceJsonPath,
       };
     } else if (fileExistsSync(angularJsonPath)) {
-      readNxWorkspaceConfig(workspacePath, angularJsonPath);
       return {
         validWorkspaceJson: true,
-        json: toWorkspaceFormat(readAndCacheJsonFile(angularJsonPath).json),
+        json: toWorkspaceFormat(
+          getNxWorkspaceConfig(workspacePath, angularJsonPath)
+        ),
         workspaceType: 'ng',
         configurationFilePath: angularJsonPath,
       };
@@ -77,53 +72,5 @@ export function verifyWorkspace(): {
       },
       configurationFilePath: '',
     };
-  }
-}
-
-export function readNxWorkspaceConfig(
-  basedir: string,
-  workspaceJsonPath: string
-) {
-  // try and use the workspace version of nx
-  try {
-    const cachedWorkspaceJson = cacheJson(workspaceJsonPath).json;
-    if (!cachedWorkspaceJson) {
-      const workspace = getNxWorkspacePackageFileUtils().readWorkspaceConfig({
-        format: 'nx',
-        path: basedir,
-      } as any);
-      cacheJson(workspaceJsonPath, '', workspace);
-    }
-  } catch (e) {
-    // noop - will use the old way
-  }
-}
-
-export function getNxConfig(baseDir: string): NxJsonConfiguration {
-  const nxConfig = readAndCacheJsonFile('nx.json', baseDir).json;
-
-  return {
-    ...readNxJsonExtends(nxConfig, baseDir),
-    ...nxConfig,
-  };
-}
-
-function readNxJsonExtends(nxJson: { extends?: string }, baseDir: string) {
-  if (nxJson.extends) {
-    let extendsPath = nxJson.extends;
-    try {
-      if (extendsPath.startsWith('.')) {
-        extendsPath = join(baseDir, extendsPath);
-      }
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      return readAndCacheJsonFile(require(extendsPath)).json;
-    } catch (e) {
-      getOutputChannel().appendLine(
-        `Unable to resolve nx.json extends. Error: ${e.message}`
-      );
-      return null;
-    }
-  } else {
-    return null;
   }
 }
