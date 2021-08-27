@@ -49,22 +49,22 @@
         {
           "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "ng.generate.ui.fileexplorer",
-          "group": "explorerContext"
+          "group": "2_workspace"
         },
         {
           "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "ng.run.fileexplorer",
-          "group": "explorerContext"
+          "group": "2_workspace"
         },
         {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.generate.ui.fileexplorer",
-          "group": "explorerContext"
+          "group": "2_workspace"
         },
         {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.run.fileexplorer",
-          "group": "explorerContext"
+          "group": "2_workspace"
         }
       ],
       "view/title": [
