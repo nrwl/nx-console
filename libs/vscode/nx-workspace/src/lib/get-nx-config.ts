@@ -8,7 +8,7 @@ export function getNxConfig(baseDir: string): NxJsonConfiguration {
     let cachedNxJson = cacheJson('nx.json', baseDir).json;
 
     if (!cachedNxJson) {
-      const nxJson = (getNxWorkspacePackageFileUtils() as any).readNxJson(
+      const nxJson = getNxWorkspacePackageFileUtils().readNxJson(
         join(baseDir, 'nx.json')
       );
 
