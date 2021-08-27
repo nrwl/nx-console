@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.9.0](https://github.com/nrwl/nx-console/compare/v17.8.0...v17.9.0) (2021-08-27)
+
+
+### Features
+
+* support nx.json extends property ([#1124](https://github.com/nrwl/nx-console/issues/1124)) ([507ce24](https://github.com/nrwl/nx-console/commits/507ce24ce3085b933c9da1aa92b35d0c34b0b0c2))
+
+
+### Performance Improvements
+
+* add onview activation event ([7ac82c0](https://github.com/nrwl/nx-console/commits/7ac82c0106877c01167cc1a20bb740c6feec7c5f))
+* use `onStartupFinished` and target es2020 ([0cef34a](https://github.com/nrwl/nx-console/commits/0cef34aab5d57796f69c5e1a0ddfd4ab9bb74265))
+
 ## [17.8.0](https://github.com/nrwl/nx-console/compare/v17.7.0...v17.8.0) (2021-08-06)
 
 
