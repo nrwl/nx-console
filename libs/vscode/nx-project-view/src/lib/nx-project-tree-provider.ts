@@ -18,8 +18,6 @@ import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
  * Provides data for the "Projects" tree view
  */
 export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeItem> {
-  loading = true;
-
   constructor(
     context: ExtensionContext,
     private readonly cliTaskProvider: CliTaskProvider
@@ -86,13 +84,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   }
 
   getChildren(parent?: NxProjectTreeItem): ProviderResult<NxProjectTreeItem[]> {
-    if (this.loading) {
-      setTimeout(() => {
-        this.loading = false;
-        this.refresh();
-      });
-      return [this.createNxProjectTreeItem({ project: 'Loading' }, 'Loading')];
-    }
     if (!parent) {
       const projects = this.cliTaskProvider.getProjectEntries();
       return projects.map(
