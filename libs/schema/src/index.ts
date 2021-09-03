@@ -47,16 +47,23 @@ export interface TaskExecutionSchema {
   contextValues?: Record<string, string | number | boolean | undefined>;
 }
 
-export interface SchematicCollection {
+export interface GeneratorCollection {
   name: string;
-  schematics: Schematic[];
+  generators: Generator[];
 }
 
-export interface Schematic {
+export enum GeneratorType {
+  Application = 'application',
+  Library = 'library',
+  Other = 'other',
+}
+
+export interface Generator {
   collection: string;
   name: string;
   description: string;
   options?: Option[];
+  type: GeneratorType;
 }
 
 export interface DefaultValue {

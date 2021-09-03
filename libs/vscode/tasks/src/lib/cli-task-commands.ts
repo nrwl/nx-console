@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { selectSchematic } from '@nx-console/server';
+import { selectGenerator } from '@nx-console/server';
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import {
@@ -10,7 +10,7 @@ import {
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
-import { Option } from '@nx-console/schema';
+import { GeneratorType, Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 
@@ -66,7 +66,7 @@ export function registerCliTaskCommands(
     );
 
     commands.registerCommand(`${cli}.generate`, () =>
-      selectSchematicAndPromptForFlags()
+      selectGeneratorAndPromptForFlags()
     );
 
     commands.registerCommand(`${cli}.generate.ui`, () =>
@@ -76,13 +76,53 @@ export function registerCliTaskCommands(
     commands.registerCommand(`${cli}.generate.ui.fileexplorer`, (uri: Uri) =>
       selectCliCommandAndShowUi('generate', context.extensionPath, uri)
     );
+
+    commands.registerCommand(`${cli}.generate.ui.app`, (uri: Uri) => {
+      selectCliCommandAndShowUi(
+        'generate',
+        context.extensionPath,
+        uri,
+        GeneratorType.Application
+      );
+    });
+    commands.registerCommand(`${cli}.generate.ui.lib`, (uri: Uri) => {
+      selectCliCommandAndShowUi(
+        'generate',
+        context.extensionPath,
+        uri,
+        GeneratorType.Library
+      );
+    });
+    commands.registerCommand(
+      `${cli}.generate.ui.app.fileexplorer`,
+      (uri: Uri) => {
+        selectCliCommandAndShowUi(
+          'generate',
+          context.extensionPath,
+          uri,
+          GeneratorType.Application
+        );
+      }
+    );
+    commands.registerCommand(
+      `${cli}.generate.ui.lib.fileexplorer`,
+      (uri: Uri) => {
+        selectCliCommandAndShowUi(
+          'generate',
+          context.extensionPath,
+          uri,
+          GeneratorType.Library
+        );
+      }
+    );
   });
 }
 
 function selectCliCommandAndShowUi(
   command: string,
   extensionPath: string,
-  uri?: Uri
+  uri?: Uri,
+  generatorType?: GeneratorType
 ) {
   const workspacePath = cliTaskProvider.getWorkspacePath();
   if (!workspacePath) {
@@ -99,7 +139,8 @@ function selectCliCommandAndShowUi(
   const workspaceTreeItem = new RunTargetTreeItem(
     configurationFilePath,
     `${command[0].toUpperCase()}${command.slice(1)}` as WorkspaceRouteTitle,
-    extensionPath
+    extensionPath,
+    generatorType
   );
 
   commands.executeCommand(
@@ -194,7 +235,7 @@ async function selectCliCommandAndPromptForFlags(
   }
 }
 
-async function selectSchematicAndPromptForFlags() {
+async function selectGeneratorAndPromptForFlags() {
   const { validWorkspaceJson, workspaceType, configurationFilePath } =
     verifyWorkspace();
 
@@ -202,7 +243,7 @@ async function selectSchematicAndPromptForFlags() {
     return;
   }
 
-  const selection = await selectSchematic(configurationFilePath);
+  const selection = await selectGenerator(configurationFilePath);
   if (!selection) {
     return;
   }

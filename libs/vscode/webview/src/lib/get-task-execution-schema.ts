@@ -1,9 +1,9 @@
-import { Option, TaskExecutionSchema } from '@nx-console/schema';
+import { GeneratorType, Option, TaskExecutionSchema } from '@nx-console/schema';
 import {
   getOutputChannel,
   getTelemetry,
   readTargetDef,
-  selectSchematic,
+  selectGenerator,
 } from '@nx-console/server';
 import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
@@ -18,7 +18,8 @@ import {
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
   workspaceRouteTitle: WorkspaceRouteTitle = 'Run',
-  contextMenuUri?: Uri
+  contextMenuUri?: Uri,
+  generatorType?: GeneratorType
 ): Promise<TaskExecutionSchema | void> {
   try {
     if (!cliTaskProvider.getWorkspacePath()) {
@@ -112,38 +113,39 @@ export async function getTaskExecutionSchema(
         });
       }
       case 'Generate': {
-        return selectSchematic(cliTaskProvider.getWorkspaceJsonPath()).then(
-          (schematic) => {
-            if (!schematic) {
+        return selectGenerator(
+          cliTaskProvider.getWorkspaceJsonPath(),
+          generatorType
+        ).then((generator) => {
+          if (!generator) {
+            return;
+          }
+
+          generator.options.forEach((option) => {
+            // TODO: mixup between items and enum has been a source for recent bugs,
+            //  util.ts normalizeSchema sets items from enum.
+            if (option.enum) {
               return;
             }
 
-            schematic.options.forEach((option) => {
-              // TODO: mixup between items and enum has been a source for recent bugs,
-              //  util.ts normalizeSchema sets items from enum.
-              if (option.enum) {
-                return;
-              }
+            if (isProjectOption(option)) {
+              option.enum = option.items = cliTaskProvider
+                .getProjectEntries()
+                .map((entry) => entry[0])
+                .sort();
+            }
+          });
 
-              if (isProjectOption(option)) {
-                option.enum = option.items = cliTaskProvider
-                  .getProjectEntries()
-                  .map((entry) => entry[0])
-                  .sort();
-              }
-            });
+          const contextValues = contextMenuUri
+            ? getConfigValuesFromContextMenuUri(
+                generator,
+                contextMenuUri,
+                cliTaskProvider
+              )
+            : undefined;
 
-            const contextValues = contextMenuUri
-              ? getConfigValuesFromContextMenuUri(
-                  schematic,
-                  contextMenuUri,
-                  cliTaskProvider
-                )
-              : undefined;
-
-            return { ...schematic, cliName: workspaceType, contextValues };
-          }
-        );
+          return { ...generator, cliName: workspaceType, contextValues };
+        });
       }
     }
   } catch (e) {
@@ -166,7 +168,7 @@ export async function getTaskExecutionSchema(
 
 // Get information about where the user clicked if invoked through right click in the explorer context menu
 function getConfigValuesFromContextMenuUri(
-  schematic: TaskExecutionSchema,
+  generator: TaskExecutionSchema,
   contextMenuUri: Uri | undefined,
   cliTaskProvider: CliTaskProvider
 ):
@@ -190,12 +192,12 @@ function getConfigValuesFromContextMenuUri(
     const appsDir = nxConfig.workspaceLayout?.appsDir ?? 'apps';
     const libsDir = nxConfig.workspaceLayout?.libsDir ?? 'libs';
     if (
-      (appsDir && schematic.name === 'application') ||
-      schematic.name === 'app'
+      (appsDir && generator.name === 'application') ||
+      generator.name === 'app'
     ) {
       path = path.replace(appsDir, '').replace(/^\//, '');
     }
-    if ((libsDir && schematic.name === 'library') || schematic.name === 'lib') {
+    if ((libsDir && generator.name === 'library') || generator.name === 'lib') {
       path = path.replace(libsDir, '').replace(/^\//, '');
     }
 
@@ -203,7 +205,7 @@ function getConfigValuesFromContextMenuUri(
       project: projectName,
       projectName,
       path,
-      ...(!(projectName && schematic.options.some(isProjectOption)) && {
+      ...(!(projectName && generator.options.some(isProjectOption)) && {
         directory: path,
       }),
     };

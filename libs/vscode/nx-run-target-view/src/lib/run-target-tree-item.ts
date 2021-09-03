@@ -1,3 +1,4 @@
+import { GeneratorType } from '@nx-console/schema';
 import { join } from 'path';
 import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 
@@ -73,7 +74,8 @@ export class RunTargetTreeItem extends TreeItem {
   constructor(
     readonly workspaceJsonPath: string,
     readonly route: WorkspaceRouteTitle,
-    readonly extensionPath: string
+    readonly extensionPath: string,
+    readonly generatorType?: GeneratorType
   ) {
     super(route, TreeItemCollapsibleState.None);
   }

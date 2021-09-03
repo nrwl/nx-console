@@ -65,6 +65,16 @@
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.run.fileexplorer",
           "group": "2_workspace"
+        },
+        {
+          "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxAppsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasApplicationGenerators",
+          "command": "nx.generate.ui.app.fileexplorer",
+          "group": "2_workspace"
+        },
+        {
+          "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxLibsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasLibraryGenerators",
+          "command": "nx.generate.ui.lib.fileexplorer",
+          "group": "2_workspace"
         }
       ],
       "view/title": [
@@ -107,6 +117,22 @@
         {
           "command": "nx.run.fileexplorer",
           "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.app.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.lib.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.app",
+          "when": "isNxWorkspace && nx.hasApplicationGenerators"
+        },
+        {
+          "command": "nx.generate.ui.lib",
+          "when": "isNxWorkspace && && nx.hasLibraryGenerators"
         },
         {
           "command": "ng.lint",
@@ -511,6 +537,26 @@
         "category": "Nx",
         "title": "Nx run",
         "command": "nx.run.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Add application",
+        "command": "nx.generate.ui.app"
+      },
+      {
+        "category": "Nx",
+        "title": "Add library",
+        "command": "nx.generate.ui.lib"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx add application",
+        "command": "nx.generate.ui.app.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx add library",
+        "command": "nx.generate.ui.lib.fileexplorer"
       }
     ],
     "configuration": {

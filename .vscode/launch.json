@@ -17,6 +17,7 @@
         "${workspaceFolder}/node_modules"
       ],
       "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
       "type": "pwa-extensionHost"
     },
     {
