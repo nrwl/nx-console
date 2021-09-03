@@ -132,7 +132,7 @@
         },
         {
           "command": "nx.generate.ui.lib",
-          "when": "isNxWorkspace && && nx.hasLibraryGenerators"
+          "when": "isNxWorkspace && nx.hasLibraryGenerators"
         },
         {
           "command": "ng.lint",
