@@ -1,4 +1,9 @@
-import { Option, Schematic, SchematicCollection } from '@nx-console/schema';
+import {
+  Option,
+  Generator,
+  GeneratorCollection,
+  GeneratorType,
+} from '@nx-console/schema';
 import { basename, dirname, join } from 'path';
 
 import {
@@ -12,11 +17,11 @@ import {
   toWorkspaceFormat,
 } from './utils';
 
-export async function readAllSchematicCollections(
+export async function readAllGeneratorCollections(
   workspaceJsonPath: string
-): Promise<SchematicCollection[]> {
+): Promise<GeneratorCollection[]> {
   const basedir = join(workspaceJsonPath, '..');
-  let collections = await readSchematicCollectionsFromNodeModules(
+  let collections = await readGeneratorCollectionsFromNodeModules(
     workspaceJsonPath
   );
   collections = [
@@ -31,19 +36,19 @@ export async function readAllSchematicCollections(
     )),
   ];
   return collections.filter(
-    (collection): collection is SchematicCollection =>
-      collection && collection.schematics.length > 0
+    (collection): collection is GeneratorCollection =>
+      collection && collection.generators.length > 0
   );
 }
 
 async function checkAndReadWorkspaceCollection(
   basedir: string,
-  workspaceSchematicsPath: string
+  workspaceGeneratorsPath: string
 ) {
-  if (directoryExists(join(basedir, workspaceSchematicsPath))) {
-    return readWorkspaceSchematicsCollection(
+  if (directoryExists(join(basedir, workspaceGeneratorsPath))) {
+    return readWorkspaceGeneratorsCollection(
       basedir,
-      workspaceSchematicsPath
+      workspaceGeneratorsPath
     ).then((val) => [val]);
   }
   return Promise.resolve([]);
@@ -56,19 +61,19 @@ function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {
-        const [collectionName, schematicName] = key.split(':');
+        const [collectionName, generatorName] = key.split(':');
         if (!collectionDefaultsMap[collectionName]) {
           collectionDefaultsMap[collectionName] = {};
         }
-        collectionDefaultsMap[collectionName][schematicName] = defaults[key];
+        collectionDefaultsMap[collectionName][generatorName] = defaults[key];
       } else {
         const collectionName = key;
         if (!collectionDefaultsMap[collectionName]) {
           collectionDefaultsMap[collectionName] = {};
         }
-        Object.keys(defaults[collectionName]).forEach((schematicName) => {
-          collectionDefaultsMap[collectionName][schematicName] =
-            defaults[collectionName][schematicName];
+        Object.keys(defaults[collectionName]).forEach((generatorName) => {
+          collectionDefaultsMap[collectionName][generatorName] =
+            defaults[collectionName][generatorName];
         });
       }
       return collectionDefaultsMap;
@@ -78,13 +83,13 @@ function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
   return collectionDefaults;
 }
 
-async function readSchematicCollectionsFromNodeModules(
+async function readGeneratorCollectionsFromNodeModules(
   workspaceJsonPath: string
-): Promise<SchematicCollection[]> {
+): Promise<GeneratorCollection[]> {
   const basedir = join(workspaceJsonPath, '..');
   const nodeModulesDir = join(basedir, 'node_modules');
   const packages = listOfUnnestedNpmPackages(nodeModulesDir);
-  const schematicCollections = packages.filter((p) => {
+  const generatorCollections = packages.filter((p) => {
     try {
       const packageJson = readAndCacheJsonFile(
         join(p, 'package.json'),
@@ -106,26 +111,23 @@ async function readSchematicCollectionsFromNodeModules(
 
   return (
     await Promise.all(
-      schematicCollections.map((c) => readCollection(nodeModulesDir, c))
+      generatorCollections.map((c) => readCollection(nodeModulesDir, c))
     )
-  ).filter((c): c is SchematicCollection => Boolean(c));
+  ).filter((c): c is GeneratorCollection => Boolean(c));
 }
 
-async function readWorkspaceSchematicsCollection(
+async function readWorkspaceGeneratorsCollection(
   basedir: string,
-  workspaceSchematicsPath: string
-): Promise<{
-  name: string;
-  schematics: Schematic[];
-}> {
-  const collectionDir = join(basedir, workspaceSchematicsPath);
+  workspaceGeneratorsPath: string
+): Promise<GeneratorCollection> {
+  const collectionDir = join(basedir, workspaceGeneratorsPath);
   const collectionName = 'workspace-schematic';
   if (fileExistsSync(join(collectionDir, 'collection.json'))) {
     const collection = readAndCacheJsonFile('collection.json', collectionDir);
 
-    return await readCollectionSchematics(collectionName, collection.json);
+    return readCollectionGenerators(collectionName, collection.json);
   } else {
-    const schematics: Schematic[] = await Promise.all(
+    const generators: Generator[] = await Promise.all(
       listFiles(collectionDir)
         .filter((f) => basename(f) === 'schema.json')
         .map(async (f) => {
@@ -135,17 +137,18 @@ async function readWorkspaceSchematicsCollection(
             collection: collectionName,
             options: await normalizeSchema(schemaJson.json),
             description: '',
+            type: GeneratorType.Other,
           };
         })
     );
-    return { name: collectionName, schematics };
+    return { name: collectionName, generators };
   }
 }
 
 async function readCollection(
   basedir: string,
   collectionName: string
-): Promise<SchematicCollection | null> {
+): Promise<GeneratorCollection | null> {
   try {
     const packageJson = readAndCacheJsonFile(
       join(collectionName, 'package.json'),
@@ -155,29 +158,42 @@ async function readCollection(
       packageJson.json.schematics || packageJson.json.generators,
       dirname(packageJson.path)
     );
-    return readCollectionSchematics(collectionName, collection.json);
+    return readCollectionGenerators(collectionName, collection.json);
   } catch (e) {
     // this happens when package is misconfigured. We decided to ignore such a case.
     return null;
   }
 }
 
-async function readCollectionSchematics(
+function readCollectionGenerators(
   collectionName: string,
   collectionJson: any
-) {
-  const generators = new Set<Schematic>();
+): GeneratorCollection {
+  const generators = new Set<Generator>();
 
   try {
     Object.entries(
       Object.assign({}, collectionJson.schematics, collectionJson.generators)
-    ).forEach(async ([k, v]: [any, any]) => {
+    ).forEach(([k, v]: [any, any]) => {
       try {
         if (canAdd(k, v)) {
+          let generatorType: GeneratorType;
+          switch (v['x-type']) {
+            case 'application':
+              generatorType = GeneratorType.Application;
+              break;
+            case 'library':
+              generatorType = GeneratorType.Library;
+              break;
+            default:
+              generatorType = GeneratorType.Other;
+              break;
+          }
           generators.add({
             name: k,
             collection: collectionName,
             description: v.description || '',
+            type: generatorType,
           });
         }
       } catch (e) {
@@ -193,14 +209,14 @@ async function readCollectionSchematics(
   }
   return {
     name: collectionName,
-    schematics: Array.from(generators),
+    generators: Array.from(generators),
   };
 }
 
-export async function readSchematicOptions(
+export async function readGeneratorOptions(
   workspaceJsonPath: string,
   collectionName: string,
-  schematicName: string
+  generatorName: string
 ): Promise<Option[]> {
   const basedir = join(workspaceJsonPath, '..');
   const nodeModulesDir = join(basedir, 'node_modules');
@@ -213,22 +229,22 @@ export async function readSchematicOptions(
       collectionPackageJson.json.generators,
     dirname(collectionPackageJson.path)
   );
-  const schematics = Object.assign(
+  const generators = Object.assign(
     {},
     collectionJson.json.schematics,
     collectionJson.json.generators
   );
 
-  const schematicSchema = readAndCacheJsonFile(
-    schematics[schematicName].schema,
+  const generatorSchema = readAndCacheJsonFile(
+    generators[generatorName].schema,
     dirname(collectionJson.path)
   );
   const workspaceDefaults = readWorkspaceJsonDefaults(workspaceJsonPath);
   const defaults =
     workspaceDefaults &&
     workspaceDefaults[collectionName] &&
-    workspaceDefaults[collectionName][schematicName];
-  return await normalizeSchema(schematicSchema.json, defaults);
+    workspaceDefaults[collectionName][generatorName];
+  return await normalizeSchema(generatorSchema.json, defaults);
 }
 
 function canAdd(

@@ -17,6 +17,10 @@
         "${workspaceFolder}/node_modules"
       ],
       "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**",
+        "/Applications/Visual Studio Code.app/**"
+      ],
       "type": "pwa-extensionHost"
     },
     {

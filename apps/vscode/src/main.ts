@@ -21,6 +21,7 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
+  readAllGeneratorCollections,
   teardownTelemetry,
   watchFile,
 } from '@nx-console/server';
@@ -44,6 +45,7 @@ import {
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
 import {
+  getNxConfig,
   verifyWorkspace,
   WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
@@ -53,6 +55,7 @@ import {
   WorkspaceJsonSchema,
   ProjectJsonSchema,
 } from '@nx-console/vscode/json-schema';
+import { GeneratorType } from '@nx-console/schema';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -196,10 +199,10 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
 
   while (currentDirectory !== root) {
     if (existsSync(join(currentDirectory, 'angular.json'))) {
-      return setWorkspace(join(currentDirectory, 'angular.json'));
+      setWorkspace(join(currentDirectory, 'angular.json'));
     }
     if (existsSync(join(currentDirectory, 'workspace.json'))) {
-      return setWorkspace(join(currentDirectory, 'workspace.json'));
+      setWorkspace(join(currentDirectory, 'workspace.json'));
     }
     currentDirectory = dirname(currentDirectory);
   }
@@ -244,6 +247,8 @@ async function setWorkspace(workspaceJsonPath: string) {
     );
   }
 
+  await setApplicationAndLibraryContext(workspaceJsonPath);
+
   const isNxWorkspace = existsSync(join(workspaceJsonPath, '..', 'nx.json'));
   const isAngularWorkspace = workspaceJsonPath.endsWith('angular.json');
 
@@ -269,6 +274,50 @@ async function setWorkspace(workspaceJsonPath: string) {
   }
 
   getTelemetry().record('WorkspaceType', { workspaceType });
+}
+
+async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
+  const nxConfig = getNxConfig(dirname(workspaceJsonPath));
+
+  commands.executeCommand('setContext', 'nxAppsDir', [
+    join(
+      dirname(workspaceJsonPath),
+      nxConfig.workspaceLayout?.appsDir ?? 'apps'
+    ),
+  ]);
+  commands.executeCommand('setContext', 'nxLibsDir', [
+    join(
+      dirname(workspaceJsonPath),
+      nxConfig.workspaceLayout?.libsDir ?? 'libs'
+    ),
+  ]);
+
+  const generatorCollections = await readAllGeneratorCollections(
+    workspaceJsonPath
+  );
+  let hasApplicationGenerators = false;
+  let hasLibraryGenerators = false;
+
+  generatorCollections.forEach((generatorCollection) => {
+    generatorCollection.generators.forEach((generator) => {
+      if (generator.type === 'application') {
+        hasApplicationGenerators = true;
+      } else if (generator.type === 'library') {
+        hasLibraryGenerators = true;
+      }
+    });
+  });
+
+  commands.executeCommand(
+    'setContext',
+    'nx.hasApplicationGenerators',
+    hasApplicationGenerators
+  );
+  commands.executeCommand(
+    'setContext',
+    'nx.hasLibraryGenerators',
+    hasLibraryGenerators
+  );
 }
 
 function registerWorkspaceFileWatcher(

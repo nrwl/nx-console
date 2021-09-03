@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { isAbsolute, join, relative } from 'path';
 import {
   ProviderResult,
   Task,
@@ -141,13 +141,15 @@ export class CliTaskProvider implements TaskProvider {
 
     const entry = this.getProjectEntries().find(([, def]) => {
       const fullProjectPath = join(this.getWorkspacePath(), def.root);
+      if (fullProjectPath === selectedPath) {
+        return true;
+      }
+
+      const relativePath = relative(fullProjectPath, selectedPath);
       return (
-        selectedPath.startsWith(fullProjectPath) &&
-        // check that it's not a partial match
-        selectedPath
-          .replace(fullProjectPath, '')
-          .replace(/\\/g, '/')
-          .startsWith('/')
+        relativePath &&
+        !relativePath.startsWith('..') &&
+        !isAbsolute(relativePath)
       );
     });
 

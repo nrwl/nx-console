@@ -21,7 +21,7 @@ import {
 } from 'jsonc-parser';
 import { getOutputChannel } from './output-channel';
 
-export interface SchematicDefaults {
+export interface GeneratorDefaults {
   [name: string]: string;
 }
 
@@ -216,7 +216,7 @@ export async function normalizeSchema(
     properties: { [k: string]: any };
     required: string[];
   },
-  projectDefaults?: SchematicDefaults
+  projectDefaults?: GeneratorDefaults
 ): Promise<Option[]> {
   const options: CliOption[] = await parseJsonSchemaToOptions(registry, s);
   const requiredFields = new Set(s.required || []);
