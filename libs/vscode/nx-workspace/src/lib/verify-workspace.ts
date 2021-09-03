@@ -29,7 +29,7 @@ export function verifyWorkspace(): {
         validWorkspaceJson: true,
         // TODO(cammisuli): change all instances to use the new version - basically reverse this to the new format
         json: toWorkspaceFormat(
-          getNxWorkspaceConfig(workspacePath, angularJsonPath)
+          getNxWorkspaceConfig(workspacePath, workspaceJsonPath)
         ),
         workspaceType: 'nx',
         configurationFilePath: workspaceJsonPath,
