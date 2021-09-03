@@ -390,7 +390,7 @@
       },
       {
         "category": "ng",
-        "title": "ng generate (ui)",
+        "title": "ng generate...",
         "command": "ng.generate.ui.fileexplorer"
       },
       {
@@ -530,7 +530,7 @@
       },
       {
         "category": "Nx",
-        "title": "Nx generate (ui)",
+        "title": "Nx generate...",
         "command": "nx.generate.ui.fileexplorer"
       },
       {
@@ -540,22 +540,22 @@
       },
       {
         "category": "Nx",
-        "title": "Add application",
+        "title": "generate application",
         "command": "nx.generate.ui.app"
       },
       {
         "category": "Nx",
-        "title": "Add library",
+        "title": "generate library",
         "command": "nx.generate.ui.lib"
       },
       {
         "category": "Nx",
-        "title": "Nx add application",
+        "title": "Nx generate application",
         "command": "nx.generate.ui.app.fileexplorer"
       },
       {
         "category": "Nx",
-        "title": "Nx add library",
+        "title": "Nx generate library",
         "command": "nx.generate.ui.lib.fileexplorer"
       }
     ],
