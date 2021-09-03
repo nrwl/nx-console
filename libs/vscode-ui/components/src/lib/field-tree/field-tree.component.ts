@@ -9,6 +9,7 @@ import {
 import { Option } from '@nx-console/schema';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'vscode-ui-field-tree',
   templateUrl: './field-tree.component.html',
   styleUrls: ['./field-tree.component.scss'],
@@ -18,6 +19,8 @@ export class FieldTreeComponent implements OnChanges {
   @Input() fields: Array<Option>;
   @Input() activeFieldName: string;
   @Input() filteredFields: Set<string>;
+  @Input() validFields: {[name: string]: string[] | string | number | boolean};
+  @Input() invalidFields: {[name: string]: string[] | string | number | boolean};
 
   userSelectedField?: string;
 
@@ -71,5 +74,13 @@ export class FieldTreeComponent implements OnChanges {
         inline: 'start',
       });
     }
+  }
+
+  isFieldValid(fieldName: string): boolean {
+    return this.validFields && !!this.validFields[fieldName];
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    return this.invalidFields && this.invalidFields[fieldName] !== undefined;
   }
 }

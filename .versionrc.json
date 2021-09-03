@@ -4,6 +4,10 @@
     {
       "filename": "apps/vscode/src/package.json",
       "type": "json"
+    },
+    {
+      "filename": "package.json",
+      "type": "json"
     }
   ],
   "types": [

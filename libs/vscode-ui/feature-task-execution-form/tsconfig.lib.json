@@ -2,11 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../../dist/out-tsc",
-    "target": "es2015",
     "declaration": true,
-    "inlineSources": true,
-    "types": [],
-    "lib": ["dom", "es2018"]
+    "inlineSources": true
   },
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,
@@ -16,11 +13,6 @@
     "strictInjectionParameters": true,
     "enableResourceInlining": true
   },
-  "exclude": [
-    "src/test.ts",
-    "**/*.spec.ts",
-    "**/*.stories.ts",
-    "**/*.stories.js"
-  ],
+  "exclude": ["src/test.ts", "**/*.spec.ts"],
   "include": ["**/*.ts"]
 }

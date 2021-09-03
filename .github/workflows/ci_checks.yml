@@ -2,109 +2,40 @@ name: CI Checks
 on: [push, pull_request]
 
 jobs:
-  setup:
+  checks:
     runs-on: ${{ matrix.os }}
+
+    env:
+      NX_BRANCH: ${{ github.event.number || github.ref }}
+      NX_RUN_GROUP: ${{ github.run_id }}
+
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [14.x]
+        node-version: [14]
+
     steps:
+      - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        id: workspace-cache
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
         with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-workspace-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-workspace-
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-
+
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
-  lint:
-    runs-on: ${{ matrix.os }}
 
-    env:
-      NX_BRANCH: ${{ github.event.number || github.ref }}
-      NX_RUN_GROUP: ${{ github.run_id }}
-
-    needs: [setup]
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [14.x]
-
-    steps:
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        id: workspace-cache
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-workspace-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-workspace-
-      - run: yarn nx run-many --all --parallel --target=lint
-
-  build:
-    runs-on: ${{ matrix.os }}
-
-    env:
-      NX_BRANCH: ${{ github.event.number || github.ref }}
-      NX_RUN_GROUP: ${{ github.run_id }}
-
-    needs: [setup]
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [14.x]
-
-    steps:
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        id: workspace-cache
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-workspace-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-workspace-
-      - run: yarn nx run-many --all --parallel --target=build
-
-  test:
-    runs-on: ${{ matrix.os }}
-
-    env:
-      NX_BRANCH: ${{ github.event.number || github.ref }}
-      NX_RUN_GROUP: ${{ github.run_id }}
-
-    needs: [setup]
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [14.x]
-
-    steps:
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        id: workspace-cache
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node-version }}-workspace-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node-version }}-workspace-
-      - run: yarn nx run-many --all --parallel --target=test
+      - name: Lint
+        run: yarn nx run-many --all --parallel --target=lint
+      - name: Test
+        run: yarn nx run-many --all --parallel --target=test
+      - name: Build
+        run: yarn nx run-many --all --parallel --target=build

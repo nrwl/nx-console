@@ -1,19 +1,21 @@
-export { readAndCacheJsonFile, fileExistsSync } from './lib/utils/utils';
-
-export { findClosestNg, findClosestNx } from './lib/utils/utils';
-
-export {
-  readAndCacheJsonFile as readJsonFile,
-  toLegacyWorkspaceFormat,
-} from './lib/utils/utils';
-
-export { Telemetry } from './lib/telemetry';
+export * from './lib/abstract-tree-provider';
 export * from './lib/extensions';
-export * from './lib/utils/read-schematic-collections';
+export * from './lib/stores';
+export * from './lib/select-generator';
+export * from './lib/telemetry';
+export * from './lib/utils/output-channel';
 export * from './lib/utils/read-projects';
-
-export interface Store {
-  get(key: string, defaultValue?: any): any;
-  set(key: string, value: any): void;
-  delete(key: string): void;
-}
+export * from './lib/utils/read-generator-collections';
+export {
+  fileExistsSync,
+  findClosestNg,
+  findClosestNx,
+  readAndParseJson,
+  readAndCacheJsonFile,
+  cacheJson,
+  clearJsonCache,
+  toLegacyWorkspaceFormat,
+  toWorkspaceFormat,
+  listOfUnnestedNpmPackages,
+} from './lib/utils/utils';
+export { watchFile } from './lib/utils/watch-file';

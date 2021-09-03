@@ -19,11 +19,12 @@ export class InputComponent {
   @Input() disabled = false;
   @Input() value: string;
   @Output() readonly valueChange = new EventEmitter<string>();
-  parentFormGroup: FormGroup;
 
-  constructor(private readonly controlContainer: ControlContainer) {
-    this.parentFormGroup = this.controlContainer.control as FormGroup;
+  get parentFormGroup(): FormGroup {
+    return this.controlContainer.control as FormGroup;
   }
+
+  constructor(private readonly controlContainer: ControlContainer) {}
 
   updateValue(updated: string): void {
     this.valueChange.emit(updated);

@@ -16,8 +16,9 @@ import {
   FormGroup,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { getOptionItems } from '../field-items/field-items.pipe';
 
-enum OptionComponent {
+export enum OptionComponent {
   Autocomplete = 'autocomplete',
   Checkbox = 'checkBox',
   Input = 'input',
@@ -46,12 +47,21 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
   valueChangeSub: Subscription;
   OptionComponent = OptionComponent;
 
-  control = new FormControl('');
-  parentFormGroup: FormGroup;
-
   disabled = false;
-  onChange: any = () => {};
-  onTouched: any = () => {};
+  onChange: any = () => {
+    // noop
+  };
+  onTouched: any = () => {
+    // noop
+  };
+
+  get parentFormGroup(): FormGroup {
+    return this.controlContainer.control as FormGroup;
+  }
+
+  get control(): FormControl {
+    return this.parentFormGroup?.get(this.field?.name) as FormControl;
+  }
 
   get value(): string {
     return this._value;
@@ -60,7 +70,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
   set value(value: string) {
     if (this._value !== value) {
       this._value = value;
-      this.control.setValue(value);
+      this.control.setValue(value, { emitEvent: false });
       this.onChange(this._value);
     }
   }
@@ -85,11 +95,12 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly controlContainer: ControlContainer
-  ) {
-    this.valueChangeSub = this.control.valueChanges.subscribe((value) => {
-      this.value = value;
-    });
-    this.parentFormGroup = this.controlContainer.control as FormGroup;
+  ) {}
+
+  ngOnDestroy(): void {
+    if (this.valueChangeSub) {
+      this.valueChangeSub.unsubscribe();
+    }
   }
 
   camelToTitle(camelCase: string) {
@@ -97,63 +108,50 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     return result.charAt(0).toUpperCase() + result.slice(1);
   }
 
-  ngOnDestroy(): void {
-    this.valueChangeSub.unsubscribe();
-  }
-
-  hasErrors(fieldName: string): boolean {
-    const control = this.parentFormGroup.get(fieldName) as FormControl;
-    if (!control) {
+  hasErrors(): boolean {
+    if (!this.control) {
       return false;
     }
 
-    return !!control.errors && (control.touched || control.dirty);
+    return (
+      !!this.control.errors && (this.control.touched || this.control.dirty)
+    );
   }
 
   getErrors(fieldName: string): string[] {
-    const control = this.parentFormGroup.get(fieldName) as FormControl;
-    if (!control || !this.hasErrors(fieldName)) {
+    if (!this.control || !this.hasErrors()) {
       return [];
     }
 
-    return Object.keys(control.errors as any)
+    return Object.keys(this.control.errors ?? {})
       .map((key) => {
-        if (!!control.errors) {
+        if (this.control.errors) {
           if (key === 'required') {
             return `${fieldName
               .slice(0, 1)
               .toLocaleUpperCase()}${fieldName.slice(1)} is required`;
           } else {
-            return control.errors[key];
+            return this.control.errors[key];
           }
         }
       })
       .filter((error) => !!error);
   }
 
-  get hasItems(): boolean {
-    return !!this.field.items && (this.field.items as string[]).length > 0;
-  }
-
-  get items(): string[] {
-    return this.field.items as string[];
-  }
-
   get component(): OptionComponent {
+    const items = getOptionItems(this.field);
     if (this.field.type === OptionType.Boolean) {
       return OptionComponent.Checkbox;
-    } else if (this.field.type === OptionType.Array && this.hasItems) {
-      return OptionComponent.MultiSelect;
-    } else {
-      if (this.hasItems) {
-        if (this.items.length > 10) {
-          return OptionComponent.Autocomplete;
-        } else {
-          return OptionComponent.Select;
-        }
+    } else if (items) {
+      if (this.field.type === OptionType.Array) {
+        return OptionComponent.MultiSelect;
+      } else if (items.length > 10) {
+        return OptionComponent.Autocomplete;
       } else {
-        return OptionComponent.Input;
+        return OptionComponent.Select;
       }
+    } else {
+      return OptionComponent.Input;
     }
   }
 }

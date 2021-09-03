@@ -1,9 +1,6 @@
 import {
   Component,
-  OnDestroy,
   Input,
-  SimpleChanges,
-  OnChanges,
   ViewChild,
   ElementRef,
   OnInit,
@@ -19,7 +16,6 @@ import {
 import {
   map,
   tap,
-  takeUntil,
   switchMap,
   startWith,
   scan,
@@ -27,15 +23,9 @@ import {
   filter,
   shareReplay,
 } from 'rxjs/operators';
-import {
-  Subject,
-  BehaviorSubject,
-  Observable,
-  fromEvent,
-  merge,
-  of,
-} from 'rxjs';
-import { ItemsWithEnum, Option } from '@nx-console/schema';
+import { BehaviorSubject, Observable, fromEvent, merge, of } from 'rxjs';
+import { Option } from '@nx-console/schema';
+import { getOptionItems } from '../field-items/field-items.pipe';
 
 export enum AutocompleteNavKeys {
   Enter = 'Enter',
@@ -58,51 +48,39 @@ export const AUTOCOMPLETE_NAV_KEYS = new Set(['Enter', 'ArrowUp', 'ArrowDown']);
     },
   ],
 })
-export class AutocompleteComponent
-  implements OnInit, OnDestroy, OnChanges, ControlValueAccessor {
-  @Input() field: Option;
-
+export class AutocompleteComponent implements OnInit, ControlValueAccessor {
   private readonly _options$ = new BehaviorSubject<string[]>([]);
   visibleOptions: Observable<string[]>;
   selectedOption$: Observable<number | null>;
 
   @ViewChild('textInput', { static: true }) textInput: ElementRef;
-  control: FormControl;
   isFocused$: Observable<boolean>;
 
-  private readonly destroying = new Subject<void>();
+  private _field: Option;
+  @Input() get field(): Option {
+    return this._field;
+  }
+  set field(field: Option) {
+    this._field = field;
+    this._options$.next(getOptionItems(field) || []);
+  }
 
-  parentFormGroup: FormGroup;
+  get parentFormGroup(): FormGroup {
+    return this.controlContainer.control as FormGroup;
+  }
+
+  get control(): FormControl {
+    return this.parentFormGroup?.get(this.field?.name) as FormControl;
+  }
+
+  onChange: any = () => {
+    // noop
+  };
 
   constructor(
-    private readonly _elementRef: ElementRef,
+    readonly _elementRef: ElementRef,
     private readonly controlContainer: ControlContainer
-  ) {
-    this.parentFormGroup = this.controlContainer.control as FormGroup;
-  }
-
-  writeValue(value: string) {
-    if (this.control) {
-      this.control.setValue(value);
-    } else {
-      this.control = new FormControl(
-        value,
-        this.parentFormGroup.controls[this.field.name].validator
-      );
-      this.visibleOptions = this._options$.pipe(
-        switchMap((options) =>
-          this.control.valueChanges.pipe(
-            startWith(''), // When panel is first opened, show the entire list
-            map((formValue) =>
-              options.filter((option) =>
-                option.toLowerCase().includes(formValue.toLowerCase())
-              )
-            )
-          )
-        )
-      );
-    }
-  }
+  ) {}
 
   ngOnInit() {
     this.isFocused$ = merge(
@@ -114,6 +92,21 @@ export class AutocompleteComponent
       )
     ).pipe(startWith(false), debounceTime(300), shareReplay(1));
 
+    this.visibleOptions = this._options$.pipe(
+      switchMap((options) =>
+        this.control.valueChanges.pipe(
+          startWith(this.control.value || ''), // When panel is first opened, show the entire list
+          map(
+            (formValue) =>
+              options &&
+              options.filter((option) =>
+                option.toLowerCase().includes(formValue.toLowerCase())
+              )
+          )
+        )
+      )
+    );
+
     this.selectedOption$ = this.isFocused$.pipe(
       switchMap((isFocused) =>
         isFocused
@@ -124,7 +117,7 @@ export class AutocompleteComponent
                       map((event: KeyboardEvent) => event.key),
                       filter((key) => AUTOCOMPLETE_NAV_KEYS.has(key)),
                       scan(
-                        ([index, _]: [number, string | null], key) =>
+                        ([index]: [number, string | null], key) =>
                           [
                             updatedOptionIndex(
                               <AutocompleteNavKeys>key,
@@ -152,26 +145,6 @@ export class AutocompleteComponent
       ),
       shareReplay(1)
     );
-
-    this.selectedOption$.subscribe();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.field) {
-      const items = changes.field.currentValue.items;
-      if (this.isItemsWithEnum(items)) {
-        this._options$.next(items.enum.map(String));
-      } else {
-        this._options$.next((items as string[]).map(String));
-      }
-    }
-  }
-
-  private isItemsWithEnum(
-    items: string[] | ItemsWithEnum
-  ): items is ItemsWithEnum {
-    // tslint:disable-next-line: strict-type-predicates
-    return (items as ItemsWithEnum).enum !== undefined;
   }
 
   optionSelected(value: string) {
@@ -179,20 +152,22 @@ export class AutocompleteComponent
     this.textInput.nativeElement.blur();
   }
 
-  registerOnChange(fn: any) {
-    this.control.valueChanges
-      .pipe(tap(fn), takeUntil(this.destroying))
-      .subscribe();
+  writeValue(value: string) {
+    if (this.control.value !== value) {
+      this.control.setValue(value);
+    }
   }
 
-  registerOnTouched() {}
+  registerOnChange(fn: any) {
+    this.onChange = fn;
+  }
+
+  registerOnTouched() {
+    // noop
+  }
 
   setDisabledState(isDisabled: boolean) {
     isDisabled ? this.control.disable() : this.control.enable();
-  }
-
-  ngOnDestroy() {
-    this.destroying.next();
   }
 }
 

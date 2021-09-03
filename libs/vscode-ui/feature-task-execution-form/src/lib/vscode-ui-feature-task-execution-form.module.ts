@@ -1,8 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
+import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
+import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { TaskExecutionSchema } from '@nx-console/schema';
@@ -18,8 +21,14 @@ export function getSchema() {
 }
 
 @NgModule({
-  imports: [CommonModule, VscodeUiComponentsModule, ReactiveFormsModule],
-  declarations: [TaskExecutionFormComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ClipboardModule,
+    VscodeUiComponentsModule,
+    ArgumentListModule,
+  ],
+  declarations: [TaskExecutionFormComponent, FormatTaskPipe],
   exports: [TaskExecutionFormComponent],
   providers: [
     {

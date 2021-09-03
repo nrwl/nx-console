@@ -1,4 +1,4 @@
-import { Store } from '@nx-console/server';
+import {Store} from "../stores/store";
 
 export type UserState = 'untracked' | 'tracked';
 

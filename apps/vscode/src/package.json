@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Nx Console",
   "description": "Nx Console for Visual Studio Code",
-  "version": "17.0.3",
+  "version": "17.9.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"
@@ -37,27 +37,47 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished",
+    "onView:nx-console"
   ],
   "dependencies": {
-    "jsonc-parser": "^2.1.1",
-    "json5": "2.1.1"
+    "jsonc-parser": "^3.0.0"
   },
   "contributes": {
     "menus": {
       "explorer/context": [
         {
-          "when": "isGenerateFromContextMenuEnabled",
+          "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "ng.generate.ui.fileexplorer",
+          "group": "2_workspace"
+        },
+        {
+          "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "ng.run.fileexplorer",
+          "group": "2_workspace"
+        },
+        {
+          "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.generate.ui.fileexplorer",
-          "group": "explorerContext"
+          "group": "2_workspace"
+        },
+        {
+          "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "nx.run.fileexplorer",
+          "group": "2_workspace"
+        },
+        {
+          "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxAppsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasApplicationGenerators",
+          "command": "nx.generate.ui.app.fileexplorer",
+          "group": "2_workspace"
+        },
+        {
+          "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxLibsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasLibraryGenerators",
+          "command": "nx.generate.ui.lib.fileexplorer",
+          "group": "2_workspace"
         }
       ],
       "view/title": [
-        {
-          "command": "nxConsole.refreshNxProjectsTree",
-          "when": "view == nxConsoleJson",
-          "group": "navigation"
-        },
         {
           "command": "nxConsole.refreshNxProjectsTree",
           "when": "view == nxProjects",
@@ -66,13 +86,8 @@
       ],
       "view/item/context": [
         {
-          "command": "nxConsole.revealInExplorer",
-          "when": "view == nxConsoleJson && viewItem == project",
-          "group": "inline"
-        },
-        {
-          "command": "nxConsole.runTask",
-          "when": "view == nxConsoleJson && viewItem == task",
+          "command": "nxConsole.editWorkspaceJson",
+          "when": "view == nxProjects",
           "group": "inline"
         },
         {
@@ -87,6 +102,38 @@
         }
       ],
       "commandPalette": [
+        {
+          "command": "ng.generate.ui.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "ng.run.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.run.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.app.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.lib.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.app",
+          "when": "isNxWorkspace && nx.hasApplicationGenerators"
+        },
+        {
+          "command": "nx.generate.ui.lib",
+          "when": "isNxWorkspace && nx.hasLibraryGenerators"
+        },
         {
           "command": "ng.lint",
           "when": "isAngularWorkspace"
@@ -109,6 +156,10 @@
         },
         {
           "command": "ng.test",
+          "when": "isAngularWorkspace"
+        },
+        {
+          "command": "ng.run",
           "when": "isAngularWorkspace"
         },
         {
@@ -169,6 +220,10 @@
         },
         {
           "command": "nx.run-many",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.run",
           "when": "isNxWorkspace"
         },
         {
@@ -244,27 +299,24 @@
     "commands": [
       {
         "command": "nxConsole.refreshNxProjectsTree",
-        "title": "Refresh",
-        "icon": {
-          "light": "assets/refresh-light.svg",
-          "dark": "assets/refresh-dark.svg"
-        }
+        "title": "Refresh Projects",
+        "category": "Nx",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "nxConsole.editWorkspaceJson",
+        "title": "Edit workspace definition",
+        "icon": "$(go-to-file)"
       },
       {
         "command": "nxConsole.revealInExplorer",
         "title": "Reveal in Explorer",
-        "icon": {
-          "light": "assets/folder-light.svg",
-          "dark": "assets/folder-dark.svg"
-        }
+        "icon": "$(folder)"
       },
       {
         "command": "nxConsole.runTask",
         "title": "Execute task",
-        "icon": {
-          "light": "assets/continue-light.svg",
-          "dark": "assets/continue-dark.svg"
-        }
+        "icon": "$(play)"
       },
       {
         "category": "ng",
@@ -295,6 +347,11 @@
         "category": "ng",
         "title": "test",
         "command": "ng.test"
+      },
+      {
+        "category": "ng",
+        "title": "run",
+        "command": "ng.run"
       },
       {
         "category": "ng",
@@ -332,134 +389,174 @@
         "command": "ng.generate.ui"
       },
       {
-        "category": "nx",
+        "category": "ng",
+        "title": "ng generate...",
+        "command": "ng.generate.ui.fileexplorer"
+      },
+      {
+        "category": "ng",
+        "title": "ng run",
+        "command": "ng.run.fileexplorer"
+      },
+      {
+        "category": "Nx",
         "title": "lint",
         "command": "nx.lint"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "build",
         "command": "nx.build"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "e2e",
         "command": "nx.e2e"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "generate",
         "command": "nx.generate"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "serve",
         "command": "nx.serve"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "test",
         "command": "nx.test"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "dep-graph",
         "command": "nx.dep-graph"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "run-many",
         "command": "nx.run-many"
       },
       {
-        "category": "nx",
+        "category": "Nx",
+        "title": "run",
+        "command": "nx.run"
+      },
+      {
+        "category": "Nx",
         "title": "affected",
         "command": "nx.affected"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected test",
         "command": "nx.affected.test"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected build",
         "command": "nx.affected.build"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected e2e",
         "command": "nx.affected.e2e"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected lint",
         "command": "nx.affected.lint"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected apps",
         "command": "nx.affected.apps"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected libs",
         "command": "nx.affected.libs"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "affected dep-graph",
         "command": "nx.affected.dep-graph"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "list",
         "command": "nx.list"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "migrate",
         "command": "nx.migrate"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "lint (ui)",
         "command": "nx.lint.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "build (ui)",
         "command": "nx.build.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "e2e (ui)",
         "command": "nx.e2e.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "serve (ui)",
         "command": "nx.serve.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "test (ui)",
         "command": "nx.test.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "xi18n (ui)",
         "command": "nx.xi18n.ui"
       },
       {
-        "category": "nx",
+        "category": "Nx",
         "title": "generate (ui)",
         "command": "nx.generate.ui"
       },
       {
-        "category": "nx",
-        "title": "Nx generate (ui)",
+        "category": "Nx",
+        "title": "Nx generate...",
         "command": "nx.generate.ui.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx run",
+        "command": "nx.run.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "generate application",
+        "command": "nx.generate.ui.app"
+      },
+      {
+        "category": "Nx",
+        "title": "generate library",
+        "command": "nx.generate.ui.lib"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx generate application",
+        "command": "nx.generate.ui.app.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx generate library",
+        "command": "nx.generate.ui.lib.fileexplorer"
       }
     ],
     "configuration": {
@@ -479,6 +576,11 @@
           "type": "boolean",
           "default": true,
           "description": "Shows or hides Nx Generate ui option from the file explorer context menu."
+        },
+        "nxConsole.enableWorkspaceConfigCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shows or hides CodeLens for running targets from the Nx workspace config file."
         }
       }
     },
@@ -521,6 +623,10 @@
             "type": "string",
             "description": "The Angular CLI command to run on the selected project"
           },
+          "positional": {
+            "type": "string",
+            "description": "The project to run the command against"
+          },
           "flags": {
             "type": "array",
             "description": "An array of flags to pass to the CLI"
@@ -542,6 +648,10 @@
             "type": "string",
             "description": "The NX CLI command to run on the selected project"
           },
+          "positional": {
+            "type": "string",
+            "description": "The project to run the command against"
+          },
           "flags": {
             "type": "array",
             "description": "An array of flags to pass to the CLI"
@@ -558,10 +668,77 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "nxConsole.views.welcome",
+        "contents": "Nx Console - The UI for Nx"
+      },
+      {
+        "view": "nxConsole.views.welcome",
+        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vscode)"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "nxConsole",
+        "title": "Getting Started with Nx Console",
+        "description": "Interacting with your Nx Workspace",
+        "steps": [
+          {
+            "id": "nxConsole.generate",
+            "title": "Generate",
+            "description": "Use Nx Console to scaffold different files with [Generate](command:nx.generate.ui)",
+            "media": {
+              "markdown": "getting-started/1-generate.md"
+            }
+          },
+          {
+            "id": "nxConsole.run",
+            "title": "Run",
+            "description": "[Run](command:nx.run) Nx commands with selected options",
+            "media": {
+              "markdown": "getting-started/2-run.md"
+            }
+          },
+          {
+            "id": "nxConsole.commonNxCommands",
+            "title": "Common Nx Commands",
+            "description": "Open the [dep-graph](command:nx.dep-graph), run a task for [affected](command:nx.affected) projects, or [run-many](command:nx.run-many) on selected projects",
+            "media": {
+              "markdown": "getting-started/3-common-nx-commands.md"
+            }
+          },
+          {
+            "id": "nxConsole.projects",
+            "title": "Projects",
+            "description": "See all the [projects](command:nxProjects.focus) in your workspace",
+            "media": {
+              "markdown": "getting-started/4-projects.md"
+            }
+          },
+          {
+            "id": "nxConsole.streamlining",
+            "title": "Streamlining",
+            "description": "[Rerun Last Task](command:workbench.action.tasks.reRunTask) or set up custom tasks and [keybindings](command:workbench.action.openGlobalKeybindings)",
+            "media": {
+              "markdown": "getting-started/5-streamlining.md"
+            }
+          }
+        ]
+      }
+    ],
     "views": {
       "nx-console": [
         {
-          "id": "nxConsole",
+          "id": "nxConsole.views.welcome",
+          "name": "Welcome",
+          "when": "!isNxWorkspace && !isAngularWorkspace",
+          "contextualTitle": "Nx Console Getting Started",
+          "icon": "assets/nx-console.png",
+          "visibility": "visible"
+        },
+        {
+          "id": "nxRunTarget",
           "name": "Generate & Run Target"
         },
         {
@@ -575,6 +752,20 @@
           "when": "isNxWorkspace || isAngularWorkspace"
         }
       ]
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "workspace.json",
+        "url": "./workspace-schema.json"
+      },
+      {
+        "fileMatch": "angular.json",
+        "url": "./workspace-schema.json"
+      },
+      {
+        "fileMatch": "project.json",
+        "url": "./project-schema.json"
+      }
+    ]
   }
 }

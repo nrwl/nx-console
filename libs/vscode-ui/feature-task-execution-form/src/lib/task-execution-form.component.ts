@@ -9,6 +9,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { Clipboard } from '@angular/cdk/clipboard';
 import {
   FormBuilder,
   FormControl,
@@ -19,6 +20,7 @@ import {
 import {
   BehaviorSubject,
   combineLatest,
+  merge,
   Observable,
   ReplaySubject,
   Subscription,
@@ -32,15 +34,19 @@ import {
   tap,
   flatMap,
   mapTo,
+  mergeMap,
+  filter,
+  withLatestFrom,
 } from 'rxjs/operators';
+import { getConfigurationFlag, formatTask } from './format-task/format-task';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
   TaskExecutionSchema,
   TaskExecutionMessage,
-  ItemsWithEnum,
+  ItemsWithEnum
 } from '@nx-console/schema';
-import { Value } from '@angular/cli/models/interface';
+import { OptionType, Value } from '@angular/cli/models/interface';
 
 declare global {
   interface Window {
@@ -85,7 +91,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       }
       if (taskExecForm.architect.command === 'generate') {
         this.dryRunSubscription = taskExecForm.form.valueChanges
-          .pipe(debounceTime(500))
+          .pipe(
+            debounceTime(500),
+            filter(() => taskExecForm.form.valid)
+          )
           .subscribe(() => {
             this.runCommand({ ...taskExecForm, dryRun: true });
           });
@@ -156,13 +165,34 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     shareReplay()
   );
 
+  runCommandArguments$ = this.taskExecForm$.pipe(
+    mergeMap((taskExecForm) =>
+      taskExecForm.form.valueChanges.pipe(
+        startWith(taskExecForm.form.value),
+        map(() => taskExecForm)
+      )
+    ),
+    map(({ architect, form }) =>
+      this.serializeArgs(
+        form.value,
+        architect,
+        form.get('configuration')?.value
+      )
+    )
+  );
+
+  validFields$ = this.getValidFields$(true);
+
+  invalidFields$ = this.getValidFields$(false);
+
   dryRunSubscription?: Subscription;
 
   constructor(
     private readonly fb: FormBuilder,
     @Inject(TASK_EXECUTION_SCHEMA) public initialSchema: TaskExecutionSchema,
     private readonly ngZone: NgZone,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly clipboard: Clipboard
   ) {}
 
   ngOnInit() {
@@ -310,11 +340,12 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         defaultValues[field.name] = field.default.map((item) => String(item));
       } else {
         defaultValues[field.name] =
-          String(field.default) || (field.type === 'boolean' ? 'false' : '');
+          String(field.default) || (field.type === OptionType.Boolean ? 'false' : '');
       }
     });
 
     if (configurationName && architect.configurations) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const configuration = architect.configurations.find(
         (c) => c.name === configurationName
       )!;
@@ -336,7 +367,14 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect: TaskExecutionSchema;
     dryRun?: boolean;
   }) {
-    const flags = this.serializeArgs(form.value, architect);
+    const configuration = form.get('configuration')?.value;
+    const args = this.serializeArgs(form.value, architect, configuration);
+    const flags = configuration
+      ? [
+          getConfigurationFlag(configuration),
+          ...args,
+        ]
+      : args;
     if (architect.command === 'generate') {
       flags.push('--no-interactive');
     }
@@ -351,7 +389,51 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  getValidFields$(
+    valid: boolean
+  ): Observable<{ [name: string]: string[] | string | number | boolean }> {
+    return this.taskExecForm$.pipe(
+      mergeMap((taskExecForm) =>
+        merge(
+          taskExecForm.form.valueChanges,
+          taskExecForm.form.statusChanges
+        ).pipe(
+          startWith(taskExecForm),
+          map(() => taskExecForm)
+        )
+      ),
+      withLatestFrom(this.defaultValues$),
+      map(([{ form, architect }, defaultValues]) => {
+        return architect.options
+          .filter((option) => {
+            const control = form.controls[option.name];
+            return (
+              // ** VALID fields **
+              (valid &&
+                control.valid &&
+                // touched is not working with checkbox, so ignore touched and just check !== defaultValue
+                // control.touched &&
+                ((option.type !== OptionType.Array && control.value !== defaultValues[option.name]) ||
+                  (option.type === OptionType.Array &&
+                    control.value &&
+                    control.value.join(',') !== ((defaultValues[option.name] || []) as string[]).join(',')
+                  )
+                )) ||
+              // ** INVALID fields **
+              // invalid and touched (checkbox is always valid as true/false)
+              (!valid && control.touched && control.invalid)
+            );
+          })
+          .reduce((options, option) => ({
+            ...options,
+            [option.name]: form.controls[option.name].value,
+          }), {});
+      })
+    );
+  }
+
   private serializeArgs(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: { [p: string]: any },
     architect: TaskExecutionSchema,
     configurationName?: string
@@ -366,9 +448,15 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     fields.forEach((f) => {
       if (defaultValues[f.name] === value[f.name]) return;
       if (!defaultValues[f.name] && !value[f.name]) return;
+      if (
+        Array.isArray(defaultValues[f.name]) &&
+        (defaultValues[f.name] as string[]).join(',') === value[f.name].join(',')
+      )
+        return;
+
       if (f.positional) {
         args.push(sanitizeWhitespace(value[f.name]));
-      } else if (f.type === 'boolean') {
+      } else if (f.type === OptionType.Boolean) {
         args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else {
         const fieldValue = value[f.name];
@@ -381,6 +469,17 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       }
     });
     return args;
+  }
+
+  copyCommandToClipboard(form: FormGroup, architect: TaskExecutionSchema) {
+    const configuration = form.get('configuration')?.value;
+    this.clipboard.copy(
+      `${formatTask(architect, configuration)} ${this.serializeArgs(
+        form.value,
+        architect,
+        configuration
+      ).join(' ')}`
+    );
   }
 }
 

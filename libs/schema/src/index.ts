@@ -42,21 +42,28 @@ export interface TaskExecutionSchema {
   cliName: 'nx' | 'ng';
   builder?: string;
   description: string;
-  configurations?: ArchitectConfiguration[];
+  configurations?: TargetConfiguration[];
   options: Option[];
   contextValues?: Record<string, string | number | boolean | undefined>;
 }
 
-export interface SchematicCollection {
+export interface GeneratorCollection {
   name: string;
-  schematics: Schematic[];
+  generators: Generator[];
 }
 
-export interface Schematic {
+export enum GeneratorType {
+  Application = 'application',
+  Library = 'library',
+  Other = 'other',
+}
+
+export interface Generator {
   collection: string;
   name: string;
   description: string;
-  options: Option[];
+  options?: Option[];
+  type: GeneratorType;
 }
 
 export interface DefaultValue {
@@ -64,7 +71,7 @@ export interface DefaultValue {
   defaultValue: string | undefined;
 }
 
-export interface ArchitectConfiguration {
+export interface TargetConfiguration {
   name: string;
   defaultValues: DefaultValue[];
 }
@@ -73,16 +80,17 @@ export interface Project {
   name: string;
   root: string;
   projectType: string;
-  architect: Architect[];
+  targets: Targets[];
 }
 
-export interface Architect {
+export interface Targets {
   name: string;
   project: string;
   builder: string;
   description: string;
-  configurations: ArchitectConfiguration[];
+  configurations: TargetConfiguration[];
   options: CliOption[];
 }
 
-export const WORKSPACE_GENERATOR_NAME_REGEX = /^workspace-(schematic|generator):(.+)/;
+export const WORKSPACE_GENERATOR_NAME_REGEX =
+  /^workspace-(schematic|generator):(.+)/;

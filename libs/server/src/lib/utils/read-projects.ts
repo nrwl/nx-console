@@ -1,11 +1,12 @@
 import {
-  Architect,
+  Targets,
   Project,
   Option,
   DefaultValue,
-  ArchitectConfiguration,
+  TargetConfiguration,
 } from '@nx-console/schema';
 import * as path from 'path';
+import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
 
 import {
   getPrimitiveValue,
@@ -13,45 +14,32 @@ import {
   readAndCacheJsonFile,
 } from '../utils/utils';
 
-export function readProjects(json: any): Project[] {
-  return Object.entries(json)
-    .map(
-      ([key, value]: [string, any]): Project => ({
-        name: key,
-        root: value.root,
-        projectType: value.projectType,
-        architect: readArchitect(key, value.architect),
-      })
-    )
-    .sort((a, b) => a.root.localeCompare(b.root));
-}
-
-export function readArchitectDef(
-  architectName: string,
-  architectDef: any,
+export function readTargetDef(
+  targetName: string,
+  targetsDef: NxTargetConfiguration,
   project: string
-): Architect {
-  const configurations: ArchitectConfiguration[] = architectDef.configurations
-    ? Object.keys(architectDef.configurations).map((name) => ({
+): Targets {
+  const configurations: TargetConfiguration[] = targetsDef.configurations
+    ? Object.keys(targetsDef.configurations).map((name) => ({
         name,
-        defaultValues: readDefaultValues(architectDef.configurations, name),
+        defaultValues: readDefaultValues(targetsDef.configurations, name),
       }))
     : [];
 
   return {
     options: [],
     configurations,
-    name: architectName,
+    name: targetName,
     project,
-    description: architectDef.description || '',
-    builder: architectDef.builder,
+    description: (targetsDef as any).description ?? '',
+    builder: targetsDef.executor,
   };
 }
 
-export function readArchitect(project: string, architect: any): Architect[] {
-  if (!architect) return [];
-  return Object.entries(architect).map(([key, value]: [string, any]) => {
-    return readArchitectDef(key, value, project);
+export function readTargets(project: string, targets: any): Targets[] {
+  if (!targets) return [];
+  return Object.entries(targets).map(([key, value]: [string, any]) => {
+    return readTargetDef(key, value, project);
   });
 }
 
@@ -67,7 +55,8 @@ function readDefaultValues(configurations: any, name: string): DefaultValue[] {
 
 export async function readBuilderSchema(
   basedir: string,
-  builder: string
+  builder: string,
+  projectDefaults?: { [name: string]: string }
 ): Promise<Option[]> {
   const [npmPackage, builderName] = builder.split(':');
   const packageJson = readAndCacheJsonFile(
@@ -88,5 +77,5 @@ export async function readBuilderSchema(
     path.dirname(buildersJson.path)
   );
 
-  return await normalizeSchema(builderSchema.json);
+  return await normalizeSchema(builderSchema.json, projectDefaults);
 }
