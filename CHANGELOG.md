@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.10.0](https://github.com/nrwl/nx-console/compare/v17.9.0...v17.10.0) (2021-09-03)
+
+
+### Features
+
+* Add commands to add applications and libraries directly ([#1128](https://github.com/nrwl/nx-console/issues/1128)) ([b908c11](https://github.com/nrwl/nx-console/commits/b908c11aa3b2de1fd35ec52ba243803d2cdaeb34))
+
+
+### Bug Fixes
+
+* remove loading item from projects view ([#1129](https://github.com/nrwl/nx-console/issues/1129)) ([7ad5f60](https://github.com/nrwl/nx-console/commits/7ad5f60cdba5a0f766592aed5b718ba82c3e0881))
+* use proper workspace json path when verifying workspaces ([#1130](https://github.com/nrwl/nx-console/issues/1130)) ([f2365be](https://github.com/nrwl/nx-console/commits/f2365bed33a10e6734fe96e35df01552763905a1))
+
 ## [17.9.0](https://github.com/nrwl/nx-console/compare/v17.8.0...v17.9.0) (2021-08-27)
 
 
