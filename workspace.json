@@ -129,7 +129,8 @@
                   "replace": "apps/vscode/src/environments/environment.ts",
                   "with": "apps/vscode/src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "webpackConfig": "apps/vscode/webpack.prod.config.js"
             }
           },
           "outputs": ["{options.outputPath}"]

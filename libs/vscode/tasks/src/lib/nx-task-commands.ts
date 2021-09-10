@@ -48,7 +48,7 @@ export function registerNxCommands(
 }
 
 async function promptForTarget(): Promise<string | undefined> {
-  const { validWorkspaceJson, json } = verifyWorkspace();
+  const { validWorkspaceJson, json } = await verifyWorkspace();
 
   if (!validWorkspaceJson || !json) {
     return;
@@ -259,7 +259,7 @@ async function promptForRunMany() {
   }
 
   let options = RUN_MANY_OPTIONS;
-  const projects = validProjectsForTarget(target);
+  const projects = await validProjectsForTarget(target);
   if (projects && projects.length) {
     options = [
       {
@@ -331,8 +331,10 @@ async function promptForMigrate() {
   tasks.executeTask(task);
 }
 
-function validProjectsForTarget(target: string): string[] | undefined {
-  const { validWorkspaceJson, json } = verifyWorkspace();
+async function validProjectsForTarget(
+  target: string
+): Promise<string[] | undefined> {
+  const { validWorkspaceJson, json } = await verifyWorkspace();
 
   if (!validWorkspaceJson || !json) {
     return;

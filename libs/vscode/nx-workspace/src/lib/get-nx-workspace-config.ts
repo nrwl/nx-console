@@ -2,18 +2,20 @@ import { readAndCacheJsonFile, cacheJson } from '@nx-console/server';
 import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
 import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 
-export function getNxWorkspaceConfig(
+export async function getNxWorkspaceConfig(
   basedir: string,
   workspaceJsonPath: string
-): WorkspaceJsonConfiguration {
+): Promise<WorkspaceJsonConfiguration> {
   // try and use the workspace version of nx
   try {
     let cachedWorkspaceJson = cacheJson(workspaceJsonPath).json;
     if (!cachedWorkspaceJson) {
-      const workspace = getNxWorkspacePackageFileUtils().readWorkspaceConfig({
+      const workspace = (
+        await getNxWorkspacePackageFileUtils()
+      ).readWorkspaceConfig({
         format: 'nx',
         path: basedir,
-      } as any);
+      });
       cachedWorkspaceJson = cacheJson(workspaceJsonPath, '', workspace).json;
     }
     return cachedWorkspaceJson;

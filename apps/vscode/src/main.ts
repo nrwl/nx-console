@@ -44,18 +44,12 @@ import {
   NxProjectTreeItem,
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
-import {
-  getNxConfig,
-  verifyWorkspace,
-  WorkspaceCodeLensProvider,
-} from '@nx-console/vscode/nx-workspace';
 import { environment } from './environments/environment';
 
 import {
   WorkspaceJsonSchema,
   ProjectJsonSchema,
 } from '@nx-console/vscode/json-schema';
-import { GeneratorType } from '@nx-console/schema';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -68,7 +62,7 @@ let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
 let workspaceFileWatcher: FileSystemWatcher | undefined;
 
-export function activate(c: ExtensionContext) {
+export async function activate(c: ExtensionContext) {
   try {
     const startTime = Date.now();
     context = c;
@@ -131,6 +125,9 @@ export function activate(c: ExtensionContext) {
     );
 
     // registers itself as a CodeLensProvider and watches config to dispose/re-register
+    const { WorkspaceCodeLensProvider } = await import(
+      '@nx-console/vscode/nx-workspace'
+    );
     new WorkspaceCodeLensProvider(context);
     new WorkspaceJsonSchema(context);
     new ProjectJsonSchema(context);
@@ -213,8 +210,9 @@ async function setWorkspace(workspaceJsonPath: string) {
     'nxWorkspaceJsonPath',
     workspaceJsonPath
   );
+  const { verifyWorkspace } = await import('@nx-console/vscode/nx-workspace');
 
-  const { validWorkspaceJson } = verifyWorkspace();
+  const { validWorkspaceJson } = await verifyWorkspace();
   if (!validWorkspaceJson) {
     return;
   }
@@ -277,7 +275,8 @@ async function setWorkspace(workspaceJsonPath: string) {
 }
 
 async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
-  const nxConfig = getNxConfig(dirname(workspaceJsonPath));
+  const { getNxConfig } = await import('@nx-console/vscode/nx-workspace');
+  const nxConfig = await getNxConfig(dirname(workspaceJsonPath));
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(
