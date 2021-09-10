@@ -61,8 +61,8 @@ export function registerCliTaskCommands(
         );
       }
     );
-    commands.registerCommand(`${cli}.run.fileexplorer`, (uri: Uri) =>
-      selectCliCommandAndPromptForFlags('run', getCliProjectFromUri(uri))
+    commands.registerCommand(`${cli}.run.fileexplorer`, async (uri: Uri) =>
+      selectCliCommandAndPromptForFlags('run', await getCliProjectFromUri(uri))
     );
 
     commands.registerCommand(`${cli}.generate`, () =>
@@ -118,7 +118,7 @@ export function registerCliTaskCommands(
   });
 }
 
-function selectCliCommandAndShowUi(
+async function selectCliCommandAndShowUi(
   command: string,
   extensionPath: string,
   uri?: Uri,
@@ -131,7 +131,7 @@ function selectCliCommandAndShowUi(
     );
     return;
   }
-  const { validWorkspaceJson, configurationFilePath } = verifyWorkspace();
+  const { validWorkspaceJson, configurationFilePath } = await verifyWorkspace();
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
@@ -163,7 +163,7 @@ async function selectCliCommandAndPromptForFlags(
     // don't prompt for flags when project and target are already specified
     flags = [];
   }
-  const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
+  const { validWorkspaceJson, json, workspaceType } = await verifyWorkspace();
 
   if (!projectName) {
     const selection = validWorkspaceJson
@@ -237,7 +237,7 @@ async function selectCliCommandAndPromptForFlags(
 
 async function selectGeneratorAndPromptForFlags() {
   const { validWorkspaceJson, workspaceType, configurationFilePath } =
-    verifyWorkspace();
+    await verifyWorkspace();
 
   if (!validWorkspaceJson) {
     return;
@@ -263,17 +263,18 @@ async function selectGeneratorAndPromptForFlags() {
   }
 }
 
-export function getCliProjectFromUri(uri: Uri): string | undefined {
-  const project = cliTaskProvider.projectForPath(uri.fsPath);
+export async function getCliProjectFromUri(
+  uri: Uri
+): Promise<string | undefined> {
+  const project = await cliTaskProvider.projectForPath(uri.fsPath);
   return project?.name;
 }
 
-export function selectCliProject(
+export async function selectCliProject(
   command: string,
   json: WorkspaceJsonConfiguration
 ) {
-  const items = cliTaskProvider
-    .getProjectEntries(json)
+  const items = (await cliTaskProvider.getProjectEntries(json))
     .filter(([, { targets }]) => Boolean(targets))
     .flatMap(([project, { targets }]) => ({ project, targets }))
     .filter(

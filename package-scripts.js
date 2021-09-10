@@ -28,7 +28,7 @@ module.exports = {
       },
       vscode: {
         build: nps.series.nps('prepare.vscode.server', 'prepare.vscode.client'),
-        server: 'nx build vscode-app --prod --noSourceMap',
+        server: 'nx build vscode-app --prod',
         client: 'nx build vscode-ui --prod',
       },
       ci: {

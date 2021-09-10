@@ -115,11 +115,11 @@ export class CliTaskProvider implements TaskProvider {
     });
   }
 
-  getProjects(json?: WorkspaceJsonConfiguration) {
+  async getProjects(json?: WorkspaceJsonConfiguration) {
     if (json) {
       return json.projects;
     } else {
-      const result = verifyWorkspace();
+      const result = await verifyWorkspace();
       if (!result.validWorkspaceJson || !result.json) {
         return {};
       } else {
@@ -128,18 +128,18 @@ export class CliTaskProvider implements TaskProvider {
     }
   }
 
-  getProjectNames(): string[] {
-    return Object.keys(this.getProjects() || {});
+  async getProjectNames(): Promise<string[]> {
+    return Object.keys((await this.getProjects()) || {});
   }
 
-  getProjectEntries(json?: WorkspaceJsonConfiguration) {
-    return Object.entries(this.getProjects(json) || {});
+  async getProjectEntries(json?: WorkspaceJsonConfiguration) {
+    return Object.entries((await this.getProjects(json)) || {});
   }
 
-  projectForPath(selectedPath: string) {
+  async projectForPath(selectedPath: string) {
     if (!this.getWorkspaceJsonPath()) return null;
 
-    const entry = this.getProjectEntries().find(([, def]) => {
+    const entry = (await this.getProjectEntries()).find(([, def]) => {
       const fullProjectPath = join(this.getWorkspacePath(), def.root);
       if (fullProjectPath === selectedPath) {
         return true;

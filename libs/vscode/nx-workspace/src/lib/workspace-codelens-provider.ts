@@ -47,7 +47,9 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
    * @param document a document matched by the pattern passed to registerCodeLensProvider
    * @returns ProjectCodeLens Range locations and properties for the document
    */
-  provideCodeLenses(document: TextDocument): CodeLens[] | undefined {
+  async provideCodeLenses(
+    document: TextDocument
+  ): Promise<CodeLens[] | undefined> {
     const lens: CodeLens[] = [];
 
     let projectName = '';
@@ -71,7 +73,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     }
 
     const projectLocations = getProjectLocations(document, projectName);
-    const { validWorkspaceJson, workspaceType } = verifyWorkspace();
+    const { validWorkspaceJson, workspaceType } = await verifyWorkspace();
     if (!validWorkspaceJson) {
       return;
     }
@@ -163,9 +165,10 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
           GlobalConfigurationStore.configurationSection
         );
         if (affectsNxConsoleConfig) {
-          const enableWorkspaceConfigCodeLens = GlobalConfigurationStore.instance.get(
-            'enableWorkspaceConfigCodeLens'
-          );
+          const enableWorkspaceConfigCodeLens =
+            GlobalConfigurationStore.instance.get(
+              'enableWorkspaceConfigCodeLens'
+            );
           if (enableWorkspaceConfigCodeLens && !this.codeLensProvider) {
             this.registerWorkspaceCodeLensProvider(this.context);
           } else if (!enableWorkspaceConfigCodeLens && this.codeLensProvider) {

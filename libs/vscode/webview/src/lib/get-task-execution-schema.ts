@@ -25,7 +25,7 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, json, workspaceType } = verifyWorkspace();
+    const { validWorkspaceJson, json, workspaceType } = await verifyWorkspace();
 
     if (!validWorkspaceJson) {
       return;
@@ -64,8 +64,7 @@ export async function getTaskExecutionSchema(
         };
       }
       case 'Run': {
-        const runnableItems = cliTaskProvider
-          .getProjectEntries()
+        const runnableItems = (await cliTaskProvider.getProjectEntries())
           .filter(([, { targets }]) => Boolean(targets))
           .flatMap(([project, { targets }]) => ({ project, targets }))
           .flatMap(({ project, targets }) => [
@@ -113,39 +112,39 @@ export async function getTaskExecutionSchema(
         });
       }
       case 'Generate': {
-        return selectGenerator(
+        const generator = await selectGenerator(
           cliTaskProvider.getWorkspaceJsonPath(),
           generatorType
-        ).then((generator) => {
-          if (!generator) {
-            return;
+        );
+
+        if (!generator) {
+          return;
+        }
+
+        for (const option of generator.options) {
+          // TODO: mixup between items and enum has been a source for recent bugs,
+          //  util.ts normalizeSchema sets items from enum.
+          if (option.enum) {
+            continue;
           }
 
-          generator.options.forEach((option) => {
-            // TODO: mixup between items and enum has been a source for recent bugs,
-            //  util.ts normalizeSchema sets items from enum.
-            if (option.enum) {
-              return;
-            }
+          if (isProjectOption(option)) {
+            const projects = await cliTaskProvider.getProjectEntries();
+            option.enum = option.items = projects
+              .map((entry) => entry[0])
+              .sort();
+          }
+        }
 
-            if (isProjectOption(option)) {
-              option.enum = option.items = cliTaskProvider
-                .getProjectEntries()
-                .map((entry) => entry[0])
-                .sort();
-            }
-          });
+        const contextValues = contextMenuUri
+          ? await getConfigValuesFromContextMenuUri(
+              generator,
+              contextMenuUri,
+              cliTaskProvider
+            )
+          : undefined;
 
-          const contextValues = contextMenuUri
-            ? getConfigValuesFromContextMenuUri(
-                generator,
-                contextMenuUri,
-                cliTaskProvider
-              )
-            : undefined;
-
-          return { ...generator, cliName: workspaceType, contextValues };
-        });
+        return { ...generator, cliName: workspaceType, contextValues };
       }
     }
   } catch (e) {
@@ -167,20 +166,21 @@ export async function getTaskExecutionSchema(
 }
 
 // Get information about where the user clicked if invoked through right click in the explorer context menu
-function getConfigValuesFromContextMenuUri(
+async function getConfigValuesFromContextMenuUri(
   generator: TaskExecutionSchema,
   contextMenuUri: Uri | undefined,
   cliTaskProvider: CliTaskProvider
-):
+): Promise<
   | {
       path?: string;
       directory?: string;
       project?: string;
       projectName?: string;
     }
-  | undefined {
+  | undefined
+> {
   if (contextMenuUri) {
-    const project = cliTaskProvider.projectForPath(contextMenuUri.fsPath);
+    const project = await cliTaskProvider.projectForPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
 
     const workspacePath = cliTaskProvider.getWorkspacePath();
@@ -188,7 +188,7 @@ function getConfigValuesFromContextMenuUri(
       .replace(workspacePath, '')
       .replace(/\\/g, '/')
       .replace(/^\//, '');
-    const nxConfig = getNxConfig(workspacePath);
+    const nxConfig = await getNxConfig(workspacePath);
     const appsDir = nxConfig.workspaceLayout?.appsDir ?? 'apps';
     const libsDir = nxConfig.workspaceLayout?.libsDir ?? 'libs';
     if (

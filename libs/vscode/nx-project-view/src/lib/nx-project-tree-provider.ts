@@ -38,7 +38,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     });
   }
 
-  getParent(element: NxProjectTreeItem): NxProjectTreeItem | null | undefined {
+  async getParent(
+    element: NxProjectTreeItem
+  ): Promise<NxProjectTreeItem | null | undefined> {
     const { project, target } = element.nxProject;
 
     if (target) {
@@ -55,7 +57,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     }
   }
 
-  createNxProjectTreeItem(
+  async createNxProjectTreeItem(
     workspaceJsonLabel: NxProject,
     treeItemLabel: string,
     hasChildren?: boolean
@@ -68,8 +70,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         : TreeItemCollapsibleState.None
     );
     if (!workspaceJsonLabel.target) {
-      const projectDef =
-        this.cliTaskProvider.getProjects()[workspaceJsonLabel.project];
+      const projectDef = (await this.cliTaskProvider.getProjects())[
+        workspaceJsonLabel.project
+      ];
       if (projectDef) {
         item.resourceUri = Uri.file(
           join(this.cliTaskProvider.getWorkspacePath(), projectDef.root)
@@ -83,22 +86,26 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     return item;
   }
 
-  getChildren(parent?: NxProjectTreeItem): ProviderResult<NxProjectTreeItem[]> {
+  async getChildren(
+    parent?: NxProjectTreeItem
+  ): Promise<NxProjectTreeItem[] | undefined> {
     if (!parent) {
-      const projects = this.cliTaskProvider.getProjectEntries();
-      return projects.map(
-        ([name, def]): NxProjectTreeItem =>
-          this.createNxProjectTreeItem(
-            { project: name },
-            name,
-            Boolean(def.targets)
-          )
+      const projects = await this.cliTaskProvider.getProjectEntries();
+      return Promise.all(
+        projects.map(
+          async ([name, def]): Promise<NxProjectTreeItem> =>
+            this.createNxProjectTreeItem(
+              { project: name },
+              name,
+              Boolean(def.targets)
+            )
+        )
       );
     }
 
     const { nxProject } = parent;
     const { target, project } = nxProject;
-    const projectDef = this.cliTaskProvider.getProjects()[project];
+    const projectDef = (await this.cliTaskProvider.getProjects())[project];
 
     if (!projectDef) {
       return;
@@ -106,13 +113,15 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
 
     if (!target) {
       if (projectDef.targets) {
-        return Object.keys(projectDef.targets).map(
-          (name): NxProjectTreeItem =>
-            this.createNxProjectTreeItem(
-              { target: { name }, project },
-              name,
-              Boolean(projectDef.targets?.[name].configurations)
-            )
+        return Promise.all(
+          Object.keys(projectDef.targets).map(
+            async (name): Promise<NxProjectTreeItem> =>
+              this.createNxProjectTreeItem(
+                { target: { name }, project },
+                name,
+                Boolean(projectDef.targets?.[name].configurations)
+              )
+          )
         );
       }
     } else {
@@ -129,14 +138,14 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         return;
       }
 
-      return Object.keys(configurations).map((name) => {
-        const item = this.createNxProjectTreeItem(
-          { target: { ...target, configuration: name }, project },
-          name
-        );
-
-        return item;
-      });
+      return Promise.all(
+        Object.keys(configurations).map(async (name) =>
+          this.createNxProjectTreeItem(
+            { target: { ...target, configuration: name }, project },
+            name
+          )
+        )
+      );
     }
   }
 
