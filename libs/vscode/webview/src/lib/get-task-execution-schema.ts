@@ -125,13 +125,12 @@ export async function getTaskExecutionSchema(
           // TODO: mixup between items and enum has been a source for recent bugs,
           //  util.ts normalizeSchema sets items from enum.
           if (option.enum) {
-            return;
+            continue;
           }
 
           if (isProjectOption(option)) {
-            option.enum = option.items = (
-              await cliTaskProvider.getProjectEntries()
-            )
+            const projects = await cliTaskProvider.getProjectEntries();
+            option.enum = option.items = projects
               .map((entry) => entry[0])
               .sort();
           }
