@@ -1,5 +1,5 @@
 import { CliTaskDefinition } from './cli-task-definition';
-import { Task, TaskGroup, TaskScope } from 'vscode';
+import { ShellExecution, Task, TaskGroup, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
 import { findClosestNg, findClosestNx } from '@nx-console/server';
 import { join } from 'path';
