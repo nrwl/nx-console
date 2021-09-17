@@ -1,6 +1,4 @@
 import { ShellExecution } from 'vscode';
-import { platform } from 'os';
-import { execSync } from 'child_process';
 
 export interface ShellConfig {
   /** Human-readable string which will be used to represent the terminal in the UI. */
@@ -14,8 +12,10 @@ export interface ShellConfig {
 export function getShellExecutionForConfig(
   config: ShellConfig
 ): ShellExecution {
-  return new ShellExecution(config.displayCommand, {
-    cwd: config.cwd,
-    shellArgs: [config.program, ...config.args],
-  });
+  return new ShellExecution(
+    `${config.program.replace(/\\/g, '/')} ${config.args.join(' ')}`,
+    {
+      cwd: config.cwd,
+    }
+  );
 }
