@@ -350,6 +350,11 @@ export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
     });
   });
 
+  const sortedProjects = Object.entries(w.projects || {}).sort(
+    (projectA, projectB) => projectA[0].localeCompare(projectB[0])
+  );
+  w.projects = Object.fromEntries(sortedProjects);
+
   if (w.schematics) {
     renameProperty(w, 'schematics', 'generators');
   }
