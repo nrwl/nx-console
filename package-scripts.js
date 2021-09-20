@@ -74,5 +74,8 @@ module.exports = {
     'install-dependencies': {
       vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
     },
+    lint: {
+      default: "nx run-many --all --parallel --target=lint"
+    }
   },
 };
