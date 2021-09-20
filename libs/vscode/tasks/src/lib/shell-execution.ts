@@ -1,10 +1,7 @@
+import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
 import { ShellExecution } from 'vscode';
 
 export interface ShellConfig {
-  /** Human-readable string which will be used to represent the terminal in the UI. */
-  name: string;
-  program: string;
-  args: string[];
   cwd: string;
   displayCommand: string;
 }
@@ -12,8 +9,11 @@ export interface ShellConfig {
 export function getShellExecutionForConfig(
   config: ShellConfig
 ): ShellExecution {
+  const packageManager = detectPackageManager(config.cwd);
+  const packageManagerCommand = getPackageManagerCommand(packageManager);
+
   return new ShellExecution(
-    `${config.program.replace(/\\/g, '/')} ${config.args.join(' ')}`,
+    `${packageManagerCommand.exec} ${config.displayCommand}`,
     {
       cwd: config.cwd,
     }

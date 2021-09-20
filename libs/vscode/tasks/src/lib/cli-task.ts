@@ -1,8 +1,7 @@
-import { CliTaskDefinition } from './cli-task-definition';
-import { ShellExecution, Task, TaskGroup, TaskScope } from 'vscode';
-import { getShellExecutionForConfig } from './shell-execution';
-import { findClosestNg, findClosestNx } from '@nx-console/server';
 import { join } from 'path';
+import { Task, TaskGroup, TaskScope } from 'vscode';
+import { CliTaskDefinition } from './cli-task-definition';
+import { getShellExecutionForConfig } from './shell-execution';
 
 export class CliTask extends Task {
   static create(
@@ -17,9 +16,6 @@ export class CliTask extends Task {
     const args = getArgs(definition);
 
     const useNxCli = workspaceJsonPath.endsWith('workspace.json');
-    const program = useNxCli
-      ? findClosestNx(workspacePath)
-      : findClosestNg(workspacePath);
 
     const displayCommand = useNxCli
       ? `nx ${args.join(' ')}`
@@ -29,14 +25,11 @@ export class CliTask extends Task {
       { ...definition, type: useNxCli ? 'nx' : 'ng' }, // definition
       TaskScope.Workspace, // scope
       displayCommand, // name
-      'nx-console', // source
+      useNxCli ? 'nx' : 'ng',
       // execution
       getShellExecutionForConfig({
         displayCommand,
-        args,
         cwd: workspacePath,
-        name: displayCommand,
-        program,
       })
     );
 
