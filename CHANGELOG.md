@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.11.0](https://github.com/nrwl/nx-console/compare/v17.10.0...v17.11.0) (2021-09-24)
+
+
+### Features
+
+* sort projects in project view ([#1137](https://github.com/nrwl/nx-console/issues/1137)) ([7cc9ebe](https://github.com/nrwl/nx-console/commits/7cc9ebe257999d39cea9cffee0d925e6a693d83a))
+* use vscode settings for shell execution ([#1134](https://github.com/nrwl/nx-console/issues/1134)) ([fc4caea](https://github.com/nrwl/nx-console/commits/fc4caeaf3c17c95f1f305d13f6dd062acff5f47c))
+
+
+### Performance Improvements
+
+* decrease activation time ([#1131](https://github.com/nrwl/nx-console/issues/1131)) ([6a23cea](https://github.com/nrwl/nx-console/commits/6a23ceaff7c4211e36c591892a8510a067f07d4f))
+
 ## [17.10.0](https://github.com/nrwl/nx-console/compare/v17.9.0...v17.10.0) (2021-09-03)
 
 
