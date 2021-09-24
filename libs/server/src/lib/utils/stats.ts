@@ -5,9 +5,6 @@ import { gzipSync } from 'zlib';
 
 import { SPECIAL_SOURCE_FILE_MAPPINGS } from './stats.constants';
 
-// @ts-ignore
-import * as exploreSourceMap from 'source-map-explorer';
-
 export interface Module {
   file: string;
   size: string;
@@ -35,7 +32,7 @@ class FileNameNormalizer {
 
   constructor(cwd: string) {
     this.cwdPrefixRegexp = new RegExp(
-      `^[\/]*(${cwd.toLowerCase().replace(/^\//, '')})?[\/]*(.*)`
+      `^[/]*(${cwd.toLowerCase().replace(/^\//, '')})?[/]*(.*)`
     );
   }
 
@@ -49,90 +46,6 @@ class FileNameNormalizer {
     }
     return file;
   }
-}
-
-export function generateStats(
-  _outputPath: string,
-  cwd: string,
-  earliestTimeStamp: number
-) {
-  const outputPath = join(cwd, _outputPath);
-  const fileSizeGetter = new FileSystemFileSizeGetter();
-  // grouped by index as id since webpack ids are sequential numbers
-  const modulesByBundle: { [key: string]: ModuleData[] } = {};
-  const summary = {
-    assets: createSizeData(),
-    modules: 0,
-    dependencies: 0,
-  };
-
-  const outputAssets = getAssets(outputPath, earliestTimeStamp);
-  const assets: AssetData[] = [];
-  const bundles: AssetData[] = [];
-  // Windows path uses '\', but webpack and sourcemap contain '/'.
-  const normalizedCwd = cwd.replace(/\\/g, '/');
-  const fileNormalizer = new FileNameNormalizer(normalizedCwd);
-
-  outputAssets.forEach((asset: string) => {
-    const sizes = fileSizeGetter.read(asset, outputPath);
-    const modules: ModuleData[] = [];
-
-    summary.assets.parsed += sizes.parsed;
-    summary.assets.gzipped += sizes.gzipped;
-    assets.push({ file: asset, sizes });
-
-    if (asset.endsWith('.js')) {
-      bundles.push({ file: asset, sizes });
-
-      try {
-        const sourceMapData = exploreSourceMap(join(outputPath, asset));
-
-        Object.keys(sourceMapData.files).forEach((_file) => {
-          const size = sourceMapData.files[_file];
-          summary.modules += size;
-
-          if (_file === '<unmapped>') {
-            modules.push({
-              size,
-              file: _file,
-              isDep: false,
-            });
-          } else {
-            const file = fileNormalizer.normalize(_file);
-            const isDep = /node_modules/.test(file);
-
-            if (isDep) {
-              summary.dependencies += size;
-            }
-
-            modules.push({
-              size,
-              file,
-              isDep,
-            });
-          }
-        });
-      } catch (e) {
-        // If we fail to parse sourcemaps it either does not exist, or explorer cannot parse it.
-        // Return the chunk as the only module.
-        summary.modules += sizes.parsed;
-        modules.push({
-          size: sizes.parsed,
-          file: asset,
-          isDep: false,
-        });
-      }
-    }
-
-    modulesByBundle[asset] = modules;
-  });
-
-  return {
-    assets,
-    bundles,
-    modulesByBundle,
-    summary,
-  };
 }
 
 export function calculateStatsFromChunks(cs: Module[]) {
