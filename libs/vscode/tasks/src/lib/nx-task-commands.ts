@@ -76,7 +76,7 @@ const AFFECTED_OPTIONS: Option[] = [
     name: 'base',
     type: OptionType.String,
     isRequired: false,
-    description: 'Base of the current branch (usually master)',
+    description: 'Base of the current branch (usually main)',
   },
   {
     name: 'head',
