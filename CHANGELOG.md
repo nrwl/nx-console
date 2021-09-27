@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.11.2](https://github.com/nrwl/nx-console/compare/v17.11.1...v17.11.2) (2021-09-27)
+
+
+### Bug Fixes
+
+* use proper file schema for importing on windows ([#1149](https://github.com/nrwl/nx-console/issues/1149)) ([0470a33](https://github.com/nrwl/nx-console/commits/0470a33f7c69e24d4327616593497d08ca76373d))
+
 ### [17.11.1](https://github.com/nrwl/nx-console/compare/v17.11.0...v17.11.1) (2021-09-27)
 
 
