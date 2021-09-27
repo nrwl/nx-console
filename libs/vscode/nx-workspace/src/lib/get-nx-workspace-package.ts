@@ -14,7 +14,7 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
   );
 
   try {
-    return import(
+    const workspaceImport = import(
       /*webpackIgnore: true*/
       join(
         workspacePath,
@@ -23,9 +23,10 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
         'workspace',
         'src',
         'core',
-        'file-utils'
+        'file-utils.js'
       )
     );
+    return workspaceImport;
   } catch (err) {
     getOutputChannel().appendLine(
       `Error loading @nrwl/workspace from workspace. Falling back to extension dependency`
