@@ -1,6 +1,5 @@
 import { Task, TaskScope } from 'vscode';
 import { getShellExecutionForConfig } from './shell-execution';
-import { findClosestNx } from '@nx-console/server';
 
 export interface NxTaskDefinition {
   positional?: string;
@@ -23,17 +22,13 @@ export class NxTask extends Task {
       { ...definition, type: 'nx' }, // definition
       TaskScope.Workspace, // scope
       displayCommand, // name
-      'nx-console', // source
+      'nx', // source
       // execution
       getShellExecutionForConfig({
         displayCommand,
-        args,
         cwd: workspacePath,
-        name: displayCommand,
-        program: findClosestNx(workspacePath),
       })
     );
-
     return task;
   }
 }

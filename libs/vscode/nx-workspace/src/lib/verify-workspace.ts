@@ -10,12 +10,12 @@ import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 
-export function verifyWorkspace(): {
+export async function verifyWorkspace(): Promise<{
   validWorkspaceJson: boolean;
   json: WorkspaceJsonConfiguration;
   workspaceType: 'ng' | 'nx';
   configurationFilePath: string;
-} {
+}> {
   const workspacePath = dirname(
     WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
   );
@@ -29,7 +29,7 @@ export function verifyWorkspace(): {
         validWorkspaceJson: true,
         // TODO(cammisuli): change all instances to use the new version - basically reverse this to the new format
         json: toWorkspaceFormat(
-          getNxWorkspaceConfig(workspacePath, angularJsonPath)
+          await getNxWorkspaceConfig(workspacePath, workspaceJsonPath)
         ),
         workspaceType: 'nx',
         configurationFilePath: workspaceJsonPath,
@@ -38,7 +38,7 @@ export function verifyWorkspace(): {
       return {
         validWorkspaceJson: true,
         json: toWorkspaceFormat(
-          getNxWorkspaceConfig(workspacePath, angularJsonPath)
+          await getNxWorkspaceConfig(workspacePath, angularJsonPath)
         ),
         workspaceType: 'ng',
         configurationFilePath: angularJsonPath,

@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.11.1](https://github.com/nrwl/nx-console/compare/v17.11.0...v17.11.1) (2021-09-27)
+
+
+### Bug Fixes
+
+* ensure that projects are properly resolved during async calls ([#1145](https://github.com/nrwl/nx-console/issues/1145)) ([35c40b5](https://github.com/nrwl/nx-console/commits/35c40b50a316c7ce905316af36e789cdf03d7cd1))
+
+## [17.11.0](https://github.com/nrwl/nx-console/compare/v17.10.0...v17.11.0) (2021-09-24)
+
+
+### Features
+
+* sort projects in project view ([#1137](https://github.com/nrwl/nx-console/issues/1137)) ([7cc9ebe](https://github.com/nrwl/nx-console/commits/7cc9ebe257999d39cea9cffee0d925e6a693d83a))
+* use vscode settings for shell execution ([#1134](https://github.com/nrwl/nx-console/issues/1134)) ([fc4caea](https://github.com/nrwl/nx-console/commits/fc4caeaf3c17c95f1f305d13f6dd062acff5f47c))
+
+
+### Performance Improvements
+
+* decrease activation time ([#1131](https://github.com/nrwl/nx-console/issues/1131)) ([6a23cea](https://github.com/nrwl/nx-console/commits/6a23ceaff7c4211e36c591892a8510a067f07d4f))
+
+## [17.10.0](https://github.com/nrwl/nx-console/compare/v17.9.0...v17.10.0) (2021-09-03)
+
+
+### Features
+
+* Add commands to add applications and libraries directly ([#1128](https://github.com/nrwl/nx-console/issues/1128)) ([b908c11](https://github.com/nrwl/nx-console/commits/b908c11aa3b2de1fd35ec52ba243803d2cdaeb34))
+
+
+### Bug Fixes
+
+* remove loading item from projects view ([#1129](https://github.com/nrwl/nx-console/issues/1129)) ([7ad5f60](https://github.com/nrwl/nx-console/commits/7ad5f60cdba5a0f766592aed5b718ba82c3e0881))
+* use proper workspace json path when verifying workspaces ([#1130](https://github.com/nrwl/nx-console/issues/1130)) ([f2365be](https://github.com/nrwl/nx-console/commits/f2365bed33a10e6734fe96e35df01552763905a1))
+
 ## [17.9.0](https://github.com/nrwl/nx-console/compare/v17.8.0...v17.9.0) (2021-08-27)
 
 

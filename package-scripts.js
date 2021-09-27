@@ -28,7 +28,7 @@ module.exports = {
       },
       vscode: {
         build: nps.series.nps('prepare.vscode.server', 'prepare.vscode.client'),
-        server: 'nx build vscode-app --prod --noSourceMap',
+        server: 'nx build vscode-app --prod',
         client: 'nx build vscode-ui --prod',
       },
       ci: {
@@ -74,5 +74,8 @@ module.exports = {
     'install-dependencies': {
       vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
     },
+    lint: {
+      default: "nx run-many --all --parallel --target=lint"
+    }
   },
 };

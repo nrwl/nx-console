@@ -40,7 +40,7 @@ $offset-with-configurations: $offset-without-configurations +
 .scroll-container,
 vscode-ui-field-tree {
   box-sizing: border-box;
-  padding-top: $host-padding-top / 2;
+  padding-top: $host-padding-top * 0.5;
   min-height: calc(100vh - #{$offset-without-configurations});
   max-height: calc(100vh - #{$offset-without-configurations});
 

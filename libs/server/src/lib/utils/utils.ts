@@ -1,24 +1,23 @@
 import { schema } from '@angular-devkit/core';
 import { standardFormats } from '@angular-devkit/schematics/src/formats';
+import { Option as CliOption } from '@angular/cli/models/interface';
 import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
 import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
-import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
-import { platform } from 'os';
-import * as path from 'path';
 import {
-  Option,
-  XPrompt,
-  LongFormXPrompt,
-  ItemTooltips,
-  OptionItemLabelValue,
   ItemsWithEnum,
+  ItemTooltips,
+  LongFormXPrompt,
+  Option,
+  OptionItemLabelValue,
+  XPrompt,
 } from '@nx-console/schema';
-import { Option as CliOption } from '@angular/cli/models/interface';
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import {
   parse as parseJson,
-  printParseErrorCode,
   ParseError,
+  printParseErrorCode,
 } from 'jsonc-parser';
+import * as path from 'path';
 import { getOutputChannel } from './output-channel';
 
 export interface GeneratorDefaults {
@@ -38,46 +37,6 @@ const IMPORTANT_FIELD_NAMES = [
   'port',
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
-
-export function findClosestNg(dir: string): string {
-  if (directoryExists(path.join(dir, 'node_modules'))) {
-    if (platform() === 'win32') {
-      if (fileExistsSync(path.join(dir, 'ng.cmd'))) {
-        return path.join(dir, 'ng.cmd');
-      } else {
-        return path.join(dir, 'node_modules', '.bin', 'ng.cmd');
-      }
-    } else {
-      if (fileExistsSync(path.join(dir, 'node_modules', '.bin', 'ng'))) {
-        return path.join(dir, 'node_modules', '.bin', 'ng');
-      } else {
-        return path.join(dir, 'node_modules', '@angular', 'cli', 'bin', 'ng');
-      }
-    }
-  } else {
-    return findClosestNg(path.dirname(dir));
-  }
-}
-
-export function findClosestNx(dir: string): string {
-  if (directoryExists(path.join(dir, 'node_modules'))) {
-    if (platform() === 'win32') {
-      if (fileExistsSync(path.join(dir, 'nx.cmd'))) {
-        return path.join(dir, 'nx.cmd');
-      } else {
-        return path.join(dir, 'node_modules', '.bin', 'nx.cmd');
-      }
-    } else {
-      if (fileExistsSync(path.join(dir, 'node_modules', '.bin', 'nx'))) {
-        return path.join(dir, 'node_modules', '.bin', 'nx');
-      } else {
-        return path.join(dir, 'node_modules', '@nrwl', 'cli', 'bin', 'nx.js');
-      }
-    }
-  } else {
-    return findClosestNx(path.dirname(dir));
-  }
-}
 
 export function listOfUnnestedNpmPackages(nodeModulesDir: string): string[] {
   const res: string[] = [];
@@ -390,6 +349,11 @@ export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
       }
     });
   });
+
+  const sortedProjects = Object.entries(w.projects || {}).sort(
+    (projectA, projectB) => projectA[0].localeCompare(projectB[0])
+  );
+  w.projects = Object.fromEntries(sortedProjects);
 
   if (w.schematics) {
     renameProperty(w, 'schematics', 'generators');

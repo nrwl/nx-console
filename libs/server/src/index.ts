@@ -8,8 +8,6 @@ export * from './lib/utils/read-projects';
 export * from './lib/utils/read-generator-collections';
 export {
   fileExistsSync,
-  findClosestNg,
-  findClosestNx,
   readAndParseJson,
   readAndCacheJsonFile,
   cacheJson,
