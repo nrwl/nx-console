@@ -83,7 +83,7 @@ function promptForFlagValue(flagToSet: CliTaskFlagQuickPickItem) {
   } else if (flagToSet.option.enum && flagToSet.option.enum.length) {
     return window.showQuickPick([...flagToSet.option.enum.map(String)], {
       placeHolder,
-      canPickMany: flagToSet.option.type === 'array'
+      canPickMany: flagToSet.option.type === 'array',
     });
   } else {
     return window.showInputBox({

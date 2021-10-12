@@ -66,7 +66,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
       }
     }
 
-    CHANGE_WORKSPACE.description = "Current: " + dirname(workspaceJsonPath);
+    CHANGE_WORKSPACE.description = 'Current: ' + dirname(workspaceJsonPath);
 
     return [
       ...ROUTE_LIST.map(

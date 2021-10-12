@@ -1,4 +1,3 @@
-
 import * as ua from 'universal-analytics';
 import uuidv4 = require('uuid/v4');
 

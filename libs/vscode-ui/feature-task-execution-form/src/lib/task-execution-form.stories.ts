@@ -86,8 +86,7 @@ const initialSchema: TaskExecutionSchema = {
         shell:
           'shell - for wrapping different libraries and exposing them as a single library. Also, for routing.',
         ui: 'ui - for dumb components',
-        util:
-          'util - for model files, constants, validators, pipes and any other miscellaneous items, e.g. shared functions.',
+        util: 'util - for model files, constants, validators, pipes and any other miscellaneous items, e.g. shared functions.',
       },
     },
     {

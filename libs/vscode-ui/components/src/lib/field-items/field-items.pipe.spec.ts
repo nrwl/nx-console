@@ -27,7 +27,7 @@ describe('FieldItemsPipe', () => {
       aliases: [],
       description: 'The file extension to be used for style files.',
       default: 'scss',
-      items: ['css', 'scss', 'styl', 'less']
+      items: ['css', 'scss', 'styl', 'less'],
     };
     expect(getOptionItems(field2)).toEqual(field2.items);
   });

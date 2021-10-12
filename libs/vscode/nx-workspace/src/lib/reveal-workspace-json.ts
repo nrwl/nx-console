@@ -18,7 +18,7 @@ export async function revealNxProject(
     const workspaceRootDir = dirname(workspaceJsonPath);
     workspaceJsonPath = join(
       workspaceRootDir,
-      (rawWorkspace.projects[projectName] as unknown) as string,
+      rawWorkspace.projects[projectName] as unknown as string,
       'project.json'
     );
   }

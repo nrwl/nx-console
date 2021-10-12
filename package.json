@@ -24,7 +24,8 @@
     "package": "nps prepare.and.package.vscode",
     "release": "standard-version",
     "postinstall": "node ./tools/scripts/postinstall.js && node ./decorate-angular-cli.js",
-    "update": "nx migrate latest"
+    "update": "nx migrate latest",
+    "prepare": "is-ci || husky install"
   },
   "dependencies": {
     "jsonc-parser": "^3.0.0"
@@ -71,16 +72,17 @@
     "copy-webpack-plugin": "^9.0.1",
     "cypress": "6.5.0",
     "eslint": "7.10.0",
-    "eslint-config-prettier": "8.1.0",
-    "husky": "^3.0.9",
+    "eslint-config-prettier": "8.3.0",
+    "husky": "^7.0.2",
+    "is-ci": "^3.0.0",
     "jest": "27.0.3",
     "jest-preset-angular": "9.0.3",
     "ngx-build-plus": "11.0.0",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "ovsx": "^0.2.0",
-    "prettier": "2.3.2",
-    "pretty-quick": "^1.11.1",
+    "prettier": "^2.4.1",
+    "pretty-quick": "^3.1.1",
     "rxjs": "6.5.5",
     "shelljs": "0.8.3",
     "shx": "^0.3.2",

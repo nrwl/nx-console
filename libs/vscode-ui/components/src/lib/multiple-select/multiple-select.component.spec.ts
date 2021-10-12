@@ -55,7 +55,11 @@ describe('MultipleSelectComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [ParentFormComponent, MultipleSelectComponent, FieldItemsPipe],
+        declarations: [
+          ParentFormComponent,
+          MultipleSelectComponent,
+          FieldItemsPipe,
+        ],
         imports: [ReactiveFormsModule],
       }).compileComponents();
     })

@@ -3,7 +3,10 @@ import {
   WORKSPACE_GENERATOR_NAME_REGEX,
 } from '@nx-console/schema';
 
-export const formatTask = (architect: TaskExecutionSchema, configuration?: string): string => {
+export const formatTask = (
+  architect: TaskExecutionSchema,
+  configuration?: string
+): string => {
   const positionals = architect.positional?.match(
     WORKSPACE_GENERATOR_NAME_REGEX
   );
@@ -17,7 +20,9 @@ export const formatTask = (architect: TaskExecutionSchema, configuration?: strin
   }
 
   return configuration
-    ? `${architect.cliName} ${architect.command} ${architect.positional} ${getConfigurationFlag(configuration)}`
+    ? `${architect.cliName} ${architect.command} ${
+        architect.positional
+      } ${getConfigurationFlag(configuration)}`
     : `${architect.cliName} ${architect.command} ${architect.positional}`;
 };
 
@@ -29,4 +34,4 @@ export const getConfigurationFlag = (configuration?: string): string => {
   } else {
     return `-c=${configuration}`;
   }
-}
+};

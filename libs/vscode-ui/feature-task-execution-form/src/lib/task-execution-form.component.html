@@ -57,7 +57,10 @@
         <form class="fields" [formGroup]="taskExecForm.form">
           <div class="title-container">
             <span class="title">
-              {{ taskExecForm.architect | formatTask: taskExecForm.form.get('configuration')?.value }}
+              {{
+                taskExecForm.architect
+                  | formatTask: taskExecForm.form.get('configuration')?.value
+              }}
             </span>
             <button
               (click)="
@@ -75,7 +78,7 @@
             <nx-console-argument-list
               [args]="runCommandArguments$ | async"
             ></nx-console-argument-list>
-            <div class ="fields-container">
+            <div class="fields-container">
               <ng-container *ngIf="defaultValues$ | async as defaultValues">
                 <nx-console-field
                   [id]="field.name + '-nx-console-field'"

@@ -23,10 +23,7 @@ const mockOption: Option = {
 @Component({
   template: `
     <form *ngIf="formGroup" [formGroup]="formGroup">
-      <nx-console-field
-        #control
-        [field]="field"
-      ></nx-console-field>
+      <nx-console-field #control [field]="field"></nx-console-field>
     </form>
   `,
 })
@@ -79,7 +76,9 @@ describe('FieldComponent', () => {
 
   it('should show correct component for field', () => {
     expect(parent.fieldComponent.component).toEqual(OptionComponent.Checkbox);
-    expect(fixture.debugElement.query(By.css('nx-console-checkbox'))).toBeDefined();
+    expect(
+      fixture.debugElement.query(By.css('nx-console-checkbox'))
+    ).toBeDefined();
 
     parent.field = {
       name: 'style',
@@ -93,7 +92,9 @@ describe('FieldComponent', () => {
     };
     fixture.detectChanges();
     expect(parent.fieldComponent.component).toEqual(OptionComponent.Select);
-    expect(fixture.debugElement.query(By.css('nx-console-select'))).toBeDefined();
+    expect(
+      fixture.debugElement.query(By.css('nx-console-select'))
+    ).toBeDefined();
 
     parent.field = {
       name: 'style',
@@ -103,11 +104,27 @@ describe('FieldComponent', () => {
       itemTooltips: {
         test: 'testLabel',
       },
-      items: ['test', 'some', 'other', 'values', 'but', 'it', 'is', 'a', 'really', 'long', 'list'],
+      items: [
+        'test',
+        'some',
+        'other',
+        'values',
+        'but',
+        'it',
+        'is',
+        'a',
+        'really',
+        'long',
+        'list',
+      ],
     };
     fixture.detectChanges();
-    expect(parent.fieldComponent.component).toEqual(OptionComponent.Autocomplete);
-    expect(fixture.debugElement.query(By.css('nx-console-autocomplete'))).toBeDefined();
+    expect(parent.fieldComponent.component).toEqual(
+      OptionComponent.Autocomplete
+    );
+    expect(
+      fixture.debugElement.query(By.css('nx-console-autocomplete'))
+    ).toBeDefined();
 
     parent.field = {
       name: 'style',
@@ -123,8 +140,12 @@ describe('FieldComponent', () => {
       },
     };
     fixture.detectChanges();
-    expect(parent.fieldComponent.component).toEqual(OptionComponent.MultiSelect);
-    expect(fixture.debugElement.query(By.css('nx-console-multiple-select'))).toBeDefined();
+    expect(parent.fieldComponent.component).toEqual(
+      OptionComponent.MultiSelect
+    );
+    expect(
+      fixture.debugElement.query(By.css('nx-console-multiple-select'))
+    ).toBeDefined();
 
     parent.field = {
       name: 'style',
@@ -134,6 +155,8 @@ describe('FieldComponent', () => {
     };
     fixture.detectChanges();
     expect(parent.fieldComponent.component).toEqual(OptionComponent.Input);
-    expect(fixture.debugElement.query(By.css('nx-console-input'))).toBeDefined();
+    expect(
+      fixture.debugElement.query(By.css('nx-console-input'))
+    ).toBeDefined();
   });
 });

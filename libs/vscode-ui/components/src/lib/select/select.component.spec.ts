@@ -99,6 +99,9 @@ describe('SelectComponent', () => {
     };
     parent.field = longForm;
     fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#option-items-with-enum option')).length).toEqual(4);
+    expect(
+      fixture.debugElement.queryAll(By.css('#option-items-with-enum option'))
+        .length
+    ).toEqual(4);
   });
 });
