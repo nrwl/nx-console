@@ -11,7 +11,8 @@ import {
   OptionItemLabelValue,
   XPrompt,
 } from '@nx-console/schema';
-import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
+import { readdirSync, statSync } from 'fs';
+import { readFile, stat } from 'fs/promises';
 import {
   parse as parseJson,
   ParseError,
@@ -37,24 +38,6 @@ const IMPORTANT_FIELD_NAMES = [
   'port',
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
-
-export function listOfUnnestedNpmPackages(nodeModulesDir: string): string[] {
-  const res: string[] = [];
-  if (!existsSync(nodeModulesDir)) {
-    return res;
-  }
-
-  readdirSync(nodeModulesDir).forEach((npmPackageOrScope) => {
-    if (npmPackageOrScope.startsWith('@')) {
-      readdirSync(path.join(nodeModulesDir, npmPackageOrScope)).forEach((p) => {
-        res.push(`${npmPackageOrScope}/${p}`);
-      });
-    } else {
-      res.push(npmPackageOrScope);
-    }
-  });
-  return res;
-}
 
 export function listFiles(dirName: string): string[] {
   // TODO use .gitignore to skip files
@@ -83,9 +66,9 @@ export function listFiles(dirName: string): string[] {
   return res;
 }
 
-export function directoryExists(filePath: string): boolean {
+export async function directoryExists(filePath: string): Promise<boolean> {
   try {
-    return statSync(filePath).isDirectory();
+    return (await stat(filePath)).isDirectory();
   } catch {
     return false;
   }
@@ -99,8 +82,8 @@ export function fileExistsSync(filePath: string): boolean {
   }
 }
 
-export function readAndParseJson(filePath: string) {
-  const content = readFileSync(filePath, 'utf-8');
+export async function readAndParseJson(filePath: string) {
+  const content = await readFile(filePath, 'utf-8');
   try {
     return JSON.parse(content);
   } catch {
@@ -147,14 +130,21 @@ export function cacheJson(filePath: string, basedir = '', content?: any) {
   };
 }
 
-export function readAndCacheJsonFile(
-  filePath: string,
+export async function readAndCacheJsonFile(
+  filePath: string | undefined,
   basedir = ''
-): { path: string; json: any } {
-  const fullFilePath = path.join(basedir, filePath);
+): Promise<{ path: string; json: any }> {
+  if (!filePath) {
+    return {
+      path: '',
+      json: {},
+    };
+  }
 
-  if (fileContents[fullFilePath] || existsSync(fullFilePath)) {
-    fileContents[fullFilePath] ||= readAndParseJson(fullFilePath);
+  const fullFilePath = path.join(basedir, filePath);
+  const stats = await stat(fullFilePath);
+  if (fileContents[fullFilePath] || stats.isFile()) {
+    fileContents[fullFilePath] ||= await readAndParseJson(fullFilePath);
 
     return {
       path: fullFilePath,

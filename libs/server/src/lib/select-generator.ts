@@ -1,13 +1,11 @@
-import { Generator, GeneratorType } from '@nx-console/schema';
+import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
 import { TaskExecutionSchema } from '@nx-console/schema';
 import { QuickPickItem, window } from 'vscode';
-import {
-  readAllGeneratorCollections,
-  readGeneratorOptions,
-} from './utils/read-generator-collections';
+import { getGenerators, readGeneratorOptions } from './utils/get-generators';
 
 export async function selectGenerator(
   workspaceJsonPath: string,
+  workspaceType: 'nx' | 'ng',
   generatorType?: GeneratorType
 ): Promise<TaskExecutionSchema | undefined> {
   interface GenerateQuickPickItem extends QuickPickItem {
@@ -15,28 +13,27 @@ export async function selectGenerator(
     generator: Generator;
   }
 
-  let generators = (await readAllGeneratorCollections(workspaceJsonPath))
-    .filter((c) => c && c.generators.length)
-    .map((c): GenerateQuickPickItem[] =>
-      c.generators.map(
-        (s: Generator): GenerateQuickPickItem => ({
-          description: s.description,
-          label: `${c.name} - ${s.name}`,
-          collectionName: c.name,
-          generator: s,
-        })
-      )
-    )
-    .flat();
+  const generators = await getGenerators(workspaceJsonPath, workspaceType);
+  let generatorsQuickPicks = generators
+    .filter((c) => !!c.data)
+    .map((c): GenerateQuickPickItem => {
+      const generatorData = c.data!;
+      return {
+        description: generatorData.description,
+        label: `${generatorData.collection} - ${generatorData.name}`,
+        collectionName: generatorData.collection,
+        generator: generatorData,
+      };
+    });
 
   if (generatorType) {
-    generators = generators.filter((generator) => {
+    generatorsQuickPicks = generatorsQuickPicks.filter((generator) => {
       return generator.generator.type === generatorType;
     });
   }
 
   if (generators) {
-    const selection = await window.showQuickPick(generators);
+    const selection = await window.showQuickPick(generatorsQuickPicks);
     if (selection) {
       const options =
         selection.generator.options ||

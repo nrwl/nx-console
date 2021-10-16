@@ -59,20 +59,20 @@ export async function readBuilderSchema(
   projectDefaults?: { [name: string]: string }
 ): Promise<Option[]> {
   const [npmPackage, builderName] = builder.split(':');
-  const packageJson = readAndCacheJsonFile(
+  const packageJson = await readAndCacheJsonFile(
     path.join(npmPackage, 'package.json'),
     path.join(basedir, 'node_modules')
   );
   const b = packageJson.json.builders || packageJson.json.executors;
   const buildersPath = b.startsWith('.') ? b : `./${b}`;
-  const buildersJson = readAndCacheJsonFile(
+  const buildersJson = await readAndCacheJsonFile(
     buildersPath,
     path.dirname(packageJson.path)
   );
 
   const builderDef = (buildersJson.json.builders ||
     buildersJson.json.executors)[builderName];
-  const builderSchema = readAndCacheJsonFile(
+  const builderSchema = await readAndCacheJsonFile(
     builderDef.schema,
     path.dirname(buildersJson.path)
   );

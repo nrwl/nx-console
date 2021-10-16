@@ -18,6 +18,6 @@ export async function getNxConfig(
     }
     return cachedNxJson;
   } catch (e) {
-    return readAndCacheJsonFile('nx.json', baseDir).json;
+    return (await readAndCacheJsonFile('nx.json', baseDir)).json;
   }
 }

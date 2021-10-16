@@ -243,7 +243,7 @@ async function selectGeneratorAndPromptForFlags() {
     return;
   }
 
-  const selection = await selectGenerator(configurationFilePath);
+  const selection = await selectGenerator(configurationFilePath, workspaceType);
   if (!selection) {
     return;
   }

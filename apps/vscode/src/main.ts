@@ -21,7 +21,7 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
-  readAllGeneratorCollections,
+  getGenerators,
   teardownTelemetry,
   watchFile,
 } from '@nx-console/server';
@@ -291,20 +291,19 @@ async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
     ),
   ]);
 
-  const generatorCollections = await readAllGeneratorCollections(
-    workspaceJsonPath
-  );
+  const generatorCollections = await getGenerators(workspaceJsonPath, 'nx');
+
   let hasApplicationGenerators = false;
   let hasLibraryGenerators = false;
 
   generatorCollections.forEach((generatorCollection) => {
-    generatorCollection.generators.forEach((generator) => {
-      if (generator.type === 'application') {
+    if (generatorCollection.data) {
+      if (generatorCollection.data.type === 'application') {
         hasApplicationGenerators = true;
-      } else if (generator.type === 'library') {
+      } else if (generatorCollection.data.type === 'library') {
         hasLibraryGenerators = true;
       }
-    });
+    }
   });
 
   commands.executeCommand(

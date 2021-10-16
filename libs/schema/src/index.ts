@@ -47,9 +47,11 @@ export interface TaskExecutionSchema {
   contextValues?: Record<string, string | number | boolean | undefined>;
 }
 
-export interface GeneratorCollection {
+export interface CollectionInfo {
   name: string;
-  generators: Generator[];
+  path: string;
+  type: 'executor' | 'generator';
+  data?: Generator;
 }
 
 export enum GeneratorType {

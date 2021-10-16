@@ -1,8 +1,8 @@
-import { watchFile } from '@nx-console/server';
+import { CollectionInfo } from '@nx-console/schema';
+import { getExecutors, watchFile } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { dirname, join } from 'path';
 import * as vscode from 'vscode';
-import { ExecutorInfo, getAllExecutors } from './get-all-executors';
 
 let FILE_WATCHER: vscode.FileSystemWatcher;
 
@@ -32,13 +32,16 @@ export class ProjectJsonSchema {
     this.setupSchema(workspacePath, context.extensionUri);
   }
 
-  setupSchema(
+  async setupSchema(
     workspacePath: string,
     extensionUri: vscode.Uri,
     clearPackageJsonCache = false
   ) {
     const filePath = vscode.Uri.joinPath(extensionUri, 'project-schema.json');
-    const collections = getAllExecutors(workspacePath, clearPackageJsonCache);
+    const collections = await getExecutors(
+      workspacePath,
+      clearPackageJsonCache
+    );
     const contents = getProjectJsonSchema(collections);
     vscode.workspace.fs.writeFile(
       filePath,
@@ -47,14 +50,14 @@ export class ProjectJsonSchema {
   }
 }
 
-function getProjectJsonSchema(collections: ExecutorInfo[]) {
+function getProjectJsonSchema(collections: CollectionInfo[]) {
   const [builders, executors] = createBuildersAndExecutorsSchema(collections);
   const contents = createJsonSchema(builders, executors);
   return contents;
 }
 
 function createBuildersAndExecutorsSchema(
-  collections: ExecutorInfo[]
+  collections: CollectionInfo[]
 ): [string, string] {
   const builders = collections
     .map(
@@ -65,10 +68,10 @@ function createBuildersAndExecutorsSchema(
     "required": ["builder"]
   },
   "then": {
-    "properties": { 
+    "properties": {
       "options": {
         "$ref": "${collection.path}"
-      }, 
+      },
       "configurations": {
         "additionalProperties": {
           "$ref": "${collection.path}",
@@ -85,13 +88,13 @@ function createBuildersAndExecutorsSchema(
   const executors = collections
     .map(
       (collection) => `
-{   
+{
   "if": {
     "properties": { "executor": { "const": "${collection.name}" } },
     "required": ["executor"]
   },
   "then": {
-    "properties": { 
+    "properties": {
       "options": {
         "$ref": "${collection.path}"
       },
@@ -138,7 +141,7 @@ function createJsonSchema(builders: string, executors: string) {
             }
           },
           "allOf": [
-            ${executors} 
+            ${executors}
           ]
         }
       }

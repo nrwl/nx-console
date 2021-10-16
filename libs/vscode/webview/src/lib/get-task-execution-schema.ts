@@ -114,6 +114,7 @@ export async function getTaskExecutionSchema(
       case 'Generate': {
         const generator = await selectGenerator(
           cliTaskProvider.getWorkspaceJsonPath(),
+          workspaceType,
           generatorType
         );
 
