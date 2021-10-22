@@ -45,6 +45,7 @@ import {
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
 import { environment } from './environments/environment';
+import { Awaited } from '@nx-console/schema';
 
 import {
   WorkspaceJsonSchema,
@@ -276,6 +277,7 @@ async function setWorkspace(workspaceJsonPath: string) {
 
 async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
   const { getNxConfig } = await import('@nx-console/vscode/nx-workspace');
+
   let nxConfig: Awaited<ReturnType<typeof getNxConfig>>;
   try {
     nxConfig = await getNxConfig(dirname(workspaceJsonPath));
