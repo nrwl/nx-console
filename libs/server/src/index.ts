@@ -12,7 +12,6 @@ export {
   readAndCacheJsonFile,
   cacheJson,
   clearJsonCache,
-  toLegacyWorkspaceFormat,
   toWorkspaceFormat,
   listOfUnnestedNpmPackages,
 } from './lib/utils/utils';

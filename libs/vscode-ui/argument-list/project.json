@@ -1,0 +1,26 @@
+{
+  "projectType": "library",
+  "root": "libs/vscode-ui/argument-list",
+  "sourceRoot": "libs/vscode-ui/argument-list/src",
+  "prefix": "nx-console",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/vscode-ui/argument-list/src/**/*.ts",
+          "libs/vscode-ui/argument-list/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/vscode-ui/argument-list"],
+      "options": {
+        "jestConfig": "libs/vscode-ui/argument-list/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
