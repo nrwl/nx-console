@@ -1,0 +1,57 @@
+{
+  "projectType": "library",
+  "root": "libs/vscode-ui/feature-task-execution-form",
+  "sourceRoot": "libs/vscode-ui/feature-task-execution-form/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/vscode-ui/feature-task-execution-form/src/**/*.ts",
+          "libs/vscode-ui/feature-task-execution-form/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "options": {
+        "jestConfig": "libs/vscode-ui/feature-task-execution-form/jest.config.js",
+        "passWithNoTests": true
+      },
+      "outputs": ["coverage/libs/vscode-ui/feature-task-execution-form"]
+    },
+    "storybook": {
+      "executor": "@nrwl/storybook:storybook",
+      "options": {
+        "uiFramework": "@storybook/angular",
+        "port": 4400,
+        "config": {
+          "configFolder": "libs/vscode-ui/feature-task-execution-form/.storybook"
+        }
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@nrwl/storybook:build",
+      "options": {
+        "uiFramework": "@storybook/angular",
+        "outputPath": "dist/storybook/vscode-ui-feature-task-execution-form",
+        "config": {
+          "configFolder": "libs/vscode-ui/feature-task-execution-form/.storybook"
+        }
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      },
+      "outputs": ["{options.outputPath}"]
+    }
+  },
+  "generators": {},
+  "tags": []
+}

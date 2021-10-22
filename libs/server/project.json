@@ -1,0 +1,27 @@
+{
+  "root": "libs/server",
+  "sourceRoot": "libs/server/src",
+  "projectType": "library",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "options": {
+        "jestConfig": "libs/server/jest.config.js",
+        "passWithNoTests": true
+      },
+      "outputs": ["coverage/libs/server"]
+    },
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/server",
+        "tsConfig": "libs/server/tsconfig.lib.json",
+        "packageJson": "libs/server/package.json",
+        "main": "libs/server/src/index.ts",
+        "assets": ["libs/server/*.md"]
+      }
+    }
+  },
+  "tags": []
+}

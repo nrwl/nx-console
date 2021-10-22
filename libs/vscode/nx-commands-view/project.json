@@ -1,0 +1,33 @@
+{
+  "root": "libs/vscode/nx-commands-view",
+  "sourceRoot": "libs/vscode/nx-commands-view/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/vscode/nx-commands-view/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/vscode/nx-commands-view"],
+      "options": {
+        "jestConfig": "libs/vscode/nx-commands-view/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/vscode/nx-commands-view",
+        "tsConfig": "libs/vscode/nx-commands-view/tsconfig.lib.json",
+        "packageJson": "libs/vscode/nx-commands-view/package.json",
+        "main": "libs/vscode/nx-commands-view/src/index.ts",
+        "assets": ["libs/vscode/nx-commands-view/*.md"]
+      }
+    }
+  },
+  "tags": []
+}

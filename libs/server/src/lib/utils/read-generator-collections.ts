@@ -13,7 +13,6 @@ import {
   listOfUnnestedNpmPackages,
   normalizeSchema,
   readAndCacheJsonFile,
-  toLegacyWorkspaceFormat,
   toWorkspaceFormat,
 } from './utils';
 
@@ -55,9 +54,11 @@ async function checkAndReadWorkspaceCollection(
 }
 
 function readWorkspaceJsonDefaults(workspaceJsonPath: string): any {
+  // TODO(Cammisuli): Change this to use getNxConfig to support nx 13
   const defaults =
-    toWorkspaceFormat(readAndCacheJsonFile(workspaceJsonPath).json)
+    (toWorkspaceFormat(readAndCacheJsonFile(workspaceJsonPath).json) as any)
       .generators || {};
+
   const collectionDefaults = Object.keys(defaults).reduce(
     (collectionDefaultsMap: any, key) => {
       if (key.includes(':')) {

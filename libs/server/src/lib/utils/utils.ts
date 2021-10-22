@@ -314,27 +314,6 @@ function renameProperty(obj: any, from: string, to: string) {
   delete obj[from];
 }
 
-export function toLegacyWorkspaceFormat(w: WorkspaceJsonConfiguration) {
-  Object.values(w.projects || {}).forEach((project: any) => {
-    if (project.targets) {
-      renameProperty(project, 'targets', 'architect');
-    }
-    if (project.generators) {
-      renameProperty(project, 'generators', 'schematics');
-    }
-    Object.values(project.architect || {}).forEach((target: any) => {
-      if (target.executor) {
-        renameProperty(target, 'executor', 'builder');
-      }
-    });
-  });
-
-  if (w.generators) {
-    renameProperty(w, 'generators', 'schematics');
-  }
-  return w;
-}
-
 export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
   Object.values(w.projects || {}).forEach((project: any) => {
     if (project.architect) {

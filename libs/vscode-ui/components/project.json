@@ -1,0 +1,25 @@
+{
+  "projectType": "library",
+  "root": "libs/vscode-ui/components",
+  "sourceRoot": "libs/vscode-ui/components/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/vscode-ui/components/src/**/*.ts",
+          "libs/vscode-ui/components/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "options": {
+        "jestConfig": "libs/vscode-ui/components/jest.config.js",
+        "passWithNoTests": true
+      },
+      "outputs": ["coverage/libs/vscode-ui/components"]
+    }
+  },
+  "tags": []
+}

@@ -1,0 +1,84 @@
+{
+  "projectType": "application",
+  "generators": {
+    "@nrwl/workspace:component": {
+      "style": "scss"
+    }
+  },
+  "root": "apps/vscode-ui",
+  "sourceRoot": "apps/vscode-ui/src",
+  "targets": {
+    "build": {
+      "executor": "ngx-build-plus:browser",
+      "options": {
+        "extraWebpackConfig": "apps/vscode-ui/webpack.dev.js",
+        "outputPath": "dist/apps/vscode/assets/public",
+        "index": "apps/vscode-ui/src/index.html",
+        "main": "apps/vscode-ui/src/main.ts",
+        "tsConfig": "apps/vscode-ui/tsconfig.app.json",
+        "assets": [
+          "apps/vscode-ui/src/favicon.ico",
+          "apps/vscode-ui/src/assets"
+        ],
+        "styles": ["apps/vscode-ui/src/styles.scss"],
+        "namedChunks": false,
+        "extractLicenses": true,
+        "vendorChunk": false,
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/vscode-ui/styles/src/lib"]
+        },
+        "allowedCommonJsDependencies": ["zone.js"]
+      },
+      "configurations": {
+        "production": {
+          "sourceMap": false,
+          "aot": true,
+          "optimization": true,
+          "buildOptimizer": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/vscode-ui/src/environments/environment.ts",
+              "with": "apps/vscode-ui/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      },
+      "outputs": ["{options.outputPath}"]
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "browserTarget": "vscode-ui:build"
+      },
+      "configurations": {
+        "production": {
+          "browserTarget": "vscode-ui:build:production"
+        }
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "vscode-ui:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/vscode-ui/src/**/*.ts",
+          "apps/vscode-ui/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "options": {
+        "jestConfig": "apps/vscode-ui/jest.config.js",
+        "passWithNoTests": true
+      },
+      "outputs": ["coverage/apps/vscode-ui"]
+    }
+  },
+  "tags": []
+}

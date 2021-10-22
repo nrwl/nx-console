@@ -26,63 +26,6 @@
       }
     }
   },
-  "projects": {
-    "schema": {
-      "tags": []
-    },
-    "server": {
-      "tags": []
-    },
-    "vscode-app": {
-      "tags": []
-    },
-    "vscode-configuration": {
-      "tags": []
-    },
-    "vscode-json-schema": {
-      "tags": []
-    },
-    "vscode-nx-commands-view": {
-      "tags": []
-    },
-    "vscode-nx-project-view": {
-      "tags": []
-    },
-    "vscode-nx-run-target-view": {
-      "tags": []
-    },
-    "vscode-nx-workspace": {
-      "tags": []
-    },
-    "vscode-tasks": {
-      "tags": []
-    },
-    "vscode-ui": {
-      "tags": []
-    },
-    "vscode-ui-argument-list": {
-      "tags": []
-    },
-    "vscode-ui-components": {
-      "tags": []
-    },
-    "vscode-ui-feature-task-execution-form": {
-      "tags": []
-    },
-    "vscode-ui-feature-task-execution-form-e2e": {
-      "tags": [],
-      "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
-    },
-    "vscode-ui-styles": {
-      "tags": []
-    },
-    "vscode-verify": {
-      "tags": []
-    },
-    "vscode-webview": {
-      "tags": []
-    }
-  },
   "targetDependencies": {
     "build": [
       {
@@ -90,5 +33,40 @@
         "projects": "dependencies"
       }
     ]
-  }
+  },
+  "cli": {
+    "warnings": {
+      "typescriptMismatch": false,
+      "versionMismatch": false
+    },
+    "packageManager": "yarn",
+    "defaultCollection": "@nrwl/angular"
+  },
+  "generators": {
+    "@nrwl/schematics:component": {
+      "styleext": "scss"
+    },
+    "@nrwl/schematics:library": {
+      "unitTestRunner": "jest",
+      "framework": "angular"
+    },
+    "@nrwl/schematics:node-application": {
+      "framework": "express"
+    },
+    "@nrwl/angular:application": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest"
+    },
+    "@nrwl/angular:component": {
+      "style": "scss"
+    }
+  },
+  "defaultProject": "vscode-ui"
 }
