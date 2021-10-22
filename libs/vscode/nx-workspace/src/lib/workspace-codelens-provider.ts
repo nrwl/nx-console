@@ -58,7 +58,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
      * Find the project name of the corresponding project.json file
      */
     if (document.uri.path.endsWith('project.json')) {
-      const { rawWorkspace } = getRawWorkspace();
+      const { rawWorkspace } = await getRawWorkspace();
       for (const [key, project] of Object.entries(rawWorkspace.projects)) {
         if (
           typeof project === 'string' &&

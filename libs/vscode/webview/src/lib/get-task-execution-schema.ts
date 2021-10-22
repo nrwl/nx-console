@@ -3,7 +3,6 @@ import {
   getOutputChannel,
   getTelemetry,
   readTargetDef,
-  selectGenerator,
 } from '@nx-console/server';
 import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
@@ -13,6 +12,7 @@ import {
   CliTaskProvider,
   CliTaskQuickPickItem,
   selectCliProject,
+  selectGenerator,
 } from '@nx-console/vscode/tasks';
 
 export async function getTaskExecutionSchema(
@@ -114,6 +114,7 @@ export async function getTaskExecutionSchema(
       case 'Generate': {
         const generator = await selectGenerator(
           cliTaskProvider.getWorkspaceJsonPath(),
+          workspaceType,
           generatorType
         );
 

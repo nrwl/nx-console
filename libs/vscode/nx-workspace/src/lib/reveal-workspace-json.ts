@@ -7,7 +7,7 @@ export async function revealNxProject(
   projectName: string,
   target?: { name: string; configuration?: string }
 ) {
-  const raw = getRawWorkspace();
+  const raw = await getRawWorkspace();
   const rawWorkspace = raw.rawWorkspace;
   let workspaceJsonPath = raw.workspaceJsonPath;
 
@@ -18,7 +18,7 @@ export async function revealNxProject(
     const workspaceRootDir = dirname(workspaceJsonPath);
     workspaceJsonPath = join(
       workspaceRootDir,
-      (rawWorkspace.projects[projectName] as unknown) as string,
+      rawWorkspace.projects[projectName] as unknown as string,
       'project.json'
     );
   }

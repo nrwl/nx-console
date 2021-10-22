@@ -20,7 +20,7 @@ export async function getNxWorkspaceConfig(
     }
     return cachedWorkspaceJson;
   } catch (e) {
-    return readAndCacheJsonFile(workspaceJsonPath).json;
+    return (await readAndCacheJsonFile(workspaceJsonPath)).json;
   }
 }
 

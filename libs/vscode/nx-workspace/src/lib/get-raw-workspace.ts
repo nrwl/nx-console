@@ -5,14 +5,14 @@ import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 /**
  * Get the raw workspace file that hasn't been normalized by nx
  */
-export function getRawWorkspace() {
+export async function getRawWorkspace() {
   const workspaceJsonPath = WorkspaceConfigurationStore.instance.get(
     'nxWorkspaceJsonPath',
     ''
   );
 
-  const rawWorkspace = readAndParseJson(
+  const rawWorkspace = (await readAndParseJson(
     workspaceJsonPath
-  ) as WorkspaceJsonConfiguration;
+  )) as WorkspaceJsonConfiguration;
   return { rawWorkspace, workspaceJsonPath };
 }

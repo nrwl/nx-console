@@ -1,8 +1,8 @@
-import { watchFile } from '@nx-console/server';
+import { CollectionInfo } from '@nx-console/schema';
+import { getExecutors, watchFile } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { dirname, join } from 'path';
 import * as vscode from 'vscode';
-import { ExecutorInfo, getAllExecutors } from './get-all-executors';
 
 let FILE_WATCHER: vscode.FileSystemWatcher;
 
@@ -32,14 +32,17 @@ export class WorkspaceJsonSchema {
     this.setupSchema(workspacePath, context.extensionUri);
   }
 
-  setupSchema(
+  async setupSchema(
     workspacePath: string,
     extensionUri: vscode.Uri,
     clearPackageJsonCache = false
   ) {
     const filePath = vscode.Uri.joinPath(extensionUri, 'workspace-schema.json');
-    const collections = getAllExecutors(workspacePath, clearPackageJsonCache);
-    const contents = getWorkspaceJsonSchema(collections);
+    const collections = await getExecutors(
+      workspacePath,
+      clearPackageJsonCache
+    );
+    const contents = await getWorkspaceJsonSchema(collections);
     vscode.workspace.fs.writeFile(
       filePath,
       new Uint8Array(Buffer.from(contents, 'utf8'))
@@ -47,14 +50,14 @@ export class WorkspaceJsonSchema {
   }
 }
 
-function getWorkspaceJsonSchema(collections: ExecutorInfo[]) {
+function getWorkspaceJsonSchema(collections: CollectionInfo[]) {
   const [builders, executors] = createBuildersAndExecutorsSchema(collections);
   const contents = createJsonSchema(builders, executors);
   return contents;
 }
 
 function createBuildersAndExecutorsSchema(
-  collections: ExecutorInfo[]
+  collections: CollectionInfo[]
 ): [string, string] {
   const builders = collections
     .map(
@@ -131,7 +134,7 @@ function createJsonSchema(builders: string, executors: string) {
         },
         "then": {
           "description": "Read more about this workspace file at https://nx.dev/latest/angular/getting-started/configuration",
-          "properties": { 
+          "properties": {
             "projects": {
               "type": "object",
               "additionalProperties": {
@@ -157,7 +160,7 @@ function createJsonSchema(builders: string, executors: string) {
                         }
                       },
                       "allOf": [
-                       ${builders} 
+                       ${builders}
                       ]
                     }
                   }

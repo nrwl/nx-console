@@ -1,6 +1,5 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { selectGenerator } from '@nx-console/server';
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import {
@@ -13,6 +12,7 @@ import { selectFlags } from './select-flags';
 import { GeneratorType, Option } from '@nx-console/schema';
 import { OptionType } from '@angular/cli/models/interface';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { selectGenerator } from './select-generator';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -243,7 +243,7 @@ async function selectGeneratorAndPromptForFlags() {
     return;
   }
 
-  const selection = await selectGenerator(configurationFilePath);
+  const selection = await selectGenerator(configurationFilePath, workspaceType);
   if (!selection) {
     return;
   }
