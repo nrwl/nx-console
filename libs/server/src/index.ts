@@ -1,7 +1,5 @@
 export * from './lib/abstract-tree-provider';
-export * from './lib/extensions';
 export * from './lib/stores';
-export * from './lib/select-generator';
 export * from './lib/telemetry';
 export * from './lib/utils/output-channel';
 export * from './lib/utils/read-projects';
@@ -12,6 +10,7 @@ export {
   fileExistsSync,
   readAndParseJson,
   readAndCacheJsonFile,
+  normalizeSchema,
   cacheJson,
   clearJsonCache,
   toWorkspaceFormat,

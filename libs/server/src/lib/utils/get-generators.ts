@@ -1,10 +1,5 @@
-import {
-  Option,
-  Generator,
-  CollectionInfo,
-  GeneratorType,
-} from '@nx-console/schema';
-import { basename, dirname, join } from 'path';
+import { CollectionInfo, GeneratorType } from '@nx-console/schema';
+import { basename, join } from 'path';
 
 import {
   directoryExists,
@@ -12,7 +7,6 @@ import {
   listFiles,
   normalizeSchema,
   readAndCacheJsonFile,
-  toWorkspaceFormat,
 } from './utils';
 import {
   getCollectionInfo,
@@ -34,12 +28,12 @@ export async function getGenerators(
 
   generatorCollections = [
     ...generatorCollections,
-    ...(await checkAndReadWorkspaceCollection(
+    ...(await checkAndReadWorkspaceGenerators(
       basedir,
       join('tools', 'schematics'),
       workspaceType
     )),
-    ...(await checkAndReadWorkspaceCollection(
+    ...(await checkAndReadWorkspaceGenerators(
       basedir,
       join('tools', 'generators'),
       workspaceType
@@ -50,7 +44,7 @@ export async function getGenerators(
   );
 }
 
-async function checkAndReadWorkspaceCollection(
+async function checkAndReadWorkspaceGenerators(
   basedir: string,
   workspaceGeneratorsPath: string,
   workspaceType: 'nx' | 'ng'
@@ -64,36 +58,6 @@ async function checkAndReadWorkspaceCollection(
     return collection;
   }
   return Promise.resolve([]);
-}
-
-async function readWorkspaceJsonDefaults(
-  workspaceJsonPath: string
-): Promise<any> {
-  const workspaceJson = await readAndCacheJsonFile(workspaceJsonPath);
-  const defaults = toWorkspaceFormat(workspaceJson.json).generators || {};
-  const collectionDefaults = Object.keys(defaults).reduce(
-    (collectionDefaultsMap: any, key) => {
-      if (key.includes(':')) {
-        const [collectionName, generatorName] = key.split(':');
-        if (!collectionDefaultsMap[collectionName]) {
-          collectionDefaultsMap[collectionName] = {};
-        }
-        collectionDefaultsMap[collectionName][generatorName] = defaults[key];
-      } else {
-        const collectionName = key;
-        if (!collectionDefaultsMap[collectionName]) {
-          collectionDefaultsMap[collectionName] = {};
-        }
-        Object.keys(defaults[collectionName]).forEach((generatorName) => {
-          collectionDefaultsMap[collectionName][generatorName] =
-            defaults[collectionName][generatorName];
-        });
-      }
-      return collectionDefaultsMap;
-    },
-    {}
-  );
-  return collectionDefaults;
 }
 
 async function readWorkspaceGeneratorsCollection(
@@ -114,6 +78,7 @@ async function readWorkspaceGeneratorsCollection(
     return getCollectionInfo(
       collectionName,
       collectionPath,
+      collectionDir,
       {},
       collection.json
     );
@@ -123,12 +88,13 @@ async function readWorkspaceGeneratorsCollection(
         .filter((f) => basename(f) === 'schema.json')
         .map(async (f) => {
           const schemaJson = await readAndCacheJsonFile(f, '');
+          const name = schemaJson.json.id || schemaJson.json.$id;
           return {
             name: collectionName,
             type: 'generator',
             path: collectionDir,
             data: {
-              name: schemaJson.json.id || schemaJson.json.$id,
+              name,
               collection: collectionName,
               options: await normalizeSchema(schemaJson.json),
               description: '',
@@ -138,38 +104,4 @@ async function readWorkspaceGeneratorsCollection(
         })
     );
   }
-}
-
-export async function readGeneratorOptions(
-  workspaceJsonPath: string,
-  collectionName: string,
-  generatorName: string
-): Promise<Option[]> {
-  const basedir = join(workspaceJsonPath, '..');
-  const nodeModulesDir = join(basedir, 'node_modules');
-  const collectionPackageJson = await readAndCacheJsonFile(
-    join(collectionName, 'package.json'),
-    nodeModulesDir
-  );
-  const collectionJson = await readAndCacheJsonFile(
-    collectionPackageJson.json.schematics ||
-      collectionPackageJson.json.generators,
-    dirname(collectionPackageJson.path)
-  );
-  const generators = Object.assign(
-    {},
-    collectionJson.json.schematics,
-    collectionJson.json.generators
-  );
-
-  const generatorSchema = await readAndCacheJsonFile(
-    generators[generatorName].schema,
-    dirname(collectionJson.path)
-  );
-  const workspaceDefaults = await readWorkspaceJsonDefaults(workspaceJsonPath);
-  const defaults =
-    workspaceDefaults &&
-    workspaceDefaults[collectionName] &&
-    workspaceDefaults[collectionName][generatorName];
-  return await normalizeSchema(generatorSchema.json, defaults);
 }

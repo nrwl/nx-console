@@ -34,21 +34,37 @@ export async function readCollectionsFromNodeModules(
     })
   );
 
-  const collectionMap = await Promise.all(
-    collections.map((c) => readCollections(nodeModulesDir, c.packageName))
-  );
+  const allCollections = (
+    await Promise.all(
+      collections.map((c) => readCollections(nodeModulesDir, c.packageName))
+    )
+  ).flat();
 
-  return collectionMap.flat().filter((c): c is CollectionInfo => Boolean(c));
+  /**
+   * Since we gather all collections, and collections listed in `extends`, we need to dedupe collections here if workspaces have that extended collection in their own package.json
+   */
+  const dedupedCollections = new Map<string, CollectionInfo>();
+  for (const singleCollection of allCollections) {
+    if (!singleCollection) {
+      continue;
+    }
+
+    if (!dedupedCollections.has(singleCollection.name)) {
+      dedupedCollections.set(singleCollection.name, singleCollection);
+    }
+  }
+
+  return Array.from(dedupedCollections.values());
 }
 
 export async function readCollections(
-  basedir: string,
+  nodeModulesDir: string,
   collectionName: string
 ): Promise<CollectionInfo[] | null> {
   try {
     const packageJson = await readAndCacheJsonFile(
       join(collectionName, 'package.json'),
-      basedir
+      nodeModulesDir
     );
 
     const [executorCollections, generatorCollections] = await Promise.all([
@@ -65,6 +81,7 @@ export async function readCollections(
     return getCollectionInfo(
       collectionName,
       packageJson.path,
+      nodeModulesDir,
       executorCollections.json,
       generatorCollections.json
     );
@@ -73,15 +90,16 @@ export async function readCollections(
   }
 }
 
-export function getCollectionInfo(
+export async function getCollectionInfo(
   collectionName: string,
   path: string,
+  collectionDir: string,
   executorCollectionJson: any,
   generatorCollectionJson: any
-): CollectionInfo[] {
+): Promise<CollectionInfo[]> {
   const baseDir = dirname(path);
 
-  const collection: CollectionInfo[] = [];
+  const collectionMap: Map<string, CollectionInfo> = new Map();
 
   const buildCollectionInfo = (
     name: string,
@@ -105,11 +123,14 @@ export function getCollectionInfo(
   for (const [key, schema] of Object.entries<any>(
     executorCollectionJson.executors || executorCollectionJson.executors || {}
   )) {
-    if (!canUse(collectionName, schema)) {
+    if (!canUse(key, schema)) {
       continue;
     }
-
-    collection.push(buildCollectionInfo(key, schema, 'executor'));
+    const collectionInfo = buildCollectionInfo(key, schema, 'executor');
+    if (collectionMap.has(collectionInfo.name)) {
+      continue;
+    }
+    collectionMap.set(collectionInfo.name, collectionInfo);
   }
 
   for (const [key, schema] of Object.entries<any>(
@@ -117,7 +138,7 @@ export function getCollectionInfo(
       generatorCollectionJson.schematics ||
       {}
   )) {
-    if (!canUse(collectionName, schema)) {
+    if (!canUse(key, schema)) {
       continue;
     }
 
@@ -128,13 +149,40 @@ export function getCollectionInfo(
         key,
         schema
       );
-      collection.push(collectionInfo);
+      if (collectionMap.has(collectionInfo.name)) {
+        continue;
+      }
+      collectionMap.set(collectionInfo.name, collectionInfo);
     } catch (e) {
       // noop - generator is invalid
     }
   }
 
-  return collection;
+  if (
+    generatorCollectionJson.extends &&
+    Array.isArray(generatorCollectionJson.extends)
+  ) {
+    const extendedSchema = generatorCollectionJson.extends as string[];
+    const extendedCollections = (
+      await Promise.all(
+        extendedSchema
+          .filter((extended) => extended !== '@nrwl/workspace')
+          .map((extended: string) => readCollections(collectionDir, extended))
+      )
+    )
+      .flat()
+      .filter((c): c is CollectionInfo => Boolean(c));
+
+    for (const collection of extendedCollections) {
+      if (collectionMap.has(collection.name)) {
+        continue;
+      }
+
+      collectionMap.set(collection.name, collection);
+    }
+  }
+
+  return Array.from(collectionMap.values());
 }
 
 function readCollectionGenerator(
