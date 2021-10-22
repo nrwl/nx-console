@@ -1,7 +1,7 @@
-import { clearJsonCache, readAndCacheJsonFile } from '@nx-console/server';
 import { platform } from 'os';
 import { dirname, join } from 'path';
 import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
+import { clearJsonCache, readAndCacheJsonFile } from './utils';
 
 export async function readCollectionsFromNodeModules(
   workspaceJsonPath: string,
@@ -102,20 +102,32 @@ export function getCollectionInfo(
     };
   };
 
-  for (const [key, value] of Object.entries<any>(
+  for (const [key, schema] of Object.entries<any>(
     executorCollectionJson.executors || executorCollectionJson.executors || {}
   )) {
-    collection.push(buildCollectionInfo(key, value, 'executor'));
+    if (!canUse(collectionName, schema)) {
+      continue;
+    }
+
+    collection.push(buildCollectionInfo(key, schema, 'executor'));
   }
 
-  for (const [key, value] of Object.entries<any>(
+  for (const [key, schema] of Object.entries<any>(
     generatorCollectionJson.generators ||
       generatorCollectionJson.schematics ||
       {}
   )) {
+    if (!canUse(collectionName, schema)) {
+      continue;
+    }
+
     try {
-      const collectionInfo = buildCollectionInfo(key, value, 'generator');
-      collectionInfo.data = readCollectionGenerator(collectionName, key, value);
+      const collectionInfo = buildCollectionInfo(key, schema, 'generator');
+      collectionInfo.data = readCollectionGenerator(
+        collectionName,
+        key,
+        schema
+      );
       collection.push(collectionInfo);
     } catch (e) {
       // noop - generator is invalid
@@ -131,26 +143,24 @@ function readCollectionGenerator(
   collectionJson: any
 ): Generator | undefined {
   try {
-    if (canAdd(collectionSchemaName, collectionJson)) {
-      let generatorType: GeneratorType;
-      switch (collectionJson['x-type']) {
-        case 'application':
-          generatorType = GeneratorType.Application;
-          break;
-        case 'library':
-          generatorType = GeneratorType.Library;
-          break;
-        default:
-          generatorType = GeneratorType.Other;
-          break;
-      }
-      return {
-        name: collectionSchemaName,
-        collection: collectionName,
-        description: collectionJson.description || '',
-        type: generatorType,
-      };
+    let generatorType: GeneratorType;
+    switch (collectionJson['x-type']) {
+      case 'application':
+        generatorType = GeneratorType.Application;
+        break;
+      case 'library':
+        generatorType = GeneratorType.Library;
+        break;
+      default:
+        generatorType = GeneratorType.Other;
+        break;
     }
+    return {
+      name: collectionSchemaName,
+      collection: collectionName,
+      description: collectionJson.description || '',
+      type: generatorType,
+    };
   } catch (e) {
     console.error(e);
     console.error(
@@ -159,7 +169,13 @@ function readCollectionGenerator(
   }
 }
 
-function canAdd(
+/**
+ * Checks to see if the collection is usable within Nx Console.
+ * @param name
+ * @param s
+ * @returns
+ */
+function canUse(
   name: string,
   s: { hidden: boolean; private: boolean; schema: string; extends: boolean }
 ): boolean {
