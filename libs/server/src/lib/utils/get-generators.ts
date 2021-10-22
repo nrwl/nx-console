@@ -14,8 +14,7 @@ import {
 } from './read-collections';
 
 export async function getGenerators(
-  workspaceJsonPath: string,
-  workspaceType: 'nx' | 'ng'
+  workspaceJsonPath: string
 ): Promise<CollectionInfo[]> {
   const basedir = join(workspaceJsonPath, '..');
   const collections = await readCollectionsFromNodeModules(
@@ -30,13 +29,11 @@ export async function getGenerators(
     ...generatorCollections,
     ...(await checkAndReadWorkspaceGenerators(
       basedir,
-      join('tools', 'schematics'),
-      workspaceType
+      join('tools', 'schematics')
     )),
     ...(await checkAndReadWorkspaceGenerators(
       basedir,
-      join('tools', 'generators'),
-      workspaceType
+      join('tools', 'generators')
     )),
   ];
   return generatorCollections.filter(
@@ -46,14 +43,12 @@ export async function getGenerators(
 
 async function checkAndReadWorkspaceGenerators(
   basedir: string,
-  workspaceGeneratorsPath: string,
-  workspaceType: 'nx' | 'ng'
+  workspaceGeneratorsPath: string
 ) {
   if (await directoryExists(join(basedir, workspaceGeneratorsPath))) {
     const collection = await readWorkspaceGeneratorsCollection(
       basedir,
-      workspaceGeneratorsPath,
-      workspaceType
+      workspaceGeneratorsPath
     );
     return collection;
   }
@@ -62,12 +57,10 @@ async function checkAndReadWorkspaceGenerators(
 
 async function readWorkspaceGeneratorsCollection(
   basedir: string,
-  workspaceGeneratorsPath: string,
-  workspaceType: 'nx' | 'ng'
+  workspaceGeneratorsPath: string
 ): Promise<CollectionInfo[]> {
   const collectionDir = join(basedir, workspaceGeneratorsPath);
-  const collectionName =
-    workspaceType === 'nx' ? 'workspace-generator' : 'workspace-schematic';
+  const collectionName = 'workspace-generator';
   const collectionPath = join(collectionDir, 'collection.json');
   if (fileExistsSync(collectionPath)) {
     const collection = await readAndCacheJsonFile(
@@ -89,6 +82,8 @@ async function readWorkspaceGeneratorsCollection(
         .map(async (f) => {
           const schemaJson = await readAndCacheJsonFile(f, '');
           const name = schemaJson.json.id || schemaJson.json.$id;
+          const type: GeneratorType =
+            schemaJson.json['x-type'] ?? GeneratorType.Other;
           return {
             name: collectionName,
             type: 'generator',
@@ -98,7 +93,7 @@ async function readWorkspaceGeneratorsCollection(
               collection: collectionName,
               options: await normalizeSchema(schemaJson.json),
               description: '',
-              type: GeneratorType.Other,
+              type,
             },
           } as CollectionInfo;
         })

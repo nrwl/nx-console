@@ -291,7 +291,7 @@ async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
     ),
   ]);
 
-  const generatorCollections = await getGenerators(workspaceJsonPath, 'nx');
+  const generatorCollections = await getGenerators(workspaceJsonPath);
 
   let hasApplicationGenerators = false;
   let hasLibraryGenerators = false;

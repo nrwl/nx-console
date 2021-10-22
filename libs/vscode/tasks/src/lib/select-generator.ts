@@ -102,7 +102,7 @@ export async function selectGenerator(
     generator: Generator;
   }
 
-  const generators = await getGenerators(workspaceJsonPath, workspaceType);
+  const generators = await getGenerators(workspaceJsonPath);
   let generatorsQuickPicks = generators
     .map((c) => c.data)
     .filter(
