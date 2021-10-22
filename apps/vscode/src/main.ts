@@ -276,7 +276,12 @@ async function setWorkspace(workspaceJsonPath: string) {
 
 async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
   const { getNxConfig } = await import('@nx-console/vscode/nx-workspace');
-  const nxConfig = await getNxConfig(dirname(workspaceJsonPath));
+  let nxConfig: Awaited<ReturnType<typeof getNxConfig>>;
+  try {
+    nxConfig = await getNxConfig(dirname(workspaceJsonPath));
+  } catch {
+    return;
+  }
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(
