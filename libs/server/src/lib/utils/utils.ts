@@ -18,6 +18,7 @@ import {
   ParseError,
   printParseErrorCode,
 } from 'jsonc-parser';
+import { readdir } from 'fs/promises';
 import * as path from 'path';
 import { getOutputChannel } from './output-channel';
 
@@ -38,6 +39,50 @@ const IMPORTANT_FIELD_NAMES = [
   'port',
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
+
+/**
+ * Get a flat list of all node_modules folders in the workspace.
+ * This is needed to continue to support Angular CLI projects.
+ *
+ * @param nodeModulesDir
+ * @returns
+ */
+export async function listOfUnnestedNpmPackages(
+  nodeModulesDir: string
+): Promise<string[]> {
+  const res: string[] = [];
+  const stats = await stat(nodeModulesDir);
+  if (!stats.isDirectory()) {
+    return res;
+  }
+
+  const dirContents = await readdir(nodeModulesDir);
+
+  for (const npmPackageOrScope of dirContents) {
+    if (npmPackageOrScope.startsWith('.')) {
+      continue;
+    }
+
+    const packageStats = await stat(
+      path.join(nodeModulesDir, npmPackageOrScope)
+    );
+    if (!packageStats.isDirectory()) {
+      continue;
+    }
+
+    if (npmPackageOrScope.startsWith('@')) {
+      (await readdir(path.join(nodeModulesDir, npmPackageOrScope))).forEach(
+        (p) => {
+          res.push(`${npmPackageOrScope}/${p}`);
+        }
+      );
+    } else {
+      res.push(npmPackageOrScope);
+    }
+  }
+
+  return res;
+}
 
 export function listFiles(dirName: string): string[] {
   // TODO use .gitignore to skip files

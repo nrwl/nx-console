@@ -1,7 +1,11 @@
 import { platform } from 'os';
 import { dirname, join } from 'path';
 import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
-import { clearJsonCache, readAndCacheJsonFile } from './utils';
+import {
+  clearJsonCache,
+  listOfUnnestedNpmPackages,
+  readAndCacheJsonFile,
+} from './utils';
 
 export async function readCollectionsFromNodeModules(
   workspaceJsonPath: string,
@@ -14,15 +18,10 @@ export async function readCollectionsFromNodeModules(
     clearJsonCache('package.json', basedir);
   }
 
-  const packageJson = (await readAndCacheJsonFile('package.json', basedir))
-    .json;
-  const packages: { [packageName: string]: string } = {
-    ...(packageJson.devDependencies || {}),
-    ...(packageJson.dependencies || {}),
-  };
+  const packages = await listOfUnnestedNpmPackages(nodeModulesDir);
 
   const collections = await Promise.all(
-    Object.keys(packages).map(async (p) => {
+    packages.map(async (p) => {
       const json = await readAndCacheJsonFile(
         join(p, 'package.json'),
         nodeModulesDir
