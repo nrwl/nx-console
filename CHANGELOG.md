@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.12.1](https://github.com/nrwl/nx-console/compare/v17.12.0...v17.12.1) (2021-10-23)
+
+
+### Bug Fixes
+
+* use require instead of import for loading workspace dependency ([#1165](https://github.com/nrwl/nx-console/issues/1165)) ([254d8e3](https://github.com/nrwl/nx-console/commits/254d8e3666ba41456ec45bb251d836b78351a422))
+
 ## [17.12.0](https://github.com/nrwl/nx-console/compare/v17.11.2...v17.12.0) (2021-10-23)
 
 
