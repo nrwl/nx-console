@@ -21,7 +21,7 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
-  readAllGeneratorCollections,
+  getGenerators,
   teardownTelemetry,
   watchFile,
 } from '@nx-console/server';
@@ -45,6 +45,7 @@ import {
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
 import { environment } from './environments/environment';
+import { Awaited } from '@nx-console/schema';
 
 import {
   WorkspaceJsonSchema,
@@ -276,7 +277,13 @@ async function setWorkspace(workspaceJsonPath: string) {
 
 async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
   const { getNxConfig } = await import('@nx-console/vscode/nx-workspace');
-  const nxConfig = await getNxConfig(dirname(workspaceJsonPath));
+
+  let nxConfig: Awaited<ReturnType<typeof getNxConfig>>;
+  try {
+    nxConfig = await getNxConfig(dirname(workspaceJsonPath));
+  } catch {
+    return;
+  }
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(
@@ -291,20 +298,19 @@ async function setApplicationAndLibraryContext(workspaceJsonPath: string) {
     ),
   ]);
 
-  const generatorCollections = await readAllGeneratorCollections(
-    workspaceJsonPath
-  );
+  const generatorCollections = await getGenerators(workspaceJsonPath);
+
   let hasApplicationGenerators = false;
   let hasLibraryGenerators = false;
 
   generatorCollections.forEach((generatorCollection) => {
-    generatorCollection.generators.forEach((generator) => {
-      if (generator.type === 'application') {
+    if (generatorCollection.data) {
+      if (generatorCollection.data.type === 'application') {
         hasApplicationGenerators = true;
-      } else if (generator.type === 'library') {
+      } else if (generatorCollection.data.type === 'library') {
         hasLibraryGenerators = true;
       }
-    });
+    }
   });
 
   commands.executeCommand(

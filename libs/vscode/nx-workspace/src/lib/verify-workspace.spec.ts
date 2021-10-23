@@ -41,9 +41,6 @@ const mockWorkspace: WorkspaceJsonConfiguration = {
       root: 'project-two',
     },
   },
-  defaultProject: undefined,
-  generators: undefined,
-  cli: undefined,
 };
 
 const DefaultWorkspaceInformation = {

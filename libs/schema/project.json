@@ -1,0 +1,25 @@
+{
+  "root": "libs/schema",
+  "sourceRoot": "libs/schema/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/schema/**/*.ts"]
+      }
+    },
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/schema",
+        "tsConfig": "libs/schema/tsconfig.lib.json",
+        "packageJson": "libs/schema/package.json",
+        "main": "libs/schema/src/index.ts",
+        "assets": ["libs/schema/*.md"]
+      }
+    }
+  },
+  "tags": []
+}

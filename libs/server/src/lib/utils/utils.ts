@@ -11,12 +11,14 @@ import {
   OptionItemLabelValue,
   XPrompt,
 } from '@nx-console/schema';
-import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
+import { readdirSync, statSync } from 'fs';
+import { readFile, stat } from 'fs/promises';
 import {
   parse as parseJson,
   ParseError,
   printParseErrorCode,
 } from 'jsonc-parser';
+import { readdir } from 'fs/promises';
 import * as path from 'path';
 import { getOutputChannel } from './output-channel';
 
@@ -38,21 +40,47 @@ const IMPORTANT_FIELD_NAMES = [
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
 
-export function listOfUnnestedNpmPackages(nodeModulesDir: string): string[] {
+/**
+ * Get a flat list of all node_modules folders in the workspace.
+ * This is needed to continue to support Angular CLI projects.
+ *
+ * @param nodeModulesDir
+ * @returns
+ */
+export async function listOfUnnestedNpmPackages(
+  nodeModulesDir: string
+): Promise<string[]> {
   const res: string[] = [];
-  if (!existsSync(nodeModulesDir)) {
+  const stats = await stat(nodeModulesDir);
+  if (!stats.isDirectory()) {
     return res;
   }
 
-  readdirSync(nodeModulesDir).forEach((npmPackageOrScope) => {
+  const dirContents = await readdir(nodeModulesDir);
+
+  for (const npmPackageOrScope of dirContents) {
+    if (npmPackageOrScope.startsWith('.')) {
+      continue;
+    }
+
+    const packageStats = await stat(
+      path.join(nodeModulesDir, npmPackageOrScope)
+    );
+    if (!packageStats.isDirectory()) {
+      continue;
+    }
+
     if (npmPackageOrScope.startsWith('@')) {
-      readdirSync(path.join(nodeModulesDir, npmPackageOrScope)).forEach((p) => {
-        res.push(`${npmPackageOrScope}/${p}`);
-      });
+      (await readdir(path.join(nodeModulesDir, npmPackageOrScope))).forEach(
+        (p) => {
+          res.push(`${npmPackageOrScope}/${p}`);
+        }
+      );
     } else {
       res.push(npmPackageOrScope);
     }
-  });
+  }
+
   return res;
 }
 
@@ -83,9 +111,9 @@ export function listFiles(dirName: string): string[] {
   return res;
 }
 
-export function directoryExists(filePath: string): boolean {
+export async function directoryExists(filePath: string): Promise<boolean> {
   try {
-    return statSync(filePath).isDirectory();
+    return (await stat(filePath)).isDirectory();
   } catch {
     return false;
   }
@@ -99,8 +127,8 @@ export function fileExistsSync(filePath: string): boolean {
   }
 }
 
-export function readAndParseJson(filePath: string) {
-  const content = readFileSync(filePath, 'utf-8');
+export async function readAndParseJson(filePath: string) {
+  const content = await readFile(filePath, 'utf-8');
   try {
     return JSON.parse(content);
   } catch {
@@ -147,14 +175,21 @@ export function cacheJson(filePath: string, basedir = '', content?: any) {
   };
 }
 
-export function readAndCacheJsonFile(
-  filePath: string,
+export async function readAndCacheJsonFile(
+  filePath: string | undefined,
   basedir = ''
-): { path: string; json: any } {
-  const fullFilePath = path.join(basedir, filePath);
+): Promise<{ path: string; json: any }> {
+  if (!filePath) {
+    return {
+      path: '',
+      json: {},
+    };
+  }
 
-  if (fileContents[fullFilePath] || existsSync(fullFilePath)) {
-    fileContents[fullFilePath] ||= readAndParseJson(fullFilePath);
+  const fullFilePath = path.join(basedir, filePath);
+  const stats = await stat(fullFilePath);
+  if (fileContents[fullFilePath] || stats.isFile()) {
+    fileContents[fullFilePath] ||= await readAndParseJson(fullFilePath);
 
     return {
       path: fullFilePath,
@@ -312,27 +347,6 @@ export function getPrimitiveValue(value: any): string | undefined {
 function renameProperty(obj: any, from: string, to: string) {
   obj[to] = obj[from];
   delete obj[from];
-}
-
-export function toLegacyWorkspaceFormat(w: WorkspaceJsonConfiguration) {
-  Object.values(w.projects || {}).forEach((project: any) => {
-    if (project.targets) {
-      renameProperty(project, 'targets', 'architect');
-    }
-    if (project.generators) {
-      renameProperty(project, 'generators', 'schematics');
-    }
-    Object.values(project.architect || {}).forEach((target: any) => {
-      if (target.executor) {
-        renameProperty(target, 'executor', 'builder');
-      }
-    });
-  });
-
-  if (w.generators) {
-    renameProperty(w, 'generators', 'schematics');
-  }
-  return w;
 }
 
 export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
