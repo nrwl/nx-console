@@ -4,6 +4,8 @@ import * as NxWorkspaceFileUtils from '@nrwl/workspace/src/core/file-utils';
 import { getOutputChannel } from '@nx-console/server';
 import { platform } from 'os';
 
+declare function __non_webpack_require__(importPath: string): any;
+
 /**
  * Get the local installed version of @nrwl/workspace
  */
@@ -14,7 +16,7 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
     WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
   );
 
-  const importPath = join(
+  let importPath = join(
     workspacePath,
     'node_modules',
     '@nrwl',
@@ -24,13 +26,21 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
     'file-utils.js'
   );
 
-  return import(
-    /*webpackIgnore: true*/
-    platform() === 'win32' ? `file://${importPath}` : importPath
-  ).catch(() => {
-    getOutputChannel().appendLine(
-      `Error loading @nrwl/workspace from workspace. Falling back to extension dependency`
-    );
-    return NxWorkspaceFileUtils;
+  return new Promise((res) => {
+    try {
+      if (platform() === 'win32') {
+        importPath = importPath.replace(/\\/g, '/');
+      }
+      const imported = __non_webpack_require__(importPath);
+      return res(imported);
+    } catch (error) {
+      getOutputChannel().appendLine(
+        `
+    Error loading @nrwl/workspace from workspace. Falling back to extension dependency
+    Error: ${error}
+          `
+      );
+      return res(NxWorkspaceFileUtils);
+    }
   });
 }
