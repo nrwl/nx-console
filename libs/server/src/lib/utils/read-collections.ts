@@ -119,9 +119,11 @@ export async function getCollectionInfo(
     };
   };
 
-  for (const [key, schema] of Object.entries<any>(
-    executorCollectionJson.executors || executorCollectionJson.executors || {}
-  )) {
+  const executors = {
+    ...executorCollectionJson.executors,
+    ...executorCollectionJson.builders,
+  };
+  for (const [key, schema] of Object.entries<any>(executors)) {
     if (!canUse(key, schema)) {
       continue;
     }
@@ -132,11 +134,11 @@ export async function getCollectionInfo(
     collectionMap.set(collectionInfo.name, collectionInfo);
   }
 
-  for (const [key, schema] of Object.entries<any>(
-    generatorCollectionJson.generators ||
-      generatorCollectionJson.schematics ||
-      {}
-  )) {
+  const generators = {
+    ...generatorCollectionJson.generators,
+    ...generatorCollectionJson.schematics,
+  };
+  for (const [key, schema] of Object.entries<any>(generators)) {
     if (!canUse(key, schema)) {
       continue;
     }
