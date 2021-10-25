@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.12.2](https://github.com/nrwl/nx-console/compare/v17.12.1...v17.12.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* make sure that executors/builders and generator/schematics are combined respectively ([#1167](https://github.com/nrwl/nx-console/issues/1167)) ([8b2cd53](https://github.com/nrwl/nx-console/commits/8b2cd5327e30f43e06eb6e7dd66c023785b8ed50))
+
 ### [17.12.1](https://github.com/nrwl/nx-console/compare/v17.12.0...v17.12.1) (2021-10-23)
 
 
