@@ -187,20 +187,23 @@ export async function readAndCacheJsonFile(
   }
 
   const fullFilePath = path.join(basedir, filePath);
-  const stats = await stat(fullFilePath);
-  if (fileContents[fullFilePath] || stats.isFile()) {
-    fileContents[fullFilePath] ||= await readAndParseJson(fullFilePath);
-
-    return {
-      path: fullFilePath,
-      json: fileContents[fullFilePath],
-    };
-  } else {
-    return {
-      path: fullFilePath,
-      json: {},
-    };
+  try {
+    const stats = await stat(fullFilePath);
+    if (fileContents[fullFilePath] || stats.isFile()) {
+      fileContents[fullFilePath] ||= await readAndParseJson(fullFilePath);
+      return {
+        path: fullFilePath,
+        json: fileContents[fullFilePath],
+      };
+    }
+  } catch (e) {
+    getOutputChannel().appendLine(`${fullFilePath} does not exist`);
   }
+
+  return {
+    path: fullFilePath,
+    json: {},
+  };
 }
 
 const registry = new schema.CoreSchemaRegistry(standardFormats);
