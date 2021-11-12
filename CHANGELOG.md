@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.12.3](https://github.com/nrwl/nx-console/compare/v17.12.2...v17.12.3) (2021-11-12)
+
+
+### Bug Fixes
+
+* handle non existant nx.json file better. Fixes pure angular workspaces. ([#1172](https://github.com/nrwl/nx-console/issues/1172)) ([b1705f1](https://github.com/nrwl/nx-console/commits/b1705f140d8ec53ab8e4c9501ff0809484ed9d4e))
+* handle non-existing files better and return an empty object ([#1171](https://github.com/nrwl/nx-console/issues/1171)) ([8971434](https://github.com/nrwl/nx-console/commits/89714349f822963d1e12a4f9656ff1dd878a5b98))
+
 ### [17.12.2](https://github.com/nrwl/nx-console/compare/v17.12.1...v17.12.2) (2021-10-25)
 
 
