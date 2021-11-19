@@ -72,7 +72,10 @@ async function readWorkspaceGeneratorsCollection(
       collectionName,
       collectionPath,
       collectionDir,
-      {},
+      {
+        path: collectionPath,
+        json: {},
+      },
       collection.json
     );
   } else {

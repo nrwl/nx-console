@@ -1,6 +1,6 @@
-import { platform } from 'os';
-import { dirname, join } from 'path';
 import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
+import { platform } from 'os';
+import { dirname, join, resolve } from 'path';
 import {
   clearJsonCache,
   listOfUnnestedNpmPackages,
@@ -81,8 +81,8 @@ export async function readCollections(
       collectionName,
       packageJson.path,
       nodeModulesDir,
-      executorCollections.json,
-      generatorCollections.json
+      executorCollections,
+      generatorCollections
     );
   } catch (e) {
     return null;
@@ -93,8 +93,8 @@ export async function getCollectionInfo(
   collectionName: string,
   path: string,
   collectionDir: string,
-  executorCollectionJson: any,
-  generatorCollectionJson: any
+  executorCollection: { path: string; json: any },
+  generatorCollection: { path: string; json: any }
 ): Promise<CollectionInfo[]> {
   const baseDir = dirname(path);
 
@@ -103,13 +103,13 @@ export async function getCollectionInfo(
   const buildCollectionInfo = (
     name: string,
     value: any,
-    type: 'executor' | 'generator'
+    type: 'executor' | 'generator',
+    schemaPath: string
   ): CollectionInfo => {
-    let path = '';
+    let path = resolve(baseDir, dirname(schemaPath), value.schema);
+
     if (platform() === 'win32') {
-      path = `file:///${join(baseDir, value.schema).replace(/\\/g, '/')}`;
-    } else {
-      path = join(baseDir, value.schema);
+      path = `file:///${path.replace(/\\/g, '/')}`;
     }
 
     return {
@@ -120,14 +120,19 @@ export async function getCollectionInfo(
   };
 
   const executors = {
-    ...executorCollectionJson.executors,
-    ...executorCollectionJson.builders,
+    ...executorCollection.json.executors,
+    ...executorCollection.json.builders,
   };
   for (const [key, schema] of Object.entries<any>(executors)) {
     if (!canUse(key, schema)) {
       continue;
     }
-    const collectionInfo = buildCollectionInfo(key, schema, 'executor');
+    const collectionInfo = buildCollectionInfo(
+      key,
+      schema,
+      'executor',
+      executorCollection.path
+    );
     if (collectionMap.has(collectionInfo.name)) {
       continue;
     }
@@ -135,8 +140,8 @@ export async function getCollectionInfo(
   }
 
   const generators = {
-    ...generatorCollectionJson.generators,
-    ...generatorCollectionJson.schematics,
+    ...generatorCollection.json.generators,
+    ...generatorCollection.json.schematics,
   };
   for (const [key, schema] of Object.entries<any>(generators)) {
     if (!canUse(key, schema)) {
@@ -144,7 +149,12 @@ export async function getCollectionInfo(
     }
 
     try {
-      const collectionInfo = buildCollectionInfo(key, schema, 'generator');
+      const collectionInfo = buildCollectionInfo(
+        key,
+        schema,
+        'generator',
+        generatorCollection.path
+      );
       collectionInfo.data = readCollectionGenerator(
         collectionName,
         key,
@@ -160,10 +170,10 @@ export async function getCollectionInfo(
   }
 
   if (
-    generatorCollectionJson.extends &&
-    Array.isArray(generatorCollectionJson.extends)
+    generatorCollection.json.extends &&
+    Array.isArray(generatorCollection.json.extends)
   ) {
-    const extendedSchema = generatorCollectionJson.extends as string[];
+    const extendedSchema = generatorCollection.json.extends as string[];
     const extendedCollections = (
       await Promise.all(
         extendedSchema
