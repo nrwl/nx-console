@@ -22,13 +22,13 @@ export async function readCollectionsFromNodeModules(
 
   const collections = await Promise.all(
     packages.map(async (p) => {
-      const json = await readAndCacheJsonFile(
+      const { json } = await readAndCacheJsonFile(
         join(p, 'package.json'),
         nodeModulesDir
       );
       return {
         packageName: p,
-        packageJson: json.json,
+        packageJson: json,
       };
     })
   );

@@ -1,4 +1,4 @@
-import { dirname, join } from 'path';
+import { buildProjectPath } from '@nx-console/server';
 import { Selection, TextDocument, Uri, window, workspace } from 'vscode';
 import { getProjectLocations } from './find-workspace-json-target';
 import { getRawWorkspace } from './get-raw-workspace';
@@ -15,11 +15,9 @@ export async function revealNxProject(
    * if the project is a split config, just use the project.json as the "workspace.json"
    */
   if (typeof rawWorkspace.projects[projectName] === 'string') {
-    const workspaceRootDir = dirname(workspaceJsonPath);
-    workspaceJsonPath = join(
-      workspaceRootDir,
-      rawWorkspace.projects[projectName] as unknown as string,
-      'project.json'
+    workspaceJsonPath = buildProjectPath(
+      workspaceJsonPath,
+      rawWorkspace.projects[projectName] as unknown as string
     );
   }
 
@@ -31,14 +29,16 @@ export async function revealNxProject(
 
   let offset = projectLocations[projectName].position;
   if (target) {
-    const projectTarget = projectLocations[projectName].targets[target.name];
-    const targetConfiguration =
-      projectTarget.configurations?.[target.configuration || ''];
+    const projectTarget = projectLocations[projectName].targets?.[target.name];
+    if (projectTarget) {
+      const targetConfiguration =
+        projectTarget.configurations?.[target.configuration || ''];
 
-    if (targetConfiguration) {
-      offset = targetConfiguration.position;
-    } else {
-      offset = projectTarget.position;
+      if (targetConfiguration) {
+        offset = targetConfiguration.position;
+      } else {
+        offset = projectTarget.position;
+      }
     }
   }
 

@@ -7,15 +7,20 @@ import {
   ExtensionContext,
   languages,
   Range,
+  Uri,
   workspace,
 } from 'vscode';
 import { TextDocument } from 'vscode';
 import { verifyWorkspace } from './verify-workspace';
-import { getProjectLocations } from './find-workspace-json-target';
+import {
+  getProjectLocations,
+  ProjectLocations,
+} from './find-workspace-json-target';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { getRawWorkspace } from './get-raw-workspace';
+import { buildProjectPath } from '@nx-console/server';
 
-export class ProjectCodeLens extends CodeLens {
+export class TargetCodeLens extends CodeLens {
   constructor(
     range: Range,
     public workspaceType: 'nx' | 'ng',
@@ -26,6 +31,17 @@ export class ProjectCodeLens extends CodeLens {
     super(range);
   }
 }
+
+export class ProjectCodeLens extends CodeLens {
+  constructor(
+    range: Range,
+    public project: string,
+    public projectPath: string
+  ) {
+    super(range);
+  }
+}
+
 export class WorkspaceCodeLensProvider implements CodeLensProvider {
   /**
    * CodeLensProvider is disposed and re-registered on setting changes
@@ -57,8 +73,8 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     /**
      * Find the project name of the corresponding project.json file
      */
+    const { rawWorkspace, workspaceJsonPath } = await getRawWorkspace();
     if (document.uri.path.endsWith('project.json')) {
-      const { rawWorkspace } = await getRawWorkspace();
       for (const [key, project] of Object.entries(rawWorkspace.projects)) {
         if (
           typeof project === 'string' &&
@@ -80,39 +96,83 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
 
     for (const projectName in projectLocations) {
       const project = projectLocations[projectName];
-      const projectTargets = project.targets;
-      for (const target in projectTargets) {
-        const position = document.positionAt(projectTargets[target].position);
 
-        lens.push(
-          new ProjectCodeLens(
-            new Range(position, position),
-            workspaceType,
-            projectName,
-            target
-          )
-        );
-        const configurations = projectTargets[target].configurations;
-        if (configurations) {
-          for (const configuration in configurations) {
-            const configurationPosition = document.positionAt(
-              configurations[configuration].position
-            );
+      this.buildProjectLenses(
+        project,
+        document,
+        lens,
+        projectName,
+        workspaceJsonPath
+      );
 
-            lens.push(
-              new ProjectCodeLens(
-                new Range(configurationPosition, configurationPosition),
-                workspaceType,
-                projectName,
-                target,
-                configuration
-              )
-            );
-          }
+      this.buildTargetLenses(
+        project,
+        document,
+        lens,
+        workspaceType,
+        projectName
+      );
+    }
+    return lens;
+  }
+  buildProjectLenses(
+    project: ProjectLocations[string],
+    document: TextDocument,
+    lens: CodeLens[],
+    projectName: string,
+    workspaceJsonPath: string
+  ) {
+    if (!project.projectPath) {
+      return;
+    }
+    const position = document.positionAt(project.position);
+    lens.push(
+      new ProjectCodeLens(
+        new Range(position, position),
+        projectName,
+        buildProjectPath(workspaceJsonPath, project.projectPath)
+      )
+    );
+  }
+
+  private buildTargetLenses(
+    project: ProjectLocations[string],
+    document: TextDocument,
+    lens: CodeLens[],
+    workspaceType: 'nx' | 'ng',
+    projectName: string
+  ) {
+    const projectTargets = project.targets;
+    for (const target in projectTargets) {
+      const position = document.positionAt(projectTargets[target].position);
+
+      lens.push(
+        new TargetCodeLens(
+          new Range(position, position),
+          workspaceType,
+          projectName,
+          target
+        )
+      );
+      const configurations = projectTargets[target].configurations;
+      if (configurations) {
+        for (const configuration in configurations) {
+          const configurationPosition = document.positionAt(
+            configurations[configuration].position
+          );
+
+          lens.push(
+            new TargetCodeLens(
+              new Range(configurationPosition, configurationPosition),
+              workspaceType,
+              projectName,
+              target,
+              configuration
+            )
+          );
         }
       }
     }
-    return lens;
   }
 
   /**
@@ -122,7 +182,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
    */
   // https://github.com/microsoft/vscode-extension-samples/blob/main/codelens-sample/src/CodelensProvider.ts
   resolveCodeLens(lens: CodeLens): CodeLens | Promise<CodeLens> | null {
-    if (lens instanceof ProjectCodeLens) {
+    if (lens instanceof TargetCodeLens) {
       const command: Command = {
         command: `${lens.workspaceType}.run`,
         title: lens.configuration
@@ -133,6 +193,17 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       lens.command = command;
       return lens;
     }
+
+    if (lens instanceof ProjectCodeLens) {
+      const command: Command = {
+        command: `vscode.open`,
+        title: `Go to "${lens.project}" configuration`,
+        arguments: [Uri.file(lens.projectPath)],
+      };
+      lens.command = command;
+      return lens;
+    }
+
     return null;
   }
 
