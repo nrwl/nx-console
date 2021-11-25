@@ -41,9 +41,16 @@
     "onView:nx-console"
   ],
   "dependencies": {
-    "jsonc-parser": "^3.0.0"
+    "jsonc-parser": "^3.0.0",
+    "@monodon/typescript-nx-imports-plugin": "~0.1.0"
   },
   "contributes": {
+    "typescriptServerPlugins": [
+      {
+        "enableForWorkspaceTypeScriptVersions": true,
+        "name": "@monodon/typescript-nx-imports-plugin"
+      }
+    ],
     "menus": {
       "explorer/context": [
         {
