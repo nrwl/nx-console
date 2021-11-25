@@ -16,3 +16,4 @@ export {
   toWorkspaceFormat,
 } from './lib/utils/utils';
 export { watchFile } from './lib/utils/watch-file';
+export { buildProjectPath } from './lib/utils/build-project-path';
