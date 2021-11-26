@@ -17,3 +17,4 @@ export {
 } from './lib/utils/utils';
 export { watchFile } from './lib/utils/watch-file';
 export { buildProjectPath } from './lib/utils/build-project-path';
+export { findConfig } from './lib/utils/find-config';

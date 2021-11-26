@@ -134,8 +134,7 @@ export async function activate(c: ExtensionContext) {
     new WorkspaceJsonSchema(context);
     new ProjectJsonSchema(context);
 
-    // TODO(cammisuli): add config to disable this
-    // await enableTypeScriptPlugin();
+    await enableTypeScriptPlugin(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {

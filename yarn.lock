@@ -2602,10 +2602,10 @@
   resolved "https://registry.yarnpkg.com/@mdx-js/util/-/util-1.6.22.tgz#219dfd89ae5b97a8801f015323ffa4b62f45718b"
   integrity sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==
 
-"@monodon/typescript-nx-imports-plugin@0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@monodon/typescript-nx-imports-plugin/-/typescript-nx-imports-plugin-0.1.2.tgz#a8a2466525e0a9544142c1b8d2ca6c47a8279d6d"
-  integrity sha512-U9S1wwr5Yn+Eua1v+bNUEWE3Q12JJr+mfdbO+9UWweILKXhpjXGt7M/mV4r2kcx8iCvgEmT7oaa86wajsV8glg==
+"@monodon/typescript-nx-imports-plugin@0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@monodon/typescript-nx-imports-plugin/-/typescript-nx-imports-plugin-0.1.3.tgz#de40f7547e4a1fe1ec846719d3487b0d6e306683"
+  integrity sha512-zJ8TTKOchy4P9sQmbRK7gbK3Tr6z1tpOBexT95K9YijM6pPQGMqvaGJPMmid2RG/v7Zp+ZfEYn3dOKzNoa6AYg==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
