@@ -1,5 +1,4 @@
 const nps = require('nps-utils');
-const { join } = require('path');
 
 function affected(affectedCommand) {
   return {
@@ -10,7 +9,6 @@ function affected(affectedCommand) {
 
 module.exports = {
   scripts: {
-    clean: 'shx rm -rf dist/',
     prepare: {
       and: {
         e2e: {
@@ -45,12 +43,6 @@ module.exports = {
         }),
       },
     },
-    package: {
-      vscode: nps.series(
-        `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*-es5.js')}`,
-        `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
-      ),
-    },
     format: {
       default: 'nx format:write --base=upstream/master',
       and: {
@@ -71,11 +63,8 @@ module.exports = {
       default: 'nx affected:test --all --parallel',
       affected: affected('test'),
     },
-    'install-dependencies': {
-      vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
-    },
     lint: {
-      default: "nx run-many --all --parallel --target=lint"
-    }
+      default: 'nx run-many --all --parallel --target=lint',
+    },
   },
 };
