@@ -1,4 +1,4 @@
-import { workspace, FileSystemWatcher, GlobPattern } from 'vscode';
+import { workspace, GlobPattern, Disposable } from 'vscode';
 
 /**
  * Watch a file and execute the callback on changes.
@@ -10,9 +10,10 @@ import { workspace, FileSystemWatcher, GlobPattern } from 'vscode';
  */
 export function watchFile(
   filePath: GlobPattern,
-  callback: (...args: any[]) => unknown
+  callback: (...args: any[]) => unknown,
+  disposable?: Disposable[]
 ) {
   const filewatcher = workspace.createFileSystemWatcher(filePath);
-  filewatcher.onDidChange(callback);
+  filewatcher.onDidChange(callback, disposable);
   return filewatcher;
 }

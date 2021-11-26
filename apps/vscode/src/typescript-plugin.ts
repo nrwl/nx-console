@@ -1,7 +1,14 @@
-import { findConfig, readAndCacheJsonFile } from '@nx-console/server';
+import {
+  clearJsonCache,
+  findConfig,
+  readAndCacheJsonFile,
+  watchFile,
+} from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { dirname, join } from 'path';
 import * as vscode from 'vscode';
+
+const TSCONFIG_BASE = 'tsconfig.base.json';
 
 export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
   const tsExtension = vscode.extensions.getExtension(
@@ -23,36 +30,58 @@ export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
     return;
   }
 
+  const workspaceRoot = dirname(
+    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+  );
+
   vscode.workspace.onDidOpenTextDocument(
     (document) => {
-      if (document.uri.fsPath.endsWith('.ts')) {
-        configurePlugin(api);
+      if (
+        document.uri.fsPath.endsWith('.ts') ||
+        document.uri.fsPath.endsWith('.tsx')
+      ) {
+        configurePlugin(workspaceRoot, api);
       }
     },
     undefined,
     context.subscriptions
   );
 
-  configurePlugin(api);
+  watchFile(
+    `${workspaceRoot}/tsconfig.base.json`,
+    () => {
+      clearJsonCache(TSCONFIG_BASE, workspaceRoot);
+      configurePlugin(workspaceRoot, api);
+    },
+    context.subscriptions
+  );
+
+  vscode.workspace.onDidChangeTextDocument(
+    ({ document }) => {
+      if (document.uri.fsPath.endsWith(TSCONFIG_BASE)) {
+        configurePlugin(workspaceRoot, api);
+      }
+    },
+    undefined,
+    context.subscriptions
+  );
+
+  configurePlugin(workspaceRoot, api);
 }
 
-async function configurePlugin(api: any) {
-  const externalFiles = await getExternalFiles();
+async function configurePlugin(workspaceRoot: string, api: any) {
+  const externalFiles = await getExternalFiles(workspaceRoot);
   // TODO(cammisuli): add config to disable this
   api.configurePlugin('@monodon/typescript-nx-imports-plugin', {
     externalFiles,
   });
 }
 
-async function getExternalFiles(): Promise<
-  { mainFile: string; directory: string }[]
-> {
-  const workspaceRoot = dirname(
-    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
-  );
-
+async function getExternalFiles(
+  workspaceRoot: string
+): Promise<{ mainFile: string; directory: string }[]> {
   const baseTsConfig = (
-    await readAndCacheJsonFile('tsconfig.base.json', workspaceRoot)
+    await readAndCacheJsonFile(TSCONFIG_BASE, workspaceRoot)
   ).json;
 
   const paths = baseTsConfig.compilerOptions.paths;
