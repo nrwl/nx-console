@@ -37,13 +37,22 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onView:nx-console"
+    "onView:nx-console",
+    "workspaceContains:workspace.json",
+    "workspaceContains:angular.json",
+    "workspaceContains:nx.json"
   ],
   "dependencies": {
-    "jsonc-parser": "^3.0.0"
+    "jsonc-parser": "^3.0.0",
+    "@monodon/typescript-nx-imports-plugin": "0.1.3"
   },
   "contributes": {
+    "typescriptServerPlugins": [
+      {
+        "enableForWorkspaceTypeScriptVersions": true,
+        "name": "@monodon/typescript-nx-imports-plugin"
+      }
+    ],
     "menus": {
       "explorer/context": [
         {

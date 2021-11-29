@@ -32,7 +32,6 @@
       "@nx-console/vscode-ui/feature-task-execution-form": [
         "libs/vscode-ui/feature-task-execution-form/src/index.ts"
       ],
-      "@nx-console/vscode-ui/styles": ["libs/vscode-ui/styles/src/index.ts"],
       "@nx-console/vscode/configuration": [
         "libs/vscode/configuration/src/index.ts"
       ],

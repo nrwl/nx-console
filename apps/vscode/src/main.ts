@@ -51,6 +51,7 @@ import {
   WorkspaceJsonSchema,
   ProjectJsonSchema,
 } from '@nx-console/vscode/json-schema';
+import { enableTypeScriptPlugin } from './typescript-plugin';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -132,6 +133,8 @@ export async function activate(c: ExtensionContext) {
     new WorkspaceCodeLensProvider(context);
     new WorkspaceJsonSchema(context);
     new ProjectJsonSchema(context);
+
+    await enableTypeScriptPlugin(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
