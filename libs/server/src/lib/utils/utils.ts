@@ -1,6 +1,9 @@
 import { Schema } from '@nrwl/tao/src/shared/params';
 import * as path from 'path';
-import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import type {
+  WorkspaceJsonConfiguration,
+  NxJsonConfiguration,
+} from '@nrwl/devkit';
 
 import {
   ItemsWithEnum,
@@ -119,9 +122,9 @@ export async function directoryExists(filePath: string): Promise<boolean> {
   }
 }
 
-export function fileExistsSync(filePath: string): boolean {
+export async function fileExists(filePath: string): Promise<boolean> {
   try {
-    return statSync(filePath).isFile();
+    return (await stat(filePath)).isFile();
   } catch {
     return false;
   }
@@ -347,7 +350,9 @@ function renameProperty(obj: any, from: string, to: string) {
   delete obj[from];
 }
 
-export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
+export function toWorkspaceFormat(
+  w: any
+): WorkspaceJsonConfiguration & NxJsonConfiguration {
   Object.values(w.projects || {}).forEach((project: any) => {
     if (project.architect) {
       renameProperty(project, 'architect', 'targets');

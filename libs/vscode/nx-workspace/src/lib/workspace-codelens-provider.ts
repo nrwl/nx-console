@@ -16,7 +16,10 @@ import {
   getProjectLocations,
   ProjectLocations,
 } from './find-workspace-json-target';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import {
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
 import { getRawWorkspace } from './get-raw-workspace';
 import { buildProjectPath } from '@nx-console/server';
 
@@ -69,18 +72,14 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     const lens: CodeLens[] = [];
 
     let projectName = '';
+    const { json } = await verifyWorkspace();
 
-    /**
-     * Find the project name of the corresponding project.json file
-     */
-    const { rawWorkspace, workspaceJsonPath } = await getRawWorkspace();
     if (document.uri.path.endsWith('project.json')) {
-      for (const [key, project] of Object.entries(rawWorkspace.projects)) {
+      for (const [key, project] of Object.entries(json.projects)) {
         if (
-          typeof project === 'string' &&
           document.uri.path
             .replace(/\\/g, '/')
-            .endsWith(`${project}/project.json`)
+            .endsWith(`${project.root}/project.json`)
         ) {
           projectName = key;
           break;
@@ -102,7 +101,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
         document,
         lens,
         projectName,
-        workspaceJsonPath
+        WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
       );
 
       this.buildTargetLenses(
@@ -120,7 +119,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     document: TextDocument,
     lens: CodeLens[],
     projectName: string,
-    workspaceJsonPath: string
+    workspacePath: string
   ) {
     if (!project.projectPath) {
       return;
@@ -130,7 +129,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       new ProjectCodeLens(
         new Range(position, position),
         projectName,
-        buildProjectPath(workspaceJsonPath, project.projectPath)
+        buildProjectPath(workspacePath, project.projectPath)
       )
     );
   }

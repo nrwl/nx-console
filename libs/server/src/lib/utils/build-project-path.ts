@@ -1,15 +1,14 @@
-import { dirname, join } from 'path';
+import { join } from 'path';
 
 /**
  * Builds the project path from the given project name.
- * @param workspaceJsonPath The full path to the workspace.json file
- * @param projectPath The path to the project relative to the workspace.json file
+ * @param workspacePath The full path to the configured workspace
+ * @param projectPath The path to the project relative to the workspace
  * @returns The full path to the project.json file
  */
 export function buildProjectPath(
-  workspaceJsonPath: string,
+  workspacePath: string,
   projectPath: string
 ): string {
-  const workspaceRootDir = dirname(workspaceJsonPath);
-  return join(workspaceRootDir, projectPath, 'project.json');
+  return join(workspacePath, projectPath, 'project.json');
 }

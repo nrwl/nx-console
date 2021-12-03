@@ -12,6 +12,7 @@ export class NxProjectTreeItem extends TreeItem {
 
 export interface NxProject {
   project: string;
+  root: string;
   target?: {
     name: string;
     configuration?: string;

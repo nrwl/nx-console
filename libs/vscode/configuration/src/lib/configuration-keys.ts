@@ -11,7 +11,7 @@ export const GLOBAL_CONFIG_KEYS = [
  */
 export type GlobalConfigKeys = typeof GLOBAL_CONFIG_KEYS[number];
 
-export const WORKSPACE_CONFIG_KEYS = ['nxWorkspaceJsonPath'] as const;
+export const WORKSPACE_CONFIG_KEYS = ['nxWorkspacePath'] as const;
 /**
  * configuration Keys used for NxConsole on a vscode workspace level
  */

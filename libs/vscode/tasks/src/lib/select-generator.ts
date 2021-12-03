@@ -11,14 +11,13 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
 } from '@nx-console/server';
-import { getNxConfig } from '@nx-console/vscode/nx-workspace';
+import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { dirname, join } from 'path';
 
-async function readWorkspaceJsonDefaults(
-  workspaceJsonPath: string
-): Promise<any> {
-  const workspaceJson = await readAndCacheJsonFile(workspaceJsonPath);
-  let defaults = workspaceJson.json.schematics || workspaceJson.json.generators;
+async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
+  const { json } = await verifyWorkspace();
+
+  let defaults = json.generators;
 
   if (!defaults) {
     try {
@@ -26,8 +25,7 @@ async function readWorkspaceJsonDefaults(
        * This could potentially fail if we're in an Angular CLI project without schematics being part of angular.json
        * Default the default to {} on the catch
        */
-      defaults =
-        (await getNxConfig(dirname(workspaceJsonPath))).generators || {};
+      defaults = (await getNxConfig(dirname(workspacePath))).generators || {};
     } catch (e) {
       defaults = {};
     }
@@ -40,16 +38,18 @@ async function readWorkspaceJsonDefaults(
         if (!collectionDefaultsMap[collectionName]) {
           collectionDefaultsMap[collectionName] = {};
         }
-        collectionDefaultsMap[collectionName][generatorName] = defaults[key];
+        collectionDefaultsMap[collectionName][generatorName] = defaults?.[key];
       } else {
         const collectionName = key;
         if (!collectionDefaultsMap[collectionName]) {
           collectionDefaultsMap[collectionName] = {};
         }
-        Object.keys(defaults[collectionName]).forEach((generatorName) => {
-          collectionDefaultsMap[collectionName][generatorName] =
-            defaults[collectionName][generatorName];
-        });
+        Object.keys(defaults?.[collectionName] ?? {}).forEach(
+          (generatorName) => {
+            collectionDefaultsMap[collectionName][generatorName] =
+              defaults?.[collectionName][generatorName];
+          }
+        );
       }
       return collectionDefaultsMap;
     },
@@ -59,12 +59,11 @@ async function readWorkspaceJsonDefaults(
 }
 
 export async function readGeneratorOptions(
-  workspaceJsonPath: string,
+  workspacePath: string,
   collectionName: string,
   generatorName: string
 ): Promise<Option[]> {
-  const basedir = join(workspaceJsonPath, '..');
-  const nodeModulesDir = join(basedir, 'node_modules');
+  const nodeModulesDir = join(workspacePath, 'node_modules');
   const collectionPackageJson = await readAndCacheJsonFile(
     join(collectionName, 'package.json'),
     nodeModulesDir
@@ -84,7 +83,7 @@ export async function readGeneratorOptions(
     generators[generatorName].schema,
     dirname(collectionJson.path)
   );
-  const workspaceDefaults = await readWorkspaceJsonDefaults(workspaceJsonPath);
+  const workspaceDefaults = await readWorkspaceJsonDefaults(workspacePath);
   const defaults =
     workspaceDefaults &&
     workspaceDefaults[collectionName] &&
@@ -93,7 +92,7 @@ export async function readGeneratorOptions(
 }
 
 export async function selectGenerator(
-  workspaceJsonPath: string,
+  workspacePath: string,
   workspaceType: 'nx' | 'ng',
   generatorType?: GeneratorType
 ): Promise<TaskExecutionSchema | undefined> {
@@ -102,7 +101,7 @@ export async function selectGenerator(
     generator: Generator;
   }
 
-  const generators = await getGenerators(workspaceJsonPath);
+  const generators = await getGenerators(workspacePath);
   let generatorsQuickPicks = generators
     .map((c) => c.data)
     .filter(
@@ -129,7 +128,7 @@ export async function selectGenerator(
       const options =
         selection.generator.options ||
         (await readGeneratorOptions(
-          workspaceJsonPath,
+          workspacePath,
           selection.collectionName,
           selection.generator.name
         ));

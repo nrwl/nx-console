@@ -36,24 +36,28 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   getWorkspacePath() {
-    return join(this.getWorkspaceJsonPath(), '..');
+    return WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
   }
 
+  /**
+   *
+   * @deprecated
+   */
   getWorkspaceJsonPath() {
-    return WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '');
+    return WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
   }
 
   provideTasks(): ProviderResult<Task[]> {
     return null;
   }
 
-  resolveTask(task: Task): Task | undefined {
+  async resolveTask(task: Task): Promise<Task | undefined> {
     if (
-      this.getWorkspaceJsonPath() &&
+      this.getWorkspacePath() &&
       task.definition.command &&
       task.definition.project
     ) {
-      const cliTask = this.createTask({
+      const cliTask = await this.createTask({
         command: task.definition.command,
         positional: task.definition.project,
         flags: Array.isArray(task.definition.flags)
@@ -66,12 +70,12 @@ export class CliTaskProvider implements TaskProvider {
     }
   }
 
-  createTask(definition: CliTaskDefinition) {
-    return CliTask.create(definition, this.getWorkspaceJsonPath());
+  async createTask(definition: CliTaskDefinition) {
+    return CliTask.create(definition, this.getWorkspacePath());
   }
 
-  executeTask(definition: CliTaskDefinition) {
-    const { validNodeModules: hasNodeModules } = verifyNodeModules(
+  async executeTask(definition: CliTaskDefinition) {
+    const { validNodeModules: hasNodeModules } = await verifyNodeModules(
       this.getWorkspacePath()
     );
     if (!hasNodeModules) {
@@ -102,7 +106,7 @@ export class CliTaskProvider implements TaskProvider {
         cliTaskProvider.getWorkspacePath()
       );
     } else {
-      task = this.createTask(definition);
+      task = await this.createTask(definition);
     }
 
     const telemetry = getTelemetry();

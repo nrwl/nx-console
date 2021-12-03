@@ -276,13 +276,19 @@ export async function selectCliProject(
 ) {
   const items = (await cliTaskProvider.getProjectEntries(json))
     .filter(([, { targets }]) => Boolean(targets))
-    .flatMap(([project, { targets }]) => ({ project, targets }))
+    .flatMap(([project, { targets, root }]) => ({ project, targets, root }))
     .filter(
       ({ targets }) => Boolean(targets && targets[command]) || command === 'run'
     )
     .map(
-      ({ project, targets }) =>
-        new CliTaskQuickPickItem(project, targets![command]!, command, project)
+      ({ project, targets, root }) =>
+        new CliTaskQuickPickItem(
+          project,
+          root,
+          targets![command]!,
+          command,
+          project
+        )
     );
 
   if (!items.length) {

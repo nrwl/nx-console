@@ -34,8 +34,9 @@ export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
     return;
   }
 
-  const workspaceRoot = dirname(
-    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+  const workspaceRoot = WorkspaceConfigurationStore.instance.get(
+    'nxWorkspacePath',
+    ''
   );
 
   vscode.workspace.onDidOpenTextDocument(
