@@ -3,6 +3,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'useNVM',
   'enableGenerateFromContextMenu',
   'enableWorkspaceConfigCodeLens',
+  'enableLibraryImports',
 ] as const;
 
 /**

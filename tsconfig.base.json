@@ -23,6 +23,7 @@
     "paths": {
       "@nx-console/schema": ["libs/schema/src/index.ts"],
       "@nx-console/server": ["libs/server/src/index.ts"],
+      "@nx-console/typescript-plugin": ["libs/typescript-plugin/src/index.ts"],
       "@nx-console/vscode-ui/argument-list": [
         "libs/vscode-ui/argument-list/src/index.ts"
       ],

@@ -51,7 +51,7 @@ import {
   WorkspaceJsonSchema,
   ProjectJsonSchema,
 } from '@nx-console/vscode/json-schema';
-import { enableTypeScriptPlugin } from './typescript-plugin';
+import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;

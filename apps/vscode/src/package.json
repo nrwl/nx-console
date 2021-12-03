@@ -590,6 +590,11 @@
           "type": "boolean",
           "default": true,
           "description": "Shows or hides CodeLens for running targets from the Nx workspace config file."
+        },
+        "nxConsole.enableLibraryImports": {
+          "type": "boolean",
+          "default": false,
+          "description": "Configures a TypeScript language server plugin to include configured libraries in root files for TypeScript projects. This allows for importing libraries into other libraries even when the import was not there before."
         }
       }
     },
