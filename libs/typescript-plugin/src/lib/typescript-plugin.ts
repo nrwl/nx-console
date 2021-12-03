@@ -4,11 +4,15 @@ import {
   readAndCacheJsonFile,
   watchFile,
 } from '@nx-console/server';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import {
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
 import { dirname, join } from 'path';
 import * as vscode from 'vscode';
 
 const TSCONFIG_BASE = 'tsconfig.base.json';
+const TSCONFIG_LIB = 'tsconfig.lib.json';
 
 export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
   const tsExtension = vscode.extensions.getExtension(
@@ -66,15 +70,46 @@ export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
     context.subscriptions
   );
 
+  vscode.workspace.onDidChangeConfiguration(
+    async (configurationChange) => {
+      const affectsNxConsole = configurationChange.affectsConfiguration(
+        GlobalConfigurationStore.configurationSection
+      );
+
+      const enableLibraryImports = GlobalConfigurationStore.instance.get(
+        'enableLibraryImports'
+      );
+
+      if (!enableLibraryImports) {
+        vscode.window.setStatusBarMessage(
+          'Restarting the TypeScript Server',
+          5000
+        );
+        await vscode.commands.executeCommand('typescript.restartTsServer');
+      }
+
+      if (affectsNxConsole) {
+        configurePlugin(workspaceRoot, api);
+      }
+    },
+    undefined,
+    context.subscriptions
+  );
+
   configurePlugin(workspaceRoot, api);
 }
 
 async function configurePlugin(workspaceRoot: string, api: any) {
-  const externalFiles = await getExternalFiles(workspaceRoot);
-  // TODO(cammisuli): add config to disable this
-  api.configurePlugin('@monodon/typescript-nx-imports-plugin', {
-    externalFiles,
-  });
+  const enableLibraryImports = GlobalConfigurationStore.instance.get(
+    'enableLibraryImports'
+  );
+
+  if (enableLibraryImports) {
+    const externalFiles = await getExternalFiles(workspaceRoot);
+    api.configurePlugin('@monodon/typescript-nx-imports-plugin', {
+      externalFiles,
+    });
+  }
 }
 
 async function getExternalFiles(
@@ -90,7 +125,7 @@ async function getExternalFiles(
 
   for (const [, value] of Object.entries<string[]>(paths)) {
     const mainFile = join(workspaceRoot, value[0]);
-    const configFilePath = await findConfig(mainFile, 'tsconfig.lib.json');
+    const configFilePath = await findConfig(mainFile, TSCONFIG_LIB);
 
     if (!configFilePath) {
       continue;

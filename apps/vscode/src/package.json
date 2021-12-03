@@ -44,7 +44,7 @@
   ],
   "dependencies": {
     "jsonc-parser": "^3.0.0",
-    "@monodon/typescript-nx-imports-plugin": "0.1.3"
+    "@monodon/typescript-nx-imports-plugin": "0.2.0"
   },
   "contributes": {
     "typescriptServerPlugins": [
@@ -590,6 +590,11 @@
           "type": "boolean",
           "default": true,
           "description": "Shows or hides CodeLens for running targets from the Nx workspace config file."
+        },
+        "nxConsole.enableLibraryImports": {
+          "type": "boolean",
+          "default": true,
+          "description": "Configures a TypeScript language server plugin to include configured libraries in root files for TypeScript projects. This allows for importing libraries into other libraries even when the import was not there before."
         }
       }
     },
