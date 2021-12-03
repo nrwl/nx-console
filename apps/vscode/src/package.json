@@ -593,7 +593,7 @@
         },
         "nxConsole.enableLibraryImports": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Configures a TypeScript language server plugin to include configured libraries in root files for TypeScript projects. This allows for importing libraries into other libraries even when the import was not there before."
         }
       }
