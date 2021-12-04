@@ -50,6 +50,7 @@ import { Awaited } from '@nx-console/schema';
 import {
   WorkspaceJsonSchema,
   ProjectJsonSchema,
+  NxJsonSchema,
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 
@@ -133,6 +134,7 @@ export async function activate(c: ExtensionContext) {
     new WorkspaceCodeLensProvider(context);
     new WorkspaceJsonSchema(context);
     new ProjectJsonSchema(context);
+    new NxJsonSchema(context);
 
     await enableTypeScriptPlugin(context);
 
