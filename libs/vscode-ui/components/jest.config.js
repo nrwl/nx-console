@@ -5,7 +5,6 @@ module.exports = {
   globals: {
     'ts-jest': {
       stringifyContentPathRegex: '\\.(html|svg)$',
-
       tsconfig: '<rootDir>/tsconfig.spec.json',
     },
   },
@@ -15,5 +14,6 @@ module.exports = {
     'jest-preset-angular/build/serializers/ng-snapshot',
     'jest-preset-angular/build/serializers/html-comment',
   ],
-  transform: { '^.+\\.(ts|js|html)$': 'jest-preset-angular' },
+  transform: { '^.+\\.(mjs|ts|js|html)$': 'jest-preset-angular' },
+  transformIgnorePatterns: ['node_modules/(?!.*.mjs$)'],
 };

@@ -5,7 +5,7 @@
 /tmp
 /out-tsc
 /osbuilds
-
+/.angular
 /cypress
 
 # dependencies
