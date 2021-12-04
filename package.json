@@ -76,7 +76,7 @@
     "husky": "^3.0.9",
     "jest": "27.2.3",
     "jest-preset-angular": "11.0.0",
-    "ngx-build-plus": "11.0.0",
+    "ngx-build-plus": "13.0.1",
     "nps": "5.9.3",
     "nps-utils": "1.7.0",
     "ovsx": "^0.2.0",
