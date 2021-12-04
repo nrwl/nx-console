@@ -29,6 +29,7 @@
 !.vscode/extensions.json
 
 # misc
+/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
@@ -52,5 +53,3 @@ apps/intellij/build/*
 apps/intellij/.gradle/*
 apps/intellij/.idea/*
 
-# Nx
-migrations.json
