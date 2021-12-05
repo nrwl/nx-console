@@ -779,6 +779,10 @@
       {
         "fileMatch": "project.json",
         "url": "./project-schema.json"
+      },
+      {
+        "fileMatch": "nx.json",
+        "url": "./nx-schema.json"
       }
     ]
   }
