@@ -15,6 +15,7 @@
         "tsConfig": "apps/vscode/tsconfig.app.json",
         "assets": [
           "apps/vscode/src/package.json",
+          "apps/vscode/src/nx-schema.json",
           "apps/vscode/src/tree-view-icon.svg",
           "apps/vscode/src/assets",
           "apps/vscode/src/getting-started",
