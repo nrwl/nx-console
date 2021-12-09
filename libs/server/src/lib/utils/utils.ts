@@ -219,7 +219,7 @@ export async function normalizeSchema(
 
     const nxOption: Option = {
       ...option,
-      required: isFieldRequired(requiredFields, option, xPrompt, $default),
+      isRequired: isFieldRequired(requiredFields, option, xPrompt, $default),
       aliases: option.alias ? [option.alias] : [],
       ...(workspaceDefault !== undefined && { default: workspaceDefault }),
       ...($default && { $default }),
@@ -374,24 +374,27 @@ export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
 }
 
 function schemaToOptions(schema: Schema): CliOption[] {
-  return Object.keys(schema.properties).reduce<CliOption[]>((acc, curr) => {
-    const currentProperties = schema.properties[curr];
-    const $default = currentProperties.$default;
-    const $defaultIndex =
-      $default?.['$source'] === 'argv' ? $default['index'] : undefined;
-    const positional: number | undefined =
-      typeof $defaultIndex === 'number' ? $defaultIndex : undefined;
+  return Object.keys(schema.properties).reduce<CliOption[]>(
+    (cliOptions, option) => {
+      const currentProperties = schema.properties[option];
+      const $default = currentProperties.$default;
+      const $defaultIndex =
+        $default?.['$source'] === 'argv' ? $default['index'] : undefined;
+      const positional: number | undefined =
+        typeof $defaultIndex === 'number' ? $defaultIndex : undefined;
 
-    const visible = currentProperties.visible ?? true;
-    if (!visible || (currentProperties as any).hidden) {
-      return acc;
-    }
+      const visible = currentProperties.visible ?? true;
+      if (!visible || (currentProperties as any).hidden) {
+        return cliOptions;
+      }
 
-    acc.push({
-      name: curr,
-      positional,
-      ...currentProperties,
-    });
-    return acc;
-  }, []);
+      cliOptions.push({
+        name: option,
+        positional,
+        ...currentProperties,
+      });
+      return cliOptions;
+    },
+    []
+  );
 }

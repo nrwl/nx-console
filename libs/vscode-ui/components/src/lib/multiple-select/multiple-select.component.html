@@ -6,7 +6,7 @@
     multiple
     role="combobox"
     [id]="field.name"
-    [required]="field.required"
+    [required]="field.isRequired"
     [formControlName]="field.name"
   >
     <option *ngIf="!field.default" value="" [selected]="!value"></option>

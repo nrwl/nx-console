@@ -16,11 +16,15 @@ import { Option } from '@nx-console/schema';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FieldTreeComponent implements OnChanges {
-  @Input() fields: Array<Option>;
+  @Input() fields: Option[];
   @Input() activeFieldName: string;
   @Input() filteredFields: Set<string>;
-  @Input() validFields: {[name: string]: string[] | string | number | boolean};
-  @Input() invalidFields: {[name: string]: string[] | string | number | boolean};
+  @Input() validFields: {
+    [name: string]: string[] | string | number | boolean;
+  };
+  @Input() invalidFields: {
+    [name: string]: string[] | string | number | boolean;
+  };
 
   userSelectedField?: string;
 

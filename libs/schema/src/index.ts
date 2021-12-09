@@ -12,19 +12,18 @@ export type OptionPropertyDescription = Schema['properties'][number];
 
 export type CliOption = {
   name: string;
-  required?: boolean;
   positional?: number;
   alias?: string;
   hidden?: boolean;
   deprecated?: boolean | string;
 } & OptionPropertyDescription;
 
-export interface Option extends Omit<CliOption, 'default'> {
+export interface Option extends CliOption {
   tooltip?: string;
   itemTooltips?: ItemTooltips;
   items?: string[] | ItemsWithEnum;
   aliases: string[];
-  default?: string[] | string | number | boolean | undefined;
+  isRequired: boolean;
 }
 
 export interface ItemTooltips {
