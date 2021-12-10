@@ -1,8 +1,7 @@
-import { schema } from '@angular-devkit/core';
-import { standardFormats } from '@angular-devkit/schematics/src/formats';
-import { Option as CliOption } from '@angular/cli/models/interface';
-import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
+import { Schema } from '@nrwl/tao/src/shared/params';
+import * as path from 'path';
 import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+
 import {
   ItemsWithEnum,
   ItemTooltips,
@@ -10,7 +9,9 @@ import {
   Option,
   OptionItemLabelValue,
   XPrompt,
+  CliOption,
 } from '@nx-console/schema';
+
 import { readdirSync, statSync } from 'fs';
 import { readFile, stat } from 'fs/promises';
 import {
@@ -19,7 +20,6 @@ import {
   printParseErrorCode,
 } from 'jsonc-parser';
 import { readdir } from 'fs/promises';
-import * as path from 'path';
 import { getOutputChannel } from './output-channel';
 
 export interface GeneratorDefaults {
@@ -185,7 +185,6 @@ export async function readAndCacheJsonFile(
       json: {},
     };
   }
-
   const fullFilePath = path.join(basedir, filePath);
   try {
     const stats = await stat(fullFilePath);
@@ -206,33 +205,29 @@ export async function readAndCacheJsonFile(
   };
 }
 
-const registry = new schema.CoreSchemaRegistry(standardFormats);
-
 export async function normalizeSchema(
-  s: {
-    properties: { [k: string]: any };
-    required: string[];
-  },
+  s: Schema,
   projectDefaults?: GeneratorDefaults
 ): Promise<Option[]> {
-  const options: CliOption[] = await parseJsonSchemaToOptions(registry, s);
+  const options = schemaToOptions(s);
   const requiredFields = new Set(s.required || []);
 
   const nxOptions = options.map((option) => {
-    const xPrompt: XPrompt = s.properties[option.name]['x-prompt'];
+    const xPrompt: XPrompt | undefined = option['x-prompt'];
     const workspaceDefault = projectDefaults && projectDefaults[option.name];
-    const $default = s.properties[option.name].$default;
+    const $default = option.$default;
 
     const nxOption: Option = {
       ...option,
-      required: isFieldRequired(requiredFields, option, xPrompt, $default),
+      isRequired: isFieldRequired(requiredFields, option, xPrompt, $default),
+      aliases: option.alias ? [option.alias] : [],
       ...(workspaceDefault !== undefined && { default: workspaceDefault }),
       ...($default && { $default }),
       ...(option.enum && { items: option.enum.map((item) => item.toString()) }),
       // Strongly suspect items does not belong in the Option schema.
       //  Angular Option doesn't have the items property outside of x-prompt,
       //  but items is used in @schematics/angular - guard
-      ...getItems(s.properties[option.name]),
+      ...getItems(option),
     };
 
     if (xPrompt) {
@@ -285,8 +280,8 @@ export async function normalizeSchema(
 
 function isFieldRequired(
   requiredFields: Set<string>,
-  nxOption: Option,
-  xPrompt: XPrompt,
+  nxOption: CliOption,
+  xPrompt: XPrompt | undefined,
   $default: any
 ): boolean {
   // checks schema.json requiredFields and xPrompt for required
@@ -300,11 +295,11 @@ function isFieldRequired(
   );
 }
 
-function getItems(option: Option): { items: string[] } | undefined {
+function getItems(option: CliOption): { items: string[] } | undefined {
   return (
     option.items && {
       items:
-        (option.items as ItemsWithEnum)?.enum ||
+        (option.items as ItemsWithEnum).enum ||
         ((option.items as string[]).length && option.items),
     }
   );
@@ -376,4 +371,30 @@ export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
     renameProperty(w, 'schematics', 'generators');
   }
   return w;
+}
+
+function schemaToOptions(schema: Schema): CliOption[] {
+  return Object.keys(schema.properties).reduce<CliOption[]>(
+    (cliOptions, option) => {
+      const currentProperties = schema.properties[option];
+      const $default = currentProperties.$default;
+      const $defaultIndex =
+        $default?.['$source'] === 'argv' ? $default['index'] : undefined;
+      const positional: number | undefined =
+        typeof $defaultIndex === 'number' ? $defaultIndex : undefined;
+
+      const visible = currentProperties.visible ?? true;
+      if (!visible || (currentProperties as any).hidden) {
+        return cliOptions;
+      }
+
+      cliOptions.push({
+        name: option,
+        positional,
+        ...currentProperties,
+      });
+      return cliOptions;
+    },
+    []
+  );
 }

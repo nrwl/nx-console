@@ -44,9 +44,10 @@ import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
   TaskExecutionSchema,
   TaskExecutionMessage,
-  ItemsWithEnum
+  ItemsWithEnum,
+  OptionType,
+  Option,
 } from '@nx-console/schema';
-import { OptionType, Value } from '@angular/cli/models/interface';
 
 declare global {
   interface Window {
@@ -131,8 +132,9 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
   readonly filterFieldsControl = new FormControl('');
 
-  private readonly filterValue$ = (this.filterFieldsControl
-    .valueChanges as Observable<string>).pipe(
+  private readonly filterValue$ = (
+    this.filterFieldsControl.valueChanges as Observable<string>
+  ).pipe(
     startWith(''),
     map((filterValue) => filterValue.toLowerCase()),
     distinctUntilChanged()
@@ -196,11 +198,27 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {}
 
   ngOnInit() {
-    this.architectSubject.next(this.initialSchema);
+    // TODO(cammisuli): Allow the UI to support array properties
+    const optionFilter = (option: Option) =>
+      !(
+        option.type === OptionType.Array &&
+        option.items &&
+        (option.items as string[]).length === 0
+      );
+
+    this.architectSubject.next({
+      ...this.initialSchema,
+      // remove array options that have no items
+      // TODO: add support for these types of items in the form
+      options: this.initialSchema.options.filter(optionFilter),
+    });
 
     window.SET_TASK_EXECUTION_SCHEMA = (schema) => {
       this.ngZone.run(() => {
-        this.architectSubject.next(schema);
+        this.architectSubject.next({
+          ...schema,
+          options: schema.options.filter(optionFilter),
+        });
 
         setTimeout(() => {
           this.scrollToTop();
@@ -268,7 +286,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
     architect.options.forEach((schema) => {
       const validators: Array<ValidatorFn> = [];
-      if (schema.required) {
+      if (schema.isRequired) {
         validators.push(Validators.required);
       }
       if (schema.enum || schema.items) {
@@ -284,7 +302,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
               !validValueSet.has(control.value)) ||
             // multiselect values are Array, check if all values are in Set
             (Array.isArray(control.value) &&
-              !control.value.every((value: Value) => validValueSet.has(value)))
+              !control.value.every((value) => validValueSet.has(value)))
           ) {
             return {
               enum: 'Please select a value from the auto-completable list',
@@ -340,7 +358,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         defaultValues[field.name] = field.default.map((item) => String(item));
       } else {
         defaultValues[field.name] =
-          String(field.default) || (field.type === OptionType.Boolean ? 'false' : '');
+          String(field.default) ||
+          (field.type === OptionType.Boolean ? 'false' : '');
       }
     });
 
@@ -370,10 +389,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     const configuration = form.get('configuration')?.value;
     const args = this.serializeArgs(form.value, architect, configuration);
     const flags = configuration
-      ? [
-          getConfigurationFlag(configuration),
-          ...args,
-        ]
+      ? [getConfigurationFlag(configuration), ...args]
       : args;
     if (architect.command === 'generate') {
       flags.push('--no-interactive');
@@ -413,21 +429,26 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
                 control.valid &&
                 // touched is not working with checkbox, so ignore touched and just check !== defaultValue
                 // control.touched &&
-                ((option.type !== OptionType.Array && control.value !== defaultValues[option.name]) ||
+                ((option.type !== OptionType.Array &&
+                  control.value !== defaultValues[option.name]) ||
                   (option.type === OptionType.Array &&
                     control.value &&
-                    control.value.join(',') !== ((defaultValues[option.name] || []) as string[]).join(',')
-                  )
-                )) ||
+                    control.value.join(',') !==
+                      ((defaultValues[option.name] || []) as string[]).join(
+                        ','
+                      )))) ||
               // ** INVALID fields **
               // invalid and touched (checkbox is always valid as true/false)
               (!valid && control.touched && control.invalid)
             );
           })
-          .reduce((options, option) => ({
-            ...options,
-            [option.name]: form.controls[option.name].value,
-          }), {});
+          .reduce(
+            (options, option) => ({
+              ...options,
+              [option.name]: form.controls[option.name].value,
+            }),
+            {}
+          );
       })
     );
   }
@@ -450,7 +471,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       if (!defaultValues[f.name] && !value[f.name]) return;
       if (
         Array.isArray(defaultValues[f.name]) &&
-        (defaultValues[f.name] as string[]).join(',') === value[f.name].join(',')
+        (defaultValues[f.name] as string[]).join(',') ===
+          value[f.name].join(',')
       )
         return;
 

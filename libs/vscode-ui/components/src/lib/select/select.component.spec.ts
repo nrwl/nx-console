@@ -2,8 +2,7 @@ import { Component, DebugElement, ViewChild } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { OptionType } from '@angular/cli/models/interface';
-import { Option } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/schema';
 import { SelectComponent } from './select.component';
 import { FieldItemsPipe } from '../field-items/field-items.pipe';
 
@@ -11,6 +10,7 @@ const initialValue = 'test';
 const mockOption: Option = {
   name: 'style',
   description: 'The file extension to be used for style files.',
+  isRequired: false,
   type: OptionType.String,
   aliases: [],
   itemTooltips: {
@@ -96,9 +96,13 @@ describe('SelectComponent', () => {
         type: OptionType.String,
         enum: ['css', 'scss', 'styl', 'less'],
       },
+      isRequired: false,
     };
     parent.field = longForm;
     fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#option-items-with-enum option')).length).toEqual(4);
+    expect(
+      fixture.debugElement.queryAll(By.css('#option-items-with-enum option'))
+        .length
+    ).toEqual(4);
   });
 });

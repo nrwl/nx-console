@@ -24,6 +24,7 @@ const mockOption: Option = {
   name: 'a-property',
   description: 'A property with more than 10 enum items.',
   type: OptionType.String,
+  isRequired: false,
   aliases: [],
   items: [
     initialValue,

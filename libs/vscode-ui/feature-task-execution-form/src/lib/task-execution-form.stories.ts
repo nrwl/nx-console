@@ -1,5 +1,4 @@
-import { OptionType } from '@angular/cli/models/interface';
-import { TaskExecutionSchema } from '@nx-console/schema';
+import { OptionType, TaskExecutionSchema } from '@nx-console/schema';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiFeatureTaskExecutionFormModule } from './vscode-ui-feature-task-execution-form.module';
@@ -61,7 +60,7 @@ const initialSchema: TaskExecutionSchema = {
       description: 'Application that the new domain libraries will belong to',
       type: OptionType.String,
       default: 'nxConsole',
-      required: true,
+      isRequired: true,
       aliases: ['a'],
       hidden: false,
       tooltip: 'What application will the new domain libraries be under?',
@@ -71,7 +70,7 @@ const initialSchema: TaskExecutionSchema = {
       name: 'libraries',
       description: 'The library types that will be generated',
       type: OptionType.Array,
-      required: true,
+      isRequired: true,
       default: ['data-access', 'feature'],
       items: {
         enum: ['data-access', 'feature', 'shell', 'ui', 'util'],
@@ -86,8 +85,7 @@ const initialSchema: TaskExecutionSchema = {
         shell:
           'shell - for wrapping different libraries and exposing them as a single library. Also, for routing.',
         ui: 'ui - for dumb components',
-        util:
-          'util - for model files, constants, validators, pipes and any other miscellaneous items, e.g. shared functions.',
+        util: 'util - for model files, constants, validators, pipes and any other miscellaneous items, e.g. shared functions.',
       },
     },
     {
@@ -95,7 +93,7 @@ const initialSchema: TaskExecutionSchema = {
       description: 'The file extension to be used for style files.',
       type: OptionType.String,
       default: 'scss',
-      required: false,
+      isRequired: false,
       aliases: ['s'],
       hidden: false,
       tooltip: 'Which stylesheet format would you like to use?',
@@ -111,7 +109,7 @@ const initialSchema: TaskExecutionSchema = {
       description: 'Add a e2e cypress project',
       type: OptionType.Boolean,
       default: true,
-      required: false,
+      isRequired: false,
       aliases: [],
       hidden: false,
       tooltip: 'Add a cypress e2e app?',
@@ -121,7 +119,7 @@ const initialSchema: TaskExecutionSchema = {
       name: 'color',
       description: 'Which color should be used?',
       type: OptionType.String,
-      required: false,
+      isRequired: false,
       default: cssColorNames[5],
       aliases: [],
       hidden: false,

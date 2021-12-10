@@ -1,8 +1,7 @@
-import { OptionType } from '@angular/cli/models/interface';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TaskExecutionSchema } from '@nx-console/schema';
+import { OptionType, TaskExecutionSchema } from '@nx-console/schema';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
 import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
@@ -20,6 +19,7 @@ const initialSchema: TaskExecutionSchema = {
       name: 'option-items-with-enum',
       type: OptionType.String,
       aliases: [],
+      isRequired: false,
       description: 'a long form select option',
       items: {
         type: OptionType.String,
@@ -30,12 +30,14 @@ const initialSchema: TaskExecutionSchema = {
       name: 'a-multiselect-option',
       type: OptionType.Array,
       aliases: [],
+      isRequired: false,
       description: 'a multiselect option',
       items: ['one', 'two', 'three', 'four'],
     },
     {
       name: 'a-long-form-multiselect-option',
       type: OptionType.Array,
+      isRequired: false,
       aliases: [],
       description: 'a long form multiselect option',
       items: {
