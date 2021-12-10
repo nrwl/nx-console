@@ -24,6 +24,7 @@ import {
 } from 'jsonc-parser';
 import { readdir } from 'fs/promises';
 import { getOutputChannel } from './output-channel';
+import { toNewFormat } from '@nrwl/tao/src/shared/workspace';
 
 export interface GeneratorDefaults {
   [name: string]: string;
@@ -345,37 +346,10 @@ export function getPrimitiveValue(value: any): string | undefined {
   }
 }
 
-function renameProperty(obj: any, from: string, to: string) {
-  obj[to] = obj[from];
-  delete obj[from];
-}
-
 export function toWorkspaceFormat(
   w: any
 ): WorkspaceJsonConfiguration & NxJsonConfiguration {
-  Object.values(w.projects || {}).forEach((project: any) => {
-    if (project.architect) {
-      renameProperty(project, 'architect', 'targets');
-    }
-    if (project.schematics) {
-      renameProperty(project, 'schematics', 'generators');
-    }
-    Object.values(project.targets || {}).forEach((target: any) => {
-      if (target.builder) {
-        renameProperty(target, 'builder', 'executor');
-      }
-    });
-  });
-
-  const sortedProjects = Object.entries(w.projects || {}).sort(
-    (projectA, projectB) => projectA[0].localeCompare(projectB[0])
-  );
-  w.projects = Object.fromEntries(sortedProjects);
-
-  if (w.schematics) {
-    renameProperty(w, 'schematics', 'generators');
-  }
-  return w;
+  return toNewFormat(w) as WorkspaceJsonConfiguration & NxJsonConfiguration;
 }
 
 function schemaToOptions(schema: Schema): CliOption[] {

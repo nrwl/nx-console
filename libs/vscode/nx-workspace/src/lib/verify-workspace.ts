@@ -24,7 +24,7 @@ export async function verifyWorkspace(): Promise<Workspace> {
   );
 
   const isAngularWorkspace = await fileExists(
-    join(workspacePath, 'angularCli')
+    join(workspacePath, 'angular.json')
   );
   const config = await getNxWorkspaceConfig(
     workspacePath,

@@ -1,5 +1,6 @@
 import { buildProjectPath, fileExists } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { join } from 'path';
 import { Selection, TextDocument, Uri, window, workspace } from 'vscode';
 
 import { getProjectLocations } from './find-workspace-json-target';
@@ -14,10 +15,16 @@ export async function revealNxProject(
     ''
   );
   const projectPath = buildProjectPath(workspacePath, root);
+  const workspaceJsonPath = join(workspacePath, 'workspace.json');
+  const angularJsonPath = join(workspacePath, 'angular.json');
 
   let path = workspacePath;
   if (await fileExists(projectPath)) {
     path = projectPath;
+  } else if (await fileExists(workspaceJsonPath)) {
+    path = workspaceJsonPath;
+  } else if (await fileExists(angularJsonPath)) {
+    path = angularJsonPath;
   }
 
   const document: TextDocument = await workspace.openTextDocument(

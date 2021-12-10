@@ -117,7 +117,6 @@ export async function activate(c: ExtensionContext) {
     const vscodeWorkspacePath =
       workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
-    debugger;
     if (vscodeWorkspacePath) {
       scanForWorkspace(vscodeWorkspacePath);
     }
