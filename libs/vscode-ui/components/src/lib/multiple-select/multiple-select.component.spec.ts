@@ -11,6 +11,7 @@ const mockOption: Option = {
   name: 'style',
   description: 'The file extension to be used for style files.',
   type: OptionType.Array,
+  isRequired: false,
   aliases: [],
   items: {
     type: OptionType.String,
@@ -54,7 +55,11 @@ describe('MultipleSelectComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [ParentFormComponent, MultipleSelectComponent, FieldItemsPipe],
+        declarations: [
+          ParentFormComponent,
+          MultipleSelectComponent,
+          FieldItemsPipe,
+        ],
         imports: [ReactiveFormsModule],
       }).compileComponents();
     })

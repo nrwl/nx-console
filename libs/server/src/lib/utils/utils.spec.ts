@@ -26,12 +26,12 @@ describe('utils', () => {
 
     it('should mark fields as required if they are listed in the required array', async () => {
       const r = await getSchema({ mockOption }, ['mockOption']);
-      expect(r[0].required).toBeTruthy();
+      expect(r[0].isRequired).toBeTruthy();
     });
 
     it('should not mark fields as required otherwise', async () => {
       const r = await getSchema({ mockOption });
-      expect(r[0].required).toBeFalsy();
+      expect(r[0].isRequired).toBeFalsy();
     });
 
     it('should sort positional arguments by ascending order', async () => {

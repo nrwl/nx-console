@@ -19,6 +19,7 @@ const initialSchema: TaskExecutionSchema = {
       name: 'option-items-with-enum',
       type: OptionType.String,
       aliases: [],
+      isRequired: false,
       description: 'a long form select option',
       items: {
         type: OptionType.String,
@@ -29,12 +30,14 @@ const initialSchema: TaskExecutionSchema = {
       name: 'a-multiselect-option',
       type: OptionType.Array,
       aliases: [],
+      isRequired: false,
       description: 'a multiselect option',
       items: ['one', 'two', 'three', 'four'],
     },
     {
       name: 'a-long-form-multiselect-option',
       type: OptionType.Array,
+      isRequired: false,
       aliases: [],
       description: 'a long form multiselect option',
       items: {

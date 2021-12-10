@@ -10,6 +10,7 @@ const initialValue = 'test';
 const mockOption: Option = {
   name: 'style',
   description: 'The file extension to be used for style files.',
+  isRequired: false,
   type: OptionType.String,
   aliases: [],
   itemTooltips: {
@@ -95,9 +96,13 @@ describe('SelectComponent', () => {
         type: OptionType.String,
         enum: ['css', 'scss', 'styl', 'less'],
       },
+      isRequired: false,
     };
     parent.field = longForm;
     fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#option-items-with-enum option')).length).toEqual(4);
+    expect(
+      fixture.debugElement.queryAll(By.css('#option-items-with-enum option'))
+        .length
+    ).toEqual(4);
   });
 });
