@@ -198,6 +198,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {}
 
   ngOnInit() {
+    // TODO(cammisuli): Allow the UI to support array properties
     const optionFilter = (option: Option) =>
       !(
         option.type === OptionType.Array &&
