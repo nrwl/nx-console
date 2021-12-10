@@ -1,21 +1,21 @@
+import { fileExists } from '@nx-console/server';
 import { join } from 'path';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
 import { getShellExecutionForConfig } from './shell-execution';
 
 export class CliTask extends Task {
-  static create(
+  static async create(
     definition: CliTaskDefinition,
-    workspaceJsonPath: string
-  ): CliTask {
-    const workspacePath = join(workspaceJsonPath, '..');
+    workspacePath: string
+  ): Promise<CliTask> {
     const { command } = definition;
 
     // Using `run [project]:[command]` is more backwards compatible in case different
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
 
-    const useNxCli = workspaceJsonPath.endsWith('workspace.json');
+    const useNxCli = await fileExists(join(workspacePath, 'nx.json'));
 
     const displayCommand = useNxCli
       ? `nx ${args.join(' ')}`

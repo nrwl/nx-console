@@ -1,28 +1,34 @@
-import { buildProjectPath } from '@nx-console/server';
+import { buildProjectPath, fileExists } from '@nx-console/server';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { join } from 'path';
 import { Selection, TextDocument, Uri, window, workspace } from 'vscode';
+
 import { getProjectLocations } from './find-workspace-json-target';
-import { getRawWorkspace } from './get-raw-workspace';
 
 export async function revealNxProject(
   projectName: string,
+  root: string,
   target?: { name: string; configuration?: string }
 ) {
-  const raw = await getRawWorkspace();
-  const rawWorkspace = raw.rawWorkspace;
-  let workspaceJsonPath = raw.workspaceJsonPath;
+  const workspacePath = WorkspaceConfigurationStore.instance.get(
+    'nxWorkspacePath',
+    ''
+  );
+  const projectPath = buildProjectPath(workspacePath, root);
+  const workspaceJsonPath = join(workspacePath, 'workspace.json');
+  const angularJsonPath = join(workspacePath, 'angular.json');
 
-  /**
-   * if the project is a split config, just use the project.json as the "workspace.json"
-   */
-  if (typeof rawWorkspace.projects[projectName] === 'string') {
-    workspaceJsonPath = buildProjectPath(
-      workspaceJsonPath,
-      rawWorkspace.projects[projectName] as unknown as string
-    );
+  let path = workspacePath;
+  if (await fileExists(projectPath)) {
+    path = projectPath;
+  } else if (await fileExists(workspaceJsonPath)) {
+    path = workspaceJsonPath;
+  } else if (await fileExists(angularJsonPath)) {
+    path = angularJsonPath;
   }
 
   const document: TextDocument = await workspace.openTextDocument(
-    Uri.file(workspaceJsonPath)
+    Uri.file(path)
   );
 
   const projectLocations = getProjectLocations(document, projectName);

@@ -25,7 +25,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
   RunTargetTreeItem | TreeItem
 > {
   private scanning = Boolean(
-    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+    WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
   );
 
   /**
@@ -53,12 +53,12 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
   }
 
   getChildren() {
-    const workspaceJsonPath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspaceJsonPath',
+    const workspacePath = WorkspaceConfigurationStore.instance.get(
+      'nxWorkspacePath',
       ''
     );
 
-    if (!workspaceJsonPath) {
+    if (!workspacePath) {
       if (this.scanning) {
         return [SCANNING_FOR_WORKSPACE];
       } else {
@@ -66,12 +66,12 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
       }
     }
 
-    CHANGE_WORKSPACE.description = "Current: " + dirname(workspaceJsonPath);
+    CHANGE_WORKSPACE.description = 'Current: ' + workspacePath;
 
     return [
       ...ROUTE_LIST.map(
         (route) =>
-          new RunTargetTreeItem(workspaceJsonPath, route, this.extensionPath)
+          new RunTargetTreeItem(workspacePath, route, this.extensionPath)
       ),
       CHANGE_WORKSPACE,
     ];

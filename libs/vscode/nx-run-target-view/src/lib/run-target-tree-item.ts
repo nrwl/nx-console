@@ -72,7 +72,7 @@ export class RunTargetTreeItem extends TreeItem {
   label: WorkspaceRouteTitle;
 
   constructor(
-    readonly workspaceJsonPath: string,
+    readonly configurationFilePath: string,
     readonly route: WorkspaceRouteTitle,
     readonly extensionPath: string,
     readonly generatorType?: GeneratorType

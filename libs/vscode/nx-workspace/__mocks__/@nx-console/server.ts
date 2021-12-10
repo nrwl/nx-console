@@ -1,6 +1,6 @@
 const cacheJson = jest.fn();
 
-const fileExistsSync = jest.fn();
+const fileExists = jest.fn();
 
 const getOutputChannel = jest.fn(() => ({
   appendLine: jest.fn(),
@@ -15,7 +15,7 @@ const toWorkspaceFormat = jest.fn();
 
 export {
   cacheJson,
-  fileExistsSync,
+  fileExists,
   getOutputChannel,
   getTelemetry,
   toWorkspaceFormat,

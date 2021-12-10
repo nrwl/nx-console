@@ -8,14 +8,13 @@ import {
 } from './utils';
 
 export async function readCollectionsFromNodeModules(
-  workspaceJsonPath: string,
+  workspacePath: string,
   clearPackageJsonCache: boolean
 ): Promise<CollectionInfo[]> {
-  const basedir = dirname(workspaceJsonPath);
-  const nodeModulesDir = join(basedir, 'node_modules');
+  const nodeModulesDir = join(workspacePath, 'node_modules');
 
   if (clearPackageJsonCache) {
-    clearJsonCache('package.json', basedir);
+    clearJsonCache('package.json', workspacePath);
   }
 
   const packages = await listOfUnnestedNpmPackages(nodeModulesDir);

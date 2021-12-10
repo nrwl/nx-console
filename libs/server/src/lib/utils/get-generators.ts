@@ -3,7 +3,7 @@ import { basename, join } from 'path';
 
 import {
   directoryExists,
-  fileExistsSync,
+  fileExists,
   listFiles,
   normalizeSchema,
   readAndCacheJsonFile,
@@ -14,11 +14,11 @@ import {
 } from './read-collections';
 
 export async function getGenerators(
-  workspaceJsonPath: string
+  workspacePath: string
 ): Promise<CollectionInfo[]> {
-  const basedir = join(workspaceJsonPath, '..');
+  const basedir = workspacePath;
   const collections = await readCollectionsFromNodeModules(
-    workspaceJsonPath,
+    workspacePath,
     false
   );
   let generatorCollections = collections.filter(
@@ -62,7 +62,7 @@ async function readWorkspaceGeneratorsCollection(
   const collectionDir = join(basedir, workspaceGeneratorsPath);
   const collectionName = 'workspace-generator';
   const collectionPath = join(collectionDir, 'collection.json');
-  if (fileExistsSync(collectionPath)) {
+  if (await fileExists(collectionPath)) {
     const collection = await readAndCacheJsonFile(
       'collection.json',
       collectionDir

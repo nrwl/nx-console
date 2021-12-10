@@ -1,18 +1,15 @@
+import { AbstractTreeProvider, clearJsonCache } from '@nx-console/server';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { revealNxProject } from '@nx-console/vscode/nx-workspace';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { join } from 'path';
 import {
   commands,
   ExtensionContext,
-  ProviderResult,
   TreeItemCollapsibleState,
   Uri,
 } from 'vscode';
-
-import { AbstractTreeProvider, clearJsonCache } from '@nx-console/server';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { NxProject, NxProjectTreeItem } from './nx-project-tree-item';
-
-import { revealNxProject } from '@nx-console/vscode/nx-workspace';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 /**
  * Provides data for the "Projects" tree view
@@ -41,16 +38,16 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   async getParent(
     element: NxProjectTreeItem
   ): Promise<NxProjectTreeItem | null | undefined> {
-    const { project, target } = element.nxProject;
+    const { project, target, root } = element.nxProject;
 
     if (target) {
       if (target.configuration) {
         return this.createNxProjectTreeItem(
-          { project, target: { name: target.name } },
+          { project, target: { name: target.name }, root },
           target.name
         );
       } else {
-        return this.createNxProjectTreeItem({ project }, project);
+        return this.createNxProjectTreeItem({ project, root }, project);
       }
     } else {
       return null;
@@ -58,20 +55,20 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   }
 
   async createNxProjectTreeItem(
-    workspaceJsonLabel: NxProject,
+    nxProject: NxProject,
     treeItemLabel: string,
     hasChildren?: boolean
   ) {
     const item = new NxProjectTreeItem(
-      workspaceJsonLabel,
+      nxProject,
       treeItemLabel,
       hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     );
-    if (!workspaceJsonLabel.target) {
+    if (!nxProject.target) {
       const projectDef = (await this.cliTaskProvider.getProjects())[
-        workspaceJsonLabel.project
+        nxProject.project
       ];
       if (projectDef) {
         item.resourceUri = Uri.file(
@@ -95,7 +92,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         projects.map(
           async ([name, def]): Promise<NxProjectTreeItem> =>
             this.createNxProjectTreeItem(
-              { project: name },
+              { project: name, root: def.root },
               name,
               Boolean(def.targets)
             )
@@ -117,7 +114,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
           Object.keys(projectDef.targets).map(
             async (name): Promise<NxProjectTreeItem> =>
               this.createNxProjectTreeItem(
-                { target: { name }, project },
+                { target: { name }, project, root: projectDef.root },
                 name,
                 Boolean(projectDef.targets?.[name].configurations)
               )
@@ -141,7 +138,11 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
       return Promise.all(
         Object.keys(configurations).map(async (name) =>
           this.createNxProjectTreeItem(
-            { target: { ...target, configuration: name }, project },
+            {
+              target: { ...target, configuration: name },
+              project,
+              root: projectDef.root,
+            },
             name
           )
         )
@@ -176,13 +177,14 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   private async editWorkspaceJson(selection: NxProjectTreeItem) {
     return revealNxProject(
       selection.nxProject.project,
+      selection.nxProject.root,
       selection.nxProject.target
     );
   }
 
   private async refreshNxProjectsTree() {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspaceJsonPath',
+      'nxWorkspacePath',
       ''
     );
     clearJsonCache(workspacePath);

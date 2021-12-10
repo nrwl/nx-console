@@ -1,11 +1,13 @@
 import { Option, OptionType } from '@nx-console/schema';
-import { readBuilderSchema, getTelemetry } from '@nx-console/server';
-import { window } from 'vscode';
-import { dirname, join } from 'path';
-import { existsSync } from 'fs';
-import { revealNxProject } from '@nx-console/vscode/nx-workspace';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import {
+  fileExists,
+  getTelemetry,
+  readBuilderSchema,
+} from '@nx-console/server';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { join } from 'path';
+import { window } from 'vscode';
 
 const RUN_ONE_OPTIONS = [
   {
@@ -71,18 +73,10 @@ export async function verifyBuilderDefinition(
   const executorName = commandDef.executor;
 
   if (!executorName) {
-    window
-      .showErrorMessage(
-        `Please update ${project}'s ${command} definition to specify a builder.`,
-        'See definition'
-      )
-      .then((value) => {
-        if (value) {
-          revealNxProject(project, {
-            name: command,
-          });
-        }
-      });
+    window.showErrorMessage(
+      `Please update ${project}'s ${command} definition to specify a builder.`,
+      'See definition'
+    );
     getTelemetry().exception('Builder part of architect definition not found');
     return {
       validBuilder: false,
@@ -99,18 +93,10 @@ export async function verifyBuilderDefinition(
   );
 
   if (!options) {
-    window
-      .showErrorMessage(
-        `Builder specified for ${project} ${command} was not found in your node_modules. Check that specified builder is correct and has a corresponding entry in package.json`,
-        'Show definition'
-      )
-      .then((value) => {
-        if (value) {
-          revealNxProject(project, {
-            name: command,
-          });
-        }
-      });
+    window.showErrorMessage(
+      `Builder specified for ${project} ${command} was not found in your node_modules. Check that specified builder is correct and has a corresponding entry in package.json`,
+      'Show definition'
+    );
     getTelemetry().exception('Specified builder not found in node_modules');
 
     return {
@@ -121,7 +107,7 @@ export async function verifyBuilderDefinition(
     };
   }
 
-  const isNxWorkspace = existsSync(join(workspacePath(), 'nx.json'));
+  const isNxWorkspace = await fileExists(join(workspacePath(), 'nx.json'));
   return {
     validBuilder: true,
     builderName: executorName,
@@ -131,7 +117,5 @@ export async function verifyBuilderDefinition(
 }
 
 function workspacePath() {
-  return dirname(
-    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
-  );
+  return WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
 }

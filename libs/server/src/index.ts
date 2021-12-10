@@ -7,7 +7,8 @@ export * from './lib/utils/get-generators';
 export * from './lib/utils/get-executors';
 export * from './lib/utils/read-collections';
 export {
-  fileExistsSync,
+  fileExists,
+  directoryExists,
   readAndParseJson,
   readAndCacheJsonFile,
   normalizeSchema,

@@ -1,7 +1,7 @@
 import { CollectionInfo } from '@nx-console/schema';
 import { getExecutors, watchFile } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { dirname, join } from 'path';
+import { join } from 'path';
 import * as vscode from 'vscode';
 
 let FILE_WATCHER: vscode.FileSystemWatcher;
@@ -9,7 +9,7 @@ let FILE_WATCHER: vscode.FileSystemWatcher;
 export class ProjectJsonSchema {
   constructor(context: vscode.ExtensionContext) {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspaceJsonPath',
+      'nxWorkspacePath',
       ''
     );
 
@@ -21,12 +21,9 @@ export class ProjectJsonSchema {
      * Whenever a new package is added to the package.json, we recreate the schema.
      * This allows newly added plugins to be added
      */
-    FILE_WATCHER = watchFile(
-      join(dirname(workspacePath), 'package.json'),
-      () => {
-        this.setupSchema(workspacePath, context.extensionUri, true);
-      }
-    );
+    FILE_WATCHER = watchFile(join(workspacePath, 'package.json'), () => {
+      this.setupSchema(workspacePath, context.extensionUri, true);
+    });
     context.subscriptions.push(FILE_WATCHER);
 
     this.setupSchema(workspacePath, context.extensionUri);

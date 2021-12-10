@@ -1,6 +1,9 @@
 import { Schema } from '@nrwl/tao/src/shared/params';
 import * as path from 'path';
-import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import type {
+  WorkspaceJsonConfiguration,
+  NxJsonConfiguration,
+} from '@nrwl/devkit';
 
 import {
   ItemsWithEnum,
@@ -21,6 +24,7 @@ import {
 } from 'jsonc-parser';
 import { readdir } from 'fs/promises';
 import { getOutputChannel } from './output-channel';
+import { toNewFormat } from '@nrwl/tao/src/shared/workspace';
 
 export interface GeneratorDefaults {
   [name: string]: string;
@@ -119,9 +123,9 @@ export async function directoryExists(filePath: string): Promise<boolean> {
   }
 }
 
-export function fileExistsSync(filePath: string): boolean {
+export async function fileExists(filePath: string): Promise<boolean> {
   try {
-    return statSync(filePath).isFile();
+    return (await stat(filePath)).isFile();
   } catch {
     return false;
   }
@@ -342,35 +346,16 @@ export function getPrimitiveValue(value: any): string | undefined {
   }
 }
 
-function renameProperty(obj: any, from: string, to: string) {
-  obj[to] = obj[from];
-  delete obj[from];
-}
-
-export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
-  Object.values(w.projects || {}).forEach((project: any) => {
-    if (project.architect) {
-      renameProperty(project, 'architect', 'targets');
-    }
-    if (project.schematics) {
-      renameProperty(project, 'schematics', 'generators');
-    }
-    Object.values(project.targets || {}).forEach((target: any) => {
-      if (target.builder) {
-        renameProperty(target, 'builder', 'executor');
-      }
-    });
-  });
-
-  const sortedProjects = Object.entries(w.projects || {}).sort(
+export function toWorkspaceFormat(
+  w: any
+): WorkspaceJsonConfiguration & NxJsonConfiguration {
+  const newFormat = toNewFormat(w) as WorkspaceJsonConfiguration &
+    NxJsonConfiguration;
+  const sortedProjects = Object.entries(newFormat.projects || {}).sort(
     (projectA, projectB) => projectA[0].localeCompare(projectB[0])
   );
-  w.projects = Object.fromEntries(sortedProjects);
-
-  if (w.schematics) {
-    renameProperty(w, 'schematics', 'generators');
-  }
-  return w;
+  newFormat.projects = Object.fromEntries(sortedProjects);
+  return newFormat;
 }
 
 function schemaToOptions(schema: Schema): CliOption[] {

@@ -1,5 +1,5 @@
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { dirname, join } from 'path';
+import { join } from 'path';
 import * as NxWorkspaceFileUtils from '@nrwl/workspace/src/core/file-utils';
 import { getOutputChannel } from '@nx-console/server';
 import { platform } from 'os';
@@ -12,8 +12,9 @@ declare function __non_webpack_require__(importPath: string): any;
 export async function getNxWorkspacePackageFileUtils(): Promise<
   typeof NxWorkspaceFileUtils
 > {
-  const workspacePath = dirname(
-    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+  const workspacePath = WorkspaceConfigurationStore.instance.get(
+    'nxWorkspacePath',
+    ''
   );
 
   let importPath = join(
