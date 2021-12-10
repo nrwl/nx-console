@@ -207,6 +207,7 @@ async function selectCliCommandAndPromptForFlags(
     if (configurations.length) {
       const configurationsOption: Option = {
         name: 'configuration',
+        isRequired: false,
         description:
           'A named build target, as specified in the "configurations" section of angular.json.',
         type: OptionType.String,

@@ -11,6 +11,7 @@ const RUN_ONE_OPTIONS = [
   {
     name: 'with-deps',
     type: OptionType.Boolean,
+    isRequired: false,
     description:
       'Include dependencies of specified projects when computing what to run',
     default: false,
@@ -18,30 +19,35 @@ const RUN_ONE_OPTIONS = [
   {
     name: 'parallel',
     type: OptionType.Boolean,
+    isRequired: false,
     description: 'Parallelize the command',
     default: 'false',
   },
   {
     name: 'maxParallel',
     type: OptionType.Number,
+    isRequired: false,
     description: 'Max number of parallel processes',
     default: 3,
   },
   {
     name: 'only-failed',
     type: OptionType.Boolean,
+    isRequired: false,
     description: 'Isolate projects which previously failed',
     default: 'false',
   },
   {
     name: 'skip-nx-cache',
     type: OptionType.Boolean,
+    isRequired: false,
     description:
       'Rerun the tasks even when the results are available in the cache',
     default: false,
   },
   {
     name: 'exclude',
+    isRequired: false,
     type: OptionType.String,
     description: 'Exclude certain projects from being processed',
   },

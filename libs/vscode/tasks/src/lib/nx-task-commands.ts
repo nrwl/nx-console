@@ -75,46 +75,59 @@ const AFFECTED_OPTIONS: Option[] = [
   {
     name: 'base',
     type: OptionType.String,
+    isRequired: false,
     description: 'Base of the current branch (usually master)',
   },
   {
     name: 'head',
     type: OptionType.String,
+    isRequired: false,
     description: 'Latest commit of the current branch (usually HEAD)',
   },
   {
     name: 'parallel',
     type: OptionType.Boolean,
     description: 'Parallelize the command',
+    isRequired: false,
     default: 'false',
   },
   {
     name: 'maxParallel',
     type: OptionType.Number,
     description: 'Max number of parallel processes',
+    isRequired: false,
     default: 3,
   },
   {
     name: 'only-failed',
     type: OptionType.Boolean,
     description: 'Isolate projects which previously failed',
+    isRequired: false,
     default: 'false',
   },
-  { name: 'all', type: OptionType.Boolean, description: 'All projects' },
+  {
+    name: 'all',
+    type: OptionType.Boolean,
+    description: 'All projects',
+    isRequired: false,
+  },
   {
     name: 'configuration',
     type: OptionType.String,
+    isRequired: false,
     description:
       'This is the configuration to use when performing tasks on projects',
   },
   {
     name: 'exclude',
     type: OptionType.String,
+    isRequired: false,
     description: 'Exclude certain projects from being processed',
   },
   {
     name: 'files',
     type: OptionType.Array,
+    isRequired: false,
     description: 'Manually specify changed files, delimited by commas',
   },
   {
@@ -122,34 +135,44 @@ const AFFECTED_OPTIONS: Option[] = [
     type: OptionType.Boolean,
     description:
       'Rerun the tasks even when the results are available in the cache',
+    isRequired: false,
     default: false,
   },
   {
     name: 'verbose',
     type: OptionType.Boolean,
+    isRequired: false,
     description: 'Print additional error stack trace on failure',
     default: false,
   },
 ].map((v) => ({ ...v, aliases: [] }));
 
 const RUN_MANY_OPTIONS: Option[] = [
-  { name: 'all', type: OptionType.Boolean, description: 'All projects' },
+  {
+    name: 'all',
+    type: OptionType.Boolean,
+    description: 'All projects',
+    isRequired: false,
+  },
   {
     name: 'parallel',
     type: OptionType.Boolean,
     description: 'Parallelize the command',
+    isRequired: false,
     default: 'false',
   },
   {
     name: 'maxParallel',
     type: OptionType.Number,
     description: 'Max number of parallel processes',
+    isRequired: false,
     default: 3,
   },
   {
     name: 'only-failed',
     type: OptionType.Boolean,
     description: 'Isolate projects which previously failed',
+    isRequired: false,
     default: 'false',
   },
   {
@@ -157,6 +180,7 @@ const RUN_MANY_OPTIONS: Option[] = [
     type: OptionType.String,
     description:
       'This is the configuration to use when performing tasks on projects',
+    isRequired: false,
   },
   {
     name: 'skip-nx-cache',
@@ -164,23 +188,27 @@ const RUN_MANY_OPTIONS: Option[] = [
     description:
       'Rerun the tasks even when the results are available in the cache',
     default: false,
+    isRequired: false,
   },
   {
     name: 'with-deps',
     type: OptionType.Boolean,
     description:
       'Include dependencies of specified projects when computing what to run',
+    isRequired: false,
     default: false,
   },
   {
     name: 'exclude',
     type: OptionType.String,
+    isRequired: false,
     description: 'Exclude certain projects from being processed',
   },
   {
     name: 'verbose',
     type: OptionType.Boolean,
     description: 'Print additional error stack trace on failure',
+    isRequired: false,
     default: false,
   },
 ].map((v) => ({ ...v, aliases: [] }));
@@ -189,28 +217,33 @@ const DEP_GRAPH_OPTIONS: Option[] = [
   {
     name: 'watch',
     type: OptionType.Boolean,
+    isRequired: false,
     description: 'Watch for changes to dep graph and update in-browser',
   },
   {
     name: 'file',
     type: OptionType.String,
+    isRequired: false,
     description: 'output file (e.g. --file=output.json)',
   },
   {
     name: 'filter',
     type: OptionType.Array,
+    isRequired: false,
     description:
       'Use to limit the dependency graph to only show specific projects, list of projects delimited by commas.',
   },
   {
     name: 'exclude',
     type: OptionType.Array,
+    isRequired: false,
     description:
       'List of projects delimited by commas to exclude from the dependency graph.',
   },
   {
     name: 'host',
     type: OptionType.String,
+    isRequired: false,
     description: 'Bind the dep graph server to a specific ip address.',
   },
 ].map((v) => ({ ...v, aliases: [] }));
@@ -266,6 +299,7 @@ async function promptForRunMany() {
         type: OptionType.Array,
         description: 'Projects to run',
         aliases: [],
+        isRequired: false,
         enum: projects,
       },
       ...RUN_MANY_OPTIONS,
