@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.13.0](https://github.com/nrwl/nx-console/compare/v17.12.4...v17.13.0) (2021-12-10)
+
+
+### Features
+
+* Go to project.json file from workspace file with codelens ([#1176](https://github.com/nrwl/nx-console/issues/1176)) ([ad3578a](https://github.com/nrwl/nx-console/commits/ad3578a1a21ab3c9a5010754c7082ae6822339c1))
+* include typescript plugin for imports ([#1177](https://github.com/nrwl/nx-console/issues/1177)) ([9c330ce](https://github.com/nrwl/nx-console/commits/9c330ce65ee683e82de8eb11801d9a3cf1e9c875))
+  * This can be disabled by setting `Enable Library Imports` to false in VSCode settings. ([#1183](https://github.com/nrwl/nx-console/issues/1183)) ([53b09eb](https://github.com/nrwl/nx-console/commits/53b09eb361845498234a6556bc296ae302660b02))
+* provide json schema for nx.json ([#1186](https://github.com/nrwl/nx-console/issues/1186)) ([70e2bbb](https://github.com/nrwl/nx-console/commits/70e2bbbcb26bd7e568535b1076bd6223d7f254ed))
+* use nx utils to read all configuration files ([#1184](https://github.com/nrwl/nx-console/issues/1184)) ([630ac6e](https://github.com/nrwl/nx-console/commits/630ac6ec0929184f98f7526a354bd7ba25bb4e68))
+
 ### [17.12.4](https://github.com/nrwl/nx-console/compare/v17.12.3...v17.12.4) (2021-11-19)
 
 
