@@ -349,7 +349,13 @@ export function getPrimitiveValue(value: any): string | undefined {
 export function toWorkspaceFormat(
   w: any
 ): WorkspaceJsonConfiguration & NxJsonConfiguration {
-  return toNewFormat(w) as WorkspaceJsonConfiguration & NxJsonConfiguration;
+  const newFormat = toNewFormat(w) as WorkspaceJsonConfiguration &
+    NxJsonConfiguration;
+  const sortedProjects = Object.entries(newFormat.projects || {}).sort(
+    (projectA, projectB) => projectA[0].localeCompare(projectB[0])
+  );
+  newFormat.projects = Object.fromEntries(sortedProjects);
+  return newFormat;
 }
 
 function schemaToOptions(schema: Schema): CliOption[] {
