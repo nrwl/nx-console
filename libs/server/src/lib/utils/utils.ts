@@ -13,6 +13,7 @@ import {
   OptionItemLabelValue,
   XPrompt,
   CliOption,
+  OptionPropertyDescription,
 } from '@nx-console/schema';
 
 import { readdirSync, statSync } from 'fs';
@@ -361,25 +362,42 @@ export function toWorkspaceFormat(
 function schemaToOptions(schema: Schema): CliOption[] {
   return Object.keys(schema.properties).reduce<CliOption[]>(
     (cliOptions, option) => {
-      const currentProperties = schema.properties[option];
-      const $default = currentProperties.$default;
+      const currentProperty = schema.properties[option];
+      const $default = currentProperty.$default;
       const $defaultIndex =
         $default?.['$source'] === 'argv' ? $default['index'] : undefined;
       const positional: number | undefined =
         typeof $defaultIndex === 'number' ? $defaultIndex : undefined;
 
-      const visible = currentProperties.visible ?? true;
-      if (!visible || (currentProperties as any).hidden) {
+      const visible = isPropertyVisible(option, currentProperty);
+      if (!visible) {
         return cliOptions;
       }
 
       cliOptions.push({
         name: option,
         positional,
-        ...currentProperties,
+        ...currentProperty,
       });
       return cliOptions;
     },
     []
   );
+}
+
+function isPropertyVisible(
+  option: string,
+  property: OptionPropertyDescription
+): boolean {
+  const ALWAYS_VISIBLE_OPTIONS = ['path'];
+
+  if (ALWAYS_VISIBLE_OPTIONS.includes(option)) {
+    return true;
+  }
+
+  if ('hidden' in property) {
+    return !(property as any)['hidden'];
+  }
+
+  return property.visible ?? true;
 }
