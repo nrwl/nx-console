@@ -236,14 +236,14 @@ async function selectCliCommandAndPromptForFlags(
 }
 
 async function selectGeneratorAndPromptForFlags() {
-  const { validWorkspaceJson, workspaceType, configurationFilePath } =
+  const { validWorkspaceJson, workspaceType, workspacePath } =
     await verifyWorkspace();
 
   if (!validWorkspaceJson) {
     return;
   }
 
-  const selection = await selectGenerator(configurationFilePath, workspaceType);
+  const selection = await selectGenerator(workspacePath, workspaceType);
   if (!selection) {
     return;
   }
