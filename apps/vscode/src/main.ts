@@ -25,6 +25,7 @@ import {
   teardownTelemetry,
   watchFile,
   directoryExists,
+  fileExists,
 } from '@nx-console/server';
 import {
   GlobalConfigurationStore,
@@ -118,7 +119,7 @@ export async function activate(c: ExtensionContext) {
       workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
     if (vscodeWorkspacePath) {
-      scanForWorkspace(vscodeWorkspacePath);
+      await scanForWorkspace(vscodeWorkspacePath);
     }
 
     context.subscriptions.push(
@@ -179,8 +180,10 @@ function manuallySelectWorkspaceDefinition() {
   }
 }
 
-function scanForWorkspace(vscodeWorkspacePath: string) {
+async function scanForWorkspace(vscodeWorkspacePath: string) {
   let currentDirectory = vscodeWorkspacePath;
+
+  const { root } = parse(vscodeWorkspacePath);
 
   const workspacePath = WorkspaceConfigurationStore.instance.get(
     'nxWorkspacePath',
@@ -191,10 +194,25 @@ function scanForWorkspace(vscodeWorkspacePath: string) {
     currentDirectory = workspacePath;
   }
 
-  setWorkspace(currentDirectory);
+  while (currentDirectory !== root) {
+    if (await fileExists(join(currentDirectory, 'angular.json'))) {
+      return setWorkspace(currentDirectory);
+    }
+    if (await fileExists(join(currentDirectory, 'workspace.json'))) {
+      return setWorkspace(currentDirectory);
+    }
+    if (await fileExists(join(currentDirectory, 'nx.json'))) {
+      return setWorkspace(currentDirectory);
+    }
+    currentDirectory = dirname(currentDirectory);
+  }
 }
 
 async function setWorkspace(workspacePath: string) {
+  if (workspacePath.match(/(workspace|angular)\.json$/)) {
+    workspacePath = dirname(workspacePath);
+  }
+
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   const { verifyWorkspace } = await import('@nx-console/vscode/nx-workspace');
 
