@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.13.2](https://github.com/nrwl/nx-console/compare/v17.13.1...v17.13.2) (2021-12-16)
+
+
+### Bug Fixes
+
+* revert to old logic for scanning workspaces, also fix checking for paths of undefined ([#1199](https://github.com/nrwl/nx-console/issues/1199)) ([039c24e](https://github.com/nrwl/nx-console/commits/039c24e6d3730d23b73244eaa210a28bccf2d97c))
+* use proper workspace path to load generators ([#1200](https://github.com/nrwl/nx-console/issues/1200)) ([6a3358e](https://github.com/nrwl/nx-console/commits/6a3358e0508092496006d1b754435af94cce71e7))
+
 ### [17.13.1](https://github.com/nrwl/nx-console/compare/v17.12.4...v17.13.1) (2021-12-11)
 ### Bug Fixes
 
