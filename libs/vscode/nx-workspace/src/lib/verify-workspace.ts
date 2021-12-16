@@ -15,6 +15,7 @@ interface Workspace {
   json: WorkspaceJsonConfiguration & NxJsonConfiguration;
   workspaceType: 'ng' | 'nx';
   configurationFilePath: string;
+  workspacePath: string;
 }
 
 export async function verifyWorkspace(): Promise<Workspace> {
@@ -36,6 +37,7 @@ export async function verifyWorkspace(): Promise<Workspace> {
       workspaceType: isAngularWorkspace ? 'ng' : 'nx',
       json: toWorkspaceFormat(config.workspaceConfiguration),
       configurationFilePath: config.configPath,
+      workspacePath,
     };
   } catch (e) {
     const humanReadableError = 'Invalid workspace: ' + workspacePath;
@@ -60,6 +62,7 @@ export async function verifyWorkspace(): Promise<Workspace> {
         version: 2,
       },
       configurationFilePath: '',
+      workspacePath,
     };
   }
 }
