@@ -116,11 +116,18 @@ async function configurePlugin(workspaceRoot: string, api: any) {
 async function getExternalFiles(
   workspaceRoot: string
 ): Promise<{ mainFile: string; directory: string }[]> {
-  const baseTsConfig = (
-    await readAndCacheJsonFile(TSCONFIG_BASE, workspaceRoot)
-  ).json;
+  let tsconfig = (await readAndCacheJsonFile(TSCONFIG_BASE, workspaceRoot))
+    .json;
 
-  const paths = baseTsConfig.compilerOptions.paths;
+  if (!('compilerOptions' in tsconfig)) {
+    tsconfig = (await readAndCacheJsonFile('tsconfig.json', workspaceRoot))
+      .json;
+    if (!('compilerOptions' in tsconfig)) {
+      return [];
+    }
+  }
+
+  const paths = tsconfig.compilerOptions.paths ?? {};
 
   const externals: { mainFile: string; directory: string }[] = [];
 
