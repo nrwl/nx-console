@@ -37,10 +37,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:nx-console",
-    "workspaceContains:workspace.json",
-    "workspaceContains:angular.json",
-    "workspaceContains:nx.json"
+    "onStartupFinished"
   ],
   "dependencies": {
     "jsonc-parser": "^3.0.0",
