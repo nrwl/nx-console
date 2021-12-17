@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.13.3](https://github.com/nrwl/nx-console/compare/v17.13.2...v17.13.3) (2021-12-17)
+
+
+### Bug Fixes
+
+* revert activationEvents to `onStartupFinished` ([#1201](https://github.com/nrwl/nx-console/issues/1201)) ([6cbd631](https://github.com/nrwl/nx-console/commits/6cbd631f3a9e80c9550d4f1c053247c3df3adbe7))
+
 ### [17.13.2](https://github.com/nrwl/nx-console/compare/v17.13.1...v17.13.2) (2021-12-16)
 
 
