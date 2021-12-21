@@ -146,7 +146,7 @@ export async function activate(c: ExtensionContext) {
     getOutputChannel().appendLine(
       'Nx Console encountered an error when activating'
     );
-    getOutputChannel().appendLine(JSON.stringify(e));
+    getOutputChannel().appendLine(e.stack);
     getTelemetry().exception(e.message);
   }
 }
