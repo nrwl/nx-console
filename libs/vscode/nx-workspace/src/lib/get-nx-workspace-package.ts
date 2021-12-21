@@ -33,12 +33,19 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
         importPath = importPath.replace(/\\/g, '/');
       }
       const imported = __non_webpack_require__(importPath);
+
+      if (!('readWorkspaceConfig' in imported)) {
+        throw new Error(
+          'Workspace tools does not have `readWorkspaceConfig` function. Use built in @nrwl/workspace package'
+        );
+      }
+
       return res(imported);
     } catch (error) {
       getOutputChannel().appendLine(
         `
     Error loading @nrwl/workspace from workspace. Falling back to extension dependency
-    Error: ${error}
+    ${error}
           `
       );
       return res(NxWorkspaceFileUtils);
