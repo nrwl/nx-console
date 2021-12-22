@@ -79,11 +79,11 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
           getOutputChannel().appendLine(
             `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`
           );
-        } else {
-          item.resourceUri = Uri.file(
-            join(this.cliTaskProvider.getWorkspacePath(), projectDef.root)
-          );
         }
+
+        item.resourceUri = Uri.file(
+          join(this.cliTaskProvider.getWorkspacePath(), projectDef.root ?? '')
+        );
       }
       item.contextValue = 'project';
     } else {
