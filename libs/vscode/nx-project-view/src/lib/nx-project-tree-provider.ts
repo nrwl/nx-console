@@ -75,7 +75,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         nxProject.project
       ];
       if (projectDef) {
-        if (!projectDef.root) {
+        if (projectDef.root === undefined) {
           getOutputChannel().appendLine(
             `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`
           );

@@ -4,7 +4,7 @@ declare function __non_webpack_require__(importPath: string): any;
 
 let nxWorkspacePackageJson: { version: string };
 let loadedNxWorkspacePackage = false;
-export function nxVersion(): number {
+export function nxVersion(): number | null {
   if (!loadedNxWorkspacePackage) {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
       'nxWorkspacePath',
@@ -16,7 +16,7 @@ export function nxVersion(): number {
       );
       loadedNxWorkspacePackage = true;
     } catch (e) {
-      // ignore
+      return null;
     }
   }
 

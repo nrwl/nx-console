@@ -14,7 +14,8 @@ export async function getNxWorkspaceConfig(
   workspaceConfiguration: WorkspaceJsonConfiguration & NxJsonConfiguration;
   configPath: string;
 }> {
-  if (nxVersion() < 13) {
+  const versionNumber = nxVersion();
+  if (versionNumber && versionNumber < 13) {
     // Versions lower than 13 throw an error when trying to read configurations of workspaces that have nx.json properties in workspace.json
     let workspaceJson: WorkspaceJsonConfiguration;
     if (format === 'nx') {
