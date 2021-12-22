@@ -1,4 +1,8 @@
-import { AbstractTreeProvider, clearJsonCache } from '@nx-console/server';
+import {
+  AbstractTreeProvider,
+  clearJsonCache,
+  getOutputChannel,
+} from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
@@ -71,8 +75,14 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         nxProject.project
       ];
       if (projectDef) {
+        if (projectDef.root === undefined) {
+          getOutputChannel().appendLine(
+            `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`
+          );
+        }
+
         item.resourceUri = Uri.file(
-          join(this.cliTaskProvider.getWorkspacePath(), projectDef.root)
+          join(this.cliTaskProvider.getWorkspacePath(), projectDef.root ?? '')
         );
       }
       item.contextValue = 'project';
