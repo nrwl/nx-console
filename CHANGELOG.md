@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.13.5](https://github.com/nrwl/nx-console/compare/v17.13.4...v17.13.5) (2021-12-22)
+
+
+### Bug Fixes
+
+* support workspaces lower than nx 13 ([#1204](https://github.com/nrwl/nx-console/issues/1204)) ([16e3155](https://github.com/nrwl/nx-console/commits/16e315521dbd90de3040abc71c28826fba44af8e))
+
 ### [17.13.4](https://github.com/nrwl/nx-console/compare/v17.13.3...v17.13.4) (2021-12-21)
 
 
