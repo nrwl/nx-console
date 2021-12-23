@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
@@ -21,8 +23,8 @@ jobs:
 
   agents:
     runs-on: ubuntu-latest
-    name: Agent 1
-    timeout-minutes: 60
+    name: Agent
+    timeout-minutes: 15
     strategy:
       matrix:
         agent: [1, 2, 3]
