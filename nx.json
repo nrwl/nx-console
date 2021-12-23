@@ -1,14 +1,16 @@
 {
   "implicitDependencies": {
-    "angular.json": "*",
-    "package.json": "*",
-    "tsconfig.base.json": "*",
+    "package.json": {
+      "devDependencies": "*",
+      "dependencies": "*"
+    },
     ".eslintrc.json": "*"
   },
   "affected": {
     "defaultBase": "master"
   },
   "npmScope": "nx-console",
+  "useDaemonProcess": true,
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/nx-cloud",
