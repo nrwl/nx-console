@@ -12,10 +12,7 @@ jobs:
       node_version: 14
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ./.github/workflows/dependencies
+      - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node-version }}
       - name: publish

@@ -1,5 +1,5 @@
-name: Dependencies And Setup
-description: Install or restore the cache for node_modules
+name: Setup
+description: Setup tasks
 inputs:
   node_version: # id of input
     description: 'Version of node to use'
@@ -8,6 +8,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - uses: actions/checkout@v2
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
       uses: nrwl/nx-set-shas@v2
     - uses: actions/setup-node@v1

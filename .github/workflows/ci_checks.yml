@@ -10,27 +10,11 @@ env:
   node_version: 14
 
 jobs:
-  master:
+  checks:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' }}
     steps:
-      - uses: actions/checkout@v2
-        name: Checkout [master]
-        with:
-          fetch-depth: 0
-      - uses: ./.github/workflows/dependencies
-        with:
-          node_version: ${{ env.node_version }}
-      - uses: ./.github/workflows/nx-run
-  pr:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout [PR]
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-      - uses: ./.github/workflows/dependencies
+      - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
       - uses: ./.github/workflows/nx-run
@@ -48,7 +32,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ env.node_version }}
-      - uses: ./.github/workflows/dependencies
+      - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
       - name: Start Nx Agent ${{ matrix.agent }}
