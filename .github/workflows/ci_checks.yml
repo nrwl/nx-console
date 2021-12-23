@@ -14,10 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' }}
     steps:
-      - name: Use Node.js ${{ env.node_version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.node_version }}
       - uses: actions/checkout@v2
         name: Checkout [master]
         with:
@@ -30,10 +26,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - name: Use Node.js ${{ env.node_version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.node_version }}
       - uses: actions/checkout@v2
         name: Checkout [PR]
         with:

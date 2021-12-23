@@ -13,10 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v2
         with:
-          node-version: ${{ env.node-version }}
+          fetch-depth: 0
       - uses: ./.github/workflows/dependencies
         with:
           node_version: ${{ env.node-version }}
