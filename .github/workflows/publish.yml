@@ -12,6 +12,7 @@ jobs:
       node_version: 14
 
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node-version }}
