@@ -30,7 +30,6 @@ jobs:
         name: Checkout [PR]
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
       - uses: ./.github/workflows/dependencies
         with:
           node_version: ${{ env.node_version }}
