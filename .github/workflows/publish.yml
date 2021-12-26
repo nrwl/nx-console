@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/workflows/setup
         with:
-          node_version: ${{ env.node-version }}
+          node_version: ${{ env.node_version }}
       - name: publish
         run: |
           yarn package
