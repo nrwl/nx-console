@@ -24,6 +24,12 @@ describe('utils', () => {
       return r;
     };
 
+    it('should work with schema without any properties', async () => {
+      // @ts-expect-error absence of required property "properties" is needed to test failure resistance
+      const r = await normalizeSchema({})
+      expect(r).toEqual([])
+    });
+
     it('should mark fields as required if they are listed in the required array', async () => {
       const r = await getSchema({ mockOption }, ['mockOption']);
       expect(r[0].isRequired).toBeTruthy();

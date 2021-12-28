@@ -360,7 +360,7 @@ export function toWorkspaceFormat(
 }
 
 function schemaToOptions(schema: Schema): CliOption[] {
-  return Object.keys(schema.properties).reduce<CliOption[]>(
+  return Object.keys(schema.properties || {}).reduce<CliOption[]>(
     (cliOptions, option) => {
       const currentProperty = schema.properties[option];
       const $default = currentProperty.$default;
