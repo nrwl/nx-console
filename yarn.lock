@@ -4982,7 +4982,7 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
-"@yarnpkg/fslib@^2.6.1-rc.5":
+"@yarnpkg/fslib@2.6.1-rc.5":
   version "2.6.1-rc.5"
   resolved "https://registry.yarnpkg.com/@yarnpkg/fslib/-/fslib-2.6.1-rc.5.tgz#6ede0f5b5be18fdb7a558d12178ce8b354c54c72"
   integrity sha512-Q17w9RQqqCf9ovxSjAftYLoZuUxZ+OKhRPy4iQhLxp1chd4Gl4UUC02LhknrmVrjhetol0UVkYnm17errAKgRQ==
