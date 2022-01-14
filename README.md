@@ -12,7 +12,7 @@
 
 ![](https://nx.dev/assets/content/shared/nx-console-screenshot.png)
 
-Nx transformed the Angular ecosystem. With it, you can get a full-stack application up and running in minutes, no need to figure out source maps, webpack, test runners. It all works out of the box. Nx also helps you enforce consistent development practices by generating components, services, and state management modules.
+With Nx Console, you can get a full-stack application up and running in minutes, no need to figure out source maps, webpack, test runners. It all works out of the box. Nx also helps you enforce consistent development practices by generating components, services, and state management modules.
 
 ## Why Nx Console?
 
