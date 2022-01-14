@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.13.7](https://github.com/nrwl/nx-console/compare/v17.13.6...v17.13.7) (2022-01-14)
+
+
+### Bug Fixes
+
+* handle absence of "properties" in schema ([#1208](https://github.com/nrwl/nx-console/issues/1208)) ([7d69dc7](https://github.com/nrwl/nx-console/commits/7d69dc70fad5961a37e27a568f2f4865ef264b0d))
+* support workspace-generators and workspace-schematics ([#1209](https://github.com/nrwl/nx-console/issues/1209)) ([8a2c48f](https://github.com/nrwl/nx-console/commits/8a2c48f4b31909115b56620f56d92a04d8184e58))
+
 ### [17.13.6](https://github.com/nrwl/nx-console/compare/v17.13.5...v17.13.6) (2021-12-23)
 
 
