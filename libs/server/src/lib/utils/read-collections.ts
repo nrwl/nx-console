@@ -1,6 +1,7 @@
 import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
 import { platform } from 'os';
 import { dirname, join, resolve } from 'path';
+import { isWorkspaceInPnp, pnpApi, pnpWorkspaceDependencies } from './pnp';
 import {
   clearJsonCache,
   listOfUnnestedNpmPackages,
@@ -15,6 +16,10 @@ export async function readCollectionsFromNodeModules(
 
   if (clearPackageJsonCache) {
     clearJsonCache('package.json', workspacePath);
+  }
+
+  if (await isWorkspaceInPnp(workspacePath)) {
+    const pnp_module = await pnpWorkspaceDependencies(workspacePath);
   }
 
   const packages = await listOfUnnestedNpmPackages(nodeModulesDir);
