@@ -23,7 +23,7 @@
     "build-vs-code": "nps prepare.dev.vscode",
     "package": "nps prepare.and.package.vscode",
     "release": "standard-version",
-    "postinstall": "node ./tools/scripts/postinstall.js && node ./decorate-angular-cli.js",
+    "postinstall": "node ./tools/scripts/postinstall.js",
     "update": "nx migrate latest"
   },
   "dependencies": {
@@ -36,7 +36,6 @@
     "@angular-eslint/eslint-plugin-template": "12.6.1",
     "@angular-eslint/template-parser": "12.6.1",
     "@angular/cdk": "13.0.3",
-    "@angular/cli": "13.0.4",
     "@angular/common": "13.0.3",
     "@angular/compiler": "13.0.3",
     "@angular/compiler-cli": "13.0.3",

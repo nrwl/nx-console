@@ -130,7 +130,6 @@ function createJsonSchema(builders: string, executors: string) {
           "required": ["version"]
         },
         "then": {
-          "description": "Read more about this workspace file at https://nx.dev/latest/angular/getting-started/configuration",
           "properties": {
             "projects": {
               "type": "object",
@@ -173,7 +172,6 @@ function createJsonSchema(builders: string, executors: string) {
           "required": ["version"]
         },
         "then": {
-          "description": "Read more about this workspace file at https://nx.dev/latest/react/getting-started/configuration",
           "properties": {
            "projects": {
               "type": "object",
