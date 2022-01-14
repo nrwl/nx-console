@@ -4,15 +4,17 @@ on:
   push:
     tags:
       - 'v*.*.*'
+env:
+  NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  node_version: 14
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-
-    env:
-      node_version: 14
-
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
@@ -21,12 +23,10 @@ jobs:
           yarn package
           yarn vsce publish --packagePath dist/apps/vscode/nx-console.vsix -p ${{ secrets.VSCE_PAT }}
           yarn ovsx publish dist/apps/vscode/nx-console.vsix -p ${{ secrets.OVSX_PAT }}
-      - name: generate changes
-        run: git show CHANGELOG.md | egrep "^\+" | tail +5 | sed -e 's/^\+//' > changelog.txt
       - name: release
         uses: softprops/action-gh-release@v1
         with:
-          body_path: changelog.txt
+          generate_release_notes: true
           files: |
             dist/apps/vscode/nx-console.vsix
         env:
