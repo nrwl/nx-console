@@ -3,8 +3,8 @@ const { join } = require('path');
 
 function affected(affectedCommand) {
   return {
-    'origin-main': `nx affected:${affectedCommand} --base=origin/main --parallel --silent --ci`,
-    'upstream-main': `nx affected:${affectedCommand} --base=upstream/main --parallel --silent --ci`,
+    'origin-master': `nx affected:${affectedCommand} --base=origin/master --parallel --silent --ci`,
+    'upstream-master': `nx affected:${affectedCommand} --base=upstream/master --parallel --silent --ci`,
   };
 }
 
@@ -52,14 +52,14 @@ module.exports = {
       ),
     },
     format: {
-      default: 'nx format:write --base=upstream/main',
+      default: 'nx format:write --base=upstream/master',
       and: {
         lint: {
           check: nps.concurrent.nps('format.check', 'lint'),
         },
       },
-      write: 'nx format:write --base=upstream/main',
-      check: 'nx format:check --base=upstream/main',
+      write: 'nx format:write --base=upstream/master',
+      check: 'nx format:check --base=upstream/master',
     },
     storybook: {
       default: 'nx run vscode-ui-feature-task-execution-form:storybook',

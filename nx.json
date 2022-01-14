@@ -1,16 +1,14 @@
 {
   "implicitDependencies": {
-    "package.json": {
-      "devDependencies": "*",
-      "dependencies": "*"
-    },
+    "angular.json": "*",
+    "package.json": "*",
+    "tsconfig.base.json": "*",
     ".eslintrc.json": "*"
   },
   "affected": {
-    "defaultBase": "main"
+    "defaultBase": "master"
   },
   "npmScope": "nx-console",
-  "useDaemonProcess": true,
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/nx-cloud",
@@ -24,8 +22,7 @@
         ],
         "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
         "canTrackAnalytics": false,
-        "showUsageWarnings": true,
-        "parallel": 1
+        "showUsageWarnings": true
       }
     }
   },
