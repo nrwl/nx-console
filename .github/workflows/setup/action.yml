@@ -6,23 +6,17 @@ inputs:
     required: true
     default: '14'
 runs:
-  using: 'composite'
+  using: composite
   steps:
+    - name: Use Node.js ${{ inputs.node_version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ inputs.node_version }}
+        check-latest: true
+        cache: yarn
+    - run: yarn install --frozen-lockfile
+      shell: bash
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
       uses: nrwl/nx-set-shas@v2
       with:
         main-branch-name: 'master'
-    - uses: actions/setup-node@v1
-      with:
-        node-version: ${{ inputs.node_version }}
-    - uses: actions/cache@v2
-      id: workspace-cache
-      with:
-        path: |
-          node_modules
-          !node_modules/.cache
-        key: ${{ runner.os }}-node-${{ inputs.node_version }}-workspace-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-node-${{ inputs.node_version }}-workspace-
-    - run: yarn install --frozen-lockfile
-      shell: bash
