@@ -1,7 +1,5 @@
 import { join } from 'path';
 import { Uri, workspace } from 'vscode';
-import { PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
-import { getLibzipSync as libzip } from '@yarnpkg/libzip';
 
 declare function __non_webpack_require__(importPath: string): any;
 
