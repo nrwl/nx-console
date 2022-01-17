@@ -1,4 +1,4 @@
-import { OptionType } from '@angular/cli/models/interface';
+import { OptionType } from '@nx-console/schema';
 import { FieldItemsPipe, getOptionItems } from './field-items.pipe';
 
 describe('FieldItemsPipe', () => {
