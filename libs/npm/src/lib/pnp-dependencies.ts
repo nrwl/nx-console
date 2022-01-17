@@ -5,25 +5,40 @@ import { getLibzipSync as libzip } from '@yarnpkg/libzip';
 
 declare function __non_webpack_require__(importPath: string): any;
 
-const PNP_FILE_NAME = '.pnp.cjs';
+async function getPnpFile(workspacePath: string) {
+  const extensions = ['.cjs', '.js'];
+  for (const ext of extensions) {
+    try {
+      const fileName = `.pnp${ext}`;
+      const pnpFile = join(workspacePath, fileName);
+      await workspace.fs.stat(Uri.file(pnpFile));
+      return pnpFile;
+    } catch {
+      return;
+    }
+  }
+}
+
+async function pnpApi(workspacePath: string) {
+  const pnpFile = await getPnpFile(workspacePath);
+  if (!pnpFile) {
+    return;
+  }
+
+  return __non_webpack_require__(pnpFile);
+}
+
 export async function isWorkspaceInPnp(workspacePath: string) {
   try {
-    const pnpFile = join(workspacePath, PNP_FILE_NAME);
-    await workspace.fs.stat(Uri.file(pnpFile));
-    return true;
+    const file = await getPnpFile(workspacePath);
+    return !!file;
   } catch {
     return false;
   }
 }
 
-export function pnpApi(workspacePath: string) {
-  const pnpFile = join(workspacePath, PNP_FILE_NAME);
-
-  return __non_webpack_require__(pnpFile);
-}
-
-export async function pnpWorkspaceDependencies(workspacePath: string) {
-  const pnp = pnpApi(workspacePath);
+export async function pnpDependencies(workspacePath: string) {
+  const pnp = await pnpApi(workspacePath);
 
   const dependencies = [];
   for (const locator of pnp.getDependencyTreeRoots()) {
@@ -33,27 +48,18 @@ export async function pnpWorkspaceDependencies(workspacePath: string) {
       if (reference === null) continue;
       if (reference.startsWith('workspace:')) continue;
 
-      const depPkg = pnp.getPackageInformation({ name, reference });
-
       try {
         let path: string = pnp.resolveToUnqualified(name, workspacePath + '/');
         if (path.includes('__virtual__')) {
           path = pnp.resolveVirtual(path);
         }
 
-        dependencies.push({
-          name,
-          path,
-          packageJson: await crossFs.readJsonPromise(path + '/package.json'),
-        });
+        dependencies.push(path);
+        // packageJson: await crossFs.readJsonPromise(path + '/package.json'),
       } catch {
         continue;
       }
     }
   }
-  debugger;
   return dependencies;
 }
-
-const zipOpenFs = new ZipOpenFS({ libzip });
-export const crossFs = new PosixFS(zipOpenFs);

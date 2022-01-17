@@ -4990,7 +4990,7 @@
     "@yarnpkg/libzip" "^2.2.3-rc.5"
     tslib "^1.13.0"
 
-"@yarnpkg/libzip@^2.2.3-rc.5":
+"@yarnpkg/libzip@2.2.3-rc.5", "@yarnpkg/libzip@^2.2.3-rc.5":
   version "2.2.3-rc.5"
   resolved "https://registry.yarnpkg.com/@yarnpkg/libzip/-/libzip-2.2.3-rc.5.tgz#2de9e361e64d6e646a685f711f34633f5c751770"
   integrity sha512-EidaTdtQERjqhtmL3AZzPH2o/91mJQIOpI/Pmvta0hElgAozscslgYEfvifYNq7QnHxkGf7oP+43q7ljz1I+ew==

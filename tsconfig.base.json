@@ -21,6 +21,7 @@
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
+      "@nx-console/npm": ["libs/npm/src/index.ts"],
       "@nx-console/schema": ["libs/schema/src/index.ts"],
       "@nx-console/server": ["libs/server/src/index.ts"],
       "@nx-console/typescript-plugin": ["libs/typescript-plugin/src/index.ts"],

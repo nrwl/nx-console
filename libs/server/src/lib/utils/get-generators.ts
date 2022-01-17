@@ -8,19 +8,13 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
 } from './utils';
-import {
-  getCollectionInfo,
-  readCollectionsFromNodeModules,
-} from './read-collections';
+import { getCollectionInfo, readCollections } from './read-collections';
 
 export async function getGenerators(
   workspacePath: string
 ): Promise<CollectionInfo[]> {
   const basedir = workspacePath;
-  const collections = await readCollectionsFromNodeModules(
-    workspacePath,
-    false
-  );
+  const collections = await readCollections(workspacePath, false);
   let generatorCollections = collections.filter(
     (collection) => collection.type === 'generator'
   );
@@ -63,14 +57,12 @@ async function readWorkspaceGeneratorsCollection(
   const collectionPath = join(collectionDir, 'collection.json');
   if (await fileExists(collectionPath)) {
     const collection = await readAndCacheJsonFile(
-      'collection.json',
-      collectionDir
+      `${collectionDir}/collection.json`
     );
 
     return getCollectionInfo(
       collectionName,
       collectionPath,
-      collectionDir,
       {
         path: collectionPath,
         json: {},

@@ -1,18 +1,17 @@
 import {
-  CollectionInfo,
   Generator,
   GeneratorType,
   Option,
   TaskExecutionSchema,
 } from '@nx-console/schema';
-import { QuickPickItem, window } from 'vscode';
 import {
   getGenerators,
   normalizeSchema,
   readAndCacheJsonFile,
 } from '@nx-console/server';
 import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
+import { QuickPickItem, window } from 'vscode';
 
 async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
   const { json } = await verifyWorkspace();
@@ -58,31 +57,13 @@ async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
   return collectionDefaults;
 }
 
-export async function readGeneratorOptions(
+export async function getGeneratorOptions(
   workspacePath: string,
   collectionName: string,
-  generatorName: string
+  generatorName: string,
+  generatorPath: string
 ): Promise<Option[]> {
-  const nodeModulesDir = join(workspacePath, 'node_modules');
-  const collectionPackageJson = await readAndCacheJsonFile(
-    join(collectionName, 'package.json'),
-    nodeModulesDir
-  );
-  const collectionJson = await readAndCacheJsonFile(
-    collectionPackageJson.json.schematics ||
-      collectionPackageJson.json.generators,
-    dirname(collectionPackageJson.path)
-  );
-  const generators = Object.assign(
-    {},
-    collectionJson.json.schematics,
-    collectionJson.json.generators
-  );
-
-  const generatorSchema = await readAndCacheJsonFile(
-    generators[generatorName].schema,
-    dirname(collectionJson.path)
-  );
+  const generatorSchema = await readAndCacheJsonFile(generatorPath);
   const workspaceDefaults = await readWorkspaceJsonDefaults(workspacePath);
   const defaults =
     workspaceDefaults &&
@@ -99,19 +80,20 @@ export async function selectGenerator(
   interface GenerateQuickPickItem extends QuickPickItem {
     collectionName: string;
     generator: Generator;
+    collectionPath: string;
   }
 
   const generators = await getGenerators(workspacePath);
   let generatorsQuickPicks = generators
-    .map((c) => c.data)
-    .filter(
-      (generator: Generator | undefined): generator is Generator => !!generator
-    )
-    .map((generatorData): GenerateQuickPickItem => {
+    .filter((collection) => !!collection.data)
+    .map((collection): GenerateQuickPickItem => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const generatorData = collection.data!;
       return {
         description: generatorData.description,
         label: `${generatorData.collection} - ${generatorData.name}`,
         collectionName: generatorData.collection,
+        collectionPath: collection.path,
         generator: generatorData,
       };
     });
@@ -127,10 +109,11 @@ export async function selectGenerator(
     if (selection) {
       const options =
         selection.generator.options ||
-        (await readGeneratorOptions(
+        (await getGeneratorOptions(
           workspacePath,
           selection.collectionName,
-          selection.generator.name
+          selection.generator.name,
+          selection.collectionPath
         ));
       const positional = `${selection.collectionName}:${selection.generator.name}`;
       return {
