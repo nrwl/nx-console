@@ -1,4 +1,7 @@
-import { workspaceDependencies } from '@nx-console/npm';
+import {
+  workspaceDependencies,
+  workspaceDependencyPath,
+} from '@nx-console/npm';
 import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
 import { platform } from 'os';
 import { dirname, join, resolve } from 'path';
@@ -16,17 +19,12 @@ export async function readCollections(
 
   const collections = await Promise.all(
     packages.map(async (p) => {
-      const { json } = await readAndCacheJsonFile(join(p, 'package.json'));
-      return {
-        packagePath: p,
-        packageName: json.name,
-        packageJson: json,
-      };
+      return await packageDetails(p);
     })
   );
 
   const allCollections = (
-    await Promise.all(collections.map((c) => readCollection(c)))
+    await Promise.all(collections.map((c) => readCollection(workspacePath, c)))
   ).flat();
 
   /**
@@ -46,26 +44,26 @@ export async function readCollections(
   return Array.from(dedupedCollections.values());
 }
 
-async function readCollection({
-  packagePath,
-  packageName,
-  packageJson: json,
-}: {
-  packagePath: string;
-  packageName: string;
-  packageJson: any;
-}): Promise<CollectionInfo[] | null> {
+async function readCollection(
+  workspacePath: string,
+  {
+    packagePath,
+    packageName,
+    packageJson: json,
+  }: {
+    packagePath: string;
+    packageName: string;
+    packageJson: any;
+  }
+): Promise<CollectionInfo[] | null> {
   try {
-    // const packageJson = await readAndCacheJsonFile(
-    //   join(collectionName, 'package.json')
-    // );
-
     const [executorCollections, generatorCollections] = await Promise.all([
       readAndCacheJsonFile(json.executors || json.builders, packagePath),
       readAndCacheJsonFile(json.generators || json.schematics, packagePath),
     ]);
 
     return getCollectionInfo(
+      workspacePath,
       packageName,
       packagePath,
       executorCollections,
@@ -77,6 +75,7 @@ async function readCollection({
 }
 
 export async function getCollectionInfo(
+  workspacePath: string,
   collectionName: string,
   collectionPath: string,
   executorCollection: { path: string; json: any },
@@ -153,30 +152,43 @@ export async function getCollectionInfo(
     }
   }
 
-  // TODO: check if the extended collection is read properly
-  // if (
-  //   generatorCollection.json.extends &&
-  //   Array.isArray(generatorCollection.json.extends)
-  // ) {
-  //   const extendedSchema = generatorCollection.json.extends as string[];
-  //   const extendedCollections = (
-  //     await Promise.all(
-  //       extendedSchema
-  //         .filter((extended) => extended !== '@nrwl/workspace')
-  //         .map((extended: string) => readCollections(extended))
-  //     )
-  //   )
-  //     .flat()
-  //     .filter((c): c is CollectionInfo => Boolean(c));
+  if (
+    generatorCollection.json.extends &&
+    Array.isArray(generatorCollection.json.extends)
+  ) {
+    const extendedSchema = generatorCollection.json.extends as string[];
+    const extendedCollections = (
+      await Promise.all(
+        extendedSchema
+          .filter((extended) => extended !== '@nrwl/workspace')
+          .map(async (extended: string) => {
+            const dependencyPath = await workspaceDependencyPath(
+              workspacePath,
+              extended
+            );
 
-  //   for (const collection of extendedCollections) {
-  //     if (collectionMap.has(collection.name)) {
-  //       continue;
-  //     }
+            if (!dependencyPath) {
+              return null;
+            }
 
-  //     collectionMap.set(collection.name, collection);
-  //   }
-  // }
+            return readCollection(
+              workspacePath,
+              await packageDetails(dependencyPath)
+            );
+          })
+      )
+    )
+      .flat()
+      .filter((c): c is CollectionInfo => Boolean(c));
+
+    for (const collection of extendedCollections) {
+      if (collectionMap.has(collection.name)) {
+        continue;
+      }
+
+      collectionMap.set(collection.name, collection);
+    }
+  }
 
   return Array.from(collectionMap.values());
 }
@@ -224,4 +236,13 @@ function canUse(
   s: { hidden: boolean; private: boolean; schema: string; extends: boolean }
 ): boolean {
   return !s.hidden && !s.private && !s.extends && name !== 'ng-add';
+}
+
+async function packageDetails(p: string) {
+  const { json } = await readAndCacheJsonFile(join(p, 'package.json'));
+  return {
+    packagePath: p,
+    packageName: json.name,
+    packageJson: json,
+  };
 }

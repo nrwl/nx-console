@@ -61,6 +61,7 @@ async function readWorkspaceGeneratorsCollection(
     );
 
     return getCollectionInfo(
+      basedir,
       collectionName,
       collectionPath,
       {

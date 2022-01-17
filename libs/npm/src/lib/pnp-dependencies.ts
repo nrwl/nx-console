@@ -46,17 +46,31 @@ export async function pnpDependencies(workspacePath: string) {
       if (reference === null) continue;
       if (reference.startsWith('workspace:')) continue;
 
-      try {
-        let path: string = pnp.resolveToUnqualified(name, workspacePath + '/');
-        if (path.includes('__virtual__')) {
-          path = pnp.resolveVirtual(path);
-        }
-
+      const path = await pnpDependencyPath(workspacePath, name);
+      if (path) {
         dependencies.push(path);
-      } catch {
-        continue;
       }
     }
   }
   return dependencies;
+}
+
+export async function pnpDependencyPath(
+  workspacePath: string,
+  dependencyName: string
+) {
+  try {
+    const pnp = await pnpApi(workspacePath);
+    let path: string = pnp.resolveToUnqualified(
+      dependencyName,
+      workspacePath + '/'
+    );
+    if (path.includes('__virtual__')) {
+      path = pnp.resolveVirtual(path);
+    }
+
+    return path;
+  } catch {
+    return;
+  }
 }
