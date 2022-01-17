@@ -23,17 +23,13 @@ jobs:
 
   agents:
     runs-on: ubuntu-latest
-    name: Agent
+    name: Agent ${{ matrix.agent }}
     timeout-minutes: 15
     strategy:
       matrix:
         agent: [1, 2, 3]
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ env.node_version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.node_version }}
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
