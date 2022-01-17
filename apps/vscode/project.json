@@ -8,7 +8,7 @@
     "build": {
       "executor": "@nrwl/node:build",
       "options": {
-        "externalDependencies": ["vscode", "tslint"],
+        "externalDependencies": ["vscode"],
         "webpackConfig": "apps/vscode/webpack.config.js",
         "outputPath": "dist/apps/vscode",
         "main": "apps/vscode/src/main.ts",
