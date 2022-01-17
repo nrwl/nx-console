@@ -2,10 +2,10 @@ import { npmDependencies } from './npm-dependencies';
 import { isWorkspaceInPnp, pnpDependencies } from './pnp-dependencies';
 
 /**
- * Get a flat list of all node_modules folders in the workspace.
+ * Get dependencies for the current workspace.
  * This is needed to continue to support Angular CLI projects.
  *
- * @param nodeModulesDir
+ * @param workspacePath
  * @returns
  */
 

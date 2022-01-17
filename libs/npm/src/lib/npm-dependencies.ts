@@ -1,6 +1,13 @@
 import { stat, readdir } from 'fs/promises';
 import { join } from 'path';
 
+/**
+ * Get a flat list of all node_modules folders in the workspace.
+ * This is needed to continue to support Angular CLI projects.
+ *
+ * @param workspacePath
+ * @returns
+ */
 export async function npmDependencies(workspacePath: string) {
   const nodeModulesDir = join(workspacePath, 'node_modules');
   const res: string[] = [];
