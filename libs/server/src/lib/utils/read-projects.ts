@@ -15,6 +15,7 @@ import {
 } from '../utils/utils';
 import { getTelemetry } from '../telemetry';
 import { getOutputChannel } from './output-channel';
+import { workspaceDependencyPath } from '@nx-console/npm';
 
 export function readTargetDef(
   targetName: string,
@@ -61,10 +62,15 @@ export async function readBuilderSchema(
   projectDefaults?: { [name: string]: string }
 ): Promise<Option[] | undefined> {
   try {
-    const [npmPackage, builderName] = builder.split(':');
+    const [packageName, builderName] = builder.split(':');
+    const packagePath = await workspaceDependencyPath(basedir, packageName);
+
+    if (!packagePath) {
+      return undefined;
+    }
+
     const packageJson = await readAndCacheJsonFile(
-      path.join(npmPackage, 'package.json'),
-      path.join(basedir, 'node_modules')
+      path.join(packagePath, 'package.json')
     );
     const b = packageJson.json.builders || packageJson.json.executors;
     const buildersPath = b.startsWith('.') ? b : `./${b}`;

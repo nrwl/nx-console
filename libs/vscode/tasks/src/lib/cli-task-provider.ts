@@ -9,7 +9,6 @@ import {
 
 import { getTelemetry } from '@nx-console/server';
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
-import { verifyNodeModules } from '@nx-console/vscode/verify';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
@@ -75,13 +74,6 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   async executeTask(definition: CliTaskDefinition) {
-    const { validNodeModules: hasNodeModules } = await verifyNodeModules(
-      this.getWorkspacePath()
-    );
-    if (!hasNodeModules) {
-      return;
-    }
-
     const isDryRun = definition.flags.includes('--dry-run');
     if (isDryRun && this.currentDryRun) {
       this.deferredDryRun = definition;

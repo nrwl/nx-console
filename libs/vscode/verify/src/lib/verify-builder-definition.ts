@@ -94,10 +94,10 @@ export async function verifyBuilderDefinition(
 
   if (!options) {
     window.showErrorMessage(
-      `Builder specified for ${project} ${command} was not found in your node_modules. Check that specified builder is correct and has a corresponding entry in package.json`,
+      `Builder specified for ${project} ${command} was not found in your dependencies. Check that specified builder is correct and has a corresponding entry in package.json`,
       'Show definition'
     );
-    getTelemetry().exception('Specified builder not found in node_modules');
+    getTelemetry().exception('Specified builder not found in dependencies');
 
     return {
       validBuilder: false,
