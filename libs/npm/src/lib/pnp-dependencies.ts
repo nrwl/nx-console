@@ -53,7 +53,6 @@ export async function pnpDependencies(workspacePath: string) {
         }
 
         dependencies.push(path);
-        // packageJson: await crossFs.readJsonPromise(path + '/package.json'),
       } catch {
         continue;
       }
