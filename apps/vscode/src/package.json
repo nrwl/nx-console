@@ -18,7 +18,7 @@
     "color": "#176BCC",
     "theme": "dark"
   },
-  "homepage": "https://nx.dev/latest/angular/cli/console",
+  "homepage": "https://nx.dev/using-nx/console#nx-console-for-vscode",
   "bugs": {
     "url": "https://github.com/nrwl/nx-console/issues"
   },
@@ -686,7 +686,7 @@
       },
       {
         "view": "nxConsole.views.welcome",
-        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vscode)"
+        "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
       }
     ],
     "walkthroughs": [
