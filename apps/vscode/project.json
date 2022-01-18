@@ -28,6 +28,11 @@
             "glob": "CHANGELOG.md",
             "input": "./",
             "output": "/"
+          },
+          {
+            "glob": "LICENSE",
+            "input": "./",
+            "output": "/"
           }
         ],
         "buildLibsFromSource": true
