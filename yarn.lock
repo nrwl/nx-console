@@ -18426,11 +18426,6 @@ vsce@~1.93.0:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-codicons@^0.0.16:
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/vscode-codicons/-/vscode-codicons-0.0.16.tgz#0bef18bfc0e9378ceb77213326495960cb53561f"
-  integrity sha512-OUijQNEJ78cmipWUR/LlUeTF9xAUW3/23YhgF3fNOKXKbajGTctUL8+sarVY1dZzv1ii7ilHXYkSJwh/d90XuA==
-
 w3c-hr-time@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/w3c-hr-time/-/w3c-hr-time-1.0.2.tgz#0a89cdf5cc15822df9c360543676963e0cc308cd"
