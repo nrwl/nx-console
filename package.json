@@ -93,7 +93,6 @@
     "typescript": "4.4.4",
     "universal-analytics": "0.4.20",
     "vsce": "^1.69.0",
-    "vscode-codicons": "^0.0.16",
     "webpack": "^5.47.0",
     "webpack-merge": "^5.8.0",
     "webpack-node-externals": "^3.0.0",
