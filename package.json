@@ -11,9 +11,6 @@
   "engines": {
     "vscode": "^1.50.0"
   },
-  "browserslist": [
-    "last 2 Chrome versions"
-  ],
   "scripts": {
     "nx": "nx",
     "ng": "nx",
