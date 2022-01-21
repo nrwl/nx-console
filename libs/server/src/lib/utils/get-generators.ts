@@ -76,7 +76,8 @@ async function readWorkspaceGeneratorsCollection(
         .filter((f) => basename(f) === 'schema.json')
         .map(async (f) => {
           const schemaJson = await readAndCacheJsonFile(f, '');
-          const name = schemaJson.json.id || schemaJson.json.$id;
+          const name =
+            schemaJson.json.title || schemaJson.json.id || schemaJson.json.$id;
           const type: GeneratorType =
             schemaJson.json['x-type'] ?? GeneratorType.Other;
           return {
@@ -87,7 +88,7 @@ async function readWorkspaceGeneratorsCollection(
               name,
               collection: collectionName,
               options: await normalizeSchema(schemaJson.json),
-              description: '',
+              description: schemaJson.json.description ?? '',
               type,
             },
           } as CollectionInfo;
