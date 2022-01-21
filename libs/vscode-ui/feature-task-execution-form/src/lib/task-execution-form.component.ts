@@ -70,6 +70,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   @ViewChild('formHeaderContainer')
   formHeaderContainer: ElementRef<HTMLElement>;
 
+  get isMacOs() {
+    return navigator.userAgent.indexOf('Mac') > -1;
+  }
+
   private readonly activeFieldIdSubject = new BehaviorSubject<string>('');
   readonly activeFieldName$ = this.activeFieldIdSubject.pipe(
     distinctUntilChanged(),

@@ -125,7 +125,7 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     return Object.keys(this.control.errors ?? {})
       .map((key) => {
         if (this.control.errors) {
-          if (key === 'isRequired') {
+          if (key === 'required') {
             return `${fieldName
               .slice(0, 1)
               .toLocaleUpperCase()}${fieldName.slice(1)} is required`;
