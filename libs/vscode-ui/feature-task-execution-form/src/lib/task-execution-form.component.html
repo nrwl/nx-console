@@ -4,6 +4,8 @@
       taskExecForm.architect.configurations &&
       taskExecForm.architect.configurations.length > 0
     "
+    (document:keydown.meta.enter)="isMacOs && runCommand(taskExecForm)"
+    (document:keydown.control.enter)="!isMacOs && runCommand(taskExecForm)"
   >
     <div class="form-header-container" #formHeaderContainer>
       <div class="form-header">
@@ -57,7 +59,10 @@
         <form class="fields" [formGroup]="taskExecForm.form">
           <div class="title-container">
             <span class="title">
-              {{ taskExecForm.architect | formatTask: taskExecForm.form.get('configuration')?.value }}
+              {{
+                taskExecForm.architect
+                  | formatTask: taskExecForm.form.get('configuration')?.value
+              }}
             </span>
             <button
               (click)="
@@ -88,7 +93,7 @@
             <nx-console-argument-list
               [args]="runCommandArguments$ | async"
             ></nx-console-argument-list>
-            <div class ="fields-container">
+            <div class="fields-container">
               <ng-container *ngIf="defaultValues$ | async as defaultValues">
                 <nx-console-field
                   [id]="field.name + '-nx-console-field'"
