@@ -23,7 +23,6 @@
     "build-vs-code": "nps prepare.dev.vscode",
     "package": "nps prepare.and.package.vscode",
     "release": "standard-version",
-    "postinstall": "node ./tools/scripts/postinstall.js",
     "update": "nx migrate latest"
   },
   "dependencies": {
@@ -84,7 +83,6 @@
     "rxjs": "6.5.5",
     "shelljs": "0.8.3",
     "shx": "^0.3.2",
-    "source-map-explorer": "^1.8.0",
     "standard-version": "^9.1.1",
     "stylelint": "^10.1.0",
     "stylelint-config-standard": "^18.3.0",
