@@ -7849,11 +7849,6 @@ delegates@^1.0.0:
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
   integrity sha1-hMbhWbgZBP3KWaDvRM2HDTElD5o=
 
-denodeify@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/denodeify/-/denodeify-1.2.1.tgz#3a36287f5034e699e7577901052c2e6c94251631"
-  integrity sha1-OjYof1A05pnnV3kBBSwubJQlFjE=
-
 depd@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
@@ -13756,11 +13751,6 @@ os-browserify@^0.3.0:
   resolved "https://registry.yarnpkg.com/os-browserify/-/os-browserify-0.3.0.tgz#854373c7f5c2315914fc9bfc6bd8238fdda1ec27"
   integrity sha1-hUNzx/XCMVkU/Jv8a9gjj92h7Cc=
 
-os-homedir@^1.0.0:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/os-homedir/-/os-homedir-1.0.2.tgz#ffbc4988336e0e833de0c168c7ef152121aa7fb3"
-  integrity sha1-/7xJiDNuDoM94MFox+8VISGqf7M=
-
 os-locale@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/os-locale/-/os-locale-2.1.0.tgz#42bc2900a6b5b8bd17376c8e882b65afccf24bf2"
@@ -13775,14 +13765,6 @@ os-tmpdir@^1.0.0, os-tmpdir@~1.0.2:
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ=
 
-osenv@^0.1.3:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/osenv/-/osenv-0.1.5.tgz#85cdfafaeb28e8677f416e287592b5f3f49ea410"
-  integrity sha512-0CWcCECdMVc2Rw3U5w9ZjqX6ga6ubk1xDVKxtBQPK7wis/0F2r9T6k4ydGYhecl7YUBxBVxhL5oisPsNxAPe2g==
-  dependencies:
-    os-homedir "^1.0.0"
-    os-tmpdir "^1.0.0"
-
 ospath@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/ospath/-/ospath-1.2.2.tgz#1276639774a3f8ef2572f7fe4280e0ea4550c07b"
@@ -13793,17 +13775,17 @@ overlayscrollbars@^1.13.1:
   resolved "https://registry.yarnpkg.com/overlayscrollbars/-/overlayscrollbars-1.13.1.tgz#0b840a88737f43a946b9d87875a2f9e421d0338a"
   integrity sha512-gIQfzgGgu1wy80EB4/6DaJGHMEGmizq27xHIESrzXq0Y/J0Ay1P3DWk6tuVmEPIZH15zaBlxeEJOqdJKmowHCQ==
 
-ovsx@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/ovsx/-/ovsx-0.2.1.tgz#62624dd89dba2d47b36e6b6c220d90d7aba62a3e"
-  integrity sha512-STCpZrGq5YW4TiR+IFRqnTeKm6SBAYewHbgD75NYh9Zzy0/G72Y3zScvLiCRMGkhu+4HfP41X8sB83RUBmO0XA==
+ovsx@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/ovsx/-/ovsx-0.3.0.tgz#2f30c80c90fbe3c8fc406730c35371219187ca0a"
+  integrity sha512-UjZjzLt6Iq7LS/XFvEuBAWyn0zmsZEe8fuy5DsbcsIb0mW7PbVtB5Dhe4HeK7NJM228nyhYXC9WCeyBoMi4M3A==
   dependencies:
     commander "^6.1.0"
     follow-redirects "^1.13.2"
     is-ci "^2.0.0"
     leven "^3.1.0"
     tmp "^0.2.1"
-    vsce "~1.97.0"
+    vsce "^2.6.3"
 
 p-all@^2.1.0:
   version "2.1.0"
@@ -18207,11 +18189,6 @@ urix@^0.1.0:
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
 
-url-join@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/url-join/-/url-join-1.1.0.tgz#741c6c2f4596c4830d6718460920d0c92202dc78"
-  integrity sha1-dBxsL0WWxIMNZxhGCSDQySIC3Hg=
-
 url-join@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/url-join/-/url-join-4.0.1.tgz#b642e21a2646808ffa178c4c5fda39844e12cde7"
@@ -18428,32 +18405,6 @@ vsce@^2.6.3:
     typed-rest-client "^1.8.4"
     url-join "^4.0.1"
     xml2js "^0.4.23"
-    yauzl "^2.3.1"
-    yazl "^2.2.2"
-
-vsce@~1.97.0:
-  version "1.97.0"
-  resolved "https://registry.yarnpkg.com/vsce/-/vsce-1.97.0.tgz#78490745c3ce4f18c390fc1319c0b1250095a153"
-  integrity sha512-5Rxj6qO0dN4FnzVS9G94osstx8R3r1OQP39G7WYERpoO9X+OSodVVkRhFDapPNjekfUNo+d5Qn7W1EtNQVoLCg==
-  dependencies:
-    azure-devops-node-api "^11.0.1"
-    chalk "^2.4.2"
-    cheerio "^1.0.0-rc.9"
-    commander "^6.1.0"
-    denodeify "^1.2.1"
-    glob "^7.0.6"
-    leven "^3.1.0"
-    lodash "^4.17.15"
-    markdown-it "^10.0.0"
-    mime "^1.3.4"
-    minimatch "^3.0.3"
-    osenv "^0.1.3"
-    parse-semver "^1.1.1"
-    read "^1.0.7"
-    semver "^5.1.0"
-    tmp "^0.2.1"
-    typed-rest-client "^1.8.4"
-    url-join "^1.1.0"
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
