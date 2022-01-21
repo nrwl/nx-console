@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables';
 
 nx-console-checkbox {
   .description {
@@ -19,9 +19,9 @@ nx-console-checkbox {
   .checkbox {
     background-color: var(--vscode-settings-checkboxBackground, #eee);
     background-size: $checkbox-size !important;
-    border: solid $input-border-width
+    border: solid variables.$input-border-width
       var(--vscode-settings-checkboxBorder, #000);
-    border-radius: $input-border-radius-size;
+    border-radius: variables.$input-border-radius-size;
     color: var(--vscode-settings-checkboxForeground);
     height: $checkbox-size;
     width: $checkbox-size;

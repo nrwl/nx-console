@@ -1,5 +1,7 @@
-@import 'flex';
-@import 'variables';
+@use 'variables';
+@use 'flex';
+
+@include flex.utils;
 
 html,
 body {
@@ -9,5 +11,5 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: $scroll-bar-width !important;
+  width: variables.$scroll-bar-width !important;
 }
