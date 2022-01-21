@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "npm": "libs/npm",
     "schema": "libs/schema",
     "server": "libs/server",
     "typescript-plugin": "libs/typescript-plugin",

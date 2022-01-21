@@ -18,7 +18,7 @@
     "color": "#176BCC",
     "theme": "dark"
   },
-  "homepage": "https://nx.dev/latest/angular/cli/console",
+  "homepage": "https://nx.dev/using-nx/console#nx-console-for-vscode",
   "bugs": {
     "url": "https://github.com/nrwl/nx-console/issues"
   },
@@ -41,7 +41,9 @@
   ],
   "dependencies": {
     "jsonc-parser": "^3.0.0",
-    "@monodon/typescript-nx-imports-plugin": "0.2.0"
+    "@monodon/typescript-nx-imports-plugin": "0.2.0",
+    "@yarnpkg/fslib": "2.6.1-rc.5",
+    "@yarnpkg/libzip": "2.2.3-rc.5"
   },
   "contributes": {
     "typescriptServerPlugins": [
@@ -686,7 +688,7 @@
       },
       {
         "view": "nxConsole.views.welcome",
-        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vscode)"
+        "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
       }
     ],
     "walkthroughs": [
