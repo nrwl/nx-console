@@ -28,6 +28,10 @@ export async function workspaceDependencyPath(
   workspacePath: string,
   workspaceDependencyName: string
 ) {
+  if (workspaceDependencyName.startsWith('.')) {
+    return join(workspacePath, workspaceDependencyName);
+  }
+
   if (await isWorkspaceInPnp(workspacePath)) {
     return pnpDependencyPath(workspacePath, workspaceDependencyName);
   }
