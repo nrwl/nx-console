@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables';
 
 nx-console-autocomplete {
   .description {
@@ -9,24 +9,24 @@ nx-console-autocomplete {
 
   .autocomplete-container {
     position: relative;
-    width: $input-width - 2px;
+    width: variables.$input-width - 2px;
   }
 
   input {
     background-color: var(--vscode-settings-textInputBackground, #eee);
     border-color: var(--vscode-settings-textInputBorder);
     border-style: solid;
-    border-width: $input-border-width;
+    border-width: variables.$input-border-width;
     color: var(--vscode-settings-textInputForeground);
     box-sizing: border-box;
     font: inherit;
     padding: 0.3rem 0.5rem;
-    width: $input-width;
+    width: variables.$input-width;
   }
 
   input.ng-invalid.ng-dirty,
   input.ng-invalid.ng-touched {
-    border-color: $error-border-color;
+    border-color: variables.$error-border-color;
   }
 
   .autocomplete-panel {

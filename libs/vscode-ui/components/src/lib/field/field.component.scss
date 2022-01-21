@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables';
 
 :host {
   display: block;
@@ -17,7 +17,7 @@
   }
 
   .deprecated-warning {
-    color: $primary-text-color;
+    color: variables.$primary-text-color;
   }
 
   .setting-item-value {
@@ -27,6 +27,6 @@
 
   .validation-error {
     margin-top: 0.5rem;
-    color: $error-text-color;
+    color: variables.$error-text-color;
   }
 }

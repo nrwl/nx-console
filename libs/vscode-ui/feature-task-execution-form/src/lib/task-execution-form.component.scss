@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables';
 
 $filter-offset: 30px;
 $host-padding-top: 16px;
@@ -24,8 +24,9 @@ $offset-with-configurations: $offset-without-configurations +
 .run-button {
   width: 80px;
   height: 30px;
-  background: $button-primary-color;
-  border: $input-border-width solid var(--vscode-settings-textInputBorder);
+  background: variables.$button-primary-color;
+  border: variables.$input-border-width solid
+    var(--vscode-settings-textInputBorder);
   color: #fff;
   text-align: center;
   cursor: pointer;
@@ -89,7 +90,7 @@ nx-console-argument-list {
 }
 
 .fields-container {
-  flex: 1 1 $input-width;
+  flex: 1 1 variables.$input-width;
 }
 
 .filter-container {
@@ -97,7 +98,7 @@ nx-console-argument-list {
   border-style: solid;
   background-color: var(--vscode-settings-textInputBackground, #eee);
   border-color: var(--vscode-settings-textInputBorder);
-  border-radius: $input-border-radius-size;
+  border-radius: variables.$input-border-radius-size;
   height: 30px;
   box-sizing: border-box;
   padding: 0.3rem 0.5rem;
@@ -128,7 +129,7 @@ nx-console-field {
   border-left: 2px solid transparent;
 
   &.changed-from-default {
-    border-left-color: $button-primary-color;
+    border-left-color: variables.$button-primary-color;
   }
 }
 
@@ -157,15 +158,15 @@ nx-console-field {
   }
 
   button {
-    background-color: $button-secondary-color;
-    color: $secondary-text-color;
+    background-color: variables.$button-secondary-color;
+    color: variables.$secondary-text-color;
     padding: 2px 2px 1px 2px;
     border: none;
     margin-left: 0.5em;
 
     &:hover,
     &:focus {
-      background-color: $button-secondary-hover-color;
+      background-color: variables.$button-secondary-hover-color;
     }
   }
 
@@ -198,7 +199,7 @@ nx-console-field {
     cursor: pointer;
 
     &.selected {
-      border-bottom: 2px solid $primary-text-color;
+      border-bottom: 2px solid variables.$primary-text-color;
     }
   }
 }
