@@ -41,7 +41,9 @@
   ],
   "dependencies": {
     "jsonc-parser": "^3.0.0",
-    "@monodon/typescript-nx-imports-plugin": "0.2.0"
+    "@monodon/typescript-nx-imports-plugin": "0.2.0",
+    "@yarnpkg/fslib": "2.6.1-rc.5",
+    "@yarnpkg/libzip": "2.2.3-rc.5"
   },
   "contributes": {
     "typescriptServerPlugins": [

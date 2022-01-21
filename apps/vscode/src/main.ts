@@ -37,7 +37,6 @@ import {
   RunTargetTreeItem,
   RunTargetTreeProvider,
 } from '@nx-console/vscode/nx-run-target-view';
-import { verifyNodeModules } from '@nx-console/vscode/verify';
 import {
   NxCommandsTreeItem,
   NxCommandsTreeProvider,
@@ -87,18 +86,6 @@ export async function activate(c: ExtensionContext) {
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        const workspacePath = WorkspaceConfigurationStore.instance.get(
-          'nxWorkspacePath',
-          ''
-        );
-        if (!(await directoryExists(join(workspacePath, 'node_modules')))) {
-          const { validNodeModules: hasNodeModules } = await verifyNodeModules(
-            workspacePath
-          );
-          if (!hasNodeModules) {
-            return;
-          }
-        }
         revealWebViewPanel({
           runTargetTreeItem,
           context,

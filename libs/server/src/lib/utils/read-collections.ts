@@ -1,41 +1,30 @@
+import {
+  workspaceDependencies,
+  workspaceDependencyPath,
+} from '@nx-console/npm';
 import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
 import { platform } from 'os';
 import { dirname, join, resolve } from 'path';
-import {
-  clearJsonCache,
-  listOfUnnestedNpmPackages,
-  readAndCacheJsonFile,
-} from './utils';
+import { clearJsonCache, readAndCacheJsonFile } from './utils';
 
-export async function readCollectionsFromNodeModules(
+export async function readCollections(
   workspacePath: string,
   clearPackageJsonCache: boolean
 ): Promise<CollectionInfo[]> {
-  const nodeModulesDir = join(workspacePath, 'node_modules');
-
   if (clearPackageJsonCache) {
     clearJsonCache('package.json', workspacePath);
   }
 
-  const packages = await listOfUnnestedNpmPackages(nodeModulesDir);
+  const packages = await workspaceDependencies(workspacePath);
 
   const collections = await Promise.all(
     packages.map(async (p) => {
-      const { json } = await readAndCacheJsonFile(
-        join(p, 'package.json'),
-        nodeModulesDir
-      );
-      return {
-        packageName: p,
-        packageJson: json,
-      };
+      return await packageDetails(p);
     })
   );
 
   const allCollections = (
-    await Promise.all(
-      collections.map((c) => readCollections(nodeModulesDir, c.packageName))
-    )
+    await Promise.all(collections.map((c) => readCollection(workspacePath, c)))
   ).flat();
 
   /**
@@ -55,31 +44,28 @@ export async function readCollectionsFromNodeModules(
   return Array.from(dedupedCollections.values());
 }
 
-export async function readCollections(
-  nodeModulesDir: string,
-  collectionName: string
+async function readCollection(
+  workspacePath: string,
+  {
+    packagePath,
+    packageName,
+    packageJson: json,
+  }: {
+    packagePath: string;
+    packageName: string;
+    packageJson: any;
+  }
 ): Promise<CollectionInfo[] | null> {
   try {
-    const packageJson = await readAndCacheJsonFile(
-      join(collectionName, 'package.json'),
-      nodeModulesDir
-    );
-
     const [executorCollections, generatorCollections] = await Promise.all([
-      readAndCacheJsonFile(
-        packageJson.json.executors || packageJson.json.builders,
-        dirname(packageJson.path)
-      ),
-      readAndCacheJsonFile(
-        packageJson.json.generators || packageJson.json.schematics,
-        dirname(packageJson.path)
-      ),
+      readAndCacheJsonFile(json.executors || json.builders, packagePath),
+      readAndCacheJsonFile(json.generators || json.schematics, packagePath),
     ]);
 
     return getCollectionInfo(
-      collectionName,
-      packageJson.path,
-      nodeModulesDir,
+      workspacePath,
+      packageName,
+      packagePath,
       executorCollections,
       generatorCollections
     );
@@ -89,14 +75,12 @@ export async function readCollections(
 }
 
 export async function getCollectionInfo(
+  workspacePath: string,
   collectionName: string,
-  path: string,
-  collectionDir: string,
+  collectionPath: string,
   executorCollection: { path: string; json: any },
   generatorCollection: { path: string; json: any }
 ): Promise<CollectionInfo[]> {
-  const baseDir = dirname(path);
-
   const collectionMap: Map<string, CollectionInfo> = new Map();
 
   const buildCollectionInfo = (
@@ -105,7 +89,7 @@ export async function getCollectionInfo(
     type: 'executor' | 'generator',
     schemaPath: string
   ): CollectionInfo => {
-    let path = resolve(baseDir, dirname(schemaPath), value.schema);
+    let path = resolve(collectionPath, dirname(schemaPath), value.schema);
 
     if (platform() === 'win32') {
       path = `file:///${path.replace(/\\/g, '/')}`;
@@ -177,7 +161,21 @@ export async function getCollectionInfo(
       await Promise.all(
         extendedSchema
           .filter((extended) => extended !== '@nrwl/workspace')
-          .map((extended: string) => readCollections(collectionDir, extended))
+          .map(async (extended: string) => {
+            const dependencyPath = await workspaceDependencyPath(
+              workspacePath,
+              extended
+            );
+
+            if (!dependencyPath) {
+              return null;
+            }
+
+            return readCollection(
+              workspacePath,
+              await packageDetails(dependencyPath)
+            );
+          })
       )
     )
       .flat()
@@ -238,4 +236,13 @@ function canUse(
   s: { hidden: boolean; private: boolean; schema: string; extends: boolean }
 ): boolean {
   return !s.hidden && !s.private && !s.extends && name !== 'ng-add';
+}
+
+async function packageDetails(p: string) {
+  const { json } = await readAndCacheJsonFile(join(p, 'package.json'));
+  return {
+    packagePath: p,
+    packageName: json.name,
+    packageJson: json,
+  };
 }

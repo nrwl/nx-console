@@ -23,9 +23,13 @@ import {
   ParseError,
   printParseErrorCode,
 } from 'jsonc-parser';
-import { readdir } from 'fs/promises';
 import { getOutputChannel } from './output-channel';
 import { toNewFormat } from '@nrwl/tao/src/shared/workspace';
+import { PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
+import { getLibzipSync as libzip } from '@yarnpkg/libzip';
+
+const zipOpenFs = new ZipOpenFS({ libzip });
+export const crossFs = new PosixFS(zipOpenFs);
 
 export interface GeneratorDefaults {
   [name: string]: string;
@@ -44,50 +48,6 @@ const IMPORTANT_FIELD_NAMES = [
   'port',
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
-
-/**
- * Get a flat list of all node_modules folders in the workspace.
- * This is needed to continue to support Angular CLI projects.
- *
- * @param nodeModulesDir
- * @returns
- */
-export async function listOfUnnestedNpmPackages(
-  nodeModulesDir: string
-): Promise<string[]> {
-  const res: string[] = [];
-  const stats = await stat(nodeModulesDir);
-  if (!stats.isDirectory()) {
-    return res;
-  }
-
-  const dirContents = await readdir(nodeModulesDir);
-
-  for (const npmPackageOrScope of dirContents) {
-    if (npmPackageOrScope.startsWith('.')) {
-      continue;
-    }
-
-    const packageStats = await stat(
-      path.join(nodeModulesDir, npmPackageOrScope)
-    );
-    if (!packageStats.isDirectory()) {
-      continue;
-    }
-
-    if (npmPackageOrScope.startsWith('@')) {
-      (await readdir(path.join(nodeModulesDir, npmPackageOrScope))).forEach(
-        (p) => {
-          res.push(`${npmPackageOrScope}/${p}`);
-        }
-      );
-    } else {
-      res.push(npmPackageOrScope);
-    }
-  }
-
-  return res;
-}
 
 export function listFiles(dirName: string): string[] {
   // TODO use .gitignore to skip files
@@ -133,7 +93,7 @@ export async function fileExists(filePath: string): Promise<boolean> {
 }
 
 export async function readAndParseJson(filePath: string) {
-  const content = await readFile(filePath, 'utf-8');
+  const content = await crossFs.readFilePromise(filePath, 'utf8');
   try {
     return JSON.parse(content);
   } catch {
@@ -192,7 +152,7 @@ export async function readAndCacheJsonFile(
   }
   const fullFilePath = path.join(basedir, filePath);
   try {
-    const stats = await stat(fullFilePath);
+    const stats = await crossFs.statPromise(fullFilePath);
     if (fileContents[fullFilePath] || stats.isFile()) {
       fileContents[fullFilePath] ||= await readAndParseJson(fullFilePath);
       return {
