@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Nx Console Logo" src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-banner.svg" width="536"/>
+    <img alt="Nx Console Logo" src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-banner.png" width="536"/>
 </p>
 
 <div align="center">
