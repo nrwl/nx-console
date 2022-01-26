@@ -9,7 +9,8 @@ export class User {
 
     if (!id) {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      id = require('uuid/v4')();
+      const uuid: typeof import('uuid') = require('uuid');
+      id = uuid.v4();
       store.set('uuid', id);
     }
 
