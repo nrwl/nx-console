@@ -1,5 +1,7 @@
-const shell = require('shelljs');
+const { execSync } = require('child_process');
+const { normalize } = require('path');
 
-shell.exec('yarn install --prod', {
-  cwd: 'dist/apps/vscode',
+execSync('yarn install --prod', {
+  stdio: [0, 1, 2],
+  cwd: normalize('dist/apps/vscode'),
 });
