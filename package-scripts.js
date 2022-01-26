@@ -10,7 +10,7 @@ function affected(affectedCommand) {
 
 module.exports = {
   scripts: {
-    clean: 'shx rm -rf dist/',
+    clean: 'rimraf ./dist/',
     prepare: {
       and: {
         e2e: {
@@ -46,10 +46,7 @@ module.exports = {
       },
     },
     package: {
-      vscode: nps.series(
-        `shx rm -rf ${join('dist', 'apps', 'vscode', '**', '*-es5.js')}`,
-        `node ${join('tools', 'scripts', 'vscode-vsce.js')}`
-      ),
+      vscode: `node ${join('tools', 'scripts', 'vscode-vsce.js')}`,
     },
     format: {
       default: 'nx format:write --base=upstream/master',
@@ -75,7 +72,7 @@ module.exports = {
       vscode: `node ${join('tools', 'scripts', 'vscode-yarn.js')}`,
     },
     lint: {
-      default: "nx run-many --all --parallel --target=lint"
-    }
+      default: 'nx run-many --all --parallel --target=lint',
+    },
   },
 };
