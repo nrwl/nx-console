@@ -3,6 +3,7 @@ import { join } from 'path';
 import * as NxWorkspaceFileUtils from '@nrwl/workspace/src/core/file-utils';
 import { getOutputChannel } from '@nx-console/server';
 import { platform } from 'os';
+import { workspaceDependencyPath } from '@nx-console/npm';
 
 declare function __non_webpack_require__(importPath: string): any;
 
@@ -17,18 +18,24 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
     ''
   );
 
-  let importPath = join(
+  const nrwlWorkspaceDepPath = await workspaceDependencyPath(
     workspacePath,
-    'node_modules',
-    '@nrwl',
-    'workspace',
-    'src',
-    'core',
-    'file-utils.js'
+    '@nrwl/workspace'
   );
 
   return new Promise((res) => {
     try {
+      if (!nrwlWorkspaceDepPath) {
+        throw '@nrwl/workspace not found';
+      }
+
+      let importPath = join(
+        nrwlWorkspaceDepPath,
+        'src',
+        'core',
+        'file-utils.js'
+      );
+
       if (platform() === 'win32') {
         importPath = importPath.replace(/\\/g, '/');
       }
