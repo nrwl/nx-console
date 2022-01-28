@@ -38,24 +38,10 @@
     ]
   },
   "cli": {
-    "warnings": {
-      "typescriptMismatch": false,
-      "versionMismatch": false
-    },
     "packageManager": "yarn",
     "defaultCollection": "@nrwl/angular"
   },
   "generators": {
-    "@nrwl/schematics:component": {
-      "styleext": "scss"
-    },
-    "@nrwl/schematics:library": {
-      "unitTestRunner": "jest",
-      "framework": "angular"
-    },
-    "@nrwl/schematics:node-application": {
-      "framework": "express"
-    },
     "@nrwl/angular:application": {
       "style": "scss",
       "linter": "eslint",
@@ -63,7 +49,6 @@
       "e2eTestRunner": "cypress"
     },
     "@nrwl/angular:library": {
-      "style": "scss",
       "linter": "eslint",
       "unitTestRunner": "jest"
     },
