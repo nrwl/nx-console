@@ -65,11 +65,9 @@
     "@types/vscode": "1.50.0",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
-    "copy-webpack-plugin": "^9.0.1",
     "cypress": "6.5.0",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.1.0",
-    "husky": "^3.0.9",
     "jest": "27.2.3",
     "jest-preset-angular": "11.0.0",
     "ngx-build-plus": "13.0.1",
@@ -77,7 +75,6 @@
     "nps-utils": "1.7.0",
     "ovsx": "^0.3.0",
     "prettier": "2.3.2",
-    "pretty-quick": "^1.11.1",
     "rimraf": "^3.0.2",
     "rxjs": "6.5.5",
     "standard-version": "^9.1.1",
@@ -89,8 +86,6 @@
     "universal-analytics": "0.4.20",
     "vsce": "^2.6.3",
     "webpack": "^5.47.0",
-    "webpack-merge": "^5.8.0",
-    "webpack-node-externals": "^3.0.0",
     "zone.js": "0.11.4"
   }
 }
