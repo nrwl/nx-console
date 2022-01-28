@@ -65,6 +65,7 @@
     "@types/vscode": "1.50.0",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
+    "@yarnpkg/pnp": "^3.1.1-rc.12",
     "cypress": "6.5.0",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.1.0",
