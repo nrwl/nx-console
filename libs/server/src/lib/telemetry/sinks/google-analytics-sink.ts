@@ -2,6 +2,7 @@ import { Sink } from '../sink';
 import { TelemetryType } from '../record';
 import { User } from '../user';
 import { TelemetryMessageBuilder } from '../message-builder';
+import type { Visitor } from 'universal-analytics';
 
 // increment this if there is substancial changes to the schema,
 // and you want to create a new view that only has this data
@@ -28,7 +29,7 @@ class TelemetryParams {
 
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  visitor = require('universal-analytics')(TRACKING_ID, {
+  visitor: Visitor = require('universal-analytics')(TRACKING_ID, {
     uid: this.user.id,
   });
 
