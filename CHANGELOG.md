@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.14.0](https://github.com/nrwl/nx-console/compare/v17.13.7...v17.14.0) (2022-02-04)
+
+
+### Features
+
+* add support for yarn pnp ([#1213](https://github.com/nrwl/nx-console/issues/1213)) ([b6cfdbf](https://github.com/nrwl/nx-console/commits/b6cfdbffad948c87f6eb67a5b18395daa06154e3))
+* use cmd/ctrl+enter to execute generator while in the UI form ([#1229](https://github.com/nrwl/nx-console/issues/1229)) ([0e2e427](https://github.com/nrwl/nx-console/commits/0e2e427c3fd7e60aaa63f5e63bd7d7621956aee7))
+
+
+### Bug Fixes
+
+* check for duplicate collections based on type ([#1241](https://github.com/nrwl/nx-console/issues/1241)) ([079bbb0](https://github.com/nrwl/nx-console/commits/079bbb0a8e726f3cc047c5f822acebc025f8187a))
+* fixed CI Node Setup and Caching ([#1215](https://github.com/nrwl/nx-console/issues/1215)) ([e99e226](https://github.com/nrwl/nx-console/commits/e99e226df146f60b2c4b995c2ddc1307f15b003a))
+* inline copy-to-clipboard icon ([#1220](https://github.com/nrwl/nx-console/issues/1220)) ([5e113df](https://github.com/nrwl/nx-console/commits/5e113dfefe9fc3318965d043e37128e6b7cdce42))
+* remove title for workspace generators ([3c20ffe](https://github.com/nrwl/nx-console/commits/3c20ffe534ab20de71f76db1db8e7c48c8389334))
+* run executors that are local to the workspace (ie local executors) ([#1230](https://github.com/nrwl/nx-console/issues/1230)) ([a7f2362](https://github.com/nrwl/nx-console/commits/a7f236278167eb777ff7fc5b81010e5dc4312a37))
+* run pnp.setup to patch require ([#1240](https://github.com/nrwl/nx-console/issues/1240)) ([919e05d](https://github.com/nrwl/nx-console/commits/919e05d37aa99e8ddb99bea21228d9cdd02bf6ab))
+* show description when running workspace generators/schematics ([#1225](https://github.com/nrwl/nx-console/issues/1225)) ([776d2a4](https://github.com/nrwl/nx-console/commits/776d2a47f10bd3e287de49021dbc9c16daabf121))
+* update default branch text to "main" ([#1143](https://github.com/nrwl/nx-console/issues/1143)) ([a15f2b4](https://github.com/nrwl/nx-console/commits/a15f2b4d7f0f3939226c705f79825b18a22ec378))
+* update nx docs urls ([#1222](https://github.com/nrwl/nx-console/issues/1222)) ([3dc48e0](https://github.com/nrwl/nx-console/commits/3dc48e079374f9a1304b69499f0797ae30bd0087))
+
 ### [17.13.7](https://github.com/nrwl/nx-console/compare/v17.13.6...v17.13.7) (2022-01-14)
 
 
