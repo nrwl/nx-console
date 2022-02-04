@@ -2,6 +2,11 @@ import { Option } from '@nx-console/schema';
 import { QuickPickItem, window } from 'vscode';
 import { CliTaskFlagQuickPickItem } from './cli-task-flag-quick-pick-item';
 
+/**
+ * Returns undefined if the user wants to cancel the command.
+ * Returns an empty array to run the command without flags.
+ * Returns an array populated with flags if the user provides them.
+ */
 export async function selectFlags(
   command: string,
   options: Option[],
@@ -83,7 +88,7 @@ function promptForFlagValue(flagToSet: CliTaskFlagQuickPickItem) {
   } else if (flagToSet.option.enum && flagToSet.option.enum.length) {
     return window.showQuickPick([...flagToSet.option.enum.map(String)], {
       placeHolder,
-      canPickMany: flagToSet.option.type === 'array'
+      canPickMany: flagToSet.option.type === 'array',
     });
   } else {
     return window.showInputBox({

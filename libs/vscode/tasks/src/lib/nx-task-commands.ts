@@ -252,21 +252,7 @@ async function promptForAffectedFlags(target: string) {
   const telemetry = getTelemetry();
   telemetry.featureUsed('affected-cli');
 
-  let positional: string | undefined;
-  let command: string;
-
-  switch (target) {
-    case 'apps':
-    case 'libs':
-    case 'dep-graph':
-      command = `affected:${target}`;
-      break;
-    default:
-      command = 'affected';
-      positional = `--target=${target}`;
-      await selectFlags(`affected ${positional}`, AFFECTED_OPTIONS, 'nx');
-  }
-  const flags = await selectFlags(command, AFFECTED_OPTIONS, 'nx');
+  const { positional, command, flags } = await selectAffectedFlags(target);
 
   if (flags !== undefined) {
     const task = NxTask.create(
@@ -278,6 +264,39 @@ async function promptForAffectedFlags(target: string) {
       cliTaskProvider.getWorkspacePath()
     );
     tasks.executeTask(task);
+  }
+}
+
+/**
+ *
+ */
+async function selectAffectedFlags(target: string): Promise<{
+  command: string;
+  flags: string[] | undefined;
+  positional?: string;
+}> {
+  switch (target) {
+    case 'apps':
+    case 'libs':
+    case 'dep-graph': {
+      const command = `affected:${target}`;
+      return {
+        command,
+        flags: await selectFlags(command, AFFECTED_OPTIONS, 'nx'),
+      };
+    }
+    default: {
+      const positional = `--target=${target}`;
+      return {
+        command: 'affected',
+        positional,
+        flags: await selectFlags(
+          `affected ${positional}`,
+          AFFECTED_OPTIONS,
+          'nx'
+        ),
+      };
+    }
   }
 }
 
