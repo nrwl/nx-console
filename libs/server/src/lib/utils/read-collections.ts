@@ -36,8 +36,15 @@ export async function readCollections(
       continue;
     }
 
-    if (!dedupedCollections.has(singleCollection.name)) {
-      dedupedCollections.set(singleCollection.name, singleCollection);
+    if (
+      !dedupedCollections.has(
+        collectionNameWithType(singleCollection.name, singleCollection.type)
+      )
+    ) {
+      dedupedCollections.set(
+        collectionNameWithType(singleCollection.name, singleCollection.type),
+        singleCollection
+      );
     }
   }
 
@@ -116,10 +123,15 @@ export async function getCollectionInfo(
       'executor',
       executorCollection.path
     );
-    if (collectionMap.has(collectionInfo.name)) {
+    if (
+      collectionMap.has(collectionNameWithType(collectionInfo.name, 'executor'))
+    ) {
       continue;
     }
-    collectionMap.set(collectionInfo.name, collectionInfo);
+    collectionMap.set(
+      collectionNameWithType(collectionInfo.name, 'executor'),
+      collectionInfo
+    );
   }
 
   const generators = {
@@ -143,10 +155,17 @@ export async function getCollectionInfo(
         key,
         schema
       );
-      if (collectionMap.has(collectionInfo.name)) {
+      if (
+        collectionMap.has(
+          collectionNameWithType(collectionInfo.name, 'generator')
+        )
+      ) {
         continue;
       }
-      collectionMap.set(collectionInfo.name, collectionInfo);
+      collectionMap.set(
+        collectionNameWithType(collectionInfo.name, 'generator'),
+        collectionInfo
+      );
     } catch (e) {
       // noop - generator is invalid
     }
@@ -236,6 +255,10 @@ function canUse(
   s: { hidden: boolean; private: boolean; schema: string; extends: boolean }
 ): boolean {
   return !s.hidden && !s.private && !s.extends && name !== 'ng-add';
+}
+
+function collectionNameWithType(name: string, type: 'generator' | 'executor') {
+  return `${name}-${type}`;
 }
 
 async function packageDetails(p: string) {
