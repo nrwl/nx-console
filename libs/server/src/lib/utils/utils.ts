@@ -1,8 +1,10 @@
-import { schema } from '@angular-devkit/core';
-import { standardFormats } from '@angular-devkit/schematics/src/formats';
-import { Option as CliOption } from '@angular/cli/models/interface';
-import { parseJsonSchemaToOptions } from '@angular/cli/utilities/json-schema';
-import type { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { Schema } from '@nrwl/tao/src/shared/params';
+import * as path from 'path';
+import type {
+  WorkspaceJsonConfiguration,
+  NxJsonConfiguration,
+} from '@nrwl/devkit';
+
 import {
   ItemsWithEnum,
   ItemTooltips,
@@ -10,7 +12,10 @@ import {
   Option,
   OptionItemLabelValue,
   XPrompt,
+  CliOption,
+  OptionPropertyDescription,
 } from '@nx-console/schema';
+
 import { readdirSync, statSync } from 'fs';
 import { readFile, stat } from 'fs/promises';
 import {
@@ -18,9 +23,13 @@ import {
   ParseError,
   printParseErrorCode,
 } from 'jsonc-parser';
-import { readdir } from 'fs/promises';
-import * as path from 'path';
 import { getOutputChannel } from './output-channel';
+import { toNewFormat } from '@nrwl/tao/src/shared/workspace';
+import { PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
+import { getLibzipSync as libzip } from '@yarnpkg/libzip';
+
+const zipOpenFs = new ZipOpenFS({ libzip });
+export const crossFs = new PosixFS(zipOpenFs);
 
 export interface GeneratorDefaults {
   [name: string]: string;
@@ -39,50 +48,6 @@ const IMPORTANT_FIELD_NAMES = [
   'port',
 ];
 const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
-
-/**
- * Get a flat list of all node_modules folders in the workspace.
- * This is needed to continue to support Angular CLI projects.
- *
- * @param nodeModulesDir
- * @returns
- */
-export async function listOfUnnestedNpmPackages(
-  nodeModulesDir: string
-): Promise<string[]> {
-  const res: string[] = [];
-  const stats = await stat(nodeModulesDir);
-  if (!stats.isDirectory()) {
-    return res;
-  }
-
-  const dirContents = await readdir(nodeModulesDir);
-
-  for (const npmPackageOrScope of dirContents) {
-    if (npmPackageOrScope.startsWith('.')) {
-      continue;
-    }
-
-    const packageStats = await stat(
-      path.join(nodeModulesDir, npmPackageOrScope)
-    );
-    if (!packageStats.isDirectory()) {
-      continue;
-    }
-
-    if (npmPackageOrScope.startsWith('@')) {
-      (await readdir(path.join(nodeModulesDir, npmPackageOrScope))).forEach(
-        (p) => {
-          res.push(`${npmPackageOrScope}/${p}`);
-        }
-      );
-    } else {
-      res.push(npmPackageOrScope);
-    }
-  }
-
-  return res;
-}
 
 export function listFiles(dirName: string): string[] {
   // TODO use .gitignore to skip files
@@ -119,16 +84,16 @@ export async function directoryExists(filePath: string): Promise<boolean> {
   }
 }
 
-export function fileExistsSync(filePath: string): boolean {
+export async function fileExists(filePath: string): Promise<boolean> {
   try {
-    return statSync(filePath).isFile();
+    return (await stat(filePath)).isFile();
   } catch {
     return false;
   }
 }
 
 export async function readAndParseJson(filePath: string) {
-  const content = await readFile(filePath, 'utf-8');
+  const content = await crossFs.readFilePromise(filePath, 'utf8');
   try {
     return JSON.parse(content);
   } catch {
@@ -185,51 +150,49 @@ export async function readAndCacheJsonFile(
       json: {},
     };
   }
-
   const fullFilePath = path.join(basedir, filePath);
-  const stats = await stat(fullFilePath);
-  if (fileContents[fullFilePath] || stats.isFile()) {
-    fileContents[fullFilePath] ||= await readAndParseJson(fullFilePath);
-
-    return {
-      path: fullFilePath,
-      json: fileContents[fullFilePath],
-    };
-  } else {
-    return {
-      path: fullFilePath,
-      json: {},
-    };
+  try {
+    const stats = await crossFs.statPromise(fullFilePath);
+    if (fileContents[fullFilePath] || stats.isFile()) {
+      fileContents[fullFilePath] ||= await readAndParseJson(fullFilePath);
+      return {
+        path: fullFilePath,
+        json: fileContents[fullFilePath],
+      };
+    }
+  } catch (e) {
+    getOutputChannel().appendLine(`${fullFilePath} does not exist`);
   }
+
+  return {
+    path: fullFilePath,
+    json: {},
+  };
 }
 
-const registry = new schema.CoreSchemaRegistry(standardFormats);
-
 export async function normalizeSchema(
-  s: {
-    properties: { [k: string]: any };
-    required: string[];
-  },
+  s: Schema,
   projectDefaults?: GeneratorDefaults
 ): Promise<Option[]> {
-  const options: CliOption[] = await parseJsonSchemaToOptions(registry, s);
+  const options = schemaToOptions(s);
   const requiredFields = new Set(s.required || []);
 
   const nxOptions = options.map((option) => {
-    const xPrompt: XPrompt = s.properties[option.name]['x-prompt'];
+    const xPrompt: XPrompt | undefined = option['x-prompt'];
     const workspaceDefault = projectDefaults && projectDefaults[option.name];
-    const $default = s.properties[option.name].$default;
+    const $default = option.$default;
 
     const nxOption: Option = {
       ...option,
-      required: isFieldRequired(requiredFields, option, xPrompt, $default),
+      isRequired: isFieldRequired(requiredFields, option, xPrompt, $default),
+      aliases: option.alias ? [option.alias] : [],
       ...(workspaceDefault !== undefined && { default: workspaceDefault }),
       ...($default && { $default }),
       ...(option.enum && { items: option.enum.map((item) => item.toString()) }),
       // Strongly suspect items does not belong in the Option schema.
       //  Angular Option doesn't have the items property outside of x-prompt,
       //  but items is used in @schematics/angular - guard
-      ...getItems(s.properties[option.name]),
+      ...getItems(option),
     };
 
     if (xPrompt) {
@@ -282,8 +245,8 @@ export async function normalizeSchema(
 
 function isFieldRequired(
   requiredFields: Set<string>,
-  nxOption: Option,
-  xPrompt: XPrompt,
+  nxOption: CliOption,
+  xPrompt: XPrompt | undefined,
   $default: any
 ): boolean {
   // checks schema.json requiredFields and xPrompt for required
@@ -297,11 +260,11 @@ function isFieldRequired(
   );
 }
 
-function getItems(option: Option): { items: string[] } | undefined {
+function getItems(option: CliOption): { items: string[] } | undefined {
   return (
     option.items && {
       items:
-        (option.items as ItemsWithEnum)?.enum ||
+        (option.items as ItemsWithEnum).enum ||
         ((option.items as string[]).length && option.items),
     }
   );
@@ -344,33 +307,57 @@ export function getPrimitiveValue(value: any): string | undefined {
   }
 }
 
-function renameProperty(obj: any, from: string, to: string) {
-  obj[to] = obj[from];
-  delete obj[from];
-}
-
-export function toWorkspaceFormat(w: any): WorkspaceJsonConfiguration {
-  Object.values(w.projects || {}).forEach((project: any) => {
-    if (project.architect) {
-      renameProperty(project, 'architect', 'targets');
-    }
-    if (project.schematics) {
-      renameProperty(project, 'schematics', 'generators');
-    }
-    Object.values(project.targets || {}).forEach((target: any) => {
-      if (target.builder) {
-        renameProperty(target, 'builder', 'executor');
-      }
-    });
-  });
-
-  const sortedProjects = Object.entries(w.projects || {}).sort(
+export function toWorkspaceFormat(
+  w: any
+): WorkspaceJsonConfiguration & NxJsonConfiguration {
+  const newFormat = toNewFormat(w) as WorkspaceJsonConfiguration &
+    NxJsonConfiguration;
+  const sortedProjects = Object.entries(newFormat.projects || {}).sort(
     (projectA, projectB) => projectA[0].localeCompare(projectB[0])
   );
-  w.projects = Object.fromEntries(sortedProjects);
+  newFormat.projects = Object.fromEntries(sortedProjects);
+  return newFormat;
+}
 
-  if (w.schematics) {
-    renameProperty(w, 'schematics', 'generators');
+function schemaToOptions(schema: Schema): CliOption[] {
+  return Object.keys(schema.properties || {}).reduce<CliOption[]>(
+    (cliOptions, option) => {
+      const currentProperty = schema.properties[option];
+      const $default = currentProperty.$default;
+      const $defaultIndex =
+        $default?.['$source'] === 'argv' ? $default['index'] : undefined;
+      const positional: number | undefined =
+        typeof $defaultIndex === 'number' ? $defaultIndex : undefined;
+
+      const visible = isPropertyVisible(option, currentProperty);
+      if (!visible) {
+        return cliOptions;
+      }
+
+      cliOptions.push({
+        name: option,
+        positional,
+        ...currentProperty,
+      });
+      return cliOptions;
+    },
+    []
+  );
+}
+
+function isPropertyVisible(
+  option: string,
+  property: OptionPropertyDescription
+): boolean {
+  const ALWAYS_VISIBLE_OPTIONS = ['path'];
+
+  if (ALWAYS_VISIBLE_OPTIONS.includes(option)) {
+    return true;
   }
-  return w;
+
+  if ('hidden' in property) {
+    return !(property as any)['hidden'];
+  }
+
+  return property.visible ?? true;
 }

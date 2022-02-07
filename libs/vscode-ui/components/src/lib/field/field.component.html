@@ -1,6 +1,6 @@
 <div class="field-title" [attr.title]="field.tooltip ? field.tooltip : null">
   {{ field.name }}
-  <ng-container *ngIf="field.required">*</ng-container>
+  <ng-container *ngIf="field.isRequired">*</ng-container>
   <span class="deprecated-warning" *ngIf="field.deprecated">(deprecated)</span>
 </div>
 

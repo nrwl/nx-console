@@ -2,8 +2,7 @@ import { Component, DebugElement, ViewChild } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { OptionType } from '@angular/cli/models/interface';
-import { Option } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/schema';
 import { MultipleSelectComponent } from './multiple-select.component';
 import { FieldItemsPipe } from '../field-items/field-items.pipe';
 
@@ -12,6 +11,7 @@ const mockOption: Option = {
   name: 'style',
   description: 'The file extension to be used for style files.',
   type: OptionType.Array,
+  isRequired: false,
   aliases: [],
   items: {
     type: OptionType.String,
@@ -55,7 +55,11 @@ describe('MultipleSelectComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [ParentFormComponent, MultipleSelectComponent, FieldItemsPipe],
+        declarations: [
+          ParentFormComponent,
+          MultipleSelectComponent,
+          FieldItemsPipe,
+        ],
         imports: [ReactiveFormsModule],
       }).compileComponents();
     })

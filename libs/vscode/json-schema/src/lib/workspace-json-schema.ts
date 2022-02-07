@@ -9,7 +9,7 @@ let FILE_WATCHER: vscode.FileSystemWatcher;
 export class WorkspaceJsonSchema {
   constructor(context: vscode.ExtensionContext) {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspaceJsonPath',
+      'nxWorkspacePath',
       ''
     );
 
@@ -21,12 +21,9 @@ export class WorkspaceJsonSchema {
      * Whenever a new package is added to the package.json, we recreate the schema.
      * This allows newly added plugins to be added
      */
-    FILE_WATCHER = watchFile(
-      join(dirname(workspacePath), 'package.json'),
-      () => {
-        this.setupSchema(workspacePath, context.extensionUri, true);
-      }
-    );
+    FILE_WATCHER = watchFile(join(workspacePath, 'package.json'), () => {
+      this.setupSchema(workspacePath, context.extensionUri, true);
+    });
     context.subscriptions.push(FILE_WATCHER);
 
     this.setupSchema(workspacePath, context.extensionUri);
@@ -133,7 +130,6 @@ function createJsonSchema(builders: string, executors: string) {
           "required": ["version"]
         },
         "then": {
-          "description": "Read more about this workspace file at https://nx.dev/latest/angular/getting-started/configuration",
           "properties": {
             "projects": {
               "type": "object",
@@ -176,7 +172,6 @@ function createJsonSchema(builders: string, executors: string) {
           "required": ["version"]
         },
         "then": {
-          "description": "Read more about this workspace file at https://nx.dev/latest/react/getting-started/configuration",
           "properties": {
            "projects": {
               "type": "object",

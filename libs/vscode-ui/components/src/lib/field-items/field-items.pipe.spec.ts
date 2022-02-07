@@ -1,4 +1,4 @@
-import { OptionType } from '@angular/cli/models/interface';
+import { OptionType } from '@nx-console/schema';
 import { FieldItemsPipe, getOptionItems } from './field-items.pipe';
 
 describe('FieldItemsPipe', () => {
@@ -13,6 +13,7 @@ describe('FieldItemsPipe', () => {
       type: OptionType.String,
       aliases: [],
       description: 'The file extension to be used for style files.',
+      isRequired: false,
       default: 'scss',
       items: {
         type: OptionType.String,
@@ -24,10 +25,11 @@ describe('FieldItemsPipe', () => {
     const field2 = {
       name: 'style',
       type: OptionType.String,
+      isRequired: false,
       aliases: [],
       description: 'The file extension to be used for style files.',
       default: 'scss',
-      items: ['css', 'scss', 'styl', 'less']
+      items: ['css', 'scss', 'styl', 'less'],
     };
     expect(getOptionItems(field2)).toEqual(field2.items);
   });

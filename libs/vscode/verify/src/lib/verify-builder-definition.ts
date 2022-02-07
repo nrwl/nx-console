@@ -1,17 +1,19 @@
-import { Option } from '@nx-console/schema';
-import { readBuilderSchema, getTelemetry } from '@nx-console/server';
-import { window } from 'vscode';
-import { OptionType } from '@angular/cli/models/interface';
-import { dirname, join } from 'path';
-import { existsSync } from 'fs';
-import { revealNxProject } from '@nx-console/vscode/nx-workspace';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { Option, OptionType } from '@nx-console/schema';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import {
+  fileExists,
+  getTelemetry,
+  readBuilderSchema,
+} from '@nx-console/server';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { join } from 'path';
+import { window } from 'vscode';
 
 const RUN_ONE_OPTIONS = [
   {
     name: 'with-deps',
     type: OptionType.Boolean,
+    isRequired: false,
     description:
       'Include dependencies of specified projects when computing what to run',
     default: false,
@@ -19,30 +21,35 @@ const RUN_ONE_OPTIONS = [
   {
     name: 'parallel',
     type: OptionType.Boolean,
+    isRequired: false,
     description: 'Parallelize the command',
     default: 'false',
   },
   {
     name: 'maxParallel',
     type: OptionType.Number,
+    isRequired: false,
     description: 'Max number of parallel processes',
     default: 3,
   },
   {
     name: 'only-failed',
     type: OptionType.Boolean,
+    isRequired: false,
     description: 'Isolate projects which previously failed',
     default: 'false',
   },
   {
     name: 'skip-nx-cache',
     type: OptionType.Boolean,
+    isRequired: false,
     description:
       'Rerun the tasks even when the results are available in the cache',
     default: false,
   },
   {
     name: 'exclude',
+    isRequired: false,
     type: OptionType.String,
     description: 'Exclude certain projects from being processed',
   },
@@ -66,18 +73,10 @@ export async function verifyBuilderDefinition(
   const executorName = commandDef.executor;
 
   if (!executorName) {
-    window
-      .showErrorMessage(
-        `Please update ${project}'s ${command} definition to specify a builder.`,
-        'See definition'
-      )
-      .then((value) => {
-        if (value) {
-          revealNxProject(project, {
-            name: command,
-          });
-        }
-      });
+    window.showErrorMessage(
+      `Please update ${project}'s ${command} definition to specify a builder.`,
+      'See definition'
+    );
     getTelemetry().exception('Builder part of architect definition not found');
     return {
       validBuilder: false,
@@ -94,19 +93,11 @@ export async function verifyBuilderDefinition(
   );
 
   if (!options) {
-    window
-      .showErrorMessage(
-        `Builder specified for ${project} ${command} was not found in your node_modules. Check that specified builder is correct and has a corresponding entry in package.json`,
-        'Show definition'
-      )
-      .then((value) => {
-        if (value) {
-          revealNxProject(project, {
-            name: command,
-          });
-        }
-      });
-    getTelemetry().exception('Specified builder not found in node_modules');
+    window.showErrorMessage(
+      `Builder specified for ${project} ${command} was not found in your dependencies. Check that specified builder is correct and has a corresponding entry in package.json`,
+      'Show definition'
+    );
+    getTelemetry().exception('Specified builder not found in dependencies');
 
     return {
       validBuilder: false,
@@ -116,7 +107,7 @@ export async function verifyBuilderDefinition(
     };
   }
 
-  const isNxWorkspace = existsSync(join(workspacePath(), 'nx.json'));
+  const isNxWorkspace = await fileExists(join(workspacePath(), 'nx.json'));
   return {
     validBuilder: true,
     builderName: executorName,
@@ -126,7 +117,5 @@ export async function verifyBuilderDefinition(
 }
 
 function workspacePath() {
-  return dirname(
-    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
-  );
+  return WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
 }

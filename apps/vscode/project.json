@@ -8,13 +8,14 @@
     "build": {
       "executor": "@nrwl/node:build",
       "options": {
-        "externalDependencies": ["vscode", "tslint"],
+        "externalDependencies": ["vscode"],
         "webpackConfig": "apps/vscode/webpack.config.js",
         "outputPath": "dist/apps/vscode",
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
         "assets": [
           "apps/vscode/src/package.json",
+          "apps/vscode/src/nx-schema.json",
           "apps/vscode/src/tree-view-icon.svg",
           "apps/vscode/src/assets",
           "apps/vscode/src/getting-started",
@@ -25,6 +26,11 @@
           },
           {
             "glob": "CHANGELOG.md",
+            "input": "./",
+            "output": "/"
+          },
+          {
+            "glob": "LICENSE",
             "input": "./",
             "output": "/"
           }

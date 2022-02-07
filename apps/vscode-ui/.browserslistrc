@@ -1,0 +1,3 @@
+# vscode ^1.50.0 uses electron 9.2.1
+# increase when updating supported vscode versions
+electron >= 9.2.1

@@ -9,5 +9,5 @@
   [style.display]="filteredFields.has(field.name) ? 'block' : 'none'"
 >
   {{ camelToTitle(field.name) }}
-  <ng-container *ngIf="field.required">*</ng-container>
+  <ng-container *ngIf="field.isRequired">*</ng-container>
 </div>

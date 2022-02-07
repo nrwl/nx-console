@@ -1,17 +1,20 @@
 import { normalizeSchema } from './utils';
-import { OptionType } from '@angular/cli/models/interface';
-import { LongFormXPrompt, Option } from '@nx-console/schema';
+import {
+  LongFormXPrompt,
+  Option,
+  OptionType,
+  OptionPropertyDescription,
+} from '@nx-console/schema';
+import { Schema } from '@nrwl/tao/src/shared/params';
 
 describe('utils', () => {
   describe('normalizeSchema', () => {
-    const mockOption: any = {
-      name: 'style',
+    const mockOption: OptionPropertyDescription = {
       description: 'The file extension to be used for style files.',
       type: OptionType.String,
-      aliases: [],
     };
     const getSchema = async (
-      options: any[],
+      options: Schema['properties'],
       required: string[] = []
     ): Promise<Option[]> => {
       const r = await normalizeSchema({
@@ -21,14 +24,20 @@ describe('utils', () => {
       return r;
     };
 
+    it('should work with schema without any properties', async () => {
+      // @ts-expect-error absence of required property "properties" is needed to test failure resistance
+      const r = await normalizeSchema({})
+      expect(r).toEqual([])
+    });
+
     it('should mark fields as required if they are listed in the required array', async () => {
-      const r = await getSchema([mockOption], ['0']);
-      expect(r[0].required).toBeTruthy();
+      const r = await getSchema({ mockOption }, ['mockOption']);
+      expect(r[0].isRequired).toBeTruthy();
     });
 
     it('should not mark fields as required otherwise', async () => {
-      const r = await getSchema([mockOption]);
-      expect(r[0].required).toBeFalsy();
+      const r = await getSchema({ mockOption });
+      expect(r[0].isRequired).toBeFalsy();
     });
 
     it('should sort positional arguments by ascending order', async () => {
@@ -48,7 +57,7 @@ describe('utils', () => {
         ...mockOption,
         enum: ['test'],
       };
-      const r = await getSchema([option]);
+      const r = await getSchema({ option });
       expect(r[0].items).toEqual(['test']);
     });
 
@@ -70,7 +79,7 @@ describe('utils', () => {
           ...mockOption,
           'x-prompt': xPromptMessage,
         };
-        const r = await getSchema([option]);
+        const r = await getSchema({ option });
         expect(r[0].tooltip).toBe(xPromptMessage);
       });
 
@@ -79,12 +88,12 @@ describe('utils', () => {
           message: 'test',
           type: 'confirmation',
         };
-        const option = {
+        const option: OptionPropertyDescription = {
           ...mockOption,
-          enum: [...Array(11).keys()],
-          'x-prompt': xPrompt,
+          enum: [...Array(11).keys()].map((i) => i.toString()),
+          'x-prompt': xPrompt as any,
         };
-        const r = await getSchema([option]);
+        const r = await getSchema({ option });
         expect(r[0].tooltip).toBe(xPrompt.message);
       });
 
@@ -97,7 +106,7 @@ describe('utils', () => {
             items: xPromptItems,
           },
         };
-        const r = await getSchema([option]);
+        const r = await getSchema({ option });
         expect(r[0].itemTooltips).toEqual({
           css: xPromptItems[0].label,
           scss: xPromptItems[1].label,
@@ -113,7 +122,7 @@ describe('utils', () => {
             items: xPromptItems,
           },
         };
-        const r = await getSchema([option]);
+        const r = await getSchema({ option });
         expect(r[0].items).toEqual([
           xPromptItems[0].value,
           xPromptItems[1].value,
@@ -129,7 +138,7 @@ describe('utils', () => {
             items: ['test'],
           },
         };
-        const r = await getSchema([option]);
+        const r = await getSchema({ option });
         expect(r[0].items).toEqual(['test']);
       });
     });

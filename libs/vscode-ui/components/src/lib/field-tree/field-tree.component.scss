@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables';
 
 :host {
   display: block;
@@ -18,14 +18,14 @@
   user-select: none;
 
   &:hover {
-    color: $primary-text-color;
+    color: variables.$primary-text-color;
   }
 
   &:active,
   &.active {
     opacity: 1;
     font-weight: bold;
-    color: $primary-text-color;
+    color: variables.$primary-text-color;
   }
 
   &.indented {
@@ -38,9 +38,9 @@
   }
 
   &.valid {
-    color: $modified-text-color;
+    color: variables.$modified-text-color;
   }
   &.error {
-    color: $error-text-color;
+    color: variables.$error-text-color;
   }
 }

@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Nx Console",
   "description": "Nx Console for Visual Studio Code",
-  "version": "17.12.0",
+  "version": "17.14.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"
@@ -18,7 +18,7 @@
     "color": "#176BCC",
     "theme": "dark"
   },
-  "homepage": "https://nx.dev/latest/angular/cli/console",
+  "homepage": "https://nx.dev/using-nx/console#nx-console-for-vscode",
   "bugs": {
     "url": "https://github.com/nrwl/nx-console/issues"
   },
@@ -37,13 +37,21 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onView:nx-console"
+    "onStartupFinished"
   ],
   "dependencies": {
-    "jsonc-parser": "^3.0.0"
+    "jsonc-parser": "^3.0.0",
+    "@monodon/typescript-nx-imports-plugin": "0.2.0",
+    "@yarnpkg/fslib": "2.6.1-rc.5",
+    "@yarnpkg/libzip": "2.2.3-rc.5"
   },
   "contributes": {
+    "typescriptServerPlugins": [
+      {
+        "enableForWorkspaceTypeScriptVersions": true,
+        "name": "@monodon/typescript-nx-imports-plugin"
+      }
+    ],
     "menus": {
       "explorer/context": [
         {
@@ -581,6 +589,11 @@
           "type": "boolean",
           "default": true,
           "description": "Shows or hides CodeLens for running targets from the Nx workspace config file."
+        },
+        "nxConsole.enableLibraryImports": {
+          "type": "boolean",
+          "default": true,
+          "description": "Configures a TypeScript language server plugin to include configured libraries in root files for TypeScript projects. This allows for importing libraries into other libraries even when the import was not there before."
         }
       }
     },
@@ -675,7 +688,7 @@
       },
       {
         "view": "nxConsole.views.welcome",
-        "contents": "[Getting Started](https://nx.dev/latest/angular/getting-started/console#nx-console-for-vscode)"
+        "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
       }
     ],
     "walkthroughs": [
@@ -765,6 +778,10 @@
       {
         "fileMatch": "project.json",
         "url": "./project-schema.json"
+      },
+      {
+        "fileMatch": "nx.json",
+        "url": "./nx-schema.json"
       }
     ]
   }

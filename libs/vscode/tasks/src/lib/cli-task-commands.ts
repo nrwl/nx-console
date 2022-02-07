@@ -9,8 +9,7 @@ import {
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
-import { GeneratorType, Option } from '@nx-console/schema';
-import { OptionType } from '@angular/cli/models/interface';
+import { GeneratorType, Option, OptionType } from '@nx-console/schema';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { selectGenerator } from './select-generator';
 
@@ -208,6 +207,7 @@ async function selectCliCommandAndPromptForFlags(
     if (configurations.length) {
       const configurationsOption: Option = {
         name: 'configuration',
+        isRequired: false,
         description:
           'A named build target, as specified in the "configurations" section of angular.json.',
         type: OptionType.String,
@@ -236,14 +236,14 @@ async function selectCliCommandAndPromptForFlags(
 }
 
 async function selectGeneratorAndPromptForFlags() {
-  const { validWorkspaceJson, workspaceType, configurationFilePath } =
+  const { validWorkspaceJson, workspaceType, workspacePath } =
     await verifyWorkspace();
 
   if (!validWorkspaceJson) {
     return;
   }
 
-  const selection = await selectGenerator(configurationFilePath, workspaceType);
+  const selection = await selectGenerator(workspacePath, workspaceType);
   if (!selection) {
     return;
   }
@@ -276,13 +276,19 @@ export async function selectCliProject(
 ) {
   const items = (await cliTaskProvider.getProjectEntries(json))
     .filter(([, { targets }]) => Boolean(targets))
-    .flatMap(([project, { targets }]) => ({ project, targets }))
+    .flatMap(([project, { targets, root }]) => ({ project, targets, root }))
     .filter(
       ({ targets }) => Boolean(targets && targets[command]) || command === 'run'
     )
     .map(
-      ({ project, targets }) =>
-        new CliTaskQuickPickItem(project, targets![command]!, command, project)
+      ({ project, targets, root }) =>
+        new CliTaskQuickPickItem(
+          project,
+          root,
+          targets![command]!,
+          command,
+          project
+        )
     );
 
   if (!items.length) {

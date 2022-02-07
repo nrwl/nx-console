@@ -1,14 +1,11 @@
 import { CollectionInfo } from '@nx-console/schema';
-import { readCollectionsFromNodeModules } from './read-collections';
+import { readCollections } from './read-collections';
 
 export async function getExecutors(
-  workspaceJsonPath: string,
+  workspacePath: string,
   clearPackageJsonCache: boolean
 ): Promise<CollectionInfo[]> {
-  return (
-    await readCollectionsFromNodeModules(
-      workspaceJsonPath,
-      clearPackageJsonCache
-    )
-  ).filter((collection) => collection.type === 'executor');
+  return (await readCollections(workspacePath, clearPackageJsonCache)).filter(
+    (collection) => collection.type === 'executor'
+  );
 }

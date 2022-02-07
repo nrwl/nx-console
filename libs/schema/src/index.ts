@@ -1,10 +1,29 @@
-import { Option as CliOption, OptionType } from '@angular/cli/models/interface';
+import { Schema } from '@nrwl/tao/src/shared/params';
 
-export interface Option extends Omit<CliOption, 'default'> {
+export enum OptionType {
+  Any = 'any',
+  Array = 'array',
+  Boolean = 'boolean',
+  Number = 'number',
+  String = 'string',
+}
+
+export type OptionPropertyDescription = Schema['properties'][number];
+
+export type CliOption = {
+  name: string;
+  positional?: number;
+  alias?: string;
+  hidden?: boolean;
+  deprecated?: boolean | string;
+} & OptionPropertyDescription;
+
+export interface Option extends CliOption {
   tooltip?: string;
   itemTooltips?: ItemTooltips;
   items?: string[] | ItemsWithEnum;
-  default?: string[] | string | number | boolean | undefined;
+  aliases: string[];
+  isRequired: boolean;
 }
 
 export interface ItemTooltips {
@@ -19,7 +38,7 @@ export interface ItemsWithEnum {
 export type XPrompt = string | LongFormXPrompt;
 export interface LongFormXPrompt {
   message: string;
-  type: 'confirmation' | 'input' | 'list';
+  type: 'confirmation' | 'input' | 'list' | string;
   multiselect?: boolean;
   items?: (string | OptionItemLabelValue)[];
 }

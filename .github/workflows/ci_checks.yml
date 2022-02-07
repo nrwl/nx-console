@@ -1,41 +1,37 @@
 name: CI Checks
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  node_version: 14
 
 jobs:
   checks:
-    runs-on: ${{ matrix.os }}
-
-    env:
-      NX_BRANCH: ${{ github.event.number || github.ref }}
-      NX_RUN_GROUP: ${{ github.run_id }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [14]
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/cache@v2
+          fetch-depth: 0
+      - uses: ./.github/workflows/setup
         with:
-          path: ${{ steps.yarn-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-
+          node_version: ${{ env.node_version }}
+      - uses: ./.github/workflows/nx-run
 
-      - name: Install Dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Lint
-        run: yarn nx run-many --all --parallel --target=lint
-      - name: Test
-        run: yarn nx run-many --all --parallel --target=test
-      - name: Build
-        run: yarn nx run-many --all --parallel --target=build
+  agents:
+    runs-on: ubuntu-latest
+    name: Agent ${{ matrix.agent }}
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        agent: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup
+        with:
+          node_version: ${{ env.node_version }}
+      - name: Start Nx Agent ${{ matrix.agent }}
+        run: npx nx-cloud start-agent

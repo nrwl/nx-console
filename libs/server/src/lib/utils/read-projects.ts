@@ -13,6 +13,9 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
 } from '../utils/utils';
+import { getTelemetry } from '../telemetry';
+import { getOutputChannel } from './output-channel';
+import { workspaceDependencyPath } from '@nx-console/npm';
 
 export function readTargetDef(
   targetName: string,
@@ -57,25 +60,37 @@ export async function readBuilderSchema(
   basedir: string,
   builder: string,
   projectDefaults?: { [name: string]: string }
-): Promise<Option[]> {
-  const [npmPackage, builderName] = builder.split(':');
-  const packageJson = await readAndCacheJsonFile(
-    path.join(npmPackage, 'package.json'),
-    path.join(basedir, 'node_modules')
-  );
-  const b = packageJson.json.builders || packageJson.json.executors;
-  const buildersPath = b.startsWith('.') ? b : `./${b}`;
-  const buildersJson = await readAndCacheJsonFile(
-    buildersPath,
-    path.dirname(packageJson.path)
-  );
+): Promise<Option[] | undefined> {
+  try {
+    const [packageName, builderName] = builder.split(':');
+    const packagePath = await workspaceDependencyPath(basedir, packageName);
 
-  const builderDef = (buildersJson.json.builders ||
-    buildersJson.json.executors)[builderName];
-  const builderSchema = await readAndCacheJsonFile(
-    builderDef.schema,
-    path.dirname(buildersJson.path)
-  );
+    if (!packagePath) {
+      return undefined;
+    }
 
-  return await normalizeSchema(builderSchema.json, projectDefaults);
+    const packageJson = await readAndCacheJsonFile(
+      path.join(packagePath, 'package.json')
+    );
+    const b = packageJson.json.builders || packageJson.json.executors;
+    const buildersPath = b.startsWith('.') ? b : `./${b}`;
+    const buildersJson = await readAndCacheJsonFile(
+      buildersPath,
+      path.dirname(packageJson.path)
+    );
+
+    const builderDef = (buildersJson.json.builders ||
+      buildersJson.json.executors)[builderName];
+    const builderSchema = await readAndCacheJsonFile(
+      builderDef.schema,
+      path.dirname(buildersJson.path)
+    );
+
+    return await normalizeSchema(builderSchema.json, projectDefaults);
+  } catch (e) {
+    // todo: make this a utility function to be used in more places.
+    const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
+    getOutputChannel().appendLine(stringifiedError);
+    getTelemetry().exception(stringifiedError);
+  }
 }

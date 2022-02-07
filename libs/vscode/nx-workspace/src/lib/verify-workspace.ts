@@ -1,54 +1,44 @@
+import { NxJsonConfiguration, WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import {
-  fileExistsSync,
+  fileExists,
   getOutputChannel,
   getTelemetry,
   toWorkspaceFormat,
 } from '@nx-console/server';
-import { window } from 'vscode';
-import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { join } from 'path';
+import { window } from 'vscode';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 
-export async function verifyWorkspace(): Promise<{
+interface Workspace {
   validWorkspaceJson: boolean;
-  json: WorkspaceJsonConfiguration;
+  json: WorkspaceJsonConfiguration & NxJsonConfiguration;
   workspaceType: 'ng' | 'nx';
   configurationFilePath: string;
-}> {
-  const workspacePath = dirname(
-    WorkspaceConfigurationStore.instance.get('nxWorkspaceJsonPath', '')
+  workspacePath: string;
+}
+
+export async function verifyWorkspace(): Promise<Workspace> {
+  const workspacePath = WorkspaceConfigurationStore.instance.get(
+    'nxWorkspacePath',
+    ''
   );
 
-  const workspaceJsonPath = join(workspacePath, 'workspace.json');
-  const angularJsonPath = join(workspacePath, 'angular.json');
-
+  const isAngularWorkspace = await fileExists(
+    join(workspacePath, 'angular.json')
+  );
+  const config = await getNxWorkspaceConfig(
+    workspacePath,
+    isAngularWorkspace ? 'angularCli' : 'nx'
+  );
   try {
-    if (fileExistsSync(workspaceJsonPath)) {
-      return {
-        validWorkspaceJson: true,
-        // TODO(cammisuli): change all instances to use the new version - basically reverse this to the new format
-        json: toWorkspaceFormat(
-          await getNxWorkspaceConfig(workspacePath, workspaceJsonPath)
-        ),
-        workspaceType: 'nx',
-        configurationFilePath: workspaceJsonPath,
-      };
-    } else if (fileExistsSync(angularJsonPath)) {
-      return {
-        validWorkspaceJson: true,
-        json: toWorkspaceFormat(
-          await getNxWorkspaceConfig(workspacePath, angularJsonPath)
-        ),
-        workspaceType: 'ng',
-        configurationFilePath: angularJsonPath,
-      };
-    } else {
-      // Handles below along with other runtime errors.
-      throw new Error(
-        `Could not find configuration file in selected directory: ${workspacePath}`
-      );
-    }
+    return {
+      validWorkspaceJson: true,
+      workspaceType: isAngularWorkspace ? 'ng' : 'nx',
+      json: toWorkspaceFormat(config.workspaceConfiguration),
+      configurationFilePath: config.configPath,
+      workspacePath,
+    };
   } catch (e) {
     const humanReadableError = 'Invalid workspace: ' + workspacePath;
     window.showErrorMessage(humanReadableError, 'Show Error').then((value) => {
@@ -67,10 +57,12 @@ export async function verifyWorkspace(): Promise<{
       validWorkspaceJson: false,
       workspaceType: 'nx',
       json: {
+        npmScope: '@nx-console',
         projects: {},
         version: 2,
       },
       configurationFilePath: '',
+      workspacePath,
     };
   }
 }

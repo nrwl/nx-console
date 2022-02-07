@@ -21,8 +21,10 @@
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
+      "@nx-console/npm": ["libs/npm/src/index.ts"],
       "@nx-console/schema": ["libs/schema/src/index.ts"],
       "@nx-console/server": ["libs/server/src/index.ts"],
+      "@nx-console/typescript-plugin": ["libs/typescript-plugin/src/index.ts"],
       "@nx-console/vscode-ui/argument-list": [
         "libs/vscode-ui/argument-list/src/index.ts"
       ],
@@ -32,7 +34,6 @@
       "@nx-console/vscode-ui/feature-task-execution-form": [
         "libs/vscode-ui/feature-task-execution-form/src/index.ts"
       ],
-      "@nx-console/vscode-ui/styles": ["libs/vscode-ui/styles/src/index.ts"],
       "@nx-console/vscode/configuration": [
         "libs/vscode/configuration/src/index.ts"
       ],

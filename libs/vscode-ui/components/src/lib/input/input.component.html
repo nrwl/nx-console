@@ -9,7 +9,7 @@
     class="text-input"
     [type]="field.type === 'number' ? 'number' : 'text'"
     role="textbox"
-    [required]="field.required"
+    [required]="field.isRequired"
     [formControlName]="field.name"
   />
 </div>

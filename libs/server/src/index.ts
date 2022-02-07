@@ -7,7 +7,8 @@ export * from './lib/utils/get-generators';
 export * from './lib/utils/get-executors';
 export * from './lib/utils/read-collections';
 export {
-  fileExistsSync,
+  fileExists,
+  directoryExists,
   readAndParseJson,
   readAndCacheJsonFile,
   normalizeSchema,
@@ -16,3 +17,5 @@ export {
   toWorkspaceFormat,
 } from './lib/utils/utils';
 export { watchFile } from './lib/utils/watch-file';
+export { buildProjectPath } from './lib/utils/build-project-path';
+export { findConfig } from './lib/utils/find-config';

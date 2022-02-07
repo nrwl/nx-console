@@ -10,7 +10,8 @@ import {
 export interface ProjectLocations {
   [projectName: string]: {
     position: number;
-    targets: ProjectTargetLocation;
+    targets?: ProjectTargetLocation;
+    projectPath?: string;
   };
 }
 export interface ProjectTargetLocation {
@@ -34,10 +35,20 @@ export function getProjectLocations(document: TextDocument, projectName = '') {
       if (!projectName) {
         return;
       }
-      projectLocations[projectName] = {
-        position: project.getStart(json),
-        targets: getPositions(project, ['architect', 'targets'], json) ?? {},
-      };
+
+      if (project)
+        if (isProjectPathConfig(project)) {
+          projectLocations[projectName] = {
+            position: project.getStart(json),
+            projectPath: project.initializer.getText(json).replace(/"/g, ''),
+          };
+        } else {
+          projectLocations[projectName] = {
+            position: project.getStart(json),
+            targets:
+              getPositions(project, ['architect', 'targets'], json) ?? {},
+          };
+        }
     });
   } else {
     projectLocations[projectName] = {
@@ -59,6 +70,14 @@ function getProperties(
   } else if (isPropertyAssignment(objectLiteral)) {
     return getProperties(objectLiteral.initializer);
   }
+}
+
+function isProjectPathConfig(
+  property: typescript.ObjectLiteralElementLike
+): property is typescript.PropertyAssignment {
+  return (
+    isPropertyAssignment(property) && isStringLiteral(property.initializer)
+  );
 }
 
 function getPropertyName(property: typescript.ObjectLiteralElementLike) {

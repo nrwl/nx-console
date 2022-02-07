@@ -2,6 +2,112 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.14.0](https://github.com/nrwl/nx-console/compare/v17.13.7...v17.14.0) (2022-02-04)
+
+
+### Features
+
+* add support for yarn pnp ([#1213](https://github.com/nrwl/nx-console/issues/1213)) ([b6cfdbf](https://github.com/nrwl/nx-console/commits/b6cfdbffad948c87f6eb67a5b18395daa06154e3))
+* use cmd/ctrl+enter to execute generator while in the UI form ([#1229](https://github.com/nrwl/nx-console/issues/1229)) ([0e2e427](https://github.com/nrwl/nx-console/commits/0e2e427c3fd7e60aaa63f5e63bd7d7621956aee7))
+
+
+### Bug Fixes
+
+* check for duplicate collections based on type ([#1241](https://github.com/nrwl/nx-console/issues/1241)) ([079bbb0](https://github.com/nrwl/nx-console/commits/079bbb0a8e726f3cc047c5f822acebc025f8187a))
+* inline copy-to-clipboard icon ([#1220](https://github.com/nrwl/nx-console/issues/1220)) ([5e113df](https://github.com/nrwl/nx-console/commits/5e113dfefe9fc3318965d043e37128e6b7cdce42))
+* run executors that are local to the workspace (ie local executors) ([#1230](https://github.com/nrwl/nx-console/issues/1230)) ([a7f2362](https://github.com/nrwl/nx-console/commits/a7f236278167eb777ff7fc5b81010e5dc4312a37))
+* show description when running workspace generators/schematics ([#1225](https://github.com/nrwl/nx-console/issues/1225)) ([776d2a4](https://github.com/nrwl/nx-console/commits/776d2a47f10bd3e287de49021dbc9c16daabf121))
+* update default branch text to "main" ([#1143](https://github.com/nrwl/nx-console/issues/1143)) ([a15f2b4](https://github.com/nrwl/nx-console/commits/a15f2b4d7f0f3939226c705f79825b18a22ec378))
+
+### [17.13.7](https://github.com/nrwl/nx-console/compare/v17.13.6...v17.13.7) (2022-01-14)
+
+
+### Bug Fixes
+
+* handle absence of "properties" in schema ([#1208](https://github.com/nrwl/nx-console/issues/1208)) ([7d69dc7](https://github.com/nrwl/nx-console/commits/7d69dc70fad5961a37e27a568f2f4865ef264b0d))
+* support workspace-generators and workspace-schematics ([#1209](https://github.com/nrwl/nx-console/issues/1209)) ([8a2c48f](https://github.com/nrwl/nx-console/commits/8a2c48f4b31909115b56620f56d92a04d8184e58))
+
+### [17.13.6](https://github.com/nrwl/nx-console/compare/v17.13.5...v17.13.6) (2021-12-23)
+
+
+### Bug Fixes
+
+* read configurations manually if Nx is lower than 12 ([#1205](https://github.com/nrwl/nx-console/issues/1205)) ([1f31f23](https://github.com/nrwl/nx-console/commits/1f31f237db66b83e3d215d197ae908bf52b695cb))
+
+### [17.13.5](https://github.com/nrwl/nx-console/compare/v17.13.4...v17.13.5) (2021-12-22)
+
+
+### Bug Fixes
+
+* support workspaces lower than nx 13 ([#1204](https://github.com/nrwl/nx-console/issues/1204)) ([16e3155](https://github.com/nrwl/nx-console/commits/16e315521dbd90de3040abc71c28826fba44af8e))
+
+### [17.13.4](https://github.com/nrwl/nx-console/compare/v17.13.3...v17.13.4) (2021-12-21)
+
+
+### Bug Fixes
+
+* fallback to built in nx utils if required function doesnt exist ([#1203](https://github.com/nrwl/nx-console/issues/1203)) ([7e8d9b6](https://github.com/nrwl/nx-console/commits/7e8d9b6ee94302afd53a66bd60a88bf16d9ea3d9))
+
+### [17.13.3](https://github.com/nrwl/nx-console/compare/v17.13.2...v17.13.3) (2021-12-17)
+
+
+### Bug Fixes
+
+* revert activationEvents to `onStartupFinished` ([#1201](https://github.com/nrwl/nx-console/issues/1201)) ([6cbd631](https://github.com/nrwl/nx-console/commits/6cbd631f3a9e80c9550d4f1c053247c3df3adbe7))
+
+### [17.13.2](https://github.com/nrwl/nx-console/compare/v17.13.1...v17.13.2) (2021-12-16)
+
+
+### Bug Fixes
+
+* revert to old logic for scanning workspaces, also fix checking for paths of undefined ([#1199](https://github.com/nrwl/nx-console/issues/1199)) ([039c24e](https://github.com/nrwl/nx-console/commits/039c24e6d3730d23b73244eaa210a28bccf2d97c))
+* use proper workspace path to load generators ([#1200](https://github.com/nrwl/nx-console/issues/1200)) ([6a3358e](https://github.com/nrwl/nx-console/commits/6a3358e0508092496006d1b754435af94cce71e7))
+
+### [17.13.1](https://github.com/nrwl/nx-console/compare/v17.12.4...v17.13.1) (2021-12-11)
+### Bug Fixes
+
+* make the `path` option always visible when using generate ([#1192](https://github.com/nrwl/nx-console/issues/1192)) ([ff991e8](https://github.com/nrwl/nx-console/commits/ff991e8d851a77f48be95a9bd2142c909b32f7b7))
+
+## [17.13.0](https://github.com/nrwl/nx-console/compare/v17.12.4...v17.13.0) (2021-12-10)
+
+
+### Features
+
+* Go to project.json file from workspace file with codelens ([#1176](https://github.com/nrwl/nx-console/issues/1176)) ([ad3578a](https://github.com/nrwl/nx-console/commits/ad3578a1a21ab3c9a5010754c7082ae6822339c1))
+* include typescript plugin for imports ([#1177](https://github.com/nrwl/nx-console/issues/1177)) ([9c330ce](https://github.com/nrwl/nx-console/commits/9c330ce65ee683e82de8eb11801d9a3cf1e9c875))
+  * This can be disabled by setting `Enable Library Imports` to false in VSCode settings. ([#1183](https://github.com/nrwl/nx-console/issues/1183)) ([53b09eb](https://github.com/nrwl/nx-console/commits/53b09eb361845498234a6556bc296ae302660b02))
+* provide json schema for nx.json ([#1186](https://github.com/nrwl/nx-console/issues/1186)) ([70e2bbb](https://github.com/nrwl/nx-console/commits/70e2bbbcb26bd7e568535b1076bd6223d7f254ed))
+* use nx utils to read all configuration files ([#1184](https://github.com/nrwl/nx-console/issues/1184)) ([630ac6e](https://github.com/nrwl/nx-console/commits/630ac6ec0929184f98f7526a354bd7ba25bb4e68))
+
+### [17.12.4](https://github.com/nrwl/nx-console/compare/v17.12.3...v17.12.4) (2021-11-19)
+
+
+### Bug Fixes
+
+* resolve schema paths rather than joining ([#1175](https://github.com/nrwl/nx-console/issues/1175)) ([3ed7119](https://github.com/nrwl/nx-console/commits/3ed7119ee86b33987d580641f5c9c4369e53cbe9))
+
+### [17.12.3](https://github.com/nrwl/nx-console/compare/v17.12.2...v17.12.3) (2021-11-12)
+
+
+### Bug Fixes
+
+* handle non existant nx.json file better. Fixes pure angular workspaces. ([#1172](https://github.com/nrwl/nx-console/issues/1172)) ([b1705f1](https://github.com/nrwl/nx-console/commits/b1705f140d8ec53ab8e4c9501ff0809484ed9d4e))
+* handle non-existing files better and return an empty object ([#1171](https://github.com/nrwl/nx-console/issues/1171)) ([8971434](https://github.com/nrwl/nx-console/commits/89714349f822963d1e12a4f9656ff1dd878a5b98))
+
+### [17.12.2](https://github.com/nrwl/nx-console/compare/v17.12.1...v17.12.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* make sure that executors/builders and generator/schematics are combined respectively ([#1167](https://github.com/nrwl/nx-console/issues/1167)) ([8b2cd53](https://github.com/nrwl/nx-console/commits/8b2cd5327e30f43e06eb6e7dd66c023785b8ed50))
+
+### [17.12.1](https://github.com/nrwl/nx-console/compare/v17.12.0...v17.12.1) (2021-10-23)
+
+
+### Bug Fixes
+
+* use require instead of import for loading workspace dependency ([#1165](https://github.com/nrwl/nx-console/issues/1165)) ([254d8e3](https://github.com/nrwl/nx-console/commits/254d8e3666ba41456ec45bb251d836b78351a422))
+
 ## [17.12.0](https://github.com/nrwl/nx-console/compare/v17.11.2...v17.12.0) (2021-10-23)
 
 

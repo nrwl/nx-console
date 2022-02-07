@@ -3,38 +3,26 @@ import { basename, join } from 'path';
 
 import {
   directoryExists,
-  fileExistsSync,
+  fileExists,
   listFiles,
   normalizeSchema,
   readAndCacheJsonFile,
 } from './utils';
-import {
-  getCollectionInfo,
-  readCollectionsFromNodeModules,
-} from './read-collections';
+import { getCollectionInfo, readCollections } from './read-collections';
 
 export async function getGenerators(
-  workspaceJsonPath: string
+  workspacePath: string
 ): Promise<CollectionInfo[]> {
-  const basedir = join(workspaceJsonPath, '..');
-  const collections = await readCollectionsFromNodeModules(
-    workspaceJsonPath,
-    false
-  );
+  const basedir = workspacePath;
+  const collections = await readCollections(workspacePath, false);
   let generatorCollections = collections.filter(
     (collection) => collection.type === 'generator'
   );
 
   generatorCollections = [
     ...generatorCollections,
-    ...(await checkAndReadWorkspaceGenerators(
-      basedir,
-      join('tools', 'schematics')
-    )),
-    ...(await checkAndReadWorkspaceGenerators(
-      basedir,
-      join('tools', 'generators')
-    )),
+    ...(await checkAndReadWorkspaceGenerators(basedir, 'schematics')),
+    ...(await checkAndReadWorkspaceGenerators(basedir, 'generators')),
   ];
   return generatorCollections.filter(
     (collection): collection is CollectionInfo => !!collection.data
@@ -43,12 +31,14 @@ export async function getGenerators(
 
 async function checkAndReadWorkspaceGenerators(
   basedir: string,
-  workspaceGeneratorsPath: string
+  workspaceGeneratorType: 'generators' | 'schematics'
 ) {
+  const workspaceGeneratorsPath = join('tools', workspaceGeneratorType);
   if (await directoryExists(join(basedir, workspaceGeneratorsPath))) {
     const collection = await readWorkspaceGeneratorsCollection(
       basedir,
-      workspaceGeneratorsPath
+      workspaceGeneratorsPath,
+      workspaceGeneratorType
     );
     return collection;
   }
@@ -57,22 +47,27 @@ async function checkAndReadWorkspaceGenerators(
 
 async function readWorkspaceGeneratorsCollection(
   basedir: string,
-  workspaceGeneratorsPath: string
+  workspaceGeneratorsPath: string,
+  workspaceGeneratorType: 'generators' | 'schematics'
 ): Promise<CollectionInfo[]> {
   const collectionDir = join(basedir, workspaceGeneratorsPath);
-  const collectionName = 'workspace-generator';
+  const collectionName = `workspace-${
+    workspaceGeneratorType === 'generators' ? 'generator' : 'schematic'
+  }`;
   const collectionPath = join(collectionDir, 'collection.json');
-  if (fileExistsSync(collectionPath)) {
+  if (await fileExists(collectionPath)) {
     const collection = await readAndCacheJsonFile(
-      'collection.json',
-      collectionDir
+      `${collectionDir}/collection.json`
     );
 
     return getCollectionInfo(
+      basedir,
       collectionName,
       collectionPath,
-      collectionDir,
-      {},
+      {
+        path: collectionPath,
+        json: {},
+      },
       collection.json
     );
   } else {
@@ -92,7 +87,7 @@ async function readWorkspaceGeneratorsCollection(
               name,
               collection: collectionName,
               options: await normalizeSchema(schemaJson.json),
-              description: '',
+              description: schemaJson.json.description ?? '',
               type,
             },
           } as CollectionInfo;

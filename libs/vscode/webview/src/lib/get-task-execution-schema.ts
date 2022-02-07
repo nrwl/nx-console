@@ -66,18 +66,24 @@ export async function getTaskExecutionSchema(
       case 'Run': {
         const runnableItems = (await cliTaskProvider.getProjectEntries())
           .filter(([, { targets }]) => Boolean(targets))
-          .flatMap(([project, { targets }]) => ({ project, targets }))
-          .flatMap(({ project, targets }) => [
+          .flatMap(([project, { targets, root }]) => ({
+            project,
+            targets,
+            root,
+          }))
+          .flatMap(({ project, targets, root }) => [
             ...Object.entries(targets || {}).map(([targetName, targetDef]) => ({
               project,
               targetName,
               targetDef,
+              root,
             })),
           ])
           .map(
-            ({ project, targetName, targetDef }) =>
+            ({ project, targetName, targetDef, root }) =>
               new CliTaskQuickPickItem(
                 project,
+                root,
                 targetDef,
                 targetName,
                 `${project}:${targetName}`
@@ -113,7 +119,7 @@ export async function getTaskExecutionSchema(
       }
       case 'Generate': {
         const generator = await selectGenerator(
-          cliTaskProvider.getWorkspaceJsonPath(),
+          cliTaskProvider.getWorkspacePath(),
           workspaceType,
           generatorType
         );

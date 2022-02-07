@@ -16,10 +16,6 @@
         "index": "apps/vscode-ui/src/index.html",
         "main": "apps/vscode-ui/src/main.ts",
         "tsConfig": "apps/vscode-ui/tsconfig.app.json",
-        "assets": [
-          "apps/vscode-ui/src/favicon.ico",
-          "apps/vscode-ui/src/assets"
-        ],
         "styles": ["apps/vscode-ui/src/styles.scss"],
         "namedChunks": false,
         "extractLicenses": true,

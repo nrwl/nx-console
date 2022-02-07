@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables';
 
 .description {
   margin: 0 0 0.5rem 0;
@@ -10,16 +10,16 @@ input {
   background-color: var(--vscode-input-background, #eee);
   border-color: var(--vscode-input-foreground);
   border-style: solid;
-  border-width: $input-border-width;
+  border-width: variables.$input-border-width;
   color: var(--vscode-input-foreground);
   box-sizing: border-box;
   font: inherit;
   padding: 0.3rem 0.5rem;
   padding-bottom: 0.35rem;
-  width: $input-width;
+  width: variables.$input-width;
 }
 
 input.ng-invalid.ng-dirty,
 input.ng-invalid.ng-touched {
-  border-color: $error-border-color;
+  border-color: variables.$error-border-color;
 }
