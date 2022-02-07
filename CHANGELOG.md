@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.14.1](https://github.com/nrwl/nx-console/compare/v17.14.0...v17.14.1) (2022-02-07)
+
+
+### Bug Fixes
+
+* affected commands no longer clear flags first time through ([#1242](https://github.com/nrwl/nx-console/issues/1242)) ([0a0faca](https://github.com/nrwl/nx-console/commits/0a0facacc107e03d4cbad34b45b039c3cc9f1843))
+* remove `file:\\` when trying to read files with yarn's crossFs ([#1244](https://github.com/nrwl/nx-console/issues/1244)) ([35fe970](https://github.com/nrwl/nx-console/commits/35fe970b8d69335b6943ccf4ad7dd28d4f4ada38))
+
 ## [17.14.0](https://github.com/nrwl/nx-console/compare/v17.13.7...v17.14.0) (2022-02-04)
 
 
