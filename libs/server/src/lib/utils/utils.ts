@@ -150,7 +150,10 @@ export async function readAndCacheJsonFile(
       json: {},
     };
   }
-  const fullFilePath = path.join(basedir, filePath);
+  let fullFilePath = path.join(basedir, filePath);
+  if (fullFilePath.startsWith('file:\\')) {
+    fullFilePath = fullFilePath.replace('file:\\', '');
+  }
   try {
     const stats = await crossFs.statPromise(fullFilePath);
     if (fileContents[fullFilePath] || stats.isFile()) {
