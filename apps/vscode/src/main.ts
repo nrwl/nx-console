@@ -73,9 +73,7 @@ export async function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
-    currentRunTargetTreeProvider = new RunTargetTreeProvider(
-      context.extensionPath
-    );
+    currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
 
     initTelemetry(GlobalConfigurationStore.instance, environment.production);
 
@@ -320,6 +318,7 @@ function registerWorkspaceFileWatcher(
     new RelativePattern(workspaceDir, '**/{workspace,angular,project}.json'),
     () => {
       commands.executeCommand('nxConsole.refreshNxProjectsTree');
+      commands.executeCommand('nxConsole.refreshRunTargetTree');
     }
   );
 

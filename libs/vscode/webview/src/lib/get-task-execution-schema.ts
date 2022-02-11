@@ -33,36 +33,6 @@ export async function getTaskExecutionSchema(
 
     const command = workspaceRouteTitle.toLowerCase();
     switch (workspaceRouteTitle) {
-      case 'Build':
-      case 'E2E':
-      case 'Lint':
-      case 'Serve':
-      case 'Test': {
-        const selectedProject = await selectCliProject(command, json);
-
-        if (!selectedProject) return;
-
-        const { validBuilder, options } = await verifyBuilderDefinition(
-          selectedProject.projectName,
-          command,
-          json
-        );
-        if (!validBuilder) {
-          return;
-        }
-        return {
-          // TODO: Verify architect package is in node_modules
-          ...readTargetDef(
-            command,
-            selectedProject.targetDef,
-            selectedProject.projectName
-          ),
-          options,
-          positional: selectedProject.projectName,
-          command,
-          cliName: workspaceType,
-        };
-      }
       case 'Run': {
         const runnableItems = (await cliTaskProvider.getProjectEntries())
           .filter(([, { targets }]) => Boolean(targets))
@@ -152,6 +122,37 @@ export async function getTaskExecutionSchema(
           : undefined;
 
         return { ...generator, cliName: workspaceType, contextValues };
+      }
+      case 'Build':
+      case 'E2E':
+      case 'Lint':
+      case 'Serve':
+      case 'Test':
+      default: {
+        const selectedProject = await selectCliProject(command, json);
+
+        if (!selectedProject) return;
+
+        const { validBuilder, options } = await verifyBuilderDefinition(
+          selectedProject.projectName,
+          command,
+          json
+        );
+        if (!validBuilder) {
+          return;
+        }
+        return {
+          // TODO: Verify architect package is in node_modules
+          ...readTargetDef(
+            command,
+            selectedProject.targetDef,
+            selectedProject.projectName
+          ),
+          options,
+          positional: selectedProject.projectName,
+          command,
+          cliName: workspaceType,
+        };
       }
     }
   } catch (e) {
