@@ -23,9 +23,34 @@ const CLI_COMMAND_LIST = [
   'xi18n',
 ];
 
+async function getTargetNames(): Promise<string[]> {
+  const { json } = await verifyWorkspace();
+  const commands = Object.values(json.projects).reduce((acc, project) => {
+    for (const target of Object.keys(project.targets ?? {})) {
+      acc.add(target);
+    }
+    return acc;
+  }, new Set<string>());
+  return Array.from(commands);
+}
+
+async function getProjectsWithTargetName(
+  targetName: string
+): Promise<string[]> {
+  const { json } = await verifyWorkspace();
+  const projects = [];
+  for (const [projectName, project] of Object.entries(json.projects)) {
+    const targets = project.targets ?? {};
+    if (targets[targetName]) {
+      projects.push(projectName);
+    }
+  }
+  return projects;
+}
+
 let cliTaskProvider: CliTaskProvider;
 
-export function registerCliTaskCommands(
+export async function registerCliTaskCommands(
   context: ExtensionContext,
   n: CliTaskProvider
 ) {
@@ -51,12 +76,18 @@ export function registerCliTaskCommands(
   ['ng', 'nx'].forEach((cli) => {
     commands.registerCommand(
       `${cli}.run`,
-      (project?: string, target?: string, configuration?: string) => {
+      (
+        project?: string,
+        target?: string,
+        configuration?: string,
+        askForFlags?: boolean
+      ) => {
         selectCliCommandAndPromptForFlags(
           'run',
           project,
           target,
-          configuration
+          configuration,
+          askForFlags
         );
       }
     );
@@ -114,6 +145,19 @@ export function registerCliTaskCommands(
         );
       }
     );
+    commands.registerCommand(`${cli}.run.target`, async () => {
+      const target = await window.showQuickPick(getTargetNames());
+      if (!target) {
+        return;
+      }
+      const project = await window.showQuickPick(
+        getProjectsWithTargetName(target)
+      );
+      if (!project) {
+        return;
+      }
+      selectCliCommandAndPromptForFlags('run', project, target);
+    });
   });
 }
 
@@ -153,13 +197,13 @@ async function selectCliCommandAndPromptForFlags(
   command: string,
   projectName?: string,
   target?: string,
-  configuration?: string
+  configuration?: string,
+  askForFlags = true
 ) {
   let flags: string[] | undefined;
   if (configuration) {
     flags = [`--configuration=${configuration}`];
-  } else if (projectName && target) {
-    // don't prompt for flags when project and target are already specified
+  } else if (!askForFlags) {
     flags = [];
   }
   const { validWorkspaceJson, json, workspaceType } = await verifyWorkspace();
@@ -208,8 +252,7 @@ async function selectCliCommandAndPromptForFlags(
       const configurationsOption: Option = {
         name: 'configuration',
         isRequired: false,
-        description:
-          'A named build target, as specified in the "configurations" section of angular.json.',
+        description: `A named build target as specified in the "configurations" section of your project config.`,
         type: OptionType.String,
         enum: configurations,
         aliases: [],
