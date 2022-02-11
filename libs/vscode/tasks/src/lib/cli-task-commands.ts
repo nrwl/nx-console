@@ -23,31 +23,6 @@ const CLI_COMMAND_LIST = [
   'xi18n',
 ];
 
-async function getTargetNames(): Promise<string[]> {
-  const { json } = await verifyWorkspace();
-  const commands = Object.values(json.projects).reduce((acc, project) => {
-    for (const target of Object.keys(project.targets ?? {})) {
-      acc.add(target);
-    }
-    return acc;
-  }, new Set<string>());
-  return Array.from(commands);
-}
-
-async function getProjectsWithTargetName(
-  targetName: string
-): Promise<string[]> {
-  const { json } = await verifyWorkspace();
-  const projects = [];
-  for (const [projectName, project] of Object.entries(json.projects)) {
-    const targets = project.targets ?? {};
-    if (targets[targetName]) {
-      projects.push(projectName);
-    }
-  }
-  return projects;
-}
-
 let cliTaskProvider: CliTaskProvider;
 
 export async function registerCliTaskCommands(
@@ -351,4 +326,29 @@ async function selectCliTarget(targets: string[]): Promise<string | undefined> {
   return window.showQuickPick(targets, {
     placeHolder: 'Target to run',
   });
+}
+
+async function getTargetNames(): Promise<string[]> {
+  const { json } = await verifyWorkspace();
+  const commands = Object.values(json.projects).reduce((acc, project) => {
+    for (const target of Object.keys(project.targets ?? {})) {
+      acc.add(target);
+    }
+    return acc;
+  }, new Set<string>());
+  return Array.from(commands);
+}
+
+async function getProjectsWithTargetName(
+  targetName: string
+): Promise<string[]> {
+  const { json } = await verifyWorkspace();
+  const projects = [];
+  for (const [projectName, project] of Object.entries(json.projects)) {
+    const targets = project.targets ?? {};
+    if (targets[targetName]) {
+      projects.push(projectName);
+    }
+  }
+  return projects;
 }
