@@ -213,7 +213,7 @@ async function setWorkspace(workspacePath: string) {
     registerNxCommands(context, cliTaskProvider);
     tasks.registerTaskProvider('ng', cliTaskProvider);
     tasks.registerTaskProvider('nx', cliTaskProvider);
-    await registerCliTaskCommands(context, cliTaskProvider);
+    registerCliTaskCommands(context, cliTaskProvider);
 
     nxProjectsTreeProvider = new NxProjectTreeProvider(
       context,

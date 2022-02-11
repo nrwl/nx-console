@@ -25,7 +25,7 @@ const CLI_COMMAND_LIST = [
 
 let cliTaskProvider: CliTaskProvider;
 
-export async function registerCliTaskCommands(
+export function registerCliTaskCommands(
   context: ExtensionContext,
   n: CliTaskProvider
 ) {
