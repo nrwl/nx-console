@@ -469,7 +469,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       configurationName
     );
 
-    const args: string[] = [];
+    const args: Set<string> = new Set();
     fields.forEach((f) => {
       if (defaultValues[f.name] === value[f.name]) return;
       if (!defaultValues[f.name] && !value[f.name]) return;
@@ -481,20 +481,20 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         return;
 
       if (f.positional) {
-        args.push(sanitizeWhitespace(value[f.name]));
+        args.add(sanitizeWhitespace(value[f.name]));
       } else if (f.type === OptionType.Boolean) {
-        args.push(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
+        args.add(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else {
         const fieldValue = value[f.name];
         if (Array.isArray(fieldValue)) {
           const values = fieldValue.map((v) => sanitizeWhitespace(v));
-          args.push(`--${f.name}=${values.join(',')}`);
+          args.add(`--${f.name}=${values.join(',')}`);
         } else {
-          args.push(`--${f.name}=${sanitizeWhitespace(fieldValue)}`);
+          args.add(`--${f.name}=${sanitizeWhitespace(fieldValue)}`);
         }
       }
     });
-    return args;
+    return Array.from(args);
   }
 
   copyCommandToClipboard(form: FormGroup, architect: TaskExecutionSchema) {
