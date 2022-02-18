@@ -186,7 +186,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
         title: lens.configuration
           ? `${lens.workspaceType} run ${lens.project}:${lens.target}:${lens.configuration}`
           : `${lens.workspaceType} run ${lens.project}:${lens.target}`,
-        arguments: [lens.project, lens.target, lens.configuration],
+        arguments: [lens.project, lens.target, lens.configuration, false],
       };
       lens.command = command;
       return lens;
