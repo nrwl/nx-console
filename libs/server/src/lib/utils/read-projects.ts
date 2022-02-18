@@ -79,8 +79,10 @@ export async function readBuilderSchema(
       path.dirname(packageJson.path)
     );
 
-    const builderDef = (buildersJson.json.builders ||
-      buildersJson.json.executors)[builderName];
+    const builderDef = {
+      ...buildersJson.json.builders,
+      ...buildersJson.json.executors,
+    }[builderName];
     const builderSchema = await readAndCacheJsonFile(
       builderDef.schema,
       path.dirname(buildersJson.path)
