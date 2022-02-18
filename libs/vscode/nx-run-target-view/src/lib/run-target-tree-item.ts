@@ -3,27 +3,14 @@ import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
 import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 
-export type WorkspaceRouteTitle = string;
-
 const LIGHT_SVG_URL = 'nx-cli-light.svg';
 const DARK_SVG_URL = 'nx-cli-dark.svg';
 
-export const routeList = async (): Promise<WorkspaceRouteTitle[]> => {
-  const defaultCommands = ['Generate', 'Run'];
+export const commandList = async (): Promise<string[]> => {
+  const defaultCommands = ['generate', 'run'];
   const workspaceSpecificTargetNames = await getTargetNames();
-  return [...defaultCommands, ...workspaceSpecificTargetNames.map(titleCase)];
+  return [...defaultCommands, ...workspaceSpecificTargetNames];
 };
-
-function titleCase(target: string): string {
-  return target.split(' ').map(singleWordTitleCase).join(' ');
-}
-
-function singleWordTitleCase(target: string) {
-  if (target.length) {
-    return `${target[0].toUpperCase()}${target.slice(1)}`;
-  }
-  return target;
-}
 
 export class RunTargetTreeItem extends TreeItem {
   revealWorkspaceRoute(currentWorkspace: TreeView<RunTargetTreeItem>) {
@@ -57,11 +44,11 @@ export class RunTargetTreeItem extends TreeItem {
 
   iconPath = RunTargetTreeItem.getIconUriForRoute(this.extensionPath);
 
-  label: WorkspaceRouteTitle;
+  label: string;
 
   constructor(
     readonly configurationFilePath: string,
-    readonly route: WorkspaceRouteTitle,
+    readonly route: string,
     readonly extensionPath: string,
     readonly generatorType?: GeneratorType
   ) {

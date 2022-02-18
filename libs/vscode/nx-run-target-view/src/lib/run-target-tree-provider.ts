@@ -1,9 +1,8 @@
-import { commands, ExtensionContext, TreeItem } from 'vscode';
-
 import { AbstractTreeProvider, clearJsonCache } from '@nx-console/server';
-import { routeList, RunTargetTreeItem } from './run-target-tree-item';
-import { dirname, join } from 'path';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { join } from 'path';
+import { commands, ExtensionContext, TreeItem } from 'vscode';
+import { commandList, RunTargetTreeItem } from './run-target-tree-item';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Nx Workspace...'
@@ -78,9 +77,9 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
     CHANGE_WORKSPACE.description = 'Current: ' + workspacePath;
 
     return [
-      ...(await routeList()).map(
-        (route) =>
-          new RunTargetTreeItem(workspacePath, route, this.extensionPath)
+      ...(await commandList()).map(
+        (command) =>
+          new RunTargetTreeItem(workspacePath, command, this.extensionPath)
       ),
       CHANGE_WORKSPACE,
     ];

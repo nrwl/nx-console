@@ -7,7 +7,6 @@ import {
 import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
-import { WorkspaceRouteTitle } from '@nx-console/vscode/nx-run-target-view';
 import {
   CliTaskProvider,
   CliTaskQuickPickItem,
@@ -17,7 +16,7 @@ import {
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
-  workspaceRouteTitle: WorkspaceRouteTitle = 'Run',
+  command = 'run',
   contextMenuUri?: Uri,
   generatorType?: GeneratorType
 ): Promise<TaskExecutionSchema | void> {
@@ -31,9 +30,8 @@ export async function getTaskExecutionSchema(
       return;
     }
 
-    const command = workspaceRouteTitle.toLowerCase();
-    switch (workspaceRouteTitle) {
-      case 'Run': {
+    switch (command) {
+      case 'run': {
         const runnableItems = (await cliTaskProvider.getProjectEntries())
           .filter(([, { targets }]) => Boolean(targets))
           .flatMap(([project, { targets, root }]) => ({
@@ -87,7 +85,7 @@ export async function getTaskExecutionSchema(
           };
         });
       }
-      case 'Generate': {
+      case 'generate': {
         const generator = await selectGenerator(
           cliTaskProvider.getWorkspacePath(),
           workspaceType,
@@ -123,11 +121,6 @@ export async function getTaskExecutionSchema(
 
         return { ...generator, cliName: workspaceType, contextValues };
       }
-      case 'Build':
-      case 'E2E':
-      case 'Lint':
-      case 'Serve':
-      case 'Test':
       default: {
         const selectedProject = await selectCliProject(command, json);
 
