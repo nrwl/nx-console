@@ -1,38 +1,16 @@
 import { GeneratorType } from '@nx-console/schema';
+import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
 import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 
-export type WorkspaceRouteTitle =
-  | 'Generate'
-  | 'Run'
-  | 'Build'
-  | 'Serve'
-  | 'Test'
-  | 'E2E'
-  | 'Lint';
+const LIGHT_SVG_URL = 'nx-cli-light.svg';
+const DARK_SVG_URL = 'nx-cli-dark.svg';
 
-const ROUTE_TO_ICON_MAP = new Map<
-  WorkspaceRouteTitle | undefined,
-  { light: string; dark: string }
->([
-  ['Generate', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-  ['Run', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-  ['Build', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-  ['Serve', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-  ['Test', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-  ['E2E', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-  ['Lint', { light: 'nx-cli-light.svg', dark: 'nx-cli-dark.svg' }],
-]);
-
-export const ROUTE_LIST: WorkspaceRouteTitle[] = [
-  'Generate',
-  'Run',
-  'Build',
-  'Serve',
-  'Test',
-  'E2E',
-  'Lint',
-];
+export const commandList = async (): Promise<string[]> => {
+  const defaultCommands = ['generate', 'run'];
+  const workspaceSpecificTargetNames = await getTargetNames();
+  return [...defaultCommands, ...workspaceSpecificTargetNames];
+};
 
 export class RunTargetTreeItem extends TreeItem {
   revealWorkspaceRoute(currentWorkspace: TreeView<RunTargetTreeItem>) {
@@ -64,16 +42,13 @@ export class RunTargetTreeItem extends TreeItem {
     arguments: [this],
   };
 
-  iconPath = RunTargetTreeItem.getIconUriForRoute(
-    this.extensionPath,
-    this.route
-  );
+  iconPath = RunTargetTreeItem.getIconUriForRoute(this.extensionPath);
 
-  label: WorkspaceRouteTitle;
+  label: string;
 
   constructor(
     readonly configurationFilePath: string,
-    readonly route: WorkspaceRouteTitle,
+    readonly route: string,
     readonly extensionPath: string,
     readonly generatorType?: GeneratorType
   ) {
@@ -81,15 +56,22 @@ export class RunTargetTreeItem extends TreeItem {
   }
 
   static getIconUriForRoute(
-    extensionPath: string,
-    route?: WorkspaceRouteTitle
+    extensionPath: string
   ): { light: Uri; dark: Uri } | undefined {
-    const icon = ROUTE_TO_ICON_MAP.get(route);
-    return icon
-      ? {
-          light: Uri.file(join(extensionPath, 'assets', icon.light)),
-          dark: Uri.file(join(extensionPath, 'assets', icon.dark)),
-        }
-      : undefined;
+    return {
+      light: Uri.file(join(extensionPath, 'assets', LIGHT_SVG_URL)),
+      dark: Uri.file(join(extensionPath, 'assets', DARK_SVG_URL)),
+    };
   }
+}
+
+async function getTargetNames(): Promise<string[]> {
+  const { json } = await verifyWorkspace();
+  const commands = Object.values(json.projects).reduce((acc, project) => {
+    for (const target of Object.keys(project.targets ?? {})) {
+      acc.add(target);
+    }
+    return acc;
+  }, new Set<string>());
+  return Array.from(commands);
 }

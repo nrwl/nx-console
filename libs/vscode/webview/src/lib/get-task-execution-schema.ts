@@ -7,7 +7,6 @@ import {
 import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
-import { WorkspaceRouteTitle } from '@nx-console/vscode/nx-run-target-view';
 import {
   CliTaskProvider,
   CliTaskQuickPickItem,
@@ -17,7 +16,7 @@ import {
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
-  workspaceRouteTitle: WorkspaceRouteTitle = 'Run',
+  command = 'run',
   contextMenuUri?: Uri,
   generatorType?: GeneratorType
 ): Promise<TaskExecutionSchema | void> {
@@ -31,39 +30,8 @@ export async function getTaskExecutionSchema(
       return;
     }
 
-    const command = workspaceRouteTitle.toLowerCase();
-    switch (workspaceRouteTitle) {
-      case 'Build':
-      case 'E2E':
-      case 'Lint':
-      case 'Serve':
-      case 'Test': {
-        const selectedProject = await selectCliProject(command, json);
-
-        if (!selectedProject) return;
-
-        const { validBuilder, options } = await verifyBuilderDefinition(
-          selectedProject.projectName,
-          command,
-          json
-        );
-        if (!validBuilder) {
-          return;
-        }
-        return {
-          // TODO: Verify architect package is in node_modules
-          ...readTargetDef(
-            command,
-            selectedProject.targetDef,
-            selectedProject.projectName
-          ),
-          options,
-          positional: selectedProject.projectName,
-          command,
-          cliName: workspaceType,
-        };
-      }
-      case 'Run': {
+    switch (command) {
+      case 'run': {
         const runnableItems = (await cliTaskProvider.getProjectEntries())
           .filter(([, { targets }]) => Boolean(targets))
           .flatMap(([project, { targets, root }]) => ({
@@ -117,7 +85,7 @@ export async function getTaskExecutionSchema(
           };
         });
       }
-      case 'Generate': {
+      case 'generate': {
         const generator = await selectGenerator(
           cliTaskProvider.getWorkspacePath(),
           workspaceType,
@@ -152,6 +120,32 @@ export async function getTaskExecutionSchema(
           : undefined;
 
         return { ...generator, cliName: workspaceType, contextValues };
+      }
+      default: {
+        const selectedProject = await selectCliProject(command, json);
+
+        if (!selectedProject) return;
+
+        const { validBuilder, options } = await verifyBuilderDefinition(
+          selectedProject.projectName,
+          command,
+          json
+        );
+        if (!validBuilder) {
+          return;
+        }
+        return {
+          // TODO: Verify architect package is in node_modules
+          ...readTargetDef(
+            command,
+            selectedProject.targetDef,
+            selectedProject.projectName
+          ),
+          options,
+          positional: selectedProject.projectName,
+          command,
+          cliName: workspaceType,
+        };
       }
     }
   } catch (e) {

@@ -1,9 +1,8 @@
-import { TreeItem } from 'vscode';
-
-import { AbstractTreeProvider } from '@nx-console/server';
-import { ROUTE_LIST, RunTargetTreeItem } from './run-target-tree-item';
-import { dirname, join } from 'path';
+import { AbstractTreeProvider, clearJsonCache } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { join } from 'path';
+import { commands, ExtensionContext, TreeItem } from 'vscode';
+import { commandList, RunTargetTreeItem } from './run-target-tree-item';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Nx Workspace...'
@@ -27,12 +26,15 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
   private scanning = Boolean(
     WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
   );
+  private extensionPath: string;
 
   /**
    * Provides data for the "Generate & Run Target" view
    */
-  constructor(readonly extensionPath: string) {
+  constructor(readonly context: ExtensionContext) {
     super();
+    const extensionPath = context.extensionPath;
+    this.extensionPath = extensionPath;
     LOCATE_YOUR_WORKSPACE.iconPath = {
       light: join(extensionPath, 'assets', 'nx-console-light.svg'),
       dark: join(extensionPath, 'assets', 'nx-console-dark.svg'),
@@ -41,6 +43,12 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
       light: join(extensionPath, 'assets', 'nx-console-light.svg'),
       dark: join(extensionPath, 'assets', 'nx-console-dark.svg'),
     };
+    context.subscriptions.push(
+      commands.registerCommand(
+        `nxConsole.refreshRunTargetTree`,
+        this.refreshRunTargetTree
+      )
+    );
   }
 
   getParent() {
@@ -52,7 +60,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
     this.refresh();
   }
 
-  getChildren() {
+  async getChildren() {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
       'nxWorkspacePath',
       ''
@@ -69,11 +77,21 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
     CHANGE_WORKSPACE.description = 'Current: ' + workspacePath;
 
     return [
-      ...ROUTE_LIST.map(
-        (route) =>
-          new RunTargetTreeItem(workspacePath, route, this.extensionPath)
+      ...(await commandList()).map(
+        (command) =>
+          new RunTargetTreeItem(workspacePath, command, this.extensionPath)
       ),
       CHANGE_WORKSPACE,
     ];
   }
+
+  private refreshRunTargetTree = async () => {
+    const workspacePath = WorkspaceConfigurationStore.instance.get(
+      'nxWorkspacePath',
+      ''
+    );
+    clearJsonCache(workspacePath);
+
+    this.refresh();
+  };
 }

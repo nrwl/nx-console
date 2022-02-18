@@ -403,8 +403,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     }
 
     window.vscode.postMessage({
-      command: architect.command,
-      positional: architect.positional,
+      command: surroundWithQuotesIfHasWhiteSpace(architect.command),
+      positional: surroundWithQuotesIfHasWhiteSpace(architect.positional),
       flags,
     });
   }
@@ -512,4 +512,11 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 function sanitizeWhitespace(value: string) {
   const trimmed = value.trim();
   return /\s/.test(trimmed) ? `'${trimmed}'` : trimmed; // NOTE: We use ' rather than " for powershell compatibility
+}
+
+function surroundWithQuotesIfHasWhiteSpace(target: string): string {
+  if (target.match(/\s/g)) {
+    return `"${target}"`;
+  }
+  return target;
 }

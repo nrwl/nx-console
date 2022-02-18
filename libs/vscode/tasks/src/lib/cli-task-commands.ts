@@ -2,10 +2,7 @@ import { commands, ExtensionContext, window, Uri } from 'vscode';
 
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
-import {
-  WorkspaceRouteTitle,
-  RunTargetTreeItem,
-} from '@nx-console/vscode/nx-run-target-view';
+import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
@@ -156,7 +153,7 @@ async function selectCliCommandAndShowUi(
   }
   const workspaceTreeItem = new RunTargetTreeItem(
     configurationFilePath,
-    `${command[0].toUpperCase()}${command.slice(1)}` as WorkspaceRouteTitle,
+    `${command[0].toUpperCase()}${command.slice(1)}`,
     extensionPath,
     generatorType
   );
@@ -237,7 +234,9 @@ async function selectCliCommandAndPromptForFlags(
 
     flags = await selectFlags(
       isRunCommand
-        ? `${command} ${projectName}:${target}`
+        ? `${command} ${projectName}:${surroundWithQuotesIfHasWhiteSpace(
+            target
+          )}`
         : `${command} ${projectName}`,
       options,
       workspaceType
@@ -246,11 +245,20 @@ async function selectCliCommandAndPromptForFlags(
 
   if (flags !== undefined) {
     cliTaskProvider.executeTask({
-      positional: isRunCommand ? `${projectName}:${target}` : projectName,
+      positional: isRunCommand
+        ? `${projectName}:${surroundWithQuotesIfHasWhiteSpace(target)}`
+        : projectName,
       command,
       flags,
     });
   }
+}
+
+function surroundWithQuotesIfHasWhiteSpace(target: string): string {
+  if (target.match(/\s/g)) {
+    return `"${target}"`;
+  }
+  return target;
 }
 
 async function selectGeneratorAndPromptForFlags() {
