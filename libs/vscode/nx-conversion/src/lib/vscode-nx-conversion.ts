@@ -32,8 +32,6 @@ export class NxConversion {
       console.warn(
         'NxConversion already created, are you sure you want to create another instance?'
       );
-    } else {
-      commands.registerCommand('nxConsole.makeNgFaster', makeNgFaster);
     }
 
     NxConversion._instance = value;
@@ -68,7 +66,7 @@ export class NxConversion {
 
         if (answer === 'Yes') {
           getTelemetry().featureUsed('makeNgFaster');
-          commands.executeCommand('nxConsole.makeNgFaster');
+          makeNgFaster();
         } else if (answer === 'No') {
           getTelemetry().featureUsed('do-not makeNgFaster');
         } else {
