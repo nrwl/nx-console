@@ -1,3 +1,9 @@
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/schema';
+import { getTelemetry } from '@nx-console/server';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { NxConversion } from '@nx-console/vscode/nx-conversion';
+import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { isAbsolute, join, relative } from 'path';
 import {
   ProviderResult,
@@ -6,15 +12,9 @@ import {
   TaskProvider,
   tasks,
 } from 'vscode';
-
-import { getTelemetry } from '@nx-console/server';
-import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
-import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/schema';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 
 export let cliTaskProvider: CliTaskProvider;
 
@@ -74,6 +74,7 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   async executeTask(definition: CliTaskDefinition) {
+    NxConversion.instance.trackEvent(definition.command);
     const isDryRun = definition.flags.includes('--dry-run');
     if (isDryRun && this.currentDryRun) {
       this.deferredDryRun = definition;

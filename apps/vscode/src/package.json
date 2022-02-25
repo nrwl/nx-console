@@ -111,6 +111,10 @@
       ],
       "commandPalette": [
         {
+          "command": "nxConsole.makeNgFaster",
+          "when": "false"
+        },
+        {
           "command": "ng.generate.ui.fileexplorer",
           "when": "false"
         },
@@ -583,6 +587,11 @@
         "category": "Nx",
         "title": "Nx generate library",
         "command": "nx.generate.ui.lib.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Make Angular Faster with Nx",
+        "command": "nxConsole.makeNgFaster"
       }
     ],
     "configuration": {
