@@ -2,16 +2,9 @@ import { getShellExecutionForConfig, getTelemetry } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { pipe, Subject } from 'rxjs';
 import { filter, scan, tap } from 'rxjs/operators';
-import {
-  commands,
-  ExtensionContext,
-  Task,
-  tasks,
-  TaskScope,
-  window,
-} from 'vscode';
+import { ExtensionContext, Task, tasks, TaskScope, window } from 'vscode';
 
-const PROMPT_COUNT = 1;
+const PROMPT_COUNT = 5;
 const PROMPT_MSG = 'Convert to Nx?';
 
 /**
