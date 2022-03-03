@@ -5,7 +5,8 @@ import { filter, scan, tap } from 'rxjs/operators';
 import { ExtensionContext, Task, tasks, TaskScope, window } from 'vscode';
 
 const PROMPT_COUNT = 5;
-const PROMPT_MSG = 'Convert to Nx?';
+const PROMPT_MSG =
+  'Would you like to upgrade the Angular CLI with Nx (making your ng commands up to 10 times faster)?';
 
 /**
  * Singleton class for helping with Nx Conversion.
