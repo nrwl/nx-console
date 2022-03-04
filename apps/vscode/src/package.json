@@ -111,10 +111,6 @@
       ],
       "commandPalette": [
         {
-          "command": "nxConsole.makeNgFaster",
-          "when": "false"
-        },
-        {
           "command": "ng.generate.ui.fileexplorer",
           "when": "false"
         },
@@ -145,6 +141,10 @@
         {
           "command": "nx.generate.ui.lib",
           "when": "isNxWorkspace && nx.hasLibraryGenerators"
+        },
+        {
+          "command": "nxConsole.makeNgFaster",
+          "when": "isAngularWorkspace"
         },
         {
           "command": "ng.run.target",
@@ -590,7 +590,7 @@
       },
       {
         "category": "Nx",
-        "title": "Make Angular Faster with Nx",
+        "title": "Make ng Faster with Nx",
         "command": "nxConsole.makeNgFaster"
       }
     ],
