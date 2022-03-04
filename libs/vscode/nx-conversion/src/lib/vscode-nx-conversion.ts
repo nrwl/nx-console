@@ -4,9 +4,9 @@ import { pipe, Subject } from 'rxjs';
 import { filter, scan, tap } from 'rxjs/operators';
 import { ExtensionContext, Task, tasks, TaskScope, window } from 'vscode';
 
-const PROMPT_COUNT = 5;
+const PROMPT_COUNT = 1;
 const PROMPT_MSG =
-  'Would you like to upgrade the Angular CLI with Nx (making your ng commands up to 10 times faster)?';
+  'Would you like to make ng commands faster by adding computation caching? [Learn more here](https://nx.dev/migration/migration-angular)';
 
 /**
  * Singleton class for helping with Nx Conversion.
