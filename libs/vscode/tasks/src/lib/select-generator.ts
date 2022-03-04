@@ -75,7 +75,8 @@ export async function getGeneratorOptions(
 export async function selectGenerator(
   workspacePath: string,
   workspaceType: 'nx' | 'ng',
-  generatorType?: GeneratorType
+  generatorType?: GeneratorType,
+  generator?: { collection: string; name: string }
 ): Promise<TaskExecutionSchema | undefined> {
   interface GenerateQuickPickItem extends QuickPickItem {
     collectionName: string;
@@ -105,7 +106,13 @@ export async function selectGenerator(
   }
 
   if (generators) {
-    const selection = await window.showQuickPick(generatorsQuickPicks);
+    const selection = generator
+      ? generatorsQuickPicks.find(
+          (quickPick) =>
+            quickPick.generator.collection === generator.collection &&
+            quickPick.generator.name === generator.name
+        )
+      : await window.showQuickPick(generatorsQuickPicks);
     if (selection) {
       const options =
         selection.generator.options ||

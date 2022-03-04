@@ -18,7 +18,8 @@ export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
   command = 'run',
   contextMenuUri?: Uri,
-  generatorType?: GeneratorType
+  generatorType?: GeneratorType,
+  incomingGenerator?: string
 ): Promise<TaskExecutionSchema | void> {
   try {
     if (!cliTaskProvider.getWorkspacePath()) {
@@ -89,7 +90,13 @@ export async function getTaskExecutionSchema(
         const generator = await selectGenerator(
           cliTaskProvider.getWorkspacePath(),
           workspaceType,
-          generatorType
+          generatorType,
+          incomingGenerator
+            ? {
+                collection: incomingGenerator.split(':')[0],
+                name: incomingGenerator.split(':')[1],
+              }
+            : undefined
         );
 
         if (!generator) {

@@ -90,6 +90,7 @@ export async function activate(c: ExtensionContext) {
           cliTaskProvider,
           runTargetTreeView,
           contextMenuUri,
+          generator: runTargetTreeItem.generator,
         });
       }
     );

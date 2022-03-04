@@ -1,4 +1,12 @@
-import { commands, ExtensionContext, window, Uri } from 'vscode';
+import {
+  commands,
+  ExtensionContext,
+  window,
+  Uri,
+  Task,
+  TaskScope,
+  tasks,
+} from 'vscode';
 
 import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
@@ -66,6 +74,20 @@ export function registerCliTaskCommands(
     commands.registerCommand(`${cli}.run.fileexplorer`, async (uri: Uri) =>
       selectCliCommandAndPromptForFlags('run', await getCliProjectFromUri(uri))
     );
+
+    commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
+      const getCorrectMoveGenerator = (uri: Uri) => '@nrwl/workspace:move';
+      // ^ needs to determine if the @nrwl/angular:move is in the list of
+      // generators for the cli and use it instead if present.
+      const generator = getCorrectMoveGenerator(uri);
+      selectCliCommandAndShowUi(
+        'generate',
+        context.extensionPath,
+        uri,
+        GeneratorType.Other,
+        generator
+      );
+    });
 
     commands.registerCommand(`${cli}.generate`, () =>
       selectGeneratorAndPromptForFlags()
@@ -137,7 +159,8 @@ async function selectCliCommandAndShowUi(
   command: string,
   extensionPath: string,
   uri?: Uri,
-  generatorType?: GeneratorType
+  generatorType?: GeneratorType,
+  generator?: string
 ) {
   const workspacePath = cliTaskProvider.getWorkspacePath();
   if (!workspacePath) {
@@ -153,9 +176,10 @@ async function selectCliCommandAndShowUi(
   }
   const workspaceTreeItem = new RunTargetTreeItem(
     configurationFilePath,
-    `${command[0].toUpperCase()}${command.slice(1)}`,
+    command,
     extensionPath,
-    generatorType
+    generatorType,
+    generator
   );
 
   commands.executeCommand(
@@ -300,7 +324,8 @@ export async function selectCliProject(
   command: string,
   json: WorkspaceJsonConfiguration
 ) {
-  const items = (await cliTaskProvider.getProjectEntries(json))
+  const temp = await cliTaskProvider.getProjectEntries(json);
+  const items = temp
     .filter(([, { targets }]) => Boolean(targets))
     .flatMap(([project, { targets, root }]) => ({ project, targets, root }))
     .filter(
@@ -319,7 +344,7 @@ export async function selectCliProject(
 
   if (!items.length) {
     window.showInformationMessage(
-      `No projects have an target command for ${command}`
+      `No projects have a target command for ${command}`
     );
 
     return;

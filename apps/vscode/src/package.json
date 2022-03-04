@@ -75,6 +75,16 @@
           "group": "2_workspace"
         },
         {
+          "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "nx.move.fileexplorer",
+          "group": "2_workspace"
+        },
+        {
+          "when": "!isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "ng.move.fileexplorer",
+          "group": "2_workspace"
+        },
+        {
           "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxAppsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasApplicationGenerators",
           "command": "nx.generate.ui.app.fileexplorer",
           "group": "2_workspace"
@@ -558,6 +568,16 @@
         "category": "Nx",
         "title": "Nx generate...",
         "command": "nx.generate.ui.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Move Nx Project...",
+        "command": "nx.move.fileexplorer"
+      },
+      {
+        "category": "ng",
+        "title": "Move Nx Project...",
+        "command": "ng.move.fileexplorer"
       },
       {
         "category": "Nx",

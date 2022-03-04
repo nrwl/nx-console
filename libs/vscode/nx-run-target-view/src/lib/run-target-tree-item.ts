@@ -50,7 +50,8 @@ export class RunTargetTreeItem extends TreeItem {
     readonly configurationFilePath: string,
     readonly route: string,
     readonly extensionPath: string,
-    readonly generatorType?: GeneratorType
+    readonly generatorType?: GeneratorType,
+    readonly generator?: string
   ) {
     super(route, TreeItemCollapsibleState.None);
   }
