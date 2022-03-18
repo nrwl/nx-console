@@ -96,9 +96,11 @@ async function makeNgFaster(count = 0) {
   }
 
   if (answer === 'Yes') {
+    getTelemetry().screenViewed('Convert to Nx - Yes');
     getTelemetry().featureUsed('makeNgFaster');
     tasks.executeTask(createMakeNgFasterTask());
   } else if (answer === 'No') {
+    getTelemetry().screenViewed('Convert to Nx - No ');
     getTelemetry().featureUsed('do-not makeNgFaster');
   } else {
     WorkspaceConfigurationStore.instance.set('nxConversionDoNotAskAgain', true);
