@@ -1,5 +1,5 @@
+import { getShellExecutionForConfig } from '@nx-console/server';
 import { Task, TaskScope } from 'vscode';
-import { getShellExecutionForConfig } from './shell-execution';
 
 export interface NxTaskDefinition {
   positional?: string;

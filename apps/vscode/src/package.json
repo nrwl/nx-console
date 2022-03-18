@@ -143,6 +143,10 @@
           "when": "isNxWorkspace && nx.hasLibraryGenerators"
         },
         {
+          "command": "nxConsole.makeNgFaster",
+          "when": "isAngularWorkspace"
+        },
+        {
           "command": "ng.run.target",
           "when": "isAngularWorkspace"
         },
@@ -583,6 +587,11 @@
         "category": "Nx",
         "title": "Nx generate library",
         "command": "nx.generate.ui.lib.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Make ng Faster with Nx",
+        "command": "nxConsole.makeNgFaster"
       }
     ],
     "configuration": {

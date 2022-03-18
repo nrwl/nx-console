@@ -24,7 +24,6 @@ import {
   getGenerators,
   teardownTelemetry,
   watchFile,
-  directoryExists,
   fileExists,
 } from '@nx-console/server';
 import {
@@ -53,6 +52,7 @@ import {
   ProjectJsonSchema,
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
+import { NxConversion } from '@nx-console/vscode/nx-conversion';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -120,6 +120,8 @@ export async function activate(c: ExtensionContext) {
     new WorkspaceCodeLensProvider(context);
     new WorkspaceJsonSchema(context);
     new ProjectJsonSchema(context);
+
+    NxConversion.createInstance(context);
 
     await enableTypeScriptPlugin(context);
 
@@ -256,6 +258,7 @@ async function setWorkspace(workspacePath: string) {
   } else if (!isNxWorkspace && isAngularWorkspace) {
     workspaceType = 'angular';
   }
+  WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
 
   getTelemetry().record('WorkspaceType', { workspaceType });
 }
