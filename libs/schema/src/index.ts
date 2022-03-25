@@ -1,4 +1,4 @@
-import { Schema } from '@nrwl/tao/src/shared/params';
+import { Schema } from 'nx/src/utils/params';
 
 export enum OptionType {
   Any = 'any',
@@ -115,15 +115,3 @@ export interface Targets {
 
 export const WORKSPACE_GENERATOR_NAME_REGEX =
   /^workspace-(schematic|generator):(.+)/;
-
-/**
- * Should be in Typescript 4.4+ remove this when we upgrade to that version
- */
-export type Awaited<T> = T extends null | undefined
-  ? T // special case for `null | undefined` when not in `--strictNullChecks` mode
-  : // eslint-disable-next-line @typescript-eslint/ban-types
-  T extends object & { then(onfulfilled: infer F): any } // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
-  ? F extends (value: infer V) => any // if the argument to `then` is callable, extracts the argument
-    ? Awaited<V> // recursively unwrap the value
-    : never // the argument to `then` was not callable
-  : T;

@@ -1,4 +1,4 @@
-import { Schema } from '@nrwl/tao/src/shared/params';
+import { Schema } from 'nx/src/utils/params';
 import * as path from 'path';
 import type {
   WorkspaceJsonConfiguration,
@@ -24,7 +24,7 @@ import {
   printParseErrorCode,
 } from 'jsonc-parser';
 import { getOutputChannel } from './output-channel';
-import { toNewFormat } from '@nrwl/tao/src/shared/workspace';
+import { toNewFormat } from 'nx/src/shared/workspace';
 import { PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
 import { getLibzipSync as libzip } from '@yarnpkg/libzip';
 
