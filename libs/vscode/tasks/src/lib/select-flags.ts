@@ -50,15 +50,18 @@ async function promptForFlagToSet(
       alwaysShow: true,
       label: `Execute: ${currentCommand}`,
     },
-    ...options.map(
-      (option) =>
-        new CliTaskFlagQuickPickItem(
-          option.name,
-          option.description || option.type,
-          option,
-          `${option.name}`
-        )
-    ),
+    ...options.map((option) => {
+      const detail =
+        option.description || Array.isArray(option.type)
+          ? option.type?.[0]
+          : option.type;
+      return new CliTaskFlagQuickPickItem(
+        option.name,
+        detail,
+        option,
+        `${option.name}`
+      );
+    }),
   ];
 
   const selection = await window.showQuickPick(flagItems, {

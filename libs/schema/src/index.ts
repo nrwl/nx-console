@@ -1,4 +1,4 @@
-import { Schema } from '@nrwl/tao/src/shared/params';
+import { Schema } from 'nx/src/utils/params';
 
 export enum OptionType {
   Any = 'any',

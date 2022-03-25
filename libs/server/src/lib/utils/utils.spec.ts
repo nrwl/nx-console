@@ -5,7 +5,7 @@ import {
   OptionType,
   OptionPropertyDescription,
 } from '@nx-console/schema';
-import { Schema } from '@nrwl/tao/src/shared/params';
+import { Schema } from 'nx/src/utils/params';
 
 describe('utils', () => {
   describe('normalizeSchema', () => {
@@ -26,8 +26,8 @@ describe('utils', () => {
 
     it('should work with schema without any properties', async () => {
       // @ts-expect-error absence of required property "properties" is needed to test failure resistance
-      const r = await normalizeSchema({})
-      expect(r).toEqual([])
+      const r = await normalizeSchema({});
+      expect(r).toEqual([]);
     });
 
     it('should mark fields as required if they are listed in the required array', async () => {
