@@ -49,7 +49,7 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
     return imported;
   } catch (error) {
     getOutputChannel().appendLine(
-      `Error loading nx from the workspace. Falling back to extension dependency
+      `Error loading Nx from the workspace. Falling back to extension dependency
 ${error}
     `
     );
