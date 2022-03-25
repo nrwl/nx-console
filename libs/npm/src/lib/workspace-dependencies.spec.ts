@@ -1,7 +1,8 @@
-import { mocked } from 'ts-jest/utils';
-import { workspaceDependencyPath } from './workspace-dependencies';
-import * as pnpDependencies from './pnp-dependencies';
+import { PartialDeep } from 'type-fest';
 
+import { workspaceDependencyPath } from './workspace-dependencies';
+
+import * as pnpDependencies from './pnp-dependencies';
 jest.mock(
   './pnp-dependencies',
   (): Partial<typeof pnpDependencies> => ({
@@ -11,7 +12,32 @@ jest.mock(
     ),
   })
 );
-const mockedPnpDependencies = mocked(pnpDependencies, true);
+const mockedPnpDependencies = pnpDependencies as jest.Mocked<
+  typeof pnpDependencies
+>;
+
+import * as vscode from 'vscode';
+jest.mock('vscode', (): PartialDeep<typeof vscode> => {
+  return {
+    FileType: {
+      Directory: 2,
+    },
+    Uri: {
+      file: jest.fn((path) => path as any),
+    },
+    workspace: {
+      fs: {
+        stat: () =>
+          Promise.resolve({
+            ctime: 0,
+            mtime: 0,
+            size: 0,
+            type: 2,
+          }),
+      },
+    },
+  };
+});
 
 describe('workspace-dependencies path', () => {
   it('should return a path to a workspace dependency when using node_modules', async () => {

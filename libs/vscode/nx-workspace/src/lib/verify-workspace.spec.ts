@@ -13,7 +13,7 @@ import type {
   WorkspaceJsonConfiguration,
 } from '@nrwl/devkit';
 import * as vscode from 'vscode';
-import { Awaited } from '@nx-console/schema';
+import type { AsyncReturnType } from 'type-fest';
 
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 jest.mock('./get-nx-workspace-config', () => {
@@ -21,7 +21,7 @@ jest.mock('./get-nx-workspace-config', () => {
   return {
     ...originalModule,
     getNxWorkspaceConfig: async (): Promise<
-      Awaited<ReturnType<typeof getNxWorkspaceConfig>>
+      AsyncReturnType<typeof getNxWorkspaceConfig>
     > => {
       return {
         workspaceConfiguration: mockWorkspace,
