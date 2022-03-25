@@ -27,7 +27,8 @@
         "port": 4400,
         "config": {
           "configFolder": "libs/vscode-ui/feature-task-execution-form/.storybook"
-        }
+        },
+        "projectBuildConfig": "vscode-ui-feature-task-execution-form:build-storybook"
       },
       "configurations": {
         "ci": {
@@ -42,7 +43,8 @@
         "outputPath": "dist/storybook/vscode-ui-feature-task-execution-form",
         "config": {
           "configFolder": "libs/vscode-ui/feature-task-execution-form/.storybook"
-        }
+        },
+        "projectBuildConfig": "vscode-ui-feature-task-execution-form:build-storybook"
       },
       "configurations": {
         "ci": {

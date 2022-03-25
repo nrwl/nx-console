@@ -6,7 +6,7 @@
   "generators": {},
   "targets": {
     "build": {
-      "executor": "@nrwl/node:build",
+      "executor": "@nrwl/node:webpack",
       "options": {
         "externalDependencies": ["vscode"],
         "webpackConfig": "apps/vscode/webpack.config.js",
