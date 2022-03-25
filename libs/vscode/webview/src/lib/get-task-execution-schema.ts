@@ -29,7 +29,7 @@ export async function getTaskExecutionSchema(
     if (!validWorkspaceJson) {
       return;
     }
-
+    command = command.toLowerCase();
     switch (command) {
       case 'run': {
         const runnableItems = (await cliTaskProvider.getProjectEntries())

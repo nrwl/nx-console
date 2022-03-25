@@ -52,9 +52,8 @@ async function promptForFlagToSet(
     },
     ...options.map((option) => {
       const detail =
-        option.description || Array.isArray(option.type)
-          ? option.type?.[0]
-          : option.type;
+        option.description ??
+        (Array.isArray(option.type) ? option.type?.[0] : option.type);
       return new CliTaskFlagQuickPickItem(
         option.name,
         detail,
