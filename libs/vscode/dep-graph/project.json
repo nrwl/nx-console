@@ -1,0 +1,23 @@
+{
+  "root": "libs/vscode/dep-graph",
+  "sourceRoot": "libs/vscode/dep-graph/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/vscode/dep-graph/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/vscode/dep-graph"],
+      "options": {
+        "jestConfig": "libs/vscode/dep-graph/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

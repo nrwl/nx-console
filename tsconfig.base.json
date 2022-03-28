@@ -37,6 +37,7 @@
       "@nx-console/vscode/configuration": [
         "libs/vscode/configuration/src/index.ts"
       ],
+      "@nx-console/vscode/dep-graph": ["libs/vscode/dep-graph/src/index.ts"],
       "@nx-console/vscode/json-schema": [
         "libs/vscode/json-schema/src/index.ts"
       ],

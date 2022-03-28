@@ -53,6 +53,7 @@ import {
   ProjectJsonSchema,
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
+import { openDepGraph } from '@nx-console/vscode/dep-graph';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -124,6 +125,8 @@ export async function activate(c: ExtensionContext) {
     await enableTypeScriptPlugin(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
+    console.log('opening dep graph...');
+    await openDepGraph();
   } catch (e) {
     window.showErrorMessage(
       'Nx Console encountered an error when activating (see output panel)'
