@@ -8,7 +8,7 @@
     "build": {
       "executor": "@nrwl/node:webpack",
       "options": {
-        "externalDependencies": ["vscode"],
+        "externalDependencies": ["vscode", "typescript"],
         "webpackConfig": "apps/vscode/webpack.config.js",
         "outputPath": "dist/apps/vscode",
         "main": "apps/vscode/src/main.ts",
@@ -42,6 +42,7 @@
           "sourceMap": false,
           "optimization": true,
           "extractLicenses": true,
+          "externalDependencies": ["vscode"],
           "fileReplacements": [
             {
               "replace": "apps/vscode/src/environments/environment.ts",
