@@ -19,7 +19,7 @@ import {
  */
 const PROMPT_COUNT = 5;
 const PROMPT_MSG =
-  'Would you like to make ng commands faster by adding computation caching? [Learn more here](https://nx.dev/migration/migration-angular?utm_source=vscode-nx-conversion&utm_medium=prompt&utm_campaign=vscode-nx-conversion)';
+  'Would you like to make ng commands faster by adding computation caching? [Learn more here](https://nx.dev/migration/migration-angular?utm_source=vscode-nx-conversion&utm_medium=prompt&utm_campaign=vscode-nx-conversioni#from-nx-console)';
 const PROMPT_MSG_DONT_ASK_AGAIN =
   'If you change your mind, you can run the `make ng faster with Nx` command through the command palette.';
 
