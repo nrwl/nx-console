@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.15.0](https://github.com/nrwl/nx-console/compare/v17.14.1...v17.15.0) (2022-04-06)
+
+
+### Features
+
+* add prompts to add nx to angular cli ([#1254](https://github.com/nrwl/nx-console/issues/1254)) ([a669307](https://github.com/nrwl/nx-console/commits/a6693076d8987f370207ed965d3e5a91bde11f54))
+* adding run target to the commands ([#1249](https://github.com/nrwl/nx-console/issues/1249)) ([c4a0cbe](https://github.com/nrwl/nx-console/commits/c4a0cbe4887fc9a49638c8a456e5f6ee284ea191))
+* making the contents of the run target view match the workspace ([#1250](https://github.com/nrwl/nx-console/issues/1250)) ([11a8f60](https://github.com/nrwl/nx-console/commits/11a8f60b8efac21808032c75b7922a3508868751))
+
+
+### Bug Fixes
+
+* make sure that arguments are unique for the UI form ([#1248](https://github.com/nrwl/nx-console/issues/1248)) ([10fd881](https://github.com/nrwl/nx-console/commits/10fd881649c2f04bf487e60f1ac343c7f2d10a8c))
+* make sure to read schemas from both builders and executors for builder ([#1252](https://github.com/nrwl/nx-console/issues/1252)) ([f20cce9](https://github.com/nrwl/nx-console/commits/f20cce917043f69733e27766755dbc4a254d28a8))
+
 ### [17.14.1](https://github.com/nrwl/nx-console/compare/v17.14.0...v17.14.1) (2022-02-07)
 
 
