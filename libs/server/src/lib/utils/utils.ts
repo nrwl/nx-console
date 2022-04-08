@@ -223,12 +223,12 @@ export async function normalizeSchema(
       return -1;
     } else if (typeof b.positional === 'number') {
       return 1;
-    } else if (a.required) {
-      if (b.required) {
+    } else if (a.isRequired) {
+      if (b.isRequired) {
         return a.name.localeCompare(b.name);
       }
       return -1;
-    } else if (b.required) {
+    } else if (b.isRequired) {
       return 1;
     } else if (IMPORTANT_FIELDS_SET.has(a.name)) {
       if (IMPORTANT_FIELDS_SET.has(b.name)) {
