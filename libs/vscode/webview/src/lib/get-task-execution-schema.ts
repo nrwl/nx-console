@@ -217,6 +217,7 @@ function isProjectOption(option: Option) {
   return (
     option.name === 'project' ||
     option.name === 'projectName' ||
-    (option.$default && option.$default.$source === 'projectName')
+    option.$default?.$source === 'projectName' ||
+    option['x-dropdown'] === 'projects'
   );
 }

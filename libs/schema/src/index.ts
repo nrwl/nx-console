@@ -24,6 +24,7 @@ export interface Option extends CliOption {
   items?: string[] | ItemsWithEnum;
   aliases: string[];
   isRequired: boolean;
+  'x-dropdown'?: 'projects';
 }
 
 export interface ItemTooltips {
