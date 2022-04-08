@@ -1,6 +1,6 @@
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
-import * as NxFileUtils from 'nx/src/core/file-utils';
+import * as NxFileUtils from '@nrwl/workspace/src/core/file-utils';
 import { fileExists, getOutputChannel } from '@nx-console/server';
 import { platform } from 'os';
 import { workspaceDependencyPath } from '@nx-console/npm';
