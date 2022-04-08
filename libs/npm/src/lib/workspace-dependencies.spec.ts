@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import { PartialDeep } from 'type-fest';
 import { mocked } from 'ts-jest/utils';
 
