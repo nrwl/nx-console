@@ -52,6 +52,28 @@ describe('utils', () => {
       expect(r.map((x) => x.name)).toEqual(['a', 'c', 'b']);
     });
 
+    it('should sort required arguments', async () => {
+      const r = await normalizeSchema({
+        properties: {
+          a: { $default: { $source: 'argv', index: 1 } },
+          b: {},
+          c: {},
+          d: { $default: { $source: 'argv', index: 0 } },
+          e: {},
+        },
+        required: ['c', 'e'],
+      });
+      expect(r.map((x) => x.name)).toMatchInlineSnapshot(`
+        Array [
+          "d",
+          "a",
+          "c",
+          "e",
+          "b",
+        ]
+      `);
+    });
+
     it('should set items when enum is provided', async () => {
       const option = {
         ...mockOption,
