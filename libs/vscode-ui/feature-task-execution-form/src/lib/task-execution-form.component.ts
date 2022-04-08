@@ -463,7 +463,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect: TaskExecutionSchema,
     configurationName?: string
   ): string[] {
-    const fields = architect.options.filter((s) => value[s.name]);
+    const fields = architect.options
+      .filter((s) => value[s.name])
+      .sort((a, b) => (a?.positional ?? 0) - (b?.positional ?? 0));
+
     const defaultValues = this.getDefaultValuesForConfiguration(
       architect,
       configurationName
@@ -480,7 +483,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       )
         return;
 
-      if (f.positional) {
+      if (f.positional !== undefined && typeof f.positional === 'number') {
         args.add(sanitizeWhitespace(value[f.name]));
       } else if (f.type === OptionType.Boolean) {
         args.add(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
