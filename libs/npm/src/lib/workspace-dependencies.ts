@@ -39,8 +39,8 @@ export async function workspaceDependencyPath(
 
   const path = join(workspacePath, 'node_modules', workspaceDependencyName);
   try {
-    const fileType = (await workspace.fs.stat(Uri.file(path))).type;
-    return (fileType & FileType.Directory) === FileType.Directory
+    const directoryType = (await workspace.fs.stat(Uri.file(path))).type;
+    return (directoryType & FileType.Directory) === FileType.Directory
       ? path
       : undefined;
   } catch {
