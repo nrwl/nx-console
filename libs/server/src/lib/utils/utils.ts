@@ -24,7 +24,7 @@ import {
   printParseErrorCode,
 } from 'jsonc-parser';
 import { getOutputChannel } from './output-channel';
-import { toNewFormat } from 'nx/src/shared/workspace';
+import { toNewFormat } from 'nx/src/config/workspaces';
 import { PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
 import { getLibzipSync as libzip } from '@yarnpkg/libzip';
 
