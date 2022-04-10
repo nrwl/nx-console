@@ -15,8 +15,10 @@ import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { GeneratorType, Option, OptionType } from '@nx-console/schema';
-import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { getWorkspacePath, WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { selectGenerator } from './select-generator';
+import { exec } from 'child_process';
+import { getGenerators } from '@nx-console/server';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -76,10 +78,25 @@ export function registerCliTaskCommands(
     );
 
     commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
-      const getCorrectMoveGenerator = (uri: Uri) => '@nrwl/workspace:move';
-      // ^ needs to determine if the @nrwl/angular:move is in the list of
-      // generators for the cli and use it instead if present.
-      const generator = getCorrectMoveGenerator(uri);
+      /**
+       * Bit of a hack - always runs angular/move if it is installed.
+       *
+       * As of the date of implementation, no issues with running this angular generator
+       * on non-angular projects. BUT THIS MIGHT CHANGE IN THE FUTURE.
+       *
+       * Also, future may hold other framework specific move/remove generators - this
+       * solution won't work when that happens.
+       */
+      const getCorrectMoveGenerator = async () => {
+        const workspacePath = cliTaskProvider.getWorkspacePath();
+        const generators = await getGenerators(workspacePath);
+        return generators.find(
+          (generator) => generator.name === '@nrwl/angular:move'
+        )
+          ? '@nrwl/angular:move'
+          : '@nrwl/workspace:move';
+      };
+      const generator = await getCorrectMoveGenerator();
       selectCliCommandAndShowUi(
         'generate',
         context.extensionPath,

@@ -80,7 +80,7 @@
           "group": "2_workspace"
         },
         {
-          "when": "!isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "ng.move.fileexplorer",
           "group": "2_workspace"
         },
