@@ -341,7 +341,8 @@ export async function selectCliProject(
   command: string,
   json: WorkspaceJsonConfiguration
 ) {
-  const items = (await cliTaskProvider.getProjectEntries(json))
+  const projectEntries = await cliTaskProvider.getProjectEntries(json);
+  const items = projectEntries
     .filter(([, { targets }]) => Boolean(targets))
     .flatMap(([project, { targets, root }]) => ({ project, targets, root }))
     .filter(

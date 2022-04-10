@@ -1,8 +1,7 @@
-import { fileExists } from '@nx-console/server';
+import { fileExists, getShellExecutionForConfig } from '@nx-console/server';
 import { join } from 'path';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
-import { getShellExecutionForConfig } from './shell-execution';
 
 export class CliTask extends Task {
   static async create(

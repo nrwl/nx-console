@@ -5,7 +5,7 @@ import {
   OptionType,
   OptionPropertyDescription,
 } from '@nx-console/schema';
-import { Schema } from '@nrwl/tao/src/shared/params';
+import { Schema } from 'nx/src/utils/params';
 
 describe('utils', () => {
   describe('normalizeSchema', () => {
@@ -26,8 +26,8 @@ describe('utils', () => {
 
     it('should work with schema without any properties', async () => {
       // @ts-expect-error absence of required property "properties" is needed to test failure resistance
-      const r = await normalizeSchema({})
-      expect(r).toEqual([])
+      const r = await normalizeSchema({});
+      expect(r).toEqual([]);
     });
 
     it('should mark fields as required if they are listed in the required array', async () => {
@@ -50,6 +50,28 @@ describe('utils', () => {
         required: [],
       });
       expect(r.map((x) => x.name)).toEqual(['a', 'c', 'b']);
+    });
+
+    it('should sort required arguments', async () => {
+      const r = await normalizeSchema({
+        properties: {
+          a: { $default: { $source: 'argv', index: 1 } },
+          b: {},
+          c: {},
+          d: { $default: { $source: 'argv', index: 0 } },
+          e: {},
+        },
+        required: ['c', 'e'],
+      });
+      expect(r.map((x) => x.name)).toMatchInlineSnapshot(`
+        Array [
+          "d",
+          "a",
+          "c",
+          "e",
+          "b",
+        ]
+      `);
     });
 
     it('should set items when enum is provided', async () => {

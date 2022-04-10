@@ -9,6 +9,7 @@
     "vscode-configuration": "libs/vscode/configuration",
     "vscode-json-schema": "libs/vscode/json-schema",
     "vscode-nx-commands-view": "libs/vscode/nx-commands-view",
+    "vscode-nx-conversion": "libs/vscode/nx-conversion",
     "vscode-nx-project-view": "libs/vscode/nx-project-view",
     "vscode-nx-run-target-view": "libs/vscode/nx-run-target-view",
     "vscode-nx-workspace": "libs/vscode/nx-workspace",

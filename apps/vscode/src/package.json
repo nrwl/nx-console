@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Nx Console",
   "description": "Nx Console for Visual Studio Code",
-  "version": "17.14.1",
+  "version": "17.15.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"
@@ -151,6 +151,10 @@
         {
           "command": "nx.generate.ui.lib",
           "when": "isNxWorkspace && nx.hasLibraryGenerators"
+        },
+        {
+          "command": "nxConsole.makeNgFaster",
+          "when": "isAngularWorkspace"
         },
         {
           "command": "ng.run.target",
@@ -603,6 +607,11 @@
         "category": "Nx",
         "title": "Nx generate library",
         "command": "nx.generate.ui.lib.fileexplorer"
+      },
+      {
+        "category": "Nx",
+        "title": "Make ng Faster with Nx",
+        "command": "nxConsole.makeNgFaster"
       }
     ],
     "configuration": {

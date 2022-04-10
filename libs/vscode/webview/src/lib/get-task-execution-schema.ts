@@ -30,7 +30,7 @@ export async function getTaskExecutionSchema(
     if (!validWorkspaceJson) {
       return;
     }
-
+    command = command.toLowerCase();
     switch (command) {
       case 'run': {
         const runnableItems = (await cliTaskProvider.getProjectEntries())
@@ -224,6 +224,7 @@ function isProjectOption(option: Option) {
   return (
     option.name === 'project' ||
     option.name === 'projectName' ||
-    (option.$default && option.$default.$source === 'projectName')
+    option.$default?.$source === 'projectName' ||
+    option['x-dropdown'] === 'projects'
   );
 }

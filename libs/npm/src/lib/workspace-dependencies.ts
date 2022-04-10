@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { FileType, Uri, workspace } from 'vscode';
 import { npmDependencies } from './npm-dependencies';
 import {
   isWorkspaceInPnp,
@@ -36,5 +37,13 @@ export async function workspaceDependencyPath(
     return pnpDependencyPath(workspacePath, workspaceDependencyName);
   }
 
-  return join(workspacePath, 'node_modules', workspaceDependencyName);
+  const path = join(workspacePath, 'node_modules', workspaceDependencyName);
+  try {
+    const directoryType = (await workspace.fs.stat(Uri.file(path))).type;
+    return (directoryType & FileType.Directory) === FileType.Directory
+      ? path
+      : undefined;
+  } catch {
+    return;
+  }
 }

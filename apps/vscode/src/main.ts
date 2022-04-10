@@ -24,7 +24,6 @@ import {
   getGenerators,
   teardownTelemetry,
   watchFile,
-  directoryExists,
   fileExists,
 } from '@nx-console/server';
 import {
@@ -46,13 +45,14 @@ import {
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
 import { environment } from './environments/environment';
-import { Awaited } from '@nx-console/schema';
+import { AsyncReturnType } from 'type-fest';
 
 import {
   WorkspaceJsonSchema,
   ProjectJsonSchema,
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
+import { NxConversion } from '@nx-console/vscode/nx-conversion';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -121,6 +121,8 @@ export async function activate(c: ExtensionContext) {
     new WorkspaceCodeLensProvider(context);
     new WorkspaceJsonSchema(context);
     new ProjectJsonSchema(context);
+
+    NxConversion.createInstance(context);
 
     await enableTypeScriptPlugin(context);
 
@@ -257,6 +259,7 @@ async function setWorkspace(workspacePath: string) {
   } else if (!isNxWorkspace && isAngularWorkspace) {
     workspaceType = 'angular';
   }
+  WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
 
   getTelemetry().record('WorkspaceType', { workspaceType });
 }
@@ -264,7 +267,7 @@ async function setWorkspace(workspacePath: string) {
 async function setApplicationAndLibraryContext(workspacePath: string) {
   const { getNxConfig } = await import('@nx-console/vscode/nx-workspace');
 
-  let nxConfig: Awaited<ReturnType<typeof getNxConfig>>;
+  let nxConfig: AsyncReturnType<typeof getNxConfig>;
   try {
     nxConfig = await getNxConfig(workspacePath);
   } catch {
