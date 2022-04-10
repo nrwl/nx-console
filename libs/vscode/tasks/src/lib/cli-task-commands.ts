@@ -1,23 +1,14 @@
-import {
-  commands,
-  ExtensionContext,
-  window,
-  Uri,
-  Task,
-  TaskScope,
-  tasks,
-} from 'vscode';
+import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { nxVersion, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { GeneratorType, Option, OptionType } from '@nx-console/schema';
-import { getWorkspacePath, WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { selectGenerator } from './select-generator';
-import { exec } from 'child_process';
 import { getGenerators } from '@nx-console/server';
 
 const CLI_COMMAND_LIST = [
@@ -77,34 +68,72 @@ export function registerCliTaskCommands(
       selectCliCommandAndPromptForFlags('run', await getCliProjectFromUri(uri))
     );
 
-    commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
-      /**
-       * Bit of a hack - always runs angular/move if it is installed.
-       *
-       * As of the date of implementation, no issues with running this angular generator
-       * on non-angular projects. BUT THIS MIGHT CHANGE IN THE FUTURE.
-       *
-       * Also, future may hold other framework specific move/remove generators - this
-       * solution won't work when that happens.
-       */
-      const getCorrectMoveGenerator = async () => {
-        const workspacePath = cliTaskProvider.getWorkspacePath();
-        const generators = await getGenerators(workspacePath);
-        return generators.find(
-          (generator) => generator.name === '@nrwl/angular:move'
-        )
-          ? '@nrwl/angular:move'
-          : '@nrwl/workspace:move';
-      };
-      const generator = await getCorrectMoveGenerator();
-      selectCliCommandAndShowUi(
-        'generate',
-        context.extensionPath,
-        uri,
-        GeneratorType.Other,
-        generator
+    /**
+     * move and remove were release in patch 8.11
+     */
+    const version = nxVersion();
+    if (version && version >= 8) {
+      commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
+        /**
+         * Bit of a hack - always runs angular/move if it is installed.
+         *
+         * As of the date of implementation, no issues with running this angular generator
+         * on non-angular projects. BUT THIS MIGHT CHANGE IN THE FUTURE.
+         *
+         * Also, future may hold other framework specific move/remove generators - this
+         * solution won't work when that happens.
+         */
+        const getCorrectMoveGenerator = async () => {
+          const workspacePath = cliTaskProvider.getWorkspacePath();
+          const generators = await getGenerators(workspacePath);
+          return generators.find(
+            (generator) => generator.name === '@nrwl/angular:move'
+          )
+            ? '@nrwl/angular:move'
+            : '@nrwl/workspace:move';
+        };
+        const generator = await getCorrectMoveGenerator();
+        selectCliCommandAndShowUi(
+          'generate',
+          context.extensionPath,
+          uri,
+          GeneratorType.Other,
+          generator
+        );
+      });
+
+      commands.registerCommand(
+        `${cli}.remove.fileexplorer`,
+        async (uri: Uri) => {
+          /**
+           * Bit of a hack - always runs angular/remove if it is installed.
+           *
+           * As of the date of implementation, no issues with running this angular generator
+           * on non-angular projects. BUT THIS MIGHT CHANGE IN THE FUTURE.
+           *
+           * Also, future may hold other framework specific move/remove generators - this
+           * solution won't work when that happens.
+           */
+          const getCorrectRemoveGenerator = async () => {
+            const workspacePath = cliTaskProvider.getWorkspacePath();
+            const generators = await getGenerators(workspacePath);
+            return generators.find(
+              (generator) => generator.name === '@nrwl/angular:remove'
+            )
+              ? '@nrwl/angular:remove'
+              : '@nrwl/workspace:remove';
+          };
+          const generator = await getCorrectRemoveGenerator();
+          selectCliCommandAndShowUi(
+            'generate',
+            context.extensionPath,
+            uri,
+            GeneratorType.Other,
+            generator
+          );
+        }
       );
-    });
+    }
 
     commands.registerCommand(`${cli}.generate`, () =>
       selectGeneratorAndPromptForFlags()

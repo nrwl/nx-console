@@ -80,8 +80,8 @@
           "group": "2_workspace"
         },
         {
-          "when": "isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
-          "command": "ng.move.fileexplorer",
+          "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
+          "command": "nx.remove.fileexplorer",
           "group": "2_workspace"
         },
         {
@@ -579,9 +579,9 @@
         "command": "nx.move.fileexplorer"
       },
       {
-        "category": "ng",
-        "title": "Move Nx Project...",
-        "command": "ng.move.fileexplorer"
+        "category": "Nx",
+        "title": "Remove Nx Project...",
+        "command": "nx.move.fileexplorer"
       },
       {
         "category": "Nx",
