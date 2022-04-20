@@ -26,6 +26,7 @@ interface RevealWebViewPanelConfig {
   cliTaskProvider: CliTaskProvider;
   runTargetTreeView: TreeView<RunTargetTreeItem>;
   contextMenuUri?: Uri;
+  generator?: string;
 }
 
 export async function revealWebViewPanel({
@@ -34,13 +35,15 @@ export async function revealWebViewPanel({
   runTargetTreeItem,
   runTargetTreeView,
   contextMenuUri,
+  generator,
 }: RevealWebViewPanelConfig) {
   const { label, generatorType } = runTargetTreeItem;
   const schema = await getTaskExecutionSchema(
     cliTaskProvider,
     label,
     contextMenuUri,
-    generatorType
+    generatorType,
+    generator
   );
 
   if (!schema) {
