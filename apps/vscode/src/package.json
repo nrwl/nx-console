@@ -581,7 +581,7 @@
       {
         "category": "Nx",
         "title": "Remove Nx Project...",
-        "command": "nx.move.fileexplorer"
+        "command": "nx.remove.fileexplorer"
       },
       {
         "category": "Nx",
