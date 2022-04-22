@@ -77,12 +77,12 @@
         {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.move.fileexplorer",
-          "group": "2_workspace"
+          "group": "7_modification@-1"
         },
         {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.remove.fileexplorer",
-          "group": "2_workspace"
+          "group": "7_modification@-1"
         },
         {
           "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxAppsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasApplicationGenerators",
@@ -581,7 +581,7 @@
       {
         "category": "Nx",
         "title": "Remove Nx Project...",
-        "command": "nx.move.fileexplorer"
+        "command": "nx.remove.fileexplorer"
       },
       {
         "category": "Nx",
