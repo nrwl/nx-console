@@ -1,6 +1,11 @@
-import { CollectionInfo, GeneratorType } from '@nx-console/schema';
+import {
+  CollectionInfo,
+  GeneratorType,
+  WorkspaceProjects,
+} from '@nx-console/schema';
 import { basename, join } from 'path';
 
+import { getCollectionInfo, readCollections } from './read-collections';
 import {
   directoryExists,
   fileExists,
@@ -8,13 +13,16 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
 } from './utils';
-import { getCollectionInfo, readCollections } from './read-collections';
 
 export async function getGenerators(
-  workspacePath: string
+  workspacePath: string,
+  projects?: WorkspaceProjects
 ): Promise<CollectionInfo[]> {
   const basedir = workspacePath;
-  const collections = await readCollections(workspacePath, false);
+  const collections = await readCollections(workspacePath, {
+    projects,
+    clearPackageJsonCache: false,
+  });
   let generatorCollections = collections.filter(
     (collection) => collection.type === 'generator'
   );

@@ -2,20 +2,28 @@ import {
   workspaceDependencies,
   workspaceDependencyPath,
 } from '@nx-console/npm';
-import { CollectionInfo, Generator, GeneratorType } from '@nx-console/schema';
+import {
+  CollectionInfo,
+  Generator,
+  GeneratorType,
+  WorkspaceProjects,
+} from '@nx-console/schema';
 import { platform } from 'os';
 import { dirname, join, resolve } from 'path';
 import { clearJsonCache, readAndCacheJsonFile } from './utils';
 
 export async function readCollections(
   workspacePath: string,
-  clearPackageJsonCache: boolean
+  options: {
+    projects?: WorkspaceProjects;
+    clearPackageJsonCache?: boolean;
+  }
 ): Promise<CollectionInfo[]> {
-  if (clearPackageJsonCache) {
+  if (options?.clearPackageJsonCache) {
     clearJsonCache('package.json', workspacePath);
   }
 
-  const packages = await workspaceDependencies(workspacePath);
+  const packages = await workspaceDependencies(workspacePath, options.projects);
 
   const collections = await Promise.all(
     packages.map(async (p) => {

@@ -83,8 +83,8 @@ export async function selectGenerator(
     generator: Generator;
     collectionPath: string;
   }
-
-  const generators = await getGenerators(workspacePath);
+  const { json } = await verifyWorkspace();
+  const generators = await getGenerators(workspacePath, json.projects);
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)
     .map((collection): GenerateQuickPickItem => {

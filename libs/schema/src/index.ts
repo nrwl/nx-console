@@ -1,3 +1,4 @@
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { Schema } from 'nx/src/utils/params';
 
 export enum OptionType {
@@ -98,13 +99,6 @@ export interface TargetConfiguration {
   defaultValues: DefaultValue[];
 }
 
-export interface Project {
-  name: string;
-  root: string;
-  projectType: string;
-  targets: Targets[];
-}
-
 export interface Targets {
   name: string;
   project: string;
@@ -116,3 +110,7 @@ export interface Targets {
 
 export const WORKSPACE_GENERATOR_NAME_REGEX =
   /^workspace-(schematic|generator):(.+)/;
+
+export type WorkspaceProjects = WorkspaceJsonConfiguration['projects'];
+
+export { Store } from './store';

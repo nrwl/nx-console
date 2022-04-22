@@ -1,6 +1,5 @@
 import {
   Targets,
-  Project,
   Option,
   DefaultValue,
   TargetConfiguration,
