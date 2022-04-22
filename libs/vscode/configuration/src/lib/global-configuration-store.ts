@@ -4,7 +4,7 @@ import {
   workspace,
   Memento,
 } from 'vscode';
-import { Store } from '@nx-console/server';
+import { Store } from '@nx-console/schema';
 import { GLOBAL_CONFIG_KEYS, GlobalConfigKeys } from './configuration-keys';
 
 let CONFIG_STORE: GlobalConfigurationStore;

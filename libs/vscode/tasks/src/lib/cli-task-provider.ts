@@ -1,5 +1,8 @@
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
-import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/schema';
+import {
+  WorkspaceProjects,
+  WORKSPACE_GENERATOR_NAME_REGEX,
+} from '@nx-console/schema';
 import { getTelemetry } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
@@ -112,7 +115,9 @@ export class CliTaskProvider implements TaskProvider {
     });
   }
 
-  async getProjects(json?: WorkspaceJsonConfiguration) {
+  async getProjects(
+    json?: WorkspaceJsonConfiguration
+  ): Promise<WorkspaceProjects> {
     if (json) {
       return json.projects;
     } else {

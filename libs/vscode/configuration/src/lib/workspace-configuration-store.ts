@@ -1,4 +1,4 @@
-import { Store } from '@nx-console/server';
+import { Store } from '@nx-console/schema';
 import { ExtensionContext, Memento } from 'vscode';
 import { WorkspaceConfigKeys } from './configuration-keys';
 

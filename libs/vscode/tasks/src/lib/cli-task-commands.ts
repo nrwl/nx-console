@@ -85,7 +85,10 @@ export function registerCliTaskCommands(
          */
         const getCorrectMoveGenerator = async () => {
           const workspacePath = cliTaskProvider.getWorkspacePath();
-          const generators = await getGenerators(workspacePath);
+          const generators = await getGenerators(
+            workspacePath,
+            await cliTaskProvider.getProjects()
+          );
           return generators.find(
             (generator) => generator.name === '@nrwl/angular:move'
           )
@@ -116,7 +119,10 @@ export function registerCliTaskCommands(
            */
           const getCorrectRemoveGenerator = async () => {
             const workspacePath = cliTaskProvider.getWorkspacePath();
-            const generators = await getGenerators(workspacePath);
+            const generators = await getGenerators(
+              workspacePath,
+              await cliTaskProvider.getProjects()
+            );
             return generators.find(
               (generator) => generator.name === '@nrwl/angular:remove'
             )

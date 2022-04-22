@@ -53,6 +53,7 @@ import {
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
+import { nxVersion } from '@nx-console/vscode/nx-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -234,7 +235,7 @@ async function setWorkspace(workspacePath: string) {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
 
-  await setApplicationAndLibraryContext(workspacePath);
+  setApplicationAndLibraryContext(workspacePath);
 
   const isNxWorkspace = existsSync(join(workspacePath, 'nx.json'));
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
@@ -260,6 +261,7 @@ async function setWorkspace(workspacePath: string) {
     workspaceType = 'angular';
   }
   WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
+  WorkspaceConfigurationStore.instance.set('nxVersion', nxVersion());
 
   getTelemetry().record('WorkspaceType', { workspaceType });
 }
