@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.16.0](https://github.com/nrwl/nx-console/compare/v17.15.0...v17.16.0) (2022-04-29)
+
+
+### Features
+
+* list local plugins ([#1274](https://github.com/nrwl/nx-console/issues/1274)) ([2e6fe76](https://github.com/nrwl/nx-console/commits/2e6fe76e9063516ad0b887da6a92598d0dd3c74a))
+* Nx Move and Remove Project in Context Menu ([#1256](https://github.com/nrwl/nx-console/issues/1256)) ([ebc2a9c](https://github.com/nrwl/nx-console/commits/ebc2a9c4836c83bbf6bfe52b5fd164f82164b094))
+
+
+### Bug Fixes
+
+* check if dependency path type is directory with bit flag ([#1267](https://github.com/nrwl/nx-console/issues/1267)) ([e75daac](https://github.com/nrwl/nx-console/commits/e75daac604364b22d0891a1ea141c8abc115f2c6))
+* fall back to sourceRoot when determining target projects from the context menu ([4b6ed11](https://github.com/nrwl/nx-console/commits/4b6ed11cae922809c4ba6411452c2bad525ccf43))
+* fixing missing key for remove.fileexplorer ([#1275](https://github.com/nrwl/nx-console/issues/1275)) ([53ce4e2](https://github.com/nrwl/nx-console/commits/53ce4e2737349bb6e9394d0e9bc0fbb13165d4ef))
+* properly check positional argument for generating with UI ([#1268](https://github.com/nrwl/nx-console/issues/1268)) ([764b95f](https://github.com/nrwl/nx-console/commits/764b95f8cc7cdc2e17c5741af1374eeb98d758bc))
+* sort properties by required ([#1269](https://github.com/nrwl/nx-console/issues/1269)) ([5f58cd5](https://github.com/nrwl/nx-console/commits/5f58cd514ae087562d74ef71fb3a4de785731908))
+
 ## [17.15.0](https://github.com/nrwl/nx-console/compare/v17.14.1...v17.15.0) (2022-04-06)
 
 
