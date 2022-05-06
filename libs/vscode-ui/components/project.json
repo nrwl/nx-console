@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/vscode-ui/components",
   "sourceRoot": "libs/vscode-ui/components/src",
   "targets": {
     "lint": {
@@ -15,7 +14,7 @@
     "test": {
       "executor": "@nrwl/jest:jest",
       "options": {
-        "jestConfig": "libs/vscode-ui/components/jest.config.js",
+        "jestConfig": "libs/vscode-ui/components/jest.config.ts",
         "passWithNoTests": true
       },
       "outputs": ["coverage/libs/vscode-ui/components"]

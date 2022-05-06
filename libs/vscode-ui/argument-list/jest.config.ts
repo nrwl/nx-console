@@ -1,14 +1,15 @@
 module.exports = {
-  displayName: 'vscode-ui-components',
-  preset: '../../../jest.preset.js',
-  setupFilesAfterEnv: ['<rootDir>/test-setup.ts'],
+  displayName: 'vscode-ui-argument-list',
+
+  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
       stringifyContentPathRegex: '\\.(html|svg)$',
+
       tsconfig: '<rootDir>/tsconfig.spec.json',
     },
   },
-  coverageDirectory: '../../../coverage/libs/vscode-ui/components',
+  coverageDirectory: '../../../coverage/libs/vscode-ui/argument-list',
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',
@@ -18,4 +19,5 @@ module.exports = {
     '^.+.(ts|mjs|js|html)$': 'jest-preset-angular',
   },
   transformIgnorePatterns: ['node_modules/(?!.*.mjs$)'],
+  preset: '../../../jest.preset.ts',
 };

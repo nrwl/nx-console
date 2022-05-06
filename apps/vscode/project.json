@@ -1,5 +1,4 @@
 {
-  "root": "apps/vscode",
   "sourceRoot": "apps/vscode/src",
   "projectType": "application",
   "prefix": "vscode",

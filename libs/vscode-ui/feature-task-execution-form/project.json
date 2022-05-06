@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/vscode-ui/feature-task-execution-form",
   "sourceRoot": "libs/vscode-ui/feature-task-execution-form/src",
   "targets": {
     "lint": {
@@ -15,7 +14,7 @@
     "test": {
       "executor": "@nrwl/jest:jest",
       "options": {
-        "jestConfig": "libs/vscode-ui/feature-task-execution-form/jest.config.js",
+        "jestConfig": "libs/vscode-ui/feature-task-execution-form/jest.config.ts",
         "passWithNoTests": true
       },
       "outputs": ["coverage/libs/vscode-ui/feature-task-execution-form"]

@@ -5,7 +5,6 @@
       "style": "scss"
     }
   },
-  "root": "apps/vscode-ui",
   "sourceRoot": "apps/vscode-ui/src",
   "targets": {
     "build": {
@@ -70,7 +69,7 @@
     "test": {
       "executor": "@nrwl/jest:jest",
       "options": {
-        "jestConfig": "apps/vscode-ui/jest.config.js",
+        "jestConfig": "apps/vscode-ui/jest.config.ts",
         "passWithNoTests": true
       },
       "outputs": ["coverage/apps/vscode-ui"]

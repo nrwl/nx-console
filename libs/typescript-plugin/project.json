@@ -1,5 +1,4 @@
 {
-  "root": "libs/typescript-plugin",
   "sourceRoot": "libs/typescript-plugin/src",
   "projectType": "library",
   "targets": {
@@ -25,7 +24,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/typescript-plugin"],
       "options": {
-        "jestConfig": "libs/typescript-plugin/jest.config.js",
+        "jestConfig": "libs/typescript-plugin/jest.config.ts",
         "passWithNoTests": true
       }
     }

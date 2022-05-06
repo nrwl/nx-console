@@ -1,5 +1,4 @@
 {
-  "root": "libs/vscode/webview",
   "sourceRoot": "libs/vscode/webview/src",
   "projectType": "library",
   "targets": {
@@ -13,7 +12,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/vscode/webview"],
       "options": {
-        "jestConfig": "libs/vscode/webview/jest.config.js",
+        "jestConfig": "libs/vscode/webview/jest.config.ts",
         "passWithNoTests": true
       }
     },

@@ -1,5 +1,4 @@
 {
-  "root": "libs/vscode/nx-conversion",
   "sourceRoot": "libs/vscode/nx-conversion/src",
   "projectType": "library",
   "targets": {
@@ -25,7 +24,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/vscode/nx-conversion"],
       "options": {
-        "jestConfig": "libs/vscode/nx-conversion/jest.config.js",
+        "jestConfig": "libs/vscode/nx-conversion/jest.config.ts",
         "passWithNoTests": true
       }
     }

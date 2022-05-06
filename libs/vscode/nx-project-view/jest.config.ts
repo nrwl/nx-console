@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'vscode-nx-run-target-view',
-  preset: '../../../jest.preset.js',
+  displayName: 'vscode-nx-project-view',
+
   globals: {
     'ts-jest': { tsconfig: '<rootDir>/tsconfig.spec.json' },
   },
@@ -8,6 +8,7 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/nx-run-target-view',
+  coverageDirectory: '../../../coverage/libs/vscode/nx-project-view',
   testEnvironment: 'node',
+  preset: '../../../jest.preset.ts',
 };
