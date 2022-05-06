@@ -76,7 +76,8 @@ export async function activate(c: ExtensionContext) {
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
 
-    initTelemetry(GlobalConfigurationStore.instance, environment.production);
+    // TODO(cammisuli): revert this back to `environment.production` after verifying that new data shows up
+    initTelemetry(GlobalConfigurationStore.instance, true);
 
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,

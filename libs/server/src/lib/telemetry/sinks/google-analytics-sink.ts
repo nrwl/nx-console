@@ -7,7 +7,7 @@ import type { Visitor } from 'universal-analytics';
 // increment this if there is substancial changes to the schema,
 // and you want to create a new view that only has this data
 const ANALYTICS_VERSION = 2;
-const TRACKING_ID = 'UA-88380372-8';
+const TRACKING_ID = 'G-TNJ97NGX40';
 export type ApplicationPlatform = 'vscode';
 
 class TelemetryParams {
