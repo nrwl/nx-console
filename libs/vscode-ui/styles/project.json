@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/vscode-ui/styles",
   "sourceRoot": "libs/vscode-ui/styles/src",
   "targets": {},
   "generators": {},

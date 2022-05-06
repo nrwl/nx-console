@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/vscode-ui/argument-list",
   "sourceRoot": "libs/vscode-ui/argument-list/src",
   "prefix": "nx-console",
   "targets": {
@@ -17,7 +16,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/vscode-ui/argument-list"],
       "options": {
-        "jestConfig": "libs/vscode-ui/argument-list/jest.config.js",
+        "jestConfig": "libs/vscode-ui/argument-list/jest.config.ts",
         "passWithNoTests": true
       }
     }

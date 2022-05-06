@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'vscode-configuration',
-  preset: '../../../jest.preset.js',
+  displayName: 'vscode-tasks',
+
   globals: {
     'ts-jest': { tsconfig: '<rootDir>/tsconfig.spec.json' },
   },
@@ -8,6 +8,7 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/configuration',
+  coverageDirectory: '../../../coverage/libs/vscode/tasks',
   testEnvironment: 'node',
+  preset: '../../../jest.preset.ts',
 };

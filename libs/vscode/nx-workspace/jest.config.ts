@@ -1,6 +1,6 @@
 module.exports = {
   displayName: 'vscode-nx-workspace',
-  preset: '../../../jest.preset.js',
+
   globals: {
     'ts-jest': { tsconfig: '<rootDir>/tsconfig.spec.json' },
   },
@@ -13,4 +13,5 @@ module.exports = {
   },
   coverageDirectory: '../../../coverage/libs/vscode/nx-workspace',
   testEnvironment: 'node',
+  preset: '../../../jest.preset.ts',
 };

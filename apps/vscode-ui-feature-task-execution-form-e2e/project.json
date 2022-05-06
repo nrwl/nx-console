@@ -1,5 +1,4 @@
 {
-  "root": "apps/vscode-ui-feature-task-execution-form-e2e",
   "sourceRoot": "apps/vscode-ui-feature-task-execution-form-e2e/src",
   "projectType": "application",
   "targets": {

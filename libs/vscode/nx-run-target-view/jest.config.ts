@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'vscode-webview',
-  preset: '../../../jest.preset.js',
+  displayName: 'vscode-nx-run-target-view',
+
   globals: {
     'ts-jest': { tsconfig: '<rootDir>/tsconfig.spec.json' },
   },
@@ -8,6 +8,7 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/webview',
+  coverageDirectory: '../../../coverage/libs/vscode/nx-run-target-view',
   testEnvironment: 'node',
+  preset: '../../../jest.preset.ts',
 };

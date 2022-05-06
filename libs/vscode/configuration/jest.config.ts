@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'vscode-verify',
-  preset: '../../../jest.preset.js',
+  displayName: 'vscode-configuration',
+
   globals: {
     'ts-jest': { tsconfig: '<rootDir>/tsconfig.spec.json' },
   },
@@ -8,6 +8,7 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/verify',
+  coverageDirectory: '../../../coverage/libs/vscode/configuration',
   testEnvironment: 'node',
+  preset: '../../../jest.preset.ts',
 };
