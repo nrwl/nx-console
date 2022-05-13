@@ -38,14 +38,17 @@ describe('FormatTaskPipe', () => {
 
   it('should optionally include configuration flag', () => {
     expect(
-      pipe.transform({
-        name: '',
-        cliName: 'nx',
-        description: '',
-        options: [],
-        command: 'build',
-        positional: 'the-project',
-      }, 'production')
-    ).toEqual('nx build the-project --prod');
-  })
+      pipe.transform(
+        {
+          name: '',
+          cliName: 'nx',
+          description: '',
+          options: [],
+          command: 'build',
+          positional: 'the-project',
+        },
+        'production'
+      )
+    ).toEqual('nx build the-project --configuration production');
+  });
 });
