@@ -23,10 +23,8 @@ export const formatTask = (
 export const getConfigurationFlag = (configuration?: string): string => {
   if (!configuration || !configuration.length) {
     return '';
-  } else if (configuration === 'production') {
-    return '--prod';
   } else {
-    return `-c=${configuration}`;
+    return `--configuration ${configuration}`;
   }
 };
 
