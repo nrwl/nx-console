@@ -2,7 +2,19 @@ import { Sink } from '../sink';
 import { TelemetryType } from '../record';
 import { User } from '../user';
 import { TelemetryMessageBuilder } from '../message-builder';
-import type { Visitor } from 'universal-analytics';
+import { initializeApp } from 'firebase/app';
+import {
+  getAnalytics,
+  Analytics,
+  setUserId,
+  setUserProperties,
+  logEvent,
+} from 'firebase/analytics';
+
+// TODO(Cammisuli): get the rest of this information
+const app = initializeApp({
+  measurementId: 'G-TNJ97NGX40',
+});
 
 // increment this if there is substancial changes to the schema,
 // and you want to create a new view that only has this data
@@ -28,25 +40,29 @@ class TelemetryParams {
 }
 
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  visitor: Visitor = require('universal-analytics')(TRACKING_ID, {
-    uid: this.user.id,
-  });
+  analytics: Analytics;
 
   get enabled() {
     return this.user.state !== 'untracked';
   }
 
   constructor(readonly user: User, readonly platform: ApplicationPlatform) {
+    this.analytics = getAnalytics(app);
+
     this.setPersistentParams();
   }
 
   setPersistentParams() {
-    this.visitor.set('uid', this.user.id);
-    this.visitor.set('ds', 'app');
-    this.visitor.set('cd1', this.user.state);
-    this.visitor.set('cd2', this.platform);
-    this.visitor.set('cd3', ANALYTICS_VERSION);
+    setUserId(this.analytics, this.user.id, {
+      global: true,
+    });
+
+    setUserProperties(this.analytics, {
+      state: this.user.state,
+      // TODO(cammisuli): get version from the extension context
+      version: '',
+      platform: this.platform,
+    });
   }
 
   record(type: TelemetryType, data: any): void {
@@ -91,89 +107,60 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   }
 
   extensionActivated(time: number): void {
-    this.visitor
-      .event({
-        ec: 'Application',
-        ea: 'Activated',
-      })
-      .timing({
-        utc: 'Application',
-        utv: 'Activation Time',
-        utt: time,
-      })
-      .send();
+    logEvent(this.analytics, 'application', {
+      value: 'activated',
+      timing: time,
+    });
   }
 
   extensionDeactivated(): void {
-    this.visitor
-      .event({
-        ec: 'Application',
-        ea: 'Deactivated',
-      })
-      .send();
+    logEvent(this.analytics, 'application', {
+      value: 'deactivated',
+    });
   }
 
   startedTracking(): void {
-    this.visitor
-      .event({
-        ec: 'Data Collection',
-        ea: 'Opt In',
-      })
-      .send();
+    logEvent(this.analytics, 'data_collection', {
+      value: 'opt-in',
+    });
   }
 
   stoppedTracking(): void {
-    this.visitor
-      .event({
-        ec: 'Data Collection',
-        ea: 'Opt Out',
-      })
-      .send();
+    logEvent(this.analytics, 'data_collection', {
+      value: 'opt-out',
+    });
   }
 
   screenViewed(screen: string): void {
-    this.visitor
-      .screenview({
-        an: 'Nx Console',
-        cd: screen,
-      })
-      .send();
+    logEvent(this.analytics, 'screen_view', {
+      firebase_screen: screen,
+      firebase_screen_class: screen,
+      value: screen,
+    });
   }
 
   commandRun(commandType: string, time: number): void {
-    this.visitor
-      .timing({
-        utc: 'Command',
-        utv: commandType,
-        utt: time,
-      })
-      .send();
+    logEvent(this.analytics, 'command_run', {
+      value: commandType,
+      timing: time,
+    });
   }
 
   exception(error: string) {
-    this.visitor
-      .exception({
-        exd: error,
-      })
-      .send();
+    logEvent(this.analytics, 'exception', {
+      description: error,
+    });
   }
 
   featureUsed(feature: string) {
-    this.visitor
-      .event({
-        ec: 'Feature',
-        ea: feature,
-      })
-      .send();
+    logEvent(this.analytics, 'feature_used', {
+      value: feature,
+    });
   }
 
   workspaceType(workspaceType: string) {
-    this.visitor
-      .event({
-        ec: 'WorkspaceType',
-        ea: workspaceType,
-        ev: 1,
-      })
-      .send();
+    logEvent(this.analytics, 'workspace_type', {
+      workspaceType,
+    });
   }
 }
