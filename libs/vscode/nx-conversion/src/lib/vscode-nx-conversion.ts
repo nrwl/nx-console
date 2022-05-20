@@ -73,10 +73,6 @@ export class NxConversion {
   }
 
   async trackEvent(eventName: string) {
-    if (eventName === 'generate') {
-      return;
-    }
-
     this._listener.next(eventName);
   }
 }
