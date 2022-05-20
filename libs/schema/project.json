@@ -5,18 +5,9 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["libs/schema/**/*.ts"]
-      }
-    },
-    "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/schema",
-        "tsConfig": "libs/schema/tsconfig.lib.json",
-        "packageJson": "libs/schema/package.json",
-        "main": "libs/schema/src/index.ts",
-        "assets": ["libs/schema/*.md"]
+        "lintFilePatterns": [
+          "libs/schema/**/*.ts"
+        ]
       }
     }
   },

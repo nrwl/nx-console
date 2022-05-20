@@ -17,7 +17,9 @@
         "jestConfig": "libs/vscode-ui/components/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/vscode-ui/components"]
+      "outputs": [
+        "coverage/libs/vscode-ui/components"
+      ]
     }
   },
   "tags": []

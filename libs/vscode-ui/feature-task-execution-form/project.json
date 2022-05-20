@@ -17,7 +17,9 @@
         "jestConfig": "libs/vscode-ui/feature-task-execution-form/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/vscode-ui/feature-task-execution-form"]
+      "outputs": [
+        "coverage/libs/vscode-ui/feature-task-execution-form"
+      ]
     },
     "storybook": {
       "executor": "@nrwl/storybook:storybook",
@@ -50,7 +52,9 @@
           "quiet": true
         }
       },
-      "outputs": ["{options.outputPath}"]
+      "outputs": [
+        "{options.outputPath}"
+      ]
     }
   },
   "generators": {},

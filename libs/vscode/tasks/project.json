@@ -5,26 +5,19 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["libs/vscode/tasks/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/vscode/tasks/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/tasks"],
+      "outputs": [
+        "coverage/libs/vscode/tasks"
+      ],
       "options": {
         "jestConfig": "libs/vscode/tasks/jest.config.ts",
         "passWithNoTests": true
-      }
-    },
-    "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/vscode/tasks",
-        "tsConfig": "libs/vscode/tasks/tsconfig.lib.json",
-        "packageJson": "libs/vscode/tasks/package.json",
-        "main": "libs/vscode/tasks/src/index.ts",
-        "assets": ["libs/vscode/tasks/*.md"]
       }
     }
   },

@@ -5,26 +5,19 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["libs/vscode/nx-project-view/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/vscode/nx-project-view/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/nx-project-view"],
+      "outputs": [
+        "coverage/libs/vscode/nx-project-view"
+      ],
       "options": {
         "jestConfig": "libs/vscode/nx-project-view/jest.config.ts",
         "passWithNoTests": true
-      }
-    },
-    "build": {
-      "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/vscode/nx-project-view",
-        "tsConfig": "libs/vscode/nx-project-view/tsconfig.lib.json",
-        "packageJson": "libs/vscode/nx-project-view/package.json",
-        "main": "libs/vscode/nx-project-view/src/index.ts",
-        "assets": ["libs/vscode/nx-project-view/*.md"]
       }
     }
   },
