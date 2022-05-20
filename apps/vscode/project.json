@@ -3,7 +3,44 @@
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
+  "implicitDependencies": ["vscode-ui"],
   "targets": {
+    "watch-all": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "yarn nx watch vscode",
+            "prefix": "vscode",
+            "color": "blue"
+          },
+          {
+            "command": "yarn nx watch vscode-ui",
+            "prefix": "vscode-ui",
+            "color": "green"
+          }
+        ],
+        "parallel": true
+      }
+    },
+    "watch": {
+      "executor": "@nrwl/node:webpack",
+      "options": {
+        "externalDependencies": ["vscode", "typescript"],
+        "webpackConfig": "apps/vscode/webpack.config.js",
+        "outputPath": "dist/apps/vscode",
+        "main": "apps/vscode/src/main.ts",
+        "tsConfig": "apps/vscode/tsconfig.app.json",
+        "assets": [
+          "apps/vscode/src/package.json",
+          "apps/vscode/src/nx-schema.json",
+          "apps/vscode/src/tree-view-icon.svg",
+          "apps/vscode/src/assets",
+          "apps/vscode/src/getting-started"
+        ],
+        "watch": true
+      }
+    },
     "build": {
       "executor": "@nrwl/node:webpack",
       "options": {
@@ -57,6 +94,17 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["apps/vscode/**/*.ts"]
+      }
+    },
+    "package": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "yarn nx run vscode:build:production",
+          "node ./tools/scripts/vscode-yarn.js",
+          "node ./tools/scripts/vscode-vsce.js"
+        ],
+        "parallel": false
       }
     }
   },

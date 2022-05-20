@@ -8,17 +8,10 @@
     "email": "hello@nrwl.io"
   },
   "license": "MIT",
-  "engines": {
-    "vscode": "^1.50.0"
-  },
   "scripts": {
     "nx": "nx",
-    "ng": "nx",
-    "start": "nps",
-    "nps": "nps",
-    "format": "nps format.write",
-    "build-vs-code": "nps prepare.dev.vscode",
-    "package": "nps prepare.and.package.vscode",
+    "watch": "nx watch-all vscode",
+    "package": "export NODE_OPTIONS=--max-old-space-size=4096 && nx package vscode",
     "release": "standard-version",
     "update": "nx migrate latest"
   },
@@ -72,16 +65,12 @@
     "jest": "27.5.1",
     "jest-preset-angular": "11.1.1",
     "ngx-build-plus": "13.0.1",
-    "nps": "5.9.3",
-    "nps-utils": "1.7.0",
     "nx": "14.1.4",
     "ovsx": "^0.3.0",
     "prettier": "2.6.1",
     "rimraf": "^3.0.2",
     "rxjs": "6.5.5",
     "standard-version": "^9.1.1",
-    "stylelint": "^10.1.0",
-    "stylelint-config-standard": "^18.3.0",
     "ts-jest": "27.1.4",
     "tslib": "^2.0.0",
     "type-fest": "^2.12.1",

@@ -5,8 +5,9 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "build-vs-code",
+      "script": "watch",
       "isBackground": true,
+      "label": "Build and watch Nx Console",
       "presentation": {
         "reveal": "always"
       },

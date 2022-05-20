@@ -5,7 +5,7 @@
     "schema": "libs/schema",
     "server": "libs/server",
     "typescript-plugin": "libs/typescript-plugin",
-    "vscode-app": "apps/vscode",
+    "vscode": "apps/vscode",
     "vscode-configuration": "libs/vscode/configuration",
     "vscode-json-schema": "libs/vscode/json-schema",
     "vscode-nx-commands-view": "libs/vscode/nx-commands-view",
