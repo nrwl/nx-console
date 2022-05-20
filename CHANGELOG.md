@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.17.0](https://github.com/nrwl/nx-console/compare/v17.16.0...v17.17.0) (2022-05-20)
+
+
+### Bug Fixes
+
+* always use full `--configuration` flag ([#1283](https://github.com/nrwl/nx-console/issues/1283)) ([86f0d30](https://github.com/nrwl/nx-console/commits/86f0d30a17cf625ef91dbeae9ee7188800c7f5e9))
+* remove check for generate, and allow all commads for prompts ([eecc7f5](https://github.com/nrwl/nx-console/commits/eecc7f59a8ae8f96f7d417a4667ec8dc0c17753c))
+
 ## [17.16.0](https://github.com/nrwl/nx-console/compare/v17.15.0...v17.16.0) (2022-04-29)
 
 
