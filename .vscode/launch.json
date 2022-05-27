@@ -39,7 +39,7 @@
         "${workspaceFolder}/dist/apps/vscode/assets/public",
         "${workspaceFolder}/node_modules"
       ],
-      "preLaunchTask": "npm: build-vs-code"
+      "preLaunchTask": "npm: watch"
     }
   ]
 }
