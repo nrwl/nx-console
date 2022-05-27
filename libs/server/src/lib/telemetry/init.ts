@@ -1,5 +1,11 @@
 import { Telemetry } from './telemetry';
-import { Disposable, window, workspace } from 'vscode';
+import {
+  Disposable,
+  ExtensionContext,
+  ExtensionMode,
+  window,
+  workspace,
+} from 'vscode';
 import { Store } from '@nx-console/schema';
 
 let telemetry: Telemetry;
@@ -12,11 +18,12 @@ export function getTelemetry() {
 const enableTelemetry = 'enableTelemetry';
 const telemetrySetting = `nxConsole.${enableTelemetry}`;
 
-// using shared memory here is a shortcut, this should be an api call
-export function initTelemetry(store: Store, production: boolean) {
-  telemetry = production
-    ? Telemetry.withGoogleAnalytics(store, 'vscode')
-    : Telemetry.withLogger(store);
+export function initTelemetry(store: Store, context: ExtensionContext) {
+  const telemetry = Telemetry.withGoogleAnalytics(store);
+
+  if (context.extensionMode === ExtensionMode.Development) {
+    Telemetry.withLogger(store);
+  }
 
   if (!store.get('shownTelemetryPrompt')) {
     window.showInformationMessage(

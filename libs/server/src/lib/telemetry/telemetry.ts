@@ -1,6 +1,6 @@
 import { TelemetryType } from './record';
 import { Sink } from './sink';
-import { LoggerSink, GoogleAnalyticsSink, ApplicationPlatform } from './sinks';
+import { LoggerSink, GoogleAnalyticsSink } from './sinks';
 import { User, UserState } from './user';
 import { TelemetryMessageBuilder } from './message-builder';
 import { Store } from '@nx-console/schema';
@@ -9,23 +9,27 @@ export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];
   state: UserState = this.user.state;
 
-  static withGoogleAnalytics(
-    store: Store,
-    platform: ApplicationPlatform
-  ): Telemetry {
+  private static _instance: Telemetry;
+
+  static withGoogleAnalytics(store: Store): Telemetry {
     const user = User.fromStorage(store);
-    const instance = new Telemetry(user);
-    const sink = new GoogleAnalyticsSink(user, platform);
-    instance.addSink(sink);
-    return instance;
+
+    if (!this._instance) {
+      this._instance = new Telemetry(user);
+    }
+    const sink = new GoogleAnalyticsSink(user);
+    this._instance.addSink(sink);
+    return this._instance;
   }
 
   static withLogger(store: Store): Telemetry {
     const user = User.fromStorage(store);
-    const instance = new Telemetry(user);
+    if (!this._instance) {
+      this._instance = new Telemetry(user);
+    }
     const sink = new LoggerSink();
-    instance.addSink(sink);
-    return instance;
+    this._instance.addSink(sink);
+    return this._instance;
   }
 
   constructor(private readonly user: User) {}

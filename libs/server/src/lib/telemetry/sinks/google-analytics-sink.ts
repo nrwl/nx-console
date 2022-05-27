@@ -10,16 +10,20 @@ import {
   setUserProperties,
   logEvent,
 } from 'firebase/analytics';
+import { ExtensionContext, extensions } from 'vscode';
 
-// TODO(Cammisuli): get the rest of this information
 const app = initializeApp({
-  measurementId: 'G-TNJ97NGX40',
+  apiKey: 'AIzaSyA-GKyx4NeDKx2-WikAbqmZ7PmoUi2xyDY',
+  authDomain: 'nx-console.firebaseapp.com',
+  projectId: 'nx-console',
+  storageBucket: 'nx-console.appspot.com',
+  messagingSenderId: '482317143702',
+  appId: '1:482317143702:web:73752de7bf0fbb6fcb3cb7',
+  measurementId: 'G-9GC6FQ9WV1',
 });
 
 // increment this if there is substancial changes to the schema,
 // and you want to create a new view that only has this data
-const ANALYTICS_VERSION = 2;
-const TRACKING_ID = 'UA-88380372-8';
 export type ApplicationPlatform = 'vscode';
 
 class TelemetryParams {
@@ -46,7 +50,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     return this.user.state !== 'untracked';
   }
 
-  constructor(readonly user: User, readonly platform: ApplicationPlatform) {
+  constructor(readonly user: User) {
     this.analytics = getAnalytics(app);
 
     this.setPersistentParams();
@@ -59,9 +63,9 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
 
     setUserProperties(this.analytics, {
       state: this.user.state,
-      // TODO(cammisuli): get version from the extension context
-      version: '',
-      platform: this.platform,
+      version: extensions.getExtension('nrwl.angular-console')?.packageJSON
+        .version,
+      platform: 'vscode',
     });
   }
 

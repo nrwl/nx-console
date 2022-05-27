@@ -75,8 +75,7 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
-
-    initTelemetry(GlobalConfigurationStore.instance, environment.production);
+    initTelemetry(GlobalConfigurationStore.instance, c);
 
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,
