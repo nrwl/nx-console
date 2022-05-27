@@ -6,6 +6,10 @@ import { readAndCacheJsonFile } from '@nx-console/server';
 import { join } from 'path';
 import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
 import { nxVersion } from './nx-version';
+
+export type NxWorkspaceConfiguration = WorkspaceJsonConfiguration &
+  NxJsonConfiguration;
+
 /**
  * There's a couple things that we need to handle here.
  *
@@ -19,7 +23,7 @@ export async function getNxWorkspaceConfig(
   basedir: string,
   format: 'nx' | 'angularCli'
 ): Promise<{
-  workspaceConfiguration: WorkspaceJsonConfiguration & NxJsonConfiguration;
+  workspaceConfiguration: NxWorkspaceConfiguration;
   configPath: string;
 }> {
   const version = nxVersion();
