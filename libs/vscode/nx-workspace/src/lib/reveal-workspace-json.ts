@@ -14,12 +14,12 @@ export async function revealNxProject(
     'nxWorkspacePath',
     ''
   );
-  const projectPath = buildProjectPath(workspacePath, root);
+  const projectPath = await buildProjectPath(workspacePath, root);
   const workspaceJsonPath = join(workspacePath, 'workspace.json');
   const angularJsonPath = join(workspacePath, 'angular.json');
 
   let path = workspacePath;
-  if (await fileExists(projectPath)) {
+  if (projectPath) {
     path = projectPath;
   } else if (await fileExists(workspaceJsonPath)) {
     path = workspaceJsonPath;

@@ -113,7 +113,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     }
     return lens;
   }
-  buildProjectLenses(
+  async buildProjectLenses(
     project: ProjectLocations[string],
     document: TextDocument,
     lens: CodeLens[],
@@ -128,7 +128,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       new ProjectCodeLens(
         new Range(position, position),
         projectName,
-        buildProjectPath(workspacePath, project.projectPath)
+        (await buildProjectPath(workspacePath, project.projectPath)) ?? ''
       )
     );
   }
