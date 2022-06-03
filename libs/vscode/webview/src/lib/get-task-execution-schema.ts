@@ -197,8 +197,8 @@ async function getConfigValuesFromContextMenuUri(
       .replace(/\\/g, '/')
       .replace(/^\//, '');
     const nxConfig = await getNxConfig(workspacePath);
-    const appsDir = nxConfig.workspaceLayout?.appsDir ?? 'apps';
-    const libsDir = nxConfig.workspaceLayout?.libsDir ?? 'libs';
+    const appsDir = nxConfig.workspaceLayout?.appsDir ?? 'packages';
+    const libsDir = nxConfig.workspaceLayout?.libsDir ?? 'packages';
     if (
       (appsDir && generator.name === 'application') ||
       generator.name === 'app'

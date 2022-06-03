@@ -36,8 +36,6 @@ export async function verifyWorkspace(): Promise<Workspace> {
     isAngularWorkspace ? 'angularCli' : 'nx'
   );
 
-  await addPackageJsonTargets(workspacePath, config.workspaceConfiguration);
-
   try {
     return {
       validWorkspaceJson: true,
@@ -71,34 +69,5 @@ export async function verifyWorkspace(): Promise<Workspace> {
       configurationFilePath: '',
       workspacePath,
     };
-  }
-}
-
-/**
- * Checks to see if projects do not have a target. If they do not, then we look into the package.json and get the script options.
- * @param workspaceConfig
- */
-async function addPackageJsonTargets(
-  workspaceRoot: string,
-  workspaceConfig: NxWorkspaceConfiguration
-) {
-  for (const projectConfiguration of Object.values(workspaceConfig.projects)) {
-    if (!projectConfiguration.targets) {
-      const { json } = await readAndCacheJsonFile(
-        join(projectConfiguration.root, 'package.json'),
-        workspaceRoot
-      );
-
-      if (json.scripts) {
-        for (const script of Object.keys(json.scripts)) {
-          projectConfiguration.targets ??= {};
-          projectConfiguration.targets[script] = {
-            executor: '@nrwl/nx',
-          };
-        }
-      }
-    } else {
-      continue;
-    }
   }
 }

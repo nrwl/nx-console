@@ -1,13 +1,39 @@
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { join } from 'path';
-import * as NxFileUtils from '@nrwl/workspace/src/core/file-utils';
-import { fileExists, getOutputChannel } from '@nx-console/server';
-import { platform } from 'os';
 import { workspaceDependencyPath } from '@nx-console/npm';
+import { fileExists, getOutputChannel } from '@nx-console/server';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import * as NxFileUtils from 'nx/src/project-graph/file-utils';
+import * as NxProjectGraph from 'nx/src/project-graph/project-graph';
+import { platform } from 'os';
+import { join } from 'path';
 
 declare function __non_webpack_require__(importPath: string): any;
 
-let RESOLVED_IMPORT: typeof NxFileUtils;
+let RESOLVED_FILEUTILS_IMPORT: typeof NxFileUtils;
+let RESOLVED_PROJECTGRAPH_IMPORT: typeof NxProjectGraph;
+
+export async function getNxProjectGraph(): Promise<typeof NxProjectGraph> {
+  if (RESOLVED_PROJECTGRAPH_IMPORT) {
+    return RESOLVED_PROJECTGRAPH_IMPORT;
+  }
+
+  const workspacePath = WorkspaceConfigurationStore.instance.get(
+    'nxWorkspacePath',
+    ''
+  );
+  let importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'project-graph', 'project-graph.js')
+  );
+
+  if (!importPath) {
+    importPath = await findNxPackagePath(
+      workspacePath,
+      join('src', 'core', 'project-graph', 'project-graph.js')
+    );
+  }
+
+  return getNxPackage(importPath, NxProjectGraph, RESOLVED_PROJECTGRAPH_IMPORT);
+}
 
 /**
  * Get the local installed version of @nrwl/workspace
@@ -15,8 +41,8 @@ let RESOLVED_IMPORT: typeof NxFileUtils;
 export async function getNxWorkspacePackageFileUtils(): Promise<
   typeof NxFileUtils
 > {
-  if (RESOLVED_IMPORT) {
-    return RESOLVED_IMPORT;
+  if (RESOLVED_FILEUTILS_IMPORT) {
+    return RESOLVED_FILEUTILS_IMPORT;
   }
 
   const workspacePath = WorkspaceConfigurationStore.instance.get(
@@ -24,8 +50,26 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
     ''
   );
 
-  let importPath = await findNxPackage(workspacePath);
+  let importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'project-graph', 'file-utils.js')
+  );
 
+  if (!importPath) {
+    importPath = await findNxPackagePath(
+      workspacePath,
+      join('src', 'core', 'file-utils.js')
+    );
+  }
+
+  return getNxPackage(importPath, NxFileUtils, RESOLVED_FILEUTILS_IMPORT);
+}
+
+async function getNxPackage<T>(
+  importPath: string | undefined,
+  backupPackage: T,
+  cache: T
+): Promise<T> {
   try {
     if (!importPath) {
       throw 'local Nx dependency not found';
@@ -37,39 +81,33 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
 
     const imported = __non_webpack_require__(importPath);
 
-    if (!('readWorkspaceConfig' in imported)) {
-      throw new Error(
-        'Workspace tools does not have `readWorkspaceConfig` function'
-      );
-    }
-
     getOutputChannel().appendLine(`Using local Nx package at ${importPath}`);
 
-    RESOLVED_IMPORT = imported;
+    cache = imported;
     return imported;
   } catch (error) {
     getOutputChannel().appendLine(
-      `Error loading Nx from the workspace. Falling back to extension dependency
+      `Unable to load the ${importPath} dependency from the workspace. Falling back to extension dependency
 ${error}
     `
     );
-    RESOLVED_IMPORT = NxFileUtils;
-    return NxFileUtils;
+    cache = backupPackage;
+    return backupPackage;
   }
 }
 
 /**
  * Finds the local Nx package in the workspace.
  *
- * It will try to look for the `nx` package, with the specific file `src/core/file-utils.js`. If it does not exist, it will try to look for the `@nrwl/workspace` package, with the specific file `src/core/file-utils.js`
+ * It will try to look for the `nx` package, with the specific file. If it does not exist, it will try to look for the `@nrwl/workspace` package, with the specific file
  * @param workspacePath
  * @returns
  */
-async function findNxPackage(
-  workspacePath: string
+async function findNxPackagePath(
+  workspacePath: string,
+  filePath: string
 ): Promise<string | undefined> {
-  const buildPath = (base: string) =>
-    join(base, 'src', 'core', 'file-utils.js');
+  const buildPath = (base: string) => join(base, filePath);
 
   const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
   if (nxWorkspaceDepPath) {
