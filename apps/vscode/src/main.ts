@@ -25,6 +25,7 @@ import {
   teardownTelemetry,
   watchFile,
   fileExists,
+  checkIsNxWorkspace,
 } from '@nx-console/server';
 import {
   GlobalConfigurationStore,
@@ -194,6 +195,9 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
     if (await fileExists(join(currentDirectory, 'nx.json'))) {
       return setWorkspace(currentDirectory);
     }
+    if (await fileExists(join(currentDirectory, 'lerna.json'))) {
+      return setWorkspace(currentDirectory);
+    }
     currentDirectory = dirname(currentDirectory);
   }
 }
@@ -242,7 +246,7 @@ async function setWorkspace(workspacePath: string) {
 
   setApplicationAndLibraryContext(workspacePath);
 
-  const isNxWorkspace = existsSync(join(workspacePath, 'nx.json'));
+  const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
   commands.executeCommand(

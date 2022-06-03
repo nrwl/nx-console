@@ -1,5 +1,7 @@
-import { fileExists, getShellExecutionForConfig } from '@nx-console/server';
-import { join } from 'path';
+import {
+  checkIsNxWorkspace,
+  getShellExecutionForConfig,
+} from '@nx-console/server';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
 
@@ -14,7 +16,7 @@ export class CliTask extends Task {
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
 
-    const useNxCli = await fileExists(join(workspacePath, 'nx.json'));
+    const useNxCli = await checkIsNxWorkspace(workspacePath);
 
     const displayCommand = useNxCli
       ? `nx ${args.join(' ')}`
