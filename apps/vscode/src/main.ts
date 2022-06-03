@@ -25,6 +25,7 @@ import {
   teardownTelemetry,
   watchFile,
   fileExists,
+  checkIsNxWorkspace,
 } from '@nx-console/server';
 import {
   GlobalConfigurationStore,
@@ -115,7 +116,8 @@ export async function activate(c: ExtensionContext) {
       manuallySelectWorkspaceDefinitionCommand
     );
 
-    // registers itself as a CodeLensProvider and watches config to dispose/re-register
+    //   registers itself as a CodeLensProvider and watches config to dispose/re-register
+
     const { WorkspaceCodeLensProvider } = await import(
       '@nx-console/vscode/nx-workspace'
     );
@@ -193,6 +195,9 @@ async function scanForWorkspace(vscodeWorkspacePath: string) {
     if (await fileExists(join(currentDirectory, 'nx.json'))) {
       return setWorkspace(currentDirectory);
     }
+    if (await fileExists(join(currentDirectory, 'lerna.json'))) {
+      return setWorkspace(currentDirectory);
+    }
     currentDirectory = dirname(currentDirectory);
   }
 }
@@ -203,12 +208,16 @@ async function setWorkspace(workspacePath: string) {
   }
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
-  const { verifyWorkspace } = await import('@nx-console/vscode/nx-workspace');
 
-  const { validWorkspaceJson } = await verifyWorkspace();
-  if (!validWorkspaceJson) {
-    return;
-  }
+  // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
+  process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
+
+  // const { verifyWorkspace } = await import('@nx-console/vscode/nx-workspace');
+
+  // const { validWorkspaceJson } = await verifyWorkspace();
+  // if (!validWorkspaceJson) {
+  //   return;
+  // // }
 
   if (!cliTaskProvider) {
     cliTaskProvider = new CliTaskProvider();
@@ -237,7 +246,7 @@ async function setWorkspace(workspacePath: string) {
 
   setApplicationAndLibraryContext(workspacePath);
 
-  const isNxWorkspace = existsSync(join(workspacePath, 'nx.json'));
+  const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
   commands.executeCommand(

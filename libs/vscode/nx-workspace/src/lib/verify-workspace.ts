@@ -3,12 +3,16 @@ import {
   fileExists,
   getOutputChannel,
   getTelemetry,
+  readAndCacheJsonFile,
   toWorkspaceFormat,
 } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import { window } from 'vscode';
-import { getNxWorkspaceConfig } from './get-nx-workspace-config';
+import {
+  getNxWorkspaceConfig,
+  NxWorkspaceConfiguration,
+} from './get-nx-workspace-config';
 
 interface Workspace {
   validWorkspaceJson: boolean;
@@ -31,6 +35,7 @@ export async function verifyWorkspace(): Promise<Workspace> {
     workspacePath,
     isAngularWorkspace ? 'angularCli' : 'nx'
   );
+
   try {
     return {
       validWorkspaceJson: true,

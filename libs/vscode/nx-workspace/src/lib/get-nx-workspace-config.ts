@@ -1,11 +1,19 @@
-import type {
+import {
   NxJsonConfiguration,
   WorkspaceJsonConfiguration,
+  ProjectGraph,
 } from '@nrwl/devkit';
 import { readAndCacheJsonFile } from '@nx-console/server';
 import { join } from 'path';
-import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
+import {
+  getNxProjectGraph,
+  getNxWorkspacePackageFileUtils,
+} from './get-nx-workspace-package';
 import { nxVersion } from './nx-version';
+
+export type NxWorkspaceConfiguration = WorkspaceJsonConfiguration &
+  NxJsonConfiguration;
+
 /**
  * There's a couple things that we need to handle here.
  *
@@ -19,23 +27,60 @@ export async function getNxWorkspaceConfig(
   basedir: string,
   format: 'nx' | 'angularCli'
 ): Promise<{
-  workspaceConfiguration: WorkspaceJsonConfiguration & NxJsonConfiguration;
+  workspaceConfiguration: NxWorkspaceConfiguration;
   configPath: string;
 }> {
   const version = nxVersion();
 
-  if (version && version < 12) {
+  if (version < 12) {
     return readWorkspaceConfigs(format, basedir);
   }
 
   try {
-    const nxWorkspacePackage = await getNxWorkspacePackageFileUtils();
+    const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
+      getNxWorkspacePackageFileUtils(),
+      getNxProjectGraph(),
+    ]);
     const configFile = nxWorkspacePackage.workspaceFileName();
-    return {
-      workspaceConfiguration: nxWorkspacePackage.readWorkspaceConfig({
+
+    let projectGraph: ProjectGraph | null = null;
+    try {
+      if (format === 'angularCli') {
+        throw 'No project graph support';
+      }
+
+      if (version < 13) {
+        projectGraph = (nxProjectGraph as any).readCurrentProjectGraph();
+      } else {
+        projectGraph = nxProjectGraph.readCachedProjectGraph();
+      }
+
+      if (!projectGraph) {
+        if (version < 13) {
+          projectGraph = (nxProjectGraph as any).createProjectGraph();
+        } else {
+          projectGraph = await nxProjectGraph.createProjectGraphAsync();
+        }
+      }
+    } catch {
+      //noop
+    }
+
+    let workspaceConfiguration: NxWorkspaceConfiguration;
+    try {
+      workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
         format,
         path: basedir,
-      }),
+      });
+    } catch {
+      workspaceConfiguration = (await readWorkspaceConfigs(format, basedir))
+        .workspaceConfiguration;
+    }
+
+    addProjectTargets(workspaceConfiguration, projectGraph);
+
+    return {
+      workspaceConfiguration,
       configPath: join(basedir, configFile),
     };
   } catch (e) {
@@ -73,4 +118,19 @@ async function readWorkspaceConfigs(
         ? join(basedir, 'workspace.json')
         : join(basedir, 'angular.json'),
   };
+}
+
+function addProjectTargets(
+  workspaceConfiguration: NxWorkspaceConfiguration,
+  projectGraph: ProjectGraph | null
+) {
+  if (!projectGraph) {
+    return;
+  }
+
+  for (const [projectName, configuration] of Object.entries(
+    workspaceConfiguration.projects
+  )) {
+    configuration.targets = projectGraph.nodes[projectName].data.targets;
+  }
 }

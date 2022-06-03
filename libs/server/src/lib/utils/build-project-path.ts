@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { fileExists } from './utils';
 
 /**
  * Builds the project path from the given project name.
@@ -6,9 +7,17 @@ import { join } from 'path';
  * @param projectPath The path to the project relative to the workspace
  * @returns The full path to the project.json file
  */
-export function buildProjectPath(
+export async function buildProjectPath(
   workspacePath: string,
   projectPath: string
-): string {
-  return join(workspacePath, projectPath, 'project.json');
+): Promise<string | undefined> {
+  const basePath = join(workspacePath, projectPath);
+
+  const projectJsonPath = join(basePath, 'project.json');
+  const packageJsonPath = join(basePath, 'package.json');
+  if (await fileExists(projectJsonPath)) {
+    return projectJsonPath;
+  } else if (await fileExists(packageJsonPath)) {
+    return packageJsonPath;
+  }
 }

@@ -3,9 +3,9 @@ import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 declare function __non_webpack_require__(importPath: string): any;
 
 let nxWorkspacePackageJson: { version: string };
-let loadedNxWorkspacePackage = false;
-export function nxVersion(): number | null {
-  if (!loadedNxWorkspacePackage) {
+let loadedNxPackage = false;
+export function nxVersion(): number {
+  if (!loadedNxPackage) {
     const workspacePath = WorkspaceConfigurationStore.instance.get(
       'nxWorkspacePath',
       ''
@@ -14,9 +14,16 @@ export function nxVersion(): number | null {
       nxWorkspacePackageJson = __non_webpack_require__(
         `${workspacePath}/node_modules/@nrwl/workspace/package.json`
       );
-      loadedNxWorkspacePackage = true;
+      loadedNxPackage = true;
     } catch (e) {
-      return null;
+      try {
+        nxWorkspacePackageJson = __non_webpack_require__(
+          `${workspacePath}/node_modules/nx/package.json`
+        );
+        loadedNxPackage = true;
+      } catch {
+        return 0;
+      }
     }
   }
 
