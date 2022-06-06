@@ -95,7 +95,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     for (const projectName in projectLocations) {
       const project = projectLocations[projectName];
 
-      this.buildProjectLenses(
+      await this.buildProjectLenses(
         project,
         document,
         lens,
