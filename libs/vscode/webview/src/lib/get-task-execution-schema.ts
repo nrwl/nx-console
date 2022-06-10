@@ -30,8 +30,8 @@ export async function getTaskExecutionSchema(
     if (!validWorkspaceJson) {
       return;
     }
-    command = command.toLowerCase();
-    switch (command) {
+    const lowerCommand = command.toLowerCase();
+    switch (lowerCommand) {
       case 'run': {
         const runnableItems = (await cliTaskProvider.getProjectEntries())
           .filter(([, { targets }]) => Boolean(targets))
