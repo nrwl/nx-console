@@ -69,6 +69,7 @@ let workspaceFileWatcher: FileSystemWatcher | undefined;
 
 export async function activate(c: ExtensionContext) {
   try {
+    debugger;
     const startTime = Date.now();
     context = c;
 
@@ -270,7 +271,7 @@ async function setWorkspace(workspacePath: string) {
     workspaceType = 'angular';
   }
   WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
-  WorkspaceConfigurationStore.instance.set('nxVersion', nxVersion());
+  WorkspaceConfigurationStore.instance.set('nxVersion', await nxVersion());
 
   getTelemetry().record('WorkspaceType', { workspaceType });
 }

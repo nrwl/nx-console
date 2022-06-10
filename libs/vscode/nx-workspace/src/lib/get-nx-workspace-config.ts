@@ -30,7 +30,7 @@ export async function getNxWorkspaceConfig(
   workspaceConfiguration: NxWorkspaceConfiguration;
   configPath: string;
 }> {
-  const version = nxVersion();
+  const version = await nxVersion();
 
   if (version < 12) {
     return readWorkspaceConfigs(format, basedir);
