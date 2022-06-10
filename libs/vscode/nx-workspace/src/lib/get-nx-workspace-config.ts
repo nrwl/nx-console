@@ -43,6 +43,17 @@ export async function getNxWorkspaceConfig(
     ]);
     const configFile = nxWorkspacePackage.workspaceFileName();
 
+    let workspaceConfiguration: NxWorkspaceConfiguration;
+    try {
+      workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
+        format,
+        path: basedir,
+      });
+    } catch {
+      workspaceConfiguration = (await readWorkspaceConfigs(format, basedir))
+        .workspaceConfiguration;
+    }
+
     let projectGraph: ProjectGraph | null = null;
     try {
       if (format === 'angularCli') {
@@ -55,7 +66,11 @@ export async function getNxWorkspaceConfig(
         projectGraph = nxProjectGraph.readCachedProjectGraph();
       }
 
-      if (!projectGraph) {
+      // Projects can become out of sync if we don't use Nx directly to create projects. This is the case for package.json projects
+      if (
+        !projectGraph ||
+        projectsOutOfSync(workspaceConfiguration, projectGraph)
+      ) {
         if (version < 13) {
           projectGraph = (nxProjectGraph as any).createProjectGraph();
         } else {
@@ -64,17 +79,6 @@ export async function getNxWorkspaceConfig(
       }
     } catch {
       //noop
-    }
-
-    let workspaceConfiguration: NxWorkspaceConfiguration;
-    try {
-      workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
-        format,
-        path: basedir,
-      });
-    } catch {
-      workspaceConfiguration = (await readWorkspaceConfigs(format, basedir))
-        .workspaceConfiguration;
     }
 
     addProjectTargets(workspaceConfiguration, projectGraph);
@@ -128,9 +132,30 @@ function addProjectTargets(
     return;
   }
 
-  for (const [projectName, configuration] of Object.entries(
-    workspaceConfiguration.projects
-  )) {
-    configuration.targets = projectGraph.nodes[projectName].data.targets;
+  for (const [projectName, node] of Object.entries(projectGraph.nodes)) {
+    const workspaceProject = workspaceConfiguration.projects[projectName];
+
+    if (!workspaceProject) {
+      workspaceConfiguration.projects[projectName] = {
+        root: node.data.root,
+        targets: node.data.targets ?? {},
+        name: projectName,
+        tags: node.data.tags ?? [],
+      };
+    } else {
+      workspaceConfiguration.projects[projectName] = {
+        ...workspaceProject,
+        targets: node.data.targets ?? {},
+      };
+    }
   }
+}
+
+function projectsOutOfSync(
+  workspaceConfiguration: WorkspaceJsonConfiguration,
+  projectGraph: ProjectGraph
+): boolean {
+  const workspaceProjects = Object.keys(workspaceConfiguration.projects);
+  const projectGraphProjects = Object.keys(projectGraph.nodes);
+  return workspaceProjects.length != projectGraphProjects.length;
 }
