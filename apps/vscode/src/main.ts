@@ -270,7 +270,7 @@ async function setWorkspace(workspacePath: string) {
     workspaceType = 'angular';
   }
   WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
-  WorkspaceConfigurationStore.instance.set('nxVersion', nxVersion());
+  WorkspaceConfigurationStore.instance.set('nxVersion', await nxVersion());
 
   getTelemetry().record('WorkspaceType', { workspaceType });
 }

@@ -46,7 +46,7 @@ export function registerCliTaskCommands(
     );
   });
 
-  ['ng', 'nx'].forEach((cli) => {
+  ['ng', 'nx'].forEach(async (cli) => {
     commands.registerCommand(
       `${cli}.run`,
       (
@@ -71,7 +71,7 @@ export function registerCliTaskCommands(
     /**
      * move and remove were release in patch 8.11
      */
-    const version = nxVersion();
+    const version = await nxVersion();
     if (version && version >= 8) {
       commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
         /**

@@ -103,7 +103,7 @@ ${error}
  * @param workspacePath
  * @returns
  */
-async function findNxPackagePath(
+export async function findNxPackagePath(
   workspacePath: string,
   filePath: string
 ): Promise<string | undefined> {
