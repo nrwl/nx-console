@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.18.2](https://github.com/nrwl/nx-console/compare/v17.18.1...v17.18.2) (2022-06-10)
+
+
+### Bug Fixes
+
+* check if projectGraph is out of sync ([#1292](https://github.com/nrwl/nx-console/issues/1292)) ([189c238](https://github.com/nrwl/nx-console/commits/189c238a642ec17569a80eff8475df4c74370ea3))
+
 ### [17.18.1](https://github.com/nrwl/nx-console/compare/v17.18.0...v17.18.1) (2022-06-06)
 
 
