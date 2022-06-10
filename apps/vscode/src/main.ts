@@ -69,7 +69,6 @@ let workspaceFileWatcher: FileSystemWatcher | undefined;
 
 export async function activate(c: ExtensionContext) {
   try {
-    debugger;
     const startTime = Date.now();
     context = c;
 
