@@ -16070,13 +16070,6 @@ rxjs-for-await@0.0.2:
   resolved "https://registry.yarnpkg.com/rxjs-for-await/-/rxjs-for-await-0.0.2.tgz#26598a1d6167147cc192172970e7eed4e620384b"
   integrity sha512-IJ8R/ZCFMHOcDIqoABs82jal00VrZx8Xkgfe7TOKoaRPAW5nH/VFlG23bXpeGdrmtqI9UobFPgUKgCuFc7Lncw==
 
-rxjs@6.5.5:
-  version "6.5.5"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.5.tgz#c5c884e3094c8cfee31bf27eb87e54ccfc87f9ec"
-  integrity sha512-WfQI+1gohdf0Dai/Bbmk5L5ItH5tYqm3ki2c5GdWhKjalzjg93N3avFjVStyZZz+A2Em+ZxKH5bNghw9UeylGQ==
-  dependencies:
-    tslib "^1.9.0"
-
 rxjs@6.6.7:
   version "6.6.7"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
@@ -16097,6 +16090,13 @@ rxjs@^7.2.0:
   integrity sha512-7SQDi7xeTMCJpqViXh8gL/lebcwlp3d831F05+9B44A4B0WfsEwUQHR64gsH1kvJ+Ep/J9K2+n1hVl1CsGN23w==
   dependencies:
     tslib "~2.1.0"
+
+rxjs@~7.5.5:
+  version "7.5.5"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.5.tgz#2ebad89af0f560f460ad5cc4213219e1f7dd4e9f"
+  integrity sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==
+  dependencies:
+    tslib "^2.1.0"
 
 safe-buffer@5.1.1:
   version "5.1.1"
@@ -17646,6 +17646,11 @@ tslib@^2.0.0, tslib@^2.0.3, tslib@~2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.1.0.tgz#da60860f1c2ecaa5703ab7d39bc05b6bf988b97a"
   integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
+
+tslib@^2.1.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
+  integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
 tsutils@^3.21.0:
   version "3.21.0"
