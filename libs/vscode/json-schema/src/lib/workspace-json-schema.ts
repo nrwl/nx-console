@@ -36,10 +36,10 @@ export class WorkspaceJsonSchema {
     clearPackageJsonCache = false
   ) {
     const filePath = vscode.Uri.joinPath(extensionUri, 'workspace-schema.json');
-    const { json } = await nxWorkspace();
+    const { workspace } = await nxWorkspace();
     const collections = await getExecutors(
       workspacePath,
-      json.projects,
+      workspace.projects,
       clearPackageJsonCache
     );
     const contents = await getWorkspaceJsonSchema(collections);

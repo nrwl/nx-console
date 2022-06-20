@@ -1,7 +1,4 @@
-import type {
-  NxJsonConfiguration,
-  WorkspaceJsonConfiguration,
-} from '@nrwl/devkit';
+import type { NxJsonConfiguration, ProjectsConfigurations } from '@nrwl/devkit';
 import {
   clearJsonCache,
   fileExists,
@@ -21,11 +18,14 @@ import {
   tap,
 } from 'rxjs';
 import { window } from 'vscode';
-import { getNxWorkspaceConfig } from './get-nx-workspace-config';
+import {
+  getNxWorkspaceConfig,
+  NxWorkspaceConfiguration,
+} from './get-nx-workspace-config';
 
-interface Workspace {
+interface NxWorkspace {
   validWorkspaceJson: boolean;
-  json: WorkspaceJsonConfiguration & NxJsonConfiguration;
+  workspace: NxWorkspaceConfiguration;
   workspaceType: 'ng' | 'nx';
   configurationFilePath: string;
   workspacePath: string;
@@ -42,13 +42,13 @@ const enum Status {
   cached,
 }
 
-let cachedReplay = new ReplaySubject<Workspace>();
+let cachedReplay = new ReplaySubject<NxWorkspace>();
 let status: Status = Status.not_started;
 
-export async function nxWorkspace(reset?: boolean): Promise<Workspace> {
+export async function nxWorkspace(reset?: boolean): Promise<NxWorkspace> {
   if (reset) {
     status = Status.not_started;
-    cachedReplay = new ReplaySubject<Workspace>();
+    cachedReplay = new ReplaySubject<NxWorkspace>();
     const workspacePath = WorkspaceConfigurationStore.instance.get(
       'nxWorkspacePath',
       ''
@@ -76,7 +76,7 @@ export async function nxWorkspace(reset?: boolean): Promise<Workspace> {
   );
 }
 
-async function _workspace(): Promise<Workspace> {
+async function _workspace(): Promise<NxWorkspace> {
   const workspacePath = WorkspaceConfigurationStore.instance.get(
     'nxWorkspacePath',
     ''
@@ -96,7 +96,7 @@ async function _workspace(): Promise<Workspace> {
     return {
       validWorkspaceJson: true,
       workspaceType: isAngularWorkspace ? 'ng' : 'nx',
-      json: toWorkspaceFormat(config.workspaceConfiguration),
+      workspace: toWorkspaceFormat(config.workspaceConfiguration),
       configurationFilePath: config.configPath,
       isLerna,
       workspaceLayout: {
@@ -128,7 +128,7 @@ async function _workspace(): Promise<Workspace> {
     return {
       validWorkspaceJson: false,
       workspaceType: 'nx',
-      json: {
+      workspace: {
         npmScope: '@nx-console',
         projects: {},
         version: 2,

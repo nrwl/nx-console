@@ -71,10 +71,10 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     const lens: CodeLens[] = [];
 
     let projectName = '';
-    const { json } = await nxWorkspace();
+    const { workspace } = await nxWorkspace();
 
     if (document.uri.path.endsWith('project.json')) {
-      for (const [key, project] of Object.entries(json.projects)) {
+      for (const [key, project] of Object.entries(workspace.projects)) {
         if (
           document.uri.path
             .replace(/\\/g, '/')

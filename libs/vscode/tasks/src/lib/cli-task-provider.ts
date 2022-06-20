@@ -122,10 +122,10 @@ export class CliTaskProvider implements TaskProvider {
       return json.projects;
     } else {
       const result = await nxWorkspace();
-      if (!result.validWorkspaceJson || !result.json) {
+      if (!result.validWorkspaceJson || !result.workspace) {
         return {};
       } else {
-        return result.json.projects;
+        return result.workspace.projects;
       }
     }
   }

@@ -1,7 +1,7 @@
 import type {
   NxJsonConfiguration,
-  WorkspaceJsonConfiguration,
   ProjectGraph,
+  ProjectsConfigurations,
 } from '@nrwl/devkit';
 import { readAndCacheJsonFile } from '@nx-console/server';
 import { join } from 'path';
@@ -11,7 +11,7 @@ import {
 } from './get-nx-workspace-package';
 import { nxVersion } from './nx-version';
 
-export type NxWorkspaceConfiguration = WorkspaceJsonConfiguration &
+export type NxWorkspaceConfiguration = ProjectsConfigurations &
   NxJsonConfiguration;
 
 /**
@@ -84,7 +84,7 @@ async function readWorkspaceConfigs(
   format: 'nx' | 'angularCli',
   basedir: string
 ) {
-  let workspaceJson: WorkspaceJsonConfiguration;
+  let workspaceJson: ProjectsConfigurations;
   if (format === 'nx') {
     workspaceJson = (await readAndCacheJsonFile('workspace.json', basedir))
       .json;

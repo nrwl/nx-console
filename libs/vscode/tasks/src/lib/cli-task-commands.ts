@@ -254,11 +254,11 @@ async function selectCliCommandAndPromptForFlags(
   } else if (!askForFlags) {
     flags = [];
   }
-  const { validWorkspaceJson, json, workspaceType } = await nxWorkspace();
+  const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace();
 
   if (!projectName) {
     const selection = validWorkspaceJson
-      ? await selectCliProject(command, json)
+      ? await selectCliProject(command, workspace)
       : undefined;
     if (!selection) {
       return; // Do not execute a command if user clicks out of VSCode UI.
@@ -270,7 +270,7 @@ async function selectCliCommandAndPromptForFlags(
   if (!target) {
     if (isRunCommand) {
       target = (await selectCliTarget(
-        Object.keys(json.projects[projectName].targets || {})
+        Object.keys(workspace.projects[projectName].targets || {})
       )) as string;
       if (!target) {
         return;
@@ -283,7 +283,7 @@ async function selectCliCommandAndPromptForFlags(
   const builderDefinition = await verifyBuilderDefinition(
     projectName,
     target,
-    json,
+    workspace,
     workspaceType
   );
   const {
@@ -415,8 +415,8 @@ async function selectCliTarget(targets: string[]): Promise<string | undefined> {
 }
 
 async function getTargetNames(): Promise<string[]> {
-  const { json } = await nxWorkspace();
-  const commands = Object.values(json.projects).reduce((acc, project) => {
+  const { workspace } = await nxWorkspace();
+  const commands = Object.values(workspace.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);
     }
@@ -428,9 +428,9 @@ async function getTargetNames(): Promise<string[]> {
 async function getProjectsWithTargetName(
   targetName: string
 ): Promise<string[]> {
-  const { json } = await nxWorkspace();
+  const { workspace } = await nxWorkspace();
   const projects = [];
-  for (const [projectName, project] of Object.entries(json.projects)) {
+  for (const [projectName, project] of Object.entries(workspace.projects)) {
     const targets = project.targets ?? {};
     if (targets[targetName]) {
       projects.push(projectName);

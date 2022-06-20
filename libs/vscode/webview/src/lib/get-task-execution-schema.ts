@@ -25,7 +25,8 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, json, workspaceType } = await nxWorkspace();
+    const { validWorkspaceJson, workspace, workspaceType } =
+      await nxWorkspace();
 
     if (!validWorkspaceJson) {
       return;
@@ -67,7 +68,7 @@ export async function getTaskExecutionSchema(
           const { validBuilder, options } = await verifyBuilderDefinition(
             selection.projectName,
             selection.command,
-            json,
+            workspace,
             workspaceType
           );
           if (!validBuilder) {
@@ -130,14 +131,14 @@ export async function getTaskExecutionSchema(
         return { ...generator, cliName: workspaceType, contextValues };
       }
       default: {
-        const selectedProject = await selectCliProject(command, json);
+        const selectedProject = await selectCliProject(command, workspace);
 
         if (!selectedProject) return;
 
         const { validBuilder, options } = await verifyBuilderDefinition(
           selectedProject.projectName,
           command,
-          json,
+          workspace,
           workspaceType
         );
         if (!validBuilder) {
@@ -198,8 +199,8 @@ async function getConfigValuesFromContextMenuUri(
       .replace(workspacePath, '')
       .replace(/\\/g, '/')
       .replace(/^\//, '');
-    const { workspaceLayout } = await nxWorkspace();
 
+    const { workspaceLayout } = await nxWorkspace();
     const appsDir = workspaceLayout.appsDir;
     const libsDir = workspaceLayout.libsDir;
     if (

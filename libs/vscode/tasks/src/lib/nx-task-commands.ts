@@ -47,15 +47,15 @@ export function registerNxCommands(
 }
 
 async function promptForTarget(): Promise<string | undefined> {
-  const { validWorkspaceJson, json } = await nxWorkspace();
+  const { validWorkspaceJson, workspace } = await nxWorkspace();
 
-  if (!validWorkspaceJson || !json) {
+  if (!validWorkspaceJson || !workspace) {
     return;
   }
 
   const validTargets = Array.from(
     new Set(
-      Object.entries(json.projects)
+      Object.entries(workspace.projects)
         .map(([, project]) => Object.keys(project.targets || {}))
         .flat()
     )
@@ -386,15 +386,15 @@ async function promptForMigrate() {
 async function validProjectsForTarget(
   target: string
 ): Promise<string[] | undefined> {
-  const { validWorkspaceJson, json } = await nxWorkspace();
+  const { validWorkspaceJson, workspace } = await nxWorkspace();
 
-  if (!validWorkspaceJson || !json) {
+  if (!validWorkspaceJson || !workspace) {
     return;
   }
 
   return Array.from(
     new Set(
-      Object.entries(json.projects)
+      Object.entries(workspace.projects)
         .filter(([, project]) => project.targets && project.targets[target])
         .map(([project]) => project)
     )
