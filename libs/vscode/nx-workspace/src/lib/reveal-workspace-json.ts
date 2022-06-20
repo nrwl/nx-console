@@ -19,12 +19,12 @@ export async function revealNxProject(
   const angularJsonPath = join(workspacePath, 'angular.json');
 
   let path = workspacePath;
-  if (projectPath) {
+  if (await fileExists(angularJsonPath)) {
+    path = angularJsonPath;
+  } else if (projectPath) {
     path = projectPath;
   } else if (await fileExists(workspaceJsonPath)) {
     path = workspaceJsonPath;
-  } else if (await fileExists(angularJsonPath)) {
-    path = angularJsonPath;
   }
 
   const document: TextDocument = await workspace.openTextDocument(

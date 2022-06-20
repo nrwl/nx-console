@@ -3,6 +3,7 @@ import type {
   WorkspaceJsonConfiguration,
 } from '@nrwl/devkit';
 import {
+  clearJsonCache,
   fileExists,
   getOutputChannel,
   getTelemetry,
@@ -43,6 +44,13 @@ export async function nxWorkspace(reset?: boolean): Promise<Workspace> {
   if (reset) {
     status = Status.not_started;
     cachedReplay = new ReplaySubject<Workspace>();
+    const workspacePath = WorkspaceConfigurationStore.instance.get(
+      'nxWorkspacePath',
+      ''
+    );
+    // Clear out the workspace config path, needed for angular or older nx workspaces
+    clearJsonCache('angular.json', workspacePath);
+    clearJsonCache('workspace.json', workspacePath);
   }
 
   return firstValueFrom(
