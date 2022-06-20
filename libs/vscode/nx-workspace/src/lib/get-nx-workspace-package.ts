@@ -3,7 +3,6 @@ import { fileExists, getOutputChannel } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
-import type * as NxConfiguration from 'nx/src/config/configuration';
 import { platform } from 'os';
 import { join } from 'path';
 
@@ -11,7 +10,6 @@ declare function __non_webpack_require__(importPath: string): any;
 
 let RESOLVED_FILEUTILS_IMPORT: typeof NxFileUtils;
 let RESOLVED_PROJECTGRAPH_IMPORT: typeof NxProjectGraph;
-let RESOLVED_NXCONFIGURATION_IMPORT: typeof NxConfiguration;
 
 export async function getNxProjectGraph(): Promise<typeof NxProjectGraph> {
   if (RESOLVED_PROJECTGRAPH_IMPORT) {
