@@ -112,7 +112,13 @@ export async function activate(c: ExtensionContext) {
     context.subscriptions.push(
       runTargetTreeView,
       revealWebViewPanelCommand,
-      manuallySelectWorkspaceDefinitionCommand
+      manuallySelectWorkspaceDefinitionCommand,
+      commands.registerCommand('nxConsole.refreshWorkspace', async () => {
+        const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
+        nxWorkspace(true);
+        commands.executeCommand('nxConsole.refreshNxProjectsTree');
+        commands.executeCommand('nxConsole.refreshRunTargetTree');
+      })
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
@@ -331,17 +337,13 @@ async function registerWorkspaceFileWatcher(
 
   const workspaceDir = dirname(workspaceJsonPath);
 
-  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
-
   workspaceFileWatcher = watchFile(
     new RelativePattern(
       workspaceDir,
       '**/{workspace,angular,project,nx,package}.json'
     ),
     () => {
-      nxWorkspace(true);
-      commands.executeCommand('nxConsole.refreshNxProjectsTree');
-      commands.executeCommand('nxConsole.refreshRunTargetTree');
+      commands.executeCommand('nxConsole.refreshWorkspace');
     }
   );
 
