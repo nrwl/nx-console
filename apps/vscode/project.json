@@ -101,7 +101,6 @@
       "options": {
         "commands": [
           "yarn nx run vscode:build:production",
-          "node ./tools/scripts/vscode-yarn.js",
           "node ./tools/scripts/vscode-vsce.js"
         ],
         "parallel": false
