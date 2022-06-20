@@ -1,5 +1,5 @@
 import { GeneratorType } from '@nx-console/schema';
-import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
 import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 
@@ -67,7 +67,7 @@ export class RunTargetTreeItem extends TreeItem {
 }
 
 async function getTargetNames(): Promise<string[]> {
-  const { json } = await verifyWorkspace();
+  const { json } = await nxWorkspace();
   const commands = Object.values(json.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);

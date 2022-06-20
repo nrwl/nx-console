@@ -1,12 +1,7 @@
-import { verifyWorkspace } from './verify-workspace';
+import { nxWorkspace } from './nx-workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import * as server from '@nx-console/server';
-import {
-  cacheJson,
-  getOutputChannel,
-  getTelemetry,
-  fileExists,
-} from '@nx-console/server';
+import { getOutputChannel, getTelemetry, fileExists } from '@nx-console/server';
 import { mocked } from 'ts-jest/utils';
 import type {
   NxJsonConfiguration,
@@ -20,7 +15,7 @@ jest.mock('./get-nx-workspace-config', () => {
   const originalModule = jest.requireActual('./get-nx-workspace-config');
   return {
     ...originalModule,
-    getNxWorkspaceConfig: async (): Promise<
+    getNxWorkspaceConfig: async (): Promise
       AsyncReturnType<typeof getNxWorkspaceConfig>
     > => {
       return {
@@ -85,7 +80,7 @@ xdescribe('verifyWorkspace', () => {
 
       // act
       const { validWorkspaceJson, json, workspaceType, configurationFilePath } =
-        await verifyWorkspace();
+        await nxWorkspace();
 
       // assert
       expect(mockStoreInstanceGetFn).toHaveBeenCalledWith(
@@ -113,7 +108,7 @@ xdescribe('verifyWorkspace', () => {
       });
       // act
       const { validWorkspaceJson, json, workspaceType, configurationFilePath } =
-        await verifyWorkspace();
+        await nxWorkspace();
 
       // assert
       expect(mockStoreInstanceGetFn).toHaveBeenCalledWith(
@@ -138,7 +133,7 @@ xdescribe('verifyWorkspace', () => {
         .mockResolvedValue('Show Error');
 
       // act
-      const result = await verifyWorkspace();
+      const result = await nxWorkspace();
 
       // assert
 
@@ -171,7 +166,7 @@ xdescribe('verifyWorkspace', () => {
       // act
       const {
         json: { projects },
-      } = await verifyWorkspace();
+      } = await nxWorkspace();
       const [project1, project2, project3] = Object.keys(projects);
       const [sorted1, sorted2, sorted3] = Object.keys(sortedProject);
 

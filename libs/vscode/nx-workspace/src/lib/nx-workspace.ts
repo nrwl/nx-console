@@ -1,4 +1,7 @@
-import { NxJsonConfiguration, WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import type {
+  NxJsonConfiguration,
+  WorkspaceJsonConfiguration,
+} from '@nrwl/devkit';
 import {
   fileExists,
   getOutputChannel,
@@ -33,10 +36,15 @@ const enum Status {
   cached,
 }
 
-const cachedReplay = new ReplaySubject<Workspace>();
+let cachedReplay = new ReplaySubject<Workspace>();
 let status: Status = Status.not_started;
 
-export async function verifyWorkspace(): Promise<Workspace> {
+export async function nxWorkspace(reset?: boolean): Promise<Workspace> {
+  if (reset) {
+    status = Status.not_started;
+    cachedReplay = new ReplaySubject<Workspace>();
+  }
+
   return firstValueFrom(
     iif(
       () => status === Status.not_started,

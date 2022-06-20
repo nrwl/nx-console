@@ -1,8 +1,8 @@
 import { workspaceDependencyPath } from '@nx-console/npm';
 import { fileExists, getOutputChannel } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import * as NxFileUtils from 'nx/src/project-graph/file-utils';
-import * as NxProjectGraph from 'nx/src/project-graph/project-graph';
+import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
+import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
 import { platform } from 'os';
 import { join } from 'path';
 
@@ -32,7 +32,8 @@ export async function getNxProjectGraph(): Promise<typeof NxProjectGraph> {
     );
   }
 
-  return getNxPackage(importPath, NxProjectGraph, RESOLVED_PROJECTGRAPH_IMPORT);
+  const nxProjectGraph = await import('nx/src/project-graph/project-graph');
+  return getNxPackage(importPath, nxProjectGraph, RESOLVED_PROJECTGRAPH_IMPORT);
 }
 
 /**
@@ -62,7 +63,8 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
     );
   }
 
-  return getNxPackage(importPath, NxFileUtils, RESOLVED_FILEUTILS_IMPORT);
+  const nxFileUtils = await import('nx/src/project-graph/file-utils');
+  return getNxPackage(importPath, nxFileUtils, RESOLVED_FILEUTILS_IMPORT);
 }
 
 async function getNxPackage<T>(

@@ -54,7 +54,6 @@ import {
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
-import { nxVersion } from '@nx-console/vscode/nx-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -269,6 +268,9 @@ async function setWorkspace(workspacePath: string) {
   } else if (!isNxWorkspace && isAngularWorkspace) {
     workspaceType = 'angular';
   }
+
+  const { nxVersion } = await import('@nx-console/vscode/nx-workspace');
+
   WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
   WorkspaceConfigurationStore.instance.set('nxVersion', await nxVersion());
 
@@ -319,7 +321,7 @@ async function setApplicationAndLibraryContext(workspacePath: string) {
   );
 }
 
-function registerWorkspaceFileWatcher(
+async function registerWorkspaceFileWatcher(
   context: ExtensionContext,
   workspaceJsonPath: string
 ) {
@@ -329,9 +331,15 @@ function registerWorkspaceFileWatcher(
 
   const workspaceDir = dirname(workspaceJsonPath);
 
+  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
+
   workspaceFileWatcher = watchFile(
-    new RelativePattern(workspaceDir, '**/{workspace,angular,project}.json'),
+    new RelativePattern(
+      workspaceDir,
+      '**/{workspace,angular,project,nx,package}.json'
+    ),
     () => {
+      nxWorkspace(true);
       commands.executeCommand('nxConsole.refreshNxProjectsTree');
       commands.executeCommand('nxConsole.refreshRunTargetTree');
     }

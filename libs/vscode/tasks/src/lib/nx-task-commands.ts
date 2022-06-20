@@ -3,7 +3,7 @@ import { commands, ExtensionContext, window, tasks } from 'vscode';
 
 import { CliTaskProvider } from './cli-task-provider';
 import { selectFlags } from './select-flags';
-import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getTelemetry } from '@nx-console/server';
 import { NxTask } from './nx-task';
 
@@ -47,7 +47,7 @@ export function registerNxCommands(
 }
 
 async function promptForTarget(): Promise<string | undefined> {
-  const { validWorkspaceJson, json } = await verifyWorkspace();
+  const { validWorkspaceJson, json } = await nxWorkspace();
 
   if (!validWorkspaceJson || !json) {
     return;
@@ -386,7 +386,7 @@ async function promptForMigrate() {
 async function validProjectsForTarget(
   target: string
 ): Promise<string[] | undefined> {
-  const { validWorkspaceJson, json } = await verifyWorkspace();
+  const { validWorkspaceJson, json } = await nxWorkspace();
 
   if (!validWorkspaceJson || !json) {
     return;
