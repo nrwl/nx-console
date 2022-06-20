@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.18.3](https://github.com/nrwl/nx-console/compare/v17.18.2...v17.18.3) (2022-06-20)
+
+
+### Bug Fixes
+
+* camel case targets not working in generate & run target pane ([#1293](https://github.com/nrwl/nx-console/issues/1293)) ([e0f1025](https://github.com/nrwl/nx-console/commits/e0f10256a6b424d04c7db25e613a410447692ecb))
+* clear angular.json/workspace.json cache for older workspaces ([0b717cd](https://github.com/nrwl/nx-console/commits/0b717cd0b1ee371f945bc325225ac4815b7c6e3c))
+* improve performance for retrieving workspace details ([#1295](https://github.com/nrwl/nx-console/issues/1295)) ([f8d32ca](https://github.com/nrwl/nx-console/commits/f8d32caf3224125228b6d677cd0271b80074e190))
+
 ### [17.18.2](https://github.com/nrwl/nx-console/compare/v17.18.1...v17.18.2) (2022-06-10)
 
 
