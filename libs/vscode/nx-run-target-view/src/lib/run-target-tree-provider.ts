@@ -86,12 +86,6 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
   }
 
   private refreshRunTargetTree = async () => {
-    const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
-    );
-    clearJsonCache(workspacePath);
-
     this.refresh();
   };
 }

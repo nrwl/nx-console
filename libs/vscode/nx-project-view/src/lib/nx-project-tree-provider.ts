@@ -193,12 +193,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   }
 
   private async refreshNxProjectsTree() {
-    const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
-    );
-    clearJsonCache(workspacePath);
-
     this.refresh();
   }
 }

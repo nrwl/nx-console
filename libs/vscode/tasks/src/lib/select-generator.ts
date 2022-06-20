@@ -9,12 +9,12 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
 } from '@nx-console/server';
-import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getNxConfig, nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { dirname } from 'path';
 import { QuickPickItem, window } from 'vscode';
 
 async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
-  const { json } = await verifyWorkspace();
+  const { json } = await nxWorkspace();
 
   let defaults = json.generators;
 
@@ -83,7 +83,7 @@ export async function selectGenerator(
     generator: Generator;
     collectionPath: string;
   }
-  const { json } = await verifyWorkspace();
+  const { json } = await nxWorkspace();
   const generators = await getGenerators(workspacePath, json.projects);
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)

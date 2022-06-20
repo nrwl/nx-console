@@ -4,7 +4,7 @@ import {
   getTelemetry,
   readTargetDef,
 } from '@nx-console/server';
-import { getNxConfig, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getNxConfig, nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
 import {
@@ -25,7 +25,7 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, json, workspaceType } = await verifyWorkspace();
+    const { validWorkspaceJson, json, workspaceType } = await nxWorkspace();
 
     if (!validWorkspaceJson) {
       return;

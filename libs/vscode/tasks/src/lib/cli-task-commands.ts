@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { nxVersion, verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { nxVersion, nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider } from './cli-task-provider';
@@ -221,7 +221,7 @@ async function selectCliCommandAndShowUi(
     );
     return;
   }
-  const { validWorkspaceJson, configurationFilePath } = await verifyWorkspace();
+  const { validWorkspaceJson, configurationFilePath } = await nxWorkspace();
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
@@ -254,7 +254,7 @@ async function selectCliCommandAndPromptForFlags(
   } else if (!askForFlags) {
     flags = [];
   }
-  const { validWorkspaceJson, json, workspaceType } = await verifyWorkspace();
+  const { validWorkspaceJson, json, workspaceType } = await nxWorkspace();
 
   if (!projectName) {
     const selection = validWorkspaceJson
@@ -339,7 +339,7 @@ function surroundWithQuotesIfHasWhiteSpace(target: string): string {
 
 async function selectGeneratorAndPromptForFlags() {
   const { validWorkspaceJson, workspaceType, workspacePath } =
-    await verifyWorkspace();
+    await nxWorkspace();
 
   if (!validWorkspaceJson) {
     return;
@@ -414,7 +414,7 @@ async function selectCliTarget(targets: string[]): Promise<string | undefined> {
 }
 
 async function getTargetNames(): Promise<string[]> {
-  const { json } = await verifyWorkspace();
+  const { json } = await nxWorkspace();
   const commands = Object.values(json.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);
@@ -427,7 +427,7 @@ async function getTargetNames(): Promise<string[]> {
 async function getProjectsWithTargetName(
   targetName: string
 ): Promise<string[]> {
-  const { json } = await verifyWorkspace();
+  const { json } = await nxWorkspace();
   const projects = [];
   for (const [projectName, project] of Object.entries(json.projects)) {
     const targets = project.targets ?? {};

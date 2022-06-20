@@ -1,5 +1,5 @@
 import { cacheJson, readAndCacheJsonFile } from '@nx-console/server';
-import { NxJsonConfiguration } from '@nrwl/devkit';
+import type { NxJsonConfiguration } from '@nrwl/devkit';
 import { join } from 'path';
 import { getNxWorkspacePackageFileUtils } from './get-nx-workspace-package';
 import { stat } from 'fs/promises';

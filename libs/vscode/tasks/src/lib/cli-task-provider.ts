@@ -6,7 +6,7 @@ import {
 import { getTelemetry } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
-import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { isAbsolute, join, relative } from 'path';
 import {
   ProviderResult,
@@ -121,7 +121,7 @@ export class CliTaskProvider implements TaskProvider {
     if (json) {
       return json.projects;
     } else {
-      const result = await verifyWorkspace();
+      const result = await nxWorkspace();
       if (!result.validWorkspaceJson || !result.json) {
         return {};
       } else {

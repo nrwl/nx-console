@@ -1,18 +1,26 @@
-import { NxJsonConfiguration, WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import type {
+  NxJsonConfiguration,
+  WorkspaceJsonConfiguration,
+} from '@nrwl/devkit';
 import {
   fileExists,
   getOutputChannel,
   getTelemetry,
-  readAndCacheJsonFile,
   toWorkspaceFormat,
 } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
-import { window } from 'vscode';
 import {
-  getNxWorkspaceConfig,
-  NxWorkspaceConfiguration,
-} from './get-nx-workspace-config';
+  firstValueFrom,
+  from,
+  iif,
+  of,
+  ReplaySubject,
+  switchMap,
+  tap,
+} from 'rxjs';
+import { window } from 'vscode';
+import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 
 interface Workspace {
   validWorkspaceJson: boolean;
@@ -22,7 +30,40 @@ interface Workspace {
   workspacePath: string;
 }
 
-export async function verifyWorkspace(): Promise<Workspace> {
+const enum Status {
+  not_started,
+  in_progress,
+  cached,
+}
+
+let cachedReplay = new ReplaySubject<Workspace>();
+let status: Status = Status.not_started;
+
+export async function nxWorkspace(reset?: boolean): Promise<Workspace> {
+  if (reset) {
+    status = Status.not_started;
+    cachedReplay = new ReplaySubject<Workspace>();
+  }
+
+  return firstValueFrom(
+    iif(
+      () => status === Status.not_started,
+      of({}).pipe(
+        tap(() => {
+          status = Status.in_progress;
+        }),
+        switchMap(() => from(_workspace())),
+        tap((workspace) => {
+          cachedReplay.next(workspace);
+          status = Status.cached;
+        })
+      ),
+      cachedReplay
+    )
+  );
+}
+
+async function _workspace(): Promise<Workspace> {
   const workspacePath = WorkspaceConfigurationStore.instance.get(
     'nxWorkspacePath',
     ''

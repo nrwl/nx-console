@@ -54,7 +54,6 @@ import {
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
-import { nxVersion } from '@nx-console/vscode/nx-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -113,7 +112,13 @@ export async function activate(c: ExtensionContext) {
     context.subscriptions.push(
       runTargetTreeView,
       revealWebViewPanelCommand,
-      manuallySelectWorkspaceDefinitionCommand
+      manuallySelectWorkspaceDefinitionCommand,
+      commands.registerCommand('nxConsole.refreshWorkspace', async () => {
+        const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
+        nxWorkspace(true);
+        commands.executeCommand('nxConsole.refreshNxProjectsTree');
+        commands.executeCommand('nxConsole.refreshRunTargetTree');
+      })
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
@@ -269,6 +274,9 @@ async function setWorkspace(workspacePath: string) {
   } else if (!isNxWorkspace && isAngularWorkspace) {
     workspaceType = 'angular';
   }
+
+  const { nxVersion } = await import('@nx-console/vscode/nx-workspace');
+
   WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
   WorkspaceConfigurationStore.instance.set('nxVersion', await nxVersion());
 
@@ -330,10 +338,12 @@ function registerWorkspaceFileWatcher(
   const workspaceDir = dirname(workspaceJsonPath);
 
   workspaceFileWatcher = watchFile(
-    new RelativePattern(workspaceDir, '**/{workspace,angular,project}.json'),
+    new RelativePattern(
+      workspaceDir,
+      '**/{workspace,angular,project,nx,package}.json'
+    ),
     () => {
-      commands.executeCommand('nxConsole.refreshNxProjectsTree');
-      commands.executeCommand('nxConsole.refreshRunTargetTree');
+      commands.executeCommand('nxConsole.refreshWorkspace');
     }
   );
 

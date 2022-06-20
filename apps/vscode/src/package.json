@@ -97,8 +97,13 @@
       ],
       "view/title": [
         {
-          "command": "nxConsole.refreshNxProjectsTree",
+          "command": "nxConsole.refreshWorkspace",
           "when": "view == nxProjects",
+          "group": "navigation"
+        },
+        {
+          "command": "nxConsole.refreshWorkspace",
+          "when": "view == nxRunTarget",
           "group": "navigation"
         }
       ],
@@ -328,8 +333,8 @@
     },
     "commands": [
       {
-        "command": "nxConsole.refreshNxProjectsTree",
-        "title": "Refresh Projects",
+        "command": "nxConsole.refreshWorkspace",
+        "title": "Refresh Workspace",
         "category": "Nx",
         "icon": "$(refresh)"
       },

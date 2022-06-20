@@ -1,4 +1,4 @@
-import {
+import type {
   NxJsonConfiguration,
   WorkspaceJsonConfiguration,
   ProjectGraph,
@@ -61,21 +61,9 @@ export async function getNxWorkspaceConfig(
       }
 
       if (version < 13) {
-        projectGraph = (nxProjectGraph as any).readCurrentProjectGraph();
+        projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else {
-        projectGraph = nxProjectGraph.readCachedProjectGraph();
-      }
-
-      // Projects can become out of sync if we don't use Nx directly to create projects. This is the case for package.json projects
-      if (
-        !projectGraph ||
-        projectsOutOfSync(workspaceConfiguration, projectGraph)
-      ) {
-        if (version < 13) {
-          projectGraph = (nxProjectGraph as any).createProjectGraph();
-        } else {
-          projectGraph = await nxProjectGraph.createProjectGraphAsync();
-        }
+        projectGraph = await nxProjectGraph.createProjectGraphAsync();
       }
     } catch {
       //noop
@@ -149,13 +137,4 @@ function addProjectTargets(
       };
     }
   }
-}
-
-function projectsOutOfSync(
-  workspaceConfiguration: WorkspaceJsonConfiguration,
-  projectGraph: ProjectGraph
-): boolean {
-  const workspaceProjects = Object.keys(workspaceConfiguration.projects);
-  const projectGraphProjects = Object.keys(projectGraph.nodes);
-  return workspaceProjects.length != projectGraphProjects.length;
 }

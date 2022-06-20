@@ -19,11 +19,18 @@ import {
   switchMap,
   startWith,
   scan,
-  debounceTime,
+  debounce,
   filter,
   shareReplay,
 } from 'rxjs/operators';
-import { BehaviorSubject, Observable, fromEvent, merge, of } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  fromEvent,
+  merge,
+  of,
+  interval,
+} from 'rxjs';
 import { Option } from '@nx-console/schema';
 import { getOptionItems } from '../field-items/field-items.pipe';
 
@@ -90,7 +97,11 @@ export class AutocompleteComponent implements OnInit, ControlValueAccessor {
       fromEvent(this._elementRef.nativeElement, 'focusout').pipe(
         map(() => false)
       )
-    ).pipe(startWith(false), debounceTime(300), shareReplay(1));
+    ).pipe(
+      startWith(false),
+      debounce(() => interval(300)),
+      shareReplay(1)
+    );
 
     this.visibleOptions = this._options$.pipe(
       switchMap((options) =>

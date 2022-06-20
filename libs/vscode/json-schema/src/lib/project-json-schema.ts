@@ -1,7 +1,7 @@
 import { CollectionInfo } from '@nx-console/schema';
 import { getExecutors, watchFile } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { verifyWorkspace } from '@nx-console/vscode/nx-workspace';
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
 import * as vscode from 'vscode';
 
@@ -36,7 +36,7 @@ export class ProjectJsonSchema {
     clearPackageJsonCache = false
   ) {
     const filePath = vscode.Uri.joinPath(extensionUri, 'project-schema.json');
-    const { json } = await verifyWorkspace();
+    const { json } = await nxWorkspace();
     const collections = await getExecutors(
       workspacePath,
       json.projects,
