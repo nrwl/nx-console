@@ -15,7 +15,7 @@ jest.mock('./get-nx-workspace-config', () => {
   const originalModule = jest.requireActual('./get-nx-workspace-config');
   return {
     ...originalModule,
-    getNxWorkspaceConfig: async (): Promise
+    getNxWorkspaceConfig: async (): Promise<
       AsyncReturnType<typeof getNxWorkspaceConfig>
     > => {
       return {
