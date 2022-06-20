@@ -327,7 +327,7 @@ async function setApplicationAndLibraryContext(workspacePath: string) {
   );
 }
 
-async function registerWorkspaceFileWatcher(
+function registerWorkspaceFileWatcher(
   context: ExtensionContext,
   workspaceJsonPath: string
 ) {
