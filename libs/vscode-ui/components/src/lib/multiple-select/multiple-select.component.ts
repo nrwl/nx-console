@@ -7,7 +7,7 @@ import {
   OnInit,
   OnDestroy,
 } from '@angular/core';
-import { ControlContainer, FormControl, FormGroup } from '@angular/forms';
+import { ControlContainer, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Option } from '@nx-console/schema';
 import { Subscription } from 'rxjs';
 
@@ -22,12 +22,12 @@ export class MultipleSelectComponent implements OnInit, OnDestroy {
   @Input() value: string[];
   @Output() readonly valueChange = new EventEmitter<string[]>();
 
-  get parentFormGroup(): FormGroup {
-    return this.controlContainer.control as FormGroup;
+  get parentFormGroup(): UntypedFormGroup {
+    return this.controlContainer.control as UntypedFormGroup;
   }
 
-  get selectControl(): FormControl {
-    return this.parentFormGroup?.get(this.field?.name) as FormControl;
+  get selectControl(): UntypedFormControl {
+    return this.parentFormGroup?.get(this.field?.name) as UntypedFormControl;
   }
 
   constructor(private readonly controlContainer: ControlContainer) {}

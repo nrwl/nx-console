@@ -22,5 +22,6 @@
     "vscode-ui-styles": "libs/vscode-ui/styles",
     "vscode-verify": "libs/vscode/verify",
     "vscode-webview": "libs/vscode/webview"
-  }
+  },
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json"
 }

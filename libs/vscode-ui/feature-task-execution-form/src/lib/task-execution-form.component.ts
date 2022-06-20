@@ -11,9 +11,9 @@ import {
 } from '@angular/core';
 import { Clipboard } from '@angular/cdk/clipboard';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
@@ -85,7 +85,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   readonly architect$ = this.architectSubject.asObservable();
 
   readonly taskExecForm$: Observable<{
-    form: FormGroup;
+    form: UntypedFormGroup;
     architect: TaskExecutionSchema;
   }> = this.architect$.pipe(
     map((architect) => ({ form: this.buildForm(architect), architect })),
@@ -134,7 +134,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     shareReplay()
   );
 
-  readonly filterFieldsControl = new FormControl('');
+  readonly filterFieldsControl = new UntypedFormControl('');
 
   private readonly filterValue$ = (
     this.filterFieldsControl.valueChanges as Observable<string>
@@ -194,7 +194,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   dryRunSubscription?: Subscription;
 
   constructor(
-    private readonly fb: FormBuilder,
+    private readonly fb: UntypedFormBuilder,
     @Inject(TASK_EXECUTION_SCHEMA) public initialSchema: TaskExecutionSchema,
     private readonly ngZone: NgZone,
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -270,11 +270,11 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  buildForm(architect: TaskExecutionSchema): FormGroup {
+  buildForm(architect: TaskExecutionSchema): UntypedFormGroup {
     const taskExecForm = this.fb.group({});
 
     if (architect.configurations && architect.configurations.length) {
-      const configurationFormControl = new FormControl();
+      const configurationFormControl = new UntypedFormControl();
       taskExecForm.addControl('configuration', configurationFormControl);
 
       configurationFormControl.registerOnChange(() => {
@@ -318,7 +318,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       }
       taskExecForm.addControl(
         schema.name,
-        new FormControl(
+        new UntypedFormControl(
           (architect.contextValues && architect.contextValues[schema.name]) ||
             defaultValues[schema.name],
           validators
@@ -330,7 +330,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   }
 
   setConfiguration(
-    taskExecForm: FormGroup,
+    taskExecForm: UntypedFormGroup,
     architect: TaskExecutionSchema,
     configurationName?: string
   ) {
@@ -386,7 +386,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     architect,
     dryRun,
   }: {
-    form: FormGroup;
+    form: UntypedFormGroup;
     architect: TaskExecutionSchema;
     dryRun?: boolean;
   }) {
@@ -500,7 +500,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     return Array.from(args);
   }
 
-  copyCommandToClipboard(form: FormGroup, architect: TaskExecutionSchema) {
+  copyCommandToClipboard(form: UntypedFormGroup, architect: TaskExecutionSchema) {
     const configuration = form.get('configuration')?.value;
     this.clipboard.copy(
       `${formatTask(architect, configuration)} ${this.serializeArgs(

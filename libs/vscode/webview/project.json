@@ -1,20 +1,17 @@
 {
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/webview/src",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "libs/vscode/webview/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/vscode/webview/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/libs/vscode/webview"
-      ],
+      "outputs": ["coverage/libs/vscode/webview"],
       "options": {
         "jestConfig": "libs/vscode/webview/jest.config.ts",
         "passWithNoTests": true

@@ -11,8 +11,8 @@ import {
   ControlContainer,
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
-  FormControl,
-  FormGroup,
+  UntypedFormControl,
+  UntypedFormGroup,
 } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { getOptionItems } from '../field-items/field-items.pipe';
@@ -54,12 +54,12 @@ export class FieldComponent implements ControlValueAccessor, OnDestroy {
     // noop
   };
 
-  get parentFormGroup(): FormGroup {
-    return this.controlContainer.control as FormGroup;
+  get parentFormGroup(): UntypedFormGroup {
+    return this.controlContainer.control as UntypedFormGroup;
   }
 
-  get control(): FormControl {
-    return this.parentFormGroup?.get(this.field?.name) as FormControl;
+  get control(): UntypedFormControl {
+    return this.parentFormGroup?.get(this.field?.name) as UntypedFormControl;
   }
 
   get value(): string {

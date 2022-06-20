@@ -10,8 +10,8 @@ import {
   ControlContainer,
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
-  FormControl,
-  FormGroup,
+  UntypedFormControl,
+  UntypedFormGroup,
 } from '@angular/forms';
 import {
   map,
@@ -72,12 +72,12 @@ export class AutocompleteComponent implements OnInit, ControlValueAccessor {
     this._options$.next(getOptionItems(field) || []);
   }
 
-  get parentFormGroup(): FormGroup {
-    return this.controlContainer.control as FormGroup;
+  get parentFormGroup(): UntypedFormGroup {
+    return this.controlContainer.control as UntypedFormGroup;
   }
 
-  get control(): FormControl {
-    return this.parentFormGroup?.get(this.field?.name) as FormControl;
+  get control(): UntypedFormControl {
+    return this.parentFormGroup?.get(this.field?.name) as UntypedFormControl;
   }
 
   onChange: any = () => {

@@ -5,7 +5,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { ControlContainer, FormGroup } from '@angular/forms';
+import { ControlContainer, UntypedFormGroup } from '@angular/forms';
 import { Option } from '@nx-console/schema';
 
 @Component({
@@ -19,8 +19,8 @@ export class SelectComponent {
   @Input() value: string;
   @Output() readonly valueChange = new EventEmitter<string>();
 
-  get parentFormGroup(): FormGroup {
-    return this.controlContainer.control as FormGroup;
+  get parentFormGroup(): UntypedFormGroup {
+    return this.controlContainer.control as UntypedFormGroup;
   }
 
   constructor(private readonly controlContainer: ControlContainer) {}

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   displayName: 'vscode-nx-workspace',
 
   globals: {
@@ -13,5 +13,5 @@ module.exports = {
   },
   coverageDirectory: '../../../coverage/libs/vscode/nx-workspace',
   testEnvironment: 'node',
-  preset: '../../../jest.preset.ts',
+  preset: '../../../jest.preset.js',
 };

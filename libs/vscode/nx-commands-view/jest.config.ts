@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   displayName: 'vscode-nx-commands-view',
 
   globals: {
@@ -10,5 +10,5 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../../coverage/libs/vscode/nx-commands-view',
   testEnvironment: 'node',
-  preset: '../../../jest.preset.ts',
+  preset: '../../../jest.preset.js',
 };
