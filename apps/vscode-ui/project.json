@@ -1,5 +1,4 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "generators": {
     "@nrwl/workspace:component": {
@@ -8,6 +7,21 @@
   },
   "sourceRoot": "apps/vscode-ui/src",
   "targets": {
+    "watch": {
+      "executor": "ngx-build-plus:browser",
+      "options": {
+        "watch": true,
+        "extraWebpackConfig": "apps/vscode-ui/webpack.dev.js",
+        "outputPath": "dist/apps/vscode/assets/public",
+        "index": "apps/vscode-ui/src/index.html",
+        "main": "apps/vscode-ui/src/main.ts",
+        "tsConfig": "apps/vscode-ui/tsconfig.app.json",
+        "styles": ["apps/vscode-ui/src/styles.scss"],
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/vscode-ui/styles/src/lib"]
+        }
+      }
+    },
     "build": {
       "executor": "ngx-build-plus:browser",
       "options": {
@@ -26,9 +40,6 @@
         "allowedCommonJsDependencies": ["zone.js"]
       },
       "configurations": {
-        "watch": {
-          "watch": true
-        },
         "production": {
           "sourceMap": false,
           "aot": true,
