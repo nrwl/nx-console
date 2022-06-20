@@ -115,7 +115,7 @@ export async function activate(c: ExtensionContext) {
       manuallySelectWorkspaceDefinitionCommand,
       commands.registerCommand('nxConsole.refreshWorkspace', async () => {
         const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
-        nxWorkspace(true);
+        await nxWorkspace(true);
         commands.executeCommand('nxConsole.refreshNxProjectsTree');
         commands.executeCommand('nxConsole.refreshRunTargetTree');
       })
