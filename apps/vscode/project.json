@@ -78,7 +78,13 @@
           "sourceMap": false,
           "optimization": true,
           "extractLicenses": true,
-          "externalDependencies": ["vscode"],
+          "externalDependencies": [
+            "vscode",
+            "jsonc-parser",
+            "@monodon/typescript-nx-imports-plugin",
+            "@yarnpkg/fslib",
+            "@yarnpkg/libzip"
+          ],
           "fileReplacements": [
             {
               "replace": "apps/vscode/src/environments/environment.ts",
@@ -101,6 +107,7 @@
       "options": {
         "commands": [
           "yarn nx run vscode:build:production",
+          "node ./tools/scripts/vscode-yarn.js",
           "node ./tools/scripts/vscode-vsce.js"
         ],
         "parallel": false
