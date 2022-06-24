@@ -54,6 +54,7 @@ import {
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
+import { refreshWorkspace } from './commands/refresh-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -113,12 +114,7 @@ export async function activate(c: ExtensionContext) {
       runTargetTreeView,
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand,
-      commands.registerCommand('nxConsole.refreshWorkspace', async () => {
-        const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
-        await nxWorkspace(true);
-        commands.executeCommand('nxConsole.refreshNxProjectsTree');
-        commands.executeCommand('nxConsole.refreshRunTargetTree');
-      })
+      refreshWorkspace()
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
