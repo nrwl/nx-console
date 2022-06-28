@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.18.6](https://github.com/nrwl/nx-console/compare/v17.18.5...v17.18.6) (2022-06-28)
+
+
+### Bug Fixes
+
+* debounce refresh workspace to prevent thrashing ([45fae41](https://github.com/nrwl/nx-console/commits/45fae414169433cfa734d53306bd0c5bdff5eb0c))
+
 ### [17.18.5](https://github.com/nrwl/nx-console/compare/v17.18.4...v17.18.5) (2022-06-22)
 
 
