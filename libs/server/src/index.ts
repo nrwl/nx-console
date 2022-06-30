@@ -18,5 +18,6 @@ export {
 export { watchFile } from './lib/utils/watch-file';
 export { buildProjectPath } from './lib/utils/build-project-path';
 export { findConfig } from './lib/utils/find-config';
+export { findFilesInPath } from './lib/utils/find-files-in-path';
 export { getShellExecutionForConfig } from './lib/utils/shell-execution';
 export { checkIsNxWorkspace } from './lib/check-is-nx-workspace';

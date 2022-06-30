@@ -1,6 +1,7 @@
 import {
   clearJsonCache,
   findConfig,
+  findFilesInPath,
   readAndCacheJsonFile,
   watchFile,
 } from '@nx-console/server';
@@ -131,11 +132,11 @@ async function getExternalFiles(
 
   const externals: { mainFile: string; directory: string }[] = [];
 
-  for (const [, value] of Object.entries<string[]>(paths)) {
+  for await (const [, value] of Object.entries<string[]>(paths)) {
     const mainFile = join(workspaceRoot, value[0]);
     const configFilePath = await findConfig(mainFile, TSCONFIG_LIB);
 
-    if (!configFilePath) {
+    if (!configFilePath || mainFile.endsWith('/*')) {
       continue;
     }
 
@@ -143,5 +144,17 @@ async function getExternalFiles(
     externals.push({ mainFile, directory });
   }
 
+  for await (const [, value] of Object.entries<string[]>(paths)) {
+    const dirEntryWithAsterix = join(workspaceRoot, value[0]);
+    const configFilePath = await findConfig(dirEntryWithAsterix, TSCONFIG_LIB);
+    if (!configFilePath) {
+      continue;
+    }
+    if (dirEntryWithAsterix.endsWith('/*')) {
+      for await (const file of await findFilesInPath(dirEntryWithAsterix)) {
+        externals.push({ mainFile: file.file, directory: file.directory });
+      }
+    }
+  }
   return externals;
 }
