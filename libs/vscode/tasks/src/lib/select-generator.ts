@@ -61,7 +61,8 @@ export async function getGeneratorOptions(
   workspacePath: string,
   collectionName: string,
   generatorName: string,
-  generatorPath: string
+  generatorPath: string,
+  workspaceType: 'ng' | 'nx'
 ): Promise<Option[]> {
   const generatorSchema = await readAndCacheJsonFile(generatorPath);
   const workspaceDefaults = await readWorkspaceJsonDefaults(workspacePath);
@@ -69,7 +70,7 @@ export async function getGeneratorOptions(
     workspaceDefaults &&
     workspaceDefaults[collectionName] &&
     workspaceDefaults[collectionName][generatorName];
-  return await normalizeSchema(generatorSchema.json, defaults);
+  return await normalizeSchema(generatorSchema.json, workspaceType, defaults);
 }
 
 export async function selectGenerator(
@@ -120,7 +121,8 @@ export async function selectGenerator(
           workspacePath,
           selection.collectionName,
           selection.generator.name,
-          selection.collectionPath
+          selection.collectionPath,
+          workspaceType
         ));
       const positional = `${selection.collectionName}:${selection.generator.name}`;
       return {

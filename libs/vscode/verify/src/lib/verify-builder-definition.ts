@@ -58,7 +58,8 @@ const RUN_ONE_OPTIONS = [
 export async function verifyBuilderDefinition(
   project: string,
   command: string,
-  workspaceJson: WorkspaceJsonConfiguration
+  workspaceJson: WorkspaceJsonConfiguration,
+  workspaceType: 'ng' | 'nx'
 ): Promise<{
   validBuilder: boolean;
   builderName: string;
@@ -89,6 +90,7 @@ export async function verifyBuilderDefinition(
   const options = await readBuilderSchema(
     workspacePath(),
     executorName,
+    workspaceType,
     commandDef.options
   );
 
