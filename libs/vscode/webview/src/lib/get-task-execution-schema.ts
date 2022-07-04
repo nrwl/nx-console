@@ -4,7 +4,7 @@ import {
   getTelemetry,
   readTargetDef,
 } from '@nx-console/server';
-import { getNxConfig, nxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
 import {
@@ -196,9 +196,10 @@ async function getConfigValuesFromContextMenuUri(
       .replace(workspacePath, '')
       .replace(/\\/g, '/')
       .replace(/^\//, '');
-    const nxConfig = await getNxConfig(workspacePath);
-    const appsDir = nxConfig.workspaceLayout?.appsDir ?? 'packages';
-    const libsDir = nxConfig.workspaceLayout?.libsDir ?? 'packages';
+    const { workspaceLayout } = await nxWorkspace();
+
+    const appsDir = workspaceLayout.appsDir;
+    const libsDir = workspaceLayout.libsDir;
     if (
       (appsDir && generator.name === 'application') ||
       generator.name === 'app'

@@ -54,7 +54,10 @@ import {
 } from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
-import { refreshWorkspace } from './commands/refresh-workspace';
+import {
+  refreshWorkspace,
+  REFRESH_WORKSPACE,
+} from './commands/refresh-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -213,13 +216,6 @@ async function setWorkspace(workspacePath: string) {
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
-  // const { verifyWorkspace } = await import('@nx-console/vscode/nx-workspace');
-
-  // const { validWorkspaceJson } = await verifyWorkspace();
-  // if (!validWorkspaceJson) {
-  //   return;
-  // // }
-
   if (!cliTaskProvider) {
     cliTaskProvider = new CliTaskProvider();
     registerNxCommands(context, cliTaskProvider);
@@ -280,20 +276,15 @@ async function setWorkspace(workspacePath: string) {
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {
-  const { getNxConfig } = await import('@nx-console/vscode/nx-workspace');
+  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
 
-  let nxConfig: AsyncReturnType<typeof getNxConfig>;
-  try {
-    nxConfig = await getNxConfig(workspacePath);
-  } catch {
-    return;
-  }
+  const { workspaceLayout } = await nxWorkspace();
 
   commands.executeCommand('setContext', 'nxAppsDir', [
-    join(workspacePath, nxConfig.workspaceLayout?.appsDir ?? 'apps'),
+    join(workspacePath, workspaceLayout.appsDir),
   ]);
   commands.executeCommand('setContext', 'nxLibsDir', [
-    join(workspacePath, nxConfig.workspaceLayout?.libsDir ?? 'libs'),
+    join(workspacePath, workspaceLayout.libsDir),
   ]);
 
   const generatorCollections = await getGenerators(workspacePath);
@@ -323,25 +314,38 @@ async function setApplicationAndLibraryContext(workspacePath: string) {
   );
 }
 
-function registerWorkspaceFileWatcher(
+async function registerWorkspaceFileWatcher(
   context: ExtensionContext,
-  workspaceJsonPath: string
+  workspacePath: string
 ) {
   if (workspaceFileWatcher) {
     workspaceFileWatcher.dispose();
   }
 
-  const workspaceDir = dirname(workspaceJsonPath);
+  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
 
-  workspaceFileWatcher = watchFile(
-    new RelativePattern(
-      workspaceDir,
-      '**/{workspace,angular,project,nx,package}.json'
+  const { workspaceLayout } = await nxWorkspace();
+  const workspacePackageDirs = new Set<string>();
+  workspacePackageDirs.add(workspaceLayout.appsDir);
+  workspacePackageDirs.add(workspaceLayout.libsDir);
+  workspacePackageDirs.add('packages');
+  context.subscriptions.push(
+    watchFile(
+      new RelativePattern(workspacePath, '{workspace,angular,nx}.json'),
+      () => {
+        commands.executeCommand(REFRESH_WORKSPACE);
+      }
     ),
-    () => {
-      commands.executeCommand('nxConsole.refreshWorkspace');
-    }
+    ...Array.from(workspacePackageDirs).map((dir) => {
+      return watchFile(
+        new RelativePattern(
+          join(workspacePath, dir),
+          `**/{project,package}.json`
+        ),
+        () => {
+          commands.executeCommand(REFRESH_WORKSPACE);
+        }
+      );
+    })
   );
-
-  context.subscriptions.push(workspaceFileWatcher);
 }
