@@ -1,6 +1,8 @@
 import { debounceTime, Subject } from 'rxjs';
 import { commands } from 'vscode';
 
+export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
+
 const refresh = new Subject();
 
 refresh.pipe(debounceTime(300)).subscribe(async () => {
@@ -14,7 +16,7 @@ refresh.pipe(debounceTime(300)).subscribe(async () => {
  * Refresh workspace by debouncing multiple calls to only trigger once
  */
 export function refreshWorkspace() {
-  return commands.registerCommand('nxConsole.refreshWorkspace', () => {
+  return commands.registerCommand(REFRESH_WORKSPACE, () => {
     refresh.next(undefined);
   });
 }

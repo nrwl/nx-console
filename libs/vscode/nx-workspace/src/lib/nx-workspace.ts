@@ -29,6 +29,11 @@ interface Workspace {
   workspaceType: 'ng' | 'nx';
   configurationFilePath: string;
   workspacePath: string;
+  isLerna: boolean;
+  workspaceLayout: {
+    appsDir: string;
+    libsDir: string;
+  };
 }
 
 const enum Status {
@@ -85,12 +90,25 @@ async function _workspace(): Promise<Workspace> {
     isAngularWorkspace ? 'angularCli' : 'nx'
   );
 
+  const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
+
   try {
     return {
       validWorkspaceJson: true,
       workspaceType: isAngularWorkspace ? 'ng' : 'nx',
       json: toWorkspaceFormat(config.workspaceConfiguration),
       configurationFilePath: config.configPath,
+      isLerna,
+      workspaceLayout: {
+        appsDir:
+          config.workspaceConfiguration.workspaceLayout?.appsDir ?? isLerna
+            ? 'packages'
+            : 'apps',
+        libsDir:
+          config.workspaceConfiguration.workspaceLayout?.libsDir ?? isLerna
+            ? 'packages'
+            : 'libs',
+      },
       workspacePath,
     };
   } catch (e) {
@@ -117,6 +135,11 @@ async function _workspace(): Promise<Workspace> {
       },
       configurationFilePath: '',
       workspacePath,
+      isLerna: false,
+      workspaceLayout: {
+        appsDir: 'apps',
+        libsDir: 'libs',
+      },
     };
   }
 }
