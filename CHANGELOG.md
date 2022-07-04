@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.18.7](https://github.com/nrwl/nx-console/compare/v17.18.6...v17.18.7) (2022-07-04)
+
+
+### Bug Fixes
+
+* hyphenate arguments for ng workspaces ([#1304](https://github.com/nrwl/nx-console/issues/1304)) ([9ef6bf4](https://github.com/nrwl/nx-console/commits/9ef6bf456246bdab4f6c5399c24225105c74ebae))
+* optimize file watches ([#1303](https://github.com/nrwl/nx-console/issues/1303)) ([8caaaaf](https://github.com/nrwl/nx-console/commits/8caaaafbab7e87d3de953d266e041ce4795d9edc))
+
 ### [17.18.6](https://github.com/nrwl/nx-console/compare/v17.18.5...v17.18.6) (2022-06-28)
 
 
