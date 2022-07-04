@@ -283,7 +283,8 @@ async function selectCliCommandAndPromptForFlags(
   const builderDefinition = await verifyBuilderDefinition(
     projectName,
     target,
-    json
+    json,
+    workspaceType
   );
   const {
     validBuilder,

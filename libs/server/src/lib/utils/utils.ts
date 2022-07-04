@@ -4,6 +4,7 @@ import type {
   WorkspaceJsonConfiguration,
   NxJsonConfiguration,
 } from '@nrwl/devkit';
+import { names } from '@nrwl/devkit';
 
 import {
   ItemsWithEnum,
@@ -27,6 +28,7 @@ import { getOutputChannel } from './output-channel';
 import { toNewFormat } from 'nx/src/config/workspaces';
 import { PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
 import { getLibzipSync as libzip } from '@yarnpkg/libzip';
+import { ngVersion } from './ng-version';
 
 const zipOpenFs = new ZipOpenFS({ libzip });
 export const crossFs = new PosixFS(zipOpenFs);
@@ -175,9 +177,11 @@ export async function readAndCacheJsonFile(
 
 export async function normalizeSchema(
   s: Schema,
+  workspaceType: 'ng' | 'nx',
   projectDefaults?: GeneratorDefaults
 ): Promise<Option[]> {
-  const options = schemaToOptions(s);
+  const hyphenate = workspaceType === 'ng' && (await ngVersion()) >= 14;
+  const options = schemaToOptions(s, { hyphenate });
   const requiredFields = new Set(s.required || []);
 
   const nxOptions = options.map((option) => {
@@ -322,7 +326,10 @@ export function toWorkspaceFormat(
   return newFormat;
 }
 
-function schemaToOptions(schema: Schema): CliOption[] {
+function schemaToOptions(
+  schema: Schema,
+  config?: { hyphenate: boolean }
+): CliOption[] {
   return Object.keys(schema.properties || {}).reduce<CliOption[]>(
     (cliOptions, option) => {
       const currentProperty = schema.properties[option];
@@ -336,9 +343,9 @@ function schemaToOptions(schema: Schema): CliOption[] {
       if (!visible) {
         return cliOptions;
       }
-
+      const name = config?.hyphenate ? names(option).fileName : option;
       cliOptions.push({
-        name: option,
+        name,
         positional,
         ...currentProperty,
       });

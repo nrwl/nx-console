@@ -67,7 +67,8 @@ export async function getTaskExecutionSchema(
           const { validBuilder, options } = await verifyBuilderDefinition(
             selection.projectName,
             selection.command,
-            json
+            json,
+            workspaceType
           );
           if (!validBuilder) {
             return;
@@ -136,7 +137,8 @@ export async function getTaskExecutionSchema(
         const { validBuilder, options } = await verifyBuilderDefinition(
           selectedProject.projectName,
           command,
-          json
+          json,
+          workspaceType
         );
         if (!validBuilder) {
           return;

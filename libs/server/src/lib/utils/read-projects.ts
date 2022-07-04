@@ -58,6 +58,7 @@ function readDefaultValues(configurations: any, name: string): DefaultValue[] {
 export async function readBuilderSchema(
   basedir: string,
   builder: string,
+  workspaceType: 'ng' | 'nx',
   projectDefaults?: { [name: string]: string }
 ): Promise<Option[] | undefined> {
   try {
@@ -87,7 +88,11 @@ export async function readBuilderSchema(
       path.dirname(buildersJson.path)
     );
 
-    return await normalizeSchema(builderSchema.json, projectDefaults);
+    return await normalizeSchema(
+      builderSchema.json,
+      workspaceType,
+      projectDefaults
+    );
   } catch (e) {
     // todo: make this a utility function to be used in more places.
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
