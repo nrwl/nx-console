@@ -17,10 +17,13 @@ describe('utils', () => {
       options: Schema['properties'],
       required: string[] = []
     ): Promise<Option[]> => {
-      const r = await normalizeSchema({
-        properties: { ...options },
-        required,
-      });
+      const r = await normalizeSchema(
+        {
+          properties: { ...options },
+          required,
+        },
+        'nx'
+      );
       return r;
     };
 
@@ -41,28 +44,34 @@ describe('utils', () => {
     });
 
     it('should sort positional arguments by ascending order', async () => {
-      const r = await normalizeSchema({
-        properties: {
-          a: { $default: { $source: 'argv', index: 0 } },
-          b: { $default: { $source: 'argv', index: 2 } },
-          c: { $default: { $source: 'argv', index: 1 } },
+      const r = await normalizeSchema(
+        {
+          properties: {
+            a: { $default: { $source: 'argv', index: 0 } },
+            b: { $default: { $source: 'argv', index: 2 } },
+            c: { $default: { $source: 'argv', index: 1 } },
+          },
+          required: [],
         },
-        required: [],
-      });
+        'nx'
+      );
       expect(r.map((x) => x.name)).toEqual(['a', 'c', 'b']);
     });
 
     it('should sort required arguments', async () => {
-      const r = await normalizeSchema({
-        properties: {
-          a: { $default: { $source: 'argv', index: 1 } },
-          b: {},
-          c: {},
-          d: { $default: { $source: 'argv', index: 0 } },
-          e: {},
+      const r = await normalizeSchema(
+        {
+          properties: {
+            a: { $default: { $source: 'argv', index: 1 } },
+            b: {},
+            c: {},
+            d: { $default: { $source: 'argv', index: 0 } },
+            e: {},
+          },
+          required: ['c', 'e'],
         },
-        required: ['c', 'e'],
-      });
+        'nx'
+      );
       expect(r.map((x) => x.name)).toMatchInlineSnapshot(`
         Array [
           "d",
