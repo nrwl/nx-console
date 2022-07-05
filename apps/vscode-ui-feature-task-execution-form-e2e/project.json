@@ -1,4 +1,5 @@
 {
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/vscode-ui-feature-task-execution-form-e2e/src",
   "projectType": "application",
   "targets": {

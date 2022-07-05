@@ -803,6 +803,11 @@
           "visibility": "visible"
         },
         {
+          "id": "nxProjects",
+          "name": "Projects",
+          "when": "isNxWorkspace || isAngularWorkspace"
+        },
+        {
           "id": "nxRunTarget",
           "name": "Generate & Run Target"
         },
@@ -810,11 +815,6 @@
           "id": "nxCommands",
           "name": "Common Nx Commands",
           "when": "isNxWorkspace"
-        },
-        {
-          "id": "nxProjects",
-          "name": "Projects",
-          "when": "isNxWorkspace || isAngularWorkspace"
         }
       ]
     },

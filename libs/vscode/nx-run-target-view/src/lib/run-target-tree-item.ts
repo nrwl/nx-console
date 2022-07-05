@@ -67,8 +67,8 @@ export class RunTargetTreeItem extends TreeItem {
 }
 
 async function getTargetNames(): Promise<string[]> {
-  const { json } = await nxWorkspace();
-  const commands = Object.values(json.projects).reduce((acc, project) => {
+  const { workspace } = await nxWorkspace();
+  const commands = Object.values(workspace.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);
     }

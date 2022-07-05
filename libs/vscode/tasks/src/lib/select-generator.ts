@@ -9,14 +9,13 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
 } from '@nx-console/server';
-import { getNxConfig, nxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { dirname } from 'path';
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
 
 async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
-  const { json } = await nxWorkspace();
+  const { workspace } = await nxWorkspace();
 
-  let defaults = json.generators;
+  let defaults = workspace.generators;
 
   if (!defaults) {
     try {
@@ -24,7 +23,7 @@ async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
        * This could potentially fail if we're in an Angular CLI project without schematics being part of angular.json
        * Default the default to {} on the catch
        */
-      defaults = (await getNxConfig(dirname(workspacePath))).generators || {};
+      defaults = workspace.generators || {};
     } catch (e) {
       defaults = {};
     }
@@ -84,8 +83,8 @@ export async function selectGenerator(
     generator: Generator;
     collectionPath: string;
   }
-  const { json } = await nxWorkspace();
-  const generators = await getGenerators(workspacePath, json.projects);
+  const { workspace } = await nxWorkspace();
+  const generators = await getGenerators(workspacePath, workspace.projects);
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)
     .map((collection): GenerateQuickPickItem => {

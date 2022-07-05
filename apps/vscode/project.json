@@ -1,4 +1,5 @@
 {
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/vscode/src",
   "projectType": "application",
   "prefix": "vscode",
@@ -94,6 +95,7 @@
           "webpackConfig": "apps/vscode/webpack.prod.config.js"
         }
       },
+      "defaultConfiguration": "production",
       "outputs": ["{options.outputPath}"]
     },
     "lint": {
@@ -104,6 +106,7 @@
     },
     "package": {
       "executor": "@nrwl/workspace:run-commands",
+      "dependsOn": ["build"],
       "options": {
         "commands": [
           "yarn nx run vscode:build:production",

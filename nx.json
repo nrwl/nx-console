@@ -29,17 +29,8 @@
       }
     }
   },
-  "targetDependencies": {
-    "build": [
-      {
-        "target": "build",
-        "projects": "dependencies"
-      }
-    ]
-  },
   "cli": {
-    "packageManager": "yarn",
-    "defaultCollection": "@nrwl/angular"
+    "packageManager": "yarn"
   },
   "generators": {
     "@nrwl/angular:application": {
@@ -56,5 +47,11 @@
       "style": "scss"
     }
   },
-  "defaultProject": "vscode-ui"
+  "defaultProject": "vscode-ui",
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"]
+    }
+  }
 }
