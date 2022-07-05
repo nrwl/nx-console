@@ -79,8 +79,12 @@ xdescribe('verifyWorkspace', () => {
       // arrange
 
       // act
-      const { validWorkspaceJson, json, workspaceType, configurationFilePath } =
-        await nxWorkspace();
+      const {
+        validWorkspaceJson,
+        workspace,
+        workspaceType,
+        configurationFilePath,
+      } = await nxWorkspace();
 
       // assert
       expect(mockStoreInstanceGetFn).toHaveBeenCalledWith(
@@ -89,8 +93,8 @@ xdescribe('verifyWorkspace', () => {
       );
 
       expect(validWorkspaceJson).toBe(true);
-      expect(json).toBeTruthy();
-      expect(json).toEqual(mockWorkspace);
+      expect(workspace).toBeTruthy();
+      expect(workspace).toEqual(mockWorkspace);
       expect(workspaceType).toBe('nx');
       expect(configurationFilePath).toMatch(/workspace.json$/i);
     });
@@ -107,8 +111,12 @@ xdescribe('verifyWorkspace', () => {
         };
       });
       // act
-      const { validWorkspaceJson, json, workspaceType, configurationFilePath } =
-        await nxWorkspace();
+      const {
+        validWorkspaceJson,
+        workspace,
+        workspaceType,
+        configurationFilePath,
+      } = await nxWorkspace();
 
       // assert
       expect(mockStoreInstanceGetFn).toHaveBeenCalledWith(
@@ -117,8 +125,8 @@ xdescribe('verifyWorkspace', () => {
       );
 
       expect(validWorkspaceJson).toBe(true);
-      expect(json).toBeTruthy();
-      expect(json).toEqual(mockWorkspace);
+      expect(workspace).toBeTruthy();
+      expect(workspace).toEqual(mockWorkspace);
       expect(workspaceType).toBe('ng');
       expect(configurationFilePath).toMatch(/angular.json$/i);
     });
@@ -165,7 +173,7 @@ xdescribe('verifyWorkspace', () => {
 
       // act
       const {
-        json: { projects },
+        workspace: { projects },
       } = await nxWorkspace();
       const [project1, project2, project3] = Object.keys(projects);
       const [sorted1, sorted2, sorted3] = Object.keys(sortedProject);
