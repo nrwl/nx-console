@@ -5,7 +5,7 @@ export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 
 const refresh = new Subject();
 
-refresh.pipe(debounceTime(300)).subscribe(async () => {
+refresh.pipe(debounceTime(150)).subscribe(async () => {
   const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
   await nxWorkspace(true);
   commands.executeCommand('nxConsole.refreshNxProjectsTree');
