@@ -19,15 +19,11 @@ import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
 
-export let cliTaskProvider: CliTaskProvider;
-
 export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: CliTaskDefinition;
 
   constructor() {
-    cliTaskProvider = this;
-
     tasks.onDidEndTaskProcess(() => {
       this.currentDryRun = undefined;
       if (this.deferredDryRun) {
@@ -99,7 +95,7 @@ export class CliTaskProvider implements TaskProvider {
           positional: positionals[2],
           flags: definition.flags,
         },
-        cliTaskProvider.getWorkspacePath()
+        this.getWorkspacePath()
       );
     } else {
       task = await this.createTask(definition);
