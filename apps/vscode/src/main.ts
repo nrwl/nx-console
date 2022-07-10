@@ -46,7 +46,6 @@ import {
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
 import { environment } from './environments/environment';
-import { AsyncReturnType } from 'type-fest';
 
 import {
   WorkspaceJsonSchema,
@@ -58,6 +57,7 @@ import {
   refreshWorkspace,
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
+import { projectGraph } from '@nx-console/vscode/project-graph';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -117,7 +117,8 @@ export async function activate(c: ExtensionContext) {
       runTargetTreeView,
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand,
-      refreshWorkspace()
+      refreshWorkspace(),
+      projectGraph()
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register

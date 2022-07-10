@@ -14,12 +14,11 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
 
   getChildren() {
     return [
-      'dep-graph',
+      'project-graph',
       'run-many',
       'affected',
       'affected:apps',
       'affected:build',
-      'affected:dep-graph',
       'affected:e2e',
       'affected:libs',
       'affected:lint',

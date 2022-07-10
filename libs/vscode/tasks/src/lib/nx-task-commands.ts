@@ -21,20 +21,15 @@ export function registerNxCommands(
       }
       promptForAffectedFlags(target);
     }),
-    ...['apps', 'build', 'dep-graph', 'e2e', 'libs', 'lint', 'test'].map(
-      (command) =>
-        commands.registerCommand(`nx.affected.${command}`, () =>
-          promptForAffectedFlags(command)
-        )
+    ...['apps', 'build', 'e2e', 'libs', 'lint', 'test'].map((command) =>
+      commands.registerCommand(`nx.affected.${command}`, () =>
+        promptForAffectedFlags(command)
+      )
     )
   );
 
   context.subscriptions.push(
     commands.registerCommand('nx.run-many', () => promptForRunMany())
-  );
-
-  context.subscriptions.push(
-    commands.registerCommand('nx.dep-graph', () => promptForDepGraph())
   );
 
   context.subscriptions.push(
@@ -277,8 +272,7 @@ async function selectAffectedFlags(target: string): Promise<{
 }> {
   switch (target) {
     case 'apps':
-    case 'libs':
-    case 'dep-graph': {
+    case 'libs': {
       const command = `affected:${target}`;
       return {
         command,
@@ -331,24 +325,6 @@ async function promptForRunMany() {
     const task = NxTask.create(
       {
         command: 'run-many',
-        flags,
-      },
-      cliTaskProvider.getWorkspacePath()
-    );
-    tasks.executeTask(task);
-  }
-}
-
-async function promptForDepGraph() {
-  const telemetry = getTelemetry();
-  telemetry.featureUsed('affected-cli');
-
-  const flags = await selectFlags('dep-graph', DEP_GRAPH_OPTIONS, 'nx');
-
-  if (flags !== undefined) {
-    const task = NxTask.create(
-      {
-        command: 'dep-graph',
         flags,
       },
       cliTaskProvider.getWorkspacePath()

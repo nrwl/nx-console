@@ -1,1 +1,1 @@
-export * from './lib/vscode-project-graph';
+export * from './lib/project-graph';

@@ -1,6 +1,10 @@
 import { commands, ExtensionContext, window, Uri } from 'vscode';
 
-import { nxVersion, nxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  findProjectWithPath,
+  nxVersion,
+  nxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider } from './cli-task-provider';
@@ -369,7 +373,7 @@ async function selectGeneratorAndPromptForFlags() {
 export async function getCliProjectFromUri(
   uri: Uri
 ): Promise<string | undefined> {
-  const project = await cliTaskProvider.projectForPath(uri.fsPath);
+  const project = await findProjectWithPath(uri.fsPath);
   return project?.name;
 }
 

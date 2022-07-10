@@ -133,28 +133,4 @@ export class CliTaskProvider implements TaskProvider {
   async getProjectEntries(json?: WorkspaceJsonConfiguration) {
     return Object.entries((await this.getProjects(json)) || {});
   }
-
-  async projectForPath(selectedPath: string) {
-    if (!this.getWorkspaceJsonPath()) return null;
-
-    const entry = (await this.getProjectEntries()).find(([, def]) => {
-      const fullProjectPath = join(
-        this.getWorkspacePath(),
-        // If root is empty, that means we're in an angular project with the old ng workspace setup. Otherwise use the sourceRoot
-        def.root || def.sourceRoot || ''
-      );
-      if (fullProjectPath === selectedPath) {
-        return true;
-      }
-
-      const relativePath = relative(fullProjectPath, selectedPath);
-      return (
-        relativePath &&
-        !relativePath.startsWith('..') &&
-        !isAbsolute(relativePath)
-      );
-    });
-
-    return entry ? { name: entry[0], ...entry[1] } : null;
-  }
 }
