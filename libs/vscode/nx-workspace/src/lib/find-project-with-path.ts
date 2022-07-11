@@ -4,8 +4,11 @@ import { isAbsolute, join, relative } from 'path';
 import { nxWorkspace } from './nx-workspace';
 
 export async function findProjectWithPath(
-  selectedPath: string
+  selectedPath: string | undefined
 ): Promise<ProjectConfiguration | null> {
+  if (!selectedPath) {
+    return null;
+  }
   const workspacePath = WorkspaceConfigurationStore.instance.get(
     'nxWorkspacePath',
     ''

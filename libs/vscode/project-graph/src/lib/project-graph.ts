@@ -1,5 +1,5 @@
 import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
-import { commands, Disposable, Uri } from 'vscode';
+import { commands, Disposable, Uri, window, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { generateProjectGraph } from './graph-process';
 import { projectInWebview, webview } from './graph-webview';
@@ -10,13 +10,11 @@ export function projectGraph() {
       generateProjectGraph();
       await webview();
     }),
-    commands.registerCommand('nx.graph.focus', async (uri: Uri) => {
-      const project = await findProjectWithPath(uri.fsPath);
-      projectInWebview(project?.name, MessageType.focus);
+    commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
+      await openProjectWithFile(uri, MessageType.focus);
     }),
     commands.registerCommand('nx.graph.select', async (uri: Uri) => {
-      const project = await findProjectWithPath(uri.fsPath);
-      projectInWebview(project?.name, MessageType.select);
+      await openProjectWithFile(uri, MessageType.select);
     }),
     commands.registerCommand(
       'nx.graph.focus.button',
@@ -39,4 +37,24 @@ export function projectGraph() {
       }
     )
   );
+}
+
+/**
+ * Opens a project in the graph depending on URI or activeTextEditor
+ * @param uri
+ * @param messageType
+ */
+async function openProjectWithFile(
+  uri: Uri | undefined,
+  messageType: MessageType
+) {
+  let filePath;
+  if (uri) {
+    filePath = uri.fsPath;
+  } else {
+    filePath = window.activeTextEditor?.document.fileName;
+  }
+
+  const project = await findProjectWithPath(filePath);
+  projectInWebview(project?.name, messageType);
 }
