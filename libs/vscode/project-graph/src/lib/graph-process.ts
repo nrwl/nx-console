@@ -1,17 +1,11 @@
 import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
-import { getOutputChannel } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { ChildProcess, execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
 import * as cacheDir from 'find-cache-dir';
 
-let process: ChildProcess | undefined;
 let projectGraphCacheDir: string | undefined;
 
 export async function generateProjectGraph() {
-  if (process) {
-    return;
-  }
-
   return new Promise<void>((res, rej) => {
     if (!projectGraphCacheDir) {
       projectGraphCacheDir = cacheDir({

@@ -1,6 +1,6 @@
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
-import { getProjectGraphOutput } from './project-graph-process';
+import { getProjectGraphOutput } from './graph-process';
 
 export async function loadHtml(panel: WebviewPanel) {
   const projectGraphOutput = getProjectGraphOutput();
@@ -13,7 +13,10 @@ export async function loadHtml(panel: WebviewPanel) {
     /static\//g,
     `${panel.webview.asWebviewUri(rootUri)}/static/`
   );
-  html = html.replace('</head>', `<script>${injectedScript()}</script></head>`);
+  html = html.replace(
+    '</head>',
+    `<style>#sidebar { display: none }</style><script>${injectedScript()}</script></head>`
+  );
 
   return html;
 }

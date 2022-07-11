@@ -9,27 +9,34 @@ export async function webview() {
     panel.reveal();
   } else {
     panel = window.createWebviewPanel(
-      'project-graph',
-      'Nx Project Graph',
+      'graph',
+      'Nx Graph',
       { viewColumn: ViewColumn.Active, preserveFocus: false },
-      { enableScripts: true }
+      { enableScripts: true, retainContextWhenHidden: true }
     );
-  }
 
-  panel.webview.html = await loadHtml(panel);
+    panel.onDidDispose(() => {
+      panel = undefined;
+    });
+
+    panel.webview.html = await loadHtml(panel);
+  }
 }
 
-export function focusProjectInWebview(project: ProjectConfiguration | null) {
+export function projectInWebview(
+  projectName: string | undefined,
+  type: MessageType
+) {
   if (!panel) {
     return;
   }
 
-  if (!project) {
+  if (!projectName) {
     return;
   }
 
   panel.webview.postMessage({
-    type: MessageType.focus,
-    projectName: project.name,
+    type,
+    projectName,
   });
 }

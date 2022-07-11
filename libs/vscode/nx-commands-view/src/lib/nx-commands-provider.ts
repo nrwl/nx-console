@@ -14,7 +14,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
 
   getChildren() {
     return [
-      'project-graph',
+      'graph',
       'run-many',
       'affected',
       'affected:apps',

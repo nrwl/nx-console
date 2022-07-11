@@ -97,7 +97,12 @@
         {
           "when": "isNxWorkspace",
           "group": "2_workspace@5",
-          "command": "nx.project-graph.focus"
+          "command": "nx.graph.focus"
+        },
+        {
+          "when": "isNxWorkspace",
+          "group": "2_workspace@5",
+          "command": "nx.graph.select"
         }
       ],
       "view/title": [
@@ -127,6 +132,16 @@
           "command": "nxConsole.runTask",
           "when": "view == nxProjects && viewItem == task",
           "group": "inline"
+        },
+        {
+          "command": "nx.graph.focus.button",
+          "when": "view == nxProjects && viewItem == project",
+          "group": "inline@1"
+        },
+        {
+          "command": "nx.graph.select.button",
+          "when": "view == nxProjects && viewItem == project",
+          "group": "inline@1"
         }
       ],
       "commandPalette": [
@@ -255,8 +270,24 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.project-graph",
+          "command": "nx.graph",
           "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.graph.focus",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.graph.select",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.graph.focus.button",
+          "when": "false"
+        },
+        {
+          "command": "nx.graph.select.button",
+          "when": "false"
         },
         {
           "command": "nx.run-many",
@@ -477,12 +508,29 @@
       {
         "category": "Nx",
         "title": "Project Graph",
-        "command": "nx.project-graph"
+        "command": "nx.graph"
       },
       {
         "category": "Nx",
         "title": "Focus in Nx Graph",
-        "command": "nx.project-graph.focus"
+        "command": "nx.graph.focus"
+      },
+      {
+        "category": "Nx",
+        "title": "Select in Nx Graph",
+        "command": "nx.graph.select"
+      },
+      {
+        "category": "Nx",
+        "title": "Focus in Nx Graph",
+        "command": "nx.graph.focus.button",
+        "icon": "$(outline-view-icon)"
+      },
+      {
+        "category": "Nx",
+        "title": "Select in Nx Graph",
+        "command": "nx.graph.select.button",
+        "icon": "$(search)"
       },
       {
         "category": "Nx",
@@ -769,7 +817,7 @@
           {
             "id": "nxConsole.commonNxCommands",
             "title": "Common Nx Commands",
-            "description": "Open the [project-graph](command:nx.project-graph), run a task for [affected](command:nx.affected) projects, or [run-many](command:nx.run-many) on selected projects",
+            "description": "Open the [graph](command:nx.graph), run a task for [affected](command:nx.affected) projects, or [run-many](command:nx.run-many) on selected projects",
             "media": {
               "markdown": "getting-started/3-common-nx-commands.md"
             }
