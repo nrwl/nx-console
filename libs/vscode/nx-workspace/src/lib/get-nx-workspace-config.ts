@@ -25,7 +25,8 @@ export type NxWorkspaceConfiguration = ProjectsConfigurations &
  */
 export async function getNxWorkspaceConfig(
   basedir: string,
-  format: 'nx' | 'angularCli'
+  format: 'nx' | 'angularCli',
+  isNxWorkspace: boolean
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
   configPath: string;
@@ -56,7 +57,7 @@ export async function getNxWorkspaceConfig(
 
     let projectGraph: ProjectGraph | null = null;
     try {
-      if (format === 'angularCli') {
+      if (!isNxWorkspace) {
         throw 'No project graph support';
       }
 
