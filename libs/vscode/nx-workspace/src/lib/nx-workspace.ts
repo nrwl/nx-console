@@ -1,5 +1,6 @@
 import type { NxJsonConfiguration, ProjectsConfigurations } from '@nrwl/devkit';
 import {
+  checkIsNxWorkspace,
   clearJsonCache,
   fileExists,
   getOutputChannel,
@@ -85,9 +86,11 @@ async function _workspace(): Promise<NxWorkspace> {
   const isAngularWorkspace = await fileExists(
     join(workspacePath, 'angular.json')
   );
+  const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
   const config = await getNxWorkspaceConfig(
     workspacePath,
-    isAngularWorkspace ? 'angularCli' : 'nx'
+    isAngularWorkspace ? 'angularCli' : 'nx',
+    isNxWorkspace
   );
 
   const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
