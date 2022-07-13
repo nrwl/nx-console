@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.18.8](https://github.com/nrwl/nx-console/compare/v17.18.7...v17.18.8) (2022-07-13)
+
+
+### Bug Fixes
+
+* allow project graph loading with angular + nx workspaces ([#1306](https://github.com/nrwl/nx-console/issues/1306)) ([d89ff6d](https://github.com/nrwl/nx-console/commits/d89ff6d0c33a4a96a5fb2b27ad46586de21d4a49))
+
 ### [17.18.7](https://github.com/nrwl/nx-console/compare/v17.18.6...v17.18.7) (2022-07-04)
 
 
