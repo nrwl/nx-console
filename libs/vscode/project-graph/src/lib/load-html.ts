@@ -4,18 +4,21 @@ import { getProjectGraphOutput } from './create-project-graph';
 
 const html = String.raw;
 
-export async function loadSpinner(panel: WebviewPanel) {
-  return html`<style>
+export async function loadSpinner() {
+  return html`
+    <style>
       .lds-roller {
         display: inline-block;
         position: relative;
         width: 80px;
         height: 80px;
       }
+
       .lds-roller div {
         animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
         transform-origin: 40px 40px;
       }
+
       .lds-roller div:after {
         content: ' ';
         display: block;
@@ -23,65 +26,82 @@ export async function loadSpinner(panel: WebviewPanel) {
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: black;
+        background: var(--vscode-editor-foreground);
         margin: -4px 0 0 -4px;
       }
+
       .lds-roller div:nth-child(1) {
         animation-delay: -0.036s;
       }
+
       .lds-roller div:nth-child(1):after {
         top: 63px;
         left: 63px;
       }
+
       .lds-roller div:nth-child(2) {
         animation-delay: -0.072s;
       }
+
       .lds-roller div:nth-child(2):after {
         top: 68px;
         left: 56px;
       }
+
       .lds-roller div:nth-child(3) {
         animation-delay: -0.108s;
       }
+
       .lds-roller div:nth-child(3):after {
         top: 71px;
         left: 48px;
       }
+
       .lds-roller div:nth-child(4) {
         animation-delay: -0.144s;
       }
+
       .lds-roller div:nth-child(4):after {
         top: 72px;
         left: 40px;
       }
+
       .lds-roller div:nth-child(5) {
         animation-delay: -0.18s;
       }
+
       .lds-roller div:nth-child(5):after {
         top: 71px;
         left: 32px;
       }
+
       .lds-roller div:nth-child(6) {
         animation-delay: -0.216s;
       }
+
       .lds-roller div:nth-child(6):after {
         top: 68px;
         left: 24px;
       }
+
       .lds-roller div:nth-child(7) {
         animation-delay: -0.252s;
       }
+
       .lds-roller div:nth-child(7):after {
         top: 63px;
         left: 17px;
       }
+
       .lds-roller div:nth-child(8) {
         animation-delay: -0.288s;
       }
+
       .lds-roller div:nth-child(8):after {
         top: 56px;
         left: 12px;
       }
+
       @keyframes lds-roller {
         0% {
           transform: rotate(0deg);
@@ -109,7 +129,8 @@ export async function loadSpinner(panel: WebviewPanel) {
         <div></div>
         <div></div>
       </div>
-    </main> `;
+    </main>
+  `;
 }
 
 export async function loadHtml(panel: WebviewPanel) {
@@ -117,40 +138,55 @@ export async function loadHtml(panel: WebviewPanel) {
 
   const rootUri = Uri.file(projectGraphOutput.directory);
   const htmlUri = Uri.file(projectGraphOutput.fullPath);
-  let html = (await workspace.fs.readFile(htmlUri)).toString();
+  let projectGraphHtml = (await workspace.fs.readFile(htmlUri)).toString();
 
-  html = html.replace(
+  projectGraphHtml = projectGraphHtml.replace(
     /static\//g,
     `${panel.webview.asWebviewUri(rootUri)}/static/`
   );
-  html = html.replace(
+  projectGraphHtml = projectGraphHtml.replace(
     '</head>',
-    `<style>#sidebar { display: none } #no-projects-chosen { display: none }</style><script>${injectedScript()}</script></head>`
+    html`
+      <style>
+        #sidebar {
+          display: none;
+        }
+
+        #no-projects-chosen {
+          display: none
+        }
+
+        body {
+          background-color: var(--vscode-settings-editor-background) !important;
+        }
+      </style>
+      <script>${injectedScript()}</script>
+      </head>`
   );
 
-  return html;
+  return projectGraphHtml;
 }
 
 function injectedScript() {
   // language=JavaScript
   return `
-(function() {
-  const vscode = acquireVsCodeApi();
+(function () {
+      const vscode = acquireVsCodeApi();
 
-  vscode.postMessage({
-    command: 'ready',
-  })
+      vscode.postMessage({
+        command: 'ready',
+      })
 
-  window.addEventListener('message', ({data}) => {
-    setTimeout(() => {
-      const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
-      if(data.type === "${MessageType.focus}") {
-        projectElement.parentElement.querySelector('button').click();
-      } else if (data.type === "${MessageType.select}") {
-        projectElement.click();
-      }
-    })
-  })
-}())
+      window.addEventListener('message', ({data}) => {
+        setTimeout(() => {
+          const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
+          if (data.type === "${MessageType.focus}") {
+            projectElement.parentElement.querySelector('button').click();
+          } else if (data.type === "${MessageType.select}") {
+            projectElement.click();
+          }
+        })
+      })
+    }())
   `;
 }
