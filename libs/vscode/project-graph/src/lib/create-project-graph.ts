@@ -1,11 +1,12 @@
 import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
+import { getOutputChannel } from '@nx-console/server';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { execSync } from 'child_process';
 import * as cacheDir from 'find-cache-dir';
 
 let projectGraphCacheDir: string | undefined;
 
-export async function generateProjectGraph() {
+export async function createProjectGraph() {
   return new Promise<void>((res, rej) => {
     if (!projectGraphCacheDir) {
       projectGraphCacheDir = cacheDir({
@@ -31,9 +32,10 @@ export async function generateProjectGraph() {
           cwd: workspacePath,
         }
       );
+
       res();
     } catch (e) {
-      console.log(e);
+      getOutputChannel().appendLine('Unable to create project graph:' + e);
       rej();
     }
   });

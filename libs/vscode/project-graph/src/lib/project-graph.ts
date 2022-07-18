@@ -1,20 +1,21 @@
 import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
-import { commands, Disposable, Uri, window, workspace } from 'vscode';
+import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
-import { generateProjectGraph } from './graph-process';
-import { projectInWebview, webview } from './graph-webview';
+import { GraphWebView } from './graph-webview';
 
 export function projectGraph() {
+  const graphWebView = new GraphWebView();
+
   return Disposable.from(
-    commands.registerCommand('nx.graph', async () => {
-      generateProjectGraph();
-      await webview();
+    graphWebView,
+    commands.registerCommand('nx.graph.refresh', () => {
+      graphWebView.refresh();
     }),
     commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
-      await openProjectWithFile(uri, MessageType.focus);
+      await openProjectWithFile(graphWebView, uri, MessageType.focus);
     }),
     commands.registerCommand('nx.graph.select', async (uri: Uri) => {
-      await openProjectWithFile(uri, MessageType.select);
+      await openProjectWithFile(graphWebView, uri, MessageType.select);
     }),
     commands.registerCommand(
       'nx.graph.focus.button',
@@ -23,7 +24,7 @@ export function projectGraph() {
       }: {
         nxProject: { project: string };
       }) => {
-        projectInWebview(projectName, MessageType.focus);
+        graphWebView.projectInWebview(projectName, MessageType.focus);
       }
     ),
     commands.registerCommand(
@@ -33,7 +34,7 @@ export function projectGraph() {
       }: {
         nxProject: { project: string };
       }) => {
-        projectInWebview(projectName, MessageType.select);
+        graphWebView.projectInWebview(projectName, MessageType.select);
       }
     )
   );
@@ -45,6 +46,7 @@ export function projectGraph() {
  * @param messageType
  */
 async function openProjectWithFile(
+  webview: GraphWebView,
   uri: Uri | undefined,
   messageType: MessageType
 ) {
@@ -56,5 +58,5 @@ async function openProjectWithFile(
   }
 
   const project = await findProjectWithPath(filePath);
-  projectInWebview(project?.name, messageType);
+  webview.projectInWebview(project?.name, messageType);
 }

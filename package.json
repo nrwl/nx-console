@@ -21,7 +21,8 @@
     "@yarnpkg/libzip": "2.2.3-rc.5",
     "find-cache-dir": "^3.3.2",
     "jsonc-parser": "^3.0.0",
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "xstate": "^4.32.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "14.0.2",

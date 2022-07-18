@@ -1,3 +1,4 @@
+/* istanbul ignore catch */
 import { WorkspaceProjects } from '@nx-console/schema';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { stat } from 'fs/promises';

@@ -1,42 +1,88 @@
-import { ProjectConfiguration } from '@nrwl/devkit';
-import { ViewColumn, WebviewPanel, window } from 'vscode';
+import { Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
 import { MessageType } from './graph-message-type';
-import { loadHtml } from './load-html';
+import { graphService, ViewStatus } from './graph.machine';
+import { loadHtml, loadSpinner } from './load-html';
 
-let panel: WebviewPanel | undefined;
-export async function webview() {
-  if (panel) {
-    panel.reveal();
-  } else {
-    panel = window.createWebviewPanel(
+export class GraphWebView implements Disposable {
+  panel: WebviewPanel | undefined;
+
+  constructor() {
+    graphService.onTransition(async (state) => {
+      if (!state.changed) {
+        return;
+      }
+
+      if (!this.panel) {
+        return;
+      }
+
+      if (state.matches('loading')) {
+        this.panel.webview.html = await loadSpinner(this.panel);
+      } else if (state.matches('content')) {
+        this.panel.webview.html = await loadHtml(this.panel);
+      }
+
+      setTimeout(() => {
+        graphService.execute(state);
+
+        if (
+          state.matches('content') &&
+          state.context.project &&
+          state.context.viewStatus == ViewStatus.ready
+        ) {
+          this.panel?.webview.postMessage(state.context.project);
+        }
+      });
+    });
+
+    graphService.start();
+  }
+
+  dispose() {
+    graphService.stop();
+  }
+
+  private _webview() {
+    if (this.panel) {
+      return;
+    }
+
+    this.panel = window.createWebviewPanel(
       'graph',
       'Nx Graph',
       { viewColumn: ViewColumn.Active, preserveFocus: false },
       { enableScripts: true, retainContextWhenHidden: true }
     );
 
-    panel.onDidDispose(() => {
-      panel = undefined;
+    this.panel.onDidDispose(() => {
+      this.panel = undefined;
+      graphService.send('VIEW_DESTROYED');
     });
 
-    panel.webview.html = await loadHtml(panel);
-  }
-}
+    this.panel.webview.onDidReceiveMessage((event) => {
+      if (event.command === 'ready') {
+        graphService.send('VIEW_READY');
+      }
+    });
 
-export function projectInWebview(
-  projectName: string | undefined,
-  type: MessageType
-) {
-  if (!panel) {
-    return;
+    graphService.send('GET_CONTENT');
   }
 
-  if (!projectName) {
-    return;
+  projectInWebview(projectName: string | undefined, type: MessageType) {
+    if (!this.panel) {
+      this._webview();
+    }
+
+    if (!projectName) {
+      return;
+    }
+
+    this.panel?.reveal();
+
+    graphService.send({ type, projectName });
   }
 
-  panel.webview.postMessage({
-    type,
-    projectName,
-  });
+  refresh() {
+    graphService.send('REFRESH');
+  }
 }

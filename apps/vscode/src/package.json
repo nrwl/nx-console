@@ -270,7 +270,7 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.graph",
+          "command": "nx.graph.refresh",
           "when": "isNxWorkspace"
         },
         {
@@ -507,8 +507,8 @@
       },
       {
         "category": "Nx",
-        "title": "Project Graph",
-        "command": "nx.graph"
+        "title": "Refresh Nx Graph",
+        "command": "nx.graph.refresh"
       },
       {
         "category": "Nx",
