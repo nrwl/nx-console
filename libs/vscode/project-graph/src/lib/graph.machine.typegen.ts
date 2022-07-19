@@ -3,10 +3,11 @@
 export interface Typegen0 {
   '@@xstate/typegen': true;
   eventsCausingActions: {
-    refreshData: 'REFRESH';
+    refreshData: 'REFRESH' | 'VIEW_DESTROYED';
     projectSelected: 'PROJECT_SELECTED';
     contentLoaded: 'done.invoke.loadingContent';
     loadingFailed: 'error.platform.loadingContent';
+    clearProject: 'VIEW_DESTROYED';
   };
   internalEvents: {
     'done.invoke.loadingContent': {
