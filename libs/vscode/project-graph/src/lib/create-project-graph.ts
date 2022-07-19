@@ -20,22 +20,26 @@ export async function createProjectGraph() {
       ''
     );
     const packageManager = detectPackageManager(workspacePath);
-    const command = getPackageManagerCommand(packageManager);
+    const packageCommand = getPackageManagerCommand(packageManager);
 
     // TODO(cammisuli): determine the correct command depending on Nx Version
+    const command = `${packageCommand.exec} nx dep-graph --file ${
+      getProjectGraphOutput().relativePath
+    }`;
+
+    getOutputChannel().appendLine(
+      `Generating graph with command: \`${command}\``
+    );
     try {
-      execSync(
-        `${command.exec} nx dep-graph --open false --file ${
-          getProjectGraphOutput().fullPath
-        }`,
-        {
-          cwd: workspacePath,
-        }
-      );
+      execSync(command, {
+        cwd: workspacePath,
+      });
 
       res();
     } catch (e) {
-      getOutputChannel().appendLine('Unable to create project graph:' + e);
+      getOutputChannel().appendLine(
+        'Unable to create project graph: ' + e.toString()
+      );
       rej();
     }
   });
@@ -43,8 +47,15 @@ export async function createProjectGraph() {
 
 export function getProjectGraphOutput() {
   const directory = projectGraphCacheDir ?? '.';
+  const fullPath = `${directory}/project-graph.html`;
   return {
     directory,
-    fullPath: `${directory}/project-graph.html`,
+    relativePath:
+      '.' +
+      fullPath.replace(
+        WorkspaceConfigurationStore.instance.get('nxWorkspacePath', ''),
+        ''
+      ),
+    fullPath,
   };
 }

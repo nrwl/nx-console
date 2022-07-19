@@ -1,7 +1,7 @@
 import { Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { graphService, ViewStatus } from './graph.machine';
-import { loadHtml, loadSpinner } from './load-html';
+import { loadError, loadHtml, loadSpinner } from './load-html';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
@@ -17,9 +17,11 @@ export class GraphWebView implements Disposable {
       }
 
       if (state.matches('loading')) {
-        this.panel.webview.html = await loadSpinner(this.panel);
+        this.panel.webview.html = loadSpinner();
       } else if (state.matches('content')) {
         this.panel.webview.html = await loadHtml(this.panel);
+      } else if (state.matches('error')) {
+        this.panel.webview.html = loadError();
       }
 
       setTimeout(() => {

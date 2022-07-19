@@ -4,7 +4,16 @@ import { getProjectGraphOutput } from './create-project-graph';
 
 const html = String.raw;
 
-export async function loadSpinner() {
+export function loadError() {
+  return html`
+    <p>
+      Unable to load the project graph. Please check the output for errors and
+      try again.
+    </p>
+  `;
+}
+
+export function loadSpinner() {
   return html`
     <style>
       .lds-roller {
@@ -177,9 +186,23 @@ function injectedScript() {
         command: 'ready',
       })
 
+      function nx12(data) {
+        const projectCheckbox = document.querySelector(\`input[value="\${data.projectName}"]\`);
+        if (data.type === "${MessageType.focus}") {
+          projectCheckbox.parentElement.parentElement.querySelector('button').click();
+        } else if (data.type === "${MessageType.select}") {
+          projectCheckbox.click();
+        }
+      }
+
       window.addEventListener('message', ({data}) => {
         setTimeout(() => {
           const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
+
+          if (!projectElement) {
+            return nx12(data);
+          }
+
           if (data.type === "${MessageType.focus}") {
             projectElement.parentElement.querySelector('button').click();
           } else if (data.type === "${MessageType.select}") {

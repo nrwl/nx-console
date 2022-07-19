@@ -8,6 +8,7 @@ export interface Typegen0 {
     viewDestroyed: 'VIEW_DESTROYED';
     refreshData: 'REFRESH';
     contentLoaded: 'done.invoke.loadingContent';
+    loadingFailed: 'error.platform.loadingContent';
   };
   internalEvents: {
     'done.invoke.loadingContent': {
@@ -15,12 +16,12 @@ export interface Typegen0 {
       data: unknown;
       __tip: 'See the XState TS docs to learn how to strongly type this.';
     };
-    '': { type: '' };
-    'xstate.init': { type: 'xstate.init' };
     'error.platform.loadingContent': {
       type: 'error.platform.loadingContent';
       data: unknown;
     };
+    '': { type: '' };
+    'xstate.init': { type: 'xstate.init' };
   };
   invokeSrcNameMap: {
     generateContent: 'done.invoke.loadingContent';
@@ -38,6 +39,6 @@ export interface Typegen0 {
     loadGraph: '';
   };
   eventsCausingDelays: {};
-  matchesStates: 'init' | 'content' | 'loading';
+  matchesStates: 'init' | 'content' | 'loading' | 'error';
   tags: never;
 }
