@@ -3,10 +3,8 @@
 export interface Typegen0 {
   '@@xstate/typegen': true;
   eventsCausingActions: {
-    setProjectName: 'FOCUS' | 'SELECT';
-    viewReady: 'VIEW_READY';
-    viewDestroyed: 'VIEW_DESTROYED';
     refreshData: 'REFRESH';
+    projectSelected: 'PROJECT_SELECTED';
     contentLoaded: 'done.invoke.loadingContent';
     loadingFailed: 'error.platform.loadingContent';
   };
@@ -39,6 +37,12 @@ export interface Typegen0 {
     loadGraph: '';
   };
   eventsCausingDelays: {};
-  matchesStates: 'init' | 'content' | 'loading' | 'error';
+  matchesStates:
+    | 'init'
+    | 'content'
+    | 'loading'
+    | 'error'
+    | 'viewReady'
+    | 'viewDestroyed';
   tags: never;
 }

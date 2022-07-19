@@ -1,4 +1,5 @@
 import { interpret, StateValue } from 'xstate';
+import { waitFor } from 'xstate/lib/waitFor';
 import { graphMachine, State, ViewStatus } from './graph.machine';
 
 const mockMachine = graphMachine.withConfig({
@@ -17,38 +18,34 @@ describe('graph state machine', () => {
     interpreter.onTransition((state) => {
       states.push(state.value);
 
-      if (state.matches('content')) {
+      if (state.matches('viewReady')) {
         expect(states).toMatchInlineSnapshot(`
           Array [
             "init",
             "loading",
             "content",
+            "viewReady",
           ]
         `);
         done();
       }
     });
+
     interpreter.start();
     interpreter.send('GET_CONTENT');
+    waitFor(interpreter, (state) => state.matches('content')).then(() => {
+      interpreter.send('VIEW_READY');
+    });
   });
 
   it('should go to loading when refreshing', () => {
-    let nextState = mockMachine.transition('content', 'REFRESH');
+    const nextState = mockMachine.transition('viewReady', 'REFRESH');
     expect(nextState.value).toMatchInlineSnapshot(`"loading"`);
     expect(nextState.context).toMatchInlineSnapshot(`
       Object {
         "project": undefined,
         "state": "loading",
-        "viewStatus": "destroyed",
       }
     `);
-  });
-
-  it('should set relative view related details', () => {
-    let nextState = mockMachine.transition('content', 'VIEW_READY');
-    expect(nextState.context.viewStatus).toBe(ViewStatus.ready);
-
-    nextState = mockMachine.transition(nextState, 'VIEW_DESTROYED');
-    expect(nextState.context.viewStatus).toBe(ViewStatus.destroyed);
   });
 });

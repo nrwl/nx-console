@@ -1,6 +1,7 @@
 import { Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
+import { waitFor } from 'xstate/lib/waitFor';
 import { MessageType } from './graph-message-type';
-import { graphService, ViewStatus } from './graph.machine';
+import { graphService } from './graph.machine';
 import { loadError, loadHtml, loadSpinner } from './load-html';
 
 export class GraphWebView implements Disposable {
@@ -22,18 +23,16 @@ export class GraphWebView implements Disposable {
         this.panel.webview.html = await loadHtml(this.panel);
       } else if (state.matches('error')) {
         this.panel.webview.html = loadError();
+      } else if (state.matches('viewReady')) {
+        const project = state.context.project;
+        if (!project) {
+          return;
+        }
+        this.panel?.webview.postMessage(project);
       }
 
       setTimeout(() => {
         graphService.execute(state);
-
-        if (
-          state.matches('content') &&
-          state.context.project &&
-          state.context.viewStatus == ViewStatus.ready
-        ) {
-          this.panel?.webview.postMessage(state.context.project);
-        }
       });
     });
 
@@ -61,8 +60,9 @@ export class GraphWebView implements Disposable {
       graphService.send('VIEW_DESTROYED');
     });
 
-    this.panel.webview.onDidReceiveMessage((event) => {
+    this.panel.webview.onDidReceiveMessage(async (event) => {
       if (event.command === 'ready') {
+        await waitFor(graphService, (state) => state.matches('content'));
         graphService.send('VIEW_READY');
       }
     });
@@ -70,7 +70,7 @@ export class GraphWebView implements Disposable {
     graphService.send('GET_CONTENT');
   }
 
-  projectInWebview(projectName: string | undefined, type: MessageType) {
+  async projectInWebview(projectName: string | undefined, type: MessageType) {
     if (!this.panel) {
       this._webview();
     }
@@ -81,7 +81,13 @@ export class GraphWebView implements Disposable {
 
     this.panel?.reveal();
 
-    graphService.send({ type, projectName });
+    await waitFor(graphService, (state) => state.matches('viewReady'));
+    graphService.send('PROJECT_SELECTED', {
+      data: {
+        type,
+        projectName,
+      },
+    });
   }
 
   refresh() {
