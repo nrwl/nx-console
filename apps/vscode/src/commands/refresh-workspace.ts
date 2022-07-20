@@ -10,6 +10,7 @@ refresh.pipe(debounceTime(150)).subscribe(async () => {
   await nxWorkspace(true);
   commands.executeCommand('nxConsole.refreshNxProjectsTree');
   commands.executeCommand('nxConsole.refreshRunTargetTree');
+  commands.executeCommand('nx.graph.refresh');
 });
 
 /**

@@ -4,7 +4,10 @@ import {
   getTelemetry,
   readTargetDef,
 } from '@nx-console/server';
-import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  findProjectWithPath,
+  nxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
 import {
@@ -191,7 +194,7 @@ async function getConfigValuesFromContextMenuUri(
   | undefined
 > {
   if (contextMenuUri) {
-    const project = await cliTaskProvider.projectForPath(contextMenuUri.fsPath);
+    const project = await findProjectWithPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
 
     const workspacePath = cliTaskProvider.getWorkspacePath();

@@ -1,4 +1,3 @@
-import type { NxJsonConfiguration, ProjectsConfigurations } from '@nrwl/devkit';
 import {
   checkIsNxWorkspace,
   clearJsonCache,

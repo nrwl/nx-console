@@ -55,6 +55,9 @@
       "@nx-console/vscode/nx-workspace": [
         "libs/vscode/nx-workspace/src/index.ts"
       ],
+      "@nx-console/vscode/project-graph": [
+        "libs/vscode/project-graph/src/index.ts"
+      ],
       "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"],
       "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
       "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"]

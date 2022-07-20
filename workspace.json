@@ -13,6 +13,7 @@
     "vscode-nx-project-view": "libs/vscode/nx-project-view",
     "vscode-nx-run-target-view": "libs/vscode/nx-run-target-view",
     "vscode-nx-workspace": "libs/vscode/nx-workspace",
+    "vscode-project-graph": "libs/vscode/project-graph",
     "vscode-tasks": "libs/vscode/tasks",
     "vscode-ui": "apps/vscode-ui",
     "vscode-ui-argument-list": "libs/vscode-ui/argument-list",
