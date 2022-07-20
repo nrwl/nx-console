@@ -43,7 +43,7 @@ describe('graph state machine', () => {
     expect(nextState.value).toMatchInlineSnapshot(`"loading"`);
     expect(nextState.context).toMatchInlineSnapshot(`
       Object {
-        "project": undefined,
+        "project": null,
         "state": "loading",
       }
     `);
