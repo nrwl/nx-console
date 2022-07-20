@@ -1,7 +1,6 @@
-import { createMachine, assign, interpret } from 'xstate';
-import { MessageType } from './graph-message-type';
+import { assign, createMachine, interpret } from 'xstate';
 import { createProjectGraph } from './create-project-graph';
-import { log } from 'xstate/lib/actions';
+import { MessageType } from './graph-message-type';
 
 export const enum State {
   init = 'init',
