@@ -9,6 +9,7 @@ import {
   normalizeSchema,
   readAndCacheJsonFile,
 } from '@nx-console/server';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
 
@@ -81,6 +82,7 @@ export async function selectGenerator(
   interface GenerateQuickPickItem extends QuickPickItem {
     collectionName: string;
     generator: Generator;
+    generatorName: string;
     collectionPath: string;
   }
   const { workspace } = await nxWorkspace();
@@ -93,11 +95,31 @@ export async function selectGenerator(
       return {
         description: generatorData.description,
         label: `${generatorData.collection} - ${generatorData.name}`,
+        generatorName: `${generatorData.collection}:${generatorData.name}`,
         collectionName: generatorData.collection,
         collectionPath: collection.path,
         generator: generatorData,
       };
     });
+
+  if (GlobalConfigurationStore.instance.get('enableGeneratorFilters') ?? true) {
+    const allowlist: string[] =
+      GlobalConfigurationStore.instance.get('generatorAllowlist') ?? [];
+    const blocklist: string[] =
+      GlobalConfigurationStore.instance.get('generatorBlocklist') ?? [];
+
+    if (allowlist.length > 0) {
+      generatorsQuickPicks = generatorsQuickPicks.filter((item) =>
+        allowlist.includes(item.generatorName)
+      );
+    }
+
+    if (blocklist.length > 0) {
+      generatorsQuickPicks = generatorsQuickPicks.filter(
+        (item) => !blocklist.includes(item.generatorName)
+      );
+    }
+  }
 
   if (generatorType) {
     generatorsQuickPicks = generatorsQuickPicks.filter((generator) => {
@@ -123,7 +145,7 @@ export async function selectGenerator(
           selection.collectionPath,
           workspaceType
         ));
-      const positional = `${selection.collectionName}:${selection.generator.name}`;
+      const positional = selection.generatorName;
       return {
         ...selection.generator,
         options,
