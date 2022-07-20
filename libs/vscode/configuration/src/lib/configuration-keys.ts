@@ -1,9 +1,11 @@
 export const GLOBAL_CONFIG_KEYS = [
   'enableTelemetry',
-  'useNVM',
   'enableGenerateFromContextMenu',
   'enableWorkspaceConfigCodeLens',
   'enableLibraryImports',
+  'enableGeneratorFilters',
+  'generatorAllowlist',
+  'generatorBlocklist',
 ] as const;
 
 /**
