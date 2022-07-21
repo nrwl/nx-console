@@ -702,7 +702,7 @@
           "items": {
             "type": "string"
           },
-          "description": "A list of generator names to show in the picker (can be combined with Generator Block List).\n\nThe name of the generator should be in this format: @package:generator.\n‎ ‎ ‎ ‎ ‎eamples: @nrwl/workspace:library, workspace-generator:my-generator"
+          "description": "A list of generator names to show in the picker (can be combined with Generator Block List).\n\nThe name of the generator should be in this format: @package:generator.\n‎ ‎ ‎ ‎ ‎examples: @nrwl/workspace:library, workspace-generator:my-generator"
         },
         "nxConsole.generatorBlocklist": {
           "type": "array",
