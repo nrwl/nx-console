@@ -524,13 +524,13 @@
         "category": "Nx",
         "title": "Focus in Nx Graph",
         "command": "nx.graph.focus.button",
-        "icon": "$(outline-view-icon)"
+        "icon": "$(target)"
       },
       {
         "category": "Nx",
         "title": "Select in Nx Graph",
         "command": "nx.graph.select.button",
-        "icon": "$(search)"
+        "icon": "$(eye)"
       },
       {
         "category": "Nx",
