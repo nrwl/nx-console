@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.19.0](https://github.com/nrwl/nx-console/compare/v17.18.8...v17.19.0) (2022-07-22)
+
+
+### Features
+
+* add an allowlist and a blocklist for generators ([#1309](https://github.com/nrwl/nx-console/issues/1309)) ([86d0c35](https://github.com/nrwl/nx-console/commits/86d0c355627145fc77f5ad72e13a9b176d177f0b))
+* project graph integration ([#1305](https://github.com/nrwl/nx-console/issues/1305)) ([ebcd217](https://github.com/nrwl/nx-console/commits/ebcd21767e2eaab1cf2cd216303d2578b22890ac))
+
 ### [17.18.8](https://github.com/nrwl/nx-console/compare/v17.18.7...v17.18.8) (2022-07-13)
 
 
