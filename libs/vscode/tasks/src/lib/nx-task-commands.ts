@@ -1,10 +1,10 @@
 import { Option, OptionType } from '@nx-console/schema';
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getTelemetry } from '@nx-console/server';
 import { commands, ExtensionContext, window, tasks } from 'vscode';
 
 import { CliTaskProvider } from './cli-task-provider';
 import { selectFlags } from './select-flags';
-import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { getTelemetry } from '@nx-console/server';
 import { NxTask } from './nx-task';
 
 let cliTaskProvider: CliTaskProvider;
@@ -208,41 +208,6 @@ const RUN_MANY_OPTIONS: Option[] = [
   },
 ].map((v) => ({ ...v, aliases: [] }));
 
-const DEP_GRAPH_OPTIONS: Option[] = [
-  {
-    name: 'watch',
-    type: OptionType.Boolean,
-    isRequired: false,
-    description: 'Watch for changes to dep graph and update in-browser',
-  },
-  {
-    name: 'file',
-    type: OptionType.String,
-    isRequired: false,
-    description: 'output file (e.g. --file=output.json)',
-  },
-  {
-    name: 'filter',
-    type: OptionType.Array,
-    isRequired: false,
-    description:
-      'Use to limit the dependency graph to only show specific projects, list of projects delimited by commas.',
-  },
-  {
-    name: 'exclude',
-    type: OptionType.Array,
-    isRequired: false,
-    description:
-      'List of projects delimited by commas to exclude from the dependency graph.',
-  },
-  {
-    name: 'host',
-    type: OptionType.String,
-    isRequired: false,
-    description: 'Bind the dep graph server to a specific ip address.',
-  },
-].map((v) => ({ ...v, aliases: [] }));
-
 async function promptForAffectedFlags(target: string) {
   const telemetry = getTelemetry();
   telemetry.featureUsed('affected-cli');
@@ -262,9 +227,6 @@ async function promptForAffectedFlags(target: string) {
   }
 }
 
-/**
- *
- */
 async function selectAffectedFlags(target: string): Promise<{
   command: string;
   flags: string[] | undefined;
