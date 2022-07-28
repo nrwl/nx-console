@@ -13,7 +13,7 @@ import { selectFlags } from './select-flags';
 import { GeneratorType, Option, OptionType } from '@nx-console/schema';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { selectGenerator } from './select-generator';
-import { getGenerators } from '@nx-console/server';
+import { getGenerators } from '@nx-console/utils';
 
 const CLI_COMMAND_LIST = [
   'build',

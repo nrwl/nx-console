@@ -26,7 +26,7 @@ import {
   watchFile,
   fileExists,
   checkIsNxWorkspace,
-} from '@nx-console/server';
+} from '@nx-console/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,

@@ -1,5 +1,5 @@
 import { CollectionInfo } from '@nx-console/schema';
-import { getExecutors, watchFile } from '@nx-console/server';
+import { getExecutors, watchFile } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';

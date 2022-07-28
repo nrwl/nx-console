@@ -1,7 +1,7 @@
 import {
   checkIsNxWorkspace,
   getShellExecutionForConfig,
-} from '@nx-console/server';
+} from '@nx-console/utils';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
 

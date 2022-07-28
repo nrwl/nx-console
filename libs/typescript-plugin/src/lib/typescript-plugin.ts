@@ -3,7 +3,7 @@ import {
   findConfig,
   readAndCacheJsonFile,
   watchFile,
-} from '@nx-console/server';
+} from '@nx-console/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -83,7 +83,7 @@ export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
 
       if (!enableLibraryImports) {
         vscode.window.setStatusBarMessage(
-          'Restarting the TypeScript Server',
+          'Restarting the TypeScript Utils',
           5000
         );
         await vscode.commands.executeCommand('typescript.restartTsServer');

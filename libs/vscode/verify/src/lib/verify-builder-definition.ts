@@ -1,10 +1,6 @@
 import { Option, OptionType } from '@nx-console/schema';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
-import {
-  fileExists,
-  getTelemetry,
-  readBuilderSchema,
-} from '@nx-console/server';
+import { fileExists, getTelemetry, readBuilderSchema } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import { window } from 'vscode';

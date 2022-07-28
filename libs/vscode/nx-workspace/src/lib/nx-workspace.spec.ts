@@ -1,7 +1,7 @@
 import { nxWorkspace } from './nx-workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import * as server from '@nx-console/server';
-import { getOutputChannel, getTelemetry, fileExists } from '@nx-console/server';
+import * as server from '@nx-console/utils';
+import { getOutputChannel, getTelemetry, fileExists } from '@nx-console/utils';
 import { mocked } from 'ts-jest/utils';
 import type {
   NxJsonConfiguration,

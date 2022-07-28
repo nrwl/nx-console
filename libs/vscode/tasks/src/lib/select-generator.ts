@@ -8,7 +8,7 @@ import {
   getGenerators,
   normalizeSchema,
   readAndCacheJsonFile,
-} from '@nx-console/server';
+} from '@nx-console/utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';

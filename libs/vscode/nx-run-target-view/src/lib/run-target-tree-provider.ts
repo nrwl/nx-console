@@ -1,4 +1,4 @@
-import { AbstractTreeProvider, clearJsonCache } from '@nx-console/server';
+import { AbstractTreeProvider, clearJsonCache } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import { commands, ExtensionContext, TreeItem } from 'vscode';

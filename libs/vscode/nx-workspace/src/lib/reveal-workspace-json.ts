@@ -1,4 +1,4 @@
-import { buildProjectPath, fileExists } from '@nx-console/server';
+import { buildProjectPath, fileExists } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import { Selection, TextDocument, Uri, window, workspace } from 'vscode';

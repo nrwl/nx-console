@@ -3,7 +3,7 @@ import {
   getOutputChannel,
   getTelemetry,
   readTargetDef,
-} from '@nx-console/server';
+} from '@nx-console/utils';
 import {
   findProjectWithPath,
   nxWorkspace,

@@ -3,7 +3,7 @@ import type {
   ProjectGraph,
   ProjectsConfigurations,
 } from '@nrwl/devkit';
-import { readAndCacheJsonFile } from '@nx-console/server';
+import { readAndCacheJsonFile } from '@nx-console/utils';
 import { join } from 'path';
 import {
   getNxProjectGraph,

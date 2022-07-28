@@ -5,7 +5,7 @@ import {
   getOutputChannel,
   getTelemetry,
   toWorkspaceFormat,
-} from '@nx-console/server';
+} from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import {

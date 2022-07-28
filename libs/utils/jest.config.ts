@@ -1,7 +1,7 @@
 export default {
-  coverageDirectory: '../../coverage/libs/server',
+  coverageDirectory: '../../coverage/libs/utils',
   globals: { 'ts-jest': { tsconfig: '<rootDir>/tsconfig.spec.json' } },
-  displayName: 'server',
+  displayName: 'utils',
   testEnvironment: 'node',
   preset: '../../jest.preset.js',
 };

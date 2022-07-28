@@ -20,7 +20,7 @@ import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { buildProjectPath } from '@nx-console/server';
+import { buildProjectPath } from '@nx-console/utils';
 
 export class TargetCodeLens extends CodeLens {
   constructor(

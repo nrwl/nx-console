@@ -1,4 +1,4 @@
-import { AbstractTreeProvider } from '@nx-console/server';
+import { AbstractTreeProvider } from '@nx-console/utils';
 import { NxCommandsTreeItem } from './nx-commands-tree-item';
 import { ExtensionContext } from 'vscode';
 

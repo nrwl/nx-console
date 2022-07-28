@@ -1,5 +1,5 @@
 import { workspaceDependencyPath } from '@nx-console/npm';
-import { fileExists, getOutputChannel } from '@nx-console/server';
+import { fileExists, getOutputChannel } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
