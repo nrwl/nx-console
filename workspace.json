@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "lsp": "apps/lsp",
     "npm": "libs/npm",
     "schema": "libs/schema",
     "server": "libs/server",
