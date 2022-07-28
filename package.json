@@ -22,6 +22,9 @@
     "find-cache-dir": "^3.3.2",
     "jsonc-parser": "^3.0.0",
     "tslib": "^2.0.0",
+    "vscode-json-languageservice": "^5.1.0",
+    "vscode-languageclient": "^8.0.2",
+    "vscode-languageserver": "^8.0.2",
     "xstate": "^4.32.1"
   },
   "devDependencies": {
