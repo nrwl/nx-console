@@ -58,6 +58,7 @@ import {
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
 import { projectGraph } from '@nx-console/vscode/project-graph';
+import { lspClient } from './lsp-client';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -133,6 +134,8 @@ export async function activate(c: ExtensionContext) {
     NxConversion.createInstance(context);
 
     await enableTypeScriptPlugin(context);
+
+    lspClient(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
