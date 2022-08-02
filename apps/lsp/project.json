@@ -2,6 +2,17 @@
   "sourceRoot": "apps/lsp/src",
   "projectType": "application",
   "targets": {
+    "watch": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/vscode/lsp",
+        "main": "apps/lsp/src/main.ts",
+        "tsConfig": "apps/lsp/tsconfig.app.json",
+        "assets": ["apps/lsp/src/assets"],
+        "watch": true
+      }
+    },
     "build": {
       "executor": "@nrwl/node:webpack",
       "outputs": ["{options.outputPath}"],

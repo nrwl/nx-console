@@ -21,11 +21,11 @@
         "<node_internals>/**",
         "/Applications/Visual Studio Code.app/**"
       ],
-      "type": "pwa-extensionHost"
+      "type": "extensionHost"
     },
     {
       "name": "Run Extension In Dev Mode",
-      "type": "pwa-extensionHost",
+      "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
@@ -37,9 +37,29 @@
       "outFiles": [
         "${workspaceFolder}/dist/apps/vscode",
         "${workspaceFolder}/dist/apps/vscode/assets/public",
+        "!${workspaceFolder}/dist/apps/vscode/lsp",
         "${workspaceFolder}/node_modules"
       ],
       "preLaunchTask": "npm: watch"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to LSP Server",
+      "port": 6009,
+      "restart": true,
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "/Applications/Visual Studio Code.app/**"
+      ]
+      // "outFiles": ["${workspaceFolder}/dist/vscode/lsp/**/*.js"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Launch Client + Server",
+      "configurations": ["Launch Extension", "Attach to LSP Server"]
     }
   ]
 }

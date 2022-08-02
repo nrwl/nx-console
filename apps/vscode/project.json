@@ -1,5 +1,4 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/vscode/src",
   "projectType": "application",
   "prefix": "vscode",
@@ -19,6 +18,11 @@
             "command": "yarn nx watch vscode-ui",
             "prefix": "vscode-ui",
             "color": "green"
+          },
+          {
+            "command": "yarn nx watch lsp",
+            "prefix": "lsp",
+            "color": "magenta"
           }
         ],
         "parallel": true

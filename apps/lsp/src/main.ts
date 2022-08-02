@@ -48,15 +48,18 @@ connection.onInitialize((params) => {
   // TODO: add capability checks
   const capabilities = params.capabilities;
 
-  const initializationOptions = params.initializationOptions ?? {};
-
-  const handledProtocols = initializationOptions?.handledSchemaProtocols;
+  // const initializationOptions = params.initializationOptions ?? {};
+  // const handledProtocols = initializationOptions?.handledSchemaProtocols;
 
   languageService = getLanguageService({
     // schemaRequestService: getSchemaRequestService(handledProtocols),
     workspaceContext,
     contributions: [],
     clientCapabilities: params.capabilities,
+  });
+
+  languageService.configure({
+    schemas: [],
   });
 
   const result: InitializeResult = {
@@ -71,16 +74,20 @@ connection.onInitialize((params) => {
   return result;
 });
 
-connection.onCompletion((completionParams) => {
+connection.onCompletion(async (completionParams) => {
   const document = documents.get(completionParams.textDocument.uri);
   if (document) {
     const jsonDocument = getJsonDocument(document);
-    return languageService.doComplete(
+    const completionList = await languageService.doComplete(
       document,
       completionParams.position,
       jsonDocument
     );
+    console.log(completionList);
+    return completionList;
   }
+
+  return null;
 });
 
 function getJsonDocument(document: TextDocument) {
