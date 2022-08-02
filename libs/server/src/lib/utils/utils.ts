@@ -186,7 +186,8 @@ export async function normalizeSchema(
 
   const nxOptions = options.map((option) => {
     const xPrompt: XPrompt | undefined = option['x-prompt'];
-    const workspaceDefault = projectDefaults && projectDefaults[option.name];
+    const workspaceDefault =
+      projectDefaults?.[option.originalName ?? option.name];
     const $default = option.$default;
 
     const nxOption: Option = {
@@ -346,6 +347,7 @@ function schemaToOptions(
       const name = config?.hyphenate ? names(option).fileName : option;
       cliOptions.push({
         name,
+        originalName: option,
         positional,
         ...currentProperty,
       });
