@@ -4,6 +4,30 @@ import { getProjectGraphOutput } from './create-project-graph';
 
 const html = String.raw;
 
+export function loadNoProject() {
+  return html`
+    <script>
+      const vscodeApi = acquireVsCodeApi();
+
+      function refresh() {
+        vscodeApi.postMessage({
+          command: 'refresh',
+        });
+      }
+    </script>
+    <p>
+      Unable to find the selected project in the workspace. Please make sure
+      that node_modules is installed and that the Nx projects are loaded
+      properly.
+    </p>
+    <p>
+      If node_modules are installed, click
+      <a onclick="refresh()" style="cursor: pointer">here</a> to reload the
+      projects in the workspace.
+    </p>
+  `;
+}
+
 export function loadError() {
   return html`
     <p>
@@ -168,6 +192,9 @@ export async function loadHtml(panel: WebviewPanel) {
         body {
           background-color: var(--vscode-settings-editor-background) !important;
         }
+        .nx-select-project {
+          padding: 12px;
+        }
       </style>
       <script>${injectedScript()}</script>
       </head>`
@@ -181,6 +208,10 @@ function injectedScript() {
   return `
 (function () {
       const vscode = acquireVsCodeApi();
+
+      const noProjectElement = document.createElement('p');
+      noProjectElement.classList.add('nx-select-project');
+      noProjectElement.innerText = "Please select or focus a Nx project";
 
       vscode.postMessage({
         command: 'ready',
@@ -196,7 +227,17 @@ function injectedScript() {
       }
 
       window.addEventListener('message', ({data}) => {
+        if (!data) {
+          document.body.prepend(noProjectElement);
+          return;
+        }
+
         setTimeout(() => {
+          try {
+            document.body.removeChild(noProjectElement);
+          } catch(e) {
+            //noop
+          }
           const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
 
           if (!projectElement) {

@@ -1,8 +1,8 @@
-import { Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
+import { commands, Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
 import { waitFor } from 'xstate/lib/waitFor';
 import { MessageType } from './graph-message-type';
 import { graphService } from './graph.machine';
-import { loadError, loadHtml, loadSpinner } from './load-html';
+import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
@@ -23,11 +23,10 @@ export class GraphWebView implements Disposable {
         this.panel.webview.html = await loadHtml(this.panel);
       } else if (state.matches('error')) {
         this.panel.webview.html = loadError();
+      } else if (state.matches('no_project')) {
+        this.panel.webview.html = loadNoProject();
       } else if (state.matches('viewReady')) {
         const project = state.context.project;
-        if (!project) {
-          return;
-        }
         this.panel?.webview.postMessage(project);
       }
 
@@ -65,6 +64,9 @@ export class GraphWebView implements Disposable {
         await waitFor(graphService, (state) => state.matches('content'));
         graphService.send('VIEW_READY');
       }
+      if (event.command === 'refresh') {
+        commands.executeCommand('nxConsole.refreshWorkspace');
+      }
     });
 
     graphService.send('GET_CONTENT');
@@ -76,12 +78,12 @@ export class GraphWebView implements Disposable {
     }
 
     if (!projectName) {
+      graphService.send('NO_PROJECT');
       return;
     }
 
     this.panel?.reveal();
 
-    await waitFor(graphService, (state) => state.matches('viewReady'));
     graphService.send('PROJECT_SELECTED', {
       data: {
         type,

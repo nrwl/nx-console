@@ -1,4 +1,5 @@
 import { assign, createMachine, interpret } from 'xstate';
+import { log } from 'xstate/lib/actions';
 import { createProjectGraph } from './create-project-graph';
 import { MessageType } from './graph-message-type';
 
@@ -15,7 +16,7 @@ export const enum ViewStatus {
 }
 
 export const graphMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QAUBOB7AVmAxgFwAIBxVAQwAcALAOgEsA7WvAYiIFEAVAfQGEB5AHIc2QxKHLpYTWunpiQAD0QAOAKwAGagHYALACY9AZgCcOw4f16dAGhABPRAEZVq6sffGAbMr2OtWr0cAXyDbNCxcQhIKGhxZPDB6FgA1AEk2AHUuACU2AEEAEQBNeQkpPBk5JEVEY3VDanVVHS0DQ3V1XU9jWwcELWbGjsdDVT1PEeU-ELCMbHxiMipqOKTEllLJaVl5JQQ1TV0203NLG3tEK1cdD2Umw0c6z2aZkHD5qKWaABt0UggGFBmBBZGA6PQAG7oADWYN+-0BPHi6025Uqu0QOh0ymoqhMnUMunMjh8vUxzmoN3cnhMFk8elanle70iixi1HhAPoQLAqAwqGo5G+pDwADN0KgALYcv5cqBItZJVHbKqgPZYnF4upaQlmB6ki4IZqOIYdYwjVTKOrqZTMuas6LLXn81icXiCYSiaplFUY-YabSWEx6s5ko2eTQaDp6dTeTwTbF2iILR00CG0MAAd2yYH+dmYaUyXAKbAAyhxsnwimwCsqKjtqursbj8Tqifq9GH6cZcR1Oi0JvTnEmPmzlumswU4HgMHZIK7uPwhCIOHX0Y2VAGjkYThYDOc+t3ex1dFpB74maE3vaU19mLkAGK5UsACTXDbViFUWjDdTcHmMVRHF8HQNFUEcHTvZBKwAKTYHhuFLNgABl4OEWtvS2etVRqI1RmoQxPFaR4rUcHRPFAsNlAsU16lUIj-CaLQQiveh0AgOB5BZW92QYJh3xwvYdRNbcAiaBkLEMMMyJ7ADzX8MYrGoiCeOWVYEiVTC0Q-XDHFjTw3EJFwdE6KN4zDfQcQAxxvEeM9jFtK9uM+dlOUBAS-W-CyBm0KNFN0BzwKcm8XKdPkJQ8jcEG6E0HKaGzjFGCivDDYzKQ8fwHkAwwVNCtMM2zXMID6cQsPXT8EAZTRfHUYw9G-Xw9DUTww10TR43jLQyO6ZQaUvWZkzy6gJ0zKdYBndA5wgSKKvjdqurqy16RpdRHC7Ixj1q6jHiaepcrHSgZtw8xUv-OTzt6ligiAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAUBOB7AVmAxgFwAIBxVAQwAcALAOgEsA7WvAYiIFEAVAfQGEB5AHIc2QxKHLpYTWunpiQAD0QAOAJwAmagEYA7FuXrDW9coDMO5QBoQAT0S7V1AKwAGNy9Uud6natNOAXwDrNCxcQhIKGhxZPDB6FgA1AEk2AHUuACU2AEEAEQBNeQkpPBk5JEVEVQAWTTrVADYnGtdlF3V-azsEVW9ndx91fVN2mqCQjGx8YjIqahiE+JZiyWlZeSUENU1dfUNhk3MrW0R1Jup3F30tVqdlHQmQUOmIuZoAG3RSCAYoZggsjAdHoADd0ABrYFfH5-HixZarUrlTaIVo6ajmVwuUznVRaPqNbpoxqabEdRqmPz3LQucbBZ5TcKzKLUGG-ej-MCoDCoajkD6kPAAM3QqAAtmzvhyoPClgkkesKqAtujMTpsbjVPjCcSEI1jNRtcbdE51G57k8XszIvNubzWJxeIJhKJKiUlajthptHoDEYjhY9ZTNFcPF4fH56ZMwjNbTRQbQwAB3TJgH42ZgpdJcPJsADKHEyfAKbDyirKG0qqqcGKxbi1Op0RNOCAsGLDLgMNV8fitTLj72oiZTeTgeAwNkgju4-CEIg4FZR1ZUPr2-sOZiDrfblzD3d7pn7sbeUWY2QAYtl8wAJJdVlWIWt6zx7q4G5RObVORrH14sqhmGQYsACk2B4bh8zYAAZcDhHLd01krZUqgQH8tGoYYamUbDGlUB4mlMPVaUaRpqDMUxzGw7DOjwoIGXodAIDgeRrUHVkGCYe8UK2HRTDIrQf2GcwuwMFseluZQBkGFwDW1T91D-G0h0WOIFUQ5EH1QrRaSkmoNFuGoDTpUxZL1VoXGkikqX8ZRaWjRkTwAz5pT+bivWfVszUs418KaTw3D4pT2LtHkxXclc2w6agakopx4vaDQhmDa432uTo9G1LRgtPeYR1TdMIB6cQkOXR8EBMMj-Gpfx4uGJx+JfdQnHIyj+K0ZpDMaBy2NyhMk2TMdYAndApwgCLysaPjqD0Ls+k8Jojj1TKjWNHDcWUOydJy5yJtQyjg3ogIgA */
   createMachine(
     {
       context: { state: State.init, project: null },
@@ -36,6 +37,7 @@ export const graphMachine =
         events: {} as
           | { type: 'GET_CONTENT' }
           | { type: 'REFRESH' }
+          | { type: 'NO_PROJECT' }
           | {
               type: 'PROJECT_SELECTED';
               data: { projectName: string; type: MessageType };
@@ -48,14 +50,18 @@ export const graphMachine =
       on: {
         REFRESH: {
           actions: 'refreshData',
-          target: 'content',
+          target: '.content',
         },
         PROJECT_SELECTED: {
           actions: 'projectSelected',
         },
+        NO_PROJECT: {
+          target: '.no_project',
+        },
       },
       states: {
         init: {
+          entry: 'log',
           on: {
             GET_CONTENT: {
               target: 'content',
@@ -63,6 +69,7 @@ export const graphMachine =
           },
         },
         content: {
+          entry: 'log',
           always: {
             cond: 'loadGraph',
             target: 'loading',
@@ -74,7 +81,7 @@ export const graphMachine =
           },
         },
         loading: {
-          entry: assign({ state: State.loading }),
+          entry: [assign({ state: State.loading }), 'log'],
           invoke: {
             src: 'generateContent',
             id: 'loadingContent',
@@ -93,6 +100,14 @@ export const graphMachine =
           },
         },
         error: {
+          entry: 'log',
+          on: {
+            GET_CONTENT: {
+              target: 'content',
+            },
+          },
+        },
+        no_project: {
           on: {
             GET_CONTENT: {
               target: 'content',
@@ -100,6 +115,7 @@ export const graphMachine =
           },
         },
         viewReady: {
+          entry: 'log',
           on: {
             VIEW_DESTROYED: {
               target: 'viewDestroyed',
@@ -107,7 +123,7 @@ export const graphMachine =
           },
         },
         viewDestroyed: {
-          entry: ['refreshData', 'clearProject'],
+          entry: ['log', 'refreshData', 'clearProject'],
           on: {
             GET_CONTENT: {
               target: 'content',
@@ -123,6 +139,7 @@ export const graphMachine =
         },
       },
       actions: {
+        log: log((ctx, event) => event, 'Graph'),
         refreshData: assign({ state: () => State.init }),
         contentLoaded: assign({
           state: () => State.loaded,
