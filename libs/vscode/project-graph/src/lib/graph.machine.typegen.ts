@@ -2,13 +2,6 @@
 
 export interface Typegen0 {
   '@@xstate/typegen': true;
-  eventsCausingActions: {
-    refreshData: 'REFRESH' | 'VIEW_DESTROYED';
-    projectSelected: 'PROJECT_SELECTED';
-    contentLoaded: 'done.invoke.loadingContent';
-    loadingFailed: 'error.platform.loadingContent';
-    clearProject: 'VIEW_DESTROYED';
-  };
   internalEvents: {
     'done.invoke.loadingContent': {
       type: 'done.invoke.loadingContent';
@@ -19,8 +12,8 @@ export interface Typegen0 {
       type: 'error.platform.loadingContent';
       data: unknown;
     };
-    '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
+    '': { type: '' };
   };
   invokeSrcNameMap: {
     generateContent: 'done.invoke.loadingContent';
@@ -30,6 +23,22 @@ export interface Typegen0 {
     services: never;
     guards: never;
     delays: never;
+  };
+  eventsCausingActions: {
+    refreshData: 'REFRESH' | 'VIEW_DESTROYED';
+    projectSelected: 'PROJECT_SELECTED';
+    contentLoaded: 'done.invoke.loadingContent';
+    loadingFailed: 'error.platform.loadingContent';
+    log:
+      | 'xstate.init'
+      | 'REFRESH'
+      | 'GET_CONTENT'
+      | 'done.invoke.loadingContent'
+      | ''
+      | 'error.platform.loadingContent'
+      | 'VIEW_READY'
+      | 'VIEW_DESTROYED';
+    clearProject: 'VIEW_DESTROYED';
   };
   eventsCausingServices: {
     generateContent: '';
@@ -43,6 +52,7 @@ export interface Typegen0 {
     | 'content'
     | 'loading'
     | 'error'
+    | 'no_project'
     | 'viewReady'
     | 'viewDestroyed';
   tags: never;
