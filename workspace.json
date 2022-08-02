@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "json-schema": "libs/json-schema",
     "lsp": "apps/lsp",
     "npm": "libs/npm",
     "schema": "libs/schema",
@@ -8,7 +9,6 @@
     "utils": "libs/utils",
     "vscode": "apps/vscode",
     "vscode-configuration": "libs/vscode/configuration",
-    "vscode-json-schema": "libs/vscode/json-schema",
     "vscode-nx-commands-view": "libs/vscode/nx-commands-view",
     "vscode-nx-conversion": "libs/vscode/nx-conversion",
     "vscode-nx-project-view": "libs/vscode/nx-project-view",

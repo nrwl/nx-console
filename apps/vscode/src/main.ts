@@ -50,7 +50,7 @@ import { environment } from './environments/environment';
 import {
   WorkspaceJsonSchema,
   ProjectJsonSchema,
-} from '@nx-console/vscode/json-schema';
+} from '@nx-console/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
 import {

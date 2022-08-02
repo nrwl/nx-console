@@ -1,5 +1,5 @@
 export default {
-  displayName: 'vscode-json-schema',
+  displayName: 'json-schema',
 
   globals: {
     'ts-jest': { tsconfig: '<rootDir>/tsconfig.spec.json' },
@@ -8,7 +8,7 @@ export default {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/vscode/json-schema',
+  coverageDirectory: '../../coverage/libs/json-schema',
   testEnvironment: 'node',
-  preset: '../../../jest.preset.js',
+  preset: '../../jest.preset.js',
 };
