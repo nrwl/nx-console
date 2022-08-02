@@ -13,6 +13,7 @@ export type OptionPropertyDescription = Schema['properties'][number];
 
 export type CliOption = {
   name: string;
+  originalName?: string;
   positional?: number;
   alias?: string;
   hidden?: boolean;

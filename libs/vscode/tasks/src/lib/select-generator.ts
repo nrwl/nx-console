@@ -13,7 +13,7 @@ import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
 
-async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {
+async function readWorkspaceJsonDefaults(): Promise<any> {
   const { workspace } = await nxWorkspace();
 
   let defaults = workspace.generators;
@@ -65,7 +65,7 @@ export async function getGeneratorOptions(
   workspaceType: 'ng' | 'nx'
 ): Promise<Option[]> {
   const generatorSchema = await readAndCacheJsonFile(generatorPath);
-  const workspaceDefaults = await readWorkspaceJsonDefaults(workspacePath);
+  const workspaceDefaults = await readWorkspaceJsonDefaults();
   const defaults =
     workspaceDefaults &&
     workspaceDefaults[collectionName] &&
