@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.19.1](https://github.com/nrwl/nx-console/compare/v17.19.0...v17.19.1) (2022-08-02)
+
+
+### Bug Fixes
+
+* handle hyphenation when looking for generator defaults ([#1315](https://github.com/nrwl/nx-console/issues/1315)) ([60bdadf](https://github.com/nrwl/nx-console/commits/60bdadf35102bc6f2327cffaf7e01f395f2c7858)), closes [#1313](https://github.com/nrwl/nx-console/issues/1313)
+* provide better error messages and recovery for invalid graph states ([#1314](https://github.com/nrwl/nx-console/issues/1314)) ([9efb7bf](https://github.com/nrwl/nx-console/commits/9efb7bfd55b6624ebd9f6017bedf8774a5e90366))
+
 ## [17.19.0](https://github.com/nrwl/nx-console/compare/v17.18.8...v17.19.0) (2022-07-22)
 
 
