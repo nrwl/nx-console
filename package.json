@@ -21,6 +21,7 @@
     "@yarnpkg/libzip": "2.2.3-rc.5",
     "find-cache-dir": "^3.3.2",
     "jsonc-parser": "^3.0.0",
+    "request-light": "^0.5.8",
     "tslib": "^2.0.0",
     "vscode-json-languageservice": "^5.1.0",
     "vscode-languageclient": "^8.0.2",

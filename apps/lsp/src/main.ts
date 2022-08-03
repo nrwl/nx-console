@@ -6,7 +6,6 @@ import {
 import {
   ClientCapabilities,
   getLanguageService,
-  JSONDocument,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
@@ -16,8 +15,9 @@ import {
   TextDocuments,
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
-import { Utils, URI } from 'vscode-uri';
+import { URI, Utils } from 'vscode-uri';
 import { jsonDocumentsMapper } from './json-documents';
+import { getSchemaRequestService } from './runtime';
 
 const workspaceContext = {
   resolveRelativePath: (relativePath: string, resource: string) => {
@@ -50,13 +50,14 @@ documents.onDidClose((e) => {
 });
 
 connection.onInitialize(async (params) => {
+  debugger;
   // TODO: add capability checks
   const capabilities = params.capabilities;
 
   const { workspacePath, projects } = params.initializationOptions ?? {};
 
   languageService = getLanguageService({
-    // schemaRequestService: getSchemaRequestService(handledProtocols),
+    schemaRequestService: getSchemaRequestService(['file']),
     workspaceContext,
     contributions: [],
     clientCapabilities: params.capabilities,
@@ -66,18 +67,18 @@ connection.onInitialize(async (params) => {
   const collections = await getExecutors(workspacePath, projects, false);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
   const projectSchema = getProjectJsonSchema(collections);
-
+  console.log(projectSchema);
   languageService.configure({
     schemas: [
       {
         uri: 'nx://schemas/workspace',
-        fileMatch: ['**/workspace.json'],
-        schema: JSON.parse(workspaceSchema),
+        fileMatch: ['**/workspace.json', '**/angular.json'],
+        schema: workspaceSchema,
       },
       {
         uri: 'nx://schemas/project',
         fileMatch: ['**/project.json'],
-        schema: JSON.parse(projectSchema),
+        schema: projectSchema,
       },
     ],
   });
@@ -87,6 +88,7 @@ connection.onInitialize(async (params) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       completionProvider: {
         resolveProvider: false,
+        triggerCharacters: ['"', ':'],
       },
     },
   };
@@ -96,18 +98,18 @@ connection.onInitialize(async (params) => {
 
 connection.onCompletion(async (completionParams) => {
   const document = documents.get(completionParams.textDocument.uri);
-  if (document) {
-    const jsonDocument = getJsonDocument(document);
-    const completionList = await languageService.doComplete(
-      document,
-      completionParams.position,
-      jsonDocument
-    );
-    console.log(completionList);
-    return completionList;
+  if (!document) {
+    return null;
   }
 
-  return null;
+  const jsonDocument = getJsonDocument(document);
+  const completionList = await languageService.doComplete(
+    document,
+    completionParams.position,
+    jsonDocument
+  );
+  console.log(completionList);
+  return completionList;
 });
 
 function getJsonDocument(document: TextDocument) {

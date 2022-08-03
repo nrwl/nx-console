@@ -11,8 +11,9 @@ async function getPnpFile(workspacePath: string) {
     try {
       const fileName = `.pnp${ext}`;
       const pnpFile = join(workspacePath, fileName);
-      await fileExists(pnpFile);
-      return pnpFile;
+      if (await fileExists(pnpFile)) {
+        return pnpFile;
+      }
     } catch {
       return;
     }

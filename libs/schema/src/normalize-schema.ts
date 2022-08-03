@@ -174,6 +174,7 @@ function schemaToOptions(
       const name = config?.hyphenate ? names(option).fileName : option;
       cliOptions.push({
         name,
+        originalName: option,
         positional,
         ...currentProperty,
       });
