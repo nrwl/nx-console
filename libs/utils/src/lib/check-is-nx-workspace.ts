@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { fileExists, readAndCacheJsonFile } from './utils/utils';
+import { fileExists, readAndCacheJsonFile } from '@nx-console/file-system';
 
 export async function checkIsNxWorkspace(
   workspacePath: string

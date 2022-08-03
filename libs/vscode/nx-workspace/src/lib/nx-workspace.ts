@@ -1,7 +1,5 @@
 import {
   checkIsNxWorkspace,
-  clearJsonCache,
-  fileExists,
   getOutputChannel,
   getTelemetry,
   toWorkspaceFormat,
@@ -22,6 +20,7 @@ import {
   getNxWorkspaceConfig,
   NxWorkspaceConfiguration,
 } from './get-nx-workspace-config';
+import { clearJsonCache, fileExists } from '@nx-console/file-system';
 
 interface NxWorkspace {
   validWorkspaceJson: boolean;

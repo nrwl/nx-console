@@ -1,8 +1,4 @@
-import {
-  AbstractTreeProvider,
-  clearJsonCache,
-  getOutputChannel,
-} from '@nx-console/utils';
+import { AbstractTreeProvider, getOutputChannel } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
@@ -14,6 +10,7 @@ import {
   Uri,
 } from 'vscode';
 import { NxProject, NxProjectTreeItem } from './nx-project-tree-item';
+import { clearJsonCache } from '@nx-console/file-system';
 
 /**
  * Provides data for the "Projects" tree view

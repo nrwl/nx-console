@@ -1,6 +1,7 @@
 import {
   CollectionInfo,
   GeneratorType,
+  normalizeSchema,
   WorkspaceProjects,
 } from '@nx-console/schema';
 import { basename, join } from 'path';
@@ -9,10 +10,9 @@ import { getCollectionInfo, readCollections } from './read-collections';
 import {
   directoryExists,
   fileExists,
-  listFiles,
-  normalizeSchema,
   readAndCacheJsonFile,
-} from './utils';
+  listFiles,
+} from '@nx-console/file-system';
 
 export async function getGenerators(
   workspacePath: string,

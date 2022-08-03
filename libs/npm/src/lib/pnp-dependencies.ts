@@ -1,6 +1,6 @@
-import { join } from 'path';
-import { Uri, workspace } from 'vscode';
 import type { PnpApi } from '@yarnpkg/pnp';
+import { join } from 'path';
+import { fileExists } from '@nx-console/file-system';
 declare function __non_webpack_require__(importPath: string): any;
 
 let PNP_API: PnpApi;
@@ -11,7 +11,7 @@ async function getPnpFile(workspacePath: string) {
     try {
       const fileName = `.pnp${ext}`;
       const pnpFile = join(workspacePath, fileName);
-      await workspace.fs.stat(Uri.file(pnpFile));
+      await fileExists(pnpFile);
       return pnpFile;
     } catch {
       return;

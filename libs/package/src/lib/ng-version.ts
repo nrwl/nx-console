@@ -1,17 +1,12 @@
 import { workspaceDependencyPath } from '@nx-console/npm';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 
 declare function __non_webpack_require__(importPath: string): any;
 
 let ngPackageJson: { version: string };
 let loadedNgPackage = false;
-export async function ngVersion(): Promise<number> {
-  if (!loadedNgPackage) {
-    const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
-    );
 
+export async function ngVersion(workspacePath: string): Promise<number> {
+  if (!loadedNgPackage) {
     const packagePath = await workspaceDependencyPath(
       workspacePath,
       '@angular/cli'

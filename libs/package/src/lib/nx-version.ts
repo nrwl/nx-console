@@ -1,17 +1,11 @@
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { findNxPackagePath } from './get-nx-workspace-package';
+import { findNxPackagePath } from './find-nx-package-path';
 
 declare function __non_webpack_require__(importPath: string): any;
 
 let nxWorkspacePackageJson: { version: string };
 let loadedNxPackage = false;
-export async function nxVersion(): Promise<number> {
+export async function nxVersion(workspacePath: string): Promise<number> {
   if (!loadedNxPackage) {
-    const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
-    );
-
     const packagePath = await findNxPackagePath(workspacePath, 'package.json');
 
     if (!packagePath) {

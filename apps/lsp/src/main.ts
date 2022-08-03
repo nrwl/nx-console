@@ -1,3 +1,8 @@
+import { getExecutors } from '@nx-console/collections';
+import {
+  getProjectJsonSchema,
+  getWorkspaceJsonSchema,
+} from '@nx-console/json-schema';
 import {
   ClientCapabilities,
   getLanguageService,
@@ -44,12 +49,11 @@ documents.onDidClose((e) => {
   jsonDocumentMapper.remove(e.document);
 });
 
-connection.onInitialize((params) => {
+connection.onInitialize(async (params) => {
   // TODO: add capability checks
   const capabilities = params.capabilities;
 
-  // const initializationOptions = params.initializationOptions ?? {};
-  // const handledProtocols = initializationOptions?.handledSchemaProtocols;
+  const { workspacePath, projects } = params.initializationOptions ?? {};
 
   languageService = getLanguageService({
     // schemaRequestService: getSchemaRequestService(handledProtocols),
@@ -58,8 +62,24 @@ connection.onInitialize((params) => {
     clientCapabilities: params.capabilities,
   });
 
+  // get schemas
+  const collections = await getExecutors(workspacePath, projects, false);
+  const workspaceSchema = getWorkspaceJsonSchema(collections);
+  const projectSchema = getProjectJsonSchema(collections);
+
   languageService.configure({
-    schemas: [],
+    schemas: [
+      {
+        uri: 'nx://schemas/workspace',
+        fileMatch: ['**/workspace.json'],
+        schema: JSON.parse(workspaceSchema),
+      },
+      {
+        uri: 'nx://schemas/project',
+        fileMatch: ['**/project.json'],
+        schema: JSON.parse(projectSchema),
+      },
+    ],
   });
 
   const result: InitializeResult = {

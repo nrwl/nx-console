@@ -1,9 +1,9 @@
-import { normalizeSchema } from './utils';
 import {
   LongFormXPrompt,
   Option,
   OptionType,
   OptionPropertyDescription,
+  normalizeSchema,
 } from '@nx-console/schema';
 import { Schema } from 'nx/src/utils/params';
 

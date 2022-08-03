@@ -3,18 +3,16 @@ import {
   Option,
   DefaultValue,
   TargetConfiguration,
+  normalizeSchema,
 } from '@nx-console/schema';
 import * as path from 'path';
 import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
 
-import {
-  getPrimitiveValue,
-  normalizeSchema,
-  readAndCacheJsonFile,
-} from '../utils/utils';
+import { getPrimitiveValue } from './utils';
 import { getTelemetry } from '../telemetry';
 import { getOutputChannel } from './output-channel';
 import { workspaceDependencyPath } from '@nx-console/npm';
+import { readAndCacheJsonFile } from '@nx-console/file-system';
 
 export function readTargetDef(
   targetName: string,

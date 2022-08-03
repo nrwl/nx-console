@@ -1,7 +1,7 @@
 import { nxWorkspace } from './nx-workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import * as server from '@nx-console/utils';
-import { getOutputChannel, getTelemetry, fileExists } from '@nx-console/utils';
+import { getOutputChannel, getTelemetry } from '@nx-console/utils';
 import { mocked } from 'ts-jest/utils';
 import type {
   NxJsonConfiguration,
@@ -11,6 +11,8 @@ import * as vscode from 'vscode';
 import type { AsyncReturnType } from 'type-fest';
 
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
+import { fileExists as fileExists1, fileExists } from '@nx-console/file-system';
+
 jest.mock('./get-nx-workspace-config', () => {
   const originalModule = jest.requireActual('./get-nx-workspace-config');
   return {
@@ -27,9 +29,7 @@ jest.mock('./get-nx-workspace-config', () => {
 });
 const getNxWorkspaceConfigMock = mocked(getNxWorkspaceConfig);
 
-const mockFileExistsFn = fileExists as jest.MockedFunction<
-  typeof server.fileExists
->;
+const mockFileExistsFn = fileExists as jest.MockedFunction<typeof fileExists1>;
 mockFileExistsFn.mockImplementation(async () => false);
 
 const mockStoreInstanceGetFn = WorkspaceConfigurationStore.instance

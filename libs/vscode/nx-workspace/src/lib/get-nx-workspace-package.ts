@@ -1,10 +1,10 @@
-import { workspaceDependencyPath } from '@nx-console/npm';
-import { fileExists, getOutputChannel } from '@nx-console/utils';
+import { getOutputChannel } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
 import { platform } from 'os';
 import { join } from 'path';
+import { findNxPackagePath } from '@nx-console/package';
 
 declare function __non_webpack_require__(importPath: string): any;
 
@@ -95,38 +95,5 @@ ${error}
     );
     cache = backupPackage;
     return backupPackage;
-  }
-}
-
-/**
- * Finds the local Nx package in the workspace.
- *
- * It will try to look for the `nx` package, with the specific file. If it does not exist, it will try to look for the `@nrwl/workspace` package, with the specific file
- * @param workspacePath
- * @returns
- */
-export async function findNxPackagePath(
-  workspacePath: string,
-  filePath: string
-): Promise<string | undefined> {
-  const buildPath = (base: string) => join(base, filePath);
-
-  const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
-  if (nxWorkspaceDepPath) {
-    const path = buildPath(nxWorkspaceDepPath);
-    if (await fileExists(path)) {
-      return path;
-    }
-  }
-
-  const nrwlWorkspaceDepPath = await workspaceDependencyPath(
-    workspacePath,
-    '@nrwl/workspace'
-  );
-  if (nrwlWorkspaceDepPath) {
-    const path = buildPath(nrwlWorkspaceDepPath);
-    if (await fileExists(path)) {
-      return path;
-    }
   }
 }

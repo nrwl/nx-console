@@ -1,5 +1,6 @@
+import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
-import { ExtensionContext } from 'vscode';
+import { Disposable, ExtensionContext } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -9,12 +10,17 @@ import {
 
 let client: LanguageClient;
 
-export function lspClient(context: ExtensionContext) {
+export async function configureLspClient(
+  context: ExtensionContext
+): Promise<Disposable> {
+  const { workspacePath, workspace } = await nxWorkspace();
+
   const serverModule = context.asAbsolutePath(join('lsp', 'main.js'));
 
   const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
   const serverOptions: ServerOptions = {
     run: { module: serverModule, transport: TransportKind.ipc },
+
     debug: {
       module: serverModule,
       transport: TransportKind.ipc,
@@ -25,6 +31,10 @@ export function lspClient(context: ExtensionContext) {
   // Options to control the language client
   const clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
+    initializationOptions: {
+      workspacePath,
+      projects: workspace.projects,
+    },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },
       { scheme: 'file', language: 'json', pattern: '**/project.json' },
@@ -34,15 +44,15 @@ export function lspClient(context: ExtensionContext) {
   };
 
   client = new LanguageClient(
-    'NxConsoleClient',
-    'Nx Console Client',
+    'NxConsole',
+    'Nx Console',
     serverOptions,
     clientOptions
   );
 
   client.start();
 
-  context.subscriptions.push({
+  return {
     dispose() {
       if (!client) {
         return;
@@ -50,5 +60,5 @@ export function lspClient(context: ExtensionContext) {
 
       return client.stop();
     },
-  });
+  };
 }

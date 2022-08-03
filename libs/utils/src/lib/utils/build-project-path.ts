@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { fileExists } from './utils';
+import { fileExists } from '@nx-console/file-system';
 
 /**
  * Builds the project path from the given project name.

@@ -10,7 +10,7 @@ import {
 } from '@nx-console/schema';
 import { platform } from 'os';
 import { dirname, join, resolve } from 'path';
-import { clearJsonCache, readAndCacheJsonFile } from './utils';
+import { clearJsonCache, readAndCacheJsonFile } from '@nx-console/file-system';
 
 export async function readCollections(
   workspacePath: string,
