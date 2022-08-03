@@ -52,10 +52,10 @@ import {
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
 import { projectGraph } from '@nx-console/vscode/project-graph';
-import { configureLspClient } from './configure-lsp-client';
 import { fileExists } from '@nx-console/file-system';
 import { getGenerators } from '@nx-console/collections';
 import { nxVersion } from '@nx-console/npm';
+import { configureLspClient } from '@nx-console/vscode/lsp-client';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
