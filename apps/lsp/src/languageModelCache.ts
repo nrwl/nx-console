@@ -4,25 +4,27 @@
  *--------------------------------------------------------------------------------------------*/
 // https://github.com/microsoft/vscode/blob/89c30e1b86f941db095d9f52b128287e5039e004/extensions/json-language-features/server/src/languageModelCache.ts
 
+import { JSONDocument } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
 export interface LanguageModelCache<T> {
-  get(document: TextDocument): T;
+  get(document: TextDocument): { jsonAst: T; document: TextDocument };
   onDocumentRemoved(document: TextDocument): void;
   dispose(): void;
 }
 
-export function getLanguageModelCache<T>(
+export function getLanguageModelCache(
   maxEntries: number,
   cleanupIntervalTimeInSec: number,
-  parse: (document: TextDocument) => T
-): LanguageModelCache<T> {
+  parse: (document: TextDocument) => JSONDocument
+): LanguageModelCache<JSONDocument> {
   let languageModels: {
     [uri: string]: {
       version: number;
       languageId: string;
       cTime: number;
-      languageModel: T;
+      languageModel: JSONDocument;
+      document: TextDocument;
     };
   } = {};
   let nModels = 0;
@@ -43,7 +45,10 @@ export function getLanguageModelCache<T>(
   }
 
   return {
-    get(document: TextDocument): T {
+    get(document: TextDocument): {
+      jsonAst: JSONDocument;
+      document: TextDocument;
+    } {
       const version = document.version;
       const languageId = document.languageId;
       const languageModelInfo = languageModels[document.uri];
@@ -53,13 +58,24 @@ export function getLanguageModelCache<T>(
         languageModelInfo.languageId === languageId
       ) {
         languageModelInfo.cTime = Date.now();
-        return languageModelInfo.languageModel;
+        return {
+          jsonAst: languageModelInfo.languageModel,
+          document: languageModelInfo.document,
+        };
       }
-      const languageModel = parse(document);
+      const newDocument = TextDocument.create(
+        document.uri,
+        document.languageId,
+        document.version,
+        document.getText().replace(/"\$schema":\s".+",/, '')
+      );
+      const languageModel = parse(newDocument);
+
       languageModels[document.uri] = {
         languageModel,
         version,
         languageId,
+        document: newDocument,
         cTime: Date.now(),
       };
       if (!languageModelInfo) {
@@ -81,7 +97,7 @@ export function getLanguageModelCache<T>(
           nModels--;
         }
       }
-      return languageModel;
+      return { jsonAst: languageModel, document: newDocument };
     },
     onDocumentRemoved(document: TextDocument) {
       const uri = document.uri;

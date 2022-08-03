@@ -90,25 +90,23 @@ connection.onInitialize(async (params) => {
 });
 
 connection.onCompletion(async (completionParams) => {
-  const document = documents.get(completionParams.textDocument.uri);
-  if (!document) {
+  const changedDocument = documents.get(completionParams.textDocument.uri);
+  if (!changedDocument) {
     return null;
   }
 
-  const jsonDocument = getJsonDocument(document);
+  const { jsonAst, document } = getJsonDocument(changedDocument);
   const completionList = await languageService.doComplete(
     document,
     completionParams.position,
-    jsonDocument
+    jsonAst
   );
   console.log(completionList);
   return completionList;
 });
 
-const jsonDocumentMapper = getLanguageModelCache<JSONDocument>(
-  10,
-  60,
-  (document) => languageService.parseJSONDocument(document)
+const jsonDocumentMapper = getLanguageModelCache(10, 60, (document) =>
+  languageService.parseJSONDocument(document)
 );
 
 documents.onDidClose((e) => {
