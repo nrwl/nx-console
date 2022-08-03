@@ -6,6 +6,7 @@ import {
 import {
   ClientCapabilities,
   getLanguageService,
+  JSONDocument,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
@@ -16,7 +17,7 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { jsonDocumentsMapper } from './json-documents';
+import { getLanguageModelCache } from './languageModelCache';
 import { getSchemaRequestService } from './runtime';
 
 const workspaceContext = {
@@ -34,20 +35,12 @@ let languageService = getLanguageService({
   clientCapabilities: ClientCapabilities.LATEST,
 });
 
-const jsonDocumentMapper = jsonDocumentsMapper((document) =>
-  languageService.parseJSONDocument(document)
-);
-
 // Create a text document manager.
 const documents = new TextDocuments(TextDocument);
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events
 documents.listen(connection);
-
-documents.onDidClose((e) => {
-  jsonDocumentMapper.remove(e.document);
-});
 
 connection.onInitialize(async (params) => {
   debugger;
@@ -110,6 +103,20 @@ connection.onCompletion(async (completionParams) => {
   );
   console.log(completionList);
   return completionList;
+});
+
+const jsonDocumentMapper = getLanguageModelCache<JSONDocument>(
+  10,
+  60,
+  (document) => languageService.parseJSONDocument(document)
+);
+
+documents.onDidClose((e) => {
+  jsonDocumentMapper.onDocumentRemoved(e.document);
+});
+
+connection.onShutdown(() => {
+  jsonDocumentMapper.dispose();
 });
 
 function getJsonDocument(document: TextDocument) {

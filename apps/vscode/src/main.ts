@@ -55,7 +55,7 @@ import { projectGraph } from '@nx-console/vscode/project-graph';
 import { configureLspClient } from './configure-lsp-client';
 import { fileExists } from '@nx-console/file-system';
 import { getGenerators } from '@nx-console/collections';
-import { nxVersion } from '@nx-console/package';
+import { nxVersion } from '@nx-console/npm';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;

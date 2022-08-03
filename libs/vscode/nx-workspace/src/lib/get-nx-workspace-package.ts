@@ -4,7 +4,7 @@ import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
 import { platform } from 'os';
 import { join } from 'path';
-import { findNxPackagePath } from '@nx-console/package';
+import { findNxPackagePath } from '@nx-console/npm';
 
 declare function __non_webpack_require__(importPath: string): any;
 

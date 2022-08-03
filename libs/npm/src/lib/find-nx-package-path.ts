@@ -1,6 +1,6 @@
 import { join } from 'path';
-import { workspaceDependencyPath } from '@nx-console/npm';
 import { fileExists } from '@nx-console/file-system';
+import { workspaceDependencyPath } from './workspace-dependencies';
 
 /**
  * Finds the local Nx package in the workspace.

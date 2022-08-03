@@ -1,4 +1,4 @@
-import { workspaceDependencyPath } from '@nx-console/npm';
+import { workspaceDependencyPath } from './workspace-dependencies';
 
 declare function __non_webpack_require__(importPath: string): any;
 

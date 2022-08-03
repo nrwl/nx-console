@@ -8,7 +8,7 @@ import {
   pnpDependencyPath,
 } from './pnp-dependencies';
 import { directoryExists } from '@nx-console/file-system';
-import { nxVersion } from '@nx-console/package';
+import { nxVersion } from './nx-version';
 
 /**
  * Get dependencies for the current workspace.

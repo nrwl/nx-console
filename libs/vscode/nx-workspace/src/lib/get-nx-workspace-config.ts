@@ -9,7 +9,7 @@ import {
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
 import { readAndCacheJsonFile } from '@nx-console/file-system';
-import { nxVersion } from '@nx-console/package';
+import { nxVersion } from '@nx-console/npm';
 
 export type NxWorkspaceConfiguration = ProjectsConfigurations &
   NxJsonConfiguration;

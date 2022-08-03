@@ -6,7 +6,6 @@
     "json-schema": "libs/json-schema",
     "lsp": "apps/lsp",
     "npm": "libs/npm",
-    "package": "libs/package",
     "schema": "libs/schema",
     "typescript-plugin": "libs/typescript-plugin",
     "utils": "libs/utils",
