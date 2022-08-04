@@ -2,5 +2,5 @@
   "name": "nxls",
   "version": "0.0.1",
   "main": "main.js",
-  "bin": "main.js"
+  "bin": "bin/nxls"
 }

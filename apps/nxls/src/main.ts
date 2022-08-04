@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { getExecutors } from '@nx-console/collections';
 import {
   getProjectJsonSchema,
@@ -43,7 +44,6 @@ const documents = new TextDocuments(TextDocument);
 documents.listen(connection);
 
 connection.onInitialize(async (params) => {
-  debugger;
   // TODO: add capability checks
   const capabilities = params.capabilities;
 

@@ -21,7 +21,7 @@
         "outputPath": "dist/apps/vscode/lsp",
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
-        "assets": ["apps/nxls/src/assets"]
+        "assets": ["apps/nxls/src/assets", "apps/nxls/src/bin"]
       },
       "configurations": {
         "package": {
