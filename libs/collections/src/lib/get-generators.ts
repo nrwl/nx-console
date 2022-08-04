@@ -1,9 +1,9 @@
 import {
   CollectionInfo,
   GeneratorType,
-  normalizeSchema,
   WorkspaceProjects,
 } from '@nx-console/schema';
+import { normalizeSchema } from '@nx-console/schema/normalize';
 import { basename, join } from 'path';
 
 import { getCollectionInfo, readCollections } from './read-collections';

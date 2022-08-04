@@ -1,7 +1,6 @@
 import {
   Generator,
   GeneratorType,
-  normalizeSchema,
   Option,
   TaskExecutionSchema,
 } from '@nx-console/schema';
@@ -10,6 +9,7 @@ import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
 import { readAndCacheJsonFile } from '@nx-console/file-system';
 import { getGenerators } from '@nx-console/collections';
+import { normalizeSchema } from '@nx-console/schema/normalize';
 
 async function readWorkspaceJsonDefaults(): Promise<any> {
   const { workspace } = await nxWorkspace();

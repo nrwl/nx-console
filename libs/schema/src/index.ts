@@ -115,4 +115,3 @@ export const WORKSPACE_GENERATOR_NAME_REGEX =
 export type WorkspaceProjects = ProjectsConfigurations['projects'];
 
 export { Store } from './store';
-export { normalizeSchema } from './normalize-schema';

@@ -3,7 +3,6 @@ import {
   Option,
   DefaultValue,
   TargetConfiguration,
-  normalizeSchema,
 } from '@nx-console/schema';
 import * as path from 'path';
 import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
@@ -13,6 +12,7 @@ import { getTelemetry } from '../telemetry';
 import { getOutputChannel } from './output-channel';
 import { workspaceDependencyPath } from '@nx-console/npm';
 import { readAndCacheJsonFile } from '@nx-console/file-system';
+import { normalizeSchema } from '@nx-console/schema/normalize';
 
 export function readTargetDef(
   targetName: string,
