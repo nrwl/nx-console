@@ -3,7 +3,7 @@
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
-  "implicitDependencies": ["vscode-ui"],
+  "implicitDependencies": ["vscode-ui", "nxls"],
   "targets": {
     "watch-all": {
       "executor": "@nrwl/workspace:run-commands",
