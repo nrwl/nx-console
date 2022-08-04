@@ -20,7 +20,7 @@
             "color": "green"
           },
           {
-            "command": "yarn nx watch lsp",
+            "command": "yarn nx watch nxls",
             "prefix": "lsp",
             "color": "magenta"
           }
