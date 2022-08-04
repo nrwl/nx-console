@@ -25,7 +25,7 @@
       },
       "configurations": {
         "package": {
-          "outputPath": "dist/packages/lsp",
+          "outputPath": "dist/packages/nxls",
           "generatePackageJson": true,
           "externalDependencies": "all",
           "optimization": true,
