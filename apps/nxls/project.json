@@ -1,5 +1,6 @@
 {
-  "sourceRoot": "apps/lsp/src",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/nxls/src",
   "projectType": "application",
   "targets": {
     "watch": {
@@ -7,9 +8,9 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/vscode/lsp",
-        "main": "apps/lsp/src/main.ts",
-        "tsConfig": "apps/lsp/tsconfig.app.json",
-        "assets": ["apps/lsp/src/assets"],
+        "main": "apps/nxls/src/main.ts",
+        "tsConfig": "apps/nxls/tsconfig.app.json",
+        "assets": ["apps/nxls/src/assets"],
         "watch": true
       }
     },
@@ -18,19 +19,26 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/vscode/lsp",
-        "main": "apps/lsp/src/main.ts",
-        "tsConfig": "apps/lsp/tsconfig.app.json",
-        "assets": ["apps/lsp/src/assets"]
+        "main": "apps/nxls/src/main.ts",
+        "tsConfig": "apps/nxls/tsconfig.app.json",
+        "assets": ["apps/nxls/src/assets"]
       },
       "configurations": {
+        "package": {
+          "outputPath": "dist/packages/lsp",
+          "generatePackageJson": true,
+          "externalDependencies": "all",
+          "optimization": true,
+          "extractLicenses": true
+        },
         "production": {
           "optimization": true,
           "extractLicenses": true,
           "inspect": false,
           "fileReplacements": [
             {
-              "replace": "apps/lsp/src/environments/environment.ts",
-              "with": "apps/lsp/src/environments/environment.prod.ts"
+              "replace": "apps/nxls/src/environments/environment.ts",
+              "with": "apps/nxls/src/environments/environment.prod.ts"
             }
           ]
         }
@@ -39,21 +47,21 @@
     "serve": {
       "executor": "@nrwl/node:node",
       "options": {
-        "buildTarget": "lsp:build"
+        "buildTarget": "nxls:build"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/lsp/**/*.ts"]
+        "lintFilePatterns": ["apps/nxls/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/lsp"],
+      "outputs": ["coverage/apps/nxls"],
       "options": {
-        "jestConfig": "apps/lsp/jest.config.ts",
+        "jestConfig": "apps/nxls/jest.config.ts",
         "passWithNoTests": true
       }
     }
