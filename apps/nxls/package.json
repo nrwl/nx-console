@@ -2,5 +2,8 @@
   "name": "nxls",
   "version": "0.0.1",
   "main": "main.js",
-  "bin": "bin/nxls"
+  "bin": "bin/nxls",
+  "dependencies": {
+    "@nrwl/devkit": "14.4.1"
+  }
 }

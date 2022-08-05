@@ -7,7 +7,7 @@
       "executor": "@nrwl/node:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/vscode/lsp",
+        "outputPath": "dist/apps/vscode/nxls",
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
         "assets": ["apps/nxls/src/assets"],

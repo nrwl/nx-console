@@ -15,7 +15,7 @@ export async function configureLspClient(
 ): Promise<Disposable> {
   const { workspacePath, workspace } = await nxWorkspace();
 
-  const serverModule = context.asAbsolutePath(join('lsp', 'main.js'));
+  const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
 
   const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
   const serverOptions: ServerOptions = {
