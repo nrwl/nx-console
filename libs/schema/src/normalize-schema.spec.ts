@@ -1,11 +1,11 @@
+import { Schema } from 'nx/src/utils/params';
 import {
   LongFormXPrompt,
-  Option,
-  OptionType,
   OptionPropertyDescription,
-  normalizeSchema,
-} from '@nx-console/schema';
-import { Schema } from 'nx/src/utils/params';
+  OptionType,
+  Option,
+} from './index';
+import { normalizeSchema } from './normalize-schema';
 
 describe('utils', () => {
   describe('normalizeSchema', () => {
