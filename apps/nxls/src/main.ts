@@ -7,7 +7,6 @@ import {
 import {
   ClientCapabilities,
   getLanguageService,
-  JSONDocument,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
@@ -44,9 +43,6 @@ const documents = new TextDocuments(TextDocument);
 documents.listen(connection);
 
 connection.onInitialize(async (params) => {
-  // TODO: add capability checks
-  const capabilities = params.capabilities;
-
   const { workspacePath, projects } = params.initializationOptions ?? {};
 
   languageService = getLanguageService({
@@ -57,10 +53,13 @@ connection.onInitialize(async (params) => {
   });
 
   // get schemas
-  const collections = await getExecutors(workspacePath, projects, false);
+  const collections = await getExecutors(
+    workspacePath ?? params.rootPath,
+    projects,
+    false
+  );
   const workspaceSchema = getWorkspaceJsonSchema(collections);
   const projectSchema = getProjectJsonSchema(collections);
-  console.log(projectSchema);
   languageService.configure({
     schemas: [
       {
@@ -83,6 +82,7 @@ connection.onInitialize(async (params) => {
         resolveProvider: false,
         triggerCharacters: ['"', ':'],
       },
+      hoverProvider: true,
     },
   };
 
@@ -96,13 +96,22 @@ connection.onCompletion(async (completionParams) => {
   }
 
   const { jsonAst, document } = getJsonDocument(changedDocument);
-  const completionList = await languageService.doComplete(
+  return languageService.doComplete(
     document,
     completionParams.position,
     jsonAst
   );
-  console.log(completionList);
-  return completionList;
+});
+
+connection.onHover(async (hoverParams) => {
+  const hoverDocument = documents.get(hoverParams.textDocument.uri);
+
+  if (!hoverDocument) {
+    return null;
+  }
+
+  const { jsonAst, document } = getJsonDocument(hoverDocument);
+  return languageService.doHover(document, hoverParams.position, jsonAst);
 });
 
 const jsonDocumentMapper = getLanguageModelCache(10, 60, (document) =>

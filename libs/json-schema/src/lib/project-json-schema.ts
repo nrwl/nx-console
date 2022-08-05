@@ -10,24 +10,16 @@ export function getProjectJsonSchema(collections: CollectionInfo[]) {
 
 function createJsonSchema(executors: JSONSchema[]): JSONSchema {
   return {
-    title: 'JSON schema for Nx projects',
-    id: 'https://nx.dev/project-schema',
     type: 'object',
     properties: {
       targets: {
-        description:
-          'Configures all the targets which define what tasks you can run against the project',
         additionalProperties: {
           type: 'object',
           properties: {
             executor: {
-              description:
-                'The function that Nx will invoke when you run this target',
               type: 'string',
             },
             configurations: {
-              description:
-                'provides extra sets of values that will be merged into the options map',
               additionalProperties: {
                 type: 'object',
               },
