@@ -1,5 +1,4 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/nxls/src",
   "projectType": "application",
   "targets": {
@@ -14,40 +13,24 @@
         "watch": true
       }
     },
-    "build": {
+    "package": {
       "executor": "@nrwl/node:webpack",
-      "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/vscode/lsp",
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
-        "assets": ["apps/nxls/src/assets", "apps/nxls/src/bin"]
-      },
-      "configurations": {
-        "package": {
-          "outputPath": "dist/packages/nxls",
-          "generatePackageJson": true,
-          "externalDependencies": "all",
-          "optimization": true,
-          "extractLicenses": true
-        },
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false,
-          "fileReplacements": [
-            {
-              "replace": "apps/nxls/src/environments/environment.ts",
-              "with": "apps/nxls/src/environments/environment.prod.ts"
-            }
-          ]
-        }
+        "outputPath": "dist/packages/nxls",
+        "assets": ["apps/nxls/src/bin"],
+        "generatePackageJson": true,
+        "externalDependencies": "all",
+        "optimization": true,
+        "extractLicenses": true
       }
     },
-    "serve": {
-      "executor": "@nrwl/node:node",
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["dist/apps/vscode/nxls"],
       "options": {
-        "buildTarget": "nxls:build"
+        "commands": ["yarn rollup -c ./apps/nxls/rollup.config.ts"]
       }
     },
     "lint": {

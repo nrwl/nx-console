@@ -44,8 +44,8 @@ export async function configureLspClient(
   };
 
   client = new LanguageClient(
-    'NxConsole',
-    'Nx Console',
+    'NxConsoleClient',
+    'Nx Console Client',
     serverOptions,
     clientOptions
   );

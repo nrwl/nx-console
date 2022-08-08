@@ -37,7 +37,8 @@
         "stylePreprocessorOptions": {
           "includePaths": ["libs/vscode-ui/styles/src/lib"]
         },
-        "allowedCommonJsDependencies": ["zone.js"]
+        "allowedCommonJsDependencies": ["zone.js"],
+        "deleteOutputPath": false
       },
       "configurations": {
         "production": {

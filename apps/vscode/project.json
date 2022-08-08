@@ -76,7 +76,8 @@
             "output": "/"
           }
         ],
-        "buildLibsFromSource": true
+        "buildLibsFromSource": true,
+        "deleteOutputPath": false
       },
       "configurations": {
         "production": {
@@ -110,7 +111,6 @@
     },
     "package": {
       "executor": "@nrwl/workspace:run-commands",
-      "dependsOn": ["build"],
       "options": {
         "commands": [
           "yarn nx run vscode:build:production",

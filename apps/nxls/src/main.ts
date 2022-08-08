@@ -1,4 +1,5 @@
-#!/usr/bin/env node
+import './global-polyfills';
+
 import { getExecutors } from '@nx-console/collections';
 import {
   getProjectJsonSchema,

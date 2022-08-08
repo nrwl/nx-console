@@ -114,4 +114,4 @@ export const WORKSPACE_GENERATOR_NAME_REGEX =
 
 export type WorkspaceProjects = ProjectsConfigurations['projects'];
 
-export { Store } from './store';
+export type { Store } from './store';
