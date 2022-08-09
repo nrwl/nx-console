@@ -20,6 +20,7 @@ jest.mock('@nx-console/file-system', (): Partial<typeof fs> => {
   return {
     ...original,
     fileExists: jest.fn(() => Promise.resolve(true)),
+    directoryExists: jest.fn(() => Promise.resolve(true)),
   };
 });
 

@@ -79,7 +79,7 @@ export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
 
       if (!enableLibraryImports) {
         vscode.window.setStatusBarMessage(
-          'Restarting the TypeScript Utils',
+          'Restarting the TypeScript Server',
           5000
         );
         await vscode.commands.executeCommand('typescript.restartTsServer');
