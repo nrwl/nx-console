@@ -30,9 +30,14 @@
       "executor": "nx:run-commands",
       "outputs": ["dist/apps/vscode/nxls"],
       "options": {
-        "commands": [
-          "export NODE_OPTIONS=--max-old-space-size=4096 && yarn rollup -c ./apps/nxls/rollup.config.ts"
-        ]
+        "commands": ["yarn tsc -p ./apps/nxls/tsconfig.app.json --noEmit"]
+      },
+      "configurations": {
+        "production": {
+          "commands": [
+            "export NODE_OPTIONS=--max-old-space-size=4096 && yarn rollup -c ./apps/nxls/rollup.config.ts"
+          ]
+        }
       }
     },
     "lint": {
