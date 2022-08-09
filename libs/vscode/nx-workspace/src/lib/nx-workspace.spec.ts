@@ -2,7 +2,7 @@ import { nxWorkspace } from './nx-workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import * as server from '@nx-console/utils';
 import { getOutputChannel, getTelemetry } from '@nx-console/utils';
-import { mocked } from 'ts-jest/utils';
+import { mocked } from 'jest-mock';
 import type {
   NxJsonConfiguration,
   WorkspaceJsonConfiguration,
@@ -11,7 +11,6 @@ import * as vscode from 'vscode';
 import type { AsyncReturnType } from 'type-fest';
 
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
-import { fileExists as fileExists1, fileExists } from '@nx-console/file-system';
 
 jest.mock('./get-nx-workspace-config', () => {
   const originalModule = jest.requireActual('./get-nx-workspace-config');
@@ -29,16 +28,18 @@ jest.mock('./get-nx-workspace-config', () => {
 });
 const getNxWorkspaceConfigMock = mocked(getNxWorkspaceConfig);
 
-const mockFileExistsFn = fileExists as jest.MockedFunction<typeof fileExists1>;
-mockFileExistsFn.mockImplementation(async () => false);
+import * as fs from '@nx-console/file-system';
+jest.mock('@nx-console/file-system', (): Partial<typeof fs> => {
+  const original = jest.requireActual('@nx-console/file-system');
+  return {
+    ...original,
+    fileExists: jest.fn(() => Promise.resolve(true)),
+  };
+});
 
 const mockStoreInstanceGetFn = WorkspaceConfigurationStore.instance
   .get as jest.MockedFunction<typeof WorkspaceConfigurationStore.instance.get>;
 mockStoreInstanceGetFn.mockImplementation(() => workspacePath);
-
-const originalNxConsoleServerModule = jest.requireActual('@nx-console/server');
-(server.toWorkspaceFormat as unknown) =
-  originalNxConsoleServerModule.toWorkspaceFormat;
 
 const mockWorkspace: WorkspaceJsonConfiguration & NxJsonConfiguration = {
   version: 2,
@@ -103,7 +104,6 @@ xdescribe('verifyWorkspace', () => {
   describe('when Ng workspace exists', () => {
     it('returns information about Ng workspace', async () => {
       // arrange
-      mockFileExistsFn.mockImplementationOnce(async () => true);
       getNxWorkspaceConfigMock.mockImplementationOnce(async () => {
         return {
           workspaceConfiguration: mockWorkspace,
