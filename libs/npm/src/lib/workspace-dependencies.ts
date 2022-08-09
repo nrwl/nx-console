@@ -1,14 +1,14 @@
 import { WorkspaceProjects } from '@nx-console/schema';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { stat } from 'fs/promises';
 import { join } from 'path';
-import { FileType, Uri, workspace } from 'vscode';
 import { npmDependencies } from './npm-dependencies';
 import {
   isWorkspaceInPnp,
   pnpDependencies,
   pnpDependencyPath,
 } from './pnp-dependencies';
+import { directoryExists } from '@nx-console/file-system';
+import { nxVersion } from './nx-version';
 
 /**
  * Get dependencies for the current workspace.
@@ -49,10 +49,7 @@ export async function workspaceDependencyPath(
 
   const path = join(workspacePath, 'node_modules', workspaceDependencyName);
   try {
-    const directoryType = (await workspace.fs.stat(Uri.file(path))).type;
-    return (directoryType & FileType.Directory) === FileType.Directory
-      ? path
-      : undefined;
+    return (await directoryExists(path)) ? path : undefined;
   } catch {
     return;
   }
@@ -66,9 +63,8 @@ async function localDependencies(
     return [];
   }
 
-  const nxVersion = WorkspaceConfigurationStore.instance.get('nxVersion', null);
-
-  if (nxVersion && nxVersion < 13) {
+  // Local plugins do not work with nxVersion less than 13
+  if ((await nxVersion(workspacePath)) < 13) {
     return [];
   }
 

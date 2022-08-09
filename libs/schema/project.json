@@ -8,6 +8,14 @@
       "options": {
         "lintFilePatterns": ["libs/schema/**/*.ts"]
       }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "options": {
+        "jestConfig": "libs/schema/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "outputs": ["coverage/libs/schema"]
     }
   },
   "tags": []

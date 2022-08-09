@@ -1,10 +1,9 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/vscode/src",
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
-  "implicitDependencies": ["vscode-ui"],
+  "implicitDependencies": ["vscode-ui", "nxls"],
   "targets": {
     "watch-all": {
       "executor": "@nrwl/workspace:run-commands",
@@ -19,6 +18,11 @@
             "command": "yarn nx watch vscode-ui",
             "prefix": "vscode-ui",
             "color": "green"
+          },
+          {
+            "command": "yarn nx watch nxls",
+            "prefix": "lsp",
+            "color": "magenta"
           }
         ],
         "parallel": true
@@ -72,7 +76,8 @@
             "output": "/"
           }
         ],
-        "buildLibsFromSource": true
+        "buildLibsFromSource": true,
+        "deleteOutputPath": false
       },
       "configurations": {
         "production": {
@@ -106,7 +111,6 @@
     },
     "package": {
       "executor": "@nrwl/workspace:run-commands",
-      "dependsOn": ["build"],
       "options": {
         "commands": [
           "yarn nx run vscode:build:production",

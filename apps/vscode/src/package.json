@@ -885,18 +885,6 @@
     },
     "jsonValidation": [
       {
-        "fileMatch": "workspace.json",
-        "url": "./workspace-schema.json"
-      },
-      {
-        "fileMatch": "angular.json",
-        "url": "./workspace-schema.json"
-      },
-      {
-        "fileMatch": "project.json",
-        "url": "./project-schema.json"
-      },
-      {
         "fileMatch": "nx.json",
         "url": "./nx-schema.json"
       }

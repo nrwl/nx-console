@@ -1,9 +1,10 @@
-import { buildProjectPath, fileExists } from '@nx-console/server';
+import { buildProjectPath } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import { Selection, TextDocument, Uri, window, workspace } from 'vscode';
 
 import { getProjectLocations } from './find-workspace-json-target';
+import { fileExists } from '@nx-console/file-system';
 
 export async function revealNxProject(
   projectName: string,

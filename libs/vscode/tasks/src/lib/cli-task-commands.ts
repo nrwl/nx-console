@@ -1,19 +1,19 @@
-import { commands, ExtensionContext, window, Uri } from 'vscode';
+import { commands, ExtensionContext, Uri, window } from 'vscode';
 
+import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
+import { getGenerators } from '@nx-console/collections';
+import { nxVersion } from '@nx-console/npm';
+import { GeneratorType, Option, OptionType } from '@nx-console/schema';
+import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   findProjectWithPath,
-  nxVersion,
   nxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
-import { GeneratorType, Option, OptionType } from '@nx-console/schema';
-import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { selectGenerator } from './select-generator';
-import { getGenerators } from '@nx-console/server';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -75,8 +75,8 @@ export function registerCliTaskCommands(
     /**
      * move and remove were release in patch 8.11
      */
-    const version = await nxVersion();
-    if (version && version >= 8) {
+    const version = await nxVersion(cliTaskProvider.getWorkspacePath());
+    if (version >= 8) {
       commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
         /**
          * Bit of a hack - always runs angular/move if it is installed.

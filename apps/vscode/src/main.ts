@@ -21,12 +21,10 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
-  getGenerators,
   teardownTelemetry,
   watchFile,
-  fileExists,
   checkIsNxWorkspace,
-} from '@nx-console/server';
+} from '@nx-console/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -47,10 +45,6 @@ import {
 } from '@nx-console/vscode/nx-project-view';
 import { environment } from './environments/environment';
 
-import {
-  WorkspaceJsonSchema,
-  ProjectJsonSchema,
-} from '@nx-console/vscode/json-schema';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
 import {
@@ -58,6 +52,10 @@ import {
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
 import { projectGraph } from '@nx-console/vscode/project-graph';
+import { fileExists } from '@nx-console/file-system';
+import { getGenerators } from '@nx-console/collections';
+import { nxVersion } from '@nx-console/npm';
+import { configureLspClient } from '@nx-console/vscode/lsp-client';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -118,7 +116,8 @@ export async function activate(c: ExtensionContext) {
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand,
       refreshWorkspace(),
-      projectGraph()
+      projectGraph(),
+      await configureLspClient(context)
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
@@ -127,8 +126,6 @@ export async function activate(c: ExtensionContext) {
       '@nx-console/vscode/nx-workspace'
     );
     new WorkspaceCodeLensProvider(context);
-    new WorkspaceJsonSchema(context);
-    new ProjectJsonSchema(context);
 
     NxConversion.createInstance(context);
 
@@ -268,10 +265,11 @@ async function setWorkspace(workspacePath: string) {
     workspaceType = 'angular';
   }
 
-  const { nxVersion } = await import('@nx-console/vscode/nx-workspace');
-
   WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
-  WorkspaceConfigurationStore.instance.set('nxVersion', await nxVersion());
+  WorkspaceConfigurationStore.instance.set(
+    'nxVersion',
+    await nxVersion(workspacePath)
+  );
 
   getTelemetry().record('WorkspaceType', { workspaceType });
 }

@@ -3,13 +3,13 @@ import type {
   ProjectGraph,
   ProjectsConfigurations,
 } from '@nrwl/devkit';
-import { readAndCacheJsonFile } from '@nx-console/server';
 import { join } from 'path';
 import {
   getNxProjectGraph,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
-import { nxVersion } from './nx-version';
+import { readAndCacheJsonFile } from '@nx-console/file-system';
+import { nxVersion } from '@nx-console/npm';
 
 export type NxWorkspaceConfiguration = ProjectsConfigurations &
   NxJsonConfiguration;
@@ -24,17 +24,17 @@ export type NxWorkspaceConfiguration = ProjectsConfigurations &
  *
  */
 export async function getNxWorkspaceConfig(
-  basedir: string,
+  workspacePath: string,
   format: 'nx' | 'angularCli',
   isNxWorkspace: boolean
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
   configPath: string;
 }> {
-  const version = await nxVersion();
+  const version = await nxVersion(workspacePath);
 
   if (version < 12) {
-    return readWorkspaceConfigs(format, basedir);
+    return readWorkspaceConfigs(format, workspacePath);
   }
 
   try {
@@ -48,11 +48,12 @@ export async function getNxWorkspaceConfig(
     try {
       workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
         format,
-        path: basedir,
+        path: workspacePath,
       });
     } catch {
-      workspaceConfiguration = (await readWorkspaceConfigs(format, basedir))
-        .workspaceConfiguration;
+      workspaceConfiguration = (
+        await readWorkspaceConfigs(format, workspacePath)
+      ).workspaceConfiguration;
     }
 
     let projectGraph: ProjectGraph | null = null;
@@ -74,10 +75,10 @@ export async function getNxWorkspaceConfig(
 
     return {
       workspaceConfiguration,
-      configPath: join(basedir, configFile),
+      configPath: join(workspacePath, configFile),
     };
   } catch (e) {
-    return readWorkspaceConfigs(format, basedir);
+    return readWorkspaceConfigs(format, workspacePath);
   }
 }
 

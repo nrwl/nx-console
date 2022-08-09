@@ -1,0 +1,64 @@
+{
+  "sourceRoot": "apps/nxls/src",
+  "projectType": "application",
+  "targets": {
+    "watch": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/vscode/nxls",
+        "main": "apps/nxls/src/main.ts",
+        "tsConfig": "apps/nxls/tsconfig.app.json",
+        "assets": ["apps/nxls/src/assets"],
+        "watch": true
+      }
+    },
+    "package": {
+      "executor": "@nrwl/node:webpack",
+      "options": {
+        "main": "apps/nxls/src/main.ts",
+        "tsConfig": "apps/nxls/tsconfig.app.json",
+        "outputPath": "dist/packages/nxls",
+        "assets": ["apps/nxls/src/bin"],
+        "generatePackageJson": true,
+        "externalDependencies": "all",
+        "optimization": true,
+        "extractLicenses": true
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["dist/apps/vscode/nxls"],
+      "options": {
+        "commands": [
+          "export NODE_OPTIONS=--max-old-space-size=4096 && yarn rollup -c ./apps/nxls/rollup.config.ts"
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/nxls/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/nxls"],
+      "options": {
+        "jestConfig": "apps/nxls/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "semantic-release": {
+      "executor": "@theunderscorer/nx-semantic-release:semantic-release",
+      "options": {
+        "buildTarget": "nxls:package",
+        "outputPath": "dist/packages/nxls",
+        "packageJsonDir": "apps/nxls",
+        "ci": false
+      }
+    }
+  },
+  "tags": []
+}
