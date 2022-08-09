@@ -3,6 +3,15 @@
   "version": "0.0.1",
   "main": "main.js",
   "bin": "bin/nxls",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nrwl/nx-console.git"
+  },
+  "author": {
+    "name": "Narwhal Technologies Inc",
+    "email": "hello@nrwl.io"
+  },
   "dependencies": {
     "@nrwl/devkit": "14.4.1"
   }

@@ -30,7 +30,9 @@
       "executor": "nx:run-commands",
       "outputs": ["dist/apps/vscode/nxls"],
       "options": {
-        "commands": ["yarn rollup -c ./apps/nxls/rollup.config.ts"]
+        "commands": [
+          "export NODE_OPTIONS=--max-old-space-size=4096 && yarn rollup -c ./apps/nxls/rollup.config.ts"
+        ]
       }
     },
     "lint": {
@@ -46,6 +48,15 @@
       "options": {
         "jestConfig": "apps/nxls/jest.config.ts",
         "passWithNoTests": true
+      }
+    },
+    "semantic-release": {
+      "executor": "@theunderscorer/nx-semantic-release:semantic-release",
+      "options": {
+        "buildTarget": "nxls:package",
+        "outputPath": "dist/packages/nxls",
+        "packageJsonDir": "apps/nxls",
+        "ci": false
       }
     }
   },
