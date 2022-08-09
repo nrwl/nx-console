@@ -9,9 +9,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "nx": "nx",
+    "nx": "export NODE_OPTIONS=--max-old-space-size=409 && nx",
     "watch": "nx watch-all vscode",
-    "package": "export NODE_OPTIONS=--max-old-space-size=4096 && nx package vscode",
+    "package": "nx package vscode",
     "release": "standard-version",
     "update": "nx migrate latest"
   },
