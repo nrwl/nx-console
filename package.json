@@ -65,6 +65,7 @@
     "@storybook/core-server": "6.5.9",
     "@storybook/manager-webpack5": "6.5.9",
     "@swc-node/register": "^1.5.1",
+    "@theunderscorer/nx-semantic-release": "^1.14.0",
     "@types/find-cache-dir": "^3.2.1",
     "@types/jest": "27.4.1",
     "@types/node": "18.0.0",

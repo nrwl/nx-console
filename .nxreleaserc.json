@@ -1,0 +1,7 @@
+{
+  "changelog": true,
+  "npm": true,
+  "github": false,
+  "repositoryUrl": "https://github.com/nrwl/nx-console",
+  "branches": ["master"]
+}
