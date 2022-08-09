@@ -53,28 +53,32 @@ connection.onInitialize(async (params) => {
     clientCapabilities: params.capabilities,
   });
 
-  // get schemas
-  const collections = await getExecutors(
-    workspacePath ?? params.rootPath,
-    projects,
-    false
-  );
-  const workspaceSchema = getWorkspaceJsonSchema(collections);
-  const projectSchema = getProjectJsonSchema(collections);
-  languageService.configure({
-    schemas: [
-      {
-        uri: 'nx://schemas/workspace',
-        fileMatch: ['**/workspace.json', '**/angular.json'],
-        schema: workspaceSchema,
-      },
-      {
-        uri: 'nx://schemas/project',
-        fileMatch: ['**/project.json'],
-        schema: projectSchema,
-      },
-    ],
-  });
+  try {
+    // get schemas
+    const collections = await getExecutors(
+      workspacePath ?? params.rootPath,
+      projects,
+      false
+    );
+    const workspaceSchema = getWorkspaceJsonSchema(collections);
+    const projectSchema = getProjectJsonSchema(collections);
+    languageService.configure({
+      schemas: [
+        {
+          uri: 'nx://schemas/workspace',
+          fileMatch: ['**/workspace.json', '**/angular.json'],
+          schema: workspaceSchema,
+        },
+        {
+          uri: 'nx://schemas/project',
+          fileMatch: ['**/project.json'],
+          schema: projectSchema,
+        },
+      ],
+    });
+  } catch (e) {
+    connection.console.log('Unable to get Nx info: ' + e.toString());
+  }
 
   const result: InitializeResult = {
     capabilities: {
