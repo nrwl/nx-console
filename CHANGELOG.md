@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.20.0](https://github.com/nrwl/nx-console/compare/v17.19.1...v17.20.0) (2022-08-10)
+
+
+### Features
+
+* nx lsp ([#1316](https://github.com/nrwl/nx-console/issues/1316)) ([ab8031c](https://github.com/nrwl/nx-console/commits/ab8031c0711ce18cfb8d91c82321b9ca2f3d7f94))
+
+
+### Bug Fixes
+
+* do not include workspace deps in project view ([#1321](https://github.com/nrwl/nx-console/issues/1321)) ([09c97b8](https://github.com/nrwl/nx-console/commits/09c97b88a6f3e83206151fc4c0423bc481af05a5))
+* x-dropdown options populate projects properly ([#1322](https://github.com/nrwl/nx-console/issues/1322)) ([9164f09](https://github.com/nrwl/nx-console/commits/9164f09f2d17a51bb6b5c232abd373e3b46becfc))
+* **nxls:** catch errors if not in a workspace with node_modules ([1da4886](https://github.com/nrwl/nx-console/commits/1da4886a1e8e629b44c2d18a0bc1322b0a6d55d8))
+
 ### [17.19.1](https://github.com/nrwl/nx-console/compare/v17.19.0...v17.19.1) (2022-08-02)
 
 
