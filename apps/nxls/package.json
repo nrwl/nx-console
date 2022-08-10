@@ -4,6 +4,7 @@
   "main": "main.js",
   "bin": "bin/nxls",
   "license": "MIT",
+  "readme": "README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"

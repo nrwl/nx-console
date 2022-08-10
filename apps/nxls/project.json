@@ -19,7 +19,14 @@
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
         "outputPath": "dist/packages/nxls",
-        "assets": ["apps/nxls/src/bin"],
+        "assets": [
+          "apps/nxls/src/bin",
+          {
+            "glob": "README.md",
+            "input": "./",
+            "output": "/"
+          }
+        ],
         "generatePackageJson": true,
         "externalDependencies": "all",
         "optimization": true,
