@@ -126,6 +126,13 @@ function addProjectTargets(
     const workspaceProject = workspaceConfiguration.projects[projectName];
 
     if (!workspaceProject) {
+      // Certain versions of Nx will include npm, (or other third party dependencies) in the project graph nodes.
+      // These usually start with `npm:depname`
+      // We dont want to include them.
+      if (projectName.match(/:/)) {
+        continue;
+      }
+
       workspaceConfiguration.projects[projectName] = {
         root: node.data.root,
         targets: node.data.targets ?? {},
