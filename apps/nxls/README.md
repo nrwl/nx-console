@@ -18,7 +18,7 @@ You should be able to configure the nxls using [nvim-lspconfig](https://github.c
 
 ## Implementations
 
-- `onCodeComplete`
+- `onCompletion`
 
   - Provides completion results within `project.json`, and `workspace.json` files.
   - Lists installed executors when writing out new targets for a project.
