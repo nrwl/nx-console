@@ -316,10 +316,32 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
           return null;
         });
       }
+
+      const contextDefaultValue = (
+        schema: Option,
+        contextValues?: typeof architect['contextValues']
+      ): string | undefined => {
+        function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
+          return key in obj;
+        }
+
+        if (!contextValues) {
+          return;
+        }
+
+        if (schema['x-dropdown'] === 'projects') {
+          return contextValues['projectName'];
+        } else if (hasKey(contextValues, schema.name)) {
+          return contextValues[schema.name];
+        } else {
+          return undefined;
+        }
+      };
+
       taskExecForm.addControl(
         schema.name,
         new UntypedFormControl(
-          (architect.contextValues && architect.contextValues[schema.name]) ||
+          contextDefaultValue(schema, architect.contextValues) ||
             defaultValues[schema.name],
           validators
         )
@@ -500,7 +522,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     return Array.from(args);
   }
 
-  copyCommandToClipboard(form: UntypedFormGroup, architect: TaskExecutionSchema) {
+  copyCommandToClipboard(
+    form: UntypedFormGroup,
+    architect: TaskExecutionSchema
+  ) {
     const configuration = form.get('configuration')?.value;
     this.clipboard.copy(
       `${formatTask(architect, configuration)} ${this.serializeArgs(

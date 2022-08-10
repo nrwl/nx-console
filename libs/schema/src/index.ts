@@ -66,7 +66,12 @@ export interface TaskExecutionSchema {
   description: string;
   configurations?: TargetConfiguration[];
   options: Option[];
-  contextValues?: Record<string, string | number | boolean | undefined>;
+  contextValues?: {
+    path?: string;
+    directory?: string;
+    project?: string;
+    projectName?: string;
+  };
 }
 
 export interface CollectionInfo {
