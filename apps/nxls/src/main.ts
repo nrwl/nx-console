@@ -54,12 +54,12 @@ connection.onInitialize(async (params) => {
   });
 
   try {
+    const workingPath =
+      workspacePath ??
+      params.rootPath ??
+      URI.parse(params.rootUri ?? '').fsPath;
     // get schemas
-    const collections = await getExecutors(
-      workspacePath ?? params.rootPath,
-      projects,
-      false
-    );
+    const collections = await getExecutors(workingPath, projects, false);
     const workspaceSchema = getWorkspaceJsonSchema(collections);
     const projectSchema = getProjectJsonSchema(collections);
     languageService.configure({
