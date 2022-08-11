@@ -4,7 +4,6 @@
 ### Bug Fixes
 
 * **nxls:** get the working path from rootUri ([cf56f10](https://github.com/nrwl/nx-console/commit/cf56f10b8df09ecb08dea3fe9ef29b059f74bae2))
-* x-dropdown options populate projects properly ([#1322](https://github.com/nrwl/nx-console/issues/1322)) ([9164f09](https://github.com/nrwl/nx-console/commit/9164f09f2d17a51bb6b5c232abd373e3b46becfc))
 
 ## [1.0.1](https://github.com/nrwl/nx-console/compare/nxls-v1.0.0...nxls-v1.0.1) (2022-08-09)
 
