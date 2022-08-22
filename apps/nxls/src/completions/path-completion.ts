@@ -95,6 +95,7 @@ async function pathCompletion(
 
   const files = await fastGlob([workingPath + '/**/' + glob], {
     ignore: ['**/node_modules/**'],
+    dot: true,
     onlyFiles: searchType === 'file',
     onlyDirectories: searchType === 'directory',
     objectMode: true,
