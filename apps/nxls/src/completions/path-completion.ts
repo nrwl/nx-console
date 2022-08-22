@@ -3,22 +3,21 @@ import {
   ASTNode,
   CompletionItem,
   CompletionItemKind,
-  CompletionList,
   JSONSchema,
   TextDocument,
 } from 'vscode-json-languageservice';
-import {
-  isObjectNode,
-  isPropertyNode,
-  isStringNode,
-} from '../utils/node-types';
 import {
   CompletionType,
   hasCompletionGlob,
   hasCompletionType,
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
-} from '../utils/completion-type';
+} from '@nx-console/json-schema';
+import {
+  isObjectNode,
+  isPropertyNode,
+  isStringNode,
+} from '../utils/node-types';
 
 export async function getPathCompletionItems(
   workingPath: string | undefined,
@@ -34,18 +33,18 @@ export async function getPathCompletionItems(
 
   const pathItems = async (
     completion: CompletionType,
-    glob: string
+    glob?: string
   ): Promise<CompletionItem[]> => {
     switch (completion) {
       case 'file': {
         return pathCompletion(workingPath, node, document, {
-          glob,
+          glob: glob ?? '**/*.*',
           searchType: 'file',
         });
       }
       case 'directory': {
         return pathCompletion(workingPath, node, document, {
-          glob,
+          glob: glob ?? '*',
           searchType: 'directory',
         });
       }
@@ -57,12 +56,11 @@ export async function getPathCompletionItems(
 
   if (hasCompletionType(schema)) {
     const completion = schema[X_COMPLETION_TYPE];
-    let glob = '**/*.*';
     if (hasCompletionGlob(schema)) {
-      glob = schema[X_COMPLETION_GLOB];
+      return pathItems(completion, schema[X_COMPLETION_GLOB]);
     }
 
-    return pathItems(completion, glob);
+    return pathItems(completion);
   } else {
     return [];
   }
@@ -73,9 +71,9 @@ async function pathCompletion(
   node: ASTNode,
   document: TextDocument,
   options?: {
-    glob?: string;
-    supportsInterpolation?: boolean;
+    glob: string;
     searchType: 'file' | 'directory';
+    supportsInterpolation?: boolean;
   }
 ): Promise<CompletionItem[]> {
   const items: CompletionItem[] = [];
@@ -85,8 +83,6 @@ async function pathCompletion(
   }
 
   const { supportsInterpolation, glob, searchType } = {
-    glob: '**/*.*',
-    searchType: 'file',
     supportsInterpolation: false,
     ...options,
   };

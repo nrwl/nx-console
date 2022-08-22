@@ -17,8 +17,3 @@ export function hasCompletionGlob(
 ): schema is JSONSchema & { [X_COMPLETION_GLOB]: string } {
   return hasKey(schema, X_COMPLETION_GLOB);
 }
-
-const t: JSONSchema = {
-  type: 'string',
-  enum: ['file', 'directory', 'target'],
-};
