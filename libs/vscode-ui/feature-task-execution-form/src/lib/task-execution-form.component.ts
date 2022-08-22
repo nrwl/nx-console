@@ -48,6 +48,7 @@ import {
   OptionType,
   Option,
 } from '@nx-console/schema';
+import { hasKey } from '@nx-console/utils/shared';
 
 declare global {
   interface Window {
@@ -321,10 +322,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         schema: Option,
         contextValues?: typeof architect['contextValues']
       ): string | undefined => {
-        function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
-          return key in obj;
-        }
-
         if (!contextValues) {
           return;
         }
