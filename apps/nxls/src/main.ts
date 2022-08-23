@@ -19,7 +19,7 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { getPathCompletionItems } from './completions/path-completion';
+import { getCompletionItems } from './completions';
 import { getLanguageModelCache } from './utils/language-model-cache';
 import { getSchemaRequestService } from './utils/runtime';
 import { mergeArrays } from './utils/merge-arrays';
@@ -127,7 +127,7 @@ connection.onCompletion(async (completionParams) => {
   const schemas = await languageService.getMatchingSchemas(document, jsonAst);
   for (const s of schemas) {
     if (s.node === node) {
-      const pathItems = await getPathCompletionItems(
+      const pathItems = await getCompletionItems(
         WORKING_PATH,
         s.schema,
         node,

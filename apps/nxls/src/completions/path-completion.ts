@@ -3,70 +3,15 @@ import {
   ASTNode,
   CompletionItem,
   CompletionItemKind,
-  JSONSchema,
   TextDocument,
 } from 'vscode-json-languageservice';
-import {
-  CompletionType,
-  hasCompletionGlob,
-  hasCompletionType,
-  X_COMPLETION_GLOB,
-  X_COMPLETION_TYPE,
-} from '@nx-console/json-schema';
 import {
   isObjectNode,
   isPropertyNode,
   isStringNode,
 } from '../utils/node-types';
 
-export async function getPathCompletionItems(
-  workingPath: string | undefined,
-  schema: JSONSchema,
-  node: ASTNode,
-  document: TextDocument
-): Promise<CompletionItem[]> {
-  const items: Array<CompletionItem> = [];
-
-  if (!workingPath) {
-    return items;
-  }
-
-  const pathItems = async (
-    completion: CompletionType,
-    glob?: string
-  ): Promise<CompletionItem[]> => {
-    switch (completion) {
-      case 'file': {
-        return pathCompletion(workingPath, node, document, {
-          glob: glob ?? '**/*.*',
-          searchType: 'file',
-        });
-      }
-      case 'directory': {
-        return pathCompletion(workingPath, node, document, {
-          glob: glob ?? '*',
-          searchType: 'directory',
-        });
-      }
-      default: {
-        return [];
-      }
-    }
-  };
-
-  if (hasCompletionType(schema)) {
-    const completion = schema[X_COMPLETION_TYPE];
-    if (hasCompletionGlob(schema)) {
-      return pathItems(completion, schema[X_COMPLETION_GLOB]);
-    }
-
-    return pathItems(completion);
-  } else {
-    return [];
-  }
-}
-
-async function pathCompletion(
+export async function pathCompletion(
   workingPath: string | undefined,
   node: ASTNode,
   document: TextDocument,
@@ -136,7 +81,11 @@ function findProjectRoot(node: ASTNode): string {
   if (isObjectNode(node)) {
     for (const child of node.children) {
       if (isPropertyNode(child)) {
-        if (child.keyNode.value === 'root' && isStringNode(child.valueNode)) {
+        if (
+          (child.keyNode.value === 'root' ||
+            child.keyNode.value === 'sourceRoot') &&
+          isStringNode(child.valueNode)
+        ) {
           return child.valueNode?.value;
         }
       }
