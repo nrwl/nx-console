@@ -1,6 +1,11 @@
 import { CollectionInfo } from '@nx-console/schema';
-import { JSONSchema } from 'vscode-json-languageservice';
+import type { JSONSchema } from 'vscode-json-languageservice';
 import { createBuildersAndExecutorsSchema } from './create-builders-and-executors-schema';
+import {
+  CompletionType,
+  X_COMPLETION_GLOB,
+  X_COMPLETION_TYPE,
+} from './completion-type';
 
 export function getProjectJsonSchema(collections: CollectionInfo[]) {
   const [, executors] = createBuildersAndExecutorsSchema(collections);
@@ -8,14 +13,34 @@ export function getProjectJsonSchema(collections: CollectionInfo[]) {
   return contents;
 }
 
-function createJsonSchema(executors: JSONSchema[]): JSONSchema {
+interface EnhancedJsonSchema extends JSONSchema {
+  [X_COMPLETION_TYPE]?: CompletionType;
+  [X_COMPLETION_GLOB]?: string;
+}
+
+function createJsonSchema(executors: JSONSchema[]): EnhancedJsonSchema {
   return {
     type: 'object',
     properties: {
+      root: {
+        type: 'string',
+        'x-completion-type': 'directory',
+      } as EnhancedJsonSchema,
+      sourceRoot: {
+        type: 'string',
+        'x-completion-type': 'directory',
+      } as EnhancedJsonSchema,
       targets: {
         additionalProperties: {
           type: 'object',
           properties: {
+            outputs: {
+              type: 'array',
+              items: {
+                type: 'string',
+                'x-completion-type': 'directory',
+              } as EnhancedJsonSchema,
+            },
             executor: {
               type: 'string',
             },

@@ -47,6 +47,7 @@
       "request": "attach",
       "name": "Attach to LSP Server",
       "port": 6009,
+      "timeout": 30000,
       "restart": true,
       "sourceMaps": true,
       "skipFiles": [

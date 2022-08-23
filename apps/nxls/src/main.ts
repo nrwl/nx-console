@@ -7,6 +7,7 @@ import {
 } from '@nx-console/json-schema';
 import {
   ClientCapabilities,
+  CompletionList,
   getLanguageService,
   TextDocument,
 } from 'vscode-json-languageservice';
@@ -18,8 +19,12 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { getLanguageModelCache } from './languageModelCache';
-import { getSchemaRequestService } from './runtime';
+import { getCompletionItems } from './completions';
+import { getLanguageModelCache } from './utils/language-model-cache';
+import { getSchemaRequestService } from './utils/runtime';
+import { mergeArrays } from './utils/merge-arrays';
+
+let WORKING_PATH: string | undefined = undefined;
 
 const workspaceContext = {
   resolveRelativePath: (relativePath: string, resource: string) => {
@@ -54,12 +59,16 @@ connection.onInitialize(async (params) => {
   });
 
   try {
-    const workingPath =
+    WORKING_PATH =
       workspacePath ??
       params.rootPath ??
       URI.parse(params.rootUri ?? '').fsPath;
-    // get schemas
-    const collections = await getExecutors(workingPath, projects, false);
+
+    if (!WORKING_PATH) {
+      throw 'Unable to determine workspace path';
+    }
+
+    const collections = await getExecutors(WORKING_PATH, projects, false);
     const workspaceSchema = getWorkspaceJsonSchema(collections);
     const projectSchema = getProjectJsonSchema(collections);
     languageService.configure({
@@ -101,11 +110,35 @@ connection.onCompletion(async (completionParams) => {
   }
 
   const { jsonAst, document } = getJsonDocument(changedDocument);
-  return languageService.doComplete(
-    document,
-    completionParams.position,
-    jsonAst
-  );
+
+  const completionResults =
+    (await languageService.doComplete(
+      document,
+      completionParams.position,
+      jsonAst
+    )) ?? CompletionList.create([]);
+
+  const offset = document.offsetAt(completionParams.position);
+  const node = jsonAst.getNodeFromOffset(offset);
+  if (!node) {
+    return completionResults;
+  }
+
+  const schemas = await languageService.getMatchingSchemas(document, jsonAst);
+  for (const s of schemas) {
+    if (s.node === node) {
+      const pathItems = await getCompletionItems(
+        WORKING_PATH,
+        s.schema,
+        node,
+        document
+      );
+      mergeArrays(completionResults.items, pathItems);
+      break;
+    }
+  }
+
+  return completionResults;
 });
 
 connection.onHover(async (hoverParams) => {
