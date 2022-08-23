@@ -20,13 +20,30 @@ export async function getCompletionItems(
   node: ASTNode,
   document: TextDocument
 ): Promise<CompletionItem[]> {
-  const items: Array<CompletionItem> = [];
-
   if (!workingPath) {
-    return items;
+    return [];
   }
 
-  const completionItems = async (
+  const items = completionItems(workingPath, node, document);
+
+  if (hasCompletionType(schema)) {
+    const completion = schema[X_COMPLETION_TYPE];
+    if (hasCompletionGlob(schema)) {
+      return items(completion, schema[X_COMPLETION_GLOB]);
+    }
+
+    return items(completion);
+  } else {
+    return [];
+  }
+}
+
+function completionItems(
+  workingPath: string,
+  node: ASTNode,
+  document: TextDocument
+) {
+  return async (
     completion: CompletionType,
     glob?: string
   ): Promise<CompletionItem[]> => {
@@ -51,15 +68,4 @@ export async function getCompletionItems(
       }
     }
   };
-
-  if (hasCompletionType(schema)) {
-    const completion = schema[X_COMPLETION_TYPE];
-    if (hasCompletionGlob(schema)) {
-      return completionItems(completion, schema[X_COMPLETION_GLOB]);
-    }
-
-    return completionItems(completion);
-  } else {
-    return [];
-  }
 }
