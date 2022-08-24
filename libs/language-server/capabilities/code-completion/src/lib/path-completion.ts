@@ -1,3 +1,7 @@
+import {
+  findProjectRoot,
+  isStringNode,
+} from '@nx-console/language-server/utils';
 import fastGlob from 'fast-glob';
 import {
   ASTNode,
@@ -5,8 +9,6 @@ import {
   CompletionItemKind,
   TextDocument,
 } from 'vscode-json-languageservice';
-import { isStringNode } from '../../utils/node-types';
-import { findProjectRoot } from '../../utils/find-project-root';
 
 export async function pathCompletion(
   workingPath: string | undefined,

@@ -24,6 +24,15 @@
       "@nx-console/collections": ["libs/collections/src/index.ts"],
       "@nx-console/file-system": ["libs/file-system/src/index.ts"],
       "@nx-console/json-schema": ["libs/json-schema/src/index.ts"],
+      "@nx-console/language-server/capabilities/code-completion": [
+        "libs/language-server/capabilities/code-completion/src/index.ts"
+      ],
+      "@nx-console/language-server/capabilities/document-links": [
+        "libs/language-server/capabilities/document-links/src/index.ts"
+      ],
+      "@nx-console/language-server/utils": [
+        "libs/language-server/utils/src/index.ts"
+      ],
       "@nx-console/npm": ["libs/npm/src/index.ts"],
       "@nx-console/schema": ["libs/schema/src/index.ts"],
       "@nx-console/schema/normalize": ["libs/schema/src/normalize-schema.ts"],

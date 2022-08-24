@@ -1,17 +1,13 @@
 import { fileExists } from '@nx-console/file-system';
-import {
-  hasCompletionGlob,
-  hasCompletionType,
-  X_COMPLETION_TYPE,
-} from '@nx-console/json-schema';
+import { hasCompletionType, X_COMPLETION_TYPE } from '@nx-console/json-schema';
+import { findProjectRoot } from '@nx-console/language-server/utils';
 import {
   DocumentLink,
   JSONDocument,
   MatchingSchema,
-  TextDocument,
   Range,
+  TextDocument,
 } from 'vscode-json-languageservice';
-import { findProjectRoot } from '../../utils/find-project-root';
 
 export async function getDocumentLinks(
   workingPath: string | undefined,

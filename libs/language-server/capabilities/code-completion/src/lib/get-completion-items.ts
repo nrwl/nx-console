@@ -1,19 +1,18 @@
 import {
-  ASTNode,
-  CompletionItem,
-  JSONDocument,
-  JSONSchema,
-  MatchingSchema,
-  Position,
-  TextDocument,
-} from 'vscode-json-languageservice';
-import {
   CompletionType,
   hasCompletionGlob,
   hasCompletionType,
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
 } from '@nx-console/json-schema';
+import {
+  ASTNode,
+  CompletionItem,
+  JSONDocument,
+  MatchingSchema,
+  Position,
+  TextDocument,
+} from 'vscode-json-languageservice';
 import { pathCompletion } from './path-completion';
 import { targetCompletion } from './target-completion';
 

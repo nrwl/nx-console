@@ -6,6 +6,11 @@ import {
   getWorkspaceJsonSchema,
 } from '@nx-console/json-schema';
 import {
+  getLanguageModelCache,
+  getSchemaRequestService,
+  mergeArrays,
+} from '@nx-console/language-server/utils';
+import {
   ClientCapabilities,
   CompletionList,
   getLanguageService,
@@ -20,9 +25,6 @@ import {
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 import { getCompletionItems, getDocumentLinks } from './capabilities';
-import { getLanguageModelCache } from './utils/language-model-cache';
-import { getSchemaRequestService } from './utils/runtime';
-import { mergeArrays } from './utils/merge-arrays';
 
 let WORKING_PATH: string | undefined = undefined;
 
