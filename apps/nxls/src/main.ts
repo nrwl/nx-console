@@ -5,6 +5,8 @@ import {
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
 } from '@nx-console/json-schema';
+import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
+import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
   getLanguageModelCache,
   getSchemaRequestService,
@@ -24,7 +26,6 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { getCompletionItems, getDocumentLinks } from './capabilities';
 
 let WORKING_PATH: string | undefined = undefined;
 

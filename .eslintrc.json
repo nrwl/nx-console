@@ -15,6 +15,11 @@
               {
                 "sourceTag": "*",
                 "onlyDependOnLibsWithTags": ["*"]
+              },
+              {
+                "sourceTag": "type:lsp",
+                "onlyDependOnLibsWithTags": ["type:lsp", "type:shared-utils"],
+                "bannedExternalImports": ["vscode"]
               }
             ]
           }
