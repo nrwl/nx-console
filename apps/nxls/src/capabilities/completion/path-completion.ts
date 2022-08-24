@@ -5,11 +5,8 @@ import {
   CompletionItemKind,
   TextDocument,
 } from 'vscode-json-languageservice';
-import {
-  isObjectNode,
-  isPropertyNode,
-  isStringNode,
-} from '../utils/node-types';
+import { isStringNode } from '../../utils/node-types';
+import { findProjectRoot } from '../../utils/find-project-root';
 
 export async function pathCompletion(
   workingPath: string | undefined,
@@ -70,33 +67,6 @@ export async function pathCompletion(
   }
 
   return items;
-}
-
-/**
- * Get the first `root` property from the current node to determine `${projectRoot}`
- * @param node
- * @returns
- */
-function findProjectRoot(node: ASTNode): string {
-  if (isObjectNode(node)) {
-    for (const child of node.children) {
-      if (isPropertyNode(child)) {
-        if (
-          (child.keyNode.value === 'root' ||
-            child.keyNode.value === 'sourceRoot') &&
-          isStringNode(child.valueNode)
-        ) {
-          return child.valueNode?.value;
-        }
-      }
-    }
-  }
-
-  if (node.parent) {
-    return findProjectRoot(node.parent);
-  }
-
-  return '';
 }
 
 function addCompletionPathItem(
