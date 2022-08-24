@@ -19,7 +19,7 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { getCompletionItems } from './completions';
+import { getCompletionItems, getDocumentLinks } from './capabilities';
 import { getLanguageModelCache } from './utils/language-model-cache';
 import { getSchemaRequestService } from './utils/runtime';
 import { mergeArrays } from './utils/merge-arrays';
@@ -97,6 +97,10 @@ connection.onInitialize(async (params) => {
         triggerCharacters: ['"', ':'],
       },
       hoverProvider: true,
+      documentLinkProvider: {
+        resolveProvider: false,
+        workDoneProgress: false,
+      },
     },
   };
 
@@ -118,25 +122,16 @@ connection.onCompletion(async (completionParams) => {
       jsonAst
     )) ?? CompletionList.create([]);
 
-  const offset = document.offsetAt(completionParams.position);
-  const node = jsonAst.getNodeFromOffset(offset);
-  if (!node) {
-    return completionResults;
-  }
-
   const schemas = await languageService.getMatchingSchemas(document, jsonAst);
-  for (const s of schemas) {
-    if (s.node === node) {
-      const pathItems = await getCompletionItems(
-        WORKING_PATH,
-        s.schema,
-        node,
-        document
-      );
-      mergeArrays(completionResults.items, pathItems);
-      break;
-    }
-  }
+
+  const pathItems = await getCompletionItems(
+    WORKING_PATH,
+    jsonAst,
+    document,
+    schemas,
+    completionParams.position
+  );
+  mergeArrays(completionResults.items, pathItems);
 
   return completionResults;
 });
@@ -150,6 +145,19 @@ connection.onHover(async (hoverParams) => {
 
   const { jsonAst, document } = getJsonDocument(hoverDocument);
   return languageService.doHover(document, hoverParams.position, jsonAst);
+});
+
+connection.onDocumentLinks(async (params) => {
+  const linkDocument = documents.get(params.textDocument.uri);
+
+  if (!linkDocument) {
+    return null;
+  }
+
+  const { jsonAst, document } = getJsonDocument(linkDocument);
+  const schemas = await languageService.getMatchingSchemas(document, jsonAst);
+
+  return getDocumentLinks(WORKING_PATH, jsonAst, document, schemas);
 });
 
 const jsonDocumentMapper = getLanguageModelCache(10, 60, (document) =>

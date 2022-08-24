@@ -1,7 +1,10 @@
 import {
   ASTNode,
   CompletionItem,
+  JSONDocument,
   JSONSchema,
+  MatchingSchema,
+  Position,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
@@ -16,26 +19,41 @@ import { targetCompletion } from './target-completion';
 
 export async function getCompletionItems(
   workingPath: string | undefined,
-  schema: JSONSchema,
-  node: ASTNode,
-  document: TextDocument
+  jsonAst: JSONDocument,
+  document: TextDocument,
+  schemas: MatchingSchema[],
+  position: Position
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
   }
 
-  const items = completionItems(workingPath, node, document);
-
-  if (hasCompletionType(schema)) {
-    const completion = schema[X_COMPLETION_TYPE];
-    if (hasCompletionGlob(schema)) {
-      return items(completion, schema[X_COMPLETION_GLOB]);
-    }
-
-    return items(completion);
-  } else {
+  const offset = document.offsetAt(position);
+  const node = jsonAst.getNodeFromOffset(offset);
+  if (!node) {
     return [];
   }
+
+  for (const { schema, node: schemaNode } of schemas) {
+    // Find the schema node that matches the current node
+    // If the node is found, then we will return the whole function so that we don't have to loop over the rest of the items.
+    if (schemaNode == node) {
+      const items = completionItems(workingPath, node, document);
+
+      if (hasCompletionType(schema)) {
+        const completion = schema[X_COMPLETION_TYPE];
+        if (hasCompletionGlob(schema)) {
+          return items(completion, schema[X_COMPLETION_GLOB]);
+        }
+
+        return items(completion);
+      } else {
+        return [];
+      }
+    }
+  }
+
+  return [];
 }
 
 function completionItems(
