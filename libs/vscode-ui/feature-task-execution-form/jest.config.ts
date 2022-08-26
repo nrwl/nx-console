@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default {
   displayName: 'vscode-ui-feature-task-execution-form',
 

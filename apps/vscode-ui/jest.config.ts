@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default {
   coverageDirectory: '../../coverage/apps/vscode-ui',
 
