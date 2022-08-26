@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default {
   displayName: 'vscode-nx-run-target-view',
 

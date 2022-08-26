@@ -8,10 +8,12 @@
   "sourceRoot": "apps/vscode-ui/src",
   "targets": {
     "watch": {
-      "executor": "ngx-build-plus:browser",
+      "executor": "@angular-builders/custom-webpack:browser",
       "options": {
         "watch": true,
-        "extraWebpackConfig": "apps/vscode-ui/webpack.dev.js",
+        "customWebpackConfig": {
+          "path": "apps/vscode-ui/webpack.dev.js"
+        },
         "outputPath": "dist/apps/vscode/assets/public",
         "index": "apps/vscode-ui/src/index.html",
         "main": "apps/vscode-ui/src/main.ts",
@@ -23,9 +25,11 @@
       }
     },
     "build": {
-      "executor": "ngx-build-plus:browser",
+      "executor": "@angular-builders/custom-webpack:browser",
       "options": {
-        "extraWebpackConfig": "apps/vscode-ui/webpack.dev.js",
+        "customWebpackConfig": {
+          "path": "apps/vscode-ui/webpack.dev.js"
+        },
         "outputPath": "dist/apps/vscode/assets/public",
         "index": "apps/vscode-ui/src/index.html",
         "main": "apps/vscode-ui/src/main.ts",
