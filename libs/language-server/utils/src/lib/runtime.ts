@@ -6,6 +6,7 @@ import {
 } from 'request-light';
 import { URI } from 'vscode-uri';
 import * as fs from 'fs';
+import { Thenable } from 'vscode-json-languageservice';
 
 export interface RequestService {
   getContent(uri: string): Promise<string>;

@@ -67,7 +67,7 @@ function completionItems(
     switch (completion) {
       case 'file': {
         return pathCompletion(workingPath, node, document, {
-          glob: glob ?? '**/*.*',
+          glob: glob ?? '*.*',
           searchType: 'file',
         });
       }
