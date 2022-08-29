@@ -65,7 +65,8 @@
       "options": {
         "buildTarget": "nxls:package",
         "ci": false,
-        "packageJsonDir": "apps/nxls"
+        "packageJsonDir": "apps/nxls",
+        "outputPath": "dist/packages/nxls"
       }
     }
   },
