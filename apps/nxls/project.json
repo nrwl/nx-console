@@ -64,7 +64,8 @@
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
         "buildTarget": "nxls:package",
-        "ci": false
+        "ci": false,
+        "packageJsonDir": "apps/nxls"
       }
     }
   },
