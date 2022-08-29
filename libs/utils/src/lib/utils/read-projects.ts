@@ -3,6 +3,7 @@ import {
   Option,
   DefaultValue,
   TargetConfiguration,
+  WorkspaceProjects,
 } from '@nx-console/schema';
 import * as path from 'path';
 import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
@@ -10,7 +11,7 @@ import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
 import { getPrimitiveValue } from './utils';
 import { getTelemetry } from '../telemetry';
 import { getOutputChannel } from './output-channel';
-import { workspaceDependencyPath } from '@nx-console/npm';
+import { localDependencyPath, workspaceDependencyPath } from '@nx-console/npm';
 import { readAndCacheJsonFile } from '@nx-console/file-system';
 import { normalizeSchema } from '@nx-console/schema/normalize';
 
@@ -57,11 +58,16 @@ export async function readBuilderSchema(
   basedir: string,
   builder: string,
   workspaceType: 'ng' | 'nx',
+  projects: WorkspaceProjects,
   projectDefaults?: { [name: string]: string }
 ): Promise<Option[] | undefined> {
   try {
     const [packageName, builderName] = builder.split(':');
-    const packagePath = await workspaceDependencyPath(basedir, packageName);
+    let packagePath = await workspaceDependencyPath(basedir, packageName);
+
+    if (!packagePath) {
+      packagePath = await localDependencyPath(basedir, packageName, projects);
+    }
 
     if (!packagePath) {
       return undefined;
