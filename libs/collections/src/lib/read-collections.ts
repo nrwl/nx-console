@@ -1,6 +1,7 @@
 import {
   workspaceDependencies,
   workspaceDependencyPath,
+  packageDetails,
 } from '@nx-console/npm';
 import {
   CollectionInfo,
@@ -267,13 +268,4 @@ function canUse(
 
 function collectionNameWithType(name: string, type: 'generator' | 'executor') {
   return `${name}-${type}`;
-}
-
-async function packageDetails(p: string) {
-  const { json } = await readAndCacheJsonFile(join(p, 'package.json'));
-  return {
-    packagePath: p,
-    packageName: json.name,
-    packageJson: json,
-  };
 }

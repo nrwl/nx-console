@@ -88,6 +88,7 @@ export async function verifyBuilderDefinition(
     workspacePath(),
     executorName,
     workspaceType,
+    projects,
     commandDef.options
   );
 

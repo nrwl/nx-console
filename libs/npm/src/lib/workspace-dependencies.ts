@@ -9,6 +9,7 @@ import {
 } from './pnp-dependencies';
 import { directoryExists } from '@nx-console/file-system';
 import { nxVersion } from './nx-version';
+import { packageDetails } from './package-details';
 
 /**
  * Get dependencies for the current workspace.
@@ -52,6 +53,20 @@ export async function workspaceDependencyPath(
     return (await directoryExists(path)) ? path : undefined;
   } catch {
     return;
+  }
+}
+
+export async function localDependencyPath(
+  workspacePath: string,
+  workspaceDependencyName: string,
+  projects: WorkspaceProjects
+): Promise<string | undefined> {
+  for (const project of Object.values(projects)) {
+    const projectPath = join(workspacePath, project.root);
+    const pkgDetails = await packageDetails(projectPath);
+    if (pkgDetails.packageName === workspaceDependencyName) {
+      return pkgDetails.packagePath;
+    }
   }
 }
 
