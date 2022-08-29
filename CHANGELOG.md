@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.21.0](https://github.com/nrwl/nx-console/compare/v17.20.0...v17.21.0) (2022-08-29)
+
+
+### Features
+
+* **nxls:** add document links ([#1327](https://github.com/nrwl/nx-console/issues/1327)) ([2693834](https://github.com/nrwl/nx-console/commits/269383426540c17a5783b98192a657c27aaac4c4))
+* **nxls:** path completion for files and directories ([#1326](https://github.com/nrwl/nx-console/issues/1326)) ([816a4d8](https://github.com/nrwl/nx-console/commits/816a4d8ccd518ea4227f00a4e3af1cd7d06cc3cd))
+
+
+### Bug Fixes
+
+* read builder schema for local plugins when running targets ([#1329](https://github.com/nrwl/nx-console/issues/1329)) ([7932691](https://github.com/nrwl/nx-console/commits/7932691e8e3b4cfa2e64f03c9ced2269e9d4b35d))
+* **nxls:** get the working path from rootUri ([cf56f10](https://github.com/nrwl/nx-console/commits/cf56f10b8df09ecb08dea3fe9ef29b059f74bae2))
+
 ## [17.20.0](https://github.com/nrwl/nx-console/compare/v17.19.1...v17.20.0) (2022-08-10)
 
 
