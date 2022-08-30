@@ -17,8 +17,17 @@
                 "onlyDependOnLibsWithTags": ["*"]
               },
               {
+                "sourceTag": "type:vscode",
+                "onlyDependOnLibsWithTags": ["type:shared", "type:vscode"]
+              },
+              {
                 "sourceTag": "type:lsp",
-                "onlyDependOnLibsWithTags": ["type:lsp", "type:shared-utils"],
+                "onlyDependOnLibsWithTags": ["type:lsp", "type:shared"],
+                "bannedExternalImports": ["vscode"]
+              },
+              {
+                "sourceTag": "type:shared",
+                "onlyDependOnLibsWithTags": ["type:shared"],
                 "bannedExternalImports": ["vscode"]
               }
             ]

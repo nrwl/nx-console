@@ -8,12 +8,12 @@ import {
 import * as path from 'path';
 import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
 
-import { getPrimitiveValue } from './utils';
-import { getTelemetry } from '../telemetry';
+import { getTelemetry } from './telemetry';
 import { getOutputChannel } from './output-channel';
 import { localDependencyPath, workspaceDependencyPath } from '@nx-console/npm';
 import { readAndCacheJsonFile } from '@nx-console/file-system';
 import { normalizeSchema } from '@nx-console/schema/normalize';
+import { getPrimitiveValue } from '@nx-console/utils';
 
 export function readTargetDef(
   targetName: string,

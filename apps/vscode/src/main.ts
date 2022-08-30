@@ -12,14 +12,7 @@ import {
   workspace,
 } from 'vscode';
 
-import {
-  checkIsNxWorkspace,
-  getOutputChannel,
-  getTelemetry,
-  initTelemetry,
-  teardownTelemetry,
-  watchFile,
-} from '@nx-console/utils';
+import { checkIsNxWorkspace } from '@nx-console/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -42,6 +35,13 @@ import {
   registerCliTaskCommands,
   registerNxCommands,
 } from '@nx-console/vscode/tasks';
+import {
+  getOutputChannel,
+  getTelemetry,
+  initTelemetry,
+  teardownTelemetry,
+  watchFile,
+} from '@nx-console/vscode/utils';
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import { environment } from './environments/environment';
 
@@ -288,9 +288,9 @@ async function setWorkspace(workspacePath: string) {
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {
-  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
+  const { nxWorkspace } = await import('@nx-console/workspace');
 
-  const { workspaceLayout } = await nxWorkspace();
+  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger());
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(workspacePath, workspaceLayout.appsDir),
@@ -334,9 +334,9 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
+  const { nxWorkspace } = await import('@nx-console/workspace');
 
-  const { workspaceLayout } = await nxWorkspace();
+  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger());
   const workspacePackageDirs = new Set<string>();
   workspacePackageDirs.add(workspaceLayout.appsDir);
   workspacePackageDirs.add(workspaceLayout.libsDir);

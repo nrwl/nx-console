@@ -1,4 +1,4 @@
-import { findConfig, watchFile } from '@nx-console/utils';
+import { findConfig } from '@nx-console/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -6,6 +6,7 @@ import {
 import { dirname, join } from 'path';
 import * as vscode from 'vscode';
 import { clearJsonCache, readAndCacheJsonFile } from '@nx-console/file-system';
+import { watchFile } from '@nx-console/vscode/utils';
 
 const TSCONFIG_BASE = 'tsconfig.base.json';
 const TSCONFIG_LIB = 'tsconfig.lib.json';

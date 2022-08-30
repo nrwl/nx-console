@@ -1,10 +1,7 @@
-import {
-  checkIsNxWorkspace,
-  getOutputChannel,
-  getTelemetry,
-  toWorkspaceFormat,
-} from '@nx-console/utils';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { checkIsNxWorkspace, toWorkspaceFormat } from '@nx-console/utils';
+
+import { clearJsonCache, fileExists } from '@nx-console/file-system';
+import { Logger } from '@nx-console/schema';
 import { join } from 'path';
 import {
   firstValueFrom,
@@ -15,12 +12,10 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { window } from 'vscode';
 import {
   getNxWorkspaceConfig,
   NxWorkspaceConfiguration,
 } from './get-nx-workspace-config';
-import { clearJsonCache, fileExists } from '@nx-console/file-system';
 
 interface NxWorkspace {
   validWorkspaceJson: boolean;
@@ -44,14 +39,18 @@ const enum Status {
 let cachedReplay = new ReplaySubject<NxWorkspace>();
 let status: Status = Status.not_started;
 
-export async function nxWorkspace(reset?: boolean): Promise<NxWorkspace> {
+export async function nxWorkspace(
+  workspacePath: string,
+  logger: Logger = {
+    appendLine(message) {
+      console.log(message);
+    },
+  },
+  reset?: boolean
+): Promise<NxWorkspace> {
   if (reset) {
     status = Status.not_started;
     cachedReplay = new ReplaySubject<NxWorkspace>();
-    const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
-    );
     // Clear out the workspace config path, needed for angular or older nx workspaces
     clearJsonCache('angular.json', workspacePath);
     clearJsonCache('workspace.json', workspacePath);
@@ -64,7 +63,7 @@ export async function nxWorkspace(reset?: boolean): Promise<NxWorkspace> {
         tap(() => {
           status = Status.in_progress;
         }),
-        switchMap(() => from(_workspace())),
+        switchMap(() => from(_workspace(workspacePath, logger))),
         tap((workspace) => {
           cachedReplay.next(workspace);
           status = Status.cached;
@@ -75,12 +74,10 @@ export async function nxWorkspace(reset?: boolean): Promise<NxWorkspace> {
   );
 }
 
-async function _workspace(): Promise<NxWorkspace> {
-  const workspacePath = WorkspaceConfigurationStore.instance.get(
-    'nxWorkspacePath',
-    ''
-  );
-
+async function _workspace(
+  workspacePath: string,
+  logger: Logger
+): Promise<NxWorkspace> {
   const isAngularWorkspace = await fileExists(
     join(workspacePath, 'angular.json')
   );
@@ -88,7 +85,8 @@ async function _workspace(): Promise<NxWorkspace> {
   const config = await getNxWorkspaceConfig(
     workspacePath,
     isAngularWorkspace ? 'angularCli' : 'nx',
-    isNxWorkspace
+    isNxWorkspace,
+    logger
   );
 
   const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
@@ -114,16 +112,9 @@ async function _workspace(): Promise<NxWorkspace> {
     };
   } catch (e) {
     const humanReadableError = 'Invalid workspace: ' + workspacePath;
-    window.showErrorMessage(humanReadableError, 'Show Error').then((value) => {
-      if (value) {
-        getOutputChannel().show();
-      }
-    });
-    getOutputChannel().appendLine(humanReadableError);
-
+    logger?.appendLine(humanReadableError);
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
-    getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exception(stringifiedError);
+    logger?.appendLine(stringifiedError);
 
     // Default to nx workspace
     return {

@@ -1,5 +1,5 @@
 import { dirname, join } from 'path';
-import * as vscode from 'vscode';
+import { fileExists } from '@nx-console/file-system';
 
 export async function forEachAncestorDirectory(
   directory: string,
@@ -28,8 +28,9 @@ export async function findConfig(
   return forEachAncestorDirectory(searchPath, async (ancestor) => {
     const fileName = join(ancestor, configName);
     try {
-      await vscode.workspace.fs.stat(vscode.Uri.file(fileName));
-      return fileName;
+      if (await fileExists(fileName)) {
+        return fileName;
+      }
     } catch (e) {
       return undefined;
     }

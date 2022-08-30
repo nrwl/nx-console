@@ -10,6 +10,7 @@ import {
 } from './get-nx-workspace-package';
 import { readAndCacheJsonFile } from '@nx-console/file-system';
 import { nxVersion } from '@nx-console/npm';
+import { Logger } from '@nx-console/schema';
 
 export type NxWorkspaceConfiguration = ProjectsConfigurations &
   NxJsonConfiguration;
@@ -26,7 +27,8 @@ export type NxWorkspaceConfiguration = ProjectsConfigurations &
 export async function getNxWorkspaceConfig(
   workspacePath: string,
   format: 'nx' | 'angularCli',
-  isNxWorkspace: boolean
+  isNxWorkspace: boolean,
+  logger: Logger
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
   configPath: string;
@@ -39,8 +41,8 @@ export async function getNxWorkspaceConfig(
 
   try {
     const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
-      getNxWorkspacePackageFileUtils(),
-      getNxProjectGraph(),
+      getNxWorkspacePackageFileUtils(workspacePath, logger),
+      getNxProjectGraph(workspacePath, logger),
     ]);
     const configFile = nxWorkspacePackage.workspaceFileName();
 

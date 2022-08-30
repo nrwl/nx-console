@@ -1,4 +1,5 @@
 import { OutputChannel, window } from 'vscode';
+import { Logger } from '@nx-console/schema';
 
 let _channel: OutputChannel;
 
@@ -7,4 +8,12 @@ export function getOutputChannel(): OutputChannel {
     _channel = window.createOutputChannel('Nx Console');
   }
   return _channel;
+}
+
+export function outputLogger(): Logger {
+  return {
+    appendLine(message) {
+      _channel.appendLine(message);
+    },
+  };
 }

@@ -5,15 +5,14 @@ import { getGenerators } from '@nx-console/collections';
 import { nxVersion } from '@nx-console/npm';
 import { GeneratorType, Option, OptionType } from '@nx-console/schema';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
-import {
-  findProjectWithPath,
-  nxWorkspace,
-} from '@nx-console/vscode/nx-workspace';
+import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { selectGenerator } from './select-generator';
+import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
+import { nxWorkspace } from '@nx-console/workspace';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -225,7 +224,10 @@ async function selectCliCommandAndShowUi(
     );
     return;
   }
-  const { validWorkspaceJson, configurationFilePath } = await nxWorkspace();
+  const { validWorkspaceJson, configurationFilePath } = await nxWorkspace(
+    getWorkspacePath(),
+    outputLogger()
+  );
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
@@ -258,7 +260,10 @@ async function selectCliCommandAndPromptForFlags(
   } else if (!askForFlags) {
     flags = [];
   }
-  const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace();
+  const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace(
+    getWorkspacePath(),
+    outputLogger()
+  );
 
   if (!projectName) {
     const selection = validWorkspaceJson
@@ -344,7 +349,7 @@ function surroundWithQuotesIfHasWhiteSpace(target: string): string {
 
 async function selectGeneratorAndPromptForFlags() {
   const { validWorkspaceJson, workspaceType, workspacePath } =
-    await nxWorkspace();
+    await nxWorkspace(getWorkspacePath(), outputLogger());
 
   if (!validWorkspaceJson) {
     return;
@@ -373,7 +378,7 @@ async function selectGeneratorAndPromptForFlags() {
 export async function getCliProjectFromUri(
   uri: Uri
 ): Promise<string | undefined> {
-  const project = await findProjectWithPath(uri.fsPath);
+  const project = await findProjectWithPath(uri.fsPath, getWorkspacePath());
   return project?.name;
 }
 
@@ -419,7 +424,7 @@ async function selectCliTarget(targets: string[]): Promise<string | undefined> {
 }
 
 async function getTargetNames(): Promise<string[]> {
-  const { workspace } = await nxWorkspace();
+  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger());
   const commands = Object.values(workspace.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);
@@ -432,7 +437,7 @@ async function getTargetNames(): Promise<string[]> {
 async function getProjectsWithTargetName(
   targetName: string
 ): Promise<string[]> {
-  const { workspace } = await nxWorkspace();
+  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger());
   const projects = [];
   for (const [projectName, project] of Object.entries(workspace.projects)) {
     const targets = project.targets ?? {};

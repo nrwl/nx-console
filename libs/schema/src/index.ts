@@ -120,3 +120,7 @@ export const WORKSPACE_GENERATOR_NAME_REGEX =
 export type WorkspaceProjects = ProjectsConfigurations['projects'];
 
 export type { Store } from './store';
+
+export interface Logger {
+  appendLine(message: string): void;
+}
