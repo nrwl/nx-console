@@ -6,7 +6,6 @@ import {
   outputLogger,
   readTargetDef,
 } from '@nx-console/vscode/utils';
-import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
 import {
@@ -15,7 +14,7 @@ import {
   selectCliProject,
   selectGenerator,
 } from '@nx-console/vscode/tasks';
-import { nxWorkspace } from '@nx-console/workspace';
+import { findProjectWithPath, nxWorkspace } from '@nx-console/workspace';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,

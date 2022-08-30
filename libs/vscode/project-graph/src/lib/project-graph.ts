@@ -1,5 +1,5 @@
-import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { findProjectWithPath } from '@nx-console/workspace';
 import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
