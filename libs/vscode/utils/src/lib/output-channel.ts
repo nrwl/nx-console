@@ -13,7 +13,7 @@ export function getOutputChannel(): OutputChannel {
 export function outputLogger(): Logger {
   return {
     appendLine(message) {
-      _channel.appendLine(message);
+      getOutputChannel().appendLine(message);
     },
   };
 }

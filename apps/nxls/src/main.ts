@@ -26,6 +26,7 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
+import { nxWorkspace } from '@nx-console/workspace';
 
 let WORKING_PATH: string | undefined = undefined;
 
@@ -74,6 +75,13 @@ connection.onInitialize(async (params) => {
     const collections = await getExecutors(WORKING_PATH, projects, false);
     const workspaceSchema = getWorkspaceJsonSchema(collections);
     const projectSchema = getProjectJsonSchema(collections);
+
+    const workspace = await nxWorkspace(WORKING_PATH, {
+      appendLine(message) {
+        connection.console.log(message);
+      },
+    });
+
     languageService.configure({
       schemas: [
         {
