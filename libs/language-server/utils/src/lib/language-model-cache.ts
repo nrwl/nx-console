@@ -6,6 +6,7 @@
 
 import { JSONDocument } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { getJsonLanguageService } from './json-language-service';
 
 export interface LanguageModelCache<T> {
   get(document: TextDocument): { jsonAst: T; document: TextDocument };
@@ -13,22 +14,23 @@ export interface LanguageModelCache<T> {
   dispose(): void;
 }
 
-export function getLanguageModelCache(
-  maxEntries: number,
-  cleanupIntervalTimeInSec: number,
-  parse: (document: TextDocument) => JSONDocument
-): LanguageModelCache<JSONDocument> {
-  let languageModels: {
-    [uri: string]: {
-      version: number;
-      languageId: string;
-      cTime: number;
-      languageModel: JSONDocument;
-      document: TextDocument;
-    };
-  } = {};
-  let nModels = 0;
+const parse = (document: TextDocument): JSONDocument =>
+  getJsonLanguageService().parseJSONDocument(document);
 
+let languageModels: {
+  [uri: string]: {
+    version: number;
+    languageId: string;
+    cTime: number;
+    languageModel: JSONDocument;
+    document: TextDocument;
+  };
+} = {};
+const maxEntries = 10;
+const cleanupIntervalTimeInSec = 60;
+let nModels = 0;
+
+export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
   let cleanupInterval: NodeJS.Timer | undefined = undefined;
   if (cleanupIntervalTimeInSec > 0) {
     cleanupInterval = setInterval(() => {

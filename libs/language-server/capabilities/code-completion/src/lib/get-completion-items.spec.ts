@@ -1,22 +1,23 @@
-import { getLanguageModelCache } from '@nx-console/language-server/utils';
 import { X_COMPLETION_GLOB, X_COMPLETION_TYPE } from '@nx-console/json-schema';
 import {
-  ClientCapabilities,
-  getLanguageService,
-  TextDocument,
-} from 'vscode-json-languageservice';
+  configureJsonLanguageService,
+  getJsonLanguageService,
+  getLanguageModelCache,
+} from '@nx-console/language-server/utils';
+import { vol } from 'memfs';
+import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
 import { getCompletionItems } from './get-completion-items';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('fs', () => require('memfs').fs);
-import { vol } from 'memfs';
 
-const languageservice = getLanguageService({
-  clientCapabilities: ClientCapabilities.LATEST,
-});
-const documentMapper = getLanguageModelCache(10, 60, (document) =>
-  languageservice.parseJSONDocument(document)
+configureJsonLanguageService(
+  {
+    clientCapabilities: ClientCapabilities.LATEST,
+  },
+  {}
 );
+const documentMapper = getLanguageModelCache();
 
 const { document, jsonAst } = documentMapper.get(
   TextDocument.create(
@@ -48,7 +49,7 @@ afterAll(() => {
 });
 
 it('should return all completion items without a glob', async () => {
-  const matchingSchemas = await languageservice.getMatchingSchemas(
+  const matchingSchemas = await getJsonLanguageService().getMatchingSchemas(
     document,
     jsonAst,
     {
@@ -90,7 +91,7 @@ it('should return all completion items without a glob', async () => {
 });
 
 it('should be able to use a glob', async () => {
-  const matchingSchemas = await languageservice.getMatchingSchemas(
+  const matchingSchemas = await getJsonLanguageService().getMatchingSchemas(
     document,
     jsonAst,
     {

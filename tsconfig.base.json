@@ -38,7 +38,6 @@
       "@nx-console/schema/normalize": ["libs/schema/src/normalize-schema.ts"],
       "@nx-console/typescript-plugin": ["libs/typescript-plugin/src/index.ts"],
       "@nx-console/utils": ["libs/utils/src/index.ts"],
-      "@nx-console/utils/shared": ["libs/utils/src/shared.ts"],
       "@nx-console/vscode-ui/argument-list": [
         "libs/vscode-ui/argument-list/src/index.ts"
       ],
