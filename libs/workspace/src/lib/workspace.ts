@@ -42,7 +42,7 @@ let status: Status = Status.not_started;
 export async function nxWorkspace(
   workspacePath: string,
   logger: Logger = {
-    appendLine(message) {
+    log(message) {
       console.log(message);
     },
   },
@@ -112,9 +112,9 @@ async function _workspace(
     };
   } catch (e) {
     const humanReadableError = 'Invalid workspace: ' + workspacePath;
-    logger?.appendLine(humanReadableError);
+    logger?.log(humanReadableError);
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
-    logger?.appendLine(stringifiedError);
+    logger?.log(stringifiedError);
 
     // Default to nx workspace
     return {

@@ -10,10 +10,8 @@ export function getOutputChannel(): OutputChannel {
   return _channel;
 }
 
-export function outputLogger(): Logger {
-  return {
-    appendLine(message) {
-      getOutputChannel().appendLine(message);
-    },
-  };
-}
+export const outputLogger: Logger = {
+  log(message) {
+    getOutputChannel().appendLine(message);
+  },
+};

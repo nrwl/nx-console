@@ -122,5 +122,5 @@ export type WorkspaceProjects = ProjectsConfigurations['projects'];
 export type { Store } from './store';
 
 export interface Logger {
-  appendLine(message: string): void;
+  log(message: string): void;
 }

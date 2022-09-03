@@ -225,7 +225,7 @@ async function selectCliCommandAndShowUi(
   }
   const { validWorkspaceJson, configurationFilePath } = await nxWorkspace(
     getWorkspacePath(),
-    outputLogger()
+    outputLogger
   );
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
@@ -261,7 +261,7 @@ async function selectCliCommandAndPromptForFlags(
   }
   const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace(
     getWorkspacePath(),
-    outputLogger()
+    outputLogger
   );
 
   if (!projectName) {
@@ -348,7 +348,7 @@ function surroundWithQuotesIfHasWhiteSpace(target: string): string {
 
 async function selectGeneratorAndPromptForFlags() {
   const { validWorkspaceJson, workspaceType, workspacePath } =
-    await nxWorkspace(getWorkspacePath(), outputLogger());
+    await nxWorkspace(getWorkspacePath(), outputLogger);
 
   if (!validWorkspaceJson) {
     return;
@@ -423,7 +423,7 @@ async function selectCliTarget(targets: string[]): Promise<string | undefined> {
 }
 
 async function getTargetNames(): Promise<string[]> {
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger());
+  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
   const commands = Object.values(workspace.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);
@@ -436,7 +436,7 @@ async function getTargetNames(): Promise<string[]> {
 async function getProjectsWithTargetName(
   targetName: string
 ): Promise<string[]> {
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger());
+  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
   const projects = [];
   for (const [projectName, project] of Object.entries(workspace.projects)) {
     const targets = project.targets ?? {};

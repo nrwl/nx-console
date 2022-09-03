@@ -13,7 +13,7 @@ import { nxWorkspace } from '@nx-console/workspace';
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
 
 async function readWorkspaceJsonDefaults(): Promise<any> {
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger());
+  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
 
   let defaults = workspace.generators;
 
@@ -84,7 +84,7 @@ export async function selectGenerator(
     generatorName: string;
     collectionPath: string;
   }
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger());
+  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
   const generators = await getGenerators(workspacePath, workspace.projects);
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)

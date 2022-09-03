@@ -290,7 +290,7 @@ async function setWorkspace(workspacePath: string) {
 async function setApplicationAndLibraryContext(workspacePath: string) {
   const { nxWorkspace } = await import('@nx-console/workspace');
 
-  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger());
+  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(workspacePath, workspaceLayout.appsDir),
@@ -336,7 +336,7 @@ async function registerWorkspaceFileWatcher(
 
   const { nxWorkspace } = await import('@nx-console/workspace');
 
-  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger());
+  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
   const workspacePackageDirs = new Set<string>();
   workspacePackageDirs.add(workspaceLayout.appsDir);
   workspacePackageDirs.add(workspaceLayout.libsDir);

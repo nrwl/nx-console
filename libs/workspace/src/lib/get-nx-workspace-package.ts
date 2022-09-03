@@ -89,12 +89,12 @@ async function getNxPackage<T>(
 
     const imported = __non_webpack_require__(importPath);
 
-    logger?.appendLine(`Using local Nx package at ${importPath}`);
+    logger?.log(`Using local Nx package at ${importPath}`);
 
     cache = imported;
     return imported;
   } catch (error) {
-    logger?.appendLine(
+    logger?.log(
       `Unable to load the ${importPath} dependency from the workspace. Falling back to extension dependency
 ${error}
     `

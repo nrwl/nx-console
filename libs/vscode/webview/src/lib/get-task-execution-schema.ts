@@ -29,7 +29,7 @@ export async function getTaskExecutionSchema(
     }
     const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace(
       getWorkspacePath(),
-      outputLogger()
+      outputLogger
     );
 
     if (!validWorkspaceJson) {
@@ -209,7 +209,7 @@ async function getConfigValuesFromContextMenuUri(
 
     const { workspaceLayout } = await nxWorkspace(
       getWorkspacePath(),
-      outputLogger()
+      outputLogger
     );
     const appsDir = workspaceLayout.appsDir;
     const libsDir = workspaceLayout.libsDir;

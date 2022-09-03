@@ -120,7 +120,7 @@ export class CliTaskProvider implements TaskProvider {
     if (json) {
       return json.projects;
     } else {
-      const result = await nxWorkspace(getWorkspacePath(), outputLogger());
+      const result = await nxWorkspace(getWorkspacePath(), outputLogger);
       if (!result.validWorkspaceJson || !result.workspace) {
         return {};
       } else {

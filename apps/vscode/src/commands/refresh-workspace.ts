@@ -8,7 +8,7 @@ const refresh = new Subject();
 
 refresh.pipe(debounceTime(150)).subscribe(async () => {
   const { nxWorkspace } = await import('@nx-console/workspace');
-  await nxWorkspace(getWorkspacePath(), outputLogger(), true);
+  await nxWorkspace(getWorkspacePath(), outputLogger, true);
   commands.executeCommand('nxConsole.refreshNxProjectsTree');
   commands.executeCommand('nxConsole.refreshRunTargetTree');
   commands.executeCommand('nx.graph.refresh');

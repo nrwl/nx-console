@@ -114,7 +114,7 @@ async function getTargetLink(
   const workspaceProject = workspace.projects[project];
 
   if (!workspaceProject) {
-    lspLogger.appendLine(`Could not find project ${project}`);
+    lspLogger.log(`Could not find project ${project}`);
     return;
   }
 
@@ -122,9 +122,7 @@ async function getTargetLink(
   const baseTargetProjectPath = join(baseTargetPath, 'project.json');
 
   if (!(await fileExists(baseTargetProjectPath))) {
-    lspLogger.appendLine(
-      `Could not find target project: ${baseTargetProjectPath}`
-    );
+    lspLogger.log(`Could not find target project: ${baseTargetProjectPath}`);
     return;
   }
 

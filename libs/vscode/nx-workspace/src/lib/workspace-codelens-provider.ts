@@ -73,7 +73,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     const lens: CodeLens[] = [];
 
     let projectName = '';
-    const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger());
+    const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
 
     if (document.uri.path.endsWith('project.json')) {
       for (const [key, project] of Object.entries(workspace.projects)) {
@@ -91,7 +91,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     const projectLocations = getProjectLocations(document, projectName);
     const { validWorkspaceJson, workspaceType } = await nxWorkspace(
       getWorkspacePath(),
-      outputLogger()
+      outputLogger
     );
     if (!validWorkspaceJson) {
       return;

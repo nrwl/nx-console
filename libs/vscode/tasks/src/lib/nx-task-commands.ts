@@ -48,7 +48,7 @@ export function registerNxCommands(
 async function promptForTarget(): Promise<string | undefined> {
   const { validWorkspaceJson, workspace } = await nxWorkspace(
     getWorkspacePath(),
-    outputLogger()
+    outputLogger
   );
 
   if (!validWorkspaceJson || !workspace) {
@@ -371,7 +371,7 @@ async function validProjectsForTarget(
 ): Promise<string[] | undefined> {
   const { validWorkspaceJson, workspace } = await nxWorkspace(
     getWorkspacePath(),
-    outputLogger()
+    outputLogger
   );
 
   if (!validWorkspaceJson || !workspace) {

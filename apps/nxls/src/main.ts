@@ -93,7 +93,7 @@ connection.onInitialize(async (params) => {
       }
     );
   } catch (e) {
-    lspLogger.appendLine('Unable to get Nx info: ' + e.toString());
+    lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
 
   const result: InitializeResult = {

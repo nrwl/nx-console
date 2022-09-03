@@ -12,7 +12,7 @@ export function setLspLogger(connection: Connection) {
 }
 
 export const lspLogger: Logger = {
-  appendLine(message: string, ...args: any[]) {
+  log(message: string, ...args: any[]) {
     log?.(message, ...args);
   },
 };

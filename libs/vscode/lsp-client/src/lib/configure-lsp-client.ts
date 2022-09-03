@@ -16,7 +16,7 @@ export async function configureLspClient(
 ): Promise<Disposable> {
   const { workspacePath, workspace } = await nxWorkspace(
     getWorkspacePath(),
-    outputLogger()
+    outputLogger
   );
 
   const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
