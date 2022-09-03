@@ -9,7 +9,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { getJsonLanguageService } from './json-language-service';
 
 export interface LanguageModelCache<T> {
-  get(document: TextDocument): { jsonAst: T; document: TextDocument };
+  retrieve(document: TextDocument): { jsonAst: T; document: TextDocument };
   onDocumentRemoved(document: TextDocument): void;
   dispose(): void;
 }
@@ -30,24 +30,24 @@ const maxEntries = 10;
 const cleanupIntervalTimeInSec = 60;
 let nModels = 0;
 
-export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
-  let cleanupInterval: NodeJS.Timer | undefined = undefined;
-  if (cleanupIntervalTimeInSec > 0) {
-    cleanupInterval = setInterval(() => {
-      const cutoffTime = Date.now() - cleanupIntervalTimeInSec * 1000;
-      const uris = Object.keys(languageModels);
-      for (const uri of uris) {
-        const languageModelInfo = languageModels[uri];
-        if (languageModelInfo.cTime < cutoffTime) {
-          delete languageModels[uri];
-          nModels--;
-        }
+let cleanupInterval: NodeJS.Timer | undefined = undefined;
+if (cleanupIntervalTimeInSec > 0) {
+  cleanupInterval = setInterval(() => {
+    const cutoffTime = Date.now() - cleanupIntervalTimeInSec * 1000;
+    const uris = Object.keys(languageModels);
+    for (const uri of uris) {
+      const languageModelInfo = languageModels[uri];
+      if (languageModelInfo.cTime < cutoffTime) {
+        delete languageModels[uri];
+        nModels--;
       }
-    }, cleanupIntervalTimeInSec * 1000);
-  }
+    }
+  }, cleanupIntervalTimeInSec * 1000);
+}
 
+export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
   return {
-    get(document: TextDocument): {
+    retrieve(document: TextDocument): {
       jsonAst: JSONDocument;
       document: TextDocument;
     } {

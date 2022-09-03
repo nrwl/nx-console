@@ -130,7 +130,7 @@ async function getTargetLink(
     baseTargetProjectPath
   );
 
-  const {} = getLanguageModelCache();
+  // const {} = getLanguageModelCache().retrieve();
 
   return;
 }

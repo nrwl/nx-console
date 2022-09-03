@@ -196,7 +196,7 @@ connection.onRequest('nx/workspace', async () => {
 });
 
 function getJsonDocument(document: TextDocument) {
-  return jsonDocumentMapper.get(document);
+  return jsonDocumentMapper.retrieve(document);
 }
 
 connection.listen();

@@ -20,7 +20,7 @@ export async function targetCompletion(
 
   const targetCompletion: CompletionItem[] = [];
 
-  const completionItemKind = CompletionItemKind.Reference;
+  const completionItemKind = CompletionItemKind.Field;
 
   for (const [projectName, configuration] of Object.entries(
     workspace.projects

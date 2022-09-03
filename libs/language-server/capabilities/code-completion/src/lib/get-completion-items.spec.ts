@@ -19,7 +19,7 @@ configureJsonLanguageService(
 );
 const documentMapper = getLanguageModelCache();
 
-const { document, jsonAst } = documentMapper.get(
+const { document, jsonAst } = documentMapper.retrieve(
   TextDocument.create(
     'file:///project.json',
     'json',
