@@ -16,13 +16,8 @@ import {
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
-import {
-  ClientCapabilities,
-  CompletionList,
-  getLanguageService,
-  LanguageService,
-  TextDocument,
-} from 'vscode-json-languageservice';
+import { nxWorkspace } from '@nx-console/workspace';
+import { CompletionList, TextDocument } from 'vscode-json-languageservice';
 import {
   createConnection,
   InitializeResult,
@@ -32,7 +27,6 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { nxWorkspace } from '@nx-console/workspace';
 
 let WORKING_PATH: string | undefined = undefined;
 

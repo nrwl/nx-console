@@ -39,6 +39,7 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
+  outputLogger,
   teardownTelemetry,
   watchFile,
 } from '@nx-console/vscode/utils';
