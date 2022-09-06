@@ -13,28 +13,17 @@ import {
 } from 'vscode';
 
 import {
-  CliTaskProvider,
-  registerCliTaskCommands,
-  registerNxCommands,
-} from '@nx-console/vscode/tasks';
-import {
+  checkIsNxWorkspace,
   getOutputChannel,
   getTelemetry,
   initTelemetry,
   teardownTelemetry,
   watchFile,
-  checkIsNxWorkspace,
 } from '@nx-console/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { revealWebViewPanel } from '@nx-console/vscode/webview';
-import {
-  LOCATE_YOUR_WORKSPACE,
-  RunTargetTreeItem,
-  RunTargetTreeProvider,
-} from '@nx-console/vscode/nx-run-target-view';
 import {
   NxCommandsTreeItem,
   NxCommandsTreeProvider,
@@ -43,23 +32,39 @@ import {
   NxProjectTreeItem,
   NxProjectTreeProvider,
 } from '@nx-console/vscode/nx-project-view';
+import {
+  LOCATE_YOUR_WORKSPACE,
+  RunTargetTreeItem,
+  RunTargetTreeProvider,
+} from '@nx-console/vscode/nx-run-target-view';
+import {
+  CliTaskProvider,
+  registerCliTaskCommands,
+  registerNxCommands,
+} from '@nx-console/vscode/tasks';
+import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import { environment } from './environments/environment';
 
+import { getGenerators } from '@nx-console/collections';
+import { fileExists } from '@nx-console/file-system';
+import { nxVersion } from '@nx-console/npm';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
+import { configureLspClient } from '@nx-console/vscode/lsp-client';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
+import {
+  NxHelpAndFeedbackProvider,
+  NxHelpAndFeedbackTreeItem,
+} from '@nx-console/vscode/nx-help-and-feedback-view';
+import { projectGraph } from '@nx-console/vscode/project-graph';
 import {
   refreshWorkspace,
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
-import { projectGraph } from '@nx-console/vscode/project-graph';
-import { fileExists } from '@nx-console/file-system';
-import { getGenerators } from '@nx-console/collections';
-import { nxVersion } from '@nx-console/npm';
-import { configureLspClient } from '@nx-console/vscode/lsp-client';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
 let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
+let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem>;
 
 let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
@@ -234,7 +239,15 @@ async function setWorkspace(workspacePath: string) {
       treeDataProvider: nxCommandsTreeProvider,
     });
 
-    context.subscriptions.push(nxCommandsTreeView, nxProjectTreeView);
+    nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
+      treeDataProvider: new NxHelpAndFeedbackProvider(context),
+    });
+
+    context.subscriptions.push(
+      nxCommandsTreeView,
+      nxProjectTreeView,
+      nxHelpAndFeedbackTreeView
+    );
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }

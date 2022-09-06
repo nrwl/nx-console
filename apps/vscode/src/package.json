@@ -880,6 +880,11 @@
           "id": "nxCommands",
           "name": "Common Nx Commands",
           "when": "isNxWorkspace"
+        },
+        {
+          "id": "nxHelpAndFeedback",
+          "name": "Help and Feedback",
+          "when": "isNxWorkspace"
         }
       ]
     },

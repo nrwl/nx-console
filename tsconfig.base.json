@@ -58,6 +58,9 @@
       "@nx-console/vscode/nx-conversion": [
         "libs/vscode/nx-conversion/src/index.ts"
       ],
+      "@nx-console/vscode/nx-help-and-feedback-view": [
+        "libs/vscode/nx-help-and-feedback-view/src/index.ts"
+      ],
       "@nx-console/vscode/nx-project-view": [
         "libs/vscode/nx-project-view/src/index.ts"
       ],
