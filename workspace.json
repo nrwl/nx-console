@@ -17,6 +17,7 @@
     "vscode-lsp-client": "libs/vscode/lsp-client",
     "vscode-nx-commands-view": "libs/vscode/nx-commands-view",
     "vscode-nx-conversion": "libs/vscode/nx-conversion",
+    "vscode-nx-help-and-feedback-view": "libs/vscode/nx-help-and-feedback-view",
     "vscode-nx-project-view": "libs/vscode/nx-project-view",
     "vscode-nx-run-target-view": "libs/vscode/nx-run-target-view",
     "vscode-nx-workspace": "libs/vscode/nx-workspace",
