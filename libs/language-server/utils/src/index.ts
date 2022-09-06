@@ -6,3 +6,4 @@ export * from './lib/runtime';
 export * from './lib/default-completion';
 export * from './lib/lsp-log';
 export * from './lib/json-language-service';
+export * from './lib/find-property';

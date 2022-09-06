@@ -1,10 +1,6 @@
 import { CompletionType } from '@nx-console/json-schema';
-import {
-  isObjectNode,
-  isPropertyNode,
-  isStringNode,
-} from '@nx-console/language-server/utils';
 import { ASTNode } from 'vscode-json-languageservice';
+import { isPropertyNode, isStringNode } from './node-types';
 
 type DefaultCompletion = { glob?: string; completionType: CompletionType };
 
@@ -43,6 +39,9 @@ defaultCompletionMap.set('buildtarget', {
   completionType: 'target',
 });
 defaultCompletionMap.set('target', {
+  completionType: 'target',
+});
+defaultCompletionMap.set('devservertarget', {
   completionType: 'target',
 });
 

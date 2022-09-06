@@ -1,5 +1,4 @@
-import { parseTargetString } from '@nrwl/devkit';
-import { fileExists, readAndCacheJsonFile } from '@nx-console/file-system';
+import { fileExists } from '@nx-console/file-system';
 import {
   CompletionType,
   hasCompletionType,
@@ -8,21 +7,18 @@ import {
 import {
   findProjectRoot,
   getDefaultCompletionType,
-  getLanguageModelCache,
   hasDefaultCompletionType,
   isStringNode,
-  lspLogger,
 } from '@nx-console/language-server/utils';
-import { nxWorkspace } from '@nx-console/workspace';
 import { join } from 'path';
 import {
-  ASTNode,
   DocumentLink,
   JSONDocument,
   MatchingSchema,
-  Range,
   TextDocument,
 } from 'vscode-json-languageservice';
+import { createRange } from './create-range';
+import { targetLink } from './target-link';
 
 export async function getDocumentLinks(
   workingPath: string | undefined,
@@ -59,9 +55,7 @@ export async function getDocumentLinks(
       continue;
     }
 
-    const position = document.positionAt(node.offset);
-    const endPosition = document.positionAt(node.offset + node.length);
-    const range = Range.create(position, endPosition);
+    const range = createRange(document, node);
 
     switch (linkType) {
       case 'file': {
@@ -85,9 +79,9 @@ export async function getDocumentLinks(
         break;
       }
       case 'target': {
-        const targetLink = await getTargetLink(workingPath, node);
-        if (targetLink) {
-          links.push(targetLink);
+        const link = await targetLink(workingPath, node);
+        if (link) {
+          links.push(DocumentLink.create(range, link));
         }
         break;
       }
@@ -96,41 +90,4 @@ export async function getDocumentLinks(
   }
 
   return links;
-}
-
-async function getTargetLink(
-  workingPath: string,
-  node: ASTNode
-): Promise<DocumentLink | undefined> {
-  if (!isStringNode(node)) {
-    return;
-  }
-
-  const targetString = node.value;
-  const { project, target, configuration } = parseTargetString(targetString);
-
-  const { workspace } = await nxWorkspace(workingPath, lspLogger);
-
-  const workspaceProject = workspace.projects[project];
-
-  if (!workspaceProject) {
-    lspLogger.log(`Could not find project ${project}`);
-    return;
-  }
-
-  const baseTargetPath = join(workingPath, workspaceProject.root);
-  const baseTargetProjectPath = join(baseTargetPath, 'project.json');
-
-  if (!(await fileExists(baseTargetProjectPath))) {
-    lspLogger.log(`Could not find target project: ${baseTargetProjectPath}`);
-    return;
-  }
-
-  const { json: projectContents } = await readAndCacheJsonFile(
-    baseTargetProjectPath
-  );
-
-  // const {} = getLanguageModelCache().retrieve();
-
-  return;
 }

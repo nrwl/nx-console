@@ -9,7 +9,10 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { getJsonLanguageService } from './json-language-service';
 
 export interface LanguageModelCache<T> {
-  retrieve(document: TextDocument): { jsonAst: T; document: TextDocument };
+  retrieve(
+    document: TextDocument,
+    stripSchema?: boolean
+  ): { jsonAst: T; document: TextDocument };
   onDocumentRemoved(document: TextDocument): void;
   dispose(): void;
 }
@@ -47,7 +50,10 @@ if (cleanupIntervalTimeInSec > 0) {
 
 export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
   return {
-    retrieve(document: TextDocument): {
+    retrieve(
+      document: TextDocument,
+      stripSchema = true
+    ): {
       jsonAst: JSONDocument;
       document: TextDocument;
     } {
@@ -65,19 +71,23 @@ export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
           document: languageModelInfo.document,
         };
       }
-      const newDocument = TextDocument.create(
-        document.uri,
-        document.languageId,
-        document.version,
-        document.getText().replace(/"\$schema":\s".+",/, '')
-      );
-      const languageModel = parse(newDocument);
+
+      if (stripSchema) {
+        document = TextDocument.create(
+          document.uri,
+          document.languageId,
+          document.version,
+          document.getText().replace(/"\$schema":\s".+",/, '')
+        );
+      }
+
+      const languageModel = parse(document);
 
       languageModels[document.uri] = {
         languageModel,
         version,
         languageId,
-        document: newDocument,
+        document,
         cTime: Date.now(),
       };
       if (!languageModelInfo) {
@@ -99,7 +109,7 @@ export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
           nModels--;
         }
       }
-      return { jsonAst: languageModel, document: newDocument };
+      return { jsonAst: languageModel, document };
     },
     onDocumentRemoved(document: TextDocument) {
       const uri = document.uri;
