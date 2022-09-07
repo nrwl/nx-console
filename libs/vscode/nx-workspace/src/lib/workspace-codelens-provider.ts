@@ -11,7 +11,7 @@ import {
   workspace,
 } from 'vscode';
 import { TextDocument } from 'vscode';
-import { nxWorkspace } from './nx-workspace';
+
 import {
   getProjectLocations,
   ProjectLocations,
@@ -21,6 +21,8 @@ import {
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
 import { buildProjectPath } from '@nx-console/utils';
+import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
+import { nxWorkspace } from '@nx-console/workspace';
 
 export class TargetCodeLens extends CodeLens {
   constructor(
@@ -71,7 +73,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     const lens: CodeLens[] = [];
 
     let projectName = '';
-    const { workspace } = await nxWorkspace();
+    const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
 
     if (document.uri.path.endsWith('project.json')) {
       for (const [key, project] of Object.entries(workspace.projects)) {
@@ -87,7 +89,10 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     }
 
     const projectLocations = getProjectLocations(document, projectName);
-    const { validWorkspaceJson, workspaceType } = await nxWorkspace();
+    const { validWorkspaceJson, workspaceType } = await nxWorkspace(
+      getWorkspacePath(),
+      outputLogger
+    );
     if (!validWorkspaceJson) {
       return;
     }

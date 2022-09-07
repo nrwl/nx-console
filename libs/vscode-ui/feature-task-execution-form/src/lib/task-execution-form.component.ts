@@ -48,7 +48,10 @@ import {
   OptionType,
   Option,
 } from '@nx-console/schema';
-import { hasKey } from '@nx-console/utils/shared';
+
+function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
+  return key in obj;
+}
 
 declare global {
   interface Window {

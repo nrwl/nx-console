@@ -5,6 +5,7 @@ import {
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
 } from '@nx-console/json-schema';
+import { getDefaultCompletionType } from '@nx-console/language-server/utils';
 import {
   ASTNode,
   CompletionItem,
@@ -33,12 +34,12 @@ export async function getCompletionItems(
     return [];
   }
 
+  const items = completionItems(workingPath, node, document);
+
   for (const { schema, node: schemaNode } of schemas) {
     // Find the schema node that matches the current node
     // If the node is found, then we will return the whole function so that we don't have to loop over the rest of the items.
     if (schemaNode == node) {
-      const items = completionItems(workingPath, node, document);
-
       if (hasCompletionType(schema)) {
         const completion = schema[X_COMPLETION_TYPE];
         if (hasCompletionGlob(schema)) {
@@ -46,10 +47,14 @@ export async function getCompletionItems(
         }
 
         return items(completion);
-      } else {
-        return [];
       }
     }
+  }
+
+  const defaultCompletion = getDefaultCompletionType(node);
+
+  if (defaultCompletion) {
+    return items(defaultCompletion.completionType, defaultCompletion.glob);
   }
 
   return [];

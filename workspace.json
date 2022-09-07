@@ -29,8 +29,10 @@
     "vscode-ui-feature-task-execution-form": "libs/vscode-ui/feature-task-execution-form",
     "vscode-ui-feature-task-execution-form-e2e": "apps/vscode-ui-feature-task-execution-form-e2e",
     "vscode-ui-styles": "libs/vscode-ui/styles",
+    "vscode-utils": "libs/vscode/utils",
     "vscode-verify": "libs/vscode/verify",
-    "vscode-webview": "libs/vscode/webview"
+    "vscode-webview": "libs/vscode/webview",
+    "workspace": "libs/workspace"
   },
   "$schema": "./node_modules/nx/schemas/workspace-schema.json"
 }

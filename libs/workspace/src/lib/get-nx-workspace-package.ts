@@ -1,25 +1,24 @@
-import { getOutputChannel } from '@nx-console/utils';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+// import { getOutputChannel } from '@nx-console/utils';
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
 import { platform } from 'os';
 import { join } from 'path';
 import { findNxPackagePath } from '@nx-console/npm';
+import { Logger } from '@nx-console/schema';
 
 declare function __non_webpack_require__(importPath: string): any;
 
 let RESOLVED_FILEUTILS_IMPORT: typeof NxFileUtils;
 let RESOLVED_PROJECTGRAPH_IMPORT: typeof NxProjectGraph;
 
-export async function getNxProjectGraph(): Promise<typeof NxProjectGraph> {
+export async function getNxProjectGraph(
+  workspacePath: string,
+  logger: Logger
+): Promise<typeof NxProjectGraph> {
   if (RESOLVED_PROJECTGRAPH_IMPORT) {
     return RESOLVED_PROJECTGRAPH_IMPORT;
   }
 
-  const workspacePath = WorkspaceConfigurationStore.instance.get(
-    'nxWorkspacePath',
-    ''
-  );
   let importPath = await findNxPackagePath(
     workspacePath,
     join('src', 'project-graph', 'project-graph.js')
@@ -33,23 +32,24 @@ export async function getNxProjectGraph(): Promise<typeof NxProjectGraph> {
   }
 
   const nxProjectGraph = await import('nx/src/project-graph/project-graph');
-  return getNxPackage(importPath, nxProjectGraph, RESOLVED_PROJECTGRAPH_IMPORT);
+  return getNxPackage(
+    importPath,
+    nxProjectGraph,
+    RESOLVED_PROJECTGRAPH_IMPORT,
+    logger
+  );
 }
 
 /**
  * Get the local installed version of @nrwl/workspace
  */
-export async function getNxWorkspacePackageFileUtils(): Promise<
-  typeof NxFileUtils
-> {
+export async function getNxWorkspacePackageFileUtils(
+  workspacePath: string,
+  logger: Logger
+): Promise<typeof NxFileUtils> {
   if (RESOLVED_FILEUTILS_IMPORT) {
     return RESOLVED_FILEUTILS_IMPORT;
   }
-
-  const workspacePath = WorkspaceConfigurationStore.instance.get(
-    'nxWorkspacePath',
-    ''
-  );
 
   let importPath = await findNxPackagePath(
     workspacePath,
@@ -64,13 +64,19 @@ export async function getNxWorkspacePackageFileUtils(): Promise<
   }
 
   const nxFileUtils = await import('nx/src/project-graph/file-utils');
-  return getNxPackage(importPath, nxFileUtils, RESOLVED_FILEUTILS_IMPORT);
+  return getNxPackage(
+    importPath,
+    nxFileUtils,
+    RESOLVED_FILEUTILS_IMPORT,
+    logger
+  );
 }
 
 async function getNxPackage<T>(
   importPath: string | undefined,
   backupPackage: T,
-  cache: T
+  cache: T,
+  logger: Logger
 ): Promise<T> {
   try {
     if (!importPath) {
@@ -83,12 +89,12 @@ async function getNxPackage<T>(
 
     const imported = __non_webpack_require__(importPath);
 
-    getOutputChannel().appendLine(`Using local Nx package at ${importPath}`);
+    logger?.log(`Using local Nx package at ${importPath}`);
 
     cache = imported;
     return imported;
   } catch (error) {
-    getOutputChannel().appendLine(
+    logger?.log(
       `Unable to load the ${importPath} dependency from the workspace. Falling back to extension dependency
 ${error}
     `

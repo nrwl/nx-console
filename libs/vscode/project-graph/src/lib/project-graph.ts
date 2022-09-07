@@ -1,4 +1,5 @@
-import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
+import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { findProjectWithPath } from '@nx-console/workspace';
 import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
@@ -57,6 +58,6 @@ async function openProjectWithFile(
     filePath = window.activeTextEditor?.document.fileName;
   }
 
-  const project = await findProjectWithPath(filePath);
+  const project = await findProjectWithPath(filePath, getWorkspacePath());
   webview.projectInWebview(project?.name, messageType);
 }

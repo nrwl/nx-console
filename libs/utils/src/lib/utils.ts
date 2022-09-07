@@ -27,3 +27,7 @@ export function toWorkspaceFormat(
   newFormat.projects = Object.fromEntries(sortedProjects);
   return newFormat;
 }
+
+export function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
+  return key in obj;
+}

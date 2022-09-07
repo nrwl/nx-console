@@ -9,7 +9,7 @@ import {
   XPrompt,
 } from './index';
 import { Schema } from 'nx/src/utils/params';
-import { names } from '@nrwl/devkit';
+import { names } from '@nrwl/devkit/src/utils/names';
 
 export interface GeneratorDefaults {
   [name: string]: string;

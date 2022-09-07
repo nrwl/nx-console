@@ -3,3 +3,7 @@ export * from './lib/language-model-cache';
 export * from './lib/merge-arrays';
 export * from './lib/node-types';
 export * from './lib/runtime';
+export * from './lib/default-completion';
+export * from './lib/lsp-log';
+export * from './lib/json-language-service';
+export * from './lib/find-property';

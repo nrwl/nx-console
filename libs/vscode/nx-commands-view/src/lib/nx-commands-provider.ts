@@ -1,6 +1,6 @@
-import { AbstractTreeProvider } from '@nx-console/utils';
-import { ExtensionContext } from 'vscode';
+import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { NxCommandsTreeItem } from './nx-commands-tree-item';
+import { ExtensionContext } from 'vscode';
 
 export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeItem> {
   constructor(private readonly context: ExtensionContext) {

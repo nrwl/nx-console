@@ -2,12 +2,10 @@ import { GeneratorType, Option, TaskExecutionSchema } from '@nx-console/schema';
 import {
   getOutputChannel,
   getTelemetry,
+  getWorkspacePath,
+  outputLogger,
   readTargetDef,
-} from '@nx-console/utils';
-import {
-  findProjectWithPath,
-  nxWorkspace,
-} from '@nx-console/vscode/nx-workspace';
+} from '@nx-console/vscode/utils';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
 import {
@@ -16,6 +14,7 @@ import {
   selectCliProject,
   selectGenerator,
 } from '@nx-console/vscode/tasks';
+import { findProjectWithPath, nxWorkspace } from '@nx-console/workspace';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
@@ -28,8 +27,10 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, workspace, workspaceType } =
-      await nxWorkspace();
+    const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace(
+      getWorkspacePath(),
+      outputLogger
+    );
 
     if (!validWorkspaceJson) {
       return;
@@ -194,16 +195,22 @@ async function getConfigValuesFromContextMenuUri(
   | undefined
 > {
   if (contextMenuUri) {
-    const project = await findProjectWithPath(contextMenuUri.fsPath);
+    const workspacePath = getWorkspacePath();
+    const project = await findProjectWithPath(
+      contextMenuUri.fsPath,
+      workspacePath
+    );
     const projectName = (project && project.name) || undefined;
 
-    const workspacePath = cliTaskProvider.getWorkspacePath();
     let path = contextMenuUri.fsPath
       .replace(workspacePath, '')
       .replace(/\\/g, '/')
       .replace(/^\//, '');
 
-    const { workspaceLayout } = await nxWorkspace();
+    const { workspaceLayout } = await nxWorkspace(
+      getWorkspacePath(),
+      outputLogger
+    );
     const appsDir = workspaceLayout.appsDir;
     const libsDir = workspaceLayout.libsDir;
     if (

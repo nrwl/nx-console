@@ -12,5 +12,5 @@
       "outputs": ["coverage/libs/utils"]
     }
   },
-  "tags": []
+  "tags": ["type:shared"]
 }

@@ -1,6 +1,6 @@
 import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
-import { getOutputChannel } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { getOutputChannel } from '@nx-console/vscode/utils';
 import { execSync } from 'child_process';
 import * as cacheDir from 'find-cache-dir';
 

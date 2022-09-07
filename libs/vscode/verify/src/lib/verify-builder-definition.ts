@@ -1,10 +1,10 @@
 import { Option, OptionType } from '@nx-console/schema';
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
-import { getTelemetry, readBuilderSchema } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import { window } from 'vscode';
 import { fileExists } from '@nx-console/file-system';
+import { getTelemetry, readBuilderSchema } from '@nx-console/vscode/utils';
 
 const RUN_ONE_OPTIONS = [
   {
