@@ -7,7 +7,6 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<NxHelpAndFee
   constructor(private readonly context: ExtensionContext) {
     super();
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getParent(_: NxHelpAndFeedbackTreeItem) {
     return null;
   }
