@@ -24,25 +24,6 @@
       "type": "extensionHost"
     },
     {
-      "name": "Run Extension In Dev Mode",
-      "type": "extensionHost",
-      "request": "launch",
-      "runtimeExecutable": "${execPath}",
-      "args": [
-        "--disable-extensions",
-        "--extensionDevelopmentPath=${workspaceFolder}/dist/apps/vscode"
-      ],
-      "trace": false,
-      "internalConsoleOptions": "openOnFirstSessionStart",
-      "outFiles": [
-        "${workspaceFolder}/dist/apps/vscode",
-        "${workspaceFolder}/dist/apps/vscode/assets/public",
-        "!${workspaceFolder}/dist/apps/vscode/lsp",
-        "${workspaceFolder}/node_modules"
-      ],
-      "preLaunchTask": "npm: watch"
-    },
-    {
       "type": "node",
       "request": "attach",
       "name": "Attach to LSP Server",
