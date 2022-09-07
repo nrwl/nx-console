@@ -170,6 +170,14 @@
           "when": "false"
         },
         {
+          "command": "nxConsole.runTask",
+          "when": "false"
+        },
+        {
+          "command": "nxConsole.revealInExplorer",
+          "when": "false"
+        },
+        {
           "command": "nx.generate.ui.app",
           "when": "isNxWorkspace && nx.hasApplicationGenerators"
         },
