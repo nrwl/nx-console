@@ -2,20 +2,23 @@
 
 We would love for you to contribute to Nx Console! Read this document to see how to do it.
 
+If you're new to vscode extension development, check out the [Extension API](https://code.visualstudio.com/api) docs.
+
 ## Got a Question?
 
-We are trying to keep GitHub issues for bug reports and feature requests. Stack Overflow is a much better place to ask general questions about how to use Nx Console.
+We are trying to keep GitHub issues for bug reports and feature requests. Stack Overflow is a much better place to ask general questions about how to use Nx Console. You can also join the [Nrwl Community Slack](go.nrwl.io/join-slack?utm_source=nxconsole) for help.
 
 ## Prerequisites
 
 - Install yarn: https://classic.yarnpkg.com/en/docs/install
 - Run yarn install in the root directory
 
-## Building the VSCode Plugin
+## Running the Extension locally
 
-You can build the vscode extension and run it in development mode by opening up this repo in Visual Studio code and hitting the f5 function key. This will launch `nps prepare.dev.vscode` in the background and spawn an extension development host version of VSCode so that you can try out your code.
+In order to start Nx console in development mode, the repo needs to be built. Running `yarn watch` via the CLI or using the command prompt to execute `Tasks: Run Task -> Build and watch Nx Console` will automatically generate build artifacts whenever the code changes. </br>
+Use the `F5` key or the debug menu option `Launch Client + Server` to start the Extension Development Host.
 
-When you want to update the extension with a new set of changes, go back to the original editor you launched the extension host from and click the refresh button in the debug menubar (its green and looks like a browser refresh icon).
+> :warning: Even though builds will be generated automatically, the Extension Development Host needs to be restarted in order to apply a new set of changes.
 
 ### Running Unit Tests
 
