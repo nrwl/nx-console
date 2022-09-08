@@ -1,5 +1,5 @@
 import { AbstractTreeProvider, getOutputChannel } from '@nx-console/utils';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { join } from 'path';
@@ -10,7 +10,7 @@ import {
   Uri,
 } from 'vscode';
 import { NxProject, NxProjectTreeItem } from './nx-project-tree-item';
-import { clearJsonCache } from '@nx-console/file-system';
+import { NxProjectTreeHelper } from './helper';
 
 /**
  * Provides data for the "Projects" tree view
@@ -60,13 +60,19 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     treeItemLabel: string,
     hasChildren?: boolean
   ) {
-    const item = new NxProjectTreeItem(
+    const item: NxProjectTreeItem = new NxProjectTreeItem(
       nxProject,
       treeItemLabel,
       hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     );
+
+    if (nxProject.root === '') {
+      item.contextValue = 'folder';
+      return item;
+    }
+
     if (!nxProject.target) {
       const projectDef = (await this.cliTaskProvider.getProjects())[
         nxProject.project
@@ -93,21 +99,43 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
   async getChildren(
     parent?: NxProjectTreeItem
   ): Promise<NxProjectTreeItem[] | undefined> {
-    if (!parent) {
-      const projects = await this.cliTaskProvider.getProjectEntries();
+    const projects = await this.cliTaskProvider.getProjectEntries();
+
+    const folderedProject = await NxProjectTreeHelper.getProjectsInFolders(projects);
+    const useFolderStructure = GlobalConfigurationStore.instance.get('useFolderStructure');
+
+    let parentStatement = !parent;
+    if (useFolderStructure) {
+      parentStatement = !parent || (parent.contextValue === 'folder' && !NxProjectTreeHelper.isProject(projects, parent.nxProject.project))
+    }
+    
+    if (parentStatement) {
+      
+      let clonedProjects: any = projects;
+      if (useFolderStructure) {
+        clonedProjects = folderedProject;
+        if (parent && typeof parent.label === 'string') {
+            clonedProjects = (await NxProjectTreeHelper.findNestedObject(folderedProject, parent.label))[parent.label];
+        }
+      }
+      const clonedProjectsMap = useFolderStructure ? Object.entries(clonedProjects) : clonedProjects;
+
       return Promise.all(
-        projects.map(
-          async ([name, def]): Promise<NxProjectTreeItem> =>
-            this.createNxProjectTreeItem(
-              { project: name, root: def.root },
-              name,
-              Boolean(def.targets)
-            )
+        clonedProjectsMap.map(
+          async ([name, def]: any): Promise<NxProjectTreeItem> => {
+            let root = def.root;
+            const hasChildren = useFolderStructure ? root !== def : Boolean(def.targets);
+
+            if (useFolderStructure) {
+              root = Array.isArray(clonedProjects) ? def as string : ''
+            }
+            return this.createNxProjectTreeItem({ project: name, root }, name, hasChildren );
+          }
         )
       );
     }
 
-    const { nxProject } = parent;
+    const { nxProject } = parent as NxProjectTreeItem;
     const { target, project } = nxProject;
     const projectDef = (await this.cliTaskProvider.getProjects())[project];
 

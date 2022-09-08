@@ -20,6 +20,7 @@
     "@nrwl/devkit": "14.5.10",
     "@yarnpkg/fslib": "2.6.1-rc.5",
     "@yarnpkg/libzip": "2.2.3-rc.5",
+    "ajv-formats": "^2.1.1",
     "fast-glob": "^3.2.11",
     "find-cache-dir": "^3.3.2",
     "jsonc-parser": "^3.0.0",
