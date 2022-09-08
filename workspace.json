@@ -13,6 +13,7 @@
     "shared-utils": "libs/shared/utils",
     "shared-workspace": "libs/shared/workspace",
     "vscode": "apps/vscode",
+    "vscode-add-dependency": "libs/vscode/add-dependency",
     "vscode-configuration": "libs/vscode/configuration",
     "vscode-lsp-client": "libs/vscode/lsp-client",
     "vscode-nx-commands-view": "libs/vscode/nx-commands-view",

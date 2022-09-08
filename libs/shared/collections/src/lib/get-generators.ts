@@ -14,14 +14,18 @@ import {
   listFiles,
 } from '@nx-console/shared/file-system';
 
+export type GetGeneratorsOptions = { includeHidden: boolean };
+
 export async function getGenerators(
   workspacePath: string,
-  projects?: WorkspaceProjects
+  projects?: WorkspaceProjects,
+  options: GetGeneratorsOptions = { includeHidden: false }
 ): Promise<CollectionInfo[]> {
   const basedir = workspacePath;
   const collections = await readCollections(workspacePath, {
     projects,
     clearPackageJsonCache: false,
+    includeHidden: options.includeHidden,
   });
   let generatorCollections = collections.filter(
     (collection) => collection.type === 'generator'
@@ -29,8 +33,8 @@ export async function getGenerators(
 
   generatorCollections = [
     ...generatorCollections,
-    ...(await checkAndReadWorkspaceGenerators(basedir, 'schematics')),
-    ...(await checkAndReadWorkspaceGenerators(basedir, 'generators')),
+    ...(await checkAndReadWorkspaceGenerators(basedir, 'schematics', options)),
+    ...(await checkAndReadWorkspaceGenerators(basedir, 'generators', options)),
   ];
   return generatorCollections.filter(
     (collection): collection is CollectionInfo => !!collection.data
@@ -39,14 +43,16 @@ export async function getGenerators(
 
 async function checkAndReadWorkspaceGenerators(
   basedir: string,
-  workspaceGeneratorType: 'generators' | 'schematics'
+  workspaceGeneratorType: 'generators' | 'schematics',
+  options: GetGeneratorsOptions
 ) {
   const workspaceGeneratorsPath = join('tools', workspaceGeneratorType);
   if (await directoryExists(join(basedir, workspaceGeneratorsPath))) {
     const collection = await readWorkspaceGeneratorsCollection(
       basedir,
       workspaceGeneratorsPath,
-      workspaceGeneratorType
+      workspaceGeneratorType,
+      options
     );
     return collection;
   }
@@ -56,7 +62,8 @@ async function checkAndReadWorkspaceGenerators(
 async function readWorkspaceGeneratorsCollection(
   basedir: string,
   workspaceGeneratorsPath: string,
-  workspaceGeneratorType: 'generators' | 'schematics'
+  workspaceGeneratorType: 'generators' | 'schematics',
+  options: GetGeneratorsOptions
 ): Promise<CollectionInfo[]> {
   const collectionDir = join(basedir, workspaceGeneratorsPath);
   const collectionName = `workspace-${
@@ -76,7 +83,8 @@ async function readWorkspaceGeneratorsCollection(
         path: collectionPath,
         json: {},
       },
-      collection.json
+      collection.json,
+      options
     );
   } else {
     return await Promise.all(

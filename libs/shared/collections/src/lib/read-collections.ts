@@ -16,12 +16,14 @@ import {
   readAndCacheJsonFile,
 } from '@nx-console/shared/file-system';
 
+export type ReadCollectionsOptions = {
+  projects?: WorkspaceProjects;
+  clearPackageJsonCache?: boolean;
+  includeHidden?: boolean;
+};
 export async function readCollections(
   workspacePath: string,
-  options: {
-    projects?: WorkspaceProjects;
-    clearPackageJsonCache?: boolean;
-  }
+  options: ReadCollectionsOptions
 ): Promise<CollectionInfo[]> {
   if (options?.clearPackageJsonCache) {
     clearJsonCache('package.json', workspacePath);
@@ -36,7 +38,9 @@ export async function readCollections(
   );
 
   const allCollections = (
-    await Promise.all(collections.map((c) => readCollection(workspacePath, c)))
+    await Promise.all(
+      collections.map((c) => readCollection(workspacePath, c, options))
+    )
   ).flat();
 
   /**
@@ -73,7 +77,8 @@ async function readCollection(
     packagePath: string;
     packageName: string;
     packageJson: any;
-  }
+  },
+  options: ReadCollectionsOptions
 ): Promise<CollectionInfo[] | null> {
   try {
     const [executorCollections, generatorCollections] = await Promise.all([
@@ -86,7 +91,8 @@ async function readCollection(
       packageName,
       packagePath,
       executorCollections,
-      generatorCollections
+      generatorCollections,
+      options
     );
   } catch (e) {
     return null;
@@ -98,7 +104,8 @@ export async function getCollectionInfo(
   collectionName: string,
   collectionPath: string,
   executorCollection: { path: string; json: any },
-  generatorCollection: { path: string; json: any }
+  generatorCollection: { path: string; json: any },
+  options: ReadCollectionsOptions
 ): Promise<CollectionInfo[]> {
   const collectionMap: Map<string, CollectionInfo> = new Map();
 
@@ -126,7 +133,7 @@ export async function getCollectionInfo(
     ...executorCollection.json.builders,
   };
   for (const [key, schema] of Object.entries<any>(executors)) {
-    if (!canUse(key, schema)) {
+    if (!canUse(key, schema, options.includeHidden)) {
       continue;
     }
     const collectionInfo = buildCollectionInfo(
@@ -151,7 +158,7 @@ export async function getCollectionInfo(
     ...generatorCollection.json.schematics,
   };
   for (const [key, schema] of Object.entries<any>(generators)) {
-    if (!canUse(key, schema)) {
+    if (!canUse(key, schema, options.includeHidden)) {
       continue;
     }
 
@@ -204,7 +211,8 @@ export async function getCollectionInfo(
 
             return readCollection(
               workspacePath,
-              await packageDetails(dependencyPath)
+              await packageDetails(dependencyPath),
+              options
             );
           })
       )
@@ -264,9 +272,15 @@ function readCollectionGenerator(
  */
 function canUse(
   name: string,
-  s: { hidden: boolean; private: boolean; schema: string; extends: boolean }
+  s: { hidden: boolean; private: boolean; schema: string; extends: boolean },
+  includeHiddenCollections = false
 ): boolean {
-  return !s.hidden && !s.private && !s.extends && name !== 'ng-add';
+  return (
+    (!s.hidden || includeHiddenCollections) &&
+    !s.private &&
+    !s.extends &&
+    name !== 'ng-add'
+  );
 }
 
 function collectionNameWithType(name: string, type: 'generator' | 'executor') {
