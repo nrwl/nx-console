@@ -41,7 +41,7 @@ If `nps format.check` fails, run `nps format`.
 
 ### Commit Message Guidelines
 
-Commit message should follow the following format:
+Commit message have to follow the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) format. A basic example is this:
 
 ```
 type: subject
@@ -60,6 +60,12 @@ The type must be one of the following:
 - style
 - docs
 - test
+- chore
+- ci
+- perf
+- revert
+
+Refer to [commitizen/conventional-commit-types](https://github.com/commitizen/conventional-commit-types/blob/master/index.json) for a full explanation of each type.
 
 #### Subject
 
