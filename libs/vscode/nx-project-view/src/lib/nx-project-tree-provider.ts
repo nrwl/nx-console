@@ -1,7 +1,10 @@
-import { AbstractTreeProvider, getOutputChannel } from '@nx-console/utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import {
+  AbstractTreeProvider,
+  getOutputChannel,
+} from '@nx-console/vscode/utils';
 import { join } from 'path';
 import {
   commands,

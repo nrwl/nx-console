@@ -6,46 +6,54 @@
 
 import { JSONDocument } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { getJsonLanguageService } from './json-language-service';
 
 export interface LanguageModelCache<T> {
-  get(document: TextDocument): { jsonAst: T; document: TextDocument };
+  retrieve(
+    document: TextDocument,
+    stripSchema?: boolean
+  ): { jsonAst: T; document: TextDocument };
   onDocumentRemoved(document: TextDocument): void;
   dispose(): void;
 }
 
-export function getLanguageModelCache(
-  maxEntries: number,
-  cleanupIntervalTimeInSec: number,
-  parse: (document: TextDocument) => JSONDocument
-): LanguageModelCache<JSONDocument> {
-  let languageModels: {
-    [uri: string]: {
-      version: number;
-      languageId: string;
-      cTime: number;
-      languageModel: JSONDocument;
-      document: TextDocument;
-    };
-  } = {};
-  let nModels = 0;
+const parse = (document: TextDocument): JSONDocument =>
+  getJsonLanguageService().parseJSONDocument(document);
 
-  let cleanupInterval: NodeJS.Timer | undefined = undefined;
-  if (cleanupIntervalTimeInSec > 0) {
-    cleanupInterval = setInterval(() => {
-      const cutoffTime = Date.now() - cleanupIntervalTimeInSec * 1000;
-      const uris = Object.keys(languageModels);
-      for (const uri of uris) {
-        const languageModelInfo = languageModels[uri];
-        if (languageModelInfo.cTime < cutoffTime) {
-          delete languageModels[uri];
-          nModels--;
-        }
+let languageModels: {
+  [uri: string]: {
+    version: number;
+    languageId: string;
+    cTime: number;
+    languageModel: JSONDocument;
+    document: TextDocument;
+  };
+} = {};
+const maxEntries = 10;
+const cleanupIntervalTimeInSec = 60;
+let nModels = 0;
+
+let cleanupInterval: NodeJS.Timer | undefined = undefined;
+if (cleanupIntervalTimeInSec > 0) {
+  cleanupInterval = setInterval(() => {
+    const cutoffTime = Date.now() - cleanupIntervalTimeInSec * 1000;
+    const uris = Object.keys(languageModels);
+    for (const uri of uris) {
+      const languageModelInfo = languageModels[uri];
+      if (languageModelInfo.cTime < cutoffTime) {
+        delete languageModels[uri];
+        nModels--;
       }
-    }, cleanupIntervalTimeInSec * 1000);
-  }
+    }
+  }, cleanupIntervalTimeInSec * 1000);
+}
 
+export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
   return {
-    get(document: TextDocument): {
+    retrieve(
+      document: TextDocument,
+      stripSchema = true
+    ): {
       jsonAst: JSONDocument;
       document: TextDocument;
     } {
@@ -63,19 +71,23 @@ export function getLanguageModelCache(
           document: languageModelInfo.document,
         };
       }
-      const newDocument = TextDocument.create(
-        document.uri,
-        document.languageId,
-        document.version,
-        document.getText().replace(/"\$schema":\s".+",/, '')
-      );
-      const languageModel = parse(newDocument);
+
+      if (stripSchema) {
+        document = TextDocument.create(
+          document.uri,
+          document.languageId,
+          document.version,
+          document.getText().replace(/"\$schema":\s".+",/, '')
+        );
+      }
+
+      const languageModel = parse(document);
 
       languageModels[document.uri] = {
         languageModel,
         version,
         languageId,
-        document: newDocument,
+        document,
         cTime: Date.now(),
       };
       if (!languageModelInfo) {
@@ -97,7 +109,7 @@ export function getLanguageModelCache(
           nModels--;
         }
       }
-      return { jsonAst: languageModel, document: newDocument };
+      return { jsonAst: languageModel, document };
     },
     onDocumentRemoved(document: TextDocument) {
       const uri = document.uri;

@@ -1,4 +1,4 @@
-import { getShellExecutionForConfig } from '@nx-console/utils';
+import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
 import { Task, TaskScope } from 'vscode';
 
 export interface NxTaskDefinition {

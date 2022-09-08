@@ -17,6 +17,7 @@
     "vscode-lsp-client": "libs/vscode/lsp-client",
     "vscode-nx-commands-view": "libs/vscode/nx-commands-view",
     "vscode-nx-conversion": "libs/vscode/nx-conversion",
+    "vscode-nx-help-and-feedback-view": "libs/vscode/nx-help-and-feedback-view",
     "vscode-nx-project-view": "libs/vscode/nx-project-view",
     "vscode-nx-run-target-view": "libs/vscode/nx-run-target-view",
     "vscode-nx-workspace": "libs/vscode/nx-workspace",
@@ -28,8 +29,10 @@
     "vscode-ui-feature-task-execution-form": "libs/vscode-ui/feature-task-execution-form",
     "vscode-ui-feature-task-execution-form-e2e": "apps/vscode-ui-feature-task-execution-form-e2e",
     "vscode-ui-styles": "libs/vscode-ui/styles",
+    "vscode-utils": "libs/vscode/utils",
     "vscode-verify": "libs/vscode/verify",
-    "vscode-webview": "libs/vscode/webview"
+    "vscode-webview": "libs/vscode/webview",
+    "workspace": "libs/workspace"
   },
   "$schema": "./node_modules/nx/schemas/workspace-schema.json"
 }

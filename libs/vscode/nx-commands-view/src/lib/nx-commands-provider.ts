@@ -1,4 +1,4 @@
-import { AbstractTreeProvider } from '@nx-console/utils';
+import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { NxCommandsTreeItem } from './nx-commands-tree-item';
 import { ExtensionContext } from 'vscode';
 
@@ -7,7 +7,6 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     super();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getParent(_: NxCommandsTreeItem) {
     return null;
   }

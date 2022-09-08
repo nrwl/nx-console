@@ -1,10 +1,10 @@
-import { getDocumentLinks } from './get-document-links';
-import { getLanguageModelCache } from '@nx-console/language-server/utils';
 import {
-  ClientCapabilities,
-  getLanguageService,
-  TextDocument,
-} from 'vscode-json-languageservice';
+  configureJsonLanguageService,
+  getJsonLanguageService,
+  getLanguageModelCache,
+} from '@nx-console/language-server/utils';
+import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
+import { getDocumentLinks } from './get-document-links';
 
 import { X_COMPLETION_TYPE } from '@nx-console/json-schema';
 
@@ -16,14 +16,15 @@ jest.mock(
   })
 );
 
-const languageservice = getLanguageService({
-  clientCapabilities: ClientCapabilities.LATEST,
-});
-const documentMapper = getLanguageModelCache(10, 60, (document) =>
-  languageservice.parseJSONDocument(document)
+configureJsonLanguageService(
+  {
+    clientCapabilities: ClientCapabilities.LATEST,
+  },
+  {}
 );
+const documentMapper = getLanguageModelCache();
 
-const { document, jsonAst } = documentMapper.get(
+const { document, jsonAst } = documentMapper.retrieve(
   TextDocument.create(
     'file:///project.json',
     'json',
@@ -38,7 +39,7 @@ const { document, jsonAst } = documentMapper.get(
 );
 
 it('should get all document links for properties that have a X_COMPLETION_TYPE (file type only)', async () => {
-  const matchingSchemas = await languageservice.getMatchingSchemas(
+  const matchingSchemas = await getJsonLanguageService().getMatchingSchemas(
     document,
     jsonAst,
     {

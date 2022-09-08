@@ -12,6 +12,24 @@ import {
   workspace,
 } from 'vscode';
 
+import { checkIsNxWorkspace } from '@nx-console/utils';
+import {
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
+import {
+  NxCommandsTreeItem,
+  NxCommandsTreeProvider,
+} from '@nx-console/vscode/nx-commands-view';
+import {
+  NxProjectTreeItem,
+  NxProjectTreeProvider,
+} from '@nx-console/vscode/nx-project-view';
+import {
+  LOCATE_YOUR_WORKSPACE,
+  RunTargetTreeItem,
+  RunTargetTreeProvider,
+} from '@nx-console/vscode/nx-run-target-view';
 import {
   CliTaskProvider,
   registerCliTaskCommands,
@@ -21,45 +39,33 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
+  outputLogger,
   teardownTelemetry,
   watchFile,
-  checkIsNxWorkspace,
-} from '@nx-console/utils';
-import {
-  GlobalConfigurationStore,
-  WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
+} from '@nx-console/vscode/utils';
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
-import {
-  LOCATE_YOUR_WORKSPACE,
-  RunTargetTreeItem,
-  RunTargetTreeProvider,
-} from '@nx-console/vscode/nx-run-target-view';
-import {
-  NxCommandsTreeItem,
-  NxCommandsTreeProvider,
-} from '@nx-console/vscode/nx-commands-view';
-import {
-  NxProjectTreeItem,
-  NxProjectTreeProvider,
-} from '@nx-console/vscode/nx-project-view';
 import { environment } from './environments/environment';
 
+import { getGenerators } from '@nx-console/collections';
+import { fileExists } from '@nx-console/file-system';
+import { nxVersion } from '@nx-console/npm';
 import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
+import { configureLspClient } from '@nx-console/vscode/lsp-client';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
+import {
+  NxHelpAndFeedbackProvider,
+  NxHelpAndFeedbackTreeItem,
+} from '@nx-console/vscode/nx-help-and-feedback-view';
+import { projectGraph } from '@nx-console/vscode/project-graph';
 import {
   refreshWorkspace,
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
-import { projectGraph } from '@nx-console/vscode/project-graph';
-import { fileExists } from '@nx-console/file-system';
-import { getGenerators } from '@nx-console/collections';
-import { nxVersion } from '@nx-console/npm';
-import { configureLspClient } from '@nx-console/vscode/lsp-client';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
 let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
+let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem>;
 
 let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
@@ -234,7 +240,15 @@ async function setWorkspace(workspacePath: string) {
       treeDataProvider: nxCommandsTreeProvider,
     });
 
-    context.subscriptions.push(nxCommandsTreeView, nxProjectTreeView);
+    nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
+      treeDataProvider: new NxHelpAndFeedbackProvider(context),
+    });
+
+    context.subscriptions.push(
+      nxCommandsTreeView,
+      nxProjectTreeView,
+      nxHelpAndFeedbackTreeView
+    );
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
@@ -275,9 +289,9 @@ async function setWorkspace(workspacePath: string) {
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {
-  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
+  const { nxWorkspace } = await import('@nx-console/workspace');
 
-  const { workspaceLayout } = await nxWorkspace();
+  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(workspacePath, workspaceLayout.appsDir),
@@ -321,9 +335,9 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const { nxWorkspace } = await import('@nx-console/vscode/nx-workspace');
+  const { nxWorkspace } = await import('@nx-console/workspace');
 
-  const { workspaceLayout } = await nxWorkspace();
+  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
   const workspacePackageDirs = new Set<string>();
   workspacePackageDirs.add(workspaceLayout.appsDir);
   workspacePackageDirs.add(workspaceLayout.libsDir);

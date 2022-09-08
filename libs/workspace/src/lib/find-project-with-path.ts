@@ -1,19 +1,16 @@
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { isAbsolute, join, relative } from 'path';
-import { nxWorkspace } from './nx-workspace';
+import { nxWorkspace } from './workspace';
 
 export async function findProjectWithPath(
-  selectedPath: string | undefined
+  selectedPath: string | undefined,
+  workspacePath: string
 ): Promise<ProjectConfiguration | null> {
   if (!selectedPath) {
     return null;
   }
-  const workspacePath = WorkspaceConfigurationStore.instance.get(
-    'nxWorkspacePath',
-    ''
-  );
-  const { workspace } = await nxWorkspace();
+
+  const { workspace } = await nxWorkspace(workspacePath);
   const projectEntries = Object.entries(workspace.projects);
   const entry = projectEntries.find(([, def]) => {
     const fullProjectPath = join(

@@ -9,6 +9,7 @@ import {
   CompletionItemKind,
   TextDocument,
 } from 'vscode-json-languageservice';
+import { createCompletionPathItem } from './create-completion-path-item';
 
 export async function pathCompletion(
   workingPath: string | undefined,
@@ -45,6 +46,11 @@ export async function pathCompletion(
     objectMode: true,
   });
 
+  const completionKind =
+    searchType === 'directory'
+      ? CompletionItemKind.Folder
+      : CompletionItemKind.File;
+
   for (const file of files) {
     if (
       supportsInterpolation &&
@@ -54,44 +60,43 @@ export async function pathCompletion(
         '{projectRoot}' +
         file.path.replace(workingPath + '/' + projectRoot, '');
 
-      items.push(addCompletionPathItem(label, file.path, node, document));
+      items.push(
+        createCompletionPathItem(
+          label,
+          file.path,
+          node,
+          document,
+          completionKind
+        )
+      );
     }
 
     if (file.path.startsWith(workingPath)) {
       const label = file.path.replace(workingPath + '/', '');
-      items.push(addCompletionPathItem(label, file.path, node, document));
+      items.push(
+        createCompletionPathItem(
+          label,
+          file.path,
+          node,
+          document,
+          completionKind
+        )
+      );
 
       if (supportsInterpolation) {
         const label = '{workspaceRoot}' + file.path.replace(workingPath, '');
-        items.push(addCompletionPathItem(label, file.path, node, document));
+        items.push(
+          createCompletionPathItem(
+            label,
+            file.path,
+            node,
+            document,
+            completionKind
+          )
+        );
       }
     }
   }
 
   return items;
-}
-
-function addCompletionPathItem(
-  label: string,
-  path: string,
-  node: ASTNode,
-  document: TextDocument
-): CompletionItem {
-  const startPosition = document.positionAt(node.offset);
-  const endPosition = document.positionAt(node.offset + node.length);
-  label = `"${label}"`;
-  return {
-    label,
-    kind: CompletionItemKind.File,
-    insertText: label,
-    insertTextFormat: 2,
-    textEdit: {
-      newText: label,
-      range: {
-        start: startPosition,
-        end: endPosition,
-      },
-    },
-    detail: path,
-  };
 }

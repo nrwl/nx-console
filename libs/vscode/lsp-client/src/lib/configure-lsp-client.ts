@@ -1,4 +1,5 @@
-import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
+import { nxWorkspace } from '@nx-console/workspace';
 import { join } from 'path';
 import { Disposable, ExtensionContext } from 'vscode';
 import {
@@ -13,7 +14,10 @@ let client: LanguageClient;
 export async function configureLspClient(
   context: ExtensionContext
 ): Promise<Disposable> {
-  const { workspacePath, workspace } = await nxWorkspace();
+  const { workspacePath, workspace } = await nxWorkspace(
+    getWorkspacePath(),
+    outputLogger
+  );
 
   const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
 

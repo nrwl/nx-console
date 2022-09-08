@@ -3,11 +3,14 @@ import {
   WorkspaceProjects,
   WORKSPACE_GENERATOR_NAME_REGEX,
 } from '@nx-console/schema';
-import { getTelemetry } from '@nx-console/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
-import { nxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { isAbsolute, join, relative } from 'path';
+import {
+  getTelemetry,
+  getWorkspacePath,
+  outputLogger,
+} from '@nx-console/vscode/utils';
+import { nxWorkspace } from '@nx-console/workspace';
 import {
   ProviderResult,
   Task,
@@ -117,7 +120,7 @@ export class CliTaskProvider implements TaskProvider {
     if (json) {
       return json.projects;
     } else {
-      const result = await nxWorkspace();
+      const result = await nxWorkspace(getWorkspacePath(), outputLogger);
       if (!result.validWorkspaceJson || !result.workspace) {
         return {};
       } else {
