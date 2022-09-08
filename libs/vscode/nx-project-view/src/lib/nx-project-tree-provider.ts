@@ -5,6 +5,7 @@ import {
   AbstractTreeProvider,
   getOutputChannel,
 } from '@nx-console/vscode/utils';
+import { ProjectConfiguration } from '@nrwl/devkit';
 import { join } from 'path';
 import {
   commands,
@@ -114,7 +115,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     
     if (parentStatement) {
       
-      let clonedProjects: any = projects;
+      let clonedProjects: [string, ProjectConfiguration][] | Record<string, any> = projects;
       if (useFolderStructure) {
         clonedProjects = folderedProject;
         if (parent && typeof parent.label === 'string') {
