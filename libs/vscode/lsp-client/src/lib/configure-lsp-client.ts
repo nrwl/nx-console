@@ -1,5 +1,5 @@
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
-import { nxWorkspace } from '@nx-console/workspace';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import { join } from 'path';
 import { Disposable, ExtensionContext } from 'vscode';
 import {

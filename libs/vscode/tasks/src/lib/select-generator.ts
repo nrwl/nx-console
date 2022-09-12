@@ -3,13 +3,13 @@ import {
   GeneratorType,
   Option,
   TaskExecutionSchema,
-} from '@nx-console/schema';
+} from '@nx-console/shared/schema';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { QuickPickItem, window } from 'vscode';
-import { readAndCacheJsonFile } from '@nx-console/file-system';
-import { getGenerators } from '@nx-console/collections';
-import { normalizeSchema } from '@nx-console/schema/normalize';
-import { nxWorkspace } from '@nx-console/workspace';
+import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
+import { getGenerators } from '@nx-console/shared/collections';
+import { normalizeSchema } from '@nx-console/shared/schema/normalize';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
 
 async function readWorkspaceJsonDefaults(): Promise<any> {

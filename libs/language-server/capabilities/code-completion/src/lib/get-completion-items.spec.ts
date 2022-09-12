@@ -1,4 +1,7 @@
-import { X_COMPLETION_GLOB, X_COMPLETION_TYPE } from '@nx-console/json-schema';
+import {
+  X_COMPLETION_GLOB,
+  X_COMPLETION_TYPE,
+} from '@nx-console/shared/json-schema';
 import {
   configureJsonLanguageService,
   getJsonLanguageService,

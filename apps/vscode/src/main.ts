@@ -12,7 +12,7 @@ import {
   workspace,
 } from 'vscode';
 
-import { checkIsNxWorkspace } from '@nx-console/utils';
+import { checkIsNxWorkspace } from '@nx-console/shared/utils';
 import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
@@ -46,9 +46,9 @@ import {
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import { environment } from './environments/environment';
 
-import { getGenerators } from '@nx-console/collections';
-import { fileExists } from '@nx-console/file-system';
-import { nxVersion } from '@nx-console/npm';
+import { getGenerators } from '@nx-console/shared/collections';
+import { fileExists } from '@nx-console/shared/file-system';
+import { nxVersion } from '@nx-console/shared/npm';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 import { configureLspClient } from '@nx-console/vscode/lsp-client';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
@@ -128,9 +128,8 @@ export async function activate(c: ExtensionContext) {
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
 
-    const { WorkspaceCodeLensProvider } = await import(
-      '@nx-console/vscode/nx-workspace'
-    );
+    const { WorkspaceCodeLensProvider: WorkspaceCodeLensProvider } =
+      await import('@nx-console/vscode/nx-workspace');
     new WorkspaceCodeLensProvider(context);
 
     NxConversion.createInstance(context);
@@ -289,7 +288,7 @@ async function setWorkspace(workspacePath: string) {
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {
-  const { nxWorkspace } = await import('@nx-console/workspace');
+  const { nxWorkspace } = await import('@nx-console/shared/workspace');
 
   const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
 
@@ -335,7 +334,7 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const { nxWorkspace } = await import('@nx-console/workspace');
+  const { nxWorkspace } = await import('@nx-console/shared/workspace');
 
   const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
   const workspacePackageDirs = new Set<string>();

@@ -1,10 +1,10 @@
-import { Option, OptionType } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/shared/schema';
 import { commands, ExtensionContext, window, tasks } from 'vscode';
 
 import { CliTaskProvider } from './cli-task-provider';
 import { selectFlags } from './select-flags';
 import { NxTask } from './nx-task';
-import { nxWorkspace } from '@nx-console/workspace';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import {
   getTelemetry,
   getWorkspacePath,

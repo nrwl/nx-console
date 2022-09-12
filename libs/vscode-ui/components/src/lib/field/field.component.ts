@@ -1,4 +1,4 @@
-import { Option, OptionType } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/shared/schema';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,

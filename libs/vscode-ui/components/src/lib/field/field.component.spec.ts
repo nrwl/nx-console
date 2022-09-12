@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Option, OptionType } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/shared/schema';
 import { FieldComponent, OptionComponent } from './field.component';
 import { AutocompleteComponent } from '../autocomplete/autocomplete.component';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
@@ -46,23 +46,21 @@ describe('FieldComponent', () => {
   let fixture: ComponentFixture<ParentFormComponent>;
   let parent: ParentFormComponent;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [
-          ParentFormComponent,
-          FieldComponent,
-          AutocompleteComponent,
-          CheckboxComponent,
-          FieldItemsPipe,
-          InputComponent,
-          MultipleSelectComponent,
-          SelectComponent,
-        ],
-        imports: [ReactiveFormsModule],
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        ParentFormComponent,
+        FieldComponent,
+        AutocompleteComponent,
+        CheckboxComponent,
+        FieldItemsPipe,
+        InputComponent,
+        MultipleSelectComponent,
+        SelectComponent,
+      ],
+      imports: [ReactiveFormsModule],
+    }).compileComponents();
+  }));
   beforeEach(() => {
     fixture = TestBed.createComponent(ParentFormComponent);
     parent = fixture.componentInstance;

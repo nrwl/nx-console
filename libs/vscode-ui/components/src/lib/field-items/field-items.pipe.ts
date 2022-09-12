@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ItemsWithEnum, Option } from '@nx-console/schema';
+import { ItemsWithEnum, Option } from '@nx-console/shared/schema';
 
 export const getOptionItems = (field: Option): string[] | undefined => {
   return (

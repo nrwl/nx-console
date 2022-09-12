@@ -6,7 +6,7 @@ import {
   EventEmitter,
   ViewEncapsulation,
 } from '@angular/core';
-import { Option } from '@nx-console/schema';
+import { Option } from '@nx-console/shared/schema';
 
 @Component({
   selector: 'nx-console-checkbox',

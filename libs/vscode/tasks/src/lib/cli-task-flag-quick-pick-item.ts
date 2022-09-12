@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/schema';
+import { Option } from '@nx-console/shared/schema';
 import { QuickPickItem } from 'vscode';
 
 export class CliTaskFlagQuickPickItem implements QuickPickItem {

@@ -1,11 +1,11 @@
 import './global-polyfills';
 
-import { getExecutors } from '@nx-console/collections';
+import { getExecutors } from '@nx-console/shared/collections';
 import {
   getPackageJsonSchema,
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
-} from '@nx-console/json-schema';
+} from '@nx-console/shared/json-schema';
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
@@ -17,7 +17,7 @@ import {
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
-import { nxWorkspace } from '@nx-console/workspace';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import { CompletionList, TextDocument } from 'vscode-json-languageservice';
 import {
   createConnection,

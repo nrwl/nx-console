@@ -1,6 +1,6 @@
-import { GeneratorType } from '@nx-console/schema';
+import { GeneratorType } from '@nx-console/shared/schema';
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
-import { nxWorkspace } from '@nx-console/workspace';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import { join } from 'path';
 import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 

@@ -7,8 +7,12 @@ import {
   OnInit,
   OnDestroy,
 } from '@angular/core';
-import { ControlContainer, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { Option } from '@nx-console/schema';
+import {
+  ControlContainer,
+  UntypedFormControl,
+  UntypedFormGroup,
+} from '@angular/forms';
+import { Option } from '@nx-console/shared/schema';
 import { Subscription } from 'rxjs';
 
 @Component({

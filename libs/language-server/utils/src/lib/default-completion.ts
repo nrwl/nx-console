@@ -1,4 +1,4 @@
-import { CompletionType } from '@nx-console/json-schema';
+import { CompletionType } from '@nx-console/shared/json-schema';
 import { ASTNode } from 'vscode-json-languageservice';
 import { isPropertyNode, isStringNode } from './node-types';
 

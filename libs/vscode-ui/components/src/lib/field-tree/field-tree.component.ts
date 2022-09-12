@@ -6,7 +6,7 @@ import {
   OnChanges,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { Option } from '@nx-console/schema';
+import { Option } from '@nx-console/shared/schema';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector

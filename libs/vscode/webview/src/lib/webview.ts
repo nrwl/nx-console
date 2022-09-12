@@ -14,7 +14,10 @@ import {
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { getTelemetry } from '@nx-console/vscode/utils';
-import { TaskExecutionSchema, TaskExecutionMessage } from '@nx-console/schema';
+import {
+  TaskExecutionSchema,
+  TaskExecutionMessage,
+} from '@nx-console/shared/schema';
 import { getTaskExecutionSchema } from './get-task-execution-schema';
 import { watch } from 'fs';
 

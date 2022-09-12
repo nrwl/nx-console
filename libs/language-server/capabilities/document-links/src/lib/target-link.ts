@@ -1,12 +1,12 @@
 import { parseTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
-import { fileExists, readFile } from '@nx-console/file-system';
+import { fileExists, readFile } from '@nx-console/shared/file-system';
 import {
   findProperty,
   getLanguageModelCache,
   isStringNode,
   lspLogger,
 } from '@nx-console/language-server/utils';
-import { nxWorkspace } from '@nx-console/workspace';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import { join } from 'path';
 import {
   ASTNode,

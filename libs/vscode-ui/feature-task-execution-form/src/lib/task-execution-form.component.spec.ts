@@ -1,7 +1,7 @@
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OptionType, TaskExecutionSchema } from '@nx-console/schema';
+import { OptionType, TaskExecutionSchema } from '@nx-console/shared/schema';
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
 import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
@@ -53,21 +53,17 @@ describe('TaskExecutionFormComponent', () => {
   let fixture: ComponentFixture<TaskExecutionFormComponent>;
   let formGroup: FormGroup;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [TaskExecutionFormComponent, FormatTaskPipe],
-        imports: [
-          ReactiveFormsModule,
-          VscodeUiComponentsModule,
-          ArgumentListModule,
-        ],
-        providers: [
-          { provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema },
-        ],
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [TaskExecutionFormComponent, FormatTaskPipe],
+      imports: [
+        ReactiveFormsModule,
+        VscodeUiComponentsModule,
+        ArgumentListModule,
+      ],
+      providers: [{ provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema }],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TaskExecutionFormComponent);

@@ -8,7 +8,7 @@ import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
 import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
 
 import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
-import { TaskExecutionSchema } from '@nx-console/schema';
+import { TaskExecutionSchema } from '@nx-console/shared/schema';
 
 declare global {
   interface Window {

@@ -20,9 +20,9 @@ import {
   GlobalConfigurationStore,
   WorkspaceConfigurationStore,
 } from '@nx-console/vscode/configuration';
-import { buildProjectPath } from '@nx-console/utils';
+import { buildProjectPath } from '@nx-console/shared/utils';
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
-import { nxWorkspace } from '@nx-console/workspace';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 
 export class TargetCodeLens extends CodeLens {
   constructor(

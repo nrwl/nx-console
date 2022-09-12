@@ -1,7 +1,7 @@
 import {
   TaskExecutionSchema,
   WORKSPACE_GENERATOR_NAME_REGEX,
-} from '@nx-console/schema';
+} from '@nx-console/shared/schema';
 
 export const formatTask = (
   architect: TaskExecutionSchema,
