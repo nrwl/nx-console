@@ -49,7 +49,7 @@ import { environment } from './environments/environment';
 import { getGenerators } from '@nx-console/collections';
 import { fileExists } from '@nx-console/file-system';
 import { nxVersion } from '@nx-console/npm';
-import { enableTypeScriptPlugin } from '@nx-console/typescript-plugin';
+import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 import { configureLspClient } from '@nx-console/vscode/lsp-client';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
 import {

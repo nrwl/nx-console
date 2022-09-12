@@ -1,20 +1,20 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/typescript-plugin/src",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/vscode/typescript-plugin/src",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/typescript-plugin/**/*.ts"]
+        "lintFilePatterns": ["libs/vscode/typescript-plugin/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/typescript-plugin"],
+      "outputs": ["coverage/libs/vscode/typescript-plugin"],
       "options": {
-        "jestConfig": "libs/typescript-plugin/jest.config.ts",
+        "jestConfig": "libs/vscode/typescript-plugin/jest.config.ts",
         "passWithNoTests": true
       }
     }
