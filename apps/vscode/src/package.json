@@ -707,7 +707,7 @@
         "nxConsole.useFolderStructure": {
           "type": "boolean",
           "default": false,
-          "description": "Enables the folder structure which will give a hierarchy in the projects map. \n\nIMPORTANT: This only works if your project folder matches your project inside your workspace.json"
+          "description": "Enables the folder structure which will give a hierarchy in the projects map."
         },
         "nxConsole.generatorAllowlist": {
           "type": "array",

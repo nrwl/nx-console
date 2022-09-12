@@ -109,8 +109,10 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     const useFolderStructure = GlobalConfigurationStore.instance.get('useFolderStructure');
 
     let parentStatement = !parent;
+    const folderProject = parent && typeof parent.label === 'string' && projects.find(project => project[1].root.split('/').pop() === parent.label);
+
     if (useFolderStructure) {
-      parentStatement = !parent || (parent.contextValue === 'folder' && !NxProjectTreeHelper.isProject(projects, parent.nxProject.project))
+      parentStatement = !parent || (parent.contextValue === 'folder' && !folderProject)
     }
     
     if (parentStatement) {
@@ -141,7 +143,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
 
     const { nxProject } = parent as NxProjectTreeItem;
     const { target, project } = nxProject;
-    const projectDef = (await this.cliTaskProvider.getProjects())[project];
+    let def = project;
+    def = useFolderStructure && folderProject ? folderProject[0] : def;
+    const projectDef = (await this.cliTaskProvider.getProjects())[def];
 
     if (!projectDef) {
       return;

@@ -20,15 +20,6 @@ export class NxProjectTreeHelper {
     return projectsObject;
   }
 
-  static isProject(projects: [string, ProjectConfiguration][], project: string): boolean {
-    const flattenProjects = projects.flat();
-
-    if (flattenProjects.includes(project)) {
-      return true;
-    }
-    return false
-  }
-
   static async findNestedObject(fields: any, key: string): Promise<any> {
     let result = null;
     if (fields instanceof Array) {
