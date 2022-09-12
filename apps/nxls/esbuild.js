@@ -9,6 +9,7 @@
     mainFields: ['module', 'main'],
     outfile: './dist/apps/vscode/nxls/main.js',
     metafile: true,
+    external: ['typescript', 'ts-node'],
   });
 
   let text = await esbuild.analyzeMetafile(result.metafile, {
@@ -16,5 +17,5 @@
   });
 
   // Comment out to analyze the build
-  // await require('fs/promises').writeFile('./dep.txt', text);
+  await require('fs/promises').writeFile('./dep.txt', text);
 })();
