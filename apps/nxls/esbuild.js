@@ -17,5 +17,5 @@
   });
 
   // Comment out to analyze the build
-  await require('fs/promises').writeFile('./dep.txt', text);
+  // await require('fs/promises').writeFile('./dep.txt', text);
 })();
