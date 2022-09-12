@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/nrwl/nx-console/compare/nxls-v1.1.0...nxls-v1.2.0) (2022-09-12)
+
+
+### Features
+
+* **nxls:** get project targets for the language server ([#1330](https://github.com/nrwl/nx-console/issues/1330)) ([0e5ca81](https://github.com/nrwl/nx-console/commit/0e5ca812eb143dd827072fffc0ba2016dfcbe7ac))
+
 # [1.1.0](https://github.com/nrwl/nx-console/compare/nxls-v1.0.2...nxls-v1.1.0) (2022-08-29)
 
 
