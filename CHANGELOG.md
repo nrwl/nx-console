@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.22.0](https://github.com/nrwl/nx-console/compare/v17.21.0...v17.22.0) (2022-09-12)
+
+
+### Features
+
+* **nxls:** get project targets for the language server ([#1330](https://github.com/nrwl/nx-console/issues/1330)) ([0e5ca81](https://github.com/nrwl/nx-console/commits/0e5ca812eb143dd827072fffc0ba2016dfcbe7ac))
+* add help & feedback view ([#1331](https://github.com/nrwl/nx-console/issues/1331)) ([abf9cbe](https://github.com/nrwl/nx-console/commits/abf9cbe178027fca0b656767b1279232762fefc0))
+
+
+### Bug Fixes
+
+* remove broken commands from command palette ([#1335](https://github.com/nrwl/nx-console/issues/1335)) ([3f7fc6c](https://github.com/nrwl/nx-console/commits/3f7fc6c6039a6f0ef3ef848fa32a0ad5d033ed29))
+
 ## [17.21.0](https://github.com/nrwl/nx-console/compare/v17.20.0...v17.21.0) (2022-08-29)
 
 
