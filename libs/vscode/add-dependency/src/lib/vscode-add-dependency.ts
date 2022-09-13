@@ -104,11 +104,15 @@ async function executeInitGenerator(dependency: string) {
   const generators = await getGenerators(
     WorkspaceConfigurationStore.instance.get('nxWorkspacePath', ''),
     undefined,
-    { includeHidden: true }
+    { includeHidden: true, includeNgAdd: true }
   );
 
-  const initGeneratorName = `${dependency}:init`;
-  const initGenerator = generators.find((c) => c.name === initGeneratorName);
+  let initGeneratorName = `${dependency}:init`;
+  let initGenerator = generators.find((g) => g.name === initGeneratorName);
+  if (!initGenerator) {
+    initGeneratorName = `${dependency}:ng-add`;
+    initGenerator = generators.find((g) => g.name === initGeneratorName);
+  }
 
   if (!initGenerator?.data) {
     return;

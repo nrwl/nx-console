@@ -20,6 +20,7 @@ export type ReadCollectionsOptions = {
   projects?: WorkspaceProjects;
   clearPackageJsonCache?: boolean;
   includeHidden?: boolean;
+  includeNgAdd?: boolean;
 };
 export async function readCollections(
   workspacePath: string,
@@ -133,7 +134,7 @@ export async function getCollectionInfo(
     ...executorCollection.json.builders,
   };
   for (const [key, schema] of Object.entries<any>(executors)) {
-    if (!canUse(key, schema, options.includeHidden)) {
+    if (!canUse(key, schema, options.includeHidden, options.includeNgAdd)) {
       continue;
     }
     const collectionInfo = buildCollectionInfo(
@@ -158,7 +159,7 @@ export async function getCollectionInfo(
     ...generatorCollection.json.schematics,
   };
   for (const [key, schema] of Object.entries<any>(generators)) {
-    if (!canUse(key, schema, options.includeHidden)) {
+    if (!canUse(key, schema, options.includeHidden, options.includeNgAdd)) {
       continue;
     }
 
@@ -273,13 +274,14 @@ function readCollectionGenerator(
 function canUse(
   name: string,
   s: { hidden: boolean; private: boolean; schema: string; extends: boolean },
-  includeHiddenCollections = false
+  includeHiddenCollections = false,
+  includeNgAddCollection = false
 ): boolean {
   return (
     (!s.hidden || includeHiddenCollections) &&
     !s.private &&
     !s.extends &&
-    name !== 'ng-add'
+    (name !== 'ng-add' || includeNgAddCollection)
   );
 }
 

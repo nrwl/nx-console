@@ -14,18 +14,22 @@ import {
   listFiles,
 } from '@nx-console/shared/file-system';
 
-export type GetGeneratorsOptions = { includeHidden: boolean };
+export type GetGeneratorsOptions = {
+  includeHidden: boolean;
+  includeNgAdd: boolean;
+};
 
 export async function getGenerators(
   workspacePath: string,
   projects?: WorkspaceProjects,
-  options: GetGeneratorsOptions = { includeHidden: false }
+  options: GetGeneratorsOptions = { includeHidden: false, includeNgAdd: false }
 ): Promise<CollectionInfo[]> {
   const basedir = workspacePath;
   const collections = await readCollections(workspacePath, {
     projects,
     clearPackageJsonCache: false,
     includeHidden: options.includeHidden,
+    includeNgAdd: options.includeNgAdd,
   });
   let generatorCollections = collections.filter(
     (collection) => collection.type === 'generator'
