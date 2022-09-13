@@ -133,6 +133,12 @@ export async function activate(c: ExtensionContext) {
       await import('@nx-console/vscode/nx-workspace');
     new WorkspaceCodeLensProvider(context);
 
+    const { AddDependencyCodelensProvider } = await import(
+      '@nx-console/vscode/add-dependency'
+    );
+
+    new AddDependencyCodelensProvider(context);
+
     NxConversion.createInstance(context);
 
     await enableTypeScriptPlugin(context);
