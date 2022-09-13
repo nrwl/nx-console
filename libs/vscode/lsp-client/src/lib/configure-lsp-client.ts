@@ -43,6 +43,7 @@ export async function configureLspClient(
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },
       { scheme: 'file', language: 'json', pattern: '**/project.json' },
       { scheme: 'file', language: 'json', pattern: '**/workspace.json' },
+      { scheme: 'file', language: 'json', pattern: '**/package.json' },
     ],
     synchronize: {},
   };

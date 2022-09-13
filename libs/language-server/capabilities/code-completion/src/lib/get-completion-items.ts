@@ -82,7 +82,7 @@ function completionItems(
           searchType: 'directory',
         });
       }
-      case 'target': {
+      case 'projectTarget': {
         return targetCompletion(workingPath, node, document);
       }
       default: {

@@ -2,6 +2,7 @@ import './global-polyfills';
 
 import { getExecutors } from '@nx-console/collections';
 import {
+  getPackageJsonSchema,
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
 } from '@nx-console/json-schema';
@@ -63,6 +64,7 @@ connection.onInitialize(async (params) => {
     const collections = await getExecutors(WORKING_PATH, projects, false);
     const workspaceSchema = getWorkspaceJsonSchema(collections);
     const projectSchema = getProjectJsonSchema(collections);
+    const packageSchema = getPackageJsonSchema();
 
     configureJsonLanguageService(
       {
@@ -82,6 +84,11 @@ connection.onInitialize(async (params) => {
             uri: 'nx://schemas/project',
             fileMatch: ['**/project.json'],
             schema: projectSchema,
+          },
+          {
+            uri: 'nx://schemas/package',
+            fileMatch: ['**/package.json'],
+            schema: packageSchema,
           },
         ],
       }
@@ -123,9 +130,10 @@ connection.onCompletion(async (completionParams) => {
       jsonAst
     )) ?? CompletionList.create([]);
 
-  const schemas =
-    (await getJsonLanguageService().getMatchingSchemas(document, jsonAst)) ??
-    [];
+  const schemas = await getJsonLanguageService().getMatchingSchemas(
+    document,
+    jsonAst
+  );
 
   const pathItems = await getCompletionItems(
     WORKING_PATH,
@@ -162,9 +170,10 @@ connection.onDocumentLinks(async (params) => {
   }
 
   const { jsonAst, document } = getJsonDocument(linkDocument);
-  const schemas =
-    (await getJsonLanguageService().getMatchingSchemas(document, jsonAst)) ??
-    [];
+  const schemas = await getJsonLanguageService().getMatchingSchemas(
+    document,
+    jsonAst
+  );
 
   return getDocumentLinks(WORKING_PATH, jsonAst, document, schemas);
 });

@@ -30,19 +30,19 @@ defaultCompletionMap.set('outputpath', {
   completionType: 'directory',
 });
 defaultCompletionMap.set('browsertarget', {
-  completionType: 'target',
+  completionType: 'projectTarget',
 });
 defaultCompletionMap.set('servertarget', {
-  completionType: 'target',
+  completionType: 'projectTarget',
 });
 defaultCompletionMap.set('buildtarget', {
-  completionType: 'target',
+  completionType: 'projectTarget',
 });
 defaultCompletionMap.set('target', {
-  completionType: 'target',
+  completionType: 'projectTarget',
 });
 defaultCompletionMap.set('devservertarget', {
-  completionType: 'target',
+  completionType: 'projectTarget',
 });
 
 export function getDefaultCompletionType(

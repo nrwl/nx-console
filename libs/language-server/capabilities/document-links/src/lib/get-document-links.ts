@@ -78,7 +78,7 @@ export async function getDocumentLinks(
         }
         break;
       }
-      case 'target': {
+      case 'projectTarget': {
         const link = await targetLink(workingPath, node);
         if (link) {
           links.push(DocumentLink.create(range, link));
