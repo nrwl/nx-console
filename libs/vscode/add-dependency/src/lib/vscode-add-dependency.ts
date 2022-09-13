@@ -45,9 +45,11 @@ async function vscodeAddDependencyCommand() {
   if (dep) {
     getTelemetry().featureUsed('add-dependency');
     addDependency(dep);
-    const disposable = tasks.onDidEndTask(() => {
-      executeInitGenerator(dep);
-      disposable.dispose();
+    const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
+      if (taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep') {
+        executeInitGenerator(dep);
+        disposable.dispose();
+      }
     }, undefined);
   }
 }
@@ -89,7 +91,7 @@ function addDependency(dependency: string) {
   const command = `${getPackageManagerCommand(pkgManager).add} ${dependency}`;
   const task = new Task(
     {
-      type: 'nx',
+      type: 'nxconsole-add-dep',
     },
     TaskScope.Workspace,
     command,
