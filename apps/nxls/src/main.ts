@@ -198,6 +198,14 @@ connection.onRequest('nx/workspace', async () => {
   return workspace.workspace.projects;
 });
 
+connection.onNotification('nx/refreshWorkspace', async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
+  await nxWorkspace(WORKING_PATH, lspLogger, true);
+});
+
 function getJsonDocument(document: TextDocument) {
   return jsonDocumentMapper.retrieve(document);
 }

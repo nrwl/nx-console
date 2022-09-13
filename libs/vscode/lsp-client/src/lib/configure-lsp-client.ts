@@ -67,3 +67,7 @@ export async function configureLspClient(
     },
   };
 }
+
+export function sendNotification(notificationType: string) {
+  client.sendNotification(notificationType);
+}

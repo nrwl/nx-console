@@ -15,7 +15,9 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import { pathCompletion } from './path-completion';
-import { targetCompletion } from './target-completion';
+import { projectCompletion } from './project-completion';
+import { projectTargetCompletion } from './project-target-completion';
+import { tagsCompletion } from './tags-completion';
 
 export async function getCompletionItems(
   workingPath: string | undefined,
@@ -70,20 +72,26 @@ function completionItems(
     glob?: string
   ): Promise<CompletionItem[]> => {
     switch (completion) {
-      case 'file': {
+      case CompletionType.file: {
         return pathCompletion(workingPath, node, document, {
           glob: glob ?? '*.*',
           searchType: 'file',
         });
       }
-      case 'directory': {
+      case CompletionType.directory: {
         return pathCompletion(workingPath, node, document, {
           glob: glob ?? '*',
           searchType: 'directory',
         });
       }
-      case 'projectTarget': {
-        return targetCompletion(workingPath, node, document);
+      case CompletionType.projectTarget: {
+        return projectTargetCompletion(workingPath, node, document);
+      }
+      case CompletionType.project: {
+        return projectCompletion(workingPath, node, document);
+      }
+      case CompletionType.tags: {
+        return tagsCompletion(workingPath, node, document);
       }
       default: {
         return [];

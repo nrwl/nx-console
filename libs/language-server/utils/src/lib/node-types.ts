@@ -1,4 +1,5 @@
 import {
+  ArrayASTNode,
   ASTNode,
   ObjectASTNode,
   PropertyASTNode,
@@ -15,4 +16,8 @@ export function isObjectNode(node?: ASTNode): node is ObjectASTNode {
 
 export function isStringNode(node?: ASTNode): node is StringASTNode {
   return node?.type === 'string';
+}
+
+export function isArrayNode(node?: ASTNode): node is ArrayASTNode {
+  return node?.type === 'array';
 }

@@ -4,13 +4,14 @@ import { JSONSchema } from 'vscode-json-languageservice';
 export const X_COMPLETION_TYPE = 'x-completion-type' as const;
 export const X_COMPLETION_GLOB = 'x-completion-glob' as const;
 
-export type CompletionType =
-  | 'file'
-  | 'directory'
-  | 'projectTarget'
-  | 'project'
-  | 'targets'
-  | 'tags';
+export enum CompletionType {
+  file = 'file',
+  directory = 'directory',
+  projectTarget = 'projectTarget',
+  project = 'project',
+  targets = 'targets',
+  tags = 'tags',
+}
 
 export function hasCompletionType(
   schema: JSONSchema

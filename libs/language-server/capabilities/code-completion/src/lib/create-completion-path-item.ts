@@ -5,7 +5,7 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 
-export function createCompletionPathItem(
+export function createCompletionItem(
   label: string,
   path: string,
   node: ASTNode,
