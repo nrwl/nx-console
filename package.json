@@ -79,6 +79,7 @@
     "eslint": "8.15.0",
     "eslint-config-prettier": "8.1.0",
     "jest": "27.5.1",
+    "jest-environment-jsdom": "28.1.1",
     "jest-preset-angular": "11.1.2",
     "memfs": "^3.4.7",
     "nx": "14.5.10",

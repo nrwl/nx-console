@@ -28,6 +28,10 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
+import {
+  NxWorkspace,
+  NxWorkspaceRefresh,
+} from '@nx-console/language-server/types';
 
 let WORKING_PATH: string | undefined = undefined;
 
@@ -188,7 +192,7 @@ connection.onShutdown(() => {
   jsonDocumentMapper.dispose();
 });
 
-connection.onRequest('nx/workspace', async () => {
+connection.onRequest(NxWorkspace.type, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
@@ -198,7 +202,7 @@ connection.onRequest('nx/workspace', async () => {
   return workspace.workspace.projects;
 });
 
-connection.onNotification('nx/refreshWorkspace', async () => {
+connection.onNotification(NxWorkspaceRefresh.type, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
