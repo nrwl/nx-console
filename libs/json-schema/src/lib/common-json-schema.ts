@@ -116,7 +116,7 @@ export const targets = (executors?: JSONSchema[]): JSONSchema => {
           },
         },
       },
-      ...(executors ?? { allOf: executors }),
+      ...(executors && { allOf: executors }),
     },
   };
 
