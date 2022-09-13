@@ -6,7 +6,10 @@ import {
 import { getGenerators } from '@nx-console/collections';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import {
+  getShellExecutionForConfig,
+  getTelemetry,
+} from '@nx-console/vscode/utils';
 import { xhr, XHRResponse } from 'request-light';
 import {
   commands,
@@ -27,12 +30,15 @@ export function registerVscodeAddDependency(context: ExtensionContext) {
   );
 }
 
-let workspace: string;
+let workspacePath: string;
 let pkgManager: PackageManager;
 
 async function vscodeAddDependencyCommand() {
-  workspace = WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
-  pkgManager = detectPackageManager(workspace);
+  workspacePath = WorkspaceConfigurationStore.instance.get(
+    'nxWorkspacePath',
+    ''
+  );
+  pkgManager = detectPackageManager(workspacePath);
 
   const dep = await promptForDependencyName();
 
@@ -102,59 +108,77 @@ async function executeInitGenerator(dependency: string) {
   const initGeneratorName = `${dependency}:init`;
   const initGenerator = generators.find((c) => c.name === initGeneratorName);
 
-  if (initGenerator?.data?.collection) {
-    const workspaceType = WorkspaceConfigurationStore.instance.get(
-      'workspaceType',
-      'nx'
-    );
-    const opts = await getGeneratorOptions(
-      workspace,
-      initGenerator.data?.collection,
-      initGenerator.name,
-      initGenerator.path,
-      workspaceType
-    );
-    let selectedFlags;
-    if (opts.length) {
-      selectedFlags = await selectFlags(
-        initGenerator.name,
-        opts,
-        workspaceType
-      );
-    }
-    const command = `${
-      getPackageManagerCommand(pkgManager).exec
-    } nx g ${initGeneratorName} ${selectedFlags?.reduce(
-      (acc, curr) => `${acc} ${curr}`,
-      ''
-    )} --interactive=false`;
-    const task = new Task(
-      { type: 'nx' },
-      TaskScope.Workspace,
-      command,
-      pkgManager,
-      new ShellExecution(command)
-    );
-    tasks.executeTask(task);
+  if (!initGenerator?.data) {
+    return;
   }
+
+  const workspaceType = WorkspaceConfigurationStore.instance.get(
+    'workspaceType',
+    'nx'
+  );
+  const opts = await getGeneratorOptions(
+    workspacePath,
+    initGenerator.data.collection,
+    initGenerator.name,
+    initGenerator.path,
+    workspaceType
+  );
+  let selectedFlags;
+  if (opts.length) {
+    selectedFlags = await selectFlags(initGenerator.name, opts, workspaceType);
+  }
+  const command = `nx g ${initGeneratorName} ${
+    selectedFlags?.join(' ') ?? ''
+  } --interactive=false`;
+  const task = new Task(
+    { type: 'nx' },
+    TaskScope.Workspace,
+    command,
+    pkgManager,
+    getShellExecutionForConfig({
+      cwd: workspacePath,
+      displayCommand: command,
+    })
+  );
+  tasks.executeTask(task);
 }
 
 function getDependencySuggestions(): Promise<
   {
     name: string;
     description: string;
-    url: string;
   }[]
 > {
   const headers = { 'Accept-Encoding': 'gzip, deflate' };
-  return xhr({
-    url: 'https://raw.githubusercontent.com/nrwl/nx/master/community/approved-plugins.json',
-    followRedirects: 5,
-    headers,
-  }).then(
-    (response) => {
+  return Promise.all([
+    xhr({
+      url: 'https://raw.githubusercontent.com/nrwl/nx/master/docs/packages.json',
+      followRedirects: 5,
+      headers,
+    }).then((response) => {
+      return (JSON.parse(response.responseText) as { name: string }[])
+        .filter(
+          (pkg) =>
+            pkg.name !== 'add-nx-to-monorepo' &&
+            pkg.name !== 'cra-to-nx' &&
+            pkg.name !== 'create-nx-plugin' &&
+            pkg.name !== 'create-nx-workspace' &&
+            pkg.name !== 'make-angular-cli-faster' &&
+            pkg.name !== 'tao'
+        )
+        .map((pkg) => ({
+          name: `@nrwl/${pkg.name}`,
+        }));
+    }),
+    xhr({
+      url: 'https://raw.githubusercontent.com/nrwl/nx/master/community/approved-plugins.json',
+      followRedirects: 5,
+      headers,
+    }).then((response) => {
       return JSON.parse(response.responseText);
-    },
+    }),
+  ]).then(
+    (responses) => responses.flat(1),
     (error: XHRResponse) => {
       return Promise.reject(error.responseText);
     }
