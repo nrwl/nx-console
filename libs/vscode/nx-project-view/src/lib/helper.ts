@@ -2,18 +2,18 @@ import { ProjectConfiguration } from "@nrwl/devkit";
 
 export class NxProjectTreeHelper {
 
-  static async getProjectsInFolders(projects: [string, ProjectConfiguration][]): Promise<Record<string,any>> {
+  static async getProjectsInFolders(projects: [string, ProjectConfiguration][]): Promise<Record<string,ProjectConfiguration>> {
     const projectsObject = {};
 
     projects.forEach((project) => {
       const lastArray = project[1] as ProjectConfiguration;
       const splittedProject = lastArray.root.split('/');
 
-      splittedProject.reduce((r: {[key: string]: string;} & any, e: string, i: number) => {
-          if (splittedProject.length -1 > i) {
-              return r[e] || (r[e] = {});
+      splittedProject.reduce((previousValue: {[key: string]: string;} & any, currentValue: string, currentIndex: number) => {
+          if (splittedProject.length -1 > currentIndex) {
+              return previousValue[currentValue] || (previousValue[currentValue] = {});
           }
-          return r[e] || (r[e] = project)
+          return previousValue[currentValue] || (previousValue[currentValue] = project)
       }, projectsObject)
     });
 

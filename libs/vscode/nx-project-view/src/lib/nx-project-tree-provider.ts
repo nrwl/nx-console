@@ -129,10 +129,10 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
       return Promise.all(
         clonedProjectsMap.map(
           async ([name, def]: any): Promise<NxProjectTreeItem> => {
-            let root = def.root;
+            let root = Array.isArray(def) ? def[1]?.root : def.root;
             const hasChildren = useFolderStructure ? root !== def : Boolean(def.targets);
 
-            if (useFolderStructure) {
+            if (useFolderStructure && !root) {
               root = Array.isArray(clonedProjects) ? def as string : ''
             }
             return this.createNxProjectTreeItem({ project: name, root }, name, hasChildren );
