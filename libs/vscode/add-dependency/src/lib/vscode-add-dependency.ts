@@ -173,7 +173,12 @@ function getDependencySuggestions(): Promise<
       followRedirects: 5,
       headers,
     }).then((response) => {
-      return (JSON.parse(response.responseText) as { name: string }[])
+      return (
+        JSON.parse(response.responseText) as {
+          name: string;
+          description: string;
+        }[]
+      )
         .filter(
           (pkg) =>
             pkg.name !== 'add-nx-to-monorepo' &&
@@ -185,6 +190,7 @@ function getDependencySuggestions(): Promise<
         )
         .map((pkg) => ({
           name: `@nrwl/${pkg.name}`,
+          description: pkg.description,
         }));
     }),
     xhr({
