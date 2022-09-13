@@ -678,6 +678,10 @@
       {
         "title": "Add dependency to workspace",
         "command": "nxConsole.addDependency"
+      },
+      {
+        "title": "Add dev dependency to workspace",
+        "command": "nxConsole.addDevDependency"
       }
     ],
     "configuration": {

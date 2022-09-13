@@ -25,7 +25,11 @@ export function registerVscodeAddDependency(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand(
       'nxConsole.addDependency',
-      vscodeAddDependencyCommand
+      vscodeAddDependencyCommand(false)
+    ),
+    commands.registerCommand(
+      'nxConsole.addDevDependency',
+      vscodeAddDependencyCommand(true)
     )
   );
 }
@@ -33,25 +37,29 @@ export function registerVscodeAddDependency(context: ExtensionContext) {
 let workspacePath: string;
 let pkgManager: PackageManager;
 
-async function vscodeAddDependencyCommand() {
-  workspacePath = WorkspaceConfigurationStore.instance.get(
-    'nxWorkspacePath',
-    ''
-  );
-  pkgManager = detectPackageManager(workspacePath);
+function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
+  return async () => {
+    workspacePath = WorkspaceConfigurationStore.instance.get(
+      'nxWorkspacePath',
+      ''
+    );
+    pkgManager = detectPackageManager(workspacePath);
 
-  const dep = await promptForDependencyName();
+    const dep = await promptForDependencyName();
 
-  if (dep) {
-    getTelemetry().featureUsed('add-dependency');
-    addDependency(dep);
-    const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
-      if (taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep') {
-        executeInitGenerator(dep);
-        disposable.dispose();
-      }
-    }, undefined);
-  }
+    if (dep) {
+      getTelemetry().featureUsed('add-dependency');
+      addDependency(dep, installAsDevDependency);
+      const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
+        if (
+          taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
+        ) {
+          executeInitGenerator(dep);
+          disposable.dispose();
+        }
+      }, undefined);
+    }
+  };
 }
 
 async function promptForDependencyName(): Promise<string | undefined> {
@@ -87,8 +95,11 @@ async function promptForDependencyName(): Promise<string | undefined> {
   return dep;
 }
 
-function addDependency(dependency: string) {
-  const command = `${getPackageManagerCommand(pkgManager).add} ${dependency}`;
+function addDependency(dependency: string, installAsDevDependency: boolean) {
+  const pkgManagerCommands = getPackageManagerCommand(pkgManager);
+  const command = `${
+    installAsDevDependency ? pkgManagerCommands.addDev : pkgManagerCommands.add
+  } ${dependency}`;
   const task = new Task(
     {
       type: 'nxconsole-add-dep',
