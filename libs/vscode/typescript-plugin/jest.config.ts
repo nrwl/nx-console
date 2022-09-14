@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'typescript-plugin',
+  displayName: 'vscode-typescript-plugin',
 
   globals: {
     'ts-jest': {
@@ -12,6 +12,6 @@ export default {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/typescript-plugin',
-  preset: '../../jest.preset.js',
+  coverageDirectory: '../../../coverage/libs/vscode/typescript-plugin',
+  preset: '../../../jest.preset.js',
 };
