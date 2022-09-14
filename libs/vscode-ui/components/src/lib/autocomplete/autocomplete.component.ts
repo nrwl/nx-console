@@ -31,7 +31,7 @@ import {
   of,
   interval,
 } from 'rxjs';
-import { Option } from '@nx-console/schema';
+import { Option } from '@nx-console/shared/schema';
 import { getOptionItems } from '../field-items/field-items.pipe';
 
 export enum AutocompleteNavKeys {

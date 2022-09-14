@@ -47,7 +47,7 @@ import {
   ItemsWithEnum,
   OptionType,
   Option,
-} from '@nx-console/schema';
+} from '@nx-console/shared/schema';
 
 function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
   return key in obj;

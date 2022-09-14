@@ -1,9 +1,9 @@
-import { fileExists } from '@nx-console/file-system';
+import { fileExists } from '@nx-console/shared/file-system';
 import {
   CompletionType,
   hasCompletionType,
   X_COMPLETION_TYPE,
-} from '@nx-console/json-schema';
+} from '@nx-console/shared/json-schema';
 import {
   findProjectRoot,
   getDefaultCompletionType,

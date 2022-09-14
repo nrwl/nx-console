@@ -1,16 +1,17 @@
 {
   "version": 2,
   "projects": {
-    "collections": "libs/collections",
-    "file-system": "libs/file-system",
-    "json-schema": "libs/json-schema",
     "language-server-capabilities-code-completion": "libs/language-server/capabilities/code-completion",
     "language-server-capabilities-document-links": "libs/language-server/capabilities/document-links",
     "language-server-utils": "libs/language-server/utils",
-    "npm": "libs/npm",
     "nxls": "apps/nxls",
-    "schema": "libs/schema",
-    "utils": "libs/utils",
+    "shared-collections": "libs/shared/collections",
+    "shared-file-system": "libs/shared/file-system",
+    "shared-json-schema": "libs/shared/json-schema",
+    "shared-npm": "libs/shared/npm",
+    "shared-schema": "libs/shared/schema",
+    "shared-utils": "libs/shared/utils",
+    "shared-workspace": "libs/shared/workspace",
     "vscode": "apps/vscode",
     "vscode-configuration": "libs/vscode/configuration",
     "vscode-lsp-client": "libs/vscode/lsp-client",
@@ -31,8 +32,7 @@
     "vscode-ui-styles": "libs/vscode-ui/styles",
     "vscode-utils": "libs/vscode/utils",
     "vscode-verify": "libs/vscode/verify",
-    "vscode-webview": "libs/vscode/webview",
-    "workspace": "libs/workspace"
+    "vscode-webview": "libs/vscode/webview"
   },
   "$schema": "./node_modules/nx/schemas/workspace-schema.json"
 }

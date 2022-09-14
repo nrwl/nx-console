@@ -8,7 +8,7 @@ import {
 } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { Option, OptionType } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/shared/schema';
 import {
   AutocompleteComponent,
   AutocompleteNavKeys,
@@ -70,14 +70,12 @@ describe('AutocompleteComponent', () => {
   let fixture: ComponentFixture<ParentFormComponent>;
   let parent: ParentFormComponent;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [ParentFormComponent, AutocompleteComponent],
-        imports: [ReactiveFormsModule],
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ParentFormComponent, AutocompleteComponent],
+      imports: [ReactiveFormsModule],
+    }).compileComponents();
+  }));
   beforeEach(() => {
     fixture = TestBed.createComponent(ParentFormComponent);
     parent = fixture.componentInstance;

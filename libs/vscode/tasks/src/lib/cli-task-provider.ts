@@ -2,7 +2,7 @@ import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import {
   WorkspaceProjects,
   WORKSPACE_GENERATOR_NAME_REGEX,
-} from '@nx-console/schema';
+} from '@nx-console/shared/schema';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
 import {
@@ -10,7 +10,7 @@ import {
   getWorkspacePath,
   outputLogger,
 } from '@nx-console/vscode/utils';
-import { nxWorkspace } from '@nx-console/workspace';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import {
   ProviderResult,
   Task,

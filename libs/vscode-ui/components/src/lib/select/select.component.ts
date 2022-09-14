@@ -6,7 +6,7 @@ import {
   Output,
 } from '@angular/core';
 import { ControlContainer, UntypedFormGroup } from '@angular/forms';
-import { Option } from '@nx-console/schema';
+import { Option } from '@nx-console/shared/schema';
 
 @Component({
   selector: 'nx-console-select',

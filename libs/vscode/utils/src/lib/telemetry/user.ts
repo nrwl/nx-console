@@ -1,4 +1,4 @@
-import { Store } from '@nx-console/schema';
+import { Store } from '@nx-console/shared/schema';
 
 export type UserState = 'untracked' | 'tracked';
 

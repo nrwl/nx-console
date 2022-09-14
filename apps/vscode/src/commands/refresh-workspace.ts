@@ -7,7 +7,7 @@ export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 const refresh = new Subject();
 
 refresh.pipe(debounceTime(150)).subscribe(async () => {
-  const { nxWorkspace } = await import('@nx-console/workspace');
+  const { nxWorkspace } = await import('@nx-console/shared/workspace');
   await nxWorkspace(getWorkspacePath(), outputLogger, true);
   commands.executeCommand('nxConsole.refreshNxProjectsTree');
   commands.executeCommand('nxConsole.refreshRunTargetTree');

@@ -1,4 +1,4 @@
-import { Logger } from '@nx-console/schema';
+import { Logger } from '@nx-console/shared/schema';
 import { Connection } from 'vscode-languageserver';
 
 let log: Console['log'] | undefined;

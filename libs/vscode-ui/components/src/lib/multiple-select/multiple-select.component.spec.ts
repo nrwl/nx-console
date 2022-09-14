@@ -2,7 +2,7 @@ import { Component, DebugElement, ViewChild } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Option, OptionType } from '@nx-console/schema';
+import { Option, OptionType } from '@nx-console/shared/schema';
 import { MultipleSelectComponent } from './multiple-select.component';
 import { FieldItemsPipe } from '../field-items/field-items.pipe';
 
@@ -52,18 +52,16 @@ describe('MultipleSelectComponent', () => {
   let parent: ParentFormComponent;
   let options: DebugElement[];
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [
-          ParentFormComponent,
-          MultipleSelectComponent,
-          FieldItemsPipe,
-        ],
-        imports: [ReactiveFormsModule],
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        ParentFormComponent,
+        MultipleSelectComponent,
+        FieldItemsPipe,
+      ],
+      imports: [ReactiveFormsModule],
+    }).compileComponents();
+  }));
   beforeEach(() => {
     fixture = TestBed.createComponent(ParentFormComponent);
     parent = fixture.componentInstance;

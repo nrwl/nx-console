@@ -1,4 +1,8 @@
-import { GeneratorType, Option, TaskExecutionSchema } from '@nx-console/schema';
+import {
+  GeneratorType,
+  Option,
+  TaskExecutionSchema,
+} from '@nx-console/shared/schema';
 import {
   getOutputChannel,
   getTelemetry,
@@ -14,7 +18,7 @@ import {
   selectCliProject,
   selectGenerator,
 } from '@nx-console/vscode/tasks';
-import { findProjectWithPath, nxWorkspace } from '@nx-console/workspace';
+import { findProjectWithPath, nxWorkspace } from '@nx-console/shared/workspace';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,

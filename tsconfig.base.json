@@ -21,9 +21,6 @@
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
-      "@nx-console/collections": ["libs/collections/src/index.ts"],
-      "@nx-console/file-system": ["libs/file-system/src/index.ts"],
-      "@nx-console/json-schema": ["libs/json-schema/src/index.ts"],
       "@nx-console/language-server/capabilities/code-completion": [
         "libs/language-server/capabilities/code-completion/src/index.ts"
       ],
@@ -33,10 +30,22 @@
       "@nx-console/language-server/utils": [
         "libs/language-server/utils/src/index.ts"
       ],
-      "@nx-console/npm": ["libs/npm/src/index.ts"],
-      "@nx-console/schema": ["libs/schema/src/index.ts"],
-      "@nx-console/schema/normalize": ["libs/schema/src/normalize-schema.ts"],
-      "@nx-console/utils": ["libs/utils/src/index.ts"],
+      "@nx-console/shared/schema/normalize": [
+        "libs/shared/schema/src/normalize-schema.ts"
+      ],
+      "@nx-console/shared/collections": [
+        "libs/shared/collections/src/index.ts"
+      ],
+      "@nx-console/shared/file-system": [
+        "libs/shared/file-system/src/index.ts"
+      ],
+      "@nx-console/shared/json-schema": [
+        "libs/shared/json-schema/src/index.ts"
+      ],
+      "@nx-console/shared/npm": ["libs/shared/npm/src/index.ts"],
+      "@nx-console/shared/schema": ["libs/shared/schema/src/index.ts"],
+      "@nx-console/shared/utils": ["libs/shared/utils/src/index.ts"],
+      "@nx-console/shared/workspace": ["libs/shared/workspace/src/index.ts"],
       "@nx-console/vscode/typescript-plugin": [
         "libs/vscode/typescript-plugin/src/index.ts"
       ],
@@ -77,8 +86,7 @@
       "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"],
       "@nx-console/vscode/utils": ["libs/vscode/utils/src/index.ts"],
       "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
-      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"],
-      "@nx-console/workspace": ["libs/workspace/src/index.ts"]
+      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

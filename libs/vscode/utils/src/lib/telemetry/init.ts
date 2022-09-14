@@ -1,6 +1,6 @@
 import { Telemetry } from './telemetry';
 import { Disposable, window, workspace } from 'vscode';
-import { Store } from '@nx-console/schema';
+import { Store } from '@nx-console/shared/schema';
 
 let telemetry: Telemetry;
 let disposer: Disposable | null = null;
