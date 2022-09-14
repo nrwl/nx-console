@@ -23,6 +23,8 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
       'affected:test',
       'list',
       'migrate',
+      'add-dependency',
+      'add-dev-dependency',
     ].map((c) => new NxCommandsTreeItem(c, this.context.extensionPath));
   }
 }

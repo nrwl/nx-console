@@ -18,5 +18,19 @@ export class NxCommandsTreeItem extends TreeItem {
     readonly extensionPath: string
   ) {
     super(affectedCommand, TreeItemCollapsibleState.None);
+    if (this.affectedCommand === 'add-dependency') {
+      this.command = {
+        title: this.affectedCommand,
+        command: 'nxConsole.addDependency',
+        tooltip: 'Add dependency',
+      };
+    }
+    if (this.affectedCommand === 'add-dev-dependency') {
+      this.command = {
+        title: this.affectedCommand,
+        command: 'nxConsole.addDevDependency',
+        tooltip: 'Add dev dependency',
+      };
+    }
   }
 }
