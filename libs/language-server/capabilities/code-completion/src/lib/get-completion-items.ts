@@ -89,7 +89,7 @@ function completionItems(
       case CompletionType.projectTarget: {
         return projectTargetCompletion(workingPath, node, document);
       }
-      case CompletionType.project: {
+      case CompletionType.projects: {
         return projectCompletion(workingPath, node, document);
       }
       case CompletionType.tags: {

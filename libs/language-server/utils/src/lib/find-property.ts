@@ -7,7 +7,7 @@ import { isObjectNode, isPropertyNode } from './node-types';
  * @param property
  */
 export function findProperty(
-  node: ASTNode,
+  node: ASTNode | undefined,
   property: string
 ): ASTNode | undefined {
   if (isPropertyNode(node) && node.valueNode) {

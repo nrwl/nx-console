@@ -19,10 +19,6 @@ function createJsonSchema(executors: JSONSchema[]): EnhancedJsonSchema {
   return {
     type: 'object',
     properties: {
-      root: {
-        type: 'string',
-        'x-completion-type': CompletionType.directory,
-      },
       sourceRoot: {
         type: 'string',
         'x-completion-type': CompletionType.directory,

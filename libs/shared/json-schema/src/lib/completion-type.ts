@@ -8,7 +8,7 @@ export enum CompletionType {
   file = 'file',
   directory = 'directory',
   projectTarget = 'projectTarget',
-  project = 'project',
+  projects = 'projects',
   targets = 'targets',
   targetsWithDeps = 'targetsWithDeps',
   tags = 'tags',

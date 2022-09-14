@@ -5,7 +5,7 @@ export const implicitDependencies: JSONSchema = {
   type: 'array',
   items: {
     type: 'string',
-    'x-completion-type': CompletionType.project,
+    'x-completion-type': CompletionType.projects,
   },
 };
 
