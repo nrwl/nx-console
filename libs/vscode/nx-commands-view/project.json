@@ -18,5 +18,6 @@
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": ["type:vscode"],
+  "implicitDependencies": ["vscode-add-dependency"]
 }
