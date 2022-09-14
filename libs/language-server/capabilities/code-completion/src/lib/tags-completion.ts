@@ -1,4 +1,4 @@
-import { isArrayNode, lspLogger } from '@nx-console/language-server/utils';
+import { isArrayNode } from '@nx-console/language-server/utils';
 import { nxWorkspace } from '@nx-console/workspace';
 import {
   ASTNode,

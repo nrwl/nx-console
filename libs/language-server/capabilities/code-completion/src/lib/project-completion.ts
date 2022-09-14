@@ -34,7 +34,8 @@ export async function projectCompletion(
         '',
         node,
         document,
-        CompletionItemKind.Struct
+        CompletionItemKind.Struct,
+        `Exclude "${projectName}" from this project's dependencies`
       )
     );
   }

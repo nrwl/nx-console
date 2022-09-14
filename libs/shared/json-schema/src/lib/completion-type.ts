@@ -10,7 +10,10 @@ export enum CompletionType {
   projectTarget = 'projectTarget',
   project = 'project',
   targets = 'targets',
+  targetsWithDeps = 'targetsWithDeps',
   tags = 'tags',
+  inputName = 'inputName',
+  inputNameWithDeps = 'inputNameWithDeps',
 }
 
 export function hasCompletionType(

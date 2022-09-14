@@ -14,10 +14,12 @@ import {
   Position,
   TextDocument,
 } from 'vscode-json-languageservice';
+import { inputNameCompletion } from './input-name-completion';
 import { pathCompletion } from './path-completion';
 import { projectCompletion } from './project-completion';
 import { projectTargetCompletion } from './project-target-completion';
 import { tagsCompletion } from './tags-completion';
+import { targetsCompletion } from './targets-completion';
 
 export async function getCompletionItems(
   workingPath: string | undefined,
@@ -92,6 +94,18 @@ function completionItems(
       }
       case CompletionType.tags: {
         return tagsCompletion(workingPath, node, document);
+      }
+      case CompletionType.targets: {
+        return targetsCompletion(workingPath, node, document);
+      }
+      case CompletionType.targetsWithDeps: {
+        return targetsCompletion(workingPath, node, document, true);
+      }
+      case CompletionType.inputName: {
+        return inputNameCompletion(workingPath, node, document);
+      }
+      case CompletionType.inputNameWithDeps: {
+        return inputNameCompletion(workingPath, node, document, true);
       }
       default: {
         return [];

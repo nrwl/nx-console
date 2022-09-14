@@ -18,12 +18,13 @@ export const outputs: JSONSchema = {
 };
 
 export const inputs: JSONSchema[] = [
-  { type: 'string' },
+  { type: 'string', 'x-completion-type': CompletionType.inputNameWithDeps },
   {
     type: 'object',
     properties: {
       input: {
         type: 'string',
+        'x-completion-type': CompletionType.inputName,
       },
       projects: {
         type: 'string',
@@ -88,7 +89,7 @@ export const targets = (executors?: JSONSchema[]): JSONSchema => {
             oneOf: [
               {
                 type: 'string',
-                'x-completion-type': CompletionType.targets,
+                'x-completion-type': CompletionType.targetsWithDeps,
               },
               {
                 type: 'object',

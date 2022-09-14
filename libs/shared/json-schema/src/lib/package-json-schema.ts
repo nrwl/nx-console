@@ -18,6 +18,9 @@ function createJsonSchema(): EnhancedJsonSchema {
       nx: {
         type: 'object',
         properties: {
+          ignore: {
+            type: 'boolean',
+          },
           namedInputs,
           tags,
           implicitDependencies,
