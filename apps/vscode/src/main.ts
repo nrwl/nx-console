@@ -50,7 +50,10 @@ import { getGenerators } from '@nx-console/shared/collections';
 import { fileExists } from '@nx-console/shared/file-system';
 import { nxVersion } from '@nx-console/shared/npm';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
-import { registerVscodeAddDependency } from '@nx-console/vscode/add-dependency';
+import {
+  AddDependencyCodelensProvider,
+  registerVscodeAddDependency,
+} from '@nx-console/vscode/add-dependency';
 import { configureLspClient } from '@nx-console/vscode/lsp-client';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
 import {
@@ -62,6 +65,7 @@ import {
   refreshWorkspace,
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
+import { WorkspaceCodeLensProvider } from '@nx-console/vscode/nx-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -129,13 +133,7 @@ export async function activate(c: ExtensionContext) {
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
 
-    const { WorkspaceCodeLensProvider: WorkspaceCodeLensProvider } =
-      await import('@nx-console/vscode/nx-workspace');
     new WorkspaceCodeLensProvider(context);
-
-    const { AddDependencyCodelensProvider } = await import(
-      '@nx-console/vscode/add-dependency'
-    );
 
     new AddDependencyCodelensProvider(context);
 

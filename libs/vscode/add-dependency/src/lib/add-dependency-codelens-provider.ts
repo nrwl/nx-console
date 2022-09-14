@@ -17,6 +17,10 @@ import {
   Range,
   TextDocument,
 } from 'vscode';
+import {
+  ADD_DEPENDENCY_COMMAND,
+  ADD_DEV_DEPENDENCY_COMMAND,
+} from './vscode-add-dependency';
 
 export class AddDependencyCodelensProvider implements CodeLensProvider {
   constructor(context: ExtensionContext) {
@@ -45,7 +49,7 @@ export class AddDependencyCodelensProvider implements CodeLensProvider {
       const pos = document.positionAt(depProperty.getStart(packageJson));
       const command: Command = {
         title: 'Add Dependency',
-        command: 'nxConsole.addDependency',
+        command: ADD_DEPENDENCY_COMMAND,
       };
       lenses.push(new CodeLens(new Range(pos, pos), command));
     }
@@ -53,7 +57,7 @@ export class AddDependencyCodelensProvider implements CodeLensProvider {
       const pos = document.positionAt(devDepProperty.getStart(packageJson));
       const command: Command = {
         title: 'Add Dev Dependency',
-        command: 'nxConsole.addDevDependency',
+        command: ADD_DEV_DEPENDENCY_COMMAND,
       };
       lenses.push(new CodeLens(new Range(pos, pos), command));
     }

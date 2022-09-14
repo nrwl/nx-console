@@ -3,7 +3,7 @@ import {
   getPackageManagerCommand,
   PackageManager,
 } from '@nrwl/devkit';
-import { getGenerators } from '@nx-console/collections';
+import { getGenerators } from '@nx-console/shared/collections';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
 import {
@@ -14,6 +14,7 @@ import { xhr, XHRResponse } from 'request-light';
 import {
   commands,
   ExtensionContext,
+  QuickInput,
   ShellExecution,
   Task,
   tasks,
@@ -21,14 +22,17 @@ import {
   window,
 } from 'vscode';
 
+export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
+export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
+
 export function registerVscodeAddDependency(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand(
-      'nxConsole.addDependency',
+      ADD_DEPENDENCY_COMMAND,
       vscodeAddDependencyCommand(false)
     ),
     commands.registerCommand(
-      'nxConsole.addDevDependency',
+      ADD_DEV_DEPENDENCY_COMMAND,
       vscodeAddDependencyCommand(true)
     )
   );
@@ -48,12 +52,14 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
     const dep = await promptForDependencyName();
 
     if (dep) {
+      const quickInput = showLoadingQuickInput(dep);
       getTelemetry().featureUsed('add-dependency');
       addDependency(dep, installAsDevDependency);
       const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
         if (
           taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
         ) {
+          quickInput.hide();
           executeInitGenerator(dep);
           disposable.dispose();
         }
@@ -93,6 +99,18 @@ async function promptForDependencyName(): Promise<string | undefined> {
   });
 
   return dep;
+}
+
+function showLoadingQuickInput(dependency: string): QuickInput {
+  const quickInput = window.createQuickPick();
+  quickInput.busy = true;
+  quickInput.placeholder = `Please wait while ${dependency} is being installed. You might be prompted for init options.`;
+  quickInput.enabled = false;
+
+  quickInput.onDidChangeValue(() => (quickInput.value = ''));
+
+  quickInput.show();
+  return quickInput;
 }
 
 function addDependency(dependency: string, installAsDevDependency: boolean) {
