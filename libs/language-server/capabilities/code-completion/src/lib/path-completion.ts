@@ -9,7 +9,7 @@ import {
   CompletionItemKind,
   TextDocument,
 } from 'vscode-json-languageservice';
-import { createCompletionPathItem } from './create-completion-path-item';
+import { createCompletionItem } from './create-completion-path-item';
 
 export async function pathCompletion(
   workingPath: string | undefined,
@@ -61,38 +61,20 @@ export async function pathCompletion(
         file.path.replace(workingPath + '/' + projectRoot, '');
 
       items.push(
-        createCompletionPathItem(
-          label,
-          file.path,
-          node,
-          document,
-          completionKind
-        )
+        createCompletionItem(label, file.path, node, document, completionKind)
       );
     }
 
     if (file.path.startsWith(workingPath)) {
       const label = file.path.replace(workingPath + '/', '');
       items.push(
-        createCompletionPathItem(
-          label,
-          file.path,
-          node,
-          document,
-          completionKind
-        )
+        createCompletionItem(label, file.path, node, document, completionKind)
       );
 
       if (supportsInterpolation) {
         const label = '{workspaceRoot}' + file.path.replace(workingPath, '');
         items.push(
-          createCompletionPathItem(
-            label,
-            file.path,
-            node,
-            document,
-            completionKind
-          )
+          createCompletionItem(label, file.path, node, document, completionKind)
         );
       }
     }

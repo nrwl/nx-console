@@ -5,6 +5,9 @@ import { Disposable, ExtensionContext } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
+  NotificationType,
+  ProtocolNotificationType,
+  RequestType,
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
@@ -66,4 +69,8 @@ export async function configureLspClient(
       return client.stop();
     },
   };
+}
+
+export function sendNotification<P>(notificationType: NotificationType<P>) {
+  client.sendNotification(notificationType);
 }

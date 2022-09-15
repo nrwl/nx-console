@@ -8,41 +8,41 @@ const defaultCompletionMap = new Map<string, DefaultCompletion>();
 
 defaultCompletionMap.set('jestconfig', {
   glob: 'jest.config.@(js|ts)',
-  completionType: 'file',
+  completionType: CompletionType.file,
 });
 defaultCompletionMap.set('index', {
   glob: '*.html',
-  completionType: 'file',
+  completionType: CompletionType.file,
 });
 defaultCompletionMap.set('polyfills', {
   glob: '*.ts',
-  completionType: 'file',
+  completionType: CompletionType.file,
 });
 defaultCompletionMap.set('main', {
   glob: '*.ts',
-  completionType: 'file',
+  completionType: CompletionType.file,
 });
 defaultCompletionMap.set('tsconfig', {
   glob: 'tsconfig.*.json',
-  completionType: 'file',
+  completionType: CompletionType.file,
 });
 defaultCompletionMap.set('outputpath', {
-  completionType: 'directory',
+  completionType: CompletionType.directory,
 });
 defaultCompletionMap.set('browsertarget', {
-  completionType: 'projectTarget',
+  completionType: CompletionType.projectTarget,
 });
 defaultCompletionMap.set('servertarget', {
-  completionType: 'projectTarget',
+  completionType: CompletionType.projectTarget,
 });
 defaultCompletionMap.set('buildtarget', {
-  completionType: 'projectTarget',
+  completionType: CompletionType.projectTarget,
 });
 defaultCompletionMap.set('target', {
-  completionType: 'projectTarget',
+  completionType: CompletionType.projectTarget,
 });
 defaultCompletionMap.set('devservertarget', {
-  completionType: 'projectTarget',
+  completionType: CompletionType.projectTarget,
 });
 
 export function getDefaultCompletionType(

@@ -1,10 +1,11 @@
 import { JSONSchema } from 'vscode-json-languageservice';
+import { CompletionType } from './completion-type';
 
 export const implicitDependencies: JSONSchema = {
   type: 'array',
   items: {
     type: 'string',
-    'x-completion-type': 'project',
+    'x-completion-type': CompletionType.projects,
   },
 };
 
@@ -12,17 +13,18 @@ export const outputs: JSONSchema = {
   type: 'array',
   items: {
     type: 'string',
-    'x-completion-type': 'directory',
+    'x-completion-type': CompletionType.directory,
   },
 };
 
 export const inputs: JSONSchema[] = [
-  { type: 'string' },
+  { type: 'string', 'x-completion-type': CompletionType.inputNameWithDeps },
   {
     type: 'object',
     properties: {
       input: {
         type: 'string',
+        'x-completion-type': CompletionType.inputName,
       },
       projects: {
         type: 'string',
@@ -67,7 +69,7 @@ export const tags: JSONSchema = {
   type: 'array',
   items: {
     type: 'string',
-    'x-completion-type': 'tags',
+    'x-completion-type': CompletionType.tags,
   },
 };
 
@@ -87,7 +89,7 @@ export const targets = (executors?: JSONSchema[]): JSONSchema => {
             oneOf: [
               {
                 type: 'string',
-                'x-completion-type': 'targets',
+                'x-completion-type': CompletionType.targetsWithDeps,
               },
               {
                 type: 'object',
@@ -98,7 +100,7 @@ export const targets = (executors?: JSONSchema[]): JSONSchema => {
                   },
                   target: {
                     type: 'string',
-                    'x-completion-type': 'targets',
+                    'x-completion-type': CompletionType.targets,
                   },
                   params: {
                     type: 'string',

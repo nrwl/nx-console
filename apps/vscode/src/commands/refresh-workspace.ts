@@ -1,3 +1,5 @@
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import { sendNotification } from '@nx-console/vscode/lsp-client';
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
 import { debounceTime, Subject } from 'rxjs';
 import { commands } from 'vscode';
@@ -9,6 +11,7 @@ const refresh = new Subject();
 refresh.pipe(debounceTime(150)).subscribe(async () => {
   const { nxWorkspace } = await import('@nx-console/shared/workspace');
   await nxWorkspace(getWorkspacePath(), outputLogger, true);
+  sendNotification(NxWorkspaceRefreshNotification);
   commands.executeCommand('nxConsole.refreshNxProjectsTree');
   commands.executeCommand('nxConsole.refreshRunTargetTree');
   commands.executeCommand('nx.graph.refresh');

@@ -5,9 +5,9 @@ import {
   CompletionItemKind,
   TextDocument,
 } from 'vscode-json-languageservice';
-import { createCompletionPathItem } from './create-completion-path-item';
+import { createCompletionItem } from './create-completion-path-item';
 
-export async function targetCompletion(
+export async function projectTargetCompletion(
   workingPath: string | undefined,
   node: ASTNode,
   document: TextDocument
@@ -18,7 +18,7 @@ export async function targetCompletion(
 
   const { workspace } = await nxWorkspace(workingPath);
 
-  const targetCompletion: CompletionItem[] = [];
+  const projectTargetCompletion: CompletionItem[] = [];
 
   const completionItemKind = CompletionItemKind.Field;
 
@@ -29,8 +29,8 @@ export async function targetCompletion(
       configuration.targets ?? {}
     )) {
       const targetLabel = `${projectName}:${targetName}`;
-      targetCompletion.push(
-        createCompletionPathItem(
+      projectTargetCompletion.push(
+        createCompletionItem(
           targetLabel,
           '',
           node,
@@ -41,8 +41,8 @@ export async function targetCompletion(
 
       for (const configuration of Object.keys(target.configurations ?? {})) {
         const configurationLabel = `${targetLabel}:${configuration}`;
-        targetCompletion.push(
-          createCompletionPathItem(
+        projectTargetCompletion.push(
+          createCompletionItem(
             configurationLabel,
             '',
             node,
@@ -54,5 +54,5 @@ export async function targetCompletion(
     }
   }
 
-  return targetCompletion;
+  return projectTargetCompletion;
 }

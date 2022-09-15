@@ -5,18 +5,20 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 
-export function createCompletionPathItem(
+export function createCompletionItem(
   label: string,
   path: string,
   node: ASTNode,
   document: TextDocument,
-  kind: CompletionItemKind
+  kind: CompletionItemKind,
+  documentation?: string
 ): CompletionItem {
   const startPosition = document.positionAt(node.offset);
   const endPosition = document.positionAt(node.offset + node.length);
   label = `"${label}"`;
   return {
     label,
+    documentation,
     kind,
     insertText: label,
     insertTextFormat: 2,

@@ -27,6 +27,9 @@
       "@nx-console/language-server/capabilities/document-links": [
         "libs/language-server/capabilities/document-links/src/index.ts"
       ],
+      "@nx-console/language-server/types": [
+        "libs/language-server/types/src/index.ts"
+      ],
       "@nx-console/language-server/utils": [
         "libs/language-server/utils/src/index.ts"
       ],
