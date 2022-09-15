@@ -1,13 +1,11 @@
 import './global-polyfills';
 
-import { getExecutors } from '@nx-console/shared/collections';
-import {
-  getPackageJsonSchema,
-  getProjectJsonSchema,
-  getWorkspaceJsonSchema,
-} from '@nx-console/shared/json-schema';
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
+import {
+  NxWorkspaceRefreshNotification,
+  NxWorkspaceRequest,
+} from '@nx-console/language-server/types';
 import {
   configureJsonLanguageService,
   getJsonLanguageService,
@@ -17,24 +15,31 @@ import {
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
+import { getExecutors } from '@nx-console/shared/collections';
+import {
+  getNxJsonSchema,
+  getPackageJsonSchema,
+  getProjectJsonSchema,
+  getWorkspaceJsonSchema,
+} from '@nx-console/shared/json-schema';
 import { nxWorkspace } from '@nx-console/shared/workspace';
-import { CompletionList, TextDocument } from 'vscode-json-languageservice';
+import {
+  ClientCapabilities,
+  CompletionList,
+  TextDocument,
+} from 'vscode-json-languageservice';
 import {
   createConnection,
   InitializeResult,
   ProposedFeatures,
-  RequestType,
   ResponseError,
   TextDocuments,
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import {
-  NxWorkspaceRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
 
 let WORKING_PATH: string | undefined = undefined;
+let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 
 const workspaceContext = {
   resolveRelativePath: (relativePath: string, resource: string) => {
@@ -55,7 +60,7 @@ documents.listen(connection);
 connection.onInitialize(async (params) => {
   setLspLogger(connection);
 
-  const { workspacePath, projects } = params.initializationOptions ?? {};
+  const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
       workspacePath ??
@@ -66,38 +71,9 @@ connection.onInitialize(async (params) => {
       throw 'Unable to determine workspace path';
     }
 
-    const collections = await getExecutors(WORKING_PATH, projects, false);
-    const workspaceSchema = getWorkspaceJsonSchema(collections);
-    const projectSchema = getProjectJsonSchema(collections);
-    const packageSchema = getPackageJsonSchema();
+    CLIENT_CAPABILITIES = params.capabilities;
 
-    configureJsonLanguageService(
-      {
-        schemaRequestService: getSchemaRequestService(['file']),
-        workspaceContext,
-        contributions: [],
-        clientCapabilities: params.capabilities,
-      },
-      {
-        schemas: [
-          {
-            uri: 'nx://schemas/workspace',
-            fileMatch: ['**/workspace.json', '**/angular.json'],
-            schema: workspaceSchema,
-          },
-          {
-            uri: 'nx://schemas/project',
-            fileMatch: ['**/project.json'],
-            schema: projectSchema,
-          },
-          {
-            uri: 'nx://schemas/package',
-            fileMatch: ['**/package.json'],
-            schema: packageSchema,
-          },
-        ],
-      }
-    );
+    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
@@ -209,7 +185,63 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   }
 
   await nxWorkspace(WORKING_PATH, lspLogger, true);
+  configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
 });
+
+async function configureSchemas(
+  workingPath: string | undefined,
+  capabilities: ClientCapabilities | undefined
+) {
+  if (!workingPath) {
+    lspLogger.log('No workspace path provided');
+    return;
+  }
+
+  const { workspace } = await nxWorkspace(workingPath);
+  const collections = await getExecutors(
+    workingPath,
+    workspace.projects,
+    false
+  );
+  const workspaceSchema = getWorkspaceJsonSchema(collections);
+  const projectSchema = getProjectJsonSchema(collections);
+  const packageSchema = getPackageJsonSchema();
+
+  const nxSchema = getNxJsonSchema(workspace.projects);
+
+  configureJsonLanguageService(
+    {
+      schemaRequestService: getSchemaRequestService(['file']),
+      workspaceContext,
+      contributions: [],
+      clientCapabilities: capabilities,
+    },
+    {
+      schemas: [
+        {
+          uri: 'nx://schemas/workspace',
+          fileMatch: ['**/workspace.json', '**/angular.json'],
+          schema: workspaceSchema,
+        },
+        {
+          uri: 'nx://schemas/project',
+          fileMatch: ['**/project.json'],
+          schema: projectSchema,
+        },
+        {
+          uri: 'nx://schemas/package',
+          fileMatch: ['**/package.json'],
+          schema: packageSchema,
+        },
+        {
+          uri: 'nx://schemas/nx',
+          fileMatch: ['**/nx.json'],
+          schema: nxSchema,
+        },
+      ],
+    }
+  );
+}
 
 function getJsonDocument(document: TextDocument) {
   return jsonDocumentMapper.retrieve(document);
