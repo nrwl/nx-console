@@ -37,6 +37,11 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
+import { formatError } from '@nx-console/shared/utils';
+
+process.on('unhandledRejection', (e: any) => {
+  connection.console.error(formatError(`Unhandled exception`, e));
+});
 
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
