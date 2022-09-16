@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "rootDir": "./",
+    "types": [
+      "node",
+      "webdriverio/async",
+      "@wdio/mocha-framework",
+      "expect-webdriverio",
+      "wdio-vscode-service"
+    ],
+    "target": "es2019",
+    "allowJs": true
+  },
+  "include": ["**/*.ts", "**/*.js"]
+}

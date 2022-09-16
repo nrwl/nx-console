@@ -1,0 +1,15 @@
+{
+  "targets": {
+    "build": {
+      "executor": "@nrwl/webpack:webpack",
+      "configurations": {
+        "production": {
+
+        }
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest"
+    }
+  }
+}

@@ -4,16 +4,12 @@
 /dist
 /tmp
 /out-tsc
-/osbuilds
-/.angular
-/cypress
 
 # dependencies
-**/node_modules
+node_modules
 
 # IDEs and editors
 /.idea
-/.vscode
 .project
 .classpath
 .c9/
@@ -23,13 +19,12 @@
 
 # IDE - VSCode
 .vscode/*
-.vscode-test/*
+!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
 # misc
-/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
@@ -42,17 +37,3 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-
-#Environment
-.env
-
-
-# Intellij
-apps/intellij/gen/ngConsoleCli/*
-apps/intellij/build/*
-apps/intellij/.gradle/*
-apps/intellij/.idea/*
-
-# WDIO
-**/.wdio-vscode-service
-
