@@ -185,7 +185,7 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   }
 
   await nxWorkspace(WORKING_PATH, lspLogger, true);
-  configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+  await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
 });
 
 async function configureSchemas(
