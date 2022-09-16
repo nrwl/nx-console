@@ -11,10 +11,6 @@ export function configureJsonLanguageService(
   params: LanguageServiceParams,
   settings: LanguageSettings
 ) {
-  if (languageService) {
-    throw 'Language service already configured';
-  }
-
   languageService = getLanguageService(params);
   languageService.configure(settings);
 }

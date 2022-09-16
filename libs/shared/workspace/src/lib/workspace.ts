@@ -20,7 +20,7 @@ import {
   NxWorkspaceConfiguration,
 } from './get-nx-workspace-config';
 
-interface NxWorkspace {
+export interface NxWorkspace {
   validWorkspaceJson: boolean;
   workspace: NxWorkspaceConfiguration;
   workspaceType: 'ng' | 'nx';
