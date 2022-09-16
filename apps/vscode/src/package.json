@@ -674,6 +674,14 @@
         "category": "Nx",
         "title": "Make ng Faster with Nx",
         "command": "nxConsole.makeNgFaster"
+      },
+      {
+        "title": "Add dependency to workspace",
+        "command": "nxConsole.addDependency"
+      },
+      {
+        "title": "Add dev dependency to workspace",
+        "command": "nxConsole.addDevDependency"
       }
     ],
     "configuration": {

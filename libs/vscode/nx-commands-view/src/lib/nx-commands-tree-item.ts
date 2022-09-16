@@ -18,5 +18,35 @@ export class NxCommandsTreeItem extends TreeItem {
     readonly extensionPath: string
   ) {
     super(affectedCommand, TreeItemCollapsibleState.None);
+    if (this.affectedCommand === 'Add Dependency') {
+      this.command = {
+        title: this.affectedCommand,
+        command: 'nxConsole.addDependency',
+        tooltip: 'Add dependency',
+      };
+      this.iconPath = {
+        light: Uri.file(
+          join(this.extensionPath, 'assets', 'nx-console-light.svg')
+        ),
+        dark: Uri.file(
+          join(this.extensionPath, 'assets', 'nx-console-dark.svg')
+        ),
+      };
+    }
+    if (this.affectedCommand === 'Add Dev Dependency') {
+      this.command = {
+        title: this.affectedCommand,
+        command: 'nxConsole.addDevDependency',
+        tooltip: 'Add dev dependency',
+      };
+      this.iconPath = {
+        light: Uri.file(
+          join(this.extensionPath, 'assets', 'nx-console-light.svg')
+        ),
+        dark: Uri.file(
+          join(this.extensionPath, 'assets', 'nx-console-dark.svg')
+        ),
+      };
+    }
   }
 }
