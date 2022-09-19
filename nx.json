@@ -20,7 +20,8 @@
           "lint",
           "test",
           "e2e",
-          "build-storybook"
+          "build-storybook",
+          "package"
         ],
         "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
         "canTrackAnalytics": false,
