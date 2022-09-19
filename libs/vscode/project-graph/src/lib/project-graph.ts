@@ -1,4 +1,4 @@
-import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { getTelemetry, getWorkspacePath } from '@nx-console/vscode/utils';
 import { findProjectWithPath } from '@nx-console/shared/workspace';
 import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
@@ -10,12 +10,15 @@ export function projectGraph() {
   return Disposable.from(
     graphWebView,
     commands.registerCommand('nx.graph.refresh', () => {
+      getTelemetry().featureUsed('nx.graph.refresh');
       graphWebView.refresh();
     }),
     commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
+      getTelemetry().featureUsed('nx.graph.focus');
       await openProjectWithFile(graphWebView, uri, MessageType.focus);
     }),
     commands.registerCommand('nx.graph.select', async (uri: Uri) => {
+      getTelemetry().featureUsed('nx.graph.select');
       await openProjectWithFile(graphWebView, uri, MessageType.select);
     }),
     commands.registerCommand(
@@ -25,6 +28,7 @@ export function projectGraph() {
       }: {
         nxProject: { project: string };
       }) => {
+        getTelemetry().featureUsed('nx.graph.focus.button');
         graphWebView.projectInWebview(projectName, MessageType.focus);
       }
     ),
@@ -35,6 +39,7 @@ export function projectGraph() {
       }: {
         nxProject: { project: string };
       }) => {
+        getTelemetry().featureUsed('nx.graph.select.button');
         graphWebView.projectInWebview(projectName, MessageType.select);
       }
     )
