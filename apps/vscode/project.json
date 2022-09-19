@@ -112,9 +112,9 @@
       "executor": "@nrwl/workspace:run-commands",
       "options": {
         "commands": [
-          "yarn nx run nxls:build:production",
-          "yarn nx run vscode-ui:build:production",
           "yarn nx run vscode:build:production",
+          "yarn nx run vscode-ui:build:production",
+          "yarn nx run nxls:build:production",
           "node ./tools/scripts/vscode-yarn.js",
           "node ./tools/scripts/vscode-vsce.js"
         ],
