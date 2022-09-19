@@ -135,12 +135,12 @@
         },
         {
           "command": "nx.graph.focus.button",
-          "when": "view == nxProjects && viewItem == project",
+          "when": "view == nxProjects && viewItem == project && isNxWorkspace",
           "group": "inline@1"
         },
         {
           "command": "nx.graph.select.button",
-          "when": "view == nxProjects && viewItem == project",
+          "when": "view == nxProjects && viewItem == project && isNxWorkspace",
           "group": "inline@1"
         }
       ],

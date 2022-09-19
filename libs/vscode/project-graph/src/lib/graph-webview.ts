@@ -34,8 +34,6 @@ export class GraphWebView implements Disposable {
         graphService.execute(state);
       });
     });
-
-    graphService.start();
   }
 
   dispose() {
@@ -73,6 +71,7 @@ export class GraphWebView implements Disposable {
   }
 
   async projectInWebview(projectName: string | undefined, type: MessageType) {
+    graphService.start();
     if (!this.panel) {
       this._webview();
     }

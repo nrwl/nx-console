@@ -3,6 +3,7 @@
 export interface Typegen0 {
   '@@xstate/typegen': true;
   internalEvents: {
+    '': { type: '' };
     'done.invoke.loadingContent': {
       type: 'done.invoke.loadingContent';
       data: unknown;
@@ -13,7 +14,6 @@ export interface Typegen0 {
       data: unknown;
     };
     'xstate.init': { type: 'xstate.init' };
-    '': { type: '' };
   };
   invokeSrcNameMap: {
     generateContent: 'done.invoke.loadingContent';
@@ -25,20 +25,20 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingActions: {
-    refreshData: 'REFRESH' | 'VIEW_DESTROYED';
-    projectSelected: 'PROJECT_SELECTED';
+    clearProject: 'VIEW_DESTROYED';
     contentLoaded: 'done.invoke.loadingContent';
     loadingFailed: 'error.platform.loadingContent';
     log:
-      | 'xstate.init'
-      | 'REFRESH'
-      | 'GET_CONTENT'
-      | 'done.invoke.loadingContent'
       | ''
-      | 'error.platform.loadingContent'
+      | 'GET_CONTENT'
+      | 'REFRESH'
+      | 'VIEW_DESTROYED'
       | 'VIEW_READY'
-      | 'VIEW_DESTROYED';
-    clearProject: 'VIEW_DESTROYED';
+      | 'done.invoke.loadingContent'
+      | 'error.platform.loadingContent'
+      | 'xstate.init';
+    projectSelected: 'PROJECT_SELECTED';
+    refreshData: 'REFRESH' | 'VIEW_DESTROYED';
   };
   eventsCausingServices: {
     generateContent: '';
@@ -48,12 +48,12 @@ export interface Typegen0 {
   };
   eventsCausingDelays: {};
   matchesStates:
-    | 'init'
     | 'content'
-    | 'loading'
     | 'error'
+    | 'init'
+    | 'loading'
     | 'no_project'
-    | 'viewReady'
-    | 'viewDestroyed';
+    | 'viewDestroyed'
+    | 'viewReady';
   tags: never;
 }
