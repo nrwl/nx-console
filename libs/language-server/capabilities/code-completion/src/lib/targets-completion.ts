@@ -36,9 +36,14 @@ export async function targetsCompletion(
     }
 
     if (hasDependencyHat) {
+      const dependencyHat = `^${targetName}`;
+      if (existingTargets.has(dependencyHat)) {
+        continue;
+      }
+
       targetsCompletion.push(
         createCompletionItem(
-          `^${targetName}`,
+          dependencyHat,
           '',
           node,
           document,
