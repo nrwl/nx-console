@@ -2,43 +2,51 @@
   "migrations": [
     {
       "cli": "nx",
-      "version": "14.5.0-beta.0",
-      "description": "Update any references of MFE to MF.",
-      "factory": "./src/migrations/update-14-5-0/migrate-mfe-to-mf",
+      "version": "14.6.0-beta.0",
+      "description": "Update the @angular/cli package version to ~14.2.0.",
+      "factory": "./src/migrations/update-14-6-0/update-angular-cli",
       "package": "@nrwl/angular",
-      "name": "migrate-mfe-to-mf"
+      "name": "update-angular-cli-version-14-2-0"
     },
     {
+      "version": "14.6.0-beta.0",
       "cli": "nx",
-      "version": "14.5.2-beta.0",
-      "description": "Update the @angular/cli package version to ~14.1.0.",
-      "factory": "./src/migrations/update-14-5-2/update-angular-cli",
-      "package": "@nrwl/angular",
-      "name": "update-angular-cli-version-14-1-0"
-    },
-    {
-      "version": "14.5.5-beta.0",
-      "cli": "nx",
-      "description": "Exclude jest.config.ts from tsconfig where missing.",
-      "factory": "./src/migrations/update-14-0-0/update-jest-config-ext",
+      "description": "Update jest configs to support jest 28 changes (https://jestjs.io/docs/upgrading-to-jest28#configuration-options)",
+      "factory": "./src/migrations/update-14-6-0/update-configs-jest-28",
       "package": "@nrwl/jest",
-      "name": "exclude-jest-config-from-ts-config"
+      "name": "update-configs-jest-28"
+    },
+    {
+      "version": "14.6.0-beta.0",
+      "cli": "nx",
+      "description": "Update jest test files  to support jest 28 changes (https://jestjs.io/docs/upgrading-to-jest28)",
+      "factory": "./src/migrations/update-14-6-0/update-tests-jest-28",
+      "package": "@nrwl/jest",
+      "name": "update-tests-jest-28"
     },
     {
       "cli": "nx",
-      "version": "14.4.4",
-      "description": "Adds @typescript-eslint/utils as a dev dep",
-      "factory": "./src/migrations/update-14-4-4/experimental-to-utils-deps",
-      "package": "@nrwl/linter",
-      "name": "experimental-to-utils-deps"
+      "version": "14.7.6-beta.1",
+      "description": "Update usages of webpack executors to @nrwl/webpack",
+      "factory": "./src/migrations/update-14-7-6/update-webpack-executor",
+      "package": "@nrwl/node",
+      "name": "update-webpack-executor"
     },
     {
       "cli": "nx",
-      "version": "14.4.4",
-      "description": "Switch from  @typescript-eslint/experimental-utils to @typescript-eslint/utils in all rules and rules.spec files",
-      "factory": "./src/migrations/update-14-4-4/experimental-to-utils-rules",
-      "package": "@nrwl/linter",
-      "name": "experimental-to-utils-rules"
+      "version": "14.6.1-beta.0",
+      "description": "Change Cypress e2e and component testing presets to use __filename instead of __dirname and include a devServerTarget for component testing.",
+      "factory": "./src/migrations/update-14-6-1/update-cypress-configs-presets",
+      "package": "@nrwl/cypress",
+      "name": "update-cypress-configs-preset"
+    },
+    {
+      "cli": "nx",
+      "version": "14.7.0-beta.0",
+      "description": "Update Cypress if using v10 to support latest component testing features",
+      "factory": "./src/migrations/update-14-7-0/update-cypress-version-if-10",
+      "package": "@nrwl/cypress",
+      "name": "update-cypress-if-v10"
     }
   ]
 }

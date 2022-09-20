@@ -52,7 +52,7 @@
       }
     },
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "defaultConfiguration": "production",
       "options": {
         "externalDependencies": [
@@ -88,7 +88,9 @@
           }
         ],
         "buildLibsFromSource": true,
-        "deleteOutputPath": false
+        "deleteOutputPath": false,
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "ci": {
