@@ -8,6 +8,7 @@ on:
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
   node_version: 14
+  NX_VERBOSE_LOGGING: true
 
 jobs:
   checks:
