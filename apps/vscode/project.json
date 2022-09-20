@@ -48,6 +48,7 @@
     },
     "build": {
       "executor": "@nrwl/node:webpack",
+      "defaultConfiguration": "production",
       "options": {
         "externalDependencies": ["vscode", "typescript"],
         "webpackConfig": "apps/vscode/webpack.config.js",
@@ -110,16 +111,15 @@
     },
     "package": {
       "executor": "@nrwl/workspace:run-commands",
+      "dependsOn": ["build", "^build"],
       "options": {
         "commands": [
-          "yarn nx run vscode:build:production",
-          "yarn nx run vscode-ui:build:production",
-          "yarn nx run nxls:build:production",
           "node ./tools/scripts/vscode-yarn.js",
           "node ./tools/scripts/vscode-vsce.js"
         ],
         "parallel": false
-      }
+      },
+      "outputs": ["dist/apps/vscode"]
     }
   },
   "tags": []

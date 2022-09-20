@@ -8,13 +8,13 @@ runs:
       run: npx nx-cloud start-ci-run
       shell: bash
     - name: Lint
-      run: yarn nx run-many --all --parallel --target=lint --max-parallel=3
+      run: yarn nx run-many --all --parallel --target=lint --max-parallel=3 --configuration=ci
       shell: bash
     - name: Test
-      run: yarn nx run-many --all --parallel --target=test --max-parallel=3
+      run: yarn nx run-many --all --parallel --target=test --max-parallel=3 --configuration=ci
       shell: bash
     - name: Build
-      run: yarn nx run-many --all --parallel --target=build --max-parallel=3
+      run: yarn nx run-many --all --parallel --target=build --max-parallel=3 --configuration=ci
       shell: bash
     - name: Stopping nx-cloud ci agents
       run: npx nx-cloud stop-all-agents

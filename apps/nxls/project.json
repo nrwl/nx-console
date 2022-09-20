@@ -34,6 +34,7 @@
       }
     },
     "build": {
+      "defaultConfiguration": "production",
       "executor": "nx:run-commands",
       "outputs": ["dist/apps/vscode/nxls"],
       "options": {

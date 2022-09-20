@@ -25,6 +25,7 @@
       }
     },
     "build": {
+      "defaultConfiguration": "production",
       "executor": "@angular-builders/custom-webpack:browser",
       "options": {
         "customWebpackConfig": {
