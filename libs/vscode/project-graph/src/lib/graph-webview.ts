@@ -8,6 +8,7 @@ export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
 
   constructor() {
+    graphService.start();
     graphService.onTransition(async (state) => {
       if (!state.changed) {
         return;
@@ -66,12 +67,9 @@ export class GraphWebView implements Disposable {
         commands.executeCommand('nxConsole.refreshWorkspace');
       }
     });
-
-    graphService.send('GET_CONTENT');
   }
 
   async projectInWebview(projectName: string | undefined, type: MessageType) {
-    graphService.start();
     if (!this.panel) {
       this._webview();
     }
@@ -80,6 +78,8 @@ export class GraphWebView implements Disposable {
       graphService.send('NO_PROJECT');
       return;
     }
+
+    graphService.send('GET_CONTENT');
 
     this.panel?.reveal();
 
