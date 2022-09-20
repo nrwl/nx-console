@@ -4,11 +4,12 @@ import {
   PackageManager,
 } from '@nrwl/devkit';
 import { getGenerators } from '@nx-console/shared/collections';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { nxWorkspace } from '@nx-console/shared/workspace';
 import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
 import {
   getShellExecutionForConfig,
   getTelemetry,
+  getWorkspacePath,
 } from '@nx-console/vscode/utils';
 import { xhr, XHRResponse } from 'request-light';
 import {
@@ -38,14 +39,12 @@ export function registerVscodeAddDependency(context: ExtensionContext) {
   );
 }
 
-let workspacePath: string;
 let pkgManager: PackageManager;
 
 function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
   return async () => {
-    workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
+    const { workspacePath, workspaceType } = await nxWorkspace(
+      getWorkspacePath()
     );
     pkgManager = detectPackageManager(workspacePath);
 
@@ -60,7 +59,7 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
           taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
         ) {
           quickInput.hide();
-          executeInitGenerator(dep);
+          executeInitGenerator(dep, workspacePath, workspaceType);
           disposable.dispose();
         }
       }, undefined);
@@ -129,12 +128,20 @@ function addDependency(dependency: string, installAsDevDependency: boolean) {
   );
   tasks.executeTask(task);
 }
-async function executeInitGenerator(dependency: string) {
-  const generators = await getGenerators(
-    WorkspaceConfigurationStore.instance.get('nxWorkspacePath', ''),
-    undefined,
-    { includeHidden: true, includeNgAdd: true }
-  );
+async function executeInitGenerator(
+  dependency: string,
+  workspacePath: string,
+  workspaceType: 'ng' | 'nx'
+) {
+  const generators = await getGenerators(workspacePath, undefined, {
+    includeHidden: true,
+    includeNgAdd: true,
+  });
+
+  // get the dependency's name if it came with a version
+  if (dependency.lastIndexOf('@') > 0) {
+    dependency = dependency.substring(0, dependency.lastIndexOf('@'));
+  }
 
   let initGeneratorName = `${dependency}:init`;
   let initGenerator = generators.find((g) => g.name === initGeneratorName);
@@ -147,10 +154,6 @@ async function executeInitGenerator(dependency: string) {
     return;
   }
 
-  const workspaceType = WorkspaceConfigurationStore.instance.get(
-    'workspaceType',
-    'nx'
-  );
   const opts = await getGeneratorOptions(
     workspacePath,
     initGenerator.data.collection,
@@ -162,11 +165,11 @@ async function executeInitGenerator(dependency: string) {
   if (opts.length) {
     selectedFlags = await selectFlags(initGenerator.name, opts, workspaceType);
   }
-  const command = `nx g ${initGeneratorName} ${
+  const command = `${workspaceType} g ${initGeneratorName} ${
     selectedFlags?.join(' ') ?? ''
   } --interactive=false`;
   const task = new Task(
-    { type: 'nx' },
+    { type: workspaceType },
     TaskScope.Workspace,
     command,
     pkgManager,
