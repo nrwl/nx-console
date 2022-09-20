@@ -136,6 +136,11 @@ async function executeInitGenerator(dependency: string) {
     { includeHidden: true, includeNgAdd: true }
   );
 
+  // get the dependency's name if it came with a version
+  if (dependency.lastIndexOf('@') > 0) {
+    dependency = dependency.substring(0, dependency.lastIndexOf('@'));
+  }
+
   let initGeneratorName = `${dependency}:init`;
   let initGenerator = generators.find((g) => g.name === initGeneratorName);
   if (!initGenerator) {
