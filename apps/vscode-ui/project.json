@@ -46,6 +46,9 @@
         "deleteOutputPath": false
       },
       "configurations": {
+        "ci": {
+          "optimization": false
+        },
         "production": {
           "sourceMap": false,
           "aot": true,

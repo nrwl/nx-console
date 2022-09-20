@@ -81,6 +81,9 @@
         "deleteOutputPath": false
       },
       "configurations": {
+        "ci": {
+          "optimization": false
+        },
         "production": {
           "sourceMap": false,
           "optimization": true,
@@ -90,7 +93,9 @@
             "jsonc-parser",
             "@monodon/typescript-nx-imports-plugin",
             "@yarnpkg/fslib",
-            "@yarnpkg/libzip"
+            "@yarnpkg/libzip",
+            "@swc/core",
+            "ts-node"
           ],
           "fileReplacements": [
             {

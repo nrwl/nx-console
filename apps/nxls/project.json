@@ -37,10 +37,11 @@
       "defaultConfiguration": "production",
       "executor": "nx:run-commands",
       "outputs": ["dist/apps/vscode/nxls"],
-      "options": {
-        "commands": ["yarn tsc -p ./apps/nxls/tsconfig.app.json --noEmit"]
-      },
+      "options": {},
       "configurations": {
+        "ci": {
+          "commands": ["yarn tsc -p ./apps/nxls/tsconfig.app.json --noEmit"]
+        },
         "production": {
           "command": "node ./apps/nxls/esbuild.js"
         }
