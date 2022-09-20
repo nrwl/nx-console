@@ -16,12 +16,14 @@ import {
   commands,
   ExtensionContext,
   QuickInput,
+  QuickPickItem,
   ShellExecution,
   Task,
   tasks,
   TaskScope,
   window,
 } from 'vscode';
+import { gte, major, rcompare } from 'semver';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -48,12 +50,23 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
     );
     pkgManager = detectPackageManager(workspacePath);
 
-    const dep = await promptForDependencyName();
+    const depInput = await promptForDependencyInput();
+
+    if (!depInput) {
+      return;
+    }
+    const depVersioningInfo = await resolveDependencyVersioning(depInput);
+
+    if (!depVersioningInfo?.version) {
+      return;
+    }
+
+    const { dep, version } = depVersioningInfo;
 
     if (dep) {
       const quickInput = showLoadingQuickInput(dep);
       getTelemetry().featureUsed('add-dependency');
-      addDependency(dep, installAsDevDependency);
+      addDependency(dep, version, installAsDevDependency);
       const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
         if (
           taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
@@ -67,13 +80,14 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
   };
 }
 
-async function promptForDependencyName(): Promise<string | undefined> {
+async function promptForDependencyInput(): Promise<string | undefined> {
   const packageSuggestions = (await getDependencySuggestions()).map((pkg) => ({
     label: pkg.name,
     description: pkg.description,
   }));
   const dep = await new Promise<string | undefined>((resolve) => {
     const quickPick = window.createQuickPick();
+    quickPick.title = 'Select Dependency';
     quickPick.items = packageSuggestions;
     quickPick.placeholder =
       'The name of the dependency you want to add. Can be anything on the npm registry.';
@@ -100,6 +114,73 @@ async function promptForDependencyName(): Promise<string | undefined> {
   return dep;
 }
 
+async function resolveDependencyVersioning(
+  depInput: string
+): Promise<{ dep: string; version: string | undefined } | undefined> {
+  const match = depInput.match(/^(.+)@(.+)/);
+  if (match) {
+    const [_, dep, version] = match;
+    return { dep, version };
+  }
+  let packageInfo: PackageInformationResponse;
+  try {
+    packageInfo = await getPackageInfo(depInput);
+  } catch (e) {
+    window.showErrorMessage(
+      `Package ${depInput} couldn't be found. Are you sure it exists?`
+    );
+    return { dep: depInput, version: undefined };
+  }
+  const versionMap: Record<string, { latest: string; all: string[] }> = {};
+  Object.entries(packageInfo.versions).forEach(([versionNum, versionInfo]) => {
+    if (versionInfo.deprecated) {
+      return;
+    }
+    const major = versionNum.split('.')[0];
+    if (!versionMap[major]) {
+      versionMap[major] = { latest: versionNum, all: [] };
+    }
+    versionMap[major].all.push(versionNum);
+    if (gte(versionNum, versionMap[major].latest)) {
+      versionMap[major].latest = versionNum;
+    }
+  });
+
+  const version = await new Promise<string | undefined>((resolve) => {
+    const quickPick = window.createQuickPick();
+    quickPick.canSelectMany = false;
+
+    const options: QuickPickItem[] = [
+      'latest',
+      ...Object.values(versionMap)
+        .map((v) => v.latest)
+        .sort(rcompare),
+    ].map((o) => ({
+      label: o,
+    }));
+
+    quickPick.items = options;
+
+    quickPick.onDidChangeValue(() => {
+      quickPick.items = [
+        ...options,
+        {
+          label: quickPick.value,
+        },
+      ];
+    });
+
+    quickPick.onDidAccept(() => {
+      resolve(quickPick.selectedItems[0]?.label);
+      quickPick.hide();
+    });
+
+    quickPick.show();
+  });
+
+  return { dep: depInput, version };
+}
+
 function showLoadingQuickInput(dependency: string): QuickInput {
   const quickInput = window.createQuickPick();
   quickInput.busy = true;
@@ -112,11 +193,15 @@ function showLoadingQuickInput(dependency: string): QuickInput {
   return quickInput;
 }
 
-function addDependency(dependency: string, installAsDevDependency: boolean) {
+function addDependency(
+  dependency: string,
+  version: string,
+  installAsDevDependency: boolean
+) {
   const pkgManagerCommands = getPackageManagerCommand(pkgManager);
   const command = `${
     installAsDevDependency ? pkgManagerCommands.addDev : pkgManagerCommands.add
-  } ${dependency}`;
+  } ${dependency}@${version}`;
   const task = new Task(
     {
       type: 'nxconsole-add-dep',
@@ -226,5 +311,24 @@ function getDependencySuggestions(): Promise<
     (error: XHRResponse) => {
       return Promise.reject(error.responseText);
     }
+  );
+}
+
+type PackageInformationResponse = {
+  versions: Record<string, { deprecated: string }>;
+};
+function getPackageInfo(dep: string): Promise<PackageInformationResponse> {
+  const headers = {
+    'Accept-Encoding': 'gzip, deflate',
+    Accept: 'application/vnd.npm.install-v1+json',
+  };
+
+  // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md
+  return xhr({
+    url: `https://registry.npmjs.org/${dep}`,
+    headers,
+  }).then(
+    (res) => JSON.parse(res.responseText),
+    (error) => Promise.reject(error)
   );
 }
