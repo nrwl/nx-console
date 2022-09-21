@@ -17,6 +17,7 @@ import {
   ExtensionContext,
   QuickInput,
   QuickPickItem,
+  QuickPickItemKind,
   ShellExecution,
   Task,
   tasks,
@@ -24,6 +25,7 @@ import {
   window,
 } from 'vscode';
 import { gte, major, rcompare } from 'semver';
+import { resolveDependencyVersioning } from './dependency-versioning';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -112,73 +114,6 @@ async function promptForDependencyInput(): Promise<string | undefined> {
   });
 
   return dep;
-}
-
-async function resolveDependencyVersioning(
-  depInput: string
-): Promise<{ dep: string; version: string | undefined } | undefined> {
-  const match = depInput.match(/^(.+)@(.+)/);
-  if (match) {
-    const [_, dep, version] = match;
-    return { dep, version };
-  }
-  let packageInfo: PackageInformationResponse;
-  try {
-    packageInfo = await getPackageInfo(depInput);
-  } catch (e) {
-    window.showErrorMessage(
-      `Package ${depInput} couldn't be found. Are you sure it exists?`
-    );
-    return { dep: depInput, version: undefined };
-  }
-  const versionMap: Record<string, { latest: string; all: string[] }> = {};
-  Object.entries(packageInfo.versions).forEach(([versionNum, versionInfo]) => {
-    if (versionInfo.deprecated) {
-      return;
-    }
-    const major = versionNum.split('.')[0];
-    if (!versionMap[major]) {
-      versionMap[major] = { latest: versionNum, all: [] };
-    }
-    versionMap[major].all.push(versionNum);
-    if (gte(versionNum, versionMap[major].latest)) {
-      versionMap[major].latest = versionNum;
-    }
-  });
-
-  const version = await new Promise<string | undefined>((resolve) => {
-    const quickPick = window.createQuickPick();
-    quickPick.canSelectMany = false;
-
-    const options: QuickPickItem[] = [
-      'latest',
-      ...Object.values(versionMap)
-        .map((v) => v.latest)
-        .sort(rcompare),
-    ].map((o) => ({
-      label: o,
-    }));
-
-    quickPick.items = options;
-
-    quickPick.onDidChangeValue(() => {
-      quickPick.items = [
-        ...options,
-        {
-          label: quickPick.value,
-        },
-      ];
-    });
-
-    quickPick.onDidAccept(() => {
-      resolve(quickPick.selectedItems[0]?.label);
-      quickPick.hide();
-    });
-
-    quickPick.show();
-  });
-
-  return { dep: depInput, version };
 }
 
 function showLoadingQuickInput(dependency: string): QuickInput {
@@ -306,24 +241,5 @@ function getDependencySuggestions(): Promise<
     (error: XHRResponse) => {
       return Promise.reject(error.responseText);
     }
-  );
-}
-
-type PackageInformationResponse = {
-  versions: Record<string, { deprecated: string }>;
-};
-function getPackageInfo(dep: string): Promise<PackageInformationResponse> {
-  const headers = {
-    'Accept-Encoding': 'gzip, deflate',
-    Accept: 'application/vnd.npm.install-v1+json',
-  };
-
-  // https://github.com/npm/registry/blob/master/docs/responses/package-metadata.md
-  return xhr({
-    url: `https://registry.npmjs.org/${dep}`,
-    headers,
-  }).then(
-    (res) => JSON.parse(res.responseText),
-    (error) => Promise.reject(error)
   );
 }
