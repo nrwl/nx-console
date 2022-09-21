@@ -16,12 +16,16 @@ import {
   commands,
   ExtensionContext,
   QuickInput,
+  QuickPickItem,
+  QuickPickItemKind,
   ShellExecution,
   Task,
   tasks,
   TaskScope,
   window,
 } from 'vscode';
+import { gte, major, rcompare } from 'semver';
+import { resolveDependencyVersioning } from './dependency-versioning';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -48,12 +52,23 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
     );
     pkgManager = detectPackageManager(workspacePath);
 
-    const dep = await promptForDependencyName();
+    const depInput = await promptForDependencyInput();
+
+    if (!depInput) {
+      return;
+    }
+    const depVersioningInfo = await resolveDependencyVersioning(depInput);
+
+    if (!depVersioningInfo?.version) {
+      return;
+    }
+
+    const { dep, version } = depVersioningInfo;
 
     if (dep) {
       const quickInput = showLoadingQuickInput(dep);
       getTelemetry().featureUsed('add-dependency');
-      addDependency(dep, installAsDevDependency);
+      addDependency(dep, version, installAsDevDependency);
       const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
         if (
           taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
@@ -67,13 +82,14 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
   };
 }
 
-async function promptForDependencyName(): Promise<string | undefined> {
+async function promptForDependencyInput(): Promise<string | undefined> {
   const packageSuggestions = (await getDependencySuggestions()).map((pkg) => ({
     label: pkg.name,
     description: pkg.description,
   }));
   const dep = await new Promise<string | undefined>((resolve) => {
     const quickPick = window.createQuickPick();
+    quickPick.title = 'Select Dependency';
     quickPick.items = packageSuggestions;
     quickPick.placeholder =
       'The name of the dependency you want to add. Can be anything on the npm registry.';
@@ -112,11 +128,15 @@ function showLoadingQuickInput(dependency: string): QuickInput {
   return quickInput;
 }
 
-function addDependency(dependency: string, installAsDevDependency: boolean) {
+function addDependency(
+  dependency: string,
+  version: string,
+  installAsDevDependency: boolean
+) {
   const pkgManagerCommands = getPackageManagerCommand(pkgManager);
   const command = `${
     installAsDevDependency ? pkgManagerCommands.addDev : pkgManagerCommands.add
-  } ${dependency}`;
+  } ${dependency}@${version}`;
   const task = new Task(
     {
       type: 'nxconsole-add-dep',
@@ -137,11 +157,6 @@ async function executeInitGenerator(
     includeHidden: true,
     includeNgAdd: true,
   });
-
-  // get the dependency's name if it came with a version
-  if (dependency.lastIndexOf('@') > 0) {
-    dependency = dependency.substring(0, dependency.lastIndexOf('@'));
-  }
 
   let initGeneratorName = `${dependency}:init`;
   let initGenerator = generators.find((g) => g.name === initGeneratorName);
