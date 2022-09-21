@@ -28,9 +28,11 @@ export interface Typegen0 {
     clearProject: 'VIEW_DESTROYED';
     contentLoaded: 'done.invoke.loadingContent';
     loadingFailed: 'error.platform.loadingContent';
+    loadingStarted: '';
     log:
       | ''
       | 'GET_CONTENT'
+      | 'PROJECT_SELECTED'
       | 'REFRESH'
       | 'VIEW_DESTROYED'
       | 'VIEW_READY'
