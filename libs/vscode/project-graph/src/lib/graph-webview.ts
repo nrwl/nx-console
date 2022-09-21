@@ -1,3 +1,4 @@
+import { getOutputChannel } from '@nx-console/vscode/utils';
 import { commands, Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
 import { waitFor } from 'xstate/lib/waitFor';
 import { MessageType } from './graph-message-type';
@@ -10,6 +11,8 @@ export class GraphWebView implements Disposable {
   constructor() {
     graphService.start();
     graphService.onTransition(async (state) => {
+      getOutputChannel().appendLine(`Graph - ${state.value}`);
+
       if (!state.changed) {
         return;
       }
@@ -67,9 +70,12 @@ export class GraphWebView implements Disposable {
         commands.executeCommand('nxConsole.refreshWorkspace');
       }
     });
+
+    graphService.send('GET_CONTENT');
   }
 
   async projectInWebview(projectName: string | undefined, type: MessageType) {
+    getOutputChannel().appendLine(`Graph - Opening graph for ${projectName}`);
     if (!this.panel) {
       this._webview();
     }
@@ -78,8 +84,6 @@ export class GraphWebView implements Disposable {
       graphService.send('NO_PROJECT');
       return;
     }
-
-    graphService.send('GET_CONTENT');
 
     this.panel?.reveal();
 
