@@ -24,7 +24,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.71.0"
   },
   "keywords": [
     "angular",

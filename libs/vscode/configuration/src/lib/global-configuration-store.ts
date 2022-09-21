@@ -41,7 +41,7 @@ export class GlobalConfigurationStore implements Store {
     this.storage(key).update(key, undefined);
   }
 
-  storage(key: GlobalConfigKeys): Memento {
+  storage(key: GlobalConfigKeys): VSCState {
     return isConfig(key) ? this.config : this.state;
   }
 
@@ -59,5 +59,5 @@ function isConfig(key: GlobalConfigKeys): boolean {
 export interface VSCState {
   get<T>(key: string): T | undefined;
   get<T>(key: string, defaultValue: T): T;
-  update(key: string, value: any, target: ConfigurationTarget): void;
+  update(key: string, value: any, target?: ConfigurationTarget): void;
 }
