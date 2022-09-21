@@ -11,7 +11,7 @@
   "scripts": {
     "nx": "export NODE_OPTIONS=--max-old-space-size=4096 && nx",
     "watch": "nx watch-all vscode",
-    "package": "nx package vscode",
+    "package": "node ./tools/scripts/clear-dist.js && nx package vscode",
     "release": "standard-version",
     "update": "nx migrate latest"
   },
