@@ -1,6 +1,22 @@
 import { interpret, StateValue } from 'xstate';
 import { waitFor } from 'xstate/lib/waitFor';
-import { graphMachine, State, ViewStatus } from './graph.machine';
+import { graphMachine } from './graph.machine';
+import { PartialDeep } from 'type-fest';
+import type { OutputChannel } from 'vscode';
+
+import * as utils from '@nx-console/vscode/utils';
+jest.mock(
+  '@nx-console/vscode/utils',
+  (): PartialDeep<typeof utils> => ({
+    getOutputChannel: () => {
+      return {
+        appendLine: jest.fn(() => {
+          // do nothing
+        }),
+      } as unknown as OutputChannel;
+    },
+  })
+);
 
 const mockMachine = graphMachine.withConfig({
   services: {
