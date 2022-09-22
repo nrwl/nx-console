@@ -17,8 +17,8 @@ export interface LanguageModelCache<T> {
   dispose(): void;
 }
 
-const parse = (document: TextDocument): JSONDocument =>
-  getJsonLanguageService().parseJSONDocument(document);
+const parse = (document: TextDocument): JSONDocument | undefined =>
+  getJsonLanguageService()?.parseJSONDocument(document);
 
 let languageModels: {
   [uri: string]: {
@@ -82,6 +82,18 @@ export function getLanguageModelCache(): LanguageModelCache<JSONDocument> {
       }
 
       const languageModel = parse(document);
+
+      if (!languageModel) {
+        return {
+          jsonAst: {
+            root: undefined,
+            getNodeFromOffset() {
+              return undefined;
+            },
+          },
+          document,
+        };
+      }
 
       languageModels[document.uri] = {
         languageModel,
