@@ -3,7 +3,10 @@
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
-  "implicitDependencies": ["vscode-ui", "nxls"],
+  "implicitDependencies": [
+    "vscode-ui",
+    "nxls"
+  ],
   "targets": {
     "watch-all": {
       "executor": "@nrwl/workspace:run-commands",
@@ -29,10 +32,12 @@
       }
     },
     "watch": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/esbuild:esbuild",
       "options": {
-        "externalDependencies": ["vscode", "typescript"],
-        "webpackConfig": "apps/vscode/webpack.config.js",
+        "external": [
+          "vscode",
+          "typescript"
+        ],
         "outputPath": "dist/apps/vscode",
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
@@ -47,11 +52,13 @@
       }
     },
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/esbuild:esbuild",
       "defaultConfiguration": "production",
       "options": {
-        "externalDependencies": ["vscode", "typescript"],
-        "webpackConfig": "apps/vscode/webpack.config.js",
+        "external": [
+          "vscode",
+          "typescript"
+        ],
         "outputPath": "dist/apps/vscode",
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
@@ -88,7 +95,7 @@
           "sourceMap": false,
           "optimization": true,
           "extractLicenses": true,
-          "externalDependencies": [
+          "external": [
             "vscode",
             "jsonc-parser",
             "@monodon/typescript-nx-imports-plugin",
@@ -102,21 +109,27 @@
               "replace": "apps/vscode/src/environments/environment.ts",
               "with": "apps/vscode/src/environments/environment.prod.ts"
             }
-          ],
-          "webpackConfig": "apps/vscode/webpack.prod.config.js"
+          ]
         }
       },
-      "outputs": ["{options.outputPath}"]
+      "outputs": [
+        "{options.outputPath}"
+      ]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/vscode/**/*.ts"]
+        "lintFilePatterns": [
+          "apps/vscode/**/*.ts"
+        ]
       }
     },
     "package": {
       "executor": "@nrwl/workspace:run-commands",
-      "dependsOn": ["build", "^build"],
+      "dependsOn": [
+        "build",
+        "^build"
+      ],
       "options": {
         "commands": [
           "node ./tools/scripts/vscode-yarn.js",
@@ -124,7 +137,9 @@
         ],
         "parallel": false
       },
-      "outputs": ["dist/apps/vscode"]
+      "outputs": [
+        "dist/apps/vscode"
+      ]
     }
   },
   "tags": []
