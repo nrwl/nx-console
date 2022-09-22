@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.23.1](https://github.com/nrwl/nx-console/compare/v17.23.0...v17.23.1) (2022-09-22)
+
+
+### Bug Fixes
+
+* handle non existent json service ([#1361](https://github.com/nrwl/nx-console/issues/1361)) ([17bfbc6](https://github.com/nrwl/nx-console/commits/17bfbc6e56f953b6838fd29f9e95d0824c699804))
+
 ## [17.23.0](https://github.com/nrwl/nx-console/compare/v17.22.0...v17.23.0) (2022-09-22)
 
 
