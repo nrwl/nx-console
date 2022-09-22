@@ -79,6 +79,8 @@ let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
 let workspaceFileWatcher: FileSystemWatcher | undefined;
 
+const x: number = 1;
+
 export async function activate(c: ExtensionContext) {
   try {
     const startTime = Date.now();
