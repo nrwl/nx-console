@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/nrwl/nx-console/compare/nxls-v1.3.0...nxls-v1.3.1) (2022-09-22)
+
+
+### Bug Fixes
+
+* handle non existent json service ([#1361](https://github.com/nrwl/nx-console/issues/1361)) ([17bfbc6](https://github.com/nrwl/nx-console/commit/17bfbc6e56f953b6838fd29f9e95d0824c699804))
+
 # [1.3.0](https://github.com/nrwl/nx-console/compare/nxls-v1.2.0...nxls-v1.3.0) (2022-09-22)
 
 
