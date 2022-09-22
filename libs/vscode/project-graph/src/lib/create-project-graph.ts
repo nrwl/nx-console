@@ -2,11 +2,11 @@ import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import { execSync } from 'child_process';
-import * as cacheDir from 'find-cache-dir';
 
 let projectGraphCacheDir: string | undefined;
 
 export async function createProjectGraph() {
+  const { default: cacheDir } = await import('find-cache-dir');
   return new Promise<void>((res, rej) => {
     if (!projectGraphCacheDir) {
       projectGraphCacheDir = cacheDir({
@@ -23,9 +23,8 @@ export async function createProjectGraph() {
     const packageCommand = getPackageManagerCommand(packageManager);
 
     // TODO(cammisuli): determine the correct command depending on Nx Version
-    const command = `${packageCommand.exec} nx dep-graph --file ${
-      getProjectGraphOutput().relativePath
-    }`;
+    const command = `${packageCommand.exec} nx dep-graph --file ${getProjectGraphOutput().relativePath
+      }`;
 
     getOutputChannel().appendLine(
       `Generating graph with command: \`${command}\``
