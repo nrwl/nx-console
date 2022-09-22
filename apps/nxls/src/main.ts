@@ -110,16 +110,20 @@ connection.onCompletion(async (completionParams) => {
   const { jsonAst, document } = getJsonDocument(changedDocument);
 
   const completionResults =
-    (await getJsonLanguageService().doComplete(
+    (await getJsonLanguageService()?.doComplete(
       document,
       completionParams.position,
       jsonAst
     )) ?? CompletionList.create([]);
 
-  const schemas = await getJsonLanguageService().getMatchingSchemas(
+  const schemas = await getJsonLanguageService()?.getMatchingSchemas(
     document,
     jsonAst
   );
+
+  if (!schemas) {
+    return completionResults;
+  }
 
   const pathItems = await getCompletionItems(
     WORKING_PATH,
@@ -141,7 +145,7 @@ connection.onHover(async (hoverParams) => {
   }
 
   const { jsonAst, document } = getJsonDocument(hoverDocument);
-  return getJsonLanguageService().doHover(
+  return getJsonLanguageService()?.doHover(
     document,
     hoverParams.position,
     jsonAst
@@ -156,10 +160,14 @@ connection.onDocumentLinks(async (params) => {
   }
 
   const { jsonAst, document } = getJsonDocument(linkDocument);
-  const schemas = await getJsonLanguageService().getMatchingSchemas(
+  const schemas = await getJsonLanguageService()?.getMatchingSchemas(
     document,
     jsonAst
   );
+
+  if (!schemas) {
+    return;
+  }
 
   return getDocumentLinks(WORKING_PATH, jsonAst, document, schemas);
 });

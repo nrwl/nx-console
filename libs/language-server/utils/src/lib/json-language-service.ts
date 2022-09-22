@@ -4,6 +4,7 @@ import {
   LanguageServiceParams,
   LanguageSettings,
 } from 'vscode-json-languageservice';
+import { lspLogger } from './lsp-log';
 
 let languageService: LanguageService | undefined;
 
@@ -13,11 +14,13 @@ export function configureJsonLanguageService(
 ) {
   languageService = getLanguageService(params);
   languageService.configure(settings);
+
+  return languageService;
 }
 
-export function getJsonLanguageService(): LanguageService {
+export function getJsonLanguageService(): LanguageService | undefined {
   if (!languageService) {
-    throw 'Language service not configured';
+    lspLogger.log('Language service not configured');
   }
 
   return languageService;
