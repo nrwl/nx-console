@@ -72,6 +72,13 @@ jest.mock(
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('fs', () => require('memfs').fs);
 
+const languageService = configureJsonLanguageService(
+  {
+    clientCapabilities: ClientCapabilities.LATEST,
+  },
+  {}
+);
+
 describe('getCompletionItems', () => {
   const getTestCompletionItemsFor = async (
     text: string,
@@ -86,8 +93,8 @@ describe('getCompletionItems', () => {
       0,
       text
     );
-    const jsonAst = getJsonLanguageService().parseJSONDocument(document);
-    const matchingSchemas = await getJsonLanguageService().getMatchingSchemas(
+    const jsonAst = languageService.parseJSONDocument(document);
+    const matchingSchemas = await languageService.getMatchingSchemas(
       document,
       jsonAst,
       schema
@@ -108,12 +115,6 @@ describe('getCompletionItems', () => {
   };
 
   beforeEach(() => {
-    configureJsonLanguageService(
-      {
-        clientCapabilities: ClientCapabilities.LATEST,
-      },
-      {}
-    );
     vol.fromNestedJSON({
       '/workspace': {
         'file.js': 'content',

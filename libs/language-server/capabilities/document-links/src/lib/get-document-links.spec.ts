@@ -16,7 +16,7 @@ jest.mock(
   })
 );
 
-configureJsonLanguageService(
+const languageService = configureJsonLanguageService(
   {
     clientCapabilities: ClientCapabilities.LATEST,
   },
@@ -39,7 +39,7 @@ const { document, jsonAst } = documentMapper.retrieve(
 );
 
 it('should get all document links for properties that have a X_COMPLETION_TYPE (file type only)', async () => {
-  const matchingSchemas = await getJsonLanguageService().getMatchingSchemas(
+  const matchingSchemas = await languageService.getMatchingSchemas(
     document,
     jsonAst,
     {

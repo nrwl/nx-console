@@ -14,6 +14,8 @@ export function configureJsonLanguageService(
 ) {
   languageService = getLanguageService(params);
   languageService.configure(settings);
+
+  return languageService;
 }
 
 export function getJsonLanguageService(): LanguageService | undefined {
