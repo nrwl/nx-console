@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.23.0](https://github.com/nrwl/nx-console/compare/v17.22.0...v17.23.0) (2022-09-22)
+
+
+### Features
+
+* enable add-dependency version selection ([#1357](https://github.com/nrwl/nx-console/issues/1357)) ([c87da06](https://github.com/nrwl/nx-console/commits/c87da062dd5d3f66ce7cc220f633be3382803125))
+* **nxls:** add support for nx.json ([#1344](https://github.com/nrwl/nx-console/issues/1344)) ([e2ace3b](https://github.com/nrwl/nx-console/commits/e2ace3b7dddac5e4211d24a7f927e6ce1ddcbdc7))
+* add dependency functionality ([#1339](https://github.com/nrwl/nx-console/issues/1339)) ([0702b0d](https://github.com/nrwl/nx-console/commits/0702b0d4717e90fb6d2fd6a94e1f289f0313773f))
+* **nxls:**  auto complete for `tags`, `targets`,  `projects`, `inputNames` completion types ([#1343](https://github.com/nrwl/nx-console/issues/1343)) ([4aeb8f9](https://github.com/nrwl/nx-console/commits/4aeb8f928ecfccaabcf59ed7402e91d632f23b5c))
+* **nxls:** add support for nx in package.json files ([#1342](https://github.com/nrwl/nx-console/issues/1342)) ([1cb0a4e](https://github.com/nrwl/nx-console/commits/1cb0a4ea7a053bc4a5034f1c97dcd752fecfd0d1))
+
+
+### Bug Fixes
+
+* always send "GET_CONTENT" for graph actions ([#1350](https://github.com/nrwl/nx-console/issues/1350)) ([c9f2f6a](https://github.com/nrwl/nx-console/commits/c9f2f6a7bbcd3a7af52fdd73b5deb54c7bce717e))
+* always start the graph service on graph commands ([#1349](https://github.com/nrwl/nx-console/issues/1349)) ([a820fef](https://github.com/nrwl/nx-console/commits/a820fefc5cdb72de870aef4cc539bd60596975fa))
+* get the package name if it comes with a version when adding a dependency ([#1353](https://github.com/nrwl/nx-console/issues/1353)) ([1d7827f](https://github.com/nrwl/nx-console/commits/1d7827f4f7636b3e7defae10f27a17bf9e866e6a))
+* trigger  GET_CONTENT on all states for the graph ([#1358](https://github.com/nrwl/nx-console/issues/1358)) ([92ecb61](https://github.com/nrwl/nx-console/commits/92ecb61cc9051ffd317b93b89a0c3be133bc2ffb))
+* **nxls:** filter target dependencies ([cf5c7c3](https://github.com/nrwl/nx-console/commits/cf5c7c3de36fcc353df2da7ee4c546b0a0233d20))
+* **nxls:** handle unhandled exceptions ([4d7e982](https://github.com/nrwl/nx-console/commits/4d7e9825d67cd333dcd6a6715db9a9e4c7c69f02))
+
 ## [17.22.0](https://github.com/nrwl/nx-console/compare/v17.21.0...v17.22.0) (2022-09-12)
 
 
