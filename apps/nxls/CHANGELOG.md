@@ -1,3 +1,20 @@
+# [1.3.0](https://github.com/nrwl/nx-console/compare/nxls-v1.2.0...nxls-v1.3.0) (2022-09-22)
+
+
+### Bug Fixes
+
+* **nxls:** filter target dependencies ([cf5c7c3](https://github.com/nrwl/nx-console/commit/cf5c7c3de36fcc353df2da7ee4c546b0a0233d20))
+* **nxls:** handle unhandled exceptions ([4d7e982](https://github.com/nrwl/nx-console/commit/4d7e9825d67cd333dcd6a6715db9a9e4c7c69f02))
+
+
+### Features
+
+* add dependency functionality ([#1339](https://github.com/nrwl/nx-console/issues/1339)) ([0702b0d](https://github.com/nrwl/nx-console/commit/0702b0d4717e90fb6d2fd6a94e1f289f0313773f))
+* enable add-dependency version selection ([#1357](https://github.com/nrwl/nx-console/issues/1357)) ([c87da06](https://github.com/nrwl/nx-console/commit/c87da062dd5d3f66ce7cc220f633be3382803125))
+* **nxls:**  auto complete for `tags`, `targets`,  `projects`, `inputNames` completion types ([#1343](https://github.com/nrwl/nx-console/issues/1343)) ([4aeb8f9](https://github.com/nrwl/nx-console/commit/4aeb8f928ecfccaabcf59ed7402e91d632f23b5c))
+* **nxls:** add support for nx in package.json files ([#1342](https://github.com/nrwl/nx-console/issues/1342)) ([1cb0a4e](https://github.com/nrwl/nx-console/commit/1cb0a4ea7a053bc4a5034f1c97dcd752fecfd0d1))
+* **nxls:** add support for nx.json ([#1344](https://github.com/nrwl/nx-console/issues/1344)) ([e2ace3b](https://github.com/nrwl/nx-console/commit/e2ace3b7dddac5e4211d24a7f927e6ce1ddcbdc7))
+
 # [1.2.0](https://github.com/nrwl/nx-console/compare/nxls-v1.1.0...nxls-v1.2.0) (2022-09-12)
 
 
