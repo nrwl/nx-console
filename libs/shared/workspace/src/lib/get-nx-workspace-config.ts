@@ -64,10 +64,18 @@ export async function getNxWorkspaceConfig(
         throw 'No project graph support';
       }
 
+      process.exit = function (code?: number) {
+        console.warn('process.exit called with code', code);
+      } as (code?: number) => never;
+
       if (version < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else {
-        projectGraph = await nxProjectGraph.createProjectGraphAsync();
+        // TODO(cammisuli): Remove `any` when upgrading to Nx 14.7+
+        projectGraph = await (nxProjectGraph as any).createProjectGraphAsync({
+          exitOnError: false,
+          resetDaemonClient: true,
+        });
       }
     } catch {
       //noop

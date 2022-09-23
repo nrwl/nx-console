@@ -1,5 +1,6 @@
 import {
   checkIsNxWorkspace,
+  formatError,
   toWorkspaceFormat,
 } from '@nx-console/shared/utils';
 
@@ -42,6 +43,14 @@ const enum Status {
 let cachedReplay = new ReplaySubject<NxWorkspace>();
 let status: Status = Status.not_started;
 
+function resetStatus(workspacePath: string) {
+  status = Status.not_started;
+  cachedReplay = new ReplaySubject<NxWorkspace>();
+  // Clear out the workspace config path, needed for angular or older nx workspaces
+  clearJsonCache('angular.json', workspacePath);
+  clearJsonCache('workspace.json', workspacePath);
+}
+
 export async function nxWorkspace(
   workspacePath: string,
   logger: Logger = {
@@ -52,11 +61,7 @@ export async function nxWorkspace(
   reset?: boolean
 ): Promise<NxWorkspace> {
   if (reset) {
-    status = Status.not_started;
-    cachedReplay = new ReplaySubject<NxWorkspace>();
-    // Clear out the workspace config path, needed for angular or older nx workspaces
-    clearJsonCache('angular.json', workspacePath);
-    clearJsonCache('workspace.json', workspacePath);
+    resetStatus(workspacePath);
   }
 
   return firstValueFrom(
@@ -85,16 +90,16 @@ async function _workspace(
     join(workspacePath, 'angular.json')
   );
   const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
-  const config = await getNxWorkspaceConfig(
-    workspacePath,
-    isAngularWorkspace ? 'angularCli' : 'nx',
-    isNxWorkspace,
-    logger
-  );
-
-  const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
 
   try {
+    const config = await getNxWorkspaceConfig(
+      workspacePath,
+      isAngularWorkspace ? 'angularCli' : 'nx',
+      isNxWorkspace,
+      logger
+    );
+
+    const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
     return {
       validWorkspaceJson: true,
       workspaceType: isAngularWorkspace ? 'ng' : 'nx',
@@ -114,10 +119,7 @@ async function _workspace(
       workspacePath,
     };
   } catch (e) {
-    const humanReadableError = 'Invalid workspace: ' + workspacePath;
-    logger?.log(humanReadableError);
-    const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
-    logger?.log(stringifiedError);
+    logger.log(formatError('Invalid workspace', e));
 
     // Default to nx workspace
     return {
