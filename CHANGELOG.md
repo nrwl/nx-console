@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.23.2](https://github.com/nrwl/nx-console/compare/v17.23.1...v17.23.2) (2022-09-23)
+
+
+### Bug Fixes
+
+* reset the daemon client when getting the project graph ([#1363](https://github.com/nrwl/nx-console/issues/1363)) ([59d4928](https://github.com/nrwl/nx-console/commits/59d4928c054a1ff809866fd72bd3df8ca07cd0f6))
+
 ### [17.23.1](https://github.com/nrwl/nx-console/compare/v17.23.0...v17.23.1) (2022-09-22)
 
 
