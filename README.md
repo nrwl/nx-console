@@ -12,7 +12,7 @@
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/nrwl.angular-console?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console)
 [![GitHub](https://img.shields.io/github/license/nrwl/nx-console?style=flat-square)](https://github.com/nrwl/nx-console/blob/master/LICENSE)
 ![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/nrwl.angular-console?style=flat-square)
-[![Visual Studio Code Support](https://img.shields.io/badge/Visual%20Studio%20Code-%5E1.50.0-blue?style=flat-square&logo=visualstudiocode)](https://code.visualstudio.com)
+[![Visual Studio Code Support](https://img.shields.io/badge/Visual%20Studio%20Code-%5E1.71.0-blue?style=flat-square&logo=visualstudiocode)](https://code.visualstudio.com)
 
 </div>
 
