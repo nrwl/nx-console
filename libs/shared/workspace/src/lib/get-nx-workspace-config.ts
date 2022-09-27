@@ -71,8 +71,7 @@ export async function getNxWorkspaceConfig(
       if (version < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else {
-        // TODO(cammisuli): Remove `any` when upgrading to Nx 14.7+
-        projectGraph = await (nxProjectGraph as any).createProjectGraphAsync({
+        projectGraph = await nxProjectGraph.createProjectGraphAsync({
           exitOnError: false,
           resetDaemonClient: true,
         });
