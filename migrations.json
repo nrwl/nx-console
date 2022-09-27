@@ -25,14 +25,6 @@
       "name": "update-cypress-if-v10"
     },
     {
-      "cli": "nx",
-      "version": "14.7.6-beta.1",
-      "description": "Update usages of webpack executors to @nrwl/webpack",
-      "factory": "./src/migrations/update-14-7-6/update-webpack-executor",
-      "package": "@nrwl/node",
-      "name": "update-webpack-executor"
-    },
-    {
       "version": "14.6.0-beta.0",
       "cli": "nx",
       "description": "Update jest configs to support jest 28 changes (https://jestjs.io/docs/upgrading-to-jest28#configuration-options)",
@@ -47,6 +39,14 @@
       "factory": "./src/migrations/update-14-6-0/update-tests-jest-28",
       "package": "@nrwl/jest",
       "name": "update-tests-jest-28"
+    },
+    {
+      "cli": "nx",
+      "version": "14.7.6-beta.1",
+      "description": "Update usages of webpack executors to @nrwl/webpack",
+      "factory": "./src/migrations/update-14-7-6/update-webpack-executor",
+      "package": "@nrwl/node",
+      "name": "update-webpack-executor"
     }
   ]
 }
