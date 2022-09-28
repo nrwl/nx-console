@@ -105,7 +105,8 @@
             "@yarnpkg/fslib",
             "@yarnpkg/libzip",
             "@swc/core",
-            "ts-node"
+            "ts-node",
+            "fsevents"
           ],
           "fileReplacements": [
             {
