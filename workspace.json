@@ -16,6 +16,7 @@
     "vscode": "apps/vscode",
     "vscode-add-dependency": "libs/vscode/add-dependency",
     "vscode-configuration": "libs/vscode/configuration",
+    "vscode-e2e": "apps/vscode-e2e",
     "vscode-lsp-client": "libs/vscode/lsp-client",
     "vscode-nx-commands-view": "libs/vscode/nx-commands-view",
     "vscode-nx-conversion": "libs/vscode/nx-conversion",

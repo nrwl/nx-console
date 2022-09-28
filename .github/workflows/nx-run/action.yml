@@ -16,6 +16,9 @@ runs:
     - name: Build
       run: yarn nx run-many --all --parallel --target=build --max-parallel=3 --configuration=ci
       shell: bash
+    - name: E2E
+      run: yarn nx run vscode-e2e:e2e:ci
+      shell: bash
     - name: Stopping nx-cloud ci agents
       run: npx nx-cloud stop-all-agents
       shell: bash

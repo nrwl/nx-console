@@ -1,0 +1,29 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/vscode-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/vscode-e2e/**/*.ts"]
+      }
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "wdio run ./wdio.conf.ts",
+        "cwd": "apps/vscode-e2e"
+      },
+      "configurations": {
+        "ci": {
+          "command": "ts-node run-headless.ts"
+        }
+      },
+      "dependsOn": ["^build"]
+    }
+  },
+  "implicitDependencies": ["vscode", "nxls"],
+  "tags": []
+}

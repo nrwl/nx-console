@@ -33,9 +33,6 @@
       "@nx-console/language-server/utils": [
         "libs/language-server/utils/src/index.ts"
       ],
-      "@nx-console/shared/schema/normalize": [
-        "libs/shared/schema/src/normalize-schema.ts"
-      ],
       "@nx-console/shared/collections": [
         "libs/shared/collections/src/index.ts"
       ],
@@ -47,11 +44,11 @@
       ],
       "@nx-console/shared/npm": ["libs/shared/npm/src/index.ts"],
       "@nx-console/shared/schema": ["libs/shared/schema/src/index.ts"],
+      "@nx-console/shared/schema/normalize": [
+        "libs/shared/schema/src/normalize-schema.ts"
+      ],
       "@nx-console/shared/utils": ["libs/shared/utils/src/index.ts"],
       "@nx-console/shared/workspace": ["libs/shared/workspace/src/index.ts"],
-      "@nx-console/vscode/typescript-plugin": [
-        "libs/vscode/typescript-plugin/src/index.ts"
-      ],
       "@nx-console/vscode-ui/argument-list": [
         "libs/vscode-ui/argument-list/src/index.ts"
       ],
@@ -90,6 +87,9 @@
         "libs/vscode/project-graph/src/index.ts"
       ],
       "@nx-console/vscode/tasks": ["libs/vscode/tasks/src/index.ts"],
+      "@nx-console/vscode/typescript-plugin": [
+        "libs/vscode/typescript-plugin/src/index.ts"
+      ],
       "@nx-console/vscode/utils": ["libs/vscode/utils/src/index.ts"],
       "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
       "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"]

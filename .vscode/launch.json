@@ -36,6 +36,24 @@
         "/Applications/Visual Studio Code.app/**"
       ]
       // "outFiles": ["${workspaceFolder}/dist/vscode/lsp/**/*.js"]
+    },
+    {
+      "name": "Debug E2E Tests",
+      "type": "node",
+      "request": "launch",
+      "args": ["run", "vscode-e2e:e2e"],
+      "env": {
+        "DEBUG": "true"
+      },
+      "cwd": "${workspaceFolder}",
+      "autoAttachChildProcesses": true,
+      "program": "${workspaceRoot}/node_modules/nx/bin/nx.js",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "${workspaceFolder}/node_modules/**/*.js",
+        "${workspaceFolder}/lib/**/*.js",
+        "<node_internals>/**/*.js"
+      ]
     }
   ],
   "compounds": [

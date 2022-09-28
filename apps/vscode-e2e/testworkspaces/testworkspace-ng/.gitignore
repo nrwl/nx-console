@@ -1,19 +1,18 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# compiled output
+# Compiled output
 /dist
 /tmp
 /out-tsc
-/osbuilds
-/.angular
-/cypress
+/bazel-out
 
-# dependencies
-**/node_modules
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
 
 # IDEs and editors
-/.idea
-/.vscode
+.idea/
 .project
 .classpath
 .c9/
@@ -21,38 +20,23 @@
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
+# Visual Studio Code
 .vscode/*
-.vscode-test/*
+!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.history/*
 
-# misc
+# Miscellaneous
 /.angular/cache
-/.sass-cache
+.sass-cache/
 /connect.lock
 /coverage
 /libpeerconnection.log
-npm-debug.log
-yarn-error.log
 testem.log
 /typings
 
-# System Files
+# System files
 .DS_Store
 Thumbs.db
-
-#Environment
-.env
-
-
-# Intellij
-apps/intellij/gen/ngConsoleCli/*
-apps/intellij/build/*
-apps/intellij/.gradle/*
-apps/intellij/.idea/*
-
-# WDIO
-**/.wdio-vscode-service
-
