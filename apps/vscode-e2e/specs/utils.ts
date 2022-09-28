@@ -43,6 +43,9 @@ export function getTestWorkspacePath() {
 export async function openNxConsoleViewContainer() {
   const workbench = await browser.getWorkbench();
   await workbench.wait();
+  await browser.waitUntil(async () => {
+    return await !!workbench.getActivityBar().getViewControl('Nx Console');
+  });
   const nxActivityBaritem = await workbench
     .getActivityBar()
     .getViewControl('Nx Console');
