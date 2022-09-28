@@ -1,5 +1,5 @@
 import type { Options } from '@wdio/types';
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 import {
   copyFileSync,
   existsSync,
@@ -199,13 +199,23 @@ export const config: Options.Testrunner = {
   onPrepare: async () => {
     const testWorkspacePath = getTestWorkspacePath();
     copyFolderRecursiveSync(`./testworkspaces`, dirname(testWorkspacePath));
-    await Promise.all(
-      ['nx', 'empty', 'ng'].map((workspaceType) => {
-        return exec(`npm ci`, {
-          cwd: join(testWorkspacePath, `testworkspace-${workspaceType}`),
+    const testWorkspaces = readdirSync(testWorkspacePath, {
+      withFileTypes: true,
+    }).filter((dirent) => dirent.isDirectory());
+
+    console.log('installing testworkspace dependencies....');
+    console.time('done in');
+    testWorkspaces.forEach((tws) => {
+      try {
+        execSync('npm ci', {
+          cwd: join(testWorkspacePath, tws.name),
+          stdio: 'ignore',
         });
-      })
-    );
+      } catch (e) {
+        console.error(`Failed to install dependencies for ${tws.name}`);
+      }
+    });
+    console.timeLog('done in');
 
     process.on('exit', () => {
       rmSync(testWorkspacePath, { recursive: true, force: true });

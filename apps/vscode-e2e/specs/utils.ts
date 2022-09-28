@@ -63,10 +63,14 @@ export async function closeAllSectionsExcept(
   const content = await viewContainer.getContent();
   await content.wait();
 
-  await browser.waitUntil(async () => {
-    const sections = await content.getSections();
-    return sections.length > 0;
-  });
+  try {
+    await browser.waitUntil(async () => {
+      const sections = await content.getSections();
+      return sections.length > 1;
+    });
+  } catch (e) {
+    // noop - if there's only one section, we don't need to close it
+  }
 
   const sections = await content.getSections();
 
