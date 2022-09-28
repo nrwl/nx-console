@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "nx": "export NODE_OPTIONS=--max-old-space-size=4096 && nx",
+    "nx": "NODE_OPTIONS=--max-old-space-size=4096 && nx",
     "watch": "nx watch-all vscode",
     "package": "node ./tools/scripts/clear-dist.js && nx package vscode",
     "e2e": "nx e2e vscode-e2e",
