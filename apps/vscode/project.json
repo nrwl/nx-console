@@ -31,7 +31,12 @@
     "watch": {
       "executor": "@nrwl/node:webpack",
       "options": {
-        "externalDependencies": ["vscode", "typescript"],
+        "externalDependencies": [
+          "vscode",
+          "typescript",
+          "@swc/core",
+          "fsevents"
+        ],
         "webpackConfig": "apps/vscode/webpack.config.js",
         "outputPath": "dist/apps/vscode",
         "main": "apps/vscode/src/main.ts",
