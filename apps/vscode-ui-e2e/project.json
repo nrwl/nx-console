@@ -6,10 +6,11 @@
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/vscode-ui-e2e/cypress.json",
+        "cypressConfig": "apps/vscode-ui-e2e/cypress.config.ts",
         "tsConfig": "apps/vscode-ui-e2e/tsconfig.e2e.json",
         "devServerTarget": "vscode-ui-feature-task-execution-form:storybook",
-        "headed": true
+        "headed": true,
+        "testingType": "e2e"
       },
       "configurations": {
         "ci": {

@@ -84,7 +84,7 @@
     "@wdio/mocha-framework": "^7.24.0",
     "@wdio/spec-reporter": "^7.24.0",
     "@yarnpkg/pnp": "^3.1.1-rc.12",
-    "cypress": "6.5.0",
+    "cypress": "^10.2.0",
     "esbuild": "^0.14.54",
     "esbuild-copy-files-plugin": "^1.1.0",
     "eslint": "8.15.0",
