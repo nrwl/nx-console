@@ -41,6 +41,9 @@
         "outputDir": "dist/storybook/vscode-ui-feature-task-execution-form",
         "configDir": "libs/vscode-ui/feature-task-execution-form/.storybook",
         "browserTarget": "vscode-ui-feature-task-execution-form:build-storybook",
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/vscode-ui/styles/src/lib"]
+        },
         "compodoc": false
       },
       "configurations": {
