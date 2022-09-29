@@ -1,0 +1,10 @@
+{
+  "name": "testworkspace-lerna",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^5.5.4"
+  }
+}
