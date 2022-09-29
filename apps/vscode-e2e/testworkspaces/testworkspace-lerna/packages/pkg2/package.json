@@ -1,0 +1,9 @@
+{
+  "name": "pkg2",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo build",
+    "test": "echo test",
+    "extra": "echo extra"
+  }
+}
