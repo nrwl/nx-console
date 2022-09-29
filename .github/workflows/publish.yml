@@ -14,9 +14,12 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: ./.github/workflows/setup
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@v2
         with:
-          node_version: ${{ env.node_version }}
+          node-version: ${{ env.node_version }}
+      - run: yarn install --immutable
+        shell: bash
       - name: publish
         run: |
           yarn package
