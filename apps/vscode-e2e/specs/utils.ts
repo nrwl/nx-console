@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { SideBarView } from 'wdio-vscode-service';
 
-export type TestWorkspaceKind = 'empty' | 'nx' | 'ng';
+export type TestWorkspaceKind = 'empty' | 'nx' | 'ng' | 'lerna';
 export async function openWorkspace(workspace: TestWorkspaceKind) {
   const testFolder = join(
     getTestWorkspacePath(),
@@ -63,10 +63,14 @@ export async function closeAllSectionsExcept(
   const content = await viewContainer.getContent();
   await content.wait();
 
-  await browser.waitUntil(async () => {
-    const sections = await content.getSections();
-    return sections.length > 0;
-  });
+  try {
+    await browser.waitUntil(async () => {
+      const sections = await content.getSections();
+      return sections.length > 1;
+    });
+  } catch (e) {
+    // noop - if there's only one section, we don't need to close it
+  }
 
   const sections = await content.getSections();
 

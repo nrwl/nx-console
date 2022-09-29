@@ -1,7 +1,8 @@
 import type { Options } from '@wdio/types';
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 import {
   copyFileSync,
+  exists,
   existsSync,
   lstatSync,
   mkdirSync,
@@ -198,14 +199,27 @@ export const config: Options.Testrunner = {
    */
   onPrepare: async () => {
     const testWorkspacePath = getTestWorkspacePath();
+    if (existsSync(testWorkspacePath)) {
+      rmSync(testWorkspacePath, { recursive: true, force: true });
+    }
     copyFolderRecursiveSync(`./testworkspaces`, dirname(testWorkspacePath));
-    await Promise.all(
-      ['nx', 'empty', 'ng'].map((workspaceType) => {
-        return exec(`npm ci`, {
-          cwd: join(testWorkspacePath, `testworkspace-${workspaceType}`),
+    const testWorkspaces = readdirSync(testWorkspacePath, {
+      withFileTypes: true,
+    }).filter((dirent) => dirent.isDirectory());
+
+    console.log('installing testworkspace dependencies....');
+    console.time('done in');
+    testWorkspaces.forEach((tws) => {
+      try {
+        execSync('npm ci', {
+          cwd: join(testWorkspacePath, tws.name),
+          stdio: 'ignore',
         });
-      })
-    );
+      } catch (e) {
+        console.error(`Failed to install dependencies for ${tws.name}`);
+      }
+    });
+    console.timeLog('done in');
 
     process.on('exit', () => {
       rmSync(testWorkspacePath, { recursive: true, force: true });
@@ -344,15 +358,15 @@ export const config: Options.Testrunner = {
   // }
 };
 
-function copyFolderRecursiveSync(source, target) {
+function copyFolderRecursiveSync(source: string, target: string) {
   // Check if folder needs to be created or integrated
   const targetFolder = join(target, basename(source));
   if (!existsSync(targetFolder)) {
     mkdirSync(targetFolder);
   }
 
-  // Copy
-  if (lstatSync(source).isDirectory()) {
+  // Copy everything but ignore node_modules
+  if (lstatSync(source).isDirectory() && !source.includes('node_modules')) {
     const files = readdirSync(source);
     files.forEach(function (file) {
       const curSource = join(source, file);
