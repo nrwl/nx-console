@@ -18,6 +18,7 @@
     "lib": ["es2019", "dom", "esnext.asynciterable"],
     "types": ["node", "jest"],
     "module": "commonjs",
+    "esModuleInterop": true,
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {

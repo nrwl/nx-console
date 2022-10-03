@@ -3600,6 +3600,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nrwl/esbuild@npm:14.8.2":
+  version: 14.8.2
+  resolution: "@nrwl/esbuild@npm:14.8.2"
+  dependencies:
+    "@nrwl/devkit": 14.8.2
+    "@nrwl/js": 14.8.2
+    "@nrwl/workspace": 14.8.2
+    chalk: 4.1.0
+    dotenv: ~10.0.0
+    fs-extra: ^10.1.0
+    tslib: ^2.3.0
+  peerDependencies:
+    esbuild: ~0.15.9
+  peerDependenciesMeta:
+    esbuild:
+      optional: true
+  checksum: effe934528e69844fc505ed7359eb917fae3edb5d0062b8ea0a7f12a4feda739e0e3a3ab92f048e02ff15659d0bc21e0edaa9d9065754b592f6998bce63607e2
+  languageName: node
+  linkType: hard
+
 "@nrwl/eslint-plugin-nx@npm:14.8.2":
   version: 14.8.2
   resolution: "@nrwl/eslint-plugin-nx@npm:14.8.2"
@@ -20312,6 +20332,7 @@ __metadata:
     "@nrwl/angular": 14.8.2
     "@nrwl/cypress": 14.8.2
     "@nrwl/devkit": 14.8.2
+    "@nrwl/esbuild": 14.8.2
     "@nrwl/eslint-plugin-nx": 14.8.2
     "@nrwl/jest": 14.8.2
     "@nrwl/js": 14.8.2

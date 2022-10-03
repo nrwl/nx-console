@@ -10,40 +10,52 @@
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
         "assets": ["apps/nxls/src/assets"],
-        "watch": true
+        "watch": true,
+        "deleteOutputPath": false
       }
     },
     "package": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/esbuild:esbuild",
       "options": {
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
         "outputPath": "dist/packages/nxls",
+        "external": ["@swc/core"],
         "assets": [
-          "apps/nxls/src/bin",
+          {
+            "glob": "apps/nxls/src/bin",
+            "input": "./",
+            "output": "/"
+          },
           {
             "glob": "README.md",
             "input": "./",
             "output": "/"
           }
         ],
-        "generatePackageJson": true,
-        "externalDependencies": "all",
-        "optimization": true,
-        "extractLicenses": true
+        "esbuildOptions": {
+          "bundle": false
+        }
       }
     },
     "build": {
       "defaultConfiguration": "production",
-      "executor": "nx:run-commands",
+      "executor": "@nrwl/esbuild:esbuild",
       "outputs": ["dist/apps/vscode/nxls"],
-      "options": {},
+      "options": {
+        "external": ["typescript", "ts-node", "@swc/core"],
+        "outputPath": "dist/apps/vscode/nxls",
+        "main": "apps/nxls/src/main.ts",
+        "tsConfig": "apps/nxls/tsconfig.app.json",
+        "platform": "node",
+        "generatePackageJson": false
+      },
       "configurations": {
         "ci": {
-          "commands": ["yarn tsc -p ./apps/nxls/tsconfig.app.json --noEmit"]
+          "skipTypeCheck": false
         },
         "production": {
-          "command": "node ./apps/nxls/esbuild.js"
+          "minify": true
         }
       }
     },

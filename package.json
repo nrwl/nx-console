@@ -51,6 +51,7 @@
     "@babel/core": "7.5.4",
     "@nrwl/angular": "14.8.2",
     "@nrwl/cypress": "14.8.2",
+    "@nrwl/esbuild": "14.8.2",
     "@nrwl/eslint-plugin-nx": "14.8.2",
     "@nrwl/jest": "14.8.2",
     "@nrwl/js": "14.8.2",
