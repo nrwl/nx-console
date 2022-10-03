@@ -6,7 +6,7 @@
   "implicitDependencies": ["vscode-ui", "nxls"],
   "targets": {
     "watch-all": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": [
           {
@@ -128,7 +128,7 @@
       }
     },
     "package": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "dependsOn": ["build", "^build"],
       "options": {
         "commands": [
