@@ -1,44 +1,12 @@
 {
   "migrations": [
     {
+      "version": "14.8.0-beta.0",
+      "description": "Migrates from @nrwl/workspace:run-commands to nx:run-commands",
       "cli": "nx",
-      "version": "14.5.0-beta.0",
-      "description": "Update any references of MFE to MF.",
-      "factory": "./src/migrations/update-14-5-0/migrate-mfe-to-mf",
-      "package": "@nrwl/angular",
-      "name": "migrate-mfe-to-mf"
-    },
-    {
-      "cli": "nx",
-      "version": "14.5.2-beta.0",
-      "description": "Update the @angular/cli package version to ~14.1.0.",
-      "factory": "./src/migrations/update-14-5-2/update-angular-cli",
-      "package": "@nrwl/angular",
-      "name": "update-angular-cli-version-14-1-0"
-    },
-    {
-      "version": "14.5.5-beta.0",
-      "cli": "nx",
-      "description": "Exclude jest.config.ts from tsconfig where missing.",
-      "factory": "./src/migrations/update-14-0-0/update-jest-config-ext",
-      "package": "@nrwl/jest",
-      "name": "exclude-jest-config-from-ts-config"
-    },
-    {
-      "cli": "nx",
-      "version": "14.4.4",
-      "description": "Adds @typescript-eslint/utils as a dev dep",
-      "factory": "./src/migrations/update-14-4-4/experimental-to-utils-deps",
-      "package": "@nrwl/linter",
-      "name": "experimental-to-utils-deps"
-    },
-    {
-      "cli": "nx",
-      "version": "14.4.4",
-      "description": "Switch from  @typescript-eslint/experimental-utils to @typescript-eslint/utils in all rules and rules.spec files",
-      "factory": "./src/migrations/update-14-4-4/experimental-to-utils-rules",
-      "package": "@nrwl/linter",
-      "name": "experimental-to-utils-rules"
+      "implementation": "./src/migrations/update-14-8-0/change-run-commands-executor",
+      "package": "@nrwl/workspace",
+      "name": "14-8-0-change-run-commands-executor"
     }
   ]
 }

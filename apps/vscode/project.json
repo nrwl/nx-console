@@ -6,7 +6,7 @@
   "implicitDependencies": ["vscode-ui", "nxls"],
   "targets": {
     "watch-all": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": [
           {
@@ -52,7 +52,7 @@
       }
     },
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "defaultConfiguration": "production",
       "options": {
         "externalDependencies": [
@@ -88,7 +88,9 @@
           }
         ],
         "buildLibsFromSource": true,
-        "deleteOutputPath": false
+        "deleteOutputPath": false,
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "ci": {
@@ -126,7 +128,7 @@
       }
     },
     "package": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "dependsOn": ["build", "^build"],
       "options": {
         "commands": [
