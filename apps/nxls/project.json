@@ -23,13 +23,13 @@
         "external": ["@swc/core"],
         "assets": [
           {
-            "glob": "apps/nxls/src/bin",
-            "input": "./",
-            "output": "/"
+            "glob": "nxls",
+            "input": "./apps/nxls/src/bin",
+            "output": "/bin"
           },
           {
             "glob": "README.md",
-            "input": "./",
+            "input": "./apps/nxls/",
             "output": "/"
           }
         ],

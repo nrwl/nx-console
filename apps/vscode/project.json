@@ -37,27 +37,27 @@
         "tsConfig": "apps/vscode/tsconfig.app.json",
         "assets": [
           {
-            "input": "./",
+            "input": "apps/vscode/src",
             "glob": "package.json",
             "output": "/"
           },
           {
-            "input": "./",
+            "input": "apps/vscode/src",
             "glob": "nx-schema.json",
             "output": "/"
           },
           {
-            "input": "./",
+            "input": "apps/vscode/src",
             "glob": "tree-view-icon.svg",
             "output": "/"
           },
           {
-            "input": "./",
+            "input": "apps/vscode/src",
             "glob": "assets",
             "output": "/"
           },
           {
-            "input": "./",
+            "input": "apps/vscode/src",
             "glob": "getting-started",
             "output": "/"
           },
