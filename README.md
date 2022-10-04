@@ -1,6 +1,6 @@
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-dar.png">
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-dark.png">
         <img alt="Nx - Smart, Fast and Extensible Build System" src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-light.png" width="100%">
     </picture>
 </p>
