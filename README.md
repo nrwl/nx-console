@@ -1,10 +1,13 @@
 <p align="center">
-    <img alt="Nx Console Logo" src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-banner.png" width="536"/>
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-light.png">
+        <img alt="Nx - Smart, Fast and Extensible Build System" src="https://raw.githubusercontent.com/nrwl/nx-console/master/static/nx-console-dark.png" width="100%">
+    </picture>
 </p>
 
 <div align="center">
 
-# The UI for Nx
+# The UI for Nx & Lerna
 
 **Spend less time looking up command line arguments and more time shipping incredible products.**
 
@@ -38,9 +41,9 @@ Nx Console does all that and more!
 
 You can install the [Nx Console Visual Studio Code Plugin](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) from the Visual Studio Marketplace.
 
-## True UI for Nx
+## True UI for Nx & Lerna
 
-Nx Console is the UI for Nx. It works for any generator or any architect commands. Nx Console does not have a specific UI for, say, generating a component. Instead, Nx Console does what the command-line version of Nx does - it analyzes the same meta information to create the needed UI. This means that anything you can do with Nx, you can do with Nx Console. After all, Nx Console is the UI for Nx.
+Nx Console is the UI for all Nx workspaces. It works for any generator or any architect commands. Nx Console does not have a specific UI for, say, generating a component. Instead, Nx Console does what the command-line version of Nx does - it analyzes the same meta information to create the needed UI. This means that anything you can do with Nx, you can do with Nx Console. After all, Nx Console is the UI for Nx.
 
 ## Useful for Both Experts and Beginners
 
