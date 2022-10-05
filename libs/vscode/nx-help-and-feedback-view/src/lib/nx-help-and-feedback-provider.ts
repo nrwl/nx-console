@@ -106,13 +106,9 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
     );
   }
 
-  async isConnectedToCloud(ignoreNxJsonCache = true): Promise<boolean> {
+  async isConnectedToCloud(): Promise<boolean> {
     const nxConfig = (
-      await nxWorkspace(
-        getWorkspacePath(),
-        undefined,
-        ignoreNxJsonCache && this.nxJsonHasChanged
-      )
+      await nxWorkspace(getWorkspacePath(), undefined, this.nxJsonHasChanged)
     ).workspace;
 
     if (!nxConfig.tasksRunnerOptions) {
@@ -126,7 +122,7 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
   async connectToCloud() {
     getTelemetry().featureUsed('nxConsole.connectToNxCloud');
 
-    const isConnected = await this.isConnectedToCloud(false);
+    const isConnected = await this.isConnectedToCloud();
     if (isConnected) {
       window.showInformationMessage('You are already connected to Nx Cloud');
       return;
