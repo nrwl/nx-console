@@ -4,7 +4,7 @@ import {
   closeAllSectionsExcept,
   openNxConsoleViewContainer,
   openWorkspace,
-} from './utils';
+} from '../utils';
 
 let nxConsoleViewContainer: SideBarView<unknown>;
 let projectsSection: ViewSection;

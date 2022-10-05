@@ -3,6 +3,7 @@ import { nxWorkspace } from '@nx-console/shared/workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   AbstractTreeProvider,
+  getTelemetry,
   getWorkspacePath,
   watchFile,
 } from '@nx-console/vscode/utils';
@@ -123,6 +124,8 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
   }
 
   async connectToCloud() {
+    getTelemetry().featureUsed('nxConsole.connectToNxCloud');
+
     const isConnected = await this.isConnectedToCloud(false);
     if (isConnected) {
       window.showInformationMessage('You are already connected to Nx Cloud');

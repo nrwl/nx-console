@@ -2,7 +2,7 @@ import {
   assertWorkspaceIsLoaded,
   openNxConsoleViewContainer,
   openWorkspace,
-} from './utils';
+} from '../utils';
 
 describe('NxConsole Projects View in an empty workspace', () => {
   before(async () => {
