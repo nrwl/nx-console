@@ -16,7 +16,9 @@ import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import { getTelemetry } from '@nx-console/vscode/utils';
 import {
   TaskExecutionSchema,
-  TaskExecutionMessage,
+  TaskExecutionSchemaInputMessage,
+  TaskExecutionOutputMessage,
+  TaskExecutionOutputMessageType,
 } from '@nx-console/shared/schema';
 import { getTaskExecutionSchema } from './get-task-execution-schema';
 import { watch } from 'fs';
@@ -76,11 +78,8 @@ export function createWebViewPanel(
   title: string,
   cliTaskProvider: CliTaskProvider
 ) {
-  if (webviewPanel) {
-    webviewPanel.title = title;
-    webviewPanel.webview.postMessage({ taskExecutionSchema: schema });
-    webviewPanel.reveal();
-  } else {
+  const webviewPanelExists = !!webviewPanel;
+  if (!webviewPanel) {
     webviewPanel = window.createWebviewPanel(
       'nx-console', // Identifies the type of the webview. Used internally
       title, // Title of the panel displayed to the user
@@ -101,13 +100,12 @@ export function createWebViewPanel(
         join(context.extensionPath, 'assets', 'nx-console-dark.svg')
       ),
     };
-
-    setWebViewContent(webviewPanel, context, schema);
+    setWebViewContent(webviewPanel, context);
 
     if (context.extensionMode === ExtensionMode.Development) {
       watch(join(context.extensionPath, 'assets', 'public', 'main.js'), () => {
         if (webviewPanel) {
-          setWebViewContent(webviewPanel, context, schema);
+          setWebViewContent(webviewPanel, context);
           commands.executeCommand(
             'workbench.action.webview.reloadWebviewAction'
           );
@@ -115,32 +113,58 @@ export function createWebViewPanel(
       });
     }
 
-    webviewPanel.webview.onDidReceiveMessage((message: TaskExecutionMessage) =>
-      cliTaskProvider.executeTask(message)
+    webviewPanel.webview.onDidReceiveMessage(
+      (message: TaskExecutionOutputMessage) => {
+        switch (message.type) {
+          case TaskExecutionOutputMessageType.RunCommand: {
+            cliTaskProvider.executeTask(message.payload);
+            break;
+          }
+          case TaskExecutionOutputMessageType.TaskExecutionFormInit: {
+            publishMessagesToTaskExecutionForm(
+              webviewPanel as WebviewPanel,
+              schema
+            );
+            break;
+          }
+        }
+      }
     );
   }
+
+  if (!webviewPanelExists) webviewPanel.title = title;
+
+  publishMessagesToTaskExecutionForm(webviewPanel as WebviewPanel, schema);
+
+  if (!webviewPanelExists) webviewPanel.reveal();
 
   getTelemetry().screenViewed(title);
 
   return webviewPanel;
 }
 
+function publishMessagesToTaskExecutionForm(
+  webViewPanelRef: WebviewPanel,
+  schema: TaskExecutionSchema
+) {
+  webViewPanelRef.webview.postMessage(
+    new TaskExecutionSchemaInputMessage(schema)
+  );
+}
+
 function setWebViewContent(
   webviewPanel: WebviewPanel,
   context: ExtensionContext,
-  schema: TaskExecutionSchema
 ) {
   webviewPanel.webview.html = getIframeHtml(
     webviewPanel.webview,
     context,
-    schema
   );
 }
 
 export function getIframeHtml(
   webView: Webview,
   context: ExtensionContext,
-  schema: TaskExecutionSchema
 ) {
   const stylePath = Uri.joinPath(
     context.extensionUri,
@@ -161,7 +185,7 @@ export function getIframeHtml(
     'main.js'
   );
 
-  const indexHtml = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -171,16 +195,6 @@ export function getIframeHtml(
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <script>
-      // At runtime, VSCode server will replace this empty schema with the one to render.
-      window.VSCODE_UI_SCHEMA = {};
-
-      window.addEventListener('message', event => {
-        const taskExecutionSchema = event.data.taskExecutionSchema;
-        if (taskExecutionSchema && window.SET_TASK_EXECUTION_SCHEMA) {
-          window.SET_TASK_EXECUTION_SCHEMA(taskExecutionSchema);
-        }
-      });
-
       window.vscode = acquireVsCodeApi();
     </script>
     <link href="${webView.asWebviewUri(stylePath)}" rel="stylesheet"/>
@@ -191,9 +205,4 @@ export function getIframeHtml(
     <script src="${webView.asWebviewUri(mainPath)}"></script>
   </body>
 </html>`;
-
-  return indexHtml.replace(
-    'window.VSCODE_UI_SCHEMA = {};',
-    `window.VSCODE_UI_SCHEMA = ${JSON.stringify(schema)};`
-  );
 }

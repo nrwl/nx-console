@@ -1,7 +1,12 @@
-import { OptionType, TaskExecutionSchema } from '@nx-console/shared/schema';
-import { TaskExecutionFormComponent } from './task-execution-form.component';
-import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
+import { Component, Input } from '@angular/core';
+import { Story } from '@storybook/angular';
+import {
+  OptionType,
+  TaskExecutionSchema,
+  TaskExecutionSchemaInputMessage,
+} from '@nx-console/shared/schema';
 import { VscodeUiFeatureTaskExecutionFormModule } from './vscode-ui-feature-task-execution-form.module';
+import { StoryFnAngularReturnType } from '@storybook/angular/dist/ts3.9/client/preview/types';
 
 const cssColorNames = [
   'AliceBlue',
@@ -145,35 +150,39 @@ export default {
   title: 'feature-task-execution-form',
 };
 
-const moduleMetadata = {
-  imports: [VscodeUiFeatureTaskExecutionFormModule],
-  providers: [{ provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema }],
-};
-
-const noDefaultsModuleMetadata = {
-  imports: [VscodeUiFeatureTaskExecutionFormModule],
-  providers: [
-    { provide: TASK_EXECUTION_SCHEMA, useValue: schemaWithoutDefaults },
-  ],
-};
-
-const baseConfig = {
-  component: TaskExecutionFormComponent,
+@Component({
+  selector: 'vscode-ui-task-execution-form-example',
   template: `
     <vscode-ui-task-execution-form #component></vscode-ui-task-execution-form>
     <ng-container *ngIf="component.taskExecForm$ | async as taskExecForm">
       <ng-container *ngFor="let item of taskExecForm.form.value | keyvalue">
-        <p [attr.data-cy]="item.key">{{item.value}}</p>
+        <p [attr.data-cy]="item.key">{{ item.value }}</p>
       </ng-container>
     </ng-container>
   `,
+})
+class TaskExecutionFormExampleComponent {
+  @Input() set schema(value: TaskExecutionSchema) {
+    window.postMessage(new TaskExecutionSchemaInputMessage(value));
+  }
+}
+
+const baseConfig: StoryFnAngularReturnType = {
+  component: TaskExecutionFormExampleComponent,
+  moduleMetadata: {
+    imports: [VscodeUiFeatureTaskExecutionFormModule],
+  },
 };
-export const DefaultValues = () => ({
+export const DefaultValues: Story = () => ({
   ...baseConfig,
-  moduleMetadata,
+  props: {
+    schema: initialSchema,
+  },
 });
 
 export const NoDefaultValues = () => ({
   ...baseConfig,
-  moduleMetadata: noDefaultsModuleMetadata,
+  props: {
+    schema: schemaWithoutDefaults,
+  },
 });
