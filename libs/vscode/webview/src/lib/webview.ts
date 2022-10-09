@@ -19,9 +19,11 @@ import {
   TaskExecutionSchemaInputMessage,
   TaskExecutionOutputMessage,
   TaskExecutionOutputMessageType,
+  TaskExecutionGlobalConfigurationInputMessage,
 } from '@nx-console/shared/schema';
 import { getTaskExecutionSchema } from './get-task-execution-schema';
 import { watch } from 'fs';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 
 let webviewPanel: WebviewPanel | undefined;
 
@@ -134,7 +136,7 @@ export function createWebViewPanel(
 
   if (!webviewPanelExists) webviewPanel.title = title;
 
-  publishMessagesToTaskExecutionForm(webviewPanel as WebviewPanel, schema);
+  publishMessagesToTaskExecutionForm(webviewPanel, schema);
 
   if (!webviewPanelExists) webviewPanel.reveal();
 
@@ -150,22 +152,24 @@ function publishMessagesToTaskExecutionForm(
   webViewPanelRef.webview.postMessage(
     new TaskExecutionSchemaInputMessage(schema)
   );
+  webViewPanelRef.webview.postMessage(
+    new TaskExecutionGlobalConfigurationInputMessage({
+      enableTaskExecutionDryRunOnChange:
+        !!GlobalConfigurationStore.instance.get(
+          'enableTaskExecutionDryRunOnChange'
+        ),
+    })
+  );
 }
 
 function setWebViewContent(
   webviewPanel: WebviewPanel,
-  context: ExtensionContext,
+  context: ExtensionContext
 ) {
-  webviewPanel.webview.html = getIframeHtml(
-    webviewPanel.webview,
-    context,
-  );
+  webviewPanel.webview.html = getIframeHtml(webviewPanel.webview, context);
 }
 
-export function getIframeHtml(
-  webView: Webview,
-  context: ExtensionContext,
-) {
+export function getIframeHtml(webView: Webview, context: ExtensionContext) {
   const stylePath = Uri.joinPath(
     context.extensionUri,
     'assets',

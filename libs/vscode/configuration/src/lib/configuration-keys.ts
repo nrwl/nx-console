@@ -6,6 +6,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'enableGeneratorFilters',
   'generatorAllowlist',
   'generatorBlocklist',
+  'enableTaskExecutionDryRunOnChange',
 ] as const;
 
 /**

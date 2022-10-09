@@ -77,9 +77,11 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   @ViewChild('formHeaderContainer')
   formHeaderContainer: ElementRef<HTMLElement>;
 
-  get isMacOs() {
+  get isMacOs(): boolean {
     return navigator.userAgent.indexOf('Mac') > -1;
   }
+
+  private enableTaskExecutionDryRunOnChange = true;
 
   private readonly activeFieldIdSubject = new BehaviorSubject<string>('');
   readonly activeFieldName$ = this.activeFieldIdSubject.pipe(
@@ -88,6 +90,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   );
 
   private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
+  private readonly enableTaskExecutionDryRunOnChangeSubject =
+    new BehaviorSubject(true);
 
   readonly architect$ = this.architectSubject.asObservable();
 
@@ -99,17 +103,34 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         this.dryRunSubscription = undefined;
       }
       if (taskExecForm.architect.command === 'generate') {
-        this.dryRunSubscription = taskExecForm.form.valueChanges
+        this.dryRunSubscription = combineLatest([
+          taskExecForm.form.valueChanges,
+          this.enableTaskExecutionDryRunOnChangeSubject,
+        ])
           .pipe(
             debounceTime(500),
-            filter(() => taskExecForm.form.valid)
+            filter(
+              ([, dryRunEnabled]) => dryRunEnabled && taskExecForm.form.valid
+            )
           )
           .subscribe(() => {
             this.runCommand(taskExecForm, true);
           });
       }
     }),
-    shareReplay()
+    shareReplay({ refCount: true, bufferSize: 1 })
+  );
+
+  readonly showDryRunBtn$: Observable<boolean> = combineLatest([
+    this.taskExecForm$,
+    this.enableTaskExecutionDryRunOnChangeSubject,
+  ]).pipe(
+    map(([schema, enableTaskExecutionDryRunOnChange]) => {
+      return (
+        schema.architect.command === 'generate' &&
+        !enableTaskExecutionDryRunOnChange
+      );
+    })
   );
 
   readonly defaultValues$ = this.taskExecForm$.pipe(
@@ -135,7 +156,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         configurationName
       );
     }),
-    shareReplay()
+    shareReplay({ refCount: true, bufferSize: 1 })
   );
 
   readonly filterFieldsControl = new UntypedFormControl('');
@@ -172,7 +193,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
       return filteredFields;
     }),
-    shareReplay()
+    shareReplay({ refCount: true, bufferSize: 1 })
   );
 
   runCommandArguments$ = this.taskExecForm$.pipe(
@@ -535,6 +556,16 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
                 this.scrollToTop();
                 this.changeDetectorRef.detectChanges();
               }, 0);
+            });
+            break;
+          }
+
+          case TaskExecutionInputMessageType.SetGlobalConfiguration: {
+            this.ngZone.run(() => {
+              this.enableTaskExecutionDryRunOnChangeSubject.next(
+                data.payload.enableTaskExecutionDryRunOnChange
+              );
+              this.changeDetectorRef.detectChanges();
             });
             break;
           }

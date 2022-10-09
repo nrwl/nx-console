@@ -1,5 +1,9 @@
 import { TaskExecutionMessage, TaskExecutionSchema } from './schema';
 
+export interface GlobalConfigurationData {
+  enableTaskExecutionDryRunOnChange: boolean;
+}
+
 // Task execution output messages
 export type TaskExecutionOutputMessage =
   | TaskExecutionFormInitOutputMessage
@@ -23,14 +27,23 @@ export class TaskExecutionFormInitOutputMessage {
 }
 
 // Task execution input messages
-export type TaskExecutionInputMessage = TaskExecutionSchemaInputMessage;
+export type TaskExecutionInputMessage =
+  | TaskExecutionSchemaInputMessage
+  | TaskExecutionGlobalConfigurationInputMessage;
 
 export enum TaskExecutionInputMessageType {
   SetTaskExecutionSchema = 1,
+  SetGlobalConfiguration,
 }
 
 export class TaskExecutionSchemaInputMessage {
   readonly type = TaskExecutionInputMessageType.SetTaskExecutionSchema;
 
   constructor(public readonly payload: TaskExecutionSchema) {}
+}
+
+export class TaskExecutionGlobalConfigurationInputMessage {
+  readonly type = TaskExecutionInputMessageType.SetGlobalConfiguration;
+
+  constructor(public readonly payload: GlobalConfigurationData) {}
 }

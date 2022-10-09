@@ -71,7 +71,7 @@ describe('TaskExecutionFormComponent', () => {
     fixture = TestBed.createComponent(TaskExecutionFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    window.postMessage(new TaskExecutionSchemaInputMessage(initialSchema), "/");
+    window.postMessage(new TaskExecutionSchemaInputMessage(initialSchema), '/');
     formGroup = component.buildForm(initialSchema);
   });
 

@@ -1,12 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { Story } from '@storybook/angular';
+import { AngularFramework, Story } from '@storybook/angular';
 import {
   OptionType,
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
 import { VscodeUiFeatureTaskExecutionFormModule } from './vscode-ui-feature-task-execution-form.module';
-import { StoryFnAngularReturnType } from '@storybook/angular/dist/ts3.9/client/preview/types';
 
 const cssColorNames = [
   'AliceBlue',
@@ -167,7 +166,7 @@ class TaskExecutionFormExampleComponent {
   }
 }
 
-const baseConfig: StoryFnAngularReturnType = {
+const baseConfig: AngularFramework['storyResult'] = {
   component: TaskExecutionFormExampleComponent,
   moduleMetadata: {
     imports: [VscodeUiFeatureTaskExecutionFormModule],
