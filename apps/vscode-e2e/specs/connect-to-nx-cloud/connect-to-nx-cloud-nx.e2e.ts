@@ -55,6 +55,10 @@ describe('Connect to Nx Cloud button', () => {
       }
     }
 
+    const treeItemElem = await connectToNxCloudTreeItem.elem;
+    await treeItemElem.waitForClickable();
+    treeItemElem.click();
+
     let actionButtons: ViewItemAction[];
     await browser.waitUntil(async () => {
       const abs = await connectToNxCloudTreeItem.getActionButtons();
@@ -64,7 +68,10 @@ describe('Connect to Nx Cloud button', () => {
       }
     });
 
-    (await actionButtons[0].elem).click();
+    const launchButton = await actionButtons[0].elem;
+    await launchButton.waitForClickable();
+    launchButton.click();
+
     const workbench = await browser.getWorkbench();
     await browser.waitUntil(
       async () => {
