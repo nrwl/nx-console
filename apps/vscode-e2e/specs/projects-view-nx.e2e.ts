@@ -58,12 +58,8 @@ describe('NxConsole Projects View in an Nx workspace', () => {
         if (!isExpandable) {
           return;
         }
-
-        await item.expand();
-        const hasChildren = await item.hasChildren();
-
-        if (hasChildren) {
-          const children = await item.getChildren();
+        const children = await item.getChildren();
+        if (children) {
           await expandTreeViewItems(children as CustomTreeItem[]);
         }
       }

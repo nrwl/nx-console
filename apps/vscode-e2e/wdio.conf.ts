@@ -219,6 +219,7 @@ export const config: Options.Testrunner = {
         console.error(`Failed to install dependencies for ${tws.name}`);
       }
     });
+
     console.timeLog('done in');
 
     process.on('exit', () => {

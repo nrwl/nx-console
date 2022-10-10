@@ -58,12 +58,8 @@ describe('NxConsole Projects View in an Ng workspace', () => {
         if (!isExpandable) {
           return;
         }
-
-        await item.expand();
-        const hasChildren = await item.hasChildren();
-
-        if (hasChildren) {
-          const children = await item.getChildren();
+        const children = await item.getChildren();
+        if (children) {
           await expandTreeViewItems(children as CustomTreeItem[]);
         }
       }
@@ -73,6 +69,7 @@ describe('NxConsole Projects View in an Ng workspace', () => {
     await expandTreeViewItems(projectItems);
 
     const items = (await projectsSection.getVisibleItems()) as CustomTreeItem[];
+
     const labels = await Promise.all(items.map((vi) => vi.getLabel()));
     expect(labels).toEqual([
       'testworkspace-ng',
