@@ -1,5 +1,5 @@
-import { getPackageManagerCommand } from '@nrwl/devkit';
-import { nxWorkspace } from '@nx-console/shared/workspace';
+import { getPackageManagerCommand, readJsonFile } from '@nrwl/devkit';
+import { NxWorkspaceConfiguration } from '@nx-console/shared/workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   AbstractTreeProvider,
@@ -28,16 +28,17 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
   NxHelpAndFeedbackTreeItem | TreeItem
 > {
   nxJsonChange = new EventEmitter<undefined>();
-  nxJsonHasChanged = false;
+  nxConfig: NxWorkspaceConfiguration | undefined;
 
   constructor(private readonly context: ExtensionContext) {
     super();
+    this.nxConfig = readNxWorkspaceConfiguration();
     context.subscriptions.push(
       commands.registerCommand('nxConsole.connectToNxCloud', () => {
         this.connectToCloud();
       }),
       watchFile(`${getWorkspacePath()}/nx.json`, () => {
-        this.nxJsonHasChanged = true;
+        this.nxConfig = readNxWorkspaceConfiguration();
         this.nxJsonChange.fire(undefined);
       })
     );
@@ -50,7 +51,12 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
   async getChildren(): Promise<
     (NxHelpAndFeedbackTreeItem | TreeItem)[] | null | undefined
   > {
-    return [await this.getConnectToNxCloudItem(), ...this.getInfoItems()];
+    const items = [];
+    if (this.nxConfig) {
+      items.push(await this.getConnectToNxCloudItem());
+    }
+    items.push(...this.getInfoItems());
+    return items;
   }
 
   onDidChangeTreeData: Event<NxHelpAndFeedbackTreeItem | TreeItem | undefined> =
@@ -107,14 +113,10 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
   }
 
   async isConnectedToCloud(): Promise<boolean> {
-    const nxConfig = (
-      await nxWorkspace(getWorkspacePath(), undefined, this.nxJsonHasChanged)
-    ).workspace;
-
-    if (!nxConfig.tasksRunnerOptions) {
+    if (!this.nxConfig?.tasksRunnerOptions) {
       return false;
     }
-    return !!Object.values(nxConfig.tasksRunnerOptions).find(
+    return !!Object.values(this.nxConfig.tasksRunnerOptions).find(
       (r) => r.runner == '@nrwl/nx-cloud'
     );
   }
@@ -170,5 +172,16 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
         });
       }
     );
+  }
+}
+
+// TODO: MaxKless get it to work with nxWorkspace
+function readNxWorkspaceConfiguration(): NxWorkspaceConfiguration | undefined {
+  try {
+    return readJsonFile(
+      `${getWorkspacePath()}/nx.json`
+    ) as NxWorkspaceConfiguration;
+  } catch (e) {
+    return undefined;
   }
 }
