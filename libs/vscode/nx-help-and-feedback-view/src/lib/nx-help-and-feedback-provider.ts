@@ -145,10 +145,14 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
           try {
             if (lt(coerce(nxVersion) ?? '', '12.0.0')) {
               execSync(
+                `${getPackageManagerCommand().add} @nrwl/nx-cloud@${nxVersion}`
+              );
+              execSync(
                 `${getPackageManagerCommand().exec} nx g @nrwl/nx-cloud:init`,
                 { cwd: getWorkspacePath() }
               );
               resolve(true);
+              return;
             }
             const commandProcess = spawn(
               getPackageManagerCommand().exec,
