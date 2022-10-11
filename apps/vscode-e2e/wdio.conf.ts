@@ -9,7 +9,7 @@ import {
   readdirSync,
   rmSync,
 } from 'fs';
-import { basename, dirname, join } from 'path';
+import { basename, dirname, join, resolve } from 'path';
 import { getTestWorkspacePath } from './specs/utils';
 
 const debug = process.env.DEBUG;
@@ -305,21 +305,29 @@ export const config: Options.Testrunner = {
    * @param {Boolean} result.passed    true if test has passed, otherwise false
    * @param {Object}  result.retries   informations to spec related retries, e.g. `{ attempts: 0, limit: 0 }`
    */
-  afterTest: function (
+  afterTest: async function (
     test,
     context,
     { error, result, duration, passed, retries }
   ) {
     if (error) {
-      if (!existsSync('./.screenshots')) {
-        mkdirSync('./.screenshots');
+      if (!existsSync('.screenshots')) {
+        mkdirSync('.screenshots');
       }
       const time = new Date();
       const screenshotTitle =
         `${time.getFullYear()}-${time.getMonth()}-${time.getDay()}-${time.getUTCHours()}:${time.getUTCMinutes()}:${time.getUTCSeconds()}-${
           test.parent
-        }-${test.title}`.replace(/[ |/]/, '-');
-      browser.saveScreenshot(`./.screenshots/${screenshotTitle}.png`);
+        }-${test.title}`.replace(/[ |/]/g, '-');
+      console.log('saving screenshot');
+      await browser.saveScreenshot(`.screenshots/${screenshotTitle}.png`);
+      console.log('screenshot folder', readdirSync('.screenshots'));
+      console.log(
+        'screenshot folder path',
+        resolve('.screenshots'),
+        'exists?',
+        existsSync(resolve('.screenshots'))
+      );
     }
   },
 
