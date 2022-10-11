@@ -53,11 +53,6 @@ describe('NxConsole Projects View in an Nx workspace', () => {
   it('should include all project targets', async () => {
     async function expandTreeViewItems(items: CustomTreeItem[]) {
       for (const item of items) {
-        const isExpandable = await item.isExpandable();
-
-        if (!isExpandable) {
-          return;
-        }
         const children = await item.getChildren();
         if (children) {
           await expandTreeViewItems(children as CustomTreeItem[]);
@@ -79,7 +74,7 @@ describe('NxConsole Projects View in an Nx workspace', () => {
       'test',
       'lib2',
       'test',
-      'weird',
+      'weirdo',
     ]);
   });
 });
