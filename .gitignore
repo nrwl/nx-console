@@ -64,4 +64,5 @@ apps/intellij/.idea/*
 
 # WDIO
 **/.wdio-vscode-service
+apps/vscode-e2e/.screenshots
 
