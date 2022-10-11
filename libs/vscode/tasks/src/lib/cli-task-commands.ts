@@ -74,7 +74,7 @@ export function registerCliTaskCommands(
      * move and remove were release in patch 8.11
      */
     const version = await nxVersion(cliTaskProvider.getWorkspacePath());
-    if (version >= 8) {
+    if (version.major >= 8) {
       commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
         /**
          * Bit of a hack - always runs angular/move if it is installed.

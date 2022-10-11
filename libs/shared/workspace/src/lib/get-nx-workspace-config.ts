@@ -35,7 +35,7 @@ export async function getNxWorkspaceConfig(
 }> {
   const version = await nxVersion(workspacePath);
 
-  if (version < 12) {
+  if (version.major < 12) {
     return readWorkspaceConfigs(format, workspacePath);
   }
 
@@ -68,7 +68,7 @@ export async function getNxWorkspaceConfig(
         console.warn('process.exit called with code', code);
       } as (code?: number) => never;
 
-      if (version < 13) {
+      if (version.major < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else {
         projectGraph = await nxProjectGraph.createProjectGraphAsync({
