@@ -90,7 +90,7 @@ export default (workspaceKind: TestWorkspaceKind) => () => {
             return true;
           }
         },
-        { timeoutMsg: 'Connection notification never opened.' }
+        { timeoutMsg: 'Connection notification never opened.', interval: 100 }
       );
 
       await browser.waitUntil(

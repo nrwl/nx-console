@@ -7,9 +7,10 @@ import {
   getWorkspacePath,
   watchFile,
 } from '@nx-console/vscode/utils';
-import { execSync, spawn } from 'child_process';
+import { exec, execSync, spawn } from 'child_process';
 import { join } from 'path';
 import { coerce, lt } from 'semver';
+import { promisify } from 'util';
 import {
   commands,
   Event,
@@ -142,17 +143,17 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
         return new Promise((resolve) => {
           try {
             if (lt(coerce(nxVersion) ?? '', '12.0.0')) {
-              execSync(
+              promisify(exec)(
                 `${
                   getPackageManagerCommand().addDev
                 } @nrwl/nx-cloud@${nxVersion}`,
                 { cwd: getWorkspacePath() }
-              );
-              execSync(
-                `${getPackageManagerCommand().exec} nx g @nrwl/nx-cloud:init`,
-                { cwd: getWorkspacePath() }
-              );
-              resolve(true);
+              ).then(() => {
+                promisify(exec)(
+                  `${getPackageManagerCommand().exec} nx g @nrwl/nx-cloud:init`,
+                  { cwd: getWorkspacePath() }
+                ).then(() => resolve(true));
+              });
               return;
             }
 
