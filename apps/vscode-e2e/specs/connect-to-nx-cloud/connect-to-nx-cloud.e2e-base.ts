@@ -30,9 +30,14 @@ export default (workspaceKind: TestWorkspaceKind) => () => {
       closeAllSectionsExcept(nxConsoleViewContainer, 'HELP AND FEEDBACK');
 
       await browser.waitUntil(async () => {
-        const view = await nxConsoleViewContainer
-          .getContent()
-          .getSection('HELP AND FEEDBACK');
+        let view: ViewSection;
+        try {
+          view = await nxConsoleViewContainer
+            .getContent()
+            .getSection('HELP AND FEEDBACK');
+        } catch (error) {
+          view = undefined;
+        }
         if (view) {
           helpAndFeedbackSection = view;
           return true;
