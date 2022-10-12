@@ -93,9 +93,6 @@ async function _workspace(
   const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
 
   try {
-    process.exit = function (code?: number) {
-      console.log('process.exit called with code ' + code);
-    } as (code?: number) => never;
     const config = await getNxWorkspaceConfig(
       workspacePath,
       isAngularWorkspace ? 'angularCli' : 'nx',

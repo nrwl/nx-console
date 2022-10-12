@@ -37,9 +37,6 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
         this.connectToCloud();
       }),
       watchFile(`${getWorkspacePath()}/nx.json`, () => {
-        execSync(`${getPackageManagerCommand().exec} nx reset`, {
-          cwd: getWorkspacePath(),
-        });
         this.nxJsonHasChanged = true;
         this.nxJsonChange.fire(undefined);
       })
@@ -159,10 +156,16 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
               return;
             }
 
+            process.exit = function (code?: number) {
+              console.log(
+                'process.exit called with code (before spawn)' + code
+              );
+            } as (code?: number) => never;
+
             const commandProcess = spawn(
               getPackageManagerCommand().exec,
               ['nx', 'connect-to-nx-cloud'],
-              { cwd: getWorkspacePath() }
+              { cwd: getWorkspacePath(), shell: true }
             );
 
             commandProcess.stdout.setEncoding('utf8');

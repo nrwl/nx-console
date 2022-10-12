@@ -217,6 +217,9 @@ export const config: Options.Testrunner = {
         });
       } catch (e) {
         console.error(`Failed to install dependencies for ${tws.name}`);
+        if (debug) {
+          console.error(e);
+        }
       }
     });
     console.timeLog('done in');
