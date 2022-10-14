@@ -15,7 +15,7 @@
         "jestConfig": "libs/shared/schema/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/shared/schema"]
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/schema"]
     }
   },
   "tags": ["type:shared"]

@@ -12,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/add-dependency"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/add-dependency"],
       "options": {
         "jestConfig": "libs/vscode/add-dependency/jest.config.ts",
         "passWithNoTests": true

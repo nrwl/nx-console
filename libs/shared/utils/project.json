@@ -9,7 +9,7 @@
         "jestConfig": "libs/shared/utils/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/shared/utils"]
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/utils"]
     }
   },
   "tags": ["type:shared"]

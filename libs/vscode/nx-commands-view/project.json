@@ -11,7 +11,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/nx-commands-view"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/nx-commands-view"],
       "options": {
         "jestConfig": "libs/vscode/nx-commands-view/jest.config.ts",
         "passWithNoTests": true

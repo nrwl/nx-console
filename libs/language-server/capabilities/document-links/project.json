@@ -14,7 +14,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/language-server/capabilities/document-links"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/language-server/capabilities/document-links"
+      ],
       "options": {
         "jestConfig": "libs/language-server/capabilities/document-links/jest.config.ts",
         "passWithNoTests": true

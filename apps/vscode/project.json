@@ -137,7 +137,7 @@
         ],
         "parallel": false
       },
-      "outputs": ["dist/apps/vscode"]
+      "outputs": ["{workspaceRoot}/dist/apps/vscode"]
     }
   },
   "tags": []

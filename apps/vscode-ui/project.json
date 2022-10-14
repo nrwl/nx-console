@@ -96,7 +96,7 @@
         "jestConfig": "apps/vscode-ui/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/apps/vscode-ui"]
+      "outputs": ["{workspaceRoot}/coverage/apps/vscode-ui"]
     }
   },
   "tags": []

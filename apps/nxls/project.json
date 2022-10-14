@@ -36,7 +36,7 @@
     "build": {
       "defaultConfiguration": "production",
       "executor": "nx:run-commands",
-      "outputs": ["dist/apps/vscode/nxls"],
+      "outputs": ["{workspaceRoot}/dist/apps/vscode/nxls"],
       "options": {},
       "configurations": {
         "ci": {
@@ -56,7 +56,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/nxls"],
+      "outputs": ["{workspaceRoot}/coverage/apps/nxls"],
       "options": {
         "jestConfig": "apps/nxls/jest.config.ts",
         "passWithNoTests": true

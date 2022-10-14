@@ -12,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/lsp-client"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/lsp-client"],
       "options": {
         "jestConfig": "libs/vscode/lsp-client/jest.config.ts",
         "passWithNoTests": true

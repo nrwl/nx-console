@@ -12,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/project-graph"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/project-graph"],
       "options": {
         "jestConfig": "libs/vscode/project-graph/jest.config.ts",
         "passWithNoTests": true

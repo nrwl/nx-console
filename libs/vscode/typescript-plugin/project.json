@@ -12,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/typescript-plugin"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/typescript-plugin"],
       "options": {
         "jestConfig": "libs/vscode/typescript-plugin/jest.config.ts",
         "passWithNoTests": true
