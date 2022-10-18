@@ -88,7 +88,7 @@ export default (workspaceKind: TestWorkspaceKind) => () => {
           }
         },
         {
-          timeout: 20000,
+          timeout: 300000,
           timeoutMsg: 'Connection to Nx Cloud not established within 20s',
           interval: 1000,
         }
