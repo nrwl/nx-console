@@ -1,42 +1,54 @@
 name: CI Checks
-
 on:
   push:
     branches:
       - master
   pull_request:
 
+env:
+  NX_CLOUD_DISTRIBUTED_EXECUTION: true
+  node_version: 14
+
 jobs:
-  main:
+  checks:
     name: Nx Cloud - Main Job
-    uses: nrwl/ci/.github/workflows/nx-cloud-main.yml@v0.6
-    with:
-      main-branch-name: 'master'
-      number-of-agents: 4
-      install-commands: 'yarn install --immutable'
-      parallel-commands: |
-        yarn exec nx-cloud record -- yarn exec nx workspace-lint
-        yarn exec nx-cloud record -- yarn exec nx format:check
-      parallel-commands-on-agents: |
-        yarn exec nx affected --target=lint --parallel=3 --configuration=ci
-        yarn exec nx affected --target=test --parallel=3 --configuration=ci
-        yarn exec nx affected --target=build --parallel=3 --configuration=ci
-        NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }} yarn exec nx affected --target=e2e --parallel=3 --configuration=ci
-      final-commands: |
-        NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }} npx nx-cloud stop-all-agents
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: ./.github/workflows/setup
+        with:
+          node_version: ${{ env.node_version }}
+      - uses: ./.github/workflows/nx-run
 
   agents:
-    name: Nx Cloud - Agents
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.6
-    with:
-      install-commands: 'yarn install --immutable'
-      number-of-agents: 3
+    runs-on: ubuntu-latest
+    name: Nx Cloud - Agent ${{ matrix.agent }}
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        agent: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup
+        with:
+          node_version: ${{ env.node_version }}
+      - name: Start Nx Agent ${{ matrix.agent }}
+        run: npx nx-cloud start-agent
 
-  agent-e2e:
+  agent:
+    runs-on: ubuntu-latest
     name: Nx Cloud - Agent E2E
-    uses: nrwl/ci/.github/workflows/nx-cloud-agents.yml@v0.6
-    with:
-      environment-variables: |
-        NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}
-      install-commands: 'sudo apt-get install -y xvfb && yarn install --immutable'
-      number-of-agents: 1
+    timeout-minutes: 15
+    steps:
+      - name: Set nx run variable
+        run: echo "NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup
+        with:
+          node_version: ${{ env.node_version }}
+      - name: Install xvfb
+        run: sudo apt-get install -y xvfb
+      - name: Start Nx Agent E2E
+        run: npx nx-cloud start-agent
