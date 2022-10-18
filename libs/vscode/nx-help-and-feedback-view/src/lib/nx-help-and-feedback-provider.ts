@@ -148,12 +148,19 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
                   getPackageManagerCommand().addDev
                 } @nrwl/nx-cloud@${nxVersion}`,
                 { cwd: getWorkspacePath() }
-              ).then(() => {
-                promisify(exec)(
-                  `${getPackageManagerCommand().exec} nx g @nrwl/nx-cloud:init`,
-                  { cwd: getWorkspacePath() }
-                ).then(() => resolve(true));
-              });
+              )
+                .then(() => {
+                  promisify(exec)(
+                    `${
+                      getPackageManagerCommand().exec
+                    } nx g @nrwl/nx-cloud:init`,
+                    { cwd: getWorkspacePath() }
+                  ).then(() => resolve(true));
+                })
+                .catch((e) => {
+                  window.showErrorMessage(e.message);
+                  resolve(true);
+                });
               return;
             }
 
