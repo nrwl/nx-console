@@ -79,20 +79,6 @@ export default (workspaceKind: TestWorkspaceKind) => () => {
       await launchButton.waitForClickable();
       launchButton.click();
 
-      const workbench = await browser.getWorkbench();
-      await browser.waitUntil(
-        async () => {
-          const notifications = await workbench.getNotifications();
-          const messages = await Promise.all(
-            notifications.map((n) => n.getMessage())
-          );
-          if (messages.includes('Connecting you to Nx Cloud...')) {
-            return true;
-          }
-        },
-        { timeoutMsg: 'Connection notification never opened.', interval: 100 }
-      );
-
       await browser.waitUntil(
         async () => {
           const hafItems = await getHelpAndFeedbackItems();
