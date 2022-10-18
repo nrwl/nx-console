@@ -506,7 +506,12 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         return;
 
       if (f.positional !== undefined && typeof f.positional === 'number') {
-        args.add(sanitizeWhitespace(value[f.name]));
+        // Only add positional arguments for the first positional. Then add the rest of the positions as explicit flags
+        if (f.positional === 0) {
+          args.add(sanitizeWhitespace(value[f.name]));
+        } else {
+          args.add(`--${f.name}=${sanitizeWhitespace(value[f.name])}`);
+        }
       } else if (f.type === OptionType.Boolean) {
         args.add(value[f.name] === 'false' ? `--no-${f.name}` : `--${f.name}`);
       } else {
