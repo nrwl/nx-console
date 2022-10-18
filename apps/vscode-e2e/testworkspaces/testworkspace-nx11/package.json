@@ -30,9 +30,9 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
-    "@nrwl/tao": "11.6.3",
-    "@nrwl/cli": "11.6.3",
-    "@nrwl/workspace": "11.6.3",
+    "@nrwl/tao": "11.2.0",
+    "@nrwl/cli": "11.2.0",
+    "@nrwl/workspace": "11.2.0",
     "@types/node": "14.14.33",
     "dotenv": "8.2.0",
     "ts-node": "~9.1.1",
