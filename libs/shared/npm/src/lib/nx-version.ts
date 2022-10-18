@@ -1,15 +1,19 @@
 import { findNxPackagePath } from './find-nx-package-path';
+import { coerce, SemVer } from 'semver';
 
 declare function __non_webpack_require__(importPath: string): any;
 
 let nxWorkspacePackageJson: { version: string };
 let loadedNxPackage = false;
-export async function nxVersion(workspacePath: string): Promise<number> {
+
+const defaultSemver = new SemVer('0.0.0');
+
+export async function nxVersion(workspacePath: string): Promise<SemVer> {
   if (!loadedNxPackage) {
     const packagePath = await findNxPackagePath(workspacePath, 'package.json');
 
     if (!packagePath) {
-      return 0;
+      return defaultSemver;
     }
 
     nxWorkspacePackageJson = __non_webpack_require__(packagePath);
@@ -17,12 +21,12 @@ export async function nxVersion(workspacePath: string): Promise<number> {
   }
 
   if (!nxWorkspacePackageJson) {
-    return 0;
+    return defaultSemver;
   }
-  const nxPackageVersion = nxWorkspacePackageJson.version;
-  const majorVersion = nxPackageVersion.split('.')[0];
-  if (!majorVersion) {
-    return 0;
+  const nxVersion = coerce(nxWorkspacePackageJson.version);
+  if (!nxVersion) {
+    return defaultSemver;
   }
-  return +majorVersion;
+
+  return nxVersion;
 }

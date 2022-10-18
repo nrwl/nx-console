@@ -9,7 +9,7 @@
     mainFields: ['module', 'main'],
     outfile: './dist/apps/vscode/nxls/main.js',
     metafile: true,
-    external: ['typescript', 'ts-node', '@swc/core'],
+    external: ['typescript', 'ts-node', '@swc/*'],
   });
 
   let text = await esbuild.analyzeMetafile(result.metafile, {

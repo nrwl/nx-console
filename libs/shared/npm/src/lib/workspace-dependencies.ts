@@ -79,7 +79,7 @@ async function localDependencies(
   }
 
   // Local plugins do not work with nxVersion less than 13
-  if ((await nxVersion(workspacePath)) < 13) {
+  if ((await nxVersion(workspacePath)).major < 13) {
     return [];
   }
 

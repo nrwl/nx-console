@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.23.3](https://github.com/nrwl/nx-console/compare/v17.23.2...v17.23.3) (2022-10-12)
+
+
+### Bug Fixes
+
+* check lerna version for nx workspace ([#1382](https://github.com/nrwl/nx-console/issues/1382)) ([034e288](https://github.com/nrwl/nx-console/commits/034e288313306557e9fc34b10f31b5be5b604785))
+* wait for nx console viewcontrol ([#1368](https://github.com/nrwl/nx-console/issues/1368)) ([f029c23](https://github.com/nrwl/nx-console/commits/f029c23fad651d28c1ef4d3f5302975311f25851))
+
 ### [17.23.2](https://github.com/nrwl/nx-console/compare/v17.23.1...v17.23.2) (2022-09-23)
 
 
