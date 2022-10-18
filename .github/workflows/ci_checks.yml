@@ -52,3 +52,8 @@ jobs:
         run: sudo apt-get install -y xvfb
       - name: Start Nx Agent E2E
         run: npx nx-cloud start-agent
+      - uses: actions/upload-artifact@v3
+        with:
+          name: e2e-screenshots
+          path: apps/vscode-e2e/.screenshots
+          if-no-files-found: ignore
