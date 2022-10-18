@@ -1,0 +1,38 @@
+name: Nx Run
+description: Start nxcloud ci-run and run tasks
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Starting nx-cloud ci agents
+      run: npx nx-cloud start-ci-run
+      shell: bash
+    - name: Workspace Lint
+      run: |
+        yarn exec nx-cloud record -- yarn exec nx workspace-lint 
+        yarn exec nx-cloud record -- yarn exec nx format:check
+      shell: bash
+      env:
+        NX_CLOUD_DISTRIBUTED_EXECUTION: false
+    - name: Lint
+      run: yarn exec nx affected --target=lint --parallel=3 --configuration=ci
+      shell: bash
+    - name: Test
+      run: yarn exec nx affected --target=test --parallel=3 --configuration=ci
+      shell: bash
+    - name: Build
+      run: yarn exec nx affected --target=build --parallel=3 --configuration=ci
+      shell: bash
+    - name: E2E
+      env:
+        NX_RUN_GROUP: run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}
+      run: yarn exec nx affected --target=e2e --parallel=3 --configuration=ci
+      shell: bash
+    - name: Stopping nx-cloud ci agents
+      run: npx nx-cloud stop-all-agents
+      shell: bash
+    - name: Stopping e2e agent
+      run: npx nx-cloud stop-all-agents
+      shell: bash
+      env:
+        NX_RUN_GROUP: run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}
