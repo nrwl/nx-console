@@ -142,6 +142,11 @@
           "command": "nx.graph.select.button",
           "when": "view == nxProjects && viewItem == project && isNxWorkspace",
           "group": "inline@1"
+        },
+        {
+          "command": "nxConsole.connectToNxCloud",
+          "when": "view == nxHelpAndFeedback && viewItem == connectToNxCloud && isNxWorkspace",
+          "group": "inline"
         }
       ],
       "commandPalette": [
@@ -682,6 +687,11 @@
       {
         "title": "Add dev dependency to workspace",
         "command": "nxConsole.addDevDependency"
+      },
+      {
+        "title": "Connect to Nx Cloud",
+        "command": "nxConsole.connectToNxCloud",
+        "icon": "$(rocket)"
       }
     ],
     "configuration": {

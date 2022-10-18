@@ -29,9 +29,11 @@ runs:
       run: yarn exec nx affected --target=e2e --parallel=3 --configuration=ci
       shell: bash
     - name: Stopping nx-cloud ci agents
+      if: always()
       run: npx nx-cloud stop-all-agents
       shell: bash
     - name: Stopping e2e agent
+      if: always()
       run: npx nx-cloud stop-all-agents
       shell: bash
       env:

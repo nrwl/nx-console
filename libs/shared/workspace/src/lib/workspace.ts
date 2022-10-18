@@ -49,6 +49,7 @@ function resetStatus(workspacePath: string) {
   // Clear out the workspace config path, needed for angular or older nx workspaces
   clearJsonCache('angular.json', workspacePath);
   clearJsonCache('workspace.json', workspacePath);
+  clearJsonCache('nx.json', workspacePath);
 }
 
 export async function nxWorkspace(

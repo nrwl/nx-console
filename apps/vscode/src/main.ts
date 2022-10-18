@@ -6,6 +6,7 @@ import {
   FileSystemWatcher,
   RelativePattern,
   tasks,
+  TreeItem,
   TreeView,
   Uri,
   window,
@@ -70,7 +71,7 @@ import { WorkspaceCodeLensProvider } from '@nx-console/vscode/nx-workspace';
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
 let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
-let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem>;
+let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
 
 let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
