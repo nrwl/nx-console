@@ -315,9 +315,9 @@ export const config: Options.Testrunner = {
       }
       const time = new Date();
       const screenshotTitle =
-        `${time.getFullYear()}-${time.getMonth()}-${time.getDay()}-${time.getUTCHours()}:${time.getUTCMinutes()}:${time.getUTCSeconds()}-${
+        `${time.getFullYear()}-${time.getMonth()}-${time.getDay()}-${time.getUTCHours()}h-${time.getUTCMinutes()}m-${time.getUTCSeconds()}s-${
           test.parent
-        }-${test.title}`.replace(/[ |/]/, '-');
+        }-${test.title}`.replace(/[ |/]/g, '-');
       browser.saveScreenshot(`./.screenshots/${screenshotTitle}.png`);
     }
   },
