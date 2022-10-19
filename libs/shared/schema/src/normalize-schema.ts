@@ -7,7 +7,7 @@ import {
   OptionItemLabelValue,
   OptionPropertyDescription,
   XPrompt,
-} from './index';
+} from './schema';
 import { Schema } from 'nx/src/utils/params';
 import { names } from '@nrwl/devkit/src/utils/names';
 

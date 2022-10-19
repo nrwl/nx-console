@@ -737,6 +737,11 @@
             "type": "string"
           },
           "description": "A list of generator names to hide in the picker (can be combined with Generator Allow List).\n\nThe name of the generator should be in this format: @package:generator.\n‎ ‎ ‎ ‎ ‎  examples: @nrwl/workspace:library, workspace-generator:my-generator"
+        },
+        "nxConsole.enableTaskExecutionDryRunOnChange": {
+          "type": "boolean",
+          "default": false,
+          "description": "Configures whether to do dry runs on change when using \"Generate\" command"
         }
       }
     },

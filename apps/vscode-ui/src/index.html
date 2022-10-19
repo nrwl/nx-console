@@ -8,16 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <script>
-      // At runtime, VSCode server will replace this empty schema with the one to render.
-      window.VSCODE_UI_SCHEMA = {};
-
-      window.addEventListener('message', (event) => {
-        const taskExecutionSchema = event.data.taskExecutionSchema;
-        if (taskExecutionSchema && window.SET_TASK_EXECUTION_SCHEMA) {
-          window.SET_TASK_EXECUTION_SCHEMA(taskExecutionSchema);
-        }
-      });
-
       window.vscode = acquireVsCodeApi();
     </script>
   </head>

@@ -36,6 +36,10 @@ $offset-with-configurations: $offset-without-configurations +
   &:hover {
     opacity: 0.8;
   }
+
+  &.dry-run {
+    background: variables.$button-secondary-color;
+  }
 }
 
 .scroll-container,

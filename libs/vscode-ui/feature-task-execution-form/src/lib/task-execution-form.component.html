@@ -17,6 +17,13 @@
               [formControl]="filterFieldsControl"
             />
           </div>
+          <button
+            class="dry-run run-button"
+            *ngIf="showDryRunBtn$ | async"
+            (click)="runCommand(taskExecForm, true)"
+          >
+            Dry Run
+          </button>
           <button class="run-button" (click)="runCommand(taskExecForm)">
             Run
           </button>

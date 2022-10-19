@@ -1,8 +1,11 @@
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OptionType, TaskExecutionSchema } from '@nx-console/shared/schema';
-import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
+import {
+  OptionType,
+  TaskExecutionSchema,
+  TaskExecutionSchemaInputMessage,
+} from '@nx-console/shared/schema';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
 import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
 import { FormatTaskPipe } from './format-task/format-task.pipe';
@@ -61,7 +64,6 @@ describe('TaskExecutionFormComponent', () => {
         VscodeUiComponentsModule,
         ArgumentListModule,
       ],
-      providers: [{ provide: TASK_EXECUTION_SCHEMA, useValue: initialSchema }],
     }).compileComponents();
   }));
 
@@ -69,6 +71,7 @@ describe('TaskExecutionFormComponent', () => {
     fixture = TestBed.createComponent(TaskExecutionFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    window.postMessage(new TaskExecutionSchemaInputMessage(initialSchema), '/');
     formGroup = component.buildForm(initialSchema);
   });
 

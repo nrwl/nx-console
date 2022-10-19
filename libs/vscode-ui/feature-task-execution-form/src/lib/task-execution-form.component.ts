@@ -4,7 +4,6 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  Inject,
   NgZone,
   OnInit,
   ViewChild,
@@ -32,21 +31,22 @@ import {
   shareReplay,
   startWith,
   tap,
-  flatMap,
-  mapTo,
   mergeMap,
   filter,
   withLatestFrom,
 } from 'rxjs/operators';
 import { getConfigurationFlag, formatTask } from './format-task/format-task';
 
-import { TASK_EXECUTION_SCHEMA } from './task-execution-form.schema';
 import {
   TaskExecutionSchema,
-  TaskExecutionMessage,
   ItemsWithEnum,
   OptionType,
   Option,
+  TaskExecutionInputMessage,
+  TaskExecutionInputMessageType,
+  TaskExecutionOutputMessage,
+  TaskExecutionRunCommandOutputMessage,
+  TaskExecutionFormInitOutputMessage,
 } from '@nx-console/shared/schema';
 
 function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
@@ -55,12 +55,15 @@ function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
 
 declare global {
   interface Window {
-    SET_TASK_EXECUTION_SCHEMA: (schema: TaskExecutionSchema) => void;
-
     vscode: {
-      postMessage: (message: TaskExecutionMessage) => void;
+      postMessage: (message: TaskExecutionOutputMessage) => void;
     };
   }
+}
+
+interface TaskExecutionForm {
+  form: UntypedFormGroup;
+  architect: TaskExecutionSchema;
 }
 
 @Component({
@@ -74,9 +77,11 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   @ViewChild('formHeaderContainer')
   formHeaderContainer: ElementRef<HTMLElement>;
 
-  get isMacOs() {
+  get isMacOs(): boolean {
     return navigator.userAgent.indexOf('Mac') > -1;
   }
+
+  private enableTaskExecutionDryRunOnChange = true;
 
   private readonly activeFieldIdSubject = new BehaviorSubject<string>('');
   readonly activeFieldName$ = this.activeFieldIdSubject.pipe(
@@ -85,13 +90,12 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   );
 
   private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
+  private readonly enableTaskExecutionDryRunOnChangeSubject =
+    new BehaviorSubject(true);
 
   readonly architect$ = this.architectSubject.asObservable();
 
-  readonly taskExecForm$: Observable<{
-    form: UntypedFormGroup;
-    architect: TaskExecutionSchema;
-  }> = this.architect$.pipe(
+  readonly taskExecForm$: Observable<TaskExecutionForm> = this.architect$.pipe(
     map((architect) => ({ form: this.buildForm(architect), architect })),
     tap((taskExecForm) => {
       if (this.dryRunSubscription) {
@@ -99,26 +103,43 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         this.dryRunSubscription = undefined;
       }
       if (taskExecForm.architect.command === 'generate') {
-        this.dryRunSubscription = taskExecForm.form.valueChanges
+        this.dryRunSubscription = combineLatest([
+          taskExecForm.form.valueChanges,
+          this.enableTaskExecutionDryRunOnChangeSubject,
+        ])
           .pipe(
             debounceTime(500),
-            filter(() => taskExecForm.form.valid)
+            filter(
+              ([, dryRunEnabled]) => dryRunEnabled && taskExecForm.form.valid
+            )
           )
           .subscribe(() => {
-            this.runCommand({ ...taskExecForm, dryRun: true });
+            this.runCommand(taskExecForm, true);
           });
       }
     }),
-    shareReplay()
+    shareReplay({ refCount: true, bufferSize: 1 })
+  );
+
+  readonly showDryRunBtn$: Observable<boolean> = combineLatest([
+    this.taskExecForm$,
+    this.enableTaskExecutionDryRunOnChangeSubject,
+  ]).pipe(
+    map(([schema, enableTaskExecutionDryRunOnChange]) => {
+      return (
+        schema.architect.command === 'generate' &&
+        !enableTaskExecutionDryRunOnChange
+      );
+    })
   );
 
   readonly defaultValues$ = this.taskExecForm$.pipe(
-    flatMap((taskExecForm) => {
+    mergeMap((taskExecForm) => {
       const configurationControl = taskExecForm.form.get('configuration');
       if (configurationControl) {
         return configurationControl.valueChanges.pipe(
           startWith(taskExecForm),
-          mapTo(taskExecForm)
+          map(() => taskExecForm)
         );
       }
       return [taskExecForm];
@@ -135,7 +156,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         configurationName
       );
     }),
-    shareReplay()
+    shareReplay({ refCount: true, bufferSize: 1 })
   );
 
   readonly filterFieldsControl = new UntypedFormControl('');
@@ -172,7 +193,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
       return filteredFields;
     }),
-    shareReplay()
+    shareReplay({ refCount: true, bufferSize: 1 })
   );
 
   runCommandArguments$ = this.taskExecForm$.pipe(
@@ -199,41 +220,17 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
   constructor(
     private readonly fb: UntypedFormBuilder,
-    @Inject(TASK_EXECUTION_SCHEMA) public initialSchema: TaskExecutionSchema,
     private readonly ngZone: NgZone,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly clipboard: Clipboard
   ) {}
 
   ngOnInit() {
-    // TODO(cammisuli): Allow the UI to support array properties
-    const optionFilter = (option: Option) =>
-      !(
-        option.type === OptionType.Array &&
-        option.items &&
-        (option.items as string[]).length === 0
-      );
-
-    this.architectSubject.next({
-      ...this.initialSchema,
-      // remove array options that have no items
-      // TODO: add support for these types of items in the form
-      options: this.initialSchema.options.filter(optionFilter),
-    });
-
-    window.SET_TASK_EXECUTION_SCHEMA = (schema) => {
-      this.ngZone.run(() => {
-        this.architectSubject.next({
-          ...schema,
-          options: schema.options.filter(optionFilter),
-        });
-
-        setTimeout(() => {
-          this.scrollToTop();
-          this.changeDetectorRef.detectChanges();
-        }, 0);
-      });
-    };
+    this.setupEventListener();
+    if (window.vscode) {
+      // "window.vscode" will be undefined in tests and storybook
+      window.vscode.postMessage(new TaskExecutionFormInitOutputMessage());
+    }
   }
 
   ngAfterViewChecked() {
@@ -403,15 +400,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     return defaultValues;
   }
 
-  runCommand({
-    form,
-    architect,
-    dryRun,
-  }: {
-    form: UntypedFormGroup;
-    architect: TaskExecutionSchema;
-    dryRun?: boolean;
-  }) {
+  runCommand({ form, architect }: TaskExecutionForm, dryRun = false) {
     const configuration = form.get('configuration')?.value;
     const args = this.serializeArgs(form.value, architect, configuration);
     const flags = configuration
@@ -424,11 +413,13 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       flags.push('--dry-run');
     }
 
-    window.vscode.postMessage({
-      command: surroundWithQuotesIfHasWhiteSpace(architect.command),
-      positional: surroundWithQuotesIfHasWhiteSpace(architect.positional),
-      flags,
-    });
+    window.vscode.postMessage(
+      new TaskExecutionRunCommandOutputMessage({
+        command: surroundWithQuotesIfHasWhiteSpace(architect.command),
+        positional: surroundWithQuotesIfHasWhiteSpace(architect.positional),
+        flags,
+      })
+    );
   }
 
   getValidFields$(
@@ -538,6 +529,53 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         architect,
         configuration
       ).join(' ')}`
+    );
+  }
+
+  private setupEventListener(): void {
+    // TODO(cammisuli): Allow the UI to support array properties
+    const optionFilter = (option: Option) =>
+      !(
+        option.type === OptionType.Array &&
+        option.items &&
+        (option.items as string[]).length === 0
+      );
+
+    window.addEventListener(
+      'message',
+      (event: MessageEvent<TaskExecutionInputMessage>) => {
+        const data = event.data;
+
+        switch (data.type) {
+          case TaskExecutionInputMessageType.SetTaskExecutionSchema: {
+            const schema = data.payload;
+            this.ngZone.run(() => {
+              this.architectSubject.next({
+                ...schema,
+                // remove array options that have no items
+                // TODO: add support for these types of items in the form
+                options: schema.options.filter(optionFilter),
+              });
+
+              setTimeout(() => {
+                this.scrollToTop();
+                this.changeDetectorRef.detectChanges();
+              }, 0);
+            });
+            break;
+          }
+
+          case TaskExecutionInputMessageType.SetGlobalConfiguration: {
+            this.ngZone.run(() => {
+              this.enableTaskExecutionDryRunOnChangeSubject.next(
+                data.payload.enableTaskExecutionDryRunOnChange
+              );
+              this.changeDetectorRef.detectChanges();
+            });
+            break;
+          }
+        }
+      }
     );
   }
 }
