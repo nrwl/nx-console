@@ -57,41 +57,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     }
   }
 
-  private async createNxProjectTreeItem(
-    nxProject: NxProject,
-    treeItemLabel: string,
-    hasChildren?: boolean
-  ) {
-    const item = new NxProjectTreeItem(
-      nxProject,
-      treeItemLabel,
-      hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
-    );
-    if (!nxProject.target) {
-      const projectDef = (await this.cliTaskProvider.getProjects())[
-        nxProject.project
-      ];
-      if (projectDef) {
-        if (projectDef.root === undefined) {
-          getOutputChannel().appendLine(
-            `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`
-          );
-        }
-
-        item.resourceUri = Uri.file(
-          join(this.cliTaskProvider.getWorkspacePath(), projectDef.root ?? '')
-        );
-      }
-      item.contextValue = 'project';
-    } else {
-      item.contextValue = 'task';
-    }
-
-    return item;
-  }
-
   async getChildren(
     element?: NxProjectTreeItem
   ): Promise<NxProjectTreeItem[] | undefined> {
@@ -173,6 +138,40 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     );
   }
 
+  private async createNxProjectTreeItem(
+    nxProject: NxProject,
+    treeItemLabel: string,
+    hasChildren?: boolean
+  ) {
+    const item = new NxProjectTreeItem(
+      nxProject,
+      treeItemLabel,
+      hasChildren
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
+    );
+    if (!nxProject.target) {
+      const projectDef = (await this.cliTaskProvider.getProjects())[
+        nxProject.project
+      ];
+      if (projectDef) {
+        if (projectDef.root === undefined) {
+          getOutputChannel().appendLine(
+            `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`
+          );
+        }
+
+        item.resourceUri = Uri.file(
+          join(this.cliTaskProvider.getWorkspacePath(), projectDef.root ?? '')
+        );
+      }
+      item.contextValue = 'project';
+    } else {
+      item.contextValue = 'task';
+    }
+
+    return item;
+  }
   private async runTask(selection: NxProjectTreeItem) {
     const { target, project } = selection.nxProject;
     if (!target) {
