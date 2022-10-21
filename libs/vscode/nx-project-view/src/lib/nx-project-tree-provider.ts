@@ -1,23 +1,17 @@
-import { ProjectConfiguration } from '@nrwl/devkit';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import {
-  AbstractTreeProvider,
-  getOutputChannel,
-} from '@nx-console/vscode/utils';
-import { join } from 'path';
-import {
-  commands,
-  ExtensionContext,
-  TreeItemCollapsibleState,
-  Uri,
-} from 'vscode';
-import { NxProject, NxProjectTreeItem } from './nx-project-tree-item';
+import { AbstractTreeProvider } from '@nx-console/vscode/utils';
+import { commands, ExtensionContext } from 'vscode';
+import { ListViewStrategy } from './nx-project-helper';
+import { createListViewStrategy } from './nx-project-list-view';
+import { NxProjectTreeItem, NxListViewItem } from './nx-project-tree-item';
 
 /**
  * Provides data for the "Projects" tree view
  */
-export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeItem> {
+export class NxProjectTreeProvider extends AbstractTreeProvider<NxListViewItem> {
+  private readonly listView: ListViewStrategy;
+
   constructor(
     context: ExtensionContext,
     private readonly cliTaskProvider: CliTaskProvider
@@ -30,153 +24,31 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
         ['revealInExplorer', this.revealInExplorer],
         ['runTask', this.runTask],
         ['refreshNxProjectsTree', this.refreshNxProjectsTree],
-      ] as [string, (item: NxProjectTreeItem) => Promise<unknown>][]
+      ] as [string, (item: NxListViewItem) => Promise<unknown>][]
     ).forEach(([commandSuffix, callback]) => {
       context.subscriptions.push(
         commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
       );
     });
+
+    this.listView = createListViewStrategy(this.cliTaskProvider);
   }
 
-  async getParent(
-    element: NxProjectTreeItem
-  ): Promise<NxProjectTreeItem | null | undefined> {
-    const { project, target, root } = element.nxProject;
-
-    if (target) {
-      if (target.configuration) {
-        return this.createNxProjectTreeItem(
-          { project, target: { name: target.name }, root },
-          target.name
-        );
-      } else {
-        return this.createNxProjectTreeItem({ project, root }, project);
-      }
-    } else {
-      return null;
-    }
+  getParent(element: NxListViewItem) {
+    return this.listView.getParent(element);
   }
 
-  async getChildren(
-    element?: NxProjectTreeItem
-  ): Promise<NxProjectTreeItem[] | undefined> {
-    if (!element) {
-      // should return root element if no element was passed
-      return this.getRootElement();
-    }
+  getChildren(element?: NxListViewItem) {
+    return this.listView.getChildren(element);
+  }
 
-    const { nxProject } = element;
-    const { target, project } = nxProject;
-    const projectDef = (await this.cliTaskProvider.getProjects())[project];
-
-    if (!projectDef) {
+  private async runTask(selection: NxListViewItem) {
+    if (selection instanceof NxProjectTreeItem) {
+      // can not run a task on a project
       return;
     }
-
-    return this.getChildrenOfElement(projectDef, project, target);
-  }
-
-  private async getRootElement() {
-    const projects = await this.cliTaskProvider.getProjectEntries();
-    return Promise.all(
-      projects.map(
-        async ([name, def]): Promise<NxProjectTreeItem> =>
-          this.createNxProjectTreeItem(
-            { project: name, root: def.root },
-            name,
-            Boolean(def.targets)
-          )
-      )
-    );
-  }
-
-  private async getChildrenOfElement(
-    projectDef: ProjectConfiguration,
-    project: string,
-    target: NxProject['target']
-  ) {
-    if (!target) {
-      if (projectDef.targets) {
-        return Promise.all(
-          Object.keys(projectDef.targets).map(
-            async (name): Promise<NxProjectTreeItem> =>
-              this.createNxProjectTreeItem(
-                { target: { name }, project, root: projectDef.root },
-                name,
-                Boolean(projectDef.targets?.[name].configurations)
-              )
-          )
-        );
-      }
-      return;
-    }
-
-    const { configuration } = target;
-
-    if (configuration || !projectDef.targets) {
-      return;
-    }
-
-    const configurations = projectDef.targets
-      ? projectDef.targets[target.name].configurations
-      : undefined;
-    if (!configurations) {
-      return;
-    }
-
-    return Promise.all(
-      Object.keys(configurations).map(async (name) =>
-        this.createNxProjectTreeItem(
-          {
-            target: { ...target, configuration: name },
-            project,
-            root: projectDef.root,
-          },
-          name
-        )
-      )
-    );
-  }
-
-  private async createNxProjectTreeItem(
-    nxProject: NxProject,
-    treeItemLabel: string,
-    hasChildren?: boolean
-  ) {
-    const item = new NxProjectTreeItem(
-      nxProject,
-      treeItemLabel,
-      hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
-    );
-    if (!nxProject.target) {
-      const projectDef = (await this.cliTaskProvider.getProjects())[
-        nxProject.project
-      ];
-      if (projectDef) {
-        if (projectDef.root === undefined) {
-          getOutputChannel().appendLine(
-            `Project ${nxProject.project} has no root. This could be because of an error loading the workspace configuration.`
-          );
-        }
-
-        item.resourceUri = Uri.file(
-          join(this.cliTaskProvider.getWorkspacePath(), projectDef.root ?? '')
-        );
-      }
-      item.contextValue = 'project';
-    } else {
-      item.contextValue = 'task';
-    }
-
-    return item;
-  }
-  private async runTask(selection: NxProjectTreeItem) {
-    const { target, project } = selection.nxProject;
-    if (!target) {
-      return;
-    }
+    const { project } = selection.nxProject;
+    const target = selection.nxTarget;
 
     const flags = [];
     if (target.configuration) {
@@ -190,18 +62,19 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxProjectTreeIte
     });
   }
 
-  private async revealInExplorer(selection: NxProjectTreeItem) {
+  private async revealInExplorer(selection: NxListViewItem) {
     if (selection.resourceUri) {
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }
 
-  private async editWorkspaceJson(selection: NxProjectTreeItem) {
-    return revealNxProject(
-      selection.nxProject.project,
-      selection.nxProject.root,
-      selection.nxProject.target
-    );
+  private async editWorkspaceJson(selection: NxListViewItem) {
+    const { project, root } = selection.nxProject;
+    if (selection instanceof NxProjectTreeItem) {
+      return revealNxProject(project, root);
+    }
+    const target = selection.nxTarget;
+    return revealNxProject(project, root, target);
   }
 
   private async refreshNxProjectsTree() {
