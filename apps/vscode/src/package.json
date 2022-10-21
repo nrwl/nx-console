@@ -722,6 +722,11 @@
           "default": true,
           "description": "Enables the filter for listed generators with Nx Console."
         },
+        "nxConsole.enableProjectTreeView": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show the projects in a tree view, which represents the actual folder folder structure"
+        },
         "nxConsole.generatorAllowlist": {
           "type": "array",
           "default": [],

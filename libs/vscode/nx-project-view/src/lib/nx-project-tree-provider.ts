@@ -1,16 +1,24 @@
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext } from 'vscode';
-import { ListViewStrategy } from './nx-project-helper';
+import { ListViewStrategy, TreeViewStrategy } from './nx-project-helper';
 import { createListViewStrategy } from './nx-project-list-view';
-import { NxProjectTreeItem, NxListViewItem } from './nx-project-tree-item';
+import {
+  NxFolderTreeItem,
+  NxListViewItem,
+  NxProjectTreeItem,
+  NxTreeItem,
+} from './nx-project-tree-item';
+import { createTreeViewStrategy } from './nx-project-tree-view';
 
 /**
  * Provides data for the "Projects" tree view
  */
-export class NxProjectTreeProvider extends AbstractTreeProvider<NxListViewItem> {
+export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly listView: ListViewStrategy;
+  private readonly treeView: TreeViewStrategy;
 
   constructor(
     context: ExtensionContext,
@@ -24,7 +32,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxListViewItem> 
         ['revealInExplorer', this.revealInExplorer],
         ['runTask', this.runTask],
         ['refreshNxProjectsTree', this.refreshNxProjectsTree],
-      ] as [string, (item: NxListViewItem) => Promise<unknown>][]
+      ] as const
     ).forEach(([commandSuffix, callback]) => {
       context.subscriptions.push(
         commands.registerCommand(`nxConsole.${commandSuffix}`, callback, this)
@@ -32,18 +40,32 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxListViewItem> 
     });
 
     this.listView = createListViewStrategy(this.cliTaskProvider);
+    this.treeView = createTreeViewStrategy(this.cliTaskProvider);
   }
 
-  getParent(element: NxListViewItem) {
-    return this.listView.getParent(element);
+  getParent(element: NxTreeItem) {
+    if (this.isListViewElement(element)) {
+      return this.listView.getParent(element);
+    }
+    return this.treeView.getParent(element);
   }
 
-  getChildren(element?: NxListViewItem) {
-    return this.listView.getChildren(element);
+  getChildren(element?: NxTreeItem) {
+    if (this.isListViewElement(element)) {
+      return this.listView.getChildren(element);
+    }
+    return this.treeView.getChildren(element);
   }
 
-  private async runTask(selection: NxListViewItem) {
-    if (selection instanceof NxProjectTreeItem) {
+  private isListViewElement(_?: NxTreeItem): _ is NxListViewItem {
+    return !GlobalConfigurationStore.instance.get('enableProjectTreeView');
+  }
+
+  private async runTask(selection: NxTreeItem) {
+    if (
+      selection instanceof NxProjectTreeItem ||
+      selection instanceof NxFolderTreeItem
+    ) {
       // can not run a task on a project
       return;
     }
@@ -62,13 +84,17 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxListViewItem> 
     });
   }
 
-  private async revealInExplorer(selection: NxListViewItem) {
+  private async revealInExplorer(selection: NxTreeItem) {
     if (selection.resourceUri) {
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }
 
-  private async editWorkspaceJson(selection: NxListViewItem) {
+  private async editWorkspaceJson(selection: NxTreeItem) {
+    if (selection instanceof NxFolderTreeItem) {
+      return;
+    }
+
     const { project, root } = selection.nxProject;
     if (selection instanceof NxProjectTreeItem) {
       return revealNxProject(project, root);

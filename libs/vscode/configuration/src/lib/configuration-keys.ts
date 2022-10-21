@@ -7,6 +7,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'generatorAllowlist',
   'generatorBlocklist',
   'enableTaskExecutionDryRunOnChange',
+  'enableProjectTreeView',
 ] as const;
 
 /**

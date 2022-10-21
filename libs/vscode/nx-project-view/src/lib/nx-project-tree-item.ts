@@ -10,7 +10,22 @@ export interface NxTarget {
   configuration?: string;
 }
 
+export type NxTreeItem = NxListViewItem | NxTreeViewItem;
 export type NxListViewItem = NxProjectTreeItem | NxTargetTreeItem;
+export type NxTreeViewItem =
+  | NxProjectTreeItem
+  | NxTargetTreeItem
+  | NxFolderTreeItem;
+
+export class NxFolderTreeItem extends TreeItem {
+  constructor(
+    public path: string,
+    treeItemLabel: string,
+    collapsibleState?: TreeItemCollapsibleState | undefined
+  ) {
+    super(treeItemLabel, collapsibleState);
+  }
+}
 
 export class NxProjectTreeItem extends TreeItem {
   constructor(
