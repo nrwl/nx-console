@@ -1,6 +1,7 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel } from '@nx-console/vscode/utils';
+import path = require('node:path');
 import { TreeItemCollapsibleState } from 'vscode';
 import { AbstractView, isDefined, TreeViewStrategy } from './nx-project-helper';
 import {
@@ -27,7 +28,7 @@ class TreeView extends AbstractView {
   }
   async getParent(element: NxTreeViewItem) {
     if (element instanceof NxFolderTreeItem) {
-      if (this.isRootPath(element.path)) {
+      if (PathHelper.isRoot(element.path)) {
         return null;
       }
       const projectDefs = await this.cliTaskProvider.getProjects();
@@ -84,7 +85,7 @@ class TreeView extends AbstractView {
       return this.createProjectTreeItem(project);
     }
 
-    const folderName = path.split('/').pop() ?? '';
+    const folderName = PathHelper.getFolderName(path);
     const item = new NxFolderTreeItem(
       path,
       folderName,
@@ -136,42 +137,52 @@ class TreeView extends AbstractView {
    * ]
    */
   private createPathPermutations(dir: string) {
-    const parts = dir.split('/').reverse();
+    const parts = PathHelper.dirs(dir).reverse();
     const permutations: string[] = [];
     for (let i = 0; i < parts.length; i++) {
-      const partialDir = parts.slice(i).reverse().join('/');
+      const partialDir = path.join(...parts.slice(i).reverse());
       permutations.push(partialDir);
     }
     return permutations;
   }
 
   private getRootFolders(map: TreeViewMap) {
-    return Array.from(map.entries()).filter(([key]) => this.isRootPath(key));
+    return Array.from(map.entries()).filter(([key]) => PathHelper.isRoot(key));
   }
 
   private getSubFolders(map: TreeViewMap, path: string) {
-    const depth = this.getPathDepth(path);
+    const depth = PathHelper.getDepth(path);
 
     return Array.from(map.entries()).filter(
-      ([key]) => key.includes(path) && this.getPathDepth(key) === depth + 1
+      ([key]) => key.includes(path) && PathHelper.getDepth(key) === depth + 1
     );
   }
 
   private getParentFolder(map: TreeViewMap, path: string) {
-    const depth = this.getPathDepth(path);
-    const parentPath = path.split('/').reverse().slice(1).reverse().join('/');
+    const depth = PathHelper.getDepth(path);
+    const parentPath = PathHelper.getParentPath(path);
 
     return Array.from(map.entries()).filter(
       ([key]) =>
-        key.includes(parentPath) && this.getPathDepth(key) === depth - 1
+        key.includes(parentPath) && PathHelper.getDepth(key) === depth - 1
     );
   }
-
-  private getPathDepth(path: string) {
-    return path.split('/').length;
-  }
-
-  private isRootPath(path: string) {
-    return this.getPathDepth(path) === 1;
-  }
 }
+
+const PathHelper = {
+  dirs(val: string) {
+    return val.split(path.sep);
+  },
+  getDepth(val: string) {
+    return this.dirs(val).length;
+  },
+  isRoot(val: string) {
+    return this.getDepth(val) === 1;
+  },
+  getFolderName(val: string) {
+    return this.dirs(val).pop() ?? '';
+  },
+  getParentPath(val: string) {
+    return path.join(...val.split(path.sep).reverse().slice(1).reverse());
+  },
+} as const;
