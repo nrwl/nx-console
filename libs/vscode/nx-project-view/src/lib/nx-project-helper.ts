@@ -60,22 +60,15 @@ export abstract class AbstractView {
       );
     }
 
-    const item = new NxProjectTreeItem(
+    return new NxProjectTreeItem(
       nxProject,
+      this.cliTaskProvider.getWorkspacePath(),
       projectName,
       hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     );
-
-    item.resourceUri = Uri.file(
-      join(this.cliTaskProvider.getWorkspacePath(), nxProject.root ?? '')
-    );
-
-    item.contextValue = 'project';
-    return item;
   }
-
   async createTargetsFormProject(parent: NxProjectTreeItem) {
     const { nxProject } = parent;
 
@@ -106,7 +99,7 @@ export abstract class AbstractView {
     ]
   ) {
     const hasChildren = !!configurations;
-    const item = new NxTargetTreeItem(
+    return new NxTargetTreeItem(
       nxProject,
       { name: targetName },
       targetName,
@@ -114,8 +107,6 @@ export abstract class AbstractView {
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     );
-    item.contextValue = 'task';
-    return item;
   }
 
   async createConfigurationsFormTarget(parent: NxTargetTreeItem) {
@@ -144,16 +135,15 @@ export abstract class AbstractView {
     }
 
     return Promise.all(
-      Object.keys(configurations).map((configuration) => {
-        const item = new NxTargetTreeItem(
-          nxProject,
-          { name: nxTarget.name, configuration },
-          configuration,
-          TreeItemCollapsibleState.None
-        );
-        item.contextValue = 'task';
-        return item;
-      })
+      Object.keys(configurations).map(
+        (configuration) =>
+          new NxTargetTreeItem(
+            nxProject,
+            { name: nxTarget.name, configuration },
+            configuration,
+            TreeItemCollapsibleState.None
+          )
+      )
     );
   }
 }

@@ -1,4 +1,5 @@
-import { TreeItem, TreeItemCollapsibleState } from 'vscode';
+import { join } from 'node:path';
+import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 
 export interface NxProject {
   project: string;
@@ -20,20 +21,26 @@ export type NxTreeViewItem =
 export class NxFolderTreeItem extends TreeItem {
   constructor(
     public path: string,
+    workspacePath: string,
     treeItemLabel: string,
     collapsibleState?: TreeItemCollapsibleState | undefined
   ) {
     super(treeItemLabel, collapsibleState);
+    this.resourceUri = Uri.file(join(workspacePath, path));
+    this.contextValue = 'folder';
   }
 }
 
 export class NxProjectTreeItem extends TreeItem {
   constructor(
     public nxProject: NxProject,
+    workspacePath: string,
     treeItemLabel: string,
     collapsibleState?: TreeItemCollapsibleState | undefined
   ) {
     super(treeItemLabel, collapsibleState);
+    this.resourceUri = Uri.file(join(workspacePath, nxProject.root ?? ''));
+    this.contextValue = 'project';
   }
 }
 
@@ -45,5 +52,6 @@ export class NxTargetTreeItem extends TreeItem {
     collapsibleState?: TreeItemCollapsibleState | undefined
   ) {
     super(treeItemLabel, collapsibleState);
+    this.contextValue = 'task';
   }
 }

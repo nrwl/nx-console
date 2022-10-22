@@ -120,12 +120,12 @@
       "view/item/context": [
         {
           "command": "nxConsole.editWorkspaceJson",
-          "when": "view == nxProjects",
+          "when": "view == nxProjects && viewItem == project || viewItem == task",
           "group": "inline"
         },
         {
           "command": "nxConsole.revealInExplorer",
-          "when": "view == nxProjects && viewItem == project",
+          "when": "view == nxProjects && viewItem != task",
           "group": "inline"
         },
         {

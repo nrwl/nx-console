@@ -86,14 +86,12 @@ class TreeView extends AbstractView {
     }
 
     const folderName = PathHelper.getFolderName(path);
-    const item = new NxFolderTreeItem(
+    return new NxFolderTreeItem(
       path,
+      this.cliTaskProvider.getWorkspacePath(),
       folderName,
       TreeItemCollapsibleState.Collapsed
     );
-
-    item.contextValue = 'folder';
-    return item;
   }
 
   /**
