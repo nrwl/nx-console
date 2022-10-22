@@ -1,19 +1,17 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel } from '@nx-console/vscode/utils';
-import path = require('node:path');
 import { TreeItemCollapsibleState } from 'vscode';
-import {
-  AbstractView,
-  isDefined,
-  TreeViewStrategy,
-} from './nx-project-base-view';
 import {
   NxFolderTreeItem,
   NxProjectTreeItem,
   NxTreeViewItem,
 } from '../nx-project-tree-item';
+import { BaseView, ProjectViewStrategy } from './nx-project-base-view';
+import { isDefined, PathHelper } from './nx-project-util';
+import path = require('node:path');
 
+export type TreeViewStrategy = ProjectViewStrategy<NxTreeViewItem>;
 type TreeViewMap = Map<string, [string, ProjectConfiguration][]>;
 
 export function createTreeViewStrategy(
@@ -26,10 +24,11 @@ export function createTreeViewStrategy(
   };
 }
 
-class TreeView extends AbstractView {
+class TreeView extends BaseView {
   constructor(cliTaskProvider: CliTaskProvider) {
     super(cliTaskProvider);
   }
+
   async getParent(element: NxTreeViewItem) {
     if (element instanceof NxFolderTreeItem) {
       if (PathHelper.isRoot(element.path)) {
@@ -170,21 +169,3 @@ class TreeView extends AbstractView {
     );
   }
 }
-
-const PathHelper = {
-  dirs(val: string) {
-    return val.split(path.sep);
-  },
-  getDepth(val: string) {
-    return this.dirs(val).length;
-  },
-  isRoot(val: string) {
-    return this.getDepth(val) === 1;
-  },
-  getFolderName(val: string) {
-    return this.dirs(val).pop() ?? '';
-  },
-  getParentPath(val: string) {
-    return path.join(...val.split(path.sep).reverse().slice(1).reverse());
-  },
-} as const;

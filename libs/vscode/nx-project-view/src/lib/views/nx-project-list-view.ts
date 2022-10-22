@@ -1,6 +1,8 @@
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { NxListViewItem, NxProjectTreeItem } from '../nx-project-tree-item';
-import { AbstractView, ListViewStrategy } from './nx-project-base-view';
+import { BaseView, ProjectViewStrategy } from './nx-project-base-view';
+
+export type ListViewStrategy = ProjectViewStrategy<NxListViewItem>;
 
 export function createListViewStrategy(
   cliTaskProvider: CliTaskProvider
@@ -12,10 +14,11 @@ export function createListViewStrategy(
   };
 }
 
-class ListView extends AbstractView {
+class ListView extends BaseView {
   constructor(cliTaskProvider: CliTaskProvider) {
     super(cliTaskProvider);
   }
+
   async getParent(element: NxListViewItem) {
     if (element instanceof NxProjectTreeItem) {
       // is already root level

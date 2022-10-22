@@ -4,17 +4,17 @@ import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext } from 'vscode';
 import {
-  ListViewStrategy,
-  TreeViewStrategy,
-} from './views/nx-project-base-view';
-import {
   NxFolderTreeItem,
   NxListViewItem,
   NxProjectTreeItem,
   NxTreeItem,
 } from './nx-project-tree-item';
-import { createTreeViewStrategy } from './views/nx-project-tree-view';
-import { createListViewStrategy } from './views/nx-project-list-view';
+import {
+  createListViewStrategy,
+  createTreeViewStrategy,
+  ListViewStrategy,
+  TreeViewStrategy,
+} from './views';
 
 /**
  * Provides data for the "Projects" tree view

@@ -11,12 +11,12 @@ export interface NxTarget {
   configuration?: string;
 }
 
-export type NxTreeItem = NxListViewItem | NxTreeViewItem;
 export type NxListViewItem = NxProjectTreeItem | NxTargetTreeItem;
 export type NxTreeViewItem =
   | NxProjectTreeItem
   | NxTargetTreeItem
   | NxFolderTreeItem;
+export type NxTreeItem = NxListViewItem | NxTreeViewItem;
 
 export class NxFolderTreeItem extends TreeItem {
   constructor(

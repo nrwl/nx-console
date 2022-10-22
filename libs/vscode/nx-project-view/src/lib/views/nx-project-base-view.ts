@@ -1,27 +1,18 @@
 import { ProjectConfiguration, TargetConfiguration } from '@nrwl/devkit';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel } from '@nx-console/vscode/utils';
-import { join } from 'path';
-import { TreeDataProvider, TreeItemCollapsibleState, Uri } from 'vscode';
+import { TreeDataProvider, TreeItemCollapsibleState } from 'vscode';
 import {
-  NxListViewItem,
   NxProject,
   NxProjectTreeItem,
   NxTargetTreeItem,
-  NxTreeViewItem,
 } from '../nx-project-tree-item';
+
 export type ProjectViewStrategy<T> = Required<
   Pick<TreeDataProvider<T>, 'getChildren' | 'getParent'>
 >;
 
-export type ListViewStrategy = ProjectViewStrategy<NxListViewItem>;
-export type TreeViewStrategy = ProjectViewStrategy<NxTreeViewItem>;
-
-export function isDefined<T>(val?: T): val is T {
-  return !!val;
-}
-
-export abstract class AbstractView {
+export abstract class BaseView {
   constructor(protected readonly cliTaskProvider: CliTaskProvider) {}
 
   async getParentOfTargetItem(element: NxTargetTreeItem) {
@@ -69,6 +60,7 @@ export abstract class AbstractView {
         : TreeItemCollapsibleState.None
     );
   }
+
   async createTargetsFormProject(parent: NxProjectTreeItem) {
     const { nxProject } = parent;
 
