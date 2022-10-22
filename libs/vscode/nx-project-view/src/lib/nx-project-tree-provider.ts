@@ -61,7 +61,8 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   }
 
   private isListViewElement(_?: NxTreeItem): _ is NxListViewItem {
-    return !GlobalConfigurationStore.instance.get('enableProjectTreeView');
+    const config = GlobalConfigurationStore.instance.get('projectViewingStyle');
+    return config === 'list' || config === null;
   }
 
   private async runTask(selection: NxTreeItem) {

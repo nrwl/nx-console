@@ -7,8 +7,20 @@ export const GLOBAL_CONFIG_KEYS = [
   'generatorAllowlist',
   'generatorBlocklist',
   'enableTaskExecutionDryRunOnChange',
-  'enableProjectTreeView',
+  'projectViewingStyle',
 ] as const;
+
+export type GlobalConfig = {
+  enableTelemetry: boolean;
+  enableGenerateFromContextMenu: boolean;
+  enableWorkspaceConfigCodeLens: boolean;
+  enableLibraryImports: boolean;
+  enableGeneratorFilters: boolean;
+  generatorAllowlist: string[];
+  generatorBlocklist: string[];
+  enableTaskExecutionDryRunOnChange: boolean;
+  projectViewingStyle: 'list' | 'tree';
+};
 
 /**
  * configuration Keys used for NxConsole
