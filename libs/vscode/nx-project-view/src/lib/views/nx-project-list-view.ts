@@ -1,6 +1,6 @@
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { AbstractView, ListViewStrategy } from './nx-project-helper';
-import { NxListViewItem, NxProjectTreeItem } from './nx-project-tree-item';
+import { NxListViewItem, NxProjectTreeItem } from '../nx-project-tree-item';
+import { AbstractView, ListViewStrategy } from './nx-project-base-view';
 
 export function createListViewStrategy(
   cliTaskProvider: CliTaskProvider

@@ -3,15 +3,18 @@ import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext } from 'vscode';
-import { ListViewStrategy, TreeViewStrategy } from './nx-project-helper';
-import { createListViewStrategy } from './nx-project-list-view';
+import {
+  ListViewStrategy,
+  TreeViewStrategy,
+} from './views/nx-project-base-view';
 import {
   NxFolderTreeItem,
   NxListViewItem,
   NxProjectTreeItem,
   NxTreeItem,
 } from './nx-project-tree-item';
-import { createTreeViewStrategy } from './nx-project-tree-view';
+import { createTreeViewStrategy } from './views/nx-project-tree-view';
+import { createListViewStrategy } from './views/nx-project-list-view';
 
 /**
  * Provides data for the "Projects" tree view

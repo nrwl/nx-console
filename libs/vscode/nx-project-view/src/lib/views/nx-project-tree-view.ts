@@ -3,12 +3,16 @@ import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import path = require('node:path');
 import { TreeItemCollapsibleState } from 'vscode';
-import { AbstractView, isDefined, TreeViewStrategy } from './nx-project-helper';
+import {
+  AbstractView,
+  isDefined,
+  TreeViewStrategy,
+} from './nx-project-base-view';
 import {
   NxFolderTreeItem,
   NxProjectTreeItem,
   NxTreeViewItem,
-} from './nx-project-tree-item';
+} from '../nx-project-tree-item';
 
 type TreeViewMap = Map<string, [string, ProjectConfiguration][]>;
 

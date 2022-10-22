@@ -9,7 +9,7 @@ import {
   NxProjectTreeItem,
   NxTargetTreeItem,
   NxTreeViewItem,
-} from './nx-project-tree-item';
+} from '../nx-project-tree-item';
 export type ProjectViewStrategy<T> = Required<
   Pick<TreeDataProvider<T>, 'getChildren' | 'getParent'>
 >;
