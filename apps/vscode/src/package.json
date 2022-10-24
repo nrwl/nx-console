@@ -740,7 +740,7 @@
         },
         "nxConsole.enableTaskExecutionDryRunOnChange": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Configures whether to do dry runs on change when using \"Generate\" command"
         }
       }
