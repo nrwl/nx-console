@@ -31,7 +31,8 @@
     "react",
     "cli",
     "monorepo",
-    "nx"
+    "nx",
+    "lerna"
   ],
   "categories": [
     "Other"
