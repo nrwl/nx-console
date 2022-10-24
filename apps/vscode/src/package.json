@@ -725,7 +725,10 @@
         "nxConsole.projectViewingStyle": {
           "type": "string",
           "default": "list",
-          "enum": ["list", "tree"],
+          "enum": [
+            "list",
+            "tree"
+          ],
           "description": "Define how the 'Projects' view shows the entries.\n\nlist: show the projects in an ordered list.\ntree: show the projects in the same folder structure as they are located in your repo."
         },
         "nxConsole.generatorAllowlist": {
