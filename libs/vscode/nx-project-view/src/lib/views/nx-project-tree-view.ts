@@ -59,9 +59,9 @@ class TreeView extends BaseView {
       return this.createFolders(element);
     }
     if (element instanceof NxProjectTreeItem) {
-      return this.createTargetsFormProject(element);
+      return this.createTargetsFromProject(element);
     }
-    return this.createConfigurationsFormTarget(element);
+    return this.createConfigurationsFromTarget(element);
   }
 
   private async createFolders(parent?: NxFolderTreeItem) {
@@ -104,7 +104,7 @@ class TreeView extends BaseView {
    */
   private groupByRootPath(projectDefs: {
     [projectName: string]: ProjectConfiguration;
-  }) {
+  }): TreeViewMap {
     return Object.entries(projectDefs)
       .flatMap((project) => {
         const [projectName, projectDef] = project;

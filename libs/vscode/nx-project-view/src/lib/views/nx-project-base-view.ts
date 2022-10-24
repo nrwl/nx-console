@@ -61,7 +61,7 @@ export abstract class BaseView {
     );
   }
 
-  async createTargetsFormProject(parent: NxProjectTreeItem) {
+  async createTargetsFromProject(parent: NxProjectTreeItem) {
     const { nxProject } = parent;
 
     const projectDef = (await this.cliTaskProvider.getProjects())[
@@ -101,7 +101,7 @@ export abstract class BaseView {
     );
   }
 
-  async createConfigurationsFormTarget(parent: NxTargetTreeItem) {
+  async createConfigurationsFromTarget(parent: NxTargetTreeItem) {
     const { nxProject, nxTarget } = parent;
 
     const projectDef = (await this.cliTaskProvider.getProjects())[

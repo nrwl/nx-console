@@ -34,9 +34,9 @@ class ListView extends BaseView {
       return this.createProjects();
     }
     if (element instanceof NxProjectTreeItem) {
-      return this.createTargetsFormProject(element);
+      return this.createTargetsFromProject(element);
     }
-    return this.createConfigurationsFormTarget(element);
+    return this.createConfigurationsFromTarget(element);
   }
 
   private async createProjects() {
