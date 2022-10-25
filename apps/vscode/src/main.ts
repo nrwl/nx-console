@@ -78,7 +78,6 @@ let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
-let workspaceFileWatcher: FileSystemWatcher | undefined;
 
 export async function activate(c: ExtensionContext) {
   try {
@@ -338,10 +337,6 @@ async function registerWorkspaceFileWatcher(
   context: ExtensionContext,
   workspacePath: string
 ) {
-  if (workspaceFileWatcher) {
-    workspaceFileWatcher.dispose();
-  }
-
   const { nxWorkspace } = await import('@nx-console/shared/workspace');
 
   const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
@@ -349,23 +344,34 @@ async function registerWorkspaceFileWatcher(
   workspacePackageDirs.add(workspaceLayout.appsDir);
   workspacePackageDirs.add(workspaceLayout.libsDir);
   workspacePackageDirs.add('packages');
+
+  // build the base directory glob - will look something like this: `{appsDir,libsDir,packages}`
+  const basePackagesPath = Array.from(workspacePackageDirs).reduce(
+    (prev, current, index, array) => {
+      prev += `${current}`;
+      if (index === array.length - 1) {
+        prev += '}';
+      } else {
+        prev += ',';
+      }
+      return prev;
+    },
+    '{'
+  );
+
   context.subscriptions.push(
     watchFile(
-      new RelativePattern(workspacePath, '{workspace,angular,nx}.json'),
-      () => {
-        commands.executeCommand(REFRESH_WORKSPACE);
-      }
-    ),
-    ...Array.from(workspacePackageDirs).map((dir) => {
-      return watchFile(
-        new RelativePattern(
-          join(workspacePath, dir),
-          `**/{project,package}.json`
-        ),
-        () => {
-          commands.executeCommand(REFRESH_WORKSPACE);
-        }
-      );
+      new RelativePattern(workspacePath, '{workspace,angular,nx}.json')
+    )(() => {
+      commands.executeCommand(REFRESH_WORKSPACE);
+    }),
+    watchFile(
+      new RelativePattern(
+        workspacePath,
+        `${basePackagesPath}/**/{project,package}.json`
+      )
+    )(() => {
+      commands.executeCommand(REFRESH_WORKSPACE);
     })
   );
 }

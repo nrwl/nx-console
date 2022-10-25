@@ -54,12 +54,11 @@ export async function enableTypeScriptPlugin(context: vscode.ExtensionContext) {
 
   watchFile(
     `${workspaceRoot}/tsconfig.base.json`,
-    () => {
-      clearJsonCache(TSCONFIG_BASE, workspaceRoot);
-      configurePlugin(workspaceRoot, api);
-    },
     context.subscriptions
-  );
+  )(() => {
+    clearJsonCache(TSCONFIG_BASE, workspaceRoot);
+    configurePlugin(workspaceRoot, api);
+  });
 
   vscode.workspace.onDidChangeTextDocument(
     ({ document }) => {

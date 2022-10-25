@@ -37,7 +37,7 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
       commands.registerCommand('nxConsole.connectToNxCloud', () => {
         this.connectToCloud();
       }),
-      watchFile(`${getWorkspacePath()}/nx.json`, () => {
+      watchFile(`${getWorkspacePath()}/nx.json`)(() => {
         this.nxJsonHasChanged = true;
         this.nxJsonChange.fire(undefined);
       })

@@ -10,7 +10,6 @@ export function projectGraph() {
   return Disposable.from(
     graphWebView,
     commands.registerCommand('nx.graph.refresh', () => {
-      getTelemetry().featureUsed('nx.graph.refresh');
       graphWebView.refresh();
     }),
     commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
