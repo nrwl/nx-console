@@ -2,7 +2,7 @@ import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
-import { commands, ExtensionContext, ProviderResult } from 'vscode';
+import { commands, ExtensionContext } from 'vscode';
 import {
   NxFolderTreeItem,
   NxListViewItem,

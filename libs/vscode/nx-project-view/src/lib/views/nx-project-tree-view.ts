@@ -7,11 +7,18 @@ import {
   NxProjectTreeItem,
   NxTreeViewItem,
 } from '../nx-project-tree-item';
-import { BaseView, ProjectViewStrategy } from './nx-project-base-view';
-import { isDefined, PathHelper } from './nx-project-util';
+import {
+  BaseView,
+  ProjectDefinition,
+  ProjectViewStrategy,
+} from './nx-project-base-view';
+import { isDefined, objectEntries, PathHelper } from './nx-project-util';
 
 export type TreeViewStrategy = ProjectViewStrategy<NxTreeViewItem>;
-type TreeViewMap = Map<string, [string, ProjectConfiguration][]>;
+type TreeViewMapValue = Array<
+  [string, ProjectConfiguration | string] | [string, string]
+>;
+type TreeViewMap = Map<string, TreeViewMapValue>;
 
 export function createTreeViewStrategy(
   cliTaskProvider: CliTaskProvider
@@ -43,7 +50,7 @@ class TreeView extends BaseView {
   }
 
   private async createRootFolders() {
-    const projectDefs = await this.cliTaskProvider.getProjects();
+    const projectDefs = await this.infoProvider.getProjects();
     const map = this.groupByRootPath(projectDefs);
 
     const rootFolders = this.getRootFolders(map);
@@ -51,7 +58,7 @@ class TreeView extends BaseView {
   }
 
   private async createFoldersOrProjectFromFolder(parent: NxFolderTreeItem) {
-    const projectDefs = await this.cliTaskProvider.getProjects();
+    const projectDefs = await this.infoProvider.getProjects();
     const map = this.groupByRootPath(projectDefs);
 
     const subFolders = this.getSubFolders(map, parent.path);
@@ -60,13 +67,14 @@ class TreeView extends BaseView {
     );
   }
 
-  private createTreeItemFromPath(
-    path: string,
-    projects?: [string, ProjectConfiguration][]
-  ) {
+  private createTreeItemFromPath(path: string, projects?: TreeViewMapValue) {
     if (projects && projects.length === 1) {
-      const [project] = projects;
-      return this.createProjectTreeItem(project);
+      const [[projectName, projectDef]] = projects;
+
+      if (typeof projectDef === 'string') {
+        return;
+      }
+      return this.createProjectTreeItem([projectName, projectDef]);
     }
     return this.createFolderTreeItem(path);
   }
@@ -75,7 +83,7 @@ class TreeView extends BaseView {
     const folderName = this.pathHelper.getFolderName(path);
     return new NxFolderTreeItem(
       path,
-      this.cliTaskProvider.getWorkspacePath(),
+      this.infoProvider.getWorkspacePath(),
       folderName,
       TreeItemCollapsibleState.Collapsed
     );
@@ -86,13 +94,13 @@ class TreeView extends BaseView {
    * Each entry is added n times.
    * n is determined by the directory depth.
    */
-  private groupByRootPath(projectDefs: {
-    [projectName: string]: ProjectConfiguration;
-  }): TreeViewMap {
-    return Object.entries(projectDefs)
+  private groupByRootPath(projectDefs: ProjectDefinition): TreeViewMap {
+    return objectEntries(projectDefs)
       .flatMap((project) => {
         const [projectName, projectDef] = project;
-        const { root } = projectDef;
+        const nodeModulesInstalled = typeof projectDef === 'string';
+
+        const root = nodeModulesInstalled ? projectDef : projectDef.root;
         if (root === undefined) {
           getOutputChannel().appendLine(
             `Project ${projectName} has no root. This could be because of an error loading the workspace configuration.`

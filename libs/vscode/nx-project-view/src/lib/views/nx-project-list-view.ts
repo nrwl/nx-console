@@ -30,7 +30,7 @@ class ListView extends BaseView {
   }
 
   private async createProjects() {
-    const projectDefs = await this.cliTaskProvider.getProjects();
+    const projectDefs = await this.infoProvider.getProjects();
     return Object.entries(projectDefs).map((project) =>
       this.createProjectTreeItem(project)
     );

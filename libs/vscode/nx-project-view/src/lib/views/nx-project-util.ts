@@ -6,6 +6,14 @@ export function isDefined<T>(val?: T): val is T {
   return !!val;
 }
 
+type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+export function objectEntries<T extends object>(val: T) {
+  return Object.entries(val) as Entries<T>;
+}
+
 export class PathHelper {
   constructor(private pathApi: typeof path = path) {}
 
