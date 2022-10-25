@@ -9,7 +9,6 @@ import {
 } from '../nx-project-tree-item';
 import { BaseView, ProjectViewStrategy } from './nx-project-base-view';
 import { isDefined, PathHelper } from './nx-project-util';
-import path = require('node:path');
 
 export type TreeViewStrategy = ProjectViewStrategy<NxTreeViewItem>;
 type TreeViewMap = Map<string, [string, ProjectConfiguration][]>;
@@ -24,6 +23,8 @@ export function createTreeViewStrategy(
 }
 
 class TreeView extends BaseView {
+  private pathHelper = new PathHelper();
+
   constructor(cliTaskProvider: CliTaskProvider) {
     super(cliTaskProvider);
   }
@@ -71,7 +72,7 @@ class TreeView extends BaseView {
   }
 
   private createFolderTreeItem(path: string) {
-    const folderName = PathHelper.getFolderName(path);
+    const folderName = this.pathHelper.getFolderName(path);
     return new NxFolderTreeItem(
       path,
       this.cliTaskProvider.getWorkspacePath(),
@@ -98,9 +99,9 @@ class TreeView extends BaseView {
           );
           return;
         }
-        return this.createPathPermutations(root).map(
-          (dir) => [dir, project] as const
-        );
+        return this.pathHelper
+          .createPathPermutations(root)
+          .map((dir) => [dir, project] as const);
       })
       .filter(isDefined)
       .reduce<TreeViewMap>((map, [dir, project]) => {
@@ -110,35 +111,18 @@ class TreeView extends BaseView {
       }, new Map());
   }
 
-  /**
-   * Create a permutation for each sub directory.
-   * @example
-   * input: 'libs/shared/collections'
-   * output: [
-   *   'libs/shared/collections'
-   *   'libs/shared'
-   *   'libs'
-   * ]
-   */
-  private createPathPermutations(dir: string) {
-    const parts = PathHelper.dirs(dir).reverse();
-    const permutations: string[] = [];
-    for (let i = 0; i < parts.length; i++) {
-      const partialDir = path.join(...parts.slice(i).reverse());
-      permutations.push(partialDir);
-    }
-    return permutations;
-  }
-
   private getRootFolders(map: TreeViewMap) {
-    return Array.from(map.entries()).filter(([key]) => PathHelper.isRoot(key));
+    return Array.from(map.entries()).filter(([key]) =>
+      this.pathHelper.isRoot(key)
+    );
   }
 
   private getSubFolders(map: TreeViewMap, path: string) {
-    const depth = PathHelper.getDepth(path);
+    const depth = this.pathHelper.getDepth(path);
 
     return Array.from(map.entries()).filter(
-      ([key]) => key.includes(path) && PathHelper.getDepth(key) === depth + 1
+      ([key]) =>
+        key.includes(path) && this.pathHelper.getDepth(key) === depth + 1
     );
   }
 }
