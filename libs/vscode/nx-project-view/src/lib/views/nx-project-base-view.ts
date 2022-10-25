@@ -53,10 +53,8 @@ export abstract class BaseView {
       return;
     }
 
-    return Promise.all(
-      Object.entries(targets).map((target) =>
-        this.createTargetTreeItem(nxProject, target)
-      )
+    Object.entries(targets).map((target) =>
+      this.createTargetTreeItem(nxProject, target)
     );
   }
 
@@ -103,16 +101,14 @@ export abstract class BaseView {
       return;
     }
 
-    return Promise.all(
-      Object.keys(configurations).map(
-        (configuration) =>
-          new NxTargetTreeItem(
-            nxProject,
-            { name: nxTarget.name, configuration },
-            configuration,
-            TreeItemCollapsibleState.None
-          )
-      )
+    return Object.keys(configurations).map(
+      (configuration) =>
+        new NxTargetTreeItem(
+          nxProject,
+          { name: nxTarget.name, configuration },
+          configuration,
+          TreeItemCollapsibleState.None
+        )
     );
   }
 }
