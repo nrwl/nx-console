@@ -30,10 +30,10 @@ class TreeView extends BaseView {
 
   async getChildren(element?: NxTreeViewItem) {
     if (!element) {
-      return this.createFolders();
+      return this.createRootFolders();
     }
     if (element instanceof NxFolderTreeItem) {
-      return this.createFolders(element);
+      return this.createFoldersOrProjectFromFolder(element);
     }
     if (element instanceof NxProjectTreeItem) {
       return this.createTargetsFromProject(element);
@@ -41,22 +41,25 @@ class TreeView extends BaseView {
     return this.createConfigurationsFromTarget(element);
   }
 
-  private async createFolders(parent?: NxFolderTreeItem) {
+  private async createRootFolders() {
     const projectDefs = await this.cliTaskProvider.getProjects();
     const map = this.groupByRootPath(projectDefs);
 
-    if (!parent) {
-      const rootFolders = this.getRootFolders(map);
-      return rootFolders.map(([path]) => this.createFolderTreeItem(path));
-    }
+    const rootFolders = this.getRootFolders(map);
+    return rootFolders.map(([path]) => this.createTreeItemFromPath(path));
+  }
+
+  private async createFoldersOrProjectFromFolder(parent: NxFolderTreeItem) {
+    const projectDefs = await this.cliTaskProvider.getProjects();
+    const map = this.groupByRootPath(projectDefs);
 
     const subFolders = this.getSubFolders(map, parent.path);
     return subFolders.map(([path, projects]) =>
-      this.createFolderTreeItem(path, projects)
+      this.createTreeItemFromPath(path, projects)
     );
   }
 
-  private createFolderTreeItem(
+  private createTreeItemFromPath(
     path: string,
     projects?: [string, ProjectConfiguration][]
   ) {
@@ -64,7 +67,10 @@ class TreeView extends BaseView {
       const [project] = projects;
       return this.createProjectTreeItem(project);
     }
+    return this.createFolderTreeItem(path);
+  }
 
+  private createFolderTreeItem(path: string) {
     const folderName = PathHelper.getFolderName(path);
     return new NxFolderTreeItem(
       path,
