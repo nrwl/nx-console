@@ -53,7 +53,7 @@ export abstract class BaseView {
       return;
     }
 
-    Object.entries(targets).map((target) =>
+    return Object.entries(targets).map((target) =>
       this.createTargetTreeItem(nxProject, target)
     );
   }
