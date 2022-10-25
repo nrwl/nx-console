@@ -17,7 +17,4 @@ export const PathHelper = {
   getFolderName(val: string) {
     return this.dirs(val).pop() ?? '';
   },
-  getParentPath(val: string) {
-    return path.join(...val.split(path.sep).reverse().slice(1).reverse());
-  },
 } as const;

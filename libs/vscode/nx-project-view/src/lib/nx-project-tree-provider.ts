@@ -2,7 +2,7 @@ import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
-import { commands, ExtensionContext } from 'vscode';
+import { commands, ExtensionContext, ProviderResult } from 'vscode';
 import {
   NxFolderTreeItem,
   NxListViewItem,
@@ -46,11 +46,9 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     this.treeView = createTreeViewStrategy(this.cliTaskProvider);
   }
 
-  getParent(element: NxTreeItem) {
-    if (this.isListViewElement(element)) {
-      return this.listView.getParent(element);
-    }
-    return this.treeView.getParent(element);
+  getParent() {
+    // not implemented, because the reveal API is not needed for the projects view
+    return null;
   }
 
   getChildren(element?: NxTreeItem) {

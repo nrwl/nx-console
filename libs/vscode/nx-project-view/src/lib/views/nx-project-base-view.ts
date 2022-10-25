@@ -9,34 +9,11 @@ import {
 } from '../nx-project-tree-item';
 
 export type ProjectViewStrategy<T> = Required<
-  Pick<TreeDataProvider<T>, 'getChildren' | 'getParent'>
+  Pick<TreeDataProvider<T>, 'getChildren'>
 >;
 
 export abstract class BaseView {
   constructor(protected readonly cliTaskProvider: CliTaskProvider) {}
-
-  async getParentOfTargetItem(element: NxTargetTreeItem) {
-    const { nxProject, nxTarget } = element;
-    const projectDef = (await this.cliTaskProvider.getProjects())[
-      nxProject.project
-    ];
-
-    if (!nxTarget.configuration) {
-      return this.createProjectTreeItem([nxProject.project, projectDef]);
-    }
-
-    if (!projectDef.targets || !projectDef.targets[nxTarget.name]) {
-      getOutputChannel().appendLine(
-        `Could not find target '${nxTarget.name}' in project '${nxProject.project}', even though it should exist`
-      );
-      return null;
-    }
-
-    return this.createTargetTreeItem(nxProject, [
-      nxTarget.name,
-      projectDef.targets[nxTarget.name],
-    ]);
-  }
 
   createProjectTreeItem([projectName, { root, name, targets }]: [
     projectName: string,

@@ -10,22 +10,12 @@ export function createListViewStrategy(
   const listView = new ListView(cliTaskProvider);
   return {
     getChildren: listView.getChildren.bind(listView),
-    getParent: listView.getParent.bind(listView),
   };
 }
 
 class ListView extends BaseView {
   constructor(cliTaskProvider: CliTaskProvider) {
     super(cliTaskProvider);
-  }
-
-  async getParent(element: NxListViewItem) {
-    if (element instanceof NxProjectTreeItem) {
-      // is already root level
-      return null;
-    }
-
-    return this.getParentOfTargetItem(element);
   }
 
   async getChildren(element?: NxListViewItem) {

@@ -20,35 +20,12 @@ export function createTreeViewStrategy(
   const listView = new TreeView(cliTaskProvider);
   return {
     getChildren: listView.getChildren.bind(listView),
-    getParent: listView.getParent.bind(listView),
   };
 }
 
 class TreeView extends BaseView {
   constructor(cliTaskProvider: CliTaskProvider) {
     super(cliTaskProvider);
-  }
-
-  async getParent(element: NxTreeViewItem) {
-    if (element instanceof NxFolderTreeItem) {
-      if (PathHelper.isRoot(element.path)) {
-        return null;
-      }
-      const projectDefs = await this.cliTaskProvider.getProjects();
-      const map = this.groupByRootPath(projectDefs);
-      const parentFolders = this.getParentFolder(map, element.path);
-      return parentFolders.map(([path]) => this.createFolderTreeItem(path));
-    }
-
-    if (element instanceof NxProjectTreeItem) {
-      const projectRoot = element.nxProject.root;
-      const projectDefs = await this.cliTaskProvider.getProjects();
-      const map = this.groupByRootPath(projectDefs);
-      const parentFolders = this.getParentFolder(map, projectRoot);
-      return parentFolders.map(([path]) => this.createFolderTreeItem(path));
-    }
-
-    return this.getParentOfTargetItem(element);
   }
 
   async getChildren(element?: NxTreeViewItem) {
@@ -156,16 +133,6 @@ class TreeView extends BaseView {
 
     return Array.from(map.entries()).filter(
       ([key]) => key.includes(path) && PathHelper.getDepth(key) === depth + 1
-    );
-  }
-
-  private getParentFolder(map: TreeViewMap, path: string) {
-    const depth = PathHelper.getDepth(path);
-    const parentPath = PathHelper.getParentPath(path);
-
-    return Array.from(map.entries()).filter(
-      ([key]) =>
-        key.includes(parentPath) && PathHelper.getDepth(key) === depth - 1
     );
   }
 }
