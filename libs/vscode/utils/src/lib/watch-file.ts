@@ -19,7 +19,6 @@ export function watchFile(
     const fileWatcher = workspace.createFileSystemWatcher(filePath);
     fileWatcher.onDidChange(
       debounce((...args) => {
-        console.log('file changed', filePath);
         callback(args);
       }, 200),
       disposable
