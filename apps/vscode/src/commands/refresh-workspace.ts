@@ -8,7 +8,7 @@ export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 
 const refresh = new Subject();
 
-refresh.pipe(debounceTime(150)).subscribe(async () => {
+refresh.pipe(debounceTime(250)).subscribe(async () => {
   const { nxWorkspace } = await import('@nx-console/shared/workspace');
   await nxWorkspace(getWorkspacePath(), outputLogger, true);
   sendNotification(NxWorkspaceRefreshNotification);
