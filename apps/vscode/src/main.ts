@@ -66,7 +66,10 @@ import {
   refreshWorkspace,
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
-import { WorkspaceCodeLensProvider } from '@nx-console/vscode/nx-workspace';
+import {
+  stopDaemon,
+  WorkspaceCodeLensProvider,
+} from '@nx-console/vscode/nx-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -156,6 +159,7 @@ export async function activate(c: ExtensionContext) {
 }
 
 export async function deactivate() {
+  await stopDaemon();
   getTelemetry().extensionDeactivated();
   teardownTelemetry();
 }
