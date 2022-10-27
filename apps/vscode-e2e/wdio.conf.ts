@@ -1,5 +1,5 @@
 import type { Options } from '@wdio/types';
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
 import {
   copyFileSync,
   existsSync,
@@ -9,6 +9,7 @@ import {
   rmSync,
 } from 'fs';
 import { basename, dirname, join } from 'path';
+import { promisify } from 'util';
 import { getTestWorkspacePath } from './specs/utils';
 
 const debug = process.env.DEBUG;
@@ -210,19 +211,19 @@ export const config: Options.Testrunner = {
 
     console.log('installing testworkspace dependencies....');
     console.time('done in');
-    testWorkspaces.forEach((tws) => {
-      try {
-        execSync('npm ci', {
+    await Promise.all(
+      testWorkspaces.map(async (tws) => {
+        await promisify(exec)('npm ci', {
           cwd: join(testWorkspacePath, tws.name),
-          stdio: 'ignore',
+        }).catch((e) => {
+          console.error(`Failed to install dependencies for ${tws.name}`);
+          if (debug) {
+            console.error(e);
+          }
         });
-      } catch (e) {
-        console.error(`Failed to install dependencies for ${tws.name}`);
-        if (debug) {
-          console.error(e);
-        }
-      }
-    });
+      })
+    );
+
     console.timeLog('done in');
 
     process.on('exit', () => {
