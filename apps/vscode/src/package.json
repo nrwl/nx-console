@@ -827,6 +827,11 @@
           "id": "nx-console",
           "title": "Nx Console",
           "icon": "tree-view-icon.svg"
+        },
+        {
+          "id": "nx-cloud",
+          "title": "Nx Cloud",
+          "icon": "tree-view-icon.svg"
         }
       ]
     },
@@ -838,6 +843,10 @@
       {
         "view": "nxConsole.views.welcome",
         "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
+      },
+      {
+        "view": "nxCloud.views.welcome",
+        "contents": "Nx Cloud"
       }
     ],
     "walkthroughs": [
@@ -917,6 +926,16 @@
           "id": "nxHelpAndFeedback",
           "name": "Help and Feedback",
           "when": "isNxWorkspace"
+        }
+      ],
+      "nx-cloud": [
+        {
+          "id": "nxCloud.views.welcome",
+          "name": "Welcome"
+        },
+        {
+          "id": "nxCloudRuns",
+          "name": "Cloud Runs"
         }
       ]
     },

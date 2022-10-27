@@ -65,6 +65,9 @@
         "libs/vscode/configuration/src/index.ts"
       ],
       "@nx-console/vscode/lsp-client": ["libs/vscode/lsp-client/src/index.ts"],
+      "@nx-console/vscode/nx-cloud-runs-view": [
+        "libs/vscode/nx-cloud-runs-view/src/index.ts"
+      ],
       "@nx-console/vscode/nx-commands-view": [
         "libs/vscode/nx-commands-view/src/index.ts"
       ],

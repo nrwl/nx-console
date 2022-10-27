@@ -6,7 +6,6 @@ import {
   FileSystemWatcher,
   RelativePattern,
   tasks,
-  TreeItem,
   TreeView,
   Uri,
   window,
@@ -57,10 +56,7 @@ import {
 } from '@nx-console/vscode/add-dependency';
 import { configureLspClient } from '@nx-console/vscode/lsp-client';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
-import {
-  NxHelpAndFeedbackProvider,
-  NxHelpAndFeedbackTreeItem,
-} from '@nx-console/vscode/nx-help-and-feedback-view';
+import { NxHelpAndFeedbackProvider } from '@nx-console/vscode/nx-help-and-feedback-view';
 import { projectGraph } from '@nx-console/vscode/project-graph';
 import {
   refreshWorkspace,
@@ -70,11 +66,11 @@ import {
   stopDaemon,
   WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
+import { NxCloudRunsProvider } from '@nx-console/vscode/nx-cloud-runs-view';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
 let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
-let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
 
 let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
@@ -251,14 +247,22 @@ async function setWorkspace(workspacePath: string) {
       treeDataProvider: nxCommandsTreeProvider,
     });
 
-    nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
-      treeDataProvider: new NxHelpAndFeedbackProvider(context),
+    const nxHelpAndFeedbackTreeView = window.createTreeView(
+      'nxHelpAndFeedback',
+      {
+        treeDataProvider: new NxHelpAndFeedbackProvider(context),
+      }
+    );
+
+    const nxCloudRunsProvider = window.createTreeView('nxCloudRuns', {
+      treeDataProvider: new NxCloudRunsProvider(),
     });
 
     context.subscriptions.push(
       nxCommandsTreeView,
       nxProjectTreeView,
-      nxHelpAndFeedbackTreeView
+      nxHelpAndFeedbackTreeView,
+      nxCloudRunsProvider
     );
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
