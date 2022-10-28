@@ -31,7 +31,7 @@ class TreeView extends BaseView {
 
   async getChildren(element?: NxTreeViewItem) {
     if (!element) {
-      return this.createRootFolders();
+      return this.createRoot();
     }
     if (element instanceof NxFolderTreeItem) {
       return this.createFoldersOrProjectFromFolder(element);
@@ -42,9 +42,16 @@ class TreeView extends BaseView {
     return this.createConfigurationsFromTarget(element);
   }
 
-  private async createRootFolders() {
+  private async createRoot() {
     const projectDefs = await this.cliTaskProvider.getProjects();
     const map = this.groupByRootPath(projectDefs);
+
+    if (map.size === 0) {
+      // An angular project has its root project dir at ''
+      // Therefore, the map will be empty
+      const [[projectName, projectDef]] = Object.entries(projectDefs);
+      return [this.createProjectTreeItem([projectName, projectDef])]
+    }
 
     const rootFolders = this.getRootFolders(map);
     return rootFolders.map(([path]) => this.createTreeItemFromPath(path));
