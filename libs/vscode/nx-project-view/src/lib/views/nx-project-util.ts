@@ -6,11 +6,13 @@ export function isDefined<T>(val?: T): val is T {
   return !!val;
 }
 
-export class PathHelper {
-  constructor(private pathApi: typeof path = path) {}
+type DetailedDirs = [dirs: string[], root: string, api: typeof path]
 
-  detailedDirs(val: string) {
-    if (!val) return [[] as string[], '', this.pathApi] as const;
+export class PathHelper {
+  constructor(private pathApi: typeof path = path) { }
+
+  private detailedDirs(val: string): DetailedDirs {
+    if (!val) return [[], '', this.pathApi];
 
     const oppositeApi = this.getOppositeApi();
     const api = val.includes(oppositeApi.sep) ? oppositeApi : this.pathApi;
@@ -31,7 +33,7 @@ export class PathHelper {
       dirs.push(base);
     }
 
-    return [dirs, root, api] as const;
+    return [dirs, root, api];
   }
 
   dirs(val: string) {
