@@ -66,7 +66,10 @@ import {
   stopDaemon,
   WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
-import { NxCloudRunsProvider } from '@nx-console/vscode/nx-cloud-runs-view';
+import {
+  NxCloudRunsProvider,
+  watchForIsConnectedToCloud,
+} from '@nx-console/vscode/nx-cloud-runs-view';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxProjectTreeItem>;
@@ -254,6 +257,7 @@ async function setWorkspace(workspacePath: string) {
       }
     );
 
+    watchForIsConnectedToCloud();
     const nxCloudRunsProvider = window.createTreeView('nxCloudRuns', {
       treeDataProvider: new NxCloudRunsProvider(),
     });

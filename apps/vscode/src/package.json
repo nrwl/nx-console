@@ -846,7 +846,7 @@
       },
       {
         "view": "nxCloud.views.welcome",
-        "contents": "Nx Cloud"
+        "contents": "You are not connected to Nx Cloud!"
       }
     ],
     "walkthroughs": [
@@ -931,11 +931,14 @@
       "nx-cloud": [
         {
           "id": "nxCloud.views.welcome",
-          "name": "Welcome"
+          "name": "Welcome",
+          "visibility": "visible",
+          "when": "!isConnectedToCloud"
         },
         {
           "id": "nxCloudRuns",
-          "name": "Cloud Runs"
+          "name": "Cloud Runs",
+          "when": "isConnectedToCloud"
         }
       ]
     },
