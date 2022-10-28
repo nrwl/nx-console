@@ -1,5 +1,6 @@
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
-import { commands, ProviderResult } from 'vscode';
+import { request } from 'graphql-request';
+import { commands } from 'vscode';
 import { CloudRun } from './cloud-run.model';
 import { NxCloudRunsTreeItem } from './nx-cloud-runs-tree-item';
 
@@ -9,27 +10,54 @@ export class NxCloudRunsProvider extends AbstractTreeProvider<NxCloudRunsTreeIte
     super();
     commands.registerCommand(REFRESH_CLOUD_RUNS_COMMAND, () => this.refresh());
   }
-  getChildren(
+  async getChildren(
     element?: NxCloudRunsTreeItem | undefined
-  ): ProviderResult<NxCloudRunsTreeItem[]> {
-    return this.getCloudRuns().map(this.mapCloudRunToTreeItem);
+  ): Promise<NxCloudRunsTreeItem[] | null | undefined> {
+    const cloudRuns = await this.getCloudRuns();
+    return cloudRuns.map((cloudRun) => new NxCloudRunsTreeItem(cloudRun));
   }
 
-  getCloudRuns(): CloudRun[] {
-    const runs: CloudRun[] = [];
-    const n = Math.floor(Math.random() * 10);
-    for (let i = 0; i < n; i++) {
-      const id = Math.floor(Math.random() * 100000).toString();
-      runs.push({
-        id,
-        command: `nx run ${id}`,
-        success: Boolean(Math.round(Math.random())),
-      });
-    }
-    return runs;
-  }
-
-  mapCloudRunToTreeItem(cloudRun: CloudRun): NxCloudRunsTreeItem {
-    return new NxCloudRunsTreeItem(cloudRun.command, cloudRun.success);
+  async getCloudRuns(): Promise<CloudRun[]> {
+    const endpoint = 'https://cloud.nx.app/api';
+    const query = `
+    query GetRunListPage(
+      $workspaceId: ID!
+    ) {
+       workspaces(workspaceId: $workspaceId) {
+        runListPage(
+          limit: 10
+          offset: 0
+          orphans: false
+          status: ""
+          branch: ""
+        ) {
+          hasNext
+          pageCount
+          offset
+          limit
+          orphans
+          runs {
+            linkId
+            workspaceId
+            command
+            startTime
+            endTime
+            branch
+            runGroup
+            tasks {
+              status
+            }
+          }
+        }
+      }
+    }`;
+    const variables = {
+      workspaceId: '60391f45cfedf9713ddaa491',
+    };
+    const data = await request<{
+      workspaces: { runListPage: { runs: CloudRun[] } }[];
+    }>(endpoint, query, variables);
+    console.log(data);
+    return data.workspaces[0].runListPage.runs;
   }
 }

@@ -1,5 +1,10 @@
 export interface CloudRun {
-  id: string;
+  linkId: string;
+  workspaceId: string;
   command: string;
-  success: boolean;
+  startTime: string;
+  endTime: string;
+  branch: string;
+  runGroup: string;
+  tasks: { status: 0 | 1 }[];
 }
