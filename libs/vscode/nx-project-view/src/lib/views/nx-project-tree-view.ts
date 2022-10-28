@@ -50,7 +50,7 @@ class TreeView extends BaseView {
       // An angular project has its root project dir at ''
       // Therefore, the map will be empty
       const [[projectName, projectDef]] = Object.entries(projectDefs);
-      return [this.createProjectTreeItem([projectName, projectDef])]
+      return [this.createProjectTreeItem([projectName, projectDef])];
     }
 
     const rootFolders = this.getRootFolders(map);

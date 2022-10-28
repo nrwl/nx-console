@@ -6,10 +6,10 @@ export function isDefined<T>(val?: T): val is T {
   return !!val;
 }
 
-type DetailedDirs = [dirs: string[], root: string, api: typeof path]
+type DetailedDirs = [dirs: string[], root: string, api: typeof path];
 
 export class PathHelper {
-  constructor(private pathApi: typeof path = path) { }
+  constructor(private pathApi: typeof path = path) {}
 
   private detailedDirs(val: string): DetailedDirs {
     if (!val) return [[], '', this.pathApi];
