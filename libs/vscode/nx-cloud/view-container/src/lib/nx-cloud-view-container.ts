@@ -1,8 +1,19 @@
 import { nxWorkspace } from '@nx-console/shared/workspace';
+import { NxCloudRunsProvider } from '@nx-console/vscode/nx-cloud/cloud-runs-view';
 import { getWorkspacePath, watchFile } from '@nx-console/vscode/utils';
-import { commands } from 'vscode';
+import { commands, ExtensionContext, window } from 'vscode';
 
-export function watchForIsConnectedToCloud() {
+export function initNxCloudViewContainer(context: ExtensionContext) {
+  watchForIsConnectedToCloud();
+
+  const nxCloudRunsProvider = window.createTreeView('nxCloudRuns', {
+    treeDataProvider: new NxCloudRunsProvider(),
+  });
+
+  context.subscriptions.push(nxCloudRunsProvider);
+}
+
+function watchForIsConnectedToCloud() {
   isConnectedToCloud().then((c) => {
     commands.executeCommand('setContext', 'isConnectedToCloud', c);
   });

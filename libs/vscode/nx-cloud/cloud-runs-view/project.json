@@ -1,0 +1,24 @@
+{
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "name": "vscode-nx-cloud-cloud-runs-view",
+  "sourceRoot": "libs/vscode/nx-cloud/cloud-runs-view/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/vscode/nx-cloud/cloud-runs-view/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/vscode/nx-cloud/cloud-runs-view"],
+      "options": {
+        "jestConfig": "libs/vscode/nx-cloud/cloud-runs-view/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
