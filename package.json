@@ -21,6 +21,7 @@
     "@nrwl/devkit": "14.8.2",
     "@yarnpkg/fslib": "2.6.1-rc.5",
     "@yarnpkg/libzip": "2.2.3-rc.5",
+    "date-fns": "^2.29.3",
     "fast-glob": "^3.2.11",
     "find-cache-dir": "^3.3.2",
     "graphql": "^16.6.0",

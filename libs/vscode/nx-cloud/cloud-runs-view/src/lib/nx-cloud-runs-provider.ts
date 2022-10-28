@@ -2,19 +2,27 @@ import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { request } from 'graphql-request';
 import { commands } from 'vscode';
 import { CloudRun } from './cloud-run.model';
+import { NxCloudRunDetailsTreeItem } from './nx-cloud-run-details-tree-item';
 import { NxCloudRunsTreeItem } from './nx-cloud-runs-tree-item';
 
 const REFRESH_CLOUD_RUNS_COMMAND = 'nxConsole.cloud.refreshCloudRuns';
-export class NxCloudRunsProvider extends AbstractTreeProvider<NxCloudRunsTreeItem> {
+export class NxCloudRunsProvider extends AbstractTreeProvider<
+  NxCloudRunsTreeItem | NxCloudRunDetailsTreeItem
+> {
   constructor() {
     super();
     commands.registerCommand(REFRESH_CLOUD_RUNS_COMMAND, () => this.refresh());
   }
   async getChildren(
     element?: NxCloudRunsTreeItem | undefined
-  ): Promise<NxCloudRunsTreeItem[] | null | undefined> {
-    const cloudRuns = await this.getCloudRuns();
-    return cloudRuns.map((cloudRun) => new NxCloudRunsTreeItem(cloudRun));
+  ): Promise<
+    (NxCloudRunsTreeItem | NxCloudRunDetailsTreeItem)[] | null | undefined
+  > {
+    if (!element) {
+      const cloudRuns = await this.getCloudRuns();
+      return cloudRuns.map((cloudRun) => new NxCloudRunsTreeItem(cloudRun));
+    }
+    return [new NxCloudRunDetailsTreeItem(element.cloudRun)];
   }
 
   async getCloudRuns(): Promise<CloudRun[]> {
