@@ -116,6 +116,11 @@
           "command": "nxConsole.refreshWorkspace",
           "when": "view == nxRunTarget",
           "group": "navigation"
+        },
+        {
+          "command": "nxConsole.cloud.refreshCloudRuns",
+          "when": "view == nxCloudRuns",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -693,6 +698,11 @@
         "title": "Connect to Nx Cloud",
         "command": "nxConsole.connectToNxCloud",
         "icon": "$(rocket)"
+      },
+      {
+        "title": "Refresh Nx Cloud Runs",
+        "command": "nxConsole.cloud.refreshCloudRuns",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
