@@ -1,4 +1,5 @@
 import { ProjectConfiguration, TargetConfiguration } from '@nrwl/devkit';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import { TreeDataProvider, TreeItemCollapsibleState } from 'vscode';
 import {
@@ -11,20 +12,8 @@ export type ProjectViewStrategy<T> = Required<
   Pick<TreeDataProvider<T>, 'getChildren'>
 >;
 
-type RootPath = string;
-export type ProjectDefinition =
-  | {
-      [projectName: string]: ProjectConfiguration;
-    }
-  | { [projectName: string]: RootPath };
-
-export interface ProjectInfoProvider {
-  getWorkspacePath(): string;
-  getProjects(): Promise<ProjectDefinition>;
-}
-
 export abstract class BaseView {
-  constructor(protected readonly infoProvider: ProjectInfoProvider) {}
+  constructor(protected readonly cliTaskProvider: CliTaskProvider) {}
 
   createProjectTreeItem([projectName, { root, name, targets }]: [
     projectName: string,
@@ -41,7 +30,7 @@ export abstract class BaseView {
 
     return new NxProjectTreeItem(
       nxProject,
-      this.infoProvider.getWorkspacePath(),
+      this.cliTaskProvider.getWorkspacePath(),
       projectName,
       hasChildren
         ? TreeItemCollapsibleState.Collapsed
@@ -52,10 +41,10 @@ export abstract class BaseView {
   async createTargetsFromProject(parent: NxProjectTreeItem) {
     const { nxProject } = parent;
 
-    const projectDef = (await this.infoProvider.getProjects())[
+    const projectDef = (await this.cliTaskProvider.getProjects())[
       nxProject.project
     ];
-    if (!projectDef || typeof projectDef === 'string') {
+    if (!projectDef) {
       return;
     }
 
@@ -90,10 +79,10 @@ export abstract class BaseView {
   async createConfigurationsFromTarget(parent: NxTargetTreeItem) {
     const { nxProject, nxTarget } = parent;
 
-    const projectDef = (await this.infoProvider.getProjects())[
+    const projectDef = (await this.cliTaskProvider.getProjects())[
       nxProject.project
     ];
-    if (!projectDef || typeof projectDef === 'string') {
+    if (!projectDef) {
       return;
     }
 
