@@ -6,5 +6,10 @@ export interface CloudRun {
   endTime: string;
   branch: string;
   runGroup: string;
-  tasks: { status: 0 | 1 }[];
+  tasks: CloudRunTask[];
+}
+
+export interface CloudRunTask {
+  status: 0 | 1;
+  projectName: string;
 }

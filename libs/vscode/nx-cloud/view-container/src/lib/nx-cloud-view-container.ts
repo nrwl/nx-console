@@ -6,11 +6,11 @@ import { commands, ExtensionContext, window } from 'vscode';
 export function initNxCloudViewContainer(context: ExtensionContext) {
   watchForIsConnectedToCloud();
 
-  const nxCloudRunsProvider = window.createTreeView('nxCloudRuns', {
+  const nxCloudRunsTreeView = window.createTreeView('nxCloudRuns', {
     treeDataProvider: new NxCloudRunsProvider(),
   });
 
-  context.subscriptions.push(nxCloudRunsProvider);
+  context.subscriptions.push(nxCloudRunsTreeView);
 }
 
 function watchForIsConnectedToCloud() {
