@@ -5,6 +5,7 @@ import type {
 } from '@nrwl/devkit';
 import { join } from 'path';
 import {
+  getNxDaemonClient,
   getNxProjectGraph,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
@@ -14,6 +15,8 @@ import { Logger } from '@nx-console/shared/schema';
 
 export type NxWorkspaceConfiguration = ProjectsConfigurations &
   NxJsonConfiguration;
+
+let projectGraph: ProjectGraph | null = null;
 
 /**
  * There's a couple things that we need to handle here.
@@ -32,6 +35,7 @@ export async function getNxWorkspaceConfig(
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
   configPath: string;
+  daemonEnabled?: boolean;
 }> {
   const version = await nxVersion(workspacePath);
 
@@ -40,11 +44,14 @@ export async function getNxWorkspaceConfig(
   }
 
   try {
-    const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
-      getNxWorkspacePackageFileUtils(workspacePath, logger),
-      getNxProjectGraph(workspacePath, logger),
-    ]);
+    const [nxWorkspacePackage, nxProjectGraph, nxDaemonClient] =
+      await Promise.all([
+        getNxWorkspacePackageFileUtils(workspacePath, logger),
+        getNxProjectGraph(workspacePath, logger),
+        getNxDaemonClient(workspacePath, logger),
+      ]);
     const configFile = nxWorkspacePackage.workspaceFileName();
+    const isDaemonEnabled = nxDaemonClient.daemonClient.enabled();
 
     let workspaceConfiguration: NxWorkspaceConfiguration;
     try {
@@ -58,7 +65,6 @@ export async function getNxWorkspaceConfig(
       ).workspaceConfiguration;
     }
 
-    let projectGraph: ProjectGraph | null = null;
     try {
       if (!isNxWorkspace) {
         throw 'No project graph support';
@@ -71,10 +77,12 @@ export async function getNxWorkspaceConfig(
       if (version.major < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else {
-        projectGraph = await nxProjectGraph.createProjectGraphAsync({
-          exitOnError: false,
-          resetDaemonClient: true,
-        });
+        if (isDaemonEnabled) {
+          projectGraph = await nxProjectGraph.createProjectGraphAsync({
+            exitOnError: false,
+            resetDaemonClient: true,
+          });
+        }
       }
     } catch {
       //noop
@@ -85,6 +93,7 @@ export async function getNxWorkspaceConfig(
     return {
       workspaceConfiguration,
       configPath: join(workspacePath, configFile),
+      daemonEnabled: isDaemonEnabled,
     };
   } catch (e) {
     return readWorkspaceConfigs(format, workspacePath);
