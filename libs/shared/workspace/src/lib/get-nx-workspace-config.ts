@@ -77,7 +77,9 @@ export async function getNxWorkspaceConfig(
       if (version.major < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else {
-        if (isDaemonEnabled) {
+        // we always want to try to get the project graph on first load.
+        // So even if the daemon is disabled, we still want to try to get the project graph
+        if (isDaemonEnabled || projectGraph === null) {
           projectGraph = await nxProjectGraph.createProjectGraphAsync({
             exitOnError: false,
             resetDaemonClient: true,
