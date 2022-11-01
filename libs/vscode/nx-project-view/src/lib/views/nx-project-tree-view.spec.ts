@@ -40,15 +40,36 @@ describe('Project View: TreeView', () => {
       await testRootChildren(expectedOutput, treeView);
     });
 
-    it('should find root directory "src"', async () => {
+    it('should use root placeholder for empty roots', async () => {
       const viewProvider = createMockViewDataProvider(
         ngExampleInSrc.workspacePath,
         ngExampleInSrc.project
       );
-      const expectedOutput = ['src'];
+      const expectedOutput = ['<root>'];
       const treeView = createTreeViewStrategy(viewProvider);
 
       await testRootChildren(expectedOutput, treeView);
+    });
+
+    it('should find projects below root directory', async () => {
+      const viewProvider = createMockViewDataProvider(
+        ngExampleInSrc.workspacePath,
+        ngExampleInSrc.project
+      );
+      const expectedOutput = [
+        'multi-application-example',
+        'multi-application-example-e2e',
+        'multi-application-example1',
+        'multi-application-example1-e2e',
+      ];
+      const treeView = createTreeViewStrategy(viewProvider);
+      const [srcDir] = (await treeView.getChildren()) ?? [];
+
+      const projects = await treeView.getChildren(srcDir);
+
+      expect(projects).toHaveLength(expectedOutput.length);
+      const paths = projects?.map((e) => e.label);
+      expect(paths).toEqual(expectedOutput);
     });
   });
 });

@@ -12,7 +12,7 @@ export class PathHelper {
   constructor(private pathApi: typeof path = path) {}
 
   private detailedDirs(val: string): DetailedDirs {
-    if (!val) return [[], '', this.pathApi];
+    if (!val) return [[''], '', this.pathApi];
 
     const oppositeApi = this.getOppositeApi();
     const api = val.includes(oppositeApi.sep) ? oppositeApi : this.pathApi;
@@ -63,6 +63,8 @@ export class PathHelper {
    * ]
    */
   createPathPermutations(dir: string) {
+    if (dir === '') return [''];
+
     const [dirs, root, api] = this.detailedDirs(dir);
     const parts = dirs.reverse();
     const permutations: string[] = [];

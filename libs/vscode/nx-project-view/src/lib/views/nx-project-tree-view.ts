@@ -61,6 +61,13 @@ class TreeView extends BaseView {
     const projectDefs = await this.cliTaskProvider.getProjects();
     const map = this.groupByRootPath(projectDefs);
 
+    /**
+     * In case that the parent is the <root> placeholder, then the children can only be projects
+     */
+    if (parent.path === '') {
+      return map.get('')?.map((project) => this.createProjectViewItem(project));
+    }
+
     const subFolders = this.getSubFolders(map, parent.path);
     return subFolders.map(([path, projects]) =>
       this.createTreeItemFromPath(path, projects)
@@ -80,10 +87,16 @@ class TreeView extends BaseView {
 
   private createFolderTreeItem(path: string): FolderViewItem {
     const folderName = this.pathHelper.getFolderName(path);
+    /**
+     * In case that a project does not have a root value.
+     * Show a placeholder value instead
+     */
+    const label = folderName === '' ? '<root>' : folderName;
+
     return {
       contextValue: 'folder',
       path,
-      label: folderName,
+      label,
       resource: join(this.cliTaskProvider.getWorkspacePath(), path),
       collapsible: 'Collapsed',
     };
@@ -100,16 +113,15 @@ class TreeView extends BaseView {
     return Object.entries(projectDefs)
       .flatMap((project) => {
         const [projectName, projectDef] = project;
-        const { root, sourceRoot } = projectDef;
-        const dir = root ? root : sourceRoot;
-        if (dir === undefined) {
+        const { root } = projectDef;
+        if (root === undefined) {
           getOutputChannel().appendLine(
             `Project ${projectName} has no root. This could be because of an error loading the workspace configuration.`
           );
           return;
         }
         return this.pathHelper
-          .createPathPermutations(dir)
+          .createPathPermutations(root)
           .map((dir) => [dir, project] as const);
       })
       .filter(isDefined)

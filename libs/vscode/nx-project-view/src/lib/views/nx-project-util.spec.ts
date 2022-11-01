@@ -122,7 +122,7 @@ describe('Project View: PathHelper', () => {
   describe('dirs', () => {
     it('empty input results in empty output', () => {
       const input = '';
-      const output: string[] = [];
+      const output: string[] = [''];
       expect(new PathHelper().dirs(input)).toEqual(output);
     });
 
@@ -144,10 +144,11 @@ describe('Project View: PathHelper', () => {
       });
     });
   });
+
   describe('createPathPermutations', () => {
     it('empty input results in empty output', () => {
       const input = '';
-      const output: string[] = [];
+      const output: string[] = [''];
       expect(new PathHelper().createPathPermutations(input)).toEqual(output);
     });
 
