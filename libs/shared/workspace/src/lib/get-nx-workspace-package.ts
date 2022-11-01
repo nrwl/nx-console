@@ -1,6 +1,7 @@
 // import { getOutputChannel } from '@nx-console/utils';
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
+import type * as NxDaemonClient from 'nx/src/daemon/client/client';
 import { platform } from 'os';
 import { join } from 'path';
 import { findNxPackagePath } from '@nx-console/shared/npm';
@@ -10,6 +11,28 @@ declare function __non_webpack_require__(importPath: string): any;
 
 let RESOLVED_FILEUTILS_IMPORT: typeof NxFileUtils;
 let RESOLVED_PROJECTGRAPH_IMPORT: typeof NxProjectGraph;
+let RESOLVED_DAEMON_CLIENT: typeof NxDaemonClient;
+
+export async function getNxDaemonClient(
+  workspacePath: string,
+  logger: Logger
+): Promise<typeof NxDaemonClient> {
+  if (RESOLVED_DAEMON_CLIENT) {
+    return RESOLVED_DAEMON_CLIENT;
+  }
+
+  const importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'daemon', 'client', 'client.js')
+  );
+  const backupPackage = await import('nx/src/daemon/client/client');
+  return getNxPackage(
+    importPath,
+    backupPackage,
+    RESOLVED_DAEMON_CLIENT,
+    logger
+  );
+}
 
 export async function getNxProjectGraph(
   workspacePath: string,

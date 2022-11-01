@@ -26,6 +26,7 @@ export interface NxWorkspace {
   workspace: NxWorkspaceConfiguration;
   workspaceType: 'ng' | 'nx';
   configurationFilePath: string;
+  daemonEnabled?: boolean;
   workspacePath: string;
   isLerna: boolean;
   workspaceLayout: {
@@ -106,6 +107,7 @@ async function _workspace(
       workspaceType: isAngularWorkspace ? 'ng' : 'nx',
       workspace: toWorkspaceFormat(config.workspaceConfiguration),
       configurationFilePath: config.configPath,
+      daemonEnabled: config.daemonEnabled,
       isLerna,
       workspaceLayout: {
         appsDir:
