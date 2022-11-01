@@ -17,6 +17,6 @@ runs:
     - run: yarn install --immutable
       shell: bash
     - name: Derive appropriate SHAs for base and head for `nx affected` commands
-      uses: nrwl/nx-set-shas@v2
+      uses: nrwl/nx-set-shas@v3
       with:
         main-branch-name: 'master'
