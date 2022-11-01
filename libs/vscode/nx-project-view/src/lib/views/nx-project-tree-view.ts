@@ -100,15 +100,16 @@ class TreeView extends BaseView {
     return Object.entries(projectDefs)
       .flatMap((project) => {
         const [projectName, projectDef] = project;
-        const { root } = projectDef;
-        if (root === undefined) {
+        const { root, sourceRoot } = projectDef;
+        const dir = root ? root : sourceRoot;
+        if (dir === undefined) {
           getOutputChannel().appendLine(
             `Project ${projectName} has no root. This could be because of an error loading the workspace configuration.`
           );
           return;
         }
         return this.pathHelper
-          .createPathPermutations(root)
+          .createPathPermutations(dir)
           .map((dir) => [dir, project] as const);
       })
       .filter(isDefined)
