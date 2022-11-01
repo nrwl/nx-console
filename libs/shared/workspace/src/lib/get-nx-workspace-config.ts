@@ -44,14 +44,19 @@ export async function getNxWorkspaceConfig(
   }
 
   try {
-    const [nxWorkspacePackage, nxProjectGraph, nxDaemonClient] =
-      await Promise.all([
-        getNxWorkspacePackageFileUtils(workspacePath, logger),
-        getNxProjectGraph(workspacePath, logger),
-        getNxDaemonClient(workspacePath, logger),
-      ]);
+    const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
+      getNxWorkspacePackageFileUtils(workspacePath, logger),
+      getNxProjectGraph(workspacePath, logger),
+    ]);
     const configFile = nxWorkspacePackage.workspaceFileName();
-    const isDaemonEnabled = nxDaemonClient.daemonClient.enabled();
+    let isDaemonEnabled = true;
+    try {
+      const nxDaemonClient = await getNxDaemonClient(workspacePath, logger);
+      nxDaemonClient.daemonClient.reset();
+      isDaemonEnabled = nxDaemonClient.daemonClient.enabled();
+    } catch {
+      logger.log('Unable to load Nx daemon utils');
+    }
 
     let workspaceConfiguration: NxWorkspaceConfiguration;
     try {
