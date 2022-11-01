@@ -7,7 +7,7 @@ on:
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
-  node_version: 14
+  node_version: 16
 
 jobs:
   checks:
@@ -31,6 +31,8 @@ jobs:
         agent: [1, 2, 3]
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
@@ -45,6 +47,8 @@ jobs:
       - name: Set nx run variable
         run: echo "NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}" >> $GITHUB_ENV
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
