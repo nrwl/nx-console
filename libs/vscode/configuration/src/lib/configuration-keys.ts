@@ -33,6 +33,7 @@ export const WORKSPACE_CONFIG_KEYS = [
   'nxConversionDoNotAskAgain',
   'workspaceType',
   'nxVersion',
+  'nxShowNxDaemonWarning',
 ] as const;
 /**
  * configuration Keys used for NxConsole on a vscode workspace level

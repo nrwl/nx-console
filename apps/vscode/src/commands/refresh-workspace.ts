@@ -1,5 +1,5 @@
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
-import { checkIsNxWorkspace } from '@nx-console/shared/utils';
+import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { sendNotification } from '@nx-console/vscode/lsp-client';
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
 import { debounceTime, Subject } from 'rxjs';
@@ -16,11 +16,27 @@ refresh.pipe(debounceTime(150)).subscribe(async () => {
     outputLogger,
     true
   );
-  if (!daemonEnabled && workspaceType === 'nx') {
-    window.showErrorMessage(
-      'It looks like the Nx daemon is not enabled.\nPlease check your configuration and restart the daemon with `nx reset`.',
-      'OK'
-    );
+
+  const showNxDaemonWarning = WorkspaceConfigurationStore.instance.get(
+    'nxShowNxDaemonWarning',
+    true
+  );
+
+  if (showNxDaemonWarning && !daemonEnabled && workspaceType === 'nx') {
+    window
+      .showInformationMessage(
+        'It looks like the Nx daemon is not enabled. To reenable it, please run `nx reset` in your terminal.',
+        'OK',
+        "Don't show again"
+      )
+      .then((value) => {
+        if (value === "Don't show again") {
+          WorkspaceConfigurationStore.instance.set(
+            'nxShowNxDaemonWarning',
+            false
+          );
+        }
+      });
   }
   sendNotification(NxWorkspaceRefreshNotification);
   commands.executeCommand('nxConsole.refreshNxProjectsTree');
