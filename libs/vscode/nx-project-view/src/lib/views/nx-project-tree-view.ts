@@ -1,20 +1,20 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel } from '@nx-console/vscode/utils';
-import { TreeItemCollapsibleState } from 'vscode';
+import { join } from 'node:path';
 import {
-  NxFolderTreeItem,
-  NxProjectTreeItem,
-  NxTreeViewItem,
-} from '../nx-project-tree-item';
-import { BaseView, ProjectViewStrategy } from './nx-project-base-view';
+  BaseView,
+  FolderViewItem,
+  ProjectViewStrategy,
+  TreeViewItem,
+  ViewDataProvider,
+} from './nx-project-base-view';
 import { isDefined, PathHelper } from './nx-project-util';
 
-export type TreeViewStrategy = ProjectViewStrategy<NxTreeViewItem>;
+export type TreeViewStrategy = ProjectViewStrategy<TreeViewItem>;
 type TreeViewMap = Map<string, [string, ProjectConfiguration][]>;
 
 export function createTreeViewStrategy(
-  cliTaskProvider: CliTaskProvider
+  cliTaskProvider: ViewDataProvider
 ): TreeViewStrategy {
   const listView = new TreeView(cliTaskProvider);
   return {
@@ -25,18 +25,18 @@ export function createTreeViewStrategy(
 class TreeView extends BaseView {
   private pathHelper = new PathHelper();
 
-  constructor(cliTaskProvider: CliTaskProvider) {
+  constructor(cliTaskProvider: ViewDataProvider) {
     super(cliTaskProvider);
   }
 
-  async getChildren(element?: NxTreeViewItem) {
+  async getChildren(element?: TreeViewItem) {
     if (!element) {
       return this.createRoot();
     }
-    if (element instanceof NxFolderTreeItem) {
+    if (element.contextValue === 'folder') {
       return this.createFoldersOrProjectFromFolder(element);
     }
-    if (element instanceof NxProjectTreeItem) {
+    if (element.contextValue === 'project') {
       return this.createTargetsFromProject(element);
     }
     return this.createConfigurationsFromTarget(element);
@@ -50,14 +50,14 @@ class TreeView extends BaseView {
       // An angular project has its root project dir at ''
       // Therefore, the map will be empty
       const [[projectName, projectDef]] = Object.entries(projectDefs);
-      return [this.createProjectTreeItem([projectName, projectDef])];
+      return [this.createProjectViewItem([projectName, projectDef])];
     }
 
     const rootFolders = this.getRootFolders(map);
     return rootFolders.map(([path]) => this.createTreeItemFromPath(path));
   }
 
-  private async createFoldersOrProjectFromFolder(parent: NxFolderTreeItem) {
+  private async createFoldersOrProjectFromFolder(parent: FolderViewItem) {
     const projectDefs = await this.cliTaskProvider.getProjects();
     const map = this.groupByRootPath(projectDefs);
 
@@ -73,19 +73,20 @@ class TreeView extends BaseView {
   ) {
     if (projects && projects.length === 1) {
       const [project] = projects;
-      return this.createProjectTreeItem(project);
+      return this.createProjectViewItem(project);
     }
     return this.createFolderTreeItem(path);
   }
 
-  private createFolderTreeItem(path: string) {
+  private createFolderTreeItem(path: string): FolderViewItem {
     const folderName = this.pathHelper.getFolderName(path);
-    return new NxFolderTreeItem(
+    return {
+      contextValue: 'folder',
       path,
-      this.cliTaskProvider.getWorkspacePath(),
-      folderName,
-      TreeItemCollapsibleState.Collapsed
-    );
+      label: folderName,
+      resource: join(this.cliTaskProvider.getWorkspacePath(), path),
+      collapsible: 'Collapsed',
+    };
   }
 
   /**

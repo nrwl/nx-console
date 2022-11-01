@@ -1,24 +1,61 @@
 import { ProjectConfiguration, TargetConfiguration } from '@nrwl/devkit';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel } from '@nx-console/vscode/utils';
-import { TreeDataProvider, TreeItemCollapsibleState } from 'vscode';
-import {
-  NxProject,
-  NxProjectTreeItem,
-  NxTargetTreeItem,
-} from '../nx-project-tree-item';
+import { join } from 'node:path';
 
-export type ProjectViewStrategy<T> = Required<
-  Pick<TreeDataProvider<T>, 'getChildren'>
+export interface ProjectViewStrategy<T> {
+  getChildren(element?: T): Promise<T[] | undefined>;
+}
+
+export type ViewDataProvider = Pick<
+  CliTaskProvider,
+  'getWorkspacePath' | 'getProjects'
 >;
 
-export abstract class BaseView {
-  constructor(protected readonly cliTaskProvider: CliTaskProvider) {}
+export type ListViewItem = ProjectViewItem | TargetViewItem;
+export type TreeViewItem = FolderViewItem | ProjectViewItem | TargetViewItem;
+export type ViewItem = ListViewItem | TreeViewItem;
 
-  createProjectTreeItem([projectName, { root, name, targets }]: [
+interface BaseViewItem<Context extends string> {
+  contextValue: Context;
+  label: string;
+  collapsible: Collapsible;
+}
+
+export interface FolderViewItem extends BaseViewItem<'folder'> {
+  path: string;
+  resource: string;
+}
+
+export interface ProjectViewItem extends BaseViewItem<'project'> {
+  nxProject: NxProject;
+  resource: string;
+}
+
+export interface TargetViewItem extends BaseViewItem<'task'> {
+  nxProject: NxProject;
+  nxTarget: NxTarget;
+}
+
+export type Collapsible = 'None' | 'Collapsed' | 'Expanded';
+
+export interface NxProject {
+  project: string;
+  root: string;
+}
+
+export interface NxTarget {
+  name: string;
+  configuration?: string;
+}
+
+export abstract class BaseView {
+  constructor(protected readonly cliTaskProvider: ViewDataProvider) {}
+
+  createProjectViewItem([projectName, { root, name, targets }]: [
     projectName: string,
     projectDefinition: ProjectConfiguration
-  ]) {
+  ]): ProjectViewItem {
     const hasChildren = !!targets;
     const nxProject = { project: name ?? projectName, root };
 
@@ -28,17 +65,19 @@ export abstract class BaseView {
       );
     }
 
-    return new NxProjectTreeItem(
+    return {
+      contextValue: 'project',
       nxProject,
-      this.cliTaskProvider.getWorkspacePath(),
-      projectName,
-      hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
-    );
+      label: projectName,
+      resource: join(
+        this.cliTaskProvider.getWorkspacePath(),
+        nxProject.root ?? ''
+      ),
+      collapsible: hasChildren ? 'Collapsed' : 'None',
+    };
   }
 
-  async createTargetsFromProject(parent: NxProjectTreeItem) {
+  async createTargetsFromProject(parent: ProjectViewItem) {
     const { nxProject } = parent;
 
     const projectDef = (await this.cliTaskProvider.getProjects())[
@@ -64,19 +103,20 @@ export abstract class BaseView {
       targetName: string,
       targetDefinition: TargetConfiguration
     ]
-  ) {
+  ): TargetViewItem {
     const hasChildren = !!configurations;
-    return new NxTargetTreeItem(
+    return {
+      contextValue: 'task',
       nxProject,
-      { name: targetName },
-      targetName,
-      hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
-    );
+      nxTarget: { name: targetName },
+      label: targetName,
+      collapsible: hasChildren ? 'Collapsed' : 'None',
+    };
   }
 
-  async createConfigurationsFromTarget(parent: NxTargetTreeItem) {
+  async createConfigurationsFromTarget(
+    parent: TargetViewItem
+  ): Promise<TargetViewItem[] | undefined> {
     const { nxProject, nxTarget } = parent;
 
     const projectDef = (await this.cliTaskProvider.getProjects())[
@@ -101,14 +141,12 @@ export abstract class BaseView {
       return;
     }
 
-    return Object.keys(configurations).map(
-      (configuration) =>
-        new NxTargetTreeItem(
-          nxProject,
-          { name: nxTarget.name, configuration },
-          configuration,
-          TreeItemCollapsibleState.None
-        )
-    );
+    return Object.keys(configurations).map((configuration) => ({
+      contextValue: 'task',
+      nxProject,
+      nxTarget: { name: nxTarget.name, configuration },
+      label: configuration,
+      collapsible: 'None',
+    }));
   }
 }
