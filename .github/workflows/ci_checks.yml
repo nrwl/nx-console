@@ -47,6 +47,8 @@ jobs:
       - name: Set nx run variable
         run: echo "NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}" >> $GITHUB_ENV
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
