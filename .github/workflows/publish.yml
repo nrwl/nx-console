@@ -5,7 +5,7 @@ on:
     tags:
       - 'v*.*.*'
 env:
-  node_version: 14
+  node_version: 16
 
 jobs:
   publish:

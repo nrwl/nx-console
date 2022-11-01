@@ -7,7 +7,7 @@ on:
 
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true
-  node_version: 14
+  node_version: 16
 
 jobs:
   checks:
