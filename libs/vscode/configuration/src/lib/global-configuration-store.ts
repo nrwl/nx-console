@@ -5,7 +5,11 @@ import {
   Memento,
 } from 'vscode';
 import { Store } from '@nx-console/shared/schema';
-import { GLOBAL_CONFIG_KEYS, GlobalConfigKeys } from './configuration-keys';
+import {
+  GLOBAL_CONFIG_KEYS,
+  GlobalConfigKeys,
+  GlobalConfig,
+} from './configuration-keys';
 
 let CONFIG_STORE: GlobalConfigurationStore;
 
@@ -28,6 +32,8 @@ export class GlobalConfigurationStore implements Store {
 
   private constructor(private readonly state: Memento) {}
 
+  get<T extends keyof GlobalConfig>(key: T): GlobalConfig[T] | null;
+  get<T>(key: GlobalConfigKeys, defaultValue?: T): T | null;
   get<T>(key: GlobalConfigKeys, defaultValue?: T): T | null {
     const value = this.storage(key).get(key, defaultValue);
     return typeof value === 'undefined' ? defaultValue || null : value;

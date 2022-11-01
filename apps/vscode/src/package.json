@@ -121,12 +121,12 @@
       "view/item/context": [
         {
           "command": "nxConsole.editWorkspaceJson",
-          "when": "view == nxProjects",
+          "when": "view == nxProjects && viewItem == project || viewItem == task",
           "group": "inline"
         },
         {
           "command": "nxConsole.revealInExplorer",
-          "when": "view == nxProjects && viewItem == project",
+          "when": "view == nxProjects && viewItem != task",
           "group": "inline"
         },
         {
@@ -722,6 +722,15 @@
           "type": "boolean",
           "default": true,
           "description": "Enables the filter for listed generators with Nx Console."
+        },
+        "nxConsole.projectViewingStyle": {
+          "type": "string",
+          "default": "list",
+          "enum": [
+            "list",
+            "tree"
+          ],
+          "description": "Define how the 'Projects' view shows the entries.\n\nlist: show the projects in an ordered list.\ntree: show the projects in the same folder structure as they are located in your repo."
         },
         "nxConsole.generatorAllowlist": {
           "type": "array",

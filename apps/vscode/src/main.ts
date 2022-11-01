@@ -23,8 +23,8 @@ import {
   NxCommandsTreeProvider,
 } from '@nx-console/vscode/nx-commands-view';
 import {
-  NxProjectTreeItem,
   NxProjectTreeProvider,
+  NxTreeItem,
 } from '@nx-console/vscode/nx-project-view';
 import {
   LOCATE_YOUR_WORKSPACE,
@@ -72,7 +72,7 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
-let nxProjectTreeView: TreeView<NxProjectTreeItem>;
+let nxProjectTreeView: TreeView<NxTreeItem>;
 let nxCommandsTreeView: TreeView<NxCommandsTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
 
