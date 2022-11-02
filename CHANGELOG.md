@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.24.0](https://github.com/nrwl/nx-console/compare/v17.23.3...v17.24.0) (2022-11-02)
+
+
+### Features
+
+* add connect-to-nx-cloud command ([#1375](https://github.com/nrwl/nx-console/issues/1375)) ([22af88c](https://github.com/nrwl/nx-console/commits/22af88c749e37267fabdb0764a6bd6d882757c57))
+* change execute dryrun on change to true ([4aa810a](https://github.com/nrwl/nx-console/commits/4aa810acbb3a665bcb50dd80605d18f5fda0696c))
+* check if nx daemon is enabled ([#1397](https://github.com/nrwl/nx-console/issues/1397)) ([a4888eb](https://github.com/nrwl/nx-console/commits/a4888ebb22dcdf7e5d97be7c940045d435b6e0b2))
+* configurable dry runs on change ([#1380](https://github.com/nrwl/nx-console/issues/1380)) ([0d5634d](https://github.com/nrwl/nx-console/commits/0d5634df3f75a6a0cfdbaa57854c580e6138a878))
+* project tree view ([#1390](https://github.com/nrwl/nx-console/issues/1390)) ([ea9445d](https://github.com/nrwl/nx-console/commits/ea9445d0275eabc81c678bd3ba7c656ceb0eb968))
+
+
+### Bug Fixes
+
+* add argument flags for positional arguments greater than 0 ([#1389](https://github.com/nrwl/nx-console/issues/1389)) ([d30d166](https://github.com/nrwl/nx-console/commits/d30d1663c4cf9c069de148152c59791589b5fcd0))
+* handle more nx daemon cases ([#1399](https://github.com/nrwl/nx-console/issues/1399)) ([123101c](https://github.com/nrwl/nx-console/commits/123101cf8a0e0ae067b44fb6c06389063a88945a))
+* stop daemon on extension deactivation ([#1394](https://github.com/nrwl/nx-console/issues/1394)) ([0f862de](https://github.com/nrwl/nx-console/commits/0f862de039cd7239ba8e4b91d349654bfdb0591c))
+
 ### [17.23.3](https://github.com/nrwl/nx-console/compare/v17.23.2...v17.23.3) (2022-10-12)
 
 
