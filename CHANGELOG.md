@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.24.2](https://github.com/nrwl/nx-console/compare/v17.24.1...v17.24.2) (2022-11-02)
+
+
+### Bug Fixes
+
+* make graph buttons work again ([#1401](https://github.com/nrwl/nx-console/issues/1401)) ([6d5fa0c](https://github.com/nrwl/nx-console/commits/6d5fa0ccda0139398869651cb9b9c171dcc8c95f))
+
 ### [17.24.1](https://github.com/nrwl/nx-console/compare/v17.24.0...v17.24.1) (2022-11-02)
 
 
