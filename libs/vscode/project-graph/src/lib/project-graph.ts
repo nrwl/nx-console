@@ -3,6 +3,10 @@ import { findProjectWithPath } from '@nx-console/shared/workspace';
 import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
+import {
+  NxTreeItem,
+  ProjectViewItem,
+} from '@nx-console/vscode/nx-project-view';
 
 export function projectGraph() {
   const graphWebView = new GraphWebView();
@@ -23,24 +27,28 @@ export function projectGraph() {
     }),
     commands.registerCommand(
       'nx.graph.focus.button',
-      async ({
-        nxProject: { project: projectName },
-      }: {
-        nxProject: { project: string };
-      }) => {
+      async (treeItem: NxTreeItem) => {
         getTelemetry().featureUsed('nx.graph.focus.button');
-        graphWebView.projectInWebview(projectName, MessageType.focus);
+        const project = getProjectItem(treeItem);
+        if (project) {
+          graphWebView.projectInWebview(
+            project.nxProject.project,
+            MessageType.focus
+          );
+        }
       }
     ),
     commands.registerCommand(
       'nx.graph.select.button',
-      async ({
-        nxProject: { project: projectName },
-      }: {
-        nxProject: { project: string };
-      }) => {
-        getTelemetry().featureUsed('nx.graph.select.button');
-        graphWebView.projectInWebview(projectName, MessageType.select);
+      async (treeItem: NxTreeItem) => {
+        getTelemetry().featureUsed('nx.graph.focus.button');
+        const project = getProjectItem(treeItem);
+        if (project) {
+          graphWebView.projectInWebview(
+            project.nxProject.project,
+            MessageType.select
+          );
+        }
       }
     )
   );
@@ -65,4 +73,10 @@ async function openProjectWithFile(
 
   const project = await findProjectWithPath(filePath, getWorkspacePath());
   webview.projectInWebview(project?.name, messageType);
+}
+
+function getProjectItem(item: NxTreeItem): ProjectViewItem | undefined {
+  if (item.contextValue === 'project') {
+    return item.item as ProjectViewItem;
+  }
 }
