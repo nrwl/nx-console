@@ -92,7 +92,7 @@ export const config: Options.Testrunner = {
   capabilities: [
     {
       browserName: 'vscode',
-      browserVersion: 'stable',
+      browserVersion: '1.72.2',
       'wdio:vscodeOptions': {
         // point to the root directory of your project
         vscodeArgs: { 'disable-extensions': true },
