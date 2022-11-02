@@ -852,11 +852,11 @@
       },
       {
         "view": "nxConsole.views.welcome",
-        "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
+        "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-co``nsole-for-vscode)"
       },
       {
         "view": "nxCloud.views.welcome",
-        "contents": "You are not connected to Nx Cloud!"
+        "contents": "You are not connected to Nx Cloud! \n [Connect to Nx Cloud](command:nxConsole.connectToNxCloud)"
       }
     ],
     "walkthroughs": [
