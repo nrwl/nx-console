@@ -2,7 +2,8 @@ type NxCloudTreeTypes =
   | 'NxCloudRun'
   | 'NxCloudRunDetails'
   | 'NxCloudTasksPlaceholder'
-  | 'NxCloudTask';
+  | 'NxCloudTask'
+  | 'NxCloudLoadMoreRuns';
 
 // https://stackoverflow.com/a/46470717 -- build DRY type guards for subclasses
 interface NxCloudTreeDataConstructor<T extends NxCloudTreeDataBase> {

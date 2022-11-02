@@ -19,23 +19,39 @@ import {
   NxCloudTasksPlaceholderTreeItem,
 } from './tree/nx-cloud-tasks-placeholder';
 import { NxCloudTreeDataBase } from './tree/nx-cloud-tree-data-base';
+import { NxCloudApiService } from './nx-cloud-api-service';
+import {
+  LOAD_MORE_CLOUD_RUNS_COMMAND,
+  NxCloudLoadMoreRunsTreeData,
+  NxCloudLoadMoreRunsTreeItem,
+} from './tree/nx-cloud-load-more-runs';
 
 const REFRESH_CLOUD_RUNS_COMMAND = 'nxConsole.cloud.refreshCloudRuns';
 
 export class NxCloudRunsProvider
   implements TreeDataProvider<NxCloudTreeDataBase>
 {
+  private cloudApiService = new NxCloudApiService();
+
   constructor() {
     commands.registerCommand(REFRESH_CLOUD_RUNS_COMMAND, () => this.refresh());
+    commands.registerCommand(LOAD_MORE_CLOUD_RUNS_COMMAND, () =>
+      this.loadMoreCloudRuns()
+    );
   }
 
-  // TODO: REFACTOR TO USE SEPARATE DATA CLASSES AND TREE ITEMS
   async getChildren(
     treeData?: NxCloudTreeDataBase | undefined
   ): Promise<NxCloudTreeDataBase[] | null | undefined> {
     if (!treeData) {
-      const cloudRuns = await this.getCloudRuns();
-      return cloudRuns.map((cloudRun) => new NxCloudRunTreeData(cloudRun));
+      let cloudRuns = this.cloudApiService.getCloudRuns();
+      if (cloudRuns.length === 0) {
+        cloudRuns = await this.cloudApiService.loadMoreCloudRuns();
+      }
+      const cloudRunData = cloudRuns.map(
+        (cloudRun) => new NxCloudRunTreeData(cloudRun)
+      );
+      return [...cloudRunData, new NxCloudLoadMoreRunsTreeData()];
     }
     if (treeData.instanceOf(NxCloudRunTreeData)) {
       const children = [];
@@ -60,7 +76,17 @@ export class NxCloudRunsProvider
     if (treeData.instanceOf(NxCloudTasksPlaceholderTreeData)) {
       return new NxCloudTasksPlaceholderTreeItem(treeData);
     }
-    return new NxCloudTaskTreeItem(treeData as NxCloudTaskTreeData);
+    if (treeData.instanceOf(NxCloudTaskTreeData)) {
+      return new NxCloudTaskTreeItem(treeData);
+    }
+    return new NxCloudLoadMoreRunsTreeItem(
+      treeData as NxCloudLoadMoreRunsTreeData
+    );
+  }
+
+  async loadMoreCloudRuns(): Promise<void> {
+    await this.cloudApiService.loadMoreCloudRuns();
+    this._onDidChangeTreeData.fire(undefined);
   }
 
   // refresh handling
@@ -70,52 +96,9 @@ export class NxCloudRunsProvider
   readonly onDidChangeTreeData: Event<NxCloudTreeDataBase | undefined> =
     this._onDidChangeTreeData.event;
 
-  refresh(): void {
+  async refresh(): Promise<void> {
+    this.cloudApiService.reset();
+    await this.cloudApiService.loadMoreCloudRuns();
     this._onDidChangeTreeData.fire(undefined);
-  }
-
-  async getCloudRuns(): Promise<CloudRun[]> {
-    const endpoint = 'https://cloud.nx.app/api';
-    const query = `
-    query GetRunListPage(
-      $workspaceId: ID!
-    ) {
-       workspaces(workspaceId: $workspaceId) {
-        runListPage(
-          limit: 10
-          offset: 0
-          orphans: false
-          status: ""
-          branch: ""
-        ) {
-          hasNext
-          pageCount
-          offset
-          limit
-          orphans
-          runs {
-            linkId
-            workspaceId
-            command
-            startTime
-            endTime
-            branch
-            runGroup
-            tasks {
-              status
-              projectName
-            }
-          }
-        }
-      }
-    }`;
-    const variables = {
-      workspaceId: '60391f45cfedf9713ddaa491',
-    };
-    const data = await request<{
-      workspaces: { runListPage: { runs: CloudRun[] } }[];
-    }>(endpoint, query, variables);
-    console.log(data);
-    return data.workspaces[0].runListPage.runs;
   }
 }
