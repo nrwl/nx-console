@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.24.1](https://github.com/nrwl/nx-console/compare/v17.24.0...v17.24.1) (2022-11-02)
+
+
+### Bug Fixes
+
+* do not show nx daemon message ([7bfaabc](https://github.com/nrwl/nx-console/commits/7bfaabc83cc8f288d1eba41e7b0cfa3f49e496f7))
+
 ## [17.24.0](https://github.com/nrwl/nx-console/compare/v17.23.3...v17.24.0) (2022-11-02)
 
 
