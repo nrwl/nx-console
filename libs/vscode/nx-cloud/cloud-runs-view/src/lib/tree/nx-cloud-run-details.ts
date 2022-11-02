@@ -1,22 +1,36 @@
 import { differenceInMilliseconds, parseISO } from 'date-fns';
 import { TreeItem, TreeItemCollapsibleState } from 'vscode';
-import { CloudRun } from './cloud-run.model';
+import { CloudRun } from '../cloud-run.model';
+import { NxCloudTreeDataBase } from './nx-cloud-tree-data-base';
 
-export class NxCloudRunDetailsTreeItem extends TreeItem {
-  constructor(private cloudRun: CloudRun) {
-    super('');
-    this.description = `Branch: ${cloudRun.branch} ⌛ ${this.getDuration()}`;
-    this.collapsibleState = TreeItemCollapsibleState.None;
+export class NxCloudRunDetailsTreeData extends NxCloudTreeDataBase {
+  static readonly type = 'NxCloudRunDetails';
+  description: string;
+  cloudRun: CloudRun;
+
+  constructor(cloudRun: CloudRun) {
+    super();
+    this.description = `Branch: ${cloudRun.branch} ⌛ ${this.getDuration(
+      cloudRun
+    )}`;
   }
 
-  getDuration() {
-    const start = parseISO(this.cloudRun.startTime);
-    const end = parseISO(this.cloudRun.endTime);
+  private getDuration(cloudRun: CloudRun) {
+    const start = parseISO(cloudRun.startTime);
+    const end = parseISO(cloudRun.endTime);
     return formatMillis(differenceInMilliseconds(end, start));
   }
 }
 
-export function formatMillis(millis: number) {
+export class NxCloudRunDetailsTreeItem extends TreeItem {
+  constructor(treeData: NxCloudRunDetailsTreeData) {
+    super('');
+    this.description = treeData.description;
+    this.collapsibleState = TreeItemCollapsibleState.None;
+  }
+}
+
+function formatMillis(millis: number) {
   let seconds = Math.floor(millis / 1000);
 
   if (seconds < 1) {

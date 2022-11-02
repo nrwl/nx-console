@@ -23,5 +23,5 @@ export abstract class AbstractTreeProvider<Item extends TreeItem>
   }
 
   abstract getChildren(element?: Item): ProviderResult<Item[]>;
-  getParent?(element: Item): ProviderResult<Item | null | undefined>;
+  abstract getParent?(element: Item): ProviderResult<Item | null | undefined>;
 }
