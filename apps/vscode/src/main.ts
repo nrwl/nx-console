@@ -96,8 +96,6 @@ export async function activate(c: ExtensionContext) {
 
     initTelemetry(GlobalConfigurationStore.instance, environment.production);
 
-    const lspContext = configureLspClient(context);
-
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,
     }) as TreeView<RunTargetTreeItem>;
@@ -229,6 +227,8 @@ async function setWorkspace(workspacePath: string) {
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
+  const lspContext = configureLspClient(context);
+
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
@@ -261,7 +261,8 @@ async function setWorkspace(workspacePath: string) {
     context.subscriptions.push(
       nxCommandsTreeView,
       nxProjectTreeView,
-      nxHelpAndFeedbackTreeView
+      nxHelpAndFeedbackTreeView,
+      lspContext
     );
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);

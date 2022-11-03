@@ -13,6 +13,10 @@ import {
 let client: LanguageClient;
 
 export function configureLspClient(context: ExtensionContext): Disposable {
+  if (client) {
+    client.dispose();
+  }
+
   const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
 
   const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };

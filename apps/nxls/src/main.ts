@@ -70,7 +70,8 @@ connection.onInitialize(async (params) => {
     WORKING_PATH =
       workspacePath ??
       params.rootPath ??
-      URI.parse(params.rootUri ?? '').fsPath;
+      URI.parse(params.rootUri ?? '').fsPath ??
+      params.workspaceFolders?.[0]?.uri;
 
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
@@ -192,7 +193,7 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {
-    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+    return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
 
   await nxWorkspace(WORKING_PATH, lspLogger, true);

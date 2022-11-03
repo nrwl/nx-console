@@ -25,6 +25,8 @@ describe('NxConsole Projects View in an Ng workspace', () => {
     );
     await projectsViewElem.waitForExist({ timeout: 10000 });
 
+    debugger;
+
     expect(projectsViewElem).toExist();
   });
 

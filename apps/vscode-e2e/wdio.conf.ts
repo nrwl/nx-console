@@ -96,6 +96,7 @@ export const config: Options.Testrunner = {
       'wdio:vscodeOptions': {
         // point to the root directory of your project
         vscodeArgs: { 'disable-extensions': true },
+        userSettings: { 'NxConsoleClient.trace.server': 'verbose' },
         extensionPath: join(__dirname, '../..', 'dist/apps/vscode'),
       },
 
