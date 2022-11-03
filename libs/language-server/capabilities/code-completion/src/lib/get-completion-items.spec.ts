@@ -14,7 +14,7 @@ import { getCompletionItems } from './get-completion-items';
 import { NxWorkspace } from '@nx-console/shared/types';
 
 jest.mock(
-  '@nx-console/shared/workspace',
+  '@nx-console/language-server/workspace',
   (): Partial<typeof workspace> => ({
     nxWorkspace: jest.fn(() =>
       Promise.resolve<NxWorkspace>({
