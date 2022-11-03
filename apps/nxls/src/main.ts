@@ -78,7 +78,7 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+    configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
