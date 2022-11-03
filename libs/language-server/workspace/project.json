@@ -1,23 +1,24 @@
 {
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/add-dependency/src",
+  "name": "language-server-workspace",
+  "sourceRoot": "libs/language-server/workspace/src",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/vscode/add-dependency/**/*.ts"]
+        "lintFilePatterns": ["libs/language-server/workspace/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/add-dependency"],
+      "outputs": ["coverage/libs/language-server/workspace"],
       "options": {
-        "jestConfig": "libs/vscode/add-dependency/jest.config.ts",
+        "jestConfig": "libs/language-server/workspace/jest.config.ts",
         "passWithNoTests": true
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": ["type:lsp"]
 }

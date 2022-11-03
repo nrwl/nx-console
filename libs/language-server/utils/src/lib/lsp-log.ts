@@ -13,6 +13,9 @@ export function setLspLogger(connection: Connection) {
 
 export const lspLogger: Logger = {
   log(message: string, ...args: any[]) {
-    log?.(message, ...args);
+    log?.(
+      `[Nxls] - ${new Date(Date.now()).toISOString()} - ${message}\n`,
+      ...args
+    );
   },
 };

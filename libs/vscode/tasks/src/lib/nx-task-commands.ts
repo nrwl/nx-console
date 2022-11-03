@@ -1,15 +1,11 @@
 import { Option, OptionType } from '@nx-console/shared/schema';
-import { commands, ExtensionContext, window, tasks } from 'vscode';
+import { commands, ExtensionContext, tasks, window } from 'vscode';
 
+import { getTelemetry } from '@nx-console/vscode/utils';
 import { CliTaskProvider } from './cli-task-provider';
-import { selectFlags } from './select-flags';
 import { NxTask } from './nx-task';
-import { nxWorkspace } from '@nx-console/shared/workspace';
-import {
-  getTelemetry,
-  getWorkspacePath,
-  outputLogger,
-} from '@nx-console/vscode/utils';
+import { selectFlags } from './select-flags';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 
 let cliTaskProvider: CliTaskProvider;
 export function registerNxCommands(
@@ -46,10 +42,7 @@ export function registerNxCommands(
 }
 
 async function promptForTarget(): Promise<string | undefined> {
-  const { validWorkspaceJson, workspace } = await nxWorkspace(
-    getWorkspacePath(),
-    outputLogger
-  );
+  const { validWorkspaceJson, workspace } = await getNxWorkspace();
 
   if (!validWorkspaceJson || !workspace) {
     return;
@@ -369,10 +362,7 @@ async function promptForMigrate() {
 async function validProjectsForTarget(
   target: string
 ): Promise<string[] | undefined> {
-  const { validWorkspaceJson, workspace } = await nxWorkspace(
-    getWorkspacePath(),
-    outputLogger
-  );
+  const { validWorkspaceJson, workspace } = await getNxWorkspace();
 
   if (!validWorkspaceJson || !workspace) {
     return;

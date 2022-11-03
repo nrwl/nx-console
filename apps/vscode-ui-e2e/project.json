@@ -28,6 +28,6 @@
       }
     }
   },
-  "tags": [],
+  "tags": ["type:vscode-ui"],
   "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
 }

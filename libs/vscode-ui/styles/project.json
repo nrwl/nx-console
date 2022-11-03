@@ -4,5 +4,5 @@
   "sourceRoot": "libs/vscode-ui/styles/src",
   "targets": {},
   "generators": {},
-  "tags": []
+  "tags": ["type:vscode-ui"]
 }

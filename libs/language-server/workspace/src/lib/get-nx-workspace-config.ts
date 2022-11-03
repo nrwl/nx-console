@@ -3,18 +3,16 @@ import type {
   ProjectGraph,
   ProjectsConfigurations,
 } from '@nrwl/devkit';
-import { join } from 'path';
-import {
-  getNxDaemonClient,
-  getNxProjectGraph,
-  getNxWorkspacePackageFileUtils,
-} from './get-nx-workspace-package';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { nxVersion } from '@nx-console/shared/npm';
 import { Logger } from '@nx-console/shared/schema';
-
-export type NxWorkspaceConfiguration = ProjectsConfigurations &
-  NxJsonConfiguration;
+import { join } from 'path';
+import {
+  getNxProjectGraph,
+  getNxWorkspacePackageFileUtils,
+} from './get-nx-workspace-package';
+import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
+import { lspLogger } from '@nx-console/language-server/utils';
 
 let projectGraph: ProjectGraph | null = null;
 
@@ -37,9 +35,12 @@ export async function getNxWorkspaceConfig(
   configPath: string;
   daemonEnabled?: boolean;
 }> {
+  const start = performance.now();
+  logger.log('Retrieving workspace configuration');
   const version = await nxVersion(workspacePath);
 
   if (version.major < 12) {
+    lspLogger.log('Major version is less than 12');
     return readWorkspaceConfigs(format, workspacePath);
   }
 
@@ -49,14 +50,6 @@ export async function getNxWorkspaceConfig(
       getNxProjectGraph(workspacePath, logger),
     ]);
     const configFile = nxWorkspacePackage.workspaceFileName();
-    let isDaemonEnabled = true;
-    try {
-      const nxDaemonClient = await getNxDaemonClient(workspacePath, logger);
-      nxDaemonClient.daemonClient.reset();
-      isDaemonEnabled = nxDaemonClient.daemonClient.enabled();
-    } catch {
-      logger.log('Unable to load Nx daemon utils');
-    }
 
     let workspaceConfiguration: NxWorkspaceConfiguration;
     try {
@@ -65,6 +58,7 @@ export async function getNxWorkspaceConfig(
         path: workspacePath,
       });
     } catch {
+      logger.log('Unable to read workspace config from nx workspace package');
       workspaceConfiguration = (
         await readWorkspaceConfigs(format, workspacePath)
       ).workspaceConfiguration;
@@ -82,25 +76,26 @@ export async function getNxWorkspaceConfig(
       if (version.major < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else {
-        // we always want to try to get the project graph on first load.
-        // So even if the daemon is disabled, we still want to try to get the project graph
-        if (isDaemonEnabled || projectGraph === null) {
-          projectGraph = await nxProjectGraph.createProjectGraphAsync({
-            exitOnError: false,
-            resetDaemonClient: true,
-          });
-        }
+        lspLogger.log('createProjectGraphAsync');
+        projectGraph = await nxProjectGraph.createProjectGraphAsync({
+          exitOnError: false,
+          resetDaemonClient: true,
+        });
+        lspLogger.log('createProjectGraphAsync successful');
       }
-    } catch {
-      //noop
+    } catch (e) {
+      lspLogger.log('Unable to get project graph');
+      lspLogger.log(e.message);
     }
 
     addProjectTargets(workspaceConfiguration, projectGraph);
 
+    const end = performance.now();
+    logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
+
     return {
       workspaceConfiguration,
       configPath: join(workspacePath, configFile),
-      daemonEnabled: isDaemonEnabled,
     };
   } catch (e) {
     return readWorkspaceConfigs(format, workspacePath);

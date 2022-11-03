@@ -1,19 +1,18 @@
+import { getGenerators } from '@nx-console/shared/collections';
+import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import {
   Generator,
   GeneratorType,
   Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import { QuickPickItem, window } from 'vscode';
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
-import { getGenerators } from '@nx-console/shared/collections';
 import { normalizeSchema } from '@nx-console/shared/schema/normalize';
-import { nxWorkspace } from '@nx-console/shared/workspace';
-import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { QuickPickItem, window } from 'vscode';
 
 async function readWorkspaceJsonDefaults(): Promise<any> {
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
+  const { workspace } = await getNxWorkspace();
 
   let defaults = workspace.generators;
 
@@ -84,7 +83,7 @@ export async function selectGenerator(
     generatorName: string;
     collectionPath: string;
   }
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
+  const { workspace } = await getNxWorkspace();
   const generators = await getGenerators(workspacePath, workspace.projects);
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)

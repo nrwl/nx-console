@@ -1,5 +1,4 @@
 import { getTelemetry, getWorkspacePath } from '@nx-console/vscode/utils';
-import { findProjectWithPath } from '@nx-console/shared/workspace';
 import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
@@ -7,6 +6,7 @@ import {
   NxTreeItem,
   ProjectViewItem,
 } from '@nx-console/vscode/nx-project-view';
+import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
 
 export function projectGraph() {
   const graphWebView = new GraphWebView();

@@ -67,6 +67,7 @@ import {
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
 import {
+  getNxWorkspace,
   stopDaemon,
   WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
@@ -94,6 +95,8 @@ export async function activate(c: ExtensionContext) {
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
 
     initTelemetry(GlobalConfigurationStore.instance, environment.production);
+
+    const lspContext = configureLspClient(context);
 
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,
@@ -132,7 +135,7 @@ export async function activate(c: ExtensionContext) {
       manuallySelectWorkspaceDefinitionCommand,
       refreshWorkspace(),
       projectGraph(),
-      await configureLspClient(context)
+      lspContext
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
@@ -300,9 +303,7 @@ async function setWorkspace(workspacePath: string) {
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {
-  const { nxWorkspace } = await import('@nx-console/shared/workspace');
-
-  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
+  const { workspaceLayout } = await getNxWorkspace();
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(workspacePath, workspaceLayout.appsDir),
@@ -346,9 +347,7 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const { nxWorkspace } = await import('@nx-console/shared/workspace');
-
-  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
+  const { workspaceLayout } = await getNxWorkspace();
   const workspacePackageDirs = new Set<string>();
   workspacePackageDirs.add(workspaceLayout.appsDir);
   workspacePackageDirs.add(workspaceLayout.libsDir);

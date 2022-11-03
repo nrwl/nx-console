@@ -1,6 +1,6 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { isAbsolute, join, relative } from 'path';
-import { nxWorkspace } from './workspace';
+import { getNxWorkspace } from './get-nx-workspace';
 
 export async function findProjectWithPath(
   selectedPath: string | undefined,
@@ -10,7 +10,7 @@ export async function findProjectWithPath(
     return null;
   }
 
-  const { workspace } = await nxWorkspace(workspacePath);
+  const { workspace } = await getNxWorkspace();
   const projectEntries = Object.entries(workspace.projects);
   const entry = projectEntries.find(([, def]) => {
     const fullProjectPath = join(

@@ -99,5 +99,5 @@
       "outputs": ["coverage/apps/vscode-ui"]
     }
   },
-  "tags": []
+  "tags": ["type:vscode-ui"]
 }

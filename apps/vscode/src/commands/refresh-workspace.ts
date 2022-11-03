@@ -1,6 +1,7 @@
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
 import { sendNotification } from '@nx-console/vscode/lsp-client';
-import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { outputLogger } from '@nx-console/vscode/utils';
 import { debounceTime, Subject } from 'rxjs';
 import { commands } from 'vscode';
 
@@ -9,12 +10,7 @@ export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 const refresh = new Subject();
 
 refresh.pipe(debounceTime(150)).subscribe(async () => {
-  const { nxWorkspace } = await import('@nx-console/shared/workspace');
-  const { daemonEnabled, workspaceType } = await nxWorkspace(
-    getWorkspacePath(),
-    outputLogger,
-    true
-  );
+  const { daemonEnabled, workspaceType } = await getNxWorkspace();
 
   if (!daemonEnabled && workspaceType === 'nx') {
     outputLogger.log('Nx Daemon is not enabled.');

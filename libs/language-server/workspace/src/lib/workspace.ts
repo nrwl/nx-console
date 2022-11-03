@@ -16,24 +16,8 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import {
-  getNxWorkspaceConfig,
-  NxWorkspaceConfiguration,
-} from './get-nx-workspace-config';
-
-export interface NxWorkspace {
-  validWorkspaceJson: boolean;
-  workspace: NxWorkspaceConfiguration;
-  workspaceType: 'ng' | 'nx';
-  configurationFilePath: string;
-  daemonEnabled?: boolean;
-  workspacePath: string;
-  isLerna: boolean;
-  workspaceLayout: {
-    appsDir: string;
-    libsDir: string;
-  };
-}
+import { getNxWorkspaceConfig } from './get-nx-workspace-config';
+import { NxWorkspace } from '@nx-console/shared/types';
 
 const enum Status {
   not_started,

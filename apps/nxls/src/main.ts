@@ -22,7 +22,7 @@ import {
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
 } from '@nx-console/shared/json-schema';
-import { nxWorkspace } from '@nx-console/shared/workspace';
+import { nxWorkspace } from '@nx-console/language-server/workspace';
 import {
   ClientCapabilities,
   CompletionList,
@@ -182,14 +182,12 @@ connection.onShutdown(() => {
   jsonDocumentMapper.dispose();
 });
 
-connection.onRequest(NxWorkspaceRequest, async () => {
+connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  const workspace = await nxWorkspace(WORKING_PATH, lspLogger);
-
-  return workspace.workspace;
+  return nxWorkspace(WORKING_PATH, lspLogger, reset);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {

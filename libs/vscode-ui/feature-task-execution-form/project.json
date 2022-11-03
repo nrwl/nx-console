@@ -54,5 +54,5 @@
     }
   },
   "generators": {},
-  "tags": []
+  "tags": ["type:vscode-ui"]
 }

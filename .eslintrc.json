@@ -13,10 +13,6 @@
             "allow": [],
             "depConstraints": [
               {
-                "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
-              },
-              {
                 "sourceTag": "type:vscode",
                 "onlyDependOnLibsWithTags": ["type:shared", "type:vscode"]
               },
@@ -29,6 +25,10 @@
                 "sourceTag": "type:shared",
                 "onlyDependOnLibsWithTags": ["type:shared"],
                 "bannedExternalImports": ["vscode"]
+              },
+              {
+                "sourceTag": "type:vscode-ui",
+                "onlyDependOnLibsWithTags": ["type:shared", "type:vscode-ui"]
               }
             ]
           }

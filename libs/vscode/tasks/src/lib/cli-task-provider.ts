@@ -5,12 +5,12 @@ import {
 } from '@nx-console/shared/schema';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
   getWorkspacePath,
   outputLogger,
 } from '@nx-console/vscode/utils';
-import { nxWorkspace } from '@nx-console/shared/workspace';
 import {
   ProviderResult,
   Task,
@@ -120,7 +120,7 @@ export class CliTaskProvider implements TaskProvider {
     if (json) {
       return json.projects;
     } else {
-      const result = await nxWorkspace(getWorkspacePath(), outputLogger);
+      const result = await getNxWorkspace();
       if (!result.validWorkspaceJson || !result.workspace) {
         return {};
       } else {

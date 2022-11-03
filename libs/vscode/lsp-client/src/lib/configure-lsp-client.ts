@@ -1,12 +1,10 @@
-import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
-import { nxWorkspace } from '@nx-console/shared/workspace';
+import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { Disposable, ExtensionContext } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
   NotificationType,
-  ProtocolNotificationType,
   RequestType,
   ServerOptions,
   TransportKind,
@@ -14,14 +12,7 @@ import {
 
 let client: LanguageClient;
 
-export async function configureLspClient(
-  context: ExtensionContext
-): Promise<Disposable> {
-  const { workspacePath, workspace } = await nxWorkspace(
-    getWorkspacePath(),
-    outputLogger
-  );
-
+export function configureLspClient(context: ExtensionContext): Disposable {
   const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
 
   const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
@@ -39,8 +30,7 @@ export async function configureLspClient(
   const clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     initializationOptions: {
-      workspacePath,
-      projects: workspace.projects,
+      workspacePath: getWorkspacePath(),
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },
@@ -73,4 +63,11 @@ export async function configureLspClient(
 
 export function sendNotification<P>(notificationType: NotificationType<P>) {
   client.sendNotification(notificationType);
+}
+
+export function sendRequest<P, R, E>(
+  requestType: RequestType<P, R, E>,
+  params: P
+) {
+  return client.sendRequest(requestType, params);
 }
