@@ -33,7 +33,8 @@ export class GlobalConfigurationStore implements Store {
   private constructor(private readonly state: Memento) {}
 
   get<T extends keyof GlobalConfig>(key: T): GlobalConfig[T] | null;
-  get<T>(key: GlobalConfigKeys, defaultValue?: T): T | null;
+  get<T>(key: GlobalConfigKeys): T | null;
+  get<T>(key: GlobalConfigKeys, defaultValue: T): T;
   get<T>(key: GlobalConfigKeys, defaultValue?: T): T | null {
     const value = this.storage(key).get(key, defaultValue);
     return typeof value === 'undefined' ? defaultValue || null : value;

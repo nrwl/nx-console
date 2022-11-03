@@ -1,29 +1,45 @@
 import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 import { join } from 'path';
 
+export type NxCommandConfig =
+  | {
+      type: 'add-dependency';
+      command: 'nxConsole.addDependency';
+      label: 'Add Dependency';
+    }
+  | {
+      type: 'add-dev-dependency';
+      command: 'nxConsole.addDevDependency';
+      label: 'Add Dev Dependency';
+    }
+  | {
+      command: string;
+      type: 'vscode-command' | 'arbitrary-command';
+      label: string;
+    };
+
 export class NxCommandsTreeItem extends TreeItem {
-  command = {
-    title: this.affectedCommand,
-    command: `nx.${this.affectedCommand.replace(':', '.')}`,
-    tooltip: `Run nx ${this.affectedCommand}`,
-  };
-
-  iconPath = {
-    light: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-light.svg')),
-    dark: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-dark.svg')),
-  };
-
   constructor(
-    readonly affectedCommand: string,
+    readonly commandConfig: NxCommandConfig,
     readonly extensionPath: string
   ) {
-    super(affectedCommand, TreeItemCollapsibleState.None);
-    if (this.affectedCommand === 'Add Dependency') {
-      this.command = {
-        title: this.affectedCommand,
-        command: 'nxConsole.addDependency',
-        tooltip: 'Add dependency',
-      };
+    super(commandConfig.label, TreeItemCollapsibleState.None);
+
+    this.command = {
+      title: commandConfig.label,
+      command: commandConfig.command,
+      tooltip:
+        commandConfig.type === 'add-dependency' ||
+        commandConfig.type === 'add-dev-dependency'
+          ? commandConfig.label
+          : `Run ${commandConfig.label}`,
+    };
+
+    this.setIcon(commandConfig);
+  }
+
+  setIcon(commandConfig: NxCommandConfig) {
+    if (commandConfig.type === 'add-dependency') {
       this.iconPath = {
         light: Uri.file(
           join(this.extensionPath, 'assets', 'nx-console-light.svg')
@@ -32,13 +48,7 @@ export class NxCommandsTreeItem extends TreeItem {
           join(this.extensionPath, 'assets', 'nx-console-dark.svg')
         ),
       };
-    }
-    if (this.affectedCommand === 'Add Dev Dependency') {
-      this.command = {
-        title: this.affectedCommand,
-        command: 'nxConsole.addDevDependency',
-        tooltip: 'Add dev dependency',
-      };
+    } else if (commandConfig.type === 'add-dev-dependency') {
       this.iconPath = {
         light: Uri.file(
           join(this.extensionPath, 'assets', 'nx-console-light.svg')
@@ -46,6 +56,11 @@ export class NxCommandsTreeItem extends TreeItem {
         dark: Uri.file(
           join(this.extensionPath, 'assets', 'nx-console-dark.svg')
         ),
+      };
+    } else {
+      this.iconPath = {
+        light: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-light.svg')),
+        dark: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-dark.svg')),
       };
     }
   }

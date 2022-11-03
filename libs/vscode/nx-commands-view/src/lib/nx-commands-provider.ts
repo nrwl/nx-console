@@ -1,6 +1,7 @@
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
-import { NxCommandsTreeItem } from './nx-commands-tree-item';
-import { ExtensionContext } from 'vscode';
+import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
+import { ExtensionContext, commands } from 'vscode';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 
 export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeItem> {
   constructor(private readonly context: ExtensionContext) {
@@ -11,20 +12,46 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     return null;
   }
 
-  getChildren() {
-    return [
-      'run-many',
-      'affected',
-      'affected:apps',
-      'affected:build',
-      'affected:e2e',
-      'affected:libs',
-      'affected:lint',
-      'affected:test',
-      'list',
-      'migrate',
-      'Add Dependency',
-      'Add Dev Dependency',
-    ].map((c) => new NxCommandsTreeItem(c, this.context.extensionPath));
+  async getChildren() {
+    const commonCommands = GlobalConfigurationStore.instance.get<string[]>(
+      'commonNxCommands',
+      []
+    );
+    const vscodeCommands = new Set(await commands.getCommands(true));
+    const availableCommands: NxCommandConfig[] = commonCommands.map(
+      (command) => {
+        const transformedCommand = `nx.${command.replace(':', '.')}`;
+        if (vscodeCommands.has(transformedCommand)) {
+          return {
+            command: transformedCommand,
+            type: 'vscode-command',
+            label: transformedCommand,
+          };
+        }
+        if (command === 'Add Dependency') {
+          return {
+            type: 'add-dependency',
+            command: 'nxConsole.addDependency',
+            label: 'Add Dependency',
+          };
+        }
+        if (command === 'Add Dev Dependency') {
+          return {
+            type: 'add-dev-dependency',
+            command: 'nxConsole.addDevDependency',
+            label: 'Add Dev Dependency',
+          };
+        }
+        return {
+          command,
+          type: 'arbitrary-command',
+          label: command,
+        };
+      }
+    );
+
+    return availableCommands.map(
+      (c) => new NxCommandsTreeItem(c, this.context.extensionPath)
+    );
   }
 }

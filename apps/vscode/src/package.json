@@ -695,6 +695,28 @@
           "default": true,
           "description": "Help make Nx Console better by sending anonymous usage data to the Nx Console team."
         },
+        "nxConsole.commonNxCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "default": [
+            "run-many",
+            "affected",
+            "affected:apps",
+            "affected:build",
+            "affected:e2e",
+            "affected:libs",
+            "affected:lint",
+            "affected:test",
+            "list",
+            "migrate",
+            "Add Dependency",
+            "Add Dev Dependency"
+          ],
+          "description": "Common Nx commands that will be available in the sidebar view."
+        },
         "nxConsole.enableGenerateFromContextMenu": {
           "type": "boolean",
           "default": true,
