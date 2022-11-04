@@ -44,8 +44,6 @@ jobs:
     name: Nx Cloud - Agent E2E
     timeout-minutes: 15
     steps:
-      - name: Debugging with tmate
-        uses: mxschmitt/action-tmate@v3.13
       - name: Set nx run variable
         run: echo "NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}" >> $GITHUB_ENV
       - uses: actions/checkout@v2
