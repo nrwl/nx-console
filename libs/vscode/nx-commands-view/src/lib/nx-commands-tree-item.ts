@@ -1,5 +1,6 @@
 import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 import { join } from 'path';
+import { EXECUTE_ARBITRARY_COMMAND } from './nx-commands-provider';
 
 export type NxCommandConfig =
   | {
@@ -27,7 +28,14 @@ export class NxCommandsTreeItem extends TreeItem {
 
     this.command = {
       title: commandConfig.label,
-      command: commandConfig.command,
+      command:
+        commandConfig.type === 'arbitrary-command'
+          ? EXECUTE_ARBITRARY_COMMAND
+          : commandConfig.command,
+      arguments:
+        commandConfig.type === 'arbitrary-command'
+          ? [commandConfig.command]
+          : [],
       tooltip:
         commandConfig.type === 'add-dependency' ||
         commandConfig.type === 'add-dev-dependency'

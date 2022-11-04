@@ -1,11 +1,26 @@
-import { AbstractTreeProvider } from '@nx-console/vscode/utils';
-import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
-import { ExtensionContext, commands } from 'vscode';
+import { detectPackageManager } from '@nrwl/devkit';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  AbstractTreeProvider,
+  getShellExecutionForConfig,
+  getWorkspacePath,
+} from '@nx-console/vscode/utils';
+import { commands, ExtensionContext, Task, tasks, TaskScope } from 'vscode';
+import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
+
+export const EXECUTE_ARBITRARY_COMMAND = 'nxConsole.executeArbitraryCommand';
 
 export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeItem> {
   constructor(private readonly context: ExtensionContext) {
     super();
+    commands.registerCommand(
+      EXECUTE_ARBITRARY_COMMAND,
+      this.executeArbirtraryCommand
+    );
+    GlobalConfigurationStore.instance.onConfigurationChange(() =>
+      this.refresh()
+    );
   }
 
   getParent(_: NxCommandsTreeItem) {
@@ -25,17 +40,17 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
           return {
             command: transformedCommand,
             type: 'vscode-command',
-            label: transformedCommand,
+            label: command,
           };
         }
-        if (command === 'Add Dependency') {
+        if (command === 'add-dependency') {
           return {
             type: 'add-dependency',
             command: 'nxConsole.addDependency',
             label: 'Add Dependency',
           };
         }
-        if (command === 'Add Dev Dependency') {
+        if (command === 'add-dev-dependency') {
           return {
             type: 'add-dev-dependency',
             command: 'nxConsole.addDevDependency',
@@ -53,5 +68,25 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     return availableCommands.map(
       (c) => new NxCommandsTreeItem(c, this.context.extensionPath)
     );
+  }
+
+  async executeArbirtraryCommand(command: string) {
+    const prefixedCommand = command.startsWith('nx ')
+      ? command
+      : `nx ${command}`;
+    const { workspacePath, workspaceType } = await getNxWorkspace();
+    const pkgManager = detectPackageManager(workspacePath);
+
+    const task = new Task(
+      { type: workspaceType },
+      TaskScope.Workspace,
+      prefixedCommand,
+      pkgManager,
+      getShellExecutionForConfig({
+        cwd: workspacePath,
+        displayCommand: prefixedCommand,
+      })
+    );
+    tasks.executeTask(task);
   }
 }
