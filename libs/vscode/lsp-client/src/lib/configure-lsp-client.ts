@@ -1,3 +1,4 @@
+import { NxChangeWorkspace } from '@nx-console/language-server/types';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { Disposable, ExtensionContext } from 'vscode';
@@ -10,11 +11,14 @@ import {
   TransportKind,
 } from 'vscode-languageclient/node';
 
-let client: LanguageClient;
+let client: LanguageClient | undefined;
 
 export function configureLspClient(context: ExtensionContext): Disposable {
   if (client) {
-    client.dispose();
+    sendNotification(NxChangeWorkspace, getWorkspacePath());
+    return {
+      dispose,
+    };
   }
 
   const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
@@ -55,23 +59,29 @@ export function configureLspClient(context: ExtensionContext): Disposable {
   client.start();
 
   return {
-    dispose() {
-      if (!client) {
-        return;
-      }
-
-      return client.stop();
-    },
+    dispose,
   };
 }
 
-export function sendNotification<P>(notificationType: NotificationType<P>) {
-  client.sendNotification(notificationType);
+function dispose() {
+  if (!client) {
+    return;
+  }
+
+  client.stop();
+  client = undefined;
+}
+
+export function sendNotification<P>(
+  notificationType: NotificationType<P>,
+  params?: P
+) {
+  client?.sendNotification(notificationType, params);
 }
 
 export function sendRequest<P, R, E>(
   requestType: RequestType<P, R, E>,
   params: P
 ) {
-  return client.sendRequest(requestType, params);
+  return client?.sendRequest(requestType, params);
 }

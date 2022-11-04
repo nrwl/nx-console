@@ -3,6 +3,7 @@ import './global-polyfills';
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
+  NxChangeWorkspace,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -196,9 +197,18 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
 
-  await nxWorkspace(WORKING_PATH, lspLogger, true);
-  await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+  await reconfigure(WORKING_PATH);
 });
+
+connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
+  WORKING_PATH = workspacePath;
+  await reconfigure(WORKING_PATH);
+});
+
+async function reconfigure(workingPath: string) {
+  await nxWorkspace(workingPath, lspLogger, true);
+  await configureSchemas(workingPath, CLIENT_CAPABILITIES);
+}
 
 async function configureSchemas(
   workingPath: string | undefined,
