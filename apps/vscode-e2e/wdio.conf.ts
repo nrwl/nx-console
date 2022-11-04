@@ -97,6 +97,7 @@ export const config: Options.Testrunner = {
         // point to the root directory of your project
         vscodeArgs: { 'disable-extensions': true },
         userSettings: { 'NxConsoleClient.trace.server': 'verbose' },
+        verboseLogging: true,
         extensionPath: join(__dirname, '../..', 'dist/apps/vscode'),
       },
 
