@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { NxChangeWorkspace } from '@nx-console/language-server/types';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'path';
@@ -76,12 +77,12 @@ export function sendNotification<P>(
   notificationType: NotificationType<P>,
   params?: P
 ) {
-  client?.sendNotification(notificationType, params);
+  client!.sendNotification(notificationType, params);
 }
 
 export function sendRequest<P, R, E>(
   requestType: RequestType<P, R, E>,
   params: P
 ) {
-  return client?.sendRequest(requestType, params);
+  return client!.sendRequest(requestType, params);
 }
