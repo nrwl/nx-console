@@ -69,9 +69,9 @@ connection.onInitialize(async (params) => {
   const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
-      workspacePath ??
-      params.rootPath ??
-      URI.parse(params.rootUri ?? '').fsPath ??
+      workspacePath ||
+      params.rootPath ||
+      URI.parse(params.rootUri ?? '').fsPath ||
       params.workspaceFolders?.[0]?.uri;
 
     if (!WORKING_PATH) {

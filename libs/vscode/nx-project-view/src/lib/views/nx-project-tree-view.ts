@@ -46,7 +46,7 @@ class TreeView extends BaseView {
     const projectDefs = await this.cliTaskProvider.getProjects();
     const map = this.groupByRootPath(projectDefs);
 
-    if (map.size === 0) {
+    if (map.size === 0 && Object.keys(projectDefs).length > 0) {
       // An angular project has its root project dir at ''
       // Therefore, the map will be empty
       const [[projectName, projectDef]] = Object.entries(projectDefs);
