@@ -26,7 +26,7 @@ runs:
     - name: E2E
       env:
         NX_RUN_GROUP: run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}
-        NX_VERBOSE_LOGGING: 'true'
+        NX_VERBOSE_LOGGING: 'false'
       run: yarn exec nx affected --target=e2e --parallel=3 --configuration=ci
       shell: bash
     - name: Stopping nx-cloud ci agents

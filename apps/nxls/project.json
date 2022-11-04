@@ -40,7 +40,10 @@
       "options": {},
       "configurations": {
         "ci": {
-          "commands": ["yarn tsc -p ./apps/nxls/tsconfig.app.json --noEmit"]
+          "commands": [
+            "yarn tsc -p ./apps/nxls/tsconfig.app.json --noEmit",
+            "node ./apps/nxls/esbuild.js"
+          ]
         },
         "production": {
           "command": "node ./apps/nxls/esbuild.js"
