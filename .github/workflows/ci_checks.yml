@@ -43,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Nx Cloud - Agent E2E
     timeout-minutes: 15
+    env:
+      NX_VERBOSE_LOGGING: 'true'
     steps:
       - name: Set nx run variable
         run: echo "NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}" >> $GITHUB_ENV
