@@ -46,7 +46,8 @@
           "apps/vscode/src/nx-schema.json",
           "apps/vscode/src/tree-view-icon.svg",
           "apps/vscode/src/assets",
-          "apps/vscode/src/getting-started"
+          "apps/vscode/src/getting-started",
+          "apps/vscode/src/connect-to-cloud"
         ],
         "watch": true
       }
@@ -71,6 +72,7 @@
           "apps/vscode/src/tree-view-icon.svg",
           "apps/vscode/src/assets",
           "apps/vscode/src/getting-started",
+          "apps/vscode/src/connect-to-cloud",
           {
             "glob": "README.md",
             "input": "./",

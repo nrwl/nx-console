@@ -896,6 +896,22 @@
             }
           }
         ]
+      },
+      {
+        "id": "nxCloud",
+        "title": "Connecting your workspace to Nx Cloud",
+        "description": "blub",
+        "when": "!isConnectedToCloud",
+        "steps": [
+          {
+            "id": "connectToNxCloud",
+            "title": "Connect to Nx Cloud",
+            "description": "blub",
+            "media": {
+              "markdown": "connect-to-cloud/1-connect-to-cloud.md"
+            }
+          }
+        ]
       }
     ],
     "views": {
