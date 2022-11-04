@@ -132,8 +132,7 @@ export async function activate(c: ExtensionContext) {
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand,
       refreshWorkspace(),
-      projectGraph(),
-      lspContext
+      projectGraph()
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
