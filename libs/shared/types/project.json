@@ -1,20 +1,21 @@
 {
+  "name": "shared-types",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/shared/workspace/src",
+  "sourceRoot": "libs/shared/types/src",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/shared/workspace/**/*.ts"]
+        "lintFilePatterns": ["libs/shared/types/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/shared/workspace"],
+      "outputs": ["coverage/libs/shared/types"],
       "options": {
-        "jestConfig": "libs/shared/workspace/jest.config.ts",
+        "jestConfig": "libs/shared/types/jest.config.ts",
         "passWithNoTests": true
       }
     }

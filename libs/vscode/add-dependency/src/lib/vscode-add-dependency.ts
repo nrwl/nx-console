@@ -4,7 +4,6 @@ import {
   PackageManager,
 } from '@nrwl/devkit';
 import { getGenerators } from '@nx-console/shared/collections';
-import { nxWorkspace } from '@nx-console/shared/workspace';
 import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
 import {
   getShellExecutionForConfig,
@@ -26,6 +25,7 @@ import {
 } from 'vscode';
 import { gte, major, rcompare } from 'semver';
 import { resolveDependencyVersioning } from './dependency-versioning';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -47,9 +47,7 @@ let pkgManager: PackageManager;
 
 function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
   return async () => {
-    const { workspacePath, workspaceType } = await nxWorkspace(
-      getWorkspacePath()
-    );
+    const { workspacePath, workspaceType } = await getNxWorkspace();
     pkgManager = detectPackageManager(workspacePath);
 
     const depInput = await promptForDependencyInput();

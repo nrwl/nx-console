@@ -140,5 +140,5 @@
       "outputs": ["dist/apps/vscode"]
     }
   },
-  "tags": []
+  "tags": ["type:vscode"]
 }

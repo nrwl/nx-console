@@ -67,6 +67,7 @@ import {
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
 import {
+  getNxWorkspace,
   stopDaemon,
   WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
@@ -131,8 +132,7 @@ export async function activate(c: ExtensionContext) {
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand,
       refreshWorkspace(),
-      projectGraph(),
-      await configureLspClient(context)
+      projectGraph()
     );
 
     //   registers itself as a CodeLensProvider and watches config to dispose/re-register
@@ -226,6 +226,8 @@ async function setWorkspace(workspacePath: string) {
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
+  const lspContext = configureLspClient(context);
+
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
@@ -258,7 +260,8 @@ async function setWorkspace(workspacePath: string) {
     context.subscriptions.push(
       nxCommandsTreeView,
       nxProjectTreeView,
-      nxHelpAndFeedbackTreeView
+      nxHelpAndFeedbackTreeView,
+      lspContext
     );
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
@@ -300,9 +303,7 @@ async function setWorkspace(workspacePath: string) {
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {
-  const { nxWorkspace } = await import('@nx-console/shared/workspace');
-
-  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
+  const { workspaceLayout } = await getNxWorkspace();
 
   commands.executeCommand('setContext', 'nxAppsDir', [
     join(workspacePath, workspaceLayout.appsDir),
@@ -346,9 +347,7 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const { nxWorkspace } = await import('@nx-console/shared/workspace');
-
-  const { workspaceLayout } = await nxWorkspace(workspacePath, outputLogger);
+  const { workspaceLayout } = await getNxWorkspace();
   const workspacePackageDirs = new Set<string>();
   workspacePackageDirs.add(workspaceLayout.appsDir);
   workspacePackageDirs.add(workspaceLayout.libsDir);

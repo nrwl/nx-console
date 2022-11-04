@@ -6,7 +6,7 @@ import {
   isStringNode,
   lspLogger,
 } from '@nx-console/language-server/utils';
-import { nxWorkspace } from '@nx-console/shared/workspace';
+import { nxWorkspace } from '@nx-console/language-server/workspace';
 import { join } from 'path';
 import {
   ASTNode,

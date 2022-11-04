@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'shared-workspace',
+  displayName: 'language-server-workspace',
   preset: '../../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -12,5 +12,5 @@ export default {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/shared/workspace',
+  coverageDirectory: '../../../coverage/libs/language-server/workspace',
 };

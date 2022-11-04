@@ -3,6 +3,7 @@ import './global-polyfills';
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
+  NxChangeWorkspace,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -22,7 +23,7 @@ import {
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
 } from '@nx-console/shared/json-schema';
-import { nxWorkspace } from '@nx-console/shared/workspace';
+import { nxWorkspace } from '@nx-console/language-server/workspace';
 import {
   ClientCapabilities,
   CompletionList,
@@ -68,9 +69,10 @@ connection.onInitialize(async (params) => {
   const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
-      workspacePath ??
-      params.rootPath ??
-      URI.parse(params.rootUri ?? '').fsPath;
+      workspacePath ||
+      params.rootPath ||
+      URI.parse(params.rootUri ?? '').fsPath ||
+      params.workspaceFolders?.[0]?.uri;
 
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
@@ -78,7 +80,7 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+    configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
@@ -182,24 +184,31 @@ connection.onShutdown(() => {
   jsonDocumentMapper.dispose();
 });
 
-connection.onRequest(NxWorkspaceRequest, async () => {
+connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  const workspace = await nxWorkspace(WORKING_PATH, lspLogger);
-
-  return workspace.workspace;
+  return nxWorkspace(WORKING_PATH, lspLogger, reset);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {
-    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+    return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
 
-  await nxWorkspace(WORKING_PATH, lspLogger, true);
-  await configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+  await reconfigure(WORKING_PATH);
 });
+
+connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
+  WORKING_PATH = workspacePath;
+  await reconfigure(WORKING_PATH);
+});
+
+async function reconfigure(workingPath: string) {
+  await nxWorkspace(workingPath, lspLogger, true);
+  await configureSchemas(workingPath, CLIENT_CAPABILITIES);
+}
 
 async function configureSchemas(
   workingPath: string | undefined,

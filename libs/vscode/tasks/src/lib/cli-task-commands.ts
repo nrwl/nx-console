@@ -11,7 +11,10 @@ import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { selectGenerator } from './select-generator';
 import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
-import { findProjectWithPath, nxWorkspace } from '@nx-console/shared/workspace';
+import {
+  findProjectWithPath,
+  getNxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -223,10 +226,7 @@ async function selectCliCommandAndShowUi(
     );
     return;
   }
-  const { validWorkspaceJson, configurationFilePath } = await nxWorkspace(
-    getWorkspacePath(),
-    outputLogger
-  );
+  const { validWorkspaceJson, configurationFilePath } = await getNxWorkspace();
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
@@ -259,10 +259,8 @@ async function selectCliCommandAndPromptForFlags(
   } else if (!askForFlags) {
     flags = [];
   }
-  const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace(
-    getWorkspacePath(),
-    outputLogger
-  );
+  const { validWorkspaceJson, workspace, workspaceType } =
+    await getNxWorkspace();
 
   if (!projectName) {
     const selection = validWorkspaceJson
@@ -348,7 +346,7 @@ function surroundWithQuotesIfHasWhiteSpace(target: string): string {
 
 async function selectGeneratorAndPromptForFlags() {
   const { validWorkspaceJson, workspaceType, workspacePath } =
-    await nxWorkspace(getWorkspacePath(), outputLogger);
+    await getNxWorkspace();
 
   if (!validWorkspaceJson) {
     return;
@@ -423,7 +421,7 @@ async function selectCliTarget(targets: string[]): Promise<string | undefined> {
 }
 
 async function getTargetNames(): Promise<string[]> {
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
+  const { workspace } = await getNxWorkspace();
   const commands = Object.values(workspace.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);
@@ -436,7 +434,7 @@ async function getTargetNames(): Promise<string[]> {
 async function getProjectsWithTargetName(
   targetName: string
 ): Promise<string[]> {
-  const { workspace } = await nxWorkspace(getWorkspacePath(), outputLogger);
+  const { workspace } = await getNxWorkspace();
   const projects = [];
   for (const [projectName, project] of Object.entries(workspace.projects)) {
     const targets = project.targets ?? {};

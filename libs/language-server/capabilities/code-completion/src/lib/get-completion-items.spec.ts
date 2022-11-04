@@ -1,12 +1,9 @@
-import {
-  configureJsonLanguageService,
-  getJsonLanguageService,
-} from '@nx-console/language-server/utils';
+import { configureJsonLanguageService } from '@nx-console/language-server/utils';
 import {
   CompletionType,
   EnhancedJsonSchema,
 } from '@nx-console/shared/json-schema';
-import * as workspace from '@nx-console/shared/workspace';
+import * as workspace from '@nx-console/language-server/workspace';
 import { vol } from 'memfs';
 import {
   ClientCapabilities,
@@ -14,12 +11,13 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import { getCompletionItems } from './get-completion-items';
+import { NxWorkspace } from '@nx-console/shared/types';
 
 jest.mock(
-  '@nx-console/shared/workspace',
+  '@nx-console/language-server/workspace',
   (): Partial<typeof workspace> => ({
     nxWorkspace: jest.fn(() =>
-      Promise.resolve<workspace.NxWorkspace>({
+      Promise.resolve<NxWorkspace>({
         configurationFilePath: '/workspace.json',
         isLerna: false,
         validWorkspaceJson: true,

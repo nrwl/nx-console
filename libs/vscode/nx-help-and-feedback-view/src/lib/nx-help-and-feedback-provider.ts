@@ -1,6 +1,6 @@
 import { getPackageManagerCommand } from '@nrwl/devkit';
-import { nxWorkspace } from '@nx-console/shared/workspace';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   AbstractTreeProvider,
   getTelemetry,
@@ -108,9 +108,7 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
   }
 
   async isConnectedToCloud(): Promise<boolean> {
-    const nxConfig = (
-      await nxWorkspace(getWorkspacePath(), undefined, this.nxJsonHasChanged)
-    ).workspace;
+    const nxConfig = (await getNxWorkspace(this.nxJsonHasChanged)).workspace;
 
     if (!nxConfig.tasksRunnerOptions) {
       return false;

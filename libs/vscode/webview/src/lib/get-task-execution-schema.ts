@@ -18,7 +18,10 @@ import {
   selectCliProject,
   selectGenerator,
 } from '@nx-console/vscode/tasks';
-import { findProjectWithPath, nxWorkspace } from '@nx-console/shared/workspace';
+import {
+  findProjectWithPath,
+  getNxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
@@ -31,10 +34,8 @@ export async function getTaskExecutionSchema(
     if (!cliTaskProvider.getWorkspacePath()) {
       return;
     }
-    const { validWorkspaceJson, workspace, workspaceType } = await nxWorkspace(
-      getWorkspacePath(),
-      outputLogger
-    );
+    const { validWorkspaceJson, workspace, workspaceType } =
+      await getNxWorkspace();
 
     if (!validWorkspaceJson) {
       return;
@@ -211,10 +212,7 @@ async function getConfigValuesFromContextMenuUri(
       .replace(/\\/g, '/')
       .replace(/^\//, '');
 
-    const { workspaceLayout } = await nxWorkspace(
-      getWorkspacePath(),
-      outputLogger
-    );
+    const { workspaceLayout } = await getNxWorkspace();
     const appsDir = workspaceLayout.appsDir;
     const libsDir = workspaceLayout.libsDir;
     if (
