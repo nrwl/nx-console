@@ -24,6 +24,6 @@
       "dependsOn": ["^build"]
     }
   },
-  "implicitDependencies": ["vscode", "nxls"],
+  "implicitDependencies": ["vscode"],
   "tags": []
 }
