@@ -156,15 +156,7 @@
           "when": "false"
         },
         {
-          "command": "ng.run.fileexplorer",
-          "when": "false"
-        },
-        {
           "command": "nx.generate.ui.fileexplorer",
-          "when": "false"
-        },
-        {
-          "command": "nx.run.fileexplorer",
           "when": "false"
         },
         {
@@ -481,7 +473,7 @@
       },
       {
         "category": "ng",
-        "title": "ng run",
+        "title": "run target for from selected file",
         "command": "ng.run.fileexplorer"
       },
       {
@@ -653,7 +645,7 @@
       },
       {
         "category": "Nx",
-        "title": "Nx run",
+        "title": "Run Target from selected file",
         "command": "nx.run.fileexplorer"
       },
       {

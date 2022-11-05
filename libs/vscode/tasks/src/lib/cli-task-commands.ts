@@ -69,8 +69,22 @@ export function registerCliTaskCommands(
         );
       }
     );
-    commands.registerCommand(`${cli}.run.fileexplorer`, async (uri: Uri) =>
-      selectCliCommandAndPromptForFlags('run', await getCliProjectFromUri(uri))
+    commands.registerCommand(
+      `${cli}.run.fileexplorer`,
+      async (uri: Uri | undefined) => {
+        if (!uri) {
+          uri = window.activeTextEditor?.document.uri;
+        }
+
+        if (!uri) {
+          return;
+        }
+
+        selectCliCommandAndPromptForFlags(
+          'run',
+          await getCliProjectFromUri(uri)
+        );
+      }
     );
 
     /**
