@@ -43,7 +43,7 @@ import { formatError } from '@nx-console/shared/utils';
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
 });
-// invalidate cache
+
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 
