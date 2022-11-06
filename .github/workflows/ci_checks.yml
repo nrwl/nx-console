@@ -45,6 +45,7 @@ jobs:
     timeout-minutes: 15
     env:
       NX_VERBOSE_LOGGING: 'false'
+      NX_SKIP_NX_CACHE: 'true'
     steps:
       - name: Set nx run variable
         run: echo "NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}" >> $GITHUB_ENV
