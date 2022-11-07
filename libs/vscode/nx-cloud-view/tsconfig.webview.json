@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "outDir": "../../../dist/apps/vscode/nx-cloud-onboarding-view",
+    "declaration": true,
+    "types": ["node"],
+    "allowJs": true,
+    "useDefineForClassFields": false
+  },
+  "include": ["src/webview/main.ts"]
+}

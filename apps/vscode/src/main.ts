@@ -68,6 +68,7 @@ import {
   stopDaemon,
   WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
+import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -234,6 +235,8 @@ async function setWorkspace(workspacePath: string) {
     registerCliTaskCommands(context, cliTaskProvider);
 
     registerVscodeAddDependency(context);
+
+    initNxCloudOnboardingView(context, environment.production);
 
     initNxCommandsView(context);
 

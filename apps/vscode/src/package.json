@@ -41,11 +41,11 @@
     "onStartupFinished"
   ],
   "dependencies": {
-    "jsonc-parser": "^3.0.0",
     "@monodon/typescript-nx-imports-plugin": "0.2.0",
     "@yarnpkg/fslib": "2.6.1-rc.5",
     "@yarnpkg/libzip": "2.2.3-rc.5",
-    "@parcel/watcher": "^2.0.7"
+    "@parcel/watcher": "^2.0.7",
+    "jsonc-parser": "^3.0.0"
   },
   "contributes": {
     "typescriptServerPlugins": [
@@ -126,6 +126,11 @@
         {
           "command": "nxConsole.editCommonCommands",
           "when": "view == nxCommands",
+          "group": "navigation"
+        },
+        {
+          "command": "nxConsole.refreshCloudWebview",
+          "when": "view == nxCloud",
           "group": "navigation"
         }
       ],
@@ -728,6 +733,15 @@
         "title": "Connect to Nx Cloud",
         "command": "nxConsole.connectToNxCloud",
         "icon": "$(rocket)"
+      },
+      {
+        "title": "Login to Nx Cloud",
+        "command": "nxConsole.loginToNxCloud"
+      },
+      {
+        "title": "Refresh Nx Cloud Webview",
+        "command": "nxConsole.refreshCloudWebview",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -970,6 +984,11 @@
           "id": "nxProjects",
           "name": "Projects",
           "when": "isNxWorkspace || isAngularWorkspace"
+        },
+        {
+          "type": "webview",
+          "id": "nxCloud",
+          "name": "Nx Cloud"
         },
         {
           "id": "nxRunTarget",
