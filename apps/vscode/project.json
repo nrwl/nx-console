@@ -23,6 +23,11 @@
             "command": "yarn nx watch nxls",
             "prefix": "lsp",
             "color": "magenta"
+          },
+          {
+            "command": "yarn nx run vscode-nx-cloud-view:watch-webview-files",
+            "prefix": "cloud-view",
+            "color": "yellow"
           }
         ],
         "parallel": true
@@ -48,6 +53,7 @@
           "apps/vscode/src/assets",
           "apps/vscode/src/getting-started"
         ],
+        "deleteOutputPath": false,
         "watch": true
       }
     },
@@ -119,6 +125,7 @@
           "webpackConfig": "apps/vscode/webpack.prod.config.js"
         }
       },
+      "dependsOn": ["^build", "^build-webview-files"],
       "outputs": ["{options.outputPath}"]
     },
     "lint": {

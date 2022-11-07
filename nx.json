@@ -21,7 +21,9 @@
           "test",
           "e2e",
           "build-storybook",
-          "package"
+          "package",
+          "build-webview-files",
+          "extract-dependencies"
         ],
         "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU="
       }

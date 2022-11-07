@@ -1,0 +1,71 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "vscode-nx-cloud-view",
+  "sourceRoot": "libs/vscode/nx-cloud-view/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/vscode/nx-cloud-view/**/*.ts"]
+      }
+    },
+    "build-webview-files": {
+      "executor": "@nrwl/esbuild:esbuild",
+      "options": {
+        "main": "libs/vscode/nx-cloud-view/src/webview/main.ts",
+        "tsConfig": "libs/vscode/nx-cloud-view/tsconfig.webview.json",
+        "assets": [
+          {
+            "input": "libs/vscode/nx-cloud-view/src/webview",
+            "glob": "*.css",
+            "output": "/"
+          }
+        ],
+        "deleteOutputPath": false,
+        "platform": "browser",
+        "outputPath": "dist/apps/vscode/nx-cloud-webview",
+        "format": ["esm"]
+      },
+      "dependsOn": ["extract-dependencies"],
+      "inputs": ["{projectRoot}/src/webview"]
+    },
+    "watch-webview-files": {
+      "executor": "@nrwl/esbuild:esbuild",
+      "options": {
+        "main": "libs/vscode/nx-cloud-view/src/webview/main.ts",
+        "tsConfig": "libs/vscode/nx-cloud-view/tsconfig.webview.json",
+        "assets": [
+          {
+            "input": "libs/vscode/nx-cloud-view/src/webview",
+            "glob": "*.css",
+            "output": "/"
+          }
+        ],
+        "deleteOutputPath": false,
+        "platform": "browser",
+        "outputPath": "dist/apps/vscode/nx-cloud-webview",
+        "format": ["esm"],
+        "watch": true
+      },
+      "dependsOn": ["extract-dependencies"],
+      "inputs": ["{projectRoot}/src/webview"]
+    },
+    "extract-dependencies": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node libs/vscode/nx-cloud-view/get-files-from-node-modules.mjs"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/vscode/nx-cloud-view"],
+      "options": {
+        "jestConfig": "libs/vscode/nx-cloud-view/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["type:vscode"]
+}
