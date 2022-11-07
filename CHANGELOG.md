@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.25.0](https://github.com/nrwl/nx-console/compare/v17.24.2...v17.25.0) (2022-11-07)
+
+
+### Features
+
+* configurable common commands ([#1403](https://github.com/nrwl/nx-console/issues/1403)) ([0db2307](https://github.com/nrwl/nx-console/commits/0db23076f4e5333b912472d05c386bec0d848f08))
+* move all workspace retrieval to the language server ([#1402](https://github.com/nrwl/nx-console/issues/1402)) ([650a44e](https://github.com/nrwl/nx-console/commits/650a44ea1cc08d5d68d6b9a37315e0c596424a26))
+* run targets from currently opened file ([#1404](https://github.com/nrwl/nx-console/issues/1404)) ([f4aa721](https://github.com/nrwl/nx-console/commits/f4aa72189cc769ecc00cd878cf98473b5df72fd3))
+
 ### [17.24.2](https://github.com/nrwl/nx-console/compare/v17.24.1...v17.24.2) (2022-11-02)
 
 
