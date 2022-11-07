@@ -1,6 +1,7 @@
 import {
   ConfigurationTarget,
   ExtensionContext,
+  EventEmitter,
   workspace,
   Memento,
 } from 'vscode';
@@ -30,10 +31,19 @@ export class GlobalConfigurationStore implements Store {
     return CONFIG_STORE;
   }
 
-  private constructor(private readonly state: Memento) {}
+  private readonly _onConfigurationChange: EventEmitter<void> =
+    new EventEmitter();
+  readonly onConfigurationChange = this._onConfigurationChange.event;
+
+  private constructor(private readonly state: Memento) {
+    workspace.onDidChangeConfiguration(() => {
+      this._onConfigurationChange.fire();
+    });
+  }
 
   get<T extends keyof GlobalConfig>(key: T): GlobalConfig[T] | null;
-  get<T>(key: GlobalConfigKeys, defaultValue?: T): T | null;
+  get<T>(key: GlobalConfigKeys): T | null;
+  get<T>(key: GlobalConfigKeys, defaultValue: T): T;
   get<T>(key: GlobalConfigKeys, defaultValue?: T): T | null {
     const value = this.storage(key).get(key, defaultValue);
     return typeof value === 'undefined' ? defaultValue || null : value;
@@ -41,10 +51,12 @@ export class GlobalConfigurationStore implements Store {
 
   set<T>(key: GlobalConfigKeys, value: T): void {
     this.storage(key).update(key, value);
+    this._onConfigurationChange.fire();
   }
 
   delete(key: GlobalConfigKeys): void {
     this.storage(key).update(key, undefined);
+    this._onConfigurationChange.fire();
   }
 
   storage(key: GlobalConfigKeys): VSCState {

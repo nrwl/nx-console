@@ -116,6 +116,11 @@
           "command": "nxConsole.refreshWorkspace",
           "when": "view == nxRunTarget",
           "group": "navigation"
+        },
+        {
+          "command": "nxConsole.editCommonCommands",
+          "when": "view == nxCommands",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -375,6 +380,11 @@
         "title": "Refresh Workspace",
         "category": "Nx",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "nxConsole.editCommonCommands",
+        "title": "Edit Common Commands",
+        "icon": "$(pencil)"
       },
       {
         "command": "nxConsole.editWorkspaceJson",
@@ -694,6 +704,28 @@
           "type": "boolean",
           "default": true,
           "description": "Help make Nx Console better by sending anonymous usage data to the Nx Console team."
+        },
+        "nxConsole.commonNxCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "default": [
+            "run-many",
+            "affected",
+            "affected:apps",
+            "affected:build",
+            "affected:e2e",
+            "affected:libs",
+            "affected:lint",
+            "affected:test",
+            "list",
+            "migrate",
+            "add-dependency",
+            "add-dev-dependency"
+          ],
+          "markdownDescription": "Common Nx commands that will be available in the sidebar view. There are three categories of commands you can specify here: \n - Arbitrary Nx commands, like `build:example-app` or `nx run my-lib:test` (note that you can omit the prefixed `nx`) \n - Nx commands that are available through Nx Console, like `run-many`. They will be executed using the Nx Console UI. \n - `add-depedency` and `add-dev-dependency` commands will be executed using the Nx Console UI for adding dependencies to the workspace."
         },
         "nxConsole.enableGenerateFromContextMenu": {
           "type": "boolean",
