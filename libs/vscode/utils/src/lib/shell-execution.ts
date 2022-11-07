@@ -16,6 +16,9 @@ export function getShellExecutionForConfig(
     `${packageManagerCommand.exec} ${config.displayCommand}`,
     {
       cwd: config.cwd,
+      env: {
+        NX_BRANCH: 'testing',
+      },
     }
   );
 }

@@ -1,1 +1,1 @@
-export * from './lib/vscode-nx-cloud-onboarding';
+export * from './lib/init-nx-cloud-onboarding';

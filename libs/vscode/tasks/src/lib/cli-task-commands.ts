@@ -246,7 +246,7 @@ async function selectCliCommandAndShowUi(
   );
 }
 
-async function selectCliCommandAndPromptForFlags(
+export async function selectCliCommandAndPromptForFlags(
   command: string,
   projectName?: string,
   target?: string,

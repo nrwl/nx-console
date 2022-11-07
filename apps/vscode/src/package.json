@@ -847,6 +847,26 @@
       {
         "view": "nxConsole.views.welcome",
         "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
+      },
+      {
+        "view": "nxConsole.views.cloudWelcome",
+        "contents": "Looks like you're not connected to Nx Cloud \n [Connect to Nx Cloud](command:nxConsole.connectToNxCloud)",
+        "when": "!isConnectedToCloud"
+      },
+      {
+        "view": "nxConsole.views.cloudWelcome",
+        "contents": "You're connected to Nx Cloud, but you haven't claimed your workspace yet. \n [Claim your workspace](command:nxConsole.claimCloudWorkspace)",
+        "when": "isConnectedToCloud && !isCloudWorkspaceClaimed"
+      },
+      {
+        "view": "nxConsole.views.cloudWelcome",
+        "contents": "You're connected to Nx Cloud, and your workspace is claimed. Now, let's run your first command! \n [Run first command](command:nxConsole.runFirstNxCommand)",
+        "when": "isConnectedToCloud && isCloudWorkspaceClaimed && !hasRunFirstCommand"
+      },
+      {
+        "view": "nxConsole.views.cloudWelcome",
+        "contents": "You've successfully run your first command! You can look at run details and more on the Nx Cloud website! \n [Go to Nx Cloud](command:nxConsole.viewFirstRunDetails)",
+        "when": "isConnectedToCloud && isCloudWorkspaceClaimed && hasRunFirstCommand"
       }
     ],
     "walkthroughs": [
@@ -901,12 +921,15 @@
         "id": "nxCloud",
         "title": "Connecting your workspace to Nx Cloud",
         "description": "blub",
-        "when": "!isConnectedToCloud",
         "steps": [
           {
             "id": "connectToNxCloud",
             "title": "Connect to Nx Cloud",
             "description": "blub",
+            "completionEvents": [
+              "onContext:isConnectedToCloud",
+              "onCommand:nxConsole.connectToNxCloud"
+            ],
             "media": {
               "markdown": "connect-to-cloud/1-connect-to-cloud.md"
             }
@@ -922,6 +945,11 @@
           "when": "!isNxWorkspace && !isAngularWorkspace",
           "contextualTitle": "Nx Console Getting Started",
           "icon": "assets/nx-console.png",
+          "visibility": "visible"
+        },
+        {
+          "id": "nxConsole.views.cloudWelcome",
+          "name": "Nx Cloud",
           "visibility": "visible"
         },
         {
