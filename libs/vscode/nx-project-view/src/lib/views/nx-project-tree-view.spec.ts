@@ -1,96 +1,10 @@
-import { ViewDataProvider } from './nx-project-base-view';
 import {
   createTreeViewStrategy,
   TreeViewStrategy,
 } from './nx-project-tree-view';
 
-const testRootChildren = async (
-  expectedOutput: string[],
-  treeView: TreeViewStrategy
-) => {
-  const rootElements = await treeView.getChildren();
-  expect(rootElements).toHaveLength(expectedOutput.length);
-  const paths = rootElements?.map((e) => e.label);
-  expect(paths).toEqual(expectedOutput);
-};
-
-describe('Project View: TreeView', () => {
-  describe('nx workspace', () => {
-    it('should find root directories', async () => {
-      const viewProvider = createMockViewDataProvider(
-        nxExample.workspacePath,
-        nxExample.project
-      );
-      const expectedOutput = ['apps', 'libs'];
-      const treeView = createTreeViewStrategy(viewProvider);
-
-      await testRootChildren(expectedOutput, treeView);
-    });
-  });
-
-  describe('angular', () => {
-    it('should find root directory "projects"', async () => {
-      const viewProvider = createMockViewDataProvider(
-        ngExample.workspacePath,
-        ngExample.project
-      );
-      const expectedOutput = ['projects'];
-      const treeView = createTreeViewStrategy(viewProvider);
-
-      await testRootChildren(expectedOutput, treeView);
-    });
-
-    it('should use root placeholder for empty roots', async () => {
-      const viewProvider = createMockViewDataProvider(
-        ngExampleInSrc.workspacePath,
-        ngExampleInSrc.project
-      );
-      const expectedOutput = ['<root>'];
-      const treeView = createTreeViewStrategy(viewProvider);
-
-      await testRootChildren(expectedOutput, treeView);
-    });
-
-    it('should find projects below root directory', async () => {
-      const viewProvider = createMockViewDataProvider(
-        ngExampleInSrc.workspacePath,
-        ngExampleInSrc.project
-      );
-      const expectedOutput = [
-        'multi-application-example',
-        'multi-application-example-e2e',
-        'multi-application-example1',
-        'multi-application-example1-e2e',
-      ];
-      const treeView = createTreeViewStrategy(viewProvider);
-      const [srcDir] = (await treeView.getChildren()) ?? [];
-
-      const projects = await treeView.getChildren(srcDir);
-
-      expect(projects).toHaveLength(expectedOutput.length);
-      const paths = projects?.map((e) => e.label);
-      expect(paths).toEqual(expectedOutput);
-    });
-  });
-});
-
-type MockDataGetWorkspacePath = ReturnType<
-  ViewDataProvider['getWorkspacePath']
->;
-type MockDataGetProjects = Awaited<ReturnType<ViewDataProvider['getProjects']>>;
-
-function createMockViewDataProvider(
-  workspacePath: MockDataGetWorkspacePath,
-  projects: unknown
-): ViewDataProvider {
-  return {
-    getWorkspacePath: () => workspacePath,
-    getProjects: () =>
-      new Promise((resolve) =>
-        setTimeout(() => resolve(projects as MockDataGetProjects))
-      ),
-  };
-}
+import * as nxWorkspaceModule from '@nx-console/vscode/nx-workspace';
+import * as vscodeUtilsModule from '@nx-console/vscode/utils';
 
 const nxExample = {
   workspacePath:
@@ -153,7 +67,6 @@ const nxExample = {
         test: {
           executor: '@nrwl/jest:jest',
         },
-        weird: {},
       },
       root: 'libs/lib2',
       tags: [],
@@ -711,3 +624,99 @@ const ngExampleInSrc = {
     },
   },
 };
+
+const testRootChildren = async (
+  expectedOutput: string[],
+  treeView: TreeViewStrategy
+) => {
+  const rootElements = await treeView.getChildren();
+  expect(rootElements).toHaveLength(expectedOutput.length);
+  const paths = rootElements?.map((e) => e.label);
+  expect(paths).toEqual(expectedOutput);
+};
+
+describe('Project View: TreeView', () => {
+  describe('nx workspace', () => {
+    it('should find root directories', async () => {
+      jest
+        .spyOn(nxWorkspaceModule, 'getNxWorkspaceProjects')
+        .mockReturnValue(
+          new Promise((resolve) => setTimeout(() => resolve(nxExample.project)))
+        );
+      jest
+        .spyOn(vscodeUtilsModule, 'getWorkspacePath')
+        .mockReturnValue(nxExample.workspacePath);
+      // const viewProvider = createMockViewDataProvider(
+      //   nxExample.workspacePath,
+      //   nxExample.project
+      // );
+      const expectedOutput = ['apps', 'libs'];
+      const treeView = createTreeViewStrategy();
+
+      await testRootChildren(expectedOutput, treeView);
+    });
+  });
+
+  describe('angular', () => {
+    it('should find root directory "projects"', async () => {
+      // const viewProvider = createMockViewDataProvider(
+      //   ngExample.workspacePath,
+      //   ngExample.project
+      // );
+      const expectedOutput = ['projects'];
+      const treeView = createTreeViewStrategy();
+
+      await testRootChildren(expectedOutput, treeView);
+    });
+
+    it('should use root placeholder for empty roots', async () => {
+      // const viewProvider = createMockViewDataProvider(
+      //   ngExampleInSrc.workspacePath,
+      //   ngExampleInSrc.project
+      // );
+      const expectedOutput = ['<root>'];
+      const treeView = createTreeViewStrategy();
+
+      await testRootChildren(expectedOutput, treeView);
+    });
+
+    it('should find projects below root directory', async () => {
+      // const viewProvider = createMockViewDataProvider(
+      //   ngExampleInSrc.workspacePath,
+      //   ngExampleInSrc.project
+      // );
+      const expectedOutput = [
+        'multi-application-example',
+        'multi-application-example-e2e',
+        'multi-application-example1',
+        'multi-application-example1-e2e',
+      ];
+      const treeView = createTreeViewStrategy();
+      const [srcDir] = (await treeView.getChildren()) ?? [];
+
+      const projects = await treeView.getChildren(srcDir);
+
+      expect(projects).toHaveLength(expectedOutput.length);
+      const paths = projects?.map((e) => e.label);
+      expect(paths).toEqual(expectedOutput);
+    });
+  });
+});
+
+// type MockDataGetWorkspacePath = ReturnType<
+//   ViewDataProvider['getWorkspacePath']
+// >;
+// type MockDataGetProjects = Awaited<ReturnType<ViewDataProvider['getProjects']>>;
+
+// function createMockViewDataProvider(
+//   workspacePath: MockDataGetWorkspacePath,
+//   projects: unknown
+// ): ViewDataProvider {
+//   return {
+//     getWorkspacePath: () => workspacePath,
+//     getProjects: () =>
+//       new Promise((resolve) =>
+//         setTimeout(() => resolve(projects as MockDataGetProjects))
+//       ),
+//   };
+// }

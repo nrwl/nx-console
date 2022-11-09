@@ -752,9 +752,15 @@
           "default": "list",
           "enum": [
             "list",
-            "tree"
+            "tree",
+            "automatic"
           ],
-          "description": "Define how the 'Projects' view shows the entries.\n\nlist: show the projects in an ordered list.\ntree: show the projects in the same folder structure as they are located in your repo."
+          "enumDescriptions": [
+            "Shows the projects in an ordered list.",
+            "Shows the projects in the same folder structure as they are located in your repo.",
+            "Shows the projects in a tree if there are more than 10, otherwise shows them in a list."
+          ],
+          "description": "Define how the 'Projects' view shows the entries."
         },
         "nxConsole.generatorAllowlist": {
           "type": "array",

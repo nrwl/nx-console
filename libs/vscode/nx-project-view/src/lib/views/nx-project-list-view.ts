@@ -1,26 +1,24 @@
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import {
   BaseView,
-  ListViewItem,
+  ProjectViewItem,
   ProjectViewStrategy,
+  TargetViewItem,
 } from './nx-project-base-view';
+
+export type ListViewItem = ProjectViewItem | TargetViewItem;
 
 export type ListViewStrategy = ProjectViewStrategy<ListViewItem>;
 
-export function createListViewStrategy(
-  cliTaskProvider: CliTaskProvider
-): ListViewStrategy {
-  const listView = new ListView(cliTaskProvider);
+export function createListViewStrategy(): ListViewStrategy {
+  const listView = new ListView();
   return {
     getChildren: listView.getChildren.bind(listView),
   };
 }
 
 class ListView extends BaseView {
-  constructor(cliTaskProvider: CliTaskProvider) {
-    super(cliTaskProvider);
-  }
-
   async getChildren(element?: ListViewItem) {
     if (!element) {
       // should return root elements if no element was passed
@@ -33,7 +31,7 @@ class ListView extends BaseView {
   }
 
   private async createProjects() {
-    const projectDefs = await this.cliTaskProvider.getProjects();
+    const projectDefs = await getNxWorkspaceProjects();
     return Object.entries(projectDefs).map((project) =>
       this.createProjectViewItem(project)
     );
