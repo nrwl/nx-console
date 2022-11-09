@@ -14,13 +14,17 @@ import {
   AutomaticViewItem,
   AutomaticViewStrategy,
   createAutomaticViewStrategy,
-  createListViewStrategy,
-  createTreeViewStrategy,
+} from './views/nx-project-automatic-view';
+import {
   ListViewItem,
   ListViewStrategy,
+  createListViewStrategy,
+} from './views/nx-project-list-view';
+import {
   TreeViewItem,
   TreeViewStrategy,
-} from './views';
+  createTreeViewStrategy,
+} from './views/nx-project-tree-view';
 
 export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
 

@@ -1,8 +1,5 @@
 import { ProjectConfiguration, TargetConfiguration } from '@nrwl/devkit';
-import {
-  getNxWorkspace,
-  getNxWorkspaceProjects,
-} from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'node:path';

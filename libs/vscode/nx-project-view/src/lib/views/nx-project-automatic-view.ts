@@ -1,11 +1,5 @@
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import {
-  BaseView,
-  FolderViewItem,
-  ProjectViewItem,
-  ProjectViewStrategy,
-  TargetViewItem,
-} from './nx-project-base-view';
+import { ProjectViewStrategy } from './nx-project-base-view';
 import { createListViewStrategy, ListViewItem } from './nx-project-list-view';
 import { createTreeViewStrategy, TreeViewItem } from './nx-project-tree-view';
 export type AutomaticViewItem = ListViewItem | TreeViewItem;

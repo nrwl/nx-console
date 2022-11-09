@@ -1,5 +1,4 @@
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import {
   BaseView,
   ProjectViewItem,
