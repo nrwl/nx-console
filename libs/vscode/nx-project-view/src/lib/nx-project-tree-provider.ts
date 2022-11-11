@@ -11,12 +11,22 @@ import {
   Uri,
 } from 'vscode';
 import {
-  createListViewStrategy,
-  createTreeViewStrategy,
+  AutomaticViewItem,
+  AutomaticViewStrategy,
+  createAutomaticViewStrategy,
+} from './views/nx-project-automatic-view';
+import {
+  ListViewItem,
   ListViewStrategy,
+  createListViewStrategy,
+} from './views/nx-project-list-view';
+import {
+  TreeViewItem,
   TreeViewStrategy,
-} from './views';
-import { ListViewItem, ViewItem } from './views/nx-project-base-view';
+  createTreeViewStrategy,
+} from './views/nx-project-tree-view';
+
+export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
 
 /**
  * Provides data for the "Projects" tree view
@@ -24,6 +34,7 @@ import { ListViewItem, ViewItem } from './views/nx-project-base-view';
 export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly listView: ListViewStrategy;
   private readonly treeView: TreeViewStrategy;
+  private readonly automaticView: AutomaticViewStrategy;
 
   constructor(
     context: ExtensionContext,
@@ -44,8 +55,13 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       );
     });
 
-    this.listView = createListViewStrategy(this.cliTaskProvider);
-    this.treeView = createTreeViewStrategy(this.cliTaskProvider);
+    this.listView = createListViewStrategy();
+    this.treeView = createTreeViewStrategy();
+    this.automaticView = createAutomaticViewStrategy();
+
+    GlobalConfigurationStore.instance.onConfigurationChange(() =>
+      this.refresh()
+    );
   }
 
   getParent() {
@@ -64,12 +80,20 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     if (this.isListViewElement(viewItem)) {
       return this.listView.getChildren(viewItem);
     }
-    return this.treeView.getChildren(viewItem);
+    if (this.isTreeViewElement(viewItem)) {
+      return this.treeView.getChildren(viewItem);
+    }
+    return this.automaticView.getChildren(viewItem);
   }
 
   private isListViewElement(_?: ViewItem): _ is ListViewItem {
     const config = GlobalConfigurationStore.instance.get('projectViewingStyle');
     return config === 'list' || config === null;
+  }
+
+  private isTreeViewElement(_?: ViewItem): _ is TreeViewItem {
+    const config = GlobalConfigurationStore.instance.get('projectViewingStyle');
+    return config === 'tree';
   }
 
   private async runTask(selection: NxTreeItem) {

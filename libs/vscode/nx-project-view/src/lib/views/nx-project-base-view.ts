@@ -1,6 +1,7 @@
 import { ProjectConfiguration, TargetConfiguration } from '@nrwl/devkit';
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getOutputChannel } from '@nx-console/vscode/utils';
+import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'node:path';
 
 export interface ProjectViewStrategy<T> {
@@ -11,10 +12,6 @@ export type ViewDataProvider = Pick<
   CliTaskProvider,
   'getWorkspacePath' | 'getProjects'
 >;
-
-export type ListViewItem = ProjectViewItem | TargetViewItem;
-export type TreeViewItem = FolderViewItem | ProjectViewItem | TargetViewItem;
-export type ViewItem = ListViewItem | TreeViewItem;
 
 interface BaseViewItem<Context extends string> {
   contextValue: Context;
@@ -50,8 +47,6 @@ export interface NxTarget {
 }
 
 export abstract class BaseView {
-  constructor(protected readonly cliTaskProvider: ViewDataProvider) {}
-
   createProjectViewItem([projectName, { root, name, targets }]: [
     projectName: string,
     projectDefinition: ProjectConfiguration
@@ -69,10 +64,7 @@ export abstract class BaseView {
       contextValue: 'project',
       nxProject,
       label: projectName,
-      resource: join(
-        this.cliTaskProvider.getWorkspacePath(),
-        nxProject.root ?? ''
-      ),
+      resource: join(getWorkspacePath(), nxProject.root ?? ''),
       collapsible: hasChildren ? 'Collapsed' : 'None',
     };
   }
@@ -80,9 +72,7 @@ export abstract class BaseView {
   async createTargetsFromProject(parent: ProjectViewItem) {
     const { nxProject } = parent;
 
-    const projectDef = (await this.cliTaskProvider.getProjects())[
-      nxProject.project
-    ];
+    const projectDef = (await getNxWorkspaceProjects())[nxProject.project];
     if (!projectDef) {
       return;
     }
@@ -119,9 +109,7 @@ export abstract class BaseView {
   ): Promise<TargetViewItem[] | undefined> {
     const { nxProject, nxTarget } = parent;
 
-    const projectDef = (await this.cliTaskProvider.getProjects())[
-      nxProject.project
-    ];
+    const projectDef = (await getNxWorkspaceProjects())[nxProject.project];
     if (!projectDef) {
       return;
     }

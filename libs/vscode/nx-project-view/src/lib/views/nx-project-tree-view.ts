@@ -1,22 +1,23 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
-import { getOutputChannel } from '@nx-console/vscode/utils';
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
+import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'node:path';
 import {
   BaseView,
   FolderViewItem,
+  ProjectViewItem,
   ProjectViewStrategy,
-  TreeViewItem,
-  ViewDataProvider,
+  TargetViewItem,
 } from './nx-project-base-view';
 import { isDefined, PathHelper } from './nx-project-util';
+
+export type TreeViewItem = FolderViewItem | ProjectViewItem | TargetViewItem;
 
 export type TreeViewStrategy = ProjectViewStrategy<TreeViewItem>;
 type TreeViewMap = Map<string, [string, ProjectConfiguration][]>;
 
-export function createTreeViewStrategy(
-  cliTaskProvider: ViewDataProvider
-): TreeViewStrategy {
-  const listView = new TreeView(cliTaskProvider);
+export function createTreeViewStrategy(): TreeViewStrategy {
+  const listView = new TreeView();
   return {
     getChildren: listView.getChildren.bind(listView),
   };
@@ -24,10 +25,6 @@ export function createTreeViewStrategy(
 
 class TreeView extends BaseView {
   private pathHelper = new PathHelper();
-
-  constructor(cliTaskProvider: ViewDataProvider) {
-    super(cliTaskProvider);
-  }
 
   async getChildren(element?: TreeViewItem) {
     if (!element) {
@@ -43,7 +40,7 @@ class TreeView extends BaseView {
   }
 
   private async createRoot() {
-    const projectDefs = await this.cliTaskProvider.getProjects();
+    const projectDefs = await getNxWorkspaceProjects();
     const map = this.groupByRootPath(projectDefs);
 
     if (map.size === 0 && Object.keys(projectDefs).length > 0) {
@@ -58,7 +55,7 @@ class TreeView extends BaseView {
   }
 
   private async createFoldersOrProjectFromFolder(parent: FolderViewItem) {
-    const projectDefs = await this.cliTaskProvider.getProjects();
+    const projectDefs = await getNxWorkspaceProjects();
     const map = this.groupByRootPath(projectDefs);
 
     /**
@@ -97,7 +94,7 @@ class TreeView extends BaseView {
       contextValue: 'folder',
       path,
       label,
-      resource: join(this.cliTaskProvider.getWorkspacePath(), path),
+      resource: join(getWorkspacePath(), path),
       collapsible: 'Collapsed',
     };
   }
