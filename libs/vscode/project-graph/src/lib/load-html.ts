@@ -217,14 +217,47 @@ function injectedScript() {
         command: 'ready',
       })
 
-      function nx12(data) {
-        const projectCheckbox = document.querySelector(\`input[value="\${data.projectName}"]\`);
-        if (data.type === "${MessageType.focus}") {
-          projectCheckbox.parentElement.parentElement.querySelector('button').click();
-        } else if (data.type === "${MessageType.select}") {
-          projectCheckbox.click();
+      function waitForAndClickOnElement(data) {
+        function clickOnElement() { 
+          const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
+          if(projectElement) {
+            if (data.type === "${MessageType.focus}") {
+              projectElement.parentElement.querySelector('button').click();
+            } else if (data.type === "${MessageType.select}") {
+              projectElement.click();
+            }
+            return true;
+          }
+          // nx12 has a different structure for the project graph
+          const projectCheckbox = document.querySelector(\`input[value="\${data.projectName}"]\`);
+          if(projectCheckbox) {
+            if (data.type === "${MessageType.focus}") {
+            projectCheckbox.parentElement.parentElement.querySelector('button').click();
+          } else if (data.type === "${MessageType.select}") {
+              projectCheckbox.click();
+            }
+            return true;
+          }
+          return false;
         }
-      }
+
+        if(clickOnElement()) {
+          return
+        }
+    
+        const observer = new MutationObserver(mutations => {
+          const success = clickOnElement();
+          if(success) {
+            observer.disconnect();
+          }
+        });
+    
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
 
       window.addEventListener('message', ({data}) => {
         if (!data) {
@@ -232,24 +265,13 @@ function injectedScript() {
           return;
         }
 
-        setTimeout(() => {
-          try {
-            document.body.removeChild(noProjectElement);
-          } catch(e) {
-            //noop
-          }
-          const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
+        try {
+          document.body.removeChild(noProjectElement);
+        } catch(e) {
+          //noop
+        }
 
-          if (!projectElement) {
-            return nx12(data);
-          }
-
-          if (data.type === "${MessageType.focus}") {
-            projectElement.parentElement.querySelector('button').click();
-          } else if (data.type === "${MessageType.select}") {
-            projectElement.click();
-          }
-        })
+        waitForAndClickOnElement(data); 
       })
     }())
   `;
