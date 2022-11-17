@@ -6,6 +6,7 @@ import {
   commands,
   ExtensionContext,
   ProviderResult,
+  ThemeIcon,
   TreeItem,
   TreeItemCollapsibleState,
   Uri,
@@ -21,9 +22,9 @@ import {
   createListViewStrategy,
 } from './views/nx-project-list-view';
 import {
+  createTreeViewStrategy,
   TreeViewItem,
   TreeViewStrategy,
-  createTreeViewStrategy,
 } from './views/nx-project-tree-view';
 
 export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
@@ -151,6 +152,19 @@ export class NxTreeItem extends TreeItem {
     this.contextValue = item.contextValue;
     if (item.contextValue === 'folder' || item.contextValue === 'project') {
       this.resourceUri = Uri.file(item.resource);
+    }
+    this.setIcons();
+  }
+
+  setIcons() {
+    if (this.contextValue === 'folder') {
+      this.iconPath = new ThemeIcon('folder');
+    }
+    if (this.contextValue === 'project') {
+      this.iconPath = new ThemeIcon('package');
+    }
+    if (this.contextValue === 'target') {
+      this.iconPath = new ThemeIcon('symbol-property');
     }
   }
 }

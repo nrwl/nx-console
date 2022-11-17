@@ -29,7 +29,7 @@ export interface ProjectViewItem extends BaseViewItem<'project'> {
   resource: string;
 }
 
-export interface TargetViewItem extends BaseViewItem<'task'> {
+export interface TargetViewItem extends BaseViewItem<'target'> {
   nxProject: NxProject;
   nxTarget: NxTarget;
 }
@@ -51,7 +51,11 @@ export abstract class BaseView {
     projectName: string,
     projectDefinition: ProjectConfiguration
   ]): ProjectViewItem {
-    const hasChildren = !!targets;
+    const hasChildren =
+      !targets ||
+      Object.keys(targets).length !== 0 ||
+      Object.getPrototypeOf(targets) !== Object.prototype;
+
     const nxProject = { project: name ?? projectName, root };
 
     if (root === undefined) {
@@ -96,7 +100,7 @@ export abstract class BaseView {
   ): TargetViewItem {
     const hasChildren = !!configurations;
     return {
-      contextValue: 'task',
+      contextValue: 'target',
       nxProject,
       nxTarget: { name: targetName },
       label: targetName,
@@ -130,7 +134,7 @@ export abstract class BaseView {
     }
 
     return Object.keys(configurations).map((configuration) => ({
-      contextValue: 'task',
+      contextValue: 'target',
       nxProject,
       nxTarget: { name: nxTarget.name, configuration },
       label: configuration,

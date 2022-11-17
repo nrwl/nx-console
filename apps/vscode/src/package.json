@@ -126,17 +126,17 @@
       "view/item/context": [
         {
           "command": "nxConsole.editWorkspaceJson",
-          "when": "view == nxProjects && viewItem == project || viewItem == task",
+          "when": "view == nxProjects && viewItem == project || viewItem == target",
           "group": "inline"
         },
         {
           "command": "nxConsole.revealInExplorer",
-          "when": "view == nxProjects && viewItem != task",
+          "when": "view == nxProjects && viewItem != target",
           "group": "inline"
         },
         {
           "command": "nxConsole.runTask",
-          "when": "view == nxProjects && viewItem == task",
+          "when": "view == nxProjects && viewItem == target",
           "group": "inline"
         },
         {

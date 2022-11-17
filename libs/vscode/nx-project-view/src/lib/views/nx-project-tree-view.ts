@@ -1,7 +1,7 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
-import { join } from 'node:path';
+import { getWorkspacePath } from '@nx-console/vscode/utils';
+import { join, parse } from 'path';
 import {
   BaseView,
   FolderViewItem,
@@ -9,12 +9,21 @@ import {
   ProjectViewStrategy,
   TargetViewItem,
 } from './nx-project-base-view';
-import { isDefined, PathHelper } from './nx-project-util';
 
 export type TreeViewItem = FolderViewItem | ProjectViewItem | TargetViewItem;
-
 export type TreeViewStrategy = ProjectViewStrategy<TreeViewItem>;
-type TreeViewMap = Map<string, [string, ProjectConfiguration][]>;
+
+type TreeNode = {
+  dir: string;
+  projectName?: string;
+  projectConfiguration?: ProjectConfiguration;
+  children: TreeNode[];
+};
+type TreeMap = Map<string, TreeNode>;
+export type ProjectInfo = {
+  dir: string;
+  configuration: ProjectConfiguration;
+};
 
 export function createTreeViewStrategy(): TreeViewStrategy {
   const listView = new TreeView();
@@ -23,67 +32,148 @@ export function createTreeViewStrategy(): TreeViewStrategy {
   };
 }
 
+/* eslint-disable @typescript-eslint/no-non-null-assertion -- dealing with maps is hard */
 class TreeView extends BaseView {
-  private pathHelper = new PathHelper();
+  treeMap: TreeMap;
 
-  async getChildren(element?: TreeViewItem) {
+  async getChildren(
+    element?: TreeViewItem
+  ): Promise<TreeViewItem[] | undefined> {
     if (!element) {
-      return this.createRoot();
+      const projectDefs = await getNxWorkspaceProjects();
+      const [treeMap, roots] = this.constructTreeMap(projectDefs);
+      this.treeMap = treeMap;
+      return roots.map((root) =>
+        this.createFolderOrProjectTreeItemFromNode(root)
+      );
     }
-    if (element.contextValue === 'folder') {
-      return this.createFoldersOrProjectFromFolder(element);
-    }
+
     if (element.contextValue === 'project') {
-      return this.createTargetsFromProject(element);
+      const targetChildren =
+        (await this.createTargetsFromProject(element)) ?? [];
+      let folderAndProjectChildren: (ProjectViewItem | FolderViewItem)[] = [];
+      if (element.nxProject && this.treeMap.has(element.nxProject.root)) {
+        folderAndProjectChildren = this.treeMap
+          .get(element.nxProject.root)!
+          .children.map((folderOrProjectNode) =>
+            this.createFolderOrProjectTreeItemFromNode(folderOrProjectNode)
+          );
+      }
+      return [...targetChildren, ...folderAndProjectChildren];
     }
-    return this.createConfigurationsFromTarget(element);
+
+    if (element.contextValue === 'folder') {
+      if (this.treeMap.has(element.path)) {
+        return this.treeMap
+          .get(element.path)!
+          .children.map((folderOrProjectNode) =>
+            this.createFolderOrProjectTreeItemFromNode(folderOrProjectNode)
+          );
+      }
+    }
+
+    if (element.contextValue === 'target') {
+      return this.createConfigurationsFromTarget(element);
+    }
   }
 
-  private async createRoot() {
-    const projectDefs = await getNxWorkspaceProjects();
-    const map = this.groupByRootPath(projectDefs);
+  /*
+   * Construct a tree (all nodes are saved in a map) from the project definitions by doing the following:
+   * - Create a node for each project and recursively add its parent folders as nodes
+   * - If a project is added where a folder exists already, overwrite the folder node
+   * - In the end, if a folder with the '.' root exists, it will be the singular root node
+   */
+  private constructTreeMap(projectDefs: {
+    [projectName: string]: ProjectConfiguration;
+  }): [TreeMap, TreeNode[]] {
+    const treeMap = new Map<string, TreeNode>();
+    const roots = new Set<TreeNode>();
 
-    if (map.size === 0 && Object.keys(projectDefs).length > 0) {
-      // An angular project has its root project dir at ''
-      // Therefore, the map will be empty
-      const [[projectName, projectDef]] = Object.entries(projectDefs);
-      return [this.createProjectViewItem([projectName, projectDef])];
+    function connectNodeToParent(node: TreeNode, parent: TreeNode) {
+      parent.children.push(node);
     }
 
-    const rootFolders = this.getRootFolders(map);
-    return rootFolders.map(([path]) => this.createTreeItemFromPath(path));
-  }
+    function addProjectOrFolderTreeNode(
+      dir: string,
+      projectName?: string,
+      projectConfiguration?: ProjectConfiguration
+    ) {
+      // if a node is only a folder and exists already, we don't need to add it again
+      if (!projectConfiguration && !projectName && treeMap.has(dir)) {
+        return;
+      }
 
-  private async createFoldersOrProjectFromFolder(parent: FolderViewItem) {
-    const projectDefs = await getNxWorkspaceProjects();
-    const map = this.groupByRootPath(projectDefs);
+      // if a node is a project and exists already, we need to replace the folder node with a new project node
+      if (projectConfiguration && projectName && treeMap.has(dir)) {
+        const oldNode = treeMap.get(dir)!;
+        treeMap.set(dir, {
+          dir,
+          projectName: projectName,
+          projectConfiguration,
+          children: oldNode.children,
+        });
+        return;
+      }
 
-    /**
-     * In case that the parent is the <root> placeholder, then the children can only be projects
-     */
-    if (parent.path === '') {
-      return map.get('')?.map((project) => this.createProjectViewItem(project));
+      // if a node doesn't exist, we need to add it
+      const treeNode = {
+        dir,
+        projectName,
+        projectConfiguration,
+        children: [],
+      };
+      treeMap.set(dir, treeNode);
+
+      // after adding, we need to connect it to its parent or create it if it doesn't exist
+      // if there is no parent, the node is a root
+      const parentPath = parse(dir).dir;
+      if (!parentPath) {
+        roots.add(treeNode);
+        return;
+      }
+
+      if (treeMap.has(parentPath)) {
+        connectNodeToParent(treeMap.get(dir)!, treeMap.get(parentPath)!);
+      } else {
+        addProjectOrFolderTreeNode(parentPath);
+        connectNodeToParent(treeMap.get(dir)!, treeMap.get(parentPath)!);
+      }
     }
 
-    const subFolders = this.getSubFolders(map, parent.path);
-    return subFolders.map(([path, projects]) =>
-      this.createTreeItemFromPath(path, projects)
-    );
-  }
-
-  private createTreeItemFromPath(
-    path: string,
-    projects?: [string, ProjectConfiguration][]
-  ) {
-    if (projects && projects.length === 1) {
-      const [project] = projects;
-      return this.createProjectViewItem(project);
+    for (const [projectName, projectDef] of Object.entries(projectDefs)) {
+      addProjectOrFolderTreeNode(projectDef.root, projectName, projectDef);
     }
-    return this.createFolderTreeItem(path);
+
+    // special case: if there is a '.' project, it will be the singular root
+    if (treeMap.has('.')) {
+      const workspaceRootProjectNode = treeMap.get('.');
+      roots.forEach((root) => {
+        if (root.projectConfiguration?.root === '.') {
+          return;
+        }
+        workspaceRootProjectNode?.children.push(root);
+      });
+      roots.clear();
+      roots.add(workspaceRootProjectNode!);
+    }
+    // same special case for angular workspaces. They will have a project with a root of ''
+    if (treeMap.has('')) {
+      const workspaceRootProjectNode = treeMap.get('')!;
+      roots.forEach((root) => {
+        if (root.projectConfiguration?.root === '') {
+          return;
+        }
+        workspaceRootProjectNode?.children.push(root);
+      });
+      roots.clear();
+      roots.add(workspaceRootProjectNode!);
+    }
+
+    return [treeMap, [...roots]];
   }
 
   private createFolderTreeItem(path: string): FolderViewItem {
-    const folderName = this.pathHelper.getFolderName(path);
+    const folderName = parse(path).base;
     /**
      * In case that a project does not have a root value.
      * Show a placeholder value instead
@@ -99,48 +189,15 @@ class TreeView extends BaseView {
     };
   }
 
-  /**
-   * Groups the ProjectConfiguration by directory.
-   * Each entry is added n times.
-   * n is determined by the directory depth.
-   */
-  private groupByRootPath(projectDefs: {
-    [projectName: string]: ProjectConfiguration;
-  }): TreeViewMap {
-    return Object.entries(projectDefs)
-      .flatMap((project) => {
-        const [projectName, projectDef] = project;
-        const { root } = projectDef;
-        if (root === undefined) {
-          getOutputChannel().appendLine(
-            `Project ${projectName} has no root. This could be because of an error loading the workspace configuration.`
-          );
-          return;
-        }
-        return this.pathHelper
-          .createPathPermutations(root)
-          .map((dir) => [dir, project] as const);
-      })
-      .filter(isDefined)
-      .reduce<TreeViewMap>((map, [dir, project]) => {
-        const list = map.get(dir) ?? [];
-        list.push(project);
-        return map.set(dir, list);
-      }, new Map());
-  }
-
-  private getRootFolders(map: TreeViewMap) {
-    return Array.from(map.entries()).filter(([key]) =>
-      this.pathHelper.isRoot(key)
-    );
-  }
-
-  private getSubFolders(map: TreeViewMap, path: string) {
-    const depth = this.pathHelper.getDepth(path);
-
-    return Array.from(map.entries()).filter(
-      ([key]) =>
-        key.includes(path) && this.pathHelper.getDepth(key) === depth + 1
-    );
+  private createFolderOrProjectTreeItemFromNode(
+    node: TreeNode
+  ): ProjectViewItem | FolderViewItem {
+    const config = node.projectConfiguration;
+    return config
+      ? this.createProjectViewItem([
+          config.name ?? node.projectName ?? '',
+          config,
+        ])
+      : this.createFolderTreeItem(node.dir);
   }
 }
