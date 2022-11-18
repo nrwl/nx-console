@@ -83,7 +83,7 @@ export const config: Options.Testrunner = {
   // and 30 processes will get spawned. The property handles how many capabilities
   // from the same test should run tests.
   //
-  maxInstances: debug || process.env.CI ? 1 : 3,
+  maxInstances: debug || process.env.CI ? 1 : 1,
   //
   // If you have trouble getting all important capabilities together, check out the
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
@@ -92,7 +92,7 @@ export const config: Options.Testrunner = {
   capabilities: [
     {
       browserName: 'vscode',
-      browserVersion: '1.72.2',
+      browserVersion: '1.73.1',
       'wdio:vscodeOptions': {
         // point to the root directory of your project
         vscodeArgs: { 'disable-extensions': true },
