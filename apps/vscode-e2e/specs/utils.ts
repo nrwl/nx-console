@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { SideBarView } from 'wdio-vscode-service';
 
-export type TestWorkspaceKind = 'empty' | 'nx' | 'ng' | 'lerna' | 'nx11';
+export type TestWorkspaceKind = 'empty' | 'nx' | 'ng' | 'lerna' | 'nested';
 export async function openWorkspace(workspace: TestWorkspaceKind) {
   const testFolder = join(
     getTestWorkspacePath(),
