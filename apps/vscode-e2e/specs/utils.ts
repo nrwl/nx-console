@@ -81,6 +81,9 @@ export async function closeAllSectionsExcept(
       title.toLocaleUpperCase() !== exception.toLocaleUpperCase()
     ) {
       await section.collapse();
+      await browser.waitUntil(async () => {
+        return !(await section.isExpanded());
+      });
     }
   }
 }
