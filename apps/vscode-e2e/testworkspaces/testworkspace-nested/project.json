@@ -1,0 +1,66 @@
+{
+  "$schema": "node_modules/nx/schemas/project-schema.json",
+  "name": "app1",
+  "sourceRoot": "./src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "outputPath": "dist/app1",
+        "index": "src/index.html",
+        "baseHref": "/",
+        "main": "src/main.tsx",
+        "polyfills": "src/polyfills.ts",
+        "tsConfig": "tsconfig.app.json",
+        "assets": ["src/favicon.ico", "src/assets"],
+        "styles": ["src/styles.css"],
+        "scripts": [],
+        "webpackConfig": "@nrwl/react/plugins/webpack"
+      },
+      "configurations": {
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
+        },
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "src/environments/environment.ts",
+              "with": "src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/webpack:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "app1:build",
+        "hmr": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "app1:build:development"
+        },
+        "production": {
+          "buildTarget": "app1:build:production",
+          "hmr": false
+        }
+      }
+    }
+  },
+  "tags": []
+}

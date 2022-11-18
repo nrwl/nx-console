@@ -1,0 +1,24 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@nestedsupport/lib1": ["libs/lib1/src/index.ts"],
+      "@nestedsupport/lib1/nestedlib": ["libs/lib1/nestedlib/src/index.ts"],
+      "@nestedsupport/lib2": ["libs/lib2/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
