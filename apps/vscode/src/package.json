@@ -533,7 +533,7 @@
       },
       {
         "category": "Nx",
-        "title": "Select in Nx Graph",
+        "title": "Select/Deselect in Nx Graph",
         "command": "nx.graph.select"
       },
       {
@@ -544,7 +544,7 @@
       },
       {
         "category": "Nx",
-        "title": "Select in Nx Graph",
+        "title": "Select/Deselect in Nx Graph",
         "command": "nx.graph.select.button",
         "icon": "$(eye)"
       },
