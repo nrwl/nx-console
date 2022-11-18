@@ -3,7 +3,7 @@
   "ignorePatterns": [
     "!**/*",
     ".wdio-vscode-service/**/*",
-    "./testworkspaces/**/*",
+    "testworkspaces/**/*",
     "**/node_modules/**/*"
   ],
   "overrides": [

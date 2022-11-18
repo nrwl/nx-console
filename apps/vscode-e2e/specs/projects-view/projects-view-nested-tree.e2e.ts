@@ -1,6 +1,7 @@
 import { CustomTreeItem, SideBarView, ViewSection } from 'wdio-vscode-service';
 import {
   assertWorkspaceIsLoaded,
+  changeSettingForWorkspace,
   closeAllSectionsExcept,
   openNxConsoleViewContainer,
   openWorkspace,
@@ -12,6 +13,11 @@ let projectItems: CustomTreeItem[];
 
 describe('NxConsole Projects View in a nested Nx workspace', () => {
   before('', async () => {
+    changeSettingForWorkspace(
+      'nested',
+      'nxConsole.projectViewingStyle',
+      'tree'
+    );
     await openWorkspace('nested');
   });
 
@@ -28,7 +34,7 @@ describe('NxConsole Projects View in a nested Nx workspace', () => {
     expect(projectsViewElem).toExist();
   });
 
-  it('should include all projects', async () => {
+  it('should include root project', async () => {
     closeAllSectionsExcept(nxConsoleViewContainer, 'PROJECTS');
 
     projectsSection = await nxConsoleViewContainer
@@ -47,25 +53,19 @@ describe('NxConsole Projects View in a nested Nx workspace', () => {
     );
 
     const labels = await Promise.all(projectItems.map((vi) => vi.getLabel()));
-    expect(labels).toEqual(['app1', 'e2e', 'lib1', 'lib1-nestedlib', 'lib2']);
+    expect(labels).toEqual(['app1']);
   });
 
   it('should include all project targets', async () => {
     async function expandTreeViewItems(items: CustomTreeItem[]) {
+      if (!items || items.length === 0) {
+        return;
+      }
       for (const item of items) {
-        const isExpandable = await item.isExpandable();
-
-        if (!isExpandable) {
-          return;
-        }
-
         await item.expand();
-        const hasChildren = await item.hasChildren();
 
-        if (hasChildren) {
-          const children = await item.getChildren();
-          await expandTreeViewItems(children as CustomTreeItem[]);
-        }
+        const children = await item.getChildren();
+        await expandTreeViewItems(children as CustomTreeItem[]);
       }
     }
 
@@ -78,11 +78,16 @@ describe('NxConsole Projects View in a nested Nx workspace', () => {
       'app1',
       'start',
       'build',
+      'development',
+      'production',
       'test',
       'serve',
+      'development',
+      'production',
       'e2e',
       'e2e',
       'production',
+      'libs',
       'lib1',
       'test',
       'lib1-nestedlib',

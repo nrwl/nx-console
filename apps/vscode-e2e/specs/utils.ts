@@ -1,3 +1,4 @@
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { SideBarView } from 'wdio-vscode-service';
 
@@ -86,4 +87,22 @@ export async function closeAllSectionsExcept(
       });
     }
   }
+}
+
+export function changeSettingForWorkspace(
+  workspace: TestWorkspaceKind,
+  settingKey: string,
+  settingValue: string
+) {
+  const testFolder = join(
+    getTestWorkspacePath(),
+    `testworkspace-${workspace}/`
+  );
+  const targetFolder = join(testFolder, '.vscode');
+  if (!existsSync(targetFolder)) {
+    mkdirSync(targetFolder);
+  }
+
+  const targetFile = join(targetFolder, 'settings.json');
+  writeFileSync(targetFile, JSON.stringify({ [settingKey]: settingValue }));
 }
