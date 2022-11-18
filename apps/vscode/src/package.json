@@ -749,7 +749,7 @@
         },
         "nxConsole.projectViewingStyle": {
           "type": "string",
-          "default": "list",
+          "default": "automatic",
           "enum": [
             "list",
             "tree",
