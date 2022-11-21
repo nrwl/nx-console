@@ -1,7 +1,8 @@
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { SideBarView } from 'wdio-vscode-service';
+import { CustomTreeItem, SideBarView } from 'wdio-vscode-service';
 
-export type TestWorkspaceKind = 'empty' | 'nx' | 'ng' | 'lerna' | 'nx11';
+export type TestWorkspaceKind = 'empty' | 'nx' | 'ng' | 'lerna' | 'nested';
 export async function openWorkspace(workspace: TestWorkspaceKind) {
   const testFolder = join(
     getTestWorkspacePath(),
@@ -81,6 +82,39 @@ export async function closeAllSectionsExcept(
       title.toLocaleUpperCase() !== exception.toLocaleUpperCase()
     ) {
       await section.collapse();
+      await browser.waitUntil(async () => {
+        return !(await section.isExpanded());
+      });
     }
+  }
+}
+
+export function changeSettingForWorkspace(
+  workspace: TestWorkspaceKind,
+  settingKey: string,
+  settingValue: string
+) {
+  const testFolder = join(
+    getTestWorkspacePath(),
+    `testworkspace-${workspace}/`
+  );
+  const targetFolder = join(testFolder, '.vscode');
+  if (!existsSync(targetFolder)) {
+    mkdirSync(targetFolder);
+  }
+
+  const targetFile = join(targetFolder, 'settings.json');
+  writeFileSync(targetFile, JSON.stringify({ [settingKey]: settingValue }));
+}
+
+export async function expandTreeViewItems(items: CustomTreeItem[]) {
+  if (!items || items.length === 0) {
+    return;
+  }
+  for (const item of items) {
+    await item.expand();
+
+    const children = await item.getChildren();
+    await expandTreeViewItems(children as CustomTreeItem[]);
   }
 }

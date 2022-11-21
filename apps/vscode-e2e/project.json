@@ -18,7 +18,7 @@
       },
       "configurations": {
         "ci": {
-          "command": "xvfb-run -a --server-args=\"-screen 0 1920x1080x24\" wdio run ./wdio.conf.ts"
+          "command": "xvfb-run -a -s\"-screen 0 1920x1080x24\" wdio run ./wdio.conf.ts"
         }
       },
       "dependsOn": ["^build"]
