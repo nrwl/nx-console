@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { SideBarView } from 'wdio-vscode-service';
+import { CustomTreeItem, SideBarView } from 'wdio-vscode-service';
 
 export type TestWorkspaceKind = 'empty' | 'nx' | 'ng' | 'lerna' | 'nested';
 export async function openWorkspace(workspace: TestWorkspaceKind) {
@@ -105,4 +105,16 @@ export function changeSettingForWorkspace(
 
   const targetFile = join(targetFolder, 'settings.json');
   writeFileSync(targetFile, JSON.stringify({ [settingKey]: settingValue }));
+}
+
+export async function expandTreeViewItems(items: CustomTreeItem[]) {
+  if (!items || items.length === 0) {
+    return;
+  }
+  for (const item of items) {
+    await item.expand();
+
+    const children = await item.getChildren();
+    await expandTreeViewItems(children as CustomTreeItem[]);
+  }
 }
