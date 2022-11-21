@@ -68,10 +68,22 @@ async function openProjectWithFile(
   if (uri) {
     filePath = uri.fsPath;
   } else {
+    if (!window.activeTextEditor) {
+      window.showErrorMessage(
+        'Error while opening the graph: No file is currently open.'
+      );
+      return;
+    }
     filePath = window.activeTextEditor?.document.fileName;
   }
 
   const project = await findProjectWithPath(filePath, getWorkspacePath());
+  if (!project) {
+    window.showErrorMessage(
+      `Error while opening the graph: No project can be found at \n ${filePath}`
+    );
+    return;
+  }
   webview.projectInWebview(project?.name, messageType);
 }
 
