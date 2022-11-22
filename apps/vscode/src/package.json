@@ -108,9 +108,14 @@
       ],
       "view/title": [
         {
+          "command": "nx.graph.showAll",
+          "when": "view == nxProjects",
+          "group": "navigation@0"
+        },
+        {
           "command": "nxConsole.refreshWorkspace",
           "when": "view == nxProjects",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "nxConsole.refreshWorkspace",
@@ -547,6 +552,12 @@
         "title": "Select/Deselect in Nx Graph",
         "command": "nx.graph.select.button",
         "icon": "$(eye)"
+      },
+      {
+        "category": "Nx",
+        "title": "Show full project graph",
+        "command": "nx.graph.showAll",
+        "icon": "$(source-control)"
       },
       {
         "category": "Nx",

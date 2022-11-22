@@ -17,6 +17,10 @@ export function projectGraph() {
       getTelemetry().featureUsed('nx.graph.refresh');
       graphWebView.refresh();
     }),
+    commands.registerCommand('nx.graph.showAll', () => {
+      getTelemetry().featureUsed('nx.graph.showAll');
+      graphWebView.showAllProjects();
+    }),
     commands.registerCommand('nx.graph.focus', async (uri: Uri | undefined) => {
       getTelemetry().featureUsed('nx.graph.focus');
       await openProjectWithFile(graphWebView, uri, MessageType.focus);
