@@ -219,6 +219,15 @@ function injectedScript() {
 
       function waitForAndClickOnElement(data) {
         function clickOnElement() { 
+          if(data.type === "${MessageType.all}") {
+            const allProjectsElement = document.querySelector(\`[data-cy="selectAllButton"]\`);
+            if(allProjectsElement) {
+              allProjectsElement.click();
+              return true;
+            } else {
+              return false;
+            }
+          }
           const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
           if(projectElement) {
             if (data.type === "${MessageType.focus}") {
@@ -271,7 +280,7 @@ function injectedScript() {
           //noop
         }
 
-        waitForAndClickOnElement(data); 
+        setTimeout(() => waitForAndClickOnElement(data), 0); 
       })
     }())
   `;
