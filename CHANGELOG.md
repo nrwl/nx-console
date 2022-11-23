@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.26.0](https://github.com/nrwl/nx-console/compare/v17.25.0...v17.26.0) (2022-11-23)
+
+
+### Features
+
+* add automatic project view style ([#1406](https://github.com/nrwl/nx-console/issues/1406)) ([dca4a6e](https://github.com/nrwl/nx-console/commits/dca4a6e3f8a758bfc05dc70fc143cbd7dd762d16))
+* add show all projects in graph command ([#1412](https://github.com/nrwl/nx-console/issues/1412)) ([2871066](https://github.com/nrwl/nx-console/commits/2871066e7aea4b2100c344f2f7291bbcf94d0dcc))
+* set project view to automatic as default ([236810d](https://github.com/nrwl/nx-console/commits/236810d53e57d0f49f4484dc9fed8fc63c2582ba))
+
+
+### Bug Fixes
+
+* always reveal generate ui view ([a90f24a](https://github.com/nrwl/nx-console/commits/a90f24a05076f6fc3f3e98a56e839d76d191e22b))
+* remove daemon enabled check ([cc6e344](https://github.com/nrwl/nx-console/commits/cc6e344f6b681ba79e2f7864fa14b72e2fdfb43b))
+* remove outdated maxParallel flag ([#1413](https://github.com/nrwl/nx-console/issues/1413)) ([a4172f9](https://github.com/nrwl/nx-console/commits/a4172f9c9e7196a6680952ba71e67606f6f2cd8d))
+* support nested projects ([#1409](https://github.com/nrwl/nx-console/issues/1409)) ([f9bb538](https://github.com/nrwl/nx-console/commits/f9bb538a1ebd1d4c8ec4a8d11de427b2849acbe7))
+* update select in nx graph texts for clarity ([#1411](https://github.com/nrwl/nx-console/issues/1411)) ([bd59c56](https://github.com/nrwl/nx-console/commits/bd59c5684546cd17577c78769eacb3778da2e5ff))
+
 ## [17.25.0](https://github.com/nrwl/nx-console/compare/v17.24.2...v17.25.0) (2022-11-07)
 
 
