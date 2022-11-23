@@ -138,7 +138,7 @@ export function createWebViewPanel(
 
   publishMessagesToTaskExecutionForm(webviewPanel, schema);
 
-  if (!webviewPanelExists) webviewPanel.reveal();
+  webviewPanel?.reveal();
 
   getTelemetry().screenViewed(title);
 
