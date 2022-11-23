@@ -151,15 +151,8 @@ const RUN_MANY_OPTIONS: Option[] = [
   },
   {
     name: 'parallel',
-    type: OptionType.Boolean,
-    description: 'Parallelize the command',
-    isRequired: false,
-    default: 'false',
-  },
-  {
-    name: 'maxParallel',
     type: OptionType.Number,
-    description: 'Max number of parallel processes',
+    description: 'Max number of parallel processes [default is 3]',
     isRequired: false,
     default: 3,
   },
