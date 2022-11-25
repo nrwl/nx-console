@@ -9,7 +9,7 @@ import {
 } from '@nx-console/vscode/utils';
 import { exec, execSync, spawn } from 'child_process';
 import { join } from 'path';
-import { coerce, lt } from 'semver';
+import { coerce, gt, gte, lt } from 'semver';
 import { promisify } from 'util';
 import {
   commands,
@@ -170,7 +170,13 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
 
             const commandProcess = spawn(
               getPackageManagerCommand().exec,
-              ['nx', 'connect-to-nx-cloud'],
+              [
+                'nx',
+                // https://github.com/nrwl/nx/pull/12942
+                gte(coerce(nxVersion) ?? '', '15.0.7')
+                  ? 'connect'
+                  : 'connect-to-nx-cloud',
+              ],
               { cwd: getWorkspacePath(), shell: true }
             );
 
