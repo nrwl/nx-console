@@ -13113,6 +13113,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-plugin-simple-import-sort@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "eslint-plugin-simple-import-sort@npm:8.0.0"
+  peerDependencies:
+    eslint: ">=5.0.0"
+  checksum: d2a92a7d148803ee9ad4f081892a8d03820198c36a0f4f16a97d9f686a714edc9c9a9e51cc79cb0ba1afff76a1fde6a5eae50e9e3754928068227c92a2db5d6b
+  languageName: node
+  linkType: hard
+
 "eslint-scope@npm:5.1.1, eslint-scope@npm:^5.1.0, eslint-scope@npm:^5.1.1":
   version: 5.1.1
   resolution: "eslint-scope@npm:5.1.1"
@@ -20464,6 +20473,7 @@ __metadata:
     esbuild-copy-files-plugin: ^1.1.0
     eslint: 8.15.0
     eslint-config-prettier: 8.1.0
+    eslint-plugin-simple-import-sort: ^8.0.0
     fast-glob: ^3.2.11
     find-cache-dir: ^3.3.2
     jest: 28.1.3
