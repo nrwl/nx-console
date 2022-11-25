@@ -1,8 +1,9 @@
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import { commands, Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
 import { waitFor } from 'xstate/lib/waitFor';
-import { MessageType } from './graph-message-type';
+
 import { graphService } from './graph.machine';
+import { MessageType } from './graph-message-type';
 import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 
 export class GraphWebView implements Disposable {

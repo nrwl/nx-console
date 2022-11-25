@@ -1,7 +1,7 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   Input,
-  ChangeDetectionStrategy,
   SecurityContext,
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';

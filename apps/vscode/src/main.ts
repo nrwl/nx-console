@@ -1,3 +1,52 @@
+import { getGenerators } from '@nx-console/shared/collections';
+import { fileExists } from '@nx-console/shared/file-system';
+import { nxVersion } from '@nx-console/shared/npm';
+import { checkIsNxWorkspace } from '@nx-console/shared/utils';
+import {
+  AddDependencyCodelensProvider,
+  registerVscodeAddDependency,
+} from '@nx-console/vscode/add-dependency';
+import {
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
+import { configureLspClient } from '@nx-console/vscode/lsp-client';
+import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
+import { NxConversion } from '@nx-console/vscode/nx-conversion';
+import {
+  NxHelpAndFeedbackProvider,
+  NxHelpAndFeedbackTreeItem,
+} from '@nx-console/vscode/nx-help-and-feedback-view';
+import {
+  NxProjectTreeProvider,
+  NxTreeItem,
+} from '@nx-console/vscode/nx-project-view';
+import {
+  LOCATE_YOUR_WORKSPACE,
+  RunTargetTreeItem,
+  RunTargetTreeProvider,
+} from '@nx-console/vscode/nx-run-target-view';
+import {
+  getNxWorkspace,
+  stopDaemon,
+  WorkspaceCodeLensProvider,
+} from '@nx-console/vscode/nx-workspace';
+import { projectGraph } from '@nx-console/vscode/project-graph';
+import {
+  CliTaskProvider,
+  registerCliTaskCommands,
+  registerNxCommands,
+} from '@nx-console/vscode/tasks';
+import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
+import {
+  getOutputChannel,
+  getTelemetry,
+  initTelemetry,
+  outputLogger,
+  teardownTelemetry,
+  watchFile,
+} from '@nx-console/vscode/utils';
+import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
@@ -13,61 +62,11 @@ import {
   workspace,
 } from 'vscode';
 
-import { checkIsNxWorkspace } from '@nx-console/shared/utils';
 import {
-  GlobalConfigurationStore,
-  WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
-import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
-import {
-  NxProjectTreeProvider,
-  NxTreeItem,
-} from '@nx-console/vscode/nx-project-view';
-import {
-  LOCATE_YOUR_WORKSPACE,
-  RunTargetTreeItem,
-  RunTargetTreeProvider,
-} from '@nx-console/vscode/nx-run-target-view';
-import {
-  CliTaskProvider,
-  registerCliTaskCommands,
-  registerNxCommands,
-} from '@nx-console/vscode/tasks';
-import {
-  getOutputChannel,
-  getTelemetry,
-  initTelemetry,
-  outputLogger,
-  teardownTelemetry,
-  watchFile,
-} from '@nx-console/vscode/utils';
-import { revealWebViewPanel } from '@nx-console/vscode/webview';
-import { environment } from './environments/environment';
-
-import { getGenerators } from '@nx-console/shared/collections';
-import { fileExists } from '@nx-console/shared/file-system';
-import { nxVersion } from '@nx-console/shared/npm';
-import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
-import {
-  AddDependencyCodelensProvider,
-  registerVscodeAddDependency,
-} from '@nx-console/vscode/add-dependency';
-import { configureLspClient } from '@nx-console/vscode/lsp-client';
-import { NxConversion } from '@nx-console/vscode/nx-conversion';
-import {
-  NxHelpAndFeedbackProvider,
-  NxHelpAndFeedbackTreeItem,
-} from '@nx-console/vscode/nx-help-and-feedback-view';
-import { projectGraph } from '@nx-console/vscode/project-graph';
-import {
-  refreshWorkspace,
   REFRESH_WORKSPACE,
+  refreshWorkspace,
 } from './commands/refresh-workspace';
-import {
-  getNxWorkspace,
-  stopDaemon,
-  WorkspaceCodeLensProvider,
-} from '@nx-console/vscode/nx-workspace';
+import { environment } from './environments/environment';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxProjectTreeView: TreeView<NxTreeItem>;

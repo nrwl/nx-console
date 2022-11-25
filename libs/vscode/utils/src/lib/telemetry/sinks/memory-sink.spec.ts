@@ -1,5 +1,5 @@
-import { MemorySink } from './memory-sink';
 import { TelemetryType } from '../record';
+import { MemorySink } from './memory-sink';
 
 describe('Telemetry: MemorySink', () => {
   const type: TelemetryType = 'ScreenViewed';

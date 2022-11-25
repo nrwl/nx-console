@@ -1,5 +1,5 @@
-import { OutputChannel, window } from 'vscode';
 import { Logger } from '@nx-console/shared/schema';
+import { OutputChannel, window } from 'vscode';
 
 let _channel: OutputChannel;
 

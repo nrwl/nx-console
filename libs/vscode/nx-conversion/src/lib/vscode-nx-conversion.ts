@@ -1,7 +1,7 @@
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import {
-  getTelemetry,
   getShellExecutionForConfig,
+  getTelemetry,
 } from '@nx-console/vscode/utils';
 import { pipe, Subject } from 'rxjs';
 import { filter, scan, tap } from 'rxjs/operators';

@@ -1,4 +1,5 @@
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
+
 import { ProjectViewStrategy } from './nx-project-base-view';
 import { createListViewStrategy, ListViewItem } from './nx-project-list-view';
 import { createTreeViewStrategy, TreeViewItem } from './nx-project-tree-view';

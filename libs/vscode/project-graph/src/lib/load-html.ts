@@ -1,6 +1,7 @@
 import { Uri, WebviewPanel, workspace } from 'vscode';
-import { MessageType } from './graph-message-type';
+
 import { getProjectGraphOutput } from './create-project-graph';
+import { MessageType } from './graph-message-type';
 
 const html = String.raw;
 

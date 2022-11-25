@@ -1,11 +1,11 @@
 import {
-  Component,
   ChangeDetectionStrategy,
-  Input,
-  Output,
+  Component,
   EventEmitter,
-  OnInit,
+  Input,
   OnDestroy,
+  OnInit,
+  Output,
 } from '@angular/core';
 import {
   ControlContainer,

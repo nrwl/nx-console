@@ -1,5 +1,4 @@
 import { parseTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
-import { fileExists, readFile } from '@nx-console/shared/file-system';
 import {
   findProperty,
   getLanguageModelCache,
@@ -7,6 +6,7 @@ import {
   lspLogger,
 } from '@nx-console/language-server/utils';
 import { nxWorkspace } from '@nx-console/language-server/workspace';
+import { fileExists, readFile } from '@nx-console/shared/file-system';
 import { join } from 'path';
 import {
   ASTNode,
@@ -15,6 +15,7 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import { URI } from 'vscode-uri';
+
 import { createRange } from './create-range';
 
 const tempDocumentCounter = new Map<string, number>();

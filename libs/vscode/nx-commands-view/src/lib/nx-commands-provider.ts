@@ -7,6 +7,7 @@ import {
   getWorkspacePath,
 } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext, Task, tasks, TaskScope } from 'vscode';
+
 import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
 
 export const EXECUTE_ARBITRARY_COMMAND = 'nxConsole.executeArbitraryCommand';

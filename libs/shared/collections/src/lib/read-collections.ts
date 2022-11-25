@@ -1,7 +1,11 @@
 import {
+  clearJsonCache,
+  readAndCacheJsonFile,
+} from '@nx-console/shared/file-system';
+import {
+  packageDetails,
   workspaceDependencies,
   workspaceDependencyPath,
-  packageDetails,
 } from '@nx-console/shared/npm';
 import {
   CollectionInfo,
@@ -11,10 +15,6 @@ import {
 } from '@nx-console/shared/schema';
 import { platform } from 'os';
 import { dirname, join, resolve } from 'path';
-import {
-  clearJsonCache,
-  readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
 
 export type ReadCollectionsOptions = {
   projects?: WorkspaceProjects;

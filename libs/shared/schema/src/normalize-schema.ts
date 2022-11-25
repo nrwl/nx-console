@@ -1,3 +1,6 @@
+import { names } from '@nrwl/devkit/src/utils/names';
+import { Schema } from 'nx/src/utils/params';
+
 import {
   CliOption,
   ItemsWithEnum,
@@ -8,8 +11,6 @@ import {
   OptionPropertyDescription,
   XPrompt,
 } from './schema';
-import { Schema } from 'nx/src/utils/params';
-import { names } from '@nrwl/devkit/src/utils/names';
 
 export interface GeneratorDefaults {
   [name: string]: string;

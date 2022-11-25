@@ -1,12 +1,12 @@
+import * as fs from 'fs';
 import {
-  xhr,
-  XHRResponse,
   configure as configureHttpRequests,
   getErrorStatusDescription,
+  xhr,
+  XHRResponse,
 } from 'request-light';
-import { URI } from 'vscode-uri';
-import * as fs from 'fs';
 import { Thenable } from 'vscode-json-languageservice';
+import { URI } from 'vscode-uri';
 
 export interface RequestService {
   getContent(uri: string): Promise<string>;

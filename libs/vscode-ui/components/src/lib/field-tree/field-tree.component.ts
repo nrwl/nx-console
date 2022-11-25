@@ -1,10 +1,10 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
-  SimpleChanges,
   OnChanges,
-  ChangeDetectionStrategy,
+  SimpleChanges,
 } from '@angular/core';
 import { Option } from '@nx-console/shared/schema';
 

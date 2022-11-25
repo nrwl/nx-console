@@ -3,12 +3,11 @@ import {
   getJsonLanguageService,
   getLanguageModelCache,
 } from '@nx-console/language-server/utils';
-import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
-import { getDocumentLinks } from './get-document-links';
-
-import { X_COMPLETION_TYPE } from '@nx-console/shared/json-schema';
-
 import * as fs from '@nx-console/shared/file-system';
+import { X_COMPLETION_TYPE } from '@nx-console/shared/json-schema';
+import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
+
+import { getDocumentLinks } from './get-document-links';
 jest.mock(
   '@nx-console/shared/file-system',
   (): Partial<typeof fs> => ({

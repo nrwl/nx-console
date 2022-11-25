@@ -2,6 +2,7 @@ import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { commands, ExtensionContext, TreeItem } from 'vscode';
+
 import { commandList, RunTargetTreeItem } from './run-target-tree-item';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(

@@ -1,5 +1,5 @@
-import { Sink } from '../sink';
 import { TelemetryType } from '../record';
+import { Sink } from '../sink';
 
 export interface LogWriter {
   log(...messages: any[]): void;

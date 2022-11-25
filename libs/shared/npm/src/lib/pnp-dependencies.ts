@@ -1,6 +1,6 @@
+import { fileExists } from '@nx-console/shared/file-system';
 import type { PnpApi } from '@yarnpkg/pnp';
 import { join } from 'path';
-import { fileExists } from '@nx-console/shared/file-system';
 declare function __non_webpack_require__(importPath: string): any;
 
 let PNP_API: PnpApi;

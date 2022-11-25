@@ -1,11 +1,11 @@
 // import { getOutputChannel } from '@nx-console/utils';
-import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
-import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
-import type * as NxDaemonClient from 'nx/src/daemon/client/client';
-import { platform } from 'os';
-import { join } from 'path';
 import { findNxPackagePath } from '@nx-console/shared/npm';
 import { Logger } from '@nx-console/shared/schema';
+import type * as NxDaemonClient from 'nx/src/daemon/client/client';
+import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
+import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
+import { platform } from 'os';
+import { join } from 'path';
 
 declare function __non_webpack_require__(importPath: string): any;
 

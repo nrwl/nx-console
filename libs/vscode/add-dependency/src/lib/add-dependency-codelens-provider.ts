@@ -17,6 +17,7 @@ import {
   Range,
   TextDocument,
 } from 'vscode';
+
 import {
   ADD_DEPENDENCY_COMMAND,
   ADD_DEV_DEPENDENCY_COMMAND,

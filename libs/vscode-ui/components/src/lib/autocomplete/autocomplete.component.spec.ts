@@ -1,20 +1,21 @@
 import { Component, ViewChild } from '@angular/core';
 import {
-  waitForAsync,
   ComponentFixture,
+  fakeAsync,
   TestBed,
   tick,
-  fakeAsync,
+  waitForAsync,
 } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Option, OptionType } from '@nx-console/shared/schema';
+import { combineLatest } from 'rxjs';
+import { filter, take, withLatestFrom } from 'rxjs/operators';
+
 import {
   AutocompleteComponent,
   AutocompleteNavKeys,
 } from '../autocomplete/autocomplete.component';
-import { filter, take, withLatestFrom } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
 
 const window: any = global;
 

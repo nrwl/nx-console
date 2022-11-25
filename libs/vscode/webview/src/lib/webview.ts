@@ -1,3 +1,15 @@
+import {
+  TaskExecutionGlobalConfigurationInputMessage,
+  TaskExecutionOutputMessage,
+  TaskExecutionOutputMessageType,
+  TaskExecutionSchema,
+  TaskExecutionSchemaInputMessage,
+} from '@nx-console/shared/schema';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/utils';
+import { watch } from 'fs';
 import { join } from 'path';
 import {
   commands,
@@ -11,19 +23,7 @@ import {
   window,
 } from 'vscode';
 
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
-import { getTelemetry } from '@nx-console/vscode/utils';
-import {
-  TaskExecutionSchema,
-  TaskExecutionSchemaInputMessage,
-  TaskExecutionOutputMessage,
-  TaskExecutionOutputMessageType,
-  TaskExecutionGlobalConfigurationInputMessage,
-} from '@nx-console/shared/schema';
 import { getTaskExecutionSchema } from './get-task-execution-schema';
-import { watch } from 'fs';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 
 let webviewPanel: WebviewPanel | undefined;
 

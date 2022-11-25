@@ -6,6 +6,7 @@
 
 import { JSONDocument } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+
 import { getJsonLanguageService } from './json-language-service';
 
 export interface LanguageModelCache<T> {

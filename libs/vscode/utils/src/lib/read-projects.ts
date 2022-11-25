@@ -1,22 +1,22 @@
-import {
-  Targets,
-  Option,
-  DefaultValue,
-  TargetConfiguration,
-  WorkspaceProjects,
-} from '@nx-console/shared/schema';
-import * as path from 'path';
 import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
-
-import { getTelemetry } from './telemetry';
-import { getOutputChannel } from './output-channel';
+import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import {
   localDependencyPath,
   workspaceDependencyPath,
 } from '@nx-console/shared/npm';
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
+import {
+  DefaultValue,
+  Option,
+  TargetConfiguration,
+  Targets,
+  WorkspaceProjects,
+} from '@nx-console/shared/schema';
 import { normalizeSchema } from '@nx-console/shared/schema/normalize';
 import { getPrimitiveValue } from '@nx-console/shared/utils';
+import * as path from 'path';
+
+import { getOutputChannel } from './output-channel';
+import { getTelemetry } from './telemetry';
 
 export function readTargetDef(
   targetName: string,

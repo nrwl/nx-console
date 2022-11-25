@@ -1,9 +1,9 @@
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
   Input,
   Output,
-  EventEmitter,
 } from '@angular/core';
 import { ControlContainer, UntypedFormGroup } from '@angular/forms';
 import { Option } from '@nx-console/shared/schema';

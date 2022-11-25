@@ -1,15 +1,16 @@
 import { exec } from 'child_process';
 import {
-  existsSync,
-  rmSync,
-  readdirSync,
-  mkdirSync,
-  lstatSync,
   copyFileSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
 } from 'fs';
 import { basename, dirname, join } from 'path';
 import { promisify } from 'util';
 import { SevereServiceError } from 'webdriverio';
+
 import { getTestWorkspacePath } from '../specs/utils';
 
 export class TestworkspaceInstallationService {

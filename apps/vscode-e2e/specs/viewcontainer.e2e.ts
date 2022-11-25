@@ -1,4 +1,5 @@
 import { Workbench } from 'wdio-vscode-service';
+
 import { openWorkspace } from './utils';
 
 let workbench: Workbench;

@@ -1,15 +1,16 @@
-import {
-  ConfigurationTarget,
-  ExtensionContext,
-  EventEmitter,
-  workspace,
-  Memento,
-} from 'vscode';
 import { Store } from '@nx-console/shared/schema';
 import {
+  ConfigurationTarget,
+  EventEmitter,
+  ExtensionContext,
+  Memento,
+  workspace,
+} from 'vscode';
+
+import {
   GLOBAL_CONFIG_KEYS,
-  GlobalConfigKeys,
   GlobalConfig,
+  GlobalConfigKeys,
 } from './configuration-keys';
 
 let CONFIG_STORE: GlobalConfigurationStore;

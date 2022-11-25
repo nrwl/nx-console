@@ -1,5 +1,6 @@
 import { CollectionInfo } from '@nx-console/shared/schema';
 import { JSONSchema } from 'vscode-json-languageservice';
+
 import { createBuildersAndExecutorsSchema } from './create-builders-and-executors-schema';
 
 export function getWorkspaceJsonSchema(collections: CollectionInfo[]) {

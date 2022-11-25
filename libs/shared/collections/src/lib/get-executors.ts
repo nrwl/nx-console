@@ -1,4 +1,5 @@
 import { CollectionInfo, WorkspaceProjects } from '@nx-console/shared/schema';
+
 import { readCollections } from './read-collections';
 
 export type GetExecutorsOptions = { includeHidden: boolean };

@@ -1,4 +1,5 @@
 import { JSONSchema } from 'vscode-json-languageservice';
+
 import { CompletionType } from './completion-type';
 
 export const implicitDependencies: JSONSchema = {

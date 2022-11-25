@@ -1,5 +1,6 @@
 import { Store } from '@nx-console/shared/schema';
 import { ExtensionContext, Memento } from 'vscode';
+
 import { WorkspaceConfigKeys } from './configuration-keys';
 
 let CONFIG_STORE: WorkspaceConfigurationStore;

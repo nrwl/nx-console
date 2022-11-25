@@ -1,6 +1,6 @@
+import { TelemetryType } from './record';
 import { MemorySink } from './sinks';
 import { Telemetry } from './telemetry';
-import { TelemetryType } from './record';
 import { User } from './user';
 
 describe('Telemetry', () => {

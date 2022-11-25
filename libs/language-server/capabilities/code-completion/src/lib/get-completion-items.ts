@@ -1,3 +1,4 @@
+import { getDefaultCompletionType } from '@nx-console/language-server/utils';
 import {
   CompletionType,
   hasCompletionGlob,
@@ -5,7 +6,6 @@ import {
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
 } from '@nx-console/shared/json-schema';
-import { getDefaultCompletionType } from '@nx-console/language-server/utils';
 import {
   ASTNode,
   CompletionItem,
@@ -14,6 +14,7 @@ import {
   Position,
   TextDocument,
 } from 'vscode-json-languageservice';
+
 import { inputNameCompletion } from './input-name-completion';
 import { pathCompletion } from './path-completion';
 import { projectCompletion } from './project-completion';

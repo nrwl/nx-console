@@ -1,5 +1,5 @@
-import { Sink } from '../sink';
 import { TelemetryType } from '../record';
+import { Sink } from '../sink';
 
 export class MemorySink implements Sink {
   records: Record[] = [];

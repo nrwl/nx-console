@@ -1,10 +1,10 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
+import { BrowserModule } from '@angular/platform-browser';
 import {
-  VscodeUiFeatureTaskExecutionFormModule,
   TaskExecutionFormComponent,
+  VscodeUiFeatureTaskExecutionFormModule,
 } from '@nx-console/vscode-ui/feature-task-execution-form';
+
 import { environment } from '../environments/environment';
 
 @NgModule({

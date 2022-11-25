@@ -1,13 +1,13 @@
+import { ComponentFixture, TestBed,waitForAsync } from '@angular/core/testing';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import {
   OptionType,
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
-import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
 import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
+import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
+
 import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 

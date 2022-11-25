@@ -1,6 +1,7 @@
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import { assign, createMachine, interpret } from 'xstate';
 import { log } from 'xstate/lib/actions';
+
 import { createProjectGraph } from './create-project-graph';
 import { MessageType } from './graph-message-type';
 

@@ -1,7 +1,7 @@
 export * from './lib/abstract-tree-provider';
-export * from './lib/telemetry';
+export { getWorkspacePath } from './lib/get-workspace-path';
 export * from './lib/output-channel';
 export * from './lib/read-projects';
-export { watchFile } from './lib/watch-file';
 export { getShellExecutionForConfig } from './lib/shell-execution';
-export { getWorkspacePath } from './lib/get-workspace-path';
+export * from './lib/telemetry';
+export { watchFile } from './lib/watch-file';

@@ -16,6 +16,7 @@ import {
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
+import { nxWorkspace } from '@nx-console/language-server/workspace';
 import { getExecutors } from '@nx-console/shared/collections';
 import {
   getNxJsonSchema,
@@ -23,7 +24,7 @@ import {
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
 } from '@nx-console/shared/json-schema';
-import { nxWorkspace } from '@nx-console/language-server/workspace';
+import { formatError } from '@nx-console/shared/utils';
 import {
   ClientCapabilities,
   CompletionList,
@@ -38,7 +39,6 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { formatError } from '@nx-console/shared/utils';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));

@@ -1,4 +1,3 @@
-import { TextDocument } from 'vscode';
 import type * as typescript from 'typescript';
 import {
   isObjectLiteralExpression,
@@ -6,6 +5,7 @@ import {
   isStringLiteral,
   parseJsonText,
 } from 'typescript';
+import { TextDocument } from 'vscode';
 
 export interface ProjectLocations {
   [projectName: string]: {

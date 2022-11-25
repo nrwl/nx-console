@@ -1,20 +1,20 @@
-import { commands, ExtensionContext, Uri, window } from 'vscode';
-
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import { getGenerators } from '@nx-console/shared/collections';
 import { nxVersion } from '@nx-console/shared/npm';
 import { GeneratorType, Option, OptionType } from '@nx-console/shared/schema';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
-import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
-import { CliTaskProvider } from './cli-task-provider';
-import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
-import { selectFlags } from './select-flags';
-import { selectGenerator } from './select-generator';
-import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
 import {
   findProjectWithPath,
   getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
+import { getWorkspacePath, outputLogger } from '@nx-console/vscode/utils';
+import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
+import { commands, ExtensionContext, Uri, window } from 'vscode';
+
+import { CliTaskProvider } from './cli-task-provider';
+import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
+import { selectFlags } from './select-flags';
+import { selectGenerator } from './select-generator';
 
 const CLI_COMMAND_LIST = [
   'build',

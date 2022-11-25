@@ -1,5 +1,6 @@
 import { CollectionInfo } from '@nx-console/shared/schema';
 import type { JSONSchema } from 'vscode-json-languageservice';
+
 import {
   implicitDependencies,
   namedInputs,

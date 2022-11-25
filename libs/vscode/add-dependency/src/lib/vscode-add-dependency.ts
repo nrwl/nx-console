@@ -4,6 +4,7 @@ import {
   PackageManager,
 } from '@nrwl/devkit';
 import { getGenerators } from '@nx-console/shared/collections';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
 import {
   getShellExecutionForConfig,
@@ -11,6 +12,7 @@ import {
   getWorkspacePath,
 } from '@nx-console/vscode/utils';
 import { xhr, XHRResponse } from 'request-light';
+import { gte, major, rcompare } from 'semver';
 import {
   commands,
   ExtensionContext,
@@ -23,9 +25,8 @@ import {
   TaskScope,
   window,
 } from 'vscode';
-import { gte, major, rcompare } from 'semver';
+
 import { resolveDependencyVersioning } from './dependency-versioning';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';

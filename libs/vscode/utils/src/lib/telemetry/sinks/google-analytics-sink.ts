@@ -1,8 +1,9 @@
-import { Sink } from '../sink';
-import { TelemetryType } from '../record';
-import { User } from '../user';
-import { TelemetryMessageBuilder } from '../message-builder';
 import type { Visitor } from 'universal-analytics';
+
+import { TelemetryMessageBuilder } from '../message-builder';
+import { TelemetryType } from '../record';
+import { Sink } from '../sink';
+import { User } from '../user';
 
 // increment this if there is substancial changes to the schema,
 // and you want to create a new view that only has this data

@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
+
 import { formatTask } from './format-task';
 
 @Pipe({

@@ -1,11 +1,11 @@
+import { clearJsonCache, fileExists } from '@nx-console/shared/file-system';
+import { Logger } from '@nx-console/shared/schema';
+import { NxWorkspace } from '@nx-console/shared/types';
 import {
   checkIsNxWorkspace,
   formatError,
   toWorkspaceFormat,
 } from '@nx-console/shared/utils';
-
-import { clearJsonCache, fileExists } from '@nx-console/shared/file-system';
-import { Logger } from '@nx-console/shared/schema';
 import { join } from 'path';
 import {
   firstValueFrom,
@@ -16,8 +16,8 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
+
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
-import { NxWorkspace } from '@nx-console/shared/types';
 
 const enum Status {
   not_started,

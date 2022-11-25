@@ -1,9 +1,10 @@
 import { Schema } from 'nx/src/utils/params';
+
 import {
   LongFormXPrompt,
+  Option,
   OptionPropertyDescription,
   OptionType,
-  Option,
 } from './index';
 import { normalizeSchema } from './normalize-schema';
 

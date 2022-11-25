@@ -1,9 +1,10 @@
+import { Store } from '@nx-console/shared/schema';
+
+import { TelemetryMessageBuilder } from './message-builder';
 import { TelemetryType } from './record';
 import { Sink } from './sink';
-import { LoggerSink, GoogleAnalyticsSink, ApplicationPlatform } from './sinks';
+import { ApplicationPlatform,GoogleAnalyticsSink, LoggerSink } from './sinks';
 import { User, UserState } from './user';
-import { TelemetryMessageBuilder } from './message-builder';
-import { Store } from '@nx-console/shared/schema';
 
 export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];

@@ -1,7 +1,7 @@
 import { WorkspaceJsonConfiguration } from '@nrwl/devkit';
 import {
-  WorkspaceProjects,
   WORKSPACE_GENERATOR_NAME_REGEX,
+  WorkspaceProjects,
 } from '@nx-console/shared/schema';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { NxConversion } from '@nx-console/vscode/nx-conversion';
@@ -18,6 +18,7 @@ import {
   TaskProvider,
   tasks,
 } from 'vscode';
+
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';

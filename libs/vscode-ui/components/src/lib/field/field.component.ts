@@ -1,4 +1,3 @@
-import { Option, OptionType } from '@nx-console/shared/schema';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -14,7 +13,9 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
 } from '@angular/forms';
+import { Option, OptionType } from '@nx-console/shared/schema';
 import { Subscription } from 'rxjs';
+
 import { getOptionItems } from '../field-items/field-items.pipe';
 
 export enum OptionComponent {

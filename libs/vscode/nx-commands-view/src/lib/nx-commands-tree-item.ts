@@ -1,5 +1,6 @@
-import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 import { join } from 'path';
+import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+
 import { EXECUTE_ARBITRARY_COMMAND } from './nx-commands-provider';
 
 export type NxCommandConfig =

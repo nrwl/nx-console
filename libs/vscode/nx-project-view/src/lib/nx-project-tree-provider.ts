@@ -11,15 +11,16 @@ import {
   TreeItemCollapsibleState,
   Uri,
 } from 'vscode';
+
 import {
   AutomaticViewItem,
   AutomaticViewStrategy,
   createAutomaticViewStrategy,
 } from './views/nx-project-automatic-view';
 import {
+  createListViewStrategy,
   ListViewItem,
   ListViewStrategy,
-  createListViewStrategy,
 } from './views/nx-project-list-view';
 import {
   createTreeViewStrategy,

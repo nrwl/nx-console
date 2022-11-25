@@ -1,3 +1,9 @@
+import { buildProjectPath } from '@nx-console/shared/utils';
+import {
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
+import { join } from 'path';
 import {
   CodeLens,
   CodeLensProvider,
@@ -12,17 +18,11 @@ import {
   workspace,
 } from 'vscode';
 
-import { buildProjectPath } from '@nx-console/shared/utils';
-import {
-  GlobalConfigurationStore,
-  WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
 import {
   getProjectLocations,
   ProjectLocations,
 } from './find-workspace-json-target';
 import { getNxWorkspace } from './get-nx-workspace';
-import { join } from 'path';
 
 export class TargetCodeLens extends CodeLens {
   constructor(

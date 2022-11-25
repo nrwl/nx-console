@@ -1,11 +1,11 @@
 import { Option, OptionType } from '@nx-console/shared/schema';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getTelemetry } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext, tasks, window } from 'vscode';
 
-import { getTelemetry } from '@nx-console/vscode/utils';
 import { CliTaskProvider } from './cli-task-provider';
 import { NxTask } from './nx-task';
 import { selectFlags } from './select-flags';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 
 let cliTaskProvider: CliTaskProvider;
 export function registerNxCommands(

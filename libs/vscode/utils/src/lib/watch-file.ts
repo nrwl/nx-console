@@ -1,4 +1,4 @@
-import { workspace, GlobPattern, Disposable } from 'vscode';
+import { Disposable,GlobPattern, workspace } from 'vscode';
 
 /**
  * Watch a file and execute the callback on changes.

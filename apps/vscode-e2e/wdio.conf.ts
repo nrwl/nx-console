@@ -1,7 +1,7 @@
 import type { Options } from '@wdio/types';
-
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+
 import { TestworkspaceInstallationService } from './services/testworkspace-installation.service';
 
 const debug = process.env.DEBUG;

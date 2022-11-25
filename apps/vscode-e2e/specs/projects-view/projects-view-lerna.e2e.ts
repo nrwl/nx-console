@@ -1,4 +1,5 @@
 import { CustomTreeItem, SideBarView, ViewSection } from 'wdio-vscode-service';
+
 import {
   assertWorkspaceIsLoaded,
   closeAllSectionsExcept,

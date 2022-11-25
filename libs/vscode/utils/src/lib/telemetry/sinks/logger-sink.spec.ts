@@ -1,5 +1,5 @@
-import { LoggerSink, LogWriter, header } from './logger-sink';
 import { TelemetryType } from '../record';
+import { header,LoggerSink, LogWriter } from './logger-sink';
 
 describe('Telemetry: Logger Sink', () => {
   const type: TelemetryType = 'CommandRun';

@@ -1,5 +1,6 @@
-import { findNxPackagePath } from './find-nx-package-path';
 import { coerce, SemVer } from 'semver';
+
+import { findNxPackagePath } from './find-nx-package-path';
 
 declare function __non_webpack_require__(importPath: string): any;
 

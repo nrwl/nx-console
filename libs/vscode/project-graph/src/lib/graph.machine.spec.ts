@@ -1,10 +1,10 @@
-import { interpret, StateValue } from 'xstate';
-import { waitFor } from 'xstate/lib/waitFor';
-import { graphMachine } from './graph.machine';
+import * as utils from '@nx-console/vscode/utils';
 import { PartialDeep } from 'type-fest';
 import type { OutputChannel } from 'vscode';
+import { interpret, StateValue } from 'xstate';
+import { waitFor } from 'xstate/lib/waitFor';
 
-import * as utils from '@nx-console/vscode/utils';
+import { graphMachine } from './graph.machine';
 jest.mock(
   '@nx-console/vscode/utils',
   (): PartialDeep<typeof utils> => ({

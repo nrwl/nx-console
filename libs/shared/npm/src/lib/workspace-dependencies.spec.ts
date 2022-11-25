@@ -1,8 +1,8 @@
-import { PartialDeep } from 'type-fest';
 import { mocked } from 'jest-mock';
-import { workspaceDependencyPath } from './workspace-dependencies';
+import { PartialDeep } from 'type-fest';
 
 import * as pnpDependencies from './pnp-dependencies';
+import { workspaceDependencyPath } from './workspace-dependencies';
 jest.mock(
   './pnp-dependencies',
   (): Partial<typeof pnpDependencies> => ({

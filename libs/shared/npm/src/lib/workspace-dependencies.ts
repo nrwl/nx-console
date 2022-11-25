@@ -1,15 +1,16 @@
+import { directoryExists } from '@nx-console/shared/file-system';
 import { WorkspaceProjects } from '@nx-console/shared/schema';
 import { stat } from 'fs/promises';
 import { join } from 'path';
+
 import { npmDependencies } from './npm-dependencies';
+import { nxVersion } from './nx-version';
+import { packageDetails } from './package-details';
 import {
   isWorkspaceInPnp,
   pnpDependencies,
   pnpDependencyPath,
 } from './pnp-dependencies';
-import { directoryExists } from '@nx-console/shared/file-system';
-import { nxVersion } from './nx-version';
-import { packageDetails } from './package-details';
 
 /**
  * Get dependencies for the current workspace.

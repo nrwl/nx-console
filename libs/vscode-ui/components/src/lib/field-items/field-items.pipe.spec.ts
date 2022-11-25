@@ -1,4 +1,5 @@
 import { OptionType } from '@nx-console/shared/schema';
+
 import { FieldItemsPipe, getOptionItems } from './field-items.pipe';
 
 describe('FieldItemsPipe', () => {

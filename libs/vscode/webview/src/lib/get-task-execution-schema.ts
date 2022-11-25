@@ -4,6 +4,16 @@ import {
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import {
+  findProjectWithPath,
+  getNxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
+import {
+  CliTaskProvider,
+  CliTaskQuickPickItem,
+  selectCliProject,
+  selectGenerator,
+} from '@nx-console/vscode/tasks';
+import {
   getOutputChannel,
   getTelemetry,
   getWorkspacePath,
@@ -12,16 +22,6 @@ import {
 } from '@nx-console/vscode/utils';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { Uri, window } from 'vscode';
-import {
-  CliTaskProvider,
-  CliTaskQuickPickItem,
-  selectCliProject,
-  selectGenerator,
-} from '@nx-console/vscode/tasks';
-import {
-  findProjectWithPath,
-  getNxWorkspace,
-} from '@nx-console/vscode/nx-workspace';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,

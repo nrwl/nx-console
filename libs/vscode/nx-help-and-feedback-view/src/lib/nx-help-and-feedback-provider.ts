@@ -23,6 +23,7 @@ import {
   Uri,
   window,
 } from 'vscode';
+
 import { NxHelpAndFeedbackTreeItem } from './nx-help-and-feedback-tree-item';
 
 export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<

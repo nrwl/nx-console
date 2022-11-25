@@ -9,6 +9,7 @@ import {
   CompletionItemKind,
   TextDocument,
 } from 'vscode-json-languageservice';
+
 import { createCompletionItem } from './create-completion-path-item';
 
 export async function pathCompletion(

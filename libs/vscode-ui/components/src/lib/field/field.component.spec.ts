@@ -1,15 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import { ComponentFixture, TestBed,waitForAsync } from '@angular/core/testing';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
 import { Option, OptionType } from '@nx-console/shared/schema';
-import { FieldComponent, OptionComponent } from './field.component';
+
 import { AutocompleteComponent } from '../autocomplete/autocomplete.component';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { FieldItemsPipe } from '../field-items/field-items.pipe';
 import { InputComponent } from '../input/input.component';
 import { MultipleSelectComponent } from '../multiple-select/multiple-select.component';
 import { SelectComponent } from '../select/select.component';
+import { FieldComponent, OptionComponent } from './field.component';
 
 const initialValue = false;
 const mockOption: Option = {

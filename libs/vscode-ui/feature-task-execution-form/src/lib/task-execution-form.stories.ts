@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { AngularFramework, Story } from '@storybook/angular';
 import {
   OptionType,
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
+import { AngularFramework, Story } from '@storybook/angular';
+
 import { VscodeUiFeatureTaskExecutionFormModule } from './vscode-ui-feature-task-execution-form.module';
 
 const cssColorNames = [

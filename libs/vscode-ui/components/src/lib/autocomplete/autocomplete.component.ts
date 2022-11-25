@@ -1,9 +1,9 @@
 import {
   Component,
-  Input,
-  ViewChild,
   ElementRef,
+  Input,
   OnInit,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import {
@@ -13,25 +13,26 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
 } from '@angular/forms';
-import {
-  map,
-  tap,
-  switchMap,
-  startWith,
-  scan,
-  debounce,
-  filter,
-  shareReplay,
-} from 'rxjs/operators';
+import { Option } from '@nx-console/shared/schema';
 import {
   BehaviorSubject,
-  Observable,
   fromEvent,
-  merge,
-  of,
   interval,
+  merge,
+  Observable,
+  of,
 } from 'rxjs';
-import { Option } from '@nx-console/shared/schema';
+import {
+  debounce,
+  filter,
+  map,
+  scan,
+  shareReplay,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
+
 import { getOptionItems } from '../field-items/field-items.pipe';
 
 export enum AutocompleteNavKeys {

@@ -1,2 +1,2 @@
-export * from './telemetry';
 export * from './init';
+export * from './telemetry';

@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import {
   AfterViewChecked,
   ChangeDetectionStrategy,
@@ -8,7 +9,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Clipboard } from '@angular/cdk/clipboard';
 import {
   UntypedFormBuilder,
   UntypedFormControl,
@@ -16,6 +16,17 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import {
+  ItemsWithEnum,
+  Option,
+  OptionType,
+  TaskExecutionFormInitOutputMessage,
+  TaskExecutionInputMessage,
+  TaskExecutionInputMessageType,
+  TaskExecutionOutputMessage,
+  TaskExecutionRunCommandOutputMessage,
+  TaskExecutionSchema,
+} from '@nx-console/shared/schema';
 import {
   BehaviorSubject,
   combineLatest,
@@ -27,27 +38,16 @@ import {
 import {
   debounceTime,
   distinctUntilChanged,
+  filter,
   map,
+  mergeMap,
   shareReplay,
   startWith,
   tap,
-  mergeMap,
-  filter,
   withLatestFrom,
 } from 'rxjs/operators';
-import { getConfigurationFlag, formatTask } from './format-task/format-task';
 
-import {
-  TaskExecutionSchema,
-  ItemsWithEnum,
-  OptionType,
-  Option,
-  TaskExecutionInputMessage,
-  TaskExecutionInputMessageType,
-  TaskExecutionOutputMessage,
-  TaskExecutionRunCommandOutputMessage,
-  TaskExecutionFormInitOutputMessage,
-} from '@nx-console/shared/schema';
+import { formatTask,getConfigurationFlag } from './format-task/format-task';
 
 function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
   return key in obj;

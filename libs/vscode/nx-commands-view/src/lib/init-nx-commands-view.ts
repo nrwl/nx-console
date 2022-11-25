@@ -1,5 +1,6 @@
-import { NxCommandsTreeProvider } from './nx-commands-provider';
 import { commands, ExtensionContext, window } from 'vscode';
+
+import { NxCommandsTreeProvider } from './nx-commands-provider';
 export function initNxCommandsView(context: ExtensionContext) {
   const nxCommandsTreeView = window.createTreeView('nxCommands', {
     treeDataProvider: new NxCommandsTreeProvider(context),

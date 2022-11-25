@@ -1,4 +1,5 @@
 import { ASTNode } from 'vscode-json-languageservice';
+
 import { isObjectNode, isPropertyNode } from './node-types';
 
 /**

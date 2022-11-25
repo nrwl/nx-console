@@ -1,10 +1,11 @@
 import { Component, DebugElement, ViewChild } from '@angular/core';
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import { ComponentFixture, TestBed,waitForAsync } from '@angular/core/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
 import { Option, OptionType } from '@nx-console/shared/schema';
-import { SelectComponent } from './select.component';
+
 import { FieldItemsPipe } from '../field-items/field-items.pipe';
+import { SelectComponent } from './select.component';
 
 const initialValue = 'test';
 const mockOption: Option = {

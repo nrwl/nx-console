@@ -1,5 +1,6 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { isAbsolute, join, relative } from 'path';
+
 import { getNxWorkspace } from './get-nx-workspace';
 
 export async function findProjectWithPath(

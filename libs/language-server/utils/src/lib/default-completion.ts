@@ -1,5 +1,6 @@
 import { CompletionType } from '@nx-console/shared/json-schema';
 import { ASTNode } from 'vscode-json-languageservice';
+
 import { isPropertyNode, isStringNode } from './node-types';
 
 type DefaultCompletion = { glob?: string; completionType: CompletionType };

@@ -1,9 +1,9 @@
 import {
   Event,
   EventEmitter,
+  ProviderResult,
   TreeDataProvider,
   TreeItem,
-  ProviderResult,
 } from 'vscode';
 
 export abstract class AbstractTreeProvider<Item extends TreeItem>

@@ -1,5 +1,5 @@
-import { NotificationType, RequestType } from 'vscode-languageserver/node';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
   'nx/changeWorkspace'

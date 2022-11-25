@@ -1,9 +1,9 @@
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
   Input,
   Output,
-  EventEmitter,
   ViewEncapsulation,
 } from '@angular/core';
 import { Option } from '@nx-console/shared/schema';

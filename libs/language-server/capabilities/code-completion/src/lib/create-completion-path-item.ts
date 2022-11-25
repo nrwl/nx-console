@@ -1,7 +1,7 @@
 import {
-  CompletionItemKind,
   ASTNode,
   CompletionItem,
+  CompletionItemKind,
   TextDocument,
 } from 'vscode-json-languageservice';
 
