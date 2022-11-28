@@ -222,7 +222,7 @@ function injectedScript() {
           if(data.type === "${MessageType.all}") {
             const allProjectsElement = document.querySelector(\`[data-cy="selectAllButton"]\`);
             if(allProjectsElement) {
-              allProjectsElement.click();
+              setTimeout(() => allProjectsElement.click(), 0)
               return true;
             } else {
               return false;
@@ -251,14 +251,15 @@ function injectedScript() {
         }
 
         if(clickOnElement()) {
-          return
+          return;
         }
+
     
         const observer = new MutationObserver(mutations => {
           const success = clickOnElement();
           if(success) {
             observer.disconnect();
-          }
+          } 
         });
     
         observer.observe(document.body, {
