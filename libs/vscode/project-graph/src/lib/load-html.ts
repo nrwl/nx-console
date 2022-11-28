@@ -185,6 +185,10 @@ export async function loadHtml(panel: WebviewPanel) {
           display: none;
         }
 
+        div[data-cy="no-projects-selected"] {
+          display: none
+        }
+
         #no-projects-chosen {
           display: none
         }
