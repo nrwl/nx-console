@@ -1,6 +1,8 @@
 import { openWorkspace } from '../utils';
 
-describe('Nx Console should have the language server running', () => {
+describe('Nx Console should have the language server running', function () {
+  this.retries(3);
+
   before(async () => {
     await openWorkspace('nx');
   });

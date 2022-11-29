@@ -2,7 +2,9 @@ import { Workbench } from 'wdio-vscode-service';
 import { openWorkspace } from './utils';
 
 let workbench: Workbench;
-describe('NxConsole ViewContainer', () => {
+describe('NxConsole ViewContainer', function () {
+  this.retries(3);
+
   beforeEach(async () => {
     workbench = await browser.getWorkbench();
   });

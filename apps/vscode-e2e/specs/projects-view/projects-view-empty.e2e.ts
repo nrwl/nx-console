@@ -4,7 +4,9 @@ import {
   openWorkspace,
 } from '../utils';
 
-describe('NxConsole Projects View in an empty workspace', () => {
+describe('NxConsole Projects View in an empty workspace', function () {
+  this.retries(3);
+
   before(async () => {
     await openWorkspace('empty');
   });
