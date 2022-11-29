@@ -725,12 +725,7 @@
           "default": [
             "run-many",
             "affected",
-            "affected:apps",
-            "affected:build",
-            "affected:e2e",
-            "affected:libs",
-            "affected:lint",
-            "affected:test",
+            "affected:graph",
             "list",
             "migrate",
             "add-dependency",
