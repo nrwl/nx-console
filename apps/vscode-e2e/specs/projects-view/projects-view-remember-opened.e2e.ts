@@ -86,8 +86,8 @@ describe('NxConsole Projects View should remember opened treeitems', () => {
   });
 
   it('should reload and see the same open projects', async () => {
-    const workbench = await browser.getWorkbench();
-    await workbench.executeCommand('nxConsole.refreshWorkspace');
+    changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'list');
+    changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'tree');
 
     projectsSection = (await nxConsoleViewContainer
       .getContent()
