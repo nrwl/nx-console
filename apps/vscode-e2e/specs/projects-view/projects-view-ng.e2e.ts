@@ -10,7 +10,9 @@ let nxConsoleViewContainer: SideBarView<unknown>;
 let projectsSection: ViewSection;
 let projectItems: CustomTreeItem[];
 
-describe('NxConsole Projects View in an Ng workspace', () => {
+describe('NxConsole Projects View in an Ng workspace', function () {
+  this.retries(3);
+
   before('', async () => {
     await openWorkspace('ng');
   });

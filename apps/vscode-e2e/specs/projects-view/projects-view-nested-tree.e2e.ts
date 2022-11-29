@@ -11,7 +11,9 @@ let nxConsoleViewContainer: SideBarView<unknown>;
 let projectsSection: ViewSection;
 let projectItems: CustomTreeItem[];
 
-describe('NxConsole Projects View in a nested Nx workspace', () => {
+describe('NxConsole Projects View in a nested Nx workspace', function () {
+  this.retries(3);
+
   before('', async () => {
     changeSettingForWorkspace(
       'nested',
