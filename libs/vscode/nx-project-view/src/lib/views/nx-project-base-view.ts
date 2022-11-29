@@ -14,6 +14,7 @@ export type ViewDataProvider = Pick<
 >;
 
 interface BaseViewItem<Context extends string> {
+  id: string;
   contextValue: Context;
   label: string;
   collapsible: Collapsible;
@@ -65,6 +66,7 @@ export abstract class BaseView {
     }
 
     return {
+      id: projectName,
       contextValue: 'project',
       nxProject,
       label: projectName,
@@ -100,6 +102,7 @@ export abstract class BaseView {
   ): TargetViewItem {
     const hasChildren = !!configurations;
     return {
+      id: `${nxProject.project}:${targetName}`,
       contextValue: 'target',
       nxProject,
       nxTarget: { name: targetName },
@@ -134,6 +137,7 @@ export abstract class BaseView {
     }
 
     return Object.keys(configurations).map((configuration) => ({
+      id: `${nxProject.project}:${nxTarget.name}:${configuration}`,
       contextValue: 'target',
       nxProject,
       nxTarget: { name: nxTarget.name, configuration },
