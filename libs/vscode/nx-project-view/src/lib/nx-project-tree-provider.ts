@@ -2,15 +2,8 @@ import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
-import {
-  commands,
-  ExtensionContext,
-  ProviderResult,
-  ThemeIcon,
-  TreeItem,
-  TreeItemCollapsibleState,
-  Uri,
-} from 'vscode';
+import { commands, ExtensionContext, ProviderResult } from 'vscode';
+import { NxTreeItem } from './nx-tree-item';
 import {
   AutomaticViewItem,
   AutomaticViewStrategy,
@@ -143,28 +136,5 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
 
   private async refreshNxProjectsTree() {
     this.refresh();
-  }
-}
-
-export class NxTreeItem extends TreeItem {
-  constructor(public readonly item: ViewItem) {
-    super(item.label, TreeItemCollapsibleState[item.collapsible]);
-    this.contextValue = item.contextValue;
-    if (item.contextValue === 'folder' || item.contextValue === 'project') {
-      this.resourceUri = Uri.file(item.resource);
-    }
-    this.setIcons();
-  }
-
-  setIcons() {
-    if (this.contextValue === 'folder') {
-      this.iconPath = new ThemeIcon('folder');
-    }
-    if (this.contextValue === 'project') {
-      this.iconPath = new ThemeIcon('package');
-    }
-    if (this.contextValue === 'target') {
-      this.iconPath = new ThemeIcon('symbol-property');
-    }
   }
 }

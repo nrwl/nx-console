@@ -181,6 +181,7 @@ class TreeView extends BaseView {
     const label = folderName === '' ? '<root>' : folderName;
 
     return {
+      id: `$folder:${path}`,
       contextValue: 'folder',
       path,
       label,

@@ -20,8 +20,8 @@ import {
 } from '@nx-console/vscode/configuration';
 import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
 import {
+  initNxProjectView,
   NxProjectTreeProvider,
-  NxTreeItem,
 } from '@nx-console/vscode/nx-project-view';
 import {
   LOCATE_YOUR_WORKSPACE,
@@ -70,7 +70,6 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
-let nxProjectTreeView: TreeView<NxTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
 
 let currentRunTargetTreeProvider: RunTargetTreeProvider;
@@ -238,23 +237,13 @@ async function setWorkspace(workspacePath: string) {
 
     initNxCommandsView(context);
 
-    nxProjectsTreeProvider = new NxProjectTreeProvider(
-      context,
-      cliTaskProvider
-    );
-    nxProjectTreeView = window.createTreeView('nxProjects', {
-      treeDataProvider: nxProjectsTreeProvider,
-    });
+    nxProjectsTreeProvider = initNxProjectView(context, cliTaskProvider);
 
     nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
       treeDataProvider: new NxHelpAndFeedbackProvider(context),
     });
 
-    context.subscriptions.push(
-      nxProjectTreeView,
-      nxHelpAndFeedbackTreeView,
-      lspContext
-    );
+    context.subscriptions.push(nxHelpAndFeedbackTreeView, lspContext);
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
