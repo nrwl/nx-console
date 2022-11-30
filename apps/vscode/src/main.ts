@@ -335,7 +335,7 @@ async function registerWorkspaceFileWatcher(
   workspacePackageDirs.add('packages');
   context.subscriptions.push(
     watchFile(
-      new RelativePattern(workspacePath, '{workspace,angular,nx}.json'),
+      new RelativePattern(workspacePath, '{workspace,angular,nx,project}.json'),
       () => {
         commands.executeCommand(REFRESH_WORKSPACE);
       }
