@@ -33,6 +33,9 @@
       "@nx-console/language-server/utils": [
         "libs/language-server/utils/src/index.ts"
       ],
+      "@nx-console/language-server/watcher": [
+        "libs/language-server/watcher/src/index.ts"
+      ],
       "@nx-console/language-server/workspace": [
         "libs/language-server/workspace/src/index.ts"
       ],

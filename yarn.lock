@@ -3973,6 +3973,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@parcel/watcher@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@parcel/watcher@npm:2.0.7"
+  dependencies:
+    node-addon-api: ^3.2.1
+    node-gyp: latest
+    node-gyp-build: ^4.3.0
+  checksum: 9cf92fbf4486ad6af441286ce85bcd53a03445abb069c61485d3e0aafabe3da3008be06e38f386c3c0e117f743ed1fe04a88936be1daaf9c455e1e7e5b15f562
+  languageName: node
+  linkType: hard
+
 "@phenomnomnominal/tsquery@npm:4.1.1":
   version: 4.1.1
   resolution: "@phenomnomnominal/tsquery@npm:4.1.1"
@@ -20432,6 +20443,7 @@ __metadata:
     "@nrwl/nx-cloud": 15.0.0
     "@nrwl/storybook": 14.8.6
     "@nrwl/workspace": 14.8.6
+    "@parcel/watcher": ^2.0.7
     "@storybook/addon-essentials": 6.5.9
     "@storybook/addon-knobs": ~6.4.0
     "@storybook/angular": 6.5.9

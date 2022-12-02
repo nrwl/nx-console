@@ -31,6 +31,9 @@ import {
 } from 'vscode-json-languageservice';
 import {
   createConnection,
+  CreateFilesParams,
+  DeleteFilesParams,
+  FileOperationPatternKind,
   InitializeResult,
   ProposedFeatures,
   ResponseError,
@@ -39,6 +42,7 @@ import {
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 import { formatError } from '@nx-console/shared/utils';
+import { languageServerWatcher } from '@nx-console/language-server/watcher';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -46,6 +50,9 @@ process.on('unhandledRejection', (e: any) => {
 
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
+let unregisterFileWatcher: () => void = () => {
+  //noop
+};
 
 const workspaceContext = {
   resolveRelativePath: (relativePath: string, resource: string) => {
@@ -81,6 +88,15 @@ connection.onInitialize(async (params) => {
     CLIENT_CAPABILITIES = params.capabilities;
 
     configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+    unregisterFileWatcher = await languageServerWatcher(
+      WORKING_PATH,
+      async () => {
+        await reconfigure(WORKING_PATH!);
+        await connection.sendNotification(
+          NxWorkspaceRefreshNotification.method
+        );
+      }
+    );
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
@@ -96,6 +112,30 @@ connection.onInitialize(async (params) => {
       documentLinkProvider: {
         resolveProvider: false,
         workDoneProgress: false,
+      },
+      workspace: {
+        fileOperations: {
+          didCreate: {
+            filters: [
+              {
+                pattern: {
+                  glob: '**/project.json',
+                  matches: FileOperationPatternKind.file,
+                },
+              },
+            ],
+          },
+          didDelete: {
+            filters: [
+              {
+                pattern: {
+                  glob: '**/project.json',
+                  matches: FileOperationPatternKind.file,
+                },
+              },
+            ],
+          },
+        },
       },
     },
   };
@@ -181,6 +221,7 @@ documents.onDidClose((e) => {
 });
 
 connection.onShutdown(() => {
+  unregisterFileWatcher();
   jsonDocumentMapper.dispose();
 });
 
@@ -199,6 +240,42 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
 
   await reconfigure(WORKING_PATH);
 });
+
+connection.onNotification(
+  'workspace/didCreateFiles',
+  async (createdFiles: CreateFilesParams) => {
+    if (!createdFiles.files.some((f) => f.uri.endsWith('project.json'))) {
+      return;
+    }
+
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1001,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+
+    await reconfigure(WORKING_PATH);
+  }
+);
+
+connection.onNotification(
+  'workspace/didDeleteFiles',
+  async (deletedFiles: DeleteFilesParams) => {
+    if (!deletedFiles.files.some((f) => f.uri.endsWith('project.json'))) {
+      return;
+    }
+
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1001,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+
+    await reconfigure(WORKING_PATH);
+  }
+);
 
 connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   WORKING_PATH = workspacePath;
