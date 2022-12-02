@@ -12,23 +12,30 @@ export async function findProjectWithPath(
 
   const { workspace } = await getNxWorkspace();
   const projectEntries = Object.entries(workspace.projects);
-  const entry = projectEntries.find(([, def]) => {
+  let perfectMatchEntry: [string, ProjectConfiguration] | undefined;
+  let secondaryMatchEntry: [string, ProjectConfiguration] | undefined;
+  projectEntries.forEach((entry) => {
+    const [, def] = entry;
     const fullProjectPath = join(
       workspacePath,
       // If root is empty, that means we're in an angular project with the old ng workspace setup. Otherwise use the sourceRoot
       def.root || def.sourceRoot || ''
     );
     if (fullProjectPath === selectedPath) {
-      return true;
+      perfectMatchEntry = entry;
     }
 
     const relativePath = relative(fullProjectPath, selectedPath);
-    return (
+    if (
       relativePath &&
       !relativePath.startsWith('..') &&
       !isAbsolute(relativePath)
-    );
+    ) {
+      secondaryMatchEntry = entry;
+    }
   });
+
+  const entry = perfectMatchEntry ?? secondaryMatchEntry;
 
   return entry ? { name: entry[0], ...entry[1] } : null;
 }
