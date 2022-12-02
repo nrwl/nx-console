@@ -5,6 +5,7 @@
     "language-server-capabilities-document-links": "libs/language-server/capabilities/document-links",
     "language-server-types": "libs/language-server/types",
     "language-server-utils": "libs/language-server/utils",
+    "language-server-watcher": "libs/language-server/watcher",
     "language-server-workspace": "libs/language-server/workspace",
     "nxls": "apps/nxls",
     "shared-collections": "libs/shared/collections",

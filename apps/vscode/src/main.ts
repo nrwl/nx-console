@@ -221,7 +221,7 @@ async function setWorkspace(workspacePath: string) {
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  const lspContext = configureLspClient(context);
+  const lspContext = configureLspClient(context, REFRESH_WORKSPACE);
 
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
@@ -339,17 +339,6 @@ async function registerWorkspaceFileWatcher(
       () => {
         commands.executeCommand(REFRESH_WORKSPACE);
       }
-    ),
-    ...Array.from(workspacePackageDirs).map((dir) => {
-      return watchFile(
-        new RelativePattern(
-          join(workspacePath, dir),
-          `**/{project,package}.json`
-        ),
-        () => {
-          commands.executeCommand(REFRESH_WORKSPACE);
-        }
-      );
-    })
+    )
   );
 }

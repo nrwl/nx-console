@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { NxChangeWorkspace } from '@nx-console/language-server/types';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
+import {
+  NxChangeWorkspace,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
+import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { Disposable, ExtensionContext } from 'vscode';
+import { commands, Disposable, ExtensionContext } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -14,7 +17,10 @@ import {
 
 let client: LanguageClient | undefined;
 
-export function configureLspClient(context: ExtensionContext): Disposable {
+export function configureLspClient(
+  context: ExtensionContext,
+  refreshCommand: string | undefined
+): Disposable {
   if (client) {
     sendNotification(NxChangeWorkspace, getWorkspacePath());
     return {
@@ -58,6 +64,14 @@ export function configureLspClient(context: ExtensionContext): Disposable {
   );
 
   client.start();
+
+  // nxls is telling us to refresh projects on this side
+  client.onNotification(NxWorkspaceRefreshNotification, () => {
+    if (refreshCommand) {
+      getOutputChannel().appendLine('Refreshing ui due to lsp notification');
+      commands.executeCommand(refreshCommand);
+    }
+  });
 
   return {
     dispose,
