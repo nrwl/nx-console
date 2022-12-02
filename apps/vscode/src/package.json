@@ -376,6 +376,14 @@
         {
           "command": "nx.generate.ui",
           "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.run.fileexplorer",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "ng.run.fileexplorer",
+          "when": "isAngularWorkspace"
         }
       ]
     },
@@ -488,7 +496,7 @@
       },
       {
         "category": "ng",
-        "title": "run target for from selected file",
+        "title": "run target from selected file",
         "command": "ng.run.fileexplorer"
       },
       {
