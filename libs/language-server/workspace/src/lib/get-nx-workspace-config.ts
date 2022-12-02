@@ -158,11 +158,13 @@ function addProjectTargets(
         targets: node.data.targets ?? {},
         name: projectName,
         tags: node.data.tags ?? [],
+        files: node.data.files ?? [],
       };
     } else {
       workspaceConfiguration.projects[projectName] = {
         ...workspaceProject,
         targets: node.data.targets ?? {},
+        files: node.data.files ?? [],
       };
     }
   }
