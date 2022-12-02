@@ -26,11 +26,11 @@ export async function findProjectWithPath(
         workspacePath,
         selectedPath
       );
+    } else if (isDirectory && relativeFilePath.startsWith(projectConfig.root)) {
+      foundProject = projectConfig;
     } else if (
       projectConfig.files.some(({ file }) => file === relativeFilePath)
     ) {
-      foundProject = projectConfig;
-    } else if (isDirectory && relativeFilePath.startsWith(projectConfig.root)) {
       foundProject = projectConfig;
     }
 
