@@ -88,7 +88,10 @@ export async function getNxWorkspaceConfig(
       lspLogger.log(e.message);
     }
 
-    addProjectTargets(workspaceConfiguration, projectGraph);
+    workspaceConfiguration = addProjectTargets(
+      workspaceConfiguration,
+      projectGraph
+    );
 
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
@@ -139,8 +142,14 @@ function addProjectTargets(
   projectGraph: ProjectGraph | null
 ) {
   if (!projectGraph) {
-    return;
+    return workspaceConfiguration;
   }
+
+  // We always want to get the latest projects from the graph, rather than the ones in the workspace configuration
+  const modifiedWorkspaceConfiguration: NxWorkspaceConfiguration = {
+    ...workspaceConfiguration,
+    projects: {},
+  };
 
   for (const [projectName, node] of Object.entries(projectGraph.nodes)) {
     const workspaceProject = workspaceConfiguration.projects[projectName];
@@ -153,7 +162,7 @@ function addProjectTargets(
         continue;
       }
 
-      workspaceConfiguration.projects[projectName] = {
+      modifiedWorkspaceConfiguration.projects[projectName] = {
         root: node.data.root,
         targets: node.data.targets ?? {},
         name: projectName,
@@ -161,11 +170,14 @@ function addProjectTargets(
         files: node.data.files ?? [],
       };
     } else {
-      workspaceConfiguration.projects[projectName] = {
+      modifiedWorkspaceConfiguration.projects[projectName] = {
         ...workspaceProject,
         targets: node.data.targets ?? {},
         files: node.data.files ?? [],
+        name: projectName,
       };
     }
   }
+
+  return modifiedWorkspaceConfiguration;
 }
