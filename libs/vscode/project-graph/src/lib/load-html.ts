@@ -193,6 +193,10 @@ export async function loadHtml(panel: WebviewPanel) {
           display: none
         }
 
+        [data-cy="no-tasks-selected"] {
+          display: none;
+        }
+
         body {
           background-color: var(--vscode-settings-editor-background) !important;
         }
@@ -221,8 +225,47 @@ function injectedScript() {
         command: 'ready',
       })
 
+      let previousSelectedProject = null;
+
       function waitForAndClickOnElement(data) {
-        function clickOnElement() { 
+        function clickOnElement() {
+
+          if (window.externalApi) {
+              let action = null;
+              switch (data.type) {
+                case '${MessageType.select}': {
+                  if (previousSelectedProject === data.projectName) {
+                    action = {type: 'deselectProject', projectName: data.projectName};
+                    previousSelectedProject = null;
+                  } else {
+                    action = {type: 'selectProject', projectName: data.projectName};
+                    previousSelectedProject = data.projectName;
+                  }
+                  break;
+                }
+                case '${MessageType.focus}': {
+                  action = {type:'focusProject', projectName: data.projectName};
+                  break;
+                }
+                case '${MessageType.all}':
+                default: {
+                  action = {type: 'selectAll'};
+                }
+            }
+            let service = null;
+            if ('projectGraphService' in window.externalApi) {
+              service = window.externalApi.projectGraphService;
+            }
+            if ('depGraphService' in window.externalApi) {
+              service = window.externalApi.depGraphService;
+            }
+            setTimeout(() => {
+              service.send(action);
+            })
+
+            return true;
+          }
+
           if(data.type === "${MessageType.all}") {
             const allProjectsElement = document.querySelector(\`[data-cy="selectAllButton"]\`);
             if(allProjectsElement) {
@@ -258,14 +301,14 @@ function injectedScript() {
           return;
         }
 
-    
+
         const observer = new MutationObserver(mutations => {
           const success = clickOnElement();
           if(success) {
             observer.disconnect();
-          } 
+          }
         });
-    
+
         observer.observe(document.body, {
             childList: true,
             subtree: true
@@ -285,7 +328,7 @@ function injectedScript() {
           //noop
         }
 
-        setTimeout(() => waitForAndClickOnElement(data), 0); 
+        setTimeout(() => waitForAndClickOnElement(data), 0);
       })
     }())
   `;
