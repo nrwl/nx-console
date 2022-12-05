@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.27.0](https://github.com/nrwl/nx-console/compare/v17.26.0...v17.27.0) (2022-12-05)
+
+
+### Features
+
+* always use the project graph when building the workspace configuration ([#1431](https://github.com/nrwl/nx-console/issues/1431)) ([b43db1d](https://github.com/nrwl/nx-console/commits/b43db1de76a9fe67fa96f69c1a5b364b11f0119b))
+* **nxls:** watch for project.json changes in the language server ([#1429](https://github.com/nrwl/nx-console/issues/1429)) ([d6c0fcc](https://github.com/nrwl/nx-console/commits/d6c0fccbef19da7cb22854e9c2e43794b6fe024f))
+* persist opened project tree items between reloads ([#1421](https://github.com/nrwl/nx-console/issues/1421)) ([20c66db](https://github.com/nrwl/nx-console/commits/20c66dbcb1834d5e94fcf090207de11c5542cdfe))
+
+
+### Bug Fixes
+
+* alias 'connect-to-nx-cloud' to 'connect' ([#1414](https://github.com/nrwl/nx-console/issues/1414)) ([e9f86a7](https://github.com/nrwl/nx-console/commits/e9f86a7b11490d3137470301e4abd92ec662c470))
+* always set `process.env.CI` to false ([9193cef](https://github.com/nrwl/nx-console/commits/9193cef92be30d39cf571b93ad7f6082092398ba))
+* correctly infer project path in standalone workspace ([#1428](https://github.com/nrwl/nx-console/issues/1428)) ([3f498c1](https://github.com/nrwl/nx-console/commits/3f498c1ba92714969b10d87f47dc715e120dde66))
+* refresh workspace on root project.json change ([#1423](https://github.com/nrwl/nx-console/issues/1423)) ([881c773](https://github.com/nrwl/nx-console/commits/881c773944341eb9e6d5d07f4d21232e0fe0b3fe))
+* repair view all projects button ([#1418](https://github.com/nrwl/nx-console/issues/1418)) ([bd5a1f1](https://github.com/nrwl/nx-console/commits/bd5a1f1bb4a7d3f0ca4235f5991913aba683b366))
+* use the project graph files to locate a project ([#1430](https://github.com/nrwl/nx-console/issues/1430)) ([e11825e](https://github.com/nrwl/nx-console/commits/e11825e82bb2696cac88614b624a7551dd48f38b))
+* use the project graph window service ([#1432](https://github.com/nrwl/nx-console/issues/1432)) ([e3929e9](https://github.com/nrwl/nx-console/commits/e3929e9de33ada5157dc2eff9dff7c5de16d4b9e))
+
+
+### Performance Improvements
+
+* **e2e:** parallelize testworkspace installation ([#1396](https://github.com/nrwl/nx-console/issues/1396)) ([3932b9c](https://github.com/nrwl/nx-console/commits/3932b9ca1f8d1c04fed496d296e480f8f687d015))
+
 ## [17.26.0](https://github.com/nrwl/nx-console/compare/v17.25.0...v17.26.0) (2022-11-23)
 
 
