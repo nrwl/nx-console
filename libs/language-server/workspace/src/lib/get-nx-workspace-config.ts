@@ -45,6 +45,8 @@ export async function getNxWorkspaceConfig(
   }
 
   try {
+    // Always set the CI env variable to false
+    (process.env as any).CI = false;
     const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
       getNxWorkspacePackageFileUtils(workspacePath, logger),
       getNxProjectGraph(workspacePath, logger),
@@ -85,7 +87,7 @@ export async function getNxWorkspaceConfig(
       }
     } catch (e) {
       lspLogger.log('Unable to get project graph');
-      lspLogger.log(e.message);
+      lspLogger.log(e.stack);
     }
 
     workspaceConfiguration = addProjectTargets(
