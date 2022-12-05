@@ -1,3 +1,25 @@
+# [1.4.0](https://github.com/nrwl/nx-console/compare/nxls-v1.3.1...nxls-v1.4.0) (2022-12-05)
+
+
+### Bug Fixes
+
+* always set `process.env.CI` to false ([9193cef](https://github.com/nrwl/nx-console/commit/9193cef92be30d39cf571b93ad7f6082092398ba))
+* check lerna version for nx workspace ([#1382](https://github.com/nrwl/nx-console/issues/1382)) ([034e288](https://github.com/nrwl/nx-console/commit/034e288313306557e9fc34b10f31b5be5b604785))
+* use the project graph files to locate a project ([#1430](https://github.com/nrwl/nx-console/issues/1430)) ([e11825e](https://github.com/nrwl/nx-console/commit/e11825e82bb2696cac88614b624a7551dd48f38b))
+
+
+### Features
+
+* always use the project graph when building the workspace configuration ([#1431](https://github.com/nrwl/nx-console/issues/1431)) ([b43db1d](https://github.com/nrwl/nx-console/commit/b43db1de76a9fe67fa96f69c1a5b364b11f0119b))
+* configurable dry runs on change ([#1380](https://github.com/nrwl/nx-console/issues/1380)) ([0d5634d](https://github.com/nrwl/nx-console/commit/0d5634df3f75a6a0cfdbaa57854c580e6138a878))
+* move all workspace retrieval to the language server ([#1402](https://github.com/nrwl/nx-console/issues/1402)) ([650a44e](https://github.com/nrwl/nx-console/commit/650a44ea1cc08d5d68d6b9a37315e0c596424a26))
+* **nxls:** watch for project.json changes in the language server ([#1429](https://github.com/nrwl/nx-console/issues/1429)) ([d6c0fcc](https://github.com/nrwl/nx-console/commit/d6c0fccbef19da7cb22854e9c2e43794b6fe024f))
+
+
+### Performance Improvements
+
+* **e2e:** parallelize testworkspace installation ([#1396](https://github.com/nrwl/nx-console/issues/1396)) ([3932b9c](https://github.com/nrwl/nx-console/commit/3932b9ca1f8d1c04fed496d296e480f8f687d015))
+
 ## [1.3.1](https://github.com/nrwl/nx-console/compare/nxls-v1.3.0...nxls-v1.3.1) (2022-09-22)
 
 
