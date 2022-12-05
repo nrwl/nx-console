@@ -1,4 +1,5 @@
 {
+  "name": "vscode-ui-components",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/vscode-ui/components/src",
@@ -18,7 +19,7 @@
         "jestConfig": "libs/vscode-ui/components/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/vscode-ui/components"]
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode-ui/components"]
     }
   },
   "tags": ["type:vscode-ui"]

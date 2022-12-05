@@ -1,4 +1,5 @@
 {
+  "name": "shared-collections",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/collections/src",
   "projectType": "library",
@@ -12,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/shared/collections"],
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/collections"],
       "options": {
         "jestConfig": "libs/shared/collections/jest.config.ts",
         "passWithNoTests": true

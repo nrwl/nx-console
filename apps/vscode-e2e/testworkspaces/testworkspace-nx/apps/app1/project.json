@@ -3,13 +3,12 @@
     "build": {
       "executor": "@nrwl/webpack:webpack",
       "configurations": {
-        "production": {
-
-        }
+        "production": {}
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest"
     }
-  }
+  },
+  "name": "vscode-e2e-testworkspaces-testworkspace-nx-apps-app1"
 }

@@ -1,4 +1,5 @@
 {
+  "name": "vscode",
   "sourceRoot": "apps/vscode/src",
   "projectType": "application",
   "prefix": "vscode",
@@ -137,7 +138,7 @@
         ],
         "parallel": false
       },
-      "outputs": ["dist/apps/vscode"]
+      "outputs": ["{workspaceRoot}/dist/apps/vscode"]
     }
   },
   "tags": ["type:vscode"]

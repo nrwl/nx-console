@@ -1,4 +1,5 @@
 {
+  "name": "vscode-ui-argument-list",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/vscode-ui/argument-list/src",
@@ -15,7 +16,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode-ui/argument-list"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode-ui/argument-list"],
       "options": {
         "jestConfig": "libs/vscode-ui/argument-list/jest.config.ts",
         "passWithNoTests": true

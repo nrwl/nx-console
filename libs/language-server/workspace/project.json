@@ -1,6 +1,6 @@
 {
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "name": "language-server-workspace",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/language-server/workspace/src",
   "projectType": "library",
   "targets": {
@@ -13,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/language-server/workspace"],
+      "outputs": ["{workspaceRoot}/coverage/libs/language-server/workspace"],
       "options": {
         "jestConfig": "libs/language-server/workspace/jest.config.ts",
         "passWithNoTests": true
