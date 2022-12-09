@@ -2,30 +2,29 @@ import {
   detectPackageManager,
   getPackageManagerCommand,
   PackageManager,
+  readJsonFile,
 } from '@nrwl/devkit';
 import { getGenerators } from '@nx-console/shared/collections';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
 import {
   getShellExecutionForConfig,
   getTelemetry,
-  getWorkspacePath,
 } from '@nx-console/vscode/utils';
+import { existsSync } from 'fs';
+import { join } from 'path';
 import { xhr, XHRResponse } from 'request-light';
 import {
   commands,
   ExtensionContext,
   QuickInput,
-  QuickPickItem,
-  QuickPickItemKind,
   ShellExecution,
   Task,
   tasks,
   TaskScope,
   window,
 } from 'vscode';
-import { gte, major, rcompare } from 'semver';
 import { resolveDependencyVersioning } from './dependency-versioning';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -66,7 +65,7 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
     if (dep) {
       const quickInput = showLoadingQuickInput(dep);
       getTelemetry().featureUsed('add-dependency');
-      addDependency(dep, version, installAsDevDependency);
+      addDependency(dep, version, installAsDevDependency, workspacePath);
       const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
         if (
           taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
@@ -129,12 +128,18 @@ function showLoadingQuickInput(dependency: string): QuickInput {
 function addDependency(
   dependency: string,
   version: string,
-  installAsDevDependency: boolean
+  installAsDevDependency: boolean,
+  workspacePath: string
 ) {
   const pkgManagerCommands = getPackageManagerCommand(pkgManager);
+  const pkgManagerWorkspaceFlag = getWorkspaceAddFlag(
+    pkgManager,
+    workspacePath
+  );
   const command = `${
     installAsDevDependency ? pkgManagerCommands.addDev : pkgManagerCommands.add
-  } ${dependency}@${version}`;
+  } ${pkgManagerWorkspaceFlag} ${dependency}@${version}`;
+
   const task = new Task(
     {
       type: 'nxconsole-add-dep',
@@ -146,6 +151,7 @@ function addDependency(
   );
   tasks.executeTask(task);
 }
+
 async function executeInitGenerator(
   dependency: string,
   workspacePath: string,
@@ -240,4 +246,30 @@ function getDependencySuggestions(): Promise<
       return Promise.reject(error.responseText);
     }
   );
+}
+
+function getWorkspaceAddFlag(
+  pkgManager: string,
+  workspacePath: string
+): string {
+  const pkgJson = readJsonFile<{
+    workspaces?: string[];
+    private?: boolean;
+  }>(join(workspacePath, 'package.json'));
+  if (pkgManager === 'yarn') {
+    const isWorkspace =
+      !!pkgJson.private &&
+      !!pkgJson.workspaces &&
+      pkgJson.workspaces?.length > 0;
+    return isWorkspace ? '-W' : '';
+  }
+  if (pkgManager === 'npm') {
+    const isWorkspace = !!pkgJson.workspaces && pkgJson.workspaces?.length > 0;
+    return isWorkspace ? '--workspaces false' : '';
+  }
+  let pnpmYml = existsSync(join(workspacePath, 'pnpm-workspace.yaml'));
+  if (!pnpmYml) {
+    pnpmYml = existsSync(join(workspacePath, 'pnpm-workspace.yml'));
+  }
+  return pnpmYml ? '-w' : '';
 }
