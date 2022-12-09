@@ -23,6 +23,7 @@ import {
 } from './find-workspace-json-target';
 import { getNxWorkspace } from './get-nx-workspace';
 import { join } from 'path';
+import { findProjectWithPath } from './find-project-with-path';
 
 export class TargetCodeLens extends CodeLens {
   constructor(
@@ -73,21 +74,17 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     const lens: CodeLens[] = [];
 
     let projectName = '';
-    const { workspace, workspacePath } = await getNxWorkspace();
+    const { workspacePath } = await getNxWorkspace();
 
     const documentPath = document.uri.path;
 
     if (documentPath.endsWith('project.json')) {
-      for (const [key, project] of Object.entries(workspace.projects)) {
-        const documentPathBelongsToProject = documentPath
-          .replace(/\\/g, '/')
-          .endsWith(`${project.root}/project.json`);
-        const documentPathBelongsToRootProject =
-          join(workspacePath, 'project.json') === documentPath;
-        if (documentPathBelongsToProject || documentPathBelongsToRootProject) {
-          projectName = key;
-          break;
-        }
+      const project = await findProjectWithPath(documentPath, workspacePath);
+      if (!project) {
+        return;
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        projectName = project.name!;
       }
     }
 
