@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.27.1](https://github.com/nrwl/nx-console/compare/v17.27.0...v17.27.1) (2022-12-12)
+
+
+### Bug Fixes
+
+* add dependency works in yarn/npm/pnpm workspaces ([#1436](https://github.com/nrwl/nx-console/issues/1436)) ([ed78721](https://github.com/nrwl/nx-console/commits/ed78721915d9a95ec74d2e9b638dacb081950325))
+* use `findProjectWithPath` function within codelens ([#1437](https://github.com/nrwl/nx-console/issues/1437)) ([c5fa99a](https://github.com/nrwl/nx-console/commits/c5fa99a92496d69a4fe05ed81cd6484e5b19b61d))
+
 ## [17.27.0](https://github.com/nrwl/nx-console/compare/v17.26.0...v17.27.0) (2022-12-05)
 
 
