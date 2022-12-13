@@ -81,7 +81,7 @@
     "@vscode/test-electron": "^2.1.5",
     "@vscode/vsce": "^2.15.0",
     "@wdio/cli": "^7.27.0",
-    "@wdio/devtools-service": "^7.270",
+    "@wdio/devtools-service": "^7.27.0",
     "@wdio/local-runner": "^7.27.0",
     "@wdio/mocha-framework": "^7.26.0",
     "@wdio/spec-reporter": "^7.26.0",
