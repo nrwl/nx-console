@@ -6646,6 +6646,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vscode/vsce@npm:^2.15.0":
+  version: 2.15.0
+  resolution: "@vscode/vsce@npm:2.15.0"
+  dependencies:
+    azure-devops-node-api: ^11.0.1
+    chalk: ^2.4.2
+    cheerio: ^1.0.0-rc.9
+    commander: ^6.1.0
+    glob: ^7.0.6
+    hosted-git-info: ^4.0.2
+    keytar: ^7.7.0
+    leven: ^3.1.0
+    markdown-it: ^12.3.2
+    mime: ^1.3.4
+    minimatch: ^3.0.3
+    parse-semver: ^1.1.1
+    read: ^1.0.7
+    semver: ^5.1.0
+    tmp: ^0.2.1
+    typed-rest-client: ^1.8.4
+    url-join: ^4.0.1
+    xml2js: ^0.4.23
+    yauzl: ^2.3.1
+    yazl: ^2.2.2
+  bin:
+    vsce: vsce
+  checksum: b2adb9e3c16599d8a81b4026b1e089f399867bb99ed8f401e7f130ab2dfc140dab4514719a7d402ac43e88a7613cb24150671e232dc07e8039c414ae5c33b801
+  languageName: node
+  linkType: hard
+
 "@wdio/cli@npm:^7.27.0":
   version: 7.27.0
   resolution: "@wdio/cli@npm:7.27.0"
@@ -14081,7 +14111,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.13.2, follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.15.0":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.14.6, follow-redirects@npm:^1.15.0":
   version: 1.15.2
   resolution: "follow-redirects@npm:1.15.2"
   peerDependenciesMeta:
@@ -20463,6 +20493,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 5.38.1
     "@typescript-eslint/parser": 5.38.1
     "@vscode/test-electron": ^2.1.5
+    "@vscode/vsce": ^2.15.0
     "@wdio/cli": ^7.27.0
     "@wdio/devtools-service": ^7.27.0
     "@wdio/local-runner": ^7.27.0
@@ -20485,7 +20516,7 @@ __metadata:
     memfs: ^3.4.7
     mocha: ^10.0.0
     nx: 14.8.6
-    ovsx: ^0.3.0
+    ovsx: ^0.7.1
     prettier: 2.7.1
     request-light: ^0.5.8
     rimraf: ^3.0.2
@@ -20499,7 +20530,6 @@ __metadata:
     typescript: 4.8.4
     universal-analytics: 0.5.3
     uuid: ^8.3.2
-    vsce: ^2.6.3
     vscode-json-languageservice: ^5.1.0
     vscode-languageclient: ^8.0.2
     vscode-languageserver: ^8.0.2
@@ -20833,19 +20863,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ovsx@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "ovsx@npm:0.3.0"
+"ovsx@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "ovsx@npm:0.7.1"
   dependencies:
+    "@vscode/vsce": ^2.15.0
     commander: ^6.1.0
-    follow-redirects: ^1.13.2
+    follow-redirects: ^1.14.6
     is-ci: ^2.0.0
     leven: ^3.1.0
     tmp: ^0.2.1
-    vsce: ^2.6.3
   bin:
     ovsx: lib/ovsx
-  checksum: 68e6e9ad036802cd6c1cac65218624356aa75d8d8e8034a5e7fda93ad0440714cc9aeef1c6e55b99e7c14726f8bc4b759add590c0dc1598b7d6504714db8cf47
+  checksum: 4fa21db237d73e7856f172839967997ec1d51b66fd29effc6c70f564241aa39d94e4da1a1891ff7b42e284bd9c75a13c1014dc3f53cd7c8f2978cef8e0c1725d
   languageName: node
   linkType: hard
 
@@ -27413,36 +27443,6 @@ __metadata:
   version: 1.1.2
   resolution: "vm-browserify@npm:1.1.2"
   checksum: 10a1c50aab54ff8b4c9042c15fc64aefccce8d2fb90c0640403242db0ee7fb269f9b102bdb69cfb435d7ef3180d61fd4fb004a043a12709abaf9056cfd7e039d
-  languageName: node
-  linkType: hard
-
-"vsce@npm:^2.6.3":
-  version: 2.11.0
-  resolution: "vsce@npm:2.11.0"
-  dependencies:
-    azure-devops-node-api: ^11.0.1
-    chalk: ^2.4.2
-    cheerio: ^1.0.0-rc.9
-    commander: ^6.1.0
-    glob: ^7.0.6
-    hosted-git-info: ^4.0.2
-    keytar: ^7.7.0
-    leven: ^3.1.0
-    markdown-it: ^12.3.2
-    mime: ^1.3.4
-    minimatch: ^3.0.3
-    parse-semver: ^1.1.1
-    read: ^1.0.7
-    semver: ^5.1.0
-    tmp: ^0.2.1
-    typed-rest-client: ^1.8.4
-    url-join: ^4.0.1
-    xml2js: ^0.4.23
-    yauzl: ^2.3.1
-    yazl: ^2.2.2
-  bin:
-    vsce: vsce
-  checksum: 334a3d74a70cf8259dae2c03b47c109697bf4165646dbd587dca4fd803e3baa97a330888f5686fdf97e2f55224e7de8c3eb55a7031aba5aceabd178dc9061a9f
   languageName: node
   linkType: hard
 
