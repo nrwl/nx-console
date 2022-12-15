@@ -1,0 +1,13 @@
+{
+  "nxConsole.projectViewingStyle": "tree",
+  "nxConsole.commonNxCommands": [
+    "run-many",
+    "affected",
+    "affected:graph",
+    "nx run vscode-e2e:e2e",
+    "nx run vscode:watch-all",
+    "add-dependency",
+    "add-dev-dependency",
+    "migrate"
+  ]
+}
