@@ -22,6 +22,10 @@ import {
 
 export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
 
+interface NxOptionalFlags {
+  skipNxCache: boolean;
+}
+
 /**
  * Provides data for the "Projects" tree view
  */
@@ -42,6 +46,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
         ['revealInExplorer', this.revealInExplorer],
         ['runTask', this.runTask],
         ['refreshNxProjectsTree', this.refreshNxProjectsTree],
+        ['runTaskSkipNxCache', this.runTaskSkipNxCache],
       ] as const
     ).forEach(([commandSuffix, callback]) => {
       context.subscriptions.push(
@@ -90,7 +95,10 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     return config === 'tree';
   }
 
-  private async runTask(selection: NxTreeItem) {
+  private async runTask(
+    selection: NxTreeItem,
+    optionalFlags?: NxOptionalFlags
+  ) {
     const viewItem = selection.item;
     if (
       viewItem.contextValue === 'project' ||
@@ -107,11 +115,19 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       flags.push(`--configuration=${target.configuration}`);
     }
 
+    if (optionalFlags?.skipNxCache) {
+      flags.push('--skip-nx-cache');
+    }
+
     this.cliTaskProvider.executeTask({
       command: target.name,
       positional: project,
       flags,
     });
+  }
+
+  private async runTaskSkipNxCache(selection: NxTreeItem) {
+    this.runTask(selection, { skipNxCache: true });
   }
 
   private async revealInExplorer(selection: NxTreeItem) {
