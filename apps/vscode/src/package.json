@@ -983,7 +983,8 @@
         {
           "id": "nxHelpAndFeedback",
           "name": "Help and Feedback",
-          "when": "isNxWorkspace"
+          "when": "isNxWorkspace",
+          "visibility": "collapsed"
         }
       ]
     },
