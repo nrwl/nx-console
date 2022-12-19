@@ -146,6 +146,11 @@
           "group": "inline"
         },
         {
+          "command": "nxConsole.runTaskSkipNxCache",
+          "when": "view == nxProjects && viewItem == target",
+          "group": "navigation"
+        },
+        {
           "command": "nx.graph.focus.button",
           "when": "view == nxProjects && viewItem == project && isNxWorkspace",
           "group": "inline@1"
@@ -180,6 +185,10 @@
         },
         {
           "command": "nxConsole.runTask",
+          "when": "false"
+        },
+        {
+          "command": "nxConsole.runTaskSkipNxCache",
           "when": "false"
         },
         {
@@ -414,6 +423,10 @@
         "command": "nxConsole.runTask",
         "title": "Execute task",
         "icon": "$(play)"
+      },
+      {
+        "command": "nxConsole.runTaskSkipNxCache",
+        "title": "Execute task without Nx cache"
       },
       {
         "category": "ng",
