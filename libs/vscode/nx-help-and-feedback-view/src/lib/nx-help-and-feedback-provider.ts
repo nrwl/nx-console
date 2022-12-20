@@ -80,7 +80,7 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
       [
         [
           'Nx Console Documentation',
-          'https://nx.dev/core-features/integrate-with-editors#nx-console-for-vscode',
+          'https://nx.dev/core-features/integrate-with-editors#nx-console-for-vscode?utm_source=nxconsole',
           {
             light: Uri.file(
               join(this.context.extensionPath, 'assets', 'nx-console-light.svg')
@@ -90,7 +90,11 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<
             ),
           },
         ],
-        ['Nx Documentation', 'https://nx.dev/', new ThemeIcon('book')],
+        [
+          'Nx Documentation',
+          'https://nx.dev?utm_source=nxconsole',
+          new ThemeIcon('book'),
+        ],
         [
           'Report a Bug',
           'https://github.com/nrwl/nx-console/issues/new?labels=type%3A+bug&template=1-bug.md',
