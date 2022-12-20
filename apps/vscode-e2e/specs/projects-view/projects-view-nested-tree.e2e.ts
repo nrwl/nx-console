@@ -3,6 +3,7 @@ import {
   assertWorkspaceIsLoaded,
   changeSettingForWorkspace,
   closeAllSectionsExcept,
+  getSortedTreeItemLabels,
   openNxConsoleViewContainer,
   openWorkspace,
 } from '../utils';
@@ -74,8 +75,8 @@ describe('NxConsole Projects View in a nested Nx workspace', function () {
     // open all projects
     await expandTreeViewItems(projectItems);
 
-    const items = (await projectsSection.getVisibleItems()) as CustomTreeItem[];
-    const labels = await Promise.all(items.map((vi) => vi.getLabel()));
+    const labels = await getSortedTreeItemLabels(projectsSection);
+
     expect(labels).toEqual([
       'app1',
       'start',

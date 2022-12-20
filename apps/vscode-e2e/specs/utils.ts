@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { CustomTreeItem, SideBarView } from 'wdio-vscode-service';
+import { CustomTreeItem, SideBarView, ViewSection } from 'wdio-vscode-service';
 
 export type TestWorkspaceKind = 'empty' | 'nx' | 'ng' | 'lerna' | 'nested';
 export async function openWorkspace(workspace: TestWorkspaceKind) {
@@ -67,10 +67,10 @@ export async function closeAllSectionsExcept(
   try {
     await browser.waitUntil(async () => {
       const sections = await content.getSections();
-      return sections.length > 1;
+      return sections.length > 3;
     });
   } catch (e) {
-    // noop - if there's only one section, we don't need to close it
+    // noop - we'll still close whatever we can
   }
 
   const sections = await content.getSections();
@@ -117,4 +117,24 @@ export async function expandTreeViewItems(items: CustomTreeItem[]) {
     const children = await item.getChildren();
     await expandTreeViewItems(children as CustomTreeItem[]);
   }
+}
+
+export async function getSortedTreeItemLabels(
+  treeViewSection: ViewSection
+): Promise<string[]> {
+  const items = (await treeViewSection.getVisibleItems()) as CustomTreeItem[];
+  const labelPositionMap = new Map<number, { label: string; y: number }>();
+  let i = 0;
+  for (const item of items) {
+    const label = await item.getLabel();
+    const y = await item.elem.getLocation('y');
+    const id = i;
+    i++;
+    labelPositionMap.set(id, { label, y });
+  }
+  const labelsSorted = Array.from(labelPositionMap.keys())
+    .sort((a, b) => labelPositionMap.get(a).y! - labelPositionMap.get(b).y!)
+    .map((id) => labelPositionMap.get(id).label);
+
+  return labelsSorted;
 }

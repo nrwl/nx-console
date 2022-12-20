@@ -2,6 +2,7 @@ import { CustomTreeItem, SideBarView, ViewSection } from 'wdio-vscode-service';
 import {
   assertWorkspaceIsLoaded,
   closeAllSectionsExcept,
+  getSortedTreeItemLabels,
   openNxConsoleViewContainer,
   openWorkspace,
 } from '../utils';
@@ -74,8 +75,8 @@ describe('NxConsole Projects View in an Nx workspace', function () {
     // open all projects
     await expandTreeViewItems(projectItems);
 
-    const items = (await projectsSection.getVisibleItems()) as CustomTreeItem[];
-    const labels = await Promise.all(items.map((vi) => vi.getLabel()));
+    const labels = await getSortedTreeItemLabels(projectsSection);
+
     expect(labels).toEqual([
       'app1',
       'build',

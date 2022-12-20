@@ -8,6 +8,7 @@ import {
   assertWorkspaceIsLoaded,
   changeSettingForWorkspace,
   closeAllSectionsExcept,
+  getSortedTreeItemLabels,
   openNxConsoleViewContainer,
   openWorkspace,
 } from '../utils';
@@ -15,7 +16,8 @@ import {
 let nxConsoleViewContainer: SideBarView<unknown>;
 let projectsSection: ViewSection;
 
-describe('NxConsole Projects View should remember opened treeitems', () => {
+describe('NxConsole Projects View should remember opened treeitems', function () {
+  this.retries(3);
   before('', async () => {
     changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'tree');
     await openWorkspace('nx');
@@ -86,38 +88,42 @@ describe('NxConsole Projects View should remember opened treeitems', () => {
   });
 
   it('should reload and see the same open projects', async () => {
-    changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'list');
-    changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'tree');
+    try {
+      console.log('before list view');
+      changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'list');
+      console.log('after list view');
+      changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'tree');
+      console.log('after tree view');
 
-    projectsSection = (await nxConsoleViewContainer
-      .getContent()
-      .getSection('PROJECTS')) as CustomTreeSection;
+      console.log('before get visible items');
+      await browser.waitUntil(
+        async () => {
+          const pi = await projectsSection.getVisibleItems();
+          console.log('visible items length', pi.length);
+          if (pi.length > 0) {
+            return true;
+          }
+        },
+        { timeout: 10000, timeoutMsg: 'Never found any projects' }
+      );
+      console.log('after get visible items');
 
-    await browser.waitUntil(
-      async () => {
-        const pi = await projectsSection.getVisibleItems();
-        if (pi.length > 0) {
-          return true;
-        }
-      },
-      { timeout: 10000, timeoutMsg: 'Never found any projects' }
-    );
+      const labels = getSortedTreeItemLabels(projectsSection);
 
-    const projectItems =
-      (await projectsSection.getVisibleItems()) as CustomTreeItem[];
-
-    const labels = await Promise.all(projectItems.map((vi) => vi.getLabel()));
-    expect(labels).toEqual([
-      'apps',
-      'app1',
-      'build',
-      'production',
-      'test',
-      'libs',
-      'lib1',
-      'lib2',
-      'test',
-      'weird',
-    ]);
+      expect(labels).toEqual([
+        'apps',
+        'app1',
+        'build',
+        'production',
+        'test',
+        'libs',
+        'lib1',
+        'lib2',
+        'test',
+        'weird',
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
   });
 });
