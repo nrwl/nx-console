@@ -1,3 +1,4 @@
+import { setInterval } from 'timers';
 import {
   CustomTreeItem,
   CustomTreeSection,
@@ -8,14 +9,14 @@ import {
   assertWorkspaceIsLoaded,
   changeSettingForWorkspace,
   closeAllSectionsExcept,
+  getSortedTreeItemLabels,
   openNxConsoleViewContainer,
   openWorkspace,
 } from '../utils';
 
-let nxConsoleViewContainer: SideBarView<unknown>;
-let projectsSection: ViewSection;
+describe('NxConsole Projects View should remember opened treeitems', function () {
+  this.retries(3);
 
-describe('NxConsole Projects View should remember opened treeitems', () => {
   before('', async () => {
     changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'tree');
     await openWorkspace('nx');
@@ -24,7 +25,8 @@ describe('NxConsole Projects View should remember opened treeitems', () => {
   it('should load VSCode', assertWorkspaceIsLoaded('nx'));
 
   it('should show projects view', async () => {
-    nxConsoleViewContainer = await openNxConsoleViewContainer();
+    const nxConsoleViewContainer: SideBarView<unknown> =
+      await openNxConsoleViewContainer();
 
     const projectsViewElem = await nxConsoleViewContainer.elem.$(
       'h3[title="Projects"]'
@@ -35,9 +37,12 @@ describe('NxConsole Projects View should remember opened treeitems', () => {
   });
 
   it('should open some projects', async () => {
+    const nxConsoleViewContainer: SideBarView<unknown> =
+      await openNxConsoleViewContainer();
+
     closeAllSectionsExcept(nxConsoleViewContainer, 'PROJECTS');
 
-    projectsSection = (await nxConsoleViewContainer
+    const projectsSection = (await nxConsoleViewContainer
       .getContent()
       .getSection('PROJECTS')) as CustomTreeSection;
 
@@ -86,38 +91,43 @@ describe('NxConsole Projects View should remember opened treeitems', () => {
   });
 
   it('should reload and see the same open projects', async () => {
-    changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'list');
-    changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'tree');
+    try {
+      changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'list');
+      changeSettingForWorkspace('nx', 'nxConsole.projectViewingStyle', 'tree');
 
-    projectsSection = (await nxConsoleViewContainer
-      .getContent()
-      .getSection('PROJECTS')) as CustomTreeSection;
+      const nxConsoleViewContainer: SideBarView<unknown> =
+        await openNxConsoleViewContainer();
 
-    await browser.waitUntil(
-      async () => {
-        const pi = await projectsSection.getVisibleItems();
-        if (pi.length > 0) {
-          return true;
-        }
-      },
-      { timeout: 10000, timeoutMsg: 'Never found any projects' }
-    );
+      const projectsSection = (await nxConsoleViewContainer
+        .getContent()
+        .getSection('PROJECTS')) as CustomTreeSection;
 
-    const projectItems =
-      (await projectsSection.getVisibleItems()) as CustomTreeItem[];
+      await browser.waitUntil(
+        async () => {
+          const pi = await projectsSection.getVisibleItems();
+          if (pi.length > 0) {
+            return true;
+          }
+        },
+        { timeout: 10000, timeoutMsg: 'Never found any projects' }
+      );
 
-    const labels = await Promise.all(projectItems.map((vi) => vi.getLabel()));
-    expect(labels).toEqual([
-      'apps',
-      'app1',
-      'build',
-      'production',
-      'test',
-      'libs',
-      'lib1',
-      'lib2',
-      'test',
-      'weird',
-    ]);
+      const labels = getSortedTreeItemLabels(projectsSection);
+
+      expect(labels).toEqual([
+        'apps',
+        'app1',
+        'build',
+        'production',
+        'test',
+        'libs',
+        'lib1',
+        'lib2',
+        'test',
+        'weird',
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
   });
 });
