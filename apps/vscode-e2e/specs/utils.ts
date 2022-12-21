@@ -67,7 +67,7 @@ export async function closeAllSectionsExcept(
   try {
     await browser.waitUntil(async () => {
       const sections = await content.getSections();
-      return sections.length > 3;
+      return sections.length > 1;
     });
   } catch (e) {
     // noop - we'll still close whatever we can
