@@ -29,7 +29,7 @@ export const config: Options.Testrunner = {
       },
     },
   ],
-  logLevel: 'info',
+  logLevel: 'warn',
   bail: 0,
   baseUrl: 'http://localhost',
   waitforTimeout: 10000,
@@ -40,7 +40,7 @@ export const config: Options.Testrunner = {
   reporters: ['spec'],
   mochaOpts: {
     ui: 'bdd',
-    timeout: debug ? 600000 : 60000,
+    timeout: debug ? 600000 : 100000,
   },
   afterTest: function (
     test,

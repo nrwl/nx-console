@@ -42,7 +42,7 @@ jobs:
   agent:
     runs-on: ubuntu-latest
     name: Nx Cloud - Agent E2E
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       NX_VERBOSE_LOGGING: 'false'
       NX_SKIP_NX_CACHE: 'true'
