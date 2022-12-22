@@ -19,11 +19,11 @@ export const config: Options.Testrunner = {
     './specs/viewcontainer.e2e.ts',
   ],
   exclude: [],
-  maxInstances: debug || process.env.CI ? 1 : 3,
+  maxInstances: 1,
   capabilities: [
     {
       browserName: 'vscode',
-      browserVersion: '1.73.1',
+      browserVersion: '1.74.1',
       'wdio:vscodeOptions': {
         vscodeArgs: { 'disable-extensions': true },
         userSettings: { 'NxConsoleClient.trace.server': 'info' },
@@ -32,7 +32,7 @@ export const config: Options.Testrunner = {
       },
     },
   ],
-  logLevel: 'error',
+  logLevel: 'warn',
   bail: 0,
   baseUrl: 'http://localhost',
   waitforTimeout: 10000,
