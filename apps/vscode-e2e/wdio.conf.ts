@@ -14,7 +14,10 @@ export const config: Options.Testrunner = {
       project: `./tsconfig.json`,
     },
   },
-  specs: [`./specs/**/*.e2e.ts`],
+  specs: [
+    // `./specs/**/*.e2e.ts`
+    './specs/viewcontainer.e2e.ts',
+  ],
   exclude: [],
   maxInstances: 1,
   capabilities: [
