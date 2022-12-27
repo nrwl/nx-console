@@ -21,15 +21,25 @@ import './all-components';
 export class Root extends LitElement {
   static styles = css`
     .container {
-      display: flex;
+      min-height: 100%;
+      position: relative;
+      display: inline-flex;
       flex-direction: column;
-      height: 100%;
+    }
+    .content {
+      padding-bottom: 1.5rem;
     }
     vscode-divider {
       margin: 1.5rem 0 1rem 0;
     }
     steps-element {
       height: 100%;
+    }
+    logo-element {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      right: 0;
     }
   `;
   @state()
@@ -42,13 +52,15 @@ export class Root extends LitElement {
       <div class="container">
         <status-labels-element .state=${this.state}></status-labels-element>
         <vscode-divider role="seperator"></vscode-divider>
-        <claim-callout-element
-          ?isusingcloudrunner=${this.state?.isUsingCloudRunner}
-          ?hasloaded=${this.state?.hasLoadedWorkspaceDetails}
-          ?isclaimed=${this.state?.isCloudWorkspaceClaimed}
-          ?isauthenticated=${this.state?.isAuthenticated}
-        ></claim-callout-element>
-        <steps-element .state=${this.state}></steps-element>
+        <div class="content">
+          <claim-callout-element
+            ?isusingcloudrunner=${this.state?.isUsingCloudRunner}
+            ?hasloaded=${this.state?.hasLoadedWorkspaceDetails}
+            ?isclaimed=${this.state?.isCloudWorkspaceClaimed}
+            ?isauthenticated=${this.state?.isAuthenticated}
+          ></claim-callout-element>
+          <steps-element .state=${this.state}></steps-element>
+        </div>
         <logo-element></logo-element>
       </div>
     `;

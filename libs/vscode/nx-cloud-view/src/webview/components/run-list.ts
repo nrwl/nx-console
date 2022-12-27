@@ -5,9 +5,6 @@ import type { RunDetails } from '../../lib/nx-cloud-service/models';
 @customElement('run-list-element')
 export class RunList extends LitElement {
   static styles = css`
-    vscode-panel-view {
-      min-height: 200px;
-    }
     vscode-progress-ring {
       padding-top: 5rem;
       margin: auto;
