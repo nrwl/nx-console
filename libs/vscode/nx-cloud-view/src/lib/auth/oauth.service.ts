@@ -141,7 +141,6 @@ export class OAuthService {
         data: searchParams.toString(),
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
       }).then((r) => {
-        console.log(r.responseText);
         return JSON.parse(r.responseText);
       });
     } catch (_) {
