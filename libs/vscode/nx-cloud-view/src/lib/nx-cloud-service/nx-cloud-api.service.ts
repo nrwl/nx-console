@@ -139,6 +139,9 @@ export class NxCloudApiService {
               tasks {
                 status
                 projectName
+                cacheStatus
+                startTime
+                endTime
               }
             }
           }

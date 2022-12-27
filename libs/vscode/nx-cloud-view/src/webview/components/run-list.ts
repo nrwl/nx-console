@@ -1,6 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { RunDetails } from '../../lib/nx-cloud-service/models';
+import { formatMilliseconds } from './ui/format-milliseconds-directive';
 
 @customElement('run-list-element')
 export class RunList extends LitElement {
@@ -32,6 +33,26 @@ export class RunList extends LitElement {
     .run-list-row .command-text {
       display: inline;
       vertical-align: sub;
+    }
+    .run-list-row .duration-cell {
+      text-align: center;
+    }
+    @media (max-width: 250px) {
+      .duration-cell {
+        display: none;
+        width: 0px;
+      }
+    }
+    .run-list-row .duration-text {
+      color: var(--vscode-input-placeholderForeground);
+      font-size: 0.75rem;
+      display: inline;
+      vertical-align: sub;
+      margin-right: 0.5rem;
+    }
+    .run-list-row .no-padding {
+      padding-left: 0;
+      padding-right: 0;
     }
     .first-command-row {
       padding: 0.25rem 0;
@@ -108,7 +129,7 @@ export class RunList extends LitElement {
           <vscode-data-grid
             id="run-list"
             aria-label="Run List"
-            grid-template-columns="10% 80% 10%"
+            grid-template-columns="10% 70% 10% 10%"
           >
             ${this.runs?.map((run) => this._getRunListRow(run))}
           </vscode-data-grid>
@@ -120,17 +141,22 @@ export class RunList extends LitElement {
   private _getRunListRow(run: RunDetails) {
     return html`
       <vscode-data-grid-row class="run-list-row">
-        <vscode-data-grid-cell grid-column="1">
-          <span class="success-icon"
-            >${this._getSuccessOrFailIcon(run.success)}</span
-          ></vscode-data-grid-cell
-        >
+        ${this._getCacheSuccessIconCell(run.success, run.cacheHit)}
+
         <vscode-data-grid-cell grid-column="2">
           <span class="command-text"
             >${run.command}</span
           ></vscode-data-grid-cell
         >
-        <vscode-data-grid-cell style="justify-self: center" grid-column="3">
+
+        <vscode-data-grid-cell class="no-padding duration-cell" grid-column="3">
+          <span class="duration-text">${formatMilliseconds(run.runTime)}</span>
+        </vscode-data-grid-cell>
+        <vscode-data-grid-cell
+          class="no-padding"
+          style="justify-self: center"
+          grid-column="4"
+        >
           <vscode-button
             appearance="icon"
             @click="${() => this._inspectButtonClicked(run.linkId)}"
@@ -156,10 +182,23 @@ export class RunList extends LitElement {
     `;
   }
 
-  private _getSuccessOrFailIcon(success: boolean) {
-    return success
-      ? html`<span class="dot" style="background: #307838"> </span>`
-      : html`<span class="dot" style="background: grey"> </span>`;
+  private _getCacheSuccessIconCell(success: boolean, cacheHit: boolean) {
+    let buttonHtml;
+    let hoverText: string;
+    if (success && cacheHit) {
+      buttonHtml = html`<span class="dot" style="background: #307838"> </span>`;
+      hoverText = 'Run Success & Cache Hit';
+    } else if (success) {
+      buttonHtml = html`<span class="dot" style="background: yellow"> </span>`;
+      hoverText = 'Run Success & Cache Miss';
+    } else {
+      buttonHtml = html`<span class="dot" style="background: grey"> </span>`;
+      hoverText = 'Run Failure';
+    }
+
+    return html` <vscode-data-grid-cell title="${hoverText}" grid-column="1">
+      <span class="success-icon">${buttonHtml}</span></vscode-data-grid-cell
+    >`;
   }
 
   private _runFirstCommand(command: string) {
