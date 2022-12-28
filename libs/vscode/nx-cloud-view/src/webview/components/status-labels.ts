@@ -15,6 +15,17 @@ export class StatusLabels extends LitElement {
   state: WebviewState | undefined = undefined;
 
   render() {
+    const dteStatus = this.state?.hasUsedDTE
+      ? 2
+      : this.state?.isUsingCloudRunner
+      ? 1
+      : 0;
+    const dteLabel =
+      dteStatus === 2
+        ? 'DTE enabled'
+        : dteStatus === 1
+        ? 'No distributed tasks executed yet'
+        : '';
     return html`
       <status-label
         .status=${this.state?.isUsingCloudRunner ? 2 : 0}
@@ -23,9 +34,10 @@ export class StatusLabels extends LitElement {
         @connectclicked=${() => this._setupCloudRunner()}
       ></status-label>
       <status-label
-        .status=${this.state?.isUsingCloudRunner ? 2 : 0}
+        .status=${dteStatus}
         text="DISTRIBUTED TASK EXECUTION (DTE)"
-        @helpclicked=${() => this._helpClicked('dte')}
+        .title="${dteLabel}"
+        @helpclicked="${() => this._helpClicked('dte')}"
         @connectclicked=${() => this._setupCloudRunner()}
       >
       </status-label>
@@ -115,13 +127,12 @@ class StatusLabel extends LitElement {
       background: #307838;
     }
     .status-1 {
-      background: yellow;
+      background: var(--vscode-editorWarning-foreground);
     }
     .status-0 {
       background: grey;
     }
   `;
-  // git yellow: var(--vscode-list-warningForeground);
   // git green var(--vscode-gitDecoration-untrackedResourceForeground)
 
   @property({ type: Number })
