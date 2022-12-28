@@ -1,27 +1,10 @@
 import { getNxCloudRunnerUrl } from '@nx-console/vscode/nx-workspace';
 import { commands, ExtensionContext, window } from 'vscode';
 import { NxCloudAuthenticationProvider } from './auth/nx-cloud-authentication-provider';
+import { prodConfig, stagingConfig } from './config';
 import { REFRESH_COMMAND } from './nx-cloud-service/commands';
 import { NxCloudService } from './nx-cloud-service/nx-cloud-service';
 import { NxCloudWebviewProvider } from './nx-cloud-webview-provider';
-
-const authStagingConfig = {
-  clientId: '11Zte67xGtfrGQhRVlz9zM8Fq0LvZYwe',
-  audience: 'https://api.staging.nrwl.io/',
-  domain: 'https://auth.staging.nx.app/login',
-};
-
-const authProdConfig = {
-  clientId: 'm6PYBsCK1t2DTKnbE30n029C22fqtTMm',
-  audience: 'https://api.nrwl.io/',
-  domain: 'https://nrwl.auth0.com/login',
-};
-
-const apiStagingEndpoint = 'https://staging.nx.app/api';
-const apiProdEndpoint = 'https://cloud.nx.app/api';
-
-const stagingUrl = 'http://staging.nx.app';
-const prodUrl = 'https://cloud.nx.app';
 
 export async function initNxCloudOnboardingView(
   context: ExtensionContext,
@@ -30,7 +13,7 @@ export async function initNxCloudOnboardingView(
   const mode = await determineProdOrDevMode(production);
 
   const nxCloudService = new NxCloudService(
-    mode === 'dev' ? apiStagingEndpoint : apiProdEndpoint
+    mode === 'dev' ? stagingConfig : prodConfig
   );
   const nxCloudWebviewProvider = new NxCloudWebviewProvider(
     context.extensionUri,
@@ -40,7 +23,7 @@ export async function initNxCloudOnboardingView(
 
   const nxCloudAuthenticationProvider = new NxCloudAuthenticationProvider(
     context,
-    mode === 'dev' ? authStagingConfig : authProdConfig
+    mode === 'dev' ? stagingConfig.authConfig : prodConfig.authConfig
   );
 
   context.subscriptions.push(
@@ -63,10 +46,10 @@ async function determineProdOrDevMode(
 ): Promise<'prod' | 'dev'> {
   const nxCloudRunnerUrl = await getNxCloudRunnerUrl();
 
-  if (nxCloudRunnerUrl === stagingUrl) {
+  if (nxCloudRunnerUrl === stagingConfig.appUrl) {
     return 'dev';
   }
-  if (nxCloudRunnerUrl === prodUrl) {
+  if (nxCloudRunnerUrl === prodConfig.appUrl) {
     return 'prod';
   }
   return productionEnv ? 'prod' : 'dev';

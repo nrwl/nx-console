@@ -29,6 +29,7 @@ import {
   tasks,
   window,
 } from 'vscode';
+import type { CloudConfig } from '../config';
 import {
   CLAIM_COMMAND,
   INSPECT_RUN_COMMAND,
@@ -100,9 +101,9 @@ export type WebviewState = Pick<
 export class NxCloudService extends StateBaseService<InternalState> {
   private nxCloudApiService: NxCloudApiService;
 
-  constructor(endpoint: string) {
+  constructor(private config: CloudConfig) {
     super(initialInternalState);
-    this.nxCloudApiService = new NxCloudApiService(endpoint);
+    this.nxCloudApiService = new NxCloudApiService(config.endpoint);
 
     this.listenForNxJsonChanges();
     this.listenForWorkspaceDetails();
@@ -212,6 +213,8 @@ export class NxCloudService extends StateBaseService<InternalState> {
       'latest'
     );
 
+    const env = { ...process.env, NX_CLOUD_API: this.config.appUrl };
+
     window.withProgress(
       {
         location: ProgressLocation.Notification,
@@ -232,7 +235,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
                     `${
                       getPackageManagerCommand().exec
                     } nx g @nrwl/nx-cloud:init`,
-                    { cwd: getWorkspacePath() }
+                    { cwd: getWorkspacePath(), env }
                   ).then(() => resolve(true));
                 })
                 .catch((e) => {
@@ -257,7 +260,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
                   ? 'connect'
                   : 'connect-to-nx-cloud',
               ],
-              { cwd: getWorkspacePath(), shell: true }
+              { cwd: getWorkspacePath(), env, shell: true }
             );
 
             commandProcess.stdout.setEncoding('utf8');
