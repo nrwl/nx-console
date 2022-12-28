@@ -49,6 +49,7 @@ type InternalState = {
   authAccessToken: string | undefined;
   canAccessCloudWorkspace: boolean | undefined;
   isCloudWorkspaceClaimed: boolean | undefined;
+  hasUsedDTE: boolean | undefined;
   runDetailsLoading: boolean;
   runDetails: RunDetails[] | undefined;
   cloudOrgs: { id: string; name: string }[];
@@ -65,6 +66,7 @@ const initialInternalState: InternalState = {
   authAccessToken: undefined,
   canAccessCloudWorkspace: undefined,
   isCloudWorkspaceClaimed: undefined,
+  hasUsedDTE: undefined,
   runDetailsLoading: false,
   runDetails: undefined,
   cloudOrgs: [],
@@ -81,6 +83,7 @@ export type WebviewState = Pick<
   | 'isUsingCloudRunner'
   | 'canAccessCloudWorkspace'
   | 'isCloudWorkspaceClaimed'
+  | 'hasUsedDTE'
   | 'runDetailsLoading'
   | 'runDetails'
   | 'cloudOrgs'
@@ -126,6 +129,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
     isUsingCloudRunnerLoading: state.isUsingCloudRunner === undefined,
     isAuthenticated: state.authAccessToken !== undefined,
     isCloudWorkspaceClaimed: state.isCloudWorkspaceClaimed,
+    hasUsedDTE: state.hasUsedDTE,
     canAccessCloudWorkspace: state.canAccessCloudWorkspace,
     hasLoadedWorkspaceDetails: !(
       state.isCloudWorkspaceClaimed === undefined ||
@@ -540,6 +544,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
 
           this.setState({
             isCloudWorkspaceClaimed: result.workspaceByToken.workspace.claimed,
+            hasUsedDTE: result.workspaceByToken.workspace.stats.hasUsedDTE,
             cloudWorkspaceId: result.workspaceByToken.workspace.id,
             cloudWorkspaceOrgId: result.workspaceByToken.workspace.orgId,
             canAccessCloudWorkspace: true,
