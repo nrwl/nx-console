@@ -1,7 +1,10 @@
 import { getPackageManagerCommand } from '@nrwl/devkit';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode/nx-commands-view';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxCloudRunnerOptions,
+  getNxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
   getWorkspacePath,
@@ -26,6 +29,7 @@ import {
   tasks,
   window,
 } from 'vscode';
+import { CloudConfig, prodConfig, stagingConfig } from '../config';
 import {
   CLAIM_COMMAND,
   INSPECT_RUN_COMMAND,
@@ -97,9 +101,9 @@ export type WebviewState = Pick<
 export class NxCloudService extends StateBaseService<InternalState> {
   private nxCloudApiService: NxCloudApiService;
 
-  constructor(config: 'prod' | 'dev') {
+  constructor(private config: CloudConfig) {
     super(initialInternalState);
-    this.nxCloudApiService = new NxCloudApiService(config);
+    this.nxCloudApiService = new NxCloudApiService(config.endpoint);
 
     this.listenForNxJsonChanges();
     this.listenForWorkspaceDetails();
@@ -209,6 +213,14 @@ export class NxCloudService extends StateBaseService<InternalState> {
       'latest'
     );
 
+    const cloudRunnerUrl =
+      this.config.appUrl === stagingConfig.appUrl
+        ? stagingConfig.appUrl
+        : undefined;
+    const env = cloudRunnerUrl
+      ? { ...process.env, NX_CLOUD_API: this.config.appUrl }
+      : process.env;
+
     window.withProgress(
       {
         location: ProgressLocation.Notification,
@@ -229,7 +241,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
                     `${
                       getPackageManagerCommand().exec
                     } nx g @nrwl/nx-cloud:init`,
-                    { cwd: getWorkspacePath() }
+                    { cwd: getWorkspacePath(), env }
                   ).then(() => resolve(true));
                 })
                 .catch((e) => {
@@ -254,7 +266,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
                   ? 'connect'
                   : 'connect-to-nx-cloud',
               ],
-              { cwd: getWorkspacePath(), shell: true }
+              { cwd: getWorkspacePath(), env, shell: true }
             );
 
             commandProcess.stdout.setEncoding('utf8');
@@ -394,8 +406,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
   }
 
   private async openRunDetails(runLinkId: string) {
-    const url = await this.getNxCloudBaseUrl();
-
+    const url = await this.getCloudRunnerUrl();
     commands.executeCommand(
       'vscode.open',
       `${url}/runs/${runLinkId}?utm_source=nxconsole`
@@ -412,7 +423,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
     }
     const orgId = this.state.cloudWorkspaceOrgId;
     const workspaceId = this.state.cloudWorkspaceId;
-    const baseUrl = await this.getNxCloudBaseUrl();
+    const baseUrl = await this.getCloudRunnerUrl();
 
     const link = `${baseUrl}/orgs/${orgId}/workspaces/${workspaceId}/set-up-vcs-integration?utm_source=nxconsole`;
 
@@ -657,20 +668,9 @@ export class NxCloudService extends StateBaseService<InternalState> {
     );
   }
 
-  private async getNxCloudBaseUrl(): Promise<string | undefined> {
-    const nxConfig = (await getNxWorkspace()).workspace;
-
-    if (!nxConfig.tasksRunnerOptions) {
-      return;
-    }
-    const nxCloudTaskRunner = Object.values(nxConfig.tasksRunnerOptions).find(
-      (r) => r.runner == '@nrwl/nx-cloud'
-    );
-
-    // remove trailing slash
-    return (nxCloudTaskRunner?.options?.url ?? 'https://cloud.nx.app').replace(
-      /\/$/,
-      ''
-    );
+  private async getCloudRunnerUrl(): Promise<string> {
+    return (
+      (await getNxCloudRunnerOptions())?.url ?? prodConfig.appUrl
+    ).replace(/\/$/, '');
   }
 }

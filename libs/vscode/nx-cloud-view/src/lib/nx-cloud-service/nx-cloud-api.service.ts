@@ -12,15 +12,8 @@ import {
   VCSIntegrationStatusResponse,
 } from './models';
 
-const stagingEndpoint = 'https://staging.nx.app/api';
-const prodEndpoint = 'https://cloud.nx.app/api';
-
 export class NxCloudApiService {
-  endpoint: string;
-
-  constructor(private config: 'prod' | 'dev') {
-    this.endpoint = config === 'dev' ? stagingEndpoint : prodEndpoint;
-  }
+  constructor(private endpoint: string) {}
   async claimCloudWorkspace(
     orgId: string
   ): Promise<ConnectWorkspaceUsingTokenResponse> {
