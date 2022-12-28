@@ -103,9 +103,12 @@ export class NxCloudWebviewProvider implements WebviewViewProvider {
 
         <style>
         html {
-          height: 100%;
+          min-height: 100%;
         }
         body {
+          height: 100vh;
+        }
+        root-element {
           height: 100%;
         }
         </style>

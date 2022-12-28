@@ -7,6 +7,7 @@ export class Logo extends LitElement {
     :host {
       color: var(--vscode-input-placeholderForeground);
       font-size: 0.75rem;
+      padding: 0.5rem;
     }
     .nx-cloud-icon {
       height: 1rem;
@@ -18,10 +19,6 @@ export class Logo extends LitElement {
       stroke: var(--vscode-input-placeholderForeground);
     }
     .logo {
-      position: sticky;
-      bottom: 0;
-      right: 0;
-      padding: 0.5rem;
       display: flex;
       align-items: center;
       justify-content: end;
