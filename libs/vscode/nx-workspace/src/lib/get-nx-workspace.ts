@@ -17,7 +17,9 @@ export async function getNxWorkspaceProjects(reset?: boolean): Promise<{
   return projects;
 }
 
-export async function getNxCloudRunnerUrl(): Promise<string | undefined> {
+export async function getNxCloudRunnerOptions(): Promise<
+  { accessToken: string; url?: string } | undefined
+> {
   const nxConfig = (await getNxWorkspace()).workspace;
 
   if (!nxConfig.tasksRunnerOptions) {
@@ -26,5 +28,5 @@ export async function getNxCloudRunnerUrl(): Promise<string | undefined> {
   const nxCloudTaskRunner = Object.values(nxConfig.tasksRunnerOptions).find(
     (r) => r.runner == '@nrwl/nx-cloud'
   );
-  return nxCloudTaskRunner?.options?.url;
+  return nxCloudTaskRunner?.options;
 }

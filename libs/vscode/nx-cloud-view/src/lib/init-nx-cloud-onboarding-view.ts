@@ -1,4 +1,4 @@
-import { getNxCloudRunnerUrl } from '@nx-console/vscode/nx-workspace';
+import { getNxCloudRunnerOptions } from '@nx-console/vscode/nx-workspace';
 import { commands, ExtensionContext, window } from 'vscode';
 import { NxCloudAuthenticationProvider } from './auth/nx-cloud-authentication-provider';
 import { prodConfig, stagingConfig } from './config';
@@ -44,7 +44,12 @@ export async function initNxCloudOnboardingView(
 async function determineProdOrDevMode(
   productionEnv: boolean
 ): Promise<'prod' | 'dev'> {
-  const nxCloudRunnerUrl = await getNxCloudRunnerUrl();
+  const nxCloudRunnerOptions = await getNxCloudRunnerOptions();
+
+  // if we're using the cloud runner but no URL is defined, it means an implicit prod endpoint
+  const nxCloudRunnerUrl = nxCloudRunnerOptions
+    ? nxCloudRunnerOptions.url ?? prodConfig.appUrl
+    : '';
 
   if (nxCloudRunnerUrl === stagingConfig.appUrl) {
     return 'dev';

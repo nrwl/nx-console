@@ -2,7 +2,7 @@ import { getPackageManagerCommand } from '@nrwl/devkit';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode/nx-commands-view';
 import {
-  getNxCloudRunnerUrl,
+  getNxCloudRunnerOptions,
   getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
 import {
@@ -29,7 +29,7 @@ import {
   tasks,
   window,
 } from 'vscode';
-import type { CloudConfig } from '../config';
+import { CloudConfig, prodConfig, stagingConfig } from '../config';
 import {
   CLAIM_COMMAND,
   INSPECT_RUN_COMMAND,
@@ -213,7 +213,13 @@ export class NxCloudService extends StateBaseService<InternalState> {
       'latest'
     );
 
-    const env = { ...process.env, NX_CLOUD_API: this.config.appUrl };
+    const cloudRunnerUrl =
+      this.config.appUrl === stagingConfig.appUrl
+        ? stagingConfig.appUrl
+        : undefined;
+    const env = cloudRunnerUrl
+      ? { ...process.env, NX_CLOUD_API: this.config.appUrl }
+      : process.env;
 
     window.withProgress(
       {
@@ -400,8 +406,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
   }
 
   private async openRunDetails(runLinkId: string) {
-    const url = await this.getNxCloudBaseUrl();
-
+    const url = await this.getCloudRunnerUrl();
     commands.executeCommand(
       'vscode.open',
       `${url}/runs/${runLinkId}?utm_source=nxconsole`
@@ -418,7 +423,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
     }
     const orgId = this.state.cloudWorkspaceOrgId;
     const workspaceId = this.state.cloudWorkspaceId;
-    const baseUrl = await getNxCloudRunnerUrl();
+    const baseUrl = await this.getCloudRunnerUrl();
 
     const link = `${baseUrl}/orgs/${orgId}/workspaces/${workspaceId}/set-up-vcs-integration?utm_source=nxconsole`;
 
@@ -663,20 +668,9 @@ export class NxCloudService extends StateBaseService<InternalState> {
     );
   }
 
-  private async getNxCloudBaseUrl(): Promise<string | undefined> {
-    const nxConfig = (await getNxWorkspace()).workspace;
-
-    if (!nxConfig.tasksRunnerOptions) {
-      return;
-    }
-    const nxCloudTaskRunner = Object.values(nxConfig.tasksRunnerOptions).find(
-      (r) => r.runner == '@nrwl/nx-cloud'
-    );
-
-    // remove trailing slash
-    return (nxCloudTaskRunner?.options?.url ?? 'https://cloud.nx.app').replace(
-      /\/$/,
-      ''
-    );
+  private async getCloudRunnerUrl(): Promise<string> {
+    return (
+      (await getNxCloudRunnerOptions())?.url ?? prodConfig.appUrl
+    ).replace(/\/$/, '');
   }
 }
