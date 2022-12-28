@@ -1,7 +1,7 @@
 import { getNxCloudRunnerOptions } from '@nx-console/vscode/nx-workspace';
 import { commands, ExtensionContext, window } from 'vscode';
 import { NxCloudAuthenticationProvider } from './auth/nx-cloud-authentication-provider';
-import { prodConfig, stagingConfig } from './config';
+import { CloudConfig, prodConfig, stagingConfig } from './config';
 import { REFRESH_COMMAND } from './nx-cloud-service/commands';
 import { NxCloudService } from './nx-cloud-service/nx-cloud-service';
 import { NxCloudWebviewProvider } from './nx-cloud-webview-provider';
@@ -10,11 +10,9 @@ export async function initNxCloudOnboardingView(
   context: ExtensionContext,
   production: boolean
 ) {
-  const mode = await determineProdOrDevMode(production);
+  const config = await determineProdOrStagingConfig(production);
 
-  const nxCloudService = new NxCloudService(
-    mode === 'dev' ? stagingConfig : prodConfig
-  );
+  const nxCloudService = new NxCloudService(config);
   const nxCloudWebviewProvider = new NxCloudWebviewProvider(
     context.extensionUri,
     context,
@@ -23,7 +21,7 @@ export async function initNxCloudOnboardingView(
 
   const nxCloudAuthenticationProvider = new NxCloudAuthenticationProvider(
     context,
-    mode === 'dev' ? stagingConfig.authConfig : prodConfig.authConfig
+    config.authConfig
   );
 
   context.subscriptions.push(
@@ -39,11 +37,11 @@ export async function initNxCloudOnboardingView(
 /**
  * Determines which endpoint to use for API calls and auth
  * it's set to staging in dev mode and prod in production mode by default
- * if there's a URL set in the cloud runner, we will use that (as long as it matches either the staging or prod endpoint)
+ * if the cloud runner is used, we will use that (as long as it matches either the staging or prod endpoint)
  *  */
-async function determineProdOrDevMode(
+async function determineProdOrStagingConfig(
   productionEnv: boolean
-): Promise<'prod' | 'dev'> {
+): Promise<CloudConfig> {
   const nxCloudRunnerOptions = await getNxCloudRunnerOptions();
 
   // if we're using the cloud runner but no URL is defined, it means an implicit prod endpoint
@@ -52,10 +50,10 @@ async function determineProdOrDevMode(
     : '';
 
   if (nxCloudRunnerUrl === stagingConfig.appUrl) {
-    return 'dev';
+    return stagingConfig;
   }
   if (nxCloudRunnerUrl === prodConfig.appUrl) {
-    return 'prod';
+    return prodConfig;
   }
-  return productionEnv ? 'prod' : 'dev';
+  return productionEnv ? prodConfig : stagingConfig;
 }
