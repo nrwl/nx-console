@@ -395,9 +395,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
 
   private async openRunDetails(runLinkId: string) {
     const url = await this.getNxCloudBaseUrl();
-    if (!url) {
-      return;
-    }
+
     commands.executeCommand(
       'vscode.open',
       `${url}/runs/${runLinkId}?utm_source=nxconsole`
@@ -668,6 +666,11 @@ export class NxCloudService extends StateBaseService<InternalState> {
     const nxCloudTaskRunner = Object.values(nxConfig.tasksRunnerOptions).find(
       (r) => r.runner == '@nrwl/nx-cloud'
     );
-    return nxCloudTaskRunner?.options?.url;
+
+    // remove trailing slash
+    return (nxCloudTaskRunner?.options?.url ?? 'https://cloud.nx.app').replace(
+      /\/$/,
+      ''
+    );
   }
 }
