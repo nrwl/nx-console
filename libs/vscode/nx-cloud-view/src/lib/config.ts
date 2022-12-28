@@ -22,7 +22,7 @@ export const prodConfig = {
   authConfig: {
     clientId: 'm6PYBsCK1t2DTKnbE30n029C22fqtTMm',
     audience: 'https://api.nrwl.io/',
-    domain: 'https://nrwl.auth0.com/login',
+    domain: 'https://auth.nx.app/login',
   },
   endpoint: 'https://cloud.nx.app/api',
   appUrl: 'https://cloud.nx.app',
