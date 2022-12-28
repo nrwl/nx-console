@@ -69,6 +69,9 @@ export class RunList extends LitElement {
       width: 0.5rem;
       align-self: center;
     }
+    .dot.yellow {
+      background: var(--vscode-editorWarning-foreground);
+    }
   `;
 
   @property({ type: Boolean })
@@ -187,10 +190,10 @@ export class RunList extends LitElement {
     let hoverText: string;
     if (success && cacheHit) {
       buttonHtml = html`<span class="dot" style="background: #307838"> </span>`;
-      hoverText = 'Run Success & Cache Hit';
+      hoverText = 'Cache Hit';
     } else if (success) {
-      buttonHtml = html`<span class="dot" style="background: yellow"> </span>`;
-      hoverText = 'Run Success & Cache Miss';
+      buttonHtml = html`<span class="dot yellow"> </span>`;
+      hoverText = 'Cache Miss';
     } else {
       buttonHtml = html`<span class="dot" style="background: grey"> </span>`;
       hoverText = 'Run Failure';
