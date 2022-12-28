@@ -10,26 +10,18 @@ import {
   window,
 } from 'vscode';
 
-const staging_config = {
-  clientId: '11Zte67xGtfrGQhRVlz9zM8Fq0LvZYwe',
-  audience: 'https://api.staging.nrwl.io/',
-  domain: 'https://auth.staging.nx.app/login',
-};
-
-const prod_config = {
-  clientId: 'm6PYBsCK1t2DTKnbE30n029C22fqtTMm',
-  audience: 'https://api.nrwl.io/',
-  domain: 'https://nrwl.auth0.com/login',
+export type AuthConfig = {
+  clientId: string;
+  audience: string;
+  domain: string;
 };
 
 export class OAuthService {
-  private _oAuthConfig: { clientId: string; audience: string; domain: string };
   private _codeExchangePromise: Promise<string | undefined> | undefined;
   private _stateId: string | undefined;
   private _uriHandler = new UriEventHandler();
 
-  constructor(private context: ExtensionContext, config: 'prod' | 'dev') {
-    this._oAuthConfig = config === 'prod' ? prod_config : staging_config;
+  constructor(private context: ExtensionContext, private config: AuthConfig) {
     window.registerUriHandler(this._uriHandler);
   }
   get redirectUri() {
@@ -80,15 +72,15 @@ export class OAuthService {
 
     const searchParams = new URLSearchParams([
       ['response_type', 'code'],
-      ['client_id', this._oAuthConfig.clientId],
+      ['client_id', this.config.clientId],
       ['redirect_uri', this.redirectUri],
       ['state', this._stateId],
       ['scope', scopeString],
-      ['audience', this._oAuthConfig.audience],
+      ['audience', this.config.audience],
     ]);
 
     const uri = Uri.parse(
-      `${this._oAuthConfig.domain}/authorize?${searchParams.toString()}`
+      `${this.config.domain}/authorize?${searchParams.toString()}`
     );
     await env.openExternal(uri);
 
@@ -129,15 +121,15 @@ export class OAuthService {
   ): Promise<{ access_token: string; refresh_token: string } | undefined> {
     const searchParams = new URLSearchParams([
       ['grant_type', 'authorization_code'],
-      ['client_id', this._oAuthConfig.clientId],
+      ['client_id', this.config.clientId],
       ['code', authCode],
       ['redirect_uri', this.redirectUri],
-      ['audience', this._oAuthConfig.audience],
+      ['audience', this.config.audience],
     ]);
     try {
       return await xhr({
         type: 'POST',
-        url: `${this._oAuthConfig.domain}/oauth/token`,
+        url: `${this.config.domain}/oauth/token`,
         data: searchParams.toString(),
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
       }).then((r) => {
@@ -151,7 +143,7 @@ export class OAuthService {
   async getUserInfo(token: string) {
     try {
       const response = await xhr({
-        url: `${this._oAuthConfig.domain}/userinfo`,
+        url: `${this.config.domain}/userinfo`,
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -188,14 +180,14 @@ export class OAuthService {
     const searchParams = new URLSearchParams([
       ['grant_type', 'refresh_token'],
       ['refresh_token', refreshToken],
-      ['client_id', this._oAuthConfig.clientId],
+      ['client_id', this.config.clientId],
       ['redirect_uri', this.redirectUri],
       ['scope', scopes.join(' ')],
     ]);
     try {
       return await xhr({
         type: 'POST',
-        url: `${this._oAuthConfig.domain}/oauth/token`,
+        url: `${this.config.domain}/oauth/token`,
         data: searchParams.toString(),
         headers: {
           'content-type': 'application/x-www-form-urlencoded',

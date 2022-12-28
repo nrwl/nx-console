@@ -1,7 +1,10 @@
 import { getPackageManagerCommand } from '@nrwl/devkit';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode/nx-commands-view';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxCloudRunnerUrl,
+  getNxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
   getWorkspacePath,
@@ -97,9 +100,9 @@ export type WebviewState = Pick<
 export class NxCloudService extends StateBaseService<InternalState> {
   private nxCloudApiService: NxCloudApiService;
 
-  constructor(config: 'prod' | 'dev') {
+  constructor(endpoint: string) {
     super(initialInternalState);
-    this.nxCloudApiService = new NxCloudApiService(config);
+    this.nxCloudApiService = new NxCloudApiService(endpoint);
 
     this.listenForNxJsonChanges();
     this.listenForWorkspaceDetails();
@@ -412,7 +415,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
     }
     const orgId = this.state.cloudWorkspaceOrgId;
     const workspaceId = this.state.cloudWorkspaceId;
-    const baseUrl = await this.getNxCloudBaseUrl();
+    const baseUrl = await getNxCloudRunnerUrl();
 
     const link = `${baseUrl}/orgs/${orgId}/workspaces/${workspaceId}/set-up-vcs-integration?utm_source=nxconsole`;
 

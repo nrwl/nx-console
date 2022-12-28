@@ -12,7 +12,7 @@ import {
   ProgressLocation,
   window,
 } from 'vscode';
-import { OAuthService } from './oauth.service';
+import { AuthConfig, OAuthService } from './oauth.service';
 import { SecretSessionStore } from './secret-session-store';
 
 export const AUTH_NAME = 'Nx Cloud';
@@ -28,7 +28,7 @@ export class NxCloudAuthenticationProvider
   private _secretSessionStore: SecretSessionStore;
   private _oAuthService: OAuthService;
 
-  constructor(readonly context: ExtensionContext, config: 'prod' | 'dev') {
+  constructor(readonly context: ExtensionContext, config: AuthConfig) {
     this._secretSessionStore = new SecretSessionStore(context);
     this._oAuthService = new OAuthService(context, config);
 
