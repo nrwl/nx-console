@@ -56,7 +56,14 @@ export type ConnectWorkspaceUsingTokenResponse = {
 export type GetWorkspaceDetailsByTokenResponse = {
   workspaceByToken: {
     result: string;
-    workspace: { claimed: boolean; id: string; orgId: string };
+    workspace: {
+      claimed: boolean;
+      id: string;
+      orgId: string;
+      stats: {
+        hasUsedDTE: boolean;
+      };
+    };
   };
 };
 

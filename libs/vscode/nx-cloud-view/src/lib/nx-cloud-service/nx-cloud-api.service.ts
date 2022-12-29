@@ -75,6 +75,9 @@ export class NxCloudApiService {
             name
             orgId
             claimed
+            stats {
+              hasUsedDTE
+            }
           }
         }
       }
