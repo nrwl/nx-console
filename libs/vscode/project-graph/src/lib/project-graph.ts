@@ -5,6 +5,7 @@ import { GraphWebView } from './graph-webview';
 import {
   NxTreeItem,
   ProjectViewItem,
+  TargetViewItem,
 } from '@nx-console/vscode/nx-project-view';
 import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
 
@@ -45,12 +46,25 @@ export function projectGraph() {
     commands.registerCommand(
       'nx.graph.select.button',
       async (treeItem: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.graph.focus.button');
+        getTelemetry().featureUsed('nx.graph.select.button');
         const project = getProjectItem(treeItem);
         if (project) {
           graphWebView.projectInWebview(
             project.nxProject.project,
             MessageType.select
+          );
+        }
+      }
+    ),
+    commands.registerCommand(
+      'nx.graph.select-task.button',
+      async (treeItem: NxTreeItem) => {
+        getTelemetry().featureUsed('nx.graph.select-task.button');
+        const target = getTargetItem(treeItem);
+        if (target) {
+          graphWebView.taskInWebview(
+            target.nxTarget.name,
+            target.nxProject.project
           );
         }
       }
@@ -94,5 +108,11 @@ async function openProjectWithFile(
 function getProjectItem(item: NxTreeItem): ProjectViewItem | undefined {
   if (item.contextValue === 'project') {
     return item.item as ProjectViewItem;
+  }
+}
+
+function getTargetItem(item: NxTreeItem): TargetViewItem | undefined {
+  if (item.contextValue === 'target') {
+    return item.item as TargetViewItem;
   }
 }

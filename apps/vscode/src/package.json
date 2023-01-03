@@ -166,6 +166,11 @@
           "group": "inline@1"
         },
         {
+          "command": "nx.graph.select-task.button",
+          "when": "view == nxProjects && viewItem == target && isNxWorkspace",
+          "group": "inline@1"
+        },
+        {
           "command": "nxConsole.connectToNxCloud",
           "when": "view == nxHelpAndFeedback && viewItem == connectToNxCloud && isNxWorkspace",
           "group": "inline"
@@ -578,6 +583,12 @@
         "category": "Nx",
         "title": "Select/Deselect in Nx Graph",
         "command": "nx.graph.select.button",
+        "icon": "$(eye)"
+      },
+      {
+        "category": "Nx",
+        "title": "Select in Nx Task Graph",
+        "command": "nx.graph.select-task.button",
         "icon": "$(eye)"
       },
       {

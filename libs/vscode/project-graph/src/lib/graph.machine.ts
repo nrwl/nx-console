@@ -18,6 +18,7 @@ export const enum ViewStatus {
 
 interface Context {
   state: State;
+  task: { taskName: string; projectName: string } | null;
   project: {
     projectName: string;
     type: MessageType;
@@ -28,7 +29,7 @@ export const graphMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QAUBOB7AVmAxgFwAIBxVAQwAcALAOgEsA7WvAYiIFEAVAfQGEB5AHIc2QxKHLpYTWunpiQAD0QAOAJwAmagEYA7FuXrDW9coDMO5QBoQAT0S7V1AKwAGNy9Uud6natNOAXwDrNCxcQhIKGhxZPDB6FgA1AEk2AHUuACU2AEEAEQBNeQkpPBk5JEVEVQAWTTrVADYnGtdlF3V-azsEVW9ndx91fVN2mqCQjGx8YjIqahiE+JZiyWlZeSUENU1dfUNhk3MrW0R1Jup3F30tVqdlHQmQUOmIuZoAG3RSCAYoZggsjAdHoADd0ABrYFfH5-HixZarUrlTaIVo6ajmVwuUznVRaPqNbpoxqabEdRqmPz3LQucbBZ5TcKzKLUGG-ej-MCoDCoajkD6kPAAM3QqAAtmzvhyoPClgkkesKqAtujMTpsbjVPjCcSEI1jNRtcbdE51G57k8XszIvNubzWJxeIJhKJKiUlajthptHoDEYjhY9ZTNFcPF4fH56ZMwjNbTRQbQwAB3TJgH42ZgpdJcPJsADKHEyfAKbDyirKG0qqqcGKxbi1Op0RNOCAsGLDLgMNV8fitTLj72oiZTeTgeAwNkgju4-CEIg4FZR1ZUPr2-sOZiDrfblzD3d7pn7sbeUWY2QAYtl8wAJJdVlWIWt6zx7q4G5RObVORrH14sqhmGQYsACk2B4bh8zYAAZcDhHLd01krZUqgQH8tGoYYamUbDGlUB4mlMPVaUaRpqDMUxzGw7DOjwoIGXodAIDgeRrUHVkGCYe8UK2HRTDIrQf2GcwuwMFseluZQBkGFwDW1T91D-G0h0WOIFUQ5EH1QrRaSkmoNFuGoDTpUxZL1VoXGkikqX8ZRaWjRkTwAz5pT+bivWfVszUs418KaTw3D4pT2LtHkxXclc2w6agakopx4vaDQhmDa432uTo9G1LRgtPeYR1TdMIB6cQkOXR8EBMMj-Gpfx4uGJx+JfdQnHIyj+K0ZpDMaBy2NyhMk2TMdYAndApwgCLysaPjqD0Ls+k8Jojj1TKjWNHDcWUOydJy5yJtQyjg3ogIgA */
   createMachine(
     {
-      context: { state: State.init, project: null },
+      context: { state: State.init, project: null, task: null },
       tsTypes: {} as import('./graph.machine.typegen').Typegen0,
       schema: {
         context: {} as Context,
@@ -45,6 +46,10 @@ export const graphMachine =
               type: 'PROJECT_SELECTED';
               data: { projectName: string; type: MessageType };
             }
+          | {
+              type: 'TASK_SELECTED';
+              data: { taskName: string; projectName: string };
+            }
           | { type: 'VIEW_READY' }
           | { type: 'VIEW_DESTROYED' },
       },
@@ -57,6 +62,9 @@ export const graphMachine =
         },
         PROJECT_SELECTED: {
           actions: ['log', 'projectSelected'],
+        },
+        TASK_SELECTED: {
+          actions: ['log', 'taskSelected'],
         },
         NO_PROJECT: {
           target: '.no_project',
@@ -162,6 +170,13 @@ export const graphMachine =
               projectName: data.projectName,
               type: data.type,
             },
+            task: null,
+          };
+        }),
+        taskSelected: assign((context, { data }) => {
+          return {
+            task: { taskName: data.taskName, projectName: data.projectName },
+            project: null,
           };
         }),
       },

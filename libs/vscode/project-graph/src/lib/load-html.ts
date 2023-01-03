@@ -247,6 +247,9 @@ function injectedScript() {
                   action = {type:'focusProject', projectName: data.projectName};
                   break;
                 }
+                case '${MessageType.selectTask}': {
+                  console.log('selectTask', data.taskName, data.projectName);
+                }
                 case '${MessageType.all}':
                 default: {
                   action = {type: 'selectAll'};

@@ -31,7 +31,16 @@ export class GraphWebView implements Disposable {
         this.panel.webview.html = loadNoProject();
       } else if (state.matches('viewReady')) {
         const project = state.context.project;
-        this.panel?.webview.postMessage(project);
+        if (project) {
+          this.panel?.webview.postMessage(project);
+          return;
+        }
+        const task = state.context.task;
+        this.panel?.webview.postMessage({
+          type: MessageType.selectTask,
+          taskName: task?.taskName,
+          projectName: task?.projectName,
+        });
       }
 
       setTimeout(() => {
@@ -90,6 +99,23 @@ export class GraphWebView implements Disposable {
     graphService.send('PROJECT_SELECTED', {
       data: {
         type,
+        projectName,
+      },
+    });
+  }
+
+  taskInWebview(taskName: string, projectName: string) {
+    getOutputChannel().appendLine(`Graph - Opening graph for task ${taskName}`);
+
+    if (!this.panel) {
+      this._webview();
+    }
+
+    this.panel?.reveal();
+
+    graphService.send('TASK_SELECTED', {
+      data: {
+        taskName,
         projectName,
       },
     });

@@ -20,9 +20,9 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
     clearProject: 'VIEW_DESTROYED';
@@ -34,6 +34,7 @@ export interface Typegen0 {
       | 'GET_CONTENT'
       | 'PROJECT_SELECTED'
       | 'REFRESH'
+      | 'TASK_SELECTED'
       | 'VIEW_DESTROYED'
       | 'VIEW_READY'
       | 'done.invoke.loadingContent'
@@ -41,14 +42,15 @@ export interface Typegen0 {
       | 'xstate.init';
     projectSelected: 'PROJECT_SELECTED';
     refreshData: 'REFRESH' | 'VIEW_DESTROYED';
+    taskSelected: 'TASK_SELECTED';
+  };
+  eventsCausingDelays: {};
+  eventsCausingGuards: {
+    loadGraph: '';
   };
   eventsCausingServices: {
     generateContent: '';
   };
-  eventsCausingGuards: {
-    loadGraph: '';
-  };
-  eventsCausingDelays: {};
   matchesStates:
     | 'content'
     | 'error'
