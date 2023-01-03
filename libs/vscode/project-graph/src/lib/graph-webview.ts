@@ -26,7 +26,7 @@ export class GraphWebView implements Disposable {
       } else if (state.matches('content')) {
         this.panel.webview.html = await loadHtml(this.panel);
       } else if (state.matches('error')) {
-        this.panel.webview.html = loadError();
+        this.panel.webview.html = loadError(state.context.error);
       } else if (state.matches('no_project')) {
         this.panel.webview.html = loadNoProject();
       } else if (state.matches('viewReady')) {

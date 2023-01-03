@@ -28,12 +28,23 @@ export function loadNoProject() {
   `;
 }
 
-export function loadError() {
+export function loadError(errorMessage: string | null) {
+  if (errorMessage) {
+    return html`
+      <style>
+        pre {
+          white-space: pre-wrap;
+          border-radius: 5px;
+          border: 2px solid var(--vscode-editorWidget-border);
+          padding: 20px;
+        }
+      </style>
+      <p>Unable to load the project graph. The following error occured:</p>
+      <pre>${errorMessage}</pre>
+    `;
+  }
   return html`
-    <p>
-      Unable to load the project graph. Please check the output for errors and
-      try again.
-    </p>
+    <p>Unable to load the project graph. Please check the output for errors.</p>
   `;
 }
 
