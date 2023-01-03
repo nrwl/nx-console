@@ -37,7 +37,12 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<NxHelpAndFee
           new ThemeIcon('book'),
         ],
         [
-          'Report a Bug',
+          'Report a Bug for Nx',
+          'https://github.com/nrwl/nx/issues/new?labels=type%3A+bug&template=1-bug.yml',
+          new ThemeIcon('bug'),
+        ],
+        [
+          'Report a Bug for Nx Console',
           'https://github.com/nrwl/nx-console/issues/new?labels=type%3A+bug&template=1-bug.md',
           new ThemeIcon('bug'),
         ],
