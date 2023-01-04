@@ -1,6 +1,5 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 import { VCSIntegrationStatusOptions } from '../../lib/nx-cloud-service/models';
 import type { WebviewState } from '../../lib/nx-cloud-service/nx-cloud-service';
 
@@ -20,23 +19,24 @@ export class StatusLabels extends LitElement {
       : this.state?.isUsingCloudRunner
       ? 1
       : 0;
-    const dteLabel =
-      dteStatus === 2
-        ? 'DTE enabled'
-        : dteStatus === 1
-        ? 'No distributed tasks executed yet'
-        : '';
+
     return html`
       <status-label
         .status=${this.state?.isUsingCloudRunner ? 2 : 0}
         text="REMOTE CACHE"
+        .hoverTexts="${{
+          0: 'Not connected to Nx Cloud',
+        }}"
         @helpclicked=${() => this._helpClicked('remote-cache')}
         @connectclicked=${() => this._setupCloudRunner()}
       ></status-label>
       <status-label
         .status=${dteStatus}
         text="DISTRIBUTED TASK EXECUTION (DTE)"
-        .title="${dteLabel}"
+        .hoverTexts="${{
+          1: 'No distributed tasks executed yet',
+          0: 'Not connected to Nx Cloud',
+        }}"
         @helpclicked="${() => this._helpClicked('dte')}"
         @connectclicked=${() => this._setupCloudRunner()}
       >
@@ -46,6 +46,10 @@ export class StatusLabels extends LitElement {
           this.state?.vcsIntegrationStatus
         )}
         text="VCS INTEGRATION"
+        .hoverTexts="${{
+          1: 'Legacy VCS integration enabled',
+          0: 'Not connected to Nx Cloud',
+        }}"
         @helpclicked=${() => this._helpClicked('vcs')}
         @connectclicked=${() => this._setupVcs()}
       >
@@ -138,14 +142,18 @@ class StatusLabel extends LitElement {
   @property({ type: Number })
   status: 2 | 1 | 0 = 0;
 
+  @property()
+  hoverTexts: { [key: number]: string };
+
   @property({ type: String })
   text: string;
 
   render() {
+    const hoverText = this.hoverTexts?.[this.status] ?? '';
     return html`
       <div class="flexcontainer" style="margin: 10px 0px 10px 0px">
         <!-- Status Dot-->
-        <span class="dot status-${this.status}"> </span>
+        <span class="dot status-${this.status}" .title="${hoverText}"> </span>
         <!-- Label-->
         <span class="text"> ${this.text} </span>
         <div class="actions">
