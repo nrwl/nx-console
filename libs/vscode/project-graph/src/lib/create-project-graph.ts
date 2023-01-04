@@ -7,7 +7,7 @@ import * as cacheDir from 'find-cache-dir';
 let projectGraphCacheDir: string | undefined;
 
 export async function createProjectGraph() {
-  return new Promise<void>((res, rej) => {
+  return new Promise<void | string>((res, rej) => {
     if (!projectGraphCacheDir) {
       projectGraphCacheDir = cacheDir({
         name: 'nx-console-project-graph',
@@ -37,10 +37,11 @@ export async function createProjectGraph() {
 
       res();
     } catch (e) {
+      const errorMessage = e.output[1].toString() || e.toString();
       getOutputChannel().appendLine(
-        'Unable to create project graph: ' + e.toString()
+        'Unable to create project graph: ' + errorMessage
       );
-      rej();
+      rej(errorMessage);
     }
   });
 }

@@ -20,9 +20,9 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
     clearProject: 'VIEW_DESTROYED';
@@ -42,13 +42,13 @@ export interface Typegen0 {
     projectSelected: 'PROJECT_SELECTED';
     refreshData: 'REFRESH' | 'VIEW_DESTROYED';
   };
-  eventsCausingServices: {
-    generateContent: '';
-  };
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     loadGraph: '';
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    generateContent: '';
+  };
   matchesStates:
     | 'content'
     | 'error'
