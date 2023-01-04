@@ -988,7 +988,8 @@
         {
           "type": "webview",
           "id": "nxCloud",
-          "name": "Nx Cloud"
+          "name": "Nx Cloud",
+          "when": "isNxWorkspace"
         },
         {
           "id": "nxRunTarget",
