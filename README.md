@@ -11,7 +11,7 @@
 
 **Spend less time looking up command line arguments and more time shipping incredible products.**
 
-[![CI Status](https://img.shields.io/github/workflow/status/nrwl/nx-console/CI%20Checks/master?label=CI&logo=github&style=flat-square)](https://github.com/nrwl/nx-console/actions/workflows/ci_checks.yml)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/nrwl/nx-console/ci_checks.yml?branch=master&label=CI&logo=github&style=flat-square)](https://github.com/nrwl/nx-console/actions/workflows/ci_checks.yml)
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/nrwl.angular-console?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console)
 [![GitHub](https://img.shields.io/github/license/nrwl/nx-console?style=flat-square)](https://github.com/nrwl/nx-console/blob/master/LICENSE)
 ![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/nrwl.angular-console?style=flat-square)
