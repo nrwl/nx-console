@@ -1,0 +1,18 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>dev.nx.console</id>
+    <name>Nx Console</name>
+    <vendor>Nx</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="dev.nx.console.services.MyApplicationService"/>
+        <projectService serviceImplementation="dev.nx.console.services.MyProjectService"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="dev.nx.console.listeners.MyProjectManagerListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </applicationListeners>
+</idea-plugin>

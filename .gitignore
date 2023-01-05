@@ -57,13 +57,11 @@ Thumbs.db
 
 
 # Intellij
-apps/intellij/gen/ngConsoleCli/*
-apps/intellij/build/*
-apps/intellij/.gradle/*
-apps/intellij/.idea/*
+.gradle
 
 # WDIO
 **/.wdio-vscode-service
 apps/vscode-e2e/.screenshots
 **/dist
+
 
