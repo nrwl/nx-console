@@ -2,6 +2,7 @@
 
 # compiled output
 /dist
+build/
 /tmp
 /out-tsc
 /osbuilds
@@ -58,6 +59,7 @@ Thumbs.db
 
 # Intellij
 .gradle
+.qodana
 
 # WDIO
 **/.wdio-vscode-service
