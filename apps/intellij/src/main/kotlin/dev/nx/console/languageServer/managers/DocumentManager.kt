@@ -11,9 +11,9 @@ import dev.nx.console.utils.DocumentUtils
 import org.eclipse.lsp4j.*
 
 private val documentManagers = HashMap<String, DocumentManager>();
-fun getOrCreateDocumentManager(document: Document, nxlsWrapper: NxlsLanguageServerWrapper) {
-  documentManagers.getOrPut(getFilePath(document) ?: "") {
-    DocumentManager(document, nxlsWrapper).apply {
+fun getOrCreateDocumentManager(editor: Editor, nxlsWrapper: NxlsLanguageServerWrapper) {
+  documentManagers.getOrPut(getFilePath(editor.document) ?: "") {
+    DocumentManager(editor, nxlsWrapper).apply {
       documentOpened()
     }
   }
@@ -21,11 +21,12 @@ fun getOrCreateDocumentManager(document: Document, nxlsWrapper: NxlsLanguageServ
 }
 
 
-class DocumentManager(val document: Document, val nxlsWrapper: NxlsLanguageServerWrapper) {
+class DocumentManager(val editor: Editor, val nxlsWrapper: NxlsLanguageServerWrapper) {
 
   var version = 0;
-  val identifier = TextDocumentIdentifier(getFilePath(document))
   val textDocumentService = nxlsWrapper.languageServer?.textDocumentService
+  val document = editor.document
+  val identifier = TextDocumentIdentifier(getFilePath(document))
   val documentListener = object : DocumentListener {
     override fun documentChanged(event: DocumentEvent) {
       handleDocumentChanged(event)
@@ -46,7 +47,6 @@ class DocumentManager(val document: Document, val nxlsWrapper: NxlsLanguageServe
     val newText = event.newFragment
     val offset = event.offset
     val newTextLength = event.newLength
-    val editor: Editor = editorEventManager.editor
     val lspPosition: Position = DocumentUtils.offsetToLSPPos(editor, offset) ?: return
     val startLine = lspPosition.line
     val startColumn = lspPosition.character
@@ -90,11 +90,11 @@ class DocumentManager(val document: Document, val nxlsWrapper: NxlsLanguageServe
   }
 
 
-  fun addDocumentListener(document: Document) {
+  fun addDocumentListener() {
     document.addDocumentListener(documentListener)
   }
 
-  fun removeDocumentListener(document: Document) {
+  fun removeDocumentListener() {
     document.removeDocumentListener(documentListener)
   }
 }
