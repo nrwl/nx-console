@@ -295,7 +295,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
     commands.executeCommand('nxConsole.loginToNxCloud');
     const loggedIn = await new Promise((resolve) => {
       authentication
-        .getSession('nxCloud', [], { createIfNone: false })
+        .getSession('nxCloud', [], { silent: true })
         .then((session) => {
           if (session) {
             resolve(true);
@@ -616,7 +616,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
   private async listenForIsAuthenticated() {
     const loadAndSetIsAuthenticated = async () => {
       authentication
-        .getSession('nxCloud', [], { createIfNone: false })
+        .getSession('nxCloud', [], { silent: true })
         .then((session) => {
           this.setState({ authAccessToken: session?.accessToken });
         });

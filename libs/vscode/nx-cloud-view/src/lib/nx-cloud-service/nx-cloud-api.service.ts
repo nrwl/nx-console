@@ -88,7 +88,7 @@ export class NxCloudApiService {
     };
 
     const session = await authentication.getSession('nxCloud', [], {
-      createIfNone: false,
+      silent: true,
     });
     const headers = session?.accessToken
       ? {
@@ -177,7 +177,9 @@ export class NxCloudApiService {
       }
     `;
 
-    const session = await authentication.getSession('nxCloud', []);
+    const session = await authentication.getSession('nxCloud', [], {
+      silent: true,
+    });
 
     const headers = {
       Authorization: `Bearer ${session?.accessToken}`,
@@ -234,7 +236,7 @@ export class NxCloudApiService {
 
   private async getAccessToken() {
     return await authentication
-      .getSession('nxCloud', [])
+      .getSession('nxCloud', [], { silent: true })
       .then((session) => session?.accessToken);
   }
 }
