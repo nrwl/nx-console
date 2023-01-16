@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [17.28.0](https://github.com/nrwl/nx-console/compare/v17.27.0...v17.28.0) (2023-01-16)
+
+
+### Features
+
+* add caching indicators to run list ([#1456](https://github.com/nrwl/nx-console/issues/1456)) ([ce452bd](https://github.com/nrwl/nx-console/commits/ce452bd1c6c9b4232503c6eeb4db5a2e669b6353))
+* add context menu to execute task without Nx cache ([#1445](https://github.com/nrwl/nx-console/issues/1445)) ([8a2c844](https://github.com/nrwl/nx-console/commits/8a2c844b080b8d55a39b859b86f041eb7c9d755f))
+* add nx cloud view ([#1441](https://github.com/nrwl/nx-console/issues/1441)) ([fe9a140](https://github.com/nrwl/nx-console/commits/fe9a1403c08b47cd7e4ec95def376a503ea7bbdc))
+* display error result if creating graph fails ([#1463](https://github.com/nrwl/nx-console/issues/1463)) ([01979a5](https://github.com/nrwl/nx-console/commits/01979a5bf062d1f8c716866c4f2ed6ab695adb65))
+
+
+### Bug Fixes
+
+* add dependency works in yarn/npm/pnpm workspaces ([#1436](https://github.com/nrwl/nx-console/issues/1436)) ([ed78721](https://github.com/nrwl/nx-console/commits/ed78721915d9a95ec74d2e9b638dacb081950325))
+* consider dev/prod mode in more scenarios ([#1457](https://github.com/nrwl/nx-console/issues/1457)) ([5e8e25c](https://github.com/nrwl/nx-console/commits/5e8e25c18a0f90cb7ceeb862956893c7c415a8fc))
+* ensure correct order in project view e2e tests ([#1452](https://github.com/nrwl/nx-console/issues/1452)) ([ee12bfb](https://github.com/nrwl/nx-console/commits/ee12bfb2317658b8c90df44f3dff921a6d31cd1a))
+* fall back to nx.app if no cloud url is set in nx.json ([#1453](https://github.com/nrwl/nx-console/issues/1453)) ([cafa427](https://github.com/nrwl/nx-console/commits/cafa4272bcc8c2686d8464d51e4145b5eae87683))
+* repair nx cloud footer styling ([#1455](https://github.com/nrwl/nx-console/issues/1455)) ([76bc4b6](https://github.com/nrwl/nx-console/commits/76bc4b6c149da7f5f6d9e105f6d80c098746cacc))
+* use `findProjectWithPath` function within codelens ([#1437](https://github.com/nrwl/nx-console/issues/1437)) ([c5fa99a](https://github.com/nrwl/nx-console/commits/c5fa99a92496d69a4fe05ed81cd6484e5b19b61d))
+
 ### [17.27.1](https://github.com/nrwl/nx-console/compare/v17.27.0...v17.27.1) (2022-12-12)
 
 
