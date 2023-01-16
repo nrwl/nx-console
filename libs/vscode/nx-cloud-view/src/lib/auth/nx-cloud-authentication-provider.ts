@@ -39,11 +39,9 @@ export class NxCloudAuthenticationProvider
         this,
         { supportsMultipleAccounts: false }
       ),
-      commands.registerCommand('nxConsole.loginToNxCloud', () =>
-        authentication.getSession('nxCloud', [], {
-          createIfNone: true,
-        })
-      )
+      commands.registerCommand('nxConsole.loginToNxCloud', () => {
+        authentication.getSession('nxCloud', [], { createIfNone: true });
+      })
     );
     this.initialize();
   }
