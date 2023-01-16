@@ -2,6 +2,7 @@
 
 # compiled output
 /dist
+build/
 /tmp
 /out-tsc
 /osbuilds
@@ -57,13 +58,13 @@ Thumbs.db
 
 
 # Intellij
-apps/intellij/gen/ngConsoleCli/*
-apps/intellij/build/*
-apps/intellij/.gradle/*
-apps/intellij/.idea/*
+.gradle
+.qodana
+apps/intellij/bin/
 
 # WDIO
 **/.wdio-vscode-service
 apps/vscode-e2e/.screenshots
 **/dist
+
 

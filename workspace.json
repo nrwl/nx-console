@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "intellij": "apps/intellij",
     "language-server-capabilities-code-completion": "libs/language-server/capabilities/code-completion",
     "language-server-capabilities-document-links": "libs/language-server/capabilities/document-links",
     "language-server-types": "libs/language-server/types",

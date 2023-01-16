@@ -1,0 +1,28 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "intellij",
+  "projectType": "application",
+  "targets": {
+    "x-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./gradlew :apps:intellij:buildPlugin"
+      }
+    },
+    "x-test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./gradlew :apps:intellij:test"
+      }
+    },
+    "x-lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./gradlew :apps:intellij:runInspections"
+      }
+    }
+  },
+  "tags": [
+    "type:intellij"
+  ]
+}
