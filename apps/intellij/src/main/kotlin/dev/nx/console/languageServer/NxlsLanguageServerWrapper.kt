@@ -38,7 +38,7 @@ class NxlsLanguageServerWrapper(val project: Project) {
         Pair(getInputStream(), getOutputStream())
       }
       languageClient = NxlsLanguageClient()
-
+      
       Launcher.createLauncher(
         languageClient,
         LanguageServer::class.java,
@@ -51,6 +51,7 @@ class NxlsLanguageServerWrapper(val project: Project) {
         };
 
       initializeResult = languageServer?.initialize(getInitParams())?.await()
+
     } catch (e: Exception) {
       thisLogger().info("Cannot start nxls", e);
     } finally {
