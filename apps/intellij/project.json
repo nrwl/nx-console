@@ -3,24 +3,26 @@
   "name": "intellij",
   "projectType": "application",
   "targets": {
-    "build": {
+    "x-build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:buildPlugin"
       }
     },
-    "test": {
+    "x-test": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:test"
       }
     },
-    "lint": {
+    "x-lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:runInspections"
       }
     }
   },
-  "tags": ["type:intellij"]
+  "tags": [
+    "type:intellij"
+  ]
 }
