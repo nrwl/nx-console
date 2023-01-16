@@ -1,7 +1,7 @@
 {
   "name": "angular-console",
   "displayName": "Nx Console",
-  "description": "Nx Console for Visual Studio Code",
+  "description": "The UI for Nx & Lerna",
   "version": "17.28.0",
   "repository": {
     "type": "git",
