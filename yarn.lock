@@ -12119,6 +12119,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv@npm:^16.0.3":
+  version: 16.0.3
+  resolution: "dotenv@npm:16.0.3"
+  checksum: afcf03f373d7a6d62c7e9afea6328e62851d627a4e73f2e12d0a8deae1cd375892004f3021883f8aec85932cd2834b091f568ced92b4774625b321db83b827f8
+  languageName: node
+  linkType: hard
+
 "dotenv@npm:^8.0.0":
   version: 8.6.0
   resolution: "dotenv@npm:8.6.0"
@@ -20682,6 +20689,7 @@ __metadata:
     "@yarnpkg/libzip": 2.2.3-rc.5
     "@yarnpkg/pnp": ^3.1.1-rc.12
     cypress: ^10.2.0
+    dotenv: ^16.0.3
     esbuild: ^0.14.54
     esbuild-copy-files-plugin: ^1.1.0
     eslint: 8.15.0
