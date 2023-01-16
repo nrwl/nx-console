@@ -16,16 +16,20 @@ private val nxFiles = setOf("nx.json", "workspace.json", "project.json")
 class NxEditorListener : EditorFactoryListener {
 
   override fun editorReleased(event: EditorFactoryEvent) {
+    val project = event.editor.project ?: return super.editorCreated(event);
+    project.service<NxlsService>().removeDocument(event.editor);
+
     super.editorReleased(event)
   }
 
   override fun editorCreated(event: EditorFactoryEvent) {
 
     val file = virtualFile(event.editor.document) ?: return super.editorCreated(event)
+    val project = event.editor.project ?: return super.editorCreated(event);
 
     if (file.name in nxFiles) {
       log.info("Connecting ${file.path} to lsp")
-      event.editor.project?.service<NxlsService>();
+      project.service<NxlsService>().addDocument(event.editor)
     }
 
     super.editorCreated(event)

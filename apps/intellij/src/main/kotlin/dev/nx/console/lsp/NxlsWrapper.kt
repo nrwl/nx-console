@@ -5,13 +5,25 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import dev.nx.console.lsp.client.NxlsLanguageClient
+import dev.nx.console.lsp.managers.DocumentManager
+import dev.nx.console.lsp.managers.getOrCreateDocumentManager
 import dev.nx.console.lsp.server.NxlsLanguageServer
 import kotlinx.coroutines.future.await
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.Launcher
+import org.eclipse.lsp4j.jsonrpc.MessageConsumer
+import org.eclipse.lsp4j.jsonrpc.messages.Message
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+
+enum class NxlsState {
+  STOPPED,
+  STARTING,
+  STARTED,
+  FAILED
+}
 
 private val log = logger<NxlsWrapper>()
 
@@ -21,10 +33,11 @@ class NxlsWrapper(val project: Project) {
   var languageClient: NxlsLanguageClient? = null
   private var initializeResult: InitializeResult? = null
   private var initializeFuture: CompletableFuture<InitializeResult>? = null
-
-  private var connectedEditors = HashSet<Editor>()
-
   private var basePath: String = project.basePath ?: throw IllegalStateException("Cannot get the project base path")
+
+  private var connectedEditors = HashMap<Editor, DocumentManager>()
+
+  private var status = NxlsState.STOPPED;
 
   fun getServerCapabilities(): ServerCapabilities? {
     log.info("Getting language server capabilities")
@@ -34,18 +47,26 @@ class NxlsWrapper(val project: Project) {
   suspend fun start() {
 
     try {
+      status = NxlsState.STARTING
       val (input, output) = NxlsProcess(basePath).run {
         start()
         Pair(getInputStream(), getOutputStream())
       }
       languageClient = NxlsLanguageClient()
+      val executorService = Executors.newCachedThreadPool()
 
       Launcher.createLauncher(
         languageClient,
         NxlsLanguageServer::class.java,
         input,
         output,
-      )
+        executorService
+      ) { consume ->
+        MessageConsumer { message ->
+//          log.info("$message");
+          consume.consume(message);
+        }
+      }
         .also {
           languageServer = it.remoteProxy
           it.startListening()
@@ -55,8 +76,13 @@ class NxlsWrapper(val project: Project) {
 
     } catch (e: Exception) {
       thisLogger().info("Cannot start nxls", e);
+      status = NxlsState.FAILED
     } finally {
       log.info("Initialized")
+      status = NxlsState.STARTED
+      for ((_, manager) in connectedEditors) {
+        connectTextService(manager);
+      }
     }
   }
 
@@ -70,21 +96,31 @@ class NxlsWrapper(val project: Project) {
 
   fun connect(editor: Editor) {
 
-    initializeFuture?.thenRun {
-      if (connectedEditors.contains(editor)) {
-        return@thenRun
-      }
+    val documentManager = getOrCreateDocumentManager(editor)
+    if (status == NxlsState.STARTED) {
 
-
-      connectedEditors.add(editor)
-
-
+      connectTextService(documentManager);
+    } else {
+      log.info("Nxls not ready for documents yet.. ")
     }
+
+    connectedEditors.put(editor, documentManager)
+
 
   }
 
+  private fun connectTextService(documentManager: DocumentManager) {
+    log.info("Connecting textService to ${documentManager.documentPath}")
+    val textService = languageServer?.textDocumentService ?: return log.info("text service not ready");
+    documentManager.addTextDocumentService(textService)
+    documentManager.documentOpened()
+  }
+
   fun disconnect(editor: Editor) {
+    val documentManager = connectedEditors.get(editor) ?: return log.info("editor not part of connected editors")
+    documentManager.documentClosed();
     connectedEditors.remove(editor);
+    log.info("Disconnected ${documentManager.documentPath}")
   }
 
   fun getInitParams(): InitializeParams {
