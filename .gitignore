@@ -60,6 +60,7 @@ Thumbs.db
 # Intellij
 .gradle
 .qodana
+apps/intellij/bin/
 
 # WDIO
 **/.wdio-vscode-service
