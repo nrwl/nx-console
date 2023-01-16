@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [17.28.1](https://github.com/nrwl/nx-console/compare/v17.28.0...v17.28.1) (2023-01-16)
+
+
+### Bug Fixes
+
+* remove nx cloud authentication badge ([#1474](https://github.com/nrwl/nx-console/issues/1474)) ([fec83be](https://github.com/nrwl/nx-console/commits/fec83be5ff75f52d20e157da85b922c339c54b2b))
+* take nx-cloud.env into account for cloud view ([#1475](https://github.com/nrwl/nx-console/issues/1475)) ([fdc376e](https://github.com/nrwl/nx-console/commits/fdc376e1365adfafe04cad3e23d0ef984fef327f))
+
 ## [17.28.0](https://github.com/nrwl/nx-console/compare/v17.27.0...v17.28.0) (2023-01-16)
 
 
