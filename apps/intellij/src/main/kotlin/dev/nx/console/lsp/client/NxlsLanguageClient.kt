@@ -1,13 +1,13 @@
-package dev.nx.console.languageServer
+package dev.nx.console.lsp.client
 
 import com.intellij.openapi.diagnostic.logger
 import org.eclipse.lsp4j.MessageActionItem
 import org.eclipse.lsp4j.MessageParams
 import org.eclipse.lsp4j.PublishDiagnosticsParams
 import org.eclipse.lsp4j.ShowMessageRequestParams
+import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.services.LanguageClient
 import java.util.concurrent.CompletableFuture
-
 
 private val log = logger<NxlsLanguageClient>()
 
@@ -32,4 +32,8 @@ class NxlsLanguageClient : LanguageClient {
     log.info(message?.message)
   }
 
+  @JsonNotification("nx/refreshWorkspace")
+  fun refreshWorkspace() {
+    log.info("Refresh workspace called from nxls")
+  }
 }

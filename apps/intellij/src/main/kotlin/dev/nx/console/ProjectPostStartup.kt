@@ -10,5 +10,8 @@ class ProjectPostStartup : ProjectPostStartupActivity {
     val service = project.service<NxlsService>()
 
     service.start()
+
+    val workspace = service.workspace()
+    println(workspace)
   }
 }

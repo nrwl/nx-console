@@ -1,4 +1,4 @@
-package dev.nx.console.languageServer.managers
+package dev.nx.console.lsp.managers
 
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
@@ -6,12 +6,12 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
-import dev.nx.console.languageServer.NxlsLanguageServerWrapper
+import dev.nx.console.lsp.NxlsWrapper
 import dev.nx.console.utils.DocumentUtils
 import org.eclipse.lsp4j.*
 
 private val documentManagers = HashMap<String, DocumentManager>();
-fun getOrCreateDocumentManager(editor: Editor, nxlsWrapper: NxlsLanguageServerWrapper) {
+fun getOrCreateDocumentManager(editor: Editor, nxlsWrapper: NxlsWrapper) {
   documentManagers.getOrPut(getFilePath(editor.document) ?: "") {
     DocumentManager(editor, nxlsWrapper).apply {
       documentOpened()
@@ -21,7 +21,7 @@ fun getOrCreateDocumentManager(editor: Editor, nxlsWrapper: NxlsLanguageServerWr
 }
 
 
-class DocumentManager(val editor: Editor, val nxlsWrapper: NxlsLanguageServerWrapper) {
+class DocumentManager(val editor: Editor, val nxlsWrapper: NxlsWrapper) {
 
   var version = 0;
   val textDocumentService = nxlsWrapper.languageServer?.textDocumentService

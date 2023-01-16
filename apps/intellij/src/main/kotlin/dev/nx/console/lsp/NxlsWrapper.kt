@@ -1,22 +1,23 @@
-package dev.nx.console.languageServer
+package dev.nx.console.lsp
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import dev.nx.console.lsp.client.NxlsLanguageClient
+import dev.nx.console.lsp.server.NxlsLanguageServer
 import kotlinx.coroutines.future.await
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.Launcher
-import org.eclipse.lsp4j.services.LanguageServer
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 
-private val log = logger<NxlsLanguageServerWrapper>()
+private val log = logger<NxlsWrapper>()
 
-class NxlsLanguageServerWrapper(val project: Project) {
+class NxlsWrapper(val project: Project) {
 
-  var languageServer: LanguageServer? = null
+  var languageServer: NxlsLanguageServer? = null
   var languageClient: NxlsLanguageClient? = null
   private var initializeResult: InitializeResult? = null
   private var initializeFuture: CompletableFuture<InitializeResult>? = null
@@ -38,14 +39,14 @@ class NxlsLanguageServerWrapper(val project: Project) {
         Pair(getInputStream(), getOutputStream())
       }
       languageClient = NxlsLanguageClient()
-      
+
       Launcher.createLauncher(
         languageClient,
-        LanguageServer::class.java,
+        NxlsLanguageServer::class.java,
         input,
         output,
       )
-        .let {
+        .also {
           languageServer = it.remoteProxy
           it.startListening()
         };

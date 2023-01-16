@@ -1,4 +1,4 @@
-package dev.nx.console.languageServer
+package dev.nx.console.lsp
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.EnvironmentUtil
