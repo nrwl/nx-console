@@ -1,4 +1,4 @@
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getNxCloudRunnerOptions } from '@nx-console/vscode/nx-workspace';
 import request, { gql } from 'graphql-request';
 import { authentication } from 'vscode';
 import {
@@ -17,11 +17,9 @@ export class NxCloudApiService {
   async claimCloudWorkspace(
     orgId: string
   ): Promise<ConnectWorkspaceUsingTokenResponse> {
-    const workspaceConfig = (await getNxWorkspace()).workspace;
-    const nxAccessToken =
-      workspaceConfig.tasksRunnerOptions?.['default']?.options['accessToken'];
+    const nxAccessToken = (await getNxCloudRunnerOptions())?.accessToken;
 
-    const authAccessToken = await this.getAccessToken();
+    const authAccessToken = await this.getAuthAccessToken();
 
     if (!authAccessToken) {
       throw new Error('No auth access token found');
@@ -58,11 +56,9 @@ export class NxCloudApiService {
   }
 
   async getWorkspaceDetailsByToken(): Promise<GetWorkspaceDetailsByTokenResponse> {
-    const workspaceConfig = (await getNxWorkspace()).workspace;
-    const nxAcessToken =
-      workspaceConfig.tasksRunnerOptions?.['default']?.options['accessToken'];
+    const nxAccessToken = (await getNxCloudRunnerOptions())?.accessToken;
 
-    if (!nxAcessToken) {
+    if (!nxAccessToken) {
       throw new Error('No nx access token found.');
     }
 
@@ -84,7 +80,7 @@ export class NxCloudApiService {
     `;
 
     const variables = {
-      accessToken: nxAcessToken,
+      accessToken: nxAccessToken,
     };
 
     const session = await authentication.getSession('nxCloud', [], {
@@ -148,7 +144,7 @@ export class NxCloudApiService {
       workspaceId: workspaceId,
     };
 
-    const authAccessToken = await this.getAccessToken();
+    const authAccessToken = await this.getAuthAccessToken();
     const headers = authAccessToken
       ? {
           Authorization: `Bearer ${authAccessToken}`,
@@ -234,7 +230,7 @@ export class NxCloudApiService {
     return 'disconnected';
   }
 
-  private async getAccessToken() {
+  private async getAuthAccessToken() {
     return await authentication
       .getSession('nxCloud', [], { silent: true })
       .then((session) => session?.accessToken);
