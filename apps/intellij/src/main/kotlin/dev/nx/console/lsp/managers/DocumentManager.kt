@@ -4,25 +4,30 @@ import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.AutoCompletionPolicy
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.text.StringUtil
-import dev.nx.console.utils.ApplicationUtils.Companion.invokeLater
+import com.intellij.psi.PsiDocumentManager
 import dev.nx.console.utils.DocumentUtils
+import dev.nx.console.utils.writeAction
 import org.apache.commons.lang3.StringUtils
 import org.eclipse.lsp4j.*
+import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.eclipse.lsp4j.services.TextDocumentService
+import java.util.*
+import java.util.function.Consumer
 
 private val documentManagers = HashMap<String, DocumentManager>();
-fun getOrCreateDocumentManager(editor: Editor): DocumentManager {
+fun getDocumentManager(editor: Editor): DocumentManager {
   return documentManagers.getOrPut(getFilePath(editor.document) ?: "") {
     DocumentManager(editor)
   }
-
 }
 
 
@@ -91,18 +96,17 @@ class DocumentManager(val editor: Editor) {
 
     try {
       val res = request.get()
-
       for (item in res.right.items) {
-        createLookupItem(item)?.let {
+        createLookupItem(this, item)?.let {
           lookupItems.add(it)
         }
       }
 
     } catch (e: Exception) {
       log.info(e);
-    } finally {
-      return lookupItems;
     }
+
+    return lookupItems;
 
   }
 
@@ -141,7 +145,7 @@ fun getFilePath(document: Document): String? {
 }
 
 
-fun createLookupItem(item: CompletionItem): LookupElement? {
+fun createLookupItem(documentManager: DocumentManager, item: CompletionItem): LookupElement? {
   val command = item.command
   val detail = item.detail
   val insertText = item.insertText
@@ -168,10 +172,15 @@ fun createLookupItem(item: CompletionItem): LookupElement? {
   if (StringUtils.isEmpty(lookupString)) {
     return null
   }
-  // Fixes IDEA internal assertion failure in windows.
+// Fixes IDEA internal assertion failure in windows.
 //  lookupString = lookupString.replace(DocumentUtils.WIN_SEPARATOR, DocumentUtils.LINUX_SEPARATOR)
-  lookupElementBuilder = LookupElementBuilder.create(lookupString!!)
-//  lookupElementBuilder = addCompletionInsertHandlers(item, lookupElementBuilder, lookupString)
+  lookupElementBuilder =
+    LookupElementBuilder.create(convertPlaceHolders(lookupString!!)).withInsertHandler { context, _ ->
+      applyInitialTextEdit(documentManager, item, context, lookupString)
+      context.commitDocument()
+//    prepareAndRunSnippet(lookupString)
+    }
+
   if (kind == CompletionItemKind.Keyword) {
     lookupElementBuilder = lookupElementBuilder.withBoldness(true)
   }
@@ -179,3 +188,160 @@ fun createLookupItem(item: CompletionItem): LookupElement? {
     .withAutoCompletionPolicy(AutoCompletionPolicy.SETTINGS_DEPENDENT)
 }
 
+
+//
+//
+private fun applyInitialTextEdit(
+  documentManager: DocumentManager,
+  item: CompletionItem,
+  context: InsertionContext,
+  lookupString: String,
+) {
+  // remove intellij edit, server is controlling insertion
+  writeAction {
+    val runnable = Runnable {
+      context.document.deleteString(context.startOffset, context.tailOffset)
+    }
+    CommandProcessor.getInstance()
+      .executeCommand(context.project, runnable, "Removing Intellij Completion", "LSPPlugin", context.document)
+  }
+  context.commitDocument()
+  if (item.textEdit.isLeft) {
+    item.textEdit.left.newText = convertPlaceHolders(lookupString)
+  }
+  applyEdit(documentManager, Int.MAX_VALUE, listOf(item.textEdit), "text edit", false, true)
+
+}
+
+private fun convertPlaceHolders(insertText: String): String {
+  val SNIPPET_PLACEHOLDER_REGEX = "(\\$\\{\\d+:?([^{^}]*)}|\\$\\d+)";
+  return insertText.replace(SNIPPET_PLACEHOLDER_REGEX.toRegex(), "")
+}
+
+fun applyEdit(
+  documentManager: DocumentManager,
+  version: Int,
+  edits: List<Either<TextEdit, InsertReplaceEdit>>,
+  name: String?,
+  closeAfter: Boolean,
+  setCaret: Boolean
+): Boolean {
+  val runnable = getEditsRunnable(documentManager, version, edits, name, setCaret)
+  val project = documentManager.editor.project ?: run {
+    log.info("No project associated with editor")
+    return false
+  }
+
+  writeAction {
+    if (runnable != null) {
+      CommandProcessor.getInstance()
+        .executeCommand(documentManager.editor.project, runnable, name, "LSPPlugin", documentManager.editor.document)
+    }
+    if (closeAfter) {
+      val file =
+        PsiDocumentManager.getInstance(project).getPsiFile(documentManager.editor.document)
+      if (file != null) {
+        FileEditorManager.getInstance(project).closeFile(file.virtualFile)
+      }
+    }
+  }
+  return runnable != null
+}
+
+fun getEditsRunnable(
+  documentManager: DocumentManager,
+  version: Int,
+  edits: List<Either<TextEdit, InsertReplaceEdit>>?,
+  name: String?,
+  setCaret: Boolean
+): Runnable? {
+  if (version < documentManager.version) {
+    log.warn("Edit version $version is older than current version ${documentManager.version}")
+    return null
+  }
+  if (edits == null) {
+    log.warn("Received edits list is null.")
+    return null
+  }
+  if (documentManager.editor.isDisposed()) {
+    log.warn("Text edits couldn't be applied as the editor is already disposed.")
+    return null
+  }
+  val document: Document = documentManager.editor.getDocument()
+  if (!document.isWritable) {
+    log.warn("Document is not writable")
+    return null
+  }
+  return Runnable {
+    val editor = documentManager.editor;
+    // Creates a sorted edit list based on the insertion position and the edits will be applied from the bottom
+    // to the top of the document. Otherwise all the other edit ranges will be invalid after the very first edit,
+    // since the document is changed.
+    val lspEdits: MutableList<LSPTextEdit> =
+      ArrayList<LSPTextEdit>()
+    edits.forEach(Consumer { edit: Either<TextEdit, InsertReplaceEdit> ->
+      if (edit.isLeft) {
+        val text = edit.left.newText
+        val range = edit.left.range
+        if (range != null) {
+          val start: Int = DocumentUtils.LSPPosToOffset(editor, range.start)
+          val end: Int = DocumentUtils.LSPPosToOffset(editor, range.end)
+          lspEdits.add(LSPTextEdit(text, start, end))
+        }
+      } else if (edit.isRight) {
+        val text = edit.right.newText
+        var range = edit.right.insert
+        if (range != null) {
+          val start: Int = DocumentUtils.LSPPosToOffset(editor, range.start)
+          val end: Int = DocumentUtils.LSPPosToOffset(editor, range.end)
+          lspEdits.add(LSPTextEdit(text, start, end))
+        } else if (edit.right.replace.also { range = it } != null) {
+          val start: Int = DocumentUtils.LSPPosToOffset(editor, range!!.start)
+          val end: Int = DocumentUtils.LSPPosToOffset(editor, range!!.end)
+          lspEdits.add(LSPTextEdit(text, start, end))
+        }
+      }
+    })
+
+    // Sort according to the start offset, in descending order.
+    Collections.sort(lspEdits)
+    lspEdits.forEach(Consumer<LSPTextEdit> { edit: LSPTextEdit ->
+      val text: String = edit.text
+      val start: Int = edit.startOffset
+      val end: Int = edit.endOffset
+      if (StringUtils.isEmpty(text)) {
+        document.deleteString(start, end)
+        if (setCaret) {
+          editor.getCaretModel().moveToOffset(start)
+        }
+      } else {
+//        text = text.replace(DocumentUtils.WIN_SEPARATOR, DocumentUtils.LINUX_SEPARATOR)
+        if (end >= 0) {
+          if (end - start <= 0) {
+            document.insertString(start, text)
+          } else {
+            document.replaceString(start, end, text)
+          }
+        } else if (start == 0) {
+          document.setText(text)
+        } else if (start > 0) {
+          document.insertString(start, text)
+        }
+        if (setCaret) {
+          editor.getCaretModel().moveToOffset(start + text.length)
+        }
+      }
+      FileDocumentManager.getInstance().saveDocument(editor.document)
+    })
+  }
+}
+
+private class LSPTextEdit constructor(val text: String, val startOffset: Int, val endOffset: Int) :
+  Comparable<LSPTextEdit?> {
+
+
+  override fun compareTo(other: LSPTextEdit?): Int {
+    return (other?.startOffset ?: 0) - startOffset
+  }
+
+}

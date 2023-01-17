@@ -6,13 +6,12 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import dev.nx.console.lsp.client.NxlsLanguageClient
 import dev.nx.console.lsp.managers.DocumentManager
-import dev.nx.console.lsp.managers.getOrCreateDocumentManager
+import dev.nx.console.lsp.managers.getDocumentManager
 import dev.nx.console.lsp.server.NxlsLanguageServer
 import kotlinx.coroutines.future.await
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
-import org.eclipse.lsp4j.jsonrpc.messages.Message
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -96,7 +95,7 @@ class NxlsWrapper(val project: Project) {
 
   fun connect(editor: Editor) {
 
-    val documentManager = getOrCreateDocumentManager(editor)
+    val documentManager = getDocumentManager(editor)
     if (status == NxlsState.STARTED) {
 
       connectTextService(documentManager);
