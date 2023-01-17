@@ -39,9 +39,6 @@
       "@nx-console/language-server/workspace": [
         "libs/language-server/workspace/src/index.ts"
       ],
-      "@nx-console/shared/collections": [
-        "libs/shared/collections/src/index.ts"
-      ],
       "@nx-console/shared/file-system": [
         "libs/shared/file-system/src/index.ts"
       ],
