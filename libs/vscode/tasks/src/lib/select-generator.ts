@@ -1,4 +1,3 @@
-import { getGenerators } from '@nx-console/shared/collections';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import {
   Generator,
@@ -8,7 +7,7 @@ import {
 } from '@nx-console/shared/schema';
 import { normalizeSchema } from '@nx-console/shared/schema/normalize';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getGenerators, getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
 
 async function readWorkspaceJsonDefaults(): Promise<any> {
@@ -56,7 +55,6 @@ async function readWorkspaceJsonDefaults(): Promise<any> {
 }
 
 export async function getGeneratorOptions(
-  workspacePath: string,
   collectionName: string,
   generatorName: string,
   generatorPath: string,
@@ -84,7 +82,7 @@ export async function selectGenerator(
     collectionPath: string;
   }
   const { workspace } = await getNxWorkspace();
-  const generators = await getGenerators(workspacePath, workspace.projects);
+  const generators = await getGenerators(workspace.projects);
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)
     .map((collection): GenerateQuickPickItem => {
@@ -137,7 +135,6 @@ export async function selectGenerator(
       const options =
         selection.generator.options ||
         (await getGeneratorOptions(
-          workspacePath,
           selection.collectionName,
           selection.generator.name,
           selection.collectionPath,

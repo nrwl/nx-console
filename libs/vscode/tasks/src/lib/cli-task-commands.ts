@@ -1,12 +1,12 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 
-import { getGenerators } from '@nx-console/shared/collections';
 import { nxVersion } from '@nx-console/shared/npm';
 import { GeneratorType, Option, OptionType } from '@nx-console/shared/schema';
 import { NxProjectsConfiguration } from '@nx-console/shared/types';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   findProjectWithPath,
+  getGenerators,
   getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
@@ -103,9 +103,7 @@ export function registerCliTaskCommands(
          * solution won't work when that happens.
          */
         const getCorrectMoveGenerator = async () => {
-          const workspacePath = cliTaskProvider.getWorkspacePath();
           const generators = await getGenerators(
-            workspacePath,
             await cliTaskProvider.getProjects()
           );
           return generators.find(
@@ -137,9 +135,7 @@ export function registerCliTaskCommands(
            * solution won't work when that happens.
            */
           const getCorrectRemoveGenerator = async () => {
-            const workspacePath = cliTaskProvider.getWorkspacePath();
             const generators = await getGenerators(
-              workspacePath,
               await cliTaskProvider.getProjects()
             );
             return generators.find(

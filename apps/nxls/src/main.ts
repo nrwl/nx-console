@@ -4,6 +4,7 @@ import { getCompletionItems } from '@nx-console/language-server/capabilities/cod
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
   NxChangeWorkspace,
+  NxGeneratorsRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -16,14 +17,20 @@ import {
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
-import { getExecutors } from '@nx-console/shared/collections';
+import {
+  getExecutors,
+  GetGeneratorsOptions,
+} from '@nx-console/shared/collections';
 import {
   getNxJsonSchema,
   getPackageJsonSchema,
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
 } from '@nx-console/shared/json-schema';
-import { nxWorkspace } from '@nx-console/language-server/workspace';
+import {
+  getGenerators,
+  nxWorkspace,
+} from '@nx-console/language-server/workspace';
 import {
   ClientCapabilities,
   CompletionList,
@@ -43,6 +50,7 @@ import {
 import { URI, Utils } from 'vscode-uri';
 import { formatError } from '@nx-console/shared/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
+import { WorkspaceProjects } from '@nx-console/shared/schema';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -232,6 +240,23 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
 
   return nxWorkspace(WORKING_PATH, lspLogger, reset);
 });
+
+connection.onRequest(
+  NxGeneratorsRequest,
+  async (args: {
+    projects?: WorkspaceProjects;
+    options?: GetGeneratorsOptions;
+  }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+
+    return getGenerators(WORKING_PATH, args.projects, args.options);
+  }
+);
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {
