@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.AutoCompletionPolicy
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
@@ -11,17 +12,15 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.PsiDocumentManager
 import dev.nx.console.utils.DocumentUtils
 import dev.nx.console.utils.writeAction
 import org.apache.commons.lang3.StringUtils
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.eclipse.lsp4j.services.TextDocumentService
-import java.util.*
 import java.util.function.Consumer
+import javax.swing.Icon
 
 private val documentManagers = HashMap<String, DocumentManager>();
 fun getDocumentManager(editor: Editor): DocumentManager {
@@ -41,14 +40,14 @@ class DocumentManager(val editor: Editor) {
   val identifier = TextDocumentIdentifier(getFilePath(document))
   val documentListener = object : DocumentListener {
     override fun documentChanged(event: DocumentEvent) {
-      handleDocumentChanged(event)
+      handleDocumentChanged(event, textDocumentService)
     }
   }
 
 
   private var textDocumentService: TextDocumentService? = null;
 
-  fun handleDocumentChanged(event: DocumentEvent) {
+  fun handleDocumentChanged(event: DocumentEvent, textDocumentService: TextDocumentService?) {
 
     val changesParams =
       DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(), listOf(TextDocumentContentChangeEvent()))
@@ -146,14 +145,12 @@ fun getFilePath(document: Document): String? {
 
 
 fun createLookupItem(documentManager: DocumentManager, item: CompletionItem): LookupElement? {
-  val command = item.command
   val detail = item.detail
   val insertText = item.insertText
   val kind = item.kind
   val label = item.label
   val textEdit = item.textEdit.left
   val insertReplaceEdit = item.textEdit.right
-  val addTextEdits = item.additionalTextEdits
   val presentableText = if (StringUtils.isNotEmpty(label)) label else insertText ?: ""
   val tailText = detail ?: ""
 //  val iconProvider: LSPIconProvider = GUIUtils.getIconProviderFor(wrapper.getServerDefinition())
@@ -172,25 +169,21 @@ fun createLookupItem(documentManager: DocumentManager, item: CompletionItem): Lo
   if (StringUtils.isEmpty(lookupString)) {
     return null
   }
-// Fixes IDEA internal assertion failure in windows.
-//  lookupString = lookupString.replace(DocumentUtils.WIN_SEPARATOR, DocumentUtils.LINUX_SEPARATOR)
+
   lookupElementBuilder =
     LookupElementBuilder.create(convertPlaceHolders(lookupString!!)).withInsertHandler { context, _ ->
       applyInitialTextEdit(documentManager, item, context, lookupString)
       context.commitDocument()
-//    prepareAndRunSnippet(lookupString)
-    }
+    }.withIcon(getCompletionIcon(kind))
 
   if (kind == CompletionItemKind.Keyword) {
     lookupElementBuilder = lookupElementBuilder.withBoldness(true)
   }
+
   return lookupElementBuilder.withPresentableText(presentableText).withTypeText(tailText, true)
     .withAutoCompletionPolicy(AutoCompletionPolicy.SETTINGS_DEPENDENT)
 }
 
-
-//
-//
 private fun applyInitialTextEdit(
   documentManager: DocumentManager,
   item: CompletionItem,
@@ -209,7 +202,7 @@ private fun applyInitialTextEdit(
   if (item.textEdit.isLeft) {
     item.textEdit.left.newText = convertPlaceHolders(lookupString)
   }
-  applyEdit(documentManager, Int.MAX_VALUE, listOf(item.textEdit), "text edit", false, true)
+  applyEdit(documentManager, listOf(item.textEdit), "text edit")
 
 }
 
@@ -220,29 +213,15 @@ private fun convertPlaceHolders(insertText: String): String {
 
 fun applyEdit(
   documentManager: DocumentManager,
-  version: Int,
   edits: List<Either<TextEdit, InsertReplaceEdit>>,
   name: String?,
-  closeAfter: Boolean,
-  setCaret: Boolean
 ): Boolean {
-  val runnable = getEditsRunnable(documentManager, version, edits, name, setCaret)
-  val project = documentManager.editor.project ?: run {
-    log.info("No project associated with editor")
-    return false
-  }
+  val runnable = getEditsRunnable(documentManager, edits)
 
   writeAction {
     if (runnable != null) {
       CommandProcessor.getInstance()
         .executeCommand(documentManager.editor.project, runnable, name, "LSPPlugin", documentManager.editor.document)
-    }
-    if (closeAfter) {
-      val file =
-        PsiDocumentManager.getInstance(project).getPsiFile(documentManager.editor.document)
-      if (file != null) {
-        FileEditorManager.getInstance(project).closeFile(file.virtualFile)
-      }
     }
   }
   return runnable != null
@@ -250,20 +229,11 @@ fun applyEdit(
 
 fun getEditsRunnable(
   documentManager: DocumentManager,
-  version: Int,
-  edits: List<Either<TextEdit, InsertReplaceEdit>>?,
-  name: String?,
-  setCaret: Boolean
+  edits: List<Either<TextEdit, InsertReplaceEdit>>
 ): Runnable? {
-  if (version < documentManager.version) {
-    log.warn("Edit version $version is older than current version ${documentManager.version}")
-    return null
-  }
-  if (edits == null) {
-    log.warn("Received edits list is null.")
-    return null
-  }
-  if (documentManager.editor.isDisposed()) {
+
+
+  if (documentManager.editor.isDisposed) {
     log.warn("Text edits couldn't be applied as the editor is already disposed.")
     return null
   }
@@ -303,38 +273,33 @@ fun getEditsRunnable(
       }
     })
 
-    // Sort according to the start offset, in descending order.
-    Collections.sort(lspEdits)
-    lspEdits.forEach(Consumer<LSPTextEdit> { edit: LSPTextEdit ->
+    lspEdits.sort()
+    lspEdits.forEach { edit ->
       val text: String = edit.text
       val start: Int = edit.startOffset
       val end: Int = edit.endOffset
-      if (StringUtils.isEmpty(text)) {
-        document.deleteString(start, end)
-        if (setCaret) {
-          editor.getCaretModel().moveToOffset(start)
-        }
-      } else {
-//        text = text.replace(DocumentUtils.WIN_SEPARATOR, DocumentUtils.LINUX_SEPARATOR)
-        if (end >= 0) {
-          if (end - start <= 0) {
-            document.insertString(start, text)
-          } else {
-            document.replaceString(start, end, text)
-          }
-        } else if (start == 0) {
-          document.setText(text)
-        } else if (start > 0) {
+      if (end >= 0) {
+        if (end - start <= 0) {
           document.insertString(start, text)
+        } else {
+          document.replaceString(start, end, text)
         }
-        if (setCaret) {
-          editor.getCaretModel().moveToOffset(start + text.length)
-        }
+      } else if (start == 0) {
+        document.setText(text)
+      } else if (start > 0) {
+        document.insertString(start, text)
       }
-      FileDocumentManager.getInstance().saveDocument(editor.document)
-    })
+
+      // TODO(cammisuli): make sure to place caret where snippet text was
+      editor.caretModel.moveToOffset(start + text.length)
+
+    }
+
+    FileDocumentManager.getInstance().saveDocument(editor.document)
   }
+
 }
+
 
 private class LSPTextEdit constructor(val text: String, val startOffset: Int, val endOffset: Int) :
   Comparable<LSPTextEdit?> {
@@ -345,3 +310,32 @@ private class LSPTextEdit constructor(val text: String, val startOffset: Int, va
   }
 
 }
+
+fun getCompletionIcon(kind: CompletionItemKind?): Icon? {
+  kind ?: return null;
+
+  return when (kind) {
+    CompletionItemKind.Class -> AllIcons.Nodes.Class
+    CompletionItemKind.Enum -> AllIcons.Nodes.Enum
+    CompletionItemKind.Field -> AllIcons.Nodes.Field
+    CompletionItemKind.File -> AllIcons.FileTypes.Any_type
+    CompletionItemKind.Function -> AllIcons.Nodes.Function
+    CompletionItemKind.Interface -> AllIcons.Nodes.Interface
+    CompletionItemKind.Keyword -> AllIcons.Nodes.UpLevel
+    CompletionItemKind.Method -> AllIcons.Nodes.Method
+    CompletionItemKind.Module -> AllIcons.Nodes.Module
+    CompletionItemKind.Property -> AllIcons.Nodes.Property
+    CompletionItemKind.Reference -> AllIcons.Nodes.MethodReference
+    CompletionItemKind.Snippet -> AllIcons.Nodes.Static
+    CompletionItemKind.Text -> AllIcons.FileTypes.Text
+    CompletionItemKind.Unit -> AllIcons.Nodes.Artifact
+    CompletionItemKind.Variable -> AllIcons.Nodes.Variable
+    CompletionItemKind.Value -> AllIcons.Nodes.Controller
+    else -> null
+  }
+}
+
+
+
+
+
