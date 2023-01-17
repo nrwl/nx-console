@@ -7,6 +7,7 @@ import {
   CollectionInfo,
   Generator,
   GeneratorType,
+  WorkspaceProjects,
 } from '@nx-console/shared/schema';
 import { platform } from 'os';
 import { dirname, resolve } from 'path';
@@ -14,7 +15,13 @@ import {
   clearJsonCache,
   readAndCacheJsonFile,
 } from '@nx-console/shared/file-system';
-import { ReadCollectionsOptions } from '@nx-console/shared/collections';
+
+export type ReadCollectionsOptions = {
+  projects?: WorkspaceProjects;
+  clearPackageJsonCache?: boolean;
+  includeHidden?: boolean;
+  includeNgAdd?: boolean;
+};
 
 export async function readCollections(
   workspacePath: string,

@@ -1,4 +1,4 @@
-import { GetGeneratorsOptions } from '@nx-console/shared/collections';
+import { GetGeneratorsOptions } from '@nx-console/language-server/types';
 import {
   directoryExists,
   fileExists,

@@ -3,6 +3,7 @@ import './global-polyfills';
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
+  GetGeneratorsOptions,
   NxChangeWorkspace,
   NxGeneratorsRequest,
   NxWorkspaceRefreshNotification,
@@ -18,16 +19,13 @@ import {
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import {
-  getExecutors,
-  GetGeneratorsOptions,
-} from '@nx-console/shared/collections';
-import {
   getNxJsonSchema,
   getPackageJsonSchema,
   getProjectJsonSchema,
   getWorkspaceJsonSchema,
 } from '@nx-console/shared/json-schema';
 import {
+  getExecutors,
   getGenerators,
   nxWorkspace,
 } from '@nx-console/language-server/workspace';
@@ -322,11 +320,7 @@ async function configureSchemas(
   }
 
   const { workspace } = await nxWorkspace(workingPath);
-  const collections = await getExecutors(
-    workingPath,
-    workspace.projects,
-    false
-  );
+  const collections = await getExecutors(workingPath, workspace.projects);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
   const projectSchema = getProjectJsonSchema(collections);
   const packageSchema = getPackageJsonSchema();

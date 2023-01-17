@@ -1,5 +1,7 @@
-import { NxGeneratorsRequest } from '@nx-console/language-server/types';
-import { GetGeneratorsOptions } from '@nx-console/shared/collections';
+import {
+  GetGeneratorsOptions,
+  NxGeneratorsRequest,
+} from '@nx-console/language-server/types';
 import { CollectionInfo, WorkspaceProjects } from '@nx-console/shared/schema';
 import { sendRequest } from '@nx-console/vscode/lsp-client';
 
