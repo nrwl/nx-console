@@ -13,7 +13,7 @@ export const jsonCompare = <T>(prev: T, curr: T) =>
 /**
  * Class to isolate all state management boilerplate
  */
-export class StateBaseService<T> {
+export class StateBaseService<T extends { refreshCounter: number }> {
   private initialState: T;
   private refreshSubject = new Subject<void>();
   protected refresh$ = this.refreshSubject
@@ -45,7 +45,10 @@ export class StateBaseService<T> {
   }
 
   protected refresh() {
-    this.setState(this.initialState);
+    this.setState({
+      ...this.initialState,
+      refreshCounter: this.state.refreshCounter + 1,
+    });
     this.refreshSubject.next();
   }
 }

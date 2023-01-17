@@ -62,6 +62,7 @@ type InternalState = {
   runFirstCommandOptions: string[];
   serverError: string | undefined;
   vcsIntegrationStatus: VCSIntegrationStatusOptions | undefined;
+  refreshCounter: number;
 };
 
 const initialInternalState: InternalState = {
@@ -79,6 +80,7 @@ const initialInternalState: InternalState = {
   runFirstCommandOptions: [],
   serverError: undefined,
   vcsIntegrationStatus: undefined,
+  refreshCounter: 0,
 };
 
 // the state that is consumed by the webview, composed of internal state and some derived state
@@ -635,6 +637,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
       isCloudWorkspaceClaimed: state.isCloudWorkspaceClaimed,
       authAccessToken: state.authAccessToken,
       cloudWorkspaceId: state.cloudWorkspaceId,
+      refreshCounter: state.refreshCounter,
     }))
       .pipe(
         filter(
