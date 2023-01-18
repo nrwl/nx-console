@@ -1,24 +1,26 @@
 {
+  "name": "generate-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "generators": {
     "@nrwl/workspace:component": {
       "style": "scss"
     }
   },
-  "sourceRoot": "apps/vscode-ui/src",
+  "sourceRoot": "apps/generate-ui/src",
   "targets": {
     "watch": {
       "executor": "@angular-builders/custom-webpack:browser",
       "options": {
         "watch": true,
         "customWebpackConfig": {
-          "path": "apps/vscode-ui/webpack.dev.js"
+          "path": "apps/generate-ui/webpack.dev.js"
         },
         "outputPath": "dist/apps/vscode/assets/public",
-        "index": "apps/vscode-ui/src/index.html",
-        "main": "apps/vscode-ui/src/main.ts",
-        "tsConfig": "apps/vscode-ui/tsconfig.app.json",
-        "styles": ["apps/vscode-ui/src/styles.scss"],
+        "index": "apps/generate-ui/src/index.html",
+        "main": "apps/generate-ui/src/main.ts",
+        "tsConfig": "apps/generate-ui/tsconfig.app.json",
+        "styles": ["apps/generate-ui/src/styles.scss"],
         "stylePreprocessorOptions": {
           "includePaths": ["libs/vscode-ui/styles/src/lib"]
         }
@@ -29,13 +31,13 @@
       "executor": "@angular-builders/custom-webpack:browser",
       "options": {
         "customWebpackConfig": {
-          "path": "apps/vscode-ui/webpack.dev.js"
+          "path": "apps/generate-ui/webpack.dev.js"
         },
         "outputPath": "dist/apps/vscode/assets/public",
-        "index": "apps/vscode-ui/src/index.html",
-        "main": "apps/vscode-ui/src/main.ts",
-        "tsConfig": "apps/vscode-ui/tsconfig.app.json",
-        "styles": ["apps/vscode-ui/src/styles.scss"],
+        "index": "apps/generate-ui/src/index.html",
+        "main": "apps/generate-ui/src/main.ts",
+        "tsConfig": "apps/generate-ui/tsconfig.app.json",
+        "styles": ["apps/generate-ui/src/styles.scss"],
         "namedChunks": false,
         "extractLicenses": true,
         "vendorChunk": false,
@@ -56,8 +58,8 @@
           "buildOptimizer": true,
           "fileReplacements": [
             {
-              "replace": "apps/vscode-ui/src/environments/environment.ts",
-              "with": "apps/vscode-ui/src/environments/environment.prod.ts"
+              "replace": "apps/generate-ui/src/environments/environment.ts",
+              "with": "apps/generate-ui/src/environments/environment.prod.ts"
             }
           ]
         }
@@ -67,36 +69,36 @@
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "options": {
-        "browserTarget": "vscode-ui:build"
+        "browserTarget": "generate-ui:build"
       },
       "configurations": {
         "production": {
-          "browserTarget": "vscode-ui:build:production"
+          "browserTarget": "generate-ui:build:production"
         }
       }
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "vscode-ui:build"
+        "browserTarget": "generate-ui:build"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "apps/vscode-ui/src/**/*.ts",
-          "apps/vscode-ui/src/**/*.html"
+          "apps/generate-ui/src/**/*.ts",
+          "apps/generate-ui/src/**/*.html"
         ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "options": {
-        "jestConfig": "apps/vscode-ui/jest.config.ts",
+        "jestConfig": "apps/generate-ui/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/apps/vscode-ui"]
+      "outputs": ["coverage/apps/generate-ui"]
     }
   },
   "tags": ["type:vscode-ui"]
