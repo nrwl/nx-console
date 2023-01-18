@@ -5,7 +5,7 @@ import {
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
-import { VscodeUiFeatureTaskExecutionFormModule } from './vscode-ui-feature-task-execution-form.module';
+import { GenerateUiFeatureTaskExecutionFormModule } from './generate-ui-feature-task-execution-form.module';
 
 const cssColorNames = [
   'AliceBlue',
@@ -169,7 +169,7 @@ class TaskExecutionFormExampleComponent {
 const baseConfig: AngularFramework['storyResult'] = {
   component: TaskExecutionFormExampleComponent,
   moduleMetadata: {
-    imports: [VscodeUiFeatureTaskExecutionFormModule],
+    imports: [GenerateUiFeatureTaskExecutionFormModule],
   },
 };
 export const DefaultValues: Story = () => ({

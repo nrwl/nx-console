@@ -2,13 +2,13 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import {
-  VscodeUiFeatureTaskExecutionFormModule,
+  GenerateUiFeatureTaskExecutionFormModule,
   TaskExecutionFormComponent,
-} from '@nx-console/vscode-ui/feature-task-execution-form';
+} from '@nx-console/generate-ui/feature-task-execution-form';
 import { environment } from '../environments/environment';
 
 @NgModule({
-  imports: [BrowserModule, VscodeUiFeatureTaskExecutionFormModule],
+  imports: [BrowserModule, GenerateUiFeatureTaskExecutionFormModule],
   providers: [...environment.providers],
   bootstrap: [TaskExecutionFormComponent],
 })

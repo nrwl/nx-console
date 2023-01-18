@@ -18,4 +18,4 @@ import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
   declarations: [TaskExecutionFormComponent, FormatTaskPipe],
   exports: [TaskExecutionFormComponent],
 })
-export class VscodeUiFeatureTaskExecutionFormModule {}
+export class GenerateUiFeatureTaskExecutionFormModule {}

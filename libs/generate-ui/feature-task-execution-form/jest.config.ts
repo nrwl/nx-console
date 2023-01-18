@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'vscode-ui-feature-task-execution-form',
+  displayName: 'generate-ui-feature-task-execution-form',
 
   setupFilesAfterEnv: ['<rootDir>/test-setup.ts'],
   globals: {
@@ -11,7 +11,7 @@ export default {
     },
   },
   coverageDirectory:
-    '../../../coverage/libs/vscode-ui/feature-task-execution-form',
+    '../../../coverage/libs/generate-ui/feature-task-execution-form',
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',

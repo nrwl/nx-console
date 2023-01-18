@@ -1,31 +1,32 @@
 {
+  "name": "generate-ui-feature-task-execution-form",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "sourceRoot": "libs/vscode-ui/feature-task-execution-form/src",
+  "sourceRoot": "libs/generate-ui/feature-task-execution-form/src",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/vscode-ui/feature-task-execution-form/src/**/*.ts",
-          "libs/vscode-ui/feature-task-execution-form/src/**/*.html"
+          "libs/generate-ui/feature-task-execution-form/src/**/*.ts",
+          "libs/generate-ui/feature-task-execution-form/src/**/*.html"
         ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "options": {
-        "jestConfig": "libs/vscode-ui/feature-task-execution-form/jest.config.ts",
+        "jestConfig": "libs/generate-ui/feature-task-execution-form/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/vscode-ui/feature-task-execution-form"]
+      "outputs": ["coverage/libs/generate-ui/feature-task-execution-form"]
     },
     "storybook": {
       "executor": "@storybook/angular:start-storybook",
       "options": {
         "port": 4400,
-        "configDir": "libs/vscode-ui/feature-task-execution-form/.storybook",
-        "browserTarget": "vscode-ui-feature-task-execution-form:build-storybook",
+        "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
+        "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
         "compodoc": false
       },
       "configurations": {
@@ -39,8 +40,8 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputDir": "dist/storybook/vscode-ui-feature-task-execution-form",
-        "configDir": "libs/vscode-ui/feature-task-execution-form/.storybook",
-        "browserTarget": "vscode-ui-feature-task-execution-form:build-storybook",
+        "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
+        "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
         "stylePreprocessorOptions": {
           "includePaths": ["libs/vscode-ui/styles/src/lib"]
         },

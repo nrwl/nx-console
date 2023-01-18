@@ -1,6 +1,6 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "generate-ui-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/generate-ui-e2e/src",
   "projectType": "application",
   "targets": {
@@ -9,7 +9,7 @@
       "options": {
         "cypressConfig": "apps/generate-ui-e2e/cypress.config.ts",
         "tsConfig": "apps/generate-ui-e2e/tsconfig.e2e.json",
-        "devServerTarget": "vscode-ui-feature-task-execution-form:storybook",
+        "devServerTarget": "generate-ui-feature-task-execution-form:storybook",
         "headed": true,
         "testingType": "e2e"
       },
@@ -30,5 +30,5 @@
     }
   },
   "tags": ["type:vscode-ui"],
-  "implicitDependencies": ["vscode-ui-feature-task-execution-form"]
+  "implicitDependencies": ["generate-ui-feature-task-execution-form"]
 }
