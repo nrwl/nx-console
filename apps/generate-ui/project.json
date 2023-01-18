@@ -22,7 +22,7 @@
         "tsConfig": "apps/generate-ui/tsconfig.app.json",
         "styles": ["apps/generate-ui/src/styles.scss"],
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/vscode-ui/styles/src/lib"]
+          "includePaths": ["libs/generate-ui/styles/src/lib"]
         }
       }
     },
@@ -42,7 +42,7 @@
         "extractLicenses": true,
         "vendorChunk": false,
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/vscode-ui/styles/src/lib"]
+          "includePaths": ["libs/generatae-ui/styles/src/lib"]
         },
         "allowedCommonJsDependencies": ["zone.js"],
         "deleteOutputPath": false

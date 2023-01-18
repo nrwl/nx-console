@@ -43,7 +43,7 @@
         "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
         "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/vscode-ui/styles/src/lib"]
+          "includePaths": ["libs/generatae-ui/styles/src/lib"]
         },
         "compodoc": false
       },
