@@ -6,7 +6,7 @@ import {
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
-import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
+import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
 import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
 import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
@@ -61,7 +61,7 @@ describe('TaskExecutionFormComponent', () => {
       declarations: [TaskExecutionFormComponent, FormatTaskPipe],
       imports: [
         ReactiveFormsModule,
-        VscodeUiComponentsModule,
+        GenerateUiComponentsModule,
         ArgumentListModule,
       ],
     }).compileComponents();

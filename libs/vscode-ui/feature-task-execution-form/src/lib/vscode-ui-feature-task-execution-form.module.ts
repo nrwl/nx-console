@@ -4,7 +4,7 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { FormatTaskPipe } from './format-task/format-task.pipe';
-import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
+import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
 import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
 
 @NgModule({
@@ -12,7 +12,7 @@ import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
     CommonModule,
     ReactiveFormsModule,
     ClipboardModule,
-    VscodeUiComponentsModule,
+    GenerateUiComponentsModule,
     ArgumentListModule,
   ],
   declarations: [TaskExecutionFormComponent, FormatTaskPipe],

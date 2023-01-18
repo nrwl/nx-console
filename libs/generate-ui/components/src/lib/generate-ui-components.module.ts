@@ -32,4 +32,4 @@ import { FieldItemsPipe } from './field-items/field-items.pipe';
     MultipleSelectComponent,
   ],
 })
-export class VscodeUiComponentsModule {}
+export class GenerateUiComponentsModule {}

@@ -9,7 +9,6 @@
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
-        // This linting rule seems to not be working correctly, so we'll disable it for now.
         "@angular-eslint/use-pipe-transform-interface": "off",
         "@angular-eslint/directive-selector": [
           "error",

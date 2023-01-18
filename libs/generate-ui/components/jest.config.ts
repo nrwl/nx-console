@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'vscode-ui-components',
+  displayName: 'generate-ui-components',
 
   setupFilesAfterEnv: ['<rootDir>/test-setup.ts'],
   globals: {
@@ -9,7 +9,7 @@ export default {
       tsconfig: '<rootDir>/tsconfig.spec.json',
     },
   },
-  coverageDirectory: '../../../coverage/libs/vscode-ui/components',
+  coverageDirectory: '../../../coverage/libs/generate-ui/components',
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',
