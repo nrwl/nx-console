@@ -1,0 +1,214 @@
+@use 'variables';
+
+$filter-offset: 30px;
+$host-padding-top: 16px;
+$host-padding-left: 20px;
+$host-padding-right: 36px;
+$scrollbar-width: 14px;
+$configurations-offset: 48px;
+$form-header-padding-bottom: $host-padding-top;
+$offset-without-configurations: $filter-offset + $host-padding-top +
+  $form-header-padding-bottom;
+$offset-with-configurations: $offset-without-configurations +
+  $configurations-offset;
+
+:host {
+  height: 100vh;
+  overflow: hidden;
+  display: block;
+  box-sizing: border-box;
+  padding-top: $host-padding-top;
+  padding-left: $host-padding-left;
+}
+
+.run-button {
+  width: 80px;
+  height: 30px;
+  background: variables.$button-primary-color;
+  border: variables.$input-border-width solid
+    var(--vscode-settings-textInputBorder);
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  transition: background ease-in-out 0.1s;
+  margin-left: 1rem;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.dry-run {
+    background: variables.$button-secondary-color;
+  }
+}
+
+.scroll-container,
+generate-ui-field-tree {
+  box-sizing: border-box;
+  padding-top: $host-padding-top * 0.5;
+  min-height: calc(100vh - #{$offset-without-configurations});
+  max-height: calc(100vh - #{$offset-without-configurations});
+
+  .has-configurations & {
+    min-height: calc(100vh - #{$offset-with-configurations});
+    max-height: calc(100vh - #{$offset-with-configurations});
+  }
+}
+
+generate-ui-field-tree {
+  overflow: hidden;
+  position: fixed;
+  bottom: 0;
+  z-index: 1;
+  top: #{$offset-without-configurations};
+
+  &:hover {
+    overflow: auto;
+  }
+
+  .has-configurations & {
+    top: #{$offset-with-configurations};
+  }
+}
+
+form {
+  margin-left: 190px;
+  padding-right: $host-padding-right - $scrollbar-width;
+}
+
+.scroll-container {
+  overflow-y: scroll;
+  overflow-x: visible;
+}
+
+.form-header,
+.form-container {
+  box-sizing: border-box;
+  max-width: 980px;
+  margin: auto;
+}
+
+nx-console-argument-list {
+  flex: 1 1 140px;
+  padding-left: $host-padding-left;
+}
+
+.fields-container {
+  flex: 1 1 variables.$input-width;
+}
+
+.filter-container {
+  border-width: 1px;
+  border-style: solid;
+  background-color: var(--vscode-settings-textInputBackground, #eee);
+  border-color: var(--vscode-settings-textInputBorder);
+  border-radius: variables.$input-border-radius-size;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0.3rem 0.5rem;
+
+  input {
+    width: 100%;
+    line-height: 30px;
+    height: 20px;
+    margin: none;
+    box-sizing: border-box;
+    color: var(--vscode-settings-textInputForeground);
+    background: transparent;
+    border: none !important;
+    outline: none !important;
+    font-size: 13px;
+  }
+}
+
+generate-ui-field-tree,
+nx-console-field,
+.form-header,
+.filter-flags-message,
+.title-container {
+  padding-left: 0.5rem;
+}
+
+nx-console-field {
+  border-left: 2px solid transparent;
+
+  &.changed-from-default {
+    border-left-color: variables.$button-primary-color;
+  }
+}
+
+.form-header-container {
+  margin-left: $host-padding-left * -1;
+  padding-left: $host-padding-left;
+  transition: box-shadow ease-in-out 0.1s;
+
+  &.scrolled {
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  }
+
+  .form-header {
+    max-width: 996px;
+    padding-right: $host-padding-right;
+    padding-bottom: $host-padding-top;
+  }
+}
+
+.title-container {
+  .title {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 21px;
+  }
+
+  button {
+    background-color: variables.$button-secondary-color;
+    color: variables.$secondary-text-color;
+    padding: 2px 2px 1px 2px;
+    border: none;
+    margin-left: 0.5em;
+
+    &:hover,
+    &:focus {
+      background-color: variables.$button-secondary-hover-color;
+    }
+  }
+
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+  form {
+    margin-left: 0;
+  }
+
+  generate-ui-field-tree {
+    display: none;
+  }
+  nx-console-argument-list {
+    display: none;
+  }
+}
+
+.configurations-container {
+  margin-top: 24px;
+  height: $configurations-offset - 24px;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .configuration {
+    margin-right: 24px;
+    user-select: none;
+    cursor: pointer;
+
+    &.selected {
+      border-bottom: 2px solid variables.$primary-text-color;
+    }
+  }
+}
+
+.clear-search {
+  cursor: pointer;
+  text-decoration: underline;
+}

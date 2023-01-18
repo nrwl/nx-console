@@ -1,6 +1,13 @@
 {
   "version": 2,
   "projects": {
+    "generate-ui": "apps/generate-ui",
+    "generate-ui-argument-list": "libs/generate-ui/argument-list",
+    "generate-ui-components": "libs/generate-ui/components",
+    "generate-ui-e2e": "apps/generate-ui-e2e",
+    "generate-ui-feature-task-execution-form": "libs/generate-ui/feature-task-execution-form",
+    "generate-ui-styles": "libs/generate-ui/styles",
+
     "intellij": "apps/intellij",
     "language-server-capabilities-code-completion": "libs/language-server/capabilities/code-completion",
     "language-server-capabilities-document-links": "libs/language-server/capabilities/document-links",
@@ -31,12 +38,6 @@
     "vscode-project-graph": "libs/vscode/project-graph",
     "vscode-tasks": "libs/vscode/tasks",
     "vscode-typescript-plugin": "libs/vscode/typescript-plugin",
-    "vscode-ui": "apps/vscode-ui",
-    "vscode-ui-argument-list": "libs/vscode-ui/argument-list",
-    "vscode-ui-components": "libs/vscode-ui/components",
-    "vscode-ui-e2e": "apps/vscode-ui-e2e",
-    "vscode-ui-feature-task-execution-form": "libs/vscode-ui/feature-task-execution-form",
-    "vscode-ui-styles": "libs/vscode-ui/styles",
     "vscode-utils": "libs/vscode/utils",
     "vscode-verify": "libs/vscode/verify",
     "vscode-webview": "libs/vscode/webview"

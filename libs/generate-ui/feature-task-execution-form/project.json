@@ -1,0 +1,60 @@
+{
+  "name": "generate-ui-feature-task-execution-form",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/generate-ui/feature-task-execution-form/src",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/generate-ui/feature-task-execution-form/src/**/*.ts",
+          "libs/generate-ui/feature-task-execution-form/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "options": {
+        "jestConfig": "libs/generate-ui/feature-task-execution-form/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "outputs": ["coverage/libs/generate-ui/feature-task-execution-form"]
+    },
+    "storybook": {
+      "executor": "@storybook/angular:start-storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
+        "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@storybook/angular:build-storybook",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputDir": "dist/storybook/generate-ui-feature-task-execution-form",
+        "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
+        "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/generate-ui/styles/src/lib"]
+        },
+        "compodoc": false
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    }
+  },
+  "generators": {},
+  "implicitDependencies": ["generate-ui-styles"],
+  "tags": ["type:generate-ui"]
+}

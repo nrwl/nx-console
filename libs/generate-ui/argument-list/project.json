@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "generate-ui-argument-list",
+  "projectType": "library",
+  "sourceRoot": "libs/generate-ui/argument-list/src",
+  "prefix": "nx-console",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/generate-ui/argument-list/src/**/*.ts",
+          "libs/generate-ui/argument-list/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/generate-ui/argument-list"],
+      "options": {
+        "jestConfig": "libs/generate-ui/argument-list/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["type:generate-ui"]
+}

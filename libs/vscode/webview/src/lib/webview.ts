@@ -204,7 +204,7 @@ export function getIframeHtml(webView: Webview, context: ExtensionContext) {
     <link href="${webView.asWebviewUri(stylePath)}" rel="stylesheet"/>
   </head>
   <body>
-    <vscode-ui-task-execution-form></vscode-ui-task-execution-form>
+    <generate-ui-task-execution-form></generate-ui-task-execution-form>
     <script src="${webView.asWebviewUri(runtimePath)}"></script>
     <script src="${webView.asWebviewUri(mainPath)}"></script>
   </body>

@@ -27,8 +27,8 @@
                 "bannedExternalImports": ["vscode"]
               },
               {
-                "sourceTag": "type:vscode-ui",
-                "onlyDependOnLibsWithTags": ["type:shared", "type:vscode-ui"]
+                "sourceTag": "type:generate-ui",
+                "onlyDependOnLibsWithTags": ["type:shared", "type:generate-ui"]
               }
             ]
           }

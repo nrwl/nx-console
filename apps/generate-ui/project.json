@@ -1,0 +1,106 @@
+{
+  "name": "generate-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "generators": {
+    "@nrwl/workspace:component": {
+      "style": "scss"
+    }
+  },
+  "sourceRoot": "apps/generate-ui/src",
+  "targets": {
+    "watch": {
+      "executor": "@angular-builders/custom-webpack:browser",
+      "options": {
+        "watch": true,
+        "customWebpackConfig": {
+          "path": "apps/generate-ui/webpack.dev.js"
+        },
+        "outputPath": "dist/apps/vscode/assets/public",
+        "index": "apps/generate-ui/src/index.html",
+        "main": "apps/generate-ui/src/main.ts",
+        "tsConfig": "apps/generate-ui/tsconfig.app.json",
+        "styles": ["apps/generate-ui/src/styles.scss"],
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/generate-ui/styles/src/lib"]
+        }
+      }
+    },
+    "build": {
+      "defaultConfiguration": "production",
+      "executor": "@angular-builders/custom-webpack:browser",
+      "options": {
+        "customWebpackConfig": {
+          "path": "apps/generate-ui/webpack.dev.js"
+        },
+        "outputPath": "dist/apps/vscode/assets/public",
+        "index": "apps/generate-ui/src/index.html",
+        "main": "apps/generate-ui/src/main.ts",
+        "tsConfig": "apps/generate-ui/tsconfig.app.json",
+        "styles": ["apps/generate-ui/src/styles.scss"],
+        "namedChunks": false,
+        "extractLicenses": true,
+        "vendorChunk": false,
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/generate-ui/styles/src/lib"]
+        },
+        "allowedCommonJsDependencies": ["zone.js"],
+        "deleteOutputPath": false
+      },
+      "configurations": {
+        "ci": {
+          "optimization": false
+        },
+        "production": {
+          "sourceMap": false,
+          "aot": true,
+          "optimization": true,
+          "buildOptimizer": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/generate-ui/src/environments/environment.ts",
+              "with": "apps/generate-ui/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      },
+      "outputs": ["{options.outputPath}"]
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "browserTarget": "generate-ui:build"
+      },
+      "configurations": {
+        "production": {
+          "browserTarget": "generate-ui:build:production"
+        }
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "generate-ui:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/generate-ui/src/**/*.ts",
+          "apps/generate-ui/src/**/*.html"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "options": {
+        "jestConfig": "apps/generate-ui/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "outputs": ["coverage/apps/generate-ui"]
+    }
+  },
+  "implicitDependencies": ["generate-ui-styles"],
+  "tags": ["type:generate-ui"]
+}
