@@ -4,7 +4,7 @@ import {
   PackageManager,
   readJsonFile,
 } from '@nrwl/devkit';
-import { getGenerators } from '@nx-console/shared/collections';
+import { getGenerators } from '@nx-console/vscode/nx-workspace';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
 import {
@@ -157,7 +157,7 @@ async function executeInitGenerator(
   workspacePath: string,
   workspaceType: 'ng' | 'nx'
 ) {
-  const generators = await getGenerators(workspacePath, undefined, {
+  const generators = await getGenerators({
     includeHidden: true,
     includeNgAdd: true,
   });
@@ -174,7 +174,6 @@ async function executeInitGenerator(
   }
 
   const opts = await getGeneratorOptions(
-    workspacePath,
     initGenerator.data.collection,
     initGenerator.name,
     initGenerator.path,

@@ -37,14 +37,12 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
-  outputLogger,
   teardownTelemetry,
   watchFile,
 } from '@nx-console/vscode/utils';
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import { environment } from './environments/environment';
 
-import { getGenerators } from '@nx-console/shared/collections';
 import { fileExists } from '@nx-console/shared/file-system';
 import { nxVersion } from '@nx-console/shared/npm';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
@@ -64,6 +62,7 @@ import {
   REFRESH_WORKSPACE,
 } from './commands/refresh-workspace';
 import {
+  getGenerators,
   getNxWorkspace,
   stopDaemon,
   WorkspaceCodeLensProvider,
@@ -296,7 +295,7 @@ async function setApplicationAndLibraryContext(workspacePath: string) {
     join(workspacePath, workspaceLayout.libsDir),
   ]);
 
-  const generatorCollections = await getGenerators(workspacePath);
+  const generatorCollections = await getGenerators();
 
   let hasApplicationGenerators = false;
   let hasLibraryGenerators = false;

@@ -16,7 +16,6 @@
     "language-server-watcher": "libs/language-server/watcher",
     "language-server-workspace": "libs/language-server/workspace",
     "nxls": "apps/nxls",
-    "shared-collections": "libs/shared/collections",
     "shared-file-system": "libs/shared/file-system",
     "shared-json-schema": "libs/shared/json-schema",
     "shared-npm": "libs/shared/npm",
