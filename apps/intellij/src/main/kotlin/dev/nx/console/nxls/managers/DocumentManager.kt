@@ -1,4 +1,4 @@
-package dev.nx.console.lsp.managers
+package dev.nx.console.nxls.managers
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.diagnostic.logger

@@ -9,7 +9,7 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import dev.nx.console.lsp.managers.DocumentManager
+import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.utils.DocumentUtils
 import dev.nx.console.utils.writeAction
 import org.apache.commons.lang3.StringUtils

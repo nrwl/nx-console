@@ -1,3 +1,3 @@
-package dev.nx.console.lsp.server
+package dev.nx.console.nxls.server
 
 data class NxWorkspaceRequest(val reset: Boolean = false)
