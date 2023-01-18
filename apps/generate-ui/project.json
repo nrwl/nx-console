@@ -42,7 +42,7 @@
         "extractLicenses": true,
         "vendorChunk": false,
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/generatae-ui/styles/src/lib"]
+          "includePaths": ["libs/generate-ui/styles/src/lib"]
         },
         "allowedCommonJsDependencies": ["zone.js"],
         "deleteOutputPath": false
@@ -101,5 +101,6 @@
       "outputs": ["coverage/apps/generate-ui"]
     }
   },
+  "implicitDependencies": ["generate-ui-styles"],
   "tags": ["type:generate-ui"]
 }
