@@ -5,23 +5,17 @@ import {
   listFiles,
   readAndCacheJsonFile,
 } from '@nx-console/shared/file-system';
-import {
-  CollectionInfo,
-  GeneratorType,
-  WorkspaceProjects,
-} from '@nx-console/shared/schema';
+import { CollectionInfo, GeneratorType } from '@nx-console/shared/schema';
 import { normalizeSchema } from '@nx-console/shared/schema/normalize';
 import { basename, join } from 'path';
 import { getCollectionInfo, readCollections } from './read-collections';
 
 export async function getGenerators(
   workspacePath: string,
-  projects?: WorkspaceProjects,
   options: GetGeneratorsOptions = { includeHidden: false, includeNgAdd: false }
 ): Promise<CollectionInfo[]> {
   const basedir = workspacePath;
   const collections = await readCollections(workspacePath, {
-    projects,
     clearPackageJsonCache: false,
     includeHidden: options.includeHidden,
     includeNgAdd: options.includeNgAdd,

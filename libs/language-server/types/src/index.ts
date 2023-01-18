@@ -1,6 +1,6 @@
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 import { NxWorkspace } from '@nx-console/shared/types';
-import { CollectionInfo, WorkspaceProjects } from '@nx-console/shared/schema';
+import { CollectionInfo } from '@nx-console/shared/schema';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
   'nx/changeWorkspace'
@@ -22,7 +22,6 @@ export type GetGeneratorsOptions = {
 
 export const NxGeneratorsRequest: RequestType<
   {
-    projects?: WorkspaceProjects;
     options?: GetGeneratorsOptions;
   },
   CollectionInfo[],

@@ -241,10 +241,7 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
 
 connection.onRequest(
   NxGeneratorsRequest,
-  async (args: {
-    projects?: WorkspaceProjects;
-    options?: GetGeneratorsOptions;
-  }) => {
+  async (args: { options?: GetGeneratorsOptions }) => {
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -252,7 +249,7 @@ connection.onRequest(
       );
     }
 
-    return getGenerators(WORKING_PATH, args.projects, args.options);
+    return getGenerators(WORKING_PATH, args.options);
   }
 );
 
@@ -320,7 +317,7 @@ async function configureSchemas(
   }
 
   const { workspace } = await nxWorkspace(workingPath);
-  const collections = await getExecutors(workingPath, workspace.projects);
+  const collections = await getExecutors(workingPath);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
   const projectSchema = getProjectJsonSchema(collections);
   const packageSchema = getPackageJsonSchema();

@@ -81,8 +81,7 @@ export async function selectGenerator(
     generatorName: string;
     collectionPath: string;
   }
-  const { workspace } = await getNxWorkspace();
-  const generators = await getGenerators(workspace.projects);
+  const generators = await getGenerators();
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)
     .map((collection): GenerateQuickPickItem => {

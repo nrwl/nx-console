@@ -1,4 +1,4 @@
-import { CollectionInfo, WorkspaceProjects } from '@nx-console/shared/schema';
+import { CollectionInfo } from '@nx-console/shared/schema';
 import { readCollections } from './read-collections';
 
 export type GetExecutorsOptions = {
@@ -8,7 +8,6 @@ export type GetExecutorsOptions = {
 
 export async function getExecutors(
   workspacePath: string,
-  projects?: WorkspaceProjects,
   options: GetExecutorsOptions = {
     includeHidden: false,
     clearPackageJsonCache: false,
@@ -16,7 +15,6 @@ export async function getExecutors(
 ): Promise<CollectionInfo[]> {
   return (
     await readCollections(workspacePath, {
-      projects,
       clearPackageJsonCache: options.clearPackageJsonCache,
       includeHidden: options.includeHidden,
     })

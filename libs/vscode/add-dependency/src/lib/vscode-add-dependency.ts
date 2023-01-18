@@ -157,7 +157,7 @@ async function executeInitGenerator(
   workspacePath: string,
   workspaceType: 'ng' | 'nx'
 ) {
-  const generators = await getGenerators(undefined, {
+  const generators = await getGenerators({
     includeHidden: true,
     includeNgAdd: true,
   });
