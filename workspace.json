@@ -2,6 +2,7 @@
   "version": 2,
   "projects": {
     "generate-ui": "apps/generate-ui",
+    "generate-ui-e2e": "apps/generate-ui-e2e",
     "intellij": "apps/intellij",
     "language-server-capabilities-code-completion": "libs/language-server/capabilities/code-completion",
     "language-server-capabilities-document-links": "libs/language-server/capabilities/document-links",
@@ -34,7 +35,6 @@
     "vscode-typescript-plugin": "libs/vscode/typescript-plugin",
     "vscode-ui-argument-list": "libs/vscode-ui/argument-list",
     "vscode-ui-components": "libs/vscode-ui/components",
-    "vscode-ui-e2e": "apps/vscode-ui-e2e",
     "vscode-ui-feature-task-execution-form": "libs/vscode-ui/feature-task-execution-form",
     "vscode-ui-styles": "libs/vscode-ui/styles",
     "vscode-utils": "libs/vscode/utils",

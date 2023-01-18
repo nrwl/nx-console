@@ -1,13 +1,14 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/vscode-ui-e2e/src",
+  "name": "generate-ui-e2e",
+  "sourceRoot": "apps/generate-ui-e2e/src",
   "projectType": "application",
   "targets": {
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/vscode-ui-e2e/cypress.config.ts",
-        "tsConfig": "apps/vscode-ui-e2e/tsconfig.e2e.json",
+        "cypressConfig": "apps/generate-ui-e2e/cypress.config.ts",
+        "tsConfig": "apps/generate-ui-e2e/tsconfig.e2e.json",
         "devServerTarget": "vscode-ui-feature-task-execution-form:storybook",
         "headed": true,
         "testingType": "e2e"
@@ -22,8 +23,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "apps/vscode-ui-e2e/src/**/*.ts",
-          "apps/vscode-ui-e2e/src/**/*.html"
+          "apps/generate-ui-e2e/src/**/*.ts",
+          "apps/generate-ui-e2e/src/**/*.html"
         ]
       }
     }
