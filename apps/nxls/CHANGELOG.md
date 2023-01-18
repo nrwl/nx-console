@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/nrwl/nx-console/compare/nxls-v1.4.0...nxls-v1.5.0) (2023-01-18)
+
+
+### Bug Fixes
+
+* take nx-cloud.env into account for cloud view ([#1475](https://github.com/nrwl/nx-console/issues/1475)) ([fdc376e](https://github.com/nrwl/nx-console/commit/fdc376e1365adfafe04cad3e23d0ef984fef327f))
+
+
+### Features
+
+* add nx cloud view ([#1441](https://github.com/nrwl/nx-console/issues/1441)) ([fe9a140](https://github.com/nrwl/nx-console/commit/fe9a1403c08b47cd7e4ec95def376a503ea7bbdc))
+
 # [1.4.0](https://github.com/nrwl/nx-console/compare/nxls-v1.3.1...nxls-v1.4.0) (2022-12-05)
 
 
