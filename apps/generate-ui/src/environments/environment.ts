@@ -3,7 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const NG_BUILD_ARCHITECT = {
-  title: 'ng build vscode-ui',
+  title: 'ng build generate-ui',
   schema: [
     {
       name: 'assets',
@@ -403,15 +403,15 @@ export const NG_BUILD_ARCHITECT = {
       },
       {
         name: 'index',
-        defaultValue: 'apps/vscode-ui/src/index.html',
+        defaultValue: 'apps/generate-ui/src/index.html',
       },
       {
         name: 'main',
-        defaultValue: 'apps/vscode-ui/src/main.ts',
+        defaultValue: 'apps/generate-ui/src/main.ts',
       },
       {
         name: 'tsConfig',
-        defaultValue: 'apps/vscode-ui/tsconfig.app.json',
+        defaultValue: 'apps/generate-ui/tsconfig.app.json',
       },
       {
         name: 'assets',
@@ -454,15 +454,15 @@ export const NG_BUILD_ARCHITECT = {
         },
         {
           name: 'index',
-          defaultValue: 'apps/vscode-ui/src/index.html',
+          defaultValue: 'apps/generate-ui/src/index.html',
         },
         {
           name: 'main',
-          defaultValue: 'apps/vscode-ui/src/main.ts',
+          defaultValue: 'apps/generate-ui/src/main.ts',
         },
         {
           name: 'tsConfig',
-          defaultValue: 'apps/vscode-ui/tsconfig.app.json',
+          defaultValue: 'apps/generate-ui/tsconfig.app.json',
         },
         {
           name: 'assets',
@@ -516,7 +516,7 @@ export const NG_BUILD_ARCHITECT = {
     },
   ],
   name: 'build',
-  project: 'vscode-ui',
+  project: 'generate-ui',
   description: '',
   builder: '@angular-devkit/build-angular:browser',
 };

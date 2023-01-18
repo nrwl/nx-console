@@ -22,7 +22,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "vscode-ui",
+            "prefix": "generate-ui",
             "style": "kebab-case"
           }
         ]

@@ -67,7 +67,7 @@ interface TaskExecutionForm {
 }
 
 @Component({
-  selector: 'vscode-ui-task-execution-form',
+  selector: 'generate-ui-task-execution-form',
   templateUrl: './task-execution-form.component.html',
   styleUrls: ['./task-execution-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -23,5 +23,5 @@
       }
     }
   },
-  "tags": ["type:vscode-ui"]
+  "tags": ["type:generate-ui"]
 }

@@ -43,7 +43,7 @@ $offset-with-configurations: $offset-without-configurations +
 }
 
 .scroll-container,
-vscode-ui-field-tree {
+generate-ui-field-tree {
   box-sizing: border-box;
   padding-top: $host-padding-top * 0.5;
   min-height: calc(100vh - #{$offset-without-configurations});
@@ -55,7 +55,7 @@ vscode-ui-field-tree {
   }
 }
 
-vscode-ui-field-tree {
+generate-ui-field-tree {
   overflow: hidden;
   position: fixed;
   bottom: 0;
@@ -121,7 +121,7 @@ nx-console-argument-list {
   }
 }
 
-vscode-ui-field-tree,
+generate-ui-field-tree,
 nx-console-field,
 .form-header,
 .filter-flags-message,
@@ -182,7 +182,7 @@ nx-console-field {
     margin-left: 0;
   }
 
-  vscode-ui-field-tree {
+  generate-ui-field-tree {
     display: none;
   }
   nx-console-argument-list {

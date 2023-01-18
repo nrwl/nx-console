@@ -10,7 +10,7 @@ import { Option } from '@nx-console/shared/schema';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'vscode-ui-field-tree',
+  selector: 'generate-ui-field-tree',
   templateUrl: './field-tree.component.html',
   styleUrls: ['./field-tree.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

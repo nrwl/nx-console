@@ -22,5 +22,5 @@
       "outputs": ["coverage/libs/generate-ui/components"]
     }
   },
-  "tags": ["type:vscode-ui"]
+  "tags": ["type:generate-ui"]
 }

@@ -15,8 +15,8 @@
             "color": "blue"
           },
           {
-            "command": "yarn nx watch vscode-ui",
-            "prefix": "vscode-ui",
+            "command": "yarn nx watch generate-ui",
+            "prefix": "generate-ui",
             "color": "green"
           },
           {

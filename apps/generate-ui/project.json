@@ -101,5 +101,5 @@
       "outputs": ["coverage/apps/generate-ui"]
     }
   },
-  "tags": ["type:vscode-ui"]
+  "tags": ["type:generate-ui"]
 }

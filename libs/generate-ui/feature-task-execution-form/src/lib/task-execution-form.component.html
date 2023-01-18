@@ -56,13 +56,13 @@
         class="form-container flags-and-fields-container fx-row"
         *ngIf="filteredFields$ | async as filteredFields"
       >
-        <vscode-ui-field-tree
+        <generate-ui-field-tree
           [activeFieldName]="activeFieldName$ | async"
           [fields]="taskExecForm.architect.options"
           [filteredFields]="filteredFields"
           [validFields]="validFields$ | async"
           [invalidFields]="invalidFields$ | async"
-        ></vscode-ui-field-tree>
+        ></generate-ui-field-tree>
         <form class="fields" [formGroup]="taskExecForm.form">
           <div class="title-container">
             <span class="title">

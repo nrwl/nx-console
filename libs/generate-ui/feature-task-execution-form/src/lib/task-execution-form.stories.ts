@@ -150,9 +150,11 @@ export default {
 };
 
 @Component({
-  selector: 'vscode-ui-task-execution-form-example',
+  selector: 'generate-ui-task-execution-form-example',
   template: `
-    <vscode-ui-task-execution-form #component></vscode-ui-task-execution-form>
+    <generate-ui-task-execution-form
+      #component
+    ></generate-ui-task-execution-form>
     <ng-container *ngIf="component.taskExecForm$ | async as taskExecForm">
       <ng-container *ngFor="let item of taskExecForm.form.value | keyvalue">
         <p [attr.data-cy]="item.key">{{ item.value }}</p>

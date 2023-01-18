@@ -29,6 +29,6 @@
       }
     }
   },
-  "tags": ["type:vscode-ui"],
+  "tags": ["type:generate-ui"],
   "implicitDependencies": ["generate-ui-feature-task-execution-form"]
 }

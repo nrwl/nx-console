@@ -39,7 +39,7 @@
       "executor": "@storybook/angular:build-storybook",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputDir": "dist/storybook/vscode-ui-feature-task-execution-form",
+        "outputDir": "dist/storybook/generate-ui-feature-task-execution-form",
         "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
         "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
         "stylePreprocessorOptions": {
@@ -55,5 +55,5 @@
     }
   },
   "generators": {},
-  "tags": ["type:vscode-ui"]
+  "tags": ["type:generate-ui"]
 }
