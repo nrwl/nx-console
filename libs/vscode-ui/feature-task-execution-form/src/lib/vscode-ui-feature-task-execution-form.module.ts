@@ -5,7 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
-import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
+import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
 
 @NgModule({
   imports: [

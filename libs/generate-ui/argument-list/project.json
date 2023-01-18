@@ -1,23 +1,24 @@
 {
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "generate-ui-argument-list",
   "projectType": "library",
-  "sourceRoot": "libs/vscode-ui/argument-list/src",
+  "sourceRoot": "libs/generate-ui/argument-list/src",
   "prefix": "nx-console",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/vscode-ui/argument-list/src/**/*.ts",
-          "libs/vscode-ui/argument-list/src/**/*.html"
+          "libs/generate-ui/argument-list/src/**/*.ts",
+          "libs/generate-ui/argument-list/src/**/*.html"
         ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode-ui/argument-list"],
+      "outputs": ["coverage/libs/generate-ui/argument-list"],
       "options": {
-        "jestConfig": "libs/vscode-ui/argument-list/jest.config.ts",
+        "jestConfig": "libs/generate-ui/argument-list/jest.config.ts",
         "passWithNoTests": true
       }
     }

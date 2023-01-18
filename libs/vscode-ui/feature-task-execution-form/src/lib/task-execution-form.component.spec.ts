@@ -7,7 +7,7 @@ import {
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
 import { VscodeUiComponentsModule } from '@nx-console/vscode-ui/components';
-import { ArgumentListModule } from '@nx-console/vscode-ui/argument-list';
+import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
 import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 

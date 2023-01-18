@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'vscode-ui-argument-list',
+  displayName: 'generate-ui-argument-list',
 
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
@@ -10,7 +10,7 @@ export default {
       tsconfig: '<rootDir>/tsconfig.spec.json',
     },
   },
-  coverageDirectory: '../../../coverage/libs/vscode-ui/argument-list',
+  coverageDirectory: '../../../coverage/libs/generate-ui/argument-list',
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',

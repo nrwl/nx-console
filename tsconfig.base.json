@@ -21,6 +21,9 @@
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
+      "@nx-console/generate-ui/argument-list": [
+        "libs/generate-ui/argument-list/src/index.ts"
+      ],
       "@nx-console/language-server/capabilities/code-completion": [
         "libs/language-server/capabilities/code-completion/src/index.ts"
       ],
@@ -55,9 +58,6 @@
       ],
       "@nx-console/shared/types": ["libs/shared/types/src/index.ts"],
       "@nx-console/shared/utils": ["libs/shared/utils/src/index.ts"],
-      "@nx-console/vscode-ui/argument-list": [
-        "libs/vscode-ui/argument-list/src/index.ts"
-      ],
       "@nx-console/vscode-ui/components": [
         "libs/vscode-ui/components/src/index.ts"
       ],
