@@ -3,9 +3,11 @@ import './global-polyfills';
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
-  GetGeneratorsOptions,
   NxChangeWorkspace,
+  NxGeneratorOptionsRequest,
+  NxGeneratorOptionsRequestOptions,
   NxGeneratorsRequest,
+  NxGeneratorsRequestOptions,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -26,6 +28,7 @@ import {
 } from '@nx-console/shared/json-schema';
 import {
   getExecutors,
+  getGeneratorOptions,
   getGenerators,
   nxWorkspace,
 } from '@nx-console/language-server/workspace';
@@ -48,7 +51,6 @@ import {
 import { URI, Utils } from 'vscode-uri';
 import { formatError } from '@nx-console/shared/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
-import { WorkspaceProjects } from '@nx-console/shared/schema';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -241,7 +243,7 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
 
 connection.onRequest(
   NxGeneratorsRequest,
-  async (args: { options?: GetGeneratorsOptions }) => {
+  async (args: { options?: NxGeneratorsRequestOptions }) => {
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -250,6 +252,25 @@ connection.onRequest(
     }
 
     return getGenerators(WORKING_PATH, args.options);
+  }
+);
+
+connection.onRequest(
+  NxGeneratorOptionsRequest,
+  async (args: { options: NxGeneratorOptionsRequestOptions }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+
+    return getGeneratorOptions(
+      WORKING_PATH,
+      args.options.collection,
+      args.options.name,
+      args.options.path
+    );
   }
 );
 

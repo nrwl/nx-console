@@ -14,6 +14,9 @@
     <completion.contributor language="JSON"
                             implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
+
+    <!-- Generate UI -->
+    <fileEditorProvider implementation="dev.nx.console.generate_ui.editor.NxGenerateUiFileEditorProvider"/>
   </extensions>
 
   <applicationListeners>
@@ -24,4 +27,11 @@
   <!--  <extensions defaultExtensionNs="JavaScript.JsonSchema">-->
   <!--    <ProviderFactory implementation="" />-->
   <!--  </extensions>-->
+
+  <actions>
+
+    <!-- Generate UI -->
+    <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
+            text="Nx Generate (UI)" description="Open the nx generate UI "/>
+  </actions>
 </idea-plugin>

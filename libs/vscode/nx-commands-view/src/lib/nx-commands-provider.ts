@@ -4,7 +4,6 @@ import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   AbstractTreeProvider,
   getShellExecutionForConfig,
-  getWorkspacePath,
 } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext, Task, tasks, TaskScope } from 'vscode';
 import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
