@@ -11,8 +11,11 @@ plugins {
   id("java")
   // Kotlin support
   id("org.jetbrains.kotlin.jvm") version "1.8.0"
+  // Kotlin serialization
+  id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
   // Gradle IntelliJ Plugin
   id("org.jetbrains.intellij") version "1.12.0"
+
   // Gradle Changelog Plugin
   id("org.jetbrains.changelog") version "2.0.0"
   // Gradle Qodana Plugin
@@ -32,6 +35,9 @@ repositories {
 dependencies {
   implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+
+
 }
 
 // Set the JVM language level used to build project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

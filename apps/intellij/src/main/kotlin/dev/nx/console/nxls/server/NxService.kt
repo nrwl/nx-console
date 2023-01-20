@@ -13,6 +13,16 @@ interface NxService {
         throw UnsupportedOperationException()
     }
 
+  @JsonRequest
+  fun generators(generatorsRequest: NxGeneratorsRequest = NxGeneratorsRequest()): CompletableFuture<List<NxGenerator>> {
+      throw UnsupportedOperationException()
+  }
+
+  @JsonRequest
+  fun generatorOptions(generatorOptionsRequest: NxGeneratorOptionsRequest): CompletableFuture<List<NxGeneratorOption>> {
+    throw UnsupportedOperationException()
+  }
+
     @JsonNotification
     fun refreshWorkspace() {
         throw UnsupportedOperationException()
