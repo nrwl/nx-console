@@ -1,6 +1,6 @@
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 import { NxWorkspace } from '@nx-console/shared/types';
-import { CollectionInfo } from '@nx-console/shared/schema';
+import { CollectionInfo, Option } from '@nx-console/shared/schema';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
   'nx/changeWorkspace'
@@ -15,15 +15,27 @@ export const NxWorkspaceRequest: RequestType<
   unknown
 > = new RequestType('nx/workspace');
 
-export type GetGeneratorsOptions = {
+export type NxGeneratorsRequestOptions = {
   includeHidden: boolean;
   includeNgAdd: boolean;
 };
 
 export const NxGeneratorsRequest: RequestType<
   {
-    options?: GetGeneratorsOptions;
+    options?: NxGeneratorsRequestOptions;
   },
   CollectionInfo[],
   unknown
 > = new RequestType('nx/generators');
+
+export type NxGeneratorOptionsRequestOptions = {
+  collection: string;
+  name: string;
+  path: string;
+};
+
+export const NxGeneratorOptionsRequest: RequestType<
+  { options: NxGeneratorOptionsRequestOptions },
+  Option[],
+  unknown
+> = new RequestType('nx/generatorOptions');
