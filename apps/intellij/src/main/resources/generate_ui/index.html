@@ -1,0 +1,44 @@
+<html>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono">
+<style>
+    body {
+        font-family: 'JetBrains Mono';
+        color: black;
+    }
+</style>
+
+<body id="body">
+  <h1 id="title">
+    Title
+  </h1>
+  <p id="generator"> generator </p>
+
+  <button id="button">send message to ide</button>
+
+
+  <script>
+    window.intellijApi = {
+      post(message) {
+        if(message.type === "style") {
+          const styleSheet = new CSSStyleSheet()
+          styleSheet.replaceSync(`
+          body {
+            background-color: ${message.payload.backgroundColor}
+          }
+          `)
+          document.adoptedStyleSheets = [styleSheet]
+          console.log(message)
+        }
+        if(message.type === "generator") {
+          document.getElementById("title").textContent = message.payload.generator.name
+          document.getElementById("generator").textContent = JSON.stringify(message.payload.options)
+        }
+      }
+    }
+    document.getElementById("button").onclick = () => window.intellijApi.postToIde("hey")
+  </script>
+
+</body>
+</html>
+
