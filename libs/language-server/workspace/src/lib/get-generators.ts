@@ -1,4 +1,4 @@
-import { GetGeneratorsOptions } from '@nx-console/language-server/types';
+import { NxGeneratorsRequestOptions } from '@nx-console/language-server/types';
 import {
   directoryExists,
   fileExists,
@@ -12,7 +12,10 @@ import { getCollectionInfo, readCollections } from './read-collections';
 
 export async function getGenerators(
   workspacePath: string,
-  options: GetGeneratorsOptions = { includeHidden: false, includeNgAdd: false }
+  options: NxGeneratorsRequestOptions = {
+    includeHidden: false,
+    includeNgAdd: false,
+  }
 ): Promise<CollectionInfo[]> {
   const basedir = workspacePath;
   const collections = await readCollections(workspacePath, {
@@ -37,7 +40,7 @@ export async function getGenerators(
 async function checkAndReadWorkspaceGenerators(
   basedir: string,
   workspaceGeneratorType: 'generators' | 'schematics',
-  options: GetGeneratorsOptions
+  options: NxGeneratorsRequestOptions
 ) {
   const workspaceGeneratorsPath = join('tools', workspaceGeneratorType);
   if (await directoryExists(join(basedir, workspaceGeneratorsPath))) {
@@ -56,7 +59,7 @@ async function readWorkspaceGeneratorsCollection(
   basedir: string,
   workspaceGeneratorsPath: string,
   workspaceGeneratorType: 'generators' | 'schematics',
-  options: GetGeneratorsOptions
+  options: NxGeneratorsRequestOptions
 ): Promise<CollectionInfo[]> {
   const collectionDir = join(basedir, workspaceGeneratorsPath);
   const collectionName = `workspace-${
