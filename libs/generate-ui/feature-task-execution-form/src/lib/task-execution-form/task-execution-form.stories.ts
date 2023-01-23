@@ -5,7 +5,7 @@ import {
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
-import { GenerateUiFeatureTaskExecutionFormModule } from './generate-ui-feature-task-execution-form.module';
+import { GenerateUiFeatureTaskExecutionFormModule } from '../generate-ui-feature-task-execution-form.module';
 
 const cssColorNames = [
   'AliceBlue',

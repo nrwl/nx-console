@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  inject,
   NgZone,
   OnInit,
   ViewChild,
@@ -35,7 +36,7 @@ import {
   filter,
   withLatestFrom,
 } from 'rxjs/operators';
-import { getConfigurationFlag, formatTask } from './format-task/format-task';
+import { getConfigurationFlag, formatTask } from '../format-task/format-task';
 
 import {
   TaskExecutionSchema,
@@ -48,17 +49,10 @@ import {
   TaskExecutionRunCommandOutputMessage,
   TaskExecutionFormInitOutputMessage,
 } from '@nx-console/shared/schema';
+import { IdeCommunicationService } from '../ide-communication/ide-communication.service';
 
-function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
+function hasKey<T extends object>(obj: T, key: PropertyKey): key is keyof T {
   return key in obj;
-}
-
-declare global {
-  interface Window {
-    vscode: {
-      postMessage: (message: TaskExecutionOutputMessage) => void;
-    };
-  }
 }
 
 interface TaskExecutionForm {
@@ -81,19 +75,19 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     return navigator.userAgent.indexOf('Mac') > -1;
   }
 
-  private enableTaskExecutionDryRunOnChange = true;
-
   private readonly activeFieldIdSubject = new BehaviorSubject<string>('');
   readonly activeFieldName$ = this.activeFieldIdSubject.pipe(
     distinctUntilChanged(),
     map((field) => field.replace('-nx-console-field', ''))
   );
 
-  private readonly architectSubject = new ReplaySubject<TaskExecutionSchema>();
-  private readonly enableTaskExecutionDryRunOnChangeSubject =
-    new BehaviorSubject(true);
+  private readonly enableTaskExecutionDryRunOnChange$ = inject(
+    IdeCommunicationService
+  ).enableTaskExecutionDryRunOnChange$;
 
-  readonly architect$ = this.architectSubject.asObservable();
+  readonly architect$: Observable<TaskExecutionSchema> = inject(
+    IdeCommunicationService
+  ).taskExecutionSchema$;
 
   readonly taskExecForm$: Observable<TaskExecutionForm> = this.architect$.pipe(
     map((architect) => ({ form: this.buildForm(architect), architect })),
@@ -105,7 +99,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       if (taskExecForm.architect.command === 'generate') {
         this.dryRunSubscription = combineLatest([
           taskExecForm.form.valueChanges,
-          this.enableTaskExecutionDryRunOnChangeSubject,
+          this.enableTaskExecutionDryRunOnChange$,
         ])
           .pipe(
             debounceTime(500),
@@ -123,7 +117,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
 
   readonly showDryRunBtn$: Observable<boolean> = combineLatest([
     this.taskExecForm$,
-    this.enableTaskExecutionDryRunOnChangeSubject,
+    this.enableTaskExecutionDryRunOnChange$,
   ]).pipe(
     map(([schema, enableTaskExecutionDryRunOnChange]) => {
       return (
@@ -222,15 +216,15 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     private readonly fb: UntypedFormBuilder,
     private readonly ngZone: NgZone,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly clipboard: Clipboard
+    private readonly clipboard: Clipboard,
+    private readonly ideCommunicationService: IdeCommunicationService
   ) {}
 
   ngOnInit() {
-    this.setupEventListener();
-    if (window.vscode) {
-      // "window.vscode" will be undefined in tests and storybook
-      window.vscode.postMessage(new TaskExecutionFormInitOutputMessage());
-    }
+    this.ideCommunicationService.postMessage(
+      new TaskExecutionFormInitOutputMessage()
+    );
+    this.architect$.subscribe(() => this.scrollToTop());
   }
 
   ngAfterViewChecked() {
@@ -362,7 +356,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   }
 
   private scrollToTop() {
-    this.scrollContainer.nativeElement.scrollTo({
+    this.scrollContainer?.nativeElement.scrollTo({
       top: 0,
     });
   }
@@ -413,7 +407,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       flags.push('--dry-run');
     }
 
-    window.vscode.postMessage(
+    this.ideCommunicationService.postMessage(
       new TaskExecutionRunCommandOutputMessage({
         command: surroundWithQuotesIfHasWhiteSpace(architect.command),
         positional: surroundWithQuotesIfHasWhiteSpace(architect.positional),
@@ -529,53 +523,6 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         architect,
         configuration
       ).join(' ')}`
-    );
-  }
-
-  private setupEventListener(): void {
-    // TODO(cammisuli): Allow the UI to support array properties
-    const optionFilter = (option: Option) =>
-      !(
-        option.type === OptionType.Array &&
-        option.items &&
-        (option.items as string[]).length === 0
-      );
-
-    window.addEventListener(
-      'message',
-      (event: MessageEvent<TaskExecutionInputMessage>) => {
-        const data = event.data;
-
-        switch (data.type) {
-          case TaskExecutionInputMessageType.SetTaskExecutionSchema: {
-            const schema = data.payload;
-            this.ngZone.run(() => {
-              this.architectSubject.next({
-                ...schema,
-                // remove array options that have no items
-                // TODO: add support for these types of items in the form
-                options: schema.options.filter(optionFilter),
-              });
-
-              setTimeout(() => {
-                this.scrollToTop();
-                this.changeDetectorRef.detectChanges();
-              }, 0);
-            });
-            break;
-          }
-
-          case TaskExecutionInputMessageType.SetGlobalConfiguration: {
-            this.ngZone.run(() => {
-              this.enableTaskExecutionDryRunOnChangeSubject.next(
-                data.payload.enableTaskExecutionDryRunOnChange
-              );
-              this.changeDetectorRef.detectChanges();
-            });
-            break;
-          }
-        }
-      }
     );
   }
 }
