@@ -198,9 +198,6 @@ export function getIframeHtml(webView: Webview, context: ExtensionContext) {
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <script>
-      window.vscode = acquireVsCodeApi();
-    </script>
     <link href="${webView.asWebviewUri(stylePath)}" rel="stylesheet"/>
   </head>
   <body>

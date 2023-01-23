@@ -8,8 +8,9 @@ import {
 } from '@nx-console/shared/schema';
 import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
 import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
-import { FormatTaskPipe } from './format-task/format-task.pipe';
+import { FormatTaskPipe } from '../format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
+import { IdeCommunicationService } from '../ide-communication/ide-communication.service';
 
 const initialSchema: TaskExecutionSchema = {
   name: 'long-form-x-prompt-without-enum',
@@ -64,10 +65,24 @@ describe('TaskExecutionFormComponent', () => {
         GenerateUiComponentsModule,
         ArgumentListModule,
       ],
+      providers: [IdeCommunicationService],
     }).compileComponents();
   }));
 
   beforeEach(() => {
+    window.acquireVsCodeApi = () => {
+      return {
+        postMessage: (message: unknown) => {
+          console.log(message);
+        },
+        getState: () => {
+          return undefined;
+        },
+        setState: (_: any) => {
+          return _;
+        },
+      };
+    };
     fixture = TestBed.createComponent(TaskExecutionFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
