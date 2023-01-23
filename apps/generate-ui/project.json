@@ -16,13 +16,20 @@
         "customWebpackConfig": {
           "path": "apps/generate-ui/webpack.dev.js"
         },
-        "outputPath": "dist/apps/vscode/assets/public",
+        "outputPath": "dist/apps/generate-ui",
         "index": "apps/generate-ui/src/index.html",
         "main": "apps/generate-ui/src/main.ts",
         "tsConfig": "apps/generate-ui/tsconfig.app.json",
         "styles": ["apps/generate-ui/src/styles.scss"],
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/generate-ui/styles/src/lib"]
+          "includePaths": ["libs/generate-ui/styles/src/lib/vscode"]
+        }
+      },
+      "configurations": {
+        "intellij": {
+          "stylePreprocessorOptions": {
+            "includePaths": ["libs/generate-ui/styles/src/lib/intellij"]
+          }
         }
       }
     },
@@ -33,7 +40,7 @@
         "customWebpackConfig": {
           "path": "apps/generate-ui/webpack.dev.js"
         },
-        "outputPath": "dist/apps/vscode/assets/public",
+        "outputPath": "dist/apps/generate-ui",
         "index": "apps/generate-ui/src/index.html",
         "main": "apps/generate-ui/src/main.ts",
         "tsConfig": "apps/generate-ui/tsconfig.app.json",
@@ -42,7 +49,7 @@
         "extractLicenses": true,
         "vendorChunk": false,
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/generate-ui/styles/src/lib"]
+          "includePaths": ["libs/generate-ui/styles/src/lib/vscode"]
         },
         "allowedCommonJsDependencies": ["zone.js"],
         "deleteOutputPath": false
@@ -50,6 +57,12 @@
       "configurations": {
         "ci": {
           "optimization": false
+        },
+        "ci-intellij": {
+          "optimization": false,
+          "stylePreprocessorOptions": {
+            "includePaths": ["libs/generate-ui/styles/src/lib/intellij"]
+          }
         },
         "production": {
           "sourceMap": false,
@@ -62,6 +75,21 @@
               "with": "apps/generate-ui/src/environments/environment.prod.ts"
             }
           ]
+        },
+        "production-intellij": {
+          "sourceMap": false,
+          "aot": true,
+          "optimization": true,
+          "buildOptimizer": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/generate-ui/src/environments/environment.ts",
+              "with": "apps/generate-ui/src/environments/environment.prod.ts"
+            }
+          ],
+          "stylePreprocessorOptions": {
+            "includePaths": ["libs/generate-ui/styles/src/lib/intellij"]
+          }
         }
       },
       "outputs": ["{options.outputPath}"]

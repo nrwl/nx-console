@@ -13,7 +13,7 @@
       "name": "Launch Extension",
       "outFiles": [
         "${workspaceFolder}/dist/apps/vscode",
-        "${workspaceFolder}/dist/apps/vscode/assets/public",
+        "${workspaceFolder}/dist/apps/generate-ui",
         "${workspaceFolder}/node_modules"
       ],
       "request": "launch",

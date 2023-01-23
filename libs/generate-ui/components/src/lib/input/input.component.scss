@@ -7,19 +7,19 @@
 }
 
 input {
-  background-color: var(--vscode-input-background, #eee);
-  border-color: var(--vscode-input-foreground);
+  background-color: var(--text-input-background-color);
+  border-color: var(--text-input-border-color);
   border-style: solid;
-  border-width: variables.$input-border-width;
-  color: var(--vscode-input-foreground);
+  border-width: var(--input-border-width);
+  color: var(--text-input-text-color);
   box-sizing: border-box;
   font: inherit;
   padding: 0.3rem 0.5rem;
   padding-bottom: 0.35rem;
-  width: variables.$input-width;
+  width: var(--input-width);
 }
 
 input.ng-invalid.ng-dirty,
 input.ng-invalid.ng-touched {
-  border-color: variables.$error-border-color;
+  border-color: var(--error-border-color);
 }

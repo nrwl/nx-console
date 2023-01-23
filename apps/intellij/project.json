@@ -3,11 +3,27 @@
   "name": "intellij",
   "projectType": "application",
   "targets": {
+    "runIde": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./gradlew :apps:intellij:runIde"
+      },
+      "configurations": {
+        "production-intellij": {}
+      },
+      "defaultConfiguration": "production-intellij",
+      "dependsOn": ["^build"]
+    },
     "x-build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:buildPlugin"
-      }
+      },
+      "configurations": {
+        "production-intellij": {}
+      },
+      "defaultConfiguration": "production-intellij",
+      "dependsOn": ["^build"]
     },
     "x-test": {
       "executor": "nx:run-commands",
@@ -24,5 +40,6 @@
   },
   "tags": [
     "type:intellij"
-  ]
+  ],
+  "implicitDependencies": ["generate-ui"]
 }

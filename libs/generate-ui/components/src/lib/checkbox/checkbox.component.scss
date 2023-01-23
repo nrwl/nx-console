@@ -17,12 +17,11 @@ nx-console-checkbox {
   $checkbox-size: 1rem;
 
   .checkbox {
-    background-color: var(--vscode-settings-checkboxBackground, #eee);
+    background-color: var(--checkbox-background-color);
     background-size: $checkbox-size !important;
-    border: solid variables.$input-border-width
-      var(--vscode-settings-checkboxBorder, #000);
-    border-radius: variables.$input-border-radius-size;
-    color: var(--vscode-settings-checkboxForeground);
+    border: solid var(--input-border-width) var(--checkbox-border-color);
+    border-radius: var(--input-border-radius-size);
+    color: var(--checkbox-text-color);
     height: $checkbox-size;
     width: $checkbox-size;
     min-height: $checkbox-size;

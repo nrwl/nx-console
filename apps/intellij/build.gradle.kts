@@ -3,28 +3,28 @@ import org.jetbrains.changelog.markdownToHTML
 
 val nxlsRoot = "${rootDir}/dist/apps/nxls"
 
-buildDir = file("../../dist/apps/intellij")
+buildDir = file("${rootDir}/dist/apps/intellij")
 
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-    // Java support
-    id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.8.0"
-    // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
-    // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.12.0"
+  // Java support
+  id("java")
+  // Kotlin support
+  id("org.jetbrains.kotlin.jvm") version "1.8.0"
+  // Kotlin serialization
+  id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
+  // Gradle IntelliJ Plugin
+  id("org.jetbrains.intellij") version "1.12.0"
 
-    // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "2.0.0"
-    // Gradle Qodana Plugin
-    id("org.jetbrains.qodana") version "0.1.13"
-    // Gradle Kover Plugin
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+  // Gradle Changelog Plugin
+  id("org.jetbrains.changelog") version "2.0.0"
+  // Gradle Qodana Plugin
+  id("org.jetbrains.qodana") version "0.1.13"
+  // Gradle Kover Plugin
+  id("org.jetbrains.kotlinx.kover") version "0.6.1"
 
-    id("com.ncorti.ktfmt.gradle") version "0.11.0"
+  id("com.ncorti.ktfmt.gradle") version "0.11.0"
 }
 
 group = properties("pluginGroup")
@@ -49,9 +49,9 @@ kotlin { jvmToolchain(17) }
 // Configure Gradle IntelliJ Plugin - read more:
 // https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    type.set(properties("platformType"))
+  pluginName.set(properties("pluginName"))
+  version.set(properties("platformVersion"))
+  type.set(properties("platformType"))
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     plugins.set(
@@ -62,16 +62,16 @@ intellij {
 // Configure Gradle Changelog Plugin - read more:
 // https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
-    groups.set(emptyList())
-    repositoryUrl.set(properties("pluginRepositoryUrl"))
+  groups.set(emptyList())
+  repositoryUrl.set(properties("pluginRepositoryUrl"))
 }
 
 // Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
 qodana {
-    cachePath.set(file(".qodana").canonicalPath)
-    reportPath.set(file("dist/reports/inspections").canonicalPath)
-    saveReport.set(true)
-    showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
+  cachePath.set(file(".qodana").canonicalPath)
+  reportPath.set(file("dist/reports/inspections").canonicalPath)
+  saveReport.set(true)
+  showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
 }
 
 // Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
@@ -85,15 +85,15 @@ tasks {
     prepareSandbox {
         dependsOn("buildNxls")
         from("${rootDir}/node_modules/node-gyp-build") {
-            into("${rootProject.name}/nxls/node_modules/node-gyp-build")
+          into("${rootProject.name}/nxls/node_modules/node-gyp-build")
         }
-        from("${rootDir}/node_modules/@parcel/watcher") {
-            into("${rootProject.name}/nxls/node_modules/@parcel/watcher")
-        }
-        from(nxlsRoot) {
-            include("**/*.js")
-            into("${rootProject.name}/nxls")
-        }
+      from("${rootDir}/node_modules/@parcel/watcher") {
+        into("${rootProject.name}/nxls/node_modules/@parcel/watcher")
+      }
+      from(nxlsRoot) {
+        include("**/*.js")
+        into("${rootProject.name}/nxls")
+      }
     }
 
     patchPluginXml {
@@ -135,20 +135,20 @@ tasks {
         )
     }
 
-    // Configure UI tests plugin
-    // Read more: https://github.com/JetBrains/intellij-ui-test-robot
-    runIdeForUiTests {
-        systemProperty("robot-server.port", "8082")
-        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
-        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
-        systemProperty("jb.consents.confirmation.enabled", "false")
-    }
+  // Configure UI tests plugin
+  // Read more: https://github.com/JetBrains/intellij-ui-test-robot
+  runIdeForUiTests {
+    systemProperty("robot-server.port", "8082")
+    systemProperty("ide.mac.message.dialogs.as.sheets", "false")
+    systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+    systemProperty("jb.consents.confirmation.enabled", "false")
+  }
 
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
+  signPlugin {
+    certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
+    privateKey.set(System.getenv("PRIVATE_KEY"))
+    password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+  }
 
     publishPlugin {
         dependsOn("patchChangelog")
@@ -164,6 +164,17 @@ tasks {
             )
         )
     }
+
+  jar {
+  dependsOn("copyGenerateUiArtifacts")
+  }
 }
 
 tasks.register<Exec>("buildNxls") { commandLine = listOf("bash", "-c", "npx nx run nxls:build") }
+tasks.register<Exec>("buildGenerateUi") { commandLine = listOf("bash", "-c", "npx nx run generate-ui:build:production-intellij") }
+tasks.register<Copy>("copyGenerateUiArtifacts") {
+  dependsOn("buildGenerateUi")
+  from("${rootDir}/dist/apps/generate-ui")
+  include("*.js", "*.css")
+  into("${buildDir}/resources/main/generate_ui")
+}
