@@ -356,7 +356,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   }
 
   private scrollToTop() {
-    this.scrollContainer.nativeElement.scrollTo({
+    this.scrollContainer?.nativeElement.scrollTo({
       top: 0,
     });
   }

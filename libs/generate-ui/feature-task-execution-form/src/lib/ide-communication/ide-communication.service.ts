@@ -6,7 +6,7 @@ import {
   TaskExecutionInputMessageType,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 import type { WebviewApi } from 'vscode-webview';
 
 @Injectable({
@@ -15,12 +15,12 @@ import type { WebviewApi } from 'vscode-webview';
 export class IdeCommunicationService {
   private postToIde: (message: unknown) => void;
 
-  private taskExecutionSchemaSubject: Subject<TaskExecutionSchema> =
-    new Subject();
+  private taskExecutionSchemaSubject: ReplaySubject<TaskExecutionSchema> =
+    new ReplaySubject();
   taskExecutionSchema$ = this.taskExecutionSchemaSubject.asObservable();
 
-  private enableTaskExecutionDryRunOnChangeSubject: Subject<boolean> =
-    new Subject();
+  private enableTaskExecutionDryRunOnChangeSubject: BehaviorSubject<boolean> =
+    new BehaviorSubject(true);
   enableTaskExecutionDryRunOnChange$ =
     this.enableTaskExecutionDryRunOnChangeSubject.asObservable();
 
@@ -57,6 +57,9 @@ export class IdeCommunicationService {
       'message',
       (event: MessageEvent<TaskExecutionInputMessage>) => {
         const data = event.data;
+        if (!data) {
+          return;
+        }
 
         switch (data.type) {
           case TaskExecutionInputMessageType.SetTaskExecutionSchema: {
