@@ -14,12 +14,10 @@ import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.services.TextDocumentService
 
 private val documentManagers = HashMap<String, DocumentManager>()
-fun getDocumentManager(editor: Editor): DocumentManager {
-    return documentManagers.getOrPut(getFilePath(editor.document) ?: "") {
-        DocumentManager(editor)
-    }
-}
 
+fun getDocumentManager(editor: Editor): DocumentManager {
+    return documentManagers.getOrPut(getFilePath(editor.document) ?: "") { DocumentManager(editor) }
+}
 
 private val log = logger<DocumentManager>()
 
@@ -29,19 +27,22 @@ class DocumentManager(val editor: Editor) {
     val document = editor.document
     val documentPath = getFilePath(document)
     val identifier = TextDocumentIdentifier(getFilePath(document))
-    val documentListener = object : DocumentListener {
-        override fun documentChanged(event: DocumentEvent) {
-            handleDocumentChanged(event, textDocumentService)
+    val documentListener =
+        object : DocumentListener {
+            override fun documentChanged(event: DocumentEvent) {
+                handleDocumentChanged(event, textDocumentService)
+            }
         }
-    }
-
 
     private var textDocumentService: TextDocumentService? = null
 
     fun handleDocumentChanged(event: DocumentEvent, textDocumentService: TextDocumentService?) {
 
         val changesParams =
-            DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(), listOf(TextDocumentContentChangeEvent()))
+            DidChangeTextDocumentParams(
+                VersionedTextDocumentIdentifier(),
+                listOf(TextDocumentContentChangeEvent())
+            )
         changesParams.textDocument.uri = identifier.uri
         changesParams.textDocument.version = ++version
 
@@ -54,17 +55,19 @@ class DocumentManager(val editor: Editor) {
         val startColumn = lspPosition.character
         val oldText = event.oldFragment
 
-        //if text was deleted/replaced, calculate the end position of inserted/deleted text
+        // if text was deleted/replaced, calculate the end position of inserted/deleted text
         val endLine: Int
         val endColumn: Int
         if (oldText.length > 0) {
             endLine = startLine + StringUtil.countNewLines(oldText)
             val content = oldText.toString()
-            val oldLines = content.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val oldLines =
+                content.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val oldTextLength = if (oldLines.size == 0) 0 else oldLines[oldLines.size - 1].length
             endColumn =
-                if (content.endsWith("\n")) 0 else if (oldLines.size == 1) startColumn + oldTextLength else oldTextLength
-        } else { //if insert or no text change, the end position is the same
+                if (content.endsWith("\n")) 0
+                else if (oldLines.size == 1) startColumn + oldTextLength else oldTextLength
+        } else { // if insert or no text change, the end position is the same
             endLine = startLine
             endColumn = startColumn
         }
@@ -74,24 +77,18 @@ class DocumentManager(val editor: Editor) {
         changeEvent.text = newText.toString()
 
         textDocumentService?.didChange(changesParams)
-
     }
-
 
     fun completions(pos: Position): Iterable<LookupElement> {
         val lookupItems = arrayListOf<LookupElement>()
         val service = textDocumentService ?: return lookupItems
         val request = service.completion(CompletionParams(identifier, pos))
 
-
         try {
             val res = request.get()
             for (item in res.right.items) {
-                createLookupItem(this, item)?.let {
-                    lookupItems.add(it)
-                }
+                createLookupItem(this, item)?.let { lookupItems.add(it) }
             }
-
         } catch (e: Exception) {
             log.info(e)
         }
@@ -108,13 +105,11 @@ class DocumentManager(val editor: Editor) {
         addDocumentListener()
     }
 
-
     fun documentClosed() {
         removeDocumentListener()
         textDocumentService?.didClose(DidCloseTextDocumentParams(identifier))
         documentManagers.remove(getFilePath(document))
     }
-
 
     private fun addDocumentListener() {
         try {
@@ -136,8 +131,3 @@ class DocumentManager(val editor: Editor) {
 fun getFilePath(document: Document): String? {
     return FileDocumentManager.getInstance().getFile(document)?.url
 }
-
-
-
-
-
