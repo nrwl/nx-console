@@ -1,3 +1,11 @@
+# [1.6.0](https://github.com/nrwl/nx-console/compare/nxls-v1.5.0...nxls-v1.6.0) (2023-01-24)
+
+
+### Features
+
+* add NxGeneratorOptions request to nxls ([#1486](https://github.com/nrwl/nx-console/issues/1486)) ([92cc757](https://github.com/nrwl/nx-console/commit/92cc757e41a043608fa375f45dd531b676a5b33e))
+* hide deprecated generators and executors ([#1489](https://github.com/nrwl/nx-console/issues/1489)) ([e26347b](https://github.com/nrwl/nx-console/commit/e26347b871ffb0e3a21bc405721f2889594d5771))
+
 # [1.5.0](https://github.com/nrwl/nx-console/compare/nxls-v1.4.0...nxls-v1.5.0) (2023-01-18)
 
 
