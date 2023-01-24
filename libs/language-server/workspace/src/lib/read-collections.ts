@@ -275,7 +275,13 @@ function readCollectionGenerator(
  */
 function canUse(
   name: string,
-  s: { hidden: boolean; private: boolean; schema: string; extends: boolean },
+  s: {
+    hidden: boolean;
+    private: boolean;
+    schema: string;
+    extends: boolean;
+    'x-deprecated'?: string;
+  },
   includeHiddenCollections = false,
   includeNgAddCollection = false
 ): boolean {
@@ -283,6 +289,7 @@ function canUse(
     (!s.hidden || includeHiddenCollections) &&
     !s.private &&
     !s.extends &&
+    !s['x-deprecated'] &&
     (name !== 'ng-add' || includeNgAddCollection)
   );
 }
