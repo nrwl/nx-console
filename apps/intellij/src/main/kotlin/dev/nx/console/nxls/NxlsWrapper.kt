@@ -12,6 +12,8 @@ import kotlinx.coroutines.future.await
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
+import org.eclipse.lsp4j.jsonrpc.messages.RequestMessage
+import org.eclipse.lsp4j.jsonrpc.messages.ResponseMessage
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -62,7 +64,21 @@ class NxlsWrapper(val project: Project) {
                 executorService
             ) { consume ->
                 MessageConsumer { message ->
-//          log.info("$message")
+                    val response = message as? ResponseMessage;
+                    response?.let {
+                        it.error?.let {
+                            log.trace("Error from nxls: ${it.message}")
+                        }
+                        it.result?.let {
+                            log.trace("Result from nxls: ${it}")
+                        }
+                    }
+
+                    val request = message as? RequestMessage
+                    request?.let {
+                        log.trace("Sending request to nxls: ${it.method} (${it.params})")
+                    }
+
                     consume.consume(message)
                 }
             }
