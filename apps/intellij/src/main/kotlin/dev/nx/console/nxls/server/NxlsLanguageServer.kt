@@ -9,8 +9,4 @@ interface NxlsLanguageServer : LanguageServer {
     fun getNxService(): NxService {
         throw UnsupportedOperationException()
     }
-
 }
-
-
-

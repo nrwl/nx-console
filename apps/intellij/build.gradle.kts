@@ -22,6 +22,8 @@ plugins {
     id("org.jetbrains.qodana") version "0.1.13"
     // Gradle Kover Plugin
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
+
+    id("com.ncorti.ktfmt.gradle") version "0.11.0"
 }
 
 group = properties("pluginGroup")
@@ -38,6 +40,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
 
+}
+
+ktfmt {
+    kotlinLangStyle()
 }
 
 // Set the JVM language level used to build project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

@@ -15,28 +15,34 @@ private val log = logger<NxCompletionContributor>()
 
 class NxCompletionContributor : CompletionContributor() {
     init {
-        extend(CompletionType.BASIC, jsonProperty(), object : CompletionProvider<CompletionParameters?>() {
-            override fun addCompletions(
-                parameters: CompletionParameters,
-                context: ProcessingContext,
-                result: CompletionResultSet
-            ) {
-                log.info("Getting completions")
-                val offset = DocumentUtils.offsetToLSPPos(parameters.editor, parameters.offset) ?: run {
-                    log.info("Cannot get LSP positions")
-                    return
+        extend(
+            CompletionType.BASIC,
+            jsonProperty(),
+            object : CompletionProvider<CompletionParameters?>() {
+                override fun addCompletions(
+                    parameters: CompletionParameters,
+                    context: ProcessingContext,
+                    result: CompletionResultSet
+                ) {
+                    log.info("Getting completions")
+                    val offset =
+                        DocumentUtils.offsetToLSPPos(parameters.editor, parameters.offset)
+                            ?: run {
+                                log.info("Cannot get LSP positions")
+                                return
+                            }
+
+                    ApplicationUtil.runWithCheckCanceled(
+                        {
+                            getDocumentManager(parameters.editor).apply {
+                                completions(offset).let { result.addAllElements(it) }
+                            }
+                        },
+                        ProgressIndicatorProvider.getGlobalProgressIndicator()
+                    )
                 }
-
-                ApplicationUtil.runWithCheckCanceled({
-                    getDocumentManager(parameters.editor).apply {
-                        completions(offset).let {
-                            result.addAllElements(it)
-                        }
-                    }
-                }, ProgressIndicatorProvider.getGlobalProgressIndicator())
-
             }
-        })
+        )
     }
 
     private fun jsonProperty(): PsiElementPattern.Capture<PsiElement> {

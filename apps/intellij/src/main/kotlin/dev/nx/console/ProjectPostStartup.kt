@@ -7,13 +7,14 @@ import com.intellij.openapi.startup.ProjectPostStartupActivity
 import dev.nx.console.services.NxlsService
 
 private val logger = logger<ProjectPostStartup>()
+
 class ProjectPostStartup : ProjectPostStartupActivity {
-  override suspend fun execute(project: Project) {
-    val service = project.service<NxlsService>()
+    override suspend fun execute(project: Project) {
+        val service = project.service<NxlsService>()
 
-    service.start()
+        service.start()
 
-    val workspace = service.workspace()
-    logger.info(workspace.toString())
-  }
+        val workspace = service.workspace()
+        logger.info(workspace.toString())
+    }
 }
