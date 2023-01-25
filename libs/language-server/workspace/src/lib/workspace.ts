@@ -90,7 +90,6 @@ async function _workspace(
       validWorkspaceJson: true,
       workspaceType: isAngularWorkspace ? 'ng' : 'nx',
       workspace: toWorkspaceFormat(config.workspaceConfiguration),
-      configurationFilePath: config.configPath,
       daemonEnabled: config.daemonEnabled,
       isLerna,
       workspaceLayout: {
@@ -117,7 +116,6 @@ async function _workspace(
         projects: {},
         version: 2,
       },
-      configurationFilePath: '',
       workspacePath,
       isLerna: false,
       workspaceLayout: {

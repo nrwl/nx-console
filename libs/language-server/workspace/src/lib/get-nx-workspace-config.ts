@@ -32,7 +32,6 @@ export async function getNxWorkspaceConfig(
   logger: Logger
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
-  configPath: string;
   daemonEnabled?: boolean;
 }> {
   const start = performance.now();
@@ -51,7 +50,6 @@ export async function getNxWorkspaceConfig(
       getNxWorkspacePackageFileUtils(workspacePath, logger),
       getNxProjectGraph(workspacePath, logger),
     ]);
-    const configFile = nxWorkspacePackage.workspaceFileName();
 
     let workspaceConfiguration: NxWorkspaceConfiguration;
     try {
@@ -100,9 +98,9 @@ export async function getNxWorkspaceConfig(
 
     return {
       workspaceConfiguration,
-      configPath: join(workspacePath, configFile),
     };
   } catch (e) {
+    lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
     return readWorkspaceConfigs(format, workspacePath);
   }
 }
