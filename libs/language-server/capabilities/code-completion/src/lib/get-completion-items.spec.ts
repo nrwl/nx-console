@@ -18,7 +18,6 @@ jest.mock(
   (): Partial<typeof workspace> => ({
     nxWorkspace: jest.fn(() =>
       Promise.resolve<NxWorkspace>({
-        configurationFilePath: '/workspace.json',
         isLerna: false,
         validWorkspaceJson: true,
         workspaceType: 'nx',
