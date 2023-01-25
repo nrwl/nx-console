@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Message {
-  val payload: Any;
+    val payload: Any
 }
 
 @Serializable
@@ -15,13 +15,10 @@ data class GeneratorPayload(val generator: NxGenerator, val options: List<NxGene
 
 @Serializable
 @SerialName("generator")
-data class GeneratorMessage(override val payload: GeneratorPayload): Message {
-}
+data class GeneratorMessage(override val payload: GeneratorPayload) : Message {}
 
-@Serializable
-data class StylePayload(val backgroundColor: String)
+@Serializable data class StylePayload(val backgroundColor: String)
 
 @Serializable
 @SerialName("style")
-data class StyleMessage(override val payload: StylePayload): Message {
-}
+data class StyleMessage(override val payload: StylePayload) : Message {}

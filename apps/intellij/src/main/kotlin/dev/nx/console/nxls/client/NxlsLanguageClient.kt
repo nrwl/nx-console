@@ -1,13 +1,13 @@
 package dev.nx.console.nxls.client
 
 import com.intellij.openapi.diagnostic.logger
+import java.util.concurrent.CompletableFuture
 import org.eclipse.lsp4j.MessageActionItem
 import org.eclipse.lsp4j.MessageParams
 import org.eclipse.lsp4j.PublishDiagnosticsParams
 import org.eclipse.lsp4j.ShowMessageRequestParams
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.services.LanguageClient
-import java.util.concurrent.CompletableFuture
 
 private val log = logger<NxlsLanguageClient>()
 
@@ -24,7 +24,9 @@ class NxlsLanguageClient : LanguageClient {
         TODO("Not yet implemented")
     }
 
-    override fun showMessageRequest(requestParams: ShowMessageRequestParams?): CompletableFuture<MessageActionItem> {
+    override fun showMessageRequest(
+        requestParams: ShowMessageRequestParams?
+    ): CompletableFuture<MessageActionItem> {
         TODO("Not yet implemented")
     }
 

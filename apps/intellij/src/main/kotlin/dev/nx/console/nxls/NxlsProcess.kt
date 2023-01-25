@@ -7,21 +7,20 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
-
 private val logger = logger<NxlsProcess>()
 
 class NxlsProcess(private val workingDir: String) {
     // todo(cammisuli): Make sure this is platform agnostic
-    val processBuilder: ProcessBuilder = ProcessBuilder("/bin/bash", "-c", "nxls --stdio").apply {
-        val processEnv = environment()
-        val env = EnvironmentUtil.getEnvironmentMap()
-        processEnv["PATH"] = env["PATH"]
-        logger.info("PROCESS ENV: $processEnv")
+    val processBuilder: ProcessBuilder =
+        ProcessBuilder("/bin/bash", "-c", "nxls --stdio").apply {
+            val processEnv = environment()
+            val env = EnvironmentUtil.getEnvironmentMap()
+            processEnv["PATH"] = env["PATH"]
+            logger.info("PROCESS ENV: $processEnv")
 
-
-        directory(File(workingDir))
-        redirectError(ProcessBuilder.Redirect.INHERIT)
-    }
+            directory(File(workingDir))
+            redirectError(ProcessBuilder.Redirect.INHERIT)
+        }
 
     var process: Process? = null
 

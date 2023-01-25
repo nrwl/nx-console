@@ -7,8 +7,7 @@ import dev.nx.console.services.NxlsService
 
 internal class ProjectManagerListener : ProjectManagerListener {
 
-  override fun projectClosed(project: Project) {
-    project.service<NxlsService>().close()
-  }
-
+    override fun projectClosed(project: Project) {
+        project.service<NxlsService>().close()
+    }
 }

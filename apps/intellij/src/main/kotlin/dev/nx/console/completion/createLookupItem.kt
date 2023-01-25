@@ -12,11 +12,11 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.utils.DocumentUtils
 import dev.nx.console.utils.writeAction
+import javax.swing.Icon
 import org.apache.commons.lang3.StringUtils
 import org.eclipse.lsp4j.CompletionItem
 import org.eclipse.lsp4j.CompletionItemKind
 import org.eclipse.lsp4j.TextEdit
-import javax.swing.Icon
 
 interface CreateLookupElements {}
 
@@ -34,16 +34,21 @@ fun createLookupItem(documentManager: DocumentManager, item: CompletionItem): Lo
     val tailText = detail ?: ""
     val lookupString: String = convertPlaceHolders(textEdit.newText)
 
-    var lookupElementBuilder = LookupElementBuilder.create(lookupString).withInsertHandler { context, _ ->
-        applyInitialTextEdit(documentManager, item, context)
-        context.commitDocument()
-    }.withIcon(getCompletionIcon(kind))
+    var lookupElementBuilder =
+        LookupElementBuilder.create(lookupString)
+            .withInsertHandler { context, _ ->
+                applyInitialTextEdit(documentManager, item, context)
+                context.commitDocument()
+            }
+            .withIcon(getCompletionIcon(kind))
 
     if (kind == CompletionItemKind.Keyword) {
         lookupElementBuilder = lookupElementBuilder.withBoldness(true)
     }
 
-    return lookupElementBuilder.withPresentableText(presentableText).withTypeText(tailText, true)
+    return lookupElementBuilder
+        .withPresentableText(presentableText)
+        .withTypeText(tailText, true)
         .withAutoCompletionPolicy(AutoCompletionPolicy.SETTINGS_DEPENDENT)
 }
 
@@ -55,17 +60,19 @@ fun applyInitialTextEdit(
     // remove intellij edit, server is controlling insertion
     writeAction {
         val runnable = Runnable {
-            context.document.deleteString(
-                context.startOffset,
-                context.selectionEndOffset
-            )
+            context.document.deleteString(context.startOffset, context.selectionEndOffset)
         }
         CommandProcessor.getInstance()
-            .executeCommand(context.project, runnable, "Removing Intellij Completion", "LSPPlugin", context.document)
+            .executeCommand(
+                context.project,
+                runnable,
+                "Removing Intellij Completion",
+                "LSPPlugin",
+                context.document
+            )
     }
     context.commitDocument()
     applyEdit(documentManager, item.textEdit.left)
-
 }
 
 private fun convertPlaceHolders(insertText: String): String {
@@ -93,10 +100,7 @@ private fun applyEdit(
     return runnable != null
 }
 
-private fun getEditsRunnable(
-    documentManager: DocumentManager,
-    textEdit: TextEdit
-): Runnable? {
+private fun getEditsRunnable(documentManager: DocumentManager, textEdit: TextEdit): Runnable? {
     if (documentManager.editor.isDisposed) {
         log.warn("Text edits couldn't be applied as the editor is already disposed.")
         return null
@@ -133,9 +137,7 @@ private fun getEditsRunnable(
 
         FileDocumentManager.getInstance().saveDocument(editor.document)
     }
-
 }
-
 
 private fun getCompletionIcon(kind: CompletionItemKind?): Icon? {
     return when (kind) {
