@@ -78,8 +78,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
 
     return [
       ...(await commandList()).map(
-        (command) =>
-          new RunTargetTreeItem(workspacePath, command, this.extensionPath)
+        (command) => new RunTargetTreeItem(command, this.extensionPath)
       ),
       CHANGE_WORKSPACE,
     ];

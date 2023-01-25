@@ -17,7 +17,6 @@ export interface NxWorkspace {
   validWorkspaceJson: boolean;
   workspace: NxWorkspaceConfiguration;
   workspaceType: 'ng' | 'nx';
-  configurationFilePath: string;
   daemonEnabled?: boolean;
   workspacePath: string;
   isLerna: boolean;

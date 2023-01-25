@@ -47,7 +47,6 @@ export class RunTargetTreeItem extends TreeItem {
   label: string;
 
   constructor(
-    readonly configurationFilePath: string,
     readonly route: string,
     readonly extensionPath: string,
     readonly generatorType?: GeneratorType,

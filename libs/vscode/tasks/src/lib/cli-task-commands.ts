@@ -232,13 +232,12 @@ async function selectCliCommandAndShowUi(
     );
     return;
   }
-  const { validWorkspaceJson, configurationFilePath } = await getNxWorkspace();
+  const { validWorkspaceJson } = await getNxWorkspace();
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
   }
   const workspaceTreeItem = new RunTargetTreeItem(
-    configurationFilePath,
     command,
     extensionPath,
     generatorType,
