@@ -1,37 +1,37 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-  <id>dev.nx.console</id>
-  <name>Nx Console</name>
-  <vendor>Nx</vendor>
+    <id>dev.nx.console</id>
+    <name>Nx Console</name>
+    <vendor>Nx</vendor>
 
-  <depends>com.intellij.modules.platform</depends>
-  <depends>JavaScript</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>JavaScript</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
-    <projectService serviceImplementation="dev.nx.console.services.MyProjectService"/>
-    <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
-    <completion.contributor language="JSON"
-                            implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
-    <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
+        <projectService serviceImplementation="dev.nx.console.services.MyProjectService"/>
+        <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
+        <completion.contributor language="JSON"
+                                implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
+        <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
-    <!-- Generate UI -->
-    <fileEditorProvider implementation="dev.nx.console.generate_ui.editor.NxGenerateUiFileEditorProvider"/>
-  </extensions>
+        <!-- Generate UI -->
+        <fileEditorProvider implementation="dev.nx.console.generate_ui.editor.NxGenerateUiFileEditorProvider"/>
+    </extensions>
 
-  <applicationListeners>
-    <listener class="dev.nx.console.listeners.ProjectManagerListener"
-              topic="com.intellij.openapi.project.ProjectManagerListener"/>
-  </applicationListeners>
+    <applicationListeners>
+        <listener class="dev.nx.console.listeners.ProjectManagerListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </applicationListeners>
 
-  <!--  <extensions defaultExtensionNs="JavaScript.JsonSchema">-->
-  <!--    <ProviderFactory implementation="" />-->
-  <!--  </extensions>-->
+    <!--  <extensions defaultExtensionNs="JavaScript.JsonSchema">-->
+    <!--    <ProviderFactory implementation="" />-->
+    <!--  </extensions>-->
 
-  <actions>
+    <actions>
 
-    <!-- Generate UI -->
-    <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
-            text="Nx Generate (UI)" description="Open the nx generate UI "/>
-  </actions>
+        <!-- Generate UI -->
+        <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
+                text="Nx Generate (UI)" description="Open the nx generate UI "/>
+    </actions>
 </idea-plugin>

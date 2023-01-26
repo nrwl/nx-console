@@ -139,6 +139,7 @@
       "dependsOn": ["build", "^build"],
       "options": {
         "commands": [
+          "node ./tools/scripts/copy-nxls-to-vscode.js",
           "node ./tools/scripts/vscode-yarn.js",
           "node ./tools/scripts/vscode-vsce.js"
         ],
