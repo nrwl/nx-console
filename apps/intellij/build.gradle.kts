@@ -1,6 +1,7 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 
+val nxlsRoot = "${rootDir}/dist/apps/nxls"
 
 buildDir = file("../../dist/apps/intellij")
 
@@ -27,42 +28,39 @@ plugins {
 }
 
 group = properties("pluginGroup")
+
 version = properties("pluginVersion")
 
 // Configure project's dependencies
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-
-
 }
 
-ktfmt {
-    kotlinLangStyle()
-}
+ktfmt { kotlinLangStyle() }
 
-// Set the JVM language level used to build project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
-kotlin {
-    jvmToolchain(11)
+// Set the JVM language level used to build project. Use Java 11 for 2020.3+, and Java 17 for
+// 2022.2+.
+kotlin { jvmToolchain(17) }
 
-}
-
-// Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
+// Configure Gradle IntelliJ Plugin - read more:
+// https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     pluginName.set(properties("pluginName"))
     version.set(properties("platformVersion"))
     type.set(properties("platformType"))
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+    plugins.set(
+        properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty)
+    )
 }
 
-// Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
+// Configure Gradle Changelog Plugin - read more:
+// https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     groups.set(emptyList())
     repositoryUrl.set(properties("pluginRepositoryUrl"))
@@ -77,47 +75,64 @@ qodana {
 }
 
 // Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
-kover.xmlReport {
-    onCheck.set(true)
-}
-
+kover.xmlReport { onCheck.set(true) }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+    kotlinOptions { jvmTarget = "17" }
 }
 
 tasks {
-
+    prepareSandbox {
+        dependsOn("buildNxls")
+        from("${rootDir}/node_modules/node-gyp-build") {
+            into("${rootProject.name}/nxls/node_modules/node-gyp-build")
+        }
+        from("${rootDir}/node_modules/@parcel/watcher") {
+            into("${rootProject.name}/nxls/node_modules/@parcel/watcher")
+        }
+        from(nxlsRoot) {
+            include("**/*.js")
+            into("${rootProject.name}/nxls")
+        }
+    }
 
     patchPluginXml {
         version.set(properties("pluginVersion"))
-//        sinceBuild.set(properties("pluginSinceBuild"))
+        //        sinceBuild.set(properties("pluginSinceBuild"))
         untilBuild.set("")
 
-        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+        // Extract the <!-- Plugin description --> section from README.md and provide for the
+        // plugin's manifest
         pluginDescription.set(
-            file("README.md").readText().lines().run {
-                val start = "<!-- Plugin description -->"
-                val end = "<!-- Plugin description end -->"
+            file("README.md")
+                .readText()
+                .lines()
+                .run {
+                    val start = "<!-- Plugin description -->"
+                    val end = "<!-- Plugin description end -->"
 
-                if (!containsAll(listOf(start, end))) {
-                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                    if (!containsAll(listOf(start, end))) {
+                        throw GradleException(
+                            "Plugin description section not found in README.md:\n$start ... $end"
+                        )
+                    }
+                    subList(indexOf(start) + 1, indexOf(end))
                 }
-                subList(indexOf(start) + 1, indexOf(end))
-            }.joinToString("\n").let { markdownToHTML(it) }
+                .joinToString("\n")
+                .let { markdownToHTML(it) }
         )
 
         // Get the latest available change notes from the changelog file
-        changeNotes.set(provider {
-            with(changelog) {
-                renderItem(
-                    getOrNull(properties("pluginVersion")) ?: getLatest(),
-                    Changelog.OutputType.HTML,
-                )
+        changeNotes.set(
+            provider {
+                with(changelog) {
+                    renderItem(
+                        getOrNull(properties("pluginVersion")) ?: getLatest(),
+                        Changelog.OutputType.HTML,
+                    )
+                }
             }
-        })
+        )
     }
 
     // Configure UI tests plugin
@@ -138,9 +153,17 @@ tasks {
     publishPlugin {
         dependsOn("patchChangelog")
         token.set(System.getenv("PUBLISH_TOKEN"))
-        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
-        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
+        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release
+        // labels, like 2.1.7-alpha.3
+        // Specify pre-release label to publish the plugin in a custom Release Channel
+        // automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+        channels.set(
+            listOf(
+                properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()
+            )
+        )
     }
 }
+
+tasks.register<Exec>("buildNxls") { commandLine = listOf("bash", "-c", "npx nx run nxls:build") }
