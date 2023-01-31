@@ -4,8 +4,9 @@
     <name>Nx Console</name>
     <vendor>Nx</vendor>
 
-    <depends>com.intellij.modules.platform</depends>
-    <depends>JavaScript</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>org.jetbrains.plugins.terminal</depends>
+  <depends>JavaScript</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>

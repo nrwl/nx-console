@@ -1,3 +1,4 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import {
   AfterViewChecked,
   ChangeDetectionStrategy,
@@ -9,7 +10,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Clipboard } from '@angular/cdk/clipboard';
 import {
   UntypedFormBuilder,
   UntypedFormControl,
@@ -22,32 +22,28 @@ import {
   combineLatest,
   merge,
   Observable,
-  ReplaySubject,
   Subscription,
 } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
+  filter,
   map,
+  mergeMap,
   shareReplay,
   startWith,
   tap,
-  mergeMap,
-  filter,
   withLatestFrom,
 } from 'rxjs/operators';
-import { getConfigurationFlag, formatTask } from '../format-task/format-task';
+import { formatTask, getConfigurationFlag } from '../format-task/format-task';
 
 import {
-  TaskExecutionSchema,
   ItemsWithEnum,
-  OptionType,
   Option,
-  TaskExecutionInputMessage,
-  TaskExecutionInputMessageType,
-  TaskExecutionOutputMessage,
-  TaskExecutionRunCommandOutputMessage,
+  OptionType,
   TaskExecutionFormInitOutputMessage,
+  TaskExecutionRunCommandOutputMessage,
+  TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import { IdeCommunicationService } from '../ide-communication/ide-communication.service';
 
@@ -66,10 +62,22 @@ interface TaskExecutionForm {
   styleUrls: ['./task-execution-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
-  @ViewChild('scrollContainer') scrollContainer: ElementRef<HTMLElement>;
-  @ViewChild('formHeaderContainer')
-  formHeaderContainer: ElementRef<HTMLElement>;
+export class TaskExecutionFormComponent implements OnInit {
+  private _scrollContainer: ElementRef<HTMLElement>;
+  @ViewChild('scrollContainer') set scrollContainer(
+    sc: ElementRef<HTMLElement>
+  ) {
+    this._scrollContainer = sc;
+    this.setupActiveFieldTracking();
+  }
+
+  private _formHeaderContainer: ElementRef<HTMLElement>;
+  @ViewChild('formHeaderContainer') set formHeaderContainer(
+    fhc: ElementRef<HTMLElement>
+  ) {
+    this._formHeaderContainer = fhc;
+    this.setupActiveFieldTracking();
+  }
 
   get isMacOs(): boolean {
     return navigator.userAgent.indexOf('Mac') > -1;
@@ -112,7 +120,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
           });
       }
     }),
-    shareReplay({ refCount: true, bufferSize: 1 })
+    shareReplay({ refCount: true, bufferSize: 1 }),
+    tap(() => {
+      setTimeout(() => this.changeDetectorRef.detectChanges(), 0);
+    })
   );
 
   readonly showDryRunBtn$: Observable<boolean> = combineLatest([
@@ -203,7 +214,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         architect,
         form.get('configuration')?.value
       )
-    )
+    ),
+    tap(() => setTimeout(() => this.changeDetectorRef.detectChanges(), 0))
   );
 
   validFields$ = this.getValidFields$(true);
@@ -221,47 +233,11 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {}
 
   ngOnInit() {
-    this.ideCommunicationService.postMessage(
+    this.ideCommunicationService.postMessageToIde(
       new TaskExecutionFormInitOutputMessage()
     );
-    this.architect$.subscribe(() => this.scrollToTop());
-  }
-
-  ngAfterViewChecked() {
-    if (!this.scrollContainer || this.scrollContainer.nativeElement.onscroll) {
-      return;
-    }
-    this.ngZone.runOutsideAngular(() => {
-      const scrollElement = this.scrollContainer.nativeElement;
-      const formHeaderElement = this.formHeaderContainer.nativeElement;
-      let scrolled = false;
-      scrollElement.onscroll = () => {
-        if (scrollElement.scrollTop === 0) {
-          formHeaderElement.classList.remove('scrolled');
-          scrolled = false;
-        } else {
-          if (!scrolled) {
-            formHeaderElement.classList.add('scrolled');
-            scrolled = true;
-          }
-        }
-
-        const fields = Array.from(
-          scrollElement.querySelectorAll<HTMLElement>('nx-console-field')
-        );
-        const top =
-          Number(scrollElement.scrollTop) +
-          Number(scrollElement.offsetTop) -
-          24;
-        const activeField =
-          fields.find((e: HTMLElement) => e.offsetTop > top) || fields[0];
-
-        if (this.activeFieldIdSubject.value !== activeField.id) {
-          this.ngZone.run(() => {
-            this.activeFieldIdSubject.next(activeField.id);
-          });
-        }
-      };
+    this.architect$.subscribe(() => {
+      this.scrollToTop();
     });
   }
 
@@ -356,8 +332,45 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   }
 
   private scrollToTop() {
-    this.scrollContainer?.nativeElement.scrollTo({
+    this._scrollContainer?.nativeElement.scrollTo({
       top: 0,
+    });
+  }
+
+  private setupActiveFieldTracking() {
+    if (!this._scrollContainer || !this._formHeaderContainer) {
+      return;
+    }
+    this.ngZone.runOutsideAngular(() => {
+      const scrollElement = this._scrollContainer.nativeElement;
+      const formHeaderElement = this._formHeaderContainer.nativeElement;
+      let scrolled = false;
+      scrollElement.onscroll = () => {
+        if (scrollElement.scrollTop === 0) {
+          formHeaderElement.classList.remove('scrolled');
+          scrolled = false;
+        } else {
+          if (!scrolled) {
+            formHeaderElement.classList.add('scrolled');
+            scrolled = true;
+          }
+        }
+
+        const fields = Array.from(
+          scrollElement.querySelectorAll<HTMLElement>('nx-console-field')
+        );
+        const top =
+          Number(scrollElement.scrollTop) +
+          Number(scrollElement.offsetTop) -
+          24;
+        const activeField =
+          fields.find((e: HTMLElement) => e.offsetTop > top) || fields[0];
+        if (this.activeFieldIdSubject.value !== activeField.id) {
+          this.ngZone.run(() => {
+            this.activeFieldIdSubject.next(activeField.id);
+          });
+        }
+      };
     });
   }
 
@@ -407,7 +420,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       flags.push('--dry-run');
     }
 
-    this.ideCommunicationService.postMessage(
+    this.ideCommunicationService.postMessageToIde(
       new TaskExecutionRunCommandOutputMessage({
         command: surroundWithQuotesIfHasWhiteSpace(architect.command),
         positional: surroundWithQuotesIfHasWhiteSpace(architect.positional),

@@ -1,43 +1,25 @@
+<!DOCTYPE html>
 <html>
-<link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono">
-<style>
+<head>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono">
+  <link rel="stylesheet" href="styles.css">
+  <style>
     body {
-        font-family: 'JetBrains Mono';
-        color: black;
+      font-family: 'JetBrains Mono';
+      background: var(--background-color);
+      color: var(--secondary-text-color);
     }
-</style>
+  </style>
+</head>
 
-<body id="body">
-  <h1 id="title">
-    Title
-  </h1>
-  <p id="generator"> generator </p>
+<body>
+  <script src="api.js"></script>
 
-  <button id="button">send message to ide</button>
+  <generate-ui-task-execution-form></generate-ui-task-execution-form>
 
-
-  <script>
-    window.intellijApi = {
-      post(message) {
-        if(message.type === "style") {
-          const styleSheet = new CSSStyleSheet()
-          styleSheet.replaceSync(`
-          body {
-            background-color: ${message.payload.backgroundColor}
-          }
-          `)
-          document.adoptedStyleSheets = [styleSheet]
-          console.log(message)
-        }
-        if(message.type === "generator") {
-          document.getElementById("title").textContent = message.payload.generator.name
-          document.getElementById("generator").textContent = JSON.stringify(message.payload.options)
-        }
-      }
-    }
-    document.getElementById("button").onclick = () => window.intellijApi.postToIde("hey")
-  </script>
+  <!-- Angular app artifacts, will be included in bundled JAR -->
+  <script src="runtime.js" type="module"></script><script src="main.js" type="module"></script>
 
 </body>
 </html>

@@ -18,14 +18,14 @@
   user-select: none;
 
   &:hover {
-    color: variables.$primary-text-color;
+    color: var(--primary-text-color);
   }
 
   &:active,
   &.active {
     opacity: 1;
     font-weight: bold;
-    color: variables.$primary-text-color;
+    color: var(--primary-text-color);
   }
 
   &.indented {
@@ -38,9 +38,9 @@
   }
 
   &.valid {
-    color: variables.$modified-text-color;
+    color: var(--modified-text-color);
   }
   &.error {
-    color: variables.$error-text-color;
+    color: var(--error-text-color);
   }
 }

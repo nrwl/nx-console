@@ -17,7 +17,7 @@
   }
 
   .deprecated-warning {
-    color: variables.$primary-text-color;
+    color: var(--primary-text-color);
   }
 
   .setting-item-value {
@@ -27,6 +27,6 @@
 
   .validation-error {
     margin-top: 0.5rem;
-    color: variables.$error-text-color;
+    color: var(--error-text-color);
   }
 }
