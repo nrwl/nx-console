@@ -22,7 +22,7 @@ class NxGenerateUiFileEditor(
     }
 
     override fun getName(): String {
-        return "Nx Generate"
+        return "Generate"
     }
 
     override fun getPreferredFocusedComponent(): JComponent? {

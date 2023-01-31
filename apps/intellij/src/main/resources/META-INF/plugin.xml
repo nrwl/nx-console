@@ -4,9 +4,9 @@
     <name>Nx Console</name>
     <vendor>Nx</vendor>
 
-  <depends>com.intellij.modules.platform</depends>
-  <depends>org.jetbrains.plugins.terminal</depends>
-  <depends>JavaScript</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>JavaScript</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
@@ -33,6 +33,6 @@
 
         <!-- Generate UI -->
         <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
-                text="Nx Generate (UI)" description="Open the nx generate UI "/>
+                text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action"/>
     </actions>
 </idea-plugin>
