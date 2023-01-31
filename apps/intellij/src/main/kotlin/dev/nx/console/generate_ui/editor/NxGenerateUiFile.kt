@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
+import dev.nx.console.NxIcons
 import dev.nx.console.generate_ui.CustomSchemeHandlerFactory
 import dev.nx.console.generate_ui.run_generator.runGenerator
 import dev.nx.console.generate_ui.utils.getHexColor
@@ -26,8 +27,7 @@ class NxGenerateUiFileType : FileType {
     override fun getDescription(): String = ""
     override fun getDefaultExtension(): String = ".nx"
 
-    // TODO(maxkless): proper icon
-    override fun getIcon(): Icon = icons.TasksIcons.Bug
+    override fun getIcon(): Icon = NxIcons.FileType
     override fun isBinary(): Boolean = true
     override fun isReadOnly(): Boolean = true
     override fun getCharset(file: VirtualFile, content: ByteArray): String? = null
