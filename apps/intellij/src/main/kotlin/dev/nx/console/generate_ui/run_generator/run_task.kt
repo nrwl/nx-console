@@ -26,7 +26,7 @@ fun runGenerator(generator: String, flags: List<String>, project: Project): Unit
         )
     val pkgManagerExecCommand: String =
         if (npmPkgManager != null && NpmUtil.isYarnAlikePackage(npmPkgManager)) {
-            "yarn exec"
+            "yarn"
         } else if (npmPkgManager != null && NpmUtil.isPnpmPackage(npmPkgManager)) {
             "pnpm exec"
         } else {
