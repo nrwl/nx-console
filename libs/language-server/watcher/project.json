@@ -13,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/language-server/watcher"],
+      "outputs": ["{workspaceRoot}/coverage/libs/language-server/watcher"],
       "options": {
         "jestConfig": "libs/language-server/watcher/jest.config.ts",
         "passWithNoTests": true

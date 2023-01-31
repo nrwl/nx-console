@@ -1,6 +1,6 @@
 {
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "name": "generate-ui-argument-list",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/generate-ui/argument-list/src",
   "prefix": "nx-console",
@@ -16,7 +16,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/generate-ui/argument-list"],
+      "outputs": ["{workspaceRoot}/coverage/libs/generate-ui/argument-list"],
       "options": {
         "jestConfig": "libs/generate-ui/argument-list/jest.config.ts",
         "passWithNoTests": true

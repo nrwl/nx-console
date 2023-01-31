@@ -1,6 +1,6 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "intellij",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
     "runIde": {
@@ -38,8 +38,6 @@
       }
     }
   },
-  "tags": [
-    "type:intellij"
-  ],
+  "tags": ["type:intellij"],
   "implicitDependencies": ["generate-ui"]
 }

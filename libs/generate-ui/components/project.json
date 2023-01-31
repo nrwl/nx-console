@@ -1,6 +1,6 @@
 {
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "name": "generate-ui-components",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/generate-ui/components/src",
   "targets": {
@@ -19,7 +19,7 @@
         "jestConfig": "libs/generate-ui/components/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/generate-ui/components"]
+      "outputs": ["{workspaceRoot}/coverage/libs/generate-ui/components"]
     }
   },
   "tags": ["type:generate-ui"]
