@@ -13,8 +13,8 @@ class NxGeneratorOptionsRequest(val options: NxGeneratorOptionsRequestOptions)
 @Serializable
 data class NxGeneratorOption(
     val name: String,
-    val isRequired: Boolean,
-    val deprecated: Boolean,
-    val description: String,
-    val type: String
+    val isRequired: Boolean?,
+    val deprecated: Boolean?,
+    val description: String?,
+    val type: String?
 )

@@ -15,10 +15,8 @@ window.intellijApi = {
     setTimeout(() => window.intellijApi.postToIde(message), 100)
   },
   registerPostToWebviewCallback(callback) {
-    {
       console.log("registering post to webview callback", callback)
       postToWebviewCallbacks.push(callback)
-    }
   },
   registerPostToIdeCallback(callback) {
     console.log("registering post to ide callback", callback)
