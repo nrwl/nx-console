@@ -16,7 +16,7 @@ import { readAndParseJson } from '@nx-console/shared/file-system';
 import { CliTaskProvider } from './cli-task-provider';
 import { NxTask } from './nx-task';
 import { selectFlags } from './select-flags';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { resolveDependencyVersioning } from './dependency-versioning';
 
 let cliTaskProvider: CliTaskProvider;
 export function registerNxCommands(
@@ -352,15 +352,58 @@ async function promptForList() {
 
 async function promptForMigrate() {
   const telemetry = getTelemetry();
-  telemetry.featureUsed('affected-cli');
-  const task = NxTask.create(
-    {
-      command: 'migrate',
-      flags: [],
-    },
-    cliTaskProvider.getWorkspacePath()
+  telemetry.featureUsed('migrate command');
+
+  const { workspacePath } = await getNxWorkspace();
+
+  const packageJson = await readAndParseJson(
+    join(workspacePath, 'package.json')
   );
-  tasks.executeTask(task);
+
+  if (
+    packageJson.dependencies == undefined ||
+    packageJson.devDependencies == undefined
+  ) {
+    return;
+  }
+
+  const dependencyToMigrate = await new Promise<string | undefined>(
+    (resolve) => {
+      const quickPick = window.createQuickPick();
+      quickPick.title = 'Select dependency';
+      quickPick.items = buildQuickPickItems(packageJson);
+      quickPick.placeholder = 'Select the dependency you want to migrate.';
+
+      quickPick.onDidAccept(() => {
+        resolve(quickPick.selectedItems[0]?.label);
+        quickPick.hide();
+      });
+
+      quickPick.show();
+    }
+  );
+
+  if (dependencyToMigrate === undefined) {
+    return;
+  }
+
+  const depVersioningInfo = await resolveDependencyVersioning(
+    dependencyToMigrate
+  );
+
+  if (depVersioningInfo !== undefined) {
+    const { dep, version } = depVersioningInfo;
+
+    const task = NxTask.create(
+      {
+        command: 'migrate',
+        flags: [`${dep}@${version}`],
+      },
+      cliTaskProvider.getWorkspacePath()
+    );
+
+    tasks.executeTask(task);
+  }
 }
 
 async function validProjectsForTarget(
@@ -379,4 +422,34 @@ async function validProjectsForTarget(
         .map(([project]) => project)
     )
   ).sort();
+}
+
+function buildQuickPickItems({
+  dependencies,
+  devDependencies,
+}: {
+  dependencies: { [key: string]: string };
+  devDependencies: { [key: string]: string };
+}): QuickPickItem[] {
+  const depsQuickPickItems: QuickPickItem[] = [
+    {
+      label: 'dependencies',
+      kind: QuickPickItemKind.Separator,
+    },
+    ...Object.keys(dependencies).map((item) => ({
+      label: item,
+    })),
+  ];
+
+  const devDepsQuickPickItems: QuickPickItem[] = [
+    {
+      label: 'devDependencies',
+      kind: QuickPickItemKind.Separator,
+    },
+    ...Object.keys(devDependencies).map((item) => ({
+      label: item,
+    })),
+  ];
+
+  return [...depsQuickPickItems, ...devDepsQuickPickItems];
 }
