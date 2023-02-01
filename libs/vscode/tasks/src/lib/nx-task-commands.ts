@@ -9,14 +9,16 @@ import {
 import { join } from 'path';
 
 import { Option, OptionType } from '@nx-console/shared/schema';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import {
+  getTelemetry,
+  resolveDependencyVersioning,
+} from '@nx-console/vscode/utils';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { readAndParseJson } from '@nx-console/shared/file-system';
 
 import { CliTaskProvider } from './cli-task-provider';
 import { NxTask } from './nx-task';
 import { selectFlags } from './select-flags';
-import { resolveDependencyVersioning } from './dependency-versioning';
 
 let cliTaskProvider: CliTaskProvider;
 export function registerNxCommands(
