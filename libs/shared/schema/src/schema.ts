@@ -108,7 +108,7 @@ export interface TargetConfiguration {
 export interface Targets {
   name: string;
   project: string;
-  builder: string;
+  builder?: string;
   description: string;
   configurations: TargetConfiguration[];
   options: CliOption[];
