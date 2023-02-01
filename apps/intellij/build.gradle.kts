@@ -166,7 +166,7 @@ tasks {
     }
 
   jar {
-  dependsOn("copyGenerateUiArtifacts")
+    dependsOn("copyGenerateUiArtifacts")
   }
 }
 

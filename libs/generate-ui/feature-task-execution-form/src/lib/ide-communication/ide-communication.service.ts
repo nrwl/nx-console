@@ -90,6 +90,8 @@ export class IdeCommunicationService {
             --text-input-border-color: ${message.payload.secondaryTextColor};
             --checkbox-background-color: ${message.payload.fieldBackground};
             --checkbox-border-color: ${message.payload.secondaryTextColor};
+            --dropdown-input-background-color: ${message.payload.fieldBackground};
+            --dropdown-input-border-color: ${message.payload.secondaryTextColor};
           }
           `);
           document.adoptedStyleSheets = [styleSheet];
