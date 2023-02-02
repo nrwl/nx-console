@@ -16,5 +16,7 @@ data class NxGeneratorOption(
     val isRequired: Boolean?,
     val deprecated: Boolean?,
     val description: String?,
-    val type: String?
+    val type: String?,
+    val enum: List<String>?,
+    val items: List<String>?
 )
