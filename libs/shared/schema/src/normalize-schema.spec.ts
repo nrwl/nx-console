@@ -43,42 +43,27 @@ describe('utils', () => {
       expect(r[0].isRequired).toBeFalsy();
     });
 
-    it('should sort positional arguments by ascending order', async () => {
+    it('should sort arguments', async () => {
       const r = await normalizeSchema(
         {
           properties: {
-            a: { $default: { $source: 'argv', index: 0 } },
-            b: { $default: { $source: 'argv', index: 2 } },
-            c: { $default: { $source: 'argv', index: 1 } },
-          },
-          required: [],
-        },
-        'nx'
-      );
-      expect(r.map((x) => x.name)).toEqual(['a', 'c', 'b']);
-    });
-
-    it('should sort required arguments', async () => {
-      const r = await normalizeSchema(
-        {
-          properties: {
-            a: { $default: { $source: 'argv', index: 1 } },
-            b: {},
-            c: {},
-            d: { $default: { $source: 'argv', index: 0 } },
+            a: { 'x-priority': 'internal' },
+            b: { 'x-priority': 'important' },
+            c: { 'x-deprecated': 'good reason' },
+            d: {},
             e: {},
-          },
-          required: ['c', 'e'],
+          } as Schema['properties'],
+          required: ['e'],
         },
         'nx'
       );
       expect(r.map((x) => x.name)).toMatchInlineSnapshot(`
         Array [
+          "e",
+          "b",
           "d",
           "a",
           "c",
-          "e",
-          "b",
         ]
       `);
     });
