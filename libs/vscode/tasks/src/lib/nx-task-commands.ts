@@ -362,35 +362,22 @@ async function promptForMigrate() {
     join(workspacePath, 'package.json')
   );
 
-  if (
-    packageJson.dependencies == undefined ||
-    packageJson.devDependencies == undefined
-  ) {
-    return;
-  }
-
-  const dependencyToMigrate = await new Promise<string | undefined>(
-    (resolve) => {
-      const quickPick = window.createQuickPick();
-      quickPick.title = 'Select dependency';
-      quickPick.items = buildQuickPickItems(packageJson);
-      quickPick.placeholder = 'Select the dependency you want to migrate.';
-
-      quickPick.onDidAccept(() => {
-        resolve(quickPick.selectedItems[0]?.label);
-        quickPick.hide();
-      });
-
-      quickPick.show();
+  const dependencyToMigrate = await window.showQuickPick(
+    buildQuickPickItems(packageJson),
+    {
+      title: 'Select dependency',
+      placeHolder: 'Select the dependency you want to migrate.',
     }
   );
 
   if (dependencyToMigrate === undefined) {
-    return;
+    return window.showInformationMessage(
+      `Please select the dependency you want to migrate.`
+    );
   }
 
   const depVersioningInfo = await resolveDependencyVersioning(
-    dependencyToMigrate
+    dependencyToMigrate.label
   );
 
   if (depVersioningInfo !== undefined) {
@@ -427,31 +414,37 @@ async function validProjectsForTarget(
 }
 
 function buildQuickPickItems({
-  dependencies,
-  devDependencies,
+  dependencies = {},
+  devDependencies = {},
 }: {
   dependencies: { [key: string]: string };
   devDependencies: { [key: string]: string };
 }): QuickPickItem[] {
-  const depsQuickPickItems: QuickPickItem[] = [
-    {
-      label: 'dependencies',
-      kind: QuickPickItemKind.Separator,
-    },
-    ...Object.keys(dependencies).map((item) => ({
-      label: item,
-    })),
-  ];
+  const depsQuickPickItems: QuickPickItem[] =
+    Object.keys(dependencies).length > 0
+      ? [
+          {
+            label: 'dependencies',
+            kind: QuickPickItemKind.Separator,
+          },
+          ...Object.keys(dependencies).map((item) => ({
+            label: item,
+          })),
+        ]
+      : [];
 
-  const devDepsQuickPickItems: QuickPickItem[] = [
-    {
-      label: 'devDependencies',
-      kind: QuickPickItemKind.Separator,
-    },
-    ...Object.keys(devDependencies).map((item) => ({
-      label: item,
-    })),
-  ];
+  const devDepsQuickPickItems: QuickPickItem[] =
+    Object.keys(devDependencies).length > 0
+      ? [
+          {
+            label: 'devDependencies',
+            kind: QuickPickItemKind.Separator,
+          },
+          ...Object.keys(devDependencies).map((item) => ({
+            label: item,
+          })),
+        ]
+      : [];
 
   return [...depsQuickPickItems, ...devDepsQuickPickItems];
 }
