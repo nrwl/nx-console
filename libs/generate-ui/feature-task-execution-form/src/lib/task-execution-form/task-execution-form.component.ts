@@ -174,31 +174,45 @@ export class TaskExecutionFormComponent implements OnInit {
     distinctUntilChanged()
   );
 
-  readonly filteredFields$: Observable<Set<string>> = combineLatest([
-    this.architect$.pipe(
-      map((architect) => {
-        return architect.options.map((field) => {
-          return {
-            fieldName: field.name,
-            fieldNameLowerCase: field.name.toLowerCase(),
-          };
-        });
-      })
-    ),
+  readonly filteredFields$: Observable<Set<Option>> = combineLatest([
+    this.architect$,
     this.filterValue$,
   ]).pipe(
-    map(([fields, filterValue]) => {
-      const filteredFields = new Set<string>();
+    map(([{ options }, filterValue]) => {
+      const filteredFields = new Set<Option>();
 
-      fields.forEach((field) => {
-        if (field.fieldNameLowerCase.includes(filterValue)) {
-          filteredFields.add(field.fieldName);
+      options.forEach((option) => {
+        if (option.name.toLocaleLowerCase().includes(filterValue)) {
+          filteredFields.add(option);
         }
       });
 
       return filteredFields;
     }),
     shareReplay({ refCount: true, bufferSize: 1 })
+  );
+
+  readonly splitFields$: Observable<{
+    all: Set<string>;
+    important: Set<string>;
+    other: Set<string>;
+  }> = this.filteredFields$.pipe(
+    map((filteredFields) => {
+      const importantFields = new Set<string>();
+      const otherFields = new Set<string>();
+      const allFields = new Set<string>();
+
+      filteredFields.forEach((field) => {
+        if (field.isRequired || field['x-priority'] === 'important') {
+          importantFields.add(field.name);
+          allFields.add(field.name);
+        } else if (field['x-priority'] !== 'internal') {
+          otherFields.add(field.name);
+          allFields.add(field.name);
+        }
+      });
+      return { important: importantFields, other: otherFields, all: allFields };
+    })
   );
 
   runCommandArguments$ = this.taskExecForm$.pipe(
