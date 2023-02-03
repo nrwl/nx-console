@@ -113,7 +113,7 @@ function createMakeNgFasterTask() {
     'nxWorkspacePath',
     ''
   );
-  const displayCommand = 'make-angular-cli-faster';
+  const displayCommand = 'nx init';
   const task = new Task(
     {
       type: 'nx',
