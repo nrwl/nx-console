@@ -371,9 +371,7 @@ async function promptForMigrate() {
   );
 
   if (dependencyToMigrate === undefined) {
-    return window.showInformationMessage(
-      `Please select the dependency you want to migrate.`
-    );
+    return;
   }
 
   const depVersioningInfo = await resolveDependencyVersioning(
