@@ -125,8 +125,15 @@
           "webpackConfig": "apps/vscode/webpack.prod.config.js"
         }
       },
-      "dependsOn": ["^build", "^build-webview-files"],
+      "dependsOn": ["^build", "^build-webview-files", "extract-dependencies"],
       "outputs": ["{options.outputPath}"]
+    },
+    "extract-dependencies": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ./tools/scripts/copy-nxls-to-vscode.js"
+      },
+      "dependsOn": ["^build"]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
@@ -139,7 +146,6 @@
       "dependsOn": ["build", "^build"],
       "options": {
         "commands": [
-          "node ./tools/scripts/copy-nxls-to-vscode.js",
           "node ./tools/scripts/vscode-yarn.js",
           "node ./tools/scripts/vscode-vsce.js"
         ],
