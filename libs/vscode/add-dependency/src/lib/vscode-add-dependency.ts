@@ -13,6 +13,7 @@ import { selectFlags } from '@nx-console/vscode/tasks';
 import {
   getShellExecutionForConfig,
   getTelemetry,
+  resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 import { existsSync } from 'fs';
 import { join } from 'path';
@@ -27,7 +28,6 @@ import {
   TaskScope,
   window,
 } from 'vscode';
-import { resolveDependencyVersioning } from './dependency-versioning';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';

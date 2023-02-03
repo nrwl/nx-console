@@ -1,11 +1,24 @@
-import { Option, OptionType } from '@nx-console/shared/schema';
-import { commands, ExtensionContext, tasks, window } from 'vscode';
+import {
+  commands,
+  ExtensionContext,
+  QuickPickItem,
+  QuickPickItemKind,
+  tasks,
+  window,
+} from 'vscode';
+import { join } from 'path';
 
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { Option, OptionType } from '@nx-console/shared/schema';
+import {
+  getTelemetry,
+  resolveDependencyVersioning,
+} from '@nx-console/vscode/utils';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { readAndParseJson } from '@nx-console/shared/file-system';
+
 import { CliTaskProvider } from './cli-task-provider';
 import { NxTask } from './nx-task';
 import { selectFlags } from './select-flags';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 
 let cliTaskProvider: CliTaskProvider;
 export function registerNxCommands(
@@ -341,15 +354,43 @@ async function promptForList() {
 
 async function promptForMigrate() {
   const telemetry = getTelemetry();
-  telemetry.featureUsed('affected-cli');
-  const task = NxTask.create(
-    {
-      command: 'migrate',
-      flags: [],
-    },
-    cliTaskProvider.getWorkspacePath()
+  telemetry.featureUsed('migrate command');
+
+  const { workspacePath } = await getNxWorkspace();
+
+  const packageJson = await readAndParseJson(
+    join(workspacePath, 'package.json')
   );
-  tasks.executeTask(task);
+
+  const dependencyToMigrate = await window.showQuickPick(
+    buildQuickPickItems(packageJson),
+    {
+      title: 'Select dependency',
+      placeHolder: 'Select the dependency you want to migrate.',
+    }
+  );
+
+  if (dependencyToMigrate === undefined) {
+    return;
+  }
+
+  const depVersioningInfo = await resolveDependencyVersioning(
+    dependencyToMigrate.label
+  );
+
+  if (depVersioningInfo !== undefined) {
+    const { dep, version } = depVersioningInfo;
+
+    const task = NxTask.create(
+      {
+        command: 'migrate',
+        flags: [`${dep}@${version}`],
+      },
+      cliTaskProvider.getWorkspacePath()
+    );
+
+    tasks.executeTask(task);
+  }
 }
 
 async function validProjectsForTarget(
@@ -368,4 +409,40 @@ async function validProjectsForTarget(
         .map(([project]) => project)
     )
   ).sort();
+}
+
+function buildQuickPickItems({
+  dependencies = {},
+  devDependencies = {},
+}: {
+  dependencies: { [key: string]: string };
+  devDependencies: { [key: string]: string };
+}): QuickPickItem[] {
+  const depsQuickPickItems: QuickPickItem[] =
+    Object.keys(dependencies).length > 0
+      ? [
+          {
+            label: 'dependencies',
+            kind: QuickPickItemKind.Separator,
+          },
+          ...Object.keys(dependencies).map((item) => ({
+            label: item,
+          })),
+        ]
+      : [];
+
+  const devDepsQuickPickItems: QuickPickItem[] =
+    Object.keys(devDependencies).length > 0
+      ? [
+          {
+            label: 'devDependencies',
+            kind: QuickPickItemKind.Separator,
+          },
+          ...Object.keys(devDependencies).map((item) => ({
+            label: item,
+          })),
+        ]
+      : [];
+
+  return [...depsQuickPickItems, ...devDepsQuickPickItems];
 }
