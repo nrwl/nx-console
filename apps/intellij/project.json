@@ -7,12 +7,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:runIde"
-      },
-      "configurations": {
-        "production-intellij": {}
-      },
-      "defaultConfiguration": "production-intellij",
-      "dependsOn": ["^build"]
+      }
     },
     "x-build": {
       "executor": "nx:run-commands",

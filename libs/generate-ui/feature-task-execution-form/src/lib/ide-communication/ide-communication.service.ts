@@ -68,6 +68,7 @@ export class IdeCommunicationService {
         if (!data) {
           return;
         }
+        console.log('received message from vscode', data);
 
         this.handleTaskExecutionMessage(data);
       }
