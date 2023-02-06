@@ -23,5 +23,6 @@ data class NxGeneratorOption(
     val items: List<String>?,
     // LSP4J uses GSON for serialization, while we use kotlinx.serialization - this is why we have
     // to do double annotations
-    @SerializedName("x-priority") @SerialName("x-priority") val priority: String?
+    @SerializedName("x-priority") @SerialName("x-priority") val priority: String?,
+    val default: String?
 )

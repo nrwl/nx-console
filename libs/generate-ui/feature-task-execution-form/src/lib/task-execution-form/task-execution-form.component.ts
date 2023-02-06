@@ -380,7 +380,7 @@ export class TaskExecutionFormComponent implements OnInit {
   ) {
     const defaultValues: { [key: string]: string | string[] } = {};
     architect.options.forEach((field) => {
-      if (field.default === undefined) {
+      if (field.default === undefined || field.default === null) {
         defaultValues[field.name] = '';
         return;
       }
