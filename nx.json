@@ -49,5 +49,8 @@
   },
   "defaultProject": "generate-ui",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {}
+  "targetDefaults": {},
+  "namedInputs": {
+    "nodeModules": ["{workspaceRoot}/node_modules/"]
+  }
 }
