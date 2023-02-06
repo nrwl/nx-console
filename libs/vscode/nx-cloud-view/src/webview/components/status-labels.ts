@@ -138,6 +138,17 @@ class StatusLabel extends LitElement {
     .status-0 {
       background: grey;
     }
+    @media screen and (max-width: 250px) {
+      :host {
+        font-size: calc(var(--vscode-font-size) * 0.8);
+      }
+      .flexcontainer {
+        gap: 0.25rem;
+      }
+      .codicon[class*='codicon-'] {
+        font-size: calc(var(--vscode-font-size) * 0.8) !important;
+      }
+    }
   `;
   // git green var(--vscode-gitDecoration-untrackedResourceForeground)
 
