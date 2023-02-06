@@ -55,7 +55,7 @@
     "extract-dependencies": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node libs/vscode/nx-cloud-view/get-files-from-node-modules.mjs"
+        "command": "node ./tools/scripts/copy-cloud-webview-deps.mjs"
       }
     },
     "test": {
