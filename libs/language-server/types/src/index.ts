@@ -49,7 +49,7 @@ export const NxProjectByPathRequest: RequestType<
   { projectPath: string },
   ProjectConfiguration | null,
   unknown
-> = new RequestType('nx/project-by-path');
+> = new RequestType('nx/projectByPath');
 
 export const NxGeneratorContextFromPathRequest: RequestType<
   {
@@ -64,4 +64,4 @@ export const NxGeneratorContextFromPathRequest: RequestType<
     }
   | undefined,
   unknown
-> = new RequestType('nx/generator-context-from-path');
+> = new RequestType('nx/generatorContextFromPath');

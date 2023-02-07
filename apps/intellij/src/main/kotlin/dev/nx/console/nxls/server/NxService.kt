@@ -29,6 +29,13 @@ interface NxService {
         throw UnsupportedOperationException()
     }
 
+    @JsonRequest
+    fun generatorContextFromPath(
+        generatorContextFromPathRequest: NxGetGeneratorContextFromPathRequest
+    ): CompletableFuture<NxGeneratorContext> {
+        throw UnsupportedOperationException()
+    }
+
     @JsonNotification
     fun refreshWorkspace() {
         throw UnsupportedOperationException()

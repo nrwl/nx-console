@@ -45,6 +45,14 @@ class NxlsService(val project: Project) {
         return server()?.getNxService()?.generatorOptions(request)?.await() ?: emptyList()
     }
 
+    suspend fun generatorContextFromPath(
+        generator: NxGenerator,
+        path: String
+    ): NxGeneratorContext? {
+        val request = NxGetGeneratorContextFromPathRequest(generator, path)
+        return server()?.getNxService()?.generatorContextFromPath(request)?.await() ?: null
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }

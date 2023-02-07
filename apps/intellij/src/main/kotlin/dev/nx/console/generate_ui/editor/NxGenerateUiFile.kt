@@ -14,7 +14,6 @@ import dev.nx.console.generate_ui.run_generator.runGenerator
 import dev.nx.console.generate_ui.utils.getHexColor
 import dev.nx.console.generate_ui.utils.onBrowserLoadEnd
 import dev.nx.console.nxls.server.NxGenerator
-import dev.nx.console.nxls.server.NxGeneratorOption
 import javax.swing.Icon
 import javax.swing.JComponent
 import kotlinx.serialization.decodeFromString
@@ -63,7 +62,7 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
         return browser.component
     }
 
-    fun setupGeneratorForm(generator: NxGenerator, options: List<NxGeneratorOption>) {
+    fun setupGeneratorForm(generator: NxGenerator) {
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
@@ -82,12 +81,15 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
             postMessageToBrowser(GlobalConfigurationMessage(GlobalConfigurationPayload(true)))
 
             // we will send this info to the webview once it's initialized
-            this.generatorToDisplay =
-                GeneratorSchemaPayload(
-                    name = generator.name,
-                    description = generator.data.description,
-                    options = options
-                )
+            generator.options?.let {
+                this.generatorToDisplay =
+                    GeneratorSchemaPayload(
+                        name = generator.name,
+                        description = generator.data.description,
+                        options = generator.options,
+                        contextValues = generator.contextValues
+                    )
+            }
         }
     }
 
