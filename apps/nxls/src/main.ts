@@ -8,6 +8,7 @@ import {
   NxGeneratorOptionsRequestOptions,
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
+  NxProjectByPathRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -30,6 +31,7 @@ import {
   getExecutors,
   getGeneratorOptions,
   getGenerators,
+  getProjectByPath,
   nxWorkspace,
 } from '@nx-console/language-server/workspace';
 import {
@@ -271,6 +273,19 @@ connection.onRequest(
       args.options.name,
       args.options.path
     );
+  }
+);
+
+connection.onRequest(
+  NxProjectByPathRequest,
+  async (args: { projectPath: string }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getProjectByPath(args.projectPath, WORKING_PATH);
   }
 );
 

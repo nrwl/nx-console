@@ -1,9 +1,9 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { directoryExists } from '@nx-console/shared/file-system';
 import { isAbsolute, join, relative } from 'path';
-import { getNxWorkspace } from './get-nx-workspace';
+import { nxWorkspace } from './workspace';
 
-export async function findProjectWithPath(
+export async function getProjectByPath(
   selectedPath: string | undefined,
   workspacePath: string
 ): Promise<ProjectConfiguration | null> {
@@ -11,7 +11,7 @@ export async function findProjectWithPath(
     return null;
   }
 
-  const { workspace } = await getNxWorkspace();
+  const { workspace } = await nxWorkspace(workspacePath);
 
   const relativeFilePath = relative(workspacePath, selectedPath);
   const isDirectory = await directoryExists(selectedPath);

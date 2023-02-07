@@ -19,7 +19,7 @@ import {
   selectGenerator,
 } from '@nx-console/vscode/tasks';
 import {
-  findProjectWithPath,
+  getProjectByPath,
   getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
 
@@ -189,7 +189,7 @@ export async function getTaskExecutionSchema(
 async function getConfigValuesFromContextMenuUri(
   generator: TaskExecutionSchema,
   contextMenuUri: Uri | undefined,
-  cliTaskProvider: CliTaskProvider
+  _: CliTaskProvider
 ): Promise<
   | {
       path?: string;
@@ -201,10 +201,7 @@ async function getConfigValuesFromContextMenuUri(
 > {
   if (contextMenuUri) {
     const workspacePath = getWorkspacePath();
-    const project = await findProjectWithPath(
-      contextMenuUri.fsPath,
-      workspacePath
-    );
+    const project = await getProjectByPath(contextMenuUri.fsPath);
     const projectName = (project && project.name) || undefined;
 
     let path = contextMenuUri.fsPath
