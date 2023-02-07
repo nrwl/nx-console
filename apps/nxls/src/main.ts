@@ -4,6 +4,7 @@ import { getCompletionItems } from '@nx-console/language-server/capabilities/cod
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
   NxChangeWorkspace,
+  NxGeneratorContextFromPathRequest,
   NxGeneratorOptionsRequest,
   NxGeneratorOptionsRequestOptions,
   NxGeneratorsRequest,
@@ -29,6 +30,7 @@ import {
 } from '@nx-console/shared/json-schema';
 import {
   getExecutors,
+  getGeneratorContextFromPath,
   getGeneratorOptions,
   getGenerators,
   getProjectByPath,
@@ -53,6 +55,7 @@ import {
 import { URI, Utils } from 'vscode-uri';
 import { formatError } from '@nx-console/shared/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
+import { TaskExecutionSchema } from '@nx-console/shared/schema';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -286,6 +289,19 @@ connection.onRequest(
       );
     }
     return getProjectByPath(args.projectPath, WORKING_PATH);
+  }
+);
+
+connection.onRequest(
+  NxGeneratorContextFromPathRequest,
+  async (args: { generator: TaskExecutionSchema; path: string }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getGeneratorContextFromPath(args.generator, args.path, WORKING_PATH);
   }
 );
 

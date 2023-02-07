@@ -1,17 +1,12 @@
 import {
   GeneratorType,
-  Option,
+  isProjectOption,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import {
-  getOutputChannel,
-  getTelemetry,
-  getWorkspacePath,
-  outputLogger,
-  readTargetDef,
-} from '@nx-console/vscode/utils';
-import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
-import { Uri, window } from 'vscode';
+  getGeneratorContextFromPath,
+  getNxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
 import {
   CliTaskProvider,
   CliTaskQuickPickItem,
@@ -19,9 +14,12 @@ import {
   selectGenerator,
 } from '@nx-console/vscode/tasks';
 import {
-  getProjectByPath,
-  getNxWorkspace,
-} from '@nx-console/vscode/nx-workspace';
+  getOutputChannel,
+  getTelemetry,
+  readTargetDef,
+} from '@nx-console/vscode/utils';
+import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
+import { Uri, window } from 'vscode';
 
 export async function getTaskExecutionSchema(
   cliTaskProvider: CliTaskProvider,
@@ -130,11 +128,7 @@ export async function getTaskExecutionSchema(
         }
 
         const contextValues = contextMenuUri
-          ? await getConfigValuesFromContextMenuUri(
-              generator,
-              contextMenuUri,
-              cliTaskProvider
-            )
+          ? await getGeneratorContextFromPath(generator, contextMenuUri.fsPath)
           : undefined;
 
         return { ...generator, cliName: workspaceType, contextValues };
@@ -183,61 +177,4 @@ export async function getTaskExecutionSchema(
         }
       });
   }
-}
-
-// Get information about where the user clicked if invoked through right click in the explorer context menu
-async function getConfigValuesFromContextMenuUri(
-  generator: TaskExecutionSchema,
-  contextMenuUri: Uri | undefined,
-  _: CliTaskProvider
-): Promise<
-  | {
-      path?: string;
-      directory?: string;
-      project?: string;
-      projectName?: string;
-    }
-  | undefined
-> {
-  if (contextMenuUri) {
-    const workspacePath = getWorkspacePath();
-    const project = await getProjectByPath(contextMenuUri.fsPath);
-    const projectName = (project && project.name) || undefined;
-
-    let path = contextMenuUri.fsPath
-      .replace(workspacePath, '')
-      .replace(/\\/g, '/')
-      .replace(/^\//, '');
-
-    const { workspaceLayout } = await getNxWorkspace();
-    const appsDir = workspaceLayout.appsDir;
-    const libsDir = workspaceLayout.libsDir;
-    if (
-      (appsDir && generator.name === 'application') ||
-      generator.name === 'app'
-    ) {
-      path = path.replace(appsDir, '').replace(/^\//, '');
-    }
-    if ((libsDir && generator.name === 'library') || generator.name === 'lib') {
-      path = path.replace(libsDir, '').replace(/^\//, '');
-    }
-
-    return {
-      project: projectName,
-      projectName,
-      path,
-      ...(!(projectName && generator.options.some(isProjectOption)) && {
-        directory: path,
-      }),
-    };
-  }
-}
-
-function isProjectOption(option: Option) {
-  return (
-    option.name === 'project' ||
-    option.name === 'projectName' ||
-    option.$default?.$source === 'projectName' ||
-    option['x-dropdown'] === 'projects'
-  );
 }
