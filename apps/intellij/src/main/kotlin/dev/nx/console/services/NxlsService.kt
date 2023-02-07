@@ -12,6 +12,10 @@ private val logger = logger<NxlsService>()
 
 class NxlsService(val project: Project) {
 
+    companion object {
+        fun getInstance(project: Project): NxlsService = project.getService(NxlsService::class.java)
+    }
+
     var wrapper: NxlsWrapper = NxlsWrapper(project)
 
     private fun client(): NxlsLanguageClient? {
@@ -51,5 +55,9 @@ class NxlsService(val project: Project) {
 
     fun removeDocument(editor: Editor) {
         wrapper.disconnect(editor)
+    }
+
+    fun isEditorConnected(editor: Editor): Boolean {
+        return wrapper.isEditorConnected(editor)
     }
 }
