@@ -3,6 +3,7 @@ export * from './lib/reveal-workspace-json';
 export * from './lib/workspace-codelens-provider';
 export * from './lib/stop-daemon';
 export * from './lib/get-nx-workspace';
-export * from './lib/find-project-with-path';
+export * from './lib/get-project-by-path';
 export * from './lib/get-generators';
 export * from './lib/get-generator-options';
+export * from './lib/get-generator-context-from-path';

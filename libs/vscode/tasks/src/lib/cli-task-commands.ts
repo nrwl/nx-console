@@ -5,7 +5,7 @@ import { GeneratorType, Option, OptionType } from '@nx-console/shared/schema';
 import { NxProjectsConfiguration } from '@nx-console/shared/types';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
-  findProjectWithPath,
+  getProjectByPath,
   getGenerators,
   getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
@@ -380,7 +380,7 @@ async function selectGeneratorAndPromptForFlags() {
 export async function getCliProjectFromUri(
   uri: Uri
 ): Promise<string | undefined> {
-  const project = await findProjectWithPath(uri.fsPath, getWorkspacePath());
+  const project = await getProjectByPath(uri.fsPath);
   return project?.name;
 }
 

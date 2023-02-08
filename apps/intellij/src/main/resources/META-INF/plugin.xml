@@ -30,9 +30,11 @@
     <!--  </extensions>-->
 
     <actions>
-
         <!-- Generate UI -->
         <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
-                text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action"/>
+                text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
+          <add-to-group group-id="CodeMenu"/>
+          <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
+        </action>
     </actions>
 </idea-plugin>

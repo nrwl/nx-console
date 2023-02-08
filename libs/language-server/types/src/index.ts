@@ -1,6 +1,11 @@
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 import { NxWorkspace } from '@nx-console/shared/types';
-import { CollectionInfo, Option } from '@nx-console/shared/schema';
+import {
+  CollectionInfo,
+  Option,
+  TaskExecutionSchema,
+} from '@nx-console/shared/schema';
+import { ProjectConfiguration } from '@nrwl/devkit';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
   'nx/changeWorkspace'
@@ -39,3 +44,24 @@ export const NxGeneratorOptionsRequest: RequestType<
   Option[],
   unknown
 > = new RequestType('nx/generatorOptions');
+
+export const NxProjectByPathRequest: RequestType<
+  { projectPath: string },
+  ProjectConfiguration | null,
+  unknown
+> = new RequestType('nx/projectByPath');
+
+export const NxGeneratorContextFromPathRequest: RequestType<
+  {
+    generator: TaskExecutionSchema;
+    path: string;
+  },
+  | {
+      path?: string;
+      directory?: string;
+      project?: string;
+      projectName?: string;
+    }
+  | undefined,
+  unknown
+> = new RequestType('nx/generatorContextFromPath');

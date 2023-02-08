@@ -1,4 +1,4 @@
-import { getTelemetry, getWorkspacePath } from '@nx-console/vscode/utils';
+import { getTelemetry } from '@nx-console/vscode/utils';
 import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
@@ -6,7 +6,7 @@ import {
   NxTreeItem,
   ProjectViewItem,
 } from '@nx-console/vscode/nx-project-view';
-import { findProjectWithPath } from '@nx-console/vscode/nx-workspace';
+import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
 
 export function projectGraph() {
   const graphWebView = new GraphWebView();
@@ -81,7 +81,7 @@ async function openProjectWithFile(
     filePath = window.activeTextEditor?.document.fileName;
   }
 
-  const project = await findProjectWithPath(filePath, getWorkspacePath());
+  const project = await getProjectByPath(filePath);
   if (!project) {
     window.showErrorMessage(
       `Error while opening the graph: No project can be found at \n ${filePath}`

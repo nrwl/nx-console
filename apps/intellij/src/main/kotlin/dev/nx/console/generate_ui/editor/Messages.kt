@@ -1,5 +1,6 @@
 package dev.nx.console.generate_ui.editor
 
+import dev.nx.console.nxls.server.NxGeneratorContext
 import dev.nx.console.nxls.server.NxGeneratorOption
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
@@ -23,7 +24,8 @@ data class GlobalConfigurationMessage(override val payload: GlobalConfigurationP
 data class GeneratorSchemaPayload(
     val name: String,
     val description: String,
-    val options: List<NxGeneratorOption>
+    val options: List<NxGeneratorOption>,
+    val contextValues: NxGeneratorContext?
 ) {
     @EncodeDefault() val command: String = "generate"
 

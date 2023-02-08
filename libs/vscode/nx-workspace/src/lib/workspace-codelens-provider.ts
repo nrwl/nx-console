@@ -22,8 +22,7 @@ import {
   ProjectLocations,
 } from './find-workspace-json-target';
 import { getNxWorkspace } from './get-nx-workspace';
-import { join } from 'path';
-import { findProjectWithPath } from './find-project-with-path';
+import { getProjectByPath } from './get-project-by-path';
 
 export class TargetCodeLens extends CodeLens {
   constructor(
@@ -74,12 +73,11 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     const lens: CodeLens[] = [];
 
     let projectName = '';
-    const { workspacePath } = await getNxWorkspace();
 
     const documentPath = document.uri.path;
 
     if (documentPath.endsWith('project.json')) {
-      const project = await findProjectWithPath(documentPath, workspacePath);
+      const project = await getProjectByPath(documentPath);
       if (!project) {
         return;
       } else {
