@@ -10,6 +10,8 @@
       }
     },
     "build": {
+      "inputs": ["kotlin"],
+      "outputs": ["dist/apps/intellij/distributions"],
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:buildPlugin"
@@ -18,27 +20,24 @@
         "production-intellij": {}
       },
       "defaultConfiguration": "production-intellij",
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "test": {
+      "inputs": ["kotlin"],
+      "outputs": ["dist/apps/intellij/reports/tests"],
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:check"
       }
     },
-    "lint": {
+    "x-lint": {
+      "//": "Run inspections take a long time on the CI. Disable for now",
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:runInspections"
       }
     }
   },
-  "tags": [
-    "type:intellij"
-  ],
-  "implicitDependencies": [
-    "generate-ui"
-  ]
+  "tags": ["type:intellij"],
+  "implicitDependencies": ["generate-ui"]
 }

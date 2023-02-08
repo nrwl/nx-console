@@ -14,6 +14,18 @@ runs:
         node-version: ${{ inputs.node_version }}
         check-latest: true
         cache: yarn
+
+    # Validate wrapper
+    - name: Gradle Wrapper Validation
+      uses: gradle/wrapper-validation-action@v1.0.5
+
+    # Setup Java 11 environment for the next steps
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: zulu
+        java-version: 17
+
     - run: yarn install --immutable
       shell: bash
     - name: Derive appropriate SHAs for base and head for `nx affected` commands

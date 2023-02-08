@@ -51,6 +51,13 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {},
   "namedInputs": {
-    "nodeModules": ["{workspaceRoot}/node_modules/"]
+    "nodeModules": ["{workspaceRoot}/node_modules/"],
+    "kotlin": [
+      "{projectRoot}/build.gradle.kts",
+      "{projectRoot}/**/*.kt",
+      "{workspaceRoot}/**/gradle.properties",
+      "{workspaceRoot}/settings.gradle.kts",
+      "{workspaceRoot}/build.gradle.kts"
+    ]
   }
 }
