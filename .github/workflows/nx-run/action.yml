@@ -11,7 +11,7 @@ runs:
       run: |
         yarn exec nx-cloud record -- yarn exec nx workspace-lint
         yarn exec nx-cloud record -- yarn exec nx format:check
-        yarn exec nx-cloud record -- ./gradlew kmtFmtCheck
+        yarn exec nx-cloud record -- ./gradlew ktfmtCheck
       shell: bash
       env:
         NX_CLOUD_DISTRIBUTED_EXECUTION: false
