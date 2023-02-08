@@ -10,8 +10,15 @@ import org.eclipse.lsp4j.Position
 
 private val log = logger<DocumentUtils>()
 
+private val nxFiles = setOf("nx.json", "workspace.json", "project.json")
+
 class DocumentUtils {
     companion object {
+
+        fun isNxFile(fileName: String): Boolean {
+            return fileName in nxFiles
+        }
+
         fun offsetToLSPPos(editor: Editor, offset: Int): Position? {
             return computableReadAction {
                 if (editor.isDisposed) {

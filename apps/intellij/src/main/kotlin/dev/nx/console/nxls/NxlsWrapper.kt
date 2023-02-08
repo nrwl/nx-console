@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
-import dev.nx.console.nxls.managers.getDocumentManager
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
@@ -104,7 +103,7 @@ class NxlsWrapper(val project: Project) {
 
     fun connect(editor: Editor) {
 
-        val documentManager = getDocumentManager(editor)
+        val documentManager = DocumentManager.getInstance(editor)
         if (status == NxlsState.STARTED) {
 
             connectTextService(documentManager)
@@ -129,6 +128,10 @@ class NxlsWrapper(val project: Project) {
         documentManager.documentClosed()
         connectedEditors.remove(editor)
         log.info("Disconnected ${documentManager.documentPath}")
+    }
+
+    fun isEditorConnected(editor: Editor): Boolean {
+        return connectedEditors.contains(editor)
     }
 
     fun getInitParams(): InitializeParams {

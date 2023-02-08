@@ -8,10 +8,9 @@ import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.vfs.VirtualFile
 import dev.nx.console.services.NxlsService
+import dev.nx.console.utils.DocumentUtils
 
 private val log = logger<NxEditorListener>()
-
-private val nxFiles = setOf("nx.json", "workspace.json", "project.json")
 
 class NxEditorListener : EditorFactoryListener {
 
@@ -27,9 +26,9 @@ class NxEditorListener : EditorFactoryListener {
         val file = virtualFile(event.editor.document) ?: return super.editorCreated(event)
         val project = event.editor.project ?: return super.editorCreated(event)
 
-        if (file.name in nxFiles) {
+        if (DocumentUtils.isNxFile(file.name)) {
             log.info("Connecting ${file.path} to lsp")
-            project.service<NxlsService>().addDocument(event.editor)
+            NxlsService.getInstance(project).addDocument(event.editor)
         }
 
         super.editorCreated(event)

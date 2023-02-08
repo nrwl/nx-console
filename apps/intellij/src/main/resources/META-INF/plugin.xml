@@ -10,11 +10,15 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
-        <projectService serviceImplementation="dev.nx.console.services.MyProjectService"/>
         <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
         <completion.contributor language="JSON"
                                 implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
+        <lang.documentationProvider language="JSON"
+                                    implementationClass="dev.nx.console.providers.NxlsDocumentationProvider"/>
+
         <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
+
+        <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
 
         <!-- Generate UI -->
         <fileEditorProvider implementation="dev.nx.console.generate_ui.editor.NxGenerateUiFileEditorProvider"/>
@@ -24,11 +28,6 @@
         <listener class="dev.nx.console.listeners.ProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
-
-    <!--  <extensions defaultExtensionNs="JavaScript.JsonSchema">-->
-    <!--    <ProviderFactory implementation="" />-->
-    <!--  </extensions>-->
-
     <actions>
         <!-- Generate UI -->
         <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
