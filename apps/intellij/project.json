@@ -9,7 +9,7 @@
         "command": "./gradlew :apps:intellij:runIde"
       }
     },
-    "x-build": {
+    "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:buildPlugin"
@@ -18,15 +18,17 @@
         "production-intellij": {}
       },
       "defaultConfiguration": "production-intellij",
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
-    "x-test": {
+    "test": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:test"
       }
     },
-    "x-lint": {
+    "lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:runInspections"
@@ -36,5 +38,7 @@
   "tags": [
     "type:intellij"
   ],
-  "implicitDependencies": ["generate-ui"]
+  "implicitDependencies": [
+    "generate-ui"
+  ]
 }
