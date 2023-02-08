@@ -25,7 +25,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "./gradlew :apps:intellij:test"
+        "command": "./gradlew :apps:intellij:check"
       }
     },
     "lint": {
