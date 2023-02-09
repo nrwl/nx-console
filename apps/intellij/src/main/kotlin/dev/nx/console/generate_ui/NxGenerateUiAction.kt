@@ -1,5 +1,6 @@
 package dev.nx.console.generate_ui
 
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -21,7 +22,12 @@ class NxGenerateUiAction() : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
+        val path =
+            if (ActionPlaces.isPopupPlace(e.place)) {
+                e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
+            } else {
+                null
+            }
 
         runBlocking { launch { selectGenerator(project, path, e) } }
     }
