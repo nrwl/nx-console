@@ -19,7 +19,6 @@
       "configurations": {
         "production-intellij": {}
       },
-      "defaultConfiguration": "production-intellij",
       "dependsOn": ["^build"]
     },
     "test": {
