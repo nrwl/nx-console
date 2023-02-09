@@ -19,7 +19,7 @@ runs:
     - name: Gradle Wrapper Validation
       uses: gradle/wrapper-validation-action@v1.0.5
 
-    # Setup Java 11 environment for the next steps
+    # Setup Java 17 environment for the next steps
     - name: Setup Java
       uses: actions/setup-java@v3
       with:
