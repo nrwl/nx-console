@@ -42,9 +42,10 @@ data class GeneratorSchemaMessage(override val payload: GeneratorSchemaPayload) 
 @Serializable
 data class StylePayload(
     val backgroundColor: String,
-    val primaryTextColor: String,
+    val highlightTextColor: String,
     val secondaryTextColor: String,
-    val fieldBackground: String
+    val fieldBackground: String,
+    val fontFamily: String,
 )
 
 @Serializable

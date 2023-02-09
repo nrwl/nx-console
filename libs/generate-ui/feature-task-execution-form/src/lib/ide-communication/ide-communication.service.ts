@@ -84,7 +84,7 @@ export class IdeCommunicationService {
           const styleSheet = new CSSStyleSheet();
           styleSheet.replaceSync(`
           :root {
-            --primary-text-color: ${message.payload.primaryTextColor};
+            --highlight-text-color: ${message.payload.highlightTextColor};
             --secondary-text-color: ${message.payload.secondaryTextColor};
             --background-color: ${message.payload.backgroundColor};
             --text-input-background-color: ${message.payload.fieldBackground};
@@ -93,6 +93,7 @@ export class IdeCommunicationService {
             --checkbox-border-color: ${message.payload.secondaryTextColor};
             --dropdown-input-background-color: ${message.payload.fieldBackground};
             --dropdown-input-border-color: ${message.payload.secondaryTextColor};
+            --font-family: ${message.payload.fontFamily};
           }
           `);
           document.adoptedStyleSheets = [styleSheet];

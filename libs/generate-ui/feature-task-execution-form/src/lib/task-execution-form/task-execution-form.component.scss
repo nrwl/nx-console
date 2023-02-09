@@ -202,7 +202,7 @@ nx-console-field {
     cursor: pointer;
 
     &.selected {
-      border-bottom: 2px solid var(--primary-text-color);
+      border-bottom: 2px solid var(--highlight-text-color);
     }
   }
 }

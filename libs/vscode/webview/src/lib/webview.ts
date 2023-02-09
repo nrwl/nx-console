@@ -203,6 +203,11 @@ export function getIframeHtml(webView: Webview, context: ExtensionContext) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link href="${webView.asWebviewUri(stylePath)}" rel="stylesheet"/>
+    <style>
+      body {
+        color: var(--secondary-text-color);
+      }
+    </style>
   </head>
   <body>
     <generate-ui-task-execution-form></generate-ui-task-execution-form>

@@ -31,6 +31,7 @@ nx-console-checkbox {
 
     svg {
       display: none;
+      fill: var(--secondary-text-color);
     }
 
     &.checked {
