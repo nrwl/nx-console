@@ -189,16 +189,17 @@ export class TaskExecutionFormComponent implements OnInit {
   ]).pipe(
     map(([fields, filterValue]) => {
       const filteredFields = new Set<string>();
-
       fields.forEach((field) => {
         if (field.fieldNameLowerCase.includes(filterValue)) {
           filteredFields.add(field.fieldName);
         }
       });
-
       return filteredFields;
     }),
-    shareReplay({ refCount: true, bufferSize: 1 })
+    shareReplay({ refCount: true, bufferSize: 1 }),
+    tap(() => {
+      setTimeout(() => this.changeDetectorRef.detectChanges(), 0);
+    })
   );
 
   runCommandArguments$ = this.taskExecForm$.pipe(
