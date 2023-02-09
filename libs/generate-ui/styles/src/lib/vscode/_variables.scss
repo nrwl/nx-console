@@ -33,8 +33,8 @@
   --checkbox-border-color: var(--vscode-settings-checkboxBorder, #000);
   --checkbox-text-color: var(--vscode-settings-checkboxForeground);
 
-  --primary-text-color: var(--vscode-settings-headerForeground);
-  --secondary-text-color: var(--vscode-button-secondaryForeground);
+  --highlight-text-color: var(--vscode-settings-headerForeground);
+  --secondary-text-color: var(--vscode-editor-foreground);
   --modified-text-color: var(
     --vscode-gitDecoration-modifiedResourceForeground,
     #e2c08d

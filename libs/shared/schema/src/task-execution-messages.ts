@@ -56,9 +56,10 @@ export class TaskExecutionSetStylesMessage {
   constructor(
     public readonly payload: {
       backgroundColor: string;
-      primaryTextColor: string;
+      highlightTextColor: string;
       secondaryTextColor: string;
       fieldBackground: string;
+      fontFamily: string;
     }
   ) {}
 }

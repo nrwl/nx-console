@@ -124,9 +124,13 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
 
     private fun extractIntellijStyles(): StylePayload {
         val backgroundColor = getHexColor(UIUtil.getPanelBackground())
-        val primaryTextColor = getHexColor(UIUtil.getActiveTextColor())
+        val highlightTextColor = getHexColor(when(UIUtil.isUnderDarcula()) {
+          true -> UIUtil.getActiveTextColor()
+          false -> UIUtil.getLabelForeground()
+        } )
         val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
         val fieldBackground = getHexColor(UIUtil.getTextFieldBackground())
-        return StylePayload(backgroundColor, primaryTextColor, secondaryTextColor, fieldBackground)
+        val fontFamily = "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
+        return StylePayload(backgroundColor, highlightTextColor, secondaryTextColor, fieldBackground, fontFamily)
     }
 }
