@@ -90,8 +90,7 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
                         contextValues = generator.contextValues
                     )
             }
-          browser.component.requestFocus()
-
+            browser.component.requestFocus()
         }
     }
 
@@ -126,13 +125,23 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
 
     private fun extractIntellijStyles(): StylePayload {
         val backgroundColor = getHexColor(UIUtil.getPanelBackground())
-        val highlightTextColor = getHexColor(when(UIUtil.isUnderDarcula()) {
-          true -> UIUtil.getActiveTextColor()
-          false -> UIUtil.getLabelForeground()
-        } )
+        val highlightTextColor =
+            getHexColor(
+                when (UIUtil.isUnderDarcula()) {
+                    true -> UIUtil.getActiveTextColor()
+                    false -> UIUtil.getLabelForeground()
+                }
+            )
         val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
         val fieldBackground = getHexColor(UIUtil.getTextFieldBackground())
-        val fontFamily = "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
-        return StylePayload(backgroundColor, highlightTextColor, secondaryTextColor, fieldBackground, fontFamily)
+        val fontFamily =
+            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
+        return StylePayload(
+            backgroundColor,
+            highlightTextColor,
+            secondaryTextColor,
+            fieldBackground,
+            fontFamily
+        )
     }
 }
