@@ -25,6 +25,7 @@ runs:
       with:
         distribution: zulu
         java-version: 17
+        cache: gradle
 
     - run: yarn install --immutable
       shell: bash
