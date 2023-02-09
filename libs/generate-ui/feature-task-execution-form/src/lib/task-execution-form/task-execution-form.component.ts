@@ -238,6 +238,7 @@ export class TaskExecutionFormComponent implements OnInit {
     );
     this.architect$.subscribe(() => {
       this.scrollToTop();
+      this.focusFirstElement();
     });
   }
 
@@ -334,6 +335,16 @@ export class TaskExecutionFormComponent implements OnInit {
   private scrollToTop() {
     this._scrollContainer?.nativeElement.scrollTo({
       top: 0,
+    });
+  }
+
+  private focusFirstElement() {
+    retry(2, 50, () => {
+      const element = document
+        .querySelector('nx-console-field')
+        ?.querySelector('input, select, div[role="checkbox"]') as HTMLElement;
+      element?.focus();
+      return !!element;
     });
   }
 
@@ -550,4 +561,13 @@ function surroundWithQuotesIfHasWhiteSpace(target: string): string {
     return `"${target}"`;
   }
   return target;
+}
+
+function retry(remaining: number, waitFor: number, fn: () => boolean) {
+  setTimeout(() => {
+    const success = fn();
+    if (!success && remaining > 0) {
+      retry(remaining - 1, waitFor, fn);
+    }
+  }, waitFor);
 }

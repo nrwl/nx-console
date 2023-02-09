@@ -126,6 +126,7 @@ export function createWebViewPanel(
             break;
           }
           case TaskExecutionOutputMessageType.TaskExecutionFormInit: {
+            commands.executeCommand('workbench.action.focusActiveEditorGroup');
             publishMessagesToTaskExecutionForm(
               webviewPanel as WebviewPanel,
               schema

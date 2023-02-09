@@ -90,6 +90,8 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
                         contextValues = generator.contextValues
                     )
             }
+          browser.component.requestFocus()
+
         }
     }
 
