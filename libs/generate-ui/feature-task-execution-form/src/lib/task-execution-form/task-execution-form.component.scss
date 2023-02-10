@@ -211,3 +211,16 @@ nx-console-field {
   cursor: pointer;
   text-decoration: underline;
 }
+
+hr.divider {
+  border-top: 1.5px solid var(--secondary-text-color);
+}
+
+.accordion {
+  padding-left: 0.5rem;
+  transition: 0.4s;
+  p {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}

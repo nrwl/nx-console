@@ -1,6 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import {
-  AfterViewChecked,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -78,6 +77,8 @@ export class TaskExecutionFormComponent implements OnInit {
     this._formHeaderContainer = fhc;
     this.setupActiveFieldTracking();
   }
+
+  showOtherFields = false;
 
   get isMacOs(): boolean {
     return navigator.userAgent.indexOf('Mac') > -1;
@@ -200,6 +201,25 @@ export class TaskExecutionFormComponent implements OnInit {
     tap(() => {
       setTimeout(() => this.changeDetectorRef.detectChanges(), 0);
     })
+  );
+
+  readonly splitFields$: Observable<{
+    important: Set<string>;
+    other: Set<string>;
+  }> = this.architect$.pipe(
+    map((architect) => {
+      const importantFields = new Set<string>();
+      const otherFields = new Set<string>();
+      architect.options.forEach((field) => {
+        if (field.isRequired || field['x-priority'] === 'important') {
+          importantFields.add(field.name);
+        } else {
+          otherFields.add(field.name);
+        }
+      });
+      return { important: importantFields, other: otherFields };
+    }),
+    startWith({ important: new Set<string>(), other: new Set<string>() })
   );
 
   runCommandArguments$ = this.taskExecForm$.pipe(
@@ -549,6 +569,29 @@ export class TaskExecutionFormComponent implements OnInit {
         configuration
       ).join(' ')}`
     );
+  }
+
+  hasFilteredOtherFields(
+    filteredFields: Set<string>,
+    otherFields: Set<string>
+  ): boolean {
+    return Array.from(filteredFields.values()).some((filtered) =>
+      otherFields.has(filtered)
+    );
+  }
+
+  hasFilteredImportantFields(
+    filteredFields: Set<string>,
+    important: Set<string>
+  ): boolean {
+    return Array.from(filteredFields.values()).some((filtered) =>
+      important.has(filtered)
+    );
+  }
+
+  toggleShowFields() {
+    this.showOtherFields = !this.showOtherFields;
+    this.changeDetectorRef.detectChanges();
   }
 }
 

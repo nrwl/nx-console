@@ -19,6 +19,8 @@ export class FieldTreeComponent implements OnChanges {
   @Input() fields: Option[];
   @Input() activeFieldName: string;
   @Input() filteredFields: Set<string>;
+  @Input() importantFields: Set<string>;
+  @Input() showOtherField = false;
   @Input() validFields: {
     [name: string]: string[] | string | number | boolean;
   };
@@ -78,6 +80,13 @@ export class FieldTreeComponent implements OnChanges {
         inline: 'start',
       });
     }
+  }
+
+  getFieldsToDisplay() {
+    if (this.showOtherField) {
+      return this.fields;
+    }
+    return this.fields.filter((f) => this.importantFields.has(f.name));
   }
 
   isFieldValid(fieldName: string): boolean {
