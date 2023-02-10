@@ -295,7 +295,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular-devkit/core@npm:15.1.5":
+"@angular-devkit/core@npm:15.1.5, @angular-devkit/core@npm:~15.1.0":
   version: 15.1.5
   resolution: "@angular-devkit/core@npm:15.1.5"
   dependencies:
@@ -313,7 +313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular-devkit/schematics@npm:15.1.5":
+"@angular-devkit/schematics@npm:15.1.5, @angular-devkit/schematics@npm:~15.1.0":
   version: 15.1.5
   resolution: "@angular-devkit/schematics@npm:15.1.5"
   dependencies:
@@ -4973,7 +4973,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@schematics/angular@npm:15.1.5":
+"@schematics/angular@npm:15.1.5, @schematics/angular@npm:~15.1.0":
   version: 15.1.5
   resolution: "@schematics/angular@npm:15.1.5"
   dependencies:
@@ -21847,6 +21847,8 @@ __metadata:
   dependencies:
     "@angular-builders/custom-webpack": ^14.0.1
     "@angular-devkit/build-angular": 15.1.5
+    "@angular-devkit/core": ~15.1.0
+    "@angular-devkit/schematics": ~15.1.0
     "@angular-eslint/eslint-plugin": 15.0.0
     "@angular-eslint/eslint-plugin-template": 15.0.0
     "@angular-eslint/template-parser": 15.0.0
@@ -21874,6 +21876,7 @@ __metadata:
     "@nrwl/storybook": 15.7.0-beta.5
     "@nrwl/workspace": 15.7.0-beta.5
     "@parcel/watcher": ^2.0.7
+    "@schematics/angular": ~15.1.0
     "@storybook/addon-essentials": 6.5.16
     "@storybook/addon-knobs": ~6.4.0
     "@storybook/angular": 6.5.16

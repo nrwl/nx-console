@@ -43,6 +43,8 @@
   "devDependencies": {
     "@angular-builders/custom-webpack": "^14.0.1",
     "@angular-devkit/build-angular": "15.1.5",
+    "@angular-devkit/core": "~15.1.0",
+    "@angular-devkit/schematics": "~15.1.0",
     "@angular-eslint/eslint-plugin": "15.0.0",
     "@angular-eslint/eslint-plugin-template": "15.0.0",
     "@angular-eslint/template-parser": "15.0.0",
@@ -67,6 +69,7 @@
     "@nrwl/nx-cloud": "15.0.3",
     "@nrwl/storybook": "15.7.0-beta.5",
     "@nrwl/workspace": "15.7.0-beta.5",
+    "@schematics/angular": "~15.1.0",
     "@storybook/addon-essentials": "6.5.16",
     "@storybook/addon-knobs": "~6.4.0",
     "@storybook/angular": "6.5.16",
