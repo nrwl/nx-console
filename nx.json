@@ -1,11 +1,4 @@
 {
-  "implicitDependencies": {
-    "package.json": {
-      "devDependencies": "*",
-      "dependencies": "*"
-    },
-    ".eslintrc.json": "*"
-  },
   "affected": {
     "defaultBase": "master"
   },
@@ -49,7 +42,23 @@
   },
   "defaultProject": "generate-ui",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {},
+  "targetDefaults": {
+    "build": {
+      "inputs": ["production", "^production"]
+    },
+    "e2e": {
+      "inputs": ["default", "^default"]
+    },
+    "test": {
+      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"]
+    },
+    "lint": {
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
+    },
+    "build-storybook": {
+      "inputs": ["default", "^default", "{workspaceRoot}/.storybook/**/*"]
+    }
+  },
   "namedInputs": {
     "nodeModules": ["{workspaceRoot}/node_modules/"],
     "kotlin": [

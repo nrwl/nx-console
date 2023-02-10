@@ -1,4 +1,5 @@
 {
+  "name": "vscode-typescript-plugin",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/typescript-plugin/src",
   "projectType": "library",
@@ -12,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/typescript-plugin"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/typescript-plugin"],
       "options": {
         "jestConfig": "libs/vscode/typescript-plugin/jest.config.ts",
         "passWithNoTests": true

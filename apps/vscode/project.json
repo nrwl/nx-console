@@ -1,4 +1,5 @@
 {
+  "name": "vscode",
   "sourceRoot": "apps/vscode/src",
   "projectType": "application",
   "prefix": "vscode",
@@ -135,7 +136,7 @@
       },
       "dependsOn": ["^build"],
       "inputs": ["{workspaceRoot}/dist/apps/nxls"],
-      "outputs": ["dist/apps/vscode/nxls"]
+      "outputs": ["{workspaceRoot}/dist/apps/vscode/nxls"]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
@@ -153,7 +154,7 @@
         ],
         "parallel": false
       },
-      "outputs": ["dist/apps/vscode"]
+      "outputs": ["{workspaceRoot}/dist/apps/vscode"]
     }
   },
   "tags": ["type:vscode"]

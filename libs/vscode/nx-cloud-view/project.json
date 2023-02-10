@@ -1,6 +1,6 @@
 {
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "name": "vscode-nx-cloud-view",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/nx-cloud-view/src",
   "projectType": "library",
   "targets": {
@@ -58,11 +58,11 @@
         "command": "node ./tools/scripts/copy-cloud-webview-deps.mjs"
       },
       "inputs": ["nodeModules"],
-      "outputs": ["dist/apps/vscode/nx-cloud-webview"]
+      "outputs": ["{workspaceRoot}/dist/apps/vscode/nx-cloud-webview"]
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/nx-cloud-view"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/nx-cloud-view"],
       "options": {
         "jestConfig": "libs/vscode/nx-cloud-view/jest.config.ts",
         "passWithNoTests": true

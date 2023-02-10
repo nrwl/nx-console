@@ -19,7 +19,9 @@
         "jestConfig": "libs/generate-ui/feature-task-execution-form/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/libs/generate-ui/feature-task-execution-form"]
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/generate-ui/feature-task-execution-form"
+      ]
     },
     "storybook": {
       "executor": "@storybook/angular:start-storybook",
