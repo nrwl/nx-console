@@ -12,17 +12,17 @@
       "options": {
         "commands": [
           {
-            "command": "yarn nx watch vscode",
+            "command": "yarn nx run vscode:watch",
             "prefix": "vscode",
             "color": "blue"
           },
           {
-            "command": "yarn nx watch generate-ui",
+            "command": "yarn nx run generate-ui:watch",
             "prefix": "generate-ui",
             "color": "green"
           },
           {
-            "command": "yarn nx watch nxls",
+            "command": "yarn nx run nxls:watch",
             "prefix": "lsp",
             "color": "magenta"
           },
@@ -36,7 +36,7 @@
       }
     },
     "watch": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "options": {
         "externalDependencies": [
           "vscode",

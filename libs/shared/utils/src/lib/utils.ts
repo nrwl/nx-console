@@ -2,7 +2,7 @@ import type {
   NxJsonConfiguration,
   WorkspaceJsonConfiguration,
 } from '@nrwl/devkit';
-import { toNewFormat } from 'nx/src/config/workspaces';
+import { toNewFormat } from 'nx/src/adapter/angular-json';
 
 export function getPrimitiveValue(value: any): string | undefined {
   if (

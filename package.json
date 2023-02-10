@@ -68,6 +68,7 @@
     "@nrwl/node": "15.8.2",
     "@nrwl/nx-cloud": "15.1.1",
     "@nrwl/storybook": "15.8.2",
+    "@nrwl/webpack": "15.8.2",
     "@nrwl/workspace": "15.8.2",
     "@schematics/angular": "~15.1.0",
     "@storybook/addon-essentials": "6.5.16",

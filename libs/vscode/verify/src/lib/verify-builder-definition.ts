@@ -58,7 +58,7 @@ export async function verifyBuilderDefinition(
   workspaceJson: NxWorkspaceConfiguration
 ): Promise<{
   validBuilder: boolean;
-  builderName: string;
+  builderName: string | undefined;
   configurations: string[];
   options: Array<Option>;
 }> {

@@ -1,4 +1,6 @@
-module.exports = function transformWebpack(config) {
+const { composePlugins, withNx } = require('@nrwl/webpack');
+
+module.exports = composePlugins(withNx(), (config) => {
   // the default node webpack config has minimize: false when optimization is set to true
   config.output.filename = '[name].js';
   config.optimization = {
@@ -11,4 +13,4 @@ module.exports = function transformWebpack(config) {
   };
 
   return config;
-};
+});
