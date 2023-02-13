@@ -10,7 +10,7 @@ import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.NxIcons
 import dev.nx.console.generate_ui.CustomSchemeHandlerFactory
-import dev.nx.console.generate_ui.run_generator.runGenerator
+import dev.nx.console.generate_ui.run_generator.RunGeneratorManager
 import dev.nx.console.generate_ui.utils.getHexColor
 import dev.nx.console.generate_ui.utils.onBrowserLoadEnd
 import dev.nx.console.nxls.server.NxGenerator
@@ -45,19 +45,21 @@ abstract class NxGenerateUiFile(name: String) :
     abstract fun createMainComponent(project: Project): JComponent
 }
 
-class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
+class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name) {
 
     private val browser: JBCefBrowser = JBCefBrowser()
     private var generatorToDisplay: GeneratorSchemaPayload? = null
-    private var project: Project? = null
+    private val runGeneratorManager: RunGeneratorManager
+
+    init {
+        runGeneratorManager = RunGeneratorManager(project)
+    }
     override fun createMainComponent(project: Project): JComponent {
 
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
         registerAppSchemeHandler()
         browser.loadURL("http://nxconsole/index.html")
         Disposer.register(project, browser)
-
-        this.project = project
 
         return browser.component
     }
@@ -105,9 +107,10 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
         }
         if (messageParsed.type == "run-command") {
             if (messageParsed is TaskExecutionRunCommandOutputMessage) {
-                this.project?.let {
-                    runGenerator(messageParsed.payload.positional, messageParsed.payload.flags, it)
-                }
+                runGeneratorManager.queueGeneratorToBeRun(
+                    messageParsed.payload.positional,
+                    messageParsed.payload.flags
+                )
             }
         }
     }

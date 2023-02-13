@@ -89,7 +89,7 @@ class NxGenerateUiAction() : AnAction() {
             }
         }
 
-        val virtualFile = DefaultNxGenerateUiFile("Generate")
+        val virtualFile = DefaultNxGenerateUiFile("Generate", project)
 
         val fileEditorManager = FileEditorManager.getInstance(project)
         if (fileEditorManager.isFileOpen(virtualFile)) {
