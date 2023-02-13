@@ -3,11 +3,9 @@ package dev.nx.console.generate_ui.run_generator
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.filters.TextConsoleBuilderFactory
-import com.intellij.execution.process.ColoredProcessHandler
+import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessEvent
-import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessListener
-import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.javascript.nodejs.interpreter.NodeJsInterpreterManager
@@ -21,7 +19,7 @@ import dev.nx.console.NxIcons
 class RunGeneratorManager(val project: Project) {
 
     private var queuedGeneratorDefinition: List<String>? = null
-    private var runningProcessHandler: ProcessHandler? = null
+    private var runningProcessHandler: KillableColoredProcessHandler? = null
 
     fun queueGeneratorToBeRun(
         generator: String,
@@ -33,6 +31,9 @@ class RunGeneratorManager(val project: Project) {
             if (it == null) {
                 runGenerator(generatorDefinition)
                 return
+            }
+            if (it.commandLine.contains("--dry-run")) {
+                it.killProcess()
             }
             queuedGeneratorDefinition = generatorDefinition
             it.addProcessListener(
@@ -48,28 +49,28 @@ class RunGeneratorManager(val project: Project) {
 
     private fun runGenerator(definition: List<String>): Unit {
         val pkgManagerExecCommand = getPackageManagerExecCommand()
-
         try {
             ApplicationManager.getApplication()
                 .invokeLater(
                     {
-                        val commandLine = GeneralCommandLine()
-                        commandLine.setExePath(pkgManagerExecCommand)
-                        commandLine.addParameters(definition)
-                        commandLine.setWorkDirectory(project.basePath)
+                        val commandLine =
+                            GeneralCommandLine().apply {
+                                setExePath(pkgManagerExecCommand)
+                                addParameters(definition)
+                                setWorkDirectory(project.basePath)
+                                withParentEnvironmentType(
+                                    GeneralCommandLine.ParentEnvironmentType.CONSOLE
+                                )
+                                withEnvironment("FORCE_COLOR", "2")
+                            }
 
-                        val processHandler: ProcessHandler = ColoredProcessHandler(commandLine)
-                        processHandler.startNotify()
+                        val processHandler = KillableColoredProcessHandler(commandLine)
 
                         val consoleBuilder =
                             TextConsoleBuilderFactory.getInstance().createBuilder(project)
                         val console = consoleBuilder.console
-
-                        console.print(
-                            "$pkgManagerExecCommand ${definition.joinToString(" ")}",
-                            ConsoleViewContentType.LOG_INFO_OUTPUT
-                        )
                         console.attachToProcess(processHandler)
+                        processHandler.startNotify()
 
                         val contentDescriptor =
                             RunContentDescriptor(
@@ -95,7 +96,7 @@ class RunGeneratorManager(val project: Project) {
         }
     }
 
-    private fun setProcessHandler(processHandler: ProcessHandler) {
+    private fun setProcessHandler(processHandler: KillableColoredProcessHandler) {
         processHandler.addProcessListener(
             object : ProcessListener {
                 override fun processTerminated(event: ProcessEvent) {
