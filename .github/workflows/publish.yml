@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'vscode-v*.*.*'
 env:
   node_version: 16
 
