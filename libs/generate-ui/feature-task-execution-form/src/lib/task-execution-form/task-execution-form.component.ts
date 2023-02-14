@@ -1,6 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import {
-  AfterViewChecked,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -46,6 +45,13 @@ import {
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import { IdeCommunicationService } from '../ide-communication/ide-communication.service';
+import {
+  trigger,
+  state,
+  transition,
+  animate,
+  style,
+} from '@angular/animations';
 
 function hasKey<T extends object>(obj: T, key: PropertyKey): key is keyof T {
   return key in obj;
@@ -61,6 +67,22 @@ interface TaskExecutionForm {
   templateUrl: './task-execution-form.component.html',
   styleUrls: ['./task-execution-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('contentExpansion', [
+      state(
+        'expanded',
+        style({ height: '*', opacity: 1, visibility: 'visible' })
+      ),
+      state(
+        'collapsed',
+        style({ height: '0px', opacity: 0, visibility: 'hidden' })
+      ),
+      transition(
+        'expanded <=> collapsed',
+        animate('200ms cubic-bezier(.37,1.04,.68,.98)')
+      ),
+    ]),
+  ],
 })
 export class TaskExecutionFormComponent implements OnInit {
   private _scrollContainer: ElementRef<HTMLElement>;
@@ -78,6 +100,8 @@ export class TaskExecutionFormComponent implements OnInit {
     this._formHeaderContainer = fhc;
     this.setupActiveFieldTracking();
   }
+
+  showOtherFields = false;
 
   get isMacOs(): boolean {
     return navigator.userAgent.indexOf('Mac') > -1;
@@ -202,6 +226,25 @@ export class TaskExecutionFormComponent implements OnInit {
     })
   );
 
+  readonly splitFields$: Observable<{
+    important: Set<string>;
+    other: Set<string>;
+  }> = this.architect$.pipe(
+    map((architect) => {
+      const importantFields = new Set<string>();
+      const otherFields = new Set<string>();
+      architect.options.forEach((field) => {
+        if (field.isRequired || field['x-priority'] === 'important') {
+          importantFields.add(field.name);
+        } else {
+          otherFields.add(field.name);
+        }
+      });
+      return { important: importantFields, other: otherFields };
+    }),
+    startWith({ important: new Set<string>(), other: new Set<string>() })
+  );
+
   runCommandArguments$ = this.taskExecForm$.pipe(
     mergeMap((taskExecForm) =>
       taskExecForm.form.valueChanges.pipe(
@@ -224,6 +267,7 @@ export class TaskExecutionFormComponent implements OnInit {
   invalidFields$ = this.getValidFields$(false);
 
   dryRunSubscription?: Subscription;
+  ide: 'vscode' | 'intellij';
 
   constructor(
     private readonly fb: UntypedFormBuilder,
@@ -231,7 +275,9 @@ export class TaskExecutionFormComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly clipboard: Clipboard,
     private readonly ideCommunicationService: IdeCommunicationService
-  ) {}
+  ) {
+    this.ide = this.ideCommunicationService.ide;
+  }
 
   ngOnInit() {
     this.ideCommunicationService.postMessageToIde(
@@ -341,9 +387,10 @@ export class TaskExecutionFormComponent implements OnInit {
 
   private focusFirstElement() {
     retry(2, 50, () => {
-      const element = document
-        .querySelector('nx-console-field')
-        ?.querySelector('input, select, div[role="checkbox"]') as HTMLElement;
+      // const element = document
+      //   .querySelector('nx-console-field')
+      //   ?.querySelector('input, select, div[role="checkbox"]') as HTMLElement;
+      const element = document.querySelector('input') as HTMLElement;
       element?.focus();
       return !!element;
     });
@@ -549,6 +596,43 @@ export class TaskExecutionFormComponent implements OnInit {
         configuration
       ).join(' ')}`
     );
+  }
+
+  hasFilteredOtherFields(
+    filteredFields: Set<string>,
+    otherFields: Set<string>
+  ): boolean {
+    return Array.from(filteredFields.values()).some((filtered) =>
+      otherFields.has(filtered)
+    );
+  }
+
+  hasFilteredImportantFields(
+    filteredFields: Set<string>,
+    important: Set<string>
+  ): boolean {
+    return Array.from(filteredFields.values()).some((filtered) =>
+      important.has(filtered)
+    );
+  }
+
+  toggleShowFields() {
+    this.showOtherFields = !this.showOtherFields;
+    this.changeDetectorRef.detectChanges();
+  }
+
+  getDocsLink(taskExecForm: TaskExecutionForm): string | undefined {
+    if (
+      !taskExecForm.architect.collection ||
+      !taskExecForm.architect.collection.includes('@nrwl')
+    ) {
+      return undefined;
+    }
+    const collectionStripped = taskExecForm.architect.collection.replace(
+      '@nrwl/',
+      ''
+    );
+    return `https://nx.dev/packages/${collectionStripped}/generators/${taskExecForm.architect.name}`;
   }
 }
 

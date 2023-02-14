@@ -6,6 +6,7 @@ import { FormatTaskPipe } from './format-task/format-task.pipe';
 import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
 import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
 import { TaskExecutionFormComponent } from './task-execution-form/task-execution-form.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
@@ -14,6 +15,7 @@ import { TaskExecutionFormComponent } from './task-execution-form/task-execution
     ClipboardModule,
     GenerateUiComponentsModule,
     ArgumentListModule,
+    BrowserAnimationsModule,
   ],
   declarations: [TaskExecutionFormComponent, FormatTaskPipe],
   exports: [TaskExecutionFormComponent],

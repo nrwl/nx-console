@@ -211,3 +211,49 @@ nx-console-field {
   cursor: pointer;
   text-decoration: underline;
 }
+
+hr.divider {
+  border-color: var(--button-secondary-color);
+  background-color: var(--button-secondary-color);
+  border-top: 1px solid;
+  color: var(--button-secondary-color);
+}
+
+.accordion-button {
+  padding-left: 0.5rem;
+  transition: 0.4s;
+  width: var(--input-width);
+
+  .flexcontainer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+.accordion {
+  display: none;
+  .expanded {
+    display: block;
+  }
+}
+
+.options-button {
+  width: 80px;
+  height: 30px;
+  font-size: 11px;
+  background: var(--button-secondary-color);
+  border: var(--input-border-width) solid var(--text-input-border-color);
+  color: var(--button-secondary-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: background ease-in-out 0.1s;
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.details-link {
+  padding-top: 0.5rem;
+}
