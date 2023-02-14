@@ -43,7 +43,9 @@
         "npm": false,
         "plugins": ["gradle-semantic-release-plugin"],
         "gitAssets": ["gradle.properties"],
-        "buildTarget": "intellij:build"
+        "writerOpts": {
+          "headerPartial": "## {{#if isPatch~}} <small>\n  {{~/if~}} {{version}}\n  {{~#if title}} \"{{title}}\"\n  {{~/if~}}\n  {{~#if date}} ({{date}})\n  {{~/if~}}\n  {{~#if isPatch~}} </small>\n  {{~/if}}\n"
+        }
       }
     }
   },
