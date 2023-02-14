@@ -45,6 +45,13 @@ import {
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import { IdeCommunicationService } from '../ide-communication/ide-communication.service';
+import {
+  trigger,
+  state,
+  transition,
+  animate,
+  style,
+} from '@angular/animations';
 
 function hasKey<T extends object>(obj: T, key: PropertyKey): key is keyof T {
   return key in obj;
@@ -60,6 +67,22 @@ interface TaskExecutionForm {
   templateUrl: './task-execution-form.component.html',
   styleUrls: ['./task-execution-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('contentExpansion', [
+      state(
+        'expanded',
+        style({ height: '*', opacity: 1, visibility: 'visible' })
+      ),
+      state(
+        'collapsed',
+        style({ height: '0px', opacity: 0, visibility: 'hidden' })
+      ),
+      transition(
+        'expanded <=> collapsed',
+        animate('200ms cubic-bezier(.37,1.04,.68,.98)')
+      ),
+    ]),
+  ],
 })
 export class TaskExecutionFormComponent implements OnInit {
   private _scrollContainer: ElementRef<HTMLElement>;
@@ -244,6 +267,7 @@ export class TaskExecutionFormComponent implements OnInit {
   invalidFields$ = this.getValidFields$(false);
 
   dryRunSubscription?: Subscription;
+  ide: 'vscode' | 'intellij';
 
   constructor(
     private readonly fb: UntypedFormBuilder,
@@ -251,7 +275,9 @@ export class TaskExecutionFormComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly clipboard: Clipboard,
     private readonly ideCommunicationService: IdeCommunicationService
-  ) {}
+  ) {
+    this.ide = this.ideCommunicationService.ide;
+  }
 
   ngOnInit() {
     this.ideCommunicationService.postMessageToIde(
@@ -361,9 +387,10 @@ export class TaskExecutionFormComponent implements OnInit {
 
   private focusFirstElement() {
     retry(2, 50, () => {
-      const element = document
-        .querySelector('nx-console-field')
-        ?.querySelector('input, select, div[role="checkbox"]') as HTMLElement;
+      // const element = document
+      //   .querySelector('nx-console-field')
+      //   ?.querySelector('input, select, div[role="checkbox"]') as HTMLElement;
+      const element = document.querySelector('input') as HTMLElement;
       element?.focus();
       return !!element;
     });

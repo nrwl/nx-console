@@ -75,36 +75,42 @@
           ></generate-ui-field-tree>
           <form class="fields" [formGroup]="taskExecForm.form">
             <div class="title-container">
-              <span class="title">
-                {{
-                  taskExecForm.architect
-                    | formatTask: taskExecForm.form.get('configuration')?.value
-                }}
-              </span>
-              <button
-                (click)="
-                  copyCommandToClipboard(
-                    taskExecForm.form,
+              <div>
+                <span class="title">
+                  {{
                     taskExecForm.architect
-                  )
-                "
-                title="Copy to clipboard"
-              >
-                <!-- https://raw.githubusercontent.com/microsoft/vscode-codicons/main/src/icons/clippy.svg -->
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
+                      | formatTask
+                        : taskExecForm.form.get('configuration')?.value
+                  }}
+                </span>
+                <button
+                  (click)="
+                    copyCommandToClipboard(
+                      taskExecForm.form,
+                      taskExecForm.architect
+                    )
+                  "
+                  title="Copy to clipboard"
                 >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M7 13.992H4v-9h8v2h1v-2.5l-.5-.5H11v-1h-1a2 2 0 0 0-4 0H4.94v1H3.5l-.5.5v10l.5.5H7v-1zm0-11.2a1 1 0 0 1 .8-.8 1 1 0 0 1 .58.06.94.94 0 0 1 .45.36 1 1 0 1 1-1.75.94 1 1 0 0 1-.08-.56zm7.08 9.46L13 13.342v-5.35h-1v5.34l-1.08-1.08-.71.71 1.94 1.93h.71l1.93-1.93-.71-.71zm-5.92-4.16h.71l1.93 1.93-.71.71-1.08-1.08v5.34h-1v-5.35l-1.08 1.09-.71-.71 1.94-1.93z"
-                  />
-                </svg>
-              </button>
+                  <!-- https://raw.githubusercontent.com/microsoft/vscode-codicons/main/src/icons/clippy.svg -->
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M7 13.992H4v-9h8v2h1v-2.5l-.5-.5H11v-1h-1a2 2 0 0 0-4 0H4.94v1H3.5l-.5.5v10l.5.5H7v-1zm0-11.2a1 1 0 0 1 .8-.8 1 1 0 0 1 .58.06.94.94 0 0 1 .45.36 1 1 0 1 1-1.75.94 1 1 0 0 1-.08-.56zm7.08 9.46L13 13.342v-5.35h-1v5.34l-1.08-1.08-.71.71 1.94 1.93h.71l1.93-1.93-.71-.71zm-5.92-4.16h.71l1.93 1.93-.71.71-1.08-1.08v5.34h-1v-5.35l-1.08 1.09-.71-.71 1.94-1.93z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div class="details-link" *ngIf="ide === 'vscode'">
+                <a href="https://nx.dev"> View full details </a>
+              </div>
             </div>
             <div class="fx-row-reverse">
               <nx-console-argument-list
@@ -141,41 +147,52 @@
                         )
                       "
                       (click)="toggleShowFields()"
-                      class="accordion"
+                      class="accordion-button"
                     >
                       <hr class="divider" />
-                      <div>
-                        <div>Show additional flags</div>
+                      <div class="flexcontainer">
+                        <button class="options-button">
+                          {{
+                            showOtherFields
+                              ? 'Show less options'
+                              : 'Show all options'
+                          }}
+                        </button>
                       </div>
                     </div>
-                    <ng-container
-                      *ngIf="
+                    <div
+                      [@contentExpansion]="
                         showOtherFields ||
                         !hasFilteredImportantFields(
                           filteredFields,
                           splitFields.important
                         )
+                          ? 'expanded'
+                          : 'collapsed'
                       "
                     >
-                      <div [@inOutAnimation]>
-                        <nx-console-field
-                          [id]="field.name + '-nx-console-field'"
-                          *ngFor="let field of taskExecForm.architect.options"
-                          [class.changed-from-default]="
-                            defaultValues[field.name] !==
-                            taskExecForm.form.value[field.name]
-                          "
-                          [field]="field"
-                          [formControlName]="field.name"
-                          [style.display]="
-                            filteredFields.has(field.name) &&
-                            splitFields.other.has(field.name)
-                              ? 'block'
-                              : 'none'
-                          "
-                        ></nx-console-field>
-                      </div>
-                    </ng-container>
+                      <nx-console-field
+                        [id]="field.name + '-nx-console-field'"
+                        *ngFor="let field of taskExecForm.architect.options"
+                        [class.changed-from-default]="
+                          defaultValues[field.name] !==
+                          taskExecForm.form.value[field.name]
+                        "
+                        [field]="field"
+                        [formControlName]="field.name"
+                        [style.display]="
+                          (showOtherFields ||
+                            !hasFilteredImportantFields(
+                              filteredFields,
+                              splitFields.important
+                            )) &&
+                          filteredFields.has(field.name) &&
+                          splitFields.other.has(field.name)
+                            ? 'block'
+                            : 'none'
+                        "
+                      ></nx-console-field>
+                    </div>
                   </div>
                 </ng-container>
 

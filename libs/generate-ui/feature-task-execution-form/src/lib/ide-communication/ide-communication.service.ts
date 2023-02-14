@@ -37,6 +37,8 @@ export class IdeCommunicationService {
   enableTaskExecutionDryRunOnChange$ =
     this.enableTaskExecutionDryRunOnChangeSubject.asObservable();
 
+  ide: 'vscode' | 'intellij';
+
   constructor() {
     let vscode: WebviewApi<undefined> | undefined;
     try {
@@ -44,10 +46,9 @@ export class IdeCommunicationService {
     } catch (e) {
       // noop
     }
-    console.log(
-      'initializing ide communication for',
-      vscode ? 'vscode' : 'intellij'
-    );
+
+    this.ide = vscode ? 'vscode' : 'intellij';
+    console.log('initializing ide communication for', this.ide);
 
     if (vscode) {
       this.setupVscodeCommunication(vscode);
@@ -94,6 +95,7 @@ export class IdeCommunicationService {
             --dropdown-input-background-color: ${message.payload.fieldBackground};
             --dropdown-input-border-color: ${message.payload.secondaryTextColor};
             --font-family: ${message.payload.fontFamily};
+            --button-secondary-color: ${message.payload.fieldBackground};
           }
           `);
           document.adoptedStyleSheets = [styleSheet];
@@ -117,7 +119,7 @@ export class IdeCommunicationService {
         option.type === OptionType.Array &&
         option.items &&
         (option.items as string[]).length === 0
-      );
+      ) && option['x-priority'] !== 'internal';
 
     switch (message.type) {
       case TaskExecutionInputMessageType.SetTaskExecutionSchema: {
