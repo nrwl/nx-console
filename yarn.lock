@@ -4060,16 +4060,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/watcher@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@parcel/watcher@npm:2.1.0"
+"@parcel/watcher@npm:2.0.7":
+  version: 2.0.7
+  resolution: "@parcel/watcher@npm:2.0.7"
   dependencies:
-    is-glob: ^4.0.3
-    micromatch: ^4.0.5
     node-addon-api: ^3.2.1
     node-gyp: latest
     node-gyp-build: ^4.3.0
-  checksum: 17f512ad6d5dbb40053ceea7091f8af754afc63786b8f050b225b89a8ba24900468aad8bc4edb25c0349b4c0c8d061f50aa19242c0af52cbc30e6ebf50c7bf4c
+  checksum: 9cf92fbf4486ad6af441286ce85bcd53a03445abb069c61485d3e0aafabe3da3008be06e38f386c3c0e117f743ed1fe04a88936be1daaf9c455e1e7e5b15f562
   languageName: node
   linkType: hard
 
@@ -19421,7 +19419,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"micromatch@npm:^4.0.0, micromatch@npm:^4.0.2, micromatch@npm:^4.0.4, micromatch@npm:^4.0.5":
+"micromatch@npm:^4.0.0, micromatch@npm:^4.0.2, micromatch@npm:^4.0.4":
   version: 4.0.5
   resolution: "micromatch@npm:4.0.5"
   dependencies:
@@ -20682,7 +20680,7 @@ __metadata:
     "@nrwl/nx-cloud": 15.0.0
     "@nrwl/storybook": 14.8.6
     "@nrwl/workspace": 14.8.6
-    "@parcel/watcher": 2.1.0
+    "@parcel/watcher": 2.0.7
     "@storybook/addon-essentials": 6.5.9
     "@storybook/addon-knobs": ~6.4.0
     "@storybook/angular": 6.5.9
