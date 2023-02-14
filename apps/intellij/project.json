@@ -42,6 +42,7 @@
         "ci": false,
         "npm": false,
         "plugins": ["gradle-semantic-release-plugin"],
+        "gitAssets": ["gradle.properties"],
         "buildTarget": "intellij:build"
       }
     }
