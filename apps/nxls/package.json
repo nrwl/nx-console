@@ -1,6 +1,6 @@
 {
   "name": "nxls",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "main": "main.js",
   "bin": "bin/nxls",
   "license": "MIT",
