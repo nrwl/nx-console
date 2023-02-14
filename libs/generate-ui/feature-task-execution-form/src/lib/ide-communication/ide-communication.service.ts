@@ -96,6 +96,7 @@ export class IdeCommunicationService {
             --dropdown-input-border-color: ${message.payload.secondaryTextColor};
             --font-family: ${message.payload.fontFamily};
             --button-secondary-color: ${message.payload.fieldBackground};
+            --button-secondary-text-color: ${message.payload.secondaryTextColor};
           }
           `);
           document.adoptedStyleSheets = [styleSheet];

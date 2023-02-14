@@ -108,8 +108,11 @@
                   </svg>
                 </button>
               </div>
-              <div class="details-link" *ngIf="ide === 'vscode'">
-                <a href="https://nx.dev"> View full details </a>
+              <div
+                class="details-link"
+                *ngIf="ide === 'vscode' && getDocsLink(taskExecForm)"
+              >
+                <a [href]="getDocsLink(taskExecForm)"> View full details </a>
               </div>
             </div>
             <div class="fx-row-reverse">

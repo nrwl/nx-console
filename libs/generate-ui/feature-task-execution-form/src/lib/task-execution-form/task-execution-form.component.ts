@@ -620,6 +620,20 @@ export class TaskExecutionFormComponent implements OnInit {
     this.showOtherFields = !this.showOtherFields;
     this.changeDetectorRef.detectChanges();
   }
+
+  getDocsLink(taskExecForm: TaskExecutionForm): string | undefined {
+    if (
+      !taskExecForm.architect.collection ||
+      !taskExecForm.architect.collection.includes('@nrwl')
+    ) {
+      return undefined;
+    }
+    const collectionStripped = taskExecForm.architect.collection.replace(
+      '@nrwl/',
+      ''
+    );
+    return `https://nx.dev/packages/${collectionStripped}/generators/${taskExecForm.architect.name}`;
+  }
 }
 
 function sanitizeWhitespace(value: string) {

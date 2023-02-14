@@ -61,6 +61,7 @@ export interface TaskExecutionMessage {
 export interface TaskExecutionSchema {
   name: string;
   command: string;
+  collection?: string;
   positional: string;
   cliName: 'nx' | 'ng';
   builder?: string;
