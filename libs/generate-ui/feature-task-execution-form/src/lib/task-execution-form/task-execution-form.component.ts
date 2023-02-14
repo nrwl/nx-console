@@ -1,5 +1,5 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import {
-  AfterViewChecked,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -9,7 +9,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Clipboard } from '@angular/cdk/clipboard';
 import {
   UntypedFormBuilder,
   UntypedFormControl,
@@ -22,34 +21,37 @@ import {
   combineLatest,
   merge,
   Observable,
-  ReplaySubject,
   Subscription,
 } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
+  filter,
   map,
+  mergeMap,
   shareReplay,
   startWith,
   tap,
-  mergeMap,
-  filter,
   withLatestFrom,
 } from 'rxjs/operators';
-import { getConfigurationFlag, formatTask } from '../format-task/format-task';
+import { formatTask, getConfigurationFlag } from '../format-task/format-task';
 
 import {
-  TaskExecutionSchema,
   ItemsWithEnum,
-  OptionType,
   Option,
-  TaskExecutionInputMessage,
-  TaskExecutionInputMessageType,
-  TaskExecutionOutputMessage,
-  TaskExecutionRunCommandOutputMessage,
+  OptionType,
   TaskExecutionFormInitOutputMessage,
+  TaskExecutionRunCommandOutputMessage,
+  TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import { IdeCommunicationService } from '../ide-communication/ide-communication.service';
+import {
+  trigger,
+  state,
+  transition,
+  animate,
+  style,
+} from '@angular/animations';
 
 function hasKey<T extends object>(obj: T, key: PropertyKey): key is keyof T {
   return key in obj;
@@ -65,11 +67,41 @@ interface TaskExecutionForm {
   templateUrl: './task-execution-form.component.html',
   styleUrls: ['./task-execution-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('contentExpansion', [
+      state(
+        'expanded',
+        style({ height: '*', opacity: 1, visibility: 'visible' })
+      ),
+      state(
+        'collapsed',
+        style({ height: '0px', opacity: 0, visibility: 'hidden' })
+      ),
+      transition(
+        'expanded <=> collapsed',
+        animate('200ms cubic-bezier(.37,1.04,.68,.98)')
+      ),
+    ]),
+  ],
 })
-export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
-  @ViewChild('scrollContainer') scrollContainer: ElementRef<HTMLElement>;
-  @ViewChild('formHeaderContainer')
-  formHeaderContainer: ElementRef<HTMLElement>;
+export class TaskExecutionFormComponent implements OnInit {
+  private _scrollContainer: ElementRef<HTMLElement>;
+  @ViewChild('scrollContainer') set scrollContainer(
+    sc: ElementRef<HTMLElement>
+  ) {
+    this._scrollContainer = sc;
+    this.setupActiveFieldTracking();
+  }
+
+  private _formHeaderContainer: ElementRef<HTMLElement>;
+  @ViewChild('formHeaderContainer') set formHeaderContainer(
+    fhc: ElementRef<HTMLElement>
+  ) {
+    this._formHeaderContainer = fhc;
+    this.setupActiveFieldTracking();
+  }
+
+  showOtherFields = false;
 
   get isMacOs(): boolean {
     return navigator.userAgent.indexOf('Mac') > -1;
@@ -112,7 +144,10 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
           });
       }
     }),
-    shareReplay({ refCount: true, bufferSize: 1 })
+    shareReplay({ refCount: true, bufferSize: 1 }),
+    tap(() => {
+      setTimeout(() => this.changeDetectorRef.detectChanges(), 0);
+    })
   );
 
   readonly showDryRunBtn$: Observable<boolean> = combineLatest([
@@ -178,16 +213,36 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ]).pipe(
     map(([fields, filterValue]) => {
       const filteredFields = new Set<string>();
-
       fields.forEach((field) => {
         if (field.fieldNameLowerCase.includes(filterValue)) {
           filteredFields.add(field.fieldName);
         }
       });
-
       return filteredFields;
     }),
-    shareReplay({ refCount: true, bufferSize: 1 })
+    shareReplay({ refCount: true, bufferSize: 1 }),
+    tap(() => {
+      setTimeout(() => this.changeDetectorRef.detectChanges(), 0);
+    })
+  );
+
+  readonly splitFields$: Observable<{
+    important: Set<string>;
+    other: Set<string>;
+  }> = this.architect$.pipe(
+    map((architect) => {
+      const importantFields = new Set<string>();
+      const otherFields = new Set<string>();
+      architect.options.forEach((field) => {
+        if (field.isRequired || field['x-priority'] === 'important') {
+          importantFields.add(field.name);
+        } else {
+          otherFields.add(field.name);
+        }
+      });
+      return { important: importantFields, other: otherFields };
+    }),
+    startWith({ important: new Set<string>(), other: new Set<string>() })
   );
 
   runCommandArguments$ = this.taskExecForm$.pipe(
@@ -203,7 +258,8 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
         architect,
         form.get('configuration')?.value
       )
-    )
+    ),
+    tap(() => setTimeout(() => this.changeDetectorRef.detectChanges(), 0))
   );
 
   validFields$ = this.getValidFields$(true);
@@ -211,6 +267,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   invalidFields$ = this.getValidFields$(false);
 
   dryRunSubscription?: Subscription;
+  ide: 'vscode' | 'intellij';
 
   constructor(
     private readonly fb: UntypedFormBuilder,
@@ -218,50 +275,17 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly clipboard: Clipboard,
     private readonly ideCommunicationService: IdeCommunicationService
-  ) {}
-
-  ngOnInit() {
-    this.ideCommunicationService.postMessage(
-      new TaskExecutionFormInitOutputMessage()
-    );
-    this.architect$.subscribe(() => this.scrollToTop());
+  ) {
+    this.ide = this.ideCommunicationService.ide;
   }
 
-  ngAfterViewChecked() {
-    if (!this.scrollContainer || this.scrollContainer.nativeElement.onscroll) {
-      return;
-    }
-    this.ngZone.runOutsideAngular(() => {
-      const scrollElement = this.scrollContainer.nativeElement;
-      const formHeaderElement = this.formHeaderContainer.nativeElement;
-      let scrolled = false;
-      scrollElement.onscroll = () => {
-        if (scrollElement.scrollTop === 0) {
-          formHeaderElement.classList.remove('scrolled');
-          scrolled = false;
-        } else {
-          if (!scrolled) {
-            formHeaderElement.classList.add('scrolled');
-            scrolled = true;
-          }
-        }
-
-        const fields = Array.from(
-          scrollElement.querySelectorAll<HTMLElement>('nx-console-field')
-        );
-        const top =
-          Number(scrollElement.scrollTop) +
-          Number(scrollElement.offsetTop) -
-          24;
-        const activeField =
-          fields.find((e: HTMLElement) => e.offsetTop > top) || fields[0];
-
-        if (this.activeFieldIdSubject.value !== activeField.id) {
-          this.ngZone.run(() => {
-            this.activeFieldIdSubject.next(activeField.id);
-          });
-        }
-      };
+  ngOnInit() {
+    this.ideCommunicationService.postMessageToIde(
+      new TaskExecutionFormInitOutputMessage()
+    );
+    this.architect$.subscribe(() => {
+      this.scrollToTop();
+      this.focusFirstElement();
     });
   }
 
@@ -356,8 +380,56 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   }
 
   private scrollToTop() {
-    this.scrollContainer?.nativeElement.scrollTo({
+    this._scrollContainer?.nativeElement.scrollTo({
       top: 0,
+    });
+  }
+
+  private focusFirstElement() {
+    retry(2, 50, () => {
+      // const element = document
+      //   .querySelector('nx-console-field')
+      //   ?.querySelector('input, select, div[role="checkbox"]') as HTMLElement;
+      const element = document.querySelector('input') as HTMLElement;
+      element?.focus();
+      return !!element;
+    });
+  }
+
+  private setupActiveFieldTracking() {
+    if (!this._scrollContainer || !this._formHeaderContainer) {
+      return;
+    }
+    this.ngZone.runOutsideAngular(() => {
+      const scrollElement = this._scrollContainer.nativeElement;
+      const formHeaderElement = this._formHeaderContainer.nativeElement;
+      let scrolled = false;
+      scrollElement.onscroll = () => {
+        if (scrollElement.scrollTop === 0) {
+          formHeaderElement.classList.remove('scrolled');
+          scrolled = false;
+        } else {
+          if (!scrolled) {
+            formHeaderElement.classList.add('scrolled');
+            scrolled = true;
+          }
+        }
+
+        const fields = Array.from(
+          scrollElement.querySelectorAll<HTMLElement>('nx-console-field')
+        );
+        const top =
+          Number(scrollElement.scrollTop) +
+          Number(scrollElement.offsetTop) -
+          24;
+        const activeField =
+          fields.find((e: HTMLElement) => e.offsetTop > top) || fields[0];
+        if (this.activeFieldIdSubject.value !== activeField.id) {
+          this.ngZone.run(() => {
+            this.activeFieldIdSubject.next(activeField.id);
+          });
+        }
+      };
     });
   }
 
@@ -367,7 +439,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
   ) {
     const defaultValues: { [key: string]: string | string[] } = {};
     architect.options.forEach((field) => {
-      if (field.default === undefined) {
+      if (field.default === undefined || field.default === null) {
         defaultValues[field.name] = '';
         return;
       }
@@ -407,7 +479,7 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       flags.push('--dry-run');
     }
 
-    this.ideCommunicationService.postMessage(
+    this.ideCommunicationService.postMessageToIde(
       new TaskExecutionRunCommandOutputMessage({
         command: surroundWithQuotesIfHasWhiteSpace(architect.command),
         positional: surroundWithQuotesIfHasWhiteSpace(architect.positional),
@@ -525,6 +597,43 @@ export class TaskExecutionFormComponent implements OnInit, AfterViewChecked {
       ).join(' ')}`
     );
   }
+
+  hasFilteredOtherFields(
+    filteredFields: Set<string>,
+    otherFields: Set<string>
+  ): boolean {
+    return Array.from(filteredFields.values()).some((filtered) =>
+      otherFields.has(filtered)
+    );
+  }
+
+  hasFilteredImportantFields(
+    filteredFields: Set<string>,
+    important: Set<string>
+  ): boolean {
+    return Array.from(filteredFields.values()).some((filtered) =>
+      important.has(filtered)
+    );
+  }
+
+  toggleShowFields() {
+    this.showOtherFields = !this.showOtherFields;
+    this.changeDetectorRef.detectChanges();
+  }
+
+  getDocsLink(taskExecForm: TaskExecutionForm): string | undefined {
+    if (
+      !taskExecForm.architect.collection ||
+      !taskExecForm.architect.collection.includes('@nrwl')
+    ) {
+      return undefined;
+    }
+    const collectionStripped = taskExecForm.architect.collection.replace(
+      '@nrwl/',
+      ''
+    );
+    return `https://nx.dev/packages/${collectionStripped}/generators/${taskExecForm.architect.name}`;
+  }
 }
 
 function sanitizeWhitespace(value: string) {
@@ -537,4 +646,13 @@ function surroundWithQuotesIfHasWhiteSpace(target: string): string {
     return `"${target}"`;
   }
   return target;
+}
+
+function retry(remaining: number, waitFor: number, fn: () => boolean) {
+  setTimeout(() => {
+    const success = fn();
+    if (!success && remaining > 0) {
+      retry(remaining - 1, waitFor, fn);
+    }
+  }, waitFor);
 }

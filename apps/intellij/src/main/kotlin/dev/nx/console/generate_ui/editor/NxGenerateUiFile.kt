@@ -8,13 +8,15 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
+import dev.nx.console.NxIcons
 import dev.nx.console.generate_ui.CustomSchemeHandlerFactory
+import dev.nx.console.generate_ui.run_generator.RunGeneratorManager
 import dev.nx.console.generate_ui.utils.getHexColor
 import dev.nx.console.generate_ui.utils.onBrowserLoadEnd
 import dev.nx.console.nxls.server.NxGenerator
-import dev.nx.console.nxls.server.NxGeneratorOption
 import javax.swing.Icon
 import javax.swing.JComponent
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.cef.CefApp
@@ -24,8 +26,7 @@ class NxGenerateUiFileType : FileType {
     override fun getDescription(): String = ""
     override fun getDefaultExtension(): String = ".nx"
 
-    // TODO(maxkless): proper icon
-    override fun getIcon(): Icon = icons.TasksIcons.Bug
+    override fun getIcon(): Icon = NxIcons.FileType
     override fun isBinary(): Boolean = true
     override fun isReadOnly(): Boolean = true
     override fun getCharset(file: VirtualFile, content: ByteArray): String? = null
@@ -44,10 +45,15 @@ abstract class NxGenerateUiFile(name: String) :
     abstract fun createMainComponent(project: Project): JComponent
 }
 
-class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
+class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name) {
 
     private val browser: JBCefBrowser = JBCefBrowser()
+    private var generatorToDisplay: GeneratorSchemaPayload? = null
+    private val runGeneratorManager: RunGeneratorManager
 
+    init {
+        runGeneratorManager = RunGeneratorManager(project)
+    }
     override fun createMainComponent(project: Project): JComponent {
 
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
@@ -58,7 +64,7 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
         return browser.component
     }
 
-    fun setupGeneratorForm(generator: NxGenerator, options: List<NxGeneratorOption>) {
+    fun setupGeneratorForm(generator: NxGenerator) {
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
@@ -67,31 +73,78 @@ class DefaultNxGenerateUiFile(name: String) : NxGenerateUiFile(name) {
             }
             val js =
                 """
-            window.intellijApi.postToIde = (message) => {
+            window.intellijApi.registerPostToIdeCallback((message) => {
                     ${query.inject("message")}
-            }
+            })
         """
             browser.executeJavaScriptAsync(js)
 
-            postMessageToBrowser(
-                StyleMessage(StylePayload(getHexColor(UIUtil.getPanelBackground())))
-            )
-            postMessageToBrowser(GeneratorMessage(GeneratorPayload(generator, options)))
+            postMessageToBrowser(StyleMessage(this.extractIntellijStyles()))
+            postMessageToBrowser(GlobalConfigurationMessage(GlobalConfigurationPayload(true)))
+
+            // we will send this info to the webview once it's initialized
+            generator.options?.let {
+                this.generatorToDisplay =
+                    GeneratorSchemaPayload(
+                        name = generator.name,
+                        description = generator.data.description,
+                        options = generator.options,
+                        contextValues = generator.contextValues
+                    )
+            }
+            browser.component.requestFocus()
         }
     }
 
     private fun handleMessageFromBrowser(message: String) {
         val logger = logger<DefaultNxGenerateUiFile>()
-        logger.info(message)
+        val messageParsed =
+            Json { ignoreUnknownKeys = true }.decodeFromString<TaskExecutionOutputMessage>(message)
+        logger.info("received message $messageParsed")
+        if (messageParsed.type == "output-init") {
+            this.generatorToDisplay?.let { this.postMessageToBrowser(GeneratorSchemaMessage(it)) }
+            return
+        }
+        if (messageParsed.type == "run-command") {
+            if (messageParsed is TaskExecutionRunCommandOutputMessage) {
+                runGeneratorManager.queueGeneratorToBeRun(
+                    messageParsed.payload.positional,
+                    messageParsed.payload.flags
+                )
+            }
+        }
     }
 
-    private fun postMessageToBrowser(message: Message) {
-        val message = Json.encodeToString(message)
-        logger<NxGenerateUiFile>().info("posting message $message")
-        browser.executeJavaScriptAsync("""window.intellijApi.post($message)""")
+    private fun postMessageToBrowser(message: TaskExecutionInputMessage) {
+        val messageString = Json.encodeToString(message)
+        logger<NxGenerateUiFile>().info("posting message $messageString")
+        browser.executeJavaScriptAsync("""window.intellijApi.postToWebview($messageString)""")
     }
+
     private fun registerAppSchemeHandler(): Unit {
         CefApp.getInstance()
             .registerSchemeHandlerFactory("http", "nxconsole", CustomSchemeHandlerFactory())
+    }
+
+    private fun extractIntellijStyles(): StylePayload {
+        val backgroundColor = getHexColor(UIUtil.getPanelBackground())
+        val highlightTextColor =
+            getHexColor(
+                when (UIUtil.isUnderDarcula()) {
+                    true -> UIUtil.getActiveTextColor()
+                    false -> UIUtil.getLabelForeground()
+                }
+            )
+        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
+        val fieldBackground = getHexColor(UIUtil.getTextFieldBackground())
+        val fontFamily =
+            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
+        return StylePayload(
+            backgroundColor,
+            highlightTextColor,
+            secondaryTextColor,
+            fieldBackground,
+            fontFamily
+        )
     }
 }

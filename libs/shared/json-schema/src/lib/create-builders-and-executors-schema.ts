@@ -1,4 +1,5 @@
 import { CollectionInfo } from '@nx-console/shared/schema';
+import { platform } from 'os';
 import { JSONSchema } from 'vscode-json-languageservice';
 
 type BuildersSchema = JSONSchema;
@@ -15,6 +16,9 @@ export function createBuildersAndExecutorsSchema(
 ): [BuildersSchema[], ExecutorsSchema[]] {
   return collections.reduce<[BuildersSchema[], ExecutorsSchema[]]>(
     (acc, collection) => {
+      const schemaRef =
+        platform() === 'win32' ? collection.path : `file://${collection.path}`;
+
       acc[0].push({
         if: {
           properties: { builder: { const: collection.name } },
@@ -23,11 +27,11 @@ export function createBuildersAndExecutorsSchema(
         then: {
           properties: {
             options: {
-              $ref: `file://${collection.path}`,
+              $ref: schemaRef,
             },
             configurations: {
               additionalProperties: {
-                $ref: `file://${collection.path}`,
+                $ref: schemaRef,
                 required: [],
               },
             },
@@ -42,11 +46,11 @@ export function createBuildersAndExecutorsSchema(
         then: {
           properties: {
             options: {
-              $ref: `file://${collection.path}`,
+              $ref: schemaRef,
             },
             configurations: {
               additionalProperties: {
-                $ref: `file://${collection.path}`,
+                $ref: schemaRef,
                 required: [],
               },
             },

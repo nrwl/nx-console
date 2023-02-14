@@ -15,6 +15,5 @@ class ProjectPostStartup : ProjectPostStartupActivity {
         service.start()
 
         val workspace = service.workspace()
-        logger.info(workspace.toString())
     }
 }

@@ -17,12 +17,11 @@ nx-console-checkbox {
   $checkbox-size: 1rem;
 
   .checkbox {
-    background-color: var(--vscode-settings-checkboxBackground, #eee);
+    background-color: var(--checkbox-background-color);
     background-size: $checkbox-size !important;
-    border: solid variables.$input-border-width
-      var(--vscode-settings-checkboxBorder, #000);
-    border-radius: variables.$input-border-radius-size;
-    color: var(--vscode-settings-checkboxForeground);
+    border: solid var(--input-border-width) var(--checkbox-border-color);
+    border-radius: var(--input-border-radius-size);
+    color: var(--checkbox-text-color);
     height: $checkbox-size;
     width: $checkbox-size;
     min-height: $checkbox-size;
@@ -30,11 +29,15 @@ nx-console-checkbox {
     margin: 0 0.5rem 0.2rem 0;
     padding: 0;
 
+    svg {
+      display: none;
+      fill: var(--secondary-text-color);
+    }
+
     &.checked {
-      // black check
-      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 3.763l-9.193 8.172-.721-.042L1 7.296l.763-.678 3.747 4.214L14.321 3l.679.763z' fill='%23000000'/%3E%3C/svg%3E");
-      background-position: 50%;
-      background-repeat: no-repeat;
+      svg {
+        display: block;
+      }
     }
   }
 }

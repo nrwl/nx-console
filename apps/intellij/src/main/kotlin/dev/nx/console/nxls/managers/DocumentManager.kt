@@ -2,6 +2,7 @@ package dev.nx.console.nxls.managers
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.DocumentEvent
@@ -10,18 +11,23 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.text.StringUtil
 import dev.nx.console.completion.createLookupItem
 import dev.nx.console.utils.DocumentUtils
+import kotlinx.coroutines.future.await
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.services.TextDocumentService
 
 private val documentManagers = HashMap<String, DocumentManager>()
 
-fun getDocumentManager(editor: Editor): DocumentManager {
-    return documentManagers.getOrPut(getFilePath(editor.document) ?: "") { DocumentManager(editor) }
-}
-
 private val log = logger<DocumentManager>()
 
 class DocumentManager(val editor: Editor) {
+
+    companion object {
+        fun getInstance(editor: Editor): DocumentManager {
+            return documentManagers.getOrPut(getFilePath(editor.document) ?: "") {
+                DocumentManager(editor)
+            }
+        }
+    }
 
     var version = 0
     val document = editor.document
@@ -90,10 +96,27 @@ class DocumentManager(val editor: Editor) {
                 createLookupItem(this, item)?.let { lookupItems.add(it) }
             }
         } catch (e: Exception) {
-            log.info(e)
+            thisLogger().info(e)
         }
 
         return lookupItems
+    }
+
+    suspend fun hover(startOffset: Int): String? {
+        val pos = DocumentUtils.offsetToLSPPos(editor, startOffset)
+        val request = textDocumentService?.hover(HoverParams(identifier, pos))
+        return try {
+            return request
+                ?.await()
+                ?.contents
+                ?.left
+                ?.joinToString { it.left }
+                ?.replace("\\", "")
+                ?.ifEmpty { null }
+        } catch (e: Exception) {
+            thisLogger().info(e)
+            null
+        }
     }
 
     fun documentOpened() {

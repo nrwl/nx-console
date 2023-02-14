@@ -89,6 +89,9 @@ export function createWebViewPanel(
       {
         retainContextWhenHidden: true,
         enableScripts: true,
+        localResourceRoots: [
+          Uri.joinPath(context.extensionUri, '..', 'generate-ui'),
+        ],
       }
     );
     webviewPanel.onDidDispose(() => {
@@ -105,7 +108,7 @@ export function createWebViewPanel(
     setWebViewContent(webviewPanel, context);
 
     if (context.extensionMode === ExtensionMode.Development) {
-      watch(join(context.extensionPath, 'assets', 'public', 'main.js'), () => {
+      watch(join(context.extensionPath, '..', 'generate-ui'), () => {
         if (webviewPanel) {
           setWebViewContent(webviewPanel, context);
           commands.executeCommand(
@@ -123,6 +126,7 @@ export function createWebViewPanel(
             break;
           }
           case TaskExecutionOutputMessageType.TaskExecutionFormInit: {
+            commands.executeCommand('workbench.action.focusActiveEditorGroup');
             publishMessagesToTaskExecutionForm(
               webviewPanel as WebviewPanel,
               schema
@@ -172,20 +176,20 @@ function setWebViewContent(
 export function getIframeHtml(webView: Webview, context: ExtensionContext) {
   const stylePath = Uri.joinPath(
     context.extensionUri,
-    'assets',
-    'public',
+    '..',
+    'generate-ui',
     'styles.css'
   );
   const runtimePath = Uri.joinPath(
     context.extensionUri,
-    'assets',
-    'public',
+    '..',
+    'generate-ui',
     'runtime.js'
   );
   const mainPath = Uri.joinPath(
     context.extensionUri,
-    'assets',
-    'public',
+    '..',
+    'generate-ui',
     'main.js'
   );
 
@@ -199,6 +203,11 @@ export function getIframeHtml(webView: Webview, context: ExtensionContext) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link href="${webView.asWebviewUri(stylePath)}" rel="stylesheet"/>
+    <style>
+      body {
+        color: var(--secondary-text-color);
+      }
+    </style>
   </head>
   <body>
     <generate-ui-task-execution-form></generate-ui-task-execution-form>

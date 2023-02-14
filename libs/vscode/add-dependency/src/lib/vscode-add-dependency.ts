@@ -4,12 +4,16 @@ import {
   PackageManager,
   readJsonFile,
 } from '@nrwl/devkit';
-import { getGenerators } from '@nx-console/vscode/nx-workspace';
+import {
+  getGeneratorOptions,
+  getGenerators,
+} from '@nx-console/vscode/nx-workspace';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { getGeneratorOptions, selectFlags } from '@nx-console/vscode/tasks';
+import { selectFlags } from '@nx-console/vscode/tasks';
 import {
   getShellExecutionForConfig,
   getTelemetry,
+  resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 import { existsSync } from 'fs';
 import { join } from 'path';
@@ -24,7 +28,6 @@ import {
   TaskScope,
   window,
 } from 'vscode';
-import { resolveDependencyVersioning } from './dependency-versioning';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -173,12 +176,12 @@ async function executeInitGenerator(
     return;
   }
 
-  const opts = await getGeneratorOptions(
-    initGenerator.data.collection,
-    initGenerator.name,
-    initGenerator.path,
-    workspaceType
-  );
+  const opts = await getGeneratorOptions({
+    collection: initGenerator.data.collection,
+    name: initGenerator.name,
+    path: initGenerator.path,
+    workspaceType,
+  });
   let selectedFlags;
   if (opts.length) {
     selectedFlags = await selectFlags(initGenerator.name, opts, workspaceType);

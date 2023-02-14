@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
-import dev.nx.console.nxls.managers.getDocumentManager
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
@@ -33,8 +32,6 @@ class NxlsWrapper(val project: Project) {
     var languageClient: NxlsLanguageClient? = null
     private var initializeResult: InitializeResult? = null
     private var initializeFuture: CompletableFuture<InitializeResult>? = null
-    private var basePath: String =
-        project.basePath ?: throw IllegalStateException("Cannot get the project base path")
 
     private var connectedEditors = HashMap<Editor, DocumentManager>()
 
@@ -50,7 +47,7 @@ class NxlsWrapper(val project: Project) {
         try {
             status = NxlsState.STARTING
             val (input, output) =
-                NxlsProcess(basePath).run {
+                NxlsProcess(project).run {
                     start()
                     Pair(getInputStream(), getOutputStream())
                 }
@@ -84,11 +81,11 @@ class NxlsWrapper(val project: Project) {
                 }
 
             initializeResult = languageServer?.initialize(getInitParams())?.await()
+            log.info("Initialized")
         } catch (e: Exception) {
             thisLogger().info("Cannot start nxls", e)
             status = NxlsState.FAILED
         } finally {
-            log.info("Initialized")
             status = NxlsState.STARTED
             for ((_, manager) in connectedEditors) {
                 connectTextService(manager)
@@ -106,7 +103,7 @@ class NxlsWrapper(val project: Project) {
 
     fun connect(editor: Editor) {
 
-        val documentManager = getDocumentManager(editor)
+        val documentManager = DocumentManager.getInstance(editor)
         if (status == NxlsState.STARTED) {
 
             connectTextService(documentManager)
@@ -133,9 +130,14 @@ class NxlsWrapper(val project: Project) {
         log.info("Disconnected ${documentManager.documentPath}")
     }
 
+    fun isEditorConnected(editor: Editor): Boolean {
+        return connectedEditors.contains(editor)
+    }
+
     fun getInitParams(): InitializeParams {
         val initParams = InitializeParams()
-        initParams.rootUri = basePath
+        initParams.rootUri = project.basePath
+        initParams.workspaceFolders = listOf(WorkspaceFolder(project.basePath))
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()
         workspaceClientCapabilities.applyEdit = true

@@ -27,6 +27,7 @@ export interface Option extends CliOption {
   aliases: string[];
   isRequired: boolean;
   'x-dropdown'?: 'projects';
+  'x-priority'?: 'important' | 'internal';
 }
 
 export interface ItemTooltips {
@@ -60,6 +61,7 @@ export interface TaskExecutionMessage {
 export interface TaskExecutionSchema {
   name: string;
   command: string;
+  collection?: string;
   positional: string;
   cliName: 'nx' | 'ng';
   builder?: string;

@@ -7,6 +7,9 @@ export const formatTask = (
   architect: TaskExecutionSchema,
   configuration?: string
 ): string => {
+  if (!architect) {
+    return '';
+  }
   architect = handleWorkspaceGenerators(architect);
 
   const commandBuilder = [

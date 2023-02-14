@@ -8,6 +8,7 @@ import {
 } from '@nx-console/shared/schema';
 import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
 import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormatTaskPipe } from '../format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
 import { IdeCommunicationService } from '../ide-communication/ide-communication.service';
@@ -64,6 +65,7 @@ describe('TaskExecutionFormComponent', () => {
         ReactiveFormsModule,
         GenerateUiComponentsModule,
         ArgumentListModule,
+        BrowserAnimationsModule,
       ],
       providers: [IdeCommunicationService],
     }).compileComponents();

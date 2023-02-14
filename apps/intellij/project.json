@@ -3,26 +3,50 @@
   "name": "intellij",
   "projectType": "application",
   "targets": {
-    "x-build": {
+    "runIde": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./gradlew :apps:intellij:runIde"
+      }
+    },
+    "build": {
+      "inputs": ["kotlin"],
+      "outputs": ["dist/apps/intellij/distributions"],
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:buildPlugin"
-      }
+      },
+      "configurations": {
+        "production-intellij": {}
+      },
+      "dependsOn": ["^build"]
     },
-    "x-test": {
+    "test": {
+      "inputs": ["kotlin"],
+      "outputs": ["dist/apps/intellij/reports/tests"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "./gradlew :apps:intellij:test"
+        "command": "./gradlew :apps:intellij:check"
       }
     },
     "x-lint": {
+      "//": "Run inspections take a long time on the CI. Disable for now",
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:runInspections"
       }
+    },
+    "semantic-release": {
+      "executor": "@theunderscorer/nx-semantic-release:semantic-release",
+      "options": {
+        "ci": false,
+        "npm": false,
+        "plugins": ["gradle-semantic-release-plugin"],
+        "gitAssets": ["gradle.properties"],
+        "buildTarget": "intellij:build"
+      }
     }
   },
-  "tags": [
-    "type:intellij"
-  ]
+  "tags": ["type:intellij"],
+  "implicitDependencies": ["generate-ui", "nxls"]
 }

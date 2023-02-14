@@ -401,6 +401,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@angular/animations@npm:14.2.3":
+  version: 14.2.3
+  resolution: "@angular/animations@npm:14.2.3"
+  dependencies:
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/core": 14.2.3
+  checksum: 89cbcf3f5a05a64271c68ccfb520e2d62039f81f565e4d24e5b95682c1254bd0c22b80812a754df9a6ef75b6d35d059713171f121ad1947ef9ea284c3d9e7550
+  languageName: node
+  linkType: hard
+
 "@angular/cdk@npm:14.2.2":
   version: 14.2.2
   resolution: "@angular/cdk@npm:14.2.2"
@@ -4049,14 +4060,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/watcher@npm:^2.0.7":
-  version: 2.0.7
-  resolution: "@parcel/watcher@npm:2.0.7"
+"@parcel/watcher@npm:2.1.0":
+  version: 2.1.0
+  resolution: "@parcel/watcher@npm:2.1.0"
   dependencies:
+    is-glob: ^4.0.3
+    micromatch: ^4.0.5
     node-addon-api: ^3.2.1
     node-gyp: latest
     node-gyp-build: ^4.3.0
-  checksum: 9cf92fbf4486ad6af441286ce85bcd53a03445abb069c61485d3e0aafabe3da3008be06e38f386c3c0e117f743ed1fe04a88936be1daaf9c455e1e7e5b15f562
+  checksum: 17f512ad6d5dbb40053ceea7091f8af754afc63786b8f050b225b89a8ba24900468aad8bc4edb25c0349b4c0c8d061f50aa19242c0af52cbc30e6ebf50c7bf4c
   languageName: node
   linkType: hard
 
@@ -15142,6 +15155,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"gradle-semantic-release-plugin@npm:^1.7.6":
+  version: 1.7.6
+  resolution: "gradle-semantic-release-plugin@npm:1.7.6"
+  dependencies:
+    promisified-properties: ^2.0.27
+    split2: ^4.1.0
+  peerDependencies:
+    semantic-release: ^20.0.0
+  checksum: c8da17ec3a861e9a6d04e2b8af5f0ca04f63a1dd79c578b3d56f726ca558a077e0397d82ee67d0ef12a52fff7078d0162103c0944bf7dc354ae38cd75f6b2414
+  languageName: node
+  linkType: hard
+
 "grapheme-splitter@npm:^1.0.2":
   version: 1.0.4
   resolution: "grapheme-splitter@npm:1.0.4"
@@ -19396,7 +19421,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"micromatch@npm:^4.0.0, micromatch@npm:^4.0.2, micromatch@npm:^4.0.4":
+"micromatch@npm:^4.0.0, micromatch@npm:^4.0.2, micromatch@npm:^4.0.4, micromatch@npm:^4.0.5":
   version: 4.0.5
   resolution: "micromatch@npm:4.0.5"
   dependencies:
@@ -20633,6 +20658,7 @@ __metadata:
     "@angular-eslint/eslint-plugin": 14.0.4
     "@angular-eslint/eslint-plugin-template": 14.0.4
     "@angular-eslint/template-parser": 14.0.4
+    "@angular/animations": 14.2.3
     "@angular/cdk": 14.2.2
     "@angular/cli": 14.2.3
     "@angular/common": 14.2.3
@@ -20656,7 +20682,7 @@ __metadata:
     "@nrwl/nx-cloud": 15.0.0
     "@nrwl/storybook": 14.8.6
     "@nrwl/workspace": 14.8.6
-    "@parcel/watcher": ^2.0.7
+    "@parcel/watcher": 2.1.0
     "@storybook/addon-essentials": 6.5.9
     "@storybook/addon-knobs": ~6.4.0
     "@storybook/angular": 6.5.9
@@ -20696,6 +20722,7 @@ __metadata:
     eslint-config-prettier: 8.1.0
     fast-glob: ^3.2.11
     find-cache-dir: ^3.3.2
+    gradle-semantic-release-plugin: ^1.7.6
     graphql: ^16.6.0
     graphql-request: ^5.0.0
     jest: 28.1.3
@@ -21556,6 +21583,13 @@ __metadata:
   version: 1.3.3
   resolution: "parseurl@npm:1.3.3"
   checksum: 407cee8e0a3a4c5cd472559bca8b6a45b82c124e9a4703302326e9ab60fc1081442ada4e02628efef1eb16197ddc7f8822f5a91fd7d7c86b51f530aedb17dfa2
+  languageName: node
+  linkType: hard
+
+"parsimmon@npm:^1.13.0":
+  version: 1.18.1
+  resolution: "parsimmon@npm:1.18.1"
+  checksum: ef6da910fb2bf2630098eed30d9ea7c3cd2dc53087041709e12da5714888a61764dd7082a56e96d9f9c7a67591f017f2d30543e03a50009e46267becc1502402
   languageName: node
   linkType: hard
 
@@ -22974,6 +23008,15 @@ __metadata:
     define-properties: ^1.1.3
     es-abstract: ^1.19.1
   checksum: aba8af6ae8d076e2c344d2674409b44c8f98b3aba98b78619739aeb4a74ebac80dbba5f9338da7cf0108a34384799d3996c46697d2e21c6e998c04d68041213c
+  languageName: node
+  linkType: hard
+
+"promisified-properties@npm:^2.0.27":
+  version: 2.0.27
+  resolution: "promisified-properties@npm:2.0.27"
+  dependencies:
+    parsimmon: ^1.13.0
+  checksum: d8a0141a91934c8f078b37e7547f78b3420b511828d2a0a105f66ec31682357616435280fa03e9166beea157a334102729d1074c25598aaa469bd4373b73eb5c
   languageName: node
   linkType: hard
 

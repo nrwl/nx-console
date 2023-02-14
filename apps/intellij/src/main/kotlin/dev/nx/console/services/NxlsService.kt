@@ -12,6 +12,10 @@ private val logger = logger<NxlsService>()
 
 class NxlsService(val project: Project) {
 
+    companion object {
+        fun getInstance(project: Project): NxlsService = project.getService(NxlsService::class.java)
+    }
+
     var wrapper: NxlsWrapper = NxlsWrapper(project)
 
     private fun client(): NxlsLanguageClient? {
@@ -45,11 +49,23 @@ class NxlsService(val project: Project) {
         return server()?.getNxService()?.generatorOptions(request)?.await() ?: emptyList()
     }
 
+    suspend fun generatorContextFromPath(
+        generator: NxGenerator,
+        path: String
+    ): NxGeneratorContext? {
+        val request = NxGetGeneratorContextFromPathRequest(generator, path)
+        return server()?.getNxService()?.generatorContextFromPath(request)?.await() ?: null
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }
 
     fun removeDocument(editor: Editor) {
         wrapper.disconnect(editor)
+    }
+
+    fun isEditorConnected(editor: Editor): Boolean {
+        return wrapper.isEditorConnected(editor)
     }
 }

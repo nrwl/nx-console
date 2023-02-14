@@ -1,11 +1,18 @@
 # Nx Console
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Spend less time looking up command line arguments and more time shipping incredible products.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+### Why Nx Console?
 
-To keep everything working, do not remove `<!-- ... -->` sections.
+Developers use both command-line tools and user interfaces. They commit in the terminal, but resolve conflicts in Visual Studio Code or WebStorm. They use the right tool for the job.
+
+Nx is a command-line tool, which works great when you want to serve an application or generate a simple component. But it falls short once you start doing advanced things.
+
+For instance:
+
+- Exploring custom generator collections is hard in the terminal, but it's easy using Nx Console.
+- Using rarely-used flags is challenging. Do you pass absolute or relative paths? You don't have to remember any flags, names or paths - Nx Console will help you by providing autocompletion and validating your inputs.
 <!-- Plugin description end -->
 
 ## Installation

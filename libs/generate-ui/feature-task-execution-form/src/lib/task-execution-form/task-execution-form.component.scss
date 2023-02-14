@@ -24,9 +24,8 @@ $offset-with-configurations: $offset-without-configurations +
 .run-button {
   width: 80px;
   height: 30px;
-  background: variables.$button-primary-color;
-  border: variables.$input-border-width solid
-    var(--vscode-settings-textInputBorder);
+  background: var(--button-primary-color);
+  border: var(--input-border-width) solid var(--text-input-border-color);
   color: #fff;
   text-align: center;
   cursor: pointer;
@@ -38,7 +37,7 @@ $offset-with-configurations: $offset-without-configurations +
   }
 
   &.dry-run {
-    background: variables.$button-secondary-color;
+    background: var(--button-secondary-color);
   }
 }
 
@@ -94,15 +93,15 @@ nx-console-argument-list {
 }
 
 .fields-container {
-  flex: 1 1 variables.$input-width;
+  flex: 1 1 var(--input-width);
 }
 
 .filter-container {
   border-width: 1px;
   border-style: solid;
-  background-color: var(--vscode-settings-textInputBackground, #eee);
-  border-color: var(--vscode-settings-textInputBorder);
-  border-radius: variables.$input-border-radius-size;
+  background-color: var(--text-input-background-color);
+  border-color: var(--text-input-text-color);
+  border-radius: var(--input-border-radius-size);
   height: 30px;
   box-sizing: border-box;
   padding: 0.3rem 0.5rem;
@@ -113,7 +112,7 @@ nx-console-argument-list {
     height: 20px;
     margin: none;
     box-sizing: border-box;
-    color: var(--vscode-settings-textInputForeground);
+    color: var(--text-input-text-color);
     background: transparent;
     border: none !important;
     outline: none !important;
@@ -133,7 +132,7 @@ nx-console-field {
   border-left: 2px solid transparent;
 
   &.changed-from-default {
-    border-left-color: variables.$button-primary-color;
+    border-left-color: var(--button-primary-color);
   }
 }
 
@@ -162,15 +161,15 @@ nx-console-field {
   }
 
   button {
-    background-color: variables.$button-secondary-color;
-    color: variables.$secondary-text-color;
+    background-color: var(--button-secondary-color);
+    color: var(--secondary-text-color);
     padding: 2px 2px 1px 2px;
     border: none;
     margin-left: 0.5em;
 
     &:hover,
     &:focus {
-      background-color: variables.$button-secondary-hover-color;
+      background-color: var(--button-secondary-hover-color);
     }
   }
 
@@ -203,7 +202,7 @@ nx-console-field {
     cursor: pointer;
 
     &.selected {
-      border-bottom: 2px solid variables.$primary-text-color;
+      border-bottom: 2px solid var(--highlight-text-color);
     }
   }
 }
@@ -211,4 +210,50 @@ nx-console-field {
 .clear-search {
   cursor: pointer;
   text-decoration: underline;
+}
+
+hr.divider {
+  border-color: var(--button-secondary-color);
+  background-color: var(--button-secondary-color);
+  border-top: 1px solid;
+  color: var(--button-secondary-color);
+}
+
+.accordion-button {
+  padding-left: 0.5rem;
+  transition: 0.4s;
+  width: var(--input-width);
+
+  .flexcontainer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+.accordion {
+  display: none;
+  .expanded {
+    display: block;
+  }
+}
+
+.options-button {
+  width: 80px;
+  height: 30px;
+  font-size: 11px;
+  background: var(--button-secondary-color);
+  border: var(--input-border-width) solid var(--text-input-border-color);
+  color: var(--button-secondary-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: background ease-in-out 0.1s;
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.details-link {
+  padding-top: 0.5rem;
 }

@@ -11,5 +11,5 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: variables.$scroll-bar-width !important;
+  width: var(--scroll-bar-width) !important;
 }

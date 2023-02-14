@@ -9,29 +9,29 @@ nx-console-autocomplete {
 
   .autocomplete-container {
     position: relative;
-    width: variables.$input-width - 2px;
+    width: var(--input-width) - 2px;
   }
 
   input {
-    background-color: var(--vscode-settings-textInputBackground, #eee);
-    border-color: var(--vscode-settings-textInputBorder);
+    background-color: var(--text-input-background-color);
+    border-color: var(--text-input-border-color);
     border-style: solid;
-    border-width: variables.$input-border-width;
-    color: var(--vscode-settings-textInputForeground);
+    border-width: var(--input-border-width);
+    color: var(--text-input-text-color);
     box-sizing: border-box;
     font: inherit;
     padding: 0.3rem 0.5rem;
-    width: variables.$input-width;
+    width: var(--input-width);
   }
 
   input.ng-invalid.ng-dirty,
   input.ng-invalid.ng-touched {
-    border-color: variables.$error-border-color;
+    border-color: var(--error-border-color);
   }
 
   .autocomplete-panel {
-    border-color: var(--vscode-settings-dropdownBorder);
-    background-color: var(--vscode-settings-dropdownBackground, #eee);
+    border-color: var(--dropdown-input-border-color);
+    background-color: var(--dropdown-input-background-color);
     position: absolute;
     left: 0;
     right: 0;
@@ -47,11 +47,11 @@ nx-console-autocomplete {
   }
 
   .option {
-    border-color: var(--vscode-settings-dropdownBorder);
+    border-color: var(--dropdown-input-border-color);
     box-sizing: border-box;
     padding: 0.4rem 0.6rem;
     font-size: 14px;
-    color: var(--vscode-settings-textInputForeground);
+    color: var(--text-input-text-color);
     cursor: pointer;
     display: block;
     width: 100%;

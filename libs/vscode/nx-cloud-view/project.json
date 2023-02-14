@@ -29,7 +29,7 @@
         "format": ["esm"]
       },
       "dependsOn": ["extract-dependencies"],
-      "inputs": ["{projectRoot}/src/webview"]
+      "inputs": ["{projectRoot}/src/webview/**/*"]
     },
     "watch-webview-files": {
       "executor": "@nrwl/esbuild:esbuild",
@@ -55,8 +55,10 @@
     "extract-dependencies": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node libs/vscode/nx-cloud-view/get-files-from-node-modules.mjs"
-      }
+        "command": "node ./tools/scripts/copy-cloud-webview-deps.mjs"
+      },
+      "inputs": ["nodeModules"],
+      "outputs": ["dist/apps/vscode/nx-cloud-webview"]
     },
     "test": {
       "executor": "@nrwl/jest:jest",

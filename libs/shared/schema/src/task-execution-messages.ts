@@ -10,8 +10,8 @@ export type TaskExecutionOutputMessage =
   | TaskExecutionRunCommandOutputMessage;
 
 export enum TaskExecutionOutputMessageType {
-  TaskExecutionFormInit = 1,
-  RunCommand,
+  TaskExecutionFormInit = 'output-init',
+  RunCommand = 'run-command',
 }
 
 export class TaskExecutionRunCommandOutputMessage {
@@ -29,11 +29,13 @@ export class TaskExecutionFormInitOutputMessage {
 // Task execution input messages
 export type TaskExecutionInputMessage =
   | TaskExecutionSchemaInputMessage
-  | TaskExecutionGlobalConfigurationInputMessage;
+  | TaskExecutionGlobalConfigurationInputMessage
+  | TaskExecutionSetStylesMessage;
 
 export enum TaskExecutionInputMessageType {
-  SetTaskExecutionSchema = 1,
-  SetGlobalConfiguration,
+  SetTaskExecutionSchema = 'generator',
+  SetGlobalConfiguration = 'config',
+  SetStyles = 'style',
 }
 
 export class TaskExecutionSchemaInputMessage {
@@ -46,4 +48,18 @@ export class TaskExecutionGlobalConfigurationInputMessage {
   readonly type = TaskExecutionInputMessageType.SetGlobalConfiguration;
 
   constructor(public readonly payload: GlobalConfigurationData) {}
+}
+
+export class TaskExecutionSetStylesMessage {
+  readonly type = TaskExecutionInputMessageType.SetStyles;
+
+  constructor(
+    public readonly payload: {
+      backgroundColor: string;
+      highlightTextColor: string;
+      secondaryTextColor: string;
+      fieldBackground: string;
+      fontFamily: string;
+    }
+  ) {}
 }

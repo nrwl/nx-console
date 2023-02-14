@@ -15,17 +15,6 @@ export interface GeneratorDefaults {
   [name: string]: string;
 }
 
-const IMPORTANT_FIELD_NAMES = [
-  'name',
-  'project',
-  'module',
-  'watch',
-  'style',
-  'directory',
-  'port',
-];
-const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
-
 export async function normalizeSchema(
   s: Schema,
   workspaceType: 'ng' | 'nx',
@@ -71,36 +60,41 @@ export async function normalizeSchema(
     return nxOption;
   });
 
-  return nxOptions.sort((a, b) => {
-    if (typeof a.positional === 'number' && typeof b.positional === 'number') {
-      return a.positional - b.positional;
-    }
+  return nxOptions.sort(compareOptions);
+}
 
-    if (typeof a.positional === 'number') {
-      return -1;
-    } else if (typeof b.positional === 'number') {
-      return 1;
-    } else if (a.isRequired) {
-      if (b.isRequired) {
-        return a.name.localeCompare(b.name);
-      }
-      return -1;
-    } else if (b.isRequired) {
-      return 1;
-    } else if (IMPORTANT_FIELDS_SET.has(a.name)) {
-      if (IMPORTANT_FIELDS_SET.has(b.name)) {
-        return (
-          IMPORTANT_FIELD_NAMES.indexOf(a.name) -
-          IMPORTANT_FIELD_NAMES.indexOf(b.name)
-        );
-      }
-      return -1;
-    } else if (IMPORTANT_FIELDS_SET.has(b.name)) {
-      return 1;
-    } else {
-      return a.name.localeCompare(b.name);
+/**
+ * sorts options in the following order
+ * - required
+ * - x-priority: important
+ * - everything else
+ * - x-priority: internal
+ * - deprecated
+ * if two options are equal, they are sorted by name
+ */
+function compareOptions(a: Option, b: Option): number {
+  function getPrio(opt: Option): number {
+    if (opt.isRequired) {
+      return 0;
     }
-  });
+    if (opt['x-priority'] === 'important') {
+      return 1;
+    }
+    if (opt['x-deprecated']) {
+      return 4;
+    }
+    if (opt['x-priority'] === 'internal') {
+      return 3;
+    }
+    return 2;
+  }
+
+  const aPrio = getPrio(a);
+  const bPrio = getPrio(b);
+  if (aPrio === bPrio) {
+    return a.name.localeCompare(b.name);
+  }
+  return aPrio - bPrio;
 }
 
 function isFieldRequired(

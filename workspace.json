@@ -7,7 +7,6 @@
     "generate-ui-e2e": "apps/generate-ui-e2e",
     "generate-ui-feature-task-execution-form": "libs/generate-ui/feature-task-execution-form",
     "generate-ui-styles": "libs/generate-ui/styles",
-
     "intellij": "apps/intellij",
     "language-server-capabilities-code-completion": "libs/language-server/capabilities/code-completion",
     "language-server-capabilities-document-links": "libs/language-server/capabilities/document-links",

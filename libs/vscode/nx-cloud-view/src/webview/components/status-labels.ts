@@ -111,13 +111,15 @@ class StatusLabel extends LitElement {
     .flexcontainer .text {
       grid-column: 2 / -1;
       font-weight: bold;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
     .flexcontainer .actions {
       grid-column: -1;
     }
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
       gap: 0.25rem;
     }
     .dot {
@@ -135,6 +137,17 @@ class StatusLabel extends LitElement {
     }
     .status-0 {
       background: grey;
+    }
+    @media screen and (max-width: 250px) {
+      :host {
+        font-size: calc(var(--vscode-font-size) * 0.8);
+      }
+      .flexcontainer {
+        gap: 0.25rem;
+      }
+      .codicon[class*='codicon-'] {
+        font-size: calc(var(--vscode-font-size) * 0.8) !important;
+      }
     }
   `;
   // git green var(--vscode-gitDecoration-untrackedResourceForeground)
@@ -155,24 +168,34 @@ class StatusLabel extends LitElement {
         <!-- Status Dot-->
         <span class="dot status-${this.status}" .title="${hoverText}"> </span>
         <!-- Label-->
-        <span class="text"> ${this.text} </span>
-        <div class="actions">
-          <!-- Optional Disconnected Button -->
-          ${this.status !== 0
-            ? undefined
-            : html` <vscode-button
-                appearance="icon"
-                @click=${this._connectClicked}
-                ><codicon-element icon="debug-disconnect"></codicon-element
-              ></vscode-button>`}
-          <!-- Help Button-->
-          <vscode-button
-            appearance="icon"
-            @click=${this._helpClicked}
-            style="grid-column: 2"
-            ><codicon-element icon="question"></codicon-element
-          ></vscode-button>
-        </div>
+        <span class="text" .title="${this.text}"> ${this.text} </span>
+        ${this.status === 0
+          ? html`
+              <div class="actions" style="grid-template-columns: 1fr 1fr;">
+                <!-- Disconnected Button -->
+                <vscode-button appearance="icon" @click=${this._connectClicked}
+                  ><codicon-element icon="debug-disconnect"></codicon-element
+                ></vscode-button>
+                <!-- Help Button-->
+                <vscode-button
+                  appearance="icon"
+                  @click=${this._helpClicked}
+                  style="grid-column: 2"
+                  ><codicon-element icon="question"></codicon-element
+                ></vscode-button>
+              </div>
+            `
+          : html`
+              <div class="actions" style="grid-template-columns: 1fr;">
+                <!-- Help Button-->
+                <vscode-button
+                  appearance="icon"
+                  @click=${this._helpClicked}
+                  style="grid-column: 2"
+                  ><codicon-element icon="question"></codicon-element
+                ></vscode-button>
+              </div>
+            `}
       </div>
     `;
   }

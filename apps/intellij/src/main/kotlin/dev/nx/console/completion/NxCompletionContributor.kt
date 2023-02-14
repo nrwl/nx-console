@@ -8,7 +8,7 @@ import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.PsiElementPattern
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import dev.nx.console.nxls.managers.getDocumentManager
+import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.utils.DocumentUtils
 
 private val log = logger<NxCompletionContributor>()
@@ -34,7 +34,7 @@ class NxCompletionContributor : CompletionContributor() {
 
                     ApplicationUtil.runWithCheckCanceled(
                         {
-                            getDocumentManager(parameters.editor).apply {
+                            DocumentManager.getInstance(parameters.editor).apply {
                                 completions(offset).let { result.addAllElements(it) }
                             }
                         },

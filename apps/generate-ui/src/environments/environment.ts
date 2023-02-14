@@ -399,7 +399,7 @@ export const NG_BUILD_ARCHITECT = {
     defaultValues: [
       {
         name: 'outputPath',
-        defaultValue: 'dist/apps/vscode/assets/public',
+        defaultValue: 'dist/apps/generate-ui',
       },
       {
         name: 'index',
