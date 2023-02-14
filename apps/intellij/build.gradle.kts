@@ -182,3 +182,9 @@ tasks.register<Copy>("copyGenerateUiArtifacts") {
     include("*.js", "*.css")
     into("${buildDir}/resources/main/generate_ui")
 }
+
+tasks.register<DefaultTask>("publish") {
+    // does nothing
+    group = "publish"
+    description = "Placeholder task to workaround the semantic-release plugin"
+}

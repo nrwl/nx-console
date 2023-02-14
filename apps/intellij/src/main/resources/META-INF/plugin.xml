@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>dev.nx.console</id>
     <name>Nx Console</name>
-    <vendor>Nx</vendor>
+    <vendor>NxDev</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
@@ -32,8 +32,8 @@
         <!-- Generate UI -->
         <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
                 text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
-          <add-to-group group-id="CodeMenu"/>
-          <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
+            <add-to-group group-id="CodeMenu"/>
+            <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
         </action>
     </actions>
 </idea-plugin>
