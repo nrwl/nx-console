@@ -1,3 +1,9 @@
+## <small>1.0.1 (2023-02-14)</small>
+
+### Bug Fixes
+
+* revert back to parcel/watcher@2.0.7 ([076705f](https://github.com/nrwl/nx-console/commit/076705f2749c4cd945faac40dfb516a801fc2704))
+
 ## 1.0.0 (2023-02-14)
 
 ### Bug Fixes
