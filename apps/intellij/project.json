@@ -35,8 +35,17 @@
       "options": {
         "command": "./gradlew :apps:intellij:runInspections"
       }
+    },
+    "semantic-release": {
+      "executor": "@theunderscorer/nx-semantic-release:semantic-release",
+      "options": {
+        "ci": false,
+        "npm": false,
+        "plugins": ["gradle-semantic-release-plugin"],
+        "buildTarget": "intellij:build"
+      }
     }
   },
   "tags": ["type:intellij"],
-  "implicitDependencies": ["generate-ui"]
+  "implicitDependencies": ["generate-ui", "nxls"]
 }
