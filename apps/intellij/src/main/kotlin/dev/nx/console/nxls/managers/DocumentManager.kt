@@ -143,7 +143,11 @@ class DocumentManager(val editor: Editor) {
     }
 
     private fun removeDocumentListener() {
-        document.removeDocumentListener(documentListener)
+        try {
+            document.removeDocumentListener(documentListener)
+        } catch (exception: Exception) {
+            log.info("Document listener was not registered for this document")
+        }
     }
 
     fun addTextDocumentService(textDocumentService: TextDocumentService) {
