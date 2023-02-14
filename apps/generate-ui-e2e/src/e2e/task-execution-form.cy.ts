@@ -26,24 +26,29 @@ describe('task-execution-form.spec', () => {
       );
     });
     it('should set input value to typed text', () => {
-      cy.get('nx-console-input input').type('testInput');
+      cy.get('nx-console-input input').first().type('testInput');
       cy.get('[data-cy=application]').contains('testInput');
     });
     it('should set multiple select value to selected options', () => {
-      cy.get('nx-console-multiple-select select').select(['feature', 'util']);
+      cy.get('nx-console-multiple-select select')
+        .first()
+        .select(['feature', 'util']);
       cy.get('[data-cy=libraries]').contains('feature,util');
     });
+    it('should expand options to show all', () => {
+      cy.get('button.options-button').click();
+    });
     it('should set select value to selected option', () => {
-      cy.get('nx-console-select select').select('less');
+      cy.get('nx-console-select select').eq(1).select('less');
       cy.get('[data-cy=style]').contains('less');
     });
     it('should update checkbox value when it is clicked', () => {
-      cy.get('nx-console-checkbox .bool-control').click();
+      cy.get('nx-console-checkbox .bool-control').eq(1).click();
       cy.get('[data-cy=addE2EProject]').contains('true');
     });
     it('should update autocomplete to selected option', () => {
-      cy.get('nx-console-autocomplete input').click();
-      cy.get('nx-console-autocomplete .option').eq(0).click();
+      cy.get('nx-console-autocomplete input').eq(1).click();
+      cy.get('nx-console-autocomplete .option').first().eq(0).click();
       cy.get('[data-cy=color]').contains('AliceBlue');
     });
   });
