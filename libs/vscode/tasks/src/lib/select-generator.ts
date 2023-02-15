@@ -50,13 +50,16 @@ export async function selectGenerator(
 
     if (allowlist.length > 0) {
       generatorsQuickPicks = generatorsQuickPicks.filter((item) =>
-        allowlist.includes(item.generatorName)
+        allowlist.find((rule) => matchWithWildcards(item.generatorName, rule))
       );
     }
 
     if (blocklist.length > 0) {
       generatorsQuickPicks = generatorsQuickPicks.filter(
-        (item) => !blocklist.includes(item.generatorName)
+        (item) =>
+          !blocklist.find((rule) =>
+            matchWithWildcards(item.generatorName, rule)
+          )
       );
     }
   }
@@ -94,4 +97,12 @@ export async function selectGenerator(
       };
     }
   }
+}
+
+function matchWithWildcards(text: string, expression: string) {
+  const escapeRegex = (str: string) =>
+    str.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
+  return new RegExp(
+    `^${expression.split('*').map(escapeRegex).join('.*')}$`
+  ).test(text);
 }

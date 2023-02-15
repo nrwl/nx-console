@@ -154,6 +154,13 @@
         "parallel": false
       },
       "outputs": ["dist/apps/vscode"]
+    },
+    "semantic-release": {
+      "executor": "@theunderscorer/nx-semantic-release:semantic-release",
+      "options": {
+        "packageJsonDir": "apps/vscode/src",
+        "commitMessage": "chore(release-${PROJECT_NAME}): ${nextRelease.version}"
+      }
     }
   },
   "tags": ["type:vscode"]
