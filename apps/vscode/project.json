@@ -84,7 +84,7 @@
           },
           {
             "glob": "CHANGELOG.md",
-            "input": "./",
+            "input": "apps/vscode",
             "output": "/"
           },
           {
