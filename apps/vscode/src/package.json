@@ -12,6 +12,7 @@
     "email": "hello@nrwl.io"
   },
   "publisher": "nrwl",
+  "private": true,
   "main": "main.js",
   "icon": "assets/nx-console-logo-large.png",
   "galleryBanner": {

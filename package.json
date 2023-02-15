@@ -13,7 +13,6 @@
     "watch": "nx watch-all vscode",
     "package": "node ./tools/scripts/clear-dist.js && nx package vscode",
     "e2e": "nx e2e vscode-e2e",
-    "release": "standard-version",
     "update": "nx migrate latest"
   },
   "dependencies": {
@@ -110,7 +109,6 @@
     "ovsx": "^0.7.1",
     "prettier": "2.7.1",
     "rimraf": "^3.0.2",
-    "standard-version": "^9.1.1",
     "ts-jest": "28.0.8",
     "ts-node": "10.9.1",
     "tslib": "^2.0.0",
