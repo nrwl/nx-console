@@ -56,9 +56,7 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "node ./tools/scripts/copy-cloud-webview-deps.mjs"
-      },
-      "inputs": ["nodeModules"],
-      "outputs": ["dist/apps/vscode/nx-cloud-webview"]
+      }
     },
     "test": {
       "executor": "@nrwl/jest:jest",

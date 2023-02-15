@@ -22,8 +22,7 @@
           "e2e",
           "build-storybook",
           "package",
-          "build-webview-files",
-          "extract-dependencies"
+          "build-webview-files"
         ],
         "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU="
       }
@@ -51,7 +50,6 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {},
   "namedInputs": {
-    "nodeModules": ["{workspaceRoot}/node_modules/"],
     "kotlin": [
       "{projectRoot}/build.gradle.kts",
       "{projectRoot}/**/*.kt",

@@ -16,7 +16,7 @@
         "customWebpackConfig": {
           "path": "apps/generate-ui/webpack.dev.js"
         },
-        "outputPath": "dist/apps/generate-ui",
+        "outputPath": "dist/apps/vscode/generate-ui",
         "index": "apps/generate-ui/src/index.html",
         "main": "apps/generate-ui/src/main.ts",
         "tsConfig": "apps/generate-ui/tsconfig.app.json",

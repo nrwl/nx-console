@@ -89,9 +89,7 @@ export function createWebViewPanel(
       {
         retainContextWhenHidden: true,
         enableScripts: true,
-        localResourceRoots: [
-          Uri.joinPath(context.extensionUri, '..', 'generate-ui'),
-        ],
+        localResourceRoots: [Uri.joinPath(context.extensionUri, 'generate-ui')],
       }
     );
     webviewPanel.onDidDispose(() => {
@@ -108,7 +106,7 @@ export function createWebViewPanel(
     setWebViewContent(webviewPanel, context);
 
     if (context.extensionMode === ExtensionMode.Development) {
-      watch(join(context.extensionPath, '..', 'generate-ui'), () => {
+      watch(join(context.extensionPath, 'generate-ui'), () => {
         if (webviewPanel) {
           setWebViewContent(webviewPanel, context);
           commands.executeCommand(
@@ -176,22 +174,15 @@ function setWebViewContent(
 export function getIframeHtml(webView: Webview, context: ExtensionContext) {
   const stylePath = Uri.joinPath(
     context.extensionUri,
-    '..',
     'generate-ui',
     'styles.css'
   );
   const runtimePath = Uri.joinPath(
     context.extensionUri,
-    '..',
     'generate-ui',
     'runtime.js'
   );
-  const mainPath = Uri.joinPath(
-    context.extensionUri,
-    '..',
-    'generate-ui',
-    'main.js'
-  );
+  const mainPath = Uri.joinPath(context.extensionUri, 'generate-ui', 'main.js');
 
   return `<!DOCTYPE html>
 <html lang="en">

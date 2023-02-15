@@ -131,11 +131,9 @@
     "extract-dependencies": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ./tools/scripts/copy-nxls-to-vscode.js"
+        "command": "node ./tools/scripts/copy-to-vscode.js"
       },
-      "dependsOn": ["^build"],
-      "inputs": ["{workspaceRoot}/dist/apps/nxls"],
-      "outputs": ["dist/apps/vscode/nxls"]
+      "dependsOn": ["^build"]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
