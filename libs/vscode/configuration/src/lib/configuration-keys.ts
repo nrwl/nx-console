@@ -9,6 +9,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'generatorBlocklist',
   'enableTaskExecutionDryRunOnChange',
   'projectViewingStyle',
+  'moveGeneratorPatterns',
 ] as const;
 
 export type GlobalConfig = {
@@ -21,7 +22,8 @@ export type GlobalConfig = {
   generatorAllowlist: string[];
   generatorBlocklist: string[];
   enableTaskExecutionDryRunOnChange: boolean;
-  projectViewingStyle: 'list' | 'tree';
+  projectViewingStyle: 'list' | 'tree' | 'automatic';
+  moveGeneratorPatterns: Record<string, string>;
 };
 
 /**

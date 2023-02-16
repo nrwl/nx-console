@@ -1,21 +1,18 @@
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import {
   Generator,
   GeneratorType,
-  Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import { normalizeSchema } from '@nx-console/shared/schema/normalize';
+import { matchWithWildcards } from '@nx-console/shared/utils';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getGeneratorOptions,
   getGenerators,
-  getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
 
 export async function selectGenerator(
-  workspacePath: string,
+  workspacePath: string | undefined,
   workspaceType: 'nx' | 'ng',
   generatorType?: GeneratorType,
   generator?: { collection: string; name: string }
@@ -77,7 +74,9 @@ export async function selectGenerator(
             quickPick.generator.collection === generator.collection &&
             quickPick.generator.name === generator.name
         )
-      : await window.showQuickPick(generatorsQuickPicks);
+      : generatorsQuickPicks.length > 1
+      ? await window.showQuickPick(generatorsQuickPicks)
+      : generatorsQuickPicks[0];
     if (selection) {
       const options =
         selection.generator.options ||
@@ -97,12 +96,4 @@ export async function selectGenerator(
       };
     }
   }
-}
-
-function matchWithWildcards(text: string, expression: string) {
-  const escapeRegex = (str: string) =>
-    str.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
-  return new RegExp(
-    `^${expression.split('*').map(escapeRegex).join('.*')}$`
-  ).test(text);
 }
