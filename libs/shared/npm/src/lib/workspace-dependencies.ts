@@ -8,8 +8,9 @@ import {
   pnpDependencyPath,
 } from './pnp-dependencies';
 import { directoryExists } from '@nx-console/shared/file-system';
-import { nxVersion } from './nx-version';
 import { packageDetails } from './package-details';
+import { coerce, SemVer } from 'semver';
+import { findNxPackagePath } from './find-nx-package-path';
 
 /**
  * Get dependencies for the current workspace.
@@ -101,4 +102,38 @@ async function localDependencies(
   }
 
   return existingPackages;
+}
+
+// THIS IS HANDLED BY THE NXLS NOW
+// KEEPING IT AROUND IN THE SHARED FOLDER FOR NG CLI COMPAT
+// TODO: REMOVE
+
+declare function __non_webpack_require__(importPath: string): any;
+
+let nxWorkspacePackageJson: { version: string };
+let loadedNxPackage = false;
+
+const defaultSemver = new SemVer('0.0.0');
+
+export async function nxVersion(workspacePath: string): Promise<SemVer> {
+  if (!loadedNxPackage) {
+    const packagePath = await findNxPackagePath(workspacePath, 'package.json');
+
+    if (!packagePath) {
+      return defaultSemver;
+    }
+
+    nxWorkspacePackageJson = __non_webpack_require__(packagePath);
+    loadedNxPackage = true;
+  }
+
+  if (!nxWorkspacePackageJson) {
+    return defaultSemver;
+  }
+  const nxVersion = coerce(nxWorkspacePackageJson.version);
+  if (!nxVersion) {
+    return defaultSemver;
+  }
+
+  return nxVersion;
 }

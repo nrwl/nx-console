@@ -10,6 +10,7 @@ import {
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
   NxProjectByPathRequest,
+  NxVersionRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -22,20 +23,24 @@ import {
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
-import {
-  getNxJsonSchema,
-  getPackageJsonSchema,
-  getProjectJsonSchema,
-  getWorkspaceJsonSchema,
-} from '@nx-console/shared/json-schema';
+import { languageServerWatcher } from '@nx-console/language-server/watcher';
 import {
   getExecutors,
   getGeneratorContextFromPath,
   getGeneratorOptions,
   getGenerators,
   getProjectByPath,
+  getNxVersion,
   nxWorkspace,
 } from '@nx-console/language-server/workspace';
+import {
+  getNxJsonSchema,
+  getPackageJsonSchema,
+  getProjectJsonSchema,
+  getWorkspaceJsonSchema,
+} from '@nx-console/shared/json-schema';
+import { TaskExecutionSchema } from '@nx-console/shared/schema';
+import { formatError } from '@nx-console/shared/utils';
 import {
   ClientCapabilities,
   CompletionList,
@@ -53,9 +58,6 @@ import {
   TextDocumentSyncKind,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
-import { formatError } from '@nx-console/shared/utils';
-import { languageServerWatcher } from '@nx-console/language-server/watcher';
-import { TaskExecutionSchema } from '@nx-console/shared/schema';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -304,6 +306,13 @@ connection.onRequest(
     return getGeneratorContextFromPath(args.generator, args.path, WORKING_PATH);
   }
 );
+
+connection.onRequest(NxVersionRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return getNxVersion(WORKING_PATH);
+});
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {

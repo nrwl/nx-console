@@ -3,16 +3,16 @@ import type {
   ProjectGraph,
   ProjectsConfigurations,
 } from '@nrwl/devkit';
+import { lspLogger } from '@nx-console/language-server/utils';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
-import { nxVersion } from '@nx-console/shared/npm';
 import { Logger } from '@nx-console/shared/schema';
+import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
+import { getNxVersion } from './get-nx-version';
 import {
   getNxProjectGraph,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
-import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
-import { lspLogger } from '@nx-console/language-server/utils';
 
 let projectGraph: ProjectGraph | null = null;
 
@@ -36,7 +36,7 @@ export async function getNxWorkspaceConfig(
 }> {
   const start = performance.now();
   logger.log('Retrieving workspace configuration');
-  const version = await nxVersion(workspacePath);
+  const version = await getNxVersion(workspacePath);
 
   if (version.major < 12) {
     lspLogger.log('Major version is less than 12');
