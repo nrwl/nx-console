@@ -69,6 +69,9 @@ class RunGeneratorManager(val project: Project) {
                         val consoleBuilder =
                             TextConsoleBuilderFactory.getInstance().createBuilder(project)
                         val console = consoleBuilder.console
+                        project.basePath?.let {
+                            console.addMessageFilter(NxGeneratorMessageFilter(project, it))
+                        }
                         console.attachToProcess(processHandler)
                         processHandler.startNotify()
 
