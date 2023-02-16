@@ -6,6 +6,7 @@ import {
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import { ProjectConfiguration } from '@nrwl/devkit';
+import { SemVer } from 'semver';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
   'nx/changeWorkspace'
@@ -65,3 +66,6 @@ export const NxGeneratorContextFromPathRequest: RequestType<
   | undefined,
   unknown
 > = new RequestType('nx/generatorContextFromPath');
+
+export const NxVersionRequest: RequestType<undefined, SemVer, unknown> =
+  new RequestType('nx/version');
