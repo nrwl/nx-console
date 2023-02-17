@@ -60,7 +60,15 @@ export async function normalizeSchema(
     return nxOption;
   });
 
-  return nxOptions.sort(compareOptions);
+  // since some folks are using Nx Console with older versions,
+  // we need to make sure their options are sorted like before
+  const optionComparator = nxOptions.some(
+    (option) => option['x-priority'] !== undefined
+  )
+    ? compareOptions
+    : legacyCompareOptions;
+
+  return nxOptions.sort(optionComparator);
 }
 
 /**
@@ -70,7 +78,7 @@ export async function normalizeSchema(
  * - everything else
  * - x-priority: internal
  * - deprecated
- * if two options are equal, they are sorted by name
+ * if two options are equal, they are sorted by whether they are positional args and name
  */
 function compareOptions(a: Option, b: Option): number {
   function getPrio(opt: Option): number {
@@ -92,9 +100,58 @@ function compareOptions(a: Option, b: Option): number {
   const aPrio = getPrio(a);
   const bPrio = getPrio(b);
   if (aPrio === bPrio) {
+    if (typeof a.positional === 'number' && typeof b.positional === 'number') {
+      return a.positional - b.positional;
+    }
+    if (typeof a.positional === 'number') {
+      return -1;
+    } else if (typeof b.positional === 'number') {
+      return 1;
+    }
     return a.name.localeCompare(b.name);
   }
   return aPrio - bPrio;
+}
+
+function legacyCompareOptions(a: Option, b: Option): number {
+  const IMPORTANT_FIELD_NAMES = [
+    'name',
+    'project',
+    'module',
+    'watch',
+    'style',
+    'directory',
+    'port',
+  ];
+  const IMPORTANT_FIELDS_SET = new Set(IMPORTANT_FIELD_NAMES);
+  if (typeof a.positional === 'number' && typeof b.positional === 'number') {
+    return a.positional - b.positional;
+  }
+
+  if (typeof a.positional === 'number') {
+    return -1;
+  } else if (typeof b.positional === 'number') {
+    return 1;
+  } else if (a.isRequired) {
+    if (b.isRequired) {
+      return a.name.localeCompare(b.name);
+    }
+    return -1;
+  } else if (b.isRequired) {
+    return 1;
+  } else if (IMPORTANT_FIELDS_SET.has(a.name)) {
+    if (IMPORTANT_FIELDS_SET.has(b.name)) {
+      return (
+        IMPORTANT_FIELD_NAMES.indexOf(a.name) -
+        IMPORTANT_FIELD_NAMES.indexOf(b.name)
+      );
+    }
+    return -1;
+  } else if (IMPORTANT_FIELDS_SET.has(b.name)) {
+    return 1;
+  } else {
+    return a.name.localeCompare(b.name);
+  }
 }
 
 function isFieldRequired(
