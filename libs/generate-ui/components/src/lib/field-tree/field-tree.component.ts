@@ -20,7 +20,7 @@ export class FieldTreeComponent implements OnChanges {
   @Input() activeFieldName: string;
   @Input() filteredFields: Set<string>;
   @Input() importantFields: Set<string>;
-  @Input() showOtherField = false;
+  @Input() showOtherFields = false;
   @Input() validFields: {
     [name: string]: string[] | string | number | boolean;
   };
@@ -74,6 +74,10 @@ export class FieldTreeComponent implements OnChanges {
     this.activeFieldName = fieldName;
     this.userSelectedField = fieldName;
     const element = document.getElementById(fieldName + '-nx-console-field');
+    console.log('active', this.activeFieldName);
+    console.log('user', this.userSelectedField);
+    console.log('element', element);
+
     if (element) {
       element.scrollIntoView({
         block: 'start',
@@ -83,7 +87,7 @@ export class FieldTreeComponent implements OnChanges {
   }
 
   getFieldsToDisplay() {
-    if (this.showOtherField) {
+    if (this.showOtherFields) {
       return this.fields;
     }
     return this.fields.filter((f) => this.importantFields.has(f.name));

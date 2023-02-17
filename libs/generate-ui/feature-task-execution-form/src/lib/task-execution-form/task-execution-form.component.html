@@ -64,7 +64,7 @@
             [importantFields]="splitFields.important"
             [validFields]="validFields$ | async"
             [invalidFields]="invalidFields$ | async"
-            [showOtherField]="
+            [showOtherFields]="
               showOtherFields ||
               (hasFilteredOtherFields(filteredFields, splitFields.other) &&
                 !hasFilteredImportantFields(
@@ -121,22 +121,23 @@
               ></nx-console-argument-list>
               <div class="fields-container">
                 <ng-container *ngIf="defaultValues$ | async as defaultValues">
-                  <nx-console-field
-                    [id]="field.name + '-nx-console-field'"
+                  <ng-container
                     *ngFor="let field of taskExecForm.architect.options"
-                    [class.changed-from-default]="
-                      defaultValues[field.name] !==
-                      taskExecForm.form.value[field.name]
-                    "
-                    [field]="field"
-                    [formControlName]="field.name"
-                    [style.display]="
-                      filteredFields.has(field.name) &&
-                      splitFields.important.has(field.name)
-                        ? 'block'
-                        : 'none'
-                    "
-                  ></nx-console-field>
+                  >
+                    <nx-console-field
+                      [id]="field.name + '-nx-console-field'"
+                      [class.changed-from-default]="
+                        defaultValues[field.name] !==
+                        taskExecForm.form.value[field.name]
+                      "
+                      [field]="field"
+                      [formControlName]="field.name"
+                      *ngIf="
+                        filteredFields.has(field.name) &&
+                        splitFields.important.has(field.name)
+                      "
+                    ></nx-console-field>
+                  </ng-container>
                   <div
                     *ngIf="
                       hasFilteredOtherFields(filteredFields, splitFields.other)
@@ -170,27 +171,28 @@
                           : 'collapsed'
                       "
                     >
-                      <nx-console-field
-                        [id]="field.name + '-nx-console-field'"
+                      <ng-container
                         *ngFor="let field of taskExecForm.architect.options"
-                        [class.changed-from-default]="
-                          defaultValues[field.name] !==
-                          taskExecForm.form.value[field.name]
-                        "
-                        [field]="field"
-                        [formControlName]="field.name"
-                        [style.display]="
-                          (showOtherFields ||
-                            !hasFilteredImportantFields(
-                              filteredFields,
-                              splitFields.important
-                            )) &&
-                          filteredFields.has(field.name) &&
-                          splitFields.other.has(field.name)
-                            ? 'block'
-                            : 'none'
-                        "
-                      ></nx-console-field>
+                      >
+                        <nx-console-field
+                          [id]="field.name + '-nx-console-field'"
+                          [class.changed-from-default]="
+                            defaultValues[field.name] !==
+                            taskExecForm.form.value[field.name]
+                          "
+                          [field]="field"
+                          [formControlName]="field.name"
+                          *ngIf="
+                            (showOtherFields ||
+                              !hasFilteredImportantFields(
+                                filteredFields,
+                                splitFields.important
+                              )) &&
+                            filteredFields.has(field.name) &&
+                            splitFields.other.has(field.name)
+                          "
+                        ></nx-console-field>
+                      </ng-container>
                     </div>
                   </div>
                 </ng-container>
