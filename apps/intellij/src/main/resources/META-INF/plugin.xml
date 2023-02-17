@@ -1,5 +1,5 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin>
+<idea-plugin require-restart="true">
     <id>dev.nx.console</id>
     <name>Nx Console</name>
     <vendor>NxDev</vendor>
