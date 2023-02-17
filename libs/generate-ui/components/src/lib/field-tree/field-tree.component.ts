@@ -74,9 +74,6 @@ export class FieldTreeComponent implements OnChanges {
     this.activeFieldName = fieldName;
     this.userSelectedField = fieldName;
     const element = document.getElementById(fieldName + '-nx-console-field');
-    console.log('active', this.activeFieldName);
-    console.log('user', this.userSelectedField);
-    console.log('element', element);
 
     if (element) {
       element.scrollIntoView({
