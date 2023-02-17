@@ -28,7 +28,10 @@ export function toWorkspaceFormat(
   return newFormat;
 }
 
-export function hasKey<T>(obj: T, key: PropertyKey): key is keyof T {
+export function hasKey<T extends object>(
+  obj: T,
+  key: PropertyKey
+): key is keyof T {
   return key in obj;
 }
 
@@ -42,4 +45,16 @@ export function formatError(message: string, err: any): string {
     return `${message}: ${err.toString()}`;
   }
   return message;
+}
+
+export function matchWithWildcards(
+  text: string,
+  expression: string,
+  strict = true
+) {
+  const escapeRegex = (str: string) =>
+    str.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
+  return new RegExp(
+    `${strict ? '^' : ''}${expression.split('*').map(escapeRegex).join('.*')}$`
+  ).test(text);
 }

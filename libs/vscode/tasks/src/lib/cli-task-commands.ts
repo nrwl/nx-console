@@ -1,20 +1,20 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 
-import { nxVersion } from '@nx-console/shared/npm';
 import { GeneratorType, Option, OptionType } from '@nx-console/shared/schema';
 import { NxProjectsConfiguration } from '@nx-console/shared/types';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
-  getProjectByPath,
   getGenerators,
+  getNxVersion,
   getNxWorkspace,
+  getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { CliTaskProvider } from './cli-task-provider';
 import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { selectGenerator } from './select-generator';
+import { selectReMoveGenerator } from './select-re-move-generator';
 
 const CLI_COMMAND_LIST = [
   'build',
@@ -90,27 +90,13 @@ export function registerCliTaskCommands(
     /**
      * move and remove were release in patch 8.11
      */
-    const version = await nxVersion(cliTaskProvider.getWorkspacePath());
+    const version = await getNxVersion();
     if (version.major >= 8) {
       commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
-        /**
-         * Bit of a hack - always runs angular/move if it is installed.
-         *
-         * As of the date of implementation, no issues with running this angular generator
-         * on non-angular projects. BUT THIS MIGHT CHANGE IN THE FUTURE.
-         *
-         * Also, future may hold other framework specific move/remove generators - this
-         * solution won't work when that happens.
-         */
-        const getCorrectMoveGenerator = async () => {
-          const generators = await getGenerators();
-          return generators.find(
-            (generator) => generator.name === '@nrwl/angular:move'
-          )
-            ? '@nrwl/angular:move'
-            : '@nrwl/workspace:move';
-        };
-        const generator = await getCorrectMoveGenerator();
+        const generator = await selectReMoveGenerator(uri.toString(), 'move');
+        if (!generator) {
+          return;
+        }
         selectCliCommandAndShowUi(
           'generate',
           context.extensionPath,
@@ -123,24 +109,13 @@ export function registerCliTaskCommands(
       commands.registerCommand(
         `${cli}.remove.fileexplorer`,
         async (uri: Uri) => {
-          /**
-           * Bit of a hack - always runs angular/remove if it is installed.
-           *
-           * As of the date of implementation, no issues with running this angular generator
-           * on non-angular projects. BUT THIS MIGHT CHANGE IN THE FUTURE.
-           *
-           * Also, future may hold other framework specific move/remove generators - this
-           * solution won't work when that happens.
-           */
-          const getCorrectRemoveGenerator = async () => {
-            const generators = await getGenerators();
-            return generators.find(
-              (generator) => generator.name === '@nrwl/angular:remove'
-            )
-              ? '@nrwl/angular:remove'
-              : '@nrwl/workspace:remove';
-          };
-          const generator = await getCorrectRemoveGenerator();
+          const generator = await selectReMoveGenerator(
+            uri.toString(),
+            'remove'
+          );
+          if (!generator) {
+            return;
+          }
           selectCliCommandAndShowUi(
             'generate',
             context.extensionPath,

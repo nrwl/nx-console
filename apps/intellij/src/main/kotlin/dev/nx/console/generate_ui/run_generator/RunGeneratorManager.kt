@@ -47,21 +47,29 @@ class RunGeneratorManager(val project: Project) {
         }
     }
 
-    private fun runGenerator(definition: List<String>): Unit {
-        val pkgManagerExecCommand = getPackageManagerExecCommand()
+    private fun runGenerator(definition: List<String>) {
+        val pkgManagerExecCommand: List<String> = getPackageManagerExecCommand()
+        val pkgManagerExecutable = pkgManagerExecCommand.get(0)
+        val pkgManagerParameters =
+            pkgManagerExecCommand.let {
+                if (it.size == 1) emptyList() else it.subList(1, it.size)
+            } + definition
+
         try {
             ApplicationManager.getApplication()
                 .invokeLater(
                     {
                         val commandLine =
                             GeneralCommandLine().apply {
-                                setExePath(pkgManagerExecCommand)
-                                addParameters(definition)
+                                setExePath(pkgManagerExecutable)
+                                addParameters(pkgManagerParameters)
                                 setWorkDirectory(project.basePath)
                                 withParentEnvironmentType(
                                     GeneralCommandLine.ParentEnvironmentType.CONSOLE
                                 )
-                                withEnvironment("FORCE_COLOR", "2")
+                                val env =
+                                    this.parentEnvironment.toMap() + mapOf("FORCE_COLOR" to "2")
+                                withEnvironment(env)
                             }
 
                         val processHandler = KillableColoredProcessHandler(commandLine)
@@ -69,6 +77,9 @@ class RunGeneratorManager(val project: Project) {
                         val consoleBuilder =
                             TextConsoleBuilderFactory.getInstance().createBuilder(project)
                         val console = consoleBuilder.console
+                        project.basePath?.let {
+                            console.addMessageFilter(NxGeneratorMessageFilter(project, it))
+                        }
                         console.attachToProcess(processHandler)
                         processHandler.startNotify()
 
@@ -107,7 +118,7 @@ class RunGeneratorManager(val project: Project) {
         runningProcessHandler = processHandler
     }
 
-    private fun getPackageManagerExecCommand(): String {
+    private fun getPackageManagerExecCommand(): List<String> {
         val npmPackageRef = NpmUtil.createProjectPackageManagerPackageRef()
         val npmPkgManager =
             NpmUtil.resolveRef(
@@ -115,13 +126,13 @@ class RunGeneratorManager(val project: Project) {
                 project,
                 NodeJsInterpreterManager.getInstance(project).interpreter
             )
-        val pkgManagerExecCommand: String =
+        val pkgManagerExecCommand: List<String> =
             if (npmPkgManager != null && NpmUtil.isYarnAlikePackage(npmPkgManager)) {
-                "yarn"
+                listOf("yarn")
             } else if (npmPkgManager != null && NpmUtil.isPnpmPackage(npmPkgManager)) {
-                "pnpm exec"
+                listOf("pnpm", "exec")
             } else {
-                "npx"
+                listOf("npx")
             }
         return pkgManagerExecCommand
     }
