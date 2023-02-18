@@ -9,6 +9,14 @@
     <depends>JavaScript</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+
+        <!-- works in WebStorm and other SmallIDEs -->
+        <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
+        <!-- works in IDEA -->
+        <projectTemplatesFactory implementation="dev.nx.console.cli.NxProjectTemplateFactory"/>
+        <!-- works in new IDEA wizard -->
+        <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
+
         <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
         <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
         <completion.contributor language="JSON"
