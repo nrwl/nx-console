@@ -1,4 +1,4 @@
-package dev.nx.console.generate_ui
+package dev.nx.console.generate.ui
 
 import java.io.IOException
 import java.net.URLConnection

@@ -1,4 +1,4 @@
-package dev.nx.console.generate_ui.utils
+package dev.nx.console.generate.ui.utils
 
 fun getHexColor(color: java.awt.Color?): String {
     if (color == null) {

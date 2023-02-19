@@ -1,4 +1,4 @@
-package dev.nx.console.generate_ui
+package dev.nx.console.generate
 
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
@@ -8,11 +8,9 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import dev.nx.console.generate_ui.editor.DefaultNxGenerateUiFile
+import dev.nx.console.generate.ui.editor.DefaultNxGenerateUiFile
 import dev.nx.console.nxls.server.*
 import dev.nx.console.services.NxlsService
-import javax.swing.ListSelectionModel.SINGLE_SELECTION
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -21,6 +19,7 @@ private val logger = logger<NxGenerateUiAction>()
 class NxGenerateUiAction() : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+        val generateService = project.service<NxGenerateService>()
 
         val path =
             if (ActionPlaces.isPopupPlace(e.place)) {
@@ -29,32 +28,11 @@ class NxGenerateUiAction() : AnAction() {
                 null
             }
 
-        runBlocking { launch { selectGenerator(project, path, e) } }
-    }
-
-    private suspend fun selectGenerator(project: Project, path: String?, e: AnActionEvent) {
-        val nxlsService = project.service<NxlsService>()
-
-        val generators = nxlsService.generators()
-        val generatorNames = generators.map { it.name }
-
-        JBPopupFactory.getInstance()
-            .createPopupChooserBuilder(generatorNames)
-            .setTitle("Nx Generate (UI)")
-            .setSelectionMode(SINGLE_SELECTION)
-            .setRequestFocus(true)
-            .setFilterAlwaysVisible(true)
-            .setResizable(true)
-            .setMovable(true)
-            .setNamerForFiltering { it }
-            .setItemChosenCallback { chosen ->
-                val chosenGenerator = generators.find { g -> g.name == chosen }
-                if (chosenGenerator != null) {
-                    openGenerateUi(project, chosenGenerator, path)
-                }
+        runBlocking {
+            launch {
+                generateService.selectGenerator(e) { it?.let { openGenerateUi(project, it, path) } }
             }
-            .createPopup()
-            .showInBestPositionFor(e.dataContext)
+        }
     }
 
     private fun openGenerateUi(project: Project, generator: NxGenerator, contextPath: String?) {
