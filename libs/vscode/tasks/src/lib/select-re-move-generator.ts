@@ -4,7 +4,7 @@ import { getGenerators } from '@nx-console/vscode/nx-workspace';
 import { window } from 'vscode';
 
 export async function selectReMoveGenerator(
-  path: string,
+  path: string | undefined,
   target: 'move' | 'remove'
 ): Promise<string | undefined> {
   const generators = await getGenerators();
@@ -21,7 +21,7 @@ export async function selectReMoveGenerator(
     GlobalConfigurationStore.instance.get('moveGeneratorPatterns') ?? {};
   let matchedCollection: string | undefined;
   for (const [pattern, collection] of Object.entries(patterns)) {
-    if (matchWithWildcards(path, pattern, false)) {
+    if (path && matchWithWildcards(path, pattern, false)) {
       matchedCollection = collection;
     }
   }
@@ -36,8 +36,13 @@ export async function selectReMoveGenerator(
     generator: generator.name,
   }));
 
-  const selectedGenerator = (await window.showQuickPick(quickPickItems))
-    ?.generator;
+  const selectedGenerator = (
+    await window.showQuickPick(quickPickItems, {
+      title: `Select ${target} generator`,
+      placeHolder: `@nrwl/workspace:${target}`,
+      canPickMany: false,
+    })
+  )?.generator;
 
   return selectedGenerator;
 }

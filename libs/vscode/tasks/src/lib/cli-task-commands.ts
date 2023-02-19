@@ -92,8 +92,8 @@ export function registerCliTaskCommands(
      */
     const version = await getNxVersion();
     if (version.major >= 8) {
-      commands.registerCommand(`${cli}.move.fileexplorer`, async (uri: Uri) => {
-        const generator = await selectReMoveGenerator(uri.toString(), 'move');
+      commands.registerCommand(`${cli}.move`, async (uri: Uri) => {
+        const generator = await selectReMoveGenerator(uri?.toString(), 'move');
         if (!generator) {
           return;
         }
@@ -106,25 +106,22 @@ export function registerCliTaskCommands(
         );
       });
 
-      commands.registerCommand(
-        `${cli}.remove.fileexplorer`,
-        async (uri: Uri) => {
-          const generator = await selectReMoveGenerator(
-            uri.toString(),
-            'remove'
-          );
-          if (!generator) {
-            return;
-          }
-          selectCliCommandAndShowUi(
-            'generate',
-            context.extensionPath,
-            uri,
-            GeneratorType.Other,
-            generator
-          );
+      commands.registerCommand(`${cli}.remove`, async (uri: Uri) => {
+        const generator = await selectReMoveGenerator(
+          uri?.toString(),
+          'remove'
+        );
+        if (!generator) {
+          return;
         }
-      );
+        selectCliCommandAndShowUi(
+          'generate',
+          context.extensionPath,
+          uri,
+          GeneratorType.Other,
+          generator
+        );
+      });
     }
 
     commands.registerCommand(`${cli}.generate`, () =>

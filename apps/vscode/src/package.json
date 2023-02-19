@@ -79,12 +79,12 @@
         },
         {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
-          "command": "nx.move.fileexplorer",
+          "command": "nx.move",
           "group": "7_modification@-1"
         },
         {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
-          "command": "nx.remove.fileexplorer",
+          "command": "nx.remove",
           "group": "7_modification@-1"
         },
         {
@@ -685,12 +685,12 @@
       {
         "category": "Nx",
         "title": "Move Nx Project...",
-        "command": "nx.move.fileexplorer"
+        "command": "nx.move"
       },
       {
         "category": "Nx",
         "title": "Remove Nx Project...",
-        "command": "nx.remove.fileexplorer"
+        "command": "nx.remove"
       },
       {
         "category": "Nx",
