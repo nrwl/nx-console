@@ -8,13 +8,16 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
-import com.intellij.javascript.nodejs.interpreter.NodeJsInterpreterManager
-import com.intellij.javascript.nodejs.npm.NpmUtil
+import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
+import dev.nx.console.utils.NxExecutable
+
+val log = logger<RunGeneratorManager>()
 
 class RunGeneratorManager(val project: Project) {
 
@@ -26,7 +29,7 @@ class RunGeneratorManager(val project: Project) {
         flags: List<String>,
     ) {
 
-        val generatorDefinition = listOf("nx", "g", generator, *flags.toTypedArray())
+        val generatorDefinition = listOf("g", generator, *flags.toTypedArray())
         runningProcessHandler.let {
             if (it == null) {
                 runGenerator(generatorDefinition)
@@ -48,28 +51,26 @@ class RunGeneratorManager(val project: Project) {
     }
 
     private fun runGenerator(definition: List<String>) {
-        val pkgManagerExecCommand: List<String> = getPackageManagerExecCommand()
-        val pkgManagerExecutable = pkgManagerExecCommand.get(0)
-        val pkgManagerParameters =
-            pkgManagerExecCommand.let {
-                if (it.size == 1) emptyList() else it.subList(1, it.size)
-            } + definition
-
         try {
             ApplicationManager.getApplication()
                 .invokeLater(
                     {
+                        val nxExecutable =
+                            NxExecutable.getExecutablePath(
+                                project.basePath
+                                    ?: throw Exception("Project base path does not exist")
+                            )
+
                         val commandLine =
                             GeneralCommandLine().apply {
-                                setExePath(pkgManagerExecutable)
-                                addParameters(pkgManagerParameters)
+                                exePath = nxExecutable
+                                addParameters(definition)
                                 setWorkDirectory(project.basePath)
                                 withParentEnvironmentType(
                                     GeneralCommandLine.ParentEnvironmentType.CONSOLE
                                 )
-                                val env =
-                                    this.parentEnvironment.toMap() + mapOf("FORCE_COLOR" to "2")
-                                withEnvironment(env)
+
+                                NodeCommandLineUtil.configureUsefulEnvironment(this)
                             }
 
                         val processHandler = KillableColoredProcessHandler(commandLine)
@@ -103,7 +104,7 @@ class RunGeneratorManager(val project: Project) {
                     ModalityState.defaultModalityState()
                 )
         } catch (e: Exception) {
-            logger<String>().warn("Cannot execute command", e)
+            thisLogger().info("Cannot execute command", e)
         }
     }
 
@@ -116,24 +117,5 @@ class RunGeneratorManager(val project: Project) {
             }
         )
         runningProcessHandler = processHandler
-    }
-
-    private fun getPackageManagerExecCommand(): List<String> {
-        val npmPackageRef = NpmUtil.createProjectPackageManagerPackageRef()
-        val npmPkgManager =
-            NpmUtil.resolveRef(
-                npmPackageRef,
-                project,
-                NodeJsInterpreterManager.getInstance(project).interpreter
-            )
-        val pkgManagerExecCommand: List<String> =
-            if (npmPkgManager != null && NpmUtil.isYarnAlikePackage(npmPkgManager)) {
-                listOf("yarn")
-            } else if (npmPkgManager != null && NpmUtil.isPnpmPackage(npmPkgManager)) {
-                listOf("pnpm", "exec")
-            } else {
-                listOf("npx")
-            }
-        return pkgManagerExecCommand
     }
 }
