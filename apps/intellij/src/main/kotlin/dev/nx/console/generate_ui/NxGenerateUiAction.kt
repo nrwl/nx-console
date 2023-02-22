@@ -23,11 +23,11 @@ import dev.nx.console.nxls.server.NxGeneratorContext
 import dev.nx.console.nxls.server.NxGeneratorOption
 import dev.nx.console.nxls.server.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.awt.Dimension
 import javax.swing.JList
 import javax.swing.ListSelectionModel.SINGLE_SELECTION
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 private val logger = logger<NxGenerateUiAction>()
 
@@ -71,11 +71,11 @@ class NxGenerateUiAction() : AnAction() {
                         )
                         append(
                             " " +
-                                    StringUtil.shortenTextWithEllipsis(
-                                        value.data.description,
-                                        80 - value.name.length,
-                                        0
-                                    ),
+                                StringUtil.shortenTextWithEllipsis(
+                                    value.data.description,
+                                    80 - value.name.length,
+                                    0
+                                ),
                             SimpleTextAttributes.GRAY_ATTRIBUTES,
                             false
                         )
