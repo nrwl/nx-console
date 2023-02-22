@@ -20,6 +20,7 @@ export interface NxWorkspace {
   daemonEnabled?: boolean;
   workspacePath: string;
   isLerna: boolean;
+  isStandaloneNx: boolean;
   workspaceLayout: {
     appsDir: string;
     libsDir: string;

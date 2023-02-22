@@ -92,6 +92,7 @@ async function _workspace(
       workspace: toWorkspaceFormat(config.workspaceConfiguration),
       daemonEnabled: config.daemonEnabled,
       isLerna,
+      isStandaloneNx: !!(config.workspaceConfiguration as any).installation,
       workspaceLayout: {
         appsDir:
           config.workspaceConfiguration.workspaceLayout?.appsDir ?? isLerna
@@ -117,6 +118,7 @@ async function _workspace(
         version: 2,
       },
       workspacePath,
+      isStandaloneNx: false,
       isLerna: false,
       workspaceLayout: {
         appsDir: 'apps',

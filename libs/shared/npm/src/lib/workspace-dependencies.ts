@@ -49,9 +49,27 @@ export async function workspaceDependencyPath(
     return pnpDependencyPath(workspacePath, workspaceDependencyName);
   }
 
-  const path = join(workspacePath, 'node_modules', workspaceDependencyName);
+  const nodeModulesPath = join(
+    workspacePath,
+    'node_modules',
+    workspaceDependencyName
+  );
+  const standalonePath = join(
+    workspacePath,
+    '.nx',
+    'installation',
+    'node_modules',
+    workspaceDependencyName
+  );
+
   try {
-    return (await directoryExists(path)) ? path : undefined;
+    if (await directoryExists(nodeModulesPath)) {
+      return nodeModulesPath;
+    } else if (await directoryExists(standalonePath)) {
+      return standalonePath;
+    } else {
+      return undefined;
+    }
   } catch {
     return;
   }
