@@ -9,12 +9,25 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.ui.ColoredListCellRenderer
+import com.intellij.ui.SimpleTextAttributes
+import com.intellij.ui.scale.JBUIScale
+import com.intellij.util.ui.EmptyIcon
+import com.intellij.util.ui.JBScalableIcon
+import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate_ui.editor.DefaultNxGenerateUiFile
-import dev.nx.console.nxls.server.*
+import dev.nx.console.nxls.server.NxGenerator
+import dev.nx.console.nxls.server.NxGeneratorContext
+import dev.nx.console.nxls.server.NxGeneratorOption
+import dev.nx.console.nxls.server.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
-import javax.swing.ListSelectionModel.SINGLE_SELECTION
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.awt.Dimension
+import javax.swing.JList
+import javax.swing.ListSelectionModel.SINGLE_SELECTION
 
 private val logger = logger<NxGenerateUiAction>()
 
@@ -34,25 +47,55 @@ class NxGenerateUiAction() : AnAction() {
 
     private suspend fun selectGenerator(project: Project, path: String?, e: AnActionEvent) {
         val nxlsService = project.service<NxlsService>()
-
         val generators = nxlsService.generators()
-        val generatorNames = generators.map { it.name }
 
         JBPopupFactory.getInstance()
-            .createPopupChooserBuilder(generatorNames)
+            .createPopupChooserBuilder(generators)
+            .setRenderer(
+                object : ColoredListCellRenderer<NxGenerator>() {
+                    override fun customizeCellRenderer(
+                        list: JList<out NxGenerator>,
+                        value: NxGenerator,
+                        index: Int,
+                        selected: Boolean,
+                        hasFocus: Boolean
+                    ) {
+                        if (!selected && index % 2 == 0) {
+                            background = UIUtil.getDecoratedRowColor()
+                        }
+                        icon = JBUIScale.scaleIcon(EmptyIcon.create(5) as JBScalableIcon)
+                        append(
+                            value.name.split(":").joinToString(" - "),
+                            SimpleTextAttributes.REGULAR_ATTRIBUTES,
+                            true
+                        )
+                        append(
+                            " " +
+                                    StringUtil.shortenTextWithEllipsis(
+                                        value.data.description,
+                                        80 - value.name.length,
+                                        0
+                                    ),
+                            SimpleTextAttributes.GRAY_ATTRIBUTES,
+                            false
+                        )
+                    }
+                }
+            )
             .setTitle("Nx Generate (UI)")
             .setSelectionMode(SINGLE_SELECTION)
             .setRequestFocus(true)
             .setFilterAlwaysVisible(true)
             .setResizable(true)
             .setMovable(true)
-            .setNamerForFiltering { it }
+            .setNamerForFiltering { it.name }
             .setItemChosenCallback { chosen ->
-                val chosenGenerator = generators.find { g -> g.name == chosen }
-                if (chosenGenerator != null) {
-                    openGenerateUi(project, chosenGenerator, path)
+                if (chosen != null) {
+                    openGenerateUi(project, chosen, path)
                 }
             }
+            .setMinSize(Dimension(JBUI.scale(350), JBUI.scale(300)))
+            .setDimensionServiceKey("nx.dev.console.generate")
             .createPopup()
             .showInBestPositionFor(e.dataContext)
     }
