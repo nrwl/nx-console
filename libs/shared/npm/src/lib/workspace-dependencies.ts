@@ -54,7 +54,7 @@ export async function workspaceDependencyPath(
     'node_modules',
     workspaceDependencyName
   );
-  const standalonePath = join(
+  const encapsulatedPath = join(
     workspacePath,
     '.nx',
     'installation',
@@ -65,8 +65,8 @@ export async function workspaceDependencyPath(
   try {
     if (await directoryExists(nodeModulesPath)) {
       return nodeModulesPath;
-    } else if (await directoryExists(standalonePath)) {
-      return standalonePath;
+    } else if (await directoryExists(encapsulatedPath)) {
+      return encapsulatedPath;
     } else {
       return undefined;
     }
