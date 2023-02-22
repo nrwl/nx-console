@@ -1,4 +1,4 @@
-package dev.nx.console.generate_ui.run_generator
+package dev.nx.console.generate.run_generator
 
 import com.intellij.execution.filters.AbstractFileHyperlinkFilter
 import com.intellij.execution.filters.FileHyperlinkRawData

@@ -1,9 +1,8 @@
-package dev.nx.console.generate_ui.editor
+package dev.nx.console.generate.ui.editor
 
 import com.intellij.diff.util.FileEditorBase
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.ui.jcef.*
 import javax.swing.JComponent
 
 class NxGenerateUiFileEditor(

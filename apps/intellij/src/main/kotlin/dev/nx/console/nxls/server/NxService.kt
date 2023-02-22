@@ -1,6 +1,7 @@
 package dev.nx.console.nxls.server
 
 import java.util.concurrent.CompletableFuture
+import kotlinx.serialization.json.JsonObject
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment
@@ -11,7 +12,7 @@ interface NxService {
     @JsonRequest
     fun workspace(
         workspaceRequest: NxWorkspaceRequest = NxWorkspaceRequest()
-    ): CompletableFuture<Any> {
+    ): CompletableFuture<com.google.gson.JsonObject> {
         throw UnsupportedOperationException()
     }
 

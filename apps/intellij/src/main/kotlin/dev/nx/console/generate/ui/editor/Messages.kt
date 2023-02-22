@@ -1,4 +1,4 @@
-package dev.nx.console.generate_ui.editor
+package dev.nx.console.generate.ui.editor
 
 import dev.nx.console.nxls.server.NxGeneratorContext
 import dev.nx.console.nxls.server.NxGeneratorOption

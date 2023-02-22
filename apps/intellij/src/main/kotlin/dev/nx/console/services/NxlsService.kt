@@ -7,6 +7,7 @@ import dev.nx.console.nxls.NxlsWrapper
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
 import kotlinx.coroutines.future.await
+import kotlinx.serialization.json.JsonObject
 
 private val logger = logger<NxlsService>()
 
@@ -34,7 +35,7 @@ class NxlsService(val project: Project) {
         wrapper.stop()
     }
 
-    suspend fun workspace(): Any? {
+    suspend fun workspace(): com.google.gson.JsonObject? {
         return server()?.getNxService()?.workspace()?.await()
     }
 
@@ -50,7 +51,7 @@ class NxlsService(val project: Project) {
     }
 
     suspend fun generatorContextFromPath(
-        generator: NxGenerator,
+        generator: NxGenerator? = null,
         path: String
     ): NxGeneratorContext? {
         val request = NxGetGeneratorContextFromPathRequest(generator, path)

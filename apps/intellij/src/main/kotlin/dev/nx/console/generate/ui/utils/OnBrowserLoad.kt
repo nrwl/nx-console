@@ -1,4 +1,4 @@
-package dev.nx.console.generate_ui.utils
+package dev.nx.console.generate.ui.utils
 
 import com.intellij.ui.jcef.JBCefBrowser
 import org.cef.browser.CefBrowser

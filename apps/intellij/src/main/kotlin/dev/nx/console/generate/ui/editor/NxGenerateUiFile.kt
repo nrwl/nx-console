@@ -1,4 +1,4 @@
-package dev.nx.console.generate_ui.editor
+package dev.nx.console.generate.ui.editor
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileTypes.FileType
@@ -9,10 +9,10 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.NxIcons
-import dev.nx.console.generate_ui.CustomSchemeHandlerFactory
-import dev.nx.console.generate_ui.run_generator.RunGeneratorManager
-import dev.nx.console.generate_ui.utils.getHexColor
-import dev.nx.console.generate_ui.utils.onBrowserLoadEnd
+import dev.nx.console.generate.run_generator.RunGeneratorManager
+import dev.nx.console.generate.ui.CustomSchemeHandlerFactory
+import dev.nx.console.generate.ui.utils.getHexColor
+import dev.nx.console.generate.ui.utils.onBrowserLoadEnd
 import dev.nx.console.nxls.server.NxGenerator
 import javax.swing.Icon
 import javax.swing.JComponent
