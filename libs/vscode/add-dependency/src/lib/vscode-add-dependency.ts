@@ -197,6 +197,7 @@ async function executeInitGenerator(
     getShellExecutionForConfig({
       cwd: workspacePath,
       displayCommand: command,
+      standaloneNx: false,
     })
   );
   tasks.executeTask(task);

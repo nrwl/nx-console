@@ -124,6 +124,7 @@ function createMakeNgFasterTask() {
     getShellExecutionForConfig({
       cwd: workspacePath,
       displayCommand,
+      standaloneNx: false,
     })
   );
   return task;
