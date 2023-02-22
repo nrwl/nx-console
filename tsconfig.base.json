@@ -21,9 +21,6 @@
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
-      "@nx-console/generate-ui/argument-list": [
-        "libs/generate-ui/argument-list/src/index.ts"
-      ],
       "@nx-console/generate-ui/components": [
         "libs/generate-ui/components/src/index.ts"
       ],

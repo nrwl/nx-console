@@ -245,23 +245,6 @@ export class TaskExecutionFormComponent implements OnInit {
     startWith({ important: new Set<string>(), other: new Set<string>() })
   );
 
-  runCommandArguments$ = this.taskExecForm$.pipe(
-    mergeMap((taskExecForm) =>
-      taskExecForm.form.valueChanges.pipe(
-        startWith(taskExecForm.form.value),
-        map(() => taskExecForm)
-      )
-    ),
-    map(({ architect, form }) =>
-      this.serializeArgs(
-        form.value,
-        architect,
-        form.get('configuration')?.value
-      )
-    ),
-    tap(() => setTimeout(() => this.changeDetectorRef.detectChanges(), 0))
-  );
-
   validFields$ = this.getValidFields$(true);
 
   invalidFields$ = this.getValidFields$(false);
