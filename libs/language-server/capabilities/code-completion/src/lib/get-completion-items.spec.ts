@@ -19,6 +19,7 @@ jest.mock(
     nxWorkspace: jest.fn(() =>
       Promise.resolve<NxWorkspace>({
         isLerna: false,
+        isStandaloneNx: false,
         validWorkspaceJson: true,
         workspaceType: 'nx',
         workspacePath: '/',
