@@ -1,6 +1,5 @@
 package dev.nx.console.generate_ui.run_generator
 
-import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.filters.TextConsoleBuilderFactory
@@ -10,15 +9,13 @@ import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.javascript.nodejs.NodeCommandLineUtil
-import com.intellij.javascript.nodejs.npm.NpmPackageDescriptor
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import dev.nx.console.NxConsoleBundle
 import dev.nx.console.NxIcons
-import java.nio.file.Paths
+import dev.nx.console.utils.NxExecutable
 
 val log = logger<RunGeneratorManager>()
 
@@ -58,16 +55,15 @@ class RunGeneratorManager(val project: Project) {
             ApplicationManager.getApplication()
                 .invokeLater(
                     {
-                        val binPath =
-                            Paths.get(project.basePath ?: ".", "node_modules", ".bin").toString()
-                        log.info("Using ${binPath} as base to find local nx binary")
-                        val nxPackage =
-                            NpmPackageDescriptor.findLocalBinaryFilePackage(binPath, "nx")
-                                ?: throw ExecutionException(NxConsoleBundle.message("nx.not.found"))
+                        val nxExecutable =
+                            NxExecutable.getExecutablePath(
+                                project.basePath
+                                    ?: throw Exception("Project base path does not exist")
+                            )
 
                         val commandLine =
                             GeneralCommandLine().apply {
-                                exePath = nxPackage.systemDependentPath
+                                exePath = nxExecutable
                                 addParameters(definition)
                                 setWorkDirectory(project.basePath)
                                 withParentEnvironmentType(
