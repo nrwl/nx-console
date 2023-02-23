@@ -11,8 +11,12 @@ import { join } from 'path';
 export async function npmDependencies(workspacePath: string) {
   const nodeModulesDir = join(workspacePath, 'node_modules');
   const res: string[] = [];
-  const stats = await stat(nodeModulesDir);
-  if (!stats.isDirectory()) {
+  try {
+    const stats = await stat(nodeModulesDir);
+    if (!stats.isDirectory()) {
+      return res;
+    }
+  } catch {
     return res;
   }
 
