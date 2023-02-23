@@ -1,4 +1,3 @@
-import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
