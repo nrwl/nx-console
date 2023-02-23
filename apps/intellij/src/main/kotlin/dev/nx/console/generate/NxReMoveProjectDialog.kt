@@ -57,7 +57,10 @@ class NxReMoveProjectDialog(
 
     override fun createCenterPanel(): JComponent {
         val model =
-            ReMoveProjectDialogModel(reMoveGeneratorContext?.project ?: "", reMoveGenerators.get(0))
+            ReMoveProjectDialogModel(
+                reMoveGeneratorContext?.project ?: "",
+                reMoveGenerators.find { it.contains("@nrwl/workspace") } ?: reMoveGenerators.get(0)
+            )
 
         panel =
             panel {
@@ -123,7 +126,6 @@ class NxReMoveProjectDialog(
                                 textField()
                                     .bindText(model::directory)
                                     .horizontalAlign(HorizontalAlign.FILL)
-                                    .comment("")
                                     .component
                         }
                         .visible(mode == "move")
@@ -171,9 +173,19 @@ class NxReMoveProjectDialog(
             return ""
         }
         if (projectType == "application") {
-            return "${workspaceLayout.appsDir}/"
+            return workspaceLayout.appsDir.let {
+                if (it == null || it == "") {
+                    return ""
+                }
+                "${it}/"
+            }
         } else {
-            return "${workspaceLayout.libsDir}/"
+            return workspaceLayout.libsDir.let {
+                if (it == null || it == "") {
+                    return ""
+                }
+                "${it}/"
+            }
         }
     }
 }
