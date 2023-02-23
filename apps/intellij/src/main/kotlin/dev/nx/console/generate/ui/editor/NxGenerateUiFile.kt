@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
+import dev.nx.console.NxConsoleSettingsProvider
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.CustomSchemeHandlerFactory
@@ -93,7 +94,13 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
             browser.executeJavaScriptAsync(js)
 
             postMessageToBrowser(StyleMessage(this.extractIntellijStyles()))
-            postMessageToBrowser(GlobalConfigurationMessage(GlobalConfigurationPayload(true)))
+            postMessageToBrowser(
+                GlobalConfigurationMessage(
+                    GlobalConfigurationPayload(
+                        NxConsoleSettingsProvider.getInstance().enableDryRunOnGenerateChange
+                    )
+                )
+            )
 
             // we will send this info to the webview once it's initialized
             generator.options?.let {

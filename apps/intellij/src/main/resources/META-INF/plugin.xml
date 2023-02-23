@@ -26,10 +26,18 @@
 
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
+    <applicationConfigurable
+      parentId="tools"
+      instance="dev.nx.console.NxConsoleSettingsConfigurable"
+      id="com.example.ApplicationSettingsConfigurable"
+      displayName="Nx Console"/>
+    <applicationService serviceImplementation="dev.nx.console.NxConsoleSettingsProvider"/>
+
+
     <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
 
     <!-- Generate -->
-    <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"></projectService>
+    <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
     <fileEditorProvider implementation="dev.nx.console.generate.ui.editor.NxGenerateUiFileEditorProvider"/>
   </extensions>
 
