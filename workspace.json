@@ -2,7 +2,6 @@
   "version": 2,
   "projects": {
     "generate-ui": "apps/generate-ui",
-    "generate-ui-argument-list": "libs/generate-ui/argument-list",
     "generate-ui-components": "libs/generate-ui/components",
     "generate-ui-e2e": "apps/generate-ui-e2e",
     "generate-ui-feature-task-execution-form": "libs/generate-ui/feature-task-execution-form",
