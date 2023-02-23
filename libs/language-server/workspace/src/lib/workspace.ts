@@ -94,14 +94,8 @@ async function _workspace(
       isLerna,
       isEncapsulatedNx: !!(config.workspaceConfiguration as any).installation,
       workspaceLayout: {
-        appsDir:
-          config.workspaceConfiguration.workspaceLayout?.appsDir ?? isLerna
-            ? 'packages'
-            : 'apps',
-        libsDir:
-          config.workspaceConfiguration.workspaceLayout?.libsDir ?? isLerna
-            ? 'packages'
-            : 'libs',
+        appsDir: config.workspaceConfiguration.workspaceLayout?.appsDir,
+        libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,
       },
       workspacePath,
     };

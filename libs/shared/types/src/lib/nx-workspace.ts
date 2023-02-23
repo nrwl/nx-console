@@ -22,7 +22,7 @@ export interface NxWorkspace {
   isLerna: boolean;
   isEncapsulatedNx: boolean;
   workspaceLayout: {
-    appsDir: string;
-    libsDir: string;
+    appsDir?: string;
+    libsDir?: string;
   };
 }
