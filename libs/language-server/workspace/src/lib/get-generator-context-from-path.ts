@@ -33,12 +33,12 @@ export async function getGeneratorContextFromPath(
   const appsDir = workspaceLayout.appsDir;
   const libsDir = workspaceLayout.libsDir;
   if (
-    (appsDir && generator?.name === 'application') ||
-    generator?.name === 'app'
+    appsDir &&
+    (generator?.name === 'application' || generator?.name === 'app')
   ) {
     modifiedPath = modifiedPath.replace(appsDir, '').replace(/^\//, '');
   }
-  if ((libsDir && generator?.name === 'library') || generator?.name === 'lib') {
+  if (libsDir && (generator?.name === 'library' || generator?.name === 'lib')) {
     modifiedPath = modifiedPath.replace(libsDir, '').replace(/^\//, '');
   }
 
