@@ -5,6 +5,7 @@
   position: relative;
   margin-bottom: 1rem;
   white-space: normal;
+  max-width: var(--input-width);
 
   .field-title {
     white-space: nowrap;

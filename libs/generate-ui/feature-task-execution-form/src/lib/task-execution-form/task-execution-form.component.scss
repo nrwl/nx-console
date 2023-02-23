@@ -71,7 +71,9 @@ generate-ui-field-tree {
 }
 
 form {
-  margin-left: 190px;
+  margin: auto;
+  padding-left: 190px;
+  padding-right: 190px;
   padding-right: $host-padding-right - $scrollbar-width;
 }
 
@@ -85,6 +87,7 @@ form {
   box-sizing: border-box;
   max-width: 980px;
   margin: auto;
+  justify-items: space-between;
 }
 
 nx-console-argument-list {
@@ -178,7 +181,8 @@ nx-console-field {
 
 @media (max-width: 600px) {
   form {
-    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   generate-ui-field-tree {
