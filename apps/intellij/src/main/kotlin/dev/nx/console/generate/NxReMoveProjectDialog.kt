@@ -43,12 +43,12 @@ class NxReMoveProjectDialog(
         init()
     }
 
-    lateinit private var panel: DialogPanel
-    lateinit private var model: ReMoveProjectDialogModel
+    private lateinit var panel: DialogPanel
+    private lateinit var model: ReMoveProjectDialogModel
 
-    lateinit private var projectField: TextFieldWithAutoCompletion<String>
-    lateinit private var destinationField: JBTextField
-    private var appsOrLibsText: JEditorPane? = null
+    private lateinit var projectField: TextFieldWithAutoCompletion<String>
+    private lateinit var destinationField: JBTextField
+    private var appsOrLibsText: Cell<JEditorPane>? = null
 
     fun getResult(): ReMoveProjectDialogModel {
         panel.apply()
@@ -88,13 +88,7 @@ class NxReMoveProjectDialog(
                                                 override fun afterDocumentChange(
                                                     document: Document
                                                 ) {
-                                                    val text = document.text
-                                                    projectOptions?.get(text).let {
-                                                        appsOrLibsText?.text =
-                                                            if (it != null)
-                                                                getDestinationDirHint(it)
-                                                            else ""
-                                                    }
+                                                    updateDestinationDirHint(document.text)
                                                 }
                                             }
                                         )
@@ -114,14 +108,10 @@ class NxReMoveProjectDialog(
                         .layout(RowLayout.PARENT_GRID)
                     row {
                             label("Destination:")
-                            if (workspaceLayout != null) {
-                                val initialDirHint =
-                                    model.project.let {
-                                        projectOptions?.get(it)?.let { getDestinationDirHint(it) }
-                                    }
-                                        ?: ""
-                                appsOrLibsText = text(initialDirHint).gap(RightGap.SMALL).component
-                            }
+
+                            appsOrLibsText = text("").gap(RightGap.SMALL)
+                            updateDestinationDirHint(model.project)
+
                             destinationField =
                                 textField()
                                     .bindText(model::directory)
@@ -165,10 +155,22 @@ class NxReMoveProjectDialog(
       )} for project completion\n"
     }
 
-    private fun getDestinationDirHint(projectType: String): String {
-        if (projectType != "application" && projectType != "library") {
-            return ""
+    fun updateDestinationDirHint(projectType: String?) {
+        val appOrLibDirByProjectType = getDestinationDirHint(projectOptions?.get(projectType))
+        appsOrLibsText.let {
+            if (it == null) {
+                return
+            }
+            if (appOrLibDirByProjectType == "") {
+                it.visible(false)
+                return
+            }
+            it.visible(true)
+            it.component.text = appOrLibDirByProjectType
         }
+    }
+
+    private fun getDestinationDirHint(projectType: String?): String {
         if (workspaceLayout == null) {
             return ""
         }
@@ -179,7 +181,8 @@ class NxReMoveProjectDialog(
                 }
                 "${it}/"
             }
-        } else {
+        }
+        if (projectType == "library") {
             return workspaceLayout.libsDir.let {
                 if (it == null || it == "") {
                     return ""
@@ -187,6 +190,7 @@ class NxReMoveProjectDialog(
                 "${it}/"
             }
         }
+        return ""
     }
 }
 
