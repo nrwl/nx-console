@@ -288,12 +288,16 @@ async function setWorkspace(workspacePath: string) {
 async function setApplicationAndLibraryContext(workspacePath: string) {
   const { workspaceLayout } = await getNxWorkspace();
 
-  commands.executeCommand('setContext', 'nxAppsDir', [
-    join(workspacePath, workspaceLayout.appsDir),
-  ]);
-  commands.executeCommand('setContext', 'nxLibsDir', [
-    join(workspacePath, workspaceLayout.libsDir),
-  ]);
+  if (workspaceLayout.appsDir) {
+    commands.executeCommand('setContext', 'nxAppsDir', [
+      join(workspacePath, workspaceLayout.appsDir),
+    ]);
+  }
+  if (workspaceLayout.libsDir) {
+    commands.executeCommand('setContext', 'nxLibsDir', [
+      join(workspacePath, workspaceLayout.libsDir),
+    ]);
+  }
 
   const generatorCollections = await getGenerators();
 
@@ -332,8 +336,12 @@ async function registerWorkspaceFileWatcher(
 
   const { workspaceLayout } = await getNxWorkspace();
   const workspacePackageDirs = new Set<string>();
-  workspacePackageDirs.add(workspaceLayout.appsDir);
-  workspacePackageDirs.add(workspaceLayout.libsDir);
+  if (workspaceLayout.appsDir) {
+    workspacePackageDirs.add(workspaceLayout.appsDir);
+  }
+  if (workspaceLayout.libsDir) {
+    workspacePackageDirs.add(workspaceLayout.libsDir);
+  }
   workspacePackageDirs.add('packages');
   context.subscriptions.push(
     watchFile(
