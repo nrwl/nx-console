@@ -18,7 +18,7 @@ export class NxTask extends Task {
       ...flags,
     ];
 
-    const { isStandaloneNx, workspacePath } = await getNxWorkspace();
+    const { isEncapsulatedNx, workspacePath } = await getNxWorkspace();
 
     const displayCommand = `nx ${args.join(' ')}`;
     const task = new NxTask(
@@ -30,7 +30,7 @@ export class NxTask extends Task {
       getShellExecutionForConfig({
         displayCommand,
         cwd: workspacePath,
-        standaloneNx: isStandaloneNx,
+        encapsulatedNx: isEncapsulatedNx,
       })
     );
     return task;

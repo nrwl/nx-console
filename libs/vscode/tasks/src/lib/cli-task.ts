@@ -12,7 +12,7 @@ export class CliTask extends Task {
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
 
-    const { isStandaloneNx, workspacePath, workspaceType } =
+    const { isEncapsulatedNx, workspacePath, workspaceType } =
       await getNxWorkspace();
     const useNxCli = workspaceType == 'nx';
 
@@ -29,7 +29,7 @@ export class CliTask extends Task {
       getShellExecutionForConfig({
         displayCommand,
         cwd: workspacePath,
-        standaloneNx: isStandaloneNx,
+        encapsulatedNx: isEncapsulatedNx,
       })
     );
 

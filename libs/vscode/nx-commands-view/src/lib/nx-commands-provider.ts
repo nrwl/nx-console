@@ -73,7 +73,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     const prefixedCommand = command.startsWith('nx ')
       ? command
       : `nx ${command}`;
-    const { workspacePath, workspaceType, isStandaloneNx } =
+    const { workspacePath, workspaceType, isEncapsulatedNx } =
       await getNxWorkspace();
     const pkgManager = detectPackageManager(workspacePath);
 
@@ -85,7 +85,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
       getShellExecutionForConfig({
         cwd: workspacePath,
         displayCommand: prefixedCommand,
-        standaloneNx: isStandaloneNx,
+        encapsulatedNx: isEncapsulatedNx,
       })
     );
     tasks.executeTask(task);

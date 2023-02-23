@@ -11,7 +11,7 @@ import * as cacheDir from 'find-cache-dir';
 let projectGraphCacheDir: string | undefined;
 
 export async function createProjectGraph() {
-  const { isStandaloneNx, workspacePath } = await getNxWorkspace();
+  const { isEncapsulatedNx, workspacePath } = await getNxWorkspace();
   return new Promise<void | string>((res, rej) => {
     if (!projectGraphCacheDir) {
       projectGraphCacheDir = cacheDir({
@@ -24,7 +24,7 @@ export async function createProjectGraph() {
       cwd: workspacePath,
       displayCommand:
         'nx dep-graph --file ' + getProjectGraphOutput().relativePath,
-      standaloneNx: isStandaloneNx,
+      encapsulatedNx: isEncapsulatedNx,
     });
 
     getOutputChannel().appendLine(
