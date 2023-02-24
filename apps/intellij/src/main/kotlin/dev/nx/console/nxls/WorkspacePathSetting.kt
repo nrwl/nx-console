@@ -1,18 +1,24 @@
 package dev.nx.console.nxls
 
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import dev.nx.console.settings.NxConsoleSettingBase
-import javax.swing.JComponent
 
 class WorkspacePathSetting : NxConsoleSettingBase<String?> {
 
     private val inputField = JBTextField()
-    override fun getComponent(): JComponent {
-        return this.inputField
-    }
-
-    override fun getLabel(): String {
-        return "Workspace path"
+    override fun render(panel: Panel) {
+        panel.apply {
+            row {
+                label("Workspace path")
+                cell(inputField)
+                    .horizontalAlign(HorizontalAlign.FILL)
+                    .comment(
+                        "Set this if your Nx workspace is not at the root of the project opened in IntelliJ"
+                    )
+            }
+        }
     }
 
     override fun getValue(): String? {

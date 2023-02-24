@@ -2,6 +2,7 @@ package dev.nx.console.settings
 
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
+import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import dev.nx.console.generate.settings.EnableDryRunOnGenerateChangeSetting
 import dev.nx.console.nxls.WorkspacePathSetting
@@ -24,10 +25,8 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         workspacePathSetting.setValue(projectSettingsProvider.workspacePath)
 
         return panel {
-            row { label("Project Settings") }
-            row(workspacePathSetting.getLabel()) { cell(workspacePathSetting.getComponent()) }
-            row { label("Application Settings") }
-            row { cell(enableDryRunOnGenerateChangeSetting.getComponent()) }
+            group("Project Settings") { workspacePathSetting.render(this) }
+            group("Application Settings") { enableDryRunOnGenerateChangeSetting.render(this) }
         }
     }
 
@@ -51,13 +50,9 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
 }
 
 interface NxConsoleSettingBase<T> {
-    fun getComponent(): JComponent
+    fun render(panel: Panel): Unit
 
     fun getValue(): T
 
     fun setValue(value: T): Unit
-
-    fun getLabel(): String {
-        return ""
-    }
 }
