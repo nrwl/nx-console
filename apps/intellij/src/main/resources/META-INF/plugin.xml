@@ -39,6 +39,11 @@
     <!-- Generate -->
     <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
     <fileEditorProvider implementation="dev.nx.console.generate.ui.editor.NxGenerateUiFileEditorProvider"/>
+
+    <!--run anything execution provider-->
+    <runAnything.executionProvider
+            implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
+
   </extensions>
 
   <applicationListeners>
