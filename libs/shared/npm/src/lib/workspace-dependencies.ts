@@ -16,8 +16,6 @@ import { findNxPackagePath } from './find-nx-package-path';
  * Get dependencies for the current workspace.
  * This is needed to continue to support Angular CLI projects.
  *
- * @param workspacePath
- * @returns
  */
 
 export async function workspaceDependencies(

@@ -9,15 +9,31 @@ import { join } from 'path';
  * @returns
  */
 export async function npmDependencies(workspacePath: string) {
-  const nodeModulesDir = join(workspacePath, 'node_modules');
+  const nodeModules = join(workspacePath, 'node_modules');
+  const nodeModulesEncapsulated = join(
+    workspacePath,
+    '.nx',
+    'installation',
+    'node_modules'
+  );
+
+  let nodeModulesDir = nodeModules;
+
   const res: string[] = [];
   try {
-    const stats = await stat(nodeModulesDir);
-    if (!stats.isDirectory()) {
+    if (!(await stat(nodeModules)).isDirectory()) {
       return res;
     }
   } catch {
-    return res;
+    try {
+      if (!(await stat(nodeModulesEncapsulated)).isDirectory()) {
+        return res;
+      } else {
+        nodeModulesDir = nodeModulesEncapsulated;
+      }
+    } catch {
+      return res;
+    }
   }
 
   const dirContents = await readdir(nodeModulesDir);
