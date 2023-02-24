@@ -12,7 +12,7 @@ import com.intellij.util.ui.EmptyIcon
 import com.intellij.util.ui.JBScalableIcon
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
-import dev.nx.console.nxls.server.NxGenerator
+import dev.nx.console.models.NxGenerator
 import dev.nx.console.services.NxlsService
 import java.awt.Dimension
 import javax.swing.JList

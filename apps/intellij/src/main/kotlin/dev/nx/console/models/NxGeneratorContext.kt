@@ -1,11 +1,6 @@
-package dev.nx.console.nxls.server
+package dev.nx.console.models
 
 import kotlinx.serialization.Serializable
-
-data class NxGetGeneratorContextFromPathRequest(
-    val generator: NxGenerator? = null,
-    val path: String
-) {}
 
 @Serializable()
 data class NxGeneratorContext(

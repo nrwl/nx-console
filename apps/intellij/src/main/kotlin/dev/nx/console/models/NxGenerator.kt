@@ -1,13 +1,6 @@
-package dev.nx.console.nxls.server
+package dev.nx.console.models
 
 import kotlinx.serialization.Serializable
-
-data class NxGeneratorsRequestOptions(val includeHidden: Boolean, val includeNgAdd: Boolean)
-
-data class NxGeneratorsRequest(
-    val options: NxGeneratorsRequestOptions =
-        NxGeneratorsRequestOptions(includeHidden = false, includeNgAdd = false)
-)
 
 @Serializable
 data class NxGenerator(

@@ -1,7 +1,7 @@
 package dev.nx.console.generate.ui.editor
 
-import dev.nx.console.nxls.server.NxGeneratorContext
-import dev.nx.console.nxls.server.NxGeneratorOption
+import dev.nx.console.models.NxGeneratorContext
+import dev.nx.console.models.NxGeneratorOption
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

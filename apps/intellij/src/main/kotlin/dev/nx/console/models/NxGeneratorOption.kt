@@ -1,16 +1,8 @@
-package dev.nx.console.nxls.server
+package dev.nx.console.models
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-data class NxGeneratorOptionsRequestOptions(
-    val collection: String,
-    val name: String,
-    val path: String
-)
-
-class NxGeneratorOptionsRequest(val options: NxGeneratorOptionsRequestOptions)
 
 @Serializable
 data class NxGeneratorOption(
