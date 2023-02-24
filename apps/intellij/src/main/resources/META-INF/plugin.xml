@@ -1,47 +1,61 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin require-restart="true">
-    <id>dev.nx.console</id>
-    <name>Nx Console</name>
-    <vendor>NxDev</vendor>
+  <id>dev.nx.console</id>
+  <name>Nx Console</name>
+  <vendor>NxDev</vendor>
 
-    <depends>com.intellij.modules.platform</depends>
-    <depends>org.jetbrains.plugins.terminal</depends>
-    <depends>JavaScript</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>org.jetbrains.plugins.terminal</depends>
+  <depends>JavaScript</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
+  <extensions defaultExtensionNs="com.intellij">
 
-        <!-- works in WebStorm and other SmallIDEs -->
-        <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
-        <!-- works in IDEA -->
-        <projectTemplatesFactory implementation="dev.nx.console.cli.NxProjectTemplateFactory"/>
-        <!-- works in new IDEA wizard -->
-        <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
+    <!-- works in WebStorm and other SmallIDEs -->
+    <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
+    <!-- works in IDEA -->
+    <projectTemplatesFactory implementation="dev.nx.console.cli.NxProjectTemplateFactory"/>
+    <!-- works in new IDEA wizard -->
+    <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
 
-        <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
-        <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
-        <completion.contributor language="JSON"
-                                implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
-        <lang.documentationProvider language="JSON"
-                                    implementationClass="dev.nx.console.providers.NxlsDocumentationProvider"/>
+    <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
+    <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
+    <completion.contributor language="JSON"
+                            implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
+    <lang.documentationProvider language="JSON"
+                                implementationClass="dev.nx.console.providers.NxlsDocumentationProvider"/>
 
-        <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
+    <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
-        <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
+    <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
 
-        <!-- Generate UI -->
-        <fileEditorProvider implementation="dev.nx.console.generate_ui.editor.NxGenerateUiFileEditorProvider"/>
-    </extensions>
+    <!-- Generate -->
+    <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"></projectService>
+    <fileEditorProvider implementation="dev.nx.console.generate.ui.editor.NxGenerateUiFileEditorProvider"/>
+  </extensions>
 
-    <applicationListeners>
-        <listener class="dev.nx.console.listeners.ProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
-    <actions>
-        <!-- Generate UI -->
-        <action id="dev.nx.console.generate_ui.NxGenerateUiAction" class="dev.nx.console.generate_ui.NxGenerateUiAction"
-                text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="CodeMenu"/>
-            <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
-        </action>
-    </actions>
+  <applicationListeners>
+    <listener class="dev.nx.console.listeners.ProjectManagerListener"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </applicationListeners>
+  <actions>
+    <!-- Generate -->
+    <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
+            class="dev.nx.console.generate.actions.NxGenerateUiAction"
+            text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="CodeMenu"/>
+      <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
+    </action>
+    <action id="dev.nx.console.generate.actions.NxMoveProjectAction"
+            class="dev.nx.console.generate.actions.NxMoveProjectAction"
+            text="Move Nx Project" description="Move an Nx project to the desired location using a generator"
+            icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="RefactoringMenu" anchor="last"/>
+    </action>
+    <action id="dev.nx.console.generate.actions.NxRemoveProjectAction"
+            class="dev.nx.console.generate.actions.NxRemoveProjectAction"
+            text="Remove Nx Project" description="Safely remove an Nx project using a generator"
+            icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="RefactoringMenu" anchor="last"/>
+    </action>
+  </actions>
 </idea-plugin>
