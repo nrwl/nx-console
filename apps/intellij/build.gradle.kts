@@ -165,7 +165,10 @@ tasks {
         )
     }
 
-    jar { dependsOn("copyGenerateUiArtifacts") }
+    jar {
+        dependsOn("copyGenerateUiArtifacts")
+        archiveBaseName.set("nx-console")
+    }
 }
 
 tasks.register<Exec>("buildNxls") { commandLine = listOf("bash", "-c", "npx nx run nxls:build") }
