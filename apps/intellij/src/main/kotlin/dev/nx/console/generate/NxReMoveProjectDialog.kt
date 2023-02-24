@@ -157,10 +157,7 @@ class NxReMoveProjectDialog(
 
     fun updateDestinationDirHint(projectType: String?) {
         val appOrLibDirByProjectType = getDestinationDirHint(projectOptions?.get(projectType))
-        appsOrLibsText.let {
-            if (it == null) {
-                return
-            }
+        appsOrLibsText?.let {
             if (appOrLibDirByProjectType == "") {
                 it.visible(false)
                 return
@@ -176,7 +173,7 @@ class NxReMoveProjectDialog(
         }
         if (projectType == "application") {
             return workspaceLayout.appsDir.let {
-                if (it == null || it == "") {
+                if (it.isNullOrEmpty()) {
                     return ""
                 }
                 "${it}/"
@@ -184,7 +181,7 @@ class NxReMoveProjectDialog(
         }
         if (projectType == "library") {
             return workspaceLayout.libsDir.let {
-                if (it == null || it == "") {
+                if (it.isNullOrEmpty()) {
                     return ""
                 }
                 "${it}/"
