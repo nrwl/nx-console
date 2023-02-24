@@ -1,37 +1,36 @@
-import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { getOutputChannel } from '@nx-console/vscode/utils';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  getOutputChannel,
+  getShellExecutionForConfig,
+} from '@nx-console/vscode/utils';
 import { execSync } from 'child_process';
 import * as cacheDir from 'find-cache-dir';
 
 let projectGraphCacheDir: string | undefined;
 
 export async function createProjectGraph() {
+  const { isEncapsulatedNx, workspacePath } = await getNxWorkspace();
   return new Promise<void | string>((res, rej) => {
     if (!projectGraphCacheDir) {
       projectGraphCacheDir = cacheDir({
         name: 'nx-console-project-graph',
-        cwd: WorkspaceConfigurationStore.instance.get('nxWorkspacePath', ''),
+        cwd: workspacePath,
       });
     }
 
-    const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
-    );
-    const packageManager = detectPackageManager(workspacePath);
-    const packageCommand = getPackageManagerCommand(packageManager);
-
-    // TODO(cammisuli): determine the correct command depending on Nx Version
-    const command = `${packageCommand.exec} nx dep-graph --file ${
-      getProjectGraphOutput().relativePath
-    }`;
+    const shellExecution = getShellExecutionForConfig({
+      cwd: workspacePath,
+      displayCommand:
+        'nx dep-graph --file ' + getProjectGraphOutput().relativePath,
+      encapsulatedNx: isEncapsulatedNx,
+    });
 
     getOutputChannel().appendLine(
-      `Generating graph with command: \`${command}\``
+      `Generating graph with command: \`${shellExecution.command}\``
     );
     try {
-      execSync(command, {
+      execSync(shellExecution.commandLine ?? '', {
         cwd: workspacePath,
       });
 

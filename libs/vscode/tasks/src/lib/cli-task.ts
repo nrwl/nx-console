@@ -2,19 +2,19 @@ import { checkIsNxWorkspace } from '@nx-console/shared/utils';
 import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 
 export class CliTask extends Task {
-  static async create(
-    definition: CliTaskDefinition,
-    workspacePath: string
-  ): Promise<CliTask> {
+  static async create(definition: CliTaskDefinition): Promise<CliTask> {
     const { command } = definition;
 
     // Using `run [project]:[command]` is more backwards compatible in case different
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
 
-    const useNxCli = await checkIsNxWorkspace(workspacePath);
+    const { isEncapsulatedNx, workspacePath, workspaceType } =
+      await getNxWorkspace();
+    const useNxCli = workspaceType == 'nx';
 
     const displayCommand = useNxCli
       ? `nx ${args.join(' ')}`
@@ -29,6 +29,7 @@ export class CliTask extends Task {
       getShellExecutionForConfig({
         displayCommand,
         cwd: workspacePath,
+        encapsulatedNx: isEncapsulatedNx,
       })
     );
 
