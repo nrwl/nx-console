@@ -1,7 +1,7 @@
 package dev.nx.console.generate.settings
 
 import com.intellij.ui.components.JBCheckBox
-import dev.nx.console.NxConsoleSettingBase
+import dev.nx.console.settings.NxConsoleSettingBase
 import javax.swing.JComponent
 
 class EnableDryRunOnGenerateChangeSetting : NxConsoleSettingBase<Boolean> {

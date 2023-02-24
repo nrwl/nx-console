@@ -28,10 +28,10 @@
 
     <applicationConfigurable
       parentId="tools"
-      instance="dev.nx.console.NxConsoleSettingsConfigurable"
+      instance="dev.nx.console.settings.NxConsoleSettingsConfigurable"
       id="com.example.ApplicationSettingsConfigurable"
       displayName="Nx Console"/>
-    <applicationService serviceImplementation="dev.nx.console.NxConsoleSettingsProvider"/>
+    <applicationService serviceImplementation="dev.nx.console.settings.NxConsoleSettingsProvider"/>
 
 
     <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
