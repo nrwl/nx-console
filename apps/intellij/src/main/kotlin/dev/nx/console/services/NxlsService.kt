@@ -3,11 +3,16 @@ package dev.nx.console.services
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import dev.nx.console.models.NxGenerator
+import dev.nx.console.models.NxGeneratorContext
+import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.NxlsWrapper
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
+import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
+import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
+import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
 import kotlinx.coroutines.future.await
-import kotlinx.serialization.json.JsonObject
 
 private val logger = logger<NxlsService>()
 

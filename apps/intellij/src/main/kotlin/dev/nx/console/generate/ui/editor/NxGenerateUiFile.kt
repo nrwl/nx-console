@@ -14,7 +14,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.CustomSchemeHandlerFactory
 import dev.nx.console.generate.ui.utils.getHexColor
 import dev.nx.console.generate.ui.utils.onBrowserLoadEnd
-import dev.nx.console.nxls.server.NxGenerator
+import dev.nx.console.models.NxGenerator
 import javax.swing.Icon
 import javax.swing.JComponent
 import kotlinx.serialization.decodeFromString

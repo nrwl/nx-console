@@ -13,8 +13,8 @@ import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.WorkspaceLayout
-import dev.nx.console.nxls.server.NxGeneratorContext
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
