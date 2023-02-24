@@ -71,6 +71,10 @@ class NxlsService(val project: Project) {
         wrapper.disconnect(editor)
     }
 
+    fun changeWorkspace(workspacePath: String) {
+        server()?.getNxService()?.changeWorkspace(workspacePath)
+    }
+
     fun isEditorConnected(editor: Editor): Boolean {
         return wrapper.isEditorConnected(editor)
     }

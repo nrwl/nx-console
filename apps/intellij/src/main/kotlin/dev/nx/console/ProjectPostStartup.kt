@@ -17,6 +17,8 @@ class ProjectPostStartup : ProjectPostStartupActivity {
 
         val workspace = service.workspace()
 
-        NxConsoleProjectSettingsProvider.getInstance(project).workspacePath?.apply {}
+        NxConsoleProjectSettingsProvider.getInstance(project).workspacePath?.apply {
+            service.changeWorkspace(this)
+        }
     }
 }

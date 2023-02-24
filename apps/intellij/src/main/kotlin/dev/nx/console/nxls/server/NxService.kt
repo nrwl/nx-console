@@ -3,10 +3,7 @@ package dev.nx.console.nxls.server
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
-import dev.nx.console.nxls.server.requests.NxGeneratorsRequest
-import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
-import dev.nx.console.nxls.server.requests.NxWorkspaceRequest
+import dev.nx.console.nxls.server.requests.*
 import java.util.concurrent.CompletableFuture
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.jsonrpc.services.JsonRequest
@@ -40,6 +37,11 @@ interface NxService {
     fun generatorContextFromPath(
         generatorContextFromPathRequest: NxGetGeneratorContextFromPathRequest
     ): CompletableFuture<NxGeneratorContext> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonNotification
+    fun changeWorkspace(workspacePath: String) {
         throw UnsupportedOperationException()
     }
 

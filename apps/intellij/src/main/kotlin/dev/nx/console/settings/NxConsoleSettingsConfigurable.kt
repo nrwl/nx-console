@@ -32,12 +32,14 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
 
     override fun isModified(): Boolean {
         return enableDryRunOnGenerateChangeSetting.getValue() !=
-            settingsProvider.enableDryRunOnGenerateChange
+            settingsProvider.enableDryRunOnGenerateChange ||
+            workspacePathSetting.getValue() != projectSettingsProvider.workspacePath
     }
 
     override fun apply() {
         settingsProvider.enableDryRunOnGenerateChange =
             enableDryRunOnGenerateChangeSetting.getValue()
+        projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
     }
 
     override fun getDisplayName(): String {
