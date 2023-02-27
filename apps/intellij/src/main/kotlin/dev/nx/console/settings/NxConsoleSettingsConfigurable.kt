@@ -21,7 +21,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
         enableDryRunOnGenerateChangeSetting.setValue(settingsProvider.enableDryRunOnGenerateChange)
 
-        workspacePathSetting = WorkspacePathSetting()
+        workspacePathSetting = WorkspacePathSetting(project)
         workspacePathSetting.setValue(projectSettingsProvider.workspacePath)
 
         return panel {
@@ -40,6 +40,8 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         settingsProvider.enableDryRunOnGenerateChange =
             enableDryRunOnGenerateChangeSetting.getValue()
         projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
+
+        workspacePathSetting.doApply()
     }
 
     override fun getDisplayName(): String {
@@ -57,4 +59,8 @@ interface NxConsoleSettingBase<T> {
     fun getValue(): T
 
     fun setValue(value: T): Unit
+
+    fun doApply(): Unit {
+        return
+    }
 }
