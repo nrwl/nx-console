@@ -54,6 +54,13 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
 
         val generators = nxlsService.generators()
         val moveGenerators = generators.map { it.name }.filter { it.contains(Regex(":${mode}$")) }
+
+        if (moveGenerators.isEmpty()) {
+            throw Exception(
+                "No $mode generators found. Make sure the nxls is configured correctly."
+            )
+        }
+
         val moveGeneratorContext = path?.let { nxlsService.generatorContextFromPath(path = path) }
 
         val runGeneratorManager = RunGeneratorManager(project)

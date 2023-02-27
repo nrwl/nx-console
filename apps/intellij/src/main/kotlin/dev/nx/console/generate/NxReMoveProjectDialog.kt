@@ -59,7 +59,7 @@ class NxReMoveProjectDialog(
         val model =
             ReMoveProjectDialogModel(
                 reMoveGeneratorContext?.project ?: "",
-                reMoveGenerators.find { it.contains("@nrwl/workspace") } ?: reMoveGenerators.get(0)
+                reMoveGenerators.find { it.contains("@nrwl/workspace") } ?: reMoveGenerators[0]
             )
 
         panel =
@@ -102,7 +102,7 @@ class NxReMoveProjectDialog(
                                     .bindItem(model::generator)
                                     .horizontalAlign(HorizontalAlign.FILL)
                             } else {
-                                text(reMoveGenerators.get(0))
+                                text(reMoveGenerators[0])
                             }
                         }
                         .layout(RowLayout.PARENT_GRID)
