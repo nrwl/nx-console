@@ -10,6 +10,7 @@ import com.intellij.lang.javascript.service.JSLanguageServiceUtil
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxConsoleBundle
+import dev.nx.console.utils.nxBasePath
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -19,20 +20,16 @@ private val logger = logger<NxlsProcess>()
 
 class NxlsProcess(private val project: Project) {
 
-    val basePath =
-        project.basePath
-            ?: throw IllegalStateException(
-                "Cannot determine the base path from the current project"
-            )
+    private val basePath = project.nxBasePath
 
-    var process: Process? = null
+    private var process: Process? = null
 
     fun start() {
-        logger.info("Staring the nxls process in workingDir ${basePath}")
+        logger.info("Staring the nxls process in workingDir $basePath")
         createCommandLine().apply {
             process = createProcess()
             process?.let {
-                if (!it.isAlive()) {
+                if (!it.isAlive) {
                     throw IOException("Unable to start nxls")
                 } else {
                     logger.info("nxls started: $it")
@@ -49,7 +46,7 @@ class NxlsProcess(private val project: Project) {
         return process?.outputStream
     }
 
-    fun createCommandLine(): GeneralCommandLine {
+    private fun createCommandLine(): GeneralCommandLine {
         val nodeInterpreter = NodeJsInterpreterManager.getInstance(project).interpreter
         if (nodeInterpreter !is NodeJsLocalInterpreter && nodeInterpreter !is WslNodeInterpreter) {
             throw ExecutionException(NxConsoleBundle.message("interpreter.not.configured"))

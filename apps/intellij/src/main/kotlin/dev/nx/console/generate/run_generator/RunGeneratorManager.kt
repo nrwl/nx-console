@@ -16,6 +16,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
 import dev.nx.console.utils.NxExecutable
+import dev.nx.console.utils.nxBasePath
 
 val log = logger<RunGeneratorManager>()
 
@@ -57,7 +58,7 @@ class RunGeneratorManager(val project: Project) {
                     {
                         val nxExecutable =
                             NxExecutable.getExecutablePath(
-                                project.basePath
+                                project.nxBasePath
                                     ?: throw Exception("Project base path does not exist")
                             )
 
@@ -65,7 +66,7 @@ class RunGeneratorManager(val project: Project) {
                             GeneralCommandLine().apply {
                                 exePath = nxExecutable
                                 addParameters(definition)
-                                setWorkDirectory(project.basePath)
+                                setWorkDirectory(project.nxBasePath)
                                 withParentEnvironmentType(
                                     GeneralCommandLine.ParentEnvironmentType.CONSOLE
                                 )
@@ -78,7 +79,7 @@ class RunGeneratorManager(val project: Project) {
                         val consoleBuilder =
                             TextConsoleBuilderFactory.getInstance().createBuilder(project)
                         val console = consoleBuilder.console
-                        project.basePath?.let {
+                        project.nxBasePath?.let {
                             console.addMessageFilter(NxGeneratorMessageFilter(project, it))
                         }
                         console.attachToProcess(processHandler)
