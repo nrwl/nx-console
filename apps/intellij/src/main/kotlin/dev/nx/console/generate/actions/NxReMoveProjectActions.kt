@@ -57,7 +57,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
 
         if (moveGenerators.isEmpty()) {
             throw Exception(
-                "No $mode generators found. Make sure the nxls is configured correctly."
+                "No $mode generators found. Make sure that node_modules are installed, or set the root of Nx Console to point to a Nx workspace in editor settings."
             )
         }
 
