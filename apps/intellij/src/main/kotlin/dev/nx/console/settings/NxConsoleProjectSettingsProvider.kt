@@ -3,10 +3,7 @@ package dev.nx.console.settings
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 
-@State(
-    name = "NxConsoleSettingsProvider",
-    storages = [Storage(StoragePathMacros.PRODUCT_WORKSPACE_FILE)]
-)
+@State(name = "NxConsoleSettingsProvider", storages = [Storage("nx-console.xml")])
 class NxConsoleProjectSettingsProvider(val project: Project) :
     PersistentStateComponent<NxConsoleProjectSettingsState> {
 
