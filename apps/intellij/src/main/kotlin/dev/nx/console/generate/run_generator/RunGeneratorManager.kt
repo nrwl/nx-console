@@ -56,11 +56,7 @@ class RunGeneratorManager(val project: Project) {
             ApplicationManager.getApplication()
                 .invokeLater(
                     {
-                        val nxExecutable =
-                            NxExecutable.getExecutablePath(
-                                project.nxBasePath
-                                    ?: throw Exception("Project base path does not exist")
-                            )
+                        val nxExecutable = NxExecutable.getExecutablePath(project.nxBasePath)
 
                         val commandLine =
                             GeneralCommandLine().apply {
@@ -79,7 +75,7 @@ class RunGeneratorManager(val project: Project) {
                         val consoleBuilder =
                             TextConsoleBuilderFactory.getInstance().createBuilder(project)
                         val console = consoleBuilder.console
-                        project.nxBasePath?.let {
+                        project.nxBasePath.let {
                             console.addMessageFilter(NxGeneratorMessageFilter(project, it))
                         }
                         console.attachToProcess(processHandler)
