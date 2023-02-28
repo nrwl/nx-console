@@ -50,7 +50,7 @@
     <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
             class="dev.nx.console.generate.actions.NxGenerateUiAction"
             text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
-      <add-to-group group-id="CodeMenu"/>
+      <add-to-group group-id="NewGroup"/>
       <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
     </action>
     <action id="dev.nx.console.generate.actions.NxMoveProjectAction"
