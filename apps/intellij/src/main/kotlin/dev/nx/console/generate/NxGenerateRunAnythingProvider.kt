@@ -53,8 +53,8 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
         if (args.isEmpty()) {
             return false
         }
-        if (executor is DefaultDebugExecutor && "--dryRun" !in args) {
-            args.add("--dryRun")
+        if (executor is DefaultDebugExecutor && "--dryRun" !in args && "--dry-run" !in args) {
+            args.add("--dry-run")
         }
         runGeneratorManager.queueGeneratorToBeRun(args.first(), args.drop(1))
         return true
