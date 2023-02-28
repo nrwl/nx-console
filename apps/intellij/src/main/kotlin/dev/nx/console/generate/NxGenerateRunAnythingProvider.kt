@@ -8,13 +8,14 @@ import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import dev.nx.console.NxConsoleBundle
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
-import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
+import javax.swing.Icon
 
 class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
 
@@ -31,6 +32,12 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun getHelpCommandPlaceholder(): String {
         return "nx generate <generator>"
+    }
+
+    override fun getAdText(): String = getAdDebugText()
+
+    private fun getAdDebugText(): String {
+        return NxConsoleBundle.message("nx.run.anything.ad.run.with.debug", RunAnythingUtil.SHIFT_SHORTCUT_TEXT)
     }
 
     override fun getHelpCommand(): String {
