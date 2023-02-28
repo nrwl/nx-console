@@ -6,6 +6,7 @@ import com.intellij.ide.actions.runAnything.RunAnythingUtil
 import com.intellij.ide.actions.runAnything.activity.RunAnythingCommandLineProvider
 import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
@@ -66,7 +67,7 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
     ): Sequence<String> {
         val project = RunAnythingUtil.fetchProject(dataContext)
         val generators: List<NxGenerator> = runBlocking {
-            NxlsService.getInstance(project).generators()
+            project.service<NxlsService>().generators()
         }
 
         val completeSchematicName = completeSchematicName(commandLine, generators).sorted()
