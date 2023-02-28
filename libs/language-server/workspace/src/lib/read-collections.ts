@@ -30,9 +30,16 @@ export async function readCollections(
     clearJsonCache('package.json', workspacePath);
   }
 
-  const projects = (await nxWorkspace(workspacePath)).workspace.projects;
+  const {
+    workspace: { projects },
+    nxVersion,
+  } = await nxWorkspace(workspacePath);
 
-  const packages = await workspaceDependencies(workspacePath, projects);
+  const packages = await workspaceDependencies(
+    workspacePath,
+    nxVersion,
+    projects
+  );
 
   const collections = await Promise.all(
     packages.map(async (p) => {

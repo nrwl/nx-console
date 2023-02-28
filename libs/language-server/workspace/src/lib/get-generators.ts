@@ -98,7 +98,7 @@ async function readWorkspaceGeneratorsCollection(
             data: {
               name,
               collection: collectionName,
-              options: await normalizeSchema(schemaJson.json, 'nx'),
+              options: await normalizeSchema(schemaJson.json),
               description: schemaJson.json.description ?? '',
               type,
             },

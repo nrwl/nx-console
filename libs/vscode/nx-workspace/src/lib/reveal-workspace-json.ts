@@ -17,12 +17,9 @@ export async function revealNxProject(
   );
   const projectPath = await buildProjectPath(workspacePath, root);
   const workspaceJsonPath = join(workspacePath, 'workspace.json');
-  const angularJsonPath = join(workspacePath, 'angular.json');
 
   let path = workspacePath;
-  if (await fileExists(angularJsonPath)) {
-    path = angularJsonPath;
-  } else if (projectPath) {
+  if (projectPath) {
     path = projectPath;
   } else if (await fileExists(workspaceJsonPath)) {
     path = workspaceJsonPath;

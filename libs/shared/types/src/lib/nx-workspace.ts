@@ -11,15 +11,21 @@ export type NxProjectsConfiguration = {
   };
 };
 
+export type NxVersion = {
+  major: number;
+  minor: number;
+  full: string;
+};
+
 export type NxWorkspaceConfiguration = NxProjectsConfiguration &
   NxJsonConfiguration;
 export interface NxWorkspace {
   validWorkspaceJson: boolean;
   workspace: NxWorkspaceConfiguration;
-  workspaceType: 'ng' | 'nx';
   daemonEnabled?: boolean;
   workspacePath: string;
   isLerna: boolean;
+  nxVersion: NxVersion;
   isEncapsulatedNx: boolean;
   workspaceLayout: {
     appsDir?: string;

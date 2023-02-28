@@ -58,16 +58,6 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
-          "command": "ng.generate.ui.fileexplorer",
-          "group": "2_workspace"
-        },
-        {
-          "when": "!isNxWorkspace && isAngularWorkspace && config.nxConsole.enableGenerateFromContextMenu",
-          "command": "ng.run.fileexplorer",
-          "group": "2_workspace"
-        },
-        {
           "when": "isNxWorkspace && config.nxConsole.enableGenerateFromContextMenu",
           "command": "nx.generate.ui.fileexplorer",
           "group": "2_workspace"
@@ -174,10 +164,6 @@
       ],
       "commandPalette": [
         {
-          "command": "ng.generate.ui.fileexplorer",
-          "when": "false"
-        },
-        {
           "command": "nx.generate.ui.fileexplorer",
           "when": "false"
         },
@@ -210,67 +196,7 @@
           "when": "isNxWorkspace && nx.hasLibraryGenerators"
         },
         {
-          "command": "nxConsole.makeNgFaster",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.run.target",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.lint",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.build",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.e2e",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.generate",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.serve",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.test",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.run",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.lint.ui",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.build.ui",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.e2e.ui",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.serve.ui",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.test.ui",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.xi18n.ui",
-          "when": "isAngularWorkspace"
-        },
-        {
-          "command": "ng.generate.ui",
+          "command": "nxConsole.migrateAngularCliToNx",
           "when": "isAngularWorkspace"
         },
         {
@@ -398,8 +324,32 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "ng.run.fileexplorer",
-          "when": "isAngularWorkspace"
+          "command": "nxConsole.connectToNxCloud",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nxConsole.loginToNxCloud",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nxConsole.refreshCloudWebview",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.move",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.remove",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.graph.showAll",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nxConsole.refreshWorkspace",
+          "when": "isNxWorkspace"
         }
       ]
     },
@@ -433,91 +383,6 @@
       {
         "command": "nxConsole.runTaskSkipNxCache",
         "title": "Execute task without Nx cache"
-      },
-      {
-        "category": "ng",
-        "title": "Run Target",
-        "command": "ng.run.target"
-      },
-      {
-        "category": "ng",
-        "title": "lint",
-        "command": "ng.lint"
-      },
-      {
-        "category": "ng",
-        "title": "build",
-        "command": "ng.build"
-      },
-      {
-        "category": "ng",
-        "title": "e2e",
-        "command": "ng.e2e"
-      },
-      {
-        "category": "ng",
-        "title": "generate",
-        "command": "ng.generate"
-      },
-      {
-        "category": "ng",
-        "title": "serve",
-        "command": "ng.serve"
-      },
-      {
-        "category": "ng",
-        "title": "test",
-        "command": "ng.test"
-      },
-      {
-        "category": "ng",
-        "title": "run",
-        "command": "ng.run"
-      },
-      {
-        "category": "ng",
-        "title": "lint (ui)",
-        "command": "ng.lint.ui"
-      },
-      {
-        "category": "ng",
-        "title": "build (ui)",
-        "command": "ng.build.ui"
-      },
-      {
-        "category": "ng",
-        "title": "e2e (ui)",
-        "command": "ng.e2e.ui"
-      },
-      {
-        "category": "ng",
-        "title": "serve (ui)",
-        "command": "ng.serve.ui"
-      },
-      {
-        "category": "ng",
-        "title": "test (ui)",
-        "command": "ng.test.ui"
-      },
-      {
-        "category": "ng",
-        "title": "xi18n (ui)",
-        "command": "ng.xi18n.ui"
-      },
-      {
-        "category": "ng",
-        "title": "generate (ui)",
-        "command": "ng.generate.ui"
-      },
-      {
-        "category": "ng",
-        "title": "ng generate...",
-        "command": "ng.generate.ui.fileexplorer"
-      },
-      {
-        "category": "ng",
-        "title": "run target from selected file",
-        "command": "ng.run.fileexplorer"
       },
       {
         "category": "Nx",
@@ -719,8 +584,8 @@
       },
       {
         "category": "Nx",
-        "title": "Make ng Faster with Nx",
-        "command": "nxConsole.makeNgFaster"
+        "title": "Convert Angular CLI to Nx workspace",
+        "command": "nxConsole.migrateAngularCliToNx"
       },
       {
         "title": "Add dependency to workspace",
@@ -862,31 +727,6 @@
     ],
     "taskDefinitions": [
       {
-        "type": "ng",
-        "required": [
-          "project",
-          "command"
-        ],
-        "properties": {
-          "project": {
-            "type": "string",
-            "description": "The Angular CLI project to run a command on"
-          },
-          "command": {
-            "type": "string",
-            "description": "The Angular CLI command to run on the selected project"
-          },
-          "positional": {
-            "type": "string",
-            "description": "The project to run the command against"
-          },
-          "flags": {
-            "type": "array",
-            "description": "An array of flags to pass to the CLI"
-          }
-        }
-      },
-      {
         "type": "nx",
         "required": [
           "project",
@@ -929,6 +769,10 @@
       {
         "view": "nxConsole.views.welcome",
         "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
+      },
+      {
+        "view": "nxConsole.views.angular-welcome",
+        "contents": "Nx Console no longer supports Angular workspaces. \nYou can still use Nx Console and all its powerful capabilities by migrating your workspace to Nx.\n [Learn more about Angular with Nx](https://blog.nrwl.io/angular-cli-and-nx-why-df160946888f)\nWith Nx Console and Nx, you'll also get many more features like:\n - more powerful code generation and first-class ecosystem integrations (Jest, Cypress, Tailwind, Storybook,...)\n- computation caching (never run the same task twice)\n- visual overview of your workspace with the nx graph\n- Project overview with targets in your editor\nTry the one-click migration below to convert to Nx with the same workspace layout you're used to:\n[Migrate to Nx](command:nxConsole.migrateAngularCliToNx)"
       }
     ],
     "walkthroughs": [
@@ -987,13 +831,21 @@
           "name": "Welcome",
           "when": "!isNxWorkspace && !isAngularWorkspace",
           "contextualTitle": "Nx Console Getting Started",
-          "icon": "assets/nx-console.png",
+          "icon": "tree-view-icon.svg",
+          "visibility": "visible"
+        },
+        {
+          "id": "nxConsole.views.angular-welcome",
+          "name": "Angular CLI Compatibility",
+          "when": "isAngularWorkspace",
+          "contextualTitle": "Nx Console Getting Started",
+          "icon": "tree-view-icon.svg",
           "visibility": "visible"
         },
         {
           "id": "nxProjects",
           "name": "Projects",
-          "when": "isNxWorkspace || isAngularWorkspace"
+          "when": "isNxWorkspace"
         },
         {
           "type": "webview",
@@ -1003,7 +855,8 @@
         },
         {
           "id": "nxRunTarget",
-          "name": "Generate & Run Target"
+          "name": "Generate & Run Target",
+          "when": "isNxWorkspace"
         },
         {
           "id": "nxCommands",

@@ -63,7 +63,6 @@ export interface TaskExecutionSchema {
   command: string;
   collection?: string;
   positional: string;
-  cliName: 'nx' | 'ng';
   builder?: string;
   description: string;
   configurations?: TargetConfiguration[];

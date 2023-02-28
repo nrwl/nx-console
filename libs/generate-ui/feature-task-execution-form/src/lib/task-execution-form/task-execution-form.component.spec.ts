@@ -15,8 +15,7 @@ import { IdeCommunicationService } from '../ide-communication/ide-communication.
 const initialSchema: TaskExecutionSchema = {
   name: 'long-form-x-prompt-without-enum',
   command: 'generate',
-  positional: 'workspace-generator:long-form-x-prompt-without-enum',
-  cliName: 'ng',
+  positional: '@nrwl/demo:long-form-x-prompt-without-enum',
   description: 'LongFormXPrompt',
   options: [
     {

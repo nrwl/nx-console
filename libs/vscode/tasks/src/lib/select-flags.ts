@@ -10,7 +10,6 @@ import { CliTaskFlagQuickPickItem } from './cli-task-flag-quick-pick-item';
 export async function selectFlags(
   command: string,
   options: Option[],
-  workspaceType: 'ng' | 'nx',
   userSetFlags: { [key: string]: string } = {}
 ): Promise<string[] | undefined> {
   const flagArray = Object.entries(userSetFlags).map(
@@ -18,7 +17,7 @@ export async function selectFlags(
   );
 
   const selection = await promptForFlagToSet(
-    `${workspaceType} ${command} ${flagArray.join(' ')}`,
+    `nx ${command} ${flagArray.join(' ')}`,
     options
   );
 
@@ -34,7 +33,7 @@ export async function selectFlags(
     delete userSetFlags[selection.flag.flagName];
   }
 
-  return selectFlags(command, options, workspaceType, userSetFlags);
+  return selectFlags(command, options, userSetFlags);
 }
 
 async function promptForFlagToSet(

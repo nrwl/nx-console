@@ -29,8 +29,6 @@ data class GeneratorSchemaPayload(
 ) {
     @EncodeDefault() val command: String = "generate"
 
-    @EncodeDefault() val cliName: String = "nx"
-
     @EncodeDefault() val positional = this.name
 }
 

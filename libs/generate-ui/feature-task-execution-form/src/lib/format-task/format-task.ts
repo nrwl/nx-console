@@ -13,7 +13,7 @@ export const formatTask = (
   architect = handleWorkspaceGenerators(architect);
 
   const commandBuilder = [
-    architect.cliName,
+    'nx',
     surroundWithQuotesIfHasWhiteSpace(architect.command),
     surroundWithQuotesIfHasWhiteSpace(architect.positional),
   ];
@@ -45,7 +45,6 @@ function handleWorkspaceGenerators(
   ) {
     newArchitect = {
       ...architect,
-      cliName: 'nx',
       command: `workspace-${positionals[1]}`,
       positional: positionals[2],
     };

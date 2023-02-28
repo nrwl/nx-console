@@ -17,13 +17,10 @@ describe('utils', () => {
       options: Schema['properties'],
       required: string[] = []
     ): Promise<Option[]> => {
-      const r = await normalizeSchema(
-        {
-          properties: { ...options },
-          required,
-        },
-        'nx'
-      );
+      const r = await normalizeSchema({
+        properties: { ...options },
+        required,
+      });
       return r;
     };
 
@@ -44,19 +41,16 @@ describe('utils', () => {
     });
 
     it('should sort arguments', async () => {
-      const r = await normalizeSchema(
-        {
-          properties: {
-            a: { 'x-priority': 'internal' },
-            b: { 'x-priority': 'important' },
-            c: { 'x-deprecated': 'good reason' },
-            d: {},
-            e: {},
-          } as Schema['properties'],
-          required: ['e'],
-        },
-        'nx'
-      );
+      const r = await normalizeSchema({
+        properties: {
+          a: { 'x-priority': 'internal' },
+          b: { 'x-priority': 'important' },
+          c: { 'x-deprecated': 'good reason' },
+          d: {},
+          e: {},
+        } as Schema['properties'],
+        required: ['e'],
+      });
       expect(r.map((x) => x.name)).toMatchInlineSnapshot(`
         Array [
           "e",
