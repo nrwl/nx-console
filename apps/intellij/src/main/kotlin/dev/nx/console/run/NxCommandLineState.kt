@@ -10,6 +10,7 @@ import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
 import dev.nx.console.utils.NxExecutable
+import dev.nx.console.utils.nxBasePath
 
 class NxCommandLineState(
     environment: ExecutionEnvironment,
@@ -17,23 +18,28 @@ class NxCommandLineState(
 ) : CommandLineState(environment) {
     override fun startProcess(): ProcessHandler {
         val project: Project = environment.project
-
-        val nxExecutable =
-            NxExecutable.getExecutablePath(
-                project.basePath ?: throw Exception("Project base path does not exist")
-            )
+        val nxExecutable = NxExecutable.getExecutablePath(project.nxBasePath)
+        val nxProjects = runConfiguration.nxProjects.split(",")
+        val nxTargets = runConfiguration.nxTargets.split(",")
+        val args =
+            if (nxProjects.size > 1 || nxTargets.size > 1)
+                arrayOf(
+                    "run-many",
+                    "--targets=${nxTargets.joinToString(separator = ",")}",
+                    "--projects=${nxProjects.joinToString(separator = ",")}",
+                )
+            else arrayOf("run", "${nxProjects.first()}:${nxTargets.first()}")
 
         val commandLine =
             GeneralCommandLine().apply {
                 exePath = nxExecutable
                 addParameters(
                     listOf(
-                        "run",
-                        runConfiguration.command,
-                        *(ParametersListUtil.parseToArray(runConfiguration.arguments))
+                        *args,
+                        *(ParametersListUtil.parseToArray(runConfiguration.arguments)),
                     )
                 )
-                setWorkDirectory(project.basePath)
+                setWorkDirectory(project.nxBasePath)
                 withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
 
                 NodeCommandLineUtil.configureUsefulEnvironment(this)

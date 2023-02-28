@@ -1,22 +1,19 @@
 package dev.nx.console.run
 
 import com.intellij.execution.Executor
-import com.intellij.execution.ExternalizablePath
 import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import java.nio.file.Path
-import java.nio.file.Paths
 import org.jdom.Element
 
 class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
     LocatableConfigurationBase<RunProfileState>(project, factory, "Nx"),
     RunConfigurationWithSuppressedDefaultDebugAction {
 
-    var command: String = ""
-    var workingDirectory: Path? = null
+    var nxProjects: String = ""
+    var nxTargets: String = ""
     var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
     var arguments: String = ""
 
@@ -30,16 +27,16 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
 
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
-        element.writeString("command", this.command)
-        element.writePath("workingDirectory", this.workingDirectory)
+        element.writeString("nx-projects", this.nxProjects)
+        element.writeString("nx-targets", this.nxTargets)
         environmentVariables.writeExternal(element)
         element.writeString("arguments", this.arguments)
     }
 
     override fun readExternal(element: Element) {
         super.readExternal(element)
-        this.command = element.readString("command") ?: return
-        this.workingDirectory = element.readPath("workingDirectory") ?: return
+        this.nxProjects = element.readString("nx-projects") ?: return
+        this.nxTargets = element.readString("nx-targets") ?: return
         this.environmentVariables = EnvironmentVariablesData.readExternal(element)
         this.arguments = element.readString("arguments") ?: return
     }
@@ -56,14 +53,3 @@ fun Element.readString(name: String): String? =
     children
         .find { it.name == "option" && it.getAttributeValue("name") == name }
         ?.getAttributeValue("value")
-
-fun Element.writePath(name: String, value: Path?) {
-    if (value != null) {
-        val s = ExternalizablePath.urlValue(value.toString())
-        writeString(name, s)
-    }
-}
-
-fun Element.readPath(name: String): Path? {
-    return readString(name)?.let { Paths.get(ExternalizablePath.localPathValue(it)) }
-}
