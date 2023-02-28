@@ -14,8 +14,8 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
-import kotlinx.coroutines.runBlocking
 import javax.swing.Icon
+import kotlinx.coroutines.runBlocking
 
 class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
 
@@ -37,7 +37,10 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
     override fun getAdText(): String = getAdDebugText()
 
     private fun getAdDebugText(): String {
-        return NxConsoleBundle.message("nx.run.anything.ad.run.with.debug", RunAnythingUtil.SHIFT_SHORTCUT_TEXT)
+        return NxConsoleBundle.message(
+            "nx.run.anything.ad.run.with.debug",
+            RunAnythingUtil.SHIFT_SHORTCUT_TEXT
+        )
     }
 
     override fun getHelpCommand(): String {
