@@ -1,0 +1,52 @@
+package dev.nx.console.nxls
+
+import com.intellij.openapi.components.service
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.openapi.ui.emptyText
+import com.intellij.ui.components.textFieldWithBrowseButton
+import com.intellij.ui.dsl.builder.MAX_LINE_LENGTH_WORD_WRAP
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import dev.nx.console.services.NxlsService
+import dev.nx.console.settings.NxConsoleSettingBase
+
+class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?> {
+
+    private val inputField: TextFieldWithBrowseButton
+
+    init {
+        val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+        inputField = textFieldWithBrowseButton(project, "Nx workspace root", descriptor)
+    }
+    override fun render(panel: Panel) {
+        panel.apply {
+            row {
+                label("Workspace path")
+                cell(inputField)
+                    .horizontalAlign(HorizontalAlign.FILL)
+                    .comment(
+                        "Set this if your Nx workspace is not at the root of the currently opened project.",
+                        MAX_LINE_LENGTH_WORD_WRAP
+                    )
+                    .apply { component.emptyText.text = project.basePath ?: "" }
+            }
+        }
+    }
+
+    override fun doApply() {
+        (getValue() ?: project.basePath)?.apply {
+            project.service<NxlsService>().changeWorkspace(this)
+        }
+    }
+
+    override fun getValue(): String? {
+        return this.inputField.text
+    }
+
+    override fun setValue(value: String?) {
+        if (value == null) return
+        this.inputField.text = value
+    }
+}

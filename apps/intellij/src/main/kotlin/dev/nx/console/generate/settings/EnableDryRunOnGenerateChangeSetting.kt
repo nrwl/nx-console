@@ -1,16 +1,16 @@
 package dev.nx.console.generate.settings
 
 import com.intellij.ui.components.JBCheckBox
-import dev.nx.console.NxConsoleSettingBase
-import javax.swing.JComponent
+import com.intellij.ui.dsl.builder.Panel
+import dev.nx.console.settings.NxConsoleSettingBase
 
 class EnableDryRunOnGenerateChangeSetting : NxConsoleSettingBase<Boolean> {
 
     private val checkbox: JBCheckBox =
         JBCheckBox().apply { text = "Enable dry run on generate change" }
 
-    override fun getComponent(): JComponent {
-        return checkbox
+    override fun render(panel: Panel): Unit {
+        panel.apply { row { cell(checkbox) } }
     }
 
     override fun getValue(): Boolean {

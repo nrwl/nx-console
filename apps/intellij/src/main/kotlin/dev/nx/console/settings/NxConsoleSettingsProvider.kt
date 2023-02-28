@@ -1,4 +1,4 @@
-package dev.nx.console
+package dev.nx.console.settings
 
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State

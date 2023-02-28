@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.server.NxlsLanguageServer
+import dev.nx.console.utils.nxBasePath
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -136,8 +137,8 @@ class NxlsWrapper(val project: Project) {
 
     fun getInitParams(): InitializeParams {
         val initParams = InitializeParams()
-        initParams.rootUri = project.basePath
-        initParams.workspaceFolders = listOf(WorkspaceFolder(project.basePath))
+        initParams.rootUri = project.nxBasePath
+        initParams.workspaceFolders = listOf(WorkspaceFolder(project.nxBasePath))
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()
         workspaceClientCapabilities.applyEdit = true
