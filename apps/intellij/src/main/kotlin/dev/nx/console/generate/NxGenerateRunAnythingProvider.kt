@@ -70,19 +70,19 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
             project.service<NxlsService>().generators()
         }
 
-        val completeSchematicName = completeSchematicName(commandLine, generators).sorted()
+        val completeGeneratorNames = completeGeneratorNames(commandLine, generators).sorted()
         val completeOptions =
             completeOptions(RunAnythingUtil.fetchProject(dataContext), commandLine, generators)
                 .sorted()
 
         return when {
-            commandLine.toComplete.startsWith("--") -> completeOptions + completeSchematicName
-            commandLine.toComplete.startsWith("-") -> completeOptions + completeSchematicName
-            else -> completeSchematicName + completeOptions
+            commandLine.toComplete.startsWith("--") -> completeOptions + completeGeneratorNames
+            commandLine.toComplete.startsWith("-") -> completeOptions + completeGeneratorNames
+            else -> completeGeneratorNames + completeOptions
         }
     }
 
-    private fun completeSchematicName(
+    private fun completeGeneratorNames(
         commandLine: CommandLine,
         generators: List<NxGenerator>
     ): Sequence<String> {
