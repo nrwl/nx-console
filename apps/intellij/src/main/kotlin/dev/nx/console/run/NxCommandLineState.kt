@@ -7,6 +7,9 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.javascript.nodejs.NodeCommandLineUtil
+import com.intellij.javascript.nodejs.NodeConsoleAdditionalFilter
+import com.intellij.javascript.nodejs.NodeStackTraceFilter
+import com.intellij.lang.javascript.buildTools.TypeScriptErrorConsoleFilter
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
 import dev.nx.console.utils.NxExecutable
@@ -47,6 +50,11 @@ class NxCommandLineState(
 
         val handler = KillableColoredProcessHandler(commandLine)
         consoleBuilder.console.attachToProcess(handler)
+        addConsoleFilters(
+            NodeStackTraceFilter(project, project.nxBasePath),
+            NodeConsoleAdditionalFilter(project, project.nxBasePath),
+            TypeScriptErrorConsoleFilter(project, project.nxBasePath),
+        )
         ProcessTerminatedListener.attach(handler) // shows exit code upon termination
         return handler
     }
