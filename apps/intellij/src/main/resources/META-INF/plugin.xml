@@ -59,7 +59,7 @@
       <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
     </action>
     <action id="dev.nx.console.generate.actions.NxGenerateRunAnythingAction"
-            class="dev.nx.console.generate.actions.NxGenerateRunAnythingAction" text="Nx Generate (Run Anything)"
+            class="dev.nx.console.generate.actions.NxGenerateRunAnythingAction" text="Nx Generate"
             description="Run a generator via the Run Anything popup."
             icon="dev.nx.console.NxIcons.Action"
     />
