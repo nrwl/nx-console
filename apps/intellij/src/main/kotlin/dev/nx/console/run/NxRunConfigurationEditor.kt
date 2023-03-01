@@ -5,6 +5,7 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.ui.layout.panel
+import com.intellij.util.ui.ComponentWithEmptyText
 import javax.swing.JComponent
 
 class NxRunConfigurationEditor : SettingsEditor<NxCommandConfiguration>() {
@@ -12,7 +13,13 @@ class NxRunConfigurationEditor : SettingsEditor<NxCommandConfiguration>() {
     private val nxProjects = ExpandableTextField()
     private val nxTargets = ExpandableTextField()
     private val environmentVariables = EnvironmentVariablesComponent()
-    private val arguments = RawCommandLineEditor()
+    private val arguments =
+        RawCommandLineEditor().apply {
+            if (textField is ComponentWithEmptyText) {
+                (textField as ComponentWithEmptyText).emptyText.text =
+                    "Additional flags, e.g. --skip-cache, or --parallel=2"
+            }
+        }
 
     override fun resetEditorFrom(configuration: NxCommandConfiguration) {
         nxProjects.text = configuration.nxProjects
