@@ -39,6 +39,11 @@
     <!-- Generate -->
     <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
     <fileEditorProvider implementation="dev.nx.console.generate.ui.editor.NxGenerateUiFileEditorProvider"/>
+
+    <!--run anything execution provider-->
+    <runAnything.executionProvider
+      implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
+
   </extensions>
 
   <applicationListeners>
@@ -53,6 +58,11 @@
       <add-to-group group-id="NewGroup"/>
       <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
     </action>
+    <action id="dev.nx.console.generate.actions.NxGenerateRunAnythingAction"
+            class="dev.nx.console.generate.actions.NxGenerateRunAnythingAction" text="Nx Generate"
+            description="Run a generator via the Run Anything popup."
+            icon="dev.nx.console.NxIcons.Action"
+    />
     <action id="dev.nx.console.generate.actions.NxMoveProjectAction"
             class="dev.nx.console.generate.actions.NxMoveProjectAction"
             text="Move Nx Project" description="Move an Nx project to the desired location using a generator"
@@ -65,5 +75,6 @@
             icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="RefactoringMenu" anchor="last"/>
     </action>
+
   </actions>
 </idea-plugin>
