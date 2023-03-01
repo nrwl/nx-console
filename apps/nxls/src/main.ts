@@ -296,7 +296,7 @@ connection.onRequest(
 
 connection.onRequest(
   NxGeneratorContextFromPathRequest,
-  async (args: { generator: TaskExecutionSchema; path: string }) => {
+  async (args: { generator?: TaskExecutionSchema; path: string }) => {
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,

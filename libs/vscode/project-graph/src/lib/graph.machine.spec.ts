@@ -5,6 +5,8 @@ import { PartialDeep } from 'type-fest';
 import type { OutputChannel } from 'vscode';
 
 import * as utils from '@nx-console/vscode/utils';
+import { NxWorkspace } from '@nx-console/shared/types';
+
 jest.mock(
   '@nx-console/vscode/utils',
   (): PartialDeep<typeof utils> => ({
@@ -16,6 +18,20 @@ jest.mock(
       } as unknown as OutputChannel;
     },
   })
+);
+
+jest.mock(
+  '@nx-console/vscode/nx-workspace',
+  (): PartialDeep<typeof import('@nx-console/vscode/nx-workspace')> => {
+    return {
+      async getNxWorkspace(reset?: boolean): Promise<NxWorkspace> {
+        return {
+          isEncapsulatedNx: false,
+          workspacePath: 'temp',
+        } as NxWorkspace;
+      },
+    };
+  }
 );
 
 const mockMachine = graphMachine.withConfig({

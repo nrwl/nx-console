@@ -6,7 +6,7 @@ import { getProjectByPath } from './get-project-by-path';
 import { nxWorkspace } from './workspace';
 
 export async function getGeneratorContextFromPath(
-  generator: TaskExecutionSchema,
+  generator: TaskExecutionSchema | undefined,
   path: string,
   workspacePath: string
 ): Promise<
@@ -33,12 +33,19 @@ export async function getGeneratorContextFromPath(
   const appsDir = workspaceLayout.appsDir;
   const libsDir = workspaceLayout.libsDir;
   if (
-    (appsDir && generator.name === 'application') ||
-    generator.name === 'app'
+    appsDir &&
+    (generator?.name === 'application' ||
+      generator?.name === 'app' ||
+      modifiedPath.startsWith(appsDir))
   ) {
     modifiedPath = modifiedPath.replace(appsDir, '').replace(/^\//, '');
   }
-  if ((libsDir && generator.name === 'library') || generator.name === 'lib') {
+  if (
+    libsDir &&
+    (generator?.name === 'library' ||
+      generator?.name === 'lib' ||
+      modifiedPath.startsWith(libsDir))
+  ) {
     modifiedPath = modifiedPath.replace(libsDir, '').replace(/^\//, '');
   }
 
@@ -46,7 +53,7 @@ export async function getGeneratorContextFromPath(
     project: projectName,
     projectName,
     path: modifiedPath,
-    ...(!(projectName && generator.options.some(isProjectOption)) && {
+    ...(!(projectName && generator?.options?.some(isProjectOption)) && {
       directory: modifiedPath,
     }),
   };

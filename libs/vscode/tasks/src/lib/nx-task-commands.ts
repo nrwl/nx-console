@@ -256,14 +256,11 @@ async function promptForAffectedFlags(target: string) {
   const { positional, command, flags } = await selectAffectedFlags(target);
 
   if (flags !== undefined) {
-    const task = NxTask.create(
-      {
-        command,
-        flags,
-        positional,
-      },
-      cliTaskProvider.getWorkspacePath()
-    );
+    const task = await NxTask.create({
+      command,
+      flags,
+      positional,
+    });
     tasks.executeTask(task);
   }
 }
@@ -328,13 +325,10 @@ async function promptForRunMany() {
   const flags = await selectFlags('run-many', options, 'nx', { target });
 
   if (flags !== undefined) {
-    const task = NxTask.create(
-      {
-        command: 'run-many',
-        flags,
-      },
-      cliTaskProvider.getWorkspacePath()
-    );
+    const task = await NxTask.create({
+      command: 'run-many',
+      flags,
+    });
     tasks.executeTask(task);
   }
 }
@@ -342,13 +336,10 @@ async function promptForRunMany() {
 async function promptForList() {
   const telemetry = getTelemetry();
   telemetry.featureUsed('affected-cli');
-  const task = NxTask.create(
-    {
-      command: 'list',
-      flags: [],
-    },
-    cliTaskProvider.getWorkspacePath()
-  );
+  const task = await NxTask.create({
+    command: 'list',
+    flags: [],
+  });
   tasks.executeTask(task);
 }
 
@@ -381,13 +372,10 @@ async function promptForMigrate() {
   if (depVersioningInfo !== undefined) {
     const { dep, version } = depVersioningInfo;
 
-    const task = NxTask.create(
-      {
-        command: 'migrate',
-        flags: [`${dep}@${version}`],
-      },
-      cliTaskProvider.getWorkspacePath()
-    );
+    const task = await NxTask.create({
+      command: 'migrate',
+      flags: [`${dep}@${version}`],
+    });
 
     tasks.executeTask(task);
   }

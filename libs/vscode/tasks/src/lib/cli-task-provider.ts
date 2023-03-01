@@ -68,7 +68,7 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   async createTask(definition: CliTaskDefinition) {
-    return CliTask.create(definition, this.getWorkspacePath());
+    return CliTask.create(definition);
   }
 
   async executeTask(definition: CliTaskDefinition) {
@@ -88,14 +88,11 @@ export class CliTaskProvider implements TaskProvider {
       positionals &&
       positionals.length > 2
     ) {
-      task = NxTask.create(
-        {
-          command: `workspace-${positionals[1]}`,
-          positional: positionals[2],
-          flags: definition.flags,
-        },
-        this.getWorkspacePath()
-      );
+      task = await NxTask.create({
+        command: `workspace-${positionals[1]}`,
+        positional: positionals[2],
+        flags: definition.flags,
+      });
     } else {
       task = await this.createTask(definition);
     }

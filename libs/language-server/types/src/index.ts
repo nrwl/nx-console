@@ -54,7 +54,7 @@ export const NxProjectByPathRequest: RequestType<
 
 export const NxGeneratorContextFromPathRequest: RequestType<
   {
-    generator: TaskExecutionSchema;
+    generator?: TaskExecutionSchema;
     path: string;
   },
   | {

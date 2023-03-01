@@ -3,9 +3,15 @@ package dev.nx.console.services
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import dev.nx.console.models.NxGenerator
+import dev.nx.console.models.NxGeneratorContext
+import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.NxlsWrapper
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
+import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
+import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
+import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
 import kotlinx.coroutines.future.await
 
 private val logger = logger<NxlsService>()
@@ -34,7 +40,7 @@ class NxlsService(val project: Project) {
         wrapper.stop()
     }
 
-    suspend fun workspace(): Any? {
+    suspend fun workspace(): com.google.gson.JsonObject? {
         return server()?.getNxService()?.workspace()?.await()
     }
 
@@ -50,7 +56,7 @@ class NxlsService(val project: Project) {
     }
 
     suspend fun generatorContextFromPath(
-        generator: NxGenerator,
+        generator: NxGenerator? = null,
         path: String
     ): NxGeneratorContext? {
         val request = NxGetGeneratorContextFromPathRequest(generator, path)
@@ -63,6 +69,10 @@ class NxlsService(val project: Project) {
 
     fun removeDocument(editor: Editor) {
         wrapper.disconnect(editor)
+    }
+
+    fun changeWorkspace(workspacePath: String) {
+        server()?.getNxService()?.changeWorkspace(workspacePath)
     }
 
     fun isEditorConnected(editor: Editor): Boolean {

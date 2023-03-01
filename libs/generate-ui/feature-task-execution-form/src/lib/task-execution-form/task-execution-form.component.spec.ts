@@ -7,7 +7,6 @@ import {
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
 import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
-import { ArgumentListModule } from '@nx-console/generate-ui/argument-list';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormatTaskPipe } from '../format-task/format-task.pipe';
 import { TaskExecutionFormComponent } from './task-execution-form.component';
@@ -64,7 +63,6 @@ describe('TaskExecutionFormComponent', () => {
       imports: [
         ReactiveFormsModule,
         GenerateUiComponentsModule,
-        ArgumentListModule,
         BrowserAnimationsModule,
       ],
       providers: [IdeCommunicationService],

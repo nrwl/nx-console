@@ -20,15 +20,23 @@ export async function getProjectByPath(
   let foundProject: ProjectConfiguration | null = null;
 
   for (const [projectName, projectConfig] of projectEntries) {
+    const startsWithRoot = relativeFilePath.startsWith(projectConfig.root);
+    const relativeRootConfig = projectConfig.sourceRoot
+      ? relative(workspacePath, projectConfig.sourceRoot)
+      : undefined;
+    const startsWithRootConfig =
+      relativeRootConfig && relativeFilePath.startsWith(relativeRootConfig);
+
     if (!projectConfig.files) {
       foundProject = findByFilePath(
         [projectName, projectConfig],
         workspacePath,
         selectedPath
       );
-    } else if (isDirectory && relativeFilePath.startsWith(projectConfig.root)) {
+    } else if (isDirectory && (startsWithRoot || startsWithRootConfig)) {
       foundProject = projectConfig;
     } else if (
+      !isDirectory &&
       projectConfig.files.some(({ file }) => file === relativeFilePath)
     ) {
       foundProject = projectConfig;
