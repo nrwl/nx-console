@@ -44,6 +44,13 @@
     <runAnything.executionProvider
       implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
 
+
+    <!-- Nx Run Configuration-->
+    <configurationType
+            implementation="dev.nx.console.run.NxCommandConfigurationType"/>
+    <runAnything.executionProvider
+            implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
+
   </extensions>
 
   <applicationListeners>
