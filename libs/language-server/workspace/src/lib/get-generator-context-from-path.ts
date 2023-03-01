@@ -34,11 +34,18 @@ export async function getGeneratorContextFromPath(
   const libsDir = workspaceLayout.libsDir;
   if (
     appsDir &&
-    (generator?.name === 'application' || generator?.name === 'app')
+    (generator?.name === 'application' ||
+      generator?.name === 'app' ||
+      modifiedPath.startsWith(appsDir))
   ) {
     modifiedPath = modifiedPath.replace(appsDir, '').replace(/^\//, '');
   }
-  if (libsDir && (generator?.name === 'library' || generator?.name === 'lib')) {
+  if (
+    libsDir &&
+    (generator?.name === 'library' ||
+      generator?.name === 'lib' ||
+      modifiedPath.startsWith(libsDir))
+  ) {
     modifiedPath = modifiedPath.replace(libsDir, '').replace(/^\//, '');
   }
 
