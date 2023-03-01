@@ -49,8 +49,12 @@
     <!-- Nx Run Configuration-->
     <configurationType
       implementation="dev.nx.console.run.NxCommandConfigurationType"/>
-    <runAnything.executionProvider
-      implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
+            implementation="dev.nx.console.run.NxCommandConfigurationType"/>
+    <runConfigurationProducer
+            implementation="dev.nx.console.run.NxRunConfigurationProducer"/>
+
+    <runLineMarkerContributor language="JSON"
+                              implementationClass="dev.nx.console.run.NxRunLineMarkerContributor"/>
 
   </extensions>
 

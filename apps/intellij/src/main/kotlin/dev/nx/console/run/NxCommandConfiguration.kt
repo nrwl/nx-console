@@ -40,6 +40,10 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
         this.environmentVariables = EnvironmentVariablesData.readExternal(element)
         this.arguments = element.readString("arguments") ?: return
     }
+
+    override fun suggestedName(): String {
+        return "$nxProjects[$nxTargets]"
+    }
 }
 
 fun Element.writeString(name: String, value: String) {
