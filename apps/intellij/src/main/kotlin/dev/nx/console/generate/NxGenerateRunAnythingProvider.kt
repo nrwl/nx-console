@@ -4,6 +4,7 @@ import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.ide.actions.runAnything.RunAnythingAction
 import com.intellij.ide.actions.runAnything.RunAnythingUtil
 import com.intellij.ide.actions.runAnything.activity.RunAnythingCommandLineProvider
+import com.intellij.ide.actions.runAnything.items.RunAnythingItem
 import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
@@ -12,12 +13,16 @@ import dev.nx.console.NxConsoleBundle
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
+import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
 import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
 
 class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
+
+    private var generators: List<NxGenerator> = emptyList()
+    private val generatorOptions: MutableMap<String, List<NxGeneratorOption>> = mutableMapOf()
 
     override fun getIcon(value: String): Icon = NxIcons.Action
 
@@ -53,8 +58,10 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun getHelpIcon(): Icon = NxIcons.Action
 
-    override fun getMainListItem(dataContext: DataContext, value: String) =
-        RunAnythingItemBase(getCommand(value), NxIcons.Action)
+    override fun getMainListItem(dataContext: DataContext, value: String): RunAnythingItem {
+        val description = this.getDescription(value)
+        return NxGenerateRunAnythingItem(getCommand(value), NxIcons.Action, description)
+    }
 
     override fun run(dataContext: DataContext, commandLine: CommandLine): Boolean {
         val project = RunAnythingUtil.fetchProject(dataContext)
@@ -76,14 +83,13 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
         commandLine: CommandLine
     ): Sequence<String> {
         val project = RunAnythingUtil.fetchProject(dataContext)
-        val generators: List<NxGenerator> = runBlocking {
-            project.service<NxlsService>().generators()
+        if (generators.isEmpty()) {
+            generators = runBlocking { project.service<NxlsService>().generators() }
         }
 
         val completeGeneratorNames = completeGeneratorNames(commandLine, generators).sorted()
         val completeOptions =
             completeOptions(RunAnythingUtil.fetchProject(dataContext), commandLine, generators)
-                .sorted()
 
         return when {
             commandLine.toComplete.startsWith("--") -> completeOptions + completeGeneratorNames
@@ -106,17 +112,23 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
         generators: List<NxGenerator>
     ): Sequence<String> {
         val generator = hasGenerator(commandLine, generators) ?: return emptySequence()
-        val generatorOptions = runBlocking {
-            NxlsService.getInstance(project)
-                .generatorOptions(
-                    NxGeneratorOptionsRequestOptions(
-                        collection = generator.data.collection,
-                        name = generator.name,
-                        path = generator.path
+        if (generatorOptions.containsKey(generator.name).not()) {
+            val opts = runBlocking {
+                NxlsService.getInstance(project)
+                    .generatorOptions(
+                        NxGeneratorOptionsRequestOptions(
+                            collection = generator.data.collection,
+                            name = generator.name,
+                            path = generator.path
+                        )
                     )
-                )
+            }
+            generatorOptions[generator.name] = opts
         }
-        return generatorOptions.map { "--${it.name}" }.filterNot { it in commandLine }.asSequence()
+        return generatorOptions[generator.name]?.let { options ->
+            options.map { "--${it.name}" }.filterNot { it in commandLine }.asSequence()
+        }
+            ?: emptySequence()
     }
 
     private fun hasGenerator(
@@ -124,7 +136,25 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
         generators: List<NxGenerator>
     ): NxGenerator? = generators.find { commandLine.completedParameters.contains(it.name) }
 
+    private fun getDescription(value: String): String {
+        val generator = Regex("@\\w+\\/\\w+:\\w+").find(value)?.value ?: return ""
+        val lastFlag = Regex("--\\S+$").find(value)?.value?.replace("--", "") ?: return ""
+        return if (generatorOptions[generator]?.find { it.name == lastFlag }?.isRequired == true)
+            "required"
+        else ""
+    }
+
     companion object {
         const val HELP_COMMAND = "nx generate"
+    }
+
+    internal class NxGenerateRunAnythingItem(
+        command: String,
+        icon: Icon,
+        private val description: String
+    ) : RunAnythingItemBase(command, icon) {
+        override fun getDescription(): String? {
+            return this.description
+        }
     }
 }
