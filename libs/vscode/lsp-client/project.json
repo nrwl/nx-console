@@ -1,4 +1,5 @@
 {
+  "name": "vscode-lsp-client",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/lsp-client/src",
   "projectType": "library",
@@ -12,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/lsp-client"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/lsp-client"],
       "options": {
         "jestConfig": "libs/vscode/lsp-client/jest.config.ts",
         "passWithNoTests": true

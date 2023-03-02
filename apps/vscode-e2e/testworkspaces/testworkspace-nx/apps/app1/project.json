@@ -1,11 +1,11 @@
 {
+  "name": "vscode-e2e-testworkspaces-testworkspace-nx-apps-app1",
+  "$schema": "../../../../../../node_modules/nx/schemas/project-schema.json",
   "targets": {
     "build": {
       "executor": "@nrwl/webpack:webpack",
       "configurations": {
-        "production": {
-
-        }
+        "production": {}
       }
     },
     "test": {

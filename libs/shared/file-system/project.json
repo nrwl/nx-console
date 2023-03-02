@@ -1,4 +1,5 @@
 {
+  "name": "shared-file-system",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/file-system/src",
   "projectType": "library",
@@ -12,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/shared/file-system"],
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/file-system"],
       "options": {
         "jestConfig": "libs/shared/file-system/jest.config.ts",
         "passWithNoTests": true

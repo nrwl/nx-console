@@ -1,5 +1,5 @@
 const rootMain = require('../../../../.storybook/main');
-
+rootMain.addons.push('@storybook/addon-essentials');
 // Use the following syntax to add addons!
 // rootMain.addons.push('');
 rootMain.stories.push(
