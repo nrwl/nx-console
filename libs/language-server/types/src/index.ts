@@ -69,3 +69,13 @@ export const NxGeneratorContextFromPathRequest: RequestType<
 
 export const NxVersionRequest: RequestType<undefined, SemVer, unknown> =
   new RequestType('nx/version');
+
+export const NxProjectGraphOutputRequest: RequestType<
+  undefined,
+  {
+    directory: string;
+    relativePath: string;
+    fullPath: string;
+  },
+  unknown
+> = new RequestType('nx/projectGraphOutput');

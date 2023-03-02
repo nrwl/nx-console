@@ -1,5 +1,8 @@
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxWorkspace,
+  getProjectGraphOutput,
+} from '@nx-console/vscode/nx-workspace';
 import {
   getOutputChannel,
   getShellExecutionForConfig,
@@ -11,6 +14,8 @@ let projectGraphCacheDir: string | undefined;
 
 export async function createProjectGraph() {
   const { isEncapsulatedNx, workspacePath } = await getNxWorkspace();
+  const projectGraphOutput = await getProjectGraphOutput();
+
   return new Promise<void | string>((res, rej) => {
     if (!projectGraphCacheDir) {
       projectGraphCacheDir = cacheDir({
@@ -21,8 +26,7 @@ export async function createProjectGraph() {
 
     const shellExecution = getShellExecutionForConfig({
       cwd: workspacePath,
-      displayCommand:
-        'nx dep-graph --file ' + getProjectGraphOutput().relativePath,
+      displayCommand: 'nx dep-graph --file ' + projectGraphOutput.relativePath,
       encapsulatedNx: isEncapsulatedNx,
     });
 
@@ -43,19 +47,4 @@ export async function createProjectGraph() {
       rej(errorMessage);
     }
   });
-}
-
-export function getProjectGraphOutput() {
-  const directory = projectGraphCacheDir ?? '.';
-  const fullPath = `${directory}/project-graph.html`;
-  return {
-    directory,
-    relativePath:
-      '.' +
-      fullPath.replace(
-        WorkspaceConfigurationStore.instance.get('nxWorkspacePath', ''),
-        ''
-      ),
-    fullPath,
-  };
 }
