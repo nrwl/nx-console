@@ -44,8 +44,6 @@ export class RunTargetTreeItem extends TreeItem {
 
   iconPath = RunTargetTreeItem.getIconUriForRoute(this.extensionPath);
 
-  label: string;
-
   constructor(
     readonly route: string,
     readonly extensionPath: string,
