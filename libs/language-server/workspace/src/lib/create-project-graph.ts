@@ -2,7 +2,7 @@ import { Logger } from '@nx-console/shared/schema';
 import { getNxExecutionCommand } from '@nx-console/shared/utils';
 
 import { execSync } from 'child_process';
-import { ResponseError } from 'vscode-languageserver';
+import { ResponseError } from 'vscode-languageserver/node';
 import { getProjectGraphOutput } from './get-project-graph-output';
 import { nxWorkspace } from './workspace';
 
