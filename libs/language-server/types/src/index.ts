@@ -1,4 +1,8 @@
-import { NotificationType, RequestType } from 'vscode-languageserver/node';
+import {
+  NotificationType,
+  RequestType,
+  ResponseError,
+} from 'vscode-languageserver/node';
 import { NxWorkspace } from '@nx-console/shared/types';
 import {
   CollectionInfo,
@@ -79,3 +83,9 @@ export const NxProjectGraphOutputRequest: RequestType<
   },
   unknown
 > = new RequestType('nx/projectGraphOutput');
+
+export const NxCreateProjectGraphRequest: RequestType<
+  undefined,
+  undefined | ResponseError,
+  unknown
+> = new RequestType('nx/createProjectGraph');

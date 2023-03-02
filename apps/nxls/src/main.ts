@@ -4,6 +4,7 @@ import { getCompletionItems } from '@nx-console/language-server/capabilities/cod
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import {
   NxChangeWorkspace,
+  NxCreateProjectGraphRequest,
   NxGeneratorContextFromPathRequest,
   NxGeneratorOptionsRequest,
   NxGeneratorOptionsRequestOptions,
@@ -34,6 +35,7 @@ import {
   getNxVersion,
   nxWorkspace,
   getProjectGraphOutput,
+  createProjectGraph,
 } from '@nx-console/language-server/workspace';
 import {
   getNxJsonSchema,
@@ -321,6 +323,13 @@ connection.onRequest(NxProjectGraphOutputRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   return getProjectGraphOutput(WORKING_PATH);
+});
+
+connection.onRequest(NxCreateProjectGraphRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return await createProjectGraph(WORKING_PATH);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
