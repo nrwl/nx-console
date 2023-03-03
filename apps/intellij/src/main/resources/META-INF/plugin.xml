@@ -9,6 +9,7 @@
   <depends>JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
 
     <!-- works in WebStorm and other SmallIDEs -->
     <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
