@@ -29,8 +29,11 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         context: ConfigurationContext,
         sourceElement: Ref<PsiElement>
     ): Boolean {
-        return createRunSettingsFromContext(configuration.nxRunSettings, context, sourceElement)
-            ?.also { setupConfigurationFromSettings(configuration, it) } == null
+        val runSettings =
+            createRunSettingsFromContext(configuration.nxRunSettings, context, sourceElement)
+                ?: return false
+        setupConfigurationFromSettings(configuration, runSettings)
+        return true
     }
 
     private fun setupConfigurationFromSettings(
@@ -47,39 +50,28 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         sourceElement: Ref<PsiElement>?
     ): NxRunSettings? {
         val element = getElement(context)
-        if (element != null && element.isValid) {
-            val psiProjectJsonFile = getContainingProjectJsonFile(element)
-            if (psiProjectJsonFile == null) {
-                return null
-            } else {
-                val virtualPackageJson = psiProjectJsonFile.virtualFile
-                if (virtualPackageJson == null) {
-                    return null
-                } else {
-                    val targetProperty = findContainingProperty(element)
-                    return if (targetProperty == null) {
-                        null
-                    } else {
-                        val propertyLiteral = element.parent as? JsonStringLiteral
-                        val nxTarget = propertyLiteral?.value ?: return null
-                        val nxProject =
-                            (((propertyLiteral.parent as? JsonProperty)
-                                        ?.parentOfType<JsonObject>()
-                                        ?.parentOfType<JsonObject>()
-                                        ?.findProperty("name") as JsonProperty)
-                                    .value as JsonStringLiteral)
-                                .value
-                        sourceElement?.set(targetProperty)
-                        return runSettings.copy(
-                            nxProjects = nxProject,
-                            nxTargets = nxTarget,
-                        )
-                    }
-                }
-            }
-        } else {
+        if (element == null || element.isValid.not()) {
             return null
         }
+        val psiProjectJsonFile = getContainingProjectJsonFile(element) ?: return null
+        psiProjectJsonFile.virtualFile ?: return null
+        val targetProperty = element.parentOfType<JsonProperty>() ?: return null
+        val propertyLiteral = element.parent as? JsonStringLiteral ?: return null
+        val nxTarget = propertyLiteral.value
+        // TODO see if we can use nxls if it's more efficient
+        val nxProject =
+            ((propertyLiteral.parent as? JsonProperty)
+                    ?.parentOfType<JsonObject>()
+                    ?.parentOfType<JsonObject>()
+                    ?.findProperty("name")
+                    ?.value as? JsonStringLiteral)
+                ?.value
+                ?: return null
+        sourceElement?.set(targetProperty)
+        return runSettings.copy(
+            nxProjects = nxProject,
+            nxTargets = nxTarget,
+        )
     }
 
     override fun isConfigurationFromContext(

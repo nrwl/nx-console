@@ -9,39 +9,34 @@ import com.intellij.json.psi.JsonProperty
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
 
 class NxRunLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         if (element !is LeafPsiElement) {
             return null
-        } else if (element.elementType !== JsonElementTypes.DOUBLE_QUOTED_STRING) {
-            return null
-        } else {
-            val property = findContainingProperty(element)
-            if (property != null && property.nameElement === element.getParent()) {
-                return if (isTargetProperty(property).not()) null
-                else {
-                    Info(RunConfigurations.TestState.Run, ExecutorAction.getActions()) {
-                        psiElement: PsiElement? ->
-                        "Run Target"
-                    }
-                }
-            } else {
-                return null
-            }
         }
+
+        if (element.elementType !== JsonElementTypes.DOUBLE_QUOTED_STRING) {
+            return null
+        }
+
+        if (isInsideNxProjectJsonFile(element).not()) {
+            return null
+        }
+
+        val property = element.parentOfType<JsonProperty>() ?: return null
+        if (isTargetProperty(property).not()) {
+            return null
+        }
+
+        return Info(RunConfigurations.TestState.Run, ExecutorAction.getActions()) { "Run Target" }
     }
 }
 
 fun isTargetProperty(property: JsonProperty?): Boolean {
     val targetsProperty = PsiTreeUtil.getParentOfType(property, JsonProperty::class.java, true)
     return targetsProperty != null && "targets" == targetsProperty.name
-}
-
-fun findContainingProperty(element: PsiElement): JsonProperty? {
-    return if (isInsideNxProjectJsonFile(element))
-        PsiTreeUtil.getParentOfType(element, JsonProperty::class.java, false)
-    else null
 }
 
 fun isInsideNxProjectJsonFile(element: PsiElement): Boolean {
