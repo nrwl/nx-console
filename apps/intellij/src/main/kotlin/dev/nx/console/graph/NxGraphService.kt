@@ -1,0 +1,96 @@
+package dev.nx.console.graph
+
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
+import dev.nx.console.graph.ui.DefaultNxGraphFile
+import dev.nx.console.graph.ui.NxGraphBrowser
+import dev.nx.console.graph.ui.NxGraphFileType
+import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.services.NxlsService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+
+private val logger = logger<NxGraphService>()
+
+class NxGraphService(val project: Project) {
+
+    private val nxlsService = NxlsService.getInstance(project)
+
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private val state: MutableStateFlow<NxGraphStates> = MutableStateFlow(NxGraphStates.Init)
+
+    private lateinit var graphBrowser: NxGraphBrowser
+
+    private var projectGraphOutput: ProjectGraphOutput? = null
+    init {
+        scope.launch {
+            projectGraphOutput = nxlsService.projectGraphOutput()
+            nxlsService.refreshFlow.onEach { loadProjectGraph(reload = true) }.collect()
+        }
+    }
+
+    fun showProjectGraphInEditor() {
+        val fileEditorManager = FileEditorManager.getInstance(project)
+
+        val nxGraphEditor =
+            fileEditorManager.allEditors.find {
+                it.file.fileType.name == NxGraphFileType.INSTANCE.name
+            }
+
+        // if there is already a graph file, we open it and call it a day
+        if (nxGraphEditor != null) {
+            fileEditorManager.openEditor(OpenFileDescriptor(project, nxGraphEditor.file), true)
+            return
+        }
+
+        graphBrowser = NxGraphBrowser(project, state.asStateFlow())
+        val virtualFile = DefaultNxGraphFile("Project Graph", project, graphBrowser)
+
+        if (state.value is NxGraphStates.Init || state.value is NxGraphStates.Error) {
+            scope.launch { loadProjectGraph() }
+        }
+
+        fileEditorManager.openFile(virtualFile, true).apply {
+            Disposer.register(first(), graphBrowser)
+        }
+    }
+
+    fun selectAllProjects() {
+        graphBrowser.selectAllProjects()
+    }
+
+    fun focusProject(projectName: String) {
+        graphBrowser.focusProject(projectName)
+    }
+
+    private suspend fun loadProjectGraph(reload: Boolean = false) {
+        state.emit(NxGraphStates.Loading)
+        nxlsService.createProjectGraph().apply {
+            if (this == null) {
+                state.value =
+                    projectGraphOutput.let {
+                        if (it == null) {
+                            NxGraphStates.Error("could not load project graph location")
+                        } else {
+                            NxGraphStates.Loaded(it, reload)
+                        }
+                    }
+            } else {
+                state.value = NxGraphStates.Error(this.message)
+            }
+        }
+    }
+
+    companion object {
+        fun getInstance(project: Project): NxGraphService =
+            project.getService(NxGraphService::class.java)
+    }
+}

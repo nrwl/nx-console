@@ -1,9 +1,6 @@
 package dev.nx.console.nxls.server
 
-import dev.nx.console.models.NxGenerator
-import dev.nx.console.models.NxGeneratorContext
-import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.models.NxWorkspace
+import dev.nx.console.models.*
 import dev.nx.console.nxls.server.requests.*
 import java.util.concurrent.CompletableFuture
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
@@ -41,6 +38,15 @@ interface NxService {
         throw UnsupportedOperationException()
     }
 
+    @JsonRequest
+    fun projectGraphOutput(): CompletableFuture<ProjectGraphOutput> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
+    fun createProjectGraph(): CompletableFuture<CreateProjectGraphError?> {
+        throw UnsupportedOperationException()
+    }
     @JsonNotification
     fun changeWorkspace(workspacePath: String) {
         throw UnsupportedOperationException()

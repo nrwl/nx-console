@@ -11,6 +11,7 @@ import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
+import dev.nx.console.utils.isInsideNxProjectJsonFile
 
 data class NxRunSettings(
     val nxProjects: String = "",
