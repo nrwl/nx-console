@@ -10,7 +10,6 @@ import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.intellij.psi.util.parentOfType
 
 data class NxRunSettings(
@@ -53,7 +52,10 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         if (element == null || element.isValid.not()) {
             return null
         }
-        val psiProjectJsonFile = getContainingProjectJsonFile(element) ?: return null
+        if (isInsideNxProjectJsonFile(element).not()) {
+            return null
+        }
+        val psiProjectJsonFile = element.containingFile as JsonFile
         psiProjectJsonFile.virtualFile ?: return null
         val targetProperty = element.parentOfType<JsonProperty>() ?: return null
         val propertyLiteral = element.parent as? JsonStringLiteral ?: return null
@@ -97,13 +99,4 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         val location = context.location
         return location?.psiElement
     }
-}
-
-fun getContainingProjectJsonFile(element: PsiElement): JsonFile? {
-    val file = element.containingFile
-    return if (isProjectJsonFile(file)) file as JsonFile else null
-}
-
-fun isProjectJsonFile(file: PsiFile): Boolean {
-    return file is JsonFile && ("project.json" == file.getName())
 }
