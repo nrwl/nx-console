@@ -12,12 +12,9 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
     LocatableConfigurationBase<RunProfileState>(project, factory, "Nx"),
     RunConfigurationWithSuppressedDefaultDebugAction {
 
-    var nxProjects: String = ""
-    var nxTargets: String = ""
-    var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
-    var arguments: String = ""
+    var nxRunSettings = NxRunSettings()
 
-    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
         return NxCommandLineState(environment, this)
     }
 
@@ -27,22 +24,25 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
 
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
-        element.writeString("nx-projects", this.nxProjects)
-        element.writeString("nx-targets", this.nxTargets)
-        environmentVariables.writeExternal(element)
-        element.writeString("arguments", this.arguments)
+        element.writeString("nx-projects", nxRunSettings.nxProjects)
+        element.writeString("nx-targets", nxRunSettings.nxTargets)
+        nxRunSettings.environmentVariables.writeExternal(element)
+        element.writeString("arguments", nxRunSettings.arguments)
     }
 
     override fun readExternal(element: Element) {
         super.readExternal(element)
-        this.nxProjects = element.readString("nx-projects") ?: return
-        this.nxTargets = element.readString("nx-targets") ?: return
-        this.environmentVariables = EnvironmentVariablesData.readExternal(element)
-        this.arguments = element.readString("arguments") ?: return
+        nxRunSettings =
+            NxRunSettings(
+                nxProjects = element.readString("nx-projects") ?: return,
+                nxTargets = element.readString("nx-targets") ?: return,
+                environmentVariables = EnvironmentVariablesData.readExternal(element),
+                arguments = element.readString("arguments") ?: return,
+            )
     }
 
     override fun suggestedName(): String {
-        return "$nxProjects[$nxTargets]"
+        return "${nxRunSettings.nxProjects}[${nxRunSettings.nxTargets}]"
     }
 }
 

@@ -22,17 +22,21 @@ class NxRunConfigurationEditor : SettingsEditor<NxCommandConfiguration>() {
         }
 
     override fun resetEditorFrom(configuration: NxCommandConfiguration) {
-        nxProjects.text = configuration.nxProjects
-        nxTargets.text = configuration.nxTargets
-        environmentVariables.envData = configuration.environmentVariables
-        arguments.text = configuration.arguments
+        val nxRunSettings = configuration.nxRunSettings
+        nxProjects.text = nxRunSettings.nxProjects
+        nxTargets.text = nxRunSettings.nxTargets
+        environmentVariables.envData = nxRunSettings.environmentVariables
+        arguments.text = nxRunSettings.arguments
     }
 
     override fun applyEditorTo(configuration: NxCommandConfiguration) {
-        configuration.nxProjects = nxProjects.text
-        configuration.nxTargets = nxTargets.text
-        configuration.environmentVariables = environmentVariables.envData
-        configuration.arguments = arguments.text
+        configuration.nxRunSettings =
+            NxRunSettings(
+                nxProjects = nxProjects.text,
+                nxTargets = nxTargets.text,
+                environmentVariables = environmentVariables.envData,
+                arguments = arguments.text,
+            )
     }
 
     override fun createEditor(): JComponent {
