@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui.editor
+package dev.nx.console.generate.ui
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileTypes.FileType
@@ -10,11 +10,10 @@ import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
-import dev.nx.console.generate.ui.CustomSchemeHandlerFactory
-import dev.nx.console.generate.ui.utils.getHexColor
-import dev.nx.console.generate.ui.utils.onBrowserLoadEnd
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
+import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
+import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import javax.swing.Icon
 import javax.swing.JComponent
 import kotlinx.serialization.decodeFromString

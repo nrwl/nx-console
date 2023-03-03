@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui.editor
+package dev.nx.console.generate.ui
 
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.NxGeneratorOption
