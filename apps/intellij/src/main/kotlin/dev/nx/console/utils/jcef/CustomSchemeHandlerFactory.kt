@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui
+package dev.nx.console.utils.jcef
 
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame

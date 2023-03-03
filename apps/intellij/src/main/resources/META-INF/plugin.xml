@@ -38,7 +38,7 @@
 
     <!-- Generate -->
     <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
-    <fileEditorProvider implementation="dev.nx.console.generate.ui.editor.NxGenerateUiFileEditorProvider"/>
+    <fileEditorProvider implementation="dev.nx.console.generate.ui.NxGenerateUiFileEditorProvider"/>
 
     <!--run anything execution provider-->
     <runAnything.executionProvider
@@ -47,9 +47,9 @@
 
     <!-- Nx Run Configuration-->
     <configurationType
-            implementation="dev.nx.console.run.NxCommandConfigurationType"/>
+      implementation="dev.nx.console.run.NxCommandConfigurationType"/>
     <runAnything.executionProvider
-            implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
+      implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
 
   </extensions>
 
