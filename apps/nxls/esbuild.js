@@ -10,6 +10,7 @@
     outfile: './dist/apps/nxls/main.js',
     metafile: true,
     external: ['typescript', 'ts-node', '@swc/*', '@parcel/watcher'],
+    loader: { '.node': 'file' },
   });
 
   let text = await esbuild.analyzeMetafile(result.metafile, {

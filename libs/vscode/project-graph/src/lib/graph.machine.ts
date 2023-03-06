@@ -1,6 +1,6 @@
+import { createProjectGraph } from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import { assign, createMachine, interpret } from 'xstate';
-import { createProjectGraph } from './create-project-graph';
 import { MessageType } from './graph-message-type';
 
 export const enum State {
@@ -122,7 +122,7 @@ export const graphMachine =
     {
       services: {
         generateContent: async () => {
-          return createProjectGraph();
+          return (await createProjectGraph())?.message;
         },
       },
       actions: {
