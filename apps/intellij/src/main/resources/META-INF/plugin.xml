@@ -62,6 +62,12 @@
     <!--nx workspace service-->
     <projectService serviceImplementation="dev.nx.console.services.NxWorkspaceService"/>
 
+
+    <!--Tool Window-->
+    <toolWindow id="Nx Console"
+                anchor="right"
+                factoryClass="dev.nx.console.toolWindow.NxToolWindowFactory"
+                icon="/icons/nx-console.svg" />
   </extensions>
 
   <applicationListeners>
