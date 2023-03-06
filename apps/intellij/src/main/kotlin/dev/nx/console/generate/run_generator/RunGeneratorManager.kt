@@ -9,6 +9,7 @@ import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
 import com.intellij.javascript.nodejs.NodeCommandLineUtil
+import com.intellij.lang.javascript.modules.ConsoleProgress
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.logger
@@ -72,14 +73,14 @@ class RunGeneratorManager(val project: Project) {
 
                         val processHandler = KillableColoredProcessHandler(commandLine)
 
-                        val consoleBuilder =
-                            TextConsoleBuilderFactory.getInstance().createBuilder(project)
-                        val console = consoleBuilder.console
-                        project.nxBasePath.let {
-                            console.addMessageFilter(NxGeneratorMessageFilter(project, it))
-                        }
+                        val console =
+                            TextConsoleBuilderFactory.getInstance()
+                                .createBuilder(project)
+                                .filters(NxGeneratorMessageFilter(project, project.nxBasePath))
+                                .console
+
                         console.attachToProcess(processHandler)
-                        processHandler.startNotify()
+                        ConsoleProgress.install(console, processHandler)
 
                         val contentDescriptor =
                             RunContentDescriptor(
@@ -96,6 +97,7 @@ class RunGeneratorManager(val project: Project) {
                             contentDescriptor
                         )
 
+                        processHandler.startNotify()
                         this.setProcessHandler(processHandler)
                     },
                     ModalityState.defaultModalityState()
