@@ -70,6 +70,7 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
     override fun createMainComponent(project: Project): JComponent {
 
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
+        browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         registerAppSchemeHandler()
         browser.loadURL("http://nxconsole/index.html")
         Disposer.register(project, browser)
