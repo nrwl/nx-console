@@ -53,8 +53,8 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
                 .getConfigurationSettingsList(NxCommandConfigurationType.getInstance())
                 .firstOrNull {
                     val nxCommandConfiguration = it.configuration as NxCommandConfiguration
-                    nxCommandConfiguration.nxTargets == nxTarget &&
-                        nxCommandConfiguration.nxProjects == nxProject
+                    val nxRunSettings = nxCommandConfiguration.nxRunSettings
+                    nxRunSettings.nxTargets == nxTarget && nxRunSettings.nxProjects == nxProject
                 }
                 ?: runManager
                     .createConfiguration(
@@ -63,9 +63,12 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
                     )
                     .apply {
                         (configuration as NxCommandConfiguration).apply {
-                            nxProjects = nxProject
-                            nxTargets = nxTarget
-                            arguments = args.drop(1).joinToString(" ")
+                            nxRunSettings =
+                                NxRunSettings(
+                                    nxProjects = nxProject,
+                                    nxTargets = nxTarget,
+                                    arguments = args.drop(1).joinToString(" "),
+                                )
                         }
                     }
                     .also { runManager.addConfiguration(it) }
