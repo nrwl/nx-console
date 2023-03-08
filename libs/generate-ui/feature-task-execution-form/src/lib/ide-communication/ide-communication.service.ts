@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   Option,
   OptionType,
@@ -7,8 +7,8 @@ import {
   TaskExecutionOutputMessage,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
-import type { WebviewApi } from 'vscode-webview';
+import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
+import type {WebviewApi} from 'vscode-webview';
 
 declare global {
   interface Window {
@@ -22,6 +22,7 @@ declare global {
     };
   }
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -95,6 +96,7 @@ export class IdeCommunicationService {
             --dropdown-input-background-color: ${message.payload.fieldBackground};
             --dropdown-input-border-color: ${message.payload.secondaryTextColor};
             --font-family: ${message.payload.fontFamily};
+            --font-size: ${message.payload.fontSize};
             --button-secondary-color: ${message.payload.fieldBackground};
             --button-secondary-text-color: ${message.payload.secondaryTextColor};
           }
