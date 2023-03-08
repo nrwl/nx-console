@@ -1,12 +1,13 @@
 // MANY OF THESE WILL BE OVERRIDEN WITH INTELLIJ THEME COLORS
 :root {
+  font-size: var(--font-size);
   --input-border-width: 1px;
   --input-border-radius-size: 3px;
-  --input-width: 320px;
-  --input-height: 26px;
+  --input-width: clamp(320px, calc(var(--font-size) * 24), 700px);
+  --input-height: clamp(26px, calc(var(--font-size) * 1.6), 50px);
 
   @media (min-width: 700px) {
-    --input-width: 440px;
+    --input-width: clamp(440px, calc(var(--font-size) * 32), 700px);
   }
 
   --scroll-bar-width: 12px;
@@ -16,15 +17,15 @@
   --button-secondary-hover-color: var(--vscode-button-secondaryHoverBackground);
 
   --text-input-background-color: var(
-    --vscode-settings-textInputBackground,
-    #eee
+      --vscode-settings-textInputBackground,
+      #eee
   );
   --text-input-border-color: var(--vscode-settings-textInputBorder);
   --text-input-text-color: var(--vscode-settings-textInputForeground);
 
   --dropdown-input-background-color: var(
-    --vscode-settings-dropdownBackground,
-    #eee
+      --vscode-settings-dropdownBackground,
+      #eee
   );
   --dropdown-input-border-color: var(--vscode-settings-dropdownBorder);
 
@@ -35,8 +36,8 @@
   --highlight-text-color: var(--vscode-settings-headerForeground);
   --secondary-text-color: var(--vscode-button-secondaryForeground);
   --modified-text-color: var(
-    --vscode-gitDecoration-modifiedResourceForeground,
-    #e2c08d
+      --vscode-gitDecoration-modifiedResourceForeground,
+      #e2c08d
   );
   --error-text-color: var(--vscode-errorForeground, #f00);
   --error-border-color: var(--vscode-inputValidation-errorBorder, #f00);
