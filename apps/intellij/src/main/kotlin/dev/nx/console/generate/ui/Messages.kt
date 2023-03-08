@@ -46,6 +46,7 @@ data class StylePayload(
     val secondaryTextColor: String,
     val fieldBackground: String,
     val fontFamily: String,
+    val fontSize: String,
 )
 
 @Serializable
