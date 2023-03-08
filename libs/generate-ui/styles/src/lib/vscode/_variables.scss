@@ -7,6 +7,8 @@
   @media (min-width: 700px) {
     --input-width: 440px;
   }
+  --font-size: var(--vscode-font-size);
+  font-size: var(--font-size);
 
   --scroll-bar-width: 12px;
 

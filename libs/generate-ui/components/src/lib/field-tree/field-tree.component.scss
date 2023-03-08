@@ -8,9 +8,8 @@
 .tree-item {
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 22px;
-  height: 22px;
-  font-size: 14px;
+  line-height: calc(var(--font-size) * 1.6);
+  height: calc(var(--font-size) * 1.6);
   opacity: 0.9;
   flex-shrink: 1;
   font-weight: 300;
@@ -40,6 +39,7 @@
   &.valid {
     color: var(--modified-text-color);
   }
+
   &.error {
     color: var(--error-text-color);
   }
