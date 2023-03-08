@@ -257,6 +257,7 @@ function readCollectionGenerator(
       name: collectionSchemaName,
       collection: collectionName,
       description: collectionJson.description || '',
+      aliases: collectionJson.aliases ?? [],
       type: generatorType,
     };
   } catch (e) {
