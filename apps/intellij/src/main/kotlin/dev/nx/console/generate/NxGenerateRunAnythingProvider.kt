@@ -87,22 +87,28 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
             generators = runBlocking { project.service<NxlsService>().generators() }
         }
 
+        val completedGeneratorName = commandLine.completedParameters.firstOrNull()
+
         val completeGeneratorNames = completeGeneratorNames(commandLine, generators).sorted()
         val completeOptions =
             completeOptions(RunAnythingUtil.fetchProject(dataContext), commandLine, generators)
 
-        return when {
-            commandLine.toComplete.startsWith("--") -> completeOptions + completeGeneratorNames
-            commandLine.toComplete.startsWith("-") -> completeOptions + completeGeneratorNames
-            else -> completeGeneratorNames + completeOptions
+        if (
+            completedGeneratorName != null &&
+                generatorOptions.containsKey(completedGeneratorName).not()
+        ) {
+            return emptySequence()
         }
+
+        return completeGeneratorNames + completeOptions
     }
 
     private fun completeGeneratorNames(
         commandLine: CommandLine,
         generators: List<NxGenerator>
     ): Sequence<String> {
-        return if (generators.any { it.name in commandLine }) emptySequence()
+        return if (generators.any { it.name in commandLine || commandLine.containsAlias(it) })
+            emptySequence()
         else generators.map { it.name }.asSequence()
     }
 
@@ -111,7 +117,7 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
         commandLine: CommandLine,
         generators: List<NxGenerator>
     ): Sequence<String> {
-        val generator = hasGenerator(commandLine, generators) ?: return emptySequence()
+        val generator = findGenerator(commandLine, generators) ?: return emptySequence()
         if (generatorOptions.containsKey(generator.name).not()) {
             val opts = runBlocking {
                 NxlsService.getInstance(project)
@@ -123,7 +129,9 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
                         )
                     )
             }
-            generatorOptions[generator.name] = opts
+            generatorOptions.putAll(
+                (generator.data.fullNamesWithAliases + generator.name).map { it to opts }
+            )
         }
         return generatorOptions[generator.name]?.let { options ->
             options.map { "--${it.name}" }.filterNot { it in commandLine }.asSequence()
@@ -131,10 +139,15 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
             ?: emptySequence()
     }
 
-    private fun hasGenerator(
+    private fun findGenerator(
         commandLine: CommandLine,
         generators: List<NxGenerator>
-    ): NxGenerator? = generators.find { commandLine.completedParameters.contains(it.name) }
+    ): NxGenerator? {
+        val params = commandLine.completedParameters
+        return generators.find {
+            commandLine.completedParameters.contains(it.name) || commandLine.containsAlias(it)
+        }
+    }
 
     private fun getDescription(value: String): String {
         val generator = Regex("@\\w+\\/\\w+:\\w+").find(value)?.value ?: return ""
@@ -143,6 +156,9 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
             "required"
         else ""
     }
+
+    private fun CommandLine.containsAlias(generator: NxGenerator): Boolean =
+        generator.data.fullNamesWithAliases.any { this.completedParameters.contains(it) }
 
     companion object {
         const val HELP_COMMAND = "nx generate"
