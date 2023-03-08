@@ -159,12 +159,14 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
         val fieldBackground = getHexColor(UIUtil.getTextFieldBackground())
         val fontFamily =
             "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
+        val fontSize = "${UIUtil.getLabelFont().size}px"
         return StylePayload(
             backgroundColor,
             highlightTextColor,
             secondaryTextColor,
             fieldBackground,
-            fontFamily
+            fontFamily,
+            fontSize
         )
     }
 }
