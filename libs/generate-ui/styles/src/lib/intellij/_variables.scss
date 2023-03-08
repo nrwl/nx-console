@@ -17,15 +17,15 @@
   --button-secondary-hover-color: var(--vscode-button-secondaryHoverBackground);
 
   --text-input-background-color: var(
-      --vscode-settings-textInputBackground,
-      #eee
+    --vscode-settings-textInputBackground,
+    #eee
   );
   --text-input-border-color: var(--vscode-settings-textInputBorder);
   --text-input-text-color: var(--vscode-settings-textInputForeground);
 
   --dropdown-input-background-color: var(
-      --vscode-settings-dropdownBackground,
-      #eee
+    --vscode-settings-dropdownBackground,
+    #eee
   );
   --dropdown-input-border-color: var(--vscode-settings-dropdownBorder);
 
@@ -36,8 +36,8 @@
   --highlight-text-color: var(--vscode-settings-headerForeground);
   --secondary-text-color: var(--vscode-button-secondaryForeground);
   --modified-text-color: var(
-      --vscode-gitDecoration-modifiedResourceForeground,
-      #e2c08d
+    --vscode-gitDecoration-modifiedResourceForeground,
+    #e2c08d
   );
   --error-text-color: var(--vscode-errorForeground, #f00);
   --error-border-color: var(--vscode-inputValidation-errorBorder, #f00);

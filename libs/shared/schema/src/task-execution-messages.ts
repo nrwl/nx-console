@@ -1,4 +1,4 @@
-import {TaskExecutionMessage, TaskExecutionSchema} from './schema';
+import { TaskExecutionMessage, TaskExecutionSchema } from './schema';
 
 export interface GlobalConfigurationData {
   enableTaskExecutionDryRunOnChange: boolean;
@@ -17,8 +17,7 @@ export enum TaskExecutionOutputMessageType {
 export class TaskExecutionRunCommandOutputMessage {
   readonly type = TaskExecutionOutputMessageType.RunCommand;
 
-  constructor(public readonly payload: TaskExecutionMessage) {
-  }
+  constructor(public readonly payload: TaskExecutionMessage) {}
 }
 
 export class TaskExecutionFormInitOutputMessage {
@@ -42,15 +41,13 @@ export enum TaskExecutionInputMessageType {
 export class TaskExecutionSchemaInputMessage {
   readonly type = TaskExecutionInputMessageType.SetTaskExecutionSchema;
 
-  constructor(public readonly payload: TaskExecutionSchema) {
-  }
+  constructor(public readonly payload: TaskExecutionSchema) {}
 }
 
 export class TaskExecutionGlobalConfigurationInputMessage {
   readonly type = TaskExecutionInputMessageType.SetGlobalConfiguration;
 
-  constructor(public readonly payload: GlobalConfigurationData) {
-  }
+  constructor(public readonly payload: GlobalConfigurationData) {}
 }
 
 export class TaskExecutionSetStylesMessage {
@@ -65,6 +62,5 @@ export class TaskExecutionSetStylesMessage {
       fontFamily: string;
       fontSize: string;
     }
-  ) {
-  }
+  ) {}
 }

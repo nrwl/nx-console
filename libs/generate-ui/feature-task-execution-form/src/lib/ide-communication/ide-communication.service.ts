@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   Option,
   OptionType,
@@ -7,8 +7,8 @@ import {
   TaskExecutionOutputMessage,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
-import type {WebviewApi} from 'vscode-webview';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import type { WebviewApi } from 'vscode-webview';
 
 declare global {
   interface Window {
