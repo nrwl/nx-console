@@ -95,6 +95,7 @@ export interface Generator {
   description: string;
   options?: Option[];
   type: GeneratorType;
+  aliases: string[];
 }
 
 export interface DefaultValue {
