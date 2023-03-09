@@ -22,5 +22,11 @@ data class NxGeneratorData(
     val collection: String,
     val name: String,
     val description: String,
-    val type: String
-)
+    val type: String,
+    val aliases: List<String>
+) {
+    val fullNamesWithAliases: List<String>
+        get(): List<String> {
+            return aliases.map { "$collection:$it" }
+        }
+}
