@@ -27,7 +27,6 @@ import { getProjectByPath } from './get-project-by-path';
 export class TargetCodeLens extends CodeLens {
   constructor(
     range: Range,
-    public workspaceType: 'nx' | 'ng',
     public project: string,
     public target: string,
     public configuration?: string
@@ -87,7 +86,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     }
 
     const projectLocations = getProjectLocations(document, projectName);
-    const { validWorkspaceJson, workspaceType } = await getNxWorkspace();
+    const { validWorkspaceJson } = await getNxWorkspace();
     if (!validWorkspaceJson) {
       return;
     }
@@ -103,13 +102,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
         WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
       );
 
-      this.buildTargetLenses(
-        project,
-        document,
-        lens,
-        workspaceType,
-        projectName
-      );
+      this.buildTargetLenses(project, document, lens, projectName);
     }
     return lens;
   }
@@ -137,7 +130,6 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     project: ProjectLocations[string],
     document: TextDocument,
     lens: CodeLens[],
-    workspaceType: 'nx' | 'ng',
     projectName: string
   ) {
     const projectTargets = project.targets;
@@ -145,12 +137,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       const position = document.positionAt(projectTargets[target].position);
 
       lens.push(
-        new TargetCodeLens(
-          new Range(position, position),
-          workspaceType,
-          projectName,
-          target
-        )
+        new TargetCodeLens(new Range(position, position), projectName, target)
       );
       const configurations = projectTargets[target].configurations;
       if (configurations) {
@@ -162,7 +149,6 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
           lens.push(
             new TargetCodeLens(
               new Range(configurationPosition, configurationPosition),
-              workspaceType,
               projectName,
               target,
               configuration
@@ -182,10 +168,10 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
   resolveCodeLens(lens: CodeLens): CodeLens | Promise<CodeLens> | null {
     if (lens instanceof TargetCodeLens) {
       const command: Command = {
-        command: `${lens.workspaceType}.run`,
+        command: `nx.run`,
         title: lens.configuration
-          ? `${lens.workspaceType} run ${lens.project}:${lens.target}:${lens.configuration}`
-          : `${lens.workspaceType} run ${lens.project}:${lens.target}`,
+          ? `nx run ${lens.project}:${lens.target}:${lens.configuration}`
+          : `nx run ${lens.project}:${lens.target}`,
         arguments: [lens.project, lens.target, lens.configuration, false],
       };
       lens.command = command;
@@ -215,7 +201,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     );
     if (enableWorkspaceConfigCodeLens) {
       this.codeLensProvider = languages.registerCodeLensProvider(
-        { pattern: '**/{workspace,angular,project}.json' },
+        { pattern: '**/{workspace,project}.json' },
         this
       );
       context.subscriptions.push(this.codeLensProvider);

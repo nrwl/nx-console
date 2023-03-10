@@ -15,7 +15,7 @@ export async function getGeneratorOptions(
     workspaceDefaults &&
     workspaceDefaults[collectionName] &&
     workspaceDefaults[collectionName][generatorName];
-  return await normalizeSchema(generatorSchema.json, 'nx', defaults);
+  return await normalizeSchema(generatorSchema.json, defaults);
 }
 
 async function readWorkspaceJsonDefaults(workspacePath: string): Promise<any> {

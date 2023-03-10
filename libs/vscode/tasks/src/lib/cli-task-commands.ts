@@ -4,7 +4,6 @@ import { GeneratorType, Option, OptionType } from '@nx-console/shared/schema';
 import { NxProjectsConfiguration } from '@nx-console/shared/types';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
-  getGenerators,
   getNxVersion,
   getNxWorkspace,
   getProjectByPath,
@@ -28,7 +27,7 @@ const CLI_COMMAND_LIST = [
 
 let cliTaskProvider: CliTaskProvider;
 
-export function registerCliTaskCommands(
+export async function registerCliTaskCommands(
   context: ExtensionContext,
   n: CliTaskProvider
 ) {
@@ -36,12 +35,6 @@ export function registerCliTaskCommands(
 
   CLI_COMMAND_LIST.forEach((command) => {
     context.subscriptions.push(
-      commands.registerCommand(`ng.${command}`, () =>
-        selectCliCommandAndPromptForFlags(command)
-      ),
-      commands.registerCommand(`ng.${command}.ui`, () =>
-        selectCliCommandAndShowUi(command, context.extensionPath)
-      ),
       commands.registerCommand(`nx.${command}`, () =>
         selectCliCommandAndPromptForFlags(command)
       ),
@@ -51,142 +44,128 @@ export function registerCliTaskCommands(
     );
   });
 
-  ['ng', 'nx'].forEach(async (cli) => {
-    commands.registerCommand(
-      `${cli}.run`,
-      (
-        project?: string,
-        target?: string,
-        configuration?: string,
-        askForFlags?: boolean
-      ) => {
-        selectCliCommandAndPromptForFlags(
-          'run',
-          project,
-          target,
-          configuration,
-          askForFlags
-        );
-      }
-    );
-    commands.registerCommand(
-      `${cli}.run.fileexplorer`,
-      async (uri: Uri | undefined) => {
-        if (!uri) {
-          uri = window.activeTextEditor?.document.uri;
-        }
-
-        if (!uri) {
-          return;
-        }
-
-        selectCliCommandAndPromptForFlags(
-          'run',
-          await getCliProjectFromUri(uri)
-        );
-      }
-    );
-
-    /**
-     * move and remove were release in patch 8.11
-     */
-    const version = await getNxVersion();
-    if (version.major >= 8) {
-      commands.registerCommand(`${cli}.move`, async (uri: Uri) => {
-        const generator = await selectReMoveGenerator(uri?.toString(), 'move');
-        if (!generator) {
-          return;
-        }
-        selectCliCommandAndShowUi(
-          'generate',
-          context.extensionPath,
-          uri,
-          GeneratorType.Other,
-          generator
-        );
-      });
-
-      commands.registerCommand(`${cli}.remove`, async (uri: Uri) => {
-        const generator = await selectReMoveGenerator(
-          uri?.toString(),
-          'remove'
-        );
-        if (!generator) {
-          return;
-        }
-        selectCliCommandAndShowUi(
-          'generate',
-          context.extensionPath,
-          uri,
-          GeneratorType.Other,
-          generator
-        );
-      });
+  commands.registerCommand(
+    `nx.run`,
+    (
+      project?: string,
+      target?: string,
+      configuration?: string,
+      askForFlags?: boolean
+    ) => {
+      selectCliCommandAndPromptForFlags(
+        'run',
+        project,
+        target,
+        configuration,
+        askForFlags
+      );
     }
+  );
+  commands.registerCommand(
+    `nx.run.fileexplorer`,
+    async (uri: Uri | undefined) => {
+      if (!uri) {
+        uri = window.activeTextEditor?.document.uri;
+      }
 
-    commands.registerCommand(`${cli}.generate`, () =>
-      selectGeneratorAndPromptForFlags()
-    );
+      if (!uri) {
+        return;
+      }
 
-    commands.registerCommand(`${cli}.generate.ui`, () =>
-      selectCliCommandAndShowUi('generate', context.extensionPath)
-    );
+      selectCliCommandAndPromptForFlags('run', await getCliProjectFromUri(uri));
+    }
+  );
 
-    commands.registerCommand(`${cli}.generate.ui.fileexplorer`, (uri: Uri) =>
-      selectCliCommandAndShowUi('generate', context.extensionPath, uri)
-    );
-
-    commands.registerCommand(`${cli}.generate.ui.app`, (uri: Uri) => {
+  /**
+   * move and remove were release in patch 8.11
+   */
+  const version = await getNxVersion();
+  if (version.major >= 8) {
+    commands.registerCommand(`nx.move`, async (uri: Uri) => {
+      const generator = await selectReMoveGenerator(uri?.toString(), 'move');
+      if (!generator) {
+        return;
+      }
       selectCliCommandAndShowUi(
         'generate',
         context.extensionPath,
         uri,
-        GeneratorType.Application
+        GeneratorType.Other,
+        generator
       );
     });
-    commands.registerCommand(`${cli}.generate.ui.lib`, (uri: Uri) => {
+
+    commands.registerCommand(`nx.remove`, async (uri: Uri) => {
+      const generator = await selectReMoveGenerator(uri?.toString(), 'remove');
+      if (!generator) {
+        return;
+      }
       selectCliCommandAndShowUi(
         'generate',
         context.extensionPath,
         uri,
-        GeneratorType.Library
+        GeneratorType.Other,
+        generator
       );
     });
-    commands.registerCommand(
-      `${cli}.generate.ui.app.fileexplorer`,
-      (uri: Uri) => {
-        selectCliCommandAndShowUi(
-          'generate',
-          context.extensionPath,
-          uri,
-          GeneratorType.Application
-        );
-      }
+  }
+
+  commands.registerCommand(`nx.generate`, () =>
+    selectGeneratorAndPromptForFlags()
+  );
+
+  commands.registerCommand(`nx.generate.ui`, () =>
+    selectCliCommandAndShowUi('generate', context.extensionPath)
+  );
+
+  commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) =>
+    selectCliCommandAndShowUi('generate', context.extensionPath, uri)
+  );
+
+  commands.registerCommand(`nx.generate.ui.app`, (uri: Uri) => {
+    selectCliCommandAndShowUi(
+      'generate',
+      context.extensionPath,
+      uri,
+      GeneratorType.Application
     );
-    commands.registerCommand(
-      `${cli}.generate.ui.lib.fileexplorer`,
-      (uri: Uri) => {
-        selectCliCommandAndShowUi(
-          'generate',
-          context.extensionPath,
-          uri,
-          GeneratorType.Library
-        );
-      }
+  });
+  commands.registerCommand(`nx.generate.ui.lib`, (uri: Uri) => {
+    selectCliCommandAndShowUi(
+      'generate',
+      context.extensionPath,
+      uri,
+      GeneratorType.Library
     );
-    commands.registerCommand(`${cli}.run.target`, async () => {
-      const target = await window.showQuickPick(getTargetNames());
-      if (!target) {
-        return;
-      }
-      const project = await window.showQuickPick(
-        getProjectsWithTargetName(target)
-      );
-      if (!project) {
-        return;
-      }
-      selectCliCommandAndPromptForFlags('run', project, target);
-    });
+  });
+  commands.registerCommand(`nx.generate.ui.app.fileexplorer`, (uri: Uri) => {
+    selectCliCommandAndShowUi(
+      'generate',
+      context.extensionPath,
+      uri,
+      GeneratorType.Application
+    );
+  });
+  commands.registerCommand(`nx.generate.ui.lib.fileexplorer`, (uri: Uri) => {
+    selectCliCommandAndShowUi(
+      'generate',
+      context.extensionPath,
+      uri,
+      GeneratorType.Library
+    );
+  });
+  commands.registerCommand(`nx.run.target`, async () => {
+    const target = await window.showQuickPick(getTargetNames());
+    if (!target) {
+      return;
+    }
+    const project = await window.showQuickPick(
+      getProjectsWithTargetName(target)
+    );
+    if (!project) {
+      return;
+    }
+    selectCliCommandAndPromptForFlags('run', project, target);
   });
 }
 
@@ -236,8 +215,7 @@ async function selectCliCommandAndPromptForFlags(
   } else if (!askForFlags) {
     flags = [];
   }
-  const { validWorkspaceJson, workspace, workspaceType } =
-    await getNxWorkspace();
+  const { validWorkspaceJson, workspace } = await getNxWorkspace();
 
   if (!projectName) {
     const selection = validWorkspaceJson
@@ -266,8 +244,7 @@ async function selectCliCommandAndPromptForFlags(
   const builderDefinition = await verifyBuilderDefinition(
     projectName,
     target,
-    workspace,
-    workspaceType
+    workspace
   );
   const {
     validBuilder,
@@ -298,8 +275,7 @@ async function selectCliCommandAndPromptForFlags(
             target
           )}`
         : `${command} ${projectName}`,
-      options,
-      workspaceType
+      options
     );
   }
 
@@ -322,22 +298,20 @@ function surroundWithQuotesIfHasWhiteSpace(target: string): string {
 }
 
 async function selectGeneratorAndPromptForFlags() {
-  const { validWorkspaceJson, workspaceType, workspacePath } =
-    await getNxWorkspace();
+  const { validWorkspaceJson } = await getNxWorkspace();
 
   if (!validWorkspaceJson) {
     return;
   }
 
-  const selection = await selectGenerator(workspacePath, workspaceType);
+  const selection = await selectGenerator();
   if (!selection) {
     return;
   }
 
   const flags = await selectFlags(
     `generate ${selection.positional}`,
-    selection.options,
-    workspaceType
+    selection.options
   );
 
   if (flags !== undefined) {

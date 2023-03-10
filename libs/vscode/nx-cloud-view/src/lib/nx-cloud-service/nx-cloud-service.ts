@@ -214,10 +214,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
       return;
     }
 
-    const nxVersion = await WorkspaceConfigurationStore.instance.get(
-      'nxVersion',
-      'latest'
-    );
+    const { nxVersion } = await getNxWorkspace();
 
     const cloudRunnerUrl =
       this.config.appUrl === stagingConfig.appUrl
@@ -235,11 +232,11 @@ export class NxCloudService extends StateBaseService<InternalState> {
       () => {
         return new Promise((resolve) => {
           try {
-            if (lt(coerce(nxVersion) ?? '', '12.0.0')) {
+            if (lt(coerce(nxVersion.full) ?? '', '12.0.0')) {
               promisify(exec)(
-                `${
-                  getPackageManagerCommand().addDev
-                } @nrwl/nx-cloud@${nxVersion}`,
+                `${getPackageManagerCommand().addDev} @nrwl/nx-cloud@${
+                  nxVersion.full
+                }`,
                 { cwd: getWorkspacePath() }
               )
                 .then(() => {
@@ -268,7 +265,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
               [
                 'nx',
                 // https://github.com/nrwl/nx/pull/12942
-                gte(coerce(nxVersion) ?? '', '15.0.7')
+                gte(coerce(nxVersion.full) ?? '', '15.0.7')
                   ? 'connect'
                   : 'connect-to-nx-cloud',
               ],

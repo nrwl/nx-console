@@ -21,11 +21,15 @@ jest.mock(
         isLerna: false,
         isEncapsulatedNx: false,
         validWorkspaceJson: true,
-        workspaceType: 'nx',
         workspacePath: '/',
         workspaceLayout: {
           appsDir: '',
           libsDir: '',
+        },
+        nxVersion: {
+          major: 0,
+          minor: 0,
+          full: '0.0.0',
         },
         workspace: {
           version: 2,

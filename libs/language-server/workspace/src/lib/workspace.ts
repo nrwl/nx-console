@@ -1,8 +1,4 @@
-import {
-  checkIsNxWorkspace,
-  formatError,
-  toWorkspaceFormat,
-} from '@nx-console/shared/utils';
+import { formatError, toWorkspaceFormat } from '@nx-console/shared/utils';
 
 import { clearJsonCache, fileExists } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
@@ -18,6 +14,7 @@ import {
 } from 'rxjs';
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { getNxVersion } from './get-nx-version';
 
 const enum Status {
   not_started,
@@ -31,8 +28,7 @@ let status: Status = Status.not_started;
 function resetStatus(workspacePath: string) {
   status = Status.not_started;
   cachedReplay = new ReplaySubject<NxWorkspace>();
-  // Clear out the workspace config path, needed for angular or older nx workspaces
-  clearJsonCache('angular.json', workspacePath);
+  // Clear out the workspace config path, needed for older nx workspaces
   clearJsonCache('workspace.json', workspacePath);
   clearJsonCache('nx.json', workspacePath);
 }
@@ -72,23 +68,13 @@ async function _workspace(
   workspacePath: string,
   logger: Logger
 ): Promise<NxWorkspace> {
-  const isAngularWorkspace = await fileExists(
-    join(workspacePath, 'angular.json')
-  );
-  const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
-
   try {
-    const config = await getNxWorkspaceConfig(
-      workspacePath,
-      isAngularWorkspace ? 'angularCli' : 'nx',
-      isNxWorkspace,
-      logger
-    );
+    const version = await getNxVersion(workspacePath);
+    const config = await getNxWorkspaceConfig(workspacePath, version, logger);
 
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
     return {
       validWorkspaceJson: true,
-      workspaceType: isAngularWorkspace ? 'ng' : 'nx',
       workspace: toWorkspaceFormat(config.workspaceConfiguration),
       daemonEnabled: config.daemonEnabled,
       isLerna,
@@ -96,6 +82,11 @@ async function _workspace(
       workspaceLayout: {
         appsDir: config.workspaceConfiguration.workspaceLayout?.appsDir,
         libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,
+      },
+      nxVersion: {
+        major: version.major,
+        minor: version.minor,
+        full: version.version,
       },
       workspacePath,
     };
@@ -105,7 +96,6 @@ async function _workspace(
     // Default to nx workspace
     return {
       validWorkspaceJson: false,
-      workspaceType: 'nx',
       workspace: {
         npmScope: '@nx-console',
         projects: {},
@@ -113,6 +103,11 @@ async function _workspace(
       },
       workspacePath,
       isEncapsulatedNx: false,
+      nxVersion: {
+        major: 0,
+        minor: 0,
+        full: '0.0.0',
+      },
       isLerna: false,
       workspaceLayout: {
         appsDir: 'apps',

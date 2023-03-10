@@ -15,7 +15,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     super();
     commands.registerCommand(
       EXECUTE_ARBITRARY_COMMAND,
-      this.executeArbirtraryCommand
+      this.executeArbitraryCommand
     );
     GlobalConfigurationStore.instance.onConfigurationChange(() =>
       this.refresh()
@@ -69,16 +69,15 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     );
   }
 
-  async executeArbirtraryCommand(command: string) {
+  async executeArbitraryCommand(command: string) {
     const prefixedCommand = command.startsWith('nx ')
       ? command
       : `nx ${command}`;
-    const { workspacePath, workspaceType, isEncapsulatedNx } =
-      await getNxWorkspace();
+    const { workspacePath, isEncapsulatedNx } = await getNxWorkspace();
     const pkgManager = detectPackageManager(workspacePath);
 
     const task = new Task(
-      { type: workspaceType },
+      { type: 'nx' },
       TaskScope.Workspace,
       prefixedCommand,
       pkgManager,

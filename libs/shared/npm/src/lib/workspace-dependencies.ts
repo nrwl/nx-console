@@ -1,16 +1,15 @@
+import { directoryExists } from '@nx-console/shared/file-system';
 import { WorkspaceProjects } from '@nx-console/shared/schema';
+import { NxVersion } from '@nx-console/shared/types';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { npmDependencies } from './npm-dependencies';
+import { packageDetails } from './package-details';
 import {
   isWorkspaceInPnp,
   pnpDependencies,
   pnpDependencyPath,
 } from './pnp-dependencies';
-import { directoryExists } from '@nx-console/shared/file-system';
-import { packageDetails } from './package-details';
-import { coerce, SemVer } from 'semver';
-import { findNxPackagePath } from './find-nx-package-path';
 
 /**
  * Get dependencies for the current workspace.
@@ -20,11 +19,14 @@ import { findNxPackagePath } from './find-nx-package-path';
 
 export async function workspaceDependencies(
   workspacePath: string,
+  nxVersion: NxVersion,
   projects?: WorkspaceProjects
 ): Promise<string[]> {
   const dependencies: string[] = [];
 
-  dependencies.push(...(await localDependencies(workspacePath, projects)));
+  dependencies.push(
+    ...(await localDependencies(workspacePath, nxVersion, projects))
+  );
 
   if (await isWorkspaceInPnp(workspacePath)) {
     dependencies.push(...(await pnpDependencies(workspacePath)));
@@ -89,6 +91,7 @@ export async function localDependencyPath(
 
 async function localDependencies(
   workspacePath: string,
+  version: NxVersion,
   projects?: WorkspaceProjects
 ): Promise<string[]> {
   if (!projects) {
@@ -96,7 +99,7 @@ async function localDependencies(
   }
 
   // Local plugins do not work with nxVersion less than 13
-  if ((await nxVersion(workspacePath)).major < 13) {
+  if (version.major < 13) {
     return [];
   }
 
@@ -118,38 +121,4 @@ async function localDependencies(
   }
 
   return existingPackages;
-}
-
-// THIS IS HANDLED BY THE NXLS NOW
-// KEEPING IT AROUND IN THE SHARED FOLDER FOR NG CLI COMPAT
-// TODO: REMOVE
-
-declare function __non_webpack_require__(importPath: string): any;
-
-let nxWorkspacePackageJson: { version: string };
-let loadedNxPackage = false;
-
-const defaultSemver = new SemVer('0.0.0');
-
-export async function nxVersion(workspacePath: string): Promise<SemVer> {
-  if (!loadedNxPackage) {
-    const packagePath = await findNxPackagePath(workspacePath, 'package.json');
-
-    if (!packagePath) {
-      return defaultSemver;
-    }
-
-    nxWorkspacePackageJson = __non_webpack_require__(packagePath);
-    loadedNxPackage = true;
-  }
-
-  if (!nxWorkspacePackageJson) {
-    return defaultSemver;
-  }
-  const nxVersion = coerce(nxWorkspacePackageJson.version);
-  if (!nxVersion) {
-    return defaultSemver;
-  }
-
-  return nxVersion;
 }

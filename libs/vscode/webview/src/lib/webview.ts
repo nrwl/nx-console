@@ -46,8 +46,6 @@ export async function revealWebViewPanel({
 }: RevealWebViewPanelConfig) {
   const { label, generatorType } = runTargetTreeItem;
   const schema = await getTaskExecutionSchema(
-    cliTaskProvider,
-    label,
     contextMenuUri,
     generatorType,
     generator

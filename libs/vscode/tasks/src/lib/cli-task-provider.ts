@@ -4,7 +4,6 @@ import {
 } from '@nx-console/shared/schema';
 import { NxProjectsConfiguration } from '@nx-console/shared/types';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { NxConversion } from '@nx-console/vscode/nx-conversion';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getTelemetry } from '@nx-console/vscode/utils';
 import {
@@ -72,7 +71,6 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   async executeTask(definition: CliTaskDefinition) {
-    NxConversion.instance.trackEvent(definition.command);
     const isDryRun = definition.flags.includes('--dry-run');
     if (isDryRun && this.currentDryRun) {
       this.deferredDryRun = definition;

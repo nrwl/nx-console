@@ -414,7 +414,7 @@ async function configureSchemas(
       schemas: [
         {
           uri: 'nx://schemas/workspace',
-          fileMatch: ['**/workspace.json', '**/angular.json'],
+          fileMatch: ['**/workspace.json'],
           schema: workspaceSchema,
         },
         {

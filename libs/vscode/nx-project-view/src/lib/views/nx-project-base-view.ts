@@ -100,7 +100,8 @@ export abstract class BaseView {
       targetDefinition: TargetConfiguration
     ]
   ): TargetViewItem {
-    const hasChildren = !!configurations;
+    const hasChildren =
+      configurations && Object.keys(configurations).length > 0;
     return {
       id: `${nxProject.project}:${targetName}`,
       contextValue: 'target',
