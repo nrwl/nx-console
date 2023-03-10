@@ -133,7 +133,6 @@ const initialSchema: TaskExecutionSchema = {
   description: 'schematic description',
   command: 'generate',
   positional: '@scope:schematic',
-  cliName: 'ng',
 };
 
 const schemaWithoutDefaults: TaskExecutionSchema = {

@@ -49,7 +49,7 @@ let pkgManager: PackageManager;
 
 function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
   return async () => {
-    const { workspacePath, workspaceType } = await getNxWorkspace();
+    const { workspacePath } = await getNxWorkspace();
     pkgManager = detectPackageManager(workspacePath);
 
     const depInput = await promptForDependencyInput();
@@ -74,7 +74,7 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
           taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
         ) {
           quickInput.hide();
-          executeInitGenerator(dep, workspacePath, workspaceType);
+          executeInitGenerator(dep, workspacePath);
           disposable.dispose();
         }
       }, undefined);
@@ -155,11 +155,7 @@ function addDependency(
   tasks.executeTask(task);
 }
 
-async function executeInitGenerator(
-  dependency: string,
-  workspacePath: string,
-  workspaceType: 'ng' | 'nx'
-) {
+async function executeInitGenerator(dependency: string, workspacePath: string) {
   const generators = await getGenerators({
     includeHidden: true,
     includeNgAdd: true,
@@ -180,17 +176,16 @@ async function executeInitGenerator(
     collection: initGenerator.data.collection,
     name: initGenerator.name,
     path: initGenerator.path,
-    workspaceType,
   });
   let selectedFlags;
   if (opts.length) {
-    selectedFlags = await selectFlags(initGenerator.name, opts, workspaceType);
+    selectedFlags = await selectFlags(initGenerator.name, opts);
   }
-  const command = `${workspaceType} g ${initGeneratorName} ${
+  const command = `nx g ${initGeneratorName} ${
     selectedFlags?.join(' ') ?? ''
   } --interactive=false`;
   const task = new Task(
-    { type: workspaceType },
+    { type: 'nx' },
     TaskScope.Workspace,
     command,
     pkgManager,

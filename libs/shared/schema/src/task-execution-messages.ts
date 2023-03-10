@@ -60,6 +60,7 @@ export class TaskExecutionSetStylesMessage {
       secondaryTextColor: string;
       fieldBackground: string;
       fontFamily: string;
+      fontSize: string;
     }
   ) {}
 }

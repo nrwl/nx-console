@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui.editor
+package dev.nx.console.generate.ui
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileTypes.FileType
@@ -10,11 +10,10 @@ import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
-import dev.nx.console.generate.ui.CustomSchemeHandlerFactory
-import dev.nx.console.generate.ui.utils.getHexColor
-import dev.nx.console.generate.ui.utils.onBrowserLoadEnd
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
+import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
+import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import javax.swing.Icon
 import javax.swing.JComponent
 import kotlinx.serialization.decodeFromString
@@ -71,6 +70,7 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
     override fun createMainComponent(project: Project): JComponent {
 
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
+        browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         registerAppSchemeHandler()
         browser.loadURL("http://nxconsole/index.html")
         Disposer.register(project, browser)
@@ -159,12 +159,14 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
         val fieldBackground = getHexColor(UIUtil.getTextFieldBackground())
         val fontFamily =
             "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"
+        val fontSize = "${UIUtil.getLabelFont().size}px"
         return StylePayload(
             backgroundColor,
             highlightTextColor,
             secondaryTextColor,
             fieldBackground,
-            fontFamily
+            fontFamily,
+            fontSize
         )
     }
 }

@@ -22,6 +22,7 @@ declare global {
     };
   }
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -95,6 +96,7 @@ export class IdeCommunicationService {
             --dropdown-input-background-color: ${message.payload.fieldBackground};
             --dropdown-input-border-color: ${message.payload.secondaryTextColor};
             --font-family: ${message.payload.fontFamily};
+            --font-size: ${message.payload.fontSize};
             --button-secondary-color: ${message.payload.fieldBackground};
             --button-secondary-text-color: ${message.payload.secondaryTextColor};
           }

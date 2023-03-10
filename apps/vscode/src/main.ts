@@ -44,14 +44,12 @@ import { revealWebViewPanel } from '@nx-console/vscode/webview';
 import { environment } from './environments/environment';
 
 import { fileExists } from '@nx-console/shared/file-system';
-import { nxVersion } from '@nx-console/shared/npm';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
 import { configureLspClient } from '@nx-console/vscode/lsp-client';
-import { NxConversion } from '@nx-console/vscode/nx-conversion';
 import {
   NxHelpAndFeedbackProvider,
   NxHelpAndFeedbackTreeItem,
@@ -68,6 +66,7 @@ import {
   WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
 import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
+import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -78,6 +77,8 @@ let nxProjectsTreeProvider: NxProjectTreeProvider;
 let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
 let workspaceFileWatcher: FileSystemWatcher | undefined;
+
+let isNxWorkspace = false;
 
 export async function activate(c: ExtensionContext) {
   try {
@@ -130,15 +131,8 @@ export async function activate(c: ExtensionContext) {
       projectGraph()
     );
 
-    //   registers itself as a CodeLensProvider and watches config to dispose/re-register
-
-    new WorkspaceCodeLensProvider(context);
-
-    new AddDependencyCodelensProvider(context);
-
-    NxConversion.createInstance(context);
-
     await enableTypeScriptPlugin(context);
+    initNxCommandsView(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
@@ -226,10 +220,14 @@ async function setWorkspace(workspacePath: string) {
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
-  if (!cliTaskProvider) {
+  setApplicationAndLibraryContext(workspacePath);
+
+  isNxWorkspace = await checkIsNxWorkspace(workspacePath);
+  const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
+
+  if (!cliTaskProvider && !isAngularWorkspace) {
     cliTaskProvider = new CliTaskProvider();
     registerNxCommands(context, cliTaskProvider);
-    tasks.registerTaskProvider('ng', cliTaskProvider);
     tasks.registerTaskProvider('nx', cliTaskProvider);
     registerCliTaskCommands(context, cliTaskProvider);
 
@@ -237,23 +235,22 @@ async function setWorkspace(workspacePath: string) {
 
     initNxCloudOnboardingView(context, environment.production);
 
-    initNxCommandsView(context);
-
     nxProjectsTreeProvider = initNxProjectView(context, cliTaskProvider);
 
     nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
       treeDataProvider: new NxHelpAndFeedbackProvider(context),
     });
 
+    //   registers itself as a CodeLensProvider and watches config to dispose/re-register
+
+    new WorkspaceCodeLensProvider(context);
+
+    new AddDependencyCodelensProvider(context);
+
     context.subscriptions.push(nxHelpAndFeedbackTreeView, lspContext);
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
-
-  setApplicationAndLibraryContext(workspacePath);
-
-  const isNxWorkspace = await checkIsNxWorkspace(workspacePath);
-  const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
   commands.executeCommand(
     'setContext',
@@ -264,8 +261,8 @@ async function setWorkspace(workspacePath: string) {
 
   registerWorkspaceFileWatcher(context, workspacePath);
 
-  currentRunTargetTreeProvider.refresh();
-  nxProjectsTreeProvider.refresh();
+  currentRunTargetTreeProvider?.refresh();
+  nxProjectsTreeProvider?.refresh();
 
   let workspaceType: 'nx' | 'angular' | 'angularWithNx' = 'nx';
   if (isNxWorkspace && isAngularWorkspace) {
@@ -276,11 +273,9 @@ async function setWorkspace(workspacePath: string) {
     workspaceType = 'angular';
   }
 
-  WorkspaceConfigurationStore.instance.set('workspaceType', workspaceType);
-  WorkspaceConfigurationStore.instance.set(
-    'nxVersion',
-    await nxVersion(workspacePath)
-  );
+  if (workspaceType === 'angular') {
+    initNxConversion(context);
+  }
 
   getTelemetry().record('WorkspaceType', { workspaceType });
 }
@@ -347,7 +342,13 @@ async function registerWorkspaceFileWatcher(
     watchFile(
       new RelativePattern(workspacePath, '{workspace,angular,nx,project}.json'),
       () => {
-        commands.executeCommand(REFRESH_WORKSPACE);
+        if (!isNxWorkspace) {
+          setTimeout(() => {
+            setWorkspace(workspacePath);
+          }, 1000);
+        } else {
+          commands.executeCommand(REFRESH_WORKSPACE);
+        }
       }
     )
   );

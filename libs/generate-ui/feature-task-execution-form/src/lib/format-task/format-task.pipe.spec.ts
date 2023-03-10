@@ -7,7 +7,6 @@ describe('FormatTaskPipe', () => {
     expect(
       pipe.transform({
         name: '',
-        cliName: 'ng',
         description: '',
         options: [],
         command: 'generate',
@@ -17,7 +16,6 @@ describe('FormatTaskPipe', () => {
     expect(
       pipe.transform({
         name: '',
-        cliName: 'ng',
         description: '',
         options: [],
         command: 'generate',
@@ -27,13 +25,12 @@ describe('FormatTaskPipe', () => {
     expect(
       pipe.transform({
         name: '',
-        cliName: 'ng',
         description: '',
         options: [],
         command: 'generate',
         positional: '@nrwl/angular:library',
       })
-    ).toEqual('ng generate @nrwl/angular:library');
+    ).toEqual('nx generate @nrwl/angular:library');
   });
 
   it('should optionally include configuration flag', () => {
@@ -41,7 +38,6 @@ describe('FormatTaskPipe', () => {
       pipe.transform(
         {
           name: '',
-          cliName: 'nx',
           description: '',
           options: [],
           command: 'build',

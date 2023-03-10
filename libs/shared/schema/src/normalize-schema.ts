@@ -17,12 +17,9 @@ export interface GeneratorDefaults {
 
 export async function normalizeSchema(
   s: Schema,
-  workspaceType: 'ng' | 'nx',
   projectDefaults?: GeneratorDefaults
 ): Promise<Option[]> {
-  // TODO(cammisuli): check what version ng supports hyphenated args
-  const hyphenate = workspaceType === 'ng';
-  const options = schemaToOptions(s, { hyphenate });
+  const options = schemaToOptions(s);
   const requiredFields = new Set(s.required || []);
 
   const nxOptions = options.map((option) => {
@@ -206,10 +203,7 @@ function isOptionItemLabelValue(
   );
 }
 
-function schemaToOptions(
-  schema: Schema,
-  config?: { hyphenate: boolean }
-): CliOption[] {
+function schemaToOptions(schema: Schema): CliOption[] {
   return Object.keys(schema.properties || {}).reduce<CliOption[]>(
     (cliOptions, option) => {
       const currentProperty = schema.properties[option];
@@ -223,9 +217,8 @@ function schemaToOptions(
       if (!visible) {
         return cliOptions;
       }
-      const name = config?.hyphenate ? names(option).fileName : option;
       cliOptions.push({
-        name,
+        name: option,
         originalName: option,
         positional,
         ...currentProperty,

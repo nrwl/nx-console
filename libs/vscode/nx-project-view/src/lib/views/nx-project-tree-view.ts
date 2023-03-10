@@ -156,18 +156,6 @@ class TreeView extends BaseView {
       roots.clear();
       roots.add(workspaceRootProjectNode!);
     }
-    // same special case for angular workspaces. They will have a project with a root of ''
-    if (treeMap.has('')) {
-      const workspaceRootProjectNode = treeMap.get('')!;
-      roots.forEach((root) => {
-        if (root.projectConfiguration?.root === '') {
-          return;
-        }
-        workspaceRootProjectNode?.children.push(root);
-      });
-      roots.clear();
-      roots.add(workspaceRootProjectNode!);
-    }
 
     return [treeMap, [...roots]];
   }

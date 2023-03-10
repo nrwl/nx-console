@@ -33,10 +33,7 @@ export type GlobalConfigKeys = typeof GLOBAL_CONFIG_KEYS[number];
 
 export const WORKSPACE_CONFIG_KEYS = [
   'nxWorkspacePath',
-  'nxConversionCount',
-  'nxConversionDoNotAskAgain',
-  'workspaceType',
-  'nxVersion',
+  'nxConversionDate',
   'projectsViewCollapsibleState',
 ] as const;
 /**

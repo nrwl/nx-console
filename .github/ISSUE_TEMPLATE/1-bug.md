@@ -31,7 +31,7 @@ labels: 'type: bug'
 ### Environment
 
 <!-- It's important for us to know the context in which you experience this behavior! -->
-<!-- Make sure to include the version of Nx Console and VSCode that you're using. And if you're using pure Angular CLI or Nx -->
+<!-- Make sure to include the version of Nx Console, VSCode or JetBrains IDE and Nx that you're using. -->
 <!-- If possible, please paste the result of `nx report` below! If not, then the contents of your `devDependencies` and `dependencies` in your package.json file-->
 
 - Nx Console version:

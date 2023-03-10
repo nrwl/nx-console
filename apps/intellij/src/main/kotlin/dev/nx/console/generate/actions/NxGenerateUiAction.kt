@@ -9,7 +9,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import dev.nx.console.generate.NxGenerateService
-import dev.nx.console.generate.ui.editor.DefaultNxGenerateUiFile
+import dev.nx.console.generate.ui.DefaultNxGenerateUiFile
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.NxGeneratorOption

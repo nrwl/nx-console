@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui.editor
+package dev.nx.console.generate.ui
 
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.NxGeneratorOption
@@ -29,8 +29,6 @@ data class GeneratorSchemaPayload(
 ) {
     @EncodeDefault() val command: String = "generate"
 
-    @EncodeDefault() val cliName: String = "nx"
-
     @EncodeDefault() val positional = this.name
 }
 
@@ -46,6 +44,7 @@ data class StylePayload(
     val secondaryTextColor: String,
     val fieldBackground: String,
     val fontFamily: String,
+    val fontSize: String,
 )
 
 @Serializable

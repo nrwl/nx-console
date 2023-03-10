@@ -22,8 +22,9 @@ class NxCommandLineState(
     override fun startProcess(): ProcessHandler {
         val project: Project = environment.project
         val nxExecutable = NxExecutable.getExecutablePath(project.nxBasePath)
-        val nxProjects = runConfiguration.nxProjects.split(",")
-        val nxTargets = runConfiguration.nxTargets.split(",")
+        val nxRunSettings = runConfiguration.nxRunSettings
+        val nxProjects = nxRunSettings.nxProjects.split(",")
+        val nxTargets = nxRunSettings.nxTargets.split(",")
         val args =
             if (nxProjects.size > 1 || nxTargets.size > 1)
                 arrayOf(
@@ -39,7 +40,7 @@ class NxCommandLineState(
                 addParameters(
                     listOf(
                         *args,
-                        *(ParametersListUtil.parseToArray(runConfiguration.arguments)),
+                        *(ParametersListUtil.parseToArray(nxRunSettings.arguments)),
                     )
                 )
                 setWorkDirectory(project.nxBasePath)

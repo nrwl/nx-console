@@ -9,6 +9,7 @@
   <depends>JavaScript</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
 
     <!-- works in WebStorm and other SmallIDEs -->
     <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
@@ -38,7 +39,7 @@
 
     <!-- Generate -->
     <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
-    <fileEditorProvider implementation="dev.nx.console.generate.ui.editor.NxGenerateUiFileEditorProvider"/>
+    <fileEditorProvider implementation="dev.nx.console.generate.ui.NxGenerateUiFileEditorProvider"/>
 
     <!--run anything execution provider-->
     <runAnything.executionProvider
@@ -47,9 +48,16 @@
 
     <!-- Nx Run Configuration-->
     <configurationType
-            implementation="dev.nx.console.run.NxCommandConfigurationType"/>
+      implementation="dev.nx.console.run.NxCommandConfigurationType"/>
+
+    <runConfigurationProducer
+            implementation="dev.nx.console.run.NxRunConfigurationProducer"/>
+
     <runAnything.executionProvider
             implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
+
+    <runLineMarkerContributor language="JSON"
+                              implementationClass="dev.nx.console.run.NxRunLineMarkerContributor"/>
 
   </extensions>
 

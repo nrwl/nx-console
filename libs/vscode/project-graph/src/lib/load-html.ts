@@ -1,6 +1,6 @@
+import { getProjectGraphOutput } from '@nx-console/vscode/nx-workspace';
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
-import { getProjectGraphOutput } from './create-project-graph';
 
 const html = String.raw;
 
@@ -178,7 +178,7 @@ export function loadSpinner() {
 }
 
 export async function loadHtml(panel: WebviewPanel) {
-  const projectGraphOutput = getProjectGraphOutput();
+  const projectGraphOutput = await getProjectGraphOutput();
 
   const rootUri = Uri.file(projectGraphOutput.directory);
   const htmlUri = Uri.file(projectGraphOutput.fullPath);

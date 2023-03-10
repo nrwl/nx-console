@@ -63,7 +63,6 @@ export interface TaskExecutionSchema {
   command: string;
   collection?: string;
   positional: string;
-  cliName: 'nx' | 'ng';
   builder?: string;
   description: string;
   configurations?: TargetConfiguration[];
@@ -95,6 +94,7 @@ export interface Generator {
   description: string;
   options?: Option[];
   type: GeneratorType;
+  aliases: string[];
 }
 
 export interface DefaultValue {

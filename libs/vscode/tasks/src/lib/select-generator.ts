@@ -12,8 +12,6 @@ import {
 import { QuickPickItem, window } from 'vscode';
 
 export async function selectGenerator(
-  workspacePath: string | undefined,
-  workspaceType: 'nx' | 'ng',
   generatorType?: GeneratorType,
   generator?: { collection: string; name: string }
 ): Promise<TaskExecutionSchema | undefined> {
@@ -84,7 +82,6 @@ export async function selectGenerator(
           collection: selection.collectionName,
           name: selection.generator.name,
           path: selection.collectionPath,
-          workspaceType,
         }));
       const positional = selection.generatorName;
       return {
@@ -92,7 +89,6 @@ export async function selectGenerator(
         options,
         command: 'generate',
         positional,
-        cliName: 'nx',
       };
     }
   }

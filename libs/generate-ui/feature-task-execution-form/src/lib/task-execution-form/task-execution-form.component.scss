@@ -12,6 +12,8 @@ $offset-without-configurations: $filter-offset + $host-padding-top +
 $offset-with-configurations: $offset-without-configurations +
   $configurations-offset;
 
+$search-height: max(26px, calc(var(--font-size) * 1.4));
+
 :host {
   height: 100vh;
   overflow: hidden;
@@ -23,7 +25,8 @@ $offset-with-configurations: $offset-without-configurations +
 
 .run-button {
   width: 80px;
-  height: 30px;
+  height: $search-height;
+  font-size: calc(var(--font-size) * 0.85);
   background: var(--button-primary-color);
   border: var(--input-border-width) solid var(--text-input-border-color);
   color: var(--secondary-text-color);
@@ -104,21 +107,25 @@ nx-console-argument-list {
   background-color: var(--text-input-background-color);
   border-color: var(--text-input-text-color);
   border-radius: var(--input-border-radius-size);
-  height: 30px;
+  height: $search-height;
   box-sizing: border-box;
-  padding: 0.3rem 0.5rem;
+  padding-left: 0.3rem;
 
   input {
     width: 100%;
-    line-height: 30px;
-    height: 20px;
+    line-height: $search-height;
+    height: $search-height;
     margin: none;
     box-sizing: border-box;
     color: var(--text-input-text-color);
     background: transparent;
     border: none !important;
     outline: none !important;
-    font-size: 13px;
+    font-size: max(calc(var(--font-size) * 0.7), 11px);
+  }
+
+  input::placeholder {
+    font-size: max(calc(var(--font-size) * 0.7), 11px);
   }
 }
 
@@ -158,7 +165,7 @@ nx-console-field {
 .title-container {
   .title {
     font-weight: 500;
-    font-size: 20px;
+    font-size: calc(var(--font-size) * 1.5);
     line-height: 21px;
   }
 
@@ -242,9 +249,8 @@ hr.divider {
 }
 
 .options-button {
-  width: 80px;
-  height: 30px;
-  font-size: 11px;
+  height: max(26px, calc(var(--font-size) * 1.6));
+  font-size: calc(var(--font-size) * 0.85);
   background: var(--button-secondary-color);
   border: var(--input-border-width) solid var(--text-input-border-color);
   color: var(--button-secondary-text-color);
