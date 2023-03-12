@@ -11,6 +11,8 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ScrollPaneFactory
+import dev.nx.console.services.NxProjectsRefreshListener
+import dev.nx.console.services.NxlsService
 import javax.swing.JComponent
 
 class NxToolWindow(val project: Project) {
@@ -19,6 +21,20 @@ class NxToolWindow(val project: Project) {
     private val projectStructure =
         NxProjectsTreeStructure(NxExecutor(project), projectTree, project, project.nxWorkspace())
     val content: JComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
+
+    init {
+        with(project.messageBus.connect()) {
+            subscribe(
+                NxlsService.NX_PROJECTS_REFRESH_TOPIC,
+                object : NxProjectsRefreshListener {
+                    override fun onNxProjectsRefresh() {
+                        invokeLater { projectStructure.updateNxProjects(project.nxWorkspace()) }
+                    }
+                }
+            )
+        }
+        invokeLater { projectStructure.updateNxProjects(project.nxWorkspace()) }
+    }
 
     val toolbar: ActionToolbar = run {
         val actionManager = ActionManager.getInstance()
@@ -69,10 +85,6 @@ class NxToolWindow(val project: Project) {
         actionGroup.add(collapseAllAction)
 
         actionManager.createActionToolbar(NX_TOOLBAR_PLACE, actionGroup, true)
-    }
-
-    init {
-        invokeLater { projectStructure.updateNxProjects(project.nxWorkspace()) }
     }
 
     companion object {
