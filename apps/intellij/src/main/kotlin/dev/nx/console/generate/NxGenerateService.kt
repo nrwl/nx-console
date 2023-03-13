@@ -74,7 +74,7 @@ class NxGenerateService(val project: Project) {
                             }
                             icon = JBUIScale.scaleIcon(EmptyIcon.create(5) as JBScalableIcon)
                             append(
-                                value.name.split(":").joinToString(" - "),
+                                "${value.data.collection} - ${value.data.name}",
                                 SimpleTextAttributes.REGULAR_ATTRIBUTES,
                                 true
                             )
