@@ -14,7 +14,7 @@ nx-console-checkbox {
     margin-top: 0.2rem;
   }
 
-  $checkbox-size: 1rem;
+  $checkbox-size: var(--font-size);
 
   .checkbox {
     background-color: var(--checkbox-background-color);
