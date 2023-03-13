@@ -21,39 +21,20 @@ import javax.swing.ListSelectionModel.SINGLE_SELECTION
 class NxGenerateService(val project: Project) {
 
     suspend fun selectGenerator(
-        actionEvent: AnActionEvent,
-        callback: (generator: NxGenerator?) -> Unit
-    ) {
-        selectGenerator(actionEvent, null, callback)
-    }
-    suspend fun selectGenerator(
-        generatorFilter: Regex,
-        callback: (generator: NxGenerator?) -> Unit
-    ) {
-        selectGenerator(null, generatorFilter, callback)
-    }
-    suspend fun selectGenerator(
         actionEvent: AnActionEvent?,
-        generatorFilter: Regex?,
         callback: (generator: NxGenerator?) -> Unit
     ) {
         val nxlsService = project.service<NxlsService>()
 
         val generators = nxlsService.generators()
-        val generatorNames = generators.map { it.name }
 
-        val generatorNamesFiltered =
-            when (generatorFilter) {
-                null -> generatorNames
-                else -> generatorNames.filter { it.contains(generatorFilter) }
-            }
-
-        if (generatorNamesFiltered.size == 0) {
+        if (generators.isEmpty()) {
             callback(null)
         }
+        val generatorNames = generators.map { it.name }
 
-        if (generatorNamesFiltered.size == 1) {
-            val chosenGenerator = generators.find { g -> g.name == generatorNamesFiltered[0] }
+        if (generatorNames.size == 1) {
+            val chosenGenerator = generators.find { g -> g.name == generatorNames[0] }
             callback(chosenGenerator)
         }
 
@@ -97,7 +78,7 @@ class NxGenerateService(val project: Project) {
                 .setFilterAlwaysVisible(true)
                 .setResizable(true)
                 .setMovable(true)
-                .setNamerForFiltering { it.name }
+                .setNamerForFiltering { "${it.data.collection} - ${it.data.name}" }
                 .setItemChosenCallback { chosen ->
                     if (chosen != null) {
                         callback(chosen)
