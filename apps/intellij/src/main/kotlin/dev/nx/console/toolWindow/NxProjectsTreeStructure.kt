@@ -20,6 +20,8 @@ import com.intellij.ui.treeStructure.SimpleNode
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.NxIcons
+import dev.nx.console.models.NxProject
+import dev.nx.console.models.NxWorkspace
 import dev.nx.console.run.NxCommandConfiguration
 import dev.nx.console.run.NxCommandConfigurationType
 import dev.nx.console.run.NxRunSettings
@@ -29,7 +31,7 @@ class NxProjectsTreeStructure(
     val nxExecutor: NxExecutor,
     val tree: NxProjectsTree,
     val parentDisposable: Disposable,
-    private var nxWorkspace: NxWorkspace
+    private var nxWorkspace: NxWorkspace?
 ) : SimpleTreeStructure() {
 
     private val treeModel = StructureTreeModel(this, parentDisposable)
@@ -43,113 +45,98 @@ class NxProjectsTreeStructure(
 
     override fun getRootElement(): Any = root
 
-    fun updateNxProjects(nxWorkspace: NxWorkspace) {
+    fun updateNxProjects(nxWorkspace: NxWorkspace?) {
         this.nxWorkspace = nxWorkspace
         root = NxSimpleNode.Root(nxWorkspace)
         treeModel.invalidate()
     }
 
     sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
-        class Root(val nxWorkspace: NxWorkspace) : NxSimpleNode(null) {
+        class Root(val nxWorkspace: NxWorkspace?) : NxSimpleNode(null) {
 
             init {
                 icon = NxIcons.Action
             }
 
             override fun buildChildren(): Array<SimpleNode> {
-                val tasks: Array<SimpleNode> = arrayOf(Tasks(nxWorkspace.nxProjects, this))
-                val apps: Array<SimpleNode> = arrayOf(Apps(nxWorkspace.nxProjects, this))
-                val libs: Array<SimpleNode> = arrayOf(Libs(nxWorkspace.nxProjects, this))
+                if (nxWorkspace == null) {
+                    return emptyArray()
+                }
+                val tasks: Array<SimpleNode> = arrayOf(Tasks(nxWorkspace, this))
+                val apps: Array<SimpleNode> = arrayOf(Apps(nxWorkspace, this))
+                val libs: Array<SimpleNode> = arrayOf(Libs(nxWorkspace, this))
                 return tasks + apps + libs
             }
 
-            override fun getName(): String {
-                return nxWorkspace.name
-            }
+            // TODO do not add a root node or get the name of workspace properly?
+            override fun getName(): String =
+                nxWorkspace?.workspacePath?.substringAfterLast("/") ?: "nx"
         }
 
-        class Apps(private val nxProjects: List<NxProject>, parent: SimpleNode) :
-            NxSimpleNode(null) {
+        class Apps(private val nxWorkspace: NxWorkspace, parent: SimpleNode) : NxSimpleNode(null) {
 
             init {
                 icon = AllIcons.Nodes.ModuleGroup
             }
 
-            override fun buildChildren(): Array<SimpleNode> {
+            override fun buildChildren(): Array<SimpleNode> =
+                nxWorkspace.workspace.projects.values
+                    .filter { it.projectType == "application" }
+                    .map { Project(it, this) }
+                    .toTypedArray()
 
-                val projects: Array<SimpleNode> =
-                    nxProjects
-                        .filter { it.projectType == "application" }
-                        .map { Project(it, this) }
-                        .toTypedArray()
-                return projects
-            }
-
-            override fun getName(): String {
-                return "apps"
-            }
+            override fun getName(): String = "apps"
         }
 
-        class Libs(private val nxProjects: List<NxProject>, parent: SimpleNode) :
-            NxSimpleNode(null) {
+        class Libs(private val nxWorkspace: NxWorkspace, parent: SimpleNode) : NxSimpleNode(null) {
 
             init {
                 icon = AllIcons.Nodes.PpLibFolder
             }
 
-            override fun buildChildren(): Array<SimpleNode> {
-                val projects: Array<SimpleNode> =
-                    nxProjects
-                        .filter { it.projectType == "library" }
-                        .map { Project(it, this) }
-                        .toTypedArray()
-                return projects
-            }
+            override fun buildChildren(): Array<SimpleNode> =
+                nxWorkspace.workspace.projects.values
+                    .filter { it.projectType == "application" }
+                    .map { Project(it, this) }
+                    .toTypedArray()
 
-            override fun getName(): String {
-                return "libs"
-            }
+            override fun getName(): String = "libs"
         }
 
-        class Tasks(private val nxProjects: List<NxProject>, parent: SimpleNode) :
+        class Tasks(private val nxWorkspace: NxWorkspace, parent: SimpleNode) :
             NxSimpleNode(parent) {
             init {
                 icon = AllIcons.Nodes.ConfigFolder
             }
 
-            override fun buildChildren(): Array<SimpleNode> {
-                return nxProjects
-                    .flatMap { it.targets }
-                    .distinct()
-                    .map { Task(nxProjects, it, this) }
+            override fun buildChildren(): Array<SimpleNode> =
+                nxWorkspace.workspace.projects.values
+                    .flatMap { p -> p.targets.keys.map { it to p.name } }
+                    .groupBy { it.first }
+                    .map { Task(nxWorkspace, it.key, this) }
                     .toTypedArray()
-            }
 
             override fun getName(): String = "Tasks"
         }
 
-        class Task(
-            private val nxProjects: List<NxProject>,
-            val taskName: String,
-            parent: SimpleNode
-        ) : NxSimpleNode(parent) {
+        class Task(private val nxWorkspace: NxWorkspace, val taskName: String, parent: SimpleNode) :
+            NxSimpleNode(parent) {
             init {
                 icon = AllIcons.Nodes.ConfigFolder
             }
 
-            override fun buildChildren(): Array<SimpleNode> {
-                return nxProjects
-                    .filter { it.targets.contains(taskName) }
+            override fun buildChildren(): Array<SimpleNode> =
+                nxWorkspace.workspace.projects
+                    .filter { it.value.targets.contains(taskName) }
                     .map {
                         NxTarget(
-                            name = it.name,
-                            nxProject = it.name,
+                            name = it.key,
+                            nxProject = it.key,
                             nxTarget = taskName,
                             parent = this
                         )
                     }
                     .toTypedArray()
-            }
 
             override fun getName(): String = taskName
         }
@@ -177,8 +164,8 @@ class NxProjectsTreeStructure(
                     else AllIcons.Nodes.PpLib
             }
 
-            override fun buildChildren(): Array<SimpleNode> {
-                return nxProject.targets
+            override fun buildChildren(): Array<SimpleNode> =
+                nxProject.targets.keys
                     .map {
                         NxTarget(
                             name = it,
@@ -188,11 +175,8 @@ class NxProjectsTreeStructure(
                         )
                     }
                     .toTypedArray()
-            }
 
-            override fun getName(): String {
-                return nxProject.name
-            }
+            override fun getName(): String = nxProject.name
         }
     }
 
