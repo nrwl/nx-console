@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.NxGeneratorOption
+import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nxls.NxlsWrapper
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
@@ -40,7 +41,7 @@ class NxlsService(val project: Project) {
         wrapper.stop()
     }
 
-    suspend fun workspace(): com.google.gson.JsonObject? {
+    suspend fun workspace(): NxWorkspace? {
         return server()?.getNxService()?.workspace()?.await()
     }
 
