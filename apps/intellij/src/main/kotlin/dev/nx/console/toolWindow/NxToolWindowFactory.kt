@@ -17,26 +17,7 @@ class NxToolWindowFactory : ToolWindowFactory {
     }
 }
 
-data class NxWorkspace(val name: String, val nxProjects: List<NxProject>)
-
-fun Project.nxWorkspace() = runBlocking {
-    val workspace = service<NxlsService>().workspace()?.get("workspace")
-    val nxName = workspace?.asJsonObject?.get("npmScope")?.asString ?: "nx"
-    val nxProjects =
-        workspace?.asJsonObject?.get("projects")?.asJsonObject?.entrySet()?.map { entry ->
-            NxProject(
-                name = entry.key,
-                projectType = entry.value?.asJsonObject?.get("projectType")?.asString ?: "library",
-                targets =
-                    entry.value?.asJsonObject?.get("targets")?.asJsonObject?.keySet()?.toList()
-                        ?: emptyList(),
-            )
-        }
-            ?: emptyList()
-    NxWorkspace(nxName, nxProjects)
-}
-
-data class NxProject(val name: String, val projectType: String, val targets: List<String>)
+fun Project.nxWorkspace() = runBlocking { service<NxlsService>().workspace() }
 
 data class NxTaskSet(val nxProjects: List<String>, val nxTargets: List<String>)
 
