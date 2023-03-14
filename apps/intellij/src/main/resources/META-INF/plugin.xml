@@ -67,7 +67,7 @@
     <toolWindow id="Nx Console"
                 anchor="right"
                 factoryClass="dev.nx.console.toolWindow.NxToolWindowFactory"
-                icon="/icons/nx-console.svg" />
+                icon="dev.nx.console.NxIcons.Action" />
   </extensions>
 
   <applicationListeners>
