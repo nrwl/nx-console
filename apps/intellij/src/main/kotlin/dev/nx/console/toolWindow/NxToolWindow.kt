@@ -12,8 +12,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ScrollPaneFactory
 import dev.nx.console.models.NxWorkspace
-import dev.nx.console.services.NxWorkspaceChangedListener
-import dev.nx.console.services.NxWorkspaceService
+import dev.nx.console.services.NxWorkspaceRefreshListener
+import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import javax.swing.JComponent
 
 class NxToolWindow(val project: Project) {
@@ -26,9 +26,9 @@ class NxToolWindow(val project: Project) {
     init {
         with(project.messageBus.connect()) {
             subscribe(
-                NxWorkspaceService.NX_WORKSPACE_CHANGED_TOPIC,
-                object : NxWorkspaceChangedListener {
-                    override fun onNxWorkspaceChanged(nxWorkspace: NxWorkspace) {
+                NX_WORKSPACE_REFRESH_TOPIC,
+                object : NxWorkspaceRefreshListener {
+                    override fun onNxWorkspaceRefresh(nxWorkspace: NxWorkspace) {
                         invokeLater { projectStructure.updateNxProjects(nxWorkspace) }
                     }
                 }
