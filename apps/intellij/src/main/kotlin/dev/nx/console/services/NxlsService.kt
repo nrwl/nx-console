@@ -3,6 +3,7 @@ package dev.nx.console.services
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.util.messages.Topic
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.NxGeneratorOption
@@ -20,7 +21,11 @@ private val logger = logger<NxlsService>()
 class NxlsService(val project: Project) {
 
     companion object {
+
         fun getInstance(project: Project): NxlsService = project.getService(NxlsService::class.java)
+
+        val NX_WORKSPACE_REFRESH_TOPIC: Topic<NxWorkspaceRefreshListener> =
+            Topic("NxWorkspaceRefresh", NxWorkspaceRefreshListener::class.java)
     }
 
     var wrapper: NxlsWrapper = NxlsWrapper(project)
@@ -79,4 +84,8 @@ class NxlsService(val project: Project) {
     fun isEditorConnected(editor: Editor): Boolean {
         return wrapper.isEditorConnected(editor)
     }
+}
+
+interface NxWorkspaceRefreshListener {
+    fun onNxWorkspaceRefresh(nxWorkspace: NxWorkspace)
 }
