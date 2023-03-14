@@ -62,15 +62,15 @@ class NxProjectsTreeStructure(
                 if (nxWorkspace == null) {
                     return emptyArray()
                 }
-                val tasks: Array<SimpleNode> = arrayOf(Tasks(nxWorkspace, this))
+                val targets: Array<SimpleNode> = arrayOf(Targets(nxWorkspace, this))
                 val apps: Array<SimpleNode> = arrayOf(Apps(nxWorkspace, this))
                 val libs: Array<SimpleNode> = arrayOf(Libs(nxWorkspace, this))
-                return tasks + apps + libs
+                return targets + apps + libs
             }
 
             // TODO do not add a root node or get the name of workspace properly?
             override fun getName(): String =
-                nxWorkspace?.workspacePath?.substringAfterLast("/") ?: "nx"
+                nxWorkspace?.workspacePath?.substringAfterLast("/") ?: "nx-workspace"
         }
 
         class Apps(private val nxWorkspace: NxWorkspace, parent: SimpleNode) : NxSimpleNode(null) {
@@ -103,7 +103,7 @@ class NxProjectsTreeStructure(
             override fun getName(): String = "libs"
         }
 
-        class Tasks(private val nxWorkspace: NxWorkspace, parent: SimpleNode) :
+        class Targets(private val nxWorkspace: NxWorkspace, parent: SimpleNode) :
             NxSimpleNode(parent) {
             init {
                 icon = AllIcons.Nodes.ConfigFolder
@@ -113,32 +113,35 @@ class NxProjectsTreeStructure(
                 nxWorkspace.workspace.projects.values
                     .flatMap { p -> p.targets.keys.map { it to p.name } }
                     .groupBy { it.first }
-                    .map { Task(nxWorkspace, it.key, this) }
+                    .map { Target(nxWorkspace, it.key, this) }
                     .toTypedArray()
 
-            override fun getName(): String = "Tasks"
+            override fun getName(): String = "Targets"
         }
 
-        class Task(private val nxWorkspace: NxWorkspace, val taskName: String, parent: SimpleNode) :
-            NxSimpleNode(parent) {
+        class Target(
+            private val nxWorkspace: NxWorkspace,
+            val targetName: String,
+            parent: SimpleNode
+        ) : NxSimpleNode(parent) {
             init {
                 icon = AllIcons.Nodes.ConfigFolder
             }
 
             override fun buildChildren(): Array<SimpleNode> =
                 nxWorkspace.workspace.projects
-                    .filter { it.value.targets.contains(taskName) }
+                    .filter { it.value.targets.contains(targetName) }
                     .map {
                         NxTarget(
                             name = it.key,
                             nxProject = it.key,
-                            nxTarget = taskName,
+                            nxTarget = targetName,
                             parent = this
                         )
                     }
                     .toTypedArray()
 
-            override fun getName(): String = taskName
+            override fun getName(): String = targetName
         }
 
         class NxTarget(

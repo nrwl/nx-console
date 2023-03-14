@@ -43,7 +43,11 @@ class NxToolWindow(val project: Project) {
 
         val nxRunAnythingAction =
             object :
-                AnAction("Execute Nx Tasks", "Execute nx tasks", AllIcons.Actions.Run_anything) {
+                AnAction(
+                    "Execute Nx Targets",
+                    "Execute nx targets",
+                    AllIcons.Actions.Run_anything
+                ) {
                 override fun actionPerformed(e: AnActionEvent) {
                     project.service<RunAnythingManager>().show("nx run", false, e)
                 }
