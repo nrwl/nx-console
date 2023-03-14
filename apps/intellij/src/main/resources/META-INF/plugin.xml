@@ -59,6 +59,9 @@
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.run.NxRunLineMarkerContributor"/>
 
+    <!--nx workspace service-->
+    <projectService serviceImplementation="dev.nx.console.services.NxWorkspaceService"/>
+
   </extensions>
 
   <applicationListeners>
