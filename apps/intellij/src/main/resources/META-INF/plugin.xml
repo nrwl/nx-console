@@ -95,6 +95,7 @@
     <group
       id="dev.nx.console.run.NxRunActionGroup"
       text="Nx: Run Target"
+      description="Run any target based on the selected project"
       class="dev.nx.console.run.NxRunActionGroup"
       popup="true"
       icon="dev.nx.console.NxIcons.Action"
