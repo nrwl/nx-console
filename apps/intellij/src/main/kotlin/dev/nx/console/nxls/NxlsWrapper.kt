@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.server.NxlsLanguageServer
-import dev.nx.console.services.NxWorkspaceService.Companion.NX_WORKSPACE_CHANGED_TOPIC
+import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.toolWindow.nxWorkspace
 import dev.nx.console.utils.nxBasePath
 import java.util.concurrent.CompletableFuture
@@ -87,8 +87,8 @@ class NxlsWrapper(val project: Project) {
             log.info("Initialized")
             project.nxWorkspace()?.run {
                 project.messageBus
-                    .syncPublisher(NX_WORKSPACE_CHANGED_TOPIC)
-                    .onNxWorkspaceChanged(this)
+                    .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
+                    .onNxWorkspaceRefresh(this)
             }
         } catch (e: Exception) {
             thisLogger().info("Cannot start nxls", e)
