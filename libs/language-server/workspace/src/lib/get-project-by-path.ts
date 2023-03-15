@@ -1,6 +1,6 @@
 import { ProjectConfiguration } from '@nrwl/devkit';
 import { directoryExists } from '@nx-console/shared/file-system';
-import { isAbsolute, join, relative } from 'path';
+import { isAbsolute, join, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';
 
 export async function getProjectByPath(
@@ -20,12 +20,13 @@ export async function getProjectByPath(
   let foundProject: ProjectConfiguration | null = null;
 
   for (const [projectName, projectConfig] of projectEntries) {
-    const startsWithRoot = relativeFilePath.startsWith(projectConfig.root);
+    const isChildOfRoot = isChildOrEqual(projectConfig.root, relativeFilePath);
     const relativeRootConfig = projectConfig.sourceRoot
       ? relative(workspacePath, projectConfig.sourceRoot)
       : undefined;
-    const startsWithRootConfig =
-      relativeRootConfig && relativeFilePath.startsWith(relativeRootConfig);
+    const isChildOfRootConfig =
+      relativeRootConfig &&
+      isChildOrEqual(relativeRootConfig, relativeFilePath);
 
     if (!projectConfig.files) {
       foundProject = findByFilePath(
@@ -33,7 +34,7 @@ export async function getProjectByPath(
         workspacePath,
         selectedPath
       );
-    } else if (isDirectory && (startsWithRoot || startsWithRootConfig)) {
+    } else if (isDirectory && (isChildOfRoot || isChildOfRootConfig)) {
       foundProject = projectConfig;
     } else if (
       !isDirectory &&
@@ -85,4 +86,10 @@ function findByFilePath(
   entry = perfectMatchEntry ?? secondaryMatchEntry;
 
   return entry ? { name: entry[0], ...entry[1] } : null;
+}
+
+function isChildOrEqual(parent: string, child: string) {
+  const p = parent.endsWith(sep) ? parent : parent + sep;
+  const c = child.endsWith(sep) ? child : child + sep;
+  return c.startsWith(p);
 }
