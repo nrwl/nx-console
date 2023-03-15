@@ -14,8 +14,8 @@ import javax.swing.Icon
 
 class NxCreateWorkspaceProjectGenerator : NpmPackageProjectGenerator() {
 
-    private val PACKAGE_NAME = "create-nx-workspace"
-    private val CREATE_COMMAND = "create-nx-workspace"
+    private val PACKAGE_NAME = "create-nx-workspace@latest"
+    private val CREATE_COMMAND = "create-nx-workspace@latest"
 
     override fun getId(): String = "Nx"
 
@@ -40,9 +40,9 @@ class NxCreateWorkspaceProjectGenerator : NpmPackageProjectGenerator() {
     }
     override fun packageName(): String = PACKAGE_NAME
 
-    override fun presentablePackageName(): String = "create-nx-&workspace:"
+    override fun presentablePackageName(): String = "Command:"
 
-    override fun getIcon(): Icon = NxIcons.Action
+    override fun getIcon(): Icon = NxIcons.FileType
 
     override fun validateProjectPath(path: String): String? {
         val error = NodePackageUtil.validateNpmPackageName(PathUtil.getFileName(path))
