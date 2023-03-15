@@ -51,10 +51,10 @@
       implementation="dev.nx.console.run.NxCommandConfigurationType"/>
 
     <runConfigurationProducer
-            implementation="dev.nx.console.run.NxRunConfigurationProducer"/>
+      implementation="dev.nx.console.run.NxRunConfigurationProducer"/>
 
     <runAnything.executionProvider
-            implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
+      implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
 
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.run.NxRunLineMarkerContributor"/>
@@ -91,5 +91,16 @@
       <add-to-group group-id="RefactoringMenu" anchor="last"/>
     </action>
 
+    <!-- Run -->
+    <group
+      id="dev.nx.console.run.NxRunActionGroup"
+      text="Nx: Run Target"
+      description="Run any target based on the selected project"
+      class="dev.nx.console.run.NxRunActionGroup"
+      popup="true"
+      icon="dev.nx.console.NxIcons.Action"
+    >
+      <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
+    </group>
   </actions>
 </idea-plugin>
