@@ -346,8 +346,6 @@ async function registerWorkspaceFileWatcher(
           setTimeout(() => {
             setWorkspace(workspacePath);
           }, 1000);
-        } else {
-          commands.executeCommand(REFRESH_WORKSPACE);
         }
       }
     )
