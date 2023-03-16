@@ -92,6 +92,7 @@ tasks {
         }
         from(nxlsRoot) {
             include("**/*.js")
+            include("**/*.map")
             into("${rootProject.name}/nxls")
         }
     }
