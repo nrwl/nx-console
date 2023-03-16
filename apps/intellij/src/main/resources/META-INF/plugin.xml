@@ -62,8 +62,8 @@
     <!--Tool Window-->
     <toolWindow id="Nx Console"
                 anchor="right"
-                factoryClass="dev.nx.console.toolWindow.NxToolWindowFactory"
-                icon="dev.nx.console.NxIcons.Action" />
+                factoryClass="dev.nx.console.nx_toolwindow.NxToolWindowFactory"
+                icon="dev.nx.console.NxIcons.Action"/>
   </extensions>
 
   <applicationListeners>

@@ -1,4 +1,4 @@
-package dev.nx.console.toolWindow
+package dev.nx.console.nx_toolwindow
 
 import com.intellij.execution.Executor
 import com.intellij.execution.RunManager
@@ -7,180 +7,46 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
 import com.intellij.lang.javascript.JavaScriptBundle
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.Project
 import com.intellij.ui.ClickListener
 import com.intellij.ui.PopupHandler
 import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
-import com.intellij.ui.treeStructure.CachingSimpleNode
-import com.intellij.ui.treeStructure.SimpleNode
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
-import dev.nx.console.NxIcons
-import dev.nx.console.models.NxProject
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.run.NxCommandConfiguration
 import dev.nx.console.run.NxCommandConfigurationType
 import dev.nx.console.run.NxRunSettings
+import dev.nx.console.run.NxTaskExecutionManager
+import dev.nx.console.utils.nxWorkspace
 import java.awt.event.MouseEvent
 
 class NxProjectsTreeStructure(
-    val nxExecutor: NxExecutor,
+    val nxTaskExecutionManager: NxTaskExecutionManager,
     val tree: NxProjectsTree,
-    val parentDisposable: Disposable,
-    private var nxWorkspace: NxWorkspace?
+    val project: Project,
+    nxWorkspace: NxWorkspace?
 ) : SimpleTreeStructure() {
 
-    private val treeModel = StructureTreeModel(this, parentDisposable)
+    private val treeModel = StructureTreeModel(this, project)
     private var root: NxSimpleNode.Root = NxSimpleNode.Root(nxWorkspace)
 
     init {
-        tree.model = AsyncTreeModel(treeModel, parentDisposable)
+        tree.model = AsyncTreeModel(treeModel, project)
         TreeUtil.installActions(tree)
         installPopupActions()
     }
 
     override fun getRootElement(): Any = root
 
-    fun updateNxProjects(nxWorkspace: NxWorkspace?) {
-        this.nxWorkspace = nxWorkspace
+    fun updateNxProjects() {
+        val nxWorkspace = project.nxWorkspace()
         root = NxSimpleNode.Root(nxWorkspace)
-        treeModel.invalidate()
-    }
-
-    sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
-        class Root(val nxWorkspace: NxWorkspace?) : NxSimpleNode(null) {
-
-            init {
-                icon = NxIcons.Action
-            }
-
-            override fun buildChildren(): Array<SimpleNode> {
-                if (nxWorkspace == null) {
-                    return emptyArray()
-                }
-                val targets: Array<SimpleNode> = arrayOf(Targets(nxWorkspace, this))
-                val apps: Array<SimpleNode> = arrayOf(Apps(nxWorkspace, this))
-                val libs: Array<SimpleNode> = arrayOf(Libs(nxWorkspace, this))
-                return targets + apps + libs
-            }
-
-            // TODO do not add a root node or get the name of workspace properly?
-            override fun getName(): String =
-                nxWorkspace?.workspacePath?.substringAfterLast("/") ?: "nx-workspace"
-        }
-
-        class Apps(private val nxWorkspace: NxWorkspace, parent: SimpleNode) : NxSimpleNode(null) {
-
-            init {
-                icon = AllIcons.Nodes.ModuleGroup
-            }
-
-            override fun buildChildren(): Array<SimpleNode> =
-                nxWorkspace.workspace.projects.values
-                    .filter { it.projectType == "application" }
-                    .map { Project(it, this) }
-                    .toTypedArray()
-
-            override fun getName(): String = "apps"
-        }
-
-        class Libs(private val nxWorkspace: NxWorkspace, parent: SimpleNode) : NxSimpleNode(null) {
-
-            init {
-                icon = AllIcons.Nodes.PpLibFolder
-            }
-
-            override fun buildChildren(): Array<SimpleNode> =
-                nxWorkspace.workspace.projects.values
-                    .filter { it.projectType == "application" }
-                    .map { Project(it, this) }
-                    .toTypedArray()
-
-            override fun getName(): String = "libs"
-        }
-
-        class Targets(private val nxWorkspace: NxWorkspace, parent: SimpleNode) :
-            NxSimpleNode(parent) {
-            init {
-                icon = AllIcons.Nodes.ConfigFolder
-            }
-
-            override fun buildChildren(): Array<SimpleNode> =
-                nxWorkspace.workspace.projects.values
-                    .flatMap { p -> p.targets.keys.map { it to p.name } }
-                    .groupBy { it.first }
-                    .map { Target(nxWorkspace, it.key, this) }
-                    .toTypedArray()
-
-            override fun getName(): String = "Targets"
-        }
-
-        class Target(
-            private val nxWorkspace: NxWorkspace,
-            val targetName: String,
-            parent: SimpleNode
-        ) : NxSimpleNode(parent) {
-            init {
-                icon = AllIcons.Nodes.ConfigFolder
-            }
-
-            override fun buildChildren(): Array<SimpleNode> =
-                nxWorkspace.workspace.projects
-                    .filter { it.value.targets.contains(targetName) }
-                    .map {
-                        NxTarget(
-                            name = it.key,
-                            nxProject = it.key,
-                            nxTarget = targetName,
-                            parent = this
-                        )
-                    }
-                    .toTypedArray()
-
-            override fun getName(): String = targetName
-        }
-
-        class NxTarget(
-            private val name: String,
-            val nxProject: String,
-            val nxTarget: String,
-            parent: SimpleNode
-        ) : NxSimpleNode(parent) {
-            init {
-                icon = AllIcons.General.Gear
-            }
-
-            override fun buildChildren(): Array<SimpleNode> = emptyArray()
-
-            override fun getName(): String = name
-        }
-
-        class Project(val nxProject: NxProject, parent: SimpleNode) : NxSimpleNode(parent) {
-
-            init {
-                icon =
-                    if (nxProject.projectType == "application") AllIcons.Nodes.Module
-                    else AllIcons.Nodes.PpLib
-            }
-
-            override fun buildChildren(): Array<SimpleNode> =
-                nxProject.targets.keys
-                    .map {
-                        NxTarget(
-                            name = it,
-                            nxProject = nxProject.name,
-                            nxTarget = it,
-                            parent = this
-                        )
-                    }
-                    .toTypedArray()
-
-            override fun getName(): String = nxProject.name
-        }
+        treeModel.invalidateAsync()
     }
 
     private inner class RunAction : ExecuteAction(DefaultRunExecutor.getRunExecutorInstance()) {
@@ -195,16 +61,14 @@ class NxProjectsTreeStructure(
         }
 
         override fun update(e: AnActionEvent) {
-            val project = e.project ?: return
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             e.presentation.isEnabledAndVisible = taskSet != null
             if (taskSet != null) {
-                e.presentation.setText(
+                e.presentation.text =
                     JavaScriptBundle.message(
                         "buildTools.EditRunSettingsAction.text",
                         *arrayOf<Any>(taskSet.suggestedName)
                     )
-                )
             }
         }
 
@@ -278,7 +142,10 @@ class NxProjectsTreeStructure(
                 override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
                     if (event.button == 1 && clickCount == 2) {
                         val taskSet: NxTaskSet = createTaskSetFromSelectedNodes() ?: return false
-                        nxExecutor.execute(taskSet)
+                        nxTaskExecutionManager.execute(
+                            taskSet.nxProjects.first(),
+                            taskSet.nxTargets.first()
+                        )
                         return true
                     }
                     return false
@@ -287,7 +154,7 @@ class NxProjectsTreeStructure(
             .installOn(this.tree)
     }
 
-    inner abstract class ExecuteAction(executor: Executor) :
+    abstract inner class ExecuteAction(executor: Executor) :
         AnAction(executor.startActionText, null as String?, executor.icon), DumbAware {
         private val myExecutor: Executor
 
@@ -312,13 +179,16 @@ class NxProjectsTreeStructure(
             e.project ?: return
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             if (taskSet != null) {
-                nxExecutor.execute(taskSet)
+                nxTaskExecutionManager.execute(
+                    taskSet.nxProjects.first(),
+                    taskSet.nxTargets.first()
+                )
             }
         }
     }
 
     private fun createTaskSetFromSelectedNodes(): NxTaskSet? {
-        val userObject = tree.selectedNode as? NxSimpleNode.NxTarget
+        val userObject = tree.selectedNode as? NxSimpleNode.Target
         if (userObject != null) {
             return NxTaskSet(
                 nxProjects = listOf(userObject.nxProject),

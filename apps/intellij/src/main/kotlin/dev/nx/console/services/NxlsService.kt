@@ -14,7 +14,10 @@ import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
 
 private val logger = logger<NxlsService>()
 
@@ -40,6 +43,15 @@ class NxlsService(val project: Project) {
 
     suspend fun start() {
         wrapper.start()
+        client()?.registerRefreshCallback {
+            CoroutineScope(Dispatchers.Default).launch {
+                workspace().run {
+                    project.messageBus
+                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
+                        .onNxWorkspaceRefresh()
+                }
+            }
+        }
     }
 
     fun close() {
@@ -87,5 +99,5 @@ class NxlsService(val project: Project) {
 }
 
 interface NxWorkspaceRefreshListener {
-    fun onNxWorkspaceRefresh(nxWorkspace: NxWorkspace)
+    fun onNxWorkspaceRefresh()
 }

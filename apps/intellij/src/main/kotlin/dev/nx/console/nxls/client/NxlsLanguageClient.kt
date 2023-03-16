@@ -12,6 +12,8 @@ import org.eclipse.lsp4j.services.LanguageClient
 private val log = logger<NxlsLanguageClient>()
 
 class NxlsLanguageClient : LanguageClient {
+
+    val refreshCallbacks: MutableList<() -> Unit> = mutableListOf()
     override fun telemetryEvent(`object`: Any?) {
         TODO("Not yet implemented")
     }
@@ -34,8 +36,13 @@ class NxlsLanguageClient : LanguageClient {
         log.info(message?.message)
     }
 
+    fun registerRefreshCallback(block: () -> Unit) {
+        refreshCallbacks.add(block)
+    }
+
     @JsonNotification("nx/refreshWorkspace")
     fun refreshWorkspace() {
         log.info("Refresh workspace called from nxls")
+        refreshCallbacks.forEach { it() }
     }
 }

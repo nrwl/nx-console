@@ -1,4 +1,4 @@
-package dev.nx.console.toolWindow
+package dev.nx.console.nx_toolwindow
 
 import com.intellij.ui.treeStructure.SimpleTree
 import javax.swing.tree.TreeSelectionModel

@@ -1,4 +1,4 @@
-package dev.nx.console.toolWindow
+package dev.nx.console.nx_toolwindow
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.CommonActionsManager
@@ -11,16 +11,22 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ScrollPaneFactory
-import dev.nx.console.models.NxWorkspace
+import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.services.NxWorkspaceRefreshListener
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
+import dev.nx.console.utils.nxWorkspace
 import javax.swing.JComponent
 
 class NxToolWindow(val project: Project) {
 
     private val projectTree = NxProjectsTree()
     private val projectStructure =
-        NxProjectsTreeStructure(NxExecutor(project), projectTree, project, project.nxWorkspace())
+        NxProjectsTreeStructure(
+            NxTaskExecutionManager(project),
+            projectTree,
+            project,
+            project.nxWorkspace()
+        )
     val content: JComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
 
     init {
@@ -28,13 +34,13 @@ class NxToolWindow(val project: Project) {
             subscribe(
                 NX_WORKSPACE_REFRESH_TOPIC,
                 object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh(nxWorkspace: NxWorkspace) {
-                        invokeLater { projectStructure.updateNxProjects(nxWorkspace) }
+                    override fun onNxWorkspaceRefresh() {
+                        invokeLater { projectStructure.updateNxProjects() }
                     }
                 }
             )
         }
-        invokeLater { projectStructure.updateNxProjects(project.nxWorkspace()) }
+        invokeLater { projectStructure.updateNxProjects() }
     }
 
     val toolbar: ActionToolbar = run {
@@ -65,7 +71,7 @@ class NxToolWindow(val project: Project) {
                 }
 
                 override fun actionPerformed(e: AnActionEvent) {
-                    invokeLater { projectStructure.updateNxProjects(project.nxWorkspace()) }
+                    invokeLater { projectStructure.updateNxProjects() }
                 }
             }
 

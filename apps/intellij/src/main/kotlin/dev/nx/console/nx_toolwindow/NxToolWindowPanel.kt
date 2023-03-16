@@ -1,4 +1,4 @@
-package dev.nx.console.toolWindow
+package dev.nx.console.nx_toolwindow
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel

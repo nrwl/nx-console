@@ -1,4 +1,4 @@
-package dev.nx.console.toolWindow
+package dev.nx.console.run
 
 import com.intellij.execution.Executor
 import com.intellij.execution.RunManager
@@ -7,15 +7,11 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import dev.nx.console.run.NxCommandConfiguration
-import dev.nx.console.run.NxCommandConfigurationType
-import dev.nx.console.run.NxRunSettings
 
-class NxExecutor(val project: Project) {
-    fun execute(taskSet: NxTaskSet) {
+class NxTaskExecutionManager(val project: Project) {
+    fun execute(nxProject: String, nxTarget: String) {
         val runManager = project.service<RunManager>()
-        val nxTarget = taskSet.nxTargets.first()
-        val nxProject = taskSet.nxProjects.first()
+
         val runnerAndConfigurationSettings: RunnerAndConfigurationSettings =
             runManager
                 .getConfigurationSettingsList(NxCommandConfigurationType.getInstance())
