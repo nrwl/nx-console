@@ -22,7 +22,7 @@ export async function languageServerWatcher(
         )
       ) {
         lspLogger.log('Project configuration changed');
-        callback();
+        debounce(callback, 200)();
       }
     },
     watcherOptions(workspacePath)
@@ -44,4 +44,14 @@ function watcherOptions(workspacePath: string): watcher.Options | undefined {
   }
 
   return options;
+}
+
+function debounce(callback: () => any, wait: number) {
+  let timerId: NodeJS.Timeout;
+  return () => {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      callback();
+    }, wait);
+  };
 }
