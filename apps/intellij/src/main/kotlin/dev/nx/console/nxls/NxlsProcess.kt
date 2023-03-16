@@ -9,6 +9,7 @@ import com.intellij.javascript.nodejs.interpreter.wsl.WslNodeInterpreter
 import com.intellij.lang.javascript.service.JSLanguageServiceUtil
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
+import com.intellij.util.application
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.utils.nxBasePath
 import java.io.File
@@ -61,6 +62,9 @@ class NxlsProcess(private val project: Project) {
         logger.info("nxls found via ${lsp.path}")
         return GeneralCommandLine().apply {
             withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+            if (application.isInternal) {
+                withEnvironment("NODE_OPTIONS", "--inspect=6009 --enable-source-maps")
+            }
             withCharset(Charsets.UTF_8)
             workDirectory = File(basePath)
             addParameter(lsp.path)

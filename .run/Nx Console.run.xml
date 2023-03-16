@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Nx Console" type="CompoundRunConfigurationType">
+    <toRun name="Debug NxLS" type="ChromiumRemoteDebugType" />
+    <toRun name="Run Plugin" type="GradleRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>
