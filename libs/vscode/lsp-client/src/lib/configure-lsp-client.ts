@@ -69,7 +69,7 @@ export function configureLspClient(
   client.onNotification(NxWorkspaceRefreshNotification, () => {
     if (refreshCommand) {
       getOutputChannel().appendLine('Refreshing ui due to lsp notification');
-      commands.executeCommand(refreshCommand);
+      commands.executeCommand(refreshCommand, true);
     }
   });
 
