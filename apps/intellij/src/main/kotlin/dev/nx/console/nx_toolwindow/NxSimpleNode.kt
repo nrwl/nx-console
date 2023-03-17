@@ -101,6 +101,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "target_${nxProject}_$nxTarget"
         init {
             icon = AllIcons.General.Gear
+            presentation.tooltip = "Target"
         }
 
         override fun buildChildren(): Array<SimpleNode> = emptyArray()
@@ -112,9 +113,8 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         override val id: String = "project_${nxProject.name}"
 
         init {
-            icon =
-                if (nxProject.projectType == "application") AllIcons.Nodes.Module
-                else AllIcons.Nodes.PpLib
+            icon = AllIcons.Nodes.Module
+            presentation.tooltip = "Project"
         }
 
         override fun buildChildren(): Array<SimpleNode> =
