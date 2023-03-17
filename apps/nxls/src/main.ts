@@ -401,7 +401,7 @@ async function configureSchemas(
   const projectSchema = getProjectJsonSchema(collections);
   const packageSchema = getPackageJsonSchema();
 
-  const nxSchema = getNxJsonSchema(workspace.projects);
+  const nxSchema = getNxJsonSchema(collections, workspace.projects);
 
   configureJsonLanguageService(
     {
