@@ -8,8 +8,21 @@ import dev.nx.console.models.NxProject
 import dev.nx.console.models.NxWorkspace
 
 sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
+    abstract val id: String?
+    val idPath: List<String?> by lazy {
+        when (parent) {
+            is NxSimpleNode -> {
+                parent.idPath + id
+            }
+            else -> {
+                listOf(id)
+            }
+        }
+    }
+
     class Root(private val nxWorkspace: NxWorkspace?) : NxSimpleNode(null) {
 
+        override val id = null
         init {
             icon = NxIcons.Action
         }
@@ -31,6 +44,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
 
     class Projects(private val nxWorkspace: NxWorkspace, parent: SimpleNode) :
         NxSimpleNode(parent) {
+        override val id: String = "_projects"
         init {
             icon = AllIcons.Nodes.ModuleGroup
         }
@@ -41,6 +55,8 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
     }
 
     class Targets(private val nxWorkspace: NxWorkspace, parent: SimpleNode) : NxSimpleNode(parent) {
+
+        override val id: String = "_targets"
         init {
             icon = AllIcons.Nodes.ConfigFolder
         }
@@ -60,6 +76,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         private val targetName: String,
         parent: SimpleNode
     ) : NxSimpleNode(parent) {
+        override val id: String = "targetGroup_${targetName}"
         init {
             icon = AllIcons.Nodes.ConfigFolder
         }
@@ -81,6 +98,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         val nxTarget: String,
         parent: SimpleNode
     ) : NxSimpleNode(parent) {
+        override val id: String = "target_${nxProject}_$nxTarget"
         init {
             icon = AllIcons.General.Gear
         }
@@ -91,6 +109,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
     }
 
     class Project(private val nxProject: NxProject, parent: SimpleNode) : NxSimpleNode(parent) {
+        override val id: String = "project_${nxProject.name}"
 
         init {
             icon =

@@ -24,6 +24,10 @@ import dev.nx.console.run.NxRunSettings
 import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.utils.nxWorkspace
 import java.awt.event.MouseEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
 
 class NxProjectsTreeStructure(
     val nxTaskExecutionManager: NxTaskExecutionManager,
@@ -34,19 +38,26 @@ class NxProjectsTreeStructure(
 
     private val treeModel = StructureTreeModel(this, project)
     private var root: NxSimpleNode.Root = NxSimpleNode.Root(nxWorkspace)
+    private var treePersistenceManager = NxProjectsTreePersistenceManager(tree)
 
     init {
         tree.model = AsyncTreeModel(treeModel, project)
         TreeUtil.installActions(tree)
         installPopupActions()
+        treePersistenceManager.installPersistenceListeners()
     }
 
     override fun getRootElement(): Any = root
 
     fun updateNxProjects() {
+        val expandedPaths = TreeUtil.collectExpandedPaths(tree)
         val nxWorkspace = project.nxWorkspace()
         root = NxSimpleNode.Root(nxWorkspace)
-        treeModel.invalidateAsync()
+
+        CoroutineScope(Dispatchers.Default).launch {
+            treeModel.invalidateAsync().await()
+            TreeUtil.promiseExpand(tree, treePersistenceManager.NxProjectsTreePersistenceVisitor())
+        }
     }
 
     private inner class RunAction : ExecuteAction(DefaultRunExecutor.getRunExecutorInstance()) {
