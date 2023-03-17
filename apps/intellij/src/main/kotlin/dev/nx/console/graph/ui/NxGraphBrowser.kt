@@ -9,19 +9,21 @@ import com.intellij.ui.jcef.executeJavaScriptAsync
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
+import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import java.io.File
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 private val logger = logger<NxGraphService>()
 
-class NxGraphBrowser(val project: Project, private val state: SharedFlow<NxGraphStates>) :
-    Disposable {
+class NxGraphBrowser(
+    val project: Project,
+    private val state: StateFlow<NxGraphStates>,
+    private val nxVersion: Deferred<NxVersion?>
+) : Disposable {
 
     private val browser: JBCefBrowser = JBCefBrowser()
     private val browserLoadedState: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -43,15 +45,32 @@ class NxGraphBrowser(val project: Project, private val state: SharedFlow<NxGraph
     fun selectAllProjects() {
         executeWhenLoaded {
             lastCommand = Command.SelectAll
-            browser.executeJavaScriptAsync("window.externalApi?.selectAllProjects()")
-            browser.openDevtools()
+            val major = runBlocking { nxVersion.await()?.major }
+            if (major == null || major.toInt() > 14) {
+                browser.executeJavaScriptAsync("window.externalApi?.selectAllProjects()")
+            } else if (major.toInt() == 14) {
+                browser.executeJavaScriptAsync(
+                    "window.externalApi.depGraphService.send({type: 'selectAll'})"
+                )
+            } else {
+                loadOldVersionHtml()
+            }
         }
     }
 
     fun focusProject(projectName: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusProject(projectName)
-            browser.executeJavaScriptAsync("window.externalApi?.focusProject('$projectName')")
+            val major = runBlocking { nxVersion.await()?.major }
+            if (major == null || major.toInt() > 14) {
+                browser.executeJavaScriptAsync("window.externalApi?.focusProject('$projectName')")
+            } else if (major.toInt() == 14) {
+                browser.executeJavaScriptAsync(
+                    "window.externalApi.depGraphService.send({type: 'focusProject', projectName: '$projectName'})"
+                )
+            } else {
+                loadOldVersionHtml()
+            }
         }
     }
 
@@ -135,6 +154,26 @@ class NxGraphBrowser(val project: Project, private val state: SharedFlow<NxGraph
             </style>
             <p>Unable to load the project graph. The following error occured:</p>
             <pre>${errorMessage}</pre>
+    """
+                .trimIndent()
+        browser.loadHTML(html)
+    }
+
+    private fun loadOldVersionHtml() {
+        val html =
+            """
+      <style>
+      body {
+       color: ${getHexColor(UIUtil.getLabelForeground())};
+                    font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+      }
+      p {
+       padding: 2rem;
+       margin: auto;
+      }
+      </style>
+       <p>The Nx graph integration is only available for Nx versions 14 and up.</p>
     """
                 .trimIndent()
         browser.loadHTML(html)

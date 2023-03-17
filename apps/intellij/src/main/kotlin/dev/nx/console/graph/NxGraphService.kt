@@ -2,7 +2,6 @@ package dev.nx.console.graph
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import dev.nx.console.graph.ui.DefaultNxGraphFile
@@ -12,6 +11,7 @@ import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.services.NxlsService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
@@ -45,13 +45,18 @@ class NxGraphService(val project: Project) {
                 it.file.fileType.name == NxGraphFileType.INSTANCE.name
             }
 
-        // if there is already a graph file, we open it and call it a day
         if (nxGraphEditor != null) {
-            fileEditorManager.openEditor(OpenFileDescriptor(project, nxGraphEditor.file), true)
-            return
+            fileEditorManager.closeFile(nxGraphEditor.file)
+            // opening the file instead of reloading is instant and more performant but leads to a
+            // shifted graph sometimes
+            // fileEditorManager.openEditor(OpenFileDescriptor(project, nxGraphEditor.file), true)
+            // return
         }
 
-        graphBrowser = NxGraphBrowser(project, state.asStateFlow())
+        val nxVersion =
+            CoroutineScope(Dispatchers.Default).async { nxlsService.workspace()?.nxVersion }
+
+        graphBrowser = NxGraphBrowser(project, state.asStateFlow(), nxVersion)
         val virtualFile = DefaultNxGraphFile("Project Graph", project, graphBrowser)
 
         if (state.value is NxGraphStates.Init || state.value is NxGraphStates.Error) {
