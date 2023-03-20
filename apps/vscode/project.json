@@ -135,7 +135,8 @@
         "platform": "node",
         "esbuildOptions": {
           "mainFields": ["module", "main"],
-          "sourcemap": "both"
+          "sourcemap": "both",
+          "outExtension": { ".js": ".js" }
         }
       },
       "configurations": {

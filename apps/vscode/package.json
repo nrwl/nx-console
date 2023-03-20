@@ -13,7 +13,7 @@
   },
   "publisher": "nrwl",
   "private": true,
-  "main": "main.cjs",
+  "main": "main.js",
   "icon": "assets/nx-console-logo-large.png",
   "galleryBanner": {
     "color": "#176BCC",
