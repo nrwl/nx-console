@@ -59,6 +59,11 @@
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.run.NxRunLineMarkerContributor"/>
 
+    <!--Tool Window-->
+    <toolWindow id="Nx Console"
+                anchor="right"
+                factoryClass="dev.nx.console.nx_toolwindow.NxToolWindowFactory"
+                icon="dev.nx.console.NxIcons.Action"/>
   </extensions>
 
   <applicationListeners>
