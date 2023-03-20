@@ -61,7 +61,6 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         val targetProperty = element.parentOfType<JsonProperty>() ?: return null
         val propertyLiteral = element.parent as? JsonStringLiteral ?: return null
         val nxTarget = propertyLiteral.value
-        // TODO see if we can use nxls if it's more efficient
         val nxProject =
             ((propertyLiteral.parent as? JsonProperty)
                     ?.parentOfType<JsonObject>()

@@ -41,7 +41,6 @@ class NxGraphBrowser(
 
     val component = browser.component
 
-    // TODO: LEGACY NX VERSIONS WITH MESSAGES LIKE {type: 'selectAll'}
     fun selectAllProjects() {
         executeWhenLoaded {
             lastCommand = Command.SelectAll
