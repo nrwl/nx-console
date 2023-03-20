@@ -17,6 +17,7 @@ import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
+import dev.nx.console.graph.NxGraphFocusProjectAction
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.run.NxCommandConfiguration
 import dev.nx.console.run.NxCommandConfigurationType
@@ -50,7 +51,6 @@ class NxProjectsTreeStructure(
     override fun getRootElement(): Any = root
 
     fun updateNxProjects() {
-        val expandedPaths = TreeUtil.collectExpandedPaths(tree)
         val nxWorkspace = project.nxWorkspace()
         root = NxSimpleNode.Root(nxWorkspace)
 
@@ -138,6 +138,7 @@ class NxProjectsTreeStructure(
                 RunAction(),
                 EditRunSettingsAction(),
                 Separator(),
+                NxGraphFocusProjectAction()
             )
 
         val copyAction = ActionManager.getInstance().getAction("\$Copy")
@@ -148,7 +149,7 @@ class NxProjectsTreeStructure(
         }
         val actionGroup = DefaultActionGroup(actionList)
         actionList.forEach { it.registerCustomShortcutSet(it.shortcutSet, tree) }
-        PopupHandler.installPopupMenu(this.tree, actionGroup, "NxBuildTool")
+        PopupHandler.installPopupMenu(this.tree, actionGroup, "NxToolWindow")
         object : ClickListener() {
                 override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
                     if (event.button == 1 && clickCount == 2) {
