@@ -87,6 +87,14 @@ class NxGraphService(val project: Project) {
         graphBrowser.focusProject(projectName)
     }
 
+    fun selectAllTasks() {
+        graphBrowser.selectAllTasks()
+    }
+
+    fun focusTaskGroup(taskGroupName: String) {
+        graphBrowser.focusTaskGroup(taskGroupName)
+    }
+
     private suspend fun loadProjectGraph(reload: Boolean = false) {
         state.emit(NxGraphStates.Loading)
         nxlsService.createProjectGraph().apply {

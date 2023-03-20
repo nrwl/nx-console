@@ -73,6 +73,23 @@ class NxGraphBrowser(
         }
     }
 
+    fun selectAllTasks() {
+        executeWhenLoaded {
+            lastCommand = Command.SelectAllTasks
+            browser.openDevtools()
+            browser.loadHTML("<p>select all tasks</p>")
+        }
+    }
+
+    fun focusTaskGroup(taskGroupName: String) {
+        executeWhenLoaded {
+            lastCommand = Command.FocusTaskGroup(taskGroupName)
+            browser.executeJavaScriptAsync(
+                "window.externalApi?.router?.navigate('tasks/$taskGroupName/all')"
+            )
+        }
+    }
+
     private suspend fun listenToGraphStates() {
         state
             .onEach { event ->
@@ -89,38 +106,36 @@ class NxGraphBrowser(
         browserLoadedState.value = false
         val originalGraphHtml = File(graphOutput.fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
-            originalGraphHtml.let {
-                it.replace(
-                    Regex("</head>"),
-                    """
-                <style>
-                  #sidebar {
-                    display: none;
-                  }
-
-                  div[data-cy="no-projects-selected"] {
-                    display: none;
-                  }
-
-                  #no-projects-chosen {
-                    display: none;
-                  }
-
-                  [data-cy="no-tasks-selected"] {
-                    display: none;
-                  }
-
-                  body {
-                    background-color: $backgroundColor !important;
-                  }
-                  .nx-select-project {
-                    padding: 12px;
-                  }
-                </style>
-                </head>
+            originalGraphHtml.replace(
+                Regex("</head>"),
                 """
-                )
+          <style>
+            #sidebar {
+              display: none;
             }
+
+            div[data-cy="no-projects-selected"] {
+              display: none;
+            }
+
+            #no-projects-chosen {
+              display: none;
+            }
+
+            [data-cy="no-tasks-selected"] {
+              display: none;
+            }
+
+            body {
+              background-color: $backgroundColor !important;
+            }
+            .nx-select-project {
+              padding: 12px;
+            }
+          </style>
+          </head>
+          """
+            )
         browser.loadHTML(transformedGraphHtml, "file://${graphOutput.fullPath}")
 
         if (reload) {
@@ -128,6 +143,8 @@ class NxGraphBrowser(
                 when (this) {
                     is Command.SelectAll -> selectAllProjects()
                     is Command.FocusProject -> focusProject(projectName)
+                    is Command.SelectAllTasks -> selectAllProjects()
+                    is Command.FocusTaskGroup -> focusTaskGroup(taskGroupName)
                 }
             }
         }
@@ -195,5 +212,8 @@ class NxGraphBrowser(
     private sealed class Command {
         object SelectAll : Command() {}
         data class FocusProject(val projectName: String) : Command() {}
+
+        object SelectAllTasks : Command() {}
+        data class FocusTaskGroup(val taskGroupName: String) : Command() {}
     }
 }

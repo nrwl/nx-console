@@ -127,5 +127,9 @@
             text="Nx Graph: Focus project" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
+    <action id="dev.nx.console.graph.NxGraphSelectAllTasksAction"
+            class="dev.nx.console.graph.NxGraphSelectAllTasksAction" text="Nx Graph: Select all Tasks"/>
+    <action id="dev.nx.console.graph.NxGraphFocusTaskGroupAction"
+            class="dev.nx.console.graph.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"/>
   </actions>
 </idea-plugin>

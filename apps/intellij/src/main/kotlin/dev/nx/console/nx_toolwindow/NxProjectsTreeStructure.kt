@@ -18,6 +18,7 @@ import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.graph.NxGraphFocusProjectAction
+import dev.nx.console.graph.NxGraphFocusTaskGroupAction
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.run.NxCommandConfiguration
 import dev.nx.console.run.NxCommandConfigurationType
@@ -138,7 +139,8 @@ class NxProjectsTreeStructure(
                 RunAction(),
                 EditRunSettingsAction(),
                 Separator(),
-                NxGraphFocusProjectAction()
+                NxGraphFocusProjectAction(),
+                NxGraphFocusTaskGroupAction()
             )
 
         val copyAction = ActionManager.getInstance().getAction("\$Copy")
