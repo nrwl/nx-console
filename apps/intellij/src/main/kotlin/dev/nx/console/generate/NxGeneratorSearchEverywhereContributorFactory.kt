@@ -3,17 +3,15 @@ package dev.nx.console.generate
 import com.intellij.icons.AllIcons
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory
-import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.service
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.util.Processor
-import dev.nx.console.generate.ui.DefaultNxGenerateUiFile
+import dev.nx.console.generate.actions.NxGenerateUiAction
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
@@ -74,30 +72,8 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
                 }
             }
 
-        val path =
-            if (ActionPlaces.isPopupPlace(event.place)) {
-                event.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
-            } else {
-                null
-            }
-
-        val generatorWithOptions = NxGenerator(selected, generatorOptions)
-
-        val generatorContext = runBlocking {
-            path?.let { service.generatorContextFromPath(generatorWithOptions, path) }
-        }
-
-        val virtualFile = DefaultNxGenerateUiFile("Generate", project)
-        val fileEditorManager = FileEditorManager.getInstance(project)
-        if (fileEditorManager.isFileOpen(virtualFile)) {
-            fileEditorManager.closeFile(virtualFile)
-        }
-
-        fileEditorManager.openFile(virtualFile, true)
-
-        virtualFile.setupGeneratorForm(
-            NxGenerator(generator = generatorWithOptions, contextValues = generatorContext)
-        )
+        val path = event.getData(CommonDataKeys.VIRTUAL_FILE)?.path
+        NxGenerateUiAction.openGenerateUi(project, selected, path, generatorOptions)
         return true
     }
 
