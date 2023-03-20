@@ -24,13 +24,14 @@ import java.util.concurrent.ConcurrentMap
 import javax.swing.ListCellRenderer
 import kotlinx.coroutines.runBlocking
 
-class NxGeneratorSearchEvrywhereContributor : SearchEverywhereContributorFactory<NxGenerator> {
+class NxGeneratorSearchEverywhereContributorFactory :
+    SearchEverywhereContributorFactory<NxGenerator> {
     override fun createContributor(
         initEvent: AnActionEvent
-    ): SearchEverywhereContributor<NxGenerator> = NxGeneratorSEContributor(initEvent)
+    ): SearchEverywhereContributor<NxGenerator> = NxGeneratorSearchEverywhereContributor(initEvent)
 }
 
-class NxGeneratorSEContributor(val event: AnActionEvent) :
+class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
     SearchEverywhereContributor<NxGenerator> {
 
     private val project = event.getRequiredData(CommonDataKeys.PROJECT)
