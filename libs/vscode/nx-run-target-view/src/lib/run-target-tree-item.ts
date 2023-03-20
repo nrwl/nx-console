@@ -42,7 +42,7 @@ export class RunTargetTreeItem extends TreeItem {
     arguments: [this],
   };
 
-  iconPath = RunTargetTreeItem.getIconUriForRoute(this.extensionPath);
+  iconPath;
 
   constructor(
     readonly route: string,
@@ -51,6 +51,7 @@ export class RunTargetTreeItem extends TreeItem {
     readonly generator?: string
   ) {
     super(route, TreeItemCollapsibleState.None);
+    this.iconPath = RunTargetTreeItem.getIconUriForRoute(this.extensionPath);
   }
 
   static getIconUriForRoute(

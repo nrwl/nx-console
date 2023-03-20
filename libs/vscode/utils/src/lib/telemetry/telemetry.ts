@@ -7,7 +7,7 @@ import { Store } from '@nx-console/shared/schema';
 
 export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];
-  state: UserState = this.user.state;
+  state: UserState;
 
   static withGoogleAnalytics(
     store: Store,
@@ -28,7 +28,9 @@ export class Telemetry implements TelemetryMessageBuilder {
     return instance;
   }
 
-  constructor(private readonly user: User) {}
+  constructor(private readonly user: User) {
+    this.state = user.state;
+  }
 
   addSink(sink: Sink) {
     this.sinks.push(sink);

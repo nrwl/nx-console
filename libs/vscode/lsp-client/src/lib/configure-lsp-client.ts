@@ -28,7 +28,7 @@ export function configureLspClient(
     };
   }
 
-  const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
+  const serverModule = context.asAbsolutePath(join('nxls', 'main.cjs'));
 
   const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
   const serverOptions: ServerOptions = {
