@@ -8,14 +8,13 @@ import dev.nx.console.graph.ui.DefaultNxGraphFile
 import dev.nx.console.graph.ui.NxGraphBrowser
 import dev.nx.console.graph.ui.NxGraphFileType
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.services.NxWorkspaceRefreshListener
 import dev.nx.console.services.NxlsService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 private val logger = logger<NxGraphService>()
@@ -33,7 +32,19 @@ class NxGraphService(val project: Project) {
     init {
         scope.launch {
             projectGraphOutput = nxlsService.projectGraphOutput()
-            nxlsService.refreshFlow.onEach { loadProjectGraph(reload = true) }.collect()
+
+            with(project.messageBus.connect()) {
+                subscribe(
+                    NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                    object : NxWorkspaceRefreshListener {
+                        override fun onNxWorkspaceRefresh() {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                loadProjectGraph(reload = true)
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
 
