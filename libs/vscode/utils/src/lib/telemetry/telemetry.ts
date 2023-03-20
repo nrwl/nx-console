@@ -9,13 +9,10 @@ export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];
   state: UserState;
 
-  static withGoogleAnalytics(
-    store: Store,
-    platform: ApplicationPlatform
-  ): Telemetry {
+  static withGoogleAnalytics(store: Store): Telemetry {
     const user = User.fromStorage(store);
     const instance = new Telemetry(user);
-    const sink = new GoogleAnalyticsSink(user, platform);
+    const sink = new GoogleAnalyticsSink();
     instance.addSink(sink);
     return instance;
   }

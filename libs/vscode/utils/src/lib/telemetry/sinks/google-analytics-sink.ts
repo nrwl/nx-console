@@ -2,12 +2,11 @@ import { Sink } from '../sink';
 import { TelemetryType } from '../record';
 import { User } from '../user';
 import { TelemetryMessageBuilder } from '../message-builder';
+import { env, extensions } from 'vscode';
 import type { Visitor } from 'universal-analytics';
+import { xhr } from 'request-light';
+import { platform } from 'os';
 
-// increment this if there is substancial changes to the schema,
-// and you want to create a new view that only has this data
-const ANALYTICS_VERSION = 2;
-const TRACKING_ID = 'UA-88380372-8';
 export type ApplicationPlatform = 'vscode';
 
 class TelemetryParams {
@@ -27,37 +26,73 @@ class TelemetryParams {
   }
 }
 
+class MeasurementProtocol {
+  MEASUREMENT_ID = 'G-TNJ97NGX40';
+  API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
+
+  private _version: string;
+  constructor() {
+    this._version =
+      extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
+      '0.0.0';
+  }
+
+  sendEvent(eventName: string) {
+    if (!env.isTelemetryEnabled) {
+      return;
+    }
+
+    fetch(
+      `https://www.google-analytics.com/mp/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`,
+      {
+        headers: {
+          accept: '*/*',
+          'accept-language': 'en-US,en;q=0.9',
+          'cache-control': 'no-cache',
+          'content-type': 'text/plain;charset=UTF-8',
+        },
+        body: JSON.stringify({
+          client_id: env.machineId,
+          timestamp_micros: Date.now(),
+          non_personalized_ads: true,
+          user_properties: {
+            editor: { value: 'vscode' },
+            os: { value: platform() },
+            appversion: { value: this._version },
+          },
+          events: [
+            {
+              name: 'action_triggered',
+              params: {
+                items: [],
+                action_type: eventName,
+                engagement_time_msec: '1',
+                sessionId: env.sessionId,
+              },
+            },
+          ],
+          validationBehavior: 'ENFORCE_RECOMMENDATIONS',
+        }),
+        method: 'POST',
+        credentials: 'omit',
+      }
+    );
+  }
+}
+
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  visitor: Visitor = require('universal-analytics')(TRACKING_ID, {
-    uid: this.user.id,
-  });
 
-  get enabled() {
-    return this.user.state !== 'untracked';
-  }
+  mp: MeasurementProtocol;
 
-  constructor(readonly user: User, readonly platform: ApplicationPlatform) {
-    this.setPersistentParams();
-  }
-
-  setPersistentParams() {
-    this.visitor.set('uid', this.user.id);
-    this.visitor.set('ds', 'app');
-    this.visitor.set('cd1', this.user.state);
-    this.visitor.set('cd2', this.platform);
-    this.visitor.set('cd3', ANALYTICS_VERSION);
+  constructor() {
+    this.mp = new MeasurementProtocol();
   }
 
   record(type: TelemetryType, data: any): void {
-    if (!this.enabled) return;
     const params = new TelemetryParams(type, data);
 
     switch (type) {
-      case 'UserStateChanged':
-        this.user.state = params.fetch('state');
-        this.setPersistentParams();
-        break;
       case 'ExtensionActivated':
         this.extensionActivated(params.fetch('time'));
         break;
