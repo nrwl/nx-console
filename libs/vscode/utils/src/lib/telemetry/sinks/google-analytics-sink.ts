@@ -1,13 +1,8 @@
 import { Sink } from '../sink';
 import { TelemetryType } from '../record';
-import { User } from '../user';
 import { TelemetryMessageBuilder } from '../message-builder';
 import { env, extensions } from 'vscode';
-import type { Visitor } from 'universal-analytics';
-import { xhr } from 'request-light';
 import { platform } from 'os';
-
-export type ApplicationPlatform = 'vscode';
 
 class TelemetryParams {
   constructor(readonly type: string, readonly data: any) {}
@@ -26,7 +21,7 @@ class TelemetryParams {
   }
 }
 
-class MeasurementProtocol {
+export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   MEASUREMENT_ID = 'G-TNJ97NGX40';
   API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
 
@@ -35,58 +30,6 @@ class MeasurementProtocol {
     this._version =
       extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
       '0.0.0';
-  }
-
-  sendEvent(eventName: string) {
-    if (!env.isTelemetryEnabled) {
-      return;
-    }
-
-    fetch(
-      `https://www.google-analytics.com/mp/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`,
-      {
-        headers: {
-          accept: '*/*',
-          'accept-language': 'en-US,en;q=0.9',
-          'cache-control': 'no-cache',
-          'content-type': 'text/plain;charset=UTF-8',
-        },
-        body: JSON.stringify({
-          client_id: env.machineId,
-          timestamp_micros: Date.now(),
-          non_personalized_ads: true,
-          user_properties: {
-            editor: { value: 'vscode' },
-            os: { value: platform() },
-            appversion: { value: this._version },
-          },
-          events: [
-            {
-              name: 'action_triggered',
-              params: {
-                items: [],
-                action_type: eventName,
-                engagement_time_msec: '1',
-                sessionId: env.sessionId,
-              },
-            },
-          ],
-          validationBehavior: 'ENFORCE_RECOMMENDATIONS',
-        }),
-        method: 'POST',
-        credentials: 'omit',
-      }
-    );
-  }
-}
-
-export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-
-  mp: MeasurementProtocol;
-
-  constructor() {
-    this.mp = new MeasurementProtocol();
   }
 
   record(type: TelemetryType, data: any): void {
@@ -117,98 +60,80 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       case 'FeatureUsed':
         this.featureUsed(params.fetch('feature'));
         break;
-      case 'WorkspaceType':
-        this.workspaceType(params.fetch('workspaceType'));
-        break;
       default:
         throw new Error(`Unknown Telemetry type: ${type}`);
     }
   }
 
   extensionActivated(time: number): void {
-    this.visitor
-      .event({
-        ec: 'Application',
-        ea: 'Activated',
-      })
-      .timing({
-        utc: 'Application',
-        utv: 'Activation Time',
-        utt: time,
-      })
-      .send();
+    throw new Error('Method not implemented.');
   }
-
   extensionDeactivated(): void {
-    this.visitor
-      .event({
-        ec: 'Application',
-        ea: 'Deactivated',
-      })
-      .send();
+    throw new Error('Method not implemented.');
   }
-
   startedTracking(): void {
-    this.visitor
-      .event({
-        ec: 'Data Collection',
-        ea: 'Opt In',
-      })
-      .send();
+    throw new Error('Method not implemented.');
   }
-
   stoppedTracking(): void {
-    this.visitor
-      .event({
-        ec: 'Data Collection',
-        ea: 'Opt Out',
-      })
-      .send();
+    throw new Error('Method not implemented.');
   }
-
   screenViewed(screen: string): void {
-    this.visitor
-      .screenview({
-        an: 'Nx Console',
-        cd: screen,
-      })
-      .send();
+    throw new Error('Method not implemented.');
   }
-
   commandRun(commandType: string, time: number): void {
-    this.visitor
-      .timing({
-        utc: 'Command',
-        utv: commandType,
-        utt: time,
+    throw new Error('Method not implemented.');
+  }
+  exception(error: string): void {
+    throw new Error('Method not implemented.');
+  }
+  featureUsed(feature: string): void {
+    this._post(
+      this._buildPayload({
+        name: 'action_triggered',
+        params: {
+          items: [],
+          action_type: feature,
+          engagement_time_msec: '1',
+          session_id: env.sessionId,
+        },
       })
-      .send();
+    );
   }
 
-  exception(error: string) {
-    this.visitor
-      .exception({
-        exd: error,
-      })
-      .send();
+  private _buildPayload(event: object) {
+    return {
+      client_id: env.machineId,
+      timestamp_micros: Date.now(),
+      non_personalized_ads: true,
+      user_properties: {
+        editor: { value: 'vscode' },
+        os: { value: platform() },
+        appversion: { value: this._version },
+      },
+      events: [event],
+      validationBehavior: 'ENFORCE_RECOMMENDATIONS',
+      method: 'POST',
+      credentials: 'omit',
+    };
   }
 
-  featureUsed(feature: string) {
-    this.visitor
-      .event({
-        ec: 'Feature',
-        ea: feature,
-      })
-      .send();
-  }
+  private _post(body: object) {
+    if (!env.isTelemetryEnabled) {
+      return;
+    }
 
-  workspaceType(workspaceType: string) {
-    this.visitor
-      .event({
-        ec: 'WorkspaceType',
-        ea: workspaceType,
-        ev: 1,
-      })
-      .send();
+    fetch(
+      `https://www.google-analytics.com/mp/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`,
+      {
+        headers: {
+          accept: '*/*',
+          'accept-language': 'en-US,en;q=0.9',
+          'cache-control': 'no-cache',
+          'content-type': 'text/plain;charset=UTF-8',
+        },
+        body: JSON.stringify(body),
+        method: 'POST',
+      }
+    );
   }
 }
