@@ -128,8 +128,12 @@
       <add-to-group group-id="AnalyzeActions"/>
     </action>
     <action id="dev.nx.console.graph.NxGraphSelectAllTasksAction"
-            class="dev.nx.console.graph.NxGraphSelectAllTasksAction" text="Nx Graph: Select all Tasks"/>
+            class="dev.nx.console.graph.NxGraphSelectAllTasksAction" text="Nx Graph: Select all Tasks"
+            icon="dev.nx.console.NxIcons.Action"/>
     <action id="dev.nx.console.graph.NxGraphFocusTaskGroupAction"
-            class="dev.nx.console.graph.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"/>
+            class="dev.nx.console.graph.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"
+            icon="dev.nx.console.NxIcons.Action"/>
+    <action id="dev.nx.console.graph.NxGraphFocusTaskAction" class="dev.nx.console.graph.NxGraphFocusTaskAction"
+            text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action"/>
   </actions>
 </idea-plugin>

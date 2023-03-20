@@ -90,6 +90,14 @@ class NxGraphBrowser(
         }
     }
 
+    fun focusTask(nxProject: String, nxTarget: String) {
+        executeWhenLoaded {
+            lastCommand = Command.FocusTask(nxProject, nxTarget)
+            browser.openDevtools()
+            browser.loadHTML("<p>select $nxProject : $nxTarget </p>")
+        }
+    }
+
     private suspend fun listenToGraphStates() {
         state
             .onEach { event ->
@@ -145,6 +153,7 @@ class NxGraphBrowser(
                     is Command.FocusProject -> focusProject(projectName)
                     is Command.SelectAllTasks -> selectAllProjects()
                     is Command.FocusTaskGroup -> focusTaskGroup(taskGroupName)
+                    is Command.FocusTask -> focusTask(nxProject, nxTarget)
                 }
             }
         }
@@ -215,5 +224,6 @@ class NxGraphBrowser(
 
         object SelectAllTasks : Command() {}
         data class FocusTaskGroup(val taskGroupName: String) : Command() {}
+        data class FocusTask(val nxProject: String, val nxTarget: String) : Command() {}
     }
 }
