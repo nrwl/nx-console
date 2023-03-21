@@ -1,8 +1,9 @@
-package dev.nx.console.graph
+package dev.nx.console.graph.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService

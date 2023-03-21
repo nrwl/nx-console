@@ -4,14 +4,9 @@ import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.LazyRunConfigurationProducer
 import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.configurations.ConfigurationFactory
-import com.intellij.json.psi.JsonFile
-import com.intellij.json.psi.JsonObject
-import com.intellij.json.psi.JsonProperty
-import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.parentOfType
-import dev.nx.console.utils.isInsideNxProjectJsonFile
+import dev.nx.console.utils.getNxTargetDescriptorFromElement
 
 data class NxRunSettings(
     val nxProjects: String = "",
@@ -49,30 +44,12 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         context: ConfigurationContext,
         sourceElement: Ref<PsiElement>?
     ): NxRunSettings? {
-        val element = getElement(context)
-        if (element == null || element.isValid.not()) {
-            return null
-        }
-        if (isInsideNxProjectJsonFile(element).not()) {
-            return null
-        }
-        val psiProjectJsonFile = element.containingFile as JsonFile
-        psiProjectJsonFile.virtualFile ?: return null
-        val targetProperty = element.parentOfType<JsonProperty>() ?: return null
-        val propertyLiteral = element.parent as? JsonStringLiteral ?: return null
-        val nxTarget = propertyLiteral.value
-        val nxProject =
-            ((propertyLiteral.parent as? JsonProperty)
-                    ?.parentOfType<JsonObject>()
-                    ?.parentOfType<JsonObject>()
-                    ?.findProperty("name")
-                    ?.value as? JsonStringLiteral)
-                ?.value
-                ?: return null
-        sourceElement?.set(targetProperty)
+        val element = getElement(context) ?: return null
+        val targetDescriptor = getNxTargetDescriptorFromElement(element) ?: return null
+        sourceElement?.set(element)
         return runSettings.copy(
-            nxProjects = nxProject,
-            nxTargets = nxTarget,
+            nxProjects = targetDescriptor.nxProject,
+            nxTargets = targetDescriptor.nxTarget,
         )
     }
 

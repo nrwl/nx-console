@@ -44,6 +44,8 @@
     <!-- Graph -->
     <projectService serviceImplementation="dev.nx.console.graph.NxGraphService"/>
     <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
+    <runLineMarkerContributor language="JSON"
+                              implementationClass="dev.nx.console.graph.NxFocusTargetInGraphLineMarkerContributor"/>
 
 
     <!--run anything execution provider-->
@@ -120,20 +122,23 @@
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </group>
     <!-- Graph -->
-    <action id="dev.nx.console.graph.NxGraphSelectAllAction" class="dev.nx.console.graph.NxGraphSelectAllAction"
+    <action id="dev.nx.console.graph.actions.NxGraphSelectAllAction"
+            class="dev.nx.console.graph.actions.NxGraphSelectAllAction"
             text="Nx Graph: View full graph" description="Open the Nx project graph in an editor window"
             icon="dev.nx.console.NxIcons.Action"/>
-    <action id="dev.nx.console.graph.NxGraphFocusProjectAction" class="dev.nx.console.graph.NxGraphFocusProjectAction"
+    <action id="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
+            class="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
             text="Nx Graph: Focus project" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
-    <action id="dev.nx.console.graph.NxGraphSelectAllTasksAction"
-            class="dev.nx.console.graph.NxGraphSelectAllTasksAction" text="Nx Graph: Select all Tasks"
+    <action id="dev.nx.console.graph.actions.NxGraphSelectAllTasksAction"
+            class="dev.nx.console.graph.actions.NxGraphSelectAllTasksAction" text="Nx Graph: Select all Tasks"
             icon="dev.nx.console.NxIcons.Action"/>
-    <action id="dev.nx.console.graph.NxGraphFocusTaskGroupAction"
-            class="dev.nx.console.graph.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"
+    <action id="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"
+            class="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"
             icon="dev.nx.console.NxIcons.Action"/>
-    <action id="dev.nx.console.graph.NxGraphFocusTaskAction" class="dev.nx.console.graph.NxGraphFocusTaskAction"
+    <action id="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
+            class="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
             text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action"/>
   </actions>
 </idea-plugin>

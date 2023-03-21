@@ -17,9 +17,9 @@ import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
-import dev.nx.console.graph.NxGraphFocusProjectAction
-import dev.nx.console.graph.NxGraphFocusTaskAction
-import dev.nx.console.graph.NxGraphFocusTaskGroupAction
+import dev.nx.console.graph.actions.NxGraphFocusProjectAction
+import dev.nx.console.graph.actions.NxGraphFocusTaskAction
+import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.run.NxCommandConfiguration
 import dev.nx.console.run.NxCommandConfigurationType
