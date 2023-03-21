@@ -13,6 +13,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
+import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import javax.swing.Icon
 import javax.swing.JComponent

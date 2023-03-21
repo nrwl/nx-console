@@ -41,6 +41,11 @@
     <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
     <fileEditorProvider implementation="dev.nx.console.generate.ui.NxGenerateUiFileEditorProvider"/>
 
+    <!-- Graph -->
+    <projectService serviceImplementation="dev.nx.console.graph.NxGraphService"/>
+    <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
+
+
     <!--run anything execution provider-->
     <runAnything.executionProvider
       implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
@@ -57,7 +62,7 @@
       implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
 
     <runLineMarkerContributor language="JSON"
-                              implementationClass="dev.nx.console.run.NxRunLineMarkerContributor"/>
+                              implementationClass="dev.nx.console.run.NxRunTargetLineMarkerContributor"/>
 
     <!--Tool Window-->
     <toolWindow id="Nx Console"
@@ -71,6 +76,12 @@
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
   <actions>
+    <action id="dev.nx.console.nxls.NxRefreshWorkspaceAction" class="dev.nx.console.nxls.NxRefreshWorkspaceAction"
+            text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="EditorTabPopupMenu"></add-to-group>
+      <add-to-group group-id="EditorTabsEntryPoint"></add-to-group>
+    </action>
+
     <!-- Generate -->
     <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
             class="dev.nx.console.generate.actions.NxGenerateUiAction"
@@ -107,5 +118,13 @@
     >
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </group>
+    <!-- Graph -->
+    <action id="dev.nx.console.graph.NxGraphSelectAllAction" class="dev.nx.console.graph.NxGraphSelectAllAction"
+            text="Nx Graph: View full graph" description="Open the Nx project graph in an editor window"
+            icon="dev.nx.console.NxIcons.Action"/>
+    <action id="dev.nx.console.graph.NxGraphFocusProjectAction" class="dev.nx.console.graph.NxGraphFocusProjectAction"
+            text="Nx Graph: Focus project" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="AnalyzeActions"/>
+    </action>
   </actions>
 </idea-plugin>

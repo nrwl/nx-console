@@ -109,7 +109,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         override fun getName(): String = name
     }
 
-    class Project(private val nxProject: NxProject, parent: SimpleNode) : NxSimpleNode(parent) {
+    class Project(val nxProject: NxProject, parent: SimpleNode) : NxSimpleNode(parent) {
         override val id: String = "project_${nxProject.name}"
 
         init {

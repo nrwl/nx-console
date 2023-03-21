@@ -30,7 +30,6 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
         runBlocking { selectOptionsAndRun(path, project) }
     }
 
-    // TODO: fix autocomplete, add additional options
     private suspend fun selectOptionsAndRun(path: String?, project: Project) {
         val nxlsService = project.service<NxlsService>()
 
