@@ -1,7 +1,7 @@
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { AbstractTreeProvider } from '@nx-console/vscode/utils';
+import { AbstractTreeProvider, getTelemetry } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext, ProviderResult } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
 import {
@@ -99,6 +99,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     selection: NxTreeItem,
     optionalFlags?: NxOptionalFlags
   ) {
+    getTelemetry().featureUsed('runTask');
     const viewItem = selection.item;
     if (
       viewItem.contextValue === 'project' ||
@@ -127,16 +128,19 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   }
 
   private async runTaskSkipNxCache(selection: NxTreeItem) {
+    getTelemetry().featureUsed('runTask');
     this.runTask(selection, { skipNxCache: true });
   }
 
   private async revealInExplorer(selection: NxTreeItem) {
     if (selection.resourceUri) {
+      getTelemetry().featureUsed('revealInExplorer');
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }
 
   private async editWorkspaceJson(selection: NxTreeItem) {
+    getTelemetry().featureUsed('editWorkspaceJson');
     const viewItem = selection.item;
     if (viewItem.contextValue === 'folder') {
       return;

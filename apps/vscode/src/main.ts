@@ -37,7 +37,6 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
-  teardownTelemetry,
   watchFile,
 } from '@nx-console/vscode/utils';
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
@@ -90,7 +89,7 @@ export async function activate(c: ExtensionContext) {
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
 
-    initTelemetry(GlobalConfigurationStore.instance, environment.production);
+    initTelemetry(environment.production);
 
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,
@@ -99,6 +98,7 @@ export async function activate(c: ExtensionContext) {
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
+        getTelemetry().featureUsed('generate ui');
         revealWebViewPanel({
           runTargetTreeItem,
           context,
@@ -143,14 +143,12 @@ export async function activate(c: ExtensionContext) {
       'Nx Console encountered an error when activating'
     );
     getOutputChannel().appendLine(e.stack);
-    getTelemetry().exception(e.message);
   }
 }
 
 export async function deactivate() {
   await stopDaemon();
   getTelemetry().extensionDeactivated();
-  teardownTelemetry();
 }
 
 // -----------------------------------------------------------------------------
@@ -276,8 +274,6 @@ async function setWorkspace(workspacePath: string) {
   if (workspaceType === 'angular') {
     initNxConversion(context);
   }
-
-  getTelemetry().record('WorkspaceType', { workspaceType });
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {

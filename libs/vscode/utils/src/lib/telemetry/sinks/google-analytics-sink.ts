@@ -3,6 +3,7 @@ import { TelemetryType } from '../record';
 import { TelemetryMessageBuilder } from '../message-builder';
 import { env, extensions } from 'vscode';
 import { platform } from 'os';
+import { xhr, XHRResponse } from 'request-light';
 
 class TelemetryParams {
   constructor(readonly type: string, readonly data: any) {}
@@ -26,7 +27,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
 
   private _version: string;
-  constructor() {
+  constructor(private production: boolean) {
     this._version =
       extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
       '0.0.0';
@@ -42,21 +43,6 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       case 'ExtensionDeactivated':
         this.extensionDeactivated();
         break;
-      case 'StartedTracking':
-        this.startedTracking();
-        break;
-      case 'StoppedTracking':
-        this.stoppedTracking();
-        break;
-      case 'ScreenViewed':
-        this.screenViewed(params.fetch('screen'));
-        break;
-      case 'CommandRun':
-        this.commandRun(params.fetch('commandType'), params.fetch('time'));
-        break;
-      case 'ExceptionOccurred':
-        this.exception(params.fetch('error'));
-        break;
       case 'FeatureUsed':
         this.featureUsed(params.fetch('feature'));
         break;
@@ -66,44 +52,53 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   }
 
   extensionActivated(time: number): void {
-    throw new Error('Method not implemented.');
-  }
-  extensionDeactivated(): void {
-    throw new Error('Method not implemented.');
-  }
-  startedTracking(): void {
-    throw new Error('Method not implemented.');
-  }
-  stoppedTracking(): void {
-    throw new Error('Method not implemented.');
-  }
-  screenViewed(screen: string): void {
-    throw new Error('Method not implemented.');
-  }
-  commandRun(commandType: string, time: number): void {
-    throw new Error('Method not implemented.');
-  }
-  exception(error: string): void {
-    throw new Error('Method not implemented.');
-  }
-  featureUsed(feature: string): void {
     this._post(
       this._buildPayload({
-        name: 'action_triggered',
+        name: 'activated',
         params: {
-          items: [],
-          action_type: feature,
-          engagement_time_msec: '1',
-          session_id: env.sessionId,
+          ...this._eventParams(),
+          timing: time,
         },
       })
     );
   }
 
+  extensionDeactivated(): void {
+    this._post(
+      this._buildPayload({
+        name: 'deactivated',
+        params: {
+          ...this._eventParams(),
+        },
+      })
+    );
+  }
+
+  featureUsed(feature: string): void {
+    this._post(
+      this._buildPayload({
+        name: 'action_triggered',
+        params: {
+          ...this._eventParams(),
+          action_type: feature,
+        },
+      })
+    );
+  }
+
+  private _eventParams() {
+    return {
+      items: [],
+      engagement_time_msec: '1',
+      session_id: env.sessionId,
+    };
+  }
+
   private _buildPayload(event: object) {
     return {
       client_id: env.machineId,
-      timestamp_micros: Date.now(),
+      user_id: env.machineId,
+      timestamp_micros: Date.now() * 1000,
       non_personalized_ads: true,
       user_properties: {
         editor: { value: 'vscode' },
@@ -111,9 +106,6 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
         appversion: { value: this._version },
       },
       events: [event],
-      validationBehavior: 'ENFORCE_RECOMMENDATIONS',
-      method: 'POST',
-      credentials: 'omit',
     };
   }
 
@@ -122,18 +114,17 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       return;
     }
 
-    fetch(
-      `https://www.google-analytics.com/mp/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`,
-      {
-        headers: {
-          accept: '*/*',
-          'accept-language': 'en-US,en;q=0.9',
-          'cache-control': 'no-cache',
-          'content-type': 'text/plain;charset=UTF-8',
-        },
-        body: JSON.stringify(body),
-        method: 'POST',
-      }
-    );
+    const url = `https://www.google-analytics.com/mp/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`;
+    xhr({
+      url,
+      data: JSON.stringify(body),
+      type: 'POST',
+    })
+      .then((response) => {
+        console.log(response.responseText);
+      })
+      .catch((reason: XHRResponse) => {
+        console.log(`unable to send telemetry`, reason.responseText);
+      });
   }
 }

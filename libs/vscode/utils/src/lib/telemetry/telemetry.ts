@@ -6,9 +6,9 @@ import { TelemetryMessageBuilder } from './message-builder';
 export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];
 
-  static withGoogleAnalytics(): Telemetry {
+  static withGoogleAnalytics(production: boolean): Telemetry {
     const instance = new Telemetry();
-    const sink = new GoogleAnalyticsSink();
+    const sink = new GoogleAnalyticsSink(production);
     instance.addSink(sink);
     return instance;
   }
@@ -34,18 +34,6 @@ export class Telemetry implements TelemetryMessageBuilder {
 
   extensionDeactivated(): void {
     this.record('ExtensionDeactivated');
-  }
-
-  screenViewed(screen: string): void {
-    this.record('ScreenViewed', { screen });
-  }
-
-  commandRun(commandType: string, time: number): void {
-    this.record('CommandRun', { commandType, time });
-  }
-
-  exception(error: string): void {
-    this.record('ExceptionOccurred', { error });
   }
 
   featureUsed(feature: string): void {

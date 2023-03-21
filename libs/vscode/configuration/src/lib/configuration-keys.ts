@@ -1,5 +1,4 @@
 export const GLOBAL_CONFIG_KEYS = [
-  'enableTelemetry',
   'commonNxCommands',
   'enableGenerateFromContextMenu',
   'enableWorkspaceConfigCodeLens',
@@ -13,7 +12,6 @@ export const GLOBAL_CONFIG_KEYS = [
 ] as const;
 
 export type GlobalConfig = {
-  enableTelemetry: boolean;
   commonNxCommands: string[];
   enableGenerateFromContextMenu: boolean;
   enableWorkspaceConfigCodeLens: boolean;
