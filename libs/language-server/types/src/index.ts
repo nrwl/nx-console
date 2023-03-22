@@ -9,7 +9,7 @@ import {
   Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import { ProjectConfiguration } from '@nrwl/devkit';
+import type { ProjectConfiguration } from '@nrwl/devkit';
 import { SemVer } from 'semver';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(

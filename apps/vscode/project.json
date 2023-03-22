@@ -44,8 +44,6 @@
           "typescript",
           "@swc/core",
           "fsevents",
-          "@nrwl/nx*",
-          "@nrwl/devkit",
           "ts-node",
           "pnpapi",
           "@angular-devkit/*"
@@ -99,10 +97,10 @@
           "typescript",
           "@swc/core",
           "fsevents",
-          "@nrwl/nx*",
-          "@nrwl/devkit",
           "ts-node",
           "pnpapi",
+          "@nrwl/devkit",
+          "webpack",
           "@angular-devkit/*"
         ],
         "bundle": true,

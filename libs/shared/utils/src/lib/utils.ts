@@ -1,8 +1,4 @@
-import type {
-  NxJsonConfiguration,
-  WorkspaceJsonConfiguration,
-} from '@nrwl/devkit';
-import { toNewFormat } from 'nx/src/adapter/angular-json';
+import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 
 export function getPrimitiveValue(value: any): string | undefined {
   if (
@@ -16,16 +12,14 @@ export function getPrimitiveValue(value: any): string | undefined {
   }
 }
 
-export function toWorkspaceFormat(
-  w: any
-): WorkspaceJsonConfiguration & NxJsonConfiguration {
-  const newFormat = toNewFormat(w) as WorkspaceJsonConfiguration &
-    NxJsonConfiguration;
-  const sortedProjects = Object.entries(newFormat.projects || {}).sort(
+export function sortWorkspaceProjects(
+  w: NxWorkspaceConfiguration
+): NxWorkspaceConfiguration {
+  const sortedProjects = Object.entries(w.projects || {}).sort(
     (projectA, projectB) => projectA[0].localeCompare(projectB[0])
   );
-  newFormat.projects = Object.fromEntries(sortedProjects);
-  return newFormat;
+  w.projects = Object.fromEntries(sortedProjects);
+  return w;
 }
 
 export function hasKey<T extends object>(

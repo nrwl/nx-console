@@ -72,7 +72,6 @@
         "format": ["cjs"],
         "thirdParty": true,
         "platform": "node",
-        "generatePackageJson": false,
         "esbuildOptions": {
           "mainFields": ["module", "main"],
           "sourcemap": true,

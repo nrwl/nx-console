@@ -1,5 +1,5 @@
-import { ProjectsConfigurations } from '@nrwl/devkit';
-import { Schema } from 'nx/src/utils/params';
+import type { ProjectsConfigurations } from '@nrwl/devkit';
+import type { Schema } from 'nx/src/utils/params';
 
 export enum OptionType {
   Any = 'any',

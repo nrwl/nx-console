@@ -1,4 +1,4 @@
-import { parseTargetString } from '@nrwl/devkit/src/executors/parse-target-string';
+import { parseTargetString } from '@nrwl/devkit';
 import { fileExists, readFile } from '@nx-console/shared/file-system';
 import {
   findProperty,
