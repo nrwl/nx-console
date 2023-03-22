@@ -26,7 +26,9 @@ describe('task-execution-form.spec', () => {
       );
     });
     it('should set input value to typed text', () => {
-      cy.get('nx-console-input input').type('testInput');
+      cy.get('nx-console-input input.text-input').type('testInput', {
+        force: true,
+      });
       cy.get('[data-cy=application]').contains('testInput');
     });
     it('should set multiple select value to selected options', () => {
