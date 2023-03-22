@@ -87,10 +87,6 @@ class NxGraphService(val project: Project) {
         graphBrowser.focusProject(projectName)
     }
 
-    fun selectAllTasks() {
-        graphBrowser.selectAllTasks()
-    }
-
     fun focusTaskGroup(taskGroupName: String) {
         graphBrowser.focusTaskGroup(taskGroupName)
     }

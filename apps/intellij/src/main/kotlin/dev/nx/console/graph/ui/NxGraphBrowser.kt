@@ -16,6 +16,7 @@ import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import java.io.File
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.jetbrains.concurrency.await
 
 private val logger = logger<NxGraphService>()
 
@@ -73,14 +74,6 @@ class NxGraphBrowser(
         }
     }
 
-    fun selectAllTasks() {
-        executeWhenLoaded {
-            lastCommand = Command.SelectAllTasks
-            browser.openDevtools()
-            browser.loadHTML("<p>select all tasks</p>")
-        }
-    }
-
     fun focusTaskGroup(taskGroupName: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTaskGroup(taskGroupName)
@@ -93,8 +86,16 @@ class NxGraphBrowser(
     fun focusTask(nxProject: String, nxTarget: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTask(nxProject, nxTarget)
-            browser.openDevtools()
-            browser.loadHTML("<p>select $nxProject : $nxTarget </p>")
+            CoroutineScope(Dispatchers.Default).launch {
+                browser
+                    .executeJavaScriptAsync(
+                        "window.externalApi?.router?.navigate('tasks/$nxTarget')"
+                    )
+                    .await()
+                browser.executeJavaScriptAsync(
+                    "document.querySelector('label[data-project=\"$nxProject\"]')?.click()"
+                )
+            }
         }
     }
 
