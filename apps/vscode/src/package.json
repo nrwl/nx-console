@@ -197,7 +197,7 @@
         },
         {
           "command": "nxConsole.migrateAngularCliToNx",
-          "when": "isAngularWorkspace"
+          "when": "isAngularWorkspace && !isNxWorkspace"
         },
         {
           "command": "nx.run.target",
@@ -837,7 +837,7 @@
         {
           "id": "nxConsole.views.angular-welcome",
           "name": "Angular CLI Compatibility",
-          "when": "isAngularWorkspace",
+          "when": "isAngularWorkspace && !isNxWorkspace",
           "contextualTitle": "Nx Console Getting Started",
           "icon": "tree-view-icon.svg",
           "visibility": "visible"
