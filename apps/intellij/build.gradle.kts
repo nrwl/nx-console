@@ -173,7 +173,7 @@ tasks {
 }
 
 tasks.register<Exec>("buildNxls") {
-    commandLine = listOf("bash", "-c", "npx nx run nxls:build --verbose")
+    commandLine = listOf("bash", "-c", "npx nx run nxls:build")
     workingDir = rootDir
 }
 
