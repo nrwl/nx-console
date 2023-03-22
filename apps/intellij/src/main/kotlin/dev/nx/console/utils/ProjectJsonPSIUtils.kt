@@ -1,20 +1,27 @@
 package dev.nx.console.utils
 
+import com.intellij.json.JsonElementTypes
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
 
 data class NxTargetDescriptor(val nxProject: String, val nxTarget: String) {}
 
-fun getNxTargetDescriptorFromElement(element: PsiElement): NxTargetDescriptor? {
-    if (element == null || element.isValid.not()) {
-        return null
-    }
-    if (isInsideNxProjectJsonFile(element).not()) {
+// we should only provide gutters for leaf nodes (see LineMarkerProvider comment)
+// this gets the entire node containing the target for a leaf node
+fun getTargetNodeFromLeafNode(element: PsiElement): JsonProperty? {
+    if (element.elementType != JsonElementTypes.DOUBLE_QUOTED_STRING) return null
+    val parent = element.parentOfType<JsonStringLiteral>() ?: return null
+    return parent.parentOfType()
+}
+
+fun getNxTargetDescriptorFromTargetNode(element: PsiElement): NxTargetDescriptor? {
+    if (element.isValid.not()) {
         return null
     }
 
@@ -45,13 +52,13 @@ fun isTargetNodeInsideProjectJson(element: PsiElement): Boolean {
     if (isInsideNxProjectJsonFile(element).not()) {
         return false
     }
-    if (isTargetProperty(element).not()) {
+    if (isTargetNode(element).not()) {
         return false
     }
     return true
 }
 
-fun isTargetProperty(property: JsonProperty?): Boolean {
+fun isTargetNode(property: JsonProperty?): Boolean {
     val targetsProperty = PsiTreeUtil.getParentOfType(property, JsonProperty::class.java, true)
     return targetsProperty != null && "targets" == targetsProperty.name
 }

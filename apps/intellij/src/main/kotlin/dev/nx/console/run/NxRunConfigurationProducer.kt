@@ -6,7 +6,8 @@ import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
-import dev.nx.console.utils.getNxTargetDescriptorFromElement
+import dev.nx.console.utils.getNxTargetDescriptorFromTargetNode
+import dev.nx.console.utils.getTargetNodeFromLeafNode
 
 data class NxRunSettings(
     val nxProjects: String = "",
@@ -45,7 +46,8 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         sourceElement: Ref<PsiElement>?
     ): NxRunSettings? {
         val element = getElement(context) ?: return null
-        val targetDescriptor = getNxTargetDescriptorFromElement(element) ?: return null
+        val targetNode = getTargetNodeFromLeafNode(element) ?: return null
+        val targetDescriptor = getNxTargetDescriptorFromTargetNode(targetNode) ?: return null
         sourceElement?.set(element)
         return runSettings.copy(
             nxProjects = targetDescriptor.nxProject,

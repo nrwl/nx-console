@@ -5,13 +5,14 @@ import com.intellij.execution.lineMarker.RunLineMarkerContributor
 import com.intellij.icons.AllIcons.RunConfigurations
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import dev.nx.console.utils.getTargetNodeFromLeafNode
 import dev.nx.console.utils.isTargetNodeInsideProjectJson
 
 class NxRunTargetLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
-        if (!isTargetNodeInsideProjectJson(element)) return null
+        val targetNode = getTargetNodeFromLeafNode(element) ?: return null
+        if (!isTargetNodeInsideProjectJson(targetNode)) return null
 
-        // TODO: change to leaf node
         return Info(RunConfigurations.TestState.Run, ExecutorAction.getActions()) { "Run Target" }
     }
 
