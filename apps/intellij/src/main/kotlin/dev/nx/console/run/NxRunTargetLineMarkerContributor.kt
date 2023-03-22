@@ -11,6 +11,7 @@ class NxRunTargetLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         if (!isTargetNodeInsideProjectJson(element)) return null
 
+        // TODO: change to leaf node
         return Info(RunConfigurations.TestState.Run, ExecutorAction.getActions()) { "Run Target" }
     }
 

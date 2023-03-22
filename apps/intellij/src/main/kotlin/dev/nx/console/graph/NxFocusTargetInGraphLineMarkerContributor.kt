@@ -10,6 +10,7 @@ import dev.nx.console.utils.getNxTargetDescriptorFromElement
 class NxFocusTargetInGraphLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         val targetDescriptor = getNxTargetDescriptorFromElement(element) ?: return null
+        // TODO: change to leaf node
         return Info(
             AllIcons.RunConfigurations.TestState.Run,
             arrayOf(NxGraphFocusTaskAction(targetDescriptor))

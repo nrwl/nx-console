@@ -1,17 +1,30 @@
 package dev.nx.console.graph.actions
 
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
+import dev.nx.console.services.NxlsService
 import dev.nx.console.utils.NxTargetDescriptor
+import dev.nx.console.utils.getNxProjectFromDataContext
+import javax.swing.ListSelectionModel
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.*
 
 class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? = null) :
     AnAction() {
 
     override fun update(e: AnActionEvent) {
+        if (e.place == ActionPlaces.ACTION_SEARCH) {
+            return
+        }
         val targetDescriptor =
             this.targetDescriptor ?: getTargetDescriptorFromDataContext(e.dataContext)
         if (targetDescriptor == null) {
@@ -25,12 +38,21 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        val targetDescriptor =
-            this.targetDescriptor ?: getTargetDescriptorFromDataContext(e.dataContext) ?: return
-
-        val graphService = NxGraphService.getInstance(project)
-        graphService.showProjectGraphInEditor()
-        graphService.focusTask(targetDescriptor.nxProject, targetDescriptor.nxTarget)
+        CoroutineScope(Dispatchers.Default).launch {
+            val targetDescriptor =
+                if (e.place == ActionPlaces.ACTION_SEARCH) {
+                    selectProjectAndTarget(project, e.dataContext)
+                } else {
+                    this@NxGraphFocusTaskAction.targetDescriptor
+                        ?: getTargetDescriptorFromDataContext(e.dataContext)
+                }
+                    ?: return@launch
+            ApplicationManager.getApplication().invokeLater {
+                val graphService = NxGraphService.getInstance(project)
+                graphService.showProjectGraphInEditor()
+                graphService.focusTask(targetDescriptor.nxProject, targetDescriptor.nxTarget)
+            }
+        }
     }
 
     private fun getTargetDescriptorFromDataContext(dataContext: DataContext): NxTargetDescriptor? {
@@ -43,4 +65,82 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         return null
     }
+
+    private suspend fun selectProjectAndTarget(
+        project: Project,
+        dataContext: DataContext
+    ): NxTargetDescriptor? {
+        var nxProject = getNxProjectFromDataContext(project, dataContext)
+        if (nxProject == null) {
+            nxProject = selectProject(project, dataContext) ?: return null
+        }
+
+        val nxTarget: String =
+            selectTargetForProject(project, dataContext, nxProject) ?: return null
+
+        return NxTargetDescriptor(nxProject, nxTarget)
+    }
+
+    private suspend fun selectProject(
+        project: Project,
+        dataContext: DataContext,
+    ) =
+        suspendCoroutine<String?> {
+            val projects = runBlocking {
+                NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toList()
+                    ?: emptyList()
+            }
+            ApplicationManager.getApplication().invokeLater {
+                val popup =
+                    JBPopupFactory.getInstance()
+                        .createPopupChooserBuilder(projects)
+                        .setTitle("Select project")
+                        .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+                        .setRequestFocus(true)
+                        .setFilterAlwaysVisible(true)
+                        .setResizable(true)
+                        .setMovable(true)
+                        .setItemChosenCallback { chosen -> it.resume(chosen) }
+                        .setDimensionServiceKey("nx.dev.console.select_target")
+                        .createPopup()
+
+                popup.showInBestPositionFor(dataContext)
+            }
+        }
+
+    private suspend fun selectTargetForProject(
+        project: Project,
+        dataContext: DataContext,
+        nxProject: String,
+    ) =
+        suspendCoroutine<String?> {
+            val targets = runBlocking {
+                NxlsService.getInstance(project)
+                    .workspace()
+                    ?.workspace
+                    ?.projects
+                    ?.get(nxProject)
+                    ?.targets
+                    ?.keys
+                    ?.toList()
+                    ?: emptyList()
+            }
+
+            ApplicationManager.getApplication().invokeLater {
+                val popup =
+                    JBPopupFactory.getInstance()
+                        .createPopupChooserBuilder(targets)
+                        .setTitle("Select target of $nxProject")
+                        .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+                        .setRequestFocus(true)
+                        .setFilterAlwaysVisible(true)
+                        .setResizable(true)
+                        .setMovable(true)
+                        .setItemChosenCallback { chosen -> it.resume(chosen) }
+                        .setDimensionServiceKey("nx.dev.console.select_target")
+                        .createPopup()
+
+                popup.showInBestPositionFor(dataContext)
+            }
+        }
 }
