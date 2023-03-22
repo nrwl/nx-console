@@ -225,7 +225,7 @@ async function setWorkspace(workspacePath: string) {
   isNxWorkspace = await checkIsNxWorkspace(workspacePath);
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
-  if (!cliTaskProvider && !isAngularWorkspace) {
+  if (!cliTaskProvider && !(isAngularWorkspace && !isNxWorkspace)) {
     cliTaskProvider = new CliTaskProvider();
     registerNxCommands(context, cliTaskProvider);
     tasks.registerTaskProvider('nx', cliTaskProvider);
