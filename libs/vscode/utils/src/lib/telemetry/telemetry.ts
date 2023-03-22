@@ -36,7 +36,7 @@ export class Telemetry implements TelemetryMessageBuilder {
     this.record('ExtensionDeactivated');
   }
 
-  featureUsed(feature: string): void {
-    this.record('FeatureUsed', { feature });
+  featureUsed(feature: string, details: object = {}): void {
+    this.record('FeatureUsed', { feature, details });
   }
 }

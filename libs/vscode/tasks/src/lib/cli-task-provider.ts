@@ -95,9 +95,6 @@ export class CliTaskProvider implements TaskProvider {
       task = await this.createTask(definition);
     }
 
-    const telemetry = getTelemetry();
-    telemetry.featureUsed(definition.command);
-
     return tasks.executeTask(task).then((execution) => {
       if (isDryRun) {
         this.currentDryRun = execution;

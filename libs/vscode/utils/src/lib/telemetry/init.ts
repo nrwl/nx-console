@@ -8,10 +8,9 @@ export function getTelemetry() {
 
 // using shared memory here is a shortcut, this should be an api call
 export function initTelemetry(production: boolean) {
-  // telemetry = production
-  //   ? Telemetry.withGoogleAnalytics()
-  //   : Telemetry.withLogger();
-  telemetry = Telemetry.withGoogleAnalytics(production);
+  telemetry = production
+    ? Telemetry.withGoogleAnalytics(production)
+    : Telemetry.withLogger();
 
   return telemetry;
 }

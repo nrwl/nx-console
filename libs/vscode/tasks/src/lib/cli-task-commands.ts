@@ -55,7 +55,7 @@ export async function registerCliTaskCommands(
       configuration?: string,
       askForFlags?: boolean
     ) => {
-      getTelemetry().featureUsed('nx.run');
+      getTelemetry().featureUsed('nx.run', { target });
       selectCliCommandAndPromptForFlags(
         'run',
         project,

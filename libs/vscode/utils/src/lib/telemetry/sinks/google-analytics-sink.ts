@@ -1,9 +1,10 @@
-import { Sink } from '../sink';
-import { TelemetryType } from '../record';
-import { TelemetryMessageBuilder } from '../message-builder';
-import { env, extensions } from 'vscode';
 import { platform } from 'os';
 import { xhr, XHRResponse } from 'request-light';
+import { env, extensions } from 'vscode';
+import { getOutputChannel } from '../../output-channel';
+import { TelemetryMessageBuilder } from '../message-builder';
+import { TelemetryType } from '../record';
+import { Sink } from '../sink';
 
 class TelemetryParams {
   constructor(readonly type: string, readonly data: any) {}
@@ -44,7 +45,7 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
         this.extensionDeactivated();
         break;
       case 'FeatureUsed':
-        this.featureUsed(params.fetch('feature'));
+        this.featureUsed(params.fetch('feature'), params.fetch('details'));
         break;
       default:
         throw new Error(`Unknown Telemetry type: ${type}`);
@@ -74,13 +75,14 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
     );
   }
 
-  featureUsed(feature: string): void {
+  featureUsed(feature: string, details: object): void {
     this._post(
       this._buildPayload({
         name: 'action_triggered',
         params: {
           ...this._eventParams(),
           action_type: feature,
+          ...details,
         },
       })
     );
@@ -88,9 +90,9 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
 
   private _eventParams() {
     return {
-      items: [],
       engagement_time_msec: '1',
       session_id: env.sessionId,
+      debug_mode: !this.production,
     };
   }
 
@@ -114,17 +116,25 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
       return;
     }
 
-    const url = `https://www.google-analytics.com/mp/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`;
+    const base = this.production
+      ? 'https://www.google-analytics.com/mp'
+      : 'https://www.google-analytics.com/debug/mp';
+
+    const url = `${base}/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`;
     xhr({
       url,
       data: JSON.stringify(body),
       type: 'POST',
     })
       .then((response) => {
-        console.log(response.responseText);
+        if (response.responseText.length > 0) {
+          getOutputChannel().append(response.responseText);
+        }
       })
       .catch((reason: XHRResponse) => {
-        console.log(`unable to send telemetry`, reason.responseText);
+        getOutputChannel().append(
+          `unable to send telemetry: ${reason.responseText}`
+        );
       });
   }
 }
