@@ -19,9 +19,11 @@
         "outputFileName": "main.js",
         "format": ["cjs"],
         "platform": "node",
+        "generatePackageJson": false,
         "esbuildOptions": {
           "mainFields": ["module", "main"],
-          "sourcemap": true
+          "sourcemap": true,
+          "outExtension": { ".js": ".js" }
         }
       }
     },
@@ -70,12 +72,14 @@
         "format": ["cjs"],
         "thirdParty": true,
         "platform": "node",
+        "generatePackageJson": false,
         "esbuildOptions": {
           "mainFields": ["module", "main"],
           "sourcemap": true,
           "loader": {
             ".node": "file"
-          }
+          },
+          "outExtension": { ".js": ".js" }
         }
       },
       "configurations": {

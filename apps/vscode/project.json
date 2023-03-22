@@ -47,7 +47,8 @@
           "@nrwl/nx*",
           "@nrwl/devkit",
           "ts-node",
-          "pnpapi"
+          "pnpapi",
+          "@angular-devkit/*"
         ],
         "bundle": true,
         "thirdParty": true,
@@ -81,10 +82,12 @@
           }
         ],
         "deleteOutputPath": false,
+        "generatePackageJson": false,
         "platform": "node",
         "esbuildOptions": {
           "mainFields": ["module", "main"],
-          "sourcemap": "both"
+          "sourcemap": "both",
+          "outExtension": { ".js": ".js" }
         }
       }
     },
@@ -99,7 +102,8 @@
           "@nrwl/nx*",
           "@nrwl/devkit",
           "ts-node",
-          "pnpapi"
+          "pnpapi",
+          "@angular-devkit/*"
         ],
         "bundle": true,
         "thirdParty": true,
@@ -109,6 +113,7 @@
         "format": ["cjs"],
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
+        "generatePackageJson": false,
         "assets": [
           {
             "glob": "nx-schema.json",
