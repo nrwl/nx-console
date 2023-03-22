@@ -98,7 +98,6 @@ export async function activate(c: ExtensionContext) {
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        getTelemetry().featureUsed('generate ui');
         revealWebViewPanel({
           runTargetTreeItem,
           context,
