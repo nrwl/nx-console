@@ -1,4 +1,4 @@
-import type { ProjectConfiguration } from '@nrwl/devkit';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { JSONSchemaMap } from 'vscode-json-languageservice/lib/umd/jsonSchema';
 import { targets } from './common-json-schema';
 import { CompletionType, EnhancedJsonSchema } from './completion-type';

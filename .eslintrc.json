@@ -33,6 +33,13 @@
             ]
           }
         ],
+        "no-restricted-imports": [
+          "error",
+          {
+            "name": "@nrwl/devkit",
+            "message": "Please use nx/src/devkit-exports instead, or import function directly from @nrwl/devkit/src/*"
+          }
+        ],
         "@typescript-eslint/no-unused-vars": [
           "warn",
           {

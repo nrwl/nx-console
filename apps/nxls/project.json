@@ -60,13 +60,9 @@
         "external": [
           "@swc/*",
           "@angular-devkit/*",
-          "typescript",
           "@parcel/watcher",
-          "nx",
           "webpack",
-          "fsevents",
-          "prettier",
-          "parser-flow"
+          "fsevents"
         ],
         "outputFileName": "main.js",
         "format": ["cjs"],
@@ -76,8 +72,9 @@
           "mainFields": ["module", "main"],
           "sourcemap": true,
           "loader": {
-            ".node": "file"
+            ".node": "dataurl"
           },
+          "logLevel": "error",
           "outExtension": { ".js": ".js" }
         }
       },

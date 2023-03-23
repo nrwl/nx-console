@@ -94,17 +94,15 @@
       "options": {
         "external": [
           "vscode",
-          "typescript",
           "@swc/core",
           "fsevents",
           "ts-node",
           "pnpapi",
-          "@nrwl/devkit",
           "webpack",
           "@angular-devkit/*"
         ],
-        "bundle": true,
         "thirdParty": true,
+        "minify": true,
         "sourcemap": true,
         "outputPath": "dist/apps/vscode",
         "outputFileName": "main.js",
@@ -139,7 +137,14 @@
         "esbuildOptions": {
           "mainFields": ["module", "main"],
           "sourcemap": "both",
-          "outExtension": { ".js": ".js" }
+          "outExtension": {
+            ".js": ".js"
+          },
+          "treeShaking": true,
+          "loader": {
+            ".node": "dataurl"
+          },
+          "logLevel": "error"
         }
       },
       "configurations": {
@@ -147,8 +152,8 @@
           "optimization": false
         },
         "production": {
-          "minify": true,
-          "skipTypeCheck": true
+          "skipTypeCheck": true,
+          "minify": false
         }
       },
       "dependsOn": ["^build", "^build-webview-files", "extract-dependencies"],

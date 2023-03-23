@@ -1,4 +1,4 @@
-import type { ProjectsConfigurations } from '@nrwl/devkit';
+import type { ProjectsConfigurations } from 'nx/src/devkit-exports';
 import type { Schema } from 'nx/src/utils/params';
 
 export enum OptionType {

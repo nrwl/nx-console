@@ -1,4 +1,4 @@
-import { getPackageManagerCommand } from '@nrwl/devkit';
+import { getPackageManagerCommand } from 'nx/src/devkit-exports';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { exec } from 'child_process';
 import { promisify } from 'util';
