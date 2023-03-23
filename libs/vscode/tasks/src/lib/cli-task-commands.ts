@@ -37,9 +37,6 @@ export async function registerCliTaskCommands(
     context.subscriptions.push(
       commands.registerCommand(`nx.${command}`, () =>
         selectCliCommandAndPromptForFlags(command)
-      ),
-      commands.registerCommand(`nx.${command}.ui`, () =>
-        selectCliCommandAndShowUi(command, context.extensionPath)
       )
     );
   });
@@ -86,8 +83,7 @@ export async function registerCliTaskCommands(
       if (!generator) {
         return;
       }
-      selectCliCommandAndShowUi(
-        'generate',
+      showGenerateUi(
         context.extensionPath,
         uri,
         GeneratorType.Other,
@@ -100,8 +96,7 @@ export async function registerCliTaskCommands(
       if (!generator) {
         return;
       }
-      selectCliCommandAndShowUi(
-        'generate',
+      showGenerateUi(
         context.extensionPath,
         uri,
         GeneratorType.Other,
@@ -115,44 +110,24 @@ export async function registerCliTaskCommands(
   );
 
   commands.registerCommand(`nx.generate.ui`, () =>
-    selectCliCommandAndShowUi('generate', context.extensionPath)
+    showGenerateUi(context.extensionPath)
   );
 
   commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) =>
-    selectCliCommandAndShowUi('generate', context.extensionPath, uri)
+    showGenerateUi(context.extensionPath, uri)
   );
 
   commands.registerCommand(`nx.generate.ui.app`, (uri: Uri) => {
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Application
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Application);
   });
   commands.registerCommand(`nx.generate.ui.lib`, (uri: Uri) => {
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Library
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Library);
   });
   commands.registerCommand(`nx.generate.ui.app.fileexplorer`, (uri: Uri) => {
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Application
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Application);
   });
   commands.registerCommand(`nx.generate.ui.lib.fileexplorer`, (uri: Uri) => {
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Library
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Library);
   });
   commands.registerCommand(`nx.run.target`, async () => {
     const target = await window.showQuickPick(getTargetNames());
@@ -169,27 +144,25 @@ export async function registerCliTaskCommands(
   });
 }
 
-async function selectCliCommandAndShowUi(
-  command: string,
+async function showGenerateUi(
   extensionPath: string,
   uri?: Uri,
   generatorType?: GeneratorType,
   generator?: string
 ) {
-  const workspacePath = cliTaskProvider.getWorkspacePath();
+  const { workspacePath, validWorkspaceJson } = await getNxWorkspace();
   if (!workspacePath) {
     window.showErrorMessage(
       'Nx Console requires a workspace be set to perform this action'
     );
     return;
   }
-  const { validWorkspaceJson } = await getNxWorkspace();
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
   }
   const workspaceTreeItem = new RunTargetTreeItem(
-    command,
+    'generate',
     extensionPath,
     generatorType,
     generator
