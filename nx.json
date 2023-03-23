@@ -1,11 +1,4 @@
 {
-  "implicitDependencies": {
-    "package.json": {
-      "devDependencies": "*",
-      "dependencies": "*"
-    },
-    ".eslintrc.json": "*"
-  },
   "affected": {
     "defaultBase": "master"
   },
@@ -49,7 +42,28 @@
   },
   "defaultProject": "generate-ui",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {},
+  "targetDefaults": {
+    "build": {
+      "inputs": ["production", "^production"]
+    },
+    "test": {
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+    },
+    "lint": {
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
+    },
+    "e2e": {
+      "inputs": ["default", "^production"]
+    },
+    "build-storybook": {
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/.storybook/**/*",
+        "!{projectRoot}/.storybook/**/*"
+      ]
+    }
+  },
   "namedInputs": {
     "kotlin": [
       "{projectRoot}/build.gradle.kts",
@@ -57,6 +71,15 @@
       "{workspaceRoot}/**/gradle.properties",
       "{workspaceRoot}/settings.gradle.kts",
       "{workspaceRoot}/build.gradle.kts"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/.storybook/**/*",
+      "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)"
     ]
   }
 }

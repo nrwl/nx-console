@@ -1,4 +1,4 @@
-import { ProjectConfiguration } from '@nrwl/devkit';
+import { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { NxProjectByPathRequest } from '@nx-console/language-server/types';
 import { sendRequest } from '@nx-console/vscode/lsp-client';
 

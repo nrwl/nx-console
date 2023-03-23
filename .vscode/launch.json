@@ -21,6 +21,10 @@
         "<node_internals>/**",
         "/Applications/Visual Studio Code.app/**"
       ],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
       "type": "extensionHost"
     },
     {

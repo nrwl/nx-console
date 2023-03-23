@@ -1,8 +1,6 @@
 import { findNxPackagePath } from '@nx-console/shared/npm';
 import { coerce, SemVer } from 'semver';
 
-declare function __non_webpack_require__(importPath: string): any;
-
 let nxWorkspacePackageJson: { version: string };
 let loadedNxPackage = false;
 
@@ -16,7 +14,7 @@ export async function getNxVersion(workspacePath: string): Promise<SemVer> {
       return defaultSemver;
     }
 
-    nxWorkspacePackageJson = __non_webpack_require__(packagePath);
+    nxWorkspacePackageJson = require(packagePath);
     loadedNxPackage = true;
   }
 

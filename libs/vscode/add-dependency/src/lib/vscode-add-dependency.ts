@@ -1,9 +1,9 @@
 import {
+  readJsonFile,
   detectPackageManager,
   getPackageManagerCommand,
   PackageManager,
-  readJsonFile,
-} from '@nrwl/devkit';
+} from 'nx/src/devkit-exports';
 import {
   getGeneratorOptions,
   getGenerators,

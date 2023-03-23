@@ -1,4 +1,5 @@
 {
+  "name": "language-server-utils",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/language-server/utils/src",
   "projectType": "library",
@@ -12,7 +13,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/language-server/utils"],
+      "outputs": ["{workspaceRoot}/coverage/libs/language-server/utils"],
       "options": {
         "jestConfig": "libs/language-server/utils/jest.config.ts",
         "passWithNoTests": true

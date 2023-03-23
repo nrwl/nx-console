@@ -1,8 +1,10 @@
 {
-    "targets": {
-        "test": {
-            "executor": "@nrwl/jest:jest"
-          },
-          "weird": {}
-    }
+  "name": "vscode-e2e-testworkspaces-testworkspace-nx-libs-lib2",
+  "$schema": "../../../../../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest"
+    },
+    "weird": {}
+  }
 }

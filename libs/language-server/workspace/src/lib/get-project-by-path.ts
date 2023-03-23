@@ -1,4 +1,4 @@
-import { ProjectConfiguration } from '@nrwl/devkit';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { directoryExists } from '@nx-console/shared/file-system';
 import { isAbsolute, join, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';

@@ -7,8 +7,6 @@ import { join } from 'path';
 import { findNxPackagePath } from '@nx-console/shared/npm';
 import { Logger } from '@nx-console/shared/schema';
 
-declare function __non_webpack_require__(importPath: string): any;
-
 export async function getNxDaemonClient(
   workspacePath: string,
   logger: Logger
@@ -17,8 +15,7 @@ export async function getNxDaemonClient(
     workspacePath,
     join('src', 'daemon', 'client', 'client.js')
   );
-  const backupPackage = await import('nx/src/daemon/client/client');
-  return getNxPackage(importPath, backupPackage, logger);
+  return getNxPackage(importPath, logger);
 }
 
 export async function getNxProjectGraph(
@@ -37,8 +34,7 @@ export async function getNxProjectGraph(
     );
   }
 
-  const nxProjectGraph = await import('nx/src/project-graph/project-graph');
-  return getNxPackage(importPath, nxProjectGraph, logger);
+  return getNxPackage(importPath, logger);
 }
 
 /**
@@ -60,35 +56,28 @@ export async function getNxWorkspacePackageFileUtils(
     );
   }
 
-  const nxFileUtils = await import('nx/src/project-graph/file-utils');
-  return getNxPackage(importPath, nxFileUtils, logger);
+  return getNxPackage(importPath, logger);
 }
 
 async function getNxPackage<T>(
   importPath: string | undefined,
-  backupPackage: T,
   logger: Logger
 ): Promise<T> {
-  try {
-    if (!importPath) {
-      throw 'local Nx dependency not found';
-    }
-
-    if (platform() === 'win32') {
-      importPath = importPath.replace(/\\/g, '/');
-    }
-
-    const imported = __non_webpack_require__(importPath);
-
-    logger?.log(`Using local Nx package at ${importPath}`);
-
-    return imported;
-  } catch (error) {
+  if (!importPath) {
     logger?.log(
-      `Unable to load the ${importPath} dependency from the workspace. Falling back to extension dependency
-${error}
-    `
+      `Unable to load the ${importPath} dependency from the workspace. Please ensure that the proper dependencies are installed locally.`
     );
-    return backupPackage;
+    throw 'local Nx dependency not found';
   }
+
+  if (platform() === 'win32') {
+    importPath = importPath.replace(/\\/g, '/');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const imported = require(importPath);
+
+  logger?.log(`Using local Nx package at ${importPath}`);
+
+  return imported;
 }

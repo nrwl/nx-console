@@ -1,4 +1,7 @@
-import { NxJsonConfiguration, ProjectConfiguration } from '@nrwl/devkit';
+import type {
+  NxJsonConfiguration,
+  ProjectConfiguration,
+} from 'nx/src/devkit-exports';
 
 export type NxProjectConfiguration = ProjectConfiguration & {
   files?: { file: string }[];

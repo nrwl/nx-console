@@ -1,7 +1,6 @@
 import type { PnpApi } from '@yarnpkg/pnp';
 import { join } from 'path';
 import { fileExists } from '@nx-console/shared/file-system';
-declare function __non_webpack_require__(importPath: string): any;
 
 let PNP_API: PnpApi;
 
@@ -27,7 +26,8 @@ async function pnpApi(workspacePath: string) {
   }
 
   if (!PNP_API) {
-    const pnp = __non_webpack_require__(pnpFile);
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const pnp = require(pnpFile);
     pnp.setup();
     PNP_API = pnp;
   }

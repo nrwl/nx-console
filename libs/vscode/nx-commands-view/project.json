@@ -1,4 +1,5 @@
 {
+  "name": "vscode-nx-commands-view",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/nx-commands-view/src",
   "projectType": "library",
@@ -11,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/nx-commands-view"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/nx-commands-view"],
       "options": {
         "jestConfig": "libs/vscode/nx-commands-view/jest.config.ts",
         "passWithNoTests": true

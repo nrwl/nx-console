@@ -1,8 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node", "jest"],
-    "target": "es2020"
+    "types": ["node", "jest"]
   },
   "include": [],
   "files": [],

@@ -1,4 +1,4 @@
-import { Schema } from 'nx/src/utils/params';
+import type { Schema } from 'nx/src/utils/params';
 import {
   LongFormXPrompt,
   OptionPropertyDescription,
