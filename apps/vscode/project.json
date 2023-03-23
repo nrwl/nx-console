@@ -85,7 +85,11 @@
         "esbuildOptions": {
           "mainFields": ["module", "main"],
           "sourcemap": "both",
-          "outExtension": { ".js": ".js" }
+          "outExtension": { ".js": ".js" },
+          "loader": {
+            ".node": "dataurl"
+          },
+          "logLevel": "error"
         }
       }
     },
