@@ -11,6 +11,7 @@ import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.parentOfType
+import dev.nx.console.utils.isInsideNxProjectJsonFile
 
 data class NxRunSettings(
     val nxProjects: String = "",
@@ -60,7 +61,6 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         val targetProperty = element.parentOfType<JsonProperty>() ?: return null
         val propertyLiteral = element.parent as? JsonStringLiteral ?: return null
         val nxTarget = propertyLiteral.value
-        // TODO see if we can use nxls if it's more efficient
         val nxProject =
             ((propertyLiteral.parent as? JsonProperty)
                     ?.parentOfType<JsonObject>()

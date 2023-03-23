@@ -1,20 +1,34 @@
 {
+  "name": "nxls",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/nxls/src",
   "projectType": "application",
   "targets": {
     "watch": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/vscode/nxls",
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
         "assets": ["apps/nxls/src/assets"],
-        "watch": true
+        "sourcemap": true,
+        "watch": true,
+        "skipTypeCheck": false,
+        "external": ["@swc/*", "@parcel/watcher", "nx", "webpack", "fsevents"],
+        "outputFileName": "main.js",
+        "format": ["cjs"],
+        "platform": "node",
+        "generatePackageJson": false,
+        "esbuildOptions": {
+          "mainFields": ["module", "main"],
+          "sourcemap": true,
+          "outExtension": { ".js": ".js" }
+        }
       }
     },
     "package": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "options": {
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
@@ -29,24 +43,48 @@
         ],
         "generatePackageJson": true,
         "externalDependencies": "all",
+        "target": "node",
         "optimization": true,
         "extractLicenses": true
       }
     },
     "build": {
       "defaultConfiguration": "production",
-      "executor": "nx:run-commands",
-      "outputs": ["dist/apps/nxls"],
-      "options": {},
+      "executor": "@nrwl/esbuild:esbuild",
+      "outputs": ["{workspaceRoot}/dist/apps/nxls"],
+      "options": {
+        "main": "apps/nxls/src/main.ts",
+        "tsConfig": "apps/nxls/tsconfig.app.json",
+        "outputPath": "dist/apps/nxls",
+        "skipTypeCheck": true,
+        "external": [
+          "@swc/*",
+          "@angular-devkit/*",
+          "@parcel/watcher",
+          "webpack",
+          "fsevents"
+        ],
+        "outputFileName": "main.js",
+        "format": ["cjs"],
+        "thirdParty": true,
+        "platform": "node",
+        "esbuildOptions": {
+          "mainFields": ["module", "main"],
+          "sourcemap": true,
+          "loader": {
+            ".node": "dataurl"
+          },
+          "logLevel": "error",
+          "outExtension": { ".js": ".js" }
+        }
+      },
       "configurations": {
         "ci": {
-          "commands": [
-            "yarn tsc -p ./apps/nxls/tsconfig.app.json --noEmit",
-            "node ./apps/nxls/esbuild.js"
-          ]
+          "skipTypeCheck": false
         },
         "production": {
-          "command": "node ./apps/nxls/esbuild.js"
+          "minify": true,
+          "skipTypeCheck": true
         }
       }
     },
@@ -59,7 +97,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/nxls"],
+      "outputs": ["{workspaceRoot}/coverage/apps/nxls"],
       "options": {
         "jestConfig": "apps/nxls/jest.config.ts",
         "passWithNoTests": true

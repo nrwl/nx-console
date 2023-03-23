@@ -1,5 +1,5 @@
-import { ProjectsConfigurations } from '@nrwl/devkit';
-import { Schema } from 'nx/src/utils/params';
+import type { ProjectsConfigurations } from 'nx/src/devkit-exports';
+import type { Schema } from 'nx/src/utils/params';
 
 export enum OptionType {
   Any = 'any',
@@ -110,7 +110,7 @@ export interface TargetConfiguration {
 export interface Targets {
   name: string;
   project: string;
-  builder: string;
+  builder: string | undefined;
   description: string;
   configurations: TargetConfiguration[];
   options: CliOption[];

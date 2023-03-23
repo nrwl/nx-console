@@ -1,4 +1,4 @@
-import { formatError, toWorkspaceFormat } from '@nx-console/shared/utils';
+import { formatError, sortWorkspaceProjects } from '@nx-console/shared/utils';
 
 import { clearJsonCache, fileExists } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
@@ -75,10 +75,10 @@ async function _workspace(
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
     return {
       validWorkspaceJson: true,
-      workspace: toWorkspaceFormat(config.workspaceConfiguration),
+      workspace: sortWorkspaceProjects(config.workspaceConfiguration),
       daemonEnabled: config.daemonEnabled,
       isLerna,
-      isEncapsulatedNx: !!(config.workspaceConfiguration as any).installation,
+      isEncapsulatedNx: !!config.workspaceConfiguration.installation,
       workspaceLayout: {
         appsDir: config.workspaceConfiguration.workspaceLayout?.appsDir,
         libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,

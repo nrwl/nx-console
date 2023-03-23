@@ -6,7 +6,7 @@ import {
   WorkspaceProjects,
 } from '@nx-console/shared/schema';
 import * as path from 'path';
-import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
+import { TargetConfiguration as NxTargetConfiguration } from 'nx/src/devkit-exports';
 
 import { getTelemetry } from './telemetry';
 import { getOutputChannel } from './output-channel';

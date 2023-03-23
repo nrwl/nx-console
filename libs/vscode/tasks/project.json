@@ -1,4 +1,5 @@
 {
+  "name": "vscode-tasks",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/tasks/src",
   "projectType": "library",
@@ -11,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/tasks"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/tasks"],
       "options": {
         "jestConfig": "libs/vscode/tasks/jest.config.ts",
         "passWithNoTests": true

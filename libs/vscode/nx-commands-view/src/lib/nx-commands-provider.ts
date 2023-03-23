@@ -1,4 +1,4 @@
-import { detectPackageManager } from '@nrwl/devkit';
+import { detectPackageManager } from 'nx/src/devkit-exports';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {

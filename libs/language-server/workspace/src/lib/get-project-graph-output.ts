@@ -1,4 +1,4 @@
-import { cacheDir } from '@nrwl/devkit';
+import { cacheDir } from 'nx/src/devkit-exports';
 import { join } from 'path';
 
 export function getProjectGraphOutput(workspacePath: string) {

@@ -1,5 +1,4 @@
-import { getPackageManagerCommand } from '@nrwl/devkit';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { getPackageManagerCommand } from 'nx/src/devkit-exports';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode/nx-commands-view';
 import {
   getNxCloudRunnerOptions,

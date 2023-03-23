@@ -1,5 +1,5 @@
 import { CollectionInfo } from '@nx-console/shared/schema';
-import type { ProjectConfiguration } from '@nrwl/devkit';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import type { JSONSchema } from 'vscode-json-languageservice';
 import { targets } from './common-json-schema';
 import { CompletionType, EnhancedJsonSchema } from './completion-type';

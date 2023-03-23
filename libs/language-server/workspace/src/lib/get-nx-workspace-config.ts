@@ -2,7 +2,7 @@ import type {
   NxJsonConfiguration,
   ProjectGraph,
   ProjectsConfigurations,
-} from '@nrwl/devkit';
+} from 'nx/src/devkit-exports';
 import { lspLogger } from '@nx-console/language-server/utils';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';

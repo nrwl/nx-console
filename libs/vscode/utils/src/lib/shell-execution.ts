@@ -1,4 +1,7 @@
-import { detectPackageManager, getPackageManagerCommand } from '@nrwl/devkit';
+import {
+  detectPackageManager,
+  getPackageManagerCommand,
+} from 'nx/src/devkit-exports';
 import { platform } from 'os';
 
 import { ShellExecution } from 'vscode';

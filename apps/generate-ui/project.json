@@ -126,7 +126,7 @@
         "jestConfig": "apps/generate-ui/jest.config.ts",
         "passWithNoTests": true
       },
-      "outputs": ["coverage/apps/generate-ui"]
+      "outputs": ["{workspaceRoot}/coverage/apps/generate-ui"]
     }
   },
   "implicitDependencies": ["generate-ui-styles"],

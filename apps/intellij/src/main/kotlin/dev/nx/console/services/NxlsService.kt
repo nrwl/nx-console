@@ -3,27 +3,24 @@ package dev.nx.console.services
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import dev.nx.console.models.NxGenerator
-import dev.nx.console.models.NxGeneratorContext
-import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.models.NxWorkspace
+import com.intellij.util.messages.Topic
+import dev.nx.console.models.*
 import dev.nx.console.nxls.NxlsWrapper
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
+import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
 private val logger = logger<NxlsService>()
 
 class NxlsService(val project: Project) {
-
-    companion object {
-        fun getInstance(project: Project): NxlsService = project.getService(NxlsService::class.java)
-    }
-
-    var wrapper: NxlsWrapper = NxlsWrapper(project)
+    private var wrapper: NxlsWrapper = NxlsWrapper(project)
 
     private fun client(): NxlsLanguageClient? {
         return wrapper.languageClient
@@ -35,10 +32,32 @@ class NxlsService(val project: Project) {
 
     suspend fun start() {
         wrapper.start()
+        client()?.registerRefreshCallback {
+            CoroutineScope(Dispatchers.Default).launch {
+                workspace().run {
+                    project.messageBus
+                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
+                        .onNxWorkspaceRefresh()
+                }
+            }
+        }
     }
 
     fun close() {
         wrapper.stop()
+    }
+
+    fun refreshWorkspace() {
+        CoroutineScope(Dispatchers.Default).launch {
+            CoroutineScope(Dispatchers.Default).launch {
+                workspace().run {
+                    project.messageBus
+                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
+                        .onNxWorkspaceRefresh()
+                }
+            }
+        }
+        server()?.getNxService()?.refreshWorkspace()
     }
 
     suspend fun workspace(): NxWorkspace? {
@@ -64,6 +83,18 @@ class NxlsService(val project: Project) {
         return server()?.getNxService()?.generatorContextFromPath(request)?.await() ?: null
     }
 
+    suspend fun projectGraphOutput(): ProjectGraphOutput? {
+        return server()?.getNxService()?.projectGraphOutput()?.await()
+    }
+
+    suspend fun createProjectGraph(): CreateProjectGraphError? {
+        return try {
+            server()?.getNxService()?.createProjectGraph()?.await()
+        } catch (e: ResponseErrorException) {
+            CreateProjectGraphError(e.responseError.code, e.responseError.message)
+        }
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }
@@ -79,4 +110,14 @@ class NxlsService(val project: Project) {
     fun isEditorConnected(editor: Editor): Boolean {
         return wrapper.isEditorConnected(editor)
     }
+
+    companion object {
+        fun getInstance(project: Project): NxlsService = project.getService(NxlsService::class.java)
+        val NX_WORKSPACE_REFRESH_TOPIC: Topic<NxWorkspaceRefreshListener> =
+            Topic("NxWorkspaceRefresh", NxWorkspaceRefreshListener::class.java)
+    }
+}
+
+interface NxWorkspaceRefreshListener {
+    fun onNxWorkspaceRefresh()
 }

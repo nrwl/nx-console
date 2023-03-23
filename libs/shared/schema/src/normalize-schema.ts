@@ -8,8 +8,7 @@ import {
   OptionPropertyDescription,
   XPrompt,
 } from './schema';
-import { Schema } from 'nx/src/utils/params';
-import { names } from '@nrwl/devkit/src/utils/names';
+import type { Schema } from 'nx/src/utils/params';
 
 export interface GeneratorDefaults {
   [name: string]: string;
