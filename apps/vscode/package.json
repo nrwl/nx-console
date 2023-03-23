@@ -289,30 +289,6 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.lint.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.build.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.e2e.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.serve.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.test.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.xi18n.ui",
-          "when": "isNxWorkspace"
-        },
-        {
           "command": "nx.generate.ui",
           "when": "isNxWorkspace"
         },
@@ -503,36 +479,6 @@
         "category": "Nx",
         "title": "migrate",
         "command": "nx.migrate"
-      },
-      {
-        "category": "Nx",
-        "title": "lint (ui)",
-        "command": "nx.lint.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "build (ui)",
-        "command": "nx.build.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "e2e (ui)",
-        "command": "nx.e2e.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "serve (ui)",
-        "command": "nx.serve.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "test (ui)",
-        "command": "nx.test.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "xi18n (ui)",
-        "command": "nx.xi18n.ui"
       },
       {
         "category": "Nx",
