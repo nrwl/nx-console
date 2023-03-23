@@ -131,12 +131,14 @@
             text="Nx Graph: Focus project" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
-    
+
     <action id="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"
             class="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"
             icon="dev.nx.console.NxIcons.Action"/>
     <action id="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
             class="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
-            text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action"/>
+            text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="AnalyzeActions"/>
+    </action>
   </actions>
 </idea-plugin>

@@ -1,10 +1,9 @@
 package dev.nx.console.graph.actions
 
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import dev.nx.console.graph.NxGraphService
@@ -19,10 +18,10 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.*
 
 class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? = null) :
-    AnAction() {
+    DumbAwareAction() {
 
     override fun update(e: AnActionEvent) {
-        if (e.place == ActionPlaces.ACTION_SEARCH) {
+        if (e.place != "NxToolWindow") {
             return
         }
         val targetDescriptor =
@@ -40,7 +39,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         CoroutineScope(Dispatchers.Default).launch {
             val targetDescriptor =
-                if (e.place == ActionPlaces.ACTION_SEARCH) {
+                if (e.place != "NxToolWindow") {
                     selectProjectAndTarget(project, e.dataContext)
                 } else {
                     this@NxGraphFocusTaskAction.targetDescriptor
@@ -49,7 +48,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
                     ?: return@launch
             ApplicationManager.getApplication().invokeLater {
                 val graphService = NxGraphService.getInstance(project)
-                graphService.showProjectGraphInEditor()
+                graphService.showNxGraphInEditor()
                 graphService.focusTask(targetDescriptor.nxProject, targetDescriptor.nxTarget)
             }
         }

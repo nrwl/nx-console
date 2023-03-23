@@ -48,7 +48,7 @@ class NxGraphService(val project: Project) {
         }
     }
 
-    fun showProjectGraphInEditor() {
+    fun showNxGraphInEditor() {
         val fileEditorManager = FileEditorManager.getInstance(project)
 
         val nxGraphEditor =
@@ -68,7 +68,7 @@ class NxGraphService(val project: Project) {
             CoroutineScope(Dispatchers.Default).async { nxlsService.workspace()?.nxVersion }
 
         graphBrowser = NxGraphBrowser(project, state.asStateFlow(), nxVersion)
-        val virtualFile = DefaultNxGraphFile("Project Graph", project, graphBrowser)
+        val virtualFile = DefaultNxGraphFile("Nx Graph", project, graphBrowser)
 
         if (state.value is NxGraphStates.Init || state.value is NxGraphStates.Error) {
             scope.launch { loadProjectGraph() }

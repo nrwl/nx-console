@@ -1,12 +1,12 @@
 package dev.nx.console.graph.actions
 
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 
-class NxGraphFocusTaskGroupAction : AnAction() {
+class NxGraphFocusTaskGroupAction : DumbAwareAction() {
 
     override fun update(e: AnActionEvent) {
         val targetGroup: NxSimpleNode.TargetGroup? =
@@ -25,7 +25,7 @@ class NxGraphFocusTaskGroupAction : AnAction() {
             e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup } ?: return
 
         val graphService = NxGraphService.getInstance(project)
-        graphService.showProjectGraphInEditor()
+        graphService.showNxGraphInEditor()
         graphService.focusTaskGroup(targetGroup.name)
     }
 }
