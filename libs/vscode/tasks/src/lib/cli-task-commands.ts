@@ -15,16 +15,6 @@ import { selectFlags } from './select-flags';
 import { selectGenerator } from './select-generator';
 import { selectReMoveGenerator } from './select-re-move-generator';
 
-const CLI_COMMAND_LIST = [
-  'build',
-  'deploy',
-  'e2e',
-  'lint',
-  'serve',
-  'test',
-  'xi18n',
-];
-
 let cliTaskProvider: CliTaskProvider;
 
 export async function registerCliTaskCommands(
@@ -32,14 +22,6 @@ export async function registerCliTaskCommands(
   n: CliTaskProvider
 ) {
   cliTaskProvider = n;
-
-  CLI_COMMAND_LIST.forEach((command) => {
-    context.subscriptions.push(
-      commands.registerCommand(`nx.${command}`, () =>
-        selectCliCommandAndPromptForFlags(command)
-      )
-    );
-  });
 
   commands.registerCommand(
     `nx.run`,
