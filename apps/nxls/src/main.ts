@@ -396,10 +396,13 @@ async function configureSchemas(
   const { workspace } = await nxWorkspace(workingPath);
   const collections = await getExecutors(workingPath);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
-  const projectSchema = getProjectJsonSchema(collections);
+  const projectSchema = getProjectJsonSchema(
+    collections,
+    workspace.targetDefaults
+  );
   const packageSchema = getPackageJsonSchema();
 
-  const nxSchema = getNxJsonSchema(workspace.projects);
+  const nxSchema = getNxJsonSchema(collections, workspace.projects);
 
   configureJsonLanguageService(
     {
