@@ -31,55 +31,7 @@ class NxGenerateUiAction : AnAction() {
             }
 
         runBlocking {
-            generateService.selectGenerator(e) { it?.let { openGenerateUi(project, it, path) } }
-        }
-    }
-
-    companion object {
-        fun openGenerateUi(
-            project: Project,
-            generator: NxGenerator,
-            contextPath: String? = null,
-            options: List<NxGeneratorOption>? = null
-        ) {
-
-            val generatorOptions =
-                options
-                    ?: runBlocking {
-                        project
-                            .service<NxlsService>()
-                            .generatorOptions(
-                                NxGeneratorOptionsRequestOptions(
-                                    generator.data.collection,
-                                    generator.name,
-                                    generator.path
-                                )
-                            )
-                    }
-
-            val generatorWithOptions = NxGenerator(generator, generatorOptions)
-
-            val generatorContext =
-                contextPath?.let {
-                    runBlocking {
-                        project
-                            .service<NxlsService>()
-                            .generatorContextFromPath(generatorWithOptions, contextPath)
-                    }
-                }
-
-            val virtualFile = DefaultNxGenerateUiFile("Generate", project)
-
-            val fileEditorManager = FileEditorManager.getInstance(project)
-            if (fileEditorManager.isFileOpen(virtualFile)) {
-                fileEditorManager.closeFile(virtualFile)
-            }
-
-            fileEditorManager.openFile(virtualFile, true)
-
-            virtualFile.setupGeneratorForm(
-                NxGenerator(generator = generatorWithOptions, contextValues = generatorContext)
-            )
+            generateService.selectGenerator(e) { it?.let { generateService.openGenerateUi(project, it, path) } }
         }
     }
 }

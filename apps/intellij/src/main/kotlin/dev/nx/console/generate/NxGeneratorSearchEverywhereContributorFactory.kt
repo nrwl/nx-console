@@ -62,7 +62,7 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
         modifiers: Int,
         searchText: String
     ): Boolean {
-        val service = project.service<NxlsService>()
+        val service = NxlsService.getInstance(project)
         val generatorOptions: List<NxGeneratorOption>? =
             generatorToOptionsCache.computeIfAbsent(selected) {
                 runBlocking {
@@ -73,7 +73,7 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
             }
 
         val path = event.getData(CommonDataKeys.VIRTUAL_FILE)?.path
-        NxGenerateUiAction.openGenerateUi(project, selected, path, generatorOptions)
+        NxGenerateService.getInstance(project).openGenerateUi(project, selected, path, generatorOptions)
         return true
     }
 

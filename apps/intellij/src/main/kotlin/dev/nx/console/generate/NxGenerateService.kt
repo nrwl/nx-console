@@ -2,14 +2,19 @@ package dev.nx.console.generate
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.util.ui.JBUI
+import dev.nx.console.generate.ui.DefaultNxGenerateUiFile
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.models.NxGenerator
+import dev.nx.console.models.NxGeneratorOption
+import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
 import java.awt.Dimension
 import javax.swing.ListSelectionModel.SINGLE_SELECTION
+import kotlinx.coroutines.runBlocking
 
 class NxGenerateService(val project: Project) {
 
@@ -56,5 +61,55 @@ class NxGenerateService(val project: Project) {
         } else {
             popup.showInFocusCenter()
         }
+    }
+
+    fun openGenerateUi(
+        project: Project,
+        generator: NxGenerator,
+        contextPath: String? = null,
+        options: List<NxGeneratorOption>? = null
+    ) {
+
+        val generatorOptions =
+            options
+                ?: runBlocking {
+                    project
+                        .service<NxlsService>()
+                        .generatorOptions(
+                            NxGeneratorOptionsRequestOptions(
+                                generator.data.collection,
+                                generator.name,
+                                generator.path
+                            )
+                        )
+                }
+
+        val generatorWithOptions = NxGenerator(generator, generatorOptions)
+
+        val generatorContext =
+            contextPath?.let {
+                runBlocking {
+                    project
+                        .service<NxlsService>()
+                        .generatorContextFromPath(generatorWithOptions, contextPath)
+                }
+            }
+
+        val virtualFile = DefaultNxGenerateUiFile("Generate", project)
+
+        val fileEditorManager = FileEditorManager.getInstance(project)
+        if (fileEditorManager.isFileOpen(virtualFile)) {
+            fileEditorManager.closeFile(virtualFile)
+        }
+
+        fileEditorManager.openFile(virtualFile, true)
+
+        virtualFile.setupGeneratorForm(
+            NxGenerator(generator = generatorWithOptions, contextValues = generatorContext)
+        )
+    }
+
+    companion object {
+        fun getInstance(project: Project): NxGenerateService = project.getService(NxGenerateService::class.java)
     }
 }
