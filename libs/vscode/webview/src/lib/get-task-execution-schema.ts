@@ -52,7 +52,6 @@ export async function getTaskExecutionSchema(
   } catch (e) {
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
     getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exception(stringifiedError);
 
     window
       .showErrorMessage(

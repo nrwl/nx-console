@@ -610,11 +610,6 @@
     "configuration": {
       "title": "Nx Console",
       "properties": {
-        "nxConsole.enableTelemetry": {
-          "type": "boolean",
-          "default": true,
-          "description": "Help make Nx Console better by sending anonymous usage data to the Nx Console team."
-        },
         "nxConsole.commonNxCommands": {
           "type": "array",
           "items": {

@@ -99,6 +99,5 @@ export async function readBuilderSchema(
     // todo: make this a utility function to be used in more places.
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
     getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exception(stringifiedError);
   }
 }

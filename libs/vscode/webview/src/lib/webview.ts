@@ -140,8 +140,6 @@ export function createWebViewPanel(
 
   webviewPanel?.reveal();
 
-  getTelemetry().screenViewed(title);
-
   return webviewPanel;
 }
 
