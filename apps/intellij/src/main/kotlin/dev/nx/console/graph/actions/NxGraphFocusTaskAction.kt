@@ -21,7 +21,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
     DumbAwareAction() {
 
     override fun update(e: AnActionEvent) {
-        if (e.place != "NxToolWindow") {
+        if (e.place != "NxToolWindow" && targetDescriptor == null) {
             return
         }
         val targetDescriptor =
