@@ -11,7 +11,6 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.util.Processor
-import dev.nx.console.generate.actions.NxGenerateUiAction
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
@@ -73,7 +72,8 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
             }
 
         val path = event.getData(CommonDataKeys.VIRTUAL_FILE)?.path
-        NxGenerateService.getInstance(project).openGenerateUi(project, selected, path, generatorOptions)
+        NxGenerateService.getInstance(project)
+            .openGenerateUi(project, selected, path, generatorOptions)
         return true
     }
 

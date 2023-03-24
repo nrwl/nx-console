@@ -110,6 +110,7 @@ class NxGenerateService(val project: Project) {
     }
 
     companion object {
-        fun getInstance(project: Project): NxGenerateService = project.getService(NxGenerateService::class.java)
+        fun getInstance(project: Project): NxGenerateService =
+            project.getService(NxGenerateService::class.java)
     }
 }

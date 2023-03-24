@@ -6,14 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.project.Project
 import dev.nx.console.generate.NxGenerateService
-import dev.nx.console.generate.ui.DefaultNxGenerateUiFile
-import dev.nx.console.models.NxGenerator
-import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
-import dev.nx.console.services.NxlsService
 import kotlinx.coroutines.runBlocking
 
 private val logger = logger<NxGenerateUiAction>()
@@ -31,7 +24,9 @@ class NxGenerateUiAction : AnAction() {
             }
 
         runBlocking {
-            generateService.selectGenerator(e) { it?.let { generateService.openGenerateUi(project, it, path) } }
+            generateService.selectGenerator(e) {
+                it?.let { generateService.openGenerateUi(project, it, path) }
+            }
         }
     }
 }
