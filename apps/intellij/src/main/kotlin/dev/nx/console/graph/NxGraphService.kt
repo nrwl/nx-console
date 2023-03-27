@@ -48,7 +48,7 @@ class NxGraphService(val project: Project) {
         }
     }
 
-    fun showProjectGraphInEditor() {
+    fun showNxGraphInEditor() {
         val fileEditorManager = FileEditorManager.getInstance(project)
 
         val nxGraphEditor =
@@ -64,11 +64,10 @@ class NxGraphService(val project: Project) {
             // return
         }
 
-        val nxVersion =
-            CoroutineScope(Dispatchers.Default).async { nxlsService.workspace()?.nxVersion }
+        val nxVersion = scope.async { nxlsService.workspace()?.nxVersion }
 
         graphBrowser = NxGraphBrowser(project, state.asStateFlow(), nxVersion)
-        val virtualFile = DefaultNxGraphFile("Project Graph", project, graphBrowser)
+        val virtualFile = DefaultNxGraphFile("Nx Graph", project, graphBrowser)
 
         if (state.value is NxGraphStates.Init || state.value is NxGraphStates.Error) {
             scope.launch { loadProjectGraph() }
@@ -85,6 +84,14 @@ class NxGraphService(val project: Project) {
 
     fun focusProject(projectName: String) {
         graphBrowser.focusProject(projectName)
+    }
+
+    fun focusTaskGroup(taskGroupName: String) {
+        graphBrowser.focusTaskGroup(taskGroupName)
+    }
+
+    fun focusTask(nxProject: String, nxTarget: String) {
+        graphBrowser.focusTask(nxProject, nxTarget)
     }
 
     private suspend fun loadProjectGraph(reload: Boolean = false) {
