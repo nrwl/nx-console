@@ -20,7 +20,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Project")
+        TelemetryService.getInstance(project).featureUsed("Nx Graph Select Project")
 
         val nxProjectName =
             e.getData(NxTreeNodeKey)

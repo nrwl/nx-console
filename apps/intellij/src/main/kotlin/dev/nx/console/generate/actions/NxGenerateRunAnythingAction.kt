@@ -9,7 +9,7 @@ class NxGenerateRunAnythingAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        TelemetryService.getInstance(project).featureUsed("Generate")
+        TelemetryService.getInstance(project).featureUsed("Nx Generate")
         RunAnythingManager.getInstance(project).show("nx generate", false, e)
     }
 }

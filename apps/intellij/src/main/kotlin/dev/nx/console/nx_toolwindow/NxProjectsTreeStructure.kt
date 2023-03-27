@@ -194,7 +194,7 @@ class NxProjectsTreeStructure(
 
         override fun actionPerformed(e: AnActionEvent) {
             val project = e.project ?: return
-            TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Group Tasks")
+            TelemetryService.getInstance(project).featureUsed("Nx Run - Target List")
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             if (taskSet != null) {
                 nxTaskExecutionManager.execute(
