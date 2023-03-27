@@ -64,8 +64,7 @@ class NxGraphService(val project: Project) {
             // return
         }
 
-        val nxVersion =
-            CoroutineScope(Dispatchers.Default).async { nxlsService.workspace()?.nxVersion }
+        val nxVersion = scope.async { nxlsService.workspace()?.nxVersion }
 
         graphBrowser = NxGraphBrowser(project, state.asStateFlow(), nxVersion)
         val virtualFile = DefaultNxGraphFile("Nx Graph", project, graphBrowser)

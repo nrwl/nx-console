@@ -9,7 +9,7 @@ import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
 import kotlinx.coroutines.runBlocking
 
-class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus project") {
+class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     override fun update(e: AnActionEvent) {
         val nxTreeNode = e.getData(NxTreeNodeKey) ?: return
         if (nxTreeNode !is NxSimpleNode.Project) {

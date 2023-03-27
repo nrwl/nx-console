@@ -45,7 +45,7 @@ class NxGraphBrowser(
     fun selectAllProjects() {
         executeWhenLoaded {
             lastCommand = Command.SelectAll
-            val major = runBlocking { nxVersion.await()?.major }
+            val major = nxVersion.await()?.major
             if (major == null || major.toInt() > 14) {
                 browser.executeJavaScriptAsync("window.externalApi?.selectAllProjects()")
             } else if (major.toInt() == 14) {
@@ -61,7 +61,7 @@ class NxGraphBrowser(
     fun focusProject(projectName: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusProject(projectName)
-            val major = runBlocking { nxVersion.await()?.major }
+            val major = nxVersion.await()?.major
             if (major == null || major.toInt() > 14) {
                 browser.executeJavaScriptAsync("window.externalApi?.focusProject('$projectName')")
             } else if (major.toInt() == 14) {
@@ -205,11 +205,11 @@ class NxGraphBrowser(
         browser.loadHTML(html)
     }
 
-    private fun executeWhenLoaded(block: () -> Unit) {
-        if (browserLoadedState.value) {
-            block()
-        } else {
-            CoroutineScope(Dispatchers.Default).launch {
+    private fun executeWhenLoaded(block: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.Default).launch {
+            if (browserLoadedState.value) {
+                block()
+            } else {
                 browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
             }
         }

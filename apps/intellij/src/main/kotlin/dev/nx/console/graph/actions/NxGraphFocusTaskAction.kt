@@ -39,13 +39,13 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         CoroutineScope(Dispatchers.Default).launch {
             val targetDescriptor =
-                if (e.place != "NxToolWindow") {
-                    selectProjectAndTarget(project, e.dataContext)
-                } else {
-                    this@NxGraphFocusTaskAction.targetDescriptor
-                        ?: getTargetDescriptorFromDataContext(e.dataContext)
-                }
-                    ?: return@launch
+                this@NxGraphFocusTaskAction.targetDescriptor
+                    ?: if (e.place != "NxToolWindow") {
+                        selectProjectAndTarget(project, e.dataContext)
+                    } else {
+                        getTargetDescriptorFromDataContext(e.dataContext)
+                    }
+                        ?: return@launch
             ApplicationManager.getApplication().invokeLater {
                 val graphService = NxGraphService.getInstance(project)
                 graphService.showNxGraphInEditor()
