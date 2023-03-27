@@ -22,7 +22,7 @@ class NxTaskExecutionManager(val project: Project) {
                 }
                 ?: runManager
                     .createConfiguration(
-                        "$nxProject[$nxTarget]",
+                        "$nxProject:$nxTarget",
                         NxCommandConfigurationType::class.java
                     )
                     .apply {

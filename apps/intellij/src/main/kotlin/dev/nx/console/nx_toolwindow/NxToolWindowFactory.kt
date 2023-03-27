@@ -17,6 +17,15 @@ class NxToolWindowFactory : ToolWindowFactory, DumbAware {
 
 data class NxTaskSet(val nxProjects: List<String>, val nxTargets: List<String>)
 
-val NxTaskSet.suggestedName
-    get() =
-        nxProjects.joinToString(separator = ",") + nxTargets.joinToString(separator = ",", "[", "]")
+val NxTaskSet.suggestedName: String
+    get() {
+        var name = nxProjects.joinToString(separator = ",")
+        name +=
+            if (nxTargets.size > 1) {
+                " --targets=${nxTargets.joinToString(separator = ",")}"
+            } else {
+                ":${nxTargets.first()}"
+            }
+
+        return name
+    }
