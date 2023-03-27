@@ -6,6 +6,7 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import dev.nx.console.NxIcons
+import dev.nx.console.services.telemetry.TelemetryService
 
 class NxRunAction(private val nxProject: String, private val nxTarget: String) : AnAction() {
 
@@ -16,6 +17,9 @@ class NxRunAction(private val nxProject: String, private val nxTarget: String) :
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+
+        TelemetryService.getInstance(project).featureUsed("Nx Run - context menu")
+
         val runConfig =
             NxCommandConfiguration(project, NxRunConfigurationProducer().configurationFactory)
         runConfig.nxRunSettings = NxRunSettings().copy(nxProjects = nxProject, nxTargets = nxTarget)

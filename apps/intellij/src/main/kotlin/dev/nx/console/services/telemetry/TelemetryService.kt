@@ -23,9 +23,8 @@ class TelemetryService {
 
     val scope = CoroutineScope(Dispatchers.Default)
 
-    // TODO: revert this logic
     private val service: Telemetry =
-        if (!application.isInternal) {
+        if (application.isInternal) {
             LoggerTelemetryService()
         } else {
             MeasurementProtocolService(

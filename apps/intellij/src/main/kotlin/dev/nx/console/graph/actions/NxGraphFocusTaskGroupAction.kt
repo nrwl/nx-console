@@ -5,6 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
+import dev.nx.console.services.telemetry.TelemetryService
 
 class NxGraphFocusTaskGroupAction : DumbAwareAction() {
 
@@ -20,7 +21,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
     }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-
+        TelemetryService.getInstance(project).featureUsed("CHECK THIS")
         val targetGroup: NxSimpleNode.TargetGroup =
             e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup } ?: return
 

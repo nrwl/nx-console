@@ -9,6 +9,8 @@ import dev.nx.console.services.telemetry.TelemetryService
 import java.util.*
 import kotlinx.serialization.Serializable
 
+val SESSION_ID = UUID.randomUUID().toString()
+
 @Serializable
 class MeasurementProtocolPayload private constructor(val events: List<MeasurementProtocolEvent>) {
     constructor(payload: MeasurementProtocolEvent) : this(listOf(payload))
@@ -35,7 +37,7 @@ class MeasurementProtocolUserProperties {
 @Serializable
 open class MeasurementProtocolBaseParams() {
     val engagement_time_msec = "1"
-    val session_id = UUID.randomUUID().toString()
+    val session_id = SESSION_ID
     val debug_mode = application.isInternal
 }
 

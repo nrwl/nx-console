@@ -23,19 +23,19 @@
         <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
         <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
         <projectService serviceImplementation="dev.nx.console.services.telemetry.TelemetryService"/>
-    <completion.contributor language="JSON"
+        <completion.contributor language="JSON"
                                 implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
         <lang.documentationProvider language="JSON"
                                     implementationClass="dev.nx.console.providers.NxlsDocumentationProvider"/>
 
         <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
-    <projectConfigurable
-            parentId="tools"
-            instance="dev.nx.console.settings.NxConsoleSettingsConfigurable"
-            displayName="Nx Console"/>
-    <applicationService serviceImplementation="dev.nx.console.settings.NxConsoleSettingsProvider"/>
-    <projectService serviceImplementation="dev.nx.console.settings.NxConsoleProjectSettingsProvider"/>
+        <projectConfigurable
+                parentId="tools"
+                instance="dev.nx.console.settings.NxConsoleSettingsConfigurable"
+                displayName="Nx Console"/>
+        <applicationService serviceImplementation="dev.nx.console.settings.NxConsoleSettingsProvider"/>
+        <projectService serviceImplementation="dev.nx.console.settings.NxConsoleProjectSettingsProvider"/>
 
 
         <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->

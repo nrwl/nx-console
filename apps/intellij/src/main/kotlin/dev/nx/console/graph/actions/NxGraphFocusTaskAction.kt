@@ -10,6 +10,7 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
+import dev.nx.console.services.telemetry.TelemetryService
 import dev.nx.console.utils.NxTargetDescriptor
 import dev.nx.console.utils.getNxProjectFromDataContext
 import javax.swing.ListSelectionModel
@@ -36,6 +37,8 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+
+        TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Task")
 
         CoroutineScope(Dispatchers.Default).launch {
             val targetDescriptor =
