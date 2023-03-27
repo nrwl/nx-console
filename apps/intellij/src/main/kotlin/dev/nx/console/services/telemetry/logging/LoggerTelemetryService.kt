@@ -17,5 +17,4 @@ class LoggerTelemetryService : Telemetry {
     override suspend fun extensionDeactivated(time: Int) {
         logger.info("[TELEMETRY] Extension deactivated: $time")
     }
-
 }

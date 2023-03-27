@@ -30,8 +30,7 @@ class MeasurementProtocolUserProperties {
         )
 }
 
-@Serializable
-data class MeasurementProtocolValue(val value: String)
+@Serializable data class MeasurementProtocolValue(val value: String)
 
 @Serializable
 open class MeasurementProtocolBaseParams() {

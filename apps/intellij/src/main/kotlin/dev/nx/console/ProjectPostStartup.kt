@@ -13,7 +13,7 @@ class ProjectPostStartup : ProjectPostStartupActivity {
     override suspend fun execute(project: Project) {
 
         val service = NxlsService.getInstance(project)
-        service.start();
+        service.start()
 
         TelemetryService.getInstance(project).extensionActivated(0)
     }
