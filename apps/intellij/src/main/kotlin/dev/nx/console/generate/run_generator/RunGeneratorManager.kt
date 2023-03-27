@@ -18,6 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import dev.nx.console.NxIcons
 import dev.nx.console.utils.NxExecutable
+import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
 import java.io.File
 
@@ -71,6 +72,10 @@ class RunGeneratorManager(val project: Project) {
                                 )
 
                                 NodeCommandLineUtil.configureUsefulEnvironment(this)
+                                NodeCommandLineUtil.prependNodeDirToPATH(
+                                    this,
+                                    project.nodeInterpreter
+                                )
                             }
 
                         val processHandler = KillableColoredProcessHandler(commandLine)

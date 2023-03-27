@@ -3,14 +3,12 @@ package dev.nx.console.nxls
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.javascript.nodejs.interpreter.NodeCommandLineConfigurator
-import com.intellij.javascript.nodejs.interpreter.NodeJsInterpreterManager
-import com.intellij.javascript.nodejs.interpreter.local.NodeJsLocalInterpreter
-import com.intellij.javascript.nodejs.interpreter.wsl.WslNodeInterpreter
 import com.intellij.lang.javascript.service.JSLanguageServiceUtil
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import dev.nx.console.NxConsoleBundle
+import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
 import java.io.File
 import java.io.IOException
@@ -48,11 +46,6 @@ class NxlsProcess(private val project: Project) {
     }
 
     private fun createCommandLine(): GeneralCommandLine {
-        val nodeInterpreter = NodeJsInterpreterManager.getInstance(project).interpreter
-        if (nodeInterpreter !is NodeJsLocalInterpreter && nodeInterpreter !is WslNodeInterpreter) {
-            throw ExecutionException(NxConsoleBundle.message("interpreter.not.configured"))
-        }
-
         val lsp = JSLanguageServiceUtil.getPluginDirectory(javaClass, "nxls/main.js")
         //        val nxlsPath = PathEnvironmentVariableUtil.findInPath("nxls")
         if (lsp == null || !lsp.exists()) {
@@ -70,7 +63,7 @@ class NxlsProcess(private val project: Project) {
             addParameter(lsp.path)
             addParameter("--stdio")
 
-            NodeCommandLineConfigurator.find(nodeInterpreter)
+            NodeCommandLineConfigurator.find(project.nodeInterpreter)
                 .configure(this, NodeCommandLineConfigurator.defaultOptions(project))
         }
     }
