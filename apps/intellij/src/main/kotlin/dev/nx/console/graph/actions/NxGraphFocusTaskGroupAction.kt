@@ -21,7 +21,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
     }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        TelemetryService.getInstance(project).featureUsed("CHECK THIS")
+        TelemetryService.getInstance(project).featureUsed("Nx Graph: Focus Task Group")
         val targetGroup: NxSimpleNode.TargetGroup =
             e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup } ?: return
 
