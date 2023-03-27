@@ -1,4 +1,4 @@
-import { TargetConfiguration } from '@nrwl/devkit';
+import { TargetConfiguration } from 'nx/src/devkit-exports';
 import { QuickPickItem } from 'vscode';
 
 export class CliTaskQuickPickItem implements QuickPickItem {

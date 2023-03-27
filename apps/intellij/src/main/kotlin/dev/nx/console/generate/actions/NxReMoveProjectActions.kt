@@ -30,26 +30,21 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
         runBlocking { selectOptionsAndRun(path, project) }
     }
 
-    // TODO: fix autocomplete, add additional options
     private suspend fun selectOptionsAndRun(path: String?, project: Project) {
         val nxlsService = project.service<NxlsService>()
 
         val projectsWithType =
             nxlsService
                 .workspace()
-                ?.get("workspace")
-                ?.asJsonObject
-                ?.get("projects")
-                ?.asJsonObject
-                ?.entrySet()
-                ?.map { entry ->
-                    entry.key to (entry.value?.asJsonObject?.get("projectType")?.asString ?: "")
-                }
+                ?.workspace
+                ?.projects
+                ?.entries
+                ?.map { entry -> entry.key to (entry.value.projectType) }
                 ?.associate { it }
 
         val workspaceLayoutPair =
-            nxlsService.workspace()?.get("workspaceLayout")?.asJsonObject?.let {
-                WorkspaceLayout(it?.get("appsDir")?.asString, it?.get("libsDir")?.asString)
+            nxlsService.workspace()?.workspaceLayout.let {
+                WorkspaceLayout(it?.appsDir, it?.libsDir)
             }
 
         val generators = nxlsService.generators()

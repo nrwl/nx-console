@@ -5,10 +5,12 @@ import { commands } from 'vscode';
 
 export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 
-const refresh = new Subject();
+const refresh = new Subject<boolean>();
 
-refresh.pipe(debounceTime(150)).subscribe(async () => {
-  sendNotification(NxWorkspaceRefreshNotification);
+refresh.pipe(debounceTime(150)).subscribe(async (fromLsp) => {
+  if (!fromLsp) {
+    sendNotification(NxWorkspaceRefreshNotification);
+  }
   commands.executeCommand('nxConsole.refreshNxProjectsTree');
   commands.executeCommand('nxConsole.refreshRunTargetTree');
   commands.executeCommand('nx.graph.refresh');
@@ -18,7 +20,7 @@ refresh.pipe(debounceTime(150)).subscribe(async () => {
  * Refresh workspace by debouncing multiple calls to only trigger once
  */
 export function refreshWorkspace() {
-  return commands.registerCommand(REFRESH_WORKSPACE, () => {
-    refresh.next(undefined);
+  return commands.registerCommand(REFRESH_WORKSPACE, (fromLsp: boolean) => {
+    refresh.next(fromLsp);
   });
 }

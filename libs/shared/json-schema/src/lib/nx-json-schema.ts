@@ -1,18 +1,28 @@
-import type { ProjectConfiguration } from '@nrwl/devkit';
-import { JSONSchemaMap } from 'vscode-json-languageservice/lib/umd/jsonSchema';
+import { CollectionInfo } from '@nx-console/shared/schema';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type { JSONSchema } from 'vscode-json-languageservice';
 import { targets } from './common-json-schema';
 import { CompletionType, EnhancedJsonSchema } from './completion-type';
+import { createBuildersAndExecutorsSchema } from './create-builders-and-executors-schema';
+
+type JSONSchemaMap = NonNullable<JSONSchema['properties']>;
 
 export function getNxJsonSchema(
+  collections: CollectionInfo[],
   projects: Record<string, ProjectConfiguration>
 ) {
+  const [, executors] = createBuildersAndExecutorsSchema(collections);
   const targets = getTargets(projects);
-  const contents = createJsonSchema(targets);
+  const contents = createJsonSchema(executors, targets);
   return contents;
 }
 
-function createJsonSchema(projectTargets: string[]): EnhancedJsonSchema {
-  const targetsSchema = (targets().additionalProperties as object) ?? {};
+function createJsonSchema(
+  executors: JSONSchema[],
+  projectTargets: string[]
+): EnhancedJsonSchema {
+  const targetsSchema =
+    (targets(executors).additionalProperties as object) ?? {};
   return {
     type: 'object',
     properties: {

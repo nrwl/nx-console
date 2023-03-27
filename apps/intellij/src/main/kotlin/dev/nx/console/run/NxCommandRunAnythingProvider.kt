@@ -88,16 +88,10 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
             project
                 .service<NxlsService>()
                 .workspace()
-                ?.get("workspace")
-                ?.asJsonObject
-                ?.get("projects")
-                ?.asJsonObject
-                ?.entrySet()
-                ?.map { entry ->
-                    entry.key to
-                        (entry.value?.asJsonObject?.get("targets")?.asJsonObject?.keySet()
-                            ?: emptySet())
-                }
+                ?.workspace
+                ?.projects
+                ?.entries
+                ?.map { entry -> entry.key to (entry.value?.targets?.keys ?: emptySet()) }
                 ?.associate { it }
                 ?: emptyMap()
         }

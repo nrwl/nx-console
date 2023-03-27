@@ -13,6 +13,7 @@ import com.intellij.lang.javascript.buildTools.TypeScriptErrorConsoleFilter
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
 import dev.nx.console.utils.NxExecutable
+import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
 
 class NxCommandLineState(
@@ -47,6 +48,7 @@ class NxCommandLineState(
                 withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
 
                 NodeCommandLineUtil.configureUsefulEnvironment(this)
+                NodeCommandLineUtil.prependNodeDirToPATH(this, project.nodeInterpreter)
             }
 
         val handler = KillableColoredProcessHandler(commandLine)

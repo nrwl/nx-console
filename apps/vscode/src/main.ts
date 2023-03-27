@@ -37,7 +37,6 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
-  teardownTelemetry,
   watchFile,
 } from '@nx-console/vscode/utils';
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
@@ -90,7 +89,7 @@ export async function activate(c: ExtensionContext) {
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
 
-    initTelemetry(GlobalConfigurationStore.instance, environment.production);
+    initTelemetry(environment.production);
 
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,
@@ -143,14 +142,12 @@ export async function activate(c: ExtensionContext) {
       'Nx Console encountered an error when activating'
     );
     getOutputChannel().appendLine(e.stack);
-    getTelemetry().exception(e.message);
   }
 }
 
 export async function deactivate() {
   await stopDaemon();
   getTelemetry().extensionDeactivated();
-  teardownTelemetry();
 }
 
 // -----------------------------------------------------------------------------
@@ -225,7 +222,7 @@ async function setWorkspace(workspacePath: string) {
   isNxWorkspace = await checkIsNxWorkspace(workspacePath);
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
-  if (!cliTaskProvider && !isAngularWorkspace) {
+  if (!cliTaskProvider && !(isAngularWorkspace && !isNxWorkspace)) {
     cliTaskProvider = new CliTaskProvider();
     registerNxCommands(context, cliTaskProvider);
     tasks.registerTaskProvider('nx', cliTaskProvider);
@@ -276,8 +273,6 @@ async function setWorkspace(workspacePath: string) {
   if (workspaceType === 'angular') {
     initNxConversion(context);
   }
-
-  getTelemetry().record('WorkspaceType', { workspaceType });
 }
 
 async function setApplicationAndLibraryContext(workspacePath: string) {
@@ -346,8 +341,6 @@ async function registerWorkspaceFileWatcher(
           setTimeout(() => {
             setWorkspace(workspacePath);
           }, 1000);
-        } else {
-          commands.executeCommand(REFRESH_WORKSPACE);
         }
       }
     )

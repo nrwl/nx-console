@@ -28,6 +28,7 @@ export function registerNxCommands(
   cliTaskProvider = n;
   context.subscriptions.push(
     commands.registerCommand(`nx.affected`, async () => {
+      getTelemetry().featureUsed('nx.affected');
       const target = await promptForTarget();
       if (!target) {
         return;
@@ -35,22 +36,32 @@ export function registerNxCommands(
       promptForAffectedFlags(target);
     }),
     ...['apps', 'build', 'e2e', 'libs', 'lint', 'test'].map((command) =>
-      commands.registerCommand(`nx.affected.${command}`, () =>
-        promptForAffectedFlags(command)
-      )
+      commands.registerCommand(`nx.affected.${command}`, () => {
+        getTelemetry().featureUsed(`nx.affected.${command}`);
+        promptForAffectedFlags(command);
+      })
     )
   );
 
   context.subscriptions.push(
-    commands.registerCommand('nx.run-many', () => promptForRunMany())
+    commands.registerCommand('nx.run-many', () => {
+      getTelemetry().featureUsed('nx.run-many');
+      promptForRunMany();
+    })
   );
 
   context.subscriptions.push(
-    commands.registerCommand('nx.list', () => promptForList())
+    commands.registerCommand('nx.list', () => {
+      getTelemetry().featureUsed('nx.list');
+      promptForList();
+    })
   );
 
   context.subscriptions.push(
-    commands.registerCommand('nx.migrate', () => promptForMigrate())
+    commands.registerCommand('nx.migrate', () => {
+      getTelemetry().featureUsed('nx.migrate');
+      promptForMigrate();
+    })
   );
 }
 

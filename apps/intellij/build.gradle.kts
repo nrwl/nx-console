@@ -92,6 +92,7 @@ tasks {
         }
         from(nxlsRoot) {
             include("**/*.js")
+            include("**/*.map")
             into("${rootProject.name}/nxls")
         }
     }
@@ -171,10 +172,14 @@ tasks {
     }
 }
 
-tasks.register<Exec>("buildNxls") { commandLine = listOf("bash", "-c", "npx nx run nxls:build") }
+tasks.register<Exec>("buildNxls") {
+    commandLine = listOf("bash", "-c", "npx nx run nxls:build")
+    workingDir = rootDir
+}
 
 tasks.register<Exec>("buildGenerateUi") {
     commandLine = listOf("bash", "-c", "npx nx run generate-ui:build:production-intellij")
+    workingDir = rootDir
 }
 
 tasks.register<Copy>("copyGenerateUiArtifacts") {

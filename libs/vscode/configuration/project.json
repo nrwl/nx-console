@@ -1,4 +1,5 @@
 {
+  "name": "vscode-configuration",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/configuration/src",
   "projectType": "library",
@@ -11,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/vscode/configuration"],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/configuration"],
       "options": {
         "jestConfig": "libs/vscode/configuration/jest.config.ts",
         "passWithNoTests": true

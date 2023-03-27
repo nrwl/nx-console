@@ -58,7 +58,7 @@ export async function revealWebViewPanel({
   const webViewPanel = createWebViewPanel(
     context,
     schema,
-    label,
+    (label as string) ?? '',
     cliTaskProvider
   );
   context.subscriptions.push(webViewPanel);
@@ -139,8 +139,6 @@ export function createWebViewPanel(
   publishMessagesToTaskExecutionForm(webviewPanel, schema);
 
   webviewPanel?.reveal();
-
-  getTelemetry().screenViewed(title);
 
   return webviewPanel;
 }

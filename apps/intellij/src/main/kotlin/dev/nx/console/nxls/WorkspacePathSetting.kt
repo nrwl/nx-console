@@ -41,9 +41,7 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
         }
     }
 
-    override fun getValue(): String? {
-        return this.inputField.text
-    }
+    override fun getValue(): String? = inputField.text.ifEmpty { null }
 
     override fun setValue(value: String?) {
         if (value == null) return

@@ -1,4 +1,4 @@
-import { ProjectConfiguration } from '@nrwl/devkit';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join, parse } from 'path';

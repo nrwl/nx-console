@@ -2,7 +2,7 @@ import type {
   NxJsonConfiguration,
   ProjectGraph,
   ProjectsConfigurations,
-} from '@nrwl/devkit';
+} from 'nx/src/devkit-exports';
 import { lspLogger } from '@nx-console/language-server/utils';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
@@ -36,6 +36,7 @@ export async function getNxWorkspaceConfig(
     // Always set the CI env variable to false
     (process.env as any).CI = false;
     (process.env as any).NX_PROJECT_GLOB_CACHE = false;
+    (process.env as any).NX_WORKSPACE_ROOT_PATH = workspacePath;
     const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
       getNxWorkspacePackageFileUtils(workspacePath, logger),
       getNxProjectGraph(workspacePath, logger),

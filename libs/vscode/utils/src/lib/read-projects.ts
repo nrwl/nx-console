@@ -6,7 +6,7 @@ import {
   WorkspaceProjects,
 } from '@nx-console/shared/schema';
 import * as path from 'path';
-import { TargetConfiguration as NxTargetConfiguration } from '@nrwl/devkit';
+import { TargetConfiguration as NxTargetConfiguration } from 'nx/src/devkit-exports';
 
 import { getTelemetry } from './telemetry';
 import { getOutputChannel } from './output-channel';
@@ -99,6 +99,5 @@ export async function readBuilderSchema(
     // todo: make this a utility function to be used in more places.
     const stringifiedError = e.toString ? e.toString() : JSON.stringify(e);
     getOutputChannel().appendLine(stringifiedError);
-    getTelemetry().exception(stringifiedError);
   }
 }
