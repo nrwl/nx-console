@@ -36,6 +36,9 @@ group = properties("pluginGroup")
 // Configure project's dependencies
 repositories { mavenCentral() }
 
+configurations.all {
+    exclude("org.slf4j", "slf4j-api")
+}
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -43,9 +46,10 @@ dependencies {
 
     val ktorVersion = "2.2.4"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-java:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
 }
 
 ktfmt { kotlinLangStyle() }

@@ -1,39 +1,60 @@
 package dev.nx.console.services.telemetry
 
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
+import dev.nx.console.services.telemetry.logging.LoggerTelemetryService
+import dev.nx.console.services.telemetry.measurementProtocol.MeasurementProtocolService
 import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.logging.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
+val logging = logger<TelemetryService>()
 
-class TelemetryService : Telemetry {
+class TelemetryService {
 
     companion object {
         fun getInstance(project: Project): TelemetryService = project.getService(TelemetryService::class.java)
     }
 
-    // TODO: revert this logic 
+    val scope = CoroutineScope(Dispatchers.Default)
+
+
+    // TODO: revert this logic
     private val service: Telemetry = if (!application.isInternal) {
         LoggerTelemetryService()
     } else {
-        MeasurementProtocolTelemetryService(HttpClient() {
-            install(ContentNegotiation) {
-                json()
+        MeasurementProtocolService(HttpClient(CIO) {
+            install(Logging) {
+                level = LogLevel.ALL
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        logging.info(message)
+                    }
+                }
             }
         })
     }
 
-    override fun featureUsed(feature: String) {
-        service.featureUsed(feature)
+    fun featureUsed(feature: String) {
+        scope.launch {
+            service.featureUsed(feature)
+        }
     }
 
-    override fun extensionActivated(time: Int) {
-        service.extensionActivated(time)
+    fun extensionActivated(time: Int) {
+        scope.launch {
+            service.extensionActivated(time)
+        }
     }
 
-    override fun extensionDeactivated(time: Int) {
-        service.extensionDeactivated(time)
+    fun extensionDeactivated(time: Int) {
+        scope.launch {
+            service.extensionDeactivated(time)
+        }
     }
 }
 
