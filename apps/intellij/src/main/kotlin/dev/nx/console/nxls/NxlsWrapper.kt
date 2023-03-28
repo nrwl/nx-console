@@ -133,7 +133,8 @@ class NxlsWrapper(val project: Project) {
     fun disconnect(editor: Editor) {
         val filePath = getFilePath(editor.document)
         val documentManager =
-            connectedEditors.get(filePath) ?: return log.info("editor not part of connected editors")
+            connectedEditors.get(filePath)
+                ?: return log.info("editor not part of connected editors")
         documentManager.documentClosed()
         connectedEditors.remove(filePath)
         log.info("Disconnected ${documentManager.documentPath}")
