@@ -23,7 +23,7 @@ class DocumentManager(val editor: Editor) {
 
     companion object {
         fun getInstance(editor: Editor): DocumentManager {
-            return documentManagers.getOrPut(getFilePath(editor.document) ?: "") {
+            return documentManagers.getOrPut(getFilePath(editor.document)) {
                 DocumentManager(editor)
             }
         }
@@ -155,6 +155,6 @@ class DocumentManager(val editor: Editor) {
     }
 }
 
-fun getFilePath(document: Document): String? {
-    return FileDocumentManager.getInstance().getFile(document)?.url
+fun getFilePath(document: Document): String {
+    return FileDocumentManager.getInstance().getFile(document)?.url ?: "/dev/"
 }

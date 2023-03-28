@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
+import dev.nx.console.nxls.managers.getFilePath
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.utils.nxBasePath
@@ -36,7 +37,7 @@ class NxlsWrapper(val project: Project) {
     private var initializeResult: InitializeResult? = null
     private var initializeFuture: CompletableFuture<InitializeResult>? = null
 
-    private var connectedEditors = HashMap<Editor, DocumentManager>()
+    private var connectedEditors = HashMap<String, DocumentManager>()
 
     private var status = NxlsState.STOPPED
 
@@ -111,13 +112,14 @@ class NxlsWrapper(val project: Project) {
 
         val documentManager = DocumentManager.getInstance(editor)
         if (status == NxlsState.STARTED) {
-
-            connectTextService(documentManager)
+            if (!connectedEditors.containsKey(getFilePath(editor.document))) {
+                connectTextService(documentManager)
+            }
         } else {
             log.info("Nxls not ready for documents yet.. ")
         }
 
-        connectedEditors.put(editor, documentManager)
+        connectedEditors.put(getFilePath(editor.document), documentManager)
     }
 
     private fun connectTextService(documentManager: DocumentManager) {
@@ -129,15 +131,17 @@ class NxlsWrapper(val project: Project) {
     }
 
     fun disconnect(editor: Editor) {
+        val filePath = getFilePath(editor.document)
         val documentManager =
-            connectedEditors.get(editor) ?: return log.info("editor not part of connected editors")
+            connectedEditors.get(filePath) ?: return log.info("editor not part of connected editors")
         documentManager.documentClosed()
-        connectedEditors.remove(editor)
+        connectedEditors.remove(filePath)
         log.info("Disconnected ${documentManager.documentPath}")
     }
 
     fun isEditorConnected(editor: Editor): Boolean {
-        return connectedEditors.contains(editor)
+        val filePath = getFilePath(editor.document)
+        return connectedEditors.contains(filePath)
     }
 
     fun getInitParams(): InitializeParams {
