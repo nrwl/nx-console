@@ -142,7 +142,6 @@ class NxlsWrapper(val project: Project) {
 
     fun getInitParams(): InitializeParams {
         val initParams = InitializeParams()
-        initParams.rootUri = project.nxBasePath
         initParams.workspaceFolders = listOf(WorkspaceFolder(project.nxBasePath))
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()

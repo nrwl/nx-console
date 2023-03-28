@@ -94,9 +94,9 @@ connection.onInitialize(async (params) => {
   try {
     WORKING_PATH =
       workspacePath ||
+      params.workspaceFolders?.[0]?.uri ||
       params.rootPath ||
-      URI.parse(params.rootUri ?? '').fsPath ||
-      params.workspaceFolders?.[0]?.uri;
+      URI.parse(params.rootUri ?? '').fsPath;
 
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
