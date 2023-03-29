@@ -6,15 +6,18 @@ import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.wsl.WSLCommandLineOptions
 import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.javascript.nodejs.NodeConsoleAdditionalFilter
 import com.intellij.javascript.nodejs.NodeStackTraceFilter
+import com.intellij.javascript.nodejs.interpreter.wsl.WslNodeInterpreter
 import com.intellij.lang.javascript.buildTools.TypeScriptErrorConsoleFilter
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
 import dev.nx.console.utils.NxExecutable
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
+import dev.nx.console.utils.nxlsWorkingPath
 
 class NxCommandLineState(
     environment: ExecutionEnvironment,
@@ -49,6 +52,28 @@ class NxCommandLineState(
 
                 NodeCommandLineUtil.configureUsefulEnvironment(this)
                 NodeCommandLineUtil.prependNodeDirToPATH(this, project.nodeInterpreter)
+
+                if (project.nodeInterpreter is WslNodeInterpreter) {
+                    val wslInterpreter = project.nodeInterpreter as WslNodeInterpreter;
+                   val distribution = wslInterpreter.distribution
+
+                   val nodeExportPath = wslInterpreter.prependNodeDirToPathCommand
+
+                    val options = WSLCommandLineOptions().apply {
+                        initShellCommands.add(nodeExportPath)
+                        remoteWorkingDirectory = nxlsWorkingPath(project.nxBasePath)
+                    }
+
+
+                    distribution.patchCommandLine(this, project, options)
+
+
+                } else {
+
+
+                }
+
+
             }
 
         val handler = KillableColoredProcessHandler(commandLine)
