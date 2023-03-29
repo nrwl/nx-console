@@ -171,8 +171,8 @@ class NxlsWrapper(val project: Project) {
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()
         workspaceClientCapabilities.applyEdit = true
-        workspaceClientCapabilities.didChangeWatchedFiles = DidChangeWatchedFilesCapabilities()
         workspaceClientCapabilities.executeCommand = ExecuteCommandCapabilities()
+        workspaceClientCapabilities.didChangeWatchedFiles = DidChangeWatchedFilesCapabilities()
         workspaceClientCapabilities.workspaceEdit = WorkspaceEditCapabilities()
         workspaceClientCapabilities.symbol = SymbolCapabilities()
         workspaceClientCapabilities.workspaceFolders = false

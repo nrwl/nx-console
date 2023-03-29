@@ -7,6 +7,8 @@ import com.intellij.javascript.nodejs.interpreter.local.NodeJsLocalInterpreter
 import com.intellij.javascript.nodejs.interpreter.wsl.WslNodeInterpreter
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxConsoleBundle
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 val Project.nodeInterpreter: NodeJsInterpreter
     get() =
@@ -16,3 +18,11 @@ val Project.nodeInterpreter: NodeJsInterpreter
             }
         }
             ?: throw IllegalStateException(NxConsoleBundle.message("interpreter.not.configured"))
+
+@OptIn(ExperimentalContracts::class)
+fun isWslInterpreter(interpreter: NodeJsInterpreter): Boolean {
+    contract {
+        returns(true) implies (interpreter is WslNodeInterpreter)
+    }
+    return interpreter is WslNodeInterpreter
+}

@@ -1,5 +1,6 @@
 package dev.nx.console.graph.ui
 
+import com.intellij.execution.wsl.WslPath
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
@@ -11,14 +12,19 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.utils.isWslInterpreter
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
+import dev.nx.console.utils.nodeInterpreter
 import java.io.File
 import java.util.regex.Matcher
 import kotlin.io.path.Path
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.jetbrains.concurrency.await
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import kotlin.io.path.Path
 
 private val logger = logger<NxGraphService>()
 
@@ -116,11 +122,15 @@ class NxGraphBrowser(
     private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
 
-        val fullPath = graphOutput.fullPath
+        val fullPath = project.nodeInterpreter.let {
+            if (isWslInterpreter(it)) {
+                it.distribution.getWindowsPath(graphOutput.fullPath)
+            } else graphOutput.fullPath
+        }
 
         val basePath = "${Path(fullPath).parent}/"
 
-        val originalGraphHtml = File(graphOutput.fullPath).readText(Charsets.UTF_8)
+        val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
             originalGraphHtml.replace(
                 Regex("<head>"),
@@ -153,6 +163,18 @@ class NxGraphBrowser(
           </style>
           """
             )
+.let {
+                if (WslPath.isWslUncPath(fullPath)) {
+                    val basePath = "${Path(fullPath).parent}\\"
+                    it.replace(
+                        Regex("<head>"), """
+                        <head>
+                        <base href="${Matcher.quoteReplacement(basePath)}">
+                    """.trimIndent()
+                    )
+                } else it
+            }
+
 
         browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
