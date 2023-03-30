@@ -1,6 +1,5 @@
 package dev.nx.console.graph.ui
 
-import com.intellij.execution.wsl.WslPath
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
@@ -160,20 +159,7 @@ class NxGraphBrowser(
             }
           </style>
           """
-                )
-                .let {
-                    if (WslPath.isWslUncPath(fullPath)) {
-                        val basePath = "${Path(fullPath).parent}\\"
-                        it.replace(
-                            Regex("<head>"),
-                            """
-                        <head>
-                        <base href="${Matcher.quoteReplacement(basePath)}">
-                    """
-                                .trimIndent()
-                        )
-                    } else it
-                }
+            )
 
         browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
