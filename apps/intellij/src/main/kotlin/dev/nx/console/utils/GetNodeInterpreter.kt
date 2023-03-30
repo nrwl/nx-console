@@ -21,8 +21,6 @@ val Project.nodeInterpreter: NodeJsInterpreter
 
 @OptIn(ExperimentalContracts::class)
 fun isWslInterpreter(interpreter: NodeJsInterpreter): Boolean {
-    contract {
-        returns(true) implies (interpreter is WslNodeInterpreter)
-    }
+    contract { returns(true) implies (interpreter is WslNodeInterpreter) }
     return interpreter is WslNodeInterpreter
 }

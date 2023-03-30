@@ -1,16 +1,12 @@
 package dev.nx.console.run
 
 import com.intellij.execution.configurations.CommandLineState
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.intellij.execution.wsl.WSLCommandLineOptions
-import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.javascript.nodejs.NodeConsoleAdditionalFilter
 import com.intellij.javascript.nodejs.NodeStackTraceFilter
-import com.intellij.javascript.nodejs.interpreter.wsl.WslNodeInterpreter
 import com.intellij.lang.javascript.buildTools.TypeScriptErrorConsoleFilter
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
@@ -34,13 +30,15 @@ class NxCommandLineState(
                 )
             else arrayOf("run", "${nxProjects.first()}:${nxTargets.first()}")
 
-        val commandLine = NxGeneralCommandLine(
-            project, listOf(
-                *args,
-                *(ParametersListUtil.parseToArray(nxRunSettings.arguments)),
+        val commandLine =
+            NxGeneralCommandLine(
+                project,
+                listOf(
+                    *args,
+                    *(ParametersListUtil.parseToArray(nxRunSettings.arguments)),
+                )
             )
-        )
-        
+
         val handler = KillableColoredProcessHandler(commandLine)
         consoleBuilder.console.attachToProcess(handler)
         addConsoleFilters(

@@ -22,9 +22,6 @@ import kotlin.io.path.Path
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.jetbrains.concurrency.await
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-import kotlin.io.path.Path
 
 private val logger = logger<NxGraphService>()
 
@@ -122,11 +119,12 @@ class NxGraphBrowser(
     private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
 
-        val fullPath = project.nodeInterpreter.let {
-            if (isWslInterpreter(it)) {
-                it.distribution.getWindowsPath(graphOutput.fullPath)
-            } else graphOutput.fullPath
-        }
+        val fullPath =
+            project.nodeInterpreter.let {
+                if (isWslInterpreter(it)) {
+                    it.distribution.getWindowsPath(graphOutput.fullPath)
+                } else graphOutput.fullPath
+            }
 
         val basePath = "${Path(fullPath).parent}/"
 
@@ -162,19 +160,20 @@ class NxGraphBrowser(
             }
           </style>
           """
-            )
-.let {
-                if (WslPath.isWslUncPath(fullPath)) {
-                    val basePath = "${Path(fullPath).parent}\\"
-                    it.replace(
-                        Regex("<head>"), """
+                )
+                .let {
+                    if (WslPath.isWslUncPath(fullPath)) {
+                        val basePath = "${Path(fullPath).parent}\\"
+                        it.replace(
+                            Regex("<head>"),
+                            """
                         <head>
                         <base href="${Matcher.quoteReplacement(basePath)}">
-                    """.trimIndent()
-                    )
-                } else it
-            }
-
+                    """
+                                .trimIndent()
+                        )
+                    } else it
+                }
 
         browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 

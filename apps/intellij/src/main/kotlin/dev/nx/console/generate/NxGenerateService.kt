@@ -92,7 +92,10 @@ class NxGenerateService(val project: Project) {
                 runBlocking {
                     project
                         .service<NxlsService>()
-                        .generatorContextFromPath(generatorWithOptions, nxlsWorkingPath(contextPath))
+                        .generatorContextFromPath(
+                            generatorWithOptions,
+                            nxlsWorkingPath(contextPath)
+                        )
                 }
             }
 
