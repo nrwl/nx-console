@@ -1,6 +1,5 @@
 import { cacheDir } from 'nx/src/devkit-exports';
-import { join, relative } from 'path';
-import { normalize } from '@angular-devkit/core';
+import { join, relative, normalize } from 'path';
 
 export function getProjectGraphOutput(workspacePath: string) {
   const directory = join(cacheDir, 'nx-console-project-graph');
