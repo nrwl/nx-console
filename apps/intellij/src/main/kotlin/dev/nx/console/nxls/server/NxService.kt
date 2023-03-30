@@ -44,7 +44,7 @@ interface NxService {
     }
 
     @JsonRequest
-    fun createProjectGraph(): CompletableFuture<CreateProjectGraphError?> {
+    fun createProjectGraph(): CompletableFuture<String?> {
         throw UnsupportedOperationException()
     }
     @JsonNotification

@@ -173,12 +173,16 @@ tasks {
 }
 
 tasks.register<Exec>("buildNxls") {
-    commandLine = listOf("bash", "-c", "npx nx run nxls:build")
+    commandLine = buildCommands().apply {
+        add("npx nx run nxls:build")
+    }
     workingDir = rootDir
 }
 
 tasks.register<Exec>("buildGenerateUi") {
-    commandLine = listOf("bash", "-c", "npx nx run generate-ui:build:production-intellij")
+    commandLine = buildCommands().apply {
+        add("npx nx run generate-ui:build:production-intellij")
+    }
     workingDir = rootDir
 }
 
@@ -193,4 +197,12 @@ tasks.register<DefaultTask>("publish") {
     // does nothing
     group = "publish"
     description = "Placeholder task to workaround the semantic-release plugin"
+}
+
+fun buildCommands() = mutableListOf<String>().apply {
+    if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+        addAll(listOf("pwsh", "-command"))
+    } else {
+        addAll(listOf("bash", "-c"))
+    }
 }
