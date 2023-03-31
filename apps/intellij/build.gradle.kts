@@ -173,7 +173,11 @@ tasks {
 }
 
 tasks.register<Exec>("buildNxls") {
-    commandLine = listOf("bash", "-c", "npx nx run nxls:build")
+    commandLine = if (System.getenv("IDEA_DEBUG") == "true") {
+        listOf("bash", "-c", "npx nx run nxls:build:debug")
+    } else {
+        listOf("bash", "-c", "npx nx run nxls:build")
+    }
     workingDir = rootDir
 }
 

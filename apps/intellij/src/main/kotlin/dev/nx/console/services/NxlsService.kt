@@ -27,6 +27,9 @@ class NxlsService(val project: Project) {
     }
 
     private fun server(): NxlsLanguageServer? {
+        if (!wrapper.isStarted()) {
+            return null
+        }
         return wrapper.languageServer
     }
 
@@ -49,12 +52,12 @@ class NxlsService(val project: Project) {
 
     fun refreshWorkspace() {
         CoroutineScope(Dispatchers.Default).launch {
-            CoroutineScope(Dispatchers.Default).launch {
-                workspace().run {
-                    project.messageBus
-                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
-                        .onNxWorkspaceRefresh()
-                }
+            if (!wrapper.isStarted()) {
+                start()
+            }
+
+            workspace().run {
+                project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
             }
         }
         server()?.getNxService()?.refreshWorkspace()

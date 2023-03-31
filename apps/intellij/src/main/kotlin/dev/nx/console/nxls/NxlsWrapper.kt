@@ -10,7 +10,6 @@ import dev.nx.console.nxls.managers.getFilePath
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.utils.nxBasePath
-import dev.nx.console.utils.nxWorkspace
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -50,11 +49,15 @@ class NxlsWrapper(val project: Project) {
 
         try {
             status = NxlsState.STARTING
+            val nxlsProcess = NxlsProcess(project)
             val (input, output) =
-                NxlsProcess(project).run {
+                nxlsProcess.run {
                     start()
                     Pair(getInputStream(), getOutputStream())
                 }
+
+            nxlsProcess.callOnExit { status = NxlsState.STOPPED }
+
             languageClient = NxlsLanguageClient()
             val executorService = Executors.newCachedThreadPool()
 
@@ -66,17 +69,31 @@ class NxlsWrapper(val project: Project) {
                     executorService
                 ) { consume ->
                     MessageConsumer { message ->
-                        val response = message as? ResponseMessage
-                        response?.let {
-                            it.error?.let { log.trace("Error from nxls: ${it.message}") }
-                            it.result?.let { log.trace("Result from nxls: ${it}") }
-                        }
+                        try {
+                            val response = message as? ResponseMessage
+                            response?.let {
+                                it.error?.let { log.trace("Error from nxls: ${it.message}") }
+                                it.result?.let { log.trace("Result from nxls: ${it}") }
+                            }
 
-                        val request = message as? RequestMessage
-                        request?.let {
-                            log.trace("Sending request to nxls: ${it.method} (${it.params})")
+                            val request = message as? RequestMessage
+                            request?.let {
+                                log.trace("Sending request to nxls: ${it.method} (${it.params})")
+                            }
+
+                            nxlsProcess.isAlive()?.run {
+                                if (this) {
+                                    consume.consume(message)
+                                } else {
+                                    log.info(
+                                        "Unable to send messages to the nxls, the process has exited"
+                                    )
+                                    status = NxlsState.STOPPED
+                                }
+                            }
+                        } catch (e: Throwable) {
+                            thisLogger().error(e)
                         }
-                        consume.consume(message)
                     }
                 }
                 .also {
@@ -86,9 +103,7 @@ class NxlsWrapper(val project: Project) {
 
             initializeResult = languageServer?.initialize(getInitParams())?.await()
             log.info("Initialized")
-            project.nxWorkspace()?.run {
-                project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
-            }
+            project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
         } catch (e: Exception) {
             thisLogger().info("Cannot start nxls", e)
             status = NxlsState.FAILED
@@ -106,6 +121,10 @@ class NxlsWrapper(val project: Project) {
         initializeFuture?.cancel(true)
         languageServer?.shutdown()?.get(5000, TimeUnit.MILLISECONDS)
         languageServer?.exit()
+    }
+
+    fun isStarted(): Boolean {
+        return status == NxlsState.STARTED
     }
 
     fun connect(editor: Editor) {
