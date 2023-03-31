@@ -11,6 +11,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
 
+        <notificationGroup displayType="BALLOON" id="Nx Console"/>
+
         <!-- works in WebStorm and other SmallIDEs -->
         <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
         <!-- works in IDEA -->
@@ -51,7 +53,8 @@
         <!--run anything execution provider-->
         <runAnything.executionProvider
                 implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
-        <searchEverywhereContributor implementation="dev.nx.console.generate.NxGeneratorSearchEverywhereContributorFactory"/>
+        <searchEverywhereContributor
+                implementation="dev.nx.console.generate.NxGeneratorSearchEverywhereContributorFactory"/>
 
 
         <!-- Nx Run Configuration-->
@@ -81,8 +84,8 @@
     <actions>
         <action id="dev.nx.console.nxls.NxRefreshWorkspaceAction" class="dev.nx.console.nxls.NxRefreshWorkspaceAction"
                 text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="EditorTabPopupMenu"></add-to-group>
-            <add-to-group group-id="EditorTabsEntryPoint"></add-to-group>
+            <add-to-group group-id="EditorTabPopupMenu"/>
+            <add-to-group group-id="EditorTabsEntryPoint"/>
         </action>
 
         <!-- Generate -->

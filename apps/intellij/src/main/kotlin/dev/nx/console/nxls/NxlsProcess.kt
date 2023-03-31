@@ -8,12 +8,17 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import dev.nx.console.NxConsoleBundle
+import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
 
 private val logger = logger<NxlsProcess>()
 
@@ -22,6 +27,8 @@ class NxlsProcess(private val project: Project) {
     private val basePath = project.nxBasePath
 
     private var process: Process? = null
+
+    private var onExit: (() -> Unit)? = null
 
     fun start() {
         logger.info("Staring the nxls process in workingDir $basePath")
@@ -33,6 +40,19 @@ class NxlsProcess(private val project: Project) {
                 } else {
                     logger.info("nxls started: $it")
                 }
+                CoroutineScope(Dispatchers.Default).launch {
+                    val e = it.onExit().await()
+                    e.errorStream.readAllBytes().decodeToString().run {
+                        if (this.isEmpty()) {
+                            return@run
+                        }
+
+                        logger.trace("Error: $this")
+
+                        Notifier.notifyNxlsError(project)
+                        onExit?.invoke()
+                    }
+                }
             }
         }
     }
@@ -43,6 +63,14 @@ class NxlsProcess(private val project: Project) {
 
     fun getOutputStream(): OutputStream? {
         return process?.outputStream
+    }
+
+    fun isAlive(): Boolean? {
+        return process?.isAlive()
+    }
+
+    fun callOnExit(callback: () -> Unit) {
+        this.onExit = callback
     }
 
     private fun createCommandLine(): GeneralCommandLine {

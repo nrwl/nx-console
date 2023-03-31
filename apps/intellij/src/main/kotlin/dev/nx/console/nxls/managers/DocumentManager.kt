@@ -137,7 +137,7 @@ class DocumentManager(val editor: Editor) {
     private fun addDocumentListener() {
         try {
             document.addDocumentListener(documentListener)
-        } catch (exception: Exception) {
+        } catch (exception: Throwable) {
             log.info("Document listener already registered for this document")
         }
     }
@@ -145,7 +145,7 @@ class DocumentManager(val editor: Editor) {
     private fun removeDocumentListener() {
         try {
             document.removeDocumentListener(documentListener)
-        } catch (exception: Exception) {
+        } catch (exception: Throwable) {
             log.info("Document listener was not registered for this document")
         }
     }
