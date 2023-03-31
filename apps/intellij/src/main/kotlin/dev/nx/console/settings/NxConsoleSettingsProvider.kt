@@ -23,6 +23,12 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
             state.enableDryRunOnGenerateChange = value
         }
 
+    var enableTelemetry: Boolean
+        get() = state.enableTelemetry
+        set(value) {
+            state.enableTelemetry = value
+        }
+
     companion object {
         fun getInstance(): NxConsoleSettingsProvider {
             return service()
@@ -30,4 +36,7 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
     }
 }
 
-data class NxConsoleSettingsState(var enableDryRunOnGenerateChange: Boolean = true)
+data class NxConsoleSettingsState(
+    var enableDryRunOnGenerateChange: Boolean = true,
+    var enableTelemetry: Boolean = false
+)

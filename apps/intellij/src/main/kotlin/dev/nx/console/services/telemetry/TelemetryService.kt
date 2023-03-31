@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import dev.nx.console.services.telemetry.logging.LoggerTelemetryService
 import dev.nx.console.services.telemetry.measurementProtocol.MeasurementProtocolService
+import dev.nx.console.settings.NxConsoleSettingsProvider
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
@@ -24,7 +25,7 @@ class TelemetryService {
     val scope = CoroutineScope(Dispatchers.Default)
 
     private val service: Telemetry =
-        if (application.isInternal) {
+        if (application.isInternal || !NxConsoleSettingsProvider.getInstance().enableTelemetry) {
             LoggerTelemetryService()
         } else {
             MeasurementProtocolService(
