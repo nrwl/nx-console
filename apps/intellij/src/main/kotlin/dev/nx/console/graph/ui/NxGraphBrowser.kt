@@ -14,6 +14,8 @@ import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import java.io.File
+import java.util.regex.Matcher
+import kotlin.io.path.Path
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.jetbrains.concurrency.await
@@ -113,11 +115,18 @@ class NxGraphBrowser(
 
     private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
+
+        val fullPath = graphOutput.fullPath
+
+        val basePath = "${Path(fullPath).parent}/"
+
         val originalGraphHtml = File(graphOutput.fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
             originalGraphHtml.replace(
-                Regex("</head>"),
+                Regex("<head>"),
                 """
+          <head>
+          <base href="${Matcher.quoteReplacement(basePath)}">
           <style>
             #sidebar {
               display: none;
@@ -142,10 +151,10 @@ class NxGraphBrowser(
               padding: 12px;
             }
           </style>
-          </head>
           """
             )
-        browser.loadHTML(transformedGraphHtml, "file://${graphOutput.fullPath}")
+
+        browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
         if (reload) {
             lastCommand?.apply {

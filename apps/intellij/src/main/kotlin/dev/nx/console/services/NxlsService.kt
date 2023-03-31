@@ -92,7 +92,9 @@ class NxlsService(val project: Project) {
 
     suspend fun createProjectGraph(): CreateProjectGraphError? {
         return try {
-            server()?.getNxService()?.createProjectGraph()?.await()
+            server()?.getNxService()?.createProjectGraph()?.await()?.let {
+                CreateProjectGraphError(1000, it)
+            }
         } catch (e: ResponseErrorException) {
             CreateProjectGraphError(e.responseError.code, e.responseError.message)
         }

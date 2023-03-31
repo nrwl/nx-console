@@ -1,6 +1,10 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 
+fun isWindows(): Boolean {
+    return System.getProperty("os.name").toLowerCase().startsWith("windows")
+}
+
 val nxlsRoot = "${rootDir}/dist/apps/nxls"
 
 buildDir = file("${rootDir}/dist/apps/intellij")
@@ -174,15 +178,15 @@ tasks {
 
 tasks.register<Exec>("buildNxls") {
     commandLine = if (System.getenv("IDEA_DEBUG") == "true") {
-        listOf("bash", "-c", "npx nx run nxls:build:debug")
+        buildCommands() + "npx nx run nxls:build:debug"
     } else {
-        listOf("bash", "-c", "npx nx run nxls:build")
+        buildCommands() + "npx nx run nxls:build"
     }
     workingDir = rootDir
 }
 
 tasks.register<Exec>("buildGenerateUi") {
-    commandLine = listOf("bash", "-c", "npx nx run generate-ui:build:production-intellij")
+    commandLine = buildCommands() + "npx nx run generate-ui:build:production-intellij"
     workingDir = rootDir
 }
 
@@ -198,3 +202,10 @@ tasks.register<DefaultTask>("publish") {
     group = "publish"
     description = "Placeholder task to workaround the semantic-release plugin"
 }
+
+fun buildCommands() =
+    if (isWindows()) {
+        mutableListOf("pwsh", "-command")
+    } else {
+        mutableListOf("bash", "-c")
+    }

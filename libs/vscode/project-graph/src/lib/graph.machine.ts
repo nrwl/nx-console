@@ -122,7 +122,7 @@ export const graphMachine =
     {
       services: {
         generateContent: async () => {
-          return (await createProjectGraph())?.message;
+          return await createProjectGraph();
         },
       },
       actions: {
