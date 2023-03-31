@@ -1,13 +1,14 @@
 package dev.nx.console.nxls
 
 import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.ui.NxGraphFileType
 import dev.nx.console.services.NxlsService
 
-class NxRefreshWorkspaceAction : AnAction() {
+class NxRefreshWorkspaceAction :
+    DumbAwareAction("Refresh Nx Workspace", "Refreshes the Nx workspace", null) {
 
     override fun update(e: AnActionEvent) {
         val p = e.place
