@@ -1,11 +1,12 @@
-package dev.nx.console.services.telemetry.measurementProtocol
+package dev.nx.console.telemetry.measurementProtocol
 
-import dev.nx.console.services.telemetry.Telemetry
-import dev.nx.console.services.telemetry.TelemetryValues
-import dev.nx.console.services.telemetry.logging
-import dev.nx.console.services.telemetry.measurementProtocol.payload.MeasurementProtocolExtensionActivatedEvent
-import dev.nx.console.services.telemetry.measurementProtocol.payload.MeasurementProtocolFeatureUsedEvent
-import dev.nx.console.services.telemetry.measurementProtocol.payload.MeasurementProtocolPayload
+import com.intellij.openapi.diagnostic.logger
+import dev.nx.console.settings.NxConsoleSettingsProvider
+import dev.nx.console.telemetry.Telemetry
+import dev.nx.console.telemetry.TelemetryValues
+import dev.nx.console.telemetry.measurementProtocol.payload.MeasurementProtocolExtensionActivatedEvent
+import dev.nx.console.telemetry.measurementProtocol.payload.MeasurementProtocolFeatureUsedEvent
+import dev.nx.console.telemetry.measurementProtocol.payload.MeasurementProtocolPayload
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -17,6 +18,8 @@ val json = Json {
     classDiscriminator = "name"
 }
 
+private val logger = logger<MeasurementProtocolService>()
+
 class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
 
     override suspend fun featureUsed(feature: String) {
@@ -25,7 +28,7 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
         try {
             post(json.encodeToString(featureUsed))
         } catch (e: Exception) {
-            logging.error(e.printStackTrace())
+            logger.error(e.printStackTrace())
         }
     }
 
@@ -35,7 +38,7 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
         try {
             post(json.encodeToString(extensionActivated))
         } catch (e: Exception) {
-            logging.error(e.printStackTrace())
+            logger.error(e.printStackTrace())
         }
     }
 
@@ -44,6 +47,8 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
     }
 
     private suspend fun post(payload: String) {
+        if (!NxConsoleSettingsProvider.getInstance().enableTelemetry) return
+
         try {
             client
                 .post {
@@ -53,11 +58,11 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
                 .body<String>()
                 .run {
                     if (isNotEmpty()) {
-                        logging.info(this)
+                        logger.info(this)
                     }
                 }
         } catch (e: Exception) {
-            logging.error(e.printStackTrace())
+            logger.error(e.printStackTrace())
         }
     }
 }

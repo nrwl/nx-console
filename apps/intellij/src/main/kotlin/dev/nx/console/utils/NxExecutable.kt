@@ -9,7 +9,7 @@ import dev.nx.console.NxConsoleBundle
 import java.io.File
 import java.nio.file.Paths
 
-val logger = logger<NxExecutable>()
+private val logger = logger<NxExecutable>()
 
 class NxExecutable {
     companion object {

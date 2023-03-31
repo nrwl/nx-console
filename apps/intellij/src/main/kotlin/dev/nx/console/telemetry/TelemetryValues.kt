@@ -1,4 +1,4 @@
-package dev.nx.console.services.telemetry
+package dev.nx.console.telemetry
 
 const val MEASUREMENT_ID = "G-TNJ97NGX40"
 

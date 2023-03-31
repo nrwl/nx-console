@@ -7,7 +7,7 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 import kotlinx.coroutines.runBlocking
 
 class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {

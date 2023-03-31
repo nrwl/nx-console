@@ -25,7 +25,6 @@ import dev.nx.console.run.NxCommandConfiguration
 import dev.nx.console.run.NxCommandConfigurationType
 import dev.nx.console.run.NxRunSettings
 import dev.nx.console.run.NxTaskExecutionManager
-import dev.nx.console.services.telemetry.TelemetryService
 import dev.nx.console.utils.nxWorkspace
 import java.awt.event.MouseEvent
 import kotlinx.coroutines.CoroutineScope
@@ -194,7 +193,6 @@ class NxProjectsTreeStructure(
 
         override fun actionPerformed(e: AnActionEvent) {
             val project = e.project ?: return
-            TelemetryService.getInstance(project).featureUsed("Nx Run - Target List")
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             if (taskSet != null) {
                 nxTaskExecutionManager.execute(

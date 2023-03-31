@@ -1,11 +1,11 @@
-package dev.nx.console.services.telemetry.measurementProtocol.payload
+package dev.nx.console.telemetry.measurementProtocol.payload
 
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.PermanentInstallationID
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.application
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 import java.util.*
 import kotlinx.serialization.Serializable
 

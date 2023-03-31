@@ -5,7 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 
 class NxGraphFocusTaskGroupAction : DumbAwareAction() {
 

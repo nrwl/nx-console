@@ -29,6 +29,12 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
             state.enableTelemetry = value
         }
 
+    var promptedForTelemetry: Boolean
+        get() = state.promptedForTelemetry
+        set(value) {
+            state.promptedForTelemetry = value
+        }
+
     companion object {
         fun getInstance(): NxConsoleSettingsProvider {
             return service()
@@ -38,5 +44,6 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
 
 data class NxConsoleSettingsState(
     var enableDryRunOnGenerateChange: Boolean = true,
-    var enableTelemetry: Boolean = false
+    var enableTelemetry: Boolean = false,
+    var promptedForTelemetry: Boolean = false
 )

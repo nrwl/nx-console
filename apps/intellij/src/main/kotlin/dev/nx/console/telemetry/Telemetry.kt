@@ -1,4 +1,4 @@
-package dev.nx.console.services.telemetry
+package dev.nx.console.telemetry
 
 interface Telemetry {
     suspend fun featureUsed(feature: String)

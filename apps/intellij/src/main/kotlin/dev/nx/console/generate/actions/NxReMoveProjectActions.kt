@@ -10,7 +10,7 @@ import dev.nx.console.generate.NxReMoveProjectDialog
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.WorkspaceLayout
 import dev.nx.console.services.NxlsService
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 import kotlinx.coroutines.runBlocking
 
 open class NxReMoveProjectActionBase(val mode: String) : AnAction() {

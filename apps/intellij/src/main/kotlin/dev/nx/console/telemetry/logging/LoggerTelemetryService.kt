@@ -1,11 +1,10 @@
-package dev.nx.console.services.telemetry.logging
+package dev.nx.console.telemetry.logging
 
 import com.intellij.openapi.diagnostic.logger
-import dev.nx.console.services.telemetry.Telemetry
-
-val logger = logger<LoggerTelemetryService>()
+import dev.nx.console.telemetry.Telemetry
 
 class LoggerTelemetryService : Telemetry {
+    val logger = logger<LoggerTelemetryService>()
     override suspend fun featureUsed(feature: String) {
         logger.info("[TELEMETRY] Feature used: $feature")
     }

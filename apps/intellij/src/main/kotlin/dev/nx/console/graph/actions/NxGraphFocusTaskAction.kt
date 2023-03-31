@@ -10,7 +10,7 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxTargetDescriptor
 import dev.nx.console.utils.getNxProjectFromDataContext
 import javax.swing.ListSelectionModel

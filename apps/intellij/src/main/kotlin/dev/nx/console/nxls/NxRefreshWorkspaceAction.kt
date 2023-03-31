@@ -1,5 +1,6 @@
 package dev.nx.console.nxls
 
+import com.intellij.notification.Notification
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -27,6 +28,13 @@ class NxRefreshWorkspaceAction :
     }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+
+        try {
+            Notification.get(e).expire()
+        } catch (e: Throwable) {
+            // do nothing
+            // This action can be triggered from a notification as well as the command prompt
+        }
 
         NxlsService.getInstance(project).refreshWorkspace()
     }

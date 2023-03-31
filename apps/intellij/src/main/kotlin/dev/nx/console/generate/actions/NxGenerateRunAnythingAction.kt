@@ -3,7 +3,7 @@ package dev.nx.console.generate.actions
 import com.intellij.ide.actions.runAnything.RunAnythingManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 
 class NxGenerateRunAnythingAction : AnAction() {
 

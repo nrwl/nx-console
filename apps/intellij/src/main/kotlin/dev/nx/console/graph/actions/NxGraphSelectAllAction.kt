@@ -3,7 +3,7 @@ package dev.nx.console.graph.actions
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 
 class NxGraphSelectAllAction : DumbAwareAction() {
     override fun actionPerformed(e: AnActionEvent) {

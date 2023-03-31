@@ -6,7 +6,7 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import dev.nx.console.NxIcons
-import dev.nx.console.services.telemetry.TelemetryService
+import dev.nx.console.telemetry.TelemetryService
 
 class NxRunAction(private val nxProject: String, private val nxTarget: String) : AnAction() {
 

@@ -1,4 +1,4 @@
-package dev.nx.console.services.telemetry.measurementProtocol.payload
+package dev.nx.console.telemetry.measurementProtocol.payload
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

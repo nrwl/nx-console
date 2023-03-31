@@ -11,7 +11,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
 
-        <notificationGroup displayType="BALLOON" id="Nx Console"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="Nx Console"/>
 
         <!-- works in WebStorm and other SmallIDEs -->
         <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
@@ -22,7 +22,7 @@
 
         <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
         <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
-        <projectService serviceImplementation="dev.nx.console.services.telemetry.TelemetryService"/>
+        <projectService serviceImplementation="dev.nx.console.telemetry.TelemetryService"/>
         <completion.contributor language="JSON"
                                 implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
         <lang.documentationProvider language="JSON"
