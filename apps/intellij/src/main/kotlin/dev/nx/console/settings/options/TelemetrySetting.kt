@@ -3,6 +3,7 @@ package dev.nx.console.settings.options
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.MAX_LINE_LENGTH_WORD_WRAP
 import com.intellij.ui.dsl.builder.Panel
+import dev.nx.console.NxConsoleBundle
 import dev.nx.console.settings.NxConsoleSettingBase
 
 class TelemetrySetting() : NxConsoleSettingBase<Boolean> {
@@ -14,7 +15,8 @@ class TelemetrySetting() : NxConsoleSettingBase<Boolean> {
             row {
                 cell(checkbox)
                     .comment(
-                        "Enable telemetry to help us improve Nx Console.",
+                        NxConsoleBundle.message("nx.telemetry.permission") +
+                            """ <a href="https://nx.dev">Learn more.</a>""",
                         MAX_LINE_LENGTH_WORD_WRAP
                     )
             }
