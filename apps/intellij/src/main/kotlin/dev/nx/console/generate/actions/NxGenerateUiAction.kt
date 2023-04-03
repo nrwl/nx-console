@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import dev.nx.console.generate.NxGenerateService
+import dev.nx.console.telemetry.TelemetryService
 import kotlinx.coroutines.runBlocking
 
 private val logger = logger<NxGenerateUiAction>()
@@ -14,6 +15,9 @@ private val logger = logger<NxGenerateUiAction>()
 class NxGenerateUiAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+
+        TelemetryService.getInstance(project).featureUsed("Nx Generate UI")
+
         val generateService = project.service<NxGenerateService>()
 
         val path =

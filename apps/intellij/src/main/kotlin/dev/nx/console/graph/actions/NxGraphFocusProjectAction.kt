@@ -7,6 +7,7 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
+import dev.nx.console.telemetry.TelemetryService
 import kotlinx.coroutines.runBlocking
 
 class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
@@ -18,6 +19,8 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+
+        TelemetryService.getInstance(project).featureUsed("Nx Graph Select Project")
 
         val nxProjectName =
             e.getData(NxTreeNodeKey)

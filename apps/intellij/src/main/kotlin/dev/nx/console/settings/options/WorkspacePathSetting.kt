@@ -1,4 +1,4 @@
-package dev.nx.console.nxls
+package dev.nx.console.settings.options
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory

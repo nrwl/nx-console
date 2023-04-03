@@ -1,4 +1,4 @@
-package dev.nx.console.generate.settings
+package dev.nx.console.settings.options
 
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.Panel

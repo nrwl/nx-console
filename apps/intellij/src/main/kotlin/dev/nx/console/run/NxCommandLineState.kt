@@ -10,6 +10,7 @@ import com.intellij.javascript.nodejs.NodeStackTraceFilter
 import com.intellij.lang.javascript.buildTools.TypeScriptErrorConsoleFilter
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
 
 class NxCommandLineState(
@@ -29,6 +30,9 @@ class NxCommandLineState(
                     "--projects=${nxProjects.joinToString(separator = ",")}",
                 )
             else arrayOf("run", "${nxProjects.first()}:${nxTargets.first()}")
+
+        TelemetryService.getInstance(project)
+            .featureUsed("Nx Run - from context menu/target list/codelens")
 
         val commandLine =
             NxGeneralCommandLine(
