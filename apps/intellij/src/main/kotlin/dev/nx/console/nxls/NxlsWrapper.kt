@@ -10,6 +10,7 @@ import dev.nx.console.nxls.managers.getFilePath
 import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.utils.nxBasePath
+import dev.nx.console.utils.nxlsWorkingPath
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -166,12 +167,12 @@ class NxlsWrapper(val project: Project) {
 
     fun getInitParams(): InitializeParams {
         val initParams = InitializeParams()
-        initParams.workspaceFolders = listOf(WorkspaceFolder(project.nxBasePath))
+        initParams.workspaceFolders = listOf(WorkspaceFolder(nxlsWorkingPath(project.nxBasePath)))
 
         val workspaceClientCapabilities = WorkspaceClientCapabilities()
         workspaceClientCapabilities.applyEdit = true
-        workspaceClientCapabilities.didChangeWatchedFiles = DidChangeWatchedFilesCapabilities()
         workspaceClientCapabilities.executeCommand = ExecuteCommandCapabilities()
+        workspaceClientCapabilities.didChangeWatchedFiles = DidChangeWatchedFilesCapabilities()
         workspaceClientCapabilities.workspaceEdit = WorkspaceEditCapabilities()
         workspaceClientCapabilities.symbol = SymbolCapabilities()
         workspaceClientCapabilities.workspaceFolders = false

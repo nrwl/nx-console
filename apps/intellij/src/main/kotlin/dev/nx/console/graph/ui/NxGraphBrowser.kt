@@ -11,8 +11,10 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.utils.isWslInterpreter
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
+import dev.nx.console.utils.nodeInterpreter
 import java.io.File
 import java.util.regex.Matcher
 import kotlin.io.path.Path
@@ -116,11 +118,16 @@ class NxGraphBrowser(
     private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
 
-        val fullPath = graphOutput.fullPath
+        val fullPath =
+            project.nodeInterpreter.let {
+                if (isWslInterpreter(it)) {
+                    it.distribution.getWindowsPath(graphOutput.fullPath)
+                } else graphOutput.fullPath
+            }
 
         val basePath = "${Path(fullPath).parent}/"
 
-        val originalGraphHtml = File(graphOutput.fullPath).readText(Charsets.UTF_8)
+        val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
             originalGraphHtml.replace(
                 Regex("<head>"),

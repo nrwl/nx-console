@@ -1,6 +1,5 @@
 package dev.nx.console.generate.run_generator
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 import com.intellij.execution.process.KillableColoredProcessHandler
@@ -8,7 +7,6 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.execution.ui.RunContentManager
-import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.lang.javascript.modules.ConsoleProgress
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -17,8 +15,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import dev.nx.console.NxIcons
-import dev.nx.console.utils.NxExecutable
-import dev.nx.console.utils.nodeInterpreter
+import dev.nx.console.utils.NxGeneralCommandLine
 import dev.nx.console.utils.nxBasePath
 import java.io.File
 
@@ -60,26 +57,9 @@ class RunGeneratorManager(val project: Project) {
             ApplicationManager.getApplication()
                 .invokeLater(
                     {
-                        val nxExecutable = NxExecutable.getExecutablePath(project.nxBasePath)
-
-                        val commandLine =
-                            GeneralCommandLine().apply {
-                                exePath = nxExecutable
-                                addParameters(definition)
-                                setWorkDirectory(project.nxBasePath)
-                                withParentEnvironmentType(
-                                    GeneralCommandLine.ParentEnvironmentType.CONSOLE
-                                )
-
-                                NodeCommandLineUtil.configureUsefulEnvironment(this)
-                                NodeCommandLineUtil.prependNodeDirToPATH(
-                                    this,
-                                    project.nodeInterpreter
-                                )
-                            }
+                        val commandLine = NxGeneralCommandLine(project, definition)
 
                         val processHandler = KillableColoredProcessHandler(commandLine)
-
                         val console =
                             TextConsoleBuilderFactory.getInstance()
                                 .createBuilder(project)

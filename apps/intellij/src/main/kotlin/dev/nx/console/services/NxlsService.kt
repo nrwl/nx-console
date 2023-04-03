@@ -11,6 +11,7 @@ import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
+import dev.nx.console.utils.nxlsWorkingPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
@@ -109,7 +110,7 @@ class NxlsService(val project: Project) {
     }
 
     fun changeWorkspace(workspacePath: String) {
-        server()?.getNxService()?.changeWorkspace(workspacePath)
+        server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath))
     }
 
     fun isEditorConnected(editor: Editor): Boolean {

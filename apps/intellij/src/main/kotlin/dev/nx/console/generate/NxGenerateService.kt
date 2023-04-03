@@ -12,6 +12,7 @@ import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
+import dev.nx.console.utils.nxlsWorkingPath
 import java.awt.Dimension
 import javax.swing.ListSelectionModel.SINGLE_SELECTION
 import kotlinx.coroutines.runBlocking
@@ -91,7 +92,10 @@ class NxGenerateService(val project: Project) {
                 runBlocking {
                     project
                         .service<NxlsService>()
-                        .generatorContextFromPath(generatorWithOptions, contextPath)
+                        .generatorContextFromPath(
+                            generatorWithOptions,
+                            nxlsWorkingPath(contextPath)
+                        )
                 }
             }
 
