@@ -16,7 +16,7 @@ class TelemetrySetting() : NxConsoleSettingBase<Boolean> {
                 cell(checkbox)
                     .comment(
                         NxConsoleBundle.message("nx.telemetry.permission") +
-                            """ <a href="https://nx.dev">Learn more.</a>""",
+                            """ <a href="https://nx.dev/recipes/nx-console/console-telemetry#collected-data">Learn more.</a>""",
                         MAX_LINE_LENGTH_WORD_WRAP
                     )
             }

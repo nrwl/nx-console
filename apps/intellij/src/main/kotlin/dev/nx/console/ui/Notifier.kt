@@ -39,7 +39,9 @@ class Notifier {
                         TelemetryOptOutAction(),
                         object : AnAction("Learn more") {
                             override fun actionPerformed(e: AnActionEvent) {
-                                BrowserUtil.browse("https://nx.dev")
+                                BrowserUtil.browse(
+                                    "https://nx.dev/recipes/nx-console/console-telemetry#collected-data"
+                                )
                             }
                         }
                     )
