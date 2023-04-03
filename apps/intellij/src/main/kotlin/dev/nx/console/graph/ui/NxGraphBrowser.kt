@@ -143,6 +143,14 @@ class NxGraphBrowser(
               display: none;
             }
 
+            #app > * {
+              display: none;
+            }
+            
+            #app #main-content {
+              display: block !important;
+            }
+
             #no-projects-chosen {
               display: none;
             }
