@@ -45,6 +45,12 @@ export class ProjectCodeLens extends CodeLens {
   }
 }
 
+export class TaskGraphCodeLens extends CodeLens {
+  constructor(range: Range, public project: string, public target: string) {
+    super(range);
+  }
+}
+
 export class WorkspaceCodeLensProvider implements CodeLensProvider {
   /**
    * CodeLensProvider is disposed and re-registered on setting changes
@@ -137,7 +143,12 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       const position = document.positionAt(projectTargets[target].position);
 
       lens.push(
-        new TargetCodeLens(new Range(position, position), projectName, target)
+        new TargetCodeLens(new Range(position, position), projectName, target),
+        new TaskGraphCodeLens(
+          new Range(position, position),
+          projectName,
+          target
+        )
       );
       const configurations = projectTargets[target].configurations;
       if (configurations) {
@@ -185,6 +196,15 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
         arguments: [Uri.file(lens.projectPath)],
       };
       lens.command = command;
+      return lens;
+    }
+
+    if (lens instanceof TaskGraphCodeLens) {
+      lens.command = {
+        command: `nx.graph.task.button`,
+        title: `show nx task graph for ${lens.project}:${lens.target}`,
+        arguments: [[lens.project, lens.target]],
+      };
       return lens;
     }
 

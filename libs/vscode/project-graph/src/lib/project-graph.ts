@@ -68,11 +68,13 @@ export function projectGraph() {
     }),
     commands.registerCommand(
       'nx.graph.task.button',
-      async (treeItem: RunTargetTreeItem | NxTreeItem) => {
+      async (
+        item: RunTargetTreeItem | NxTreeItem | [project: string, task: string]
+      ) => {
         getTelemetry().featureUsed('nx.graph.task.button');
 
-        if (treeItem instanceof NxTreeItem) {
-          const project = getTaskItem(treeItem);
+        if (item instanceof NxTreeItem) {
+          const project = getTaskItem(item);
           if (project) {
             graphWebView.projectInWebview(
               project.nxProject.project,
@@ -80,10 +82,11 @@ export function projectGraph() {
               MessageType.task
             );
           }
-        } else {
-          const target = treeItem.route;
+        } else if (item instanceof RunTargetTreeItem) {
+          const target = item.route;
           graphWebView.showAllTasks(target);
-        }
+        } else
+          graphWebView.projectInWebview(item[0], item[1], MessageType.task);
       }
     )
   );
