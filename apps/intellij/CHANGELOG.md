@@ -1,3 +1,44 @@
+## 1.3.0 (2023-04-04)
+
+### Bug Fixes
+
+* **generate-ui:** ensure checkboxes have correctly centered checkmarks ([#1604](https://github.com/nrwl/nx-console/issues/1604)) ([5e4180e](https://github.com/nrwl/nx-console/commit/5e4180e1091391587506263da18b11fdabd23b7b))
+* handle nxls startup errors ([#1649](https://github.com/nrwl/nx-console/issues/1649)) ([da9ed6e](https://github.com/nrwl/nx-console/commit/da9ed6e175908c603eb97024f0b5c4a33fe1f0a2))
+* **intellij:** add missing NxCommandRunAnythingProvider ([#1600](https://github.com/nrwl/nx-console/issues/1600)) ([fc45ef9](https://github.com/nrwl/nx-console/commit/fc45ef94418c19221adf9599f9c47f2a50b8ae26))
+* **intellij:** add the configured node interpreter to the path when running nx commands ([#1635](https://github.com/nrwl/nx-console/issues/1635)) ([00e0dad](https://github.com/nrwl/nx-console/commit/00e0dad161009c6e50858f90de2bd9cbab2c360b))
+* **intellij:** change default task name ([#1636](https://github.com/nrwl/nx-console/issues/1636)) ([64925f1](https://github.com/nrwl/nx-console/commit/64925f1a4d6c6e6361db811fd729b00d98b35941))
+* **intellij:** correctly display workspace-generator name ([#1605](https://github.com/nrwl/nx-console/issues/1605)) ([2c2bb4b](https://github.com/nrwl/nx-console/commit/2c2bb4b34671d322311c370a128c537c3748a7c9))
+* **intellij:** do not add or remove document listeners on editors that are not connected to the language server ([#1640](https://github.com/nrwl/nx-console/issues/1640)) ([1bb74e9](https://github.com/nrwl/nx-console/commit/1bb74e969c9fdbc42353403e1c89882d3bbbbb07))
+* **intellij:** don't apply empty workspace path setting ([#1611](https://github.com/nrwl/nx-console/issues/1611)) ([1dab266](https://github.com/nrwl/nx-console/commit/1dab26675b79d14a8bfb9d370d95d0f85c82341d))
+* **intellij:** refresh file system after running generator ([#1589](https://github.com/nrwl/nx-console/issues/1589)) ([4bed233](https://github.com/nrwl/nx-console/commit/4bed233c3b36241789a82c32317c3c149507948a))
+* **intellij:** remove the 404 page that shows up when opening the project graph ([#1654](https://github.com/nrwl/nx-console/issues/1654)) ([609dcb5](https://github.com/nrwl/nx-console/commit/609dcb5fdf3de644cefb3b6d7668e645aa68b419))
+* **intellij:** rework generate run anything provider with aliases ([#1599](https://github.com/nrwl/nx-console/issues/1599)) ([0e7c67b](https://github.com/nrwl/nx-console/commit/0e7c67b083315c0e4332f87d2f142354eb79f54e))
+* **intellij:** slightly reduce generate-ui white flicker ([#1591](https://github.com/nrwl/nx-console/issues/1591)) ([d3e9618](https://github.com/nrwl/nx-console/commit/d3e96188c6e3206ffe843f379bd1523ed2e5646b))
+* **intellij:** update configuration name for the run anything command ([#1653](https://github.com/nrwl/nx-console/issues/1653)) ([3fcebcd](https://github.com/nrwl/nx-console/commit/3fcebcd1c75f58bb61a982824b23d21c859570c9))
+* **intellij:** use latest by default when creating a new workspace ([#1612](https://github.com/nrwl/nx-console/issues/1612)) ([6a9342d](https://github.com/nrwl/nx-console/commit/6a9342d173a93e4b184edbbfd8198db635e15132))
+* **nxls:** debounce @parcel/watcher to avoid race conditions ([#1620](https://github.com/nrwl/nx-console/issues/1620)) ([96f91fa](https://github.com/nrwl/nx-console/commit/96f91faf36ee2b4965e944a7b60333fb38cc175b))
+* **nxls:** distinguish projects that are substrings of one another ([#1610](https://github.com/nrwl/nx-console/issues/1610)) ([a404c00](https://github.com/nrwl/nx-console/commit/a404c000ccd6597f3b1a1d6266ea4d8aa73aee48))
+* **nxls:** do not output exec to stdio ([#1644](https://github.com/nrwl/nx-console/issues/1644) ([f0f112c](https://github.com/nrwl/nx-console/commit/f0f112c5a5b04fbf659d36655fe17cd02b5c462c))
+* **nxls:** handle daemon better ([#1615](https://github.com/nrwl/nx-console/issues/1615)) ([0216d0c](https://github.com/nrwl/nx-console/commit/0216d0cf12c962765a060dee793bcf368eedc87f))
+* **nxls:** use `workspaceFolders` before `rootUri` for better Windows path compatibility ([#1639](https://github.com/nrwl/nx-console/issues/1639)) ([2a5a07e](https://github.com/nrwl/nx-console/commit/2a5a07e07c989e49dc79d915ab17521177859781))
+
+
+### Features
+
+* **intellij:** add action for running targets ([#1607](https://github.com/nrwl/nx-console/issues/1607)) ([001dc91](https://github.com/nrwl/nx-console/commit/001dc91ecb31dc6c7807a078e9c4f9fe216a47c4))
+* **intellij:** add nx console project toolwindow ([#1613](https://github.com/nrwl/nx-console/issues/1613)) ([df501b9](https://github.com/nrwl/nx-console/commit/df501b9a74ab1dd89808f9f659ef5c42f2a9c388))
+* **intellij:** add nx generator search evrywhere contributor ([#1623](https://github.com/nrwl/nx-console/issues/1623)) ([7f4ea6a](https://github.com/nrwl/nx-console/commit/7f4ea6a1c46b3a28e247bc958c2016be75f0395e))
+* **intellij:** add nx run line marker contributor for project.json ([#1584](https://github.com/nrwl/nx-console/issues/1584)) ([ee2e808](https://github.com/nrwl/nx-console/commit/ee2e808a11bc4950f09bb58f2f4e895beb53c66e))
+* **intellij:** add task graph integration ([#1630](https://github.com/nrwl/nx-console/issues/1630)) ([5b5e2e0](https://github.com/nrwl/nx-console/commit/5b5e2e0b02b2ef612fffafb6872bef8a105a2b87))
+* **intellij:** add telemetry ([#1634](https://github.com/nrwl/nx-console/issues/1634) ([c80ebdf](https://github.com/nrwl/nx-console/commit/c80ebdfe37a56fdd7c4049ac8105d8516a3ee7ae))
+* **intellij:** integrate project graph webview ([#1603](https://github.com/nrwl/nx-console/issues/1603)) ([1468f07](https://github.com/nrwl/nx-console/commit/1468f0762f4a602b689112107baf5a66e6c02c81))
+* **intellij:** run with wsl ([#1641](https://github.com/nrwl/nx-console/issues/1641)) ([460d286](https://github.com/nrwl/nx-console/commit/460d286e08c1ca1be2db9c23574ba75f76a0bf91))
+* **intellij:** show console running indicator ([#1593](https://github.com/nrwl/nx-console/issues/1593)) ([b7ec0fd](https://github.com/nrwl/nx-console/commit/b7ec0fd58162174f18b87c5618f6c3e1164d0b7c))
+* **intellij:** suggest installing plugin by dependency support ([#1592](https://github.com/nrwl/nx-console/issues/1592)) ([2d5890b](https://github.com/nrwl/nx-console/commit/2d5890bf9145bcc67b755c24a5e2cc10eac11f62))
+* **nxls:** provide generator aliases via nxls ([#1598](https://github.com/nrwl/nx-console/issues/1598)) ([63f44ce](https://github.com/nrwl/nx-console/commit/63f44ce925613ea132808e81ac775e8a36d0f8a1))
+* **nxls:** support executors in and from targetDefaults ([#1621](https://github.com/nrwl/nx-console/issues/1621)) ([1d0c263](https://github.com/nrwl/nx-console/commit/1d0c263da44a2613a36f6a3aa64d0a3d8ff5e9ee))
+* remove angular cli compatibility ([#1575](https://github.com/nrwl/nx-console/issues/1575)) ([702e205](https://github.com/nrwl/nx-console/commit/702e205d5629059ad5fb5ca7c5d102d0cca0c4ce))
+
 ## 1.2.0 (2023-03-02)
 
 ### Bug Fixes
