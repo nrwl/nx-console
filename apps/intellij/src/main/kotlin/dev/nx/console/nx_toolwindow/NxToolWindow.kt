@@ -40,7 +40,6 @@ class NxToolWindow(val project: Project) {
                 }
             )
         }
-        invokeLater { projectStructure.updateNxProjects() }
     }
 
     val toolbar: ActionToolbar = run {

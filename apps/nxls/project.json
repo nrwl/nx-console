@@ -23,7 +23,9 @@
         "esbuildOptions": {
           "mainFields": ["module", "main"],
           "sourcemap": true,
-          "outExtension": { ".js": ".js" }
+          "outExtension": {
+            ".js": ".js"
+          }
         }
       }
     },
@@ -70,17 +72,22 @@
         "platform": "node",
         "esbuildOptions": {
           "mainFields": ["module", "main"],
-          "sourcemap": true,
           "loader": {
             ".node": "dataurl"
           },
           "logLevel": "error",
-          "outExtension": { ".js": ".js" }
+          "outExtension": {
+            ".js": ".js"
+          }
         }
       },
       "configurations": {
         "ci": {
           "skipTypeCheck": false
+        },
+        "debug": {
+          "minify": false,
+          "sourcemap": "both"
         },
         "production": {
           "minify": true,

@@ -11,6 +11,7 @@ import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
+import dev.nx.console.utils.nxlsWorkingPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
@@ -27,6 +28,9 @@ class NxlsService(val project: Project) {
     }
 
     private fun server(): NxlsLanguageServer? {
+        if (!wrapper.isStarted()) {
+            return null
+        }
         return wrapper.languageServer
     }
 
@@ -49,12 +53,12 @@ class NxlsService(val project: Project) {
 
     fun refreshWorkspace() {
         CoroutineScope(Dispatchers.Default).launch {
-            CoroutineScope(Dispatchers.Default).launch {
-                workspace().run {
-                    project.messageBus
-                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
-                        .onNxWorkspaceRefresh()
-                }
+            if (!wrapper.isStarted()) {
+                start()
+            }
+
+            workspace().run {
+                project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
             }
         }
         server()?.getNxService()?.refreshWorkspace()
@@ -89,7 +93,9 @@ class NxlsService(val project: Project) {
 
     suspend fun createProjectGraph(): CreateProjectGraphError? {
         return try {
-            server()?.getNxService()?.createProjectGraph()?.await()
+            server()?.getNxService()?.createProjectGraph()?.await()?.let {
+                CreateProjectGraphError(1000, it)
+            }
         } catch (e: ResponseErrorException) {
             CreateProjectGraphError(e.responseError.code, e.responseError.message)
         }
@@ -104,7 +110,7 @@ class NxlsService(val project: Project) {
     }
 
     fun changeWorkspace(workspacePath: String) {
-        server()?.getNxService()?.changeWorkspace(workspacePath)
+        server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath))
     }
 
     fun isEditorConnected(editor: Editor): Boolean {

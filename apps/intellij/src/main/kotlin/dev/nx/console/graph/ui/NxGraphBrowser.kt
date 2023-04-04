@@ -11,9 +11,13 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.utils.isWslInterpreter
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
+import dev.nx.console.utils.nodeInterpreter
 import java.io.File
+import java.util.regex.Matcher
+import kotlin.io.path.Path
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.jetbrains.concurrency.await
@@ -113,11 +117,23 @@ class NxGraphBrowser(
 
     private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
-        val originalGraphHtml = File(graphOutput.fullPath).readText(Charsets.UTF_8)
+
+        val fullPath =
+            project.nodeInterpreter.let {
+                if (isWslInterpreter(it)) {
+                    it.distribution.getWindowsPath(graphOutput.fullPath)
+                } else graphOutput.fullPath
+            }
+
+        val basePath = "${Path(fullPath).parent}/"
+
+        val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
             originalGraphHtml.replace(
-                Regex("</head>"),
+                Regex("<head>"),
                 """
+          <head>
+          <base href="${Matcher.quoteReplacement(basePath)}">
           <style>
             #sidebar {
               display: none;
@@ -125,6 +141,14 @@ class NxGraphBrowser(
 
             div[data-cy="no-projects-selected"] {
               display: none;
+            }
+
+            #app > * {
+              display: none;
+            }
+            
+            #app #main-content {
+              display: block !important;
             }
 
             #no-projects-chosen {
@@ -142,10 +166,10 @@ class NxGraphBrowser(
               padding: 12px;
             }
           </style>
-          </head>
           """
             )
-        browser.loadHTML(transformedGraphHtml, "file://${graphOutput.fullPath}")
+
+        browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
         if (reload) {
             lastCommand?.apply {

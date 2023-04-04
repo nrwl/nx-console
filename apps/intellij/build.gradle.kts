@@ -1,6 +1,10 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 
+fun isWindows(): Boolean {
+    return System.getProperty("os.name").toLowerCase().startsWith("windows")
+}
+
 val nxlsRoot = "${rootDir}/dist/apps/nxls"
 
 buildDir = file("${rootDir}/dist/apps/intellij")
@@ -32,10 +36,20 @@ group = properties("pluginGroup")
 // Configure project's dependencies
 repositories { mavenCentral() }
 
+configurations.all {
+    exclude("org.slf4j", "slf4j-api")
+}
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+
+    val ktorVersion = "2.2.4"
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
 }
 
 ktfmt { kotlinLangStyle() }
@@ -173,12 +187,16 @@ tasks {
 }
 
 tasks.register<Exec>("buildNxls") {
-    commandLine = listOf("bash", "-c", "npx nx run nxls:build")
+    commandLine = if (System.getenv("IDEA_DEBUG") == "true") {
+        buildCommands() + "npx nx run nxls:build:debug"
+    } else {
+        buildCommands() + "npx nx run nxls:build"
+    }
     workingDir = rootDir
 }
 
 tasks.register<Exec>("buildGenerateUi") {
-    commandLine = listOf("bash", "-c", "npx nx run generate-ui:build:production-intellij")
+    commandLine = buildCommands() + "npx nx run generate-ui:build:production-intellij"
     workingDir = rootDir
 }
 
@@ -194,3 +212,10 @@ tasks.register<DefaultTask>("publish") {
     group = "publish"
     description = "Placeholder task to workaround the semantic-release plugin"
 }
+
+fun buildCommands() =
+    if (isWindows()) {
+        mutableListOf("pwsh", "-command")
+    } else {
+        mutableListOf("bash", "-c")
+    }

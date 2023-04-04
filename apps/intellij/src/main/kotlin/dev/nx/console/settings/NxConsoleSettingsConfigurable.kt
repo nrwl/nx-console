@@ -4,8 +4,9 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
-import dev.nx.console.generate.settings.EnableDryRunOnGenerateChangeSetting
-import dev.nx.console.nxls.WorkspacePathSetting
+import dev.nx.console.settings.options.EnableDryRunOnGenerateChangeSetting
+import dev.nx.console.settings.options.TelemetrySetting
+import dev.nx.console.settings.options.WorkspacePathSetting
 import javax.swing.JComponent
 
 class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurable {
@@ -16,6 +17,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
 
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var workspacePathSetting: WorkspacePathSetting
+    private lateinit var telemetrySetting: TelemetrySetting
 
     override fun createComponent(): JComponent {
         enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
@@ -24,21 +26,29 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         workspacePathSetting = WorkspacePathSetting(project)
         workspacePathSetting.setValue(projectSettingsProvider.workspacePath)
 
+        telemetrySetting = TelemetrySetting()
+        telemetrySetting.setValue(settingsProvider.enableTelemetry)
+
         return panel {
             group("Project Settings") { workspacePathSetting.render(this) }
-            group("Application Settings") { enableDryRunOnGenerateChangeSetting.render(this) }
+            group("Application Settings") {
+                enableDryRunOnGenerateChangeSetting.render(this)
+                telemetrySetting.render(this)
+            }
         }
     }
 
     override fun isModified(): Boolean {
         return enableDryRunOnGenerateChangeSetting.getValue() !=
             settingsProvider.enableDryRunOnGenerateChange ||
+            telemetrySetting.getValue() != settingsProvider.enableTelemetry ||
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath
     }
 
     override fun apply() {
         settingsProvider.enableDryRunOnGenerateChange =
             enableDryRunOnGenerateChangeSetting.getValue()
+        settingsProvider.enableTelemetry = telemetrySetting.getValue()
         projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
 
         workspacePathSetting.doApply()

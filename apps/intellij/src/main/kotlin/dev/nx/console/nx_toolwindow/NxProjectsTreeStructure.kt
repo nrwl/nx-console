@@ -192,7 +192,7 @@ class NxProjectsTreeStructure(
         }
 
         override fun actionPerformed(e: AnActionEvent) {
-            e.project ?: return
+            val project = e.project ?: return
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             if (taskSet != null) {
                 nxTaskExecutionManager.execute(
