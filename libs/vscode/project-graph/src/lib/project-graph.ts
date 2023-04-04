@@ -3,10 +3,16 @@ import { commands, Disposable, Uri, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
 import {
+  NxProject,
   NxTreeItem,
   ProjectViewItem,
+  TargetViewItem,
 } from '@nx-console/vscode/nx-project-view';
-import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxWorkspace,
+  getProjectByPath,
+} from '@nx-console/vscode/nx-workspace';
+import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 
 export function projectGraph() {
   const graphWebView = new GraphWebView();
@@ -36,6 +42,7 @@ export function projectGraph() {
         if (project) {
           graphWebView.projectInWebview(
             project.nxProject.project,
+            undefined,
             MessageType.focus
           );
         }
@@ -49,8 +56,33 @@ export function projectGraph() {
         if (project) {
           graphWebView.projectInWebview(
             project.nxProject.project,
+            undefined,
             MessageType.select
           );
+        }
+      }
+    ),
+    commands.registerCommand('nx.graph.task', async (uri: Uri | undefined) => {
+      getTelemetry().featureUsed('nx.graph.task');
+      await openProjectWithFile(graphWebView, uri, MessageType.task);
+    }),
+    commands.registerCommand(
+      'nx.graph.task.button',
+      async (treeItem: RunTargetTreeItem | NxTreeItem) => {
+        getTelemetry().featureUsed('nx.graph.task.button');
+
+        if (treeItem instanceof NxTreeItem) {
+          const project = getTaskItem(treeItem);
+          if (project) {
+            graphWebView.projectInWebview(
+              project.nxProject.project,
+              project.nxTarget.name,
+              MessageType.task
+            );
+          }
+        } else {
+          const target = treeItem.route;
+          graphWebView.showAllTasks(target);
         }
       }
     )
@@ -87,11 +119,33 @@ async function openProjectWithFile(
     );
     return;
   }
-  webview.projectInWebview(project?.name, messageType);
+
+  if (messageType === MessageType.task) {
+    const targets = Object.keys(project.targets ?? {});
+    if (targets.length === 0) {
+      return;
+    }
+
+    const selectedTarget = await window.showQuickPick(targets);
+
+    if (!selectedTarget) {
+      return;
+    }
+
+    webview.projectInWebview(project?.name, selectedTarget, messageType);
+  } else {
+    webview.projectInWebview(project?.name, undefined, messageType);
+  }
 }
 
 function getProjectItem(item: NxTreeItem): ProjectViewItem | undefined {
   if (item.contextValue === 'project') {
     return item.item as ProjectViewItem;
+  }
+}
+
+function getTaskItem(item: NxTreeItem): TargetViewItem | undefined {
+  if (item.contextValue === 'target') {
+    return item.item as TargetViewItem;
   }
 }

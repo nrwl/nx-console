@@ -211,6 +211,7 @@ export async function loadHtml(panel: WebviewPanel) {
         body {
           background-color: var(--vscode-settings-editor-background) !important;
         }
+
         .nx-select-project {
           padding: 12px;
         }
@@ -225,7 +226,7 @@ export async function loadHtml(panel: WebviewPanel) {
 function injectedScript() {
   // language=JavaScript
   return `
-(function () {
+    (function() {
       const vscode = acquireVsCodeApi();
 
       const noProjectElement = document.createElement('p');
@@ -242,27 +243,51 @@ function injectedScript() {
         function clickOnElement() {
 
           if (window.externalApi) {
-              let action = null;
-              switch (data.type) {
-                case '${MessageType.select}': {
-                  if (previousSelectedProject === data.projectName) {
-                    action = {type: 'deselectProject', projectName: data.projectName};
-                    previousSelectedProject = null;
-                  } else {
-                    action = {type: 'selectProject', projectName: data.projectName};
-                    previousSelectedProject = data.projectName;
-                  }
-                  break;
+            let action = null;
+            switch (data.type) {
+              case '${MessageType.select}': {
+                if (previousSelectedProject === data.projectName) {
+                  action = { type: 'deselectProject', projectName: data.projectName };
+                  previousSelectedProject = null;
+                } else {
+                  action = { type: 'selectProject', projectName: data.projectName };
+                  previousSelectedProject = data.projectName;
                 }
-                case '${MessageType.focus}': {
-                  action = {type:'focusProject', projectName: data.projectName};
-                  break;
-                }
-                case '${MessageType.all}':
-                default: {
-                  action = {type: 'selectAll'};
-                }
+                break;
+              }
+              case '${MessageType.focus}': {
+                action = { type: 'focusProject', projectName: data.projectName };
+                break;
+              }
+              case '${MessageType.task}': {
+                action = { type: 'task', taskName: data.taskName, projectName: data.projectName };
+                break;
+              }
+              case '${MessageType.allTasks}': {
+                action = { type: 'allTasks', taskName: data.taskName };
+                break;
+              }
+              case '${MessageType.all}':
+              default: {
+                action = { type: 'selectAll' };
+              }
             }
+
+            if (action.type === 'task') {
+              document.querySelector(\`[data-cy="deselectAllButton"]\`)?.click()
+              window.externalApi.router?.navigate(\`tasks/\${action.taskName}\`).then(() => {
+                document.querySelector(\`label[data-project="\${action.projectName}"\`)?.click()
+              })
+              return true;
+            } else if (action.type === 'allTasks') {
+              document.querySelector(\`[data-cy="deselectAllButton"]\`)?.click()
+              window.externalApi.router?.navigate(\`tasks/\${action.taskName}\`).then(() => {
+                document.querySelector(\`[data-cy="selectAllButton"]\`)?.click()
+              })
+              return true;
+            }
+
+
             let service = null;
             if ('projectGraphService' in window.externalApi) {
               service = window.externalApi.projectGraphService;
@@ -277,9 +302,9 @@ function injectedScript() {
             return true;
           }
 
-          if(data.type === "${MessageType.all}") {
+          if (data.type === "${MessageType.all}") {
             const allProjectsElement = document.querySelector(\`[data-cy="selectAllButton"]\`);
-            if(allProjectsElement) {
+            if (allProjectsElement) {
               setTimeout(() => allProjectsElement.click(), 0)
               return true;
             } else {
@@ -287,7 +312,7 @@ function injectedScript() {
             }
           }
           const projectElement = document.querySelector(\`[data-project="\${data.projectName}"]\`);
-          if(projectElement) {
+          if (projectElement) {
             if (data.type === "${MessageType.focus}") {
               projectElement.parentElement.querySelector('button').click();
             } else if (data.type === "${MessageType.select}") {
@@ -297,10 +322,10 @@ function injectedScript() {
           }
           // nx12 has a different structure for the project graph
           const projectCheckbox = document.querySelector(\`input[value="\${data.projectName}"]\`);
-          if(projectCheckbox) {
+          if (projectCheckbox) {
             if (data.type === "${MessageType.focus}") {
-            projectCheckbox.parentElement.parentElement.querySelector('button').click();
-          } else if (data.type === "${MessageType.select}") {
+              projectCheckbox.parentElement.parentElement.querySelector('button').click();
+            } else if (data.type === "${MessageType.select}") {
               projectCheckbox.click();
             }
             return true;
@@ -308,26 +333,26 @@ function injectedScript() {
           return false;
         }
 
-        if(clickOnElement()) {
+        if (clickOnElement()) {
           return;
         }
 
 
         const observer = new MutationObserver(mutations => {
           const success = clickOnElement();
-          if(success) {
+          if (success) {
             observer.disconnect();
           }
         });
 
         observer.observe(document.body, {
-            childList: true,
-            subtree: true
+          childList: true,
+          subtree: true
         });
-    }
+      }
 
 
-      window.addEventListener('message', ({data}) => {
+      window.addEventListener('message', ({ data }) => {
         if (!data) {
           document.body.prepend(noProjectElement);
           return;
@@ -335,7 +360,7 @@ function injectedScript() {
 
         try {
           document.body.removeChild(noProjectElement);
-        } catch(e) {
+        } catch (e) {
           //noop
         }
 
