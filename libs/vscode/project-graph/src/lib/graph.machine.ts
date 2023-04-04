@@ -19,7 +19,7 @@ interface Context {
   state: State;
   project: {
     projectName: string;
-    taskName: string | undefined
+    taskName: string | undefined;
     type: MessageType;
   } | null;
   error: string | null;
@@ -45,7 +45,11 @@ export const graphMachine =
           | { type: 'NO_PROJECT' }
           | {
               type: 'PROJECT_SELECTED';
-              data: { projectName: string; taskName: string | undefined; type: MessageType };
+              data: {
+                projectName: string;
+                taskName: string | undefined;
+                type: MessageType;
+              };
             }
           | { type: 'VIEW_READY' }
           | { type: 'VIEW_DESTROYED' }

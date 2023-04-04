@@ -74,7 +74,11 @@ export class GraphWebView implements Disposable {
     graphService.send('GET_CONTENT');
   }
 
-  projectInWebview(projectName: string | undefined, taskName: string | undefined, type: MessageType) {
+  projectInWebview(
+    projectName: string | undefined,
+    taskName: string | undefined,
+    type: MessageType
+  ) {
     getOutputChannel().appendLine(`Graph - Opening graph for ${projectName}`);
     if (!this.panel) {
       this._webview();
@@ -91,7 +95,7 @@ export class GraphWebView implements Disposable {
       data: {
         type,
         projectName,
-        taskName
+        taskName,
       },
     });
   }
