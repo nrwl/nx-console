@@ -52,6 +52,13 @@ You can install Nx Console in the following places:
   Visual Studio Marketplace.
 - [Nx Console for JetBrains](https://plugins.jetbrains.com/plugin/21060-nx-console) from the JetBrains Marketplace
 
+### Jetbrains WSL support
+
+The Node interpreter under **Languages & Frameworks** > **Node.js** needs to be configured to use the Node executable
+within the WSL distribution.
+You can read more on
+the [official Jetbrains docs](https://www.jetbrains.com/help/webstorm/how-to-use-wsl-development-environment-in-product.html#ws_wsl_node_interpreter_configure).
+
 ## True UI for Nx & Lerna
 
 Nx Console is the UI for all Nx workspaces. It works for any generator or any architect commands. Nx Console does not
@@ -80,3 +87,4 @@ Please read the [contributing guidelines](https://github.com/nrwl/nx-console/blo
 the issues from
 the [good first issue](https://github.com/nrwl/nx-console/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 list to get started.
+
