@@ -1,6 +1,5 @@
 package dev.nx.console.listeners
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.event.EditorFactoryEvent
@@ -15,8 +14,11 @@ private val log = logger<NxEditorListener>()
 class NxEditorListener : EditorFactoryListener {
 
     override fun editorReleased(event: EditorFactoryEvent) {
-        val project = event.editor.project ?: return super.editorCreated(event)
-        project.service<NxlsService>().removeDocument(event.editor)
+        val project = event.editor.project ?: return super.editorReleased(event)
+        val service = NxlsService.getInstance(project)
+        if (service.isEditorConnected(event.editor)) {
+            service.removeDocument(event.editor)
+        }
 
         super.editorReleased(event)
     }
@@ -28,7 +30,10 @@ class NxEditorListener : EditorFactoryListener {
 
         if (DocumentUtils.isNxFile(file.name)) {
             log.info("Connecting ${file.path} to lsp")
-            NxlsService.getInstance(project).addDocument(event.editor)
+            val service = NxlsService.getInstance(project)
+            if (!service.isEditorConnected(event.editor)) {
+                service.addDocument(event.editor)
+            }
         }
 
         super.editorCreated(event)

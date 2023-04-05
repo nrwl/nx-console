@@ -11,11 +11,16 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.utils.isWslInterpreter
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
+import dev.nx.console.utils.nodeInterpreter
 import java.io.File
+import java.util.regex.Matcher
+import kotlin.io.path.Path
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.jetbrains.concurrency.await
 
 private val logger = logger<NxGraphService>()
 
@@ -44,7 +49,7 @@ class NxGraphBrowser(
     fun selectAllProjects() {
         executeWhenLoaded {
             lastCommand = Command.SelectAll
-            val major = runBlocking { nxVersion.await()?.major }
+            val major = nxVersion.await()?.major
             if (major == null || major.toInt() > 14) {
                 browser.executeJavaScriptAsync("window.externalApi?.selectAllProjects()")
             } else if (major.toInt() == 14) {
@@ -60,7 +65,7 @@ class NxGraphBrowser(
     fun focusProject(projectName: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusProject(projectName)
-            val major = runBlocking { nxVersion.await()?.major }
+            val major = nxVersion.await()?.major
             if (major == null || major.toInt() > 14) {
                 browser.executeJavaScriptAsync("window.externalApi?.focusProject('$projectName')")
             } else if (major.toInt() == 14) {
@@ -69,6 +74,31 @@ class NxGraphBrowser(
                 )
             } else {
                 loadOldVersionHtml()
+            }
+        }
+    }
+
+    fun focusTaskGroup(taskGroupName: String) {
+        executeWhenLoaded {
+            lastCommand = Command.FocusTaskGroup(taskGroupName)
+            browser.executeJavaScriptAsync(
+                "window.externalApi?.router?.navigate('tasks/$taskGroupName/all')"
+            )
+        }
+    }
+
+    fun focusTask(nxProject: String, nxTarget: String) {
+        executeWhenLoaded {
+            lastCommand = Command.FocusTask(nxProject, nxTarget)
+            CoroutineScope(Dispatchers.Default).launch {
+                browser
+                    .executeJavaScriptAsync(
+                        "window.externalApi?.router?.navigate('tasks/$nxTarget')"
+                    )
+                    .await()
+                browser.executeJavaScriptAsync(
+                    "document.querySelector('label[data-project=\"$nxProject\"]')?.click()"
+                )
             }
         }
     }
@@ -87,47 +117,68 @@ class NxGraphBrowser(
 
     private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
-        val originalGraphHtml = File(graphOutput.fullPath).readText(Charsets.UTF_8)
-        val transformedGraphHtml =
-            originalGraphHtml.let {
-                it.replace(
-                    Regex("</head>"),
-                    """
-                <style>
-                  #sidebar {
-                    display: none;
-                  }
 
-                  div[data-cy="no-projects-selected"] {
-                    display: none;
-                  }
-
-                  #no-projects-chosen {
-                    display: none;
-                  }
-
-                  [data-cy="no-tasks-selected"] {
-                    display: none;
-                  }
-
-                  body {
-                    background-color: $backgroundColor !important;
-                  }
-                  .nx-select-project {
-                    padding: 12px;
-                  }
-                </style>
-                </head>
-                """
-                )
+        val fullPath =
+            project.nodeInterpreter.let {
+                if (isWslInterpreter(it)) {
+                    it.distribution.getWindowsPath(graphOutput.fullPath)
+                } else graphOutput.fullPath
             }
-        browser.loadHTML(transformedGraphHtml, "file://${graphOutput.fullPath}")
+
+        val basePath = "${Path(fullPath).parent}/"
+
+        val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
+        val transformedGraphHtml =
+            originalGraphHtml.replace(
+                Regex("<head>"),
+                """
+          <head>
+          <base href="${Matcher.quoteReplacement(basePath)}">
+          <style>
+            #sidebar {
+              display: none;
+            }
+
+            div[data-cy="no-projects-selected"] {
+              display: none;
+            }
+
+            #app > * {
+              display: none;
+            }
+            
+            #app #main-content {
+              display: block !important;
+            }
+
+            #no-projects-chosen {
+              display: none;
+            }
+
+            [data-cy="no-tasks-selected"] {
+              display: none;
+            }
+
+            body {
+              background-color: $backgroundColor !important;
+            }
+            .nx-select-project {
+              padding: 12px;
+            }
+          </style>
+          """
+            )
+
+        browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
         if (reload) {
             lastCommand?.apply {
                 when (this) {
                     is Command.SelectAll -> selectAllProjects()
                     is Command.FocusProject -> focusProject(projectName)
+                    is Command.SelectAllTasks -> selectAllProjects()
+                    is Command.FocusTaskGroup -> focusTaskGroup(taskGroupName)
+                    is Command.FocusTask -> focusTask(nxProject, nxTarget)
                 }
             }
         }
@@ -178,11 +229,11 @@ class NxGraphBrowser(
         browser.loadHTML(html)
     }
 
-    private fun executeWhenLoaded(block: () -> Unit) {
-        if (browserLoadedState.value) {
-            block()
-        } else {
-            CoroutineScope(Dispatchers.Default).launch {
+    private fun executeWhenLoaded(block: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.Default).launch {
+            if (browserLoadedState.value) {
+                block()
+            } else {
                 browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
             }
         }
@@ -195,5 +246,9 @@ class NxGraphBrowser(
     private sealed class Command {
         object SelectAll : Command() {}
         data class FocusProject(val projectName: String) : Command() {}
+
+        object SelectAllTasks : Command() {}
+        data class FocusTaskGroup(val taskGroupName: String) : Command() {}
+        data class FocusTask(val nxProject: String, val nxTarget: String) : Command() {}
     }
 }

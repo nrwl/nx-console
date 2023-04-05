@@ -74,7 +74,6 @@ export async function verifyBuilderDefinition(
       `Please update ${project}'s ${command} definition to specify a builder.`,
       'See definition'
     );
-    getTelemetry().exception('Builder part of architect definition not found');
     return {
       validBuilder: false,
       configurations,
@@ -95,7 +94,6 @@ export async function verifyBuilderDefinition(
       `Builder specified for ${project} ${command} was not found in your dependencies. Check that specified builder is correct and has a corresponding entry in package.json`,
       'Show definition'
     );
-    getTelemetry().exception('Specified builder not found in dependencies');
 
     return {
       validBuilder: false,

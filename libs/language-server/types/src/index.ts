@@ -86,6 +86,6 @@ export const NxProjectGraphOutputRequest: RequestType<
 
 export const NxCreateProjectGraphRequest: RequestType<
   undefined,
-  undefined | ResponseError,
+  string | undefined,
   unknown
 > = new RequestType('nx/createProjectGraph');

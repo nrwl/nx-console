@@ -1,6 +1,7 @@
 package dev.nx.console.run
 
 import com.intellij.openapi.actionSystem.*
+import com.intellij.util.application
 import dev.nx.console.services.NxlsService
 import kotlinx.coroutines.runBlocking
 
@@ -18,14 +19,17 @@ class NxRunActionGroup : ActionGroup() {
 
         val nxlsService = NxlsService.getInstance(project)
 
-        val nxProject =
-            runBlocking { nxlsService.generatorContextFromPath(path = path)?.project }
-                ?: return emptyArray()
+        return application.runReadAction<Array<AnAction>> {
+            val nxProject =
+                runBlocking { nxlsService.generatorContextFromPath(path = path)?.project }
+                    ?: return@runReadAction emptyArray()
 
-        val targets = runBlocking {
-            nxlsService.workspace()?.workspace?.projects?.get(nxProject)?.targets?.keys
+            val targets = runBlocking {
+                nxlsService.workspace()?.workspace?.projects?.get(nxProject)?.targets?.keys
+            }
+
+            return@runReadAction targets?.map { NxRunAction(nxProject, it) }?.toTypedArray()
+                ?: emptyArray()
         }
-
-        return targets?.map { NxRunAction(nxProject, it) }?.toTypedArray() ?: emptyArray()
     }
 }

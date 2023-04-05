@@ -45,6 +45,12 @@ export class RunTargetTreeItem extends TreeItem {
           ? []
           : ['', this.commandString],
     };
+
+    if (commandString === 'generate' || commandString === 'run') {
+      this.contextValue = 'nxCommand';
+    } else {
+      this.contextValue = 'runTarget';
+    }
   }
   iconPath;
 

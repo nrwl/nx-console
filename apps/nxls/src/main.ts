@@ -65,6 +65,10 @@ process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
 });
 
+process.on('uncaughtException', (e) => {
+  connection.console.error(formatError('Unhandled exception', e));
+});
+
 let WORKING_PATH: string | undefined = undefined;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
@@ -94,9 +98,9 @@ connection.onInitialize(async (params) => {
   try {
     WORKING_PATH =
       workspacePath ||
+      params.workspaceFolders?.[0]?.uri ||
       params.rootPath ||
-      URI.parse(params.rootUri ?? '').fsPath ||
-      params.workspaceFolders?.[0]?.uri;
+      URI.parse(params.rootUri ?? '').fsPath;
 
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
@@ -327,7 +331,11 @@ connection.onRequest(NxCreateProjectGraphRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return await createProjectGraph(WORKING_PATH);
+  try {
+    await createProjectGraph(WORKING_PATH, lspLogger);
+  } catch (e) {
+    return e;
+  }
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
@@ -396,10 +404,13 @@ async function configureSchemas(
   const { workspace } = await nxWorkspace(workingPath);
   const collections = await getExecutors(workingPath);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
-  const projectSchema = getProjectJsonSchema(collections);
+  const projectSchema = getProjectJsonSchema(
+    collections,
+    workspace.targetDefaults
+  );
   const packageSchema = getPackageJsonSchema();
 
-  const nxSchema = getNxJsonSchema(workspace.projects);
+  const nxSchema = getNxJsonSchema(collections, workspace.projects);
 
   configureJsonLanguageService(
     {

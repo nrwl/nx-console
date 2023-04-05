@@ -14,6 +14,7 @@ import { CliTaskQuickPickItem } from './cli-task-quick-pick-item';
 import { selectFlags } from './select-flags';
 import { selectGenerator } from './select-generator';
 import { selectReMoveGenerator } from './select-re-move-generator';
+import { getTelemetry } from '@nx-console/vscode/utils';
 
 let cliTaskProvider: CliTaskProvider;
 
@@ -31,6 +32,7 @@ export async function registerCliTaskCommands(
       configuration?: string,
       askForFlags?: boolean
     ) => {
+      getTelemetry().featureUsed('nx.run', { target });
       selectCliCommandAndPromptForFlags(
         'run',
         project,
@@ -43,6 +45,7 @@ export async function registerCliTaskCommands(
   commands.registerCommand(
     `nx.run.fileexplorer`,
     async (uri: Uri | undefined) => {
+      getTelemetry().featureUsed('nx.run.fileexplorer');
       if (!uri) {
         uri = window.activeTextEditor?.document.uri;
       }
@@ -61,6 +64,7 @@ export async function registerCliTaskCommands(
   const version = await getNxVersion();
   if (version.major >= 8) {
     commands.registerCommand(`nx.move`, async (uri: Uri) => {
+      getTelemetry().featureUsed('nx.move');
       const generator = await selectReMoveGenerator(uri?.toString(), 'move');
       if (!generator) {
         return;
@@ -74,6 +78,7 @@ export async function registerCliTaskCommands(
     });
 
     commands.registerCommand(`nx.remove`, async (uri: Uri) => {
+      getTelemetry().featureUsed('nx.remove');
       const generator = await selectReMoveGenerator(uri?.toString(), 'remove');
       if (!generator) {
         return;
@@ -87,31 +92,39 @@ export async function registerCliTaskCommands(
     });
   }
 
-  commands.registerCommand(`nx.generate`, () =>
-    selectGeneratorAndPromptForFlags()
-  );
+  commands.registerCommand(`nx.generate`, () => {
+    getTelemetry().featureUsed('nx.generate');
+    selectGeneratorAndPromptForFlags();
+  });
 
-  commands.registerCommand(`nx.generate.ui`, () =>
+  commands.registerCommand(`nx.generate.ui`, () => {
+    getTelemetry().featureUsed('nx.generate.ui');
     showGenerateUi(context.extensionPath)
-  );
+  });
 
-  commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) =>
+  commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) => {
+    getTelemetry().featureUsed('nx.generate.fileexplorer');
     showGenerateUi(context.extensionPath, uri)
-  );
+  });
 
   commands.registerCommand(`nx.generate.ui.app`, (uri: Uri) => {
+    getTelemetry().featureUsed('nx.generate.ui.app');
     showGenerateUi(context.extensionPath, uri, GeneratorType.Application);
   });
   commands.registerCommand(`nx.generate.ui.lib`, (uri: Uri) => {
+    getTelemetry().featureUsed('nx.generate.ui.lib');
     showGenerateUi(context.extensionPath, uri, GeneratorType.Library);
   });
   commands.registerCommand(`nx.generate.ui.app.fileexplorer`, (uri: Uri) => {
+    getTelemetry().featureUsed('nx.generate.ui.app.fileexplorer');
     showGenerateUi(context.extensionPath, uri, GeneratorType.Application);
   });
   commands.registerCommand(`nx.generate.ui.lib.fileexplorer`, (uri: Uri) => {
+    getTelemetry().featureUsed('nx.generate.ui.lib.fileexplorer');
     showGenerateUi(context.extensionPath, uri, GeneratorType.Library);
   });
   commands.registerCommand(`nx.run.target`, async () => {
+    getTelemetry().featureUsed('nx.run.target');
     const target = await window.showQuickPick(getTargetNames());
     if (!target) {
       return;

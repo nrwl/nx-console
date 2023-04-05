@@ -74,7 +74,11 @@ export class GraphWebView implements Disposable {
     graphService.send('GET_CONTENT');
   }
 
-  projectInWebview(projectName: string | undefined, type: MessageType) {
+  projectInWebview(
+    projectName: string | undefined,
+    taskName: string | undefined,
+    type: MessageType
+  ) {
     getOutputChannel().appendLine(`Graph - Opening graph for ${projectName}`);
     if (!this.panel) {
       this._webview();
@@ -91,6 +95,7 @@ export class GraphWebView implements Disposable {
       data: {
         type,
         projectName,
+        taskName,
       },
     });
   }
@@ -107,6 +112,24 @@ export class GraphWebView implements Disposable {
     graphService.send('PROJECT_SELECTED', {
       data: {
         type: MessageType.all,
+        projectName: '',
+      },
+    });
+  }
+
+  showAllTasks(taskName: string) {
+    getOutputChannel().appendLine(`Graph - Opening full graph`);
+
+    if (!this.panel) {
+      this._webview();
+    }
+
+    this.panel?.reveal();
+
+    graphService.send('PROJECT_SELECTED', {
+      data: {
+        type: MessageType.allTasks,
+        taskName,
         projectName: '',
       },
     });

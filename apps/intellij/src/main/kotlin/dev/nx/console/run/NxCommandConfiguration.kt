@@ -42,7 +42,15 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
     }
 
     override fun suggestedName(): String {
-        return "${nxRunSettings.nxProjects}[${nxRunSettings.nxTargets}]"
+        if (nxRunSettings.nxProjects.isEmpty() || nxRunSettings.nxTargets.isEmpty()) {
+            return ""
+        }
+
+        if (',' in nxRunSettings.nxTargets) {
+            return "${nxRunSettings.nxProjects} --targets=${nxRunSettings.nxTargets}"
+        }
+
+        return "${nxRunSettings.nxProjects}:${nxRunSettings.nxTargets}"
     }
 }
 

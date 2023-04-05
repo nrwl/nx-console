@@ -21,11 +21,12 @@
         "<node_internals>/**",
         "/Applications/Visual Studio Code.app/**"
       ],
+      "type": "extensionHost",
+      "enableTurboSourcemaps": true,
       "resolveSourceMapLocations": [
         "${workspaceFolder}/**",
         "!**/node_modules/**"
-      ],
-      "type": "extensionHost"
+      ]
     },
     {
       "type": "node",

@@ -1,35 +1,23 @@
 import { TelemetryType } from './record';
 import { Sink } from './sink';
-import { LoggerSink, GoogleAnalyticsSink, ApplicationPlatform } from './sinks';
-import { User, UserState } from './user';
+import { LoggerSink, GoogleAnalyticsSink } from './sinks';
 import { TelemetryMessageBuilder } from './message-builder';
-import { Store } from '@nx-console/shared/schema';
 
 export class Telemetry implements TelemetryMessageBuilder {
   readonly sinks: Sink[] = [];
-  state: UserState;
 
-  static withGoogleAnalytics(
-    store: Store,
-    platform: ApplicationPlatform
-  ): Telemetry {
-    const user = User.fromStorage(store);
-    const instance = new Telemetry(user);
-    const sink = new GoogleAnalyticsSink(user, platform);
+  static withGoogleAnalytics(production: boolean): Telemetry {
+    const instance = new Telemetry();
+    const sink = new GoogleAnalyticsSink(production);
     instance.addSink(sink);
     return instance;
   }
 
-  static withLogger(store: Store): Telemetry {
-    const user = User.fromStorage(store);
-    const instance = new Telemetry(user);
+  static withLogger(): Telemetry {
+    const instance = new Telemetry();
     const sink = new LoggerSink();
     instance.addSink(sink);
     return instance;
-  }
-
-  constructor(private readonly user: User) {
-    this.state = user.state;
   }
 
   addSink(sink: Sink) {
@@ -48,41 +36,7 @@ export class Telemetry implements TelemetryMessageBuilder {
     this.record('ExtensionDeactivated');
   }
 
-  startedTracking(): void {
-    this.user.tracked();
-    this.userStateChanged();
-    this.record('StartedTracking');
-  }
-
-  stoppedTracking(): void {
-    // Record event before disabling data collection.
-    // Otherwise we won't get the opt-out event.
-    this.record('StoppedTracking');
-
-    this.user.untracked();
-    this.userStateChanged();
-  }
-
-  userStateChanged() {
-    if (this.state !== this.user.state) {
-      this.state = this.user.state;
-      this.record('UserStateChanged', { state: this.user.state });
-    }
-  }
-
-  screenViewed(screen: string): void {
-    this.record('ScreenViewed', { screen });
-  }
-
-  commandRun(commandType: string, time: number): void {
-    this.record('CommandRun', { commandType, time });
-  }
-
-  exception(error: string): void {
-    this.record('ExceptionOccurred', { error });
-  }
-
-  featureUsed(feature: string): void {
-    this.record('FeatureUsed', { feature });
+  featureUsed(feature: string, details: object = {}): void {
+    this.record('FeatureUsed', { feature, details });
   }
 }

@@ -1,14 +1,10 @@
-import { Sink } from '../sink';
-import { TelemetryType } from '../record';
-import { User } from '../user';
+import { platform } from 'os';
+import { xhr, XHRResponse } from 'request-light';
+import { env, extensions } from 'vscode';
+import { getOutputChannel } from '../../output-channel';
 import { TelemetryMessageBuilder } from '../message-builder';
-import type { Visitor } from 'universal-analytics';
-
-// increment this if there is substancial changes to the schema,
-// and you want to create a new view that only has this data
-const ANALYTICS_VERSION = 2;
-const TRACKING_ID = 'UA-88380372-8';
-export type ApplicationPlatform = 'vscode';
+import { TelemetryType } from '../record';
+import { Sink } from '../sink';
 
 class TelemetryParams {
   constructor(readonly type: string, readonly data: any) {}
@@ -28,62 +24,28 @@ class TelemetryParams {
 }
 
 export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  visitor: Visitor = require('universal-analytics')(TRACKING_ID, {
-    uid: this.user.id,
-  });
+  MEASUREMENT_ID = 'G-TNJ97NGX40';
+  API_TOKEN = '3J_QsvygSLKfjxMXFSG03Q';
 
-  get enabled() {
-    return this.user.state !== 'untracked';
-  }
-
-  constructor(readonly user: User, readonly platform: ApplicationPlatform) {
-    this.setPersistentParams();
-  }
-
-  setPersistentParams() {
-    this.visitor.set('uid', this.user.id);
-    this.visitor.set('ds', 'app');
-    this.visitor.set('cd1', this.user.state);
-    this.visitor.set('cd2', this.platform);
-    this.visitor.set('cd3', ANALYTICS_VERSION);
+  private _version: string;
+  constructor(private production: boolean) {
+    this._version =
+      extensions.getExtension('nrwl.angular-console')?.packageJSON?.version ??
+      '0.0.0';
   }
 
   record(type: TelemetryType, data: any): void {
-    if (!this.enabled) return;
     const params = new TelemetryParams(type, data);
 
     switch (type) {
-      case 'UserStateChanged':
-        this.user.state = params.fetch('state');
-        this.setPersistentParams();
-        break;
       case 'ExtensionActivated':
         this.extensionActivated(params.fetch('time'));
         break;
       case 'ExtensionDeactivated':
         this.extensionDeactivated();
         break;
-      case 'StartedTracking':
-        this.startedTracking();
-        break;
-      case 'StoppedTracking':
-        this.stoppedTracking();
-        break;
-      case 'ScreenViewed':
-        this.screenViewed(params.fetch('screen'));
-        break;
-      case 'CommandRun':
-        this.commandRun(params.fetch('commandType'), params.fetch('time'));
-        break;
-      case 'ExceptionOccurred':
-        this.exception(params.fetch('error'));
-        break;
       case 'FeatureUsed':
-        this.featureUsed(params.fetch('feature'));
-        break;
-      case 'WorkspaceType':
-        this.workspaceType(params.fetch('workspaceType'));
+        this.featureUsed(params.fetch('feature'), params.fetch('details'));
         break;
       default:
         throw new Error(`Unknown Telemetry type: ${type}`);
@@ -91,89 +53,88 @@ export class GoogleAnalyticsSink implements Sink, TelemetryMessageBuilder {
   }
 
   extensionActivated(time: number): void {
-    this.visitor
-      .event({
-        ec: 'Application',
-        ea: 'Activated',
+    this._post(
+      this._buildPayload({
+        name: 'activated',
+        params: {
+          ...this._eventParams(),
+          timing: time,
+        },
       })
-      .timing({
-        utc: 'Application',
-        utv: 'Activation Time',
-        utt: time,
-      })
-      .send();
+    );
   }
 
   extensionDeactivated(): void {
-    this.visitor
-      .event({
-        ec: 'Application',
-        ea: 'Deactivated',
+    this._post(
+      this._buildPayload({
+        name: 'deactivated',
+        params: {
+          ...this._eventParams(),
+        },
       })
-      .send();
+    );
   }
 
-  startedTracking(): void {
-    this.visitor
-      .event({
-        ec: 'Data Collection',
-        ea: 'Opt In',
+  featureUsed(feature: string, details: object): void {
+    this._post(
+      this._buildPayload({
+        name: 'action_triggered',
+        params: {
+          ...this._eventParams(),
+          action_type: feature,
+          ...details,
+        },
       })
-      .send();
+    );
   }
 
-  stoppedTracking(): void {
-    this.visitor
-      .event({
-        ec: 'Data Collection',
-        ea: 'Opt Out',
-      })
-      .send();
+  private _eventParams() {
+    return {
+      engagement_time_msec: '1',
+      session_id: env.sessionId,
+      debug_mode: !this.production,
+    };
   }
 
-  screenViewed(screen: string): void {
-    this.visitor
-      .screenview({
-        an: 'Nx Console',
-        cd: screen,
-      })
-      .send();
+  private _buildPayload(event: object) {
+    return {
+      client_id: env.machineId,
+      user_id: env.machineId,
+      timestamp_micros: Date.now() * 1000,
+      non_personalized_ads: true,
+      user_properties: {
+        editor: { value: 'vscode' },
+        os: { value: platform() },
+        appversion: { value: this._version },
+      },
+      events: [event],
+    };
   }
 
-  commandRun(commandType: string, time: number): void {
-    this.visitor
-      .timing({
-        utc: 'Command',
-        utv: commandType,
-        utt: time,
-      })
-      .send();
-  }
+  private _post(body: object) {
+    if (!env.isTelemetryEnabled) {
+      return;
+    }
 
-  exception(error: string) {
-    this.visitor
-      .exception({
-        exd: error,
-      })
-      .send();
-  }
+    const base = this.production
+      ? 'https://www.google-analytics.com/mp'
+      : 'https://www.google-analytics.com/debug/mp';
 
-  featureUsed(feature: string) {
-    this.visitor
-      .event({
-        ec: 'Feature',
-        ea: feature,
+    const url = `${base}/collect?api_secret=${this.API_TOKEN}&measurement_id=${this.MEASUREMENT_ID}`;
+    xhr({
+      url,
+      data: JSON.stringify(body),
+      type: 'POST',
+    })
+      .then((response) => {
+        if (response.responseText.length > 0) {
+          getOutputChannel().append(response.responseText);
+        }
       })
-      .send();
-  }
-
-  workspaceType(workspaceType: string) {
-    this.visitor
-      .event({
-        ec: 'WorkspaceType',
-        ea: workspaceType,
-        ev: 1,
-      })
-      .send();
+      .catch((reason: XHRResponse) => {
+        getOutputChannel().append(
+          `unable to send telemetry: ${reason.responseText}`
+        );
+      });
   }
 }

@@ -1,14 +1,16 @@
-package dev.nx.console.graph
+package dev.nx.console.graph.actions
 
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.project.DumbAwareAction
+import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
+import dev.nx.console.telemetry.TelemetryService
 import kotlinx.coroutines.runBlocking
 
-class NxGraphFocusProjectAction : AnAction("Nx Graph: Focus project") {
+class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     override fun update(e: AnActionEvent) {
         val nxTreeNode = e.getData(NxTreeNodeKey) ?: return
         if (nxTreeNode !is NxSimpleNode.Project) {
@@ -17,6 +19,8 @@ class NxGraphFocusProjectAction : AnAction("Nx Graph: Focus project") {
     }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+
+        TelemetryService.getInstance(project).featureUsed("Nx Graph Select Project")
 
         val nxProjectName =
             e.getData(NxTreeNodeKey)
@@ -37,7 +41,7 @@ class NxGraphFocusProjectAction : AnAction("Nx Graph: Focus project") {
                 ?: return
 
         val graphService = NxGraphService.getInstance(project)
-        graphService.showProjectGraphInEditor()
+        graphService.showNxGraphInEditor()
         graphService.focusProject(nxProjectName)
     }
 }
