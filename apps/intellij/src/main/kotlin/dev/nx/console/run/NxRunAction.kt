@@ -1,7 +1,6 @@
 package dev.nx.console.run
 
 import com.intellij.execution.ProgramRunnerUtil
-import com.intellij.execution.RunManager
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -24,9 +23,8 @@ class NxRunAction(private val nxProject: String, private val nxTarget: String) :
             NxCommandConfiguration(project, NxRunConfigurationProducer().configurationFactory)
         runConfig.nxRunSettings = NxRunSettings().copy(nxProjects = nxProject, nxTargets = nxTarget)
 
-        ProgramRunnerUtil.executeConfiguration(
-            RunManager.getInstance(project).getConfigurationSettingsList(runConfig.type).first(),
-            DefaultRunExecutor.getRunExecutorInstance()
-        )
+        val runner = getOrCreateRunnerConfigurationSettings(project, nxProject, nxTarget)
+
+        ProgramRunnerUtil.executeConfiguration(runner, DefaultRunExecutor.getRunExecutorInstance())
     }
 }
