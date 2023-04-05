@@ -2,7 +2,6 @@ package dev.nx.console.run
 
 import com.intellij.execution.Executor
 import com.intellij.execution.RunManager
-import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
 import com.intellij.ide.actions.runAnything.RunAnythingUtil
@@ -48,30 +47,12 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
         val task = args.firstOrNull() ?: return false
         val nxProject = task.substringBefore(":")
         val nxTarget = task.substringAfter(":")
-        val runnerAndConfigurationSettings: RunnerAndConfigurationSettings =
-            runManager
-                .getConfigurationSettingsList(NxCommandConfigurationType.getInstance())
-                .firstOrNull {
-                    val nxCommandConfiguration = it.configuration as NxCommandConfiguration
-                    val nxRunSettings = nxCommandConfiguration.nxRunSettings
-                    nxRunSettings.nxTargets == nxTarget && nxRunSettings.nxProjects == nxProject
-                }
-                ?: runManager
-                    .createConfiguration(
-                        "$nxProject:$nxTarget",
-                        NxCommandConfigurationType::class.java
-                    )
-                    .apply {
-                        (configuration as NxCommandConfiguration).apply {
-                            nxRunSettings =
-                                NxRunSettings(
-                                    nxProjects = nxProject,
-                                    nxTargets = nxTarget,
-                                    arguments = args.drop(1).joinToString(" "),
-                                )
-                        }
-                    }
-                    .also { runManager.addConfiguration(it) }
+
+        val runnerAndConfigurationSettings =
+            getOrCreateRunnerConfigurationSettings(project, nxProject, nxTarget, args).also {
+                runManager.addConfiguration(it)
+            }
+
         runManager.selectedConfiguration = runnerAndConfigurationSettings
         val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
         ExecutionUtil.runConfiguration(runnerAndConfigurationSettings, executor)
