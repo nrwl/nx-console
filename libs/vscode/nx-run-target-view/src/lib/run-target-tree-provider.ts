@@ -1,8 +1,9 @@
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { commands, ExtensionContext, TreeItem } from 'vscode';
-import { commandList, RunTargetTreeItem } from './run-target-tree-item';
+import { RunTargetTreeItem } from './run-target-tree-item';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Nx Workspace...'
@@ -61,10 +62,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
   }
 
   async getChildren() {
-    const workspacePath = WorkspaceConfigurationStore.instance.get(
-      'nxWorkspacePath',
-      ''
-    );
+    const workspacePath = (await getNxWorkspace()).workspacePath;
 
     if (!workspacePath) {
       if (this.scanning) {
@@ -87,4 +85,21 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
   private refreshRunTargetTree = async () => {
     this.refresh();
   };
+}
+
+const commandList = async (): Promise<string[]> => {
+  const defaultCommands = ['generate', 'run'];
+  const workspaceSpecificTargetNames = await getTargetNames();
+  return [...defaultCommands, ...workspaceSpecificTargetNames];
+};
+
+async function getTargetNames(): Promise<string[]> {
+  const { workspace } = await getNxWorkspace();
+  const commands = Object.values(workspace.projects).reduce((acc, project) => {
+    for (const target of Object.keys(project.targets ?? {})) {
+      acc.add(target);
+    }
+    return acc;
+  }, new Set<string>());
+  return Array.from(commands);
 }

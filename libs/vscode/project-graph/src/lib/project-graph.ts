@@ -83,7 +83,7 @@ export function projectGraph() {
             );
           }
         } else if (item instanceof RunTargetTreeItem) {
-          const target = item.route;
+          const target = item.commandString;
           graphWebView.showAllTasks(target);
         } else
           graphWebView.projectInWebview(item[0], item[1], MessageType.task);
