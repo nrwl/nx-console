@@ -52,6 +52,11 @@ export class RunTargetTreeItem extends TreeItem {
   ) {
     super(route, TreeItemCollapsibleState.None);
     this.iconPath = RunTargetTreeItem.getIconUriForRoute(this.extensionPath);
+    if (route === 'generate' || route === 'run') {
+      this.contextValue = 'nxCommand';
+    } else {
+      this.contextValue = 'runTarget';
+    }
   }
 
   static getIconUriForRoute(
