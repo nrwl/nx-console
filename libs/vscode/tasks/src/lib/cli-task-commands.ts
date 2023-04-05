@@ -99,12 +99,12 @@ export async function registerCliTaskCommands(
 
   commands.registerCommand(`nx.generate.ui`, () => {
     getTelemetry().featureUsed('nx.generate.ui');
-    showGenerateUi(context.extensionPath)
+    showGenerateUi(context.extensionPath);
   });
 
   commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) => {
     getTelemetry().featureUsed('nx.generate.fileexplorer');
-    showGenerateUi(context.extensionPath, uri)
+    showGenerateUi(context.extensionPath, uri);
   });
 
   commands.registerCommand(`nx.generate.ui.app`, (uri: Uri) => {
