@@ -1,3 +1,11 @@
+## [18.0.2](https://github.com/nrwl/nx-console/compare/vscode-v18.0.1...vscode-v18.0.2) (2023-04-06)
+
+
+### Bug Fixes
+
+* **vscode:** add graph directory to local resource roots ([#1664](https://github.com/nrwl/nx-console/issues/1664)) ([85f713e](https://github.com/nrwl/nx-console/commit/85f713eb1a36b7e8f9ae346a52a8cf6122fa1015))
+* **vscode:** use extension mode to determine production ([a74744e](https://github.com/nrwl/nx-console/commit/a74744e70dbc15078e235cf4db4d8cd5a7af8ad4))
+
 ## [18.0.1](https://github.com/nrwl/nx-console/compare/vscode-v18.0.0...vscode-v18.0.1) (2023-04-06)
 
 
