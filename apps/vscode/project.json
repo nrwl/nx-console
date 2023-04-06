@@ -191,7 +191,7 @@
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
-        "packageJsonDir": "apps/vscode/src",
+        "packageJsonDir": "apps/vscode",
         "commitMessage": "chore(release-${PROJECT_NAME}): ${nextRelease.version}"
       }
     }
