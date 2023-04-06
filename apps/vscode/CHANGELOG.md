@@ -1,3 +1,34 @@
+# [18.0.0](https://github.com/nrwl/nx-console/compare/vscode-v17.32.0...vscode-v18.0.0) (2023-04-06)
+
+
+### Bug Fixes
+
+* **generate-ui:** ensure checkboxes have correctly centered checkmarks ([#1604](https://github.com/nrwl/nx-console/issues/1604)) ([5e4180e](https://github.com/nrwl/nx-console/commit/5e4180e1091391587506263da18b11fdabd23b7b))
+* handle nxls startup errors ([#1649](https://github.com/nrwl/nx-console/issues/1649)) ([da9ed6e](https://github.com/nrwl/nx-console/commit/da9ed6e175908c603eb97024f0b5c4a33fe1f0a2))
+* **nxls:** debounce @parcel/watcher to avoid race conditions ([#1620](https://github.com/nrwl/nx-console/issues/1620)) ([96f91fa](https://github.com/nrwl/nx-console/commit/96f91faf36ee2b4965e944a7b60333fb38cc175b))
+* **nxls:** distinguish projects that are substrings of one another ([#1610](https://github.com/nrwl/nx-console/issues/1610)) ([a404c00](https://github.com/nrwl/nx-console/commit/a404c000ccd6597f3b1a1d6266ea4d8aa73aee48))
+* **nxls:** do not output exec to stdio ([#1644](https://github.com/nrwl/nx-console/issues/1644) ([f0f112c](https://github.com/nrwl/nx-console/commit/f0f112c5a5b04fbf659d36655fe17cd02b5c462c))
+* **nxls:** handle daemon better ([#1615](https://github.com/nrwl/nx-console/issues/1615)) ([0216d0c](https://github.com/nrwl/nx-console/commit/0216d0cf12c962765a060dee793bcf368eedc87f))
+* **nxls:** temporarily disable daemon ([0570f53](https://github.com/nrwl/nx-console/commit/0570f53f698fc138fb854b575841fba289992266))
+* **nxls:** use `workspaceFolders` before `rootUri` for better Windows path compatibility ([#1639](https://github.com/nrwl/nx-console/issues/1639)) ([2a5a07e](https://github.com/nrwl/nx-console/commit/2a5a07e07c989e49dc79d915ab17521177859781))
+* **vscode:** clarify angular cli deprecation message ([#1627](https://github.com/nrwl/nx-console/issues/1627)) ([078e4b5](https://github.com/nrwl/nx-console/commit/078e4b5f55a3b490d17353a5d556dcc31d97580f))
+* **vscode:** handle angular with nx case correctly ([#1628](https://github.com/nrwl/nx-console/issues/1628)) ([5499cb2](https://github.com/nrwl/nx-console/commit/5499cb25b35e0e3bca54b5940be1a17db08b8e65))
+
+
+### Features
+
+* **nxls:** provide generator aliases via nxls ([#1598](https://github.com/nrwl/nx-console/issues/1598)) ([63f44ce](https://github.com/nrwl/nx-console/commit/63f44ce925613ea132808e81ac775e8a36d0f8a1))
+* **nxls:** support executors in and from targetDefaults ([#1621](https://github.com/nrwl/nx-console/issues/1621)) ([1d0c263](https://github.com/nrwl/nx-console/commit/1d0c263da44a2613a36f6a3aa64d0a3d8ff5e9ee))
+* remove angular cli compatibility ([#1575](https://github.com/nrwl/nx-console/issues/1575)) ([702e205](https://github.com/nrwl/nx-console/commit/702e205d5629059ad5fb5ca7c5d102d0cca0c4ce))
+* **vscode:** add task graph support ([#1656](https://github.com/nrwl/nx-console/issues/1656)) ([66e50fe](https://github.com/nrwl/nx-console/commit/66e50fe89dd129909f898e628ef7807adda3562e))
+* **vscode:** breaking change ([c160b5c](https://github.com/nrwl/nx-console/commit/c160b5cf0d6a1833126695ef71cf76420dc42548))
+* **vscode:** move analytics to measurement protocol ([#1625](https://github.com/nrwl/nx-console/issues/1625)) ([fd0f64f](https://github.com/nrwl/nx-console/commit/fd0f64fb0dde190683192c9555adb1a55ac3caba))
+
+
+### BREAKING CHANGES
+
+* **vscode:** we removed angular-cli support
+
 # Breaking Change
 # [17.32.0](https://github.com/nrwl/nx-console/compare/vscode-v17.31.0...vscode-v17.32.0) (2023-03-02)
 

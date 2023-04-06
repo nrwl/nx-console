@@ -2,7 +2,7 @@
   "name": "angular-console",
   "displayName": "Nx Console",
   "description": "The UI for Nx & Lerna",
-  "version": "17.32.0",
+  "version": "18.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nrwl/nx-console.git"
