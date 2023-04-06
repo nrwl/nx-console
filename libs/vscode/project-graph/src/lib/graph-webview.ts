@@ -1,5 +1,13 @@
+import { getProjectGraphOutput } from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode/utils';
-import { commands, Disposable, ViewColumn, WebviewPanel, window } from 'vscode';
+import {
+  commands,
+  Disposable,
+  Uri,
+  ViewColumn,
+  WebviewPanel,
+  window,
+} from 'vscode';
 import { waitFor } from 'xstate/lib/waitFor';
 import { MessageType } from './graph-message-type';
 import { graphService } from './graph.machine';
@@ -44,16 +52,22 @@ export class GraphWebView implements Disposable {
     graphService.stop();
   }
 
-  private _webview() {
+  private async _webview() {
     if (this.panel) {
       return;
     }
+
+    const { directory } = await getProjectGraphOutput();
 
     this.panel = window.createWebviewPanel(
       'graph',
       'Nx Graph',
       { viewColumn: ViewColumn.Active, preserveFocus: false },
-      { enableScripts: true, retainContextWhenHidden: true }
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [Uri.file(directory)],
+      }
     );
 
     this.panel.onDidDispose(() => {
@@ -74,14 +88,14 @@ export class GraphWebView implements Disposable {
     graphService.send('GET_CONTENT');
   }
 
-  projectInWebview(
+  async projectInWebview(
     projectName: string | undefined,
     taskName: string | undefined,
     type: MessageType
   ) {
     getOutputChannel().appendLine(`Graph - Opening graph for ${projectName}`);
     if (!this.panel) {
-      this._webview();
+      await this._webview();
     }
 
     if (!projectName) {
@@ -100,11 +114,11 @@ export class GraphWebView implements Disposable {
     });
   }
 
-  showAllProjects() {
+  async showAllProjects() {
     getOutputChannel().appendLine(`Graph - Opening full graph`);
 
     if (!this.panel) {
-      this._webview();
+      await this._webview();
     }
 
     this.panel?.reveal();
@@ -117,11 +131,11 @@ export class GraphWebView implements Disposable {
     });
   }
 
-  showAllTasks(taskName: string) {
+  async showAllTasks(taskName: string) {
     getOutputChannel().appendLine(`Graph - Opening full graph`);
 
     if (!this.panel) {
-      this._webview();
+      await this._webview();
     }
 
     this.panel?.reveal();
