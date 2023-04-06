@@ -3,6 +3,7 @@ import { dirname, join, parse } from 'path';
 import {
   commands,
   ExtensionContext,
+  ExtensionMode,
   FileSystemWatcher,
   RelativePattern,
   tasks,
@@ -89,7 +90,7 @@ export async function activate(c: ExtensionContext) {
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
 
-    initTelemetry(environment.production);
+    initTelemetry(context.extensionMode === ExtensionMode.Production);
 
     runTargetTreeView = window.createTreeView('nxRunTarget', {
       treeDataProvider: currentRunTargetTreeProvider,
