@@ -76,6 +76,8 @@
                     anchor="right"
                     factoryClass="dev.nx.console.nx_toolwindow.NxToolWindowFactory"
                     icon="dev.nx.console.NxIcons.Action"/>
+
+        <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
     </extensions>
 
     <applicationListeners>

@@ -16,16 +16,6 @@ import { selectGenerator } from './select-generator';
 import { selectReMoveGenerator } from './select-re-move-generator';
 import { getTelemetry } from '@nx-console/vscode/utils';
 
-const CLI_COMMAND_LIST = [
-  'build',
-  'deploy',
-  'e2e',
-  'lint',
-  'serve',
-  'test',
-  'xi18n',
-];
-
 let cliTaskProvider: CliTaskProvider;
 
 export async function registerCliTaskCommands(
@@ -33,19 +23,6 @@ export async function registerCliTaskCommands(
   n: CliTaskProvider
 ) {
   cliTaskProvider = n;
-
-  CLI_COMMAND_LIST.forEach((command) => {
-    context.subscriptions.push(
-      commands.registerCommand(`nx.${command}`, () => {
-        getTelemetry().featureUsed(`builtin - nx.${command} `);
-        selectCliCommandAndPromptForFlags(command);
-      }),
-      commands.registerCommand(`nx.${command}.ui`, () => {
-        getTelemetry().featureUsed(`builtin - nx.${command}.ui `);
-        selectCliCommandAndShowUi(command, context.extensionPath);
-      })
-    );
-  });
 
   commands.registerCommand(
     `nx.run`,
@@ -92,8 +69,7 @@ export async function registerCliTaskCommands(
       if (!generator) {
         return;
       }
-      selectCliCommandAndShowUi(
-        'generate',
+      showGenerateUi(
         context.extensionPath,
         uri,
         GeneratorType.Other,
@@ -107,8 +83,7 @@ export async function registerCliTaskCommands(
       if (!generator) {
         return;
       }
-      selectCliCommandAndShowUi(
-        'generate',
+      showGenerateUi(
         context.extensionPath,
         uri,
         GeneratorType.Other,
@@ -124,49 +99,29 @@ export async function registerCliTaskCommands(
 
   commands.registerCommand(`nx.generate.ui`, () => {
     getTelemetry().featureUsed('nx.generate.ui');
-    selectCliCommandAndShowUi('generate', context.extensionPath);
+    showGenerateUi(context.extensionPath);
   });
 
   commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) => {
     getTelemetry().featureUsed('nx.generate.fileexplorer');
-    selectCliCommandAndShowUi('generate', context.extensionPath, uri);
+    showGenerateUi(context.extensionPath, uri);
   });
 
   commands.registerCommand(`nx.generate.ui.app`, (uri: Uri) => {
     getTelemetry().featureUsed('nx.generate.ui.app');
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Application
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Application);
   });
   commands.registerCommand(`nx.generate.ui.lib`, (uri: Uri) => {
     getTelemetry().featureUsed('nx.generate.ui.lib');
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Library
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Library);
   });
   commands.registerCommand(`nx.generate.ui.app.fileexplorer`, (uri: Uri) => {
     getTelemetry().featureUsed('nx.generate.ui.app.fileexplorer');
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Application
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Application);
   });
   commands.registerCommand(`nx.generate.ui.lib.fileexplorer`, (uri: Uri) => {
     getTelemetry().featureUsed('nx.generate.ui.lib.fileexplorer');
-    selectCliCommandAndShowUi(
-      'generate',
-      context.extensionPath,
-      uri,
-      GeneratorType.Library
-    );
+    showGenerateUi(context.extensionPath, uri, GeneratorType.Library);
   });
   commands.registerCommand(`nx.run.target`, async () => {
     getTelemetry().featureUsed('nx.run.target');
@@ -184,27 +139,25 @@ export async function registerCliTaskCommands(
   });
 }
 
-async function selectCliCommandAndShowUi(
-  command: string,
+async function showGenerateUi(
   extensionPath: string,
   uri?: Uri,
   generatorType?: GeneratorType,
   generator?: string
 ) {
-  const workspacePath = cliTaskProvider.getWorkspacePath();
+  const { workspacePath, validWorkspaceJson } = await getNxWorkspace();
   if (!workspacePath) {
     window.showErrorMessage(
       'Nx Console requires a workspace be set to perform this action'
     );
     return;
   }
-  const { validWorkspaceJson } = await getNxWorkspace();
   if (!validWorkspaceJson) {
     window.showErrorMessage('Invalid configuration file');
     return;
   }
   const workspaceTreeItem = new RunTargetTreeItem(
-    command,
+    'generate',
     extensionPath,
     generatorType,
     generator

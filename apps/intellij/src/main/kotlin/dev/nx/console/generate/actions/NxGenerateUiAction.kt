@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.util.application
 import dev.nx.console.generate.NxGenerateService
 import dev.nx.console.telemetry.TelemetryService
 import kotlinx.coroutines.runBlocking
@@ -27,9 +28,11 @@ class NxGenerateUiAction : AnAction() {
                 null
             }
 
-        runBlocking {
-            generateService.selectGenerator(e) {
-                it?.let { generateService.openGenerateUi(project, it, path) }
+        application.runReadAction {
+            runBlocking {
+                generateService.selectGenerator(e) {
+                    it?.let { generateService.openGenerateUi(project, it, path) }
+                }
             }
         }
     }

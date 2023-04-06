@@ -154,6 +154,16 @@
           "group": "inline@1"
         },
         {
+          "command": "nx.graph.task.button",
+          "when": "view == nxProjects && viewItem == target && isNxWorkspace",
+          "group": "inline@1"
+        },
+        {
+          "command": "nx.graph.task.button",
+          "when": "view == nxRunTarget && viewItem == runTarget && isNxWorkspace",
+          "group": "inline@1"
+        },
+        {
           "command": "nxConsole.connectToNxCloud",
           "when": "view == nxHelpAndFeedback && viewItem == connectToNxCloud && isNxWorkspace",
           "group": "inline"
@@ -237,6 +247,14 @@
           "when": "isNxWorkspace"
         },
         {
+          "command": "nx.graph.task",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.graph.task.button",
+          "when": "false"
+        },
+        {
           "command": "nx.graph.focus.button",
           "when": "false"
         },
@@ -286,30 +304,6 @@
         },
         {
           "command": "nx.migrate",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.lint.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.build.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.e2e.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.serve.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.test.ui",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.xi18n.ui",
           "when": "isNxWorkspace"
         },
         {
@@ -433,6 +427,17 @@
       },
       {
         "category": "Nx",
+        "title": "Focus task in Nx Graph",
+        "command": "nx.graph.task"
+      },
+      {
+        "category": "Nx",
+        "title": "Focus task in Nx Graph",
+        "command": "nx.graph.task.button",
+        "icon": "$(target)"
+      },
+      {
+        "category": "Nx",
         "title": "Focus in Nx Graph",
         "command": "nx.graph.focus.button",
         "icon": "$(target)"
@@ -503,36 +508,6 @@
         "category": "Nx",
         "title": "migrate",
         "command": "nx.migrate"
-      },
-      {
-        "category": "Nx",
-        "title": "lint (ui)",
-        "command": "nx.lint.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "build (ui)",
-        "command": "nx.build.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "e2e (ui)",
-        "command": "nx.e2e.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "serve (ui)",
-        "command": "nx.serve.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "test (ui)",
-        "command": "nx.test.ui"
-      },
-      {
-        "category": "Nx",
-        "title": "xi18n (ui)",
-        "command": "nx.xi18n.ui"
       },
       {
         "category": "Nx",

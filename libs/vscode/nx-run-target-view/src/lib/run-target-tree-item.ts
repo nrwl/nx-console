@@ -1,16 +1,9 @@
 import { GeneratorType } from '@nx-console/shared/schema';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { join } from 'path';
 import { TreeItem, TreeItemCollapsibleState, TreeView, Uri } from 'vscode';
 
 const LIGHT_SVG_URL = 'nx-cli-light.svg';
 const DARK_SVG_URL = 'nx-cli-dark.svg';
-
-export const commandList = async (): Promise<string[]> => {
-  const defaultCommands = ['generate', 'run'];
-  const workspaceSpecificTargetNames = await getTargetNames();
-  return [...defaultCommands, ...workspaceSpecificTargetNames];
-};
 
 export class RunTargetTreeItem extends TreeItem {
   revealWorkspaceRoute(currentWorkspace: TreeView<RunTargetTreeItem>) {
@@ -30,31 +23,38 @@ export class RunTargetTreeItem extends TreeItem {
     ); // Explicitly handle rejection
   }
 
-  command: {
-    title: string;
-    command: string;
-    tooltip: string;
-    arguments: any;
-  } = {
-    title: this.route,
-    command: 'nxConsole.revealWebViewPanel',
-    tooltip: '',
-    arguments: [this],
-  };
-
-  iconPath;
-
   constructor(
-    readonly route: string,
+    readonly commandString: string,
     readonly extensionPath: string,
     readonly generatorType?: GeneratorType,
     readonly generator?: string
   ) {
-    super(route, TreeItemCollapsibleState.None);
-    this.iconPath = RunTargetTreeItem.getIconUriForRoute(this.extensionPath);
-  }
+    super(commandString, TreeItemCollapsibleState.None);
+    this.iconPath = RunTargetTreeItem.getIconUri(this.extensionPath);
+    this.command = {
+      title: commandString,
+      command:
+        commandString === 'generate'
+          ? 'nxConsole.revealWebViewPanel'
+          : 'nx.run',
+      tooltip: '',
+      arguments:
+        commandString === 'generate'
+          ? [this]
+          : commandString === 'run'
+          ? []
+          : ['', this.commandString],
+    };
 
-  static getIconUriForRoute(
+    if (commandString === 'generate' || commandString === 'run') {
+      this.contextValue = 'nxCommand';
+    } else {
+      this.contextValue = 'runTarget';
+    }
+  }
+  iconPath;
+
+  static getIconUri(
     extensionPath: string
   ): { light: Uri; dark: Uri } | undefined {
     return {
@@ -62,15 +62,4 @@ export class RunTargetTreeItem extends TreeItem {
       dark: Uri.file(join(extensionPath, 'assets', DARK_SVG_URL)),
     };
   }
-}
-
-async function getTargetNames(): Promise<string[]> {
-  const { workspace } = await getNxWorkspace();
-  const commands = Object.values(workspace.projects).reduce((acc, project) => {
-    for (const target of Object.keys(project.targets ?? {})) {
-      acc.add(target);
-    }
-    return acc;
-  }, new Set<string>());
-  return Array.from(commands);
 }

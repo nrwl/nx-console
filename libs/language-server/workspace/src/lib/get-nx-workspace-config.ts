@@ -37,6 +37,8 @@ export async function getNxWorkspaceConfig(
     (process.env as any).CI = false;
     (process.env as any).NX_PROJECT_GLOB_CACHE = false;
     (process.env as any).NX_WORKSPACE_ROOT_PATH = workspacePath;
+    // TODO(jcammisuli): temporarily disable daemon while I investigate how to restart it after failures
+    (process.env as any).NX_DAEMON = false;
     const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
       getNxWorkspacePackageFileUtils(workspacePath, logger),
       getNxProjectGraph(workspacePath, logger),
