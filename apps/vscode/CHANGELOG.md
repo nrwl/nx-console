@@ -1,3 +1,4 @@
+# Breaking Change
 # [17.32.0](https://github.com/nrwl/nx-console/compare/vscode-v17.31.0...vscode-v17.32.0) (2023-03-02)
 
 
