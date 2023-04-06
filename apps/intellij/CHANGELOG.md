@@ -1,3 +1,12 @@
+## <small>1.3.1 (2023-04-06)</small>
+
+### Bug Fixes
+
+* **intellij:** catch throwable in measurement protocol ([f0bf915](https://github.com/nrwl/nx-console/commit/f0bf915993d18ef1e5d0a640c2a99262e8565405))
+* **intellij:** find the proper run configuration settings for nx targets ([#1661](https://github.com/nrwl/nx-console/issues/1661)) ([f30841d](https://github.com/nrwl/nx-console/commit/f30841deca39f7d3ce6d541cc5af5bf93b2013b1))
+* **intellij:** run generate ui in `application.readAction` ([662b314](https://github.com/nrwl/nx-console/commit/662b3148d18f57cd1b3aa0a0881d2c036cdff6be))
+* **nxls:** temporarily disable daemon ([e0bd16e](https://github.com/nrwl/nx-console/commit/e0bd16e1e0b2a21d695ca3b840e9aea4daa744c6))
+
 ## 1.3.0 (2023-04-04)
 
 ### Bug Fixes
