@@ -1,3 +1,10 @@
+## [18.0.1](https://github.com/nrwl/nx-console/compare/vscode-v18.0.0...vscode-v18.0.1) (2023-04-06)
+
+
+### Bug Fixes
+
+* **vscode:** use extension mode to determine production ([fe3ee51](https://github.com/nrwl/nx-console/commit/fe3ee5151e04537a1f01f8691b7ccf76575307d5))
+
 # [18.0.0](https://github.com/nrwl/nx-console/compare/vscode-v17.32.0...vscode-v18.0.0) (2023-04-06)
 
 
