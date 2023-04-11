@@ -211,27 +211,7 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.lint",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.build",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.e2e",
-          "when": "isNxWorkspace"
-        },
-        {
           "command": "nx.generate",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.serve",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.test",
           "when": "isNxWorkspace"
         },
         {
@@ -822,8 +802,7 @@
         },
         {
           "id": "nxRunTarget",
-          "name": "Generate & Run Target",
-          "when": "isNxWorkspace"
+          "name": "Generate & Run Target"
         },
         {
           "id": "nxCommands",

@@ -1,6 +1,9 @@
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { AbstractTreeProvider } from '@nx-console/vscode/utils';
+import {
+  AbstractTreeProvider,
+  getOutputChannel,
+} from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { commands, ExtensionContext, TreeItem } from 'vscode';
 import { RunTargetTreeItem } from './run-target-tree-item';
@@ -24,9 +27,6 @@ CHANGE_WORKSPACE.command = {
 export class RunTargetTreeProvider extends AbstractTreeProvider<
   RunTargetTreeItem | TreeItem
 > {
-  private scanning = Boolean(
-    WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '')
-  );
   private extensionPath: string;
 
   /**
@@ -56,20 +56,15 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
     return null;
   }
 
-  endScan() {
-    this.scanning = false;
-    this.refresh();
-  }
-
   async getChildren() {
-    const workspacePath = (await getNxWorkspace()).workspacePath;
-
-    if (!workspacePath) {
-      if (this.scanning) {
-        return [SCANNING_FOR_WORKSPACE];
-      } else {
-        return [LOCATE_YOUR_WORKSPACE];
-      }
+    let workspacePath = null;
+    try {
+      workspacePath = (await getNxWorkspace()).workspacePath;
+    } catch (e) {
+      getOutputChannel().appendLine(
+        `Unable to load workspace path: ${e.stack}`
+      );
+      return [LOCATE_YOUR_WORKSPACE];
     }
 
     CHANGE_WORKSPACE.description = 'Current: ' + workspacePath;
