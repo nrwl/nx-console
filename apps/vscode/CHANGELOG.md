@@ -1,3 +1,11 @@
+## [18.0.3](https://github.com/nrwl/nx-console/compare/vscode-v18.0.2...vscode-v18.0.3) (2023-04-11)
+
+
+### Bug Fixes
+
+* **vscode:** remove obsolete commands ([#1672](https://github.com/nrwl/nx-console/issues/1672)) ([45af4f7](https://github.com/nrwl/nx-console/commit/45af4f709209636bb35f9c3096b853d1bba14868))
+* **vscode:** show select workspace in non-workspaces ([#1671](https://github.com/nrwl/nx-console/issues/1671)) ([b201168](https://github.com/nrwl/nx-console/commit/b201168939801c03e39d600d135685b7a02053f2))
+
 ## [18.0.2](https://github.com/nrwl/nx-console/compare/vscode-v18.0.1...vscode-v18.0.2) (2023-04-06)
 
 
