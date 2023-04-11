@@ -822,8 +822,7 @@
         },
         {
           "id": "nxRunTarget",
-          "name": "Generate & Run Target",
-          "when": "isNxWorkspace"
+          "name": "Generate & Run Target"
         },
         {
           "id": "nxCommands",

@@ -88,13 +88,7 @@ export async function activate(c: ExtensionContext) {
     GlobalConfigurationStore.fromContext(context);
     WorkspaceConfigurationStore.fromContext(context);
 
-    currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
-
     initTelemetry(context.extensionMode === ExtensionMode.Production);
-
-    runTargetTreeView = window.createTreeView('nxRunTarget', {
-      treeDataProvider: currentRunTargetTreeProvider,
-    }) as TreeView<RunTargetTreeItem>;
 
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
@@ -133,6 +127,11 @@ export async function activate(c: ExtensionContext) {
 
     await enableTypeScriptPlugin(context);
     initNxCommandsView(context);
+
+    currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
+    runTargetTreeView = window.createTreeView('nxRunTarget', {
+      treeDataProvider: currentRunTargetTreeProvider,
+    }) as TreeView<RunTargetTreeItem>;
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
