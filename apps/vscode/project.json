@@ -85,7 +85,9 @@
         "esbuildOptions": {
           "mainFields": ["module", "main"],
           "sourcemap": "both",
-          "outExtension": { ".js": ".js" },
+          "outExtension": {
+            ".js": ".js"
+          },
           "loader": {
             ".node": "dataurl"
           },
@@ -134,6 +136,16 @@
             "glob": "**/*",
             "input": "apps/vscode/src/getting-started",
             "output": "/getting-started"
+          },
+          {
+            "glob": "LICENSE",
+            "input": "",
+            "output": "/"
+          },
+          {
+            "glob": "README.md",
+            "input": "apps/vscode",
+            "output": "/"
           }
         ],
         "deleteOutputPath": false,
