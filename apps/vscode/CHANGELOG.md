@@ -1,3 +1,10 @@
+## [18.0.4](https://github.com/nrwl/nx-console/compare/vscode-v18.0.3...vscode-v18.0.4) (2023-04-13)
+
+
+### Bug Fixes
+
+* **vscode:** fix readme, include license ([#1676](https://github.com/nrwl/nx-console/issues/1676)) ([ebbef65](https://github.com/nrwl/nx-console/commit/ebbef65124973527d6669f942087476775a9786c))
+
 ## [18.0.3](https://github.com/nrwl/nx-console/compare/vscode-v18.0.2...vscode-v18.0.3) (2023-04-11)
 
 
