@@ -66,6 +66,7 @@
           "webpack",
           "fsevents"
         ],
+        "target": "es2020",
         "outputFileName": "main.js",
         "format": ["cjs"],
         "thirdParty": true,
