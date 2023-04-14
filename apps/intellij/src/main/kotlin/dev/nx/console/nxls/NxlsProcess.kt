@@ -47,7 +47,11 @@ class NxlsProcess(private val project: Project) {
                             return@run
                         }
 
-                        logger.trace("Error: $this")
+                        if (project.isDisposed) {
+                            return@run
+                        }
+
+                        logger.trace("Nxls early exit: $this")
 
                         Notifier.notifyNxlsError(project)
                         onExit?.invoke()

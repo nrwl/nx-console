@@ -401,7 +401,7 @@ async function configureSchemas(
     return;
   }
 
-  const { workspace } = await nxWorkspace(workingPath);
+  const { workspace } = await nxWorkspace(workingPath, lspLogger);
   const collections = await getExecutors(workingPath);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
   const projectSchema = getProjectJsonSchema(

@@ -57,7 +57,10 @@ class NxlsWrapper(val project: Project) {
                     Pair(getInputStream(), getOutputStream())
                 }
 
-            nxlsProcess.callOnExit { status = NxlsState.STOPPED }
+            nxlsProcess.callOnExit {
+                status = NxlsState.STOPPED
+                stop()
+            }
 
             languageClient = NxlsLanguageClient()
             val executorService = Executors.newCachedThreadPool()

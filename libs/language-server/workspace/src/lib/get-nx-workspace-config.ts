@@ -13,6 +13,7 @@ import {
   getNxProjectGraph,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
+import { performance } from 'perf_hooks';
 
 let projectGraph: ProjectGraph | null = null;
 
