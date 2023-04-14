@@ -28,9 +28,9 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
         try {
             post(json.encodeToString(featureUsed))
         } catch (e: Exception) {
-            logger.error(e.printStackTrace())
+            logger.warn(e.toString())
         } catch (e: Throwable) {
-            logger.error(e.printStackTrace())
+            logger.warn(e.toString())
         }
     }
 
@@ -40,9 +40,9 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
         try {
             post(json.encodeToString(extensionActivated))
         } catch (e: Exception) {
-            logger.error(e.printStackTrace())
+            logger.warn(e.toString())
         } catch (e: Throwable) {
-            logger.error(e.printStackTrace())
+            logger.warn(e.toString())
         }
     }
 
@@ -66,9 +66,9 @@ class MeasurementProtocolService(private val client: HttpClient) : Telemetry {
                     }
                 }
         } catch (e: Exception) {
-            logger.error(e.printStackTrace())
+            logger.warn(e.toString())
         } catch (e: Throwable) {
-            logger.error(e.printStackTrace())
+            logger.warn(e.toString())
         }
     }
 }
