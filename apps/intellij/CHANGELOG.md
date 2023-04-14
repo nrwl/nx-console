@@ -1,3 +1,10 @@
+## <small>1.3.2 (2023-04-14)</small>
+
+### Bug Fixes
+
+* **intellij:** use warn instead of error for caught exceptions ([#1680](https://github.com/nrwl/nx-console/issues/1680)) ([54a93b7](https://github.com/nrwl/nx-console/commit/54a93b7f7d08053f04878f0df508cbd32d3ccfad))
+* **nxls:** support running under node 14 ([#1679](https://github.com/nrwl/nx-console/issues/1679)) ([f081bdb](https://github.com/nrwl/nx-console/commit/f081bdb6efb11e46faabba8d81d7d4c0e1230ad7))
+
 ## <small>1.3.1 (2023-04-06)</small>
 
 ### Bug Fixes
