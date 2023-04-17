@@ -4,6 +4,8 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import dev.nx.console.models.NxGeneratorOption
+import dev.nx.console.models.NxGeneratorOptionDeserializer
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.managers.getFilePath
@@ -65,41 +67,50 @@ class NxlsWrapper(val project: Project) {
             languageClient = NxlsLanguageClient()
             val executorService = Executors.newCachedThreadPool()
 
-            Launcher.createLauncher(
+            Launcher.createIoLauncher(
                     languageClient,
                     NxlsLanguageServer::class.java,
                     input,
                     output,
-                    executorService
-                ) { consume ->
-                    MessageConsumer { message ->
-                        try {
-                            val response = message as? ResponseMessage
-                            response?.let {
-                                it.error?.let { log.trace("Error from nxls: ${it.message}") }
-                                it.result?.let { log.trace("Result from nxls: ${it}") }
-                            }
-
-                            val request = message as? RequestMessage
-                            request?.let {
-                                log.trace("Sending request to nxls: ${it.method} (${it.params})")
-                            }
-
-                            nxlsProcess.isAlive()?.run {
-                                if (this) {
-                                    consume.consume(message)
-                                } else {
-                                    log.info(
-                                        "Unable to send messages to the nxls, the process has exited"
-                                    )
-                                    status = NxlsState.STOPPED
+                    executorService,
+                    fun(consume: MessageConsumer): MessageConsumer {
+                        return MessageConsumer { message ->
+                            try {
+                                val response = message as? ResponseMessage
+                                response?.let {
+                                    it.error?.let { log.trace("Error from nxls: ${it.message}") }
+                                    it.result?.let { log.trace("Result from nxls: ${it}") }
                                 }
+
+                                val request = message as? RequestMessage
+                                request?.let {
+                                    log.trace(
+                                        "Sending request to nxls: ${it.method} (${it.params})"
+                                    )
+                                }
+
+                                nxlsProcess.isAlive()?.run {
+                                    if (this) {
+                                        consume.consume(message)
+                                    } else {
+                                        log.info(
+                                            "Unable to send messages to the nxls, the process has exited"
+                                        )
+                                        status = NxlsState.STOPPED
+                                    }
+                                }
+                            } catch (e: Throwable) {
+                                thisLogger().error(e)
                             }
-                        } catch (e: Throwable) {
-                            thisLogger().error(e)
                         }
+                    },
+                    fun(gson) {
+                        gson.registerTypeAdapter(
+                            NxGeneratorOption::class.java,
+                            NxGeneratorOptionDeserializer()
+                        )
                     }
-                }
+                )
                 .also {
                     languageServer = it.remoteProxy
                     it.startListening()

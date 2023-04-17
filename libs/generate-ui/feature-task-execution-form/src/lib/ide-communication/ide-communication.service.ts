@@ -82,7 +82,7 @@ export class IdeCommunicationService {
   private setupIntellijCommunication() {
     window.intellijApi?.registerPostToWebviewCallback(
       (message: TaskExecutionInputMessage) => {
-        if (message.type === 'style') {
+        if (message.payloadType === 'style') {
           const styleSheet = new CSSStyleSheet();
           styleSheet.replaceSync(`
           :root {
@@ -124,7 +124,7 @@ export class IdeCommunicationService {
         (option.items as string[]).length === 0
       ) && option['x-priority'] !== 'internal';
 
-    switch (message.type) {
+    switch (message.payloadType) {
       case TaskExecutionInputMessageType.SetTaskExecutionSchema: {
         const schema = message.payload;
         this.taskExecutionSchemaSubject.next({

@@ -39,19 +39,19 @@ export enum TaskExecutionInputMessageType {
 }
 
 export class TaskExecutionSchemaInputMessage {
-  readonly type = TaskExecutionInputMessageType.SetTaskExecutionSchema;
+  readonly payloadType = TaskExecutionInputMessageType.SetTaskExecutionSchema;
 
   constructor(public readonly payload: TaskExecutionSchema) {}
 }
 
 export class TaskExecutionGlobalConfigurationInputMessage {
-  readonly type = TaskExecutionInputMessageType.SetGlobalConfiguration;
+  readonly payloadType = TaskExecutionInputMessageType.SetGlobalConfiguration;
 
   constructor(public readonly payload: GlobalConfigurationData) {}
 }
 
 export class TaskExecutionSetStylesMessage {
-  readonly type = TaskExecutionInputMessageType.SetStyles;
+  readonly payloadType = TaskExecutionInputMessageType.SetStyles;
 
   constructor(
     public readonly payload: {
