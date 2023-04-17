@@ -57,11 +57,8 @@ class NxGraphService(val project: Project) {
             }
 
         if (nxGraphEditor != null) {
-            fileEditorManager.closeFile(nxGraphEditor.file)
-            // opening the file instead of reloading is instant and more performant but leads to a
-            // shifted graph sometimes
-            // fileEditorManager.openEditor(OpenFileDescriptor(project, nxGraphEditor.file), true)
-            // return
+            fileEditorManager.openFile(nxGraphEditor.file, true)
+            return
         }
 
         val nxVersion = scope.async { nxlsService.workspace()?.nxVersion }
