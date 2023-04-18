@@ -22,6 +22,11 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.cef.CefApp
 
+val json = Json {
+    classDiscriminator = "payloadType"
+    ignoreUnknownKeys = true
+}
+
 class NxGenerateUiFileType : FileType {
     override fun getName(): String = "NxGenerateUi"
     override fun getDescription(): String = ""
@@ -119,8 +124,7 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
 
     private fun handleMessageFromBrowser(message: String) {
         val logger = logger<DefaultNxGenerateUiFile>()
-        val messageParsed =
-            Json { ignoreUnknownKeys = true }.decodeFromString<TaskExecutionOutputMessage>(message)
+        val messageParsed = json.decodeFromString<TaskExecutionOutputMessage>(message)
         logger.info("received message $messageParsed")
         if (messageParsed.type == "output-init") {
             this.generatorToDisplay?.let { this.postMessageToBrowser(GeneratorSchemaMessage(it)) }
@@ -137,7 +141,7 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
     }
 
     private fun postMessageToBrowser(message: TaskExecutionInputMessage) {
-        val messageString = Json.encodeToString(message)
+        val messageString = json.encodeToString(message)
         logger<NxGenerateUiFile>().info("posting message $messageString")
         browser.executeJavaScriptAsync("""window.intellijApi.postToWebview($messageString)""")
     }
