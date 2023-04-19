@@ -53,12 +53,12 @@ data class StyleMessage(override val payload: StylePayload) : TaskExecutionInput
 
 @Serializable
 sealed interface TaskExecutionOutputMessage {
-    val type: String
+    val payloadType: String
 }
 
-@Serializable
+@Serializable()
 @SerialName("output-init")
-data class TaskExecutionFormInitOutputMessage(override val type: String) :
+data class TaskExecutionFormInitOutputMessage(override val payloadType: String) :
     TaskExecutionOutputMessage {}
 
 @Serializable()
@@ -67,6 +67,6 @@ data class TaskExecutionRunCommandPayload(val positional: String, val flags: Lis
 @Serializable()
 @SerialName("run-command")
 data class TaskExecutionRunCommandOutputMessage(
-    override val type: String,
+    override val payloadType: String,
     val payload: TaskExecutionRunCommandPayload
 ) : TaskExecutionOutputMessage {}

@@ -15,15 +15,13 @@ export enum TaskExecutionOutputMessageType {
 }
 
 export class TaskExecutionRunCommandOutputMessage {
-  readonly type = TaskExecutionOutputMessageType.RunCommand;
+  readonly payloadType = TaskExecutionOutputMessageType.RunCommand;
 
   constructor(public readonly payload: TaskExecutionMessage) {}
 }
 
 export class TaskExecutionFormInitOutputMessage {
-  readonly type = TaskExecutionOutputMessageType.TaskExecutionFormInit;
-
-  readonly payload = null;
+  readonly payloadType = TaskExecutionOutputMessageType.TaskExecutionFormInit;
 }
 
 // Task execution input messages

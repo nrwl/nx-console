@@ -116,7 +116,7 @@ export function createWebViewPanel(
 
     webviewPanel.webview.onDidReceiveMessage(
       (message: TaskExecutionOutputMessage) => {
-        switch (message.type) {
+        switch (message.payloadType) {
           case TaskExecutionOutputMessageType.RunCommand: {
             cliTaskProvider.executeTask(message.payload);
             break;
