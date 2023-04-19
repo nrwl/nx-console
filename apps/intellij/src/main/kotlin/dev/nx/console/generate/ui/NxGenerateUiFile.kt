@@ -126,11 +126,11 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
         val logger = logger<DefaultNxGenerateUiFile>()
         val messageParsed = json.decodeFromString<TaskExecutionOutputMessage>(message)
         logger.info("received message $messageParsed")
-        if (messageParsed.type == "output-init") {
+        if (messageParsed.payloadType == "output-init") {
             this.generatorToDisplay?.let { this.postMessageToBrowser(GeneratorSchemaMessage(it)) }
             return
         }
-        if (messageParsed.type == "run-command") {
+        if (messageParsed.payloadType == "run-command") {
             if (messageParsed is TaskExecutionRunCommandOutputMessage) {
                 runGeneratorManager.queueGeneratorToBeRun(
                     messageParsed.payload.positional,
