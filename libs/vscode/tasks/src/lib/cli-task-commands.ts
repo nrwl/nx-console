@@ -186,8 +186,12 @@ async function selectCliCommandAndPromptForFlags(
   const { validWorkspaceJson, workspace } = await getNxWorkspace();
 
   if (!projectName) {
+    let taskToRun = command;
+    if (command === 'run' && target !== undefined) {
+      taskToRun = target;
+    }
     const selection = validWorkspaceJson
-      ? await selectCliProject(command, workspace)
+      ? await selectCliProject(taskToRun, workspace)
       : undefined;
     if (!selection) {
       return; // Do not execute a command if user clicks out of VSCode UI.
