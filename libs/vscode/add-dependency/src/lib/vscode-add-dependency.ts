@@ -150,7 +150,7 @@ function addDependency(
     TaskScope.Workspace,
     command,
     pkgManager,
-    new ShellExecution(command)
+    new ShellExecution(command, { cwd: workspacePath })
   );
   tasks.executeTask(task);
 }
