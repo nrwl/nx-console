@@ -362,33 +362,8 @@
       },
       {
         "category": "Nx",
-        "title": "lint",
-        "command": "nx.lint"
-      },
-      {
-        "category": "Nx",
-        "title": "build",
-        "command": "nx.build"
-      },
-      {
-        "category": "Nx",
-        "title": "e2e",
-        "command": "nx.e2e"
-      },
-      {
-        "category": "Nx",
         "title": "generate",
         "command": "nx.generate"
-      },
-      {
-        "category": "Nx",
-        "title": "serve",
-        "command": "nx.serve"
-      },
-      {
-        "category": "Nx",
-        "title": "test",
-        "command": "nx.test"
       },
       {
         "category": "Nx",
