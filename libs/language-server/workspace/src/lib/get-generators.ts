@@ -86,15 +86,15 @@ async function readWorkspaceGeneratorsCollection(
     return await Promise.all(
       listFiles(collectionDir)
         .filter((f) => basename(f) === 'schema.json')
-        .map(async (f) => {
-          const schemaJson = await readAndCacheJsonFile(f, '');
+        .map(async (schemaJsonPath) => {
+          const schemaJson = await readAndCacheJsonFile(schemaJsonPath, '');
           const name = schemaJson.json.id || schemaJson.json.$id;
           const type: GeneratorType =
             schemaJson.json['x-type'] ?? GeneratorType.Other;
           return {
             name: collectionName,
             type: 'generator',
-            path: collectionDir,
+            path: schemaJsonPath,
             data: {
               name,
               collection: collectionName,
