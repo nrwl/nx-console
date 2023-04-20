@@ -538,13 +538,19 @@ export class TaskExecutionFormComponent implements OnInit {
     fields.forEach((f) => {
       if (defaultValues[f.name] === value[f.name]) return;
       if (!defaultValues[f.name] && !value[f.name]) return;
+      // it's possible that default values is an array and value is a string so we need to make two checks here
       if (
         Array.isArray(defaultValues[f.name]) &&
+        Array.isArray(value[f.name]) &&
         (defaultValues[f.name] as string[]).join(',') ===
           value[f.name].join(',')
       )
         return;
-
+      if (
+        Array.isArray(defaultValues[f.name]) &&
+        (defaultValues[f.name] as string[]).join(',') === value[f.name]
+      )
+        return;
       if (f.positional !== undefined && typeof f.positional === 'number') {
         // Only add positional arguments for the first positional. Then add the rest of the positions as explicit flags
         if (f.positional === 0) {
