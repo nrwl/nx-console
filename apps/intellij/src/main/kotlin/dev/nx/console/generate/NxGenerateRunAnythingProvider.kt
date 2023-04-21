@@ -133,8 +133,18 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
                 (generator.data.fullNamesWithAliases + generator.name).map { it to opts }
             )
         }
+        // options can be specified both with a space or = as a delimiter
+        val specifiedOptions =
+            commandLine.completedParameters
+                .map {
+                    when ("=" in it) {
+                        true -> it.substringBefore("=")
+                        false -> it
+                    }
+                }
+                .toSet()
         return generatorOptions[generator.name]?.let { options ->
-            options.map { "--${it.name}" }.filterNot { it in commandLine }.asSequence()
+            options.map { "--${it.name}" }.filterNot { it in specifiedOptions }.asSequence()
         }
             ?: emptySequence()
     }
@@ -143,7 +153,6 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
         commandLine: CommandLine,
         generators: List<NxGenerator>
     ): NxGenerator? {
-        val params = commandLine.completedParameters
         return generators.find {
             commandLine.completedParameters.contains(it.name) || commandLine.containsAlias(it)
         }
