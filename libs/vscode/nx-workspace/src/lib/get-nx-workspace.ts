@@ -31,7 +31,7 @@ export async function getNxCloudRunnerOptions(): Promise<
   }
   const nxCloudTaskRunner = Object.values(
     workspaceConfig.tasksRunnerOptions
-  ).find((r) => r.runner == '@nrwl/nx-cloud');
+  ).find((r) => r.runner == '@nrwl/nx-cloud' || r.runner == 'nx-cloud');
 
   if (!nxCloudTaskRunner) {
     return undefined;
