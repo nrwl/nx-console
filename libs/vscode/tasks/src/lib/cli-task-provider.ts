@@ -1,11 +1,5 @@
-import {
-  WorkspaceProjects,
-  WORKSPACE_GENERATOR_NAME_REGEX,
-} from '@nx-console/shared/schema';
-import { NxProjectsConfiguration } from '@nx-console/shared/types';
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared/schema';
+import { getNxWorkspacePath } from '@nx-console/vscode/nx-workspace';
 import {
   ProviderResult,
   Task,
@@ -31,25 +25,13 @@ export class CliTaskProvider implements TaskProvider {
     });
   }
 
-  getWorkspacePath() {
-    return WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
-  }
-
-  /**
-   *
-   * @deprecated
-   */
-  getWorkspaceJsonPath() {
-    return WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
-  }
-
   provideTasks(): ProviderResult<Task[]> {
     return null;
   }
 
   async resolveTask(task: Task): Promise<Task | undefined> {
     if (
-      this.getWorkspacePath() &&
+      (await getNxWorkspacePath()) &&
       task.definition.command &&
       task.definition.project
     ) {
@@ -100,28 +82,5 @@ export class CliTaskProvider implements TaskProvider {
         this.currentDryRun = execution;
       }
     });
-  }
-
-  async getProjects(
-    json?: NxProjectsConfiguration
-  ): Promise<WorkspaceProjects> {
-    if (json) {
-      return json.projects;
-    } else {
-      const result = await getNxWorkspace();
-      if (!result.validWorkspaceJson || !result.workspace) {
-        return {};
-      } else {
-        return result.workspace.projects;
-      }
-    }
-  }
-
-  async getProjectNames(): Promise<string[]> {
-    return Object.keys((await this.getProjects()) || {});
-  }
-
-  async getProjectEntries(json?: NxProjectsConfiguration) {
-    return Object.entries((await this.getProjects(json)) || {});
   }
 }

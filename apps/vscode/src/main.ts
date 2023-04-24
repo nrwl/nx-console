@@ -224,7 +224,7 @@ async function setWorkspace(workspacePath: string) {
 
   if (!cliTaskProvider && !(isAngularWorkspace && !isNxWorkspace)) {
     cliTaskProvider = new CliTaskProvider();
-    registerNxCommands(context, cliTaskProvider);
+    registerNxCommands(context);
     tasks.registerTaskProvider('nx', cliTaskProvider);
     registerCliTaskCommands(context, cliTaskProvider);
 

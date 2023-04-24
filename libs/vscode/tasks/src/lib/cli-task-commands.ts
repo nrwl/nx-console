@@ -191,7 +191,7 @@ async function selectCliCommandAndPromptForFlags(
       taskToRun = target;
     }
     const selection = validWorkspaceJson
-      ? await selectCliProject(taskToRun, workspace)
+      ? await selectCliProject(taskToRun)
       : undefined;
     if (!selection) {
       return; // Do not execute a command if user clicks out of VSCode UI.
@@ -302,11 +302,8 @@ export async function getCliProjectFromUri(
   return project?.name;
 }
 
-export async function selectCliProject(
-  command: string,
-  json: NxProjectsConfiguration
-) {
-  const projectEntries = await cliTaskProvider.getProjectEntries(json);
+export async function selectCliProject(command: string) {
+  const projectEntries = Object.entries((await getNxWorkspace()) || {});
   const items = projectEntries
     .filter(([, { targets }]) => Boolean(targets))
     .flatMap(([project, { targets, root }]) => ({ project, targets, root }))

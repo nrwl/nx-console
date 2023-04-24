@@ -20,6 +20,11 @@ export async function getNxWorkspaceProjects(reset?: boolean): Promise<{
   return projects;
 }
 
+export async function getNxWorkspacePath(): Promise<string> {
+  const { workspacePath } = await getNxWorkspace();
+  return workspacePath;
+}
+
 export async function getNxCloudRunnerOptions(): Promise<
   { accessToken: string; url?: string } | undefined
 > {
