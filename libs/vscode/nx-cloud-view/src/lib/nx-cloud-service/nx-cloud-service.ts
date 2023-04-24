@@ -130,6 +130,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
     isUsingPrivateCloud:
       state.cloudRunnerUrl !== undefined &&
       state.cloudRunnerUrl !== 'http://staging.nx.app' &&
+      state.cloudRunnerUrl !== 'https://staging.nx.app' &&
       state.cloudRunnerUrl !== 'https://cloud.nx.app',
     isUsingCloudRunnerLoading: state.isUsingCloudRunner === undefined,
     isAuthenticated: state.authAccessToken !== undefined,
