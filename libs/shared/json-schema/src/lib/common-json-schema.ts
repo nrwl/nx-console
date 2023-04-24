@@ -79,7 +79,6 @@ export const targets = (
   executors?: JSONSchema[]
 ): JSONSchema => {
   let projects: JSONSchema = {};
-  debugger;
   if (nxVersion.major < 16) {
     projects = {
       type: 'string',

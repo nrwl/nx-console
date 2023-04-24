@@ -31,8 +31,6 @@ export async function getCompletionItems(
   if (!workingPath) {
     return [];
   }
-  debugger;
-
   const offset = document.offsetAt(position);
   const node = jsonAst.getNodeFromOffset(offset);
   if (!node) {
