@@ -10,6 +10,7 @@ import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
 import { SemVer } from 'semver';
 import {
+  getNxOutput,
   getNxProjectGraph,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
@@ -38,11 +39,10 @@ export async function getNxWorkspaceConfig(
     (process.env as any).CI = false;
     (process.env as any).NX_PROJECT_GLOB_CACHE = false;
     (process.env as any).NX_WORKSPACE_ROOT_PATH = workspacePath;
-    // TODO(jcammisuli): temporarily disable daemon while I investigate how to restart it after failures
-    (process.env as any).NX_DAEMON = false;
-    const [nxWorkspacePackage, nxProjectGraph] = await Promise.all([
+    const [nxWorkspacePackage, nxProjectGraph, nxOutput] = await Promise.all([
       getNxWorkspacePackageFileUtils(workspacePath, logger),
       getNxProjectGraph(workspacePath, logger),
+      getNxOutput(workspacePath, logger),
     ]);
 
     let workspaceConfiguration: NxWorkspaceConfiguration;
@@ -61,6 +61,12 @@ export async function getNxWorkspaceConfig(
       process.exit = function (code?: number) {
         console.warn('process.exit called with code', code);
       } as (code?: number) => never;
+
+      if (nxOutput !== undefined) {
+        nxOutput.output.error = (output) => {
+          // do nothing
+        };
+      }
 
       if (nxVersion.major < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
