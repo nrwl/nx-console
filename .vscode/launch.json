@@ -36,9 +36,11 @@
       "timeout": 30000,
       "restart": true,
       "sourceMaps": true,
+      "enableTurboSourcemaps": true,
       "skipFiles": [
         "<node_internals>/**",
-        "/Applications/Visual Studio Code.app/**"
+        "/Applications/Visual Studio Code.app/**",
+        "${workspaceFolder}/dist/apps/intellij/**"
       ]
       // "outFiles": ["${workspaceFolder}/dist/vscode/lsp/**/*.js"]
     },

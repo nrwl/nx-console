@@ -1,5 +1,6 @@
 import { JSONSchema } from 'vscode-json-languageservice';
 import { CompletionType } from './completion-type';
+import { NxVersion } from '@nx-console/shared/types';
 
 export const implicitDependencies: JSONSchema = {
   type: 'array',
@@ -73,7 +74,35 @@ export const tags: JSONSchema = {
   },
 };
 
-export const targets = (executors?: JSONSchema[]): JSONSchema => {
+export const targets = (
+  nxVersion: NxVersion,
+  executors?: JSONSchema[]
+): JSONSchema => {
+  let projects: JSONSchema = {};
+  debugger;
+  if (nxVersion.major < 16) {
+    projects = {
+      type: 'string',
+      enum: ['self', 'dependencies'],
+    };
+  } else {
+    projects = {
+      oneOf: [
+        {
+          type: 'string',
+          'x-completion-type': CompletionType.projectWithDeps,
+        },
+        {
+          type: 'array',
+          items: {
+            type: 'string',
+            'x-completion-type': CompletionType.projectWithDeps,
+          },
+        },
+      ],
+    };
+  }
+
   const schema: JSONSchema = {
     additionalProperties: {
       type: 'object',
@@ -94,10 +123,7 @@ export const targets = (executors?: JSONSchema[]): JSONSchema => {
               {
                 type: 'object',
                 properties: {
-                  projects: {
-                    type: 'string',
-                    enum: ['self', 'dependencies'],
-                  },
+                  projects,
                   target: {
                     type: 'string',
                     'x-completion-type': CompletionType.targets,

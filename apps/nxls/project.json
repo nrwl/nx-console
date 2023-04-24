@@ -22,7 +22,6 @@
         "generatePackageJson": false,
         "esbuildOptions": {
           "mainFields": ["module", "main"],
-          "sourcemap": true,
           "outExtension": {
             ".js": ".js"
           }

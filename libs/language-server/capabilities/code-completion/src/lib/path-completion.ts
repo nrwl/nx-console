@@ -67,12 +67,12 @@ export async function pathCompletion(
 
     if (file.path.startsWith(workingPath)) {
       const label = file.path.replace(workingPath + '/', '');
-      items.push(
-        createCompletionItem(label, file.path, node, document, completionKind)
-      );
-
       if (supportsInterpolation) {
         const label = '{workspaceRoot}' + file.path.replace(workingPath, '');
+        items.push(
+          createCompletionItem(label, file.path, node, document, completionKind)
+        );
+      } else {
         items.push(
           createCompletionItem(label, file.path, node, document, completionKind)
         );

@@ -1,3 +1,4 @@
+import { NxVersion } from '@nx-console/shared/types';
 import {
   implicitDependencies,
   namedInputs,
@@ -6,12 +7,12 @@ import {
 } from './common-json-schema';
 import { EnhancedJsonSchema } from './completion-type';
 
-export function getPackageJsonSchema() {
-  const contents = createJsonSchema();
+export function getPackageJsonSchema(nxVersion: NxVersion) {
+  const contents = createJsonSchema(nxVersion);
   return contents;
 }
 
-function createJsonSchema(): EnhancedJsonSchema {
+function createJsonSchema(nxVersion: NxVersion): EnhancedJsonSchema {
   return {
     type: 'object',
     properties: {
@@ -24,7 +25,7 @@ function createJsonSchema(): EnhancedJsonSchema {
           namedInputs,
           tags,
           implicitDependencies,
-          targets: targets(),
+          targets: targets(nxVersion),
         },
       },
     },

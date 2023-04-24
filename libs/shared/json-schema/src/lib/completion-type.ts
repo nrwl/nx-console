@@ -7,12 +7,17 @@ export const X_COMPLETION_GLOB = 'x-completion-glob' as const;
 export enum CompletionType {
   file = 'file',
   directory = 'directory',
+  // support for projectName:build auto complete
   projectTarget = 'projectTarget',
+  // support for {self}, {dependencies}, and project names
+  projectWithDeps = 'projectWithDeps',
   projects = 'projects',
   targets = 'targets',
+  // support for target with ^ (^build, build, etc)
   targetsWithDeps = 'targetsWithDeps',
   tags = 'tags',
   inputName = 'inputName',
+  // support for input names with ^ (^production, production, etc)
   inputNameWithDeps = 'inputNameWithDeps',
 }
 
