@@ -30,7 +30,6 @@ let webviewPanel: WebviewPanel | undefined;
 interface RevealWebViewPanelConfig {
   context: ExtensionContext;
   runTargetTreeItem: RunTargetTreeItem;
-  cliTaskProvider: CliTaskProvider;
   runTargetTreeView: TreeView<RunTargetTreeItem>;
   contextMenuUri?: Uri;
   generator?: string;
@@ -38,7 +37,6 @@ interface RevealWebViewPanelConfig {
 
 export async function revealWebViewPanel({
   context,
-  cliTaskProvider,
   runTargetTreeItem,
   runTargetTreeView,
   contextMenuUri,
@@ -58,8 +56,7 @@ export async function revealWebViewPanel({
   const webViewPanel = createWebViewPanel(
     context,
     schema,
-    (label as string) ?? '',
-    cliTaskProvider
+    (label as string) ?? ''
   );
   context.subscriptions.push(webViewPanel);
 
@@ -75,8 +72,7 @@ export async function revealWebViewPanel({
 export function createWebViewPanel(
   context: ExtensionContext,
   schema: TaskExecutionSchema,
-  title: string,
-  cliTaskProvider: CliTaskProvider
+  title: string
 ) {
   const webviewPanelExists = !!webviewPanel;
   if (!webviewPanel) {
@@ -118,7 +114,7 @@ export function createWebViewPanel(
       (message: TaskExecutionOutputMessage) => {
         switch (message.payloadType) {
           case TaskExecutionOutputMessageType.RunCommand: {
-            cliTaskProvider.executeTask(message.payload);
+            CliTaskProvider.instance.executeTask(message.payload);
             break;
           }
           case TaskExecutionOutputMessageType.TaskExecutionFormInit: {

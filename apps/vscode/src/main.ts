@@ -74,7 +74,6 @@ let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
 let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
-let cliTaskProvider: CliTaskProvider;
 let context: ExtensionContext;
 let workspaceFileWatcher: FileSystemWatcher | undefined;
 
@@ -96,7 +95,6 @@ export async function activate(c: ExtensionContext) {
         revealWebViewPanel({
           runTargetTreeItem,
           context,
-          cliTaskProvider,
           runTargetTreeView,
           contextMenuUri,
           generator: runTargetTreeItem.generator,
@@ -222,17 +220,16 @@ async function setWorkspace(workspacePath: string) {
   isNxWorkspace = await checkIsNxWorkspace(workspacePath);
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
-  if (!cliTaskProvider && !(isAngularWorkspace && !isNxWorkspace)) {
-    cliTaskProvider = new CliTaskProvider();
+  if (!(isAngularWorkspace && !isNxWorkspace)) {
     registerNxCommands(context);
-    tasks.registerTaskProvider('nx', cliTaskProvider);
-    registerCliTaskCommands(context, cliTaskProvider);
+    tasks.registerTaskProvider('nx', CliTaskProvider.instance);
+    registerCliTaskCommands(context);
 
     registerVscodeAddDependency(context);
 
     initNxCloudOnboardingView(context, environment.production);
 
-    nxProjectsTreeProvider = initNxProjectView(context, cliTaskProvider);
+    nxProjectsTreeProvider = initNxProjectView(context);
 
     nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
       treeDataProvider: new NxHelpAndFeedbackProvider(context),

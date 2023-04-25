@@ -15,6 +15,14 @@ export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
   private deferredDryRun?: CliTaskDefinition;
 
+  private static _instance: CliTaskProvider;
+  static get instance(): CliTaskProvider {
+    if (!this._instance) {
+      this._instance = new CliTaskProvider();
+    }
+    return this._instance;
+  }
+
   constructor() {
     tasks.onDidEndTaskProcess(() => {
       this.currentDryRun = undefined;
