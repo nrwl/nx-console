@@ -104,6 +104,11 @@ describe('getCompletionItems', () => {
 
     const items = await getCompletionItems(
       '/workspace',
+      {
+        major: 15,
+        minor: 0,
+        full: '15.0.0',
+      },
       jsonAst,
       document,
       matchingSchemas,
