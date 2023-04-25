@@ -105,7 +105,10 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
         nxProject: NxProject,
         parent: SimpleNode
     ) : NxSimpleNode(nxProject, parent) {
-        override val id: String = "target_${nxProject.name}_$nxTarget"
+        val nxProjectName = nxProject.name
+
+        override val id: String = "target_${nxProjectName}_$nxTarget"
+
         init {
             icon = AllIcons.General.Gear
             presentation.tooltip = "Target"
