@@ -89,7 +89,6 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
                 .map {
                     Target(
                         name = it.key,
-                        nxProjectName = it.key,
                         nxTarget = targetName,
                         nxProject = it.value,
                         parent = this
@@ -102,12 +101,11 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
 
     class Target(
         private val name: String,
-        val nxProjectName: String,
         val nxTarget: String,
         nxProject: NxProject,
         parent: SimpleNode
     ) : NxSimpleNode(nxProject, parent) {
-        override val id: String = "target_${nxProjectName}_$nxTarget"
+        override val id: String = "target_${nxProject.name}_$nxTarget"
         init {
             icon = AllIcons.General.Gear
             presentation.tooltip = "Target"
@@ -130,15 +128,7 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
             nxProject!!
                 .targets
                 .keys
-                .map {
-                    Target(
-                        name = it,
-                        nxProjectName = nxProject.name,
-                        nxProject = nxProject,
-                        nxTarget = it,
-                        parent = this
-                    )
-                }
+                .map { Target(name = it, nxProject = nxProject, nxTarget = it, parent = this) }
                 .toTypedArray()
 
         override fun getName(): String = nxProject!!.name
