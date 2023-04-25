@@ -5,7 +5,10 @@ import {
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
 } from '@nx-console/shared/json-schema';
-import { getDefaultCompletionType } from '@nx-console/language-server/utils';
+import {
+  getDefaultCompletionType,
+  isArrayNode,
+} from '@nx-console/language-server/utils';
 import {
   ASTNode,
   CompletionItem,
@@ -42,6 +45,8 @@ export async function getCompletionItems(
 
   const items = completionItems(workingPath, nxVersion, node, document);
 
+  let resolvedItems: CompletionItem[] = [];
+
   for (const { schema, node: schemaNode } of schemas) {
     // Find the schema node that matches the current node
     // If the node is found, then we will return the whole function so that we don't have to loop over the rest of the items.
@@ -49,10 +54,10 @@ export async function getCompletionItems(
       if (hasCompletionType(schema)) {
         const completion = schema[X_COMPLETION_TYPE];
         if (hasCompletionGlob(schema)) {
-          return items(completion, schema[X_COMPLETION_GLOB]);
+          resolvedItems = await items(completion, schema[X_COMPLETION_GLOB]);
         }
 
-        return items(completion);
+        resolvedItems = await items(completion);
       }
     }
   }
@@ -60,10 +65,23 @@ export async function getCompletionItems(
   const defaultCompletion = getDefaultCompletionType(node);
 
   if (defaultCompletion) {
-    return items(defaultCompletion.completionType, defaultCompletion.glob);
+    resolvedItems = await items(
+      defaultCompletion.completionType,
+      defaultCompletion.glob
+    );
   }
 
-  return [];
+  // remove duplicate values from the resolved completed items
+  if (isArrayNode(node.parent)) {
+    const existingItems = node.parent.children.map((i) =>
+      JSON.stringify(i.value)
+    );
+    resolvedItems = resolvedItems.filter(
+      (resolvedItem) => !existingItems.includes(resolvedItem.label)
+    );
+  }
+
+  return resolvedItems;
 }
 
 function completionItems(
