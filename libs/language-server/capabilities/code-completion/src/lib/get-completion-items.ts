@@ -55,9 +55,11 @@ export async function getCompletionItems(
         const completion = schema[X_COMPLETION_TYPE];
         if (hasCompletionGlob(schema)) {
           resolvedItems = await items(completion, schema[X_COMPLETION_GLOB]);
+          break;
         }
 
         resolvedItems = await items(completion);
+        break;
       }
     }
   }
