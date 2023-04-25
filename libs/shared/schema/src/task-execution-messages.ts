@@ -15,15 +15,13 @@ export enum TaskExecutionOutputMessageType {
 }
 
 export class TaskExecutionRunCommandOutputMessage {
-  readonly type = TaskExecutionOutputMessageType.RunCommand;
+  readonly payloadType = TaskExecutionOutputMessageType.RunCommand;
 
   constructor(public readonly payload: TaskExecutionMessage) {}
 }
 
 export class TaskExecutionFormInitOutputMessage {
-  readonly type = TaskExecutionOutputMessageType.TaskExecutionFormInit;
-
-  readonly payload = null;
+  readonly payloadType = TaskExecutionOutputMessageType.TaskExecutionFormInit;
 }
 
 // Task execution input messages
@@ -39,19 +37,19 @@ export enum TaskExecutionInputMessageType {
 }
 
 export class TaskExecutionSchemaInputMessage {
-  readonly type = TaskExecutionInputMessageType.SetTaskExecutionSchema;
+  readonly payloadType = TaskExecutionInputMessageType.SetTaskExecutionSchema;
 
   constructor(public readonly payload: TaskExecutionSchema) {}
 }
 
 export class TaskExecutionGlobalConfigurationInputMessage {
-  readonly type = TaskExecutionInputMessageType.SetGlobalConfiguration;
+  readonly payloadType = TaskExecutionInputMessageType.SetGlobalConfiguration;
 
   constructor(public readonly payload: GlobalConfigurationData) {}
 }
 
 export class TaskExecutionSetStylesMessage {
-  readonly type = TaskExecutionInputMessageType.SetStyles;
+  readonly payloadType = TaskExecutionInputMessageType.SetStyles;
 
   constructor(
     public readonly payload: {

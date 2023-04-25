@@ -21,6 +21,7 @@ import dev.nx.console.graph.actions.NxGraphFocusProjectAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
 import dev.nx.console.models.NxWorkspace
+import dev.nx.console.nx_toolwindow.actions.EditNxProjectConfigurationAction
 import dev.nx.console.run.NxCommandConfiguration
 import dev.nx.console.run.NxCommandConfigurationType
 import dev.nx.console.run.NxRunSettings
@@ -140,6 +141,7 @@ class NxProjectsTreeStructure(
                 RunAction(),
                 EditRunSettingsAction(),
                 Separator(),
+                EditNxProjectConfigurationAction(),
                 NxGraphFocusProjectAction(),
                 NxGraphFocusTaskGroupAction(),
                 NxGraphFocusTaskAction()
@@ -207,7 +209,7 @@ class NxProjectsTreeStructure(
         val userObject = tree.selectedNode as? NxSimpleNode.Target
         if (userObject != null) {
             return NxTaskSet(
-                nxProjects = listOf(userObject.nxProject),
+                nxProjects = listOf(userObject.nxProjectName),
                 nxTargets = listOf(userObject.nxTarget)
             )
         }

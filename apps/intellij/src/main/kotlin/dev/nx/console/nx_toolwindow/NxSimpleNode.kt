@@ -7,7 +7,8 @@ import dev.nx.console.NxIcons
 import dev.nx.console.models.NxProject
 import dev.nx.console.models.NxWorkspace
 
-sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
+sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
+    CachingSimpleNode(parent) {
     abstract val id: String?
     val idPath: List<String?> by lazy {
         when (parent) {
@@ -20,7 +21,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         }
     }
 
-    class Root(private val nxWorkspace: NxWorkspace?) : NxSimpleNode(null) {
+    class Root(private val nxWorkspace: NxWorkspace?) : NxSimpleNode(null, null) {
 
         override val id = null
         init {
@@ -43,7 +44,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
     }
 
     class Projects(private val nxWorkspace: NxWorkspace, parent: SimpleNode) :
-        NxSimpleNode(parent) {
+        NxSimpleNode(null, parent) {
         override val id: String = "_projects"
         init {
             icon = AllIcons.Nodes.ModuleGroup
@@ -54,7 +55,8 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         override fun getName(): String = "Projects"
     }
 
-    class Targets(private val nxWorkspace: NxWorkspace, parent: SimpleNode) : NxSimpleNode(parent) {
+    class Targets(private val nxWorkspace: NxWorkspace, parent: SimpleNode) :
+        NxSimpleNode(null, parent) {
 
         override val id: String = "_targets"
         init {
@@ -75,7 +77,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         private val nxWorkspace: NxWorkspace,
         private val targetName: String,
         parent: SimpleNode
-    ) : NxSimpleNode(parent) {
+    ) : NxSimpleNode(null, parent) {
         override val id: String = "targetGroup_${targetName}"
         init {
             icon = AllIcons.Nodes.ConfigFolder
@@ -85,7 +87,12 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
             nxWorkspace.workspace.projects
                 .filter { it.value.targets.contains(targetName) }
                 .map {
-                    Target(name = it.key, nxProject = it.key, nxTarget = targetName, parent = this)
+                    Target(
+                        name = it.key,
+                        nxTarget = targetName,
+                        nxProject = it.value,
+                        parent = this
+                    )
                 }
                 .toTypedArray()
 
@@ -94,11 +101,14 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
 
     class Target(
         private val name: String,
-        val nxProject: String,
         val nxTarget: String,
+        nxProject: NxProject,
         parent: SimpleNode
-    ) : NxSimpleNode(parent) {
-        override val id: String = "target_${nxProject}_$nxTarget"
+    ) : NxSimpleNode(nxProject, parent) {
+        val nxProjectName = nxProject.name
+
+        override val id: String = "target_${nxProjectName}_$nxTarget"
+
         init {
             icon = AllIcons.General.Gear
             presentation.tooltip = "Target"
@@ -109,7 +119,7 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         override fun getName(): String = name
     }
 
-    class Project(val nxProject: NxProject, parent: SimpleNode) : NxSimpleNode(parent) {
+    class Project(nxProject: NxProject, parent: SimpleNode) : NxSimpleNode(nxProject, parent) {
         override val id: String = "project_${nxProject.name}"
 
         init {
@@ -118,10 +128,12 @@ sealed class NxSimpleNode(parent: SimpleNode?) : CachingSimpleNode(parent) {
         }
 
         override fun buildChildren(): Array<SimpleNode> =
-            nxProject.targets.keys
-                .map { Target(name = it, nxProject = nxProject.name, nxTarget = it, parent = this) }
+            nxProject!!
+                .targets
+                .keys
+                .map { Target(name = it, nxProject = nxProject, nxTarget = it, parent = this) }
                 .toTypedArray()
 
-        override fun getName(): String = nxProject.name
+        override fun getName(): String = nxProject!!.name
     }
 }

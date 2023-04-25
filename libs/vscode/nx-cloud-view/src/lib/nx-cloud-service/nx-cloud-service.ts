@@ -130,6 +130,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
     isUsingPrivateCloud:
       state.cloudRunnerUrl !== undefined &&
       state.cloudRunnerUrl !== 'http://staging.nx.app' &&
+      state.cloudRunnerUrl !== 'https://staging.nx.app' &&
       state.cloudRunnerUrl !== 'https://cloud.nx.app',
     isUsingCloudRunnerLoading: state.isUsingCloudRunner === undefined,
     isAuthenticated: state.authAccessToken !== undefined,
@@ -468,7 +469,9 @@ export class NxCloudService extends StateBaseService<InternalState> {
   private async loadAndSetIsPrivateCloud() {
     const nxWorkspaceConfig = (await getNxWorkspace()).workspace;
     const cloudRunnerUrl =
-      nxWorkspaceConfig.tasksRunnerOptions?.default?.runner === '@nrwl/nx-cloud'
+      nxWorkspaceConfig.tasksRunnerOptions?.default?.runner ===
+        '@nrwl/nx-cloud' ||
+      nxWorkspaceConfig.tasksRunnerOptions?.default?.runner == 'nx-cloud'
         ? nxWorkspaceConfig.tasksRunnerOptions?.default?.options?.url
         : undefined;
 
@@ -668,7 +671,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
       return false;
     }
     return !!Object.values(nxConfig.tasksRunnerOptions).find(
-      (r) => r.runner == '@nrwl/nx-cloud'
+      (r) => r.runner == '@nrwl/nx-cloud' || r.runner == 'nx-cloud'
     );
   }
 

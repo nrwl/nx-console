@@ -2,6 +2,7 @@
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
 import type * as NxDaemonClient from 'nx/src/daemon/client/client';
+import type * as NxOutput from 'nx/src/utils/output';
 import { platform } from 'os';
 import { join } from 'path';
 import { findNxPackagePath } from '@nx-console/shared/npm';
@@ -15,6 +16,22 @@ export async function getNxDaemonClient(
     workspacePath,
     join('src', 'daemon', 'client', 'client.js')
   );
+  return getNxPackage(importPath, logger);
+}
+
+export async function getNxOutput(
+  workspacePath: string,
+  logger: Logger
+): Promise<typeof NxOutput | undefined> {
+  const importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'utils', 'output.js')
+  );
+
+  if (!importPath) {
+    return;
+  }
+
   return getNxPackage(importPath, logger);
 }
 

@@ -121,8 +121,8 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     }
 
     this.cliTaskProvider.executeTask({
-      command: target.name,
-      positional: project,
+      command: 'run',
+      positional: `${project}:${target.name}`,
       flags,
     });
   }
