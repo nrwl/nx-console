@@ -67,6 +67,7 @@ export async function pathCompletion(
 
     if (file.path.startsWith(workingPath)) {
       const label = file.path.replace(workingPath + '/', '');
+
       if (supportsInterpolation) {
         const label = '{workspaceRoot}' + file.path.replace(workingPath, '');
         items.push(

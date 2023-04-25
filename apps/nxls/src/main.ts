@@ -165,6 +165,10 @@ connection.onInitialize(async (params) => {
 });
 
 connection.onCompletion(async (completionParams) => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
   const changedDocument = documents.get(completionParams.textDocument.uri);
   if (!changedDocument) {
     return null;
@@ -187,8 +191,12 @@ connection.onCompletion(async (completionParams) => {
   if (!schemas) {
     return completionResults;
   }
+
+  const { nxVersion } = await nxWorkspace(WORKING_PATH, lspLogger);
+
   const pathItems = await getCompletionItems(
     WORKING_PATH,
+    nxVersion,
     jsonAst,
     document,
     schemas,

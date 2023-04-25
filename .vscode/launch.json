@@ -39,8 +39,7 @@
       "enableTurboSourcemaps": true,
       "skipFiles": [
         "<node_internals>/**",
-        "/Applications/Visual Studio Code.app/**",
-        "${workspaceFolder}/dist/apps/intellij/**"
+        "/Applications/Visual Studio Code.app/**"
       ]
       // "outFiles": ["${workspaceFolder}/dist/vscode/lsp/**/*.js"]
     },

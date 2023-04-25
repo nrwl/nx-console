@@ -20,9 +20,11 @@ import { projectCompletion } from './project-completion';
 import { projectTargetCompletion } from './project-target-completion';
 import { tagsCompletion } from './tags-completion';
 import { targetsCompletion } from './targets-completion';
+import { NxVersion } from '@nx-console/shared/types';
 
 export async function getCompletionItems(
   workingPath: string | undefined,
+  nxVersion: NxVersion,
   jsonAst: JSONDocument,
   document: TextDocument,
   schemas: MatchingSchema[],
@@ -31,13 +33,14 @@ export async function getCompletionItems(
   if (!workingPath) {
     return [];
   }
+
   const offset = document.offsetAt(position);
   const node = jsonAst.getNodeFromOffset(offset);
   if (!node) {
     return [];
   }
 
-  const items = completionItems(workingPath, node, document);
+  const items = completionItems(workingPath, nxVersion, node, document);
 
   for (const { schema, node: schemaNode } of schemas) {
     // Find the schema node that matches the current node
@@ -65,6 +68,7 @@ export async function getCompletionItems(
 
 function completionItems(
   workingPath: string,
+  nxVersion: NxVersion,
   node: ASTNode,
   document: TextDocument
 ) {
@@ -72,17 +76,22 @@ function completionItems(
     completion: CompletionType,
     glob?: string
   ): Promise<CompletionItem[]> => {
+    // const supportsInterpolation = nxVersion.major >= 16;
+    // todo(jcammisuli): change this once executors support {workspaceRoot} and {projectRoot} in their options
+    const supportsInterpolation = false;
     switch (completion) {
       case CompletionType.file: {
         return pathCompletion(workingPath, node, document, {
           glob: glob ?? '*.*',
           searchType: 'file',
+          supportsInterpolation,
         });
       }
       case CompletionType.directory: {
         return pathCompletion(workingPath, node, document, {
           glob: glob ?? '*',
           searchType: 'directory',
+          supportsInterpolation,
         });
       }
       case CompletionType.projectTarget: {
