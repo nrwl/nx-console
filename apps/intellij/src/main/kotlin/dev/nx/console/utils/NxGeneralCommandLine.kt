@@ -1,16 +1,22 @@
 package dev.nx.console.utils
 
+import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.wsl.WSLCommandLineOptions
 import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.openapi.project.Project
 
-fun NxGeneralCommandLine(project: Project, args: List<String>) =
+fun NxGeneralCommandLine(
+    project: Project,
+    args: List<String>,
+    environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
+) =
     GeneralCommandLine().apply {
         exePath = NxExecutable.getExecutablePath(project.nxBasePath)
         addParameters(args)
         setWorkDirectory(project.nxBasePath)
-        withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+
+        environmentVariables.configureCommandLine(this, true)
 
         NodeCommandLineUtil.configureUsefulEnvironment(this)
         NodeCommandLineUtil.prependNodeDirToPATH(this, project.nodeInterpreter)
