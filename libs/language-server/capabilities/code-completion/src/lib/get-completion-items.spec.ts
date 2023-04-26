@@ -313,23 +313,27 @@ describe('getCompletionItems', () => {
     });
   });
 
-  describe('project with targets', () => {
+  describe('targets', () => {
     const projectWithTargetsSchema = {
       type: 'object',
       properties: {
-        targets: {
+        projectTargets: {
           type: 'array',
           items: {
             type: 'string',
             'x-completion-type': CompletionType.projectTarget,
           },
         },
+        targets: {
+          type: 'string',
+          'x-completion-type': CompletionType.projectWithDeps,
+        },
       },
     };
 
     it('should return targets', async () => {
       const { labels } = await getTestCompletionItemsFor(
-        `{"targets": ["|"]}`,
+        `{"projectTargets": ["|"]}`,
         projectWithTargetsSchema
       );
       expect(labels).toMatchInlineSnapshot(`
@@ -340,6 +344,21 @@ describe('getCompletionItems', () => {
           "\\"project2:build:production\\"",
           "\\"project2:test\\"",
           "\\"project2:lint\\"",
+        ]
+      `);
+    });
+
+    it('should return completion-type results before trying default implementations', async () => {
+      const { labels } = await getTestCompletionItemsFor(
+        `{"targets": "|"}`,
+        projectWithTargetsSchema
+      );
+      expect(labels).toMatchInlineSnapshot(`
+        Array [
+          "\\"project1\\"",
+          "\\"project2\\"",
+          "\\"{self}\\"",
+          "\\"{dependencies}\\"",
         ]
       `);
     });
