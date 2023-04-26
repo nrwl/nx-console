@@ -1,7 +1,6 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 
 import { GeneratorType, Option, OptionType } from '@nx-console/shared/schema';
-import { NxProjectsConfiguration } from '@nx-console/shared/types';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   getNxVersion,
@@ -16,14 +15,7 @@ import { selectGenerator } from './select-generator';
 import { selectReMoveGenerator } from './select-re-move-generator';
 import { getTelemetry } from '@nx-console/vscode/utils';
 
-let cliTaskProvider: CliTaskProvider;
-
-export async function registerCliTaskCommands(
-  context: ExtensionContext,
-  n: CliTaskProvider
-) {
-  cliTaskProvider = n;
-
+export async function registerCliTaskCommands(context: ExtensionContext) {
   commands.registerCommand(
     `nx.run`,
     (
@@ -191,7 +183,7 @@ async function selectCliCommandAndPromptForFlags(
       taskToRun = target;
     }
     const selection = validWorkspaceJson
-      ? await selectCliProject(taskToRun, workspace)
+      ? await selectCliProject(taskToRun)
       : undefined;
     if (!selection) {
       return; // Do not execute a command if user clicks out of VSCode UI.
@@ -252,7 +244,7 @@ async function selectCliCommandAndPromptForFlags(
   }
 
   if (flags !== undefined) {
-    cliTaskProvider.executeTask({
+    CliTaskProvider.instance.executeTask({
       positional: isRunCommand
         ? `${projectName}:${surroundWithQuotesIfHasWhiteSpace(target)}`
         : projectName,
@@ -287,7 +279,7 @@ async function selectGeneratorAndPromptForFlags() {
   );
 
   if (flags !== undefined) {
-    cliTaskProvider.executeTask({
+    CliTaskProvider.instance.executeTask({
       positional: selection.positional,
       command: 'generate',
       flags,
@@ -302,11 +294,8 @@ export async function getCliProjectFromUri(
   return project?.name;
 }
 
-export async function selectCliProject(
-  command: string,
-  json: NxProjectsConfiguration
-) {
-  const projectEntries = await cliTaskProvider.getProjectEntries(json);
+export async function selectCliProject(command: string) {
+  const projectEntries = Object.entries((await getNxWorkspace()) || {});
   const items = projectEntries
     .filter(([, { targets }]) => Boolean(targets))
     .flatMap(([project, { targets, root }]) => ({ project, targets, root }))

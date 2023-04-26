@@ -16,16 +16,10 @@ import {
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { readAndParseJson } from '@nx-console/shared/file-system';
 
-import { CliTaskProvider } from './cli-task-provider';
 import { NxTask } from './nx-task';
 import { selectFlags } from './select-flags';
 
-let cliTaskProvider: CliTaskProvider;
-export function registerNxCommands(
-  context: ExtensionContext,
-  n: CliTaskProvider
-) {
-  cliTaskProvider = n;
+export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand(`nx.affected`, async () => {
       getTelemetry().featureUsed('nx.affected');

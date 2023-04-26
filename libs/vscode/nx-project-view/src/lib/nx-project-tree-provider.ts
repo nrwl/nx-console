@@ -34,10 +34,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private readonly treeView: TreeViewStrategy;
   private readonly automaticView: AutomaticViewStrategy;
 
-  constructor(
-    context: ExtensionContext,
-    private readonly cliTaskProvider: CliTaskProvider
-  ) {
+  constructor(context: ExtensionContext) {
     super();
 
     (
@@ -120,7 +117,7 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       flags.push('--skip-nx-cache');
     }
 
-    this.cliTaskProvider.executeTask({
+    CliTaskProvider.instance.executeTask({
       command: 'run',
       positional: `${project}:${target.name}`,
       flags,
