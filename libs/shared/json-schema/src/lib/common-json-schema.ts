@@ -89,13 +89,13 @@ export const targets = (
       oneOf: [
         {
           type: 'string',
-          'x-completion-type': CompletionType.projectWithDeps,
+          'x-completion-type': CompletionType.projects,
         },
         {
           type: 'array',
           items: {
             type: 'string',
-            'x-completion-type': CompletionType.projectWithDeps,
+            'x-completion-type': CompletionType.projects,
           },
         },
       ],

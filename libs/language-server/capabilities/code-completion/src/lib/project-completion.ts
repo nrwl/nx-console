@@ -10,8 +10,7 @@ import { createCompletionItem } from './create-completion-path-item';
 export async function projectCompletion(
   workingPath: string | undefined,
   node: ASTNode,
-  document: TextDocument,
-  includeDeps = false
+  document: TextDocument
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
@@ -31,37 +30,14 @@ export async function projectCompletion(
         CompletionItemKind.Struct
       )
     );
-    if (!includeDeps) {
-      projectCompletion.push(
-        createCompletionItem(
-          `!${projectName}`,
-          '',
-          node,
-          document,
-          CompletionItemKind.Struct,
-          `Exclude "${projectName}" from this project's dependencies`
-        )
-      );
-    }
-  }
-
-  if (includeDeps) {
     projectCompletion.push(
       createCompletionItem(
-        '{self}',
+        `!${projectName}`,
         '',
         node,
         document,
         CompletionItemKind.Struct,
-        "Include this project's targets"
-      ),
-      createCompletionItem(
-        '{dependencies}',
-        '',
-        node,
-        document,
-        CompletionItemKind.Struct,
-        "Include this project's dependency's targets"
+        `Exclude "${projectName}" from this project's dependencies`
       )
     );
   }

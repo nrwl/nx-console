@@ -120,9 +120,6 @@ function completionItems(
       case CompletionType.projects: {
         return projectCompletion(workingPath, node, document);
       }
-      case CompletionType.projectWithDeps: {
-        return projectCompletion(workingPath, node, document, true);
-      }
       case CompletionType.tags: {
         return tagsCompletion(workingPath, node, document);
       }

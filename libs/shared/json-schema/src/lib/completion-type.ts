@@ -9,8 +9,6 @@ export enum CompletionType {
   directory = 'directory',
   // support for projectName:build auto complete
   projectTarget = 'projectTarget',
-  // support for {self}, {dependencies}, and project names
-  projectWithDeps = 'projectWithDeps',
   projects = 'projects',
   targets = 'targets',
   // support for target with ^ (^build, build, etc)

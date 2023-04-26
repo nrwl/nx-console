@@ -326,7 +326,7 @@ describe('getCompletionItems', () => {
         },
         targets: {
           type: 'string',
-          'x-completion-type': CompletionType.projectWithDeps,
+          'x-completion-type': CompletionType.projects,
         },
       },
     };
@@ -356,9 +356,9 @@ describe('getCompletionItems', () => {
       expect(labels).toMatchInlineSnapshot(`
         Array [
           "\\"project1\\"",
+          "\\"!project1\\"",
           "\\"project2\\"",
-          "\\"{self}\\"",
-          "\\"{dependencies}\\"",
+          "\\"!project2\\"",
         ]
       `);
     });
