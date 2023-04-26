@@ -10,7 +10,7 @@ import org.eclipse.lsp4j.Position
 
 private val log = logger<DocumentUtils>()
 
-private val nxFiles = setOf("nx.json", "workspace.json", "project.json")
+private val nxFiles = setOf("nx.json", "workspace.json", "project.json", "package.json")
 
 class DocumentUtils {
     companion object {
