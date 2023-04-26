@@ -28,9 +28,7 @@ export async function projectCompletion(
         node,
         document,
         CompletionItemKind.Struct
-      )
-    );
-    projectCompletion.push(
+      ),
       createCompletionItem(
         `!${projectName}`,
         '',
