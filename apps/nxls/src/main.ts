@@ -1,5 +1,6 @@
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
+import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
   NxChangeWorkspace,
   NxCreateProjectGraphRequest,
@@ -208,11 +209,7 @@ connection.onHover(async (hoverParams) => {
   }
 
   const { jsonAst, document } = getJsonDocument(hoverDocument);
-  return getJsonLanguageService()?.doHover(
-    document,
-    hoverParams.position,
-    jsonAst
-  );
+  return await getHover(hoverParams, jsonAst, document);
 });
 
 connection.onDocumentLinks(async (params) => {
@@ -223,6 +220,7 @@ connection.onDocumentLinks(async (params) => {
   }
 
   const { jsonAst, document } = getJsonDocument(linkDocument);
+
   const schemas = await getJsonLanguageService()?.getMatchingSchemas(
     document,
     jsonAst
