@@ -66,7 +66,7 @@ function createJsonSchema(
       },
       implicitDependencies,
       tags,
-      namedInputs,
+      namedInputs: namedInputs(nxVersion),
       targets: {
         type: 'object',
         properties: targetsProperties,

@@ -18,7 +18,7 @@ export const outputs: JSONSchema = {
   },
 };
 
-export const inputs: JSONSchema[] = [
+export const inputs = (nxVersion: NxVersion): JSONSchema[] => [
   { type: 'string', 'x-completion-type': CompletionType.inputNameWithDeps },
   {
     type: 'object',
@@ -27,10 +27,7 @@ export const inputs: JSONSchema[] = [
         type: 'string',
         'x-completion-type': CompletionType.inputName,
       },
-      projects: {
-        type: 'string',
-        enum: ['self', 'dependencies'],
-      },
+      projects: projects(nxVersion),
     },
   },
   {
@@ -59,12 +56,12 @@ export const inputs: JSONSchema[] = [
   },
 ];
 
-export const namedInputs: JSONSchema = {
+export const namedInputs = (nxVersion: NxVersion): JSONSchema => ({
   type: 'object',
   additionalProperties: {
-    oneOf: inputs,
+    oneOf: inputs(nxVersion),
   },
-};
+});
 
 export const tags: JSONSchema = {
   type: 'array',
@@ -74,18 +71,14 @@ export const tags: JSONSchema = {
   },
 };
 
-export const targets = (
-  nxVersion: NxVersion,
-  executors?: JSONSchema[]
-): JSONSchema => {
-  let projects: JSONSchema = {};
+const projects = (nxVersion: NxVersion): JSONSchema => {
   if (nxVersion.major < 16) {
-    projects = {
+    return {
       type: 'string',
       enum: ['self', 'dependencies'],
     };
   } else {
-    projects = {
+    return {
       oneOf: [
         {
           type: 'string',
@@ -101,7 +94,12 @@ export const targets = (
       ],
     };
   }
+};
 
+export const targets = (
+  nxVersion: NxVersion,
+  executors?: JSONSchema[]
+): JSONSchema => {
   const schema: JSONSchema = {
     additionalProperties: {
       type: 'object',
@@ -122,7 +120,7 @@ export const targets = (
               {
                 type: 'object',
                 properties: {
-                  projects,
+                  projects: projects(nxVersion),
                   target: {
                     type: 'string',
                     'x-completion-type': CompletionType.targets,
@@ -139,7 +137,7 @@ export const targets = (
         inputs: {
           type: 'array',
           items: {
-            oneOf: inputs,
+            oneOf: inputs(nxVersion),
           },
         },
       },

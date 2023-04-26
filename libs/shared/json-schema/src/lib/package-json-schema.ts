@@ -22,7 +22,7 @@ function createJsonSchema(nxVersion: NxVersion): EnhancedJsonSchema {
           ignore: {
             type: 'boolean',
           },
-          namedInputs,
+          namedInputs: namedInputs(nxVersion),
           tags,
           implicitDependencies,
           targets: targets(nxVersion),
