@@ -66,7 +66,7 @@ export async function getCompletionItems(
 
   const defaultCompletion = getDefaultCompletionType(node);
 
-  if (defaultCompletion) {
+  if (defaultCompletion && resolvedItems.length === 0) {
     resolvedItems = await items(
       defaultCompletion.completionType,
       defaultCompletion.glob
