@@ -5,7 +5,12 @@ import {
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
-import { GenerateUiFeatureTaskExecutionFormModuleForStorybook } from '../generate-ui-feature-task-execution-form.module';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
+import { FormatTaskPipe } from '../format-task/format-task.pipe';
+import { TaskExecutionFormComponent } from './task-execution-form.component';
 
 const cssColorNames = [
   'AliceBlue',
@@ -165,7 +170,13 @@ class TaskExecutionFormExampleComponent {
 
 const baseConfig: AngularRenderer['storyResult'] = {
   moduleMetadata: {
-    imports: [GenerateUiFeatureTaskExecutionFormModuleForStorybook],
+    imports: [
+      CommonModule,
+      ReactiveFormsModule,
+      ClipboardModule,
+      GenerateUiComponentsModule,
+    ],
+    declarations: [TaskExecutionFormComponent, FormatTaskPipe],
   },
 };
 

@@ -22,15 +22,3 @@ import {
   exports: [TaskExecutionFormComponent],
 })
 export class GenerateUiFeatureTaskExecutionFormModule {}
-
-@NgModule({
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ClipboardModule,
-    GenerateUiComponentsModule,
-  ],
-  declarations: [TaskExecutionFormComponent, FormatTaskPipe],
-  exports: [TaskExecutionFormComponent],
-})
-export class GenerateUiFeatureTaskExecutionFormModuleForStorybook {}
