@@ -21,6 +21,12 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
             state.workspacePath = value
         }
 
+    var generatorAllowlist: String?
+        get() = state.generatorAllowlist
+        set(value) {
+            state.generatorAllowlist = value
+        }
+
     companion object {
         fun getInstance(project: Project): NxConsoleProjectSettingsProvider {
             return project.getService(NxConsoleProjectSettingsProvider::class.java)
@@ -28,4 +34,7 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
     }
 }
 
-data class NxConsoleProjectSettingsState(var workspacePath: String? = null) {}
+data class NxConsoleProjectSettingsState(
+    var workspacePath: String? = null,
+    var generatorAllowlist: String? = null
+) {}

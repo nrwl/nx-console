@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import dev.nx.console.settings.options.EnableDryRunOnGenerateChangeSetting
+import dev.nx.console.settings.options.GeneratorAllowlistSetting
 import dev.nx.console.settings.options.TelemetrySetting
 import dev.nx.console.settings.options.WorkspacePathSetting
 import javax.swing.JComponent
@@ -18,6 +19,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var workspacePathSetting: WorkspacePathSetting
     private lateinit var telemetrySetting: TelemetrySetting
+    private lateinit var generatorAllowlistSetting: GeneratorAllowlistSetting
 
     override fun createComponent(): JComponent {
         enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
@@ -29,8 +31,14 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         telemetrySetting = TelemetrySetting()
         telemetrySetting.setValue(settingsProvider.enableTelemetry)
 
+        generatorAllowlistSetting = GeneratorAllowlistSetting(project)
+        generatorAllowlistSetting.setValue(projectSettingsProvider.generatorAllowlist)
+
         return panel {
-            group("Project Settings") { workspacePathSetting.render(this) }
+            group("Project Settings") {
+                workspacePathSetting.render(this)
+                generatorAllowlistSetting.render(this)
+            }
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
                 telemetrySetting.render(this)

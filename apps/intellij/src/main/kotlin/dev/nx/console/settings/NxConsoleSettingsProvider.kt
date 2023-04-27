@@ -45,5 +45,5 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
 data class NxConsoleSettingsState(
     var enableDryRunOnGenerateChange: Boolean = true,
     var enableTelemetry: Boolean = false,
-    var promptedForTelemetry: Boolean = false
+    var promptedForTelemetry: Boolean = false,
 )
