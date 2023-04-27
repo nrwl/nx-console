@@ -165,6 +165,10 @@ connection.onInitialize(async (params) => {
 });
 
 connection.onCompletion(async (completionParams) => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
   const changedDocument = documents.get(completionParams.textDocument.uri);
   if (!changedDocument) {
     return null;
@@ -188,8 +192,11 @@ connection.onCompletion(async (completionParams) => {
     return completionResults;
   }
 
+  const { nxVersion } = await nxWorkspace(WORKING_PATH, lspLogger);
+
   const pathItems = await getCompletionItems(
     WORKING_PATH,
+    nxVersion,
     jsonAst,
     document,
     schemas,
@@ -401,16 +408,17 @@ async function configureSchemas(
     return;
   }
 
-  const { workspace } = await nxWorkspace(workingPath, lspLogger);
+  const { workspace, nxVersion } = await nxWorkspace(workingPath, lspLogger);
   const collections = await getExecutors(workingPath);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
   const projectSchema = getProjectJsonSchema(
     collections,
-    workspace.targetDefaults
+    workspace.targetDefaults,
+    nxVersion
   );
-  const packageSchema = getPackageJsonSchema();
+  const packageSchema = getPackageJsonSchema(nxVersion);
 
-  const nxSchema = getNxJsonSchema(collections, workspace.projects);
+  const nxSchema = getNxJsonSchema(collections, workspace.projects, nxVersion);
 
   configureJsonLanguageService(
     {

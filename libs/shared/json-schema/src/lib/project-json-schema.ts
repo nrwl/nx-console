@@ -10,24 +10,27 @@ import {
 } from './common-json-schema';
 import { CompletionType, EnhancedJsonSchema } from './completion-type';
 import { createBuildersAndExecutorsSchema } from './create-builders-and-executors-schema';
+import { NxVersion } from '@nx-console/shared/types';
 
 type JSONSchemaMap = NonNullable<JSONSchema['properties']>;
 
 export function getProjectJsonSchema(
   collections: CollectionInfo[],
-  targetDefaults: TargetDefaults = {}
+  targetDefaults: TargetDefaults = {},
+  nxVersion: NxVersion
 ) {
   const [, executors] = createBuildersAndExecutorsSchema(collections);
-  const contents = createJsonSchema(executors, targetDefaults);
+  const contents = createJsonSchema(executors, targetDefaults, nxVersion);
   return contents;
 }
 
 function createJsonSchema(
   executors: JSONSchema[],
-  targetDefaults: TargetDefaults
+  targetDefaults: TargetDefaults,
+  nxVersion: NxVersion
 ): EnhancedJsonSchema {
   const targetsSchema =
-    (targets(executors).additionalProperties as object) ?? {};
+    (targets(nxVersion, executors).additionalProperties as object) ?? {};
   const targetsProperties = Object.keys(targetDefaults).reduce<JSONSchemaMap>(
     (targets, target) => {
       const defaults: Partial<TargetConfiguration> = targetDefaults[target];
@@ -63,7 +66,7 @@ function createJsonSchema(
       },
       implicitDependencies,
       tags,
-      namedInputs,
+      namedInputs: namedInputs(nxVersion),
       targets: {
         type: 'object',
         properties: targetsProperties,

@@ -5,7 +5,10 @@ import {
   X_COMPLETION_GLOB,
   X_COMPLETION_TYPE,
 } from '@nx-console/shared/json-schema';
-import { getDefaultCompletionType } from '@nx-console/language-server/utils';
+import {
+  getDefaultCompletionType,
+  isArrayNode,
+} from '@nx-console/language-server/utils';
 import {
   ASTNode,
   CompletionItem,
@@ -20,9 +23,11 @@ import { projectCompletion } from './project-completion';
 import { projectTargetCompletion } from './project-target-completion';
 import { tagsCompletion } from './tags-completion';
 import { targetsCompletion } from './targets-completion';
+import { NxVersion } from '@nx-console/shared/types';
 
 export async function getCompletionItems(
   workingPath: string | undefined,
+  nxVersion: NxVersion,
   jsonAst: JSONDocument,
   document: TextDocument,
   schemas: MatchingSchema[],
@@ -38,7 +43,9 @@ export async function getCompletionItems(
     return [];
   }
 
-  const items = completionItems(workingPath, node, document);
+  const items = completionItems(workingPath, nxVersion, node, document);
+
+  let resolvedItems: CompletionItem[] = [];
 
   for (const { schema, node: schemaNode } of schemas) {
     // Find the schema node that matches the current node
@@ -47,25 +54,41 @@ export async function getCompletionItems(
       if (hasCompletionType(schema)) {
         const completion = schema[X_COMPLETION_TYPE];
         if (hasCompletionGlob(schema)) {
-          return items(completion, schema[X_COMPLETION_GLOB]);
+          resolvedItems = await items(completion, schema[X_COMPLETION_GLOB]);
+          break;
         }
 
-        return items(completion);
+        resolvedItems = await items(completion);
+        break;
       }
     }
   }
 
   const defaultCompletion = getDefaultCompletionType(node);
 
-  if (defaultCompletion) {
-    return items(defaultCompletion.completionType, defaultCompletion.glob);
+  if (defaultCompletion && resolvedItems.length === 0) {
+    resolvedItems = await items(
+      defaultCompletion.completionType,
+      defaultCompletion.glob
+    );
   }
 
-  return [];
+  // remove duplicate values from the resolved completed items
+  if (isArrayNode(node.parent)) {
+    const existingItems = node.parent.children.map((i) =>
+      JSON.stringify(i.value)
+    );
+    resolvedItems = resolvedItems.filter(
+      (resolvedItem) => !existingItems.includes(resolvedItem.label)
+    );
+  }
+
+  return resolvedItems;
 }
 
 function completionItems(
   workingPath: string,
+  nxVersion: NxVersion,
   node: ASTNode,
   document: TextDocument
 ) {
@@ -73,17 +96,22 @@ function completionItems(
     completion: CompletionType,
     glob?: string
   ): Promise<CompletionItem[]> => {
+    // const supportsInterpolation = nxVersion.major >= 16;
+    // todo(jcammisuli): change this once executors support {workspaceRoot} and {projectRoot} in their options
+    const supportsInterpolation = false;
     switch (completion) {
       case CompletionType.file: {
         return pathCompletion(workingPath, node, document, {
           glob: glob ?? '*.*',
           searchType: 'file',
+          supportsInterpolation,
         });
       }
       case CompletionType.directory: {
         return pathCompletion(workingPath, node, document, {
           glob: glob ?? '*',
           searchType: 'directory',
+          supportsInterpolation,
         });
       }
       case CompletionType.projectTarget: {
