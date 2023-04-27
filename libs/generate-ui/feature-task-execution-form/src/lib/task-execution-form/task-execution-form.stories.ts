@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { AngularFramework, Story } from '@storybook/angular';
+import { AngularRenderer, Meta, StoryFn } from '@storybook/angular';
 import {
   OptionType,
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
-import { GenerateUiFeatureTaskExecutionFormModule } from '../generate-ui-feature-task-execution-form.module';
+import { GenerateUiFeatureTaskExecutionFormModuleForStorybook } from '../generate-ui-feature-task-execution-form.module';
 
 const cssColorNames = [
   'AliceBlue',
@@ -144,10 +144,6 @@ const schemaWithoutDefaults: TaskExecutionSchema = {
   }),
 };
 
-export default {
-  title: 'feature-task-execution-form',
-};
-
 @Component({
   selector: 'generate-ui-task-execution-form-example',
   template: `
@@ -167,13 +163,13 @@ class TaskExecutionFormExampleComponent {
   }
 }
 
-const baseConfig: AngularFramework['storyResult'] = {
-  component: TaskExecutionFormExampleComponent,
+const baseConfig: AngularRenderer['storyResult'] = {
   moduleMetadata: {
-    imports: [GenerateUiFeatureTaskExecutionFormModule],
+    imports: [GenerateUiFeatureTaskExecutionFormModuleForStorybook],
   },
 };
-export const DefaultValues: Story = () => ({
+
+export const DefaultValues: StoryFn = () => ({
   ...baseConfig,
   props: {
     schema: initialSchema,
@@ -186,3 +182,9 @@ export const NoDefaultValues = () => ({
     schema: schemaWithoutDefaults,
   },
 });
+
+const meta: Meta<TaskExecutionFormExampleComponent> = {
+  component: TaskExecutionFormExampleComponent,
+  title: 'feature-task-execution-form',
+};
+export default meta;
