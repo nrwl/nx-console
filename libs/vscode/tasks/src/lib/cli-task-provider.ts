@@ -1,12 +1,9 @@
 import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared/schema';
-import { getNxWorkspacePath } from '@nx-console/vscode/nx-workspace';
 import {
-  ProviderResult,
-  Task,
-  TaskExecution,
-  TaskProvider,
-  tasks,
-} from 'vscode';
+  getNxWorkspace,
+  getNxWorkspacePath,
+} from '@nx-console/vscode/nx-workspace';
+import { Task, TaskExecution, TaskProvider, tasks, TaskScope } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
@@ -33,19 +30,34 @@ export class CliTaskProvider implements TaskProvider {
     });
   }
 
-  provideTasks(): ProviderResult<Task[]> {
-    return null;
+  async provideTasks(): Promise<Task[]> {
+    const nxWorkspace = await getNxWorkspace();
+    const projectTargetCombinations: [string, string][] = [];
+
+    Object.entries(nxWorkspace.workspace.projects).forEach(
+      ([projectName, project]) => {
+        Object.keys(project.targets ?? {}).forEach((targetName) => {
+          projectTargetCombinations.push([projectName, targetName]);
+        });
+      }
+    );
+    const tasks: Task[] = [];
+    for (const [projectName, targetName] of projectTargetCombinations) {
+      const task = await this.createTask({
+        command: 'run',
+        positional: `${projectName}:${targetName}`,
+        flags: [],
+      });
+      tasks.push(task);
+    }
+    return tasks;
   }
 
   async resolveTask(task: Task): Promise<Task | undefined> {
-    if (
-      (await getNxWorkspacePath()) &&
-      task.definition.command &&
-      task.definition.project
-    ) {
+    if ((await getNxWorkspacePath()) && task.definition.command) {
       const cliTask = await this.createTask({
         command: task.definition.command,
-        positional: task.definition.project,
+        positional: task.definition.positional,
         flags: Array.isArray(task.definition.flags)
           ? task.definition.flags
           : [],
