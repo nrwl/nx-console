@@ -613,14 +613,15 @@ export class TaskExecutionFormComponent implements OnInit {
   getDocsLink(taskExecForm: TaskExecutionForm): string | undefined {
     if (
       !taskExecForm.architect.collection ||
-      !taskExecForm.architect.collection.includes('@nrwl')
+      !taskExecForm.architect.collection.includes('@nrwl') ||
+      !taskExecForm.architect.collection.includes('@nx')
     ) {
       return undefined;
     }
-    const collectionStripped = taskExecForm.architect.collection.replace(
-      '@nrwl/',
-      ''
-    );
+    const collectionStripped = taskExecForm.architect.collection
+      .replace('@nrwl/', '')
+      .replace('@nx/', '');
+
     return `https://nx.dev/packages/${collectionStripped}/generators/${taskExecForm.architect.name}`;
   }
 }
