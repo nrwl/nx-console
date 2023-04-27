@@ -55,7 +55,7 @@ export async function getNxProjectGraph(
 }
 
 /**
- * Get the local installed version of @nrwl/workspace
+ * Get the local installed version of @nx/workspace
  */
 export async function getNxWorkspacePackageFileUtils(
   workspacePath: string,

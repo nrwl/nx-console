@@ -28,9 +28,9 @@ describe('FormatTaskPipe', () => {
         description: '',
         options: [],
         command: 'generate',
-        positional: '@nrwl/angular:library',
+        positional: '@nx/angular:library',
       })
-    ).toEqual('nx generate @nrwl/angular:library');
+    ).toEqual('nx generate @nx/angular:library');
   });
 
   it('should optionally include configuration flag', () => {

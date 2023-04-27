@@ -5,7 +5,7 @@
   "sourceRoot": "libs/generate-ui/components/src",
   "targets": {
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": [
           "libs/generate-ui/components/src/**/*.ts",
@@ -14,7 +14,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "options": {
         "jestConfig": "libs/generate-ui/components/jest.config.ts",
         "passWithNoTests": true

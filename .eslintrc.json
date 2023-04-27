@@ -1,12 +1,12 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nrwl/nx"],
+  "plugins": ["@nx"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@nrwl/nx/enforce-module-boundaries": [
+        "@nx/enforce-module-boundaries": [
           "error",
           {
             "enforceBuildableLibDependency": true,
@@ -36,8 +36,8 @@
         "no-restricted-imports": [
           "error",
           {
-            "name": "@nrwl/devkit",
-            "message": "Please use nx/src/devkit-exports instead, or import function directly from @nrwl/devkit/src/*"
+            "name": "@nx/devkit",
+            "message": "Please use nx/src/devkit-exports instead, or import function directly from @nx/devkit/src/*"
           }
         ],
         "@typescript-eslint/no-unused-vars": [
@@ -50,17 +50,18 @@
     },
     {
       "files": ["*.ts", "*.tsx"],
-      "extends": ["plugin:@nrwl/nx/typescript"],
+      "extends": ["plugin:@nx/typescript"],
       "rules": {}
     },
     {
       "files": ["*.js", "*.jsx"],
-      "extends": ["plugin:@nrwl/nx/javascript"],
+      "extends": ["plugin:@nx/javascript"],
       "rules": {}
     },
     {
       "files": ["*.html"],
       "rules": {}
     }
-  ]
+  ],
+  "extends": ["plugin:storybook/recommended"]
 }
