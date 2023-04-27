@@ -6,20 +6,14 @@
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/language-server/capabilities/hover/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/language-server/capabilities/hover/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/language-server/capabilities/hover/jest.config.ts",
         "passWithNoTests": true
@@ -32,7 +26,5 @@
       }
     }
   },
-  "tags": [
-    "type:lsp"
-  ]
+  "tags": ["type:lsp"]
 }

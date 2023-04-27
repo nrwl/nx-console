@@ -106,13 +106,11 @@ class DocumentManager(val editor: Editor) {
         val pos = DocumentUtils.offsetToLSPPos(editor, startOffset)
         val request = textDocumentService?.hover(HoverParams(identifier, pos))
         return try {
-            return request
-                ?.await()
-                ?.contents
-                ?.left
-                ?.joinToString { it.left }
-                ?.replace("\\", "")
-                ?.ifEmpty { null }
+            val contents: String? =
+                request?.await()?.contents.let {
+                    it?.left?.joinToString { l -> l.left } ?: it?.right?.value
+                }
+            return contents?.replace("\\", "")?.ifEmpty { null }
         } catch (e: Exception) {
             thisLogger().info(e)
             null
