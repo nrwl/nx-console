@@ -12,10 +12,10 @@ class GeneratorAllowlistSetting(val project: Project) : NxConsoleSettingBase<Str
         panel.apply { row { cell(inputTable) } }
     }
 
-    override fun getValue(): String? = inputTable.getValueAt(0, 0)
+    override fun getValue(): String? = inputTable.getValueAt(0, 0) as? String
 
     override fun setValue(value: String?) {
         if (value == null) return
-        this.inputField.text = value
+        this.inputTable.setValueAt(value,0, 0)
     }
 }
