@@ -36,7 +36,7 @@
       }
     },
     "watch": {
-      "executor": "@nrwl/esbuild:esbuild",
+      "executor": "@nx/esbuild:esbuild",
       "options": {
         "watch": true,
         "external": [
@@ -96,7 +96,7 @@
       }
     },
     "build": {
-      "executor": "@nrwl/esbuild:esbuild",
+      "executor": "@nx/esbuild:esbuild",
       "options": {
         "external": [
           "vscode",
@@ -183,7 +183,7 @@
       "dependsOn": ["^build"]
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": ["apps/vscode/**/*.ts"]
       }

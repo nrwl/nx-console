@@ -208,7 +208,10 @@ export async function getCollectionInfo(
     const extendedCollections = (
       await Promise.all(
         extendedSchema
-          .filter((extended) => extended !== '@nrwl/workspace')
+          .filter(
+            (extended) =>
+              extended !== '@nx/workspace' && extended !== '@nrwl/workspace'
+          )
           .map(async (extended: string) => {
             const dependencyPath = await workspaceDependencyPath(
               workspacePath,

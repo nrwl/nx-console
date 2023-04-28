@@ -40,7 +40,8 @@ class NxCommandLineState(
                 listOf(
                     *args,
                     *(ParametersListUtil.parseToArray(nxRunSettings.arguments)),
-                )
+                ),
+                nxRunSettings.environmentVariables
             )
 
         val handler = KillableColoredProcessHandler(commandLine)

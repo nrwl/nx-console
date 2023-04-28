@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "watch": {
-      "executor": "@nrwl/esbuild:esbuild",
+      "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/vscode/nxls",
@@ -22,7 +22,6 @@
         "generatePackageJson": false,
         "esbuildOptions": {
           "mainFields": ["module", "main"],
-          "sourcemap": true,
           "outExtension": {
             ".js": ".js"
           }
@@ -30,7 +29,7 @@
       }
     },
     "package": {
-      "executor": "@nrwl/webpack:webpack",
+      "executor": "@nx/webpack:webpack",
       "options": {
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
@@ -52,7 +51,7 @@
     },
     "build": {
       "defaultConfiguration": "production",
-      "executor": "@nrwl/esbuild:esbuild",
+      "executor": "@nx/esbuild:esbuild",
       "outputs": ["{workspaceRoot}/dist/apps/nxls"],
       "options": {
         "main": "apps/nxls/src/main.ts",
@@ -97,14 +96,14 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/nxls/**/*.ts"]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/nxls"],
       "options": {
         "jestConfig": "apps/nxls/jest.config.ts",

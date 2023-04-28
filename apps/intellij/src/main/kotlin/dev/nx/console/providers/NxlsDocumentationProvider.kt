@@ -1,5 +1,7 @@
 package dev.nx.console.providers
 
+import com.intellij.lang.documentation.DocumentationMarkup.CONTENT_END
+import com.intellij.lang.documentation.DocumentationMarkup.CONTENT_START
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
@@ -19,10 +21,29 @@ class NxlsDocumentationProvider : DocumentationProvider {
             return null
         }
 
-        return runBlocking {
-            DocumentManager.getInstance(editor ?: return@runBlocking null)
-                .hover(element.startOffset)
+        val doc =
+            runBlocking {
+                DocumentManager.getInstance(editor ?: return@runBlocking null)
+                    .hover(element.startOffset)
+            }
+                ?: return null
+
+        // extract LSP Markdown format and convert links to html that intellij can understand
+        val matches =
+            Regex("\\[(.+)\\]\\((https:\\/\\/nx.dev\\/.*)\\)").matchEntire(doc)?.groupValues
+                ?: return doc
+
+        if (matches.size < 3) {
+            return doc
         }
+
+        val nxDevLinkText = matches[1]
+        val nxDevLinkUrl = matches[2]
+
+        if (nxDevLinkText.isNullOrEmpty() || nxDevLinkUrl.isNullOrEmpty()) {
+            return doc
+        }
+        return "$CONTENT_START <a href='$nxDevLinkUrl'>$nxDevLinkText</a> $CONTENT_END"
     }
 
     override fun getCustomDocumentationElement(

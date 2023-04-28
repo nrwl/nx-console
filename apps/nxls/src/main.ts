@@ -1,5 +1,6 @@
 import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
+import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
   NxChangeWorkspace,
   NxCreateProjectGraphRequest,
@@ -165,6 +166,10 @@ connection.onInitialize(async (params) => {
 });
 
 connection.onCompletion(async (completionParams) => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
   const changedDocument = documents.get(completionParams.textDocument.uri);
   if (!changedDocument) {
     return null;
@@ -188,8 +193,11 @@ connection.onCompletion(async (completionParams) => {
     return completionResults;
   }
 
+  const { nxVersion } = await nxWorkspace(WORKING_PATH, lspLogger);
+
   const pathItems = await getCompletionItems(
     WORKING_PATH,
+    nxVersion,
     jsonAst,
     document,
     schemas,
@@ -208,11 +216,7 @@ connection.onHover(async (hoverParams) => {
   }
 
   const { jsonAst, document } = getJsonDocument(hoverDocument);
-  return getJsonLanguageService()?.doHover(
-    document,
-    hoverParams.position,
-    jsonAst
-  );
+  return await getHover(hoverParams, jsonAst, document);
 });
 
 connection.onDocumentLinks(async (params) => {
@@ -223,6 +227,7 @@ connection.onDocumentLinks(async (params) => {
   }
 
   const { jsonAst, document } = getJsonDocument(linkDocument);
+
   const schemas = await getJsonLanguageService()?.getMatchingSchemas(
     document,
     jsonAst
@@ -401,16 +406,17 @@ async function configureSchemas(
     return;
   }
 
-  const { workspace } = await nxWorkspace(workingPath, lspLogger);
+  const { workspace, nxVersion } = await nxWorkspace(workingPath, lspLogger);
   const collections = await getExecutors(workingPath);
   const workspaceSchema = getWorkspaceJsonSchema(collections);
   const projectSchema = getProjectJsonSchema(
     collections,
-    workspace.targetDefaults
+    workspace.targetDefaults,
+    nxVersion
   );
-  const packageSchema = getPackageJsonSchema();
+  const packageSchema = getPackageJsonSchema(nxVersion);
 
-  const nxSchema = getNxJsonSchema(collections, workspace.projects);
+  const nxSchema = getNxJsonSchema(collections, workspace.projects, nxVersion);
 
   configureJsonLanguageService(
     {

@@ -3,18 +3,12 @@ import {
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'node:path';
 
 export interface ProjectViewStrategy<T> {
   getChildren(element?: T): Promise<T[] | undefined>;
 }
-
-export type ViewDataProvider = Pick<
-  CliTaskProvider,
-  'getWorkspacePath' | 'getProjects'
->;
 
 interface BaseViewItem<Context extends string> {
   id: string;
