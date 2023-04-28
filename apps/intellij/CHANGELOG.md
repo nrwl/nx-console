@@ -1,3 +1,33 @@
+## 1.4.0 (2023-04-28)
+
+### Bug Fixes
+
+* **generate-ui:** correctly serialize options with array default values ([#1690](https://github.com/nrwl/nx-console/issues/1690)) ([f21508c](https://github.com/nrwl/nx-console/commit/f21508cd2cd7da43be03881778810736971e13fd))
+* **generate-ui:** handle multiple default values for generate ui ([#1684](https://github.com/nrwl/nx-console/issues/1684)) ([2529b56](https://github.com/nrwl/nx-console/commit/2529b563137ae7f732e77a09191d9582463e582f))
+* **intellij:** catch throwable in measurement protocol ([28f2f38](https://github.com/nrwl/nx-console/commit/28f2f38ca99c33a315f18b3e6a94428e6a2d4bad))
+* **intellij:** correctly pick up options in the generate run anything provider when using = ([#1696](https://github.com/nrwl/nx-console/issues/1696)) ([b610bad](https://github.com/nrwl/nx-console/commit/b610badc04535a93fac5bdd39d62402643c2d055))
+* **intellij:** find the proper run configuration settings for nx targets ([#1661](https://github.com/nrwl/nx-console/issues/1661)) ([22f8486](https://github.com/nrwl/nx-console/commit/22f8486b64149c318e8b84e7614d035445a98f64))
+* **intellij:** fix graph loading in intellij ([#1710](https://github.com/nrwl/nx-console/issues/1710)) ([df3d024](https://github.com/nrwl/nx-console/commit/df3d0249d7fa917c33142ce750af325c9fa2c708))
+* **intellij:** include configured env variables when running targets ([#1705](https://github.com/nrwl/nx-console/issues/1705)) ([e2c5ee4](https://github.com/nrwl/nx-console/commit/e2c5ee4a0dffd221364e08f95883b4a9a50737c2))
+* **intellij:** include package.json for nx file types ([#1706](https://github.com/nrwl/nx-console/issues/1706)) ([b011cc3](https://github.com/nrwl/nx-console/commit/b011cc354e5b76b1bee0205ea95b5dc395d744d3))
+* **intellij:** run generate ui in `application.readAction` ([2e94883](https://github.com/nrwl/nx-console/commit/2e94883350e86832b0290c5fc6fff7fa5cc7a219))
+* **intellij:** use warn instead of error for caught exceptions ([#1680](https://github.com/nrwl/nx-console/issues/1680)) ([a2f1fdc](https://github.com/nrwl/nx-console/commit/a2f1fdc5665843739a90b5c20dbe44b22557d6f6))
+* **nxls:** handle the daemon output so that stdout isnt polluted ([#1698](https://github.com/nrwl/nx-console/issues/1698)) ([cf3f93f](https://github.com/nrwl/nx-console/commit/cf3f93f075bb1b654ff991d7b3ec891118126b0e))
+* **nxls:** support running under node 14 ([#1679](https://github.com/nrwl/nx-console/issues/1679)) ([a6e91a5](https://github.com/nrwl/nx-console/commit/a6e91a53a0a78a26f555967e8a847606d13ba408))
+* **nxls:** temporarily disable daemon ([0570f53](https://github.com/nrwl/nx-console/commit/0570f53f698fc138fb854b575841fba289992266))
+* **nxls:** use the schema.json for the workspace generator collection path ([#1691](https://github.com/nrwl/nx-console/issues/1691)) ([10574c1](https://github.com/nrwl/nx-console/commit/10574c174742268ebbf755e39b5aec0c381de42e))
+* serialize output messages with payloadType ([#1687](https://github.com/nrwl/nx-console/issues/1687)) ([055477f](https://github.com/nrwl/nx-console/commit/055477f00023828ecf410e08848b9e50ffd88dbd))
+
+
+### Features
+
+* add hover with links to nx.dev for executors ([#1708](https://github.com/nrwl/nx-console/issues/1708)) ([eab101c](https://github.com/nrwl/nx-console/commit/eab101c7a8daa2a3309a2072fce76e85cfec5442))
+* **intellij:** add console folding ([#1662](https://github.com/nrwl/nx-console/issues/1662)) ([c99371f](https://github.com/nrwl/nx-console/commit/c99371f1ea8720aae1c83eb206924ac82195856d))
+* **intellij:** add edit project configuration to nx console tool window ([#1700](https://github.com/nrwl/nx-console/issues/1700)) ([6ec2cd6](https://github.com/nrwl/nx-console/commit/6ec2cd647198e1830f2a72c6f51fa409b7b18fdc))
+* **intellij:** improve project graph loading experience ([#1683](https://github.com/nrwl/nx-console/issues/1683)) ([1978371](https://github.com/nrwl/nx-console/commit/1978371a6e910e600f1d637cc403c9614d65a01b))
+* **nxls:** update dependsOn and namedInputs completion for nx 16 ([#1701](https://github.com/nrwl/nx-console/issues/1701)) ([8eb8b1c](https://github.com/nrwl/nx-console/commit/8eb8b1c5ad962e759fef3428e98222aebe2101ec))
+* support nx 16 ([#1686](https://github.com/nrwl/nx-console/issues/1686)) ([0126e58](https://github.com/nrwl/nx-console/commit/0126e58fccf54a765256c86e48e323659b4cb2fa))
+
 ## 1.3.0 (2023-04-04)
 
 ### Bug Fixes
