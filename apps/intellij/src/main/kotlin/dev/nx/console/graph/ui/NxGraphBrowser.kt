@@ -138,9 +138,10 @@ class NxGraphBrowser(
 
         val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
-            originalGraphHtml.replace(
-                Regex("<head>"),
-                """
+            originalGraphHtml
+                .replace(
+                    Regex("<head>"),
+                    """
           <head>
           <base href="${Matcher.quoteReplacement(basePath)}">
           <style>
@@ -175,20 +176,24 @@ class NxGraphBrowser(
               padding: 12px;
             }
           </style>
-          <script>
-          (function() {
-            window.intellij = {
-                message(msg) {
-                   ${queryMessenger.inject("msg")}
-                }
-            }
-            
-            window.intellij.message("ready");
-          
-          })()
-          </script>
           """
-            )
+                )
+                .replace(
+                    Regex("</body>"),
+                    """
+          <script>
+            (function() {
+                window.intellij = {
+                    message(msg) {
+                        ${queryMessenger.inject("msg")}
+                    }
+                }
+                window.intellij.message("ready");
+             })()
+          </script>
+          </body>
+            """
+                )
 
         browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
