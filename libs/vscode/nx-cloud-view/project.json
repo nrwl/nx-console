@@ -26,7 +26,9 @@
         "deleteOutputPath": false,
         "platform": "browser",
         "outputPath": "dist/apps/vscode/nx-cloud-webview",
-        "format": ["esm"]
+        "format": ["esm"],
+        "external": ["@vscode"],
+        "thirdParty": true
       },
       "dependsOn": ["extract-dependencies"],
       "inputs": ["{projectRoot}/src/webview/**/*"]
@@ -47,6 +49,8 @@
         "platform": "browser",
         "outputPath": "dist/apps/vscode/nx-cloud-webview",
         "format": ["esm"],
+        "external": ["@vscode"],
+        "thirdParty": true,
         "watch": true
       },
       "dependsOn": ["extract-dependencies"],
