@@ -59,7 +59,10 @@ class NxReMoveProjectDialog(
         val model =
             ReMoveProjectDialogModel(
                 reMoveGeneratorContext?.project ?: "",
-                reMoveGenerators.find { it.contains("@nrwl/workspace") } ?: reMoveGenerators[0]
+                reMoveGenerators.find {
+                    it.contains("@nx/workspace") || it.contains("@nrwl/workspace")
+                }
+                    ?: reMoveGenerators[0]
             )
 
         panel =

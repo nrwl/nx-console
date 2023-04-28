@@ -1,7 +1,10 @@
 const rootMain = require('../../../../.storybook/main');
-
 module.exports = rootMain;
-module.exports.core = { builder: 'webpack5' };
+module.exports.core = {
+  builder: {
+    name: '@storybook/builder-webpack5',
+  },
+};
 module.exports.stories = [
   '../src/lib/**/*.stories.mdx',
   '../src/lib/**/*.stories.@(js|jsx|ts|tsx)',

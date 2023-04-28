@@ -39,7 +39,7 @@ export async function selectReMoveGenerator(
   const selectedGenerator = (
     await window.showQuickPick(quickPickItems, {
       title: `Select ${target} generator`,
-      placeHolder: `@nrwl/workspace:${target}`,
+      placeHolder: `@nx/workspace:${target}`,
       canPickMany: false,
     })
   )?.generator;

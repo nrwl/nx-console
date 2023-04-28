@@ -1,11 +1,16 @@
 import { Component, Input } from '@angular/core';
-import { AngularFramework, Story } from '@storybook/angular';
+import { AngularRenderer, Meta, StoryFn } from '@storybook/angular';
 import {
   OptionType,
   TaskExecutionSchema,
   TaskExecutionSchemaInputMessage,
 } from '@nx-console/shared/schema';
-import { GenerateUiFeatureTaskExecutionFormModule } from '../generate-ui-feature-task-execution-form.module';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { GenerateUiComponentsModule } from '@nx-console/generate-ui/components';
+import { FormatTaskPipe } from '../format-task/format-task.pipe';
+import { TaskExecutionFormComponent } from './task-execution-form.component';
 
 const cssColorNames = [
   'AliceBlue',
@@ -144,10 +149,6 @@ const schemaWithoutDefaults: TaskExecutionSchema = {
   }),
 };
 
-export default {
-  title: 'feature-task-execution-form',
-};
-
 @Component({
   selector: 'generate-ui-task-execution-form-example',
   template: `
@@ -167,13 +168,19 @@ class TaskExecutionFormExampleComponent {
   }
 }
 
-const baseConfig: AngularFramework['storyResult'] = {
-  component: TaskExecutionFormExampleComponent,
+const baseConfig: AngularRenderer['storyResult'] = {
   moduleMetadata: {
-    imports: [GenerateUiFeatureTaskExecutionFormModule],
+    imports: [
+      CommonModule,
+      ReactiveFormsModule,
+      ClipboardModule,
+      GenerateUiComponentsModule,
+    ],
+    declarations: [TaskExecutionFormComponent, FormatTaskPipe],
   },
 };
-export const DefaultValues: Story = () => ({
+
+export const DefaultValues: StoryFn = () => ({
   ...baseConfig,
   props: {
     schema: initialSchema,
@@ -186,3 +193,9 @@ export const NoDefaultValues = () => ({
     schema: schemaWithoutDefaults,
   },
 });
+
+const meta: Meta<TaskExecutionFormExampleComponent> = {
+  component: TaskExecutionFormExampleComponent,
+  title: 'feature-task-execution-form',
+};
+export default meta;
