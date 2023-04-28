@@ -1,3 +1,28 @@
+# [18.1.0](https://github.com/nrwl/nx-console/compare/vscode-v18.0.4...vscode-v18.1.0) (2023-04-28)
+
+
+### Bug Fixes
+
+* **generate-ui:** correctly serialize options with array default values ([#1690](https://github.com/nrwl/nx-console/issues/1690)) ([f21508c](https://github.com/nrwl/nx-console/commit/f21508cd2cd7da43be03881778810736971e13fd))
+* **generate-ui:** handle multiple default values for generate ui ([#1684](https://github.com/nrwl/nx-console/issues/1684)) ([2529b56](https://github.com/nrwl/nx-console/commit/2529b563137ae7f732e77a09191d9582463e582f))
+* **nxls:** handle the daemon output so that stdout isnt polluted ([#1698](https://github.com/nrwl/nx-console/issues/1698)) ([cf3f93f](https://github.com/nrwl/nx-console/commit/cf3f93f075bb1b654ff991d7b3ec891118126b0e))
+* **nxls:** support running under node 14 ([#1679](https://github.com/nrwl/nx-console/issues/1679)) ([a6e91a5](https://github.com/nrwl/nx-console/commit/a6e91a53a0a78a26f555967e8a847606d13ba408))
+* **nxls:** use the schema.json for the workspace generator collection path ([#1691](https://github.com/nrwl/nx-console/issues/1691)) ([10574c1](https://github.com/nrwl/nx-console/commit/10574c174742268ebbf755e39b5aec0c381de42e))
+* serialize output messages with payloadType ([#1687](https://github.com/nrwl/nx-console/issues/1687)) ([055477f](https://github.com/nrwl/nx-console/commit/055477f00023828ecf410e08848b9e50ffd88dbd))
+* **vscode:** enable authorizing with nx cloud in codespaces ([#1697](https://github.com/nrwl/nx-console/issues/1697)) ([2425596](https://github.com/nrwl/nx-console/commit/242559644c0532f582fbae272579336348caa6c2))
+* **vscode:** read cloud runner information correctly for v16 ([#1695](https://github.com/nrwl/nx-console/issues/1695)) ([59db061](https://github.com/nrwl/nx-console/commit/59db0615ddcdecfbf76417109b6e5f422c7831e2))
+* **vscode:** remove obsolete commands ([#1693](https://github.com/nrwl/nx-console/issues/1693)) ([92bfe1e](https://github.com/nrwl/nx-console/commit/92bfe1e621e92f22a4f2d1c37bfbbbde20e4ce76))
+* **vscode:** run target filters projects ([#1692](https://github.com/nrwl/nx-console/issues/1692)) ([c6c4f1e](https://github.com/nrwl/nx-console/commit/c6c4f1e6794771386e733bcf90a27c498730f38f))
+* **vscode:** use correct workspace path when adding dependency ([#1689](https://github.com/nrwl/nx-console/issues/1689)) ([6458664](https://github.com/nrwl/nx-console/commit/64586644a2dbaea484e62aa4f3702a0873be2059))
+* **vscode:** use more robust project:target syntax for running tasks ([#1694](https://github.com/nrwl/nx-console/issues/1694)) ([1c48cb1](https://github.com/nrwl/nx-console/commit/1c48cb11725786c90adb7b84479f478e35041ba0))
+
+
+### Features
+
+* add hover with links to nx.dev for executors ([#1708](https://github.com/nrwl/nx-console/issues/1708)) ([eab101c](https://github.com/nrwl/nx-console/commit/eab101c7a8daa2a3309a2072fce76e85cfec5442))
+* **nxls:** update dependsOn and namedInputs completion for nx 16 ([#1701](https://github.com/nrwl/nx-console/issues/1701)) ([8eb8b1c](https://github.com/nrwl/nx-console/commit/8eb8b1c5ad962e759fef3428e98222aebe2101ec))
+* support nx 16 ([#1686](https://github.com/nrwl/nx-console/issues/1686)) ([0126e58](https://github.com/nrwl/nx-console/commit/0126e58fccf54a765256c86e48e323659b4cb2fa))
+
 ## [18.0.4](https://github.com/nrwl/nx-console/compare/vscode-v18.0.3...vscode-v18.0.4) (2023-04-13)
 
 
