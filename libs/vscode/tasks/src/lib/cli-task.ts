@@ -2,16 +2,31 @@ import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
 import { Task, TaskGroup, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { NxWorkspace } from '@nx-console/shared/types';
+import {
+  detectPackageManager,
+  getPackageManagerCommand,
+  PackageManagerCommands,
+} from 'nx/src/utils/package-manager';
 
 export class CliTask extends Task {
-  static async create(definition: CliTaskDefinition): Promise<CliTask> {
+  /**
+   * workspace & packageManagerCommands can be passed in to increase performance when creating multiple tasks
+   * if you don't pass them in, they will fetched for you
+   */
+  static async create(
+    definition: CliTaskDefinition,
+    workspace?: NxWorkspace,
+    packageManagerComands?: PackageManagerCommands
+  ): Promise<CliTask> {
     const { command } = definition;
 
     // Using `run [project]:[command]` is more backwards compatible in case different
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
 
-    const { isEncapsulatedNx, workspacePath } = await getNxWorkspace();
+    const { isEncapsulatedNx, workspacePath } =
+      workspace ?? (await getNxWorkspace());
 
     const displayCommand = `nx ${args.join(' ')}`;
 
@@ -21,11 +36,14 @@ export class CliTask extends Task {
       displayCommand, // name
       'nx',
       // execution
-      getShellExecutionForConfig({
-        displayCommand,
-        cwd: workspacePath,
-        encapsulatedNx: isEncapsulatedNx,
-      })
+      getShellExecutionForConfig(
+        {
+          displayCommand,
+          cwd: workspacePath,
+          encapsulatedNx: isEncapsulatedNx,
+        },
+        packageManagerComands
+      )
     );
 
     switch (command) {
@@ -38,6 +56,22 @@ export class CliTask extends Task {
     }
 
     return task;
+  }
+
+  static async batchCreate(
+    definitions: CliTaskDefinition[],
+    workspace?: NxWorkspace
+  ): Promise<CliTask[]> {
+    const w = workspace ?? (await getNxWorkspace());
+
+    const packageManagerCommands = getPackageManagerCommand(
+      detectPackageManager(w.workspacePath)
+    );
+    return await Promise.all(
+      definitions.map((definition) =>
+        this.create(definition, w, packageManagerCommands)
+      )
+    );
   }
 }
 
