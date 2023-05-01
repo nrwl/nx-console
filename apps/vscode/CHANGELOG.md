@@ -1,3 +1,10 @@
+## [18.1.1](https://github.com/nrwl/nx-console/compare/vscode-v18.1.0...vscode-v18.1.1) (2023-05-01)
+
+
+### Bug Fixes
+
+* **vscode:** get projects properly in cli-task-command ([#1715](https://github.com/nrwl/nx-console/issues/1715)) ([a08c751](https://github.com/nrwl/nx-console/commit/a08c751ef0420fb723ca012824ff22a5eafabcf9))
+
 # [18.1.0](https://github.com/nrwl/nx-console/compare/vscode-v18.0.4...vscode-v18.1.0) (2023-04-28)
 
 
