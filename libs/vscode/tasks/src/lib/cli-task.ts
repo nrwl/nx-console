@@ -17,10 +17,8 @@ export class CliTask extends Task {
   static async create(
     definition: CliTaskDefinition,
     workspace?: NxWorkspace,
-    packageManagerComands?: PackageManagerCommands
+    packageManagerCommands?: PackageManagerCommands
   ): Promise<CliTask> {
-    const { command } = definition;
-
     // Using `run [project]:[command]` is more backwards compatible in case different
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
@@ -42,18 +40,9 @@ export class CliTask extends Task {
           cwd: workspacePath,
           encapsulatedNx: isEncapsulatedNx,
         },
-        packageManagerComands
+        packageManagerCommands
       )
     );
-
-    switch (command) {
-      case 'build':
-        task.group = TaskGroup.Build;
-        task.problemMatchers.push('$webpack-builder');
-        break;
-      default:
-        task.group = TaskGroup.Test;
-    }
 
     return task;
   }
