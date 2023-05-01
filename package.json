@@ -76,7 +76,7 @@
     "@storybook/angular": "7.0.7",
     "@storybook/core-server": "7.0.7",
     "@swc-node/register": "^1.5.1",
-    "@theunderscorer/nx-semantic-release": "2.2.1",
+    "@theunderscorer/nx-semantic-release": "2.4.0",
     "@types/find-cache-dir": "^3.2.1",
     "@types/jest": "29.4.0",
     "@types/mocha": "^9.1.1",

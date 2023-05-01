@@ -295,7 +295,10 @@ export async function getCliProjectFromUri(
 }
 
 export async function selectCliProject(command: string) {
-  const projectEntries = Object.entries((await getNxWorkspace()) || {});
+  const {
+    workspace: { projects },
+  } = await getNxWorkspace();
+  const projectEntries = Object.entries(projects);
   const items = projectEntries
     .filter(([, { targets }]) => Boolean(targets))
     .flatMap(([project, { targets, root }]) => ({ project, targets, root }))
