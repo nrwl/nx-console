@@ -24,7 +24,7 @@ class NxGenerateService(val project: Project) {
     suspend fun getFilteredGenerators(): List<NxGenerator> {
         val generators = NxlsService.getInstance(project).generators()
         val filters =
-            NxConsoleProjectSettingsProvider.getInstance(project).generatorAllowlist
+            NxConsoleProjectSettingsProvider.getInstance(project).generatorFilters
                 ?: return generators
         val includeFilters = mutableListOf<GeneratorFilter>()
         val excludeFilters = mutableListOf<GeneratorFilter>()

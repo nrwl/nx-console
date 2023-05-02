@@ -10,8 +10,7 @@ import com.intellij.util.ui.table.TableModelEditor.EditableColumnInfo
 import dev.nx.console.settings.NxConsoleSettingBase
 import javax.swing.JTable
 
-class GeneratorAllowlistSetting(val project: Project) :
-    NxConsoleSettingBase<List<GeneratorFilter>?> {
+class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<GeneratorFilter>?> {
 
     private val listModel: ListTableModel<GeneratorListItem>
     private val table: TableView<GeneratorListItem>

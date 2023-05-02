@@ -22,7 +22,7 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
             state.workspacePath = value
         }
 
-    var generatorAllowlist: List<GeneratorFilter>?
+    var generatorFilters: List<GeneratorFilter>?
         get() = state.generatorAllowlist
         set(value) {
             state.generatorAllowlist = value

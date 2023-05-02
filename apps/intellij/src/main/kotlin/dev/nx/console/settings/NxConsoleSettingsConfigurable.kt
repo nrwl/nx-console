@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import dev.nx.console.settings.options.EnableDryRunOnGenerateChangeSetting
-import dev.nx.console.settings.options.GeneratorAllowlistSetting
+import dev.nx.console.settings.options.GeneratorFiltersSetting
 import dev.nx.console.settings.options.TelemetrySetting
 import dev.nx.console.settings.options.WorkspacePathSetting
 import javax.swing.JComponent
@@ -19,7 +19,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var workspacePathSetting: WorkspacePathSetting
     private lateinit var telemetrySetting: TelemetrySetting
-    private lateinit var generatorAllowlistSetting: GeneratorAllowlistSetting
+    private lateinit var generatorFiltersSetting: GeneratorFiltersSetting
 
     override fun createComponent(): JComponent {
         enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
@@ -31,13 +31,13 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         telemetrySetting = TelemetrySetting()
         telemetrySetting.setValue(settingsProvider.enableTelemetry)
 
-        generatorAllowlistSetting = GeneratorAllowlistSetting(project)
-        generatorAllowlistSetting.setValue(projectSettingsProvider.generatorAllowlist)
+        generatorFiltersSetting = GeneratorFiltersSetting(project)
+        generatorFiltersSetting.setValue(projectSettingsProvider.generatorFilters)
 
         return panel {
             group("Project Settings") {
                 workspacePathSetting.render(this)
-                generatorAllowlistSetting.render(this)
+                generatorFiltersSetting.render(this)
             }
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
@@ -51,7 +51,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             settingsProvider.enableDryRunOnGenerateChange ||
             telemetrySetting.getValue() != settingsProvider.enableTelemetry ||
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
-            generatorAllowlistSetting.getValue() != projectSettingsProvider.generatorAllowlist
+            generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters
     }
 
     override fun apply() {
@@ -59,7 +59,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
         projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
-        projectSettingsProvider.generatorAllowlist = generatorAllowlistSetting.getValue()
+        projectSettingsProvider.generatorFilters = generatorFiltersSetting.getValue()
 
         workspacePathSetting.doApply()
     }
