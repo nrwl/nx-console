@@ -27,7 +27,6 @@
         "platform": "browser",
         "outputPath": "dist/apps/vscode/nx-cloud-webview",
         "format": ["esm"],
-        "external": ["@vscode"],
         "thirdParty": true
       },
       "dependsOn": ["extract-dependencies"],
@@ -49,7 +48,6 @@
         "platform": "browser",
         "outputPath": "dist/apps/vscode/nx-cloud-webview",
         "format": ["esm"],
-        "external": ["@vscode"],
         "thirdParty": true,
         "watch": true
       },
