@@ -7,6 +7,7 @@ import {
 import {
   getGeneratorOptions,
   getGenerators,
+  getNxVersion,
 } from '@nx-console/vscode/nx-workspace';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { selectFlags } from '@nx-console/vscode/tasks';
@@ -198,12 +199,13 @@ async function executeInitGenerator(dependency: string, workspacePath: string) {
   tasks.executeTask(task);
 }
 
-function getDependencySuggestions(): Promise<
+async function getDependencySuggestions(): Promise<
   {
     name: string;
     description: string;
   }[]
 > {
+  const version = await getNxVersion();
   const headers = { 'Accept-Encoding': 'gzip, deflate' };
   return Promise.all([
     xhr({
@@ -227,7 +229,7 @@ function getDependencySuggestions(): Promise<
             pkg.name !== 'tao'
         )
         .map((pkg) => ({
-          name: `@nrwl/${pkg.name}`,
+          name: `@${version.major <= 15 ? 'nrwl' : 'nx'}/${pkg.name}`,
           description: pkg.description,
         }));
     }),
