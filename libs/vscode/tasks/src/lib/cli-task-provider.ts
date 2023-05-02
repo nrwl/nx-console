@@ -1,12 +1,9 @@
 import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared/schema';
-import { getNxWorkspacePath } from '@nx-console/vscode/nx-workspace';
 import {
-  ProviderResult,
-  Task,
-  TaskExecution,
-  TaskProvider,
-  tasks,
-} from 'vscode';
+  getNxWorkspace,
+  getNxWorkspacePath,
+} from '@nx-console/vscode/nx-workspace';
+import { Task, TaskExecution, TaskProvider, tasks } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
@@ -33,19 +30,36 @@ export class CliTaskProvider implements TaskProvider {
     });
   }
 
-  provideTasks(): ProviderResult<Task[]> {
-    return null;
+  async provideTasks(): Promise<Task[]> {
+    const nxWorkspace = await getNxWorkspace();
+
+    const projectTargetCombinations: [string, string][] = [];
+
+    Object.entries(nxWorkspace.workspace.projects).forEach(
+      ([projectName, project]) => {
+        Object.keys(project.targets ?? {}).forEach((targetName) => {
+          projectTargetCombinations.push([projectName, targetName]);
+        });
+      }
+    );
+
+    return CliTask.batchCreate(
+      projectTargetCombinations.map(([projectName, targetName]) => {
+        return {
+          command: 'run',
+          positional: `${projectName}:${targetName}`,
+          flags: [],
+        };
+      }),
+      nxWorkspace
+    );
   }
 
   async resolveTask(task: Task): Promise<Task | undefined> {
-    if (
-      (await getNxWorkspacePath()) &&
-      task.definition.command &&
-      task.definition.project
-    ) {
-      const cliTask = await this.createTask({
+    if ((await getNxWorkspacePath()) && task.definition.command) {
+      const cliTask = await CliTask.create({
         command: task.definition.command,
-        positional: task.definition.project,
+        positional: task.definition.positional,
         flags: Array.isArray(task.definition.flags)
           ? task.definition.flags
           : [],
@@ -54,10 +68,6 @@ export class CliTaskProvider implements TaskProvider {
       cliTask.definition = task.definition;
       return cliTask;
     }
-  }
-
-  async createTask(definition: CliTaskDefinition) {
-    return CliTask.create(definition);
   }
 
   async executeTask(definition: CliTaskDefinition) {
@@ -82,7 +92,7 @@ export class CliTaskProvider implements TaskProvider {
         flags: definition.flags,
       });
     } else {
-      task = await this.createTask(definition);
+      task = await CliTask.create(definition);
     }
 
     return tasks.executeTask(task).then((execution) => {
