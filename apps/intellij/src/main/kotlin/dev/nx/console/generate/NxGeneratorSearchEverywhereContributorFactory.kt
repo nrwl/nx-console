@@ -33,7 +33,9 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
 
     private val project = event.getRequiredData(CommonDataKeys.PROJECT)
 
-    private val generators = runBlocking { project.service<NxlsService>().generators() }
+    private val generators = runBlocking {
+        NxGenerateService.getInstance(project).getFilteredGenerators()
+    }
 
     private val generatorToOptionsCache: ConcurrentMap<NxGenerator, List<NxGeneratorOption>> =
         ConcurrentHashMap()
