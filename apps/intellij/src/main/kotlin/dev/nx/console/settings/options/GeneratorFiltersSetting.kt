@@ -28,7 +28,8 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
     }
     override fun render(panel: Panel) {
         panel.apply {
-            row("Generator Filters") {
+            row() {
+                    label("Generator Filters").align(AlignY.TOP)
                     cell(
                             ToolbarDecorator.createDecorator(table)
                                 .setAddAction { addData() }
@@ -37,6 +38,10 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
                                 .createPanel()
                         )
                         .align(Align.FILL)
+                        .comment(
+                            "Generator names or wildcard patterns to include/exclude throughout the UI.",
+                            MAX_LINE_LENGTH_WORD_WRAP
+                        )
                         .component
                 }
                 .layout(RowLayout.PARENT_GRID)
@@ -113,7 +118,7 @@ class GeneratorFiltersSetting(val project: Project) : NxConsoleSettingBase<List<
 }
 
 private class GeneratorListItem(
-    var matcher: String = "@nx/example",
+    var matcher: String = "@nx/example:*",
     var include: Boolean = false,
     var exclude: Boolean = true
 ) {}
