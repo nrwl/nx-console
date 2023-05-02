@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.emptyText
 import com.intellij.ui.components.textFieldWithBrowseButton
 import com.intellij.ui.dsl.builder.MAX_LINE_LENGTH_WORD_WRAP
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingBase
@@ -31,7 +32,8 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
                         MAX_LINE_LENGTH_WORD_WRAP
                     )
                     .apply { component.emptyText.text = project.basePath ?: "" }
-            }
+            }.layout(RowLayout.PARENT_GRID)
+
         }
     }
 

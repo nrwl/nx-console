@@ -2,6 +2,7 @@ package dev.nx.console.settings
 
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
+import dev.nx.console.settings.options.GeneratorFilter
 
 @State(name = "NxConsoleSettingsProvider", storages = [Storage("nx-console.xml")])
 class NxConsoleProjectSettingsProvider(val project: Project) :
@@ -21,7 +22,7 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
             state.workspacePath = value
         }
 
-    var generatorAllowlist: String?
+    var generatorAllowlist: List<GeneratorFilter>?
         get() = state.generatorAllowlist
         set(value) {
             state.generatorAllowlist = value
@@ -36,5 +37,5 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
 
 data class NxConsoleProjectSettingsState(
     var workspacePath: String? = null,
-    var generatorAllowlist: String? = null
+    var generatorAllowlist: List<GeneratorFilter>? = null
 ) {}

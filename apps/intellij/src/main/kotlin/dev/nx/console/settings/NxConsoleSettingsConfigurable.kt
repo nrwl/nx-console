@@ -50,7 +50,8 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         return enableDryRunOnGenerateChangeSetting.getValue() !=
             settingsProvider.enableDryRunOnGenerateChange ||
             telemetrySetting.getValue() != settingsProvider.enableTelemetry ||
-            workspacePathSetting.getValue() != projectSettingsProvider.workspacePath
+            workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
+            generatorAllowlistSetting.getValue() != projectSettingsProvider.generatorAllowlist
     }
 
     override fun apply() {
@@ -58,6 +59,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
         projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
+        projectSettingsProvider.generatorAllowlist = generatorAllowlistSetting.getValue()
 
         workspacePathSetting.doApply()
     }
