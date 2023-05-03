@@ -126,7 +126,7 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
                     TargetConfiguration(
                         nxTargetConfigurationName = it,
                         nxTargetName = nxTargetName,
-                        nxProject = nxProject,
+                        nxProject = nxProject!!,
                         parent = this
                     )
                 }
@@ -162,13 +162,15 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
     }
 
     class TargetConfiguration(
-        private val nxTargetConfigurationName: String,
+        val nxTargetConfigurationName: String,
         val nxTargetName: String,
-        nxProject: NxProject?,
+        nxProject: NxProject,
         parent: SimpleNode
     ) : NxSimpleNode(nxProject, parent) {
+        val nxProjectName = nxProject.name
+
         override val id: String =
-            "config_${nxProject?.name}_${nxTargetName}_$nxTargetConfigurationName"
+            "config_${nxProject.name}_${nxTargetName}_$nxTargetConfigurationName"
 
         init {
             icon = AllIcons.General.Gear

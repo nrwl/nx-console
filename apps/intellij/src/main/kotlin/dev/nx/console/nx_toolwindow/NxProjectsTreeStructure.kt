@@ -91,8 +91,8 @@ class NxProjectsTreeStructure(
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             val runManager = project.service<RunManager>()
             if (taskSet != null) {
-                val nxTarget = taskSet.nxTargets.first()
-                val nxProject = taskSet.nxProjects.first()
+                val nxTarget = taskSet.nxTarget
+                val nxProject = taskSet.nxProject
                 val runnerAndConfigurationSettings: RunnerAndConfigurationSettings =
                     runManager
                         .getConfigurationSettingsList(NxCommandConfigurationType.getInstance())
@@ -161,8 +161,9 @@ class NxProjectsTreeStructure(
                     if (event.button == 1 && clickCount == 2) {
                         val taskSet: NxTaskSet = createTaskSetFromSelectedNodes() ?: return false
                         nxTaskExecutionManager.execute(
-                            taskSet.nxProjects.first(),
-                            taskSet.nxTargets.first()
+                            taskSet.nxProject,
+                            taskSet.nxTarget,
+                            taskSet.nxTargetConfiguration
                         )
                         return true
                     }
@@ -198,21 +199,34 @@ class NxProjectsTreeStructure(
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             if (taskSet != null) {
                 nxTaskExecutionManager.execute(
-                    taskSet.nxProjects.first(),
-                    taskSet.nxTargets.first()
+                    taskSet.nxProject,
+                    taskSet.nxTarget,
+                    taskSet.nxTargetConfiguration
                 )
             }
         }
     }
 
     private fun createTaskSetFromSelectedNodes(): NxTaskSet? {
-        val userObject = tree.selectedNode as? NxSimpleNode.Target
-        if (userObject != null) {
+        val targetNode = tree.selectedNode as? NxSimpleNode.Target
+
+        if (targetNode != null) {
             return NxTaskSet(
-                nxProjects = listOf(userObject.nxProjectName),
-                nxTargets = listOf(userObject.nxTargetName)
+                nxProject = targetNode.nxProjectName,
+                nxTarget = targetNode.nxTargetName
             )
         }
+
+        val targetConfigurationNode = tree.selectedNode as? NxSimpleNode.TargetConfiguration
+
+        if (targetConfigurationNode != null) {
+            return NxTaskSet(
+                nxProject = targetConfigurationNode.nxProjectName,
+                nxTarget = targetConfigurationNode.nxTargetName,
+                nxTargetConfiguration = targetConfigurationNode.nxTargetConfigurationName
+            )
+        }
+
         return null
     }
 }
