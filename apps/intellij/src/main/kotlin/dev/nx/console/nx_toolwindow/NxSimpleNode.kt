@@ -5,6 +5,7 @@ import com.intellij.ui.treeStructure.CachingSimpleNode
 import com.intellij.ui.treeStructure.SimpleNode
 import dev.nx.console.NxIcons
 import dev.nx.console.models.NxProject
+import dev.nx.console.models.NxTarget
 import dev.nx.console.models.NxWorkspace
 
 sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
@@ -87,21 +88,25 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
             nxWorkspace.workspace.projects
                 .filter { it.value.targets.contains(targetName) }
                 .map {
+                    val target = it.value.targets[targetName] ?: return@map null
                     Target(
-                        name = it.key,
-                        nxTarget = targetName,
+                        displayName = it.key,
+                        nxTarget = target,
+                        nxTargetName = targetName,
                         nxProject = it.value,
                         parent = this
                     )
                 }
+                .filterNotNull()
                 .toTypedArray()
 
         override fun getName(): String = targetName
     }
 
     class Target(
-        private val name: String,
-        val nxTarget: String,
+        private val displayName: String,
+        val nxTarget: NxTarget,
+        val nxTargetName: String,
         nxProject: NxProject,
         parent: SimpleNode
     ) : NxSimpleNode(nxProject, parent) {
@@ -114,9 +119,21 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
             presentation.tooltip = "Target"
         }
 
-        override fun buildChildren(): Array<SimpleNode> = emptyArray()
+        override fun buildChildren(): Array<SimpleNode> =
+            nxTarget.configurations
+                ?.keys
+                ?.map {
+                    TargetConfiguration(
+                        nxTargetConfigurationName = it,
+                        nxTargetName = nxTargetName,
+                        nxProject = nxProject,
+                        parent = this
+                    )
+                }
+                ?.toTypedArray()
+                ?: emptyArray()
 
-        override fun getName(): String = name
+        override fun getName(): String = displayName
     }
 
     class Project(nxProject: NxProject, parent: SimpleNode) : NxSimpleNode(nxProject, parent) {
@@ -130,10 +147,36 @@ sealed class NxSimpleNode(val nxProject: NxProject?, parent: SimpleNode?) :
         override fun buildChildren(): Array<SimpleNode> =
             nxProject!!
                 .targets
-                .keys
-                .map { Target(name = it, nxProject = nxProject, nxTarget = it, parent = this) }
+                .map {
+                    Target(
+                        displayName = it.key,
+                        nxTarget = it.value,
+                        nxTargetName = it.key,
+                        nxProject = nxProject,
+                        parent = this
+                    )
+                }
                 .toTypedArray()
 
         override fun getName(): String = nxProject!!.name
+    }
+
+    class TargetConfiguration(
+        private val nxTargetConfigurationName: String,
+        val nxTargetName: String,
+        nxProject: NxProject?,
+        parent: SimpleNode
+    ) : NxSimpleNode(nxProject, parent) {
+        override val id: String =
+            "config_${nxProject?.name}_${nxTargetName}_$nxTargetConfigurationName"
+
+        init {
+            icon = AllIcons.General.Gear
+            presentation.tooltip = "Target Configuration"
+        }
+
+        override fun getName(): String = nxTargetConfigurationName
+
+        override fun buildChildren(): Array<SimpleNode> = emptyArray()
     }
 }

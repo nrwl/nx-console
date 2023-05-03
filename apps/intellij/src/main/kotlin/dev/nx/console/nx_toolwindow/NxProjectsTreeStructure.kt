@@ -210,7 +210,7 @@ class NxProjectsTreeStructure(
         if (userObject != null) {
             return NxTaskSet(
                 nxProjects = listOf(userObject.nxProjectName),
-                nxTargets = listOf(userObject.nxTarget)
+                nxTargets = listOf(userObject.nxTargetName)
             )
         }
         return null
