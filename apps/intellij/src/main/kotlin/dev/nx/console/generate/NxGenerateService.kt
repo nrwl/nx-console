@@ -39,7 +39,7 @@ class NxGenerateService(val project: Project) {
             var keep = true
             if (includeFilters.size > 0) {
                 keep =
-                    includeFilters.all { filter ->
+                    includeFilters.any { filter ->
                         matchWithWildcards(generator.name, filter.matcher)
                     }
             }
