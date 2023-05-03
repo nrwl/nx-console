@@ -49,9 +49,14 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
         val nxTarget = task.substringAfter(":")
 
         val runnerAndConfigurationSettings =
-            getOrCreateRunnerConfigurationSettings(project, nxProject, nxTarget, args).also {
-                runManager.addConfiguration(it)
-            }
+            getOrCreateRunnerConfigurationSettings(
+                    project,
+                    nxProject,
+                    nxTarget,
+                    null,
+                    args,
+                )
+                .also { runManager.addConfiguration(it) }
 
         runManager.selectedConfiguration = runnerAndConfigurationSettings
         val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()

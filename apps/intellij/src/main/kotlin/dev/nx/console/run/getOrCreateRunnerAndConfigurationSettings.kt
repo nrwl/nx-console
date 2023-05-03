@@ -8,6 +8,7 @@ fun getOrCreateRunnerConfigurationSettings(
     project: Project,
     nxProject: String,
     nxTarget: String,
+    nxTargetConfiguration: String? = "",
     args: List<String> = listOf()
 ): RunnerAndConfigurationSettings {
     val runManager = RunManager.getInstance(project)
@@ -17,16 +18,22 @@ fun getOrCreateRunnerConfigurationSettings(
         .firstOrNull {
             val nxCommandConfiguration = it.configuration as NxCommandConfiguration
             val nxRunSettings = nxCommandConfiguration.nxRunSettings
-            nxRunSettings.nxTargets == nxTarget && nxRunSettings.nxProjects == nxProject
+            nxRunSettings.nxTargets == nxTarget &&
+                nxRunSettings.nxProjects == nxProject &&
+                nxRunSettings.nxTargetsConfiguration == nxTargetConfiguration
         }
         ?: runManager
-            .createConfiguration("$nxProject:$nxTarget", NxCommandConfigurationType::class.java)
+            .createConfiguration(
+                "$nxProject:$nxTarget${if(nxTargetConfiguration.isNullOrBlank().not()) ":$nxTargetConfiguration" else ""}",
+                NxCommandConfigurationType::class.java
+            )
             .apply {
                 (configuration as NxCommandConfiguration).apply {
                     nxRunSettings =
                         NxRunSettings(
                             nxProjects = nxProject,
                             nxTargets = nxTarget,
+                            nxTargetsConfiguration = nxTargetConfiguration,
                             arguments = args.drop(1).joinToString(" "),
                         )
                 }

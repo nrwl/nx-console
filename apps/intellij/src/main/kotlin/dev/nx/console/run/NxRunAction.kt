@@ -23,7 +23,7 @@ class NxRunAction(private val nxProject: String, private val nxTarget: String) :
             NxCommandConfiguration(project, NxRunConfigurationProducer().configurationFactory)
         runConfig.nxRunSettings = NxRunSettings().copy(nxProjects = nxProject, nxTargets = nxTarget)
 
-        val runner = getOrCreateRunnerConfigurationSettings(project, nxProject, nxTarget)
+        val runner = getOrCreateRunnerConfigurationSettings(project, nxProject, nxTarget, null)
 
         ProgramRunnerUtil.executeConfiguration(runner, DefaultRunExecutor.getRunExecutorInstance())
     }
