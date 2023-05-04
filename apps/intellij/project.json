@@ -10,8 +10,12 @@
       }
     },
     "build": {
-      "inputs": ["kotlin"],
-      "outputs": ["{workspaceRoot}/dist/apps/intellij/distributions"],
+      "inputs": [
+        "kotlin"
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/apps/intellij/distributions"
+      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:buildPlugin"
@@ -19,11 +23,17 @@
       "configurations": {
         "production-intellij": {}
       },
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "test": {
-      "inputs": ["kotlin"],
-      "outputs": ["{workspaceRoot}/dist/apps/intellij/reports/tests"],
+      "inputs": [
+        "kotlin"
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/apps/intellij/reports/tests"
+      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew :apps:intellij:check"
@@ -39,13 +49,23 @@
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
+        "outputPath": "",
         "ci": false,
         "npm": false,
-        "plugins": ["gradle-semantic-release-plugin"],
-        "gitAssets": ["gradle.properties"]
+        "plugins": [
+          "gradle-semantic-release-plugin"
+        ],
+        "gitAssets": [
+          "gradle.properties"
+        ]
       }
     }
   },
-  "tags": ["type:intellij"],
-  "implicitDependencies": ["generate-ui", "nxls"]
+  "tags": [
+    "type:intellij"
+  ],
+  "implicitDependencies": [
+    "generate-ui",
+    "nxls"
+  ]
 }

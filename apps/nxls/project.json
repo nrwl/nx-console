@@ -6,22 +6,37 @@
   "targets": {
     "watch": {
       "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/vscode/nxls",
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
-        "assets": ["apps/nxls/src/assets"],
+        "assets": [
+          "apps/nxls/src/assets"
+        ],
         "sourcemap": true,
         "watch": true,
         "skipTypeCheck": false,
-        "external": ["@swc/*", "@parcel/watcher", "nx", "webpack", "fsevents"],
+        "external": [
+          "@swc/*",
+          "@parcel/watcher",
+          "nx",
+          "webpack",
+          "fsevents"
+        ],
         "outputFileName": "main.js",
-        "format": ["cjs"],
+        "format": [
+          "cjs"
+        ],
         "platform": "node",
         "generatePackageJson": false,
         "esbuildOptions": {
-          "mainFields": ["module", "main"],
+          "mainFields": [
+            "module",
+            "main"
+          ],
           "outExtension": {
             ".js": ".js"
           }
@@ -52,7 +67,9 @@
     "build": {
       "defaultConfiguration": "production",
       "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{workspaceRoot}/dist/apps/nxls"],
+      "outputs": [
+        "{workspaceRoot}/dist/apps/nxls"
+      ],
       "options": {
         "main": "apps/nxls/src/main.ts",
         "tsConfig": "apps/nxls/tsconfig.app.json",
@@ -67,11 +84,16 @@
         ],
         "target": "es2020",
         "outputFileName": "main.js",
-        "format": ["cjs"],
+        "format": [
+          "cjs"
+        ],
         "thirdParty": true,
         "platform": "node",
         "esbuildOptions": {
-          "mainFields": ["module", "main"],
+          "mainFields": [
+            "module",
+            "main"
+          ],
           "loader": {
             ".node": "dataurl"
           },
@@ -97,14 +119,20 @@
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/nxls/**/*.ts"]
+        "lintFilePatterns": [
+          "apps/nxls/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/nxls"],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/nxls"
+      ],
       "options": {
         "jestConfig": "apps/nxls/jest.config.ts",
         "passWithNoTests": true
@@ -120,5 +148,7 @@
       }
     }
   },
-  "tags": ["type:lsp"]
+  "tags": [
+    "type:lsp"
+  ]
 }

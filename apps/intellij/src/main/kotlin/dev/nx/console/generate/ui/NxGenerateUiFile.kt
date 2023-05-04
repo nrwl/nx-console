@@ -50,6 +50,8 @@ abstract class NxGenerateUiFile(name: String) :
 
     abstract fun createMainComponent(project: Project): JComponent
 
+    abstract fun setupGeneratorForm(generator: NxGenerator): Unit
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -84,7 +86,7 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
         return browser.component
     }
 
-    fun setupGeneratorForm(generator: NxGenerator) {
+    override fun setupGeneratorForm(generator: NxGenerator) {
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
