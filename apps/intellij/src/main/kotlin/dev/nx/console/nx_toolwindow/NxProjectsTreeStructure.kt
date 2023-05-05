@@ -2,7 +2,6 @@ package dev.nx.console.nx_toolwindow
 
 import com.intellij.execution.Executor
 import com.intellij.execution.RunManager
-import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
@@ -22,10 +21,7 @@ import dev.nx.console.graph.actions.NxGraphFocusTaskAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
 import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nx_toolwindow.actions.EditNxProjectConfigurationAction
-import dev.nx.console.run.NxCommandConfiguration
-import dev.nx.console.run.NxCommandConfigurationType
-import dev.nx.console.run.NxRunSettings
-import dev.nx.console.run.NxTaskExecutionManager
+import dev.nx.console.run.*
 import dev.nx.console.utils.nxWorkspace
 import java.awt.event.MouseEvent
 import kotlinx.coroutines.CoroutineScope
@@ -91,31 +87,16 @@ class NxProjectsTreeStructure(
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             val runManager = project.service<RunManager>()
             if (taskSet != null) {
-                val nxTarget = taskSet.nxTargets.first()
-                val nxProject = taskSet.nxProjects.first()
-                val runnerAndConfigurationSettings: RunnerAndConfigurationSettings =
-                    runManager
-                        .getConfigurationSettingsList(NxCommandConfigurationType.getInstance())
-                        .firstOrNull {
-                            val nxCommandConfiguration = it.configuration as NxCommandConfiguration
-                            val nxRunSettings = nxCommandConfiguration.nxRunSettings
-                            nxRunSettings.nxTargets == nxTarget &&
-                                nxRunSettings.nxProjects == nxProject
-                        }
-                        ?: runManager
-                            .createConfiguration(
-                                "$nxProject[$nxTarget]",
-                                NxCommandConfigurationType::class.java
-                            )
-                            .apply {
-                                (configuration as NxCommandConfiguration).apply {
-                                    nxRunSettings =
-                                        NxRunSettings(
-                                            nxProjects = nxProject,
-                                            nxTargets = nxTarget,
-                                        )
-                                }
-                            }
+                val nxTarget = taskSet.nxTarget
+                val nxProject = taskSet.nxProject
+                val nxTargetConfiguration = taskSet.nxTargetConfiguration
+                val runnerAndConfigurationSettings =
+                    getOrCreateRunnerConfigurationSettings(
+                        project,
+                        nxProject,
+                        nxTarget,
+                        nxTargetConfiguration
+                    )
 
                 val ok =
                     RunDialog.editConfiguration(
@@ -161,8 +142,9 @@ class NxProjectsTreeStructure(
                     if (event.button == 1 && clickCount == 2) {
                         val taskSet: NxTaskSet = createTaskSetFromSelectedNodes() ?: return false
                         nxTaskExecutionManager.execute(
-                            taskSet.nxProjects.first(),
-                            taskSet.nxTargets.first()
+                            taskSet.nxProject,
+                            taskSet.nxTarget,
+                            taskSet.nxTargetConfiguration
                         )
                         return true
                     }
@@ -194,25 +176,37 @@ class NxProjectsTreeStructure(
         }
 
         override fun actionPerformed(e: AnActionEvent) {
-            val project = e.project ?: return
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
             if (taskSet != null) {
                 nxTaskExecutionManager.execute(
-                    taskSet.nxProjects.first(),
-                    taskSet.nxTargets.first()
+                    taskSet.nxProject,
+                    taskSet.nxTarget,
+                    taskSet.nxTargetConfiguration
                 )
             }
         }
     }
 
     private fun createTaskSetFromSelectedNodes(): NxTaskSet? {
-        val userObject = tree.selectedNode as? NxSimpleNode.Target
-        if (userObject != null) {
+        val targetNode = tree.selectedNode as? NxSimpleNode.Target
+
+        if (targetNode != null) {
             return NxTaskSet(
-                nxProjects = listOf(userObject.nxProjectName),
-                nxTargets = listOf(userObject.nxTarget)
+                nxProject = targetNode.nxProjectName,
+                nxTarget = targetNode.nxTargetName
             )
         }
+
+        val targetConfigurationNode = tree.selectedNode as? NxSimpleNode.TargetConfiguration
+
+        if (targetConfigurationNode != null) {
+            return NxTaskSet(
+                nxProject = targetConfigurationNode.nxProjectName,
+                nxTarget = targetConfigurationNode.nxTargetName,
+                nxTargetConfiguration = targetConfigurationNode.nxTargetConfigurationName
+            )
+        }
+
         return null
     }
 }

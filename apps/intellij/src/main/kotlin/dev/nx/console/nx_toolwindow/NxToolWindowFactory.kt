@@ -15,17 +15,12 @@ class NxToolWindowFactory : ToolWindowFactory, DumbAware {
     }
 }
 
-data class NxTaskSet(val nxProjects: List<String>, val nxTargets: List<String>)
-
-val NxTaskSet.suggestedName: String
-    get() {
-        var name = nxProjects.joinToString(separator = ",")
-        name +=
-            if (nxTargets.size > 1) {
-                " --targets=${nxTargets.joinToString(separator = ",")}"
-            } else {
-                ":${nxTargets.first()}"
-            }
-
-        return name
-    }
+data class NxTaskSet(
+    val nxProject: String,
+    val nxTarget: String,
+    val nxTargetConfiguration: String?
+) {
+    constructor(nxProject: String, nxTarget: String) : this(nxProject, nxTarget, null) {}
+    val suggestedName =
+        "${nxProject}:${nxTarget}${if(nxTargetConfiguration.isNullOrBlank().not()) ":$nxTargetConfiguration" else ""}"
+}

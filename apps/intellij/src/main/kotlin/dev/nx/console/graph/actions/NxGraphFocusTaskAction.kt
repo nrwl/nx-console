@@ -62,7 +62,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
             dataContext.getData(NxTreeNodeKey).let { it as? NxSimpleNode.Target }
 
         if (targetTreeNode != null) {
-            return NxTargetDescriptor(targetTreeNode.nxProjectName, targetTreeNode.nxTarget)
+            return NxTargetDescriptor(targetTreeNode.nxProjectName, targetTreeNode.nxTargetName)
         }
 
         return null

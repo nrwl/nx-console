@@ -12,6 +12,7 @@ import dev.nx.console.utils.getTargetNodeFromLeafNode
 data class NxRunSettings(
     val nxProjects: String = "",
     val nxTargets: String = "",
+    val nxTargetsConfiguration: String? = "",
     val arguments: String = "",
     var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
 )
@@ -71,7 +72,9 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         thisRunSettings: NxRunSettings
     ): Boolean {
         return configuration.nxRunSettings.nxProjects == thisRunSettings.nxProjects &&
-            configuration.nxRunSettings.nxTargets == thisRunSettings.nxTargets
+            configuration.nxRunSettings.nxTargets == thisRunSettings.nxTargets &&
+            configuration.nxRunSettings.nxTargetsConfiguration ==
+                thisRunSettings.nxTargetsConfiguration
     }
 
     private fun getElement(context: ConfigurationContext): PsiElement? {
