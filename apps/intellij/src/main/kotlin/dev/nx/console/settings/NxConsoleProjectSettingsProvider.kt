@@ -4,7 +4,7 @@ import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import dev.nx.console.settings.options.GeneratorFilter
 
-@State(name = "NxConsoleSettingsProvider", storages = [Storage("nx-console.xml")])
+@State(name = "NxConsoleProjectSettingsProvider", storages = [Storage("nx-console.xml")])
 class NxConsoleProjectSettingsProvider(val project: Project) :
     PersistentStateComponent<NxConsoleProjectSettingsState> {
 
@@ -23,9 +23,9 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
         }
 
     var generatorFilters: List<GeneratorFilter>?
-        get() = state.generatorAllowlist
+        get() = state.generatorAllowlist?.entries?.map { GeneratorFilter(it.key, it.value) }
         set(value) {
-            state.generatorAllowlist = value
+            state.generatorAllowlist = value?.associateBy({ it.matcher }, { it.include })
         }
 
     companion object {
@@ -37,5 +37,5 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
 
 data class NxConsoleProjectSettingsState(
     var workspacePath: String? = null,
-    var generatorAllowlist: List<GeneratorFilter>? = null
+    var generatorAllowlist: Map<String, Boolean>? = null
 ) {}
