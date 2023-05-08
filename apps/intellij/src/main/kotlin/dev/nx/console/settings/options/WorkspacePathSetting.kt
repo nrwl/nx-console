@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.emptyText
 import com.intellij.ui.components.textFieldWithBrowseButton
 import com.intellij.ui.dsl.builder.MAX_LINE_LENGTH_WORD_WRAP
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingBase
@@ -23,15 +24,16 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
     override fun render(panel: Panel) {
         panel.apply {
             row {
-                label("Workspace path")
-                cell(inputField)
-                    .horizontalAlign(HorizontalAlign.FILL)
-                    .comment(
-                        "Set this if your Nx workspace is not at the root of the currently opened project.",
-                        MAX_LINE_LENGTH_WORD_WRAP
-                    )
-                    .apply { component.emptyText.text = project.basePath ?: "" }
-            }
+                    label("Workspace path")
+                    cell(inputField)
+                        .horizontalAlign(HorizontalAlign.FILL)
+                        .comment(
+                            "Set this if your Nx workspace is not at the root of the currently opened project.",
+                            MAX_LINE_LENGTH_WORD_WRAP
+                        )
+                        .apply { component.emptyText.text = project.basePath ?: "" }
+                }
+                .layout(RowLayout.PARENT_GRID)
         }
     }
 

@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import dev.nx.console.settings.options.EnableDryRunOnGenerateChangeSetting
+import dev.nx.console.settings.options.GeneratorFiltersSetting
 import dev.nx.console.settings.options.TelemetrySetting
 import dev.nx.console.settings.options.WorkspacePathSetting
 import javax.swing.JComponent
@@ -18,6 +19,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var workspacePathSetting: WorkspacePathSetting
     private lateinit var telemetrySetting: TelemetrySetting
+    private lateinit var generatorFiltersSetting: GeneratorFiltersSetting
 
     override fun createComponent(): JComponent {
         enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
@@ -29,8 +31,14 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         telemetrySetting = TelemetrySetting()
         telemetrySetting.setValue(settingsProvider.enableTelemetry)
 
+        generatorFiltersSetting = GeneratorFiltersSetting(project)
+        generatorFiltersSetting.setValue(projectSettingsProvider.generatorFilters)
+
         return panel {
-            group("Project Settings") { workspacePathSetting.render(this) }
+            group("Project Settings") {
+                workspacePathSetting.render(this)
+                generatorFiltersSetting.render(this)
+            }
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
                 telemetrySetting.render(this)
@@ -42,7 +50,8 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         return enableDryRunOnGenerateChangeSetting.getValue() !=
             settingsProvider.enableDryRunOnGenerateChange ||
             telemetrySetting.getValue() != settingsProvider.enableTelemetry ||
-            workspacePathSetting.getValue() != projectSettingsProvider.workspacePath
+            workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
+            generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters
     }
 
     override fun apply() {
@@ -50,6 +59,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
         projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
+        projectSettingsProvider.generatorFilters = generatorFiltersSetting.getValue()
 
         workspacePathSetting.doApply()
     }
