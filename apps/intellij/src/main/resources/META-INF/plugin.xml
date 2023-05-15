@@ -1,150 +1,152 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin require-restart="true">
-    <id>dev.nx.console</id>
-    <name>Nx Console</name>
-    <vendor>NxDev</vendor>
+  <id>dev.nx.console</id>
+  <name>Nx Console</name>
+  <vendor>NxDev</vendor>
 
-    <depends>com.intellij.modules.platform</depends>
-    <depends>org.jetbrains.plugins.terminal</depends>
-    <depends>JavaScript</depends>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>org.jetbrains.plugins.terminal</depends>
+  <depends>JavaScript</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
+  <extensions defaultExtensionNs="com.intellij">
+    <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
 
-        <notificationGroup displayType="STICKY_BALLOON" id="Nx Console"/>
+    <notificationGroup displayType="STICKY_BALLOON" id="Nx Console"/>
 
-        <!-- works in WebStorm and other SmallIDEs -->
-        <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
-        <!-- works in IDEA -->
-        <projectTemplatesFactory implementation="dev.nx.console.cli.NxProjectTemplateFactory"/>
-        <!-- works in new IDEA wizard -->
-        <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
+    <!-- works in WebStorm and other SmallIDEs -->
+    <directoryProjectGenerator implementation="dev.nx.console.cli.NxCreateWorkspaceProjectGenerator"/>
+    <!-- works in IDEA -->
+    <projectTemplatesFactory implementation="dev.nx.console.cli.NxProjectTemplateFactory"/>
+    <!-- works in new IDEA wizard -->
+    <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
 
-        <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
-        <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
-        <projectService serviceImplementation="dev.nx.console.telemetry.TelemetryService"/>
-        <completion.contributor language="JSON"
-                                implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
-        <lang.documentationProvider language="JSON"
-                                    implementationClass="dev.nx.console.providers.NxlsDocumentationProvider"/>
+    <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
+    <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
+    <projectService serviceImplementation="dev.nx.console.telemetry.TelemetryService"/>
+    <completion.contributor language="JSON"
+                            implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
+    <lang.documentationProvider language="JSON"
+                                implementationClass="dev.nx.console.providers.NxlsDocumentationProvider"/>
 
-        <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
+    <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
-        <projectConfigurable
-                parentId="tools"
-                instance="dev.nx.console.settings.NxConsoleSettingsConfigurable"
-                displayName="Nx Console"/>
-        <applicationService serviceImplementation="dev.nx.console.settings.NxConsoleSettingsProvider"/>
-        <projectService serviceImplementation="dev.nx.console.settings.NxConsoleProjectSettingsProvider"/>
-
-
-        <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
-
-        <!-- Generate -->
-        <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
-        <fileEditorProvider implementation="dev.nx.console.generate.ui.NxGenerateUiFileEditorProvider"/>
-
-        <!-- Graph -->
-        <projectService serviceImplementation="dev.nx.console.graph.NxGraphService"/>
-        <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
-        <runLineMarkerContributor language="JSON"
-                                  implementationClass="dev.nx.console.graph.NxFocusTargetInGraphLineMarkerContributor"/>
+    <projectConfigurable
+      parentId="tools"
+      instance="dev.nx.console.settings.NxConsoleSettingsConfigurable"
+      displayName="Nx Console"/>
+    <applicationService serviceImplementation="dev.nx.console.settings.NxConsoleSettingsProvider"/>
+    <projectService serviceImplementation="dev.nx.console.settings.NxConsoleProjectSettingsProvider"/>
 
 
-        <!--run anything execution provider-->
-        <runAnything.executionProvider
-                implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
-        <searchEverywhereContributor
-                implementation="dev.nx.console.generate.NxGeneratorSearchEverywhereContributorFactory"/>
+    <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
+
+    <!-- Generate -->
+    <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
+    <fileEditorProvider implementation="dev.nx.console.generate.ui.NxGenerateUiFileEditorProvider"/>
+
+    <!-- Graph -->
+    <projectService serviceImplementation="dev.nx.console.graph.NxGraphService"/>
+    <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
+    <runLineMarkerContributor language="JSON"
+                              implementationClass="dev.nx.console.graph.NxFocusTargetInGraphLineMarkerContributor"/>
 
 
-        <!-- Nx Run Configuration-->
-        <configurationType
-                implementation="dev.nx.console.run.NxCommandConfigurationType"/>
+    <!-- Run -->
+    <projectService serviceImplementation="dev.nx.console.run.NxTaskExecutionManager"/>
+    <runAnything.executionProvider
+      implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
+    <searchEverywhereContributor
+      implementation="dev.nx.console.generate.NxGeneratorSearchEverywhereContributorFactory"/>
 
-        <runConfigurationProducer
-                implementation="dev.nx.console.run.NxRunConfigurationProducer"/>
+    <configurationType
+      implementation="dev.nx.console.run.NxCommandConfigurationType"/>
 
-        <runAnything.executionProvider
-                implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
+    <runConfigurationProducer
+      implementation="dev.nx.console.run.NxRunConfigurationProducer"/>
 
-        <runLineMarkerContributor language="JSON"
-                                  implementationClass="dev.nx.console.run.NxRunTargetLineMarkerContributor"/>
+    <runAnything.executionProvider
+      implementation="dev.nx.console.run.NxCommandRunAnythingProvider" order="first"/>
 
-        <!--Tool Window-->
-        <toolWindow id="Nx Console"
-                    anchor="right"
-                    factoryClass="dev.nx.console.nx_toolwindow.NxToolWindowFactory"
-                    icon="dev.nx.console.NxIcons.Action"/>
+    <runLineMarkerContributor language="JSON"
+                              implementationClass="dev.nx.console.run.NxRunTargetLineMarkerContributor"/>
 
-        <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
-    </extensions>
-
-    <applicationListeners>
-        <listener class="dev.nx.console.listeners.ProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
-    <actions>
-        <action id="dev.nx.console.nxls.NxRefreshWorkspaceAction" class="dev.nx.console.nxls.NxRefreshWorkspaceAction"
-                text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="EditorTabPopupMenu"/>
-            <add-to-group group-id="EditorTabsEntryPoint"/>
-        </action>
-
-        <!-- Generate -->
-        <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
-                class="dev.nx.console.generate.actions.NxGenerateUiAction"
-                text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="NewGroup"/>
-            <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
-        </action>
-        <action id="dev.nx.console.generate.actions.NxGenerateRunAnythingAction"
-                class="dev.nx.console.generate.actions.NxGenerateRunAnythingAction" text="Nx Generate"
-                description="Run a generator via the Run Anything popup."
-                icon="dev.nx.console.NxIcons.Action"
-        />
-        <action id="dev.nx.console.generate.actions.NxMoveProjectAction"
-                class="dev.nx.console.generate.actions.NxMoveProjectAction"
-                text="Move Nx Project" description="Move an Nx project to the desired location using a generator"
-                icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="RefactoringMenu" anchor="last"/>
-        </action>
-        <action id="dev.nx.console.generate.actions.NxRemoveProjectAction"
-                class="dev.nx.console.generate.actions.NxRemoveProjectAction"
-                text="Remove Nx Project" description="Safely remove an Nx project using a generator"
-                icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="RefactoringMenu" anchor="last"/>
-        </action>
-
-        <!-- Run -->
-        <group
-                id="dev.nx.console.run.NxRunActionGroup"
-                text="Nx: Run Target"
-                description="Run any target based on the selected project"
-                class="dev.nx.console.run.NxRunActionGroup"
-                popup="true"
-                icon="dev.nx.console.NxIcons.Action"
-        >
-            <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
-        </group>
-        <!-- Graph -->
-        <action id="dev.nx.console.graph.actions.NxGraphSelectAllAction"
-                class="dev.nx.console.graph.actions.NxGraphSelectAllAction"
-                text="Nx Graph: View Full Graph" description="Open the Nx project graph in an editor window"
+    <!--Tool Window-->
+    <toolWindow id="Nx Console"
+                anchor="right"
+                factoryClass="dev.nx.console.nx_toolwindow.NxToolWindowFactory"
                 icon="dev.nx.console.NxIcons.Action"/>
-        <action id="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
-                class="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
-                text="Nx Graph: Focus Project" icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="AnalyzeActions"/>
-        </action>
 
-        <action id="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"
-                class="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"
-                icon="dev.nx.console.NxIcons.Action"/>
-        <action id="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
-                class="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
-                text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
-            <add-to-group group-id="AnalyzeActions"/>
-        </action>
-    </actions>
+    <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
+  </extensions>
+
+  <applicationListeners>
+    <listener class="dev.nx.console.listeners.ProjectManagerListener"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </applicationListeners>
+  <actions>
+    <action id="dev.nx.console.nxls.NxRefreshWorkspaceAction" class="dev.nx.console.nxls.NxRefreshWorkspaceAction"
+            text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="EditorTabPopupMenu"/>
+      <add-to-group group-id="EditorTabsEntryPoint"/>
+    </action>
+
+    <!-- Generate -->
+    <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
+            class="dev.nx.console.generate.actions.NxGenerateUiAction"
+            text="Nx Generate (UI)" description="Open the nx generate UI " icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="NewGroup"/>
+      <add-to-group group-id="ProjectViewPopupMenuModifyGroup"/>
+    </action>
+    <action id="dev.nx.console.generate.actions.NxGenerateRunAnythingAction"
+            class="dev.nx.console.generate.actions.NxGenerateRunAnythingAction" text="Nx Generate"
+            description="Run a generator via the Run Anything popup."
+            icon="dev.nx.console.NxIcons.Action"
+    />
+    <action id="dev.nx.console.generate.actions.NxMoveProjectAction"
+            class="dev.nx.console.generate.actions.NxMoveProjectAction"
+            text="Move Nx Project" description="Move an Nx project to the desired location using a generator"
+            icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="RefactoringMenu" anchor="last"/>
+    </action>
+    <action id="dev.nx.console.generate.actions.NxRemoveProjectAction"
+            class="dev.nx.console.generate.actions.NxRemoveProjectAction"
+            text="Remove Nx Project" description="Safely remove an Nx project using a generator"
+            icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="RefactoringMenu" anchor="last"/>
+    </action>
+
+    <!-- Run -->
+    <group
+      id="dev.nx.console.run.actions.NxRunFromContextMenuActionGroup"
+      text="Nx: Run Target"
+      description="Run any target based on the selected project"
+      class="dev.nx.console.run.actions.NxRunFromContextMenuActionGroup"
+      popup="true"
+      icon="dev.nx.console.NxIcons.Action"
+    >
+      <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
+    </group>
+
+
+    <!-- Graph -->
+    <action id="dev.nx.console.graph.actions.NxGraphSelectAllAction"
+            class="dev.nx.console.graph.actions.NxGraphSelectAllAction"
+            text="Nx Graph: View Full Graph" description="Open the Nx project graph in an editor window"
+            icon="dev.nx.console.NxIcons.Action"/>
+    <action id="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
+            class="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
+            text="Nx Graph: Focus Project" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="AnalyzeActions"/>
+    </action>
+
+    <action id="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"
+            class="dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction" text="Nx Graph: Focus Target Group"
+            icon="dev.nx.console.NxIcons.Action"/>
+    <action id="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
+            class="dev.nx.console.graph.actions.NxGraphFocusTaskAction"
+            text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="AnalyzeActions"/>
+    </action>
+
+  </actions>
 </idea-plugin>

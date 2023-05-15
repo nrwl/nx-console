@@ -5,17 +5,14 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.popup.JBPopupFactory
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
-import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.NxTargetDescriptor
 import dev.nx.console.utils.getNxProjectFromDataContext
-import javax.swing.ListSelectionModel
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import dev.nx.console.utils.selectNxProject
+import dev.nx.console.utils.selectTargetForNxProject
 import kotlinx.coroutines.*
 
 class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? = null) :
@@ -74,75 +71,12 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
     ): NxTargetDescriptor? {
         var nxProject = getNxProjectFromDataContext(project, dataContext)
         if (nxProject == null) {
-            nxProject = selectProject(project, dataContext) ?: return null
+            nxProject = selectNxProject(project, dataContext) ?: return null
         }
 
         val nxTarget: String =
-            selectTargetForProject(project, dataContext, nxProject) ?: return null
+            selectTargetForNxProject(project, dataContext, nxProject) ?: return null
 
         return NxTargetDescriptor(nxProject, nxTarget)
     }
-
-    private suspend fun selectProject(
-        project: Project,
-        dataContext: DataContext,
-    ) =
-        suspendCoroutine<String?> {
-            val projects = runBlocking {
-                NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toList()
-                    ?: emptyList()
-            }
-            ApplicationManager.getApplication().invokeLater {
-                val popup =
-                    JBPopupFactory.getInstance()
-                        .createPopupChooserBuilder(projects)
-                        .setTitle("Select project")
-                        .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-                        .setRequestFocus(true)
-                        .setFilterAlwaysVisible(true)
-                        .setResizable(true)
-                        .setMovable(true)
-                        .setItemChosenCallback { chosen -> it.resume(chosen) }
-                        .setDimensionServiceKey("nx.dev.console.select_target")
-                        .createPopup()
-
-                popup.showInBestPositionFor(dataContext)
-            }
-        }
-
-    private suspend fun selectTargetForProject(
-        project: Project,
-        dataContext: DataContext,
-        nxProject: String,
-    ) =
-        suspendCoroutine<String?> {
-            val targets = runBlocking {
-                NxlsService.getInstance(project)
-                    .workspace()
-                    ?.workspace
-                    ?.projects
-                    ?.get(nxProject)
-                    ?.targets
-                    ?.keys
-                    ?.toList()
-                    ?: emptyList()
-            }
-
-            ApplicationManager.getApplication().invokeLater {
-                val popup =
-                    JBPopupFactory.getInstance()
-                        .createPopupChooserBuilder(targets)
-                        .setTitle("Select target of $nxProject")
-                        .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-                        .setRequestFocus(true)
-                        .setFilterAlwaysVisible(true)
-                        .setResizable(true)
-                        .setMovable(true)
-                        .setItemChosenCallback { chosen -> it.resume(chosen) }
-                        .setDimensionServiceKey("nx.dev.console.select_target")
-                        .createPopup()
-
-                popup.showInBestPositionFor(dataContext)
-            }
-        }
 }

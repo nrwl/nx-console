@@ -46,4 +46,9 @@ class NxTaskExecutionManager(val project: Project) {
         val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
         ExecutionUtil.runConfiguration(runnerAndConfigurationSettings, executor)
     }
+
+    companion object {
+        fun getInstance(project: Project): NxTaskExecutionManager =
+            project.getService(NxTaskExecutionManager::class.java)
+    }
 }
