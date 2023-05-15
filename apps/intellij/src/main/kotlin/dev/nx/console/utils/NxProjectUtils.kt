@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.ColoredListCellRenderer
@@ -16,11 +17,16 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.runBlocking
 
 fun getNxProjectFromDataContext(project: Project, dataContext: DataContext): String? {
-    val path = dataContext?.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return null
+    try {
+        val path = dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return null
 
-    return runBlocking {
-        NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
+        return runBlocking {
+            NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
+        }
+    } catch (e: Error) {
+        logger<String>().error("ERROR $e")
     }
+    return null
 }
 
 suspend fun selectNxProject(
@@ -34,7 +40,7 @@ suspend fun selectNxProject(
     }
 
     if (preferredProject != null) {
-        projects.remove(preferredProject)
+        projects.removeIf { it == preferredProject }
         projects.add(0, preferredProject)
     }
     ApplicationManager.getApplication().invokeLater {

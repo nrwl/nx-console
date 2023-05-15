@@ -1,5 +1,6 @@
 package dev.nx.console.graph.actions
 
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
@@ -41,7 +42,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
             val targetDescriptor =
                 this@NxGraphFocusTaskAction.targetDescriptor
                     ?: if (e.place != "NxToolWindow") {
-                        selectProjectAndTarget(project, e.dataContext)
+                        selectProjectAndTarget(project, e)
                     } else {
                         getTargetDescriptorFromDataContext(e.dataContext)
                     }
@@ -67,15 +68,20 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
     private suspend fun selectProjectAndTarget(
         project: Project,
-        dataContext: DataContext
+        e: AnActionEvent
     ): NxTargetDescriptor? {
-        var nxProject = getNxProjectFromDataContext(project, dataContext)
+        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+
+        val nxProject =
+            if (ActionPlaces.isPopupPlace(e.place)) currentlyOpenedProject
+            else selectNxProject(project, e.dataContext, currentlyOpenedProject)
+
         if (nxProject == null) {
-            nxProject = selectNxProject(project, dataContext) ?: return null
+            return null
         }
 
         val nxTarget: String =
-            selectTargetForNxProject(project, dataContext, nxProject) ?: return null
+            selectTargetForNxProject(project, e.dataContext, nxProject) ?: return null
 
         return NxTargetDescriptor(nxProject, nxTarget)
     }

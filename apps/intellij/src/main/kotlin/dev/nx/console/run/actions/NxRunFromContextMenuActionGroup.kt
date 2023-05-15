@@ -1,7 +1,7 @@
 package dev.nx.console.run.actions
 
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.util.application
 import dev.nx.console.NxIcons
 import dev.nx.console.run.NxTaskExecutionManager
@@ -31,16 +31,14 @@ class NxRunFromContextMenuActionGroup : ActionGroup() {
         val project = e.project ?: return
 
         CoroutineScope(Dispatchers.Default).launch {
-            try {
-                val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
-                val nxProject =
-                    selectNxProject(project, e.dataContext, currentlyOpenedProject) ?: return@launch
-                val nxTarget =
-                    selectTargetForNxProject(project, e.dataContext, nxProject) ?: return@launch
+            val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+            val nxProject =
+                selectNxProject(project, e.dataContext, currentlyOpenedProject) ?: return@launch
+            val nxTarget =
+                selectTargetForNxProject(project, e.dataContext, nxProject) ?: return@launch
 
+            ApplicationManager.getApplication().invokeLater {
                 NxTaskExecutionManager.getInstance(project).execute(nxProject, nxTarget)
-            } catch (e: Error) {
-                logger<NxRunFromContextMenuActionGroup>().info(e.toString())
             }
         }
     }
