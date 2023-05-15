@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.ColoredListCellRenderer
@@ -17,16 +16,12 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.runBlocking
 
 fun getNxProjectFromDataContext(project: Project, dataContext: DataContext): String? {
-    try {
-        val path = dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return null
 
-        return runBlocking {
-            NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
-        }
-    } catch (e: Error) {
-        logger<String>().error("ERROR $e")
+    val path = dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return null
+
+    return runBlocking {
+        NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
     }
-    return null
 }
 
 suspend fun selectNxProject(
@@ -117,22 +112,21 @@ suspend fun selectTargetForNxProject(
                 .setResizable(true)
                 .setMovable(true)
                 .setAutoPackHeightOnFiltering(true)
-                //                .setRenderer(
-                //                    object : ColoredListCellRenderer<String>() {
-                //                        override fun customizeCellRenderer(
-                //                            list: JList<out String>,
-                //                            value: String?,
-                //                            index: Int,
-                //                            selected: Boolean,
-                //                            hasFocus: Boolean
-                //                        ) {
-                //                            if (value == null) return
-                //                            icon = AllIcons.General.Gear
-                //                            append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES,
-                // true)
-                //                        }
-                //                    }
-                //                )
+                .setRenderer(
+                    object : ColoredListCellRenderer<String>() {
+                        override fun customizeCellRenderer(
+                            list: JList<out String>,
+                            value: String?,
+                            index: Int,
+                            selected: Boolean,
+                            hasFocus: Boolean
+                        ) {
+                            if (value == null) return
+                            icon = AllIcons.General.Gear
+                            append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
+                        }
+                    }
+                )
                 .setItemChosenCallback { chosen -> it.resume(chosen) }
                 .setDimensionServiceKey("nx.dev.console.select_target")
                 .createPopup()
