@@ -22,6 +22,8 @@ class NxRunTargetActionGroup : ActionGroup() {
 
     override fun update(e: AnActionEvent) {
         super.update(e)
+        // depending on whether this is called from a popup or the action search
+        // we have to either provide child actions or perform an action
         if (!ActionPlaces.isPopupPlace(e.place)) {
             this.templatePresentation.isPerformGroup = true
         }
@@ -59,13 +61,13 @@ class NxRunTargetActionGroup : ActionGroup() {
                 nxlsService.workspace()?.workspace?.projects?.get(nxProject)?.targets?.keys
             }
 
-            return@runReadAction targets?.map { ChildNxRunAction(nxProject, it) }?.toTypedArray()
+            return@runReadAction targets?.map { NxRunTargetAction(nxProject, it) }?.toTypedArray()
                 ?: emptyArray()
         }
     }
 }
 
-private class ChildNxRunAction(private val nxProject: String, private val nxTarget: String) :
+private class NxRunTargetAction(private val nxProject: String, private val nxTarget: String) :
     AnAction() {
 
     init {
