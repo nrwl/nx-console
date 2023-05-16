@@ -30,7 +30,6 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 
 class NxProjectsTreeStructure(
-    val nxTaskExecutionManager: NxTaskExecutionManager,
     val tree: NxProjectsTree,
     val project: Project,
     nxWorkspace: NxWorkspace?
@@ -39,6 +38,7 @@ class NxProjectsTreeStructure(
     private val treeModel = StructureTreeModel(this, project)
     private var root: NxSimpleNode.Root = NxSimpleNode.Root(nxWorkspace)
     private var treePersistenceManager = NxProjectsTreePersistenceManager(tree)
+    private var nxTaskExecutionManager = NxTaskExecutionManager.getInstance(project)
 
     init {
         tree.model = AsyncTreeModel(treeModel, project)
