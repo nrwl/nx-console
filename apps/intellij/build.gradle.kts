@@ -36,9 +36,8 @@ group = properties("pluginGroup")
 // Configure project's dependencies
 repositories { mavenCentral() }
 
-configurations.all {
-    exclude("org.slf4j", "slf4j-api")
-}
+configurations.all { exclude("org.slf4j", "slf4j-api") }
+
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -187,11 +186,12 @@ tasks {
 }
 
 tasks.register<Exec>("buildNxls") {
-    commandLine = if (System.getenv("IDEA_DEBUG") == "true") {
-        buildCommands() + "npx nx run nxls:build:debug"
-    } else {
-        buildCommands() + "npx nx run nxls:build"
-    }
+    commandLine =
+        if (System.getenv("IDEA_DEBUG") == "true") {
+            buildCommands() + "npx nx run nxls:build:debug"
+        } else {
+            buildCommands() + "npx nx run nxls:build"
+        }
     workingDir = rootDir
 }
 

@@ -15,6 +15,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.runBlocking
 
+/** Don't run this from within coroutines */
 fun getNxProjectFromDataContext(project: Project, dataContext: DataContext): String? {
     val path = dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return null
 

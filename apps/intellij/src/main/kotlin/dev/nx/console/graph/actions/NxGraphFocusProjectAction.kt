@@ -26,8 +26,10 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
 
         TelemetryService.getInstance(project).featureUsed("Nx Graph Select Project")
 
+        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+
         CoroutineScope(Dispatchers.Default).launch {
-            val nxProjectName = getNxProject(e) ?: return@launch
+            val nxProjectName: String = getNxProject(e, currentlyOpenedProject) ?: return@launch
 
             ApplicationManager.getApplication().invokeLater {
                 val graphService = NxGraphService.getInstance(project)
@@ -37,14 +39,13 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         }
     }
 
-    private suspend fun getNxProject(e: AnActionEvent): String? {
+    private suspend fun getNxProject(e: AnActionEvent, currentlyOpenedProject: String?): String? {
         val nxTreeNodeProject = e.getData(NxTreeNodeKey)?.nxProject
         if (nxTreeNodeProject != null) {
             return nxTreeNodeProject.name
         }
 
         val project = e.project ?: return null
-        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
 
         return if (ActionPlaces.isPopupPlace(e.place)) currentlyOpenedProject
         else selectNxProject(project, e.dataContext, currentlyOpenedProject)

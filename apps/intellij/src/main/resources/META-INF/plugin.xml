@@ -117,10 +117,10 @@
 
     <!-- Run -->
     <group
-      id="dev.nx.console.run.actions.NxRunFromContextMenuActionGroup"
+      id="dev.nx.console.run.actions.NxRunTargetActionGroup"
       text="Nx: Run Target"
       description="Run any target based on the selected project"
-      class="dev.nx.console.run.actions.NxRunFromContextMenuActionGroup"
+      class="dev.nx.console.run.actions.NxRunTargetActionGroup"
       popup="true"
       icon="dev.nx.console.NxIcons.Action"
     >

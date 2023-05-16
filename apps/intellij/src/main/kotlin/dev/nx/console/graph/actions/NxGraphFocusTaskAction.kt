@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.openapi.project.Project
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
@@ -38,15 +37,30 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Task")
 
+        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+
         CoroutineScope(Dispatchers.Default).launch {
-            val targetDescriptor =
+            val targetDescriptor: NxTargetDescriptor =
                 this@NxGraphFocusTaskAction.targetDescriptor
-                    ?: if (e.place != "NxToolWindow") {
-                        selectProjectAndTarget(project, e)
-                    } else {
+                    ?: if (e.place == "NxToolWindow") {
                         getTargetDescriptorFromDataContext(e.dataContext)
+                    } else {
+                        val nxProject =
+                            if (ActionPlaces.isPopupPlace(e.place)) currentlyOpenedProject
+                            else selectNxProject(project, e.dataContext, currentlyOpenedProject)
+
+                        if (nxProject == null) {
+                            return@launch
+                        }
+
+                        val nxTarget =
+                            selectTargetForNxProject(project, e.dataContext, nxProject)
+                                ?: return@launch
+
+                        NxTargetDescriptor(nxProject, nxTarget)
                     }
                         ?: return@launch
+
             ApplicationManager.getApplication().invokeLater {
                 val graphService = NxGraphService.getInstance(project)
                 graphService.showNxGraphInEditor()
@@ -64,25 +78,5 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
         }
 
         return null
-    }
-
-    private suspend fun selectProjectAndTarget(
-        project: Project,
-        e: AnActionEvent
-    ): NxTargetDescriptor? {
-        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
-
-        val nxProject =
-            if (ActionPlaces.isPopupPlace(e.place)) currentlyOpenedProject
-            else selectNxProject(project, e.dataContext, currentlyOpenedProject)
-
-        if (nxProject == null) {
-            return null
-        }
-
-        val nxTarget: String =
-            selectTargetForNxProject(project, e.dataContext, nxProject) ?: return null
-
-        return NxTargetDescriptor(nxProject, nxTarget)
     }
 }

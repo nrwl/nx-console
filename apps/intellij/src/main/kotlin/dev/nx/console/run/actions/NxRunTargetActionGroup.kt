@@ -12,7 +12,7 @@ import dev.nx.console.utils.selectNxProject
 import dev.nx.console.utils.selectTargetForNxProject
 import kotlinx.coroutines.*
 
-class NxRunFromContextMenuActionGroup : ActionGroup() {
+class NxRunTargetActionGroup : ActionGroup() {
 
     init {
         templatePresentation.isHideGroupIfEmpty = true
@@ -30,8 +30,9 @@ class NxRunFromContextMenuActionGroup : ActionGroup() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
+        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+
         CoroutineScope(Dispatchers.Default).launch {
-            val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
             val nxProject =
                 selectNxProject(project, e.dataContext, currentlyOpenedProject) ?: return@launch
             val nxTarget =
