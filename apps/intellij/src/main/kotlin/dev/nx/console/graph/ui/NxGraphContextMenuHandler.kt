@@ -13,6 +13,11 @@ class NxGraphContextMenuHandler : CefContextMenuHandlerAdapter() {
         params: CefContextMenuParams?,
         model: CefMenuModel?
     ) {
-        model?.clear()
+        if (model == null) {
+            return
+        }
+        model.clear()
+        // 28500 is the magic command id to open the devtools
+        model.addItem(28500, "Open DevTools")
     }
 }
