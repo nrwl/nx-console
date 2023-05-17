@@ -18,6 +18,7 @@ class NxRunTargetLineMarkerContributor : RunLineMarkerContributor() {
         )
             return null
 
+        // TODO: PROPERLY RUN CONFIGURATION
         return Info(RunConfigurations.TestState.Run, ExecutorAction.getActions()) { "Run Target" }
     }
 

@@ -53,6 +53,7 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         return runSettings.copy(
             nxProjects = targetDescriptor.nxProject,
             nxTargets = targetDescriptor.nxTarget,
+            nxTargetsConfiguration = targetDescriptor.nxTargetConfiguration
         )
     }
 
