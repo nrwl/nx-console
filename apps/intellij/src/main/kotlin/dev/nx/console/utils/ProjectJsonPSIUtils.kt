@@ -5,10 +5,15 @@ import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 data class NxTargetDescriptor(
     val nxProject: String,
@@ -67,7 +72,10 @@ fun getNxTargetDescriptorFromNode(element: PsiElement): NxTargetDescriptor? {
     return null
 }
 
+@OptIn(ExperimentalContracts::class)
 fun isTargetNodeInsideProjectJson(element: PsiElement): Boolean {
+    contract { returns(true) implies (element is JsonProperty) }
+
     if (element !is JsonProperty) {
         return false
     }
@@ -81,7 +89,9 @@ fun isTargetNodeInsideProjectJson(element: PsiElement): Boolean {
     return true
 }
 
+@OptIn(ExperimentalContracts::class)
 fun isTargetConfigurationNodeInsideProjectJson(element: PsiElement): Boolean {
+    contract { returns(true) implies (element is JsonProperty) }
     if (element !is JsonProperty) {
         return false
     }
@@ -114,4 +124,46 @@ fun isTargetNode(property: JsonProperty?): Boolean {
 fun isInsideNxProjectJsonFile(element: PsiElement): Boolean {
     val file = element.containingFile
     return file is JsonFile && file.name == "project.json"
+}
+
+fun findLineNumberForTargetAndConfiguration(
+    psiFile: PsiFile,
+    targetName: String?,
+    targetConfigurationName: String?
+): Int? {
+    class TargetAndConfigurationVisitor : PsiRecursiveElementWalkingVisitor() {
+        var foundLineNumber: Int? = null
+
+        override fun visitElement(element: PsiElement) {
+            if (
+                targetConfigurationName != null &&
+                    isTargetConfigurationNodeInsideProjectJson(element) &&
+                    element.name == targetConfigurationName
+            ) {
+
+                foundLineNumber = getLineNumber(element)
+                return
+            }
+            if (
+                targetName != null &&
+                    isTargetNodeInsideProjectJson(element) &&
+                    element.name == targetName
+            ) {
+                foundLineNumber = getLineNumber(element)
+                return
+            }
+            super.visitElement(element)
+        }
+
+        private fun getLineNumber(element: PsiElement): Int {
+            val document =
+                PsiDocumentManager.getInstance(element.project).getDocument(element.containingFile)
+            return document?.getLineNumber(element.textOffset) ?: -1
+        }
+    }
+
+    val visitor = TargetAndConfigurationVisitor()
+    psiFile.accept(visitor)
+
+    return visitor.foundLineNumber
 }
