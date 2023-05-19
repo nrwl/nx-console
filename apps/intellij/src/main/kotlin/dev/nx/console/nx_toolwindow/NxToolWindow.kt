@@ -38,13 +38,13 @@ class NxToolWindow(val project: Project) {
 
     val toolbar: ActionToolbar = run {
         val actionManager = ActionManager.getInstance()
-        val actionGroup = DefaultActionGroup()
+        val actionGroup = DefaultActionGroup().apply { templatePresentation.text = "Nx Toolwindow" }
 
         val nxRunAnythingAction =
             object :
                 AnAction(
                     "Execute Nx Targets",
-                    "Execute nx targets",
+                    "Execute Nx targets",
                     AllIcons.Actions.Run_anything
                 ) {
                 override fun actionPerformed(e: AnActionEvent) {
@@ -56,7 +56,7 @@ class NxToolWindow(val project: Project) {
             object :
                 RefreshAction(
                     "Reload Nx Projects",
-                    "Reload nx projects",
+                    "Reload Nx projects",
                     AllIcons.Actions.Refresh
                 ) {
                 override fun update(e: AnActionEvent) {
@@ -74,6 +74,9 @@ class NxToolWindow(val project: Project) {
         actionGroup.addAction(refreshAction)
         actionGroup.addSeparator()
         actionGroup.add(nxRunAnythingAction)
+        actionGroup.add(
+            actionManager.getAction("dev.nx.console.graph.actions.NxGraphSelectAllAction")
+        )
         actionGroup.addSeparator()
 
         val expander: TreeExpander = DefaultTreeExpander(tree)

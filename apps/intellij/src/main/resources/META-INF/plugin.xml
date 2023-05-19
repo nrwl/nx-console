@@ -131,7 +131,7 @@
     <!-- Graph -->
     <action id="dev.nx.console.graph.actions.NxGraphSelectAllAction"
             class="dev.nx.console.graph.actions.NxGraphSelectAllAction"
-            text="Nx Graph: View Full Graph" description="Open the Nx project graph in an editor window"
+            text="Nx Graph: View Full Project Graph"
             icon="dev.nx.console.NxIcons.Action"/>
     <action id="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
             class="dev.nx.console.graph.actions.NxGraphFocusProjectAction"
