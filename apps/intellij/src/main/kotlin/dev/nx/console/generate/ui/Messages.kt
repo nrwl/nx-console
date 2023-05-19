@@ -23,13 +23,14 @@ data class GlobalConfigurationMessage(override val payload: GlobalConfigurationP
 @Serializable
 data class GeneratorSchemaPayload(
     val name: String,
+    val collection: String,
     val description: String,
     val options: List<NxGeneratorOption>,
     val contextValues: NxGeneratorContext?
 ) {
     @EncodeDefault() val command: String = "generate"
 
-    @EncodeDefault() val positional = this.name
+    @EncodeDefault() val positional = "${this.collection}:${this.name}"
 }
 
 @Serializable
