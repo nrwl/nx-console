@@ -108,6 +108,15 @@ class NxGenerateService(val project: Project) {
         val generatorOptions =
             options
                 ?: runBlocking {
+                    val nxProjectNames =
+                        project
+                            .service<NxlsService>()
+                            .workspace()
+                            ?.workspace
+                            ?.projects
+                            ?.keys
+                            ?.toList()
+                            ?: emptyList()
                     project
                         .service<NxlsService>()
                         .generatorOptions(
@@ -117,6 +126,16 @@ class NxGenerateService(val project: Project) {
                                 generator.path
                             )
                         )
+                        .map {
+                            if (
+                                it.name == "project" ||
+                                    it.name == "projectName" ||
+                                    it.dropdown == "projects"
+                            ) {
+                                it.items = nxProjectNames
+                            }
+                            it
+                        }
                 }
 
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
