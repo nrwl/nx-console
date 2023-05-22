@@ -11,7 +11,7 @@
         "lintFilePatterns": ["libs/vscode/nx-cloud-view/**/*.ts"]
       }
     },
-    "build-webview-files": {
+    "build": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
         "main": "libs/vscode/nx-cloud-view/src/webview/main.ts",
@@ -32,7 +32,7 @@
       "dependsOn": ["extract-dependencies"],
       "inputs": ["{projectRoot}/src/webview/**/*"]
     },
-    "watch-webview-files": {
+    "watch": {
       "executor": "@nx/esbuild:esbuild",
       "options": {
         "main": "libs/vscode/nx-cloud-view/src/webview/main.ts",

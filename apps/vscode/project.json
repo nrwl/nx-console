@@ -27,7 +27,7 @@
             "color": "magenta"
           },
           {
-            "command": "yarn nx run vscode-nx-cloud-view:watch-webview-files",
+            "command": "yarn nx run vscode-nx-cloud-view:watch",
             "prefix": "cloud-view",
             "color": "yellow"
           }
@@ -172,7 +172,7 @@
           "minify": false
         }
       },
-      "dependsOn": ["^build", "^build-webview-files", "extract-dependencies"],
+      "dependsOn": ["^build", "extract-dependencies"],
       "outputs": ["{options.outputPath}"]
     },
     "extract-dependencies": {
