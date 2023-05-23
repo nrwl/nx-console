@@ -1,11 +1,13 @@
-import { ThemeIcon, TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+import {
+  ThemeIcon,
+  TreeItem,
+  TreeItemCollapsibleState,
+  Uri,
+  commands,
+} from 'vscode';
 
 export class NxHelpAndFeedbackTreeItem extends TreeItem {
-  command = {
-    title: this.title,
-    command: `vscode.open`,
-    arguments: [`${this.link}`],
-  };
+  commandString: string;
 
   constructor(
     private readonly title: string,
@@ -18,5 +20,28 @@ export class NxHelpAndFeedbackTreeItem extends TreeItem {
   ) {
     super(title, TreeItemCollapsibleState.None);
     this.iconPath = icon;
+    this.contextValue = link;
+    this.commandString = `nxConsole.helpAndFeedback.openUrl.${this.title.replace(
+      ' ',
+      '_'
+    )}`;
+    this.command = {
+      title: this.title,
+      command: this.commandString,
+    };
+
+    this.registerCommand(this.link);
+  }
+
+  // kinda hacky but just setting 'command' on the TreeItem doesn't work anymore
+  async registerCommand(url: string) {
+    const openCommand = (await commands.getCommands(true)).find(
+      (command) => command === this.commandString
+    );
+    if (!openCommand) {
+      commands.registerCommand(this.commandString, () => {
+        commands.executeCommand('vscode.open', url);
+      });
+    }
   }
 }
