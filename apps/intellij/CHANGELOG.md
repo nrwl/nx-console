@@ -1,3 +1,22 @@
+## 1.5.0 (2023-05-23)
+
+### Bug Fixes
+
+* **intellij:** correctly display & run workspace generators via the UI ([#1740](https://github.com/nrwl/nx-console/issues/1740)) ([ba293c0](https://github.com/nrwl/nx-console/commit/ba293c03978b1032e4b93a4f89d2553b23e55a49))
+* **intellij:** display project dropdown for project fields ([#1741](https://github.com/nrwl/nx-console/issues/1741)) ([7c0fffa](https://github.com/nrwl/nx-console/commit/7c0fffa47e61eda30014cad1bccf44110bc5657e))
+* **intellij:** fix default values in webview by passing correct name to nxls ([#1743](https://github.com/nrwl/nx-console/issues/1743)) ([38f200f](https://github.com/nrwl/nx-console/commit/38f200fa6ff6130cfc84fc3eb8213e4966073359))
+
+
+### Features
+
+* **intellij:** add generator filter setting ([#1716](https://github.com/nrwl/nx-console/issues/1716)) ([e99f8c1](https://github.com/nrwl/nx-console/commit/e99f8c1f81e7422aabf133bc024c103bb0e5fdd2))
+* **intellij:** add gutter actions for target configurations ([#1735](https://github.com/nrwl/nx-console/issues/1735)) ([04262a6](https://github.com/nrwl/nx-console/commit/04262a6be10783066a5bb56ec084a858b9099978))
+* **intellij:** add toolwindow button to view full project graph ([#1734](https://github.com/nrwl/nx-console/issues/1734)) ([56b3c21](https://github.com/nrwl/nx-console/commit/56b3c2189c0bef530ae2587beeeed2e391f673bd))
+* **intellij:** allow nx graph download ([#1730](https://github.com/nrwl/nx-console/issues/1730)) ([c05814d](https://github.com/nrwl/nx-console/commit/c05814dcdbb3f7b2ca54d9b9addc26afe5413b17))
+* **intellij:** display target configurations in the toolwindow & run configuration editor ([#1717](https://github.com/nrwl/nx-console/issues/1717)) ([d638dec](https://github.com/nrwl/nx-console/commit/d638decb45dcccd2bed8bb587d8fe005afc46003))
+* **intellij:** enable jumping to target & configuration from toolwindow ([#1736](https://github.com/nrwl/nx-console/issues/1736)) ([e00ee32](https://github.com/nrwl/nx-console/commit/e00ee32bcb6e567aaa062c4371c6d5d2b0e15daa))
+* **intellij:** rework target running & improve project selection ([#1733](https://github.com/nrwl/nx-console/issues/1733)) ([8c3a119](https://github.com/nrwl/nx-console/commit/8c3a119abd05f8b147ab4b1c16a0ef0b6889f4dd))
+
 ## 1.4.0 (2023-04-28)
 
 ### Bug Fixes
