@@ -1,3 +1,12 @@
+## [18.1.2](https://github.com/nrwl/nx-console/compare/vscode-v18.1.1...vscode-v18.1.2) (2023-05-23)
+
+
+### Bug Fixes
+
+* **vscode:** handle [@nx](https://github.com/nx) and [@nrwl](https://github.com/nrwl) cases in add dependency feature ([#1711](https://github.com/nrwl/nx-console/issues/1711)) ([81b6fd9](https://github.com/nrwl/nx-console/commit/81b6fd9bdcf5d1e0f492027ad1d4645301f8bfce))
+* **vscode:** repair automatically detecting and running nx tasks ([#1709](https://github.com/nrwl/nx-console/issues/1709)) ([d16ce48](https://github.com/nrwl/nx-console/commit/d16ce48d0f21911933f99d2bc2473a4602260419))
+* **vscode:** repair opening help and feedback links ([#1746](https://github.com/nrwl/nx-console/issues/1746)) ([cc38746](https://github.com/nrwl/nx-console/commit/cc38746fa4bfd90bbfa2ca8e47bd739a61b26359))
+
 ## [18.1.1](https://github.com/nrwl/nx-console/compare/vscode-v18.1.0...vscode-v18.1.1) (2023-05-01)
 
 
