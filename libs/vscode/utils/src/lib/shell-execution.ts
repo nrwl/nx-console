@@ -2,6 +2,7 @@ import {
   detectPackageManager,
   getPackageManagerCommand,
 } from 'nx/src/devkit-exports';
+import { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { platform } from 'os';
 
 import { ShellExecution } from 'vscode';
@@ -13,7 +14,8 @@ export interface ShellConfig {
 }
 
 export function getShellExecutionForConfig(
-  config: ShellConfig
+  config: ShellConfig,
+  packageManagerCommands?: PackageManagerCommands
 ): ShellExecution {
   let command = config.displayCommand;
   if (config.encapsulatedNx) {
@@ -23,9 +25,10 @@ export function getShellExecutionForConfig(
       command = command.replace(/^nx/, './nx');
     }
   } else {
-    const packageManager = detectPackageManager(config.cwd);
-    const packageManagerCommand = getPackageManagerCommand(packageManager);
-    command = `${packageManagerCommand.exec} ${command}`;
+    const pmc =
+      packageManagerCommands ??
+      getPackageManagerCommand(detectPackageManager(config.cwd));
+    command = `${pmc.exec} ${command}`;
   }
 
   return new ShellExecution(command, {

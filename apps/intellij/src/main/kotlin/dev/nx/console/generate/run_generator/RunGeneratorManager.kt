@@ -30,8 +30,18 @@ class RunGeneratorManager(val project: Project) {
         generator: String,
         flags: List<String>,
     ) {
+        var generatorDefinition: List<String>
+        if (generator.matches(Regex("^workspace-(schematic|generator):(.+)"))) {
+            generatorDefinition =
+                listOf(
+                    "workspace-generator",
+                    generator.replace(Regex("^workspace-(schematic|generator):"), ""),
+                    *flags.toTypedArray()
+                )
+        } else {
+            generatorDefinition = listOf("g", generator, *flags.toTypedArray())
+        }
 
-        val generatorDefinition = listOf("g", generator, *flags.toTypedArray())
         runningProcessHandler.let {
             if (it == null) {
                 runGenerator(generatorDefinition)

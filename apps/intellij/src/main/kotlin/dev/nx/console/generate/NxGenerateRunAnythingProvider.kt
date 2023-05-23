@@ -7,7 +7,6 @@ import com.intellij.ide.actions.runAnything.activity.RunAnythingCommandLineProvi
 import com.intellij.ide.actions.runAnything.items.RunAnythingItem
 import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.NxIcons
@@ -84,7 +83,9 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
     ): Sequence<String> {
         val project = RunAnythingUtil.fetchProject(dataContext)
         if (generators.isEmpty()) {
-            generators = runBlocking { project.service<NxlsService>().generators() }
+            generators = runBlocking {
+                NxGenerateService.getInstance(project).getFilteredGenerators()
+            }
         }
 
         val completedGeneratorName = commandLine.completedParameters.firstOrNull()
@@ -124,7 +125,7 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
                     .generatorOptions(
                         NxGeneratorOptionsRequestOptions(
                             collection = generator.data.collection,
-                            name = generator.name,
+                            name = generator.data.name,
                             path = generator.path
                         )
                     )

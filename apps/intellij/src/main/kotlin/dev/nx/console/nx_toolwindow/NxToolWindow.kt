@@ -11,7 +11,6 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ScrollPaneFactory
-import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.services.NxWorkspaceRefreshListener
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.utils.nxWorkspace
@@ -21,12 +20,7 @@ class NxToolWindow(val project: Project) {
 
     private val projectTree = NxProjectsTree()
     private val projectStructure =
-        NxProjectsTreeStructure(
-            NxTaskExecutionManager(project),
-            projectTree,
-            project,
-            project.nxWorkspace()
-        )
+        NxProjectsTreeStructure(projectTree, project, project.nxWorkspace())
     val content: JComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
 
     init {
@@ -44,13 +38,13 @@ class NxToolWindow(val project: Project) {
 
     val toolbar: ActionToolbar = run {
         val actionManager = ActionManager.getInstance()
-        val actionGroup = DefaultActionGroup()
+        val actionGroup = DefaultActionGroup().apply { templatePresentation.text = "Nx Toolwindow" }
 
         val nxRunAnythingAction =
             object :
                 AnAction(
                     "Execute Nx Targets",
-                    "Execute nx targets",
+                    "Execute Nx targets",
                     AllIcons.Actions.Run_anything
                 ) {
                 override fun actionPerformed(e: AnActionEvent) {
@@ -62,7 +56,7 @@ class NxToolWindow(val project: Project) {
             object :
                 RefreshAction(
                     "Reload Nx Projects",
-                    "Reload nx projects",
+                    "Reload Nx projects",
                     AllIcons.Actions.Refresh
                 ) {
                 override fun update(e: AnActionEvent) {
@@ -80,6 +74,9 @@ class NxToolWindow(val project: Project) {
         actionGroup.addAction(refreshAction)
         actionGroup.addSeparator()
         actionGroup.add(nxRunAnythingAction)
+        actionGroup.add(
+            actionManager.getAction("dev.nx.console.graph.actions.NxGraphSelectAllAction")
+        )
         actionGroup.addSeparator()
 
         val expander: TreeExpander = DefaultTreeExpander(tree)

@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import dev.nx.console.generate.NxGenerateService
 import dev.nx.console.generate.NxReMoveProjectDialog
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.WorkspaceLayout
@@ -50,7 +51,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                 WorkspaceLayout(it?.appsDir, it?.libsDir)
             }
 
-        val generators = nxlsService.generators()
+        val generators = NxGenerateService.getInstance(project).getFilteredGenerators()
         val moveGenerators = generators.map { it.name }.filter { it.contains(Regex(":${mode}$")) }
 
         if (moveGenerators.isEmpty()) {

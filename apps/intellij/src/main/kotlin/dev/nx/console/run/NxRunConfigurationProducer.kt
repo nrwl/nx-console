@@ -6,12 +6,13 @@ import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
-import dev.nx.console.utils.getNxTargetDescriptorFromTargetNode
-import dev.nx.console.utils.getTargetNodeFromLeafNode
+import dev.nx.console.utils.getNxTargetDescriptorFromNode
+import dev.nx.console.utils.getPropertyNodeFromLeafNode
 
 data class NxRunSettings(
     val nxProjects: String = "",
     val nxTargets: String = "",
+    val nxTargetsConfiguration: String? = "",
     val arguments: String = "",
     var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
 )
@@ -46,12 +47,13 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         sourceElement: Ref<PsiElement>?
     ): NxRunSettings? {
         val element = getElement(context) ?: return null
-        val targetNode = getTargetNodeFromLeafNode(element) ?: return null
-        val targetDescriptor = getNxTargetDescriptorFromTargetNode(targetNode) ?: return null
+        val targetNode = getPropertyNodeFromLeafNode(element) ?: return null
+        val targetDescriptor = getNxTargetDescriptorFromNode(targetNode) ?: return null
         sourceElement?.set(element)
         return runSettings.copy(
             nxProjects = targetDescriptor.nxProject,
             nxTargets = targetDescriptor.nxTarget,
+            nxTargetsConfiguration = targetDescriptor.nxTargetConfiguration
         )
     }
 
@@ -71,7 +73,9 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
         thisRunSettings: NxRunSettings
     ): Boolean {
         return configuration.nxRunSettings.nxProjects == thisRunSettings.nxProjects &&
-            configuration.nxRunSettings.nxTargets == thisRunSettings.nxTargets
+            configuration.nxRunSettings.nxTargets == thisRunSettings.nxTargets &&
+            configuration.nxRunSettings.nxTargetsConfiguration ==
+                thisRunSettings.nxTargetsConfiguration
     }
 
     private fun getElement(context: ConfigurationContext): PsiElement? {

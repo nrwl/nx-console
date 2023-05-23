@@ -112,7 +112,8 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
             generator.options?.let {
                 this.generatorToDisplay =
                     GeneratorSchemaPayload(
-                        name = generator.name,
+                        name = generator.data.name,
+                        collection = generator.data.collection,
                         description = generator.data.description,
                         options = generator.options,
                         contextValues = generator.contextValues

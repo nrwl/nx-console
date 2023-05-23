@@ -4,13 +4,19 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.editor.CaretModel
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.ScrollingModel
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.psi.PsiManager
 import dev.nx.console.NxConsoleBundle
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.findLineNumberForTargetAndConfiguration
 import dev.nx.console.utils.nxProjectConfigurationPath
 
 class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSource) {
@@ -20,7 +26,11 @@ class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
     }
 
     override fun update(e: AnActionEvent) {
-        if (this.projectNode(e) == null && this.targetNode(e) == null) {
+        if (
+            this.projectNode(e) == null &&
+                this.targetNode(e) == null &&
+                this.targetConfigurationNode(e) == null
+        ) {
             e.presentation.isEnabledAndVisible = false
         } else {
             e.presentation.text = NxConsoleBundle.message("edit.configuration")
@@ -34,14 +44,36 @@ class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
 
         TelemetryService.getInstance(project).featureUsed("Edit Project Configuration")
 
-        val node = this.projectNode(e) ?: this.targetNode(e) ?: return
+        val node = e.getData(NxTreeNodeKey) ?: return
 
         val projectFilePath = nxProjectConfigurationPath(project, node.nxProject?.root) ?: return
         val projectFile = LocalFileSystem.getInstance().findFileByPath(projectFilePath) ?: return
 
-        FileEditorManager.getInstance(project).openFile(projectFile, true)
+        val fileEditorManager = FileEditorManager.getInstance(project)
+
+        fileEditorManager.openFile(projectFile, true)
+
+        val nxTarget = this.targetNode(e)?.nxTargetName
+        val nxTargetConfiguration = this.targetConfigurationNode(e)?.nxTargetConfigurationName
+
+        val psiFile = PsiManager.getInstance(project).findFile(projectFile) ?: return
+        val lineNumber =
+            findLineNumberForTargetAndConfiguration(psiFile, nxTarget, nxTargetConfiguration)
+                ?: return
+
+        val editor = fileEditorManager.selectedTextEditor
+
+        if (editor != null && lineNumber > 0) {
+            val caretModel: CaretModel = editor.caretModel
+            val logicalPosition = LogicalPosition(lineNumber, 0)
+            caretModel.moveToLogicalPosition(logicalPosition)
+            val scrollingModel: ScrollingModel = editor.scrollingModel
+            scrollingModel.scrollToCaret(ScrollType.CENTER)
+        }
     }
 
     private fun projectNode(e: AnActionEvent) = e.getData(NxTreeNodeKey) as? NxSimpleNode.Project
     private fun targetNode(e: AnActionEvent) = e.getData(NxTreeNodeKey) as? NxSimpleNode.Target
+    private fun targetConfigurationNode(e: AnActionEvent) =
+        e.getData(NxTreeNodeKey) as? NxSimpleNode.TargetConfiguration
 }

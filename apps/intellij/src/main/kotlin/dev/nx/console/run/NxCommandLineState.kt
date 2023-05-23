@@ -22,14 +22,25 @@ class NxCommandLineState(
         val nxRunSettings = runConfiguration.nxRunSettings
         val nxProjects = nxRunSettings.nxProjects.split(",")
         val nxTargets = nxRunSettings.nxTargets.split(",")
+        val nxTargetsConfiguration = nxRunSettings.nxTargetsConfiguration
         val args =
-            if (nxProjects.size > 1 || nxTargets.size > 1)
+            if (nxProjects.size > 1 || nxTargets.size > 1) {
+                val array =
+                    arrayOf(
+                        "run-many",
+                        "--targets=${nxTargets.joinToString(separator = ",")}",
+                        "--projects=${nxProjects.joinToString(separator = ",")}",
+                    )
+                if (nxTargetsConfiguration.isNullOrBlank().not()) {
+                    array + "-c $nxTargetsConfiguration"
+                } else {
+                    array
+                }
+            } else
                 arrayOf(
-                    "run-many",
-                    "--targets=${nxTargets.joinToString(separator = ",")}",
-                    "--projects=${nxProjects.joinToString(separator = ",")}",
+                    "run",
+                    "${nxProjects.first()}:${nxTargets.first()}${if(nxTargetsConfiguration.isNullOrBlank().not()) ":$nxTargetsConfiguration" else ""}"
                 )
-            else arrayOf("run", "${nxProjects.first()}:${nxTargets.first()}")
 
         TelemetryService.getInstance(project)
             .featureUsed("Nx Run - from context menu/target list/codelens")

@@ -12,6 +12,8 @@ import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
+import dev.nx.console.settings.NxConsoleProjectSettingsProvider
+import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.utils.nxlsWorkingPath
 import java.awt.Dimension
 import javax.swing.ListSelectionModel.SINGLE_SELECTION
@@ -19,13 +21,45 @@ import kotlinx.coroutines.runBlocking
 
 class NxGenerateService(val project: Project) {
 
+    suspend fun getFilteredGenerators(): List<NxGenerator> {
+        val generators = NxlsService.getInstance(project).generators()
+        val filters =
+            NxConsoleProjectSettingsProvider.getInstance(project).generatorFilters
+                ?: return generators
+        val includeFilters = mutableListOf<GeneratorFilter>()
+        val excludeFilters = mutableListOf<GeneratorFilter>()
+        filters.forEach {
+            if (it.include) {
+                includeFilters.add(it)
+            } else {
+                excludeFilters.add(it)
+            }
+        }
+        return generators.filter { generator ->
+            var keep = true
+            if (includeFilters.size > 0) {
+                keep =
+                    includeFilters.any { filter ->
+                        matchWithWildcards(generator.name, filter.matcher)
+                    }
+            }
+            if (excludeFilters.size > 0) {
+                keep =
+                    keep &&
+                        excludeFilters.none { filter ->
+                            matchWithWildcards(generator.name, filter.matcher)
+                        }
+            }
+            keep
+        }
+    }
+
     suspend fun selectGenerator(
         actionEvent: AnActionEvent?,
         callback: (generator: NxGenerator?) -> Unit
     ) {
-        val nxlsService = project.service<NxlsService>()
 
-        val generators = nxlsService.generators()
+        val generators = this.getFilteredGenerators()
 
         if (generators.isEmpty()) {
             callback(null)
@@ -74,15 +108,34 @@ class NxGenerateService(val project: Project) {
         val generatorOptions =
             options
                 ?: runBlocking {
+                    val nxProjectNames =
+                        project
+                            .service<NxlsService>()
+                            .workspace()
+                            ?.workspace
+                            ?.projects
+                            ?.keys
+                            ?.toList()
+                            ?: emptyList()
                     project
                         .service<NxlsService>()
                         .generatorOptions(
                             NxGeneratorOptionsRequestOptions(
                                 generator.data.collection,
-                                generator.name,
+                                generator.data.name,
                                 generator.path
                             )
                         )
+                        .map {
+                            if (
+                                it.name == "project" ||
+                                    it.name == "projectName" ||
+                                    it.dropdown == "projects"
+                            ) {
+                                it.items = nxProjectNames
+                            }
+                            it
+                        }
                 }
 
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
@@ -117,4 +170,14 @@ class NxGenerateService(val project: Project) {
         fun getInstance(project: Project): NxGenerateService =
             project.getService(NxGenerateService::class.java)
     }
+}
+
+private fun matchWithWildcards(text: String, pattern: String): Boolean {
+    val regexFromPattern =
+        Regex("${pattern.split("*").map { escapeRegex(it) }.joinToString(".*")}$")
+    return regexFromPattern.matches(text)
+}
+
+private fun escapeRegex(text: String): String {
+    return text.replace("([.*+?^=!:{$}()|[\\]/\\\\])", "\\$1")
 }
