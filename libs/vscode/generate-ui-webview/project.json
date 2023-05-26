@@ -6,20 +6,14 @@
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/vscode/generate-ui-webview/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/vscode/generate-ui-webview/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/vscode/generate-ui-webview/jest.config.ts",
         "passWithNoTests": true
@@ -32,7 +26,5 @@
       }
     }
   },
-  "tags": [
-    "type:vscode"
-  ]
+  "tags": ["type:vscode"]
 }

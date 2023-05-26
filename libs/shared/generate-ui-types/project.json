@@ -6,17 +6,11 @@
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/shared/generate-ui-types/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/shared/generate-ui-types/**/*.ts"]
       }
     }
   },
-  "tags": [
-    "type:shared"
-  ]
+  "tags": ["type:shared"]
 }

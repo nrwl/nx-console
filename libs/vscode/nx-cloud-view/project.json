@@ -6,13 +6,9 @@
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/vscode/nx-cloud-view/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/vscode/nx-cloud-view/**/*.ts"]
       }
     },
     "build-webview-files": {
@@ -30,17 +26,11 @@
         "deleteOutputPath": false,
         "platform": "browser",
         "outputPath": "dist/apps/vscode/nx-cloud-webview",
-        "format": [
-          "esm"
-        ],
+        "format": ["esm"],
         "thirdParty": true
       },
-      "dependsOn": [
-        "extract-dependencies"
-      ],
-      "inputs": [
-        "{projectRoot}/src/webview/**/*"
-      ]
+      "dependsOn": ["extract-dependencies"],
+      "inputs": ["{projectRoot}/src/webview/**/*"]
     },
     "watch-webview-files": {
       "executor": "@nx/esbuild:esbuild",
@@ -57,18 +47,12 @@
         "deleteOutputPath": false,
         "platform": "browser",
         "outputPath": "dist/apps/vscode/nx-cloud-webview",
-        "format": [
-          "esm"
-        ],
+        "format": ["esm"],
         "thirdParty": true,
         "watch": true
       },
-      "dependsOn": [
-        "extract-dependencies"
-      ],
-      "inputs": [
-        "{projectRoot}/src/webview"
-      ]
+      "dependsOn": ["extract-dependencies"],
+      "inputs": ["{projectRoot}/src/webview"]
     },
     "extract-dependencies": {
       "executor": "nx:run-commands",
@@ -78,16 +62,12 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/vscode/nx-cloud-view"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/libs/vscode/nx-cloud-view"],
       "options": {
         "jestConfig": "libs/vscode/nx-cloud-view/jest.config.ts",
         "passWithNoTests": true
       }
     }
   },
-  "tags": [
-    "type:vscode"
-  ]
+  "tags": ["type:vscode"]
 }
