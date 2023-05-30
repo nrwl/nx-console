@@ -29,7 +29,8 @@ export type GenerateUiRunGeneratorPayload = {
 export type GenerateUiInputMessage =
   | GenerateUiGeneratorSchemaInputMessage
   | GenerateUiConfigurationInputMessage
-  | GenerateUiStylesInputMessage;
+  | GenerateUiStylesInputMessage
+  | GenerateUiBannerInputMessage;
 
 export class GenerateUiGeneratorSchemaInputMessage {
   readonly payloadType = 'generator';
@@ -67,4 +68,16 @@ export type GenerateUiStyles = {
   fieldBackgroundColor: string;
   fieldBorderColor: string;
   selectFieldBackgroundColor: string;
+  bannerWarningBackgroundColor: string;
 };
+
+export class GenerateUiBannerInputMessage {
+  readonly payloadType = 'banner';
+
+  constructor(
+    public readonly payload: {
+      message: string;
+      type: 'warning' | 'error';
+    }
+  ) {}
+}

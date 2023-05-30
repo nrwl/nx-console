@@ -84,6 +84,9 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             this.generatorToDisplay?.let {
                 this.postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(it))
             }
+            this.postMessageToBrowser(
+                GenerateUiBannerInputMessage(GenerateUiBanner("test", "warning"))
+            )
             return
         }
         if (messageParsed.payloadType == "run-generator") {
@@ -131,13 +134,16 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
         // 'Helvetica Neue', sans-serif;"
         //        val fontSize = "${UIUtil.getLabelFont().size}px"
+        val bannerWarningBackgroundColor =
+            getHexColor(UIManager.getColor("Component.warningFocusColor"))
         return GenerateUiStyles(
             backgroundColor,
             foregroundColor,
             primaryColor,
             fieldBackgroundColor,
             fieldBorderColor,
-            selectFieldBackgroundColor
+            selectFieldBackgroundColor,
+            bannerWarningBackgroundColor
         )
     }
 }

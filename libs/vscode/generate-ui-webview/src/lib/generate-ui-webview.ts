@@ -1,4 +1,5 @@
 import {
+  GenerateUiBannerInputMessage,
   GenerateUiConfigurationInputMessage,
   GenerateUiGeneratorSchemaInputMessage,
   GenerateUiInputMessage,
@@ -20,6 +21,7 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
+import { isWorkingTreeClean } from './git-working-tree.plugin';
 
 export class GenerateUiWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -154,6 +156,13 @@ export class GenerateUiWebview {
         this.postMessageToWebview(
           new GenerateUiGeneratorSchemaInputMessage(this.generatorToDisplay)
         );
+        isWorkingTreeClean().then((workingTreeCleanMessage) => {
+          if (workingTreeCleanMessage) {
+            this.postMessageToWebview(
+              new GenerateUiBannerInputMessage(workingTreeCleanMessage)
+            );
+          }
+        });
         break;
       }
     }
@@ -190,6 +199,8 @@ export class GenerateUiWebview {
       --foreground-color: var(--vscode-editor-foreground);
       --background-color: var(--vscode-editor-background);
       --field-border-color: var(--panel-view-border);
+      --banner-warning-color: var(--vscode-statusBarItem-warningBackground);
+      --banner-error-color: var(--vscode-statusBarItem-errorBackground);
     `;
   }
 }

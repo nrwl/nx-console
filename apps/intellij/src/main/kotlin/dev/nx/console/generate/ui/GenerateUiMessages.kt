@@ -66,8 +66,21 @@ data class GenerateUiStyles(
     val primaryColor: String,
     val fieldBackgroundColor: String,
     val fieldBorderColor: String,
-    val selectFieldBackgroundColor: String
+    val selectFieldBackgroundColor: String,
+    val bannerWarningBackgroundColor: String
 //    val secondaryTextColor: String,
 //    val fontFamily: String,
 //    val fontSize: String,
 )
+
+@Serializable
+@SerialName("banner")
+data class GenerateUiBannerInputMessage(override val payload: GenerateUiBanner) :
+    GenerateUiInputMessage {}
+
+@Serializable
+data class GenerateUiBanner(val message: String, val type: String) {
+    init {
+        require(type == "warning" || type == "error")
+    }
+}

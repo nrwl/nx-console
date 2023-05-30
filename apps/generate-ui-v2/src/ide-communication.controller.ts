@@ -17,6 +17,13 @@ export class IdeCommunicationController implements ReactiveController {
   generatorSchema: GeneratorSchema | undefined;
   configuration: GenerateUiConfiguration | undefined;
 
+  banner:
+    | {
+        message: string;
+        type: 'info' | 'warning' | 'error';
+      }
+    | undefined;
+
   constructor(private host: ReactiveControllerHost) {
     let vscode: WebviewApi<undefined> | undefined;
     try {
@@ -109,6 +116,12 @@ export class IdeCommunicationController implements ReactiveController {
         this.host.requestUpdate();
         break;
       }
+
+      case 'banner': {
+        this.banner = message.payload;
+        this.host.requestUpdate();
+        break;
+      }
     }
   }
 
@@ -122,6 +135,7 @@ export class IdeCommunicationController implements ReactiveController {
       --field-background-color: ${styles.fieldBackgroundColor};
       --field-border-color: ${styles.fieldBorderColor};
       --select-field-background-color: ${styles.selectFieldBackgroundColor};
+      --banner-warning-color: ${styles.bannerWarningBackgroundColor};
     }
     `);
     // --secondary-text-color: ${styles.secondaryTextColor};
