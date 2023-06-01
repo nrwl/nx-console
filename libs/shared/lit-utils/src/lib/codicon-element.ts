@@ -1,6 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+// required window.codiconsUri to be set
 @customElement('codicon-element')
 export class Codicon extends LitElement {
   static styles = css`

@@ -4,10 +4,7 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
-import dev.nx.console.settings.options.EnableDryRunOnGenerateChangeSetting
-import dev.nx.console.settings.options.GeneratorFiltersSetting
-import dev.nx.console.settings.options.TelemetrySetting
-import dev.nx.console.settings.options.WorkspacePathSetting
+import dev.nx.console.settings.options.*
 import javax.swing.JComponent
 
 class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurable {
@@ -20,6 +17,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
     private lateinit var workspacePathSetting: WorkspacePathSetting
     private lateinit var telemetrySetting: TelemetrySetting
     private lateinit var generatorFiltersSetting: GeneratorFiltersSetting
+    private lateinit var useNewGenerateUIPreviewSetting: UseNewGenerateUIPreviewSetting
 
     override fun createComponent(): JComponent {
         enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
@@ -34,6 +32,9 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         generatorFiltersSetting = GeneratorFiltersSetting(project)
         generatorFiltersSetting.setValue(projectSettingsProvider.generatorFilters)
 
+        useNewGenerateUIPreviewSetting = UseNewGenerateUIPreviewSetting()
+        useNewGenerateUIPreviewSetting.setValue(settingsProvider.useNewGenerateUIPreview)
+
         return panel {
             group("Project Settings") {
                 workspacePathSetting.render(this)
@@ -42,6 +43,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
                 telemetrySetting.render(this)
+                useNewGenerateUIPreviewSetting.render(this)
             }
         }
     }
@@ -50,6 +52,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         return enableDryRunOnGenerateChangeSetting.getValue() !=
             settingsProvider.enableDryRunOnGenerateChange ||
             telemetrySetting.getValue() != settingsProvider.enableTelemetry ||
+            useNewGenerateUIPreviewSetting.getValue() != settingsProvider.useNewGenerateUIPreview ||
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
             generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters
     }
@@ -58,6 +61,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         settingsProvider.enableDryRunOnGenerateChange =
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
+        settingsProvider.useNewGenerateUIPreview = useNewGenerateUIPreviewSetting.getValue()
         projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
         projectSettingsProvider.generatorFilters = generatorFiltersSetting.getValue()
 

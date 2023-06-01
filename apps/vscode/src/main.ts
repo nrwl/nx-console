@@ -67,6 +67,10 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
+import {
+  initGenerateUiWebview,
+  openGenerateUi,
+} from '@nx-console/vscode/generate-ui-webview';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -92,13 +96,20 @@ export async function activate(c: ExtensionContext) {
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        revealWebViewPanel({
-          runTargetTreeItem,
-          context,
-          runTargetTreeView,
-          contextMenuUri,
-          generator: runTargetTreeItem.generator,
-        });
+        const preview = GlobalConfigurationStore.instance.get(
+          'useNewGenerateUiPreview'
+        );
+        if (preview) {
+          openGenerateUi();
+        } else {
+          revealWebViewPanel({
+            runTargetTreeItem,
+            context,
+            runTargetTreeView,
+            contextMenuUri,
+            generator: runTargetTreeItem.generator,
+          });
+        }
       }
     );
 
@@ -228,6 +239,7 @@ async function setWorkspace(workspacePath: string) {
     registerVscodeAddDependency(context);
 
     initNxCloudOnboardingView(context, environment.production);
+    initGenerateUiWebview(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

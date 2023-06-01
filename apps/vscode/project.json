@@ -5,7 +5,7 @@
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
-  "implicitDependencies": ["generate-ui", "nxls"],
+  "implicitDependencies": ["generate-ui", "generate-ui-v2", "nxls"],
   "targets": {
     "watch-all": {
       "executor": "nx:run-commands",
