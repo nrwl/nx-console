@@ -1,6 +1,7 @@
 // import { getOutputChannel } from '@nx-console/utils';
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
+import type * as NxProjectGraphFileUtils from 'nx/src/project-graph/file-map-utils';
 import type * as NxDaemonClient from 'nx/src/daemon/client/client';
 import type * as NxOutput from 'nx/src/utils/output';
 import { platform } from 'os';
@@ -26,6 +27,22 @@ export async function getNxOutput(
   const importPath = await findNxPackagePath(
     workspacePath,
     join('src', 'utils', 'output.js')
+  );
+
+  if (!importPath) {
+    return;
+  }
+
+  return getNxPackage(importPath, logger);
+}
+
+export async function getNxProjectGraphUtils(
+  workspacePath: string,
+  logger: Logger
+): Promise<typeof NxProjectGraphFileUtils | undefined> {
+  const importPath = await findNxPackagePath(
+    workspacePath,
+    join('src', 'project-graph', 'file-utils.js')
   );
 
   if (!importPath) {
