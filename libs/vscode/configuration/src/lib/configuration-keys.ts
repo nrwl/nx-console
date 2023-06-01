@@ -9,7 +9,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'enableTaskExecutionDryRunOnChange',
   'projectViewingStyle',
   'moveGeneratorPatterns',
-  'useNewGenerateUIPreview',
+  'useNewGenerateUiPreview',
 ] as const;
 
 export type GlobalConfig = {
@@ -23,7 +23,7 @@ export type GlobalConfig = {
   enableTaskExecutionDryRunOnChange: boolean;
   projectViewingStyle: 'list' | 'tree' | 'automatic';
   moveGeneratorPatterns: Record<string, string>;
-  useNewGenerateUIPreview: boolean;
+  useNewGenerateUiPreview: boolean;
 };
 
 /**

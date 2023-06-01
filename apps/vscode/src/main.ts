@@ -97,7 +97,7 @@ export async function activate(c: ExtensionContext) {
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
         const preview = GlobalConfigurationStore.instance.get(
-          'useNewGenerateUIPreview'
+          'useNewGenerateUiPreview'
         );
         if (preview) {
           openGenerateUi();
