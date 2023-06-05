@@ -25,7 +25,8 @@
           "outExtension": {
             ".js": ".js"
           }
-        }
+        },
+        "thirdParty": true
       }
     },
     "package": {
