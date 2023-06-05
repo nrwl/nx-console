@@ -42,7 +42,7 @@ export async function getNxProjectGraphUtils(
 ): Promise<typeof NxProjectGraphFileUtils | undefined> {
   const importPath = await findNxPackagePath(
     workspacePath,
-    join('src', 'project-graph', 'file-utils.js')
+    join('src', 'project-graph', 'file-map-utils.js')
   );
 
   if (!importPath) {
