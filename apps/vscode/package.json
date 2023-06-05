@@ -151,7 +151,7 @@
         {
           "command": "nx.graph.select.button",
           "when": "view == nxProjects && viewItem == project && isNxWorkspace",
-          "group": "inline@1"
+          "group": "navigation"
         },
         {
           "command": "nx.graph.task.button",
