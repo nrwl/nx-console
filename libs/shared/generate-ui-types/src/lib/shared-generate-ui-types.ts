@@ -1,11 +1,19 @@
 import { Option } from '@nx-console/shared/schema';
+
+export type FormValues = Record<
+  string,
+  string | boolean | number | string[] | undefined
+>;
+
+export type ValidationResults = Record<string, string | boolean>;
 /**
  * Output Messages
  */
 
 export type GenerateUiOutputMessage =
   | GenerateUiFormInitOutputMessage
-  | GenerateUiRunGeneratorOutputMessage;
+  | GenerateUiRunGeneratorOutputMessage
+  | GenerateUiRequestValidationOutputMessage;
 
 export class GenerateUiFormInitOutputMessage {
   readonly payloadType = 'output-init';
@@ -22,6 +30,14 @@ export type GenerateUiRunGeneratorPayload = {
   readonly flags: string[];
 };
 
+export class GenerateUiRequestValidationOutputMessage {
+  readonly payloadType = 'request-validation';
+
+  constructor(
+    public readonly payload: { formValues: FormValues; schema: GeneratorSchema }
+  ) {}
+}
+
 /**
  * Input Messages
  */
@@ -30,7 +46,8 @@ export type GenerateUiInputMessage =
   | GenerateUiGeneratorSchemaInputMessage
   | GenerateUiConfigurationInputMessage
   | GenerateUiStylesInputMessage
-  | GenerateUiBannerInputMessage;
+  | GenerateUiBannerInputMessage
+  | GenerateUiValidationResultsInputMessage;
 
 export class GenerateUiGeneratorSchemaInputMessage {
   readonly payloadType = 'generator';
@@ -80,4 +97,10 @@ export class GenerateUiBannerInputMessage {
       type: 'warning' | 'error';
     }
   ) {}
+}
+
+export class GenerateUiValidationResultsInputMessage {
+  readonly payloadType = 'validation-results';
+
+  constructor(public readonly payload: ValidationResults) {}
 }

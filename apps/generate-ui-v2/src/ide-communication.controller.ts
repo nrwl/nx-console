@@ -1,9 +1,12 @@
 import {
+  FormValues,
   GenerateUiConfiguration,
   GenerateUiInputMessage,
   GenerateUiOutputMessage,
+  GenerateUiRequestValidationOutputMessage,
   GenerateUiStyles,
   GeneratorSchema,
+  ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
 import { Option, OptionType } from '@nx-console/shared/schema';
 import { ReactiveController, ReactiveControllerHost } from 'lit';
@@ -11,8 +14,6 @@ import { ReactiveController, ReactiveControllerHost } from 'lit';
 import type { WebviewApi } from 'vscode-webview';
 
 export class IdeCommunicationController implements ReactiveController {
-  private postToIde: (message: unknown) => void;
-
   editor: 'vscode' | 'intellij';
   generatorSchema: GeneratorSchema | undefined;
   configuration: GenerateUiConfiguration | undefined;
@@ -23,6 +24,10 @@ export class IdeCommunicationController implements ReactiveController {
         type: 'info' | 'warning' | 'error';
       }
     | undefined;
+
+  private postToIde: (message: unknown) => void;
+  // private pluginValidationListeners: ((value: ValidationResults) => void)[] =
+  //   [];
 
   constructor(private host: ReactiveControllerHost) {
     let vscode: WebviewApi<undefined> | undefined;
@@ -53,6 +58,26 @@ export class IdeCommunicationController implements ReactiveController {
   postMessageToIde(message: GenerateUiOutputMessage) {
     console.log('sending message to ide', message);
     this.postToIde(message);
+  }
+
+  private pendingPluginValidationQueue: ((
+    results: ValidationResults
+  ) => void)[] = [];
+
+  async getValidationResults(
+    formValues: FormValues,
+    schema: GeneratorSchema
+  ): Promise<ValidationResults> {
+    // send request and wait until handleInputMessage resolves the promise
+    const promise = new Promise<ValidationResults>((resolve) => {
+      this.pendingPluginValidationQueue.push(resolve);
+    });
+
+    this.postMessageToIde(
+      new GenerateUiRequestValidationOutputMessage({ formValues, schema })
+    );
+
+    return await promise;
   }
 
   private setupVscodeCommunication(vscode: WebviewApi<undefined>) {
@@ -120,6 +145,19 @@ export class IdeCommunicationController implements ReactiveController {
       case 'banner': {
         this.banner = message.payload;
         this.host.requestUpdate();
+        break;
+      }
+
+      case 'validation-results': {
+        // get most recent listener from queue and resolve it
+        if (this.pendingPluginValidationQueue.length > 0) {
+          const resolve = this.pendingPluginValidationQueue.shift();
+          if (!resolve) {
+            break;
+          }
+          resolve(message.payload);
+        }
+
         break;
       }
     }

@@ -16,7 +16,8 @@ export class InputField extends Field(LitElement) {
     } else {
       return html`
         <vscode-text-field type="text" @input="${this.handleChange}">
-        </vscode-text-field>
+        </vscode-text-field
+        >${this.validation ?? ''}
       `;
     }
   }

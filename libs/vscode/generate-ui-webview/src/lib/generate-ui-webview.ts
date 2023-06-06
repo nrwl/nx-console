@@ -4,7 +4,9 @@ import {
   GenerateUiGeneratorSchemaInputMessage,
   GenerateUiInputMessage,
   GenerateUiOutputMessage,
+  GenerateUiValidationResultsInputMessage,
   GeneratorSchema,
+  ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
@@ -161,6 +163,7 @@ export class GenerateUiWebview {
         this.postMessageToWebview(
           new GenerateUiGeneratorSchemaInputMessage(this.generatorToDisplay)
         );
+
         const nxWorkspace = await getNxWorkspace();
         this.plugins?.startupMessages?.forEach((messageFunction) => {
           const message = messageFunction(nxWorkspace);
@@ -170,6 +173,25 @@ export class GenerateUiWebview {
             );
           }
         });
+        break;
+      }
+      case 'request-validation': {
+        const validators = this.plugins?.validators;
+        let validationErrors: ValidationResults = {};
+        if (validators) {
+          validators.forEach((validator) => {
+            const result = validator(
+              message.payload.formValues,
+              message.payload.schema
+            );
+            if (result) {
+              validationErrors = { ...validationErrors, ...result };
+            }
+          });
+        }
+        this.postMessageToWebview(
+          new GenerateUiValidationResultsInputMessage(validationErrors)
+        );
         break;
       }
     }
