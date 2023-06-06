@@ -13,7 +13,7 @@ export class CheckboxField extends Field(LitElement) {
       />`;
     } else {
       return html`<vscode-checkbox
-        @input="${this.handleChange}"
+        @change="${this.handleChange}"
       ></vscode-checkbox>`;
     }
   }
