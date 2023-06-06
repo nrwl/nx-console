@@ -21,7 +21,6 @@ import {
   WebviewPanel,
   window,
 } from 'vscode';
-import { isWorkingTreeClean } from './git-working-tree.plugin';
 
 export class GenerateUiWebview {
   private webviewPanel: WebviewPanel | undefined;
@@ -30,6 +29,10 @@ export class GenerateUiWebview {
 
   private generatorToDisplay: GeneratorSchema | undefined;
 
+  private plugins:
+    | { schemaProcessors?: any[]; validators?: any[]; startupMessages?: any[] }
+    | undefined;
+
   constructor(private context: ExtensionContext) {
     this._webviewSourceUri = Uri.joinPath(
       this.context.extensionUri,
@@ -37,7 +40,7 @@ export class GenerateUiWebview {
     );
   }
 
-  openGenerateUi(generator: GeneratorSchema) {
+  async openGenerateUi(generator: GeneratorSchema) {
     this.generatorToDisplay = generator;
     if (!this.webviewPanel) {
       this.webviewPanel = window.createWebviewPanel(
@@ -118,6 +121,8 @@ export class GenerateUiWebview {
         this.webviewPanel = undefined;
         this.generatorToDisplay = undefined;
       });
+
+      this.plugins = await this.loadPlugins();
     }
     this.webviewPanel.reveal();
   }
@@ -131,7 +136,7 @@ export class GenerateUiWebview {
     }
   }
 
-  private handleMessageFromWebview(message: GenerateUiOutputMessage) {
+  private async handleMessageFromWebview(message: GenerateUiOutputMessage) {
     switch (message.payloadType) {
       case 'run-generator': {
         CliTaskProvider.instance.executeTask({
@@ -156,15 +161,33 @@ export class GenerateUiWebview {
         this.postMessageToWebview(
           new GenerateUiGeneratorSchemaInputMessage(this.generatorToDisplay)
         );
-        isWorkingTreeClean().then((workingTreeCleanMessage) => {
-          if (workingTreeCleanMessage) {
+        const nxWorkspace = await getNxWorkspace();
+        this.plugins?.startupMessages?.forEach((messageFunction) => {
+          const message = messageFunction(nxWorkspace);
+          if (message) {
             this.postMessageToWebview(
-              new GenerateUiBannerInputMessage(workingTreeCleanMessage)
+              new GenerateUiBannerInputMessage(message)
             );
           }
         });
         break;
       }
+    }
+  }
+
+  private async loadPlugins(): Promise<
+    | { schemaProcessors?: any[]; validators?: any[]; startupMessages?: any[] }
+    | undefined
+  > {
+    const workspace = await getNxWorkspace();
+    try {
+      const pluginFile = `${workspace.workspacePath}/.nx/console/plugins.mjs`;
+      if (!existsSync(pluginFile)) {
+        return undefined;
+      }
+      return await import(pluginFile).then((module) => module.default);
+    } catch (_) {
+      return undefined;
     }
   }
 
@@ -174,22 +197,15 @@ export class GenerateUiWebview {
     const workspace = await getNxWorkspace();
     let modifiedSchema = message.payload;
     try {
-      const localModDir = `${workspace.workspacePath}/.nx/console`;
-      if (!existsSync(localModDir)) {
-        return message;
-      }
-      const localMods = readdirSync(localModDir);
-      for (const mod of localMods) {
-        await import(`${localModDir}/${mod}`).then(
-          (module) =>
-            (modifiedSchema = module.default(modifiedSchema, workspace))
-        );
-      }
+      this.plugins?.schemaProcessors?.forEach((processor) => {
+        modifiedSchema = processor(modifiedSchema, workspace);
+      });
       return {
         ...message,
         payload: modifiedSchema,
       };
     } catch (e) {
+      console.log(e);
       return message;
     }
   }
