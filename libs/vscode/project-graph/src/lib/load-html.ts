@@ -279,13 +279,13 @@ function injectedScript() {
 
             if (action.type === 'task') {
               document.querySelector(\`[data-cy="deselectAllButton"]\`)?.click()
-              window.externalApi.router?.navigate(\`tasks/\${action.taskName}\`).then(() => {
+              window.externalApi.router?.navigate(\`/tasks/\${action.taskName}\`).then(() => {
                 document.querySelector(\`label[data-project="\${action.projectName}"\`)?.click()
               })
               return true;
             } else if (action.type === 'allTasks') {
               document.querySelector(\`[data-cy="deselectAllButton"]\`)?.click()
-              window.externalApi.router?.navigate(\`tasks/\${action.taskName}\`).then(() => {
+              window.externalApi.router?.navigate(\`/tasks/\${action.taskName}\`).then(() => {
                 document.querySelector(\`[data-cy="selectAllButton"]\`)?.click()
               })
               return true;
