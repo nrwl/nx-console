@@ -92,7 +92,7 @@ class NxGraphBrowser(
         executeWhenLoaded {
             lastCommand = Command.FocusTaskGroup(taskGroupName)
             browser.executeJavaScriptAsync(
-                "window.externalApi?.router?.navigate('tasks/$taskGroupName/all')"
+                "window.externalApi?.router?.navigate('/tasks/$taskGroupName/all')"
             )
         }
     }
@@ -103,7 +103,7 @@ class NxGraphBrowser(
             CoroutineScope(Dispatchers.Default).launch {
                 browser
                     .executeJavaScriptAsync(
-                        "window.externalApi?.router?.navigate('tasks/$nxTarget')"
+                        "window.externalApi?.router?.navigate('/tasks/$nxTarget')"
                     )
                     .await()
                 browser.executeJavaScriptAsync(
@@ -158,7 +158,7 @@ class NxGraphBrowser(
             #app > * {
               display: none;
             }
-            
+
             #app #main-content {
               display: block !important;
             }
