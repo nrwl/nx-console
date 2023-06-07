@@ -101,7 +101,7 @@ const renderOptions = (
   hiddenOptionNames: Set<string>,
   show = true
 ): TemplateResult => {
-  return html` <div>
+  return html`<div>
     ${options.map((option) => {
       const componentTag = getFieldComponent(option);
       const hidden = !show || hiddenOptionNames.has(option.name);

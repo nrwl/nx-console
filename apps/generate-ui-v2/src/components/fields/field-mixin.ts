@@ -37,14 +37,21 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
     protected touched = false;
 
     @state()
+    protected isDefaultValue = true;
+
+    @state()
     private submitted = false;
 
     protected render() {
       return html`
-        <div class="flex flex-col mb-4">
-          <p class="">
-            ${this.option.name}${this.option.isRequired ? '*' : ''}
-          </p>
+        <div
+          class="flex flex-col py-1 my-2 pl-3 border-l-4 ${this.shouldRenderError()
+            ? 'border-red-500'
+            : this.shouldRenderChanged()
+            ? 'border-blue-500'
+            : 'border-transparent'}"
+        >
+          <p>${this.option.name}${this.option.isRequired ? '*' : ''}</p>
           <p class="text-sm text-gray-500">${this.option.description}</p>
           ${this.renderField()}
           ${when(
@@ -76,9 +83,13 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
     }
 
     protected dispatchValue(
-      value: string | boolean | number | string[] | undefined,
-      isDefaultValue = false
+      value: string | boolean | number | string[] | undefined
     ) {
+      const defaultValue = extractDefaultValue(this.option);
+      // if the default value is undefined, false & empty string are considered default values
+      const isDefaultValue =
+        value === defaultValue || (!value && !defaultValue);
+
       this.dispatchEvent(
         new CustomEvent('option-changed', {
           bubbles: true,
@@ -93,6 +104,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       if (!isDefaultValue) {
         this.touched = true;
       }
+      this.isDefaultValue = isDefaultValue;
     }
 
     protected firstUpdated(
@@ -104,7 +116,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       if (defaultValue) {
         this.setFieldValue(defaultValue);
       }
-      this.dispatchValue(defaultValue, true);
+      this.dispatchValue(defaultValue);
     }
 
     protected createRenderRoot(): Element | ShadowRoot {
@@ -117,6 +129,10 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
         this.validation !== true &&
         (this.touched || this.submitted)
       );
+    }
+
+    shouldRenderChanged(): boolean {
+      return this.touched && !this.isDefaultValue;
     }
 
     // placeholders for subclasses
