@@ -107,11 +107,9 @@ const renderOptions = (
       const hidden = !show || hiddenOptionNames.has(option.name);
 
       return html` <div
-        class="flex flex-col mb-4 ${hidden ? 'hidden' : ''}"
+        class="${hidden ? 'hidden' : ''}"
         id="option-${option.name}"
       >
-        <p class="">${option.name}${option.isRequired ? '*' : ''}</p>
-        <p class="text-sm text-gray-500">${option.description}</p>
         ${componentTag}
       </div>`;
     })}

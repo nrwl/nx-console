@@ -8,7 +8,7 @@ import { extractDefaultValue } from '../../generator-schema-utils';
 
 @customElement('select-field')
 export class SelectField extends Field(LitElement) {
-  render() {
+  renderField() {
     if (this.editor === 'intellij') {
       return this.renderIntellij();
     } else {

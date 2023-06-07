@@ -4,7 +4,7 @@ import { Field } from './field-mixin';
 
 @customElement('checkbox-field')
 export class CheckboxField extends Field(LitElement) {
-  render() {
+  renderField() {
     if (this.editor === 'intellij') {
       return html`<input
         type="checkbox"

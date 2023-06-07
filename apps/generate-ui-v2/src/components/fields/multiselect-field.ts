@@ -7,7 +7,7 @@ import { extractDefaultValue } from '../../generator-schema-utils';
 
 @customElement('multiselect-field')
 export class MultiselectField extends Field(LitElement) {
-  render() {
+  renderField() {
     return html`
       <select @change="${this.handleChange}" multiple>
         ${map(
