@@ -61,7 +61,6 @@ export class FormValuesService {
       const option = options.find((option) => option.name === key);
       if (!value && option?.isRequired) {
         errors[key] = 'This field is required';
-        console.log('required error', key, value);
       }
     });
 

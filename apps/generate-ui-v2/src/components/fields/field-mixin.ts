@@ -15,6 +15,7 @@ export declare class FieldInterface {
   protected setFieldValue(
     value: string | boolean | number | string[] | undefined
   ): void;
+  protected isValid(): boolean;
 }
 
 export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
@@ -78,6 +79,10 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
 
     protected createRenderRoot(): Element | ShadowRoot {
       return this;
+    }
+
+    isValid(): boolean {
+      return this.validation === undefined || this.validation === true;
     }
   }
 

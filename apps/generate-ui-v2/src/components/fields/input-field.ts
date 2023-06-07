@@ -15,7 +15,13 @@ export class InputField extends Field(LitElement) {
       `;
     } else {
       return html`
-        <vscode-text-field type="text" @input="${this.handleChange}">
+        <vscode-text-field
+          type="text"
+          @input="${this.handleChange}"
+          style="${!this.isValid()
+            ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
+            : ''}"
+        >
         </vscode-text-field
         >${this.validation ?? ''}
       `;
