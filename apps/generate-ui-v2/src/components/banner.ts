@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { EditorContext } from '../editor-context';
+import { EditorContext } from '../contexts/editor-context';
 
 @customElement('banner-element')
 export class Banner extends EditorContext(LitElement) {

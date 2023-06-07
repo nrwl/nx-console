@@ -1,11 +1,15 @@
 import { LitElement, PropertyValueMap, TemplateResult, html } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared/schema';
-import { ContextConsumer } from '@lit-labs/context';
-import { EditorContext, EditorContextInterface } from '../../editor-context';
+import { ContextConsumer, consume } from '@lit-labs/context';
+import {
+  EditorContext,
+  EditorContextInterface,
+} from '../../contexts/editor-context';
 import { formValuesServiceContext } from '../../form-values.service';
 import { extractDefaultValue } from '../../generator-schema-utils';
 import { when } from 'lit/directives/when.js';
+import { submittedContext } from '../../contexts/submitted-context';
 
 type Constructor<T> = new (...args: any[]) => T;
 
@@ -31,6 +35,9 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
 
     @state()
     protected touched = false;
+
+    @state()
+    private submitted = false;
 
     protected render() {
       return html`
@@ -60,6 +67,11 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
           );
         },
         subscribe: false,
+      });
+      new ContextConsumer(this, {
+        context: submittedContext,
+        callback: (submitted) => (this.submitted = submitted),
+        subscribe: true,
       });
     }
 
@@ -103,7 +115,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       return (
         this.validation !== undefined &&
         this.validation !== true &&
-        this.touched
+        (this.touched || this.submitted)
       );
     }
 

@@ -12,13 +12,14 @@ import './components/field-list';
 import './components/search-bar';
 import './components/banner';
 import '@nx-console/shared/lit-utils';
-import { editorContext } from './editor-context';
+import { editorContext } from './contexts/editor-context';
 import { debounce, getGeneratorIdentifier } from './generator-schema-utils';
 import { IdeCommunicationController } from './ide-communication.controller';
 import {
   formValuesServiceContext,
   FormValuesService,
 } from './form-values.service';
+import { submittedContext } from './contexts/submitted-context';
 
 @customElement('root-element')
 export class Root extends LitElement {
@@ -31,6 +32,11 @@ export class Root extends LitElement {
   private formValuesService: FormValuesService;
   private formValuesServiceContextProvider = new ContextProvider(this, {
     context: formValuesServiceContext,
+  });
+
+  private submittedContextProvider = new ContextProvider(this, {
+    context: submittedContext,
+    initialValue: false,
   });
 
   constructor() {
@@ -131,6 +137,7 @@ export class Root extends LitElement {
     if (dryRun) {
       args.push('--dry-run');
     }
+    this.submittedContextProvider.setValue(true);
     this.icc.postMessageToIde({
       payloadType: 'run-generator',
       payload: {

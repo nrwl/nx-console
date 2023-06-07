@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { EditorContext } from '../editor-context';
+import { EditorContext } from '../contexts/editor-context';
 
 @customElement('search-bar')
 export class SearchBar extends EditorContext(LitElement) {

@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume, ContextConsumer } from '@lit-labs/context';
-import { editorContext } from '../editor-context';
+import { editorContext } from '../contexts/editor-context';
 
 @customElement('button-element')
 export class Button extends LitElement {

@@ -26,8 +26,6 @@ export class IdeCommunicationController implements ReactiveController {
     | undefined;
 
   private postToIde: (message: unknown) => void;
-  // private pluginValidationListeners: ((value: ValidationResults) => void)[] =
-  //   [];
 
   constructor(private host: ReactiveControllerHost) {
     let vscode: WebviewApi<undefined> | undefined;
