@@ -39,3 +39,17 @@ export function debounce<T extends (...args: any[]) => void>(
     }, delay);
   }.bind(func);
 }
+
+export function shouldRenderError(
+  validation: string | boolean | undefined,
+  touched: boolean,
+  submitted: boolean
+) {
+  return (
+    validation !== undefined && validation !== true && (touched || submitted)
+  );
+}
+
+export function shouldRenderChanged(touched: boolean, isDefaultValue: boolean) {
+  return touched && !isDefaultValue;
+}

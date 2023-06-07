@@ -19,8 +19,16 @@ export class FormValuesService {
 
   private validationListeners: Record<
     string,
-    (value: string | boolean | undefined) => void
+    ((value: string | boolean | undefined) => void)[]
   > = {};
+
+  private defaultValueListeners: Record<
+    string,
+    ((isDefault: boolean) => void)[]
+  > = {};
+
+  private touchedListeners: Record<string, ((isTouched: boolean) => void)[]> =
+    {};
 
   constructor(
     private icc: IdeCommunicationController,
@@ -39,13 +47,21 @@ export class FormValuesService {
       );
 
       // notify consumers of changes
-      Object.entries(this.validationListeners).forEach(([key, callback]) => {
-        callback(this.validationResults[key]);
+      Object.entries(this.validationListeners).forEach(([key, callbacks]) => {
+        callbacks?.forEach((callback) => callback(this.validationResults[key]));
       });
       if (!e.detail.isDefaultValue) {
         if (Object.keys(this.validationResults).length === 0) {
           this.validFormCallback();
         }
+        this.touchedListeners[e.detail.name]?.forEach((callback) =>
+          callback(true)
+        );
+      }
+      if (this.defaultValueListeners[e.detail.name]) {
+        this.defaultValueListeners[e.detail.name]?.forEach((callback) =>
+          callback(e.detail.isDefaultValue)
+        );
       }
     });
   }
@@ -76,7 +92,21 @@ export class FormValuesService {
     key: string,
     listener: (value: string | boolean | undefined) => void
   ) {
-    this.validationListeners[key] = listener;
+    if (!this.validationListeners[key]) this.validationListeners[key] = [];
+    this.validationListeners[key].push(listener);
+  }
+
+  registerDefaultValueListener(
+    key: string,
+    listener: (isDefault: boolean) => void
+  ) {
+    if (!this.defaultValueListeners[key]) this.defaultValueListeners[key] = [];
+    this.defaultValueListeners[key].push(listener);
+  }
+
+  registerTouchedListener(key: string, listener: (isTouched: boolean) => void) {
+    if (!this.touchedListeners[key]) this.touchedListeners[key] = [];
+    this.touchedListeners[key].push(listener);
   }
 
   getSerializedFormValues(): string[] {

@@ -7,7 +7,11 @@ import {
   EditorContextInterface,
 } from '../../contexts/editor-context';
 import { formValuesServiceContext } from '../../form-values.service';
-import { extractDefaultValue } from '../../generator-schema-utils';
+import {
+  extractDefaultValue,
+  shouldRenderChanged,
+  shouldRenderError,
+} from '../../generator-schema-utils';
 import { when } from 'lit/directives/when.js';
 import { submittedContext } from '../../contexts/submitted-context';
 
@@ -72,6 +76,14 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
             this.option.name,
             (value) => (this.validation = value)
           );
+          service.registerTouchedListener(
+            this.option.name,
+            (value) => (this.touched = value)
+          );
+          service.registerDefaultValueListener(
+            this.option.name,
+            (value) => (this.isDefaultValue = value)
+          );
         },
         subscribe: false,
       });
@@ -101,10 +113,6 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
           },
         })
       );
-      if (!isDefaultValue) {
-        this.touched = true;
-      }
-      this.isDefaultValue = isDefaultValue;
     }
 
     protected firstUpdated(
@@ -124,15 +132,11 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
     }
 
     shouldRenderError(): boolean {
-      return (
-        this.validation !== undefined &&
-        this.validation !== true &&
-        (this.touched || this.submitted)
-      );
+      return shouldRenderError(this.validation, this.touched, this.submitted);
     }
 
     shouldRenderChanged(): boolean {
-      return this.touched && !this.isDefaultValue;
+      return shouldRenderChanged(this.touched, this.isDefaultValue);
     }
 
     // placeholders for subclasses
