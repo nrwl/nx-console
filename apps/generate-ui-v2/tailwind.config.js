@@ -9,6 +9,8 @@ module.exports = {
         fieldBackground: 'var(--field-background-color)',
         fieldBorder: 'var(--field-border-color)',
         selectFieldBackground: 'var(--select-field-background-color)',
+        bannerWarning: 'var(--banner-warning-color)',
+        bannerError: 'var(--banner-error-color)',
       },
     },
   },
