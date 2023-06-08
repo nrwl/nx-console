@@ -8,6 +8,7 @@ module.exports = {
         primary: 'var(--primary-color)',
         fieldBackground: 'var(--field-background-color)',
         fieldBorder: 'var(--field-border-color)',
+        focusBorder: 'var(--focus-border-color)',
         selectFieldBackground: 'var(--select-field-background-color)',
         bannerWarning: 'var(--banner-warning-color)',
         bannerError: 'var(--banner-error-color)',
