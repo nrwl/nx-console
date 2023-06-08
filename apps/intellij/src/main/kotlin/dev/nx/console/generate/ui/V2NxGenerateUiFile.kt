@@ -84,9 +84,6 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             this.generatorToDisplay?.let {
                 this.postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(it))
             }
-            this.postMessageToBrowser(
-                GenerateUiBannerInputMessage(GenerateUiBanner("test", "warning"))
-            )
             return
         }
         if (messageParsed.payloadType == "run-generator") {
@@ -97,6 +94,9 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                 )
             }
         }
+      if(messageParsed.payloadType == "request-validation") {
+        this.postMessageToBrowser(GenerateUiValidationResultsInputMessage(mapOf()))
+      }
     }
 
     private fun postMessageToBrowser(message: GenerateUiInputMessage) {
