@@ -94,9 +94,9 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                 )
             }
         }
-      if(messageParsed.payloadType == "request-validation") {
-        this.postMessageToBrowser(GenerateUiValidationResultsInputMessage(mapOf()))
-      }
+        if (messageParsed.payloadType == "request-validation") {
+            this.postMessageToBrowser(GenerateUiValidationResultsInputMessage(mapOf()))
+        }
     }
 
     private fun postMessageToBrowser(message: GenerateUiInputMessage) {

@@ -29,7 +29,8 @@ data class GenerateUiRunGeneratorOutputMessage(
 // The payload will have to be changed for plugins to be truly supported in Intellij
 @Serializable()
 @SerialName("request-validation")
-data class GenerateUiRequestValidationOutputMessage(override val payloadType: String): GenerateUiOutputMessage {}
+data class GenerateUiRequestValidationOutputMessage(override val payloadType: String) :
+    GenerateUiOutputMessage {}
 
 /** Input Messages */
 @Serializable
@@ -93,4 +94,5 @@ data class GenerateUiBanner(val message: String, val type: String) {
 // The payload will have to be changed for plugins to be truly supported in Intellij
 @Serializable
 @SerialName("validation-results")
-data class GenerateUiValidationResultsInputMessage(override val payload: Map<String, Boolean> ): GenerateUiInputMessage
+data class GenerateUiValidationResultsInputMessage(override val payload: Map<String, Boolean>) :
+    GenerateUiInputMessage
