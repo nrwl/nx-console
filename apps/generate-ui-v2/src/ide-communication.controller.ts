@@ -116,11 +116,7 @@ export class IdeCommunicationController implements ReactiveController {
   private handleInputMessage(message: GenerateUiInputMessage) {
     // TODO: Allow the UI to support array properties
     const optionFilter = (option: Option) =>
-      !(
-        option.type === OptionType.Array &&
-        option.items &&
-        (option.items as string[]).length === 0
-      ) && option['x-priority'] !== 'internal';
+      option['x-priority'] !== 'internal';
 
     switch (message.payloadType) {
       case 'generator': {
