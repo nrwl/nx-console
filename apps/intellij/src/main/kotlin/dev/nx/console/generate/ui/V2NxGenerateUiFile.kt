@@ -4,7 +4,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.jcef.*
-import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
@@ -123,7 +122,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                     false -> UIUtil.getLabelForeground()
                 }
             )
-        val primaryColor = getHexColor(JBUI.CurrentTheme.RunWidget.BACKGROUND)
+        val primaryColor = getHexColor(UIManager.getColor("Button.default.startBackground"))
         val fieldBackgroundColor = getHexColor(UIManager.getColor("TextField.background"))
         val fieldBorderColor = getHexColor(UIManager.getColor("Component.borderColor"))
         val selectFieldBackgroundColor =
