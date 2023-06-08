@@ -1,19 +1,16 @@
-import { LitElement, PropertyValueMap, TemplateResult, html } from 'lit';
-import { property, state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared/schema';
-import { ContextConsumer, consume } from '@lit-labs/context';
+import { LitElement, PropertyValueMap, TemplateResult, html } from 'lit';
+import { property } from 'lit/decorators.js';
+import { when } from 'lit/directives/when.js';
 import {
   EditorContext,
   EditorContextInterface,
 } from '../../contexts/editor-context';
-import { formValuesServiceContext } from '../../form-values.service';
+import { extractDefaultValue } from '../../generator-schema-utils';
 import {
-  extractDefaultValue,
-  shouldRenderChanged,
-  shouldRenderError,
-} from '../../generator-schema-utils';
-import { when } from 'lit/directives/when.js';
-import { submittedContext } from '../../contexts/submitted-context';
+  FieldValueConsumer,
+  FieldValueConsumerInterface,
+} from '../field-value-consumer-mixin';
 
 type Constructor<T> = new (...args: any[]) => T;
 
@@ -30,21 +27,9 @@ export declare class FieldInterface {
 }
 
 export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
-  class FieldElement extends EditorContext(superClass) {
+  class FieldElement extends FieldValueConsumer(EditorContext(superClass)) {
     @property()
     option: Option;
-
-    @state()
-    protected validation: boolean | string | undefined;
-
-    @state()
-    protected touched = false;
-
-    @state()
-    protected isDefaultValue = true;
-
-    @state()
-    private submitted = false;
 
     protected render() {
       return html`
@@ -64,34 +49,6 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
           )}
         </div>
       `;
-    }
-
-    constructor(...rest: any[]) {
-      super();
-      // we can't use the @consume decorator due to mixin typing quirks
-      new ContextConsumer(this, {
-        context: formValuesServiceContext,
-        callback: (service) => {
-          service.registerValidationListener(
-            this.option.name,
-            (value) => (this.validation = value)
-          );
-          service.registerTouchedListener(
-            this.option.name,
-            (value) => (this.touched = value)
-          );
-          service.registerDefaultValueListener(
-            this.option.name,
-            (value) => (this.isDefaultValue = value)
-          );
-        },
-        subscribe: false,
-      });
-      new ContextConsumer(this, {
-        context: submittedContext,
-        callback: (submitted) => (this.submitted = submitted),
-        subscribe: true,
-      });
     }
 
     protected dispatchValue(
@@ -131,14 +88,6 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       return this;
     }
 
-    shouldRenderError(): boolean {
-      return shouldRenderError(this.validation, this.touched, this.submitted);
-    }
-
-    shouldRenderChanged(): boolean {
-      return shouldRenderChanged(this.touched, this.isDefaultValue);
-    }
-
     // placeholders for subclasses
     protected setFieldValue(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -153,7 +102,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
   }
 
   return FieldElement as unknown as Constructor<
-    FieldInterface & EditorContextInterface
+    FieldInterface & EditorContextInterface & FieldValueConsumerInterface
   > &
     T;
 };

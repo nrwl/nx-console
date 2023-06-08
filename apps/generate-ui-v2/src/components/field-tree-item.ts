@@ -1,79 +1,33 @@
 import { ContextConsumer } from '@lit-labs/context';
-import { customElement, html, LitElement } from 'lit-element';
-import { property, state } from 'lit/decorators.js';
+import { html, LitElement } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
 import { formValuesServiceContext } from '../form-values.service';
-import {
-  shouldRenderChanged,
-  shouldRenderError,
-} from '../generator-schema-utils';
-import { submittedContext } from '../contexts/submitted-context';
+import { FieldValueConsumer } from './field-value-consumer-mixin';
+import { Option } from '@nx-console/shared/schema';
 
 @customElement('field-tree-item')
-export class FieldTreeItem extends LitElement {
+export class FieldTreeItem extends FieldValueConsumer(LitElement) {
   @property()
-  optionName: string;
-
-  @state()
-  private validation: string | boolean | undefined;
-
-  @state()
-  private touched = false;
-
-  @state()
-  private isDefaultValue = true;
-
-  @state()
-  private submitted = false;
-
-  constructor() {
-    super();
-    new ContextConsumer(this, {
-      context: formValuesServiceContext,
-      callback: (service) => {
-        service.registerValidationListener(
-          this.optionName,
-          (value) => (this.validation = value)
-        );
-        service.registerTouchedListener(
-          this.optionName,
-          (value) => (this.touched = value)
-        );
-        service.registerDefaultValueListener(
-          this.optionName,
-          (value) => (this.isDefaultValue = value)
-        );
-      },
-      subscribe: false,
-    });
-    new ContextConsumer(this, {
-      context: submittedContext,
-      callback: (submitted) => (this.submitted = submitted),
-      subscribe: true,
-    });
-  }
+  protected option: Option;
 
   render() {
     return html`
       <li
         @click="${this.handleTreeClickEvent}"
-        class="text-ellipsis ${shouldRenderError(
-          this.validation,
-          this.touched,
-          this.submitted
-        )
+        class="text-ellipsis ${this.shouldRenderError()
           ? 'text-red-500'
-          : shouldRenderChanged(this.touched, this.isDefaultValue)
+          : this.shouldRenderChanged()
           ? 'text-blue-500'
           : 'text-foreground'}"
       >
-        ${this.optionName}
+        ${this.option.name}
       </li>
     `;
   }
 
   private handleTreeClickEvent() {
     const event = new CustomEvent('click', {
-      detail: this.optionName,
+      detail: this.option.name,
     });
     this.dispatchEvent(event);
   }

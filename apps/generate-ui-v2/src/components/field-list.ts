@@ -68,7 +68,7 @@ export class FieldList extends LitElement {
         (option) =>
           html`<field-tree-item
             class="${hiddenOptionNames.has(option.name) ? 'hidden' : ''}"
-            optionName=${option.name}
+            .option="${option}"
             @click=${this.handleTreeClickEvent}
           ></field-tree-item>`
       );
