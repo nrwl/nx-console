@@ -8,7 +8,7 @@ import { extractDefaultValue } from '../../generator-schema-utils';
 
 @customElement('select-field')
 export class SelectField extends Field(LitElement) {
-  render() {
+  renderField() {
     if (this.editor === 'intellij') {
       return this.renderIntellij();
     } else {
@@ -36,7 +36,12 @@ export class SelectField extends Field(LitElement) {
 
   private renderVscode() {
     return html`
-      <vscode-dropdown @change="${this.handleChange}">
+      <vscode-dropdown
+        @change="${this.handleChange}"
+        style="${this.shouldRenderError()
+          ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
+          : ''}"
+      >
         ${when(
           extractDefaultValue(this.option) === undefined,
           () => html`<vscode-option value="">--</vscode-option>`

@@ -2,6 +2,8 @@ import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared/schema';
 import { when } from 'lit/directives/when.js';
+import { ContextConsumer } from '@lit-labs/context';
+import { formValuesServiceContext } from '../form-values.service';
 
 @customElement('field-list')
 export class FieldList extends LitElement {
@@ -64,14 +66,11 @@ export class FieldList extends LitElement {
     const renderListItems = (options: Option[]): TemplateResult[] =>
       options.map(
         (option) =>
-          html` <li
-            @click="${this.handleTreeClickEvent}"
-            class="text-ellipsis ${hiddenOptionNames.has(option.name)
-              ? 'hidden'
-              : ''}"
-          >
-            ${option.name}
-          </li>`
+          html`<field-tree-item
+            class="${hiddenOptionNames.has(option.name) ? 'hidden' : ''}"
+            .option="${option}"
+            @click=${this.handleTreeClickEvent}
+          ></field-tree-item>`
       );
     return html`
       <ul>
@@ -101,17 +100,15 @@ const renderOptions = (
   hiddenOptionNames: Set<string>,
   show = true
 ): TemplateResult => {
-  return html` <div>
+  return html`<div>
     ${options.map((option) => {
       const componentTag = getFieldComponent(option);
       const hidden = !show || hiddenOptionNames.has(option.name);
 
       return html` <div
-        class="flex flex-col mb-4 ${hidden ? 'hidden' : ''}"
+        class="${hidden ? 'hidden' : ''}"
         id="option-${option.name}"
       >
-        <p class="">${option.name}${option.isRequired ? '*' : ''}</p>
-        <p class="text-sm text-gray-500">${option.description}</p>
         ${componentTag}
       </div>`;
     })}

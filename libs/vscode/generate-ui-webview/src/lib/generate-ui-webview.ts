@@ -1,9 +1,12 @@
 import {
+  GenerateUiBannerInputMessage,
   GenerateUiConfigurationInputMessage,
   GenerateUiGeneratorSchemaInputMessage,
   GenerateUiInputMessage,
   GenerateUiOutputMessage,
+  GenerateUiValidationResultsInputMessage,
   GeneratorSchema,
+  ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
@@ -28,6 +31,10 @@ export class GenerateUiWebview {
 
   private generatorToDisplay: GeneratorSchema | undefined;
 
+  private plugins:
+    | { schemaProcessors?: any[]; validators?: any[]; startupMessages?: any[] }
+    | undefined;
+
   constructor(private context: ExtensionContext) {
     this._webviewSourceUri = Uri.joinPath(
       this.context.extensionUri,
@@ -35,7 +42,7 @@ export class GenerateUiWebview {
     );
   }
 
-  openGenerateUi(generator: GeneratorSchema) {
+  async openGenerateUi(generator: GeneratorSchema) {
     this.generatorToDisplay = generator;
     if (!this.webviewPanel) {
       this.webviewPanel = window.createWebviewPanel(
@@ -116,6 +123,8 @@ export class GenerateUiWebview {
         this.webviewPanel = undefined;
         this.generatorToDisplay = undefined;
       });
+
+      this.plugins = await this.loadPlugins();
     }
     this.webviewPanel.reveal();
   }
@@ -129,7 +138,7 @@ export class GenerateUiWebview {
     }
   }
 
-  private handleMessageFromWebview(message: GenerateUiOutputMessage) {
+  private async handleMessageFromWebview(message: GenerateUiOutputMessage) {
     switch (message.payloadType) {
       case 'run-generator': {
         CliTaskProvider.instance.executeTask({
@@ -154,8 +163,53 @@ export class GenerateUiWebview {
         this.postMessageToWebview(
           new GenerateUiGeneratorSchemaInputMessage(this.generatorToDisplay)
         );
+
+        const nxWorkspace = await getNxWorkspace();
+        this.plugins?.startupMessages?.forEach((messageFunction) => {
+          const message = messageFunction(nxWorkspace);
+          if (message) {
+            this.postMessageToWebview(
+              new GenerateUiBannerInputMessage(message)
+            );
+          }
+        });
         break;
       }
+      case 'request-validation': {
+        const validators = this.plugins?.validators;
+        let validationErrors: ValidationResults = {};
+        if (validators) {
+          validators.forEach((validator) => {
+            const result = validator(
+              message.payload.formValues,
+              message.payload.schema
+            );
+            if (result) {
+              validationErrors = { ...validationErrors, ...result };
+            }
+          });
+        }
+        this.postMessageToWebview(
+          new GenerateUiValidationResultsInputMessage(validationErrors)
+        );
+        break;
+      }
+    }
+  }
+
+  private async loadPlugins(): Promise<
+    | { schemaProcessors?: any[]; validators?: any[]; startupMessages?: any[] }
+    | undefined
+  > {
+    const workspace = await getNxWorkspace();
+    try {
+      const pluginFile = `${workspace.workspacePath}/.nx/console/plugins.mjs`;
+      if (!existsSync(pluginFile)) {
+        return undefined;
+      }
+      return await import(pluginFile).then((module) => module.default);
+    } catch (_) {
+      return undefined;
     }
   }
 
@@ -165,22 +219,15 @@ export class GenerateUiWebview {
     const workspace = await getNxWorkspace();
     let modifiedSchema = message.payload;
     try {
-      const localModDir = `${workspace.workspacePath}/.nx/console`;
-      if (!existsSync(localModDir)) {
-        return message;
-      }
-      const localMods = readdirSync(localModDir);
-      for (const mod of localMods) {
-        await import(`${localModDir}/${mod}`).then(
-          (module) =>
-            (modifiedSchema = module.default(modifiedSchema, workspace))
-        );
-      }
+      this.plugins?.schemaProcessors?.forEach((processor) => {
+        modifiedSchema = processor(modifiedSchema, workspace);
+      });
       return {
         ...message,
         payload: modifiedSchema,
       };
     } catch (e) {
+      console.log(e);
       return message;
     }
   }
@@ -190,6 +237,8 @@ export class GenerateUiWebview {
       --foreground-color: var(--vscode-editor-foreground);
       --background-color: var(--vscode-editor-background);
       --field-border-color: var(--panel-view-border);
+      --banner-warning-color: var(--vscode-statusBarItem-warningBackground);
+      --banner-error-color: var(--vscode-statusBarItem-errorBackground);
     `;
   }
 }

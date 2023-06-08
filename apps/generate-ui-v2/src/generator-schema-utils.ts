@@ -8,11 +8,6 @@ export function getGeneratorIdentifier(
   return `${generatorSchema.collectionName}:${generatorSchema.generatorName}`;
 }
 
-export type FormValues = Record<
-  string,
-  string | boolean | number | string[] | undefined
->;
-
 export function extractDefaultValue(
   option?: Option
 ): string | boolean | number | string[] | undefined {

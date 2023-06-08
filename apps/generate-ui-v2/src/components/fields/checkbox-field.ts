@@ -4,7 +4,7 @@ import { Field } from './field-mixin';
 
 @customElement('checkbox-field')
 export class CheckboxField extends Field(LitElement) {
-  render() {
+  renderField() {
     if (this.editor === 'intellij') {
       return html`<input
         type="checkbox"
@@ -13,7 +13,10 @@ export class CheckboxField extends Field(LitElement) {
       />`;
     } else {
       return html`<vscode-checkbox
-        @input="${this.handleChange}"
+        @change="${this.handleChange}"
+        style="${this.shouldRenderError()
+          ? '--border-width: 1; --checkbox-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
+          : ''}"
       ></vscode-checkbox>`;
     }
   }
