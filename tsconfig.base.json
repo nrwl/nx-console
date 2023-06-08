@@ -51,9 +51,13 @@
       "@nx-console/shared/file-system": [
         "libs/shared/file-system/src/index.ts"
       ],
+      "@nx-console/shared/generate-ui-types": [
+        "libs/shared/generate-ui-types/src/index.ts"
+      ],
       "@nx-console/shared/json-schema": [
         "libs/shared/json-schema/src/index.ts"
       ],
+      "@nx-console/shared/lit-utils": ["libs/shared/lit-utils/src/index.ts"],
       "@nx-console/shared/npm": ["libs/shared/npm/src/index.ts"],
       "@nx-console/shared/schema": ["libs/shared/schema/src/index.ts"],
       "@nx-console/shared/schema/normalize": [
@@ -66,6 +70,9 @@
       ],
       "@nx-console/vscode/configuration": [
         "libs/vscode/configuration/src/index.ts"
+      ],
+      "@nx-console/vscode/generate-ui-webview": [
+        "libs/vscode/generate-ui-webview/src/index.ts"
       ],
       "@nx-console/vscode/lsp-client": ["libs/vscode/lsp-client/src/index.ts"],
       "@nx-console/vscode/nx-cloud-view": [

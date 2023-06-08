@@ -14,6 +14,7 @@
       "outFiles": [
         "${workspaceFolder}/dist/apps/vscode",
         "${workspaceFolder}/dist/apps/generate-ui",
+        "${workspaceFolder}/dist/apps/generate-ui-v2",
         "${workspaceFolder}/node_modules"
       ],
       "request": "launch",

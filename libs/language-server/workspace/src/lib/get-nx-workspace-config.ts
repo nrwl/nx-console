@@ -1,5 +1,6 @@
 import type {
   NxJsonConfiguration,
+  ProjectFileMap,
   ProjectGraph,
   ProjectsConfigurations,
 } from 'nx/src/devkit-exports';
@@ -12,6 +13,7 @@ import { SemVer } from 'semver';
 import {
   getNxOutput,
   getNxProjectGraph,
+  getNxProjectGraphUtils,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
 import { performance } from 'perf_hooks';
@@ -39,11 +41,13 @@ export async function getNxWorkspaceConfig(
     (process.env as any).CI = false;
     (process.env as any).NX_PROJECT_GLOB_CACHE = false;
     (process.env as any).NX_WORKSPACE_ROOT_PATH = workspacePath;
-    const [nxWorkspacePackage, nxProjectGraph, nxOutput] = await Promise.all([
-      getNxWorkspacePackageFileUtils(workspacePath, logger),
-      getNxProjectGraph(workspacePath, logger),
-      getNxOutput(workspacePath, logger),
-    ]);
+    const [nxWorkspacePackage, nxProjectGraph, nxOutput, nxProjectGraphUtils] =
+      await Promise.all([
+        getNxWorkspacePackageFileUtils(workspacePath, logger),
+        getNxProjectGraph(workspacePath, logger),
+        getNxOutput(workspacePath, logger),
+        getNxProjectGraphUtils(workspacePath, logger),
+      ]);
 
     let workspaceConfiguration: NxWorkspaceConfiguration;
     try {
@@ -83,9 +87,24 @@ export async function getNxWorkspaceConfig(
       lspLogger.log(e.stack);
     }
 
-    workspaceConfiguration = addProjectTargets(
+    let projectFileMap: ProjectFileMap = {};
+    if (nxVersion.major >= 16 && nxVersion.minor >= 3 && projectGraph) {
+      projectFileMap =
+        (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
+          projectGraph
+        )) ?? {};
+    } else {
+      Object.keys(projectGraph?.nodes ?? {}).forEach((projectName) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        projectFileMap[projectName] =
+          (projectGraph?.nodes[projectName].data as any).files ?? [];
+      });
+    }
+
+    workspaceConfiguration = createNxWorkspaceConfiguration(
       workspaceConfiguration,
-      projectGraph
+      projectGraph,
+      projectFileMap
     );
 
     const end = performance.now();
@@ -122,9 +141,10 @@ async function readWorkspaceConfigs(basedir: string) {
   };
 }
 
-function addProjectTargets(
+function createNxWorkspaceConfiguration(
   workspaceConfiguration: NxWorkspaceConfiguration,
-  projectGraph: ProjectGraph | null
+  projectGraph: ProjectGraph | null,
+  projectFileMap: ProjectFileMap
 ) {
   if (!projectGraph) {
     return workspaceConfiguration;
@@ -152,13 +172,13 @@ function addProjectTargets(
         targets: node.data.targets ?? {},
         name: projectName,
         tags: node.data.tags ?? [],
-        files: node.data.files ?? [],
+        files: projectFileMap[projectName],
       };
     } else {
       modifiedWorkspaceConfiguration.projects[projectName] = {
         ...workspaceProject,
         targets: node.data.targets ?? {},
-        files: node.data.files ?? [],
+        files: projectFileMap[projectName],
         name: projectName,
       };
     }

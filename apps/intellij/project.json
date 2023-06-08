@@ -39,6 +39,7 @@
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
+        "outputPath": "",
         "ci": false,
         "npm": false,
         "plugins": ["gradle-semantic-release-plugin"],

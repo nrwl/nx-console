@@ -613,8 +613,8 @@ export class TaskExecutionFormComponent implements OnInit {
   getDocsLink(taskExecForm: TaskExecutionForm): string | undefined {
     if (
       !taskExecForm.architect.collection ||
-      !taskExecForm.architect.collection.includes('@nrwl') ||
-      !taskExecForm.architect.collection.includes('@nx')
+      (!taskExecForm.architect.collection.includes('@nrwl') &&
+        !taskExecForm.architect.collection.includes('@nx'))
     ) {
       return undefined;
     }

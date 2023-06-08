@@ -8,11 +8,13 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.util.ui.JBUI
 import dev.nx.console.generate.ui.DefaultNxGenerateUiFile
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
+import dev.nx.console.generate.ui.V2NxGenerateUiFile
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
+import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.utils.nxlsWorkingPath
 import java.awt.Dimension
@@ -152,7 +154,11 @@ class NxGenerateService(val project: Project) {
                 }
             }
 
-        val virtualFile = DefaultNxGenerateUiFile("Generate", project)
+        val virtualFile =
+        // will exchange with feature toggle in the future
+        if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
+                V2NxGenerateUiFile("Generate", project)
+            else DefaultNxGenerateUiFile("Generate", project)
 
         val fileEditorManager = FileEditorManager.getInstance(project)
         if (fileEditorManager.isFileOpen(virtualFile)) {

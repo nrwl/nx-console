@@ -10,6 +10,7 @@
       "options": {
         "cacheableOperations": [
           "build",
+          "_build",
           "lint",
           "test",
           "e2e",
