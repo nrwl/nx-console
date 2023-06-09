@@ -84,6 +84,7 @@ export type GenerateUiStyles = {
   primaryColor: string;
   fieldBackgroundColor: string;
   fieldBorderColor: string;
+  focusBorderColor: string;
   selectFieldBackgroundColor: string;
   bannerWarningBackgroundColor: string;
   badgeBackgroundColor: string;

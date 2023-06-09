@@ -127,24 +127,26 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val fieldBorderColor = getHexColor(UIManager.getColor("Component.borderColor"))
         val selectFieldBackgroundColor =
             getHexColor(UIManager.getColor("ComboBox.nonEditableBackground"))
-        //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
-        //        val fontFamily =
-        //            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system,
-        // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
-        // 'Helvetica Neue', sans-serif;"
-        //        val fontSize = "${UIUtil.getLabelFont().size}px"
+        val focusBorderColor = getHexColor(UIManager.getColor("Component.focusColor"))
        val badgeBackgroundColor = selectFieldBackgroundColor;
         val bannerWarningBackgroundColor =
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
         return GenerateUiStyles(
-            backgroundColor,
-            foregroundColor,
-            primaryColor,
-            fieldBackgroundColor,
-            fieldBorderColor,
-            selectFieldBackgroundColor,
-            badgeBackgroundColor,
-            bannerWarningBackgroundColor
+            backgroundColor = backgroundColor,
+            foregroundColor = foregroundColor,
+            primaryColor = primaryColor,
+            fieldBackgroundColor = fieldBackgroundColor,
+            fieldBorderColor = fieldBorderColor,
+            selectFieldBackgroundColor = selectFieldBackgroundColor,
+            focusBorderColor = focusBorderColor,
+            badgeBackgroundColor = badgeBackgroundColor,
+            bannerWarningBackgroundColor = bannerWarningBackgroundColor
         )
+      //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
+      //        val fontFamily =
+      //            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system,
+      // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+      // 'Helvetica Neue', sans-serif;"
+      //        val fontSize = "${UIUtil.getLabelFont().size}px"
     }
 }
