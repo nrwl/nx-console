@@ -1,3 +1,10 @@
+## <small>1.6.1 (2023-06-09)</small>
+
+### Bug Fixes
+
+* **intellij:** replace usage of deprecated color var ([#1757](https://github.com/nrwl/nx-console/issues/1757)) ([13b2ebf](https://github.com/nrwl/nx-console/commit/13b2ebf2f41b6777c0a307c8a006f6b428834505))
+* **nxls:** change projectFileMap loading between 16.3 patch versions ([#1759](https://github.com/nrwl/nx-console/issues/1759)) ([5b0657a](https://github.com/nrwl/nx-console/commit/5b0657a920890604cae9df54e0d69133181e8666))
+
 ## 1.6.0 (2023-06-08)
 
 ### Bug Fixes
