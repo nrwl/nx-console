@@ -91,10 +91,9 @@ class OpenedConnection(private val connection: URLConnection) : ResourceHandlerS
                 cefResponse.mimeType = "text/javascript"
             } else if (url.contains("html")) {
                 cefResponse.mimeType = "text/html"
-            }  else if(url.contains("svg")) {
-              cefResponse.mimeType = "image/svg+xml"
-            }
-            else {
+            } else if (url.contains("svg")) {
+                cefResponse.mimeType = "image/svg+xml"
+            } else {
                 cefResponse.mimeType = connection.contentType
             }
 

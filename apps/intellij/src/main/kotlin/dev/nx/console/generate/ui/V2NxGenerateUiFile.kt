@@ -72,7 +72,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                     )
             }
             browser.component.requestFocus()
-          browser.openDevtools()
+            browser.openDevtools()
         }
     }
 
@@ -129,7 +129,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val selectFieldBackgroundColor =
             getHexColor(UIManager.getColor("ComboBox.nonEditableBackground"))
         val focusBorderColor = getHexColor(UIManager.getColor("Component.focusColor"))
-       val badgeBackgroundColor = selectFieldBackgroundColor;
+        val badgeBackgroundColor = selectFieldBackgroundColor
         val bannerWarningBackgroundColor =
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
         return GenerateUiStyles(
@@ -143,11 +143,11 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             badgeBackgroundColor = badgeBackgroundColor,
             bannerWarningBackgroundColor = bannerWarningBackgroundColor
         )
-      //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
-      //        val fontFamily =
-      //            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system,
-      // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
-      // 'Helvetica Neue', sans-serif;"
-      //        val fontSize = "${UIUtil.getLabelFont().size}px"
+        //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
+        //        val fontFamily =
+        //            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system,
+        // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+        // 'Helvetica Neue', sans-serif;"
+        //        val fontSize = "${UIUtil.getLabelFont().size}px"
     }
 }
