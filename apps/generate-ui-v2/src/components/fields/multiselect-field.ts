@@ -43,7 +43,10 @@ export class MultiselectField extends Field(LitElement) {
   }
   private renderSelectField() {
     if (this.editor === 'intellij') {
-      return html`<select @change="${this.addValue}">
+      return html`<select
+        @change="${this.addValue}"
+        class="bg-selectFieldBackground border border-fieldBorder"
+      >
         <option value="">
           ${this.selectedElements.length
             ? 'Add another value'
@@ -91,23 +94,23 @@ export class MultiselectField extends Field(LitElement) {
     }
     this.selectedElements = [...this.selectedElements, value];
     selectElement.value = '';
+    this.dispatchValue(this.selectedElements);
   }
 
   protected setFieldValue(
     value: string | number | boolean | string[] | undefined
   ): void {
-    // const selectNode = this.renderRoot.querySelector('select');
-    // if (!selectNode) {
-    //   return;
-    // }
-    // Array.from(selectNode.options).forEach((option) => {
-    //   if (!Array.isArray(value)) {
-    //     return;
-    //   }
-    //   if (value.includes(option.value)) {
-    //     option.selected = true;
-    //   }
-    // });
+    let values: string[] = [];
+    if (typeof value === 'string') {
+      values = value.split(',');
+    } else if (Array.isArray(value)) {
+      values = value;
+    }
+
+    const possibleOptions = this.extractItemOptions(this.option);
+    this.selectedElements = values.filter((value) =>
+      possibleOptions.includes(value)
+    );
   }
 
   private extractItemOptions(option: Option): string[] {
@@ -123,13 +126,5 @@ export class MultiselectField extends Field(LitElement) {
     }
 
     return options.filter((item) => !this.selectedElements.includes(item));
-  }
-
-  private handleChange(e: Event) {
-    // const options = (e.target as HTMLSelectElement).options;
-    // const value = Array.from(options)
-    //   .filter((option) => option.selected)
-    //   .map((option) => option.value);
-    // this.dispatchValue(value);
   }
 }
