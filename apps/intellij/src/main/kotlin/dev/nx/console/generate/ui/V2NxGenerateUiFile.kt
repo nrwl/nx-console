@@ -72,6 +72,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                     )
             }
             browser.component.requestFocus()
+          browser.openDevtools()
         }
     }
 

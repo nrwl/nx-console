@@ -7,12 +7,18 @@ export class SearchBar extends EditorContext(LitElement) {
   render() {
     if (this.editor === 'intellij') {
       return html`
-        <input
-          class="w-full px-3 text-black border bg-fieldBackground border border-fieldBorder text-foreground"
-          type="text"
-          placeholder="Search..."
-          @input="${this.handleInput}"
-        />
+        <div class="relative inline-block w-full">
+          <input
+            class="w-full px-3 pl-6 text-black border bg-fieldBackground border border-fieldBorder text-foreground"
+            type="text"
+            placeholder="Search..."
+            @input="${this.handleInput}"
+          />
+          <icon-element
+            icon="search"
+            class="absolute left-2 top-1"
+          ></icon-element>
+        </div>
       `;
     } else {
       return html`

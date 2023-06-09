@@ -30,10 +30,10 @@ export class ArrayField extends Field(LitElement) {
                   this.handleEnterKeyRemove(index, event)}"
               >
                 <p class="leading-none">${element}</p>
-                <codicon-element
+                <icon-element
                   @click="${() => this.removeValue(index)}"
                   icon="close"
-                ></codicon-element>
+                ></icon-element>
               </div>`
           )}
         </div>
