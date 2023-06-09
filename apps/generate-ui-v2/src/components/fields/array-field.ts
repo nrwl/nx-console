@@ -95,5 +95,11 @@ export class ArrayField extends Field(LitElement) {
 
   protected setFieldValue(
     value: string | boolean | number | string[] | undefined
-  ) {}
+  ) {
+    if (typeof value === 'string') {
+      this.elements = value.split(',');
+    } else if (Array.isArray(value)) {
+      this.elements = value;
+    }
+  }
 }
