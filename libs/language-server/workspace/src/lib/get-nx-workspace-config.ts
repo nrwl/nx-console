@@ -88,7 +88,12 @@ export async function getNxWorkspaceConfig(
     }
 
     let projectFileMap: ProjectFileMap = {};
-    if (nxVersion.major >= 16 && nxVersion.minor >= 3 && projectGraph) {
+    if (
+      nxVersion.major >= 16 &&
+      nxVersion.minor >= 3 &&
+      nxVersion.patch >= 1 &&
+      projectGraph
+    ) {
       projectFileMap =
         (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
           projectGraph
