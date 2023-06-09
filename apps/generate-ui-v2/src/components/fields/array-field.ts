@@ -1,4 +1,3 @@
-import { Option } from '@nx-console/shared/schema';
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Field } from './field-mixin';
@@ -8,22 +7,11 @@ export class ArrayField extends Field(LitElement) {
   @state()
   private elements: string[] = [];
 
+  // TODO: GENERALIZE ICON ELEMENT
   renderField() {
-    if (this.editor === 'intellij') {
-      return html``;
-    } else {
-      return this.renderVSCode();
-    }
-  }
-
-  private renderVSCode() {
     return html`<div>
       <div class="flex flex-row gap-2">
-        <vscode-text-field
-          type="text"
-          class="grow"
-          @keydown="${this.handleEnterKeyAdd}"
-        ></vscode-text-field>
+        ${this.renderInputField()}
         <button-element
           text="Add"
           appearance="secondary"
@@ -37,8 +25,7 @@ export class ArrayField extends Field(LitElement) {
             (element, index) =>
               html` <div
                 tabindex="0"
-                style="background-color: var(--badge-background);"
-                class="p-2 pb-0 flex flex-row gap-1 focus:ring-1 focus:ring-focusBorder focus:outline-none"
+                class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground focus:ring-1 focus:ring-focusBorder focus:outline-none"
                 @keydown="${(event: KeyboardEvent) =>
                   this.handleEnterKeyRemove(index, event)}"
               >
@@ -54,6 +41,26 @@ export class ArrayField extends Field(LitElement) {
     </div>`;
   }
 
+  private renderInputField() {
+    if (this.editor === 'intellij') {
+      return html` <input
+        class="bg-fieldBackground border border-fieldBorder grow"
+        type="text"
+        @keydown="${this.handleEnterKeyAdd}"
+      />`;
+    } else {
+      return html`<vscode-text-field
+        type="text"
+        class="grow"
+        @keydown="${this.handleEnterKeyAdd}"
+      ></vscode-text-field>`;
+    }
+  }
+
+  private get inputFieldSelector() {
+    return this.editor === 'intellij' ? 'input' : 'vscode-text-field';
+  }
+
   private handleEnterKeyAdd(event: KeyboardEvent) {
     if (event.key === 'Enter') {
       this.addValue();
@@ -67,7 +74,7 @@ export class ArrayField extends Field(LitElement) {
   }
 
   private addValue() {
-    const textfield = this.querySelector('vscode-text-field');
+    const textfield = this.querySelector(this.inputFieldSelector);
     const inputValue = textfield?.value;
     if (!inputValue) {
       return;

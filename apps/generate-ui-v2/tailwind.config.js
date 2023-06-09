@@ -10,6 +10,7 @@ module.exports = {
         fieldBorder: 'var(--field-border-color)',
         focusBorder: 'var(--focus-border-color)',
         selectFieldBackground: 'var(--select-field-background-color)',
+        badgeBackground: 'var(--badge-background-color)',
         bannerWarning: 'var(--banner-warning-color)',
         bannerError: 'var(--banner-error-color)',
       },

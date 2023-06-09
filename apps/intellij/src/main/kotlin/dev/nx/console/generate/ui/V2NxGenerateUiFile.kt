@@ -133,6 +133,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
         // 'Helvetica Neue', sans-serif;"
         //        val fontSize = "${UIUtil.getLabelFont().size}px"
+       val badgeBackgroundColor = selectFieldBackgroundColor;
         val bannerWarningBackgroundColor =
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
         return GenerateUiStyles(
@@ -142,6 +143,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             fieldBackgroundColor,
             fieldBorderColor,
             selectFieldBackgroundColor,
+            badgeBackgroundColor,
             bannerWarningBackgroundColor
         )
     }
