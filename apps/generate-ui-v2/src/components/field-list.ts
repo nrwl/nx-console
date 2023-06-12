@@ -29,7 +29,7 @@ export class FieldList extends LitElement {
     return html`
       <div class="flex h-full">
         <div
-          class="p-6 w-52 border-r-2 border-fieldBorder fixed h-full overflow-y-auto"
+          class="p-6 w-52 border-r-2 border-fieldBorder fixed h-full overflow-y-auto max-sm:hidden"
         >
           ${this.renderOptionTree(
             importantOptions,
@@ -38,7 +38,7 @@ export class FieldList extends LitElement {
             this.showMore || !!this.searchValue
           )}
         </div>
-        <div class="p-6 ml-52 grow">
+        <div class="p-6 sm:ml-52 grow">
           ${renderOptions(importantOptions, hiddenOptionNames)}
           <show-more-divider
             @show-more=${this.toggleShowMore}
