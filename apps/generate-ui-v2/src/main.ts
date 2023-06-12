@@ -11,6 +11,7 @@ import './components/button';
 import './components/field-list';
 import './components/search-bar';
 import './components/banner';
+import './components/icon';
 import './components/field-tree-item';
 import '@nx-console/shared/lit-utils';
 import { editorContext } from './contexts/editor-context';

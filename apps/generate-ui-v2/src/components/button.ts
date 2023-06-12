@@ -8,6 +8,9 @@ export class Button extends LitElement {
   @property()
   text: string;
 
+  @property()
+  appearance: 'primary' | 'secondary' = 'primary';
+
   editor: string;
 
   constructor() {
@@ -28,7 +31,7 @@ export class Button extends LitElement {
   }
 
   renderVSCode() {
-    return html`<vscode-button appearance="primary"
+    return html`<vscode-button appearance="${this.appearance}"
       >${this.text}</vscode-button
     >`;
   }

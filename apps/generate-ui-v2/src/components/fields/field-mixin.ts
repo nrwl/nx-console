@@ -19,7 +19,9 @@ export declare class FieldInterface {
   protected renderField(): TemplateResult;
   protected validation: boolean | string | undefined;
   protected touched: boolean;
-  protected dispatchValue(value: unknown): void;
+  protected dispatchValue(
+    value: string | boolean | number | string[] | undefined
+  ): void;
   protected setFieldValue(
     value: string | boolean | number | string[] | undefined
   ): void;

@@ -116,11 +116,7 @@ export class IdeCommunicationController implements ReactiveController {
   private handleInputMessage(message: GenerateUiInputMessage) {
     // TODO: Allow the UI to support array properties
     const optionFilter = (option: Option) =>
-      !(
-        option.type === OptionType.Array &&
-        option.items &&
-        (option.items as string[]).length === 0
-      ) && option['x-priority'] !== 'internal';
+      option['x-priority'] !== 'internal';
 
     switch (message.payloadType) {
       case 'generator': {
@@ -171,7 +167,9 @@ export class IdeCommunicationController implements ReactiveController {
       --field-background-color: ${styles.fieldBackgroundColor};
       --field-border-color: ${styles.fieldBorderColor};
       --select-field-background-color: ${styles.selectFieldBackgroundColor};
+      --focus-border-color: ${styles.focusBorderColor};
       --banner-warning-color: ${styles.bannerWarningBackgroundColor};
+      --badge-background-color: ${styles.badgeBackgroundColor};
     }
     `);
     // --secondary-text-color: ${styles.secondaryTextColor};
