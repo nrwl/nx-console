@@ -2,8 +2,6 @@ import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared/schema';
 import { when } from 'lit/directives/when.js';
-import { ContextConsumer } from '@lit-labs/context';
-import { formValuesServiceContext } from '../form-values.service';
 
 @customElement('field-list')
 export class FieldList extends LitElement {
@@ -16,8 +14,8 @@ export class FieldList extends LitElement {
   @state()
   private showMore = false;
 
-  private toggleShowMore() {
-    this.showMore = !this.showMore;
+  private toggleShowMore(e: CustomEvent) {
+    this.showMore = !!e.detail;
   }
 
   protected render() {
@@ -42,11 +40,10 @@ export class FieldList extends LitElement {
         </div>
         <div class="p-6 ml-52">
           ${renderOptions(importantOptions, hiddenOptionNames)}
-          <button-element
-            @click=${this.toggleShowMore}
-            text="${this.showMore ? 'Show Less' : 'Show More'}"
+          <show-more-divider
+            @show-more=${this.toggleShowMore}
             class="${this.searchValue ? 'hidden' : ''}"
-          ></button-element>
+          ></show-more-divider>
           ${renderOptions(
             otherOptions,
             hiddenOptionNames,

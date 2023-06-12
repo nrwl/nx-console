@@ -13,6 +13,7 @@ import './components/search-bar';
 import './components/banner';
 import './components/icon';
 import './components/field-tree-item';
+import './components/show-more-divider';
 import '@nx-console/shared/lit-utils';
 import { editorContext } from './contexts/editor-context';
 import { debounce, getGeneratorIdentifier } from './generator-schema-utils';
