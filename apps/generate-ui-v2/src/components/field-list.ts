@@ -38,11 +38,13 @@ export class FieldList extends LitElement {
             this.showMore || !!this.searchValue
           )}
         </div>
-        <div class="p-6 ml-52">
+        <div class="p-6 ml-52 grow">
           ${renderOptions(importantOptions, hiddenOptionNames)}
           <show-more-divider
             @show-more=${this.toggleShowMore}
-            class="${this.searchValue ? 'hidden' : ''}"
+            class="${this.searchValue || otherOptions.length === 0
+              ? 'hidden'
+              : ''}"
           ></show-more-divider>
           ${renderOptions(
             otherOptions,

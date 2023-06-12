@@ -14,9 +14,14 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
         @click=${this.handleClick}
       >
         <hr
-          class="grow h-0"
-          style="border-top: calc(var(--border-width) * 1px) solid
-      var(--divider-background);"
+          class="grow h-0 ${
+            this.editor === 'intellij' ? 'border-fieldBorder' : ''
+          }"
+          style="${
+            this.editor === 'vscode'
+              ? 'border-top: calc(var(--border-width) * 1px) solid var(--divider-background);'
+              : ''
+          }"
         />
 
         <div>${
