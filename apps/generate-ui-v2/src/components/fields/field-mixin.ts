@@ -6,7 +6,10 @@ import {
   EditorContext,
   EditorContextInterface,
 } from '../../contexts/editor-context';
-import { extractDefaultValue } from '../../generator-schema-utils';
+import {
+  compareWithDefaultValue,
+  extractDefaultValue,
+} from '../../generator-schema-utils';
 import {
   FieldValueConsumer,
   FieldValueConsumerInterface,
@@ -57,9 +60,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       value: string | boolean | number | string[] | undefined
     ) {
       const defaultValue = extractDefaultValue(this.option);
-      // if the default value is undefined, false & empty string are considered default values
-      const isDefaultValue =
-        value === defaultValue || (!value && !defaultValue);
+      const isDefaultValue = compareWithDefaultValue(value, defaultValue);
 
       this.dispatchEvent(
         new CustomEvent('option-changed', {

@@ -24,6 +24,20 @@ export function extractDefaultValue(
   return String(option.default) ?? '';
 }
 
+export function compareWithDefaultValue(
+  value: string | boolean | number | string[] | undefined,
+  defaultValue: string | boolean | number | string[] | undefined
+): boolean {
+  // if the default value is undefined, false & empty string are considered default values
+  if (!value && !defaultValue) return true;
+
+  if (Array.isArray(value) && Array.isArray(defaultValue)) {
+    return value.join(',') === defaultValue.join(',');
+  }
+
+  return value === defaultValue;
+}
+
 export function debounce<T extends (...args: any[]) => void>(
   func: T,
   delay: number

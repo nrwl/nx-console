@@ -37,7 +37,11 @@ export class Button extends LitElement {
   }
 
   renderIntellij() {
-    return html`<button class="bg-primary py-1 px-4 rounded-md">
+    return html`<button
+      class="py-1 px-4 rounded-md ${this.appearance === 'primary'
+        ? 'bg-primary'
+        : 'border border-fieldBorder'}"
+    >
       ${this.text}
     </button>`;
   }
