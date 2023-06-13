@@ -171,6 +171,8 @@ export class IdeCommunicationController implements ReactiveController {
       --banner-warning-color: ${styles.bannerWarningBackgroundColor};
       --badge-background-color: ${styles.badgeBackgroundColor};
       --separator-color: ${styles.separatorColor};
+      --field-nav-hover-color: ${styles.fieldNavHoverColor};
+      font-family: ${styles.fontFamily};
     }
     `);
     // --secondary-text-color: ${styles.secondaryTextColor};

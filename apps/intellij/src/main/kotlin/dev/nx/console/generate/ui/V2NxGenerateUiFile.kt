@@ -27,7 +27,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         runGeneratorManager = RunGeneratorManager(project)
     }
     override fun createMainComponent(project: Project): JComponent {
-        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
+        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         registerAppSchemeHandler()
         browser.loadURL("http://nxconsolev2/index.html")
@@ -133,7 +133,11 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val bannerWarningBackgroundColor =
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
         val statusBarBorderColor = getHexColor(UIManager.getColor("StatusBar.borderColor"))
-         return GenerateUiStyles(
+        val fieldNavHoverColor = getHexColor(UIManager.getColor("TabbedPane.hoverColor"))
+        val fontFamily =
+            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;"
+
+        return GenerateUiStyles(
             backgroundColor = backgroundColor,
             foregroundColor = foregroundColor,
             primaryColor = primaryColor,
@@ -143,13 +147,11 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             focusBorderColor = focusBorderColor,
             badgeBackgroundColor = badgeBackgroundColor,
             bannerWarningBackgroundColor = bannerWarningBackgroundColor,
-            separatorColor = statusBarBorderColor
+            separatorColor = statusBarBorderColor,
+            fieldNavHoverColor = fieldNavHoverColor,
+          fontFamily = fontFamily
         )
         //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
-        //        val fontFamily =
-        //            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system,
-        // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
-        // 'Helvetica Neue', sans-serif;"
         //        val fontSize = "${UIUtil.getLabelFont().size}px"
     }
 }

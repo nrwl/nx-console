@@ -19,7 +19,7 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
           : this.shouldRenderChanged()
           ? 'text-blue-500'
           : 'text-foreground'} 
-          hover:bg-fieldNavBackground"
+          hover:bg-fieldNavHoverBackground"
       >
         ${this.option.name}
       </li>
