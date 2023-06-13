@@ -85,6 +85,15 @@ export class Root extends LitElement {
   }
 
   private renderHeader() {
+    const isNxGenerator =
+      this.icc.generatorSchema?.collectionName?.includes('@nx') ||
+      this.icc.generatorSchema?.collectionName?.includes('@nrwl');
+    const nxDevLink = `https://nx.dev/packages/${this.icc.generatorSchema?.collectionName
+      ?.replace('@nrwl/', '')
+      ?.replace('@nx/', '')}/generators/${
+      this.icc.generatorSchema?.generatorName
+    }`;
+
     return html`
       <div class="">
         <header class="flex justify-between items-center">
@@ -92,6 +101,13 @@ export class Root extends LitElement {
             <h1 class="text-xl font-bold">
               nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
             </h1>
+            ${when(
+              isNxGenerator && this.icc.editor === 'vscode',
+              () =>
+                html`<a href="${nxDevLink}" target="_blank" class="text-sm"
+                  >View full details
+                </a> `
+            )}
           </div>
 
           <div class="flex space-x-2">
