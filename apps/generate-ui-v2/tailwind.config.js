@@ -13,6 +13,7 @@ module.exports = {
         badgeBackground: 'var(--badge-background-color)',
         bannerWarning: 'var(--banner-warning-color)',
         bannerError: 'var(--banner-error-color)',
+        bannerText: 'var(--banner-text-color)',
         separator: 'var(--separator-color)',
         fieldNavHoverBackground: 'var(--field-nav-hover-color)',
       },
