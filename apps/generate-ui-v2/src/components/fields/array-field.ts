@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Field } from './field-mixin';
+import { spread } from '@open-wc/lit-helpers';
 
 @customElement('array-field')
 export class ArrayField extends Field(LitElement) {
@@ -41,26 +42,20 @@ export class ArrayField extends Field(LitElement) {
     </div>`;
   }
 
-  private renderAriaAttributes() {
-    return `
-        id="${this.fieldId}"
-        aria-invalid="${this.shouldRenderError()}"
-        aria-describedby="${this.fieldId}-error"
-    `;
-  }
-
   private renderInputField() {
     if (this.editor === 'intellij') {
       return html` <input
         class="bg-fieldBackground border border-fieldBorder grow"
         type="text"
         @keydown="${this.handleEnterKeyAdd}"
+        ${spread(this.ariaAttributes)}
       />`;
     } else {
       return html`<vscode-text-field
         type="text"
         class="grow"
         @keydown="${this.handleEnterKeyAdd}"
+        ${spread(this.ariaAttributes)}
       ></vscode-text-field>`;
     }
   }

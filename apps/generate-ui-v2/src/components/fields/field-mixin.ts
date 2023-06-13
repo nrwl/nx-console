@@ -19,7 +19,6 @@ type Constructor<T> = new (...args: any[]) => T;
 
 export declare class FieldInterface {
   option: Option;
-  protected fieldId: string;
   protected renderField(): TemplateResult;
   protected validation: boolean | string | undefined;
   protected touched: boolean;
@@ -30,16 +29,14 @@ export declare class FieldInterface {
     value: string | boolean | number | string[] | undefined
   ): void;
   protected shouldRenderError(): boolean;
+  protected fieldId: string;
+  protected ariaAttributes: Record<string, string>;
 }
 
 export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
   class FieldElement extends FieldValueConsumer(EditorContext(superClass)) {
     @property()
     option: Option;
-
-    protected get fieldId(): string {
-      return `${this.option.name}-field`;
-    }
 
     protected render() {
       return html`
@@ -57,7 +54,14 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
           ${this.renderField()}
           ${when(
             this.shouldRenderError() && typeof this.validation === 'string',
-            () => html`<p class="text-sm text-red-500">${this.validation}</p>`
+            () =>
+              html`<p
+                class="text-sm text-red-500"
+                id="${this.fieldId}-error"
+                aria-live="polite"
+              >
+                ${this.validation}
+              </p>`
           )}
         </div>
       `;
@@ -94,6 +98,20 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       this.dispatchValue(defaultValue);
     }
 
+    protected get fieldId(): string {
+      return `${this.option.name}-field`;
+    }
+
+    protected get ariaAttributes(): Record<
+      'id' | 'aria-invalid' | 'aria-describedby',
+      string
+    > {
+      return {
+        id: this.fieldId,
+        'aria-invalid': `${this.shouldRenderError()}`,
+        'aria-describedby': `${this.fieldId}-error`,
+      };
+    }
     protected createRenderRoot(): Element | ShadowRoot {
       return this;
     }

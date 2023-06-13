@@ -1,6 +1,7 @@
 import { html, LitElement, TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Field } from './field-mixin';
+import { spread } from '@open-wc/lit-helpers';
 
 @customElement('input-field')
 export class InputField extends Field(LitElement) {
@@ -8,21 +9,21 @@ export class InputField extends Field(LitElement) {
     if (this.editor === 'intellij') {
       return html`
         <input
-          id="${this.fieldId}"
           class="bg-fieldBackground border border-fieldBorder"
           type="text"
           @input="${this.handleChange}"
+          ${spread(this.ariaAttributes)}
         />
       `;
     } else {
       return html`
         <vscode-text-field
-          id="${this.fieldId}"
           type="text"
           @input="${this.handleChange}"
           style="${this.shouldRenderError()
             ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
             : ''}"
+          ${spread(this.ariaAttributes)}
         >
         </vscode-text-field>
       `;

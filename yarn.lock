@@ -5146,6 +5146,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@open-wc/lit-helpers@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@open-wc/lit-helpers@npm:0.6.0"
+  peerDependencies:
+    lit: ^2.0.0
+  checksum: 41f87344b6ad20bc6f9fb415fd7e7fb2109e04065fb78fc1f0cf30c9e80e094ddba8a02a5d9d0834d457d2bb5d4bea1d79825dcfd46c5c73fe5788cb527f0c04
+  languageName: node
+  linkType: hard
+
 "@parcel/watcher@npm:2.0.4":
   version: 2.0.4
   resolution: "@parcel/watcher@npm:2.0.4"
@@ -21308,6 +21317,7 @@ __metadata:
     "@nx/storybook": 16.3.1
     "@nx/webpack": 16.3.1
     "@nx/workspace": 16.3.1
+    "@open-wc/lit-helpers": ^0.6.0
     "@parcel/watcher": 2.0.7
     "@schematics/angular": 16.0.4
     "@storybook/addon-essentials": 7.0.18
