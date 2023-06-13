@@ -26,6 +26,12 @@ export class FieldList extends LitElement {
     const [importantOptions, otherOptions] = splitOptionsByPriority(
       this.options
     );
+    const shouldShowMoreOptions =
+      this.showMore || !!this.searchValue || importantOptions.length === 0;
+    const shouldHideShowMoreButton =
+      !!this.searchValue ||
+      otherOptions.length === 0 ||
+      importantOptions.length === 0;
     return html`
       <div class="flex h-full">
         <div
@@ -35,21 +41,19 @@ export class FieldList extends LitElement {
             importantOptions,
             otherOptions,
             hiddenOptionNames,
-            this.showMore || !!this.searchValue
+            shouldShowMoreOptions
           )}
         </div>
         <div class="p-6 sm:ml-52 grow">
           ${renderOptions(importantOptions, hiddenOptionNames)}
           <show-more-divider
             @show-more=${this.toggleShowMore}
-            class="${this.searchValue || otherOptions.length === 0
-              ? 'hidden'
-              : ''}"
+            class="${shouldHideShowMoreButton ? 'hidden' : ''}"
           ></show-more-divider>
           ${renderOptions(
             otherOptions,
             hiddenOptionNames,
-            this.showMore || !!this.searchValue
+            shouldShowMoreOptions
           )}
         </div>
       </div>
