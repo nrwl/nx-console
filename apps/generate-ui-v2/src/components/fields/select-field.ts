@@ -19,6 +19,7 @@ export class SelectField extends Field(LitElement) {
   private renderIntellij() {
     return html`
       <select
+        id="${this.fieldId}"
         @change="${this.handleChange}"
         class="bg-selectFieldBackground border border-fieldBorder"
       >
@@ -37,6 +38,7 @@ export class SelectField extends Field(LitElement) {
   private renderVscode() {
     return html`
       <vscode-dropdown
+        id="${this.fieldId}"
         @change="${this.handleChange}"
         style="${this.shouldRenderError()
           ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'

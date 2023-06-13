@@ -44,6 +44,7 @@ export class MultiselectField extends Field(LitElement) {
   private renderSelectField() {
     if (this.editor === 'intellij') {
       return html`<select
+        id="${this.fieldId}"
         @change="${this.addValue}"
         class="bg-selectFieldBackground border border-fieldBorder"
       >
@@ -58,7 +59,10 @@ export class MultiselectField extends Field(LitElement) {
         )}
       </select>`;
     } else {
-      return html` <vscode-dropdown @change="${this.addValue}">
+      return html` <vscode-dropdown
+        id="${this.fieldId}"
+        @change="${this.addValue}"
+      >
         <vscode-option value="">
           ${this.selectedElements.length
             ? 'Add another value'
@@ -73,7 +77,7 @@ export class MultiselectField extends Field(LitElement) {
   }
 
   private handleEnterKeyRemove(index: number, event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' || event.key === ' ') {
       this.removeValue(index);
     }
   }

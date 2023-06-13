@@ -41,6 +41,14 @@ export class ArrayField extends Field(LitElement) {
     </div>`;
   }
 
+  private renderAriaAttributes() {
+    return `
+        id="${this.fieldId}"
+        aria-invalid="${this.shouldRenderError()}"
+        aria-describedby="${this.fieldId}-error"
+    `;
+  }
+
   private renderInputField() {
     if (this.editor === 'intellij') {
       return html` <input
@@ -68,7 +76,7 @@ export class ArrayField extends Field(LitElement) {
   }
 
   private handleEnterKeyRemove(index: number, event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' || event.key === ' ') {
       this.removeValue(index);
     }
   }

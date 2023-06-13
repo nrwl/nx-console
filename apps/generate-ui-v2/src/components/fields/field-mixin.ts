@@ -19,6 +19,7 @@ type Constructor<T> = new (...args: any[]) => T;
 
 export declare class FieldInterface {
   option: Option;
+  protected fieldId: string;
   protected renderField(): TemplateResult;
   protected validation: boolean | string | undefined;
   protected touched: boolean;
@@ -36,6 +37,10 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
     @property()
     option: Option;
 
+    protected get fieldId(): string {
+      return `${this.option.name}-field`;
+    }
+
     protected render() {
       return html`
         <div
@@ -45,7 +50,9 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
             ? 'border-blue-500'
             : 'border-transparent'}"
         >
-          <p>${this.option.name}${this.option.isRequired ? '*' : ''}</p>
+          <label for="${this.fieldId}"
+            >${this.option.name}${this.option.isRequired ? '*' : ''}</label
+          >
           <p class="text-sm text-gray-500">${this.option.description}</p>
           ${this.renderField()}
           ${when(

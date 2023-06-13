@@ -7,12 +7,14 @@ export class CheckboxField extends Field(LitElement) {
   renderField() {
     if (this.editor === 'intellij') {
       return html`<input
+        id="${this.fieldId}"
         type="checkbox"
         class="form-checkbox bg-fieldBackground border border-fieldBorder rounded checked:bg-primary checked:border-transparent"
         @input="${this.handleChange}"
       />`;
     } else {
       return html`<vscode-checkbox
+        id="${this.fieldId}"
         @change="${this.handleChange}"
         style="${this.shouldRenderError()
           ? '--border-width: 1; --checkbox-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'

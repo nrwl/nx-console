@@ -8,6 +8,7 @@ export class InputField extends Field(LitElement) {
     if (this.editor === 'intellij') {
       return html`
         <input
+          id="${this.fieldId}"
           class="bg-fieldBackground border border-fieldBorder"
           type="text"
           @input="${this.handleChange}"
@@ -16,6 +17,7 @@ export class InputField extends Field(LitElement) {
     } else {
       return html`
         <vscode-text-field
+          id="${this.fieldId}"
           type="text"
           @input="${this.handleChange}"
           style="${this.shouldRenderError()
