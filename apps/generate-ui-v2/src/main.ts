@@ -59,7 +59,10 @@ export class Root extends LitElement {
 
   render() {
     const options = this.icc.generatorSchema?.options;
-    return html` <div class="text-foreground h-screen flex flex-col">
+    return html` <div
+      class="text-foreground h-screen flex flex-col"
+      @keydown="${this.handleGeneratorShortcut}"
+    >
       <div
         class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-separator"
       >
@@ -131,6 +134,14 @@ export class Root extends LitElement {
   private handleValidFormChange() {
     if (this.icc.configuration?.enableTaskExecutionDryRunOnChange) {
       this.debouncedRunGenerator(true);
+    }
+  }
+
+  private handleGeneratorShortcut(e: KeyboardEvent) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+
+      this.runGenerator();
     }
   }
 
