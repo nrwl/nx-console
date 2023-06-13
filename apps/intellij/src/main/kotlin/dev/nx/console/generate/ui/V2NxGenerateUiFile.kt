@@ -149,7 +149,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             bannerWarningBackgroundColor = bannerWarningBackgroundColor,
             separatorColor = statusBarBorderColor,
             fieldNavHoverColor = fieldNavHoverColor,
-          fontFamily = fontFamily
+            fontFamily = fontFamily
         )
         //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
         //        val fontSize = "${UIUtil.getLabelFont().size}px"
