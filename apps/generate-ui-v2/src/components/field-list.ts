@@ -31,7 +31,7 @@ export class FieldList extends LitElement {
         <div
           class="p-6 w-52 border-r-2 border-separator fixed h-full overflow-y-auto max-sm:hidden"
         >
-          ${this.renderOptionTree(
+          ${this.renderOptionNav(
             importantOptions,
             otherOptions,
             hiddenOptionNames,
@@ -56,7 +56,7 @@ export class FieldList extends LitElement {
     `;
   }
 
-  private renderOptionTree(
+  private renderOptionNav(
     importantOptions: Option[],
     otherOptions: Option[],
     hiddenOptionNames: Set<string>,
@@ -65,11 +65,11 @@ export class FieldList extends LitElement {
     const renderListItems = (options: Option[]): TemplateResult[] =>
       options.map(
         (option) =>
-          html`<field-tree-item
+          html`<field-nav-item
             class="${hiddenOptionNames.has(option.name) ? 'hidden' : ''}"
             .option="${option}"
             @click=${this.handleTreeClickEvent}
-          ></field-tree-item>`
+          ></field-nav-item>`
       );
     return html`
       <ul>

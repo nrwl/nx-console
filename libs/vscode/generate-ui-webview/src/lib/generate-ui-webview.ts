@@ -243,6 +243,7 @@ export class GenerateUiWebview {
       --banner-warning-color: var(--vscode-statusBarItem-warningBackground);
       --banner-error-color: var(--vscode-statusBarItem-errorBackground);
       --separator-color: var(--vscode-editorWidget-border);
+      --field-nav-background-color: var(--vscode-list-hoverBackground);
     `;
   }
 }

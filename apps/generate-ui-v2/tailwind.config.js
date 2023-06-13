@@ -14,6 +14,7 @@ module.exports = {
         bannerWarning: 'var(--banner-warning-color)',
         bannerError: 'var(--banner-error-color)',
         separator: 'var(--separator-color)',
+        fieldNavBackground: 'var(--field-nav-background-color)',
       },
     },
   },

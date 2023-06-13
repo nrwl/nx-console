@@ -5,8 +5,8 @@ import { formValuesServiceContext } from '../form-values.service';
 import { FieldValueConsumer } from './field-value-consumer-mixin';
 import { Option } from '@nx-console/shared/schema';
 
-@customElement('field-tree-item')
-export class FieldTreeItem extends FieldValueConsumer(LitElement) {
+@customElement('field-nav-item')
+export class FieldNavItem extends FieldValueConsumer(LitElement) {
   @property()
   protected option: Option;
 
@@ -18,7 +18,8 @@ export class FieldTreeItem extends FieldValueConsumer(LitElement) {
           ? 'text-red-500'
           : this.shouldRenderChanged()
           ? 'text-blue-500'
-          : 'text-foreground'}"
+          : 'text-foreground'} 
+          hover:bg-fieldNavBackground"
       >
         ${this.option.name}
       </li>
