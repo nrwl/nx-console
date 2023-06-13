@@ -61,7 +61,7 @@ export class Root extends LitElement {
     const options = this.icc.generatorSchema?.options;
     return html` <div class="text-foreground h-screen flex flex-col">
       <div
-        class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-fieldBorder"
+        class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-separator"
       >
         ${this.renderHeader()}
       </div>

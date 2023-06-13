@@ -11,11 +11,11 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
     return html`
       <div
         class="flex flex-row items-center space-x-4 pl-4"
-        @click=${this.handleClick}
+        @click=${this.toggleShowMore}
       >
         <hr
           class="grow h-0 ${
-            this.editor === 'intellij' ? 'border-fieldBorder' : ''
+            this.editor === 'intellij' ? 'border-separator' : ''
           }"
           style="${
             this.editor === 'vscode'
@@ -24,16 +24,24 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
           }"
         />
 
-        <div>${
-          this.showMore ? 'Show less options' : 'Show all options'
-        } <icon-element icon="${
+        <div tabindex="0" aria-role="button" class="focus:ring-1 focus:ring-focusBorder focus:outline-none" @keydown="${
+          this.handleKeyEvent
+        }">${
+      this.showMore ? 'Show less options' : 'Show all options'
+    } <icon-element icon="${
       this.showMore ? 'chevron-up' : 'chevron-down'
     }" class="align-sub"></div>
       </div>
     `;
   }
 
-  handleClick() {
+  handleKeyEvent(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      this.toggleShowMore();
+    }
+  }
+
+  toggleShowMore() {
     this.showMore = !this.showMore;
     this.dispatchEvent(new CustomEvent('show-more', { detail: this.showMore }));
   }

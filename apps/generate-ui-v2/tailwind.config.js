@@ -13,6 +13,7 @@ module.exports = {
         badgeBackground: 'var(--badge-background-color)',
         bannerWarning: 'var(--banner-warning-color)',
         bannerError: 'var(--banner-error-color)',
+        separator: 'var(--separator-color)',
       },
     },
   },

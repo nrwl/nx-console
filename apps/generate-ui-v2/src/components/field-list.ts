@@ -29,7 +29,7 @@ export class FieldList extends LitElement {
     return html`
       <div class="flex h-full">
         <div
-          class="p-6 w-52 border-r-2 border-fieldBorder fixed h-full overflow-y-auto max-sm:hidden"
+          class="p-6 w-52 border-r-2 border-separator fixed h-full overflow-y-auto max-sm:hidden"
         >
           ${this.renderOptionTree(
             importantOptions,

@@ -88,6 +88,7 @@ export type GenerateUiStyles = {
   selectFieldBackgroundColor: string;
   bannerWarningBackgroundColor: string;
   badgeBackgroundColor: string;
+  separatorColor: string;
 };
 
 export class GenerateUiBannerInputMessage {

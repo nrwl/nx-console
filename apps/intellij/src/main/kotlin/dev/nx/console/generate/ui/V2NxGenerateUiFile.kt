@@ -132,7 +132,8 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val badgeBackgroundColor = selectFieldBackgroundColor
         val bannerWarningBackgroundColor =
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
-        return GenerateUiStyles(
+        val statusBarBorderColor = getHexColor(UIManager.getColor("StatusBar.borderColor"))
+         return GenerateUiStyles(
             backgroundColor = backgroundColor,
             foregroundColor = foregroundColor,
             primaryColor = primaryColor,
@@ -141,7 +142,8 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             selectFieldBackgroundColor = selectFieldBackgroundColor,
             focusBorderColor = focusBorderColor,
             badgeBackgroundColor = badgeBackgroundColor,
-            bannerWarningBackgroundColor = bannerWarningBackgroundColor
+            bannerWarningBackgroundColor = bannerWarningBackgroundColor,
+            separatorColor = statusBarBorderColor
         )
         //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
         //        val fontFamily =
