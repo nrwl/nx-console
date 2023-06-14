@@ -36,7 +36,7 @@
       "dependsOn": ["setup-lit-dir"]
     },
     "setup-lit-dir": {
-      "command": "node ./setup-lit-dir.js",
+      "command": "node ./setup-lit-dir.mjs",
       "options": {
         "cwd": "apps/generate-ui-v2-e2e"
       },

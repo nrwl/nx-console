@@ -6,5 +6,11 @@
     "allowJs": true,
     "types": ["cypress", "node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "cypress.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+    "cypress.config.ts",
+    "src/test-schema.mjs"
+  ],
+  "exclude": ["apps/generate-ui/**"]
 }

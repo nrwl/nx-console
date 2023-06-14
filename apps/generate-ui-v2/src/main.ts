@@ -98,7 +98,7 @@ export class Root extends LitElement {
       <div class="">
         <header class="flex justify-between items-center">
           <div>
-            <h1 class="text-xl font-bold">
+            <h1 class="text-xl font-bold" data-cy="header-text">
               nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
             </h1>
             ${when(

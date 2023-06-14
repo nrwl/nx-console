@@ -1,13 +1,12 @@
-import { getGreeting } from '../support/app.po';
+import { schema } from '../test-schema.mjs';
 
 describe('generate-ui-v2', () => {
   beforeEach(() => cy.visit('/'));
 
-  it('should display welcome message', () => {
-    // Custom command example, see `../support/commands.ts` file
-    cy.login('my-email@something.com', 'myPassword');
-
-    // Function helper example, see `../support/app.po.ts` file
-    getGreeting().contains('Welcome generate-ui-v2');
+  it('should display header', () => {
+    cy.get("[data-cy='header-text']").should(
+      'contain.text',
+      `nx generate ${schema.collectionName}:${schema.generatorName}`
+    );
   });
 });
