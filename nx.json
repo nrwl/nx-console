@@ -2,7 +2,6 @@
   "affected": {
     "defaultBase": "master"
   },
-  "npmScope": "nx-console",
   "useDaemonProcess": true,
   "tasksRunnerOptions": {
     "default": {
