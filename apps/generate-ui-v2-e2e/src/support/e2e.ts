@@ -14,4 +14,4 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './stub-api';
+import './get-fields';

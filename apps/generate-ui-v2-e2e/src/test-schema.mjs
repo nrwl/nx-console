@@ -2,5 +2,8 @@ export const schema = {
   collectionName: '@nx/test',
   generatorName: 'test',
   description: 'description',
-  options: [],
+  options: [
+    { name: 'option1', 'x-priority': 'important' },
+    { name: 'option2' },
+  ],
 };
