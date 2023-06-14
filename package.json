@@ -130,6 +130,7 @@
     "typescript": "5.0.4",
     "universal-analytics": "0.5.3",
     "uuid": "^8.3.2",
+    "vite": "^4.3.4",
     "wdio-vscode-service": "^4.2.1",
     "webdriverio": "^7.26.0",
     "webpack": "^5.64.0",
