@@ -8,12 +8,14 @@
       "executor": "@nx/cypress:cypress",
       "options": {
         "cypressConfig": "apps/generate-ui-v2-e2e/cypress.config.ts",
-        "devServerTarget": "generate-ui-v2:serve",
-        "testingType": "e2e"
+        "devServerTarget": "generate-ui-v2-e2e:serve",
+        "testingType": "e2e",
+        "headed": true,
+        "baseUrl": "http://localhost:4200"
       },
       "configurations": {
-        "production": {
-          "devServerTarget": "generate-ui-v2:serve:production"
+        "watch": {
+          "watch": true
         }
       }
     },
@@ -23,8 +25,23 @@
       "options": {
         "lintFilePatterns": ["apps/generate-ui-v2-e2e/**/*.{js,ts}"]
       }
+    },
+    "serve": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "staticFilePath": "apps/generate-ui-v2-e2e/dist/generate-ui-v2",
+        "buildTarget": "generate-ui-v2-e2e:setup-lit-dir",
+        "watch": false
+      },
+      "dependsOn": ["setup-lit-dir"]
+    },
+    "setup-lit-dir": {
+      "command": "node ./setup-lit-dir.js",
+      "options": {
+        "cwd": "apps/generate-ui-v2-e2e"
+      },
+      "dependsOn": ["generate-ui-v2:build"]
     }
   },
-  "tags": [],
-  "implicitDependencies": ["generate-ui-v2"]
+  "tags": []
 }
