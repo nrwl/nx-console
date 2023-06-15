@@ -6,7 +6,10 @@ import {
   EditorContext,
   EditorContextInterface,
 } from '../../contexts/editor-context';
-import { extractDefaultValue } from '../../generator-schema-utils';
+import {
+  compareWithDefaultValue,
+  extractDefaultValue,
+} from '../../generator-schema-utils';
 import {
   FieldValueConsumer,
   FieldValueConsumerInterface,
@@ -26,6 +29,8 @@ export declare class FieldInterface {
     value: string | boolean | number | string[] | undefined
   ): void;
   protected shouldRenderError(): boolean;
+  protected fieldId: string;
+  protected ariaAttributes: Record<string, string>;
 }
 
 export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
@@ -42,12 +47,21 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
             ? 'border-blue-500'
             : 'border-transparent'}"
         >
-          <p>${this.option.name}${this.option.isRequired ? '*' : ''}</p>
+          <label for="${this.fieldId}"
+            >${this.option.name}${this.option.isRequired ? '*' : ''}</label
+          >
           <p class="text-sm text-gray-500">${this.option.description}</p>
           ${this.renderField()}
           ${when(
             this.shouldRenderError() && typeof this.validation === 'string',
-            () => html`<p class="text-sm text-red-500">${this.validation}</p>`
+            () =>
+              html`<p
+                class="text-sm text-red-500"
+                id="${this.fieldId}-error"
+                aria-live="polite"
+              >
+                ${this.validation}
+              </p>`
           )}
         </div>
       `;
@@ -57,9 +71,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       value: string | boolean | number | string[] | undefined
     ) {
       const defaultValue = extractDefaultValue(this.option);
-      // if the default value is undefined, false & empty string are considered default values
-      const isDefaultValue =
-        value === defaultValue || (!value && !defaultValue);
+      const isDefaultValue = compareWithDefaultValue(value, defaultValue);
 
       this.dispatchEvent(
         new CustomEvent('option-changed', {
@@ -86,6 +98,20 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       this.dispatchValue(defaultValue);
     }
 
+    protected get fieldId(): string {
+      return `${this.option.name}-field`;
+    }
+
+    protected get ariaAttributes(): Record<
+      'id' | 'aria-invalid' | 'aria-describedby',
+      string
+    > {
+      return {
+        id: this.fieldId,
+        'aria-invalid': `${this.shouldRenderError()}`,
+        'aria-describedby': `${this.fieldId}-error`,
+      };
+    }
     protected createRenderRoot(): Element | ShadowRoot {
       return this;
     }

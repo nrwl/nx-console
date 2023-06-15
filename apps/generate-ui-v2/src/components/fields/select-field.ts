@@ -5,6 +5,7 @@ import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
 import { Field } from './field-mixin';
 import { extractDefaultValue } from '../../generator-schema-utils';
+import { spread } from '@open-wc/lit-helpers';
 
 @customElement('select-field')
 export class SelectField extends Field(LitElement) {
@@ -21,6 +22,7 @@ export class SelectField extends Field(LitElement) {
       <select
         @change="${this.handleChange}"
         class="bg-selectFieldBackground border border-fieldBorder"
+        ${spread(this.ariaAttributes)}
       >
         ${when(
           extractDefaultValue(this.option) === undefined,
@@ -41,6 +43,7 @@ export class SelectField extends Field(LitElement) {
         style="${this.shouldRenderError()
           ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
           : ''}"
+        ${spread(this.ariaAttributes)}
       >
         ${when(
           extractDefaultValue(this.option) === undefined,

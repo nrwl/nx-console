@@ -101,14 +101,15 @@ export class GenerateUiWebview {
             </style>
             </head>
         <body>
-        <script type="module" src="${uiToolkitUri}">“</script>
-        <script type="module" src="${scriptUri}"></script>
-        
-        <script type="text/javascript">
-         window.codiconsUri = "${codiconsUri}";
-        </script>
+          <script type="module" src="${uiToolkitUri}">“</script>
+          <script type="module" src="${scriptUri}"></script>
+          
+          <script type="text/javascript">
+            window.codiconsUri = "${codiconsUri}";
+          </script>
 
-        <root-element></root-element>
+          <root-element></root-element>
+
         </body>
         </html>
     `;
@@ -227,12 +228,12 @@ export class GenerateUiWebview {
         payload: modifiedSchema,
       };
     } catch (e) {
-      console.log(e);
       return message;
     }
   }
 
   private getVscodeStyleMappings(): string {
+    // --separator-color should really be --divider-background but that's not picked up for some reason
     return `
       --foreground-color: var(--vscode-editor-foreground);
       --background-color: var(--vscode-editor-background);
@@ -241,6 +242,9 @@ export class GenerateUiWebview {
       --badge-background-color: var(--badge-background);
       --banner-warning-color: var(--vscode-statusBarItem-warningBackground);
       --banner-error-color: var(--vscode-statusBarItem-errorBackground);
+      --banner-text-color: var(--vscode-statusBarItem-warningForeground);
+      --separator-color: var(--vscode-editorWidget-border);
+      --field-nav-hover-color: var(--vscode-list-hoverBackground);
     `;
   }
 }

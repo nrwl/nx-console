@@ -75,9 +75,11 @@ data class GenerateUiStyles(
     val selectFieldBackgroundColor: String,
     val focusBorderColor: String,
     val badgeBackgroundColor: String,
-    val bannerWarningBackgroundColor: String
+    val bannerWarningBackgroundColor: String,
+    val separatorColor: String,
+    val fieldNavHoverColor: String,
+    val fontFamily: String,
 //    val secondaryTextColor: String,
-//    val fontFamily: String,
 //    val fontSize: String,
 )
 

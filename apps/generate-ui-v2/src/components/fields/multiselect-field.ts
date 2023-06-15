@@ -5,6 +5,7 @@ import { map } from 'lit/directives/map.js';
 import { Field } from './field-mixin';
 import { extractDefaultValue } from '../../generator-schema-utils';
 import { when } from 'lit/directives/when.js';
+import { spread } from '@open-wc/lit-helpers';
 
 @customElement('multiselect-field')
 export class MultiselectField extends Field(LitElement) {
@@ -46,6 +47,7 @@ export class MultiselectField extends Field(LitElement) {
       return html`<select
         @change="${this.addValue}"
         class="bg-selectFieldBackground border border-fieldBorder"
+        ${spread(this.ariaAttributes)}
       >
         <option value="">
           ${this.selectedElements.length
@@ -58,7 +60,10 @@ export class MultiselectField extends Field(LitElement) {
         )}
       </select>`;
     } else {
-      return html` <vscode-dropdown @change="${this.addValue}">
+      return html` <vscode-dropdown
+        @change="${this.addValue}"
+        ${spread(this.ariaAttributes)}
+      >
         <vscode-option value="">
           ${this.selectedElements.length
             ? 'Add another value'
@@ -73,7 +78,7 @@ export class MultiselectField extends Field(LitElement) {
   }
 
   private handleEnterKeyRemove(index: number, event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' || event.key === ' ') {
       this.removeValue(index);
     }
   }

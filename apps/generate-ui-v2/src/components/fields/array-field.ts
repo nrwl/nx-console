@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Field } from './field-mixin';
+import { spread } from '@open-wc/lit-helpers';
 
 @customElement('array-field')
 export class ArrayField extends Field(LitElement) {
@@ -47,12 +48,14 @@ export class ArrayField extends Field(LitElement) {
         class="bg-fieldBackground border border-fieldBorder grow"
         type="text"
         @keydown="${this.handleEnterKeyAdd}"
+        ${spread(this.ariaAttributes)}
       />`;
     } else {
       return html`<vscode-text-field
         type="text"
         class="grow"
         @keydown="${this.handleEnterKeyAdd}"
+        ${spread(this.ariaAttributes)}
       ></vscode-text-field>`;
     }
   }
@@ -68,7 +71,7 @@ export class ArrayField extends Field(LitElement) {
   }
 
   private handleEnterKeyRemove(index: number, event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' || event.key === ' ') {
       this.removeValue(index);
     }
   }
