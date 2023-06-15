@@ -8,7 +8,6 @@ export class ArrayField extends Field(LitElement) {
   @state()
   private elements: string[] = [];
 
-  // TODO: GENERALIZE ICON ELEMENT
   renderField() {
     return html`<div>
       <div class="flex flex-row gap-2">

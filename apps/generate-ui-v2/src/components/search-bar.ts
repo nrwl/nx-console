@@ -13,6 +13,7 @@ export class SearchBar extends EditorContext(LitElement) {
             type="text"
             placeholder="Search..."
             @input="${this.handleInput}"
+            data-cy="search-bar"
           />
           <icon-element
             icon="search"
@@ -27,6 +28,7 @@ export class SearchBar extends EditorContext(LitElement) {
           placeholder="Search..."
           type="text"
           @input="${this.handleInput}"
+          data-cy="search-bar"
         >
           <span slot="start">
             <codicon-element icon="search"></codicon-element>

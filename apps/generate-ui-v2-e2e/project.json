@@ -10,13 +10,13 @@
         "cypressConfig": "apps/generate-ui-v2-e2e/cypress.config.ts",
         "devServerTarget": "generate-ui-v2-e2e:serve",
         "testingType": "e2e",
-        "headed": true,
         "baseUrl": "http://localhost:4200",
         "browser": "electron"
       },
       "configurations": {
         "watch": {
-          "watch": true
+          "watch": true,
+          "headed": true
         }
       }
     },

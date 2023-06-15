@@ -37,7 +37,6 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
   }
 
   handleKeyEvent(e: KeyboardEvent) {
-    console.log(e.key);
     if (e.key === 'Enter' || e.key === ' ') {
       this.toggleShowMore();
     }

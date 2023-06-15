@@ -11,6 +11,5 @@
     "src/**/*.js",
     "cypress.config.ts",
     "src/test-schema.mjs"
-  ],
-  "exclude": ["apps/generate-ui/**"]
+  ]
 }

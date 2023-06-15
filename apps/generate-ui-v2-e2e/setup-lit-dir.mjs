@@ -27,7 +27,7 @@ fs.writeFileSync(
 fs.createFileSync('./dist/generate-ui-v2/api.js');
 fs.writeFileSync(
   './dist/generate-ui-v2/api.js',
-  `
+  /*javascript*/ `
   const postToWebviewCallbacks = [];
 
   window.intellijApi = {
@@ -42,6 +42,12 @@ fs.writeFileSync(
         window.intellijApi?.postToWebview({
           payloadType: 'generator',
           payload: ${JSON.stringify(schema)},
+        });
+      }
+      if(messageParsed.payloadType === 'request-validation') {
+        window.intellijApi?.postToWebview({
+          payloadType: 'validation-results',
+          payload: {},
         });
       }
     },

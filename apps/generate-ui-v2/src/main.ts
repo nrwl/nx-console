@@ -126,6 +126,7 @@ export class Root extends LitElement {
               class="px-3 py-2"
               @click="${() => this.runGenerator()}"
               text="Generate"
+              data-cy="generate-button"
             >
             </button-element>
           </div>

@@ -10,18 +10,16 @@ import {
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
 import type { WebviewApi } from 'vscode-webview';
 
-declare global {
-  interface Window {
-    intellijApi?: {
-      postToWebview: (message: string) => void;
-      postToIde: (message: string) => void;
-      registerPostToWebviewCallback: (
-        callback: (message: TaskExecutionInputMessage) => void
-      ) => void;
-      registerPostToIdeCallback: (callback: (message: string) => void) => void;
-    };
-  }
-}
+declare const window: {
+  intellijApi?: {
+    postToWebview: (message: string) => void;
+    postToIde: (message: string) => void;
+    registerPostToWebviewCallback: (
+      callback: (message: TaskExecutionInputMessage) => void
+    ) => void;
+    registerPostToIdeCallback: (callback: (message: string) => void) => void;
+  };
+} & Window;
 
 @Injectable({
   providedIn: 'root',
