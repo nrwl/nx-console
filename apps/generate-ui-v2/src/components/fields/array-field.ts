@@ -16,6 +16,7 @@ export class ArrayField extends Field(LitElement) {
           text="Add"
           appearance="secondary"
           @click="${this.addValue}"
+          data-cy="${this.fieldId}-add-button"
         ></button-element>
       </div>
       <div class="mt-2">
@@ -26,13 +27,15 @@ export class ArrayField extends Field(LitElement) {
               html` <div
                 tabindex="0"
                 class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground focus:ring-1 focus:ring-focusBorder focus:outline-none"
+                data-cy="${this.fieldId}-item"
                 @keydown="${(event: KeyboardEvent) =>
                   this.handleEnterKeyRemove(index, event)}"
               >
                 <p class="leading-none">${element}</p>
                 <icon-element
-                  @click="${() => this.removeValue(index)}"
                   icon="close"
+                  @click="${() => this.removeValue(index)}"
+                  data-cy="${this.fieldId}-remove-button"
                 ></icon-element>
               </div>`
           )}
