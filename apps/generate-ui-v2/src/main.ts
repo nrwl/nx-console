@@ -64,7 +64,7 @@ export class Root extends LitElement {
     const options = this.icc.generatorSchema?.options;
     return html` <div
       class="text-foreground h-screen flex flex-col"
-      @keydown="${this.handleGeneratorShortcut}"
+      @keydown="${this.handleGlobalKeyboardShortcuts}"
     >
       <div
         class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-separator"
@@ -162,11 +162,20 @@ export class Root extends LitElement {
     }
   }
 
-  private handleGeneratorShortcut(e: KeyboardEvent) {
+  private handleGlobalKeyboardShortcuts(e: KeyboardEvent) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
 
       this.runGenerator();
+    }
+    if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
+      console.log('focus');
+      e.preventDefault();
+      const searchBar = this.renderRoot.querySelector('[id="search-bar"]');
+      console.log(searchBar);
+      if (searchBar) {
+        (searchBar as HTMLElement).focus();
+      }
     }
   }
 

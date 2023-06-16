@@ -47,7 +47,7 @@ describe('generate-ui-v2', () => {
     });
 
     it('should filter items based on the search bar', () => {
-      cy.get('[data-cy="search-bar"]').type('option1');
+      cy.get('[id="search-bar"]').type('option1');
       getFields().should('have.length', 1);
       getFieldNavItems().should('have.length', 1);
       cy.get('[data-cy="show-more"]').should('not.be.visible');
