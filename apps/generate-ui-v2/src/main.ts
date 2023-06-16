@@ -169,7 +169,6 @@ export class Root extends LitElement {
       this.runGenerator();
     }
     if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
-      console.log('focus');
       e.preventDefault();
       const searchBar = this.renderRoot.querySelector('[id="search-bar"]');
       console.log(searchBar);

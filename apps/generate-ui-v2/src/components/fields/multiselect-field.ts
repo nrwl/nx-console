@@ -30,11 +30,13 @@ export class MultiselectField extends Field(LitElement) {
                   class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground focus:ring-1 focus:ring-focusBorder focus:outline-none"
                   @keydown="${(event: KeyboardEvent) =>
                     this.handleEnterKeyRemove(index, event)}"
+                  data-cy="${this.fieldId}-item"
                 >
                   <p class="leading-none">${element}</p>
                   <icon-element
                     @click="${() => this.removeValue(index)}"
                     icon="close"
+                    data-cy="${this.fieldId}-remove-button"
                   ></icon-element>
                 </div>`
             )}

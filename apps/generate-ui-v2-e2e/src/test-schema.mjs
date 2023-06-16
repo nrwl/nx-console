@@ -16,6 +16,6 @@ export const schema = {
       items: ['option1', 'option2', 'option3'],
     },
     { name: 'array-field', type: 'array' },
-    { name: 'option2' },
+    { name: 'option2', pattern: '^[a-zA-Z].*$' },
   ],
 };
