@@ -35,5 +35,12 @@ describe('generate-ui-v2', () => {
         expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
       });
     });
+    it('should be able to dry run generator with shortcut', () => {
+      spyOnConsoleLog().then((consoleLog) => {
+        cy.get('body').type('{ctrl}{shift}{enter}');
+        expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
+        expectConsoleLogToHaveBeenCalledWith(consoleLog, '--dry-run');
+      });
+    });
   });
 });

@@ -166,7 +166,11 @@ export class Root extends LitElement {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
 
-      this.runGenerator();
+      if (e.shiftKey) {
+        this.runGenerator(true);
+      } else {
+        this.runGenerator();
+      }
     }
     if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
