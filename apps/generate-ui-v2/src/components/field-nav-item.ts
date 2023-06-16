@@ -18,7 +18,7 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
         class="text-ellipsis ${this.shouldRenderError()
           ? 'text-red-500'
           : this.shouldRenderChanged()
-          ? 'text-blue-500'
+          ? 'text-primary'
           : 'text-foreground'} 
           hover:bg-fieldNavHoverBackground"
       >

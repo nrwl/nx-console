@@ -83,6 +83,18 @@ export class FieldList extends LitElement {
     `;
   }
 
+  protected firstUpdated(): void {
+    this.updateComplete.then(() => {
+      const field = Array.from(this.renderRoot.querySelectorAll('*')).find(
+        (el) =>
+          el.id.toLowerCase().endsWith('-field') && el instanceof HTMLElement
+      );
+      if (field) {
+        (field as HTMLElement).focus();
+      }
+    });
+  }
+
   private handleTreeClickEvent(event: Event) {
     const element = this.querySelector(
       `#option-${(event.target as HTMLElement).innerText}`

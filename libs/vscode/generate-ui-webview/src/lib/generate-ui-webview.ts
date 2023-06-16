@@ -237,6 +237,7 @@ export class GenerateUiWebview {
     return `
       --foreground-color: var(--vscode-editor-foreground);
       --background-color: var(--vscode-editor-background);
+      --primary-color: var(--button-primary-background);
       --field-border-color: var(--panel-view-border);
       --focus-border-color: var(--vscode-focusBorder);
       --badge-background-color: var(--badge-background);

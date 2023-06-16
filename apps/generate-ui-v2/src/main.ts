@@ -1,5 +1,5 @@
 import { ContextProvider } from '@lit-labs/context';
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import './components/fields/checkbox-field';
@@ -83,10 +83,6 @@ export class Root extends LitElement {
     </div>`;
   }
 
-  private handleSearchValueChange(e: CustomEvent) {
-    this.searchValue = e.detail;
-  }
-
   private renderHeader() {
     const isNxGenerator =
       this.icc.generatorSchema?.collectionName?.includes('@nx') ||
@@ -100,16 +96,21 @@ export class Root extends LitElement {
     return html`
       <div class="">
         <header class="flex justify-between items-center">
-          <div>
-            <h1 class="text-xl font-bold" data-cy="header-text">
+          <div class="flex flex-wrap gap-2 items-end">
+            <h1 class="text-xl font-bold leading-none" data-cy="header-text">
               nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
             </h1>
             ${when(
               isNxGenerator && this.icc.editor === 'vscode',
               () =>
-                html`<a href="${nxDevLink}" target="_blank" class="text-sm"
-                  >View full details
-                </a> `
+                html`
+                  <a
+                    href="${nxDevLink}"
+                    target="_blank"
+                    class="text-sm underline leading-none pb-px focus:ring-1 focus:ring-focusBorder focus:outline-none"
+                    >View full details
+                  </a>
+                `
             )}
           </div>
 
@@ -149,6 +150,10 @@ export class Root extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  private handleSearchValueChange(e: CustomEvent) {
+    this.searchValue = e.detail;
   }
 
   private handleValidFormChange() {
