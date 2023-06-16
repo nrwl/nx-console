@@ -303,6 +303,10 @@
           "when": "isNxWorkspace"
         },
         {
+          "command": "nxConsole.clearCloudSessions",
+          "when": "isNxWorkspace"
+        },
+        {
           "command": "nxConsole.refreshCloudWebview",
           "when": "isNxWorkspace"
         },
@@ -530,6 +534,10 @@
       {
         "title": "Login to Nx Cloud",
         "command": "nxConsole.loginToNxCloud"
+      },
+      {
+        "title": "Clear local Nx Cloud sessions",
+        "command": "nxConsole.clearCloudSessions"
       },
       {
         "title": "Refresh Nx Cloud Webview",
