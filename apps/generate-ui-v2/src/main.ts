@@ -16,7 +16,10 @@ import './components/field-nav-item';
 import './components/show-more-divider';
 import '@nx-console/shared/lit-utils';
 import { editorContext } from './contexts/editor-context';
-import { debounce, getGeneratorIdentifier } from './generator-schema-utils';
+import {
+  debounce,
+  getGeneratorIdentifier,
+} from './utils/generator-schema-utils';
 import { IdeCommunicationController } from './ide-communication.controller';
 import {
   formValuesServiceContext,

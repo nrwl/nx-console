@@ -4,8 +4,9 @@ import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
 import { Field } from './field-mixin';
-import { extractDefaultValue } from '../../generator-schema-utils';
+import { extractDefaultValue } from '../../utils/generator-schema-utils';
 import { spread } from '@open-wc/lit-helpers';
+import { intellijFocusRing } from '../../utils/ui-utils';
 
 @customElement('select-field')
 export class SelectField extends Field(LitElement) {
@@ -21,7 +22,7 @@ export class SelectField extends Field(LitElement) {
     return html`
       <select
         @change="${this.handleChange}"
-        class="bg-selectFieldBackground border border-fieldBorder"
+        class="bg-selectFieldBackground border border-fieldBorder rounded ${intellijFocusRing}"
         ${spread(this.ariaAttributes)}
       >
         ${when(

@@ -2,6 +2,7 @@ import { html, LitElement, TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Field } from './field-mixin';
 import { spread } from '@open-wc/lit-helpers';
+import { intellijFieldColors, intellijFocusRing } from '../../utils/ui-utils';
 
 @customElement('input-field')
 export class InputField extends Field(LitElement) {
@@ -9,7 +10,7 @@ export class InputField extends Field(LitElement) {
     if (this.editor === 'intellij') {
       return html`
         <input
-          class="bg-fieldBackground border border-fieldBorder"
+          class="${intellijFieldColors} ${intellijFocusRing}"
           type="text"
           @input="${this.handleChange}"
           ${spread(this.ariaAttributes)}

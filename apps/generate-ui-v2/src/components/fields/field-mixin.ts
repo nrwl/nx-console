@@ -9,7 +9,7 @@ import {
 import {
   compareWithDefaultValue,
   extractDefaultValue,
-} from '../../generator-schema-utils';
+} from '../../utils/generator-schema-utils';
 import {
   FieldValueConsumer,
   FieldValueConsumerInterface,

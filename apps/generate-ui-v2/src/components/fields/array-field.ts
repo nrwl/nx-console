@@ -2,6 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Field } from './field-mixin';
 import { spread } from '@open-wc/lit-helpers';
+import { intellijFieldColors, intellijFocusRing } from '../../utils/ui-utils';
 
 @customElement('array-field')
 export class ArrayField extends Field(LitElement) {
@@ -47,7 +48,7 @@ export class ArrayField extends Field(LitElement) {
   private renderInputField() {
     if (this.editor === 'intellij') {
       return html` <input
-        class="bg-fieldBackground border border-fieldBorder grow"
+        class="${intellijFieldColors} grow ${intellijFocusRing}"
         type="text"
         @keydown="${this.handleEnterKeyAdd}"
         ${spread(this.ariaAttributes)}

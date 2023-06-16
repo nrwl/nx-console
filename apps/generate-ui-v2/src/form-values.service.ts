@@ -1,7 +1,7 @@
 import { createContext } from '@lit-labs/context';
 import { IdeCommunicationController } from './ide-communication.controller';
 
-import { extractDefaultValue } from './generator-schema-utils';
+import { extractDefaultValue } from './utils/generator-schema-utils';
 import {
   FormValues,
   GenerateUiRequestValidationOutputMessage,
