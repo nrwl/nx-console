@@ -10,17 +10,15 @@ describe('multiselect field', () => {
     field.select('option1');
     field.select('option2');
 
-    const items = cy.get(`[data-cy="${fieldName}-field-item"]`);
-    items.should('have.length', 2);
+    cy.get(`[data-cy="${fieldName}-field-item"]`).as('items');
+    cy.get('@items').should('have.length', 2);
 
-    const removeButtons = cy.get(
-      `[data-cy="${fieldName}-field-remove-button"]`
-    );
-    removeButtons.should('have.length', 2);
-    removeButtons.first().click();
-    removeButtons.first().click();
+    cy.get(`[data-cy="${fieldName}-field-remove-button"]`).as('removeButtons');
+    cy.get('@removeButtons').should('have.length', 2);
+    cy.get('@removeButtons').first().click();
+    cy.get('@removeButtons').first().click();
 
-    items.should('have.length', 0);
+    cy.get('@items').should('have.length', 0);
   });
 
   it('should add and remove values with keyboard', () => {
@@ -32,12 +30,12 @@ describe('multiselect field', () => {
     field.select('option1');
     field.select('option2');
 
-    const items = cy.get(`[data-cy="${fieldName}-field-item"]`);
-    items.should('have.length', 2);
+    cy.get(`[data-cy="${fieldName}-field-item"]`).as('items');
+    cy.get('@items').should('have.length', 2);
 
-    items.first().focus().type('{enter}');
-    items.first().focus().type('{enter}');
+    cy.get('@items').first().focus().type('{enter}');
+    cy.get('@items').first().focus().type('{enter}');
 
-    items.should('have.length', 0);
+    cy.get('@items').should('have.length', 0);
   });
 });

@@ -3,11 +3,7 @@ import {
   expectConsoleLogToHaveBeenCalledWith,
   spyOnConsoleLog,
 } from '../support/console-spy';
-import {
-  clickShowMore,
-  getFieldByName,
-  getFields,
-} from '../support/get-elements';
+import { clickShowMore, getFieldByName } from '../support/get-elements';
 
 describe('generate-ui-v2', () => {
   beforeEach(() => cy.visit('/'));
