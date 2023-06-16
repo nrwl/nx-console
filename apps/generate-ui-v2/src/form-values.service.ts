@@ -75,7 +75,14 @@ export class FormValuesService {
     const errors: Record<string, boolean | string> = {};
     Object.entries(formValues).forEach(([key, value]) => {
       const option = options.find((option) => option.name === key);
-      if (!value && option?.isRequired) {
+      if (!option) return;
+      if (option.pattern) {
+        const regex = new RegExp(option.pattern);
+        if (!regex.test(String(value))) {
+          errors[key] = `Value should match the pattern '${option.pattern}'`;
+        }
+      }
+      if (!value && option.isRequired) {
         errors[key] = 'This field is required';
       }
     });
