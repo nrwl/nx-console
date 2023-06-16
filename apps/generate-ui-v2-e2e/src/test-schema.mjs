@@ -9,7 +9,7 @@ export const schema = {
       items: ['option1', 'option2', 'option3'],
       'x-priority': 'important',
     },
-    { name: 'checkbox-option', type: 'boolean' },
+    { name: 'checkbox-field', type: 'boolean' },
     {
       name: 'multiselect-field',
       type: 'array',

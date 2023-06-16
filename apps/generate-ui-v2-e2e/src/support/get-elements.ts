@@ -7,7 +7,7 @@ export const getFieldNavItems = () =>
   cy.get('[data-cy^="field-nav-item"]:visible');
 
 export const getFieldByName = (name: string) =>
-  cy.get(`[id=${name}-field]:visible`);
+  cy.get(`[id="${name}-field"]:visible`);
 
 export const getFieldErrorByName = (name: string) =>
   cy.get(`[id="${name}-field-error"]`);

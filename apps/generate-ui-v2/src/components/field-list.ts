@@ -155,7 +155,7 @@ const getHiddenOptionNames = (
   if (!searchValue) {
     return hiddenOptions;
   }
-  options.forEach((option) => {
+  options?.forEach((option) => {
     if (!option.name.includes(searchValue)) {
       hiddenOptions.add(option.name);
     }
@@ -166,7 +166,7 @@ const getHiddenOptionNames = (
 const splitOptionsByPriority = (options: Option[]): [Option[], Option[]] => {
   const importantOptions: Option[] = [];
   const otherOptions: Option[] = [];
-  options.forEach((option) => {
+  options?.forEach((option) => {
     if (option.isRequired || option['x-priority'] === 'important') {
       importantOptions.push(option);
     } else {
