@@ -44,5 +44,6 @@
       "dependsOn": ["generate-ui-v2:build"]
     }
   },
-  "tags": []
+  "tags": [],
+  "implicitDependencies": ["generate-ui-v2"]
 }
