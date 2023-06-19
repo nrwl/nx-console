@@ -164,6 +164,7 @@ export class IdeCommunicationController implements ReactiveController {
       --foreground-color: ${styles.foregroundColor};
       --background-color: ${styles.backgroundColor};
       --primary-color: ${styles.primaryColor};
+      --error-color: ${styles.errorColor};
       --field-background-color: ${styles.fieldBackgroundColor};
       --field-border-color: ${styles.fieldBorderColor};
       --select-field-background-color: ${styles.selectFieldBackgroundColor};

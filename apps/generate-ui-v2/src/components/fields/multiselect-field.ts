@@ -2,20 +2,26 @@ import { Option } from '@nx-console/shared/schema';
 import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
-import { Field } from './field-mixin';
+import { Field } from './mixins/field-mixin';
 import { extractDefaultValue } from '../../utils/generator-schema-utils';
 import { when } from 'lit/directives/when.js';
 import { spread } from '@open-wc/lit-helpers';
-import { intellijFocusRing } from '../../utils/ui-utils';
+import {
+  intellijErrorRingStyles,
+  intellijFieldPadding,
+  intellijFocusRing,
+  vscodeErrorStyleOverrides,
+} from '../../utils/ui-utils';
+import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('multiselect-field')
-export class MultiselectField extends Field(LitElement) {
+export class MultiselectField extends FieldWrapper(Field(LitElement)) {
   @state()
   private selectedElements: string[] = [];
 
   renderField() {
     return html`
-      <div>
+      <div class="flex flex-col">
         ${this.renderSelectField()}
         <div class="mt-2">
           ${when(
@@ -25,20 +31,11 @@ export class MultiselectField extends Field(LitElement) {
           <div class="flex flex-row gap-4 mt-2">
             ${this.selectedElements.map(
               (element, index) =>
-                html` <div
-                  tabindex="0"
-                  class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground focus:ring-1 focus:ring-focusBorder focus:outline-none"
-                  @keydown="${(event: KeyboardEvent) =>
-                    this.handleEnterKeyRemove(index, event)}"
-                  data-cy="${this.fieldId}-item"
-                >
-                  <p class="leading-none">${element}</p>
-                  <icon-element
-                    @click="${() => this.removeValue(index)}"
-                    icon="close"
-                    data-cy="${this.fieldId}-remove-button"
-                  ></icon-element>
-                </div>`
+                html`<badge-element
+                  text="${element}"
+                  fieldId="${this.fieldId}"
+                  @remove="${() => this.removeValue(index)}"
+                ></badge-element>`
             )}
           </div>
         </div>
@@ -49,7 +46,9 @@ export class MultiselectField extends Field(LitElement) {
     if (this.editor === 'intellij') {
       return html`<select
         @change="${this.addValue}"
-        class="bg-selectFieldBackground border border-fieldBorder rounded ${intellijFocusRing}"
+        class="bg-selectFieldBackground border border-fieldBorder rounded grow ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
+          this.shouldRenderError()
+        )})}"
         ${spread(this.ariaAttributes)}
       >
         <option value="">
@@ -65,6 +64,7 @@ export class MultiselectField extends Field(LitElement) {
     } else {
       return html` <vscode-dropdown
         @change="${this.addValue}"
+        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
         ${spread(this.ariaAttributes)}
       >
         <vscode-option value="">
@@ -77,12 +77,6 @@ export class MultiselectField extends Field(LitElement) {
           (item) => html`<vscode-option value="${item}">${item}</vscode-option>`
         )}
       </vscode-dropdown>`;
-    }
-  }
-
-  private handleEnterKeyRemove(index: number, event: KeyboardEvent) {
-    if (event.key === 'Enter' || event.key === ' ') {
-      this.removeValue(index);
     }
   }
 
@@ -119,6 +113,7 @@ export class MultiselectField extends Field(LitElement) {
     this.selectedElements = values.filter((value) =>
       possibleOptions.includes(value)
     );
+    this.dispatchValue(this.selectedElements);
   }
 
   private extractItemOptions(option: Option): string[] {

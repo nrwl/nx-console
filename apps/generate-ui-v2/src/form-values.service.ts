@@ -1,7 +1,10 @@
 import { createContext } from '@lit-labs/context';
 import { IdeCommunicationController } from './ide-communication.controller';
 
-import { extractDefaultValue } from './utils/generator-schema-utils';
+import {
+  compareWithDefaultValue,
+  extractDefaultValue,
+} from './utils/generator-schema-utils';
 import {
   FormValues,
   GenerateUiRequestValidationOutputMessage,
@@ -82,7 +85,10 @@ export class FormValuesService {
           errors[key] = `Value should match the pattern '${option.pattern}'`;
         }
       }
-      if (!value && option.isRequired) {
+      if (
+        option.isRequired &&
+        (!value || (Array.isArray(value) && value.length === 0))
+      ) {
         errors[key] = 'This field is required';
       }
     });
@@ -123,9 +129,7 @@ export class FormValuesService {
         (option) => option.name === key
       );
       const defaultValue = extractDefaultValue(option);
-      if (defaultValue === value) return;
-      if (!defaultValue && !value) return;
-      if (Array.isArray(value) && defaultValue === value) return;
+      if (compareWithDefaultValue(value, defaultValue)) return;
       args.push(`--${key}=${value}`);
     });
     return args;

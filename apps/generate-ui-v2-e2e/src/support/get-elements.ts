@@ -1,13 +1,18 @@
 export const getFields = () =>
-  cy.get('*:visible').filter((index, element) => {
-    return element.tagName.toLowerCase().endsWith('-field');
+  cy.get('*').filter((index, element) => {
+    return (
+      element.checkVisibility() &&
+      element.tagName.toLowerCase().endsWith('-field')
+    );
   });
 
 export const getFieldNavItems = () =>
   cy.get('[data-cy^="field-nav-item"]:visible');
 
 export const getFieldByName = (name: string) =>
-  cy.get(`[id="${name}-field"]:visible`);
+  cy
+    .get(`[id="${name}-field"]`)
+    .filter((_, element) => element.checkVisibility());
 
 export const getFieldErrorByName = (name: string) =>
   cy.get(`[id="${name}-field-error"]`);

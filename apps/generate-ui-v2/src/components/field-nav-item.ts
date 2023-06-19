@@ -16,7 +16,7 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
         data-cy="field-nav-item-${this.option.name}"
         @click="${this.handleTreeClickEvent}"
         class="text-ellipsis ${this.shouldRenderError()
-          ? 'text-red-500'
+          ? 'text-error'
           : this.shouldRenderChanged()
           ? 'text-primary'
           : 'text-foreground'} 

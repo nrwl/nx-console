@@ -48,7 +48,7 @@ describe('field list', () => {
     });
   });
 
-  const errorClass = 'text-red-500';
+  const errorClass = 'text-error';
 
   it('should correctly show validation for required field', () => {
     const fieldName = 'option1';
@@ -64,7 +64,7 @@ describe('field list', () => {
     getFieldNavItemByName(fieldName).should('have.class', errorClass);
   });
 
-  it('should correctly show validation for required field', () => {
+  it('should correctly show validation for field with pattern', () => {
     const fieldName = 'option2';
     clickShowMore();
     const field = getFieldByName(fieldName);

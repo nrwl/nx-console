@@ -14,6 +14,7 @@ import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.utils.isWslInterpreter
+import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.nodeInterpreter
 import java.io.File
@@ -42,7 +43,10 @@ class NxGraphBrowser(
     init {
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
         browser.jbCefClient.addDownloadHandler(NxGraphDownloadHandler(), browser.cefBrowser)
-        browser.jbCefClient.addContextMenuHandler(NxGraphContextMenuHandler(), browser.cefBrowser)
+        browser.jbCefClient.addContextMenuHandler(
+            OpenDevToolsContextMenuHandler(),
+            browser.cefBrowser
+        )
         browser.setPageBackgroundColor(backgroundColor)
 
         CoroutineScope(Dispatchers.Default).launch { listenToGraphStates() }

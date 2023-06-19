@@ -121,7 +121,7 @@ const renderOptions = (
       const hidden = !show || hiddenOptionNames.has(option.name);
 
       return html` <div
-        class="${hidden ? 'hidden' : ''}"
+        class="${hidden ? 'hidden' : ''}  mb-4"
         id="option-${option.name}"
       >
         ${componentTag}

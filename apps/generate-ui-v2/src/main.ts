@@ -14,6 +14,7 @@ import './components/banner';
 import './components/icon';
 import './components/field-nav-item';
 import './components/show-more-divider';
+import './components/badge';
 import '@nx-console/shared/lit-utils';
 import { editorContext } from './contexts/editor-context';
 import {
@@ -55,6 +56,10 @@ export class Root extends LitElement {
       this.handleValidFormChange()
     );
     this.formValuesServiceContextProvider.setValue(this.formValuesService);
+
+    window.addEventListener('keydown', (e) =>
+      this.handleGlobalKeyboardShortcuts(e)
+    );
   }
 
   @state()
@@ -62,10 +67,7 @@ export class Root extends LitElement {
 
   render() {
     const options = this.icc.generatorSchema?.options;
-    return html` <div
-      class="text-foreground h-screen flex flex-col"
-      @keydown="${this.handleGlobalKeyboardShortcuts}"
-    >
+    return html` <div class="text-foreground h-screen flex flex-col">
       <div
         class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-separator"
       >
@@ -175,7 +177,6 @@ export class Root extends LitElement {
     if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       const searchBar = this.renderRoot.querySelector('[id="search-bar"]');
-      console.log(searchBar);
       if (searchBar) {
         (searchBar as HTMLElement).focus();
       }
