@@ -70,15 +70,6 @@ export class NxCloudWebviewProvider implements WebviewViewProvider {
     );
 
     // and all other URI's used in the webview
-    const uiToolkitUri = webview.asWebviewUri(
-      Uri.joinPath(
-        this._webviewSourceUri,
-        '@vscode',
-        'webview-ui-toolkit',
-        'dist',
-        'toolkit.js'
-      )
-    );
     const codiconsUri = webview.asWebviewUri(
       Uri.joinPath(
         this._webviewSourceUri,
@@ -115,7 +106,6 @@ export class NxCloudWebviewProvider implements WebviewViewProvider {
       </head>
       <body>
 
-        <script type="module" src="${uiToolkitUri}">“</script>
         <script type="module" src="${scriptUri}">“</script>
 
         <script type="text/javascript">

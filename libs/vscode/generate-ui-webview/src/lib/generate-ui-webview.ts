@@ -63,16 +63,6 @@ export class GenerateUiWebview {
         Uri.joinPath(this._webviewSourceUri, 'output.css')
       );
 
-      const uiToolkitUri = this.webviewPanel.webview.asWebviewUri(
-        Uri.joinPath(
-          this._webviewSourceUri,
-          '@vscode',
-          'webview-ui-toolkit',
-          'dist',
-          'toolkit.js'
-        )
-      );
-
       const codiconsUri = this.webviewPanel.webview.asWebviewUri(
         Uri.joinPath(
           this._webviewSourceUri,
@@ -91,9 +81,7 @@ export class GenerateUiWebview {
             <title>Generate UI</title>
             <link href="${stylesUri}" rel="stylesheet">
             <link href="${codiconsUri}" rel="stylesheet">
-            </head>
-        <body>
-        <style>
+            <style>
             :root {
               ${this.getVscodeStyleMappings()}
             }
@@ -101,7 +89,8 @@ export class GenerateUiWebview {
               padding: 0;
             }
             </style>
-          <script type="module" src="${uiToolkitUri}">“</script>
+        </head>
+        <body>
           <script type="module" src="${scriptUri}"></script>
           
           <script type="text/javascript">

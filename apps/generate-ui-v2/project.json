@@ -20,6 +20,7 @@
         "format": ["esm"],
         "bundle": true,
         "thirdParty": true,
+        "minify": true,
         "main": "apps/generate-ui-v2/src/main.ts",
         "tsConfig": "apps/generate-ui-v2/tsconfig.app.json",
         "assets": [
@@ -31,7 +32,7 @@
           }
         ],
         "esbuildOptions": {
-          "sourcemap": true,
+          "sourcemap": false,
           "outExtension": {
             ".js": ".js"
           }

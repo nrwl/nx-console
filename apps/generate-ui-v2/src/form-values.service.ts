@@ -7,7 +7,6 @@ import {
 } from './utils/generator-schema-utils';
 import {
   FormValues,
-  GenerateUiRequestValidationOutputMessage,
   GeneratorSchema,
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';

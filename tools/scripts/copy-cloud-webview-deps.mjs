@@ -2,7 +2,6 @@ import { copyFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 
 const files = [
-  join('@vscode', 'webview-ui-toolkit', 'dist', 'toolkit.js'),
   join('@vscode', 'codicons', 'dist', 'codicon.css'),
   join('@vscode', 'codicons', 'dist', 'codicon.ttf'),
 ];
