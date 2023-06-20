@@ -82,6 +82,7 @@ export type GenerateUiStyles = {
   foregroundColor: string;
   backgroundColor: string;
   primaryColor: string;
+  errorColor: string;
   fieldBackgroundColor: string;
   fieldBorderColor: string;
   focusBorderColor: string;

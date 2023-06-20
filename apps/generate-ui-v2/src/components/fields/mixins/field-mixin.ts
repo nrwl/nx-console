@@ -5,15 +5,15 @@ import { when } from 'lit/directives/when.js';
 import {
   EditorContext,
   EditorContextInterface,
-} from '../../contexts/editor-context';
+} from '../../../contexts/editor-context';
 import {
   compareWithDefaultValue,
   extractDefaultValue,
-} from '../../utils/generator-schema-utils';
+} from '../../../utils/generator-schema-utils';
 import {
   FieldValueConsumer,
   FieldValueConsumerInterface,
-} from '../field-value-consumer-mixin';
+} from '../../field-value-consumer-mixin';
 
 type Constructor<T> = new (...args: any[]) => T;
 
@@ -28,7 +28,6 @@ export declare class FieldInterface {
   protected setFieldValue(
     value: string | boolean | number | string[] | undefined
   ): void;
-  protected shouldRenderError(): boolean;
   protected fieldId: string;
   protected ariaAttributes: Record<string, string>;
 }
@@ -37,35 +36,6 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
   class FieldElement extends FieldValueConsumer(EditorContext(superClass)) {
     @property()
     option: Option;
-
-    protected render() {
-      return html`
-        <div
-          class="flex flex-col py-1 my-2 pl-3 border-l-4 ${this.shouldRenderError()
-            ? 'border-red-500'
-            : this.shouldRenderChanged()
-            ? 'border-primary'
-            : 'border-transparent'}"
-        >
-          <label for="${this.fieldId}"
-            >${this.option.name}${this.option.isRequired ? '*' : ''}</label
-          >
-          <p class="text-sm text-gray-500">${this.option.description}</p>
-          ${this.renderField()}
-          ${when(
-            this.shouldRenderError() && typeof this.validation === 'string',
-            () =>
-              html`<p
-                class="text-sm text-red-500"
-                id="${this.fieldId}-error"
-                aria-live="polite"
-              >
-                ${this.validation}
-              </p>`
-          )}
-        </div>
-      `;
-    }
 
     protected dispatchValue(
       value: string | boolean | number | string[] | undefined

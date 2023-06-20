@@ -2,6 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume, ContextConsumer } from '@lit-labs/context';
 import { editorContext } from '../contexts/editor-context';
+import { intellijFocusRing } from '../utils/ui-utils';
 
 @customElement('button-element')
 export class Button extends LitElement {
@@ -38,9 +39,10 @@ export class Button extends LitElement {
 
   renderIntellij() {
     return html`<button
-      class="py-1 px-4 rounded-md ${this.appearance === 'primary'
-        ? 'bg-primary'
-        : 'border border-fieldBorder'}"
+      class="py-1 px-4 rounded ${intellijFocusRing} ${this.appearance ===
+      'primary'
+        ? 'bg-primary focus:!ring-offset-1 focus:!ring-offset-background'
+        : 'border !border-fieldBorder focus:!border-focusBorder"}'}"
     >
       ${this.text}
     </button>`;

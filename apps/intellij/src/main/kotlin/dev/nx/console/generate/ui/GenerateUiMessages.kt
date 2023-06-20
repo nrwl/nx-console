@@ -70,6 +70,7 @@ data class GenerateUiStyles(
     val backgroundColor: String,
     val foregroundColor: String,
     val primaryColor: String,
+    val errorColor: String,
     val fieldBackgroundColor: String,
     val fieldBorderColor: String,
     val selectFieldBackgroundColor: String,

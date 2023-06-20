@@ -1,11 +1,18 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Field } from './field-mixin';
+import { Field } from './mixins/field-mixin';
 import { spread } from '@open-wc/lit-helpers';
-import { intellijFieldColors, intellijFocusRing } from '../../utils/ui-utils';
+import {
+  intellijErrorRingStyles,
+  intellijFieldColors,
+  intellijFieldPadding,
+  intellijFocusRing,
+  vscodeErrorStyleOverrides,
+} from '../../utils/ui-utils';
+import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('array-field')
-export class ArrayField extends Field(LitElement) {
+export class ArrayField extends FieldWrapper(Field(LitElement)) {
   @state()
   private elements: string[] = [];
 
@@ -18,6 +25,10 @@ export class ArrayField extends Field(LitElement) {
           appearance="secondary"
           @click="${this.addValue}"
           data-cy="${this.fieldId}-add-button"
+          class="self-center"
+          style="${this.shouldRenderError()
+            ? '--field-border-color: var(--error-color); --focus-border-color: var(--error-color);'
+            : ''}"
         ></button-element>
       </div>
       <div class="mt-2">
@@ -25,20 +36,11 @@ export class ArrayField extends Field(LitElement) {
         <div class="flex flex-row gap-4 mt-2">
           ${this.elements.map(
             (element, index) =>
-              html` <div
-                tabindex="0"
-                class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground focus:ring-1 focus:ring-focusBorder focus:outline-none"
-                data-cy="${this.fieldId}-item"
-                @keydown="${(event: KeyboardEvent) =>
-                  this.handleEnterKeyRemove(index, event)}"
-              >
-                <p class="leading-none">${element}</p>
-                <icon-element
-                  icon="close"
-                  @click="${() => this.removeValue(index)}"
-                  data-cy="${this.fieldId}-remove-button"
-                ></icon-element>
-              </div>`
+              html`<badge-element
+                text="${element}"
+                fieldId="${this.fieldId}"
+                @remove="${() => this.removeValue(index)}"
+              ></badge-element>`
           )}
         </div>
       </div>
@@ -48,7 +50,9 @@ export class ArrayField extends Field(LitElement) {
   private renderInputField() {
     if (this.editor === 'intellij') {
       return html` <input
-        class="${intellijFieldColors} grow ${intellijFocusRing}"
+        class="${intellijFieldColors} grow ${intellijFocusRing} rounded ${intellijFieldPadding} ${intellijErrorRingStyles(
+          this.shouldRenderError()
+        )})}"
         type="text"
         @keydown="${this.handleEnterKeyAdd}"
         ${spread(this.ariaAttributes)}
@@ -58,6 +62,7 @@ export class ArrayField extends Field(LitElement) {
         type="text"
         class="grow"
         @keydown="${this.handleEnterKeyAdd}"
+        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
         ${spread(this.ariaAttributes)}
       ></vscode-text-field>`;
     }
@@ -70,12 +75,6 @@ export class ArrayField extends Field(LitElement) {
   private handleEnterKeyAdd(event: KeyboardEvent) {
     if (event.key === 'Enter') {
       this.addValue();
-    }
-  }
-
-  private handleEnterKeyRemove(index: number, event: KeyboardEvent) {
-    if (event.key === 'Enter' || event.key === ' ') {
-      this.removeValue(index);
     }
   }
 

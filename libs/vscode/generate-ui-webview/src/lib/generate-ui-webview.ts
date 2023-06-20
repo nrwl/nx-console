@@ -91,7 +91,9 @@ export class GenerateUiWebview {
             <title>Generate UI</title>
             <link href="${stylesUri}" rel="stylesheet">
             <link href="${codiconsUri}" rel="stylesheet">
-            <style>
+            </head>
+        <body>
+        <style>
             :root {
               ${this.getVscodeStyleMappings()}
             }
@@ -99,8 +101,6 @@ export class GenerateUiWebview {
               padding: 0;
             }
             </style>
-            </head>
-        <body>
           <script type="module" src="${uiToolkitUri}">“</script>
           <script type="module" src="${scriptUri}"></script>
           
@@ -233,19 +233,24 @@ export class GenerateUiWebview {
   }
 
   private getVscodeStyleMappings(): string {
-    // --separator-color should really be --divider-background but that's not picked up for some reason
-    return `
+    // note that --vscode-settings-dropdownListBorder is the color used for the webview ui toolkit divider
+    // refer to https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/design-tokens.ts
+    const mappings = `
       --foreground-color: var(--vscode-editor-foreground);
       --background-color: var(--vscode-editor-background);
       --primary-color: var(--button-primary-background);
+      --error-color: var(--vscode-inputValidation-errorBorder);
       --field-border-color: var(--panel-view-border);
       --focus-border-color: var(--vscode-focusBorder);
-      --badge-background-color: var(--badge-background);
+      --badge-background-color: var(--vscode-badge-background);
+      --badge-foreground-color: var(--vscode-badge-foreground);
       --banner-warning-color: var(--vscode-statusBarItem-warningBackground);
       --banner-error-color: var(--vscode-statusBarItem-errorBackground);
       --banner-text-color: var(--vscode-statusBarItem-warningForeground);
-      --separator-color: var(--vscode-editorWidget-border);
+      --separator-color: var(--vscode-settings-dropdownListBorder);
       --field-nav-hover-color: var(--vscode-list-hoverBackground);
     `;
+    console.log(mappings);
+    return mappings;
   }
 }

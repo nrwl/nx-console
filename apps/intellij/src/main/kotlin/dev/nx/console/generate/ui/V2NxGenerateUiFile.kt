@@ -9,6 +9,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
+import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import javax.swing.JComponent
@@ -31,6 +32,10 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         registerAppSchemeHandler()
         browser.loadURL("http://nxconsolev2/index.html")
+        browser.jbCefClient.addContextMenuHandler(
+            OpenDevToolsContextMenuHandler(),
+            browser.cefBrowser
+        )
         Disposer.register(project, browser)
 
         return browser.component
@@ -72,7 +77,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                     )
             }
             browser.component.requestFocus()
-            browser.openDevtools()
+            //            browser.openDevtools()
         }
     }
 
@@ -123,7 +128,8 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                     false -> UIUtil.getLabelForeground()
                 }
             )
-        val primaryColor = getHexColor(UIManager.getColor("Button.default.startBackground"))
+        val primaryColor = getHexColor(UIManager.getColor("Button.default.endBackground"))
+        val errorColor = getHexColor(UIManager.getColor("Component.errorFocusColor"))
         val fieldBackgroundColor = getHexColor(UIManager.getColor("TextField.background"))
         val fieldBorderColor = getHexColor(UIManager.getColor("Component.borderColor"))
         val selectFieldBackgroundColor =
@@ -141,6 +147,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             backgroundColor = backgroundColor,
             foregroundColor = foregroundColor,
             primaryColor = primaryColor,
+            errorColor = errorColor,
             fieldBackgroundColor = fieldBackgroundColor,
             fieldBorderColor = fieldBorderColor,
             selectFieldBackgroundColor = selectFieldBackgroundColor,

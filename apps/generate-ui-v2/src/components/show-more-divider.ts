@@ -40,7 +40,7 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
     if (e.key === 'Enter' || e.key === ' ') {
       this.toggleShowMore();
     }
-    if (e.key === 'Tab' && !this.showMore) {
+    if (e.key === 'Tab' && !e.shiftKey && !this.showMore) {
       this.toggleShowMore();
     }
   }

@@ -3,13 +3,19 @@ import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
-import { Field } from './field-mixin';
+import { Field } from './mixins/field-mixin';
 import { extractDefaultValue } from '../../utils/generator-schema-utils';
 import { spread } from '@open-wc/lit-helpers';
-import { intellijFocusRing } from '../../utils/ui-utils';
+import {
+  intellijErrorRingStyles,
+  intellijFieldPadding,
+  intellijFocusRing,
+  vscodeErrorStyleOverrides,
+} from '../../utils/ui-utils';
+import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('select-field')
-export class SelectField extends Field(LitElement) {
+export class SelectField extends FieldWrapper(Field(LitElement)) {
   renderField() {
     if (this.editor === 'intellij') {
       return this.renderIntellij();
@@ -22,7 +28,9 @@ export class SelectField extends Field(LitElement) {
     return html`
       <select
         @change="${this.handleChange}"
-        class="bg-selectFieldBackground border border-fieldBorder rounded ${intellijFocusRing}"
+        class="form-select bg-selectFieldBackground border border-fieldBorder rounded ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
+          this.shouldRenderError()
+        )})}"
         ${spread(this.ariaAttributes)}
       >
         ${when(
@@ -41,9 +49,7 @@ export class SelectField extends Field(LitElement) {
     return html`
       <vscode-dropdown
         @change="${this.handleChange}"
-        style="${this.shouldRenderError()
-          ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
-          : ''}"
+        style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
         ${spread(this.ariaAttributes)}
       >
         ${when(
