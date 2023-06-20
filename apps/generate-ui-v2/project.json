@@ -6,11 +6,7 @@
   "targets": {
     "build": {
       "command": "npx tailwindcss -i dist/apps/generate-ui-v2/tailwind.css -o dist/apps/generate-ui-v2/output.css -c apps/generate-ui-v2/tailwind.config.js --content 'dist/apps/generate-ui-v2/*.{html,js}'",
-      "dependsOn": ["extract-dependencies"],
-      "configurations": {
-        "development": {},
-        "production": {}
-      }
+      "dependsOn": ["extract-dependencies"]
     },
     "extract-dependencies": {
       "command": "node ./tools/scripts/copy-generate-ui-deps.mjs",
@@ -19,7 +15,6 @@
     "_build": {
       "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/generate-ui-v2",
         "format": ["esm"],
@@ -39,17 +34,6 @@
           "sourcemap": true,
           "outExtension": {
             ".js": ".js"
-          }
-        }
-      },
-      "configurations": {
-        "development": {},
-        "production": {
-          "esbuildOptions": {
-            "sourcemap": false,
-            "outExtension": {
-              ".js": ".js"
-            }
           }
         }
       }
