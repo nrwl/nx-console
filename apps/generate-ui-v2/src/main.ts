@@ -14,7 +14,7 @@ import {
 } from './form-values.service';
 import { submittedContext } from './contexts/submitted-context';
 
-import './all-components';
+import './components/all-components';
 
 @customElement('root-element')
 export class Root extends LitElement {

@@ -81,9 +81,7 @@ export class GenerateUiWebview {
             <title>Generate UI</title>
             <link href="${stylesUri}" rel="stylesheet">
             <link href="${codiconsUri}" rel="stylesheet">
-            </head>
-        <body>
-        <style>
+            <style>
             :root {
               ${this.getVscodeStyleMappings()}
             }
@@ -91,7 +89,7 @@ export class GenerateUiWebview {
               padding: 0;
             }
             </style>
-            </head>
+        </head>
         <body>
           <script type="module" src="${scriptUri}"></script>
           
