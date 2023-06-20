@@ -1,21 +1,7 @@
 import { ContextProvider } from '@lit-labs/context';
-import { html, LitElement, PropertyValueMap } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import './components/fields/checkbox-field';
-import './components/fields/array-field';
-import './components/fields/input-field';
-import './components/fields/multiselect-field';
-import './components/fields/select-field';
-import './components/button';
-import './components/field-list';
-import './components/search-bar';
-import './components/banner';
-import './components/icon';
-import './components/field-nav-item';
-import './components/show-more-divider';
-import './components/badge';
-import '@nx-console/shared/lit-utils';
 import { editorContext } from './contexts/editor-context';
 import {
   debounce,
@@ -27,6 +13,8 @@ import {
   FormValuesService,
 } from './form-values.service';
 import { submittedContext } from './contexts/submitted-context';
+
+import './all-components';
 
 @customElement('root-element')
 export class Root extends LitElement {
