@@ -11,9 +11,17 @@ export class Icon extends EditorContext(LitElement) {
     if (this.editor === 'intellij') {
       return html`<img
         src="./icons/${this.icon}.svg"
+        class="h-[1.25rem]"
       ></img>`;
     } else {
-      return html`<codicon-element icon="${this.icon}"></codicon-element>`;
+      return html`<i
+        class="codicon codicon-${this.icon}"
+        style="text-align: center; font-size: 0.9rem;"
+      ></i>`;
     }
+  }
+
+  protected createRenderRoot(): Element | ShadowRoot {
+    return this;
   }
 }
