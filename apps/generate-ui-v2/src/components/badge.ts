@@ -16,7 +16,7 @@ export class Banner extends EditorContext(LitElement) {
     return html`
       <div
         tabindex="0"
-        class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground text-badgeForeground rounded focus:ring-1 focus:ring-focusBorder focus:outline-none ${this.editorSpecificStyles()}"
+        class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground text-badgeForeground rounded focus:ring-focusBorder focus:outline-none ${this.editorSpecificStyles()}"
         @keydown="${this.handleEnterKeyRemove}"
         data-cy="${this.fieldId}-item"
       >
@@ -32,9 +32,9 @@ export class Banner extends EditorContext(LitElement) {
 
   private editorSpecificStyles(): string {
     if (this.editor === 'intellij') {
-      return 'border border-fieldBorder';
+      return 'border border-fieldBorder focus:ring-2';
     } else {
-      return 'focus:ring-offset-1';
+      return 'focus:ring-1 focus:!ring-offset-1 focus:!ring-offset-background';
     }
   }
 
