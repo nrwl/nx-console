@@ -11,7 +11,6 @@ import './icon';
 import './field-nav-item';
 import './show-more-divider';
 import './badge';
-import '@nx-console/shared/lit-utils';
 import {
   provideVSCodeDesignSystem,
   vsCodeButton,

@@ -1,11 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { EditorContext } from '../contexts/editor-context';
-import {
-  intellijFieldColors,
-  intellijFieldPadding,
-  intellijFocusRing,
-} from '../utils/ui-utils';
+import { intellijFieldColors, intellijFocusRing } from '../utils/ui-utils';
 
 @customElement('search-bar')
 export class SearchBar extends EditorContext(LitElement) {
@@ -14,7 +10,7 @@ export class SearchBar extends EditorContext(LitElement) {
       return html`
         <div class="relative inline-block w-full">
           <input
-            class="w-full px-2 py-2 pl-7 text-black ${intellijFieldColors} ${intellijFocusRing} text-foreground rounded"
+            class="w-full px-2 py-2 pl-8 text-black ${intellijFieldColors} ${intellijFocusRing} text-foreground rounded"
             type="text"
             placeholder="Search..."
             @input="${this.handleInput}"
@@ -22,7 +18,7 @@ export class SearchBar extends EditorContext(LitElement) {
           />
           <icon-element
             icon="search"
-            class="absolute left-2 top-3"
+            class="absolute left-2 top-[0.7rem]"
           ></icon-element>
         </div>
       `;
@@ -36,7 +32,7 @@ export class SearchBar extends EditorContext(LitElement) {
           id="search-bar"
         >
           <span slot="start">
-            <codicon-element icon="search"></codicon-element>
+            <icon-element icon="search"></icon-element>
           </span>
         </vscode-text-field>
       `;

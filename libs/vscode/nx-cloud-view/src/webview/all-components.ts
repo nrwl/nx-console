@@ -1,4 +1,3 @@
-import '@nx-console/shared/lit-utils';
 import {
   allComponents,
   provideVSCodeDesignSystem,
@@ -10,5 +9,6 @@ import './components/status-labels';
 import './components/steps';
 import './components/ui/callout';
 import './components/ui/logo';
+import './components/ui/codicon-element';
 
 provideVSCodeDesignSystem().register(allComponents);

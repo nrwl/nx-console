@@ -9,18 +9,15 @@ import {
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import {
-  getNxWorkspace,
-  getNxWorkspacePath,
-} from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import {
-  commands,
   ExtensionContext,
   Uri,
   ViewColumn,
   WebviewPanel,
+  commands,
   window,
 } from 'vscode';
 
@@ -92,10 +89,6 @@ export class GenerateUiWebview {
         </head>
         <body>
           <script type="module" src="${scriptUri}"></script>
-          
-          <script type="text/javascript">
-            window.codiconsUri = "${codiconsUri}";
-          </script>
 
           <root-element></root-element>
 
