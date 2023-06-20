@@ -1,5 +1,5 @@
 import { ContextProvider } from '@lit-labs/context';
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import './components/fields/checkbox-field';
@@ -16,7 +16,10 @@ import './components/field-nav-item';
 import './components/show-more-divider';
 import '@nx-console/shared/lit-utils';
 import { editorContext } from './contexts/editor-context';
-import { debounce, getGeneratorIdentifier } from './generator-schema-utils';
+import {
+  debounce,
+  getGeneratorIdentifier,
+} from './utils/generator-schema-utils';
 import { IdeCommunicationController } from './ide-communication.controller';
 import {
   formValuesServiceContext,
@@ -61,7 +64,7 @@ export class Root extends LitElement {
     const options = this.icc.generatorSchema?.options;
     return html` <div
       class="text-foreground h-screen flex flex-col"
-      @keydown="${this.handleGeneratorShortcut}"
+      @keydown="${this.handleGlobalKeyboardShortcuts}"
     >
       <div
         class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-separator"
@@ -80,10 +83,6 @@ export class Root extends LitElement {
     </div>`;
   }
 
-  private handleSearchValueChange(e: CustomEvent) {
-    this.searchValue = e.detail;
-  }
-
   private renderHeader() {
     const isNxGenerator =
       this.icc.generatorSchema?.collectionName?.includes('@nx') ||
@@ -97,16 +96,21 @@ export class Root extends LitElement {
     return html`
       <div class="">
         <header class="flex justify-between items-center">
-          <div>
-            <h1 class="text-xl font-bold">
+          <div class="flex flex-wrap gap-2 items-end">
+            <h1 class="text-xl font-bold leading-none" data-cy="header-text">
               nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
             </h1>
             ${when(
               isNxGenerator && this.icc.editor === 'vscode',
               () =>
-                html`<a href="${nxDevLink}" target="_blank" class="text-sm"
-                  >View full details
-                </a> `
+                html`
+                  <a
+                    href="${nxDevLink}"
+                    target="_blank"
+                    class="text-sm underline leading-none pb-px focus:ring-1 focus:ring-focusBorder focus:outline-none"
+                    >View full details
+                  </a>
+                `
             )}
           </div>
 
@@ -126,6 +130,7 @@ export class Root extends LitElement {
               class="px-3 py-2"
               @click="${() => this.runGenerator()}"
               text="Generate"
+              data-cy="generate-button"
             >
             </button-element>
           </div>
@@ -147,17 +152,33 @@ export class Root extends LitElement {
     `;
   }
 
+  private handleSearchValueChange(e: CustomEvent) {
+    this.searchValue = e.detail;
+  }
+
   private handleValidFormChange() {
     if (this.icc.configuration?.enableTaskExecutionDryRunOnChange) {
       this.debouncedRunGenerator(true);
     }
   }
 
-  private handleGeneratorShortcut(e: KeyboardEvent) {
+  private handleGlobalKeyboardShortcuts(e: KeyboardEvent) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
 
-      this.runGenerator();
+      if (e.shiftKey) {
+        this.runGenerator(true);
+      } else {
+        this.runGenerator();
+      }
+    }
+    if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      const searchBar = this.renderRoot.querySelector('[id="search-bar"]');
+      console.log(searchBar);
+      if (searchBar) {
+        (searchBar as HTMLElement).focus();
+      }
     }
   }
 

@@ -9,7 +9,7 @@ import {
 import {
   compareWithDefaultValue,
   extractDefaultValue,
-} from '../../generator-schema-utils';
+} from '../../utils/generator-schema-utils';
 import {
   FieldValueConsumer,
   FieldValueConsumerInterface,
@@ -44,7 +44,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
           class="flex flex-col py-1 my-2 pl-3 border-l-4 ${this.shouldRenderError()
             ? 'border-red-500'
             : this.shouldRenderChanged()
-            ? 'border-blue-500'
+            ? 'border-primary'
             : 'border-transparent'}"
         >
           <label for="${this.fieldId}"

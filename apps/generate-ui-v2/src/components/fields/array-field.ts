@@ -2,13 +2,13 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Field } from './field-mixin';
 import { spread } from '@open-wc/lit-helpers';
+import { intellijFieldColors, intellijFocusRing } from '../../utils/ui-utils';
 
 @customElement('array-field')
 export class ArrayField extends Field(LitElement) {
   @state()
   private elements: string[] = [];
 
-  // TODO: GENERALIZE ICON ELEMENT
   renderField() {
     return html`<div>
       <div class="flex flex-row gap-2">
@@ -17,6 +17,7 @@ export class ArrayField extends Field(LitElement) {
           text="Add"
           appearance="secondary"
           @click="${this.addValue}"
+          data-cy="${this.fieldId}-add-button"
         ></button-element>
       </div>
       <div class="mt-2">
@@ -27,13 +28,15 @@ export class ArrayField extends Field(LitElement) {
               html` <div
                 tabindex="0"
                 class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground focus:ring-1 focus:ring-focusBorder focus:outline-none"
+                data-cy="${this.fieldId}-item"
                 @keydown="${(event: KeyboardEvent) =>
                   this.handleEnterKeyRemove(index, event)}"
               >
                 <p class="leading-none">${element}</p>
                 <icon-element
-                  @click="${() => this.removeValue(index)}"
                   icon="close"
+                  @click="${() => this.removeValue(index)}"
+                  data-cy="${this.fieldId}-remove-button"
                 ></icon-element>
               </div>`
           )}
@@ -45,7 +48,7 @@ export class ArrayField extends Field(LitElement) {
   private renderInputField() {
     if (this.editor === 'intellij') {
       return html` <input
-        class="bg-fieldBackground border border-fieldBorder grow"
+        class="${intellijFieldColors} grow ${intellijFocusRing}"
         type="text"
         @keydown="${this.handleEnterKeyAdd}"
         ${spread(this.ariaAttributes)}

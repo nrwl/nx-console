@@ -69,6 +69,7 @@
     "@nx/linter": "16.3.1",
     "@nx/node": "16.3.1",
     "@nx/storybook": "16.3.1",
+    "@nx/web": "^16.3.2",
     "@nx/webpack": "16.3.1",
     "@nx/workspace": "16.3.1",
     "@schematics/angular": "16.0.4",

@@ -83,6 +83,18 @@ export class FieldList extends LitElement {
     `;
   }
 
+  protected firstUpdated(): void {
+    this.updateComplete.then(() => {
+      const field = Array.from(this.renderRoot.querySelectorAll('*')).find(
+        (el) =>
+          el.id.toLowerCase().endsWith('-field') && el instanceof HTMLElement
+      );
+      if (field) {
+        (field as HTMLElement).focus();
+      }
+    });
+  }
+
   private handleTreeClickEvent(event: Event) {
     const element = this.querySelector(
       `#option-${(event.target as HTMLElement).innerText}`
@@ -143,7 +155,7 @@ const getHiddenOptionNames = (
   if (!searchValue) {
     return hiddenOptions;
   }
-  options.forEach((option) => {
+  options?.forEach((option) => {
     if (!option.name.includes(searchValue)) {
       hiddenOptions.add(option.name);
     }
@@ -154,7 +166,7 @@ const getHiddenOptionNames = (
 const splitOptionsByPriority = (options: Option[]): [Option[], Option[]] => {
   const importantOptions: Option[] = [];
   const otherOptions: Option[] = [];
-  options.forEach((option) => {
+  options?.forEach((option) => {
     if (option.isRequired || option['x-priority'] === 'important') {
       importantOptions.push(option);
     } else {

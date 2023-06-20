@@ -3,9 +3,10 @@ import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { Field } from './field-mixin';
-import { extractDefaultValue } from '../../generator-schema-utils';
+import { extractDefaultValue } from '../../utils/generator-schema-utils';
 import { when } from 'lit/directives/when.js';
 import { spread } from '@open-wc/lit-helpers';
+import { intellijFocusRing } from '../../utils/ui-utils';
 
 @customElement('multiselect-field')
 export class MultiselectField extends Field(LitElement) {
@@ -29,11 +30,13 @@ export class MultiselectField extends Field(LitElement) {
                   class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground focus:ring-1 focus:ring-focusBorder focus:outline-none"
                   @keydown="${(event: KeyboardEvent) =>
                     this.handleEnterKeyRemove(index, event)}"
+                  data-cy="${this.fieldId}-item"
                 >
                   <p class="leading-none">${element}</p>
                   <icon-element
                     @click="${() => this.removeValue(index)}"
                     icon="close"
+                    data-cy="${this.fieldId}-remove-button"
                   ></icon-element>
                 </div>`
             )}
@@ -46,7 +49,7 @@ export class MultiselectField extends Field(LitElement) {
     if (this.editor === 'intellij') {
       return html`<select
         @change="${this.addValue}"
-        class="bg-selectFieldBackground border border-fieldBorder"
+        class="bg-selectFieldBackground border border-fieldBorder rounded ${intellijFocusRing}"
         ${spread(this.ariaAttributes)}
       >
         <option value="">

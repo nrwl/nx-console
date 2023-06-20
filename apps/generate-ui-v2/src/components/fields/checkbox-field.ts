@@ -2,6 +2,7 @@ import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Field } from './field-mixin';
 import { spread } from '@open-wc/lit-helpers';
+import { intellijFieldColors, intellijFocusRing } from '../../utils/ui-utils';
 
 @customElement('checkbox-field')
 export class CheckboxField extends Field(LitElement) {
@@ -9,7 +10,7 @@ export class CheckboxField extends Field(LitElement) {
     if (this.editor === 'intellij') {
       return html`<input
         type="checkbox"
-        class="form-checkbox bg-fieldBackground border border-fieldBorder rounded checked:bg-primary checked:border-transparent"
+        class="form-checkbox ${intellijFieldColors} rounded checked:bg-primary checked:border-transparent ${intellijFocusRing} focus:ring-offset-0"
         @input="${this.handleChange}"
         ${spread(this.ariaAttributes)}
       />`;

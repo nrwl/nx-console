@@ -12,6 +12,7 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
       <div
         class="flex flex-row items-center space-x-4 pl-4"
         @click=${this.toggleShowMore}
+        data-cy="show-more"
       >
         <hr
           class="grow h-0 ${
@@ -36,8 +37,10 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
   }
 
   handleKeyEvent(e: KeyboardEvent) {
-    console.log(e.key);
     if (e.key === 'Enter' || e.key === ' ') {
+      this.toggleShowMore();
+    }
+    if (e.key === 'Tab' && !this.showMore) {
       this.toggleShowMore();
     }
   }

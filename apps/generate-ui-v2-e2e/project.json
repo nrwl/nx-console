@@ -1,0 +1,49 @@
+{
+  "name": "generate-ui-v2-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/generate-ui-v2-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/generate-ui-v2-e2e/cypress.config.ts",
+        "devServerTarget": "generate-ui-v2-e2e:serve",
+        "testingType": "e2e",
+        "baseUrl": "http://localhost:4200",
+        "browser": "electron"
+      },
+      "configurations": {
+        "watch": {
+          "watch": true,
+          "headed": true
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/generate-ui-v2-e2e/**/*.{js,ts}"]
+      }
+    },
+    "serve": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "staticFilePath": "apps/generate-ui-v2-e2e/dist/generate-ui-v2",
+        "buildTarget": "generate-ui-v2-e2e:setup-lit-dir",
+        "watch": false
+      },
+      "dependsOn": ["setup-lit-dir"]
+    },
+    "setup-lit-dir": {
+      "command": "node ./setup-lit-dir.mjs",
+      "options": {
+        "cwd": "apps/generate-ui-v2-e2e"
+      },
+      "dependsOn": ["generate-ui-v2:build"]
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["generate-ui-v2"]
+}
