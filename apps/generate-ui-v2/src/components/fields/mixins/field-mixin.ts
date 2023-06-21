@@ -17,6 +17,12 @@ import {
 
 type Constructor<T> = new (...args: any[]) => T;
 
+export type OptionChangedDetails = {
+  name: string;
+  value: string | number | boolean | string[] | undefined;
+  isDefaultValue: boolean;
+};
+
 export declare class FieldInterface {
   option: Option;
   protected renderField(): TemplateResult;
@@ -44,7 +50,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       const isDefaultValue = compareWithDefaultValue(value, defaultValue);
 
       this.dispatchEvent(
-        new CustomEvent('option-changed', {
+        new CustomEvent<OptionChangedDetails>('option-changed', {
           bubbles: true,
           composed: true,
           detail: {
@@ -60,12 +66,32 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       _changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>
     ): void {
       super.updated(_changedProperties);
+
+      if (this.generatorContext) {
+        if (
+          (this.generatorContext.project && this.option.name === 'project') ||
+          this.option.name === 'projectName'
+        ) {
+          this.setFieldValue(this.generatorContext.project);
+          this.dispatchValue(this.generatorContext.project);
+          return;
+        }
+        if (
+          this.generatorContext.directory &&
+          this.option.name === 'directory'
+        ) {
+          this.setFieldValue(this.generatorContext.directory);
+          this.dispatchValue(this.generatorContext.directory);
+          return;
+        }
+      }
+
       const defaultValue = extractDefaultValue(this.option);
 
       if (defaultValue) {
         this.setFieldValue(defaultValue);
+        this.dispatchValue(defaultValue);
       }
-      this.dispatchValue(defaultValue);
     }
 
     protected get fieldId(): string {

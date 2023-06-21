@@ -4,6 +4,8 @@ import { formValuesServiceContext } from '../form-values.service';
 import { submittedContext } from '../contexts/submitted-context';
 import { state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared/schema';
+import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
+import { generatorContextContext } from '../contexts/generator-context-context';
 
 type Constructor<T> = new (...args: any[]) => T;
 
@@ -13,6 +15,7 @@ export declare class FieldValueConsumerInterface {
   protected touched: boolean;
   protected isDefaultValue: boolean;
   protected submitted: boolean;
+  protected generatorContext: GeneratorContext | undefined;
   protected shouldRenderChanged(): boolean;
   protected shouldRenderError(): boolean;
 }
@@ -34,6 +37,8 @@ export const FieldValueConsumer = <T extends Constructor<LitElement>>(
 
     @state()
     private submitted = false;
+
+    @state() generatorContext: GeneratorContext | undefined;
 
     constructor(...rest: any[]) {
       super();
@@ -58,6 +63,12 @@ export const FieldValueConsumer = <T extends Constructor<LitElement>>(
       new ContextConsumer(this, {
         context: submittedContext,
         callback: (submitted) => (this.submitted = submitted),
+        subscribe: true,
+      });
+      new ContextConsumer(this, {
+        context: generatorContextContext,
+        callback: (generatorContext) =>
+          (this.generatorContext = generatorContext),
         subscribe: true,
       });
     }

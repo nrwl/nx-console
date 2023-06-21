@@ -10,6 +10,7 @@ import {
   GeneratorSchema,
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
+import { OptionChangedDetails } from './components/fields/mixins/field-mixin';
 
 export const formValuesServiceContext = createContext<FormValuesService>(
   Symbol('form-values')
@@ -36,36 +37,43 @@ export class FormValuesService {
     private icc: IdeCommunicationController,
     private validFormCallback: () => void
   ) {
-    window.addEventListener('option-changed', async (e: CustomEventInit) => {
-      // update internal state
-      this.formValues = {
-        ...this.formValues,
-        [e.detail.name]: e.detail.value,
-      };
-
-      this.validationResults = await this.validate(
-        this.formValues,
-        this.icc.generatorSchema
-      );
-
-      // notify consumers of changes
-      Object.entries(this.validationListeners).forEach(([key, callbacks]) => {
-        callbacks?.forEach((callback) => callback(this.validationResults[key]));
-      });
-      if (!e.detail.isDefaultValue) {
-        if (Object.keys(this.validationResults).length === 0) {
-          this.validFormCallback();
-        }
-        this.touchedListeners[e.detail.name]?.forEach((callback) =>
-          callback(true)
-        );
+    window.addEventListener(
+      'option-changed',
+      (e: CustomEventInit<OptionChangedDetails>) => {
+        if (!e.detail) return;
+        this.handleOptionChange(e.detail);
       }
-      if (this.defaultValueListeners[e.detail.name]) {
-        this.defaultValueListeners[e.detail.name]?.forEach((callback) =>
-          callback(e.detail.isDefaultValue)
-        );
-      }
+    );
+  }
+
+  private async handleOptionChange(details: OptionChangedDetails) {
+    this.formValues = {
+      ...this.formValues,
+      [details.name]: details.value,
+    };
+
+    this.validationResults = await this.validate(
+      this.formValues,
+      this.icc.generatorSchema
+    );
+
+    // notify consumers of changes
+    Object.entries(this.validationListeners).forEach(([key, callbacks]) => {
+      callbacks?.forEach((callback) => callback(this.validationResults[key]));
     });
+    if (!details.isDefaultValue) {
+      if (Object.keys(this.validationResults).length === 0) {
+        this.validFormCallback();
+      }
+      this.touchedListeners[details.name]?.forEach((callback) =>
+        callback(true)
+      );
+    }
+    if (this.defaultValueListeners[details.name]) {
+      this.defaultValueListeners[details.name]?.forEach((callback) =>
+        callback(details.isDefaultValue)
+      );
+    }
   }
 
   private async validate(
@@ -100,6 +108,21 @@ export class FormValuesService {
     return { ...errors, ...pluginValidationResults };
   }
 
+  getSerializedFormValues(): string[] {
+    const args: string[] = [];
+    Object.entries(this.formValues).forEach(([key, value]) => {
+      const option = this.icc.generatorSchema?.options.find(
+        (option) => option.name === key
+      );
+      const defaultValue = extractDefaultValue(option);
+      if (compareWithDefaultValue(value, defaultValue)) return;
+      args.push(`--${key}=${value}`);
+    });
+    return args;
+  }
+
+  /** listeners **/
+
   registerValidationListener(
     key: string,
     listener: (value: string | boolean | undefined) => void
@@ -119,18 +142,5 @@ export class FormValuesService {
   registerTouchedListener(key: string, listener: (isTouched: boolean) => void) {
     if (!this.touchedListeners[key]) this.touchedListeners[key] = [];
     this.touchedListeners[key].push(listener);
-  }
-
-  getSerializedFormValues(): string[] {
-    const args: string[] = [];
-    Object.entries(this.formValues).forEach(([key, value]) => {
-      const option = this.icc.generatorSchema?.options.find(
-        (option) => option.name === key
-      );
-      const defaultValue = extractDefaultValue(option);
-      if (compareWithDefaultValue(value, defaultValue)) return;
-      args.push(`--${key}=${value}`);
-    });
-    return args;
   }
 }

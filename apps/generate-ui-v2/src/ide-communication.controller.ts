@@ -1,3 +1,4 @@
+import { ContextProvider } from '@lit-labs/context';
 import {
   FormValues,
   GenerateUiConfiguration,
@@ -5,13 +6,16 @@ import {
   GenerateUiOutputMessage,
   GenerateUiRequestValidationOutputMessage,
   GenerateUiStyles,
+  GeneratorContext,
   GeneratorSchema,
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
-import { Option, OptionType } from '@nx-console/shared/schema';
-import { ReactiveController, ReactiveControllerHost } from 'lit';
+import { Option } from '@nx-console/shared/schema';
+import { ReactiveController, ReactiveElement } from 'lit';
 
 import type { WebviewApi } from 'vscode-webview';
+import { editorContext } from './contexts/editor-context';
+import { generatorContextContext } from './contexts/generator-context-context';
 
 export class IdeCommunicationController implements ReactiveController {
   editor: 'vscode' | 'intellij';
@@ -27,7 +31,11 @@ export class IdeCommunicationController implements ReactiveController {
 
   private postToIde: (message: unknown) => void;
 
-  constructor(private host: ReactiveControllerHost) {
+  private generatorContextContextProvider: ContextProvider<{
+    __context__: GeneratorContext | undefined;
+  }>;
+
+  constructor(private host: ReactiveElement) {
     let vscode: WebviewApi<undefined> | undefined;
     try {
       vscode = acquireVsCodeApi();
@@ -38,6 +46,11 @@ export class IdeCommunicationController implements ReactiveController {
     this.editor = vscode ? 'vscode' : 'intellij';
     console.log('initializing ide communication for', this.editor);
 
+    new ContextProvider(host, {
+      context: editorContext,
+      initialValue: this.editor,
+    });
+
     if (vscode) {
       this.setupVscodeCommunication(vscode);
     } else {
@@ -46,6 +59,11 @@ export class IdeCommunicationController implements ReactiveController {
 
     this.postMessageToIde({
       payloadType: 'output-init',
+    });
+
+    this.generatorContextContextProvider = new ContextProvider(host, {
+      context: generatorContextContext,
+      initialValue: undefined,
     });
   }
 
@@ -114,19 +132,23 @@ export class IdeCommunicationController implements ReactiveController {
   }
 
   private handleInputMessage(message: GenerateUiInputMessage) {
-    // TODO: Allow the UI to support array properties
     const optionFilter = (option: Option) =>
       option['x-priority'] !== 'internal';
 
     switch (message.payloadType) {
       case 'generator': {
-        const description = message.payload;
-        const descriptionWithFilteredOptions = {
-          ...description,
-          options: description.options.filter(optionFilter),
+        const schema = message.payload;
+        const schemaWithFilteredOptions = {
+          ...schema,
+          options: schema.options.filter(optionFilter),
         };
-        this.generatorSchema = descriptionWithFilteredOptions;
+        this.generatorSchema = schemaWithFilteredOptions;
+        this.generatorContextContextProvider.setValue(
+          this.generatorSchema.context
+        );
+
         this.host.requestUpdate();
+
         break;
       }
 
@@ -176,17 +198,6 @@ export class IdeCommunicationController implements ReactiveController {
       font-family: ${styles.fontFamily};
     }
     `);
-    // --secondary-text-color: ${styles.secondaryTextColor};
-    // --text-input-background-color: ${styles.fieldBackground};
-    // --text-input-border-color: ${styles.secondaryTextColor};
-    // --checkbox-background-color: ${styles.fieldBackground};
-    // --checkbox-border-color: ${styles.secondaryTextColor};
-    // --dropdown-input-background-color: ${styles.fieldBackground};
-    // --dropdown-input-border-color: ${styles.secondaryTextColor};
-    // --font-family: ${styles.fontFamily};
-    // --font-size: ${styles.fontSize};
-    // --button-secondary-color: ${styles.fieldBackground};
-    // --button-secondary-text-color: ${styles.secondaryTextColor};
     document.adoptedStyleSheets = [styleSheet];
   }
 }

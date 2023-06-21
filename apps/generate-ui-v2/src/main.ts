@@ -2,7 +2,6 @@ import { ContextProvider } from '@lit-labs/context';
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { editorContext } from './contexts/editor-context';
 import {
   debounce,
   getGeneratorIdentifier,
@@ -15,14 +14,11 @@ import {
 import { submittedContext } from './contexts/submitted-context';
 
 import './components/index';
+import { generatorContextContext } from './contexts/generator-context-context';
 
 @customElement('root-element')
 export class Root extends LitElement {
   private icc: IdeCommunicationController;
-
-  private editorContextProvider = new ContextProvider(this, {
-    context: editorContext,
-  });
 
   private formValuesService: FormValuesService;
   private formValuesServiceContextProvider = new ContextProvider(this, {
@@ -37,8 +33,6 @@ export class Root extends LitElement {
   constructor() {
     super();
     this.icc = new IdeCommunicationController(this);
-
-    this.editorContextProvider.setValue(this.icc.editor);
 
     this.formValuesService = new FormValuesService(this.icc, () =>
       this.handleValidFormChange()

@@ -1,7 +1,7 @@
 import { createContext } from '@lit-labs/context';
 import { LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { consume, ContextConsumer } from '@lit-labs/context';
+import { ContextConsumer } from '@lit-labs/context';
 
 export const editorContext = createContext<'vscode' | 'intellij'>(
   Symbol('editor')
@@ -27,7 +27,7 @@ export const EditorContext = <T extends Constructor<LitElement>>(
         callback: (value) => {
           this.editor = value;
         },
-        subscribe: false,
+        subscribe: true,
       });
     }
   }
