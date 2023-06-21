@@ -51,6 +51,11 @@ export class IdeCommunicationController implements ReactiveController {
       initialValue: this.editor,
     });
 
+    this.generatorContextContextProvider = new ContextProvider(host, {
+      context: generatorContextContext,
+      initialValue: undefined,
+    });
+
     if (vscode) {
       this.setupVscodeCommunication(vscode);
     } else {
@@ -59,11 +64,6 @@ export class IdeCommunicationController implements ReactiveController {
 
     this.postMessageToIde({
       payloadType: 'output-init',
-    });
-
-    this.generatorContextContextProvider = new ContextProvider(host, {
-      context: generatorContextContext,
-      initialValue: undefined,
     });
   }
 
