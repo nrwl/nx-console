@@ -91,7 +91,10 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       if (defaultValue) {
         this.setFieldValue(defaultValue);
         this.dispatchValue(defaultValue);
+        return;
       }
+
+      this.dispatchValue(undefined);
     }
 
     protected get fieldId(): string {
