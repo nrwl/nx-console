@@ -60,6 +60,11 @@ export type GeneratorSchema = {
   generatorName: string;
   description: string;
   options: Option[];
+  context?: {
+    path?: string;
+    directory?: string;
+    project?: string;
+  };
 };
 
 export class GenerateUiConfigurationInputMessage {
