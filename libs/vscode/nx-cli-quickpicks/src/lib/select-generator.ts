@@ -8,8 +8,10 @@ import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getGeneratorOptions,
   getGenerators,
+  getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
+import { selectFlags } from './select-flags';
 
 export async function selectGenerator(
   generatorType?: GeneratorType,
@@ -92,4 +94,33 @@ export async function selectGenerator(
       };
     }
   }
+}
+
+export async function selectGeneratorAndPromptForFlags(): Promise<
+  | {
+      generator: TaskExecutionSchema;
+      flags: string[];
+    }
+  | undefined
+> {
+  const { validWorkspaceJson } = await getNxWorkspace();
+
+  if (!validWorkspaceJson) {
+    return;
+  }
+
+  const selection = await selectGenerator();
+  if (!selection) {
+    return;
+  }
+
+  const flags = await selectFlags(
+    `generate ${selection.positional}`,
+    selection.options
+  );
+
+  return {
+    generator: selection,
+    flags: flags ?? [],
+  };
 }

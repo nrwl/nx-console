@@ -65,7 +65,7 @@
     "@nx/esbuild": "16.3.1",
     "@nx/eslint-plugin": "16.3.1",
     "@nx/jest": "16.3.1",
-    "@nx/js": "16.3.1",
+    "@nx/js": "16.3.2",
     "@nx/linter": "16.3.1",
     "@nx/node": "16.3.1",
     "@nx/storybook": "16.3.1",

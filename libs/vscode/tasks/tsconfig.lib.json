@@ -7,5 +7,12 @@
     "types": ["node"]
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
-  "include": ["**/*.ts"]
+  "include": [
+    "**/*.ts",
+    "../nx-cli-quickpicks/src/lib/select-generator.ts",
+    "../nx-cli-quickpicks/src/lib/select-re-move-generator.ts",
+    "../nx-cli-quickpicks/src/lib/cli-task-quick-pick-item.ts",
+    "../nx-cli-quickpicks/src/lib/select-flags.ts",
+    "../nx-cli-quickpicks/src/lib/cli-task-flag-quick-pick-item.ts"
+  ]
 }

@@ -104,7 +104,10 @@
       ],
       "@nx-console/vscode/utils": ["libs/vscode/utils/src/index.ts"],
       "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
-      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"]
+      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"],
+      "@nx-console/vscode/nx-cli-quickpicks": [
+        "libs/vscode/nx-cli-quickpicks/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
