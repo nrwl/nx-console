@@ -1,19 +1,8 @@
 import { Option, OptionType } from '@nx-console/shared/schema';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
-import { QuickPickItem, window } from 'vscode';
+import { window } from 'vscode';
 import { selectFlags } from './select-flags';
-import { TargetConfiguration } from 'nx/src/devkit-exports';
-
-export class CliTaskQuickPickItem implements QuickPickItem {
-  constructor(
-    readonly projectName: string,
-    readonly projectRoot: string,
-    readonly targetDef: TargetConfiguration,
-    readonly command: string,
-    readonly label: string
-  ) {}
-}
 
 export async function selectRunInformation(
   projectName?: string,
