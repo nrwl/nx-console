@@ -1,4 +1,4 @@
-import { Option } from '@nx-console/shared/schema';
+import { GeneratorSchema } from './generator-schema';
 
 export type FormValues = Record<
   string,
@@ -54,18 +54,6 @@ export class GenerateUiGeneratorSchemaInputMessage {
 
   constructor(public readonly payload: GeneratorSchema) {}
 }
-
-export type GeneratorSchema = {
-  collectionName: string;
-  generatorName: string;
-  description: string;
-  options: Option[];
-  context?: {
-    path?: string;
-    directory?: string;
-    project?: string;
-  };
-};
 
 export class GenerateUiConfigurationInputMessage {
   readonly payloadType = 'config';
