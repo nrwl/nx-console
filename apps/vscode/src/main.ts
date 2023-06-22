@@ -100,7 +100,7 @@ export async function activate(c: ExtensionContext) {
           'useNewGenerateUiPreview'
         );
         if (preview) {
-          openGenerateUi();
+          openGenerateUi(contextMenuUri);
         } else {
           revealWebViewPanel({
             runTargetTreeItem,

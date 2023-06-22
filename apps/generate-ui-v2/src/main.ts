@@ -1,49 +1,22 @@
-import { ContextProvider } from '@lit-labs/context';
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { editorContext } from './contexts/editor-context';
-import {
-  debounce,
-  getGeneratorIdentifier,
-} from './utils/generator-schema-utils';
+import { FormValuesService } from './form-values.service';
 import { IdeCommunicationController } from './ide-communication.controller';
-import {
-  formValuesServiceContext,
-  FormValuesService,
-} from './form-values.service';
-import { submittedContext } from './contexts/submitted-context';
+import { getGeneratorIdentifier } from './utils/generator-schema-utils';
 
 import './components/index';
 
 @customElement('root-element')
 export class Root extends LitElement {
-  private icc: IdeCommunicationController;
-
-  private editorContextProvider = new ContextProvider(this, {
-    context: editorContext,
-  });
+  icc: IdeCommunicationController;
 
   private formValuesService: FormValuesService;
-  private formValuesServiceContextProvider = new ContextProvider(this, {
-    context: formValuesServiceContext,
-  });
-
-  private submittedContextProvider = new ContextProvider(this, {
-    context: submittedContext,
-    initialValue: false,
-  });
 
   constructor() {
     super();
     this.icc = new IdeCommunicationController(this);
-
-    this.editorContextProvider.setValue(this.icc.editor);
-
-    this.formValuesService = new FormValuesService(this.icc, () =>
-      this.handleValidFormChange()
-    );
-    this.formValuesServiceContextProvider.setValue(this.formValuesService);
+    this.formValuesService = new FormValuesService(this);
 
     window.addEventListener('keydown', (e) =>
       this.handleGlobalKeyboardShortcuts(e)
@@ -110,7 +83,7 @@ export class Root extends LitElement {
               () =>
                 html` <button-element
                   class="px-3 py-2"
-                  @click="${() => this.runGenerator(true)}"
+                  @click="${() => this.formValuesService.runGenerator(true)}"
                   text="Dry Run"
                 >
                 </button-element>`
@@ -118,7 +91,7 @@ export class Root extends LitElement {
 
             <button-element
               class="px-3 py-2"
-              @click="${() => this.runGenerator()}"
+              @click="${() => this.formValuesService.runGenerator()}"
               text="Generate"
               data-cy="generate-button"
             >
@@ -146,20 +119,14 @@ export class Root extends LitElement {
     this.searchValue = e.detail;
   }
 
-  private handleValidFormChange() {
-    if (this.icc.configuration?.enableTaskExecutionDryRunOnChange) {
-      this.debouncedRunGenerator(true);
-    }
-  }
-
   private handleGlobalKeyboardShortcuts(e: KeyboardEvent) {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
 
       if (e.shiftKey) {
-        this.runGenerator(true);
+        this.formValuesService.runGenerator(true);
       } else {
-        this.runGenerator();
+        this.formValuesService.runGenerator();
       }
     }
     if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
@@ -170,27 +137,6 @@ export class Root extends LitElement {
       }
     }
   }
-
-  private runGenerator(dryRun = false) {
-    const args = this.formValuesService.getSerializedFormValues();
-    args.push('--no-interactive');
-    if (dryRun) {
-      args.push('--dry-run');
-    }
-    this.submittedContextProvider.setValue(true);
-    this.icc.postMessageToIde({
-      payloadType: 'run-generator',
-      payload: {
-        positional: getGeneratorIdentifier(this.icc.generatorSchema),
-        flags: args,
-      },
-    });
-  }
-
-  private debouncedRunGenerator = debounce(
-    (dryRun: boolean) => this.runGenerator(dryRun),
-    500
-  );
 
   protected createRenderRoot() {
     return this;

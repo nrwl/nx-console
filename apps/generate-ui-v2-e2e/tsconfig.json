@@ -3,13 +3,13 @@
   "compilerOptions": {
     "sourceMap": false,
     "outDir": "../../dist/out-tsc",
-    "allowJs": true,
-    "types": ["cypress", "node"]
+    "types": ["cypress", "node"],
+    "moduleResolution": "node"
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
     "cypress.config.ts",
-    "src/test-schema.mjs"
+    "src/support/test-schema.ts"
   ]
 }

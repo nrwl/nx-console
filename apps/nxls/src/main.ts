@@ -5,6 +5,7 @@ import {
   NxChangeWorkspace,
   NxCreateProjectGraphRequest,
   NxGeneratorContextFromPathRequest,
+  NxGeneratorContextV2Request,
   NxGeneratorOptionsRequest,
   NxGeneratorOptionsRequestOptions,
   NxGeneratorsRequest,
@@ -35,6 +36,7 @@ import {
   nxWorkspace,
   getProjectGraphOutput,
   createProjectGraph,
+  getGeneratorContextV2,
 } from '@nx-console/language-server/workspace';
 import {
   getNxJsonSchema,
@@ -305,6 +307,7 @@ connection.onRequest(
   }
 );
 
+// TODO: REMOVE ONCE OLD GENERATE UI IS GONE
 connection.onRequest(
   NxGeneratorContextFromPathRequest,
   async (args: { generator?: TaskExecutionSchema; path: string }) => {
@@ -315,6 +318,19 @@ connection.onRequest(
       );
     }
     return getGeneratorContextFromPath(args.generator, args.path, WORKING_PATH);
+  }
+);
+
+connection.onRequest(
+  NxGeneratorContextV2Request,
+  async (args: { path: string }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getGeneratorContextV2(args.path, WORKING_PATH);
   }
 );
 

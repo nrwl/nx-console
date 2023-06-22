@@ -1,7 +1,10 @@
 import { clickShowMore, getFieldByName } from '../support/get-elements';
+import { schema } from '../support/test-schema';
+import { visitGenerateUi } from '../support/visit-generate-ui';
 
 describe('multiselect field', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => visitGenerateUi(schema));
+
   it('should add and remove values by clicking', () => {
     const fieldName = 'multiselect-field';
     clickShowMore();

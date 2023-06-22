@@ -1,8 +1,11 @@
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { isProjectOption } from '@nx-console/shared/schema';
-import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
+import {
+  getGeneratorContextV2,
+  getNxWorkspaceProjects,
+} from '@nx-console/vscode/nx-workspace';
 import { selectGenerator } from '@nx-console/vscode/tasks';
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, Uri } from 'vscode';
 import { GenerateUiWebview } from './generate-ui-webview';
 
 let generateUIWebview: GenerateUiWebview;
@@ -11,16 +14,22 @@ export function initGenerateUiWebview(context: ExtensionContext) {
   generateUIWebview = new GenerateUiWebview(context);
 }
 
-export async function openGenerateUi() {
+export async function openGenerateUi(contextUri: Uri | undefined) {
   const deprecatedTaskExecutionSchema = await selectGenerator();
   if (!deprecatedTaskExecutionSchema) {
     return;
   }
+
+  const generatorContext = contextUri
+    ? await getGeneratorContextV2(contextUri.fsPath)
+    : undefined;
+
   const generator: GeneratorSchema = {
     collectionName: deprecatedTaskExecutionSchema.collection ?? '',
     generatorName: deprecatedTaskExecutionSchema.name,
     description: deprecatedTaskExecutionSchema.description,
     options: deprecatedTaskExecutionSchema.options,
+    context: generatorContext,
   };
 
   generateUIWebview.openGenerateUi(await augmentGeneratorSchema(generator));

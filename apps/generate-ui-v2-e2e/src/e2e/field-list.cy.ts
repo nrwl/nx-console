@@ -6,9 +6,11 @@ import {
   getFieldErrorByName,
   getFieldNavItemByName,
 } from '../support/get-elements';
+import { schema } from '../support/test-schema';
+import { visitGenerateUi } from '../support/visit-generate-ui';
 
 describe('field list', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => visitGenerateUi(schema));
 
   it('should show only important fields by default', () => {
     getFields().should('have.length', 2);

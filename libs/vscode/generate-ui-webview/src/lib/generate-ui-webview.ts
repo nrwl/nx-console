@@ -217,7 +217,7 @@ export class GenerateUiWebview {
   private getVscodeStyleMappings(): string {
     // note that --vscode-settings-dropdownListBorder is the color used for the webview ui toolkit divider
     // refer to https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/design-tokens.ts
-    const mappings = `
+    return `
       --foreground-color: var(--vscode-editor-foreground);
       --background-color: var(--vscode-editor-background);
       --primary-color: var(--button-primary-background);
@@ -232,7 +232,5 @@ export class GenerateUiWebview {
       --separator-color: var(--vscode-settings-dropdownListBorder);
       --field-nav-hover-color: var(--vscode-list-hoverBackground);
     `;
-    console.log(mappings);
-    return mappings;
   }
 }

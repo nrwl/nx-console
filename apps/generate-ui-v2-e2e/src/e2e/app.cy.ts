@@ -1,12 +1,13 @@
-import { schema } from '../test-schema.mjs';
+import { schema } from '../support/test-schema';
 import {
   expectConsoleLogToHaveBeenCalledWith,
   spyOnConsoleLog,
 } from '../support/console-spy';
 import { clickShowMore, getFieldByName } from '../support/get-elements';
+import { visitGenerateUi } from '../support/visit-generate-ui';
 
 describe('generate-ui-v2', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => visitGenerateUi(schema));
 
   describe('header', () => {
     it('should display generator name', () => {
