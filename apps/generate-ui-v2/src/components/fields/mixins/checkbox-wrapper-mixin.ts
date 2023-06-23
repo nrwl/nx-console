@@ -27,7 +27,7 @@ export const CheckboxWrapper = <
           >
           <div class="flex flex-row items-start gap-2 mt-2">
             ${this.renderField()}
-            <p class="text-sm text-gray-500">${this.option.description}</p>
+            <p class="text-gray-500 self-center">${this.option.description}</p>
             ${when(
               this.shouldRenderError() && typeof this.validation === 'string',
               () =>

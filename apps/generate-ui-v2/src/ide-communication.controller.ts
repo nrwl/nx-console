@@ -196,6 +196,7 @@ export class IdeCommunicationController implements ReactiveController {
       --separator-color: ${styles.separatorColor};
       --field-nav-hover-color: ${styles.fieldNavHoverColor};
       font-family: ${styles.fontFamily};
+      font-size: ${styles.fontSize};
     }
     `);
     document.adoptedStyleSheets = [styleSheet];

@@ -80,8 +80,7 @@ data class GenerateUiStyles(
     val separatorColor: String,
     val fieldNavHoverColor: String,
     val fontFamily: String,
-//    val secondaryTextColor: String,
-//    val fontSize: String,
+    val fontSize: String,
 )
 
 @Serializable
