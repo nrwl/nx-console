@@ -3,11 +3,13 @@ import { isProjectOption } from '@nx-console/shared/schema';
 import { selectGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
 import {
   getGeneratorContextV2,
+  getGeneratorOptions,
+  getGenerators,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode/nx-workspace';
 import { ExtensionContext, Uri } from 'vscode';
-import { GenerateUiWebview } from './generate-ui-webview';
 import { registerGenerateCommands } from './generate-commands';
+import { GenerateUiWebview } from './generate-ui-webview';
 
 let generateUIWebview: GenerateUiWebview;
 
@@ -17,9 +19,9 @@ export async function initGenerateUiWebview(context: ExtensionContext) {
   registerGenerateCommands(context);
 }
 
-export async function openGenerateUi(contextUri: Uri | undefined) {
-  const deprecatedTaskExecutionSchema = await selectGenerator();
-  if (!deprecatedTaskExecutionSchema) {
+export async function openGenerateUi(contextUri?: Uri, generatorName?: string) {
+  const generator = await getGenerator(generatorName);
+  if (!generator) {
     return;
   }
 
@@ -27,15 +29,12 @@ export async function openGenerateUi(contextUri: Uri | undefined) {
     ? await getGeneratorContextV2(contextUri.fsPath)
     : undefined;
 
-  const generator: GeneratorSchema = {
-    collectionName: deprecatedTaskExecutionSchema.collection ?? '',
-    generatorName: deprecatedTaskExecutionSchema.name,
-    description: deprecatedTaskExecutionSchema.description,
-    options: deprecatedTaskExecutionSchema.options,
-    context: generatorContext,
-  };
-
-  generateUIWebview.openGenerateUi(await augmentGeneratorSchema(generator));
+  generateUIWebview.openGenerateUi(
+    await augmentGeneratorSchema({
+      ...generator,
+      context: generatorContext,
+    })
+  );
 }
 
 async function augmentGeneratorSchema(
@@ -49,4 +48,45 @@ async function augmentGeneratorSchema(
   }
 
   return generatorSchema;
+}
+
+async function getGenerator(
+  generatorName?: string
+): Promise<GeneratorSchema | undefined> {
+  if (generatorName) {
+    const generatorInfo = {
+      collection: generatorName.split(':')[0],
+      name: generatorName.split(':')[1],
+    };
+    const foundGenerator = (await getGenerators()).find(
+      (gen) =>
+        generatorInfo.collection === gen.data?.collection &&
+        generatorInfo.name === gen.data?.name
+    );
+    if (foundGenerator) {
+      const options = await getGeneratorOptions({
+        collection: generatorInfo.collection,
+        name: generatorInfo.name,
+        path: foundGenerator.path,
+      });
+      return {
+        collectionName: foundGenerator.data?.collection ?? '',
+        generatorName: foundGenerator.data?.name ?? '',
+        description: foundGenerator.data?.description ?? '',
+        options: options ?? [],
+      };
+    }
+  }
+
+  const deprecatedTaskExecutionSchema = await selectGenerator();
+  if (!deprecatedTaskExecutionSchema) {
+    return;
+  }
+
+  return {
+    collectionName: deprecatedTaskExecutionSchema.collection ?? '',
+    generatorName: deprecatedTaskExecutionSchema.name,
+    description: deprecatedTaskExecutionSchema.description,
+    options: deprecatedTaskExecutionSchema.options,
+  };
 }

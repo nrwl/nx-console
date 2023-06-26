@@ -49,12 +49,19 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       if (!generator) {
         return;
       }
-      showGenerateUi(
-        context.extensionPath,
-        uri,
-        GeneratorType.Other,
-        generator
+      const newGenUi = GlobalConfigurationStore.instance.get(
+        'useNewGenerateUiPreview'
       );
+      if (newGenUi) {
+        openGenerateUi(uri, generator);
+      } else {
+        showGenerateUi(
+          context.extensionPath,
+          uri,
+          GeneratorType.Other,
+          generator
+        );
+      }
     });
 
     commands.registerCommand(`nx.remove`, async (uri?: Uri) => {
@@ -67,7 +74,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
         'useNewGenerateUiPreview'
       );
       if (newGenUi) {
-        openGenerateUi(uri);
+        openGenerateUi(uri, generator);
       } else {
         showGenerateUi(
           context.extensionPath,
