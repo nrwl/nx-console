@@ -5,9 +5,9 @@ import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.util.Processor
@@ -19,6 +19,9 @@ import dev.nx.console.services.NxlsService
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import javax.swing.ListCellRenderer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class NxGeneratorSearchEverywhereContributorFactory :
@@ -32,10 +35,6 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
     SearchEverywhereContributor<NxGenerator> {
 
     private val project = event.getRequiredData(CommonDataKeys.PROJECT)
-
-    private val generators = runBlocking {
-        NxGenerateService.getInstance(project).getFilteredGenerators()
-    }
 
     private val generatorToOptionsCache: ConcurrentMap<NxGenerator, List<NxGeneratorOption>> =
         ConcurrentHashMap()
@@ -91,10 +90,13 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
 
         val matcher = NameUtil.buildMatcher(pattern).build()
 
-        ProgressManager.getInstance()
-            .executeProcessUnderProgress(
-                { generators.filter { matcher.matches(it.name) }.forEach { consumer.process(it) } },
-                progressIndicator
-            )
+        ApplicationManager.getApplication().invokeLater {
+            CoroutineScope(Dispatchers.Default).launch {
+                NxGenerateService.getInstance(project)
+                    .getFilteredGenerators()
+                    .filter { matcher.matches(it.name) }
+                    .forEach { consumer.process(it) }
+            }
+        }
     }
 }
