@@ -1,6 +1,14 @@
 import { Option } from '@nx-console/shared/schema';
 import { QuickPickItem, window } from 'vscode';
-import { CliTaskFlagQuickPickItem } from './cli-task-flag-quick-pick-item';
+
+export class CliTaskFlagQuickPickItem implements QuickPickItem {
+  constructor(
+    readonly flagName: string,
+    readonly detail: string = '',
+    readonly option: Option,
+    readonly label: string
+  ) {}
+}
 
 /**
  * Returns undefined if the user wants to cancel the command.

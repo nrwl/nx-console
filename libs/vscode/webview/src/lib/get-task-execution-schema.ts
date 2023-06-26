@@ -7,9 +7,9 @@ import {
   getGeneratorContextFromPath,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode/nx-workspace';
-import { selectGenerator } from '@nx-console/vscode/tasks';
-import { getOutputChannel, getTelemetry } from '@nx-console/vscode/utils';
+import { getOutputChannel } from '@nx-console/vscode/utils';
 import { Uri, window } from 'vscode';
+import { selectGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
 
 export async function getTaskExecutionSchema(
   contextMenuUri?: Uri,

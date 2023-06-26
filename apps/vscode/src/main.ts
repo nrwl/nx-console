@@ -96,10 +96,10 @@ export async function activate(c: ExtensionContext) {
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        const preview = GlobalConfigurationStore.instance.get(
+        const newGenUi = GlobalConfigurationStore.instance.get(
           'useNewGenerateUiPreview'
         );
-        if (preview) {
+        if (newGenUi) {
           openGenerateUi(contextMenuUri);
         } else {
           revealWebViewPanel({

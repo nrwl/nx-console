@@ -10,7 +10,6 @@ import {
   getNxVersion,
 } from '@nx-console/vscode/nx-workspace';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { selectFlags } from '@nx-console/vscode/tasks';
 import {
   getShellExecutionForConfig,
   getTelemetry,
@@ -29,6 +28,7 @@ import {
   TaskScope,
   window,
 } from 'vscode';
+import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';

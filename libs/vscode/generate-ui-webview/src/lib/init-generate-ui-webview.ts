@@ -1,17 +1,20 @@
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { isProjectOption } from '@nx-console/shared/schema';
+import { selectGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
 import {
   getGeneratorContextV2,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode/nx-workspace';
-import { selectGenerator } from '@nx-console/vscode/tasks';
 import { ExtensionContext, Uri } from 'vscode';
 import { GenerateUiWebview } from './generate-ui-webview';
+import { registerGenerateCommands } from './generate-commands';
 
 let generateUIWebview: GenerateUiWebview;
 
-export function initGenerateUiWebview(context: ExtensionContext) {
+export async function initGenerateUiWebview(context: ExtensionContext) {
   generateUIWebview = new GenerateUiWebview(context);
+
+  registerGenerateCommands(context);
 }
 
 export async function openGenerateUi(contextUri: Uri | undefined) {
