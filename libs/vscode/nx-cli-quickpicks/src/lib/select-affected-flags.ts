@@ -1,9 +1,7 @@
 import { OptionType, Option } from '@nx-console/shared/schema';
 import { selectFlags } from './select-flags';
 
-/**
- *
- */
+// TODO: REMOVE HARD CODED LIST OF FLAGS
 export async function selectAffectedFlags(target: string): Promise<{
   command: string;
   flags: string[] | undefined;
