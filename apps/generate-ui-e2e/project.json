@@ -8,7 +8,6 @@
       "executor": "@nx/cypress:cypress",
       "options": {
         "cypressConfig": "apps/generate-ui-e2e/cypress.config.ts",
-        "tsConfig": "apps/generate-ui-e2e/tsconfig.e2e.json",
         "devServerTarget": "generate-ui-feature-task-execution-form:storybook",
         "headed": true,
         "testingType": "e2e"

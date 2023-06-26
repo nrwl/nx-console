@@ -74,6 +74,9 @@
         "libs/vscode/generate-ui-webview/src/index.ts"
       ],
       "@nx-console/vscode/lsp-client": ["libs/vscode/lsp-client/src/index.ts"],
+      "@nx-console/vscode/nx-cli-quickpicks": [
+        "libs/vscode/nx-cli-quickpicks/src/index.ts"
+      ],
       "@nx-console/vscode/nx-cloud-view": [
         "libs/vscode/nx-cloud-view/src/index.ts"
       ],
@@ -104,10 +107,7 @@
       ],
       "@nx-console/vscode/utils": ["libs/vscode/utils/src/index.ts"],
       "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
-      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"],
-      "@nx-console/vscode/nx-cli-quickpicks": [
-        "libs/vscode/nx-cli-quickpicks/src/index.ts"
-      ]
+      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
