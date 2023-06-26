@@ -30,7 +30,7 @@ export class Root extends LitElement {
     const options = this.icc.generatorSchema?.options;
     return html` <div class="text-foreground h-screen flex flex-col">
       <div
-        class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-separator"
+        class="sticky top-0 z-50 w-full bg-background border-b-2 border-separator"
       >
         ${this.renderHeader()}
       </div>
@@ -38,7 +38,7 @@ export class Root extends LitElement {
         ${!options || options.length === 0
           ? html`<p>No options</p>`
           : html` <field-list
-              class="h-full"
+              class="h-full max-w-screen-xl"
               .options="${options}"
               .searchValue="${this.searchValue}"
             ></field-list>`}
@@ -57,7 +57,7 @@ export class Root extends LitElement {
     }`;
 
     return html`
-      <div class="">
+      <div class="max-w-screen-xl p-6">
         <header class="flex justify-between items-center">
           <div class="flex flex-wrap gap-2 items-end">
             <h1 class="text-xl font-bold leading-none" data-cy="header-text">
