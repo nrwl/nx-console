@@ -81,6 +81,7 @@ export class GenerateUiWebview {
             <style>
             :root {
               ${this.getVscodeStyleMappings()}
+              font-size: var(--vscode-font-size);
             }
             body {
               padding: 0;
