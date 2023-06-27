@@ -16,7 +16,9 @@ import com.intellij.util.Processor
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.models.NxGenerator
 import javax.swing.ListCellRenderer
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NxGeneratorSearchEverywhereContributorFactory :
     SearchEverywhereContributorFactory<NxGenerator> {
@@ -71,7 +73,7 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
         val matcher = NameUtil.buildMatcher(pattern).build()
 
         val task = Runnable {
-            runBlocking {
+            CoroutineScope(Dispatchers.Default).launch {
                 NxGenerateService.getInstance(project)
                     .getFilteredGenerators()
                     .filter { matcher.matches(it.name) }
