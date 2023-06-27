@@ -85,6 +85,7 @@ export type GenerateUiStyles = {
   separatorColor: string;
   fieldNavHoverColor: string;
   fontFamily: string;
+  fontSize: string;
 };
 
 export class GenerateUiBannerInputMessage {

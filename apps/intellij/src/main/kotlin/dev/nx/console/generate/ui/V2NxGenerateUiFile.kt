@@ -142,6 +142,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val fieldNavHoverColor = getHexColor(UIManager.getColor("TabbedPane.hoverColor"))
         val fontFamily =
             "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;"
+        val fontSize = "${UIUtil.getLabelFont().size}px"
 
         return GenerateUiStyles(
             backgroundColor = backgroundColor,
@@ -156,9 +157,9 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             bannerWarningBackgroundColor = bannerWarningBackgroundColor,
             separatorColor = statusBarBorderColor,
             fieldNavHoverColor = fieldNavHoverColor,
-            fontFamily = fontFamily
+            fontFamily = fontFamily,
+            fontSize = fontSize
         )
         //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
-        //        val fontSize = "${UIUtil.getLabelFont().size}px"
     }
 }

@@ -24,7 +24,7 @@ export const FieldWrapper = <
           <label for="${this.fieldId}"
             >${this.option.name}${this.option.isRequired ? '*' : ''}</label
           >
-          <p class="text-sm text-gray-500 mb-2">${this.option.description}</p>
+          <p class="text-gray-500 mb-2">${this.option.description}</p>
           ${this.renderField()}
           ${when(
             this.shouldRenderError() && typeof this.validation === 'string',

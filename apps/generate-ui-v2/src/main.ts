@@ -28,9 +28,11 @@ export class Root extends LitElement {
 
   render() {
     const options = this.icc.generatorSchema?.options;
-    return html` <div class="text-foreground h-screen flex flex-col">
+    return html` <div
+      class="text-foreground p-6 h-screen max-w-screen-xl m-auto flex flex-col"
+    >
       <div
-        class="sticky top-0 z-50 p-6 w-full bg-background border-b-2 border-separator"
+        class="sticky top-0 z-50 pb-6 w-full bg-background border-b-2 border-separator"
       >
         ${this.renderHeader()}
       </div>
@@ -57,7 +59,7 @@ export class Root extends LitElement {
     }`;
 
     return html`
-      <div class="">
+      <div>
         <header class="flex justify-between items-center">
           <div class="flex flex-wrap gap-2 items-end">
             <h1 class="text-xl font-bold leading-none" data-cy="header-text">
@@ -77,20 +79,21 @@ export class Root extends LitElement {
             )}
           </div>
 
-          <div class="flex space-x-2">
+          <div class="flex shrink-0">
             ${when(
               !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
               () =>
                 html` <button-element
-                  class="px-3 py-2"
+                  class="pl-3 py-2"
                   @click="${() => this.formValuesService.runGenerator(true)}"
                   text="Dry Run"
+                  appearance="secondary"
                 >
                 </button-element>`
             )}
 
             <button-element
-              class="px-3 py-2"
+              class="pl-3 py-2"
               @click="${() => this.formValuesService.runGenerator()}"
               text="Generate"
               data-cy="generate-button"
