@@ -39,21 +39,28 @@ export async function npmDependencies(workspacePath: string) {
   const dirContents = await readdir(nodeModulesDir);
 
   for (const npmPackageOrScope of dirContents) {
-    if (npmPackageOrScope.startsWith('.')) {
-      continue;
-    }
+    try {
+      if (npmPackageOrScope.startsWith('.')) {
+        continue;
+      }
 
-    const packageStats = await stat(join(nodeModulesDir, npmPackageOrScope));
-    if (!packageStats.isDirectory()) {
-      continue;
-    }
+      const packageStats = await stat(join(nodeModulesDir, npmPackageOrScope));
+      if (!packageStats.isDirectory()) {
+        continue;
+      }
 
-    if (npmPackageOrScope.startsWith('@')) {
-      (await readdir(join(nodeModulesDir, npmPackageOrScope))).forEach((p) => {
-        res.push(`${nodeModulesDir}/${npmPackageOrScope}/${p}`);
-      });
-    } else {
-      res.push(`${nodeModulesDir}/${npmPackageOrScope}`);
+      if (npmPackageOrScope.startsWith('@')) {
+        (await readdir(join(nodeModulesDir, npmPackageOrScope))).forEach(
+          (p) => {
+            res.push(`${nodeModulesDir}/${npmPackageOrScope}/${p}`);
+          }
+        );
+      } else {
+        res.push(`${nodeModulesDir}/${npmPackageOrScope}`);
+      }
+    } catch (e) {
+      // ignore packages where reading them causes an error
+      continue;
     }
   }
 
