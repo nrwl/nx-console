@@ -75,16 +75,6 @@
           "group": "7_modification@-1"
         },
         {
-          "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxAppsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasApplicationGenerators",
-          "command": "nx.generate.ui.app.fileexplorer",
-          "group": "2_workspace"
-        },
-        {
-          "when": "isNxWorkspace && explorerResourceIsFolder && resourcePath in nxLibsDir && config.nxConsole.enableGenerateFromContextMenu && nx.hasLibraryGenerators",
-          "command": "nx.generate.ui.lib.fileexplorer",
-          "group": "2_workspace"
-        },
-        {
           "when": "isNxWorkspace",
           "group": "2_workspace@5",
           "command": "nx.graph.focus"
@@ -175,14 +165,6 @@
           "when": "false"
         },
         {
-          "command": "nx.generate.ui.app.fileexplorer",
-          "when": "false"
-        },
-        {
-          "command": "nx.generate.ui.lib.fileexplorer",
-          "when": "false"
-        },
-        {
           "command": "nxConsole.runTask",
           "when": "false"
         },
@@ -193,14 +175,6 @@
         {
           "command": "nxConsole.revealInExplorer",
           "when": "false"
-        },
-        {
-          "command": "nx.generate.ui.app",
-          "when": "isNxWorkspace && nx.hasApplicationGenerators"
-        },
-        {
-          "command": "nx.generate.ui.lib",
-          "when": "isNxWorkspace && nx.hasLibraryGenerators"
         },
         {
           "command": "nxConsole.migrateAngularCliToNx",
@@ -271,14 +245,6 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.affected.apps",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.affected.libs",
-          "when": "isNxWorkspace"
-        },
-        {
           "command": "nx.list",
           "when": "isNxWorkspace"
         },
@@ -300,6 +266,10 @@
         },
         {
           "command": "nxConsole.loginToNxCloud",
+          "when": "isNxWorkspace"
+        },
+        {
+          "command": "nxConsole.clearCloudSessions",
           "when": "isNxWorkspace"
         },
         {
@@ -446,16 +416,6 @@
       },
       {
         "category": "Nx",
-        "title": "affected apps",
-        "command": "nx.affected.apps"
-      },
-      {
-        "category": "Nx",
-        "title": "affected libs",
-        "command": "nx.affected.libs"
-      },
-      {
-        "category": "Nx",
         "title": "list",
         "command": "nx.list"
       },
@@ -491,26 +451,6 @@
       },
       {
         "category": "Nx",
-        "title": "generate application",
-        "command": "nx.generate.ui.app"
-      },
-      {
-        "category": "Nx",
-        "title": "generate library",
-        "command": "nx.generate.ui.lib"
-      },
-      {
-        "category": "Nx",
-        "title": "Nx generate application",
-        "command": "nx.generate.ui.app.fileexplorer"
-      },
-      {
-        "category": "Nx",
-        "title": "Nx generate library",
-        "command": "nx.generate.ui.lib.fileexplorer"
-      },
-      {
-        "category": "Nx",
         "title": "Convert Angular CLI to Nx workspace",
         "command": "nxConsole.migrateAngularCliToNx"
       },
@@ -530,6 +470,10 @@
       {
         "title": "Login to Nx Cloud",
         "command": "nxConsole.loginToNxCloud"
+      },
+      {
+        "title": "Clear local Nx Cloud sessions",
+        "command": "nxConsole.clearCloudSessions"
       },
       {
         "title": "Refresh Nx Cloud Webview",

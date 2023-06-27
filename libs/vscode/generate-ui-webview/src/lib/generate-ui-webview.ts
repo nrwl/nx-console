@@ -9,18 +9,15 @@ import {
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import {
-  getNxWorkspace,
-  getNxWorkspacePath,
-} from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import {
-  commands,
   ExtensionContext,
   Uri,
   ViewColumn,
   WebviewPanel,
+  commands,
   window,
 } from 'vscode';
 
@@ -63,16 +60,6 @@ export class GenerateUiWebview {
         Uri.joinPath(this._webviewSourceUri, 'output.css')
       );
 
-      const uiToolkitUri = this.webviewPanel.webview.asWebviewUri(
-        Uri.joinPath(
-          this._webviewSourceUri,
-          '@vscode',
-          'webview-ui-toolkit',
-          'dist',
-          'toolkit.js'
-        )
-      );
-
       const codiconsUri = this.webviewPanel.webview.asWebviewUri(
         Uri.joinPath(
           this._webviewSourceUri,
@@ -94,21 +81,18 @@ export class GenerateUiWebview {
             <style>
             :root {
               ${this.getVscodeStyleMappings()}
+              font-size: var(--vscode-font-size);
             }
             body {
               padding: 0;
             }
             </style>
-            </head>
+        </head>
         <body>
-        <script type="module" src="${uiToolkitUri}">“</script>
-        <script type="module" src="${scriptUri}"></script>
-        
-        <script type="text/javascript">
-         window.codiconsUri = "${codiconsUri}";
-        </script>
+          <script type="module" src="${scriptUri}"></script>
 
-        <root-element></root-element>
+          <root-element></root-element>
+
         </body>
         </html>
     `;
@@ -227,18 +211,27 @@ export class GenerateUiWebview {
         payload: modifiedSchema,
       };
     } catch (e) {
-      console.log(e);
       return message;
     }
   }
 
   private getVscodeStyleMappings(): string {
+    // note that --vscode-settings-dropdownListBorder is the color used for the webview ui toolkit divider
+    // refer to https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/design-tokens.ts
     return `
       --foreground-color: var(--vscode-editor-foreground);
       --background-color: var(--vscode-editor-background);
+      --primary-color: var(--button-primary-background);
+      --error-color: var(--vscode-inputValidation-errorBorder);
       --field-border-color: var(--panel-view-border);
+      --focus-border-color: var(--vscode-focusBorder);
+      --badge-background-color: var(--vscode-badge-background);
+      --badge-foreground-color: var(--vscode-badge-foreground);
       --banner-warning-color: var(--vscode-statusBarItem-warningBackground);
       --banner-error-color: var(--vscode-statusBarItem-errorBackground);
+      --banner-text-color: var(--vscode-statusBarItem-warningForeground);
+      --separator-color: var(--vscode-settings-dropdownListBorder);
+      --field-nav-hover-color: var(--vscode-list-hoverBackground);
     `;
   }
 }

@@ -2,8 +2,6 @@ import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared/schema';
 import { when } from 'lit/directives/when.js';
-import { ContextConsumer } from '@lit-labs/context';
-import { formValuesServiceContext } from '../form-values.service';
 
 @customElement('field-list')
 export class FieldList extends LitElement {
@@ -16,8 +14,8 @@ export class FieldList extends LitElement {
   @state()
   private showMore = false;
 
-  private toggleShowMore() {
-    this.showMore = !this.showMore;
+  private toggleShowMore(e: CustomEvent) {
+    this.showMore = !!e.detail;
   }
 
   protected render() {
@@ -28,36 +26,41 @@ export class FieldList extends LitElement {
     const [importantOptions, otherOptions] = splitOptionsByPriority(
       this.options
     );
+    const shouldShowMoreOptions =
+      this.showMore || !!this.searchValue || importantOptions.length === 0;
+    const shouldHideShowMoreButton =
+      !!this.searchValue ||
+      otherOptions.length === 0 ||
+      importantOptions.length === 0;
     return html`
-      <div class="flex h-full">
+      <div class="flex h-full w-full">
         <div
-          class="p-6 w-52 border-r-2 border-fieldBorder fixed h-full overflow-y-auto"
+          class="p-6 w-52 md:w-64 border-r-2 border-separator fixed h-full overflow-y-auto max-sm:hidden"
         >
-          ${this.renderOptionTree(
+          ${this.renderOptionNav(
             importantOptions,
             otherOptions,
             hiddenOptionNames,
-            this.showMore || !!this.searchValue
+            shouldShowMoreOptions
           )}
         </div>
-        <div class="p-6 ml-52">
+        <div class="p-6 sm:ml-52 md:ml-64 w-full">
           ${renderOptions(importantOptions, hiddenOptionNames)}
-          <button-element
-            @click=${this.toggleShowMore}
-            text="${this.showMore ? 'Show Less' : 'Show More'}"
-            class="${this.searchValue ? 'hidden' : ''}"
-          ></button-element>
+          <show-more-divider
+            @show-more=${this.toggleShowMore}
+            class="${shouldHideShowMoreButton ? 'hidden' : ''}"
+          ></show-more-divider>
           ${renderOptions(
             otherOptions,
             hiddenOptionNames,
-            this.showMore || !!this.searchValue
+            shouldShowMoreOptions
           )}
         </div>
       </div>
     `;
   }
 
-  private renderOptionTree(
+  private renderOptionNav(
     importantOptions: Option[],
     otherOptions: Option[],
     hiddenOptionNames: Set<string>,
@@ -66,11 +69,11 @@ export class FieldList extends LitElement {
     const renderListItems = (options: Option[]): TemplateResult[] =>
       options.map(
         (option) =>
-          html`<field-tree-item
+          html`<field-nav-item
             class="${hiddenOptionNames.has(option.name) ? 'hidden' : ''}"
             .option="${option}"
             @click=${this.handleTreeClickEvent}
-          ></field-tree-item>`
+          ></field-nav-item>`
       );
     return html`
       <ul>
@@ -78,6 +81,18 @@ export class FieldList extends LitElement {
         ${when(showMore, () => renderListItems(otherOptions))}
       </ul>
     `;
+  }
+
+  protected firstUpdated(): void {
+    this.updateComplete.then(() => {
+      const field = Array.from(this.renderRoot.querySelectorAll('*')).find(
+        (el) =>
+          el.id.toLowerCase().endsWith('-field') && el instanceof HTMLElement
+      );
+      if (field) {
+        (field as HTMLElement).focus();
+      }
+    });
   }
 
   private handleTreeClickEvent(event: Event) {
@@ -106,7 +121,7 @@ const renderOptions = (
       const hidden = !show || hiddenOptionNames.has(option.name);
 
       return html` <div
-        class="${hidden ? 'hidden' : ''}"
+        class="${hidden ? 'hidden' : ''}  mb-4"
         id="option-${option.name}"
       >
         ${componentTag}
@@ -140,7 +155,7 @@ const getHiddenOptionNames = (
   if (!searchValue) {
     return hiddenOptions;
   }
-  options.forEach((option) => {
+  options?.forEach((option) => {
     if (!option.name.includes(searchValue)) {
       hiddenOptions.add(option.name);
     }
@@ -151,7 +166,7 @@ const getHiddenOptionNames = (
 const splitOptionsByPriority = (options: Option[]): [Option[], Option[]] => {
   const importantOptions: Option[] = [];
   const otherOptions: Option[] = [];
-  options.forEach((option) => {
+  options?.forEach((option) => {
     if (option.isRequired || option['x-priority'] === 'important') {
       importantOptions.push(option);
     } else {

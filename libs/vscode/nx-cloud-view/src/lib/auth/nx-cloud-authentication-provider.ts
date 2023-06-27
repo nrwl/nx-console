@@ -41,7 +41,10 @@ export class NxCloudAuthenticationProvider
       ),
       commands.registerCommand('nxConsole.loginToNxCloud', () => {
         authentication.getSession('nxCloud', [], { createIfNone: true });
-      })
+      }),
+      commands.registerCommand('nxConsole.clearCloudSessions', () =>
+        this.clearSessions()
+      )
     );
     this.initialize();
   }
@@ -289,6 +292,22 @@ export class NxCloudAuthenticationProvider
     }
 
     return refreshedSessions;
+  }
+
+  private async clearSessions(): Promise<void> {
+    const sessions = await this._secretSessionStore.getSessions();
+    await this._secretSessionStore.storeSessions([]);
+    await this._secretSessionStore.storeRefreshTokens([]);
+
+    getTelemetry().featureUsed('nxConsole.cloud.clearSessions');
+
+    if (sessions) {
+      this._sessionChangeEmitter.fire({
+        added: [],
+        removed: sessions,
+        changed: [],
+      });
+    }
   }
 
   public async dispose() {

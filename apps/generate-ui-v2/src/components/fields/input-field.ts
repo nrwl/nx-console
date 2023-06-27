@@ -1,16 +1,29 @@
 import { html, LitElement, TemplateResult } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { Field } from './field-mixin';
+import { Field } from './mixins/field-mixin';
+import { spread } from '@open-wc/lit-helpers';
+import {
+  intellijErrorRingStyles,
+  intellijFieldColors,
+  intellijFieldPadding,
+  intellijFocusRing,
+  vscodeErrorStyleOverrides,
+} from '../../utils/ui-utils';
+import { FieldWrapper } from './mixins/field-wrapper-mixin';
 
 @customElement('input-field')
-export class InputField extends Field(LitElement) {
+export class InputField extends FieldWrapper(Field(LitElement)) {
   protected renderField(): TemplateResult {
+    const error = this.shouldRenderError();
     if (this.editor === 'intellij') {
       return html`
         <input
-          class="bg-fieldBackground border border-fieldBorder"
+          class="${intellijFieldColors} ${intellijFocusRing} rounded ${intellijFieldPadding} ${intellijErrorRingStyles(
+            error
+          )}"
           type="text"
           @input="${this.handleChange}"
+          ${spread(this.ariaAttributes)}
         />
       `;
     } else {
@@ -18,9 +31,8 @@ export class InputField extends Field(LitElement) {
         <vscode-text-field
           type="text"
           @input="${this.handleChange}"
-          style="${this.shouldRenderError()
-            ? '--border-width: 1; --dropdown-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
-            : ''}"
+          style="${vscodeErrorStyleOverrides(this.shouldRenderError())}"
+          ${spread(this.ariaAttributes)}
         >
         </vscode-text-field>
       `;

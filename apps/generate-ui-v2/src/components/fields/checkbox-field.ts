@@ -1,15 +1,23 @@
 import { html, LitElement, PropertyValueMap } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { Field } from './field-mixin';
+import { Field } from './mixins/field-mixin';
+import { spread } from '@open-wc/lit-helpers';
+import {
+  intellijFieldColors,
+  intellijFieldPadding,
+  intellijFocusRing,
+} from '../../utils/ui-utils';
+import { CheckboxWrapper } from './mixins/checkbox-wrapper-mixin';
 
 @customElement('checkbox-field')
-export class CheckboxField extends Field(LitElement) {
+export class CheckboxField extends CheckboxWrapper(Field(LitElement)) {
   renderField() {
     if (this.editor === 'intellij') {
       return html`<input
         type="checkbox"
-        class="form-checkbox bg-fieldBackground border border-fieldBorder rounded checked:bg-primary checked:border-transparent"
+        class="form-checkbox ${intellijFieldColors} h-5 w-5 rounded checked:bg-primary checked:border-transparent ${intellijFocusRing} focus:ring-offset-0"
         @input="${this.handleChange}"
+        ${spread(this.ariaAttributes)}
       />`;
     } else {
       return html`<vscode-checkbox
@@ -17,6 +25,7 @@ export class CheckboxField extends Field(LitElement) {
         style="${this.shouldRenderError()
           ? '--border-width: 1; --checkbox-border: var(--vscode-inputValidation-errorBorder); --focus-border: var(--vscode-inputValidation-errorBorder);'
           : ''}"
+        ${spread(this.ariaAttributes)}
       ></vscode-checkbox>`;
     }
   }

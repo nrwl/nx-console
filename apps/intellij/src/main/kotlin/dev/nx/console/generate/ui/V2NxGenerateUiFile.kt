@@ -9,6 +9,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
+import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import javax.swing.JComponent
@@ -27,10 +28,14 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         runGeneratorManager = RunGeneratorManager(project)
     }
     override fun createMainComponent(project: Project): JComponent {
-        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
+        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
         registerAppSchemeHandler()
         browser.loadURL("http://nxconsolev2/index.html")
+        browser.jbCefClient.addContextMenuHandler(
+            OpenDevToolsContextMenuHandler(),
+            browser.cefBrowser
+        )
         Disposer.register(project, browser)
 
         return browser.component
@@ -72,6 +77,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                     )
             }
             browser.component.requestFocus()
+            //            browser.openDevtools()
         }
     }
 
@@ -122,27 +128,38 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                     false -> UIUtil.getLabelForeground()
                 }
             )
-        val primaryColor = getHexColor(UIManager.getColor("Button.default.startBackground"))
+        val primaryColor = getHexColor(UIManager.getColor("Button.default.endBackground"))
+        val errorColor = getHexColor(UIManager.getColor("Component.errorFocusColor"))
         val fieldBackgroundColor = getHexColor(UIManager.getColor("TextField.background"))
         val fieldBorderColor = getHexColor(UIManager.getColor("Component.borderColor"))
         val selectFieldBackgroundColor =
             getHexColor(UIManager.getColor("ComboBox.nonEditableBackground"))
-        //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
-        //        val fontFamily =
-        //            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system,
-        // BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
-        // 'Helvetica Neue', sans-serif;"
-        //        val fontSize = "${UIUtil.getLabelFont().size}px"
+        val focusBorderColor = getHexColor(UIManager.getColor("Component.focusColor"))
+        val badgeBackgroundColor = selectFieldBackgroundColor
         val bannerWarningBackgroundColor =
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
+        val statusBarBorderColor = getHexColor(UIManager.getColor("StatusBar.borderColor"))
+        val fieldNavHoverColor = getHexColor(UIManager.getColor("TabbedPane.hoverColor"))
+        val fontFamily =
+            "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;"
+        val fontSize = "${UIUtil.getLabelFont().size}px"
+
         return GenerateUiStyles(
-            backgroundColor,
-            foregroundColor,
-            primaryColor,
-            fieldBackgroundColor,
-            fieldBorderColor,
-            selectFieldBackgroundColor,
-            bannerWarningBackgroundColor
+            backgroundColor = backgroundColor,
+            foregroundColor = foregroundColor,
+            primaryColor = primaryColor,
+            errorColor = errorColor,
+            fieldBackgroundColor = fieldBackgroundColor,
+            fieldBorderColor = fieldBorderColor,
+            selectFieldBackgroundColor = selectFieldBackgroundColor,
+            focusBorderColor = focusBorderColor,
+            badgeBackgroundColor = badgeBackgroundColor,
+            bannerWarningBackgroundColor = bannerWarningBackgroundColor,
+            separatorColor = statusBarBorderColor,
+            fieldNavHoverColor = fieldNavHoverColor,
+            fontFamily = fontFamily,
+            fontSize = fontSize
         )
+        //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
     }
 }

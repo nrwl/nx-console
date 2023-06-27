@@ -96,11 +96,11 @@ export async function activate(c: ExtensionContext) {
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        const preview = GlobalConfigurationStore.instance.get(
+        const newGenUi = GlobalConfigurationStore.instance.get(
           'useNewGenerateUiPreview'
         );
-        if (preview) {
-          openGenerateUi();
+        if (newGenUi) {
+          openGenerateUi(contextMenuUri);
         } else {
           revealWebViewPanel({
             runTargetTreeItem,
@@ -238,7 +238,10 @@ async function setWorkspace(workspacePath: string) {
 
     registerVscodeAddDependency(context);
 
-    initNxCloudOnboardingView(context, environment.production);
+    initNxCloudOnboardingView(
+      context,
+      context.extensionMode !== ExtensionMode.Development
+    );
     initGenerateUiWebview(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);

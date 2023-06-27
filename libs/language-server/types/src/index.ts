@@ -11,6 +11,7 @@ import {
 } from '@nx-console/shared/schema';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { SemVer } from 'semver';
+import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
   'nx/changeWorkspace'
@@ -70,6 +71,14 @@ export const NxGeneratorContextFromPathRequest: RequestType<
   | undefined,
   unknown
 > = new RequestType('nx/generatorContextFromPath');
+
+export const NxGeneratorContextV2Request: RequestType<
+  {
+    path: string;
+  },
+  GeneratorContext,
+  unknown
+> = new RequestType('nx/generatorContextV2');
 
 export const NxVersionRequest: RequestType<undefined, SemVer, unknown> =
   new RequestType('nx/version');

@@ -216,13 +216,10 @@ export class NxCloudService extends StateBaseService<InternalState> {
 
     const { nxVersion } = await getNxWorkspace();
 
-    const cloudRunnerUrl =
+    const env =
       this.config.appUrl === stagingConfig.appUrl
-        ? stagingConfig.appUrl
-        : undefined;
-    const env = cloudRunnerUrl
-      ? { ...process.env, NX_CLOUD_API: this.config.appUrl }
-      : process.env;
+        ? { ...process.env, NX_CLOUD_API: this.config.appUrl }
+        : process.env;
 
     window.withProgress(
       {

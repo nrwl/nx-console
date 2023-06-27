@@ -39,7 +39,7 @@ export class FieldTreeComponent implements OnChanges {
         this.userSelectedField = undefined;
       }
       const item = document.getElementById(
-        this.activeFieldName + '-field-tree-item'
+        this.activeFieldName + '-field-nav-item'
       );
 
       const parentTop = Number(this.elementRef.nativeElement.scrollTop);
