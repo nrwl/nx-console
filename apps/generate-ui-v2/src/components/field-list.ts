@@ -33,7 +33,7 @@ export class FieldList extends LitElement {
       otherOptions.length === 0 ||
       importantOptions.length === 0;
     return html`
-      <div class="flex h-full w-full max-w-screen-xl">
+      <div class="flex h-full w-full">
         <div
           class="p-6 w-52 md:w-64 border-r-2 border-separator fixed h-full overflow-y-auto max-sm:hidden"
         >
