@@ -39,8 +39,8 @@ export class Button extends LitElement {
 
   renderIntellij() {
     return html`<button
-      class="py-1 px-4 rounded ${intellijFocusRing} ${this.appearance ===
-      'primary'
+      class="py-1 px-4 rounded whitespace-nowrap ${intellijFocusRing} ${this
+        .appearance === 'primary'
         ? 'bg-primary focus:!ring-offset-1 focus:!ring-offset-background'
         : 'border !border-fieldBorder focus:!border-focusBorder"}'}"
     >

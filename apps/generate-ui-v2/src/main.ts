@@ -77,20 +77,21 @@ export class Root extends LitElement {
             )}
           </div>
 
-          <div class="flex space-x-2">
+          <div class="flex shrink-0">
             ${when(
               !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
               () =>
                 html` <button-element
-                  class="px-3 py-2"
+                  class="pl-3 py-2"
                   @click="${() => this.formValuesService.runGenerator(true)}"
                   text="Dry Run"
+                  appearance="secondary"
                 >
                 </button-element>`
             )}
 
             <button-element
-              class="px-3 py-2"
+              class="pl-3 py-2"
               @click="${() => this.formValuesService.runGenerator()}"
               text="Generate"
               data-cy="generate-button"
