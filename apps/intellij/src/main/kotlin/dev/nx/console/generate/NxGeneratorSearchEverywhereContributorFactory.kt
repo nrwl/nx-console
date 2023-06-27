@@ -1,27 +1,21 @@
 package dev.nx.console.generate
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.actions.searcheverywhere.PossibleSlowContributor
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributor
 import com.intellij.ide.actions.searcheverywhere.SearchEverywhereContributorFactory
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.util.Processor
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.models.NxGenerator
-import dev.nx.console.models.NxGeneratorOption
-import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
-import dev.nx.console.services.NxlsService
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
 import javax.swing.ListCellRenderer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class NxGeneratorSearchEverywhereContributorFactory :
@@ -31,13 +25,10 @@ class NxGeneratorSearchEverywhereContributorFactory :
     ): SearchEverywhereContributor<NxGenerator> = NxGeneratorSearchEverywhereContributor(initEvent)
 }
 
-class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
-    SearchEverywhereContributor<NxGenerator> {
+class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
+    SearchEverywhereContributor<NxGenerator>, PossibleSlowContributor {
 
     private val project = event.getRequiredData(CommonDataKeys.PROJECT)
-
-    private val generatorToOptionsCache: ConcurrentMap<NxGenerator, List<NxGeneratorOption>> =
-        ConcurrentHashMap()
 
     override fun getSearchProviderId(): String = javaClass.name
 
@@ -62,19 +53,8 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
         modifiers: Int,
         searchText: String
     ): Boolean {
-        val service = NxlsService.getInstance(project)
-        val generatorOptions: List<NxGeneratorOption>? =
-            generatorToOptionsCache.computeIfAbsent(selected) {
-                runBlocking {
-                    service.generatorOptions(
-                        NxGeneratorOptionsRequestOptions(it.data.collection, it.name, it.path)
-                    )
-                }
-            }
-
         val path = event.getData(CommonDataKeys.VIRTUAL_FILE)?.path
-        NxGenerateService.getInstance(project)
-            .openGenerateUi(project, selected, path, generatorOptions)
+        NxGenerateService.getInstance(project).openGenerateUi(project, selected, path)
         return true
     }
 
@@ -90,13 +70,20 @@ class NxGeneratorSearchEverywhereContributor(val event: AnActionEvent) :
 
         val matcher = NameUtil.buildMatcher(pattern).build()
 
-        ApplicationManager.getApplication().invokeLater {
-            CoroutineScope(Dispatchers.Default).launch {
+        val task = Runnable {
+            runBlocking {
                 NxGenerateService.getInstance(project)
                     .getFilteredGenerators()
                     .filter { matcher.matches(it.name) }
                     .forEach { consumer.process(it) }
             }
+        }
+        val application: Application = ApplicationManager.getApplication()
+        if (application.isDispatchThread) {
+            application.runReadAction(task)
+        } else {
+            ProgressIndicatorUtils.yieldToPendingWriteActions()
+            ProgressIndicatorUtils.runInReadActionWithWriteActionPriority(task, progressIndicator)
         }
     }
 }
