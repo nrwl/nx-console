@@ -52,5 +52,5 @@ data class NxConsoleSettingsState(
     var enableDryRunOnGenerateChange: Boolean = true,
     var enableTelemetry: Boolean = false,
     var promptedForTelemetry: Boolean = false,
-    var useNewGenerateUIPreview: Boolean = false
+    var useNewGenerateUIPreview: Boolean = true
 )
