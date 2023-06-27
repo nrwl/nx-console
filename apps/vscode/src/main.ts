@@ -238,7 +238,10 @@ async function setWorkspace(workspacePath: string) {
 
     registerVscodeAddDependency(context);
 
-    initNxCloudOnboardingView(context, environment.production);
+    initNxCloudOnboardingView(
+      context,
+      context.extensionMode !== ExtensionMode.Development
+    );
     initGenerateUiWebview(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
