@@ -1,6 +1,6 @@
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { directoryExists } from '@nx-console/shared/file-system';
-import { isAbsolute, join, relative, sep } from 'path';
+import { isAbsolute, join, normalize, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';
 
 export async function getProjectByPath(
@@ -38,7 +38,9 @@ export async function getProjectByPath(
       foundProject = projectConfig;
     } else if (
       !isDirectory &&
-      projectConfig.files.some(({ file }) => file === relativeFilePath)
+      projectConfig.files.some(
+        ({ file }) => normalize(file) === relativeFilePath
+      )
     ) {
       foundProject = projectConfig;
     }
@@ -91,5 +93,5 @@ function findByFilePath(
 function isChildOrEqual(parent: string, child: string) {
   const p = parent.endsWith(sep) ? parent : parent + sep;
   const c = child.endsWith(sep) ? child : child + sep;
-  return c.startsWith(p);
+  return normalize(c).startsWith(normalize(p));
 }
