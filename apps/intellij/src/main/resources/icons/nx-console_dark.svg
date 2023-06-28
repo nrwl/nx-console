@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
-     stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round"
-     viewBox="0 0 16 16">
-  <path fill="#fff" fill-rule="evenodd"
-        d="M7.12 11.97h1.96v-8H6.75v4.26L3.04 3.97H1.08v8h2.33V7.71l3.71 4.26Zm2.91-2.8h2.38l2.5-2.63-2.5-2.57h-2.27l2.51 2.57-2.62 2.63Zm0 1.61h4.89v1.25h-4.89v-1.25Z" />
+<svg stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round"
+     viewBox="0 0 16 16" xml:space="preserve"
+     xmlns="http://www.w3.org/2000/svg">
+  <path d="M7.12 11.97h1.96v-8H6.75v4.26L3.04 3.97H1.08v8h2.33V7.71l3.71 4.26Zm2.91-2.8h2.38l2.5-2.63-2.5-2.57h-2.27l2.51 2.57-2.62 2.63Zm0 1.61h4.89v1.25h-4.89v-1.25Z" fill="#CED0D6"
+        fill-rule="evenodd"/>
 </svg>
