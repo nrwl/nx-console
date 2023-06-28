@@ -18,9 +18,9 @@ export class InputField extends FieldWrapper(Field(LitElement)) {
     if (this.editor === 'intellij') {
       return html`
         <input
-          class="${intellijFieldColors} ${intellijFocusRing} rounded ${intellijFieldPadding} ${intellijErrorRingStyles(
+          class="${intellijFieldColors} ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
             error
-          )}"
+          )} rounded"
           type="text"
           @input="${this.handleChange}"
           ${spread(this.ariaAttributes)}

@@ -9,7 +9,7 @@ import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
 import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
-import { SemVer } from 'semver';
+import { SemVer, gte } from 'semver';
 import {
   getNxOutput,
   getNxProjectGraph,
@@ -88,12 +88,7 @@ export async function getNxWorkspaceConfig(
     }
 
     let projectFileMap: ProjectFileMap = {};
-    if (
-      nxVersion.major >= 16 &&
-      nxVersion.minor >= 3 &&
-      nxVersion.patch >= 1 &&
-      projectGraph
-    ) {
+    if (gte(nxVersion, new SemVer('16.3.1')) && projectGraph) {
       projectFileMap =
         (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
           projectGraph

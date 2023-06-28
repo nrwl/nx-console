@@ -569,7 +569,7 @@
         "nxConsole.useNewGenerateUiPreview": {
           "type": "boolean",
           "scope": "application",
-          "default": false,
+          "default": true,
           "description": "Use the new Generate UI - still in development."
         }
       }

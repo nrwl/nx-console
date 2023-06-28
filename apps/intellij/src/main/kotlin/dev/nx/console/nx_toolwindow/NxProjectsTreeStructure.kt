@@ -6,7 +6,9 @@ import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
 import com.intellij.lang.javascript.JavaScriptBundle
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -19,7 +21,6 @@ import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.graph.actions.NxGraphFocusProjectAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
-import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nx_toolwindow.actions.EditNxProjectConfigurationAction
 import dev.nx.console.run.*
 import dev.nx.console.utils.nxWorkspace
@@ -32,28 +33,28 @@ import kotlinx.coroutines.launch
 class NxProjectsTreeStructure(
     val tree: NxProjectsTree,
     val project: Project,
-    nxWorkspace: NxWorkspace?
-) : SimpleTreeStructure() {
+) : SimpleTreeStructure(), Disposable {
 
-    private val treeModel = StructureTreeModel(this, project)
-    private var root: NxSimpleNode.Root = NxSimpleNode.Root(nxWorkspace)
+    private val treeModel = StructureTreeModel(this, this)
+    private var root: NxSimpleNode.Root = NxSimpleNode.Root(null)
+
     private var treePersistenceManager = NxProjectsTreePersistenceManager(tree)
     private var nxTaskExecutionManager = NxTaskExecutionManager.getInstance(project)
 
     init {
-        tree.model = AsyncTreeModel(treeModel, project)
+        tree.model = AsyncTreeModel(treeModel, this)
         TreeUtil.installActions(tree)
         installPopupActions()
         treePersistenceManager.installPersistenceListeners()
+        invokeLater { updateNxProjects() }
     }
 
     override fun getRootElement(): Any = root
 
     fun updateNxProjects() {
-        val nxWorkspace = project.nxWorkspace()
-        root = NxSimpleNode.Root(nxWorkspace)
-
         CoroutineScope(Dispatchers.Default).launch {
+            val nxWorkspace = project.nxWorkspace()
+            root = NxSimpleNode.Root(nxWorkspace)
             treeModel.invalidateAsync().await()
             TreeUtil.promiseExpand(tree, treePersistenceManager.NxProjectsTreePersistenceVisitor())
         }
@@ -209,4 +210,6 @@ class NxProjectsTreeStructure(
 
         return null
     }
+
+    override fun dispose() {}
 }

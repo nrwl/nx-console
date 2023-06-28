@@ -28,7 +28,7 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
             this.selectedElements.length > 0,
             () => html`<p>Selected:</p>`
           )}
-          <div class="flex flex-row gap-4 mt-2">
+          <div class="mt-2 flex flex-row gap-4">
             ${this.selectedElements.map(
               (element, index) =>
                 html`<badge-element
@@ -46,9 +46,9 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
     if (this.editor === 'intellij') {
       return html`<select
         @change="${this.addValue}"
-        class="bg-selectFieldBackground border border-fieldBorder rounded grow ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
+        class="bg-selectFieldBackground border-fieldBorder ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
           this.shouldRenderError()
-        )})}"
+        )})} grow rounded border"
         ${spread(this.ariaAttributes)}
       >
         <option value="">

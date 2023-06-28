@@ -33,7 +33,7 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
       </div>
       <div class="mt-2">
         <p>${this.elements.length} items</p>
-        <div class="flex flex-row gap-4 mt-2">
+        <div class="mt-2 flex flex-row gap-4">
           ${this.elements.map(
             (element, index) =>
               html`<badge-element
@@ -50,9 +50,9 @@ export class ArrayField extends FieldWrapper(Field(LitElement)) {
   private renderInputField() {
     if (this.editor === 'intellij') {
       return html` <input
-        class="${intellijFieldColors} grow ${intellijFocusRing} rounded ${intellijFieldPadding} ${intellijErrorRingStyles(
+        class="${intellijFieldColors} ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
           this.shouldRenderError()
-        )})}"
+        )})} grow rounded"
         type="text"
         @keydown="${this.handleEnterKeyAdd}"
         ${spread(this.ariaAttributes)}
