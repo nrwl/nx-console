@@ -136,17 +136,20 @@ export class IdeCommunicationController implements ReactiveController {
       option['x-priority'] !== 'internal';
 
     // THIS IS A FIX UNTIL DIR & PATH OPTIONS ARE PROPERLY HANDLED
-    // WE DON'T WANT TO PREFILL DIR WHEN THERE'S A PROJECT 
-    const transformContext = (schema: GeneratorSchema, context: GeneratorContext | undefined) => {
-      if(schema.options.find(opt => opt.name === "project")) {
+    // WE DON'T WANT TO PREFILL DIR WHEN THERE'S A PROJECT
+    const transformContext = (
+      schema: GeneratorSchema,
+      context: GeneratorContext | undefined
+    ) => {
+      if (schema.options.find((opt) => opt.name === 'project')) {
         return {
           ...context,
-          directory: undefined
-        }
+          directory: undefined,
+        };
       } else {
-        return context
+        return context;
       }
-    }
+    };
 
     switch (message.payloadType) {
       case 'generator': {

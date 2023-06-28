@@ -38,7 +38,9 @@ export async function getProjectByPath(
       foundProject = projectConfig;
     } else if (
       !isDirectory &&
-      projectConfig.files.some(({ file }) => normalize(file) === relativeFilePath)
+      projectConfig.files.some(
+        ({ file }) => normalize(file) === relativeFilePath
+      )
     ) {
       foundProject = projectConfig;
     }
