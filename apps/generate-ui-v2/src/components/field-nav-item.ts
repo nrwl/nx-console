@@ -15,12 +15,12 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
       <li
         data-cy="field-nav-item-${this.option.name}"
         @click="${this.handleTreeClickEvent}"
-        class="text-ellipsis overflow-hidden  cursor-pointer ${this.shouldRenderError()
+        class="${this.shouldRenderError()
           ? 'text-error'
           : this.shouldRenderChanged()
           ? 'text-primary'
-          : 'text-foreground'} 
-          hover:bg-fieldNavHoverBackground"
+          : 'text-foreground'} hover:bg-fieldNavHoverBackground  cursor-pointer overflow-hidden 
+          text-ellipsis"
       >
         ${this.option.name}
       </li>

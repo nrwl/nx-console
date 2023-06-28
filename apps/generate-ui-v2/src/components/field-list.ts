@@ -35,7 +35,7 @@ export class FieldList extends LitElement {
     return html`
       <div class="flex h-full w-full">
         <div
-          class="p-6 w-52 md:w-64 border-r-2 border-separator fixed h-full overflow-y-auto max-sm:hidden"
+          class="border-separator fixed h-full w-52 overflow-y-auto border-r-2 p-6 max-sm:hidden md:w-64"
         >
           ${this.renderOptionNav(
             importantOptions,
@@ -44,7 +44,7 @@ export class FieldList extends LitElement {
             shouldShowMoreOptions
           )}
         </div>
-        <div class="p-6 sm:ml-52 md:ml-64 w-full">
+        <div class="w-full p-6 sm:ml-52 md:ml-64">
           ${renderOptions(importantOptions, hiddenOptionNames)}
           <show-more-divider
             @show-more=${this.toggleShowMore}

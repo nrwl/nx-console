@@ -10,7 +10,7 @@ export class SearchBar extends EditorContext(LitElement) {
       return html`
         <div class="relative inline-block w-full">
           <input
-            class="w-full px-2 py-2 pl-8 text-black ${intellijFieldColors} ${intellijFocusRing} text-foreground rounded"
+            class="${intellijFieldColors} ${intellijFocusRing} text-foreground w-full rounded px-2 py-2 pl-8 text-black"
             type="text"
             placeholder="Search..."
             @input="${this.handleInput}"
