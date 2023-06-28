@@ -16,7 +16,7 @@ export class Banner extends EditorContext(LitElement) {
     return html`
       <div
         tabindex="0"
-        class="p-2 pb-0 flex flex-row gap-1 bg-badgeBackground text-badgeForeground rounded focus:ring-focusBorder focus:outline-none ${this.editorSpecificStyles()}"
+        class="bg-badgeBackground text-badgeForeground focus:ring-focusBorder ${this.editorSpecificStyles()} flex flex-row gap-1 rounded p-2 pb-0 focus:outline-none"
         @keydown="${this.handleEnterKeyRemove}"
         data-cy="${this.fieldId}-item"
       >

@@ -15,7 +15,7 @@ export class CheckboxField extends CheckboxWrapper(Field(LitElement)) {
     if (this.editor === 'intellij') {
       return html`<input
         type="checkbox"
-        class="form-checkbox ${intellijFieldColors} h-5 w-5 rounded checked:bg-primary checked:border-transparent ${intellijFocusRing} focus:ring-offset-0"
+        class="form-checkbox ${intellijFieldColors} checked:bg-primary ${intellijFocusRing} h-5 w-5 rounded checked:border-transparent focus:ring-offset-0"
         @input="${this.handleChange}"
         ${spread(this.ariaAttributes)}
       />`;

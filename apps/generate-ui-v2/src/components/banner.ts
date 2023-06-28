@@ -22,7 +22,7 @@ export class Banner extends EditorContext(LitElement) {
     }
     return html`
       <div
-        class="w-full p-2 mt-2 text-left opacity-80 flex flex-row rounded ${bannerClass} text-bannerText"
+        class="${bannerClass} text-bannerText mt-2 flex w-full flex-row rounded p-2 text-left opacity-80"
       >
         <p class="grow">${this.message}</p>
         <div @click="${this.dismiss}" class="px-2 py-1">

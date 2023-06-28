@@ -28,9 +28,9 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
     return html`
       <select
         @change="${this.handleChange}"
-        class="form-select bg-selectFieldBackground border border-fieldBorder rounded ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
+        class="form-select bg-selectFieldBackground border-fieldBorder ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
           this.shouldRenderError()
-        )})}"
+        )})} rounded border"
         ${spread(this.ariaAttributes)}
       >
         ${when(

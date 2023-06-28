@@ -29,10 +29,10 @@ export class Root extends LitElement {
   render() {
     const options = this.icc.generatorSchema?.options;
     return html` <div
-      class="text-foreground p-6 h-screen max-w-screen-xl m-auto flex flex-col"
+      class="text-foreground m-auto flex h-screen max-w-screen-xl flex-col p-6"
     >
       <div
-        class="sticky top-0 z-50 pb-6 w-full bg-background border-b-2 border-separator"
+        class="bg-background border-separator sticky top-0 z-50 w-full border-b-2 pb-6"
       >
         ${this.renderHeader()}
       </div>
@@ -60,8 +60,8 @@ export class Root extends LitElement {
 
     return html`
       <div>
-        <header class="flex justify-between items-center">
-          <div class="flex flex-wrap gap-2 items-end">
+        <header class="flex items-center justify-between">
+          <div class="flex flex-wrap items-end gap-2">
             <h1 class="text-xl font-bold leading-none" data-cy="header-text">
               nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
             </h1>
@@ -72,7 +72,7 @@ export class Root extends LitElement {
                   <a
                     href="${nxDevLink}"
                     target="_blank"
-                    class="text-sm underline leading-none pb-px focus:ring-1 focus:ring-focusBorder focus:outline-none"
+                    class="focus:ring-focusBorder pb-px text-sm leading-none underline focus:outline-none focus:ring-1"
                     >View full details
                   </a>
                 `
@@ -84,7 +84,7 @@ export class Root extends LitElement {
               !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
               () =>
                 html` <button-element
-                  class="pl-3 py-2"
+                  class="py-2 pl-3"
                   @click="${() => this.formValuesService.runGenerator(true)}"
                   text="Dry Run"
                   appearance="secondary"
@@ -93,7 +93,7 @@ export class Root extends LitElement {
             )}
 
             <button-element
-              class="pl-3 py-2"
+              class="py-2 pl-3"
               @click="${() => this.formValuesService.runGenerator()}"
               text="Generate"
               data-cy="generate-button"
