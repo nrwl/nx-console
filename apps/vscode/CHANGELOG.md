@@ -1,3 +1,28 @@
+# [18.3.0](https://github.com/nrwl/nx-console/compare/vscode-v18.2.1...vscode-v18.3.0) (2023-06-28)
+
+
+### Bug Fixes
+
+* adjust font size and some spacing ([#1781](https://github.com/nrwl/nx-console/issues/1781)) ([12c9eec](https://github.com/nrwl/nx-console/commit/12c9eec28a550819a8fc882f8b41921574e3370a))
+* **nxls:** fix broken version comparison for file map ([#1785](https://github.com/nrwl/nx-console/issues/1785)) ([9af8155](https://github.com/nrwl/nx-console/commit/9af8155aaf3a5fe43ef28f91e4fe85a5136b641e))
+* properly catch errors when reading package.json files ([#1786](https://github.com/nrwl/nx-console/issues/1786)) ([578aff9](https://github.com/nrwl/nx-console/commit/578aff9667711b01f5cd65abc8ccd54db3d73da5))
+* remove faulty webpack config in old generate ui ([#1780](https://github.com/nrwl/nx-console/issues/1780)) ([34c3b13](https://github.com/nrwl/nx-console/commit/34c3b1322d02d8fdeb6267e776b1854c482e5fa8))
+* **vscode:** fix cloud view connecting to staging ([#1784](https://github.com/nrwl/nx-console/issues/1784)) ([eded240](https://github.com/nrwl/nx-console/commit/eded240d9bec23572ccc06c0c32d29c3991c255d))
+
+
+### Features
+
+* add cypress tests & additional features to new generate ui ([#1770](https://github.com/nrwl/nx-console/issues/1770)) ([866a14a](https://github.com/nrwl/nx-console/commit/866a14a08ff5567ff5986ed19da2c843378fe943))
+* add generator context & refactor large parts ([#1776](https://github.com/nrwl/nx-console/issues/1776)) ([5ff6f02](https://github.com/nrwl/nx-console/commit/5ff6f028e56a7d6957aeab52129265f597e0ed0d))
+* enable new generate ui in re/move actions ([#1778](https://github.com/nrwl/nx-console/issues/1778)) ([fa56bc4](https://github.com/nrwl/nx-console/commit/fa56bc41c7a2e2abe0da71b954bebde9dd5d1a5b))
+* fix styles after review and general fixes/improvements ([#1771](https://github.com/nrwl/nx-console/issues/1771)) ([70b3ded](https://github.com/nrwl/nx-console/commit/70b3ded361f40c33081994868bb15d64b9d1d3e0))
+* further style & functionality improvements to new generate ui ([#1764](https://github.com/nrwl/nx-console/issues/1764)) ([a4bf156](https://github.com/nrwl/nx-console/commit/a4bf15610dbe7c303ce65043a190511e5167e45e))
+* refactor nx cli commands, throw out deprecated or outdated stuff  & update nx ([#1777](https://github.com/nrwl/nx-console/issues/1777)) ([e9f6149](https://github.com/nrwl/nx-console/commit/e9f6149c084190446518f717f6d1982df386fff3))
+* register vscode toolkit webcomponents through code ([#1774](https://github.com/nrwl/nx-console/issues/1774)) ([c18b5b8](https://github.com/nrwl/nx-console/commit/c18b5b863f1ab288d110221cb5e9d2ec58269c32))
+* toggle new generate ui to be enabled by default 🎉 ([#1787](https://github.com/nrwl/nx-console/issues/1787)) ([e6f9cc9](https://github.com/nrwl/nx-console/commit/e6f9cc92ff394bccec72af00740816dba1d96be7))
+* update generate ui with improved array & multiselect fields ([#1760](https://github.com/nrwl/nx-console/issues/1760)) ([4f95c96](https://github.com/nrwl/nx-console/commit/4f95c96051c643c707df96308aecf48cbf345b47))
+* **vscode:** add command to clear nx cloud session storage manually ([#1769](https://github.com/nrwl/nx-console/issues/1769)) ([e390423](https://github.com/nrwl/nx-console/commit/e39042358f246ee8d7d78b636c7c49c5832b8ce7))
+
 ## [18.2.1](https://github.com/nrwl/nx-console/compare/vscode-v18.2.0...vscode-v18.2.1) (2023-06-09)
 
 
