@@ -14,6 +14,7 @@ import {
 } from '../lib/nx-cloud-service/commands';
 import type { WebviewState } from '../lib/nx-cloud-service/nx-cloud-service';
 import type { WebviewApi } from 'vscode-webview';
+import { when } from 'lit/directives/when.js';
 
 import './all-components';
 
@@ -50,8 +51,16 @@ export class Root extends LitElement {
   render() {
     return html`
       <div class="container">
-        <status-labels-element .state=${this.state}></status-labels-element>
-        <vscode-divider role="seperator"></vscode-divider>
+        ${when(
+          this.state?.isUsingCloudRunner,
+          () =>
+            html`
+              <status-labels-element
+                .state=${this.state}
+              ></status-labels-element>
+              <vscode-divider role="seperator"></vscode-divider>
+            `
+        )}
         <div class="content">
           <claim-callout-element
             ?isusingcloudrunner=${this.state?.isUsingCloudRunner}
@@ -69,6 +78,7 @@ export class Root extends LitElement {
   private setState(state: WebviewState) {
     this.state = { ...state };
     this.vscodeApi.setState(state);
+    console.log(this.state);
   }
 
   async connectedCallback(): Promise<void> {
