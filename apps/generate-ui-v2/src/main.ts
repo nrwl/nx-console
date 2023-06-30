@@ -80,6 +80,14 @@ export class Root extends LitElement {
           </div>
 
           <div class="flex shrink-0">
+            <button-element
+              class="flex items-center py-2 pl-3"
+              appearance="icon"
+              text="copy"
+              @click="${() => this.formValuesService.copyCommandToClipboard()}"
+              id="copy-button"
+            >
+            </button-element>
             ${when(
               !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
               () =>

@@ -26,6 +26,13 @@ data class GenerateUiRunGeneratorOutputMessage(
     val payload: GenerateUiRunGeneratorPayload
 ) : GenerateUiOutputMessage {}
 
+@Serializable()
+@SerialName("copy-to-clipboard")
+data class GenerateUiCopyToClipboardOutputMessage(
+    override val payloadType: String,
+    val payload: String
+) : GenerateUiOutputMessage {}
+
 // The payload will have to be changed for plugins to be truly supported in Intellij
 @Serializable()
 @SerialName("request-validation")

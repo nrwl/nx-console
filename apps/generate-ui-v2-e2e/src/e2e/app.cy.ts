@@ -66,6 +66,21 @@ describe('generate-ui-v2', () => {
         );
       });
     });
+    it('should copy command to clipboard', () => {
+      clickShowMore();
+      getFieldByName('option1').type('test-option1');
+      getFieldByName('select-field').select('option1');
+
+      cy.get("[id='copy-button']").click();
+
+      cy.window()
+        .its('navigator.clipboard')
+        .then((clip) => clip.readText())
+        .should(
+          'equal',
+          'nx g @nx/test:test --option1=test-option1 --select-field=option1'
+        );
+    });
   });
   describe('keyboard shortcuts', () => {
     it('should be able to focus search bar with shortcut', () => {

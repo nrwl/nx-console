@@ -1,6 +1,7 @@
 package dev.nx.console.generate.ui
 
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.jcef.*
@@ -12,6 +13,7 @@ import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
+import java.awt.datatransfer.StringSelection
 import javax.swing.JComponent
 import javax.swing.UIManager
 import kotlinx.serialization.decodeFromString
@@ -101,6 +103,11 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         }
         if (messageParsed.payloadType == "request-validation") {
             this.postMessageToBrowser(GenerateUiValidationResultsInputMessage(mapOf()))
+        }
+        if (messageParsed.payloadType == "copy-to-clipboard") {
+            if (messageParsed is GenerateUiCopyToClipboardOutputMessage) {
+                CopyPasteManager.getInstance().setContents(StringSelection(messageParsed.payload))
+            }
         }
     }
 
