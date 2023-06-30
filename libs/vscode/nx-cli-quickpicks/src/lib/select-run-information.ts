@@ -20,6 +20,11 @@ export async function selectRunInformation(
   } else if (!askForFlags) {
     flags = [];
   }
+
+  if (projectName && targetName && flags) {
+    return { flags, projectName, targetName: targetName };
+  }
+
   const { validWorkspaceJson, workspace } = await getNxWorkspace();
   if (!validWorkspaceJson) {
     return;
@@ -72,7 +77,7 @@ export async function selectRunInformation(
       options
     );
 
-    return { flags, projectName, targetName: targetName };
+    return { flags, projectName, targetName };
   }
   return;
 }
@@ -81,46 +86,50 @@ async function selectProjectAndThenTarget(
   projectName?: string,
   targetName?: string
 ): Promise<{ projectName: string; targetName: string } | undefined> {
-  if (!projectName) {
+  let p = projectName;
+  let t = targetName;
+  if (!p) {
     const projects = await getProjects();
-    projectName = await selectProject(projects);
-    if (!projectName) {
+    p = await selectProject(projects);
+    if (!p) {
       return;
     }
   }
 
-  if (!targetName) {
-    const targets = await getTargets(projectName);
-    targetName = (await selectTarget(targets)) as string;
-    if (!targetName) {
+  if (!t) {
+    const targets = await getTargets(p);
+    t = (await selectTarget(targets)) as string;
+    if (!t) {
       return;
     }
   }
 
-  return { projectName, targetName };
+  return { projectName: p, targetName: t };
 }
 
 async function selectTargetAndThenProject(
   projectName?: string,
   targetName?: string
 ): Promise<{ projectName: string; targetName: string } | undefined> {
-  if (!targetName) {
-    const targets = await getTargets(projectName);
-    targetName = (await selectTarget(targets)) as string;
-    if (!targetName) {
+  let p = projectName;
+  let t = targetName;
+  if (!t) {
+    const targets = await getTargets(p);
+    t = (await selectTarget(targets)) as string;
+    if (!t) {
       return;
     }
   }
 
-  if (!projectName) {
-    const projects = await getProjects(targetName);
-    projectName = (await selectProject(projects)) as string;
-    if (!projectName) {
+  if (!p) {
+    const projects = await getProjects(t);
+    p = (await selectProject(projects)) as string;
+    if (!p) {
       return;
     }
   }
 
-  return { projectName, targetName };
+  return { projectName: p, targetName: t };
 }
 
 async function getTargets(projectName?: string): Promise<string[]> {

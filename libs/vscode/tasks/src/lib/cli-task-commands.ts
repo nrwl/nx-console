@@ -1,9 +1,6 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 
-import {
-  getNxWorkspace,
-  getProjectByPath,
-} from '@nx-console/vscode/nx-workspace';
+import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from './cli-task-provider';
 
 import { selectRunInformation } from '@nx-console/vscode/nx-cli-quickpicks';
@@ -20,21 +17,7 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
         askForFlags?: boolean
       ) => {
         getTelemetry().featureUsed('nx.run', { target });
-        const runInformation = await selectRunInformation(
-          project,
-          target,
-          configuration,
-          askForFlags
-        );
-        if (
-          !runInformation ||
-          !runInformation.projectName ||
-          !runInformation.targetName
-        ) {
-          return;
-        }
-        const { projectName, targetName, flags } = runInformation;
-        runCliCommand('run', projectName, targetName, flags);
+        selectRunInformationAndRun(project, target, configuration, askForFlags);
       }
     ),
     commands.registerCommand(
@@ -49,30 +32,40 @@ export async function registerCliTaskCommands(context: ExtensionContext) {
           return;
         }
 
-        selectRunInformation(await getCliProjectFromUri(uri));
+        selectRunInformationAndRun(await getCliProjectFromUri(uri));
       }
     ),
     commands.registerCommand(`nx.run.target`, async () => {
       getTelemetry().featureUsed('nx.run.target');
 
-      const runInformation = await selectRunInformation(
-        undefined,
-        undefined,
-        undefined,
-        true,
-        true
-      );
-      if (
-        !runInformation ||
-        !runInformation.projectName ||
-        !runInformation.targetName
-      ) {
-        return;
-      }
-      const { projectName, targetName, flags } = runInformation;
-      runCliCommand('run', projectName, targetName, flags);
+      selectRunInformationAndRun(undefined, undefined, undefined, true, true);
     })
   );
+}
+
+async function selectRunInformationAndRun(
+  projectName?: string,
+  targetName?: string,
+  configuration?: string,
+  askForFlags = true,
+  selectTargetFirst = false
+) {
+  const runInformation = await selectRunInformation(
+    projectName,
+    targetName,
+    configuration,
+    askForFlags,
+    selectTargetFirst
+  );
+  if (
+    !runInformation ||
+    !runInformation.projectName ||
+    !runInformation.targetName
+  ) {
+    return;
+  }
+  const { projectName: p, targetName: t, flags: f } = runInformation;
+  runCliCommand('run', p, t, f);
 }
 
 function runCliCommand(
@@ -105,29 +98,4 @@ export async function getCliProjectFromUri(
 ): Promise<string | undefined> {
   const project = await getProjectByPath(uri.fsPath);
   return project?.name;
-}
-
-async function getTargetNames(): Promise<string[]> {
-  const { workspace } = await getNxWorkspace();
-  const commands = Object.values(workspace.projects).reduce((acc, project) => {
-    for (const target of Object.keys(project.targets ?? {})) {
-      acc.add(target);
-    }
-    return acc;
-  }, new Set<string>());
-  return Array.from(commands);
-}
-
-async function getProjectsWithTargetName(
-  targetName: string
-): Promise<string[]> {
-  const { workspace } = await getNxWorkspace();
-  const projects = [];
-  for (const [projectName, project] of Object.entries(workspace.projects)) {
-    const targets = project.targets ?? {};
-    if (targets[targetName]) {
-      projects.push(projectName);
-    }
-  }
-  return projects;
 }
