@@ -102,17 +102,16 @@ tasks {
             include("**/package.json")
             include("**/*.map")
             into("${rootProject.name}/nxls")
+        }
 
-            val nxlsDestDir =
-                File(
-                    destinationDir,
-                    rootProject.name + "/nxls",
-                )
-            if (nxlsDestDir.exists()) {
-                exec {
-                    workingDir = nxlsDestDir
-                    commandLine = buildCommands() + "npm install --force"
-                }
+        doLast {
+            exec {
+                workingDir =
+                    File(
+                        destinationDir,
+                        rootProject.name + "/nxls",
+                    )
+                commandLine = buildCommands() + "npm install --force"
             }
         }
     }
