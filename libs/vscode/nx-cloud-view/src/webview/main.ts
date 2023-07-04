@@ -78,7 +78,6 @@ export class Root extends LitElement {
   private setState(state: WebviewState) {
     this.state = { ...state };
     this.vscodeApi.setState(state);
-    console.log(this.state);
   }
 
   async connectedCallback(): Promise<void> {
