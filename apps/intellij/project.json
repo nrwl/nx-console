@@ -26,7 +26,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/intellij/reports/tests"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "./gradlew :apps:intellij:check"
+        "command": "./gradlew :apps:intellij:check --info --debug"
       }
     },
     "x-lint": {
