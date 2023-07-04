@@ -97,16 +97,19 @@ tasks {
 
     prepareSandbox {
         dependsOn("buildNxls")
-        from("${rootDir}/node_modules/node-gyp-build") {
-            into("${rootProject.name}/nxls/node_modules/node-gyp-build")
-        }
-        from("${rootDir}/node_modules/@parcel/watcher") {
-            into("${rootProject.name}/nxls/node_modules/@parcel/watcher")
-        }
         from(nxlsRoot) {
             include("**/*.js")
+            include("**/package.json")
             include("**/*.map")
             into("${rootProject.name}/nxls")
+            exec {
+                workingDir =
+                    File(
+                        destinationDir,
+                        rootProject.name + "/nxls",
+                    )
+                commandLine = buildCommands() + "npm install --force"
+            }
         }
     }
 
