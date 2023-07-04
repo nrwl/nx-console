@@ -10,12 +10,9 @@
   "sourceRoot": "apps/generate-ui/src",
   "targets": {
     "watch": {
-      "executor": "@angular-builders/custom-webpack:browser",
+      "executor": "@angular-devkit/build-angular:browser",
       "options": {
         "watch": true,
-        "customWebpackConfig": {
-          "path": "apps/generate-ui/webpack.dev.js"
-        },
         "outputPath": "dist/apps/vscode/generate-ui",
         "index": "apps/generate-ui/src/index.html",
         "main": "apps/generate-ui/src/main.ts",
@@ -35,11 +32,8 @@
     },
     "build": {
       "defaultConfiguration": "production",
-      "executor": "@angular-builders/custom-webpack:browser",
+      "executor": "@angular-devkit/build-angular:browser",
       "options": {
-        "customWebpackConfig": {
-          "path": "apps/generate-ui/webpack.dev.js"
-        },
         "outputPath": "dist/apps/generate-ui",
         "index": "apps/generate-ui/src/index.html",
         "main": "apps/generate-ui/src/main.ts",
@@ -93,23 +87,6 @@
         }
       },
       "outputs": ["{options.outputPath}"]
-    },
-    "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
-      "options": {
-        "browserTarget": "generate-ui:build"
-      },
-      "configurations": {
-        "production": {
-          "browserTarget": "generate-ui:build:production"
-        }
-      }
-    },
-    "extract-i18n": {
-      "executor": "@angular-devkit/build-angular:extract-i18n",
-      "options": {
-        "browserTarget": "generate-ui:build"
-      }
     },
     "lint": {
       "executor": "@nx/linter:eslint",

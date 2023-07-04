@@ -25,6 +25,9 @@ export const visitGenerateUi = (schema: GeneratorSchema) =>
               payload: {},
             });
           }
+          if (messageParsed.payloadType === 'copy-to-clipboard') {
+            win.navigator.clipboard.writeText(messageParsed.payload);
+          }
         },
         registerPostToWebviewCallback(callback: any) {
           console.log('registering post to webview callback', callback);

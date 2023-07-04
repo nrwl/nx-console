@@ -96,13 +96,29 @@ export class FieldList extends LitElement {
   }
 
   private handleTreeClickEvent(event: Event) {
-    const element = this.querySelector(
-      `#option-${(event.target as HTMLElement).innerText}`
-    );
+    const optionName = (event.target as HTMLElement).innerText;
+    const element = this.querySelector(`#option-${optionName}`);
     if (!element) {
       return;
     }
     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // focus field after scrolling to option
+    const fieldElement = this.querySelector(`#${optionName}-field`);
+    if (!fieldElement) {
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          (fieldElement as HTMLElement).focus();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '0px', threshold: 1.0 }
+    );
+
+    observer.observe(element);
   }
 
   protected createRenderRoot(): Element | ShadowRoot {

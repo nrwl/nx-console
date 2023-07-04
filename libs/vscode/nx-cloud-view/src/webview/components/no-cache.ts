@@ -9,7 +9,11 @@ export class NoCache extends LitElement {
     }
     .setup-button {
       width: 100%;
-      margin-top: 20px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    a {
+      color: var(--vscode-textLink-foreground);
     }
   `;
 
@@ -17,17 +21,23 @@ export class NoCache extends LitElement {
     return html`
       <p>
         Your workspace is not currently set up to use distributed caching and
-        task execution. It only uses local caching which is not affecting your
-        CI runs.
-      </p>
-      <p>
-        Set up your workspace to use the Nx Cloud runner to enable distributed
-        caching and task execution.
+        task execution.
       </p>
       <vscode-button @click="${this._setupButtonClicked}" class="setup-button">
         Set up Nx Cloud
         <span slot="start" class="nx-cloud-icon"></span>
       </vscode-button>
+      <p>
+        Your workspace only uses local caching which is not affecting your CI
+        runs or coworkers. Use the Nx Cloud runner to enable
+        <a href="https://nx.dev/core-features/share-your-cache">
+          distributed caching
+        </a>
+        and
+        <a href="https://nx.dev/core-features/distribute-task-execution">
+          task execution </a
+        >.
+      </p>
     `;
   }
 

@@ -13,7 +13,8 @@ export type ValidationResults = Record<string, string | boolean>;
 export type GenerateUiOutputMessage =
   | GenerateUiFormInitOutputMessage
   | GenerateUiRunGeneratorOutputMessage
-  | GenerateUiRequestValidationOutputMessage;
+  | GenerateUiRequestValidationOutputMessage
+  | GenerateUiCopyToClipboardOutputMessage;
 
 export class GenerateUiFormInitOutputMessage {
   readonly payloadType = 'output-init';
@@ -36,6 +37,12 @@ export class GenerateUiRequestValidationOutputMessage {
   constructor(
     public readonly payload: { formValues: FormValues; schema: GeneratorSchema }
   ) {}
+}
+
+export class GenerateUiCopyToClipboardOutputMessage {
+  readonly payloadType = 'copy-to-clipboard';
+
+  constructor(public readonly payload: string) {}
 }
 
 /**

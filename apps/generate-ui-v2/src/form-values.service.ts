@@ -9,6 +9,7 @@ import {
 } from './utils/generator-schema-utils';
 import {
   FormValues,
+  GenerateUiCopyToClipboardOutputMessage,
   GeneratorSchema,
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
@@ -135,7 +136,20 @@ export class FormValuesService {
     500
   );
 
-  getSerializedFormValues(): string[] {
+  copyCommandToClipboard() {
+    const args = this.getSerializedFormValues();
+    const positional = getGeneratorIdentifier(this.icc.generatorSchema);
+    const command = `nx g ${positional} ${args.join(' ')}`;
+    if (this.icc.editor === 'vscode') {
+      navigator.clipboard.writeText(command);
+    } else {
+      this.icc.postMessageToIde(
+        new GenerateUiCopyToClipboardOutputMessage(command)
+      );
+    }
+  }
+
+  private getSerializedFormValues(): string[] {
     const args: string[] = [];
     Object.entries(this.formValues).forEach(([key, value]) => {
       const option = this.icc.generatorSchema?.options.find(

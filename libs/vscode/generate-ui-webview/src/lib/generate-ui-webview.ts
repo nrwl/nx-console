@@ -40,37 +40,40 @@ export class GenerateUiWebview {
   }
 
   async openGenerateUi(generator: GeneratorSchema) {
+    if (this.webviewPanel !== undefined) {
+      this.webviewPanel.dispose();
+    }
+
     this.generatorToDisplay = generator;
-    if (!this.webviewPanel) {
-      this.webviewPanel = window.createWebviewPanel(
-        'nx-console', // Identifies the type of the webview. Used internally
-        'Generate UI', // Title of the panel displayed to the user
-        ViewColumn.Active, // Editor column to show the new webview panel in.
-        {
-          retainContextWhenHidden: true,
-          enableScripts: true,
-          localResourceRoots: [this._webviewSourceUri],
-        }
-      );
+    this.webviewPanel = window.createWebviewPanel(
+      'nx-console', // Identifies the type of the webview. Used internally
+      'Generate UI', // Title of the panel displayed to the user
+      ViewColumn.Active, // Editor column to show the new webview panel in.
+      {
+        retainContextWhenHidden: true,
+        enableScripts: true,
+        localResourceRoots: [this._webviewSourceUri],
+      }
+    );
 
-      const scriptUri = this.webviewPanel.webview.asWebviewUri(
-        Uri.joinPath(this._webviewSourceUri, 'main.js')
-      );
-      const stylesUri = this.webviewPanel.webview.asWebviewUri(
-        Uri.joinPath(this._webviewSourceUri, 'output.css')
-      );
+    const scriptUri = this.webviewPanel.webview.asWebviewUri(
+      Uri.joinPath(this._webviewSourceUri, 'main.js')
+    );
+    const stylesUri = this.webviewPanel.webview.asWebviewUri(
+      Uri.joinPath(this._webviewSourceUri, 'output.css')
+    );
 
-      const codiconsUri = this.webviewPanel.webview.asWebviewUri(
-        Uri.joinPath(
-          this._webviewSourceUri,
-          '@vscode',
-          'codicons',
-          'dist',
-          'codicon.css'
-        )
-      );
+    const codiconsUri = this.webviewPanel.webview.asWebviewUri(
+      Uri.joinPath(
+        this._webviewSourceUri,
+        '@vscode',
+        'codicons',
+        'dist',
+        'codicon.css'
+      )
+    );
 
-      this.webviewPanel.webview.html = `
+    this.webviewPanel.webview.html = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -97,19 +100,19 @@ export class GenerateUiWebview {
         </html>
     `;
 
-      this.webviewPanel.webview.onDidReceiveMessage(
-        (message: GenerateUiOutputMessage) => {
-          this.handleMessageFromWebview(message);
-        }
-      );
+    this.webviewPanel.webview.onDidReceiveMessage(
+      (message: GenerateUiOutputMessage) => {
+        this.handleMessageFromWebview(message);
+      }
+    );
 
-      this.webviewPanel.onDidDispose(() => {
-        this.webviewPanel = undefined;
-        this.generatorToDisplay = undefined;
-      });
+    this.webviewPanel.onDidDispose(() => {
+      this.webviewPanel = undefined;
+      this.generatorToDisplay = undefined;
+    });
 
-      this.plugins = await this.loadPlugins();
-    }
+    this.plugins = await this.loadPlugins();
+
     this.webviewPanel.reveal();
   }
 

@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "command": "npx tailwindcss -i dist/apps/generate-ui-v2/tailwind.css -o dist/apps/generate-ui-v2/output.css -c apps/generate-ui-v2/tailwind.config.js --content 'dist/apps/generate-ui-v2/*.{html,js}'",
+      "command": "npx tailwindcss -i dist/apps/generate-ui-v2/tailwind.css -o dist/apps/generate-ui-v2/output.css -c apps/generate-ui-v2/tailwind.config.js",
       "dependsOn": ["extract-dependencies"]
     },
     "extract-dependencies": {
