@@ -6580,7 +6580,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/watcher@npm:^2.2.0":
+"@parcel/watcher@npm:2.2.0":
   version: 2.2.0
   resolution: "@parcel/watcher@npm:2.2.0"
   dependencies:
@@ -22930,7 +22930,7 @@ __metadata:
     "@nx/webpack": 16.4.0
     "@nx/workspace": 16.4.0
     "@open-wc/lit-helpers": ^0.6.0
-    "@parcel/watcher": ^2.2.0
+    "@parcel/watcher": 2.2.0
     "@schematics/angular": 16.1.1
     "@storybook/addon-essentials": 7.0.18
     "@storybook/addon-knobs": ~7.0.2
