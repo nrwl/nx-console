@@ -3,6 +3,8 @@ import { Field } from './mixins/field-mixin';
 import { customElement, state } from 'lit/decorators.js';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
 import { when } from 'lit/directives/when.js';
+import { map } from 'lit/directives/map.js';
+import { extractItemOptions } from '../../utils/generator-schema-utils';
 
 @customElement('autocomplete-field')
 export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
@@ -14,14 +16,12 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
 
   protected renderField(): TemplateResult {
     return html`
-      <vscode-text-field
-        @focus="${() => (this.focused = true)}"
-        @blur="${() => (this.focused = false)}"
-        @input="${(e: Event) => this.handleInput(e)}"
-      ></vscode-text-field>
-      ${when(this.focused, () => {
-        return html`<vscode-option value="123">test</vscode-option> `;
-      })}
+      <fast-combobox autocomplete="both">
+        ${map(
+          extractItemOptions(this.option),
+          (item) => html`<fast-option value="${item}">${item}</fast-option>`
+        )}
+      </fast-combobox>
     `;
   }
 

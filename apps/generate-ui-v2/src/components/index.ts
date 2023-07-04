@@ -1,3 +1,33 @@
+import {
+  provideVSCodeDesignSystem,
+  vsCodeButton,
+  vsCodeCheckbox,
+  vsCodeDropdown,
+  vsCodeOption,
+  vsCodeTextField,
+} from '@vscode/webview-ui-toolkit';
+import { styles } from './fields/vscode-autocomplete';
+import {
+  fastCombobox,
+  fastOption,
+  provideFASTDesignSystem,
+} from '@microsoft/fast-components';
+
+provideFASTDesignSystem().register(
+  fastOption(),
+  fastCombobox({
+    styles,
+  })
+);
+
+provideVSCodeDesignSystem().register(
+  vsCodeButton(),
+  vsCodeTextField(),
+  vsCodeCheckbox(),
+  vsCodeDropdown(),
+  vsCodeOption()
+);
+
 import './fields/checkbox-field';
 import './fields/array-field';
 import './fields/input-field';
@@ -12,19 +42,3 @@ import './icon';
 import './field-nav-item';
 import './show-more-divider';
 import './badge';
-import {
-  provideVSCodeDesignSystem,
-  vsCodeButton,
-  vsCodeCheckbox,
-  vsCodeDropdown,
-  vsCodeOption,
-  vsCodeTextField,
-} from '@vscode/webview-ui-toolkit';
-
-provideVSCodeDesignSystem().register(
-  vsCodeButton(),
-  vsCodeTextField(),
-  vsCodeCheckbox(),
-  vsCodeDropdown(),
-  vsCodeOption()
-);
