@@ -6,7 +6,7 @@ import {
   vsCodeOption,
   vsCodeTextField,
 } from '@vscode/webview-ui-toolkit';
-import { styles } from './fields/vscode-autocomplete';
+import { comboboxStyles } from './fields/vscode-autocomplete';
 import {
   fastCombobox,
   fastOption,
@@ -16,7 +16,7 @@ import {
 provideFASTDesignSystem().register(
   fastOption(),
   fastCombobox({
-    styles,
+    styles: comboboxStyles,
   })
 );
 

@@ -12,7 +12,7 @@ const borderWidth = '1';
 const cornerRadius = '0';
 const designUnit = '4';
 
-export const styles = () => css`
+export const comboboxStyles = () => css`
   ${display('inline-flex')} :host {
     background: var(--vscode-dropdown-background);
     box-sizing: border-box;
@@ -39,6 +39,14 @@ export const styles = () => css`
     min-height: 100%;
     padding: 2px 6px 2px 8px;
     width: 100%;
+  }
+  input {
+    -webkit-appearance: none;
+    font: inherit;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    outline: none;
   }
   .listbox {
     background: var(--vscode-dropdown-background);
@@ -146,5 +154,64 @@ export const styles = () => css`
   ::slotted([role='option']),
   ::slotted(option) {
     flex: 0 0 auto;
+  }
+`;
+
+export const optionStyles = (
+  context: ElementDefinitionContext,
+  definition: OptionOptions
+) => css`
+  ${display('inline-flex')} :host {
+    font-family: var(--body-font);
+    border-radius: ${cornerRadius};
+    border: calc(${borderWidth} * 1px) solid transparent;
+    box-sizing: border-box;
+    color: var(--vscode-foreground);
+    cursor: pointer;
+    fill: currentcolor;
+    font-size: ${typeRampBaseFontSize};
+    line-height: ${typeRampBaseLineHeight};
+    margin: 0;
+    outline: none;
+    overflow: hidden;
+    padding: 0 calc((${designUnit} / 2) * 1px) calc((${designUnit} / 4) * 1px);
+    user-select: none;
+    white-space: nowrap;
+  }
+  :host(:${focusVisible}) {
+    border-color: ${focusBorder};
+    background: ${listActiveSelectionBackground};
+    color: var(--vscode-foreground);
+  }
+  :host([aria-selected='true']) {
+    background: ${listActiveSelectionBackground};
+    border: calc(${borderWidth} * 1px) solid ${focusBorder};
+    color: ${listActiveSelectionForeground};
+  }
+  :host(:active) {
+    background: ${listActiveSelectionBackground};
+    color: ${listActiveSelectionForeground};
+  }
+  :host(:not([aria-selected='true']):hover) {
+    background: ${listActiveSelectionBackground};
+    border: calc(${borderWidth} * 1px) solid ${focusBorder};
+    color: ${listActiveSelectionForeground};
+  }
+  :host(:not([aria-selected='true']):active) {
+    background: ${listActiveSelectionBackground};
+    color: var(--vscode-foreground);
+  }
+  :host([disabled]) {
+    cursor: ${disabledCursor};
+    opacity: ${disabledOpacity};
+  }
+  :host([disabled]:hover) {
+    background-color: inherit;
+  }
+  .content {
+    grid-column-start: 2;
+    justify-self: start;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
