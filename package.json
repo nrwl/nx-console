@@ -20,7 +20,7 @@
     "@monodon/typescript-nx-imports-plugin": "0.2.0",
     "@nx/devkit": "16.4.0",
     "@open-wc/lit-helpers": "^0.6.0",
-    "@parcel/watcher": "2.0.7",
+    "@parcel/watcher": "^2.2.0",
     "@vscode/codicons": "^0.0.32",
     "@vscode/webview-ui-toolkit": "^1.2.0",
     "@yarnpkg/fslib": "2.6.1-rc.5",
