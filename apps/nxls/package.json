@@ -13,5 +13,16 @@
     "name": "Narwhal Technologies Inc",
     "email": "hello@nrwl.io"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@parcel/watcher": "2.2.0",
+    "@parcel/watcher-darwin-arm64": "2.2.0",
+    "@parcel/watcher-darwin-x64": "2.2.0",
+    "@parcel/watcher-linux-arm-glibc": "2.2.0",
+    "@parcel/watcher-linux-arm64-glibc": "2.2.0",
+    "@parcel/watcher-linux-arm64-musl": "2.2.0",
+    "@parcel/watcher-linux-x64-glibc": "2.2.0",
+    "@parcel/watcher-linux-x64-musl": "2.2.0",
+    "@parcel/watcher-win32-arm64": "2.2.0",
+    "@parcel/watcher-win32-x64": "2.2.0"
+  }
 }
