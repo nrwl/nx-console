@@ -1,3 +1,21 @@
+# [18.4.0](https://github.com/nrwl/nx-console/compare/vscode-v18.3.0...vscode-v18.4.0) (2023-07-04)
+
+
+### Bug Fixes
+
+* adjust generator autofilling ([#1792](https://github.com/nrwl/nx-console/issues/1792)) ([81663df](https://github.com/nrwl/nx-console/commit/81663df9a634c4ce0223bc8dc7be5988583a4f29))
+* **generate-ui:** re-open new gen ui when using the command twice ([#1798](https://github.com/nrwl/nx-console/issues/1798)) ([0b53a3a](https://github.com/nrwl/nx-console/commit/0b53a3a8595e1614b13a92e00145a98fb8f2b190))
+* make sure nx.run works in all contexts ([#1795](https://github.com/nrwl/nx-console/issues/1795)) ([a3b84e4](https://github.com/nrwl/nx-console/commit/a3b84e4fdde92979ba877a63a40ae1af4a2fcdd0))
+* revert ts version because it broke old generate ui ([#1796](https://github.com/nrwl/nx-console/issues/1796)) ([916aa4c](https://github.com/nrwl/nx-console/commit/916aa4ca1634319baae3262437bd2956d6ea0702))
+* update @parcel/watcher for more prebuilt binaries ([#1803](https://github.com/nrwl/nx-console/issues/1803)) ([4909b24](https://github.com/nrwl/nx-console/commit/4909b24fa5629cc659afa681e0fbbf0541a73a33))
+
+
+### Features
+
+* focus field element after scrolling to it from option nav ([#1793](https://github.com/nrwl/nx-console/issues/1793)) ([740fc60](https://github.com/nrwl/nx-console/commit/740fc601dbe97c96d5ce3b1a93f1110ee7dd2f5a))
+* **generate-ui:** add copy to clipboard button to generate ui ([#1799](https://github.com/nrwl/nx-console/issues/1799)) ([9b8a20d](https://github.com/nrwl/nx-console/commit/9b8a20ded0c508e9cb79468ad9fced5fc3fb0976))
+* **vscode:** rearrange empty state for nx cloud view to make button more prominent ([#1797](https://github.com/nrwl/nx-console/issues/1797)) ([0405aa7](https://github.com/nrwl/nx-console/commit/0405aa7eb7e44fcf2961343b7b9d3b928490ff2c))
+
 # [18.3.0](https://github.com/nrwl/nx-console/compare/vscode-v18.2.1...vscode-v18.3.0) (2023-06-28)
 
 
