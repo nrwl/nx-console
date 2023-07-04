@@ -3,6 +3,7 @@ import './fields/array-field';
 import './fields/input-field';
 import './fields/multiselect-field';
 import './fields/select-field';
+import './fields/autocomplete-field';
 import './button';
 import './field-list';
 import './search-bar';

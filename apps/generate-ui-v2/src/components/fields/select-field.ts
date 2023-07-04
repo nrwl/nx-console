@@ -4,7 +4,10 @@ import { customElement, property } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { when } from 'lit/directives/when.js';
 import { Field } from './mixins/field-mixin';
-import { extractDefaultValue } from '../../utils/generator-schema-utils';
+import {
+  extractDefaultValue,
+  extractItemOptions,
+} from '../../utils/generator-schema-utils';
 import { spread } from '@open-wc/lit-helpers';
 import {
   intellijErrorRingStyles,
@@ -38,7 +41,7 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
           () => html`<option value="">--</option>`
         )}
         ${map(
-          this.extractItemOptions(this.option),
+          extractItemOptions(this.option),
           (item) => html`<option value="${item}">${item}</option>`
         )}
       </select>
@@ -57,7 +60,7 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
           () => html`<vscode-option value="">--</vscode-option>`
         )}
         ${map(
-          this.extractItemOptions(this.option),
+          extractItemOptions(this.option),
           (item) => html`<vscode-option value="${item}">${item}</vscode-option>`
         )}
       </vscode-dropdown>
@@ -74,16 +77,6 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
       return;
     }
     selectNode.value = value ? `${value}` : '';
-  }
-
-  private extractItemOptions(option: Option): string[] {
-    if (!option.items) {
-      return [];
-    }
-    if (Array.isArray(option.items)) {
-      return option.items;
-    }
-    return option.items.enum;
   }
 
   private handleChange(e: Event) {
