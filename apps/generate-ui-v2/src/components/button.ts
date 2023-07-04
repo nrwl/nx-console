@@ -1,6 +1,6 @@
+import { ContextConsumer } from '@lit-labs/context';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { consume, ContextConsumer } from '@lit-labs/context';
 import { editorContext } from '../contexts/editor-context';
 import { intellijFocusRing } from '../utils/ui-utils';
 
@@ -10,7 +10,7 @@ export class Button extends LitElement {
   text: string;
 
   @property()
-  appearance: 'primary' | 'secondary' = 'primary';
+  appearance: 'primary' | 'secondary' | 'icon' = 'primary';
 
   editor: string;
 
@@ -32,12 +32,27 @@ export class Button extends LitElement {
   }
 
   renderVSCode() {
+    if (this.appearance === 'icon') {
+      return html`
+        <vscode-button appearance="icon">
+          <icon-element
+            class="flex items-start"
+            icon="${this.text}"
+          ></icon-element>
+        </vscode-button>
+      `;
+    }
     return html`<vscode-button appearance="${this.appearance}"
       >${this.text}</vscode-button
     >`;
   }
 
   renderIntellij() {
+    if (this.appearance === 'icon') {
+      return html`<div class="hover:bg-fieldNavHoverBackground rounded p-1">
+        <icon-element icon="${this.text}"></icon-element>
+      </div>`;
+    }
     return html`<button
       class="${intellijFocusRing} ${this.appearance === 'primary'
         ? 'bg-primary focus:!ring-offset-1 focus:!ring-offset-background'

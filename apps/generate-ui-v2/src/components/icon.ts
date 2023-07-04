@@ -14,10 +14,10 @@ export class Icon extends EditorContext(LitElement) {
         class="h-[1.25rem]"
       ></img>`;
     } else {
-      return html`<i
+      return html`<span
         class="codicon codicon-${this.icon}"
         style="text-align: center; font-size: 0.9rem;"
-      ></i>`;
+      ></span>`;
     }
   }
 
