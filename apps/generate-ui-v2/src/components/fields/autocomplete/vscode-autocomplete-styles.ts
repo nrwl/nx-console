@@ -12,6 +12,8 @@ const borderWidth = '1';
 const cornerRadius = '0';
 const designUnit = '4';
 
+// taken from: https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/dropdown/dropdown.styles.ts
+
 export const vscodeComboboxStyles = () => css`
   ${display('inline-flex')} :host {
     background: var(--vscode-dropdown-background);

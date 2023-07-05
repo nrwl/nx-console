@@ -12,6 +12,10 @@ const cornerRadius = '0.25rem';
 const listboxCornerRadius = '1rem';
 const designUnit = '4';
 
+// refer to https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/dropdown/dropdown.styles.ts
+// and https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/option/option.styles.ts
+// for inspiration
+
 export const intellijComboboxStyles = () => css`
   ${display('inline-flex')} :host {
     background: var(--select-field-background-color);
