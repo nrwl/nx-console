@@ -1,38 +1,35 @@
 import { LitElement, TemplateResult, html } from 'lit';
 import { Field } from './mixins/field-mixin';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 import { FieldWrapper } from './mixins/field-wrapper-mixin';
-import { when } from 'lit/directives/when.js';
 import { map } from 'lit/directives/map.js';
 import { extractItemOptions } from '../../utils/generator-schema-utils';
 
 @customElement('autocomplete-field')
 export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
-  @state()
-  private focused = false;
-
-  @state()
-  private value = '';
-
   protected renderField(): TemplateResult {
     return html`
-      <fast-combobox autocomplete="both">
+      <vscode-combobox autocomplete="both" @change="${this.handleChange}">
         ${map(
           extractItemOptions(this.option),
-          (item) => html`<fast-option value="${item}">${item}</fast-option>`
+          (item) => html`<vscode-option value="${item}">${item}</vscode-option>`
         )}
-      </fast-combobox>
+      </vscode-combobox>
     `;
   }
 
-  private handleInput(e: Event) {
+  private handleChange(e: Event) {
     const value = (e.target as HTMLInputElement).value;
-    this.value = value;
+    this.dispatchValue(value);
   }
 
   protected setFieldValue(
     value: string | boolean | number | string[] | undefined
   ) {
-    // nooooooop
+    const selectNode = this.renderRoot.querySelector('vscode-combobox');
+    if (!selectNode) {
+      return;
+    }
+    selectNode.value = value ? `${value}` : '';
   }
 }

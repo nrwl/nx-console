@@ -12,7 +12,7 @@ const borderWidth = '1';
 const cornerRadius = '0';
 const designUnit = '4';
 
-export const comboboxStyles = () => css`
+export const vscodeComboboxStyles = () => css`
   ${display('inline-flex')} :host {
     background: var(--vscode-dropdown-background);
     box-sizing: border-box;
@@ -157,10 +157,7 @@ export const comboboxStyles = () => css`
   }
 `;
 
-export const optionStyles = (
-  context: ElementDefinitionContext,
-  definition: OptionOptions
-) => css`
+export const vscodeOptionStyles = () => css`
   ${display('inline-flex')} :host {
     font-family: var(--body-font);
     border-radius: ${cornerRadius};
@@ -169,8 +166,8 @@ export const optionStyles = (
     color: var(--vscode-foreground);
     cursor: pointer;
     fill: currentcolor;
-    font-size: ${typeRampBaseFontSize};
-    line-height: ${typeRampBaseLineHeight};
+    font-size: var(--vscode-font-size);
+    line-height: normal;
     margin: 0;
     outline: none;
     overflow: hidden;
@@ -179,31 +176,31 @@ export const optionStyles = (
     white-space: nowrap;
   }
   :host(:${focusVisible}) {
-    border-color: ${focusBorder};
-    background: ${listActiveSelectionBackground};
+    border-color: var(--vscode-focusBorder);
+    background: var(--vscode-list-activeSelectionBackground);
     color: var(--vscode-foreground);
   }
   :host([aria-selected='true']) {
-    background: ${listActiveSelectionBackground};
-    border: calc(${borderWidth} * 1px) solid ${focusBorder};
-    color: ${listActiveSelectionForeground};
+    background: var(--vscode-list-activeSelectionBackground);
+    border: calc(${borderWidth} * 1px) solid var(--vscode-focusBorder);
+    color: var(--vscode-list-activeSelectionForeground);
   }
   :host(:active) {
-    background: ${listActiveSelectionBackground};
-    color: ${listActiveSelectionForeground};
+    background: var(--vscode-list-activeSelectionBackground);
+    color: var(--vscode-list-activeSelectionForeground);
   }
   :host(:not([aria-selected='true']):hover) {
-    background: ${listActiveSelectionBackground};
-    border: calc(${borderWidth} * 1px) solid ${focusBorder};
-    color: ${listActiveSelectionForeground};
+    background: var(--vscode-list-activeSelectionBackground);
+    border: calc(${borderWidth} * 1px) solid var(--vscode-focusBorder);
+    color: var(--vscode-list-activeSelectionForeground);
   }
   :host(:not([aria-selected='true']):active) {
-    background: ${listActiveSelectionBackground};
+    background: var(--vscode-list-activeSelectionBackground);
     color: var(--vscode-foreground);
   }
   :host([disabled]) {
     cursor: ${disabledCursor};
-    opacity: ${disabledOpacity};
+    opacity: 0.4;
   }
   :host([disabled]:hover) {
     background-color: inherit;
