@@ -11,7 +11,7 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
     if (this.editor === 'vscode') {
       return this.renderVSCode();
     } else {
-      return html``;
+      return this.renderIntellij();
     }
   }
 
@@ -30,6 +30,22 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
     `;
   }
 
+  private renderIntellij() {
+    return html`
+      <intellij-combobox
+        autocomplete="both"
+        position="below"
+        @change="${this.handleChange}"
+      >
+        ${map(
+          extractItemOptions(this.option),
+          (item) =>
+            html`<intellij-option value="${item}">${item}</intellij-option>`
+        )}
+      </intellij-combobox>
+    `;
+  }
+
   private handleChange(e: Event) {
     const value = (e.target as HTMLInputElement).value;
     this.dispatchValue(value);
@@ -38,12 +54,14 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
   protected setFieldValue(
     value: string | boolean | number | string[] | undefined
   ) {
-    const autocompleteNode = this.renderRoot.querySelector('vscode-combobox');
+    const selector =
+      this.editor === 'vscode' ? 'vscode-combobox' : 'intellij-combobox';
+    const autocompleteNode = this.renderRoot.querySelector(selector);
     if (!autocompleteNode) {
       return;
     }
     // there is some internal setup that needs to happen before we can set the value
-    customElements.whenDefined('vscode-combobox').then(() => {
+    customElements.whenDefined(selector).then(() => {
       autocompleteNode.value = value ? `${value}` : '';
     });
   }

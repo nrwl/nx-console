@@ -9,5 +9,6 @@ declare global {
     'vscode-dropdown': Dropdown;
     'search-bar': SearchBar;
     'vscode-combobox': ComboBox;
+    'intellij-combobox': ComboBox;
   }
 }

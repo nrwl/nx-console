@@ -37,7 +37,16 @@ provideFASTDesignSystem().register(
 			/>
 		</svg>
 	`,
-  })
+  }),
+  fastCombobox({
+    prefix: 'intellij',
+    styles: intellijComboboxStyles,
+    indicator: `<img
+        src="./icons/chevron-down.svg"
+        class="h-[1.25rem]"
+      ></img>`,
+  }),
+  fastOption({ prefix: 'intellij', styles: intellijOptionStyles })
 );
 
 provideVSCodeDesignSystem().register(
@@ -62,3 +71,7 @@ import './icon';
 import './field-nav-item';
 import './show-more-divider';
 import './badge';
+import {
+  intellijComboboxStyles,
+  intellijOptionStyles,
+} from './fields/intellij-autocomplete-styles';

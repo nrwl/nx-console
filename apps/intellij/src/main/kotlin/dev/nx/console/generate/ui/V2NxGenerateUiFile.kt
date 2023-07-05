@@ -141,6 +141,8 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val fieldBorderColor = getHexColor(UIManager.getColor("Component.borderColor"))
         val selectFieldBackgroundColor =
             getHexColor(UIManager.getColor("ComboBox.nonEditableBackground"))
+        val activeSelectionBackgroundColor =
+            getHexColor(UIManager.getColor("ComboBox.selectionBackground"))
         val focusBorderColor = getHexColor(UIManager.getColor("Component.focusColor"))
         val badgeBackgroundColor = selectFieldBackgroundColor
         val bannerWarningBackgroundColor =
@@ -159,6 +161,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             fieldBackgroundColor = fieldBackgroundColor,
             fieldBorderColor = fieldBorderColor,
             selectFieldBackgroundColor = selectFieldBackgroundColor,
+            activeSelectionBackgroundColor = activeSelectionBackgroundColor,
             focusBorderColor = focusBorderColor,
             badgeBackgroundColor = badgeBackgroundColor,
             bannerWarningBackgroundColor = bannerWarningBackgroundColor,

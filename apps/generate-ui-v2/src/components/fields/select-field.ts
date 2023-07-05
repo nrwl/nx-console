@@ -33,7 +33,7 @@ export class SelectField extends FieldWrapper(Field(LitElement)) {
         @change="${this.handleChange}"
         class="form-select bg-selectFieldBackground border-fieldBorder ${intellijFocusRing} ${intellijFieldPadding} ${intellijErrorRingStyles(
           this.shouldRenderError()
-        )})} rounded border"
+        )} rounded border"
         ${spread(this.ariaAttributes)}
       >
         ${when(
