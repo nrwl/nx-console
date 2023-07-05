@@ -8,8 +8,20 @@ import { extractItemOptions } from '../../utils/generator-schema-utils';
 @customElement('autocomplete-field')
 export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
   protected renderField(): TemplateResult {
+    if (this.editor === 'vscode') {
+      return this.renderVSCode();
+    } else {
+      return html``;
+    }
+  }
+
+  private renderVSCode() {
     return html`
-      <vscode-combobox autocomplete="both" @change="${this.handleChange}">
+      <vscode-combobox
+        autocomplete="both"
+        position="below"
+        @change="${this.handleChange}"
+      >
         ${map(
           extractItemOptions(this.option),
           (item) => html`<vscode-option value="${item}">${item}</vscode-option>`
@@ -26,10 +38,13 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
   protected setFieldValue(
     value: string | boolean | number | string[] | undefined
   ) {
-    const selectNode = this.renderRoot.querySelector('vscode-combobox');
-    if (!selectNode) {
+    const autocompleteNode = this.renderRoot.querySelector('vscode-combobox');
+    if (!autocompleteNode) {
       return;
     }
-    selectNode.value = value ? `${value}` : '';
+    // there is some internal setup that needs to happen before we can set the value
+    customElements.whenDefined('vscode-combobox').then(() => {
+      autocompleteNode.value = value ? `${value}` : '';
+    });
   }
 }

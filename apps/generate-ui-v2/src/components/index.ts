@@ -17,7 +17,6 @@ import {
 } from '@microsoft/fast-components';
 
 provideFASTDesignSystem().register(
-  fastOption({ prefix: 'vscode', styles: vscodeOptionStyles }),
   fastCombobox({
     prefix: 'vscode',
     styles: vscodeComboboxStyles,
