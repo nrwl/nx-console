@@ -94,6 +94,9 @@ export const vscodeComboboxStyles = () => css`
   :host(:not([disabled])) .control:active {
     border-color: var(--vscode-focusBorder);
   }
+  :host(:focus-within) .control {
+    border-color: var(--vscode-focusBorder);
+  }
   :host(:empty) .listbox {
     display: none;
   }
