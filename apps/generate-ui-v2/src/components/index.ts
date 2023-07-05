@@ -6,15 +6,31 @@ import {
   vsCodeOption,
   vsCodeTextField,
 } from '@vscode/webview-ui-toolkit';
-import {
-  vscodeComboboxStyles,
-  vscodeOptionStyles,
-} from './fields/vscode-autocomplete-styles';
+import { vscodeComboboxStyles } from './fields/autocomplete/vscode-autocomplete-styles';
 import {
   fastCombobox,
   fastOption,
   provideFASTDesignSystem,
 } from '@microsoft/fast-components';
+import {
+  intellijComboboxStyles,
+  intellijOptionStyles,
+} from './fields/autocomplete/intellij-autocomplete-styles';
+
+import './fields/checkbox-field';
+import './fields/array-field';
+import './fields/input-field';
+import './fields/multiselect-field';
+import './fields/select-field';
+import './fields/autocomplete/autocomplete-field';
+import './button';
+import './field-list';
+import './search-bar';
+import './banner';
+import './icon';
+import './field-nav-item';
+import './show-more-divider';
+import './badge';
 
 provideFASTDesignSystem().register(
   fastCombobox({
@@ -56,22 +72,3 @@ provideVSCodeDesignSystem().register(
   vsCodeDropdown(),
   vsCodeOption()
 );
-
-import './fields/checkbox-field';
-import './fields/array-field';
-import './fields/input-field';
-import './fields/multiselect-field';
-import './fields/select-field';
-import './fields/autocomplete-field';
-import './button';
-import './field-list';
-import './search-bar';
-import './banner';
-import './icon';
-import './field-nav-item';
-import './show-more-divider';
-import './badge';
-import {
-  intellijComboboxStyles,
-  intellijOptionStyles,
-} from './fields/intellij-autocomplete-styles';

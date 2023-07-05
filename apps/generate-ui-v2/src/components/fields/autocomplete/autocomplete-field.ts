@@ -1,9 +1,9 @@
 import { LitElement, TemplateResult, html } from 'lit';
-import { Field } from './mixins/field-mixin';
+import { Field } from '../mixins/field-mixin';
 import { customElement } from 'lit/decorators.js';
-import { FieldWrapper } from './mixins/field-wrapper-mixin';
+import { FieldWrapper } from '../mixins/field-wrapper-mixin';
 import { map } from 'lit/directives/map.js';
-import { extractItemOptions } from '../../utils/generator-schema-utils';
+import { extractItemOptions } from '../../../utils/generator-schema-utils';
 
 @customElement('autocomplete-field')
 export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
