@@ -11,7 +11,7 @@
         "devServerTarget": "generate-ui-v2-e2e:serve",
         "testingType": "e2e",
         "baseUrl": "http://localhost:4200",
-        "browser": "chrome"
+        "browser": "electron"
       },
       "configurations": {
         "watch": {
