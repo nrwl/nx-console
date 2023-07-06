@@ -7,7 +7,6 @@ import dev.nx.console.NxIcons
 import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.getNxProjectFromDataContext
 import dev.nx.console.utils.selectNxProject
 import dev.nx.console.utils.selectTargetForNxProject
 import kotlinx.coroutines.*
@@ -32,9 +31,13 @@ class NxRunTargetActionGroup : ActionGroup() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         CoroutineScope(Dispatchers.Default).launch {
+            val currentlyOpenedProject =
+                path?.let {
+                    NxlsService.getInstance(project).generatorContextFromPath(path = it)?.project
+                }
             val nxProject =
                 selectNxProject(project, e.dataContext, currentlyOpenedProject) ?: return@launch
             val nxTarget =

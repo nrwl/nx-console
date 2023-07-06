@@ -49,5 +49,24 @@ class Notifier {
                 )
                 .notify(project)
         }
+
+        fun notifyNoProject(project: Project, path: String?) {
+            if (path == null) {
+                this.notifyAnything(project, "Couldn't find project.", NotificationType.ERROR)
+            } else {
+                this.notifyAnything(
+                    project,
+                    "Couldn't find a project at path $path. Are you sure this path belongs to an Nx project?",
+                    NotificationType.ERROR
+                )
+            }
+        }
+        fun notifyAnything(
+            project: Project,
+            message: String,
+            type: NotificationType = NotificationType.INFORMATION
+        ) {
+            group.createNotification(message, type).setTitle("Nx Console").notify(project)
+        }
     }
 }
