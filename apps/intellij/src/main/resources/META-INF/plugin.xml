@@ -116,16 +116,16 @@
     </action>
 
     <!-- Run -->
-    <group
-      id="dev.nx.console.run.actions.NxRunTargetActionGroup"
+    <action
+      id="dev.nx.console.run.actions.NxRunTargetAction"
       text="Nx: Run Target"
       description="Run any target based on the selected project"
-      class="dev.nx.console.run.actions.NxRunTargetActionGroup"
+      class="dev.nx.console.run.actions.NxRunTargetAction"
       popup="true"
       icon="dev.nx.console.NxIcons.Action"
     >
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
-    </group>
+    </action>
 
 
     <!-- Graph -->

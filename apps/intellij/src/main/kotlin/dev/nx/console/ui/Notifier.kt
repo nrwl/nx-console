@@ -56,7 +56,7 @@ class Notifier {
             } else {
                 this.notifyAnything(
                     project,
-                    "Couldn't find a project at path $path. Are you sure this path belongs to an Nx project?",
+                    "Couldn't find a project at $path. Are you sure this path belongs to an Nx project?",
                     NotificationType.ERROR
                 )
             }
