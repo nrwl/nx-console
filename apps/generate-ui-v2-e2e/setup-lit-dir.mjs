@@ -12,6 +12,23 @@ fs.writeFileSync(
       <meta charset="UTF-8">
       <title>Generate UI</title>
       <link href="output.css" rel="stylesheet">
+      <style>
+      :root {
+        --foreground-color: black;
+      --background-color: white;
+      --primary-color: blue;
+      --error-color: red;
+      --field-background-color: grey;
+      --field-border-color: black;
+      --select-field-background-color: grey;
+      --active-selection-background-color: blue;
+      --focus-border-color: blue;
+      --banner-warning-color: red;
+      --badge-background-color: grey;
+      --separator-color: black;
+      --field-nav-hover-color: grey;
+      }
+      </style>
     </head>
     <body>
 

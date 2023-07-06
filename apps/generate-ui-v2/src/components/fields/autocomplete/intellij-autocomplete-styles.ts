@@ -179,7 +179,7 @@ export const intellijComboboxStyles = () => css`
 
 export const intellijOptionStyles = () => css`
   ${display('inline-flex')} :host {
-    font-family: var(--body-font);
+    font-family: inherit;
     border-radius: ${cornerRadius};
     border: calc(${borderWidth} * 1px) solid transparent;
     box-sizing: border-box;

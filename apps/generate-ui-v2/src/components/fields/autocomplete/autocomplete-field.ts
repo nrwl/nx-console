@@ -4,6 +4,7 @@ import { customElement } from 'lit/decorators.js';
 import { FieldWrapper } from '../mixins/field-wrapper-mixin';
 import { map } from 'lit/directives/map.js';
 import { extractItemOptions } from '../../../utils/generator-schema-utils';
+import { spread } from '@open-wc/lit-helpers';
 
 @customElement('autocomplete-field')
 export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
@@ -21,6 +22,7 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
         autocomplete="both"
         position="below"
         @change="${this.handleChange}"
+        ${spread(this.ariaAttributes)}
       >
         ${map(
           extractItemOptions(this.option),
@@ -36,6 +38,7 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
         autocomplete="both"
         position="below"
         @change="${this.handleChange}"
+        ${spread(this.ariaAttributes)}
       >
         ${map(
           extractItemOptions(this.option),
