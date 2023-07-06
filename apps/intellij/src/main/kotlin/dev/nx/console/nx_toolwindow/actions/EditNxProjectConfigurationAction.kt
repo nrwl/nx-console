@@ -13,8 +13,9 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
 import dev.nx.console.NxConsoleBundle
-import dev.nx.console.nx_toolwindow.NxSimpleNode
-import dev.nx.console.nx_toolwindow.NxTreeNodeKey
+import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
+import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
+import dev.nx.console.nx_toolwindow.tree.NxTreeNodeProjectKey
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.findLineNumberForTargetAndConfiguration
 import dev.nx.console.utils.nxProjectConfigurationPath
@@ -44,9 +45,9 @@ class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
 
         TelemetryService.getInstance(project).featureUsed("Edit Project Configuration")
 
-        val node = e.getData(NxTreeNodeKey) ?: return
+        val nxProject = e.getData(NxTreeNodeProjectKey) ?: return
 
-        val projectFilePath = nxProjectConfigurationPath(project, node.nxProject?.root) ?: return
+        val projectFilePath = nxProjectConfigurationPath(project, nxProject.root) ?: return
         val projectFile = LocalFileSystem.getInstance().findFileByPath(projectFilePath) ?: return
 
         val fileEditorManager = FileEditorManager.getInstance(project)

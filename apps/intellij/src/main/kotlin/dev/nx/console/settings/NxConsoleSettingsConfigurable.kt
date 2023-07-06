@@ -13,24 +13,33 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
     private val settingsProvider = NxConsoleSettingsProvider.getInstance()
     private val projectSettingsProvider = NxConsoleProjectSettingsProvider.getInstance(project)
 
-    private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
+    // project settings
     private lateinit var workspacePathSetting: WorkspacePathSetting
-    private lateinit var telemetrySetting: TelemetrySetting
     private lateinit var generatorFiltersSetting: GeneratorFiltersSetting
+    private lateinit var toolWindowStyleSetting: ToolWindowStyleSetting
+
+    // application settings
+    private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
+    private lateinit var telemetrySetting: TelemetrySetting
     private lateinit var useNewGenerateUIPreviewSetting: UseNewGenerateUIPreviewSetting
 
     override fun createComponent(): JComponent {
-        enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
-        enableDryRunOnGenerateChangeSetting.setValue(settingsProvider.enableDryRunOnGenerateChange)
-
+        // project settings
         workspacePathSetting = WorkspacePathSetting(project)
         workspacePathSetting.setValue(projectSettingsProvider.workspacePath)
 
-        telemetrySetting = TelemetrySetting()
-        telemetrySetting.setValue(settingsProvider.enableTelemetry)
-
         generatorFiltersSetting = GeneratorFiltersSetting(project)
         generatorFiltersSetting.setValue(projectSettingsProvider.generatorFilters)
+
+        toolWindowStyleSetting = ToolWindowStyleSetting(project)
+        toolWindowStyleSetting.setValue(projectSettingsProvider.toolwindowStyle)
+
+        // application settings
+        enableDryRunOnGenerateChangeSetting = EnableDryRunOnGenerateChangeSetting()
+        enableDryRunOnGenerateChangeSetting.setValue(settingsProvider.enableDryRunOnGenerateChange)
+
+        telemetrySetting = TelemetrySetting()
+        telemetrySetting.setValue(settingsProvider.enableTelemetry)
 
         useNewGenerateUIPreviewSetting = UseNewGenerateUIPreviewSetting()
         useNewGenerateUIPreviewSetting.setValue(settingsProvider.useNewGenerateUIPreview)
@@ -39,6 +48,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             group("Project Settings") {
                 workspacePathSetting.render(this)
                 generatorFiltersSetting.render(this)
+                toolWindowStyleSetting.render(this)
             }
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
@@ -54,18 +64,23 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             telemetrySetting.getValue() != settingsProvider.enableTelemetry ||
             useNewGenerateUIPreviewSetting.getValue() != settingsProvider.useNewGenerateUIPreview ||
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
-            generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters
+            generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters ||
+            toolWindowStyleSetting.getValue() != projectSettingsProvider.toolwindowStyle
     }
 
     override fun apply() {
+        // project settings
+        projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
+        projectSettingsProvider.generatorFilters = generatorFiltersSetting.getValue()
+        projectSettingsProvider.toolwindowStyle = toolWindowStyleSetting.getValue()
+
+        workspacePathSetting.doApply()
+
+        // application settings
         settingsProvider.enableDryRunOnGenerateChange =
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
         settingsProvider.useNewGenerateUIPreview = useNewGenerateUIPreviewSetting.getValue()
-        projectSettingsProvider.workspacePath = workspacePathSetting.getValue()
-        projectSettingsProvider.generatorFilters = generatorFiltersSetting.getValue()
-
-        workspacePathSetting.doApply()
     }
 
     override fun getDisplayName(): String {

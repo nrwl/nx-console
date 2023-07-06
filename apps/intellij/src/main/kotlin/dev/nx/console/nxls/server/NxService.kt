@@ -47,6 +47,11 @@ interface NxService {
     fun createProjectGraph(): CompletableFuture<String?> {
         throw UnsupportedOperationException()
     }
+
+    @JsonRequest
+    fun projectFolderTree(): CompletableFuture<SerializedNxFolderTreeData> {
+        throw UnsupportedOperationException()
+    }
     @JsonNotification
     fun changeWorkspace(workspacePath: String) {
         throw UnsupportedOperationException()

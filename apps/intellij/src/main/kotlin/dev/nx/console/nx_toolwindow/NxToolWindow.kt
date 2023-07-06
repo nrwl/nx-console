@@ -11,6 +11,8 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ScrollPaneFactory
+import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
+import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.services.NxWorkspaceRefreshListener
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import javax.swing.JComponent
@@ -18,7 +20,7 @@ import javax.swing.JComponent
 class NxToolWindow(val project: Project) {
 
     private val projectTree = NxProjectsTree()
-    private val projectStructure = NxProjectsTreeStructure(projectTree, project)
+    private val projectStructure = NxTreeStructure(projectTree, project)
     val content: JComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
 
     init {

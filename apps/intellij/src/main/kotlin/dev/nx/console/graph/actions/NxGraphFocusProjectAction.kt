@@ -6,9 +6,9 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
-import dev.nx.console.nx_toolwindow.NxSimpleNode
-import dev.nx.console.nx_toolwindow.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
+import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
+import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.selectNxProject
@@ -51,9 +51,15 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     }
 
     private suspend fun getNxProject(e: AnActionEvent, currentlyOpenedProject: String?): String? {
-        val nxTreeNodeProject = e.getData(NxTreeNodeKey)?.nxProject
-        if (nxTreeNodeProject != null) {
-            return nxTreeNodeProject.name
+        val nxTreeNode = e.getData(NxTreeNodeKey) ?: return null
+        if (nxTreeNode is NxSimpleNode.Target) {
+            return nxTreeNode.nxProjectName
+        }
+        if (nxTreeNode is NxSimpleNode.TargetConfiguration) {
+            return nxTreeNode.nxProjectName
+        }
+        if (nxTreeNode is NxSimpleNode.Project) {
+            return nxTreeNode.nxProjectName
         }
 
         val project = e.project ?: return null
