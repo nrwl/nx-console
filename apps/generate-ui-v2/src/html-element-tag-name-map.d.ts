@@ -1,4 +1,5 @@
 import type { TextField, Checkbox, Dropdown } from '@vscode/webview-ui-toolkit';
+import type { ComboBox } from '@microsoft/fast-foundation';
 import type { SearchBar } from './components/search-bar';
 
 declare global {
@@ -7,5 +8,7 @@ declare global {
     'vscode-checkbox': Checkbox;
     'vscode-dropdown': Dropdown;
     'search-bar': SearchBar;
+    'vscode-combobox': ComboBox;
+    'intellij-combobox': ComboBox;
   }
 }

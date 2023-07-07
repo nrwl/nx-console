@@ -12,6 +12,7 @@ module.exports = {
         fieldBorder: 'var(--field-border-color)',
         focusBorder: 'var(--focus-border-color)',
         selectFieldBackground: 'var(--select-field-background-color)',
+        activeSelectionBackground: 'var(--active-selection-background-color)',
         badgeBackground: 'var(--badge-background-color)',
         badgeForeground: 'var(--badge-foreground-color)',
         bannerWarning: 'var(--banner-warning-color)',

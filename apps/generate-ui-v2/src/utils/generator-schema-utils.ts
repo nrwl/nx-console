@@ -53,3 +53,13 @@ export function debounce<T extends (...args: any[]) => void>(
     }, delay);
   }.bind(func);
 }
+
+export function extractItemOptions(option: Option): string[] {
+  if (!option.items) {
+    return [];
+  }
+  if (Array.isArray(option.items)) {
+    return option.items;
+  }
+  return option.items.enum;
+}

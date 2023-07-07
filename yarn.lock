@@ -5417,6 +5417,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@microsoft/fast-colors@npm:^5.3.0":
+  version: 5.3.1
+  resolution: "@microsoft/fast-colors@npm:5.3.1"
+  checksum: ff87f402faadb4b5aeee3d27762566c11807f927cd4012b8bbc7f073ca68de0e2197f95330ff5dfd7038f4b4f0e2f51b11feb64c5d570f5c598d37850a5daf60
+  languageName: node
+  linkType: hard
+
+"@microsoft/fast-components@npm:^2.30.6":
+  version: 2.30.6
+  resolution: "@microsoft/fast-components@npm:2.30.6"
+  dependencies:
+    "@microsoft/fast-colors": ^5.3.0
+    "@microsoft/fast-element": ^1.10.1
+    "@microsoft/fast-foundation": ^2.46.2
+    "@microsoft/fast-web-utilities": ^5.4.1
+    tslib: ^1.13.0
+  checksum: 1fbf3b7c265bcbf6abcae4d2f72430f7f871104a3d8344f16667a4cc7b123698cdf2bab8b760cbed92ef761c4db350a67f570665c76b132d6996990ac93cbd4f
+  languageName: node
+  linkType: hard
+
+"@microsoft/fast-element@npm:^1.10.1, @microsoft/fast-element@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@microsoft/fast-element@npm:1.12.0"
+  checksum: bbff4e9c83106d1d74f3eeedc87bf84832429e78fee59c6a4ae8164ee4f42667503f586896bea72341b4d2c76c244a3cb0d4fd0d5d3732755f00357714dd609e
+  languageName: node
+  linkType: hard
+
 "@microsoft/fast-element@npm:^1.11.0, @microsoft/fast-element@npm:^1.6.2, @microsoft/fast-element@npm:^1.9.0":
   version: 1.11.0
   resolution: "@microsoft/fast-element@npm:1.11.0"
@@ -5433,6 +5460,18 @@ __metadata:
     tabbable: ^5.2.0
     tslib: ^1.13.0
   checksum: 065a70bf7399f068a876c9b78d9c2e3474fe764cb9865635a55474b47020329f6f0a7f5e2aba6abe9076e7fe6868028852b7460e6c099d5b669fa5c4a8613762
+  languageName: node
+  linkType: hard
+
+"@microsoft/fast-foundation@npm:^2.46.2, @microsoft/fast-foundation@npm:^2.49.0":
+  version: 2.49.0
+  resolution: "@microsoft/fast-foundation@npm:2.49.0"
+  dependencies:
+    "@microsoft/fast-element": ^1.12.0
+    "@microsoft/fast-web-utilities": ^5.4.1
+    tabbable: ^5.2.0
+    tslib: ^1.13.0
+  checksum: 41d55efda4f31550f6eeedc5917ffc4ffc2d620955afc378e5b518119747c56280b045ba2393495ec91c4990dbb588de83df9fc18bd4b3aae01087101d0c705d
   languageName: node
   linkType: hard
 
@@ -22915,6 +22954,9 @@ __metadata:
     "@angular/platform-browser-dynamic": 16.1.2
     "@babel/core": 7.21.0
     "@lit-labs/context": ^0.3.1
+    "@microsoft/fast-components": ^2.30.6
+    "@microsoft/fast-element": ^1.12.0
+    "@microsoft/fast-foundation": ^2.49.0
     "@monodon/typescript-nx-imports-plugin": 0.2.0
     "@nx/angular": 16.4.0
     "@nx/cypress": 16.4.0
