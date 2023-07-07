@@ -12,7 +12,7 @@ import dev.nx.console.utils.getPropertyNodeFromLeafNode
 data class NxRunSettings(
     val nxProjects: String = "",
     val nxTargets: String = "",
-    val nxTargetsConfiguration: String? = "",
+    val nxTargetsConfiguration: String = "",
     val arguments: String = "",
     var environmentVariables: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
 )

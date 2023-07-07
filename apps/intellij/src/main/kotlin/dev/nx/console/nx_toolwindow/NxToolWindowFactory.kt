@@ -18,9 +18,9 @@ class NxToolWindowFactory : ToolWindowFactory, DumbAware {
 data class NxTaskSet(
     val nxProject: String,
     val nxTarget: String,
-    val nxTargetConfiguration: String?
+    val nxTargetConfiguration: String
 ) {
-    constructor(nxProject: String, nxTarget: String) : this(nxProject, nxTarget, null) {}
+    constructor(nxProject: String, nxTarget: String) : this(nxProject, nxTarget, "") {}
     val suggestedName =
-        "${nxProject}:${nxTarget}${if(nxTargetConfiguration.isNullOrBlank().not()) ":$nxTargetConfiguration" else ""}"
+        "${nxProject}:${nxTarget}${if(nxTargetConfiguration.isBlank().not()) ":$nxTargetConfiguration" else ""}"
 }

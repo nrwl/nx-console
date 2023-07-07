@@ -18,7 +18,7 @@ import kotlin.contracts.contract
 data class NxTargetDescriptor(
     val nxProject: String,
     val nxTarget: String,
-    val nxTargetConfiguration: String? = null
+    val nxTargetConfiguration: String = ""
 ) {}
 
 // we should only provide gutters for leaf nodes (see LineMarkerProvider comment)

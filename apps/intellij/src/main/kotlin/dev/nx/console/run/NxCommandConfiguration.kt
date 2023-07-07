@@ -26,6 +26,7 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
         super.writeExternal(element)
         element.writeString("nx-projects", nxRunSettings.nxProjects)
         element.writeString("nx-targets", nxRunSettings.nxTargets)
+        element.writeString("nx-target-configuration", nxRunSettings.nxTargetsConfiguration)
         nxRunSettings.environmentVariables.writeExternal(element)
         element.writeString("arguments", nxRunSettings.arguments)
     }
@@ -36,6 +37,7 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
             NxRunSettings(
                 nxProjects = element.readString("nx-projects") ?: return,
                 nxTargets = element.readString("nx-targets") ?: return,
+                nxTargetsConfiguration = element.readString("nx-target-configuration") ?: return,
                 environmentVariables = EnvironmentVariablesData.readExternal(element),
                 arguments = element.readString("arguments") ?: return,
             )
@@ -47,10 +49,10 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
         }
 
         if (',' in nxRunSettings.nxTargets) {
-            return "${nxRunSettings.nxProjects} --targets=${nxRunSettings.nxTargets} ${if(nxRunSettings.nxTargetsConfiguration.isNullOrBlank().not()) "-c ${nxRunSettings.nxTargetsConfiguration}" else ""}"
+            return "${nxRunSettings.nxProjects} --targets=${nxRunSettings.nxTargets} ${if(nxRunSettings.nxTargetsConfiguration.isBlank().not()) "-c ${nxRunSettings.nxTargetsConfiguration}" else ""}"
         }
 
-        return "${nxRunSettings.nxProjects}:${nxRunSettings.nxTargets}${if(nxRunSettings.nxTargetsConfiguration.isNullOrBlank().not()) ":${nxRunSettings.nxTargetsConfiguration}" else ""}"
+        return "${nxRunSettings.nxProjects}:${nxRunSettings.nxTargets}${if(nxRunSettings.nxTargetsConfiguration.isBlank().not()) ":${nxRunSettings.nxTargetsConfiguration}" else ""}"
     }
 }
 
