@@ -37,7 +37,7 @@ class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
             NxRunSettings(
                 nxProjects = element.readString("nx-projects") ?: return,
                 nxTargets = element.readString("nx-targets") ?: return,
-                nxTargetsConfiguration = element.readString("nx-target-configuration") ?: return,
+                nxTargetsConfiguration = element.readString("nx-target-configuration") ?: "",
                 environmentVariables = EnvironmentVariablesData.readExternal(element),
                 arguments = element.readString("arguments") ?: return,
             )
