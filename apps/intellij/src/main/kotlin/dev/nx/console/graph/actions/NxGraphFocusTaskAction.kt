@@ -2,15 +2,17 @@ package dev.nx.console.graph.actions
 
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
+import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.NxTargetDescriptor
-import dev.nx.console.utils.getNxProjectFromDataContext
 import dev.nx.console.utils.selectNxProject
 import dev.nx.console.utils.selectTargetForNxProject
 import kotlinx.coroutines.*
@@ -37,9 +39,11 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Task")
 
-        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return
 
         CoroutineScope(Dispatchers.Default).launch {
+            val currentlyOpenedProject =
+                NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
             val targetDescriptor: NxTargetDescriptor =
                 this@NxGraphFocusTaskAction.targetDescriptor
                     ?: if (e.place == "NxToolWindow") {
@@ -50,6 +54,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
                             else selectNxProject(project, e.dataContext, currentlyOpenedProject)
 
                         if (nxProject == null) {
+                            Notifier.notifyNoProject(project, path)
                             return@launch
                         }
 
