@@ -1,7 +1,6 @@
 package dev.nx.console.utils
 
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
@@ -14,15 +13,6 @@ import javax.swing.ListSelectionModel
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.runBlocking
-
-/** Don't run this from within coroutines */
-fun getNxProjectFromDataContext(project: Project, dataContext: DataContext): String? {
-    val path = dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return null
-
-    return runBlocking {
-        NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
-    }
-}
 
 suspend fun selectNxProject(
     project: Project,

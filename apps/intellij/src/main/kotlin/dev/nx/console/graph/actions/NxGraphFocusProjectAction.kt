@@ -2,13 +2,15 @@ package dev.nx.console.graph.actions
 
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.NxSimpleNode
 import dev.nx.console.nx_toolwindow.NxTreeNodeKey
+import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.getNxProjectFromDataContext
+import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.selectNxProject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,11 +27,20 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         val project = e.project ?: return
 
         TelemetryService.getInstance(project).featureUsed("Nx Graph Select Project")
-
-        val currentlyOpenedProject = getNxProjectFromDataContext(project, e.dataContext)
+        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         CoroutineScope(Dispatchers.Default).launch {
-            val nxProjectName: String = getNxProject(e, currentlyOpenedProject) ?: return@launch
+            val currentlyOpenedProject =
+                path?.let {
+                    NxlsService.getInstance(project).generatorContextFromPath(path = it)?.project
+                }
+
+            val nxProjectName: String? = getNxProject(e, currentlyOpenedProject)
+
+            if (nxProjectName == null) {
+                Notifier.notifyNoProject(project, path)
+                return@launch
+            }
 
             ApplicationManager.getApplication().invokeLater {
                 val graphService = NxGraphService.getInstance(project)

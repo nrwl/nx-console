@@ -2,6 +2,7 @@ import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Option } from '@nx-console/shared/schema';
 import { when } from 'lit/directives/when.js';
+import { extractItemOptions } from '../utils/generator-schema-utils';
 
 @customElement('field-list')
 export class FieldList extends LitElement {
@@ -158,7 +159,11 @@ const getFieldComponent = (option: Option) => {
     }
   }
   if (option.items) {
-    return html` <select-field .option=${option}></select-field>`;
+    if (extractItemOptions(option).length > 10) {
+      return html`<autocomplete-field .option=${option}></autocomplete-field>`;
+    } else {
+      return html` <select-field .option=${option}></select-field>`;
+    }
   }
   return html` <input-field .option=${option}></input-field>`;
 };

@@ -11,9 +11,9 @@ import com.intellij.openapi.project.Project
 class NxTaskExecutionManager(val project: Project) {
 
     fun execute(nxProject: String, nxTarget: String) {
-        execute(nxProject, nxTarget, null)
+        execute(nxProject, nxTarget, "")
     }
-    fun execute(nxProject: String, nxTarget: String, nxTargetConfiguration: String?) {
+    fun execute(nxProject: String, nxTarget: String, nxTargetConfiguration: String) {
         val runManager = project.service<RunManager>()
 
         val runnerAndConfigurationSettings: RunnerAndConfigurationSettings =
@@ -28,7 +28,7 @@ class NxTaskExecutionManager(val project: Project) {
                 }
                 ?: runManager
                     .createConfiguration(
-                        "$nxProject:$nxTarget${if(nxTargetConfiguration.isNullOrBlank().not()) ":$nxTargetConfiguration" else ""}",
+                        "$nxProject:$nxTarget${if(nxTargetConfiguration.isBlank().not()) ":$nxTargetConfiguration" else ""}",
                         NxCommandConfigurationType::class.java
                     )
                     .apply {
