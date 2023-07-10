@@ -7,8 +7,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
-import dev.nx.console.nx_toolwindow.NxSimpleNode
-import dev.nx.console.nx_toolwindow.NxTreeNodeKey
+import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
+import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.ui.Notifier

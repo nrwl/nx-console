@@ -11,14 +11,18 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.ScrollPaneFactory
+import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
+import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.services.NxWorkspaceRefreshListener
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
+import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
+import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import javax.swing.JComponent
 
 class NxToolWindow(val project: Project) {
 
     private val projectTree = NxProjectsTree()
-    private val projectStructure = NxProjectsTreeStructure(projectTree, project)
+    private val projectStructure = NxTreeStructure(projectTree, project)
     val content: JComponent = ScrollPaneFactory.createScrollPane(projectTree, 0)
 
     init {
@@ -27,6 +31,14 @@ class NxToolWindow(val project: Project) {
                 NX_WORKSPACE_REFRESH_TOPIC,
                 object : NxWorkspaceRefreshListener {
                     override fun onNxWorkspaceRefresh() {
+                        invokeLater { projectStructure.updateNxProjects() }
+                    }
+                }
+            )
+            subscribe(
+                NX_TOOLWINDOW_STYLE_SETTING_TOPIC,
+                object : NxToolWindowStyleSettingListener {
+                    override fun onNxToolWindowStyleChange() {
                         invokeLater { projectStructure.updateNxProjects() }
                     }
                 }

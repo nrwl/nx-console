@@ -3,8 +3,8 @@ package dev.nx.console.graph.actions
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
-import dev.nx.console.nx_toolwindow.NxSimpleNode
-import dev.nx.console.nx_toolwindow.NxTreeNodeKey
+import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
+import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.telemetry.TelemetryService
 
 class NxGraphFocusTaskGroupAction : DumbAwareAction() {
