@@ -75,6 +75,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         projectSettingsProvider.toolwindowStyle = toolWindowStyleSetting.getValue()
 
         workspacePathSetting.doApply()
+        toolWindowStyleSetting.doApply()
 
         // application settings
         settingsProvider.enableDryRunOnGenerateChange =

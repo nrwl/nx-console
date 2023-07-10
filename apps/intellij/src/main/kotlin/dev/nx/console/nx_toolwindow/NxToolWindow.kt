@@ -15,6 +15,8 @@ import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.services.NxWorkspaceRefreshListener
 import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
+import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
+import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import javax.swing.JComponent
 
 class NxToolWindow(val project: Project) {
@@ -29,6 +31,14 @@ class NxToolWindow(val project: Project) {
                 NX_WORKSPACE_REFRESH_TOPIC,
                 object : NxWorkspaceRefreshListener {
                     override fun onNxWorkspaceRefresh() {
+                        invokeLater { projectStructure.updateNxProjects() }
+                    }
+                }
+            )
+            subscribe(
+                NX_TOOLWINDOW_STYLE_SETTING_TOPIC,
+                object : NxToolWindowStyleSettingListener {
+                    override fun onNxToolWindowStyleChange() {
                         invokeLater { projectStructure.updateNxProjects() }
                     }
                 }

@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.util.messages.Topic
 import dev.nx.console.settings.NxConsoleSettingBase
 
 enum class ToolWindowStyles(private val displayName: String) {
@@ -12,6 +13,13 @@ enum class ToolWindowStyles(private val displayName: String) {
     AUTOMATIC("Automatic");
 
     override fun toString() = displayName
+}
+
+val NX_TOOLWINDOW_STYLE_SETTING_TOPIC: Topic<NxToolWindowStyleSettingListener> =
+    Topic("NxToolWindowStyleSetting", NxToolWindowStyleSettingListener::class.java)
+
+interface NxToolWindowStyleSettingListener {
+    fun onNxToolWindowStyleChange()
 }
 
 class ToolWindowStyleSetting(val project: Project) : NxConsoleSettingBase<ToolWindowStyles> {
@@ -39,5 +47,11 @@ class ToolWindowStyleSetting(val project: Project) : NxConsoleSettingBase<ToolWi
 
     override fun setValue(value: ToolWindowStyles) {
         comboBoxField.item = value
+    }
+
+    override fun doApply() {
+        project.messageBus
+            .syncPublisher(NX_TOOLWINDOW_STYLE_SETTING_TOPIC)
+            .onNxToolWindowStyleChange()
     }
 }

@@ -78,7 +78,7 @@ class NxTreeStructure(
         val numProjects = nxWorkspace?.workspace?.projects?.size ?: 1
         return if (
             toolWindowStyle == ToolWindowStyles.LIST ||
-                (toolWindowStyle == ToolWindowStyles.AUTOMATIC && numProjects > 10)
+                (toolWindowStyle == ToolWindowStyles.AUTOMATIC && numProjects < 10)
         ) {
             NxListTreeBuilder(nxWorkspace)
         } else {
