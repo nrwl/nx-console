@@ -89,7 +89,7 @@ async function selectProjectAndThenTarget(
   let p = projectName;
   let t = targetName;
   if (!p) {
-    const projects = await getProjects();
+    const projects = await getProjects(t);
     p = await selectProject(projects);
     if (!p) {
       return;
