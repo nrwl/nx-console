@@ -3,6 +3,7 @@ package dev.nx.console.settings
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import dev.nx.console.settings.options.GeneratorFilter
+import dev.nx.console.settings.options.ToolWindowStyles
 
 @State(name = "NxConsoleProjectSettingsProvider", storages = [Storage("nx-console.xml")])
 class NxConsoleProjectSettingsProvider(val project: Project) :
@@ -28,6 +29,12 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
             state.generatorAllowlist = value?.associateBy({ it.matcher }, { it.include })
         }
 
+    var toolwindowStyle: ToolWindowStyles
+        get() = state.toolwindowStyle
+        set(value) {
+            state.toolwindowStyle = value
+        }
+
     companion object {
         fun getInstance(project: Project): NxConsoleProjectSettingsProvider {
             return project.getService(NxConsoleProjectSettingsProvider::class.java)
@@ -37,5 +44,6 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
 
 data class NxConsoleProjectSettingsState(
     var workspacePath: String? = null,
-    var generatorAllowlist: Map<String, Boolean>? = null
+    var generatorAllowlist: Map<String, Boolean>? = null,
+    var toolwindowStyle: ToolWindowStyles = ToolWindowStyles.AUTOMATIC
 ) {}

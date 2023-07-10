@@ -3,7 +3,7 @@ import {
   RequestType,
   ResponseError,
 } from 'vscode-languageserver/node';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { NxWorkspace, TreeMap, TreeNode } from '@nx-console/shared/types';
 import {
   CollectionInfo,
   Option,
@@ -98,3 +98,12 @@ export const NxCreateProjectGraphRequest: RequestType<
   string | undefined,
   unknown
 > = new RequestType('nx/createProjectGraph');
+
+export const NxProjectFolderTreeRequest: RequestType<
+  undefined,
+  {
+    serializedTreeMap: { name: string; node: TreeNode }[];
+    roots: TreeNode[];
+  },
+  unknown
+> = new RequestType('nx/projectFolderTree');

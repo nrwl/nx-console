@@ -8,4 +8,5 @@ export * from './lib/get-executors';
 export * from './lib/get-nx-version';
 export * from './lib/get-project-graph-output';
 export * from './lib/create-project-graph';
+export * from './lib/get-project-folder-tree';
 export { getNxDaemonClient } from './lib/get-nx-workspace-package';

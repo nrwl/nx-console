@@ -11,3 +11,4 @@ export * from './lib/get-generator-context-v2';
 export * from './lib/get-nx-version';
 export * from './lib/get-project-graph-output';
 export * from './lib/create-project-graph';
+export * from './lib/get-project-folder-tree';

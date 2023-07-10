@@ -1,11 +1,11 @@
-package dev.nx.console.nx_toolwindow
+package dev.nx.console.nx_toolwindow.tree
 
 import com.intellij.ui.tree.TreeVisitor
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.tree.TreePath
 
-class NxProjectsTreePersistenceManager(private val tree: NxProjectsTree) {
+class NxTreePersistenceManager(private val tree: NxProjectsTree) {
     private val expandedPaths: MutableSet<List<String?>> = mutableSetOf()
 
     fun installPersistenceListeners() {

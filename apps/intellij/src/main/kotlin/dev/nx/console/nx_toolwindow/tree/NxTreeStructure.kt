@@ -1,4 +1,4 @@
-package dev.nx.console.nx_toolwindow
+package dev.nx.console.nx_toolwindow.tree
 
 import com.intellij.execution.Executor
 import com.intellij.execution.RunManager
@@ -16,13 +16,23 @@ import com.intellij.ui.ClickListener
 import com.intellij.ui.PopupHandler
 import com.intellij.ui.tree.AsyncTreeModel
 import com.intellij.ui.tree.StructureTreeModel
+import com.intellij.ui.treeStructure.NullNode
+import com.intellij.ui.treeStructure.SimpleNode
 import com.intellij.ui.treeStructure.SimpleTreeStructure
 import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.graph.actions.NxGraphFocusProjectAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
+import dev.nx.console.models.NxWorkspace
+import dev.nx.console.nx_toolwindow.NxTaskSet
 import dev.nx.console.nx_toolwindow.actions.EditNxProjectConfigurationAction
+import dev.nx.console.nx_toolwindow.tree.builder.NxFolderTreeBuilder
+import dev.nx.console.nx_toolwindow.tree.builder.NxListTreeBuilder
+import dev.nx.console.nx_toolwindow.tree.builder.NxTreeBuilderBase
 import dev.nx.console.run.*
+import dev.nx.console.services.NxlsService
+import dev.nx.console.settings.NxConsoleProjectSettingsProvider
+import dev.nx.console.settings.options.ToolWindowStyles
 import dev.nx.console.utils.nxWorkspace
 import java.awt.event.MouseEvent
 import kotlinx.coroutines.CoroutineScope
@@ -30,15 +40,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 
-class NxProjectsTreeStructure(
+class NxTreeStructure(
     val tree: NxProjectsTree,
     val project: Project,
 ) : SimpleTreeStructure(), Disposable {
 
     private val treeModel = StructureTreeModel(this, this)
-    private var root: NxSimpleNode.Root = NxSimpleNode.Root(null)
+    private lateinit var nxTreeBuilder: NxTreeBuilderBase
+    private var root: SimpleNode = NullNode()
 
-    private var treePersistenceManager = NxProjectsTreePersistenceManager(tree)
+    private var treePersistenceManager = NxTreePersistenceManager(tree)
     private var nxTaskExecutionManager = NxTaskExecutionManager.getInstance(project)
 
     init {
@@ -54,10 +65,65 @@ class NxProjectsTreeStructure(
     fun updateNxProjects() {
         CoroutineScope(Dispatchers.Default).launch {
             val nxWorkspace = project.nxWorkspace()
-            root = NxSimpleNode.Root(nxWorkspace)
+            nxTreeBuilder = getTreeBuilder(nxWorkspace)
+            root = nxTreeBuilder.buildRootNode()
             treeModel.invalidateAsync().await()
             TreeUtil.promiseExpand(tree, treePersistenceManager.NxProjectsTreePersistenceVisitor())
         }
+    }
+
+    private suspend fun getTreeBuilder(nxWorkspace: NxWorkspace?): NxTreeBuilderBase {
+        val toolWindowStyle: ToolWindowStyles =
+            NxConsoleProjectSettingsProvider.getInstance(project).toolwindowStyle
+        val numProjects = nxWorkspace?.workspace?.projects?.size ?: 1
+        return if (
+            toolWindowStyle == ToolWindowStyles.LIST ||
+                (toolWindowStyle == ToolWindowStyles.AUTOMATIC && numProjects < 10)
+        ) {
+            NxListTreeBuilder(nxWorkspace)
+        } else {
+            val nxFolderTreeData = NxlsService.getInstance(project).projectFolderTree()
+            NxFolderTreeBuilder(nxWorkspace, nxFolderTreeData)
+        }
+    }
+
+    // Tree Node Actions
+    private fun installPopupActions() {
+        val actionList: MutableList<AnAction> =
+            mutableListOf(
+                RunAction(),
+                EditRunSettingsAction(),
+                Separator(),
+                EditNxProjectConfigurationAction(),
+                NxGraphFocusProjectAction(),
+                NxGraphFocusTaskGroupAction(),
+                NxGraphFocusTaskAction()
+            )
+
+        val copyAction = ActionManager.getInstance().getAction("\$Copy")
+        copyAction?.registerCustomShortcutSet(copyAction.shortcutSet, this.tree)
+        val copyPathsAction = ActionManager.getInstance().getAction("CopyPaths")
+        if (copyPathsAction != null) {
+            actionList.add(copyPathsAction)
+        }
+        val actionGroup = DefaultActionGroup(actionList)
+        actionList.forEach { it.registerCustomShortcutSet(it.shortcutSet, tree) }
+        PopupHandler.installPopupMenu(this.tree, actionGroup, "NxToolWindow")
+        object : ClickListener() {
+                override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
+                    if (event.button == 1 && clickCount == 2) {
+                        val taskSet: NxTaskSet = createTaskSetFromSelectedNode() ?: return false
+                        nxTaskExecutionManager.execute(
+                            taskSet.nxProject,
+                            taskSet.nxTarget,
+                            taskSet.nxTargetConfiguration
+                        )
+                        return true
+                    }
+                    return false
+                }
+            }
+            .installOn(this.tree)
     }
 
     private inner class RunAction : ExecuteAction(DefaultRunExecutor.getRunExecutorInstance()) {
@@ -72,7 +138,7 @@ class NxProjectsTreeStructure(
         }
 
         override fun update(e: AnActionEvent) {
-            val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
+            val taskSet: NxTaskSet? = createTaskSetFromSelectedNode()
             e.presentation.isEnabledAndVisible = taskSet != null
             if (taskSet != null) {
                 e.presentation.text =
@@ -85,7 +151,7 @@ class NxProjectsTreeStructure(
 
         override fun actionPerformed(e: AnActionEvent) {
             val project = e.project ?: return
-            val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
+            val taskSet: NxTaskSet? = createTaskSetFromSelectedNode()
             val runManager = project.service<RunManager>()
             if (taskSet != null) {
                 val nxTarget = taskSet.nxTarget
@@ -117,44 +183,6 @@ class NxProjectsTreeStructure(
         }
     }
 
-    private fun installPopupActions() {
-        val actionList: MutableList<AnAction> =
-            mutableListOf(
-                RunAction(),
-                EditRunSettingsAction(),
-                Separator(),
-                EditNxProjectConfigurationAction(),
-                NxGraphFocusProjectAction(),
-                NxGraphFocusTaskGroupAction(),
-                NxGraphFocusTaskAction()
-            )
-
-        val copyAction = ActionManager.getInstance().getAction("\$Copy")
-        copyAction?.registerCustomShortcutSet(copyAction.shortcutSet, this.tree)
-        val copyPathsAction = ActionManager.getInstance().getAction("CopyPaths")
-        if (copyPathsAction != null) {
-            actionList.add(copyPathsAction)
-        }
-        val actionGroup = DefaultActionGroup(actionList)
-        actionList.forEach { it.registerCustomShortcutSet(it.shortcutSet, tree) }
-        PopupHandler.installPopupMenu(this.tree, actionGroup, "NxToolWindow")
-        object : ClickListener() {
-                override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
-                    if (event.button == 1 && clickCount == 2) {
-                        val taskSet: NxTaskSet = createTaskSetFromSelectedNodes() ?: return false
-                        nxTaskExecutionManager.execute(
-                            taskSet.nxProject,
-                            taskSet.nxTarget,
-                            taskSet.nxTargetConfiguration
-                        )
-                        return true
-                    }
-                    return false
-                }
-            }
-            .installOn(this.tree)
-    }
-
     abstract inner class ExecuteAction(executor: Executor) :
         AnAction(executor.startActionText, null as String?, executor.icon), DumbAware {
         private val myExecutor: Executor
@@ -169,7 +197,7 @@ class NxProjectsTreeStructure(
         }
 
         override fun update(e: AnActionEvent) {
-            val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
+            val taskSet: NxTaskSet? = createTaskSetFromSelectedNode()
             e.presentation.isEnabledAndVisible = taskSet != null
             if (taskSet != null) {
                 e.presentation.text = myExecutor.getStartActionText(taskSet.suggestedName)
@@ -177,7 +205,7 @@ class NxProjectsTreeStructure(
         }
 
         override fun actionPerformed(e: AnActionEvent) {
-            val taskSet: NxTaskSet? = createTaskSetFromSelectedNodes()
+            val taskSet: NxTaskSet? = createTaskSetFromSelectedNode()
             if (taskSet != null) {
                 nxTaskExecutionManager.execute(
                     taskSet.nxProject,
@@ -188,7 +216,7 @@ class NxProjectsTreeStructure(
         }
     }
 
-    private fun createTaskSetFromSelectedNodes(): NxTaskSet? {
+    private fun createTaskSetFromSelectedNode(): NxTaskSet? {
         val targetNode = tree.selectedNode as? NxSimpleNode.Target
 
         if (targetNode != null) {

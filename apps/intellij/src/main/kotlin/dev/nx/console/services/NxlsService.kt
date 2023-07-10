@@ -101,6 +101,15 @@ class NxlsService(val project: Project) {
         }
     }
 
+    suspend fun projectFolderTree(): NxFolderTreeData? {
+        return try {
+            server()?.getNxService()?.projectFolderTree()?.await()?.toFolderTreeData()
+        } catch (e: Throwable) {
+            println(e.message)
+            null
+        }
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }
