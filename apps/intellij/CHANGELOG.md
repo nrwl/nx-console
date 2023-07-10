@@ -1,3 +1,17 @@
+## 1.9.0 (2023-07-10)
+
+### Bug Fixes
+
+* **intellij:** handle nxls shutdown without blocking ([#1804](https://github.com/nrwl/nx-console/issues/1804)) ([3e4fa1b](https://github.com/nrwl/nx-console/commit/3e4fa1bbcdb1a94afdba6915033c915c3c08dcbf))
+* **intellij:** rework actions to remove runBlocking & improve UX ([#1809](https://github.com/nrwl/nx-console/issues/1809)) ([0adee2e](https://github.com/nrwl/nx-console/commit/0adee2ef8c444327e5e293c38752484f1e1680a4))
+* **intellij:** save and load run configurations that have a nx target configuration set ([#1811](https://github.com/nrwl/nx-console/issues/1811)) ([e0d03d9](https://github.com/nrwl/nx-console/commit/e0d03d9c4cfcddd5bd42648346a58e4b040ae663))
+
+
+### Features
+
+* add autocomplete field and use it for options with many items ([#1807](https://github.com/nrwl/nx-console/issues/1807)) ([777a897](https://github.com/nrwl/nx-console/commit/777a89761c22b98a866bc2ea5c50de57f402e041))
+* refactor & add folder view to jetbrains toolwindow ([#1814](https://github.com/nrwl/nx-console/issues/1814)) ([70a9c88](https://github.com/nrwl/nx-console/commit/70a9c88fb60fc1e0dcaf1811463adb60f7151037))
+
 ## 1.8.0 (2023-07-04)
 
 ### Bug Fixes
