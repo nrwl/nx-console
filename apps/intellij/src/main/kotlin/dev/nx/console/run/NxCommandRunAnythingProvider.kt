@@ -53,7 +53,7 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
                     project,
                     nxProject,
                     nxTarget,
-                    null,
+                    "",
                     args,
                 )
                 .also { runManager.addConfiguration(it) }
