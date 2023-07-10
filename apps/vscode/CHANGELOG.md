@@ -1,3 +1,15 @@
+# [18.5.0](https://github.com/nrwl/nx-console/compare/vscode-v18.4.0...vscode-v18.5.0) (2023-07-10)
+
+
+### Bug Fixes
+
+* **vscode:** use target to determine real list of projects ([#1813](https://github.com/nrwl/nx-console/issues/1813)) ([1b45b0b](https://github.com/nrwl/nx-console/commit/1b45b0b326f0eb8e2d2d7233c6ad49eb1aaa82ce))
+
+
+### Features
+
+* add autocomplete field and use it for options with many items ([#1807](https://github.com/nrwl/nx-console/issues/1807)) ([777a897](https://github.com/nrwl/nx-console/commit/777a89761c22b98a866bc2ea5c50de57f402e041))
+
 # [18.4.0](https://github.com/nrwl/nx-console/compare/vscode-v18.3.0...vscode-v18.4.0) (2023-07-04)
 
 
