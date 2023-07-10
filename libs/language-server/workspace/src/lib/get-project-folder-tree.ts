@@ -9,9 +9,7 @@ import { nxWorkspace } from './workspace';
  * - In the end, if a folder with the '.' root exists, it will be the singular root node
  */
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- dealing with maps is hard */
-export async function getProjectFolderTree(
-  workspacePath: string
-): Promise<{
+export async function getProjectFolderTree(workspacePath: string): Promise<{
   serializedTreeMap: { name: string; node: TreeNode }[];
   roots: TreeNode[];
 }> {
