@@ -1,6 +1,7 @@
 package dev.nx.console.generate
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
@@ -19,7 +20,11 @@ import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.utils.nxlsWorkingPath
 import java.awt.Dimension
 import javax.swing.ListSelectionModel.SINGLE_SELECTION
-import kotlinx.coroutines.runBlocking
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NxGenerateService(val project: Project) {
 
@@ -58,118 +63,110 @@ class NxGenerateService(val project: Project) {
 
     suspend fun selectGenerator(
         actionEvent: AnActionEvent?,
-        callback: (generator: NxGenerator?) -> Unit
-    ) {
+    ) = suspendCoroutine {
+        CoroutineScope(Dispatchers.Default).launch {
+            val generators = getFilteredGenerators()
 
-        val generators = this.getFilteredGenerators()
+            if (generators.isEmpty()) {
+                it.resume(null)
+            }
+            val generatorNames = generators.map { it.name }
 
-        if (generators.isEmpty()) {
-            callback(null)
-        }
-        val generatorNames = generators.map { it.name }
+            if (generatorNames.size == 1) {
+                val chosenGenerator = generators.find { g -> g.name == generatorNames[0] }
+                it.resume(chosenGenerator)
+            }
 
-        if (generatorNames.size == 1) {
-            val chosenGenerator = generators.find { g -> g.name == generatorNames[0] }
-            callback(chosenGenerator)
-        }
-
-        val popup =
-            JBPopupFactory.getInstance()
-                .createPopupChooserBuilder(generators)
-                .setRenderer(NxGeneratorListCellRenderer())
-                .setTitle("Nx Generate (UI)")
-                .setSelectionMode(SINGLE_SELECTION)
-                .setRequestFocus(true)
-                .setFilterAlwaysVisible(true)
-                .setResizable(true)
-                .setMovable(true)
-                .setNamerForFiltering { "${it.data.collection} - ${it.data.name}" }
-                .setItemChosenCallback { chosen ->
-                    if (chosen != null) {
-                        callback(chosen)
+            val popup =
+                JBPopupFactory.getInstance()
+                    .createPopupChooserBuilder(generators)
+                    .setRenderer(NxGeneratorListCellRenderer())
+                    .setTitle("Nx Generate (UI)")
+                    .setSelectionMode(SINGLE_SELECTION)
+                    .setRequestFocus(true)
+                    .setFilterAlwaysVisible(true)
+                    .setResizable(true)
+                    .setMovable(true)
+                    .setNamerForFiltering { "${it.data.collection} - ${it.data.name}" }
+                    .setItemChosenCallback { chosen ->
+                        if (chosen != null) {
+                            it.resume(chosen)
+                        }
                     }
-                }
-                .setMinSize(Dimension(JBUI.scale(350), JBUI.scale(300)))
-                .setDimensionServiceKey("nx.dev.console.generate")
-                .createPopup()
+                    .setMinSize(Dimension(JBUI.scale(350), JBUI.scale(300)))
+                    .setDimensionServiceKey("nx.dev.console.generate")
+                    .createPopup()
 
-        if (actionEvent?.dataContext != null) {
-            popup.showInBestPositionFor(actionEvent.dataContext)
-        } else {
-            popup.showInFocusCenter()
+            ApplicationManager.getApplication().invokeLater {
+                if (actionEvent?.dataContext != null) {
+                    popup.showInBestPositionFor(actionEvent.dataContext)
+                } else {
+                    popup.showInFocusCenter()
+                }
+            }
         }
     }
 
-    fun openGenerateUi(
+    suspend fun openGenerateUi(
         project: Project,
         generator: NxGenerator,
         contextPath: String? = null,
         options: List<NxGeneratorOption>? = null
     ) {
-
         val generatorOptions =
-            options
-                ?: runBlocking {
-                    val nxProjectNames =
-                        project
-                            .service<NxlsService>()
-                            .workspace()
-                            ?.workspace
-                            ?.projects
-                            ?.keys
-                            ?.toList()
-                            ?: emptyList()
-                    project
-                        .service<NxlsService>()
-                        .generatorOptions(
-                            NxGeneratorOptionsRequestOptions(
-                                generator.data.collection,
-                                generator.data.name,
-                                generator.path
-                            )
+            if (options != null) options
+            else {
+                val nxProjectNames =
+                    project.service<NxlsService>().workspace()?.workspace?.projects?.keys?.toList()
+                        ?: emptyList()
+                project
+                    .service<NxlsService>()
+                    .generatorOptions(
+                        NxGeneratorOptionsRequestOptions(
+                            generator.data.collection,
+                            generator.data.name,
+                            generator.path
                         )
-                        .map {
-                            if (
-                                it.name == "project" ||
-                                    it.name == "projectName" ||
-                                    it.dropdown == "projects"
-                            ) {
-                                it.items = nxProjectNames
-                            }
-                            it
+                    )
+                    .map {
+                        if (
+                            it.name == "project" ||
+                                it.name == "projectName" ||
+                                it.dropdown == "projects"
+                        ) {
+                            it.items = nxProjectNames
                         }
-                }
+                        it
+                    }
+            }
 
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
 
         val generatorContext =
             contextPath?.let {
-                runBlocking {
-                    project
-                        .service<NxlsService>()
-                        .generatorContextFromPath(
-                            generatorWithOptions,
-                            nxlsWorkingPath(contextPath)
-                        )
-                }
+                project
+                    .service<NxlsService>()
+                    .generatorContextFromPath(generatorWithOptions, nxlsWorkingPath(contextPath))
             }
 
-        val virtualFile =
-        // will exchange with feature toggle in the future
-        if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
-                V2NxGenerateUiFile("Generate", project)
-            else DefaultNxGenerateUiFile("Generate", project)
+        ApplicationManager.getApplication().invokeLater {
+            val virtualFile =
+            // will exchange with feature toggle in the future
+            if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
+                    V2NxGenerateUiFile("Generate", project)
+                else DefaultNxGenerateUiFile("Generate", project)
 
-        val fileEditorManager = FileEditorManager.getInstance(project)
-        if (fileEditorManager.isFileOpen(virtualFile)) {
-            fileEditorManager.closeFile(virtualFile)
+            val fileEditorManager = FileEditorManager.getInstance(project)
+            if (fileEditorManager.isFileOpen(virtualFile)) {
+                fileEditorManager.closeFile(virtualFile)
+            }
+
+            fileEditorManager.openFile(virtualFile, true)
+
+            virtualFile.setupGeneratorForm(
+                NxGenerator(generator = generatorWithOptions, contextValues = generatorContext)
+            )
         }
-
-        fileEditorManager.openFile(virtualFile, true)
-
-        virtualFile.setupGeneratorForm(
-            NxGenerator(generator = generatorWithOptions, contextValues = generatorContext)
-        )
     }
 
     companion object {

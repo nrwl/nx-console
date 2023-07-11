@@ -56,7 +56,9 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
         searchText: String
     ): Boolean {
         val path = event.getData(CommonDataKeys.VIRTUAL_FILE)?.path
-        NxGenerateService.getInstance(project).openGenerateUi(project, selected, path)
+        CoroutineScope(Dispatchers.Default).launch {
+            NxGenerateService.getInstance(project).openGenerateUi(project, selected, path)
+        }
         return true
     }
 
