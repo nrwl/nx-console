@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
@@ -35,7 +36,7 @@ class NxGenerateUiFileType : FileType {
     override fun getIcon(): Icon = NxIcons.FileType
     override fun isBinary(): Boolean = true
     override fun isReadOnly(): Boolean = true
-    override fun getCharset(file: VirtualFile, content: ByteArray): String? = null
+    override fun getCharset(file: VirtualFile, content: ByteArray): String = CharsetToolkit.UTF8
 
     companion object {
         val INSTANCE = NxGenerateUiFileType()
