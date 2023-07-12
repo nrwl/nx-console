@@ -223,15 +223,23 @@ export async function loadHtml(panel: WebviewPanel) {
       <script>${injectedScript()}</script>
       </head>`
   );
+  projectGraphHtml = projectGraphHtml.replace(
+    '</body>',
+    html`
+    <script>
+      ${registerFileClickListener()};
+    </script>
+   </body>`
+  );
 
   return projectGraphHtml;
 }
 
 function injectedScript() {
-  // language=JavaScript
   return `
     (function() {
       const vscode = acquireVsCodeApi();
+      window.vscode = vscode;
 
       const noProjectElement = document.createElement('p');
       noProjectElement.classList.add('nx-select-project');
@@ -372,4 +380,16 @@ function injectedScript() {
       })
     }())
   `;
+}
+
+function registerFileClickListener() {
+  return `
+  window.externalApi?.registerFileClickCallback?.((message) => {
+    window.vscode.postMessage({
+      command: 'fileClick',
+      data: message
+    })
+ })
+ 
+ `;
 }
