@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import dev.nx.console.generate.NxGenerateService
@@ -12,7 +13,9 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.WorkspaceLayout
 import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
     init {
@@ -31,7 +34,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                 null
             }
 
-        runBlocking { selectOptionsAndRun(path, project) }
+        CoroutineScope(Dispatchers.Default).launch { selectOptionsAndRun(path, project) }
     }
 
     private suspend fun selectOptionsAndRun(path: String?, project: Project) {
@@ -64,19 +67,21 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
 
         val runGeneratorManager = RunGeneratorManager(project)
 
-        val dialog =
-            NxReMoveProjectDialog(
-                project,
-                mode,
-                moveGenerators,
-                moveGeneratorContext,
-                projectsWithType,
-                workspaceLayoutPair
-            ) {
-                runReMoveGenerator(it, runGeneratorManager, dryRun = true)
+        ApplicationManager.getApplication().invokeLater {
+            val dialog =
+                NxReMoveProjectDialog(
+                    project,
+                    mode,
+                    moveGenerators,
+                    moveGeneratorContext,
+                    projectsWithType,
+                    workspaceLayoutPair
+                ) {
+                    runReMoveGenerator(it, runGeneratorManager, dryRun = true)
+                }
+            if (dialog.showAndGet()) {
+                runReMoveGenerator(dialog, runGeneratorManager)
             }
-        if (dialog.showAndGet()) {
-            runReMoveGenerator(dialog, runGeneratorManager)
         }
     }
     private fun runReMoveGenerator(

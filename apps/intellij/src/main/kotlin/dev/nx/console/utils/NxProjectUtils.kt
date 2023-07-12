@@ -12,64 +12,67 @@ import javax.swing.JList
 import javax.swing.ListSelectionModel
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 suspend fun selectNxProject(
     project: Project,
     dataContext: DataContext?,
     preferredProject: String? = null
 ): String? = suspendCoroutine {
-    val projects = runBlocking {
-        NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toMutableList()
-            ?: mutableListOf()
-    }
+    CoroutineScope(Dispatchers.Default).launch {
+        val projects =
+            NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toMutableList()
+                ?: mutableListOf()
 
-    if (preferredProject != null) {
-        projects.removeIf { it == preferredProject }
-        projects.add(0, preferredProject)
-    }
-    ApplicationManager.getApplication().invokeLater {
-        val popup =
-            JBPopupFactory.getInstance()
-                .createPopupChooserBuilder(projects)
-                .setTitle("Select project")
-                .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-                .setRequestFocus(true)
-                .setFilterAlwaysVisible(true)
-                .setResizable(true)
-                .setMovable(true)
-                .setAutoPackHeightOnFiltering(true)
-                .setRenderer(
-                    object : ColoredListCellRenderer<String>() {
-                        override fun customizeCellRenderer(
-                            list: JList<out String>,
-                            value: String?,
-                            index: Int,
-                            selected: Boolean,
-                            hasFocus: Boolean
-                        ) {
-                            if (value == null) return
-                            icon = AllIcons.Nodes.Module
-                            append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
-                            if (preferredProject != null && preferredProject == value) {
-                                append(
-                                    "  - currently open",
-                                    SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES,
-                                    false
-                                )
-                                icon = AllIcons.Nodes.Favorite
+        if (preferredProject != null) {
+            projects.removeIf { it == preferredProject }
+            projects.add(0, preferredProject)
+        }
+        ApplicationManager.getApplication().invokeLater {
+            val popup =
+                JBPopupFactory.getInstance()
+                    .createPopupChooserBuilder(projects)
+                    .setTitle("Select Project")
+                    .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+                    .setRequestFocus(true)
+                    .setFilterAlwaysVisible(true)
+                    .setResizable(true)
+                    .setMovable(true)
+                    .setAutoPackHeightOnFiltering(true)
+                    .setRenderer(
+                        object : ColoredListCellRenderer<String>() {
+                            override fun customizeCellRenderer(
+                                list: JList<out String>,
+                                value: String?,
+                                index: Int,
+                                selected: Boolean,
+                                hasFocus: Boolean
+                            ) {
+                                if (value == null) return
+                                icon = AllIcons.Nodes.Module
+                                append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
+                                if (preferredProject != null && preferredProject == value) {
+                                    append(
+                                        "  - currently open",
+                                        SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES,
+                                        false
+                                    )
+                                    icon = AllIcons.Nodes.Favorite
+                                }
                             }
                         }
-                    }
-                )
-                .setItemChosenCallback { chosen -> it.resume(chosen) }
-                .setDimensionServiceKey("nx.dev.console.select_target")
-                .createPopup()
+                    )
+                    .setItemChosenCallback { chosen -> it.resume(chosen) }
+                    .setDimensionServiceKey("nx.dev.console.select_target")
+                    .createPopup()
 
-        if (dataContext != null) {
-            popup.showInBestPositionFor(dataContext)
-        } else {
-            popup.showInFocusCenter()
+            if (dataContext != null) {
+                popup.showInBestPositionFor(dataContext)
+            } else {
+                popup.showInFocusCenter()
+            }
         }
     }
 }
@@ -79,48 +82,49 @@ suspend fun selectTargetForNxProject(
     dataContext: DataContext,
     nxProject: String,
 ): String? = suspendCoroutine {
-    val targets = runBlocking {
-        NxlsService.getInstance(project)
-            .workspace()
-            ?.workspace
-            ?.projects
-            ?.get(nxProject)
-            ?.targets
-            ?.keys
-            ?.toList()
-            ?: emptyList()
-    }
+    CoroutineScope(Dispatchers.Default).launch {
+        val targets =
+            NxlsService.getInstance(project)
+                .workspace()
+                ?.workspace
+                ?.projects
+                ?.get(nxProject)
+                ?.targets
+                ?.keys
+                ?.toList()
+                ?: emptyList()
 
-    ApplicationManager.getApplication().invokeLater {
-        val popup =
-            JBPopupFactory.getInstance()
-                .createPopupChooserBuilder(targets)
-                .setTitle("Select target of $nxProject")
-                .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-                .setRequestFocus(true)
-                .setFilterAlwaysVisible(true)
-                .setResizable(true)
-                .setMovable(true)
-                .setAutoPackHeightOnFiltering(true)
-                .setRenderer(
-                    object : ColoredListCellRenderer<String>() {
-                        override fun customizeCellRenderer(
-                            list: JList<out String>,
-                            value: String?,
-                            index: Int,
-                            selected: Boolean,
-                            hasFocus: Boolean
-                        ) {
-                            if (value == null) return
-                            icon = AllIcons.General.Gear
-                            append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
+        ApplicationManager.getApplication().invokeLater {
+            val popup =
+                JBPopupFactory.getInstance()
+                    .createPopupChooserBuilder(targets)
+                    .setTitle("Select target of $nxProject")
+                    .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+                    .setRequestFocus(true)
+                    .setFilterAlwaysVisible(true)
+                    .setResizable(true)
+                    .setMovable(true)
+                    .setAutoPackHeightOnFiltering(true)
+                    .setRenderer(
+                        object : ColoredListCellRenderer<String>() {
+                            override fun customizeCellRenderer(
+                                list: JList<out String>,
+                                value: String?,
+                                index: Int,
+                                selected: Boolean,
+                                hasFocus: Boolean
+                            ) {
+                                if (value == null) return
+                                icon = AllIcons.General.Gear
+                                append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
+                            }
                         }
-                    }
-                )
-                .setItemChosenCallback { chosen -> it.resume(chosen) }
-                .setDimensionServiceKey("nx.dev.console.select_target")
-                .createPopup()
+                    )
+                    .setItemChosenCallback { chosen -> it.resume(chosen) }
+                    .setDimensionServiceKey("nx.dev.console.select_target")
+                    .createPopup()
 
-        popup.showInBestPositionFor(dataContext)
+            popup.showInBestPositionFor(dataContext)
+        }
     }
 }
