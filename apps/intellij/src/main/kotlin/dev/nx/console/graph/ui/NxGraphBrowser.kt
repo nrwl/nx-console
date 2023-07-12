@@ -1,8 +1,12 @@
 package dev.nx.console.graph.ui
 
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefClient
@@ -13,11 +17,15 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.isWslInterpreter
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
+import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import dev.nx.console.utils.nodeInterpreter
+import dev.nx.console.utils.nxBasePath
 import java.io.File
+import java.nio.file.Paths
 import java.util.regex.Matcher
 import kotlin.io.path.Path
 import kotlinx.coroutines.*
@@ -56,6 +64,7 @@ class NxGraphBrowser(
             }
             null
         }
+        registerFileClickHandler(browser)
     }
 
     val component = browser.component
@@ -403,6 +412,34 @@ class NxGraphBrowser(
         }
     }
 
+    private fun registerFileClickHandler(browser: JBCefBrowser) {
+        onBrowserLoadEnd(browser) {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                val path = Paths.get(project.nxBasePath, msg).toString()
+                val file = LocalFileSystem.getInstance().findFileByPath(path)
+                if (file == null) {
+                    Notifier.notifyAnything(
+                        project,
+                        "Couldn't find file at path $path",
+                        NotificationType.ERROR
+                    )
+                    return@addHandler null
+                }
+                ApplicationManager.getApplication().invokeLater {
+                    FileEditorManager.getInstance(project).openFile(file, true)
+                }
+                null
+            }
+            val js =
+                """
+            window.externalApi?.registerFileClickCallback?.((message) => {
+                    ${query.inject("message")}
+            })
+            """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
     override fun dispose() {
         browser.dispose()
     }
