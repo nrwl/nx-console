@@ -11,11 +11,13 @@ import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
+import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.nxlsWorkingPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
+import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
 private val logger = logger<NxlsService>()
@@ -65,49 +67,54 @@ class NxlsService(val project: Project) {
     }
 
     suspend fun workspace(): NxWorkspace? {
-        return server()?.getNxService()?.workspace()?.await()
+        return withMessageIssueCatch { server()?.getNxService()?.workspace()?.await() }()
     }
 
     suspend fun generators(): List<NxGenerator> {
-        return server()?.getNxService()?.generators()?.await() ?: emptyList()
+        return withMessageIssueCatch { server()?.getNxService()?.generators()?.await() }()
+            ?: emptyList()
     }
 
     suspend fun generatorOptions(
         requestOptions: NxGeneratorOptionsRequestOptions
     ): List<NxGeneratorOption> {
-        val request = NxGeneratorOptionsRequest(requestOptions)
-        return server()?.getNxService()?.generatorOptions(request)?.await() ?: emptyList()
+        return withMessageIssueCatch {
+            val request = NxGeneratorOptionsRequest(requestOptions)
+            server()?.getNxService()?.generatorOptions(request)?.await()
+        }()
+            ?: emptyList()
     }
 
     suspend fun generatorContextFromPath(
         generator: NxGenerator? = null,
         path: String
     ): NxGeneratorContext? {
-        val request = NxGetGeneratorContextFromPathRequest(generator, path)
-        return server()?.getNxService()?.generatorContextFromPath(request)?.await() ?: null
+        return withMessageIssueCatch {
+            val request = NxGetGeneratorContextFromPathRequest(generator, path)
+            server()?.getNxService()?.generatorContextFromPath(request)?.await()
+        }()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
-        return server()?.getNxService()?.projectGraphOutput()?.await()
+        return withMessageIssueCatch { server()?.getNxService()?.projectGraphOutput()?.await() }()
     }
 
     suspend fun createProjectGraph(): CreateProjectGraphError? {
-        return try {
-            server()?.getNxService()?.createProjectGraph()?.await()?.let {
-                CreateProjectGraphError(1000, it)
+        return withMessageIssueCatch {
+            try {
+                server()?.getNxService()?.createProjectGraph()?.await()?.let {
+                    CreateProjectGraphError(1000, it)
+                }
+            } catch (e: ResponseErrorException) {
+                CreateProjectGraphError(e.responseError.code, e.responseError.message)
             }
-        } catch (e: ResponseErrorException) {
-            CreateProjectGraphError(e.responseError.code, e.responseError.message)
-        }
+        }()
     }
 
     suspend fun projectFolderTree(): NxFolderTreeData? {
-        return try {
+        return withMessageIssueCatch {
             server()?.getNxService()?.projectFolderTree()?.await()?.toFolderTreeData()
-        } catch (e: Throwable) {
-            println(e.message)
-            null
-        }
+        }()
     }
 
     fun addDocument(editor: Editor) {
@@ -124,6 +131,17 @@ class NxlsService(val project: Project) {
 
     fun isEditorConnected(editor: Editor): Boolean {
         return wrapper.isEditorConnected(editor)
+    }
+
+    private fun <T> withMessageIssueCatch(block: suspend () -> T): suspend () -> T? {
+        return {
+            try {
+                block()
+            } catch (e: MessageIssueException) {
+                Notifier.notifyLSPMessageIssueException(project, e)
+                null
+            }
+        }
     }
 
     companion object {

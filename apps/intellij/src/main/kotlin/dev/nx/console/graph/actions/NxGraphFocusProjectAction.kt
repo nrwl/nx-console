@@ -51,20 +51,25 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     }
 
     private suspend fun getNxProject(e: AnActionEvent, currentlyOpenedProject: String?): String? {
-        val nxTreeNode = e.getData(NxTreeNodeKey) ?: return null
-        if (nxTreeNode is NxSimpleNode.Target) {
-            return nxTreeNode.nxProjectName
+        if (e.place == "NxToolWindow") {
+            val nxTreeNode = e.getData(NxTreeNodeKey) ?: return null
+            if (nxTreeNode is NxSimpleNode.Target) {
+                return nxTreeNode.nxProjectName
+            }
+            if (nxTreeNode is NxSimpleNode.TargetConfiguration) {
+                return nxTreeNode.nxProjectName
+            }
+            if (nxTreeNode is NxSimpleNode.Project) {
+                return nxTreeNode.nxProjectName
+            }
         }
-        if (nxTreeNode is NxSimpleNode.TargetConfiguration) {
-            return nxTreeNode.nxProjectName
-        }
-        if (nxTreeNode is NxSimpleNode.Project) {
-            return nxTreeNode.nxProjectName
+
+        if (ActionPlaces.isPopupPlace(e.place)) {
+            return currentlyOpenedProject
         }
 
         val project = e.project ?: return null
 
-        return if (ActionPlaces.isPopupPlace(e.place)) currentlyOpenedProject
-        else selectNxProject(project, e.dataContext, currentlyOpenedProject)
+        return selectNxProject(project, e.dataContext, currentlyOpenedProject)
     }
 }
