@@ -10,6 +10,7 @@ import dev.nx.console.NxConsoleBundle
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.telemetry.actions.TelemetryOptInAction
 import dev.nx.console.telemetry.actions.TelemetryOptOutAction
+import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 
 class Notifier {
     companion object {
@@ -60,6 +61,17 @@ class Notifier {
                     NotificationType.ERROR
                 )
             }
+        }
+        fun notifyLSPMessageIssueException(project: Project, e: MessageIssueException) {
+            this.notifyAnything(
+                project,
+                "<html>" +
+                    "Nx Console ran into problems reading your workspace files: <br>" +
+                    "<pre>${e.issues.first().cause.message}</pre><br>" +
+                    "Make sure to double-check your project.json & nx.json files for syntax errors." +
+                    "</html>",
+                NotificationType.ERROR
+            )
         }
         fun notifyAnything(
             project: Project,
