@@ -1,3 +1,15 @@
+## 1.10.0 (2023-07-12)
+
+### Bug Fixes
+
+* **intellij:** remove usage of runBlocking from generate ui actions ([#1816](https://github.com/nrwl/nx-console/issues/1816)) ([76a3473](https://github.com/nrwl/nx-console/commit/76a34738067e1e6bf8c637036339087f0ea4e12e))
+* **intellij:** repair focus nx project from context menu ([#1817](https://github.com/nrwl/nx-console/issues/1817)) ([d278e50](https://github.com/nrwl/nx-console/commit/d278e50842281d6cdf08ec28aa516ede922cbb8a))
+
+
+### Features
+
+* **intellij:** show notification when there is a parsing error ([#1819](https://github.com/nrwl/nx-console/issues/1819)) ([514075b](https://github.com/nrwl/nx-console/commit/514075bebdbfaf3199201d44246b7e7991db8ef0))
+
 ## 1.9.0 (2023-07-10)
 
 ### Bug Fixes
