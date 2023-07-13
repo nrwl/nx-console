@@ -313,14 +313,16 @@ connection.onRequest(
 
 connection.onRequest(
   NxProjectsByPathsRequest,
-  async (args: { projectPaths: string[] }) => {
+  async (args: { paths: string[] }) => {
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
         'Unable to get Nx info: no workspace path'
       );
     }
-    return getProjectsByPaths(args.projectPaths, WORKING_PATH);
+    const projectsByPath = await getProjectsByPaths(args.paths, WORKING_PATH);
+    lspLogger.log(JSON.stringify(projectsByPath));
+    return projectsByPath;
   }
 );
 

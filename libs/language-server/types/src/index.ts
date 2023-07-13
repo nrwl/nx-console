@@ -58,7 +58,7 @@ export const NxProjectByPathRequest: RequestType<
 > = new RequestType('nx/projectByPath');
 
 export const NxProjectsByPathsRequest: RequestType<
-  { projectPaths: string[] },
+  { paths: string[] },
   { [path: string]: ProjectConfiguration | undefined },
   unknown
 > = new RequestType('nx/projectsByPaths');

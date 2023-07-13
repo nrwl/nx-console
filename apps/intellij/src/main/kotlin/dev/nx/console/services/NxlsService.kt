@@ -11,8 +11,8 @@ import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
-import dev.nx.console.ui.Notifier
 import dev.nx.console.nxls.server.requests.NxProjectsByPathsRequest
+import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.nxlsWorkingPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -98,7 +98,10 @@ class NxlsService(val project: Project) {
 
     suspend fun projectsByPaths(paths: Array<String>): Map<String, NxProject> {
         val request = NxProjectsByPathsRequest(paths)
-        return server()?.getNxService()?.projectsByPaths(request)?.await() ?: emptyMap()
+        return withMessageIssueCatch {
+            server()?.getNxService()?.projectsByPaths(request)?.await()
+        }()
+            ?: emptyMap()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
@@ -153,7 +156,6 @@ class NxlsService(val project: Project) {
             }
         }
     }
-    
 
     companion object {
         fun getInstance(project: Project): NxlsService = project.getService(NxlsService::class.java)
