@@ -1,8 +1,7 @@
-import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { directoryExists } from '@nx-console/shared/file-system';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { isAbsolute, join, normalize, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';
-import { lspLogger } from '@nx-console/language-server/utils';
 
 export async function getProjectByPath(
   path: string,
@@ -86,8 +85,6 @@ export async function getProjectsByPaths(
       break;
     }
   }
-
-  lspLogger.log('map ' + JSON.stringify(foundProjects));
   return Object.fromEntries(foundProjects);
 }
 
