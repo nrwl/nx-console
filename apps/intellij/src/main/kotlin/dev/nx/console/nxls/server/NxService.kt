@@ -39,6 +39,13 @@ interface NxService {
     }
 
     @JsonRequest
+    fun projectsByPaths(
+        projectsByPathsRequest: NxProjectsByPathsRequest
+    ): CompletableFuture<Map<String, NxProject>> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun projectGraphOutput(): CompletableFuture<ProjectGraphOutput> {
         throw UnsupportedOperationException()
     }

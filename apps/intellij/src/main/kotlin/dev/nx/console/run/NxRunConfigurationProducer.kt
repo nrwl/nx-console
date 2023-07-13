@@ -48,7 +48,8 @@ class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfigu
     ): NxRunSettings? {
         val element = getElement(context) ?: return null
         val targetNode = getPropertyNodeFromLeafNode(element) ?: return null
-        val targetDescriptor = getNxTargetDescriptorFromNode(targetNode) ?: return null
+        val targetDescriptor =
+            getNxTargetDescriptorFromNode(targetNode, context.project) ?: return null
         sourceElement?.set(element)
         return runSettings.copy(
             nxProjects = targetDescriptor.nxProject,

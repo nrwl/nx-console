@@ -13,6 +13,7 @@ import {
   NxProjectByPathRequest,
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
+  NxProjectsByPathsRequest,
   NxVersionRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
@@ -39,6 +40,7 @@ import {
   createProjectGraph,
   getGeneratorContextV2,
   getProjectFolderTree,
+  getProjectsByPaths,
 } from '@nx-console/language-server/workspace';
 import {
   getNxJsonSchema,
@@ -306,6 +308,19 @@ connection.onRequest(
       );
     }
     return getProjectByPath(args.projectPath, WORKING_PATH);
+  }
+);
+
+connection.onRequest(
+  NxProjectsByPathsRequest,
+  async (args: { projectPaths: string[] }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getProjectsByPaths(args.projectPaths, WORKING_PATH);
   }
 );
 
