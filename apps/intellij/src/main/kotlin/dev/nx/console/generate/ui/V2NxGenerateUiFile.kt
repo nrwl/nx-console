@@ -75,7 +75,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                         collectionName = generator.data.collection,
                         description = generator.data.description,
                         options = generator.options,
-                        contextValues = generator.contextValues
+                        context = generator.contextValues
                     )
             }
             browser.component.requestFocus()
