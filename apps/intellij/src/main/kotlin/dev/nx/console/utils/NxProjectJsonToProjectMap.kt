@@ -3,7 +3,6 @@ package dev.nx.console.utils
 import com.intellij.json.psi.JsonFile
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -47,9 +46,7 @@ class NxProjectJsonToProjectMap(val project: Project) {
 
     private suspend fun populateMap() {
         val paths = findProjectJsonFiles()
-        logger<NxProjectJsonToProjectMap>().info("loading projects by path")
         val projectsMap = NxlsService.getInstance(project).projectsByPaths(paths.toTypedArray())
-        logger<NxProjectJsonToProjectMap>().info("loaded projects by path")
 
         pathsToProjectsMap.clear()
         pathsToProjectsMap.putAll(projectsMap)
