@@ -66,11 +66,10 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
       _changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>
     ): void {
       super.updated(_changedProperties);
-
       if (this.generatorContext) {
         if (
-          (this.generatorContext.project && this.option.name === 'project') ||
-          this.option.name === 'projectName'
+          this.generatorContext.project &&
+          (this.option.name === 'project' || this.option.name === 'projectName')
         ) {
           this.setFieldValue(this.generatorContext.project);
           this.dispatchValue(this.generatorContext.project);

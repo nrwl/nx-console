@@ -57,7 +57,7 @@ data class GeneratorSchema(
     val generatorName: String,
     val description: String,
     val options: List<NxGeneratorOption>,
-    val contextValues: NxGeneratorContext?
+    val context: NxGeneratorContext?
 ) {}
 
 @Serializable
