@@ -8,6 +8,7 @@ import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.ui.Notifier
+import dev.nx.console.utils.NxProjectJsonToProjectMap
 
 private val logger = logger<ProjectPostStartup>()
 
@@ -22,5 +23,7 @@ class ProjectPostStartup : ProjectPostStartupActivity {
         }
 
         TelemetryService.getInstance(project).extensionActivated(0)
+
+        service.runAfterStarted { NxProjectJsonToProjectMap.getInstance(project).init() }
     }
 }

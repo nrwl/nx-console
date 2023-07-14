@@ -5,6 +5,7 @@ import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -29,7 +30,7 @@ fun getPropertyNodeFromLeafNode(element: PsiElement): JsonProperty? {
     return parent.parentOfType()
 }
 
-fun getNxTargetDescriptorFromNode(element: PsiElement): NxTargetDescriptor? {
+fun getNxTargetDescriptorFromNode(element: PsiElement, project: Project): NxTargetDescriptor? {
     if (element.isValid.not()) {
         return null
     }
@@ -40,13 +41,16 @@ fun getNxTargetDescriptorFromNode(element: PsiElement): NxTargetDescriptor? {
         val childPropertyLiteral = element.firstChild as? JsonStringLiteral ?: return null
         val nxTarget = childPropertyLiteral.value
         val nxProject =
-            (element
-                    ?.parentOfType<JsonObject>()
-                    ?.parentOfType<JsonObject>()
-                    ?.findProperty("name")
-                    ?.value as? JsonStringLiteral)
-                ?.value
-                ?: return null
+            NxProjectJsonToProjectMap.getInstance(project)
+                .getProjectForProjectJson(element.containingFile)
+                ?.name
+                ?: (element
+                        .parentOfType<JsonObject>()
+                        ?.parentOfType<JsonObject>()
+                        ?.findProperty("name")
+                        ?.value as? JsonStringLiteral)
+                    ?.value
+                    ?: return null
 
         return NxTargetDescriptor(nxProject, nxTarget)
     }

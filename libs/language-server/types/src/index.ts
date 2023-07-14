@@ -57,6 +57,12 @@ export const NxProjectByPathRequest: RequestType<
   unknown
 > = new RequestType('nx/projectByPath');
 
+export const NxProjectsByPathsRequest: RequestType<
+  { paths: string[] },
+  { [path: string]: ProjectConfiguration | undefined },
+  unknown
+> = new RequestType('nx/projectsByPaths');
+
 export const NxGeneratorContextFromPathRequest: RequestType<
   {
     generator?: TaskExecutionSchema;

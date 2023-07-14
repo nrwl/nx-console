@@ -1,56 +1,91 @@
-import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { directoryExists } from '@nx-console/shared/file-system';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { isAbsolute, join, normalize, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';
 
 export async function getProjectByPath(
-  selectedPath: string | undefined,
+  path: string,
   workspacePath: string
-): Promise<ProjectConfiguration | null> {
-  if (!selectedPath) {
-    return null;
+): Promise<ProjectConfiguration | undefined> {
+  const projectsMap = await getProjectsByPaths([path], workspacePath);
+  return projectsMap?.[path] || undefined;
+}
+
+export async function getProjectsByPaths(
+  paths: string[] | undefined,
+  workspacePath: string
+): Promise<Record<string, ProjectConfiguration> | undefined> {
+  if (!paths) {
+    return undefined;
   }
 
   const { workspace } = await nxWorkspace(workspacePath);
-
-  const relativeFilePath = relative(workspacePath, selectedPath);
-  const isDirectory = await directoryExists(selectedPath);
+  const pathsMap = new Map<
+    string,
+    { relativePath: string; isDirectory: boolean }
+  >();
+  for (const path of paths) {
+    pathsMap.set(path, {
+      relativePath: relative(workspacePath, path),
+      isDirectory: await directoryExists(path),
+    });
+  }
 
   const projectEntries = Object.entries(workspace.projects);
-  let foundProject: ProjectConfiguration | null = null;
+  const foundProjects: Map<string, ProjectConfiguration> = new Map();
 
   for (const [projectName, projectConfig] of projectEntries) {
-    const isChildOfRoot = isChildOrEqual(projectConfig.root, relativeFilePath);
-    const relativeRootConfig = projectConfig.sourceRoot
-      ? relative(workspacePath, projectConfig.sourceRoot)
-      : undefined;
-    const isChildOfRootConfig =
-      relativeRootConfig &&
-      isChildOrEqual(relativeRootConfig, relativeFilePath);
-
+    // If there is no files array, it's an old version of Nx and we need backwards compatibility
     if (!projectConfig.files) {
-      foundProject = findByFilePath(
-        [projectName, projectConfig],
-        workspacePath,
-        selectedPath
-      );
-    } else if (isDirectory && (isChildOfRoot || isChildOfRootConfig)) {
-      foundProject = projectConfig;
-    } else if (
-      !isDirectory &&
-      projectConfig.files.some(
-        ({ file }) => normalize(file) === relativeFilePath
-      )
-    ) {
-      foundProject = projectConfig;
+      new Map(pathsMap).forEach((_, path) => {
+        const foundProject = findByFilePath(
+          [projectName, projectConfig],
+          workspacePath,
+          path
+        );
+        if (foundProject) {
+          foundProjects.set(path, foundProject);
+          pathsMap.delete(path);
+        }
+      });
+      continue;
     }
 
-    if (foundProject) {
+    // project check for directories
+    new Map(pathsMap).forEach(({ relativePath, isDirectory }, path) => {
+      if (!isDirectory) return;
+
+      const isChildOfRoot = isChildOrEqual(projectConfig.root, relativePath);
+      const relativeRootConfig = projectConfig.sourceRoot
+        ? relative(workspacePath, projectConfig.sourceRoot)
+        : undefined;
+      const isChildOfRootConfig =
+        relativeRootConfig && isChildOrEqual(relativeRootConfig, relativePath);
+
+      if (isChildOfRoot || isChildOfRootConfig) {
+        foundProjects.set(path, projectConfig);
+        pathsMap.delete(path);
+      }
+    });
+
+    // iterate over the project files once and find all the paths that match
+    const nonDirectoryPaths = [...pathsMap.entries()].filter(
+      ([_, { isDirectory }]) => !isDirectory
+    );
+    projectConfig.files?.forEach(({ file }) => {
+      for (const [path, { relativePath }] of nonDirectoryPaths) {
+        if (file === relativePath) {
+          foundProjects.set(path, projectConfig);
+          pathsMap.delete(path);
+        }
+      }
+    });
+
+    if (pathsMap.size === 0) {
       break;
     }
   }
-
-  return foundProject;
+  return Object.fromEntries(foundProjects);
 }
 
 /** This is only used for backwards compatibility  */

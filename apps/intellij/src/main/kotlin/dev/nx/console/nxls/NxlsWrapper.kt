@@ -34,8 +34,8 @@ class NxlsWrapper(val project: Project) {
 
     var languageServer: NxlsLanguageServer? = null
     var languageClient: NxlsLanguageClient? = null
+    var initializeFuture: CompletableFuture<InitializeResult>? = null
     private var initializeResult: InitializeResult? = null
-    private var initializeFuture: CompletableFuture<InitializeResult>? = null
 
     private var connectedEditors = HashMap<String, DocumentManager>()
 
@@ -172,14 +172,6 @@ class NxlsWrapper(val project: Project) {
         connectedEditors.put(getFilePath(editor.document), documentManager)
     }
 
-    private fun connectTextService(documentManager: DocumentManager) {
-        log.info("Connecting textService to ${documentManager.documentPath}")
-        val textService =
-            languageServer?.textDocumentService ?: return log.info("text service not ready")
-        documentManager.addTextDocumentService(textService)
-        documentManager.documentOpened()
-    }
-
     fun disconnect(editor: Editor) {
         val filePath = getFilePath(editor.document)
         val documentManager =
@@ -195,7 +187,15 @@ class NxlsWrapper(val project: Project) {
         return connectedEditors.contains(filePath)
     }
 
-    fun getInitParams(): InitializeParams {
+    private fun connectTextService(documentManager: DocumentManager) {
+        log.info("Connecting textService to ${documentManager.documentPath}")
+        val textService =
+            languageServer?.textDocumentService ?: return log.info("text service not ready")
+        documentManager.addTextDocumentService(textService)
+        documentManager.documentOpened()
+    }
+
+    private fun getInitParams(): InitializeParams {
         val initParams = InitializeParams()
         initParams.workspaceFolders = listOf(WorkspaceFolder(nxlsWorkingPath(project.nxBasePath)))
 
