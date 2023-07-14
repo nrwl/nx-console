@@ -194,6 +194,13 @@ class NxGraphBrowser(
           """
                 )
                 .replace(
+                    "</head>",
+                    """
+                     <script> window.environment = 'nx-console' </script>
+                     </head>
+                    """
+                )
+                .replace(
                     Regex("</body>"),
                     """
           <script>

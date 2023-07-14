@@ -221,6 +221,8 @@ export async function loadHtml(panel: WebviewPanel) {
         }
       </style>
       <script>${injectedScript()}</script>
+      <script> window.environment = 'nx-console'</script>
+
       </head>`
   );
   projectGraphHtml = projectGraphHtml.replace(
