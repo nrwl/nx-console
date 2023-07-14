@@ -17,6 +17,7 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.services.NxlsService
 import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.isWslInterpreter
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
@@ -24,6 +25,7 @@ import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
+import io.github.z4kn4fein.semver.toVersion
 import java.io.File
 import java.nio.file.Paths
 import java.util.regex.Matcher
@@ -139,7 +141,7 @@ class NxGraphBrowser(
             .collect()
     }
 
-    private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
+    private suspend fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
 
         val fullPath =
@@ -150,6 +152,17 @@ class NxGraphBrowser(
             }
 
         val basePath = "${Path(fullPath).parent}/"
+
+        val nxConsoleEnvironmentScriptTag: String =
+            NxlsService.getInstance(project).nxVersion()?.let {
+                // TODO: once this is released on the nx side, replace with the proper version check
+                if (it.full.toVersion(strict = false) >= "17.0.0".toVersion(strict = false)) {
+                    "<script> window.environment = 'nx-console' </script>"
+                } else {
+                    ""
+                }
+            }
+                ?: ""
 
         val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
@@ -196,7 +209,7 @@ class NxGraphBrowser(
                 .replace(
                     "</head>",
                     """
-                     <script> window.environment = 'nx-console' </script>
+                     $nxConsoleEnvironmentScriptTag
                      </head>
                     """
                 )

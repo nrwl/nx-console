@@ -117,6 +117,10 @@ class NxlsService(val project: Project) {
         }()
     }
 
+    suspend fun nxVersion(): NxVersion? {
+        return this.workspace()?.nxVersion
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }

@@ -1,7 +1,11 @@
-import { getProjectGraphOutput } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxVersion,
+  getProjectGraphOutput,
+} from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
+import { SemVer, coerce, gte } from 'semver';
 
 const html = String.raw;
 
@@ -221,7 +225,7 @@ export async function loadHtml(panel: WebviewPanel) {
         }
       </style>
       <script>${injectedScript()}</script>
-      <script> window.environment = 'nx-console'</script>
+      ${await setNxConsoleEnvironment()}
 
       </head>`
   );
@@ -382,6 +386,18 @@ function injectedScript() {
       })
     }())
   `;
+}
+
+async function setNxConsoleEnvironment() {
+  const nxVersion = await getNxVersion();
+  console.log(nxVersion);
+  // TODO: once this is released on the nx side, replace with the proper version check
+  if (gte(nxVersion.version, '17.0.0')) {
+    console.log('hello');
+    return '<script> window.environment = "nx-console"</script>';
+  } else {
+    return '';
+  }
 }
 
 function registerFileClickListener() {

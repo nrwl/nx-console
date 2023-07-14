@@ -49,6 +49,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
+
+    implementation("io.github.z4kn4fein:semver:1.4.2")
 }
 
 ktfmt { kotlinLangStyle() }

@@ -21,7 +21,7 @@ export async function getNxWorkspaceProjects(reset?: boolean): Promise<{
 }
 
 export async function getNxWorkspacePath(): Promise<string> {
-  const { workspacePath } = await getNxWorkspace();
+  const { workspacePath, nxVersion } = await getNxWorkspace();
   return workspacePath;
 }
 
