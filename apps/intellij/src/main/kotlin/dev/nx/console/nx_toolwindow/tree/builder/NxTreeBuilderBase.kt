@@ -46,6 +46,7 @@ abstract class NxTreeBuilderBase(private val nxWorkspace: NxWorkspace?) {
         return nxWorkspace.workspace.projects.values
             .flatMap { p -> p.targets.keys.map { it to p.name } }
             .groupBy { it.first }
+            .toSortedMap()
             .map { NxSimpleNode.TargetGroup(it.key, targetsSectionNode) }
             .toTypedArray()
     }
