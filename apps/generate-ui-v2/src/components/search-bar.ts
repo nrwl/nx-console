@@ -20,6 +20,12 @@ export class SearchBar extends EditorContext(LitElement) {
             icon="search"
             class="absolute left-2 top-[0.7rem]"
           ></icon-element>
+          <div class="absolute right-2 top-2.5">
+            <kbd
+              class="border-fieldBorder bg-selectFieldBackground whitespace-nowrap rounded-md border p-1 shadow"
+              >${this.getKeyboardShortcutSymbol()}S</kbd
+            >
+          </div>
         </div>
       `;
     } else {
@@ -34,9 +40,26 @@ export class SearchBar extends EditorContext(LitElement) {
           <span slot="start">
             <icon-element icon="search"></icon-element>
           </span>
+          <div slot="end">
+            <kbd class="bg-background whitespace-nowrap"
+              >${this.getKeyboardShortcutSymbol()}S</kbd
+            >
+          </div>
         </vscode-text-field>
       `;
     }
+  }
+
+  getKeyboardShortcutSymbol() {
+    if (window.navigator.platform.toLowerCase().includes('mac')) {
+      return '⌘';
+    } else {
+      return 'Ctrl ';
+    }
+  }
+
+  protected createRenderRoot(): Element | ShadowRoot {
+    return this;
   }
 
   private handleInput(e: Event) {
@@ -44,9 +67,5 @@ export class SearchBar extends EditorContext(LitElement) {
       detail: (e.target as HTMLInputElement).value,
     });
     this.dispatchEvent(event);
-  }
-
-  protected createRenderRoot(): Element | ShadowRoot {
-    return this;
   }
 }
