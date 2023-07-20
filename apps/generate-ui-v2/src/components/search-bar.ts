@@ -21,8 +21,8 @@ export class SearchBar extends EditorContext(LitElement) {
             class="absolute left-2 top-[0.7rem]"
           ></icon-element>
           <div class="absolute right-2 top-2.5">
-            <kbd class="border-fieldBorder rounded-md border p-1 drop-shadow-lg"
-              >${this.getKeyboardShortcutSymbol()}S</kbd
+            <kbd class="border-fieldBorder rounded-md border p-1 drop-shadow-lg whitespace-nowrap"
+              >${this.getKeyboardShortcutSymbol()} S</kbd
             >
           </div>
         </div>
@@ -40,8 +40,8 @@ export class SearchBar extends EditorContext(LitElement) {
             <icon-element icon="search"></icon-element>
           </span>
           <div slot="end">
-            <kbd class="bg-background"
-              >${this.getKeyboardShortcutSymbol()}S</kbd
+            <kbd class="bg-background whitespace-nowrap"
+              >${this.getKeyboardShortcutSymbol()} S</kbd
             >
           </div>
         </vscode-text-field>
