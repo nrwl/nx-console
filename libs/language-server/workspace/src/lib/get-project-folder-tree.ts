@@ -93,5 +93,8 @@ export async function getProjectFolderTree(workspacePath: string): Promise<{
       node,
     })
   );
-  return { serializedTreeMap, roots: [...roots] };
+  const sortedRoots = Array.from(roots).sort((a, b) => {
+    return a.dir.localeCompare(b.dir);
+  });
+  return { serializedTreeMap, roots: sortedRoots };
 }
