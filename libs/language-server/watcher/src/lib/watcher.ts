@@ -22,7 +22,7 @@ export async function languageServerWatcher(
         )
       ) {
         lspLogger.log('Project configuration changed');
-        debounce(callback, 200)();
+        debounce(callback, 500)();
       }
     },
     watcherOptions(workspacePath)
