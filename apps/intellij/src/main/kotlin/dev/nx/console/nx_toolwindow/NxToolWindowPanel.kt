@@ -74,7 +74,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                 row {
                     text(
                         "If you're just getting started with Nx, you can <a href='https://nx.dev/plugin-features/use-code-generators'>use generators</a> to quickly scaffold new projects or <a href='https://nx.dev/reference/project-configuration'>add them manually</a>." +
-                            "<br/> If your nx workspace is not at the root of the opened project, make sure to set the <a href='open-setting'>workspace path setting</a>."
+                            "<br/> If your Nx workspace is not at the root of the opened project, make sure to set the <a href='open-setting'>workspace path setting</a>."
                     ) {
                         if (it.description.equals("open-setting")) {
                             ShowSettingsUtil.getInstance()
