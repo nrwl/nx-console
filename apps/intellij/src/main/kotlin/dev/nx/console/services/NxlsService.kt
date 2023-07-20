@@ -151,7 +151,7 @@ class NxlsService(val project: Project) {
             try {
                 block()
             } catch (e: MessageIssueException) {
-                Notifier.notifyLSPMessageIssueException(project, e)
+                Notifier.notifyLspMessageIssueExceptionThrottled(project, e)
                 null
             }
         }

@@ -20,8 +20,6 @@
     <!-- works in new IDEA wizard -->
     <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
 
-    <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
-    <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
     <projectService serviceImplementation="dev.nx.console.telemetry.TelemetryService"/>
     <completion.contributor language="JSON"
                             implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
@@ -30,15 +28,17 @@
 
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
+    <!-- Nxls -->
+    <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
+    <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
+
+    <!-- Settings -->
     <projectConfigurable
       parentId="tools"
       instance="dev.nx.console.settings.NxConsoleSettingsConfigurable"
       displayName="Nx Console"/>
     <applicationService serviceImplementation="dev.nx.console.settings.NxConsoleSettingsProvider"/>
     <projectService serviceImplementation="dev.nx.console.settings.NxConsoleProjectSettingsProvider"/>
-
-
-    <!--        <lsp.serverSupportProvider implementation="dev.nx.console.nxls.NxlsSupportProvider"/>-->
 
     <!-- Generate -->
     <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
@@ -49,7 +49,6 @@
     <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.graph.NxFocusTargetInGraphLineMarkerContributor"/>
-
 
     <!-- Run -->
     <projectService serviceImplementation="dev.nx.console.run.NxTaskExecutionManager"/>
@@ -84,11 +83,18 @@
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
   </applicationListeners>
   <actions>
+    <!-- Misc -->
     <action id="dev.nx.console.nxls.NxRefreshWorkspaceAction" class="dev.nx.console.nxls.NxRefreshWorkspaceAction"
             text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="EditorTabPopupMenu"/>
       <add-to-group group-id="EditorTabsEntryPoint"/>
     </action>
+
+    <action id="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
+            class="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
+            icon="dev.nx.console.NxIcons.Action"
+            text="Nx: Analyze Nx Configuration Files"
+            description="Makes sure project.json and nx.json files conform to the schema"/>
 
     <!-- Generate -->
     <action id="dev.nx.console.generate.actions.NxGenerateUiAction"
@@ -147,6 +153,5 @@
             text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
-
   </actions>
 </idea-plugin>

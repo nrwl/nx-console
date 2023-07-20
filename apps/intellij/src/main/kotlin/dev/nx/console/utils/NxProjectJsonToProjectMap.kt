@@ -1,13 +1,8 @@
 package dev.nx.console.utils
 
 import com.intellij.json.psi.JsonFile
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.psi.PsiFile
 import dev.nx.console.models.NxProject
 import dev.nx.console.services.NxWorkspaceRefreshListener
@@ -45,32 +40,11 @@ class NxProjectJsonToProjectMap(val project: Project) {
     }
 
     private suspend fun populateMap() {
-        val paths = findProjectJsonFiles()
+        val paths = findNxConfigurationFiles(project, includeNxJson = false).map { it.path }
         val projectsMap = NxlsService.getInstance(project).projectsByPaths(paths.toTypedArray())
 
         pathsToProjectsMap.clear()
         pathsToProjectsMap.putAll(projectsMap)
-    }
-
-    private fun findProjectJsonFiles(): List<String> {
-        val paths: MutableList<String> = ArrayList()
-        ReadAction.run<RuntimeException> {
-            val startDirectory = LocalFileSystem.getInstance().findFileByPath(project.nxBasePath)
-            if (startDirectory != null) {
-                VfsUtilCore.visitChildrenRecursively(
-                    startDirectory,
-                    object : VirtualFileVisitor<Any?>() {
-                        override fun visitFile(file: VirtualFile): Boolean {
-                            if (!file.isDirectory && file.name == "project.json") {
-                                paths.add(file.path)
-                            }
-                            return true
-                        }
-                    }
-                )
-            }
-        }
-        return paths
     }
 
     companion object {
