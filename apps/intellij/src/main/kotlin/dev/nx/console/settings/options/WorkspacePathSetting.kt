@@ -12,6 +12,7 @@ import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingBase
+import java.nio.file.Paths
 
 class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?> {
 
@@ -19,7 +20,10 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
 
     init {
         val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
-        inputField = textFieldWithBrowseButton(project, "Nx workspace root", descriptor)
+        inputField =
+            textFieldWithBrowseButton(project, "Nx workspace root", descriptor) {
+                Paths.get(project.basePath ?: "").relativize(Paths.get(it.path)).toString()
+            }
     }
     override fun render(panel: Panel) {
         panel.apply {
@@ -28,10 +32,10 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
                     cell(inputField)
                         .horizontalAlign(HorizontalAlign.FILL)
                         .comment(
-                            "Set this if your Nx workspace is not at the root of the currently opened project.",
+                            "Set this if your Nx workspace is not at the root of the currently opened project. Relative to the project base path.",
                             MAX_LINE_LENGTH_WORD_WRAP
                         )
-                        .apply { component.emptyText.text = project.basePath ?: "" }
+                        .apply { component.emptyText.text = "./" }
                 }
                 .layout(RowLayout.PARENT_GRID)
         }
