@@ -92,6 +92,7 @@ export type GenerateUiStyles = {
   badgeBackgroundColor: string;
   separatorColor: string;
   fieldNavHoverColor: string;
+  scrollbarThumbColor: string;
   fontFamily: string;
   fontSize: string;
 };
