@@ -84,6 +84,7 @@ export class Root extends LitElement {
               class="flex items-center py-2 pl-3"
               appearance="icon"
               text="copy"
+              title="Copy generate command to clipboard"
               @click="${() => this.formValuesService.copyCommandToClipboard()}"
               id="copy-button"
             >
