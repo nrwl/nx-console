@@ -1,8 +1,13 @@
+import { Option } from '@nx-console/shared/schema';
 import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Option } from '@nx-console/shared/schema';
-import { when } from 'lit/directives/when.js';
 import { extractItemOptions } from '../utils/generator-schema-utils';
+
+type OptionWithMetadata = {
+  option: Option;
+  isInSearchResults: boolean;
+  isImportant: boolean;
+};
 
 @customElement('field-list')
 export class FieldList extends LitElement {
@@ -15,46 +20,33 @@ export class FieldList extends LitElement {
   @state()
   private showMore = false;
 
-  private toggleShowMore(e: CustomEvent) {
-    this.showMore = !!e.detail;
+  private toggleShowMore() {
+    this.showMore = !this.showMore;
   }
 
   protected render() {
-    const hiddenOptionNames: Set<string> = getHiddenOptionNames(
-      this.options,
-      this.searchValue
-    );
-    const [importantOptions, otherOptions] = splitOptionsByPriority(
-      this.options
-    );
+    const { optionsWithMetadata, numOfImportantOptions, numOfOtherOptions } =
+      getOptionsWithMetadata(this.options, this.searchValue);
+
     const shouldShowMoreOptions =
-      this.showMore || !!this.searchValue || importantOptions.length === 0;
+      this.showMore || !!this.searchValue || numOfImportantOptions === 0;
     const shouldHideShowMoreButton =
       !!this.searchValue ||
-      otherOptions.length === 0 ||
-      importantOptions.length === 0;
+      numOfOtherOptions === 0 ||
+      numOfImportantOptions === 0;
+
     return html`
       <div class="flex h-full w-full">
         <div
           class="border-separator fixed h-full w-52 overflow-y-auto border-r-2 p-6 max-sm:hidden md:w-64"
         >
-          ${this.renderOptionNav(
-            importantOptions,
-            otherOptions,
-            hiddenOptionNames,
-            shouldShowMoreOptions
-          )}
+          ${this.renderOptionNav(optionsWithMetadata, shouldShowMoreOptions)}
         </div>
         <div class="w-full p-6 sm:ml-52 md:ml-64">
-          ${renderOptions(importantOptions, hiddenOptionNames)}
-          <show-more-divider
-            @show-more=${this.toggleShowMore}
-            class="${shouldHideShowMoreButton ? 'hidden' : ''}"
-          ></show-more-divider>
-          ${renderOptions(
-            otherOptions,
-            hiddenOptionNames,
-            shouldShowMoreOptions
+          ${this.renderOptionsWithDivider(
+            optionsWithMetadata,
+            shouldShowMoreOptions,
+            shouldHideShowMoreButton
           )}
         </div>
       </div>
@@ -62,25 +54,66 @@ export class FieldList extends LitElement {
   }
 
   private renderOptionNav(
-    importantOptions: Option[],
-    otherOptions: Option[],
-    hiddenOptionNames: Set<string>,
-    showMore: boolean
+    optionsWithMetadata: OptionWithMetadata[],
+    shouldShowMoreOptions: boolean
   ): TemplateResult {
-    const renderListItems = (options: Option[]): TemplateResult[] =>
-      options.map(
-        (option) =>
-          html`<field-nav-item
-            class="${hiddenOptionNames.has(option.name) ? 'hidden' : ''}"
-            .option="${option}"
-            @click=${this.handleTreeClickEvent}
-          ></field-nav-item>`
-      );
     return html`
       <ul>
-        ${renderListItems(importantOptions)}
-        ${when(showMore, () => renderListItems(otherOptions))}
+        ${optionsWithMetadata.map((optionWithMetadata) => {
+          const hidden =
+            this.searchValue && !optionWithMetadata.isInSearchResults;
+          const greyedOut =
+            !shouldShowMoreOptions && !optionWithMetadata.isImportant;
+
+          return html`<field-nav-item
+            class="${hidden ? 'hidden' : ''}"
+            .option="${optionWithMetadata.option}"
+            .greyedOut="${greyedOut}"
+            @click=${(e: Event) => this.handleTreeClickEvent(e, greyedOut)}
+          ></field-nav-item>`;
+        })}
       </ul>
+    `;
+  }
+
+  private renderOptionsWithDivider(
+    optionsWithMetadata: OptionWithMetadata[],
+    shouldShowMoreOptions: boolean,
+    shouldHideShowMoreButton: boolean
+  ): TemplateResult {
+    // we need to render all options but hide some so the component instances are persisted
+    const renderOption = (
+      optionWithMetadata: OptionWithMetadata,
+      hidden = false
+    ) => {
+      const componentTag = getFieldComponent(optionWithMetadata.option);
+      return html` <div
+        class=" ${hidden ? 'hidden' : ''} mb-4"
+        id="option-${optionWithMetadata.option.name}"
+      >
+        ${componentTag}
+      </div>`;
+    };
+    if (this.searchValue) {
+      return html`<div>
+        ${optionsWithMetadata.map((opt) =>
+          renderOption(opt, !opt.isInSearchResults)
+        )}
+      </div>`;
+    }
+    const importantOptions = optionsWithMetadata.filter(
+      (opt) => opt.isImportant
+    );
+
+    const otherOptions = optionsWithMetadata.filter((opt) => !opt.isImportant);
+    return html`
+      ${importantOptions.map((opt) => renderOption(opt, false))}
+      <show-more-divider
+        .showMore=${this.showMore}
+        @show-more=${this.toggleShowMore}
+        class="${shouldHideShowMoreButton ? 'hidden' : ''}"
+      ></show-more-divider>
+      ${otherOptions.map((opt) => renderOption(opt, !shouldShowMoreOptions))}
     `;
   }
 
@@ -96,56 +129,42 @@ export class FieldList extends LitElement {
     });
   }
 
-  private handleTreeClickEvent(event: Event) {
+  private handleTreeClickEvent(event: Event, wasGreyedOut: boolean) {
     const optionName = (event.target as HTMLElement).innerText;
-    const element = this.querySelector(`#option-${optionName}`);
-    if (!element) {
-      return;
-    }
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // focus field after scrolling to option
-    const fieldElement = this.querySelector(`#${optionName}-field`);
-    if (!fieldElement) {
-      return;
+    if (wasGreyedOut) {
+      this.showMore = !this.showMore;
     }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          (fieldElement as HTMLElement).focus();
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '0px', threshold: 1.0 }
-    );
+    setTimeout(() => {
+      const element = this.querySelector(`#option-${optionName}`);
+      if (!element) {
+        return;
+      }
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    observer.observe(element);
+      // focus field after scrolling to option
+      const fieldElement = this.querySelector(`#${optionName}-field`);
+      if (!fieldElement) {
+        return;
+      }
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            (fieldElement as HTMLElement).focus();
+            observer.disconnect();
+          }
+        },
+        { rootMargin: '0px', threshold: 1.0 }
+      );
+
+      observer.observe(element);
+    }, 100);
   }
 
   protected createRenderRoot(): Element | ShadowRoot {
     return this;
   }
 }
-
-const renderOptions = (
-  options: Option[],
-  hiddenOptionNames: Set<string>,
-  show = true
-): TemplateResult => {
-  return html`<div>
-    ${options.map((option) => {
-      const componentTag = getFieldComponent(option);
-      const hidden = !show || hiddenOptionNames.has(option.name);
-
-      return html` <div
-        class="${hidden ? 'hidden' : ''}  mb-4"
-        id="option-${option.name}"
-      >
-        ${componentTag}
-      </div>`;
-    })}
-  </div>`;
-};
 
 const getFieldComponent = (option: Option) => {
   if (option.type === 'boolean') {
@@ -168,31 +187,26 @@ const getFieldComponent = (option: Option) => {
   return html` <input-field .option=${option}></input-field>`;
 };
 
-const getHiddenOptionNames = (
+const getOptionsWithMetadata = (
   options: Option[],
   searchValue: string | undefined
-) => {
-  const hiddenOptions = new Set<string>();
-  if (!searchValue) {
-    return hiddenOptions;
-  }
-  options?.forEach((option) => {
-    if (!option.name.includes(searchValue)) {
-      hiddenOptions.add(option.name);
-    }
-  });
-  return hiddenOptions;
-};
-
-const splitOptionsByPriority = (options: Option[]): [Option[], Option[]] => {
-  const importantOptions: Option[] = [];
-  const otherOptions: Option[] = [];
-  options?.forEach((option) => {
-    if (option.isRequired || option['x-priority'] === 'important') {
-      importantOptions.push(option);
-    } else {
-      otherOptions.push(option);
-    }
-  });
-  return [importantOptions, otherOptions];
+): {
+  optionsWithMetadata: OptionWithMetadata[];
+  numOfImportantOptions: number;
+  numOfOtherOptions: number;
+} => {
+  const optionsWithMetadata = options.map((option) => ({
+    option,
+    isInSearchResults: !searchValue || option.name.includes(searchValue),
+    isImportant: option.isRequired || option['x-priority'] === 'important',
+  }));
+  return {
+    optionsWithMetadata,
+    numOfImportantOptions: optionsWithMetadata.filter(
+      (option) => option.isImportant
+    ).length,
+    numOfOtherOptions: optionsWithMetadata.filter(
+      (option) => !option.isImportant
+    ).length,
+  };
 };

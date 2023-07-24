@@ -10,6 +10,9 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
   @property()
   protected option: Option;
 
+  @property()
+  greyedOut = false;
+
   render() {
     return html`
       <li
@@ -19,6 +22,8 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
           ? 'text-error'
           : this.shouldRenderChanged()
           ? 'text-primary'
+          : this.greyedOut
+          ? 'text-gray-500'
           : 'text-foreground'} hover:bg-fieldNavHoverBackground  cursor-pointer overflow-hidden 
           text-ellipsis"
       >
