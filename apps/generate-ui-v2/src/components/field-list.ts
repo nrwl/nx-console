@@ -94,6 +94,8 @@ export class FieldList extends LitElement {
         ${componentTag}
       </div>`;
     };
+
+    // if there is a search value, show all matching options regardless of importance
     if (this.searchValue) {
       return html`<div>
         ${optionsWithMetadata.map((opt) =>
@@ -101,6 +103,7 @@ export class FieldList extends LitElement {
         )}
       </div>`;
     }
+
     const importantOptions = optionsWithMetadata.filter(
       (opt) => opt.isImportant
     );
