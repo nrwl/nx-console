@@ -134,9 +134,8 @@ export class FieldList extends LitElement {
 
   private handleTreeClickEvent(event: Event, wasGreyedOut: boolean) {
     const optionName = (event.target as HTMLElement).innerText;
-
     if (wasGreyedOut) {
-      this.showMore = !this.showMore;
+      this.showMore = true;
     }
     setTimeout(() => {
       const element = this.querySelector(`#option-${optionName}`);

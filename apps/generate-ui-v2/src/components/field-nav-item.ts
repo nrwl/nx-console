@@ -1,9 +1,7 @@
-import { ContextConsumer } from '@lit-labs/context';
-import { html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { formValuesServiceContext } from '../form-values.service';
-import { FieldValueConsumer } from './field-value-consumer-mixin';
 import { Option } from '@nx-console/shared/schema';
+import { html, LitElement } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { FieldValueConsumer } from './field-value-consumer-mixin';
 
 @customElement('field-nav-item')
 export class FieldNavItem extends FieldValueConsumer(LitElement) {
