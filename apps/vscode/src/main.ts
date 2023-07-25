@@ -63,7 +63,6 @@ import {
   getGenerators,
   getNxWorkspace,
   stopDaemon,
-  WorkspaceCodeLensProvider,
 } from '@nx-console/vscode/nx-workspace';
 import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
@@ -71,6 +70,7 @@ import {
   initGenerateUiWebview,
   openGenerateUi,
 } from '@nx-console/vscode/generate-ui-webview';
+import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -250,9 +250,7 @@ async function setWorkspace(workspacePath: string) {
       treeDataProvider: new NxHelpAndFeedbackProvider(context),
     });
 
-    //   registers itself as a CodeLensProvider and watches config to dispose/re-register
-
-    new WorkspaceCodeLensProvider(context);
+    initNxConfigDecoration(context);
 
     new AddDependencyCodelensProvider(context);
 

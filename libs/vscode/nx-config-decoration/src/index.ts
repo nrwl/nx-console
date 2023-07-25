@@ -1,1 +1,2 @@
-export * from './lib/vscode-nx-config-decoration';
+export * from './lib/init-config-decoration';
+export * from './lib/reveal-nx-project';
