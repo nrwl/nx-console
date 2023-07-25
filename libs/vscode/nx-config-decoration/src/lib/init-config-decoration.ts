@@ -7,12 +7,14 @@ import {
   workspace,
 } from 'vscode';
 import { WorkspaceCodeLensProvider } from './workspace-codelens-provider';
+import { updatePluginTargetDecorationsOnEditorChange } from './plugin-target-decorations';
 
 let codeLensProvider: Disposable | null;
 
 export function initNxConfigDecoration(context: ExtensionContext) {
   registerWorkspaceCodeLensProvider(context);
   watchWorkspaceCodeLensConfigChange(context);
+  updatePluginTargetDecorationsOnEditorChange(context);
 }
 
 /**

@@ -2,6 +2,7 @@ import {
   CodeLens,
   CodeLensProvider,
   Command,
+  Position,
   Range,
   TextDocument,
   Uri,
@@ -13,7 +14,12 @@ import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import { ProjectLocations, getProjectLocations } from './get-project-locations';
+import {
+  ProjectLocations,
+  ProjectTargetLocation,
+  getProjectLocations,
+  getTargetsPropertyLocation,
+} from './get-project-locations';
 
 export class TargetCodeLens extends CodeLens {
   constructor(
@@ -85,6 +91,13 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       );
 
       this.buildTargetLenses(project, document, lens, projectName);
+
+      await this.buildSyntheticTargetLenses(
+        lens,
+        document,
+        projectName,
+        project.targets
+      );
     }
     return lens;
   }
@@ -143,6 +156,29 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
           );
         }
       }
+    }
+  }
+
+  private async buildSyntheticTargetLenses(
+    lenses: CodeLens[],
+    document: TextDocument,
+    projectName: string,
+    explicitTargets: ProjectTargetLocation = {}
+  ) {
+    const { workspace } = await getNxWorkspace();
+    const targets = Object.keys(workspace.projects[projectName].targets ?? {});
+    const syntheticTargets = targets.filter(
+      (targetName) => !Object.keys(explicitTargets).includes(targetName)
+    );
+
+    const position = getTargetsPropertyLocation(document);
+    if (!position) {
+      return;
+    }
+    for (const target of syntheticTargets) {
+      lenses.push(
+        new TargetCodeLens(new Range(position, position), projectName, target)
+      );
     }
   }
 
