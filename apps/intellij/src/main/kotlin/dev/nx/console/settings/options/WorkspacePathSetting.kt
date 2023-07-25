@@ -20,10 +20,7 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
 
     init {
         val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
-        inputField =
-            textFieldWithBrowseButton(project, "Nx workspace root", descriptor) {
-                Paths.get(project.basePath ?: "").relativize(Paths.get(it.path)).toString()
-            }
+        inputField = textFieldWithBrowseButton(project, "Nx workspace root", descriptor)
     }
     override fun render(panel: Panel) {
         panel.apply {
@@ -32,10 +29,10 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
                     cell(inputField)
                         .horizontalAlign(HorizontalAlign.FILL)
                         .comment(
-                            "Set this if your Nx workspace is not at the root of the currently opened project. Relative to the project base path.",
+                            "Set this if your Nx workspace is not at the root of the currently opened project.",
                             MAX_LINE_LENGTH_WORD_WRAP
                         )
-                        .apply { component.emptyText.text = "./" }
+                        .apply { component.emptyText.text = project.basePath ?: "" }
                 }
                 .layout(RowLayout.PARENT_GRID)
         }
@@ -47,10 +44,14 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
         }
     }
 
-    override fun getValue(): String? = inputField.text.ifEmpty { null }
+    override fun getValue(): String? =
+        inputField.text
+            .ifEmpty { null }
+            ?.let { Paths.get(project.basePath ?: "").relativize(Paths.get(it)).toString() }
 
     override fun setValue(value: String?) {
         if (value == null) return
-        this.inputField.text = value
+        val absolutePath = Paths.get(project.basePath ?: "").resolve(Paths.get(value))
+        this.inputField.text = absolutePath.toString()
     }
 }
