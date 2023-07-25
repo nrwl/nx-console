@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .intellij-scrollbar::-webkit-scrollbar {
+    background-color: var(--background-color);
+    width: 8px;
+  }
+
+  .intellij-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+  }
+}

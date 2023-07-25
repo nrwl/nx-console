@@ -87,6 +87,7 @@ data class GenerateUiStyles(
     val bannerWarningBackgroundColor: String,
     val separatorColor: String,
     val fieldNavHoverColor: String,
+    val scrollbarThumbColor: String,
     val fontFamily: String,
     val fontSize: String,
 )
