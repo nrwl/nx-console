@@ -380,9 +380,7 @@ connection.onRequest(NxProjectFolderTreeRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  const res = await getProjectFolderTree(WORKING_PATH);
-  lspLogger.log(JSON.stringify(res));
-  return res;
+  return await getProjectFolderTree(WORKING_PATH);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {

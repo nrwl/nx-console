@@ -14,13 +14,3 @@ class NxToolWindowFactory : ToolWindowFactory, DumbAware {
         contentManager.addContent(content)
     }
 }
-
-data class NxTaskSet(
-    val nxProject: String,
-    val nxTarget: String,
-    val nxTargetConfiguration: String
-) {
-    constructor(nxProject: String, nxTarget: String) : this(nxProject, nxTarget, "") {}
-    val suggestedName =
-        "${nxProject}:${nxTarget}${if(nxTargetConfiguration.isBlank().not()) ":$nxTargetConfiguration" else ""}"
-}

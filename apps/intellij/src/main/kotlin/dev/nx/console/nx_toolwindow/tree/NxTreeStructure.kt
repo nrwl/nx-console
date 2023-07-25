@@ -8,7 +8,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.lang.javascript.JavaScriptBundle
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -24,7 +23,6 @@ import dev.nx.console.graph.actions.NxGraphFocusProjectAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
 import dev.nx.console.models.NxWorkspace
-import dev.nx.console.nx_toolwindow.NxTaskSet
 import dev.nx.console.nx_toolwindow.actions.EditNxProjectConfigurationAction
 import dev.nx.console.nx_toolwindow.tree.builder.NxFolderTreeBuilder
 import dev.nx.console.nx_toolwindow.tree.builder.NxListTreeBuilder
@@ -57,14 +55,12 @@ class NxTreeStructure(
         TreeUtil.installActions(tree)
         installPopupActions()
         treePersistenceManager.installPersistenceListeners()
-        invokeLater { updateNxProjects() }
     }
 
     override fun getRootElement(): Any = root
 
-    fun updateNxProjects() {
+    fun updateNxProjects(nxWorkspace: NxWorkspace) {
         CoroutineScope(Dispatchers.Default).launch {
-            val nxWorkspace = project.nxWorkspace()
             nxTreeBuilder = getTreeBuilder(nxWorkspace)
             root = nxTreeBuilder.buildRootNode()
             treeModel.invalidateAsync().await()
@@ -240,4 +236,14 @@ class NxTreeStructure(
     }
 
     override fun dispose() {}
+}
+
+data class NxTaskSet(
+    val nxProject: String,
+    val nxTarget: String,
+    val nxTargetConfiguration: String
+) {
+    constructor(nxProject: String, nxTarget: String) : this(nxProject, nxTarget, "") {}
+    val suggestedName =
+        "${nxProject}:${nxTarget}${if(nxTargetConfiguration.isBlank().not()) ":$nxTargetConfiguration" else ""}"
 }
