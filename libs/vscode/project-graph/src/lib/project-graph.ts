@@ -1,18 +1,19 @@
-import { getTelemetry } from '@nx-console/vscode/utils';
-import { commands, Disposable, Uri, window } from 'vscode';
-import { MessageType } from './graph-message-type';
-import { GraphWebView } from './graph-webview';
+import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
 import {
-  NxProject,
   NxTreeItem,
   ProjectViewItem,
   TargetViewItem,
 } from '@nx-console/vscode/nx-project-view';
+import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
+import { getTelemetry } from '@nx-console/vscode/utils';
+import { ProjectConfiguration } from 'nx/src/devkit-exports';
+import { commands, Disposable, Uri, window } from 'vscode';
+import { MessageType } from './graph-message-type';
+import { GraphWebView } from './graph-webview';
 
 export function projectGraph() {
   const graphWebView = new GraphWebView();
@@ -92,11 +93,6 @@ export function projectGraph() {
   );
 }
 
-/**
- * Opens a project in the graph depending on URI or activeTextEditor
- * @param uri
- * @param messageType
- */
 async function openProjectWithFile(
   webview: GraphWebView,
   uri: Uri | undefined,
@@ -106,21 +102,24 @@ async function openProjectWithFile(
   if (uri) {
     filePath = uri.fsPath;
   } else {
-    if (!window.activeTextEditor) {
-      window.showErrorMessage(
-        'Error while opening the graph: No file is currently open.'
-      );
-      return;
-    }
     filePath = window.activeTextEditor?.document.fileName;
   }
-
-  const project = await getProjectByPath(filePath);
+  // we try to infer the project based on the current path
+  // if it's not possible, just ask the user
+  let project: ProjectConfiguration | null = null;
+  if (filePath) {
+    project = await getProjectByPath(filePath);
+  }
   if (!project) {
-    window.showErrorMessage(
-      `Error while opening the graph: No project can be found at \n ${filePath}`
-    );
-    return;
+    const {
+      workspace: { projects },
+    } = await getNxWorkspace();
+
+    const selectedProjectName = await selectProject(Object.keys(projects));
+    if (!selectedProjectName) {
+      return;
+    }
+    project = projects[selectedProjectName];
   }
 
   if (messageType === MessageType.task) {

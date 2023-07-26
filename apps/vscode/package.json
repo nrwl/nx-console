@@ -351,7 +351,7 @@
       },
       {
         "category": "Nx",
-        "title": "Focus in Nx Graph",
+        "title": "Focus Project in Nx Graph",
         "command": "nx.graph.focus"
       },
       {
