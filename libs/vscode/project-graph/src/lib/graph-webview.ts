@@ -1,8 +1,10 @@
 import {
   getNxWorkspacePath,
+  getNxWorkspaceProjects,
   getProjectGraphOutput,
+  revealNxProject,
 } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/utils';
+import { getOutputChannel, getTelemetry } from '@nx-console/vscode/utils';
 import {
   commands,
   Disposable,
@@ -89,10 +91,19 @@ export class GraphWebView implements Disposable {
         commands.executeCommand('nxConsole.refreshWorkspace');
       }
       if (event.command === 'fileClick') {
+        getTelemetry().featureUsed('nx.graph.openProjectEdgeFile');
         commands.executeCommand(
           'vscode.open',
           Uri.file(join(workspacePath, event.data))
         );
+      }
+      if (event.command === 'openProject') {
+        getTelemetry().featureUsed('nx.graph.openProjectJson');
+        getNxWorkspaceProjects().then((projects) => {
+          const root = projects[event.data]?.root;
+          if (!root) return;
+          revealNxProject(event.data, root);
+        });
       }
     });
 
