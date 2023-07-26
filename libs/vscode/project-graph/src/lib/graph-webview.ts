@@ -18,6 +18,7 @@ import { MessageType } from './graph-message-type';
 import { graphService } from './graph.machine';
 import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 import { join } from 'node:path';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
@@ -103,6 +104,14 @@ export class GraphWebView implements Disposable {
           const root = projects[event.data]?.root;
           if (!root) return;
           revealNxProject(event.data, root);
+        });
+      }
+      if (event.command === 'runTask') {
+        getTelemetry().featureUsed('nx.graph.runTask');
+        CliTaskProvider.instance.executeTask({
+          command: 'run',
+          positional: event.data,
+          flags: [],
         });
       }
     });

@@ -235,6 +235,7 @@ export async function loadHtml(panel: WebviewPanel) {
     <script>
       ${registerFileClickListener()};
       ${registerOpenProjectConfigCallback()};
+      ${registerRunTaskCallback()};
     </script>
    </body>`
   );
@@ -413,6 +414,16 @@ function registerOpenProjectConfigCallback() {
 window.externalApi?.registerOpenProjectConfigCallback?.((message) => {
   window.vscode.postMessage({
     command: 'openProject',
+    data: message
+  })
+})
+`;
+}
+function registerRunTaskCallback() {
+  return `
+window.externalApi?.registerRunTaskCallback?.((message) => {
+  window.vscode.postMessage({
+    command: 'runTask',
     data: message
   })
 })

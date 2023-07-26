@@ -92,6 +92,11 @@
           "when": "isNxWorkspace",
           "group": "2_workspace@5",
           "command": "nx.graph.select"
+        },
+        {
+          "when": "isNxWorkspace",
+          "group": "2_workspace@5",
+          "command": "nx.graph.task"
         }
       ],
       "view/title": [

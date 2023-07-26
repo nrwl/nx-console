@@ -17,6 +17,7 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.ui.Notifier
@@ -67,6 +68,7 @@ class NxGraphBrowser(
         }
         registerFileClickHandler(browser)
         registerOpenProjectConfigHandler(browser)
+        registerRunTaskHandler(browser)
     }
 
     val component = browser.component
@@ -484,6 +486,28 @@ class NxGraphBrowser(
             val js =
                 """
             window.externalApi?.registerOpenProjectConfigCallback?.((message) => {
+                    ${query.inject("message")}
+            })
+            """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
+    private fun registerRunTaskHandler(browser: JBCefBrowser) {
+        onBrowserLoadEnd(browser) {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                CoroutineScope(Dispatchers.Default).launch {
+                    TelemetryService.getInstance(project).featureUsed("Nx Graph Run Task")
+
+                    val (projectName, targetName) = msg.split(":")
+                    NxTaskExecutionManager.getInstance(project).execute(projectName, targetName)
+                }
+
+                null
+            }
+            val js =
+                """
+            window.externalApi?.registerRunTaskCallback?.((message) => {
                     ${query.inject("message")}
             })
             """
