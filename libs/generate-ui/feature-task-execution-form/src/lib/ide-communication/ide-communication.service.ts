@@ -122,7 +122,6 @@ export class IdeCommunicationService {
         (option.items as string[]).length === 0
       ) && option['x-priority'] !== 'internal';
 
-    console.log(TaskExecutionInputMessageType);
     switch (message.payloadType) {
       case TaskExecutionInputMessageType.SetTaskExecutionSchema: {
         const schema = message.payload;

@@ -1,4 +1,7 @@
-import { getProjectGraphOutput } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxWorkspacePath,
+  getProjectGraphOutput,
+} from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import {
   commands,
@@ -12,6 +15,7 @@ import { waitFor } from 'xstate/lib/waitFor';
 import { MessageType } from './graph-message-type';
 import { graphService } from './graph.machine';
 import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
+import { join } from 'node:path';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
@@ -57,6 +61,7 @@ export class GraphWebView implements Disposable {
       return;
     }
 
+    const workspacePath = await getNxWorkspacePath();
     const { directory } = await getProjectGraphOutput();
 
     this.panel = window.createWebviewPanel(
@@ -82,6 +87,12 @@ export class GraphWebView implements Disposable {
       }
       if (event.command === 'refresh') {
         commands.executeCommand('nxConsole.refreshWorkspace');
+      }
+      if (event.command === 'fileClick') {
+        commands.executeCommand(
+          'vscode.open',
+          Uri.file(join(workspacePath, event.data))
+        );
       }
     });
 
