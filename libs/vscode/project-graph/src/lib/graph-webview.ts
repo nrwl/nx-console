@@ -98,7 +98,7 @@ export class GraphWebView implements Disposable {
         );
       }
       if (event.command === 'openProject') {
-        getTelemetry().featureUsed('nx.graph.openProjectJson');
+        getTelemetry().featureUsed('nx.graph.openProjectConfigFile');
         getNxWorkspaceProjects().then((projects) => {
           const root = projects[event.data]?.root;
           if (!root) return;

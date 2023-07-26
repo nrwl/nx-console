@@ -18,13 +18,12 @@ import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.services.NxlsService
+import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.ui.Notifier
-import dev.nx.console.utils.isWslInterpreter
+import dev.nx.console.utils.*
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
-import dev.nx.console.utils.nodeInterpreter
-import dev.nx.console.utils.nxBasePath
 import io.github.z4kn4fein.semver.toVersion
 import java.io.File
 import java.nio.file.Paths
@@ -67,6 +66,7 @@ class NxGraphBrowser(
             null
         }
         registerFileClickHandler(browser)
+        registerOpenProjectConfigHandler(browser)
     }
 
     val component = browser.component
@@ -435,6 +435,8 @@ class NxGraphBrowser(
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
+                TelemetryService.getInstance(project).featureUsed("Nx Graph Open Project Edge File")
+
                 val path = Paths.get(project.nxBasePath, msg).toString()
                 val file = LocalFileSystem.getInstance().findFileByPath(path)
                 if (file == null) {
@@ -453,6 +455,35 @@ class NxGraphBrowser(
             val js =
                 """
             window.externalApi?.registerFileClickCallback?.((message) => {
+                    ${query.inject("message")}
+            })
+            """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
+    private fun registerOpenProjectConfigHandler(browser: JBCefBrowser) {
+        onBrowserLoadEnd(browser) {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                CoroutineScope(Dispatchers.Default).launch {
+                    TelemetryService.getInstance(project)
+                        .featureUsed("Nx Graph Open Project Config File")
+
+                    project.nxWorkspace()?.workspace?.projects?.get(msg)?.apply {
+                        val path = nxProjectConfigurationPath(project, root) ?: return@apply
+                        val file =
+                            LocalFileSystem.getInstance().findFileByPath(path) ?: return@apply
+                        ApplicationManager.getApplication().invokeLater {
+                            FileEditorManager.getInstance(project).openFile(file, true)
+                        }
+                    }
+                }
+
+                null
+            }
+            val js =
+                """
+            window.externalApi?.registerOpenProjectConfigCallback?.((message) => {
                     ${query.inject("message")}
             })
             """
