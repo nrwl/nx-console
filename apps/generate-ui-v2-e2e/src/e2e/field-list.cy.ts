@@ -14,23 +14,19 @@ describe('field list', () => {
 
   it('should show only important fields by default', () => {
     getFields().should('have.length', 2);
-    getFieldNavItems().should('have.length', 2);
   });
 
   it('should show and hide fields when button is clicked', () => {
     clickShowMore();
     getFields().should('have.length', 6);
-    getFieldNavItems().should('have.length', 6);
     clickShowMore();
     getFields().should('have.length', 2);
-    getFieldNavItems().should('have.length', 2);
   });
 
   it('should filter items based on the search bar', () => {
     cy.get('[id="search-bar"]').type('option1');
     getFields().should('have.length', 1);
-    getFieldNavItems().should('have.length', 1);
-    cy.get('[data-cy="show-more"]').should('not.be.visible');
+    cy.get('[data-cy="show-more"]').should('not.exist');
   });
 
   it('should render correct fields based on the schema', () => {
@@ -80,5 +76,36 @@ describe('field list', () => {
 
     getFieldErrorByName(fieldName).should('have.length', 1);
     getFieldNavItemByName(fieldName).should('have.class', errorClass);
+  });
+
+  describe('field nav', () => {
+    const greyedOutClass = 'text-gray-500';
+
+    it('should show all fields and some greyed out by default', () => {
+      getFieldNavItems().should('have.length', 6);
+      getFieldNavItems().filter(`.${greyedOutClass}`).should('have.length', 4);
+    });
+
+    it('should show all fields and none greyed when expanded', () => {
+      clickShowMore();
+      getFieldNavItems().should('have.length', 6);
+      getFieldNavItems().filter(`.${greyedOutClass}`).should('have.length', 0);
+    });
+
+    it('should filter nav items based on the search bar', () => {
+      cy.get('[id="search-bar"]').type('option1');
+      getFieldNavItems().should('have.length', 1);
+      cy.get('[data-cy="show-more"]').should('not.exist');
+    });
+
+    it('should expand items and scroll to them when clicked', () => {
+      getFieldNavItemByName('option2')
+        .should('be.visible')
+        .click({ force: true });
+      cy.clock().tick(100);
+      getFields().should('have.length', 6);
+      getFieldNavItems().filter(`.${greyedOutClass}`).should('have.length', 0);
+      getFieldByName('option2').should('be.visible');
+    });
   });
 });
