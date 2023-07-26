@@ -390,10 +390,7 @@ function injectedScript() {
 
 async function setNxConsoleEnvironment() {
   const nxVersion = await getNxVersion();
-  console.log(nxVersion);
-  // TODO: once this is released on the nx side, replace with the proper version check
-  if (gte(nxVersion.version, '17.0.0')) {
-    console.log('hello');
+  if (gte(nxVersion.version, '16.6.0')) {
     return '<script> window.environment = "nx-console"</script>';
   } else {
     return '';

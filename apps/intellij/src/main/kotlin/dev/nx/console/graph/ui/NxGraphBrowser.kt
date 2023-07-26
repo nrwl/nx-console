@@ -155,8 +155,7 @@ class NxGraphBrowser(
 
         val nxConsoleEnvironmentScriptTag: String =
             NxlsService.getInstance(project).nxVersion()?.let {
-                // TODO: once this is released on the nx side, replace with the proper version check
-                if (it.full.toVersion(strict = false) >= "17.0.0".toVersion(strict = false)) {
+                if (it.full.toVersion(strict = false) >= "16.6.0".toVersion(strict = false)) {
                     "<script> window.environment = 'nx-console' </script>"
                 } else {
                     ""

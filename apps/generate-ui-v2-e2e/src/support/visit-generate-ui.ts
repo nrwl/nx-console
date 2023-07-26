@@ -3,7 +3,6 @@ import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 export const visitGenerateUi = (schema: GeneratorSchema) =>
   cy.visit('/', {
     onBeforeLoad: (win: any) => {
-      console.log('win', win);
       const postToWebviewCallbacks: any[] = [];
       win.intellijApi = {
         postToWebview(message: string) {
@@ -30,7 +29,6 @@ export const visitGenerateUi = (schema: GeneratorSchema) =>
           }
         },
         registerPostToWebviewCallback(callback: any) {
-          console.log('registering post to webview callback', callback);
           postToWebviewCallbacks.push(callback);
         },
       };
