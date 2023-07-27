@@ -173,6 +173,13 @@
           "group": "inline"
         }
       ],
+      "editor/title": [
+        {
+          "command": "nx.graph.refresh",
+          "group": "navigation",
+          "when": "graphWebviewVisible"
+        }
+      ],
       "commandPalette": [
         {
           "command": "nx.generate.ui.fileexplorer",
@@ -352,7 +359,8 @@
       {
         "category": "Nx",
         "title": "Refresh Nx Graph",
-        "command": "nx.graph.refresh"
+        "command": "nx.graph.refresh",
+        "icon": "$(refresh)"
       },
       {
         "category": "Nx",

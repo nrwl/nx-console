@@ -81,6 +81,7 @@ export class GraphWebView implements Disposable {
     this.panel.onDidDispose(() => {
       this.panel = undefined;
       graphService.send('VIEW_DESTROYED');
+      commands.executeCommand('setContext', 'graphWebviewVisible', false);
     });
 
     this.panel.webview.onDidReceiveMessage(async (event) => {
@@ -114,6 +115,14 @@ export class GraphWebView implements Disposable {
           flags: [],
         });
       }
+    });
+
+    this.panel.onDidChangeViewState(({ webviewPanel }) => {
+      commands.executeCommand(
+        'setContext',
+        'graphWebviewVisible',
+        webviewPanel.visible
+      );
     });
 
     graphService.send('GET_CONTENT');
