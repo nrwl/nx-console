@@ -150,7 +150,22 @@
         {
           "command": "nx.graph.select.button",
           "when": "view == nxProjects && viewItem == project && isNxWorkspace",
-          "group": "navigation"
+          "group": "z_commands"
+        },
+        {
+          "command": "nx.move.projectView",
+          "when": "view == nxProjects && viewItem == project && isNxWorkspace",
+          "group": "navigation@2"
+        },
+        {
+          "command": "nx.remove.projectView",
+          "when": "view == nxProjects && viewItem == project && isNxWorkspace",
+          "group": "navigation@2"
+        },
+        {
+          "command": "nx.generate.ui.projectView",
+          "when": "view == nxProjects && viewItem == project && isNxWorkspace && config.nxConsole.useNewGenerateUiPreview",
+          "group": "navigation@1"
         },
         {
           "command": "nx.graph.task.button",
@@ -171,6 +186,10 @@
       "commandPalette": [
         {
           "command": "nx.generate.ui.fileexplorer",
+          "when": "false"
+        },
+        {
+          "command": "nx.generate.ui.projectView",
           "when": "false"
         },
         {
@@ -223,6 +242,14 @@
         },
         {
           "command": "nx.graph.select.button",
+          "when": "false"
+        },
+        {
+          "command": "nx.move.projectView",
+          "when": "false"
+        },
+        {
+          "command": "nx.remove.projectView",
           "when": "false"
         },
         {
@@ -440,18 +467,33 @@
       },
       {
         "category": "Nx",
-        "title": "Nx generate...",
+        "title": "Nx generate",
         "command": "nx.generate.ui.fileexplorer"
       },
       {
         "category": "Nx",
-        "title": "Move Nx Project...",
+        "title": "Nx generate",
+        "command": "nx.generate.ui.projectView"
+      },
+      {
+        "category": "Nx",
+        "title": "Move Nx Project",
         "command": "nx.move"
       },
       {
         "category": "Nx",
-        "title": "Remove Nx Project...",
+        "title": "Remove Nx Project",
         "command": "nx.remove"
+      },
+      {
+        "category": "Nx",
+        "title": "Move Nx Project",
+        "command": "nx.move.projectView"
+      },
+      {
+        "category": "Nx",
+        "title": "Remove Nx Project",
+        "command": "nx.remove.projectView"
       },
       {
         "category": "Nx",
