@@ -10,7 +10,10 @@ import {
 } from '@nx-console/vscode/nx-cli-quickpicks';
 import { openGenerateUi } from './init-generate-ui-webview';
 import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
-import { NxTreeItem, ProjectViewItem } from '@nx-console/vscode/nx-project-view';
+import {
+  NxTreeItem,
+  ProjectViewItem,
+} from '@nx-console/vscode/nx-project-view';
 
 export async function registerGenerateCommands(context: ExtensionContext) {
   commands.registerCommand(`nx.generate`, async () => {
@@ -39,10 +42,17 @@ export async function registerGenerateCommands(context: ExtensionContext) {
     showGenerateUi(context.extensionPath, uri);
   });
 
-  commands.registerCommand('nx.generate.ui.projectView', (treeItem: NxTreeItem) => {
-    getTelemetry().featureUsed('nx.generate.fileexplorer.projectView');
-    openGenerateUi(undefined, undefined, (treeItem.item as ProjectViewItem).nxProject.project);
-  })
+  commands.registerCommand(
+    'nx.generate.ui.projectView',
+    (treeItem: NxTreeItem) => {
+      getTelemetry().featureUsed('nx.generate.fileexplorer.projectView');
+      openGenerateUi(
+        undefined,
+        undefined,
+        (treeItem.item as ProjectViewItem).nxProject.project
+      );
+    }
+  );
 
   /**
    * move and remove were release in patch 8.11
@@ -55,8 +65,8 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       if (!generator) {
         return;
       }
-      
-      openReMoveGenerator(generator, uri, undefined)
+
+      openReMoveGenerator(generator, uri, undefined);
     });
 
     commands.registerCommand(`nx.remove`, async (uri?: Uri) => {
@@ -65,39 +75,47 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       if (!generator) {
         return;
       }
-     
-      openReMoveGenerator(generator,uri, undefined)
+
+      openReMoveGenerator(generator, uri, undefined);
     });
 
-    commands.registerCommand(`nx.move.projectView`, async (treeItem?: NxTreeItem) => {
-      getTelemetry().featureUsed('nx.move.projectView');
-      const generator = await selectReMoveGenerator(undefined, 'move');
-      if (!generator) {
-        return;
+    commands.registerCommand(
+      `nx.move.projectView`,
+      async (treeItem?: NxTreeItem) => {
+        getTelemetry().featureUsed('nx.move.projectView');
+        const generator = await selectReMoveGenerator(undefined, 'move');
+        if (!generator) {
+          return;
+        }
+
+        const projectName = (treeItem?.item as ProjectViewItem).nxProject
+          .project;
+
+        openReMoveGenerator(generator, undefined, projectName);
       }
+    );
 
-      const projectName = (treeItem?.item as ProjectViewItem).nxProject.project
+    commands.registerCommand(
+      `nx.remove.projectView`,
+      async (treeItem?: NxTreeItem) => {
+        getTelemetry().featureUsed('nx.remove.projectView');
+        const generator = await selectReMoveGenerator(undefined, 'remove');
+        if (!generator) {
+          return;
+        }
 
-      
-      openReMoveGenerator(generator, undefined, projectName)
-    });
+        const projectName = (treeItem?.item as ProjectViewItem).nxProject
+          .project;
 
-    commands.registerCommand(`nx.remove.projectView`, async (treeItem?: NxTreeItem) => {
-      getTelemetry().featureUsed('nx.remove.projectView');
-      const generator = await selectReMoveGenerator(undefined, 'remove');
-      if (!generator) {
-        return;
+        openReMoveGenerator(generator, undefined, projectName);
       }
+    );
 
-      const projectName = (treeItem?.item as ProjectViewItem).nxProject.project
-
-      
-      openReMoveGenerator(generator, undefined, projectName)
-    });
-
-
-
-    const openReMoveGenerator = (generator: string, uri: Uri | undefined, projectName: string | undefined ) => {
+    const openReMoveGenerator = (
+      generator: string,
+      uri: Uri | undefined,
+      projectName: string | undefined
+    ) => {
       const newGenUi = GlobalConfigurationStore.instance.get(
         'useNewGenerateUiPreview'
       );
@@ -111,7 +129,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
           generator
         );
       }
-    }
+    };
   }
 }
 

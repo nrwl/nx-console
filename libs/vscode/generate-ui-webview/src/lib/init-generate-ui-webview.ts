@@ -19,7 +19,11 @@ export async function initGenerateUiWebview(context: ExtensionContext) {
   registerGenerateCommands(context);
 }
 
-export async function openGenerateUi(contextUri?: Uri, generatorName?: string, projectName?: string) {
+export async function openGenerateUi(
+  contextUri?: Uri,
+  generatorName?: string,
+  projectName?: string
+) {
   const generator = await getGenerator(generatorName);
   if (!generator) {
     return;
@@ -27,14 +31,14 @@ export async function openGenerateUi(contextUri?: Uri, generatorName?: string, p
 
   let generatorContext = contextUri
     ? await getGeneratorContextV2(contextUri.fsPath)
-    :  {};
+    : {};
 
-    if(projectName) {
-      generatorContext = {
-    ...generatorContext,
-    project: projectName
-      }
-    }
+  if (projectName) {
+    generatorContext = {
+      ...generatorContext,
+      project: projectName,
+    };
+  }
 
   generateUIWebview.openGenerateUi(
     await augmentGeneratorSchema({
