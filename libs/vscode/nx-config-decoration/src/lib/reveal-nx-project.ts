@@ -3,7 +3,7 @@ import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
 import { Selection, TextDocument, Uri, window, workspace } from 'vscode';
 
-import { getProjectLocations } from './find-workspace-json-target';
+import { getProjectLocations } from './get-project-locations';
 import { fileExists } from '@nx-console/shared/file-system';
 
 export async function revealNxProject(
