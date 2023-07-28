@@ -1,17 +1,13 @@
-import {
-  NotificationType,
-  RequestType,
-  ResponseError,
-} from 'vscode-languageserver/node';
-import { NxWorkspace, TreeMap, TreeNode } from '@nx-console/shared/types';
+import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
 import {
   CollectionInfo,
   Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
+import { NxWorkspace, TreeNode } from '@nx-console/shared/types';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { SemVer } from 'semver';
-import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
+import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
   'nx/changeWorkspace'

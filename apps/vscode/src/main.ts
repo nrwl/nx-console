@@ -49,7 +49,10 @@ import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
-import { configureLspClient } from '@nx-console/vscode/lsp-client';
+import {
+  configureLspClient,
+  sendNotification,
+} from '@nx-console/vscode/lsp-client';
 import {
   NxHelpAndFeedbackProvider,
   NxHelpAndFeedbackTreeItem,
@@ -82,6 +85,8 @@ let context: ExtensionContext;
 let workspaceFileWatcher: FileSystemWatcher | undefined;
 
 let isNxWorkspace = false;
+
+let hasInitializedExtensionPoints = false;
 
 export async function activate(c: ExtensionContext) {
   try {
@@ -116,7 +121,7 @@ export async function activate(c: ExtensionContext) {
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
       LOCATE_YOUR_WORKSPACE.command?.command || '',
       async () => {
-        return manuallySelectWorkspaceDefinition();
+        manuallySelectWorkspaceDefinition();
       }
     );
     const vscodeWorkspacePath =
@@ -173,7 +178,7 @@ function manuallySelectWorkspaceDefinition() {
       .then((value) => {
         if (value && value[0]) {
           const selectedDirectory = value[0].fsPath;
-          return setWorkspace(selectedDirectory);
+          setWorkspace(selectedDirectory);
         }
       });
   } else {
@@ -221,17 +226,19 @@ async function setWorkspace(workspacePath: string) {
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  const lspContext = configureLspClient(context, REFRESH_WORKSPACE);
+  configureLspClient(context, REFRESH_WORKSPACE);
 
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
 
-  setApplicationAndLibraryContext(workspacePath);
-
   isNxWorkspace = await checkIsNxWorkspace(workspacePath);
   const isAngularWorkspace = existsSync(join(workspacePath, 'angular.json'));
 
-  if (!(isAngularWorkspace && !isNxWorkspace)) {
+  if (
+    !(isAngularWorkspace && !isNxWorkspace) &&
+    !hasInitializedExtensionPoints
+  ) {
+    hasInitializedExtensionPoints = true;
     registerNxCommands(context);
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
     registerCliTaskCommands(context);
@@ -254,10 +261,15 @@ async function setWorkspace(workspacePath: string) {
 
     new AddDependencyCodelensProvider(context);
 
-    context.subscriptions.push(nxHelpAndFeedbackTreeView, lspContext);
+    context.subscriptions.push(nxHelpAndFeedbackTreeView);
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
+
+  registerWorkspaceFileWatcher(context, workspacePath);
+
+  currentRunTargetTreeProvider?.refresh();
+  nxProjectsTreeProvider?.refresh();
 
   commands.executeCommand(
     'setContext',
@@ -265,11 +277,6 @@ async function setWorkspace(workspacePath: string) {
     isAngularWorkspace
   );
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
-
-  registerWorkspaceFileWatcher(context, workspacePath);
-
-  currentRunTargetTreeProvider?.refresh();
-  nxProjectsTreeProvider?.refresh();
 
   let workspaceType: 'nx' | 'angular' | 'angularWithNx' = 'nx';
   if (isNxWorkspace && isAngularWorkspace) {
@@ -283,47 +290,6 @@ async function setWorkspace(workspacePath: string) {
   if (workspaceType === 'angular') {
     initNxConversion(context);
   }
-}
-
-async function setApplicationAndLibraryContext(workspacePath: string) {
-  const { workspaceLayout } = await getNxWorkspace();
-
-  if (workspaceLayout.appsDir) {
-    commands.executeCommand('setContext', 'nxAppsDir', [
-      join(workspacePath, workspaceLayout.appsDir),
-    ]);
-  }
-  if (workspaceLayout.libsDir) {
-    commands.executeCommand('setContext', 'nxLibsDir', [
-      join(workspacePath, workspaceLayout.libsDir),
-    ]);
-  }
-
-  const generatorCollections = await getGenerators();
-
-  let hasApplicationGenerators = false;
-  let hasLibraryGenerators = false;
-
-  generatorCollections.forEach((generatorCollection) => {
-    if (generatorCollection.data) {
-      if (generatorCollection.data.type === 'application') {
-        hasApplicationGenerators = true;
-      } else if (generatorCollection.data.type === 'library') {
-        hasLibraryGenerators = true;
-      }
-    }
-  });
-
-  commands.executeCommand(
-    'setContext',
-    'nx.hasApplicationGenerators',
-    hasApplicationGenerators
-  );
-  commands.executeCommand(
-    'setContext',
-    'nx.hasLibraryGenerators',
-    hasLibraryGenerators
-  );
 }
 
 async function registerWorkspaceFileWatcher(
