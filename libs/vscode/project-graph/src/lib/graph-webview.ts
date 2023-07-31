@@ -2,7 +2,6 @@ import {
   getNxWorkspacePath,
   getNxWorkspaceProjects,
   getProjectGraphOutput,
-  revealNxProject,
 } from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel, getTelemetry } from '@nx-console/vscode/utils';
 import {
@@ -19,6 +18,7 @@ import { graphService } from './graph.machine';
 import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 import { join } from 'node:path';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
