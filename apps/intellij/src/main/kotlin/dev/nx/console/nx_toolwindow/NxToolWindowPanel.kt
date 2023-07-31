@@ -63,8 +63,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             indent {
                 row {
                     text(
-                        "<html>" +
-                            "<h3>We couldn't find any projects in this workspace.</h3> Make sure that the proper dependencies are installed locally and refresh the workspace."
+                        "<h3>We couldn't find any projects in this workspace.</h3> Make sure that the proper dependencies are installed locally and refresh the workspace."
                     )
                 }
                 row {

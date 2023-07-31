@@ -95,8 +95,7 @@ class NxlsProcess(private val project: Project) {
             addParameter(lsp.path)
             addParameter("--stdio")
 
-            NodeCommandLineConfigurator.find(project.nodeInterpreter)
-                .configure(this, NodeCommandLineConfigurator.defaultOptions(project))
+            NodeCommandLineConfigurator.find(project.nodeInterpreter).configure(this)
         }
     }
 }
