@@ -1,6 +1,6 @@
 import * as path from 'path';
-import { PosixFS, ZipOpenFS } from '@yarnpkg/fslib';
-import { getLibzipSync as libzip } from '@yarnpkg/libzip';
+import { PosixFS } from '@yarnpkg/fslib';
+import { ZipOpenFS, getLibzipSync as libzip } from '@yarnpkg/libzip';
 
 import { parse as parseJson, ParseError } from 'jsonc-parser';
 

@@ -10694,16 +10694,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@yarnpkg/fslib@npm:2.6.1-rc.5":
-  version: 2.6.1-rc.5
-  resolution: "@yarnpkg/fslib@npm:2.6.1-rc.5"
-  dependencies:
-    "@yarnpkg/libzip": ^2.2.3-rc.5
-    tslib: ^1.13.0
-  checksum: 3471b234f66b64ae4d01afca5b060c409817e9353fc4b5c26aab6b60fc6f0a2ee981485abc961646aaa538fc0cd8c63db1b688e637b7ac57a79f5c624727660d
-  languageName: node
-  linkType: hard
-
 "@yarnpkg/fslib@npm:^2.7.1":
   version: 2.7.1
   resolution: "@yarnpkg/fslib@npm:2.7.1"
@@ -10714,13 +10704,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@yarnpkg/libzip@npm:2.2.3-rc.5":
-  version: 2.2.3-rc.5
-  resolution: "@yarnpkg/libzip@npm:2.2.3-rc.5"
+"@yarnpkg/fslib@npm:^3.0.0-rc.48":
+  version: 3.0.0-rc.48
+  resolution: "@yarnpkg/fslib@npm:3.0.0-rc.48"
   dependencies:
-    "@types/emscripten": ^1.38.0
-    tslib: ^1.13.0
-  checksum: 1ccf5f48a294c50388b14df9f0e694e46a17815b55e66fd0ee537a87e1482bc779ed3acb3550802b3e225477f193b339369b0bde20887bc16258c8774b5fe1aa
+    tslib: ^2.4.0
+  checksum: 658b8c1b688d875de06adf1a4be167641b3082445e310b9a1312deb71a7ef816f829675a571acad10725aed3ee5d0791d6c370a6565af05e1f4f38f470d457d2
   languageName: node
   linkType: hard
 
@@ -10734,13 +10723,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@yarnpkg/libzip@npm:^2.2.3-rc.5, @yarnpkg/libzip@npm:^2.2.4":
+"@yarnpkg/libzip@npm:^2.2.4":
   version: 2.2.4
   resolution: "@yarnpkg/libzip@npm:2.2.4"
   dependencies:
     "@types/emscripten": ^1.38.0
     tslib: ^1.13.0
   checksum: 974a286d4e7ff52bd924d56cb39492898a2306e95774362e4a3eb94690f180273a078243bf4044909e0fe29354552acc1cddd7d10d71ce332f7b1e1ff8eb54d9
+  languageName: node
+  linkType: hard
+
+"@yarnpkg/libzip@npm:^3.0.0-rc.48":
+  version: 3.0.0-rc.48
+  resolution: "@yarnpkg/libzip@npm:3.0.0-rc.48"
+  dependencies:
+    "@types/emscripten": ^1.39.6
+    "@yarnpkg/fslib": ^3.0.0-rc.48
+    tslib: ^2.4.0
+  peerDependencies:
+    "@yarnpkg/fslib": ^3.0.0-rc.48
+  checksum: 9e699e4315a92693de303d0c447a0b104e6171e5c4a583761f0a690bcc9917ba3c7cd051737eac94e1a52e7012fcad294db345ffd31261a5e74d2aad10ec35f6
   languageName: node
   linkType: hard
 
@@ -23673,8 +23675,8 @@ __metadata:
     "@wdio/local-runner": ^7.27.0
     "@wdio/mocha-framework": ^7.26.0
     "@wdio/spec-reporter": ^7.26.0
-    "@yarnpkg/fslib": 2.6.1-rc.5
-    "@yarnpkg/libzip": 2.2.3-rc.5
+    "@yarnpkg/fslib": ^3.0.0-rc.48
+    "@yarnpkg/libzip": ^3.0.0-rc.48
     "@yarnpkg/pnp": ^3.1.1-rc.12
     cypress: 12.17.2
     dotenv: ^16.0.3
