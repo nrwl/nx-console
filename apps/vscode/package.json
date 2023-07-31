@@ -92,6 +92,11 @@
           "when": "isNxWorkspace",
           "group": "2_workspace@5",
           "command": "nx.graph.select"
+        },
+        {
+          "when": "isNxWorkspace",
+          "group": "2_workspace@5",
+          "command": "nx.graph.task"
         }
       ],
       "view/title": [
@@ -181,6 +186,13 @@
           "command": "nxConsole.connectToNxCloud",
           "when": "view == nxHelpAndFeedback && viewItem == connectToNxCloud && isNxWorkspace",
           "group": "inline"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "nx.graph.refresh",
+          "group": "navigation",
+          "when": "graphWebviewVisible"
         }
       ],
       "commandPalette": [
@@ -374,7 +386,8 @@
       {
         "category": "Nx",
         "title": "Refresh Nx Graph",
-        "command": "nx.graph.refresh"
+        "command": "nx.graph.refresh",
+        "icon": "$(refresh)"
       },
       {
         "category": "Nx",
