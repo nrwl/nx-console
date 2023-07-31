@@ -5,7 +5,24 @@ import { commands, ExtensionContext, window } from 'vscode';
 
 let run = false;
 
-export async function initNxConversion(context: ExtensionContext) {
+export async function initNxConversion(
+  context: ExtensionContext,
+  isAngularWorkspace: boolean,
+  isNxWorkspace: boolean
+) {
+  let workspaceType: 'nx' | 'angular' | 'angularWithNx' = 'nx';
+  if (isNxWorkspace && isAngularWorkspace) {
+    workspaceType = 'angularWithNx';
+  } else if (isNxWorkspace && !isAngularWorkspace) {
+    workspaceType = 'nx';
+  } else if (!isNxWorkspace && isAngularWorkspace) {
+    workspaceType = 'angular';
+  }
+
+  if (workspaceType !== 'angular') {
+    return;
+  }
+
   if (run) {
     return;
   }

@@ -1,15 +1,15 @@
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
-  commands,
   ExtensionContext,
   ExtensionMode,
   FileSystemWatcher,
   RelativePattern,
-  tasks,
   TreeItem,
   TreeView,
   Uri,
+  commands,
+  tasks,
   window,
   workspace,
 } from 'vscode';
@@ -21,8 +21,8 @@ import {
 } from '@nx-console/vscode/configuration';
 import { initNxCommandsView } from '@nx-console/vscode/nx-commands-view';
 import {
-  initNxProjectView,
   NxProjectTreeProvider,
+  initNxProjectView,
 } from '@nx-console/vscode/nx-project-view';
 import {
   LOCATE_YOUR_WORKSPACE,
@@ -41,39 +41,31 @@ import {
   watchFile,
 } from '@nx-console/vscode/utils';
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
-import { environment } from './environments/environment';
 
 import { fileExists } from '@nx-console/shared/file-system';
-import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
 import {
-  configureLspClient,
-  sendNotification,
-} from '@nx-console/vscode/lsp-client';
+  initGenerateUiWebview,
+  openGenerateUi,
+} from '@nx-console/vscode/generate-ui-webview';
+import { configureLspClient } from '@nx-console/vscode/lsp-client';
+import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
+import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
+import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import {
   NxHelpAndFeedbackProvider,
   NxHelpAndFeedbackTreeItem,
 } from '@nx-console/vscode/nx-help-and-feedback-view';
+import { getNxWorkspace, stopDaemon } from '@nx-console/vscode/nx-workspace';
 import { projectGraph } from '@nx-console/vscode/project-graph';
+import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 import {
-  refreshWorkspace,
   REFRESH_WORKSPACE,
+  refreshWorkspace,
 } from './commands/refresh-workspace';
-import {
-  getGenerators,
-  getNxWorkspace,
-  stopDaemon,
-} from '@nx-console/vscode/nx-workspace';
-import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
-import { initNxConversion } from '@nx-console/vscode/nx-conversion';
-import {
-  initGenerateUiWebview,
-  openGenerateUi,
-} from '@nx-console/vscode/generate-ui-webview';
-import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -278,18 +270,7 @@ async function setWorkspace(workspacePath: string) {
   );
   commands.executeCommand('setContext', 'isNxWorkspace', isNxWorkspace);
 
-  let workspaceType: 'nx' | 'angular' | 'angularWithNx' = 'nx';
-  if (isNxWorkspace && isAngularWorkspace) {
-    workspaceType = 'angularWithNx';
-  } else if (isNxWorkspace && !isAngularWorkspace) {
-    workspaceType = 'nx';
-  } else if (!isNxWorkspace && isAngularWorkspace) {
-    workspaceType = 'angular';
-  }
-
-  if (workspaceType === 'angular') {
-    initNxConversion(context);
-  }
+  initNxConversion(context, isAngularWorkspace, isNxWorkspace);
 }
 
 async function registerWorkspaceFileWatcher(
