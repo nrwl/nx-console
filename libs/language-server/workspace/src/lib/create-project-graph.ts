@@ -21,7 +21,6 @@ export async function createProjectGraph(
       cwd: workspacePath,
       displayCommand: 'nx dep-graph --file ' + projectGraphOutput.relativePath,
       encapsulatedNx: isEncapsulatedNx,
-      useNpx: true,
     });
 
     logger.log(`Generating graph with command: \`${command}\``);

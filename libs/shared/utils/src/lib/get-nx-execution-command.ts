@@ -11,7 +11,6 @@ export function getNxExecutionCommand(config: {
   cwd: string;
   displayCommand: string;
   encapsulatedNx: boolean;
-  useNpx?: boolean;
 }): string {
   let command = config.displayCommand;
   if (config.encapsulatedNx) {
@@ -21,13 +20,9 @@ export function getNxExecutionCommand(config: {
       command = command.replace(/^nx/, './nx');
     }
   } else {
-    if (config.useNpx) {
-      command = `npx ${command}`;
-    } else {
-      const packageManager = detectPackageManager(config.cwd);
-      const packageManagerCommand = getPackageManagerCommand(packageManager);
-      command = `${packageManagerCommand.exec} ${command}`;
-    }
+    const packageManager = detectPackageManager(config.cwd);
+    const packageManagerCommand = getPackageManagerCommand(packageManager);
+    command = `${packageManagerCommand.exec} ${command}`;
   }
 
   return command;
