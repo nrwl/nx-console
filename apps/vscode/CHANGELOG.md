@@ -1,3 +1,31 @@
+# [18.6.0](https://github.com/nrwl/nx-console/compare/vscode-v18.5.0...vscode-v18.6.0) (2023-08-02)
+
+
+### Bug Fixes
+
+* add better empty states to project view/toolwindow ([#1833](https://github.com/nrwl/nx-console/issues/1833)) ([de3e03d](https://github.com/nrwl/nx-console/commit/de3e03d8d000a3b1ad2763166e2b867c1bcabed9))
+* enable gutter actions in project.json without name & refactor project by path request ([#1822](https://github.com/nrwl/nx-console/issues/1822)) ([43632e2](https://github.com/nrwl/nx-console/commit/43632e2958e0c5ff7852d57320bfdf98550c7132))
+* **generate-ui:** add hover tooltip to copy button ([#1836](https://github.com/nrwl/nx-console/issues/1836)) ([aa24925](https://github.com/nrwl/nx-console/commit/aa24925451d82022b9014ac53df177c6ab21dd03))
+* **generate-ui:** filter autocomplete options using .includes instead of .startsWith ([#1825](https://github.com/nrwl/nx-console/issues/1825)) ([e34a3f2](https://github.com/nrwl/nx-console/commit/e34a3f258a172397373330e71295422617273482))
+* **generate-ui:** refactor field list & show greyed out hidden options ([#1838](https://github.com/nrwl/nx-console/issues/1838)) ([43f51ab](https://github.com/nrwl/nx-console/commit/43f51ab26c68824ffb8aa53bfce4dc00ea336d5b))
+* make scrollbar look more native in intellij ([#1837](https://github.com/nrwl/nx-console/issues/1837)) ([102c726](https://github.com/nrwl/nx-console/commit/102c7263d39e17a6a11421029a54c614f308782a))
+* **nxls:** increase watcher debounce to avoid daemon timing issues ([#1829](https://github.com/nrwl/nx-console/issues/1829)) ([5d5eae9](https://github.com/nrwl/nx-console/commit/5d5eae9e4cfa0c1a10828fabc6df206aa09ba9eb))
+* repair generator context passing in intellij ([#1821](https://github.com/nrwl/nx-console/issues/1821)) ([6e373b9](https://github.com/nrwl/nx-console/commit/6e373b9ec0720692992a971266a9faeb80e83b41))
+* sort project tree view / nx toolwindow ([#1830](https://github.com/nrwl/nx-console/issues/1830)) ([e077225](https://github.com/nrwl/nx-console/commit/e0772256bdb3af7240d4dee39928dffc70e0aa72))
+* **vscode:** don't register vscode things twice & remove outdated stuff from main.ts ([#1848](https://github.com/nrwl/nx-console/issues/1848)) ([0bd8fa1](https://github.com/nrwl/nx-console/commit/0bd8fa1322ee87612c0b77fa0e0eba2cf4424cbb))
+* **vscode:** enhance graph/task focus commands to fallback to manual selection ([#1842](https://github.com/nrwl/nx-console/issues/1842)) ([685bc30](https://github.com/nrwl/nx-console/commit/685bc3001eaee67158723c7bb098dc34ee77edde))
+
+
+### Features
+
+* consume new graph events to open files in the ide ([#1823](https://github.com/nrwl/nx-console/issues/1823)) ([5049c76](https://github.com/nrwl/nx-console/commit/5049c76359733b162806249b7747449226093b21))
+* enable opening project configuration files & running tasks from graph ([#1841](https://github.com/nrwl/nx-console/issues/1841)) ([b2e3785](https://github.com/nrwl/nx-console/commit/b2e378564f8d674b93130b4e9bff958828e7dfa6))
+* refactor & add folder view to jetbrains toolwindow ([#1814](https://github.com/nrwl/nx-console/issues/1814)) ([70a9c88](https://github.com/nrwl/nx-console/commit/70a9c88fb60fc1e0dcaf1811463adb60f7151037))
+* show keyboard shortcut indicator in generate ui search bar ([#1832](https://github.com/nrwl/nx-console/issues/1832)) ([6e80a69](https://github.com/nrwl/nx-console/commit/6e80a691e1d081a2ba6ad53f012fcfa0c874156c))
+* support yarn pnp ([#1850](https://github.com/nrwl/nx-console/issues/1850)) ([f5787a3](https://github.com/nrwl/nx-console/commit/f5787a32b384b4ab19d1c2e6774a92b28e2c7e3b))
+* **vscode:** add generate/move/remove to project view context menu ([#1846](https://github.com/nrwl/nx-console/issues/1846)) ([d02492f](https://github.com/nrwl/nx-console/commit/d02492f6f4135902e918bbcd2904a85056b0c8ef))
+* **vscode:** refactoring & add synthetic target codelenses ([#1840](https://github.com/nrwl/nx-console/issues/1840)) ([9cd18a9](https://github.com/nrwl/nx-console/commit/9cd18a9aafc61ab9575add4e1abbf40a6c7e2942))
+
 # [18.5.0](https://github.com/nrwl/nx-console/compare/vscode-v18.4.0...vscode-v18.5.0) (2023-07-10)
 
 
