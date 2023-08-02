@@ -7,14 +7,19 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import dev.nx.console.NxConsoleBundle
+import dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesNotificationAction
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.telemetry.actions.TelemetryOptInAction
 import dev.nx.console.telemetry.actions.TelemetryOptOutAction
+import dev.nx.console.utils.Throttler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 
 class Notifier {
     companion object {
         val group = NotificationGroupManager.getInstance().getNotificationGroup("Nx Console")
+
         fun notifyNxlsError(project: Project) {
             group
                 .createNotification(
@@ -62,16 +67,24 @@ class Notifier {
                 )
             }
         }
+
+        private val lspIssueExceptionThrottler =
+            Throttler(1000L, CoroutineScope(Dispatchers.Default))
+        fun notifyLspMessageIssueExceptionThrottled(project: Project, e: MessageIssueException) =
+            lspIssueExceptionThrottler.throttle { notifyLSPMessageIssueException(project, e) }
         fun notifyLSPMessageIssueException(project: Project, e: MessageIssueException) {
-            this.notifyAnything(
-                project,
-                "<html>" +
-                    "Nx Console ran into problems reading your workspace files: <br>" +
-                    "<pre>${e.issues.first().cause.message}</pre><br>" +
-                    "Make sure to double-check your project.json & nx.json files for syntax errors." +
-                    "</html>",
-                NotificationType.ERROR
-            )
+            group
+                .createNotification(
+                    "<html>" +
+                        "Nx Console ran into problems reading your workspace files: <br>" +
+                        "<pre>${e.issues.first().cause.message}</pre><br>" +
+                        "Make sure to double-check your project.json & nx.json files for syntax errors below." +
+                        "</html>",
+                    NotificationType.ERROR
+                )
+                .setTitle("Nx Console")
+                .addAction(AnalyzeNxConfigurationFilesNotificationAction())
+                .notify(project)
         }
         fun notifyAnything(
             project: Project,

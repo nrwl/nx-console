@@ -1,14 +1,15 @@
-import { ContextConsumer } from '@lit-labs/context';
-import { html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { formValuesServiceContext } from '../form-values.service';
-import { FieldValueConsumer } from './field-value-consumer-mixin';
 import { Option } from '@nx-console/shared/schema';
+import { html, LitElement } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { FieldValueConsumer } from './field-value-consumer-mixin';
 
 @customElement('field-nav-item')
 export class FieldNavItem extends FieldValueConsumer(LitElement) {
   @property()
   protected option: Option;
+
+  @property()
+  greyedOut = false;
 
   render() {
     return html`
@@ -19,6 +20,8 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
           ? 'text-error'
           : this.shouldRenderChanged()
           ? 'text-primary'
+          : this.greyedOut
+          ? 'text-gray-500'
           : 'text-foreground'} hover:bg-fieldNavHoverBackground  cursor-pointer overflow-hidden 
           text-ellipsis"
       >

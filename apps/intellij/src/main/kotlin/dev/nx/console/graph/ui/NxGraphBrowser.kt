@@ -1,8 +1,12 @@
 package dev.nx.console.graph.ui
 
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefClient
@@ -13,11 +17,17 @@ import dev.nx.console.graph.NxGraphService
 import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
-import dev.nx.console.utils.isWslInterpreter
+import dev.nx.console.run.NxTaskExecutionManager
+import dev.nx.console.services.NxlsService
+import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.ui.Notifier
+import dev.nx.console.utils.*
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
-import dev.nx.console.utils.nodeInterpreter
+import dev.nx.console.utils.jcef.onBrowserLoadEnd
+import io.github.z4kn4fein.semver.toVersion
 import java.io.File
+import java.nio.file.Paths
 import java.util.regex.Matcher
 import kotlin.io.path.Path
 import kotlinx.coroutines.*
@@ -56,6 +66,9 @@ class NxGraphBrowser(
             }
             null
         }
+        registerFileClickHandler(browser)
+        registerOpenProjectConfigHandler(browser)
+        registerRunTaskHandler(browser)
     }
 
     val component = browser.component
@@ -130,7 +143,7 @@ class NxGraphBrowser(
             .collect()
     }
 
-    private fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
+    private suspend fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
         browserLoadedState.value = false
 
         val fullPath =
@@ -141,6 +154,16 @@ class NxGraphBrowser(
             }
 
         val basePath = "${Path(fullPath).parent}/"
+
+        val nxConsoleEnvironmentScriptTag: String =
+            NxlsService.getInstance(project).nxVersion()?.let {
+                if (it.full.toVersion(strict = false) >= "16.6.0".toVersion(strict = false)) {
+                    "<script> window.environment = 'nx-console' </script>"
+                } else {
+                    ""
+                }
+            }
+                ?: ""
 
         val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
@@ -183,6 +206,13 @@ class NxGraphBrowser(
             }
           </style>
           """
+                )
+                .replace(
+                    "</head>",
+                    """
+                     $nxConsoleEnvironmentScriptTag
+                     </head>
+                    """
                 )
                 .replace(
                     Regex("</body>"),
@@ -403,6 +433,87 @@ class NxGraphBrowser(
         }
     }
 
+    private fun registerFileClickHandler(browser: JBCefBrowser) {
+        onBrowserLoadEnd(browser) {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                TelemetryService.getInstance(project).featureUsed("Nx Graph Open Project Edge File")
+
+                val path = Paths.get(project.nxBasePath, msg).toString()
+                val file = LocalFileSystem.getInstance().findFileByPath(path)
+                if (file == null) {
+                    Notifier.notifyAnything(
+                        project,
+                        "Couldn't find file at path $path",
+                        NotificationType.ERROR
+                    )
+                    return@addHandler null
+                }
+                ApplicationManager.getApplication().invokeLater {
+                    FileEditorManager.getInstance(project).openFile(file, true)
+                }
+                null
+            }
+            val js =
+                """
+            window.externalApi?.registerFileClickCallback?.((message) => {
+                    ${query.inject("message")}
+            })
+            """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
+    private fun registerOpenProjectConfigHandler(browser: JBCefBrowser) {
+        onBrowserLoadEnd(browser) {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                CoroutineScope(Dispatchers.Default).launch {
+                    TelemetryService.getInstance(project)
+                        .featureUsed("Nx Graph Open Project Config File")
+
+                    project.nxWorkspace()?.workspace?.projects?.get(msg)?.apply {
+                        val path = nxProjectConfigurationPath(project, root) ?: return@apply
+                        val file =
+                            LocalFileSystem.getInstance().findFileByPath(path) ?: return@apply
+                        ApplicationManager.getApplication().invokeLater {
+                            FileEditorManager.getInstance(project).openFile(file, true)
+                        }
+                    }
+                }
+
+                null
+            }
+            val js =
+                """
+            window.externalApi?.registerOpenProjectConfigCallback?.((message) => {
+                    ${query.inject("message")}
+            })
+            """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
+    private fun registerRunTaskHandler(browser: JBCefBrowser) {
+        onBrowserLoadEnd(browser) {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                CoroutineScope(Dispatchers.Default).launch {
+                    TelemetryService.getInstance(project).featureUsed("Nx Graph Run Task")
+
+                    val (projectName, targetName) = msg.split(":")
+                    NxTaskExecutionManager.getInstance(project).execute(projectName, targetName)
+                }
+
+                null
+            }
+            val js =
+                """
+            window.externalApi?.registerRunTaskCallback?.((message) => {
+                    ${query.inject("message")}
+            })
+            """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
     override fun dispose() {
         browser.dispose()
     }

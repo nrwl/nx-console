@@ -1,5 +1,4 @@
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import { revealNxProject } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider, getTelemetry } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext, ProviderResult } from 'vscode';
@@ -19,6 +18,7 @@ import {
   TreeViewItem,
   TreeViewStrategy,
 } from './views/nx-project-tree-view';
+import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 
 export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
 

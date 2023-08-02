@@ -57,7 +57,7 @@ data class GeneratorSchema(
     val generatorName: String,
     val description: String,
     val options: List<NxGeneratorOption>,
-    val contextValues: NxGeneratorContext?
+    val context: NxGeneratorContext?
 ) {}
 
 @Serializable
@@ -87,6 +87,7 @@ data class GenerateUiStyles(
     val bannerWarningBackgroundColor: String,
     val separatorColor: String,
     val fieldNavHoverColor: String,
+    val scrollbarThumbColor: String,
     val fontFamily: String,
     val fontSize: String,
 )

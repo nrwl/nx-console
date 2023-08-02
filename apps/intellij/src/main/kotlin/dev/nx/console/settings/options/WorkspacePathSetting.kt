@@ -12,6 +12,7 @@ import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingBase
+import java.nio.file.Paths
 
 class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?> {
 
@@ -43,10 +44,14 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
         }
     }
 
-    override fun getValue(): String? = inputField.text.ifEmpty { null }
+    override fun getValue(): String? =
+        inputField.text
+            .ifEmpty { null }
+            ?.let { Paths.get(project.basePath ?: "").relativize(Paths.get(it)).toString() }
 
     override fun setValue(value: String?) {
         if (value == null) return
-        this.inputField.text = value
+        val absolutePath = Paths.get(project.basePath ?: "").resolve(Paths.get(value))
+        this.inputField.text = absolutePath.toString()
     }
 }

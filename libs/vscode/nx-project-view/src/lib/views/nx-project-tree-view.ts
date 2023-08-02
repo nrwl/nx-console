@@ -36,9 +36,16 @@ class TreeView extends BaseView {
     if (!element) {
       const { treeMap, roots } = await getProjectFolderTree();
       this.treeMap = treeMap;
-      return roots.map((root) =>
-        this.createFolderOrProjectTreeItemFromNode(root)
-      );
+      return roots
+        .sort((a, b) => {
+          // the VSCode tree view looks chaotic when folders and projects are on the same level
+          // so we sort the nodes to have folders first and projects after
+          if (!!a.projectName == !!b.projectName) {
+            return a.dir.localeCompare(b.dir);
+          }
+          return a.projectName ? 1 : -1;
+        })
+        .map((root) => this.createFolderOrProjectTreeItemFromNode(root));
     }
 
     if (element.contextValue === 'project') {

@@ -11,6 +11,7 @@ import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
+import dev.nx.console.nxls.server.requests.NxProjectsByPathsRequest
 import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.nxlsWorkingPath
 import kotlinx.coroutines.CoroutineScope
@@ -95,6 +96,14 @@ class NxlsService(val project: Project) {
         }()
     }
 
+    suspend fun projectsByPaths(paths: Array<String>): Map<String, NxProject> {
+        val request = NxProjectsByPathsRequest(paths)
+        return withMessageIssueCatch {
+            server()?.getNxService()?.projectsByPaths(request)?.await()
+        }()
+            ?: emptyMap()
+    }
+
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
         return withMessageIssueCatch { server()?.getNxService()?.projectGraphOutput()?.await() }()
     }
@@ -117,6 +126,10 @@ class NxlsService(val project: Project) {
         }()
     }
 
+    suspend fun nxVersion(): NxVersion? {
+        return this.workspace()?.nxVersion
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }
@@ -133,12 +146,16 @@ class NxlsService(val project: Project) {
         return wrapper.isEditorConnected(editor)
     }
 
+    fun runAfterStarted(block: Runnable) {
+        wrapper.initializeFuture?.thenRun(block)
+    }
+
     private fun <T> withMessageIssueCatch(block: suspend () -> T): suspend () -> T? {
         return {
             try {
                 block()
             } catch (e: MessageIssueException) {
-                Notifier.notifyLSPMessageIssueException(project, e)
+                Notifier.notifyLspMessageIssueExceptionThrottled(project, e)
                 null
             }
         }

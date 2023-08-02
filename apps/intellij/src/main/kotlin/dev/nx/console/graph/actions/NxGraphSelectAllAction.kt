@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
-import dev.nx.console.nx_toolwindow.NxToolWindow
+import dev.nx.console.nx_toolwindow.NxToolWindowPanel
 import dev.nx.console.telemetry.TelemetryService
 import javax.swing.Icon
 
@@ -18,7 +18,7 @@ open class NxGraphSelectAllAction(
     override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     override fun update(e: AnActionEvent) {
-        if (e.place == NxToolWindow.NX_TOOLBAR_PLACE) {
+        if (e.place == NxToolWindowPanel.NX_TOOLBAR_PLACE) {
             e.presentation.text = "View Full Project Graph"
             e.presentation.icon = AllIcons.Graph.Layout
         }

@@ -1,5 +1,9 @@
-import { getProjectGraphOutput } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/utils';
+import {
+  getNxWorkspacePath,
+  getNxWorkspaceProjects,
+  getProjectGraphOutput,
+} from '@nx-console/vscode/nx-workspace';
+import { getOutputChannel, getTelemetry } from '@nx-console/vscode/utils';
 import {
   commands,
   Disposable,
@@ -12,6 +16,9 @@ import { waitFor } from 'xstate/lib/waitFor';
 import { MessageType } from './graph-message-type';
 import { graphService } from './graph.machine';
 import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
+import { join } from 'node:path';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;
@@ -57,6 +64,7 @@ export class GraphWebView implements Disposable {
       return;
     }
 
+    const workspacePath = await getNxWorkspacePath();
     const { directory } = await getProjectGraphOutput();
 
     this.panel = window.createWebviewPanel(
@@ -73,6 +81,7 @@ export class GraphWebView implements Disposable {
     this.panel.onDidDispose(() => {
       this.panel = undefined;
       graphService.send('VIEW_DESTROYED');
+      commands.executeCommand('setContext', 'graphWebviewVisible', false);
     });
 
     this.panel.webview.onDidReceiveMessage(async (event) => {
@@ -83,6 +92,37 @@ export class GraphWebView implements Disposable {
       if (event.command === 'refresh') {
         commands.executeCommand('nxConsole.refreshWorkspace');
       }
+      if (event.command === 'fileClick') {
+        getTelemetry().featureUsed('nx.graph.openProjectEdgeFile');
+        commands.executeCommand(
+          'vscode.open',
+          Uri.file(join(workspacePath, event.data))
+        );
+      }
+      if (event.command === 'openProject') {
+        getTelemetry().featureUsed('nx.graph.openProjectConfigFile');
+        getNxWorkspaceProjects().then((projects) => {
+          const root = projects[event.data]?.root;
+          if (!root) return;
+          revealNxProject(event.data, root);
+        });
+      }
+      if (event.command === 'runTask') {
+        getTelemetry().featureUsed('nx.graph.runTask');
+        CliTaskProvider.instance.executeTask({
+          command: 'run',
+          positional: event.data,
+          flags: [],
+        });
+      }
+    });
+
+    this.panel.onDidChangeViewState(({ webviewPanel }) => {
+      commands.executeCommand(
+        'setContext',
+        'graphWebviewVisible',
+        webviewPanel.visible
+      );
     });
 
     graphService.send('GET_CONTENT');

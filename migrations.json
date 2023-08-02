@@ -2,49 +2,19 @@
   "migrations": [
     {
       "cli": "nx",
-      "version": "16.4.0-beta.8",
-      "description": "Replace @nx/node:node with @nx/js:node for all project targets",
-      "implementation": "./src/migrations/update-16-4-0/replace-node-executor",
-      "package": "@nx/node",
-      "name": "update-16-4-0-replace-node-executor"
+      "version": "16.5.0-beta.0",
+      "description": "Move .storybook/tsconfig.json to tsconfig.storybook.json for non-Angular projects.",
+      "factory": "./src/migrations/update-16-5-0/move-storybook-tsconfig",
+      "package": "@nx/storybook",
+      "name": "update-16-5-0"
     },
     {
       "cli": "nx",
-      "version": "16.4.0-beta.10",
-      "description": "Remove tsconfig.e2e.json and add settings to project tsconfig.json. tsConfigs executor option is now deprecated. The project level tsconfig.json file should be used instead.",
-      "implementation": "./src/migrations/update-16-4-0/tsconfig-sourcemaps",
-      "package": "@nx/cypress",
-      "name": "update-16-3-0-remove-old-tsconfigs"
-    },
-    {
-      "cli": "nx",
-      "version": "16.4.0-beta.11",
-      "description": "Cypress Component Testing is broken with Angular 16.1.0. Warn about it if the workspace has Angular >= 16.1.0 and Angular projects using Component Testing.",
-      "implementation": "./src/migrations/update-16-4-0/warn-incompatible-angular-cypress",
-      "package": "@nx/cypress",
-      "name": "update-16-4-0-warn-incompatible-angular-cypress"
-    },
-    {
-      "cli": "nx",
-      "version": "16.4.0-beta.6",
-      "requires": {
-        "@angular-eslint/eslint-plugin-template": ">=16.0.0"
-      },
-      "description": "Remove the 'accessibility-' prefix from '@angular-eslint/eslint-plugin-template' rules.",
-      "factory": "./src/migrations/update-16-4-0/rename-angular-eslint-accesibility-rules",
-      "package": "@nx/angular",
-      "name": "rename-angular-eslint-accesibility-rules"
-    },
-    {
-      "cli": "nx",
-      "version": "16.4.0-beta.11",
-      "requires": {
-        "@angular/core": ">=16.1.0"
-      },
-      "description": "Update the @angular/cli package version to ~16.1.0.",
-      "factory": "./src/migrations/update-16-4-0/update-angular-cli",
-      "package": "@nx/angular",
-      "name": "update-angular-cli-version-16-1-0"
+      "version": "16.5.0-beta.2",
+      "description": "Add test-setup.ts to ignored files in production input",
+      "implementation": "./src/migrations/update-16-5-0/add-test-setup-to-inputs-ignore",
+      "package": "@nx/jest",
+      "name": "add-test-setup-to-inputs-ignore"
     }
   ]
 }

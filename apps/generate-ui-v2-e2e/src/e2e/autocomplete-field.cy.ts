@@ -22,12 +22,13 @@ const autocompleteSchema = {
         'item4',
         'item5',
         'item6',
-        'item7',
-        'item8',
-        'item9',
-        'item10',
-        'item11',
-        'item12',
+        'object1',
+        'object2',
+        'object3',
+        'object4',
+        'object5',
+        'object6',
+        'object7',
       ],
       aliases: [],
     },
@@ -47,6 +48,6 @@ describe('autocomplete field', () => {
 
   it('should correctly render all options when expanded', () => {
     getFieldByName('option2').click();
-    cy.get('intellij-option').should('have.length', 12);
+    cy.get('intellij-option').should('have.length', 13);
   });
 });

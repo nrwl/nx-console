@@ -1,10 +1,10 @@
 import { css, html, LitElement } from 'lit';
 import { EditorContext } from '../contexts/editor-context';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('show-more-divider')
 export class ShowMoreDivider extends EditorContext(LitElement) {
-  @state()
+  @property()
   showMore = false;
 
   render() {

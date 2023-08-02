@@ -83,6 +83,9 @@
       "@nx-console/vscode/nx-commands-view": [
         "libs/vscode/nx-commands-view/src/index.ts"
       ],
+      "@nx-console/vscode/nx-config-decoration": [
+        "libs/vscode/nx-config-decoration/src/index.ts"
+      ],
       "@nx-console/vscode/nx-conversion": [
         "libs/vscode/nx-conversion/src/index.ts"
       ],

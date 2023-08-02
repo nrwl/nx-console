@@ -212,6 +212,7 @@ export class IdeCommunicationController implements ReactiveController {
       --badge-background-color: ${styles.badgeBackgroundColor};
       --separator-color: ${styles.separatorColor};
       --field-nav-hover-color: ${styles.fieldNavHoverColor};
+      --scrollbar-thumb-color: ${styles.scrollbarThumbColor};
       font-family: ${styles.fontFamily};
       font-size: ${styles.fontSize};
     }

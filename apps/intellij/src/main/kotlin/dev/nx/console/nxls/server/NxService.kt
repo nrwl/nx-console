@@ -39,6 +39,13 @@ interface NxService {
     }
 
     @JsonRequest
+    fun projectsByPaths(
+        projectsByPathsRequest: NxProjectsByPathsRequest
+    ): CompletableFuture<Map<String, NxProject>> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun projectGraphOutput(): CompletableFuture<ProjectGraphOutput> {
         throw UnsupportedOperationException()
     }
@@ -52,6 +59,7 @@ interface NxService {
     fun projectFolderTree(): CompletableFuture<SerializedNxFolderTreeData> {
         throw UnsupportedOperationException()
     }
+
     @JsonNotification
     fun changeWorkspace(workspacePath: String) {
         throw UnsupportedOperationException()

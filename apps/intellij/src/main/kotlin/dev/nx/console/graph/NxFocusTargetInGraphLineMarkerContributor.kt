@@ -11,7 +11,8 @@ import dev.nx.console.utils.getPropertyNodeFromLeafNode
 class NxFocusTargetInGraphLineMarkerContributor : RunLineMarkerContributor() {
     override fun getInfo(element: PsiElement): Info? {
         val targetNode = getPropertyNodeFromLeafNode(element) ?: return null
-        val targetDescriptor = getNxTargetDescriptorFromNode(targetNode) ?: return null
+        val targetDescriptor =
+            getNxTargetDescriptorFromNode(targetNode, element.project) ?: return null
 
         return Info(
             AllIcons.RunConfigurations.TestState.Run,

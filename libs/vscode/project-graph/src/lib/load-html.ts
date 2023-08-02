@@ -1,7 +1,11 @@
-import { getProjectGraphOutput } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxVersion,
+  getProjectGraphOutput,
+} from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel } from '@nx-console/vscode/utils';
 import { Uri, WebviewPanel, workspace } from 'vscode';
 import { MessageType } from './graph-message-type';
+import { SemVer, coerce, gte } from 'semver';
 
 const html = String.raw;
 
@@ -221,17 +225,29 @@ export async function loadHtml(panel: WebviewPanel) {
         }
       </style>
       <script>${injectedScript()}</script>
+      ${await setNxConsoleEnvironment()}
+
       </head>`
+  );
+  projectGraphHtml = projectGraphHtml.replace(
+    '</body>',
+    html`
+    <script>
+      ${registerFileClickListener()};
+      ${registerOpenProjectConfigCallback()};
+      ${registerRunTaskCallback()};
+    </script>
+   </body>`
   );
 
   return projectGraphHtml;
 }
 
 function injectedScript() {
-  // language=JavaScript
   return `
     (function() {
       const vscode = acquireVsCodeApi();
+      window.vscode = vscode;
 
       const noProjectElement = document.createElement('p');
       noProjectElement.classList.add('nx-select-project');
@@ -372,4 +388,44 @@ function injectedScript() {
       })
     }())
   `;
+}
+
+async function setNxConsoleEnvironment() {
+  const nxVersion = await getNxVersion();
+  if (gte(nxVersion.version, '16.6.0')) {
+    return '<script> window.environment = "nx-console"</script>';
+  } else {
+    return '';
+  }
+}
+
+function registerFileClickListener() {
+  return `
+  window.externalApi?.registerFileClickCallback?.((message) => {
+    window.vscode.postMessage({
+      command: 'fileClick',
+      data: message
+    })
+ })
+ `;
+}
+function registerOpenProjectConfigCallback() {
+  return `
+window.externalApi?.registerOpenProjectConfigCallback?.((message) => {
+  window.vscode.postMessage({
+    command: 'openProject',
+    data: message
+  })
+})
+`;
+}
+function registerRunTaskCallback() {
+  return `
+window.externalApi?.registerRunTaskCallback?.((message) => {
+  window.vscode.postMessage({
+    command: 'runTask',
+    data: message
+  })
+})
+`;
 }

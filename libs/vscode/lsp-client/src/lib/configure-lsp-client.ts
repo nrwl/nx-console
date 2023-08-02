@@ -20,12 +20,10 @@ let client: LanguageClient | undefined;
 export function configureLspClient(
   context: ExtensionContext,
   refreshCommand: string | undefined
-): Disposable {
+) {
   if (client) {
     sendNotification(NxChangeWorkspace, getWorkspacePath());
-    return {
-      dispose,
-    };
+    return;
   }
 
   const serverModule = context.asAbsolutePath(join('nxls', 'main.js'));
@@ -73,9 +71,7 @@ export function configureLspClient(
     }
   });
 
-  return {
-    dispose,
-  };
+  context.subscriptions.push({ dispose });
 }
 
 function dispose() {

@@ -75,7 +75,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
                         collectionName = generator.data.collection,
                         description = generator.data.description,
                         options = generator.options,
-                        contextValues = generator.contextValues
+                        context = generator.contextValues
                     )
             }
             browser.component.requestFocus()
@@ -149,6 +149,8 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
         val statusBarBorderColor = getHexColor(UIManager.getColor("StatusBar.borderColor"))
         val fieldNavHoverColor = getHexColor(UIManager.getColor("TabbedPane.hoverColor"))
+
+        val scrollbarThumbColor = selectFieldBackgroundColor
         val fontFamily =
             "'${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;"
         val fontSize = "${UIUtil.getLabelFont().size}px"
@@ -167,6 +169,7 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
             bannerWarningBackgroundColor = bannerWarningBackgroundColor,
             separatorColor = statusBarBorderColor,
             fieldNavHoverColor = fieldNavHoverColor,
+            scrollbarThumbColor = scrollbarThumbColor,
             fontFamily = fontFamily,
             fontSize = fontSize
         )
