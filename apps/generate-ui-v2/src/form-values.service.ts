@@ -157,7 +157,16 @@ export class FormValuesService {
       );
       const defaultValue = extractDefaultValue(option);
       if (compareWithDefaultValue(value, defaultValue)) return;
-      args.push(`--${key}=${value}`);
+      const valueString = value?.toString() ?? '';
+      if (valueString.includes(' ')) {
+        if (valueString.includes('"')) {
+          args.push(`--${key}='${value}'`);
+        } else {
+          args.push(`--${key}="${value}"`);
+        }
+      } else {
+        args.push(`--${key}=${value}`);
+      }
     });
     return args;
   }
