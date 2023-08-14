@@ -2,7 +2,7 @@ package dev.nx.console
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.ProjectPostStartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryService
@@ -11,7 +11,7 @@ import dev.nx.console.utils.NxProjectJsonToProjectMap
 
 private val logger = logger<ProjectPostStartup>()
 
-class ProjectPostStartup : ProjectPostStartupActivity {
+class ProjectPostStartup : ProjectActivity {
     override suspend fun execute(project: Project) {
 
         val service = NxlsService.getInstance(project)

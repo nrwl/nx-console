@@ -5,8 +5,8 @@ import com.intellij.openapi.options.SettingsEditor
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.fields.ExpandableTextField
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.util.ui.ComponentWithEmptyText
 import javax.swing.JComponent
 
@@ -51,14 +51,14 @@ class NxRunConfigurationEditor : SettingsEditor<NxCommandConfiguration>() {
                 nxProjectsField =
                     expandableTextField()
                         .comment("Nx projects separated with commas, e.g. 'project1,project2'")
-                        .horizontalAlign(HorizontalAlign.FILL)
+                        .align(AlignX.FILL)
                         .component
             }
             row("&Targets:") {
                 nxTargetsField =
                     expandableTextField()
                         .comment("Nx targets separated with commas, e.g. 'lint,test'")
-                        .horizontalAlign(HorizontalAlign.FILL)
+                        .align(AlignX.FILL)
                         .component
             }
             row("Configuration:") {
@@ -67,13 +67,13 @@ class NxRunConfigurationEditor : SettingsEditor<NxCommandConfiguration>() {
                         .comment(
                             "Nx target configuration that will be used for all targets (if it exists), e.g. 'production'"
                         )
-                        .horizontalAlign(HorizontalAlign.FILL)
+                        .align(AlignX.FILL)
                         .component
             }
             row(environmentVariablesField.label) {
-                cell(environmentVariablesField.component).horizontalAlign(HorizontalAlign.FILL)
+                cell(environmentVariablesField.component).align(AlignX.FILL)
             }
-            row("A&rguments:") { cell(argumentsField).horizontalAlign(HorizontalAlign.FILL) }
+            row("A&rguments:") { cell(argumentsField).align(AlignX.FILL) }
         }
     }
 }

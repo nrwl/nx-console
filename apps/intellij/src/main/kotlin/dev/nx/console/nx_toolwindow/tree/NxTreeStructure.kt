@@ -124,7 +124,7 @@ class NxTreeStructure(
 
     private inner class RunAction : ExecuteAction(DefaultRunExecutor.getRunExecutorInstance()) {
         init {
-            shortcutSet = CommonShortcuts.ENTER
+            registerCustomShortcutSet(CommonShortcuts.ENTER, null)
         }
     }
 
@@ -185,7 +185,7 @@ class NxTreeStructure(
 
         init {
             myExecutor = executor
-            this.shortcutSet = CommonShortcuts.ENTER
+            registerCustomShortcutSet(CommonShortcuts.ENTER, null)
         }
 
         override fun getActionUpdateThread(): ActionUpdateThread {

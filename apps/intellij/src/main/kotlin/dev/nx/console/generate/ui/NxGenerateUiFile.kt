@@ -1,12 +1,15 @@
 package dev.nx.console.generate.ui
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
+import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
@@ -21,6 +24,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.cef.CefApp
+import org.cef.browser.CefBrowser
+import org.cef.handler.CefLifeSpanHandlerAdapter
 
 val json = Json {
     classDiscriminator = "payloadType"
@@ -42,10 +47,46 @@ class NxGenerateUiFileType : FileType {
     }
 }
 
-abstract class NxGenerateUiFile(name: String) :
+abstract class NxGenerateUiFile(name: String, v2: Boolean = false) :
     LightVirtualFile(name, NxGenerateUiFileType.INSTANCE, "") {
+
+    protected val browser: JBCefBrowser = JBCefBrowser()
+
+    private val connection: MessageBusConnection
+
+    val lifeSpanHandler: CefLifeSpanHandlerAdapter =
+        object : CefLifeSpanHandlerAdapter() {
+            override fun onAfterCreated(browser: CefBrowser) {
+                val domainName = if (v2) "nxconsolev2" else "nxconsole"
+                CefApp.getInstance()
+                    .registerSchemeHandlerFactory(
+                        "http",
+                        domainName,
+                        CustomSchemeHandlerFactory(v2)
+                    )
+                browser.loadURL("http://$domainName/index.html")
+            }
+        }
+
     init {
         isWritable = false
+        connection = ApplicationManager.getApplication().messageBus.connect()
+        connection.subscribe(
+            FileEditorManagerListener.FILE_EDITOR_MANAGER,
+            object : FileEditorManagerListener {
+                override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
+                    if (file == this@NxGenerateUiFile) {
+                        connection.disconnect()
+                        browser.jbCefClient.removeLifeSpanHandler(
+                            lifeSpanHandler,
+                            browser.cefBrowser
+                        )
+                        browser.dispose()
+                    }
+                }
+            }
+        )
+        browser.jbCefClient.addLifeSpanHandler(lifeSpanHandler, browser.cefBrowser)
     }
 
     abstract fun createMainComponent(project: Project): JComponent
@@ -68,7 +109,6 @@ abstract class NxGenerateUiFile(name: String) :
 
 class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name) {
 
-    private val browser: JBCefBrowser = JBCefBrowser()
     private var generatorToDisplay: GeneratorSchemaPayload? = null
     private val runGeneratorManager: RunGeneratorManager
 
@@ -79,9 +119,6 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
 
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
-        registerAppSchemeHandler()
-        browser.loadURL("http://nxconsole/index.html")
-        Disposer.register(project, browser)
 
         return browser.component
     }
@@ -147,11 +184,6 @@ class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile
         val messageString = json.encodeToString(message)
         logger<NxGenerateUiFile>().info("posting message $messageString")
         browser.executeJavaScriptAsync("""window.intellijApi.postToWebview($messageString)""")
-    }
-
-    private fun registerAppSchemeHandler(): Unit {
-        CefApp.getInstance()
-            .registerSchemeHandlerFactory("http", "nxconsole", CustomSchemeHandlerFactory())
     }
 
     private fun extractIntellijStyles(): StylePayload {
