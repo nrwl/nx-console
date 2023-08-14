@@ -22,8 +22,10 @@ import dev.nx.console.utils.nxProjectConfigurationPath
 
 class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSource) {
     init {
-        shortcutSet =
-            ActionManager.getInstance().getAction(IdeActions.ACTION_EDIT_SOURCE).shortcutSet
+        registerCustomShortcutSet(
+            ActionManager.getInstance().getAction(IdeActions.ACTION_EDIT_SOURCE).shortcutSet,
+            null
+        )
     }
 
     override fun update(e: AnActionEvent) {

@@ -12,7 +12,6 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.WorkspaceLayout
 import java.awt.event.ActionEvent
@@ -84,7 +83,6 @@ class NxReMoveProjectDialog(
                                                 model::project.toMutableProperty()
                                             )
                                             .comment(getShortcutHint())
-                                            .horizontalAlign(HorizontalAlign.FILL)
 
                                         addDocumentListener(
                                             object : BulkAwareDocumentListener.Simple {
@@ -102,8 +100,8 @@ class NxReMoveProjectDialog(
                             label("Using:")
                             if (reMoveGenerators.size > 1) {
                                 comboBox(reMoveGenerators)
-                                    .bindItem(model::generator)
-                                    .horizontalAlign(HorizontalAlign.FILL)
+                                    .bindItem(model::generator.toNullableProperty(""))
+                                    .align(AlignX.FILL)
                             } else {
                                 text(reMoveGenerators[0])
                             }
@@ -116,10 +114,7 @@ class NxReMoveProjectDialog(
                             updateDestinationDirHint(model.project)
 
                             destinationField =
-                                textField()
-                                    .bindText(model::directory)
-                                    .horizontalAlign(HorizontalAlign.FILL)
-                                    .component
+                                textField().bindText(model::directory).align(AlignX.FILL).component
                         }
                         .visible(mode == "move")
                         .layout(RowLayout.PARENT_GRID)
