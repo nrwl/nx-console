@@ -3,13 +3,11 @@ package dev.nx.console.generate.ui
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
-import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
@@ -18,27 +16,23 @@ import javax.swing.JComponent
 import javax.swing.UIManager
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import org.cef.CefApp
 
-class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name) {
+class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name, true) {
 
-    private val browser: JBCefBrowser = JBCefBrowser()
     private var generatorToDisplay: GeneratorSchema? = null
     private val runGeneratorManager: RunGeneratorManager
 
     init {
         runGeneratorManager = RunGeneratorManager(project)
     }
+
     override fun createMainComponent(project: Project): JComponent {
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
         browser.setPageBackgroundColor(getHexColor(UIUtil.getPanelBackground()))
-        registerAppSchemeHandler()
-        browser.loadURL("http://nxconsolev2/index.html")
         browser.jbCefClient.addContextMenuHandler(
             OpenDevToolsContextMenuHandler(),
             browser.cefBrowser
         )
-        Disposer.register(project, browser)
 
         return browser.component
     }
@@ -115,15 +109,6 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val messageString = json.encodeToString(message)
         logger<NxGenerateUiFile>().info("posting message $messageString")
         browser.executeJavaScriptAsync("""window.intellijApi.postToWebview($messageString)""")
-    }
-
-    private fun registerAppSchemeHandler(): Unit {
-        CefApp.getInstance()
-            .registerSchemeHandlerFactory(
-                "http",
-                "nxconsolev2",
-                CustomSchemeHandlerFactory(v2 = true)
-            )
     }
 
     private fun extractIntellijStyles(): GenerateUiStyles {
