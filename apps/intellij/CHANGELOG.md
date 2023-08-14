@@ -1,3 +1,10 @@
+## <small>1.11.1 (2023-08-14)</small>
+
+### Bug Fixes
+
+* **intellij:** register schema handler after the cefBrowser is created ([#1858](https://github.com/nrwl/nx-console/issues/1858)) ([f43f927](https://github.com/nrwl/nx-console/commit/f43f9277e52d55a6dbf6869d00b29d96f7bd0dbc))
+* **intellij:** update deprecated apis ([#1859](https://github.com/nrwl/nx-console/issues/1859)) ([99b8b96](https://github.com/nrwl/nx-console/commit/99b8b962d4e07d4060ddf5a10069aba8443717a9))
+
 ## 1.11.0 (2023-08-02)
 
 ### Bug Fixes
