@@ -9,7 +9,10 @@ import {
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxWorkspace,
+  getTransformedGeneratorSchema,
+} from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { existsSync } from 'node:fs';
 import {
@@ -203,19 +206,13 @@ export class GenerateUiWebview {
   private async transformMessage(
     message: GenerateUiGeneratorSchemaInputMessage
   ): Promise<GenerateUiGeneratorSchemaInputMessage> {
-    const workspace = await getNxWorkspace();
-    let modifiedSchema = message.payload;
-    try {
-      this.plugins?.schemaProcessors?.forEach((processor) => {
-        modifiedSchema = processor(modifiedSchema, workspace);
-      });
-      return {
-        ...message,
-        payload: modifiedSchema,
-      };
-    } catch (e) {
-      return message;
-    }
+    const transformedSchema = await getTransformedGeneratorSchema(
+      message.payload
+    );
+    return {
+      ...message,
+      payload: transformedSchema,
+    };
   }
 
   private getVscodeStyleMappings(): string {
