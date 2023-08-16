@@ -155,8 +155,14 @@ export class FormValuesService {
       const option = this.icc.generatorSchema?.options.find(
         (option) => option.name === key
       );
+
+      const fixedValue =
+        this.icc.generatorSchema?.context?.fixedFormValues?.[key];
+      if (fixedValue) value = fixedValue;
+
       const defaultValue = extractDefaultValue(option);
       if (compareWithDefaultValue(value, defaultValue)) return;
+
       const valueString = value?.toString() ?? '';
       if (valueString.includes(' ')) {
         if (valueString.includes('"')) {
