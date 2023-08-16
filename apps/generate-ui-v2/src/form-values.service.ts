@@ -151,14 +151,14 @@ export class FormValuesService {
 
   private getSerializedFormValues(): string[] {
     const args: string[] = [];
-    Object.entries(this.formValues).forEach(([key, value]) => {
+    const formValues = {
+      ...this.formValues,
+      ...(this.icc.generatorSchema?.context?.fixedFormValues ?? {}),
+    };
+    Object.entries(formValues).forEach(([key, value]) => {
       const option = this.icc.generatorSchema?.options.find(
         (option) => option.name === key
       );
-
-      const fixedValue =
-        this.icc.generatorSchema?.context?.fixedFormValues?.[key];
-      if (fixedValue) value = fixedValue;
 
       const defaultValue = extractDefaultValue(option);
       if (compareWithDefaultValue(value, defaultValue)) return;
