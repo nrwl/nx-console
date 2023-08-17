@@ -19,6 +19,7 @@ sealed interface NxGeneratorOption {
     var items: List<String>?
     val priority: String?
     val dropdown: String?
+    val hint: String?
 }
 
 @Serializable
@@ -31,7 +32,8 @@ data class NxOptionWithNoDefault(
     override val enum: List<String>?,
     override var items: List<String>?,
     @SerializedName("x-priority") @SerialName("x-priority") override val priority: String?,
-    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?
+    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?,
+    @SerializedName("x-hint") @SerialName("x-hint") override val hint: String?
 ) : NxGeneratorOption
 
 @Serializable
@@ -45,7 +47,8 @@ data class NxOptionWithStringDefault(
     override val enum: List<String>?,
     override var items: List<String>?,
     @SerializedName("x-priority") @SerialName("x-priority") override val priority: String?,
-    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?
+    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?,
+    @SerializedName("x-hint") @SerialName("x-hint") override val hint: String?
 ) : NxGeneratorOption
 
 @Serializable
@@ -59,7 +62,8 @@ data class NxOptionWithBooleanDefault(
     override val enum: List<String>?,
     override var items: List<String>?,
     @SerializedName("x-priority") @SerialName("x-priority") override val priority: String?,
-    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?
+    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?,
+    @SerializedName("x-hint") @SerialName("x-hint") override val hint: String?
 ) : NxGeneratorOption
 
 @Serializable
@@ -73,7 +77,8 @@ data class NxOptionWithArrayDefault(
     override val enum: List<String>?,
     override var items: List<String>?,
     @SerializedName("x-priority") @SerialName("x-priority") override val priority: String?,
-    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?
+    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?,
+    @SerializedName("x-hint") @SerialName("x-hint") override val hint: String?
 ) : NxGeneratorOption
 
 @Serializable
@@ -87,7 +92,8 @@ data class NxOptionWithNumberDefault(
     override val enum: List<String>?,
     override var items: List<String>?,
     @SerializedName("x-priority") @SerialName("x-priority") override val priority: String?,
-    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?
+    @SerializedName("x-dropdown") @SerialName("x-dropdown") override val dropdown: String?,
+    @SerializedName("x-hint") @SerialName("x-hint") override val hint: String?
 ) : NxGeneratorOption
 
 class NxGeneratorOptionDeserializer : JsonDeserializer<NxGeneratorOption> {

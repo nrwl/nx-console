@@ -1,5 +1,4 @@
 import { Option } from '@nx-console/shared/schema';
-import { FormValues } from './messages';
 
 export type GeneratorSchema = {
   collectionName: string;
@@ -12,5 +11,5 @@ export type GeneratorSchema = {
 export type GeneratorContext = {
   project?: string;
   directory?: string;
-  fixedFormValues?: FormValues;
+  fixedFormValues?: Record<string, string>;
 };
