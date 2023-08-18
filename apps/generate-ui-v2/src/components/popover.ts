@@ -31,6 +31,7 @@ export class Popover extends LitElement {
           class="${this.isPopoverVisible
             ? 'block'
             : 'hidden'}  tooltip-content border-fieldBorder bg-badgeBackground text-foreground absolute left-0 z-10 w-max max-w-md whitespace-normal border p-1 shadow-md"
+          data-cy="popover-content"
         >
           ${this.content}
         </div>
