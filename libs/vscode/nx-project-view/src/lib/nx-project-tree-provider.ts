@@ -1,7 +1,7 @@
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { AbstractTreeProvider, getTelemetry } from '@nx-console/vscode/utils';
-import { commands, ExtensionContext, ProviderResult } from 'vscode';
+import { commands, env, ExtensionContext, ProviderResult } from 'vscode';
 import { NxTreeItem } from './nx-tree-item';
 import {
   AutomaticViewItem,
@@ -19,6 +19,7 @@ import {
   TreeViewStrategy,
 } from './views/nx-project-tree-view';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
+import { TargetViewItem } from './views/nx-project-base-view';
 
 export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
 
@@ -44,6 +45,8 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
         ['runTask', this.runTask],
         ['refreshNxProjectsTree', this.refreshNxProjectsTree],
         ['runTaskSkipNxCache', this.runTaskSkipNxCache],
+        ['copyTaskToClipboard', this.copyTaskToClipboard],
+        ['runTaskWithOptions', this.runTaskWithOptions],
       ] as const
     ).forEach(([commandSuffix, callback]) => {
       context.subscriptions.push(
@@ -127,6 +130,19 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
   private async runTaskSkipNxCache(selection: NxTreeItem) {
     getTelemetry().featureUsed('runTask');
     this.runTask(selection, { skipNxCache: true });
+  }
+  private async runTaskWithOptions(selection: NxTreeItem) {
+    getTelemetry().featureUsed('runTask');
+    const item = selection.item as TargetViewItem;
+    const project = item.nxProject.project;
+    const target = item.nxTarget.name;
+    const configuration = item.nxTarget.configuration;
+    commands.executeCommand('nx.run', project, target, configuration, true);
+  }
+
+  private async copyTaskToClipboard(selection: NxTreeItem) {
+    getTelemetry().featureUsed('copyTaskToClipboard');
+    env.clipboard.writeText(`nx run ${selection.id}`);
   }
 
   private async revealInExplorer(selection: NxTreeItem) {

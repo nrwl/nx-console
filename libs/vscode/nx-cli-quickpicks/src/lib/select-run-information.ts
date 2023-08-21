@@ -15,9 +15,7 @@ export async function selectRunInformation(
   | undefined
 > {
   let flags: string[] | undefined;
-  if (configuration) {
-    flags = [`--configuration=${configuration}`];
-  } else if (!askForFlags) {
+  if (!askForFlags) {
     flags = [];
   }
 
@@ -60,7 +58,7 @@ export async function selectRunInformation(
   }
 
   if (!flags) {
-    if (configurations.length) {
+    if (configurations.length && !configuration) {
       const configurationsOption: Option = {
         name: 'configuration',
         isRequired: false,
@@ -74,7 +72,12 @@ export async function selectRunInformation(
 
     flags = await selectFlags(
       `run ${projectName}:${surroundWithQuotesIfHasWhiteSpace(targetName)}`,
-      options
+      options,
+      configuration
+        ? {
+            configuration,
+          }
+        : undefined
     );
 
     return { flags, projectName, targetName };
