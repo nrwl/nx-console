@@ -1,4 +1,7 @@
-import { GeneratorContext } from '@nx-console/shared/generate-ui-types';
+import {
+  GeneratorContext,
+  GeneratorSchema,
+} from '@nx-console/shared/generate-ui-types';
 import {
   CollectionInfo,
   Option,
@@ -109,3 +112,9 @@ export const NxProjectFolderTreeRequest: RequestType<
   },
   unknown
 > = new RequestType('nx/projectFolderTree');
+
+export const NxTransformedGeneratorSchemaRequest: RequestType<
+  GeneratorSchema,
+  GeneratorSchema,
+  unknown
+> = new RequestType('nx/transformedGeneratorSchema');

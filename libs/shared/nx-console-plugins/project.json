@@ -1,0 +1,16 @@
+{
+  "name": "shared-nx-console-plugins",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/nx-console-plugins/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/shared/nx-console-plugins/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["type:shared"]
+}

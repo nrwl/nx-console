@@ -28,6 +28,7 @@ export interface Option extends CliOption {
   isRequired: boolean;
   'x-dropdown'?: 'projects';
   'x-priority'?: 'important' | 'internal';
+  'x-hint'?: string;
 }
 
 export interface ItemTooltips {

@@ -7,5 +7,6 @@ data class NxGeneratorContext(
     val project: String?,
     val projectName: String?,
     val directory: String?,
-    val path: String?
+    val path: String?,
+    val fixedFormValues: Map<String, String>?
 )
