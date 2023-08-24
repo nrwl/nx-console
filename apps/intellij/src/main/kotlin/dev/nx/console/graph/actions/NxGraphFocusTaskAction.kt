@@ -1,9 +1,6 @@
 package dev.nx.console.graph.actions
 
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.NxGraphService
@@ -19,6 +16,10 @@ import kotlinx.coroutines.*
 
 class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? = null) :
     DumbAwareAction() {
+
+    init {
+        shortcutSet = CustomShortcutSet.fromString("control shift G")
+    }
 
     override fun update(e: AnActionEvent) {
         if (e.place != "NxToolWindow" && targetDescriptor == null) {
@@ -39,11 +40,13 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Task")
 
-        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return
+        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         CoroutineScope(Dispatchers.Default).launch {
             val currentlyOpenedProject =
-                NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
+                path?.let {
+                    NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
+                }
             val targetDescriptor: NxTargetDescriptor =
                 this@NxGraphFocusTaskAction.targetDescriptor
                     ?: if (e.place == "NxToolWindow") {
