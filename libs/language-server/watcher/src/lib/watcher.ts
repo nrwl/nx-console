@@ -1,7 +1,7 @@
 import { lspLogger } from '@nx-console/language-server/utils';
 import * as watcher from '@parcel/watcher';
 import { platform } from 'os';
-import { join } from 'path';
+import { getIgnoredGlobs } from 'nx/src/utils/ignore';
 
 export async function languageServerWatcher(
   workspacePath: string,
@@ -36,7 +36,7 @@ export async function languageServerWatcher(
 
 function watcherOptions(workspacePath: string): watcher.Options | undefined {
   const options: watcher.Options = {
-    ignore: [join(workspacePath, 'node_modules')],
+    ignore: getIgnoredGlobs(workspacePath),
   };
 
   if (platform() === 'win32') {
