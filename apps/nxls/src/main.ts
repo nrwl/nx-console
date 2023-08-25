@@ -14,6 +14,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxTransformedGeneratorSchemaRequest,
   NxVersionRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
@@ -41,7 +42,9 @@ import {
   getGeneratorContextV2,
   getProjectFolderTree,
   getProjectsByPaths,
+  getTransformedGeneratorSchema,
 } from '@nx-console/language-server/workspace';
+import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import {
   getNxJsonSchema,
   getPackageJsonSchema,
@@ -382,6 +385,19 @@ connection.onRequest(NxProjectFolderTreeRequest, async () => {
   }
   return await getProjectFolderTree(WORKING_PATH);
 });
+
+connection.onRequest(
+  NxTransformedGeneratorSchemaRequest,
+  async (schema: GeneratorSchema) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getTransformedGeneratorSchema(WORKING_PATH, schema);
+  }
+);
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {

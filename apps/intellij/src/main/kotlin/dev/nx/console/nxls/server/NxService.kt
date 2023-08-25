@@ -1,5 +1,6 @@
 package dev.nx.console.nxls.server
 
+import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.*
 import dev.nx.console.nxls.server.requests.*
 import java.util.concurrent.CompletableFuture
@@ -57,6 +58,10 @@ interface NxService {
 
     @JsonRequest
     fun projectFolderTree(): CompletableFuture<SerializedNxFolderTreeData> {
+        throw UnsupportedOperationException()
+    }
+    @JsonRequest
+    fun transformedGeneratorSchema(schema: GeneratorSchema): CompletableFuture<GeneratorSchema> {
         throw UnsupportedOperationException()
     }
 

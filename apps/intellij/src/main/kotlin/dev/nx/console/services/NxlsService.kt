@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
+import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.*
 import dev.nx.console.nxls.NxlsWrapper
 import dev.nx.console.nxls.client.NxlsLanguageClient
@@ -124,6 +125,13 @@ class NxlsService(val project: Project) {
         return withMessageIssueCatch {
             server()?.getNxService()?.projectFolderTree()?.await()?.toFolderTreeData()
         }()
+    }
+
+    suspend fun transformedGeneratorSchema(schema: GeneratorSchema): GeneratorSchema {
+        return withMessageIssueCatch {
+            server()?.getNxService()?.transformedGeneratorSchema(schema)?.await()
+        }()
+            ?: schema
     }
 
     suspend fun nxVersion(): NxVersion? {

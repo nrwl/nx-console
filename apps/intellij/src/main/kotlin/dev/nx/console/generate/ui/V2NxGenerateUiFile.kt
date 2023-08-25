@@ -7,6 +7,7 @@ import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
+import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
@@ -14,17 +15,17 @@ import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import java.awt.datatransfer.StringSelection
 import javax.swing.JComponent
 import javax.swing.UIManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name, true) {
+class V2NxGenerateUiFile(name: String, private val project: Project) :
+    NxGenerateUiFile(name, true) {
 
     private var generatorToDisplay: GeneratorSchema? = null
-    private val runGeneratorManager: RunGeneratorManager
-
-    init {
-        runGeneratorManager = RunGeneratorManager(project)
-    }
+    private val runGeneratorManager: RunGeneratorManager = RunGeneratorManager(project)
 
     override fun createMainComponent(project: Project): JComponent {
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
@@ -82,8 +83,12 @@ class V2NxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name
         val messageParsed = json.decodeFromString<GenerateUiOutputMessage>(message)
         logger.info("received message $messageParsed")
         if (messageParsed.payloadType == "output-init") {
-            this.generatorToDisplay?.let {
-                this.postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(it))
+            this.generatorToDisplay?.let { schema ->
+                CoroutineScope(Dispatchers.Default).launch {
+                    val transformedSchema =
+                        NxlsService.getInstance(project).transformedGeneratorSchema(schema)
+                    postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(transformedSchema))
+                }
             }
             return
         }

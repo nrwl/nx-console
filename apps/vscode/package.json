@@ -143,9 +143,19 @@
           "group": "inline"
         },
         {
+          "command": "nxConsole.runTaskWithOptions",
+          "when": "view == nxProjects && viewItem == target",
+          "group": "navigation@1"
+        },
+        {
           "command": "nxConsole.runTaskSkipNxCache",
           "when": "view == nxProjects && viewItem == target",
-          "group": "navigation"
+          "group": "navigation@1"
+        },
+        {
+          "command": "nxConsole.copyTaskToClipboard",
+          "when": "view == nxProjects && viewItem == target",
+          "group": "navigation@3"
         },
         {
           "command": "nx.graph.focus.button",
@@ -210,6 +220,14 @@
         },
         {
           "command": "nxConsole.runTaskSkipNxCache",
+          "when": "false"
+        },
+        {
+          "command": "nxConsole.runTaskWithOptions",
+          "when": "false"
+        },
+        {
+          "command": "nxConsole.copyTaskToClipboard",
           "when": "false"
         },
         {
@@ -372,6 +390,14 @@
       {
         "command": "nxConsole.runTaskSkipNxCache",
         "title": "Execute task without Nx cache"
+      },
+      {
+        "command": "nxConsole.runTaskWithOptions",
+        "title": "Execute task with options"
+      },
+      {
+        "command": "nxConsole.copyTaskToClipboard",
+        "title": "Copy task to clipboard"
       },
       {
         "category": "Nx",
