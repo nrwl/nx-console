@@ -1,3 +1,18 @@
+# [18.7.0](https://github.com/nrwl/nx-console/compare/vscode-v18.6.0...vscode-v18.7.0) (2023-08-25)
+
+
+### Bug Fixes
+
+* **generate-ui:** make sure arguments with spaces or quotes are handled correctly ([#1853](https://github.com/nrwl/nx-console/issues/1853)) ([61e4384](https://github.com/nrwl/nx-console/commit/61e4384c57b7c7ad1ac9871e9d4f7c9deea87c08))
+* **intellij:** update deprecated apis ([#1859](https://github.com/nrwl/nx-console/issues/1859)) ([99b8b96](https://github.com/nrwl/nx-console/commit/99b8b962d4e07d4060ddf5a10069aba8443717a9))
+* **nxls:** use ignore globs from nx for the file watcher ([#1865](https://github.com/nrwl/nx-console/issues/1865)) ([8b3fa1d](https://github.com/nrwl/nx-console/commit/8b3fa1d65404b4b508d63584959650976208bc73))
+
+
+### Features
+
+* move plugins to lsp & write internal projectRootAndNameFormat plugin ([#1860](https://github.com/nrwl/nx-console/issues/1860)) ([d0f8852](https://github.com/nrwl/nx-console/commit/d0f8852b12de3c1a64e2c98177925deb280d9c85))
+* **vscode:** add more run task context menu to project view ([#1855](https://github.com/nrwl/nx-console/issues/1855)) ([15e2615](https://github.com/nrwl/nx-console/commit/15e261522402a24aee8e037eb0225e111aeca844))
+
 # [18.6.0](https://github.com/nrwl/nx-console/compare/vscode-v18.5.0...vscode-v18.6.0) (2023-08-02)
 
 
