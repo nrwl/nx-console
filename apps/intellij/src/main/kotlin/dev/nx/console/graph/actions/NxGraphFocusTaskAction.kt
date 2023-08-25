@@ -3,6 +3,7 @@ package dev.nx.console.graph.actions
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
+import dev.nx.console.NxIcons
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
@@ -32,6 +33,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
         } else {
             e.presentation.text =
                 "Nx Graph: Focus ${targetDescriptor.nxProject}:${targetDescriptor.nxTarget} target"
+            e.presentation.icon = NxIcons.Action
         }
     }
 
