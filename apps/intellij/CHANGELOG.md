@@ -1,3 +1,14 @@
+## 1.12.0 (2023-08-25)
+
+### Bug Fixes
+
+* **nxls:** use ignore globs from nx for the file watcher ([#1865](https://github.com/nrwl/nx-console/issues/1865)) ([8b3fa1d](https://github.com/nrwl/nx-console/commit/8b3fa1d65404b4b508d63584959650976208bc73))
+
+
+### Features
+
+* move plugins to lsp & write internal projectRootAndNameFormat plugin ([#1860](https://github.com/nrwl/nx-console/issues/1860)) ([d0f8852](https://github.com/nrwl/nx-console/commit/d0f8852b12de3c1a64e2c98177925deb280d9c85))
+
 ## <small>1.11.1 (2023-08-14)</small>
 
 ### Bug Fixes
