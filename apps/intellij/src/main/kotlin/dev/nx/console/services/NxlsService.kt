@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
+import dev.nx.console.generate.ui.GenerateUiStartupMessageDefinition
 import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.*
 import dev.nx.console.nxls.NxlsWrapper
@@ -132,6 +133,10 @@ class NxlsService(val project: Project) {
             server()?.getNxService()?.transformedGeneratorSchema(schema)?.await()
         }()
             ?: schema
+    }
+
+    suspend fun startupMessage(schema: GeneratorSchema): GenerateUiStartupMessageDefinition? {
+        return withMessageIssueCatch { server()?.getNxService()?.startupMessage(schema)?.await() }()
     }
 
     suspend fun nxVersion(): NxVersion? {

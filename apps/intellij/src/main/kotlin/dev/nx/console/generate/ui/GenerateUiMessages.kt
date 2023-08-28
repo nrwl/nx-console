@@ -85,6 +85,7 @@ data class GenerateUiStyles(
     val focusBorderColor: String,
     val badgeBackgroundColor: String,
     val bannerWarningBackgroundColor: String,
+    val bannerTextColor: String,
     val separatorColor: String,
     val fieldNavHoverColor: String,
     val scrollbarThumbColor: String,
@@ -94,11 +95,12 @@ data class GenerateUiStyles(
 
 @Serializable
 @SerialName("banner")
-data class GenerateUiBannerInputMessage(override val payload: GenerateUiBanner) :
-    GenerateUiInputMessage {}
+data class GenerateUiStartupMessageDefinitionInputMessage(
+    override val payload: GenerateUiStartupMessageDefinition
+) : GenerateUiInputMessage {}
 
 @Serializable
-data class GenerateUiBanner(val message: String, val type: String) {
+data class GenerateUiStartupMessageDefinition(val message: String, val type: String) {
     init {
         require(type == "warning" || type == "error")
     }

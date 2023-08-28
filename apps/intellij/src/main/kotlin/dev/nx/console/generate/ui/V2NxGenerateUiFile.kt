@@ -85,11 +85,17 @@ class V2NxGenerateUiFile(name: String, private val project: Project) :
         if (messageParsed.payloadType == "output-init") {
             this.generatorToDisplay?.let { schema ->
                 CoroutineScope(Dispatchers.Default).launch {
-                    val transformedSchema =
-                        NxlsService.getInstance(project).transformedGeneratorSchema(schema)
-                    postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(transformedSchema))
+                    NxlsService.getInstance(project).transformedGeneratorSchema(schema).apply {
+                        postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(this))
+                    }
+                }
+                CoroutineScope(Dispatchers.Default).launch {
+                    NxlsService.getInstance(project).startupMessage(schema)?.apply {
+                        postMessageToBrowser(GenerateUiStartupMessageDefinitionInputMessage(this))
+                    }
                 }
             }
+
             return
         }
         if (messageParsed.payloadType == "run-generator") {
@@ -137,6 +143,7 @@ class V2NxGenerateUiFile(name: String, private val project: Project) :
         val badgeBackgroundColor = selectFieldBackgroundColor
         val bannerWarningBackgroundColor =
             getHexColor(UIManager.getColor("Component.warningFocusColor"))
+        val bannerTextColor = getHexColor(UIManager.getColor("Button.foreground"))
         val statusBarBorderColor = getHexColor(UIManager.getColor("StatusBar.borderColor"))
         val fieldNavHoverColor = getHexColor(UIManager.getColor("TabbedPane.hoverColor"))
 
@@ -157,6 +164,7 @@ class V2NxGenerateUiFile(name: String, private val project: Project) :
             focusBorderColor = focusBorderColor,
             badgeBackgroundColor = badgeBackgroundColor,
             bannerWarningBackgroundColor = bannerWarningBackgroundColor,
+            bannerTextColor = bannerTextColor,
             separatorColor = statusBarBorderColor,
             fieldNavHoverColor = fieldNavHoverColor,
             scrollbarThumbColor = scrollbarThumbColor,

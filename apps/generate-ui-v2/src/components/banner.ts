@@ -17,6 +17,7 @@ export class Banner extends EditorContext(LitElement) {
   render() {
     const bannerClass =
       this.type === 'error' ? 'bg-bannerError' : 'bg-bannerWarning';
+
     if (this.dismissed) {
       return html``;
     }
@@ -27,7 +28,12 @@ export class Banner extends EditorContext(LitElement) {
         <p class="grow">${this.message}</p>
         <div @click="${this.dismiss}" class="px-2 py-1">
           ${this.editor === 'intellij'
-            ? html`x`
+            ? html`<icon-element
+                icon="close"
+                color="${getComputedStyle(this).getPropertyValue(
+                  '--banner-text-color'
+                )}"
+              ></icon-element>`
             : html`<icon-element icon="close"></icon-element>`}
         </div>
       </div>
