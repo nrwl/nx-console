@@ -66,16 +66,16 @@ async function loadPlugins(
 
   return {
     schemaProcessors: [
-      ...(workspacePlugins?.schemaProcessors ?? []),
       ...(internalPlugins.schemaProcessors ?? []),
+      ...(workspacePlugins?.schemaProcessors ?? []),
     ],
     validators: [
-      ...(workspacePlugins?.validators ?? []),
       ...(internalPlugins.validators ?? []),
+      ...(workspacePlugins?.validators ?? []),
     ],
     startupMessageFactories: [
-      ...(workspacePlugins?.startupMessageFactories ?? []),
       ...(internalPlugins.startupMessageFactories ?? []),
+      ...(workspacePlugins?.startupMessageFactories ?? []),
     ],
   };
 }
