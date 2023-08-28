@@ -10,6 +10,7 @@ import {
 import { NxWorkspace, TreeNode } from '@nx-console/shared/types';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { SemVer } from 'semver';
+import { StartupMessageDefinition } from 'shared/nx-console-plugins';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
 
 export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
@@ -118,3 +119,9 @@ export const NxTransformedGeneratorSchemaRequest: RequestType<
   GeneratorSchema,
   unknown
 > = new RequestType('nx/transformedGeneratorSchema');
+
+export const NxStartupMessageRequest: RequestType<
+  GeneratorSchema,
+  StartupMessageDefinition | undefined,
+  unknown
+> = new RequestType('nx/startupMessage');
