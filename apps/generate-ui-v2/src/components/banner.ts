@@ -28,7 +28,7 @@ export class Banner extends EditorContext(LitElement) {
         <div @click="${this.dismiss}" class="px-2 py-1">
           ${this.editor === 'intellij'
             ? html`x`
-            : html` <codicon-element icon="close"></codicon-element>`}
+            : html`<icon-element icon="close"></icon-element>`}
         </div>
       </div>
     `;
