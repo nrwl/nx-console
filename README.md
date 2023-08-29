@@ -78,7 +78,8 @@ used the CLI, you don't get overwhelmed.
 
 - [Documentation](https://nx.dev/core-features/integrate-with-editors) - Official documentation with video tutorials
 - [nx.dev](http://nx.dev) - Documentation, Guides and Interactive Tutorials on Nx
-- [Learn more about the team at Nrwl](https://nx.app/company) - The team at Nrwl led the development of Nx Console,
+- [Join the community](http://go.nx.dev/community) - Chat about Nx & Nx Console on the official discord server
+- [Learn more about the team at Nx](https://nx.app/company) - The team at Nx led the development of Nx Console,
   after working with many Enterprise clients.
 
 # Contributing
