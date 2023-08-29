@@ -13,7 +13,12 @@ class NxTaskExecutionManager(val project: Project) {
     fun execute(nxProject: String, nxTarget: String) {
         execute(nxProject, nxTarget, "")
     }
-    fun execute(nxProject: String, nxTarget: String, nxTargetConfiguration: String) {
+    fun execute(
+        nxProject: String,
+        nxTarget: String,
+        nxTargetConfiguration: String,
+        executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
+    ) {
         val runManager = project.service<RunManager>()
 
         val runnerAndConfigurationSettings: RunnerAndConfigurationSettings =
@@ -43,7 +48,7 @@ class NxTaskExecutionManager(val project: Project) {
                     }
                     .also { runManager.addConfiguration(it) }
         runManager.selectedConfiguration = runnerAndConfigurationSettings
-        val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
+
         ExecutionUtil.runConfiguration(runnerAndConfigurationSettings, executor)
     }
 
