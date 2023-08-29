@@ -215,6 +215,7 @@ class NxTreeStructure(
                     taskSet.nxProject,
                     taskSet.nxTarget,
                     taskSet.nxTargetConfiguration,
+                    emptyList(),
                     executor
                 )
             }

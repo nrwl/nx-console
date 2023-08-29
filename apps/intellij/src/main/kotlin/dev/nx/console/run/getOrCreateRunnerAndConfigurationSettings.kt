@@ -9,7 +9,7 @@ fun getOrCreateRunnerConfigurationSettings(
     nxProject: String,
     nxTarget: String,
     nxTargetConfiguration: String = "",
-    args: List<String> = listOf()
+    args: List<String> = emptyList()
 ): RunnerAndConfigurationSettings {
     val runManager = RunManager.getInstance(project)
 

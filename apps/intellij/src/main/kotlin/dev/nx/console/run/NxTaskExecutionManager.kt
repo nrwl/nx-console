@@ -17,36 +17,20 @@ class NxTaskExecutionManager(val project: Project) {
         nxProject: String,
         nxTarget: String,
         nxTargetConfiguration: String,
+        args: List<String> = emptyList(),
         executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
     ) {
         val runManager = project.service<RunManager>()
 
         val runnerAndConfigurationSettings: RunnerAndConfigurationSettings =
-            runManager
-                .getConfigurationSettingsList(NxCommandConfigurationType.getInstance())
-                .firstOrNull {
-                    val nxCommandConfiguration = it.configuration as NxCommandConfiguration
-                    val nxRunSettings = nxCommandConfiguration.nxRunSettings
-                    nxRunSettings.nxTargets == nxTarget &&
-                        nxRunSettings.nxProjects == nxProject &&
-                        nxRunSettings.nxTargetsConfiguration == nxTargetConfiguration
-                }
-                ?: runManager
-                    .createConfiguration(
-                        "$nxProject:$nxTarget${if(nxTargetConfiguration.isBlank().not()) ":$nxTargetConfiguration" else ""}",
-                        NxCommandConfigurationType::class.java
-                    )
-                    .apply {
-                        (configuration as NxCommandConfiguration).apply {
-                            nxRunSettings =
-                                NxRunSettings(
-                                    nxProjects = nxProject,
-                                    nxTargets = nxTarget,
-                                    nxTargetsConfiguration = nxTargetConfiguration
-                                )
-                        }
-                    }
-                    .also { runManager.addConfiguration(it) }
+            getOrCreateRunnerConfigurationSettings(
+                    project,
+                    nxProject,
+                    nxTarget,
+                    nxTargetConfiguration,
+                    args
+                )
+                .also { runManager.addConfiguration(it) }
         runManager.selectedConfiguration = runnerAndConfigurationSettings
 
         ExecutionUtil.runConfiguration(runnerAndConfigurationSettings, executor)
