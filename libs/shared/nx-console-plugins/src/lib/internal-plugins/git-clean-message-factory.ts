@@ -12,6 +12,7 @@ export async function gitCleanMessageFactory(
   try {
     await promisify(exec)('git diff --quiet', {
       cwd: workspacePath,
+      windowsHide: true,
     });
   } catch (e) {
     return {
