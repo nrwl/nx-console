@@ -2,6 +2,7 @@ package dev.nx.console.graph.actions
 
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.NxIcons
 import dev.nx.console.graph.NxGraphService
@@ -19,7 +20,16 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
     DumbAwareAction() {
 
     init {
-        shortcutSet = CustomShortcutSet.fromString("control shift G")
+        val keyMapSet =
+            KeymapUtil.getActiveKeymapShortcuts(
+                "dev.nx.console.graph.actions.NxGraphFocusTaskAction"
+            )
+
+        if (keyMapSet.shortcuts.isEmpty()) {
+            shortcutSet = CustomShortcutSet.fromString("control shift G")
+        } else {
+            shortcutSet = keyMapSet
+        }
     }
 
     override fun update(e: AnActionEvent) {
