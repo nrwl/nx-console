@@ -1,5 +1,6 @@
 package dev.nx.console.nxls.server
 
+import dev.nx.console.generate.ui.GenerateUiStartupMessageDefinition
 import dev.nx.console.generate.ui.GeneratorSchema
 import dev.nx.console.models.*
 import dev.nx.console.nxls.server.requests.*
@@ -62,6 +63,13 @@ interface NxService {
     }
     @JsonRequest
     fun transformedGeneratorSchema(schema: GeneratorSchema): CompletableFuture<GeneratorSchema> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
+    fun startupMessage(
+        schema: GeneratorSchema
+    ): CompletableFuture<GenerateUiStartupMessageDefinition> {
         throw UnsupportedOperationException()
     }
 
