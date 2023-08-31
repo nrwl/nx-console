@@ -1,15 +1,21 @@
 import { NxConsolePluginsDefinition } from '../nx-console-plugin-types';
 import { filterInternalAndDeprecatedProcessor } from './filter-internal-and-deprecated-processor';
 import { gitCleanMessageFactory } from './git-clean-message-factory';
-import { projectNameAndRootProcessor } from './project-name-and-root-processor';
-import { tempNoProjectAndDirProcessor } from './temp-no-project-and-dir-processor';
+import { prefillProjectAndDirProcessor } from './prefill-project-and-dir-processor';
+import {
+  pluginNameAndRootStartupMessage,
+  projectNameAndRootProcessor,
+} from './project-name-and-root-plugin';
 
 export const internalPlugins: NxConsolePluginsDefinition = {
   schemaProcessors: [
     projectNameAndRootProcessor,
     filterInternalAndDeprecatedProcessor,
-    tempNoProjectAndDirProcessor,
+    prefillProjectAndDirProcessor,
   ],
   validators: [],
-  startupMessageFactories: [gitCleanMessageFactory],
+  startupMessageFactories: [
+    gitCleanMessageFactory,
+    pluginNameAndRootStartupMessage,
+  ],
 };
