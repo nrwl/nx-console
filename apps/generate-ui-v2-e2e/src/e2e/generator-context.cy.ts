@@ -21,21 +21,14 @@ const schemaProj: GeneratorSchema = {
   context: {
     project: 'project3',
     directory: 'nested/nested2',
-  },
-};
-const schemaDir: GeneratorSchema = {
-  collectionName: '@nx/test',
-  generatorName: 'test',
-  description: 'description',
-  options: [{ name: 'directory', isRequired: false, aliases: [] }],
-  context: {
-    project: 'project3',
-    directory: 'nested/nested2',
+    prefillValues: {
+      project: 'project3',
+    },
   },
 };
 
 describe('generator context', () => {
-  it('should correctly use the context to autofill project', () => {
+  it('should correctly use the context to prefill values', () => {
     visitGenerateUi(schemaProj);
     getFieldByName('project').should('have.value', 'project3');
 
@@ -43,21 +36,6 @@ describe('generator context', () => {
       cy.get("[data-cy='generate-button']").click();
       expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
       expectConsoleLogToHaveBeenCalledWith(consoleLog, '--project=project3');
-    });
-  });
-
-  it('should correctly use the context to autofill directory', () => {
-    visitGenerateUi(schemaDir);
-
-    getFieldByName('directory').should('have.value', 'nested/nested2');
-
-    spyOnConsoleLog().then((consoleLog) => {
-      cy.get("[data-cy='generate-button']").click();
-      expectConsoleLogToHaveBeenCalledWith(consoleLog, 'run-generator');
-      expectConsoleLogToHaveBeenCalledWith(
-        consoleLog,
-        '--directory=nested/nested2'
-      );
     });
   });
 

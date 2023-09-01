@@ -67,20 +67,11 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
     ): void {
       super.updated(_changedProperties);
       if (this.generatorContext) {
-        if (
-          this.generatorContext.project &&
-          (this.option.name === 'project' || this.option.name === 'projectName')
-        ) {
-          this.setFieldValue(this.generatorContext.project);
-          this.dispatchValue(this.generatorContext.project);
-          return;
-        }
-        if (
-          this.generatorContext.directory &&
-          this.option.name === 'directory'
-        ) {
-          this.setFieldValue(this.generatorContext.directory);
-          this.dispatchValue(this.generatorContext.directory);
+        const prefillValue =
+          this.generatorContext.prefillValues?.[this.option.name];
+        if (prefillValue) {
+          this.setFieldValue(prefillValue);
+          this.dispatchValue(prefillValue);
           return;
         }
       }
