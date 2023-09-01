@@ -20,19 +20,10 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
     DumbAwareAction() {
 
     init {
-        val keyMapSet =
-            KeymapUtil.getActiveKeymapShortcuts(
-                "dev.nx.console.graph.actions.NxGraphFocusTaskAction"
-            )
-
-        if (keyMapSet.shortcuts.isEmpty()) {
-            shortcutSet = CustomShortcutSet.fromString("control shift G")
-        } else {
-            shortcutSet = keyMapSet
-        }
+        useKeyMapShortcutSetOrDefault()
     }
-
     override fun update(e: AnActionEvent) {
+        useKeyMapShortcutSetOrDefault()
         if (e.place != "NxToolWindow" && targetDescriptor == null) {
             return
         }
@@ -98,5 +89,19 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
         }
 
         return null
+    }
+
+    private fun useKeyMapShortcutSetOrDefault() {
+        val keyMapSet = KeymapUtil.getActiveKeymapShortcuts(ID)
+
+        if (keyMapSet.shortcuts.isEmpty()) {
+            shortcutSet = CustomShortcutSet.fromString(DEFAULT_SHORTCUT)
+        } else {
+            shortcutSet = keyMapSet
+        }
+    }
+    companion object {
+        const val DEFAULT_SHORTCUT = "control shift T"
+        const val ID = "dev.nx.console.graph.actions.NxGraphFocusTaskAction"
     }
 }
