@@ -457,7 +457,6 @@ class NxGraphBrowser(
             val js =
                 """
             window.externalApi?.registerFileClickCallback?.((message) => {
-            console.log("file click", message)
                     ${query.inject("message")}
             })
             """
@@ -487,8 +486,6 @@ class NxGraphBrowser(
             val js =
                 """
             window.externalApi?.registerOpenProjectConfigCallback?.((message) => {
-                    console.log("openProject click", message)
-
                     ${query.inject("message")}
             })
             """
@@ -511,8 +508,6 @@ class NxGraphBrowser(
             val js =
                 """
             window.externalApi?.registerRunTaskCallback?.((message) => {
-                    console.log("runtask click", message)
-
                     ${query.inject("message")}
             })
             """
