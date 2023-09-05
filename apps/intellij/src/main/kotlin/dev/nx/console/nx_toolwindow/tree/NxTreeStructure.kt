@@ -2,6 +2,7 @@ package dev.nx.console.nx_toolwindow.tree
 
 import com.intellij.execution.Executor
 import com.intellij.execution.RunManager
+import com.intellij.execution.executors.DefaultDebugExecutor
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.impl.RunDialog
 import com.intellij.icons.AllIcons
@@ -88,6 +89,7 @@ class NxTreeStructure(
         val actionList: MutableList<AnAction> =
             mutableListOf(
                 RunAction(),
+                RunWithDebugAction(),
                 EditRunSettingsAction(),
                 Separator(),
                 EditNxProjectConfigurationAction(),
@@ -123,8 +125,16 @@ class NxTreeStructure(
     }
 
     private inner class RunAction : ExecuteAction(DefaultRunExecutor.getRunExecutorInstance()) {
+
         init {
             registerCustomShortcutSet(CommonShortcuts.ENTER, null)
+        }
+    }
+
+    private inner class RunWithDebugAction :
+        ExecuteAction(DefaultDebugExecutor.getDebugExecutorInstance()) {
+        init {
+            registerCustomShortcutSet(CommonShortcuts.CTRL_ENTER, null)
         }
     }
 
@@ -179,12 +189,10 @@ class NxTreeStructure(
         }
     }
 
-    abstract inner class ExecuteAction(executor: Executor) :
+    abstract inner class ExecuteAction(private val executor: Executor) :
         AnAction(executor.startActionText, null as String?, executor.icon), DumbAware {
-        private val myExecutor: Executor
 
         init {
-            myExecutor = executor
             registerCustomShortcutSet(CommonShortcuts.ENTER, null)
         }
 
@@ -196,7 +204,7 @@ class NxTreeStructure(
             val taskSet: NxTaskSet? = createTaskSetFromSelectedNode()
             e.presentation.isEnabledAndVisible = taskSet != null
             if (taskSet != null) {
-                e.presentation.text = myExecutor.getStartActionText(taskSet.suggestedName)
+                e.presentation.text = executor.getStartActionText(taskSet.suggestedName)
             }
         }
 
@@ -206,7 +214,9 @@ class NxTreeStructure(
                 nxTaskExecutionManager.execute(
                     taskSet.nxProject,
                     taskSet.nxTarget,
-                    taskSet.nxTargetConfiguration
+                    taskSet.nxTargetConfiguration,
+                    emptyList(),
+                    executor
                 )
             }
         }

@@ -132,6 +132,10 @@
     >
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </action>
+    
+    <action id="dev.nx.console.run.actions.NxRunAnythingAction" class="dev.nx.console.run.actions.NxRunAnythingAction"
+            text="Nx: Run Anything" description="Run Nx targets in a CLI-like interface"
+            icon="AllIcons.Actions.Run_anything"/>
 
 
     <!-- Graph -->
@@ -153,5 +157,6 @@
             text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
+
   </actions>
 </idea-plugin>
