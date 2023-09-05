@@ -51,7 +51,7 @@ class NxGraphBrowser(
     private val foregroundColor = getHexColor(UIUtil.getLabelForeground())
 
     init {
-        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)
+        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
         browser.jbCefClient.addDownloadHandler(NxGraphDownloadHandler(), browser.cefBrowser)
         browser.jbCefClient.addContextMenuHandler(
             OpenDevToolsContextMenuHandler(),

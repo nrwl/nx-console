@@ -1,11 +1,10 @@
 package dev.nx.console.graph.actions
 
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
+import dev.nx.console.NxIcons
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
@@ -20,7 +19,11 @@ import kotlinx.coroutines.*
 class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? = null) :
     DumbAwareAction() {
 
+    init {
+        useKeyMapShortcutSetOrDefault()
+    }
     override fun update(e: AnActionEvent) {
+        useKeyMapShortcutSetOrDefault()
         if (e.place != "NxToolWindow" && targetDescriptor == null) {
             return
         }
@@ -31,6 +34,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
         } else {
             e.presentation.text =
                 "Nx Graph: Focus ${targetDescriptor.nxProject}:${targetDescriptor.nxTarget} target"
+            e.presentation.icon = NxIcons.Action
         }
     }
 
@@ -39,11 +43,13 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Task")
 
-        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path ?: return
+        val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
         CoroutineScope(Dispatchers.Default).launch {
             val currentlyOpenedProject =
-                NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
+                path?.let {
+                    NxlsService.getInstance(project).generatorContextFromPath(path = path)?.project
+                }
             val targetDescriptor: NxTargetDescriptor =
                 this@NxGraphFocusTaskAction.targetDescriptor
                     ?: if (e.place == "NxToolWindow") {
@@ -83,5 +89,19 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
         }
 
         return null
+    }
+
+    private fun useKeyMapShortcutSetOrDefault() {
+        val keyMapSet = KeymapUtil.getActiveKeymapShortcuts(ID)
+
+        if (keyMapSet.shortcuts.isEmpty()) {
+            shortcutSet = CustomShortcutSet.fromString(DEFAULT_SHORTCUT)
+        } else {
+            shortcutSet = keyMapSet
+        }
+    }
+    companion object {
+        const val DEFAULT_SHORTCUT = "control shift T"
+        const val ID = "dev.nx.console.graph.actions.NxGraphFocusTaskAction"
     }
 }
