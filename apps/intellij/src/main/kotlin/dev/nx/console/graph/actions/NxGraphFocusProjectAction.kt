@@ -3,8 +3,11 @@ package dev.nx.console.graph.actions
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.CustomShortcutSet
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
+import dev.nx.console.NxIcons
 import dev.nx.console.graph.NxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
@@ -17,11 +20,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
+
+    init {
+        useKeyMapShortcutSetOrDefault()
+    }
     override fun update(e: AnActionEvent) {
+        useKeyMapShortcutSetOrDefault()
         val nxTreeNode = e.getData(NxTreeNodeKey) ?: return
         if (nxTreeNode !is NxSimpleNode.Project) {
             e.presentation.isEnabledAndVisible = false
         }
+        e.presentation.icon = NxIcons.Action
     }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
@@ -71,5 +80,20 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         val project = e.project ?: return null
 
         return selectNxProject(project, e.dataContext, currentlyOpenedProject)
+    }
+
+    private fun useKeyMapShortcutSetOrDefault() {
+        val keyMapSet = KeymapUtil.getActiveKeymapShortcuts(ID)
+
+        if (keyMapSet.shortcuts.isEmpty()) {
+            shortcutSet = CustomShortcutSet.fromString(DEFAULT_SHORTCUT)
+        } else {
+            shortcutSet = keyMapSet
+        }
+    }
+
+    companion object {
+        const val DEFAULT_SHORTCUT = "control shift G"
+        const val ID = "dev.nx.console.graph.actions.NxGraphFocusProjectAction"
     }
 }

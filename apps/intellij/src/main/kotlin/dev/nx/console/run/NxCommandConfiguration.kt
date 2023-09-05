@@ -4,13 +4,13 @@ import com.intellij.execution.Executor
 import com.intellij.execution.configuration.EnvironmentVariablesData
 import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.javascript.nodejs.debug.NodeDebugRunConfiguration
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
 import org.jdom.Element
 
 class NxCommandConfiguration(project: Project, factory: ConfigurationFactory) :
-    LocatableConfigurationBase<RunProfileState>(project, factory, "Nx"),
-    RunConfigurationWithSuppressedDefaultDebugAction {
+    LocatableConfigurationBase<RunProfileState>(project, factory, "Nx"), NodeDebugRunConfiguration {
 
     var nxRunSettings = NxRunSettings()
 

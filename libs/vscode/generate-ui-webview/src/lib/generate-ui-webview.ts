@@ -11,6 +11,7 @@ import {
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getNxWorkspace,
+  getStartupMessage,
   getTransformedGeneratorSchema,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
@@ -154,12 +155,10 @@ export class GenerateUiWebview {
           new GenerateUiGeneratorSchemaInputMessage(this.generatorToDisplay)
         );
 
-        const nxWorkspace = await getNxWorkspace();
-        this.plugins?.startupMessages?.forEach((messageFunction) => {
-          const message = messageFunction(nxWorkspace);
-          if (message) {
+        getStartupMessage(this.generatorToDisplay).then((startupMessage) => {
+          if (startupMessage) {
             this.postMessageToWebview(
-              new GenerateUiBannerInputMessage(message)
+              new GenerateUiBannerInputMessage(startupMessage)
             );
           }
         });

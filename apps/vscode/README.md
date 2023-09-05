@@ -44,6 +44,14 @@ For instance:
 
 Nx Console does all that and more!
 
+## Download
+
+You can install Nx Console in the following places:
+
+- [Nx Console for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console) from the
+  Visual Studio Marketplace.
+- [Nx Console for JetBrains](https://plugins.jetbrains.com/plugin/21060-nx-console) from the JetBrains Marketplace
+
 ## True UI for Nx & Lerna
 
 Nx Console is the UI for all Nx workspaces. It works for any generator or any architect commands. Nx Console does not
@@ -63,5 +71,13 @@ used the CLI, you don't get overwhelmed.
 
 - [Documentation](https://nx.dev/core-features/integrate-with-editors) - Official documentation with video tutorials
 - [nx.dev](http://nx.dev) - Documentation, Guides and Interactive Tutorials on Nx
-- [Learn more about the team at Nrwl](https://nx.app/company) - The team at Nrwl led the development of Nx Console,
+- [Join the community](http://go.nx.dev/community) - Chat about Nx & Nx Console on the official discord server
+- [Learn more about the team at Nx](https://nx.app/company) - The team at Nx led the development of Nx Console,
   after working with many Enterprise clients.
+
+# Contributing
+
+Please read the [contributing guidelines](https://github.com/nrwl/nx-console/blob/master/CONTRIBUTING.md). Pick one of
+the issues from
+the [good first issue](https://github.com/nrwl/nx-console/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+list to get started.

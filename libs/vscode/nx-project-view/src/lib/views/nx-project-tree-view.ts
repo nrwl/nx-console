@@ -10,6 +10,7 @@ import {
   ProjectViewStrategy,
   TargetViewItem,
 } from './nx-project-base-view';
+import { TreeItemCollapsibleState } from 'vscode';
 
 export type TreeViewItem = FolderViewItem | ProjectViewItem | TargetViewItem;
 export type TreeViewStrategy = ProjectViewStrategy<TreeViewItem>;
@@ -36,6 +37,8 @@ class TreeView extends BaseView {
     if (!element) {
       const { treeMap, roots } = await getProjectFolderTree();
       this.treeMap = treeMap;
+      // if there's only a single root, start with it expanded
+      const isSingleProject = roots.length === 1;
       return roots
         .sort((a, b) => {
           // the VSCode tree view looks chaotic when folders and projects are on the same level
@@ -45,7 +48,14 @@ class TreeView extends BaseView {
           }
           return a.projectName ? 1 : -1;
         })
-        .map((root) => this.createFolderOrProjectTreeItemFromNode(root));
+        .map((root) =>
+          this.createFolderOrProjectTreeItemFromNode(
+            root,
+            isSingleProject
+              ? TreeItemCollapsibleState.Expanded
+              : TreeItemCollapsibleState.Collapsed
+          )
+        );
     }
 
     if (element.contextValue === 'project') {
@@ -77,7 +87,10 @@ class TreeView extends BaseView {
     }
   }
 
-  private createFolderTreeItem(path: string): FolderViewItem {
+  private createFolderTreeItem(
+    path: string,
+    collapsible = TreeItemCollapsibleState.Collapsed
+  ): FolderViewItem {
     const folderName = parse(path).base;
     /**
      * In case that a project does not have a root value.
@@ -91,19 +104,20 @@ class TreeView extends BaseView {
       path,
       label,
       resource: join(getWorkspacePath(), path),
-      collapsible: 'Collapsed',
+      collapsible,
     };
   }
 
   private createFolderOrProjectTreeItemFromNode(
-    node: TreeNode
+    node: TreeNode,
+    collapsible = TreeItemCollapsibleState.Collapsed
   ): ProjectViewItem | FolderViewItem {
     const config = node.projectConfiguration;
     return config
-      ? this.createProjectViewItem([
-          config.name ?? node.projectName ?? '',
-          config,
-        ])
-      : this.createFolderTreeItem(node.dir);
+      ? this.createProjectViewItem(
+          [config.name ?? node.projectName ?? '', config],
+          collapsible
+        )
+      : this.createFolderTreeItem(node.dir, collapsible);
   }
 }

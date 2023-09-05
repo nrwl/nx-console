@@ -5,13 +5,10 @@ import com.intellij.ide.CommonActionsManager
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
-import com.intellij.ide.actions.runAnything.RunAnythingManager
 import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.components.service
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
@@ -94,18 +91,6 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             val actionGroup =
                 DefaultActionGroup().apply { templatePresentation.text = "Nx Toolwindow" }
 
-            val nxRunAnythingAction =
-                object :
-                    AnAction(
-                        "Execute Nx Targets",
-                        "Execute Nx targets",
-                        AllIcons.Actions.Run_anything
-                    ) {
-                    override fun actionPerformed(e: AnActionEvent) {
-                        project.service<RunAnythingManager>().show("nx run", false, e)
-                    }
-                }
-
             val refreshAction =
                 object :
                     RefreshAction(
@@ -127,7 +112,9 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
 
             actionGroup.addAction(refreshAction)
             actionGroup.addSeparator()
-            actionGroup.add(nxRunAnythingAction)
+            actionGroup.add(
+                actionManager.getAction("dev.nx.console.run.actions.NxRunAnythingAction")
+            )
             actionGroup.add(
                 actionManager.getAction("dev.nx.console.graph.actions.NxGraphSelectAllAction")
             )

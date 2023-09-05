@@ -1,9 +1,7 @@
 package dev.nx.console.run
 
-import com.intellij.execution.Executor
-import com.intellij.execution.RunManager
 import com.intellij.execution.executors.DefaultRunExecutor
-import com.intellij.execution.runners.ExecutionUtil
+import com.intellij.ide.actions.runAnything.RunAnythingAction
 import com.intellij.ide.actions.runAnything.RunAnythingUtil
 import com.intellij.ide.actions.runAnything.activity.RunAnythingCommandLineProvider
 import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
@@ -43,24 +41,15 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
     override fun run(dataContext: DataContext, commandLine: CommandLine): Boolean {
         val project = RunAnythingUtil.fetchProject(dataContext)
         val args = commandLine.parameters.toMutableList()
-        val runManager = project.service<RunManager>()
         val task = args.firstOrNull() ?: return false
         val nxProject = task.substringBefore(":")
         val nxTarget = task.substringAfter(":")
+        val executor =
+            dataContext.getData(RunAnythingAction.EXECUTOR_KEY)
+                ?: DefaultRunExecutor.getRunExecutorInstance()
 
-        val runnerAndConfigurationSettings =
-            getOrCreateRunnerConfigurationSettings(
-                    project,
-                    nxProject,
-                    nxTarget,
-                    "",
-                    args,
-                )
-                .also { runManager.addConfiguration(it) }
+        NxTaskExecutionManager.getInstance(project).execute(nxProject, nxTarget, "", args, executor)
 
-        runManager.selectedConfiguration = runnerAndConfigurationSettings
-        val executor: Executor = DefaultRunExecutor.getRunExecutorInstance()
-        ExecutionUtil.runConfiguration(runnerAndConfigurationSettings, executor)
         return true
     }
 

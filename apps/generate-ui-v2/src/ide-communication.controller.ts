@@ -10,7 +10,6 @@ import {
   GeneratorSchema,
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
-import { Option } from '@nx-console/shared/schema';
 import { ReactiveController, ReactiveElement } from 'lit';
 
 import type { WebviewApi } from 'vscode-webview';
@@ -132,35 +131,11 @@ export class IdeCommunicationController implements ReactiveController {
   }
 
   private handleInputMessage(message: GenerateUiInputMessage) {
-    const optionFilter = (option: Option) =>
-      option['x-priority'] !== 'internal';
-
-    // THIS IS A FIX UNTIL DIR & PATH OPTIONS ARE PROPERLY HANDLED
-    // WE DON'T WANT TO PREFILL DIR WHEN THERE'S A PROJECT
-    const transformContext = (
-      schema: GeneratorSchema,
-      context: GeneratorContext | undefined
-    ) => {
-      if (schema.options.find((opt) => opt.name === 'project')) {
-        return {
-          ...context,
-          directory: undefined,
-        };
-      } else {
-        return context;
-      }
-    };
-
     switch (message.payloadType) {
       case 'generator': {
-        const schema = message.payload;
-        const schemaWithFilteredOptions = {
-          ...schema,
-          options: schema.options.filter(optionFilter),
-        };
-        this.generatorSchema = schemaWithFilteredOptions;
+        this.generatorSchema = message.payload;
         this.generatorContextContextProvider.setValue(
-          transformContext(schema, this.generatorSchema.context)
+          this.generatorSchema.context
         );
 
         this.host.requestUpdate();
@@ -209,6 +184,7 @@ export class IdeCommunicationController implements ReactiveController {
       --active-selection-background-color: ${styles.activeSelectionBackgroundColor};
       --focus-border-color: ${styles.focusBorderColor};
       --banner-warning-color: ${styles.bannerWarningBackgroundColor};
+      --banner-text-color: ${styles.bannerTextColor};
       --badge-background-color: ${styles.badgeBackgroundColor};
       --separator-color: ${styles.separatorColor};
       --field-nav-hover-color: ${styles.fieldNavHoverColor};
