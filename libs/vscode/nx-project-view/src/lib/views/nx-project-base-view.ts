@@ -5,6 +5,7 @@ import {
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'node:path';
+import { TreeItemCollapsibleState } from 'vscode';
 
 export interface ProjectViewStrategy<T> {
   getChildren(element?: T): Promise<T[] | undefined>;
@@ -14,7 +15,7 @@ interface BaseViewItem<Context extends string> {
   id: string;
   contextValue: Context;
   label: string;
-  collapsible: Collapsible;
+  collapsible: TreeItemCollapsibleState;
 }
 
 export interface FolderViewItem extends BaseViewItem<'folder'> {
@@ -32,8 +33,6 @@ export interface TargetViewItem extends BaseViewItem<'target'> {
   nxTarget: NxTarget;
 }
 
-export type Collapsible = 'None' | 'Collapsed' | 'Expanded';
-
 export interface NxProject {
   project: string;
   root: string;
@@ -45,10 +44,13 @@ export interface NxTarget {
 }
 
 export abstract class BaseView {
-  createProjectViewItem([projectName, { root, name, targets }]: [
-    projectName: string,
-    projectDefinition: ProjectConfiguration
-  ]): ProjectViewItem {
+  createProjectViewItem(
+    [projectName, { root, name, targets }]: [
+      projectName: string,
+      projectDefinition: ProjectConfiguration
+    ],
+    collapsible = TreeItemCollapsibleState.Collapsed
+  ): ProjectViewItem {
     const hasChildren =
       !targets ||
       Object.keys(targets).length !== 0 ||
@@ -68,7 +70,7 @@ export abstract class BaseView {
       nxProject,
       label: projectName,
       resource: join(getWorkspacePath(), nxProject.root ?? ''),
-      collapsible: hasChildren ? 'Collapsed' : 'None',
+      collapsible: hasChildren ? collapsible : TreeItemCollapsibleState.None,
     };
   }
 
@@ -105,7 +107,9 @@ export abstract class BaseView {
       nxProject,
       nxTarget: { name: targetName },
       label: targetName,
-      collapsible: hasChildren ? 'Collapsed' : 'None',
+      collapsible: hasChildren
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None,
     };
   }
 
@@ -140,7 +144,7 @@ export abstract class BaseView {
       nxProject,
       nxTarget: { name: nxTarget.name, configuration },
       label: configuration,
-      collapsible: 'None',
+      collapsible: TreeItemCollapsibleState.None,
     }));
   }
 }
