@@ -1,3 +1,17 @@
+## 1.13.0 (2023-09-05)
+
+### Bug Fixes
+
+* **intellij:** add shortcut to focus task action ([#1866](https://github.com/nrwl/nx-console/issues/1866)) ([eb2c9b6](https://github.com/nrwl/nx-console/commit/eb2c9b62eb3d93e7a3d9449bad330d9d9cea7b52))
+* move projectNameAndRootFormat message to banner from tooltip ([#1873](https://github.com/nrwl/nx-console/issues/1873)) ([6b328fe](https://github.com/nrwl/nx-console/commit/6b328fe46b01497619f6e3502dde06cb69ec77b8))
+
+
+### Features
+
+* **generate-ui:** filter deprecated fields & move functionality to plugins ([#1862](https://github.com/nrwl/nx-console/issues/1862)) ([63225f0](https://github.com/nrwl/nx-console/commit/63225f0a8d6674a7fb499e22022202b45ff97d08))
+* **intellij:** add debug mode to run configurations ([#1870](https://github.com/nrwl/nx-console/issues/1870)) ([d053726](https://github.com/nrwl/nx-console/commit/d053726c1fd731d4c516abbf9d213baf10c2f6a4))
+* write internal git clean startup message plugin & display startup messages in intellij ([#1869](https://github.com/nrwl/nx-console/issues/1869)) ([339db9b](https://github.com/nrwl/nx-console/commit/339db9b7c770b527e59c7c742d17c5ab13d95748))
+
 ## 1.12.0 (2023-08-25)
 
 ### Bug Fixes
