@@ -7,12 +7,10 @@ export class NxTreeItem extends TreeItem {
 
   constructor(public readonly item: ViewItem) {
     let collapsibleState: TreeItemCollapsibleState;
-    if (item.collapsible === 'None') {
+    if (item.collapsible === TreeItemCollapsibleState.None) {
       collapsibleState = TreeItemCollapsibleState.None;
     } else {
-      collapsibleState =
-        getStoredCollapsibleState(item.id) ??
-        TreeItemCollapsibleState[item.collapsible];
+      collapsibleState = getStoredCollapsibleState(item.id) ?? item.collapsible;
     }
     super(item.label, collapsibleState);
 
