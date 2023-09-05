@@ -1,3 +1,17 @@
+# [18.8.0](https://github.com/nrwl/nx-console/compare/vscode-v18.7.0...vscode-v18.8.0) (2023-09-05)
+
+
+### Bug Fixes
+
+* move projectNameAndRootFormat message to banner from tooltip ([#1873](https://github.com/nrwl/nx-console/issues/1873)) ([6b328fe](https://github.com/nrwl/nx-console/commit/6b328fe46b01497619f6e3502dde06cb69ec77b8))
+* **vscode:** expand root node if project view contains only single project ([#1874](https://github.com/nrwl/nx-console/issues/1874)) ([8e980fb](https://github.com/nrwl/nx-console/commit/8e980fb9163f1833867eec87ab2220df17387036))
+
+
+### Features
+
+* **generate-ui:** filter deprecated fields & move functionality to plugins ([#1862](https://github.com/nrwl/nx-console/issues/1862)) ([63225f0](https://github.com/nrwl/nx-console/commit/63225f0a8d6674a7fb499e22022202b45ff97d08))
+* write internal git clean startup message plugin & display startup messages in intellij ([#1869](https://github.com/nrwl/nx-console/issues/1869)) ([339db9b](https://github.com/nrwl/nx-console/commit/339db9b7c770b527e59c7c742d17c5ab13d95748))
+
 # [18.7.0](https://github.com/nrwl/nx-console/compare/vscode-v18.6.0...vscode-v18.7.0) (2023-08-25)
 
 
