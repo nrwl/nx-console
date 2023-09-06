@@ -60,30 +60,26 @@ async function selectRunInformationAndRun(
   if (
     !runInformation ||
     !runInformation.projectName ||
-    !runInformation.targetName
+    !runInformation.targetName ||
+    !runInformation.flags
   ) {
     return;
   }
-  const { projectName: p, targetName: t, flags: f } = runInformation;
-  runCliCommand('run', p, t, f);
-}
+  const {
+    projectName: p,
+    targetName: t,
+    configuration: c,
+    flags: f,
+  } = runInformation;
 
-function runCliCommand(
-  command: string,
-  projectName: string,
-  target: string,
-  flags: string[] | undefined
-) {
-  if (flags !== undefined) {
-    CliTaskProvider.instance.executeTask({
-      positional:
-        command === 'run'
-          ? `${projectName}:${surroundWithQuotesIfHasWhiteSpace(target)}`
-          : projectName,
-      command,
-      flags,
-    });
-  }
+  const positional = c
+    ? `${p}:${surroundWithQuotesIfHasWhiteSpace(t)}:${c}`
+    : `${p}:${surroundWithQuotesIfHasWhiteSpace(t)}`;
+  CliTaskProvider.instance.executeTask({
+    positional,
+    command: 'run',
+    flags: f,
+  });
 }
 
 function surroundWithQuotesIfHasWhiteSpace(target: string): string {
