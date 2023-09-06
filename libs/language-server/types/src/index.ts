@@ -100,7 +100,7 @@ export const NxProjectGraphOutputRequest: RequestType<
 > = new RequestType('nx/projectGraphOutput');
 
 export const NxCreateProjectGraphRequest: RequestType<
-  undefined,
+  { showAffected: boolean },
   string | undefined,
   unknown
 > = new RequestType('nx/createProjectGraph');
@@ -125,3 +125,9 @@ export const NxStartupMessageRequest: RequestType<
   StartupMessageDefinition | undefined,
   unknown
 > = new RequestType('nx/startupMessage');
+
+export const NxHasAffectedProjectsRequest: RequestType<
+  undefined,
+  boolean,
+  unknown
+> = new RequestType('nx/hasAffectedProjects');

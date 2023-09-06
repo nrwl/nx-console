@@ -26,7 +26,7 @@ interface Context {
 }
 
 export const graphMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QAUBOB7AVmAxgFwAIBxVAQwAcALAYgCUBRAMQYGUAJAbQAYBdRUculgBLPMPQA7fiAAeiAKwB2ADQgAnogCMADgBsAOgCcAFkObjigMzGATEs2GAvo9VosuQiQo1ktAPIAUvQAwgAqAPos9AAyIaH0ACLcfEgggiJiktJyCLq6Nvq6mlx2XJbWNrqWhqoaCNrG2vpcio02lvLahkqGNs6uGNj4xGRU1AByfuG+gXHJ0umi4lKpOUq1iNaW+jba2h02xbpcJrr9IG5DnqM0RPQRwX7j8c-zqYuZK6BrKuqIxvl9PJLFxQfIbIZFPsuJpzpcPCNvPocJI8GAJHhqAA1ACS9AA6uEGABBBIATTeAiESyyq0Qila+gBlnM8kMlkUJhsGwQAMMQMUukUxU0NhOYsscMGCK8VGRqPRmMpaWpn2y-0U8iBDkUNgZvXKOh5nW2lWMxjZhmOXGZUvcw1llH0ABt0KQIMIJFBqBBJGB9J6AG7oADW-td7s9UGCCoxyo+y3VvM0Wo5JRTvWBhj0vzq+X5NmMZUspSU4O0dquiLlEY9XuoYFQGFQ+nIztIeAAZuhUABbF1uuvR2N4eOqxN05MGYUnBwdErCnm6gog1ryAFCi12Ssym76QPCMAAd1oYHdamxeMJCXoLFC-jJiTHGQn3y0LX5FnNhz1el6PL5AUhRFMVehtZwXBACR0AgOBpHhB0bgWcdaTfBAaj+BAAFoDFBUEi20D89WFWFIIQ64kU9URkJfVDZC0TogVsU5LCqEFjA5HltE0JluPyLoOXNYxNDOMjpUQpEUQxRUaJpL56NyCF9E0KErAcAE9m4gCAQFNc7EhQxukqHcJJrQco1ktVJ3WTD5F0LVNA5QjuihEsVJMii5UbZtLNfBT82U1SWVOTTNCXMVChaEF5B0c0YuMDzqydaDwnIcS8F8uiclsLh9DTQ42Tsaocx5LZ9ChUULCKcwxXNRLHX3Q8TzPCA6ipWj5JydljGUww8N1bRBQ5DC6nNAwlD0tlOSM0SBntTynQPY8EjgPAMDUSBMs6rQ9X5JRv3nIoIVzf4Is6MV9j2TUOmBCDHCAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAUBOB7AVmAxgFwAIBxVAQwAcALAYgCUBRAMQYGUAJAbQAYBdRUculgBLPMPQA7fiAAeiAKwB2ADQgAnogCMADgBsAOgCcAFkObjigMzGATEs2GAvo9VosuQiQo1ktAPIAUvQAwgAqAPos9AAyIaH0ACLcfEgggiJiktJyCLq6Nvq6mlx2XJbWNrqWhqoaCNrG2vpcio02lvLahkqGNs6uGNj4xGRU1AByfuG+gXHJ0umi4lKpOUq1iNaW+jba2h02xbpcJrr9IG5DnqOU+jiSeGASeNQAagCS9ADq4QwAggkAJrzVKLTIrUA5RStfTGKrmeSGSyKEw2DYIOGGfRKXSKYqaGwnQmWc6XDwjbx3B5PF4ggRCJZZVaICzybEORQ2aG9co6dGdbaVYzGRGGY5cOEklwXQbkrxUfTkVBgcikZXRdCkCDCCRQah0tIM8HZRBcdFcUmy4by24AG012t11AgkjA+h1ADd0ABrN32rU6qDBanPA1g5YmjGaNnIkrR3ryap6FTqRD5LE2YxlSylJTyXaW9zWm76f2OvVgVAYVCK22kPAAM3QqAAtqWHYHg88aWGjRHmVGDHiTg4OiU8ejOQVLC0RXDcSK7IWrhSFR7hGAAO60MBatRvT4-BL0FihfyAxK9jL9yFaFpYizCw5cvS9dGY7GKXH4wm9CXOaUJHQCA4GkMli28BY+yZW8EAAWkadE4O0RR9BzGwzCsHFY0UZc5RLHVRCg68YNkLROmxWxTksKoZ2MZF0W0TRYSY-IumRYVjE0M5pXA65KXubtnmIxkITI3IMP0TRFBQywHDhPYmPfOFP1afNERRbpKjwiCFSVFU1TADUA11ETjQHM1UwQExjGaVptHaTpuhRPpeKtfiFTLQMzJvcT1is+RdDZTRkW0E4lH2Q5cLcosPNuStqx80icnTKSZKseTdEUzRJ0JQoWhneQdGFIrjB0uL9CA8IlVipKxJyWwuDQxQ40ROwk1xdEtn0GSCQsIpzEJYVytXW51y3Hc9zqyMkVshwuAWzkUKqFFlIMJQ1LsQxNPzHiBli0b9HGzcEjgPAMDUSBpoHAkUU-J8xyKDCUzqRrsQcrh9j2RRE3kRMAMcIA */
   createMachine(
     {
       predictableActionArguments: true,
@@ -62,14 +62,14 @@ export const graphMachine =
           actions: ['log', 'refreshData'],
           target: '.content',
         },
+
         PROJECT_SELECTED: {
           actions: ['log', 'projectSelected'],
+          target: '.prepareLoading',
         },
+
         NO_PROJECT: {
           target: '.no_project',
-        },
-        GET_CONTENT: {
-          target: '.content',
         },
       },
       states: {
@@ -87,6 +87,9 @@ export const graphMachine =
               target: 'viewReady',
             },
           },
+        },
+        prepareLoading: {
+          always: 'loading',
         },
         loading: {
           entry: ['loadingStarted', 'log'],
@@ -126,8 +129,10 @@ export const graphMachine =
     },
     {
       services: {
-        generateContent: async () => {
-          return await createProjectGraph();
+        generateContent: async (context) => {
+          const showAffected =
+            context?.project?.type === MessageType.affectedProjects;
+          return await createProjectGraph(showAffected);
         },
       },
       actions: {

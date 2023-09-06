@@ -31,7 +31,6 @@ export interface Typegen0 {
     loadingStarted: '';
     log:
       | ''
-      | 'GET_CONTENT'
       | 'PROJECT_SELECTED'
       | 'REFRESH'
       | 'VIEW_DESTROYED'
@@ -55,6 +54,7 @@ export interface Typegen0 {
     | 'init'
     | 'loading'
     | 'no_project'
+    | 'prepareLoading'
     | 'viewDestroyed'
     | 'viewReady';
   tags: never;
