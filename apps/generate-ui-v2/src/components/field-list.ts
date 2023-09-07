@@ -2,6 +2,7 @@ import { Option } from '@nx-console/shared/schema';
 import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { extractItemOptions } from '../utils/generator-schema-utils';
+import { EditorContext } from '../contexts/editor-context';
 
 type OptionWithMetadata = {
   option: Option;
@@ -10,7 +11,7 @@ type OptionWithMetadata = {
 };
 
 @customElement('field-list')
-export class FieldList extends LitElement {
+export class FieldList extends EditorContext(LitElement) {
   @property()
   options: Option[];
 
@@ -38,11 +39,17 @@ export class FieldList extends LitElement {
     return html`
       <div class="flex h-full w-full">
         <div
-          class="border-separator fixed h-full w-52 overflow-y-auto border-r-2 p-6 max-sm:hidden md:w-64"
+          class="border-separator ${this.editor === 'intellij'
+            ? 'hidden md:block'
+            : 'max-sm:hidden md:w-64'} fixed h-full w-52 overflow-y-auto border-r-2  p-6"
         >
           ${this.renderOptionNav(optionsWithMetadata, shouldShowMoreOptions)}
         </div>
-        <div class="w-full p-6 sm:ml-52 md:ml-64">
+        <div
+          class="${this.editor === 'intellij'
+            ? 'md:ml-52 md:p-6'
+            : 'sm:ml-52 sm:p-6 md:ml-64'} w-full pt-6"
+        >
           ${this.renderOptionsWithDivider(
             optionsWithMetadata,
             shouldShowMoreOptions,
