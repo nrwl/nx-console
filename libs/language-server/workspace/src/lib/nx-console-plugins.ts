@@ -18,7 +18,7 @@ export async function getTransformedGeneratorSchema(
   let modifiedSchema = schema;
   try {
     plugins?.schemaProcessors?.forEach((processor) => {
-      modifiedSchema = processor(modifiedSchema, workspace);
+      modifiedSchema = processor(modifiedSchema, workspace, lspLogger);
     });
     return modifiedSchema;
   } catch (e) {
@@ -38,7 +38,7 @@ export async function getStartupMessage(
     undefined;
   try {
     for (const factory of plugins?.startupMessageFactories ?? []) {
-      startupMessageDefinition = await factory(schema, workspace);
+      startupMessageDefinition = await factory(schema, workspace, lspLogger);
     }
 
     return startupMessageDefinition;
