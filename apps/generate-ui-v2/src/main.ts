@@ -72,16 +72,16 @@ export class Root extends LitElement {
                   <a
                     href="${nxDevLink}"
                     target="_blank"
-                    class="focus:ring-focusBorder pb-px text-sm leading-none underline focus:outline-none focus:ring-1"
+                    class="focus:ring-focusBorder pb-px text-sm leading-none underline focus:outline-none focus:ring-1 max-sm:hidden"
                     >View full details
                   </a>
                 `
             )}
           </div>
 
-          <div class="flex shrink-0">
+          <div class="sm: flex shrink-0">
             <button-element
-              class="flex items-center py-2 pl-3"
+              class="flex items-center py-2 pl-3 max-sm:hidden"
               appearance="icon"
               text="copy"
               title="Copy generate command to clipboard"
@@ -92,13 +92,21 @@ export class Root extends LitElement {
             ${when(
               !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
               () =>
-                html` <button-element
-                  class="py-2 pl-3"
-                  @click="${() => this.formValuesService.runGenerator(true)}"
-                  text="Dry Run"
-                  appearance="secondary"
-                >
-                </button-element>`
+                html`<button-element
+                    class="py-2 pl-3 sm:hidden"
+                    @click="${() => this.formValuesService.runGenerator(true)}"
+                    text="debug"
+                    appearance="icon"
+                    title="Dry Run"
+                  >
+                  </button-element>
+                  <button-element
+                    class="hidden py-2 pl-3 sm:block"
+                    @click="${() => this.formValuesService.runGenerator(true)}"
+                    text="Dry Run"
+                    appearance="secondary"
+                  >
+                  </button-element> `
             )}
 
             <button-element
