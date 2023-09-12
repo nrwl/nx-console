@@ -1,3 +1,12 @@
+## [18.8.1](https://github.com/nrwl/nx-console/compare/vscode-v18.8.0...vscode-v18.8.1) (2023-09-12)
+
+
+### Bug Fixes
+
+* **generate-ui:** adjust generate ui styling for large fonts ([#1878](https://github.com/nrwl/nx-console/issues/1878)) ([fca0e26](https://github.com/nrwl/nx-console/commit/fca0e262882f9c589f72ea16d776d777775db781))
+* take nx.json projectNameAndRootFormat config into account in generate ui ([#1880](https://github.com/nrwl/nx-console/issues/1880)) ([9d4a0c1](https://github.com/nrwl/nx-console/commit/9d4a0c14c3d65e37772964f9b5b822d3d0fdffa7))
+* **vscode:** fix configuration codelens running the correct config ([#1877](https://github.com/nrwl/nx-console/issues/1877)) ([6463c66](https://github.com/nrwl/nx-console/commit/6463c6661709ee6cf22a6149c529504cc674afe8))
+
 # [18.8.0](https://github.com/nrwl/nx-console/compare/vscode-v18.7.0...vscode-v18.8.0) (2023-09-05)
 
 
