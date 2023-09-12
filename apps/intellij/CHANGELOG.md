@@ -1,3 +1,9 @@
+## <small>1.13.2 (2023-09-12)</small>
+
+### Bug Fixes
+
+* **intellij:** fix running nx targets in wsl ([#1881](https://github.com/nrwl/nx-console/issues/1881)) ([3d80124](https://github.com/nrwl/nx-console/commit/3d801243b6103fd65390a78449caa7aafe6312a3))
+
 ## <small>1.13.1 (2023-09-12)</small>
 
 ### Bug Fixes
