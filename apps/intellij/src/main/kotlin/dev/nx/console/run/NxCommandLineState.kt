@@ -6,6 +6,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.target.value.TargetValue
+import com.intellij.execution.wsl.WslPath
 import com.intellij.javascript.debugger.CommandLineDebugConfigurator
 import com.intellij.javascript.nodejs.NodeCommandLineUtil
 import com.intellij.javascript.nodejs.NodeCommandLineUtil.createConsole
@@ -86,7 +87,10 @@ class NxCommandLineState(
                     *(ParametersListUtil.parseToArray(nxRunSettings.arguments)),
                 )
             )
-            setWorkingDirectory(project.nxBasePath)
+
+            setWorkingDirectory(
+                WslPath.parseWindowsUncPath(project.nxBasePath)?.linuxPath ?: project.nxBasePath
+            )
         }
 
         return targetRun.startProcess()
