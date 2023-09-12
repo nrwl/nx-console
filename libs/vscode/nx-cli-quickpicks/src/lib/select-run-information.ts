@@ -11,7 +11,12 @@ export async function selectRunInformation(
   askForFlags = true,
   selectTargetFirst = false
 ): Promise<
-  | { projectName: string; targetName: string; flags: string[] | undefined }
+  | {
+      projectName: string;
+      targetName: string;
+      configuration?: string;
+      flags: string[] | undefined;
+    }
   | undefined
 > {
   let flags: string[] | undefined;
@@ -20,7 +25,7 @@ export async function selectRunInformation(
   }
 
   if (projectName && targetName && flags) {
-    return { flags, projectName, targetName: targetName };
+    return { flags, projectName, targetName, configuration };
   }
 
   const { validWorkspaceJson, workspace } = await getNxWorkspace();
@@ -80,7 +85,7 @@ export async function selectRunInformation(
         : undefined
     );
 
-    return { flags, projectName, targetName };
+    return { flags, projectName, targetName, configuration };
   }
   return;
 }
