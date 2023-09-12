@@ -1,9 +1,16 @@
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import { StartupMessageFactory } from '../nx-console-plugin-types';
+import {
+  SchemaProcessor,
+  StartupMessageFactory,
+} from '../nx-console-plugin-types';
+import { NxWorkspace } from '@nx-console/shared/types';
+import { Logger } from '@nx-console/shared/schema';
 
-export function projectNameAndRootProcessor(
-  schema: GeneratorSchema
-): GeneratorSchema {
+export const projectNameAndRootProcessor: SchemaProcessor = (
+  schema: GeneratorSchema,
+  workspace: NxWorkspace,
+  lspLogger: Logger
+) => {
   if (
     !schema?.options?.find(
       (option) => option.name === 'projectNameAndRootFormat'
@@ -11,6 +18,24 @@ export function projectNameAndRootProcessor(
   ) {
     return schema;
   }
+
+  // TODO: remove any after update
+  if (
+    (workspace.workspace.workspaceLayout as any)?.projectNameAndRootFormat ===
+    'derived'
+  ) {
+    return {
+      ...schema,
+      context: {
+        ...schema.context,
+        prefillValues: {
+          ...(schema.context?.prefillValues ?? {}),
+          projectNameAndRootFormat: 'derived',
+        },
+      },
+    };
+  }
+
   return {
     ...schema,
     options: schema.options.map((option) => {
@@ -37,16 +62,23 @@ export function projectNameAndRootProcessor(
       },
     },
   };
-}
+};
 
 export const pluginNameAndRootStartupMessage: StartupMessageFactory = (
-  schema: GeneratorSchema
+  schema: GeneratorSchema,
+  workspace: NxWorkspace
 ) => {
   if (
     !schema?.options?.find(
       (option) => option.name === 'projectNameAndRootFormat'
     )
   ) {
+    return undefined;
+  }
+  // if they have explicitly set the option, we don't need to educate users about the change
+
+  // TODO: remove any after update
+  if ((workspace.workspace.workspaceLayout as any)?.projectNameAndRootFormat) {
     return undefined;
   }
   return {

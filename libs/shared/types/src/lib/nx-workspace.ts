@@ -33,5 +33,6 @@ export interface NxWorkspace {
   workspaceLayout: {
     appsDir?: string;
     libsDir?: string;
+    projectNameAndRootFormat?: 'as-provided' | 'derived';
   };
 }
