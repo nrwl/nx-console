@@ -6348,12 +6348,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nrwl/nx-cloud@npm:16.1.1":
-  version: 16.1.1
-  resolution: "@nrwl/nx-cloud@npm:16.1.1"
+"@nrwl/nx-cloud@npm:16.4.0":
+  version: 16.4.0
+  resolution: "@nrwl/nx-cloud@npm:16.4.0"
   dependencies:
-    nx-cloud: 16.1.1
-  checksum: 8cc2fdf9a13b3533968ac892239fbef8aa75936ee9c44ac46a2a288d4d538676fea550c3af4c908120fc7025f0c23d759fd7024176d3bae697c0cbafd679682f
+    nx-cloud: 16.4.0
+  checksum: d72db82bcc0fa07547fc8388069ca012d974803922600885088ef5321f5f92d3944c6b4c005f98d540a414a8c2a53a57a0e365a33df3e0656c6b4ac7d2f1cf64
   languageName: node
   linkType: hard
 
@@ -23584,11 +23584,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nx-cloud@npm:16.1.1":
-  version: 16.1.1
-  resolution: "nx-cloud@npm:16.1.1"
+"nx-cloud@npm:16.4.0":
+  version: 16.4.0
+  resolution: "nx-cloud@npm:16.4.0"
   dependencies:
-    "@nrwl/nx-cloud": 16.1.1
+    "@nrwl/nx-cloud": 16.4.0
     axios: 1.1.3
     chalk: ^4.1.0
     dotenv: ~10.0.0
@@ -23600,7 +23600,7 @@ __metadata:
     yargs-parser: ">=21.1.1"
   bin:
     nx-cloud: bin/nx-cloud.js
-  checksum: 63cf0312281acfab5d9596fdde9507ff1ae3765869a13cb805507fc0c6a91bedef628342205bbb4567e545ee97b0416bcc2aba83494e6d47f58b0a8dd0481310
+  checksum: 41319b77ea3c2a9a80610d50eb52a43f6d86fe84233373697930a6aa887350295785739c9b68cb56f5be60928d67549fa5ec8af3a8091c68851c2758ed5f4dfe
   languageName: node
   linkType: hard
 
@@ -23701,7 +23701,7 @@ __metadata:
     memfs: ^3.4.7
     mocha: ^10.0.0
     nx: 16.5.5
-    nx-cloud: 16.1.1
+    nx-cloud: 16.4.0
     ovsx: ^0.7.1
     prettier: 2.7.1
     prettier-plugin-tailwindcss: ^0.3.0
