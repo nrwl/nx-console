@@ -151,15 +151,11 @@ class NxGenerateService(val project: Project) {
 
         ApplicationManager.getApplication().invokeLater {
             val virtualFile =
-            // will exchange with feature toggle in the future
-            if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
+                if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
                     V2NxGenerateUiFile("Generate", project)
                 else DefaultNxGenerateUiFile("Generate", project)
 
             val fileEditorManager = FileEditorManager.getInstance(project)
-            if (fileEditorManager.isFileOpen(virtualFile)) {
-                fileEditorManager.closeFile(virtualFile)
-            }
 
             fileEditorManager.openFile(virtualFile, true)
 
