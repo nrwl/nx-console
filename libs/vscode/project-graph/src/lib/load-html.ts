@@ -279,6 +279,10 @@ function injectedScript() {
                 action = { type: 'focusProject', projectName: data.projectName };
                 break;
               }
+              case '${MessageType.affectedProjects}': {
+                action = { type: 'affectedProjects'};
+                break;
+              }
               case '${MessageType.task}': {
                 action = { type: 'task', taskName: data.taskName, projectName: data.projectName };
                 break;
@@ -304,6 +308,9 @@ function injectedScript() {
               window.externalApi.router?.navigate(\`/tasks/\${action.taskName}\`).then(() => {
                 document.querySelector(\`[data-cy="selectAllButton"]\`)?.click()
               })
+              return true;
+            } else if(action.type === 'affectedProjects') {
+              window.externalApi.router?.navigate(\`/projects/affected\`);
               return true;
             }
 
@@ -353,7 +360,17 @@ function injectedScript() {
           return false;
         }
 
+        function centerGraph() {
+          window.externalApi?.graphService?.renderGraph?.cy?.fit()
+            const zoom = window.externalApi?.graphService?.renderGraph?.cy?.zoom();
+            if(zoom) {
+              window.externalApi?.graphService?.renderGraph?.cy?.zoom(zoom * 0.9);
+            }
+            window.externalApi?.graphService?.renderGraph?.cy?.center();
+        }
+
         if (clickOnElement()) {
+          setTimeout(() => centerGraph(), 0);
           return;
         }
 
@@ -361,6 +378,7 @@ function injectedScript() {
         const observer = new MutationObserver(mutations => {
           const success = clickOnElement();
           if (success) {
+            setTimeout(() => centerGraph(), 0);
             observer.disconnect();
           }
         });

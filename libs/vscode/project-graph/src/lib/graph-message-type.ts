@@ -4,4 +4,5 @@ export const enum MessageType {
   all = 'ALL',
   task = 'TASK',
   allTasks = 'ALL_TASKS',
+  affectedProjects = 'AFFECTED_PROJECTS',
 }

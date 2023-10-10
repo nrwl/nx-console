@@ -10,3 +10,4 @@ export * from './lib/get-project-graph-output';
 export * from './lib/create-project-graph';
 export * from './lib/get-project-folder-tree';
 export * from './lib/nx-console-plugin-requests';
+export * from './lib/has-affected-projects';
