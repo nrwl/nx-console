@@ -8,21 +8,34 @@ import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.NxProjectJsonToProjectMap
+import dev.nx.console.utils.nxBasePath
+import java.io.File
 
 private val logger = logger<ProjectPostStartup>()
 
 class ProjectPostStartup : ProjectActivity {
     override suspend fun execute(project: Project) {
 
-        val service = NxlsService.getInstance(project)
-        service.start()
+        var currentDir = File(project.nxBasePath)
+        val filesToScanFor = listOf("nx.json", "workspace.json", "angular.json", "lerna.json")
+
+        while (true) {
+            if (filesToScanFor.any { currentDir.resolve(it).exists() }) {
+                val service = NxlsService.getInstance(project)
+                service.start()
+                service.runAfterStarted { NxProjectJsonToProjectMap.getInstance(project).init() }
+                break
+            }
+            if (currentDir.parentFile == null) {
+                break
+            }
+            currentDir = currentDir.parentFile
+        }
 
         if (!NxConsoleSettingsProvider.getInstance().promptedForTelemetry) {
             Notifier.notifyTelemetry(project)
         }
 
         TelemetryService.getInstance(project).extensionActivated(0)
-
-        service.runAfterStarted { NxProjectJsonToProjectMap.getInstance(project).init() }
     }
 }
