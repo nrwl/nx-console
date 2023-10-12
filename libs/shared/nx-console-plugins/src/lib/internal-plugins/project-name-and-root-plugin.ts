@@ -64,7 +64,7 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
   };
 };
 
-export const pluginNameAndRootStartupMessage: StartupMessageFactory = (
+export const projectNameAndRootStartupMessage: StartupMessageFactory = (
   schema: GeneratorSchema,
   workspace: NxWorkspace
 ) => {
