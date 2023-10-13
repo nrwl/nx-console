@@ -8,6 +8,7 @@ import {
   getPackageManagerCommand,
   PackageManagerCommands,
 } from 'nx/src/utils/package-manager';
+import { join } from 'path';
 
 export class CliTask extends Task {
   /**
@@ -37,7 +38,9 @@ export class CliTask extends Task {
       getShellExecutionForConfig(
         {
           displayCommand,
-          cwd: workspacePath,
+          cwd: definition.cwd
+            ? join(workspacePath, definition.cwd)
+            : workspacePath,
           encapsulatedNx: isEncapsulatedNx,
         },
         packageManagerCommands

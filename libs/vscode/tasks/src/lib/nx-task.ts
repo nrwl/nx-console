@@ -1,16 +1,18 @@
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
+import { join } from 'path';
 import { Task, TaskScope } from 'vscode';
 
 export interface NxTaskDefinition {
   positional?: string;
   command: string;
   flags: Array<string>;
+  cwd?: string;
 }
 
 export class NxTask extends Task {
   static async create(definition: NxTaskDefinition): Promise<NxTask> {
-    const { command, flags, positional } = definition;
+    const { command, flags, positional, cwd } = definition;
 
     const args: string[] = [
       command,
@@ -29,7 +31,7 @@ export class NxTask extends Task {
       // execution
       getShellExecutionForConfig({
         displayCommand,
-        cwd: workspacePath,
+        cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         encapsulatedNx: isEncapsulatedNx,
       })
     );

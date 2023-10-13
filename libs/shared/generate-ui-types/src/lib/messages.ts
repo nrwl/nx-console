@@ -29,6 +29,7 @@ export class GenerateUiRunGeneratorOutputMessage {
 export type GenerateUiRunGeneratorPayload = {
   readonly positional: string;
   readonly flags: string[];
+  readonly cwd?: string;
 };
 
 export class GenerateUiRequestValidationOutputMessage {

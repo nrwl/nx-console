@@ -22,30 +22,13 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
       };
     }
   }
-  // with nameAndDirectoryFormat, the project option is ignored, so we don't prefill it
-  if (
-    schema?.options?.find((option) => option.name === 'nameAndDirectoryFormat')
-  ) {
-    if (schema.context?.directory) {
-      schema.context.prefillValues = {
-        ...(schema.context.prefillValues ?? {}),
-        directory: schema.context.directory,
-      };
-    }
-  }
 
-  // if we're >17 & without nameAndDirectoryFormat, we prefill all the info we have
-  if (schema.context?.project) {
-    schema.context.prefillValues = {
-      ...(schema.context.prefillValues ?? {}),
-      project: schema.context.project,
-      projectName: schema.context.project,
-    };
-  }
+  // after nx 17, project option won't exist anymore and cwd-ing into directories will be the way to go
+
   if (schema.context?.directory) {
     schema.context.prefillValues = {
       ...(schema.context.prefillValues ?? {}),
-      directory: schema.context.directory,
+      cwd: schema.context.directory,
     };
   }
 

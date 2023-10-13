@@ -50,6 +50,7 @@ export class FieldList extends EditorContext(LitElement) {
             ? 'md:ml-52 md:p-6'
             : 'sm:ml-52 sm:p-6 md:ml-64'} w-full pt-6"
         >
+          <cwd-input-element></cwd-input-element>
           ${this.renderOptionsWithDivider(
             optionsWithMetadata,
             shouldShowMoreOptions,

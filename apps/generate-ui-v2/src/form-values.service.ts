@@ -22,6 +22,7 @@ export const formValuesServiceContext = createContext<FormValuesService>(
 );
 
 export class FormValuesService {
+  private cwdValue: string | undefined = undefined;
   private formValues: FormValues = {};
   private validationResults: ValidationResults = {};
 
@@ -47,6 +48,17 @@ export class FormValuesService {
         this.handleOptionChange(e.detail);
       }
     );
+    window.addEventListener('cwd-changed', (e: CustomEventInit<string>) => {
+      if (!e.detail) return;
+      const firstChange = this.cwdValue === undefined;
+      this.cwdValue = e.detail;
+      if (
+        !firstChange &&
+        this.icc.configuration?.enableTaskExecutionDryRunOnChange
+      ) {
+        this.debouncedRunGenerator(true);
+      }
+    });
   }
 
   private async handleOptionChange(details: OptionChangedDetails) {
@@ -127,6 +139,7 @@ export class FormValuesService {
       payload: {
         positional: getGeneratorIdentifier(this.icc.generatorSchema),
         flags: args,
+        cwd: this.cwdValue?.toString(),
       },
     });
   }
