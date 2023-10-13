@@ -3,6 +3,7 @@ import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { extractItemOptions } from '../utils/generator-schema-utils';
 import { EditorContext } from '../contexts/editor-context';
+import { GeneratorContextContext } from '../contexts/generator-context-context';
 
 type OptionWithMetadata = {
   option: Option;
@@ -11,7 +12,9 @@ type OptionWithMetadata = {
 };
 
 @customElement('field-list')
-export class FieldList extends EditorContext(LitElement) {
+export class FieldList extends GeneratorContextContext(
+  EditorContext(LitElement)
+) {
   @property()
   options: Option[];
 
@@ -50,7 +53,9 @@ export class FieldList extends EditorContext(LitElement) {
             ? 'md:ml-52 md:p-6'
             : 'sm:ml-52 sm:p-6 md:ml-64'} w-full pt-6"
         >
-          <cwd-input-element></cwd-input-element>
+          ${(this.generatorContext?.nxVersion?.major ?? 0) >= 17
+            ? html` <cwd-input-element></cwd-input-element> `
+            : ``}
           ${this.renderOptionsWithDivider(
             optionsWithMetadata,
             shouldShowMoreOptions,

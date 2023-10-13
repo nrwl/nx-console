@@ -347,7 +347,7 @@ connection.onRequest(
 
 connection.onRequest(
   NxGeneratorContextV2Request,
-  async (args: { path: string }) => {
+  async (args: { path: string | undefined }) => {
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
