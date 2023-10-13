@@ -9,6 +9,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.lang.javascript.JavaScriptBundle
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -36,7 +37,6 @@ import dev.nx.console.utils.nxWorkspace
 import java.awt.event.MouseEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 
 class NxTreeStructure(
@@ -64,8 +64,14 @@ class NxTreeStructure(
         CoroutineScope(Dispatchers.Default).launch {
             nxTreeBuilder = getTreeBuilder(nxWorkspace)
             root = nxTreeBuilder.buildRootNode()
-            treeModel.invalidateAsync().await()
-            TreeUtil.promiseExpand(tree, treePersistenceManager.NxProjectsTreePersistenceVisitor())
+            ApplicationManager.getApplication().invokeLater {
+                treeModel.invalidateAsync().thenRun {
+                    TreeUtil.promiseExpand(
+                        tree,
+                        treePersistenceManager.NxProjectsTreePersistenceVisitor()
+                    )
+                }
+            }
         }
     }
 
