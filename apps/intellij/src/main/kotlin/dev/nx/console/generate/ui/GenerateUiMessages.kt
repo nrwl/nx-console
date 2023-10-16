@@ -17,7 +17,11 @@ data class GenerateUiFormInitOutputMessage(override val payloadType: String) :
     GenerateUiOutputMessage {}
 
 @Serializable()
-data class GenerateUiRunGeneratorPayload(val positional: String, val flags: List<String>) {}
+data class GenerateUiRunGeneratorPayload(
+    val positional: String,
+    val flags: List<String>,
+    val cwd: String? = null
+) {}
 
 @Serializable()
 @SerialName("run-generator")

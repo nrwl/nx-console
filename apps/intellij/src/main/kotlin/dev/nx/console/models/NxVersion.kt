@@ -1,3 +1,5 @@
 package dev.nx.console.models
 
-data class NxVersion(val minor: Number, val major: Number, val full: String) {}
+import kotlinx.serialization.Serializable
+
+@Serializable() data class NxVersion(val minor: Int, val major: Int, val full: String) {}

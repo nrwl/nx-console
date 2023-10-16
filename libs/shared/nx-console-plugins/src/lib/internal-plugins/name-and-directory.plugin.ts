@@ -22,6 +22,8 @@ export const nameAndDirectoryProcessor: SchemaProcessor = (
         return {
           ...option,
           'x-priority': 'important',
+          'x-hint':
+            'You can provide a nested name instead of setting the directory option, e.g. my-dir/my-component',
         };
       }
       if (option.name === 'directory') {

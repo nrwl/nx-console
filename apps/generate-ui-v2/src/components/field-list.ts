@@ -53,9 +53,6 @@ export class FieldList extends GeneratorContextContext(
             ? 'md:ml-52 md:p-6'
             : 'sm:ml-52 sm:p-6 md:ml-64'} w-full pt-6"
         >
-          ${(this.generatorContext?.nxVersion?.major ?? 0) >= 17
-            ? html` <cwd-input-element></cwd-input-element> `
-            : ``}
           ${this.renderOptionsWithDivider(
             optionsWithMetadata,
             shouldShowMoreOptions,
@@ -101,7 +98,7 @@ export class FieldList extends GeneratorContextContext(
     ) => {
       const componentTag = getFieldComponent(optionWithMetadata.option);
       return html` <div
-        class=" ${hidden ? 'hidden' : ''} mb-4"
+        class="${hidden ? 'hidden' : ''} mb-4"
         id="option-${optionWithMetadata.option.name}"
       >
         ${componentTag}
@@ -130,6 +127,12 @@ export class FieldList extends GeneratorContextContext(
         class="${shouldHideShowMoreButton ? 'hidden' : ''}"
       ></show-more-divider>
       ${otherOptions.map((opt) => renderOption(opt, !shouldShowMoreOptions))}
+      <cwd-input-element
+        class="${(this.generatorContext?.nxVersion?.major ?? 0) >= 17 &&
+        shouldShowMoreOptions
+          ? ''
+          : 'hidden'}"
+      ></cwd-input-element>
     `;
   }
 

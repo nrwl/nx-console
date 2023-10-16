@@ -49,7 +49,7 @@ export class FormValuesService {
       }
     );
     window.addEventListener('cwd-changed', (e: CustomEventInit<string>) => {
-      if (!e.detail) return;
+      if (e.detail === undefined) return;
       const firstChange = this.cwdValue === undefined;
       this.cwdValue = e.detail;
       if (

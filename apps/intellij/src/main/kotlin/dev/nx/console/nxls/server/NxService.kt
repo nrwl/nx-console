@@ -34,7 +34,7 @@ interface NxService {
     }
 
     @JsonRequest
-    fun generatorContextFromPath(
+    fun generatorContextV2(
         generatorContextFromPathRequest: NxGetGeneratorContextFromPathRequest
     ): CompletableFuture<NxGeneratorContext> {
         throw UnsupportedOperationException()

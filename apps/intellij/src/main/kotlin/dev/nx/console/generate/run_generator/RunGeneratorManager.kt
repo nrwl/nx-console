@@ -26,10 +26,7 @@ class RunGeneratorManager(val project: Project) {
     private var queuedGeneratorDefinition: List<String>? = null
     private var runningProcessHandler: KillableColoredProcessHandler? = null
 
-    fun queueGeneratorToBeRun(
-        generator: String,
-        flags: List<String>,
-    ) {
+    fun queueGeneratorToBeRun(generator: String, flags: List<String>, cwd: String? = null) {
         var generatorDefinition: List<String>
         if (generator.matches(Regex("^workspace-(schematic|generator):(.+)"))) {
             generatorDefinition =
@@ -44,7 +41,7 @@ class RunGeneratorManager(val project: Project) {
 
         runningProcessHandler.let {
             if (it == null) {
-                runGenerator(generatorDefinition)
+                runGenerator(generatorDefinition, cwd)
                 return
             }
             if (it.commandLine.isDryRun()) {
@@ -54,7 +51,9 @@ class RunGeneratorManager(val project: Project) {
             it.addProcessListener(
                 object : ProcessListener {
                     override fun processTerminated(event: ProcessEvent) {
-                        queuedGeneratorDefinition?.let { definition -> runGenerator(definition) }
+                        queuedGeneratorDefinition?.let { definition ->
+                            runGenerator(definition, cwd)
+                        }
                         queuedGeneratorDefinition = null
                     }
                 }
@@ -62,12 +61,12 @@ class RunGeneratorManager(val project: Project) {
         }
     }
 
-    private fun runGenerator(definition: List<String>) {
+    private fun runGenerator(definition: List<String>, cwd: String?) {
         try {
             ApplicationManager.getApplication()
                 .invokeLater(
                     {
-                        val commandLine = NxGeneralCommandLine(project, definition)
+                        val commandLine = NxGeneralCommandLine(project, definition, cwd = cwd)
 
                         val processHandler = KillableColoredProcessHandler(commandLine)
                         val console =
