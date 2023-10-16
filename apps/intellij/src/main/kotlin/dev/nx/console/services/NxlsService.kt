@@ -10,10 +10,7 @@ import dev.nx.console.models.*
 import dev.nx.console.nxls.NxlsWrapper
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.server.*
-import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequest
-import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
-import dev.nx.console.nxls.server.requests.NxGetGeneratorContextFromPathRequest
-import dev.nx.console.nxls.server.requests.NxProjectsByPathsRequest
+import dev.nx.console.nxls.server.requests.*
 import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.nxlsWorkingPath
 import kotlinx.coroutines.CoroutineScope
@@ -110,12 +107,14 @@ class NxlsService(val project: Project) {
         return withMessageIssueCatch { server()?.getNxService()?.projectGraphOutput()?.await() }()
     }
 
-    suspend fun createProjectGraph(): CreateProjectGraphError? {
+    suspend fun createProjectGraph(showAffected: Boolean = false): CreateProjectGraphError? {
         return withMessageIssueCatch {
             try {
-                server()?.getNxService()?.createProjectGraph()?.await()?.let {
-                    CreateProjectGraphError(1000, it)
-                }
+                server()
+                    ?.getNxService()
+                    ?.createProjectGraph(NxCreateProjectGraphRequest(showAffected))
+                    ?.await()
+                    ?.let { CreateProjectGraphError(1000, it) }
             } catch (e: ResponseErrorException) {
                 CreateProjectGraphError(e.responseError.code, e.responseError.message)
             }
