@@ -65,7 +65,7 @@ export const nameAndDirectoryStartupMessage: StartupMessageFactory = (
 
   return {
     message:
-      'Starting with Nx 17, Nx Console will generate artifacts with the exact name and directory provided. Check the output files to make sure that they were created in the correct location. You can revert to the old behavior by updating nameAndDirectoryFormat',
+      'Starting with Nx 17, Nx Console will generate artifacts with the exact name and directory provided. Check the output files to make sure that they were created in the correct location. You can revert to the old behavior by updating the nameAndDirectoryFormat option below.',
     type: 'warning',
   };
 };
