@@ -1,6 +1,12 @@
-import { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type {
+  ProjectConfiguration,
+  TargetConfiguration,
+} from 'nx/src/devkit-exports';
 import { NxWorkspaceRequest } from '@nx-console/language-server/types';
-import { NxWorkspace } from '@nx-console/shared/types';
+import {
+  NxWorkspace,
+  NxWorkspaceConfiguration,
+} from '@nx-console/shared/types';
 import { sendRequest } from '@nx-console/vscode/lsp-client';
 import { parse } from 'dotenv';
 import { join } from 'path';
@@ -25,11 +31,26 @@ export async function getNxWorkspacePath(): Promise<string> {
   return workspacePath;
 }
 
-export async function getNxCloudRunnerOptions(): Promise<
-  { accessToken: string; url?: string } | undefined
-> {
-  const nxWorkspace = await getNxWorkspace();
-  const workspaceConfig = nxWorkspace.workspace;
+export async function getNxCloudRunnerOptions(
+  reset?: boolean
+): Promise<{ accessToken: string; url?: string } | undefined> {
+  const nxWorkspace = await getNxWorkspace(reset);
+  // TODO: remove type cast after update
+  const workspaceConfig = nxWorkspace.workspace as NxWorkspaceConfiguration & {
+    nxCloudAccessToken?: string;
+    nxCloudUrl?: string;
+  };
+
+  // check if nx-cloud.env exists and use that access token if it does
+  const env = getNxCloudEnv(nxWorkspace.workspacePath);
+  const envAccessToken = env.NX_CLOUD_AUTH_TOKEN || env.NX_CLOUD_ACCESS_TOKEN;
+
+  if (workspaceConfig.nxCloudAccessToken) {
+    return {
+      accessToken: envAccessToken || workspaceConfig.nxCloudAccessToken,
+      url: workspaceConfig.nxCloudUrl,
+    };
+  }
 
   if (!workspaceConfig.tasksRunnerOptions) {
     return;
@@ -42,15 +63,10 @@ export async function getNxCloudRunnerOptions(): Promise<
     return undefined;
   }
 
-  // check if nx-cloud.env exists and use that access token if it does
-  const env = getNxCloudEnv(nxWorkspace.workspacePath);
-  const accessToken = env.NX_CLOUD_AUTH_TOKEN || env.NX_CLOUD_ACCESS_TOKEN;
-
-  if (!accessToken) {
-    return nxCloudTaskRunner.options;
-  }
-
-  return { ...nxCloudTaskRunner.options, accessToken };
+  return {
+    accessToken: envAccessToken || nxCloudTaskRunner.options.accessToken,
+    url: nxCloudTaskRunner.options.url,
+  };
 }
 
 function getNxCloudEnv(workspacePath: string): any {
@@ -60,4 +76,29 @@ function getNxCloudEnv(workspacePath: string): any {
   } catch (e) {
     return {};
   }
+}
+
+export async function getCacheableOperations(): Promise<string[]> {
+  const { workspace } = await getNxWorkspace();
+  const cacheableOperations = new Set<string>();
+  for (const key in workspace.projects) {
+    if (!workspace.projects.hasOwnProperty(key)) {
+      continue;
+    }
+    const targets = workspace.projects[key].targets;
+    for (const targetKey in targets) {
+      if (!targets?.hasOwnProperty(targetKey)) {
+        continue;
+      }
+      // TODO: remove type cast after update
+      const target = targets?.[targetKey] as TargetConfiguration & {
+        cache?: boolean;
+      };
+
+      if (target?.cache) {
+        cacheableOperations.add(targetKey);
+      }
+    }
+  }
+  return [...cacheableOperations];
 }
