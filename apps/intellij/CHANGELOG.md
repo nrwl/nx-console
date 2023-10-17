@@ -1,3 +1,20 @@
+## 1.14.0 (2023-10-17)
+
+### Bug Fixes
+
+* **intellij:** allow multiple open generate ui windows ([#1879](https://github.com/nrwl/nx-console/issues/1879)) ([ae88ddd](https://github.com/nrwl/nx-console/commit/ae88ddd09c68890ef8f5c9d77701fe060f457f94))
+* **intellij:** make sure affected feature doesnt break intellij graph ([#1905](https://github.com/nrwl/nx-console/issues/1905)) ([f55cd09](https://github.com/nrwl/nx-console/commit/f55cd09bddc937f59afc5766105a96a76bb81cdf))
+* **intellij:** reload tree model on main thread ([#1885](https://github.com/nrwl/nx-console/issues/1885)) ([accb2d0](https://github.com/nrwl/nx-console/commit/accb2d0e10159800b0c1498c25c7d69002a74633))
+* **intellij:** scan for nx workspace before starting nxls ([#1899](https://github.com/nrwl/nx-console/issues/1899)) ([c2b76df](https://github.com/nrwl/nx-console/commit/c2b76df6c81b15f3e90223a1ac2ef2e6288c353a))
+* normalize windows path ([#1907](https://github.com/nrwl/nx-console/issues/1907)) ([7d3d959](https://github.com/nrwl/nx-console/commit/7d3d95907ed9f27db6a329edf69137e43cfd91d5))
+
+
+### Features
+
+* **generate-ui:** add cwd handling & prefilling ([#1904](https://github.com/nrwl/nx-console/issues/1904)) ([3fcf304](https://github.com/nrwl/nx-console/commit/3fcf304e862ffafcbcf22ee882d3ff2ebef44394))
+* **nxls:** don't process targets with hidden property ([#1897](https://github.com/nrwl/nx-console/issues/1897)) ([e55e3a8](https://github.com/nrwl/nx-console/commit/e55e3a8231eb51858e26eea7c1057b03159592d6))
+* **vscode:** add show affected graph action & fix graph zooming ([#1883](https://github.com/nrwl/nx-console/issues/1883)) ([86f06b3](https://github.com/nrwl/nx-console/commit/86f06b3cb6a36eea22403ca516b43d76195752f8))
+
 ## <small>1.13.2 (2023-09-12)</small>
 
 ### Bug Fixes
