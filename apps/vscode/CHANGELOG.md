@@ -1,3 +1,17 @@
+# [18.9.0](https://github.com/nrwl/nx-console/compare/vscode-v18.8.1...vscode-v18.9.0) (2023-10-17)
+
+
+### Bug Fixes
+
+* normalize windows path ([#1907](https://github.com/nrwl/nx-console/issues/1907)) ([7d3d959](https://github.com/nrwl/nx-console/commit/7d3d95907ed9f27db6a329edf69137e43cfd91d5))
+
+
+### Features
+
+* **generate-ui:** add cwd handling & prefilling ([#1904](https://github.com/nrwl/nx-console/issues/1904)) ([3fcf304](https://github.com/nrwl/nx-console/commit/3fcf304e862ffafcbcf22ee882d3ff2ebef44394))
+* **nxls:** don't process targets with hidden property ([#1897](https://github.com/nrwl/nx-console/issues/1897)) ([e55e3a8](https://github.com/nrwl/nx-console/commit/e55e3a8231eb51858e26eea7c1057b03159592d6))
+* **vscode:** add show affected graph action & fix graph zooming ([#1883](https://github.com/nrwl/nx-console/issues/1883)) ([86f06b3](https://github.com/nrwl/nx-console/commit/86f06b3cb6a36eea22403ca516b43d76195752f8))
+
 ## [18.8.1](https://github.com/nrwl/nx-console/compare/vscode-v18.8.0...vscode-v18.8.1) (2023-09-12)
 
 
