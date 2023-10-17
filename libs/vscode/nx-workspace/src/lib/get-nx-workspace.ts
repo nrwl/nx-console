@@ -82,16 +82,10 @@ export async function getCacheableOperations(): Promise<string[]> {
   const { workspace } = await getNxWorkspace();
   const cacheableOperations = new Set<string>();
   for (const key in workspace.projects) {
-    if (!workspace.projects.hasOwnProperty(key)) {
-      continue;
-    }
     const targets = workspace.projects[key].targets;
     for (const targetKey in targets) {
-      if (!targets?.hasOwnProperty(targetKey)) {
-        continue;
-      }
       // TODO: remove type cast after update
-      const target = targets?.[targetKey] as TargetConfiguration & {
+      const target = targets[targetKey] as TargetConfiguration & {
         cache?: boolean;
       };
 
