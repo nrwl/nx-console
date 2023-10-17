@@ -107,6 +107,20 @@ export async function getNxWorkspaceConfig(
       projectFileMap
     );
 
+    for (const project in workspaceConfiguration.projects) {
+      for (const target in workspaceConfiguration.projects[project].targets) {
+        // TODO: remove cast once hidden is available on TargetConfiguration
+        if (
+          (
+            workspaceConfiguration.projects[project].targets?.[
+              target
+            ] as unknown as any
+          ).hidden
+        ) {
+          delete workspaceConfiguration.projects[project].targets?.[target];
+        }
+      }
+    }
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
 

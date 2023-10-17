@@ -29,9 +29,7 @@ export async function openGenerateUi(
     return;
   }
 
-  let generatorContext = contextUri
-    ? await getGeneratorContextV2(contextUri.fsPath)
-    : {};
+  let generatorContext = await getGeneratorContextV2(contextUri?.fsPath);
 
   if (projectName) {
     generatorContext = {

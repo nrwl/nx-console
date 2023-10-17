@@ -3,6 +3,7 @@ import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { extractItemOptions } from '../utils/generator-schema-utils';
 import { EditorContext } from '../contexts/editor-context';
+import { GeneratorContextContext } from '../contexts/generator-context-context';
 
 type OptionWithMetadata = {
   option: Option;
@@ -11,7 +12,9 @@ type OptionWithMetadata = {
 };
 
 @customElement('field-list')
-export class FieldList extends EditorContext(LitElement) {
+export class FieldList extends GeneratorContextContext(
+  EditorContext(LitElement)
+) {
   @property()
   options: Option[];
 
@@ -95,7 +98,7 @@ export class FieldList extends EditorContext(LitElement) {
     ) => {
       const componentTag = getFieldComponent(optionWithMetadata.option);
       return html` <div
-        class=" ${hidden ? 'hidden' : ''} mb-4"
+        class="${hidden ? 'hidden' : ''} mb-4"
         id="option-${optionWithMetadata.option.name}"
       >
         ${componentTag}
@@ -124,6 +127,12 @@ export class FieldList extends EditorContext(LitElement) {
         class="${shouldHideShowMoreButton ? 'hidden' : ''}"
       ></show-more-divider>
       ${otherOptions.map((opt) => renderOption(opt, !shouldShowMoreOptions))}
+      <cwd-input-element
+        class="${(this.generatorContext?.nxVersion?.major ?? 0) >= 17 &&
+        shouldShowMoreOptions
+          ? ''
+          : 'hidden'}"
+      ></cwd-input-element>
     `;
   }
 

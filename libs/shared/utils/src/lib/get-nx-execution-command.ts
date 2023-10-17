@@ -22,7 +22,11 @@ export function getNxExecutionCommand(config: {
   } else {
     const packageManager = detectPackageManager(config.cwd);
     const packageManagerCommand = getPackageManagerCommand(packageManager);
-    command = `${packageManagerCommand.exec} ${command}`;
+    if (packageManager === 'yarn') {
+      command = `${packageManagerCommand.exec} --silent ${command}`;
+    } else {
+      command = `${packageManagerCommand.exec} ${command}`;
+    }
   }
 
   return command;

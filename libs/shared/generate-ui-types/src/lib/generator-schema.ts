@@ -1,4 +1,5 @@
 import { Option } from '@nx-console/shared/schema';
+import { NxVersion } from '@nx-console/shared/types';
 
 export type GeneratorSchema = {
   collectionName: string;
@@ -13,4 +14,5 @@ export type GeneratorContext = {
   directory?: string;
   prefillValues?: Record<string, string>;
   fixedFormValues?: Record<string, string>;
+  nxVersion?: NxVersion;
 };

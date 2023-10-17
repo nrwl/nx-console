@@ -7,6 +7,7 @@ import { nxWorkspace } from './workspace';
 
 export async function createProjectGraph(
   workspacePath: string,
+  showAffected: boolean,
   logger: Logger = {
     log(message) {
       console.log(message);
@@ -19,7 +20,9 @@ export async function createProjectGraph(
   return new Promise<string | undefined>((res, rej) => {
     const command = getNxExecutionCommand({
       cwd: workspacePath,
-      displayCommand: 'nx dep-graph --file ' + projectGraphOutput.relativePath,
+      displayCommand:
+        `nx graph ${showAffected ? '--affected' : ''} --file ` +
+        projectGraphOutput.relativePath,
       encapsulatedNx: isEncapsulatedNx,
     });
 

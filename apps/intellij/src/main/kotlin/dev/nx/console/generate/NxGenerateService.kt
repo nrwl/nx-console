@@ -143,23 +143,20 @@ class NxGenerateService(val project: Project) {
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
 
         val generatorContext =
-            contextPath?.let {
-                project
-                    .service<NxlsService>()
-                    .generatorContextFromPath(generatorWithOptions, nxlsWorkingPath(contextPath))
-            }
+            project
+                .service<NxlsService>()
+                .generatorContextFromPath(
+                    generatorWithOptions,
+                    contextPath?.let { nxlsWorkingPath(contextPath) }
+                )
 
         ApplicationManager.getApplication().invokeLater {
             val virtualFile =
-            // will exchange with feature toggle in the future
-            if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
+                if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
                     V2NxGenerateUiFile("Generate", project)
                 else DefaultNxGenerateUiFile("Generate", project)
 
             val fileEditorManager = FileEditorManager.getInstance(project)
-            if (fileEditorManager.isFileOpen(virtualFile)) {
-                fileEditorManager.closeFile(virtualFile)
-            }
 
             fileEditorManager.openFile(virtualFile, true)
 

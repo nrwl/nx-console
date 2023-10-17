@@ -5,24 +5,30 @@ import { getProjectByPath } from './get-project-by-path';
 import { nxWorkspace } from './workspace';
 
 export async function getGeneratorContextV2(
-  path: string,
+  path: string | undefined,
   workspacePath: string
 ): Promise<GeneratorContext> {
-  const normalizedPath = normalize(path);
-  const project = await getProjectByPath(normalizedPath, workspacePath);
+  let projectName: string | undefined = undefined;
+  let directory: string | undefined = undefined;
 
-  const projectName = (project && project.name) || undefined;
+  const { workspaceLayout, nxVersion } = await nxWorkspace(workspacePath);
+  if (path) {
+    const normalizedPath = normalize(path);
+    const project = await getProjectByPath(normalizedPath, workspacePath);
 
-  const { workspaceLayout } = await nxWorkspace(workspacePath);
-  const directory = getNormalizedDirectory(
-    normalizedPath,
-    workspaceLayout,
-    workspacePath
-  );
+    projectName = (project && project.name) || undefined;
+
+    directory = getNormalizedDirectory(
+      normalizedPath,
+      workspaceLayout,
+      workspacePath
+    );
+  }
 
   return {
     project: projectName,
     directory,
+    nxVersion,
   };
 }
 

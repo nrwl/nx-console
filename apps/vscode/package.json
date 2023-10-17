@@ -456,6 +456,12 @@
       },
       {
         "category": "Nx",
+        "title": "Show affected project graph",
+        "command": "nx.graph.showAffected",
+        "icon": "$(source-control)"
+      },
+      {
+        "category": "Nx",
         "title": "run-many",
         "command": "nx.run-many"
       },

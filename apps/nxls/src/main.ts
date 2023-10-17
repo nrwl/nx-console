@@ -10,6 +10,7 @@ import {
   NxGeneratorOptionsRequestOptions,
   NxGeneratorsRequest,
   NxGeneratorsRequestOptions,
+  NxHasAffectedProjectsRequest,
   NxProjectByPathRequest,
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
@@ -45,6 +46,7 @@ import {
   getProjectsByPaths,
   getTransformedGeneratorSchema,
   getStartupMessage,
+  hasAffectedProjects,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import {
@@ -345,7 +347,7 @@ connection.onRequest(
 
 connection.onRequest(
   NxGeneratorContextV2Request,
-  async (args: { path: string }) => {
+  async (args: { path: string | undefined }) => {
     if (!WORKING_PATH) {
       return new ResponseError(
         1000,
@@ -370,12 +372,12 @@ connection.onRequest(NxProjectGraphOutputRequest, async () => {
   return getProjectGraphOutput(WORKING_PATH);
 });
 
-connection.onRequest(NxCreateProjectGraphRequest, async () => {
+connection.onRequest(NxCreateProjectGraphRequest, async ({ showAffected }) => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   try {
-    await createProjectGraph(WORKING_PATH, lspLogger);
+    await createProjectGraph(WORKING_PATH, showAffected, lspLogger);
   } catch (e) {
     return e;
   }
@@ -413,6 +415,13 @@ connection.onRequest(
     return getStartupMessage(WORKING_PATH, schema);
   }
 );
+
+connection.onRequest(NxHasAffectedProjectsRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return hasAffectedProjects(WORKING_PATH, lspLogger);
+});
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {

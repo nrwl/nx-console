@@ -2,6 +2,7 @@ import {
   getNxWorkspacePath,
   getNxWorkspaceProjects,
   getProjectGraphOutput,
+  hasAffectedProjects,
 } from '@nx-console/vscode/nx-workspace';
 import { getOutputChannel, getTelemetry } from '@nx-console/vscode/utils';
 import {
@@ -184,6 +185,31 @@ export class GraphWebView implements Disposable {
       data: {
         type: MessageType.allTasks,
         taskName,
+        projectName: '',
+      },
+    });
+  }
+
+  async showAffectedProjects() {
+    getOutputChannel().appendLine(`Graph - Opening affected projects`);
+    const hasAffected = await hasAffectedProjects();
+
+    if (!hasAffected) {
+      window.showWarningMessage(
+        'No projects are affected by the current changes.'
+      );
+      return;
+    }
+
+    if (!this.panel) {
+      await this._webview();
+    }
+
+    this.panel?.reveal();
+
+    graphService.send('PROJECT_SELECTED', {
+      data: {
+        type: MessageType.affectedProjects,
         projectName: '',
       },
     });

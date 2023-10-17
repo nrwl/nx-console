@@ -18,7 +18,8 @@
           "build-webview-files",
           "extract-dependencies"
         ],
-        "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU="
+        "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
+        "useLightClient": true
       }
     }
   },
