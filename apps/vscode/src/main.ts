@@ -216,6 +216,10 @@ async function setWorkspace(workspacePath: string) {
     workspacePath = dirname(workspacePath);
   }
 
+  if (process.platform == 'win32') {
+    workspacePath = workspacePath.replace(/\//g, '\\');
+  }
+
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
   configureLspClient(context, REFRESH_WORKSPACE);
