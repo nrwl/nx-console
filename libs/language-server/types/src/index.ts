@@ -80,7 +80,7 @@ export const NxGeneratorContextFromPathRequest: RequestType<
 
 export const NxGeneratorContextV2Request: RequestType<
   {
-    path: string;
+    path: string | undefined;
   },
   GeneratorContext,
   unknown

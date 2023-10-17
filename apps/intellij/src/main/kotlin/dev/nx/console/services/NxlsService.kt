@@ -87,11 +87,11 @@ class NxlsService(val project: Project) {
 
     suspend fun generatorContextFromPath(
         generator: NxGenerator? = null,
-        path: String
+        path: String?
     ): NxGeneratorContext? {
         return withMessageIssueCatch {
-            val request = NxGetGeneratorContextFromPathRequest(generator, path)
-            server()?.getNxService()?.generatorContextFromPath(request)?.await()
+            val request = NxGetGeneratorContextFromPathRequest(path)
+            server()?.getNxService()?.generatorContextV2(request)?.await()
         }()
     }
 

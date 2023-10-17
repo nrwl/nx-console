@@ -90,6 +90,7 @@ export class CliTaskProvider implements TaskProvider {
         command: `workspace-${positionals[1]}`,
         positional: positionals[2],
         flags: definition.flags,
+        cwd: definition.cwd,
       });
     } else {
       task = await CliTask.create(definition);

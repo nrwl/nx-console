@@ -102,7 +102,8 @@ class V2NxGenerateUiFile(name: String, private val project: Project) :
             if (messageParsed is GenerateUiRunGeneratorOutputMessage) {
                 runGeneratorManager.queueGeneratorToBeRun(
                     messageParsed.payload.positional,
-                    messageParsed.payload.flags
+                    messageParsed.payload.flags,
+                    messageParsed.payload.cwd
                 )
             }
         }

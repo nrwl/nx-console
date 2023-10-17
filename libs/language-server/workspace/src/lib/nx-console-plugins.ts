@@ -38,7 +38,10 @@ export async function getStartupMessage(
     undefined;
   try {
     for (const factory of plugins?.startupMessageFactories ?? []) {
-      startupMessageDefinition = await factory(schema, workspace, lspLogger);
+      const def = await factory(schema, workspace, lspLogger);
+      if (def) {
+        startupMessageDefinition = def;
+      }
     }
 
     return startupMessageDefinition;

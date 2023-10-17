@@ -143,11 +143,12 @@ class NxGenerateService(val project: Project) {
         val generatorWithOptions = NxGenerator(generator, generatorOptions)
 
         val generatorContext =
-            contextPath?.let {
-                project
-                    .service<NxlsService>()
-                    .generatorContextFromPath(generatorWithOptions, nxlsWorkingPath(contextPath))
-            }
+            project
+                .service<NxlsService>()
+                .generatorContextFromPath(
+                    generatorWithOptions,
+                    contextPath?.let { nxlsWorkingPath(contextPath) }
+                )
 
         ApplicationManager.getApplication().invokeLater {
             val virtualFile =

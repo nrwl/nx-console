@@ -43,6 +43,8 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
         return {
           ...option,
           'x-priority': 'important',
+          'x-hint':
+            'You can provide a nested name instead of setting the directory option, e.g. my-dir/my-app',
         };
       }
       if (option.name === 'directory') {
@@ -64,9 +66,10 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
   };
 };
 
-export const pluginNameAndRootStartupMessage: StartupMessageFactory = (
+export const projectNameAndRootStartupMessage: StartupMessageFactory = (
   schema: GeneratorSchema,
-  workspace: NxWorkspace
+  workspace: NxWorkspace,
+  lspLogger: Logger
 ) => {
   if (
     !schema?.options?.find(
@@ -75,8 +78,6 @@ export const pluginNameAndRootStartupMessage: StartupMessageFactory = (
   ) {
     return undefined;
   }
-  // if they have explicitly set the option, we don't need to educate users about the change
-
   // TODO: remove any after update
   if ((workspace.workspace.workspaceLayout as any)?.projectNameAndRootFormat) {
     return undefined;
