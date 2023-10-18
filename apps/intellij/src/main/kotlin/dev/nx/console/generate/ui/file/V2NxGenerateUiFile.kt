@@ -22,8 +22,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class V2NxGenerateUiFile(name: String, private val runGeneratorManager: RunGeneratorManager) :
-    NxGenerateUiFile(name) {
+class V2NxGenerateUiFile(
+    name: String,
+    private val project: Project,
+    private val runGeneratorManager: RunGeneratorManager
+) : NxGenerateUiFile(name, true) {
 
     private var generatorToDisplay: GeneratorSchema? = null
 

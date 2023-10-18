@@ -15,7 +15,7 @@ class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
     ) {
         val virtualFile =
             if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
-                V2NxGenerateUiFile("Generate", runGeneratorManager)
+                V2NxGenerateUiFile("Generate", project, runGeneratorManager)
             else DefaultNxGenerateUiFile("Generate", runGeneratorManager)
 
         val fileEditorManager = FileEditorManager.getInstance(project)
