@@ -2,6 +2,7 @@ package dev.nx.console.generate.ui.file
 
 import com.intellij.diff.util.FileEditorBase
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.getPreferredFocusedComponent
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.JComponent
 
@@ -25,6 +26,6 @@ class NxGenerateUiFileEditor(
     }
 
     override fun getPreferredFocusedComponent(): JComponent? {
-        return null
+        return mainComponent.getPreferredFocusedComponent()
     }
 }
