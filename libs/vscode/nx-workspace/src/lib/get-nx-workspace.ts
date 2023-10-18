@@ -80,6 +80,11 @@ function getNxCloudEnv(workspacePath: string): any {
 
 export async function getCacheableOperations(): Promise<string[]> {
   const { workspace } = await getNxWorkspace();
+
+  if (workspace.tasksRunnerOptions?.default?.options.cacheableOperations) {
+    return workspace.tasksRunnerOptions.default.options.cacheableOperations;
+  }
+
   const cacheableOperations = new Set<string>();
   for (const key in workspace.projects) {
     const targets = workspace.projects[key].targets;

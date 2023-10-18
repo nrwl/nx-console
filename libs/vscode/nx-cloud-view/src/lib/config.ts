@@ -15,7 +15,7 @@ export const stagingConfig = {
     domain: 'https://auth.staging.nx.app/login',
   },
   endpoint: 'https://staging.nx.app/api',
-  appUrl: 'http://staging.nx.app',
+  appUrl: 'https://staging.nx.app',
 };
 
 export const prodConfig = {

@@ -10,7 +10,7 @@ import {
   getWorkspacePath,
   watchFile,
 } from '@nx-console/vscode/utils';
-import { exec, spawn } from 'child_process';
+import { exec, execSync, spawn } from 'child_process';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -264,7 +264,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
                 'nx',
                 // https://github.com/nrwl/nx/pull/12942
                 ...(gte(coerce(nxVersion.full) ?? '', '15.0.7')
-                  ? ['connect', '--interactive', 'false']
+                  ? ['connect']
                   : ['connect-to-nx-cloud']),
               ],
               { cwd: getWorkspacePath(), env, shell: true }
