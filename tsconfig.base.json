@@ -113,7 +113,8 @@
       "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"],
       "shared/nx-console-plugins": [
         "libs/shared/nx-console-plugins/src/index.ts"
-      ]
+      ],
+      "@nx-console/vscode/nvm-tip": ["libs/vscode/nvm-tip/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
