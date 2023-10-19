@@ -422,6 +422,20 @@ export class NxCloudService extends StateBaseService<InternalState> {
       );
       return;
     }
+    if (!this.state.canAccessCloudWorkspace) {
+      window
+        .showErrorMessage(
+          "You don't have access to this workspace. Log in to Nx Cloud in order to set up VCS integration.",
+          'Login',
+          'Cancel'
+        )
+        .then((value) => {
+          if (value === 'Login') {
+            commands.executeCommand('nxConsole.loginToNxCloud');
+          }
+        });
+      return;
+    }
     const orgId = this.state.cloudWorkspaceOrgId;
     const workspaceId = this.state.cloudWorkspaceId;
     const baseUrl = await this.getCloudRunnerUrl();
