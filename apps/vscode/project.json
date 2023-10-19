@@ -172,7 +172,16 @@
           "minify": false
         }
       },
-      "dependsOn": ["^build", "^build-webview-files", "extract-dependencies"],
+      "dependsOn": [
+        "^build",
+        "^build-webview-files",
+        "extract-dependencies",
+        {
+          "projects": "nxls",
+          "target": "build",
+          "params": "forward"
+        }
+      ],
       "outputs": ["{options.outputPath}"]
     },
     "extract-dependencies": {
