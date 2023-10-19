@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui
+package dev.nx.console.generate.ui.file
 
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.run_generator.RunGeneratorManager
+import dev.nx.console.generate.ui.*
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
@@ -21,11 +22,13 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-class V2NxGenerateUiFile(name: String, private val project: Project) :
-    NxGenerateUiFile(name, true) {
+class V2NxGenerateUiFile(
+    name: String,
+    private val project: Project,
+    private val runGeneratorManager: RunGeneratorManager
+) : NxGenerateUiFile(name, true) {
 
     private var generatorToDisplay: GeneratorSchema? = null
-    private val runGeneratorManager: RunGeneratorManager = RunGeneratorManager(project)
 
     override fun createMainComponent(project: Project): JComponent {
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)

@@ -42,7 +42,7 @@
 
     <!-- Generate -->
     <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
-    <fileEditorProvider implementation="dev.nx.console.generate.ui.NxGenerateUiFileEditorProvider"/>
+    <fileEditorProvider implementation="dev.nx.console.generate.ui.file.NxGenerateUiFileEditorProvider"/>
 
     <!-- Graph -->
     <projectService serviceImplementation="dev.nx.console.graph.NxGraphService"/>
@@ -77,7 +77,6 @@
 
     <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
   </extensions>
-
   <applicationListeners>
     <listener class="dev.nx.console.listeners.ProjectManagerListener"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
@@ -159,4 +158,8 @@
     </action>
 
   </actions>
+  <extensionPoints>
+    <extensionPoint interface="dev.nx.console.generate.ui.NxGenerateUiRenderer"
+                    name="nxGenerateUiRenderer"/>
+  </extensionPoints>
 </idea-plugin>

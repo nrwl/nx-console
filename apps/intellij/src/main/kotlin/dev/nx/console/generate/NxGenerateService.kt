@@ -3,19 +3,18 @@ package dev.nx.console.generate
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.util.ui.JBUI
-import dev.nx.console.generate.ui.DefaultNxGenerateUiFile
+import dev.nx.console.generate.run_generator.RunGeneratorManager
+import dev.nx.console.generate.ui.NxGenerateUiRenderer
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
-import dev.nx.console.generate.ui.V2NxGenerateUiFile
+import dev.nx.console.generate.ui.file.NxGenerateUiFileRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
-import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.utils.nxlsWorkingPath
 import java.awt.Dimension
@@ -151,17 +150,12 @@ class NxGenerateService(val project: Project) {
                 )
 
         ApplicationManager.getApplication().invokeLater {
-            val virtualFile =
-                if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
-                    V2NxGenerateUiFile("Generate", project)
-                else DefaultNxGenerateUiFile("Generate", project)
-
-            val fileEditorManager = FileEditorManager.getInstance(project)
-
-            fileEditorManager.openFile(virtualFile, true)
-
-            virtualFile.setupGeneratorForm(
-                NxGenerator(generator = generatorWithOptions, contextValues = generatorContext)
+            val renderers = NxGenerateUiRenderer.EP_NAME.extensionList
+            val renderer = renderers.firstOrNull() ?: NxGenerateUiFileRenderer()
+            renderer.openGenerateUi(
+                project,
+                NxGenerator(generator = generatorWithOptions, contextValues = generatorContext),
+                RunGeneratorManager(project)
             )
         }
     }

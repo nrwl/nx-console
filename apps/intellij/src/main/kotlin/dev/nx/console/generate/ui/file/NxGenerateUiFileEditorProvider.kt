@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui
+package dev.nx.console.generate.ui.file
 
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorPolicy
