@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { ConfigurationTarget, ExtensionContext, window } from 'vscode';
 
-export async function initNvmTip(context: ExtensionContext) {
+export async function initNvmTip(_: ExtensionContext) {
   const showTip = GlobalConfigurationStore.instance.get(
     'showNodeVersionOnStartup'
   );
@@ -14,7 +14,7 @@ export async function initNvmTip(context: ExtensionContext) {
   const nodeVersion = stdout.trim();
   window
     .showInformationMessage(
-      `VSCode loaded Node ${nodeVersion}. [That's wrong?](https://google.com)`,
+      `VSCode loaded Node ${nodeVersion}. [That's wrong?](https://nx.dev/recipes/nx-console/console-troubleshooting#vscode-nvm-issues)`,
       'OK',
       "Don't show again"
     )
