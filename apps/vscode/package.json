@@ -43,7 +43,7 @@
   ],
   "dependencies": {
     "@monodon/typescript-nx-imports-plugin": "0.2.0",
-    "@parcel/watcher": "2.2.0",
+    "@parcel/watcher": "2.3.0",
     "@parcel/watcher-darwin-arm64": "2.2.0",
     "@parcel/watcher-darwin-x64": "2.2.0",
     "@parcel/watcher-linux-arm-glibc": "2.2.0",

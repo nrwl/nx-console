@@ -14,7 +14,7 @@
     "email": "hello@nrwl.io"
   },
   "dependencies": {
-    "@parcel/watcher": "2.2.0",
+    "@parcel/watcher": "2.3.0",
     "@parcel/watcher-darwin-arm64": "2.2.0",
     "@parcel/watcher-darwin-x64": "2.2.0",
     "@parcel/watcher-linux-arm-glibc": "2.2.0",
