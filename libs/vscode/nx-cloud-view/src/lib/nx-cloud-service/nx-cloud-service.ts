@@ -1,6 +1,7 @@
 import { getPackageManagerCommand } from 'nx/src/devkit-exports';
 import { EXECUTE_ARBITRARY_COMMAND } from '@nx-console/vscode/nx-commands-view';
 import {
+  getCacheableOperations,
   getNxCloudRunnerOptions,
   getNxWorkspace,
 } from '@nx-console/vscode/nx-workspace';
@@ -9,7 +10,7 @@ import {
   getWorkspacePath,
   watchFile,
 } from '@nx-console/vscode/utils';
-import { exec, spawn } from 'child_process';
+import { exec, execSync, spawn } from 'child_process';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -208,7 +209,7 @@ export class NxCloudService extends StateBaseService<InternalState> {
   private async setupCloudRunner() {
     getTelemetry().featureUsed('nxConsole.cloud.setupRunner');
 
-    const isConnected = await this.isUsingCloudRunner();
+    const isConnected = Boolean(await getNxCloudRunnerOptions());
     if (isConnected) {
       window.showInformationMessage('You are already connected to Nx Cloud');
       return;
@@ -262,9 +263,9 @@ export class NxCloudService extends StateBaseService<InternalState> {
               [
                 'nx',
                 // https://github.com/nrwl/nx/pull/12942
-                gte(coerce(nxVersion.full) ?? '', '15.0.7')
-                  ? 'connect'
-                  : 'connect-to-nx-cloud',
+                ...(gte(coerce(nxVersion.full) ?? '', '15.0.7')
+                  ? ['connect']
+                  : ['connect-to-nx-cloud']),
               ],
               { cwd: getWorkspacePath(), env, shell: true }
             );
@@ -421,6 +422,20 @@ export class NxCloudService extends StateBaseService<InternalState> {
       );
       return;
     }
+    if (!this.state.canAccessCloudWorkspace) {
+      window
+        .showErrorMessage(
+          "You don't have access to this workspace. Log in to Nx Cloud in order to set up VCS integration.",
+          'Login',
+          'Cancel'
+        )
+        .then((value) => {
+          if (value === 'Login') {
+            commands.executeCommand('nxConsole.loginToNxCloud');
+          }
+        });
+      return;
+    }
     const orgId = this.state.cloudWorkspaceOrgId;
     const workspaceId = this.state.cloudWorkspaceId;
     const baseUrl = await this.getCloudRunnerUrl();
@@ -459,27 +474,22 @@ export class NxCloudService extends StateBaseService<InternalState> {
   }
 
   private async loadAndSetIsUsingCloudRunner(reset = false) {
-    const isConnected = await this.isUsingCloudRunner(reset);
+    const isConnected = Boolean(await getNxCloudRunnerOptions(reset));
     this.setState({ isUsingCloudRunner: isConnected });
   }
 
   private async loadAndSetIsPrivateCloud() {
     const nxWorkspaceConfig = (await getNxWorkspace()).workspace;
-    const cloudRunnerUrl =
-      nxWorkspaceConfig.tasksRunnerOptions?.default?.runner ===
-        '@nrwl/nx-cloud' ||
-      nxWorkspaceConfig.tasksRunnerOptions?.default?.runner == 'nx-cloud'
-        ? nxWorkspaceConfig.tasksRunnerOptions?.default?.options?.url
-        : undefined;
+    const cloudRunnerOptions = await getNxCloudRunnerOptions();
 
-    this.setState({ cloudRunnerUrl });
+    this.setState({ cloudRunnerUrl: cloudRunnerOptions?.url });
   }
 
   private async generateListOfFirstCommands(): Promise<void> {
     const generateAndSetFirstCommands = async () => {
       const nxConfig = (await getNxWorkspace()).workspace;
-      const cacheableOperations =
-        nxConfig.tasksRunnerOptions?.default?.options.cacheableOperations;
+      const cacheableOperations = await getCacheableOperations();
+
       const commands: string[] = [];
       // get cacheable operations from default project
       if (nxConfig.defaultProject && cacheableOperations) {
@@ -655,21 +665,6 @@ export class NxCloudService extends StateBaseService<InternalState> {
           this.setState({ vcsIntegrationStatus: undefined });
         }
       });
-  }
-
-  /**
-   * Helpers
-   */
-
-  private async isUsingCloudRunner(reset = false): Promise<boolean> {
-    const nxConfig = (await getNxWorkspace(reset)).workspace;
-
-    if (!nxConfig.tasksRunnerOptions) {
-      return false;
-    }
-    return !!Object.values(nxConfig.tasksRunnerOptions).find(
-      (r) => r.runner == '@nrwl/nx-cloud' || r.runner == 'nx-cloud'
-    );
   }
 
   private async getCloudRunnerUrl(): Promise<string> {
