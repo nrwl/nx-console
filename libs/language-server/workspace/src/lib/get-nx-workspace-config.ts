@@ -119,6 +119,10 @@ export async function getNxWorkspaceConfig(
         ) {
           delete workspaceConfiguration.projects[project].targets?.[target];
         }
+        // TODO: remove hard coded hide once https://github.com/nrwl/nx/pull/19513 is merged
+        if (target === 'nx-release-publish') {
+          delete workspaceConfiguration.projects[project].targets?.[target];
+        }
       }
     }
     const end = performance.now();
