@@ -1,6 +1,5 @@
 package dev.nx.console.generate.ui.file
 
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.ui.jcef.JBCefApp
@@ -17,11 +16,7 @@ class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
         runGeneratorManager: RunGeneratorManager
     ) {
         if (!JBCefApp.isSupported()) {
-            Notifier.notifyAnything(
-                project,
-                "Can't open the Generate UI. Your IDE doesn't support JCEF - please use the bundled JetBrains Runtime (JBR) instead of an alternative OpenJDK.",
-                NotificationType.ERROR
-            )
+            Notifier.notifyJCEFNotEnabled(project)
             return
         }
         val virtualFile =
