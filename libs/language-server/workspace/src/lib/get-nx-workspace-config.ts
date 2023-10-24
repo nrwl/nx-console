@@ -109,16 +109,6 @@ export async function getNxWorkspaceConfig(
 
     for (const project in workspaceConfiguration.projects) {
       for (const target in workspaceConfiguration.projects[project].targets) {
-        // TODO: remove cast once hidden is available on TargetConfiguration
-        if (
-          (
-            workspaceConfiguration.projects[project].targets?.[
-              target
-            ] as unknown as any
-          ).hidden
-        ) {
-          delete workspaceConfiguration.projects[project].targets?.[target];
-        }
         // TODO: remove hard coded hide once https://github.com/nrwl/nx/pull/19513 is merged
         if (target === 'nx-release-publish') {
           delete workspaceConfiguration.projects[project].targets?.[target];
