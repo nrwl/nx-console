@@ -15,20 +15,18 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.8.0"
+    id("org.jetbrains.kotlin.jvm") version "1.9.20-RC2"
     // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.20-RC2"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.12.0"
+    id("org.jetbrains.intellij") version "1.16.0"
 
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "2.0.0"
+    id("org.jetbrains.changelog") version "2.2.0"
     // Gradle Qodana Plugin
     id("org.jetbrains.qodana") version "0.1.13"
-    // Gradle Kover Plugin
-    id("org.jetbrains.kotlinx.kover") version "0.6.1"
 
-    id("com.ncorti.ktfmt.gradle") version "0.11.0"
+    id("com.ncorti.ktfmt.gradle") version "0.14.0"
 }
 
 group = properties("pluginGroup")
@@ -39,11 +37,11 @@ repositories { mavenCentral() }
 configurations.all { exclude("org.slf4j", "slf4j-api") }
 
 dependencies {
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.21.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
-    val ktorVersion = "2.2.4"
+    val ktorVersion = "2.3.5"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -86,9 +84,6 @@ qodana {
     saveReport.set(true)
     showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
 }
-
-// Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
-kover.xmlReport { onCheck.set(true) }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions { jvmTarget = "17" }
