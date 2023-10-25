@@ -9,9 +9,9 @@ import {
   getNxWorkspace,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import { getTelemetry, showNoProjectsMessage } from '@nx-console/vscode/utils';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
-import { commands, Disposable, Uri, window } from 'vscode';
+import { Disposable, Uri, commands, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
 
@@ -119,7 +119,14 @@ async function openProjectWithFile(
       workspace: { projects },
     } = await getNxWorkspace();
 
-    const selectedProjectName = await selectProject(Object.keys(projects));
+    const projectNames = Object.keys(projects);
+
+    if (projectNames.length === 0) {
+      showNoProjectsMessage();
+      return;
+    }
+
+    const selectedProjectName = await selectProject(projectNames);
     if (!selectedProjectName) {
       return;
     }

@@ -12,6 +12,7 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import { QuickPickItem, window } from 'vscode';
 import { selectFlags } from './select-flags';
+import { showNoGeneratorsMessage } from '@nx-console/vscode/utils';
 
 export async function selectGenerator(
   generatorType?: GeneratorType,
@@ -67,32 +68,34 @@ export async function selectGenerator(
     });
   }
 
-  if (generators) {
-    const selection = generator
-      ? generatorsQuickPicks.find(
-          (quickPick) =>
-            quickPick.generator.collection === generator.collection &&
-            quickPick.generator.name === generator.name
-        )
-      : generatorsQuickPicks.length > 1
-      ? await window.showQuickPick(generatorsQuickPicks)
-      : generatorsQuickPicks[0];
-    if (selection) {
-      const options =
-        selection.generator.options ||
-        (await getGeneratorOptions({
-          collection: selection.collectionName,
-          name: selection.generator.name,
-          path: selection.collectionPath,
-        }));
-      const positional = selection.generatorName;
-      return {
-        ...selection.generator,
-        options,
-        command: 'generate',
-        positional,
-      };
-    }
+  if (!generators || !generators.length) {
+    showNoGeneratorsMessage();
+    return;
+  }
+  const selection = generator
+    ? generatorsQuickPicks.find(
+        (quickPick) =>
+          quickPick.generator.collection === generator.collection &&
+          quickPick.generator.name === generator.name
+      )
+    : generatorsQuickPicks.length > 1
+    ? await window.showQuickPick(generatorsQuickPicks)
+    : generatorsQuickPicks[0];
+  if (selection) {
+    const options =
+      selection.generator.options ||
+      (await getGeneratorOptions({
+        collection: selection.collectionName,
+        name: selection.generator.name,
+        path: selection.collectionPath,
+      }));
+    const positional = selection.generatorName;
+    return {
+      ...selection.generator,
+      options,
+      command: 'generate',
+      positional,
+    };
   }
 }
 
