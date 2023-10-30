@@ -1,10 +1,15 @@
 import {
+  getNxWorkspace,
   getNxWorkspacePath,
   getNxWorkspaceProjects,
   getProjectGraphOutput,
   hasAffectedProjects,
 } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel, getTelemetry } from '@nx-console/vscode/utils';
+import {
+  getOutputChannel,
+  getTelemetry,
+  showNoProjectsMessage,
+} from '@nx-console/vscode/utils';
 import {
   commands,
   Disposable,
@@ -192,6 +197,14 @@ export class GraphWebView implements Disposable {
 
   async showAffectedProjects() {
     getOutputChannel().appendLine(`Graph - Opening affected projects`);
+    const {
+      workspace: { projects },
+    } = await getNxWorkspace();
+
+    if (!projects || !projects.length) {
+      showNoProjectsMessage();
+      return;
+    }
     const hasAffected = await hasAffectedProjects();
 
     if (!hasAffected) {

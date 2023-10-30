@@ -54,83 +54,75 @@ export async function registerGenerateCommands(context: ExtensionContext) {
     }
   );
 
-  /**
-   * move and remove were release in patch 8.11
-   */
-  const version = await getNxVersion();
-  if (version.major >= 8) {
-    commands.registerCommand(`nx.move`, async (uri?: Uri) => {
-      getTelemetry().featureUsed('nx.move');
-      const generator = await selectReMoveGenerator(uri?.toString(), 'move');
+  commands.registerCommand(`nx.move`, async (uri?: Uri) => {
+    getTelemetry().featureUsed('nx.move');
+    const generator = await selectReMoveGenerator(uri?.toString(), 'move');
+    if (!generator) {
+      return;
+    }
+
+    openReMoveGenerator(generator, uri, undefined);
+  });
+
+  commands.registerCommand(`nx.remove`, async (uri?: Uri) => {
+    getTelemetry().featureUsed('nx.remove');
+    const generator = await selectReMoveGenerator(uri?.toString(), 'remove');
+    if (!generator) {
+      return;
+    }
+
+    openReMoveGenerator(generator, uri, undefined);
+  });
+
+  commands.registerCommand(
+    `nx.move.projectView`,
+    async (treeItem?: NxTreeItem) => {
+      getTelemetry().featureUsed('nx.move.projectView');
+      const generator = await selectReMoveGenerator(undefined, 'move');
       if (!generator) {
         return;
       }
 
-      openReMoveGenerator(generator, uri, undefined);
-    });
+      const projectName = (treeItem?.item as ProjectViewItem).nxProject.project;
 
-    commands.registerCommand(`nx.remove`, async (uri?: Uri) => {
-      getTelemetry().featureUsed('nx.remove');
-      const generator = await selectReMoveGenerator(uri?.toString(), 'remove');
+      openReMoveGenerator(generator, undefined, projectName);
+    }
+  );
+
+  commands.registerCommand(
+    `nx.remove.projectView`,
+    async (treeItem?: NxTreeItem) => {
+      getTelemetry().featureUsed('nx.remove.projectView');
+      const generator = await selectReMoveGenerator(undefined, 'remove');
       if (!generator) {
         return;
       }
 
-      openReMoveGenerator(generator, uri, undefined);
-    });
+      const projectName = (treeItem?.item as ProjectViewItem).nxProject.project;
 
-    commands.registerCommand(
-      `nx.move.projectView`,
-      async (treeItem?: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.move.projectView');
-        const generator = await selectReMoveGenerator(undefined, 'move');
-        if (!generator) {
-          return;
-        }
+      openReMoveGenerator(generator, undefined, projectName);
+    }
+  );
 
-        const projectName = (treeItem?.item as ProjectViewItem).nxProject
-          .project;
-
-        openReMoveGenerator(generator, undefined, projectName);
-      }
+  const openReMoveGenerator = (
+    generator: string,
+    uri: Uri | undefined,
+    projectName: string | undefined
+  ) => {
+    const newGenUi = GlobalConfigurationStore.instance.get(
+      'useNewGenerateUiPreview'
     );
-
-    commands.registerCommand(
-      `nx.remove.projectView`,
-      async (treeItem?: NxTreeItem) => {
-        getTelemetry().featureUsed('nx.remove.projectView');
-        const generator = await selectReMoveGenerator(undefined, 'remove');
-        if (!generator) {
-          return;
-        }
-
-        const projectName = (treeItem?.item as ProjectViewItem).nxProject
-          .project;
-
-        openReMoveGenerator(generator, undefined, projectName);
-      }
-    );
-
-    const openReMoveGenerator = (
-      generator: string,
-      uri: Uri | undefined,
-      projectName: string | undefined
-    ) => {
-      const newGenUi = GlobalConfigurationStore.instance.get(
-        'useNewGenerateUiPreview'
+    if (newGenUi) {
+      openGenerateUi(uri, generator, projectName);
+    } else {
+      showGenerateUi(
+        context.extensionPath,
+        uri,
+        GeneratorType.Other,
+        generator
       );
-      if (newGenUi) {
-        openGenerateUi(uri, generator, projectName);
-      } else {
-        showGenerateUi(
-          context.extensionPath,
-          uri,
-          GeneratorType.Other,
-          generator
-        );
-      }
-    };
-  }
+    }
+  };
 }
 
 async function showGenerateUi(
