@@ -119,11 +119,6 @@
           "command": "nxConsole.editCommonCommands",
           "when": "view == nxCommands",
           "group": "navigation"
-        },
-        {
-          "command": "nxConsole.refreshCloudWebview",
-          "when": "view == nxCloud",
-          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -191,11 +186,6 @@
           "command": "nx.graph.task.button",
           "when": "view == nxRunTarget && viewItem == runTarget && isNxWorkspace",
           "group": "inline@1"
-        },
-        {
-          "command": "nxConsole.connectToNxCloud",
-          "when": "view == nxHelpAndFeedback && viewItem == connectToNxCloud && isNxWorkspace",
-          "group": "inline"
         }
       ],
       "editor/title": [
@@ -324,22 +314,6 @@
         },
         {
           "command": "nx.run.fileexplorer",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nxConsole.connectToNxCloud",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nxConsole.loginToNxCloud",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nxConsole.clearCloudSessions",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nxConsole.refreshCloudWebview",
           "when": "isNxWorkspace"
         },
         {
@@ -557,24 +531,6 @@
       {
         "title": "Add dev dependency to workspace",
         "command": "nxConsole.addDevDependency"
-      },
-      {
-        "title": "Connect to Nx Cloud",
-        "command": "nxConsole.connectToNxCloud",
-        "icon": "$(rocket)"
-      },
-      {
-        "title": "Login to Nx Cloud",
-        "command": "nxConsole.loginToNxCloud"
-      },
-      {
-        "title": "Clear local Nx Cloud sessions",
-        "command": "nxConsole.clearCloudSessions"
-      },
-      {
-        "title": "Refresh Nx Cloud Webview",
-        "command": "nxConsole.refreshCloudWebview",
-        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -823,12 +779,6 @@
         {
           "id": "nxProjects",
           "name": "Projects",
-          "when": "isNxWorkspace"
-        },
-        {
-          "type": "webview",
-          "id": "nxCloud",
-          "name": "Nx Cloud",
           "when": "isNxWorkspace"
         },
         {
