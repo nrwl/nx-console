@@ -38,10 +38,8 @@ describe('array field', () => {
     cy.get(`[data-cy="${fieldName}-field-item"]`).as('items');
     cy.get('@items').should('have.length', 2);
 
-    cy.get('@items').first().focus();
-    cy.get('@items').first().type('{enter}');
-    cy.get('@items').first().focus();
-    cy.get('@items').first().type('{enter}');
+    cy.get('@items').first().focus().type('{enter}');
+    cy.get('@items').first().focus().type('{enter}');
 
     cy.get('@items').should('have.length', 0);
   });

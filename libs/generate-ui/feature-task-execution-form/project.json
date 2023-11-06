@@ -5,7 +5,7 @@
   "sourceRoot": "libs/generate-ui/feature-task-execution-form/src",
   "targets": {
     "lint": {
-      "executor": "@nx/eslint:lint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": [
           "libs/generate-ui/feature-task-execution-form/src/**/*.ts",
