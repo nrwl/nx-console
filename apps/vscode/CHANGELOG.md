@@ -1,3 +1,20 @@
+# [18.10.0](https://github.com/nrwl/nx-console/compare/vscode-v18.9.0...vscode-v18.10.0) (2023-11-06)
+
+
+### Bug Fixes
+
+* **nxls:** hide special case nx-release-publish target until generic handling is available ([#1915](https://github.com/nrwl/nx-console/issues/1915)) ([22b4d85](https://github.com/nrwl/nx-console/commit/22b4d858a3b55896598cdff2ee7e5a2eef0c8bc7))
+* revert don't process targets with hidden property ([#1897](https://github.com/nrwl/nx-console/issues/1897)) ([#1916](https://github.com/nrwl/nx-console/issues/1916)) ([7449ecb](https://github.com/nrwl/nx-console/commit/7449ecbc971b76c31fb5a54b2f4ddf5f0619468a))
+* **vscode:** handle missing node_module states more gracefully ([#1918](https://github.com/nrwl/nx-console/issues/1918)) ([8351e65](https://github.com/nrwl/nx-console/commit/8351e655684292f7f13d2270c2ad86a7ff6965fb))
+* **vscode:** handle new nx cloud access token format in v17 ([#1908](https://github.com/nrwl/nx-console/issues/1908)) ([2aa6da1](https://github.com/nrwl/nx-console/commit/2aa6da1553fb7dc0e805571da6201ae24b6bef7e))
+* **vscode:** make sure to forward args to nxls so we can run with debug configuration ([#1910](https://github.com/nrwl/nx-console/issues/1910)) ([f2a5c25](https://github.com/nrwl/nx-console/commit/f2a5c25da4e1b521d8c3530eee38579bc20ed149))
+
+
+### Features
+
+* disable cloud integration ([#1921](https://github.com/nrwl/nx-console/issues/1921)) ([7728fe2](https://github.com/nrwl/nx-console/commit/7728fe2df5ec577daaf1c4a2a18448feb1ef1aeb))
+* **vscode:** show node version loaded by vscode on startup ([#1909](https://github.com/nrwl/nx-console/issues/1909)) ([5f14b7e](https://github.com/nrwl/nx-console/commit/5f14b7ec358a857d9071170e96fbaea8640eec14))
+
 # [18.9.0](https://github.com/nrwl/nx-console/compare/vscode-v18.8.1...vscode-v18.9.0) (2023-10-17)
 
 
