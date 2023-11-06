@@ -1,4 +1,4 @@
-package dev.nx.console.generate.ui
+package dev.nx.console.generate.ui.file
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
@@ -13,6 +13,7 @@ import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
+import dev.nx.console.generate.ui.*
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.jcef.CustomSchemeHandlerFactory
@@ -96,14 +97,11 @@ abstract class NxGenerateUiFile(name: String, v2: Boolean = false) :
     override fun hashCode(): Int = name.hashCode()
 }
 
-class DefaultNxGenerateUiFile(name: String, project: Project) : NxGenerateUiFile(name) {
+class DefaultNxGenerateUiFile(name: String, private val runGeneratorManager: RunGeneratorManager) :
+    NxGenerateUiFile(name) {
 
     private var generatorToDisplay: GeneratorSchemaPayload? = null
-    private val runGeneratorManager: RunGeneratorManager
 
-    init {
-        runGeneratorManager = RunGeneratorManager(project)
-    }
     override fun createMainComponent(project: Project): JComponent {
 
         browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 10)

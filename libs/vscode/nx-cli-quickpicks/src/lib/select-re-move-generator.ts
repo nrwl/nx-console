@@ -9,6 +9,13 @@ export async function selectReMoveGenerator(
 ): Promise<string | undefined> {
   const generators = await getGenerators();
 
+  if (!generators || !generators.length) {
+    window.showWarningMessage(
+      `No ${target} generator found. Did you run npm/pnpm/yarn install?`
+    );
+    return;
+  }
+
   const reMoveGenerators = generators.filter(
     (generator) => generator.data?.name === target
   );

@@ -1,6 +1,8 @@
 package dev.nx.console.ui
 
 import com.intellij.ide.BrowserUtil
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
@@ -70,8 +72,10 @@ class Notifier {
 
         private val lspIssueExceptionThrottler =
             Throttler(1000L, CoroutineScope(Dispatchers.Default))
+
         fun notifyLspMessageIssueExceptionThrottled(project: Project, e: MessageIssueException) =
             lspIssueExceptionThrottler.throttle { notifyLSPMessageIssueException(project, e) }
+
         fun notifyLSPMessageIssueException(project: Project, e: MessageIssueException) {
             group
                 .createNotification(
@@ -86,6 +90,27 @@ class Notifier {
                 .addAction(AnalyzeNxConfigurationFilesNotificationAction())
                 .notify(project)
         }
+
+        fun notifyJCEFNotEnabled(project: Project) {
+            group
+                .createNotification(
+                    "Can't open the Generate UI - Your IDE doesn't support JCEF.",
+                    NotificationType.ERROR,
+                )
+                .setTitle("Nx Console")
+                .addAction(
+                    object : NotificationAction("Learn more") {
+                        override fun actionPerformed(e: AnActionEvent, notification: Notification) {
+                            BrowserUtil.browse(
+                                "https://plugins.jetbrains.com/docs/intellij/jcef.html"
+                            )
+                            notification.expire()
+                        }
+                    }
+                )
+                .notify(project)
+        }
+
         fun notifyAnything(
             project: Project,
             message: String,

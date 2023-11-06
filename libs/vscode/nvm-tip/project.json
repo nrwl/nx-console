@@ -1,14 +1,14 @@
 {
-  "name": "vscode-nx-config-decoration",
+  "name": "vscode-nvm-tip",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/nx-config-decoration/src",
+  "sourceRoot": "libs/vscode/nvm-tip/src",
   "projectType": "library",
   "targets": {
     "lint": {
-      "executor": "@nx/eslint:lint",
+      "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/vscode/nx-config-decoration/**/*.ts"]
+        "lintFilePatterns": ["libs/vscode/nvm-tip/**/*.ts"]
       }
     }
   },

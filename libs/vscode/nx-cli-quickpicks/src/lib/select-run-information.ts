@@ -3,6 +3,7 @@ import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
 import { window } from 'vscode';
 import { selectFlags } from './select-flags';
+import { showNoProjectsMessage } from '@nx-console/vscode/utils';
 
 export async function selectRunInformation(
   projectName?: string,
@@ -98,6 +99,10 @@ async function selectProjectAndThenTarget(
   let t = targetName;
   if (!p) {
     const projects = await getProjects(t);
+    if (!projects || !projects.length) {
+      showNoProjectsMessage();
+      return;
+    }
     p = await selectProject(projects);
     if (!p) {
       return;
@@ -123,6 +128,10 @@ async function selectTargetAndThenProject(
   let t = targetName;
   if (!t) {
     const targets = await getTargets(p);
+    if (!targets || !targets.length) {
+      showNoProjectsMessage();
+      return;
+    }
     t = (await selectTarget(targets)) as string;
     if (!t) {
       return;

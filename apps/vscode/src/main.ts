@@ -66,6 +66,7 @@ import {
   REFRESH_WORKSPACE,
   refreshWorkspace,
 } from './commands/refresh-workspace';
+import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -133,6 +134,7 @@ export async function activate(c: ExtensionContext) {
 
     await enableTypeScriptPlugin(context);
     initNxCommandsView(context);
+    initNvmTip(context);
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
     runTargetTreeView = window.createTreeView('nxRunTarget', {
@@ -241,10 +243,6 @@ async function setWorkspace(workspacePath: string) {
 
     registerVscodeAddDependency(context);
 
-    initNxCloudOnboardingView(
-      context,
-      context.extensionMode !== ExtensionMode.Development
-    );
     initGenerateUiWebview(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
