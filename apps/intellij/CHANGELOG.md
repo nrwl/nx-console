@@ -1,3 +1,16 @@
+## 1.15.0 (2023-11-06)
+
+### Bug Fixes
+
+* **intellij:** make sure jcef is supported before opening ([#1911](https://github.com/nrwl/nx-console/issues/1911)) ([e7aa1ba](https://github.com/nrwl/nx-console/commit/e7aa1bab2e71c739a801b21a32e0449df3eef9d8))
+* **nxls:** hide special case nx-release-publish target until generic handling is available ([#1915](https://github.com/nrwl/nx-console/issues/1915)) ([22b4d85](https://github.com/nrwl/nx-console/commit/22b4d858a3b55896598cdff2ee7e5a2eef0c8bc7))
+* revert don't process targets with hidden property ([#1897](https://github.com/nrwl/nx-console/issues/1897)) ([#1916](https://github.com/nrwl/nx-console/issues/1916)) ([7449ecb](https://github.com/nrwl/nx-console/commit/7449ecbc971b76c31fb5a54b2f4ddf5f0619468a))
+
+
+### Features
+
+* **intellij:** add extension point to use different generate ui ([#1831](https://github.com/nrwl/nx-console/issues/1831)) ([2964e11](https://github.com/nrwl/nx-console/commit/2964e117c17449e18d0f4de2c85af3cc0337241f))
+
 ## 1.14.0 (2023-10-17)
 
 ### Bug Fixes
