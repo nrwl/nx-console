@@ -1,3 +1,10 @@
+## [18.10.1](https://github.com/nrwl/nx-console/compare/vscode-v18.10.0...vscode-v18.10.1) (2023-11-06)
+
+
+### Bug Fixes
+
+* **repo): Revert "chore(repo:** update nx to 17.0.0-rc.3 ([#1913](https://github.com/nrwl/nx-console/issues/1913))" ([#1926](https://github.com/nrwl/nx-console/issues/1926)) ([4a178b0](https://github.com/nrwl/nx-console/commit/4a178b0fb9a9d1a134ceefe3d1505fd67410437f))
+
 # [18.10.0](https://github.com/nrwl/nx-console/compare/vscode-v18.9.0...vscode-v18.10.0) (2023-11-06)
 
 
