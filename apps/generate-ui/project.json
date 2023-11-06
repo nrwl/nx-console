@@ -89,7 +89,7 @@
       "outputs": ["{options.outputPath}"]
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": [
           "apps/generate-ui/src/**/*.ts",

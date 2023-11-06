@@ -97,6 +97,7 @@ async function _workspace(
     return {
       validWorkspaceJson: false,
       workspace: {
+        npmScope: '@nx-console',
         projects: {},
         version: 2,
       },

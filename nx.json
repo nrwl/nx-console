@@ -5,7 +5,20 @@
   "useDaemonProcess": true,
   "tasksRunnerOptions": {
     "default": {
+      "runner": "nx-cloud",
       "options": {
+        "cacheableOperations": [
+          "build",
+          "_build",
+          "lint",
+          "test",
+          "e2e",
+          "build-storybook",
+          "package",
+          "build-webview-files",
+          "extract-dependencies"
+        ],
+        "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
         "useLightClient": true
       }
     }
@@ -32,20 +45,16 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "inputs": ["production", "^production"],
-      "cache": true
+      "inputs": ["production", "^production"]
     },
     "test": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
-      "cache": true
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
     },
     "lint": {
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
-      "cache": true
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
     },
     "e2e": {
-      "inputs": ["default", "^production"],
-      "cache": true
+      "inputs": ["default", "^production"]
     },
     "build-storybook": {
       "inputs": [
@@ -54,20 +63,7 @@
         "{workspaceRoot}/.storybook/**/*",
         "{projectRoot}/.storybook/**/*",
         "{projectRoot}/tsconfig.storybook.json"
-      ],
-      "cache": true
-    },
-    "_build": {
-      "cache": true
-    },
-    "package": {
-      "cache": true
-    },
-    "build-webview-files": {
-      "cache": true
-    },
-    "extract-dependencies": {
-      "cache": true
+      ]
     }
   },
   "namedInputs": {
@@ -89,6 +85,5 @@
       "!{projectRoot}/tsconfig.storybook.json",
       "!{projectRoot}/src/test-setup.[jt]s"
     ]
-  },
-  "nxCloudAccessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU="
+  }
 }
