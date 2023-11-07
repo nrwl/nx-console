@@ -40,18 +40,21 @@ export class FieldList extends GeneratorContextContext(
       numOfImportantOptions === 0;
 
     return html`
-      <div class="flex h-full w-full">
         <div
-          class="border-separator ${this.editor === 'intellij'
-            ? 'hidden md:block'
-            : 'max-sm:hidden md:w-64'} fixed h-full w-52 overflow-y-auto border-r-2  p-6"
+          class="border-separator ${
+            this.editor === 'intellij'
+              ? 'hidden md:block'
+              : 'max-sm:hidden md:w-64'
+          } fixed h-full w-52 overflow-y-auto border-r-2  p-6"
         >
           ${this.renderOptionNav(optionsWithMetadata, shouldShowMoreOptions)}
         </div>
         <div
-          class="${this.editor === 'intellij'
-            ? 'md:ml-52 md:p-6'
-            : 'sm:ml-52 sm:p-6 md:ml-64'} w-full pt-6"
+          class="${
+            this.editor === 'intellij'
+              ? 'md:ml-52 md:p-6'
+              : 'sm:ml-52 sm:p-6 md:ml-64'
+          } pt-6"
         >
           ${this.renderOptionsWithDivider(
             optionsWithMetadata,
@@ -127,12 +130,6 @@ export class FieldList extends GeneratorContextContext(
         class="${shouldHideShowMoreButton ? 'hidden' : ''}"
       ></show-more-divider>
       ${otherOptions.map((opt) => renderOption(opt, !shouldShowMoreOptions))}
-      <cwd-input-element
-        class="${(this.generatorContext?.nxVersion?.major ?? 0) >= 17 &&
-        shouldShowMoreOptions
-          ? ''
-          : 'hidden'}"
-      ></cwd-input-element>
     `;
   }
 
@@ -179,7 +176,7 @@ export class FieldList extends GeneratorContextContext(
     }, 100);
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

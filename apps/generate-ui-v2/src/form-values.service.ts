@@ -1,4 +1,4 @@
-import { ContextProvider, createContext } from '@lit-labs/context';
+import { ContextProvider, createContext } from '@lit/context';
 import { IdeCommunicationController } from './ide-communication.controller';
 
 import {
@@ -16,6 +16,7 @@ import {
 import { OptionChangedDetails } from './components/fields/mixins/field-mixin';
 import { Root } from './main';
 import { submittedContext } from './contexts/submitted-context';
+import { serializedCommandContext } from './contexts/serialized-command-context';
 
 export const formValuesServiceContext = createContext<FormValuesService>(
   Symbol('form-values')
@@ -41,11 +42,17 @@ export class FormValuesService {
       initialValue: this,
     });
 
+    const serializedCommandContextProvider = new ContextProvider(rootElement, {
+      context: serializedCommandContext,
+      initialValue: undefined,
+    });
+
     window.addEventListener(
       'option-changed',
-      (e: CustomEventInit<OptionChangedDetails>) => {
+      async (e: CustomEventInit<OptionChangedDetails>) => {
         if (!e.detail) return;
-        this.handleOptionChange(e.detail);
+        await this.handleOptionChange(e.detail);
+        serializedCommandContextProvider.setValue(this.getSerializedCommand());
       }
     );
     window.addEventListener('cwd-changed', (e: CustomEventInit<string>) => {
@@ -150,9 +157,7 @@ export class FormValuesService {
   );
 
   copyCommandToClipboard() {
-    const args = this.getSerializedFormValues();
-    const positional = getGeneratorIdentifier(this.icc.generatorSchema);
-    const command = `nx g ${positional} ${args.join(' ')}`;
+    const command = this.getSerializedCommand();
     if (this.icc.editor === 'vscode') {
       navigator.clipboard.writeText(command);
     } else {
@@ -160,6 +165,12 @@ export class FormValuesService {
         new GenerateUiCopyToClipboardOutputMessage(command)
       );
     }
+  }
+
+  private getSerializedCommand(): string {
+    const args = this.getSerializedFormValues();
+    const positional = getGeneratorIdentifier(this.icc.generatorSchema);
+    return `nx g ${positional} ${args.join(' ')}`;
   }
 
   private getSerializedFormValues(): string[] {

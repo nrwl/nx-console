@@ -1,4 +1,4 @@
-import { ContextConsumer } from '@lit-labs/context';
+import { ContextConsumer } from '@lit/context';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { editorContext } from '../contexts/editor-context';
@@ -62,7 +62,7 @@ export class Button extends LitElement {
     </button>`;
   }
 
-  protected createRenderRoot(): Element | ShadowRoot {
+  protected createRenderRoot() {
     return this;
   }
 }

@@ -101,7 +101,7 @@ export const Field = <T extends Constructor<LitElement>>(superClass: T) => {
         'aria-describedby': `${this.fieldId}-error`,
       };
     }
-    protected createRenderRoot(): Element | ShadowRoot {
+    protected createRenderRoot() {
       return this;
     }
 

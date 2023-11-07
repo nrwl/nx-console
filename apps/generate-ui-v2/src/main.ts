@@ -45,6 +45,12 @@ export class Root extends LitElement {
               .searchValue="${this.searchValue}"
             ></field-list>`}
       </div>
+      <footer>
+        <footer-element
+          ?dryRunOnChange=${this.icc.configuration
+            ?.enableTaskExecutionDryRunOnChange}
+        ></footer-element>
+      </footer>
     </div>`;
   }
 
@@ -63,7 +69,7 @@ export class Root extends LitElement {
         <header class="flex items-center justify-between">
           <div class="flex flex-wrap items-end gap-2">
             <h1 class="text-xl font-bold leading-none" data-cy="header-text">
-              nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
+              ${getGeneratorIdentifier(this.icc.generatorSchema)}
             </h1>
             ${when(
               isNxGenerator && this.icc.editor === 'vscode',
@@ -77,45 +83,6 @@ export class Root extends LitElement {
                   </a>
                 `
             )}
-          </div>
-
-          <div class="sm: flex shrink-0">
-            <button-element
-              class="flex items-center py-2 pl-3 max-sm:hidden"
-              appearance="icon"
-              text="copy"
-              title="Copy generate command to clipboard"
-              @click="${() => this.formValuesService.copyCommandToClipboard()}"
-              id="copy-button"
-            >
-            </button-element>
-            ${when(
-              !this.icc.configuration?.enableTaskExecutionDryRunOnChange,
-              () =>
-                html`<button-element
-                    class="py-2 pl-3 sm:hidden"
-                    @click="${() => this.formValuesService.runGenerator(true)}"
-                    text="debug"
-                    appearance="icon"
-                    title="Dry Run"
-                  >
-                  </button-element>
-                  <button-element
-                    class="hidden py-2 pl-3 sm:block"
-                    @click="${() => this.formValuesService.runGenerator(true)}"
-                    text="Dry Run"
-                    appearance="secondary"
-                  >
-                  </button-element> `
-            )}
-
-            <button-element
-              class="py-2 pl-3"
-              @click="${() => this.formValuesService.runGenerator()}"
-              text="Generate"
-              data-cy="generate-button"
-            >
-            </button-element>
           </div>
         </header>
         ${when(

@@ -33,6 +33,7 @@ import './show-more-divider';
 import './badge';
 import './popover';
 import './cwd-input';
+import './footer';
 
 provideFASTDesignSystem().register(
   fastCombobox({

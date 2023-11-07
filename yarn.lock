@@ -5792,36 +5792,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lit-labs/context@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "@lit-labs/context@npm:0.3.1"
+"@lit-labs/ssr-dom-shim@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@lit-labs/ssr-dom-shim@npm:1.1.2"
+  checksum: 73fd787893851d4ec4aaa5c775405ed2aae4ca0891b2dd3c973b32c2f4bf70ada5481dd0224e52b786d037aa8a00052186ad1623c44551affd66f6409cca8da6
+  languageName: node
+  linkType: hard
+
+"@lit/context@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@lit/context@npm:1.0.1"
   dependencies:
-    "@lit/reactive-element": ^1.5.0
-    lit: ^2.7.0
-  checksum: eca24343bf63a092662a45c0483a77191348514c84aa7fa1a497d45c5741c16e8e61fb294ed8e56d73536b4e7fe96c49beb416417a2c879e670e553e19f5a3f5
+    "@lit/reactive-element": ^1.6.2 || ^2.0.0
+  checksum: 9f6115ecdb979de9a0a0837fbe5df9e87411b2ace608da449afdcf9abdd9e154247bfedb97297d655143f98613730ca15d5840b854f23486609c0207c91ab8cf
   languageName: node
   linkType: hard
 
-"@lit-labs/ssr-dom-shim@npm:^1.0.0, @lit-labs/ssr-dom-shim@npm:^1.1.0":
-  version: 1.1.1
-  resolution: "@lit-labs/ssr-dom-shim@npm:1.1.1"
-  checksum: 7a7add78e3ee570a7b987b9bf85e700b20d35d31c8b54cf4c8b2e3c8458ed4e2b0ff328706e5be7887f0ca8a02878c186e76609defb78f0d1b3c0e6b47c9f6ef
-  languageName: node
-  linkType: hard
-
-"@lit/reactive-element@npm:^1.3.0, @lit/reactive-element@npm:^1.4.0":
-  version: 1.4.2
-  resolution: "@lit/reactive-element@npm:1.4.2"
-  checksum: b93eadc195b7da8b93f552d01891f0537b573acb35daa866b3bb9a495972c4e7568a540a9a413df18f92922dbb2f86fa0cdd76412e70f073df4dc4999d86bb30
-  languageName: node
-  linkType: hard
-
-"@lit/reactive-element@npm:^1.5.0, @lit/reactive-element@npm:^1.6.0":
-  version: 1.6.1
-  resolution: "@lit/reactive-element@npm:1.6.1"
+"@lit/reactive-element@npm:^1.6.2 || ^2.0.0, @lit/reactive-element@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "@lit/reactive-element@npm:2.0.1"
   dependencies:
-    "@lit-labs/ssr-dom-shim": ^1.0.0
-  checksum: fab0bcfdade9c26af2ad5115fb564bcf8ba0732a3a8be86c157851c2771e3fdc65ab38f2cd60fa121946058bf6e487461fd217f87b01f96e88ee7a95d5d866ba
+    "@lit-labs/ssr-dom-shim": ^1.1.2
+  checksum: e9cacc3743c28b7b417739ffb292288076df115d08d9e9a895e2879c7087938d50c6b8141986743535e06156efd1ca505c8cf6ef8702db99966d190df9f8e869
   languageName: node
   linkType: hard
 
@@ -20996,64 +20988,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lit-element@npm:^3.2.0":
-  version: 3.2.2
-  resolution: "lit-element@npm:3.2.2"
+"lit-element@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "lit-element@npm:4.0.1"
   dependencies:
-    "@lit/reactive-element": ^1.3.0
-    lit-html: ^2.2.0
-  checksum: e1df57c02ad5ae4c42b49a5066b3b623bccf7fa6610bbc3f65bc22cbbe1546ecd6a7f717b1f01863929262f416c4b8b7a39ff166114215f93cc22f4e5b3825c3
+    "@lit-labs/ssr-dom-shim": ^1.1.2
+    "@lit/reactive-element": ^2.0.0
+    lit-html: ^3.0.0
+  checksum: f5915ecc6d56f2a3c822cd58567b5faadb4977ee8b66492beef6ef319ed94a5157ff59b957f581a3ae1708d6f5ca5d7ffa1c8a0d1027d087111ef93855c40499
   languageName: node
   linkType: hard
 
-"lit-element@npm:^3.3.0":
-  version: 3.3.2
-  resolution: "lit-element@npm:3.3.2"
-  dependencies:
-    "@lit-labs/ssr-dom-shim": ^1.1.0
-    "@lit/reactive-element": ^1.3.0
-    lit-html: ^2.7.0
-  checksum: afe50825be05a8c83be418432dfed2f9a84ca1c6c1d1807e2090def9f94cc403dcbf832b338cdfe39cd168518664c02a6c7392868ca323e356e5744e3b4f45e6
-  languageName: node
-  linkType: hard
-
-"lit-html@npm:^2.2.0, lit-html@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "lit-html@npm:2.4.0"
+"lit-html@npm:^3.0.0":
+  version: 3.0.2
+  resolution: "lit-html@npm:3.0.2"
   dependencies:
     "@types/trusted-types": ^2.0.2
-  checksum: fb2ff513a23ce35783c231d3c184103b681f62792e2fa500b17f0bbd93b1a3168153b3fd52ccaca2c25ee5bb7f4006b657fc15ae893fa5dc733774c01eda5dce
+  checksum: 269ee6848a253db205a5402b11ae2a78086ed67766551d6ea266e757894f2de8e29c9db118a5a7f37806f6246fdffa40d53a3c306058d1a66f457f74c94b2c01
   languageName: node
   linkType: hard
 
-"lit-html@npm:^2.7.0":
-  version: 2.7.3
-  resolution: "lit-html@npm:2.7.3"
+"lit@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "lit@npm:3.0.2"
   dependencies:
-    "@types/trusted-types": ^2.0.2
-  checksum: da0110aa5fc19119dc34bb0462ff41d70b458a3bbe83bee5a484c61360eeafcbaf72c84672af76163a4402dc59a210acc523503dc51e0528b556bc32ec366dd2
-  languageName: node
-  linkType: hard
-
-"lit@npm:^2.4.1":
-  version: 2.4.1
-  resolution: "lit@npm:2.4.1"
-  dependencies:
-    "@lit/reactive-element": ^1.4.0
-    lit-element: ^3.2.0
-    lit-html: ^2.4.0
-  checksum: 0f0673bd8f7c31d3f00cef0be26683f46e34048466c54b8663e8f13a7dbb6038f06aafa9abf3f0a6635c2d702fde7319d4f88b2bd9e2bd512f81c95fb691ca87
-  languageName: node
-  linkType: hard
-
-"lit@npm:^2.7.0":
-  version: 2.7.4
-  resolution: "lit@npm:2.7.4"
-  dependencies:
-    "@lit/reactive-element": ^1.6.0
-    lit-element: ^3.3.0
-    lit-html: ^2.7.0
-  checksum: 7494f4e814fca0ebf7a73923c85454531aac26ff83f0d4d5afe62ebbc6225363c9df41f88147d79d5d3ab518925ceb9b27a557bee610bbb414ae0339c513f5a3
+    "@lit/reactive-element": ^2.0.0
+    lit-element: ^4.0.0
+    lit-html: ^3.0.0
+  checksum: 6a1d3b357660b8f4799faa9a8c2cad6bb78a95b69a6138bd23d8db39c3fb4bc9183ad032c742fe8c6e20e391010982d1498600ba370c00c5138042f5460db991
   languageName: node
   linkType: hard
 
@@ -23626,7 +23588,7 @@ __metadata:
     "@angular/platform-browser": 16.1.2
     "@angular/platform-browser-dynamic": 16.1.2
     "@babel/core": 7.21.0
-    "@lit-labs/context": ^0.3.1
+    "@lit/context": ^1.0.1
     "@microsoft/fast-components": ^2.30.6
     "@microsoft/fast-element": ^1.12.0
     "@microsoft/fast-foundation": ^2.49.0
@@ -23697,7 +23659,7 @@ __metadata:
     jest-environment-node: ^29.4.1
     jest-preset-angular: 13.1.1
     jsonc-parser: ^3.0.0
-    lit: ^2.4.1
+    lit: ^3.0.2
     memfs: ^3.4.7
     mocha: ^10.0.0
     nx: 16.5.5
