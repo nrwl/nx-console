@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": ["libs/vscode/tasks/**/*.ts"]
       }
@@ -14,8 +14,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/vscode/tasks"],
       "options": {
-        "jestConfig": "libs/vscode/tasks/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/vscode/tasks/jest.config.ts"
       }
     }
   },

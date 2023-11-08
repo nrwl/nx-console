@@ -5,20 +5,7 @@
   "useDaemonProcess": true,
   "tasksRunnerOptions": {
     "default": {
-      "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "_build",
-          "lint",
-          "test",
-          "e2e",
-          "build-storybook",
-          "package",
-          "build-webview-files",
-          "extract-dependencies"
-        ],
-        "accessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
         "useLightClient": true
       }
     }
@@ -45,16 +32,20 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "inputs": ["production", "^production"]
+      "inputs": ["production", "^production"],
+      "cache": true
     },
     "test": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "cache": true
     },
     "lint": {
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "cache": true
     },
     "e2e": {
-      "inputs": ["default", "^production"]
+      "inputs": ["default", "^production"],
+      "cache": true
     },
     "build-storybook": {
       "inputs": [
@@ -63,7 +54,33 @@
         "{workspaceRoot}/.storybook/**/*",
         "{projectRoot}/.storybook/**/*",
         "{projectRoot}/tsconfig.storybook.json"
-      ]
+      ],
+      "cache": true
+    },
+    "_build": {
+      "cache": true
+    },
+    "package": {
+      "cache": true
+    },
+    "build-webview-files": {
+      "cache": true
+    },
+    "extract-dependencies": {
+      "cache": true
+    },
+    "@nx/jest:jest": {
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "cache": true,
+      "options": {
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
     }
   },
   "namedInputs": {
@@ -85,5 +102,6 @@
       "!{projectRoot}/tsconfig.storybook.json",
       "!{projectRoot}/src/test-setup.[jt]s"
     ]
-  }
+  },
+  "nxCloudAccessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU="
 }

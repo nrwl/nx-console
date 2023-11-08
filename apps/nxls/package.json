@@ -23,6 +23,16 @@
     "@parcel/watcher-linux-x64-glibc": "2.2.0",
     "@parcel/watcher-linux-x64-musl": "2.2.0",
     "@parcel/watcher-win32-arm64": "2.2.0",
-    "@parcel/watcher-win32-x64": "2.2.0"
+    "@parcel/watcher-win32-x64": "2.2.0",
+    "@nx/nx-darwin-arm64": "17.1.0-beta.4",
+    "@nx/nx-darwin-x64": "17.1.0-beta.4",
+    "@nx/nx-freebsd-x64": "17.1.0-beta.4",
+    "@nx/nx-linux-arm-gnueabihf": "17.1.0-beta.4",
+    "@nx/nx-linux-arm64-gnu": "17.1.0-beta.4",
+    "@nx/nx-linux-arm64-musl": "17.1.0-beta.4",
+    "@nx/nx-linux-x64-gnu": "17.1.0-beta.4",
+    "@nx/nx-linux-x64-musl": "17.1.0-beta.4",
+    "@nx/nx-win32-arm64-msvc": "17.1.0-beta.4",
+    "@nx/nx-win32-x64-msvc": "17.1.0-beta.4"
   }
 }

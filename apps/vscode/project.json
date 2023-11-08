@@ -105,7 +105,8 @@
           "ts-node",
           "pnpapi",
           "webpack",
-          "@angular-devkit/*"
+          "@angular-devkit/*",
+          "@nx/nx*"
         ],
         "thirdParty": true,
         "minify": true,
@@ -192,7 +193,7 @@
       "dependsOn": ["^build"]
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": ["apps/vscode/**/*.ts"]
       }
