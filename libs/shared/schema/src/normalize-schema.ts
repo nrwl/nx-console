@@ -45,7 +45,11 @@ export async function normalizeSchema(
       nxOption.itemTooltips = getEnumTooltips(xPrompt);
       if (isLongFormXPrompt(xPrompt) && !nxOption.items) {
         const items = (xPrompt.items || []).map((item) =>
-          isOptionItemLabelValue(item) ? item.value : item
+          isOptionItemLabelValue(item)
+            ? typeof item.value === 'string'
+              ? item.value
+              : JSON.stringify(item.value)
+            : item
         );
         if (items.length > 0) {
           nxOption.items = items;
