@@ -52,7 +52,6 @@ import {
   openGenerateUi,
 } from '@nx-console/vscode/generate-ui-webview';
 import { configureLspClient } from '@nx-console/vscode/lsp-client';
-import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import {
