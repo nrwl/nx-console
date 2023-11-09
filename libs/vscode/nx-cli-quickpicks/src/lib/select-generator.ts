@@ -13,6 +13,7 @@ import {
 import { QuickPickItem, window } from 'vscode';
 import { selectFlags } from './select-flags';
 import { showNoGeneratorsMessage } from '@nx-console/vscode/utils';
+import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 
 export async function selectGenerator(
   generatorType?: GeneratorType,
@@ -97,11 +98,15 @@ export async function selectGenerator(
       positional,
     };
   }
+  return;
 }
 
-export async function selectGeneratorAndPromptForFlags(): Promise<
+export async function selectGeneratorAndPromptForFlags(
+  preselectedGenerator?: string,
+  preselectedFlags?: Record<string, string>
+): Promise<
   | {
-      generator: TaskExecutionSchema;
+      generator: GeneratorSchema;
       flags: string[];
     }
   | undefined
@@ -112,18 +117,70 @@ export async function selectGeneratorAndPromptForFlags(): Promise<
     return;
   }
 
-  const selection = await selectGenerator();
+  let selection: GeneratorSchema | undefined;
+  if (preselectedGenerator) {
+    selection = await getGenerator(preselectedGenerator);
+  } else {
+    const g = await selectGenerator();
+    selection = g ? toGeneratorSchema(g) : undefined;
+  }
   if (!selection) {
     return;
   }
 
   const flags = await selectFlags(
-    `generate ${selection.positional}`,
-    selection.options
+    `generate ${selection.collectionName}:${selection.generatorName}`,
+    selection.options,
+    preselectedFlags
   );
 
   return {
     generator: selection,
     flags: flags ?? [],
+  };
+}
+
+export async function getGenerator(
+  generatorName?: string
+): Promise<GeneratorSchema | undefined> {
+  if (generatorName) {
+    const generatorInfo = {
+      collection: generatorName.split(':')[0],
+      name: generatorName.split(':')[1],
+    };
+    const foundGenerator = (await getGenerators()).find(
+      (gen) =>
+        generatorInfo.collection === gen.data?.collection &&
+        generatorInfo.name === gen.data?.name
+    );
+    if (foundGenerator) {
+      const options = await getGeneratorOptions({
+        collection: generatorInfo.collection,
+        name: generatorInfo.name,
+        path: foundGenerator.path,
+      });
+      return {
+        collectionName: foundGenerator.data?.collection ?? '',
+        generatorName: foundGenerator.data?.name ?? '',
+        description: foundGenerator.data?.description ?? '',
+        options: options ?? [],
+      };
+    }
+  }
+
+  const deprecatedTaskExecutionSchema = await selectGenerator();
+  if (!deprecatedTaskExecutionSchema) {
+    return;
+  }
+
+  return toGeneratorSchema(deprecatedTaskExecutionSchema);
+}
+
+function toGeneratorSchema(deprecatedTaskExecutionSchema: TaskExecutionSchema) {
+  return {
+    collectionName: deprecatedTaskExecutionSchema.collection ?? '',
+    generatorName: deprecatedTaskExecutionSchema.name,
+    description: deprecatedTaskExecutionSchema.description,
+    options: deprecatedTaskExecutionSchema.options,
   };
 }
