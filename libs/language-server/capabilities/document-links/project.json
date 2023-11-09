@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
@@ -19,8 +19,7 @@
         "{workspaceRoot}/coverage/libs/language-server/capabilities/document-links"
       ],
       "options": {
-        "jestConfig": "libs/language-server/capabilities/document-links/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/language-server/capabilities/document-links/jest.config.ts"
       }
     }
   },

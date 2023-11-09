@@ -63,6 +63,7 @@
           "@swc/*",
           "@angular-devkit/*",
           "@parcel/watcher",
+          "@nx/nx*",
           "webpack",
           "fsevents"
         ],
@@ -97,7 +98,7 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/nxls/**/*.ts"]
@@ -107,8 +108,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/nxls"],
       "options": {
-        "jestConfig": "apps/nxls/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/nxls/jest.config.ts"
       }
     },
     "semantic-release": {

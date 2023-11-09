@@ -1,3 +1,5 @@
 CHANGELOG.md
 apps/intellij/*
 !apps/intellij/project.json
+
+/.nx/cache

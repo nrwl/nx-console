@@ -39,19 +39,21 @@
             "name": "@nx/devkit",
             "message": "Please use nx/src/devkit-exports instead, or import function directly from @nx/devkit/src/*"
           }
-        ],
-        "@typescript-eslint/no-unused-vars": [
-          "warn",
-          {
-            "argsIgnorePattern": "^_$"
-          }
         ]
       }
     },
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],
-      "rules": {}
+      "rules": {
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            "argsIgnorePattern": "^_$"
+          }
+        ],
+        "@typescript-eslint/no-explicit-any": "off"
+      }
     },
     {
       "files": ["*.js", "*.jsx"],
