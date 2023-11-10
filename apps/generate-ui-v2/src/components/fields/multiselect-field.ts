@@ -58,7 +58,8 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         </option>
         ${map(
           this.extractItemOptions(this.option),
-          (item) => html`<option value="${item}">${item}</option>`
+          (item) =>
+            html`<option value="${item}" title="${item}">${item}</option>`
         )}
       </select>`;
     } else {
@@ -74,7 +75,10 @@ export class MultiselectField extends FieldWrapper(Field(LitElement)) {
         </vscode-option>
         ${map(
           this.extractItemOptions(this.option),
-          (item) => html`<vscode-option value="${item}">${item}</vscode-option>`
+          (item) =>
+            html`<vscode-option value="${item}" title="${item}"
+              >${item}</vscode-option
+            >`
         )}
       </vscode-dropdown>`;
     }
