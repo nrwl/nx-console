@@ -6,7 +6,8 @@ export class CliTaskFlagQuickPickItem implements QuickPickItem {
     readonly flagName: string,
     readonly detail: string = '',
     readonly option: Option,
-    readonly label: string
+    readonly label: string,
+    readonly description?: string
   ) {}
 }
 
@@ -26,7 +27,7 @@ export async function selectFlags(
 
   const selection = await promptForFlagToSet(
     `nx ${command} ${flagArray.join(' ')}`,
-    options
+    options.filter((option) => !userSetFlags[option.name])
   );
 
   if (!selection.flag) {
@@ -65,7 +66,8 @@ async function promptForFlagToSet(
         option.name,
         detail,
         option,
-        `${option.name}`
+        `${option.name}`,
+        option.isRequired ? 'required' : undefined
       );
     }),
   ];

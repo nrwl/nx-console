@@ -1,36 +1,47 @@
 import { GeneratorType } from '@nx-console/shared/schema';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
-import { getNxVersion, getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/utils';
-import { ExtensionContext, Uri, commands, window } from 'vscode';
 import {
   selectGeneratorAndPromptForFlags,
   selectReMoveGenerator,
 } from '@nx-console/vscode/nx-cli-quickpicks';
-import { openGenerateUi } from './init-generate-ui-webview';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   NxTreeItem,
   ProjectViewItem,
 } from '@nx-console/vscode/nx-project-view';
+import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
+import {
+  getGeneratorContextV2,
+  getNxWorkspace,
+} from '@nx-console/vscode/nx-workspace';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/utils';
+import { ExtensionContext, Uri, commands, window } from 'vscode';
+import { openGenerateUi } from './init-generate-ui-webview';
 
 export async function registerGenerateCommands(context: ExtensionContext) {
-  commands.registerCommand(`nx.generate`, async () => {
-    getTelemetry().featureUsed('nx.generate');
-    const result = await selectGeneratorAndPromptForFlags();
-    if (!result) {
-      return;
+  commands.registerCommand(
+    `nx.generate`,
+    async (
+      preselectedGenerator?: string,
+      preselectedFlags?: Record<string, string>
+    ) => {
+      getTelemetry().featureUsed('nx.generate');
+      const result = await selectGeneratorAndPromptForFlags(
+        preselectedGenerator,
+        preselectedFlags
+      );
+      if (!result) {
+        return;
+      }
+      const { generator, flags } = result;
+      if (flags !== undefined) {
+        CliTaskProvider.instance.executeTask({
+          positional: `${generator.collectionName}:${generator.generatorName}`,
+          command: 'generate',
+          flags: [...flags, '--no-interactive'],
+        });
+      }
     }
-    const { generator, flags } = result;
-    if (flags !== undefined) {
-      CliTaskProvider.instance.executeTask({
-        positional: generator.positional,
-        command: 'generate',
-        flags,
-      });
-    }
-  });
+  );
 
   commands.registerCommand(`nx.generate.ui`, () => {
     getTelemetry().featureUsed('nx.generate.ui');
@@ -104,24 +115,19 @@ export async function registerGenerateCommands(context: ExtensionContext) {
     }
   );
 
-  const openReMoveGenerator = (
+  const openReMoveGenerator = async (
     generator: string,
     uri: Uri | undefined,
     projectName: string | undefined
   ) => {
-    const newGenUi = GlobalConfigurationStore.instance.get(
-      'useNewGenerateUiPreview'
-    );
-    if (newGenUi) {
-      openGenerateUi(uri, generator, projectName);
-    } else {
-      showGenerateUi(
-        context.extensionPath,
-        uri,
-        GeneratorType.Other,
-        generator
-      );
+    if (!projectName && uri) {
+      projectName = (await getGeneratorContextV2(uri.fsPath)).project;
     }
+    commands.executeCommand(
+      'nx.generate',
+      generator,
+      projectName ? { projectName } : undefined
+    );
   };
 }
 
