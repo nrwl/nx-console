@@ -188,7 +188,6 @@ tasks {
     }
 
     jar {
-        dependsOn("copyGenerateUiArtifacts")
         dependsOn("copyGenerateUiV2Artifacts")
 
         archiveBaseName.set("nx-console")
@@ -205,22 +204,9 @@ tasks.register<Exec>("buildNxls") {
     workingDir = rootDir
 }
 
-tasks.register<Exec>("buildGenerateUi") {
-    commandLine = buildCommands() + "npx nx run generate-ui:build:production-intellij"
-    workingDir = rootDir
-}
-
 tasks.register<Exec>("buildGenerateUiV2") {
     commandLine = buildCommands() + "npx nx run generate-ui-v2:build"
     workingDir = rootDir
-}
-
-tasks.register<Copy>("copyGenerateUiArtifacts") {
-    dependsOn("buildGenerateUi")
-
-    from("${rootDir}/dist/apps/generate-ui")
-    include("*.js", "*.css")
-    into("${buildDir}/resources/main/generate_ui")
 }
 
 tasks.register<Copy>("copyGenerateUiV2Artifacts") {

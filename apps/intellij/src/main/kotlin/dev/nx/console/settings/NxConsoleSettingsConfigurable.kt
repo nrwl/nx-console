@@ -21,7 +21,6 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
     // application settings
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var telemetrySetting: TelemetrySetting
-    private lateinit var useNewGenerateUIPreviewSetting: UseNewGenerateUIPreviewSetting
 
     override fun createComponent(): JComponent {
         // project settings
@@ -41,9 +40,6 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         telemetrySetting = TelemetrySetting()
         telemetrySetting.setValue(settingsProvider.enableTelemetry)
 
-        useNewGenerateUIPreviewSetting = UseNewGenerateUIPreviewSetting()
-        useNewGenerateUIPreviewSetting.setValue(settingsProvider.useNewGenerateUIPreview)
-
         return panel {
             group("Project Settings") {
                 workspacePathSetting.render(this)
@@ -53,7 +49,6 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             group("Application Settings") {
                 enableDryRunOnGenerateChangeSetting.render(this)
                 telemetrySetting.render(this)
-                useNewGenerateUIPreviewSetting.render(this)
             }
         }
     }
@@ -62,7 +57,6 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         return enableDryRunOnGenerateChangeSetting.getValue() !=
             settingsProvider.enableDryRunOnGenerateChange ||
             telemetrySetting.getValue() != settingsProvider.enableTelemetry ||
-            useNewGenerateUIPreviewSetting.getValue() != settingsProvider.useNewGenerateUIPreview ||
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
             generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters ||
             toolWindowStyleSetting.getValue() != projectSettingsProvider.toolwindowStyle
@@ -81,7 +75,6 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         settingsProvider.enableDryRunOnGenerateChange =
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
-        settingsProvider.useNewGenerateUIPreview = useNewGenerateUIPreviewSetting.getValue()
     }
 
     override fun getDisplayName(): String {

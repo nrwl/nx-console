@@ -1,9 +1,0 @@
-{
-  "name": "generate-ui-styles",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "library",
-  "sourceRoot": "libs/generate-ui/styles/src",
-  "targets": {},
-  "generators": {},
-  "tags": ["type:generate-ui"]
-}

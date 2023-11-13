@@ -40,7 +40,6 @@ import {
   initTelemetry,
   watchFile,
 } from '@nx-console/vscode/utils';
-import { revealWebViewPanel } from '@nx-console/vscode/webview';
 
 import { fileExists } from '@nx-console/shared/file-system';
 import {
@@ -93,20 +92,7 @@ export async function activate(c: ExtensionContext) {
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
       async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        const newGenUi = GlobalConfigurationStore.instance.get(
-          'useNewGenerateUiPreview'
-        );
-        if (newGenUi) {
-          openGenerateUi(contextMenuUri);
-        } else {
-          revealWebViewPanel({
-            runTargetTreeItem,
-            context,
-            runTargetTreeView,
-            contextMenuUri,
-            generator: runTargetTreeItem.generator,
-          });
-        }
+        openGenerateUi(contextMenuUri);
       }
     );
 

@@ -3,7 +3,10 @@ package dev.nx.console.generate.ui.file
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
-import com.intellij.ui.jcef.*
+import com.intellij.ui.jcef.JBCefBrowserBase
+import com.intellij.ui.jcef.JBCefClient
+import com.intellij.ui.jcef.JBCefJSQuery
+import com.intellij.ui.jcef.executeJavaScriptAsync
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.*
@@ -82,7 +85,7 @@ class V2NxGenerateUiFile(
     }
 
     private fun handleMessageFromBrowser(message: String) {
-        val logger = logger<DefaultNxGenerateUiFile>()
+        val logger = logger<V2NxGenerateUiFile>()
         val messageParsed = json.decodeFromString<GenerateUiOutputMessage>(message)
         logger.info("received message $messageParsed")
         if (messageParsed.payloadType == "output-init") {

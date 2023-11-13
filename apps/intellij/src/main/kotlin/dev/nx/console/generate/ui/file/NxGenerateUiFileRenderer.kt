@@ -6,7 +6,6 @@ import com.intellij.ui.jcef.JBCefApp
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.NxGenerateUiRenderer
 import dev.nx.console.models.NxGenerator
-import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.ui.Notifier
 
 class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
@@ -19,10 +18,7 @@ class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
             Notifier.notifyJCEFNotEnabled(project)
             return
         }
-        val virtualFile =
-            if (NxConsoleSettingsProvider.getInstance().useNewGenerateUIPreview)
-                V2NxGenerateUiFile("Generate", project, runGeneratorManager)
-            else DefaultNxGenerateUiFile("Generate", runGeneratorManager)
+        val virtualFile = V2NxGenerateUiFile("Generate", project, runGeneratorManager)
 
         val fileEditorManager = FileEditorManager.getInstance(project)
         if (fileEditorManager.isFileOpen(virtualFile)) {

@@ -35,12 +35,6 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
             state.promptedForTelemetry = value
         }
 
-    var useNewGenerateUIPreview: Boolean
-        get() = state.useNewGenerateUIPreview
-        set(value) {
-            state.useNewGenerateUIPreview = value
-        }
-
     companion object {
         fun getInstance(): NxConsoleSettingsProvider {
             return service()
@@ -52,5 +46,4 @@ data class NxConsoleSettingsState(
     var enableDryRunOnGenerateChange: Boolean = true,
     var enableTelemetry: Boolean = false,
     var promptedForTelemetry: Boolean = false,
-    var useNewGenerateUIPreview: Boolean = true
 )
