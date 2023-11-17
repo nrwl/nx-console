@@ -15,6 +15,9 @@ export const nameAndDirectoryProcessor: SchemaProcessor = (
     return schema;
   }
 
+  const nadfDefault = schema.options.find(
+    (opt) => opt.name === 'nameAndDirectoryFormat'
+  )?.default;
   return {
     ...schema,
     options: schema.options.map((option) => {
@@ -47,7 +50,7 @@ export const nameAndDirectoryProcessor: SchemaProcessor = (
       ...schema.context,
       prefillValues: {
         ...(schema.context?.prefillValues ?? {}),
-        nameAndDirectoryFormat: 'as-provided',
+        nameAndDirectoryFormat: `${nadfDefault}` ?? 'as-provided',
       },
     },
   };
