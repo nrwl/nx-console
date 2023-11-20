@@ -36,6 +36,9 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
     };
   }
 
+  const pnarfDefault = schema.options.find(
+    (opt) => opt.name === 'projectNameAndRootFormat'
+  )?.default;
   return {
     ...schema,
     options: schema.options.map((option) => {
@@ -60,7 +63,7 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
       ...schema.context,
       prefillValues: {
         ...(schema.context?.prefillValues ?? {}),
-        projectNameAndRootFormat: 'as-provided',
+        projectNameAndRootFormat: `${pnarfDefault}` ?? 'as-provided',
       },
     },
   };
