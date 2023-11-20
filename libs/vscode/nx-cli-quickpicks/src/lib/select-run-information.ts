@@ -1,7 +1,7 @@
 import { Option, OptionType } from '@nx-console/shared/schema';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { verifyBuilderDefinition } from '@nx-console/vscode/verify';
-import { window } from 'vscode';
+import { ThemeIcon, window } from 'vscode';
 import { selectFlags } from './select-flags';
 import { showNoProjectsMessage } from '@nx-console/vscode/utils';
 
@@ -185,13 +185,33 @@ async function getProjects(targetName?: string): Promise<string[]> {
     .map(([project]) => project);
 }
 
-export async function selectProject(projects: string[]) {
-  return window.showQuickPick(projects, {
+export async function selectProject(
+  projects: string[],
+  highlightedProject?: string
+): Promise<string | undefined> {
+  const quickPickItems = !highlightedProject
+    ? projects.map((p) => ({ label: p }))
+    : projects
+        .map((p) => ({
+          label: p,
+          iconPath:
+            p === highlightedProject ? new ThemeIcon('star-full') : undefined,
+          description: p === highlightedProject ? 'currently open' : undefined,
+        }))
+        .sort((a, b) => {
+          if (a.label === highlightedProject) return -1;
+          if (b.label === highlightedProject) return 1;
+          return a.label.localeCompare(b.label);
+        });
+  const selected = await window.showQuickPick(quickPickItems, {
     placeHolder: `Project to run`,
   });
+  return selected?.label;
 }
 
-async function selectTarget(targets: string[]): Promise<string | undefined> {
+export async function selectTarget(
+  targets: string[]
+): Promise<string | undefined> {
   return window.showQuickPick(targets, {
     placeHolder: 'Target to run',
   });

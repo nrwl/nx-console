@@ -8,7 +8,7 @@ import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.components.service
 import dev.nx.console.NxIcons
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxlsService
 import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
 
@@ -17,6 +17,7 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
     override fun getIcon(value: String): Icon = NxIcons.Action
 
     override fun getHelpGroupTitle() = "Nx"
+
     override fun execute(dataContext: DataContext, value: String) {
         super.execute(dataContext, value)
     }
@@ -66,9 +67,8 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
                 ?.workspace
                 ?.projects
                 ?.entries
-                ?.map { entry -> entry.key to (entry.value?.targets?.keys ?: emptySet()) }
-                ?.associate { it }
-                ?: emptyMap()
+                ?.map { entry -> entry.key to (entry.value.targets.keys) }
+                ?.associate { it } ?: emptyMap()
         }
 
         val completeTasks = targets.flatMap { entry -> entry.value.map { entry.key + ":" + it } }

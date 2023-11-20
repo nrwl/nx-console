@@ -39,7 +39,7 @@ export async function createProjectGraph(
 
       res(undefined);
     } catch (e) {
-      const errorMessage = e.output[1].toString() || e.toString();
+      const errorMessage = `${e.output[1] || e}`;
       rej('Unable to create project graph: ' + errorMessage);
     }
   });

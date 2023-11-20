@@ -2,13 +2,17 @@ package dev.nx.console.graph.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CustomShortcutSet
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.NxIcons
-import dev.nx.console.graph.NxGraphService
+import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.telemetry.TelemetryService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NxGraphFocusTaskGroupAction : DumbAwareAction() {
 
@@ -24,15 +28,19 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
             e.presentation.icon = NxIcons.Action
         }
     }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         TelemetryService.getInstance(project).featureUsed("Nx Graph Focus Task Group")
         val targetGroup: NxSimpleNode.TargetGroup =
             e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup } ?: return
 
-        val graphService = NxGraphService.getInstance(project)
-        graphService.showNxGraphInEditor()
-        graphService.focusTaskGroup(targetGroup.name)
+        CoroutineScope(Dispatchers.Default).launch {
+            val nxGraphService = getNxGraphService(project) ?: return@launch
+            ApplicationManager.getApplication().invokeLater {
+                nxGraphService.focusTaskGroup(targetGroup.name)
+            }
+        }
     }
 
     private fun useKeyMapShortcutSetOrDefault() {
@@ -44,6 +52,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
             shortcutSet = keyMapSet
         }
     }
+
     companion object {
         const val DEFAULT_SHORTCUT = "control shift U"
         const val ID = "dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction"

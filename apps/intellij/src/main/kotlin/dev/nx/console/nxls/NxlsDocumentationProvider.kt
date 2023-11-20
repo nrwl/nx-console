@@ -1,4 +1,4 @@
-package dev.nx.console.providers
+package dev.nx.console.nxls
 
 import com.intellij.lang.documentation.DocumentationMarkup.CONTENT_END
 import com.intellij.lang.documentation.DocumentationMarkup.CONTENT_START
@@ -25,8 +25,7 @@ class NxlsDocumentationProvider : DocumentationProvider {
             runBlocking {
                 DocumentManager.getInstance(editor ?: return@runBlocking null)
                     .hover(element.startOffset)
-            }
-                ?: return null
+            } ?: return null
 
         // extract LSP Markdown format and convert links to html that intellij can understand
         val matches =

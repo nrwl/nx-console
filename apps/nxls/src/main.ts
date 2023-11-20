@@ -379,6 +379,7 @@ connection.onRequest(NxCreateProjectGraphRequest, async ({ showAffected }) => {
   try {
     await createProjectGraph(WORKING_PATH, showAffected, lspLogger);
   } catch (e) {
+    lspLogger.log('Error creating project graph: ' + e.toString());
     return e;
   }
 });

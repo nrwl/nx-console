@@ -7,7 +7,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.NxGenerateUiRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.settings.NxConsoleSettingsProvider
-import dev.nx.console.ui.Notifier
+import dev.nx.console.utils.Notifier
 
 class NxGenerateUiFileRenderer : NxGenerateUiRenderer {
     override fun openGenerateUi(

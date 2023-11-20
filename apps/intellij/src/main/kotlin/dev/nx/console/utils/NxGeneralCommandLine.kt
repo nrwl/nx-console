@@ -19,11 +19,11 @@ fun NxGeneralCommandLine(
         val workDirectory =
             if (cwd !== null) Path.of(project.nxBasePath, cwd).toString() else project.nxBasePath
         setWorkDirectory(workDirectory)
-
         environmentVariables.configureCommandLine(this, true)
 
         NodeCommandLineUtil.configureUsefulEnvironment(this)
         NodeCommandLineUtil.prependNodeDirToPATH(this, project.nodeInterpreter)
+        withCharset(Charsets.UTF_8)
 
         project.nodeInterpreter.let {
             if (isWslInterpreter(it)) {

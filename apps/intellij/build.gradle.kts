@@ -2,7 +2,7 @@ import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 
 fun isWindows(): Boolean {
-    return System.getProperty("os.name").toLowerCase().startsWith("windows")
+    return System.getProperty("os.name").lowercase().startsWith("windows")
 }
 
 val nxlsRoot = "${rootDir}/dist/apps/nxls"
@@ -15,9 +15,9 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.8.0"
+    id("org.jetbrains.kotlin.jvm") version "1.9.21"
     // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
     // Gradle IntelliJ Plugin
     id("org.jetbrains.intellij") version "1.16.1"
 
@@ -39,9 +39,9 @@ repositories { mavenCentral() }
 configurations.all { exclude("org.slf4j", "slf4j-api") }
 
 dependencies {
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.21.0")
 
-    val ktorVersion = "2.2.4"
+    val ktorVersion = "2.3.4"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -55,7 +55,13 @@ ktfmt { kotlinLangStyle() }
 
 // Set the JVM language level used to build project. Use Java 11 for 2020.3+, and Java 17 for
 // 2022.2+.
-kotlin { jvmToolchain(17) }
+kotlin {
+    @Suppress("UnstableApiUsage")
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+        vendor = JvmVendorSpec.JETBRAINS
+    }
+}
 
 // Configure Gradle IntelliJ Plugin - read more:
 // https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html

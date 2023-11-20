@@ -203,6 +203,11 @@
           "command": "nxConsole.refreshWorkspace",
           "group": "navigation",
           "when": "graphWebviewVisible"
+        },
+        {
+          "command": "nx.project-details.openToSide",
+          "group": "navigation",
+          "when": "resourceFilename === project.json"
         }
       ],
       "commandPalette": [
@@ -433,6 +438,12 @@
         "title": "Show affected project graph",
         "command": "nx.graph.showAffected",
         "icon": "$(source-control)"
+      },
+      {
+        "category": "Nx",
+        "title": "Open Project Details to Side",
+        "command": "nx.project-details.openToSide",
+        "icon": "$(open-preview)"
       },
       {
         "category": "Nx",

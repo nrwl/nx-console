@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.ColoredListCellRenderer
 import com.intellij.ui.SimpleTextAttributes
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxlsService
 import javax.swing.JList
 import javax.swing.ListSelectionModel
 import kotlin.coroutines.resume
@@ -91,8 +91,7 @@ suspend fun selectTargetForNxProject(
                 ?.get(nxProject)
                 ?.targets
                 ?.keys
-                ?.toList()
-                ?: emptyList()
+                ?.toList() ?: emptyList()
 
         ApplicationManager.getApplication().invokeLater {
             val popup =

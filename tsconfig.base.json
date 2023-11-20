@@ -73,6 +73,7 @@
       "@nx-console/vscode/generate-ui-webview": [
         "libs/vscode/generate-ui-webview/src/index.ts"
       ],
+      "@nx-console/vscode/graph-base": ["libs/vscode/graph-base/src/index.ts"],
       "@nx-console/vscode/lsp-client": ["libs/vscode/lsp-client/src/index.ts"],
       "@nx-console/vscode/nvm-tip": ["libs/vscode/nvm-tip/src/index.ts"],
       "@nx-console/vscode/nx-cli-quickpicks": [
@@ -98,6 +99,9 @@
       ],
       "@nx-console/vscode/nx-workspace": [
         "libs/vscode/nx-workspace/src/index.ts"
+      ],
+      "@nx-console/vscode/project-details": [
+        "libs/vscode/project-details/src/index.ts"
       ],
       "@nx-console/vscode/project-graph": [
         "libs/vscode/project-graph/src/index.ts"

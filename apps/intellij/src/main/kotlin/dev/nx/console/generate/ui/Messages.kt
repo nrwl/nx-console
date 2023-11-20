@@ -3,6 +3,7 @@ package dev.nx.console.generate.ui
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.NxGeneratorOption
 import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -28,9 +29,11 @@ data class GeneratorSchemaPayload(
     val options: List<NxGeneratorOption>,
     val contextValues: NxGeneratorContext?
 ) {
-    @EncodeDefault() val command: String = "generate"
+    @OptIn(ExperimentalSerializationApi::class) @EncodeDefault() val command: String = "generate"
 
-    @EncodeDefault() val positional = "${this.collection}:${this.name}"
+    @OptIn(ExperimentalSerializationApi::class)
+    @EncodeDefault()
+    val positional = "${this.collection}:${this.name}"
 }
 
 @Serializable

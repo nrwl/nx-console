@@ -8,7 +8,7 @@ import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.generate.ui.*
 import dev.nx.console.models.NxGenerator
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
@@ -19,7 +19,6 @@ import javax.swing.UIManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 class V2NxGenerateUiFile(

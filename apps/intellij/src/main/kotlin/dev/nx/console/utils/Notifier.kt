@@ -1,4 +1,4 @@
-package dev.nx.console.ui
+package dev.nx.console.utils
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.notification.Notification
@@ -13,7 +13,6 @@ import dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesNot
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
 import dev.nx.console.telemetry.actions.TelemetryOptInAction
 import dev.nx.console.telemetry.actions.TelemetryOptOutAction
-import dev.nx.console.utils.Throttler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
@@ -60,9 +59,9 @@ class Notifier {
 
         fun notifyNoProject(project: Project, path: String?) {
             if (path == null) {
-                this.notifyAnything(project, "Couldn't find project.", NotificationType.ERROR)
+                notifyAnything(project, "Couldn't find project.", NotificationType.ERROR)
             } else {
-                this.notifyAnything(
+                notifyAnything(
                     project,
                     "Couldn't find a project at $path. Are you sure this path belongs to an Nx project?",
                     NotificationType.ERROR
@@ -73,14 +72,27 @@ class Notifier {
         private val lspIssueExceptionThrottler =
             Throttler(1000L, CoroutineScope(Dispatchers.Default))
 
-        fun notifyLspMessageIssueExceptionThrottled(project: Project, e: MessageIssueException) =
-            lspIssueExceptionThrottler.throttle { notifyLSPMessageIssueException(project, e) }
+        fun notifyLspMessageIssueExceptionThrottled(
+            project: Project,
+            requestName: String,
+            e: MessageIssueException
+        ) =
+            lspIssueExceptionThrottler.throttle {
+                notifyLSPMessageIssueException(project, requestName, e)
+            }
 
-        fun notifyLSPMessageIssueException(project: Project, e: MessageIssueException) {
+        fun notifyLSPMessageIssueException(
+            project: Project,
+            requestName: String,
+            e: MessageIssueException
+        ) {
             group
                 .createNotification(
                     "<html>" +
-                        "Nx Console ran into problems reading your workspace files: <br>" +
+                        "Nx Console ran into problems reading your workspace files during the following request:" +
+                        "<br>" +
+                        requestName +
+                        "<br>" +
                         "<pre>${e.issues.first().cause.message}</pre><br>" +
                         "Make sure to double-check your project.json & nx.json files for syntax errors below." +
                         "</html>",

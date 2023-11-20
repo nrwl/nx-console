@@ -6,13 +6,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.graph.ui.NxGraphFileType
-import dev.nx.console.services.NxlsService
 
 class NxRefreshWorkspaceAction :
     DumbAwareAction("Refresh Nx Workspace", "Refreshes the Nx workspace", null) {
 
     override fun update(e: AnActionEvent) {
-        val p = e.place
         if (
             e.place == ActionPlaces.getPopupPlace(ActionPlaces.TABS_MORE_TOOLBAR) ||
                 e.place == ActionPlaces.EDITOR_TAB_POPUP
@@ -26,6 +24,7 @@ class NxRefreshWorkspaceAction :
             }
         }
     }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 

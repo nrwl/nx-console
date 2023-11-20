@@ -8,7 +8,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import dev.nx.console.NxConsoleBundle
-import dev.nx.console.ui.Notifier
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
 import java.io.File
