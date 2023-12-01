@@ -1,5 +1,4 @@
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
-import { debounceTime, Subject } from 'rxjs';
 import { commands, EventEmitter, ExtensionContext } from 'vscode';
 import { sendNotification } from './configure-lsp-client';
 

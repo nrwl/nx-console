@@ -14,15 +14,14 @@ import { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { Disposable, Uri, commands, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 export function projectGraph() {
   const graphWebView = new GraphWebView();
+  onWorkspaceRefreshed(() => graphWebView.refresh());
 
   return Disposable.from(
     graphWebView,
-    commands.registerCommand('nx.graph.refresh', () => {
-      graphWebView.refresh();
-    }),
     commands.registerCommand('nx.graph.showAll', () => {
       getTelemetry().featureUsed('nx.graph.showAll');
       graphWebView.showAllProjects();
