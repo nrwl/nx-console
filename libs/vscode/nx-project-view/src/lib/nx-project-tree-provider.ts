@@ -20,6 +20,7 @@ import {
 } from './views/nx-project-tree-view';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import { TargetViewItem } from './views/nx-project-base-view';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 export type ViewItem = ListViewItem | TreeViewItem | AutomaticViewItem;
 
@@ -43,7 +44,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
         ['editWorkspaceJson', this.editWorkspaceJson],
         ['revealInExplorer', this.revealInExplorer],
         ['runTask', this.runTask],
-        ['refreshNxProjectsTree', this.refreshNxProjectsTree],
         ['runTaskSkipNxCache', this.runTaskSkipNxCache],
         ['copyTaskToClipboard', this.copyTaskToClipboard],
         ['runTaskWithOptions', this.runTaskWithOptions],
@@ -61,6 +61,8 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     GlobalConfigurationStore.instance.onConfigurationChange(() =>
       this.refresh()
     );
+
+    onWorkspaceRefreshed(() => this.refresh());
   }
 
   getParent() {
@@ -165,9 +167,5 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     }
     const target = viewItem.nxTarget;
     return revealNxProject(project, root, target);
-  }
-
-  private async refreshNxProjectsTree() {
-    this.refresh();
   }
 }
