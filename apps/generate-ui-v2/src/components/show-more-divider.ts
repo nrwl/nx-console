@@ -28,7 +28,7 @@ export class ShowMoreDivider extends EditorContext(LitElement) {
         <div tabindex="0" aria-role="button" class="flex flex-row gap-2 leading-none focus:ring-1 focus:ring-focusBorder focus:outline-none" @keydown="${
           this.handleKeyEvent
         }">${
-      this.showMore ? 'Show less options' : 'Show all options'
+      this.showMore ? 'Show fewer options' : 'Show all options'
     } <icon-element icon="${
       this.showMore ? 'chevron-up' : 'chevron-down'
     }" class="self-center"></div>
