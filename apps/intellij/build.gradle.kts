@@ -19,7 +19,7 @@ plugins {
     // Kotlin serialization
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.12.0"
+    id("org.jetbrains.intellij") version "1.16.1"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
@@ -40,8 +40,6 @@ configurations.all { exclude("org.slf4j", "slf4j-api") }
 
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.19.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
     val ktorVersion = "2.2.4"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -180,11 +178,10 @@ tasks {
         // Specify pre-release label to publish the plugin in a custom Release Channel
         // automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(
-            listOf(
-                properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()
-            )
-        )
+        //        val channel: String =
+        //            properties("pluginVersion").split('-').getOrElse(1) { "default"
+        // }.split('.').first()
+        //        channels.set(listOf(channel))
     }
 
     jar {
@@ -192,6 +189,11 @@ tasks {
         dependsOn("copyGenerateUiV2Artifacts")
 
         archiveBaseName.set("nx-console")
+    }
+
+    instrumentedJar {
+        dependsOn("copyGenerateUiArtifacts")
+        dependsOn("copyGenerateUiV2Artifacts")
     }
 }
 
