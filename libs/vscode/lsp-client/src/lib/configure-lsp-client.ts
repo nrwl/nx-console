@@ -14,13 +14,11 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
+import { handleNxlsRefresh } from './refresh-workspace';
 
 let client: LanguageClient | undefined;
 
-export function configureLspClient(
-  context: ExtensionContext,
-  refreshCommand: string | undefined
-) {
+export function configureLspClient(context: ExtensionContext) {
   if (client) {
     sendNotification(NxChangeWorkspace, getWorkspacePath());
     return;
@@ -65,10 +63,7 @@ export function configureLspClient(
 
   // nxls is telling us to refresh projects on this side
   client.onNotification(NxWorkspaceRefreshNotification, () => {
-    if (refreshCommand) {
-      getOutputChannel().appendLine('Refreshing ui due to lsp notification');
-      commands.executeCommand(refreshCommand, true);
-    }
+    handleNxlsRefresh();
   });
 
   context.subscriptions.push({ dispose });

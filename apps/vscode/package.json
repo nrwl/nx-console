@@ -200,7 +200,7 @@
       ],
       "editor/title": [
         {
-          "command": "nx.graph.refresh",
+          "command": "nxConsole.refreshWorkspace",
           "group": "navigation",
           "when": "graphWebviewVisible"
         }
@@ -244,10 +244,6 @@
         },
         {
           "command": "nx.generate",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.graph.refresh",
           "when": "isNxWorkspace"
         },
         {
@@ -392,12 +388,6 @@
         "category": "Nx",
         "title": "generate",
         "command": "nx.generate"
-      },
-      {
-        "category": "Nx",
-        "title": "Refresh Nx Graph",
-        "command": "nx.graph.refresh",
-        "icon": "$(refresh)"
       },
       {
         "category": "Nx",
