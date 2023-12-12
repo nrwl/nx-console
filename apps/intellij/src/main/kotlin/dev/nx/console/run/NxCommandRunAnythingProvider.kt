@@ -68,7 +68,8 @@ class NxCommandRunAnythingProvider : RunAnythingCommandLineProvider() {
                 ?.projects
                 ?.entries
                 ?.map { entry -> entry.key to (entry.value.targets.keys) }
-                ?.associate { it } ?: emptyMap()
+                ?.associate { it }
+                ?: emptyMap()
         }
 
         val completeTasks = targets.flatMap { entry -> entry.value.map { entry.key + ":" + it } }

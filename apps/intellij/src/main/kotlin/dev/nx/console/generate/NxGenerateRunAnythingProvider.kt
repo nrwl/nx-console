@@ -147,7 +147,8 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
                 .toSet()
         return generatorOptions[generator.name]?.let { options ->
             options.map { "--${it.name}" }.filterNot { it in specifiedOptions }.asSequence()
-        } ?: emptySequence()
+        }
+            ?: emptySequence()
     }
 
     private fun findGenerator(

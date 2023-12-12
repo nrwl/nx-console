@@ -50,7 +50,7 @@ fun getNxTargetDescriptorFromNode(element: PsiElement, project: Project): NxTarg
                         ?.findProperty("name")
                         ?.value as? JsonStringLiteral)
                     ?.value
-                ?: return null
+                    ?: return null
 
         return NxTargetDescriptor(nxProject, nxTarget)
     }
@@ -67,7 +67,8 @@ fun getNxTargetDescriptorFromNode(element: PsiElement, project: Project): NxTarg
                     ?.parentOfType<JsonObject>()
                     ?.findProperty("name")
                     ?.value as? JsonStringLiteral)
-                ?.value ?: return null
+                ?.value
+                ?: return null
 
         return NxTargetDescriptor(nxProject, nxTarget, nxTargetConfiguration)
     }

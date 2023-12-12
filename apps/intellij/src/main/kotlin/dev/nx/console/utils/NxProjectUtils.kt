@@ -91,7 +91,8 @@ suspend fun selectTargetForNxProject(
                 ?.get(nxProject)
                 ?.targets
                 ?.keys
-                ?.toList() ?: emptyList()
+                ?.toList()
+                ?: emptyList()
 
         ApplicationManager.getApplication().invokeLater {
             val popup =
