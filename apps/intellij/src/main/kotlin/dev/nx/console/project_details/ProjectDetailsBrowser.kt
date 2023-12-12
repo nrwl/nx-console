@@ -1,5 +1,7 @@
 package dev.nx.console.project_details
 
+import NxGraphServer
+import NxGraphServerRefreshListener
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -17,6 +19,9 @@ import kotlinx.coroutines.launch
 
 class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
     NxGraphBrowserBase(project), DumbAware {
+
+    private var nxProjectName: String? = null
+
     init {
         CoroutineScope(Dispatchers.Default).launch {
             graphServer.waitForServerReady()
@@ -49,16 +54,32 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                     if (nxProjectName == null) {
                         Notifier.notifyNoProject(project, file.path)
                     } else {
-                        executeWhenLoaded {
-                            browser.executeJavaScriptAsync(
-                                "window.waitForRouter().then(() => {console.log('navigating to $nxProjectName'); window.externalApi.router?.navigate('/project-details/$nxProjectName')})"
-                            )
-                        }
+                        this@ProjectDetailsBrowser.nxProjectName = nxProjectName
+                        loadProjectDetails(nxProjectName)
                     }
                 } catch (e: Throwable) {
                     logger<NxGraphBrowser>().debug(e.message)
                 }
             }
+
+            with(project.messageBus.connect()) {
+                subscribe(
+                    NxGraphServer.NX_GRAPH_SERVER_REFRESH,
+                    object : NxGraphServerRefreshListener {
+                        override fun onRefresh() {
+                            nxProjectName?.also { loadProjectDetails(it) }
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    private fun loadProjectDetails(nxProjectName: String) {
+        executeWhenLoaded {
+            browser.executeJavaScriptAsync(
+                "window.waitForRouter().then(() => window.externalApi.router?.navigate('/project-details/$nxProjectName'))"
+            )
         }
     }
 }

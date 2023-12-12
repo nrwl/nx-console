@@ -2,6 +2,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
+import com.intellij.util.messages.Topic
 import dev.nx.console.utils.NxGeneralCommandLine
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -43,35 +44,9 @@ open class NxGraphServer(
     var currentPort: Int? = null
     private var nxGraphProcess: Process? = null
 
-    private var client = HttpClient(CIO)
     private var isStarted = false
 
-    //  val updatedEventEmitter = EventEmitter()
-
-    suspend fun handleWebviewRequest(request: WebviewRequest): WebviewResponse? {
-        if (!isStarted) {
-            waitForServerReady()
-        }
-
-        val url = StringBuilder("http://localhost:${currentPort}/")
-        when (request.type) {
-            "requestProjectGraph" -> url.append("project-graph.json")
-            "requestTaskGraph" -> url.append("task-graph.json")
-            "requestExpandedTaskInputs" -> url.append("expanded-task-inputs.json")
-            "requestSourceMaps" -> url.append("source-maps.json")
-            else -> return null
-        }
-
-        return CoroutineScope(Dispatchers.IO).run {
-            try {
-                val response = client.get(url.toString()).bodyAsText()
-                WebviewResponse(request.type, request.id, response)
-            } catch (e: Exception) {
-                println("Error handling request: $e")
-                null
-            }
-        }
-    }
+    //    val updatedEventEmitter =
 
     fun start() {
         if (isStarted) {
@@ -89,64 +64,56 @@ open class NxGraphServer(
 
             currentPort = port
             try {
-                val started = spawnProcess(port)
-                if (started) {
-                    isStarted = true
-                }
+                val process = spawnProcess(port)
+                nxGraphProcess = process
+                handleGraphProcessError(process)
+                listenForGraphUpdates()
+
+                isStarted = true
             } catch (e: Exception) {
                 println("error while starting nx graph: $e")
             }
         }
     }
 
-    private suspend fun spawnProcess(port: Int): Boolean {
+    private suspend fun spawnProcess(port: Int): Process {
         println("trying to start graph at $port")
 
-        return try {
-            withContext(Dispatchers.IO) {
-                val commandLine =
-                    NxGeneralCommandLine(
-                        project,
-                        listOf(
-                            "graph",
-                            "--port",
-                            port.toString(),
-                            "--open",
-                            "false",
-                            "--watch",
-                            if (affected) "--affected" else ""
-                        ),
-                    )
+        return withContext(Dispatchers.IO) {
+            val commandLine =
+                NxGeneralCommandLine(
+                    project,
+                    listOf(
+                        "graph",
+                        "--port",
+                        port.toString(),
+                        "--open",
+                        "false",
+                        "--watch",
+                        if (affected) "--affected" else ""
+                    ),
+                )
 
-                val process = commandLine.createProcess()
-                if (!process.isAlive) {
-                    throw IOException("Unable to start graph at port $port")
-                } else {
-                    logger.info("graph server started: $process")
-                }
-
-                process.onExit().thenAccept { exitCode ->
-                    logger.debug("graph server exited with code $exitCode")
-                    isStarted = false
-                    nxGraphProcess = null
-                    process.errorStream.readAllBytes().decodeToString().run { logger.debug(this) }
-                }
-
-                // wait for process to start - signified by logging the port
-                val reader = process.inputStream.bufferedReader()
-                var stopWaiting = false
-
-                while (!stopWaiting && reader.ready()) {
-                    val line = reader.readLine()?.trim()?.lowercase()
-
-                    if (line != null && line.contains(port.toString())) {
-                        stopWaiting = true
-                    }
-                }
-                true
+            val process = commandLine.createProcess()
+            if (!process.isAlive) {
+                throw IOException("Unable to start graph at port $port")
+            } else {
+                logger.info("graph server started: $process")
             }
-        } catch (e: Exception) {
-            false
+
+            // wait for process to start - signified by logging the port
+            val reader = process.inputStream.bufferedReader()
+            var stopWaiting = false
+
+            while (!stopWaiting && reader.ready()) {
+                val line = reader.readLine()?.trim()?.lowercase()
+
+                if (line != null && line.contains(port.toString())) {
+                    stopWaiting = true
+                }
+            }
+
+            process
         }
     }
 
@@ -157,6 +124,30 @@ open class NxGraphServer(
             }
         } catch (e: IOException) {
             false
+        }
+    }
+
+    private fun listenForGraphUpdates() {
+        nxGraphProcess?.also {
+            CoroutineScope(Dispatchers.IO).launch {
+                it.inputStream.bufferedReader().use { reader ->
+                    while (isActive && it.isAlive) {
+                        val line = reader.readLine()
+                        if (line != null && line.contains("updated")) {
+                            project.messageBus.syncPublisher(NX_GRAPH_SERVER_REFRESH).onRefresh()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleGraphProcessError(process: Process) {
+        process.onExit().thenAccept { exitCode ->
+            logger.debug("graph server exited with code $exitCode")
+            isStarted = false
+            nxGraphProcess = null
+            process.errorStream.readAllBytes().decodeToString().run { logger.debug(this) }
         }
     }
 
@@ -171,4 +162,13 @@ open class NxGraphServer(
         nxGraphProcess = null
         isStarted = false
     }
+
+    companion object {
+        val NX_GRAPH_SERVER_REFRESH: Topic<NxGraphServerRefreshListener> =
+            Topic("NxGraphServerRefresh", NxGraphServerRefreshListener::class.java)
+    }
+}
+
+interface NxGraphServerRefreshListener {
+    fun onRefresh()
 }
