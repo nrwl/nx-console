@@ -25208,6 +25208,7 @@ __metadata:
     vscode-json-languageservice: ^5.1.0
     vscode-languageclient: ^8.0.2
     vscode-languageserver: ^8.0.2
+    vscode-uri: ^3.0.8
     wdio-vscode-service: ^4.2.1
     webdriverio: ^7.26.0
     webpack: 5.88.2
@@ -32166,6 +32167,13 @@ __metadata:
   version: 3.0.6
   resolution: "vscode-uri@npm:3.0.6"
   checksum: 8b6a36553d089309c09f7aa2ca8dae321a1cb7ff5dcab35f0914d5155d3110722bdb6de67dcb727df15fecd83221d11bb4ab1274a9116b9ccc05b86cefe60dfc
+  languageName: node
+  linkType: hard
+
+"vscode-uri@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "vscode-uri@npm:3.0.8"
+  checksum: 514249126850c0a41a7d8c3c2836cab35983b9dc1938b903cfa253b9e33974c1416d62a00111385adcfa2b98df456437ab704f709a2ecca76a90134ef5eb4832
   languageName: node
   linkType: hard
 

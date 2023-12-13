@@ -1,19 +1,21 @@
 import {
+  clearJsonCache,
+  readAndCacheJsonFile,
+} from '@nx-console/shared/file-system';
+import {
+  packageDetails,
   workspaceDependencies,
   workspaceDependencyPath,
-  packageDetails,
 } from '@nx-console/shared/npm';
 import {
   CollectionInfo,
+  ExecutorCollectionInfo,
   Generator,
+  GeneratorCollectionInfo,
   GeneratorType,
 } from '@nx-console/shared/schema';
 import { platform } from 'os';
 import { dirname, resolve } from 'path';
-import {
-  clearJsonCache,
-  readAndCacheJsonFile,
-} from '@nx-console/shared/file-system';
 import { nxWorkspace } from './workspace';
 
 export type ReadCollectionsOptions = {
@@ -119,25 +121,6 @@ export async function getCollectionInfo(
 ): Promise<CollectionInfo[]> {
   const collectionMap: Map<string, CollectionInfo> = new Map();
 
-  const buildCollectionInfo = (
-    name: string,
-    value: any,
-    type: 'executor' | 'generator',
-    schemaPath: string
-  ): CollectionInfo => {
-    let path = resolve(collectionPath, dirname(schemaPath), value.schema);
-
-    if (platform() === 'win32') {
-      path = `file:///${path.replace(/\\/g, '/')}`;
-    }
-
-    return {
-      name: `${collectionName}:${name}`,
-      type,
-      path,
-    };
-  };
-
   const executors = {
     ...executorCollection.json.executors,
     ...executorCollection.json.builders,
@@ -146,12 +129,21 @@ export async function getCollectionInfo(
     if (!canUse(key, schema, options.includeHidden, options.includeNgAdd)) {
       continue;
     }
-    const collectionInfo = buildCollectionInfo(
-      key,
-      schema,
-      'executor',
-      executorCollection.path
-    );
+    const collectionInfo: ExecutorCollectionInfo = {
+      type: 'executor',
+      name: `${collectionName}:${key}`,
+      schemaPath: formatCollectionPath(
+        collectionPath,
+        executorCollection.path,
+        schema.schema
+      ),
+      implementationPath: formatCollectionPath(
+        collectionPath,
+        executorCollection.path,
+        schema.implementation
+      ),
+      configPath: formatPath(resolve(collectionPath, executorCollection.path)),
+    };
     if (
       collectionMap.has(collectionNameWithType(collectionInfo.name, 'executor'))
     ) {
@@ -173,17 +165,19 @@ export async function getCollectionInfo(
     }
 
     try {
-      const collectionInfo = buildCollectionInfo(
-        key,
-        schema,
-        'generator',
-        generatorCollection.path
-      );
-      collectionInfo.data = readCollectionGenerator(
-        collectionName,
-        key,
-        schema
-      );
+      const collectionInfo: GeneratorCollectionInfo = {
+        type: 'generator',
+        name: `${collectionName}:${key}`,
+        schemaPath: formatCollectionPath(
+          collectionPath,
+          generatorCollection.path,
+          schema.schema
+        ),
+        configPath: formatPath(
+          resolve(collectionPath, generatorCollection.path)
+        ),
+        data: readCollectionGenerator(collectionName, key, schema),
+      };
       if (
         collectionMap.has(
           collectionNameWithType(collectionInfo.name, 'generator')
@@ -307,4 +301,20 @@ function canUse(
 
 function collectionNameWithType(name: string, type: 'generator' | 'executor') {
   return `${name}-${type}`;
+}
+
+function formatCollectionPath(
+  collectionPath: string,
+  jsonFilePath: string,
+  path: string
+): string {
+  return formatPath(resolve(collectionPath, dirname(jsonFilePath), path));
+}
+
+function formatPath(path: string): string {
+  if (platform() === 'win32') {
+    return `file:///${path.replace(/\\/g, '/')}`;
+  }
+
+  return path;
 }

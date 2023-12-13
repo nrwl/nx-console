@@ -1,4 +1,4 @@
-import { CollectionInfo } from '@nx-console/shared/schema';
+import { ExecutorCollectionInfo } from '@nx-console/shared/schema';
 import { readCollections } from './read-collections';
 
 export type GetExecutorsOptions = {
@@ -12,11 +12,14 @@ export async function getExecutors(
     includeHidden: false,
     clearPackageJsonCache: false,
   }
-): Promise<CollectionInfo[]> {
+): Promise<ExecutorCollectionInfo[]> {
   return (
     await readCollections(workspacePath, {
       clearPackageJsonCache: options.clearPackageJsonCache,
       includeHidden: options.includeHidden,
     })
-  ).filter((collection) => collection.type === 'executor');
+  ).filter(
+    (collection): collection is ExecutorCollectionInfo =>
+      collection.type === 'executor'
+  );
 }

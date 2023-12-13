@@ -172,8 +172,8 @@ async function getProjectSchema(
     }
     const schemaRef =
       platform() === 'win32'
-        ? matchingCollection?.path
-        : `file://${matchingCollection?.path}`;
+        ? matchingCollection.schemaPath
+        : `file://${matchingCollection.schemaPath}`;
 
     targetsProperties[key] = {
       properties: {
