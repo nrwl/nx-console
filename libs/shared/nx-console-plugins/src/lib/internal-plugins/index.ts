@@ -1,4 +1,5 @@
 import { NxConsolePluginsDefinition } from '../nx-console-plugin-types';
+import { addProjectItemsToOptionProcessor } from './add-project-items-to-option-processor';
 import { filterInternalAndDeprecatedProcessor } from './filter-internal-and-deprecated-processor';
 import { gitCleanMessageFactory } from './git-clean-message-factory';
 import {
@@ -17,6 +18,7 @@ export const internalPlugins: NxConsolePluginsDefinition = {
     filterInternalAndDeprecatedProcessor,
     prefillProjectAndDirProcessor,
     nameAndDirectoryProcessor,
+    addProjectItemsToOptionProcessor,
   ],
   validators: [],
   startupMessageFactories: [

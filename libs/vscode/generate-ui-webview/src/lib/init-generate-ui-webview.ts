@@ -36,23 +36,8 @@ export async function openGenerateUi(
     };
   }
 
-  generateUIWebview.openGenerateUi(
-    await augmentGeneratorSchema({
-      ...generator,
-      context: generatorContext,
-    })
-  );
-}
-
-async function augmentGeneratorSchema(
-  generatorSchema: GeneratorSchema
-): Promise<GeneratorSchema> {
-  for (const option of generatorSchema.options) {
-    if (isProjectOption(option)) {
-      const projects = Object.entries(await getNxWorkspaceProjects());
-      option.items = projects.map((entry) => entry[0]).sort();
-    }
-  }
-
-  return generatorSchema;
+  generateUIWebview.openGenerateUi({
+    ...generator,
+    context: generatorContext,
+  });
 }
