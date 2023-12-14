@@ -53,6 +53,8 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
     /*html*/ `
   <script> 
     // communication with server through vscode api 
+    // we send requests to vscode with an id 
+    // as responses come in, we compare ids and resolve the promise
     const vscode = acquireVsCodeApi();
     window.vscode = vscode;
     const pendingRequests = new Map();
@@ -60,8 +62,9 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
     window.externalApi = {}
     window.addEventListener('message', ({ data }) => {
       const { type, id, payload } = data;
-      const payloadParsed = JSON.parse(payload);
-      if (id && pendingRequests.has(id)) {
+      
+      if (type.startsWith('request') && id && pendingRequests.has(id)) {
+        const payloadParsed = JSON.parse(payload);
         const resolve = pendingRequests.get(id);
         resolve(payloadParsed);
         pendingRequests.delete(id);
@@ -84,6 +87,16 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
     window.externalApi.loadTaskGraph = () => sendRequest('requestTaskGraph');
     window.externalApi.loadExpandedTaskInputs = (taskId) => sendRequest('requestExpandedTaskInputs', taskId);
     window.externalApi.loadSourceMaps = () => sendRequest('requestSourceMaps');
+
+    // set up interaction events (open project config, file click, ...)
+    if(!window.externalApi.graphInteractionEventListeners) {
+        window.externalApi.graphInteractionEventListeners = []
+      }
+      window.externalApi.graphInteractionEventListeners.push((message) => {
+        console.log('graph interaction', message)
+        vscode.postMessage(message)
+      })
+
     window.environment = "nx-console"
 
     // waiting for nx graph to be ready
