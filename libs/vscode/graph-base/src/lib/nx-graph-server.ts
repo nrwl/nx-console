@@ -35,7 +35,11 @@ export class NxGraphServer implements Disposable {
 
   constructor(private startPort: number, private affected = false) {}
 
-  async handleWebviewRequest(request: { type: string; id: string }): Promise<
+  async handleWebviewRequest(request: {
+    type: string;
+    id: string;
+    payload: string;
+  }): Promise<
     | {
         type: string;
         id: string;
@@ -59,7 +63,7 @@ export class NxGraphServer implements Disposable {
           url += 'task-graph.json';
           break;
         case 'requestExpandedTaskInputs':
-          url += `expanded-task-inputs.json`;
+          url += `task-inputs.json?taskId=${request.payload}`;
           break;
         case 'requestSourceMaps':
           url += 'source-maps.json';
