@@ -88,5 +88,5 @@ async function getTargetNames(): Promise<string[]> {
     }
     return acc;
   }, new Set<string>());
-  return Array.from(commands);
+  return Array.from(commands).sort();
 }

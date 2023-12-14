@@ -163,7 +163,7 @@ async function getTargets(projectName?: string): Promise<string[]> {
       }
       return acc;
     }, new Set<string>())
-  );
+  ).sort();
 }
 
 async function getProjects(targetName?: string): Promise<string[]> {
