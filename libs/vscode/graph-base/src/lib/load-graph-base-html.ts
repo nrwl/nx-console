@@ -56,7 +56,6 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
     // we send requests to vscode with an id 
     // as responses come in, we compare ids and resolve the promise
     const vscode = acquireVsCodeApi();
-    window.vscode = vscode;
     const pendingRequests = new Map();
 
     window.externalApi = {}
@@ -65,7 +64,6 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
       
       if (type.startsWith('request') && id && pendingRequests.has(id)) {
         const payloadParsed = JSON.parse(payload);
-        console.log('payload', payloadParsed)
         const resolve = pendingRequests.get(id);
         resolve(payloadParsed);
         pendingRequests.delete(id);
@@ -92,7 +90,8 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
     // set up interaction events (open project config, file click, ...)
     window.externalApi.graphInteractionEventListener = (message) => {
       console.log('graph interaction', message)
-      vscode.postMessage(message)
+      console.log(typeof message)
+      vscode.postMessage({...message})
     }
 
     window.environment = "nx-console"

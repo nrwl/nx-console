@@ -1,6 +1,7 @@
 import {
   NxGraphServer,
   getNxGraphServer,
+  handleGraphInteractionEvent,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
 import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
@@ -25,8 +26,13 @@ export class ProjectDetailsPreview {
 
     this.graphServer = getNxGraphServer(extensionContext);
     this.webviewPanel.webview.onDidReceiveMessage(async (event) => {
-      const response = await this.graphServer.handleWebviewRequest(event);
-      this.webviewPanel.webview.postMessage(response);
+      const handled = await handleGraphInteractionEvent(event);
+      if (handled) return;
+
+      if (event.type.startsWith('request')) {
+        const response = await this.graphServer.handleWebviewRequest(event);
+        this.webviewPanel.webview.postMessage(response);
+      }
     });
     this.graphServer.updatedEventEmitter.event(() => {
       this.webviewPanel.webview.postMessage({ type: 'reload' });
