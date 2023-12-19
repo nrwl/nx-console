@@ -25,7 +25,7 @@ import dev.nx.console.graph.actions.NxGraphFocusProjectAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
 import dev.nx.console.models.NxWorkspace
-import dev.nx.console.nx_toolwindow.actions.EditNxProjectConfigurationAction
+import dev.nx.console.nx_toolwindow.actions.ShowNxProjectConfigurationAction
 import dev.nx.console.nx_toolwindow.tree.builder.NxFolderTreeBuilder
 import dev.nx.console.nx_toolwindow.tree.builder.NxListTreeBuilder
 import dev.nx.console.nx_toolwindow.tree.builder.NxTreeBuilderBase
@@ -33,7 +33,6 @@ import dev.nx.console.run.*
 import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.ToolWindowStyles
-import dev.nx.console.utils.nxWorkspace
 import java.awt.event.MouseEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -98,7 +97,7 @@ class NxTreeStructure(
                 RunWithDebugAction(),
                 EditRunSettingsAction(),
                 Separator(),
-                EditNxProjectConfigurationAction(),
+                ShowNxProjectConfigurationAction(),
                 NxGraphFocusProjectAction(),
                 NxGraphFocusTaskGroupAction(),
                 NxGraphFocusTaskAction()
@@ -260,6 +259,7 @@ data class NxTaskSet(
     val nxTargetConfiguration: String
 ) {
     constructor(nxProject: String, nxTarget: String) : this(nxProject, nxTarget, "") {}
+
     val suggestedName =
         "${nxProject}:${nxTarget}${if(nxTargetConfiguration.isBlank().not()) ":$nxTargetConfiguration" else ""}"
 }
