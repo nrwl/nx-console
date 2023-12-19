@@ -3,20 +3,7 @@ import {
   handleGraphInteractionEvent,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
-import {
-  getNxWorkspacePath,
-  getNxWorkspaceProjects,
-} from '@nx-console/vscode/nx-workspace';
-import { getTelemetry } from '@nx-console/vscode/utils';
-import { join } from 'path';
-import {
-  ExtensionContext,
-  Uri,
-  ViewColumn,
-  WebviewPanel,
-  commands,
-  window,
-} from 'vscode';
+import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 
 export class GraphWebviewManager {
   private webviewPanel: WebviewPanel | undefined;

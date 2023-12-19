@@ -4,6 +4,7 @@ import {
   handleGraphInteractionEvent,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
+import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 
 export class ProjectDetailsPreview {
@@ -28,6 +29,11 @@ export class ProjectDetailsPreview {
     this.webviewPanel.webview.onDidReceiveMessage(async (event) => {
       const handled = await handleGraphInteractionEvent(event);
       if (handled) return;
+
+      if (event.type === 'open-project-graph') {
+        getGraphWebviewManager().focusProject(event.payload.projectName);
+        return;
+      }
 
       if (event.type.startsWith('request')) {
         const response = await this.graphServer.handleWebviewRequest(event);

@@ -19,11 +19,19 @@ import { ExtensionContext, Uri, commands, window } from 'vscode';
 import { GraphWebviewManager } from './graph-webview-manager';
 import { projectGraph } from './legacy-implementation/project-graph';
 
+let graphWebviewManager: GraphWebviewManager | undefined;
+
+export function getGraphWebviewManager(): GraphWebviewManager {
+  if (!graphWebviewManager)
+    throw new Error('GraphWebviewManager not initialized');
+  return graphWebviewManager;
+}
+
 export async function initVscodeProjectGraph(context: ExtensionContext) {
   const nxVersion = await getNxVersion();
   // TODO: replace with actual version
   if (gte(nxVersion.version, '18.0.0')) {
-    const graphWebviewManager = new GraphWebviewManager(context);
+    graphWebviewManager = new GraphWebviewManager(context);
     registerActions(graphWebviewManager);
   } else {
     context.subscriptions.push(projectGraph());

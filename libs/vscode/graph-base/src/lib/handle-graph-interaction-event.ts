@@ -1,12 +1,12 @@
+import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import {
   getNxWorkspacePath,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode/nx-workspace';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { commands, Uri } from 'vscode';
-import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
-import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { Uri, commands } from 'vscode';
 
 export async function handleGraphInteractionEvent(event: {
   type: string;
@@ -18,12 +18,12 @@ export async function handleGraphInteractionEvent(event: {
 
     commands.executeCommand(
       'vscode.open',
-      Uri.file(join(workspacePath, event.payload))
+      Uri.file(join(workspacePath, event.payload.url))
     );
     return true;
   }
   if (event.type === 'open-project-config') {
-    const projectName = event.payload;
+    const projectName = event.payload.projectName;
     getTelemetry().featureUsed('nx.graph.openProjectConfigFile');
     getNxWorkspaceProjects().then((projects) => {
       const root = projects[projectName]?.root;
@@ -36,10 +36,11 @@ export async function handleGraphInteractionEvent(event: {
     getTelemetry().featureUsed('nx.graph.runTask');
     CliTaskProvider.instance.executeTask({
       command: 'run',
-      positional: event.payload,
+      positional: event.payload.taskId,
       flags: [],
     });
     return true;
   }
+
   return false;
 }

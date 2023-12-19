@@ -89,9 +89,7 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
 
     // set up interaction events (open project config, file click, ...)
     window.externalApi.graphInteractionEventListener = (message) => {
-      console.log('graph interaction', message)
-      console.log(typeof message)
-      vscode.postMessage({...message})
+      vscode.postMessage(message)
     }
 
     window.environment = "nx-console"
