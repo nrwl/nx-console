@@ -35,6 +35,15 @@ export class ProjectDetailsPreview {
         return;
       }
 
+      if (event.type === 'open-task-graph') {
+        console.log('open-task-graph', event.payload);
+        getGraphWebviewManager().focusTarget(
+          event.payload.projectName,
+          event.payload.targetName
+        );
+        return;
+      }
+
       if (event.type.startsWith('request')) {
         const response = await this.graphServer.handleWebviewRequest(event);
         this.webviewPanel.webview.postMessage(response);
