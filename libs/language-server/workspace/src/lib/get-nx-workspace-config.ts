@@ -107,14 +107,14 @@ export async function getNxWorkspaceConfig(
       projectFileMap
     );
 
-    for (const project in workspaceConfiguration.projects) {
-      for (const target in workspaceConfiguration.projects[project].targets) {
-        // TODO: remove hard coded hide once https://github.com/nrwl/nx/pull/19513 is merged
-        if (target === 'nx-release-publish') {
-          delete workspaceConfiguration.projects[project].targets?.[target];
-        }
-      }
-    }
+    
+    // for (const project in workspaceConfiguration.projects) {
+    //   for (const target in workspaceConfiguration.projects[project].targets) {
+    //     if (target === 'nx-release-publish') {
+    //       delete workspaceConfiguration.projects[project].targets?.[target];
+    //     }
+    //   }
+    // }
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
 
