@@ -20,7 +20,7 @@ import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.findLineNumberForTargetAndConfiguration
 import dev.nx.console.utils.nxProjectConfigurationPath
 
-class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSource) {
+class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSource) {
     init {
         registerCustomShortcutSet(
             ActionManager.getInstance().getAction(IdeActions.ACTION_EDIT_SOURCE).shortcutSet,
@@ -45,7 +45,7 @@ class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
-        TelemetryService.getInstance(project).featureUsed("Edit Project Configuration")
+        TelemetryService.getInstance(project).featureUsed("Show Project Configuration")
 
         val nxProject = e.getData(NxTreeNodeProjectKey) ?: return
 
@@ -76,7 +76,9 @@ class EditNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
     }
 
     private fun projectNode(e: AnActionEvent) = e.getData(NxTreeNodeKey) as? NxSimpleNode.Project
+
     private fun targetNode(e: AnActionEvent) = e.getData(NxTreeNodeKey) as? NxSimpleNode.Target
+
     private fun targetConfigurationNode(e: AnActionEvent) =
         e.getData(NxTreeNodeKey) as? NxSimpleNode.TargetConfiguration
 }
