@@ -1,17 +1,25 @@
 package dev.nx.console.graph
 
 import NxGraphServer
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.readText
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.ui.NxGraphDownloadHandler
+import dev.nx.console.run.NxTaskExecutionManager
+import dev.nx.console.telemetry.TelemetryService
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.nxBasePath
+import dev.nx.console.utils.nxProjectConfigurationPath
+import dev.nx.console.utils.nxWorkspace
 import java.nio.file.Paths
 import java.util.regex.Matcher
 import javax.swing.JComponent
@@ -19,6 +27,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 
 abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browser: JBCefBrowser = JBCefBrowser()
@@ -120,7 +131,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                   return fetch(`http://localhost:$port/task-graph.json`).then(res => res.json());
                 };
                 window.externalApi.loadExpandedTaskInputs = (taskId) => {
-                  return fetch(`http://localhost:$port/expanded-task-inputs.json`).then(res => res.json());
+                  return fetch(`http://localhost:$port/task-inputs.json?taskId=${'$'}{taskId}`).then(res => res.json());
                 };
                 window.externalApi.loadSourceMaps = () => {
                   return fetch(`http://localhost:$port/source-maps.json`).then(res => res.json());
@@ -159,6 +170,58 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         return htmlText
     }
 
+    protected fun handleGraphInteractionEventBase(event: NxGraphInteractionEvent): Boolean {
+        when (event.type) {
+            "file-click" -> {
+                event.payload.url?.also {
+                    val fullPath = Paths.get(project.nxBasePath, it).toString()
+                    val file = LocalFileSystem.getInstance().findFileByPath(fullPath)
+                    if (file == null) {
+                        Notifier.notifyAnything(
+                            project,
+                            "Couldn't find file at path $fullPath",
+                            NotificationType.ERROR
+                        )
+                        return true
+                    }
+                    val fileEditorManager = FileEditorManager.getInstance(project)
+                    ApplicationManager.getApplication().invokeLater {
+                        fileEditorManager.openFile(file, true)
+                    }
+                }
+                return true
+            }
+            "open-project-config" -> {
+                CoroutineScope(Dispatchers.Default).launch {
+                    TelemetryService.getInstance(project)
+                        .featureUsed("Nx Graph Open Project Config File")
+
+                    event.payload.projectName?.also {
+                        project.nxWorkspace()?.workspace?.projects?.get(it)?.apply {
+                            val path = nxProjectConfigurationPath(project, root) ?: return@apply
+                            val file =
+                                LocalFileSystem.getInstance().findFileByPath(path) ?: return@apply
+                            ApplicationManager.getApplication().invokeLater {
+                                FileEditorManager.getInstance(project).openFile(file, true)
+                            }
+                        }
+                    }
+                }
+                return true
+            }
+            "run-task" -> {
+                event.payload.taskId?.also {
+                    val (projectName, targetName) = it.split(":")
+                    NxTaskExecutionManager.getInstance(project).execute(projectName, targetName)
+                }
+                return true
+            }
+            else -> {
+                return false
+            }
+        }
+    }
+
     protected fun executeWhenLoaded(block: suspend () -> Unit) {
         CoroutineScope(Dispatchers.Default).launch {
             if (browserLoadedState.value) {
@@ -177,7 +240,6 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
     init {
-
         CoroutineScope(Dispatchers.Default).launch {
             graphServer.waitForServerReady()
             graphServer.currentPort?.let { port ->
@@ -189,6 +251,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                     logger<NxGraphBrowser>().debug(e.message)
                 }
             }
+            registerInteractionEventHandler(browser)
         }
     }
 
@@ -223,4 +286,43 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
             )
         }
     }
+
+    private fun registerInteractionEventHandler(browser: JBCefBrowser) {
+        executeWhenLoaded {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                try {
+                    val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+                    val handled = handleGraphInteractionEventBase(messageParsed)
+                    if (!handled) {
+                        logger<NxGraphBrowser>()
+                            .error("Unhandled graph interaction event: $messageParsed")
+                    }
+                } catch (e: SerializationException) {
+                    logger<NxGraphBrowser>()
+                        .error("Error parsing graph interaction event: ${e.message}")
+                }
+                null
+            }
+            val js =
+                """
+                window.externalApi.graphInteractionEventListener = (message) => {
+                    ${query.inject("JSON.stringify(message)")}
+                }
+                """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
 }
+
+@Serializable
+data class NxGraphInteractionEvent(val type: String, val payload: NxGraphInteractionPayload)
+
+@Serializable
+data class NxGraphInteractionPayload(
+    val projectName: String? = null,
+    val targetName: String? = null,
+    val url: String? = null,
+    val taskId: String? = null,
+    val targetConfigString: String? = null,
+)

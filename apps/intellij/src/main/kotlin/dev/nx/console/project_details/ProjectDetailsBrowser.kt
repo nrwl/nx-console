@@ -2,20 +2,39 @@ package dev.nx.console.project_details
 
 import NxGraphServer
 import NxGraphServerRefreshListener
+import com.google.gson.JsonParser
+import com.google.gson.JsonSyntaxException
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.readText
+import com.intellij.openapi.vfs.writeText
+import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.ui.jcef.JBCefBrowser
+import com.intellij.ui.jcef.JBCefBrowserBase
+import com.intellij.ui.jcef.JBCefJSQuery
 import com.intellij.ui.jcef.executeJavaScriptAsync
 import com.intellij.util.ui.UIUtil
-import dev.nx.console.graph.NxGraphBrowser
 import dev.nx.console.graph.NxGraphBrowserBase
+import dev.nx.console.graph.NxGraphInteractionEvent
+import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.nxProjectConfigurationPath
+import dev.nx.console.utils.nxWorkspace
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 
 class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
     NxGraphBrowserBase(project), DumbAware {
@@ -43,6 +62,7 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                                 .trimIndent()
                         )
                     browser.loadHTML(htmlText)
+                    registerInteractionEventHandler(browser)
 
                     val nxlsService = NxlsService.getInstance(project)
 
@@ -58,7 +78,7 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                         loadProjectDetails(nxProjectName)
                     }
                 } catch (e: Throwable) {
-                    logger<NxGraphBrowser>().debug(e.message)
+                    logger<ProjectDetailsBrowser>().debug(e.message)
                 }
             }
 
@@ -80,6 +100,111 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
             browser.executeJavaScriptAsync(
                 "window.waitForRouter().then(() => window.externalApi.router?.navigate('/project-details/$nxProjectName'))"
             )
+        }
+    }
+
+    private fun registerInteractionEventHandler(browser: JBCefBrowser) {
+        executeWhenLoaded {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler { msg ->
+                try {
+                    val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+                    val handled = handleGraphInteractionEventBase(messageParsed)
+                    if (handled) return@addHandler null
+                    when (messageParsed.type) {
+                        "open-project-graph" -> {
+                            messageParsed.payload.projectName?.also {
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    val nxGraphService = getNxGraphService(project) ?: return@launch
+                                    ApplicationManager.getApplication().invokeLater {
+                                        nxGraphService.focusProject(it)
+                                    }
+                                }
+                            }
+                        }
+                        "open-task-graph" -> {
+                            messageParsed.payload.projectName?.also { projectName ->
+                                messageParsed.payload.targetName?.also { targetName ->
+                                    CoroutineScope(Dispatchers.Default).launch {
+                                        val nxGraphService =
+                                            getNxGraphService(project) ?: return@launch
+                                        ApplicationManager.getApplication().invokeLater {
+                                            nxGraphService.focusTask(projectName, targetName)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        "override-target" -> {
+                            messageParsed.payload.projectName?.also { projectName ->
+                                messageParsed.payload.targetName?.also { targetName ->
+                                    messageParsed.payload.targetConfigString?.also {
+                                        targetConfigString ->
+                                        addTargetToProjectConfig(
+                                            projectName,
+                                            targetName,
+                                            targetConfigString
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        else -> {
+                            logger<ProjectDetailsBrowser>()
+                                .error("Unhandled graph interaction event: $messageParsed")
+                        }
+                    }
+                } catch (e: SerializationException) {
+                    logger<ProjectDetailsBrowser>()
+                        .error("Error parsing graph interaction event: ${e.message}")
+                }
+                null
+            }
+            val js =
+                """
+                window.externalApi.graphInteractionEventListener = (message) => {
+                    ${query.inject("JSON.stringify(message)")}
+                }
+                """
+            browser.executeJavaScriptAsync(js)
+        }
+    }
+
+    private fun addTargetToProjectConfig(
+        projectName: String,
+        targetName: String,
+        targetConfigString: String
+    ) {
+        CoroutineScope(Dispatchers.Default).launch {
+            project.nxWorkspace()?.workspace?.projects?.get(projectName)?.apply {
+                val path = nxProjectConfigurationPath(project, root) ?: return@apply
+                ApplicationManager.getApplication().invokeLater {
+                    val file =
+                        LocalFileSystem.getInstance().findFileByPath(path) ?: return@invokeLater
+                    val document =
+                        FileDocumentManager.getInstance().getDocument(file) ?: return@invokeLater
+                    val psiFile =
+                        PsiDocumentManager.getInstance(project).getPsiFile(document)
+                            ?: return@invokeLater
+                    val fileText = file.readText()
+                    try {
+                        val json = JsonParser.parseString(fileText).asJsonObject
+                        val targets = json.getAsJsonObject("targets")
+                        val newTargetJson = JsonParser.parseString(targetConfigString).asJsonObject
+                        targets.add(targetName, newTargetJson)
+                        WriteCommandAction.runWriteCommandAction(project) {
+                            file.writeText(json.toString())
+                            CodeStyleManager.getInstance(project).reformat(psiFile)
+                        }
+                    } catch (e: JsonSyntaxException) {
+                        Notifier.notifyAnything(
+                            project,
+                            "Error parsing json: ${e.message}",
+                            NotificationType.ERROR
+                        )
+                    }
+                }
+            }
         }
     }
 }

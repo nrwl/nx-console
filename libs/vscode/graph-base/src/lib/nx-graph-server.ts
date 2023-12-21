@@ -72,13 +72,14 @@ export class NxGraphServer implements Disposable {
           return;
       }
 
+      console.log(url);
       const headers = { 'Accept-Encoding': 'gzip, deflate' };
       const response = await xhr({
         url,
         headers,
       });
       const data = response.responseText;
-
+      console.log(data);
       return {
         type: `${type}Response`,
         id,

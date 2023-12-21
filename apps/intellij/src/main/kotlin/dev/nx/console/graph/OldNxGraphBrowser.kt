@@ -144,8 +144,7 @@ class OldNxGraphBrowser(
                 } else {
                     ""
                 }
-            }
-                ?: ""
+            } ?: ""
 
         val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
