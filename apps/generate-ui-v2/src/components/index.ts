@@ -23,6 +23,7 @@ import './fields/input-field';
 import './fields/multiselect-field';
 import './fields/select-field';
 import './fields/autocomplete/autocomplete-field';
+import './cwd-breadcrumb';
 import './button';
 import './field-list';
 import './search-bar';

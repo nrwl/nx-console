@@ -10,6 +10,7 @@ export async function getGeneratorContextV2(
 ): Promise<GeneratorContext> {
   let projectName: string | undefined = undefined;
   let directory: string | undefined = undefined;
+  let normalizedDirectory: string | undefined = undefined;
 
   const { workspaceLayout, nxVersion } = await nxWorkspace(workspacePath);
   if (path) {
@@ -18,7 +19,9 @@ export async function getGeneratorContextV2(
 
     projectName = (project && project.name) || undefined;
 
-    directory = getNormalizedDirectory(
+    directory = getDirectory(normalizedPath, workspacePath);
+
+    normalizedDirectory = getDirectoryWithoutAppsDirLibsDir(
       normalizedPath,
       workspaceLayout,
       workspacePath
@@ -28,15 +31,12 @@ export async function getGeneratorContextV2(
   return {
     project: projectName,
     directory,
+    normalizedDirectory: normalizedDirectory,
     nxVersion,
   };
 }
 
-function getNormalizedDirectory(
-  path: string,
-  { appsDir, libsDir }: { appsDir?: string; libsDir?: string },
-  workspacePath: string
-) {
+function getDirectory(path: string, workspacePath: string): string | undefined {
   let dir: string | undefined = undefined;
   if (existsSync(path)) {
     if (lstatSync(path).isDirectory()) {
@@ -46,14 +46,22 @@ function getNormalizedDirectory(
     }
   }
 
+  dir = dir?.replace(normalize(workspacePath), '');
+  return dir;
+}
+
+function getDirectoryWithoutAppsDirLibsDir(
+  path: string,
+  { appsDir, libsDir }: { appsDir?: string; libsDir?: string },
+  workspacePath: string
+) {
+  let dir = getDirectory(path, workspacePath);
+
   if (!dir) {
     return;
   }
 
-  dir = dir
-    .replace(normalize(workspacePath), '')
-    .replace(/\\/g, '/')
-    .replace(/^\//, '');
+  dir = dir.replace(/\\/g, '/').replace(/^\//, '');
 
   if (appsDir && dir.startsWith(appsDir)) {
     dir = dir.replace(appsDir, '').replace(/^\//, '');
@@ -62,6 +70,5 @@ function getNormalizedDirectory(
     dir = dir.replace(libsDir, '').replace(/^\//, '');
   }
 
-  // return the directory if the path is a file
   return dir;
 }

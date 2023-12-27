@@ -32,7 +32,7 @@ export class Root extends LitElement {
       class="text-foreground m-auto flex h-screen max-w-screen-xl flex-col p-6"
     >
       <div
-        class="bg-background border-separator sticky top-0 z-50 w-full border-b-2 pb-6"
+        class="bg-background border-separator sticky top-0 z-50 w-full border-b-2 pb-3"
       >
         ${this.renderHeader()}
       </div>
@@ -130,6 +130,7 @@ export class Root extends LitElement {
           <search-bar
             @search-input="${this.handleSearchValueChange}"
           ></search-bar>
+          <cwd-breadcrumb></cwd-breadcrumb>
         </div>
       </div>
     `;

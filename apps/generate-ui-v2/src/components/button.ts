@@ -12,6 +12,10 @@ export class Button extends LitElement {
   @property()
   appearance: 'primary' | 'secondary' | 'icon' = 'primary';
 
+  // only relevant in 'icon' mode
+  @property()
+  color: string;
+
   editor: string;
 
   constructor() {
@@ -38,6 +42,7 @@ export class Button extends LitElement {
           <icon-element
             class="flex items-start"
             icon="${this.text}"
+            color="${this.color}"
           ></icon-element>
         </vscode-button>
       `;
@@ -50,7 +55,7 @@ export class Button extends LitElement {
   renderIntellij() {
     if (this.appearance === 'icon') {
       return html`<div class="hover:bg-fieldNavHoverBackground rounded p-1">
-        <icon-element icon="${this.text}"></icon-element>
+        <icon-element icon="${this.text}" color="${this.color}"></icon-element>
       </div>`;
     }
     return html`<button
