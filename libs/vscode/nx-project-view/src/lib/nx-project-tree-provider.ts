@@ -41,7 +41,6 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
 
     (
       [
-        ['editWorkspaceJson', this.editWorkspaceJson],
         ['revealInExplorer', this.revealInExplorer],
         ['runTask', this.runTask],
         ['runTaskSkipNxCache', this.runTaskSkipNxCache],
@@ -154,18 +153,5 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
     }
   }
 
-  private async editWorkspaceJson(selection: NxTreeItem) {
-    getTelemetry().featureUsed('editWorkspaceJson');
-    const viewItem = selection.item;
-    if (viewItem.contextValue === 'folder') {
-      return;
-    }
-
-    const { project, root } = viewItem.nxProject;
-    if (viewItem.contextValue === 'project') {
-      return revealNxProject(project, root);
-    }
-    const target = viewItem.nxTarget;
-    return revealNxProject(project, root, target);
-  }
+  
 }

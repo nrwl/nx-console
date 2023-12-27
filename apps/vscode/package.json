@@ -133,7 +133,7 @@
       ],
       "view/item/context": [
         {
-          "command": "nxConsole.editWorkspaceJson",
+          "command": "nxConsole.showProjectConfiguration",
           "when": "view == nxProjects && viewItem == project || viewItem == target",
           "group": "inline"
         },
@@ -358,8 +358,8 @@
         "icon": "$(pencil)"
       },
       {
-        "command": "nxConsole.editWorkspaceJson",
-        "title": "Edit workspace definition",
+        "command": "nxConsole.showProjectConfiguration",
+        "title": "Show project configuration",
         "icon": "$(go-to-file)"
       },
       {

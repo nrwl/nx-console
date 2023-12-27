@@ -94,6 +94,11 @@
       <add-to-group group-id="EditorTabPopupMenu"/>
       <add-to-group group-id="EditorTabsEntryPoint"/>
     </action>
+    <action id="dev.nx.console.ide.ShowNxProjectConfigurationAction"
+            class="dev.nx.console.ide.ShowNxProjectConfigurationAction"
+            text="Nx: Show Project Configuration" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
+    </action>
 
     <action id="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
             class="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"

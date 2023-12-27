@@ -31,6 +31,7 @@ import {
 } from '@nx-console/vscode/nx-run-target-view';
 import {
   CliTaskProvider,
+  initTasks,
   registerCliTaskCommands,
   registerNxCommands,
 } from '@nx-console/vscode/tasks';
@@ -241,10 +242,8 @@ async function setWorkspace(workspacePath: string) {
     !hasInitializedExtensionPoints
   ) {
     hasInitializedExtensionPoints = true;
-    registerNxCommands(context);
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
-    registerCliTaskCommands(context);
-
+    initTasks(context);
     registerVscodeAddDependency(context);
 
     initGenerateUiWebview(context);
