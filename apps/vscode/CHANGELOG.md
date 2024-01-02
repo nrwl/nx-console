@@ -1,3 +1,19 @@
+# [18.11.0](https://github.com/nrwl/nx-console/compare/vscode-v18.10.1...vscode-v18.11.0) (2024-01-02)
+
+
+### Bug Fixes
+
+* distinguish more cases when prefilling ([#1935](https://github.com/nrwl/nx-console/issues/1935)) ([3760f2b](https://github.com/nrwl/nx-console/commit/3760f2b255f5c56619b6bcd6231f937d5ec7d596))
+* **generate-ui:** show fewer options instead of show less options ([#1951](https://github.com/nrwl/nx-console/issues/1951)) ([f58de30](https://github.com/nrwl/nx-console/commit/f58de3010ec6a74fc670b88c3327e38f257e6fd0))
+* **nxls:** take default options into account when prefilling as-provided options ([#1943](https://github.com/nrwl/nx-console/issues/1943)) ([73662b2](https://github.com/nrwl/nx-console/commit/73662b2f496d1b4e52d9801f54ac0bc8d8cb95e6))
+* stringify prompt items to avoid [object Object] ([#1934](https://github.com/nrwl/nx-console/issues/1934)) ([f2be598](https://github.com/nrwl/nx-console/commit/f2be598e98cfa94ad628812e4ed8986167be7e19))
+
+
+### Features
+
+* use nx native watcher & rework refreshing ([#1949](https://github.com/nrwl/nx-console/issues/1949)) ([8d8887d](https://github.com/nrwl/nx-console/commit/8d8887da03b83263c5962d9fd064a254bee0a545))
+* **vscode:** update (re)move commands to use quickpick instead of ui and fix prefilling ([#1931](https://github.com/nrwl/nx-console/issues/1931)) ([2637fc3](https://github.com/nrwl/nx-console/commit/2637fc30e43a396fbb4e366389e7c79a90f7dc25))
+
 ## [18.10.1](https://github.com/nrwl/nx-console/compare/vscode-v18.10.0...vscode-v18.10.1) (2023-11-06)
 
 
