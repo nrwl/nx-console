@@ -1,3 +1,17 @@
+## 1.16.0 (2024-01-02)
+
+### Bug Fixes
+
+* distinguish more cases when prefilling ([#1935](https://github.com/nrwl/nx-console/issues/1935)) ([3760f2b](https://github.com/nrwl/nx-console/commit/3760f2b255f5c56619b6bcd6231f937d5ec7d596))
+* **intellij:** don't try to remove document listener twice ([#1960](https://github.com/nrwl/nx-console/issues/1960)) ([d1b2abe](https://github.com/nrwl/nx-console/commit/d1b2abee7dbf06ba554ceac8a4562d7cd9e4965f))
+* **nxls:** take default options into account when prefilling as-provided options ([#1943](https://github.com/nrwl/nx-console/issues/1943)) ([73662b2](https://github.com/nrwl/nx-console/commit/73662b2f496d1b4e52d9801f54ac0bc8d8cb95e6))
+* stringify prompt items to avoid [object Object] ([#1934](https://github.com/nrwl/nx-console/issues/1934)) ([f2be598](https://github.com/nrwl/nx-console/commit/f2be598e98cfa94ad628812e4ed8986167be7e19))
+
+
+### Features
+
+* use nx native watcher & rework refreshing ([#1949](https://github.com/nrwl/nx-console/issues/1949)) ([8d8887d](https://github.com/nrwl/nx-console/commit/8d8887da03b83263c5962d9fd064a254bee0a545))
+
 ## <small>1.15.1 (2023-11-06)</small>
 
 ### Bug Fixes
