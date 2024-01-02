@@ -63,7 +63,9 @@ export const projectNameAndRootProcessor: SchemaProcessor = (
       ...schema.context,
       prefillValues: {
         ...(schema.context?.prefillValues ?? {}),
-        projectNameAndRootFormat: `${pnarfDefault}` ?? 'as-provided',
+        projectNameAndRootFormat: pnarfDefault
+          ? `${pnarfDefault}`
+          : 'as-provided',
       },
     },
   };
