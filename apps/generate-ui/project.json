@@ -89,7 +89,7 @@
       "outputs": ["{options.outputPath}"]
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
           "apps/generate-ui/src/**/*.ts",
@@ -100,8 +100,7 @@
     "test": {
       "executor": "@nx/jest:jest",
       "options": {
-        "jestConfig": "apps/generate-ui/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/generate-ui/jest.config.ts"
       },
       "outputs": ["{workspaceRoot}/coverage/apps/generate-ui"]
     }

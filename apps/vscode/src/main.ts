@@ -51,8 +51,10 @@ import {
   initGenerateUiWebview,
   openGenerateUi,
 } from '@nx-console/vscode/generate-ui-webview';
-import { configureLspClient } from '@nx-console/vscode/lsp-client';
-import { initNxCloudOnboardingView } from '@nx-console/vscode/nx-cloud-view';
+import {
+  configureLspClient,
+  initRefreshWorkspace,
+} from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import {
@@ -62,10 +64,7 @@ import {
 import { getNxWorkspace, stopDaemon } from '@nx-console/vscode/nx-workspace';
 import { projectGraph } from '@nx-console/vscode/project-graph';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
-import {
-  REFRESH_WORKSPACE,
-  refreshWorkspace,
-} from './commands/refresh-workspace';
+
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
@@ -128,13 +127,13 @@ export async function activate(c: ExtensionContext) {
       runTargetTreeView,
       revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand,
-      refreshWorkspace(),
       projectGraph()
     );
 
     await enableTypeScriptPlugin(context);
     initNxCommandsView(context);
     initNvmTip(context);
+    initRefreshWorkspace(context);
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
     runTargetTreeView = window.createTreeView('nxRunTarget', {
@@ -224,7 +223,7 @@ async function setWorkspace(workspacePath: string) {
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  configureLspClient(context, REFRESH_WORKSPACE);
+  configureLspClient(context);
 
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;

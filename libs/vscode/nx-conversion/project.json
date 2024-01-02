@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/vscode/nx-conversion/**/*.ts"]
@@ -15,8 +15,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/vscode/nx-conversion"],
       "options": {
-        "jestConfig": "libs/vscode/nx-conversion/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/vscode/nx-conversion/jest.config.ts"
       }
     }
   },

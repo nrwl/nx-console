@@ -43,16 +43,26 @@
   ],
   "dependencies": {
     "@monodon/typescript-nx-imports-plugin": "0.2.0",
-    "@parcel/watcher": "2.2.0",
-    "@parcel/watcher-darwin-arm64": "2.2.0",
-    "@parcel/watcher-darwin-x64": "2.2.0",
-    "@parcel/watcher-linux-arm-glibc": "2.2.0",
-    "@parcel/watcher-linux-arm64-glibc": "2.2.0",
-    "@parcel/watcher-linux-arm64-musl": "2.2.0",
-    "@parcel/watcher-linux-x64-glibc": "2.2.0",
-    "@parcel/watcher-linux-x64-musl": "2.2.0",
-    "@parcel/watcher-win32-arm64": "2.2.0",
-    "@parcel/watcher-win32-x64": "2.2.0"
+    "@parcel/watcher": "2.3.0",
+    "@parcel/watcher-darwin-arm64": "2.3.0",
+    "@parcel/watcher-darwin-x64": "2.3.0",
+    "@parcel/watcher-linux-arm-glibc": "2.3.0",
+    "@parcel/watcher-linux-arm64-glibc": "2.3.0",
+    "@parcel/watcher-linux-arm64-musl": "2.3.0",
+    "@parcel/watcher-linux-x64-glibc": "2.3.0",
+    "@parcel/watcher-linux-x64-musl": "2.3.0",
+    "@parcel/watcher-win32-arm64": "2.3.0",
+    "@parcel/watcher-win32-x64": "2.3.0",
+    "@nx/nx-darwin-arm64": "17.1.0-beta.4",
+    "@nx/nx-darwin-x64": "17.1.0-beta.4",
+    "@nx/nx-freebsd-x64": "17.1.0-beta.4",
+    "@nx/nx-linux-arm-gnueabihf": "17.1.0-beta.4",
+    "@nx/nx-linux-arm64-gnu": "17.1.0-beta.4",
+    "@nx/nx-linux-arm64-musl": "17.1.0-beta.4",
+    "@nx/nx-linux-x64-gnu": "17.1.0-beta.4",
+    "@nx/nx-linux-x64-musl": "17.1.0-beta.4",
+    "@nx/nx-win32-arm64-msvc": "17.1.0-beta.4",
+    "@nx/nx-win32-x64-msvc": "17.1.0-beta.4"
   },
   "contributes": {
     "typescriptServerPlugins": [
@@ -190,7 +200,7 @@
       ],
       "editor/title": [
         {
-          "command": "nx.graph.refresh",
+          "command": "nxConsole.refreshWorkspace",
           "group": "navigation",
           "when": "graphWebviewVisible"
         }
@@ -234,10 +244,6 @@
         },
         {
           "command": "nx.generate",
-          "when": "isNxWorkspace"
-        },
-        {
-          "command": "nx.graph.refresh",
           "when": "isNxWorkspace"
         },
         {
@@ -382,12 +388,6 @@
         "category": "Nx",
         "title": "generate",
         "command": "nx.generate"
-      },
-      {
-        "category": "Nx",
-        "title": "Refresh Nx Graph",
-        "command": "nx.graph.refresh",
-        "icon": "$(refresh)"
       },
       {
         "category": "Nx",

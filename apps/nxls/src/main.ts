@@ -429,6 +429,7 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   }
 
   await reconfigure(WORKING_PATH);
+  await connection.sendNotification(NxWorkspaceRefreshNotification.method);
 });
 
 connection.onNotification(

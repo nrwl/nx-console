@@ -7,6 +7,7 @@ import {
 import { join } from 'path';
 import { commands, ExtensionContext, TreeItem } from 'vscode';
 import { RunTargetTreeItem } from './run-target-tree-item';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Nx Workspace...'
@@ -44,12 +45,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
       light: join(extensionPath, 'assets', 'nx-console-light.svg'),
       dark: join(extensionPath, 'assets', 'nx-console-dark.svg'),
     };
-    context.subscriptions.push(
-      commands.registerCommand(
-        `nxConsole.refreshRunTargetTree`,
-        this.refreshRunTargetTree
-      )
-    );
+    onWorkspaceRefreshed(() => this.refresh());
   }
 
   getParent() {
@@ -76,10 +72,6 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
       CHANGE_WORKSPACE,
     ];
   }
-
-  private refreshRunTargetTree = async () => {
-    this.refresh();
-  };
 }
 
 const commandList = async (): Promise<string[]> => {

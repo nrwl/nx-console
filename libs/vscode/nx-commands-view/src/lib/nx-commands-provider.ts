@@ -7,6 +7,7 @@ import {
 } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext, Task, tasks, TaskScope } from 'vscode';
 import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 export const EXECUTE_ARBITRARY_COMMAND = 'nxConsole.executeArbitraryCommand';
 
@@ -20,6 +21,8 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     GlobalConfigurationStore.instance.onConfigurationChange(() =>
       this.refresh()
     );
+
+    onWorkspaceRefreshed(() => this.refresh());
   }
 
   getParent(_: NxCommandsTreeItem) {
