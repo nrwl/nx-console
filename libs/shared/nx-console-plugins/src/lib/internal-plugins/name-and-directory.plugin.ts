@@ -50,7 +50,7 @@ export const nameAndDirectoryProcessor: SchemaProcessor = (
       ...schema.context,
       prefillValues: {
         ...(schema.context?.prefillValues ?? {}),
-        nameAndDirectoryFormat: `${nadfDefault}` ?? 'as-provided',
+        nameAndDirectoryFormat: nadfDefault ? `${nadfDefault}` : 'as-provided',
       },
     },
   };
