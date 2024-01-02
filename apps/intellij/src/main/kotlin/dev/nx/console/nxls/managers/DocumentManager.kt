@@ -40,6 +40,8 @@ class DocumentManager(val editor: Editor) {
             }
         }
 
+    private var documentListenerIsInstalled = false
+
     private var textDocumentService: TextDocumentService? = null
 
     fun handleDocumentChanged(event: DocumentEvent, textDocumentService: TextDocumentService?) {
@@ -135,6 +137,7 @@ class DocumentManager(val editor: Editor) {
     private fun addDocumentListener() {
         try {
             document.addDocumentListener(documentListener)
+            documentListenerIsInstalled = true
         } catch (exception: Throwable) {
             log.info("Document listener already registered for this document")
         }
@@ -142,7 +145,10 @@ class DocumentManager(val editor: Editor) {
 
     private fun removeDocumentListener() {
         try {
-            document.removeDocumentListener(documentListener)
+            if (documentListenerIsInstalled) {
+                document.removeDocumentListener(documentListener)
+                documentListenerIsInstalled = false
+            }
         } catch (exception: Throwable) {
             log.info("Document listener was not registered for this document")
         }
