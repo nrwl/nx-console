@@ -127,12 +127,6 @@ export class FieldList extends GeneratorContextContext(
         class="${shouldHideShowMoreButton ? 'hidden' : ''}"
       ></show-more-divider>
       ${otherOptions.map((opt) => renderOption(opt, !shouldShowMoreOptions))}
-      <cwd-input-element
-        class="${(this.generatorContext?.nxVersion?.major ?? 0) >= 17 &&
-        shouldShowMoreOptions
-          ? ''
-          : 'hidden'}"
-      ></cwd-input-element>
     `;
   }
 
