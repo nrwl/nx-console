@@ -61,6 +61,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
     const pathArray = this.path.split('/');
     return html`
       <div
+        data-cy="cwd-breadcrumb"
         class="text-mutedForeground flex flex-wrap items-center rounded py-2 text-sm leading-none"
       >
         <span class="pr-2"> Working Directory: </span>
@@ -72,11 +73,24 @@ export class CwdBreadcrumb extends GeneratorContextContext(
         </span>
         <span class="mx-2">/</span>
         ${this.isEditable
-          ? this.renderInlineEdit()
+          ? html`
+              ${this.renderInlineEdit()}
+              <icon-element
+                @click="${this.toggleEdit}"
+                icon="close"
+                data-cy="inline-edit-cancel"
+              ></icon-element>
+              <icon-element
+                @click="${this.confirmEdit}"
+                icon="check"
+                data-cy="inline-edit-confirm"
+              ></icon-element>
+            `
           : html`
               ${pathArray.map(
                 (part, index) => html`
                   <span
+                    data-cy="cwd-breadcrumb-segment-${index}"
                     class="${index !== pathArray.length - 1
                       ? 'underline cursor-pointer hover:text-primary'
                       : ''}"
@@ -94,6 +108,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
                 appearance="icon"
                 text="edit"
                 class="self-center"
+                data-cy="inline-edit-button"
               ></button-element>
             `}
       </div>
@@ -102,16 +117,13 @@ export class CwdBreadcrumb extends GeneratorContextContext(
 
   renderInlineEdit() {
     if (this.editor === 'vscode') {
-      return html`
-        <vscode-text-field
-          type="text"
-          .value="${this.path}"
-          @keydown="${this.handleInlineEditKeydown}"
-        >
-        </vscode-text-field>
-        <icon-element @click="${this.toggleEdit}" icon="close"></icon-element>
-        <icon-element @click="${this.confirmEdit}" icon="check"></icon-element>
-      `;
+      return html` <vscode-text-field
+        type="text"
+        .value="${this.path}"
+        @keydown="${this.handleInlineEditKeydown}"
+        data-cy="inline-edit-field"
+      >
+      </vscode-text-field>`;
     } else {
       return html`
         <input
@@ -119,9 +131,8 @@ export class CwdBreadcrumb extends GeneratorContextContext(
           type="text"
           .value="${this.path}"
           @keydown="${this.handleInlineEditKeydown}"
+          data-cy="inline-edit-field"
         />
-        <icon-element @click="${this.toggleEdit}" icon="close"></icon-element>
-        <icon-element @click="${this.confirmEdit}" icon="check"></icon-element>
       `;
     }
   }
