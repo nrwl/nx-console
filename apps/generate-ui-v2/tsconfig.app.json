@@ -4,7 +4,7 @@
     "outDir": "../../dist/out-tsc",
     "module": "ESNext",
     "types": ["node"],
-    "useDefineForClassFields": false,
+    "useDefineForClassFields": false
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
   "include": ["src/**/*.ts"]
