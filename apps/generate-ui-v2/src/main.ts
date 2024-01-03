@@ -3,7 +3,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { FormValuesService } from './form-values.service';
 import { IdeCommunicationController } from './ide-communication.controller';
-import { getGeneratorIdentifier } from './utils/generator-schema-utils';
+import {
+  getGeneratorIdentifier,
+  getGeneratorNameTitleCase,
+} from './utils/generator-schema-utils';
 
 import './components/index';
 
@@ -61,27 +64,39 @@ export class Root extends LitElement {
     return html`
       <div>
         <header class="flex items-center justify-between">
-          <div class="flex flex-wrap items-end gap-2">
+          <div class="flex flex-col flex-wrap items-start gap-2">
             <h1 class="text-xl font-bold leading-none" data-cy="header-text">
-              nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
+              ${getGeneratorNameTitleCase(this.icc.generatorSchema)}
             </h1>
+            <h2 class="inline-flex text-lg font-medium leading-none">
+              ${this.icc.generatorSchema?.collectionName}
+              <popover-element
+                class="flex items-center pl-2 text-base"
+                .content="${this.icc.generatorSchema?.description}"
+              >
+                <icon-element class="flex items-start" icon="info">
+                </icon-element>
+              </popover-element>
+            </h2>
+          </div>
+
+          <div class="flex shrink-0">
             ${when(
               isNxGenerator && this.icc.editor === 'vscode',
               () =>
                 html`
-                  <a
-                    href="${nxDevLink}"
-                    target="_blank"
-                    class="focus:ring-focusBorder pb-px text-sm leading-none underline focus:outline-none focus:ring-1 max-sm:hidden"
-                    >View full details
-                  </a>
+                  <button-element
+                    @click="${() => this.openNxDev(nxDevLink)}"
+                    title="Open generator documentation on nx.dev"
+                    appearance="icon"
+                    text="link-external"
+                    class="focus:ring-focusBorder flex items-center py-2 pl-3 focus:outline-none focus:ring-1"
+                  >
+                  </button-element>
                 `
             )}
-          </div>
-
-          <div class="sm: flex shrink-0">
             <button-element
-              class="flex items-center py-2 pl-3 max-sm:hidden"
+              class="flex items-center py-2 pl-3"
               appearance="icon"
               text="copy"
               title="Copy generate command to clipboard"
@@ -157,6 +172,16 @@ export class Root extends LitElement {
         (searchBar as HTMLElement).focus();
       }
     }
+  }
+
+  openNxDev(link: string) {
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank'; // Optional: Open in new tab
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   protected createRenderRoot() {

@@ -1,11 +1,10 @@
-import { ContextConsumer } from '@lit-labs/context';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { editorContext } from '../contexts/editor-context';
+import { EditorContext } from '../contexts/editor-context';
 import { intellijFocusRing } from '../utils/ui-utils';
 
 @customElement('button-element')
-export class Button extends LitElement {
+export class Button extends EditorContext(LitElement) {
   @property()
   text: string;
 
@@ -15,19 +14,6 @@ export class Button extends LitElement {
   // only relevant in 'icon' mode
   @property()
   color: string;
-
-  editor: string;
-
-  constructor() {
-    super();
-    new ContextConsumer(this, {
-      context: editorContext,
-      callback: (value) => {
-        this.editor = value;
-      },
-      subscribe: false,
-    });
-  }
 
   render() {
     return this.editor === 'vscode'

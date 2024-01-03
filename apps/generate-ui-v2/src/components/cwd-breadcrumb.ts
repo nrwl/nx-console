@@ -44,7 +44,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
     const pathArray = this.path.split('/');
     return html`
       <div
-        class="text-mutedForeground flex items-center rounded py-2 text-sm leading-none"
+        class="text-mutedForeground flex flex-wrap items-center rounded py-2 text-sm leading-none"
       >
         <span class="pr-2"> Working Directory: </span>
         <span
