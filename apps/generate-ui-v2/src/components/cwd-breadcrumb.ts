@@ -44,9 +44,9 @@ export class CwdBreadcrumb extends GeneratorContextContext(
     const pathArray = this.path.split('/');
     return html`
       <div
-        class="flex items-center rounded py-2 text-sm leading-none text-gray-500"
+        class="text-mutedForeground flex items-center rounded py-2 text-sm leading-none"
       >
-        <span class="pr-2"> cwd: </span>
+        <span class="pr-2"> Working Directory: </span>
         <span
           @click="${this.resetPath}"
           class="hover:text-primary cursor-pointer underline"
@@ -71,7 +71,9 @@ export class CwdBreadcrumb extends GeneratorContextContext(
               ${pathArray.map(
                 (part, index) => html`
                   <span
-                    class="hover:text-primary cursor-pointer underline"
+                    class="${index !== pathArray.length - 1
+                      ? 'underline cursor-pointer hover:text-primary'
+                      : ''}"
                     @click="${() => this.editToSegment(index)}"
                     >${part}</span
                   >
@@ -82,6 +84,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
               )}
               <button-element
                 @click="${this.toggleEdit}"
+                color="var(--muted-foreground-color)"
                 appearance="icon"
                 text="edit"
                 class="self-center"

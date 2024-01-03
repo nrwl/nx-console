@@ -19,7 +19,7 @@ export class CwdInput extends GeneratorContextContext(
     return html`
       <div class="border-separator mb-4 flex flex-col border-l-4 py-2 pl-3">
         <div>cwd</div>
-        <p class="mb-2 text-gray-500">
+        <p class="text-mutedForeground mb-2">
           The directory the generator will be executed from. Relative to the
           workspace root.
         </p>

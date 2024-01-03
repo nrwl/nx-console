@@ -219,6 +219,7 @@ export class GenerateUiWebview {
     // refer to https://github.com/microsoft/vscode-webview-ui-toolkit/blob/main/src/design-tokens.ts
     return `
       --foreground-color: var(--vscode-editor-foreground);
+      --muted-foreground-color: var(--vscode-input-placeholderForeground);
       --background-color: var(--vscode-editor-background);
       --primary-color: var(--button-primary-background);
       --secondary-color: var(--button-secondary-background);
