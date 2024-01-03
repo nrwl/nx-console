@@ -153,7 +153,7 @@ async function getTargets(projectName?: string): Promise<string[]> {
   const { workspace } = await getNxWorkspace();
 
   if (projectName) {
-    return Object.keys(workspace.projects[projectName].targets || {});
+    return Object.keys(workspace.projects[projectName].targets || {}).sort();
   }
 
   return Array.from(

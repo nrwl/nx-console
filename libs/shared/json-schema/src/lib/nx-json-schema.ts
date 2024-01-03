@@ -93,5 +93,5 @@ function getTargets(projects: Record<string, ProjectConfiguration>): string[] {
     }
   }
 
-  return Array.from(tags).sort();
+  return Array.from(tags);
 }
