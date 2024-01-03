@@ -9,6 +9,7 @@ import {
 } from './utils/generator-schema-utils';
 
 import './components/index';
+import { SearchBar } from './components/search-bar';
 
 @customElement('root-element')
 export class Root extends LitElement {
@@ -46,6 +47,7 @@ export class Root extends LitElement {
               class="h-full"
               .options="${options}"
               .searchValue="${this.searchValue}"
+              @clear-search="${() => this.clearSearch()}"
             ></field-list>`}
       </div>
     </div>`;
@@ -153,6 +155,14 @@ export class Root extends LitElement {
 
   private handleSearchValueChange(e: CustomEvent) {
     this.searchValue = e.detail;
+  }
+
+  private clearSearch() {
+    const searchBar = this.renderRoot.querySelector('search-bar');
+    console.log(searchBar);
+    if (searchBar) {
+      (searchBar as SearchBar).clearSearch();
+    }
   }
 
   private handleGlobalKeyboardShortcuts(e: KeyboardEvent) {

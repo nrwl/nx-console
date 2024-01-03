@@ -50,6 +50,16 @@ export class SearchBar extends EditorContext(LitElement) {
     }
   }
 
+  clearSearch() {
+    const inputElement = this.renderRoot.querySelector<HTMLInputElement>(
+      this.editor === 'vscode' ? 'vscode-text-field' : 'input'
+    );
+    if (inputElement) {
+      inputElement.value = '';
+      inputElement.dispatchEvent(new Event('input'));
+    }
+  }
+
   getKeyboardShortcutSymbol() {
     if (window.navigator.platform.toLowerCase().includes('mac')) {
       return '⌘';
