@@ -67,10 +67,13 @@ export class Root extends LitElement {
       <div>
         <header class="flex items-center justify-between">
           <div class="flex flex-col flex-wrap items-start gap-2">
-            <h1 class="text-xl font-bold leading-none" data-cy="header-text">
+            <h1 class="text-xl font-bold leading-none" data-cy="title">
               ${getGeneratorNameTitleCase(this.icc.generatorSchema)}
             </h1>
-            <h2 class="inline-flex text-lg font-medium leading-none">
+            <h2
+              class="inline-flex text-lg font-medium leading-none"
+              data-cy="subtitle"
+            >
               ${this.icc.generatorSchema?.collectionName}
               <popover-element
                 class="flex items-center pl-2 text-base"
@@ -103,7 +106,7 @@ export class Root extends LitElement {
               text="copy"
               title="Copy generate command to clipboard"
               @click="${() => this.formValuesService.copyCommandToClipboard()}"
-              id="copy-button"
+              data-cy="copy-button"
             >
             </button-element>
             ${when(
