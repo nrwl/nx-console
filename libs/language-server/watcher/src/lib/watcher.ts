@@ -24,7 +24,8 @@ export async function languageServerWatcher(
             e.path.endsWith('project.json') ||
             e.path.endsWith('package.json') ||
             e.path.endsWith('nx.json') ||
-            e.path.endsWith('workspace.json')
+            e.path.endsWith('workspace.json') ||
+            e.path.endsWith('tsconfig.base.json')
         )
       ) {
         lspLogger.log('Project configuration changed');
@@ -48,7 +49,8 @@ export async function languageServerWatcher(
               e.path.endsWith('project.json') ||
               e.path.endsWith('package.json') ||
               e.path.endsWith('nx.json') ||
-              e.path.endsWith('workspace.json')
+              e.path.endsWith('workspace.json') ||
+              e.path.endsWith('tsconfig.base.json')
           )
         ) {
           lspLogger.log('Project configuration changed');
