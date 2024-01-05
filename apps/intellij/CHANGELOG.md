@@ -1,3 +1,10 @@
+## <small>1.16.1 (2024-01-05)</small>
+
+### Bug Fixes
+
+* **nxls:** trigger reload on tsconfig.base.json change ([#1972](https://github.com/nrwl/nx-console/issues/1972)) ([a6213ed](https://github.com/nrwl/nx-console/commit/a6213eda1650e7bccb453e701086382695e1ff83))
+* repair as-provided prefilling ([#1973](https://github.com/nrwl/nx-console/issues/1973)) ([1ba7e05](https://github.com/nrwl/nx-console/commit/1ba7e05ea7a0abb9b5e135c77594bb2c3f622743))
+
 ## 1.16.0 (2024-01-02)
 
 ### Bug Fixes
