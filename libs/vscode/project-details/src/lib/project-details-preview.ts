@@ -112,6 +112,7 @@ export class ProjectDetailsPreview {
     </body>
     `
     );
+    html = html.replace('<body', '<body style="padding: 0rem;" ');
     return html;
   }
 
@@ -127,8 +128,10 @@ export class ProjectDetailsPreview {
     const project = projects[projectName];
     const projectConfigPath = join(workspacePath, project.root, 'project.json');
     const doc = await workspace.openTextDocument(projectConfigPath);
-    const column = window.visibleTextEditors.find(editor => editor.document.fileName === doc.fileName)?.viewColumn
-    await window.showTextDocument(doc, column ?? ViewColumn.Beside)
+    const column = window.visibleTextEditors.find(
+      (editor) => editor.document.fileName === doc.fileName
+    )?.viewColumn;
+    await window.showTextDocument(doc, column ?? ViewColumn.Beside);
 
     const editor = window.visibleTextEditors.find((editor) =>
       editor.document.fileName.endsWith(projectConfigPath)

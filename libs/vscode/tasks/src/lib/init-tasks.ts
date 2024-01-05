@@ -1,12 +1,8 @@
-import { ExtensionContext, commands } from "vscode";
-import { registerNxCommands } from "./nx-task-commands";
-import { registerCliTaskCommands } from "./cli-task-commands";
-import { showProjectConfiguration } from "./show-project-config-command";
+import { ExtensionContext } from 'vscode';
+import { registerCliTaskCommands } from './cli-task-commands';
+import { registerNxCommands } from './nx-task-commands';
 
-export function initTasks(context: ExtensionContext ) {
-    registerNxCommands(context);
-    registerCliTaskCommands(context);
-
-    commands.registerCommand('nxConsole.showProjectConfiguration', showProjectConfiguration)
-
+export function initTasks(context: ExtensionContext) {
+  registerNxCommands(context);
+  registerCliTaskCommands(context);
 }
