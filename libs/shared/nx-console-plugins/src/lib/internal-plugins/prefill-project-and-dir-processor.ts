@@ -41,18 +41,11 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
     }
   }
 
-  // after nx 17, most generators will have nameAndDirectory or projectNameAndRoot options.
-  // for those, we prefill the cwd
+  // after nx 17, we prefill the cwd
+  prefillDirectoryAsCwd();
   if (
-    schema.options.find(
-      (o) =>
-        o.name === 'nameAndDirectoryFormat' ||
-        o.name === 'projectNameAndRootFormat'
-    )
+    schema.options.find((o) => o.name === 'project' || o.name === 'projectName')
   ) {
-    prefillDirectoryAsCwd();
-    // if they don't have this option, we prefill the project
-  } else {
     prefillProject();
   }
 
