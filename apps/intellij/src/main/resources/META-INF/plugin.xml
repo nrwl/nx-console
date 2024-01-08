@@ -77,6 +77,9 @@
 
     <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
   </extensions>
+  <extensions defaultExtensionNs="JavaScript">
+    <scanningFileListenerContributor implementation="dev.nx.console.ide.DotNxFolderExcludeContributor"/>
+  </extensions>
   <applicationListeners>
     <listener class="dev.nx.console.listeners.ProjectManagerListener"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
@@ -131,7 +134,7 @@
     >
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </action>
-    
+
     <action id="dev.nx.console.run.actions.NxRunAnythingAction" class="dev.nx.console.run.actions.NxRunAnythingAction"
             text="Nx: Run Anything" description="Run Nx targets in a CLI-like interface"
             icon="AllIcons.Actions.Run_anything"/>
