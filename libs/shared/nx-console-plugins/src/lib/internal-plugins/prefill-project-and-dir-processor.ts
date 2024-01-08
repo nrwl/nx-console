@@ -42,9 +42,13 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
   }
 
   // after nx 17, we prefill the cwd
+  // project is also prefilled if there is no nameAndDirectoryFormat (which ignores project)
   prefillDirectoryAsCwd();
   if (
-    schema.options.find((o) => o.name === 'project' || o.name === 'projectName')
+    schema.options.find(
+      (o) => o.name === 'project' || o.name === 'projectName'
+    ) &&
+    schema.options.every((o) => o.name !== 'nameAndDirectoryFormat')
   ) {
     prefillProject();
   }

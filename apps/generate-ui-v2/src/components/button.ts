@@ -14,6 +14,8 @@ export class Button extends EditorContext(LitElement) {
   // only relevant in 'icon' mode
   @property()
   color: string;
+  @property({ type: Boolean })
+  applyFillColor: boolean = false;
 
   render() {
     return this.editor === 'vscode'
@@ -29,6 +31,7 @@ export class Button extends EditorContext(LitElement) {
             class="flex items-start"
             icon="${this.text}"
             color="${this.color}"
+            ?applyFillColor=${this.applyFillColor}
           ></icon-element>
         </vscode-button>
       `;
@@ -40,8 +43,14 @@ export class Button extends EditorContext(LitElement) {
 
   renderIntellij() {
     if (this.appearance === 'icon') {
-      return html`<div class="hover:bg-fieldNavHoverBackground rounded p-1">
-        <icon-element icon="${this.text}" color="${this.color}"></icon-element>
+      return html`<div
+        class="hover:bg-fieldNavHoverBackground cursor-pointer rounded p-1"
+      >
+        <icon-element
+          icon="${this.text}"
+          color="${this.color}"
+          ?applyFillColor="${this.applyFillColor}"
+        ></icon-element>
       </div>`;
     }
     return html`<button

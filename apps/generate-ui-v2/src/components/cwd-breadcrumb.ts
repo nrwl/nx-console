@@ -59,6 +59,8 @@ export class CwdBreadcrumb extends GeneratorContextContext(
 
   render() {
     const pathArray = this.path.split('/');
+    const hasPathSegments = pathArray.filter((p) => !!p).length > 0;
+    console.log(pathArray);
     return html`
       <div
         data-cy="cwd-breadcrumb"
@@ -66,8 +68,10 @@ export class CwdBreadcrumb extends GeneratorContextContext(
       >
         <span class="pr-2"> Working Directory: </span>
         <span
-          @click="${this.resetPath}"
-          class="hover:text-primary cursor-pointer underline"
+          @click="${hasPathSegments ? this.resetPath : () => {}}"
+          class="${hasPathSegments
+            ? 'hover:text-primary cursor-pointer underline'
+            : ''}"
         >
           {workspaceRoot}
         </span>
@@ -105,6 +109,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
               <button-element
                 @click="${this.toggleEdit}"
                 color="var(--muted-foreground-color)"
+                ?applyFillColor="false"
                 appearance="icon"
                 text="edit"
                 class="self-center"
@@ -127,7 +132,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
     } else {
       return html`
         <input
-          class="${intellijFieldColors} ${intellijFocusRing} ${intellijFieldPadding} rounded"
+          class="${intellijFieldColors} ${intellijFocusRing} ${intellijFieldPadding} cursor-pointer rounded"
           type="text"
           .value="${this.path}"
           @keydown="${this.handleInlineEditKeydown}"
