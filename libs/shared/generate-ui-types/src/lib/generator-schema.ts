@@ -11,6 +11,7 @@ export type GeneratorSchema = {
 
 export type GeneratorContext = {
   project?: string;
+  normalizedDirectory?: string;
   directory?: string;
   prefillValues?: Record<string, string>;
   fixedFormValues?: Record<string, string>;

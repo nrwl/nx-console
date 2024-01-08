@@ -104,6 +104,7 @@
     "@wdio/spec-reporter": "^7.26.0",
     "@yarnpkg/pnp": "^3.1.1-rc.12",
     "cypress": "^13.0.0",
+    "cypress-real-events": "^1.11.0",
     "esbuild": "0.19.5",
     "esbuild-copy-files-plugin": "^1.1.0",
     "eslint": "8.46.0",

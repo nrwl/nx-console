@@ -1,29 +1,21 @@
-import { ContextConsumer } from '@lit-labs/context';
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { editorContext } from '../contexts/editor-context';
+import { EditorContext } from '../contexts/editor-context';
 import { intellijFocusRing } from '../utils/ui-utils';
 
 @customElement('button-element')
-export class Button extends LitElement {
+export class Button extends EditorContext(LitElement) {
   @property()
   text: string;
 
   @property()
   appearance: 'primary' | 'secondary' | 'icon' = 'primary';
 
-  editor: string;
-
-  constructor() {
-    super();
-    new ContextConsumer(this, {
-      context: editorContext,
-      callback: (value) => {
-        this.editor = value;
-      },
-      subscribe: false,
-    });
-  }
+  // only relevant in 'icon' mode
+  @property()
+  color: string;
+  @property({ type: Boolean })
+  applyFillColor: boolean = false;
 
   render() {
     return this.editor === 'vscode'
@@ -38,6 +30,8 @@ export class Button extends LitElement {
           <icon-element
             class="flex items-start"
             icon="${this.text}"
+            color="${this.color}"
+            ?applyFillColor=${this.applyFillColor}
           ></icon-element>
         </vscode-button>
       `;
@@ -49,8 +43,14 @@ export class Button extends LitElement {
 
   renderIntellij() {
     if (this.appearance === 'icon') {
-      return html`<div class="hover:bg-fieldNavHoverBackground rounded p-1">
-        <icon-element icon="${this.text}"></icon-element>
+      return html`<div
+        class="hover:bg-fieldNavHoverBackground cursor-pointer rounded p-1"
+      >
+        <icon-element
+          icon="${this.text}"
+          color="${this.color}"
+          ?applyFillColor="${this.applyFillColor}"
+        ></icon-element>
       </div>`;
     }
     return html`<button

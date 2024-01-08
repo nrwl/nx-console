@@ -21,7 +21,7 @@ export class FieldNavItem extends FieldValueConsumer(LitElement) {
           : this.shouldRenderChanged()
           ? 'text-primary'
           : this.greyedOut
-          ? 'text-gray-500'
+          ? 'text-mutedForeground'
           : 'text-foreground'} hover:bg-fieldNavHoverBackground  cursor-pointer overflow-hidden 
           text-ellipsis"
       >

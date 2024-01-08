@@ -3,9 +3,13 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { FormValuesService } from './form-values.service';
 import { IdeCommunicationController } from './ide-communication.controller';
-import { getGeneratorIdentifier } from './utils/generator-schema-utils';
+import {
+  getGeneratorIdentifier,
+  getGeneratorNameTitleCase,
+} from './utils/generator-schema-utils';
 
 import './components/index';
+import { SearchBar } from './components/search-bar';
 
 @customElement('root-element')
 export class Root extends LitElement {
@@ -32,7 +36,7 @@ export class Root extends LitElement {
       class="text-foreground m-auto flex h-screen max-w-screen-xl flex-col p-6"
     >
       <div
-        class="bg-background border-separator sticky top-0 z-50 w-full border-b-2 pb-6"
+        class="bg-background border-separator sticky top-0 z-50 w-full border-b-2 pb-3"
       >
         ${this.renderHeader()}
       </div>
@@ -43,6 +47,7 @@ export class Root extends LitElement {
               class="h-full"
               .options="${options}"
               .searchValue="${this.searchValue}"
+              @clear-search="${() => this.clearSearch()}"
             ></field-list>`}
       </div>
     </div>`;
@@ -61,32 +66,47 @@ export class Root extends LitElement {
     return html`
       <div>
         <header class="flex items-center justify-between">
-          <div class="flex flex-wrap items-end gap-2">
-            <h1 class="text-xl font-bold leading-none" data-cy="header-text">
-              nx generate ${getGeneratorIdentifier(this.icc.generatorSchema)}
+          <div class="flex flex-col flex-wrap items-start gap-2">
+            <h1 class="text-xl font-bold leading-none" data-cy="title">
+              ${getGeneratorNameTitleCase(this.icc.generatorSchema)}
             </h1>
+            <h2
+              class="inline-flex text-lg font-medium leading-none"
+              data-cy="subtitle"
+            >
+              ${this.icc.generatorSchema?.collectionName}
+              <popover-element
+                class="flex items-center pl-2 text-base"
+                .content="${this.icc.generatorSchema?.description}"
+              >
+                <icon-element class="flex items-start" icon="info">
+                </icon-element>
+              </popover-element>
+            </h2>
+          </div>
+
+          <div class="flex shrink-0">
             ${when(
               isNxGenerator && this.icc.editor === 'vscode',
               () =>
                 html`
-                  <a
-                    href="${nxDevLink}"
-                    target="_blank"
-                    class="focus:ring-focusBorder pb-px text-sm leading-none underline focus:outline-none focus:ring-1 max-sm:hidden"
-                    >View full details
-                  </a>
+                  <button-element
+                    @click="${() => this.openNxDev(nxDevLink)}"
+                    title="Open generator documentation on nx.dev"
+                    appearance="icon"
+                    text="link-external"
+                    class="focus:ring-focusBorder flex items-center py-2 pl-3 focus:outline-none focus:ring-1"
+                  >
+                  </button-element>
                 `
             )}
-          </div>
-
-          <div class="sm: flex shrink-0">
             <button-element
-              class="flex items-center py-2 pl-3 max-sm:hidden"
+              class="flex items-center py-2 pl-3"
               appearance="icon"
               text="copy"
               title="Copy generate command to clipboard"
               @click="${() => this.formValuesService.copyCommandToClipboard()}"
-              id="copy-button"
+              data-cy="copy-button"
             >
             </button-element>
             ${when(
@@ -130,6 +150,7 @@ export class Root extends LitElement {
           <search-bar
             @search-input="${this.handleSearchValueChange}"
           ></search-bar>
+          <cwd-breadcrumb></cwd-breadcrumb>
         </div>
       </div>
     `;
@@ -137,6 +158,14 @@ export class Root extends LitElement {
 
   private handleSearchValueChange(e: CustomEvent) {
     this.searchValue = e.detail;
+  }
+
+  private clearSearch() {
+    const searchBar = this.renderRoot.querySelector('search-bar');
+    console.log(searchBar);
+    if (searchBar) {
+      (searchBar as SearchBar).clearSearch();
+    }
   }
 
   private handleGlobalKeyboardShortcuts(e: KeyboardEvent) {
@@ -156,6 +185,16 @@ export class Root extends LitElement {
         (searchBar as HTMLElement).focus();
       }
     }
+  }
+
+  openNxDev(link: string) {
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank'; // Optional: Open in new tab
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   protected createRenderRoot() {

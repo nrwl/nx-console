@@ -8,6 +8,16 @@ export function getGeneratorIdentifier(
   return `${generatorSchema.collectionName}:${generatorSchema.generatorName}`;
 }
 
+export function getGeneratorNameTitleCase(
+  generatorSchema: GeneratorSchema | undefined
+) {
+  if (!generatorSchema) return '';
+  return generatorSchema.generatorName
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 export function extractDefaultValue(
   option?: Option
 ): string | boolean | number | string[] | undefined {

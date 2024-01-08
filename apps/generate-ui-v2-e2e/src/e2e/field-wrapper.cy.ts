@@ -15,7 +15,7 @@ describe('field wrapper', () => {
   beforeEach(() => visitGenerateUi(schema));
 
   it('should show hint if x-hint is set', () => {
-    cy.get('popover-element').click();
+    cy.get('field-list popover-element').click();
     cy.get('[data-cy="popover-content"]').should('be.visible');
     cy.get('[data-cy="popover-content"]').should('contain.text', 'hint');
   });

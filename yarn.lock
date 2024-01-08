@@ -15023,6 +15023,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cypress-real-events@npm:^1.11.0":
+  version: 1.11.0
+  resolution: "cypress-real-events@npm:1.11.0"
+  peerDependencies:
+    cypress: ^4.x || ^5.x || ^6.x || ^7.x || ^8.x || ^9.x || ^10.x || ^11.x || ^12.x || ^13.x
+  checksum: 899246ba110d4d186d483a56871df0da58baed0c69f1a7005d4c4dda44dbffba1088c83a1765bbb8029fc6e1f98787e1dee57b05be9a5267c207ead6aaf22ff3
+  languageName: node
+  linkType: hard
+
 "cypress@npm:^13.0.0":
   version: 13.3.2
   resolution: "cypress@npm:13.3.2"
@@ -25037,6 +25046,7 @@ __metadata:
     "@yarnpkg/libzip": ^3.0.0-rc.48
     "@yarnpkg/pnp": ^3.1.1-rc.12
     cypress: ^13.0.0
+    cypress-real-events: ^1.11.0
     dotenv: ^16.0.3
     esbuild: 0.19.5
     esbuild-copy-files-plugin: ^1.1.0

@@ -10,6 +10,9 @@ export class Icon extends EditorContext(LitElement) {
   @property()
   color = '';
 
+  @property({ type: Boolean })
+  applyFillColor: boolean = false;
+
   render() {
     if (this.editor === 'intellij') {
       return html`<img
@@ -37,7 +40,9 @@ export class Icon extends EditorContext(LitElement) {
 
     const allPaths = parsedSvg.querySelectorAll('path');
     allPaths.forEach((path) => {
-      path.setAttribute('fill', this.color);
+      if (this.applyFillColor) {
+        path.setAttribute('fill', this.color);
+      }
       path.setAttribute('stroke', this.color);
     });
 

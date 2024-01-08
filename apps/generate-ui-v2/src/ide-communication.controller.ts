@@ -175,6 +175,7 @@ export class IdeCommunicationController implements ReactiveController {
     styleSheet.replaceSync(`
     :root {
       --foreground-color: ${styles.foregroundColor};
+      --muted-foreground-color: ${styles.mutedForegroundColor};
       --background-color: ${styles.backgroundColor};
       --primary-color: ${styles.primaryColor};
       --error-color: ${styles.errorColor};

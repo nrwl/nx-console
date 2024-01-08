@@ -135,6 +135,7 @@ class V2NxGenerateUiFile(
                     false -> UIUtil.getLabelForeground()
                 }
             )
+        val mutedForegroundColor = getHexColor(UIManager.getColor("Component.infoForeground"))
         val primaryColor = getHexColor(UIManager.getColor("Button.default.endBackground"))
         val errorColor = getHexColor(UIManager.getColor("Component.errorFocusColor"))
         val fieldBackgroundColor = getHexColor(UIManager.getColor("TextField.background"))
@@ -159,6 +160,7 @@ class V2NxGenerateUiFile(
         return GenerateUiStyles(
             backgroundColor = backgroundColor,
             foregroundColor = foregroundColor,
+            mutedForegroundColor = mutedForegroundColor,
             primaryColor = primaryColor,
             errorColor = errorColor,
             fieldBackgroundColor = fieldBackgroundColor,

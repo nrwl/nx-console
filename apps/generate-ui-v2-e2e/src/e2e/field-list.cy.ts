@@ -79,7 +79,7 @@ describe('field list', () => {
   });
 
   describe('field nav', () => {
-    const greyedOutClass = 'text-gray-500';
+    const greyedOutClass = 'text-mutedForeground';
 
     it('should show all fields and some greyed out by default', () => {
       getFieldNavItems().should('have.length', 6);
