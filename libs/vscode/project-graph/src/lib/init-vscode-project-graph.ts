@@ -29,13 +29,14 @@ export function getGraphWebviewManager(): GraphWebviewManager {
 
 export async function initVscodeProjectGraph(context: ExtensionContext) {
   const nxVersion = await getNxVersion();
-  // TODO: replace with actual version
-  if (gte(nxVersion.version, '18.0.0')) {
-    graphWebviewManager = new GraphWebviewManager(context);
-    registerActions(graphWebviewManager);
-  } else {
-    context.subscriptions.push(projectGraph());
-  }
+  // TODO: enable & replace with actual version that has nx graph api changes
+  // eslint-disable-next-line no-constant-condition
+  // if (gte(nxVersion.version, '18.0.0')) {
+  //   graphWebviewManager = new GraphWebviewManager(context);
+  //   registerActions(graphWebviewManager);
+  // } else {
+  context.subscriptions.push(projectGraph());
+  // }
 }
 
 function registerActions(graphWebviewManager: GraphWebviewManager) {
