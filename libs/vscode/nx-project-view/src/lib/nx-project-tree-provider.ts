@@ -152,6 +152,4 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       commands.executeCommand('revealInExplorer', selection.resourceUri);
     }
   }
-
-  
 }
