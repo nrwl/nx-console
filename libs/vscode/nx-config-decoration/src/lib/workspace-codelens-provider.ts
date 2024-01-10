@@ -91,13 +91,6 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       );
 
       this.buildTargetLenses(project, document, lens, projectName);
-
-      await this.buildSyntheticTargetLenses(
-        lens,
-        document,
-        projectName,
-        project.targets
-      );
     }
     return lens;
   }
@@ -193,8 +186,8 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
       const command: Command = {
         command: `nx.run`,
         title: lens.configuration
-          ? `nx run ${lens.project}:${lens.target}:${lens.configuration}`
-          : `nx run ${lens.project}:${lens.target}`,
+          ? `nx run ${lens.target}:${lens.configuration}`
+          : `nx run ${lens.target}`,
         arguments: [lens.project, lens.target, lens.configuration, false],
       };
       lens.command = command;
@@ -214,7 +207,7 @@ export class WorkspaceCodeLensProvider implements CodeLensProvider {
     if (lens instanceof TaskGraphCodeLens) {
       lens.command = {
         command: `nx.graph.task.button`,
-        title: `show nx task graph for ${lens.project}:${lens.target}`,
+        title: `show nx graph for ${lens.target}`,
         arguments: [[lens.project, lens.target]],
       };
       return lens;

@@ -17,6 +17,7 @@ import { ProjectDetailsProvider } from './project-details-provider';
 import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { parseJsonText } from 'typescript';
+import { decorateWithProjectDetails } from '../project-details-inline-decorations';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   // const projectDetailsManager = new ProjectDetailsManager(context);
@@ -31,6 +32,7 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
     'project-details',
     projectDetailsProvider
   );
+
   commands.registerCommand('nx.project-details.openToSide', async () => {
     const uri = window.activeTextEditor?.document.uri;
     if (!uri) return;
@@ -46,9 +48,9 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
       preview: false,
       viewColumn: ViewColumn.Beside,
     });
-
-    // decorateSourceMaps();
   });
+
+  decorateWithProjectDetails();
 }
 // function highlightTargets() {
 //   const activeEditor = window.activeTextEditor;
