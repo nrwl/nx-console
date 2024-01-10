@@ -9,7 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile
 
 class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
-        return false // file.name.endsWith("project.json") || file.name.endsWith("package.json")
+        return file.name.endsWith("project.json") || file.name.endsWith("package.json")
     }
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {

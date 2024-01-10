@@ -14,41 +14,67 @@ import {
 } from 'vscode';
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
-import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxVersion,
+  getProjectByPath,
+} from '@nx-console/vscode/nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { parseJsonText } from 'typescript';
 import { decorateWithProjectDetails } from '../project-details-inline-decorations';
+import { gte } from 'semver';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
-  // const projectDetailsManager = new ProjectDetailsManager(context);
-  // commands.registerCommand('nx.project-details.openToSide', () => {
-  //   const uri = window.activeTextEditor?.document.uri;
-  //   if (!uri) return;
-  //   projectDetailsManager.openProjectDetailsToSide(uri);
-  // });
-
-  const projectDetailsProvider = new ProjectDetailsProvider();
-  workspace.registerTextDocumentContentProvider(
-    'project-details',
-    projectDetailsProvider
-  );
-
-  commands.registerCommand('nx.project-details.openToSide', async () => {
-    const uri = window.activeTextEditor?.document.uri;
-    if (!uri) return;
-    const project = await getProjectByPath(uri.path);
-    if (!project) {
-      showNoProjectAtPathMessage(uri.path);
-      return;
+  getNxVersion().then((nxVersion) => {
+    // TODO: enable & replace with actual version that has nx graph api changes
+    // eslint-disable-next-line no-constant-condition
+    if (gte(nxVersion.version, '18.0.0')) {
+      const projectDetailsManager = new ProjectDetailsManager(context);
+      commands.registerCommand('nx.project-details.openToSide', () => {
+        const uri = window.activeTextEditor?.document.uri;
+        if (!uri) return;
+        projectDetailsManager.openProjectDetailsToSide(uri);
+      });
+    } else {
+      const projectDetailsProvider = new ProjectDetailsProvider();
+      workspace.registerTextDocumentContentProvider(
+        'project-details',
+        projectDetailsProvider
+      );
+      commands.registerCommand('nx.project-details.openToSide', async () => {
+        const uri = window.activeTextEditor?.document.uri;
+        if (!uri) return;
+        const project = await getProjectByPath(uri.path);
+        if (!project) {
+          showNoProjectAtPathMessage(uri.path);
+          return;
+        }
+        const doc = await workspace.openTextDocument(
+          Uri.parse(`project-details:${project.name}.project.json`)
+        );
+        await window.showTextDocument(doc, {
+          preview: false,
+          viewColumn: ViewColumn.Beside,
+        });
+      });
     }
-    const doc = await workspace.openTextDocument(
-      Uri.parse(`project-details:${project.name}.project.json`)
-    );
-    await window.showTextDocument(doc, {
-      preview: false,
-      viewColumn: ViewColumn.Beside,
-    });
   });
+
+  // commands.registerCommand('nx.project-details.openToSide', async () => {
+  // const uri = window.activeTextEditor?.document.uri;
+  // if (!uri) return;
+  // const project = await getProjectByPath(uri.path);
+  // if (!project) {
+  //   showNoProjectAtPathMessage(uri.path);
+  //   return;
+  // }
+  // const doc = await workspace.openTextDocument(
+  //   Uri.parse(`project-details:${project.name}.project.json`)
+  // );
+  // await window.showTextDocument(doc, {
+  //   preview: false,
+  //   viewColumn: ViewColumn.Beside,
+  // });
+  // });
 
   decorateWithProjectDetails();
 }
