@@ -16,14 +16,22 @@ import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import {
   getNxVersion,
+  getNxWorkspacePath,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { parseJsonText } from 'typescript';
-import { decorateWithProjectDetails } from '../project-details-inline-decorations';
+import { decorateWithProjectDetails } from './project-details-inline-decorations';
 import { gte } from 'semver';
+import { join } from 'path';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
+  getNxWorkspacePath().then((nxWorkspacePath) => {
+    commands.executeCommand('setContext', 'nxConsole.ignoredPDVPaths', [
+      join(nxWorkspacePath, 'package.json'),
+    ]);
+  });
+
   getNxVersion().then((nxVersion) => {
     // TODO: enable & replace with actual version that has nx graph api changes
     // eslint-disable-next-line no-constant-condition

@@ -1,14 +1,16 @@
 import { debounce } from '@nx-console/shared/utils';
 import { getTargetsPropertyLocation } from '@nx-console/vscode/nx-config-decoration';
-import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
-import { ProjectConfiguration } from 'nx/src/devkit-exports';
+import {
+  getNxWorkspacePath,
+  getProjectByPath,
+} from '@nx-console/vscode/nx-workspace';
+import { join } from 'path';
 import {
   DecorationOptions,
   DecorationRangeBehavior,
   MarkdownString,
   Position,
   Range,
-  TextDocument,
   TextEditor,
   ThemeColor,
   window,
@@ -25,18 +27,19 @@ const targetDecorationType = window.createTextEditorDecorationType({
   rangeBehavior: DecorationRangeBehavior.OpenOpen,
 });
 
-export function decorateWithProjectDetails() {
-  if (shouldDecorate(window.activeTextEditor)) {
+export async function decorateWithProjectDetails() {
+  const rootPackageJsonPath = join(await getNxWorkspacePath(), 'package.json');
+  if (shouldDecorate(window.activeTextEditor, rootPackageJsonPath)) {
     debouncedDecoration(window.activeTextEditor);
   }
   window.onDidChangeActiveTextEditor((e) => {
-    if (shouldDecorate(e)) {
+    if (shouldDecorate(e, rootPackageJsonPath)) {
       debouncedDecoration(e);
     }
   });
 
   workspace.onDidChangeTextDocument((e) => {
-    if (shouldDecorate(window.activeTextEditor)) {
+    if (shouldDecorate(window.activeTextEditor, rootPackageJsonPath)) {
       debouncedDecoration(window.activeTextEditor);
     }
   });
@@ -135,10 +138,14 @@ const getHoverLink = () => {
   return hoverLink;
 };
 
-function shouldDecorate(editor: TextEditor | undefined): editor is TextEditor {
+function shouldDecorate(
+  editor: TextEditor | undefined,
+  rootPackageJsonPath: string
+): editor is TextEditor {
   return (
-    (editor?.document.fileName.endsWith('project.json') ||
-      editor?.document.fileName.endsWith('package.json')) ??
+    ((editor?.document.fileName.endsWith('project.json') ||
+      editor?.document.fileName.endsWith('package.json')) &&
+      editor.document.fileName !== rootPackageJsonPath) ??
     false
   );
 }

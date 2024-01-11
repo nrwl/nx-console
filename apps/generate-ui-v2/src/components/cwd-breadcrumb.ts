@@ -60,7 +60,6 @@ export class CwdBreadcrumb extends GeneratorContextContext(
   render() {
     const pathArray = this.path.split('/');
     const hasPathSegments = pathArray.filter((p) => !!p).length > 0;
-    console.log(pathArray);
     return html`
       <div
         data-cy="cwd-breadcrumb"
@@ -143,7 +142,6 @@ export class CwdBreadcrumb extends GeneratorContextContext(
   }
 
   private handleInlineEditKeydown(event: KeyboardEvent) {
-    console.log(event);
     if (event.key === 'Enter') {
       this.confirmEdit();
     }

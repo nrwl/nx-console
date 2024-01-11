@@ -100,7 +100,7 @@ export class GraphWebviewManager {
             } else if(type === 'show-affected-projects') {
               window.externalApi.showAffectedProjects()
             }
-        });
+        }); 
     </script>
     </head>
     `
