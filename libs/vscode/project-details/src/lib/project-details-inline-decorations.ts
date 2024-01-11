@@ -1,4 +1,5 @@
 import { debounce } from '@nx-console/shared/utils';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getNxWorkspacePath,
   getProjectByPath,
@@ -47,6 +48,11 @@ export async function decorateWithProjectDetails() {
 const debouncedDecoration = debounce(doDecoration, 500);
 
 async function doDecoration(editor: TextEditor) {
+  const isEnabled = GlobalConfigurationStore.instance.get(
+    'showProjectDetailsView'
+  );
+  if (!isEnabled) return;
+
   const fileName = editor.document.fileName;
   editor.setDecorations(projectDetailsDecorationType, []);
 

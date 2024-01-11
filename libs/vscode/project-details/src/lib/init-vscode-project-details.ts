@@ -24,6 +24,10 @@ import { parseJsonText } from 'typescript';
 import { decorateWithProjectDetails } from './project-details-inline-decorations';
 import { gte } from 'semver';
 import { join } from 'path';
+import {
+  GlobalConfigurationStore,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   getNxWorkspacePath().then((nxWorkspacePath) => {
@@ -38,6 +42,10 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
     if (gte(nxVersion.version, '18.0.0')) {
       const projectDetailsManager = new ProjectDetailsManager(context);
       commands.registerCommand('nx.project-details.openToSide', () => {
+        const isEnabled = GlobalConfigurationStore.instance.get(
+          'showProjectDetailsView'
+        );
+        if (!isEnabled) return;
         const uri = window.activeTextEditor?.document.uri;
         if (!uri) return;
         projectDetailsManager.openProjectDetailsToSide(uri);
@@ -49,6 +57,10 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
         projectDetailsProvider
       );
       commands.registerCommand('nx.project-details.openToSide', async () => {
+        const isEnabled = GlobalConfigurationStore.instance.get(
+          'showProjectDetailsView'
+        );
+        if (!isEnabled) return;
         const uri = window.activeTextEditor?.document.uri;
         if (!uri) return;
         const project = await getProjectByPath(uri.path);

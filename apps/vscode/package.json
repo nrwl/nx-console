@@ -207,7 +207,7 @@
         {
           "command": "nx.project-details.openToSide",
           "group": "navigation",
-          "when": "(resourceFilename === project.json || resourceFilename === package.json) && resourcePath not in nxConsole.ignoredPDVPaths"
+          "when": "(resourceFilename === project.json || resourceFilename === package.json) && resourcePath not in nxConsole.ignoredPDVPaths && config.nxConsole.showProjectDetailsView"
         }
       ],
       "commandPalette": [
@@ -634,6 +634,12 @@
           "scope": "application",
           "default": true,
           "description": "Use the new Generate UI - still in development."
+        },
+        "nxConsole.showProjectDetailsView": {
+          "type": "boolean",
+          "scope": "application",
+          "default": false,
+          "description": "Show the project details view for project.json or package.json files."
         },
         "nxConsole.showNodeVersionOnStartup": {
           "type": "boolean",
