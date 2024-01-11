@@ -9,4 +9,3 @@ project(":apps:intellij").projectDir =
         "apps/intellij"
     )
 
-// println(project(":intellij"))

@@ -72,6 +72,7 @@ export class GraphWebviewManager {
       ViewColumn.Active,
       {
         enableScripts: true,
+        retainContextWhenHidden: true,
       }
     );
     this.currentPanelIsAffected = affected;

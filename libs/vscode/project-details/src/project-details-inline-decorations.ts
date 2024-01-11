@@ -27,19 +27,52 @@ const targetDecorationType = window.createTextEditorDecorationType({
 
 export function decorateWithProjectDetails() {
   if (shouldDecorate(window.activeTextEditor)) {
-    doDecoration(window.activeTextEditor);
+    debouncedDecoration(window.activeTextEditor);
   }
   window.onDidChangeActiveTextEditor((e) => {
     if (shouldDecorate(e)) {
-      doDecoration(e);
+      debouncedDecoration(e);
     }
   });
 
   workspace.onDidChangeTextDocument((e) => {
     if (shouldDecorate(window.activeTextEditor)) {
-      doDecoration(window.activeTextEditor);
+      debouncedDecoration(window.activeTextEditor);
     }
   });
+}
+
+const debouncedDecoration = debounce(doDecoration, 500);
+
+async function doDecoration(editor: TextEditor) {
+  const fileName = editor.document.fileName;
+  editor.setDecorations(targetDecorationType, []);
+
+  const target = getTargetsPropertyLocation(editor.document);
+  console.log(target);
+
+  editor.setDecorations(targetDecorationType, [
+    projectDetailsLoadingDecoration(),
+  ]);
+
+  const project = await getProjectByPath(fileName);
+
+  if (!project) {
+    return;
+  }
+
+  const targetsInfo = Object.entries(project.targets ?? {}).map(
+    ([name, target]) => ({
+      name,
+      command: target.command ?? target.options?.command ?? target.executor,
+    })
+  );
+
+  editor.setDecorations(targetDecorationType, []);
+
+  editor.setDecorations(targetDecorationType, [
+    projectDetailsWithTargetsDecoration(project.name ?? '', targetsInfo),
+  ]);
 }
 
 const projectDetailsLoadingDecoration = () => {
@@ -72,7 +105,7 @@ const projectDetailsWithTargetsDecoration = (
   hoverTargets.supportThemeIcons = true;
   hoverTargets.isTrusted = true;
   hoverTargets.value = `
-  <h4>Targets in ${projectName}</h4>
+  <h4>Nx Targets in ${projectName}</h4>
   `;
   hoverTargets.appendMarkdown(`
   | Target | Command |
@@ -102,89 +135,10 @@ const getHoverLink = () => {
   return hoverLink;
 };
 
-const debouncedDecoration = debounce(doDecoration, 500);
-
-async function doDecoration(editor: TextEditor) {
-  console.log('doDecoration');
-  const fileName = editor.document.fileName;
-  editor.setDecorations(targetDecorationType, []);
-
-  const target = getTargetsPropertyLocation(editor.document);
-  console.log(target);
-
-  editor.setDecorations(targetDecorationType, [
-    projectDetailsLoadingDecoration(),
-  ]);
-
-  const project = await getProjectByPath(fileName);
-
-  if (!project) {
-    return;
-  }
-
-  const targetsInfo = Object.entries(project.targets ?? {}).map(
-    ([name, target]) => ({
-      name,
-      command: target.command ?? target.options?.command ?? target.executor,
-    })
-  );
-
-  editor.setDecorations(targetDecorationType, []);
-
-  editor.setDecorations(targetDecorationType, [
-    projectDetailsWithTargetsDecoration(project.name ?? '', targetsInfo),
-  ]);
-}
-
-function getTargetsDecoration(
-  position: Position,
-  inferredTargets?: string[]
-): DecorationOptions {
-  const decorationRange = new Range(position, position);
-
-  const hoverMessage = new MarkdownString(
-    '<span style="font-weight: 600;">[$(open-preview) View full project details](command:nx.project-details.openToSide)</span>'
-  );
-  hoverMessage.supportHtml = true;
-  hoverMessage.isTrusted = true;
-  hoverMessage.supportThemeIcons = true;
-
-  const contentText = 'Project Details Available';
-
-  return {
-    renderOptions: {
-      after: {
-        contentText,
-        color: new ThemeColor('textLink.foreground'),
-      },
-    },
-    range: decorationRange,
-    hoverMessage,
-  } as DecorationOptions;
-}
-
 function shouldDecorate(editor: TextEditor | undefined): editor is TextEditor {
   return (
     (editor?.document.fileName.endsWith('project.json') ||
       editor?.document.fileName.endsWith('package.json')) ??
     false
-  );
-}
-
-function getInferredTargets(
-  document: TextDocument,
-  project: ProjectConfiguration
-): string[] {
-  const json = JSON.parse(document.getText());
-
-  let explicitTargets: string[];
-  if (!json.targets) {
-    explicitTargets = [];
-  } else {
-    explicitTargets = Object.keys(json.targets);
-  }
-
-  return Object.keys(project.targets ?? {}).filter(
-    (targetName) => !explicitTargets.includes(targetName)
   );
 }
