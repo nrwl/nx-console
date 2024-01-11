@@ -1,5 +1,4 @@
 import { debounce } from '@nx-console/shared/utils';
-import { getTargetsPropertyLocation } from '@nx-console/vscode/nx-config-decoration';
 import {
   getNxWorkspacePath,
   getProjectByPath,
@@ -17,7 +16,7 @@ import {
   workspace,
 } from 'vscode';
 
-const targetDecorationType = window.createTextEditorDecorationType({
+const projectDetailsDecorationType = window.createTextEditorDecorationType({
   after: {
     margin: '0 0 0 1rem',
     textDecoration: 'none',
@@ -49,12 +48,9 @@ const debouncedDecoration = debounce(doDecoration, 500);
 
 async function doDecoration(editor: TextEditor) {
   const fileName = editor.document.fileName;
-  editor.setDecorations(targetDecorationType, []);
+  editor.setDecorations(projectDetailsDecorationType, []);
 
-  const target = getTargetsPropertyLocation(editor.document);
-  console.log(target);
-
-  editor.setDecorations(targetDecorationType, [
+  editor.setDecorations(projectDetailsDecorationType, [
     projectDetailsLoadingDecoration(),
   ]);
 
@@ -71,9 +67,9 @@ async function doDecoration(editor: TextEditor) {
     })
   );
 
-  editor.setDecorations(targetDecorationType, []);
+  editor.setDecorations(projectDetailsDecorationType, []);
 
-  editor.setDecorations(targetDecorationType, [
+  editor.setDecorations(projectDetailsDecorationType, [
     projectDetailsWithTargetsDecoration(project.name ?? '', targetsInfo),
   ]);
 }
