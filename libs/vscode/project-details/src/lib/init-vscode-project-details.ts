@@ -67,23 +67,6 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
     }
   });
 
-  // commands.registerCommand('nx.project-details.openToSide', async () => {
-  // const uri = window.activeTextEditor?.document.uri;
-  // if (!uri) return;
-  // const project = await getProjectByPath(uri.path);
-  // if (!project) {
-  //   showNoProjectAtPathMessage(uri.path);
-  //   return;
-  // }
-  // const doc = await workspace.openTextDocument(
-  //   Uri.parse(`project-details:${project.name}.project.json`)
-  // );
-  // await window.showTextDocument(doc, {
-  //   preview: false,
-  //   viewColumn: ViewColumn.Beside,
-  // });
-  // });
-
   decorateWithProjectDetails();
 }
 // function highlightTargets() {

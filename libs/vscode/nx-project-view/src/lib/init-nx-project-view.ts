@@ -4,6 +4,8 @@ import { listenForAndStoreCollapsibleChanges } from './tree-item-collapsible-sto
 import { NxTreeItem } from './nx-tree-item';
 import { getTelemetry } from '@nx-console/vscode/utils';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
+import { selectProject } from '@nx-console/vscode/nx-cli-quickpicks';
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 
 export function initNxProjectView(
   context: ExtensionContext
@@ -28,6 +30,13 @@ export function initNxProjectView(
 
 export async function showProjectConfiguration(selection: NxTreeItem) {
   getTelemetry().featureUsed('editWorkspaceJson');
+  if (!selection) {
+    const projects = await getNxWorkspaceProjects();
+    const project = await selectProject(Object.keys(projects));
+    if (!project) return;
+    await revealNxProject(project, projects[project].root);
+    return;
+  }
   const viewItem = selection.item;
   if (viewItem.contextValue === 'folder') {
     return;

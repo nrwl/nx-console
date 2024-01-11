@@ -207,7 +207,7 @@
         {
           "command": "nx.project-details.openToSide",
           "group": "navigation",
-          "when": "(resourceFilename === project.json || resourceFilename === package.json) && (resourcePath not in nxConsole.ignoredPDVPaths)"
+          "when": "(resourceFilename === project.json || resourceFilename === package.json) && resourcePath not in nxConsole.ignoredPDVPaths"
         }
       ],
       "commandPalette": [
