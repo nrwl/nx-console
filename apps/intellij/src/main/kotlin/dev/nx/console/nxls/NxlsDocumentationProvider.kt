@@ -1,4 +1,4 @@
-package dev.nx.console.providers
+package dev.nx.console.nxls
 
 import com.intellij.lang.documentation.DocumentationMarkup.CONTENT_END
 import com.intellij.lang.documentation.DocumentationMarkup.CONTENT_START

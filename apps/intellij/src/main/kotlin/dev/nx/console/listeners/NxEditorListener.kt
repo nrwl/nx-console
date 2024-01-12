@@ -6,7 +6,7 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent
 import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.vfs.VirtualFile
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.DocumentUtils
 
 private val log = logger<NxEditorListener>()

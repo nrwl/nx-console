@@ -1,7 +1,6 @@
-package dev.nx.console.graph.ui
+package dev.nx.console.graph
 
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -9,20 +8,16 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefBrowserBase
-import com.intellij.ui.jcef.JBCefClient
 import com.intellij.ui.jcef.JBCefJSQuery
 import com.intellij.ui.jcef.executeJavaScriptAsync
 import com.intellij.util.ui.UIUtil
-import dev.nx.console.graph.NxGraphService
-import dev.nx.console.graph.NxGraphStates
 import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.NxTaskExecutionManager
-import dev.nx.console.services.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.ui.Notifier
 import dev.nx.console.utils.*
-import dev.nx.console.utils.jcef.OpenDevToolsContextMenuHandler
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.jcef.onBrowserLoadEnd
 import io.github.z4kn4fein.semver.toVersion
@@ -34,30 +29,19 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.jetbrains.concurrency.await
 
-private val logger = logger<NxGraphService>()
+private val logger = logger<OldNxGraphService>()
 
-class NxGraphBrowser(
-    val project: Project,
+class OldNxGraphBrowser(
+    project: Project,
     private val state: StateFlow<NxGraphStates>,
     private val nxVersion: Deferred<NxVersion?>
-) : Disposable {
+) : NxGraphBrowserBase(project) {
 
-    private val browser: JBCefBrowser = JBCefBrowser()
-    private val queryMessenger = JBCefJSQuery.create(browser as JBCefBrowserBase)
-    private val browserLoadedState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private var lastCommand: Command? = null
 
-    private val backgroundColor = getHexColor(UIUtil.getPanelBackground())
     private val foregroundColor = getHexColor(UIUtil.getLabelForeground())
 
     init {
-        browser.jbCefClient.setProperty(JBCefClient.Properties.JS_QUERY_POOL_SIZE, 100)
-        browser.jbCefClient.addDownloadHandler(NxGraphDownloadHandler(), browser.cefBrowser)
-        browser.jbCefClient.addContextMenuHandler(
-            OpenDevToolsContextMenuHandler(),
-            browser.cefBrowser
-        )
-        browser.setPageBackgroundColor(backgroundColor)
 
         CoroutineScope(Dispatchers.Default).launch { listenToGraphStates() }
         queryMessenger.addHandler { msg ->
@@ -70,8 +54,6 @@ class NxGraphBrowser(
         registerOpenProjectConfigHandler(browser)
         registerRunTaskHandler(browser)
     }
-
-    val component = browser.component
 
     fun selectAllProjects() {
         executeWhenLoaded {
@@ -423,16 +405,6 @@ class NxGraphBrowser(
         browser.loadHTML(html)
     }
 
-    private fun executeWhenLoaded(block: suspend () -> Unit) {
-        CoroutineScope(Dispatchers.Default).launch {
-            if (browserLoadedState.value) {
-                block()
-            } else {
-                browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
-            }
-        }
-    }
-
     private fun registerFileClickHandler(browser: JBCefBrowser) {
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
@@ -463,6 +435,7 @@ class NxGraphBrowser(
             browser.executeJavaScriptAsync(js)
         }
     }
+
     private fun registerOpenProjectConfigHandler(browser: JBCefBrowser) {
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
@@ -492,6 +465,7 @@ class NxGraphBrowser(
             browser.executeJavaScriptAsync(js)
         }
     }
+
     private fun registerRunTaskHandler(browser: JBCefBrowser) {
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
@@ -514,16 +488,16 @@ class NxGraphBrowser(
             browser.executeJavaScriptAsync(js)
         }
     }
-    override fun dispose() {
-        browser.dispose()
-    }
 
     private sealed class Command {
         object SelectAll : Command() {}
+
         data class FocusProject(val projectName: String) : Command() {}
 
         object SelectAllTasks : Command() {}
+
         data class FocusTaskGroup(val taskGroupName: String) : Command() {}
+
         data class FocusTask(val nxProject: String, val nxTarget: String) : Command() {}
     }
 }

@@ -87,7 +87,6 @@ export class AutocompleteField extends FieldWrapper(Field(LitElement)) {
 
   private handleInput(e: Event) {
     const value = e.target as Combobox;
-    console.log(e, value);
   }
 
   private handleChange(e: Event) {

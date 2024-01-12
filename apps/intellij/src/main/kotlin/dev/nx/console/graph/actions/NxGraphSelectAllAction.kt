@@ -3,11 +3,15 @@ package dev.nx.console.graph.actions
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
-import dev.nx.console.graph.NxGraphService
+import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.NxToolWindowPanel
 import dev.nx.console.telemetry.TelemetryService
 import javax.swing.Icon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class NxGraphSelectAllAction(
     text: String? = null,
@@ -23,12 +27,14 @@ open class NxGraphSelectAllAction(
             e.presentation.icon = AllIcons.Graph.Layout
         }
     }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         TelemetryService.getInstance(project).featureUsed("Nx Graph Select All")
 
-        val graphService = NxGraphService.getInstance(project)
-        graphService.showNxGraphInEditor()
-        graphService.selectAllProjects()
+        CoroutineScope(Dispatchers.Default).launch {
+            val nxGraphService = getNxGraphService(project) ?: return@launch
+            ApplicationManager.getApplication().invokeLater { nxGraphService.selectAllProjects() }
+        }
     }
 }

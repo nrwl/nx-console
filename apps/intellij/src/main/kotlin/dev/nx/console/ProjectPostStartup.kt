@@ -3,10 +3,10 @@ package dev.nx.console
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.ui.Notifier
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.NxProjectJsonToProjectMap
 import dev.nx.console.utils.nxBasePath
 import java.io.File

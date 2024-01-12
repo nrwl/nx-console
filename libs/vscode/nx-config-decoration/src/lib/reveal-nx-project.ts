@@ -1,7 +1,14 @@
 import { buildProjectPath } from '@nx-console/shared/utils';
 import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
 import { join } from 'path';
-import { Selection, TextDocument, Uri, window, workspace } from 'vscode';
+import {
+  Selection,
+  TextDocument,
+  Uri,
+  commands,
+  window,
+  workspace,
+} from 'vscode';
 
 import { getProjectLocations } from './get-project-locations';
 import { fileExists } from '@nx-console/shared/file-system';
@@ -50,4 +57,5 @@ export async function revealNxProject(
   await window.showTextDocument(document, {
     selection: new Selection(position, position),
   });
+  commands.executeCommand('nx.project-details.openToSide');
 }

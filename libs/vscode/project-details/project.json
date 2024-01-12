@@ -1,0 +1,19 @@
+{
+  "name": "vscode-project-details",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/vscode/project-details/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/vscode/project-details/**/*.ts",
+          "libs/vscode/project-details/package.json"
+        ]
+      }
+    }
+  },
+  "tags": ["type:vscode"]
+}

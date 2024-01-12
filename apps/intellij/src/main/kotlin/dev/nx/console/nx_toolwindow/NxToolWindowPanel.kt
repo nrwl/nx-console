@@ -18,8 +18,8 @@ import com.intellij.ui.dsl.builder.panel
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
-import dev.nx.console.services.NxWorkspaceRefreshListener
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxWorkspaceRefreshListener
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener

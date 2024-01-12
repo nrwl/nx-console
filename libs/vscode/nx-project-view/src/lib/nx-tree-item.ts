@@ -1,6 +1,12 @@
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
 import { ViewItem } from './nx-project-tree-provider';
 import { getStoredCollapsibleState } from './tree-item-collapsible-store';
+import {
+  NxProject,
+  NxTarget,
+  ProjectViewItem,
+  TargetViewItem,
+} from './views/nx-project-base-view';
 
 export class NxTreeItem extends TreeItem {
   id: string;
@@ -32,6 +38,20 @@ export class NxTreeItem extends TreeItem {
     }
     if (this.contextValue === 'target') {
       this.iconPath = new ThemeIcon('symbol-property');
+    }
+  }
+
+  public getProject(): NxProject | undefined {
+    if (this.contextValue === 'project') {
+      return (this.item as ProjectViewItem).nxProject as NxProject;
+    } else if (this.contextValue === 'target') {
+      return (this.item as TargetViewItem).nxProject as NxProject;
+    }
+  }
+
+  public getTarget(): NxTarget | undefined {
+    if (this.contextValue === 'target') {
+      return (this.item as TargetViewItem).nxTarget as NxTarget;
     }
   }
 }

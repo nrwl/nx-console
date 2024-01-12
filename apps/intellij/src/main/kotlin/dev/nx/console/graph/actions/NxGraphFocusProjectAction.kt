@@ -8,12 +8,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.NxIcons
-import dev.nx.console.graph.NxGraphService
+import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.ui.Notifier
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.selectNxProject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +24,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     init {
         useKeyMapShortcutSetOrDefault()
     }
+
     override fun update(e: AnActionEvent) {
         useKeyMapShortcutSetOrDefault()
         val nxTreeNode = e.getData(NxTreeNodeKey) ?: return
@@ -32,6 +33,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         }
         e.presentation.icon = NxIcons.Action
     }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
@@ -40,9 +42,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
 
         CoroutineScope(Dispatchers.Default).launch {
             val currentlyOpenedProject =
-                path?.let {
-                    NxlsService.getInstance(project).generatorContextFromPath(path = it)?.project
-                }
+                path?.let { NxlsService.getInstance(project).projectByPath(path = it)?.name }
 
             val nxProjectName: String? = getNxProject(e, currentlyOpenedProject)
 
@@ -51,10 +51,9 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
                 return@launch
             }
 
+            val nxGraphService = getNxGraphService(project) ?: return@launch
             ApplicationManager.getApplication().invokeLater {
-                val graphService = NxGraphService.getInstance(project)
-                graphService.showNxGraphInEditor()
-                graphService.focusProject(nxProjectName)
+                nxGraphService.focusProject(nxProjectName)
             }
         }
     }

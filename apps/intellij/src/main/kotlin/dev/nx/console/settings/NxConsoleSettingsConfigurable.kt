@@ -22,6 +22,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
     private lateinit var enableDryRunOnGenerateChangeSetting: EnableDryRunOnGenerateChangeSetting
     private lateinit var telemetrySetting: TelemetrySetting
     private lateinit var useNewGenerateUIPreviewSetting: UseNewGenerateUIPreviewSetting
+    private lateinit var showProjectDetailsViewSetting: ShowProjectDetailsViewSetting
 
     override fun createComponent(): JComponent {
         // project settings
@@ -44,6 +45,9 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
         useNewGenerateUIPreviewSetting = UseNewGenerateUIPreviewSetting()
         useNewGenerateUIPreviewSetting.setValue(settingsProvider.useNewGenerateUIPreview)
 
+        showProjectDetailsViewSetting = ShowProjectDetailsViewSetting()
+        showProjectDetailsViewSetting.setValue(settingsProvider.showProjectDetailsView)
+
         return panel {
             group("Project Settings") {
                 workspacePathSetting.render(this)
@@ -54,6 +58,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
                 enableDryRunOnGenerateChangeSetting.render(this)
                 telemetrySetting.render(this)
                 useNewGenerateUIPreviewSetting.render(this)
+                showProjectDetailsViewSetting.render(this)
             }
         }
     }
@@ -65,7 +70,8 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             useNewGenerateUIPreviewSetting.getValue() != settingsProvider.useNewGenerateUIPreview ||
             workspacePathSetting.getValue() != projectSettingsProvider.workspacePath ||
             generatorFiltersSetting.getValue() != projectSettingsProvider.generatorFilters ||
-            toolWindowStyleSetting.getValue() != projectSettingsProvider.toolwindowStyle
+            toolWindowStyleSetting.getValue() != projectSettingsProvider.toolwindowStyle ||
+            showProjectDetailsViewSetting.getValue() != settingsProvider.showProjectDetailsView
     }
 
     override fun apply() {
@@ -82,6 +88,7 @@ class NxConsoleSettingsConfigurable(val project: Project) : SearchableConfigurab
             enableDryRunOnGenerateChangeSetting.getValue()
         settingsProvider.enableTelemetry = telemetrySetting.getValue()
         settingsProvider.useNewGenerateUIPreview = useNewGenerateUIPreviewSetting.getValue()
+        settingsProvider.showProjectDetailsView = showProjectDetailsViewSetting.getValue()
     }
 
     override fun getDisplayName(): String {

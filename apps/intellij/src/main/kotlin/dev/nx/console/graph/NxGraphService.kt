@@ -1,15 +1,14 @@
 package dev.nx.console.graph
 
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
-import dev.nx.console.graph.ui.DefaultNxGraphFile
-import dev.nx.console.graph.ui.NxGraphBrowser
-import dev.nx.console.graph.ui.NxGraphFileType
+import dev.nx.console.graph.ui.*
+import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
-import dev.nx.console.services.NxWorkspaceRefreshListener
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxWorkspaceRefreshListener
+import dev.nx.console.nxls.NxlsService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -17,18 +16,43 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private val logger = logger<NxGraphService>()
+public suspend fun getNxGraphService(project: Project): INxGraphService? {
+    val nxlsService = NxlsService.getInstance(project)
+    val nxVersion =
+        CoroutineScope(Dispatchers.Default).async { nxlsService.workspace()?.nxVersion }.await()
+            ?: return null
 
-class NxGraphService(val project: Project) {
+    return if (nxVersion.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
+        NxGraphService.getInstance(project)
+    } else {
+        OldNxGraphService.getInstance(project)
+    }
+}
+
+interface INxGraphService {
+    val project: Project
+
+    fun selectAllProjects()
+
+    fun focusProject(projectName: String)
+
+    fun focusTaskGroup(taskGroupName: String)
+
+    fun focusTask(nxProject: String, nxTarget: String)
+}
+
+@Service(Service.Level.PROJECT)
+class OldNxGraphService(override val project: Project) : INxGraphService {
 
     private val nxlsService = NxlsService.getInstance(project)
 
     private val scope = CoroutineScope(Dispatchers.Default)
     private val state: MutableStateFlow<NxGraphStates> = MutableStateFlow(NxGraphStates.Init)
 
-    private lateinit var graphBrowser: NxGraphBrowser
+    private lateinit var graphBrowser: OldNxGraphBrowser
 
     private var projectGraphOutput: ProjectGraphOutput? = null
+
     init {
         scope.launch {
             projectGraphOutput = nxlsService.projectGraphOutput()
@@ -48,7 +72,7 @@ class NxGraphService(val project: Project) {
         }
     }
 
-    fun showNxGraphInEditor() {
+    private fun showNxGraphInEditor() {
         val fileEditorManager = FileEditorManager.getInstance(project)
 
         val nxGraphEditor =
@@ -63,8 +87,8 @@ class NxGraphService(val project: Project) {
 
         val nxVersion = scope.async { nxlsService.workspace()?.nxVersion }
 
-        graphBrowser = NxGraphBrowser(project, state.asStateFlow(), nxVersion)
-        val virtualFile = DefaultNxGraphFile("Nx Graph", project, graphBrowser)
+        graphBrowser = OldNxGraphBrowser(project, state.asStateFlow(), nxVersion)
+        val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
 
         if (state.value is NxGraphStates.Init || state.value is NxGraphStates.Error) {
             scope.launch { loadProjectGraph() }
@@ -75,19 +99,23 @@ class NxGraphService(val project: Project) {
         }
     }
 
-    fun selectAllProjects() {
+    override fun selectAllProjects() {
+        this.showNxGraphInEditor()
         graphBrowser.selectAllProjects()
     }
 
-    fun focusProject(projectName: String) {
+    override fun focusProject(projectName: String) {
+        this.showNxGraphInEditor()
         graphBrowser.focusProject(projectName)
     }
 
-    fun focusTaskGroup(taskGroupName: String) {
+    override fun focusTaskGroup(taskGroupName: String) {
+        this.showNxGraphInEditor()
         graphBrowser.focusTaskGroup(taskGroupName)
     }
 
-    fun focusTask(nxProject: String, nxTarget: String) {
+    override fun focusTask(nxProject: String, nxTarget: String) {
+        this.showNxGraphInEditor()
         graphBrowser.focusTask(nxProject, nxTarget)
     }
 
@@ -95,7 +123,7 @@ class NxGraphService(val project: Project) {
         state.emit(NxGraphStates.Loading)
         nxlsService.createProjectGraph().apply {
             if (this == null) {
-                state.value =
+                state.emit(
                     projectGraphOutput.let {
                         if (it == null) {
                             NxGraphStates.Error("could not load project graph location")
@@ -103,10 +131,63 @@ class NxGraphService(val project: Project) {
                             NxGraphStates.Loaded(it, reload)
                         }
                     }
+                )
             } else {
-                state.value = NxGraphStates.Error(this.message)
+                state.emit(NxGraphStates.Error(this.message))
             }
         }
+    }
+
+    companion object {
+        fun getInstance(project: Project): OldNxGraphService =
+            project.getService(OldNxGraphService::class.java)
+    }
+}
+
+@Service(Service.Level.PROJECT)
+class NxGraphService(override val project: Project) : INxGraphService {
+
+    private lateinit var graphBrowser: NxGraphBrowser
+
+    private fun showNxGraphInEditor() {
+        val fileEditorManager = FileEditorManager.getInstance(project)
+
+        val nxGraphEditor =
+            fileEditorManager.allEditors.find {
+                it.file.fileType.name == NxGraphFileType.INSTANCE.name
+            }
+
+        if (nxGraphEditor != null) {
+            fileEditorManager.openFile(nxGraphEditor.file, true)
+            return
+        }
+
+        graphBrowser = NxGraphBrowser(project)
+        val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
+
+        fileEditorManager.openFile(virtualFile, true).apply {
+            Disposer.register(first(), graphBrowser)
+        }
+    }
+
+    override fun selectAllProjects() {
+        showNxGraphInEditor()
+        graphBrowser.selectAllProjects()
+    }
+
+    override fun focusProject(projectName: String) {
+        showNxGraphInEditor()
+        graphBrowser.focusProject(projectName)
+    }
+
+    override fun focusTaskGroup(taskGroupName: String) {
+        showNxGraphInEditor()
+        graphBrowser.focusTargetGroup(taskGroupName)
+    }
+
+    override fun focusTask(nxProject: String, nxTarget: String) {
+        showNxGraphInEditor()
+        graphBrowser.focusTarget(nxProject, nxTarget)
     }
 
     companion object {

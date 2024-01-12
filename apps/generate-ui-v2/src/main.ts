@@ -162,7 +162,6 @@ export class Root extends LitElement {
 
   private clearSearch() {
     const searchBar = this.renderRoot.querySelector('search-bar');
-    console.log(searchBar);
     if (searchBar) {
       (searchBar as SearchBar).clearSearch();
     }

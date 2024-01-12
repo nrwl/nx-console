@@ -1,6 +1,11 @@
 rootProject.name = "nx-console"
 
-include("apps:intellij")
-project(":apps:intellij").projectDir = file("apps/intellij")
+plugins { id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0" }
 
-//println(project(":intellij"))
+include("apps:intellij")
+
+project(":apps:intellij").projectDir =
+    file(
+        "apps/intellij"
+    )
+

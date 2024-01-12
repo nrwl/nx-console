@@ -52,3 +52,13 @@ export function matchWithWildcards(
     `${strict ? '^' : ''}${expression.split('*').map(escapeRegex).join('.*')}$`
   ).test(text);
 }
+
+export function debounce(callback: (...args: any[]) => any, wait: number) {
+  let timerId: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      return callback(...args);
+    }, wait);
+  };
+}

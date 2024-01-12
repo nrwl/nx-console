@@ -82,6 +82,7 @@
     "@storybook/angular": "7.5.3",
     "@storybook/core-server": "7.5.3",
     "@swc-node/register": "1.6.8",
+    "@swc/core": "~1.3.85",
     "@tailwindcss/forms": "0.5.3",
     "@theunderscorer/nx-semantic-release": "2.4.0",
     "@types/find-cache-dir": "^3.2.1",

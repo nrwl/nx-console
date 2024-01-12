@@ -4,6 +4,7 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.LightVirtualFile
 import dev.nx.console.NxIcons
+import dev.nx.console.graph.NxGraphBrowserBase
 import javax.swing.Icon
 import javax.swing.JComponent
 
@@ -44,9 +45,8 @@ abstract class NxGraphFile(name: String) : LightVirtualFile(name, NxGraphFileTyp
     override fun hashCode(): Int = name.hashCode()
 }
 
-class DefaultNxGraphFile(name: String, project: Project, private val graphBrowser: NxGraphBrowser) :
+class DefaultNxGraphFile(name: String, private val graphBrowser: NxGraphBrowserBase) :
     NxGraphFile(name) {
-
     override fun createMainComponent(project: Project): JComponent {
         return graphBrowser.component
     }
