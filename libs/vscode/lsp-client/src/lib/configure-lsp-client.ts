@@ -3,9 +3,9 @@ import {
   NxChangeWorkspace,
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server/types';
-import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
+import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { commands, Disposable, ExtensionContext } from 'vscode';
+import { ExtensionContext } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,

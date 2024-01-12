@@ -29,12 +29,7 @@ import {
   RunTargetTreeItem,
   RunTargetTreeProvider,
 } from '@nx-console/vscode/nx-run-target-view';
-import {
-  CliTaskProvider,
-  initTasks,
-  registerCliTaskCommands,
-  registerNxCommands,
-} from '@nx-console/vscode/tasks';
+import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
 import {
   getOutputChannel,
   getTelemetry,
@@ -63,10 +58,7 @@ import {
   NxHelpAndFeedbackTreeItem,
 } from '@nx-console/vscode/nx-help-and-feedback-view';
 import { getNxWorkspace, stopDaemon } from '@nx-console/vscode/nx-workspace';
-import {
-  initVscodeProjectGraph,
-  projectGraph,
-} from '@nx-console/vscode/project-graph';
+import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';

@@ -1,33 +1,24 @@
-import {
-  ExtensionContext,
-  Position,
-  Uri,
-  ViewColumn,
-  commands,
-  window,
-  workspace,
-  Range,
-  ThemeColor,
-  DecorationOptions,
-  TextEditorDecorationType,
-  DecorationRangeBehavior,
-} from 'vscode';
-import { ProjectDetailsManager } from './project-details-manager';
-import { ProjectDetailsProvider } from './project-details-provider';
+import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import {
   getNxVersion,
   getNxWorkspacePath,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
-import { parseJsonText } from 'typescript';
-import { decorateWithProjectDetails } from './project-details-inline-decorations';
-import { gte } from 'semver';
 import { join } from 'path';
+import { gte } from 'semver';
 import {
-  GlobalConfigurationStore,
-  WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
+  ExtensionContext,
+  Uri,
+  ViewColumn,
+  commands,
+  window,
+  workspace,
+} from 'vscode';
+import { decorateWithProjectDetails } from './project-details-inline-decorations';
+import { ProjectDetailsManager } from './project-details-manager';
+import { ProjectDetailsProvider } from './project-details-provider';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   getNxWorkspacePath().then((nxWorkspacePath) => {
@@ -35,11 +26,16 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
       join(nxWorkspacePath, 'package.json'),
     ]);
   });
+  getNxVersionAndRegisterCommand(context);
+  onWorkspaceRefreshed(() => getNxVersionAndRegisterCommand(context));
 
+  decorateWithProjectDetails();
+}
+
+function getNxVersionAndRegisterCommand(context: ExtensionContext) {
   getNxVersion().then((nxVersion) => {
-    // TODO: enable & replace with actual version that has nx graph api changes
     // eslint-disable-next-line no-constant-condition
-    if (gte(nxVersion.version, '18.0.0')) {
+    if (gte(nxVersion.version, '17.3.0-beta.3')) {
       const projectDetailsManager = new ProjectDetailsManager(context);
       commands.registerCommand('nx.project-details.openToSide', () => {
         const isEnabled = GlobalConfigurationStore.instance.get(
@@ -78,8 +74,6 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
       });
     }
   });
-
-  decorateWithProjectDetails();
 }
 // function highlightTargets() {
 //   const activeEditor = window.activeTextEditor;

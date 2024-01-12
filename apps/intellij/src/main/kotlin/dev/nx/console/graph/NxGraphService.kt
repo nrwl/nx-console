@@ -22,8 +22,7 @@ public suspend fun getNxGraphService(project: Project): INxGraphService? {
         CoroutineScope(Dispatchers.Default).async { nxlsService.workspace()?.nxVersion }.await()
             ?: return null
 
-    // TODO: replace with actual version
-    return if (nxVersion.gte(NxVersion(major = 18, minor = 0, full = "18.0.0"))) {
+    return if (nxVersion.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
         NxGraphService.getInstance(project)
     } else {
         OldNxGraphService.getInstance(project)

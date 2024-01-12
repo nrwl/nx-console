@@ -47,6 +47,7 @@ import {
   getTransformedGeneratorSchema,
   getStartupMessage,
   hasAffectedProjects,
+  nxVersionOnWorkspaceRefresh,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import {
@@ -477,6 +478,7 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 async function reconfigure(workingPath: string) {
   await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, CLIENT_CAPABILITIES);
+  nxVersionOnWorkspaceRefresh();
 }
 
 async function configureSchemas(
