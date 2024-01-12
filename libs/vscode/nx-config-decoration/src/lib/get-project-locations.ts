@@ -61,19 +61,24 @@ export function getProjectLocations(document: TextDocument, projectName = '') {
 
   return projectLocations;
 }
+
 export function getTargetsPropertyLocation(
   document: TextDocument
 ): Position | undefined {
-  const json = parseJsonText('project.json', document.getText());
-  const statement = json.statements[0];
+  try {
+    const json = parseJsonText('project.json', document.getText());
+    const statement = json.statements[0];
 
-  const targetsProperty = getProperties(statement.expression)?.filter(
-    (prop) => getPropertyName(prop) === 'targets'
-  )?.[0];
-  if (!targetsProperty) {
+    const targetsProperty = getProperties(statement.expression)?.filter(
+      (prop) => getPropertyName(prop) === 'targets'
+    )?.[0];
+    if (!targetsProperty) {
+      return;
+    }
+    return document.positionAt(targetsProperty.getStart(json));
+  } catch (e) {
     return;
   }
-  return document.positionAt(targetsProperty.getStart(json));
 }
 
 function getProperties(

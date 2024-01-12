@@ -5,6 +5,7 @@ import { getIgnoredGlobs } from 'nx/src/utils/ignore';
 import { getNxVersion } from '@nx-console/language-server/workspace';
 import { gte } from 'semver';
 import type { WatchEvent } from 'nx/src/native';
+import { debounce } from '@nx-console/shared/utils';
 
 export async function languageServerWatcher(
   workspacePath: string,
@@ -77,14 +78,4 @@ function watcherOptions(workspacePath: string): watcher.Options | undefined {
   }
 
   return options;
-}
-
-function debounce(callback: () => any, wait: number) {
-  let timerId: NodeJS.Timeout;
-  return () => {
-    clearTimeout(timerId);
-    timerId = setTimeout(() => {
-      callback();
-    }, wait);
-  };
 }

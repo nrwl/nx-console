@@ -80,6 +80,7 @@ data class GenerateUiStylesInputMessage(override val payload: GenerateUiStyles) 
 data class GenerateUiStyles(
     val backgroundColor: String,
     val foregroundColor: String,
+    val mutedForegroundColor: String,
     val primaryColor: String,
     val errorColor: String,
     val fieldBackgroundColor: String,

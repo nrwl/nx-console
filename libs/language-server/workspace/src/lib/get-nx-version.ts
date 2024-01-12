@@ -1,7 +1,8 @@
+import { lspLogger } from '@nx-console/language-server/utils';
 import { findNxPackagePath } from '@nx-console/shared/npm';
 import { coerce, SemVer } from 'semver';
 
-let nxWorkspacePackageJson: { version: string };
+let nxWorkspacePackageJson: { version: string } | undefined;
 let loadedNxPackage = false;
 
 const defaultSemver = new SemVer('0.0.0');
@@ -27,4 +28,9 @@ export async function getNxVersion(workspacePath: string): Promise<SemVer> {
   }
 
   return nxVersion;
+}
+
+export async function nxVersionOnWorkspaceRefresh() {
+  loadedNxPackage = false;
+  nxWorkspacePackageJson = undefined;
 }

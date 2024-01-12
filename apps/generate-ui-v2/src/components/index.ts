@@ -23,6 +23,7 @@ import './fields/input-field';
 import './fields/multiselect-field';
 import './fields/select-field';
 import './fields/autocomplete/autocomplete-field';
+import './cwd-breadcrumb';
 import './button';
 import './field-list';
 import './search-bar';
@@ -32,7 +33,6 @@ import './field-nav-item';
 import './show-more-divider';
 import './badge';
 import './popover';
-import './cwd-input';
 
 provideFASTDesignSystem().register(
   fastCombobox({

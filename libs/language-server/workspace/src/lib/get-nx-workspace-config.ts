@@ -9,7 +9,7 @@ import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
 import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
-import { SemVer, gte } from 'semver';
+import { SemVer, coerce, gte } from 'semver';
 import {
   getNxOutput,
   getNxProjectGraph,
@@ -19,6 +19,7 @@ import {
 import { performance } from 'perf_hooks';
 
 let projectGraph: ProjectGraph | null = null;
+let sourceMaps: Record<string, Record<string, string[]>> | null = null;
 
 export async function getNxWorkspaceConfig(
   workspacePath: string,
@@ -74,6 +75,17 @@ export async function getNxWorkspaceConfig(
 
       if (nxVersion.major < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
+      } else if (gte(nxVersion, coerce('17.2.0') ?? new SemVer('0.0.0'))) {
+        lspLogger.log('createProjectGraphAsync');
+        const projectGraphAndSourceMaps = await (
+          nxProjectGraph as any
+        ).createProjectGraphAndSourceMapsAsync({
+          exitOnError: false,
+          resetDaemonClient: true,
+        });
+        projectGraph = projectGraphAndSourceMaps.projectGraph;
+        sourceMaps = projectGraphAndSourceMaps.sourceMaps;
+        lspLogger.log('createProjectGraphAsync successful');
       } else {
         lspLogger.log('createProjectGraphAsync');
         projectGraph = await nxProjectGraph.createProjectGraphAsync({
@@ -107,14 +119,13 @@ export async function getNxWorkspaceConfig(
       projectFileMap
     );
 
-    for (const project in workspaceConfiguration.projects) {
-      for (const target in workspaceConfiguration.projects[project].targets) {
-        // TODO: remove hard coded hide once https://github.com/nrwl/nx/pull/19513 is merged
-        if (target === 'nx-release-publish') {
-          delete workspaceConfiguration.projects[project].targets?.[target];
-        }
-      }
-    }
+    // for (const project in workspaceConfiguration.projects) {
+    //   for (const target in workspaceConfiguration.projects[project].targets) {
+    //     if (target === 'nx-release-publish') {
+    //       delete workspaceConfiguration.projects[project].targets?.[target];
+    //     }
+    //   }
+    // }
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
 
@@ -152,7 +163,8 @@ async function readWorkspaceConfigs(basedir: string) {
 function createNxWorkspaceConfiguration(
   workspaceConfiguration: NxWorkspaceConfiguration,
   projectGraph: ProjectGraph | null,
-  projectFileMap: ProjectFileMap
+  projectFileMap: ProjectFileMap,
+  sourceMaps?: Record<string, Record<string, string[]>>
 ) {
   if (!projectGraph) {
     return workspaceConfiguration;
@@ -192,5 +204,5 @@ function createNxWorkspaceConfiguration(
     }
   }
 
-  return modifiedWorkspaceConfiguration;
+  return { ...modifiedWorkspaceConfiguration, sourceMaps };
 }

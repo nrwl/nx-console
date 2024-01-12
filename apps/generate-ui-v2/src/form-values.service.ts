@@ -48,17 +48,26 @@ export class FormValuesService {
         this.handleOptionChange(e.detail);
       }
     );
-    window.addEventListener('cwd-changed', (e: CustomEventInit<string>) => {
-      if (e.detail === undefined) return;
-      const firstChange = this.cwdValue === undefined;
-      this.cwdValue = e.detail;
-      if (
-        !firstChange &&
-        this.icc.configuration?.enableTaskExecutionDryRunOnChange
-      ) {
-        this.debouncedRunGenerator(true);
+    window.addEventListener(
+      'cwd-changed',
+      async (e: CustomEventInit<string>) => {
+        if (e.detail === undefined) return;
+        const firstChange = this.cwdValue === undefined;
+        this.cwdValue = e.detail;
+        if (
+          !firstChange &&
+          this.icc.configuration?.enableTaskExecutionDryRunOnChange
+        ) {
+          this.validationResults = await this.validate(
+            this.formValues,
+            this.icc.generatorSchema
+          );
+          if (Object.keys(this.validationResults).length === 0) {
+            this.debouncedRunGenerator(true);
+          }
+        }
       }
-    });
+    );
   }
 
   private async handleOptionChange(details: OptionChangedDetails) {

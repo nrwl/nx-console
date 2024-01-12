@@ -12,8 +12,8 @@ import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.generate.ui.file.NxGenerateUiFileRenderer
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
-import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.utils.nxlsWorkingPath

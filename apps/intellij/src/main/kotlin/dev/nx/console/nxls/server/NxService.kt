@@ -41,6 +41,11 @@ interface NxService {
     }
 
     @JsonRequest
+    fun projectByPath(projectByPathRequest: NxProjectByPathRequest): CompletableFuture<NxProject?> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
     fun projectsByPaths(
         projectsByPathsRequest: NxProjectsByPathsRequest
     ): CompletableFuture<Map<String, NxProject>> {
@@ -63,6 +68,7 @@ interface NxService {
     fun projectFolderTree(): CompletableFuture<SerializedNxFolderTreeData> {
         throw UnsupportedOperationException()
     }
+
     @JsonRequest
     fun transformedGeneratorSchema(schema: GeneratorSchema): CompletableFuture<GeneratorSchema> {
         throw UnsupportedOperationException()

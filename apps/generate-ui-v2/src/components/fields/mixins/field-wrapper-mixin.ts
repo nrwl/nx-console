@@ -39,7 +39,7 @@ export const FieldWrapper = <
                 `
             )}
           </div>
-          <p class="mb-2 text-gray-500">${this.option.description}</p>
+          <p class="text-mutedForeground mb-2">${this.option.description}</p>
           ${this.renderField()}
           ${when(
             this.shouldRenderError() && typeof this.validation === 'string',

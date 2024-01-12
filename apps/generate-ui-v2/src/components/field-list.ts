@@ -105,6 +105,25 @@ export class FieldList extends GeneratorContextContext(
       </div>`;
     };
 
+    if (
+      this.searchValue &&
+      optionsWithMetadata.every((opt) => !opt.isInSearchResults)
+    ) {
+      return html` <div class="flex flex-col">
+        <div class="m-auto">
+          Couldn't find any options matching "${this.searchValue}"
+        </div>
+        <button-element
+          appearance="secondary"
+          text="Clear Search"
+          class="m-auto pt-2"
+          @click=${() => this.clearSearch()}
+        ></button-element>
+
+        <div></div>
+      </div>`;
+    }
+
     // if there is a search value, show all matching options regardless of importance
     if (this.searchValue) {
       return html`<div>
@@ -127,12 +146,6 @@ export class FieldList extends GeneratorContextContext(
         class="${shouldHideShowMoreButton ? 'hidden' : ''}"
       ></show-more-divider>
       ${otherOptions.map((opt) => renderOption(opt, !shouldShowMoreOptions))}
-      <cwd-input-element
-        class="${(this.generatorContext?.nxVersion?.major ?? 0) >= 17 &&
-        shouldShowMoreOptions
-          ? ''
-          : 'hidden'}"
-      ></cwd-input-element>
     `;
   }
 
@@ -177,6 +190,11 @@ export class FieldList extends GeneratorContextContext(
 
       observer.observe(element);
     }, 100);
+  }
+
+  private clearSearch() {
+    const event = new CustomEvent('clear-search', {});
+    this.dispatchEvent(event);
   }
 
   protected createRenderRoot(): Element | ShadowRoot {

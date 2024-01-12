@@ -10,6 +10,7 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
   schema.context.prefillValues = schema.context.prefillValues ?? {};
 
   // before nx 17, path/directory options are inconsistent so we don't prefill project & directory simultaneously
+  // keep in mind that we normalize directory by appsDir & libsDir
   if (workspace.nxVersion.major < 17) {
     if (schema.context?.project) {
       schema.context.prefillValues = {
@@ -18,10 +19,10 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
         projectName: schema.context.project,
         directory: '',
       };
-    } else if (schema.context?.directory) {
+    } else if (schema.context?.normalizedDirectory) {
       schema.context.prefillValues = {
         ...(schema.context.prefillValues ?? {}),
-        directory: schema.context.directory,
+        directory: schema.context.normalizedDirectory,
       };
     }
   }
@@ -40,18 +41,15 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
     }
   }
 
-  // after nx 17, most generators will have nameAndDirectory or projectNameAndRoot options.
-  // for those, we prefill the cwd
+  // after nx 17, we prefill the cwd
+  // project is also prefilled if there is no nameAndDirectoryFormat (which ignores project)
+  prefillDirectoryAsCwd();
   if (
     schema.options.find(
-      (o) =>
-        o.name === 'nameAndDirectoryFormat' ||
-        o.name === 'projectNameAndRootFormat'
-    )
+      (o) => o.name === 'project' || o.name === 'projectName'
+    ) &&
+    schema.options.every((o) => o.name !== 'nameAndDirectoryFormat')
   ) {
-    prefillDirectoryAsCwd();
-    // if they don't have this option, we prefill the project
-  } else {
     prefillProject();
   }
 
@@ -62,6 +60,13 @@ export const prefillProjectAndDirProcessor: SchemaProcessor = (
       schema.context.prefillValues = {
         ...schema.context.prefillValues,
         cwd: schema.context?.directory,
+      };
+    } else if (schema.context?.project && schema.context?.prefillValues) {
+      const projectRoot =
+        workspace.workspace.projects[schema.context.project].root;
+      schema.context.prefillValues = {
+        ...schema.context.prefillValues,
+        cwd: projectRoot,
       };
     }
   }

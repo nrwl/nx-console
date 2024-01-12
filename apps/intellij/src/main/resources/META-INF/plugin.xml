@@ -24,13 +24,12 @@
     <completion.contributor language="JSON"
                             implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
     <lang.documentationProvider language="JSON"
-                                implementationClass="dev.nx.console.providers.NxlsDocumentationProvider"/>
+                                implementationClass="dev.nx.console.nxls.NxlsDocumentationProvider"/>
 
     <editorFactoryListener implementation="dev.nx.console.listeners.NxEditorListener"/>
 
     <!-- Nxls -->
     <postStartupActivity implementation="dev.nx.console.ProjectPostStartup"/>
-    <projectService serviceImplementation="dev.nx.console.services.NxlsService"/>
 
     <!-- Settings -->
     <projectConfigurable
@@ -45,8 +44,12 @@
     <fileEditorProvider implementation="dev.nx.console.generate.ui.file.NxGenerateUiFileEditorProvider"/>
 
     <!-- Graph -->
-    <projectService serviceImplementation="dev.nx.console.graph.NxGraphService"/>
     <fileEditorProvider implementation="dev.nx.console.graph.ui.NxGraphFileEditorProvider"/>
+    <fileEditorProvider implementation="dev.nx.console.project_details.ProjectDetailsFileEditorProvider"/>
+    <fileType implementationClass="dev.nx.console.project_details.ProjectDetailsFileType"
+              name="Project Details"
+              language="JSON"
+              fileNames="project.json;package.json"/>
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.graph.NxFocusTargetInGraphLineMarkerContributor"/>
 
@@ -77,6 +80,9 @@
 
     <console.folding implementation="dev.nx.console.ide.ConsoleFolding"/>
   </extensions>
+  <extensions defaultExtensionNs="JavaScript">
+    <scanningFileListenerContributor implementation="dev.nx.console.ide.DotNxFolderExcludeContributor"/>
+  </extensions>
   <applicationListeners>
     <listener class="dev.nx.console.listeners.ProjectManagerListener"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
@@ -87,6 +93,11 @@
             text="Nx: Refresh Workspace" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="EditorTabPopupMenu"/>
       <add-to-group group-id="EditorTabsEntryPoint"/>
+    </action>
+    <action id="dev.nx.console.ide.ShowNxProjectConfigurationAction"
+            class="dev.nx.console.ide.ShowNxProjectConfigurationAction"
+            text="Nx: Show Project Configuration" icon="dev.nx.console.NxIcons.Action">
+      <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </action>
 
     <action id="dev.nx.console.ide.project_json_inspection.AnalyzeNxConfigurationFilesAction"
@@ -131,7 +142,7 @@
     >
       <add-to-group group-id="ProjectViewPopupMenuRunGroup"/>
     </action>
-    
+
     <action id="dev.nx.console.run.actions.NxRunAnythingAction" class="dev.nx.console.run.actions.NxRunAnythingAction"
             text="Nx: Run Anything" description="Run Nx targets in a CLI-like interface"
             icon="AllIcons.Actions.Run_anything"/>
@@ -156,7 +167,6 @@
             text="Nx Graph: Focus Task" icon="dev.nx.console.NxIcons.Action">
       <add-to-group group-id="AnalyzeActions"/>
     </action>
-
   </actions>
   <extensionPoints>
     <extensionPoint interface="dev.nx.console.generate.ui.NxGenerateUiRenderer"

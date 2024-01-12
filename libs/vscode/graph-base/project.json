@@ -1,0 +1,16 @@
+{
+  "name": "vscode-graph-base",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/vscode/graph-base/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/vscode/graph-base/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["type:vscode"]
+}

@@ -13,8 +13,8 @@ import dev.nx.console.NxIcons
 import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.NxGenerator
 import dev.nx.console.models.NxGeneratorOption
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.nxls.server.requests.NxGeneratorOptionsRequestOptions
-import dev.nx.console.services.NxlsService
 import javax.swing.Icon
 import kotlinx.coroutines.runBlocking
 
@@ -26,6 +26,7 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
     override fun getIcon(value: String): Icon = NxIcons.Action
 
     override fun getHelpGroupTitle() = "Nx"
+
     override fun execute(dataContext: DataContext, value: String) {
         super.execute(dataContext, value)
     }

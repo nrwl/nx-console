@@ -81,6 +81,7 @@ export class GenerateUiStylesInputMessage {
 
 export type GenerateUiStyles = {
   foregroundColor: string;
+  mutedForegroundColor: string;
   backgroundColor: string;
   primaryColor: string;
   errorColor: string;

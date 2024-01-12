@@ -12,6 +12,7 @@ export type NxProjectsConfiguration = {
   projects: {
     [projectName: string]: NxProjectConfiguration;
   };
+  sourceMaps?: Record<string, Record<string, string[]>>;
 };
 
 export type NxVersion = {

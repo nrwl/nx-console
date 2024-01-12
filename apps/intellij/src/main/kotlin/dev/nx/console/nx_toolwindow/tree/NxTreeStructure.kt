@@ -24,13 +24,13 @@ import com.intellij.util.ui.tree.TreeUtil
 import dev.nx.console.graph.actions.NxGraphFocusProjectAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskAction
 import dev.nx.console.graph.actions.NxGraphFocusTaskGroupAction
+import dev.nx.console.ide.ShowNxProjectConfigurationAction
 import dev.nx.console.models.NxWorkspace
-import dev.nx.console.nx_toolwindow.actions.ShowNxProjectConfigurationAction
 import dev.nx.console.nx_toolwindow.tree.builder.NxFolderTreeBuilder
 import dev.nx.console.nx_toolwindow.tree.builder.NxListTreeBuilder
 import dev.nx.console.nx_toolwindow.tree.builder.NxTreeBuilderBase
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.*
-import dev.nx.console.services.NxlsService
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.ToolWindowStyles
 import java.awt.event.MouseEvent

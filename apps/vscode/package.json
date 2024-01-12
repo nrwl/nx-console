@@ -133,7 +133,7 @@
       ],
       "view/item/context": [
         {
-          "command": "nxConsole.editWorkspaceJson",
+          "command": "nxConsole.showProjectConfiguration",
           "when": "view == nxProjects && viewItem == project || viewItem == target",
           "group": "inline"
         },
@@ -203,6 +203,11 @@
           "command": "nxConsole.refreshWorkspace",
           "group": "navigation",
           "when": "graphWebviewVisible"
+        },
+        {
+          "command": "nx.project-details.openToSide",
+          "group": "navigation",
+          "when": "(resourceFilename === project.json || resourceFilename === package.json) && resourcePath not in nxConsole.ignoredPDVPaths && config.nxConsole.showProjectDetailsView"
         }
       ],
       "commandPalette": [
@@ -353,8 +358,8 @@
         "icon": "$(pencil)"
       },
       {
-        "command": "nxConsole.editWorkspaceJson",
-        "title": "Edit workspace definition",
+        "command": "nxConsole.showProjectConfiguration",
+        "title": "Show project configuration",
         "icon": "$(go-to-file)"
       },
       {
@@ -433,6 +438,12 @@
         "title": "Show affected project graph",
         "command": "nx.graph.showAffected",
         "icon": "$(source-control)"
+      },
+      {
+        "category": "Nx",
+        "title": "Open Project Details to Side",
+        "command": "nx.project-details.openToSide",
+        "icon": "$(open-preview)"
       },
       {
         "category": "Nx",
@@ -623,6 +634,12 @@
           "scope": "application",
           "default": true,
           "description": "Use the new Generate UI - still in development."
+        },
+        "nxConsole.showProjectDetailsView": {
+          "type": "boolean",
+          "scope": "application",
+          "default": false,
+          "description": "Show the project details view for project.json or package.json files."
         },
         "nxConsole.showNodeVersionOnStartup": {
           "type": "boolean",

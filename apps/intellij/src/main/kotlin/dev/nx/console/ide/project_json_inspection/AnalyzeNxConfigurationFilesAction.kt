@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.CodeSmellDetector
-import dev.nx.console.ui.Notifier
+import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.findNxConfigurationFiles
 
 class AnalyzeNxConfigurationFilesAction : AnAction() {

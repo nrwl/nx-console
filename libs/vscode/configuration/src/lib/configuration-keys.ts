@@ -10,6 +10,7 @@ export const GLOBAL_CONFIG_KEYS = [
   'projectViewingStyle',
   'moveGeneratorPatterns',
   'useNewGenerateUiPreview',
+  'showProjectDetailsView',
   'showNodeVersionOnStartup',
 ] as const;
 
@@ -25,6 +26,7 @@ export type GlobalConfig = {
   projectViewingStyle: 'list' | 'tree' | 'automatic';
   moveGeneratorPatterns: Record<string, string>;
   useNewGenerateUiPreview: boolean;
+  showProjectDetailsView: boolean;
   showNodeVersionOnStartup: boolean;
 };
 

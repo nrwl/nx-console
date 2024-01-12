@@ -10,7 +10,7 @@ import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.MAX_LINE_LENGTH_WORD_WRAP
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RowLayout
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingBase
 import java.nio.file.Paths
 
@@ -22,6 +22,7 @@ class WorkspacePathSetting(val project: Project) : NxConsoleSettingBase<String?>
         val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
         inputField = textFieldWithBrowseButton(project, "Nx workspace root", descriptor)
     }
+
     override fun render(panel: Panel) {
         panel.apply {
             row {

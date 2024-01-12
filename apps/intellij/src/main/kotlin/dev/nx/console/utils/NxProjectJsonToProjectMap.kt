@@ -5,8 +5,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import dev.nx.console.models.NxProject
-import dev.nx.console.services.NxWorkspaceRefreshListener
-import dev.nx.console.services.NxlsService
+import dev.nx.console.nxls.NxWorkspaceRefreshListener
+import dev.nx.console.nxls.NxlsService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

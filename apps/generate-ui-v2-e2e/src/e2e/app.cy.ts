@@ -5,16 +5,16 @@ import {
 } from '../support/console-spy';
 import { clickShowMore, getFieldByName } from '../support/get-elements';
 import { visitGenerateUi } from '../support/visit-generate-ui';
+import 'cypress-real-events';
 
 describe('generate-ui-v2', () => {
   beforeEach(() => visitGenerateUi(schema));
 
   describe('header', () => {
     it('should display generator name', () => {
-      cy.get("[data-cy='header-text']").should(
-        'contain.text',
-        `nx generate ${schema.collectionName}:${schema.generatorName}`
-      );
+      cy.get("[data-cy='title']").should('contain.text', `Test`);
+
+      cy.get("[data-cy='subtitle']").should('contain.text', `@nx/test`);
     });
 
     it('should send message when generate button is clicked', () => {
@@ -70,8 +70,7 @@ describe('generate-ui-v2', () => {
       clickShowMore();
       getFieldByName('option1').type('test-option1');
       getFieldByName('select-field').select('option1');
-
-      cy.get("[id='copy-button']").click();
+      cy.get("[data-cy='copy-button']").realClick();
 
       cy.window()
         .its('navigator.clipboard')

@@ -6,11 +6,11 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import dev.nx.console.models.NxGeneratorOption
 import dev.nx.console.models.NxGeneratorOptionDeserializer
+import dev.nx.console.nxls.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.nxls.client.NxlsLanguageClient
 import dev.nx.console.nxls.managers.DocumentManager
 import dev.nx.console.nxls.managers.getFilePath
 import dev.nx.console.nxls.server.NxlsLanguageServer
-import dev.nx.console.services.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
 import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.nxlsWorkingPath
 import java.util.concurrent.CompletableFuture
@@ -34,7 +34,9 @@ class NxlsWrapper(val project: Project) {
 
     var languageServer: NxlsLanguageServer? = null
     var languageClient: NxlsLanguageClient? = null
-    var initializeFuture: CompletableFuture<InitializeResult>? = null
+
+    private val startedFuture = CompletableFuture<Void>()
+    private var initializeFuture: CompletableFuture<InitializeResult>? = null
     private var initializeResult: InitializeResult? = null
 
     private var connectedEditors = HashMap<String, DocumentManager>()
@@ -135,6 +137,7 @@ class NxlsWrapper(val project: Project) {
             status = NxlsState.FAILED
         } finally {
             status = NxlsState.STARTED
+            startedFuture.complete(null)
             for ((_, manager) in connectedEditors) {
                 connectTextService(manager)
             }
@@ -151,11 +154,20 @@ class NxlsWrapper(val project: Project) {
             log.info("error while shutting down $e")
         } finally {
             languageServer?.exit()
+            startedFuture.completeExceptionally(Exception("Nxls stopped"))
         }
     }
 
     fun isStarted(): Boolean {
         return status == NxlsState.STARTED
+    }
+
+    fun awaitStarted(): CompletableFuture<Void> {
+        return if (isStarted()) {
+            CompletableFuture.completedFuture(null)
+        } else {
+            startedFuture
+        }
     }
 
     fun connect(editor: Editor) {

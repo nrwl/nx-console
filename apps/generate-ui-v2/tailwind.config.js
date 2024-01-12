@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         background: 'var(--background-color)',
         foreground: 'var(--foreground-color)',
+        mutedForeground: 'var(--muted-foreground-color)',
         primary: 'var(--primary-color)',
         error: 'var(--error-color)',
         fieldBackground: 'var(--field-background-color)',

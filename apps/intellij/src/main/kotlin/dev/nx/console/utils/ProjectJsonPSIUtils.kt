@@ -63,7 +63,7 @@ fun getNxTargetDescriptorFromNode(element: PsiElement, project: Project): NxTarg
 
         val nxProject =
             (targetProperty
-                    ?.parentOfType<JsonObject>()
+                    .parentOfType<JsonObject>()
                     ?.parentOfType<JsonObject>()
                     ?.findProperty("name")
                     ?.value as? JsonStringLiteral)

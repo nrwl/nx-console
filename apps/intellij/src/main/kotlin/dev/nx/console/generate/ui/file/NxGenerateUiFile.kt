@@ -31,16 +31,22 @@ import org.cef.handler.CefLifeSpanHandlerAdapter
 val json = Json {
     classDiscriminator = "payloadType"
     ignoreUnknownKeys = true
+    isLenient = true
 }
 
 class NxGenerateUiFileType : FileType {
     override fun getName(): String = "NxGenerateUi"
+
     override fun getDescription(): String = ""
+
     override fun getDefaultExtension(): String = ".nx"
 
     override fun getIcon(): Icon = NxIcons.FileType
+
     override fun isBinary(): Boolean = true
+
     override fun isReadOnly(): Boolean = true
+
     override fun getCharset(file: VirtualFile, content: ByteArray): String? = null
 
     companion object {

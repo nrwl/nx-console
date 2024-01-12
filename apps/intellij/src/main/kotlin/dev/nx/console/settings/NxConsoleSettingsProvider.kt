@@ -9,6 +9,7 @@ import com.intellij.openapi.components.service
 class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsState> {
 
     private var state = NxConsoleSettingsState()
+
     override fun getState(): NxConsoleSettingsState {
         return state
     }
@@ -41,6 +42,12 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
             state.useNewGenerateUIPreview = value
         }
 
+    var showProjectDetailsView: Boolean
+        get() = state.showProjectDetailsView
+        set(value) {
+            state.showProjectDetailsView = value
+        }
+
     companion object {
         fun getInstance(): NxConsoleSettingsProvider {
             return service()
@@ -52,5 +59,6 @@ data class NxConsoleSettingsState(
     var enableDryRunOnGenerateChange: Boolean = true,
     var enableTelemetry: Boolean = false,
     var promptedForTelemetry: Boolean = false,
-    var useNewGenerateUIPreview: Boolean = true
+    var useNewGenerateUIPreview: Boolean = true,
+    var showProjectDetailsView: Boolean = false
 )

@@ -6,6 +6,12 @@ export function showNoProjectsMessage() {
   );
 }
 
+export function showNoProjectAtPathMessage(path: string) {
+  window.showWarningMessage(
+    `No project found at ${path}. Did you run npm/pnpm/yarn install?`
+  );
+}
+
 export function showNoGeneratorsMessage() {
   window.showWarningMessage(
     'No generators found. Did you run npm/pnpm/yarn install?'
