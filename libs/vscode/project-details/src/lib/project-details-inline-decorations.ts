@@ -4,6 +4,7 @@ import {
   getNxWorkspacePath,
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
+import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { join } from 'path';
 import {
   DecorationOptions,
@@ -13,6 +14,7 @@ import {
   Range,
   TextEditor,
   ThemeColor,
+  commands,
   window,
   workspace,
 } from 'vscode';
@@ -104,19 +106,31 @@ const projectDetailsWithTargetsDecoration = (
   projectName: string,
   targets: { name: string; command: string }[]
 ) => {
-  const contentText = `Nx Project Details (${targets.length} targets found)`;
+  let targetsText = targets.map(({ name }) => name).join(', ');
+  if (targetsText.length > 50) {
+    targetsText = targetsText.slice(0, 50 - 3) + '...';
+  }
+
+  const contentText = `Nx Targets: ${targetsText}`;
   const hoverTargets = new MarkdownString();
   hoverTargets.supportHtml = true;
   hoverTargets.supportThemeIcons = true;
   hoverTargets.isTrusted = true;
-  hoverTargets.value = `
-  <h4>Nx Targets in ${projectName}</h4>
-  `;
   hoverTargets.appendMarkdown(`
-  | Target | Command |
-| :----------- | :------------- |
-${targets.map(({ name, command }) => `| **${name}** | ${command} |`).join('\n')}
+  ####  Nx Targets in ${projectName}
+  |  |  | |
+| :----------- | :------------- | :------------- |
+${targets
+  .map(
+    ({ name, command }) =>
+      `| **${name}**: | ${command} | [$(play)](command:nx-console.temp.project-details-decoration.run.${projectName}.${name}) |`
+  )
+  .join('\n')}
   `);
+  registerInteractivityCommands(
+    projectName,
+    targets.map(({ name }) => name)
+  );
 
   return {
     renderOptions: {
@@ -138,6 +152,39 @@ const getHoverLink = () => {
   <span style="font-weight: 600;">[$(open-preview) View full project details](command:nx.project-details.openToSide)</span>
   `;
   return hoverLink;
+};
+
+const registerInteractivityCommands = (
+  projectName: string,
+  targets: string[]
+) => {
+  commands.getCommands(true).then((cmds) => {
+    const registeredCommands = cmds.filter((c) =>
+      c.startsWith(
+        `nx-console.temp.project-details-decoration.run.${projectName}`
+      )
+    );
+    targets.forEach((name) => {
+      if (
+        registeredCommands.includes(
+          `nx-console.temp.project-details-decoration.run.${projectName}.${name}`
+        )
+      ) {
+        return;
+      }
+      commands.registerCommand(
+        `nx-console.temp.project-details-decoration.run.${projectName}.${name}`,
+        () => {
+          const target = `${projectName}:${name}`;
+          CliTaskProvider.instance.executeTask({
+            positional: target,
+            command: 'run',
+            flags: [],
+          });
+        }
+      );
+    });
+  });
 };
 
 function shouldDecorate(

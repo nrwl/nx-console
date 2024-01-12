@@ -1,17 +1,9 @@
-import {
-  getNxWorkspaceProjects,
-  getProjectByPath,
-} from '@nx-console/vscode/nx-workspace';
-import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
+import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
 import {
   CancellationToken,
   Event,
-  Position,
-  ProviderResult,
   TextDocumentContentProvider,
   Uri,
-  window,
-  Range,
 } from 'vscode';
 
 export class ProjectDetailsProvider implements TextDocumentContentProvider {

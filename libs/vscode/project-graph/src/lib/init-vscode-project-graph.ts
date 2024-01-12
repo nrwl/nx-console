@@ -29,8 +29,7 @@ export function getGraphWebviewManager(): GraphWebviewManager {
 
 export async function initVscodeProjectGraph(context: ExtensionContext) {
   const nxVersion = await getNxVersion();
-  // TODO: replace with actual version that has nx graph api changes
-  if (gte(nxVersion.version, '18.0.0')) {
+  if (gte(nxVersion.version, '17.3.0-beta.3')) {
     graphWebviewManager = new GraphWebviewManager(context);
     registerActions(graphWebviewManager);
   } else {
