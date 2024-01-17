@@ -4,10 +4,7 @@ import {
   handleGraphInteractionEvent,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
-import {
-  getNxWorkspace,
-  getNxWorkspaceProjects,
-} from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { join } from 'path';
 import {
@@ -24,7 +21,12 @@ export class ProjectDetailsPreview {
   private webviewPanel: WebviewPanel;
   private graphServer: NxGraphServer;
 
-  constructor(private projectName: string, extensionContext: ExtensionContext) {
+  constructor(
+    private projectName: string,
+    extensionContext: ExtensionContext,
+    private expandedTarget?: string
+  ) {
+    console.log('in constructor', expandedTarget);
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
       `${projectName} Details`,
@@ -40,35 +42,7 @@ export class ProjectDetailsPreview {
 
     this.graphServer = getNxGraphServer(extensionContext);
     this.webviewPanel.webview.onDidReceiveMessage(async (event) => {
-      const handled = await handleGraphInteractionEvent(event);
-      if (handled) return;
-
-      if (event.type === 'open-project-graph') {
-        getGraphWebviewManager().focusProject(event.payload.projectName);
-        return;
-      }
-
-      if (event.type === 'open-task-graph') {
-        getGraphWebviewManager().focusTarget(
-          event.payload.projectName,
-          event.payload.targetName
-        );
-        return;
-      }
-
-      if (event.type === 'override-target') {
-        this.overrideTarget(
-          event.payload.projectName,
-          event.payload.targetName,
-          event.payload.targetConfigString
-        );
-        return;
-      }
-
-      if (event.type.startsWith('request')) {
-        const response = await this.graphServer.handleWebviewRequest(event);
-        this.webviewPanel.webview.postMessage(response);
-      }
+      this.handleGraphInteractionEvent(event);
     });
     this.graphServer.updatedEventEmitter.event(() => {
       this.webviewPanel.webview.postMessage({ type: 'reload' });
@@ -91,9 +65,9 @@ export class ProjectDetailsPreview {
       /*html*/ `
     <script> 
       window.addEventListener('message', ({ data }) => {
-        const { type } = data;
+        const { type, payload } = data;
         if(type === 'reload') {
-          window.externalApi.router.navigate('/project-details/${this.projectName}')
+          window.location.reload();
         }
       });
     </script>
@@ -107,13 +81,48 @@ export class ProjectDetailsPreview {
       /*html*/ `
       <script type="module">
         await window.waitForRouter()
-        window.externalApi.router?.navigate('/project-details/${this.projectName}')
+        console.log('${this.expandedTarget}')
+        window.externalApi.openProjectDetails('${this.projectName}'${
+        this.expandedTarget ? `, '${this.expandedTarget}'` : ''
+      })
       </script>
     </body>
     `
     );
     html = html.replace('<body', '<body style="padding: 0rem;" ');
     return html;
+  }
+
+  private async handleGraphInteractionEvent(event: any) {
+    const handled = await handleGraphInteractionEvent(event);
+    if (handled) return;
+
+    if (event.type === 'open-project-graph') {
+      getGraphWebviewManager().focusProject(event.payload.projectName);
+      return;
+    }
+
+    if (event.type === 'open-task-graph') {
+      getGraphWebviewManager().focusTarget(
+        event.payload.projectName,
+        event.payload.targetName
+      );
+      return;
+    }
+
+    if (event.type === 'override-target') {
+      this.overrideTarget(
+        event.payload.projectName,
+        event.payload.targetName,
+        event.payload.targetConfigString
+      );
+      return;
+    }
+
+    if (event.type.startsWith('request')) {
+      const response = await this.graphServer.handleWebviewRequest(event);
+      this.webviewPanel.webview.postMessage(response);
+    }
   }
 
   private async overrideTarget(
