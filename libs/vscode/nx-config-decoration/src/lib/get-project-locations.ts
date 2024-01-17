@@ -1,11 +1,11 @@
-import { Position, TextDocument } from 'vscode';
 import type * as typescript from 'typescript';
 import {
-  isObjectLiteralExpression,
   isPropertyAssignment,
   isStringLiteral,
   parseJsonText,
 } from 'typescript';
+import { Position, TextDocument } from 'vscode';
+import { getProperties, getPropertyName } from './ast-utils';
 
 export interface ProjectLocations {
   [projectName: string]: {
@@ -81,28 +81,12 @@ export function getTargetsPropertyLocation(
   }
 }
 
-function getProperties(
-  objectLiteral: typescript.Node
-): typescript.NodeArray<typescript.ObjectLiteralElementLike> | undefined {
-  if (isObjectLiteralExpression(objectLiteral)) {
-    return objectLiteral.properties;
-  } else if (isPropertyAssignment(objectLiteral)) {
-    return getProperties(objectLiteral.initializer);
-  }
-}
-
 function isProjectPathConfig(
   property: typescript.ObjectLiteralElementLike
 ): property is typescript.PropertyAssignment {
   return (
     isPropertyAssignment(property) && isStringLiteral(property.initializer)
   );
-}
-
-function getPropertyName(property: typescript.ObjectLiteralElementLike) {
-  if (isPropertyAssignment(property) && isStringLiteral(property.name)) {
-    return property.name.text;
-  }
 }
 
 function getPositions(

@@ -11,7 +11,7 @@
         "lintFilePatterns": ["apps/vscode-e2e/**/*.ts"]
       }
     },
-    "e2e": {
+    "_e2e": {
       "executor": "nx:run-commands",
       "options": {
         "command": "wdio run ./wdio.conf.ts",

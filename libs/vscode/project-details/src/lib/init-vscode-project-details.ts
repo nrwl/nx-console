@@ -15,10 +15,10 @@ import {
   window,
   workspace,
 } from 'vscode';
-import { decorateWithProjectDetails } from './project-details-inline-decorations';
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   getNxWorkspacePath().then((nxWorkspacePath) => {
@@ -29,7 +29,7 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
   getNxVersionAndRegisterCommand(context);
   onWorkspaceRefreshed(() => getNxVersionAndRegisterCommand(context));
 
-  decorateWithProjectDetails();
+  ProjectDetailsCodelensProvider.register(context);
 }
 
 function getNxVersionAndRegisterCommand(context: ExtensionContext) {
