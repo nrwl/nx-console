@@ -10839,10 +10839,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/vscode@npm:1.71.0":
-  version: 1.71.0
-  resolution: "@types/vscode@npm:1.71.0"
-  checksum: c07ec75b35f03a79cbeaa2d21bb13e03103c8bd1281b36a49cf9357afffca3efd76284bc0aaf91237aed3ba99e767115bf31b3d9f83e5280abc00f8879d24eb5
+"@types/vscode@npm:^1.85.0":
+  version: 1.85.0
+  resolution: "@types/vscode@npm:1.85.0"
+  checksum: d7934e55b8606d0df0ac60e6ce0877d3edd513b5bc150e06fababd888f328a6ba87e3eef71930fc8eae1bcce60ec6106dae89d149905cdad613e84f48a6d003e
   languageName: node
   linkType: hard
 
@@ -25146,7 +25146,7 @@ __metadata:
     "@types/semver": ^7.3.12
     "@types/universal-analytics": 0.4.5
     "@types/uuid": ^8.3.4
-    "@types/vscode": 1.71.0
+    "@types/vscode": ^1.85.0
     "@types/vscode-webview": ^1.57.0
     "@typescript-eslint/eslint-plugin": 6.10.0
     "@typescript-eslint/parser": 6.10.0
