@@ -8,7 +8,7 @@ export class ProjectDetailsManager {
 
   constructor(private context: ExtensionContext) {}
 
-  async openProjectDetailsToSide(uri: Uri) {
+  async openProjectDetailsToSide(uri: Uri, expandedTarget?: string) {
     const project = await getProjectByPath(uri.path);
     if (!project) {
       showNoProjectAtPathMessage(uri.path);
@@ -20,7 +20,11 @@ export class ProjectDetailsManager {
       if (!project.name) {
         return;
       }
-      preview = new ProjectDetailsPreview(project.name, this.context);
+      preview = new ProjectDetailsPreview(
+        project.name,
+        this.context,
+        expandedTarget
+      );
       preview.onDispose(() => {
         this.previews.delete(project.root);
       });

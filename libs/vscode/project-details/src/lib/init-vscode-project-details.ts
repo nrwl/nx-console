@@ -37,15 +37,18 @@ function getNxVersionAndRegisterCommand(context: ExtensionContext) {
     // eslint-disable-next-line no-constant-condition
     if (gte(nxVersion.version, '17.3.0-beta.3')) {
       const projectDetailsManager = new ProjectDetailsManager(context);
-      commands.registerCommand('nx.project-details.openToSide', () => {
-        const isEnabled = GlobalConfigurationStore.instance.get(
-          'showProjectDetailsView'
-        );
-        if (!isEnabled) return;
-        const uri = window.activeTextEditor?.document.uri;
-        if (!uri) return;
-        projectDetailsManager.openProjectDetailsToSide(uri);
-      });
+      commands.registerCommand(
+        'nx.project-details.openToSide',
+        (expandTarget?: string) => {
+          const isEnabled = GlobalConfigurationStore.instance.get(
+            'showProjectDetailsView'
+          );
+          if (!isEnabled) return;
+          const uri = window.activeTextEditor?.document.uri;
+          if (!uri) return;
+          projectDetailsManager.openProjectDetailsToSide(uri, expandTarget);
+        }
+      );
     } else {
       const projectDetailsProvider = new ProjectDetailsProvider();
       workspace.registerTextDocumentContentProvider(
