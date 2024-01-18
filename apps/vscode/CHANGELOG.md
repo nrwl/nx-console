@@ -1,3 +1,15 @@
+# [18.13.0](https://github.com/nrwl/nx-console/compare/vscode-v18.12.0...vscode-v18.13.0) (2024-01-18)
+
+
+### Bug Fixes
+
+* **vscode:** make sure root font size is set correctly ([#1980](https://github.com/nrwl/nx-console/issues/1980)) ([865b19b](https://github.com/nrwl/nx-console/commit/865b19b2c74a791adef97da826fc8c8e707859aa))
+
+
+### Features
+
+* **vscode:** move project details inline display to codelens ([#1981](https://github.com/nrwl/nx-console/issues/1981)) ([e1aa36c](https://github.com/nrwl/nx-console/commit/e1aa36c6ae78e0ddc51ed616ce1a404bc83fb72f))
+
 # [18.12.0](https://github.com/nrwl/nx-console/compare/vscode-v18.11.1...vscode-v18.12.0) (2024-01-12)
 
 
