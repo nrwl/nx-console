@@ -43,6 +43,9 @@ export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
       background-color: var(--vscode-editor-background) !important;
       color: var(--vscode-editor-foreground) !important;
     }
+    html {
+      font-size: var(--vscode-font-size) !important;
+    }
   </style>
   </head>
   `
