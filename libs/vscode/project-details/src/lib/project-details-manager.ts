@@ -34,7 +34,6 @@ export class ProjectDetailsManager {
     }
 
     let preview = this.previews.get(project.root);
-    console.log('opening preview, exists:', !!preview);
     if (!preview) {
       if (!project.name) {
         return;
@@ -58,19 +57,17 @@ async function getProjectNameFromUri(
   document: TextDocument
 ): Promise<{ name?: string; root: string } | undefined> {
   if (document.fileName.endsWith('project.json')) {
+    try {
+      JSON.parse(document.getText());
+    } catch (e) {
+      window.showErrorMessage(
+        `Error parsing ${document.fileName}. Please make sure the JSON is valid. `
+      );
+      return;
+    }
     const json = parseJsonText(document.fileName, document.getText());
 
     const properties = getProperties(json.statements[0].expression);
-    if (!properties) {
-      try {
-        JSON.parse(document.getText());
-      } catch (e) {
-        window.showErrorMessage(
-          `Error parsing ${document.fileName}. Please make sure the JSON is valid. `
-        );
-        return;
-      }
-    }
 
     let name: string | undefined = undefined;
     const nameProperty = properties?.find(

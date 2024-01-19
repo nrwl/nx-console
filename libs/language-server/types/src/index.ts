@@ -26,6 +26,9 @@ export const NxWorkspaceRequest: RequestType<
   unknown
 > = new RequestType('nx/workspace');
 
+export const NxWorkspacePathRequest: RequestType<undefined, string, unknown> =
+  new RequestType('nx/workspacePath');
+
 export type NxGeneratorsRequestOptions = {
   includeHidden: boolean;
   includeNgAdd: boolean;
