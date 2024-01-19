@@ -66,11 +66,15 @@ export class ProjectDetailsPreview {
       window.addEventListener('message', ({ data }) => {
         const { type, payload } = data;
         if(type === 'reload') {
-          window.location.reload();
+          const currentLocation = window.externalApi.router.state.location;
+
+          const newUrl = currentLocation.pathname + currentLocation.search
+          window.externalApi.router.navigate(newUrl, {
+            preventScrollReset: true,
+          });
         }
       });
     </script>
-  
     </head>
     `
     );

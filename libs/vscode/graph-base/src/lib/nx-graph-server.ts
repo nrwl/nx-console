@@ -137,7 +137,6 @@ export class NxGraphServer implements Disposable {
   private async spawnProcess(port: number): Promise<boolean> {
     console.log('trying to start graph at', port);
     const workspacePath = await getNxWorkspacePath();
-    console.log('workspacePath', workspacePath);
 
     return new Promise((resolve) => {
       const nxGraphProcess = spawn(

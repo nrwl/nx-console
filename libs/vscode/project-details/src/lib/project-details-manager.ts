@@ -28,7 +28,6 @@ export class ProjectDetailsManager {
     expandedTarget?: string
   ) {
     const project = await getProjectNameFromUri(document);
-    console.log('got project');
     if (!project) {
       return;
     }

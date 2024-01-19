@@ -77,7 +77,6 @@ export async function getNxWorkspaceConfig(
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else if (gte(nxVersion, coerce('17.2.0') ?? new SemVer('0.0.0'))) {
         lspLogger.log('createProjectGraphAndSourceMapsAsync');
-        lspLogger.log('nxProjectGraph ' + JSON.stringify(nxProjectGraph));
         const projectGraphAndSourceMaps = await (
           nxProjectGraph as any
         ).createProjectGraphAndSourceMapsAsync({
