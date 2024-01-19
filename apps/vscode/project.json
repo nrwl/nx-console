@@ -5,7 +5,11 @@
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
-  "implicitDependencies": ["generate-ui", "generate-ui-v2", "nxls"],
+  "implicitDependencies": [
+    "generate-ui",
+    "generate-ui-v2",
+    "nxls"
+  ],
   "targets": {
     "watch-all": {
       "executor": "nx:run-commands",
@@ -54,7 +58,9 @@
         "outputPath": "dist/apps/vscode",
         "skipTypeCheck": false,
         "outputFileName": "main.js",
-        "format": ["cjs"],
+        "format": [
+          "cjs"
+        ],
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
         "assets": [
@@ -83,7 +89,10 @@
         "generatePackageJson": false,
         "platform": "node",
         "esbuildOptions": {
-          "mainFields": ["module", "main"],
+          "mainFields": [
+            "module",
+            "main"
+          ],
           "sourcemap": "both",
           "outExtension": {
             ".js": ".js"
@@ -113,7 +122,9 @@
         "sourcemap": true,
         "outputPath": "dist/apps/vscode",
         "outputFileName": "main.js",
-        "format": ["cjs"],
+        "format": [
+          "cjs"
+        ],
         "main": "apps/vscode/src/main.ts",
         "tsConfig": "apps/vscode/tsconfig.app.json",
         "generatePackageJson": false,
@@ -152,8 +163,10 @@
         "deleteOutputPath": false,
         "platform": "node",
         "esbuildOptions": {
-          "mainFields": ["module", "main"],
-          "sourcemap": "both",
+          "mainFields": [
+            "module",
+            "main"
+          ],
           "outExtension": {
             ".js": ".js"
           },
@@ -170,7 +183,8 @@
         },
         "production": {
           "skipTypeCheck": true,
-          "minify": false
+          "minify": false,
+          "sourcemap": false
         }
       },
       "dependsOn": [
@@ -183,24 +197,33 @@
           "params": "forward"
         }
       ],
-      "outputs": ["{options.outputPath}"]
+      "outputs": [
+        "{options.outputPath}"
+      ]
     },
     "extract-dependencies": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node ./tools/scripts/copy-to-vscode.js"
       },
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/vscode/**/*.ts"]
+        "lintFilePatterns": [
+          "apps/vscode/**/*.ts"
+        ]
       }
     },
     "package": {
       "executor": "nx:run-commands",
-      "dependsOn": ["build", "^build"],
+      "dependsOn": [
+        "build",
+        "^build"
+      ],
       "options": {
         "commands": [
           "node ./tools/scripts/vscode-yarn.js",
@@ -208,7 +231,9 @@
         ],
         "parallel": false
       },
-      "outputs": ["{workspaceRoot}/dist/apps/vscode"]
+      "outputs": [
+        "{workspaceRoot}/dist/apps/vscode"
+      ]
     },
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
@@ -218,5 +243,7 @@
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": [
+    "type:vscode"
+  ]
 }
