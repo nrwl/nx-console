@@ -30,6 +30,7 @@ export class NxGraphServer implements Disposable {
   private currentPort: number | undefined = undefined;
   private nxGraphProcess: ChildProcess | undefined = undefined;
 
+  isStarting = false;
   isStarted = false;
   updatedEventEmitter = new EventEmitter();
 
@@ -47,6 +48,10 @@ export class NxGraphServer implements Disposable {
       }
     | undefined
   > {
+    console.log('request, isCrashed', this.isCrashed);
+    if (this.isCrashed) {
+      await this.start();
+    }
     if (!this.isStarted) {
       await this.waitForServerReady();
     }
@@ -93,6 +98,12 @@ export class NxGraphServer implements Disposable {
    * starts nx graph server
    */
   async start() {
+    console.log('starting graph server, isStarting:', this.isStarting);
+    if (this.isStarting) {
+      return;
+    }
+    this.isStarted = false;
+    this.isStarting = false;
     let port = this.startPort;
 
     let isPortAvailable = false;
@@ -105,18 +116,28 @@ export class NxGraphServer implements Disposable {
 
     this.currentPort = port;
     try {
+      console.log('spawning process at', port);
       const started = await this.spawnProcess(port);
       if (started) {
         this.isStarted = true;
+      } else {
+        console.log('couldnt start graph server');
       }
+      this.isStarting = false;
     } catch (error) {
       console.error(`error while starting nx graph: ${error}`);
+      this.isStarting = false;
     }
+  }
+
+  private get isCrashed() {
+    return !!this.nxGraphProcess && !!this.nxGraphProcess.exitCode;
   }
 
   private async spawnProcess(port: number): Promise<boolean> {
     console.log('trying to start graph at', port);
     const workspacePath = await getNxWorkspacePath();
+    console.log('workspacePath', workspacePath);
 
     return new Promise((resolve) => {
       const nxGraphProcess = spawn(
@@ -152,10 +173,16 @@ export class NxGraphServer implements Disposable {
         }
         if (text.includes('updated')) {
           this.updatedEventEmitter.fire(true);
+        } else {
+          console.log('got text', text);
         }
       });
       nxGraphProcess.stderr.on('data', (data) => {
         console.log('err data', data.toString());
+        resolve(false);
+      });
+      nxGraphProcess.on('exit', () => {
+        console.log('on exit');
         resolve(false);
       });
 

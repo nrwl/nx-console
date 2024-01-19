@@ -26,7 +26,6 @@ export class ProjectDetailsPreview {
     extensionContext: ExtensionContext,
     private expandedTarget?: string
   ) {
-    console.log('in constructor', expandedTarget);
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
       `${projectName} Details`,
