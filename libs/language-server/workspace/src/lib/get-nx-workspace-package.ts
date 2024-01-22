@@ -93,7 +93,7 @@ export async function getNxWorkspacePackageFileUtils(
   return getNxPackage(importPath, logger);
 }
 
-async function getNxPackage<T>(
+export async function getNxPackage<T>(
   importPath: string | undefined,
   logger: Logger
 ): Promise<T> {
