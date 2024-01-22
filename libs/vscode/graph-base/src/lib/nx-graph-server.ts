@@ -30,6 +30,7 @@ export class NxGraphServer implements Disposable {
   private currentPort: number | undefined = undefined;
   private nxGraphProcess: ChildProcess | undefined = undefined;
 
+  isStarting = false;
   isStarted = false;
   updatedEventEmitter = new EventEmitter();
 
@@ -47,6 +48,9 @@ export class NxGraphServer implements Disposable {
       }
     | undefined
   > {
+    if (this.isCrashed) {
+      await this.start();
+    }
     if (!this.isStarted) {
       await this.waitForServerReady();
     }
@@ -84,7 +88,6 @@ export class NxGraphServer implements Disposable {
         payload: data,
       };
     } catch (error) {
-      console.error('Error handling request:', error);
       return;
     }
   }
@@ -93,6 +96,11 @@ export class NxGraphServer implements Disposable {
    * starts nx graph server
    */
   async start() {
+    if (this.isStarting) {
+      return;
+    }
+    this.isStarted = false;
+    this.isStarting = true;
     let port = this.startPort;
 
     let isPortAvailable = false;
@@ -108,10 +116,18 @@ export class NxGraphServer implements Disposable {
       const started = await this.spawnProcess(port);
       if (started) {
         this.isStarted = true;
+      } else {
+        console.log('couldnt start graph server');
       }
+      this.isStarting = false;
     } catch (error) {
       console.error(`error while starting nx graph: ${error}`);
+      this.isStarting = false;
     }
+  }
+
+  private get isCrashed() {
+    return !!this.nxGraphProcess && !!this.nxGraphProcess.exitCode;
   }
 
   private async spawnProcess(port: number): Promise<boolean> {
@@ -155,7 +171,11 @@ export class NxGraphServer implements Disposable {
         }
       });
       nxGraphProcess.stderr.on('data', (data) => {
-        console.log('err data', data.toString());
+        console.log('graph server error:', data.toString());
+        resolve(false);
+      });
+      nxGraphProcess.on('exit', async () => {
+        this.isStarted = false;
         resolve(false);
       });
 

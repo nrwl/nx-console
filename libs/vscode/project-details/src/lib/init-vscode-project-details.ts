@@ -15,10 +15,9 @@ import {
   window,
   workspace,
 } from 'vscode';
+import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   getNxWorkspacePath().then((nxWorkspacePath) => {
@@ -27,7 +26,6 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
     ]);
   });
   getNxVersionAndRegisterCommand(context);
-  onWorkspaceRefreshed(() => getNxVersionAndRegisterCommand(context));
 
   ProjectDetailsCodelensProvider.register(context);
 }
@@ -44,9 +42,12 @@ function getNxVersionAndRegisterCommand(context: ExtensionContext) {
             'showProjectDetailsView'
           );
           if (!isEnabled) return;
-          const uri = window.activeTextEditor?.document.uri;
-          if (!uri) return;
-          projectDetailsManager.openProjectDetailsToSide(uri, expandTarget);
+          const document = window.activeTextEditor?.document;
+          if (!document) return;
+          projectDetailsManager.openProjectDetailsToSide(
+            document,
+            expandTarget
+          );
         }
       );
     } else {

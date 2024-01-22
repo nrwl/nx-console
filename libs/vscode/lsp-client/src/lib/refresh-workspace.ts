@@ -27,4 +27,5 @@ export function initRefreshWorkspace(context: ExtensionContext) {
       handleVSCodeRefresh();
     })
   );
+  context.subscriptions.push(refreshedEventEmitter);
 }

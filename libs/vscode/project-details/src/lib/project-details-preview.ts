@@ -1,9 +1,11 @@
+import { debounce } from '@nx-console/shared/utils';
 import {
   NxGraphServer,
   getNxGraphServer,
   handleGraphInteractionEvent,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { join } from 'path';
@@ -26,7 +28,6 @@ export class ProjectDetailsPreview {
     extensionContext: ExtensionContext,
     private expandedTarget?: string
   ) {
-    console.log('in constructor', expandedTarget);
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
       `${projectName} Details`,
@@ -41,11 +42,34 @@ export class ProjectDetailsPreview {
     });
 
     this.graphServer = getNxGraphServer(extensionContext);
-    this.webviewPanel.webview.onDidReceiveMessage(async (event) => {
-      this.handleGraphInteractionEvent(event);
-    });
-    this.graphServer.updatedEventEmitter.event(() => {
-      this.webviewPanel.webview.postMessage({ type: 'reload' });
+
+    const interactionListener = this.webviewPanel.webview.onDidReceiveMessage(
+      async (event) => {
+        this.handleGraphInteractionEvent(event);
+      }
+    );
+    const graphServerListener = this.graphServer.updatedEventEmitter.event(
+      () => {
+        this.debouncedRefresh();
+      }
+    );
+    const viewStateListener = this.webviewPanel.onDidChangeViewState(
+      ({ webviewPanel }) => {
+        commands.executeCommand(
+          'setContext',
+          'projectDetailsViewVisible',
+          webviewPanel.visible
+        );
+      }
+    );
+
+    onWorkspaceRefreshed(() => this.debouncedRefresh());
+
+    this.webviewPanel.onDidDispose(() => {
+      interactionListener.dispose();
+      graphServerListener.dispose();
+      viewStateListener.dispose();
+      commands.executeCommand('setContext', 'projectDetailsViewVisible', false);
     });
   }
 
@@ -67,11 +91,15 @@ export class ProjectDetailsPreview {
       window.addEventListener('message', ({ data }) => {
         const { type, payload } = data;
         if(type === 'reload') {
-          window.location.reload();
+          const currentLocation = window.externalApi.router.state.location;
+
+          const newUrl = currentLocation.pathname + currentLocation.search
+          window.externalApi.router.navigate(newUrl, {
+            preventScrollReset: true,
+          });
         }
       });
     </script>
-  
     </head>
     `
     );
@@ -81,7 +109,6 @@ export class ProjectDetailsPreview {
       /*html*/ `
       <script type="module">
         await window.waitForRouter()
-        console.log('${this.expandedTarget}')
         window.externalApi.openProjectDetails('${this.projectName}'${
         this.expandedTarget ? `, '${this.expandedTarget}'` : ''
       })
@@ -167,4 +194,9 @@ export class ProjectDetailsPreview {
     });
     commands.executeCommand('editor.action.formatDocument');
   }
+
+  private debouncedRefresh = debounce(
+    () => this.webviewPanel.webview.postMessage({ type: 'reload' }),
+    100
+  );
 }

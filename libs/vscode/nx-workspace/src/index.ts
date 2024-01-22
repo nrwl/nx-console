@@ -1,5 +1,6 @@
 export * from './lib/stop-daemon';
 export * from './lib/get-nx-workspace';
+export * from './lib/get-nx-workspace-path';
 export * from './lib/get-project-by-path';
 export * from './lib/get-generators';
 export * from './lib/get-generator-options';
