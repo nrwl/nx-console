@@ -1,3 +1,18 @@
+# [18.14.0](https://github.com/nrwl/nx-console/compare/vscode-v18.13.0...vscode-v18.14.0) (2024-01-22)
+
+
+### Bug Fixes
+
+* automatically repair graph server when it errors in vscode ([#1985](https://github.com/nrwl/nx-console/issues/1985)) ([5e679f3](https://github.com/nrwl/nx-console/commit/5e679f3f5cbb46d0e9705be05cb02f8ba6935349))
+* **nxls:** dynamically import cache dir instead of using nx console version ([#1990](https://github.com/nrwl/nx-console/issues/1990)) ([356856d](https://github.com/nrwl/nx-console/commit/356856d94df0b68efddf115f260def0369f661a0))
+
+
+### Features
+
+* **vscode:** enable PDV integration by default ([#1991](https://github.com/nrwl/nx-console/issues/1991)) ([54b68a8](https://github.com/nrwl/nx-console/commit/54b68a8a61bd191d2f6e49a578264de13d1b6f13))
+* **vscode:** open pdv at target ([#1982](https://github.com/nrwl/nx-console/issues/1982)) ([1b3363f](https://github.com/nrwl/nx-console/commit/1b3363fbb164db90b9ebc989d2882030d5bf00ff))
+* **vscode:** Sort target names alphabetically ([#1963](https://github.com/nrwl/nx-console/issues/1963)) ([a12155f](https://github.com/nrwl/nx-console/commit/a12155f16e0d17b77936f656c293a39c57c7c13a))
+
 # [18.13.0](https://github.com/nrwl/nx-console/compare/vscode-v18.12.0...vscode-v18.13.0) (2024-01-18)
 
 
