@@ -1,13 +1,12 @@
+import { debounce } from '@nx-console/shared/utils';
 import {
   NxGraphServer,
   getNxGraphServer,
   handleGraphInteractionEvent,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
-import {
-  getNxWorkspace,
-  getNxWorkspaceProjects,
-} from '@nx-console/vscode/nx-workspace';
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { join } from 'path';
 import {
@@ -24,7 +23,11 @@ export class ProjectDetailsPreview {
   private webviewPanel: WebviewPanel;
   private graphServer: NxGraphServer;
 
-  constructor(private projectName: string, extensionContext: ExtensionContext) {
+  constructor(
+    private projectName: string,
+    extensionContext: ExtensionContext,
+    private expandedTarget?: string
+  ) {
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
       `${projectName} Details`,
@@ -39,39 +42,34 @@ export class ProjectDetailsPreview {
     });
 
     this.graphServer = getNxGraphServer(extensionContext);
-    this.webviewPanel.webview.onDidReceiveMessage(async (event) => {
-      const handled = await handleGraphInteractionEvent(event);
-      if (handled) return;
 
-      if (event.type === 'open-project-graph') {
-        getGraphWebviewManager().focusProject(event.payload.projectName);
-        return;
+    const interactionListener = this.webviewPanel.webview.onDidReceiveMessage(
+      async (event) => {
+        this.handleGraphInteractionEvent(event);
       }
-
-      if (event.type === 'open-task-graph') {
-        getGraphWebviewManager().focusTarget(
-          event.payload.projectName,
-          event.payload.targetName
+    );
+    const graphServerListener = this.graphServer.updatedEventEmitter.event(
+      () => {
+        this.debouncedRefresh();
+      }
+    );
+    const viewStateListener = this.webviewPanel.onDidChangeViewState(
+      ({ webviewPanel }) => {
+        commands.executeCommand(
+          'setContext',
+          'projectDetailsViewVisible',
+          webviewPanel.visible
         );
-        return;
       }
+    );
 
-      if (event.type === 'override-target') {
-        this.overrideTarget(
-          event.payload.projectName,
-          event.payload.targetName,
-          event.payload.targetConfigString
-        );
-        return;
-      }
+    onWorkspaceRefreshed(() => this.debouncedRefresh());
 
-      if (event.type.startsWith('request')) {
-        const response = await this.graphServer.handleWebviewRequest(event);
-        this.webviewPanel.webview.postMessage(response);
-      }
-    });
-    this.graphServer.updatedEventEmitter.event(() => {
-      this.webviewPanel.webview.postMessage({ type: 'reload' });
+    this.webviewPanel.onDidDispose(() => {
+      interactionListener.dispose();
+      graphServerListener.dispose();
+      viewStateListener.dispose();
+      commands.executeCommand('setContext', 'projectDetailsViewVisible', false);
     });
   }
 
@@ -91,13 +89,17 @@ export class ProjectDetailsPreview {
       /*html*/ `
     <script> 
       window.addEventListener('message', ({ data }) => {
-        const { type } = data;
+        const { type, payload } = data;
         if(type === 'reload') {
-          window.externalApi.router.navigate('/project-details/${this.projectName}')
+          const currentLocation = window.externalApi.router.state.location;
+
+          const newUrl = currentLocation.pathname + currentLocation.search
+          window.externalApi.router.navigate(newUrl, {
+            preventScrollReset: true,
+          });
         }
       });
     </script>
-  
     </head>
     `
     );
@@ -107,13 +109,47 @@ export class ProjectDetailsPreview {
       /*html*/ `
       <script type="module">
         await window.waitForRouter()
-        window.externalApi.router?.navigate('/project-details/${this.projectName}')
+        window.externalApi.openProjectDetails('${this.projectName}'${
+        this.expandedTarget ? `, '${this.expandedTarget}'` : ''
+      })
       </script>
     </body>
     `
     );
     html = html.replace('<body', '<body style="padding: 0rem;" ');
     return html;
+  }
+
+  private async handleGraphInteractionEvent(event: any) {
+    const handled = await handleGraphInteractionEvent(event);
+    if (handled) return;
+
+    if (event.type === 'open-project-graph') {
+      getGraphWebviewManager().focusProject(event.payload.projectName);
+      return;
+    }
+
+    if (event.type === 'open-task-graph') {
+      getGraphWebviewManager().focusTarget(
+        event.payload.projectName,
+        event.payload.targetName
+      );
+      return;
+    }
+
+    if (event.type === 'override-target') {
+      this.overrideTarget(
+        event.payload.projectName,
+        event.payload.targetName,
+        event.payload.targetConfigString
+      );
+      return;
+    }
+
+    if (event.type.startsWith('request')) {
+      const response = await this.graphServer.handleWebviewRequest(event);
+      this.webviewPanel.webview.postMessage(response);
+    }
   }
 
   private async overrideTarget(
@@ -158,4 +194,9 @@ export class ProjectDetailsPreview {
     });
     commands.executeCommand('editor.action.formatDocument');
   }
+
+  private debouncedRefresh = debounce(
+    () => this.webviewPanel.webview.postMessage({ type: 'reload' }),
+    100
+  );
 }

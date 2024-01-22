@@ -153,7 +153,6 @@
         "platform": "node",
         "esbuildOptions": {
           "mainFields": ["module", "main"],
-          "sourcemap": "both",
           "outExtension": {
             ".js": ".js"
           },
@@ -170,7 +169,8 @@
         },
         "production": {
           "skipTypeCheck": true,
-          "minify": false
+          "minify": false,
+          "sourcemap": false
         }
       },
       "dependsOn": [

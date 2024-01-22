@@ -18,6 +18,7 @@ import {
   NxStartupMessageRequest,
   NxTransformedGeneratorSchemaRequest,
   NxVersionRequest,
+  NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
@@ -271,6 +272,10 @@ connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
   }
 
   return nxWorkspace(WORKING_PATH, lspLogger, reset);
+});
+
+connection.onRequest(NxWorkspacePathRequest, () => {
+  return WORKING_PATH;
 });
 
 connection.onRequest(

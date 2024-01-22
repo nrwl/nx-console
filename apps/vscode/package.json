@@ -202,7 +202,7 @@
         {
           "command": "nxConsole.refreshWorkspace",
           "group": "navigation",
-          "when": "graphWebviewVisible"
+          "when": "graphWebviewVisible || projectDetailsViewVisible"
         },
         {
           "command": "nx.project-details.openToSide",
@@ -638,7 +638,7 @@
         "nxConsole.showProjectDetailsView": {
           "type": "boolean",
           "scope": "application",
-          "default": false,
+          "default": true,
           "description": "Show the project details view for project.json or package.json files."
         },
         "nxConsole.showNodeVersionOnStartup": {

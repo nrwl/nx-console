@@ -15,7 +15,7 @@ export async function createProjectGraph(
   }
 ): Promise<string | undefined> {
   const { isEncapsulatedNx } = await nxWorkspace(workspacePath);
-  const projectGraphOutput = getProjectGraphOutput(workspacePath);
+  const projectGraphOutput = await getProjectGraphOutput(workspacePath);
 
   return new Promise<string | undefined>((res, rej) => {
     const command = getNxExecutionCommand({

@@ -15,10 +15,9 @@ import {
   window,
   workspace,
 } from 'vscode';
+import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
-import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   getNxWorkspacePath().then((nxWorkspacePath) => {
@@ -27,7 +26,6 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
     ]);
   });
   getNxVersionAndRegisterCommand(context);
-  onWorkspaceRefreshed(() => getNxVersionAndRegisterCommand(context));
 
   ProjectDetailsCodelensProvider.register(context);
 }
@@ -37,15 +35,21 @@ function getNxVersionAndRegisterCommand(context: ExtensionContext) {
     // eslint-disable-next-line no-constant-condition
     if (gte(nxVersion.version, '17.3.0-beta.3')) {
       const projectDetailsManager = new ProjectDetailsManager(context);
-      commands.registerCommand('nx.project-details.openToSide', () => {
-        const isEnabled = GlobalConfigurationStore.instance.get(
-          'showProjectDetailsView'
-        );
-        if (!isEnabled) return;
-        const uri = window.activeTextEditor?.document.uri;
-        if (!uri) return;
-        projectDetailsManager.openProjectDetailsToSide(uri);
-      });
+      commands.registerCommand(
+        'nx.project-details.openToSide',
+        (expandTarget?: string) => {
+          const isEnabled = GlobalConfigurationStore.instance.get(
+            'showProjectDetailsView'
+          );
+          if (!isEnabled) return;
+          const document = window.activeTextEditor?.document;
+          if (!document) return;
+          projectDetailsManager.openProjectDetailsToSide(
+            document,
+            expandTarget
+          );
+        }
+      );
     } else {
       const projectDetailsProvider = new ProjectDetailsProvider();
       workspace.registerTextDocumentContentProvider(
