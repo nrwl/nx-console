@@ -1,4 +1,7 @@
-import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
+import {
+  configureSchemas,
+  getCompletionItems,
+} from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
@@ -23,40 +26,31 @@ import {
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
 import {
-  configureJsonLanguageService,
   getJsonLanguageService,
   getLanguageModelCache,
-  getSchemaRequestService,
   lspLogger,
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
 import {
-  getExecutors,
+  createProjectGraph,
   getGeneratorContextFromPath,
+  getGeneratorContextV2,
   getGeneratorOptions,
   getGenerators,
-  getProjectByPath,
   getNxVersion,
-  nxWorkspace,
-  getProjectGraphOutput,
-  createProjectGraph,
-  getGeneratorContextV2,
+  getProjectByPath,
   getProjectFolderTree,
+  getProjectGraphOutput,
   getProjectsByPaths,
-  getTransformedGeneratorSchema,
   getStartupMessage,
+  getTransformedGeneratorSchema,
   hasAffectedProjects,
   nxVersionOnWorkspaceRefresh,
+  nxWorkspace,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import {
-  getNxJsonSchema,
-  getPackageJsonSchema,
-  getProjectJsonSchema,
-  getWorkspaceJsonSchema,
-} from '@nx-console/shared/json-schema';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { formatError } from '@nx-console/shared/utils';
 import {
@@ -65,15 +59,15 @@ import {
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
-  createConnection,
   CreateFilesParams,
   DeleteFilesParams,
   FileOperationPatternKind,
   InitializeResult,
   ProposedFeatures,
   ResponseError,
-  TextDocuments,
   TextDocumentSyncKind,
+  TextDocuments,
+  createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 
@@ -124,7 +118,7 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+    configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {
@@ -260,6 +254,10 @@ const jsonDocumentMapper = getLanguageModelCache();
 documents.onDidClose((e) => {
   jsonDocumentMapper.onDocumentRemoved(e.document);
 });
+
+// documents.onDidOpen((e) => {
+//   lspLogger.log('document opened ' + e.document.uri);
+// });
 
 connection.onShutdown(() => {
   unregisterFileWatcher();
@@ -482,63 +480,8 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 
 async function reconfigure(workingPath: string) {
   await nxWorkspace(workingPath, lspLogger, true);
-  await configureSchemas(workingPath, CLIENT_CAPABILITIES);
+  await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
   nxVersionOnWorkspaceRefresh();
-}
-
-async function configureSchemas(
-  workingPath: string | undefined,
-  capabilities: ClientCapabilities | undefined
-) {
-  if (!workingPath) {
-    lspLogger.log('No workspace path provided');
-    return;
-  }
-
-  const { workspace, nxVersion } = await nxWorkspace(workingPath, lspLogger);
-  const collections = await getExecutors(workingPath);
-  const workspaceSchema = getWorkspaceJsonSchema(collections);
-  const projectSchema = getProjectJsonSchema(
-    collections,
-    workspace.targetDefaults,
-    nxVersion
-  );
-  const packageSchema = getPackageJsonSchema(nxVersion);
-
-  const nxSchema = getNxJsonSchema(collections, workspace.projects, nxVersion);
-
-  configureJsonLanguageService(
-    {
-      schemaRequestService: getSchemaRequestService(['file']),
-      workspaceContext,
-      contributions: [],
-      clientCapabilities: capabilities,
-    },
-    {
-      schemas: [
-        {
-          uri: 'nx://schemas/workspace',
-          fileMatch: ['**/workspace.json'],
-          schema: workspaceSchema,
-        },
-        {
-          uri: 'nx://schemas/project',
-          fileMatch: ['**/project.json'],
-          schema: projectSchema,
-        },
-        {
-          uri: 'nx://schemas/package',
-          fileMatch: ['**/package.json'],
-          schema: packageSchema,
-        },
-        {
-          uri: 'nx://schemas/nx',
-          fileMatch: ['**/nx.json'],
-          schema: nxSchema,
-        },
-      ],
-    }
-  );
 }
 
 function getJsonDocument(document: TextDocument) {
