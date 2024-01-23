@@ -45,13 +45,13 @@ export async function configureSchemas(
   const { nxVersion, workspace } = currentNxWorkspace;
 
   currentExecutors = await getExecutors(workingPath);
-  const workspaceSchema = getWorkspaceJsonSchema(currentExecutors);
-  const projectSchema = getProjectJsonSchema(
+  const workspaceJsonSchema = getWorkspaceJsonSchema(currentExecutors);
+  const projectJsonSchema = getProjectJsonSchema(
     currentExecutors,
     workspace.targetDefaults,
     nxVersion
   );
-  const packageSchema = getPackageJsonSchema(nxVersion);
+  const packageJsonSchema = getPackageJsonSchema(nxVersion);
 
   const nxSchema = getNxJsonSchema(
     currentExecutors,
@@ -63,17 +63,17 @@ export async function configureSchemas(
     {
       uri: 'nx://schemas/workspace',
       fileMatch: ['**/workspace.json'],
-      schema: workspaceSchema,
+      schema: workspaceJsonSchema,
     },
     {
       uri: 'nx://schemas/project',
       fileMatch: ['**/project.json'],
-      schema: projectSchema,
+      schema: projectJsonSchema,
     },
     {
       uri: 'nx://schemas/package',
       fileMatch: ['**/package.json'],
-      schema: packageSchema,
+      schema: packageJsonSchema,
     },
     {
       uri: 'nx://schemas/nx',
