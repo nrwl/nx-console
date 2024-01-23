@@ -1,6 +1,8 @@
 import {
+  configureSchemaForProject,
   configureSchemas,
   getCompletionItems,
+  projectSchemaIsRegistered,
 } from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import { getHover } from '@nx-console/language-server/capabilities/hover';
@@ -56,6 +58,8 @@ import { formatError } from '@nx-console/shared/utils';
 import {
   ClientCapabilities,
   CompletionList,
+  PropertyASTNode,
+  StringASTNode,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
@@ -186,6 +190,30 @@ connection.onCompletion(async (completionParams) => {
 
   const { jsonAst, document } = getJsonDocument(changedDocument);
 
+  // get the project name from either the json AST (fast) or via the file path (slow)
+  // if the project is not yet registered with the json language service, register it
+  const path = URI.parse(changedDocument.uri).fsPath;
+  if (path.endsWith('project.json')) {
+    let projectName = jsonAst.root?.children?.find(
+      (c): c is PropertyASTNode & { valueNode: StringASTNode } =>
+        c.type === 'property' &&
+        c.keyNode.value === 'name' &&
+        c.valueNode?.type === 'string'
+    )?.valueNode?.value;
+
+    if (!projectName) {
+      projectName = (await getProjectByPath(path, WORKING_PATH))?.name;
+    }
+
+    if (projectName && !projectSchemaIsRegistered(projectName)) {
+      await configureSchemaForProject(
+        projectName,
+        WORKING_PATH,
+        workspaceContext,
+        CLIENT_CAPABILITIES
+      );
+    }
+  }
   const completionResults =
     (await getJsonLanguageService()?.doComplete(
       document,
@@ -255,9 +283,30 @@ documents.onDidClose((e) => {
   jsonDocumentMapper.onDocumentRemoved(e.document);
 });
 
-// documents.onDidOpen((e) => {
-//   lspLogger.log('document opened ' + e.document.uri);
-// });
+documents.onDidOpen(async (e) => {
+  if (!e.document.uri.endsWith('project.json')) {
+    return;
+  }
+  const project = await getProjectByPath(
+    URI.parse(e.document.uri).fsPath,
+    WORKING_PATH!
+  );
+
+  if (!project || !project.name) {
+    return;
+  }
+
+  if (projectSchemaIsRegistered(project.name)) {
+    return;
+  }
+
+  configureSchemaForProject(
+    project.name,
+    WORKING_PATH,
+    workspaceContext,
+    CLIENT_CAPABILITIES
+  );
+});
 
 connection.onShutdown(() => {
   unregisterFileWatcher();
