@@ -31,8 +31,19 @@ function createJsonSchema(
 ): EnhancedJsonSchema {
   const targetsSchema =
     (targets(nxVersion, executors).additionalProperties as object) ?? {};
-  const targetsProperties = Object.keys(targetDefaults).reduce<JSONSchemaMap>(
-    (targets, target) => {
+  const targetsProperties = Object.keys(targetDefaults)
+    .filter(
+      (target) =>
+        !(
+          target.includes('@') &&
+          target.includes('/') &&
+          target.includes(':')
+        ) &&
+        target !== 'nx:run-commands' &&
+        target !== 'nx:run-script' &&
+        target !== 'nx:noop'
+    )
+    .reduce<JSONSchemaMap>((targets, target) => {
       const defaults: Partial<TargetConfiguration> = targetDefaults[target];
       let targetSchema: JSONSchema = targetsSchema;
       if (defaults?.executor) {
@@ -54,9 +65,7 @@ function createJsonSchema(
       }
       targets[target] = targetSchema;
       return targets;
-    },
-    {}
-  );
+    }, {});
   return {
     type: 'object',
     properties: {
