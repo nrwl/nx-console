@@ -1,4 +1,9 @@
-import { getCompletionItems } from '@nx-console/language-server/capabilities/code-completion';
+import {
+  configureSchemaForProject,
+  configureSchemas,
+  getCompletionItems,
+  projectSchemaIsRegistered,
+} from '@nx-console/language-server/capabilities/code-completion';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
@@ -23,57 +28,53 @@ import {
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
 import {
-  configureJsonLanguageService,
   getJsonLanguageService,
   getLanguageModelCache,
-  getSchemaRequestService,
   lspLogger,
   mergeArrays,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
 import {
-  getExecutors,
+  createProjectGraph,
   getGeneratorContextFromPath,
+  getGeneratorContextV2,
   getGeneratorOptions,
   getGenerators,
-  getProjectByPath,
   getNxVersion,
-  nxWorkspace,
-  getProjectGraphOutput,
-  createProjectGraph,
-  getGeneratorContextV2,
+  getProjectByPath,
+  getProjectByRoot,
   getProjectFolderTree,
+  getProjectGraphOutput,
   getProjectsByPaths,
-  getTransformedGeneratorSchema,
   getStartupMessage,
+  getTransformedGeneratorSchema,
   hasAffectedProjects,
   nxVersionOnWorkspaceRefresh,
+  nxWorkspace,
+  resetProjectPathCache,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import {
-  getNxJsonSchema,
-  getPackageJsonSchema,
-  getProjectJsonSchema,
-  getWorkspaceJsonSchema,
-} from '@nx-console/shared/json-schema';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { formatError } from '@nx-console/shared/utils';
+import { dirname, relative } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
+  PropertyASTNode,
+  StringASTNode,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
-  createConnection,
   CreateFilesParams,
   DeleteFilesParams,
   FileOperationPatternKind,
   InitializeResult,
   ProposedFeatures,
   ResponseError,
-  TextDocuments,
   TextDocumentSyncKind,
+  TextDocuments,
+  createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 
@@ -124,7 +125,7 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    configureSchemas(WORKING_PATH, CLIENT_CAPABILITIES);
+    configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {
@@ -192,6 +193,25 @@ connection.onCompletion(async (completionParams) => {
 
   const { jsonAst, document } = getJsonDocument(changedDocument);
 
+  // get the project name from either the json AST (fast) or via the file path (slow)
+  // if the project is not yet registered with the json language service, register it
+  const uri = URI.parse(changedDocument.uri).fsPath;
+  if (uri.endsWith('project.json')) {
+    let relativeRootPath = relative(WORKING_PATH, dirname(uri));
+    // the root project will have a path of '' while nx thinks of the path as '.'
+    if (relativeRootPath === '') {
+      relativeRootPath = '.';
+    }
+
+    if (relativeRootPath && !projectSchemaIsRegistered(relativeRootPath)) {
+      await configureSchemaForProject(
+        relativeRootPath,
+        WORKING_PATH,
+        workspaceContext,
+        CLIENT_CAPABILITIES
+      );
+    }
+  }
   const completionResults =
     (await getJsonLanguageService()?.doComplete(
       document,
@@ -259,6 +279,31 @@ const jsonDocumentMapper = getLanguageModelCache();
 
 documents.onDidClose((e) => {
   jsonDocumentMapper.onDocumentRemoved(e.document);
+});
+
+documents.onDidOpen(async (e) => {
+  if (!e.document.uri.endsWith('project.json')) {
+    return;
+  }
+  const project = await getProjectByPath(
+    URI.parse(e.document.uri).fsPath,
+    WORKING_PATH!
+  );
+
+  if (!project || !project.name) {
+    return;
+  }
+
+  if (projectSchemaIsRegistered(project.name)) {
+    return;
+  }
+
+  configureSchemaForProject(
+    project.name,
+    WORKING_PATH,
+    workspaceContext,
+    CLIENT_CAPABILITIES
+  );
 });
 
 connection.onShutdown(() => {
@@ -481,64 +526,10 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 });
 
 async function reconfigure(workingPath: string) {
-  await nxWorkspace(workingPath, lspLogger, true);
-  await configureSchemas(workingPath, CLIENT_CAPABILITIES);
   nxVersionOnWorkspaceRefresh();
-}
-
-async function configureSchemas(
-  workingPath: string | undefined,
-  capabilities: ClientCapabilities | undefined
-) {
-  if (!workingPath) {
-    lspLogger.log('No workspace path provided');
-    return;
-  }
-
-  const { workspace, nxVersion } = await nxWorkspace(workingPath, lspLogger);
-  const collections = await getExecutors(workingPath);
-  const workspaceSchema = getWorkspaceJsonSchema(collections);
-  const projectSchema = getProjectJsonSchema(
-    collections,
-    workspace.targetDefaults,
-    nxVersion
-  );
-  const packageSchema = getPackageJsonSchema(nxVersion);
-
-  const nxSchema = getNxJsonSchema(collections, workspace.projects, nxVersion);
-
-  configureJsonLanguageService(
-    {
-      schemaRequestService: getSchemaRequestService(['file']),
-      workspaceContext,
-      contributions: [],
-      clientCapabilities: capabilities,
-    },
-    {
-      schemas: [
-        {
-          uri: 'nx://schemas/workspace',
-          fileMatch: ['**/workspace.json'],
-          schema: workspaceSchema,
-        },
-        {
-          uri: 'nx://schemas/project',
-          fileMatch: ['**/project.json'],
-          schema: projectSchema,
-        },
-        {
-          uri: 'nx://schemas/package',
-          fileMatch: ['**/package.json'],
-          schema: packageSchema,
-        },
-        {
-          uri: 'nx://schemas/nx',
-          fileMatch: ['**/nx.json'],
-          schema: nxSchema,
-        },
-      ],
-    }
-  );
+  resetProjectPathCache();
+  await nxWorkspace(workingPath, lspLogger, true);
+  await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 }
 
 function getJsonDocument(document: TextDocument) {

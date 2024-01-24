@@ -2,6 +2,13 @@ import { directoryExists } from '@nx-console/shared/file-system';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { isAbsolute, join, normalize, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';
+import { lspLogger } from '@nx-console/language-server/utils';
+
+let _rootProjectMap: Record<string, ProjectConfiguration> | undefined;
+
+export function resetProjectPathCache() {
+  _rootProjectMap = undefined;
+}
 
 export async function getProjectByPath(
   path: string,
@@ -9,6 +16,18 @@ export async function getProjectByPath(
 ): Promise<ProjectConfiguration | undefined> {
   const projectsMap = await getProjectsByPaths([path], workspacePath);
   return projectsMap?.[path] || undefined;
+}
+
+export async function getProjectByRoot(
+  rootPath: string,
+  workspacePath: string
+): Promise<ProjectConfiguration | undefined> {
+  if (_rootProjectMap && _rootProjectMap[rootPath]) {
+    return _rootProjectMap[rootPath];
+  }
+  await getProjectsByPaths([], workspacePath);
+
+  return _rootProjectMap?.[rootPath];
 }
 
 export async function getProjectsByPaths(
@@ -34,7 +53,12 @@ export async function getProjectsByPaths(
   const projectEntries = Object.entries(workspace.projects);
   const foundProjects: Map<string, ProjectConfiguration> = new Map();
 
+  const rootProjectMap: Record<string, ProjectConfiguration> = {};
+
   for (const [projectName, projectConfig] of projectEntries) {
+    if (projectConfig.root) {
+      rootProjectMap[projectConfig.root] = projectConfig;
+    }
     // If there is no files array, it's an old version of Nx and we need backwards compatibility
     if (!projectConfig.files) {
       new Map(pathsMap).forEach((_, path) => {
@@ -85,6 +109,9 @@ export async function getProjectsByPaths(
       break;
     }
   }
+
+  _rootProjectMap = rootProjectMap;
+
   return Object.fromEntries(foundProjects);
 }
 
