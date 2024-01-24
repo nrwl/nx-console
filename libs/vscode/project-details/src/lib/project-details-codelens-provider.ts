@@ -51,7 +51,13 @@ export class ProjectDetailsCodelensProvider implements CodeLensProvider {
   ): Promise<ProjectDetailsCodeLens | undefined> {
     const project = await getProjectByPath(codeLens.filePath);
     if (!project) {
-      return undefined;
+      return {
+        ...codeLens,
+        command: {
+          command: 'nx.run.target',
+          title: `$(play) Run Nx Targets`,
+        },
+      };
     }
     let targetsString = Object.keys(project?.targets ?? {}).join(', ');
     if (targetsString.length > 50) {
