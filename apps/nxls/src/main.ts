@@ -43,6 +43,7 @@ import {
   getGenerators,
   getNxVersion,
   getProjectByPath,
+  getProjectByRoot,
   getProjectFolderTree,
   getProjectGraphOutput,
   getProjectsByPaths,
@@ -51,10 +52,12 @@ import {
   hasAffectedProjects,
   nxVersionOnWorkspaceRefresh,
   nxWorkspace,
+  resetProjectPathCache,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { formatError } from '@nx-console/shared/utils';
+import { dirname, relative } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
@@ -192,22 +195,17 @@ connection.onCompletion(async (completionParams) => {
 
   // get the project name from either the json AST (fast) or via the file path (slow)
   // if the project is not yet registered with the json language service, register it
-  const path = URI.parse(changedDocument.uri).fsPath;
-  if (path.endsWith('project.json')) {
-    let projectName = jsonAst.root?.children?.find(
-      (c): c is PropertyASTNode & { valueNode: StringASTNode } =>
-        c.type === 'property' &&
-        c.keyNode.value === 'name' &&
-        c.valueNode?.type === 'string'
-    )?.valueNode?.value;
-
-    if (!projectName) {
-      projectName = (await getProjectByPath(path, WORKING_PATH))?.name;
+  const uri = URI.parse(changedDocument.uri).fsPath;
+  if (uri.endsWith('project.json')) {
+    let relativeRootPath = relative(WORKING_PATH, dirname(uri));
+    // the root project will have a path of '' while nx thinks of the path as '.'
+    if (relativeRootPath === '') {
+      relativeRootPath = '.';
     }
 
-    if (projectName && !projectSchemaIsRegistered(projectName)) {
+    if (relativeRootPath && !projectSchemaIsRegistered(relativeRootPath)) {
       await configureSchemaForProject(
-        projectName,
+        relativeRootPath,
         WORKING_PATH,
         workspaceContext,
         CLIENT_CAPABILITIES
@@ -528,9 +526,10 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 });
 
 async function reconfigure(workingPath: string) {
+  nxVersionOnWorkspaceRefresh();
+  resetProjectPathCache();
   await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
-  nxVersionOnWorkspaceRefresh();
 }
 
 function getJsonDocument(document: TextDocument) {

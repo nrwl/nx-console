@@ -5,6 +5,7 @@ import {
 } from '@nx-console/language-server/utils';
 import {
   getExecutors,
+  getProjectByRoot,
   nxWorkspace,
 } from '@nx-console/language-server/workspace';
 import {
@@ -20,6 +21,7 @@ import {
 import { CollectionInfo } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { platform } from 'os';
+import { join } from 'path';
 import {
   ClientCapabilities,
   SchemaConfiguration,
@@ -100,8 +102,8 @@ export async function configureSchemas(
 
 const projectSchemas: Map<string, SchemaConfiguration> = new Map();
 
-export function projectSchemaIsRegistered(projectName: string): boolean {
-  return projectSchemas.has(projectName);
+export function projectSchemaIsRegistered(projectRoot: string): boolean {
+  return projectSchemas.has(projectRoot);
 }
 
 function getProjectSchemas(): SchemaConfiguration[] {
@@ -113,19 +115,19 @@ function getProjectSchemas(): SchemaConfiguration[] {
  * This will reuse workspace info set by `configureSchemas` if available
  */
 export async function configureSchemaForProject(
-  projectName: string,
+  projectRootPath: string,
   workingPath: string | undefined,
   workspaceContext: {
     resolveRelativePath: (relativePath: string, resource: string) => string;
   },
   capabilities: ClientCapabilities | undefined
 ) {
-  const projectSchema = await getProjectSchema(projectName, workingPath);
+  const projectSchema = await getProjectSchema(projectRootPath, workingPath);
   if (!projectSchema) {
     return;
   }
 
-  projectSchemas.set(projectName, projectSchema);
+  projectSchemas.set(projectRootPath, projectSchema);
 
   _configureJsonLanguageService(
     workspaceContext,
@@ -136,12 +138,12 @@ export async function configureSchemaForProject(
 }
 
 async function getProjectSchema(
-  projectName: string,
+  projectRootPath: string,
   workingPath: string | undefined
 ): Promise<SchemaConfiguration | undefined> {
   if (!workingPath) {
     lspLogger.log(
-      `No workspace path provided when configuring schema for ${projectName}`
+      `No workspace path provided when configuring schema for ${projectRootPath}`
     );
     return;
   }
@@ -152,41 +154,45 @@ async function getProjectSchema(
     currentExecutors = await getExecutors(workingPath);
   }
 
-  const { nxVersion, workspace } = currentNxWorkspace;
+  const project = await getProjectByRoot(projectRootPath, workingPath);
+  if (!project) {
+    return;
+  }
+
+  const { nxVersion } = currentNxWorkspace;
 
   const targetsProperties: Record<string, any> = {};
-  Object.entries(workspace.projects[projectName]?.targets ?? {}).forEach(
-    ([key, target]) => {
-      const executor = target.executor ?? 'nx:run-commands';
-      const matchingCollection = currentExecutors?.find(
-        (e) => e.name === executor
-      );
-      if (!matchingCollection) {
-        return;
-      }
-      const schemaRef =
-        platform() === 'win32'
-          ? matchingCollection?.path
-          : `file://${matchingCollection?.path}`;
+  Object.entries(project.targets ?? {}).forEach(([key, target]) => {
+    const executor = target.executor ?? 'nx:run-commands';
+    const matchingCollection = currentExecutors?.find(
+      (e) => e.name === executor
+    );
+    if (!matchingCollection) {
+      return;
+    }
+    const schemaRef =
+      platform() === 'win32'
+        ? matchingCollection?.path
+        : `file://${matchingCollection?.path}`;
 
-      targetsProperties[key] = {
-        properties: {
-          options: {
+    targetsProperties[key] = {
+      properties: {
+        options: {
+          $ref: schemaRef,
+        },
+        configurations: {
+          additionalProperties: {
             $ref: schemaRef,
-          },
-          configurations: {
-            additionalProperties: {
-              $ref: schemaRef,
-              required: [],
-            },
+            required: [],
           },
         },
-      };
-    }
-  );
+      },
+    };
+  });
+
   return {
-    uri: `nx://schemas/project-${projectName}`,
-    fileMatch: [`**/${projectName}/project.json`],
+    uri: `nx://schemas/project-${project.name}`,
+    fileMatch: [join(workingPath, projectRootPath, 'project.json')],
     schema: {
       type: 'object',
       properties: {
