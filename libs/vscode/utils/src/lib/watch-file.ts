@@ -12,7 +12,7 @@ export function watchFile(
   filePath: GlobPattern,
   callback: (...args: any[]) => unknown,
   disposable?: Disposable[]
-) {
+): Disposable {
   const filewatcher = workspace.createFileSystemWatcher(filePath);
   filewatcher.onDidChange(callback, disposable);
   return filewatcher;
