@@ -1,3 +1,12 @@
+## [18.14.1](https://github.com/nrwl/nx-console/compare/vscode-v18.14.0...vscode-v18.14.1) (2024-01-25)
+
+
+### Bug Fixes
+
+* **nxls:** enable target autocomplete for pcv3 projects ([#1992](https://github.com/nrwl/nx-console/issues/1992)) ([0b82c7f](https://github.com/nrwl/nx-console/commit/0b82c7f10a6d8728aecc2027d0f52a04c364cbc6))
+* **vscode:** fix root package.json codelens without root project ([#1994](https://github.com/nrwl/nx-console/issues/1994)) ([b6dbfc8](https://github.com/nrwl/nx-console/commit/b6dbfc8a0291f348b32657245a7717abe9986110))
+* **vscode:** sendRequest error on startup ([#1997](https://github.com/nrwl/nx-console/issues/1997)) ([8232a0a](https://github.com/nrwl/nx-console/commit/8232a0a25519298eeec6e149d591df1fff3038cb))
+
 # [18.14.0](https://github.com/nrwl/nx-console/compare/vscode-v18.13.0...vscode-v18.14.0) (2024-01-22)
 
 
