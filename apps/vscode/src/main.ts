@@ -87,26 +87,6 @@ export async function activate(c: ExtensionContext) {
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
 
-    const revealWebViewPanelCommand = commands.registerCommand(
-      'nxConsole.revealWebViewPanel',
-      async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        const newGenUi = GlobalConfigurationStore.instance.get(
-          'useNewGenerateUiPreview'
-        );
-        if (newGenUi) {
-          openGenerateUi(contextMenuUri);
-        } else {
-          revealWebViewPanel({
-            runTargetTreeItem,
-            context,
-            runTargetTreeView,
-            contextMenuUri,
-            generator: runTargetTreeItem.generator,
-          });
-        }
-      }
-    );
-
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
       LOCATE_YOUR_WORKSPACE.command?.command || '',
       async () => {
@@ -122,16 +102,10 @@ export async function activate(c: ExtensionContext) {
 
     context.subscriptions.push(
       runTargetTreeView,
-      revealWebViewPanelCommand,
       manuallySelectWorkspaceDefinitionCommand
     );
 
     await enableTypeScriptPlugin(context);
-    initNxCommandsView(context);
-    initNvmTip(context);
-    initRefreshWorkspace(context);
-    initVscodeProjectDetails(context);
-    initVscodeProjectGraph(context);
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
     runTargetTreeView = window.createTreeView('nxRunTarget', {
@@ -221,7 +195,7 @@ async function setWorkspace(workspacePath: string) {
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  configureLspClient(context);
+  configureLspClient(context, workspacePath);
 
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
@@ -238,7 +212,33 @@ async function setWorkspace(workspacePath: string) {
     initTasks(context);
     registerVscodeAddDependency(context);
 
+    const revealWebViewPanelCommand = commands.registerCommand(
+      'nxConsole.revealWebViewPanel',
+      async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
+        const newGenUi = GlobalConfigurationStore.instance.get(
+          'useNewGenerateUiPreview'
+        );
+        if (newGenUi) {
+          openGenerateUi(contextMenuUri);
+        } else {
+          revealWebViewPanel({
+            runTargetTreeItem,
+            context,
+            runTargetTreeView,
+            contextMenuUri,
+            generator: runTargetTreeItem.generator,
+          });
+        }
+      }
+    );
+
     initGenerateUiWebview(context);
+
+    initNxCommandsView(context);
+    initNvmTip(context);
+    initRefreshWorkspace(context);
+    initVscodeProjectDetails(context);
+    initVscodeProjectGraph(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 
@@ -250,7 +250,10 @@ async function setWorkspace(workspacePath: string) {
 
     new AddDependencyCodelensProvider(context);
 
-    context.subscriptions.push(nxHelpAndFeedbackTreeView);
+    context.subscriptions.push(
+      nxHelpAndFeedbackTreeView,
+      revealWebViewPanelCommand
+    );
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }

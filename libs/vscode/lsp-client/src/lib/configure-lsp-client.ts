@@ -3,7 +3,6 @@ import {
   NxChangeWorkspace,
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server/types';
-import { getWorkspacePath } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { ExtensionContext } from 'vscode';
 import {
@@ -18,9 +17,12 @@ import { handleNxlsRefresh } from './refresh-workspace';
 
 let client: LanguageClient | undefined;
 
-export function configureLspClient(context: ExtensionContext) {
+export function configureLspClient(
+  context: ExtensionContext,
+  workspacePath: string
+) {
   if (client) {
-    sendNotification(NxChangeWorkspace, getWorkspacePath());
+    sendNotification(NxChangeWorkspace, workspacePath);
     return;
   }
 
@@ -41,7 +43,7 @@ export function configureLspClient(context: ExtensionContext) {
   const clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     initializationOptions: {
-      workspacePath: getWorkspacePath(),
+      workspacePath,
     },
     documentSelector: [
       { scheme: 'file', language: 'json', pattern: '**/nx.json' },
@@ -62,11 +64,14 @@ export function configureLspClient(context: ExtensionContext) {
   client.start();
 
   // nxls is telling us to refresh projects on this side
-  client.onNotification(NxWorkspaceRefreshNotification, () => {
-    handleNxlsRefresh();
-  });
+  const onNotificationDisposable = client.onNotification(
+    NxWorkspaceRefreshNotification,
+    () => {
+      handleNxlsRefresh();
+    }
+  );
 
-  context.subscriptions.push({ dispose });
+  context.subscriptions.push({ dispose }, onNotificationDisposable);
 }
 
 function dispose() {
