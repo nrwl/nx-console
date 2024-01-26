@@ -19,7 +19,8 @@ import {
 import { performance } from 'perf_hooks';
 
 let projectGraph: ProjectGraph | null = null;
-let sourceMaps: Record<string, Record<string, string[]>> | null = null;
+let sourceMaps: Record<string, Record<string, string[]>> | undefined =
+  undefined;
 
 export async function getNxWorkspaceConfig(
   workspacePath: string,
@@ -116,7 +117,8 @@ export async function getNxWorkspaceConfig(
     workspaceConfiguration = createNxWorkspaceConfiguration(
       workspaceConfiguration,
       projectGraph,
-      projectFileMap
+      projectFileMap,
+      sourceMaps
     );
 
     // for (const project in workspaceConfiguration.projects) {

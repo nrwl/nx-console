@@ -134,3 +134,9 @@ export const NxHasAffectedProjectsRequest: RequestType<
   boolean,
   unknown
 > = new RequestType('nx/hasAffectedProjects');
+
+export const NxSourceMapFilesToProjectMapRequest: RequestType<
+  undefined,
+  Record<string, string>,
+  unknown
+> = new RequestType('nx/sourceMapFilesToProjectMap');
