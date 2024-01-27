@@ -17,11 +17,13 @@ import {
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
   NxProjectByPathRequest,
+  NxProjectByRootRequest,
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
   NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
+  NxTargetsForConfigFileRequest,
   NxTransformedGeneratorSchemaRequest,
   NxVersionRequest,
   NxWorkspacePathRequest,
@@ -56,6 +58,7 @@ import {
   nxWorkspace,
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
+  getTargetsForConfigFile,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
@@ -385,6 +388,19 @@ connection.onRequest(
   }
 );
 
+connection.onRequest(
+  NxProjectByRootRequest,
+  async (args: { projectRoot: string }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getProjectByRoot(args.projectRoot, WORKING_PATH);
+  }
+);
+
 // TODO: REMOVE ONCE OLD GENERATE UI IS GONE
 connection.onRequest(
   NxGeneratorContextFromPathRequest,
@@ -484,6 +500,23 @@ connection.onRequest(NxSourceMapFilesToProjectMapRequest, async () => {
   }
   return getSourceMapFilesToProjectMap(WORKING_PATH);
 });
+
+connection.onRequest(
+  NxTargetsForConfigFileRequest,
+  async (args: { projectName: string; configFilePath: string }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getTargetsForConfigFile(
+      args.projectName,
+      args.configFilePath,
+      WORKING_PATH
+    );
+  }
+);
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {

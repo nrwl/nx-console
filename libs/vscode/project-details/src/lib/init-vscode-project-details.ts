@@ -20,6 +20,7 @@ import { ProjectDetailsCodelensProvider } from './project-details-codelens-provi
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { ConfigFileCodelensProvider } from './config-file-codelens-provider';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   getNxWorkspacePath().then((nxWorkspacePath) => {
@@ -31,6 +32,7 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
   setProjectDetailsFileContext();
 
   ProjectDetailsCodelensProvider.register(context);
+  ConfigFileCodelensProvider.register(context);
 }
 
 function getNxVersionAndRegisterCommand(context: ExtensionContext) {
