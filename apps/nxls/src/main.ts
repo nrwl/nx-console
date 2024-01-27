@@ -52,9 +52,10 @@ import {
   getStartupMessage,
   getTransformedGeneratorSchema,
   hasAffectedProjects,
-  nxVersionOnWorkspaceRefresh,
+  resetNxVersionCache,
   nxWorkspace,
   resetProjectPathCache,
+  resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
@@ -535,8 +536,9 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 });
 
 async function reconfigure(workingPath: string) {
-  nxVersionOnWorkspaceRefresh();
+  resetNxVersionCache();
   resetProjectPathCache();
+  resetSourceMapFilesToProjectCache();
   await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 }
