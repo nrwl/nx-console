@@ -10,6 +10,7 @@ import { dirname, join } from 'path';
 import { gte } from 'semver';
 import {
   ExtensionContext,
+  TextDocument,
   Uri,
   ViewColumn,
   commands,
@@ -37,21 +38,31 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
 
 function getNxVersionAndRegisterCommand(context: ExtensionContext) {
   getNxVersion().then((nxVersion) => {
-    // eslint-disable-next-line no-constant-condition
     if (gte(nxVersion.version, '17.3.0-beta.3')) {
       const projectDetailsManager = new ProjectDetailsManager(context);
       commands.registerCommand(
         'nx.project-details.openToSide',
-        (expandTarget?: string) => {
+        (
+          config:
+            | {
+                document?: TextDocument;
+                expandTarget?: string;
+              }
+            | undefined
+        ) => {
           const isEnabled = GlobalConfigurationStore.instance.get(
             'showProjectDetailsView'
           );
           if (!isEnabled) return;
-          const document = window.activeTextEditor?.document;
+
+          let document = config?.document;
+          if (!document) {
+            document = window.activeTextEditor?.document;
+          }
           if (!document) return;
           projectDetailsManager.openProjectDetailsToSide(
             document,
-            expandTarget
+            config?.expandTarget
           );
         }
       );

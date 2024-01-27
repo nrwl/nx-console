@@ -41,12 +41,28 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
     }
 
     return [
-      new ConfigFileCodeLens(projectRoot, relativePath, new Range(0, 0, 0, 0)),
+      new RunTargetCodeLens(projectRoot, relativePath, new Range(0, 0, 0, 0)),
+      new OpenPDVCodeLens(
+        document,
+        projectRoot,
+        relativePath,
+        new Range(0, 0, 0, 0)
+      ),
     ];
   }
   async resolveCodeLens(
-    codeLens: ConfigFileCodeLens,
+    codeLens: RunTargetCodeLens | OpenPDVCodeLens,
     token: CancellationToken
+  ): Promise<CodeLens> {
+    if (OpenPDVCodeLens.is(codeLens)) {
+      return await this.resolveOpenPDVCodeLens(codeLens);
+    } else {
+      return await this.resolveRunTargetCodeLens(codeLens);
+    }
+  }
+
+  private async resolveRunTargetCodeLens(
+    codeLens: RunTargetCodeLens
   ): Promise<CodeLens> {
     const project = await getProjectByRoot(codeLens.projectRoot);
 
@@ -59,7 +75,7 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       return {
         ...codeLens,
         command: {
-          title: `Run ${project?.name}:${targetNames[0]} via nx`,
+          title: `$(play) Run ${project?.name}:${targetNames[0]} via nx`,
           command: 'nxConsole.config-codelens.run',
           arguments: [project?.name ?? '', targetNames[0]],
         },
@@ -72,6 +88,31 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
         title: project?.name ?? '',
         command: 'nxConsole.config-codelens.run',
         arguments: [project?.name ?? '', targetNames[0]],
+      },
+    };
+  }
+
+  private async resolveOpenPDVCodeLens(
+    codeLens: OpenPDVCodeLens
+  ): Promise<CodeLens> {
+    const project = await getProjectByRoot(codeLens.projectRoot);
+
+    const targets = await getTargetsForConfigFile(
+      project?.name ?? '',
+      codeLens.filePath
+    );
+    const targetNames = Object.keys(targets ?? {});
+    return {
+      ...codeLens,
+      command: {
+        title: `$(open-preview) Open Project Details View`,
+        command: 'nx.project-details.openToSide',
+        arguments: [
+          {
+            document: codeLens.document,
+            expandTarget: targetNames[0],
+          },
+        ],
       },
     };
   }
@@ -121,12 +162,31 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
   }
 }
 
-class ConfigFileCodeLens extends CodeLens {
+class RunTargetCodeLens extends CodeLens {
   constructor(
     public projectRoot: string,
     public filePath: string,
     range: Range
   ) {
     super(range);
+  }
+}
+
+class OpenPDVCodeLens extends CodeLens {
+  constructor(
+    public document: TextDocument,
+    public projectRoot: string,
+    public filePath: string,
+    range: Range
+  ) {
+    super(range);
+  }
+
+  static is(codeLens: CodeLens): codeLens is OpenPDVCodeLens {
+    return (
+      (codeLens as any).projectRoot &&
+      (codeLens as any).filePath &&
+      (codeLens as any).document
+    );
   }
 }
