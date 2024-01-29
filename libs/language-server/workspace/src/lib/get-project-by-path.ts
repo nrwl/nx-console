@@ -25,7 +25,14 @@ export async function getProjectByRoot(
   if (_rootProjectMap && _rootProjectMap[rootPath]) {
     return _rootProjectMap[rootPath];
   }
-  await getProjectsByPaths([], workspacePath);
+
+  const { workspace } = await nxWorkspace(workspacePath);
+  const rootProjectMap: Record<string, ProjectConfiguration> = {};
+  const projectEntries = Object.entries(workspace.projects);
+  for (const [, projectConfig] of projectEntries) {
+    rootProjectMap[projectConfig.root] = projectConfig;
+  }
+  _rootProjectMap = rootProjectMap;
 
   return _rootProjectMap?.[rootPath];
 }
@@ -51,14 +58,10 @@ export async function getProjectsByPaths(
   }
 
   const projectEntries = Object.entries(workspace.projects);
+
   const foundProjects: Map<string, ProjectConfiguration> = new Map();
 
-  const rootProjectMap: Record<string, ProjectConfiguration> = {};
-
   for (const [projectName, projectConfig] of projectEntries) {
-    if (projectConfig.root) {
-      rootProjectMap[projectConfig.root] = projectConfig;
-    }
     // If there is no files array, it's an old version of Nx and we need backwards compatibility
     if (!projectConfig.files) {
       new Map(pathsMap).forEach((_, path) => {
@@ -109,8 +112,6 @@ export async function getProjectsByPaths(
       break;
     }
   }
-
-  _rootProjectMap = rootProjectMap;
 
   return Object.fromEntries(foundProjects);
 }

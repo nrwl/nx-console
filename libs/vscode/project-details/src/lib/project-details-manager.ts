@@ -1,22 +1,7 @@
 import { getProjectByPath } from '@nx-console/vscode/nx-workspace';
 import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
-import {
-  ExtensionContext,
-  TextDocument,
-  Uri,
-  ViewColumn,
-  window,
-} from 'vscode';
+import { ExtensionContext, TextDocument, ViewColumn } from 'vscode';
 import { ProjectDetailsPreview } from './project-details-preview';
-import {
-  isPropertyAssignment,
-  isStringLiteral,
-  parseJsonText,
-} from 'typescript';
-import {
-  getProperties,
-  getPropertyName,
-} from '@nx-console/vscode/nx-config-decoration';
 
 export class ProjectDetailsManager {
   private previews: Map<string, ProjectDetailsPreview> = new Map();

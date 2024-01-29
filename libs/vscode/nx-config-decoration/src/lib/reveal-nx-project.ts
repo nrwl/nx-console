@@ -57,5 +57,7 @@ export async function revealNxProject(
   await window.showTextDocument(document, {
     selection: new Selection(position, position),
   });
-  commands.executeCommand('nx.project-details.openToSide', target?.name);
+  commands.executeCommand('nx.project-details.openToSide', {
+    expandTarget: target?.name,
+  });
 }
