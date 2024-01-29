@@ -360,6 +360,7 @@
       {
         "command": "nxConsole.showProjectConfiguration",
         "title": "Show project configuration",
+        "category": "Nx",
         "icon": "$(go-to-file)"
       },
       {

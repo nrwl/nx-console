@@ -149,10 +149,9 @@ async function getProjectForContext(
     ? (await getProjectByPath(filePath))?.name
     : undefined;
 
-  const selectedProjectName = await selectProject(
-    Object.keys(projects),
-    highlightedProject
-  );
+  const selectedProjectName = await selectProject(Object.keys(projects), {
+    highlightedProject,
+  });
   if (!selectedProjectName) return;
   return projects[selectedProjectName];
 }

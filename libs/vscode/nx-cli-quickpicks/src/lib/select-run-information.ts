@@ -187,24 +187,30 @@ async function getProjects(targetName?: string): Promise<string[]> {
 
 export async function selectProject(
   projects: string[],
-  highlightedProject?: string
+  options?: {
+    highlightedProject?: string;
+    placeholderText?: string;
+  }
 ): Promise<string | undefined> {
-  const quickPickItems = !highlightedProject
+  const quickPickItems = !options?.highlightedProject
     ? projects.map((p) => ({ label: p }))
     : projects
         .map((p) => ({
           label: p,
           iconPath:
-            p === highlightedProject ? new ThemeIcon('star-full') : undefined,
-          description: p === highlightedProject ? 'currently open' : undefined,
+            p === options?.highlightedProject
+              ? new ThemeIcon('star-full')
+              : undefined,
+          description:
+            p === options?.highlightedProject ? 'currently open' : undefined,
         }))
         .sort((a, b) => {
-          if (a.label === highlightedProject) return -1;
-          if (b.label === highlightedProject) return 1;
+          if (a.label === options?.highlightedProject) return -1;
+          if (b.label === options?.highlightedProject) return 1;
           return a.label.localeCompare(b.label);
         });
   const selected = await window.showQuickPick(quickPickItems, {
-    placeHolder: `Project to run`,
+    placeHolder: options?.placeholderText ?? `Project to run`,
   });
   return selected?.label;
 }
