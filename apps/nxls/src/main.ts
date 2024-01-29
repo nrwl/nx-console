@@ -20,6 +20,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
   NxTransformedGeneratorSchemaRequest,
   NxVersionRequest,
@@ -47,6 +48,7 @@ import {
   getProjectFolderTree,
   getProjectGraphOutput,
   getProjectsByPaths,
+  getSourceMapFilesToProjectMap,
   getStartupMessage,
   getTransformedGeneratorSchema,
   hasAffectedProjects,
@@ -473,6 +475,13 @@ connection.onRequest(NxHasAffectedProjectsRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   return hasAffectedProjects(WORKING_PATH, lspLogger);
+});
+
+connection.onRequest(NxSourceMapFilesToProjectMapRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return getSourceMapFilesToProjectMap(WORKING_PATH);
 });
 
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
