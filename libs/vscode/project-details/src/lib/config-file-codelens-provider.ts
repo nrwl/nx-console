@@ -28,7 +28,12 @@ import {
   TextDocument,
   commands,
   languages,
+  window,
 } from 'vscode';
+
+const CODELENS_RUN_TARGET_COMMAND = 'nxConsole.config-codelens.run';
+const CODELENS_OPEN_RUN_QUICKPICK_COMMAND =
+  'nxConsole.config-codelens.open-run-quickpick';
 
 export class ConfigFileCodelensProvider implements CodeLensProvider {
   constructor(
@@ -110,8 +115,8 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
   private async resolveRunTargetCodeLens(
     codeLens: RunTargetCodeLens
   ): Promise<CodeLens> {
+    console.log('project root', codeLens.projectRoot);
     const project = await getProjectByRoot(codeLens.projectRoot);
-
     const targets = await getTargetsForConfigFile(
       project?.name ?? '',
       codeLens.filePath
@@ -122,20 +127,30 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
         ...codeLens,
         command: {
           title: `$(play) Run ${project?.name}:${targetNames[0]} via nx`,
-          command: 'nxConsole.config-codelens.run',
+          command: CODELENS_RUN_TARGET_COMMAND,
           arguments: [project?.name ?? '', targetNames[0]],
         },
       };
-    }
+    } else {
+      const targetInfo = targetNames.map((targetName) => {
+        const target = targets?.[targetName];
+        const command =
+          target?.command ?? target?.options.command ?? target?.executor;
 
-    return {
-      ...codeLens,
-      command: {
-        title: project?.name ?? '',
-        command: 'nxConsole.config-codelens.run',
-        arguments: [project?.name ?? '', targetNames[0]],
-      },
-    };
+        return {
+          targetName,
+          command,
+        };
+      });
+      return {
+        ...codeLens,
+        command: {
+          title: `$(play) Run ${project?.name} targets via nx`,
+          command: CODELENS_OPEN_RUN_QUICKPICK_COMMAND,
+          arguments: [targetInfo, project?.name ?? '', codeLens.filePath],
+        },
+      };
+    }
   }
 
   private async resolveOpenPDVCodeLens(
@@ -167,6 +182,7 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
     const workspaceRoot = (await getNxWorkspace()).workspacePath;
     const initialSourceMapFilesToProjectMap =
       await getSourceMapFilesToProjectMap();
+    console.log('initial sourcemap ', initialSourceMapFilesToProjectMap);
 
     const codeLensProvider = new ConfigFileCodelensProvider(
       workspaceRoot,
@@ -177,6 +193,7 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       const updatedWorkspaceRoot = (await getNxWorkspace()).workspacePath;
       const updatedSourceMapFilesToProjectMap =
         await getSourceMapFilesToProjectMap();
+      console.log('updated sourcemap ', updatedSourceMapFilesToProjectMap);
 
       codeLensProvider.workspaceRoot = updatedWorkspaceRoot;
       codeLensProvider.sourceMapFilesToProjectMap =
@@ -191,7 +208,7 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
         codeLensProvider
       ),
       commands.registerCommand(
-        'nxConsole.config-codelens.run',
+        CODELENS_RUN_TARGET_COMMAND,
         (project: string, target: string) => {
           CliTaskProvider.instance.executeTask({
             command: 'run',
@@ -202,9 +219,47 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       )
     );
 
-    // commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
-    //   showProjectDetailsQuickpick(project);
-    // });
+    commands.registerCommand(
+      CODELENS_OPEN_RUN_QUICKPICK_COMMAND,
+      (
+        targets: { targetName: string; command: string }[],
+        projectName: string,
+        fileName: string
+      ) => {
+        if (targets.length === 0) {
+          window
+            .showErrorMessage(
+              `Couldn't find any targets for ${fileName}. Check the Nx Console Client output channel for any errors`,
+              'Open Output'
+            )
+            .then((value) => {
+              if (value === 'Open Output') {
+                commands.executeCommand('workbench.action.output.toggleOutput');
+              }
+            });
+          return;
+        }
+        window
+          .showQuickPick(
+            targets.map((target) => ({
+              label: target.targetName,
+              description: target.command,
+            })),
+            {
+              placeHolder: `Select nx target to run for ${fileName}`,
+            }
+          )
+          .then((selected) => {
+            if (selected) {
+              CliTaskProvider.instance.executeTask({
+                command: 'run',
+                positional: `${projectName}:${selected.label}`,
+                flags: [],
+              });
+            }
+          });
+      }
+    );
   }
 }
 
