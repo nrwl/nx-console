@@ -1,4 +1,5 @@
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { getProperties } from '@nx-console/vscode/nx-config-decoration';
 import {
   getNxWorkspace,
   getProjectByRoot,
@@ -7,6 +8,17 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { relative } from 'path';
+import {
+  ModifierFlags,
+  ScriptTarget,
+  createSourceFile,
+  getCombinedModifierFlags,
+  isExportAssignment,
+  isExportDeclaration,
+  isImportDeclaration,
+  parseJsonText,
+  Node,
+} from 'typescript';
 import {
   CancellationToken,
   CodeLens,
@@ -40,16 +52,50 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       return [];
     }
 
+    const location = this.getCodeLensLocation(document);
+
     return [
-      new RunTargetCodeLens(projectRoot, relativePath, new Range(0, 0, 0, 0)),
-      new OpenPDVCodeLens(
-        document,
-        projectRoot,
-        relativePath,
-        new Range(0, 0, 0, 0)
-      ),
+      new RunTargetCodeLens(projectRoot, relativePath, location),
+      new OpenPDVCodeLens(document, projectRoot, relativePath, location),
     ];
   }
+
+  private getCodeLensLocation(document: TextDocument): Range {
+    try {
+      if (['typescript', 'javascript'].includes(document.languageId)) {
+        const configFile = createSourceFile(
+          document.fileName,
+          document.getText(),
+          {
+            languageVersion: ScriptTarget.Latest,
+          }
+        );
+        let firstNonImportNode: Node | undefined = undefined;
+
+        for (const node of configFile.statements) {
+          if (isExportDeclaration(node) || isExportAssignment(node)) {
+            const pos = document.positionAt(node.getStart(configFile));
+            return new Range(pos, pos);
+          }
+
+          if (!firstNonImportNode && !isImportDeclaration(node)) {
+            firstNonImportNode = node;
+          }
+        }
+
+        if (firstNonImportNode) {
+          const pos = document.positionAt(
+            firstNonImportNode.getStart(configFile)
+          );
+          return new Range(pos, pos);
+        }
+      }
+      return new Range(0, 0, 0, 0);
+    } catch (e) {
+      return new Range(0, 0, 0, 0);
+    }
+  }
+
   async resolveCodeLens(
     codeLens: RunTargetCodeLens | OpenPDVCodeLens,
     token: CancellationToken
