@@ -1,5 +1,4 @@
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { getProperties } from '@nx-console/vscode/nx-config-decoration';
 import {
   getNxWorkspace,
   getProjectByRoot,
@@ -9,15 +8,12 @@ import {
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { relative } from 'path';
 import {
-  ModifierFlags,
+  Node,
   ScriptTarget,
   createSourceFile,
-  getCombinedModifierFlags,
   isExportAssignment,
   isExportDeclaration,
   isImportDeclaration,
-  parseJsonText,
-  Node,
 } from 'typescript';
 import {
   CancellationToken,
@@ -115,7 +111,6 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
   private async resolveRunTargetCodeLens(
     codeLens: RunTargetCodeLens
   ): Promise<CodeLens> {
-    console.log('project root', codeLens.projectRoot);
     const project = await getProjectByRoot(codeLens.projectRoot);
     const targets = await getTargetsForConfigFile(
       project?.name ?? '',
