@@ -43,20 +43,20 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
 
     init {
         CoroutineScope(Dispatchers.Default).launch {
-            val version = NxlsService.getInstance(project).nxVersion() ?: return@launch
+            try {
+                val version = NxlsService.getInstance(project).nxVersion() ?: return@launch
 
-            if (!version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
-                browser.loadHTML(
-                    """<h1 style="
+                if (!version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
+                    browser.loadHTML(
+                        """<h1 style="
                           font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
                           font-size: ${UIUtil.getLabelFont().size}px;
                           color: ${getHexColor(UIUtil.getActiveTextColor())};
                       ">The Project Details View is only available for Nx 17.3.0 and above</h1>
                       """
-                )
-                return@launch
-            }
-            try {
+                    )
+                    return@launch
+                }
                 var htmlText = loadGraphHtmlBase()
                 htmlText =
                     htmlText.replace(

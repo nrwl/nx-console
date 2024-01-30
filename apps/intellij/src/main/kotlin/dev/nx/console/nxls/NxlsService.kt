@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
@@ -27,9 +28,17 @@ class NxlsService(val project: Project) {
         return wrapper.languageClient
     }
 
-    private fun server(): NxlsLanguageServer? {
+    private suspend fun server(): NxlsLanguageServer? {
         if (!wrapper.isStarted()) {
-            return null
+            val started =
+                withTimeoutOrNull(10000) {
+                    wrapper.awaitStarted().await()
+                    true
+                }
+
+            if (started == null) {
+                return null
+            }
         }
         return wrapper.languageServer
     }
@@ -60,8 +69,8 @@ class NxlsService(val project: Project) {
             workspace().run {
                 project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
             }
+            server()?.getNxService()?.refreshWorkspace()
         }
-        server()?.getNxService()?.refreshWorkspace()
     }
 
     suspend fun workspace(): NxWorkspace? {
@@ -164,7 +173,9 @@ class NxlsService(val project: Project) {
     }
 
     fun changeWorkspace(workspacePath: String) {
-        server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath))
+        CoroutineScope(Dispatchers.Default).launch {
+            server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath))
+        }
     }
 
     fun isEditorConnected(editor: Editor): Boolean {
