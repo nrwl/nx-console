@@ -12,9 +12,9 @@ import kotlin.io.path.Path
 
 class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
-        return NxConsoleSettingsProvider.getInstance().showProjectDetailsView &&
-            (file.name.endsWith("project.json") || file.name.endsWith("package.json")) &&
-            (Path(project.nxBasePath, "package.json").toString() != file.path)
+        return (file.name.endsWith("project.json") || file.name.endsWith("package.json")) &&
+            (Path(project.nxBasePath, "package.json").toString() != file.path) &&
+            NxConsoleSettingsProvider.getInstance().showProjectDetailsView
     }
 
     override fun createEditor(project: Project, file: VirtualFile): FileEditor {

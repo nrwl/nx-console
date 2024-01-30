@@ -17,10 +17,7 @@ import com.intellij.openapi.vfs.readText
 import com.intellij.openapi.vfs.writeText
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.codeStyle.CodeStyleManager
-import com.intellij.ui.jcef.JBCefBrowser
-import com.intellij.ui.jcef.JBCefBrowserBase
-import com.intellij.ui.jcef.JBCefJSQuery
-import com.intellij.ui.jcef.executeJavaScriptAsync
+import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphBrowserBase
 import dev.nx.console.graph.NxGraphInteractionEvent
@@ -112,7 +109,7 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
 
     private fun loadProjectDetails(nxProjectName: String) {
         executeWhenLoaded {
-            browser.executeJavaScriptAsync(
+            browser.executeJavaScript(
                 "window.waitForRouter().then(() => window.externalApi.router?.navigate('/project-details/$nxProjectName'))"
             )
         }
@@ -181,7 +178,7 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                     ${query.inject("JSON.stringify(message)")}
                 }
                 """
-            browser.executeJavaScriptAsync(js)
+            browser.executeJavaScript(js)
         }
     }
 
