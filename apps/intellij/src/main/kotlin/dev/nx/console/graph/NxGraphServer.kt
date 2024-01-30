@@ -3,14 +3,17 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
+import dev.nx.console.graph.NxGraphRequest
+import dev.nx.console.nxls.NxWorkspaceRefreshListener
+import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.NxGeneralCommandLine
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import java.io.IOException
 import java.net.InetAddress
 import java.net.ServerSocket
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import kotlinx.coroutines.*
 
 data class WebviewRequest(val type: String, val id: String) {}
@@ -44,14 +47,65 @@ open class NxGraphServer(
     var currentPort: Int? = null
     private var nxGraphProcess: Process? = null
 
-    private var isStarted = false
+    private val client = HttpClient.newBuilder().build()
 
-    //    val updatedEventEmitter =
+    private var isStarted = false
+    private var isStarting = false
+
+    init {
+        with(project.messageBus.connect()) {
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                object : NxWorkspaceRefreshListener {
+                    override fun onNxWorkspaceRefresh() {
+                        CoroutineScope(Dispatchers.Default).launch {
+                            nxGraphProcess?.apply {
+                                if (!isAlive) {
+                                    start()
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    suspend fun handleGraphRequest(request: NxGraphRequest): NxGraphRequest {
+        if (nxGraphProcess?.isAlive != true) {
+            start()
+            waitForServerReady()
+        }
+        if (!isStarted) {
+            waitForServerReady()
+        }
+
+        var url = "http://localhost:${this.currentPort}/"
+        url +=
+            when (request.type) {
+                "requestProjectGraph" -> "project-graph.json"
+                "requestTaskGraph" -> "task-graph.json"
+                "requestExpandedTaskInputs" -> "task-inputs.json?taskId=${request.payload}"
+                "requestSourceMaps" -> "source-maps.json"
+                else -> throw Exception("unknown request type ${request.type}")
+            }
+
+        val httpRequest = HttpRequest.newBuilder().uri(URI.create(url)).build()
+
+        val response =
+            withContext(Dispatchers.IO) {
+                client.send(httpRequest, HttpResponse.BodyHandlers.ofString())
+            }
+        return NxGraphRequest(type = request.type, id = request.id, payload = response.body())
+    }
 
     fun start() {
-        if (isStarted) {
+        if ((isStarted && nxGraphProcess?.isAlive == true) || isStarting) {
             return
         }
+
+        isStarting = true
+        isStarted = false
         CoroutineScope(Dispatchers.Default).launch {
             var port = startPort
             var isPortAvailable = false
@@ -70,8 +124,10 @@ open class NxGraphServer(
                 listenForGraphUpdates()
 
                 isStarted = true
+                isStarting = false
             } catch (e: Exception) {
                 println("error while starting nx graph: $e")
+                isStarting = false
             }
         }
     }
