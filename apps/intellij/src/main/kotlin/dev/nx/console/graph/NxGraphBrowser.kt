@@ -9,6 +9,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.readText
+import com.intellij.ui.JBColor
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.ui.NxGraphDownloadHandler
@@ -113,7 +114,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                       body {
                         background-color: $backgroundColor !important;
                         color: ${getHexColor(
-            when (UIUtil.isUnderDarcula()) {
+            when (!JBColor.isBright()) {
               true -> UIUtil.getActiveTextColor()
               false -> UIUtil.getLabelForeground()
             }
@@ -257,7 +258,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
     fun selectAllProjects() {
         executeWhenLoaded {
-            browser.executeJavaScriptAsync(
+            browser.executeJavaScript(
                 "window.waitForRouter().then(() => {console.log('navigating to all'); window.externalApi.selectAllProjects();})"
             )
         }
@@ -265,7 +266,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
     fun focusProject(projectName: String) {
         executeWhenLoaded {
-            browser.executeJavaScriptAsync(
+            browser.executeJavaScript(
                 "window.waitForRouter().then(() => {console.log('navigating to $projectName'); window.externalApi.focusProject('$projectName')})"
             )
         }
@@ -273,7 +274,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
     fun focusTargetGroup(targetGroup: String) {
         executeWhenLoaded {
-            browser.executeJavaScriptAsync(
+            browser.executeJavaScript(
                 "window.waitForRouter().then(() => {console.log('navigating to group $targetGroup'); window.externalApi.selectAllTargetsByName('$targetGroup')})"
             )
         }
@@ -281,7 +282,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
     fun focusTarget(projectName: String, targetName: String) {
         executeWhenLoaded {
-            browser.executeJavaScriptAsync(
+            browser.executeJavaScript(
                 "window.waitForRouter().then(() => {console.log('navigating to target $projectName:$targetName'); window.externalApi.focusTarget('$projectName','$targetName')})"
             )
         }
@@ -310,7 +311,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                     ${query.inject("JSON.stringify(message)")}
                 }
                 """
-            browser.executeJavaScriptAsync(js)
+            browser.executeJavaScript(js)
         }
     }
 }

@@ -3,6 +3,7 @@ package dev.nx.console.generate.ui.file
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
+import com.intellij.ui.JBColor
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.generate.run_generator.RunGeneratorManager
@@ -53,16 +54,18 @@ class V2NxGenerateUiFile(
                     ${query.inject("message")}
             })
         """
-            browser.executeJavaScriptAsync(js)
+            CoroutineScope(Dispatchers.Default).launch {
+                browser.executeJavaScript(js)
 
-            postMessageToBrowser(GenerateUiStylesInputMessage(this.extractIntellijStyles()))
-            postMessageToBrowser(
-                GenerateUiConfigurationInputMessage(
-                    GenerateUiConfiguration(
-                        NxConsoleSettingsProvider.getInstance().enableDryRunOnGenerateChange
+                postMessageToBrowser(GenerateUiStylesInputMessage(extractIntellijStyles()))
+                postMessageToBrowser(
+                    GenerateUiConfigurationInputMessage(
+                        GenerateUiConfiguration(
+                            NxConsoleSettingsProvider.getInstance().enableDryRunOnGenerateChange
+                        )
                     )
                 )
-            )
+            }
 
             // we will send this info to the webview once it's initialized
             generator.options?.let {
@@ -122,14 +125,16 @@ class V2NxGenerateUiFile(
     private fun postMessageToBrowser(message: GenerateUiInputMessage) {
         val messageString = json.encodeToString(message)
         logger<NxGenerateUiFile>().info("posting message $messageString")
-        browser.executeJavaScriptAsync("""window.intellijApi.postToWebview($messageString)""")
+        CoroutineScope(Dispatchers.Default).launch {
+            browser.executeJavaScript("""window.intellijApi.postToWebview($messageString)""")
+        }
     }
 
     private fun extractIntellijStyles(): GenerateUiStyles {
         val backgroundColor = getHexColor(UIUtil.getPanelBackground())
         val foregroundColor =
             getHexColor(
-                when (UIUtil.isUnderDarcula()) {
+                when (!JBColor.isBright()) {
                     true -> UIUtil.getActiveTextColor()
                     false -> UIUtil.getLabelForeground()
                 }
