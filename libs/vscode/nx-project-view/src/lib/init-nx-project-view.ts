@@ -32,7 +32,9 @@ export async function showProjectConfiguration(selection: NxTreeItem) {
   getTelemetry().featureUsed('editWorkspaceJson');
   if (!selection) {
     const projects = await getNxWorkspaceProjects();
-    const project = await selectProject(Object.keys(projects));
+    const project = await selectProject(Object.keys(projects), {
+      placeholderText: 'Select project to show',
+    });
     if (!project) return;
     await revealNxProject(project, projects[project].root);
     return;
