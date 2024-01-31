@@ -11,6 +11,7 @@ import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
 import { SemVer, coerce, gte } from 'semver';
 import {
+  getNxDaemonClient,
   getNxOutput,
   getNxProjectGraph,
   getNxProjectGraphUtils,
@@ -43,13 +44,19 @@ export async function getNxWorkspaceConfig(
     (process.env as any).CI = false;
     (process.env as any).NX_PROJECT_GLOB_CACHE = false;
     (process.env as any).NX_WORKSPACE_ROOT_PATH = workspacePath;
-    const [nxWorkspacePackage, nxProjectGraph, nxOutput, nxProjectGraphUtils] =
-      await Promise.all([
-        getNxWorkspacePackageFileUtils(workspacePath, logger),
-        getNxProjectGraph(workspacePath, logger),
-        getNxOutput(workspacePath, logger),
-        getNxProjectGraphUtils(workspacePath, logger),
-      ]);
+    const [
+      nxWorkspacePackage,
+      nxProjectGraph,
+      nxOutput,
+      nxProjectGraphUtils,
+      nxDaemonClientModule,
+    ] = await Promise.all([
+      getNxWorkspacePackageFileUtils(workspacePath, logger),
+      getNxProjectGraph(workspacePath, logger),
+      getNxOutput(workspacePath, logger),
+      getNxProjectGraphUtils(workspacePath, logger),
+      getNxDaemonClient(workspacePath, logger),
+    ]);
 
     let workspaceConfiguration: NxWorkspaceConfiguration;
     try {
@@ -82,7 +89,6 @@ export async function getNxWorkspaceConfig(
           nxProjectGraph as any
         ).createProjectGraphAndSourceMapsAsync({
           exitOnError: false,
-          resetDaemonClient: true,
         });
         projectGraph = projectGraphAndSourceMaps.projectGraph;
         sourceMaps = projectGraphAndSourceMaps.sourceMaps;
@@ -91,7 +97,6 @@ export async function getNxWorkspaceConfig(
         lspLogger.log('createProjectGraphAsync');
         projectGraph = await nxProjectGraph.createProjectGraphAsync({
           exitOnError: false,
-          resetDaemonClient: true,
         });
         lspLogger.log('createProjectGraphAsync successful');
       }
@@ -120,6 +125,11 @@ export async function getNxWorkspaceConfig(
       projectFileMap,
       sourceMaps
     );
+
+    // reset the daemon client after getting all required information from the daemon
+    if (nxDaemonClientModule) {
+      nxDaemonClientModule.daemonClient.reset();
+    }
 
     // for (const project in workspaceConfiguration.projects) {
     //   for (const target in workspaceConfiguration.projects[project].targets) {
