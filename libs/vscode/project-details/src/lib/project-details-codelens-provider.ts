@@ -1,3 +1,4 @@
+import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getProperties,
   getPropertyName,
@@ -25,13 +26,24 @@ import {
   QuickPickItem,
   ThemeIcon,
   QuickPickItemKind,
+  EventEmitter,
 } from 'vscode';
 
 const OPEN_QUICKPICK_COMMAND = 'nxConsole.project-details.open-quickpick';
 
 export class ProjectDetailsCodelensProvider implements CodeLensProvider {
   constructor(private workspaceRoot: string) {}
-  onDidChangeCodeLenses?: Event<void> | undefined;
+
+  private changeEvent = new EventEmitter<void>();
+
+  public get onDidChangeCodeLenses(): Event<void> {
+    return this.changeEvent.event;
+  }
+
+  public refresh(): void {
+    this.changeEvent.fire();
+  }
+
   provideCodeLenses(
     document: TextDocument,
     token: CancellationToken
@@ -51,14 +63,26 @@ export class ProjectDetailsCodelensProvider implements CodeLensProvider {
   ): Promise<ProjectDetailsCodeLens | undefined> {
     const project = await getProjectByPath(codeLens.filePath);
     if (!project) {
-      return {
-        ...codeLens,
-        command: {
-          command: 'nx.run.target',
-          title: `$(play) Run Nx Targets`,
-        },
-      };
+      const error = (await getNxWorkspace()).error;
+      if (error) {
+        return {
+          ...codeLens,
+          command: {
+            command: 'nxConsole.error',
+            title: `$(error) Project graph computation failed. Click to see Details.`,
+          },
+        };
+      } else {
+        return {
+          ...codeLens,
+          command: {
+            command: 'nx.run.target',
+            title: `$(play) Run Nx Targets`,
+          },
+        };
+      }
     }
+
     let targetsString = Object.keys(project?.targets ?? {}).join(', ');
     if (targetsString.length > 50) {
       targetsString = targetsString.slice(0, 50 - 3) + '...';
@@ -99,15 +123,20 @@ export class ProjectDetailsCodelensProvider implements CodeLensProvider {
 
   static async register(context: ExtensionContext) {
     const workspaceRoot = (await getNxWorkspace()).workspacePath;
-    const codeLensProvider = languages.registerCodeLensProvider(
-      { pattern: '**/{package,project}.json' },
-      new ProjectDetailsCodelensProvider(workspaceRoot)
+    const codeLensProvider = new ProjectDetailsCodelensProvider(workspaceRoot);
+
+    context.subscriptions.push(
+      languages.registerCodeLensProvider(
+        { pattern: '**/{package,project}.json' },
+        codeLensProvider
+      )
     );
-    context.subscriptions.push(codeLensProvider);
 
     commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
       showProjectDetailsQuickpick(project);
     });
+
+    onWorkspaceRefreshed(() => codeLensProvider.refresh());
   }
 }
 

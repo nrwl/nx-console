@@ -52,13 +52,13 @@ import {
   getProjectsByPaths,
   getSourceMapFilesToProjectMap,
   getStartupMessage,
+  getTargetsForConfigFile,
   getTransformedGeneratorSchema,
   hasAffectedProjects,
-  resetNxVersionCache,
   nxWorkspace,
+  resetNxVersionCache,
   resetProjectPathCache,
   resetSourceMapFilesToProjectCache,
-  getTargetsForConfigFile,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
@@ -67,8 +67,6 @@ import { dirname, relative } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
-  PropertyASTNode,
-  StringASTNode,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {

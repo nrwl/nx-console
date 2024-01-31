@@ -30,7 +30,10 @@ export async function getNxWorkspaceConfig(
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
   daemonEnabled?: boolean;
+  error?: string;
 }> {
+  let error: string | undefined;
+
   const start = performance.now();
   logger.log('Retrieving workspace configuration');
 
@@ -64,10 +67,11 @@ export async function getNxWorkspaceConfig(
         format: 'nx',
         path: workspacePath,
       });
-    } catch {
+    } catch (e) {
       logger.log('Unable to read workspace config from nx workspace package');
       workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
         .workspaceConfiguration;
+      error = `${e.stack}`;
     }
 
     try {
@@ -103,6 +107,7 @@ export async function getNxWorkspaceConfig(
     } catch (e) {
       lspLogger.log('Unable to get project graph');
       lspLogger.log(e.stack);
+      error = `${e.stack}`;
     }
 
     let projectFileMap: ProjectFileMap = {};
@@ -131,26 +136,24 @@ export async function getNxWorkspaceConfig(
       nxDaemonClientModule.daemonClient.reset();
     }
 
-    // for (const project in workspaceConfiguration.projects) {
-    //   for (const target in workspaceConfiguration.projects[project].targets) {
-    //     if (target === 'nx-release-publish') {
-    //       delete workspaceConfiguration.projects[project].targets?.[target];
-    //     }
-    //   }
-    // }
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
 
     return {
       workspaceConfiguration,
+      error,
     };
   } catch (e) {
     lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
-    return readWorkspaceConfigs(workspacePath);
+    const config = await readWorkspaceConfigs(workspacePath);
+    return { ...config, error: `${e}` };
   }
 }
 
-async function readWorkspaceConfigs(basedir: string) {
+async function readWorkspaceConfigs(basedir: string): Promise<{
+  workspaceConfiguration: NxWorkspaceConfiguration;
+  configPath: string;
+}> {
   const workspaceJson: ProjectsConfigurations = (
     await readAndCacheJsonFile('workspace.json', basedir)
   ).json;

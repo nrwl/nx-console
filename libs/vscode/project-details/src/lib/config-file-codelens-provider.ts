@@ -25,6 +25,8 @@ import {
   commands,
   languages,
   window,
+  Event,
+  EventEmitter,
 } from 'vscode';
 
 const CODELENS_RUN_TARGET_COMMAND = 'nxConsole.config-codelens.run';
@@ -36,6 +38,16 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
     public workspaceRoot: string,
     public sourceMapFilesToProjectMap: Record<string, string>
   ) {}
+
+  private changeEvent = new EventEmitter<void>();
+
+  public get onDidChangeCodeLenses(): Event<void> {
+    return this.changeEvent.event;
+  }
+
+  public refresh(): void {
+    this.changeEvent.fire();
+  }
 
   async provideCodeLenses(
     document: TextDocument,
@@ -177,7 +189,6 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
     const workspaceRoot = (await getNxWorkspace()).workspacePath;
     const initialSourceMapFilesToProjectMap =
       await getSourceMapFilesToProjectMap();
-    console.log('initial sourcemap ', initialSourceMapFilesToProjectMap);
 
     const codeLensProvider = new ConfigFileCodelensProvider(
       workspaceRoot,
@@ -188,11 +199,12 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       const updatedWorkspaceRoot = (await getNxWorkspace()).workspacePath;
       const updatedSourceMapFilesToProjectMap =
         await getSourceMapFilesToProjectMap();
-      console.log('updated sourcemap ', updatedSourceMapFilesToProjectMap);
 
       codeLensProvider.workspaceRoot = updatedWorkspaceRoot;
       codeLensProvider.sourceMapFilesToProjectMap =
         updatedSourceMapFilesToProjectMap;
+
+      codeLensProvider.refresh();
     });
 
     context.subscriptions.push(

@@ -6,6 +6,23 @@ import { getNxVersion } from '@nx-console/language-server/workspace';
 import { gte } from 'semver';
 import type { WatchEvent } from 'nx/src/native';
 import { debounce } from '@nx-console/shared/utils';
+import { minimatch } from 'minimatch';
+
+const NX_PLUGIN_PATTERNS_TO_WATCH = [
+  '**/cypress.config.{js,ts,mjs,cjs}',
+  '**/{detox.config,.detoxrc}.{json,js}',
+  '**/app.{json,config.js}',
+  '**/jest.config.{cjs,mjs,js,cts,mts,ts}',
+  '**/next.config.{js,cjs,mjs}',
+  '**/nuxt.config.{js,ts,mjs,mts,cjs,cts}',
+  '**/playwright.config.{js,ts,cjs,cts,mjs,mts}',
+  '**/remix.config.{js,cjs,mjs}',
+  '**/.storybook/main.{js,ts,mjs,mts,cjs,cts}',
+  '**/{vite,vitest}.config.{js,ts,mjs,mts,cjs,cts}',
+  '**/webpack.config.{js,ts,mjs,cjs}',
+  '**/jest.preset.js',
+  '**/tsconfig.*.json',
+];
 
 export async function languageServerWatcher(
   workspacePath: string,
@@ -26,7 +43,10 @@ export async function languageServerWatcher(
             e.path.endsWith('package.json') ||
             e.path.endsWith('nx.json') ||
             e.path.endsWith('workspace.json') ||
-            e.path.endsWith('tsconfig.base.json')
+            e.path.endsWith('tsconfig.base.json') ||
+            NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
+              minimatch(e.path, pattern, { dot: true })
+            )
         )
       ) {
         lspLogger.log('Project configuration changed');

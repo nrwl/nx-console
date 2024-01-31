@@ -48,16 +48,16 @@ export class NxGraphServer implements Disposable {
       }
     | undefined
   > {
-    if (this.isCrashed) {
-      await this.start();
-    }
-    if (!this.isStarted) {
-      await this.waitForServerReady();
-    }
-
-    const { type, id } = request;
-
     try {
+      if (this.isCrashed) {
+        await this.start();
+      }
+      if (!this.isStarted) {
+        await this.waitForServerReady();
+      }
+
+      const { type, id } = request;
+
       let url = `http://localhost:${this.currentPort}/`;
       switch (type) {
         case 'requestProjectGraph':
@@ -88,6 +88,7 @@ export class NxGraphServer implements Disposable {
         payload: data,
       };
     } catch (error) {
+      console.log('error while handling webview request', error);
       return;
     }
   }
@@ -200,13 +201,25 @@ export class NxGraphServer implements Disposable {
   }
 
   private waitForServerReady(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      const timeout = 10000;
       const checkInterval = setInterval(async () => {
         if (this.isStarted) {
           clearInterval(checkInterval);
+          clearTimeout(timeoutId);
           resolve();
         }
+        if (this.isCrashed) {
+          clearTimeout(timeoutId);
+          clearInterval(checkInterval);
+          reject(new Error('Server crashed during startup'));
+        }
       }, 100);
+
+      const timeoutId = setTimeout(() => {
+        clearInterval(checkInterval);
+        reject(new Error('Server did not start within 10 seconds'));
+      }, timeout);
     });
   }
 
