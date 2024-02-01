@@ -71,7 +71,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
                         NxTargetDescriptor(nxProject, nxTarget)
                     }
-                    ?: return@launch
+                        ?: return@launch
 
             val nxGraphService = getNxGraphService(project) ?: return@launch
 
