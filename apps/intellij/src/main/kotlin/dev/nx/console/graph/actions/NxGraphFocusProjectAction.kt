@@ -1,9 +1,6 @@
 package dev.nx.console.graph.actions
 
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.CustomShortcutSet
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
@@ -24,6 +21,8 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
     init {
         useKeyMapShortcutSetOrDefault()
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     override fun update(e: AnActionEvent) {
         useKeyMapShortcutSetOrDefault()
