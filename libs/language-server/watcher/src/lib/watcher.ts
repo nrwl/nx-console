@@ -22,6 +22,8 @@ const NX_PLUGIN_PATTERNS_TO_WATCH = [
   '**/webpack.config.{js,ts,mjs,cjs}',
   '**/jest.preset.js',
   '**/tsconfig.*.json',
+  // nx-dotnet
+  '*{.csproj,fsproj,vbproj}',
 ];
 
 export async function languageServerWatcher(

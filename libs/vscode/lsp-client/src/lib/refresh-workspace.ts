@@ -1,5 +1,5 @@
 import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
-import { commands, EventEmitter, ExtensionContext } from 'vscode';
+import { commands, Disposable, EventEmitter, ExtensionContext } from 'vscode';
 import { sendNotification } from './configure-lsp-client';
 
 export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
@@ -14,8 +14,8 @@ function handleVSCodeRefresh() {
   sendNotification(NxWorkspaceRefreshNotification);
 }
 
-export function onWorkspaceRefreshed(callback: () => void) {
-  refreshedEventEmitter.event(callback);
+export function onWorkspaceRefreshed(callback: () => void): Disposable {
+  return refreshedEventEmitter.event(callback);
 }
 
 /**

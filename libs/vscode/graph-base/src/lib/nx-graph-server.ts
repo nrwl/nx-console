@@ -96,8 +96,11 @@ export class NxGraphServer implements Disposable {
   /**
    * starts nx graph server
    */
-  async start() {
+  async start(): Promise<{ error: string } | undefined> {
     if (this.isStarting) {
+      return;
+    }
+    if (this.isStarted && !this.isCrashed) {
       return;
     }
     this.isStarted = false;
@@ -114,16 +117,13 @@ export class NxGraphServer implements Disposable {
 
     this.currentPort = port;
     try {
-      const started = await this.spawnProcess(port);
-      if (started) {
-        this.isStarted = true;
-      } else {
-        console.log('couldnt start graph server');
-      }
+      await this.spawnProcess(port);
+      this.isStarted = true;
       this.isStarting = false;
     } catch (error) {
       console.error(`error while starting nx graph: ${error}`);
       this.isStarting = false;
+      return { error: `${error}` };
     }
   }
 
@@ -131,11 +131,11 @@ export class NxGraphServer implements Disposable {
     return !!this.nxGraphProcess && !!this.nxGraphProcess.exitCode;
   }
 
-  private async spawnProcess(port: number): Promise<boolean> {
+  private async spawnProcess(port: number): Promise<void> {
     console.log('trying to start graph at', port);
     const workspacePath = await getNxWorkspacePath();
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const nxGraphProcess = spawn(
         getPackageManagerCommand().exec,
         [
@@ -159,12 +159,13 @@ export class NxGraphServer implements Disposable {
       nxGraphProcess.stdout.setEncoding('utf8');
       nxGraphProcess.stderr.setEncoding('utf8');
 
+      let stdErrOutput = '';
       nxGraphProcess.stdout.on('data', (data) => {
         const text: string = data.toString().trim().toLowerCase();
 
         if (!text) return;
         if (text.includes(`${port}`)) {
-          resolve(true);
+          resolve();
           return;
         }
         if (text.includes('updated')) {
@@ -172,12 +173,11 @@ export class NxGraphServer implements Disposable {
         }
       });
       nxGraphProcess.stderr.on('data', (data) => {
-        console.log('graph server error:', data.toString());
-        resolve(false);
+        stdErrOutput += data.toString();
       });
       nxGraphProcess.on('exit', async () => {
         this.isStarted = false;
-        resolve(false);
+        reject(stdErrOutput);
       });
 
       this.nxGraphProcess = nxGraphProcess;
