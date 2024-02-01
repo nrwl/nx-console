@@ -1,3 +1,18 @@
+# [18.15.0](https://github.com/nrwl/nx-console/compare/vscode-v18.14.1...vscode-v18.15.0) (2024-02-01)
+
+
+### Bug Fixes
+
+* improve broken project graph error handling across the board ([#2007](https://github.com/nrwl/nx-console/issues/2007)) ([de6ba8c](https://github.com/nrwl/nx-console/commit/de6ba8c44c62c3fe6286cc1b1b36f0a0dea0c775))
+* reset daemon client after all daemon requests are completed only ([#2006](https://github.com/nrwl/nx-console/issues/2006)) ([96d070a](https://github.com/nrwl/nx-console/commit/96d070ac8c7ad20be851dd88da628447d5b9a098))
+* **vscode:** improve show nx project config action ([#2002](https://github.com/nrwl/nx-console/issues/2002)) ([c961909](https://github.com/nrwl/nx-console/commit/c96190937db231dc44e0eb1b636788c01fef1024))
+* **vscode:** show pdv open to side button on all files that define a project ([#1999](https://github.com/nrwl/nx-console/issues/1999)) ([dafb57f](https://github.com/nrwl/nx-console/commit/dafb57f99d5515dc8fa80ff3b6766ffbd4afbac5))
+
+
+### Features
+
+* **vscode:** show codelenses in config files that create targets ([#2001](https://github.com/nrwl/nx-console/issues/2001)) ([1a940b9](https://github.com/nrwl/nx-console/commit/1a940b93fd70eaed63a32a4b8fa3d13c99b719fb))
+
 ## [18.14.1](https://github.com/nrwl/nx-console/compare/vscode-v18.14.0...vscode-v18.14.1) (2024-01-25)
 
 
