@@ -52,6 +52,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             browser.cefBrowser
         )
         browser.setPageBackgroundColor(backgroundColor)
+        browser.setOpenLinksInExternalBrowser(true)
 
         queryMessenger.addHandler { msg ->
             when (msg) {

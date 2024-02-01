@@ -45,7 +45,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     init {
         try {
             loadHtml()
-            registerInteractionEventHandler(browser)
         } catch (e: Throwable) {
             logger<ProjectDetailsBrowser>().debug(e.message)
         }
@@ -216,6 +215,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     ApplicationManager.getApplication().invokeLater {
                         isShowingPDV = true
                         browser.loadHTML(htmlText)
+                        registerInteractionEventHandler(browser)
 
                         nxProjectName?.also { loadProjectDetails(it) }
                     }

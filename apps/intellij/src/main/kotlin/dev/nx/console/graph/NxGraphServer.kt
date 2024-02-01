@@ -170,13 +170,14 @@ open class NxGraphServer(
             // wait for process to start - signified by logging the port
             val reader = process.inputStream.bufferedReader()
             var stopWaiting = false
+            var line: String? = null
+            line = reader.readLineAsync()
 
             while (!stopWaiting) {
-                val line = reader.readLineAsync()?.trim()?.lowercase()
-
                 if (line != null && line.contains(port.toString())) {
                     stopWaiting = true
                 }
+                line = reader.readLineAsync()?.trim()?.lowercase()
             }
 
             process
