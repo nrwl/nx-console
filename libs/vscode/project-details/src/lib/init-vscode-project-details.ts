@@ -41,7 +41,7 @@ export function initVscodeProjectDetails(context: ExtensionContext) {
 
 function getNxVersionAndRegisterCommand(context: ExtensionContext) {
   getNxVersion().then((nxVersion) => {
-    if (gte(nxVersion.version, '17.3.0-beta.3')) {
+    if (gte(nxVersion.full, '17.3.0-beta.3')) {
       const projectDetailsManager = new ProjectDetailsManager(context);
       commands.registerCommand(
         'nx.project-details.openToSide',

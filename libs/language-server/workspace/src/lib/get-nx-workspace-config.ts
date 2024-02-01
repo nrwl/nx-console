@@ -7,7 +7,7 @@ import type {
 import { lspLogger } from '@nx-console/language-server/utils';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
-import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
+import { NxVersion, NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
 import { SemVer, coerce, gte } from 'semver';
 import {
@@ -21,7 +21,7 @@ import { performance } from 'perf_hooks';
 
 export async function getNxWorkspaceConfig(
   workspacePath: string,
-  nxVersion: SemVer,
+  nxVersion: NxVersion,
   logger: Logger
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
@@ -63,7 +63,7 @@ export async function getNxWorkspaceConfig(
 
     let workspaceConfiguration: NxWorkspaceConfiguration | undefined =
       undefined;
-    if (!gte(nxVersion, new SemVer('17.3.0'))) {
+    if (!gte(nxVersion.full, '17.3.0')) {
       try {
         workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
           format: 'nx',
@@ -89,7 +89,7 @@ export async function getNxWorkspaceConfig(
 
       if (nxVersion.major < 13) {
         projectGraph = (nxProjectGraph as any).createProjectGraph();
-      } else if (gte(nxVersion, coerce('17.2.0') ?? new SemVer('0.0.0'))) {
+      } else if (gte(nxVersion.full, '17.2.0')) {
         lspLogger.log('createProjectGraphAndSourceMapsAsync');
         const projectGraphAndSourceMaps = await (
           nxProjectGraph as any
@@ -113,7 +113,7 @@ export async function getNxWorkspaceConfig(
     }
 
     let projectFileMap: ProjectFileMap = {};
-    if (gte(nxVersion, new SemVer('16.3.1')) && projectGraph) {
+    if (gte(nxVersion.full, '16.3.1') && projectGraph) {
       projectFileMap =
         (await nxProjectGraphUtils?.createProjectFileMapUsingProjectGraph(
           projectGraph

@@ -14,6 +14,7 @@ private val log = logger<NxlsLanguageClient>()
 class NxlsLanguageClient : LanguageClient {
 
     val refreshCallbacks: MutableList<() -> Unit> = mutableListOf()
+
     override fun telemetryEvent(`object`: Any?) {
         TODO("Not yet implemented")
     }

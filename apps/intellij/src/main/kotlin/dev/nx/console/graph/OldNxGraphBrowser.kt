@@ -144,8 +144,7 @@ class OldNxGraphBrowser(
                 } else {
                     ""
                 }
-            }
-                ?: ""
+            } ?: ""
 
         val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
@@ -246,7 +245,7 @@ class OldNxGraphBrowser(
                 padding: 20px;
               }
             </style>
-            <p>Unable to load the project graph. The following error occured:</p>
+            <p>Unable to load the project graph. The following error occurred:</p>
             <pre>${errorMessage}</pre>
     """
                 .trimIndent()

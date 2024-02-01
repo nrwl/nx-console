@@ -7,7 +7,7 @@ import {
   Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
-import { NxWorkspace, TreeNode } from '@nx-console/shared/types';
+import { NxVersion, NxWorkspace, TreeNode } from '@nx-console/shared/types';
 import type {
   ProjectConfiguration,
   TargetConfiguration,
@@ -98,7 +98,7 @@ export const NxGeneratorContextV2Request: RequestType<
   unknown
 > = new RequestType('nx/generatorContextV2');
 
-export const NxVersionRequest: RequestType<undefined, SemVer, unknown> =
+export const NxVersionRequest: RequestType<undefined, NxVersion, unknown> =
   new RequestType('nx/version');
 
 export const NxProjectGraphOutputRequest: RequestType<

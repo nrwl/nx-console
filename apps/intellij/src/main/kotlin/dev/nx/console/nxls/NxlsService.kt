@@ -12,11 +12,9 @@ import dev.nx.console.nxls.server.*
 import dev.nx.console.nxls.server.requests.*
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.nxlsWorkingPath
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import java.lang.Runnable
+import kotlinx.coroutines.*
 import kotlinx.coroutines.future.await
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
@@ -45,13 +43,10 @@ class NxlsService(val project: Project) {
 
     suspend fun start() {
         wrapper.start()
+        awaitStarted()
         client()?.registerRefreshCallback {
             CoroutineScope(Dispatchers.Default).launch {
-                workspace().run {
-                    project.messageBus
-                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
-                        .onNxWorkspaceRefresh()
-                }
+                project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
             }
         }
     }
@@ -64,11 +59,9 @@ class NxlsService(val project: Project) {
         CoroutineScope(Dispatchers.Default).launch {
             if (!wrapper.isStarted()) {
                 start()
+                awaitStarted()
             }
 
-            workspace().run {
-                project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
-            }
             server()?.getNxService()?.refreshWorkspace()
         }
     }
@@ -82,8 +75,7 @@ class NxlsService(val project: Project) {
     suspend fun generators(): List<NxGenerator> {
         return withMessageIssueCatch("nx/generators") {
             server()?.getNxService()?.generators()?.await()
-        }()
-            ?: emptyList()
+        }() ?: emptyList()
     }
 
     suspend fun generatorOptions(
@@ -92,8 +84,7 @@ class NxlsService(val project: Project) {
         return withMessageIssueCatch("nx/generatorOptions") {
             val request = NxGeneratorOptionsRequest(requestOptions)
             server()?.getNxService()?.generatorOptions(request)?.await()
-        }()
-            ?: emptyList()
+        }() ?: emptyList()
     }
 
     suspend fun generatorContextFromPath(
@@ -117,8 +108,7 @@ class NxlsService(val project: Project) {
         val request = NxProjectsByPathsRequest(paths)
         return withMessageIssueCatch("nx/projectsByPaths") {
             server()?.getNxService()?.projectsByPaths(request)?.await()
-        }()
-            ?: emptyMap()
+        }() ?: emptyMap()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
@@ -150,8 +140,7 @@ class NxlsService(val project: Project) {
     suspend fun transformedGeneratorSchema(schema: GeneratorSchema): GeneratorSchema {
         return withMessageIssueCatch("nx/transformedGeneratorSchema") {
             server()?.getNxService()?.transformedGeneratorSchema(schema)?.await()
-        }()
-            ?: schema
+        }() ?: schema
     }
 
     suspend fun startupMessage(schema: GeneratorSchema): GenerateUiStartupMessageDefinition? {
@@ -161,7 +150,9 @@ class NxlsService(val project: Project) {
     }
 
     suspend fun nxVersion(): NxVersion? {
-        return this.workspace()?.nxVersion
+        return withMessageIssueCatch("nx/version") {
+            server()?.getNxService()?.version()?.await()
+        }()
     }
 
     fun addDocument(editor: Editor) {
@@ -184,6 +175,10 @@ class NxlsService(val project: Project) {
 
     fun runAfterStarted(block: Runnable) {
         wrapper.awaitStarted().thenRun(block)
+    }
+
+    suspend fun awaitStarted() {
+        wrapper.awaitStarted().await()
     }
 
     private fun <T> withMessageIssueCatch(

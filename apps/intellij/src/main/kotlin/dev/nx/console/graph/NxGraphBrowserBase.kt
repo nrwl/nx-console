@@ -59,8 +59,9 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 else -> {
                     try {
                         val messageParsed = Json.decodeFromString<NxGraphRequest>(msg)
-                        CoroutineScope(Dispatchers.Default).launch {
+                        CoroutineScope(Dispatchers.IO).launch {
                             val response = graphServer.handleGraphRequest(messageParsed)
+
                             browser.executeJavaScript(
                                 "window.intellij.handleResponse(${Json.encodeToString(response)})"
                             )
