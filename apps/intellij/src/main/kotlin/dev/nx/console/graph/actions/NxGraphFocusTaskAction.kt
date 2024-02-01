@@ -23,6 +23,8 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
         useKeyMapShortcutSetOrDefault()
     }
 
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
     override fun update(e: AnActionEvent) {
         useKeyMapShortcutSetOrDefault()
         if (e.place != "NxToolWindow" && targetDescriptor == null) {
