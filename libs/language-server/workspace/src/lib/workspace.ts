@@ -15,6 +15,7 @@ import {
 import { getNxWorkspaceConfig } from './get-nx-workspace-config';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { getNxVersion } from './get-nx-version';
+import { lspLogger } from '@nx-console/language-server/utils';
 
 const enum Status {
   not_started,
@@ -83,6 +84,7 @@ async function _workspace(
         appsDir: config.workspaceConfiguration.workspaceLayout?.appsDir,
         libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,
       },
+      error: config.error,
       nxVersion: {
         major: version.major,
         minor: version.minor,

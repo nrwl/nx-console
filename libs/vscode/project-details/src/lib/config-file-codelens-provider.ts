@@ -6,6 +6,7 @@ import {
   getTargetsForConfigFile,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/utils';
 import { relative } from 'path';
 import {
   Node,
@@ -25,6 +26,8 @@ import {
   commands,
   languages,
   window,
+  Event,
+  EventEmitter,
 } from 'vscode';
 
 const CODELENS_RUN_TARGET_COMMAND = 'nxConsole.config-codelens.run';
@@ -36,6 +39,16 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
     public workspaceRoot: string,
     public sourceMapFilesToProjectMap: Record<string, string>
   ) {}
+
+  private changeEvent = new EventEmitter<void>();
+
+  public get onDidChangeCodeLenses(): Event<void> {
+    return this.changeEvent.event;
+  }
+
+  public refresh(): void {
+    this.changeEvent.fire();
+  }
 
   async provideCodeLenses(
     document: TextDocument,
@@ -177,7 +190,6 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
     const workspaceRoot = (await getNxWorkspace()).workspacePath;
     const initialSourceMapFilesToProjectMap =
       await getSourceMapFilesToProjectMap();
-    console.log('initial sourcemap ', initialSourceMapFilesToProjectMap);
 
     const codeLensProvider = new ConfigFileCodelensProvider(
       workspaceRoot,
@@ -188,11 +200,12 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       const updatedWorkspaceRoot = (await getNxWorkspace()).workspacePath;
       const updatedSourceMapFilesToProjectMap =
         await getSourceMapFilesToProjectMap();
-      console.log('updated sourcemap ', updatedSourceMapFilesToProjectMap);
 
       codeLensProvider.workspaceRoot = updatedWorkspaceRoot;
       codeLensProvider.sourceMapFilesToProjectMap =
         updatedSourceMapFilesToProjectMap;
+
+      codeLensProvider.refresh();
     });
 
     context.subscriptions.push(
@@ -205,6 +218,7 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       commands.registerCommand(
         CODELENS_RUN_TARGET_COMMAND,
         (project: string, target: string) => {
+          getTelemetry().featureUsed('nx.config-file-codelens.run-target');
           CliTaskProvider.instance.executeTask({
             command: 'run',
             positional: `${project}:${target}`,
@@ -221,6 +235,11 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
         projectName: string,
         fileName: string
       ) => {
+        getTelemetry().featureUsed(
+          'nx.config-file-codelens.run-target-quickpick',
+          { fileName }
+        );
+
         if (targets.length === 0) {
           window
             .showErrorMessage(

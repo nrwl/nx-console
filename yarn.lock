@@ -25184,6 +25184,7 @@ __metadata:
     jsonc-parser: ^3.0.0
     lit: ^2.4.1
     memfs: ^3.4.7
+    minimatch: ^9.0.3
     mocha: ^10.0.0
     nx: 17.1.0-beta.4
     ovsx: ^0.7.1

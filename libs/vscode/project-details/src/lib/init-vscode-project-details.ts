@@ -5,7 +5,10 @@ import {
   getProjectByPath,
   getSourceMapFilesToProjectMap,
 } from '@nx-console/vscode/nx-workspace';
-import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
+import {
+  getTelemetry,
+  showNoProjectAtPathMessage,
+} from '@nx-console/vscode/utils';
 import { dirname, join } from 'path';
 import { gte } from 'semver';
 import {
@@ -77,6 +80,8 @@ function getNxVersionAndRegisterCommand(context: ExtensionContext) {
           'showProjectDetailsView'
         );
         if (!isEnabled) return;
+
+        getTelemetry().featureUsed('nx.open-pdv');
         const uri = window.activeTextEditor?.document.uri;
         if (!uri) return;
         const project = await getProjectByPath(uri.path);
