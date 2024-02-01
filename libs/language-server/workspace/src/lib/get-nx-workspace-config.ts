@@ -11,6 +11,7 @@ import { NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
 import { SemVer, coerce, gte } from 'semver';
 import {
+  getNxDaemonClient,
   getNxOutput,
   getNxProjectGraph,
   getNxProjectGraphUtils,
@@ -19,7 +20,8 @@ import {
 import { performance } from 'perf_hooks';
 
 let projectGraph: ProjectGraph | null = null;
-let sourceMaps: Record<string, Record<string, string[]>> | null = null;
+let sourceMaps: Record<string, Record<string, string[]>> | undefined =
+  undefined;
 
 export async function getNxWorkspaceConfig(
   workspacePath: string,
@@ -28,7 +30,10 @@ export async function getNxWorkspaceConfig(
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
   daemonEnabled?: boolean;
+  error?: string;
 }> {
+  let error: string | undefined;
+
   const start = performance.now();
   logger.log('Retrieving workspace configuration');
 
@@ -42,26 +47,35 @@ export async function getNxWorkspaceConfig(
     (process.env as any).CI = false;
     (process.env as any).NX_PROJECT_GLOB_CACHE = false;
     (process.env as any).NX_WORKSPACE_ROOT_PATH = workspacePath;
-    const [nxWorkspacePackage, nxProjectGraph, nxOutput, nxProjectGraphUtils] =
-      await Promise.all([
-        getNxWorkspacePackageFileUtils(workspacePath, logger),
-        getNxProjectGraph(workspacePath, logger),
-        getNxOutput(workspacePath, logger),
-        getNxProjectGraphUtils(workspacePath, logger),
-      ]);
+    const [
+      nxWorkspacePackage,
+      nxProjectGraph,
+      nxOutput,
+      nxProjectGraphUtils,
+      nxDaemonClientModule,
+    ] = await Promise.all([
+      getNxWorkspacePackageFileUtils(workspacePath, logger),
+      getNxProjectGraph(workspacePath, logger),
+      getNxOutput(workspacePath, logger),
+      getNxProjectGraphUtils(workspacePath, logger),
+      getNxDaemonClient(workspacePath, logger),
+    ]);
 
-    let workspaceConfiguration: NxWorkspaceConfiguration;
-    try {
-      workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
-        format: 'nx',
-        path: workspacePath,
-      });
-    } catch {
-      logger.log('Unable to read workspace config from nx workspace package');
-      workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
-        .workspaceConfiguration;
+    let workspaceConfiguration: NxWorkspaceConfiguration | undefined =
+      undefined;
+    if (!gte(nxVersion, new SemVer('17.3.0'))) {
+      try {
+        workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
+          format: 'nx',
+          path: workspacePath,
+        });
+      } catch (e) {
+        logger.log('Unable to read workspace config from nx workspace package');
+        workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
+          .workspaceConfiguration;
+        error = `${e.stack}`;
+      }
     }
-
     try {
       process.exit = function (code?: number) {
         console.warn('process.exit called with code', code);
@@ -81,7 +95,6 @@ export async function getNxWorkspaceConfig(
           nxProjectGraph as any
         ).createProjectGraphAndSourceMapsAsync({
           exitOnError: false,
-          resetDaemonClient: true,
         });
         projectGraph = projectGraphAndSourceMaps.projectGraph;
         sourceMaps = projectGraphAndSourceMaps.sourceMaps;
@@ -90,13 +103,13 @@ export async function getNxWorkspaceConfig(
         lspLogger.log('createProjectGraphAsync');
         projectGraph = await nxProjectGraph.createProjectGraphAsync({
           exitOnError: false,
-          resetDaemonClient: true,
         });
         lspLogger.log('createProjectGraphAsync successful');
       }
     } catch (e) {
       lspLogger.log('Unable to get project graph');
       lspLogger.log(e.stack);
+      error = `${e.stack}`;
     }
 
     let projectFileMap: ProjectFileMap = {};
@@ -113,32 +126,44 @@ export async function getNxWorkspaceConfig(
       });
     }
 
+    if (!workspaceConfiguration) {
+      workspaceConfiguration = {
+        version: 1,
+        projects: {},
+      };
+    }
+
     workspaceConfiguration = createNxWorkspaceConfiguration(
       workspaceConfiguration,
       projectGraph,
-      projectFileMap
+      projectFileMap,
+      sourceMaps
     );
 
-    // for (const project in workspaceConfiguration.projects) {
-    //   for (const target in workspaceConfiguration.projects[project].targets) {
-    //     if (target === 'nx-release-publish') {
-    //       delete workspaceConfiguration.projects[project].targets?.[target];
-    //     }
-    //   }
-    // }
+    // reset the daemon client after getting all required information from the daemon
+    if (nxDaemonClientModule) {
+      lspLogger.log('Resetting daemon client');
+      nxDaemonClientModule.daemonClient.reset();
+    }
+
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
 
     return {
       workspaceConfiguration,
+      error,
     };
   } catch (e) {
     lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
-    return readWorkspaceConfigs(workspacePath);
+    const config = await readWorkspaceConfigs(workspacePath);
+    return { ...config, error: `${e}` };
   }
 }
 
-async function readWorkspaceConfigs(basedir: string) {
+async function readWorkspaceConfigs(basedir: string): Promise<{
+  workspaceConfiguration: NxWorkspaceConfiguration;
+  configPath: string;
+}> {
   const workspaceJson: ProjectsConfigurations = (
     await readAndCacheJsonFile('workspace.json', basedir)
   ).json;
@@ -164,7 +189,7 @@ function createNxWorkspaceConfiguration(
   workspaceConfiguration: NxWorkspaceConfiguration,
   projectGraph: ProjectGraph | null,
   projectFileMap: ProjectFileMap,
-  sourceMaps?: Record<string, Record<string, string[]>>
+  sourceMaps: Record<string, Record<string, string[]>> | undefined
 ) {
   if (!projectGraph) {
     return workspaceConfiguration;
@@ -177,7 +202,7 @@ function createNxWorkspaceConfiguration(
   };
 
   for (const [projectName, node] of Object.entries(projectGraph.nodes)) {
-    const workspaceProject = workspaceConfiguration.projects[projectName];
+    const workspaceProject = workspaceConfiguration?.projects[projectName];
 
     if (!workspaceProject) {
       // Certain versions of Nx will include npm, (or other third party dependencies) in the project graph nodes.

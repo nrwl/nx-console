@@ -8,7 +8,10 @@ import {
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
 import { NxWorkspace, TreeNode } from '@nx-console/shared/types';
-import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type {
+  ProjectConfiguration,
+  TargetConfiguration,
+} from 'nx/src/devkit-exports';
 import { SemVer } from 'semver';
 import { StartupMessageDefinition } from 'shared/nx-console-plugins';
 import { NotificationType, RequestType } from 'vscode-languageserver/node';
@@ -65,6 +68,12 @@ export const NxProjectsByPathsRequest: RequestType<
   { [path: string]: ProjectConfiguration | undefined },
   unknown
 > = new RequestType('nx/projectsByPaths');
+
+export const NxProjectByRootRequest: RequestType<
+  { projectRoot: string },
+  ProjectConfiguration | null,
+  unknown
+> = new RequestType('nx/projectByRoot');
 
 export const NxGeneratorContextFromPathRequest: RequestType<
   {
@@ -134,3 +143,15 @@ export const NxHasAffectedProjectsRequest: RequestType<
   boolean,
   unknown
 > = new RequestType('nx/hasAffectedProjects');
+
+export const NxSourceMapFilesToProjectMapRequest: RequestType<
+  undefined,
+  Record<string, string>,
+  unknown
+> = new RequestType('nx/sourceMapFilesToProjectMap');
+
+export const NxTargetsForConfigFileRequest: RequestType<
+  { projectName: string; configFilePath: string },
+  Record<string, TargetConfiguration>,
+  unknown
+> = new RequestType('nx/targetsForConfigFile');

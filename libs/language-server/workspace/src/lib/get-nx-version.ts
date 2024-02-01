@@ -29,7 +29,7 @@ export async function getNxVersion(workspacePath: string): Promise<SemVer> {
   return nxVersion;
 }
 
-export async function nxVersionOnWorkspaceRefresh() {
+export async function resetNxVersionCache() {
   loadedNxPackage = false;
   nxWorkspacePackageJson = undefined;
 }

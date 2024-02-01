@@ -48,16 +48,16 @@ export class NxGraphServer implements Disposable {
       }
     | undefined
   > {
-    if (this.isCrashed) {
-      await this.start();
-    }
-    if (!this.isStarted) {
-      await this.waitForServerReady();
-    }
-
-    const { type, id } = request;
-
     try {
+      if (this.isCrashed) {
+        await this.start();
+      }
+      if (!this.isStarted) {
+        await this.waitForServerReady();
+      }
+
+      const { type, id } = request;
+
       let url = `http://localhost:${this.currentPort}/`;
       switch (type) {
         case 'requestProjectGraph':
@@ -88,6 +88,7 @@ export class NxGraphServer implements Disposable {
         payload: data,
       };
     } catch (error) {
+      console.log('error while handling webview request', error);
       return;
     }
   }
@@ -95,8 +96,11 @@ export class NxGraphServer implements Disposable {
   /**
    * starts nx graph server
    */
-  async start() {
+  async start(): Promise<{ error: string } | undefined> {
     if (this.isStarting) {
+      return;
+    }
+    if (this.isStarted && !this.isCrashed) {
       return;
     }
     this.isStarted = false;
@@ -113,16 +117,13 @@ export class NxGraphServer implements Disposable {
 
     this.currentPort = port;
     try {
-      const started = await this.spawnProcess(port);
-      if (started) {
-        this.isStarted = true;
-      } else {
-        console.log('couldnt start graph server');
-      }
+      await this.spawnProcess(port);
+      this.isStarted = true;
       this.isStarting = false;
     } catch (error) {
       console.error(`error while starting nx graph: ${error}`);
       this.isStarting = false;
+      return { error: `${error}` };
     }
   }
 
@@ -130,11 +131,11 @@ export class NxGraphServer implements Disposable {
     return !!this.nxGraphProcess && !!this.nxGraphProcess.exitCode;
   }
 
-  private async spawnProcess(port: number): Promise<boolean> {
+  private async spawnProcess(port: number): Promise<void> {
     console.log('trying to start graph at', port);
     const workspacePath = await getNxWorkspacePath();
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const nxGraphProcess = spawn(
         getPackageManagerCommand().exec,
         [
@@ -158,12 +159,13 @@ export class NxGraphServer implements Disposable {
       nxGraphProcess.stdout.setEncoding('utf8');
       nxGraphProcess.stderr.setEncoding('utf8');
 
+      let stdErrOutput = '';
       nxGraphProcess.stdout.on('data', (data) => {
         const text: string = data.toString().trim().toLowerCase();
 
         if (!text) return;
         if (text.includes(`${port}`)) {
-          resolve(true);
+          resolve();
           return;
         }
         if (text.includes('updated')) {
@@ -171,12 +173,11 @@ export class NxGraphServer implements Disposable {
         }
       });
       nxGraphProcess.stderr.on('data', (data) => {
-        console.log('graph server error:', data.toString());
-        resolve(false);
+        stdErrOutput += data.toString();
       });
       nxGraphProcess.on('exit', async () => {
         this.isStarted = false;
-        resolve(false);
+        reject(stdErrOutput);
       });
 
       this.nxGraphProcess = nxGraphProcess;
@@ -200,13 +201,25 @@ export class NxGraphServer implements Disposable {
   }
 
   private waitForServerReady(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      const timeout = 10000;
       const checkInterval = setInterval(async () => {
         if (this.isStarted) {
           clearInterval(checkInterval);
+          clearTimeout(timeoutId);
           resolve();
         }
+        if (this.isCrashed) {
+          clearTimeout(timeoutId);
+          clearInterval(checkInterval);
+          reject(new Error('Server crashed during startup'));
+        }
       }, 100);
+
+      const timeoutId = setTimeout(() => {
+        clearInterval(checkInterval);
+        reject(new Error('Server did not start within 10 seconds'));
+      }, timeout);
     });
   }
 

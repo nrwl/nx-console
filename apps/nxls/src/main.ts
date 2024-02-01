@@ -17,10 +17,13 @@ import {
   NxGeneratorsRequestOptions,
   NxHasAffectedProjectsRequest,
   NxProjectByPathRequest,
+  NxProjectByRootRequest,
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
+  NxTargetsForConfigFileRequest,
   NxTransformedGeneratorSchemaRequest,
   NxVersionRequest,
   NxWorkspacePathRequest,
@@ -47,12 +50,15 @@ import {
   getProjectFolderTree,
   getProjectGraphOutput,
   getProjectsByPaths,
+  getSourceMapFilesToProjectMap,
   getStartupMessage,
+  getTargetsForConfigFile,
   getTransformedGeneratorSchema,
   hasAffectedProjects,
-  nxVersionOnWorkspaceRefresh,
   nxWorkspace,
+  resetNxVersionCache,
   resetProjectPathCache,
+  resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
@@ -61,8 +67,6 @@ import { dirname, relative } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
-  PropertyASTNode,
-  StringASTNode,
   TextDocument,
 } from 'vscode-json-languageservice';
 import {
@@ -382,6 +386,19 @@ connection.onRequest(
   }
 );
 
+connection.onRequest(
+  NxProjectByRootRequest,
+  async (args: { projectRoot: string }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getProjectByRoot(args.projectRoot, WORKING_PATH);
+  }
+);
+
 // TODO: REMOVE ONCE OLD GENERATE UI IS GONE
 connection.onRequest(
   NxGeneratorContextFromPathRequest,
@@ -475,6 +492,30 @@ connection.onRequest(NxHasAffectedProjectsRequest, async () => {
   return hasAffectedProjects(WORKING_PATH, lspLogger);
 });
 
+connection.onRequest(NxSourceMapFilesToProjectMapRequest, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+  return getSourceMapFilesToProjectMap(WORKING_PATH);
+});
+
+connection.onRequest(
+  NxTargetsForConfigFileRequest,
+  async (args: { projectName: string; configFilePath: string }) => {
+    if (!WORKING_PATH) {
+      return new ResponseError(
+        1000,
+        'Unable to get Nx info: no workspace path'
+      );
+    }
+    return getTargetsForConfigFile(
+      args.projectName,
+      args.configFilePath,
+      WORKING_PATH
+    );
+  }
+);
+
 connection.onNotification(NxWorkspaceRefreshNotification, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
@@ -526,8 +567,9 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 });
 
 async function reconfigure(workingPath: string) {
-  nxVersionOnWorkspaceRefresh();
+  resetNxVersionCache();
   resetProjectPathCache();
+  resetSourceMapFilesToProjectCache();
   await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 }

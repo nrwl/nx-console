@@ -34,6 +34,8 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
         )
     }
 
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
     override fun update(e: AnActionEvent) {
         if (e.place == "NxToolWindow") {
             if (

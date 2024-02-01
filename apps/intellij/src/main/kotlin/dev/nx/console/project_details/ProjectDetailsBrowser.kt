@@ -17,15 +17,13 @@ import com.intellij.openapi.vfs.readText
 import com.intellij.openapi.vfs.writeText
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.codeStyle.CodeStyleManager
-import com.intellij.ui.jcef.JBCefBrowser
-import com.intellij.ui.jcef.JBCefBrowserBase
-import com.intellij.ui.jcef.JBCefJSQuery
-import com.intellij.ui.jcef.executeJavaScriptAsync
+import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphBrowserBase
 import dev.nx.console.graph.NxGraphInteractionEvent
 import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.models.NxVersion
+import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.jcef.getHexColor
@@ -45,9 +43,8 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
 
     init {
         CoroutineScope(Dispatchers.Default).launch {
-            graphServer.waitForServerReady()
-            graphServer.currentPort?.also { port ->
-                val version = NxlsService.getInstance(project).nxVersion() ?: return@also
+            try {
+                val version = NxlsService.getInstance(project).nxVersion() ?: return@launch
 
                 if (!version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
                     browser.loadHTML(
@@ -60,12 +57,11 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                     )
                     return@launch
                 }
-                try {
-                    var htmlText = loadGraphHtmlBase(port)
-                    htmlText =
-                        htmlText.replace(
-                            "</head>".toRegex(),
-                            """
+                var htmlText = loadGraphHtmlBase()
+                htmlText =
+                    htmlText.replace(
+                        "</head>".toRegex(),
+                        """
                     <style>
                     body {
                     font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
@@ -74,45 +70,52 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                     </style>
                     </head>
                   """
-                                .trimIndent()
-                        )
-                    browser.loadHTML(htmlText)
-                    registerInteractionEventHandler(browser)
+                            .trimIndent()
+                    )
+                browser.loadHTML(htmlText)
+                registerInteractionEventHandler(browser)
 
-                    val nxlsService = NxlsService.getInstance(project)
+                val nxlsService = NxlsService.getInstance(project)
 
-                    val completionSignal = CompletableDeferred<Unit>()
-                    nxlsService.runAfterStarted { completionSignal.complete(Unit) }
-                    completionSignal.await()
+                val completionSignal = CompletableDeferred<Unit>()
+                nxlsService.runAfterStarted { completionSignal.complete(Unit) }
+                completionSignal.await()
 
-                    val nxProjectName = nxlsService.projectByPath(file.path)?.name
-                    if (nxProjectName == null) {
-                        Notifier.notifyNoProject(project, file.path)
-                    } else {
-                        this@ProjectDetailsBrowser.nxProjectName = nxProjectName
-                        loadProjectDetails(nxProjectName)
-                    }
-                } catch (e: Throwable) {
-                    logger<ProjectDetailsBrowser>().debug(e.message)
+                val nxProjectName = nxlsService.projectByPath(file.path)?.name
+                if (nxProjectName == null) {
+                    Notifier.notifyNoProject(project, file.path)
+                } else {
+                    this@ProjectDetailsBrowser.nxProjectName = nxProjectName
+                    loadProjectDetails(nxProjectName)
                 }
+            } catch (e: Throwable) {
+                logger<ProjectDetailsBrowser>().debug(e.message)
             }
+        }
 
-            with(project.messageBus.connect()) {
-                subscribe(
-                    NxGraphServer.NX_GRAPH_SERVER_REFRESH,
-                    object : NxGraphServerRefreshListener {
-                        override fun onRefresh() {
-                            nxProjectName?.also { loadProjectDetails(it) }
-                        }
+        with(project.messageBus.connect()) {
+            subscribe(
+                NxGraphServer.NX_GRAPH_SERVER_REFRESH,
+                object : NxGraphServerRefreshListener {
+                    override fun onRefresh() {
+                        nxProjectName?.also { loadProjectDetails(it) }
                     }
-                )
-            }
+                }
+            )
+            subscribe(
+                NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
+                object : NxWorkspaceRefreshListener {
+                    override fun onNxWorkspaceRefresh() {
+                        nxProjectName?.also { loadProjectDetails(it) }
+                    }
+                }
+            )
         }
     }
 
     private fun loadProjectDetails(nxProjectName: String) {
         executeWhenLoaded {
-            browser.executeJavaScriptAsync(
+            browser.executeJavaScript(
                 "window.waitForRouter().then(() => window.externalApi.router?.navigate('/project-details/$nxProjectName'))"
             )
         }
@@ -181,7 +184,7 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                     ${query.inject("JSON.stringify(message)")}
                 }
                 """
-            browser.executeJavaScriptAsync(js)
+            browser.executeJavaScript(js)
         }
     }
 

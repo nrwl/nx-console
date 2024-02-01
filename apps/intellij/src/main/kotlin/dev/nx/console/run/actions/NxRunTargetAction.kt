@@ -15,7 +15,7 @@ class NxRunTargetAction : AnAction() {
         templatePresentation.isHideGroupIfEmpty = true
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return

@@ -207,7 +207,7 @@
         {
           "command": "nx.project-details.openToSide",
           "group": "navigation",
-          "when": "(resourceFilename === project.json || resourceFilename === package.json) && resourcePath not in nxConsole.ignoredPDVPaths && config.nxConsole.showProjectDetailsView"
+          "when": "resourcePath in nxConsole.pdvPaths && config.nxConsole.showProjectDetailsView"
         }
       ],
       "commandPalette": [
@@ -360,6 +360,7 @@
       {
         "command": "nxConsole.showProjectConfiguration",
         "title": "Show project configuration",
+        "category": "Nx",
         "icon": "$(go-to-file)"
       },
       {

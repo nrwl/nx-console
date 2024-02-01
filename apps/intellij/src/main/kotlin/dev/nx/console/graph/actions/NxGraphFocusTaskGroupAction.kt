@@ -1,5 +1,6 @@
 package dev.nx.console.graph.actions
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CustomShortcutSet
 import com.intellij.openapi.application.ApplicationManager
@@ -28,6 +29,8 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
             e.presentation.icon = NxIcons.Action
         }
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return

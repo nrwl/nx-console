@@ -5,6 +5,7 @@ data class NxWorkspace(
     val workspace: NxWorkspaceConfiguration,
     val daemonEnabled: Boolean?,
     val workspacePath: String,
+    val error: String?,
     val isLerna: Boolean,
     val nxVersion: NxVersion,
     val isEncapsulatedNx: Boolean,
