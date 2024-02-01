@@ -6,6 +6,7 @@ import {
   getTargetsForConfigFile,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/utils';
 import { relative } from 'path';
 import {
   Node,
@@ -217,6 +218,7 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       commands.registerCommand(
         CODELENS_RUN_TARGET_COMMAND,
         (project: string, target: string) => {
+          getTelemetry().featureUsed('nx.config-file-codelens.run-target');
           CliTaskProvider.instance.executeTask({
             command: 'run',
             positional: `${project}:${target}`,
@@ -233,6 +235,11 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
         projectName: string,
         fileName: string
       ) => {
+        getTelemetry().featureUsed(
+          'nx.config-file-codelens.run-target-quickpick',
+          { fileName }
+        );
+
         if (targets.length === 0) {
           window
             .showErrorMessage(

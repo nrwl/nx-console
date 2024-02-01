@@ -8,6 +8,7 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
+import { getTelemetry } from '@nx-console/vscode/utils';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { JsonSourceFile, parseJsonText } from 'typescript';
 import {
@@ -68,7 +69,7 @@ export class ProjectDetailsCodelensProvider implements CodeLensProvider {
         return {
           ...codeLens,
           command: {
-            command: 'nxConsole.error',
+            command: 'nx.project-details.openToSide',
             title: `$(error) Project graph computation failed. Click to see Details.`,
           },
         };
@@ -141,6 +142,7 @@ export class ProjectDetailsCodelensProvider implements CodeLensProvider {
 }
 
 function showProjectDetailsQuickpick(project: ProjectConfiguration) {
+  getTelemetry().featureUsed('nx.open-project-details-codelens');
   const quickPick = window.createQuickPick();
   const targetItems: QuickPickItem[] = Object.entries(
     project.targets ?? {}

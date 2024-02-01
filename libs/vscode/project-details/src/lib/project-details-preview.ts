@@ -6,8 +6,12 @@ import {
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import {
+  getNxWorkspace,
+  getProjectByPath,
+} from '@nx-console/vscode/nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
+import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import {
   ExtensionContext,
@@ -25,14 +29,16 @@ export class ProjectDetailsPreview {
 
   private isShowingErrorHtml = false;
 
+  public projectRoot: string | undefined;
+
   constructor(
-    private projectName: string,
+    private path: string,
     extensionContext: ExtensionContext,
     private expandedTarget?: string
   ) {
     this.webviewPanel = window.createWebviewPanel(
       'nx-console-project-details',
-      `${projectName} Details`,
+      `Project Details`,
       ViewColumn.Beside,
       {
         enableScripts: true,
@@ -85,8 +91,17 @@ export class ProjectDetailsPreview {
   }
 
   private async loadHtml() {
-    const error = (await getNxWorkspace()).error;
-    console.log('loading html, found error ? ', !!error);
+    let error = (await getNxWorkspace()).error;
+    const project = await getProjectByPath(this.path);
+
+    if (!project) {
+      if (!error) {
+        error = `No project found at path ${this.path}`;
+      }
+    } else {
+      this.projectRoot = project.root;
+    }
+
     let html: string;
     if (error) {
       html = await this.loadErrorHtml(error);
@@ -120,7 +135,7 @@ export class ProjectDetailsPreview {
         /*html*/ `
         <script type="module">
           await window.waitForRouter()
-          window.externalApi.openProjectDetails('${this.projectName}'${
+          window.externalApi.openProjectDetails('${project?.name}'${
           this.expandedTarget ? `, '${this.expandedTarget}'` : ''
         })
         </script>
@@ -129,6 +144,7 @@ export class ProjectDetailsPreview {
       );
       html = html.replace('<body', '<body style="padding: 0rem;" ');
       this.isShowingErrorHtml = false;
+      this.webviewPanel.title = `${project?.name} Details`;
     }
 
     this.webviewPanel.webview.html = html;
