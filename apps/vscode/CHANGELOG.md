@@ -1,3 +1,10 @@
+## [18.15.1](https://github.com/nrwl/nx-console/compare/vscode-v18.15.0...vscode-v18.15.1) (2024-02-01)
+
+
+### Bug Fixes
+
+* **nxls:** don't cache projectGraph & sourceMaps when recalculating the workspace config ([#2009](https://github.com/nrwl/nx-console/issues/2009)) ([c4da459](https://github.com/nrwl/nx-console/commit/c4da4597c40d352b208fc068b0c62e1e0d471354))
+
 # [18.15.0](https://github.com/nrwl/nx-console/compare/vscode-v18.14.1...vscode-v18.15.0) (2024-02-01)
 
 
