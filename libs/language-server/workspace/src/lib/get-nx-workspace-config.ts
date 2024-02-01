@@ -61,19 +61,21 @@ export async function getNxWorkspaceConfig(
       getNxDaemonClient(workspacePath, logger),
     ]);
 
-    let workspaceConfiguration: NxWorkspaceConfiguration;
-    try {
-      workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
-        format: 'nx',
-        path: workspacePath,
-      });
-    } catch (e) {
-      logger.log('Unable to read workspace config from nx workspace package');
-      workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
-        .workspaceConfiguration;
-      error = `${e.stack}`;
+    let workspaceConfiguration: NxWorkspaceConfiguration | undefined =
+      undefined;
+    if (!gte(nxVersion, new SemVer('17.3.0'))) {
+      try {
+        workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
+          format: 'nx',
+          path: workspacePath,
+        });
+      } catch (e) {
+        logger.log('Unable to read workspace config from nx workspace package');
+        workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
+          .workspaceConfiguration;
+        error = `${e.stack}`;
+      }
     }
-
     try {
       process.exit = function (code?: number) {
         console.warn('process.exit called with code', code);
@@ -124,6 +126,13 @@ export async function getNxWorkspaceConfig(
       });
     }
 
+    if (!workspaceConfiguration) {
+      workspaceConfiguration = {
+        version: 1,
+        projects: {},
+      };
+    }
+
     workspaceConfiguration = createNxWorkspaceConfiguration(
       workspaceConfiguration,
       projectGraph,
@@ -133,6 +142,7 @@ export async function getNxWorkspaceConfig(
 
     // reset the daemon client after getting all required information from the daemon
     if (nxDaemonClientModule) {
+      lspLogger.log('Resetting daemon client');
       nxDaemonClientModule.daemonClient.reset();
     }
 
@@ -179,7 +189,7 @@ function createNxWorkspaceConfiguration(
   workspaceConfiguration: NxWorkspaceConfiguration,
   projectGraph: ProjectGraph | null,
   projectFileMap: ProjectFileMap,
-  sourceMaps?: Record<string, Record<string, string[]>>
+  sourceMaps: Record<string, Record<string, string[]>> | undefined
 ) {
   if (!projectGraph) {
     return workspaceConfiguration;
@@ -192,7 +202,7 @@ function createNxWorkspaceConfiguration(
   };
 
   for (const [projectName, node] of Object.entries(projectGraph.nodes)) {
-    const workspaceProject = workspaceConfiguration.projects[projectName];
+    const workspaceProject = workspaceConfiguration?.projects[projectName];
 
     if (!workspaceProject) {
       // Certain versions of Nx will include npm, (or other third party dependencies) in the project graph nodes.

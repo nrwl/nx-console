@@ -31,10 +31,12 @@ export async function languageServerWatcher(
   callback: () => unknown
 ): Promise<() => void> {
   const version = await getNxVersion(workspacePath);
+  const debouncedCallback = debounce(callback, 500);
 
   if (gte(version.version, '16.4.0')) {
     const native = await import('nx/src/native');
     const watcher = new native.Watcher(workspacePath);
+
     watcher.watch((err: string | null, events: WatchEvent[]) => {
       if (err) {
         lspLogger.log('Error watching files: ' + err);
@@ -52,7 +54,7 @@ export async function languageServerWatcher(
         )
       ) {
         lspLogger.log('Project configuration changed');
-        debounce(callback, 500)();
+        debouncedCallback();
       }
     });
 
@@ -77,7 +79,7 @@ export async function languageServerWatcher(
           )
         ) {
           lspLogger.log('Project configuration changed');
-          debounce(callback, 500)();
+          debouncedCallback();
         }
       },
       watcherOptions(workspacePath)
