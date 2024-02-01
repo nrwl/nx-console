@@ -19,10 +19,6 @@ import {
 } from './get-nx-workspace-package';
 import { performance } from 'perf_hooks';
 
-let projectGraph: ProjectGraph | null = null;
-let sourceMaps: Record<string, Record<string, string[]>> | undefined =
-  undefined;
-
 export async function getNxWorkspaceConfig(
   workspacePath: string,
   nxVersion: SemVer,
@@ -32,6 +28,10 @@ export async function getNxWorkspaceConfig(
   daemonEnabled?: boolean;
   error?: string;
 }> {
+  let projectGraph: ProjectGraph | null = null;
+  let sourceMaps: Record<string, Record<string, string[]>> | undefined =
+    undefined;
+
   let error: string | undefined;
 
   const start = performance.now();
