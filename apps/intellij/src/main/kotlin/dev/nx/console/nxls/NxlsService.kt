@@ -75,7 +75,8 @@ class NxlsService(val project: Project) {
     suspend fun generators(): List<NxGenerator> {
         return withMessageIssueCatch("nx/generators") {
             server()?.getNxService()?.generators()?.await()
-        }() ?: emptyList()
+        }()
+            ?: emptyList()
     }
 
     suspend fun generatorOptions(
@@ -84,7 +85,8 @@ class NxlsService(val project: Project) {
         return withMessageIssueCatch("nx/generatorOptions") {
             val request = NxGeneratorOptionsRequest(requestOptions)
             server()?.getNxService()?.generatorOptions(request)?.await()
-        }() ?: emptyList()
+        }()
+            ?: emptyList()
     }
 
     suspend fun generatorContextFromPath(
@@ -108,7 +110,8 @@ class NxlsService(val project: Project) {
         val request = NxProjectsByPathsRequest(paths)
         return withMessageIssueCatch("nx/projectsByPaths") {
             server()?.getNxService()?.projectsByPaths(request)?.await()
-        }() ?: emptyMap()
+        }()
+            ?: emptyMap()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
@@ -140,7 +143,8 @@ class NxlsService(val project: Project) {
     suspend fun transformedGeneratorSchema(schema: GeneratorSchema): GeneratorSchema {
         return withMessageIssueCatch("nx/transformedGeneratorSchema") {
             server()?.getNxService()?.transformedGeneratorSchema(schema)?.await()
-        }() ?: schema
+        }()
+            ?: schema
     }
 
     suspend fun startupMessage(schema: GeneratorSchema): GenerateUiStartupMessageDefinition? {
