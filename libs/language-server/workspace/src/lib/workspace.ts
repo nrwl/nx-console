@@ -70,8 +70,8 @@ async function _workspace(
   logger: Logger
 ): Promise<NxWorkspace> {
   try {
-    const version = await getNxVersion(workspacePath);
-    const config = await getNxWorkspaceConfig(workspacePath, version, logger);
+    const nxVersion = await getNxVersion(workspacePath);
+    const config = await getNxWorkspaceConfig(workspacePath, nxVersion, logger);
 
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
     return {
@@ -85,11 +85,7 @@ async function _workspace(
         libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,
       },
       error: config.error,
-      nxVersion: {
-        major: version.major,
-        minor: version.minor,
-        full: version.version,
-      },
+      nxVersion,
       workspacePath,
     };
   } catch (e) {

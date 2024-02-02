@@ -1,6 +1,7 @@
 package dev.nx.console.graph
 
 import NxGraphServer
+import com.intellij.ide.ui.UISettingsListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
@@ -37,7 +38,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browser: JBCefBrowser = JBCefBrowser()
     protected val graphServer: NxGraphServer = StandardNxGraphServer.getInstance(project)
 
-    protected val backgroundColor = getHexColor(UIUtil.getPanelBackground())
+    protected var backgroundColor = getHexColor(UIUtil.getPanelBackground())
     protected val queryMessenger = JBCefJSQuery.create(browser as JBCefBrowserBase)
     protected val browserLoadedState: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -51,7 +52,10 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             OpenDevToolsContextMenuHandler(),
             browser.cefBrowser
         )
-        browser.setPageBackgroundColor(backgroundColor)
+        browser.setOpenLinksInExternalBrowser(true)
+
+        registerThemeListener()
+        setColors()
 
         queryMessenger.addHandler { msg ->
             when (msg) {
@@ -59,8 +63,9 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 else -> {
                     try {
                         val messageParsed = Json.decodeFromString<NxGraphRequest>(msg)
-                        CoroutineScope(Dispatchers.Default).launch {
+                        CoroutineScope(Dispatchers.IO).launch {
                             val response = graphServer.handleGraphRequest(messageParsed)
+
                             browser.executeJavaScript(
                                 "window.intellij.handleResponse(${Json.encodeToString(response)})"
                             )
@@ -264,6 +269,38 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             } else {
                 browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
             }
+        }
+    }
+
+    private fun registerThemeListener() {
+        val connection = ApplicationManager.getApplication().messageBus.connect()
+        connection.subscribe(UISettingsListener.TOPIC, UISettingsListener { setColors() })
+    }
+
+    private fun setColors() {
+        backgroundColor = getHexColor(UIUtil.getPanelBackground())
+        browser.setPageBackgroundColor(backgroundColor)
+        executeWhenLoaded {
+            browser.executeJavaScript(
+                """
+                const isDark = ${!JBColor.isBright()};
+              const body = document.body;
+
+              const darkClass = 'vscode-dark';
+              const lightClass = 'vscode-light';
+
+              body.classList.remove(darkClass, lightClass);
+
+              if (isDark) {
+                  body.classList.add(darkClass);
+              } else {
+                  body.classList.add(lightClass);
+              }
+              console.log("$backgroundColor")
+              body.style.setProperty('background-color', '$backgroundColor', 'important');
+                """
+                    .trimIndent()
+            )
         }
     }
 

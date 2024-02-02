@@ -1,7 +1,5 @@
 package dev.nx.console.project_details
 
-import NxGraphServer
-import NxGraphServerRefreshListener
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import com.intellij.notification.NotificationType
@@ -29,84 +27,53 @@ import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.nxProjectConfigurationPath
 import dev.nx.console.utils.nxWorkspace
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
-class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
+class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     NxGraphBrowserBase(project), DumbAware {
 
     private var nxProjectName: String? = null
+    private var isShowingPDV = false
+
+    private var currentLoadHtmlJob: Job? = null
 
     init {
-        CoroutineScope(Dispatchers.Default).launch {
-            try {
-                val version = NxlsService.getInstance(project).nxVersion() ?: return@launch
-
-                if (!version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
-                    browser.loadHTML(
-                        """<h1 style="
-                          font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
-                          font-size: ${UIUtil.getLabelFont().size}px;
-                          color: ${getHexColor(UIUtil.getActiveTextColor())};
-                      ">The Project Details View is only available for Nx 17.3.0 and above</h1>
-                      """
-                    )
-                    return@launch
-                }
-                var htmlText = loadGraphHtmlBase()
-                htmlText =
-                    htmlText.replace(
-                        "</head>".toRegex(),
-                        """
-                    <style>
-                    body {
-                    font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
-                    font-size: ${UIUtil.getLabelFont().size}px;
-                    }
-                    </style>
-                    </head>
-                  """
-                            .trimIndent()
-                    )
-                browser.loadHTML(htmlText)
-                registerInteractionEventHandler(browser)
-
-                val nxlsService = NxlsService.getInstance(project)
-
-                val completionSignal = CompletableDeferred<Unit>()
-                nxlsService.runAfterStarted { completionSignal.complete(Unit) }
-                completionSignal.await()
-
-                val nxProjectName = nxlsService.projectByPath(file.path)?.name
-                if (nxProjectName == null) {
-                    Notifier.notifyNoProject(project, file.path)
-                } else {
-                    this@ProjectDetailsBrowser.nxProjectName = nxProjectName
-                    loadProjectDetails(nxProjectName)
-                }
-            } catch (e: Throwable) {
-                logger<ProjectDetailsBrowser>().debug(e.message)
-            }
+        try {
+            loadHtml()
+        } catch (e: Throwable) {
+            logger<ProjectDetailsBrowser>().debug(e.message)
         }
 
         with(project.messageBus.connect()) {
             subscribe(
-                NxGraphServer.NX_GRAPH_SERVER_REFRESH,
-                object : NxGraphServerRefreshListener {
-                    override fun onRefresh() {
-                        nxProjectName?.also { loadProjectDetails(it) }
-                    }
-                }
-            )
-            subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                 object : NxWorkspaceRefreshListener {
                     override fun onNxWorkspaceRefresh() {
-                        nxProjectName?.also { loadProjectDetails(it) }
+                        CoroutineScope(Dispatchers.Default).launch {
+                            try {
+                                val error = NxlsService.getInstance(project).workspace()?.error
+                                if (error != null) {
+                                    loadHtml()
+                                } else if (isShowingPDV) {
+                                    nxProjectName.also {
+                                        if (it != null) {
+                                            loadProjectDetails(it)
+                                        } else {
+                                            loadHtml()
+                                        }
+                                    }
+                                } else {
+                                    loadHtml()
+                                }
+                            } catch (e: Throwable) {
+                                logger<ProjectDetailsBrowser>().debug(e.message)
+                            }
+                        }
                     }
                 }
             )
@@ -116,7 +83,7 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
     private fun loadProjectDetails(nxProjectName: String) {
         executeWhenLoaded {
             browser.executeJavaScript(
-                "window.waitForRouter().then(() => window.externalApi.router?.navigate('/project-details/$nxProjectName'))"
+                "window.waitForRouter().then(() => {console.log('waited for router', window.externalApi, '$nxProjectName'); window.externalApi.openProjectDetails('$nxProjectName')})"
             )
         }
     }
@@ -186,6 +153,98 @@ class ProjectDetailsBrowser(project: Project, file: VirtualFile) :
                 """
             browser.executeJavaScript(js)
         }
+    }
+
+    private fun loadHtml() {
+        if (currentLoadHtmlJob?.isActive == true) {
+            currentLoadHtmlJob?.cancel()
+        }
+        currentLoadHtmlJob =
+            CoroutineScope(Dispatchers.Default).launch {
+                try {
+                    isShowingPDV = false
+                    val nxlsService = NxlsService.getInstance(project)
+                    nxlsService.awaitStarted()
+
+                    val version = nxlsService.nxVersion()
+
+                    if (
+                        version == null ||
+                            !version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))
+                    ) {
+                        ApplicationManager.getApplication().invokeLater {
+                            browser.loadHTML(
+                                """<h1 style="
+                          font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
+                          font-size: ${UIUtil.getLabelFont().size}px;
+                          color: ${getHexColor(UIUtil.getActiveTextColor())};
+                      ">The Project Details View is only available for Nx 17.3.0 and above</h1>
+                      """
+                            )
+                        }
+                        return@launch
+                    }
+                    var error = nxlsService.workspace()?.error
+                    val nxProjectName = nxlsService.projectByPath(file.path)?.name
+                    this@ProjectDetailsBrowser.nxProjectName = nxProjectName
+                    if (nxProjectName == null && error == null) {
+                        error = "Unable to find Nx project for file: ${file.path}"
+                    }
+                    if (error != null) {
+                        ApplicationManager.getApplication().invokeLater {
+                            browser.loadHTML(loadErrorHtml(error))
+                        }
+                        isShowingPDV = false
+                        return@launch
+                    }
+                    var htmlText = loadGraphHtmlBase()
+                    htmlText =
+                        htmlText.replace(
+                            "</head>".toRegex(),
+                            """
+                    <style>
+                    body {
+                    font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
+                    font-size: ${UIUtil.getLabelFont().size}px;
+                    }
+                    </style>
+                    </head>
+                  """
+                                .trimIndent()
+                        )
+                    ApplicationManager.getApplication().invokeLater {
+                        isShowingPDV = true
+                        browser.loadHTML(htmlText)
+                        registerInteractionEventHandler(browser)
+
+                        nxProjectName?.also { loadProjectDetails(it) }
+                    }
+                } catch (e: Throwable) {
+                    logger<ProjectDetailsBrowser>().debug(e.message)
+                }
+            }
+    }
+
+    private fun loadErrorHtml(error: String): String {
+        return """
+       <style>
+              body {
+                    background-color: ${getHexColor(UIUtil.getPanelBackground())} !important;
+                    color: ${getHexColor(UIUtil.getLabelForeground())};
+                    font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+              }
+              pre {
+                white-space: pre-wrap;
+                border-radius: 5px;
+                border: 2px solid ${getHexColor(UIUtil.getLabelForeground())};
+                padding: 20px;
+              }
+            </style>
+            <p>Unable to load the project graph. The following error occurred:</p>
+      <pre>${error}</pre>
+    """
+            .trimIndent()
     }
 
     private fun addTargetToProjectConfig(

@@ -160,7 +160,7 @@ export class ProjectDetailsPreview {
           padding: 20px;
         }
       </style>
-      <p>Unable to load the project graph. The following error occured:</p>
+      <p>Unable to load the project graph. The following error occurred:</p>
       <pre>${error}</pre>
     `;
   }

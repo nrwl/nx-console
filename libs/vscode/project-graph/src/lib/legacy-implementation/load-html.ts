@@ -410,7 +410,7 @@ function injectedScript() {
 
 async function setNxConsoleEnvironment() {
   const nxVersion = await getNxVersion();
-  if (gte(nxVersion.version, '16.6.0')) {
+  if (gte(nxVersion.full, '16.6.0')) {
     return '<script> window.environment = "nx-console"</script>';
   } else {
     return '';
