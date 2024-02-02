@@ -62,6 +62,7 @@ import {
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
+import { NxWorkspace } from '@nx-console/shared/types';
 import { formatError } from '@nx-console/shared/utils';
 import { dirname, relative } from 'node:path';
 import {
@@ -95,6 +96,8 @@ let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
   //noop
 };
+
+let reconfigureAttempts = 0;
 
 const workspaceContext = {
   resolveRelativePath: (relativePath: string, resource: string) => {
@@ -133,10 +136,10 @@ connection.onInitialize(async (params) => {
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {
-        await reconfigure(WORKING_PATH!);
-        await connection.sendNotification(
-          NxWorkspaceRefreshNotification.method
-        );
+        if (!WORKING_PATH) {
+          return;
+        }
+        reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
       }
     );
   } catch (e) {
@@ -521,8 +524,7 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
 
-  await reconfigure(WORKING_PATH);
-  await connection.sendNotification(NxWorkspaceRefreshNotification.method);
+  reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 connection.onNotification(
@@ -566,12 +568,43 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   await reconfigure(WORKING_PATH);
 });
 
-async function reconfigure(workingPath: string) {
+async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
+  const workspace = await reconfigure(workingPath);
+  await connection.sendNotification(NxWorkspaceRefreshNotification.method);
+
+  if (!workspace?.error) {
+    reconfigureAttempts = 0;
+    return;
+  }
+
+  if (reconfigureAttempts < 5) {
+    reconfigureAttempts++;
+    lspLogger.log(
+      `reconfiguration failed, trying again in ${
+        reconfigureAttempts * reconfigureAttempts
+      } seconds`
+    );
+    new Promise((resolve) =>
+      setTimeout(resolve, 1000 * reconfigureAttempts * reconfigureAttempts)
+    ).then(() => reconfigureAndSendNotificationWithBackoff(workingPath));
+  } else {
+    lspLogger.log(
+      `reconfiguration failed after ${reconfigureAttempts} attempts`
+    );
+    reconfigureAttempts = 0;
+  }
+}
+
+async function reconfigure(
+  workingPath: string
+): Promise<NxWorkspace | undefined> {
   resetNxVersionCache();
   resetProjectPathCache();
   resetSourceMapFilesToProjectCache();
-  await nxWorkspace(workingPath, lspLogger, true);
+  const workspace = await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
+
+  return workspace;
 }
 
 function getJsonDocument(document: TextDocument) {
