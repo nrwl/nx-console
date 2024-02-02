@@ -69,9 +69,7 @@ open class NxGraphServer(
         }
     }
 
-    suspend fun handleGraphRequest(
-        request: NxGraphRequest,
-    ): NxGraphRequest {
+    suspend fun handleGraphRequest(request: NxGraphRequest, attempt: Int = 0): NxGraphRequest {
         try {
 
             if (nxGraphProcess?.isAlive != true && !isStarting) {
@@ -106,6 +104,9 @@ open class NxGraphServer(
             return NxGraphRequest(type = request.type, id = request.id, payload = response.body())
         } catch (e: Throwable) {
             logger.info("error while handling graph request: $e")
+            if (attempt == 0) {
+                return handleGraphRequest(request, 1)
+            }
             return request
         }
     }
