@@ -1,3 +1,12 @@
+## [18.15.3](https://github.com/nrwl/nx-console/compare/vscode-v18.15.2...vscode-v18.15.3) (2024-02-02)
+
+
+### Bug Fixes
+
+* handle error states better, especially in intellij ([#2010](https://github.com/nrwl/nx-console/issues/2010)) ([9ca2fb4](https://github.com/nrwl/nx-console/commit/9ca2fb4c304e4e204ba87e1e88f8002b51a2a664))
+* **vscode:** reload pdv by navigating with the router ([#2015](https://github.com/nrwl/nx-console/issues/2015)) ([5f43593](https://github.com/nrwl/nx-console/commit/5f43593aeddcb13c86bcf83d5340f41f131ddc22))
+* **vscode:** set started to false on failure ([#2014](https://github.com/nrwl/nx-console/issues/2014)) ([ed1dcb1](https://github.com/nrwl/nx-console/commit/ed1dcb141638a2ee1892cd30486f1b07508d33e8))
+
 ## [18.15.2](https://github.com/nrwl/nx-console/compare/vscode-v18.15.1...vscode-v18.15.2) (2024-02-02)
 
 
