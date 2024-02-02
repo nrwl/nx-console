@@ -116,13 +116,9 @@ export class ProjectDetailsPreview {
         window.addEventListener('message', ({ data }) => {
           const { type, payload } = data;
           if(type === 'reload') {
-            console.log('reloading')
-            const currentLocation = window.externalApi.router.state.location;
-  
-            const newUrl = currentLocation.pathname + currentLocation.search
-            window.externalApi.router.navigate(newUrl, {
-              preventScrollReset: true,
-            });
+            window.waitForRouter().then(() => {
+              window.externalApi.openProjectDetails('${project?.name}')
+            })  
           }
         });
       </script>
@@ -160,7 +156,7 @@ export class ProjectDetailsPreview {
           padding: 20px;
         }
       </style>
-      <p>Unable to load the project graph. The following error occured:</p>
+      <p>Unable to load the project graph. The following error occurred:</p>
       <pre>${error}</pre>
     `;
   }

@@ -118,11 +118,13 @@ export class NxGraphServer implements Disposable {
     this.currentPort = port;
     try {
       await this.spawnProcess(port);
+      console.log('successfully started nx graph at port', port);
       this.isStarted = true;
       this.isStarting = false;
     } catch (error) {
       console.error(`error while starting nx graph: ${error}`);
       this.isStarting = false;
+      this.isStarted = false;
       return { error: `${error}` };
     }
   }
@@ -132,7 +134,6 @@ export class NxGraphServer implements Disposable {
   }
 
   private async spawnProcess(port: number): Promise<void> {
-    console.log('trying to start graph at', port);
     const workspacePath = await getNxWorkspacePath();
 
     return new Promise((resolve, reject) => {

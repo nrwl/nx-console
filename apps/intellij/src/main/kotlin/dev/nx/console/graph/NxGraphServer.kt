@@ -2,7 +2,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
-import com.intellij.util.messages.Topic
+import com.intellij.util.io.readLineAsync
 import dev.nx.console.graph.NxGraphRequest
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
@@ -47,8 +47,6 @@ open class NxGraphServer(
     var currentPort: Int? = null
     private var nxGraphProcess: Process? = null
 
-    private val client = HttpClient.newBuilder().build()
-
     private var isStarted = false
     private var isStarting = false
 
@@ -71,32 +69,46 @@ open class NxGraphServer(
         }
     }
 
-    suspend fun handleGraphRequest(request: NxGraphRequest): NxGraphRequest {
-        if (nxGraphProcess?.isAlive != true) {
-            start()
-            waitForServerReady()
-        }
-        if (!isStarted) {
-            waitForServerReady()
-        }
+    suspend fun handleGraphRequest(request: NxGraphRequest, attempt: Int = 0): NxGraphRequest {
+        try {
 
-        var url = "http://localhost:${this.currentPort}/"
-        url +=
-            when (request.type) {
-                "requestProjectGraph" -> "project-graph.json"
-                "requestTaskGraph" -> "task-graph.json"
-                "requestExpandedTaskInputs" -> "task-inputs.json?taskId=${request.payload}"
-                "requestSourceMaps" -> "source-maps.json"
-                else -> throw Exception("unknown request type ${request.type}")
+            if (nxGraphProcess?.isAlive != true && !isStarting) {
+                start()
+                waitForServerReady()
+            }
+            if (!isStarted) {
+                waitForServerReady()
             }
 
-        val httpRequest = HttpRequest.newBuilder().uri(URI.create(url)).build()
+            var url = "http://localhost:${this.currentPort}/"
+            url +=
+                when (request.type) {
+                    "requestProjectGraph" -> "project-graph.json"
+                    "requestTaskGraph" -> "task-graph.json"
+                    "requestExpandedTaskInputs" -> "task-inputs.json?taskId=${request.payload}"
+                    "requestSourceMaps" -> "source-maps.json"
+                    else -> throw Exception("unknown request type ${request.type}")
+                }
 
-        val response =
-            withContext(Dispatchers.IO) {
-                client.send(httpRequest, HttpResponse.BodyHandlers.ofString())
+            val response =
+                withContext(Dispatchers.IO) {
+                    val client = HttpClient.newBuilder().build()
+
+                    val httpRequest =
+                        HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header("Accept-Encoding", "gzip, deflate")
+                            .build()
+                    client.send(httpRequest, HttpResponse.BodyHandlers.ofString())
+                }
+            return NxGraphRequest(type = request.type, id = request.id, payload = response.body())
+        } catch (e: Throwable) {
+            logger.info("error while handling graph request: $e")
+            if (attempt == 0) {
+                return handleGraphRequest(request, 1)
             }
-        return NxGraphRequest(type = request.type, id = request.id, payload = response.body())
+            return request
+        }
     }
 
     fun start() {
@@ -121,7 +133,6 @@ open class NxGraphServer(
                 val process = spawnProcess(port)
                 nxGraphProcess = process
                 handleGraphProcessError(process)
-                listenForGraphUpdates()
 
                 isStarted = true
                 isStarting = false
@@ -160,13 +171,14 @@ open class NxGraphServer(
             // wait for process to start - signified by logging the port
             val reader = process.inputStream.bufferedReader()
             var stopWaiting = false
+            var line: String? = null
+            line = reader.readLineAsync()
 
-            while (!stopWaiting && reader.ready()) {
-                val line = reader.readLine()?.trim()?.lowercase()
-
+            while (!stopWaiting) {
                 if (line != null && line.contains(port.toString())) {
                     stopWaiting = true
                 }
+                line = reader.readLineAsync()?.trim()?.lowercase()
             }
 
             process
@@ -183,25 +195,11 @@ open class NxGraphServer(
         }
     }
 
-    private fun listenForGraphUpdates() {
-        nxGraphProcess?.also {
-            CoroutineScope(Dispatchers.IO).launch {
-                it.inputStream.bufferedReader().use { reader ->
-                    while (isActive && it.isAlive) {
-                        val line = reader.readLine()
-                        if (line != null && line.contains("updated")) {
-                            project.messageBus.syncPublisher(NX_GRAPH_SERVER_REFRESH).onRefresh()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private fun handleGraphProcessError(process: Process) {
         process.onExit().thenAccept { exitCode ->
             logger.debug("graph server exited with code $exitCode")
             isStarted = false
+            isStarting = false
             nxGraphProcess = null
             process.errorStream.readAllBytes().decodeToString().run { logger.debug(this) }
         }
@@ -217,11 +215,7 @@ open class NxGraphServer(
         nxGraphProcess?.destroyForcibly()
         nxGraphProcess = null
         isStarted = false
-    }
-
-    companion object {
-        val NX_GRAPH_SERVER_REFRESH: Topic<NxGraphServerRefreshListener> =
-            Topic("NxGraphServerRefresh", NxGraphServerRefreshListener::class.java)
+        isStarting = false
     }
 }
 

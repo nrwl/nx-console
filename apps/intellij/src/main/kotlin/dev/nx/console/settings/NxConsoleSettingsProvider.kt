@@ -60,5 +60,5 @@ data class NxConsoleSettingsState(
     var enableTelemetry: Boolean = false,
     var promptedForTelemetry: Boolean = false,
     var useNewGenerateUIPreview: Boolean = true,
-    var showProjectDetailsView: Boolean = false
+    var showProjectDetailsView: Boolean = true
 )

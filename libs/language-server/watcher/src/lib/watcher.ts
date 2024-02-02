@@ -31,9 +31,9 @@ export async function languageServerWatcher(
   callback: () => unknown
 ): Promise<() => void> {
   const version = await getNxVersion(workspacePath);
-  const debouncedCallback = debounce(callback, 500);
+  const debouncedCallback = debounce(callback, 1000);
 
-  if (gte(version.version, '16.4.0')) {
+  if (gte(version.full, '16.4.0')) {
     const native = await import('nx/src/native');
     const watcher = new native.Watcher(workspacePath);
 

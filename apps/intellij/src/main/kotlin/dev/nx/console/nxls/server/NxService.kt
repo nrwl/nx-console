@@ -81,6 +81,11 @@ interface NxService {
         throw UnsupportedOperationException()
     }
 
+    @JsonRequest
+    fun version(): CompletableFuture<NxVersion> {
+        throw UnsupportedOperationException()
+    }
+
     @JsonNotification
     fun changeWorkspace(workspacePath: String) {
         throw UnsupportedOperationException()
