@@ -143,7 +143,7 @@ export async function getNxWorkspaceConfig(
     // reset the daemon client after getting all required information from the daemon
     if (nxDaemonClientModule) {
       lspLogger.log('Resetting daemon client');
-      nxDaemonClientModule.daemonClient.reset();
+      nxDaemonClientModule.daemonClient?.reset();
     }
 
     const end = performance.now();
