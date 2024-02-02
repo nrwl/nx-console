@@ -1,3 +1,10 @@
+## [18.15.2](https://github.com/nrwl/nx-console/compare/vscode-v18.15.1...vscode-v18.15.2) (2024-02-02)
+
+
+### Bug Fixes
+
+* **nxls:** attempt to reconfigure nxls after error with backoff ([094a17c](https://github.com/nrwl/nx-console/commit/094a17c0f07eafc94b84873f63d9dea9fbc0e892))
+
 ## [18.15.1](https://github.com/nrwl/nx-console/compare/vscode-v18.15.0...vscode-v18.15.1) (2024-02-01)
 
 
