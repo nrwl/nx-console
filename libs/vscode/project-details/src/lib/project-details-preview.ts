@@ -116,13 +116,9 @@ export class ProjectDetailsPreview {
         window.addEventListener('message', ({ data }) => {
           const { type, payload } = data;
           if(type === 'reload') {
-            console.log('reloading')
-            const currentLocation = window.externalApi.router.state.location;
-  
-            const newUrl = currentLocation.pathname + currentLocation.search
-            window.externalApi.router.navigate(newUrl, {
-              preventScrollReset: true,
-            });
+            window.waitForRouter().then(() => {
+              window.externalApi.openProjectDetails('${project?.name}')
+            })  
           }
         });
       </script>
