@@ -8,13 +8,16 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import {
+  NxCodeLensProvider,
+  getTelemetry,
+  registerCodeLensProvider,
+} from '@nx-console/vscode/utils';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { JsonSourceFile, parseJsonText } from 'typescript';
 import {
   CancellationToken,
   CodeLens,
-  CodeLensProvider,
   Event,
   ExtensionContext,
   Position,
@@ -32,7 +35,9 @@ import {
 
 const OPEN_QUICKPICK_COMMAND = 'nxConsole.project-details.open-quickpick';
 
-export class ProjectDetailsCodelensProvider implements CodeLensProvider {
+export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
+  CODELENS_PATTERN = { pattern: '**/{package,project}.json' };
+
   constructor(private workspaceRoot: string) {}
 
   private changeEvent = new EventEmitter<void>();
@@ -126,12 +131,7 @@ export class ProjectDetailsCodelensProvider implements CodeLensProvider {
     const workspaceRoot = (await getNxWorkspace()).workspacePath;
     const codeLensProvider = new ProjectDetailsCodelensProvider(workspaceRoot);
 
-    context.subscriptions.push(
-      languages.registerCodeLensProvider(
-        { pattern: '**/{package,project}.json' },
-        codeLensProvider
-      )
-    );
+    registerCodeLensProvider(codeLensProvider);
 
     commands.registerCommand(OPEN_QUICKPICK_COMMAND, (project) => {
       showProjectDetailsQuickpick(project);
