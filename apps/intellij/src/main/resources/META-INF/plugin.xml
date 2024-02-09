@@ -7,6 +7,7 @@
   <depends>com.intellij.modules.platform</depends>
   <depends>org.jetbrains.plugins.terminal</depends>
   <depends>JavaScript</depends>
+  <depends optional="true" config-file="nx-console-angular.xml">AngularJS</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
