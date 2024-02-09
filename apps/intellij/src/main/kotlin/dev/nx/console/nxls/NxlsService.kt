@@ -207,6 +207,6 @@ class NxlsService(val project: Project) {
     }
 }
 
-interface NxWorkspaceRefreshListener {
+fun interface NxWorkspaceRefreshListener {
     fun onNxWorkspaceRefresh()
 }

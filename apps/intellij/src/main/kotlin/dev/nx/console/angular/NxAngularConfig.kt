@@ -1,54 +1,49 @@
 package dev.nx.console.angular
 
-import com.fasterxml.jackson.core.JsonFactory
-import com.fasterxml.jackson.core.json.JsonReadFeature
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.text.CharSequenceReader
+import java.util.*
 import org.angular2.cli.config.AngularConfig
-import org.angular2.cli.config.AngularJsonProject
 import org.angular2.cli.config.AngularProject
-import org.angular2.cli.config.AngularProjectImpl
 
-class NxAngularConfig(text: CharSequence, override val file: VirtualFile) : AngularConfig {
+class NxAngularConfig(
+    override val file: VirtualFile,
+    val projectFiles: Map<String, VirtualFile>,
+) : AngularConfig {
 
-  override val projects: List<AngularProject> get() = listOf(defaultProject)
+    override val projects: List<AngularProject> =
+        projectFiles.mapNotNull { (name, file) -> getNxAngularProject(name, file) }
 
-  override val defaultProject: AngularProject
+    override val defaultProject: AngularProject? = projects.getOrNull(0)
 
-  init {
-    val projectFolder = file.parent
-    val workspaceFolder =
-      findFileUpHierarchy(null, file, "nx.json")?.parent
-        ?: projectFolder
-    val mapper = ObjectMapper(
-      JsonFactory.builder()
-        .configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
-        .configure(JsonReadFeature.ALLOW_SINGLE_QUOTES, true)
-        .configure(JsonReadFeature.ALLOW_MISSING_VALUES, true)
-        .configure(JsonReadFeature.ALLOW_TRAILING_COMMA, true)
-        .configure(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES, true)
-        .build()
-    )
-      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-      .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-    val angularProjectJson = mapper.readValue(CharSequenceReader(text), AngularJsonProject::class.java)
-    defaultProject = AngularProjectImpl(
-      angularProjectJson.name ?: projectFolder.name, angularProjectJson, workspaceFolder
-    )
-  }
+    override fun getProject(context: VirtualFile): AngularProject? =
+        projects
+            .map { Pair(it, it.proximity(context)) }
+            .filter { it.second >= 0 }
+            .minByOrNull { it.second }
+            ?.first
 
-  override fun getProject(context: VirtualFile): AngularProject =
-    defaultProject
-
-  override fun toString(): String {
-    return """
+    override fun toString(): String {
+        return """
       | NxAngularConfig {
-      |   $defaultProject
+      |   defaultProject: ${defaultProject?.name}
+      |   projects: [
+      |     ${projects.joinToString(",\n     ") { it.toString() }}
+      |   ]
       | }
-    """.trimMargin()
-  }
+    """
+            .trimMargin()
+    }
 
+    override fun equals(other: Any?): Boolean =
+        other === this ||
+            other is NxAngularConfig && other.file == file && other.projectFiles == projectFiles
 
+    override fun hashCode(): Int = Objects.hash(file, projectFiles)
+
+    private fun AngularProject.proximity(context: VirtualFile): Int {
+        val sourceDir = sourceDir ?: return -1
+        if (!VfsUtil.isAncestor(sourceDir, context, false)) return -1
+        return generateSequence(context) { it.parent }.takeWhile { it != sourceDir }.count()
+    }
 }
