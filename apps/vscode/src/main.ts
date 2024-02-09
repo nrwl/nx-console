@@ -34,6 +34,7 @@ import {
   getOutputChannel,
   getTelemetry,
   initTelemetry,
+  watchCodeLensConfigChange,
   watchFile,
 } from '@nx-console/vscode/utils';
 import { revealWebViewPanel } from '@nx-console/vscode/webview';
@@ -106,6 +107,7 @@ export async function activate(c: ExtensionContext) {
     );
 
     await enableTypeScriptPlugin(context);
+    watchCodeLensConfigChange(context);
 
     currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
     runTargetTreeView = window.createTreeView('nxRunTarget', {
@@ -248,7 +250,7 @@ async function setWorkspace(workspacePath: string) {
 
     initNxConfigDecoration(context);
 
-    new AddDependencyCodelensProvider(context);
+    new AddDependencyCodelensProvider();
 
     context.subscriptions.push(
       nxHelpAndFeedbackTreeView,

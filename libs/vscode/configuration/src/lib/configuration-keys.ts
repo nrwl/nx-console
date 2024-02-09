@@ -1,7 +1,7 @@
 export const GLOBAL_CONFIG_KEYS = [
   'commonNxCommands',
   'enableGenerateFromContextMenu',
-  'enableWorkspaceConfigCodeLens',
+  'enableCodeLens',
   'enableLibraryImports',
   'enableGeneratorFilters',
   'generatorAllowlist',
@@ -17,7 +17,7 @@ export const GLOBAL_CONFIG_KEYS = [
 export type GlobalConfig = {
   commonNxCommands: string[];
   enableGenerateFromContextMenu: boolean;
-  enableWorkspaceConfigCodeLens: boolean;
+  enableCodeLens: boolean;
   enableLibraryImports: boolean;
   enableGeneratorFilters: boolean;
   generatorAllowlist: string[];

@@ -20,6 +20,7 @@ import {
   getProjectLocations,
   getTargetsPropertyLocation,
 } from './get-project-locations';
+import { NxCodeLensProvider } from '@nx-console/vscode/utils';
 
 export class TargetCodeLens extends CodeLens {
   constructor(
@@ -48,7 +49,8 @@ export class TaskGraphCodeLens extends CodeLens {
   }
 }
 
-export class WorkspaceCodeLensProvider implements CodeLensProvider {
+export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
+  CODELENS_PATTERN = { pattern: '**/{workspace,project}.json' };
   /**
    * Provides a CodeLens set for a matched document
    * @param document a document matched by the pattern passed to registerCodeLensProvider
