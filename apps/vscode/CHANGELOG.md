@@ -1,3 +1,10 @@
+# [18.16.0](https://github.com/nrwl/nx-console/compare/vscode-v18.15.3...vscode-v18.16.0) (2024-02-09)
+
+
+### Features
+
+* **vscode:** add all codelens to a settings toggle ([#2021](https://github.com/nrwl/nx-console/issues/2021)) ([3bc39d7](https://github.com/nrwl/nx-console/commit/3bc39d7f5ec6142c8fef9d50c06da56300525cd4))
+
 ## [18.15.3](https://github.com/nrwl/nx-console/compare/vscode-v18.15.2...vscode-v18.15.3) (2024-02-02)
 
 
