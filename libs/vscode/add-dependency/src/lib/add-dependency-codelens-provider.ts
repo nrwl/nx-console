@@ -1,4 +1,8 @@
-import { getWorkspacePath } from '@nx-console/vscode/utils';
+import {
+  NxCodeLensProvider,
+  getWorkspacePath,
+  registerCodeLensProvider,
+} from '@nx-console/vscode/utils';
 import { join } from 'path';
 import {
   isPropertyAssignment,
@@ -7,24 +11,17 @@ import {
   ObjectLiteralExpression,
   parseJsonText,
 } from 'typescript';
-import {
-  CodeLens,
-  CodeLensProvider,
-  Command,
-  ExtensionContext,
-  languages,
-  ProviderResult,
-  Range,
-  TextDocument,
-} from 'vscode';
+import { CodeLens, Command, ProviderResult, Range, TextDocument } from 'vscode';
 import {
   ADD_DEPENDENCY_COMMAND,
   ADD_DEV_DEPENDENCY_COMMAND,
 } from './vscode-add-dependency';
 
-export class AddDependencyCodelensProvider implements CodeLensProvider {
-  constructor(context: ExtensionContext) {
-    this.registerAddDependencyCodeLensProvider(context);
+export class AddDependencyCodelensProvider implements NxCodeLensProvider {
+  CODELENS_PATTERN = { pattern: '**/package.json' };
+
+  constructor() {
+    registerCodeLensProvider(this);
   }
 
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
@@ -63,16 +60,6 @@ export class AddDependencyCodelensProvider implements CodeLensProvider {
     }
 
     return lenses;
-  }
-
-  /**
-   * Registers this as a CodeLensProvider.
-   * @param context instance of ExtensionContext from activate
-   */
-  registerAddDependencyCodeLensProvider(context: ExtensionContext) {
-    context.subscriptions.push(
-      languages.registerCodeLensProvider({ pattern: '**/package.json' }, this)
-    );
   }
 }
 

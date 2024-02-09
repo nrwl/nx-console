@@ -6,7 +6,11 @@ import {
   getTargetsForConfigFile,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import { getTelemetry } from '@nx-console/vscode/utils';
+import {
+  NxCodeLensProvider,
+  getTelemetry,
+  registerCodeLensProvider,
+} from '@nx-console/vscode/utils';
 import { relative } from 'path';
 import {
   Node,
@@ -28,13 +32,17 @@ import {
   window,
   Event,
   EventEmitter,
+  DocumentSelector,
 } from 'vscode';
 
 const CODELENS_RUN_TARGET_COMMAND = 'nxConsole.config-codelens.run';
 const CODELENS_OPEN_RUN_QUICKPICK_COMMAND =
   'nxConsole.config-codelens.open-run-quickpick';
 
-export class ConfigFileCodelensProvider implements CodeLensProvider {
+export class ConfigFileCodelensProvider implements NxCodeLensProvider {
+  CODELENS_PATTERN = {
+    scheme: 'file',
+  };
   constructor(
     public workspaceRoot: string,
     public sourceMapFilesToProjectMap: Record<string, string>
@@ -208,13 +216,9 @@ export class ConfigFileCodelensProvider implements CodeLensProvider {
       codeLensProvider.refresh();
     });
 
+    registerCodeLensProvider(codeLensProvider);
+
     context.subscriptions.push(
-      languages.registerCodeLensProvider(
-        {
-          scheme: 'file',
-        },
-        codeLensProvider
-      ),
       commands.registerCommand(
         CODELENS_RUN_TARGET_COMMAND,
         (project: string, target: string) => {
