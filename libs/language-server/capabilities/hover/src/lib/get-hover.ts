@@ -7,8 +7,7 @@ import { TextDocument } from 'vscode-languageserver-textdocument';
 import { Hover, HoverParams } from 'vscode-languageserver';
 import {
   getJsonLanguageService,
-  isPropertyNode,
-  isStringNode,
+  isExecutorStringNode,
 } from '@nx-console/language-server/utils';
 
 export async function getHover(
@@ -33,7 +32,7 @@ export async function getHover(
     return hover;
   }
 
-  if (isExecutorStringNode(node)) {
+  if (isNxExecutorStringNode(node)) {
     hover.contents = {
       kind: 'markdown',
       value: `[View executor documentation on nx.dev](${constructExecutorUrl(
@@ -45,11 +44,9 @@ export async function getHover(
   return hover;
 }
 
-function isExecutorStringNode(node: ASTNode): node is StringASTNode {
+function isNxExecutorStringNode(node: ASTNode): node is StringASTNode {
   return (
-    isStringNode(node) &&
-    isPropertyNode(node.parent) &&
-    node.parent.keyNode.value === 'executor' &&
+    isExecutorStringNode(node) &&
     (RegExp(/@nx|@nrwl\/\w+:\w+/).test(node.value) ||
       RegExp(/nx:\w+/).test(node.value))
   );
