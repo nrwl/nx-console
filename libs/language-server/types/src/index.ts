@@ -3,7 +3,7 @@ import {
   GeneratorSchema,
 } from '@nx-console/shared/generate-ui-types';
 import {
-  CollectionInfo,
+  GeneratorCollectionInfo,
   Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
@@ -41,7 +41,7 @@ export const NxGeneratorsRequest: RequestType<
   {
     options?: NxGeneratorsRequestOptions;
   },
-  CollectionInfo[],
+  GeneratorCollectionInfo[],
   unknown
 > = new RequestType('nx/generators');
 

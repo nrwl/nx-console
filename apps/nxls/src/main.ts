@@ -4,6 +4,7 @@ import {
   getCompletionItems,
   projectSchemaIsRegistered,
 } from '@nx-console/language-server/capabilities/code-completion';
+import { getDefinition } from '@nx-console/language-server/capabilities/definition';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
@@ -154,6 +155,7 @@ connection.onInitialize(async (params) => {
         triggerCharacters: ['"', ':'],
       },
       hoverProvider: true,
+      definitionProvider: true,
       documentLinkProvider: {
         resolveProvider: false,
         workDoneProgress: false,
@@ -259,6 +261,18 @@ connection.onHover(async (hoverParams) => {
 
   const { jsonAst, document } = getJsonDocument(hoverDocument);
   return await getHover(hoverParams, jsonAst, document);
+});
+
+connection.onDefinition((definitionParams) => {
+  const definitionDocument = documents.get(definitionParams.textDocument.uri);
+
+  if (!definitionDocument || !WORKING_PATH) {
+    return null;
+  }
+
+  const { jsonAst, document } = getJsonDocument(definitionDocument);
+
+  return getDefinition(WORKING_PATH, definitionParams, jsonAst, document);
 });
 
 connection.onDocumentLinks(async (params) => {

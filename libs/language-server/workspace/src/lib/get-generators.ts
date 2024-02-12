@@ -5,7 +5,11 @@ import {
   listFiles,
   readAndCacheJsonFile,
 } from '@nx-console/shared/file-system';
-import { CollectionInfo, GeneratorType } from '@nx-console/shared/schema';
+import {
+  CollectionInfo,
+  GeneratorCollectionInfo,
+  GeneratorType,
+} from '@nx-console/shared/schema';
 import { normalizeSchema } from '@nx-console/shared/schema/normalize';
 import { basename, join } from 'path';
 import { getCollectionInfo, readCollections } from './read-collections';
@@ -16,7 +20,7 @@ export async function getGenerators(
     includeHidden: false,
     includeNgAdd: false,
   }
-): Promise<CollectionInfo[]> {
+): Promise<GeneratorCollectionInfo[]> {
   const basedir = workspacePath;
   const collections = await readCollections(workspacePath, {
     clearPackageJsonCache: false,
@@ -33,7 +37,8 @@ export async function getGenerators(
     ...(await checkAndReadWorkspaceGenerators(basedir, 'generators', options)),
   ];
   return generatorCollections.filter(
-    (collection): collection is CollectionInfo => !!collection.data
+    (collection): collection is GeneratorCollectionInfo =>
+      collection.type === 'generator'
   );
 }
 
@@ -94,7 +99,7 @@ async function readWorkspaceGeneratorsCollection(
           return {
             name: collectionName,
             type: 'generator',
-            path: schemaJsonPath,
+            schemaPath: schemaJsonPath,
             data: {
               name,
               collection: collectionName,

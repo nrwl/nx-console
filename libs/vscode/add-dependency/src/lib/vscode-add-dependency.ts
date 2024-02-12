@@ -176,7 +176,7 @@ async function executeInitGenerator(dependency: string, workspacePath: string) {
   const opts = await getGeneratorOptions({
     collection: initGenerator.data.collection,
     name: initGenerator.name,
-    path: initGenerator.path,
+    path: initGenerator.schemaPath,
   });
   let selectedFlags;
   if (opts.length) {

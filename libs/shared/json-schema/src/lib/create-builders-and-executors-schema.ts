@@ -17,7 +17,9 @@ export function createBuildersAndExecutorsSchema(
   return collections.reduce<[BuildersSchema[], ExecutorsSchema[]]>(
     (acc, collection) => {
       const schemaRef =
-        platform() === 'win32' ? collection.path : `file://${collection.path}`;
+        platform() === 'win32'
+          ? collection.schemaPath
+          : `file://${collection.schemaPath}`;
 
       acc[0].push({
         if: {
