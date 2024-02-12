@@ -6,10 +6,7 @@
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/vscode-e2e/**/*.ts"]
-      }
+      "outputs": ["{options.outputFile}"]
     },
     "_e2e": {
       "executor": "nx:run-commands",

@@ -63,9 +63,6 @@
     "package": {
       "cache": true
     },
-    "build-webview-files": {
-      "cache": true
-    },
     "extract-dependencies": {
       "cache": true
     },
@@ -81,6 +78,10 @@
           "codeCoverage": true
         }
       }
+    },
+    "@nx/eslint:lint": {
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "cache": true
     }
   },
   "namedInputs": {

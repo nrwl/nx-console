@@ -193,10 +193,7 @@
       "dependsOn": ["^build"]
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": ["apps/vscode/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint"
     },
     "package": {
       "executor": "nx:run-commands",
