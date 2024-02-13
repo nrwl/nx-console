@@ -17,15 +17,21 @@
         "index": "apps/generate-ui/src/index.html",
         "main": "apps/generate-ui/src/main.ts",
         "tsConfig": "apps/generate-ui/tsconfig.app.json",
-        "styles": ["apps/generate-ui/src/styles.scss"],
+        "styles": [
+          "apps/generate-ui/src/styles.scss"
+        ],
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/generate-ui/styles/src/lib/vscode"]
+          "includePaths": [
+            "libs/generate-ui/styles/src/lib/vscode"
+          ]
         }
       },
       "configurations": {
         "intellij": {
           "stylePreprocessorOptions": {
-            "includePaths": ["libs/generate-ui/styles/src/lib/intellij"]
+            "includePaths": [
+              "libs/generate-ui/styles/src/lib/intellij"
+            ]
           }
         }
       }
@@ -38,14 +44,20 @@
         "index": "apps/generate-ui/src/index.html",
         "main": "apps/generate-ui/src/main.ts",
         "tsConfig": "apps/generate-ui/tsconfig.app.json",
-        "styles": ["apps/generate-ui/src/styles.scss"],
+        "styles": [
+          "apps/generate-ui/src/styles.scss"
+        ],
         "namedChunks": false,
         "extractLicenses": true,
         "vendorChunk": false,
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/generate-ui/styles/src/lib/vscode"]
+          "includePaths": [
+            "libs/generate-ui/styles/src/lib/vscode"
+          ]
         },
-        "allowedCommonJsDependencies": ["zone.js"],
+        "allowedCommonJsDependencies": [
+          "zone.js"
+        ],
         "deleteOutputPath": false
       },
       "configurations": {
@@ -55,7 +67,9 @@
         "ci-intellij": {
           "optimization": false,
           "stylePreprocessorOptions": {
-            "includePaths": ["libs/generate-ui/styles/src/lib/intellij"]
+            "includePaths": [
+              "libs/generate-ui/styles/src/lib/intellij"
+            ]
           }
         },
         "production": {
@@ -82,23 +96,30 @@
             }
           ],
           "stylePreprocessorOptions": {
-            "includePaths": ["libs/generate-ui/styles/src/lib/intellij"]
+            "includePaths": [
+              "libs/generate-ui/styles/src/lib/intellij"
+            ]
           }
         }
       },
-      "outputs": ["{options.outputPath}"]
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
+      "outputs": [
+        "{options.outputPath}"
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
       "options": {
         "jestConfig": "apps/generate-ui/jest.config.ts"
       },
-      "outputs": ["{workspaceRoot}/coverage/apps/generate-ui"]
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/generate-ui"
+      ]
     }
   },
-  "implicitDependencies": ["generate-ui-styles"],
-  "tags": ["type:generate-ui"]
+  "implicitDependencies": [
+    "generate-ui-styles"
+  ],
+  "tags": [
+    "type:generate-ui"
+  ]
 }

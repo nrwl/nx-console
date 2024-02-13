@@ -4,17 +4,17 @@
   "sourceRoot": "libs/language-server/watcher/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/language-server/watcher"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/language-server/watcher"
+      ],
       "options": {
         "jestConfig": "libs/language-server/watcher/jest.config.ts"
       }
     }
   },
-  "tags": ["type:lsp"]
+  "tags": [
+    "type:lsp"
+  ]
 }

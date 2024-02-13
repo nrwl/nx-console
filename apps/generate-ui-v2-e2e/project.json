@@ -20,10 +20,6 @@
         }
       }
     },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "serve": {
       "executor": "@nx/web:file-server",
       "options": {
@@ -31,16 +27,24 @@
         "buildTarget": "generate-ui-v2-e2e:setup-lit-dir",
         "watch": false
       },
-      "dependsOn": ["setup-lit-dir"]
+      "dependsOn": [
+        "setup-lit-dir"
+      ]
     },
     "setup-lit-dir": {
       "command": "node ./setup-lit-dir.mjs",
       "options": {
         "cwd": "apps/generate-ui-v2-e2e"
       },
-      "dependsOn": ["generate-ui-v2:build"]
+      "dependsOn": [
+        "generate-ui-v2:build"
+      ]
     }
   },
-  "tags": ["type:generate-ui"],
-  "implicitDependencies": ["generate-ui-v2"]
+  "tags": [
+    "type:generate-ui"
+  ],
+  "implicitDependencies": [
+    "generate-ui-v2"
+  ]
 }

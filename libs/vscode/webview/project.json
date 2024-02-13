@@ -4,16 +4,17 @@
   "sourceRoot": "libs/vscode/webview/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/vscode/webview"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/vscode/webview"
+      ],
       "options": {
         "jestConfig": "libs/vscode/webview/jest.config.ts"
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": [
+    "type:vscode"
+  ]
 }

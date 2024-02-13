@@ -4,16 +4,17 @@
   "sourceRoot": "libs/shared/json-schema/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/shared/json-schema"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/shared/json-schema"
+      ],
       "options": {
         "jestConfig": "libs/shared/json-schema/jest.config.ts"
       }
     }
   },
-  "tags": ["type:shared"]
+  "tags": [
+    "type:shared"
+  ]
 }

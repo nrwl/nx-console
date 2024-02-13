@@ -4,17 +4,17 @@
   "sourceRoot": "libs/vscode/typescript-plugin/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/vscode/typescript-plugin"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/vscode/typescript-plugin"
+      ],
       "options": {
         "jestConfig": "libs/vscode/typescript-plugin/jest.config.ts"
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": [
+    "type:vscode"
+  ]
 }

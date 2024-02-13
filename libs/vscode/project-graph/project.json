@@ -4,17 +4,17 @@
   "sourceRoot": "libs/vscode/project-graph/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/vscode/project-graph"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/vscode/project-graph"
+      ],
       "options": {
         "jestConfig": "libs/vscode/project-graph/jest.config.ts"
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": [
+    "type:vscode"
+  ]
 }

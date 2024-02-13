@@ -4,16 +4,17 @@
   "sourceRoot": "libs/vscode/verify/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/vscode/verify"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/vscode/verify"
+      ],
       "options": {
         "jestConfig": "libs/vscode/verify/jest.config.ts"
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": [
+    "type:vscode"
+  ]
 }

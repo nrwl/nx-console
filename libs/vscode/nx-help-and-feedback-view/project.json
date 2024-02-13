@@ -4,9 +4,6 @@
   "sourceRoot": "libs/vscode/nx-help-and-feedback-view/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": [
@@ -17,5 +14,7 @@
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": [
+    "type:vscode"
+  ]
 }

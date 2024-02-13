@@ -4,10 +4,6 @@
   "sourceRoot": "apps/vscode-e2e/src",
   "projectType": "application",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "_e2e": {
       "executor": "nx:run-commands",
       "options": {
@@ -19,9 +15,14 @@
           "command": "xvfb-run -a -s\"-screen 0 1920x1080x24\" wdio run ./wdio.conf.ts"
         }
       },
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     }
   },
-  "implicitDependencies": ["vscode", "nxls"],
+  "implicitDependencies": [
+    "vscode",
+    "nxls"
+  ],
   "tags": []
 }

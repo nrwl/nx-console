@@ -4,17 +4,17 @@
   "sourceRoot": "libs/language-server/utils/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/language-server/utils"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/language-server/utils"
+      ],
       "options": {
         "jestConfig": "libs/language-server/utils/jest.config.ts"
       }
     }
   },
-  "tags": ["type:lsp"]
+  "tags": [
+    "type:lsp"
+  ]
 }

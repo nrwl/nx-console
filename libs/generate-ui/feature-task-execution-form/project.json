@@ -4,9 +4,6 @@
   "projectType": "library",
   "sourceRoot": "libs/generate-ui/feature-task-execution-form/src",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
     "test": {
       "executor": "@nx/jest:jest",
       "options": {
@@ -32,13 +29,17 @@
     },
     "build-storybook": {
       "executor": "@storybook/angular:build-storybook",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputDir": "dist/storybook/generate-ui-feature-task-execution-form",
         "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
         "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
         "stylePreprocessorOptions": {
-          "includePaths": ["libs/generate-ui/styles/src/lib/vscode"]
+          "includePaths": [
+            "libs/generate-ui/styles/src/lib/vscode"
+          ]
         },
         "compodoc": false
       },
@@ -50,6 +51,10 @@
     }
   },
   "generators": {},
-  "implicitDependencies": ["generate-ui-styles"],
-  "tags": ["type:generate-ui"]
+  "implicitDependencies": [
+    "generate-ui-styles"
+  ],
+  "tags": [
+    "type:generate-ui"
+  ]
 }

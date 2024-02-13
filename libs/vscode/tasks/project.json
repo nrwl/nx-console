@@ -4,16 +4,17 @@
   "sourceRoot": "libs/vscode/tasks/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/vscode/tasks"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/vscode/tasks"
+      ],
       "options": {
         "jestConfig": "libs/vscode/tasks/jest.config.ts"
       }
     }
   },
-  "tags": ["type:vscode"]
+  "tags": [
+    "type:vscode"
+  ]
 }

@@ -4,17 +4,17 @@
   "sourceRoot": "libs/language-server/types/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/language-server/types"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/language-server/types"
+      ],
       "options": {
         "jestConfig": "libs/language-server/types/jest.config.ts"
       }
     }
   },
-  "tags": ["type:shared"]
+  "tags": [
+    "type:shared"
+  ]
 }

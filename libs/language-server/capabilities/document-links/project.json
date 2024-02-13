@@ -4,10 +4,6 @@
   "sourceRoot": "libs/language-server/capabilities/document-links/src",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": [
@@ -18,5 +14,7 @@
       }
     }
   },
-  "tags": ["type:lsp"]
+  "tags": [
+    "type:lsp"
+  ]
 }
