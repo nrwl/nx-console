@@ -3,17 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/lsp-client/src",
   "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/vscode/lsp-client"
-      ],
-      "options": {
-        "jestConfig": "libs/vscode/lsp-client/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": [
     "type:vscode"
   ]

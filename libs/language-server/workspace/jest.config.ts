@@ -14,4 +14,5 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../../coverage/libs/language-server/workspace',
+  passWithNoTests: true,
 };

@@ -5,4 +5,5 @@ export default {
   displayName: 'shared-utils',
   testEnvironment: 'node',
   preset: '../../../jest.preset.js',
+  passWithNoTests: true,
 };

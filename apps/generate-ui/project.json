@@ -105,15 +105,6 @@
       "outputs": [
         "{options.outputPath}"
       ]
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "options": {
-        "jestConfig": "apps/generate-ui/jest.config.ts"
-      },
-      "outputs": [
-        "{workspaceRoot}/coverage/apps/generate-ui"
-      ]
     }
   },
   "implicitDependencies": [

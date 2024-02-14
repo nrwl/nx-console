@@ -65,7 +65,8 @@ export async function targetLink(
     tempDocumentCounter.set(baseTargetProjectPath, versionNumber);
   }
 
-  const { document, jsonAst } = getLanguageModelCache().retrieve(
+  const languageModelCache = getLanguageModelCache();
+  const { document, jsonAst } = languageModelCache.retrieve(
     TextDocument.create(
       baseTargetProjectPath,
       'json',
@@ -74,6 +75,7 @@ export async function targetLink(
     ),
     false
   );
+  languageModelCache.dispose();
 
   const range = findTargetRange(document, jsonAst, target, configuration);
 

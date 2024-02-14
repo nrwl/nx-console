@@ -3,17 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/verify/src",
   "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/vscode/verify"
-      ],
-      "options": {
-        "jestConfig": "libs/vscode/verify/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": [
     "type:vscode"
   ]

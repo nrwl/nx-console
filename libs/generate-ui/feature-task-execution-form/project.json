@@ -4,15 +4,6 @@
   "projectType": "library",
   "sourceRoot": "libs/generate-ui/feature-task-execution-form/src",
   "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "options": {
-        "jestConfig": "libs/generate-ui/feature-task-execution-form/jest.config.ts"
-      },
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/generate-ui/feature-task-execution-form"
-      ]
-    },
     "storybook": {
       "executor": "@storybook/angular:start-storybook",
       "options": {

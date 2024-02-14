@@ -46,15 +46,6 @@
           }
         }
       }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
-      "options": {
-        "jestConfig": "apps/generate-ui-v2/jest.config.ts"
-      }
     }
   },
   "tags": [

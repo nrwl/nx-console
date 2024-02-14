@@ -7,4 +7,5 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../../coverage/libs/vscode/generate-ui-webview',
+  passWithNoTests: true,
 };

@@ -3,17 +3,7 @@
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/language-server/capabilities/document-links/src",
   "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/language-server/capabilities/document-links"
-      ],
-      "options": {
-        "jestConfig": "libs/language-server/capabilities/document-links/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": [
     "type:lsp"
   ]

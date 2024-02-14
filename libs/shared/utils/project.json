@@ -3,14 +3,8 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/utils/src",
   "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "options": {
-        "jestConfig": "libs/shared/utils/jest.config.ts"
-      },
-      "outputs": ["{workspaceRoot}/coverage/libs/shared/utils"]
-    }
-  },
-  "tags": ["type:shared"]
+  "targets": {},
+  "tags": [
+    "type:shared"
+  ]
 }

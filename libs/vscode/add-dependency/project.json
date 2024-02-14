@@ -3,17 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/add-dependency/src",
   "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/vscode/add-dependency"
-      ],
-      "options": {
-        "jestConfig": "libs/vscode/add-dependency/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": [
     "type:vscode"
   ]

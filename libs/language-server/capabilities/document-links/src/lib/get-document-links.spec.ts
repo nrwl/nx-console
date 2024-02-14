@@ -1,6 +1,5 @@
 import {
   configureJsonLanguageService,
-  getJsonLanguageService,
   getLanguageModelCache,
 } from '@nx-console/language-server/utils';
 import { ClientCapabilities, TextDocument } from 'vscode-json-languageservice';
@@ -68,4 +67,6 @@ it('should get all document links for properties that have a X_COMPLETION_TYPE (
       "/workspace/project/src/main.ts",
     ]
   `);
+
+  documentMapper.dispose();
 });

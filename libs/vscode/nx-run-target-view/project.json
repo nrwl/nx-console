@@ -3,17 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/nx-run-target-view/src",
   "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/vscode/nx-run-target-view"
-      ],
-      "options": {
-        "jestConfig": "libs/vscode/nx-run-target-view/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": [
     "type:vscode"
   ]

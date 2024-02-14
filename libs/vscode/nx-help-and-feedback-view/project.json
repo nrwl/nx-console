@@ -3,17 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/nx-help-and-feedback-view/src",
   "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/vscode/nx-help-and-feedback-view"
-      ],
-      "options": {
-        "jestConfig": "libs/vscode/nx-help-and-feedback-view/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": [
     "type:vscode"
   ]
