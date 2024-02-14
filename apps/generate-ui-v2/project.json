@@ -6,26 +6,18 @@
   "targets": {
     "build": {
       "command": "npx tailwindcss -i dist/apps/generate-ui-v2/tailwind.css -o dist/apps/generate-ui-v2/output.css -c apps/generate-ui-v2/tailwind.config.js",
-      "dependsOn": [
-        "extract-dependencies"
-      ]
+      "dependsOn": ["extract-dependencies"]
     },
     "extract-dependencies": {
       "command": "node ./tools/scripts/copy-generate-ui-deps.mjs",
-      "dependsOn": [
-        "_build"
-      ]
+      "dependsOn": ["_build"]
     },
     "_build": {
       "executor": "@nx/esbuild:esbuild",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/generate-ui-v2",
-        "format": [
-          "esm"
-        ],
+        "format": ["esm"],
         "bundle": true,
         "thirdParty": true,
         "minify": true,
@@ -48,7 +40,5 @@
       }
     }
   },
-  "tags": [
-    "type:generate-ui"
-  ]
+  "tags": ["type:generate-ui"]
 }

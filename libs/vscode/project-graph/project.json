@@ -4,7 +4,5 @@
   "sourceRoot": "libs/vscode/project-graph/src",
   "projectType": "library",
   "targets": {},
-  "tags": [
-    "type:vscode"
-  ]
+  "tags": ["type:vscode"]
 }

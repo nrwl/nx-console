@@ -4,7 +4,5 @@
   "sourceRoot": "libs/shared/schema/src",
   "projectType": "library",
   "targets": {},
-  "tags": [
-    "type:shared"
-  ]
+  "tags": ["type:shared"]
 }

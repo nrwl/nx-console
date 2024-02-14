@@ -4,7 +4,5 @@
   "sourceRoot": "libs/shared/nx-console-plugins/src",
   "projectType": "library",
   "targets": {},
-  "tags": [
-    "type:shared"
-  ]
+  "tags": ["type:shared"]
 }

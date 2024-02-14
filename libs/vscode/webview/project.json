@@ -4,7 +4,5 @@
   "sourceRoot": "libs/vscode/webview/src",
   "projectType": "library",
   "targets": {},
-  "tags": [
-    "type:vscode"
-  ]
+  "tags": ["type:vscode"]
 }

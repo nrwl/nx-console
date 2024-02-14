@@ -4,7 +4,5 @@
   "sourceRoot": "libs/shared/generate-ui-types/src",
   "projectType": "library",
   "targets": {},
-  "tags": [
-    "type:shared"
-  ]
+  "tags": ["type:shared"]
 }

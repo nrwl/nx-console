@@ -9,7 +9,5 @@
     }
   },
   "generators": {},
-  "tags": [
-    "type:generate-ui"
-  ]
+  "tags": ["type:generate-ui"]
 }

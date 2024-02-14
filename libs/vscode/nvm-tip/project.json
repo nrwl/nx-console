@@ -4,7 +4,5 @@
   "sourceRoot": "libs/vscode/nvm-tip/src",
   "projectType": "library",
   "targets": {},
-  "tags": [
-    "type:vscode"
-  ]
+  "tags": ["type:vscode"]
 }

@@ -32,32 +32,19 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "inputs": [
-        "production",
-        "^production"
-      ],
+      "inputs": ["production", "^production"],
       "cache": true
     },
     "test": {
-      "inputs": [
-        "default",
-        "^production",
-        "{workspaceRoot}/jest.preset.js"
-      ],
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
       "cache": true
     },
     "lint": {
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json"
-      ],
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     },
     "e2e": {
-      "inputs": [
-        "default",
-        "^production"
-      ],
+      "inputs": ["default", "^production"],
       "cache": true
     },
     "build-storybook": {
@@ -80,11 +67,7 @@
       "cache": true
     },
     "@nx/jest:jest": {
-      "inputs": [
-        "default",
-        "^production",
-        "{workspaceRoot}/jest.preset.js"
-      ],
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
       "cache": true,
       "options": {
         "passWithNoTests": true
@@ -97,10 +80,7 @@
       }
     },
     "@nx/eslint:lint": {
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json"
-      ],
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     }
   },
