@@ -24,11 +24,11 @@ import org.angular2.cli.config.AngularConfigProvider
 @Service(Service.Level.PROJECT)
 @State(name = "NxAngularConfigService", storages = [Storage("nx-angular-config.xml")])
 class NxAngularConfigService(private val project: Project, private val cs: CoroutineScope) :
-    PersistentStateComponent<NxAngularConfigService.AngularConfigState>, Disposable {
+    PersistentStateComponent<NxAngularConfigService.AngularConfigState> {
 
     init {
         project.messageBus
-            .connect(this)
+            .connect(cs)
             .subscribe(NX_WORKSPACE_REFRESH_TOPIC, NxWorkspaceRefreshListener { refresh() })
     }
 
@@ -100,8 +100,6 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
     }
 
     data class AngularConfigState(val workspaceLocation: String, val projects: Map<String, String>)
-
-    override fun dispose() {}
 }
 
 class NxAngularConfigProvider : AngularConfigProvider {
