@@ -36,7 +36,14 @@ group = properties("pluginGroup")
 // Configure project's dependencies
 repositories { mavenCentral() }
 
-configurations.all { exclude("org.slf4j", "slf4j-api") }
+configurations.all {
+  exclude("org.slf4j", "slf4j-api")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
+  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
+}
 
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.21.0")

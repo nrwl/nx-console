@@ -23,7 +23,7 @@ import org.angular2.cli.config.AngularConfigProvider
 
 @Service(Service.Level.PROJECT)
 @State(name = "NxAngularConfigService", storages = [Storage("nx-angular-config.xml")])
-class NxAngularConfigService(private val project: Project) :
+class NxAngularConfigService(private val project: Project, private val cs: CoroutineScope) :
     PersistentStateComponent<NxAngularConfigService.AngularConfigState>, Disposable {
 
     init {
@@ -51,7 +51,7 @@ class NxAngularConfigService(private val project: Project) :
     }
 
     private fun refresh() {
-        CoroutineScope(Dispatchers.IO).launch { refreshState() }
+        cs.launch { refreshState() }
     }
 
     private suspend fun refreshState() {
