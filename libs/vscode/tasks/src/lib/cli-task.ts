@@ -44,7 +44,8 @@ export class CliTask extends Task {
           encapsulatedNx: isEncapsulatedNx,
         },
         packageManagerCommands
-      )
+      ),
+      definition.problemMatchers
     );
 
     return task;
