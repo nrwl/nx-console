@@ -95,4 +95,9 @@ interface NxService {
     fun refreshWorkspace() {
         throw UnsupportedOperationException()
     }
+
+    @JsonNotification
+    fun reset() {
+        throw UnsupportedOperationException()
+    }
 }
