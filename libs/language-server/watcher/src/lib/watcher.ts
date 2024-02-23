@@ -6,7 +6,7 @@ import { getNxVersion } from '@nx-console/language-server/workspace';
 import { gte } from 'semver';
 import type { WatchEvent } from 'nx/src/native';
 import { debounce } from '@nx-console/shared/utils';
-import { minimatch } from 'minimatch';
+import { match as minimatch } from 'minimatch';
 
 const NX_PLUGIN_PATTERNS_TO_WATCH = [
   '**/cypress.config.{js,ts,mjs,cjs}',
@@ -49,7 +49,7 @@ export async function languageServerWatcher(
             e.path.endsWith('workspace.json') ||
             e.path.endsWith('tsconfig.base.json') ||
             NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
-              minimatch(e.path, pattern, { dot: true })
+              minimatch([e.path], pattern, { dot: true })
             )
         )
       ) {

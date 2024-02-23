@@ -66,6 +66,10 @@ class NxlsService(val project: Project) {
         }
     }
 
+    fun resetWorkspace() {
+        CoroutineScope(Dispatchers.Default).launch { server()?.getNxService()?.reset() }
+    }
+
     suspend fun workspace(): NxWorkspace? {
         return withMessageIssueCatch("nx/workspace") {
             server()?.getNxService()?.workspace()?.await()

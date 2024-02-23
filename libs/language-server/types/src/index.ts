@@ -23,6 +23,8 @@ export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
 export const NxWorkspaceRefreshNotification: NotificationType<void> =
   new NotificationType('nx/refreshWorkspace');
 
+export const NxReset: NotificationType<void> = new NotificationType('nx/reset');
+
 export const NxWorkspaceRequest: RequestType<
   { reset: boolean },
   NxWorkspace,
