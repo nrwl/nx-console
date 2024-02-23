@@ -120,7 +120,7 @@ class NxGenerateService(val project: Project) {
                         NxGeneratorOptionsRequestOptions(
                             generator.data.collection,
                             generator.data.name,
-                            generator.path
+                            generator.schemaPath
                         )
                     )
 
