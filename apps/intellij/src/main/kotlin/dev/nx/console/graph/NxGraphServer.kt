@@ -72,7 +72,7 @@ open class NxGraphServer(
     suspend fun handleGraphRequest(request: NxGraphRequest, attempt: Int = 0): NxGraphRequest {
         try {
 
-            if (nxGraphProcess?.isAlive != true && !isStarting) {
+            if (nxGraphProcess == null || nxGraphProcess?.isAlive != true && !isStarting) {
                 start()
                 waitForServerReady()
             }

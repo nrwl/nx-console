@@ -22,6 +22,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxReset,
   NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
   NxTargetsForConfigFileRequest,
@@ -36,6 +37,7 @@ import {
   getLanguageModelCache,
   lspLogger,
   mergeArrays,
+  nxReset,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
@@ -140,7 +142,7 @@ connection.onInitialize(async (params) => {
         if (!WORKING_PATH) {
           return;
         }
-        reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+        await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
       }
     );
   } catch (e) {
@@ -330,6 +332,15 @@ documents.onDidOpen(async (e) => {
 connection.onShutdown(() => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
+});
+
+connection.onNotification(NxReset, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
+  await nxReset(WORKING_PATH, lspLogger);
+  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
@@ -538,7 +549,7 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
 
-  reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 connection.onNotification(

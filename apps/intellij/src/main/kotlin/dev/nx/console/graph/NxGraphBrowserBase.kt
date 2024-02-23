@@ -55,7 +55,6 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         browser.setOpenLinksInExternalBrowser(true)
 
         registerThemeListener()
-        setColors()
 
         queryMessenger.addHandler { msg ->
             when (msg) {
@@ -207,6 +206,8 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 </head>"""
                 )
             )
+
+        setColors()
         return htmlText
     }
 
