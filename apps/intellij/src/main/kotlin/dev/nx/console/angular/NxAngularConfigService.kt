@@ -1,6 +1,5 @@
 package dev.nx.console.angular
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
@@ -70,10 +69,10 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
         val projectFiles =
             workspace.workspace.projects.values
                 .asSequence()
-                // TODO use dependency graph here, or framework property
-                .filter { project ->
-                    project.targets.values.any { it.executor.contains("angular") }
-                }
+                // TODO: use framework metadata in the future, for now just register all projects
+                //                .filter { project ->
+                //                    project.targets.values.any { it.executor.contains("angular") }
+                //                }
                 .mapNotNull { project ->
                     workspaceRoot
                         .findFileByRelativePath(project.root)
