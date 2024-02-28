@@ -1,5 +1,6 @@
 package dev.nx.console.angular
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
