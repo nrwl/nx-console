@@ -36,7 +36,7 @@ export async function selectGenerator(
         label: `${generatorData.collection} - ${generatorData.name}`,
         generatorName: `${generatorData.collection}:${generatorData.name}`,
         collectionName: generatorData.collection,
-        collectionPath: collection.path,
+        collectionPath: collection.schemaPath,
         generator: generatorData,
       };
     });
@@ -157,7 +157,7 @@ export async function getGenerator(
       const options = await getGeneratorOptions({
         collection: generatorInfo.collection,
         name: generatorInfo.name,
-        path: foundGenerator.path,
+        path: foundGenerator.schemaPath,
       });
       return {
         collectionName: foundGenerator.data?.collection ?? '',

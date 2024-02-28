@@ -1,0 +1,5 @@
+{
+  "name": "@nx-console/language-server/capabilities/definition",
+  "version": "0.0.1",
+  "type": "commonjs"
+}

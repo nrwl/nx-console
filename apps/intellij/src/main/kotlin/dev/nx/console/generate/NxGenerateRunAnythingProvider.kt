@@ -127,7 +127,7 @@ class NxGenerateRunAnythingProvider : RunAnythingCommandLineProvider() {
                         NxGeneratorOptionsRequestOptions(
                             collection = generator.data.collection,
                             name = generator.data.name,
-                            path = generator.path
+                            path = generator.schemaPath
                         )
                     )
             }

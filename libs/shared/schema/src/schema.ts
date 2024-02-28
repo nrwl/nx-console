@@ -76,11 +76,28 @@ export interface TaskExecutionSchema {
   };
 }
 
-export interface CollectionInfo {
+export type CollectionInfo = GeneratorCollectionInfo | ExecutorCollectionInfo;
+
+export interface GeneratorCollectionInfo {
+  type: 'generator';
   name: string;
-  path: string;
-  type: 'executor' | 'generator';
+  /**
+   * The path to the file that lists all generators in the collection.
+   */
+  configPath: string;
+  schemaPath: string;
   data?: Generator;
+}
+
+export interface ExecutorCollectionInfo {
+  type: 'executor';
+  name: string;
+  /**
+   * The path to the file that lists all executors in the collection.
+   */
+  configPath: string;
+  schemaPath: string;
+  implementationPath: string;
 }
 
 export enum GeneratorType {

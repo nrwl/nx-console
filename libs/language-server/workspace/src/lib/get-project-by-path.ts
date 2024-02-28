@@ -14,6 +14,9 @@ export async function getProjectByPath(
   path: string,
   workspacePath: string
 ): Promise<ProjectConfiguration | undefined> {
+  path = normalize(path);
+  // windows paths like /c:/Users/... aren't correctly picked up by normalize() so we need to handle them ourselves
+  path = path.startsWith(sep) ? path.substring(1) : path;
   const projectsMap = await getProjectsByPaths([path], workspacePath);
   return projectsMap?.[path] || undefined;
 }
@@ -44,13 +47,27 @@ export async function getProjectsByPaths(
   if (!paths) {
     return undefined;
   }
+  // windows paths like /c:/Users/... aren't correctly picked up by normalize() so we need to handle them ourselves
+  const pathsNormalized = paths
+    .map((p) => normalize(p))
+    .map((p) => (p.startsWith(sep) ? p.substring(1) : p));
+  workspacePath = normalize(workspacePath);
+  workspacePath = workspacePath.startsWith(sep)
+    ? workspacePath.substring(1)
+    : workspacePath;
 
   const { workspace } = await nxWorkspace(workspacePath);
   const pathsMap = new Map<
     string,
     { relativePath: string; isDirectory: boolean }
   >();
-  for (const path of paths) {
+  for (const path of pathsNormalized) {
+    lspLogger.log(
+      `workspacePath: ${workspacePath}, path ${path}, relative: ${relative(
+        workspacePath,
+        path
+      )}`
+    );
     pathsMap.set(path, {
       relativePath: relative(workspacePath, path),
       isDirectory: await directoryExists(path),
@@ -101,7 +118,7 @@ export async function getProjectsByPaths(
     );
     projectConfig.files?.forEach(({ file }) => {
       for (const [path, { relativePath }] of nonDirectoryPaths) {
-        if (file === relativePath) {
+        if (normalize(file) === normalize(relativePath)) {
           foundProjects.set(path, projectConfig);
           pathsMap.delete(path);
         }

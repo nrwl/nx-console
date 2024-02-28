@@ -3,7 +3,7 @@ import {
   GeneratorSchema,
 } from '@nx-console/shared/generate-ui-types';
 import {
-  CollectionInfo,
+  GeneratorCollectionInfo,
   Option,
   TaskExecutionSchema,
 } from '@nx-console/shared/schema';
@@ -23,6 +23,8 @@ export const NxChangeWorkspace: NotificationType<string> = new NotificationType(
 export const NxWorkspaceRefreshNotification: NotificationType<void> =
   new NotificationType('nx/refreshWorkspace');
 
+export const NxReset: NotificationType<void> = new NotificationType('nx/reset');
+
 export const NxWorkspaceRequest: RequestType<
   { reset: boolean },
   NxWorkspace,
@@ -41,7 +43,7 @@ export const NxGeneratorsRequest: RequestType<
   {
     options?: NxGeneratorsRequestOptions;
   },
-  CollectionInfo[],
+  GeneratorCollectionInfo[],
   unknown
 > = new RequestType('nx/generators');
 
