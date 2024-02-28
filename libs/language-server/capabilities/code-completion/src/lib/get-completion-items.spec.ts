@@ -1,9 +1,12 @@
-import { configureJsonLanguageService } from '@nx-console/language-server/utils';
+import {
+  configureJsonLanguageService,
+  getLanguageModelCache,
+} from '@nx-console/language-server/utils';
 import {
   CompletionType,
   EnhancedJsonSchema,
 } from '@nx-console/shared/json-schema';
-import * as workspace from '@nx-console/language-server/workspace';
+import type * as workspace from '@nx-console/language-server/workspace';
 import { vol } from 'memfs';
 import {
   ClientCapabilities,
@@ -135,6 +138,7 @@ describe('getCompletionItems', () => {
 
   afterAll(() => {
     vol.reset();
+    getLanguageModelCache().dispose();
   });
 
   it('should return all completion items without a glob', async () => {

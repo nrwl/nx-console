@@ -10,4 +10,5 @@ export default {
   coverageDirectory: '../../../coverage/libs/vscode/nx-run-target-view',
   testEnvironment: 'node',
   preset: '../../../jest.preset.js',
+  passWithNoTests: true,
 };
