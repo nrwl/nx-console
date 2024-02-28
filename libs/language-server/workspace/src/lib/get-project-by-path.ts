@@ -3,6 +3,7 @@ import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { isAbsolute, join, normalize, relative, sep } from 'path';
 import { nxWorkspace } from './workspace';
 import { lspLogger } from '@nx-console/language-server/utils';
+import { platform } from 'os';
 
 let _rootProjectMap: Record<string, ProjectConfiguration> | undefined;
 
@@ -16,7 +17,8 @@ export async function getProjectByPath(
 ): Promise<ProjectConfiguration | undefined> {
   path = normalize(path);
   // windows paths like /c:/Users/... aren't correctly picked up by normalize() so we need to handle them ourselves
-  path = path.startsWith(sep) ? path.substring(1) : path;
+  path =
+    path.startsWith(sep) && platform() === 'win32' ? path.substring(1) : path;
   const projectsMap = await getProjectsByPaths([path], workspacePath);
   return projectsMap?.[path] || undefined;
 }
@@ -50,11 +52,14 @@ export async function getProjectsByPaths(
   // windows paths like /c:/Users/... aren't correctly picked up by normalize() so we need to handle them ourselves
   const pathsNormalized = paths
     .map((p) => normalize(p))
-    .map((p) => (p.startsWith(sep) ? p.substring(1) : p));
+    .map((p) =>
+      p.startsWith(sep) && platform() === 'win32' ? p.substring(1) : p
+    );
   workspacePath = normalize(workspacePath);
-  workspacePath = workspacePath.startsWith(sep)
-    ? workspacePath.substring(1)
-    : workspacePath;
+  workspacePath =
+    workspacePath.startsWith(sep) && platform() === 'win32'
+      ? workspacePath.substring(1)
+      : workspacePath;
 
   const { workspace } = await nxWorkspace(workspacePath);
   const pathsMap = new Map<
@@ -62,12 +67,12 @@ export async function getProjectsByPaths(
     { relativePath: string; isDirectory: boolean }
   >();
   for (const path of pathsNormalized) {
-    lspLogger.log(
-      `workspacePath: ${workspacePath}, path ${path}, relative: ${relative(
-        workspacePath,
-        path
-      )}`
-    );
+    // lspLogger.log(
+    //   `workspacePath: ${workspacePath}, path ${path}, relative: ${relative(
+    //     workspacePath,
+    //     path
+    //   )}, isDirectory: ${await directoryExists(path)}`
+    // );
     pathsMap.set(path, {
       relativePath: relative(workspacePath, path),
       isDirectory: await directoryExists(path),
