@@ -169,6 +169,8 @@
       <add-to-group group-id="AnalyzeActions"/>
     </action>
   </actions>
+
+
   <extensionPoints>
     <extensionPoint interface="dev.nx.console.generate.ui.NxGenerateUiRenderer"
                     name="nxGenerateUiRenderer"/>

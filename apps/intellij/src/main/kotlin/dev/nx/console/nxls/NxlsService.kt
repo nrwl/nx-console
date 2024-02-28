@@ -163,6 +163,13 @@ class NxlsService(val project: Project) {
         }()
     }
 
+    suspend fun sourceMapFilesToProjectMap(): Map<String, String> {
+        return withMessageIssueCatch("nx/sourceMapFilesToProjectMap") {
+            server()?.getNxService()?.sourceMapFilesToProjectMap()?.await()
+        }()
+            ?: emptyMap()
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }

@@ -1,7 +1,8 @@
 package dev.nx.console.project_details
 
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.*
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorPolicy
@@ -13,29 +14,18 @@ import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsProvider
 import dev.nx.console.utils.nxBasePath
-import kotlin.io.path.Path
+import java.nio.file.Paths
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
     override fun accept(project: Project, file: VirtualFile): Boolean {
-        if (
-            file.name.endsWith("project.json") &&
-                NxConsoleSettingsProvider.getInstance().showProjectDetailsView
-        ) {
+        if (!NxConsoleSettingsProvider.getInstance().showProjectDetailsView) return false
+        if (file.name.endsWith("project.json")) {
             return true
         }
-        if (
-            file.name.endsWith("package.json") &&
-                NxConsoleSettingsProvider.getInstance().showProjectDetailsView
-        ) {
-            return if (Path(project.nxBasePath, "package.json").toString() != file.path) {
-                true
-            } else {
-                RootPackageJsonProjectDetailsFileEditorHandler.getInstance(project)
-                    .hasProjectAtRootPackageJson
-            }
+        if (ProjectDetailsFilesService.getInstance(project).isProjectDetailsFile(file)) {
+            return true
         }
         return false
     }
@@ -54,44 +44,67 @@ class ProjectDetailsFileEditorProvider : FileEditorProvider, DumbAware {
 }
 
 @Service(Service.Level.PROJECT)
-class RootPackageJsonProjectDetailsFileEditorHandler(private val project: Project) {
-    var hasProjectAtRootPackageJson: Boolean = false
+class ProjectDetailsFilesService(private val project: Project, private val cs: CoroutineScope) {
+    private var projectDetailsFiles: List<String> = emptyList()
 
     private val nxlsService = NxlsService.getInstance(project)
 
     init {
-        checkRootProject()
+        projectDetailsFiles =
+            PropertiesComponent.getInstance(project).getList("dev.nx.console.project_details_files")
+                ?: emptyList()
+        setProjectDetailsFiles()
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        CoroutineScope(Dispatchers.Default).launch { checkRootProject() }
-                    }
-                }
+                NxWorkspaceRefreshListener { setProjectDetailsFiles() }
             )
         }
     }
 
-    private fun checkRootProject() {
-        CoroutineScope(Dispatchers.Default).launch {
-            hasProjectAtRootPackageJson =
-                nxlsService.projectByPath(Path("package.json").toString()) != null
-            if (hasProjectAtRootPackageJson) {
-                ApplicationManager.getApplication().invokeLater {
-                    val fileEditorManager = FileEditorManager.getInstance(project)
+    fun isProjectDetailsFile(file: VirtualFile): Boolean {
+        return projectDetailsFiles.contains(file.path)
+    }
 
-                    val openFiles = fileEditorManager.openFiles
+    private fun setProjectDetailsFiles() {
+        cs.launch {
+            val sourceMapFilesToProjectMap = nxlsService.sourceMapFilesToProjectMap()
 
-                    val rootPackageJson =
-                        openFiles.find {
-                            it.path == Path(project.nxBasePath, "package.json").toString()
-                        }
+            val pathsSet = mutableSetOf<String>()
 
-                    rootPackageJson?.also {
-                        fileEditorManager.closeFile(it)
+            sourceMapFilesToProjectMap.keys.forEach { sourceMapFilePath ->
+                pathsSet.add(Paths.get(project.nxBasePath, sourceMapFilePath).toString())
 
-                        fileEditorManager.openFile(it, true)
+                Paths.get(sourceMapFilePath)
+                    .parent
+                    ?.toString()
+                    ?.let { parent ->
+                        Paths.get(project.nxBasePath, parent, "package.json").toString()
+                    }
+                    ?.also { packageJsonPath -> pathsSet.add(packageJsonPath) }
+            }
+
+            if (pathsSet.size > 0) {
+                projectDetailsFiles = pathsSet.toList()
+                PropertiesComponent.getInstance(project)
+                    .setList("dev.nx.console.project_details_files", projectDetailsFiles)
+            }
+            // because ProjectDetailsFileEditorProvider triggers only when the file is opened, we
+            // need to reopen all files that should have a PDV preview but don't
+            ApplicationManager.getApplication().invokeLater {
+                val fileEditorManager = FileEditorManager.getInstance(project)
+
+                val openFiles = fileEditorManager.openFiles
+
+                projectDetailsFiles.forEach { projectDetailsFile ->
+                    val file = openFiles.find { it.path == projectDetailsFile }
+                    if (
+                        file != null &&
+                            fileEditorManager.getSelectedEditor(file) !is
+                                ProjectDetailsEditorWithPreview
+                    ) {
+                        fileEditorManager.closeFile(file)
+                        fileEditorManager.openFile(file, true)
                     }
                 }
             }
@@ -99,7 +112,7 @@ class RootPackageJsonProjectDetailsFileEditorHandler(private val project: Projec
     }
 
     companion object {
-        fun getInstance(project: Project): RootPackageJsonProjectDetailsFileEditorHandler =
-            project.getService(RootPackageJsonProjectDetailsFileEditorHandler::class.java)
+        fun getInstance(project: Project): ProjectDetailsFilesService =
+            project.getService(ProjectDetailsFilesService::class.java)
     }
 }
