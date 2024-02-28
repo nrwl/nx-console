@@ -3,20 +3,6 @@
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/language-server/capabilities/code-completion/src",
   "projectType": "library",
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/language-server/capabilities/code-completion"
-      ],
-      "options": {
-        "jestConfig": "libs/language-server/capabilities/code-completion/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": ["type:lsp"]
 }

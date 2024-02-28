@@ -3,17 +3,6 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/generate-ui/components/src",
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "options": {
-        "jestConfig": "libs/generate-ui/components/jest.config.ts"
-      },
-      "outputs": ["{workspaceRoot}/coverage/libs/generate-ui/components"]
-    }
-  },
+  "targets": {},
   "tags": ["type:generate-ui"]
 }

@@ -3,18 +3,6 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/file-system/src",
   "projectType": "library",
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/shared/file-system"],
-      "options": {
-        "jestConfig": "libs/shared/file-system/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": ["type:shared"]
 }

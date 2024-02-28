@@ -10,4 +10,5 @@ export default {
   coverageDirectory: '../../../coverage/libs/shared/json-schema',
   testEnvironment: 'node',
   preset: '../../../jest.preset.js',
+  passWithNoTests: true,
 };

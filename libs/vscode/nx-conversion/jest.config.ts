@@ -15,4 +15,5 @@ export default {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../../coverage/libs/vscode/nx-conversion',
   preset: '../../../jest.preset.js',
+  passWithNoTests: true,
 };

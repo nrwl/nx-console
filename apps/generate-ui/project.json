@@ -87,16 +87,6 @@
         }
       },
       "outputs": ["{options.outputPath}"]
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "options": {
-        "jestConfig": "apps/generate-ui/jest.config.ts"
-      },
-      "outputs": ["{workspaceRoot}/coverage/apps/generate-ui"]
     }
   },
   "implicitDependencies": ["generate-ui-styles"],

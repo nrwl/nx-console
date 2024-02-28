@@ -192,9 +192,6 @@
       },
       "dependsOn": ["^build"]
     },
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
     "package": {
       "executor": "nx:run-commands",
       "dependsOn": ["build", "^build"],
