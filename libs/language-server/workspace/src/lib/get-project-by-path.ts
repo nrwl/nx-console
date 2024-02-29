@@ -135,6 +135,22 @@ export async function getProjectsByPaths(
     }
   }
 
+  // if a directory is not found in any projects & there's a root project, use that
+  if (pathsMap.size > 0) {
+    const rootProject = projectEntries.find(
+      ([, projectConfig]) => projectConfig.root === '.'
+    );
+    if (rootProject) {
+      new Map(pathsMap).forEach(({ isDirectory }, path) => {
+        if (!isDirectory) {
+          return;
+        }
+        foundProjects.set(path, rootProject[1]);
+        pathsMap.delete(path);
+      });
+    }
+  }
+
   return Object.fromEntries(foundProjects);
 }
 
