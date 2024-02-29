@@ -63,7 +63,9 @@ class ProjectDetailsFilesService(private val project: Project, private val cs: C
     }
 
     fun isProjectDetailsFile(file: VirtualFile): Boolean {
-        return projectDetailsFiles.contains(file.path)
+        return projectDetailsFiles
+            .map { Paths.get(it).normalize().toString() }
+            .contains(Paths.get(file.path).normalize().toString())
     }
 
     private fun setProjectDetailsFiles() {
