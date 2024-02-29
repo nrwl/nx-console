@@ -55,7 +55,6 @@
                               implementationClass="dev.nx.console.graph.NxFocusTargetInGraphLineMarkerContributor"/>
 
     <!-- Run -->
-    <projectService serviceImplementation="dev.nx.console.run.NxTaskExecutionManager"/>
     <runAnything.executionProvider
       implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
     <searchEverywhereContributor
@@ -73,6 +72,10 @@
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.run.NxRunTargetLineMarkerContributor"/>
 
+    <codeInsight.codeVisionProvider
+      implementation="dev.nx.console.project_details.ConfigFileCodeVisionProvider"/>
+    <config.codeVisionGroupSettingProvider
+      implementation="dev.nx.console.project_details.ConfigFileCodeVisionGroupSettingProvider"/>
     <!--Tool Window-->
     <toolWindow id="Nx Console"
                 anchor="right"

@@ -4,6 +4,7 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -27,10 +28,7 @@ import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.nxProjectConfigurationPath
 import dev.nx.console.utils.nxWorkspace
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
@@ -52,27 +50,25 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            try {
-                                val error = NxlsService.getInstance(project).workspace()?.error
-                                if (error != null) {
-                                    loadHtml()
-                                } else if (isShowingPDV) {
-                                    nxProjectName.also {
-                                        if (it != null) {
-                                            loadProjectDetails(it)
-                                        } else {
-                                            loadHtml()
-                                        }
+                NxWorkspaceRefreshListener {
+                    coroutineScope.launch {
+                        try {
+                            val error = NxlsService.getInstance(project).workspace()?.error
+                            if (error != null) {
+                                loadHtml()
+                            } else if (isShowingPDV) {
+                                nxProjectName.also {
+                                    if (it != null) {
+                                        loadProjectDetails(it)
+                                    } else {
+                                        loadHtml()
                                     }
-                                } else {
-                                    loadHtml()
                                 }
-                            } catch (e: Throwable) {
-                                logger<ProjectDetailsBrowser>().debug(e.message)
+                            } else {
+                                loadHtml()
                             }
+                        } catch (e: Throwable) {
+                            logger<ProjectDetailsBrowser>().debug(e.message)
                         }
                     }
                 }
@@ -82,15 +78,21 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
 
     private fun loadProjectDetails(nxProjectName: String) {
         executeWhenLoaded {
+            if (browser.isDisposed) return@executeWhenLoaded
             browser.executeJavaScript(
                 "window.waitForRouter().then(() => {console.log('waited for router', window.externalApi, '$nxProjectName'); window.externalApi.openProjectDetails('$nxProjectName')})"
             )
         }
     }
 
+    private var interactionEventQuery: JBCefJSQuery? = null
+
     private fun registerInteractionEventHandler(browser: JBCefBrowser) {
         executeWhenLoaded {
+            if (browser.isDisposed) return@executeWhenLoaded
+            interactionEventQuery?.dispose()
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+
             query.addHandler { msg ->
                 try {
                     val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
@@ -99,7 +101,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     when (messageParsed.type) {
                         "open-project-graph" -> {
                             messageParsed.payload.projectName?.also {
-                                CoroutineScope(Dispatchers.Default).launch {
+                                coroutineScope.launch {
                                     val nxGraphService = getNxGraphService(project) ?: return@launch
                                     ApplicationManager.getApplication().invokeLater {
                                         nxGraphService.focusProject(it)
@@ -110,7 +112,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         "open-task-graph" -> {
                             messageParsed.payload.projectName?.also { projectName ->
                                 messageParsed.payload.targetName?.also { targetName ->
-                                    CoroutineScope(Dispatchers.Default).launch {
+                                    coroutineScope.launch {
                                         val nxGraphService =
                                             getNxGraphService(project) ?: return@launch
                                         ApplicationManager.getApplication().invokeLater {
@@ -152,6 +154,8 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 }
                 """
             browser.executeJavaScript(js)
+
+            interactionEventQuery = query
         }
     }
 
@@ -160,20 +164,20 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
             currentLoadHtmlJob?.cancel()
         }
         currentLoadHtmlJob =
-            CoroutineScope(Dispatchers.Default).launch {
+            coroutineScope.launch {
                 try {
                     isShowingPDV = false
                     val nxlsService = NxlsService.getInstance(project)
                     nxlsService.awaitStarted()
 
-                    val version = nxlsService.nxVersion()
+                    val version = withTimeout(2000) { nxlsService.nxVersion() }
 
                     if (
                         version == null ||
                             !version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))
                     ) {
-                        ApplicationManager.getApplication().invokeLater {
-                            browser.loadHTML(
+                        withContext(Dispatchers.EDT) {
+                            wrappedBrowserLoadHtml(
                                 """<h1 style="
                           font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
                           font-size: ${UIUtil.getLabelFont().size}px;
@@ -191,8 +195,10 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         error = "Unable to find Nx project for file: ${file.path}"
                     }
                     if (error != null) {
-                        ApplicationManager.getApplication().invokeLater {
-                            browser.loadHTML(loadErrorHtml(error))
+                        withContext(Dispatchers.EDT) {
+                            if (browser.isDisposed) return@withContext
+                            wrappedBrowserLoadHtml(loadErrorHtml(error))
+
                             registerResetHandler(browser)
                         }
                         isShowingPDV = false
@@ -214,37 +220,56 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                   """
                                 .trimIndent()
                         )
-                    ApplicationManager.getApplication().invokeLater {
+                    withContext(Dispatchers.EDT) {
                         isShowingPDV = true
-                        browser.loadHTML(htmlText)
+                        wrappedBrowserLoadHtml(htmlText)
                         registerInteractionEventHandler(browser)
 
                         nxProjectName?.also { loadProjectDetails(it) }
                     }
                 } catch (e: Throwable) {
                     logger<ProjectDetailsBrowser>().debug(e.message)
+                    if (e is TimeoutCancellationException) {
+                        withContext(Dispatchers.EDT) {
+                            if (browser.isDisposed) return@withContext
+                            wrappedBrowserLoadHtml(
+                                loadErrorHtml(
+                                    e.message
+                                        ?: "Nx Console timed out while loading. Please reset to try again."
+                                )
+                            )
+
+                            registerResetHandler(browser)
+                        }
+                    }
+                    isShowingPDV = false
                 }
             }
     }
 
+    private var resetQuery: JBCefJSQuery? = null
+
     private fun registerResetHandler(browser: JBCefBrowser) {
-        CoroutineScope(Dispatchers.Default).launch {
-            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
-            query.addHandler {
-                CoroutineScope(Dispatchers.Default).launch {
+        executeWhenLoaded {
+            if (browser.isDisposed) return@executeWhenLoaded
+            resetQuery?.dispose()
+            resetQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            resetQuery?.also { query ->
+                query.addHandler {
                     val nxlsService = NxlsService.getInstance(project)
                     ApplicationManager.getApplication().invokeLater { nxlsService.resetWorkspace() }
-                }
-                null
-            }
 
-            val js =
-                """
+                    null
+                }
+
+                val js =
+                    """
                 window.reset = () => {
                     ${query.inject("reset")}
                 }
                 """
-            browser.executeJavaScript(js)
+                coroutineScope.launch { browser.executeJavaScript(js) }
+            }
         }
     }
 
@@ -267,6 +292,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 color: rgb(59 130 246)
               }
             </style>
+
             <p>Unable to load the project graph. The following error occurred:</p>
       <pre>${error}</pre>
       If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reset</a> the graph.
@@ -279,7 +305,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         targetName: String,
         targetConfigString: String
     ) {
-        CoroutineScope(Dispatchers.Default).launch {
+        coroutineScope.launch {
             project.nxWorkspace()?.workspace?.projects?.get(projectName)?.apply {
                 val path = nxProjectConfigurationPath(project, root) ?: return@apply
                 ApplicationManager.getApplication().invokeLater {

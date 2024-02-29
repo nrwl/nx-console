@@ -1,6 +1,7 @@
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.util.io.readLineAsync
 import dev.nx.console.graph.NxGraphRequest
@@ -21,7 +22,8 @@ data class WebviewRequest(val type: String, val id: String) {}
 data class WebviewResponse(val type: String, val id: String, val payload: String) {}
 
 @Service(Service.Level.PROJECT)
-class StandardNxGraphServer(project: Project) : NxGraphServer(project, 5580, false) {
+class StandardNxGraphServer(project: Project, cs: CoroutineScope) :
+    NxGraphServer(project, 5580, false, cs) {
     companion object {
         fun getInstance(project: Project): NxGraphServer =
             project.getService(StandardNxGraphServer::class.java)
@@ -29,7 +31,8 @@ class StandardNxGraphServer(project: Project) : NxGraphServer(project, 5580, fal
 }
 
 @Service(Service.Level.PROJECT)
-class AffectedNxGraphServer(project: Project) : NxGraphServer(project, 5590, true) {
+class AffectedNxGraphServer(project: Project, cs: CoroutineScope) :
+    NxGraphServer(project, 5590, true, cs) {
     companion object {
         fun getInstance(project: Project): NxGraphServer =
             project.getService(AffectedNxGraphServer::class.java)
@@ -41,7 +44,8 @@ val logger = logger<NxGraphServer>()
 open class NxGraphServer(
     private val project: Project,
     private val startPort: Int,
-    private val affected: Boolean
+    private val affected: Boolean,
+    private val cs: CoroutineScope
 ) : Disposable {
 
     var currentPort: Int? = null
@@ -54,14 +58,10 @@ open class NxGraphServer(
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            nxGraphProcess?.apply {
-                                if (!isAlive) {
-                                    start()
-                                }
-                            }
+                NxWorkspaceRefreshListener {
+                    nxGraphProcess?.apply {
+                        if (!isAlive) {
+                            start()
                         }
                     }
                 }
@@ -107,7 +107,12 @@ open class NxGraphServer(
             if (attempt == 0) {
                 return handleGraphRequest(request, 1)
             }
-            return request
+            return NxGraphRequest(
+                type = request.type,
+                id = request.id,
+                payload = request.payload,
+                error = e.message
+            )
         }
     }
 
@@ -118,7 +123,7 @@ open class NxGraphServer(
 
         isStarting = true
         isStarted = false
-        CoroutineScope(Dispatchers.Default).launch {
+        cs.launch {
             var port = startPort
             var isPortAvailable = false
             while (!isPortAvailable) {
@@ -173,12 +178,13 @@ open class NxGraphServer(
             var stopWaiting = false
             var line: String? = null
             line = reader.readLineAsync()
-
+            thisLogger().trace("Read line while starting: $line")
             while (!stopWaiting) {
                 if (line != null && line.contains(port.toString())) {
                     stopWaiting = true
                 }
                 line = reader.readLineAsync()?.trim()?.lowercase()
+                thisLogger().trace("Read line while starting: $line")
             }
 
             process
@@ -205,9 +211,11 @@ open class NxGraphServer(
         }
     }
 
-    suspend fun waitForServerReady() {
-        while (!isStarted) {
-            delay(100)
+    private suspend fun waitForServerReady() {
+        withTimeout(10000) {
+            while (!isStarted) {
+                delay(100)
+            }
         }
     }
 

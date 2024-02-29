@@ -5,14 +5,17 @@ import com.intellij.execution.RunManager
 import com.intellij.execution.RunnerAndConfigurationSettings
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionUtil
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
+@Service(Service.Level.PROJECT)
 class NxTaskExecutionManager(val project: Project) {
 
     fun execute(nxProject: String, nxTarget: String) {
         execute(nxProject, nxTarget, "")
     }
+
     fun execute(
         nxProject: String,
         nxTarget: String,

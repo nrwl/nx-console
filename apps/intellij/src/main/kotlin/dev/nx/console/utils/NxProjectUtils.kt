@@ -4,10 +4,12 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.ColoredListCellRenderer
 import com.intellij.ui.SimpleTextAttributes
 import dev.nx.console.nxls.NxlsService
+import java.util.function.Consumer
 import javax.swing.JList
 import javax.swing.ListSelectionModel
 import kotlin.coroutines.resume
@@ -38,6 +40,7 @@ suspend fun selectNxProject(
                     .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
                     .setRequestFocus(true)
                     .setFilterAlwaysVisible(true)
+                    .setNamerForFiltering { it }
                     .setResizable(true)
                     .setMovable(true)
                     .setAutoPackHeightOnFiltering(true)
@@ -81,7 +84,7 @@ suspend fun selectTargetForNxProject(
     project: Project,
     dataContext: DataContext,
     nxProject: String,
-): String? = suspendCoroutine {
+): String? = suspendCoroutine { continuation ->
     CoroutineScope(Dispatchers.Default).launch {
         val targets =
             NxlsService.getInstance(project)
@@ -96,35 +99,46 @@ suspend fun selectTargetForNxProject(
 
         ApplicationManager.getApplication().invokeLater {
             val popup =
-                JBPopupFactory.getInstance()
-                    .createPopupChooserBuilder(targets)
-                    .setTitle("Select target of $nxProject")
-                    .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-                    .setRequestFocus(true)
-                    .setFilterAlwaysVisible(true)
-                    .setResizable(true)
-                    .setMovable(true)
-                    .setAutoPackHeightOnFiltering(true)
-                    .setRenderer(
-                        object : ColoredListCellRenderer<String>() {
-                            override fun customizeCellRenderer(
-                                list: JList<out String>,
-                                value: String?,
-                                index: Int,
-                                selected: Boolean,
-                                hasFocus: Boolean
-                            ) {
-                                if (value == null) return
-                                icon = AllIcons.General.Gear
-                                append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
-                            }
-                        }
-                    )
-                    .setItemChosenCallback { chosen -> it.resume(chosen) }
-                    .setDimensionServiceKey("nx.dev.console.select_target")
-                    .createPopup()
+                createSelectTargetPopup("Select target of $nxProject ", targets) {
+                    continuation.resume(it)
+                }
 
             popup.showInBestPositionFor(dataContext)
         }
     }
+}
+
+fun createSelectTargetPopup(
+    title: String,
+    targets: List<String>,
+    callback: Consumer<String>
+): JBPopup {
+    return JBPopupFactory.getInstance()
+        .createPopupChooserBuilder(targets)
+        .setTitle(title)
+        .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        .setRequestFocus(true)
+        .setNamerForFiltering { it }
+        .setFilterAlwaysVisible(true)
+        .setResizable(true)
+        .setMovable(true)
+        .setAutoPackHeightOnFiltering(true)
+        .setRenderer(
+            object : ColoredListCellRenderer<String>() {
+                override fun customizeCellRenderer(
+                    list: JList<out String>,
+                    value: String?,
+                    index: Int,
+                    selected: Boolean,
+                    hasFocus: Boolean
+                ) {
+                    if (value == null) return
+                    icon = AllIcons.General.Gear
+                    append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
+                }
+            }
+        )
+        .setItemChosenCallback { chosen -> callback.accept(chosen) }
+        .setDimensionServiceKey("nx.dev.console.select_target")
+        .createPopup()
 }
