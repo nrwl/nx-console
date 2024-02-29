@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.CodeSmellDetector
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.findNxConfigurationFiles
 
@@ -25,9 +26,13 @@ class AnalyzeNxConfigurationFilesNotificationAction :
     }
 }
 
+@Suppress("UnstableApiUsage")
 fun checkForCodeSmells(project: Project) {
+    val files = runWithModalProgressBlocking(project, "Find configuration files") {
+        findNxConfigurationFiles(project)
+    }
     val codeSmellDetector = CodeSmellDetector.getInstance(project)
-    val codeSmells = codeSmellDetector.findCodeSmells(findNxConfigurationFiles(project))
+    val codeSmells = codeSmellDetector.findCodeSmells(files)
     if (codeSmells.size == 0) {
         Notifier.notifyAnything(
             project,
@@ -37,3 +42,4 @@ fun checkForCodeSmells(project: Project) {
         codeSmellDetector.showCodeSmellErrors(codeSmells)
     }
 }
+
