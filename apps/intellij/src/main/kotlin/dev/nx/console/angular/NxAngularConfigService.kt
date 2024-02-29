@@ -8,6 +8,8 @@ import com.intellij.openapi.roots.ex.ProjectRootManagerEx
 import com.intellij.openapi.util.EmptyRunnable
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.util.xmlb.annotations.Attribute
+import com.intellij.util.xmlb.annotations.XMap
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.nxls.NxlsService.Companion.NX_WORKSPACE_REFRESH_TOPIC
@@ -35,12 +37,19 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
 
     override fun getState(): AngularConfigState? =
         config?.let { config ->
-            AngularConfigState(config.file.url, config.projectFiles.mapValues { it.value.url })
+            AngularConfigState().apply {
+                workspaceLocation = config.file.url
+                projects = config.projectFiles.mapValues { it.value.url }.toMutableMap()
+            }
         }
+
+    override fun noStateLoaded() {
+        refresh()
+    }
 
     override fun loadState(state: AngularConfigState) {
         val vfManager = VirtualFileManager.getInstance()
-        val workspaceFile = vfManager.findFileByUrl(state.workspaceLocation)
+        val workspaceFile = state.workspaceLocation?.let { vfManager.findFileByUrl(it) }
         val projectFiles =
             state.projects
                 .mapNotNull { (name, url) -> vfManager.findFileByUrl(url)?.let { Pair(name, it) } }
@@ -98,7 +107,17 @@ class NxAngularConfigService(private val project: Project, private val cs: Corou
         }
     }
 
-    data class AngularConfigState(val workspaceLocation: String, val projects: Map<String, String>)
+    class AngularConfigState {
+        @Attribute("workspaceLocation") var workspaceLocation: String? = null
+
+        @XMap(
+            propertyElementName = "projects",
+            entryTagName = "project",
+            keyAttributeName = "name",
+            valueAttributeName = "file"
+        )
+        var projects: MutableMap<String, String> = mutableMapOf()
+    }
 }
 
 class NxAngularConfigProvider : AngularConfigProvider {
