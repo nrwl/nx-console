@@ -1,3 +1,23 @@
+## 1.19.0 (2024-03-01)
+
+### Bug Fixes
+
+* add option to reset the daemon from the project detail view ([#2029](https://github.com/nrwl/nx-console/issues/2029)) ([4cec017](https://github.com/nrwl/nx-console/commit/4cec0170e205e083dc09e4c78152e0320aad02fd))
+* don't mark generator options with x-prompt set as required anymore ([#2032](https://github.com/nrwl/nx-console/issues/2032)) ([d0a5a63](https://github.com/nrwl/nx-console/commit/d0a5a63ceba3bfc1bfc22e93d3d8bdcd369d3733))
+* **intellij:** correctly normalize paths when getting pdv preview ([#2039](https://github.com/nrwl/nx-console/issues/2039)) ([65e1250](https://github.com/nrwl/nx-console/commit/65e1250e08f4bf5b6e54d12949c5da64d56771a3))
+* **intellij:** fix generate ui ([#2030](https://github.com/nrwl/nx-console/issues/2030)) ([a6d6ecb](https://github.com/nrwl/nx-console/commit/a6d6ecb08aebdd6625efaba292706fd0b9b76ba4))
+* **intellij:** fix issue with NxAngularConfigService state not being stored ([#2037](https://github.com/nrwl/nx-console/issues/2037)) ([9e523e8](https://github.com/nrwl/nx-console/commit/9e523e814b16441057714a4b847d3e3d3fe47996))
+* **intellij:** provide Angular config for Angular support in Nx workspaces ([ec50b72](https://github.com/nrwl/nx-console/commit/ec50b7207d6e999270cad08d2e5946fdc673f637))
+* **nxls:** handle directories under a root project in getProjectByPath ([#2038](https://github.com/nrwl/nx-console/issues/2038)) ([3b94e1c](https://github.com/nrwl/nx-console/commit/3b94e1c2d05aa3ed0971285df9747a30fdde32a8))
+* **nxls:** handle windows paths better when getting project by path ([#2025](https://github.com/nrwl/nx-console/issues/2025)) ([bf82749](https://github.com/nrwl/nx-console/commit/bf8274972d5ea612d41d4b872be904e04d0eb0aa))
+* **nxls:** repair getting project by path for directories ([#2034](https://github.com/nrwl/nx-console/issues/2034)) ([b021549](https://github.com/nrwl/nx-console/commit/b02154983f0a1965a0a5319fcadc20cb83582362))
+
+
+### Features
+
+* go to executor definition ([#1962](https://github.com/nrwl/nx-console/issues/1962)) ([02c1923](https://github.com/nrwl/nx-console/commit/02c1923f569a3aceeb2f23bcfd639263afcbbc80))
+* **intellij:** show PDV in config files ([#2035](https://github.com/nrwl/nx-console/issues/2035)) ([ca6a922](https://github.com/nrwl/nx-console/commit/ca6a9225afb3e5129eb2aaa52487a19c9ff6b951))
+
 ## 1.18.0 (2024-02-02)
 
 ### Bug Fixes
