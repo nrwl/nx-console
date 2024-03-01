@@ -7,7 +7,7 @@ import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 
 export class GraphWebviewManager {
   private webviewPanel: WebviewPanel | undefined;
-  private currentPanelIsAffected: boolean = false;
+  private currentPanelIsAffected = false;
 
   constructor(private context: ExtensionContext) {}
 

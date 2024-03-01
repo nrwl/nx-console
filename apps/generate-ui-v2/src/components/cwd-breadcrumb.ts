@@ -12,7 +12,7 @@ import {
 export class CwdBreadcrumb extends GeneratorContextContext(
   EditorContext(LitElement)
 ) {
-  @state() _path: string = '';
+  @state() _path = '';
   @state() isEditable = false;
 
   set path(value: string) {
@@ -67,7 +67,11 @@ export class CwdBreadcrumb extends GeneratorContextContext(
       >
         <span class="pr-2"> Working Directory: </span>
         <span
-          @click="${hasPathSegments ? this.resetPath : () => {}}"
+          @click="${hasPathSegments
+            ? this.resetPath
+            : () => {
+                return;
+              }}"
           class="${hasPathSegments
             ? 'hover:text-primary cursor-pointer underline'
             : ''}"

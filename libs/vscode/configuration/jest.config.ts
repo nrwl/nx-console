@@ -10,4 +10,5 @@ export default {
   coverageDirectory: '../../../coverage/libs/vscode/configuration',
   testEnvironment: 'node',
   preset: '../../../jest.preset.js',
+  passWithNoTests: true,
 };

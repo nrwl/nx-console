@@ -13,4 +13,5 @@ export default {
   coverageDirectory: '../../../coverage/libs/vscode/nx-workspace',
   testEnvironment: 'node',
   preset: '../../../jest.preset.js',
+  passWithNoTests: true,
 };

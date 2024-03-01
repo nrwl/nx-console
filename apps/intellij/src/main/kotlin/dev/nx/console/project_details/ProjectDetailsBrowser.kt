@@ -193,6 +193,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     if (error != null) {
                         ApplicationManager.getApplication().invokeLater {
                             browser.loadHTML(loadErrorHtml(error))
+                            registerResetHandler(browser)
                         }
                         isShowingPDV = false
                         return@launch
@@ -206,6 +207,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     body {
                     font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
                     font-size: ${UIUtil.getLabelFont().size}px;
+                    color: ${getHexColor(UIUtil.getActiveTextColor())};
                     }
                     </style>
                     </head>
@@ -225,6 +227,27 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
             }
     }
 
+    private fun registerResetHandler(browser: JBCefBrowser) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+            query.addHandler {
+                CoroutineScope(Dispatchers.Default).launch {
+                    val nxlsService = NxlsService.getInstance(project)
+                    ApplicationManager.getApplication().invokeLater { nxlsService.resetWorkspace() }
+                }
+                null
+            }
+
+            val js =
+                """
+                window.reset = () => {
+                    ${query.inject("reset")}
+                }
+                """
+            browser.executeJavaScript(js)
+        }
+    }
+
     private fun loadErrorHtml(error: String): String {
         return """
        <style>
@@ -240,9 +263,13 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 border: 2px solid ${getHexColor(UIUtil.getLabelForeground())};
                 padding: 20px;
               }
+              a {
+                color: rgb(59 130 246)
+              }
             </style>
             <p>Unable to load the project graph. The following error occurred:</p>
       <pre>${error}</pre>
+      If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reset</a> the graph.
     """
             .trimIndent()
     }

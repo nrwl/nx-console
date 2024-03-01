@@ -4,24 +4,6 @@
   "projectType": "library",
   "sourceRoot": "libs/generate-ui/feature-task-execution-form/src",
   "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/generate-ui/feature-task-execution-form/src/**/*.ts",
-          "libs/generate-ui/feature-task-execution-form/src/**/*.html"
-        ]
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "options": {
-        "jestConfig": "libs/generate-ui/feature-task-execution-form/jest.config.ts"
-      },
-      "outputs": [
-        "{workspaceRoot}/coverage/libs/generate-ui/feature-task-execution-form"
-      ]
-    },
     "storybook": {
       "executor": "@storybook/angular:start-storybook",
       "options": {

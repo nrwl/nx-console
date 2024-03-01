@@ -11,7 +11,7 @@ export class Icon extends EditorContext(LitElement) {
   color = '';
 
   @property({ type: Boolean })
-  applyFillColor: boolean = false;
+  applyFillColor = false;
 
   render() {
     if (this.editor === 'intellij') {

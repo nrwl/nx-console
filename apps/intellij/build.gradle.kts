@@ -15,11 +15,11 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.9.21"
+    id("org.jetbrains.kotlin.jvm") version "1.9.22"
     // Kotlin serialization
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.16.1"
+    id("org.jetbrains.intellij") version "1.17.2"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
@@ -36,12 +36,19 @@ group = properties("pluginGroup")
 // Configure project's dependencies
 repositories { mavenCentral() }
 
-configurations.all { exclude("org.slf4j", "slf4j-api") }
+configurations.all {
+  exclude("org.slf4j", "slf4j-api")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
+  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
+}
 
 dependencies {
     implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.21.0")
 
-    val ktorVersion = "2.3.4"
+    val ktorVersion = "2.3.8"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
@@ -55,13 +62,7 @@ ktfmt { kotlinLangStyle() }
 
 // Set the JVM language level used to build project. Use Java 11 for 2020.3+, and Java 17 for
 // 2022.2+.
-kotlin {
-    @Suppress("UnstableApiUsage")
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-        vendor = JvmVendorSpec.JETBRAINS
-    }
-}
+kotlin { jvmToolchain(17) }
 
 // Configure Gradle IntelliJ Plugin - read more:
 // https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
@@ -124,8 +125,8 @@ tasks {
 
     patchPluginXml {
         version.set(properties("version"))
-        //        sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set("")
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the
         // plugin's manifest

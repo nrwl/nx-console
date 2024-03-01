@@ -3,20 +3,6 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/nx-project-view/src",
   "projectType": "library",
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": ["libs/vscode/nx-project-view/**/*.ts"]
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/vscode/nx-project-view"],
-      "options": {
-        "jestConfig": "libs/vscode/nx-project-view/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": ["type:vscode"]
 }

@@ -1,0 +1,8 @@
+{
+  "name": "language-server-capabilities-definition",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/language-server/capabilities/definition/src",
+  "projectType": "library",
+  "targets": {},
+  "tags": ["type:lsp"]
+}

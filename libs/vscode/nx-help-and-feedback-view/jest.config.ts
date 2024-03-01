@@ -13,4 +13,5 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../../coverage/libs/vscode/nx-help-and-feedback-view',
+  passWithNoTests: true,
 };

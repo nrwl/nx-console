@@ -66,6 +66,10 @@ class NxlsService(val project: Project) {
         }
     }
 
+    fun resetWorkspace() {
+        CoroutineScope(Dispatchers.Default).launch { server()?.getNxService()?.reset() }
+    }
+
     suspend fun workspace(): NxWorkspace? {
         return withMessageIssueCatch("nx/workspace") {
             server()?.getNxService()?.workspace()?.await()
@@ -159,6 +163,13 @@ class NxlsService(val project: Project) {
         }()
     }
 
+    suspend fun sourceMapFilesToProjectMap(): Map<String, String> {
+        return withMessageIssueCatch("nx/sourceMapFilesToProjectMap") {
+            server()?.getNxService()?.sourceMapFilesToProjectMap()?.await()
+        }()
+            ?: emptyMap()
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }
@@ -207,6 +218,6 @@ class NxlsService(val project: Project) {
     }
 }
 
-interface NxWorkspaceRefreshListener {
+fun interface NxWorkspaceRefreshListener {
     fun onNxWorkspaceRefresh()
 }

@@ -4,6 +4,7 @@ import {
   getCompletionItems,
   projectSchemaIsRegistered,
 } from '@nx-console/language-server/capabilities/code-completion';
+import { getDefinition } from '@nx-console/language-server/capabilities/definition';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
 import { getHover } from '@nx-console/language-server/capabilities/hover';
 import {
@@ -21,6 +22,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxReset,
   NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
   NxTargetsForConfigFileRequest,
@@ -35,6 +37,7 @@ import {
   getLanguageModelCache,
   lspLogger,
   mergeArrays,
+  nxReset,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
@@ -139,7 +142,7 @@ connection.onInitialize(async (params) => {
         if (!WORKING_PATH) {
           return;
         }
-        reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+        await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
       }
     );
   } catch (e) {
@@ -154,6 +157,7 @@ connection.onInitialize(async (params) => {
         triggerCharacters: ['"', ':'],
       },
       hoverProvider: true,
+      definitionProvider: true,
       documentLinkProvider: {
         resolveProvider: false,
         workDoneProgress: false,
@@ -261,6 +265,18 @@ connection.onHover(async (hoverParams) => {
   return await getHover(hoverParams, jsonAst, document);
 });
 
+connection.onDefinition((definitionParams) => {
+  const definitionDocument = documents.get(definitionParams.textDocument.uri);
+
+  if (!definitionDocument || !WORKING_PATH) {
+    return null;
+  }
+
+  const { jsonAst, document } = getJsonDocument(definitionDocument);
+
+  return getDefinition(WORKING_PATH, definitionParams, jsonAst, document);
+});
+
 connection.onDocumentLinks(async (params) => {
   const linkDocument = documents.get(params.textDocument.uri);
 
@@ -316,6 +332,15 @@ documents.onDidOpen(async (e) => {
 connection.onShutdown(() => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
+});
+
+connection.onNotification(NxReset, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
+  await nxReset(WORKING_PATH, lspLogger);
+  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
@@ -524,7 +549,7 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
 
-  reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 connection.onNotification(
