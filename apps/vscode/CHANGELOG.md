@@ -1,3 +1,21 @@
+# [18.17.0](https://github.com/nrwl/nx-console/compare/vscode-v18.16.0...vscode-v18.17.0) (2024-03-01)
+
+
+### Bug Fixes
+
+* add option to reset the daemon from the project detail view ([#2029](https://github.com/nrwl/nx-console/issues/2029)) ([4cec017](https://github.com/nrwl/nx-console/commit/4cec0170e205e083dc09e4c78152e0320aad02fd))
+* don't mark generator options with x-prompt set as required anymore ([#2032](https://github.com/nrwl/nx-console/issues/2032)) ([d0a5a63](https://github.com/nrwl/nx-console/commit/d0a5a63ceba3bfc1bfc22e93d3d8bdcd369d3733))
+* **intellij:** provide Angular config for Angular support in Nx workspaces ([ec50b72](https://github.com/nrwl/nx-console/commit/ec50b7207d6e999270cad08d2e5946fdc673f637))
+* **nxls:** handle directories under a root project in getProjectByPath ([#2038](https://github.com/nrwl/nx-console/issues/2038)) ([3b94e1c](https://github.com/nrwl/nx-console/commit/3b94e1c2d05aa3ed0971285df9747a30fdde32a8))
+* **nxls:** handle windows paths better when getting project by path ([#2025](https://github.com/nrwl/nx-console/issues/2025)) ([bf82749](https://github.com/nrwl/nx-console/commit/bf8274972d5ea612d41d4b872be904e04d0eb0aa))
+* **nxls:** repair getting project by path for directories ([#2034](https://github.com/nrwl/nx-console/issues/2034)) ([b021549](https://github.com/nrwl/nx-console/commit/b02154983f0a1965a0a5319fcadc20cb83582362))
+
+
+### Features
+
+* go to executor definition ([#1962](https://github.com/nrwl/nx-console/issues/1962)) ([02c1923](https://github.com/nrwl/nx-console/commit/02c1923f569a3aceeb2f23bcfd639263afcbbc80))
+* **vscode:** add all codelens to a settings toggle ([#2021](https://github.com/nrwl/nx-console/issues/2021)) ([b52ab82](https://github.com/nrwl/nx-console/commit/b52ab8250b3238daa22ed593e37cd4b5e9c52e08))
+
 # [18.16.0](https://github.com/nrwl/nx-console/compare/vscode-v18.15.3...vscode-v18.16.0) (2024-02-09)
 
 
