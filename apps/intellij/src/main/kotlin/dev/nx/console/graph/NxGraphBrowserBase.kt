@@ -7,6 +7,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -26,11 +27,8 @@ import dev.nx.console.utils.nxWorkspace
 import java.nio.file.Paths
 import java.util.regex.Matcher
 import javax.swing.JComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
@@ -38,13 +36,18 @@ import kotlinx.serialization.json.Json
 
 abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browser: JBCefBrowser = JBCefBrowser()
-    protected val graphServer: NxGraphServer = StandardNxGraphServer.getInstance(project)
+
+    private val graphServer: NxGraphServer = StandardNxGraphServer.getInstance(project)
+    private var queryMessenger = JBCefJSQuery.create(browser as JBCefBrowserBase)
+
     protected val coroutineScope =
         NxGraphBrowserBaseCoroutineHolder.getInstance(project).coroutineScope
 
     protected var backgroundColor = getHexColor(UIUtil.getPanelBackground())
-    protected var queryMessenger = JBCefJSQuery.create(browser as JBCefBrowserBase)
     protected val browserLoadedState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    protected val executeWhenLoadedJobs: MutableList<Job> = mutableListOf()
+
+    protected var error: String? = null
 
     init {
         graphServer.start()
@@ -58,23 +61,25 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         )
         browser.setOpenLinksInExternalBrowser(true)
 
-        createQueryMessenger()
+        queryMessenger = createGraphRequestMessenger()
 
         registerThemeListener()
     }
 
     val component: JComponent = browser.component
 
-    protected fun wrappedBrowserLoadHtml(html: String): Unit {
+    protected fun wrappedBrowserLoadHtml(html: String, url: String? = null): Unit {
         browserLoadedState.value = false
+        executeWhenLoadedJobs.forEach { it.cancel("Loading browser html, cancelling old jobs.") }
+        executeWhenLoadedJobs.clear()
         if (browser.isDisposed) return
-        if (queryMessenger.isDisposed) {
-            createQueryMessenger()
-        }
+        queryMessenger.dispose()
+        queryMessenger = createGraphRequestMessenger()
+
         var modifiedHtml = html
         val injectedScript =
             """
-         <script>
+         <script defer>
          if(!window.intellij) {
                window.intellij = {}
            }
@@ -92,7 +97,11 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             modifiedHtml += injectedScript
         }
 
-        browser.loadHTML(modifiedHtml)
+        if (url != null) {
+            browser.loadHTML(modifiedHtml, url)
+        } else {
+            browser.loadHTML(modifiedHtml)
+        }
     }
 
     protected fun loadGraphHtmlBase(): String {
@@ -221,6 +230,13 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         return htmlText
     }
 
+    protected fun setErrorAndRefresh(error: String?) {
+        this.error = error
+        refresh()
+    }
+
+    abstract fun refresh()
+
     protected fun handleGraphInteractionEventBase(event: NxGraphInteractionEvent): Boolean {
         when (event.type) {
             "file-click" -> {
@@ -274,17 +290,19 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     }
 
     protected fun executeWhenLoaded(block: suspend () -> Unit) {
-        coroutineScope.launch {
-            if (browserLoadedState.value) {
-                block()
-            } else {
-                browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
+        val job =
+            coroutineScope.launch {
+                if (browserLoadedState.value) {
+                    block()
+                } else {
+                    browserLoadedState.filter { it }.take(1).onEach { block() }.collect()
+                }
             }
-        }
+        executeWhenLoadedJobs.add(job)
     }
 
     private fun registerThemeListener() {
-        val connection = ApplicationManager.getApplication().messageBus.connect()
+        val connection = ApplicationManager.getApplication().messageBus.connect(this)
         connection.subscribe(UISettingsListener.TOPIC, UISettingsListener { setColors() })
     }
 
@@ -316,11 +334,14 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         }
     }
 
-    private fun createQueryMessenger() {
-        queryMessenger = JBCefJSQuery.create(browser as JBCefBrowserBase)
+    private fun createGraphRequestMessenger(): JBCefJSQuery {
+        val queryMessenger = JBCefJSQuery.create(browser as JBCefBrowserBase)
         queryMessenger.addHandler { msg ->
             when (msg) {
-                "ready" -> browserLoadedState.value = true
+                "ready" -> {
+                    thisLogger().trace("Browser received ready message")
+                    browserLoadedState.value = true
+                }
                 else -> {
                     try {
                         val messageParsed = Json.decodeFromString<NxGraphRequest>(msg)
@@ -329,9 +350,12 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                                 withContext(Dispatchers.IO) {
                                     graphServer.handleGraphRequest(messageParsed)
                                 }
+                            if (queryMessenger.isDisposed) return@launch
                             if (response.error != null) {
-                                logger<NxGraphBrowser>()
+                                thisLogger()
                                     .error("Error handling graph request: ${response.error}")
+                                setErrorAndRefresh(response.error)
+                                return@launch
                             }
                             browser.executeJavaScript(
                                 "window.intellij.handleResponse(${Json.encodeToString(response)})"
@@ -344,10 +368,14 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             }
             null
         }
+
+        return queryMessenger
     }
 
     override fun dispose() {
         browser.dispose()
+        queryMessenger.dispose()
+        executeWhenLoadedJobs.forEach { it.cancel("Browser disposed") }
     }
 }
 

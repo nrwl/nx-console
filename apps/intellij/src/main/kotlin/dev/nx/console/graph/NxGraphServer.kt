@@ -51,6 +51,8 @@ open class NxGraphServer(
     var currentPort: Int? = null
     private var nxGraphProcess: Process? = null
 
+    private var lastErrror: String? = null
+
     private var isStarted = false
     private var isStarting = false
 
@@ -107,11 +109,16 @@ open class NxGraphServer(
             if (attempt == 0) {
                 return handleGraphRequest(request, 1)
             }
+
+            val error =
+                if (e is TimeoutCancellationException && lastErrror != null)
+                    "error while running nx graph: $lastErrror"
+                else e.message
             return NxGraphRequest(
                 type = request.type,
                 id = request.id,
                 payload = request.payload,
-                error = e.message
+                error = error
             )
         }
     }
@@ -202,12 +209,23 @@ open class NxGraphServer(
     }
 
     private fun handleGraphProcessError(process: Process) {
-        process.onExit().thenAccept { exitCode ->
-            logger.debug("graph server exited with code $exitCode")
+        lastErrror = null
+        process.onExit().thenAccept {
+            logger.debug("graph server exited with code ${it.exitValue()}")
             isStarted = false
             isStarting = false
             nxGraphProcess = null
-            process.errorStream.readAllBytes().decodeToString().run { logger.debug(this) }
+
+            if (it.exitValue() != 0) {
+                val stdErr = process.errorStream.readAllBytes().decodeToString()
+                val stdOut = process.inputStream.readAllBytes().decodeToString()
+                logger.debug(
+                    "graph server exited with error. \n stdErr: $stdErr \n stdOut: $stdOut"
+                )
+                lastErrror =
+                    if (stdErr != null && stdErr.length > 0) stdErr
+                    else "graph exited unexpectedly. Full logs: $stdOut"
+            }
         }
     }
 

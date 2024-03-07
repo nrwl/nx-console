@@ -12,6 +12,10 @@ class ProjectDetailsPreviewFileEditor(project: Project, file: VirtualFile) :
     UserDataHolderBase(), FileEditor {
     private val browser = ProjectDetailsBrowser(project, file)
 
+    override fun dispose() {
+        browser.dispose()
+    }
+
     override fun getComponent(): JComponent = browser.component
 
     override fun getPreferredFocusedComponent(): JComponent = browser.component
@@ -19,10 +23,6 @@ class ProjectDetailsPreviewFileEditor(project: Project, file: VirtualFile) :
     override fun getName(): String = "Preview"
 
     override fun setState(state: FileEditorState) {}
-
-    override fun dispose() {
-        browser.dispose()
-    }
 
     override fun addPropertyChangeListener(listener: PropertyChangeListener) {
         // Add a listener if needed

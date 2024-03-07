@@ -3,6 +3,7 @@ package dev.nx.console.graph
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -44,12 +45,6 @@ class OldNxGraphBrowser(
     init {
 
         CoroutineScope(Dispatchers.Default).launch { listenToGraphStates() }
-        queryMessenger.addHandler { msg ->
-            when (msg) {
-                "ready" -> browserLoadedState.value = true
-            }
-            null
-        }
         registerFileClickHandler(browser)
         registerOpenProjectConfigHandler(browser)
         registerRunTaskHandler(browser)
@@ -126,7 +121,6 @@ class OldNxGraphBrowser(
     }
 
     private suspend fun loadGraphHtml(graphOutput: ProjectGraphOutput, reload: Boolean) {
-        browserLoadedState.value = false
 
         val fullPath =
             project.nodeInterpreter.let {
@@ -144,8 +138,7 @@ class OldNxGraphBrowser(
                 } else {
                     ""
                 }
-            }
-                ?: ""
+            } ?: ""
 
         val originalGraphHtml = File(fullPath).readText(Charsets.UTF_8)
         val transformedGraphHtml =
@@ -196,22 +189,10 @@ class OldNxGraphBrowser(
                      </head>
                     """
                 )
-                .replace(
-                    Regex("</body>"),
-                    """
-          <script>
-            (function() {
-                window.intellij = {
-                    message(msg) {
-                        ${queryMessenger.inject("msg")}
-                    }
-                }
-                window.intellij.message("ready");
-             })()
-          </script>
+                .replace(Regex("</body>"), """
+
           </body>
-            """
-                )
+            """)
 
         browser.loadHTML(transformedGraphHtml, "https://nx-graph")
 
@@ -487,6 +468,13 @@ class OldNxGraphBrowser(
             """
             browser.executeJavaScriptAsync(js)
         }
+    }
+
+    override fun refresh() {
+        thisLogger()
+            .debug(
+                "refresh called in old graph browser - this shouldn't happen because state is controlled from the outside here."
+            )
     }
 
     private sealed class Command {

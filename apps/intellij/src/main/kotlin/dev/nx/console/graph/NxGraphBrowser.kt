@@ -21,6 +21,12 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         registerInteractionEventHandler(browser)
     }
 
+    override fun refresh() {
+        wrappedBrowserLoadHtml(
+            loadGraphHtmlBase(),
+        )
+    }
+
     fun selectAllProjects() {
         executeWhenLoaded {
             if (browser.isDisposed) {

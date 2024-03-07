@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -25,6 +26,7 @@ import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.executeJavascriptWithCatch
 import dev.nx.console.utils.jcef.getHexColor
 import dev.nx.console.utils.nxProjectConfigurationPath
 import dev.nx.console.utils.nxWorkspace
@@ -36,9 +38,12 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     NxGraphBrowserBase(project), DumbAware {
 
     private var nxProjectName: String? = null
-    private var isShowingPDV = false
 
     private var currentLoadHtmlJob: Job? = null
+    private var resetQuery: JBCefJSQuery? = null
+    private var interactionEventQuery: JBCefJSQuery? = null
+
+    private val messageBusConnection = project.messageBus.connect()
 
     init {
         try {
@@ -47,26 +52,14 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
             logger<ProjectDetailsBrowser>().debug(e.message)
         }
 
-        with(project.messageBus.connect()) {
+        with(messageBusConnection) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                 NxWorkspaceRefreshListener {
                     coroutineScope.launch {
                         try {
                             val error = NxlsService.getInstance(project).workspace()?.error
-                            if (error != null) {
-                                loadHtml()
-                            } else if (isShowingPDV) {
-                                nxProjectName.also {
-                                    if (it != null) {
-                                        loadProjectDetails(it)
-                                    } else {
-                                        loadHtml()
-                                    }
-                                }
-                            } else {
-                                loadHtml()
-                            }
+                            setErrorAndRefresh(error)
                         } catch (e: Throwable) {
                             logger<ProjectDetailsBrowser>().debug(e.message)
                         }
@@ -76,16 +69,43 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         }
     }
 
-    private fun loadProjectDetails(nxProjectName: String) {
-        executeWhenLoaded {
-            if (browser.isDisposed) return@executeWhenLoaded
-            browser.executeJavaScript(
-                "window.waitForRouter().then(() => {console.log('waited for router', window.externalApi, '$nxProjectName'); window.externalApi.openProjectDetails('$nxProjectName')})"
-            )
+    override fun refresh() {
+        thisLogger().trace("refreshing PDV ${file.path}")
+        if (error != null) {
+            loadHtml()
+            return
+        }
+        coroutineScope.launch {
+            try {
+                val isShowingPDV =
+                    withContext(Dispatchers.EDT) {
+                        browser.executeJavaScript(
+                            "return !!window.waitForRouter && !!window.intellij && !!window.externalApi"
+                        ) == "true"
+                    }
+                val nxProjectName = this@ProjectDetailsBrowser.nxProjectName
+                if (isShowingPDV && nxProjectName != null) {
+                    loadProjectDetails(nxProjectName)
+                } else {
+                    loadHtml()
+                }
+            } catch (e: Throwable) {
+                thisLogger().trace("Error while refreshing PDV ${file.path} \n $e ")
+                loadHtml()
+            }
         }
     }
 
-    private var interactionEventQuery: JBCefJSQuery? = null
+    private fun loadProjectDetails(nxProjectName: String) {
+        executeWhenLoaded {
+            if (browser.isDisposed) return@executeWhenLoaded
+            withContext(Dispatchers.EDT) {
+                browser.executeJavaScript(
+                    "window.waitForRouter().then(() => {console.log('waited for router', window.externalApi, '$nxProjectName'); window.externalApi.openProjectDetails('$nxProjectName')})"
+                )
+            }
+        }
+    }
 
     private fun registerInteractionEventHandler(browser: JBCefBrowser) {
         executeWhenLoaded {
@@ -153,7 +173,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     ${query.inject("JSON.stringify(message)")}
                 }
                 """
-            browser.executeJavaScript(js)
+            withContext(Dispatchers.EDT) { browser.executeJavascriptWithCatch(js) }
 
             interactionEventQuery = query
         }
@@ -165,8 +185,8 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         }
         currentLoadHtmlJob =
             coroutineScope.launch {
+                thisLogger().trace("loading PDV view ${file.path}")
                 try {
-                    isShowingPDV = false
                     val nxlsService = NxlsService.getInstance(project)
                     nxlsService.awaitStarted()
 
@@ -177,18 +197,13 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                             !version.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))
                     ) {
                         withContext(Dispatchers.EDT) {
-                            wrappedBrowserLoadHtml(
-                                """<h1 style="
-                          font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
-                          font-size: ${UIUtil.getLabelFont().size}px;
-                          color: ${getHexColor(UIUtil.getActiveTextColor())};
-                      ">The Project Details View is only available for Nx 17.3.0 and above</h1>
-                      """
-                            )
+                            thisLogger().trace("Loading old version html ${file.path}")
+                            wrappedBrowserLoadHtml(loadOldVersionHtml())
                         }
                         return@launch
                     }
-                    var error = nxlsService.workspace()?.error
+
+                    var error = this@ProjectDetailsBrowser.error ?: nxlsService.workspace()?.error
                     val nxProjectName = nxlsService.projectByPath(file.path)?.name
                     this@ProjectDetailsBrowser.nxProjectName = nxProjectName
                     if (nxProjectName == null && error == null) {
@@ -197,13 +212,14 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     if (error != null) {
                         withContext(Dispatchers.EDT) {
                             if (browser.isDisposed) return@withContext
+                            thisLogger().trace("Error found, loading error html ${file.path}")
                             wrappedBrowserLoadHtml(loadErrorHtml(error))
 
                             registerResetHandler(browser)
                         }
-                        isShowingPDV = false
                         return@launch
                     }
+
                     var htmlText = loadGraphHtmlBase()
                     htmlText =
                         htmlText.replace(
@@ -221,33 +237,32 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                                 .trimIndent()
                         )
                     withContext(Dispatchers.EDT) {
-                        isShowingPDV = true
+                        thisLogger().trace("Loading actual PDV html ${file.path}")
+
                         wrappedBrowserLoadHtml(htmlText)
                         registerInteractionEventHandler(browser)
 
                         nxProjectName?.also { loadProjectDetails(it) }
                     }
                 } catch (e: Throwable) {
-                    logger<ProjectDetailsBrowser>().debug(e.message)
-                    if (e is TimeoutCancellationException) {
-                        withContext(Dispatchers.EDT) {
-                            if (browser.isDisposed) return@withContext
-                            wrappedBrowserLoadHtml(
-                                loadErrorHtml(
-                                    e.message
-                                        ?: "Nx Console timed out while loading. Please reset to try again."
-                                )
+                    logger<ProjectDetailsBrowser>()
+                        .debug(
+                            "error while loading PDV, loading error html ${file.path}: /n ${e.message}"
+                        )
+                    withContext(Dispatchers.EDT) {
+                        if (browser.isDisposed) return@withContext
+                        wrappedBrowserLoadHtml(
+                            loadErrorHtml(
+                                e.message
+                                    ?: "Nx Console timed out while loading. Please reset to try again."
                             )
+                        )
 
-                            registerResetHandler(browser)
-                        }
+                        registerResetHandler(browser)
                     }
-                    isShowingPDV = false
                 }
             }
     }
-
-    private var resetQuery: JBCefJSQuery? = null
 
     private fun registerResetHandler(browser: JBCefBrowser) {
         executeWhenLoaded {
@@ -255,6 +270,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
             resetQuery?.dispose()
             resetQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
             resetQuery?.also { query ->
+                if (query.isDisposed) return@executeWhenLoaded
                 query.addHandler {
                     val nxlsService = NxlsService.getInstance(project)
                     ApplicationManager.getApplication().invokeLater { nxlsService.resetWorkspace() }
@@ -268,7 +284,9 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     ${query.inject("reset")}
                 }
                 """
-                coroutineScope.launch { browser.executeJavaScript(js) }
+                coroutineScope.launch {
+                    withContext(Dispatchers.EDT) { browser.executeJavascriptWithCatch(js) }
+                }
             }
         }
     }
@@ -298,6 +316,15 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
       If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reset</a> the graph.
     """
             .trimIndent()
+    }
+
+    private fun loadOldVersionHtml(): String {
+        return """<h1 style="
+                          font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans','Helvetica Neue', sans-serif;
+                          font-size: ${UIUtil.getLabelFont().size}px;
+                          color: ${getHexColor(UIUtil.getActiveTextColor())};
+                      ">The Project Details View is only available for Nx 17.3.0 and above</h1>
+                      """
     }
 
     private fun addTargetToProjectConfig(
@@ -336,5 +363,13 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 }
             }
         }
+    }
+
+    override fun dispose() {
+        super.dispose()
+        messageBusConnection.dispose()
+        currentLoadHtmlJob?.cancel()
+        resetQuery?.dispose()
+        interactionEventQuery?.dispose()
     }
 }
