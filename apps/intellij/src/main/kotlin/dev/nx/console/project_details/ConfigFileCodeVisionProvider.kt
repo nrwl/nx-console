@@ -25,10 +25,10 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.utils.vfs.getPsiFile
 import dev.nx.console.models.NxProject
+import dev.nx.console.models.NxWorkspace
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.NxTaskExecutionManager
-import dev.nx.console.utils.NxWorkspaceSyncAccessService
 import dev.nx.console.utils.createSelectTargetPopup
 import java.nio.file.Paths
 import kotlinx.coroutines.CoroutineScope
@@ -54,8 +54,7 @@ class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
     override fun shouldRecomputeForEditor(editor: Editor, uiData: Unit?): Boolean =
         editor.project?.let {
             ProjectLevelConfigFileCodeVisionManager.getInstance(it).shouldRecomputeForEditor(editor)
-        }
-            ?: true
+        } ?: true
 
     override fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?) =
         editor.project?.let {
@@ -78,6 +77,7 @@ class ProjectLevelConfigFileCodeVisionManager(
     private val nxlsService = NxlsService.getInstance(project)
 
     private val partialPathToTargetsMap = mutableMapOf<String, List<String>>()
+    private var nxWorkspaceCache: NxWorkspace? = null
 
     init {
         with(project.messageBus.connect()) {
@@ -88,16 +88,8 @@ class ProjectLevelConfigFileCodeVisionManager(
                         return@NxWorkspaceRefreshListener
                     }
                     partialPathToTargetsMap.clear()
-                    ApplicationManager.getApplication().invokeLater {
-                        project
-                            .getService(CodeVisionHost::class.java)
-                            .invalidateProvider(
-                                CodeVisionHost.LensInvalidateSignal(
-                                    null,
-                                    listOf(ConfigFileCodeVisionProvider.ID)
-                                )
-                            )
-                    }
+                    nxWorkspaceCache = null
+                    cs.launch { refreshCodeVision(project) }
                 }
             )
         }
@@ -192,7 +184,11 @@ class ProjectLevelConfigFileCodeVisionManager(
                 getJsonCodevisionLocation(editor)
             }
         if (nxProject == null) {
-            if (NxWorkspaceSyncAccessService.getInstance(project).nxWorkspaceSync?.error != null) {
+            if (nxWorkspaceCache == null) {
+                cs.launch { loadWorkspaceAndRefresh(project) }
+                return CodeVisionState.NotReady
+            }
+            if (nxWorkspaceCache?.error != null) {
                 return CodeVisionState.Ready(
                     listOf(
                         Pair(
@@ -277,6 +273,16 @@ class ProjectLevelConfigFileCodeVisionManager(
         val targets = nxlsService.targetsForConfigFile(nxProjectName, path).keys.toList()
 
         partialPathToTargetsMap[path] = targets
+        refreshCodeVision(project)
+    }
+
+    private suspend fun loadWorkspaceAndRefresh(project: Project) {
+        nxWorkspaceCache = null
+        nxWorkspaceCache = nxlsService.workspace()
+        refreshCodeVision(project)
+    }
+
+    private suspend fun refreshCodeVision(project: Project) {
         withContext(Dispatchers.EDT) {
             project
                 .getService(CodeVisionHost::class.java)

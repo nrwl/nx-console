@@ -73,7 +73,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         executeWhenLoadedJobs.forEach { it.cancel("Loading browser html, cancelling old jobs.") }
         executeWhenLoadedJobs.clear()
         if (browser.isDisposed) return
-        queryMessenger.dispose()
+        val oldQuerMessenger = queryMessenger
         queryMessenger = createGraphRequestMessenger()
 
         var modifiedHtml = html
@@ -102,6 +102,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         } else {
             browser.loadHTML(modifiedHtml)
         }
+        oldQuerMessenger.dispose()
     }
 
     protected fun loadGraphHtmlBase(): String {
