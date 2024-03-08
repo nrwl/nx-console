@@ -54,7 +54,8 @@ class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
     override fun shouldRecomputeForEditor(editor: Editor, uiData: Unit?): Boolean =
         editor.project?.let {
             ProjectLevelConfigFileCodeVisionManager.getInstance(it).shouldRecomputeForEditor(editor)
-        } ?: true
+        }
+            ?: true
 
     override fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?) =
         editor.project?.let {
