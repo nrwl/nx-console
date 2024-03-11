@@ -47,6 +47,7 @@ import {
   getGeneratorContextV2,
   getGeneratorOptions,
   getGenerators,
+  getNxDaemonClient,
   getNxVersion,
   getProjectByPath,
   getProjectByRoot,
@@ -85,6 +86,8 @@ import {
   createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
+import treeKill from 'tree-kill';
+import { execSync } from 'node:child_process';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -95,6 +98,7 @@ process.on('uncaughtException', (e) => {
 });
 
 let WORKING_PATH: string | undefined = undefined;
+let PID: number | null = null;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
   //noop
@@ -120,6 +124,8 @@ documents.listen(connection);
 
 connection.onInitialize(async (params) => {
   setLspLogger(connection);
+
+  PID = params.processId;
 
   const { workspacePath } = params.initializationOptions ?? {};
   try {
@@ -332,6 +338,21 @@ documents.onDidOpen(async (e) => {
 connection.onShutdown(() => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
+});
+
+connection.onExit(async () => {
+  try {
+    if (WORKING_PATH) {
+      const nxDaemonClientModule = await getNxDaemonClient(
+        WORKING_PATH,
+        lspLogger
+      );
+      await nxDaemonClientModule?.daemonClient?.stop();
+    }
+    treeKill(PID ?? process.pid, 0);
+  } catch (e) {
+    console.log('Error killing process: ' + e);
+  }
 });
 
 connection.onNotification(NxReset, async () => {

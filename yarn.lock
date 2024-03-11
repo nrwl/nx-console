@@ -26218,6 +26218,7 @@ __metadata:
     semver: ^7.3.7
     storybook: 7.0.7
     tailwindcss: ^3.3.2
+    tree-kill: ^1.2.2
     ts-jest: 29.1.0
     ts-node: 10.9.1
     tslib: ^2.3.0
@@ -31824,7 +31825,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tree-kill@npm:1.2.2":
+"tree-kill@npm:1.2.2, tree-kill@npm:^1.2.2":
   version: 1.2.2
   resolution: "tree-kill@npm:1.2.2"
   bin:
