@@ -645,7 +645,7 @@
         "nxConsole.showNodeVersionOnStartup": {
           "type": "boolean",
           "scope": "application",
-          "default": true,
+          "default": false,
           "description": "Show a notification with the current Node version on startup - useful for debugging nvm issues."
         }
       }
