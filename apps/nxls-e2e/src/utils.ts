@@ -1,12 +1,15 @@
-import { execSync } from 'child_process';
+import { exec, execSync, spawn, spawnSync } from 'child_process';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { promisify } from 'util';
 import {
-  LanguageClient,
-  LanguageClientOptions,
-  ServerOptions,
-  TransportKind,
-} from 'vscode-languageclient/node';
+  ReadableStreamMessageReader,
+  WriteableStreamMessageWriter,
+} from 'vscode-jsonrpc';
+import {
+  StreamMessageReader,
+  StreamMessageWriter,
+} from 'vscode-languageserver/node';
 
 const defaultVersion = '18.0.4';
 
@@ -68,48 +71,50 @@ export function uniq(prefix: string) {
   return `${prefix}${Math.floor(Math.random() * 10000000)}`;
 }
 
-export function startNxls(cwd: string): LanguageClient {
-  const serverModule = join('dist', 'nxls', 'main.js');
+export function startNxls(cwd: string) {
+  try {
+    const nxlsPath = join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'dist',
+      'apps',
+      'nxls',
+      'main.js'
+    );
 
-  const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
-  const serverOptions: ServerOptions = {
-    run: {
-      module: serverModule,
-      transport: TransportKind.ipc,
-      options: {
-        cwd,
+    console.log('exists?:' + existsSync(nxlsPath));
+
+    const p = spawn(`node ${nxlsPath} --stdio`, {
+      env: process.env,
+      cwd,
+    });
+
+    const messageReader = new StreamMessageReader(p.stdout);
+    const messageWriter = new StreamMessageWriter(p.stdin);
+
+    // Example: Initialize connection
+    const initMessage = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'initialize',
+      params: {
+        processId: p.pid,
+        rootUri: null,
+        capabilities: {},
       },
-    },
-    debug: {
-      module: serverModule,
-      transport: TransportKind.ipc,
-      options: debugOptions,
-    },
-  };
+    };
 
-  const clientOptions: LanguageClientOptions = {
-    initializationOptions: {
-      workspacePath: cwd,
-    },
-    documentSelector: [
-      { scheme: 'file', language: 'json', pattern: '**/nx.json' },
-      { scheme: 'file', language: 'json', pattern: '**/project.json' },
-      { scheme: 'file', language: 'json', pattern: '**/workspace.json' },
-      { scheme: 'file', language: 'json', pattern: '**/package.json' },
-    ],
-    synchronize: {},
-  };
+    console.log('writing message', initMessage);
 
-  const client = new LanguageClient(
-    'nxls',
-    'nxls',
-    serverOptions,
-    clientOptions
-  );
+    messageWriter.write(initMessage);
 
-  client.start();
-
-  process.on('exit', () => client.stop());
-
-  return client;
+    // Handle incoming messages
+    messageReader.listen((message) => {
+      console.log('Received from server:', message);
+    });
+  } catch (e) {
+    console.error(e);
+  }
 }

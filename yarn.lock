@@ -26226,6 +26226,7 @@ __metadata:
     universal-analytics: 0.5.3
     uuid: ^8.3.2
     vscode-json-languageservice: ^5.1.0
+    vscode-jsonrpc: ^8.2.0
     vscode-languageclient: ^8.0.2
     vscode-languageserver: ^8.0.2
     vscode-uri: ^3.0.8
@@ -33015,6 +33016,13 @@ __metadata:
   version: 8.0.2
   resolution: "vscode-jsonrpc@npm:8.0.2"
   checksum: 9d055fd4c87ef1093b0eecb5370bfaf3402179b6639149b6d0f7e0bde60cf580091c7e07b0caff868f10f90331b17e7383c087217c077fdd1b5ae7bc23b72f77
+  languageName: node
+  linkType: hard
+
+"vscode-jsonrpc@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "vscode-jsonrpc@npm:8.2.0"
+  checksum: f302a01e59272adc1ae6494581fa31c15499f9278df76366e3b97b2236c7c53ebfc71efbace9041cfd2caa7f91675b9e56f2407871a1b3c7f760a2e2ee61484a
   languageName: node
   linkType: hard
 

@@ -139,6 +139,7 @@
     "typescript": "5.3.3",
     "universal-analytics": "0.5.3",
     "uuid": "^8.3.2",
+    "vscode-jsonrpc": "^8.2.0",
     "wdio-vscode-service": "^4.2.1",
     "webdriverio": "^7.26.0",
     "webpack": "5.88.2",
