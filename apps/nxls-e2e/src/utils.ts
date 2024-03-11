@@ -25,6 +25,7 @@ export function newWorkspace({
     e2eTestRunner: 'cypress',
     style: 'css',
   },
+  verbose = false,
 }: {
   name?: string;
   packageManager?: 'npm' | 'pnpm' | 'yarn';
@@ -36,6 +37,7 @@ export function newWorkspace({
     e2eTestRunner?: string;
     style?: string;
   };
+  verbose?: boolean;
 } = {}) {
   if (!version) {
     version = defaultVersion;
@@ -51,7 +53,9 @@ export function newWorkspace({
   });
   command += `--nxCloud=skip --pm=${packageManager} --no-interactive`;
 
-  console.log(`setting up new workspace ${name}`);
+  if (verbose) {
+    console.log(`setting up new workspace ${name} with ${command}`);
+  }
 
   const create = execSync(command, {
     cwd: e2eCwd,

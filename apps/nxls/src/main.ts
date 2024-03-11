@@ -335,24 +335,22 @@ documents.onDidOpen(async (e) => {
   );
 });
 
-connection.onShutdown(() => {
+connection.onShutdown(async () => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
+
+  if (WORKING_PATH) {
+    const nxDaemonClientModule = await getNxDaemonClient(
+      WORKING_PATH,
+      lspLogger
+    );
+    await nxDaemonClientModule?.daemonClient?.stop();
+  }
 });
 
-connection.onExit(async () => {
-  try {
-    if (WORKING_PATH) {
-      const nxDaemonClientModule = await getNxDaemonClient(
-        WORKING_PATH,
-        lspLogger
-      );
-      await nxDaemonClientModule?.daemonClient?.stop();
-    }
-    treeKill(PID ?? process.pid, 0);
-  } catch (e) {
-    console.log('Error killing process: ' + e);
-  }
+connection.onExit(() => {
+  connection.dispose();
+  treeKill(PID ?? process.pid, 0);
 });
 
 connection.onNotification(NxReset, async () => {

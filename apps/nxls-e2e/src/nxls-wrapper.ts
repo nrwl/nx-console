@@ -11,6 +11,8 @@ import {
   StreamMessageWriter,
 } from 'vscode-languageserver/node';
 
+import treeKill from 'tree-kill';
+
 export class NxlsWrapper {
   private messageReader?: StreamMessageReader;
   private messageWriter?: StreamMessageWriter;
@@ -22,7 +24,7 @@ export class NxlsWrapper {
     (message: ResponseMessage) => void
   >();
 
-  constructor(private verbose = true) {}
+  constructor(private verbose = false) {}
 
   private idCounter = 1;
 
@@ -61,7 +63,9 @@ export class NxlsWrapper {
         },
       });
 
-      console.log(`started nxls with pid ${p.pid}`);
+      if (this.verbose) {
+        console.log(`started nxls with pid ${p.pid}`);
+      }
 
       this.process = p;
     } catch (e) {
@@ -80,7 +84,20 @@ export class NxlsWrapper {
     this.readerErrorDisposable?.dispose();
     this.messageReader?.dispose();
     this.messageWriter?.dispose();
-    this.process?.kill();
+
+    await new Promise((resolve) => {
+      if (this.process?.pid) {
+        treeKill(this.process.pid, 0, resolve);
+      }
+    });
+    await new Promise<void>((resolve) => {
+      this.process?.on('exit', () => {
+        this.process?.stdout?.destroy();
+        this.process?.stderr?.destroy();
+        this.process?.stdin?.destroy();
+        resolve();
+      });
+    });
   }
 
   async sendRequest(
@@ -95,11 +112,10 @@ export class NxlsWrapper {
         id,
         ...request,
       } as Message;
-      this.messageWriter?.write(fullRequest);
-
       if (this.verbose) {
         console.log('sending request', JSON.stringify(fullRequest, null, 2));
       }
+      this.messageWriter?.write(fullRequest);
     });
   }
 
