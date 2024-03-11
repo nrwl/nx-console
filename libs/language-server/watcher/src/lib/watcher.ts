@@ -53,7 +53,10 @@ export async function languageServerWatcher(
             )
         )
       ) {
-        lspLogger.log('Project configuration changed');
+        lspLogger.log(
+          'Project configuration changed',
+          events.map((e) => e.path).join(', ')
+        );
         debouncedCallback();
       }
     });

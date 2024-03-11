@@ -1,6 +1,6 @@
-import { exec, execSync, spawn, spawnSync } from 'child_process';
+import { ChildProcess, exec, execSync, spawn, spawnSync } from 'child_process';
 import { existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { promisify } from 'util';
 import {
   ReadableStreamMessageReader,
@@ -51,7 +51,7 @@ export function newWorkspace({
   });
   command += `--nxCloud=skip --pm=${packageManager} --no-interactive`;
 
-  console.log(`setting up new workspace ${name} with command ${command}`);
+  console.log(`setting up new workspace ${name}`);
 
   const create = execSync(command, {
     cwd: e2eCwd,
@@ -69,52 +69,4 @@ export function newWorkspace({
 
 export function uniq(prefix: string) {
   return `${prefix}${Math.floor(Math.random() * 10000000)}`;
-}
-
-export function startNxls(cwd: string) {
-  try {
-    const nxlsPath = join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'dist',
-      'apps',
-      'nxls',
-      'main.js'
-    );
-
-    console.log('exists?:' + existsSync(nxlsPath));
-
-    const p = spawn(`node ${nxlsPath} --stdio`, {
-      env: process.env,
-      cwd,
-    });
-
-    const messageReader = new StreamMessageReader(p.stdout);
-    const messageWriter = new StreamMessageWriter(p.stdin);
-
-    // Example: Initialize connection
-    const initMessage = {
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'initialize',
-      params: {
-        processId: p.pid,
-        rootUri: null,
-        capabilities: {},
-      },
-    };
-
-    console.log('writing message', initMessage);
-
-    messageWriter.write(initMessage);
-
-    // Handle incoming messages
-    messageReader.listen((message) => {
-      console.log('Received from server:', message);
-    });
-  } catch (e) {
-    console.error(e);
-  }
 }
