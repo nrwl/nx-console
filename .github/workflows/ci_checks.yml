@@ -36,28 +36,9 @@ jobs:
       - uses: ./.github/workflows/setup
         with:
           node_version: ${{ env.node_version }}
-      - name: Start Nx Agent ${{ matrix.agent }}
-        run: npx nx-cloud start-agent
-
-  agent:
-    runs-on: ubuntu-latest
-    name: Nx Cloud - Agent E2E
-    timeout-minutes: 15
-    env:
-      NX_VERBOSE_LOGGING: 'false'
-      NX_SKIP_NX_CACHE: 'true'
-    steps:
-      - name: Set nx run variable
-        run: echo "NX_RUN_GROUP=run-group-e2e-${{ github.run_id}}-${{ github.run_attempt }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ./.github/workflows/setup
-        with:
-          node_version: ${{ env.node_version }}
       - name: Install xvfb
         run: sudo apt-get install -y xvfb
-      - name: Start Nx Agent E2E
+      - name: Start Nx Agent ${{ matrix.agent }}
         run: npx nx-cloud start-agent
       - uses: actions/upload-artifact@v3
         with:
