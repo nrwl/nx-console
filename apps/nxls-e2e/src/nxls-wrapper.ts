@@ -85,15 +85,29 @@ export class NxlsWrapper {
     this.messageReader?.dispose();
     this.messageWriter?.dispose();
 
+    let timeOut: NodeJS.Timeout;
     await Promise.all([
-      new Promise<void>((resolve) => {
-        this.process?.on('exit', () => {
-          this.process?.stdout?.destroy();
-          this.process?.stderr?.destroy();
-          this.process?.stdin?.destroy();
-          console.log('process exit called');
-          resolve();
-        });
+      Promise.race([
+        new Promise<void>((resolve) => {
+          this.process?.on('exit', () => {
+            console.log('process exit called');
+            resolve();
+          });
+        }),
+        new Promise<void>((resolve) => {
+          timeOut = setTimeout(() => {
+            console.log(
+              'waited for 5 seconds, cancelling waitinf for process.exit'
+            );
+            resolve();
+          }, 5000);
+        }),
+      ]).then(() => {
+        console.log('destroying stdio');
+        clearTimeout(timeOut);
+        this.process?.stdout?.destroy();
+        this.process?.stderr?.destroy();
+        this.process?.stdin?.destroy();
       }),
       new Promise((resolve) => {
         if (this.process?.pid) {
