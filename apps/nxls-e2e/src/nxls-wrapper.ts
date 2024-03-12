@@ -85,19 +85,22 @@ export class NxlsWrapper {
     this.messageReader?.dispose();
     this.messageWriter?.dispose();
 
-    await new Promise((resolve) => {
-      if (this.process?.pid) {
-        treeKill(this.process.pid, 0, resolve);
-      }
-    });
-    await new Promise<void>((resolve) => {
-      this.process?.on('exit', () => {
-        this.process?.stdout?.destroy();
-        this.process?.stderr?.destroy();
-        this.process?.stdin?.destroy();
-        resolve();
-      });
-    });
+    await Promise.all([
+      new Promise((resolve) => {
+        if (this.process?.pid) {
+          treeKill(this.process.pid, 0, resolve);
+        }
+      }).then(() => console.log('treekill resolved')),
+      new Promise<void>((resolve) => {
+        this.process?.on('exit', () => {
+          this.process?.stdout?.destroy();
+          this.process?.stderr?.destroy();
+          this.process?.stdin?.destroy();
+          console.log('process exit called');
+          resolve();
+        });
+      }),
+    ]);
   }
 
   async sendRequest(
