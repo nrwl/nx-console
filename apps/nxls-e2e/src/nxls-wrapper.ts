@@ -86,13 +86,14 @@ export class NxlsWrapper {
     this.messageReader?.dispose();
     this.messageWriter?.dispose();
 
-    // this.process?.stdout?.removeAllListeners();
-    // this.process?.stderr?.removeAllListeners();
-    // this.process?.stdin?.removeAllListeners();
-
-    this.process?.stdout?.emit('end');
-    this.process?.stderr?.emit('end');
-    this.process?.stdin?.emit('finish');
+    // make sure nothing can write to stdin anymore after we destroy the stream
+    // this fixes an issue where a leftover 'Content Length' header would be written to the stdin
+    // during the nxls shutdown sequence
+    if (this.process?.stdin) {
+      this.process.stdin.write = (chunk: any, cb: any) => {
+        return true;
+      };
+    }
 
     this.process?.stdout?.destroy();
     this.process?.stderr?.destroy();
@@ -105,53 +106,6 @@ export class NxlsWrapper {
         resolve();
       }
     });
-
-    // process.exit(0);
-
-    // const stdoutListeners = this.process?.stdout?.emit('end');
-    // console.log('stdout had listeners', stdoutListeners);
-
-    // const stderrListeners = this.process?.stderr?.emit('end');
-    // console.log('stderr had listeners', stderrListeners);
-
-    // let timeOut: NodeJS.Timeout;
-    // await Promise.all([
-    //   Promise.race([
-    //     new Promise<void>((resolve) => {
-    //       this.process?.on('exit', () => {
-    //         console.log('process exit called');
-    //         resolve();
-    //       });
-    //       this.process?.emit('exit');
-    //     }),
-    //     new Promise<void>((resolve) => {
-    //       timeOut = setTimeout(() => {
-    //         console.log(
-    //           'waited for 5 seconds, cancelling waitinf for process.exit'
-    //         );
-    //         resolve();
-    //       }, 5000);
-    //     }),
-    //   ]).then(() => {
-    //     console.log('ending / destroying stdio');
-    //     clearTimeout(timeOut);
-
-    //     this.process?.stdout?.destroy();
-
-    //     this.process?.stderr?.destroy();
-
-    //     this.process?.stdin?.destroy();
-    //   }),
-    //   new Promise((resolve) => {
-    //     if (this.process?.pid) {
-    //       // this.process?.kill('SIGTERM');
-    //       treeKill(this.process.pid, 'SIGTERM', resolve);
-    //     }
-    //   }).then(() => console.log('treekill resolved')),
-    // ]).then(() => {
-    //   // console.log(JSON.stringify(this.process, null, 2))
-    //   process.exit(0);
-    // });
   }
 
   async sendRequest(
