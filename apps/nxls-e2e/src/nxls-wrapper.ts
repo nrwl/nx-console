@@ -107,11 +107,13 @@ export class NxlsWrapper {
         clearTimeout(timeOut);
         this.process?.stdout?.destroy();
         this.process?.stderr?.destroy();
+        this.process?.stdin?.end();
         this.process?.stdin?.destroy();
       }),
       new Promise((resolve) => {
         if (this.process?.pid) {
-          treeKill(this.process.pid, 0, resolve);
+          this.process?.kill('SIGTERM');
+          treeKill(this.process.pid, 'SIGTERM', resolve);
         }
       }).then(() => console.log('treekill resolved')),
     ]).then(() => console.log(JSON.stringify(this.process, null, 2)));
