@@ -114,7 +114,7 @@ export class NxlsWrapper {
           treeKill(this.process.pid, 0, resolve);
         }
       }).then(() => console.log('treekill resolved')),
-    ]);
+    ]).then(() => console.log(JSON.stringify(this.process, null, 2)));
   }
 
   async sendRequest(
