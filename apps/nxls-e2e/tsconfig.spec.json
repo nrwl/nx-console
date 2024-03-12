@@ -5,12 +5,11 @@
     "module": "commonjs",
     "types": ["jest", "node", "vscode"],
     "moduleResolution": "node"
-
   },
   "include": [
     "jest.config.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "**/*.d.ts",
+    "**/*.d.ts"
   ]
 }

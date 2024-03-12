@@ -13,7 +13,5 @@
       ]
     }
   },
-  "tags": [
-    "type:lsp"
-  ]
+  "tags": ["type:lsp"]
 }
