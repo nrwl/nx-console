@@ -44,6 +44,7 @@ export class NxlsWrapper {
       const p = spawn('node', [nxlsPath, '--stdio'], {
         env: process.env,
         cwd,
+        windowsHide: true,
       });
 
       this.messageReader = new StreamMessageReader(p.stdout);
@@ -85,38 +86,72 @@ export class NxlsWrapper {
     this.messageReader?.dispose();
     this.messageWriter?.dispose();
 
-    let timeOut: NodeJS.Timeout;
-    await Promise.all([
-      Promise.race([
-        new Promise<void>((resolve) => {
-          this.process?.on('exit', () => {
-            console.log('process exit called');
-            resolve();
-          });
-        }),
-        new Promise<void>((resolve) => {
-          timeOut = setTimeout(() => {
-            console.log(
-              'waited for 5 seconds, cancelling waitinf for process.exit'
-            );
-            resolve();
-          }, 5000);
-        }),
-      ]).then(() => {
-        console.log('destroying stdio');
-        clearTimeout(timeOut);
-        this.process?.stdout?.destroy();
-        this.process?.stderr?.destroy();
-        this.process?.stdin?.end();
-        this.process?.stdin?.destroy();
-      }),
-      new Promise((resolve) => {
-        if (this.process?.pid) {
-          this.process?.kill('SIGTERM');
-          treeKill(this.process.pid, 'SIGTERM', resolve);
-        }
-      }).then(() => console.log('treekill resolved')),
-    ]).then(() => console.log(JSON.stringify(this.process, null, 2)));
+    // this.process?.stdout?.removeAllListeners();
+    // this.process?.stderr?.removeAllListeners();
+    // this.process?.stdin?.removeAllListeners();
+
+    this.process?.stdout?.emit('end');
+    this.process?.stderr?.emit('end');
+    this.process?.stdin?.emit('finish');
+
+    this.process?.stdout?.destroy();
+    this.process?.stderr?.destroy();
+    this.process?.stdin?.destroy();
+
+    await new Promise<void>((resolve) => {
+      if (this.process?.pid) {
+        treeKill(this.process.pid, 'SIGKILL', () => resolve());
+      } else {
+        resolve();
+      }
+    });
+
+    // process.exit(0);
+
+    // const stdoutListeners = this.process?.stdout?.emit('end');
+    // console.log('stdout had listeners', stdoutListeners);
+
+    // const stderrListeners = this.process?.stderr?.emit('end');
+    // console.log('stderr had listeners', stderrListeners);
+
+    // let timeOut: NodeJS.Timeout;
+    // await Promise.all([
+    //   Promise.race([
+    //     new Promise<void>((resolve) => {
+    //       this.process?.on('exit', () => {
+    //         console.log('process exit called');
+    //         resolve();
+    //       });
+    //       this.process?.emit('exit');
+    //     }),
+    //     new Promise<void>((resolve) => {
+    //       timeOut = setTimeout(() => {
+    //         console.log(
+    //           'waited for 5 seconds, cancelling waitinf for process.exit'
+    //         );
+    //         resolve();
+    //       }, 5000);
+    //     }),
+    //   ]).then(() => {
+    //     console.log('ending / destroying stdio');
+    //     clearTimeout(timeOut);
+
+    //     this.process?.stdout?.destroy();
+
+    //     this.process?.stderr?.destroy();
+
+    //     this.process?.stdin?.destroy();
+    //   }),
+    //   new Promise((resolve) => {
+    //     if (this.process?.pid) {
+    //       // this.process?.kill('SIGTERM');
+    //       treeKill(this.process.pid, 'SIGTERM', resolve);
+    //     }
+    //   }).then(() => console.log('treekill resolved')),
+    // ]).then(() => {
+    //   // console.log(JSON.stringify(this.process, null, 2))
+    //   process.exit(0);
+    // });
   }
 
   async sendRequest(
