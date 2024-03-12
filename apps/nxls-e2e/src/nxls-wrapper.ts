@@ -86,11 +86,6 @@ export class NxlsWrapper {
     this.messageWriter?.dispose();
 
     await Promise.all([
-      new Promise((resolve) => {
-        if (this.process?.pid) {
-          treeKill(this.process.pid, 0, resolve);
-        }
-      }).then(() => console.log('treekill resolved')),
       new Promise<void>((resolve) => {
         this.process?.on('exit', () => {
           this.process?.stdout?.destroy();
@@ -100,6 +95,11 @@ export class NxlsWrapper {
           resolve();
         });
       }),
+      new Promise((resolve) => {
+        if (this.process?.pid) {
+          treeKill(this.process.pid, 0, resolve);
+        }
+      }).then(() => console.log('treekill resolved')),
     ]);
   }
 
