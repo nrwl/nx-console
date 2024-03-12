@@ -2,19 +2,24 @@ import { NxWorkspaceRequest } from '@nx-console/language-server/types';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { join } from 'path';
 import { NxlsWrapper } from './nxls-wrapper';
-import { e2eCwd, newWorkspace, uniq } from './utils';
+import {
+  e2eCwd,
+  newWorkspace,
+  simpleReactWorkspaceOptions,
+  uniq,
+} from './utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
-describe('nxlsE2e', () => {
+describe('nx/workspace', () => {
   beforeAll(() => {
-    newWorkspace({ name: workspaceName });
+    newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
     nxlsWrapper = new NxlsWrapper();
     nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
-  it('should work', async () => {
+  it('should return projects for simple workspace', async () => {
     const workspaceResponse = await nxlsWrapper.sendRequest({
       ...NxWorkspaceRequest,
       params: {

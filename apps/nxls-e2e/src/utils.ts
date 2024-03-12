@@ -1,44 +1,38 @@
-import { ChildProcess, exec, execSync, spawn, spawnSync } from 'child_process';
+import { execSync } from 'child_process';
 import { existsSync, mkdirSync } from 'fs';
-import { join, relative } from 'path';
-import { promisify } from 'util';
-import {
-  ReadableStreamMessageReader,
-  WriteableStreamMessageWriter,
-} from 'vscode-jsonrpc';
-import {
-  StreamMessageReader,
-  StreamMessageWriter,
-} from 'vscode-languageserver/node';
 
 const defaultVersion = '18.0.4';
 
 export const e2eCwd = '/tmp/nxls-e2e';
 
+export type NewWorkspaceOptions = {
+  preset: string;
+  bundler?: string;
+  e2eTestRunner?: string;
+  style?: string;
+};
+
+export const simpleReactWorkspaceOptions: NewWorkspaceOptions = {
+  preset: 'react-standalone',
+  bundler: 'vite',
+  e2eTestRunner: 'cypress',
+  style: 'css',
+};
+
 export function newWorkspace({
   name = uniq('workspace'),
   packageManager = 'npm',
   version,
-  options = {
-    preset: 'react-standalone',
-    bundler: 'vite',
-    e2eTestRunner: 'cypress',
-    style: 'css',
-  },
+  options,
   verbose = false,
 }: {
   name?: string;
   packageManager?: 'npm' | 'pnpm' | 'yarn';
   preset?: string;
   version?: string;
-  options?: {
-    preset: string;
-    bundler?: string;
-    e2eTestRunner?: string;
-    style?: string;
-  };
+  options: NewWorkspaceOptions;
   verbose?: boolean;
-} = {}) {
+}) {
   if (!version) {
     version = defaultVersion;
   }
