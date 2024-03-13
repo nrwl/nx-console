@@ -1,9 +1,10 @@
 import { execSync } from 'child_process';
 import { existsSync, mkdirSync } from 'fs';
+import { normalize } from 'path';
 
 const defaultVersion = '18.0.4';
 
-export const e2eCwd = '/tmp/nxls-e2e';
+export const e2eCwd = normalize('/tmp/nxls-e2e');
 
 export type NewWorkspaceOptions = {
   preset: string;

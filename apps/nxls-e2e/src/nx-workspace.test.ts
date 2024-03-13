@@ -13,11 +13,11 @@ let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
 describe('nx/workspace', () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
-    nxlsWrapper = new NxlsWrapper();
-    nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+    nxlsWrapper = new NxlsWrapper(true);
+    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
   it('should return projects for simple workspace', async () => {
     const workspaceResponse = await nxlsWrapper.sendRequest({

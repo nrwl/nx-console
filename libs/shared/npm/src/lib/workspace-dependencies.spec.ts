@@ -32,7 +32,7 @@ describe('workspace-dependencies path', () => {
       '@nrwl/nx'
     );
     expect(normalize(dependencyPath ?? '')).toEqual(
-      normalize("/workspace/node_modules/@nrwl/nx")
+      normalize('/workspace/node_modules/@nrwl/nx')
     );
   });
 
@@ -45,7 +45,7 @@ describe('workspace-dependencies path', () => {
       '@nrwl/nx'
     );
     expect(normalize(dependencyPath ?? '')).toEqual(
-      normalize(".yarn/cache/workspace/@nrwl/nx")
+      normalize('.yarn/cache/workspace/@nrwl/nx')
     );
   });
 
@@ -55,7 +55,7 @@ describe('workspace-dependencies path', () => {
       './tools/local/executor'
     );
     expect(normalize(dependencyPath ?? '')).toEqual(
-      normalize("/workspace/tools/local/executor")
+      normalize('/workspace/tools/local/executor')
     );
   });
 });

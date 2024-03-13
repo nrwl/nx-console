@@ -63,11 +63,9 @@ it('should get all document links for properties that have a X_COMPLETION_TYPE (
     matchingSchemas
   );
 
-  expect(documentLinks.map((link) => normalize(link.target ?? ''))).toEqual(
-     [
-      normalize("/workspace/project/src/main.ts"),
-    ]
-  );
+  expect(documentLinks.map((link) => normalize(link.target ?? ''))).toEqual([
+    normalize('/workspace/project/src/main.ts'),
+  ]);
 
   documentMapper.dispose();
 });

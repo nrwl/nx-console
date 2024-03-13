@@ -156,20 +156,20 @@ describe('getCompletionItems', () => {
       }
     );
 
-    expect(labels.map(l => normalize(l)).sort()).toEqual(
-          [
-            `"file.js"`,
-            `"project/src/main.js"`,
-            `"project/src/main.ts"`,
-          ].map(l => normalize(l)).sort()
-      );
-    expect(details.map(l => normalize(l ?? '')).sort()).toEqual(
-          [
-            "/workspace/file.js",
-            "/workspace/project/src/main.js",
-            "/workspace/project/src/main.ts",
-          ].map(l => normalize(l)).sort()
-      );
+    expect(labels.map((l) => normalize(l)).sort()).toEqual(
+      [`"file.js"`, `"project/src/main.js"`, `"project/src/main.ts"`]
+        .map((l) => normalize(l))
+        .sort()
+    );
+    expect(details.map((l) => normalize(l ?? '')).sort()).toEqual(
+      [
+        '/workspace/file.js',
+        '/workspace/project/src/main.js',
+        '/workspace/project/src/main.ts',
+      ]
+        .map((l) => normalize(l))
+        .sort()
+    );
   });
 
   it('should be able to use a glob', async () => {
