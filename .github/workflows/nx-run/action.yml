@@ -1,5 +1,5 @@
 name: Nx Run
-description: Start nxcloud ci-run and run tasks
+description: run tasks
 
 runs:
   using: 'composite'
