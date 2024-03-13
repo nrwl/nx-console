@@ -32,15 +32,13 @@ jobs:
           check-latest: true
           cache: yarn
       - run: yarn install --immutable
-        shell: bash
       - name: Workspace Lint
         run: |
-          yarn exec nx-cloud record -- yarn exec nx format:check
-          yarn exec nx-cloud record -- ./gradlew ktfmtCheck
-        shell: bash
+          npx nx-cloud record -- npx nx format:check
+          npx nx-cloud record -- ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: npx nx affected --target=lint test build e2e --configuration=ci
+      - run: npx nx affected --t=lint,test,build,e2e --configuration=ci
 
   # agents:
   #   runs-on: ubuntu-latest
