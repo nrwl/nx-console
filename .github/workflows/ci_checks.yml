@@ -62,8 +62,8 @@ jobs:
       - run: yarn install --immutable
       - name: Workspace Lint
         run: |
-          npx nx-cloud record -- npx nx format:check
-          npx nx-cloud record -- ./gradlew ktfmtCheck
+          npx nx format:check
+          ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
       - run: npx nx affected --t=lint,test,build,e2e --configuration=ci
