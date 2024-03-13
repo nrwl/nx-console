@@ -43,7 +43,9 @@ export function newWorkspace({
   }
 
   if (!existsSync(e2eCwd)) {
-    mkdirSync(e2eCwd);
+    mkdirSync(e2eCwd, {
+      recursive: true,
+    });
   }
 
   let command = `npx create-nx-workspace@${version} ${name} `;
