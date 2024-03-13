@@ -8,6 +8,7 @@ import { getDocumentLinks } from './get-document-links';
 import { X_COMPLETION_TYPE } from '@nx-console/shared/json-schema';
 
 import * as fs from '@nx-console/shared/file-system';
+import { normalize } from 'path';
 jest.mock(
   '@nx-console/shared/file-system',
   (): Partial<typeof fs> => ({
@@ -62,11 +63,11 @@ it('should get all document links for properties that have a X_COMPLETION_TYPE (
     matchingSchemas
   );
 
-  expect(documentLinks.map((link) => link.target)).toMatchInlineSnapshot(`
-    Array [
-      "/workspace/project/src/main.ts",
+  expect(documentLinks.map((link) => normalize(link.target ?? ''))).toEqual(
+     [
+      normalize("/workspace/project/src/main.ts"),
     ]
-  `);
+  );
 
   documentMapper.dispose();
 });
