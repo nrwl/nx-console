@@ -19,7 +19,6 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'master'
-      # This line is needed for nx affected to work when CI is running on a PR
       - run: git branch --track master origin/master
       - run: |
           npx nx-cloud start-ci-run \
@@ -39,33 +38,32 @@ jobs:
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
       - run: npx nx affected --t=lint,test,build,e2e --configuration=ci
-  # main-windows:
-  # name: Main Windows
-  # runs-on: windows-latest
-  # steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       fetch-depth: 0
-  #   - uses: nrwl/nx-set-shas@v3
-  #     with:
-  #       main-branch-name: 'master'
-  #   # This line is needed for nx affected to work when CI is running on a PR
-  #   - run: git branch --track master origin/master
-  #   - run: |
-  #       npx nx-cloud start-ci-run \
-  #         --distribute-on="3 custom-linux-medium-js" \
-  #         --stop-agents-after="e2e"
-  #   - name: Use Node.js ${{ env.node_version }}
-  #     uses: actions/setup-node@v2
-  #     with:
-  #       node-version: ${{ env.node_version }}
-  #       check-latest: true
-  #       cache: yarn
-  #   - run: yarn install --immutable
-  #   - name: Workspace Lint
-  #     run: |
-  #       npx nx-cloud record -- npx nx format:check
-  #       npx nx-cloud record -- ./gradlew ktfmtCheck
-  #     env:
-  #       NX_CLOUD_DISTRIBUTED_EXECUTION: false
-  #   - run: npx nx affected --t=lint,test,build,e2e --configuration=ci
+  main-windows:
+    name: Main Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: nrwl/nx-set-shas@v3
+        with:
+          main-branch-name: 'master'
+      - run: git branch --track master origin/master
+      # - run: |
+      #     npx nx-cloud start-ci-run \
+      #       --distribute-on="3 custom-linux-medium-js" \
+      #       --stop-agents-after="e2e"
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node_version }}
+          check-latest: true
+          cache: yarn
+      - run: yarn install --immutable
+      - name: Workspace Lint
+        run: |
+          npx nx-cloud record -- npx nx format:check
+          npx nx-cloud record -- ./gradlew ktfmtCheck
+        env:
+          NX_CLOUD_DISTRIBUTED_EXECUTION: false
+      - run: npx nx affected --t=lint,test,build,e2e --configuration=ci
