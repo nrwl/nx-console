@@ -4,9 +4,6 @@ description: Start nxcloud ci-run and run tasks
 runs:
   using: 'composite'
   steps:
-    - name: Starting nx-cloud ci agents
-      run: npx nx-cloud start-ci-run
-      shell: bash
     - name: Workspace Lint
       run: |
         yarn exec nx-cloud record -- yarn exec nx format:check
@@ -25,8 +22,4 @@ runs:
       shell: bash
     - name: E2E
       run: yarn exec nx affected --target=e2e --parallel=3 --configuration=ci
-      shell: bash
-    - name: Stopping nx-cloud ci agents
-      if: always()
-      run: npx nx-cloud stop-all-agents
       shell: bash

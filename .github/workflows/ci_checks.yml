@@ -17,31 +17,30 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: ./.github/workflows/setup
-        with:
-          node_version: ${{ env.node_version }}
+      - name: Start CI Run on Nx Agents
+        run: 'npx nx-cloud start-ci-run --distribute-on="3 custom-linux-medium-js"'
       - uses: ./.github/workflows/nx-run
 
-  agents:
-    runs-on: ubuntu-latest
-    name: Nx Cloud - Agent ${{ matrix.agent }}
-    timeout-minutes: 15
-    strategy:
-      matrix:
-        agent: [1, 2, 3]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ./.github/workflows/setup
-        with:
-          node_version: ${{ env.node_version }}
-      - name: Install xvfb
-        run: sudo apt-get install -y xvfb
-      - name: Start Nx Agent ${{ matrix.agent }}
-        run: npx nx-cloud start-agent
-      - uses: actions/upload-artifact@v3
-        with:
-          name: e2e-screenshots
-          path: apps/vscode-e2e/.screenshots
-          if-no-files-found: ignore
+  # agents:
+  #   runs-on: ubuntu-latest
+  #   name: Nx Cloud - Agent ${{ matrix.agent }}
+  #   timeout-minutes: 15
+  #   strategy:
+  #     matrix:
+  #       agent: [1, 2, 3]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: ./.github/workflows/setup
+  #       with:
+  #         node_version: ${{ env.node_version }}
+  #     - name: Install xvfb
+  #       run: sudo apt-get install -y xvfb
+  #     - name: Start Nx Agent ${{ matrix.agent }}
+  #       run: npx nx-cloud start-agent
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: e2e-screenshots
+  #         path: apps/vscode-e2e/.screenshots
+  #         if-no-files-found: ignore
