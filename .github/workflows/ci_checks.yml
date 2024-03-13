@@ -60,10 +60,13 @@ jobs:
           check-latest: true
           cache: yarn
       - run: yarn install --immutable
-      - name: Workspace Lint
-        run: |
-          npx nx format:check
-          ./gradlew ktfmtCheck
-        env:
-          NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: npx nx affected --t=lint,test,build,e2e --configuration=ci
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1.0.5
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
+          cache: gradle
+      # there's no need to check formatting & linting again on windows
+      - run: npx nx affected --t=test,build,e2e --configuration=ci
