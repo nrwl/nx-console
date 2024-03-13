@@ -6,7 +6,6 @@ on:
   pull_request:
 
 env:
-  NX_CLOUD_DISTRIBUTED_EXECUTION: true
   node_version: 16
 
 jobs:
@@ -19,7 +18,25 @@ jobs:
           fetch-depth: 0
       - name: Start CI Run on Nx Agents
         run: 'npx nx-cloud start-ci-run --distribute-on="3 custom-linux-medium-js"'
-      - uses: ./.github/workflows/nx-run
+      # - name: Workspace Lint
+      #   run: |
+      #     yarn exec nx-cloud record -- yarn exec nx format:check
+      #     yarn exec nx-cloud record -- ./gradlew ktfmtCheck
+      #   shell: bash
+      #   env:
+      #     NX_CLOUD_DISTRIBUTED_EXECUTION: false
+      - name: Lint
+        run: yarn exec nx affected --target=lint --parallel=3 --configuration=ci
+        shell: bash
+      - name: Test
+        run: yarn exec nx affected --target=test --parallel=3 --configuration=ci
+        shell: bash
+      - name: Build
+        run: yarn exec nx affected --target=build --parallel=3 --configuration=ci
+        shell: bash
+      - name: E2E
+        run: yarn exec nx affected --target=e2e --parallel=3 --configuration=ci
+        shell: bash
 
   # agents:
   #   runs-on: ubuntu-latest
