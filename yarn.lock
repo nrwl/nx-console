@@ -10787,6 +10787,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@swc/helpers@npm:~0.5.2":
+  version: 0.5.6
+  resolution: "@swc/helpers@npm:0.5.6"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: 45de57097e1f6f356f571c7a4f55c692a46b0404c8601e5d9552e152000dfe541ff529d3d01c8a4abf60799d6e7d0078936e40be0a203ca356299d5d6adea765
+  languageName: node
+  linkType: hard
+
 "@swc/types@npm:^0.1.5":
   version: 0.1.5
   resolution: "@swc/types@npm:0.1.5"
@@ -26147,6 +26156,7 @@ __metadata:
     "@storybook/core-server": 7.5.3
     "@swc-node/register": 1.8.0
     "@swc/core": ~1.3.85
+    "@swc/helpers": ~0.5.2
     "@tailwindcss/forms": 0.5.3
     "@theunderscorer/nx-semantic-release": 2.4.0
     "@types/find-cache-dir": ^3.2.1
@@ -26208,6 +26218,7 @@ __metadata:
     semver: ^7.3.7
     storybook: 7.0.7
     tailwindcss: ^3.3.2
+    tree-kill: ^1.2.2
     ts-jest: 29.1.0
     ts-node: 10.9.1
     tslib: ^2.3.0
@@ -26216,6 +26227,7 @@ __metadata:
     universal-analytics: 0.5.3
     uuid: ^8.3.2
     vscode-json-languageservice: ^5.1.0
+    vscode-jsonrpc: ^8.2.0
     vscode-languageclient: ^8.0.2
     vscode-languageserver: ^8.0.2
     vscode-uri: ^3.0.8
@@ -31813,7 +31825,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tree-kill@npm:1.2.2":
+"tree-kill@npm:1.2.2, tree-kill@npm:^1.2.2":
   version: 1.2.2
   resolution: "tree-kill@npm:1.2.2"
   bin:
@@ -33005,6 +33017,13 @@ __metadata:
   version: 8.0.2
   resolution: "vscode-jsonrpc@npm:8.0.2"
   checksum: 9d055fd4c87ef1093b0eecb5370bfaf3402179b6639149b6d0f7e0bde60cf580091c7e07b0caff868f10f90331b17e7383c087217c077fdd1b5ae7bc23b72f77
+  languageName: node
+  linkType: hard
+
+"vscode-jsonrpc@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "vscode-jsonrpc@npm:8.2.0"
+  checksum: f302a01e59272adc1ae6494581fa31c15499f9278df76366e3b97b2236c7c53ebfc71efbace9041cfd2caa7f91675b9e56f2407871a1b3c7f760a2e2ee61484a
   languageName: node
   linkType: hard
 

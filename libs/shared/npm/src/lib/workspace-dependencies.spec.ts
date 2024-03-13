@@ -15,6 +15,7 @@ jest.mock(
 const mockedPnpDependencies = mocked(pnpDependencies);
 
 import * as fs from '@nx-console/shared/file-system';
+import { normalize } from 'path';
 jest.mock('@nx-console/shared/file-system', (): Partial<typeof fs> => {
   const original = jest.requireActual('@nx-console/shared/file-system');
   return {
@@ -30,8 +31,8 @@ describe('workspace-dependencies path', () => {
       '/workspace',
       '@nrwl/nx'
     );
-    expect(dependencyPath).toMatchInlineSnapshot(
-      `"/workspace/node_modules/@nrwl/nx"`
+    expect(normalize(dependencyPath ?? '')).toEqual(
+      normalize('/workspace/node_modules/@nrwl/nx')
     );
   });
 
@@ -43,8 +44,8 @@ describe('workspace-dependencies path', () => {
       '/workspace',
       '@nrwl/nx'
     );
-    expect(dependencyPath).toMatchInlineSnapshot(
-      `".yarn/cache/workspace/@nrwl/nx"`
+    expect(normalize(dependencyPath ?? '')).toEqual(
+      normalize('.yarn/cache/workspace/@nrwl/nx')
     );
   });
 
@@ -53,8 +54,8 @@ describe('workspace-dependencies path', () => {
       '/workspace',
       './tools/local/executor'
     );
-    expect(dependencyPath).toMatchInlineSnapshot(
-      `"/workspace/tools/local/executor"`
+    expect(normalize(dependencyPath ?? '')).toEqual(
+      normalize('/workspace/tools/local/executor')
     );
   });
 });
