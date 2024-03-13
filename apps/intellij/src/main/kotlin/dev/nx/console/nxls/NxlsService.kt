@@ -170,6 +170,17 @@ class NxlsService(val project: Project) {
             ?: emptyMap()
     }
 
+    suspend fun targetsForConfigFile(
+        projectName: String,
+        configFilePath: String
+    ): Map<String, NxTarget> {
+        return withMessageIssueCatch("nx/targetsForConfigFile") {
+            val request = NxTargetsForConfigFileRequest(projectName, configFilePath)
+            server()?.getNxService()?.targetsForConfigFile(request)?.await()
+        }()
+            ?: emptyMap()
+    }
+
     fun addDocument(editor: Editor) {
         wrapper.connect(editor)
     }

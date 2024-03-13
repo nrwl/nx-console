@@ -24,6 +24,10 @@ class ProjectDetailsEditorWithPreview(project: Project, file: VirtualFile) :
             }
     }
 
+    fun showWithPreview() {
+        this.layout = Layout.SHOW_EDITOR_AND_PREVIEW
+    }
+
     companion object {
         private fun createEditor(project: Project, file: VirtualFile): TextEditor {
             return (TextEditorProvider.getInstance().createEditor(project, file) as TextEditor)

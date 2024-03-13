@@ -91,6 +91,13 @@ interface NxService {
         throw UnsupportedOperationException()
     }
 
+    @JsonRequest
+    fun targetsForConfigFile(
+        targetsForConfigFileRequest: NxTargetsForConfigFileRequest
+    ): CompletableFuture<Map<String, NxTarget>> {
+        throw UnsupportedOperationException()
+    }
+
     @JsonNotification
     fun changeWorkspace(workspacePath: String) {
         throw UnsupportedOperationException()
