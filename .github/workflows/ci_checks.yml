@@ -18,6 +18,15 @@ jobs:
           fetch-depth: 0
       - name: Start CI Run on Nx Agents
         run: 'npx nx-cloud start-ci-run --distribute-on="3 custom-linux-medium-js"'
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node_version }}
+          check-latest: true
+          cache: yarn
+      - run: yarn install --immutable
+        shell: bash
+
       # - name: Workspace Lint
       #   run: |
       #     yarn exec nx-cloud record -- yarn exec nx format:check
