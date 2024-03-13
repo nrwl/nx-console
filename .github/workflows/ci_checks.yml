@@ -6,22 +6,25 @@ on:
   pull_request:
 
 env:
-  node_version: 16
+  node_version: 18
 
 jobs:
   checks:
     name: Nx Cloud - Main Job
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v3
+      - uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'master'
-      - name: Start CI Run on Nx Agents
-        run: 'npx nx-cloud start-ci-run --distribute-on="3 custom-linux-medium-js"'
+      # This line is needed for nx affected to work when CI is running on a PR
+      - run: git branch --track main origin/main
+      - run: |
+          pnpm exec nx-cloud start-ci-run \
+            --distribute-on="3 custom-linux-medium-js" \
+            --stop-agents-after="e2e"
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
         with:
@@ -39,17 +42,13 @@ jobs:
       #   env:
       #     NX_CLOUD_DISTRIBUTED_EXECUTION: false
       - name: Lint
-        run: yarn exec nx affected --target=lint --parallel=3 --configuration=ci
-        shell: bash
+        run: yarn exec nx affected --target=lint --configuration=ci
       - name: Test
-        run: yarn exec nx affected --target=test --parallel=3 --configuration=ci
-        shell: bash
+        run: yarn exec nx affected --target=test --configuration=ci
       - name: Build
-        run: yarn exec nx affected --target=build --parallel=3 --configuration=ci
-        shell: bash
+        run: yarn exec nx affected --target=build --configuration=ci
       - name: E2E
-        run: yarn exec nx affected --target=e2e --parallel=3 --configuration=ci
-        shell: bash
+        run: yarn exec nx affected --target=e2e --configuration=ci
 
   # agents:
   #   runs-on: ubuntu-latest
