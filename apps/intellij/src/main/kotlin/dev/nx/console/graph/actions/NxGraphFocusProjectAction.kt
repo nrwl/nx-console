@@ -22,7 +22,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         useKeyMapShortcutSetOrDefault()
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         useKeyMapShortcutSetOrDefault()

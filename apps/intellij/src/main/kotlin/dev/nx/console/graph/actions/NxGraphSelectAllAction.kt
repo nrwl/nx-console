@@ -19,7 +19,7 @@ open class NxGraphSelectAllAction(
     icon: Icon? = null
 ) : DumbAwareAction(text, description, icon) {
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         if (e.place == NxToolWindowPanel.NX_TOOLBAR_PLACE) {

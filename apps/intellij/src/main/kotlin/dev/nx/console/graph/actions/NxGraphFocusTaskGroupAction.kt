@@ -30,7 +30,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
         }
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
@@ -50,6 +50,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
         val keyMapSet = KeymapUtil.getActiveKeymapShortcuts(ID)
 
         if (keyMapSet.shortcuts.isEmpty()) {
+
             shortcutSet = CustomShortcutSet.fromString(DEFAULT_SHORTCUT)
         } else {
             shortcutSet = keyMapSet

@@ -34,7 +34,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
         )
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         if (e.place == "NxToolWindow") {
@@ -82,8 +82,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                             ?.workspace
                             ?.projects
                             ?.get(selectedNxProject)
-                    }
-                        ?: return@launch
+                    } ?: return@launch
 
             ApplicationManager.getApplication().invokeLater {
                 val projectFilePath =
@@ -109,8 +108,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                             psiFile,
                             nxTarget,
                             nxTargetConfiguration
-                        )
-                            ?: return@invokeLater
+                        ) ?: return@invokeLater
 
                     val editor = fileEditorManager.selectedTextEditor
 

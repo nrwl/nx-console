@@ -145,7 +145,7 @@ class NxTreeStructure(
 
     private inner class EditRunSettingsAction : AnAction(AllIcons.Actions.EditSource), DumbAware {
         override fun getActionUpdateThread(): ActionUpdateThread {
-            return ActionUpdateThread.EDT
+            return ActionUpdateThread.BGT
         }
 
         override fun update(e: AnActionEvent) {
@@ -202,7 +202,7 @@ class NxTreeStructure(
         }
 
         override fun getActionUpdateThread(): ActionUpdateThread {
-            return ActionUpdateThread.EDT
+            return ActionUpdateThread.BGT
         }
 
         override fun update(e: AnActionEvent) {

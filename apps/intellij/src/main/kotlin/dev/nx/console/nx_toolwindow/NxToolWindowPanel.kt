@@ -6,6 +6,7 @@ import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.invokeLater
@@ -89,7 +90,10 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         val tb = run {
             val actionManager = ActionManager.getInstance()
             val actionGroup =
-                DefaultActionGroup().apply { templatePresentation.text = "Nx Toolwindow" }
+                object : DefaultActionGroup() {
+                        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+                    }
+                    .apply { templatePresentation.text = "Nx Toolwindow" }
 
             val refreshAction =
                 object :
