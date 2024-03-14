@@ -145,11 +145,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        invokeLater { createToolwindowContent() }
-                    }
-                }
+                NxWorkspaceRefreshListener { invokeLater { createToolwindowContent() } }
             )
             subscribe(
                 NX_TOOLWINDOW_STYLE_SETTING_TOPIC,

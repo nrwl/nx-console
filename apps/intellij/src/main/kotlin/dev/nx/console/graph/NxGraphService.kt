@@ -59,7 +59,7 @@ class OldNxGraphService(override val project: Project, private val cs: Coroutine
         cs.launch {
             projectGraphOutput = nxlsService.projectGraphOutput()
 
-            with(project.messageBus.connect()) {
+            with(project.messageBus.connect(cs)) {
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                     NxWorkspaceRefreshListener { cs.launch { loadProjectGraph(reload = true) } }

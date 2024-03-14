@@ -43,7 +43,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     private var resetQuery: JBCefJSQuery? = null
     private var interactionEventQuery: JBCefJSQuery? = null
 
-    private val messageBusConnection = project.messageBus.connect()
+    private val messageBusConnection = project.messageBus.connect(this)
 
     init {
         try {

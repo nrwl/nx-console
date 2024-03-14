@@ -6,6 +6,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.jcef.*
@@ -88,7 +89,7 @@ abstract class NxGenerateUiFile(name: String, v2: Boolean = false) :
                             lifeSpanHandler,
                             browser.cefBrowser
                         )
-                        browser.dispose()
+                        Disposer.dispose(browser)
                     }
                 }
             }

@@ -3,6 +3,7 @@ package dev.nx.console.project_details
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorState
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
 import java.beans.PropertyChangeListener
@@ -13,7 +14,7 @@ class ProjectDetailsPreviewFileEditor(project: Project, file: VirtualFile) :
     private val browser = ProjectDetailsBrowser(project, file)
 
     override fun dispose() {
-        browser.dispose()
+        Disposer.dispose(browser)
     }
 
     override fun getComponent(): JComponent = browser.component
