@@ -28,9 +28,10 @@ class AnalyzeNxConfigurationFilesNotificationAction :
 
 @Suppress("UnstableApiUsage")
 fun checkForCodeSmells(project: Project) {
-    val files = runWithModalProgressBlocking(project, "Find configuration files") {
-        findNxConfigurationFiles(project)
-    }
+    val files =
+        runWithModalProgressBlocking(project, "Find configuration files") {
+            findNxConfigurationFiles(project)
+        }
     val codeSmellDetector = CodeSmellDetector.getInstance(project)
     val codeSmells = codeSmellDetector.findCodeSmells(files)
     if (codeSmells.size == 0) {
@@ -42,4 +43,3 @@ fun checkForCodeSmells(project: Project) {
         codeSmellDetector.showCodeSmellErrors(codeSmells)
     }
 }
-
