@@ -1,15 +1,19 @@
 package dev.nx.console.utils
 
-import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.readAction
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 
-fun findNxConfigurationFiles(project: Project, includeNxJson: Boolean = true): List<VirtualFile> {
+suspend fun findNxConfigurationFiles(
+    project: Project,
+    includeNxJson: Boolean = true
+): List<VirtualFile> {
     val paths: MutableList<VirtualFile> = ArrayList()
-    ReadAction.run<RuntimeException> {
+    readAction {
         val startDirectory = LocalFileSystem.getInstance().findFileByPath(project.nxBasePath)
         if (startDirectory != null) {
             VfsUtilCore.visitChildrenRecursively(
@@ -23,6 +27,7 @@ fun findNxConfigurationFiles(project: Project, includeNxJson: Boolean = true): L
                         ) {
                             paths.add(file)
                         }
+                        ProgressManager.checkCanceled()
                         return true
                     }
                 }
