@@ -19,8 +19,8 @@ import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
 @Service(Service.Level.PROJECT)
-class NxlsService(val project: Project) {
-    private var wrapper: NxlsWrapper = NxlsWrapper(project)
+class NxlsService(val project: Project, private val cs: CoroutineScope) {
+    private var wrapper: NxlsWrapper = NxlsWrapper(project, cs)
 
     private fun client(): NxlsLanguageClient? {
         return wrapper.languageClient
@@ -45,7 +45,7 @@ class NxlsService(val project: Project) {
         wrapper.start()
         awaitStarted()
         client()?.registerRefreshCallback {
-            CoroutineScope(Dispatchers.Default).launch {
+            cs.launch {
                 project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
             }
         }
@@ -56,7 +56,7 @@ class NxlsService(val project: Project) {
     }
 
     fun refreshWorkspace() {
-        CoroutineScope(Dispatchers.Default).launch {
+        cs.launch {
             if (!wrapper.isStarted()) {
                 start()
                 awaitStarted()
@@ -67,7 +67,7 @@ class NxlsService(val project: Project) {
     }
 
     fun resetWorkspace() {
-        CoroutineScope(Dispatchers.Default).launch { server()?.getNxService()?.reset() }
+        cs.launch { server()?.getNxService()?.reset() }
     }
 
     suspend fun workspace(): NxWorkspace? {
@@ -79,8 +79,7 @@ class NxlsService(val project: Project) {
     suspend fun generators(): List<NxGenerator> {
         return withMessageIssueCatch("nx/generators") {
             server()?.getNxService()?.generators()?.await()
-        }()
-            ?: emptyList()
+        }() ?: emptyList()
     }
 
     suspend fun generatorOptions(
@@ -89,8 +88,7 @@ class NxlsService(val project: Project) {
         return withMessageIssueCatch("nx/generatorOptions") {
             val request = NxGeneratorOptionsRequest(requestOptions)
             server()?.getNxService()?.generatorOptions(request)?.await()
-        }()
-            ?: emptyList()
+        }() ?: emptyList()
     }
 
     suspend fun generatorContextFromPath(
@@ -114,8 +112,7 @@ class NxlsService(val project: Project) {
         val request = NxProjectsByPathsRequest(paths)
         return withMessageIssueCatch("nx/projectsByPaths") {
             server()?.getNxService()?.projectsByPaths(request)?.await()
-        }()
-            ?: emptyMap()
+        }() ?: emptyMap()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
@@ -147,8 +144,7 @@ class NxlsService(val project: Project) {
     suspend fun transformedGeneratorSchema(schema: GeneratorSchema): GeneratorSchema {
         return withMessageIssueCatch("nx/transformedGeneratorSchema") {
             server()?.getNxService()?.transformedGeneratorSchema(schema)?.await()
-        }()
-            ?: schema
+        }() ?: schema
     }
 
     suspend fun startupMessage(schema: GeneratorSchema): GenerateUiStartupMessageDefinition? {
@@ -166,8 +162,7 @@ class NxlsService(val project: Project) {
     suspend fun sourceMapFilesToProjectMap(): Map<String, String> {
         return withMessageIssueCatch("nx/sourceMapFilesToProjectMap") {
             server()?.getNxService()?.sourceMapFilesToProjectMap()?.await()
-        }()
-            ?: emptyMap()
+        }() ?: emptyMap()
     }
 
     suspend fun targetsForConfigFile(
@@ -177,8 +172,7 @@ class NxlsService(val project: Project) {
         return withMessageIssueCatch("nx/targetsForConfigFile") {
             val request = NxTargetsForConfigFileRequest(projectName, configFilePath)
             server()?.getNxService()?.targetsForConfigFile(request)?.await()
-        }()
-            ?: emptyMap()
+        }() ?: emptyMap()
     }
 
     fun addDocument(editor: Editor) {
@@ -190,9 +184,7 @@ class NxlsService(val project: Project) {
     }
 
     fun changeWorkspace(workspacePath: String) {
-        CoroutineScope(Dispatchers.Default).launch {
-            server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath))
-        }
+        cs.launch { server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath)) }
     }
 
     fun isEditorConnected(editor: Editor): Boolean {

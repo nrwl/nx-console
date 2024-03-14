@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import dev.nx.console.generate.NxGenerateService
@@ -13,9 +13,10 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.WorkspaceLayout
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import kotlinx.coroutines.CoroutineScope
+import dev.nx.console.utils.ActionCoroutineHolderService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
     init {
@@ -34,7 +35,9 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                 null
             }
 
-        CoroutineScope(Dispatchers.Default).launch { selectOptionsAndRun(path, project) }
+        ActionCoroutineHolderService.getInstance(project).cs.launch {
+            selectOptionsAndRun(path, project)
+        }
     }
 
     private suspend fun selectOptionsAndRun(path: String?, project: Project) {
@@ -67,7 +70,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
 
         val runGeneratorManager = RunGeneratorManager(project)
 
-        ApplicationManager.getApplication().invokeLater {
+        withContext(Dispatchers.EDT) {
             val dialog =
                 NxReMoveProjectDialog(
                     project,

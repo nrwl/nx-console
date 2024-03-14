@@ -6,30 +6,21 @@ import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Service(Service.Level.PROJECT)
-class NxVersionUtil(project: Project) {
+class NxVersionUtil(project: Project, private val cs: CoroutineScope) {
     var nxVersion: NxVersion? = null
 
     private val nxlsService = NxlsService.getInstance(project)
 
     init {
-        nxlsService.runAfterStarted {
-            CoroutineScope(Dispatchers.Default).launch { nxVersion = nxlsService.nxVersion() }
-        }
+        nxlsService.runAfterStarted { cs.launch { nxVersion = nxlsService.nxVersion() } }
 
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            nxVersion = nxlsService.nxVersion()
-                        }
-                    }
-                }
+                NxWorkspaceRefreshListener { cs.launch { nxVersion = nxlsService.nxVersion() } }
             )
         }
     }

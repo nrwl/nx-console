@@ -9,7 +9,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.lang.javascript.JavaScriptBundle
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -33,10 +33,11 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.*
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.ToolWindowStyles
+import dev.nx.console.utils.ActionCoroutineHolderService
 import java.awt.event.MouseEvent
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NxTreeStructure(
     val tree: NxProjectsTree,
@@ -60,10 +61,10 @@ class NxTreeStructure(
     override fun getRootElement(): Any = root
 
     fun updateNxProjects(nxWorkspace: NxWorkspace) {
-        CoroutineScope(Dispatchers.Default).launch {
+        ActionCoroutineHolderService.getInstance(project).cs.launch {
             nxTreeBuilder = getTreeBuilder(nxWorkspace)
             root = nxTreeBuilder.buildRootNode()
-            ApplicationManager.getApplication().invokeLater {
+            withContext(Dispatchers.EDT) {
                 treeModel.invalidateAsync().thenRun {
                     TreeUtil.promiseExpand(
                         tree,

@@ -1,7 +1,7 @@
 package dev.nx.console.graph.actions
 
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.NxIcons
@@ -10,10 +10,7 @@ import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.Notifier
-import dev.nx.console.utils.NxTargetDescriptor
-import dev.nx.console.utils.selectNxProject
-import dev.nx.console.utils.selectTargetForNxProject
+import dev.nx.console.utils.*
 import kotlinx.coroutines.*
 
 class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? = null) :
@@ -48,7 +45,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
-        CoroutineScope(Dispatchers.Default).launch {
+        ActionCoroutineHolderService.getInstance(project).cs.launch {
             val currentlyOpenedProject =
                 path?.let { NxlsService.getInstance(project).projectByPath(path = path)?.name }
             val targetDescriptor: NxTargetDescriptor =
@@ -75,7 +72,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
             val nxGraphService = getNxGraphService(project) ?: return@launch
 
-            ApplicationManager.getApplication().invokeLater {
+            withContext(Dispatchers.EDT) {
                 nxGraphService.focusTask(targetDescriptor.nxProject, targetDescriptor.nxTarget)
             }
         }

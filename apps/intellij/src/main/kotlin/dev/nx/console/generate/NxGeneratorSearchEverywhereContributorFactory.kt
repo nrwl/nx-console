@@ -15,9 +15,8 @@ import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.util.Processor
 import dev.nx.console.generate.ui.NxGeneratorListCellRenderer
 import dev.nx.console.models.NxGenerator
+import dev.nx.console.utils.ActionCoroutineHolderService
 import javax.swing.ListCellRenderer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NxGeneratorSearchEverywhereContributorFactory :
@@ -56,7 +55,7 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
         searchText: String
     ): Boolean {
         val path = event.getData(CommonDataKeys.VIRTUAL_FILE)?.path
-        CoroutineScope(Dispatchers.Default).launch {
+        ActionCoroutineHolderService.getInstance(project).cs.launch {
             NxGenerateService.getInstance(project).openGenerateUi(project, selected, path)
         }
         return true
@@ -75,7 +74,7 @@ class NxGeneratorSearchEverywhereContributor(private val event: AnActionEvent) :
         val matcher = NameUtil.buildMatcher(pattern).build()
 
         val task = Runnable {
-            CoroutineScope(Dispatchers.Default).launch {
+            ActionCoroutineHolderService.getInstance(project).cs.launch {
                 NxGenerateService.getInstance(project)
                     .getFilteredGenerators()
                     .filter { matcher.matches(it.name) }

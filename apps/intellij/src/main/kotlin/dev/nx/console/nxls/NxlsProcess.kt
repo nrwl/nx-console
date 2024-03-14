@@ -16,13 +16,12 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 
 private val logger = logger<NxlsProcess>()
 
-class NxlsProcess(private val project: Project) {
+class NxlsProcess(private val project: Project, private val cs: CoroutineScope) {
 
     private val basePath = project.nxBasePath
 
@@ -40,7 +39,7 @@ class NxlsProcess(private val project: Project) {
                 } else {
                     logger.info("nxls started: $it")
                 }
-                CoroutineScope(Dispatchers.Default).launch {
+                cs.launch {
                     val e = it.onExit().await()
                     e.errorStream.readAllBytes().decodeToString().run {
                         if (this.isEmpty()) {

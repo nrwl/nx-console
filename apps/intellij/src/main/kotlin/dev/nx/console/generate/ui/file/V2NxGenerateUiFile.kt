@@ -1,5 +1,6 @@
 package dev.nx.console.generate.ui.file
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
@@ -18,7 +19,6 @@ import java.awt.datatransfer.StringSelection
 import javax.swing.JComponent
 import javax.swing.UIManager
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 
@@ -27,6 +27,7 @@ class V2NxGenerateUiFile(
     private val project: Project,
     private val runGeneratorManager: RunGeneratorManager
 ) : NxGenerateUiFile(name, true) {
+    private val cs = V2NxGenerateUiFileCoroutineHolder.getInstance(project).cs
 
     private var generatorToDisplay: GeneratorSchema? = null
 
@@ -54,7 +55,7 @@ class V2NxGenerateUiFile(
                     ${query.inject("message")}
             })
         """
-            CoroutineScope(Dispatchers.Default).launch {
+            cs.launch {
                 browser.executeJavaScript(js)
 
                 postMessageToBrowser(GenerateUiStylesInputMessage(extractIntellijStyles()))
@@ -89,12 +90,12 @@ class V2NxGenerateUiFile(
         logger.info("received message $messageParsed")
         if (messageParsed.payloadType == "output-init") {
             this.generatorToDisplay?.let { schema ->
-                CoroutineScope(Dispatchers.Default).launch {
+                cs.launch {
                     NxlsService.getInstance(project).transformedGeneratorSchema(schema).apply {
                         postMessageToBrowser(GenerateUiGeneratorSchemaInputMessage(this))
                     }
                 }
-                CoroutineScope(Dispatchers.Default).launch {
+                cs.launch {
                     NxlsService.getInstance(project).startupMessage(schema)?.apply {
                         postMessageToBrowser(GenerateUiStartupMessageDefinitionInputMessage(this))
                     }
@@ -125,7 +126,7 @@ class V2NxGenerateUiFile(
     private fun postMessageToBrowser(message: GenerateUiInputMessage) {
         val messageString = json.encodeToString(message)
         logger<NxGenerateUiFile>().info("posting message $messageString")
-        CoroutineScope(Dispatchers.Default).launch {
+        cs.launch {
             browser.executeJavaScript("""window.intellijApi.postToWebview($messageString)""")
         }
     }
@@ -182,5 +183,13 @@ class V2NxGenerateUiFile(
             fontSize = fontSize
         )
         //        val secondaryTextColor = getHexColor(UIUtil.getLabelForeground())
+    }
+}
+
+@Service(Service.Level.PROJECT)
+private class V2NxGenerateUiFileCoroutineHolder(val cs: CoroutineScope) {
+    companion object {
+        fun getInstance(project: Project): V2NxGenerateUiFileCoroutineHolder =
+            project.getService(V2NxGenerateUiFileCoroutineHolder::class.java)
     }
 }
