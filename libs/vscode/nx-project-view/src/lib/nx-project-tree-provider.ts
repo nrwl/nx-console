@@ -121,18 +121,18 @@ export class NxProjectTreeProvider extends AbstractTreeProvider<NxTreeItem> {
       flags.push('--skip-nx-cache');
     }
 
-    let problemMatchers : string | string[] | undefined;
+    let problemMatchers: string | string[] | undefined;
     switch (target.name) {
       case 'lint':
         problemMatchers = ['$eslint-stylish'];
-        break;      
+        break;
     }
 
     CliTaskProvider.instance.executeTask({
       command: 'run',
       positional: `${project}:${target.name}`,
       flags,
-      problemMatchers
+      problemMatchers,
     });
   }
 
