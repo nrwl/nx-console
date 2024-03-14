@@ -10,8 +10,8 @@ import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.ActionCoroutineHolderService
 import dev.nx.console.utils.Notifier
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.selectNxProject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class NxGraphFocusProjectAction : DumbAwareAction("Nx Graph: Focus Project") {
         TelemetryService.getInstance(project).featureUsed("Nx Graph Select Project")
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
-        ActionCoroutineHolderService.getInstance(project).cs.launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val currentlyOpenedProject =
                 path?.let { NxlsService.getInstance(project).projectByPath(path = it)?.name }
 

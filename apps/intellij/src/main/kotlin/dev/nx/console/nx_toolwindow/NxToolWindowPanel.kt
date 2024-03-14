@@ -24,7 +24,7 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
-import dev.nx.console.utils.ActionCoroutineHolderService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nxWorkspace
 import javax.swing.JComponent
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     }
 
     private fun createToolwindowContent() {
-        ActionCoroutineHolderService.getInstance(project).cs.launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val workspace = project.nxWorkspace()
             if (workspace == null || workspace.workspace.projects.isEmpty()) {
                 setContent(emptyContent)

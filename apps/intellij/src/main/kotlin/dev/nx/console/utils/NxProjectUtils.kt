@@ -23,7 +23,7 @@ suspend fun selectNxProject(
     dataContext: DataContext?,
     preferredProject: String? = null
 ): String? = suspendCoroutine {
-    ActionCoroutineHolderService.getInstance(project).cs.launch {
+    ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
         val projects =
             NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toMutableList()
                 ?: mutableListOf()
@@ -85,7 +85,7 @@ suspend fun selectTargetForNxProject(
     dataContext: DataContext,
     nxProject: String,
 ): String? = suspendCoroutine { continuation ->
-    ActionCoroutineHolderService.getInstance(project).cs.launch {
+    ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
         val targets =
             NxlsService.getInstance(project)
                 .workspace()

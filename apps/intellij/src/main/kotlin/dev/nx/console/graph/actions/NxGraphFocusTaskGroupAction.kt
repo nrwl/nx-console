@@ -11,7 +11,7 @@ import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.ActionCoroutineHolderService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,7 +39,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
         val targetGroup: NxSimpleNode.TargetGroup =
             e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup } ?: return
 
-        ActionCoroutineHolderService.getInstance(project).cs.launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val nxGraphService = getNxGraphService(project) ?: return@launch
             withContext(Dispatchers.EDT) { nxGraphService.focusTaskGroup(targetGroup.name) }
         }

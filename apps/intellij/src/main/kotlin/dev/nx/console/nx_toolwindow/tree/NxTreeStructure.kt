@@ -33,7 +33,7 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.*
 import dev.nx.console.settings.NxConsoleProjectSettingsProvider
 import dev.nx.console.settings.options.ToolWindowStyles
-import dev.nx.console.utils.ActionCoroutineHolderService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import java.awt.event.MouseEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,7 +61,7 @@ class NxTreeStructure(
     override fun getRootElement(): Any = root
 
     fun updateNxProjects(nxWorkspace: NxWorkspace) {
-        ActionCoroutineHolderService.getInstance(project).cs.launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             nxTreeBuilder = getTreeBuilder(nxWorkspace)
             root = nxTreeBuilder.buildRootNode()
             withContext(Dispatchers.EDT) {

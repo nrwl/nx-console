@@ -9,7 +9,7 @@ import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
-import dev.nx.console.utils.ActionCoroutineHolderService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 public suspend fun getNxGraphService(project: Project): INxGraphService? {
     val nxlsService = NxlsService.getInstance(project)
     val nxVersion =
-        ActionCoroutineHolderService.getInstance(project)
+        ProjectLevelCoroutineHolderService.getInstance(project)
             .cs
             .async { nxlsService.workspace()?.nxVersion }
             .await() ?: return null

@@ -13,7 +13,7 @@ import dev.nx.console.generate.run_generator.RunGeneratorManager
 import dev.nx.console.models.WorkspaceLayout
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.ActionCoroutineHolderService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,7 +35,7 @@ open class NxReMoveProjectActionBase(val mode: String) : AnAction() {
                 null
             }
 
-        ActionCoroutineHolderService.getInstance(project).cs.launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             selectOptionsAndRun(path, project)
         }
     }

@@ -45,7 +45,7 @@ class NxGraphFocusTaskAction(private val targetDescriptor: NxTargetDescriptor? =
 
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
-        ActionCoroutineHolderService.getInstance(project).cs.launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val currentlyOpenedProject =
                 path?.let { NxlsService.getInstance(project).projectByPath(path = path)?.name }
             val targetDescriptor: NxTargetDescriptor =
