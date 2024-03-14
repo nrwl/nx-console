@@ -40,7 +40,9 @@ export async function getTargetsForConfigFile(
     workspace: { sourceMaps, projects },
   } = await nxWorkspace(workingPath);
 
-  if (normalize(configFilePath).includes(workingPath)) {
+  configFilePath = normalize(configFilePath);
+
+  if (configFilePath.includes(workingPath)) {
     configFilePath = relative(workingPath, configFilePath);
   }
 
@@ -56,7 +58,7 @@ export async function getTargetsForConfigFile(
   Object.entries(sourceMap)
     .filter(([key]) => key.startsWith('targets.'))
     .forEach(([key, [file]]: [string, string[]]) => {
-      if (file === configFilePath) {
+      if (normalize(file) === configFilePath) {
         const targetName = key.split('.')[1];
         const target = project.targets?.[targetName];
         if (target) {

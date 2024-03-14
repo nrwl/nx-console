@@ -6,7 +6,7 @@
     "runIde": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "./gradlew :apps:intellij:runIde"
+        "command": "node ./apps/intellij/run-gradle.js:apps:intellij:runIde"
       }
     },
     "build": {
@@ -14,7 +14,7 @@
       "outputs": ["{workspaceRoot}/dist/apps/intellij/distributions"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "./gradlew :apps:intellij:buildPlugin"
+        "command": "node ./apps/intellij/run-gradle.js :apps:intellij:buildPlugin"
       },
       "configurations": {
         "production-intellij": {}
@@ -26,14 +26,17 @@
       "outputs": ["{workspaceRoot}/dist/apps/intellij/reports/tests"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "./gradlew :apps:intellij:check"
+        "command": "node ./apps/intellij/run-gradle.js :apps:intellij:check"
       }
+    },
+    "lint": {
+      "executor": "nx:noop"
     },
     "x-lint": {
       "//": "Run inspections take a long time on the CI. Disable for now",
       "executor": "nx:run-commands",
       "options": {
-        "command": "./gradlew :apps:intellij:runInspections"
+        "command": "node ./apps/intellij/run-gradle.js :apps:intellij:runInspections"
       }
     },
     "semantic-release": {

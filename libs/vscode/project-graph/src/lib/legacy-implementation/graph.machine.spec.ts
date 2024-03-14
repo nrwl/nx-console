@@ -26,7 +26,7 @@ jest.mock(
   '@nx-console/vscode/nx-workspace',
   (): PartialDeep<typeof nxWorkspace> => {
     return {
-      async getNxWorkspace(reset?: boolean): Promise<NxWorkspace> {
+      async getNxWorkspace(_?: boolean): Promise<NxWorkspace> {
         return {
           isEncapsulatedNx: false,
           workspacePath: 'temp',

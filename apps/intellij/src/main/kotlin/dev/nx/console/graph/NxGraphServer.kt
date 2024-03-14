@@ -1,6 +1,7 @@
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.util.io.readLineAsync
 import dev.nx.console.graph.NxGraphRequest
@@ -21,7 +22,8 @@ data class WebviewRequest(val type: String, val id: String) {}
 data class WebviewResponse(val type: String, val id: String, val payload: String) {}
 
 @Service(Service.Level.PROJECT)
-class StandardNxGraphServer(project: Project) : NxGraphServer(project, 5580, false) {
+class StandardNxGraphServer(project: Project, cs: CoroutineScope) :
+    NxGraphServer(project, 5580, false, cs) {
     companion object {
         fun getInstance(project: Project): NxGraphServer =
             project.getService(StandardNxGraphServer::class.java)
@@ -29,7 +31,8 @@ class StandardNxGraphServer(project: Project) : NxGraphServer(project, 5580, fal
 }
 
 @Service(Service.Level.PROJECT)
-class AffectedNxGraphServer(project: Project) : NxGraphServer(project, 5590, true) {
+class AffectedNxGraphServer(project: Project, cs: CoroutineScope) :
+    NxGraphServer(project, 5590, true, cs) {
     companion object {
         fun getInstance(project: Project): NxGraphServer =
             project.getService(AffectedNxGraphServer::class.java)
@@ -41,11 +44,14 @@ val logger = logger<NxGraphServer>()
 open class NxGraphServer(
     private val project: Project,
     private val startPort: Int,
-    private val affected: Boolean
+    private val affected: Boolean,
+    private val cs: CoroutineScope
 ) : Disposable {
 
     var currentPort: Int? = null
     private var nxGraphProcess: Process? = null
+
+    private var lastErrror: String? = null
 
     private var isStarted = false
     private var isStarting = false
@@ -54,14 +60,10 @@ open class NxGraphServer(
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            nxGraphProcess?.apply {
-                                if (!isAlive) {
-                                    start()
-                                }
-                            }
+                NxWorkspaceRefreshListener {
+                    nxGraphProcess?.apply {
+                        if (!isAlive) {
+                            start()
                         }
                     }
                 }
@@ -72,7 +74,7 @@ open class NxGraphServer(
     suspend fun handleGraphRequest(request: NxGraphRequest, attempt: Int = 0): NxGraphRequest {
         try {
 
-            if (nxGraphProcess?.isAlive != true && !isStarting) {
+            if (nxGraphProcess == null || nxGraphProcess?.isAlive != true && !isStarting) {
                 start()
                 waitForServerReady()
             }
@@ -107,7 +109,17 @@ open class NxGraphServer(
             if (attempt == 0) {
                 return handleGraphRequest(request, 1)
             }
-            return request
+
+            val error =
+                if (e is TimeoutCancellationException && lastErrror != null)
+                    "error while running nx graph: $lastErrror"
+                else e.message
+            return NxGraphRequest(
+                type = request.type,
+                id = request.id,
+                payload = request.payload,
+                error = error
+            )
         }
     }
 
@@ -118,7 +130,7 @@ open class NxGraphServer(
 
         isStarting = true
         isStarted = false
-        CoroutineScope(Dispatchers.Default).launch {
+        cs.launch {
             var port = startPort
             var isPortAvailable = false
             while (!isPortAvailable) {
@@ -173,12 +185,13 @@ open class NxGraphServer(
             var stopWaiting = false
             var line: String? = null
             line = reader.readLineAsync()
-
+            thisLogger().trace("Read line while starting: $line")
             while (!stopWaiting) {
                 if (line != null && line.contains(port.toString())) {
                     stopWaiting = true
                 }
                 line = reader.readLineAsync()?.trim()?.lowercase()
+                thisLogger().trace("Read line while starting: $line")
             }
 
             process
@@ -196,18 +209,31 @@ open class NxGraphServer(
     }
 
     private fun handleGraphProcessError(process: Process) {
-        process.onExit().thenAccept { exitCode ->
-            logger.debug("graph server exited with code $exitCode")
+        lastErrror = null
+        process.onExit().thenAccept {
+            logger.debug("graph server exited with code ${it.exitValue()}")
             isStarted = false
             isStarting = false
             nxGraphProcess = null
-            process.errorStream.readAllBytes().decodeToString().run { logger.debug(this) }
+
+            if (it.exitValue() != 0) {
+                val stdErr = process.errorStream.readAllBytes().decodeToString()
+                val stdOut = process.inputStream.readAllBytes().decodeToString()
+                logger.debug(
+                    "graph server exited with error. \n stdErr: $stdErr \n stdOut: $stdOut"
+                )
+                lastErrror =
+                    if (stdErr != null && stdErr.length > 0) stdErr
+                    else "graph exited unexpectedly. Full logs: $stdOut"
+            }
         }
     }
 
-    suspend fun waitForServerReady() {
-        while (!isStarted) {
-            delay(100)
+    private suspend fun waitForServerReady() {
+        withTimeout(10000) {
+            while (!isStarted) {
+                delay(100)
+            }
         }
     }
 

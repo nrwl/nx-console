@@ -3,21 +3,6 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/project-graph/src",
   "projectType": "library",
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/vscode/project-graph/**/*.ts"]
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/vscode/project-graph"],
-      "options": {
-        "jestConfig": "libs/vscode/project-graph/jest.config.ts"
-      }
-    }
-  },
+  "targets": {},
   "tags": ["type:vscode"]
 }

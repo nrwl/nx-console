@@ -15,7 +15,7 @@ export class Button extends EditorContext(LitElement) {
   @property()
   color: string;
   @property({ type: Boolean })
-  applyFillColor: boolean = false;
+  applyFillColor = false;
 
   render() {
     return this.editor === 'vscode'

@@ -7,6 +7,7 @@
   <depends>com.intellij.modules.platform</depends>
   <depends>org.jetbrains.plugins.terminal</depends>
   <depends>JavaScript</depends>
+  <depends optional="true" config-file="nx-console-angular.xml">AngularJS</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <dependencySupport kind="javascript" coordinate="npm:nx" displayName="Nx Console"/>
@@ -54,7 +55,6 @@
                               implementationClass="dev.nx.console.graph.NxFocusTargetInGraphLineMarkerContributor"/>
 
     <!-- Run -->
-    <projectService serviceImplementation="dev.nx.console.run.NxTaskExecutionManager"/>
     <runAnything.executionProvider
       implementation="dev.nx.console.generate.NxGenerateRunAnythingProvider" order="first"/>
     <searchEverywhereContributor
@@ -72,6 +72,10 @@
     <runLineMarkerContributor language="JSON"
                               implementationClass="dev.nx.console.run.NxRunTargetLineMarkerContributor"/>
 
+    <codeInsight.codeVisionProvider
+      implementation="dev.nx.console.project_details.ConfigFileCodeVisionProvider"/>
+    <config.codeVisionGroupSettingProvider
+      implementation="dev.nx.console.project_details.ConfigFileCodeVisionGroupSettingProvider"/>
     <!--Tool Window-->
     <toolWindow id="Nx Console"
                 anchor="right"
@@ -168,6 +172,8 @@
       <add-to-group group-id="AnalyzeActions"/>
     </action>
   </actions>
+
+
   <extensionPoints>
     <extensionPoint interface="dev.nx.console.generate.ui.NxGenerateUiRenderer"
                     name="nxGenerateUiRenderer"/>

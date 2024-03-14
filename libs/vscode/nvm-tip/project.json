@@ -3,14 +3,6 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/nvm-tip/src",
   "projectType": "library",
-  "targets": {
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/vscode/nvm-tip/**/*.ts"]
-      }
-    }
-  },
+  "targets": {},
   "tags": ["type:vscode"]
 }

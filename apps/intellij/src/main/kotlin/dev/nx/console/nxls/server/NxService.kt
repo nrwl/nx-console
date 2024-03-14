@@ -86,6 +86,18 @@ interface NxService {
         throw UnsupportedOperationException()
     }
 
+    @JsonRequest
+    fun sourceMapFilesToProjectMap(): CompletableFuture<Map<String, String>> {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonRequest
+    fun targetsForConfigFile(
+        targetsForConfigFileRequest: NxTargetsForConfigFileRequest
+    ): CompletableFuture<Map<String, NxTarget>> {
+        throw UnsupportedOperationException()
+    }
+
     @JsonNotification
     fun changeWorkspace(workspacePath: String) {
         throw UnsupportedOperationException()
@@ -93,6 +105,11 @@ interface NxService {
 
     @JsonNotification
     fun refreshWorkspace() {
+        throw UnsupportedOperationException()
+    }
+
+    @JsonNotification
+    fun reset() {
         throw UnsupportedOperationException()
     }
 }

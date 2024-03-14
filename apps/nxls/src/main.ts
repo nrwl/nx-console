@@ -22,6 +22,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
+  NxReset,
   NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
   NxTargetsForConfigFileRequest,
@@ -36,6 +37,7 @@ import {
   getLanguageModelCache,
   lspLogger,
   mergeArrays,
+  nxReset,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
@@ -45,6 +47,7 @@ import {
   getGeneratorContextV2,
   getGeneratorOptions,
   getGenerators,
+  getNxDaemonClient,
   getNxVersion,
   getProjectByPath,
   getProjectByRoot,
@@ -83,6 +86,8 @@ import {
   createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
+import treeKill from 'tree-kill';
+import { execSync } from 'node:child_process';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -93,6 +98,7 @@ process.on('uncaughtException', (e) => {
 });
 
 let WORKING_PATH: string | undefined = undefined;
+let PID: number | null = null;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
   //noop
@@ -119,6 +125,8 @@ documents.listen(connection);
 connection.onInitialize(async (params) => {
   setLspLogger(connection);
 
+  PID = params.processId;
+
   const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
@@ -140,7 +148,7 @@ connection.onInitialize(async (params) => {
         if (!WORKING_PATH) {
           return;
         }
-        reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+        await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
       }
     );
   } catch (e) {
@@ -327,9 +335,31 @@ documents.onDidOpen(async (e) => {
   );
 });
 
-connection.onShutdown(() => {
+connection.onShutdown(async () => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
+
+  if (WORKING_PATH) {
+    const nxDaemonClientModule = await getNxDaemonClient(
+      WORKING_PATH,
+      lspLogger
+    );
+    await nxDaemonClientModule?.daemonClient?.stop();
+  }
+});
+
+connection.onExit(() => {
+  connection.dispose();
+  treeKill(PID ?? process.pid, 0);
+});
+
+connection.onNotification(NxReset, async () => {
+  if (!WORKING_PATH) {
+    return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
+  }
+
+  await nxReset(WORKING_PATH, lspLogger);
+  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
@@ -538,7 +568,7 @@ connection.onNotification(NxWorkspaceRefreshNotification, async () => {
     return new ResponseError(1001, 'Unable to get Nx info: no workspace path');
   }
 
-  reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 connection.onNotification(

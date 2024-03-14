@@ -1,0 +1,5 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="org.angular2">
+    <configProvider implementation="dev.nx.console.angular.NxAngularConfigProvider"/>
+  </extensions>
+</idea-plugin>

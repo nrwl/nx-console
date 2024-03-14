@@ -29,7 +29,7 @@ export async function normalizeSchema(
 
     const nxOption: Option = {
       ...option,
-      isRequired: isFieldRequired(requiredFields, option, xPrompt, $default),
+      isRequired: isFieldRequired(requiredFields, option),
       aliases: option.alias ? [option.alias] : [],
       ...(workspaceDefault !== undefined && { default: workspaceDefault }),
       ...($default && { $default }),
@@ -156,19 +156,10 @@ function legacyCompareOptions(a: Option, b: Option): number {
 
 function isFieldRequired(
   requiredFields: Set<string>,
-  nxOption: CliOption,
-  xPrompt: XPrompt | undefined,
-  $default: any
+  nxOption: CliOption
 ): boolean {
   // checks schema.json requiredFields and xPrompt for required
-  return (
-    requiredFields.has(nxOption.name) ||
-    // makes xPrompt fields required so nx command can run with --no-interactive
-    // - except properties with a default (also falsey, empty, null)
-    // - except properties with a $default $source
-    // - except boolean properties (should also have default of `true`)
-    (!!xPrompt && !nxOption.default && !$default && nxOption.type !== 'boolean')
-  );
+  return requiredFields.has(nxOption.name);
 }
 
 function getItems(option: CliOption): { items: string[] } | undefined {

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NxGenerator(
     val name: String,
-    val path: String,
+    val schemaPath: String,
     val data: NxGeneratorData,
     val options: List<NxGeneratorOption>?,
     val contextValues: NxGeneratorContext?,
@@ -14,7 +14,7 @@ data class NxGenerator(
         generator: NxGenerator,
         options: List<NxGeneratorOption>? = generator.options,
         contextValues: NxGeneratorContext? = generator.contextValues
-    ) : this(generator.name, generator.path, generator.data, options, contextValues) {}
+    ) : this(generator.name, generator.schemaPath, generator.data, options, contextValues) {}
 }
 
 @Serializable

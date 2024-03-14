@@ -4,7 +4,7 @@ import { QuickPickItem, window } from 'vscode';
 export class CliTaskFlagQuickPickItem implements QuickPickItem {
   constructor(
     readonly flagName: string,
-    readonly detail: string = '',
+    readonly detail = '',
     readonly option: Option,
     readonly label: string,
     readonly description?: string

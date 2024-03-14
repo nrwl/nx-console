@@ -1,9 +1,12 @@
-import { configureJsonLanguageService } from '@nx-console/language-server/utils';
+import {
+  configureJsonLanguageService,
+  getLanguageModelCache,
+} from '@nx-console/language-server/utils';
 import {
   CompletionType,
   EnhancedJsonSchema,
 } from '@nx-console/shared/json-schema';
-import * as workspace from '@nx-console/language-server/workspace';
+import type * as workspace from '@nx-console/language-server/workspace';
 import { vol } from 'memfs';
 import {
   ClientCapabilities,
@@ -12,6 +15,7 @@ import {
 } from 'vscode-json-languageservice';
 import { getCompletionItems } from './get-completion-items';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { normalize } from 'path';
 
 jest.mock(
   '@nx-console/language-server/workspace',
@@ -135,6 +139,7 @@ describe('getCompletionItems', () => {
 
   afterAll(() => {
     vol.reset();
+    getLanguageModelCache().dispose();
   });
 
   it('should return all completion items without a glob', async () => {
@@ -151,20 +156,20 @@ describe('getCompletionItems', () => {
       }
     );
 
-    expect(labels).toMatchInlineSnapshot(`
-          Array [
-            "\\"file.js\\"",
-            "\\"project/src/main.js\\"",
-            "\\"project/src/main.ts\\"",
-          ]
-      `);
-    expect(details).toMatchInlineSnapshot(`
-          Array [
-            "/workspace/file.js",
-            "/workspace/project/src/main.js",
-            "/workspace/project/src/main.ts",
-          ]
-      `);
+    expect(labels.map((l) => normalize(l)).sort()).toEqual(
+      [`"file.js"`, `"project/src/main.js"`, `"project/src/main.ts"`]
+        .map((l) => normalize(l))
+        .sort()
+    );
+    expect(details.map((l) => normalize(l ?? '')).sort()).toEqual(
+      [
+        '/workspace/file.js',
+        '/workspace/project/src/main.js',
+        '/workspace/project/src/main.ts',
+      ]
+        .map((l) => normalize(l))
+        .sort()
+    );
   });
 
   it('should be able to use a glob', async () => {

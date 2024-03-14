@@ -140,5 +140,5 @@ export const WORKSPACE_GENERATOR_NAME_REGEX =
 export type WorkspaceProjects = ProjectsConfigurations['projects'];
 
 export interface Logger {
-  log(message: string): void;
+  log(message: string, ...args: any[]): void;
 }

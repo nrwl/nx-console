@@ -47,7 +47,8 @@
         "externalDependencies": "all",
         "target": "node",
         "optimization": true,
-        "extractLicenses": true
+        "extractLicenses": true,
+        "webpackConfig": "apps/nxls/webpack.config.js"
       }
     },
     "build": {
@@ -95,20 +96,6 @@
           "minify": true,
           "skipTypeCheck": true
         }
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/nxls/**/*.ts"]
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/nxls"],
-      "options": {
-        "jestConfig": "apps/nxls/jest.config.ts"
       }
     },
     "semantic-release": {
