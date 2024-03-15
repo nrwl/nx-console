@@ -14,7 +14,7 @@ export async function initNvmTip(_: ExtensionContext) {
   const nodeVersion = stdout.trim();
   window
     .showInformationMessage(
-      `VSCode loaded Node ${nodeVersion}. [That's wrong?](https://nx.dev/recipes/nx-console/console-troubleshooting#vscode-nvm-issues)`,
+      `VSCode loaded Node ${nodeVersion}. [If that seems wrong, read more here.](https://nx.dev/recipes/nx-console/console-troubleshooting#vscode-nvm-issues)`,
       'OK',
       "Don't show again"
     )
