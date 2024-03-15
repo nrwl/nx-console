@@ -40,7 +40,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     private var nxProjectName: String? = null
 
     private var currentLoadHtmlJob: Job? = null
-    private var resetQuery: JBCefJSQuery? = null
     private var interactionEventQuery: JBCefJSQuery? = null
 
     private val messageBusConnection = project.messageBus.connect(this)
@@ -213,9 +212,8 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         withContext(Dispatchers.EDT) {
                             if (browser.isDisposed) return@withContext
                             thisLogger().trace("Error found, loading error html ${file.path}")
-                            wrappedBrowserLoadHtml(loadErrorHtml(error))
-
-                            registerResetHandler(browser)
+                            wrappedBrowserLoadHtml(getErrorHtml(error))
+                            registerResetHandler()
                         }
                         return@launch
                     }
@@ -252,70 +250,16 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     withContext(Dispatchers.EDT) {
                         if (browser.isDisposed) return@withContext
                         wrappedBrowserLoadHtml(
-                            loadErrorHtml(
+                            getErrorHtml(
                                 e.message
                                     ?: "Nx Console timed out while loading. Please reset to try again."
                             )
                         )
 
-                        registerResetHandler(browser)
+                        registerResetHandler()
                     }
                 }
             }
-    }
-
-    private fun registerResetHandler(browser: JBCefBrowser) {
-        executeWhenLoaded {
-            if (browser.isDisposed) return@executeWhenLoaded
-            resetQuery?.dispose()
-            resetQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
-            resetQuery?.also { query ->
-                if (query.isDisposed) return@executeWhenLoaded
-                query.addHandler {
-                    val nxlsService = NxlsService.getInstance(project)
-                    ApplicationManager.getApplication().invokeLater { nxlsService.resetWorkspace() }
-
-                    null
-                }
-
-                val js =
-                    """
-                window.reset = () => {
-                    ${query.inject("reset")}
-                }
-                """
-                coroutineScope.launch {
-                    withContext(Dispatchers.EDT) { browser.executeJavascriptWithCatch(js) }
-                }
-            }
-        }
-    }
-
-    private fun loadErrorHtml(error: String): String {
-        return """
-       <style>
-              body {
-                    background-color: ${getHexColor(UIUtil.getPanelBackground())} !important;
-                    color: ${getHexColor(UIUtil.getLabelForeground())};
-                    font-family: '${UIUtil.getLabelFont().family}', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-
-              }
-              pre {
-                white-space: pre-wrap;
-                border-radius: 5px;
-                border: 2px solid ${getHexColor(UIUtil.getLabelForeground())};
-                padding: 20px;
-              }
-              a {
-                color: rgb(59 130 246)
-              }
-            </style>
-
-            <p>Unable to load the project graph. The following error occurred:</p>
-      <pre>${error}</pre>
-      If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reset</a> the graph.
-    """
-            .trimIndent()
     }
 
     private fun loadOldVersionHtml(): String {
@@ -369,7 +313,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         super.dispose()
         messageBusConnection.dispose()
         currentLoadHtmlJob?.cancel()
-        resetQuery?.dispose()
         interactionEventQuery?.dispose()
     }
 }

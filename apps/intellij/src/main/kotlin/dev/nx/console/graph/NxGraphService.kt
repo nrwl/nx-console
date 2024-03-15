@@ -1,5 +1,6 @@
 package dev.nx.console.graph
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
@@ -146,23 +147,25 @@ class NxGraphService(override val project: Project) : INxGraphService {
     private lateinit var graphBrowser: NxGraphBrowser
 
     private fun showNxGraphInEditor() {
-        val fileEditorManager = FileEditorManager.getInstance(project)
+        ApplicationManager.getApplication().invokeAndWait {
+            val fileEditorManager = FileEditorManager.getInstance(project)
 
-        val nxGraphEditor =
-            fileEditorManager.allEditors.find {
-                it.file.fileType.name == NxGraphFileType.INSTANCE.name
+            val nxGraphEditor =
+                fileEditorManager.allEditors.find {
+                    it.file.fileType.name == NxGraphFileType.INSTANCE.name
+                }
+
+            if (nxGraphEditor != null) {
+                fileEditorManager.openFile(nxGraphEditor.file, true)
+                return@invokeAndWait
             }
 
-        if (nxGraphEditor != null) {
-            fileEditorManager.openFile(nxGraphEditor.file, true)
-            return
-        }
+            graphBrowser = NxGraphBrowser(project)
+            val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
 
-        graphBrowser = NxGraphBrowser(project)
-        val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
-
-        fileEditorManager.openFile(virtualFile, true).apply {
-            Disposer.register(first(), graphBrowser)
+            fileEditorManager.openFile(virtualFile, true).apply {
+                Disposer.register(first(), graphBrowser)
+            }
         }
     }
 

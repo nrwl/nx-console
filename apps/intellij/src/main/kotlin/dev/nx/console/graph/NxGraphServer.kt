@@ -111,7 +111,7 @@ open class NxGraphServer(
             }
 
             val error =
-                if (e is TimeoutCancellationException && lastErrror != null)
+                if ((e is TimeoutCancellationException && lastErrror != null) || e.message == null)
                     "error while running nx graph: $lastErrror"
                 else e.message
             return NxGraphRequest(
