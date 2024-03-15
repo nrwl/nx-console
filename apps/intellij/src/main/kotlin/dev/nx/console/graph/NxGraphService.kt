@@ -23,7 +23,8 @@ public suspend fun getNxGraphService(project: Project): INxGraphService? {
         ProjectLevelCoroutineHolderService.getInstance(project)
             .cs
             .async { nxlsService.workspace()?.nxVersion }
-            .await() ?: return null
+            .await()
+            ?: return null
 
     return if (nxVersion.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
         NxGraphService.getInstance(project)

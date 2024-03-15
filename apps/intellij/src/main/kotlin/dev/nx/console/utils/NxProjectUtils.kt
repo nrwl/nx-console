@@ -94,7 +94,8 @@ suspend fun selectTargetForNxProject(
                 ?.get(nxProject)
                 ?.targets
                 ?.keys
-                ?.toList() ?: emptyList()
+                ?.toList()
+                ?: emptyList()
 
         withContext(Dispatchers.EDT) {
             val popup =

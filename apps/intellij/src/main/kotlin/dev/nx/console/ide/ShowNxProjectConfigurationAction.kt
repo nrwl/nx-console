@@ -79,7 +79,8 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                             ?.workspace
                             ?.projects
                             ?.get(selectedNxProject)
-                    } ?: return@launch
+                    }
+                        ?: return@launch
 
             withContext(Dispatchers.EDT) {
                 val projectFilePath =
@@ -105,7 +106,8 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                             psiFile,
                             nxTarget,
                             nxTargetConfiguration
-                        ) ?: return@withContext
+                        )
+                            ?: return@withContext
 
                     val editor = fileEditorManager.selectedTextEditor
 
