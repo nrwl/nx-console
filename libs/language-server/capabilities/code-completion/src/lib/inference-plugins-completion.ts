@@ -1,7 +1,8 @@
+import { lspLogger } from '@nx-console/language-server/utils';
 import { getNxVersion } from '@nx-console/language-server/workspace';
 import { workspaceDependencies } from '@nx-console/shared/npm';
 import { existsSync } from 'fs';
-import { join, sep } from 'path';
+import { join, normalize, sep } from 'path';
 import { CompletionItem } from 'vscode-json-languageservice';
 
 let inferencePluginsCompletionCache: CompletionItem[] | undefined = undefined;
@@ -27,10 +28,11 @@ export async function inferencePluginsCompletion(
   for (const dependency of dependencies) {
     const hasPluginJs = existsSync(join(dependency, 'plugin.js'));
     if (hasPluginJs) {
-      const dependencyPath = dependency
-        .split(`node_modules${sep}`)
+      const dependencyPath = dependency.replace(sep, '/')
+        .split(`node_modules/`)
         .pop()
-        ?.replace(sep, '/');
+      lspLogger.log(dependencyPath ?? '')
+
       inferencePluginsCompletion.push({
         label: `${dependencyPath}/plugin`,
       });
