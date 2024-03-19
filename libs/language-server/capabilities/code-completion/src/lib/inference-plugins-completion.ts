@@ -28,10 +28,10 @@ export async function inferencePluginsCompletion(
   for (const dependency of dependencies) {
     const hasPluginJs = existsSync(join(dependency, 'plugin.js'));
     if (hasPluginJs) {
-      const dependencyPath = dependency.replace(sep, '/')
+      const dependencyPath = dependency
+        .replace(sep, '/')
         .split(`node_modules/`)
-        .pop()
-      lspLogger.log(dependencyPath ?? '')
+        .pop();
 
       inferencePluginsCompletion.push({
         label: `${dependencyPath}/plugin`,
