@@ -36,12 +36,7 @@ export async function languageServerWatcher(
 
   if (gte(version.full, '16.4.0')) {
     const native = await import('nx/src/native');
-    const watcher = new native.Watcher(workspacePath, [
-      '.nx\\',
-      '.node_modules\\',
-      '.git\\',
-      ...getIgnoredGlobs(workspacePath),
-    ]);
+    const watcher = new native.Watcher(workspacePath);
 
     watcher.watch((err: string | null, events: WatchEvent[]) => {
       if (err) {
