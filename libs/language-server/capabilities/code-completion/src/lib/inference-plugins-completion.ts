@@ -1,0 +1,33 @@
+import { lspLogger } from '@nx-console/language-server/utils';
+import { getNxVersion } from '@nx-console/language-server/workspace';
+import { workspaceDependencies } from '@nx-console/shared/npm';
+import { existsSync } from 'fs';
+import { join, sep } from 'path';
+import { CompletionItem } from 'vscode-json-languageservice';
+
+export async function inferencePluginsCompletion(
+  workingPath: string | undefined
+): Promise<CompletionItem[]> {
+  if (!workingPath) {
+    return [];
+  }
+
+  const inferencePluginsCompletion: CompletionItem[] = [];
+  const nxVersion = await getNxVersion(workingPath);
+  const dependencies = await workspaceDependencies(workingPath, nxVersion);
+
+  for (const dependency of dependencies) {
+    const hasPluginJs = existsSync(join(dependency, 'plugin.js'));
+    if (hasPluginJs) {
+      const dependencyPath = dependency
+        .split(`node_modules${sep}`)
+        .pop()
+        ?.replace(sep, '/');
+      inferencePluginsCompletion.push({
+        label: `${dependencyPath}/plugin`,
+      });
+    }
+  }
+
+  return inferencePluginsCompletion;
+}

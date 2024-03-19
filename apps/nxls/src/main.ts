@@ -253,7 +253,8 @@ connection.onCompletion(async (completionParams) => {
     jsonAst,
     document,
     schemas,
-    completionParams.position
+    completionParams.position,
+    lspLogger
   );
   mergeArrays(completionResults.items, pathItems);
 

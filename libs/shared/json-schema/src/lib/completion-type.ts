@@ -17,6 +17,8 @@ export enum CompletionType {
   inputName = 'inputName',
   // support for input names with ^ (^production, production, etc)
   inputNameWithDeps = 'inputNameWithDeps',
+  // support for inference plugins like @nx/eslint/plugin
+  inferencePlugins = 'inferencePlugins',
 }
 
 export function hasCompletionType(
