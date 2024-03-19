@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, normalize, sep } from 'path';
 
 const defaultVersion = '18.0.4';
@@ -74,4 +74,10 @@ export function newWorkspace({
 
 export function uniq(prefix: string) {
   return `${prefix}${Math.floor(Math.random() * 10000000)}`;
+}
+
+export function modifyJsonFile(filePath: string, callback: (data: any) => any) {
+  let jsonData = JSON.parse(readFileSync(filePath, 'utf-8'));
+  jsonData = callback(jsonData);
+  writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
 }

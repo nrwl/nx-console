@@ -1,15 +1,23 @@
-import { lspLogger } from '@nx-console/language-server/utils';
 import { getNxVersion } from '@nx-console/language-server/workspace';
 import { workspaceDependencies } from '@nx-console/shared/npm';
 import { existsSync } from 'fs';
 import { join, sep } from 'path';
 import { CompletionItem } from 'vscode-json-languageservice';
 
+let inferencePluginsCompletionCache: CompletionItem[] | undefined = undefined;
+
 export async function inferencePluginsCompletion(
   workingPath: string | undefined
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
+  }
+
+  if (
+    inferencePluginsCompletionCache &&
+    inferencePluginsCompletionCache.length > 0
+  ) {
+    return inferencePluginsCompletionCache;
   }
 
   const inferencePluginsCompletion: CompletionItem[] = [];
@@ -29,5 +37,11 @@ export async function inferencePluginsCompletion(
     }
   }
 
+  inferencePluginsCompletionCache = inferencePluginsCompletion;
+
   return inferencePluginsCompletion;
+}
+
+export async function resetInferencePluginsCompletionCache() {
+  inferencePluginsCompletionCache = undefined;
 }
