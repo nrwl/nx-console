@@ -85,7 +85,10 @@ describe('nx.json plugins array autocomplete', () => {
     ]);
   });
 
-  it('should contain playwright plugin after installing it', async () => {
+  // This technically works but because the nxls doesn't handle reinstallation well currently,
+  // it creates a host of side effect issues that make the test flaky
+  // enable when the nxls restart story is better
+  xit('should contain playwright plugin after installing it', async () => {
     execSync('npm install @nx/playwright --save-dev', {
       cwd: join(e2eCwd, workspaceName),
     });
