@@ -8,6 +8,7 @@ import {
 import {
   getDefaultCompletionType,
   isArrayNode,
+  lspLogger,
 } from '@nx-console/language-server/utils';
 import {
   ASTNode,
@@ -24,6 +25,8 @@ import { projectTargetCompletion } from './project-target-completion';
 import { tagsCompletion } from './tags-completion';
 import { targetsCompletion } from './targets-completion';
 import { NxVersion } from '@nx-console/shared/types';
+import { Logger } from '@nx-console/shared/schema';
+import { inferencePluginsCompletion } from './inference-plugins-completion';
 
 export async function getCompletionItems(
   workingPath: string | undefined,
@@ -31,7 +34,8 @@ export async function getCompletionItems(
   jsonAst: JSONDocument,
   document: TextDocument,
   schemas: MatchingSchema[],
-  position: Position
+  position: Position,
+  lspLogger?: Logger
 ): Promise<CompletionItem[]> {
   if (!workingPath) {
     return [];
@@ -134,6 +138,9 @@ function completionItems(
       }
       case CompletionType.inputNameWithDeps: {
         return inputNameCompletion(workingPath, node, document, true);
+      }
+      case CompletionType.inferencePlugins: {
+        return inferencePluginsCompletion(workingPath);
       }
       default: {
         return [];

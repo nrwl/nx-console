@@ -3,6 +3,7 @@ import {
   configureSchemas,
   getCompletionItems,
   projectSchemaIsRegistered,
+  resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server/capabilities/code-completion';
 import { getDefinition } from '@nx-console/language-server/capabilities/definition';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
@@ -87,7 +88,6 @@ import {
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 import treeKill from 'tree-kill';
-import { execSync } from 'node:child_process';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -141,7 +141,7 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
+    await configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {
@@ -253,7 +253,8 @@ connection.onCompletion(async (completionParams) => {
     jsonAst,
     document,
     schemas,
-    completionParams.position
+    completionParams.position,
+    lspLogger
   );
   mergeArrays(completionResults.items, pathItems);
 
@@ -645,6 +646,7 @@ async function reconfigure(
   resetNxVersionCache();
   resetProjectPathCache();
   resetSourceMapFilesToProjectCache();
+  resetInferencePluginsCompletionCache();
   const workspace = await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 
