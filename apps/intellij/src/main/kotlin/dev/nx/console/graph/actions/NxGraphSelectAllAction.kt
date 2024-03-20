@@ -5,13 +5,11 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.NxToolWindowPanel
 import dev.nx.console.telemetry.TelemetryService
 import javax.swing.Icon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 open class NxGraphSelectAllAction(
     text: String? = null,
@@ -19,7 +17,7 @@ open class NxGraphSelectAllAction(
     icon: Icon? = null
 ) : DumbAwareAction(text, description, icon) {
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         if (e.place == NxToolWindowPanel.NX_TOOLBAR_PLACE) {
@@ -32,8 +30,8 @@ open class NxGraphSelectAllAction(
         val project = e.project ?: return
         TelemetryService.getInstance(project).featureUsed("Nx Graph Select All")
 
-        CoroutineScope(Dispatchers.Default).launch {
-            val nxGraphService = getNxGraphService(project) ?: return@launch
+        runWithModalProgressBlocking(project, "Opening Nx Graph") {
+            val nxGraphService = getNxGraphService(project) ?: return@runWithModalProgressBlocking
             ApplicationManager.getApplication().invokeLater { nxGraphService.selectAllProjects() }
         }
     }

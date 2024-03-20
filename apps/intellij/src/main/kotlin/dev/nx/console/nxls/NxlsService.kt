@@ -19,8 +19,8 @@ import org.eclipse.lsp4j.jsonrpc.MessageIssueException
 import org.eclipse.lsp4j.jsonrpc.ResponseErrorException
 
 @Service(Service.Level.PROJECT)
-class NxlsService(val project: Project) {
-    private var wrapper: NxlsWrapper = NxlsWrapper(project)
+class NxlsService(val project: Project, private val cs: CoroutineScope) {
+    private var wrapper: NxlsWrapper = NxlsWrapper(project, cs)
 
     private fun client(): NxlsLanguageClient? {
         return wrapper.languageClient
@@ -45,7 +45,7 @@ class NxlsService(val project: Project) {
         wrapper.start()
         awaitStarted()
         client()?.registerRefreshCallback {
-            CoroutineScope(Dispatchers.Default).launch {
+            cs.launch {
                 project.messageBus.syncPublisher(NX_WORKSPACE_REFRESH_TOPIC).onNxWorkspaceRefresh()
             }
         }
@@ -56,7 +56,7 @@ class NxlsService(val project: Project) {
     }
 
     fun refreshWorkspace() {
-        CoroutineScope(Dispatchers.Default).launch {
+        cs.launch {
             if (!wrapper.isStarted()) {
                 start()
                 awaitStarted()
@@ -67,7 +67,7 @@ class NxlsService(val project: Project) {
     }
 
     fun resetWorkspace() {
-        CoroutineScope(Dispatchers.Default).launch { server()?.getNxService()?.reset() }
+        cs.launch { server()?.getNxService()?.reset() }
     }
 
     suspend fun workspace(): NxWorkspace? {
@@ -190,9 +190,7 @@ class NxlsService(val project: Project) {
     }
 
     fun changeWorkspace(workspacePath: String) {
-        CoroutineScope(Dispatchers.Default).launch {
-            server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath))
-        }
+        cs.launch { server()?.getNxService()?.changeWorkspace(nxlsWorkingPath(workspacePath)) }
     }
 
     fun isEditorConnected(editor: Editor): Boolean {

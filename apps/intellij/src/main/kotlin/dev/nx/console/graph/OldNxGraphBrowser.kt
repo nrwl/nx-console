@@ -2,6 +2,7 @@ package dev.nx.console.graph
 
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -37,6 +38,7 @@ class OldNxGraphBrowser(
     private val state: StateFlow<NxGraphStates>,
     private val nxVersion: Deferred<NxVersion?>
 ) : NxGraphBrowserBase(project) {
+    private val cs = OldNxGraphBrowserCoroutineHolder.getInstance(project).cs
 
     private var lastCommand: Command? = null
 
@@ -44,7 +46,7 @@ class OldNxGraphBrowser(
 
     init {
 
-        CoroutineScope(Dispatchers.Default).launch { listenToGraphStates() }
+        cs.launch { listenToGraphStates() }
         registerFileClickHandler(browser)
         registerOpenProjectConfigHandler(browser)
         registerRunTaskHandler(browser)
@@ -94,7 +96,7 @@ class OldNxGraphBrowser(
     fun focusTask(nxProject: String, nxTarget: String) {
         executeWhenLoaded {
             lastCommand = Command.FocusTask(nxProject, nxTarget)
-            CoroutineScope(Dispatchers.Default).launch {
+            cs.launch {
                 browser
                     .executeJavaScriptAsync(
                         "window.externalApi?.router?.navigate('/tasks/$nxTarget')"
@@ -422,7 +424,7 @@ class OldNxGraphBrowser(
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
-                CoroutineScope(Dispatchers.Default).launch {
+                cs.launch {
                     TelemetryService.getInstance(project)
                         .featureUsed("Nx Graph Open Project Config File")
 
@@ -452,7 +454,7 @@ class OldNxGraphBrowser(
         onBrowserLoadEnd(browser) {
             val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
             query.addHandler { msg ->
-                CoroutineScope(Dispatchers.Default).launch {
+                cs.launch {
                     TelemetryService.getInstance(project).featureUsed("Nx Graph Run Task")
 
                     val (projectName, targetName) = msg.split(":")
@@ -488,5 +490,13 @@ class OldNxGraphBrowser(
         data class FocusTaskGroup(val taskGroupName: String) : Command() {}
 
         data class FocusTask(val nxProject: String, val nxTarget: String) : Command() {}
+    }
+
+    @Service(Service.Level.PROJECT)
+    private sealed class OldNxGraphBrowserCoroutineHolder(val cs: CoroutineScope) {
+        companion object {
+            fun getInstance(project: Project): OldNxGraphBrowserCoroutineHolder =
+                project.getService(OldNxGraphBrowserCoroutineHolder::class.java)
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.invokeLater
@@ -23,10 +24,9 @@ import dev.nx.console.nxls.NxlsService
 import dev.nx.console.settings.NxConsoleSettingsConfigurable
 import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nxWorkspace
 import javax.swing.JComponent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(true, true) {
@@ -44,7 +44,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     }
 
     private fun createToolwindowContent() {
-        CoroutineScope(Dispatchers.Default).launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val workspace = project.nxWorkspace()
             if (workspace == null || workspace.workspace.projects.isEmpty()) {
                 setContent(emptyContent)
@@ -89,7 +89,10 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         val tb = run {
             val actionManager = ActionManager.getInstance()
             val actionGroup =
-                DefaultActionGroup().apply { templatePresentation.text = "Nx Toolwindow" }
+                object : DefaultActionGroup() {
+                        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+                    }
+                    .apply { templatePresentation.text = "Nx Toolwindow" }
 
             val refreshAction =
                 object :
@@ -142,11 +145,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
         with(project.messageBus.connect()) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        invokeLater { createToolwindowContent() }
-                    }
-                }
+                NxWorkspaceRefreshListener { invokeLater { createToolwindowContent() } }
             )
             subscribe(
                 NX_TOOLWINDOW_STYLE_SETTING_TOPIC,

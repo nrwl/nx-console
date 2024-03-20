@@ -57,7 +57,7 @@ open class NxGraphServer(
     private var isStarting = false
 
     init {
-        with(project.messageBus.connect()) {
+        with(project.messageBus.connect(this)) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
                 NxWorkspaceRefreshListener {
@@ -111,7 +111,7 @@ open class NxGraphServer(
             }
 
             val error =
-                if (e is TimeoutCancellationException && lastErrror != null)
+                if ((e is TimeoutCancellationException && lastErrror != null) || e.message == null)
                     "error while running nx graph: $lastErrror"
                 else e.message
             return NxGraphRequest(

@@ -13,6 +13,10 @@ class NxGenerateUiFileEditor(
 
     private val mainComponent: JComponent = nxGenerateUiFile.createMainComponent(project)
 
+    override fun dispose() {
+        super.dispose()
+    }
+
     override fun getComponent(): JComponent {
         return mainComponent
     }

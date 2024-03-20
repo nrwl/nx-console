@@ -2,7 +2,7 @@ package dev.nx.console.utils
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -14,16 +14,16 @@ import javax.swing.JList
 import javax.swing.ListSelectionModel
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 suspend fun selectNxProject(
     project: Project,
     dataContext: DataContext?,
     preferredProject: String? = null
 ): String? = suspendCoroutine {
-    CoroutineScope(Dispatchers.Default).launch {
+    ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
         val projects =
             NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toMutableList()
                 ?: mutableListOf()
@@ -32,7 +32,7 @@ suspend fun selectNxProject(
             projects.removeIf { it == preferredProject }
             projects.add(0, preferredProject)
         }
-        ApplicationManager.getApplication().invokeLater {
+        withContext(Dispatchers.EDT) {
             val popup =
                 JBPopupFactory.getInstance()
                     .createPopupChooserBuilder(projects)
@@ -85,7 +85,7 @@ suspend fun selectTargetForNxProject(
     dataContext: DataContext,
     nxProject: String,
 ): String? = suspendCoroutine { continuation ->
-    CoroutineScope(Dispatchers.Default).launch {
+    ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
         val targets =
             NxlsService.getInstance(project)
                 .workspace()
@@ -97,7 +97,7 @@ suspend fun selectTargetForNxProject(
                 ?.toList()
                 ?: emptyList()
 
-        ApplicationManager.getApplication().invokeLater {
+        withContext(Dispatchers.EDT) {
             val popup =
                 createSelectTargetPopup("Select target of $nxProject ", targets) {
                     continuation.resume(it)

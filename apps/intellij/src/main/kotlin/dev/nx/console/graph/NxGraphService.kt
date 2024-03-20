@@ -1,5 +1,6 @@
 package dev.nx.console.graph
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
@@ -9,8 +10,8 @@ import dev.nx.console.models.NxVersion
 import dev.nx.console.models.ProjectGraphOutput
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,10 @@ import kotlinx.coroutines.launch
 public suspend fun getNxGraphService(project: Project): INxGraphService? {
     val nxlsService = NxlsService.getInstance(project)
     val nxVersion =
-        CoroutineScope(Dispatchers.Default).async { nxlsService.workspace()?.nxVersion }.await()
+        ProjectLevelCoroutineHolderService.getInstance(project)
+            .cs
+            .async { nxlsService.workspace()?.nxVersion }
+            .await()
             ?: return null
 
     return if (nxVersion.gte(NxVersion(major = 17, minor = 3, full = "17.3.0-beta.3"))) {
@@ -42,11 +46,11 @@ interface INxGraphService {
 }
 
 @Service(Service.Level.PROJECT)
-class OldNxGraphService(override val project: Project) : INxGraphService {
+class OldNxGraphService(override val project: Project, private val cs: CoroutineScope) :
+    INxGraphService {
 
     private val nxlsService = NxlsService.getInstance(project)
 
-    private val scope = CoroutineScope(Dispatchers.Default)
     private val state: MutableStateFlow<NxGraphStates> = MutableStateFlow(NxGraphStates.Init)
 
     private lateinit var graphBrowser: OldNxGraphBrowser
@@ -54,19 +58,13 @@ class OldNxGraphService(override val project: Project) : INxGraphService {
     private var projectGraphOutput: ProjectGraphOutput? = null
 
     init {
-        scope.launch {
+        cs.launch {
             projectGraphOutput = nxlsService.projectGraphOutput()
 
-            with(project.messageBus.connect()) {
+            with(project.messageBus.connect(cs)) {
                 subscribe(
                     NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                    object : NxWorkspaceRefreshListener {
-                        override fun onNxWorkspaceRefresh() {
-                            CoroutineScope(Dispatchers.Default).launch {
-                                loadProjectGraph(reload = true)
-                            }
-                        }
-                    }
+                    NxWorkspaceRefreshListener { cs.launch { loadProjectGraph(reload = true) } }
                 )
             }
         }
@@ -85,13 +83,13 @@ class OldNxGraphService(override val project: Project) : INxGraphService {
             return
         }
 
-        val nxVersion = scope.async { nxlsService.workspace()?.nxVersion }
+        val nxVersion = cs.async { nxlsService.workspace()?.nxVersion }
 
         graphBrowser = OldNxGraphBrowser(project, state.asStateFlow(), nxVersion)
         val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
 
         if (state.value is NxGraphStates.Init || state.value is NxGraphStates.Error) {
-            scope.launch { loadProjectGraph() }
+            cs.launch { loadProjectGraph() }
         }
 
         fileEditorManager.openFile(virtualFile, true).apply {
@@ -150,23 +148,25 @@ class NxGraphService(override val project: Project) : INxGraphService {
     private lateinit var graphBrowser: NxGraphBrowser
 
     private fun showNxGraphInEditor() {
-        val fileEditorManager = FileEditorManager.getInstance(project)
+        ApplicationManager.getApplication().invokeAndWait {
+            val fileEditorManager = FileEditorManager.getInstance(project)
 
-        val nxGraphEditor =
-            fileEditorManager.allEditors.find {
-                it.file.fileType.name == NxGraphFileType.INSTANCE.name
+            val nxGraphEditor =
+                fileEditorManager.allEditors.find {
+                    it.file.fileType.name == NxGraphFileType.INSTANCE.name
+                }
+
+            if (nxGraphEditor != null) {
+                fileEditorManager.openFile(nxGraphEditor.file, true)
+                return@invokeAndWait
             }
 
-        if (nxGraphEditor != null) {
-            fileEditorManager.openFile(nxGraphEditor.file, true)
-            return
-        }
+            graphBrowser = NxGraphBrowser(project)
+            val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
 
-        graphBrowser = NxGraphBrowser(project)
-        val virtualFile = DefaultNxGraphFile("Nx Graph", graphBrowser)
-
-        fileEditorManager.openFile(virtualFile, true).apply {
-            Disposer.register(first(), graphBrowser)
+            fileEditorManager.openFile(virtualFile, true).apply {
+                Disposer.register(first(), graphBrowser)
+            }
         }
     }
 

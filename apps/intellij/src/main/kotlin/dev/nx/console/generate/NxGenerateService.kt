@@ -22,10 +22,9 @@ import javax.swing.ListSelectionModel.SINGLE_SELECTION
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class NxGenerateService(val project: Project) {
+class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
 
     suspend fun getFilteredGenerators(): List<NxGenerator> {
         val generators = NxlsService.getInstance(project).generators()
@@ -63,7 +62,7 @@ class NxGenerateService(val project: Project) {
     suspend fun selectGenerator(
         actionEvent: AnActionEvent?,
     ) = suspendCoroutine {
-        CoroutineScope(Dispatchers.Default).launch {
+        cs.launch {
             val generators = getFilteredGenerators()
 
             if (generators.isEmpty()) {
