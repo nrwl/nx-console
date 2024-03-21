@@ -3,7 +3,7 @@ import {
   configureSchemas,
   getCompletionItems,
   projectSchemaIsRegistered,
-  resetInferencePluginsCompletionCache
+  resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server/capabilities/code-completion';
 import { getDefinition } from '@nx-console/language-server/capabilities/definition';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
@@ -31,7 +31,7 @@ import {
   NxVersionRequest,
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
-  NxWorkspaceRequest
+  NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
 import {
   getJsonLanguageService,
@@ -39,7 +39,7 @@ import {
   lspLogger,
   mergeArrays,
   nxReset,
-  setLspLogger
+  setLspLogger,
 } from '@nx-console/language-server/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
 import {
@@ -63,7 +63,7 @@ import {
   nxWorkspace,
   resetNxVersionCache,
   resetProjectPathCache,
-  resetSourceMapFilesToProjectCache
+  resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
@@ -73,7 +73,7 @@ import { dirname, relative, join } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
-  TextDocument
+  TextDocument,
 } from 'vscode-json-languageservice';
 import {
   CreateFilesParams,
@@ -84,7 +84,7 @@ import {
   ResponseError,
   TextDocumentSyncKind,
   TextDocuments,
-  createConnection
+  createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 import treeKill from 'tree-kill';
@@ -97,17 +97,25 @@ process.on('uncaughtException', (e) => {
   connection.console.error(formatError('Unhandled exception', e));
 });
 
-process.stdout.write = ((chunk: any, encodingOrCallback?: any, callback?: any) => {
+process.stdout.write = ((
+  chunk: any,
+  encodingOrCallback?: any,
+  callback?: any
+) => {
   const message = chunk.toString();
 
-  if (!message.startsWith('Content-Length:') && !message.startsWith('{"jsonrpc":"2.0"')) {
+  if (
+    !message.startsWith('Content-Length:') &&
+    !message.startsWith('{"jsonrpc":"2.0"')
+  ) {
     return;
   }
 
-  const originalWrite = process.stdout.constructor.prototype.write.bind(process.stdout);
+  const originalWrite = process.stdout.constructor.prototype.write.bind(
+    process.stdout
+  );
   return originalWrite(chunk, encodingOrCallback, callback);
 }) as typeof process.stdout.write;
-
 
 let WORKING_PATH: string | undefined = undefined;
 let PID: number | null = null;
@@ -122,7 +130,7 @@ const workspaceContext = {
   resolveRelativePath: (relativePath: string, resource: string) => {
     const base = resource.substring(0, resource.lastIndexOf('/') + 1);
     return Utils.resolvePath(URI.parse(base), relativePath).toString();
-  }
+  },
 };
 
 const connection = createConnection(ProposedFeatures.all);
@@ -172,13 +180,13 @@ connection.onInitialize(async (params) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       completionProvider: {
         resolveProvider: false,
-        triggerCharacters: ['"', ':']
+        triggerCharacters: ['"', ':'],
       },
       hoverProvider: true,
       definitionProvider: true,
       documentLinkProvider: {
         resolveProvider: false,
-        workDoneProgress: false
+        workDoneProgress: false,
       },
       workspace: {
         fileOperations: {
@@ -187,24 +195,24 @@ connection.onInitialize(async (params) => {
               {
                 pattern: {
                   glob: '**/project.json',
-                  matches: FileOperationPatternKind.file
-                }
-              }
-            ]
+                  matches: FileOperationPatternKind.file,
+                },
+              },
+            ],
           },
           didDelete: {
             filters: [
               {
                 pattern: {
                   glob: '**/project.json',
-                  matches: FileOperationPatternKind.file
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
+                  matches: FileOperationPatternKind.file,
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
   };
 
   return result;
@@ -634,7 +642,7 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
     return;
   }
 
-  if (reconfigureAttempts < 5) {
+  if (reconfigureAttempts < 3) {
     reconfigureAttempts++;
     lspLogger.log(
       `reconfiguration failed, trying again in ${
@@ -662,14 +670,13 @@ async function reconfigure(
   if (unregisterFileWatcher) {
     unregisterFileWatcher();
   }
-  unregisterFileWatcher = await languageServerWatcher(
-    workingPath,
-    async () => {
-      await reconfigureAndSendNotificationWithBackoff(workingPath);
-    }
-  );
+
   const workspace = await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
+
+  unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
+    await reconfigureAndSendNotificationWithBackoff(workingPath);
+  });
 
   return workspace;
 }
