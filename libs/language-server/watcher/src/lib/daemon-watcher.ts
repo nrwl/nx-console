@@ -50,8 +50,8 @@ export class DaemonWatcher {
                 lspLogger.log(
                   'Files changed: ' +
                     data.changedFiles
-                      .map((f) => [f.type, f.path].toString())
-                      .join(' ')
+                      .map((f) => `${f.path} (${f.type})`)
+                      .join(', ')
                 );
               }
               if (data?.changedProjects?.length) {

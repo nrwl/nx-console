@@ -218,6 +218,7 @@ function createNxWorkspaceConfiguration(
       }
 
       modifiedWorkspaceConfiguration.projects[projectName] = {
+        ...node.data,
         root: node.data.root,
         targets: node.data.targets ?? {},
         name: projectName,
