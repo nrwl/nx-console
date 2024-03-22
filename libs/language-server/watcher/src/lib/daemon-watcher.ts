@@ -8,8 +8,10 @@ export class DaemonWatcher {
 
   private disposables: Set<() => void> = new Set();
 
-  constructor(private workspacePath: string, private callback: () => unknown) {
-    this.initWatcher();
+  constructor(private workspacePath: string, private callback: () => unknown) {}
+
+  async start() {
+    await this.initWatcher();
   }
 
   stop() {
@@ -19,13 +21,22 @@ export class DaemonWatcher {
 
   private async initWatcher() {
     this.disposeEverything();
+    if (this.stopped) return;
+
     try {
       const daemonClientModule = await getNxDaemonClient(
         this.workspacePath,
         lspLogger
       );
 
-      lspLogger.log('Initializing daemon watcher');
+      lspLogger.log(`Initializing daemon watcher, retries ${this.retryCount}`);
+
+      if (!(await daemonClientModule.daemonClient.isServerAvailable())) {
+        const pid = await daemonClientModule.daemonClient.startInBackground();
+        lspLogger.log('Daemon started in background with pid ' + pid);
+      } else {
+        lspLogger.log('Daemon already running');
+      }
 
       const unregister =
         await daemonClientModule.daemonClient.registerFileWatcher(
@@ -34,7 +45,7 @@ export class DaemonWatcher {
             includeGlobalWorkspaceFiles: true,
             includeDependentProjects: true,
           },
-          (error, data) => {
+          async (error, data) => {
             if (error === 'closed') {
               if (!this.stopped) {
                 lspLogger.log('Daemon watcher connection closed, restarting');
@@ -65,7 +76,7 @@ export class DaemonWatcher {
           }
         );
 
-      this.retryCount = 0;
+      lspLogger.log('Initialized daemon watcher');
 
       this.disposables.add(unregister);
     } catch (e) {
@@ -76,7 +87,7 @@ export class DaemonWatcher {
 
   private async tryRestartWatcher() {
     this.disposeEverything();
-    if (this.retryCount > 3) {
+    if (this.retryCount > 2) {
       lspLogger.log(
         'Daemon watcher failed to restart after 3 attempts, using native watcher'
       );
@@ -95,9 +106,9 @@ export class DaemonWatcher {
   private useNativeWatcher() {
     this.disposeEverything();
 
-    const nativeWatcher = new NativeWatcher(this.workspacePath, () =>
-      this.callback()
-    );
+    const nativeWatcher = new NativeWatcher(this.workspacePath, () => {
+      this.callback();
+    });
     this.disposables.add(() => {
       nativeWatcher.stop();
     });

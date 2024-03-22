@@ -14,5 +14,10 @@
       ]
     }
   },
-  "tags": ["type:lsp"]
+  "tags": [
+    "type:lsp"
+  ],
+  "implicitDependencies": [
+    "nxls"
+  ]
 }

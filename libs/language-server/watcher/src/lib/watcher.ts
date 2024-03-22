@@ -16,6 +16,7 @@ export async function languageServerWatcher(
 
   if (gte(version.full, '16.4.0')) {
     const daemonWatcher = new DaemonWatcher(workspacePath, debouncedCallback);
+    await daemonWatcher.start();
     return () => {
       lspLogger.log('Unregistering file watcher');
       daemonWatcher.stop();

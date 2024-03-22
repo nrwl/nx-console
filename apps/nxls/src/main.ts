@@ -3,7 +3,7 @@ import {
   configureSchemas,
   getCompletionItems,
   projectSchemaIsRegistered,
-  resetInferencePluginsCompletionCache
+  resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server/capabilities/code-completion';
 import { getDefinition } from '@nx-console/language-server/capabilities/definition';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
@@ -31,7 +31,7 @@ import {
   NxVersionRequest,
   NxWorkspacePathRequest,
   NxWorkspaceRefreshNotification,
-  NxWorkspaceRequest
+  NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
 import {
   getJsonLanguageService,
@@ -39,7 +39,7 @@ import {
   lspLogger,
   mergeArrays,
   nxReset,
-  setLspLogger
+  setLspLogger,
 } from '@nx-console/language-server/utils';
 import { languageServerWatcher } from '@nx-console/language-server/watcher';
 import {
@@ -63,7 +63,7 @@ import {
   nxWorkspace,
   resetNxVersionCache,
   resetProjectPathCache,
-  resetSourceMapFilesToProjectCache
+  resetSourceMapFilesToProjectCache,
 } from '@nx-console/language-server/workspace';
 import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
@@ -73,7 +73,7 @@ import { dirname, relative, join } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
-  TextDocument
+  TextDocument,
 } from 'vscode-json-languageservice';
 import {
   CreateFilesParams,
@@ -84,7 +84,7 @@ import {
   ResponseError,
   TextDocumentSyncKind,
   TextDocuments,
-  createConnection
+  createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 import treeKill from 'tree-kill';
@@ -112,7 +112,7 @@ const workspaceContext = {
   resolveRelativePath: (relativePath: string, resource: string) => {
     const base = resource.substring(0, resource.lastIndexOf('/') + 1);
     return Utils.resolvePath(URI.parse(base), relativePath).toString();
-  }
+  },
 };
 
 const connection = createConnection(ProposedFeatures.all);
@@ -162,13 +162,13 @@ connection.onInitialize(async (params) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       completionProvider: {
         resolveProvider: false,
-        triggerCharacters: ['"', ':']
+        triggerCharacters: ['"', ':'],
       },
       hoverProvider: true,
       definitionProvider: true,
       documentLinkProvider: {
         resolveProvider: false,
-        workDoneProgress: false
+        workDoneProgress: false,
       },
       workspace: {
         fileOperations: {
@@ -177,24 +177,24 @@ connection.onInitialize(async (params) => {
               {
                 pattern: {
                   glob: '**/project.json',
-                  matches: FileOperationPatternKind.file
-                }
-              }
-            ]
+                  matches: FileOperationPatternKind.file,
+                },
+              },
+            ],
           },
           didDelete: {
             filters: [
               {
                 pattern: {
                   glob: '**/project.json',
-                  matches: FileOperationPatternKind.file
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
+                  matches: FileOperationPatternKind.file,
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
   };
 
   return result;
@@ -618,7 +618,6 @@ connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
 async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
   const workspace = await reconfigure(workingPath);
   await connection.sendNotification(NxWorkspaceRefreshNotification.method);
-
 
   if (!workspace?.error) {
     reconfigureAttempts = 0;

@@ -1,15 +1,20 @@
 import { execSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
 import { join, normalize, sep } from 'path';
 
 const defaultVersion = '18.0.4';
 
+// export const e2eCwd = join(
+//   process.platform === 'win32' ? process.cwd().split(sep)[0] : '/',
+//   'private',
+//   'tmp',
+//   'nxls-e2e'
+// );
 export const e2eCwd = join(
-  process.platform === 'win32' ? process.cwd().split(sep)[0] : '/',
-  'tmp',
+  process.platform !== 'win32' ? join('/', 'private', tmpdir()) : tmpdir(),
   'nxls-e2e'
 );
-
 export type NewWorkspaceOptions = {
   preset: string;
   bundler?: string;

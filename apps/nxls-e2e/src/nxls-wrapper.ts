@@ -23,6 +23,10 @@ export class NxlsWrapper {
     number,
     (message: ResponseMessage) => void
   >();
+  private pendingNotificationMap = new Map<
+    string,
+    (params: object | any[] | undefined) => void
+  >();
 
   constructor(private verbose = false) {}
 
@@ -140,6 +144,18 @@ export class NxlsWrapper {
     } as Message);
   }
 
+  async waitForNotification(
+    method: string
+  ): Promise<object | any[] | undefined> {
+    return await new Promise<any>((resolve) => {
+      this.pendingNotificationMap.set(method, resolve);
+    });
+  }
+
+  setVerbose(verbose: boolean) {
+    this.verbose = verbose;
+  }
+
   private listenToLSPMessages(messageReader: StreamMessageReader) {
     this.readerDisposable = messageReader.listen((message) => {
       if (
@@ -160,6 +176,12 @@ export class NxlsWrapper {
         if (resolve) {
           resolve(message);
           this.pendingRequestMap.delete(message.id);
+        }
+      } else if (isNotificationMessage(message)) {
+        const method = message.method;
+        const resolve = this.pendingNotificationMap.get(method);
+        if (resolve) {
+          resolve(message.params);
         }
       }
     });

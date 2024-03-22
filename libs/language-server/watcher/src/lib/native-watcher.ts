@@ -54,7 +54,7 @@ export class NativeWatcher {
               )
           )
       ) {
-        lspLogger.log('Project configuration changed');
+        lspLogger.log('native watcher detected project changes');
         this.callback();
       }
     });
