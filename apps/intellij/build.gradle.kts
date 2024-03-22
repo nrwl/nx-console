@@ -250,7 +250,7 @@ tasks.register<DefaultTask>("publish") {
 
 fun buildCommands() =
     if (isWindows()) {
-        mutableListOf("pwsh", "-command")
+        mutableListOf("powershell", "-command")
     } else {
         mutableListOf("bash", "-c")
     }
