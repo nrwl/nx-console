@@ -2,7 +2,7 @@ import type {
   NxJsonConfiguration,
   ProjectFileMap,
   ProjectGraph,
-  ProjectsConfigurations
+  ProjectsConfigurations,
 } from 'nx/src/devkit-exports';
 import { lspLogger } from '@nx-console/language-server/utils';
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
@@ -15,7 +15,7 @@ import {
   getNxOutput,
   getNxProjectGraph,
   getNxProjectGraphUtils,
-  getNxWorkspacePackageFileUtils
+  getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
 import { performance } from 'perf_hooks';
 import { WriteStream } from 'node:fs';
@@ -53,13 +53,13 @@ export async function getNxWorkspaceConfig(
       nxProjectGraph,
       nxOutput,
       nxProjectGraphUtils,
-      nxDaemonClientModule
+      nxDaemonClientModule,
     ] = await Promise.all([
       getNxWorkspacePackageFileUtils(workspacePath, logger),
       getNxProjectGraph(workspacePath, logger),
       getNxOutput(workspacePath, logger),
       getNxProjectGraphUtils(workspacePath, logger),
-      getNxDaemonClient(workspacePath, logger)
+      getNxDaemonClient(workspacePath, logger),
     ]);
 
     let workspaceConfiguration: NxWorkspaceConfiguration | undefined =
@@ -68,7 +68,7 @@ export async function getNxWorkspaceConfig(
       try {
         workspaceConfiguration = nxWorkspacePackage.readWorkspaceConfig({
           format: 'nx',
-          path: workspacePath
+          path: workspacePath,
         });
       } catch (e) {
         logger.log('Unable to read workspace config from nx workspace package');
@@ -78,7 +78,7 @@ export async function getNxWorkspaceConfig(
       }
     }
     try {
-      process.exit = function(code?: number) {
+      process.exit = function (code?: number) {
         console.warn('process.exit called with code', code);
       } as (code?: number) => never;
 
@@ -98,8 +98,7 @@ export async function getNxWorkspaceConfig(
         const projectGraphAndSourceMaps = await (
           nxProjectGraph as any
         ).createProjectGraphAndSourceMapsAsync({
-          exitOnError: false
-
+          exitOnError: false,
         });
         projectGraph = projectGraphAndSourceMaps.projectGraph;
         sourceMaps = projectGraphAndSourceMaps.sourceMaps;
@@ -107,7 +106,7 @@ export async function getNxWorkspaceConfig(
       } else {
         lspLogger.log('createProjectGraphAsync');
         projectGraph = await nxProjectGraph.createProjectGraphAsync({
-          exitOnError: false
+          exitOnError: false,
         });
         lspLogger.log('createProjectGraphAsync successful');
       }
@@ -134,7 +133,7 @@ export async function getNxWorkspaceConfig(
     if (!workspaceConfiguration) {
       workspaceConfiguration = {
         version: 1,
-        projects: {}
+        projects: {},
       };
     }
 
@@ -156,7 +155,7 @@ export async function getNxWorkspaceConfig(
 
     return {
       workspaceConfiguration,
-      error
+      error,
     };
   } catch (e) {
     lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
@@ -183,10 +182,10 @@ async function readWorkspaceConfigs(basedir: string): Promise<{
       projects: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...((nxJson as any).projects ?? {}),
-        ...workspaceJson.projects
-      }
+        ...workspaceJson.projects,
+      },
     },
-    configPath: join(basedir, 'workspace.json')
+    configPath: join(basedir, 'workspace.json'),
   };
 }
 
@@ -203,7 +202,7 @@ function createNxWorkspaceConfiguration(
   // We always want to get the latest projects from the graph, rather than the ones in the workspace configuration
   const modifiedWorkspaceConfiguration: NxWorkspaceConfiguration = {
     ...workspaceConfiguration,
-    projects: {}
+    projects: {},
   };
 
   for (const [projectName, node] of Object.entries(projectGraph.nodes)) {
@@ -223,14 +222,14 @@ function createNxWorkspaceConfiguration(
         targets: node.data.targets ?? {},
         name: projectName,
         tags: node.data.tags ?? [],
-        files: projectFileMap[projectName]
+        files: projectFileMap[projectName],
       };
     } else {
       modifiedWorkspaceConfiguration.projects[projectName] = {
         ...workspaceProject,
         targets: node.data.targets ?? {},
         files: projectFileMap[projectName],
-        name: projectName
+        name: projectName,
       };
     }
   }

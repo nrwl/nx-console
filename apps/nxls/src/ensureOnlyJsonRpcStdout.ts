@@ -20,5 +20,4 @@ export function ensureOnlyJsonRpcStdout() {
     );
     return originalWrite(chunk, encodingOrCallback, callback);
   }) as typeof process.stdout.write;
-
 }
