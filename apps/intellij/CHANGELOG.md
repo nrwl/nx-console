@@ -1,3 +1,16 @@
+## 1.20.0 (2024-03-25)
+
+### Bug Fixes
+
+* **intellij:** fix freeze ([#2036](https://github.com/nrwl/nx-console/issues/2036)) ([c6b94bc](https://github.com/nrwl/nx-console/commit/c6b94bcfe8d8dd8c6a1c229b45400f6af1f84e18))
+* remove -W and --silent flag for yarn ([#2063](https://github.com/nrwl/nx-console/issues/2063)) ([fd5ab5b](https://github.com/nrwl/nx-console/commit/fd5ab5ba79cf8231aa64c8ddb89b690ac26684b1))
+
+
+### Features
+
+* add autocomplete to nx.json plugins  ([#2061](https://github.com/nrwl/nx-console/issues/2061)) ([afa9bb5](https://github.com/nrwl/nx-console/commit/afa9bb51de0750fe92c2f8eaea694124131953a3))
+* add config file codelenses in intellij ([#2045](https://github.com/nrwl/nx-console/issues/2045)) ([894caab](https://github.com/nrwl/nx-console/commit/894caab9cfc4c816672cf8e27308e40906b76535))
+
 ## 1.19.0 (2024-03-01)
 
 ### Bug Fixes
