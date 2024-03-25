@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import os from 'os';
 import { EditorContext } from '../contexts/editor-context';
 import { GeneratorContextContext } from '../contexts/generator-context-context';
 import {
@@ -7,6 +8,8 @@ import {
   intellijFieldPadding,
   intellijFocusRing,
 } from '../utils/ui-utils';
+
+const pathSeparator = os.type().startsWith('Windows') ? '\\' : '/';
 
 @customElement('cwd-breadcrumb')
 export class CwdBreadcrumb extends GeneratorContextContext(
@@ -16,7 +19,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
   @state() isEditable = false;
 
   set path(value: string) {
-    this._path = value.startsWith('/') ? value.substring(1) : value;
+    this._path = value.startsWith(pathSeparator) ? value.substring(1) : value;
   }
 
   get path() {
@@ -46,8 +49,8 @@ export class CwdBreadcrumb extends GeneratorContextContext(
   }
 
   editToSegment(index: number) {
-    const pathArray = this.path.split('/');
-    this.path = pathArray.slice(0, index + 1).join('/');
+    const pathArray = this.path.split(pathSeparator);
+    this.path = pathArray.slice(0, index + 1).join(pathSeparator);
     this.dispatchValue();
   }
 
@@ -58,7 +61,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
   }
 
   render() {
-    const pathArray = this.path.split('/');
+    const pathArray = this.path.split(pathSeparator);
     const hasPathSegments = pathArray.filter((p) => !!p).length > 0;
     return html`
       <div
@@ -78,7 +81,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
         >
           {workspaceRoot}
         </span>
-        <span class="mx-2">/</span>
+        <span class="mx-2">${pathSeparator}</span>
         ${this.isEditable
           ? html`
               ${this.renderInlineEdit()}
@@ -105,7 +108,7 @@ export class CwdBreadcrumb extends GeneratorContextContext(
                     >${part}</span
                   >
                   ${index < pathArray.length - 1
-                    ? html`<span class="mx-2">/</span>`
+                    ? html`<span class="mx-2">${pathSeparator}</span>`
                     : ''}
                 `
               )}
