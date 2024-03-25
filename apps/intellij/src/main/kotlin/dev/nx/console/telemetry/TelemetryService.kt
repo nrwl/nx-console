@@ -9,18 +9,15 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TelemetryService {
+class TelemetryService(private val cs: CoroutineScope) {
     val logger = logger<TelemetryService>()
 
     companion object {
         fun getInstance(project: Project): TelemetryService =
             project.getService(TelemetryService::class.java)
     }
-
-    val scope = CoroutineScope(Dispatchers.Default)
 
     private val service: Telemetry =
         if (application.isInternal) {
@@ -42,14 +39,14 @@ class TelemetryService {
         }
 
     fun featureUsed(feature: String) {
-        scope.launch { service.featureUsed(feature) }
+        cs.launch { service.featureUsed(feature) }
     }
 
     fun extensionActivated(time: Int) {
-        scope.launch { service.extensionActivated(time) }
+        cs.launch { service.extensionActivated(time) }
     }
 
     fun extensionDeactivated(time: Int) {
-        scope.launch { service.extensionDeactivated(time) }
+        cs.launch { service.extensionDeactivated(time) }
     }
 }

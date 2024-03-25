@@ -2,7 +2,7 @@ package dev.nx.console.ide
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.editor.CaretModel
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
@@ -18,13 +18,10 @@ import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeProjectKey
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.telemetry.TelemetryService
-import dev.nx.console.utils.Notifier
-import dev.nx.console.utils.findLineNumberForTargetAndConfiguration
-import dev.nx.console.utils.nxProjectConfigurationPath
-import dev.nx.console.utils.selectNxProject
-import kotlinx.coroutines.CoroutineScope
+import dev.nx.console.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSource) {
     init {
@@ -34,7 +31,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
         )
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         if (e.place == "NxToolWindow") {
@@ -59,7 +56,7 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
 
         val path = e.dataContext.getData(CommonDataKeys.VIRTUAL_FILE)?.path
 
-        CoroutineScope(Dispatchers.Default).launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val currentlyOpenedProject =
                 path?.let { NxlsService.getInstance(project).projectByPath(path = path) }
             val nxProject: NxProject =
@@ -85,12 +82,12 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                     }
                         ?: return@launch
 
-            ApplicationManager.getApplication().invokeLater {
+            withContext(Dispatchers.EDT) {
                 val projectFilePath =
-                    nxProjectConfigurationPath(project, nxProject.root) ?: return@invokeLater
+                    nxProjectConfigurationPath(project, nxProject.root) ?: return@withContext
                 val projectFile =
                     LocalFileSystem.getInstance().findFileByPath(projectFilePath)
-                        ?: return@invokeLater
+                        ?: return@withContext
 
                 val fileEditorManager = FileEditorManager.getInstance(project)
 
@@ -103,14 +100,14 @@ class ShowNxProjectConfigurationAction : DumbAwareAction(AllIcons.Actions.EditSo
                             ?.nxTargetConfigurationName
 
                     val psiFile =
-                        PsiManager.getInstance(project).findFile(projectFile) ?: return@invokeLater
+                        PsiManager.getInstance(project).findFile(projectFile) ?: return@withContext
                     val lineNumber =
                         findLineNumberForTargetAndConfiguration(
                             psiFile,
                             nxTarget,
                             nxTargetConfiguration
                         )
-                            ?: return@invokeLater
+                            ?: return@withContext
 
                     val editor = fileEditorManager.selectedTextEditor
 

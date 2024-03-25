@@ -9,8 +9,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.application
 import dev.nx.console.generate.NxGenerateService
 import dev.nx.console.telemetry.TelemetryService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.launch
 
 private val logger = logger<NxGenerateUiAction>()
@@ -31,7 +30,7 @@ class NxGenerateUiAction : AnAction() {
             }
 
         application.runReadAction {
-            CoroutineScope(Dispatchers.Default).launch {
+            ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
                 val selectedGenerator = generateService.selectGenerator(e) ?: return@launch
                 generateService.openGenerateUi(project, selectedGenerator, path)
             }

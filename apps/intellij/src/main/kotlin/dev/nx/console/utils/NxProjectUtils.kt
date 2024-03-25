@@ -2,26 +2,28 @@ package dev.nx.console.utils
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.ColoredListCellRenderer
 import com.intellij.ui.SimpleTextAttributes
 import dev.nx.console.nxls.NxlsService
+import java.util.function.Consumer
 import javax.swing.JList
 import javax.swing.ListSelectionModel
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 suspend fun selectNxProject(
     project: Project,
     dataContext: DataContext?,
     preferredProject: String? = null
 ): String? = suspendCoroutine {
-    CoroutineScope(Dispatchers.Default).launch {
+    ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
         val projects =
             NxlsService.getInstance(project).workspace()?.workspace?.projects?.keys?.toMutableList()
                 ?: mutableListOf()
@@ -30,7 +32,7 @@ suspend fun selectNxProject(
             projects.removeIf { it == preferredProject }
             projects.add(0, preferredProject)
         }
-        ApplicationManager.getApplication().invokeLater {
+        withContext(Dispatchers.EDT) {
             val popup =
                 JBPopupFactory.getInstance()
                     .createPopupChooserBuilder(projects)
@@ -38,6 +40,7 @@ suspend fun selectNxProject(
                     .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
                     .setRequestFocus(true)
                     .setFilterAlwaysVisible(true)
+                    .setNamerForFiltering { it }
                     .setResizable(true)
                     .setMovable(true)
                     .setAutoPackHeightOnFiltering(true)
@@ -81,8 +84,8 @@ suspend fun selectTargetForNxProject(
     project: Project,
     dataContext: DataContext,
     nxProject: String,
-): String? = suspendCoroutine {
-    CoroutineScope(Dispatchers.Default).launch {
+): String? = suspendCoroutine { continuation ->
+    ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
         val targets =
             NxlsService.getInstance(project)
                 .workspace()
@@ -94,37 +97,48 @@ suspend fun selectTargetForNxProject(
                 ?.toList()
                 ?: emptyList()
 
-        ApplicationManager.getApplication().invokeLater {
+        withContext(Dispatchers.EDT) {
             val popup =
-                JBPopupFactory.getInstance()
-                    .createPopupChooserBuilder(targets)
-                    .setTitle("Select target of $nxProject")
-                    .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
-                    .setRequestFocus(true)
-                    .setFilterAlwaysVisible(true)
-                    .setResizable(true)
-                    .setMovable(true)
-                    .setAutoPackHeightOnFiltering(true)
-                    .setRenderer(
-                        object : ColoredListCellRenderer<String>() {
-                            override fun customizeCellRenderer(
-                                list: JList<out String>,
-                                value: String?,
-                                index: Int,
-                                selected: Boolean,
-                                hasFocus: Boolean
-                            ) {
-                                if (value == null) return
-                                icon = AllIcons.General.Gear
-                                append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
-                            }
-                        }
-                    )
-                    .setItemChosenCallback { chosen -> it.resume(chosen) }
-                    .setDimensionServiceKey("nx.dev.console.select_target")
-                    .createPopup()
+                createSelectTargetPopup("Select target of $nxProject ", targets) {
+                    continuation.resume(it)
+                }
 
             popup.showInBestPositionFor(dataContext)
         }
     }
+}
+
+fun createSelectTargetPopup(
+    title: String,
+    targets: List<String>,
+    callback: Consumer<String>
+): JBPopup {
+    return JBPopupFactory.getInstance()
+        .createPopupChooserBuilder(targets)
+        .setTitle(title)
+        .setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        .setRequestFocus(true)
+        .setNamerForFiltering { it }
+        .setFilterAlwaysVisible(true)
+        .setResizable(true)
+        .setMovable(true)
+        .setAutoPackHeightOnFiltering(true)
+        .setRenderer(
+            object : ColoredListCellRenderer<String>() {
+                override fun customizeCellRenderer(
+                    list: JList<out String>,
+                    value: String?,
+                    index: Int,
+                    selected: Boolean,
+                    hasFocus: Boolean
+                ) {
+                    if (value == null) return
+                    icon = AllIcons.General.Gear
+                    append(value, SimpleTextAttributes.REGULAR_ATTRIBUTES, true)
+                }
+            }
+        )
+        .setItemChosenCallback { chosen -> callback.accept(chosen) }
+        .setDimensionServiceKey("nx.dev.console.select_target")
+        .createPopup()
 }

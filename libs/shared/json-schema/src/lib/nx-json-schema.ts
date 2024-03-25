@@ -80,6 +80,18 @@ function createJsonSchema(
           ],
         },
       },
+      plugins: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            plugin: {
+              type: 'string',
+              'x-completion-type': CompletionType.inferencePlugins,
+            },
+          },
+        },
+      },
     },
   };
 }

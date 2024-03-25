@@ -3,6 +3,7 @@ import {
   configureSchemas,
   getCompletionItems,
   projectSchemaIsRegistered,
+  resetInferencePluginsCompletionCache,
 } from '@nx-console/language-server/capabilities/code-completion';
 import { getDefinition } from '@nx-console/language-server/capabilities/definition';
 import { getDocumentLinks } from '@nx-console/language-server/capabilities/document-links';
@@ -47,6 +48,7 @@ import {
   getGeneratorContextV2,
   getGeneratorOptions,
   getGenerators,
+  getNxDaemonClient,
   getNxVersion,
   getProjectByPath,
   getProjectByRoot,
@@ -85,6 +87,7 @@ import {
   createConnection,
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
+import treeKill from 'tree-kill';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -95,6 +98,7 @@ process.on('uncaughtException', (e) => {
 });
 
 let WORKING_PATH: string | undefined = undefined;
+let PID: number | null = null;
 let CLIENT_CAPABILITIES: ClientCapabilities | undefined = undefined;
 let unregisterFileWatcher: () => void = () => {
   //noop
@@ -121,6 +125,8 @@ documents.listen(connection);
 connection.onInitialize(async (params) => {
   setLspLogger(connection);
 
+  PID = params.processId;
+
   const { workspacePath } = params.initializationOptions ?? {};
   try {
     WORKING_PATH =
@@ -135,7 +141,7 @@ connection.onInitialize(async (params) => {
 
     CLIENT_CAPABILITIES = params.capabilities;
 
-    configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
+    await configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {
@@ -247,7 +253,8 @@ connection.onCompletion(async (completionParams) => {
     jsonAst,
     document,
     schemas,
-    completionParams.position
+    completionParams.position,
+    lspLogger
   );
   mergeArrays(completionResults.items, pathItems);
 
@@ -329,9 +336,22 @@ documents.onDidOpen(async (e) => {
   );
 });
 
-connection.onShutdown(() => {
+connection.onShutdown(async () => {
   unregisterFileWatcher();
   jsonDocumentMapper.dispose();
+
+  if (WORKING_PATH) {
+    const nxDaemonClientModule = await getNxDaemonClient(
+      WORKING_PATH,
+      lspLogger
+    );
+    await nxDaemonClientModule?.daemonClient?.stop();
+  }
+});
+
+connection.onExit(() => {
+  connection.dispose();
+  treeKill(PID ?? process.pid, 0);
 });
 
 connection.onNotification(NxReset, async () => {
@@ -626,6 +646,7 @@ async function reconfigure(
   resetNxVersionCache();
   resetProjectPathCache();
   resetSourceMapFilesToProjectCache();
+  resetInferencePluginsCompletionCache();
   const workspace = await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 

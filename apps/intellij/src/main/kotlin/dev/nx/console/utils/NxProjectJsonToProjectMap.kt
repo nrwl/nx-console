@@ -8,23 +8,18 @@ import dev.nx.console.models.NxProject
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Service(Service.Level.PROJECT)
-class NxProjectJsonToProjectMap(val project: Project) {
+class NxProjectJsonToProjectMap(val project: Project, private val cs: CoroutineScope) {
     private val pathsToProjectsMap: MutableMap<String, NxProject> = mutableMapOf()
 
     fun init() {
-        CoroutineScope(Dispatchers.Default).launch { populateMap() }
-        with(project.messageBus.connect()) {
+        cs.launch { populateMap() }
+        with(project.messageBus.connect(cs)) {
             subscribe(
                 NxlsService.NX_WORKSPACE_REFRESH_TOPIC,
-                object : NxWorkspaceRefreshListener {
-                    override fun onNxWorkspaceRefresh() {
-                        CoroutineScope(Dispatchers.Default).launch { populateMap() }
-                    }
-                }
+                NxWorkspaceRefreshListener { cs.launch { populateMap() } }
             )
         }
     }

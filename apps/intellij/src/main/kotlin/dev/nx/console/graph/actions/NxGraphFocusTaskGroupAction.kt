@@ -3,7 +3,7 @@ package dev.nx.console.graph.actions
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CustomShortcutSet
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.project.DumbAwareAction
 import dev.nx.console.NxIcons
@@ -11,9 +11,10 @@ import dev.nx.console.graph.getNxGraphService
 import dev.nx.console.nx_toolwindow.tree.NxSimpleNode
 import dev.nx.console.nx_toolwindow.tree.NxTreeNodeKey
 import dev.nx.console.telemetry.TelemetryService
-import kotlinx.coroutines.CoroutineScope
+import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NxGraphFocusTaskGroupAction : DumbAwareAction() {
 
@@ -30,7 +31,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
         }
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
@@ -38,11 +39,9 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
         val targetGroup: NxSimpleNode.TargetGroup =
             e.getData(NxTreeNodeKey).let { it as? NxSimpleNode.TargetGroup } ?: return
 
-        CoroutineScope(Dispatchers.Default).launch {
+        ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val nxGraphService = getNxGraphService(project) ?: return@launch
-            ApplicationManager.getApplication().invokeLater {
-                nxGraphService.focusTaskGroup(targetGroup.name)
-            }
+            withContext(Dispatchers.EDT) { nxGraphService.focusTaskGroup(targetGroup.name) }
         }
     }
 
@@ -50,6 +49,7 @@ class NxGraphFocusTaskGroupAction : DumbAwareAction() {
         val keyMapSet = KeymapUtil.getActiveKeymapShortcuts(ID)
 
         if (keyMapSet.shortcuts.isEmpty()) {
+
             shortcutSet = CustomShortcutSet.fromString(DEFAULT_SHORTCUT)
         } else {
             shortcutSet = keyMapSet

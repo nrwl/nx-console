@@ -15,6 +15,7 @@ import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.nxlsWorkingPath
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
+import kotlinx.coroutines.CoroutineScope
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
@@ -30,7 +31,7 @@ enum class NxlsState {
 
 private val log = logger<NxlsWrapper>()
 
-class NxlsWrapper(val project: Project) {
+class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
     var languageServer: NxlsLanguageServer? = null
     var languageClient: NxlsLanguageClient? = null
@@ -52,7 +53,7 @@ class NxlsWrapper(val project: Project) {
 
         try {
             status = NxlsState.STARTING
-            val nxlsProcess = NxlsProcess(project)
+            val nxlsProcess = NxlsProcess(project, cs)
             val (input, output) =
                 nxlsProcess.run {
                     start()

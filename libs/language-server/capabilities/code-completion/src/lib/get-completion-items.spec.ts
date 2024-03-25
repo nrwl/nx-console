@@ -15,6 +15,7 @@ import {
 } from 'vscode-json-languageservice';
 import { getCompletionItems } from './get-completion-items';
 import { NxWorkspace } from '@nx-console/shared/types';
+import { normalize } from 'path';
 
 jest.mock(
   '@nx-console/language-server/workspace',
@@ -155,20 +156,20 @@ describe('getCompletionItems', () => {
       }
     );
 
-    expect(labels).toMatchInlineSnapshot(`
-          Array [
-            "\\"file.js\\"",
-            "\\"project/src/main.js\\"",
-            "\\"project/src/main.ts\\"",
-          ]
-      `);
-    expect(details).toMatchInlineSnapshot(`
-          Array [
-            "/workspace/file.js",
-            "/workspace/project/src/main.js",
-            "/workspace/project/src/main.ts",
-          ]
-      `);
+    expect(labels.map((l) => normalize(l)).sort()).toEqual(
+      [`"file.js"`, `"project/src/main.js"`, `"project/src/main.ts"`]
+        .map((l) => normalize(l))
+        .sort()
+    );
+    expect(details.map((l) => normalize(l ?? '')).sort()).toEqual(
+      [
+        '/workspace/file.js',
+        '/workspace/project/src/main.js',
+        '/workspace/project/src/main.ts',
+      ]
+        .map((l) => normalize(l))
+        .sort()
+    );
   });
 
   it('should be able to use a glob', async () => {

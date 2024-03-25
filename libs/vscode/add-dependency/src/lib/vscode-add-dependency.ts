@@ -29,6 +29,8 @@ import {
   window,
 } from 'vscode';
 import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
+import { execSync } from 'child_process';
+import { major } from 'semver';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -257,11 +259,12 @@ function getWorkspaceAddFlag(
     private?: boolean;
   }>(join(workspacePath, 'package.json'));
   if (pkgManager === 'yarn') {
+    const isYarnV1 = major(execSync('yarn --version').toString().trim()) === 1;
     const isWorkspace =
       !!pkgJson.private &&
       !!pkgJson.workspaces &&
       pkgJson.workspaces?.length > 0;
-    return isWorkspace ? '-W' : '';
+    return isWorkspace && isYarnV1 ? '-W' : '';
   }
   if (pkgManager === 'npm') {
     const isWorkspace = !!pkgJson.workspaces && pkgJson.workspaces?.length > 0;

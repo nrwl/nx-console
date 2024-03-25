@@ -7,6 +7,7 @@ import { gte } from 'semver';
 import type { WatchEvent } from 'nx/src/native';
 import { debounce } from '@nx-console/shared/utils';
 import { match as minimatch } from 'minimatch';
+import { join, normalize } from 'path';
 
 const NX_PLUGIN_PATTERNS_TO_WATCH = [
   '**/cypress.config.{js,ts,mjs,cjs}',
@@ -41,17 +42,19 @@ export async function languageServerWatcher(
       if (err) {
         lspLogger.log('Error watching files: ' + err);
       } else if (
-        events.some(
-          (e) =>
-            e.path.endsWith('project.json') ||
-            e.path.endsWith('package.json') ||
-            e.path.endsWith('nx.json') ||
-            e.path.endsWith('workspace.json') ||
-            e.path.endsWith('tsconfig.base.json') ||
-            NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
-              minimatch([e.path], pattern, { dot: true })
-            )
-        )
+        events
+          .map((e) => normalize(e.path))
+          .some(
+            (path) =>
+              path.endsWith('project.json') ||
+              path.endsWith('package.json') ||
+              path.endsWith('nx.json') ||
+              path.endsWith('workspace.json') ||
+              path.endsWith('tsconfig.base.json') ||
+              NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
+                minimatch([path], pattern, { dot: true })
+              )
+          )
       ) {
         lspLogger.log('Project configuration changed');
         debouncedCallback();
