@@ -1,3 +1,16 @@
+# [18.18.0](https://github.com/nrwl/nx-console/compare/vscode-v18.17.0...vscode-v18.18.0) (2024-03-25)
+
+
+### Bug Fixes
+
+* remove -W and --silent flag for yarn ([#2063](https://github.com/nrwl/nx-console/issues/2063)) ([fd5ab5b](https://github.com/nrwl/nx-console/commit/fd5ab5ba79cf8231aa64c8ddb89b690ac26684b1))
+
+
+### Features
+
+* add autocomplete to nx.json plugins  ([#2061](https://github.com/nrwl/nx-console/issues/2061)) ([afa9bb5](https://github.com/nrwl/nx-console/commit/afa9bb51de0750fe92c2f8eaea694124131953a3))
+* add config file codelenses in intellij ([#2045](https://github.com/nrwl/nx-console/issues/2045)) ([894caab](https://github.com/nrwl/nx-console/commit/894caab9cfc4c816672cf8e27308e40906b76535))
+
 # [18.17.0](https://github.com/nrwl/nx-console/compare/vscode-v18.16.0...vscode-v18.17.0) (2024-03-01)
 
 
