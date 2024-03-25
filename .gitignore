@@ -55,7 +55,6 @@ Thumbs.db
 #Environment
 .env
 
-
 # Intellij
 .gradle
 .qodana
@@ -66,8 +65,7 @@ apps/intellij/bin/
 apps/vscode-e2e/.screenshots
 **/dist
 
-
-
 .angular
 
 .nx/cache
+**/cypress/downloads

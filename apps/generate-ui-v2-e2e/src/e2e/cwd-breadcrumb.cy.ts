@@ -2,16 +2,18 @@ import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { schema } from '../support/test-schema';
 import { visitGenerateUi } from '../support/visit-generate-ui';
 
-const schemaWithCwd: GeneratorSchema = {
-  ...schema,
-  context: {
-    prefillValues: {
-      cwd: 'packages/nested',
-    },
-  },
-};
 describe('cwd-breadcrumb component', () => {
+  let fileSeparator: string;
   beforeEach(() => {
+    fileSeparator = Cypress.platform.startsWith('win') ? '\\' : '/';
+    const schemaWithCwd: GeneratorSchema = {
+      ...schema,
+      context: {
+        prefillValues: {
+          cwd: `packages${fileSeparator}nested`,
+        },
+      },
+    };
     visitGenerateUi(schemaWithCwd);
   });
 
@@ -28,7 +30,7 @@ describe('cwd-breadcrumb component', () => {
   it('should use inline edit with buttons to edit path', () => {
     cy.get("[data-cy='inline-edit-button']").click();
     cy.get("[data-cy='inline-edit-field']").type(
-      '{selectall}{backspace}packages/hello'
+      `{selectall}{backspace}packages${fileSeparator}hello`
     );
     cy.get("[data-cy='inline-edit-confirm']").click();
     shouldContainModifiedPath();
@@ -37,7 +39,7 @@ describe('cwd-breadcrumb component', () => {
   it('should use inline edit with enter key to edit path', () => {
     cy.get("[data-cy='inline-edit-button']").click();
     cy.get("[data-cy='inline-edit-field']").type(
-      '{selectall}{backspace}packages/hello{enter}'
+      `{selectall}{backspace}packages${fileSeparator}hello{enter}`
     );
     shouldContainModifiedPath();
   });
@@ -45,7 +47,7 @@ describe('cwd-breadcrumb component', () => {
   it('should use inline edit with buttons to cancel edit', () => {
     cy.get("[data-cy='inline-edit-button']").click();
     cy.get("[data-cy='inline-edit-field']").type(
-      '{selectall}{backspace}packages/hello'
+      `{selectall}{backspace}packages${fileSeparator}hello`
     );
     cy.get("[data-cy='inline-edit-cancel']").click();
     shouldContainOriginalPath();
@@ -55,7 +57,7 @@ describe('cwd-breadcrumb component', () => {
   it('should use inline edit with escape key to cancel edit', () => {
     cy.get("[data-cy='inline-edit-button']").click();
     cy.get("[data-cy='inline-edit-field']").type(
-      '{selectall}{backspace}packages/hello{esc}'
+      `{selectall}{backspace}packages${fileSeparator}hello{esc}`
     );
     shouldContainOriginalPath();
     cy.get("[data-cy='cwd-breadcrumb']").should('not.contain', 'hello');
