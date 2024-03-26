@@ -2,9 +2,12 @@ package dev.nx.console.utils
 
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.wsl.WslPath
+import com.intellij.javascript.nodejs.library.yarn.pnp.YarnPnpManager
 import com.intellij.javascript.nodejs.npm.NpmPackageDescriptor
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.VirtualFileManager
 import dev.nx.console.NxConsoleBundle
 import java.io.File
 import java.nio.file.Paths
@@ -13,7 +16,7 @@ private val logger = logger<NxExecutable>()
 
 class NxExecutable {
     companion object {
-        fun getExecutablePath(basePath: String): String {
+        fun getExecutablePath(basePath: String, project: Project): String {
 
             logger.info("Checking if there is standalone nx")
             val nxExecutableName =
@@ -22,6 +25,19 @@ class NxExecutable {
 
             if (nxExecutable.exists()) {
                 return nxExecutable.absolutePath
+            }
+
+            val yarnPnpManager = YarnPnpManager.getInstance(project)
+            val virtualBaseFile =
+                VirtualFileManager.getInstance().findFileByNioPath(Paths.get(basePath))
+            if (virtualBaseFile != null && yarnPnpManager.isUnderPnp(virtualBaseFile)) {
+                val packagJsonFile =
+                    virtualBaseFile.findChild("package.json")
+                        ?: throw ExecutionException(NxConsoleBundle.message("nx.not.found"))
+                val nxPackage =
+                    yarnPnpManager.findInstalledPackageDir(packagJsonFile, "nx")
+                        ?: throw ExecutionException(NxConsoleBundle.message("nx.not.found"))
+                return Paths.get(nxPackage.path, "bin", "nx.js").toString()
             }
 
             val binPath = Paths.get(basePath, "node_modules", ".bin").toString()
