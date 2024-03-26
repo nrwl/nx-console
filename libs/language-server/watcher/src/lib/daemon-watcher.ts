@@ -1,6 +1,7 @@
 import { getNxDaemonClient } from '@nx-console/language-server/workspace';
 import { lspLogger } from '@nx-console/language-server/utils';
 import { NativeWatcher } from './native-watcher';
+import { normalize } from 'path';
 
 export class DaemonWatcher {
   private stopped = false;
@@ -8,7 +9,8 @@ export class DaemonWatcher {
 
   private disposables: Set<() => void> = new Set();
 
-  constructor(private workspacePath: string, private callback: () => unknown) {}
+  constructor(private workspacePath: string, private callback: () => unknown) {
+  }
 
   async start() {
     await this.initWatcher();
@@ -43,7 +45,7 @@ export class DaemonWatcher {
           {
             watchProjects: 'all',
             includeGlobalWorkspaceFiles: true,
-            includeDependentProjects: true,
+            includeDependentProjects: true
           },
           async (error, data) => {
             if (error === 'closed') {
@@ -57,18 +59,25 @@ export class DaemonWatcher {
               lspLogger.log('Error watching files: ' + error);
             } else {
               this.retryCount = 0;
-              if (data?.changedFiles?.length) {
+              const filteredChangedFiles = data?.changedFiles?.filter(
+                (f) => !normalize(f.path).startsWith(normalize('.yarn/cache'))
+              ) ?? [];
+              if (filteredChangedFiles.length === 0) {
+                lspLogger.log(`filtered out files: ${data?.changedFiles}`);
+                return;
+              }
+              if (filteredChangedFiles.length) {
                 lspLogger.log(
                   'Files changed: ' +
-                    data.changedFiles
-                      .map((f) => `${f.path} (${f.type})`)
-                      .join(', ')
+                  filteredChangedFiles
+                    .map((f) => `${f.path} (${f.type})`)
+                    .join(', ')
                 );
               }
               if (data?.changedProjects?.length) {
                 lspLogger.log(
                   'Project configuration changed: ' +
-                    data.changedProjects.join(', ')
+                  data.changedProjects.join(', ')
                 );
                 this.callback();
               }
