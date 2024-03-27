@@ -13,7 +13,6 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from './utils';
-
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
