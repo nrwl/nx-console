@@ -28,7 +28,11 @@ export class NxlsWrapper {
     (params: object | any[] | undefined) => void
   >();
 
-  constructor(private verbose = false) {}
+  constructor(private verbose?: boolean) {
+    if (verbose === undefined) {
+      this.verbose = !!process.env['CI'];
+    }
+  }
 
   private idCounter = 1;
 

@@ -26,7 +26,7 @@ describe('watcher', () => {
   beforeAll(async () => {
     newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
-    nxlsWrapper = new NxlsWrapper(false);
+    nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
@@ -47,6 +47,19 @@ describe('watcher', () => {
     );
 
     appendFileSync(cypressConfig, 'console.log("hello")');
+    await nxlsWrapper.waitForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
+  });
+
+  it('should detect daemon shutdown and restart watcher automatically', async () => {
+    execSync('npx nx daemon --stop', {
+      cwd: join(e2eCwd, workspaceName),
+      windowsHide: true,
+      env: process.env,
+    });
+
+    addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );

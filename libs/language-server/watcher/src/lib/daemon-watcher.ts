@@ -9,8 +9,7 @@ export class DaemonWatcher {
 
   private disposables: Set<() => void> = new Set();
 
-  constructor(private workspacePath: string, private callback: () => unknown) {
-  }
+  constructor(private workspacePath: string, private callback: () => unknown) {}
 
   async start() {
     await this.initWatcher();
@@ -33,19 +32,29 @@ export class DaemonWatcher {
 
       lspLogger.log(`Initializing daemon watcher, retries ${this.retryCount}`);
 
-      if (!(await daemonClientModule.daemonClient.isServerAvailable())) {
-        const pid = await daemonClientModule.daemonClient.startInBackground();
-        lspLogger.log('Daemon started in background with pid ' + pid);
-      } else {
-        lspLogger.log('Daemon already running');
+      let projectGraphErrors = false;
+      try {
+        await daemonClientModule.daemonClient.getProjectGraphAndSourceMaps();
+      } catch (e) {
+        projectGraphErrors = true;
       }
 
+      if (projectGraphErrors) {
+        lspLogger.log(
+          'project graph computation error during daemon watcher initialization, using native watcher.'
+        );
+        this.retryCount = 0;
+        this.useNativeWatcher();
+        return;
+      }
+
+      lspLogger.log('registering daemon file watcher');
       const unregister =
         await daemonClientModule.daemonClient.registerFileWatcher(
           {
             watchProjects: 'all',
             includeGlobalWorkspaceFiles: true,
-            includeDependentProjects: true
+            includeDependentProjects: true,
           },
           async (error, data) => {
             if (error === 'closed') {
@@ -59,9 +68,10 @@ export class DaemonWatcher {
               lspLogger.log('Error watching files: ' + error);
             } else {
               this.retryCount = 0;
-              const filteredChangedFiles = data?.changedFiles?.filter(
-                (f) => !normalize(f.path).startsWith(normalize('.yarn/cache'))
-              ) ?? [];
+              const filteredChangedFiles =
+                data?.changedFiles?.filter(
+                  (f) => !normalize(f.path).startsWith(normalize('.yarn/cache'))
+                ) ?? [];
               if (filteredChangedFiles.length === 0) {
                 lspLogger.log(`filtered out files: ${data?.changedFiles}`);
                 return;
@@ -69,15 +79,15 @@ export class DaemonWatcher {
               if (filteredChangedFiles.length) {
                 lspLogger.log(
                   'Files changed: ' +
-                  filteredChangedFiles
-                    .map((f) => `${f.path} (${f.type})`)
-                    .join(', ')
+                    filteredChangedFiles
+                      .map((f) => `${f.path} (${f.type})`)
+                      .join(', ')
                 );
               }
               if (data?.changedProjects?.length) {
                 lspLogger.log(
                   'Project configuration changed: ' +
-                  data.changedProjects.join(', ')
+                    data.changedProjects.join(', ')
                 );
                 this.callback();
               }

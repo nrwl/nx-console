@@ -34,7 +34,7 @@ export function newWorkspace({
   packageManager = 'npm',
   version,
   options,
-  verbose = false,
+  verbose,
 }: {
   name?: string;
   packageManager?: 'npm' | 'pnpm' | 'yarn';
@@ -43,6 +43,9 @@ export function newWorkspace({
   options: NewWorkspaceOptions;
   verbose?: boolean;
 }) {
+  if (verbose === undefined) {
+    verbose = !!process.env['CI'];
+  }
   if (!version) {
     version = defaultVersion;
   }
