@@ -21,6 +21,7 @@ const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
 const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
 describe('watcher', () => {
+  process.env['NX_DAEMON'] = 'true';
   beforeAll(async () => {
     newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
