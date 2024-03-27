@@ -2,7 +2,8 @@ import {
   NxWorkspaceRefreshNotification,
   NxWorkspaceRequest,
 } from '@nx-console/language-server/types';
-import { NxWorkspace } from '@nx-console/shared/types';
+import { execSync } from 'child_process';
+import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { NxlsWrapper } from './nxls-wrapper';
 import {
@@ -12,8 +13,6 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
 } from './utils';
-import { appendFileSync, readFileSync, writeFileSync } from 'fs';
-import { execSync } from 'child_process';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -115,8 +114,6 @@ describe('watcher', () => {
   });
 
   it('should send refresh notification after generating a new project and changing one of its files', async () => {
-    nxlsWrapper.setVerbose(true);
-
     await new Promise<void>((resolve) => {
       nxlsWrapper
         .waitForNotification(NxWorkspaceRefreshNotification.method)
@@ -135,7 +132,6 @@ describe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    nxlsWrapper.setVerbose(false);
   });
 
   afterAll(async () => {

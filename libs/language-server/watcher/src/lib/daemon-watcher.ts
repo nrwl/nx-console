@@ -48,7 +48,6 @@ export class DaemonWatcher {
         return;
       }
 
-      lspLogger.log('registering daemon file watcher');
       const unregister =
         await daemonClientModule.daemonClient.registerFileWatcher(
           {
@@ -67,6 +66,11 @@ export class DaemonWatcher {
             } else if (error) {
               lspLogger.log('Error watching files: ' + error);
             } else {
+              if (this.stopped) {
+                lspLogger.log('got file watcher event after being stopped');
+                unregister();
+                return;
+              }
               this.retryCount = 0;
               const filteredChangedFiles =
                 data?.changedFiles?.filter(

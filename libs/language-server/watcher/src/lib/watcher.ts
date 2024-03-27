@@ -7,6 +7,8 @@ import { platform } from 'os';
 import { gte } from 'semver';
 import { DaemonWatcher } from './daemon-watcher';
 
+let _daemonWatcher: DaemonWatcher | undefined;
+
 export async function languageServerWatcher(
   workspacePath: string,
   callback: () => unknown
@@ -15,7 +17,13 @@ export async function languageServerWatcher(
   const debouncedCallback = debounce(callback, 1000);
 
   if (gte(version.full, '16.4.0')) {
+    if (_daemonWatcher) {
+      _daemonWatcher.stop();
+      _daemonWatcher = undefined;
+    }
     const daemonWatcher = new DaemonWatcher(workspacePath, debouncedCallback);
+    _daemonWatcher = daemonWatcher;
+
     await daemonWatcher.start();
     return () => {
       lspLogger.log('Unregistering file watcher');
