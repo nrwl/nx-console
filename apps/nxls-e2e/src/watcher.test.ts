@@ -51,6 +51,7 @@ describe('watcher', () => {
   });
 
   it('should detect daemon shutdown and restart watcher automatically', async () => {
+    console.log('DAEMON TEST +++++++++++++++');
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
       windowsHide: true,
@@ -61,6 +62,7 @@ describe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
+    console.log('DAEMON TEST END +++++++++++++++');
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
