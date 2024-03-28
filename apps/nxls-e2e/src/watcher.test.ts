@@ -24,12 +24,17 @@ const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
 console.log('SOMETHING IS HAPPENING');
 process.env['NX_DAEMON'] = 'true';
+jest.setTimeout(3 * 60 * 1000);
 
 describe('watcher', () => {
   beforeAll(async () => {
-    newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
+    newWorkspace({
+      name: workspaceName,
+      options: simpleReactWorkspaceOptions,
+      verbose: true,
+    });
 
-    nxlsWrapper = new NxlsWrapper();
+    nxlsWrapper = new NxlsWrapper(true);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
