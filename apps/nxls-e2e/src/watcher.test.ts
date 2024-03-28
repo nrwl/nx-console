@@ -21,13 +21,14 @@ const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
 const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
 const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
+console.log('SOMETHING IS HAPPENING');
 process.env['NX_DAEMON'] = 'true';
 
 describe('watcher', () => {
   beforeAll(async () => {
     newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
-    nxlsWrapper = new NxlsWrapper(false);
+    nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
@@ -54,8 +55,6 @@ describe('watcher', () => {
   });
 
   it('should detect daemon shutdown and restart watcher automatically', async () => {
-    nxlsWrapper.setVerbose(true);
-    console.log('DAEMON TEST +++++++++++++++');
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
       windowsHide: true,
@@ -69,12 +68,9 @@ describe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    console.log('DAEMON TEST END +++++++++++++++');
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
-    console.log('starting next test');
-    nxlsWrapper.setVerbose(false);
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, 'invalid json');
     await nxlsWrapper.waitForNotification(
