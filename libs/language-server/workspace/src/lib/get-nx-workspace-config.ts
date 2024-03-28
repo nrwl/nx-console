@@ -75,6 +75,9 @@ export async function getNxWorkspaceConfig(
           .workspaceConfiguration;
         error = `${e.stack}`;
       }
+    } else {
+      workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
+        .workspaceConfiguration;
     }
     try {
       process.exit = function (code?: number) {
