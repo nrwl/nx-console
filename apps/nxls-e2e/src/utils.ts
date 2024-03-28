@@ -5,7 +5,10 @@ import { join } from 'path';
 
 const defaultVersion = '18.0.4';
 
-export const e2eCwd = join(tmpdir(), 'nxls-e2e');
+export const e2eCwd = join(
+  process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
+  'nxls-e2e'
+);
 export type NewWorkspaceOptions = {
   preset: string;
   bundler?: string;

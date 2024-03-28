@@ -24,7 +24,6 @@ const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
 console.log('SOMETHING IS HAPPENING');
 process.env['NX_DAEMON'] = 'true';
-jest.setTimeout(3 * 60 * 1000);
 
 describe('watcher', () => {
   beforeAll(async () => {
