@@ -31,7 +31,6 @@ export function configureLspClient(
   const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
   const serverOptions: ServerOptions = {
     run: { module: serverModule, transport: TransportKind.ipc },
-
     debug: {
       module: serverModule,
       transport: TransportKind.ipc,
@@ -56,7 +55,7 @@ export function configureLspClient(
 
   client = new LanguageClient(
     'NxConsoleClient',
-    'Nx Console Client',
+    'Nx Language Server',
     serverOptions,
     clientOptions
   );

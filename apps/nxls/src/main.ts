@@ -69,7 +69,7 @@ import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { formatError } from '@nx-console/shared/utils';
-import { dirname, relative } from 'node:path';
+import { dirname, relative, join } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
@@ -88,6 +88,8 @@ import {
 } from 'vscode-languageserver/node';
 import { URI, Utils } from 'vscode-uri';
 import treeKill from 'tree-kill';
+import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
+import { createHash } from 'crypto';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -351,7 +353,7 @@ connection.onShutdown(async () => {
 
 connection.onExit(() => {
   connection.dispose();
-  treeKill(PID ?? process.pid, 0);
+  treeKill(PID ?? process.pid, 'SIGTERM');
 });
 
 connection.onNotification(NxReset, async () => {
@@ -586,7 +588,7 @@ connection.onNotification(
       );
     }
 
-    await reconfigure(WORKING_PATH);
+    await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
   }
 );
 
@@ -604,13 +606,13 @@ connection.onNotification(
       );
     }
 
-    await reconfigure(WORKING_PATH);
+    await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
   }
 );
 
 connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   WORKING_PATH = workspacePath;
-  await reconfigure(WORKING_PATH);
+  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
 async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
@@ -622,7 +624,7 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
     return;
   }
 
-  if (reconfigureAttempts < 5) {
+  if (reconfigureAttempts < 3) {
     reconfigureAttempts++;
     lspLogger.log(
       `reconfiguration failed, trying again in ${
@@ -647,8 +649,15 @@ async function reconfigure(
   resetProjectPathCache();
   resetSourceMapFilesToProjectCache();
   resetInferencePluginsCompletionCache();
+
   const workspace = await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
+
+  unregisterFileWatcher();
+
+  unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
+    reconfigureAndSendNotificationWithBackoff(workingPath);
+  });
 
   return workspace;
 }
@@ -657,4 +666,5 @@ function getJsonDocument(document: TextDocument) {
   return jsonDocumentMapper.retrieve(document);
 }
 
+ensureOnlyJsonRpcStdout();
 connection.listen();

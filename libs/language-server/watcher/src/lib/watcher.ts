@@ -1,31 +1,15 @@
 import { lspLogger } from '@nx-console/language-server/utils';
-import * as watcher from '@parcel/watcher';
-import { platform } from 'os';
-import { getIgnoredGlobs } from 'nx/src/utils/ignore';
 import { getNxVersion } from '@nx-console/language-server/workspace';
-import { gte } from 'semver';
-import type { WatchEvent } from 'nx/src/native';
 import { debounce } from '@nx-console/shared/utils';
-import { match as minimatch } from 'minimatch';
-import { join, normalize } from 'path';
+import * as watcher from '@parcel/watcher';
+import { getIgnoredGlobs } from 'nx/src/utils/ignore';
+import { platform } from 'os';
+import { gte } from 'semver';
+import { DaemonWatcher } from './daemon-watcher';
+import { NativeWatcher } from './native-watcher';
 
-const NX_PLUGIN_PATTERNS_TO_WATCH = [
-  '**/cypress.config.{js,ts,mjs,cjs}',
-  '**/{detox.config,.detoxrc}.{json,js}',
-  '**/app.{json,config.js}',
-  '**/jest.config.{cjs,mjs,js,cts,mts,ts}',
-  '**/next.config.{js,cjs,mjs}',
-  '**/nuxt.config.{js,ts,mjs,mts,cjs,cts}',
-  '**/playwright.config.{js,ts,cjs,cts,mjs,mts}',
-  '**/remix.config.{js,cjs,mjs}',
-  '**/.storybook/main.{js,ts,mjs,mts,cjs,cts}',
-  '**/{vite,vitest}.config.{js,ts,mjs,mts,cjs,cts}',
-  '**/webpack.config.{js,ts,mjs,cjs}',
-  '**/jest.preset.js',
-  '**/tsconfig.*.json',
-  // nx-dotnet
-  '*{.csproj,fsproj,vbproj}',
-];
+let _daemonWatcher: DaemonWatcher | undefined;
+let _nativeWatcher: NativeWatcher | undefined;
 
 export async function languageServerWatcher(
   workspacePath: string,
@@ -35,36 +19,31 @@ export async function languageServerWatcher(
   const debouncedCallback = debounce(callback, 1000);
 
   if (gte(version.full, '16.4.0')) {
-    const native = await import('nx/src/native');
-    const watcher = new native.Watcher(workspacePath);
-
-    watcher.watch((err: string | null, events: WatchEvent[]) => {
-      if (err) {
-        lspLogger.log('Error watching files: ' + err);
-      } else if (
-        events
-          .map((e) => normalize(e.path))
-          .some(
-            (path) =>
-              path.endsWith('project.json') ||
-              path.endsWith('package.json') ||
-              path.endsWith('nx.json') ||
-              path.endsWith('workspace.json') ||
-              path.endsWith('tsconfig.base.json') ||
-              NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
-                minimatch([path], pattern, { dot: true })
-              )
-          )
-      ) {
-        lspLogger.log('Project configuration changed');
-        debouncedCallback();
+    if (process.platform === 'win32') {
+      if (_nativeWatcher) {
+        _nativeWatcher.stop();
+        _nativeWatcher = undefined;
       }
-    });
+      const nativeWatcher = new NativeWatcher(workspacePath, debouncedCallback);
+      _nativeWatcher = nativeWatcher;
+      return () => {
+        lspLogger.log('Unregistering file watcher');
+        nativeWatcher.stop();
+      };
+    } else {
+      if (_daemonWatcher) {
+        _daemonWatcher.stop();
+        _daemonWatcher = undefined;
+      }
+      const daemonWatcher = new DaemonWatcher(workspacePath, debouncedCallback);
+      _daemonWatcher = daemonWatcher;
 
-    return () => {
-      lspLogger.log('Unregistering file watcher');
-      watcher.stop();
-    };
+      await daemonWatcher.start();
+      return () => {
+        lspLogger.log('Unregistering file watcher');
+        daemonWatcher.stop();
+      };
+    }
   } else {
     const subscription = await watcher.subscribe(
       workspacePath,

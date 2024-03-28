@@ -1,15 +1,6 @@
-import { NxWorkspaceRequest } from '@nx-console/language-server/types';
-import { join } from 'path';
-import { NxlsWrapper } from '../nxls-wrapper';
-import {
-  e2eCwd,
-  modifyJsonFile,
-  newWorkspace,
-  simpleReactWorkspaceOptions,
-  uniq,
-} from '../utils';
-import { URI } from 'vscode-uri';
+import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
+import { join } from 'path';
 import {
   ArrayLiteralExpression,
   ObjectLiteralExpression,
@@ -19,9 +10,15 @@ import {
   isStringLiteral,
   parseJsonText,
 } from 'typescript';
-import { text } from 'stream/consumers';
-import { version } from 'os';
-import { execSync } from 'child_process';
+import { URI } from 'vscode-uri';
+import { NxlsWrapper } from '../nxls-wrapper';
+import {
+  e2eCwd,
+  modifyJsonFile,
+  newWorkspace,
+  simpleReactWorkspaceOptions,
+  uniq,
+} from '../utils';
 
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
