@@ -27,7 +27,7 @@ describe('watcher', () => {
   beforeAll(async () => {
     newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
-    nxlsWrapper = new NxlsWrapper();
+    nxlsWrapper = new NxlsWrapper(false);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
@@ -54,6 +54,7 @@ describe('watcher', () => {
   });
 
   it('should detect daemon shutdown and restart watcher automatically', async () => {
+    nxlsWrapper.setVerbose(true);
     console.log('DAEMON TEST +++++++++++++++');
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
@@ -72,6 +73,8 @@ describe('watcher', () => {
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
+    console.log('starting next test');
+    nxlsWrapper.setVerbose(false);
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, 'invalid json');
     await nxlsWrapper.waitForNotification(

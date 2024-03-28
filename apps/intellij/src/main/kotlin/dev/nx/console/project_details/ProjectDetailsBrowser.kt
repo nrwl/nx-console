@@ -74,6 +74,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
             loadHtml()
             return
         }
+        if (project.isDisposed) return
         coroutineScope.launch {
             try {
                 val isShowingPDV =
