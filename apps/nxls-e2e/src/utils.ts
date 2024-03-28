@@ -84,3 +84,7 @@ export function modifyJsonFile(filePath: string, callback: (data: any) => any) {
 export async function waitFor(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export function isWindows() {
+  return process.platform === 'win32';
+}

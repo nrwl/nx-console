@@ -6,8 +6,10 @@ import { getIgnoredGlobs } from 'nx/src/utils/ignore';
 import { platform } from 'os';
 import { gte } from 'semver';
 import { DaemonWatcher } from './daemon-watcher';
+import { NativeWatcher } from './native-watcher';
 
 let _daemonWatcher: DaemonWatcher | undefined;
+let _nativeWatcher: NativeWatcher | undefined;
 
 export async function languageServerWatcher(
   workspacePath: string,
@@ -17,18 +19,31 @@ export async function languageServerWatcher(
   const debouncedCallback = debounce(callback, 1000);
 
   if (gte(version.full, '16.4.0')) {
-    if (_daemonWatcher) {
-      _daemonWatcher.stop();
-      _daemonWatcher = undefined;
-    }
-    const daemonWatcher = new DaemonWatcher(workspacePath, debouncedCallback);
-    _daemonWatcher = daemonWatcher;
+    if (process.platform === 'win32') {
+      if (_nativeWatcher) {
+        _nativeWatcher.stop();
+        _nativeWatcher = undefined;
+      }
+      const nativeWatcher = new NativeWatcher(workspacePath, debouncedCallback);
+      _nativeWatcher = nativeWatcher;
+      return () => {
+        lspLogger.log('Unregistering file watcher');
+        nativeWatcher.stop();
+      };
+    } else {
+      if (_daemonWatcher) {
+        _daemonWatcher.stop();
+        _daemonWatcher = undefined;
+      }
+      const daemonWatcher = new DaemonWatcher(workspacePath, debouncedCallback);
+      _daemonWatcher = daemonWatcher;
 
-    await daemonWatcher.start();
-    return () => {
-      lspLogger.log('Unregistering file watcher');
-      daemonWatcher.stop();
-    };
+      await daemonWatcher.start();
+      return () => {
+        lspLogger.log('Unregistering file watcher');
+        daemonWatcher.stop();
+      };
+    }
   } else {
     const subscription = await watcher.subscribe(
       workspacePath,

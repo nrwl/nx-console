@@ -8,6 +8,7 @@ import { join } from 'path';
 import { NxlsWrapper } from './nxls-wrapper';
 import {
   e2eCwd,
+  isWindows,
   modifyJsonFile,
   newWorkspace,
   simpleReactWorkspaceOptions,
@@ -24,14 +25,14 @@ const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 console.log('SOMETHING IS HAPPENING');
 process.env['NX_DAEMON'] = 'true';
 
+beforeAll(async () => {
+  newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
+
+  nxlsWrapper = new NxlsWrapper();
+  return await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+});
+
 describe('watcher', () => {
-  beforeAll(async () => {
-    newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
-
-    nxlsWrapper = new NxlsWrapper();
-    return await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
-  });
-
   it('should send refresh notification when project files are changed', async () => {
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
@@ -54,7 +55,7 @@ describe('watcher', () => {
     );
   });
 
-  it('should detect daemon shutdown and restart watcher automatically', async () => {
+  it('should still get refresh notifications when daemon is stopped for some reason', async () => {
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
       windowsHide: true,
@@ -133,11 +134,11 @@ describe('watcher', () => {
       NxWorkspaceRefreshNotification.method
     );
   });
+});
 
-  afterAll(async () => {
-    console.log('RUNNING AFTERALL HOOK, STOPPING');
-    return await nxlsWrapper.stopNxls();
-  });
+afterAll(async () => {
+  console.log('RUNNING AFTERALL HOOK, STOPPING');
+  return await nxlsWrapper.stopNxls();
 });
 
 function addRandomTargetToFile(path: string) {
