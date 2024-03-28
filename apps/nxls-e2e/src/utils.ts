@@ -80,3 +80,7 @@ export function modifyJsonFile(filePath: string, callback: (data: any) => any) {
   jsonData = callback(jsonData);
   writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
 }
+
+export async function waitFor(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

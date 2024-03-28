@@ -12,6 +12,7 @@ import {
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
+  waitFor,
 } from './utils';
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
@@ -60,6 +61,9 @@ describe('watcher', () => {
       env: process.env,
     });
 
+    // give nxls a second to restart
+    await waitFor(1000);
+
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
@@ -83,13 +87,9 @@ describe('watcher', () => {
       NxWorkspaceRefreshNotification.method
     );
 
-    await new Promise<void>((resolve) =>
-      setTimeout(() => {
-        // we need to wait until the daemon watcher ultimately fails
-        // and the native watcher is started
-        resolve();
-      }, 7000)
-    );
+    // we need to wait until the daemon watcher ultimately fails
+    // and the native watcher is started
+    await waitFor(7000);
     writeFileSync(projectJsonPath, oldContents);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
@@ -111,9 +111,7 @@ describe('watcher', () => {
         throw new Error('Should not have received refresh notification');
       });
 
-    await new Promise((resolve) => {
-      setTimeout(resolve, 10000);
-    });
+    await waitFor(10000);
   });
 
   it('should send refresh notification after generating a new project and changing one of its files', async () => {
