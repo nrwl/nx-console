@@ -74,7 +74,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         executeWhenLoadedJobs.forEach { it.cancel("Loading browser html, cancelling old jobs.") }
         executeWhenLoadedJobs.clear()
         if (browser.isDisposed) return
-        val oldQuerMessenger = queryMessenger
+        val oldQueryMessenger = queryMessenger
         queryMessenger = createGraphRequestMessenger()
 
         var modifiedHtml = html
@@ -103,7 +103,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         } else {
             browser.loadHTML(modifiedHtml)
         }
-        Disposer.dispose(oldQuerMessenger)
+        Disposer.dispose(oldQueryMessenger)
     }
 
     protected fun loadGraphHtmlBase(): String {
@@ -175,7 +175,6 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 const pendingRequests = new Map();
 
                 window.intellij.handleResponse = ({ type, id, payload }) => {
-                  console.log('handling response', type, id, payload)
                   if (type.startsWith('request') && id && pendingRequests.has(id)) {
                     const payloadParsed = JSON.parse(payload);
                     const resolve = pendingRequests.get(id);
