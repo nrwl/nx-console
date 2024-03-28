@@ -28,7 +28,7 @@ jest.setTimeout(3 * 60 * 1000);
 
 describe('watcher', () => {
   beforeAll(async () => {
-    console.log('RUNNING BEFOREALL HOOK');
+    console.log(`RUNNING BEFOREALL HOOK at ${new Date().toISOString()}`);
     newWorkspace({
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
@@ -40,7 +40,9 @@ describe('watcher', () => {
   });
 
   afterAll(async () => {
-    console.log('RUNNING AFTERALL HOOK, STOPPING');
+    console.log(
+      `RUNNING AFTERALL HOOK, STOPPING at ${new Date().toISOString()}`
+    );
     await nxlsWrapper.stopNxls();
   });
 
