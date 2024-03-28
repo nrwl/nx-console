@@ -29,7 +29,7 @@ describe('watcher', () => {
     newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
     nxlsWrapper = new NxlsWrapper();
-    await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+    return await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
   it('should send refresh notification when project files are changed', async () => {
