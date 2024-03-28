@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "test": {
-      "command": "jest --runInBand --detectOpenHandles",
+      "command": "jest --detectOpenHandles",
       "dependsOn": [
         {
           "projects": "nxls",

@@ -135,6 +135,7 @@ describe('watcher', () => {
   });
 
   afterAll(async () => {
+    console.log('RUNNING AFTERALL HOOK, STOPPING');
     return await nxlsWrapper.stopNxls();
   });
 });
