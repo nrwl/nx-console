@@ -28,6 +28,7 @@ jest.setTimeout(3 * 60 * 1000);
 
 describe('watcher', () => {
   beforeAll(async () => {
+    console.log('RUNNING BEFOREALL HOOK');
     newWorkspace({
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
@@ -38,9 +39,9 @@ describe('watcher', () => {
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     console.log('RUNNING AFTERALL HOOK, STOPPING');
-    nxlsWrapper.stopNxls();
+    await nxlsWrapper.stopNxls();
   });
 
   it('should send refresh notification when project files are changed', async () => {
