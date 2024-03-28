@@ -51,6 +51,16 @@ export class NxHelpAndFeedbackProvider extends AbstractTreeProvider<NxHelpAndFee
           'https://github.com/nrwl/nx-console/issues/new?labels=type%3A+feature&template=2-feature.md',
           new ThemeIcon('lightbulb'),
         ],
+        [
+          'Nx Console Troubleshooting Guide',
+          'https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole',
+          new ThemeIcon('tools'),
+        ],
+        [
+          'Nx Troubleshooting Guide',
+          'https://nx.dev/recipes/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole',
+          new ThemeIcon('tools'),
+        ],
       ] as const
     ).map(
       ([title, link, icon]) => new NxHelpAndFeedbackTreeItem(title, link, icon)
