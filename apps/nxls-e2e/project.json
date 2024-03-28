@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "test": {
-      "command": "jest --detectOpenHandles",
+      "command": "jest --detectOpenHandles --maxWorkers=1",
       "dependsOn": [
         {
           "projects": "nxls",
