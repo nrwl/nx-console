@@ -649,15 +649,14 @@ async function reconfigure(
   resetProjectPathCache();
   resetSourceMapFilesToProjectCache();
   resetInferencePluginsCompletionCache();
-  if (unregisterFileWatcher) {
-    unregisterFileWatcher();
-  }
 
   const workspace = await nxWorkspace(workingPath, lspLogger, true);
   await configureSchemas(workingPath, workspaceContext, CLIENT_CAPABILITIES);
 
+  unregisterFileWatcher();
+
   unregisterFileWatcher = await languageServerWatcher(workingPath, async () => {
-    await reconfigureAndSendNotificationWithBackoff(workingPath);
+    reconfigureAndSendNotificationWithBackoff(workingPath);
   });
 
   return workspace;
