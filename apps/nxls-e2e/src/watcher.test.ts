@@ -62,8 +62,8 @@ describe('watcher', () => {
       env: process.env,
     });
 
-    // give nxls a second to restart
-    await waitFor(1000);
+    // give nxls a second to restart the daemon
+    await waitFor(3000);
 
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
