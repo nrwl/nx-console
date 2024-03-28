@@ -100,7 +100,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
             if (browser.isDisposed) return@executeWhenLoaded
             withContext(Dispatchers.EDT) {
                 browser.executeJavaScript(
-                    "window.waitForRouter().then(() => {console.log('waited for router', window.externalApi, '$nxProjectName'); window.externalApi.openProjectDetails('$nxProjectName')})"
+                    "window.waitForRouter?.().then(() => {console.log('waited for router', window.externalApi, '$nxProjectName'); window.externalApi.openProjectDetails('$nxProjectName')})"
                 )
             }
         }
