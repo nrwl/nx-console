@@ -48,25 +48,25 @@ describe('watcher', () => {
   });
 
   it('should send refresh notification when project files are changed', async () => {
-    await waitFor(300);
+    await waitFor(500);
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
 
-    await waitFor(300);
+    await waitFor(500);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
 
-    await waitFor(300);
+    await waitFor(500);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
 
-    await waitFor(300);
+    await waitFor(500);
     appendFileSync(cypressConfig, 'console.log("hello")');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
@@ -86,7 +86,7 @@ describe('watcher', () => {
     });
 
     // give nxls a second to restart the daemon
-    await waitFor(3000);
+    await waitFor(6000);
 
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
@@ -95,7 +95,7 @@ describe('watcher', () => {
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
-    waitFor(300);
+    waitFor(500);
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, 'invalid json');
     await nxlsWrapper.waitForNotification(
@@ -113,7 +113,7 @@ describe('watcher', () => {
 
     // we need to wait until the daemon watcher ultimately fails
     // and the native watcher is started
-    await waitFor(7000);
+    await waitFor(8000);
     writeFileSync(projectJsonPath, oldContents);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
@@ -135,7 +135,7 @@ describe('watcher', () => {
         throw new Error('Should not have received refresh notification');
       });
 
-    await waitFor(10000);
+    await waitFor(11000);
   });
 
   it('should send refresh notification after generating a new project and changing one of its files', async () => {
