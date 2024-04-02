@@ -48,25 +48,25 @@ describe('watcher', () => {
   });
 
   it('should send refresh notification when project files are changed', async () => {
-    await waitFor(200);
+    await waitFor(300);
     addRandomTargetToFile(projectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
 
-    await waitFor(200);
+    await waitFor(300);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
 
-    await waitFor(200);
+    await waitFor(300);
     addRandomTargetToFile(e2eProjectJsonPath);
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
 
-    await waitFor(200);
+    await waitFor(300);
     appendFileSync(cypressConfig, 'console.log("hello")');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
@@ -95,7 +95,7 @@ describe('watcher', () => {
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
-    waitFor(200);
+    waitFor(300);
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, 'invalid json');
     await nxlsWrapper.waitForNotification(

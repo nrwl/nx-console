@@ -54,7 +54,11 @@ export class NativeWatcher {
               )
           )
       ) {
-        lspLogger.log('native watcher detected project changes');
+        lspLogger.log(
+          `native watcher detected project changes in files ${events
+            .map((e) => e.path)
+            .join(', ')}`
+        );
         this.callback();
       }
     });
