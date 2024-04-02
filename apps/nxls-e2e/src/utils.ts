@@ -62,7 +62,7 @@ export function newWorkspace({
 
   const create = execSync(command, {
     cwd: e2eCwd,
-    stdio: 'pipe',
+    stdio: 'inherit',
     env: {
       //   CI: 'true',
       // NX_VERBOSE_LOGGING: isCI ? 'true' : 'false',
@@ -70,6 +70,14 @@ export function newWorkspace({
     },
     encoding: 'utf-8',
   });
+
+  if (verbose) {
+    console.log(
+      'created workspace with result',
+      create,
+      `at ${new Date().toISOString()}`
+    );
+  }
 
   return create;
 }
