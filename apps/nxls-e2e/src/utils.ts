@@ -57,14 +57,16 @@ export function newWorkspace({
   command += `--nxCloud=skip --pm=${packageManager} --no-interactive`;
 
   if (verbose) {
-    console.log(`setting up new workspace ${name} with ${command}`);
+    console.log(
+      `setting up new workspace ${name} with ${command} at ${new Date().toISOString()}`
+    );
   }
 
   const create = execSync(command, {
     cwd: e2eCwd,
     stdio: 'inherit',
     env: {
-      //   CI: 'true',
+      CI: 'true',
       // NX_VERBOSE_LOGGING: isCI ? 'true' : 'false',
       ...process.env,
     },
