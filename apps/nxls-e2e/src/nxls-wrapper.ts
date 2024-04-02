@@ -129,7 +129,11 @@ export class NxlsWrapper {
         ...request,
       } as Message;
       if (this.verbose) {
-        console.log('sending request', JSON.stringify(fullRequest, null, 2));
+        console.log(
+          'sending request',
+          JSON.stringify(fullRequest, null, 2),
+          `at ${new Date().toISOString()}`
+        );
       }
       this.messageWriter?.write(fullRequest);
     });
