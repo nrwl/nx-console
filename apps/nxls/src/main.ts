@@ -126,6 +126,7 @@ documents.listen(connection);
 
 connection.onInitialize(async (params) => {
   setLspLogger(connection);
+  lspLogger.log('Initializing Nx Language Server');
 
   PID = params.processId;
 
@@ -140,10 +141,13 @@ connection.onInitialize(async (params) => {
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
     }
+    lspLogger.log(`got working path ${WORKING_PATH}`);
 
     CLIENT_CAPABILITIES = params.capabilities;
 
     await configureSchemas(WORKING_PATH, workspaceContext, CLIENT_CAPABILITIES);
+    lspLogger.log(`configured schemas`);
+
     unregisterFileWatcher = await languageServerWatcher(
       WORKING_PATH,
       async () => {
@@ -153,6 +157,7 @@ connection.onInitialize(async (params) => {
         await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
       }
     );
+    lspLogger.log(`configured file watcher`);
   } catch (e) {
     lspLogger.log('Unable to get Nx info: ' + e.toString());
   }
