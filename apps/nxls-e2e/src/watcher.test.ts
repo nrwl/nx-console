@@ -36,7 +36,7 @@ describe('watcher', () => {
       verbose: true,
     });
 
-    nxlsWrapper = new NxlsWrapper(true);
+    nxlsWrapper = new NxlsWrapper(false);
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
@@ -111,6 +111,8 @@ describe('watcher', () => {
   });
 
   it('should not send refresh notification when project files are not changed', async () => {
+    console.log('in not send notification test');
+    nxlsWrapper.setVerbose(true);
     const workspace = await nxlsWrapper.sendRequest({
       ...NxWorkspaceRequest,
       params: {
@@ -129,6 +131,7 @@ describe('watcher', () => {
   });
 
   it('should send refresh notification after generating a new project and changing one of its files', async () => {
+    nxlsWrapper.setVerbose(false);
     await new Promise<void>((resolve) => {
       nxlsWrapper
         .waitForNotification(NxWorkspaceRefreshNotification.method)
