@@ -23,12 +23,14 @@ const NX_PLUGIN_PATTERNS_TO_WATCH = [
 
 export class NativeWatcher {
   private watcher: Watcher | undefined;
+  private stopped = false;
 
   constructor(private workspacePath: string, private callback: () => unknown) {
     this.initWatcher();
   }
 
   stop() {
+    this.stopped = true;
     this.watcher?.stop();
   }
 
@@ -44,23 +46,39 @@ export class NativeWatcher {
           .map((e) => normalize(e.path))
           .some(
             (path) =>
-              path.endsWith('project.json') ||
-              path.endsWith('package.json') ||
-              path.endsWith('nx.json') ||
-              path.endsWith('workspace.json') ||
-              path.endsWith('tsconfig.base.json') ||
-              NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
-                minimatch([path], pattern, { dot: true })
-              )
+              (path.endsWith('project.json') ||
+                path.endsWith('package.json') ||
+                path.endsWith('nx.json') ||
+                path.endsWith('workspace.json') ||
+                path.endsWith('tsconfig.base.json') ||
+                NX_PLUGIN_PATTERNS_TO_WATCH.some((pattern) =>
+                  minimatch([path], pattern, { dot: true })
+                ) ||
+                NativeWatcher.openDocuments.has(path)) &&
+              !path.startsWith('node_modules') &&
+              !path.startsWith(normalize('.nx/cache')) &&
+              !path.startsWith(normalize('.yarn/cache'))
           )
       ) {
+        if (this.stopped) {
+          this.watcher?.stop();
+          return;
+        }
         lspLogger.log(
           `native watcher detected project changes in files ${events
-            .map((e) => e.path)
+            .map((e) => normalize(e.path))
             .join(', ')}`
         );
         this.callback();
       }
     });
+  }
+
+  private static openDocuments: Set<string> = new Set();
+  static onOpenDocument(uri: string) {
+    this.openDocuments.add(normalize(uri));
+  }
+  static onCloseDocument(uri: string) {
+    this.openDocuments.delete(normalize(uri));
   }
 }

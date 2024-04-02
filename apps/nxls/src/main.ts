@@ -41,7 +41,10 @@ import {
   nxReset,
   setLspLogger,
 } from '@nx-console/language-server/utils';
-import { languageServerWatcher } from '@nx-console/language-server/watcher';
+import {
+  languageServerWatcher,
+  NativeWatcher,
+} from '@nx-console/language-server/watcher';
 import {
   createProjectGraph,
   getGeneratorContextFromPath,
@@ -315,10 +318,12 @@ connection.onDocumentLinks(async (params) => {
 const jsonDocumentMapper = getLanguageModelCache();
 
 documents.onDidClose((e) => {
+  NativeWatcher.onCloseDocument(e.document.uri);
   jsonDocumentMapper.onDocumentRemoved(e.document);
 });
 
 documents.onDidOpen(async (e) => {
+  NativeWatcher.onOpenDocument(e.document.uri);
   if (!e.document.uri.endsWith('project.json')) {
     return;
   }
