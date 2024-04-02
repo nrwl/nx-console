@@ -75,3 +75,4 @@ jobs:
           cache: gradle
       # there's no need to check formatting & linting again on windows
       - run: npx nx affected --t=test,build,e2e --configuration=ci
+        timeout-minutes: 45
