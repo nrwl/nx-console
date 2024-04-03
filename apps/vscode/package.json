@@ -64,9 +64,6 @@
     "@nx/nx-win32-arm64-msvc": "17.1.0-beta.4",
     "@nx/nx-win32-x64-msvc": "17.1.0-beta.4"
   },
-  "extensionKind": [
-    "workspace"
-  ],
   "contributes": {
     "typescriptServerPlugins": [
       {

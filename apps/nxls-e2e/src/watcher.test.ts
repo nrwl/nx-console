@@ -22,28 +22,22 @@ const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
 const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
 const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
-console.log(`SOMETHING IS HAPPENING at ${new Date().toISOString()}`);
 if (!isWindows()) {
   process.env['NX_DAEMON'] = 'true';
 }
 
 describe('watcher', () => {
   beforeAll(async () => {
-    console.log(`RUNNING BEFOREALL HOOK at ${new Date().toISOString()}`);
     newWorkspace({
       name: workspaceName,
       options: simpleReactWorkspaceOptions,
-      verbose: true,
     });
 
-    nxlsWrapper = new NxlsWrapper(true);
+    nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
 
   afterAll(async () => {
-    console.log(
-      `RUNNING AFTERALL HOOK, STOPPING at ${new Date().toISOString()}`
-    );
     await nxlsWrapper.stopNxls();
   });
 
