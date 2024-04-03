@@ -20,6 +20,7 @@ jobs:
         with:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
+        if: ${{ github.event_name == 'pull_request' }}
       - run: |
           npx nx-cloud start-ci-run \
             --distribute-on="3 linux-medium-js" \
@@ -54,6 +55,7 @@ jobs:
         with:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
+        if: ${{ github.event_name == 'pull_request' }}
       # - run: |
       #     npx nx-cloud start-ci-run \
       #       --distribute-on="3 custom-linux-medium-js" \
