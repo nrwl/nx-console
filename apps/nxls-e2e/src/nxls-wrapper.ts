@@ -23,8 +23,16 @@ export class NxlsWrapper {
     number,
     (message: ResponseMessage) => void
   >();
+  private pendingNotificationMap = new Map<
+    string,
+    (params: object | any[] | undefined) => void
+  >();
 
-  constructor(private verbose = false) {}
+  constructor(private verbose?: boolean) {
+    if (verbose === undefined) {
+      this.verbose = !!process.env['CI'];
+    }
+  }
 
   private idCounter = 1;
 
@@ -121,7 +129,11 @@ export class NxlsWrapper {
         ...request,
       } as Message;
       if (this.verbose) {
-        console.log('sending request', JSON.stringify(fullRequest, null, 2));
+        console.log(
+          'sending request',
+          JSON.stringify(fullRequest, null, 2),
+          `at ${new Date().toISOString()}`
+        );
       }
       this.messageWriter?.write(fullRequest);
     });
@@ -138,6 +150,18 @@ export class NxlsWrapper {
       jsonrpc: '2.0',
       ...notification,
     } as Message);
+  }
+
+  async waitForNotification(
+    method: string
+  ): Promise<object | any[] | undefined> {
+    return await new Promise<any>((resolve) => {
+      this.pendingNotificationMap.set(method, resolve);
+    });
+  }
+
+  setVerbose(verbose: boolean) {
+    this.verbose = verbose;
   }
 
   private listenToLSPMessages(messageReader: StreamMessageReader) {
@@ -160,6 +184,12 @@ export class NxlsWrapper {
         if (resolve) {
           resolve(message);
           this.pendingRequestMap.delete(message.id);
+        }
+      } else if (isNotificationMessage(message)) {
+        const method = message.method;
+        const resolve = this.pendingNotificationMap.get(method);
+        if (resolve) {
+          resolve(message.params);
         }
       }
     });

@@ -16,7 +16,7 @@ describe('nx/workspace', () => {
   beforeAll(async () => {
     newWorkspace({ name: workspaceName, options: simpleReactWorkspaceOptions });
 
-    nxlsWrapper = new NxlsWrapper(true);
+    nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
   });
   it('should return projects for simple workspace', async () => {
