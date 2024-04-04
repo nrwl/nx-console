@@ -4,6 +4,7 @@ import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   AbstractTreeProvider,
   getShellExecutionForConfig,
+  logAndShowTaskCreationError,
 } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext, Task, tasks, TaskScope } from 'vscode';
 import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
@@ -79,17 +80,22 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     const { workspacePath, isEncapsulatedNx } = await getNxWorkspace();
     const pkgManager = detectPackageManager(workspacePath);
 
-    const task = new Task(
-      { type: 'nx' },
-      TaskScope.Workspace,
-      prefixedCommand,
-      pkgManager,
-      getShellExecutionForConfig({
-        cwd: workspacePath,
-        displayCommand: prefixedCommand,
-        encapsulatedNx: isEncapsulatedNx,
-      })
-    );
-    tasks.executeTask(task);
+    try {
+      const task = new Task(
+        { type: 'nx' },
+        TaskScope.Workspace,
+        prefixedCommand,
+        pkgManager,
+        getShellExecutionForConfig({
+          cwd: workspacePath,
+          displayCommand: prefixedCommand,
+          encapsulatedNx: isEncapsulatedNx,
+        })
+      );
+      tasks.executeTask(task);
+    } catch (e) {
+      logAndShowTaskCreationError(e);
+      return;
+    }
   }
 }

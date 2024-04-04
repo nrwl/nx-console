@@ -3,10 +3,14 @@ import {
   getNxWorkspace,
   getNxWorkspacePath,
 } from '@nx-console/vscode/nx-workspace';
-import { Task, TaskExecution, TaskProvider, tasks } from 'vscode';
+import { Task, TaskExecution, TaskProvider, tasks, window } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
+import {
+  getOutputChannel,
+  logAndShowTaskCreationError,
+} from '@nx-console/vscode/utils';
 
 export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;
@@ -81,19 +85,24 @@ export class CliTaskProvider implements TaskProvider {
     const positionals = definition.positional.match(
       WORKSPACE_GENERATOR_NAME_REGEX
     );
-    if (
-      definition.command === 'generate' &&
-      positionals &&
-      positionals.length > 2
-    ) {
-      task = await NxTask.create({
-        command: `workspace-${positionals[1]}`,
-        positional: positionals[2],
-        flags: definition.flags,
-        cwd: definition.cwd,
-      });
-    } else {
-      task = await CliTask.create(definition);
+    try {
+      if (
+        definition.command === 'generate' &&
+        positionals &&
+        positionals.length > 2
+      ) {
+        task = await NxTask.create({
+          command: `workspace-${positionals[1]}`,
+          positional: positionals[2],
+          flags: definition.flags,
+          cwd: definition.cwd,
+        });
+      } else {
+        task = await CliTask.create(definition);
+      }
+    } catch (e) {
+      logAndShowTaskCreationError(e);
+      return;
     }
 
     return tasks.executeTask(task).then((execution) => {
