@@ -5,7 +5,7 @@
   "projectType": "application",
   "prefix": "vscode",
   "generators": {},
-  "implicitDependencies": ["generate-ui", "generate-ui-v2", "nxls"],
+  "implicitDependencies": ["generate-ui-v2", "nxls"],
   "targets": {
     "watch-all": {
       "executor": "nx:run-commands",
@@ -15,11 +15,6 @@
             "command": "yarn nx run vscode:watch",
             "prefix": "vscode",
             "color": "blue"
-          },
-          {
-            "command": "yarn nx run generate-ui:watch",
-            "prefix": "generate-ui",
-            "color": "green"
           },
           {
             "command": "yarn nx run nxls:watch",

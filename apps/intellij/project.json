@@ -36,5 +36,5 @@
     }
   },
   "tags": ["type:intellij"],
-  "implicitDependencies": ["generate-ui", "nxls"]
+  "implicitDependencies": ["nxls", "generate-ui-v2"]
 }
