@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
-const defaultVersion = '18.0.4';
+export const defaultVersion = '18.0.4';
 
 export const e2eCwd = join(
   process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
@@ -14,6 +14,8 @@ export type NewWorkspaceOptions = {
   bundler?: string;
   e2eTestRunner?: string;
   style?: string;
+  appName?: string;
+  framework?: string;
 };
 
 export const simpleReactWorkspaceOptions: NewWorkspaceOptions = {

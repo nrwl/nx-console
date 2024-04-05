@@ -34,12 +34,12 @@ export class DaemonWatcher {
 
       let projectGraphErrors = false;
       try {
-        await daemonClientModule.daemonClient.getProjectGraphAndSourceMaps();
+        await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
       } catch (e) {
         projectGraphErrors = true;
       }
 
-      if (projectGraphErrors) {
+      if (!daemonClientModule || projectGraphErrors) {
         lspLogger.log(
           'project graph computation error during daemon watcher initialization, using native watcher.'
         );
