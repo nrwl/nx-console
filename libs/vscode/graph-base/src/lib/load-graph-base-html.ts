@@ -1,23 +1,22 @@
+import { workspaceDependencyPath } from '@nx-console/shared/npm';
 import { getNxWorkspacePath } from '@nx-console/vscode/nx-workspace';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { Uri, Webview } from 'vscode';
+import { Uri, Webview, window } from 'vscode';
 
 export async function loadGraphBaseHtml(webview: Webview): Promise<string> {
-  const asWebviewUri = (path: string) =>
-    webview.asWebviewUri(Uri.file(join(graphPath, path))).toString();
   const workspacePath = await getNxWorkspacePath();
-  const graphPath = join(
-    workspacePath,
-    'node_modules',
-    'nx',
-    'src',
-    'core',
-    'graph'
-  );
-  if (!existsSync(graphPath)) {
+  const nxPath = await workspaceDependencyPath(workspacePath, 'nx');
+  if (!nxPath || !existsSync(nxPath)) {
+    window.showErrorMessage(
+      'Error loading the nx graph. Did you run npm/yarn/pnpm install?'
+    );
     return '';
   }
+  const graphPath = join(nxPath, 'src', 'core', 'graph');
+
+  const asWebviewUri = (path: string) =>
+    webview.asWebviewUri(Uri.file(join(graphPath, path))).toString();
 
   let html = readFileSync(join(graphPath, 'index.html'), 'utf-8');
   html = html.replace(/environment.js/g, asWebviewUri('environment.js'));

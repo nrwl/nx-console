@@ -108,11 +108,10 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 
     protected fun loadGraphHtmlBase(): String {
 
+        val nxPackagePath = getNxPackagePath(project, project.nxBasePath)
         val graphBasePath =
             Paths.get(
-                    project.nxBasePath,
-                    "node_modules",
-                    "nx",
+                    nxPackagePath,
                     "src",
                     "core",
                     "graph",

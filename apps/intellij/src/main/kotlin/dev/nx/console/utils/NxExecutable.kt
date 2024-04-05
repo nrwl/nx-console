@@ -59,3 +59,19 @@ class NxExecutable {
         }
     }
 }
+
+fun getNxPackagePath(project: Project, basePath: String): String {
+    val yarnPnpManager = YarnPnpManager.getInstance(project)
+    val virtualBaseFile = VirtualFileManager.getInstance().findFileByNioPath(Paths.get(basePath))
+    if (virtualBaseFile != null && yarnPnpManager.isUnderPnp(virtualBaseFile)) {
+        val packagJsonFile =
+            virtualBaseFile.findChild("package.json")
+                ?: throw ExecutionException(NxConsoleBundle.message("nx.not.found"))
+        val nxPackage =
+            yarnPnpManager.findInstalledPackageDir(packagJsonFile, "nx")
+                ?: throw ExecutionException(NxConsoleBundle.message("nx.not.found"))
+        return nxPackage.path
+    } else {
+        return Paths.get(basePath, "node_modules", "nx").toString()
+    }
+}
