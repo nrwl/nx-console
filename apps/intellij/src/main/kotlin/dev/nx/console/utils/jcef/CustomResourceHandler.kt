@@ -10,24 +10,18 @@ import org.cef.misc.StringRef
 import org.cef.network.CefRequest
 import org.cef.network.CefResponse
 
-const val urlScheme = "http://nxconsole"
-const val resourceFolder = "generate_ui"
-
 const val urlSchemeV2 = "http://nxconsolev2"
 const val resourceFolderV2 = "generate_ui_v2"
 
-class CustomResourceHandler(private val v2: Boolean = false) : CefResourceHandler {
+class CustomResourceHandler() : CefResourceHandler {
     private var state: ResourceHandlerState = ClosedConnection
+
     override fun processRequest(cefRequest: CefRequest?, cefCallback: CefCallback): Boolean {
         val url = cefRequest?.url
         return if (url == null) {
             false
         } else {
-            val pathToResource =
-                url.replace(
-                    if (v2) urlSchemeV2 else urlScheme,
-                    if (v2) resourceFolderV2 else resourceFolder
-                )
+            val pathToResource = url.replace(urlSchemeV2, resourceFolderV2)
             val newUrl = this.javaClass.classLoader.getResource(pathToResource)
             state = OpenedConnection(newUrl.openConnection())
             cefCallback.Continue()

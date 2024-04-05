@@ -2,6 +2,7 @@ package dev.nx.console.generate.ui.file
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.ui.JBColor
@@ -26,7 +27,7 @@ class V2NxGenerateUiFile(
     name: String,
     private val project: Project,
     private val runGeneratorManager: RunGeneratorManager
-) : NxGenerateUiFile(name, true) {
+) : NxGenerateUiFile(name) {
     private val cs = V2NxGenerateUiFileCoroutineHolder.getInstance(project).cs
 
     private var generatorToDisplay: GeneratorSchema? = null
@@ -85,9 +86,8 @@ class V2NxGenerateUiFile(
     }
 
     private fun handleMessageFromBrowser(message: String) {
-        val logger = logger<DefaultNxGenerateUiFile>()
         val messageParsed = json.decodeFromString<GenerateUiOutputMessage>(message)
-        logger.info("received message $messageParsed")
+        thisLogger().info("received message $messageParsed")
         if (messageParsed.payloadType == "output-init") {
             this.generatorToDisplay?.let { schema ->
                 cs.launch {

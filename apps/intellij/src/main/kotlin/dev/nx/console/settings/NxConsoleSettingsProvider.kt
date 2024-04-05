@@ -36,12 +36,6 @@ class NxConsoleSettingsProvider : PersistentStateComponent<NxConsoleSettingsStat
             state.promptedForTelemetry = value
         }
 
-    var useNewGenerateUIPreview: Boolean
-        get() = state.useNewGenerateUIPreview
-        set(value) {
-            state.useNewGenerateUIPreview = value
-        }
-
     var showProjectDetailsView: Boolean
         get() = state.showProjectDetailsView
         set(value) {
