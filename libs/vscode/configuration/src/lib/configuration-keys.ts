@@ -9,7 +9,6 @@ export const GLOBAL_CONFIG_KEYS = [
   'enableTaskExecutionDryRunOnChange',
   'projectViewingStyle',
   'moveGeneratorPatterns',
-  'useNewGenerateUiPreview',
   'showProjectDetailsView',
   'showNodeVersionOnStartup',
 ] as const;
@@ -25,7 +24,6 @@ export type GlobalConfig = {
   enableTaskExecutionDryRunOnChange: boolean;
   projectViewingStyle: 'list' | 'tree' | 'automatic';
   moveGeneratorPatterns: Record<string, string>;
-  useNewGenerateUiPreview: boolean;
   showProjectDetailsView: boolean;
   showNodeVersionOnStartup: boolean;
 };

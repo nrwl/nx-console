@@ -7,7 +7,6 @@ import {
   RelativePattern,
   TreeItem,
   TreeView,
-  Uri,
   commands,
   tasks,
   window,
@@ -37,17 +36,13 @@ import {
   watchCodeLensConfigChange,
   watchFile,
 } from '@nx-console/vscode/utils';
-import { revealWebViewPanel } from '@nx-console/vscode/webview';
 
 import { fileExists } from '@nx-console/shared/file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
-import {
-  initGenerateUiWebview,
-  openGenerateUi,
-} from '@nx-console/vscode/generate-ui-webview';
+import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
 import {
   configureLspClient,
   initRefreshWorkspace,
@@ -214,26 +209,6 @@ async function setWorkspace(workspacePath: string) {
     initTasks(context);
     registerVscodeAddDependency(context);
 
-    const revealWebViewPanelCommand = commands.registerCommand(
-      'nxConsole.revealWebViewPanel',
-      async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        const newGenUi = GlobalConfigurationStore.instance.get(
-          'useNewGenerateUiPreview'
-        );
-        if (newGenUi) {
-          openGenerateUi(contextMenuUri);
-        } else {
-          revealWebViewPanel({
-            runTargetTreeItem,
-            context,
-            runTargetTreeView,
-            contextMenuUri,
-            generator: runTargetTreeItem.generator,
-          });
-        }
-      }
-    );
-
     initGenerateUiWebview(context);
 
     initNxCommandsView(context);
@@ -252,10 +227,7 @@ async function setWorkspace(workspacePath: string) {
 
     new AddDependencyCodelensProvider();
 
-    context.subscriptions.push(
-      nxHelpAndFeedbackTreeView,
-      revealWebViewPanelCommand
-    );
+    context.subscriptions.push(nxHelpAndFeedbackTreeView);
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }

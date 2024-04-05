@@ -1,8 +1,0 @@
-{
-  "name": "vscode-webview",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/webview/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

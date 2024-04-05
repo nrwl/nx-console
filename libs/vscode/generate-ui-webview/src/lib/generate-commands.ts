@@ -18,101 +18,104 @@ import { ExtensionContext, Uri, commands, window } from 'vscode';
 import { openGenerateUi } from './init-generate-ui-webview';
 
 export async function registerGenerateCommands(context: ExtensionContext) {
-  commands.registerCommand(
-    `nx.generate`,
-    async (
-      preselectedGenerator?: string,
-      preselectedFlags?: Record<string, string>
-    ) => {
-      getTelemetry().featureUsed('nx.generate');
-      const result = await selectGeneratorAndPromptForFlags(
-        preselectedGenerator,
-        preselectedFlags
-      );
-      if (!result) {
-        return;
+  context.subscriptions.push(
+    commands.registerCommand(
+      'nxConsole.revealWebViewPanel',
+      async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
+        openGenerateUi(contextMenuUri);
       }
-      const { generator, flags } = result;
-      if (flags !== undefined) {
-        CliTaskProvider.instance.executeTask({
-          positional: `${generator.collectionName}:${generator.generatorName}`,
-          command: 'generate',
-          flags: [...flags, '--no-interactive'],
-        });
+    ),
+    commands.registerCommand(
+      `nx.generate`,
+      async (
+        preselectedGenerator?: string,
+        preselectedFlags?: Record<string, string>
+      ) => {
+        getTelemetry().featureUsed('nx.generate');
+        const result = await selectGeneratorAndPromptForFlags(
+          preselectedGenerator,
+          preselectedFlags
+        );
+        if (!result) {
+          return;
+        }
+        const { generator, flags } = result;
+        if (flags !== undefined) {
+          CliTaskProvider.instance.executeTask({
+            positional: `${generator.collectionName}:${generator.generatorName}`,
+            command: 'generate',
+            flags: [...flags, '--no-interactive'],
+          });
+        }
       }
-    }
-  );
-
-  commands.registerCommand(`nx.generate.ui`, () => {
-    getTelemetry().featureUsed('nx.generate.ui');
-    showGenerateUi(context.extensionPath);
-  });
-
-  commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) => {
-    getTelemetry().featureUsed('nx.generate.fileexplorer');
-    showGenerateUi(context.extensionPath, uri);
-  });
-
-  commands.registerCommand(
-    'nx.generate.ui.projectView',
-    (treeItem: NxTreeItem) => {
-      getTelemetry().featureUsed('nx.generate.fileexplorer.projectView');
-      openGenerateUi(
-        undefined,
-        undefined,
-        (treeItem.item as ProjectViewItem).nxProject.project
-      );
-    }
-  );
-
-  commands.registerCommand(`nx.move`, async (uri?: Uri) => {
-    getTelemetry().featureUsed('nx.move');
-    const generator = await selectReMoveGenerator(uri?.toString(), 'move');
-    if (!generator) {
-      return;
-    }
-
-    openReMoveGenerator(generator, uri, undefined);
-  });
-
-  commands.registerCommand(`nx.remove`, async (uri?: Uri) => {
-    getTelemetry().featureUsed('nx.remove');
-    const generator = await selectReMoveGenerator(uri?.toString(), 'remove');
-    if (!generator) {
-      return;
-    }
-
-    openReMoveGenerator(generator, uri, undefined);
-  });
-
-  commands.registerCommand(
-    `nx.move.projectView`,
-    async (treeItem?: NxTreeItem) => {
-      getTelemetry().featureUsed('nx.move.projectView');
-      const generator = await selectReMoveGenerator(undefined, 'move');
+    ),
+    commands.registerCommand(`nx.generate.ui`, () => {
+      getTelemetry().featureUsed('nx.generate.ui');
+      showGenerateUi(context.extensionPath);
+    }),
+    commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) => {
+      getTelemetry().featureUsed('nx.generate.fileexplorer');
+      showGenerateUi(context.extensionPath, uri);
+    }),
+    commands.registerCommand(
+      'nx.generate.ui.projectView',
+      (treeItem: NxTreeItem) => {
+        getTelemetry().featureUsed('nx.generate.fileexplorer.projectView');
+        openGenerateUi(
+          undefined,
+          undefined,
+          (treeItem.item as ProjectViewItem).nxProject.project
+        );
+      }
+    ),
+    commands.registerCommand(`nx.move`, async (uri?: Uri) => {
+      getTelemetry().featureUsed('nx.move');
+      const generator = await selectReMoveGenerator(uri?.toString(), 'move');
       if (!generator) {
         return;
       }
 
-      const projectName = (treeItem?.item as ProjectViewItem).nxProject.project;
-
-      openReMoveGenerator(generator, undefined, projectName);
-    }
-  );
-
-  commands.registerCommand(
-    `nx.remove.projectView`,
-    async (treeItem?: NxTreeItem) => {
-      getTelemetry().featureUsed('nx.remove.projectView');
-      const generator = await selectReMoveGenerator(undefined, 'remove');
+      openReMoveGenerator(generator, uri, undefined);
+    }),
+    commands.registerCommand(`nx.remove`, async (uri?: Uri) => {
+      getTelemetry().featureUsed('nx.remove');
+      const generator = await selectReMoveGenerator(uri?.toString(), 'remove');
       if (!generator) {
         return;
       }
 
-      const projectName = (treeItem?.item as ProjectViewItem).nxProject.project;
+      openReMoveGenerator(generator, uri, undefined);
+    }),
+    commands.registerCommand(
+      `nx.move.projectView`,
+      async (treeItem?: NxTreeItem) => {
+        getTelemetry().featureUsed('nx.move.projectView');
+        const generator = await selectReMoveGenerator(undefined, 'move');
+        if (!generator) {
+          return;
+        }
 
-      openReMoveGenerator(generator, undefined, projectName);
-    }
+        const projectName = (treeItem?.item as ProjectViewItem).nxProject
+          .project;
+
+        openReMoveGenerator(generator, undefined, projectName);
+      }
+    ),
+    commands.registerCommand(
+      `nx.remove.projectView`,
+      async (treeItem?: NxTreeItem) => {
+        getTelemetry().featureUsed('nx.remove.projectView');
+        const generator = await selectReMoveGenerator(undefined, 'remove');
+        if (!generator) {
+          return;
+        }
+
+        const projectName = (treeItem?.item as ProjectViewItem).nxProject
+          .project;
+
+        openReMoveGenerator(generator, undefined, projectName);
+      }
+    )
   );
 
   const openReMoveGenerator = async (
