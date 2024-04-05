@@ -13,6 +13,7 @@ import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   getShellExecutionForConfig,
   getTelemetry,
+  logAndShowTaskCreationError,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 import { existsSync } from 'fs';
@@ -137,25 +138,34 @@ function addDependency(
   installAsDevDependency: boolean,
   workspacePath: string
 ) {
-  const pkgManagerCommands = getPackageManagerCommand(pkgManager);
-  const pkgManagerWorkspaceFlag = getWorkspaceAddFlag(
-    pkgManager,
-    workspacePath
-  );
-  const command = `${
-    installAsDevDependency ? pkgManagerCommands.addDev : pkgManagerCommands.add
-  } ${pkgManagerWorkspaceFlag} ${dependency}@${version}`;
+  try {
+    const pkgManagerCommands = getPackageManagerCommand(pkgManager);
+    const pkgManagerWorkspaceFlag = getWorkspaceAddFlag(
+      pkgManager,
+      workspacePath
+    );
+    const command = `${
+      installAsDevDependency
+        ? pkgManagerCommands.addDev
+        : pkgManagerCommands.add
+    } ${pkgManagerWorkspaceFlag} ${dependency}@${version}`;
 
-  const task = new Task(
-    {
-      type: 'nxconsole-add-dep',
-    },
-    TaskScope.Workspace,
-    command,
-    pkgManager,
-    new ShellExecution(command, { cwd: workspacePath })
-  );
-  tasks.executeTask(task);
+    const task = new Task(
+      {
+        type: 'nxconsole-add-dep',
+      },
+      TaskScope.Workspace,
+      command,
+      pkgManager,
+      new ShellExecution(command, { cwd: workspacePath })
+    );
+    tasks.executeTask(task);
+  } catch (e) {
+    logAndShowTaskCreationError(
+      e,
+      `An error occured while adding ${dependency}. Please see the logs for more information.`
+    );
+  }
 }
 
 async function executeInitGenerator(dependency: string, workspacePath: string) {

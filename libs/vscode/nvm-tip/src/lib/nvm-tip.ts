@@ -19,7 +19,7 @@ export async function initNvmTip(_: ExtensionContext) {
       "Don't show again"
     )
     .then((value) => {
-      if (value != 'OK') {
+      if (value !== 'OK' && value !== undefined) {
         GlobalConfigurationStore.instance.set(
           'showNodeVersionOnStartup',
           false,
