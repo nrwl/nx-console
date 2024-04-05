@@ -21,9 +21,6 @@
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
-      "@nx-console/generate-ui/components": [
-        "libs/generate-ui/components/src/index.ts"
-      ],
       "@nx-console/language-server/capabilities/code-completion": [
         "libs/language-server/capabilities/code-completion/src/index.ts"
       ],
