@@ -25,7 +25,6 @@
       "style": "scss"
     }
   },
-  "defaultProject": "generate-ui",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
