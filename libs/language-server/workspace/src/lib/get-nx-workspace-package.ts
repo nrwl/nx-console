@@ -13,11 +13,14 @@ import { Logger } from '@nx-console/shared/schema';
 export async function getNxDaemonClient(
   workspacePath: string,
   logger: Logger
-): Promise<typeof NxDaemonClient> {
+): Promise<typeof NxDaemonClient | undefined> {
   const importPath = await findNxPackagePath(
     workspacePath,
     join('src', 'daemon', 'client', 'client.js')
   );
+  if (!importPath) {
+    return;
+  }
   return getNxPackage(importPath, logger);
 }
 
