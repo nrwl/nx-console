@@ -25,6 +25,8 @@ jobs:
           npx nx-cloud start-ci-run \
             --distribute-on="3 linux-medium-js" \
             --stop-agents-after="e2e"
+      - uses: browser-actions/setup-chrome@v1
+      - run: chrome --version
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
         with:
@@ -60,6 +62,7 @@ jobs:
       #     npx nx-cloud start-ci-run \
       #       --distribute-on="3 custom-linux-medium-js" \
       #       --stop-agents-after="e2e"
+      - uses: browser-actions/setup-chrome@v1
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
         with:
