@@ -625,7 +625,7 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
   const workspace = await reconfigure(workingPath);
   await connection.sendNotification(NxWorkspaceRefreshNotification.method);
 
-  if (!workspace?.error) {
+  if (!workspace?.errors) {
     reconfigureAttempts = 0;
     return;
   }

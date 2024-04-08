@@ -31,7 +31,7 @@ export interface NxWorkspace {
   isLerna: boolean;
   nxVersion: NxVersion;
   isEncapsulatedNx: boolean;
-  error?: string;
+  errors?: string[];
   workspaceLayout: {
     appsDir?: string;
     libsDir?: string;

@@ -84,7 +84,7 @@ async function _workspace(
         appsDir: config.workspaceConfiguration.workspaceLayout?.appsDir,
         libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,
       },
-      error: config.error,
+      errors: config.errors,
       nxVersion,
       workspacePath,
     };
