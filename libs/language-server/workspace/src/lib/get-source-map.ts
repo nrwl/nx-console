@@ -20,7 +20,7 @@ export async function getSourceMapFilesToProjectMap(
   Object.entries(workspace.sourceMaps ?? {}).forEach(
     ([projectRoot, sourceMap]) => {
       Object.values(sourceMap).forEach(([file]) => {
-        if (!sourceMapFilesToProjectMap[file]) {
+        if (!sourceMapFilesToProjectMap[file] && file !== 'nx.json') {
           sourceMapFilesToProjectMap[file] = projectRoot;
         }
       });
