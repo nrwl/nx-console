@@ -46,7 +46,7 @@ class NxCommandLineState(
                         "--targets=${nxTargets.joinToString(separator = ",")}",
                         "--projects=${nxProjects.joinToString(separator = ",")}",
                     )
-                if (nxTargetsConfiguration.isNullOrBlank().not()) {
+                if (nxTargetsConfiguration.isBlank().not()) {
                     array + "-c $nxTargetsConfiguration"
                 } else {
                     array
@@ -54,7 +54,7 @@ class NxCommandLineState(
             } else
                 arrayOf(
                     "run",
-                    "${nxProjects.first()}:${nxTargets.first()}${if(nxTargetsConfiguration.isNullOrBlank().not()) ":$nxTargetsConfiguration" else ""}"
+                    "${nxProjects.first()}:${nxTargets.first()}${if(nxTargetsConfiguration.isBlank().not()) ":$nxTargetsConfiguration" else ""}"
                 )
 
         if (configurator === null) {

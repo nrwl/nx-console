@@ -1,5 +1,6 @@
 package dev.nx.console.telemetry
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
@@ -11,6 +12,7 @@ import io.ktor.client.plugins.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@Service(Service.Level.PROJECT)
 class TelemetryService(private val cs: CoroutineScope) {
     val logger = logger<TelemetryService>()
 

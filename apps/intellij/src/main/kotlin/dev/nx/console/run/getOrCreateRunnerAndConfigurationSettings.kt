@@ -14,7 +14,7 @@ fun getOrCreateRunnerConfigurationSettings(
     val runManager = RunManager.getInstance(project)
 
     return runManager
-        .getConfigurationSettingsList(NxCommandConfigurationType.getInstance())
+        .getConfigurationSettingsList(NxCommandConfigurationType.Util.getInstance())
         .firstOrNull {
             val nxCommandConfiguration = it.configuration as NxCommandConfiguration
             val nxRunSettings = nxCommandConfiguration.nxRunSettings

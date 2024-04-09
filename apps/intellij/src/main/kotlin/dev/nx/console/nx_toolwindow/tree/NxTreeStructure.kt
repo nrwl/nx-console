@@ -13,6 +13,7 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.ui.ClickListener
 import com.intellij.ui.PopupHandler
 import com.intellij.ui.tree.AsyncTreeModel
@@ -56,6 +57,7 @@ class NxTreeStructure(
         TreeUtil.installActions(tree)
         installPopupActions()
         treePersistenceManager.installPersistenceListeners()
+        Disposer.register(project, this)
     }
 
     override fun getRootElement(): Any = root

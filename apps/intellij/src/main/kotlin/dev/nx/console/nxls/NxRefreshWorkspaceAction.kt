@@ -2,6 +2,7 @@ package dev.nx.console.nxls
 
 import com.intellij.notification.Notification
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.DumbAwareAction
@@ -9,6 +10,10 @@ import dev.nx.console.graph.ui.NxGraphFileType
 
 class NxRefreshWorkspaceAction :
     DumbAwareAction("Refresh Nx Workspace", "Refreshes the Nx workspace", null) {
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
+    }
 
     override fun update(e: AnActionEvent) {
         if (

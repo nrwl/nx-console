@@ -22,7 +22,7 @@ class NxCommandConfigurationType :
     val factory: ConfigurationFactory
         get() = configurationFactories.single()
 
-    companion object {
+    object Util {
         fun getInstance() =
             ConfigurationTypeUtil.findConfigurationType(NxCommandConfigurationType::class.java)
     }
