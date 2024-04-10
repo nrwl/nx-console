@@ -1,3 +1,20 @@
+## 1.21.0 (2024-04-10)
+
+### Bug Fixes
+
+* correctly load graph html without assuming node_modules ([#2083](https://github.com/nrwl/nx-console/issues/2083)) ([84b5fb7](https://github.com/nrwl/nx-console/commit/84b5fb7ed5f493a731a052fbaa323a38f4b9c329))
+* **intellij:** catch invalid path error & check project disposal more ([#2076](https://github.com/nrwl/nx-console/issues/2076)) ([5ed5b56](https://github.com/nrwl/nx-console/commit/5ed5b56e9cc4feb851e56595d2cc82e841278d9d))
+* **intellij:** get correct executable path under yarn pnp ([#2070](https://github.com/nrwl/nx-console/issues/2070)) ([3b5718a](https://github.com/nrwl/nx-console/commit/3b5718a0ebb35459e7ae1174ffc3c77c20c13ced))
+* **nxls:** ignore nx.json when processing source maps for now ([#2087](https://github.com/nrwl/nx-console/issues/2087)) ([5f70a55](https://github.com/nrwl/nx-console/commit/5f70a554dc6505ee7a70bf1be0940a7a924fee13))
+* **nxls:** repair for nx 13 & write nx/workspace tests for all supported versions ([#2084](https://github.com/nrwl/nx-console/issues/2084)) ([cdc9ecd](https://github.com/nrwl/nx-console/commit/cdc9ecde05da52d145a4fcc903976b79fe6a18dd))
+* **nxls:** respect nx.json generator defaults when showing generate ui ([#2077](https://github.com/nrwl/nx-console/issues/2077)) ([d5dc4f9](https://github.com/nrwl/nx-console/commit/d5dc4f9bd9febf2ab775c14bec8384259b2bc470))
+
+
+### Features
+
+* add @nx/gradle ([#2078](https://github.com/nrwl/nx-console/issues/2078)) ([1198bda](https://github.com/nrwl/nx-console/commit/1198bda628e0661e81d92fa045c4580c0d1b2096))
+* **nxls:** use daemon to watch files ([#2067](https://github.com/nrwl/nx-console/issues/2067)) ([4478927](https://github.com/nrwl/nx-console/commit/4478927e793187850c5b0e7976f348068a8bdfc4))
+
 ## 1.20.0 (2024-03-25)
 
 ### Bug Fixes
