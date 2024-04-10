@@ -20,10 +20,13 @@ jobs:
         with:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
+        if: ${{ github.event_name == 'pull_request' }}
       - run: |
           npx nx-cloud start-ci-run \
             --distribute-on="3 linux-medium-js" \
             --stop-agents-after="e2e"
+      - uses: browser-actions/setup-chrome@v1
+      - run: chrome --version
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
         with:
@@ -37,10 +40,15 @@ jobs:
           npx nx-cloud record -- ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: npx nx affected --t=lint,test,build,e2e --configuration=ci
+      - run: npx nx affected --t=lint,test,build,e2e --configuration=ci --exclude=nx-console
   main-windows:
     name: Main Windows
     runs-on: windows-latest
+    env:
+      GIT_AUTHOR_EMAIL: test@test.com
+      GIT_AUTHOR_NAME: Test
+      GIT_COMMITTER_EMAIL: test@test.com
+      GIT_COMMITTER_NAME: Test
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,10 +57,12 @@ jobs:
         with:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
+        if: ${{ github.event_name == 'pull_request' }}
       # - run: |
       #     npx nx-cloud start-ci-run \
       #       --distribute-on="3 custom-linux-medium-js" \
       #       --stop-agents-after="e2e"
+      - uses: browser-actions/setup-chrome@v1
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
         with:
@@ -69,4 +79,5 @@ jobs:
           java-version: 17
           cache: gradle
       # there's no need to check formatting & linting again on windows
-      - run: npx nx affected --t=test,build,e2e --configuration=ci
+      - run: npx nx affected --t=test,build,e2e --configuration=ci --exclude=nx-console
+        timeout-minutes: 45

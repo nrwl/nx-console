@@ -1,7 +1,4 @@
 {
-  "affected": {
-    "defaultBase": "master"
-  },
   "useDaemonProcess": true,
   "tasksRunnerOptions": {
     "default": {
@@ -117,6 +114,15 @@
       "options": {
         "targetName": "test"
       }
+    },
+    {
+      "plugin": "@nx/gradle",
+      "options": {
+        "testTargetName": "test",
+        "classesTargetName": "classes",
+        "buildTargetName": "build"
+      }
     }
-  ]
+  ],
+  "defaultBase": "master"
 }

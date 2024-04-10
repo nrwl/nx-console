@@ -481,11 +481,11 @@ class OldNxGraphBrowser(
     }
 
     private sealed class Command {
-        object SelectAll : Command() {}
+        data object SelectAll : Command()
 
         data class FocusProject(val projectName: String) : Command() {}
 
-        object SelectAllTasks : Command() {}
+        data object SelectAllTasks : Command()
 
         data class FocusTaskGroup(val taskGroupName: String) : Command() {}
 
@@ -493,7 +493,7 @@ class OldNxGraphBrowser(
     }
 
     @Service(Service.Level.PROJECT)
-    private sealed class OldNxGraphBrowserCoroutineHolder(val cs: CoroutineScope) {
+    private class OldNxGraphBrowserCoroutineHolder(val cs: CoroutineScope) {
         companion object {
             fun getInstance(project: Project): OldNxGraphBrowserCoroutineHolder =
                 project.getService(OldNxGraphBrowserCoroutineHolder::class.java)

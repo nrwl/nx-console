@@ -18,6 +18,7 @@ import {
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
 import { performance } from 'perf_hooks';
+import { WriteStream } from 'node:fs';
 
 export async function getNxWorkspaceConfig(
   workspacePath: string,
@@ -75,6 +76,9 @@ export async function getNxWorkspaceConfig(
           .workspaceConfiguration;
         error = `${e.stack}`;
       }
+    } else {
+      workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
+        .workspaceConfiguration;
     }
     try {
       process.exit = function (code?: number) {
@@ -83,6 +87,9 @@ export async function getNxWorkspaceConfig(
 
       if (nxOutput !== undefined) {
         nxOutput.output.error = (output) => {
+          // do nothing
+        };
+        nxOutput.output.log = (output) => {
           // do nothing
         };
       }
@@ -213,6 +220,7 @@ function createNxWorkspaceConfiguration(
       }
 
       modifiedWorkspaceConfiguration.projects[projectName] = {
+        ...node.data,
         root: node.data.root,
         targets: node.data.targets ?? {},
         name: projectName,

@@ -21,7 +21,6 @@
     <!-- works in new IDEA wizard -->
     <moduleBuilder builderClass="dev.nx.console.cli.NxCLIProjectModuleBuilder"/>
 
-    <projectService serviceImplementation="dev.nx.console.telemetry.TelemetryService"/>
     <completion.contributor language="JSON"
                             implementationClass="dev.nx.console.completion.NxCompletionContributor"/>
     <lang.documentationProvider language="JSON"
@@ -38,10 +37,8 @@
       instance="dev.nx.console.settings.NxConsoleSettingsConfigurable"
       displayName="Nx Console"/>
     <applicationService serviceImplementation="dev.nx.console.settings.NxConsoleSettingsProvider"/>
-    <projectService serviceImplementation="dev.nx.console.settings.NxConsoleProjectSettingsProvider"/>
 
     <!-- Generate -->
-    <projectService serviceImplementation="dev.nx.console.generate.NxGenerateService"/>
     <fileEditorProvider implementation="dev.nx.console.generate.ui.file.NxGenerateUiFileEditorProvider"/>
 
     <!-- Graph -->

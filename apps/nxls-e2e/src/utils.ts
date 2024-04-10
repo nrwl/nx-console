@@ -1,20 +1,21 @@
 import { execSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { join, normalize, sep } from 'path';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
-const defaultVersion = '18.0.4';
+export const defaultVersion = '18.2.1';
 
 export const e2eCwd = join(
-  process.platform === 'win32' ? process.cwd().split(sep)[0] : '/',
-  'tmp',
+  process.platform === 'darwin' ? join('/', 'private', tmpdir()) : tmpdir(),
   'nxls-e2e'
 );
-
 export type NewWorkspaceOptions = {
   preset: string;
   bundler?: string;
   e2eTestRunner?: string;
   style?: string;
+  appName?: string;
+  framework?: string;
 };
 
 export const simpleReactWorkspaceOptions: NewWorkspaceOptions = {
@@ -29,7 +30,7 @@ export function newWorkspace({
   packageManager = 'npm',
   version,
   options,
-  verbose = false,
+  verbose,
 }: {
   name?: string;
   packageManager?: 'npm' | 'pnpm' | 'yarn';
@@ -38,6 +39,9 @@ export function newWorkspace({
   options: NewWorkspaceOptions;
   verbose?: boolean;
 }) {
+  if (verbose === undefined) {
+    verbose = !!process.env['CI'];
+  }
   if (!version) {
     version = defaultVersion;
   }
@@ -55,15 +59,20 @@ export function newWorkspace({
   command += `--nxCloud=skip --pm=${packageManager} --no-interactive`;
 
   if (verbose) {
-    console.log(`setting up new workspace ${name} with ${command}`);
+    console.log(
+      `setting up new workspace ${name} with ${command} and env ${JSON.stringify(
+        process.env,
+        null,
+        2
+      )} at ${new Date().toISOString()}`
+    );
   }
 
   const create = execSync(command, {
     cwd: e2eCwd,
-    stdio: 'pipe',
+    stdio: verbose ? 'inherit' : 'pipe',
     env: {
-      //   CI: 'true',
-      // NX_VERBOSE_LOGGING: isCI ? 'true' : 'false',
+      CI: 'true',
       ...process.env,
     },
     encoding: 'utf-8',
@@ -80,4 +89,12 @@ export function modifyJsonFile(filePath: string, callback: (data: any) => any) {
   let jsonData = JSON.parse(readFileSync(filePath, 'utf-8'));
   jsonData = callback(jsonData);
   writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
+}
+
+export async function waitFor(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function isWindows() {
+  return process.platform === 'win32';
 }

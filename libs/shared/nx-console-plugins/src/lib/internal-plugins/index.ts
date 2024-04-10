@@ -11,6 +11,7 @@ import {
   projectNameAndRootStartupMessage,
   projectNameAndRootProcessor,
 } from './project-name-and-root-plugin';
+import { useGeneratorDefaultsProcessor } from './use-generator-defaults-processor';
 
 export const internalPlugins: NxConsolePluginsDefinition = {
   schemaProcessors: [
@@ -19,6 +20,7 @@ export const internalPlugins: NxConsolePluginsDefinition = {
     prefillProjectAndDirProcessor,
     nameAndDirectoryProcessor,
     addProjectItemsToOptionProcessor,
+    useGeneratorDefaultsProcessor,
   ],
   validators: [],
   startupMessageFactories: [

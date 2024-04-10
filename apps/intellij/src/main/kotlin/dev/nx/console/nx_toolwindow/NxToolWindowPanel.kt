@@ -44,6 +44,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     }
 
     private fun createToolwindowContent() {
+        if (project.isDisposed) return
         ProjectLevelCoroutineHolderService.getInstance(project).cs.launch {
             val workspace = project.nxWorkspace()
             if (workspace == null || workspace.workspace.projects.isEmpty()) {

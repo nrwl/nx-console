@@ -1,7 +1,7 @@
 package dev.nx.console.project_details
 
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
@@ -10,9 +10,12 @@ import dev.nx.console.models.NxProject
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.utils.nxBasePath
+import java.nio.file.InvalidPathException
 import java.nio.file.Paths
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Service(Service.Level.PROJECT)
 class ProjectConfigFilesService(private val project: Project, private val cs: CoroutineScope) {
@@ -35,10 +38,14 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
     }
 
     fun isProjectDetailsFile(file: VirtualFile): Boolean {
-        val normalizedFilePath = Paths.get(file.path).normalize().toString()
-        return projectConfigFilesPaths
-            .map { Paths.get(it).normalize().toString() }
-            .contains(normalizedFilePath)
+        try {
+            val normalizedFilePath = Paths.get(file.path).normalize().toString()
+            return projectConfigFilesPaths
+                .map { Paths.get(it).normalize().toString() }
+                .contains(normalizedFilePath)
+        } catch (exception: InvalidPathException) {
+            return false
+        }
     }
 
     fun getProjectForFile(file: VirtualFile): NxProject? {
@@ -81,28 +88,26 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
                 nxlsService.workspace()?.error?.also { pathsToProjectsMap.clear() }
             }
 
-            ensurePDVPreviewFileEditors()
+            withContext(Dispatchers.EDT) { ensurePDVPreviewFileEditors() }
         }
     }
 
     private fun ensurePDVPreviewFileEditors() {
+        if (project.isDisposed) return
         // because ProjectDetailsFileEditorProvider triggers only when the file is opened, we
         // need to reopen all files that should have a PDV preview but don't
-        ApplicationManager.getApplication().invokeLater {
-            val fileEditorManager = FileEditorManager.getInstance(project)
+        val fileEditorManager = FileEditorManager.getInstance(project)
 
-            val openFiles = fileEditorManager.openFiles
+        val openFiles = fileEditorManager.openFiles
 
-            projectConfigFilesPaths.forEach { projectDetailsFile ->
-                val file = openFiles.find { it.path == projectDetailsFile }
-                if (
-                    file != null &&
-                        fileEditorManager.getSelectedEditor(file) !is
-                            ProjectDetailsEditorWithPreview
-                ) {
-                    fileEditorManager.closeFile(file)
-                    fileEditorManager.openFile(file, true)
-                }
+        projectConfigFilesPaths.forEach { projectDetailsFile ->
+            val file = openFiles.find { it.path == projectDetailsFile }
+            if (
+                file != null &&
+                    fileEditorManager.getSelectedEditor(file) !is ProjectDetailsEditorWithPreview
+            ) {
+                fileEditorManager.closeFile(file)
+                fileEditorManager.openFile(file, true)
             }
         }
     }
