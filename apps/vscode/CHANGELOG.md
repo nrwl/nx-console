@@ -1,3 +1,21 @@
+# [18.19.0](https://github.com/nrwl/nx-console/compare/vscode-v18.18.0...vscode-v18.19.0) (2024-04-10)
+
+
+### Bug Fixes
+
+* correctly load graph html without assuming node_modules ([#2083](https://github.com/nrwl/nx-console/issues/2083)) ([84b5fb7](https://github.com/nrwl/nx-console/commit/84b5fb7ed5f493a731a052fbaa323a38f4b9c329))
+* fix path for windows for generate ui ([#2079](https://github.com/nrwl/nx-console/issues/2079)) ([e7f9f11](https://github.com/nrwl/nx-console/commit/e7f9f118a61a65eb9d2cea3984cf1e8736a7348c))
+* **nxls:** ignore nx.json when processing source maps for now ([#2087](https://github.com/nrwl/nx-console/issues/2087)) ([5f70a55](https://github.com/nrwl/nx-console/commit/5f70a554dc6505ee7a70bf1be0940a7a924fee13))
+* **nxls:** repair for nx 13 & write nx/workspace tests for all supported versions ([#2084](https://github.com/nrwl/nx-console/issues/2084)) ([cdc9ecd](https://github.com/nrwl/nx-console/commit/cdc9ecde05da52d145a4fcc903976b79fe6a18dd))
+* **nxls:** respect nx.json generator defaults when showing generate ui ([#2077](https://github.com/nrwl/nx-console/issues/2077)) ([d5dc4f9](https://github.com/nrwl/nx-console/commit/d5dc4f9bd9febf2ab775c14bec8384259b2bc470))
+* **vscode:** catch & surface errors during task creation better ([#2082](https://github.com/nrwl/nx-console/issues/2082)) ([eaf1c56](https://github.com/nrwl/nx-console/commit/eaf1c564b6afe24db426db3a10ce4693217e0281))
+
+
+### Features
+
+* add @nx/gradle ([#2078](https://github.com/nrwl/nx-console/issues/2078)) ([1198bda](https://github.com/nrwl/nx-console/commit/1198bda628e0661e81d92fa045c4580c0d1b2096))
+* **nxls:** use daemon to watch files ([#2067](https://github.com/nrwl/nx-console/issues/2067)) ([4478927](https://github.com/nrwl/nx-console/commit/4478927e793187850c5b0e7976f348068a8bdfc4))
+
 # [18.18.0](https://github.com/nrwl/nx-console/compare/vscode-v18.17.0...vscode-v18.18.0) (2024-03-25)
 
 
