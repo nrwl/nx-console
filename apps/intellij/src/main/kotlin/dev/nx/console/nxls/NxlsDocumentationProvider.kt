@@ -40,7 +40,7 @@ class NxlsDocumentationProvider : DocumentationProvider {
         val nxDevLinkText = matches[1]
         val nxDevLinkUrl = matches[2]
 
-        if (nxDevLinkText.isNullOrEmpty() || nxDevLinkUrl.isNullOrEmpty()) {
+        if (nxDevLinkText.isEmpty() || nxDevLinkUrl.isEmpty()) {
             return doc
         }
         return "$CONTENT_START <a href='$nxDevLinkUrl'>$nxDevLinkText</a> $CONTENT_END"

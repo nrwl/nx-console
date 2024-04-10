@@ -2,6 +2,7 @@ package dev.nx.console.generate
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -24,6 +25,7 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@Service(Service.Level.PROJECT)
 class NxGenerateService(val project: Project, private val cs: CoroutineScope) {
 
     suspend fun getFilteredGenerators(): List<NxGenerator> {

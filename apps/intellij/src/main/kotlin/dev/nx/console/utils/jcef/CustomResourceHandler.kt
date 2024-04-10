@@ -129,7 +129,7 @@ class OpenedConnection(private val connection: URLConnection) : ResourceHandlerS
     }
 }
 
-object ClosedConnection : ResourceHandlerState() {
+data object ClosedConnection : ResourceHandlerState() {
     override fun getResponseHeaders(
         cefResponse: CefResponse,
         responseLength: IntRef,

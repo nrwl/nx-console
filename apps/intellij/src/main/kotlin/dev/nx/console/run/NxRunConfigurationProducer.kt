@@ -19,7 +19,7 @@ data class NxRunSettings(
 
 class NxRunConfigurationProducer : LazyRunConfigurationProducer<NxCommandConfiguration>() {
     override fun getConfigurationFactory(): ConfigurationFactory =
-        NxCommandConfigurationType.getInstance()
+        NxCommandConfigurationType.Util.getInstance()
 
     override fun setupConfigurationFromContext(
         configuration: NxCommandConfiguration,

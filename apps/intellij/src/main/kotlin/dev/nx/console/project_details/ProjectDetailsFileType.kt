@@ -22,8 +22,4 @@ class ProjectDetailsFileType : LanguageFileType(Language.findLanguageByID("JSON"
     override fun getIcon(): Icon {
         return NxIcons.FileType // Replace with your custom icon.
     }
-
-    companion object {
-        val INSTANCE = ProjectDetailsFileType()
-    }
 }

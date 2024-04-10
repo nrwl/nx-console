@@ -5,11 +5,13 @@ import com.intellij.openapi.project.Project
 import dev.nx.console.settings.options.GeneratorFilter
 import dev.nx.console.settings.options.ToolWindowStyles
 
+@Service(Service.Level.PROJECT)
 @State(name = "NxConsoleProjectSettingsProvider", storages = [Storage("nx-console.xml")])
 class NxConsoleProjectSettingsProvider(val project: Project) :
     PersistentStateComponent<NxConsoleProjectSettingsState> {
 
     private var state = NxConsoleProjectSettingsState()
+
     override fun getState(): NxConsoleProjectSettingsState? {
         return state
     }
@@ -17,6 +19,7 @@ class NxConsoleProjectSettingsProvider(val project: Project) :
     override fun loadState(state: NxConsoleProjectSettingsState) {
         this.state = state
     }
+
     var workspacePath: String?
         get() = state.workspacePath
         set(value) {
