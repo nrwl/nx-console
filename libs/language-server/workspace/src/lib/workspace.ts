@@ -79,13 +79,14 @@ async function _workspace(
       validWorkspaceJson: true,
       workspace: sortWorkspaceProjects(config.workspaceConfiguration),
       daemonEnabled: config.daemonEnabled,
+      isPartial: config.isPartial,
       isLerna,
       isEncapsulatedNx: !!config.workspaceConfiguration.installation,
       workspaceLayout: {
         appsDir: config.workspaceConfiguration.workspaceLayout?.appsDir,
         libsDir: config.workspaceConfiguration.workspaceLayout?.libsDir,
       },
-      error: config.error,
+      errors: config.errors,
       nxVersion,
       workspacePath,
     };

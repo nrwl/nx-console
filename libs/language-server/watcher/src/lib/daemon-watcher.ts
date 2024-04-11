@@ -2,6 +2,7 @@ import { getNxDaemonClient } from '@nx-console/language-server/workspace';
 import { lspLogger } from '@nx-console/language-server/utils';
 import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
+import { ProjectGraphError } from 'nx/src/project-graph/project-graph';
 
 export class DaemonWatcher {
   private stopped = false;
@@ -40,7 +41,12 @@ export class DaemonWatcher {
       try {
         await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
       } catch (e) {
-        projectGraphErrors = true;
+        lspLogger.log(`caught error, ${JSON.stringify(e)}`);
+        if (
+          !(e instanceof ProjectGraphError || e.name === 'ProjectGraphError')
+        ) {
+          projectGraphErrors = true;
+        }
       }
 
       if (!daemonClientModule || projectGraphErrors) {
@@ -58,6 +64,11 @@ export class DaemonWatcher {
             watchProjects: 'all',
             includeGlobalWorkspaceFiles: true,
             includeDependentProjects: true,
+            allowPartialGraph: true,
+          } as {
+            watchProjects: string[] | 'all';
+            includeGlobalWorkspaceFiles?: boolean;
+            includeDependentProjects?: boolean;
           },
           async (error, data) => {
             if (error === 'closed') {

@@ -18,6 +18,7 @@ import {
   getNxProjectGraphUtils,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
+import { ProjectGraphError } from 'nx/src/project-graph/project-graph';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -28,13 +29,15 @@ export async function getNxWorkspaceConfig(
 ): Promise<{
   workspaceConfiguration: NxWorkspaceConfiguration;
   daemonEnabled?: boolean;
-  error?: string;
+  errors?: (string | any)[];
+  isPartial?: boolean;
 }> {
   let projectGraph: ProjectGraph | null = null;
   let sourceMaps: Record<string, Record<string, string[]>> | undefined =
     undefined;
+  let isPartial = undefined;
 
-  let error: string | undefined;
+  let errors: (string | any)[] | undefined;
 
   const start = performance.now();
   logger.log('Retrieving workspace configuration');
@@ -75,7 +78,7 @@ export async function getNxWorkspaceConfig(
         logger.log('Unable to read workspace config from nx workspace package');
         workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
           .workspaceConfiguration;
-        error = `${e.stack}`;
+        errors = [`${e.stack}`];
       }
     } else {
       workspaceConfiguration = (await readWorkspaceConfigs(workspacePath))
@@ -100,13 +103,25 @@ export async function getNxWorkspaceConfig(
         projectGraph = (nxProjectGraph as any).createProjectGraph();
       } else if (gte(nxVersion.full, '17.2.0')) {
         lspLogger.log('createProjectGraphAndSourceMapsAsync');
-        const projectGraphAndSourceMaps = await (
-          nxProjectGraph as any
-        ).createProjectGraphAndSourceMapsAsync({
-          exitOnError: false,
-        });
-        projectGraph = projectGraphAndSourceMaps.projectGraph;
-        sourceMaps = projectGraphAndSourceMaps.sourceMaps;
+        try {
+          const projectGraphAndSourceMaps = await (
+            nxProjectGraph as any
+          ).createProjectGraphAndSourceMapsAsync({
+            exitOnError: false,
+          });
+          projectGraph = projectGraphAndSourceMaps.projectGraph;
+          sourceMaps = projectGraphAndSourceMaps.sourceMaps;
+        } catch (e) {
+          if (
+            e instanceof ProjectGraphError ||
+            e.name === 'ProjectGraphError'
+          ) {
+            lspLogger.log('caught ProjectGraphError, using partial graph');
+            projectGraph = e.getPartialProjectGraph();
+            sourceMaps = e.getPartialSourcemaps();
+            isPartial = true;
+          }
+        }
         lspLogger.log('createProjectGraphAndSourceMapsAsync successful');
       } else {
         lspLogger.log('createProjectGraphAsync');
@@ -118,7 +133,7 @@ export async function getNxWorkspaceConfig(
     } catch (e) {
       lspLogger.log('Unable to get project graph');
       lspLogger.log(e.stack);
-      error = `${e.stack}`;
+      errors = [`${e.stack}`];
     }
 
     let projectFileMap: ProjectFileMap = {};
@@ -161,13 +176,14 @@ export async function getNxWorkspaceConfig(
     process.exit = _defaultProcessExit;
     return {
       workspaceConfiguration,
-      error,
+      errors,
+      isPartial,
     };
   } catch (e) {
     lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
     const config = await readWorkspaceConfigs(workspacePath);
     process.exit = _defaultProcessExit;
-    return { ...config, error: `${e}` };
+    return { ...config, errors: [`${e}`], isPartial };
   }
 }
 

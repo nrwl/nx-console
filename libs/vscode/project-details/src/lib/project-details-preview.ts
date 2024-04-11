@@ -87,20 +87,20 @@ export class ProjectDetailsPreview {
   }
 
   private async loadHtml() {
-    let error = (await getNxWorkspace())?.error;
+    let errors = (await getNxWorkspace())?.errors;
     const project = await getProjectByPath(this.path);
 
     if (!project) {
-      if (!error) {
-        error = `No project found at path ${this.path}`;
+      if (!errors) {
+        errors = [`No project found at path ${this.path}`];
       }
     } else {
       this.projectRoot = project.root;
     }
 
     let html: string;
-    if (error) {
-      html = await this.loadErrorHtml(error);
+    if (errors) {
+      html = await this.loadErrorHtml(errors);
       this.isShowingErrorHtml = true;
     } else {
       html = await loadGraphBaseHtml(this.webviewPanel.webview);
@@ -142,7 +142,7 @@ export class ProjectDetailsPreview {
     this.webviewPanel.webview.html = html;
   }
 
-  private loadErrorHtml(error: string): string {
+  private loadErrorHtml(errors: (string | any)[]): string {
     return /*html*/ `
     <style>
         pre {
@@ -153,7 +153,7 @@ export class ProjectDetailsPreview {
         }
       </style>
       <p>Unable to load the project graph. The following error occurred:</p>
-      <pre>${error}</pre>
+      <pre>${JSON.stringify(errors)}</pre>
     `;
   }
 
@@ -183,8 +183,8 @@ export class ProjectDetailsPreview {
   }
 
   private debouncedRefresh = debounce(async () => {
-    const error = (await getNxWorkspace())?.error;
-    if (error) {
+    const errors = (await getNxWorkspace())?.errors;
+    if (errors) {
       this.loadHtml();
     } else if (this.isShowingErrorHtml) {
       this.loadHtml();
