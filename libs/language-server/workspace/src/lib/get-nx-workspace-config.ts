@@ -119,7 +119,10 @@ export async function getNxWorkspaceConfig(
             lspLogger.log('caught ProjectGraphError, using partial graph');
             projectGraph = e.getPartialProjectGraph();
             sourceMaps = e.getPartialSourcemaps();
+            errors = e.getErrors();
             isPartial = true;
+          } else {
+            throw e;
           }
         }
         lspLogger.log('createProjectGraphAndSourceMapsAsync successful');
