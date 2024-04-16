@@ -40,7 +40,7 @@ jobs:
           npx nx-cloud record -- ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: npx nx affected --t=lint,test,build,e2e --configuration=ci --exclude=nx-console
+      - run: npx nx affected --t=lint,test,build,e2e,e2e-ci --configuration=ci --exclude=nx-console
   main-windows:
     name: Main Windows
     runs-on: windows-latest

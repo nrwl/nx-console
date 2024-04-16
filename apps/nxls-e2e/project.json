@@ -3,17 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/nxls-e2e/src",
   "projectType": "application",
-  "targets": {
-    "test": {
-      "command": "jest --detectOpenHandles --runInBand --verbose",
-      "dependsOn": [
-        {
-          "projects": "nxls",
-          "target": "build"
-        }
-      ]
-    }
-  },
+  "targets": {},
   "tags": ["type:lsp"],
   "implicitDependencies": ["nxls"]
 }
