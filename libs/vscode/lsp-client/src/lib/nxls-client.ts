@@ -58,7 +58,7 @@ export async function sendRequest<P, R, E>(
 
 type LspClientStates = 'idle' | 'starting' | 'running' | 'stopping';
 
-class NxlsClient implements Disposable {
+class NxlsClient {
   private state: LspClientStates = 'idle';
 
   private workspacePath: string | undefined;
@@ -68,7 +68,6 @@ class NxlsClient implements Disposable {
   private refreshedEventEmitter = new EventEmitter<void>();
 
   constructor(private extensionContext: ExtensionContext) {
-    extensionContext.subscriptions.push(this);
     extensionContext.subscriptions.push(
       commands.registerCommand(REFRESH_WORKSPACE, () => {
         this.refresh();
@@ -94,6 +93,7 @@ class NxlsClient implements Disposable {
     if (this.state !== 'idle') {
       return;
     }
+    this.workspacePath = workspacePath;
 
     this.state = 'starting';
 
@@ -103,7 +103,10 @@ class NxlsClient implements Disposable {
 
     const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
     const serverOptions: ServerOptions = {
-      run: { module: serverModule, transport: TransportKind.ipc },
+      run: {
+        module: serverModule,
+        transport: TransportKind.ipc,
+      },
       debug: {
         module: serverModule,
         transport: TransportKind.ipc,
@@ -130,7 +133,7 @@ class NxlsClient implements Disposable {
 
     this.client = new LanguageClient(
       'NxConsoleClient',
-      'Nx Language Server',
+      getNxlsOutputChannel().name,
       serverOptions,
       clientOptions
     );
@@ -166,17 +169,14 @@ class NxlsClient implements Disposable {
   }
 
   public async refresh() {
-    await this.stop();
     if (!this.workspacePath) {
       getOutputChannel().appendLine(
         "Can't refresh workspace without a workspace path. Make sure to start the LSP client first."
       );
       return;
     }
+    await this.stop();
     await this.start(this.workspacePath);
-  }
-
-  public dispose() {
-    this.stop();
+    this.client?.sendNotification(NxWorkspaceRefreshNotification);
   }
 }

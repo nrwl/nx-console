@@ -359,7 +359,7 @@ connection.onShutdown(async () => {
 
 connection.onExit(() => {
   connection.dispose();
-  treeKill(PID ?? process.pid, 'SIGTERM');
+  treeKill(process.pid, 'SIGTERM');
 });
 
 connection.onNotification(NxReset, async () => {

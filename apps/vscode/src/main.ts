@@ -48,7 +48,7 @@ import {
   initGenerateUiWebview,
   openGenerateUi,
 } from '@nx-console/vscode/generate-ui-webview';
-import { createNxlsClient } from '@nx-console/vscode/lsp-client';
+import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import {
@@ -125,6 +125,7 @@ export async function activate(c: ExtensionContext) {
 
 export async function deactivate() {
   await stopDaemon();
+  await getNxlsClient()?.stop();
   getTelemetry().extensionDeactivated();
 }
 
