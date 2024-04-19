@@ -1,6 +1,7 @@
 package dev.nx.console.nxls
 
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
@@ -51,23 +52,18 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         }
     }
 
-    fun close() {
+    suspend fun close() {
         wrapper.stop()
     }
 
     fun refreshWorkspace() {
         cs.launch {
-            if (!wrapper.isStarted()) {
-                start()
-                awaitStarted()
-            }
-
-            server()?.getNxService()?.refreshWorkspace()
+            // call nx reset to clear all caches
+            server()?.getNxService()?.reset()
+            thisLogger().info("reset done")
+            wrapper.stop()
+            start()
         }
-    }
-
-    fun resetWorkspace() {
-        cs.launch { server()?.getNxService()?.reset() }
     }
 
     suspend fun workspace(): NxWorkspace? {
@@ -79,8 +75,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
     suspend fun generators(): List<NxGenerator> {
         return withMessageIssueCatch("nx/generators") {
             server()?.getNxService()?.generators()?.await()
-        }()
-            ?: emptyList()
+        }() ?: emptyList()
     }
 
     suspend fun generatorOptions(
@@ -89,8 +84,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         return withMessageIssueCatch("nx/generatorOptions") {
             val request = NxGeneratorOptionsRequest(requestOptions)
             server()?.getNxService()?.generatorOptions(request)?.await()
-        }()
-            ?: emptyList()
+        }() ?: emptyList()
     }
 
     suspend fun generatorContextFromPath(
@@ -114,8 +108,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         val request = NxProjectsByPathsRequest(paths)
         return withMessageIssueCatch("nx/projectsByPaths") {
             server()?.getNxService()?.projectsByPaths(request)?.await()
-        }()
-            ?: emptyMap()
+        }() ?: emptyMap()
     }
 
     suspend fun projectGraphOutput(): ProjectGraphOutput? {
@@ -147,8 +140,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
     suspend fun transformedGeneratorSchema(schema: GeneratorSchema): GeneratorSchema {
         return withMessageIssueCatch("nx/transformedGeneratorSchema") {
             server()?.getNxService()?.transformedGeneratorSchema(schema)?.await()
-        }()
-            ?: schema
+        }() ?: schema
     }
 
     suspend fun startupMessage(schema: GeneratorSchema): GenerateUiStartupMessageDefinition? {
@@ -166,8 +158,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
     suspend fun sourceMapFilesToProjectMap(): Map<String, String> {
         return withMessageIssueCatch("nx/sourceMapFilesToProjectMap") {
             server()?.getNxService()?.sourceMapFilesToProjectMap()?.await()
-        }()
-            ?: emptyMap()
+        }() ?: emptyMap()
     }
 
     suspend fun targetsForConfigFile(
@@ -177,8 +168,7 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         return withMessageIssueCatch("nx/targetsForConfigFile") {
             val request = NxTargetsForConfigFileRequest(projectName, configFilePath)
             server()?.getNxService()?.targetsForConfigFile(request)?.await()
-        }()
-            ?: emptyMap()
+        }() ?: emptyMap()
     }
 
     fun addDocument(editor: Editor) {

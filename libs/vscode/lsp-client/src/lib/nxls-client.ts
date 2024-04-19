@@ -1,5 +1,5 @@
 import {
-  NxResetNotification,
+  NxResetRequest,
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server/types';
 import {
@@ -162,7 +162,7 @@ class NxlsClient {
       this.state = 'idle';
       return;
     }
-    await this.client.stop();
+    await this.client.stop(2000);
     this.onNotificationDisposable?.dispose();
     this.state = 'idle';
   }
@@ -178,9 +178,10 @@ class NxlsClient {
       );
       return;
     }
+    // this calls 'nx reset' to clear all caches 
+    await this.client?.sendRequest(NxResetRequest, undefined);
     await this.stop();
     await this.start(this.workspacePath);
-    // this calls 'nx reset' to clear all caches & also refreshes the workspace
-    this.client?.sendNotification(NxResetNotification);
+    
   }
 }

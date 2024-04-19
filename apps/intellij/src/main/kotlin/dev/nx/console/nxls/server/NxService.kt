@@ -108,8 +108,8 @@ interface NxService {
         throw UnsupportedOperationException()
     }
 
-    @JsonNotification
-    fun reset() {
+    @JsonRequest
+    fun reset(): CompletableFuture<Unit> {
         throw UnsupportedOperationException()
     }
 }

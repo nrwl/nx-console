@@ -23,7 +23,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
-  NxResetNotification,
+  NxResetRequest,
   NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
   NxTargetsForConfigFileRequest,
@@ -362,13 +362,12 @@ connection.onExit(() => {
   treeKill(process.pid, 'SIGTERM');
 });
 
-connection.onNotification(NxResetNotification, async () => {
+connection.onRequest(NxResetRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  await nxReset(WORKING_PATH, lspLogger);
-  await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
+  return await nxReset(WORKING_PATH, lspLogger);
 });
 
 connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {

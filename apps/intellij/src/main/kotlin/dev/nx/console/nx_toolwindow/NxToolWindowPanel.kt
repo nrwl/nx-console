@@ -1,12 +1,12 @@
 package dev.nx.console.nx_toolwindow
 
 import com.intellij.icons.AllIcons
-import com.intellij.ide.CommonActionsManager
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.invokeLater
@@ -102,6 +102,8 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
                         "Reload Nx projects",
                         AllIcons.Actions.Refresh
                     ) {
+                    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
                     override fun update(e: AnActionEvent) {
                         e.presentation.isEnabled = true
                     }
@@ -125,13 +127,25 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             actionGroup.addSeparator()
 
             val expander: TreeExpander = DefaultTreeExpander(tree)
-            val actions = CommonActionsManager.getInstance()
 
-            val expandAllAction = actions.createExpandAllAction(expander, tree)
-            expandAllAction.templatePresentation.setIcon(AllIcons.Actions.Expandall)
+            val expandAllAction =
+                object : AnAction("Expand All", "Expand all items", AllIcons.Actions.Expandall) {
+                    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-            val collapseAllAction = actions.createCollapseAllAction(expander, tree)
-            collapseAllAction.templatePresentation.setIcon(AllIcons.Actions.Collapseall)
+                    override fun actionPerformed(e: AnActionEvent) {
+                        expander.expandAll()
+                    }
+                }
+
+            val collapseAllAction =
+                object :
+                    AnAction("Collapse All", "Collapse all items", AllIcons.Actions.Collapseall) {
+                    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
+                    override fun actionPerformed(e: AnActionEvent) {
+                        expander.collapseAll()
+                    }
+                }
 
             actionGroup.add(expandAllAction)
             actionGroup.add(collapseAllAction)

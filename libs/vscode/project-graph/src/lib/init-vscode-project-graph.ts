@@ -31,16 +31,17 @@ import {
   legacyTaskButton,
 } from './legacy-implementation/project-graph';
 
-let graphWebviewManager: GraphWebviewManager | undefined;
+let _graphWebviewManager: GraphWebviewManager | undefined;
 
 export function getGraphWebviewManager(): GraphWebviewManager {
-  if (!graphWebviewManager)
+  if (!_graphWebviewManager)
     throw new Error('GraphWebviewManager not initialized');
-  return graphWebviewManager;
+  return _graphWebviewManager;
 }
 
 export async function initVscodeProjectGraph(context: ExtensionContext) {
   const graphWebviewManager = new GraphWebviewManager(context);
+  _graphWebviewManager = graphWebviewManager;
   const legacyGrapyWebView = new GraphWebView();
 
   context.subscriptions.push(
