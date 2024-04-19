@@ -29,8 +29,12 @@ export async function selectRunInformation(
     return { flags, projectName, targetName, configuration };
   }
 
-  const { validWorkspaceJson, workspace } = await getNxWorkspace();
-  if (!validWorkspaceJson) {
+  const nxWorkspace = await getNxWorkspace();
+  if (!nxWorkspace) {
+    return;
+  }
+  const { validWorkspaceJson, workspace } = nxWorkspace;
+  if (!validWorkspaceJson || !workspace) {
     return;
   }
 
@@ -150,14 +154,14 @@ async function selectTargetAndThenProject(
 }
 
 async function getTargets(projectName?: string): Promise<string[]> {
-  const { workspace } = await getNxWorkspace();
+  const workspace = (await getNxWorkspace())?.workspace;
 
   if (projectName) {
-    return Object.keys(workspace.projects[projectName].targets || {}).sort();
+    return Object.keys(workspace?.projects[projectName].targets || {}).sort();
   }
 
   return Array.from(
-    Object.values(workspace.projects).reduce((acc, project) => {
+    Object.values(workspace?.projects ?? {}).reduce((acc, project) => {
       for (const target of Object.keys(project.targets ?? {})) {
         acc.add(target);
       }
@@ -167,9 +171,13 @@ async function getTargets(projectName?: string): Promise<string[]> {
 }
 
 async function getProjects(targetName?: string): Promise<string[]> {
+  const nxWorkspace = await getNxWorkspace();
+  if (!nxWorkspace) {
+    return [];
+  }
   const {
     workspace: { projects },
-  } = await getNxWorkspace();
+  } = nxWorkspace;
   const projectEntries = Object.entries(projects);
 
   if (targetName) {

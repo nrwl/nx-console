@@ -76,7 +76,7 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
     }
 
     const projectLocations = getProjectLocations(document, projectName);
-    const { validWorkspaceJson } = await getNxWorkspace();
+    const validWorkspaceJson = (await getNxWorkspace())?.validWorkspaceJson;
     if (!validWorkspaceJson) {
       return;
     }
@@ -151,29 +151,6 @@ export class WorkspaceCodeLensProvider implements NxCodeLensProvider {
           );
         }
       }
-    }
-  }
-
-  private async buildSyntheticTargetLenses(
-    lenses: CodeLens[],
-    document: TextDocument,
-    projectName: string,
-    explicitTargets: ProjectTargetLocation = {}
-  ) {
-    const { workspace } = await getNxWorkspace();
-    const targets = Object.keys(workspace.projects[projectName].targets ?? {});
-    const syntheticTargets = targets.filter(
-      (targetName) => !Object.keys(explicitTargets).includes(targetName)
-    );
-
-    const position = getTargetsPropertyLocation(document);
-    if (!position) {
-      return;
-    }
-    for (const target of syntheticTargets) {
-      lenses.push(
-        new TargetCodeLens(new Range(position, position), projectName, target)
-      );
     }
   }
 

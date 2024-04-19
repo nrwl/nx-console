@@ -7,12 +7,12 @@ import { sendRequest } from '@nx-console/vscode/lsp-client';
 
 export async function getProjectByPath(
   selectedPath: string | undefined
-): Promise<ProjectConfiguration | null> {
+): Promise<ProjectConfiguration | undefined | null> {
   return sendRequest(NxProjectByPathRequest, { projectPath: selectedPath });
 }
 
 export async function getProjectByRoot(
   projectRoot: string
-): Promise<ProjectConfiguration | null> {
+): Promise<ProjectConfiguration | undefined | null> {
   return sendRequest(NxProjectByRootRequest, { projectRoot });
 }

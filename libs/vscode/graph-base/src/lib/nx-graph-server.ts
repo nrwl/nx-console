@@ -1,4 +1,4 @@
-import { getNxWorkspacePath } from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspacePathFromNxls } from '@nx-console/vscode/nx-workspace';
 import { ChildProcess, spawn } from 'child_process';
 import { createServer } from 'net';
 import { getPackageManagerCommand } from 'nx/src/devkit-exports';
@@ -134,7 +134,7 @@ export class NxGraphServer implements Disposable {
   }
 
   private async spawnProcess(port: number): Promise<void> {
-    const workspacePath = await getNxWorkspacePath();
+    const workspacePath = await getNxWorkspacePathFromNxls();
 
     return new Promise((resolve, reject) => {
       const nxGraphProcess = spawn(

@@ -8,7 +8,7 @@ import { StartupMessageDefinition } from 'shared/nx-console-plugins';
 
 export function getTransformedGeneratorSchema(
   schema: GeneratorSchema
-): Promise<GeneratorSchema> {
+): Promise<GeneratorSchema | undefined> {
   return sendRequest(NxTransformedGeneratorSchemaRequest, schema);
 }
 

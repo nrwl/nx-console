@@ -1,2 +1,1 @@
-export * from './lib/configure-lsp-client';
-export * from './lib/refresh-workspace';
+export * from './lib/nxls-client';

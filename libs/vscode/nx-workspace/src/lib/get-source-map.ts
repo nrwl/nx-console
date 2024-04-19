@@ -6,7 +6,7 @@ import { sendRequest } from '@nx-console/vscode/lsp-client';
 import { TargetConfiguration } from 'nx/src/devkit-exports';
 
 export async function getSourceMapFilesToProjectMap(): Promise<
-  Record<string, string>
+  Record<string, string> | undefined
 > {
   return sendRequest(NxSourceMapFilesToProjectMapRequest, undefined);
 }

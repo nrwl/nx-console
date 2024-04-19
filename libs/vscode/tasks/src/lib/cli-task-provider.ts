@@ -1,7 +1,7 @@
 import { WORKSPACE_GENERATOR_NAME_REGEX } from '@nx-console/shared/schema';
 import {
   getNxWorkspace,
-  getNxWorkspacePath,
+  getNxWorkspacePathFromNxls,
 } from '@nx-console/vscode/nx-workspace';
 import { Task, TaskExecution, TaskProvider, tasks, window } from 'vscode';
 import { CliTask } from './cli-task';
@@ -39,7 +39,7 @@ export class CliTaskProvider implements TaskProvider {
 
     const projectTargetCombinations: [string, string][] = [];
 
-    Object.entries(nxWorkspace.workspace.projects).forEach(
+    Object.entries(nxWorkspace?.workspace.projects ?? {}).forEach(
       ([projectName, project]) => {
         Object.keys(project.targets ?? {}).forEach((targetName) => {
           projectTargetCombinations.push([projectName, targetName]);
@@ -60,7 +60,7 @@ export class CliTaskProvider implements TaskProvider {
   }
 
   async resolveTask(task: Task): Promise<Task | undefined> {
-    if ((await getNxWorkspacePath()) && task.definition.command) {
+    if ((await getNxWorkspacePathFromNxls()) && task.definition.command) {
       const cliTask = await CliTask.create({
         command: task.definition.command,
         positional: task.definition.positional,
@@ -69,7 +69,7 @@ export class CliTaskProvider implements TaskProvider {
           : [],
       });
       // resolveTask requires that the same definition object be used.
-      cliTask.definition = task.definition;
+      cliTask!.definition = task.definition;
       return cliTask;
     }
   }
@@ -105,6 +105,9 @@ export class CliTaskProvider implements TaskProvider {
       return;
     }
 
+    if (!task) {
+      return;
+    }
     return tasks.executeTask(task).then((execution) => {
       if (isDryRun) {
         this.currentDryRun = execution;

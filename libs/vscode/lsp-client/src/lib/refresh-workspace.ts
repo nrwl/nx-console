@@ -1,31 +1,31 @@
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
-import { commands, Disposable, EventEmitter, ExtensionContext } from 'vscode';
-import { sendNotification } from './configure-lsp-client';
+// import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+// import { commands, Disposable, EventEmitter, ExtensionContext } from 'vscode';
+// import { sendNotification } from './configure-lsp-client';
 
-export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
+// export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 
-const refreshedEventEmitter = new EventEmitter<void>();
+// const refreshedEventEmitter = new EventEmitter<void>();
 
-export function handleNxlsRefresh() {
-  refreshedEventEmitter.fire();
-}
+// export function handleNxlsRefresh() {
+//   refreshedEventEmitter.fire();
+// }
 
-function handleVSCodeRefresh() {
-  sendNotification(NxWorkspaceRefreshNotification);
-}
+// function handleVSCodeRefresh() {
+//   sendNotification(NxWorkspaceRefreshNotification);
+// }
 
-export function onWorkspaceRefreshed(callback: () => void): Disposable {
-  return refreshedEventEmitter.event(callback);
-}
+// export function onWorkspaceRefreshed(callback: () => void): Disposable {
+//   return refreshedEventEmitter.event(callback);
+// }
 
-/**
- * Refresh workspace by debouncing multiple calls to only trigger once
- */
-export function initRefreshWorkspace(context: ExtensionContext) {
-  context.subscriptions.push(
-    commands.registerCommand(REFRESH_WORKSPACE, () => {
-      handleVSCodeRefresh();
-    })
-  );
-  context.subscriptions.push(refreshedEventEmitter);
-}
+// /**
+//  * Refresh workspace by debouncing multiple calls to only trigger once
+//  */
+// export function initRefreshWorkspace(context: ExtensionContext) {
+//   context.subscriptions.push(
+//     commands.registerCommand(REFRESH_WORKSPACE, () => {
+//       handleVSCodeRefresh();
+//     })
+//   );
+//   context.subscriptions.push(refreshedEventEmitter);
+// }

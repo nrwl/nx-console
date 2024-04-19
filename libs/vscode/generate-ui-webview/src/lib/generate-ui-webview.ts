@@ -8,7 +8,10 @@ import {
   GeneratorSchema,
   ValidationResults,
 } from '@nx-console/shared/generate-ui-types';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import {
+  getNxWorkspacePath,
+  GlobalConfigurationStore,
+} from '@nx-console/vscode/configuration';
 import {
   getNxWorkspace,
   getStartupMessage,
@@ -190,9 +193,8 @@ export class GenerateUiWebview {
     | { schemaProcessors?: any[]; validators?: any[]; startupMessages?: any[] }
     | undefined
   > {
-    const workspace = await getNxWorkspace();
     try {
-      const pluginFile = `${workspace.workspacePath}/.nx/console/plugins.mjs`;
+      const pluginFile = `${getNxWorkspacePath()}/.nx/console/plugins.mjs`;
       if (!existsSync(pluginFile)) {
         return undefined;
       }
@@ -210,7 +212,7 @@ export class GenerateUiWebview {
     );
     return {
       ...message,
-      payload: transformedSchema,
+      payload: transformedSchema ?? message.payload,
     };
   }
 

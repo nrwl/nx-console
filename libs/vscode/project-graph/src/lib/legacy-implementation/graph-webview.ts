@@ -1,6 +1,6 @@
 import {
   getNxWorkspace,
-  getNxWorkspacePath,
+  getNxWorkspacePathFromNxls,
   getNxWorkspaceProjects,
   getProjectGraphOutput,
   hasAffectedProjects,
@@ -70,9 +70,15 @@ export class GraphWebView implements Disposable {
       return;
     }
 
-    const workspacePath = await getNxWorkspacePath();
-    const { directory } = await getProjectGraphOutput();
+    const workspacePath = await getNxWorkspacePathFromNxls();
+    const projectGraphOutput = await getProjectGraphOutput();
 
+    if (!workspacePath || !projectGraphOutput) {
+      window.showErrorMessage(
+        "Couldn't load project graph. Make sure you've installed dependencies and check the logs."
+      );
+      return;
+    }
     this.panel = window.createWebviewPanel(
       'graph',
       'Nx Graph',
@@ -80,7 +86,7 @@ export class GraphWebView implements Disposable {
       {
         enableScripts: true,
         retainContextWhenHidden: true,
-        localResourceRoots: [Uri.file(directory)],
+        localResourceRoots: [Uri.file(projectGraphOutput.directory)],
       }
     );
 
@@ -197,9 +203,15 @@ export class GraphWebView implements Disposable {
 
   async showAffectedProjects() {
     getOutputChannel().appendLine(`Graph - Opening affected projects`);
+    const nxWorkspace = await getNxWorkspace();
+    if (!nxWorkspace) {
+      showNoProjectsMessage();
+      return;
+    }
+
     const {
       workspace: { projects },
-    } = await getNxWorkspace();
+    } = nxWorkspace;
 
     if (!projects || !projects.length) {
       showNoProjectsMessage();

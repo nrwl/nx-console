@@ -1,4 +1,7 @@
-import { WorkspaceConfigurationStore } from '@nx-console/vscode/configuration';
+import {
+  getNxWorkspacePath,
+  WorkspaceConfigurationStore,
+} from '@nx-console/vscode/configuration';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   AbstractTreeProvider,
@@ -55,7 +58,7 @@ export class RunTargetTreeProvider extends AbstractTreeProvider<
   async getChildren() {
     let workspacePath = null;
     try {
-      workspacePath = (await getNxWorkspace()).workspacePath;
+      workspacePath = getNxWorkspacePath();
     } catch (e) {
       getOutputChannel().appendLine(
         `Unable to load workspace path: ${e.stack}`
@@ -81,7 +84,7 @@ const commandList = async (): Promise<string[]> => {
 };
 
 async function getTargetNames(): Promise<string[]> {
-  const { workspace } = await getNxWorkspace();
+  const workspace = (await getNxWorkspace())?.workspace ?? { projects: {} };
   const commands = Object.values(workspace.projects).reduce((acc, project) => {
     for (const target of Object.keys(project.targets ?? {})) {
       acc.add(target);

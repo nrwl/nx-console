@@ -185,6 +185,10 @@ export function loadSpinner() {
 export async function loadHtml(panel: WebviewPanel) {
   const projectGraphOutput = await getProjectGraphOutput();
 
+  if (!projectGraphOutput) {
+    return '';
+  }
+
   getOutputChannel().appendLine(
     'Loading project graph from ' + projectGraphOutput.fullPath
   );
@@ -410,7 +414,7 @@ function injectedScript() {
 
 async function setNxConsoleEnvironment() {
   const nxVersion = await getNxVersion();
-  if (gte(nxVersion.full, '16.6.0')) {
+  if (gte(nxVersion?.full ?? '0.0.0', '16.6.0')) {
     return '<script> window.environment = "nx-console"</script>';
   } else {
     return '';

@@ -11,16 +11,12 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
-import { showNoProjectAtPathMessage } from '@nx-console/vscode/utils';
-import { join } from 'path';
 import {
   ExtensionContext,
-  Range,
   ViewColumn,
   WebviewPanel,
   commands,
   window,
-  workspace,
 } from 'vscode';
 
 export class ProjectDetailsPreview {
@@ -77,7 +73,7 @@ export class ProjectDetailsPreview {
     this.webviewPanel.onDidDispose(() => {
       interactionListener.dispose();
       viewStateListener.dispose();
-      workspaceRefreshListener.dispose();
+      workspaceRefreshListener?.dispose();
       commands.executeCommand('setContext', 'projectDetailsViewVisible', false);
     });
   }
@@ -91,7 +87,7 @@ export class ProjectDetailsPreview {
   }
 
   private async loadHtml() {
-    let error = (await getNxWorkspace()).error;
+    let error = (await getNxWorkspace())?.error;
     const project = await getProjectByPath(this.path);
 
     if (!project) {
@@ -178,14 +174,14 @@ export class ProjectDetailsPreview {
       return;
     }
 
-    if (event.type === 'override-target') {
-      this.overrideTarget(
-        event.payload.projectName,
-        event.payload.targetName,
-        event.payload.targetConfigString
-      );
-      return;
-    }
+    // if (event.type === 'override-target') {
+    //   this.overrideTarget(
+    //     event.payload.projectName,
+    //     event.payload.targetName,
+    //     event.payload.targetConfigString
+    //   );
+    //   return;
+    // }
 
     if (event.type.startsWith('request')) {
       const response = await this.graphServer.handleWebviewRequest(event);
@@ -195,51 +191,51 @@ export class ProjectDetailsPreview {
     }
   }
 
-  private async overrideTarget(
-    projectName: string,
-    targetName: string,
-    targetConfigString: string
-  ) {
-    const {
-      workspacePath,
-      workspace: { projects },
-    } = await getNxWorkspace();
-    const project = projects[projectName];
-    const projectConfigPath = join(workspacePath, project.root, 'project.json');
-    const doc = await workspace.openTextDocument(projectConfigPath);
-    const column = window.visibleTextEditors.find(
-      (editor) => editor.document.fileName === doc.fileName
-    )?.viewColumn;
-    await window.showTextDocument(doc, column ?? ViewColumn.Beside);
+  // private async overrideTarget(
+  //   projectName: string,
+  //   targetName: string,
+  //   targetConfigString: string
+  // ) {
+  //   const {
+  //     workspacePath,
+  //     workspace: { projects },
+  //   } = await getNxWorkspace();
+  //   const project = projects[projectName];
+  //   const projectConfigPath = join(workspacePath, project.root, 'project.json');
+  //   const doc = await workspace.openTextDocument(projectConfigPath);
+  //   const column = window.visibleTextEditors.find(
+  //     (editor) => editor.document.fileName === doc.fileName
+  //   )?.viewColumn;
+  //   await window.showTextDocument(doc, column ?? ViewColumn.Beside);
 
-    const editor = window.visibleTextEditors.find((editor) =>
-      editor.document.fileName.endsWith(projectConfigPath)
-    );
+  //   const editor = window.visibleTextEditors.find((editor) =>
+  //     editor.document.fileName.endsWith(projectConfigPath)
+  //   );
 
-    if (!editor) {
-      return;
-    }
+  //   if (!editor) {
+  //     return;
+  //   }
 
-    const json = JSON.parse(editor.document.getText());
-    if (!json.targets) {
-      json.targets = {};
-    }
+  //   const json = JSON.parse(editor.document.getText());
+  //   if (!json.targets) {
+  //     json.targets = {};
+  //   }
 
-    json.targets[targetName] = JSON.parse(targetConfigString);
-    await editor.edit((editBuilder) => {
-      editBuilder.replace(
-        new Range(
-          editor.document.positionAt(0),
-          editor.document.positionAt(editor.document.getText().length)
-        ),
-        JSON.stringify(json, null, 2)
-      );
-    });
-    commands.executeCommand('editor.action.formatDocument');
-  }
+  //   json.targets[targetName] = JSON.parse(targetConfigString);
+  //   await editor.edit((editBuilder) => {
+  //     editBuilder.replace(
+  //       new Range(
+  //         editor.document.positionAt(0),
+  //         editor.document.positionAt(editor.document.getText().length)
+  //       ),
+  //       JSON.stringify(json, null, 2)
+  //     );
+  //   });
+  //   commands.executeCommand('editor.action.formatDocument');
+  // }
 
   private debouncedRefresh = debounce(async () => {
-    const error = (await getNxWorkspace()).error;
+    const error = (await getNxWorkspace())?.error;
     if (error) {
       this.loadHtml();
     } else if (this.isShowingErrorHtml) {

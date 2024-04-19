@@ -4,8 +4,9 @@ import {
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
 import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
+import { Disposable } from 'vscode-languageserver';
 
-export class GraphWebviewManager {
+export class GraphWebviewManager implements Disposable {
   private webviewPanel: WebviewPanel | undefined;
   private currentPanelIsAffected = false;
 
@@ -123,5 +124,9 @@ export class GraphWebviewManager {
     });
 
     this.webviewPanel.reveal();
+  }
+
+  dispose() {
+    this.webviewPanel?.dispose();
   }
 }
