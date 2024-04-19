@@ -1,4 +1,7 @@
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import {
+  NxResetNotification,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -177,6 +180,7 @@ class NxlsClient {
     }
     await this.stop();
     await this.start(this.workspacePath);
-    this.client?.sendNotification(NxWorkspaceRefreshNotification);
+    // this calls 'nx reset' to clear all caches & also refreshes the workspace
+    this.client?.sendNotification(NxResetNotification);
   }
 }
