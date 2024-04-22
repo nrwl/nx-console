@@ -337,9 +337,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 if (query.isDisposed) return@executeWhenLoaded
                 query.addHandler {
                     val nxlsService = NxlsService.getInstance(project)
-                    ApplicationManager.getApplication().invokeLater {
-                        nxlsService.refreshWorkspace()
-                    }
+                    CoroutineScope(Dispatchers.EDT).launch { nxlsService.refreshWorkspace() }
 
                     null
                 }

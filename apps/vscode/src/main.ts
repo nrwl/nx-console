@@ -4,6 +4,7 @@ import {
   ExtensionContext,
   ExtensionMode,
   FileSystemWatcher,
+  ProgressLocation,
   RelativePattern,
   TreeItem,
   TreeView,
@@ -66,6 +67,7 @@ import {
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server/types';
 import { getNxGraphServer } from '@nx-console/vscode/graph-base';
+import { registerRefreshWorkspace } from './refresh-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -217,22 +219,7 @@ async function setWorkspace(workspacePath: string) {
     initTasks(context);
     registerVscodeAddDependency(context);
 
-    const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
-
-    context.subscriptions.push(
-      commands.registerCommand(REFRESH_WORKSPACE, async () => {
-        const nxlsClient = getNxlsClient();
-        // this calls 'nx reset' to clear all caches
-        await nxlsClient?.sendRequest(NxResetRequest, undefined);
-
-        await Promise.all([
-          nxlsClient?.restart(),
-          getNxGraphServer(context).restart(),
-        ]);
-
-        nxlsClient?.sendNotification(NxWorkspaceRefreshNotification);
-      })
-    );
+    registerRefreshWorkspace(context);
 
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
