@@ -1,13 +1,10 @@
-import {
-  NxResetRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
+import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
 } from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { commands, Disposable, EventEmitter, ExtensionContext } from 'vscode';
+import { Disposable, EventEmitter, ExtensionContext } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -16,8 +13,6 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
-
-export const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
 
 let client: NxlsClient | undefined;
 
@@ -70,13 +65,7 @@ class NxlsClient {
 
   private refreshedEventEmitter = new EventEmitter<void>();
 
-  constructor(private extensionContext: ExtensionContext) {
-    extensionContext.subscriptions.push(
-      commands.registerCommand(REFRESH_WORKSPACE, () => {
-        this.refresh();
-      })
-    );
-  }
+  constructor(private extensionContext: ExtensionContext) {}
 
   public sendNotification<P>(
     notificationType: NotificationType<P>,
@@ -171,17 +160,15 @@ class NxlsClient {
     return this.refreshedEventEmitter.event(callback);
   }
 
-  public async refresh() {
+  public async restart() {
     if (!this.workspacePath) {
       getOutputChannel().appendLine(
         "Can't refresh workspace without a workspace path. Make sure to start the LSP client first."
       );
       return;
     }
-    // this calls 'nx reset' to clear all caches 
-    await this.client?.sendRequest(NxResetRequest, undefined);
+
     await this.stop();
     await this.start(this.workspacePath);
-    
   }
 }

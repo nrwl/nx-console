@@ -61,6 +61,11 @@ import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
+import {
+  NxResetRequest,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
+import { getNxGraphServer } from '@nx-console/vscode/graph-base';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -211,6 +216,23 @@ async function setWorkspace(workspacePath: string) {
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
     initTasks(context);
     registerVscodeAddDependency(context);
+
+    const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';
+
+    context.subscriptions.push(
+      commands.registerCommand(REFRESH_WORKSPACE, async () => {
+        const nxlsClient = getNxlsClient();
+        // this calls 'nx reset' to clear all caches
+        await nxlsClient?.sendRequest(NxResetRequest, undefined);
+
+        await Promise.all([
+          nxlsClient?.restart(),
+          getNxGraphServer(context).restart(),
+        ]);
+
+        nxlsClient?.sendNotification(NxWorkspaceRefreshNotification);
+      })
+    );
 
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',

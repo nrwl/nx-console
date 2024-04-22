@@ -1,4 +1,4 @@
-import { getNxWorkspacePathFromNxls } from '@nx-console/vscode/nx-workspace';
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { ChildProcess, spawn } from 'child_process';
 import { createServer } from 'net';
 import { getPackageManagerCommand } from 'nx/src/devkit-exports';
@@ -129,12 +129,17 @@ export class NxGraphServer implements Disposable {
     }
   }
 
+  async restart() {
+    this.dispose();
+    await this.start();
+  }
+
   private get isCrashed() {
     return !!this.nxGraphProcess && !!this.nxGraphProcess.exitCode;
   }
 
   private async spawnProcess(port: number): Promise<void> {
-    const workspacePath = await getNxWorkspacePathFromNxls();
+    const workspacePath = await getNxWorkspacePath();
 
     return new Promise((resolve, reject) => {
       const nxGraphProcess = spawn(
@@ -225,7 +230,7 @@ export class NxGraphServer implements Disposable {
   }
 
   dispose() {
-    this.nxGraphProcess?.kill();
+    this.nxGraphProcess?.kill('SIGTERM');
     this.nxGraphProcess = undefined;
   }
 }
