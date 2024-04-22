@@ -114,7 +114,7 @@ export class DaemonWatcher {
 
   private async tryRestartWatcher() {
     this.disposeEverything();
-    if (this.retryCount > 1) {
+    if (this.retryCount > 0) {
       lspLogger.log('Daemon watcher failed to restart, using native watcher');
       this.useNativeWatcher();
       return;
