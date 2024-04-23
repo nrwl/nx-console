@@ -19,13 +19,16 @@ export class CliTask extends Task {
     definition: CliTaskDefinition,
     workspace?: NxWorkspace,
     packageManagerCommands?: PackageManagerCommands
-  ): Promise<CliTask> {
+  ): Promise<CliTask | undefined> {
     // Using `run [project]:[command]` is more backwards compatible in case different
     // versions of CLI does not handle `[command] [project]` args.
     const args = getArgs(definition);
 
-    const { isEncapsulatedNx, workspacePath } =
-      workspace ?? (await getNxWorkspace());
+    const nxWorkspace = workspace ?? (await getNxWorkspace());
+    if (!nxWorkspace) {
+      return;
+    }
+    const { isEncapsulatedNx, workspacePath } = nxWorkspace;
 
     const displayCommand = `nx ${args.join(' ')}`;
 
@@ -56,14 +59,20 @@ export class CliTask extends Task {
   ): Promise<CliTask[]> {
     const w = workspace ?? (await getNxWorkspace());
 
+    if (!w) {
+      return [];
+    }
+
     const packageManagerCommands = getPackageManagerCommand(
-      detectPackageManager(w.workspacePath)
+      detectPackageManager(w?.workspacePath)
     );
-    return await Promise.all(
+
+    const tasks = await Promise.all(
       definitions.map((definition) =>
         this.create(definition, w, packageManagerCommands)
       )
     );
+    return tasks.filter((task) => task !== undefined) as CliTask[];
   }
 }
 

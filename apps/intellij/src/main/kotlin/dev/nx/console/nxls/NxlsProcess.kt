@@ -5,6 +5,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.javascript.nodejs.interpreter.NodeCommandLineConfigurator
 import com.intellij.lang.javascript.service.JSLanguageServiceUtil
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import dev.nx.console.NxConsoleBundle
@@ -16,8 +17,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 private val logger = logger<NxlsProcess>()
 
@@ -29,6 +32,8 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
 
     private var onExit: (() -> Unit)? = null
 
+    private var exitJob: Job? = null
+
     fun start() {
         logger.info("Staring the nxls process in workingDir $basePath")
         createCommandLine().apply {
@@ -39,24 +44,48 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                 } else {
                     logger.info("nxls started: $it")
                 }
-                cs.launch {
-                    val e = it.onExit().await()
-                    e.errorStream.readAllBytes().decodeToString().run {
-                        if (this.isEmpty()) {
-                            return@run
+                exitJob =
+                    cs.launch {
+                        val e = it.onExit().await()
+                        e.errorStream.readAllBytes().decodeToString().run {
+                            if (this.isEmpty()) {
+                                return@run
+                            }
+
+                            if (project.isDisposed) {
+                                return@run
+                            }
+
+                            logger.trace("Nxls early exit: $this")
+
+                            Notifier.notifyNxlsError(project)
+                            onExit?.invoke()
                         }
-
-                        if (project.isDisposed) {
-                            return@run
-                        }
-
-                        logger.trace("Nxls early exit: $this")
-
-                        Notifier.notifyNxlsError(project)
-                        onExit?.invoke()
                     }
-                }
             }
+        }
+    }
+
+    suspend fun stop() {
+        exitJob?.cancel()
+        thisLogger().info("stopping nxls process")
+        val hasExited =
+            if (process?.isAlive == false) {
+                thisLogger().info("process is not alive")
+                true
+            } else {
+                withTimeoutOrNull(1000L) {
+                    thisLogger().info("waiting for process to exit")
+                    process?.onExit()?.await()
+                    true
+                }
+                    ?: false
+            }
+        thisLogger().info("Process exited: $hasExited")
+
+        if (!hasExited) {
+            thisLogger().info("Process did not exit in time, destroying forcibly.")
+            process?.destroyForcibly()
         }
     }
 

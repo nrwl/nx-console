@@ -3,9 +3,16 @@ import {
   handleGraphInteractionEvent,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
-import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
+import {
+  commands,
+  ExtensionContext,
+  ViewColumn,
+  WebviewPanel,
+  window,
+} from 'vscode';
+import { Disposable } from 'vscode-languageserver';
 
-export class GraphWebviewManager {
+export class GraphWebviewManager implements Disposable {
   private webviewPanel: WebviewPanel | undefined;
   private currentPanelIsAffected = false;
 
@@ -117,11 +124,28 @@ export class GraphWebviewManager {
       }
     });
 
+    const viewStateListener = this.webviewPanel.onDidChangeViewState(
+      ({ webviewPanel }) => {
+        commands.executeCommand(
+          'setContext',
+          'graphWebviewVisible',
+          webviewPanel.visible
+        );
+      }
+    );
+
     this.webviewPanel.onDidDispose(() => {
+      commands.executeCommand('setContext', 'graphWebviewVisible', false);
+      viewStateListener.dispose();
+
       this.webviewPanel = undefined;
       this.currentPanelIsAffected = false;
     });
 
     this.webviewPanel.reveal();
+  }
+
+  dispose() {
+    this.webviewPanel?.dispose();
   }
 }

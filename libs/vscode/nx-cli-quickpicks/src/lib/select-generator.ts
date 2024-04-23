@@ -25,7 +25,7 @@ export async function selectGenerator(
     generatorName: string;
     collectionPath: string;
   }
-  const generators = await getGenerators();
+  const generators = (await getGenerators()) ?? [];
   let generatorsQuickPicks = generators
     .filter((collection) => !!collection.data)
     .map((collection): GenerateQuickPickItem => {
@@ -85,11 +85,12 @@ export async function selectGenerator(
   if (selection) {
     const options =
       selection.generator.options ||
-      (await getGeneratorOptions({
+      ((await getGeneratorOptions({
         collection: selection.collectionName,
         name: selection.generator.name,
         path: selection.collectionPath,
-      }));
+      })) ??
+        []);
     const positional = selection.generatorName;
     return {
       ...selection.generator,
@@ -111,7 +112,7 @@ export async function selectGeneratorAndPromptForFlags(
     }
   | undefined
 > {
-  const { validWorkspaceJson } = await getNxWorkspace();
+  const validWorkspaceJson = (await getNxWorkspace())?.validWorkspaceJson;
 
   if (!validWorkspaceJson) {
     return;
@@ -148,7 +149,7 @@ export async function getGenerator(
       collection: generatorName.split(':')[0],
       name: generatorName.split(':')[1],
     };
-    const foundGenerator = (await getGenerators()).find(
+    const foundGenerator = ((await getGenerators()) ?? []).find(
       (gen) =>
         generatorInfo.collection === gen.data?.collection &&
         generatorInfo.name === gen.data?.name

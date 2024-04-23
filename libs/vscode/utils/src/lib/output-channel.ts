@@ -15,3 +15,12 @@ export const outputLogger: Logger = {
     getOutputChannel().appendLine(message);
   },
 };
+
+let _nxlsOutputChannel: OutputChannel;
+
+export function getNxlsOutputChannel(): OutputChannel {
+  if (!_nxlsOutputChannel) {
+    _nxlsOutputChannel = window.createOutputChannel('Nx Language Server');
+  }
+  return _nxlsOutputChannel;
+}

@@ -1,7 +1,10 @@
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
+import {
+  getOutputChannel,
+  getShellExecutionForConfig,
+} from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { Task, TaskScope } from 'vscode';
+import { Task, TaskScope, window } from 'vscode';
 
 export interface NxTaskDefinition {
   positional?: string;
@@ -11,7 +14,9 @@ export interface NxTaskDefinition {
 }
 
 export class NxTask extends Task {
-  static async create(definition: NxTaskDefinition): Promise<NxTask> {
+  static async create(
+    definition: NxTaskDefinition
+  ): Promise<NxTask | undefined> {
     const { command, flags, positional, cwd } = definition;
 
     const args: string[] = [
@@ -20,8 +25,15 @@ export class NxTask extends Task {
       ...flags,
     ];
 
-    const { isEncapsulatedNx, workspacePath } = await getNxWorkspace();
+    const workspace = await getNxWorkspace();
+    if (!workspace) {
+      getOutputChannel().appendLine(
+        'Error while creating task: no workspace found'
+      );
+      return;
+    }
 
+    const { workspacePath, isEncapsulatedNx } = workspace;
     const displayCommand = `nx ${args.join(' ')}`;
     const task = new NxTask(
       { ...definition, type: 'nx' }, // definition

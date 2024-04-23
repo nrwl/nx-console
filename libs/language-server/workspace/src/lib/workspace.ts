@@ -74,6 +74,7 @@ async function _workspace(
     const config = await getNxWorkspaceConfig(workspacePath, nxVersion, logger);
 
     const isLerna = await fileExists(join(workspacePath, 'lerna.json'));
+
     return {
       validWorkspaceJson: true,
       workspace: sortWorkspaceProjects(config.workspaceConfiguration),
