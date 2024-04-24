@@ -1,3 +1,19 @@
+## 1.22.0 (2024-04-24)
+
+### Bug Fixes
+
+* **intellij:** set color theme when starting PDV, not just on changes ([#2096](https://github.com/nrwl/nx-console/issues/2096)) ([2abb801](https://github.com/nrwl/nx-console/commit/2abb801c74e3c897e411f92c8a2ea57027e9b486))
+
+
+### Features
+
+* nx reset & restart nxls on manual refresh ([#2097](https://github.com/nrwl/nx-console/issues/2097)) ([f34afd2](https://github.com/nrwl/nx-console/commit/f34afd24c66ca2d5790fd5d75c4938a1510450bb))
+
+
+### Reverts
+
+* add @nx/gradle ([#2100](https://github.com/nrwl/nx-console/issues/2100)) ([84d5100](https://github.com/nrwl/nx-console/commit/84d51003e33cd4e3c984a6359b6c2c68fd4dc4ce))
+
 ## 1.21.0 (2024-04-10)
 
 ### Bug Fixes
