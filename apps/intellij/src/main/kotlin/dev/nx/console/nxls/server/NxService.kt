@@ -109,7 +109,7 @@ interface NxService {
     }
 
     @JsonRequest
-    fun reset(): CompletableFuture<Unit> {
+    fun stopDaemon(): CompletableFuture<Unit> {
         throw UnsupportedOperationException()
     }
 }

@@ -2,8 +2,8 @@ import { importNxPackagePath } from '@nx-console/shared/npm';
 import { Logger } from '@nx-console/shared/schema';
 import { exec } from 'node:child_process';
 
-export async function nxReset(workspacePath: string, logger: Logger) {
-  logger.log('Resetting workspace with `nx reset`');
+export async function nxStopDaemon(workspacePath: string, logger: Logger) {
+  logger.log('stopping daemon with `nx daemon --stop`');
   const { detectPackageManager, getPackageManagerCommand } =
     await importNxPackagePath<typeof import('nx/src/utils/package-manager')>(
       workspacePath,
@@ -15,7 +15,7 @@ export async function nxReset(workspacePath: string, logger: Logger) {
   );
   return new Promise<undefined>((res, rej) => {
     exec(
-      `${packageManagerCommands.exec} nx reset`,
+      `${packageManagerCommands.exec} nx daemon --stop`,
       {
         cwd: workspacePath,
       },
