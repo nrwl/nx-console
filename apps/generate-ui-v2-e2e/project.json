@@ -4,7 +4,7 @@
   "sourceRoot": "apps/generate-ui-v2-e2e/src",
   "projectType": "application",
   "targets": {
-    "e2e": {
+    "e2e-local": {
       "options": {
         "browser": "chrome"
       }

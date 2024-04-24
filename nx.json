@@ -118,7 +118,7 @@
     {
       "plugin": "@nx/cypress/plugin",
       "options": {
-        "targetName": "e2e",
+        "targetName": "e2e-local",
         "openTargetName": "open-cypress",
         "ciTargetName": "e2e-ci"
       }
