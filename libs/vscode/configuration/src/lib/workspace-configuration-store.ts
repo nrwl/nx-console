@@ -40,3 +40,7 @@ export class WorkspaceConfigurationStore implements Store {
     this.state.update(key, value);
   }
 }
+
+export function getNxWorkspacePath(): string {
+  return WorkspaceConfigurationStore.instance.get('nxWorkspacePath', '');
+}

@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  node_version: 18
+  node_version: 20
 
 jobs:
   main-linux:
@@ -40,7 +40,7 @@ jobs:
           npx nx-cloud record -- ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: npx nx affected --t=lint,test,build,e2e --configuration=ci --exclude=nx-console
+      - run: yarn nx affected --t=lint,test,build,e2e --configuration=ci --exclude=nx-console --verbose
   main-windows:
     name: Main Windows
     runs-on: windows-latest
@@ -71,7 +71,7 @@ jobs:
           cache: yarn
       - run: yarn install --immutable
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1.0.5
+        uses: gradle/wrapper-validation-action@v3
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -79,5 +79,5 @@ jobs:
           java-version: 17
           cache: gradle
       # there's no need to check formatting & linting again on windows
-      - run: npx nx affected --t=test,build,e2e --configuration=ci --exclude=nx-console
+      - run: yarn nx affected --t=test,build,e2e --configuration=ci --exclude=nx-console --verbose
         timeout-minutes: 45

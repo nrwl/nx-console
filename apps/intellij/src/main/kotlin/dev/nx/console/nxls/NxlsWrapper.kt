@@ -16,6 +16,9 @@ import dev.nx.console.utils.nxlsWorkingPath
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
@@ -24,6 +27,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.ResponseMessage
 
 enum class NxlsState {
     STOPPED,
+    STOPPING,
     STARTING,
     STARTED,
     FAILED
@@ -39,6 +43,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     private val startedFuture = CompletableFuture<Void>()
     private var initializeFuture: CompletableFuture<InitializeResult>? = null
     private var initializeResult: InitializeResult? = null
+    private var nxlsProcess: NxlsProcess? = null
 
     private var connectedEditors = HashMap<String, DocumentManager>()
 
@@ -50,22 +55,18 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     }
 
     suspend fun start() {
-
         try {
             status = NxlsState.STARTING
             val nxlsProcess = NxlsProcess(project, cs)
+            this.nxlsProcess = nxlsProcess
             val (input, output) =
                 nxlsProcess.run {
                     start()
                     Pair(getInputStream(), getOutputStream())
                 }
 
-            nxlsProcess.callOnExit {
-                status = NxlsState.STOPPED
-                stop()
-            }
+            nxlsProcess.callOnExit { cs.launch { stop() } }
             if (status !== NxlsState.STOPPED) {
-
                 languageClient = NxlsLanguageClient()
                 val executorService = Executors.newCachedThreadPool()
 
@@ -122,15 +123,14 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
 
                 initializeFuture = languageServer?.initialize(getInitParams())
 
-                initializeFuture?.whenComplete { _, error ->
-                    if (error == null) {
-                        log.info("nxls Initialized")
-                        project.messageBus
-                            .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
-                            .onNxWorkspaceRefresh()
-                    } else {
-                        log.info(error.toString())
-                    }
+                try {
+                    initializeFuture?.await()
+                    log.info("nxls Initialized")
+                    project.messageBus
+                        .syncPublisher(NX_WORKSPACE_REFRESH_TOPIC)
+                        .onNxWorkspaceRefresh()
+                } catch (e: Throwable) {
+                    log.info(e.toString())
                 }
             }
         } catch (e: Exception) {
@@ -145,17 +145,26 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
         }
     }
 
-    fun stop() {
+    suspend fun stop() {
+        if (status == NxlsState.STOPPED || status == NxlsState.STOPPING) {
+            return
+        }
+        status = NxlsState.STOPPING
         log.info("Stopping nxls")
 
         try {
             initializeFuture?.cancel(true)
-            languageServer?.shutdown()
+            withTimeoutOrNull(1000L) { languageServer?.shutdown()?.await() }
         } catch (e: Throwable) {
             log.info("error while shutting down $e")
         } finally {
             languageServer?.exit()
             startedFuture.completeExceptionally(Exception("Nxls stopped"))
+            for ((_, manager) in connectedEditors) {
+                disconnect(manager.editor)
+            }
+            nxlsProcess?.stop()
+            status = NxlsState.STOPPED
         }
     }
 

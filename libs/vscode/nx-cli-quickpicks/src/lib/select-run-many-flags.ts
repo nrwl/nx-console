@@ -86,7 +86,11 @@ const RUN_MANY_OPTIONS: Option[] = [
 async function validProjectsForTarget(
   target: string
 ): Promise<string[] | undefined> {
-  const { validWorkspaceJson, workspace } = await getNxWorkspace();
+  const nxWorkspace = await getNxWorkspace();
+  if (!nxWorkspace) {
+    return;
+  }
+  const { validWorkspaceJson, workspace } = nxWorkspace;
 
   if (!validWorkspaceJson || !workspace) {
     return;

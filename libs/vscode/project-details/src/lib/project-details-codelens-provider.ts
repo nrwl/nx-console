@@ -1,3 +1,4 @@
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getProperties,
@@ -69,7 +70,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
   ): Promise<ProjectDetailsCodeLens | undefined> {
     const project = await getProjectByPath(codeLens.filePath);
     if (!project) {
-      const error = (await getNxWorkspace()).error;
+      const error = (await getNxWorkspace())?.error;
       if (error) {
         return {
           ...codeLens,
@@ -128,7 +129,7 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
   }
 
   static async register(context: ExtensionContext) {
-    const workspaceRoot = (await getNxWorkspace()).workspacePath;
+    const workspaceRoot = getNxWorkspacePath();
     const codeLensProvider = new ProjectDetailsCodelensProvider(workspaceRoot);
 
     registerCodeLensProvider(codeLensProvider);

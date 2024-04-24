@@ -7,6 +7,6 @@ import { sendRequest } from '@nx-console/vscode/lsp-client';
 
 export function getGeneratorOptions(
   options: NxGeneratorOptionsRequestOptions
-): Promise<Option[]> {
+): Promise<Option[] | undefined> {
   return sendRequest(NxGeneratorOptionsRequest, { options });
 }

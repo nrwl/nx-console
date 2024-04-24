@@ -32,6 +32,7 @@ import {
 import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
 import { execSync } from 'child_process';
 import { major } from 'semver';
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -53,7 +54,7 @@ let pkgManager: PackageManager;
 
 function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
   return async () => {
-    const { workspacePath } = await getNxWorkspace();
+    const workspacePath = getNxWorkspacePath();
     pkgManager = detectPackageManager(workspacePath);
 
     const depInput = await promptForDependencyInput();
@@ -169,10 +170,11 @@ function addDependency(
 }
 
 async function executeInitGenerator(dependency: string, workspacePath: string) {
-  const generators = await getGenerators({
-    includeHidden: true,
-    includeNgAdd: true,
-  });
+  const generators =
+    (await getGenerators({
+      includeHidden: true,
+      includeNgAdd: true,
+    })) ?? [];
 
   let initGeneratorName = `${dependency}:init`;
   let initGenerator = generators.find((g) => g.name === initGeneratorName);
@@ -185,11 +187,12 @@ async function executeInitGenerator(dependency: string, workspacePath: string) {
     return;
   }
 
-  const opts = await getGeneratorOptions({
-    collection: initGenerator.data.collection,
-    name: initGenerator.name,
-    path: initGenerator.schemaPath,
-  });
+  const opts =
+    (await getGeneratorOptions({
+      collection: initGenerator.data.collection,
+      name: initGenerator.name,
+      path: initGenerator.schemaPath,
+    })) ?? [];
   let selectedFlags;
   if (opts.length) {
     selectedFlags = await selectFlags(initGenerator.name, opts);
@@ -241,7 +244,7 @@ async function getDependencySuggestions(): Promise<
             pkg.name !== 'tao'
         )
         .map((pkg) => ({
-          name: `@${version.major <= 15 ? 'nrwl' : 'nx'}/${pkg.name}`,
+          name: `@${version?.major ?? 16 <= 15 ? 'nrwl' : 'nx'}/${pkg.name}`,
           description: pkg.description,
         }));
     }),

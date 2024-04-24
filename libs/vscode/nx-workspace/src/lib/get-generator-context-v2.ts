@@ -4,6 +4,6 @@ import { sendRequest } from '@nx-console/vscode/lsp-client';
 
 export async function getGeneratorContextV2(
   path: string | undefined
-): Promise<GeneratorContext> {
+): Promise<GeneratorContext | undefined> {
   return sendRequest(NxGeneratorContextV2Request, { path });
 }

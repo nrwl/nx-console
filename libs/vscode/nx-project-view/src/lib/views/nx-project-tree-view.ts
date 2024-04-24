@@ -35,7 +35,11 @@ class TreeView extends BaseView {
     element?: TreeViewItem
   ): Promise<TreeViewItem[] | undefined> {
     if (!element) {
-      const { treeMap, roots } = await getProjectFolderTree();
+      const projectFolderTree = await getProjectFolderTree();
+      if (!projectFolderTree) {
+        return;
+      }
+      const { treeMap, roots } = projectFolderTree;
       this.treeMap = treeMap;
       // if there's only a single root, start with it expanded
       const isSingleProject = roots.length === 1;

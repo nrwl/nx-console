@@ -1,3 +1,4 @@
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getNxWorkspace,
@@ -195,9 +196,9 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
   }
 
   static async register(context: ExtensionContext) {
-    const workspaceRoot = (await getNxWorkspace()).workspacePath;
+    const workspaceRoot = getNxWorkspacePath();
     const initialSourceMapFilesToProjectMap =
-      await getSourceMapFilesToProjectMap();
+      (await getSourceMapFilesToProjectMap()) ?? {};
 
     const codeLensProvider = new ConfigFileCodelensProvider(
       workspaceRoot,
@@ -205,9 +206,9 @@ export class ConfigFileCodelensProvider implements NxCodeLensProvider {
     );
 
     onWorkspaceRefreshed(async () => {
-      const updatedWorkspaceRoot = (await getNxWorkspace()).workspacePath;
+      const updatedWorkspaceRoot = getNxWorkspacePath();
       const updatedSourceMapFilesToProjectMap =
-        await getSourceMapFilesToProjectMap();
+        (await getSourceMapFilesToProjectMap()) ?? {};
 
       codeLensProvider.workspaceRoot = updatedWorkspaceRoot;
       codeLensProvider.sourceMapFilesToProjectMap =

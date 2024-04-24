@@ -9,3 +9,4 @@ export { getWorkspacePath } from './lib/get-workspace-path';
 export { resolveDependencyVersioning } from './lib/dependency-versioning';
 export * from './lib/register-codelens';
 export * from './lib/task-creation-error';
+export * from './lib/log-and-show-error';

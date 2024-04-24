@@ -10,7 +10,7 @@ export async function nxReset(workspacePath: string, logger: Logger) {
   const packageManagerCommands = getPackageManagerCommand(
     detectPackageManager(workspacePath)
   );
-  return new Promise<void>((res, rej) => {
+  return new Promise<undefined>((res, rej) => {
     exec(
       `${packageManagerCommands.exec} nx reset`,
       {
@@ -20,26 +20,9 @@ export async function nxReset(workspacePath: string, logger: Logger) {
         if (err) {
           rej(err);
         } else {
-          res();
+          res(undefined);
         }
       }
     );
-  }).then(() => {
-    return new Promise<void>((res, rej) => {
-      logger.log('Starting Nx daemon');
-      exec(
-        `${packageManagerCommands.exec} nx daemon --start`,
-        {
-          cwd: workspacePath,
-        },
-        (err) => {
-          if (err) {
-            rej(err);
-          } else {
-            res();
-          }
-        }
-      );
-    });
   });
 }

@@ -6,10 +6,3 @@ tasks {
         gradleVersion = project.findProperty("gradleVersion").toString()
     }
 }
-
-
-allprojects {
-  apply {
-      plugin("project-report")
-  }
-}

@@ -1,6 +1,7 @@
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
 import {
-  getNxWorkspacePath,
+  getNxWorkspacePathFromNxls,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
@@ -14,7 +15,7 @@ export async function handleGraphInteractionEvent(event: {
 }): Promise<boolean> {
   if (event.type === 'file-click') {
     getTelemetry().featureUsed('nx.graph.openProjectEdgeFile');
-    const workspacePath = await getNxWorkspacePath();
+    const workspacePath = getNxWorkspacePath();
 
     commands.executeCommand(
       'vscode.open',

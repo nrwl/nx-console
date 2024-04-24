@@ -16,6 +16,73 @@ import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 
+export function legacyShowAll(graphWebView: GraphWebView) {
+  graphWebView.showAllProjects();
+}
+
+export function legacyShowAffected(graphWebView: GraphWebView) {
+  graphWebView.showAffectedProjects();
+}
+
+export function legacyFocus(graphWebView: GraphWebView, uri: Uri | undefined) {
+  openProjectWithFile(graphWebView, uri, MessageType.focus);
+}
+
+export function legacySelect(graphWebView: GraphWebView, uri: Uri) {
+  openProjectWithFile(graphWebView, uri, MessageType.select);
+}
+
+export function legacyFocusButton(
+  graphWebView: GraphWebView,
+  treeItem: NxTreeItem
+) {
+  const project = getProjectItem(treeItem);
+  if (project) {
+    graphWebView.projectInWebview(
+      project.nxProject.project,
+      undefined,
+      MessageType.focus
+    );
+  }
+}
+
+export function legacySelectButton(
+  graphWebView: GraphWebView,
+  treeItem: NxTreeItem
+) {
+  const project = getProjectItem(treeItem);
+  if (project) {
+    graphWebView.projectInWebview(
+      project.nxProject.project,
+      undefined,
+      MessageType.select
+    );
+  }
+}
+
+export function legacyTask(graphWebView: GraphWebView, uri: Uri | undefined) {
+  openProjectWithFile(graphWebView, uri, MessageType.task);
+}
+
+export function legacyTaskButton(
+  graphWebView: GraphWebView,
+  item: RunTargetTreeItem | NxTreeItem | [project: string, task: string]
+) {
+  if (item instanceof NxTreeItem) {
+    const project = getTaskItem(item);
+    if (project) {
+      graphWebView.projectInWebview(
+        project.nxProject.project,
+        project.nxTarget.name,
+        MessageType.task
+      );
+    }
+  } else if (item instanceof RunTargetTreeItem) {
+    const target = item.commandString;
+    graphWebView.showAllTasks(target);
+  } else graphWebView.projectInWebview(item[0], item[1], MessageType.task);
+}
+
 export function projectGraph() {
   const graphWebView = new GraphWebView();
   onWorkspaceRefreshed(() => graphWebView.refresh());
@@ -109,14 +176,19 @@ async function openProjectWithFile(
   }
   // we try to infer the project based on the current path
   // if it's not possible, just ask the user
-  let project: ProjectConfiguration | null = null;
+  let project: ProjectConfiguration | null | undefined = null;
   if (filePath) {
     project = await getProjectByPath(filePath);
   }
   if (!project) {
+    const nxWorkspace = await getNxWorkspace();
+    if (!nxWorkspace) {
+      showNoProjectsMessage();
+      return;
+    }
     const {
       workspace: { projects },
-    } = await getNxWorkspace();
+    } = nxWorkspace;
 
     const projectNames = Object.keys(projects);
 
@@ -133,7 +205,7 @@ async function openProjectWithFile(
   }
 
   if (messageType === MessageType.task) {
-    const targets = Object.keys(project.targets ?? {});
+    const targets = Object.keys(project?.targets ?? {});
     if (targets.length === 0) {
       return;
     }

@@ -114,14 +114,6 @@
       "options": {
         "targetName": "test"
       }
-    },
-    {
-      "plugin": "@nx/gradle",
-      "options": {
-        "testTargetName": "test",
-        "classesTargetName": "classes",
-        "buildTargetName": "build"
-      }
     }
   ],
   "defaultBase": "master"

@@ -4,6 +4,7 @@ import {
   ExtensionContext,
   ExtensionMode,
   FileSystemWatcher,
+  ProgressLocation,
   RelativePattern,
   TreeItem,
   TreeView,
@@ -48,10 +49,7 @@ import {
   initGenerateUiWebview,
   openGenerateUi,
 } from '@nx-console/vscode/generate-ui-webview';
-import {
-  configureLspClient,
-  initRefreshWorkspace,
-} from '@nx-console/vscode/lsp-client';
+import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import {
@@ -64,6 +62,12 @@ import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
+import {
+  NxResetRequest,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
+import { getNxGraphServer } from '@nx-console/vscode/graph-base';
+import { registerRefreshWorkspace } from './refresh-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -128,6 +132,7 @@ export async function activate(c: ExtensionContext) {
 
 export async function deactivate() {
   await stopDaemon();
+  await getNxlsClient()?.stop();
   getTelemetry().extensionDeactivated();
 }
 
@@ -197,7 +202,7 @@ async function setWorkspace(workspacePath: string) {
 
   WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
 
-  configureLspClient(context, workspacePath);
+  createNxlsClient(context).start(workspacePath);
 
   // Set the NX_WORKSPACE_ROOT_PATH as soon as possible so that the nx utils can get this.
   process.env.NX_WORKSPACE_ROOT_PATH = workspacePath;
@@ -213,6 +218,8 @@ async function setWorkspace(workspacePath: string) {
     tasks.registerTaskProvider('nx', CliTaskProvider.instance);
     initTasks(context);
     registerVscodeAddDependency(context);
+
+    registerRefreshWorkspace(context);
 
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
@@ -238,7 +245,6 @@ async function setWorkspace(workspacePath: string) {
 
     initNxCommandsView(context);
     initNvmTip(context);
-    initRefreshWorkspace(context);
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);
 
@@ -283,12 +289,12 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const { workspaceLayout } = await getNxWorkspace();
+  const workspaceLayout = (await getNxWorkspace())?.workspaceLayout;
   const workspacePackageDirs = new Set<string>();
-  if (workspaceLayout.appsDir) {
+  if (workspaceLayout?.appsDir) {
     workspacePackageDirs.add(workspaceLayout.appsDir);
   }
-  if (workspaceLayout.libsDir) {
+  if (workspaceLayout?.libsDir) {
     workspacePackageDirs.add(workspaceLayout.libsDir);
   }
   workspacePackageDirs.add('packages');

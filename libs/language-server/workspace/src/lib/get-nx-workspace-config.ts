@@ -1,15 +1,16 @@
+import { lspLogger } from '@nx-console/language-server/utils';
+import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
+import { Logger } from '@nx-console/shared/schema';
+import { NxVersion, NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import type {
   NxJsonConfiguration,
   ProjectFileMap,
   ProjectGraph,
   ProjectsConfigurations,
 } from 'nx/src/devkit-exports';
-import { lspLogger } from '@nx-console/language-server/utils';
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
-import { Logger } from '@nx-console/shared/schema';
-import { NxVersion, NxWorkspaceConfiguration } from '@nx-console/shared/types';
 import { join } from 'path';
-import { SemVer, coerce, gte } from 'semver';
+import { performance } from 'perf_hooks';
+import { gte } from 'semver';
 import {
   getNxDaemonClient,
   getNxOutput,
@@ -17,8 +18,8 @@ import {
   getNxProjectGraphUtils,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
-import { performance } from 'perf_hooks';
-import { WriteStream } from 'node:fs';
+
+let _defaultProcessExit: typeof process.exit;
 
 export async function getNxWorkspaceConfig(
   workspacePath: string,
@@ -81,6 +82,7 @@ export async function getNxWorkspaceConfig(
         .workspaceConfiguration;
     }
     try {
+      _defaultProcessExit = process.exit;
       process.exit = function (code?: number) {
         console.warn('process.exit called with code', code);
       } as (code?: number) => never;
@@ -156,6 +158,7 @@ export async function getNxWorkspaceConfig(
     const end = performance.now();
     logger.log(`Retrieved workspace configuration in: ${end - start} ms`);
 
+    process.exit = _defaultProcessExit;
     return {
       workspaceConfiguration,
       error,
@@ -163,6 +166,7 @@ export async function getNxWorkspaceConfig(
   } catch (e) {
     lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
     const config = await readWorkspaceConfigs(workspacePath);
+    process.exit = _defaultProcessExit;
     return { ...config, error: `${e}` };
   }
 }

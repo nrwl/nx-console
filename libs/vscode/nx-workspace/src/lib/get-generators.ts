@@ -7,6 +7,6 @@ import { sendRequest } from '@nx-console/vscode/lsp-client';
 
 export function getGenerators(
   options?: NxGeneratorsRequestOptions
-): Promise<GeneratorCollectionInfo[]> {
+): Promise<GeneratorCollectionInfo[] | undefined> {
   return sendRequest(NxGeneratorsRequest, { options });
 }

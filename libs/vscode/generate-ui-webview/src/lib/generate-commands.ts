@@ -16,6 +16,7 @@ import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/utils';
 import { ExtensionContext, Uri, commands, window } from 'vscode';
 import { openGenerateUi } from './init-generate-ui-webview';
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 
 export async function registerGenerateCommands(context: ExtensionContext) {
   commands.registerCommand(
@@ -121,7 +122,7 @@ export async function registerGenerateCommands(context: ExtensionContext) {
     projectName: string | undefined
   ) => {
     if (!projectName && uri) {
-      projectName = (await getGeneratorContextV2(uri.fsPath)).project;
+      projectName = (await getGeneratorContextV2(uri.fsPath))?.project;
     }
     commands.executeCommand(
       'nx.generate',
@@ -137,7 +138,8 @@ async function showGenerateUi(
   generatorType?: GeneratorType,
   generator?: string
 ) {
-  const { workspacePath, validWorkspaceJson } = await getNxWorkspace();
+  const workspacePath = getNxWorkspacePath();
+  const validWorkspaceJson = (await getNxWorkspace())?.validWorkspaceJson;
   if (!workspacePath) {
     window.showErrorMessage(
       'Nx Console requires a workspace be set to perform this action'

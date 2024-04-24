@@ -30,7 +30,11 @@ export class DaemonWatcher {
         lspLogger
       );
 
-      lspLogger.log(`Initializing daemon watcher, retries ${this.retryCount}`);
+      lspLogger.log(
+        `Initializing daemon watcher ${
+          this.retryCount > 0 ? `, retries ${this.retryCount}` : ''
+        }`
+      );
 
       let projectGraphErrors = false;
       try {
@@ -110,16 +114,14 @@ export class DaemonWatcher {
 
   private async tryRestartWatcher() {
     this.disposeEverything();
-    if (this.retryCount > 2) {
-      lspLogger.log(
-        'Daemon watcher failed to restart after 3 attempts, using native watcher'
-      );
+    if (this.retryCount > 0) {
+      lspLogger.log('Daemon watcher failed to restart, using native watcher');
       this.useNativeWatcher();
       return;
     }
     this.retryCount++;
     await new Promise((resolve) => {
-      const timeout = setTimeout(resolve, 1000 * this.retryCount);
+      const timeout = setTimeout(resolve, 100);
       this.disposables.add(() => clearTimeout(timeout));
     });
 

@@ -1,6 +1,7 @@
 package dev.nx.console.nxls
 
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.util.messages.Topic
@@ -51,23 +52,16 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         }
     }
 
-    fun close() {
+    suspend fun close() {
         wrapper.stop()
     }
 
-    fun refreshWorkspace() {
-        cs.launch {
-            if (!wrapper.isStarted()) {
-                start()
-                awaitStarted()
-            }
-
-            server()?.getNxService()?.refreshWorkspace()
-        }
-    }
-
-    fun resetWorkspace() {
-        cs.launch { server()?.getNxService()?.reset() }
+    suspend fun refreshWorkspace() {
+        // call nx reset to clear all caches
+        server()?.getNxService()?.reset()
+        thisLogger().info("reset done")
+        wrapper.stop()
+        start()
     }
 
     suspend fun workspace(): NxWorkspace? {

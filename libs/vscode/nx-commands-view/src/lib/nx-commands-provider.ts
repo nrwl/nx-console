@@ -1,5 +1,8 @@
 import { detectPackageManager } from 'nx/src/devkit-exports';
-import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
+import {
+  getNxWorkspacePath,
+  GlobalConfigurationStore,
+} from '@nx-console/vscode/configuration';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   AbstractTreeProvider,
@@ -77,7 +80,9 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     const prefixedCommand = command.startsWith('nx ')
       ? command
       : `nx ${command}`;
-    const { workspacePath, isEncapsulatedNx } = await getNxWorkspace();
+    const workspacePath = getNxWorkspacePath();
+    const isEncapsulatedNx =
+      (await getNxWorkspace())?.isEncapsulatedNx ?? false;
     const pkgManager = detectPackageManager(workspacePath);
 
     try {

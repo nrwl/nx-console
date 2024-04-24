@@ -230,7 +230,7 @@ open class NxGraphServer(
     }
 
     private suspend fun waitForServerReady() {
-        withTimeout(10000) {
+        withTimeout(100000) {
             while (!isStarted) {
                 delay(100)
             }

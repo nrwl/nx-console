@@ -5,8 +5,15 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.Project
 import dev.nx.console.graph.ui.NxGraphFileType
+import dev.nx.console.utils.Notifier
+import kotlinx.coroutines.runBlocking
 
 class NxRefreshWorkspaceAction :
     DumbAwareAction("Refresh Nx Workspace", "Refreshes the Nx workspace", null) {
@@ -40,6 +47,42 @@ class NxRefreshWorkspaceAction :
             // This action can be triggered from a notification as well as the command prompt
         }
 
-        NxlsService.getInstance(project).refreshWorkspace()
+        NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
+    }
+}
+
+@Service(Service.Level.PROJECT)
+class NxRefreshWorkspaceService(val project: Project) {
+    private var refreshing = false
+
+    fun refreshWorkspace() {
+        if (refreshing) {
+            return
+        }
+
+        refreshing = true
+
+        ProgressManager.getInstance()
+            .run(
+                object : Task.Backgroundable(project, "Refreshing Workspace", false) {
+                    override fun run(indicator: ProgressIndicator) {
+                        runBlocking {
+                            try {
+                                NxlsService.getInstance(project).refreshWorkspace()
+                            } catch (ex: Exception) {
+                                Notifier.notifyAnything(project, "Error refreshing workspace")
+                            } finally {
+                                refreshing = false
+                            }
+                        }
+                    }
+                }
+            )
+    }
+
+    companion object {
+        fun getInstance(project: Project): NxRefreshWorkspaceService {
+            return project.getService(NxRefreshWorkspaceService::class.java)
+        }
     }
 }

@@ -337,7 +337,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 if (query.isDisposed) return@executeWhenLoaded
                 query.addHandler {
                     val nxlsService = NxlsService.getInstance(project)
-                    ApplicationManager.getApplication().invokeLater { nxlsService.resetWorkspace() }
+                    CoroutineScope(Dispatchers.EDT).launch { nxlsService.refreshWorkspace() }
 
                     null
                 }
@@ -356,6 +356,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     }
 
     private fun registerThemeListener() {
+        setColors()
         val connection = ApplicationManager.getApplication().messageBus.connect(this)
         connection.subscribe(UISettingsListener.TOPIC, UISettingsListener { setColors() })
     }

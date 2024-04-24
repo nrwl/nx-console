@@ -71,7 +71,8 @@ class NxAngularProject(
             }
         }
 
-    private fun resolveFile(filePath: String?): VirtualFile? {
+    @Suppress("MemberVisibilityCanBePrivate")
+    /*override*/ fun resolveFile(filePath: String?): VirtualFile? {
         return filePath?.let { path ->
             rootDir.takeIf { it.isValid }?.findFileByRelativePath(path)
                 ?: workspaceFolder.takeIf { it.isValid }?.findFileByRelativePath(path)

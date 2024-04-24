@@ -12,6 +12,7 @@ import { readAndParseJson } from '@nx-console/shared/file-system';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
+  logAndShowError,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 
@@ -62,7 +63,11 @@ export function registerNxCommands(context: ExtensionContext) {
 }
 
 async function promptForTarget(): Promise<string | undefined> {
-  const { validWorkspaceJson, workspace } = await getNxWorkspace();
+  const nxWorkspace = await getNxWorkspace();
+  if (!nxWorkspace) {
+    return;
+  }
+  const { validWorkspaceJson, workspace } = nxWorkspace;
 
   if (!validWorkspaceJson || !workspace) {
     return;
@@ -95,6 +100,12 @@ async function promptForAffectedFlags(target: string) {
       flags,
       positional,
     });
+    if (!task) {
+      logAndShowError(
+        'Error while creating task. Please see the logs for more information.'
+      );
+      return;
+    }
     tasks.executeTask(task);
   }
 }
@@ -112,6 +123,12 @@ async function promptForRunMany() {
       command: 'run-many',
       flags,
     });
+    if (!task) {
+      logAndShowError(
+        'Error while creating task. Please see the logs for more information.'
+      );
+      return;
+    }
     tasks.executeTask(task);
   }
 }
@@ -121,6 +138,12 @@ async function promptForList() {
     command: 'list',
     flags: [],
   });
+  if (!task) {
+    logAndShowError(
+      'Error while creating task. Please see the logs for more information.'
+    );
+    return;
+  }
   tasks.executeTask(task);
 }
 
@@ -128,7 +151,11 @@ async function promptForMigrate() {
   const telemetry = getTelemetry();
   telemetry.featureUsed('migrate command');
 
-  const { workspacePath } = await getNxWorkspace();
+  const workspacePath = (await getNxWorkspace())?.workspacePath;
+
+  if (!workspacePath) {
+    return;
+  }
 
   const packageJson = await readAndParseJson(
     join(workspacePath, 'package.json')
@@ -158,6 +185,10 @@ async function promptForMigrate() {
       flags: [`${dep}@${version}`],
     });
 
+    if (!task) {
+      window.showErrorMessage('Error while creating task, ');
+      return;
+    }
     tasks.executeTask(task);
   }
 }
