@@ -356,6 +356,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     }
 
     private fun registerThemeListener() {
+        setColors()
         val connection = ApplicationManager.getApplication().messageBus.connect(this)
         connection.subscribe(UISettingsListener.TOPIC, UISettingsListener { setColors() })
     }
