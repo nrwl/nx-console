@@ -99,7 +99,9 @@ export class ProjectDetailsPreview {
     const nxWorkspace = await getNxWorkspace();
     const workspaceErrors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
-    if (workspaceErrors && !isPartial) {
+    const hasProjects =
+      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+    if (workspaceErrors && (!isPartial || !hasProjects)) {
       this.loadErrorHtml(workspaceErrors);
       return;
     }
@@ -109,7 +111,7 @@ export class ProjectDetailsPreview {
       return;
     }
 
-    await this.loadHtml(project!);
+    await this.loadHtml(project);
   }
 
   private async loadHtml(project: ProjectConfiguration) {
@@ -122,6 +124,7 @@ export class ProjectDetailsPreview {
         window.addEventListener('message', ({ data }) => {
           const { type, payload } = data;
           if(type === 'reload') {
+            console.log('reloading');
             window.waitForRouter().then(() => {
               window.externalApi.openProjectDetails('${project?.name}')
             })  
@@ -203,7 +206,9 @@ export class ProjectDetailsPreview {
     const nxWorkspace = await getNxWorkspace();
     const errors = nxWorkspace?.errors;
     const isPartial = nxWorkspace?.isPartial;
-    if (this.isShowingErrorHtml || (errors && !isPartial)) {
+    const hasProjects =
+      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+    if (this.isShowingErrorHtml || (errors && (!isPartial || !hasProjects))) {
       this.refresh();
     } else {
       this.webviewPanel.webview.postMessage({ type: 'reload' });

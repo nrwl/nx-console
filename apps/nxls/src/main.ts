@@ -624,7 +624,12 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
   const workspace = await reconfigure(workingPath);
   await connection.sendNotification(NxWorkspaceRefreshNotification.method);
 
-  if (!workspace?.errors || workspace.isPartial) {
+  if (
+    !workspace?.errors ||
+    (workspace.errors &&
+      workspace.isPartial &&
+      Object.keys(workspace.workspace.projects ?? {}).length > 0)
+  ) {
     reconfigureAttempts = 0;
     return;
   }

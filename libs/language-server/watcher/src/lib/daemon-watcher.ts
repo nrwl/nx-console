@@ -10,8 +10,7 @@ export class DaemonWatcher {
 
   private disposables: Set<() => void> = new Set();
 
-  constructor(private workspacePath: string, private callback: () => unknown) {
-  }
+  constructor(private workspacePath: string, private callback: () => unknown) {}
 
   async start() {
     await this.initWatcher();
@@ -65,7 +64,7 @@ export class DaemonWatcher {
             watchProjects: 'all',
             includeGlobalWorkspaceFiles: true,
             includeDependentProjects: true,
-            allowPartialGraph: true
+            allowPartialGraph: true,
           } as {
             watchProjects: string[] | 'all';
             includeGlobalWorkspaceFiles?: boolean;
@@ -99,15 +98,9 @@ export class DaemonWatcher {
               if (filteredChangedFiles.length) {
                 lspLogger.log(
                   'Files changed: ' +
-                  filteredChangedFiles
-                    .map((f) => `${f.path} (${f.type})`)
-                    .join(', ')
-                );
-              }
-              if (data?.changedProjects?.length) {
-                lspLogger.log(
-                  'Project configuration changed: ' +
-                  data.changedProjects.join(', ')
+                    filteredChangedFiles
+                      .map((f) => `${f.path} (${f.type})`)
+                      .join(', ')
                 );
                 this.callback();
               }
@@ -119,7 +112,9 @@ export class DaemonWatcher {
 
       this.disposables.add(unregister);
     } catch (e) {
-      lspLogger.log(`Error initializing daemon watcher, check daemon logs. ${e}`);
+      lspLogger.log(
+        `Error initializing daemon watcher, check daemon logs. ${e}`
+      );
       this.tryRestartWatcher();
     }
   }

@@ -72,7 +72,9 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
       const nxWorkspace = await getNxWorkspace();
       const errors = nxWorkspace?.errors;
       const isPartial = nxWorkspace?.isPartial;
-      if (errors && errors.length > 0 && !isPartial) {
+      const hasProjects =
+        Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+      if (errors && errors.length > 0 && (!isPartial || !hasProjects)) {
         return {
           ...codeLens,
           command: {

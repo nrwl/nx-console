@@ -54,8 +54,7 @@ class ConfigFileCodeVisionProvider : CodeVisionProvider<Unit> {
     override fun shouldRecomputeForEditor(editor: Editor, uiData: Unit?): Boolean =
         editor.project?.let {
             ProjectLevelConfigFileCodeVisionManager.getInstance(it).shouldRecomputeForEditor(editor)
-        }
-            ?: true
+        } ?: true
 
     override fun getPlaceholderCollector(editor: Editor, psiFile: PsiFile?) =
         editor.project?.let {
@@ -189,13 +188,13 @@ class ProjectLevelConfigFileCodeVisionManager(
                 cs.launch { loadWorkspaceAndRefresh(project) }
                 return CodeVisionState.NotReady
             }
-            if (nxWorkspaceCache?.error != null) {
+            if (nxWorkspaceCache?.errors != null) {
                 return CodeVisionState.Ready(
                     listOf(
                         Pair(
                             codeVisionTextRange ?: TextRange(0, 0),
                             ClickableTextCodeVisionEntry(
-                                "Project Graph Computation Failed. Click to see error.",
+                                "Project Graph Computation Failed. Click to see errors.",
                                 providerId = ConfigFileCodeVisionProvider.ID,
                                 icon = AllIcons.General.Error,
                                 onClick = { _, _ ->

@@ -31,7 +31,7 @@ export interface NxWorkspace {
   isLerna: boolean;
   nxVersion: NxVersion;
   isEncapsulatedNx: boolean;
-  errors?: (string | any)[];
+  errors?: NxError[];
   isPartial?: boolean;
   workspaceLayout: {
     appsDir?: string;
@@ -39,3 +39,10 @@ export interface NxWorkspace {
     projectNameAndRootFormat?: 'as-provided' | 'derived';
   };
 }
+
+export type NxError = {
+  message?: string;
+  file?: string;
+  plugin?: string;
+  stack?: string;
+};

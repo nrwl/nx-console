@@ -18,6 +18,8 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.jcef.*
 import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.ui.NxGraphDownloadHandler
+import dev.nx.console.models.NxError
+import dev.nx.console.nxls.NxRefreshWorkspaceService
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.telemetry.TelemetryService
@@ -48,7 +50,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browserLoadedState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     protected val executeWhenLoadedJobs: MutableList<Job> = mutableListOf()
 
-    protected var error: String? = null
+    protected var errors: Array<NxError>? = null
 
     init {
         graphServer.start()
@@ -127,7 +129,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 
         htmlText =
             htmlText.replace(
-                "<base\\b[^>]*/>".toRegex(),
+                "<base\\b[^>]*>".toRegex(),
                 """
                   <base href="${Matcher.quoteReplacement(graphBasePath)}">
                   """
@@ -177,6 +179,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                   if (type.startsWith('request') && id && pendingRequests.has(id)) {
                     const payloadParsed = JSON.parse(payload);
                     const resolve = pendingRequests.get(id);
+                    console.log('Received response for', type, payloadParsed);
                     resolve(payloadParsed);
                     pendingRequests.delete(id);
                   }
@@ -230,8 +233,8 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         return htmlText
     }
 
-    protected fun setErrorAndRefresh(error: String?) {
-        this.error = error
+    protected fun setErrorsAndRefresh(errors: Array<NxError>?) {
+        this.errors = errors
         refresh()
     }
 
@@ -301,7 +304,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         executeWhenLoadedJobs.add(job)
     }
 
-    protected fun getErrorHtml(error: String): String {
+    protected fun getErrorHtml(errors: Array<NxError>): String {
         return """
        <style>
               body {
@@ -321,8 +324,9 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
               }
             </style>
 
-            <p>Unable to load the project graph. The following error occurred:</p>
-      <pre>${error}</pre>
+            <p>Unable to load the project graph. The following error${if(errors.isNotEmpty()) "s" else ""} occurred:</p>
+      ${errors.map { "<pre>${it.message} /n ${it.stack ?: ""}</pre>" }.joinToString("\n")
+        }
       If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reset</a> the graph.
     """
             .trimIndent()
@@ -337,7 +341,9 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 if (query.isDisposed) return@executeWhenLoaded
                 query.addHandler {
                     val nxlsService = NxlsService.getInstance(project)
-                    CoroutineScope(Dispatchers.EDT).launch { nxlsService.refreshWorkspace() }
+                    CoroutineScope(Dispatchers.EDT).launch {
+                        NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
+                    }
 
                     null
                 }
@@ -409,7 +415,9 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                             if (response.error != null) {
                                 thisLogger()
                                     .debug("Error handling graph request: ${response.error}")
-                                setErrorAndRefresh(response.error)
+                                setErrorsAndRefresh(
+                                    arrayOf(NxError(response.error, null, null, null))
+                                )
                                 return@launch
                             }
                             browser.executeJavaScript(

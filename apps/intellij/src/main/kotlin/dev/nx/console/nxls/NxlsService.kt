@@ -56,11 +56,16 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         wrapper.stop()
     }
 
-    suspend fun refreshWorkspace() {
+    suspend fun restart() {
         server()?.getNxService()?.stopDaemon()?.await()
         thisLogger().info("reset done")
         wrapper.stop()
         start()
+        awaitStarted()
+    }
+
+    suspend fun refreshWorkspace() {
+        server()?.getNxService()?.refreshWorkspace()
     }
 
     suspend fun workspace(): NxWorkspace? {
