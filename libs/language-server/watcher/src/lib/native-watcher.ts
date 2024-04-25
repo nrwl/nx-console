@@ -1,7 +1,7 @@
-import { WatchEvent, Watcher } from 'nx/src/native';
+import type { WatchEvent, Watcher } from 'nx/src/native';
 import { lspLogger } from '@nx-console/language-server/utils';
-import { workspaceDependencyPath } from '@nx-console/shared/npm';
-import { join, normalize } from 'path';
+import { importNxPackagePath } from '@nx-console/shared/npm';
+import { normalize } from 'path';
 import { match as minimatch } from 'minimatch';
 
 const NX_PLUGIN_PATTERNS_TO_WATCH = [
@@ -36,23 +36,14 @@ export class NativeWatcher {
   }
 
   private async initWatcher() {
-    const nxWorkspaceDepPath = await workspaceDependencyPath(
+    const native = await importNxPackagePath<typeof import('nx/src/native')>(
       this.workspacePath,
-      'nx'
-    );
-    if (!nxWorkspaceDepPath) {
-      lspLogger.log(
-        'Could not find the "nx" package. Native watcher will not be used. Make sure to install the workspace dependencies.'
-      );
-      return;
-    }
-
-    const native = await import(
-      join(nxWorkspaceDepPath, 'src/native/index.js')
+      'src/native/index.js',
+      lspLogger
     );
     this.watcher = new native.Watcher(this.workspacePath);
 
-    this.watcher!.watch((err: string | null, events: WatchEvent[]) => {
+    this.watcher.watch((err: string | null, events: WatchEvent[]) => {
       if (err) {
         lspLogger.log('Error watching files: ' + err);
       } else if (

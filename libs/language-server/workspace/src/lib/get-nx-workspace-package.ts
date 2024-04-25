@@ -5,9 +5,11 @@ import type * as NxProjectGraphFileUtils from 'nx/src/project-graph/file-map-uti
 import type * as NxDaemonClient from 'nx/src/daemon/client/client';
 import type * as NxDaemonCache from 'nx/src/daemon/cache';
 import type * as NxOutput from 'nx/src/utils/output';
-import { platform } from 'os';
 import { join } from 'path';
-import { findNxPackagePath } from '@nx-console/shared/npm';
+import {
+  findNxPackagePath,
+  importWorkspaceDependency,
+} from '@nx-console/shared/npm';
 import { Logger } from '@nx-console/shared/schema';
 
 export async function getNxDaemonClient(
@@ -21,7 +23,7 @@ export async function getNxDaemonClient(
   if (!importPath) {
     return;
   }
-  return getNxPackage(importPath, logger);
+  return importWorkspaceDependency(importPath, logger);
 }
 
 export async function getNxDaemonCache(
@@ -32,7 +34,7 @@ export async function getNxDaemonCache(
     workspacePath,
     join('src', 'daemon', 'cache.js')
   );
-  return getNxPackage(importPath, logger);
+  return importWorkspaceDependency(importPath, logger);
 }
 
 export async function getNxOutput(
@@ -48,7 +50,7 @@ export async function getNxOutput(
     return;
   }
 
-  return getNxPackage(importPath, logger);
+  return importWorkspaceDependency(importPath, logger);
 }
 
 export async function getNxProjectGraphUtils(
@@ -64,7 +66,7 @@ export async function getNxProjectGraphUtils(
     return;
   }
 
-  return getNxPackage(importPath, logger);
+  return importWorkspaceDependency(importPath, logger);
 }
 
 export async function getNxProjectGraph(
@@ -83,7 +85,7 @@ export async function getNxProjectGraph(
     );
   }
 
-  return getNxPackage(importPath, logger);
+  return importWorkspaceDependency(importPath, logger);
 }
 
 /**
@@ -105,28 +107,5 @@ export async function getNxWorkspacePackageFileUtils(
     );
   }
 
-  return getNxPackage(importPath, logger);
-}
-
-export async function getNxPackage<T>(
-  importPath: string | undefined,
-  logger: Logger
-): Promise<T> {
-  if (!importPath) {
-    logger?.log(
-      `Unable to load the ${importPath} dependency from the workspace. Please ensure that the proper dependencies are installed locally.`
-    );
-    throw 'local Nx dependency not found';
-  }
-
-  if (platform() === 'win32') {
-    importPath = importPath.replace(/\\/g, '/');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const imported = require(importPath);
-
-  logger?.log(`Using local Nx package at ${importPath}`);
-
-  return imported;
+  return importWorkspaceDependency(importPath, logger);
 }

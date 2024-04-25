@@ -10,12 +10,11 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import {
-  getNxlsOutputChannel,
   getTelemetry,
   showNoNxVersionMessage,
   showNoProjectAtPathMessage,
 } from '@nx-console/vscode/utils';
-import { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { gte } from 'semver';
 import { ExtensionContext, Uri, commands, window } from 'vscode';
 import { GraphWebviewManager } from './graph-webview-manager';

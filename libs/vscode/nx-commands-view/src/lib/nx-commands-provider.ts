@@ -1,4 +1,3 @@
-import { detectPackageManager } from 'nx/src/devkit-exports';
 import {
   getNxWorkspacePath,
   GlobalConfigurationStore,
@@ -12,6 +11,7 @@ import {
 import { commands, ExtensionContext, Task, tasks, TaskScope } from 'vscode';
 import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { importNxPackagePath } from '@nx-console/shared/npm';
 
 export const EXECUTE_ARBITRARY_COMMAND = 'nxConsole.executeArbitraryCommand';
 
@@ -83,6 +83,9 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     const workspacePath = getNxWorkspacePath();
     const isEncapsulatedNx =
       (await getNxWorkspace())?.isEncapsulatedNx ?? false;
+    const { detectPackageManager } = await importNxPackagePath<
+      typeof import('nx/src/devkit-exports')
+    >(workspacePath, 'src/devkit-exports');
     const pkgManager = detectPackageManager(workspacePath);
 
     try {
@@ -91,7 +94,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
         TaskScope.Workspace,
         prefixedCommand,
         pkgManager,
-        getShellExecutionForConfig({
+        await getShellExecutionForConfig({
           cwd: workspacePath,
           displayCommand: prefixedCommand,
           encapsulatedNx: isEncapsulatedNx,

@@ -9,7 +9,7 @@ export async function hasAffectedProjects(
 ): Promise<boolean> {
   const { isEncapsulatedNx } = await nxWorkspace(workspacePath);
 
-  const command = getNxExecutionCommand({
+  const command = await getNxExecutionCommand({
     cwd: workspacePath,
     displayCommand: `nx show projects --affected`,
     encapsulatedNx: isEncapsulatedNx,

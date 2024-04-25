@@ -17,15 +17,13 @@ export async function createProjectGraph(
   const { isEncapsulatedNx } = await nxWorkspace(workspacePath);
   const projectGraphOutput = await getProjectGraphOutput(workspacePath);
 
-  return new Promise<string | undefined>((res, rej) => {
-    const command = getNxExecutionCommand({
-      cwd: workspacePath,
-      displayCommand:
-        `nx graph ${showAffected ? '--affected' : ''} --file ` +
-        projectGraphOutput.relativePath,
-      encapsulatedNx: isEncapsulatedNx,
-    });
-
+  return getNxExecutionCommand({
+    cwd: workspacePath,
+    displayCommand:
+      `nx graph ${showAffected ? '--affected' : ''} --file ` +
+      projectGraphOutput.relativePath,
+    encapsulatedNx: isEncapsulatedNx,
+  }).then((command) => {
     logger.log(`Generating graph with command: \`${command}\``);
     try {
       execSync(command, {
@@ -37,10 +35,10 @@ export async function createProjectGraph(
         stdio: 'ignore',
       });
 
-      res(undefined);
+      return undefined;
     } catch (e) {
       const errorMessage = `${e.output[1] || e}`;
-      rej('Unable to create project graph: ' + errorMessage);
+      throw 'Unable to create project graph: ' + errorMessage;
     }
   });
 }

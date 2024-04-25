@@ -14,8 +14,8 @@ import {
   getTelemetry,
   registerCodeLensProvider,
 } from '@nx-console/vscode/utils';
-import { ProjectConfiguration } from 'nx/src/devkit-exports';
-import { JsonSourceFile, parseJsonText } from 'typescript';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
+import { parseJsonText } from 'typescript';
 import {
   CancellationToken,
   CodeLens,
@@ -24,7 +24,6 @@ import {
   Position,
   ProviderResult,
   TextDocument,
-  languages,
   Range,
   window,
   commands,

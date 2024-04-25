@@ -2,11 +2,11 @@ import { lspLogger } from '@nx-console/language-server/utils';
 import { getNxVersion } from '@nx-console/language-server/workspace';
 import { debounce } from '@nx-console/shared/utils';
 import * as watcher from '@parcel/watcher';
-import { getIgnoredGlobs } from 'nx/src/utils/ignore';
 import { platform } from 'os';
 import { gte } from 'semver';
 import { DaemonWatcher } from './daemon-watcher';
 import { NativeWatcher } from './native-watcher';
+import { importNxPackagePath } from '@nx-console/shared/npm';
 
 let _daemonWatcher: DaemonWatcher | undefined;
 let _nativeWatcher: NativeWatcher | undefined;
@@ -64,7 +64,7 @@ export async function languageServerWatcher(
           debouncedCallback();
         }
       },
-      watcherOptions(workspacePath)
+      await watcherOptions(workspacePath)
     );
 
     return () => {
@@ -74,7 +74,12 @@ export async function languageServerWatcher(
   }
 }
 
-function watcherOptions(workspacePath: string): watcher.Options | undefined {
+async function watcherOptions(
+  workspacePath: string
+): Promise<watcher.Options | undefined> {
+  const { getIgnoredGlobs } = await importNxPackagePath<
+    typeof import('nx/src/utils/ignore')
+  >(workspacePath, 'src/utils/ignore', lspLogger);
   const options: watcher.Options = {
     ignore: getIgnoredGlobs(workspacePath),
   };

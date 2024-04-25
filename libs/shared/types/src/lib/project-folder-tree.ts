@@ -1,4 +1,4 @@
-import { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 
 export type TreeNode = {
   dir: string;
