@@ -1,3 +1,4 @@
+import { NxError } from '@nx-console/shared/types';
 import { debounce } from '@nx-console/shared/utils';
 import {
   NxGraphServer,
@@ -107,7 +108,9 @@ export class ProjectDetailsPreview {
     }
 
     if (!project) {
-      this.loadErrorHtml([`No project found at path ${this.path}`]);
+      this.loadErrorHtml([
+        { message: `No project found at path ${this.path}` },
+      ]);
       return;
     }
 
@@ -155,7 +158,7 @@ export class ProjectDetailsPreview {
     this.webviewPanel.webview.html = html;
   }
 
-  private loadErrorHtml(errors: (string | any)[]) {
+  private loadErrorHtml(errors: NxError[]) {
     this.webviewPanel.webview.html = /*html*/ `
     <style>
         pre {
@@ -166,7 +169,11 @@ export class ProjectDetailsPreview {
         }
       </style>
       <p>Unable to load the project graph. The following error occurred:</p>
-      ${errors.map((error) => `<pre>${error}</pre>`).join('')}
+      ${errors
+        .map(
+          (error) => `<pre>${error.message ?? ''} \n ${error.stack ?? ''}</pre>`
+        )
+        .join('')}
     `;
     this.isShowingErrorHtml = true;
   }
