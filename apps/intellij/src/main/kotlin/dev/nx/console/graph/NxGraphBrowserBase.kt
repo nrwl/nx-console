@@ -20,7 +20,6 @@ import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.ui.NxGraphDownloadHandler
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxRefreshWorkspaceService
-import dev.nx.console.nxls.NxlsService
 import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
@@ -325,7 +324,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             </style>
 
             <p>Unable to load the project graph. The following error${if(errors.isNotEmpty()) "s" else ""} occurred:</p>
-      ${errors.map { "<pre>${it.message} /n ${it.stack ?: ""}</pre>" }.joinToString("\n")
+      ${errors.map { "<pre>${it.message ?: ""} \n ${it.stack ?: ""}</pre>" }.joinToString("\n")
         }
       If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reset</a> the graph.
     """
@@ -340,11 +339,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             resetQuery?.also { query ->
                 if (query.isDisposed) return@executeWhenLoaded
                 query.addHandler {
-                    val nxlsService = NxlsService.getInstance(project)
-                    CoroutineScope(Dispatchers.EDT).launch {
-                        NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
-                    }
-
+                    NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
                     null
                 }
 

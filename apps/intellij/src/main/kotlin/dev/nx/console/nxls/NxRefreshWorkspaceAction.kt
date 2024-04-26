@@ -64,7 +64,6 @@ class NxRefreshWorkspaceService(val project: Project) {
         if (refreshing) {
             return
         }
-
         refreshing = true
 
         ProgressManager.getInstance()

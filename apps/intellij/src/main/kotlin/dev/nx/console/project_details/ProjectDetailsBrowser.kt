@@ -71,19 +71,25 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
 
     override fun refresh() {
         thisLogger().trace("refreshing PDV ${file.path}")
-        if (errors != null) {
-            loadHtml()
-            return
-        }
         if (project.isDisposed) return
+
         coroutineScope.launch {
+            if (errors != null) {
+                loadHtml()
+                return@launch
+            }
             try {
                 val isShowingPDV =
-                    withContext(Dispatchers.EDT) {
-                        browser.executeJavaScript(
-                            "return !!window.waitForRouter && !!window.intellij && !!window.externalApi"
-                        ) == "true"
+                    try {
+                        withContext(Dispatchers.EDT) {
+                            return@withContext browser.executeJavaScript(
+                                "return !!window.waitForRouter && !!window.intellij && !!window.externalApi && document.getElementById('app').hasChildNodes()"
+                            ) == "true"
+                        }
+                    } catch (e: Throwable) {
+                        false
                     }
+
                 val nxProjectName = this@ProjectDetailsBrowser.nxProjectName
                 if (isShowingPDV && nxProjectName != null) {
                     loadProjectDetails(nxProjectName)
@@ -92,7 +98,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 }
             } catch (e: Throwable) {
                 thisLogger().trace("Error while refreshing PDV ${file.path} \n $e ")
-                loadHtml()
             }
         }
     }
@@ -220,7 +225,13 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                                 )
                             )
                     }
-                    if (errors != null && (!hasProjects || nxWorkspace?.isPartial != true)) {
+                    val hasProject =
+                        nxProjectName != null &&
+                            nxWorkspace?.workspace?.projects?.get(nxProjectName) != null
+                    if (
+                        errors != null &&
+                            (!hasProjects || nxWorkspace?.isPartial != true || !hasProject)
+                    ) {
                         withContext(Dispatchers.EDT) {
                             if (browser.isDisposed) return@withContext
                             thisLogger().trace("Error found, loading error html ${file.path}")

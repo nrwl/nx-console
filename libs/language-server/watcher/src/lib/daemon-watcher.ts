@@ -92,9 +92,13 @@ export class DaemonWatcher {
               }
               this.retryCount = 0;
               const filteredChangedFiles =
-                data?.changedFiles?.filter(
-                  (f) => !normalize(f.path).startsWith(normalize('.yarn/cache'))
-                ) ?? [];
+                data?.changedFiles?.filter((f) => {
+                  const normalized = normalize(f.path);
+                  return !(
+                    normalized.startsWith(normalize('.yarn/cache')) ||
+                    normalized.startsWith(normalize('.nx/cache'))
+                  );
+                }) ?? [];
               if (filteredChangedFiles.length === 0) {
                 lspLogger.log(`filtered out files: ${data?.changedFiles}`);
                 return;

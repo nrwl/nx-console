@@ -485,7 +485,9 @@ connection.onRequest(NxVersionRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return getNxVersion(WORKING_PATH);
+  const nxVersion = await getNxVersion(WORKING_PATH);
+  lspLogger.log(`got nxVersion ${JSON.stringify(nxVersion)}`);
+  return nxVersion;
 });
 
 connection.onRequest(NxProjectGraphOutputRequest, async () => {
