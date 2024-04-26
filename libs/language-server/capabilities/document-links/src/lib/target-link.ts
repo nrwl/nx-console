@@ -33,11 +33,15 @@ export async function targetLink(
   const targetString = node.value;
   let project, target, configuration;
   try {
-    let importPath: string | undefined;
     const devkitPath = await workspaceDependencyPath(workingPath, '@nx/devkit');
-    if (devkitPath) {
-      importPath = join(devkitPath, 'src/executors/parse-target-string');
+    if (!devkitPath) {
+      lspLogger.log(
+        `Unable to load the "@nx/devkit" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+      );
+      throw 'local @nx/devkit dependency not found';
     }
+
+    const importPath = join(devkitPath, 'src/executors/parse-target-string');
     const { parseTargetString } = await importWorkspaceDependency<
       typeof import('@nx/devkit/src/executors/parse-target-string')
     >(importPath, lspLogger);

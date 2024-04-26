@@ -23,6 +23,13 @@ async function getCacheDir(workspacePath: string): Promise<string> {
     join('src', 'utils', 'cache-directory.js')
   );
 
+  if (!importPath) {
+    lspLogger.log(
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+    );
+    throw 'local Nx dependency not found';
+  }
+
   return (
     await importWorkspaceDependency<
       typeof import('nx/src/utils/cache-directory')

@@ -23,7 +23,7 @@ export async function getNxDaemonClient(
   if (!importPath) {
     return;
   }
-  return importWorkspaceDependency(importPath, logger);
+  return getNxPackage(importPath, logger);
 }
 
 export async function getNxDaemonCache(
@@ -34,7 +34,7 @@ export async function getNxDaemonCache(
     workspacePath,
     join('src', 'daemon', 'cache.js')
   );
-  return importWorkspaceDependency(importPath, logger);
+  return getNxPackage(importPath, logger);
 }
 
 export async function getNxOutput(
@@ -50,7 +50,7 @@ export async function getNxOutput(
     return;
   }
 
-  return importWorkspaceDependency(importPath, logger);
+  return getNxPackage(importPath, logger);
 }
 
 export async function getNxProjectGraphUtils(
@@ -66,7 +66,7 @@ export async function getNxProjectGraphUtils(
     return;
   }
 
-  return importWorkspaceDependency(importPath, logger);
+  return getNxPackage(importPath, logger);
 }
 
 export async function getNxProjectGraph(
@@ -85,7 +85,7 @@ export async function getNxProjectGraph(
     );
   }
 
-  return importWorkspaceDependency(importPath, logger);
+  return getNxPackage(importPath, logger);
 }
 
 /**
@@ -105,6 +105,20 @@ export async function getNxWorkspacePackageFileUtils(
       workspacePath,
       join('src', 'core', 'file-utils.js')
     );
+  }
+
+  return getNxPackage(importPath, logger);
+}
+
+export async function getNxPackage<T>(
+  importPath: string | undefined,
+  logger: Logger
+): Promise<T> {
+  if (!importPath) {
+    logger.log(
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+    );
+    throw 'local Nx dependency not found';
   }
 
   return importWorkspaceDependency(importPath, logger);

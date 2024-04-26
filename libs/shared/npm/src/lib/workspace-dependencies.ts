@@ -77,20 +77,13 @@ export async function workspaceDependencyPath(
 }
 
 export function importWorkspaceDependency<T>(
-  importPath: string | undefined,
+  importPath: string,
   logger: Logger = {
     log(message) {
       console.log(message);
     },
   }
 ): Promise<T> {
-  if (!importPath) {
-    logger?.log(
-      `Unable to load the ${importPath} dependency from the workspace. Please ensure that the proper dependencies are installed locally.`
-    );
-    throw 'local Nx dependency not found';
-  }
-
   if (platform() === 'win32') {
     importPath = importPath.replace(/\\/g, '/');
   }
@@ -113,11 +106,18 @@ export async function importNxPackagePath<T>(
   }
 ): Promise<T> {
   const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
-  const importPath = nxWorkspaceDepPath
-    ? join(nxWorkspaceDepPath, nestedPath)
-    : undefined;
 
-  return importWorkspaceDependency(importPath, logger);
+  if (!nxWorkspaceDepPath) {
+    logger?.log(
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+    );
+    throw 'local Nx dependency not found';
+  }
+
+  return importWorkspaceDependency(
+    join(nxWorkspaceDepPath, nestedPath),
+    logger
+  );
 }
 
 export async function localDependencyPath(
