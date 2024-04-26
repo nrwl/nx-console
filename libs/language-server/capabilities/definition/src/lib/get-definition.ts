@@ -1,6 +1,9 @@
-import { isExecutorStringNode } from '@nx-console/language-server/utils';
+import {
+  isExecutorStringNode,
+  lspLogger,
+} from '@nx-console/language-server/utils';
 import { getExecutors } from '@nx-console/language-server/workspace';
-import { resolveImplementation } from 'nx/src/config/schema-utils';
+import { importNxPackagePath } from '@nx-console/shared/npm';
 import { dirname } from 'path';
 import { JSONDocument } from 'vscode-json-languageservice';
 import { DefinitionParams, LocationLink } from 'vscode-languageserver';
@@ -28,6 +31,9 @@ export async function getDefinition(
     return undefined;
   }
 
+  const { resolveImplementation } = await importNxPackagePath<
+    typeof import('nx/src/config/schema-utils')
+  >(workingPath, 'src/config/schema-utils', lspLogger);
   const executorFile = resolveImplementation(
     executor.implementationPath,
     dirname(executor.configPath)

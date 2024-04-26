@@ -1,5 +1,6 @@
-import { WatchEvent, Watcher } from 'nx/src/native';
+import type { WatchEvent, Watcher } from 'nx/src/native';
 import { lspLogger } from '@nx-console/language-server/utils';
+import { importNxPackagePath } from '@nx-console/shared/npm';
 import { normalize } from 'path';
 import { match as minimatch } from 'minimatch';
 
@@ -35,7 +36,11 @@ export class NativeWatcher {
   }
 
   private async initWatcher() {
-    const native = await import('nx/src/native');
+    const native = await importNxPackagePath<typeof import('nx/src/native')>(
+      this.workspacePath,
+      'src/native/index.js',
+      lspLogger
+    );
     this.watcher = new native.Watcher(this.workspacePath);
 
     this.watcher.watch((err: string | null, events: WatchEvent[]) => {

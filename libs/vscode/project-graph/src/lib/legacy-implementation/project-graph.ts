@@ -10,7 +10,7 @@ import {
   getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { getTelemetry, showNoProjectsMessage } from '@nx-console/vscode/utils';
-import { ProjectConfiguration } from 'nx/src/devkit-exports';
+import type { ProjectConfiguration } from 'nx/src/devkit-exports';
 import { Disposable, Uri, commands, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';

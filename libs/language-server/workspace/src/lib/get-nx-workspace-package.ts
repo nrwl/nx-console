@@ -5,9 +5,11 @@ import type * as NxProjectGraphFileUtils from 'nx/src/project-graph/file-map-uti
 import type * as NxDaemonClient from 'nx/src/daemon/client/client';
 import type * as NxDaemonCache from 'nx/src/daemon/cache';
 import type * as NxOutput from 'nx/src/utils/output';
-import { platform } from 'os';
 import { join } from 'path';
-import { findNxPackagePath } from '@nx-console/shared/npm';
+import {
+  findNxPackagePath,
+  importWorkspaceDependency,
+} from '@nx-console/shared/npm';
 import { Logger } from '@nx-console/shared/schema';
 
 export async function getNxDaemonClient(
@@ -113,20 +115,11 @@ export async function getNxPackage<T>(
   logger: Logger
 ): Promise<T> {
   if (!importPath) {
-    logger?.log(
-      `Unable to load the ${importPath} dependency from the workspace. Please ensure that the proper dependencies are installed locally.`
+    logger.log(
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
     );
     throw 'local Nx dependency not found';
   }
 
-  if (platform() === 'win32') {
-    importPath = importPath.replace(/\\/g, '/');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const imported = require(importPath);
-
-  logger?.log(`Using local Nx package at ${importPath}`);
-
-  return imported;
+  return importWorkspaceDependency(importPath, logger);
 }

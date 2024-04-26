@@ -1,14 +1,11 @@
 import { getShellExecutionForConfig } from '@nx-console/vscode/utils';
-import { Task, TaskGroup, TaskScope } from 'vscode';
+import { Task, TaskScope } from 'vscode';
 import { CliTaskDefinition } from './cli-task-definition';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import { NxWorkspace } from '@nx-console/shared/types';
-import {
-  detectPackageManager,
-  getPackageManagerCommand,
-  PackageManagerCommands,
-} from 'nx/src/utils/package-manager';
+import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { join } from 'path';
+import { importNxPackagePath } from '@nx-console/shared/npm';
 
 export class CliTask extends Task {
   /**
@@ -38,7 +35,7 @@ export class CliTask extends Task {
       displayCommand, // name
       'nx',
       // execution
-      getShellExecutionForConfig(
+      await getShellExecutionForConfig(
         {
           displayCommand,
           cwd: definition.cwd
@@ -63,6 +60,11 @@ export class CliTask extends Task {
       return [];
     }
 
+    const { detectPackageManager, getPackageManagerCommand } =
+      await importNxPackagePath<typeof import('nx/src/utils/package-manager')>(
+        w.workspacePath,
+        'src/utils/package-manager'
+      );
     const packageManagerCommands = getPackageManagerCommand(
       detectPackageManager(w?.workspacePath)
     );

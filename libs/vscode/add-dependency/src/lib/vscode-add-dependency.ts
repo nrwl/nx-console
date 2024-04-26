@@ -1,15 +1,9 @@
-import {
-  readJsonFile,
-  detectPackageManager,
-  getPackageManagerCommand,
-  PackageManager,
-} from 'nx/src/devkit-exports';
+import type { PackageManager } from 'nx/src/devkit-exports';
 import {
   getGeneratorOptions,
   getGenerators,
   getNxVersion,
 } from '@nx-console/vscode/nx-workspace';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   getShellExecutionForConfig,
   getTelemetry,
@@ -33,6 +27,7 @@ import { selectFlags } from '@nx-console/vscode/nx-cli-quickpicks';
 import { execSync } from 'child_process';
 import { major } from 'semver';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
+import { importNxPackagePath } from '@nx-console/shared/npm';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';
@@ -55,6 +50,9 @@ let pkgManager: PackageManager;
 function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
   return async () => {
     const workspacePath = getNxWorkspacePath();
+    const { detectPackageManager } = await importNxPackagePath<
+      typeof import('nx/src/devkit-exports')
+    >(workspacePath, 'src/devkit-exports');
     pkgManager = detectPackageManager(workspacePath);
 
     const depInput = await promptForDependencyInput();
@@ -73,7 +71,7 @@ function vscodeAddDependencyCommand(installAsDevDependency: boolean) {
     if (dep) {
       const quickInput = showLoadingQuickInput(dep);
       getTelemetry().featureUsed('add-dependency');
-      addDependency(dep, version, installAsDevDependency, workspacePath);
+      await addDependency(dep, version, installAsDevDependency, workspacePath);
       const disposable = tasks.onDidEndTaskProcess((taskEndEvent) => {
         if (
           taskEndEvent.execution.task.definition.type === 'nxconsole-add-dep'
@@ -133,15 +131,18 @@ function showLoadingQuickInput(dependency: string): QuickInput {
   return quickInput;
 }
 
-function addDependency(
+async function addDependency(
   dependency: string,
   version: string,
   installAsDevDependency: boolean,
   workspacePath: string
 ) {
   try {
+    const { getPackageManagerCommand } = await importNxPackagePath<
+      typeof import('nx/src/devkit-exports')
+    >(workspacePath, 'src/devkit-exports');
     const pkgManagerCommands = getPackageManagerCommand(pkgManager);
-    const pkgManagerWorkspaceFlag = getWorkspaceAddFlag(
+    const pkgManagerWorkspaceFlag = await getWorkspaceAddFlag(
       pkgManager,
       workspacePath
     );
@@ -205,7 +206,7 @@ async function executeInitGenerator(dependency: string, workspacePath: string) {
     TaskScope.Workspace,
     command,
     pkgManager,
-    getShellExecutionForConfig({
+    await getShellExecutionForConfig({
       cwd: workspacePath,
       displayCommand: command,
       encapsulatedNx: false,
@@ -263,10 +264,13 @@ async function getDependencySuggestions(): Promise<
   );
 }
 
-function getWorkspaceAddFlag(
+async function getWorkspaceAddFlag(
   pkgManager: string,
   workspacePath: string
-): string {
+): Promise<string> {
+  const { readJsonFile } = await importNxPackagePath<
+    typeof import('nx/src/devkit-exports')
+  >(workspacePath, 'src/devkit-exports');
   const pkgJson = readJsonFile<{
     workspaces?: string[];
     private?: boolean;

@@ -1,7 +1,6 @@
-import { TargetConfiguration } from 'nx/src/devkit-exports';
+import type { TargetConfiguration } from 'nx/src/devkit-exports';
 import { nxWorkspace } from './workspace';
 import { normalize, relative } from 'path';
-import { lspLogger } from '@nx-console/language-server/utils';
 
 let _sourceMapFilesToProjectMap: Record<string, string> | undefined = undefined;
 

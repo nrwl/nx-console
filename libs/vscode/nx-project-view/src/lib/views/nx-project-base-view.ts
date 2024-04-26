@@ -1,4 +1,4 @@
-import {
+import type {
   ProjectConfiguration,
   TargetConfiguration,
 } from 'nx/src/devkit-exports';

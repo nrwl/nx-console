@@ -46,7 +46,8 @@
           "fsevents",
           "ts-node",
           "pnpapi",
-          "@angular-devkit/*"
+          "@angular-devkit/*",
+          "nx"
         ],
         "bundle": true,
         "thirdParty": true,
@@ -106,7 +107,8 @@
           "pnpapi",
           "webpack",
           "@angular-devkit/*",
-          "@nx/nx*"
+          "@nx/nx*",
+          "nx"
         ],
         "thirdParty": true,
         "minify": true,

@@ -4,7 +4,7 @@ import {
   getShellExecutionForConfig,
 } from '@nx-console/vscode/utils';
 import { join } from 'path';
-import { Task, TaskScope, window } from 'vscode';
+import { Task, TaskScope } from 'vscode';
 
 export interface NxTaskDefinition {
   positional?: string;
@@ -41,7 +41,7 @@ export class NxTask extends Task {
       displayCommand, // name
       'nx', // source
       // execution
-      getShellExecutionForConfig({
+      await getShellExecutionForConfig({
         displayCommand,
         cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         encapsulatedNx: isEncapsulatedNx,

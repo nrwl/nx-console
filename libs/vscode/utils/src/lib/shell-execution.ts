@@ -1,8 +1,5 @@
-import {
-  detectPackageManager,
-  getPackageManagerCommand,
-} from 'nx/src/devkit-exports';
-import { PackageManagerCommands } from 'nx/src/utils/package-manager';
+import { importNxPackagePath } from '@nx-console/shared/npm';
+import type { PackageManagerCommands } from 'nx/src/utils/package-manager';
 import { platform } from 'os';
 
 import { ShellExecution } from 'vscode';
@@ -13,10 +10,10 @@ export interface ShellConfig {
   encapsulatedNx: boolean;
 }
 
-export function getShellExecutionForConfig(
+export async function getShellExecutionForConfig(
   config: ShellConfig,
   packageManagerCommands?: PackageManagerCommands
-): ShellExecution {
+): Promise<ShellExecution> {
   let command = config.displayCommand;
   if (config.encapsulatedNx) {
     if (platform() == 'win32') {
@@ -25,6 +22,11 @@ export function getShellExecutionForConfig(
       command = command.replace(/^nx/, './nx');
     }
   } else {
+    const { detectPackageManager, getPackageManagerCommand } =
+      await importNxPackagePath<typeof import('nx/src/utils/package-manager')>(
+        config.cwd,
+        'src/utils/package-manager'
+      );
     const pmc =
       packageManagerCommands ??
       getPackageManagerCommand(detectPackageManager(config.cwd));

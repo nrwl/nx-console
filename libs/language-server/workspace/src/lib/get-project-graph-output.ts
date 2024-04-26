@@ -1,7 +1,9 @@
 import { lspLogger } from '@nx-console/language-server/utils';
-import { findNxPackagePath } from '@nx-console/shared/npm';
+import {
+  findNxPackagePath,
+  importWorkspaceDependency,
+} from '@nx-console/shared/npm';
 import { join, relative, normalize } from 'path';
-import { getNxPackage } from './get-nx-workspace-package';
 
 export async function getProjectGraphOutput(workspacePath: string) {
   const cacheDir = await getCacheDir(workspacePath);
@@ -21,5 +23,16 @@ async function getCacheDir(workspacePath: string): Promise<string> {
     join('src', 'utils', 'cache-directory.js')
   );
 
-  return ((await getNxPackage(importPath, lspLogger)) as any).cacheDir;
+  if (!importPath) {
+    lspLogger.log(
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+    );
+    throw 'local Nx dependency not found';
+  }
+
+  return (
+    await importWorkspaceDependency<
+      typeof import('nx/src/utils/cache-directory')
+    >(importPath, lspLogger)
+  ).cacheDir;
 }

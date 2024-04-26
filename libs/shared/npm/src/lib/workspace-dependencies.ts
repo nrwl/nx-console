@@ -1,5 +1,5 @@
-import { directoryExists } from '@nx-console/shared/file-system';
-import { WorkspaceProjects } from '@nx-console/shared/schema';
+import { directoryExists, fileExists } from '@nx-console/shared/file-system';
+import type { Logger, WorkspaceProjects } from '@nx-console/shared/schema';
 import { NxVersion } from '@nx-console/shared/types';
 import { stat } from 'fs/promises';
 import { join } from 'path';
@@ -10,6 +10,7 @@ import {
   pnpDependencies,
   pnpDependencyPath,
 } from './pnp-dependencies';
+import { platform } from 'os';
 
 /**
  * Get dependencies for the current workspace.
@@ -73,6 +74,50 @@ export async function workspaceDependencyPath(
   } catch {
     return;
   }
+}
+
+export function importWorkspaceDependency<T>(
+  importPath: string,
+  logger: Logger = {
+    log(message) {
+      console.log(message);
+    },
+  }
+): Promise<T> {
+  if (platform() === 'win32') {
+    importPath = importPath.replace(/\\/g, '/');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const imported = require(importPath);
+
+  logger?.log(`Using local Nx package at ${importPath}`);
+
+  return imported;
+}
+
+export async function importNxPackagePath<T>(
+  workspacePath: string,
+  nestedPath: string,
+  logger: Logger = {
+    log(message) {
+      console.log(message);
+    },
+  }
+): Promise<T> {
+  const nxWorkspaceDepPath = await workspaceDependencyPath(workspacePath, 'nx');
+
+  if (!nxWorkspaceDepPath) {
+    logger?.log(
+      `Unable to load the "nx" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+    );
+    throw 'local Nx dependency not found';
+  }
+
+  return importWorkspaceDependency(
+    join(nxWorkspaceDepPath, nestedPath),
+    logger
+  );
 }
 
 export async function localDependencyPath(
