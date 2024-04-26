@@ -1,5 +1,12 @@
-import { lspLogger } from '@nx-console/language-server/utils';
-import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
+import {
+  canReadNxJson,
+  lspLogger,
+  readNxJson,
+} from '@nx-console/language-server/utils';
+import {
+  readAndCacheJsonFile,
+  readAndParseJson,
+} from '@nx-console/shared/file-system';
 import { Logger } from '@nx-console/shared/schema';
 import {
   NxError,
@@ -22,7 +29,8 @@ import {
   getNxProjectGraphUtils,
   getNxWorkspacePackageFileUtils,
 } from './get-nx-workspace-package';
-import type { ProjectGraphError } from 'nx/src/project-graph/project-graph';
+import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 
 let _defaultProcessExit: typeof process.exit;
 
@@ -37,8 +45,7 @@ export async function getNxWorkspaceConfig(
   isPartial?: boolean;
 }> {
   let projectGraph: ProjectGraph | null = null;
-  let sourceMaps: Record<string, Record<string, string[]>> | undefined =
-    undefined;
+  let sourceMaps: ConfigurationSourceMaps | undefined = undefined;
   let isPartial = undefined;
 
   let errors: NxError[] | undefined;
@@ -69,6 +76,15 @@ export async function getNxWorkspaceConfig(
       getNxProjectGraphUtils(workspacePath, logger),
       getNxDaemonClient(workspacePath, logger),
     ]);
+
+    // things tend to break if nx.json is broken so let's abort in this case
+    try {
+      readNxJson(workspacePath);
+    } catch (e) {
+      const newError = new Error(`Unable to read nx.json: ${e.message}`);
+      newError.stack = e.stack;
+      throw newError;
+    }
 
     let workspaceConfiguration: NxWorkspaceConfiguration | undefined =
       undefined;
@@ -130,7 +146,7 @@ export async function getNxWorkspaceConfig(
               file:
                 (e as any).file ??
                 ((e as any).cause as any)?.errors?.[0]?.location?.file,
-              pluginName: error.pluginName,
+              pluginName: (error as any).pluginName,
             }));
             isPartial = true;
           } else {
@@ -198,7 +214,11 @@ export async function getNxWorkspaceConfig(
     lspLogger.log(`Unable to get nx workspace configuration: ${e}`);
     const config = await readWorkspaceConfigs(workspacePath);
     process.exit = _defaultProcessExit;
-    return { ...config, errors: [{ stack: e.stack }], isPartial };
+    return {
+      ...config,
+      errors: [{ message: e.message, stack: e.stack }],
+      isPartial,
+    };
   }
 }
 
@@ -231,7 +251,7 @@ function createNxWorkspaceConfiguration(
   workspaceConfiguration: NxWorkspaceConfiguration,
   projectGraph: ProjectGraph | null,
   projectFileMap: ProjectFileMap,
-  sourceMaps: Record<string, Record<string, string[]>> | undefined
+  sourceMaps: ConfigurationSourceMaps | undefined
 ) {
   if (!projectGraph) {
     return workspaceConfiguration;

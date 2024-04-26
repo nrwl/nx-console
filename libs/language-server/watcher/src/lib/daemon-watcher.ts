@@ -1,8 +1,8 @@
 import { getNxDaemonClient } from '@nx-console/language-server/workspace';
-import { lspLogger } from '@nx-console/language-server/utils';
+import { canReadNxJson, lspLogger } from '@nx-console/language-server/utils';
 import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
-import { ProjectGraphError } from 'nx/src/project-graph/project-graph';
+import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 
 export class DaemonWatcher {
   private stopped = false;
@@ -25,6 +25,12 @@ export class DaemonWatcher {
     this.disposeEverything();
     if (this.stopped) return;
 
+    if (!canReadNxJson(this.workspacePath)) {
+      lspLogger.log('Unable to read nx.json, using native watcher');
+      this.useNativeWatcher();
+      return;
+    }
+
     try {
       const daemonClientModule = await getNxDaemonClient(
         this.workspacePath,
@@ -42,9 +48,7 @@ export class DaemonWatcher {
         await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
       } catch (e) {
         lspLogger.log(`caught error, ${JSON.stringify(e)}`);
-        if (
-          !(e instanceof ProjectGraphError || e.name === 'ProjectGraphError')
-        ) {
+        if (!isProjectGraphError(e)) {
           projectGraphErrors = true;
         }
       }
@@ -152,4 +156,8 @@ export class DaemonWatcher {
     }
     this.disposables.clear();
   }
+}
+
+function isProjectGraphError(e: any): e is ProjectGraphError {
+  return e.name === 'ProjectGraphError';
 }

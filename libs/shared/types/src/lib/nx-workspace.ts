@@ -2,6 +2,7 @@ import type {
   NxJsonConfiguration,
   ProjectConfiguration,
 } from 'nx/src/devkit-exports';
+import type { ConfigurationSourceMaps } from 'nx/src/project-graph/utils/project-configuration-utils';
 
 export type NxProjectConfiguration = ProjectConfiguration & {
   files?: { file: string }[];
@@ -12,7 +13,7 @@ export type NxProjectsConfiguration = {
   projects: {
     [projectName: string]: NxProjectConfiguration;
   };
-  sourceMaps?: Record<string, Record<string, string[]>>;
+  sourceMaps?: ConfigurationSourceMaps;
 };
 
 export type NxVersion = {
