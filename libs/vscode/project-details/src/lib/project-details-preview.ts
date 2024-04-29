@@ -102,7 +102,16 @@ export class ProjectDetailsPreview {
     const isPartial = nxWorkspace?.isPartial;
     const hasProjects =
       Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
-    if (workspaceErrors && (!isPartial || !hasProjects)) {
+    const hasProject =
+      project?.name &&
+      nxWorkspace?.workspace.projects[project?.name] === undefined;
+    if (
+      workspaceErrors &&
+      (!isPartial ||
+        !hasProjects ||
+        !hasProject ||
+        nxWorkspace.nxVersion.major < 20)
+    ) {
       this.loadErrorHtml(workspaceErrors);
       return;
     }

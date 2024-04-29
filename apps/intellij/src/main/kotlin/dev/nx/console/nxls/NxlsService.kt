@@ -213,6 +213,8 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
             } catch (e: MessageIssueException) {
                 Notifier.notifyLspMessageIssueExceptionThrottled(project, requestName, e)
                 null
+            } catch (e: CancellationException) {
+                null
             }
         }
     }

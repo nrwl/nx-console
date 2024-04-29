@@ -163,6 +163,11 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
         log.info("Stopping nxls")
 
         try {
+            ApplicationManager.getApplication().invokeAndWait {
+                for ((_, manager) in connectedEditors) {
+                    disconnect(manager.editor)
+                }
+            }
             initializeFuture?.cancel(true)
             withTimeoutOrNull(1000L) { languageServer?.shutdown()?.await() }
         } catch (e: Throwable) {
@@ -170,11 +175,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
         } finally {
             languageServer?.exit()
             startedFuture.completeExceptionally(Exception("Nxls stopped"))
-            ApplicationManager.getApplication().invokeAndWait {
-                for ((_, manager) in connectedEditors) {
-                    disconnect(manager.editor)
-                }
-            }
+
             nxlsProcess?.stop()
             status = NxlsState.STOPPED
         }

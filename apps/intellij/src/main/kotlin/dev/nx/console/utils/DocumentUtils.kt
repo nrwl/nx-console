@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.codeStyle.CodeStyleSettingsManager
 import com.intellij.util.DocumentUtil
 import org.eclipse.lsp4j.Position
 
@@ -36,7 +37,16 @@ class DocumentUtils {
         }
 
         fun getTabSize(editor: Editor): Int {
-            return computableReadAction { editor.settings.getTabSize(editor.project) }
+            return computableReadAction {
+                try {
+                    editor.settings.getTabSize(editor.project)
+                } catch (error: UnsupportedOperationException) {
+                    CodeStyleSettingsManager.getInstance(editor.project)
+                        .mainProjectCodeStyle
+                        ?.getTabSize(editor.virtualFile.fileType)
+                        ?: 4
+                }
+            }
         }
 
         fun LSPPosToOffset(editor: Editor?, pos: Position): Int {

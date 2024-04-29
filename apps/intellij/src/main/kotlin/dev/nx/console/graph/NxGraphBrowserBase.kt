@@ -377,12 +377,12 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
               const darkClass = 'vscode-dark';
               const lightClass = 'vscode-light';
 
-              body.classList.remove(darkClass, lightClass);
+              body.classList?.remove(darkClass, lightClass);
 
               if (isDark) {
-                  body.classList.add(darkClass);
+                  body.classList?.add(darkClass);
               } else {
-                  body.classList.add(lightClass);
+                  body.classList?.add(lightClass);
               }
               console.log("$backgroundColor")
               body.style.setProperty('background-color', '$backgroundColor', 'important');
