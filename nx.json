@@ -82,6 +82,11 @@
     }
   },
   "namedInputs": {
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci_checks.yml",
+      "{workspaceRoot}/.nx/workflows/agents.yaml"
+    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "kotlin": [
       "{projectRoot}/build.gradle.kts",
       "{projectRoot}/**/*.kt",

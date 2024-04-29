@@ -1,0 +1,37 @@
+launch-templates:
+  windows-medium:
+    resource-class: 'windows/medium'
+    image: 'windows-2022'
+    init-steps:
+      - name: Checkout
+        uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/checkout/main.yaml'
+      - name: Restore Node Modules Cache
+        uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/cache/main.yaml'
+        env:
+          KEY: '"windows"|yarn.lock'
+          PATHS: 'node_modules'
+          BASE_BRANCH: 'master'
+      - name: Restore Browser Binary Cache
+        uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/cache/main.yaml'
+        env:
+          KEY: '"windows"|yarn.lock|"browsers"'
+          PATHS: '../.cache/Cypress'
+          BASE_BRANCH: 'master'
+      - name: Node Versions
+        script: |
+          node --version
+          npm --version
+      - name: Install Yarn
+        script: 'npm install --global yarn'
+      - name: Refresh Environment Variables
+        script: |
+          Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+          refreshenv
+      - name: PATH
+        script: $Env:Path
+      - name: Yarn Version
+        script: 'yarn --version'
+      - name: Install Node Modules
+        uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/install-node-modules/main.yaml'
+      - name: Install Browsers (if needed)
+        uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/install-browsers/main.yaml'
