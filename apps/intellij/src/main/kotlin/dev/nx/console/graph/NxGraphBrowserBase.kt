@@ -105,6 +105,8 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             browser.loadHTML(modifiedHtml)
         }
         Disposer.dispose(oldQueryMessenger)
+
+        setColors()
     }
 
     protected fun loadGraphHtmlBase(): String {
