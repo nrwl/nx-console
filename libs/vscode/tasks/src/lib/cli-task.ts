@@ -42,6 +42,7 @@ export class CliTask extends Task {
             ? join(workspacePath, definition.cwd)
             : workspacePath,
           encapsulatedNx: isEncapsulatedNx,
+          workspacePath,
         },
         packageManagerCommands
       )

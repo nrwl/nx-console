@@ -98,6 +98,7 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
           cwd: workspacePath,
           displayCommand: prefixedCommand,
           encapsulatedNx: isEncapsulatedNx,
+          workspacePath,
         })
       );
       tasks.executeTask(task);
