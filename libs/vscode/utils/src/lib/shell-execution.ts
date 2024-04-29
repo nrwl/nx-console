@@ -8,6 +8,7 @@ export interface ShellConfig {
   cwd: string;
   displayCommand: string;
   encapsulatedNx: boolean;
+  workspacePath: string;
 }
 
 export async function getShellExecutionForConfig(
@@ -24,7 +25,7 @@ export async function getShellExecutionForConfig(
   } else {
     const { detectPackageManager, getPackageManagerCommand } =
       await importNxPackagePath<typeof import('nx/src/utils/package-manager')>(
-        config.cwd,
+        config.workspacePath,
         'src/utils/package-manager'
       );
     const pmc =

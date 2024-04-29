@@ -45,6 +45,7 @@ export class NxTask extends Task {
         displayCommand,
         cwd: cwd ? join(workspacePath, cwd) : workspacePath,
         encapsulatedNx: isEncapsulatedNx,
+        workspacePath,
       })
     );
     return task;

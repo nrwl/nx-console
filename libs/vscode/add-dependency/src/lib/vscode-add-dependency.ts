@@ -210,6 +210,7 @@ async function executeInitGenerator(dependency: string, workspacePath: string) {
       cwd: workspacePath,
       displayCommand: command,
       encapsulatedNx: false,
+      workspacePath,
     })
   );
   tasks.executeTask(task);
