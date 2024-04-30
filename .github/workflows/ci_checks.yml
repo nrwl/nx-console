@@ -24,7 +24,7 @@ jobs:
       - run: |
           npx nx-cloud start-ci-run \
             --distribute-on="3 linux-medium-js" \
-            --stop-agents-after="e2e"
+            --stop-agents-after="e2e-ci"
       - uses: browser-actions/setup-chrome@v1
       - run: chrome --version
       - name: Use Node.js ${{ env.node_version }}
@@ -41,7 +41,7 @@ jobs:
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
       - run: yarn nx affected --t=lint,test,build --configuration=ci --exclude=nx-console --verbose
-      - run: yarn nx affected --t=e2e,e2e-ci --configuration=ci --exclude=nx-console --parallel=1 --verbose
+      - run: yarn nx affected --t=e2e-ci --exclude=nx-console --parallel=1 --verbose
   main-windows:
     name: Main Windows
     runs-on: windows-latest
@@ -81,5 +81,5 @@ jobs:
           cache: gradle
       # there's no need to check formatting & linting again on windows
       - run: yarn nx affected --t=test,build --configuration=ci --exclude=nx-console --verbose
-      - run: yarn nx affected --t=e2e,e2e-ci --configuration=ci --exclude=nx-console --parallel=1 --verbose
+      - run: yarn nx affected --t=e2e-local --exclude=nx-console --parallel=1 --verbose
         timeout-minutes: 45

@@ -29,9 +29,6 @@
         "command": "node ./apps/intellij/run-gradle.js :apps:intellij:check"
       }
     },
-    "lint": {
-      "executor": "nx:noop"
-    },
     "x-lint": {
       "//": "Run inspections take a long time on the CI. Disable for now",
       "executor": "nx:run-commands",

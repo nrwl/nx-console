@@ -3,11 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/generate-ui/styles/src",
-  "targets": {
-    "lint": {
-      "executor": "nx:noop"
-    }
-  },
+  "targets": {},
   "generators": {},
   "tags": ["type:generate-ui"]
 }
