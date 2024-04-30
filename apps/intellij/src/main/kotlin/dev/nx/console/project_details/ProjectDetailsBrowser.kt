@@ -233,8 +233,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                             (!hasProjects ||
                                 nxWorkspace?.isPartial != true ||
                                 !hasProject ||
-                                // update this to 19 once partial graph PR is merged
-                                version.major < 20)
+                                version.major < 19)
                     ) {
                         withContext(Dispatchers.EDT) {
                             if (browser.isDisposed) return@withContext

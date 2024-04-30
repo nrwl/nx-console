@@ -4,12 +4,12 @@ import {
   NxGraphServer,
   getNxGraphServer,
   handleGraphInteractionEventBase,
-  loadGraphBaseHtml,
+  loadGraphBaseHtml
 } from '@nx-console/vscode/graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getNxWorkspace,
-  getProjectByPath,
+  getProjectByPath
 } from '@nx-console/vscode/nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
@@ -18,17 +18,27 @@ import {
   ViewColumn,
   WebviewPanel,
   commands,
-  window,
+  window
 } from 'vscode';
 
 export class ProjectDetailsPreview {
+  public projectRoot: string | undefined;
   private webviewPanel: WebviewPanel;
   private graphServer: NxGraphServer;
-
   private graphServerError: (string | any)[] | undefined;
   private isShowingErrorHtml = false;
-
-  public projectRoot: string | undefined;
+  private debouncedRefresh = debounce(async () => {
+    const nxWorkspace = await getNxWorkspace();
+    const errors = nxWorkspace?.errors;
+    const isPartial = nxWorkspace?.isPartial;
+    const hasProjects =
+      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+    if (this.isShowingErrorHtml || (errors && (!isPartial || !hasProjects))) {
+      this.refresh();
+    } else {
+      this.webviewPanel.webview.postMessage({ type: 'reload' });
+    }
+  }, 100);
 
   constructor(
     private path: string,
@@ -40,7 +50,7 @@ export class ProjectDetailsPreview {
       `Project Details`,
       ViewColumn.Beside,
       {
-        enableScripts: true,
+        enableScripts: true
       }
     );
 
@@ -110,7 +120,7 @@ export class ProjectDetailsPreview {
       (!isPartial ||
         !hasProjects ||
         !hasProject ||
-        nxWorkspace.nxVersion.major < 20)
+        nxWorkspace.nxVersion.major < 19)
     ) {
       this.loadErrorHtml(workspaceErrors);
       return;
@@ -118,7 +128,7 @@ export class ProjectDetailsPreview {
 
     if (!project) {
       this.loadErrorHtml([
-        { message: `No project found at path ${this.path}` },
+        { message: `No project found at path ${this.path}` }
       ]);
       return;
     }
@@ -132,14 +142,14 @@ export class ProjectDetailsPreview {
     html = html.replace(
       '</head>',
       /*html*/ `
-      <script> 
+      <script>
         window.addEventListener('message', ({ data }) => {
           const { type, payload } = data;
           if(type === 'reload') {
             console.log('reloading');
             window.waitForRouter().then(() => {
               window.externalApi.openProjectDetails('${project?.name}')
-            })  
+            })
           }
         });
       </script>
@@ -179,10 +189,10 @@ export class ProjectDetailsPreview {
       </style>
       <p>Unable to load the project graph. The following error occurred:</p>
       ${errors
-        .map(
-          (error) => `<pre>${error.message ?? ''} \n ${error.stack ?? ''}</pre>`
-        )
-        .join('')}
+      .map(
+        (error) => `<pre>${error.message ?? ''} \n ${error.stack ?? ''}</pre>`
+      )
+      .join('')}
     `;
     this.isShowingErrorHtml = true;
   }
@@ -217,17 +227,4 @@ export class ProjectDetailsPreview {
       }
     }
   }
-
-  private debouncedRefresh = debounce(async () => {
-    const nxWorkspace = await getNxWorkspace();
-    const errors = nxWorkspace?.errors;
-    const isPartial = nxWorkspace?.isPartial;
-    const hasProjects =
-      Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
-    if (this.isShowingErrorHtml || (errors && (!isPartial || !hasProjects))) {
-      this.refresh();
-    } else {
-      this.webviewPanel.webview.postMessage({ type: 'reload' });
-    }
-  }, 100);
 }
