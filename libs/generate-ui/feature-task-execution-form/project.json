@@ -5,34 +5,15 @@
   "sourceRoot": "libs/generate-ui/feature-task-execution-form/src",
   "targets": {
     "storybook": {
-      "executor": "@storybook/angular:start-storybook",
       "options": {
-        "port": 4400,
-        "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
-        "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
-        "compodoc": false
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
-        }
+        "port": 4400
       }
     },
     "build-storybook": {
-      "executor": "@storybook/angular:build-storybook",
-      "outputs": ["{options.outputPath}"],
       "options": {
         "outputDir": "dist/storybook/generate-ui-feature-task-execution-form",
-        "configDir": "libs/generate-ui/feature-task-execution-form/.storybook",
-        "browserTarget": "generate-ui-feature-task-execution-form:build-storybook",
         "stylePreprocessorOptions": {
           "includePaths": ["libs/generate-ui/styles/src/lib/vscode"]
-        },
-        "compodoc": false
-      },
-      "configurations": {
-        "ci": {
-          "quiet": true
         }
       }
     }

@@ -46,13 +46,11 @@
     },
     "build-storybook": {
       "inputs": [
-        "default",
+        "production",
         "^production",
         "{workspaceRoot}/.storybook/**/*",
-        "{projectRoot}/.storybook/**/*",
-        "{projectRoot}/tsconfig.storybook.json"
-      ],
-      "cache": true
+        "{projectRoot}/.storybook/**/*"
+      ]
     },
     "_build": {
       "cache": true
@@ -121,6 +119,13 @@
         "targetName": "e2e-local",
         "openTargetName": "open-cypress",
         "ciTargetName": "e2e-ci"
+      }
+    },
+    {
+      "plugin": "@nx/storybook/plugin",
+      "options": {
+        "buildStorybookTargetName": "build-storybook",
+        "serveStorybookTargetName": "storybook"
       }
     }
   ],
