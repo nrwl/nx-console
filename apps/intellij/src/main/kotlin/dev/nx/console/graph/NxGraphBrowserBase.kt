@@ -385,7 +385,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                   body.classList?.add(lightClass);
               }
               console.log("$backgroundColor")
-              body.style.setProperty('background-color', '$backgroundColor', 'important');
+              body.style?.setProperty('background-color', '$backgroundColor', 'important');
                 """
                     .trimIndent()
             )
