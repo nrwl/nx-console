@@ -72,34 +72,36 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     override fun refresh() {
         thisLogger().trace("refreshing PDV ${file.path}")
         if (project.isDisposed) return
+        loadHtml()
 
-        coroutineScope.launch {
-            if (errors != null) {
-                loadHtml()
-                return@launch
-            }
-            try {
-                val isShowingPDV =
-                    try {
-                        withContext(Dispatchers.EDT) {
-                            return@withContext browser.executeJavaScript(
-                                "return !!window.waitForRouter && !!window.intellij && !!window.externalApi && document.getElementById('app').hasChildNodes()"
-                            ) == "true"
-                        }
-                    } catch (e: Throwable) {
-                        false
-                    }
-
-                val nxProjectName = this@ProjectDetailsBrowser.nxProjectName
-                if (isShowingPDV && nxProjectName != null) {
-                    loadProjectDetails(nxProjectName)
-                } else {
-                    loadHtml()
-                }
-            } catch (e: Throwable) {
-                thisLogger().trace("Error while refreshing PDV ${file.path} \n $e ")
-            }
-        }
+        //        coroutineScope.launch {
+        //            if (errors != null) {
+        //                loadHtml()
+        //                return@launch
+        //            }
+        //            try {
+        //                val isShowingPDV =
+        //                    try {
+        //                        withContext(Dispatchers.EDT) {
+        //                            return@withContext browser.executeJavaScript(
+        //                                "return !!window.waitForRouter && !!window.intellij &&
+        // !!window.externalApi && document.getElementById('app').hasChildNodes()"
+        //                            ) == "true"
+        //                        }
+        //                    } catch (e: Throwable) {
+        //                        false
+        //                    }
+        //
+        //                val nxProjectName = this@ProjectDetailsBrowser.nxProjectName
+        //                if (isShowingPDV && nxProjectName != null) {
+        //                    loadProjectDetails(nxProjectName)
+        //                } else {
+        //                    loadHtml()
+        //                }
+        //            } catch (e: Throwable) {
+        //                thisLogger().trace("Error while refreshing PDV ${file.path} \n $e ")
+        //            }
+        //        }
     }
 
     private fun loadProjectDetails(nxProjectName: String) {
