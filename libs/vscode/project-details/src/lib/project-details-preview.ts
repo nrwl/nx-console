@@ -4,12 +4,12 @@ import {
   NxGraphServer,
   getNxGraphServer,
   handleGraphInteractionEventBase,
-  loadGraphBaseHtml
+  loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import {
   getNxWorkspace,
-  getProjectByPath
+  getProjectByPath,
 } from '@nx-console/vscode/nx-workspace';
 import { getGraphWebviewManager } from '@nx-console/vscode/project-graph';
 import { ProjectConfiguration } from 'nx/src/devkit-exports';
@@ -18,7 +18,7 @@ import {
   ViewColumn,
   WebviewPanel,
   commands,
-  window
+  window,
 } from 'vscode';
 
 export class ProjectDetailsPreview {
@@ -50,7 +50,7 @@ export class ProjectDetailsPreview {
       `Project Details`,
       ViewColumn.Beside,
       {
-        enableScripts: true
+        enableScripts: true,
       }
     );
 
@@ -128,7 +128,7 @@ export class ProjectDetailsPreview {
 
     if (!project) {
       this.loadErrorHtml([
-        { message: `No project found at path ${this.path}` }
+        { message: `No project found at path ${this.path}` },
       ]);
       return;
     }
@@ -189,10 +189,10 @@ export class ProjectDetailsPreview {
       </style>
       <p>Unable to load the project graph. The following error occurred:</p>
       ${errors
-      .map(
-        (error) => `<pre>${error.message ?? ''} \n ${error.stack ?? ''}</pre>`
-      )
-      .join('')}
+        .map(
+          (error) => `<pre>${error.message ?? ''} \n ${error.stack ?? ''}</pre>`
+        )
+        .join('')}
     `;
     this.isShowingErrorHtml = true;
   }
