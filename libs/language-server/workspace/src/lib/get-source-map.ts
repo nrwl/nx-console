@@ -1,7 +1,6 @@
-import { TargetConfiguration } from 'nx/src/devkit-exports';
+import type { TargetConfiguration } from 'nx/src/devkit-exports';
 import { nxWorkspace } from './workspace';
 import { normalize, relative } from 'path';
-import { lspLogger } from '@nx-console/language-server/utils';
 
 let _sourceMapFilesToProjectMap: Record<string, string> | undefined = undefined;
 
@@ -20,7 +19,7 @@ export async function getSourceMapFilesToProjectMap(
   Object.entries(workspace.sourceMaps ?? {}).forEach(
     ([projectRoot, sourceMap]) => {
       Object.values(sourceMap).forEach(([file]) => {
-        if (!sourceMapFilesToProjectMap[file] && file !== 'nx.json') {
+        if (file && !sourceMapFilesToProjectMap[file] && file !== 'nx.json') {
           sourceMapFilesToProjectMap[file] = projectRoot;
         }
       });
@@ -56,8 +55,8 @@ export async function getTargetsForConfigFile(
 
   const targets: Record<string, TargetConfiguration> = {};
   Object.entries(sourceMap)
-    .filter(([key]) => key.startsWith('targets.'))
-    .forEach(([key, [file]]: [string, string[]]) => {
+    .filter<[string, [string, string]]>(isKeyWithTargetsAndFileNotNull)
+    .forEach(([key, [file]]: [string, [string, string]]) => {
       if (normalize(file) === configFilePath) {
         const targetName = key.split('.')[1];
         const target = project.targets?.[targetName];
@@ -72,4 +71,10 @@ export async function getTargetsForConfigFile(
 
 export function resetSourceMapFilesToProjectCache() {
   _sourceMapFilesToProjectMap = undefined;
+}
+
+export function isKeyWithTargetsAndFileNotNull(
+  value: [string, [string | null, string]]
+): value is [string, [string, string]] {
+  return value[0].startsWith('targets.') && value[1][0] !== null;
 }

@@ -56,12 +56,16 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
         wrapper.stop()
     }
 
-    suspend fun refreshWorkspace() {
-        // call nx reset to clear all caches
-        server()?.getNxService()?.reset()
+    suspend fun restart() {
+        server()?.getNxService()?.stopDaemon()?.await()
         thisLogger().info("reset done")
         wrapper.stop()
         start()
+        awaitStarted()
+    }
+
+    suspend fun refreshWorkspace() {
+        server()?.getNxService()?.refreshWorkspace()
     }
 
     suspend fun workspace(): NxWorkspace? {
@@ -208,6 +212,8 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
                 block()
             } catch (e: MessageIssueException) {
                 Notifier.notifyLspMessageIssueExceptionThrottled(project, requestName, e)
+                null
+            } catch (e: CancellationException) {
                 null
             }
         }

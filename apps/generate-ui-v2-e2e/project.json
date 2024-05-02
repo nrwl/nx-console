@@ -4,20 +4,9 @@
   "sourceRoot": "apps/generate-ui-v2-e2e/src",
   "projectType": "application",
   "targets": {
-    "e2e": {
-      "executor": "@nx/cypress:cypress",
+    "e2e-local": {
       "options": {
-        "cypressConfig": "apps/generate-ui-v2-e2e/cypress.config.ts",
-        "devServerTarget": "generate-ui-v2-e2e:serve",
-        "testingType": "e2e",
-        "baseUrl": "http://localhost:4200",
         "browser": "chrome"
-      },
-      "configurations": {
-        "watch": {
-          "watch": true,
-          "headed": true
-        }
       }
     },
     "serve": {

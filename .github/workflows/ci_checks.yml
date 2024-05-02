@@ -40,7 +40,8 @@ jobs:
           npx nx-cloud record -- ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: yarn nx affected --t=lint,test,build,e2e --configuration=ci --exclude=nx-console --verbose
+      - run: yarn nx affected --t=lint,test,build --configuration=ci --exclude=nx-console --verbose
+      - run: yarn nx affected --t=e2e,e2e-ci --configuration=ci --exclude=nx-console --parallel=1 --verbose
   main-windows:
     name: Main Windows
     runs-on: windows-latest
@@ -79,5 +80,6 @@ jobs:
           java-version: 17
           cache: gradle
       # there's no need to check formatting & linting again on windows
-      - run: yarn nx affected --t=test,build,e2e --configuration=ci --exclude=nx-console --verbose
+      - run: yarn nx affected --t=test,build --configuration=ci --exclude=nx-console --verbose
+      - run: yarn nx affected --t=e2e,e2e-ci --configuration=ci --exclude=nx-console --parallel=1 --verbose
         timeout-minutes: 45

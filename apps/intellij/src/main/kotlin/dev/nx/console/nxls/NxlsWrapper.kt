@@ -1,5 +1,6 @@
 package dev.nx.console.nxls
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.Editor
@@ -14,6 +15,7 @@ import dev.nx.console.nxls.server.NxlsLanguageServer
 import dev.nx.console.utils.nxBasePath
 import dev.nx.console.utils.nxlsWorkingPath
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.future.await
@@ -45,7 +47,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
     private var initializeResult: InitializeResult? = null
     private var nxlsProcess: NxlsProcess? = null
 
-    private var connectedEditors = HashMap<String, DocumentManager>()
+    private var connectedEditors = ConcurrentHashMap<String, DocumentManager>()
 
     private var status = NxlsState.STOPPED
 
@@ -84,13 +86,21 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
                                         it.error?.let {
                                             log.trace("Error from nxls: ${it.message}")
                                         }
-                                        it.result?.let { log.trace("Result from nxls: ${it}") }
+                                        it.result?.let { result ->
+                                            log.trace(
+                                                "Result from nxls: ${result?.let {
+                                                    if(it.toString().length > 100) it.toString().substring(0, 100) else it.toString()
+                                                }}"
+                                            )
+                                        }
                                     }
 
                                     val request = message as? RequestMessage
-                                    request?.let {
+                                    request?.let { request ->
                                         log.trace(
-                                            "Sending request to nxls: ${it.method} (${it.params})"
+                                            "Sending request to nxls: ${request.method} (${request.params?.let {
+                                                if(it.toString().length > 100) it.toString().substring(0, 100) else it.toString()
+                                            }})"
                                         )
                                     }
 
@@ -153,6 +163,11 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
         log.info("Stopping nxls")
 
         try {
+            ApplicationManager.getApplication().invokeAndWait {
+                for ((_, manager) in connectedEditors) {
+                    disconnect(manager.editor)
+                }
+            }
             initializeFuture?.cancel(true)
             withTimeoutOrNull(1000L) { languageServer?.shutdown()?.await() }
         } catch (e: Throwable) {
@@ -160,9 +175,7 @@ class NxlsWrapper(val project: Project, private val cs: CoroutineScope) {
         } finally {
             languageServer?.exit()
             startedFuture.completeExceptionally(Exception("Nxls stopped"))
-            for ((_, manager) in connectedEditors) {
-                disconnect(manager.editor)
-            }
+
             nxlsProcess?.stop()
             status = NxlsState.STOPPED
         }

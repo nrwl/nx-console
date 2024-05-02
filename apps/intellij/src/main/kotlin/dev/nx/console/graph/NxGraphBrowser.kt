@@ -37,8 +37,8 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                 NxWorkspaceRefreshListener {
                     coroutineScope.launch {
                         try {
-                            val error = NxlsService.getInstance(project).workspace()?.error
-                            setErrorAndRefresh(error)
+                            val errors = NxlsService.getInstance(project).workspace()?.errors
+                            setErrorsAndRefresh(errors)
                         } catch (e: Throwable) {
                             logger<ProjectDetailsBrowser>().debug(e.message)
                         }
@@ -58,9 +58,10 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         }
         currentLoadHtmlJob =
             coroutineScope.launch {
-                error =
-                    this@NxGraphBrowser.error ?: NxlsService.getInstance(project).workspace()?.error
-                error.also {
+                errors =
+                    this@NxGraphBrowser.errors
+                        ?: NxlsService.getInstance(project).workspace()?.errors
+                errors.also {
                     if (it != null) {
                         withContext(Dispatchers.EDT) {
                             wrappedBrowserLoadHtml(getErrorHtml(it))
@@ -84,7 +85,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun selectAllProjects() {
         lastGraphCommand = GraphCommand.SelectAllProjects()
         executeWhenLoaded {
-            if (error != null) return@executeWhenLoaded
+            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) {
                 thisLogger().warn("Can't select all projects because browser has been disposed.")
                 return@executeWhenLoaded
@@ -98,7 +99,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun focusProject(projectName: String) {
         lastGraphCommand = GraphCommand.FocusProject(projectName)
         executeWhenLoaded {
-            if (error != null) return@executeWhenLoaded
+            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) return@executeWhenLoaded
             browser.executeJavaScript(
                 "window.waitForRouter?.().then(() => {console.log('navigating to $projectName'); window.externalApi.focusProject('$projectName')})"
@@ -109,7 +110,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun focusTargetGroup(targetGroup: String) {
         lastGraphCommand = GraphCommand.FocusTargetGroup(targetGroup)
         executeWhenLoaded {
-            if (error != null) return@executeWhenLoaded
+            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) return@executeWhenLoaded
             browser.executeJavaScript(
                 "window.waitForRouter?.().then(() => {console.log('navigating to group $targetGroup'); window.externalApi.selectAllTargetsByName('$targetGroup')})"
@@ -120,7 +121,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun focusTarget(projectName: String, targetName: String) {
         lastGraphCommand = GraphCommand.FocusTarget(projectName, targetName)
         executeWhenLoaded {
-            if (error != null) return@executeWhenLoaded
+            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) return@executeWhenLoaded
             browser.executeJavaScript(
                 "window.waitForRouter?.().then(() => {console.log('navigating to target $projectName:$targetName'); window.externalApi.focusTarget('$projectName','$targetName')})"

@@ -66,7 +66,8 @@
           "@parcel/watcher",
           "@nx/nx*",
           "webpack",
-          "fsevents"
+          "fsevents",
+          "nx"
         ],
         "target": "es2020",
         "outputFileName": "main.js",

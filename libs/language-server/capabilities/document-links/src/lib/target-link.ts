@@ -1,4 +1,3 @@
-import { parseTargetString } from '@nx/devkit/src/executors/parse-target-string';
 import { fileExists, readFile } from '@nx-console/shared/file-system';
 import {
   findProperty,
@@ -16,6 +15,10 @@ import {
 } from 'vscode-json-languageservice';
 import { URI } from 'vscode-uri';
 import { createRange } from './create-range';
+import {
+  importWorkspaceDependency,
+  workspaceDependencyPath,
+} from '@nx-console/shared/npm';
 
 const tempDocumentCounter = new Map<string, number>();
 
@@ -30,6 +33,18 @@ export async function targetLink(
   const targetString = node.value;
   let project, target, configuration;
   try {
+    const devkitPath = await workspaceDependencyPath(workingPath, '@nx/devkit');
+    if (!devkitPath) {
+      lspLogger.log(
+        `Unable to load the "@nx/devkit" package from the workspace. Please ensure that the proper dependencies are installed locally.`
+      );
+      throw 'local @nx/devkit dependency not found';
+    }
+
+    const importPath = join(devkitPath, 'src/executors/parse-target-string');
+    const { parseTargetString } = await importWorkspaceDependency<
+      typeof import('@nx/devkit/src/executors/parse-target-string')
+    >(importPath, lspLogger);
     const parsedTargets = parseTargetString(targetString);
     project = parsedTargets.project;
     target = parsedTargets.target;

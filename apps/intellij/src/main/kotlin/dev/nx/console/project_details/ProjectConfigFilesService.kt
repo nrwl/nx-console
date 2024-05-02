@@ -85,7 +85,14 @@ class ProjectConfigFilesService(private val project: Project, private val cs: Co
                 pathsToProjectsMap.clear()
                 pathsToProjectsMap.putAll(projectsMap)
             } else {
-                nxlsService.workspace()?.error?.also { pathsToProjectsMap.clear() }
+                val workspace = nxlsService.workspace()
+                if (
+                    !workspace?.errors.isNullOrEmpty() &&
+                        workspace?.isPartial != true &&
+                        !workspace?.workspace?.projects.isNullOrEmpty()
+                ) {
+                    pathsToProjectsMap.clear()
+                }
             }
 
             withContext(Dispatchers.EDT) { ensurePDVPreviewFileEditors() }

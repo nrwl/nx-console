@@ -1,6 +1,6 @@
 import {
   getNxGraphServer,
-  handleGraphInteractionEvent,
+  handleGraphInteractionEventBase,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
 import {
@@ -115,7 +115,7 @@ export class GraphWebviewManager implements Disposable {
 
     this.webviewPanel.webview.html = html;
     this.webviewPanel.webview.onDidReceiveMessage(async (event) => {
-      const handled = await handleGraphInteractionEvent(event);
+      const handled = await handleGraphInteractionEventBase(event);
       if (handled) return;
       if (event.type.startsWith('request')) {
         const response = await graphServer.handleWebviewRequest(event);

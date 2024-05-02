@@ -155,6 +155,11 @@ open class NxGraphServer(
         }
     }
 
+    fun restart() {
+        this.dispose()
+        this.start()
+    }
+
     private suspend fun spawnProcess(port: Int): Process {
         println("trying to start graph at $port")
 
