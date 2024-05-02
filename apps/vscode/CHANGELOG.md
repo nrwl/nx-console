@@ -1,3 +1,15 @@
+# [18.21.0](https://github.com/nrwl/nx-console/compare/vscode-v18.20.0...vscode-v18.21.0) (2024-05-02)
+
+
+### Bug Fixes
+
+* import nx from the correct location when cwd is different than the workspace root ([#2109](https://github.com/nrwl/nx-console/issues/2109)) ([744c8be](https://github.com/nrwl/nx-console/commit/744c8be993f60e390dfba22d34bec98f23978222))
+
+
+### Features
+
+* enable partial graphs in nx console & fix bugs ([#2115](https://github.com/nrwl/nx-console/issues/2115)) ([72a544e](https://github.com/nrwl/nx-console/commit/72a544ed8fd900243b2b20448415fef357241b1e))
+
 # [18.20.0](https://github.com/nrwl/nx-console/compare/vscode-v18.19.0...vscode-v18.20.0) (2024-04-24)
 
 
