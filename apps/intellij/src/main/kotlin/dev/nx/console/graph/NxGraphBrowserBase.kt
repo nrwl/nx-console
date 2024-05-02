@@ -328,7 +328,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             <p>Unable to load the project graph. The following error${if(errors.isNotEmpty()) "s" else ""} occurred:</p>
       ${errors.map { "<pre>${it.message ?: ""} \n ${it.stack ?: ""}</pre>" }.joinToString("\n")
         }
-      If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reset</a> the graph.
+      If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reload the project graph</a>. If that doesn't work, try running <code>nx reset</code> in the terminal & restart the IDE.
     """
             .trimIndent()
     }
