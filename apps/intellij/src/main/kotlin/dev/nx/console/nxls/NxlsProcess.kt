@@ -57,7 +57,6 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
 
                             logger.trace("Nxls early exit: $this")
 
-                            //                            Notifier.notifyNxlsError(project)
                             onExit?.invoke()
                         }
                     }
@@ -77,8 +76,7 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                     thisLogger().info("waiting for process to exit")
                     process?.onExit()?.await()
                     true
-                }
-                    ?: false
+                } ?: false
             }
         thisLogger().info("Process exited: $hasExited")
 
