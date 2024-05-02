@@ -55,9 +55,7 @@ export async function getTargetsForConfigFile(
 
   const targets: Record<string, TargetConfiguration> = {};
   Object.entries(sourceMap)
-    .filter<[string, [string, string]]>((value) =>
-      isKeyWithTargetsAndFileNotNull(value)
-    )
+    .filter<[string, [string, string]]>(isKeyWithTargetsAndFileNotNull)
     .forEach(([key, [file]]: [string, [string, string]]) => {
       if (normalize(file) === configFilePath) {
         const targetName = key.split('.')[1];
