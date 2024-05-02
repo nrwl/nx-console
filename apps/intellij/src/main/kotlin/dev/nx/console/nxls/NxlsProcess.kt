@@ -76,7 +76,8 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                     thisLogger().info("waiting for process to exit")
                     process?.onExit()?.await()
                     true
-                } ?: false
+                }
+                    ?: false
             }
         thisLogger().info("Process exited: $hasExited")
 
