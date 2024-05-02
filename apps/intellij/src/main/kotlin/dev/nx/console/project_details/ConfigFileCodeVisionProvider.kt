@@ -189,13 +189,13 @@ class ProjectLevelConfigFileCodeVisionManager(
                 cs.launch { loadWorkspaceAndRefresh(project) }
                 return CodeVisionState.NotReady
             }
-            if (nxWorkspaceCache?.error != null) {
+            if (nxWorkspaceCache?.errors != null) {
                 return CodeVisionState.Ready(
                     listOf(
                         Pair(
                             codeVisionTextRange ?: TextRange(0, 0),
                             ClickableTextCodeVisionEntry(
-                                "Project Graph Computation Failed. Click to see error.",
+                                "Project Graph Computation Failed. Click to see errors.",
                                 providerId = ConfigFileCodeVisionProvider.ID,
                                 icon = AllIcons.General.Error,
                                 onClick = { _, _ ->

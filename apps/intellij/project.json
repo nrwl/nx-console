@@ -6,7 +6,7 @@
     "runIde": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node ./apps/intellij/run-gradle.js:apps:intellij:runIde"
+        "command": "node ./apps/intellij/run-gradle.js :apps:intellij:runIde"
       }
     },
     "build": {

@@ -22,6 +22,7 @@ import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.NxGraphBrowserBase
 import dev.nx.console.graph.NxGraphInteractionEvent
 import dev.nx.console.graph.getNxGraphService
+import dev.nx.console.models.NxError
 import dev.nx.console.models.NxVersion
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
@@ -57,8 +58,8 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 NxWorkspaceRefreshListener {
                     coroutineScope.launch {
                         try {
-                            val error = NxlsService.getInstance(project).workspace()?.error
-                            setErrorAndRefresh(error)
+                            val errors = NxlsService.getInstance(project).workspace()?.errors
+                            setErrorsAndRefresh(errors)
                         } catch (e: Throwable) {
                             logger<ProjectDetailsBrowser>().debug(e.message)
                         }
@@ -70,30 +71,37 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
 
     override fun refresh() {
         thisLogger().trace("refreshing PDV ${file.path}")
-        if (error != null) {
-            loadHtml()
-            return
-        }
         if (project.isDisposed) return
-        coroutineScope.launch {
-            try {
-                val isShowingPDV =
-                    withContext(Dispatchers.EDT) {
-                        browser.executeJavaScript(
-                            "return !!window.waitForRouter && !!window.intellij && !!window.externalApi"
-                        ) == "true"
-                    }
-                val nxProjectName = this@ProjectDetailsBrowser.nxProjectName
-                if (isShowingPDV && nxProjectName != null) {
-                    loadProjectDetails(nxProjectName)
-                } else {
-                    loadHtml()
-                }
-            } catch (e: Throwable) {
-                thisLogger().trace("Error while refreshing PDV ${file.path} \n $e ")
-                loadHtml()
-            }
-        }
+        loadHtml()
+
+        //        coroutineScope.launch {
+        //            if (errors != null) {
+        //                loadHtml()
+        //                return@launch
+        //            }
+        //            try {
+        //                val isShowingPDV =
+        //                    try {
+        //                        withContext(Dispatchers.EDT) {
+        //                            return@withContext browser.executeJavaScript(
+        //                                "return !!window.waitForRouter && !!window.intellij &&
+        // !!window.externalApi && document.getElementById('app').hasChildNodes()"
+        //                            ) == "true"
+        //                        }
+        //                    } catch (e: Throwable) {
+        //                        false
+        //                    }
+        //
+        //                val nxProjectName = this@ProjectDetailsBrowser.nxProjectName
+        //                if (isShowingPDV && nxProjectName != null) {
+        //                    loadProjectDetails(nxProjectName)
+        //                } else {
+        //                    loadHtml()
+        //                }
+        //            } catch (e: Throwable) {
+        //                thisLogger().trace("Error while refreshing PDV ${file.path} \n $e ")
+        //            }
+        //        }
     }
 
     private fun loadProjectDetails(nxProjectName: String) {
@@ -190,7 +198,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     val nxlsService = NxlsService.getInstance(project)
                     nxlsService.awaitStarted()
 
-                    val version = withTimeout(2000) { nxlsService.nxVersion() }
+                    val version = nxlsService.nxVersion()
 
                     if (
                         version == null ||
@@ -203,17 +211,36 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         return@launch
                     }
 
-                    var error = this@ProjectDetailsBrowser.error ?: nxlsService.workspace()?.error
+                    val nxWorkspace = nxlsService.workspace()
+                    val hasProjects = nxWorkspace?.workspace?.projects?.isNotEmpty() == true
+                    var errors = this@ProjectDetailsBrowser.errors ?: nxWorkspace?.errors
                     val nxProjectName = nxlsService.projectByPath(file.path)?.name
                     this@ProjectDetailsBrowser.nxProjectName = nxProjectName
-                    if (nxProjectName == null && error == null) {
-                        error = "Unable to find Nx project for file: ${file.path}"
+                    if (nxProjectName == null && errors == null) {
+                        errors =
+                            arrayOf(
+                                NxError(
+                                    "Unable to find Nx project for file: ${file.path}",
+                                    null,
+                                    file.path,
+                                    null
+                                )
+                            )
                     }
-                    if (error != null) {
+                    val hasProject =
+                        nxProjectName != null &&
+                            nxWorkspace?.workspace?.projects?.get(nxProjectName) != null
+                    if (
+                        errors != null &&
+                            (!hasProjects ||
+                                nxWorkspace?.isPartial != true ||
+                                !hasProject ||
+                                version.major < 19)
+                    ) {
                         withContext(Dispatchers.EDT) {
                             if (browser.isDisposed) return@withContext
                             thisLogger().trace("Error found, loading error html ${file.path}")
-                            wrappedBrowserLoadHtml(getErrorHtml(error))
+                            wrappedBrowserLoadHtml(getErrorHtml(errors))
                             registerResetHandler()
                         }
                         return@launch
@@ -250,12 +277,15 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         )
                     withContext(Dispatchers.EDT) {
                         if (browser.isDisposed) return@withContext
-                        wrappedBrowserLoadHtml(
-                            getErrorHtml(
+                        val error =
+                            NxError(
                                 e.message
-                                    ?: "Nx Console timed out while loading. Please reset to try again."
+                                    ?: "Nx Console encountered an error while loading. Please reset to try again.",
+                                e.stackTraceToString(),
+                                file.path,
+                                null
                             )
-                        )
+                        wrappedBrowserLoadHtml(getErrorHtml(arrayOf(error)))
 
                         registerResetHandler()
                     }

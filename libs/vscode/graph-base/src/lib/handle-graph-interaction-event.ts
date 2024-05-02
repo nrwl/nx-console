@@ -9,7 +9,7 @@ import { getTelemetry } from '@nx-console/vscode/utils';
 import { join } from 'path';
 import { Uri, commands } from 'vscode';
 
-export async function handleGraphInteractionEvent(event: {
+export async function handleGraphInteractionEventBase(event: {
   type: string;
   payload: any;
 }): Promise<boolean> {

@@ -23,7 +23,7 @@ import {
   NxProjectFolderTreeRequest,
   NxProjectGraphOutputRequest,
   NxProjectsByPathsRequest,
-  NxResetRequest,
+  NxStopDaemonRequest,
   NxSourceMapFilesToProjectMapRequest,
   NxStartupMessageRequest,
   NxTargetsForConfigFileRequest,
@@ -38,7 +38,7 @@ import {
   getLanguageModelCache,
   lspLogger,
   mergeArrays,
-  nxReset,
+  nxStopDaemon,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import {
@@ -362,12 +362,12 @@ connection.onExit(() => {
   treeKill(process.pid, 'SIGTERM');
 });
 
-connection.onRequest(NxResetRequest, async () => {
+connection.onRequest(NxStopDaemonRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
 
-  return await nxReset(WORKING_PATH, lspLogger);
+  return await nxStopDaemon(WORKING_PATH, lspLogger);
 });
 
 connection.onRequest(NxWorkspaceRequest, async ({ reset }) => {
@@ -485,7 +485,9 @@ connection.onRequest(NxVersionRequest, async () => {
   if (!WORKING_PATH) {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
-  return getNxVersion(WORKING_PATH);
+  const nxVersion = await getNxVersion(WORKING_PATH);
+  lspLogger.log(`got nxVersion ${JSON.stringify(nxVersion)}`);
+  return nxVersion;
 });
 
 connection.onRequest(NxProjectGraphOutputRequest, async () => {
@@ -624,7 +626,12 @@ async function reconfigureAndSendNotificationWithBackoff(workingPath: string) {
   const workspace = await reconfigure(workingPath);
   await connection.sendNotification(NxWorkspaceRefreshNotification.method);
 
-  if (!workspace?.error) {
+  if (
+    !workspace?.errors ||
+    (workspace.errors &&
+      workspace.isPartial &&
+      Object.keys(workspace.workspace.projects ?? {}).length > 0)
+  ) {
     reconfigureAttempts = 0;
     return;
   }

@@ -45,6 +45,7 @@ export class NxGraphServer implements Disposable {
         type: string;
         id: string;
         payload: string;
+        error?: string;
       }
     | undefined
   > {
@@ -89,7 +90,10 @@ export class NxGraphServer implements Disposable {
       };
     } catch (error) {
       console.log('error while handling webview request', error);
-      return;
+      return {
+        ...request,
+        error: `${error}`,
+      };
     }
   }
 

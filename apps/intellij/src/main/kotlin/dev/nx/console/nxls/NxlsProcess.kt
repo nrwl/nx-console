@@ -9,7 +9,6 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.util.application
 import dev.nx.console.NxConsoleBundle
-import dev.nx.console.utils.Notifier
 import dev.nx.console.utils.nodeInterpreter
 import dev.nx.console.utils.nxBasePath
 import java.io.File
@@ -57,8 +56,6 @@ class NxlsProcess(private val project: Project, private val cs: CoroutineScope) 
                             }
 
                             logger.trace("Nxls early exit: $this")
-
-                            Notifier.notifyNxlsError(project)
                             onExit?.invoke()
                         }
                     }

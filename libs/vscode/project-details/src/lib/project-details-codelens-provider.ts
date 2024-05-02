@@ -69,8 +69,12 @@ export class ProjectDetailsCodelensProvider implements NxCodeLensProvider {
   ): Promise<ProjectDetailsCodeLens | undefined> {
     const project = await getProjectByPath(codeLens.filePath);
     if (!project) {
-      const error = (await getNxWorkspace())?.error;
-      if (error) {
+      const nxWorkspace = await getNxWorkspace();
+      const errors = nxWorkspace?.errors;
+      const isPartial = nxWorkspace?.isPartial;
+      const hasProjects =
+        Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
+      if (errors && errors.length > 0 && (!isPartial || !hasProjects)) {
         return {
           ...codeLens,
           command: {

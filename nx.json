@@ -85,7 +85,8 @@
       "{projectRoot}/**/*.kt",
       "{workspaceRoot}/**/gradle.properties",
       "{workspaceRoot}/settings.gradle.kts",
-      "{workspaceRoot}/build.gradle.kts"
+      "{workspaceRoot}/build.gradle.kts",
+      "{projectRoot}/run-gradle.js"
     ],
     "production": [
       "default",

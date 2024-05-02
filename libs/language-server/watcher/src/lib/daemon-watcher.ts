@@ -1,7 +1,8 @@
 import { getNxDaemonClient } from '@nx-console/language-server/workspace';
-import { lspLogger } from '@nx-console/language-server/utils';
+import { canReadNxJson, lspLogger } from '@nx-console/language-server/utils';
 import { NativeWatcher } from './native-watcher';
 import { normalize } from 'path';
+import type { ProjectGraphError } from 'nx/src/project-graph/error-types';
 
 export class DaemonWatcher {
   private stopped = false;
@@ -24,6 +25,12 @@ export class DaemonWatcher {
     this.disposeEverything();
     if (this.stopped) return;
 
+    if (!canReadNxJson(this.workspacePath)) {
+      lspLogger.log('Unable to read nx.json, using native watcher');
+      this.useNativeWatcher();
+      return;
+    }
+
     try {
       const daemonClientModule = await getNxDaemonClient(
         this.workspacePath,
@@ -40,7 +47,10 @@ export class DaemonWatcher {
       try {
         await daemonClientModule?.daemonClient.getProjectGraphAndSourceMaps();
       } catch (e) {
-        projectGraphErrors = true;
+        lspLogger.log(`caught error, ${JSON.stringify(e)}`);
+        if (!isProjectGraphError(e)) {
+          projectGraphErrors = true;
+        }
       }
 
       if (!daemonClientModule || projectGraphErrors) {
@@ -58,6 +68,11 @@ export class DaemonWatcher {
             watchProjects: 'all',
             includeGlobalWorkspaceFiles: true,
             includeDependentProjects: true,
+            allowPartialGraph: true,
+          } as {
+            watchProjects: string[] | 'all';
+            includeGlobalWorkspaceFiles?: boolean;
+            includeDependentProjects?: boolean;
           },
           async (error, data) => {
             if (error === 'closed') {
@@ -77,9 +92,13 @@ export class DaemonWatcher {
               }
               this.retryCount = 0;
               const filteredChangedFiles =
-                data?.changedFiles?.filter(
-                  (f) => !normalize(f.path).startsWith(normalize('.yarn/cache'))
-                ) ?? [];
+                data?.changedFiles?.filter((f) => {
+                  const normalized = normalize(f.path);
+                  return !(
+                    normalized.startsWith(normalize('.yarn/cache')) ||
+                    normalized.startsWith(normalize('.nx/cache'))
+                  );
+                }) ?? [];
               if (filteredChangedFiles.length === 0) {
                 lspLogger.log(`filtered out files: ${data?.changedFiles}`);
                 return;
@@ -91,12 +110,6 @@ export class DaemonWatcher {
                       .map((f) => `${f.path} (${f.type})`)
                       .join(', ')
                 );
-              }
-              if (data?.changedProjects?.length) {
-                lspLogger.log(
-                  'Project configuration changed: ' +
-                    data.changedProjects.join(', ')
-                );
                 this.callback();
               }
             }
@@ -107,7 +120,9 @@ export class DaemonWatcher {
 
       this.disposables.add(unregister);
     } catch (e) {
-      lspLogger.log('Error initializing daemon watcher, check daemon logs.');
+      lspLogger.log(
+        `Error initializing daemon watcher, check daemon logs. ${e}`
+      );
       this.tryRestartWatcher();
     }
   }
@@ -145,4 +160,8 @@ export class DaemonWatcher {
     }
     this.disposables.clear();
   }
+}
+
+function isProjectGraphError(e: any): e is ProjectGraphError {
+  return e.name === 'ProjectGraphError';
 }

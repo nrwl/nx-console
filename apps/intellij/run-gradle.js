@@ -10,8 +10,10 @@ const gradleProcess = spawn(gradleCommand, [arg], { shell: true, stdio: 'inherit
 
 gradleProcess.on('error', (err) => {
   console.error(`Failed to start subprocess: ${err}`);
+  process.exit(1);
 });
 
 gradleProcess.on('close', (code) => {
   console.log(`Gradle process exited with code ${code}`);
+  process.exit(code);
 });

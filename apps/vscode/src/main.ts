@@ -4,7 +4,6 @@ import {
   ExtensionContext,
   ExtensionMode,
   FileSystemWatcher,
-  ProgressLocation,
   RelativePattern,
   TreeItem,
   TreeView,
@@ -62,11 +61,6 @@ import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
-import {
-  NxResetRequest,
-  NxWorkspaceRefreshNotification,
-} from '@nx-console/language-server/types';
-import { getNxGraphServer } from '@nx-console/vscode/graph-base';
 import { registerRefreshWorkspace } from './refresh-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;

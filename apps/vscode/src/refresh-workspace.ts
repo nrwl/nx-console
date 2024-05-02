@@ -1,5 +1,5 @@
 import {
-  NxResetRequest,
+  NxStopDaemonRequest,
   NxWorkspaceRefreshNotification,
 } from '@nx-console/language-server/types';
 import { getNxGraphServer } from '@nx-console/vscode/graph-base';
@@ -29,9 +29,8 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
         async (progress) => {
           try {
             const nxlsClient = getNxlsClient();
-            progress.report({ message: 'Running nx reset', increment: 10 });
-            // this calls 'nx reset' to clear all caches
-            await nxlsClient?.sendRequest(NxResetRequest, undefined);
+            progress.report({ message: 'Stopping nx daemon', increment: 10 });
+            await nxlsClient?.sendRequest(NxStopDaemonRequest, undefined);
             progress.report({ increment: 30 });
 
             progress.report({ message: 'Restarting language server' });
