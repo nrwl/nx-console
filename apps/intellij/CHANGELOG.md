@@ -1,3 +1,9 @@
+## 1.23.0 (2024-05-02)
+
+### Features
+
+* enable partial graphs in nx console & fix bugs ([#2115](https://github.com/nrwl/nx-console/issues/2115)) ([72a544e](https://github.com/nrwl/nx-console/commit/72a544ed8fd900243b2b20448415fef357241b1e))
+
 ## 1.22.0 (2024-04-24)
 
 ### Bug Fixes
