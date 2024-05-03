@@ -226,6 +226,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 )
             )
 
+        setColors()
         return htmlText
     }
 
@@ -361,7 +362,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         executeWhenLoaded {
             if (browser.isDisposed) return@executeWhenLoaded
             browser.setPageBackgroundColor(backgroundColor)
-            browser.executeJavaScript(
+            browser.executeJavascriptWithCatch(
                 """
                 const isDark = ${!JBColor.isBright()};
               const body = document.body;
