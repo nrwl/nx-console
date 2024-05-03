@@ -12,4 +12,5 @@ export * from './lib/get-project-folder-tree';
 export * from './lib/nx-console-plugins';
 export * from './lib/has-affected-projects';
 export * from './lib/get-source-map';
+export * from './lib/nx-stop-daemon';
 export { getNxDaemonClient } from './lib/get-nx-workspace-package';

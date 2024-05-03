@@ -8,5 +8,4 @@ export * from './lib/lsp-log';
 export * from './lib/json-language-service';
 export * from './lib/find-property';
 export * from './lib/executor';
-export * from './lib/nx-stop-daemon';
 export * from './lib/can-read-nx-json';

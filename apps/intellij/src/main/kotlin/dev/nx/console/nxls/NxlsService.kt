@@ -57,8 +57,12 @@ class NxlsService(val project: Project, private val cs: CoroutineScope) {
     }
 
     suspend fun restart() {
-        server()?.getNxService()?.stopDaemon()?.await()
-        thisLogger().info("reset done")
+        try {
+            server()?.getNxService()?.stopDaemon()?.await()
+        } catch (e: Throwable) {
+            // it's not critical if the daemon can't be stopped
+            thisLogger().debug("Failed to stop daemon during restart", e)
+        }
         wrapper.stop()
         start()
         awaitStarted()

@@ -9,7 +9,6 @@ let loadedNxPackage = false;
 const defaultSemver = new SemVer('0.0.0');
 
 export async function getNxVersion(workspacePath: string): Promise<NxVersion> {
-  lspLogger.log('Getting Nx version');
   if (!loadedNxPackage) {
     const packagePath = await findNxPackagePath(workspacePath, 'package.json');
 

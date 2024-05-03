@@ -39,8 +39,8 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected val browser: JBCefBrowser = JBCefBrowser()
 
     private val graphServer: NxGraphServer = StandardNxGraphServer.getInstance(project)
-    private var queryMessenger = JBCefJSQuery.create(browser as JBCefBrowserBase)
-    private var resetQuery: JBCefJSQuery? = null
+    private val queryMessenger = createGraphRequestMessenger()
+    private val resetQuery: JBCefJSQuery = createResetQuery()
 
     protected val coroutineScope =
         NxGraphBrowserBaseCoroutineHolder.getInstance(project).coroutineScope
@@ -63,8 +63,6 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         )
         browser.setOpenLinksInExternalBrowser(true)
 
-        queryMessenger = createGraphRequestMessenger()
-
         registerThemeListener()
     }
 
@@ -73,10 +71,9 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
     protected fun wrappedBrowserLoadHtml(html: String, url: String? = null): Unit {
         browserLoadedState.value = false
         executeWhenLoadedJobs.forEach { it.cancel("Loading browser html, cancelling old jobs.") }
+
         executeWhenLoadedJobs.clear()
         if (browser.isDisposed) return
-        val oldQueryMessenger = queryMessenger
-        queryMessenger = createGraphRequestMessenger()
 
         var modifiedHtml = html
         val injectedScript =
@@ -104,7 +101,6 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         } else {
             browser.loadHTML(modifiedHtml)
         }
-        Disposer.dispose(oldQueryMessenger)
 
         setColors()
     }
@@ -230,7 +226,6 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 )
             )
 
-        setColors()
         return htmlText
     }
 
@@ -315,7 +310,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 
               }
               pre {
-                white-space: pre-wrap;
+                overflow-x: auto;
                 border-radius: 5px;
                 border: 2px solid ${getHexColor(UIUtil.getLabelForeground())};
                 padding: 20px;
@@ -333,28 +328,25 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
             .trimIndent()
     }
 
+    private fun createResetQuery(): JBCefJSQuery {
+        val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+        query.addHandler {
+            NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
+            null
+        }
+        return query
+    }
+
     protected fun registerResetHandler() {
         executeWhenLoaded {
             if (browser.isDisposed) return@executeWhenLoaded
-            resetQuery?.dispose()
-            resetQuery = JBCefJSQuery.create(browser as JBCefBrowserBase)
-            resetQuery?.also { query ->
-                if (query.isDisposed) return@executeWhenLoaded
-                query.addHandler {
-                    NxRefreshWorkspaceService.getInstance(project).refreshWorkspace()
-                    null
-                }
-
-                val js =
-                    """
+            val js =
+                """
                 window.reset = () => {
-                    ${query.inject("reset")}
+                    ${resetQuery.inject("reset")}
                 }
                 """
-                coroutineScope.launch {
-                    withContext(Dispatchers.EDT) { browser.executeJavascriptWithCatch(js) }
-                }
-            }
+            withContext(Dispatchers.EDT) { browser.executeJavascriptWithCatch(js) }
         }
     }
 
@@ -366,13 +358,14 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
 
     private fun setColors() {
         backgroundColor = getHexColor(UIUtil.getPanelBackground())
-        browser.setPageBackgroundColor(backgroundColor)
         executeWhenLoaded {
             if (browser.isDisposed) return@executeWhenLoaded
+            browser.setPageBackgroundColor(backgroundColor)
             browser.executeJavaScript(
                 """
                 const isDark = ${!JBColor.isBright()};
               const body = document.body;
+              if(!body) return;
 
               const darkClass = 'vscode-dark';
               const lightClass = 'vscode-light';
@@ -397,7 +390,7 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
         queryMessenger.addHandler { msg ->
             when (msg) {
                 "ready" -> {
-                    thisLogger().trace("Browser received ready message")
+                    logger<NxGraphBrowserBase>().trace("Browser received ready message")
                     browserLoadedState.value = true
                 }
                 else -> {
@@ -417,9 +410,14 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                                 )
                                 return@launch
                             }
-                            browser.executeJavaScript(
-                                "window.intellij.handleResponse(${Json.encodeToString(response)})"
-                            )
+                            try {
+                                browser.executeJavaScript(
+                                    "window.intellij.handleResponse(${Json.encodeToString(response)})"
+                                )
+                            } catch (e: JBCefBrowserJsCallError) {
+                                logger<NxGraphBrowserBase>()
+                                    .warn("Error executing JS: ${e.message}")
+                            }
                         }
                     } catch (e: SerializationException) {
                         logger<NxGraphBrowser>().debug("Error parsing graph request: ${e.message}")
