@@ -41,9 +41,10 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
     private var nxProjectName: String? = null
 
     private var currentLoadHtmlJob: Job? = null
-    private var interactionEventQuery: JBCefJSQuery? = null
+    private val interactionEventQuery: JBCefJSQuery = createInteractionEventQuery()
 
     private val messageBusConnection = project.messageBus.connect(this)
+    private val nxlsService = NxlsService.getInstance(project)
 
     init {
         try {
@@ -58,7 +59,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                 NxWorkspaceRefreshListener {
                     coroutineScope.launch {
                         try {
-                            val errors = NxlsService.getInstance(project).workspace()?.errors
+                            val errors = nxlsService.workspace()?.errors
                             setErrorsAndRefresh(errors)
                         } catch (e: Throwable) {
                             logger<ProjectDetailsBrowser>().debug(e.message)
@@ -73,35 +74,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         thisLogger().trace("refreshing PDV ${file.path}")
         if (project.isDisposed) return
         loadHtml()
-
-        //        coroutineScope.launch {
-        //            if (errors != null) {
-        //                loadHtml()
-        //                return@launch
-        //            }
-        //            try {
-        //                val isShowingPDV =
-        //                    try {
-        //                        withContext(Dispatchers.EDT) {
-        //                            return@withContext browser.executeJavaScript(
-        //                                "return !!window.waitForRouter && !!window.intellij &&
-        // !!window.externalApi && document.getElementById('app').hasChildNodes()"
-        //                            ) == "true"
-        //                        }
-        //                    } catch (e: Throwable) {
-        //                        false
-        //                    }
-        //
-        //                val nxProjectName = this@ProjectDetailsBrowser.nxProjectName
-        //                if (isShowingPDV && nxProjectName != null) {
-        //                    loadProjectDetails(nxProjectName)
-        //                } else {
-        //                    loadHtml()
-        //                }
-        //            } catch (e: Throwable) {
-        //                thisLogger().trace("Error while refreshing PDV ${file.path} \n $e ")
-        //            }
-        //        }
     }
 
     private fun loadProjectDetails(nxProjectName: String) {
@@ -115,75 +87,75 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         }
     }
 
-    private fun registerInteractionEventHandler(browser: JBCefBrowser) {
-        executeWhenLoaded {
-            if (browser.isDisposed) return@executeWhenLoaded
-            interactionEventQuery?.dispose()
-            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+    private fun createInteractionEventQuery(): JBCefJSQuery {
+        val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
 
-            query.addHandler { msg ->
-                try {
-                    val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
-                    val handled = handleGraphInteractionEventBase(messageParsed)
-                    if (handled) return@addHandler null
-                    when (messageParsed.type) {
-                        "open-project-graph" -> {
-                            messageParsed.payload.projectName?.also {
+        query.addHandler { msg ->
+            try {
+                val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+                val handled = handleGraphInteractionEventBase(messageParsed)
+                if (handled) return@addHandler null
+                when (messageParsed.type) {
+                    "open-project-graph" -> {
+                        messageParsed.payload.projectName?.also {
+                            coroutineScope.launch {
+                                val nxGraphService = getNxGraphService(project) ?: return@launch
+                                withContext(Dispatchers.EDT) { nxGraphService.focusProject(it) }
+                            }
+                        }
+                    }
+                    "open-task-graph" -> {
+                        messageParsed.payload.projectName?.also { projectName ->
+                            messageParsed.payload.targetName?.also { targetName ->
                                 coroutineScope.launch {
                                     val nxGraphService = getNxGraphService(project) ?: return@launch
                                     ApplicationManager.getApplication().invokeLater {
-                                        nxGraphService.focusProject(it)
+                                        nxGraphService.focusTask(projectName, targetName)
                                     }
                                 }
                             }
-                        }
-                        "open-task-graph" -> {
-                            messageParsed.payload.projectName?.also { projectName ->
-                                messageParsed.payload.targetName?.also { targetName ->
-                                    coroutineScope.launch {
-                                        val nxGraphService =
-                                            getNxGraphService(project) ?: return@launch
-                                        ApplicationManager.getApplication().invokeLater {
-                                            nxGraphService.focusTask(projectName, targetName)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        "override-target" -> {
-                            messageParsed.payload.projectName?.also { projectName ->
-                                messageParsed.payload.targetName?.also { targetName ->
-                                    messageParsed.payload.targetConfigString?.also {
-                                        targetConfigString ->
-                                        addTargetToProjectConfig(
-                                            projectName,
-                                            targetName,
-                                            targetConfigString
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        else -> {
-                            logger<ProjectDetailsBrowser>()
-                                .error("Unhandled graph interaction event: $messageParsed")
                         }
                     }
-                } catch (e: SerializationException) {
-                    logger<ProjectDetailsBrowser>()
-                        .error("Error parsing graph interaction event: ${e.message}")
+                    "override-target" -> {
+                        messageParsed.payload.projectName?.also { projectName ->
+                            messageParsed.payload.targetName?.also { targetName ->
+                                messageParsed.payload.targetConfigString?.also { targetConfigString
+                                    ->
+                                    addTargetToProjectConfig(
+                                        projectName,
+                                        targetName,
+                                        targetConfigString
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    else -> {
+                        logger<ProjectDetailsBrowser>()
+                            .error("Unhandled graph interaction event: $messageParsed")
+                    }
                 }
-                null
+            } catch (e: SerializationException) {
+                logger<ProjectDetailsBrowser>()
+                    .error("Error parsing graph interaction event: ${e.message}")
             }
+            null
+        }
+
+        return query
+    }
+
+    private fun registerInteractionEventHandler() {
+        executeWhenLoaded {
+            if (browser.isDisposed) return@executeWhenLoaded
+
             val js =
                 """
                 window.externalApi.graphInteractionEventListener = (message) => {
-                    ${query.inject("JSON.stringify(message)")}
+                    ${interactionEventQuery.inject("JSON.stringify(message)")}
                 }
                 """
             withContext(Dispatchers.EDT) { browser.executeJavascriptWithCatch(js) }
-
-            interactionEventQuery = query
         }
     }
 
@@ -195,7 +167,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
             coroutineScope.launch {
                 thisLogger().trace("loading PDV view ${file.path}")
                 try {
-                    val nxlsService = NxlsService.getInstance(project)
                     nxlsService.awaitStarted()
 
                     val version = nxlsService.nxVersion()
@@ -212,7 +183,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                     }
 
                     val nxWorkspace = nxlsService.workspace()
-                    val hasProjects = nxWorkspace?.workspace?.projects?.isNotEmpty() == true
                     var errors = this@ProjectDetailsBrowser.errors ?: nxWorkspace?.errors
                     val nxProjectName = nxlsService.projectByPath(file.path)?.name
                     this@ProjectDetailsBrowser.nxProjectName = nxProjectName
@@ -227,6 +197,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                                 )
                             )
                     }
+                    val hasProjects = nxWorkspace?.workspace?.projects?.isNotEmpty() == true
                     val hasProject =
                         nxProjectName != null &&
                             nxWorkspace?.workspace?.projects?.get(nxProjectName) != null
@@ -266,7 +237,7 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
                         thisLogger().trace("Loading actual PDV html ${file.path}")
 
                         wrappedBrowserLoadHtml(htmlText)
-                        registerInteractionEventHandler(browser)
+                        registerInteractionEventHandler()
 
                         nxProjectName?.also { loadProjectDetails(it) }
                     }
@@ -344,6 +315,6 @@ class ProjectDetailsBrowser(project: Project, private val file: VirtualFile) :
         super.dispose()
         messageBusConnection.dispose()
         currentLoadHtmlJob?.cancel()
-        interactionEventQuery?.dispose()
+        interactionEventQuery.dispose()
     }
 }

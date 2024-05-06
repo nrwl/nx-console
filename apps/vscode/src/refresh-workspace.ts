@@ -30,7 +30,11 @@ export function registerRefreshWorkspace(context: ExtensionContext) {
           try {
             const nxlsClient = getNxlsClient();
             progress.report({ message: 'Stopping nx daemon', increment: 10 });
-            await nxlsClient?.sendRequest(NxStopDaemonRequest, undefined);
+            try {
+              await nxlsClient?.sendRequest(NxStopDaemonRequest, undefined);
+            } catch (e) {
+              // errors while stopping the daemon aren't critical
+            }
             progress.report({ increment: 30 });
 
             progress.report({ message: 'Restarting language server' });

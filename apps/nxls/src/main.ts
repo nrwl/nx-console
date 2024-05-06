@@ -38,7 +38,6 @@ import {
   getLanguageModelCache,
   lspLogger,
   mergeArrays,
-  nxStopDaemon,
   setLspLogger,
 } from '@nx-console/language-server/utils';
 import {
@@ -63,6 +62,7 @@ import {
   getTargetsForConfigFile,
   getTransformedGeneratorSchema,
   hasAffectedProjects,
+  nxStopDaemon,
   nxWorkspace,
   resetNxVersionCache,
   resetProjectPathCache,
@@ -486,7 +486,6 @@ connection.onRequest(NxVersionRequest, async () => {
     return new ResponseError(1000, 'Unable to get Nx info: no workspace path');
   }
   const nxVersion = await getNxVersion(WORKING_PATH);
-  lspLogger.log(`got nxVersion ${JSON.stringify(nxVersion)}`);
   return nxVersion;
 });
 
