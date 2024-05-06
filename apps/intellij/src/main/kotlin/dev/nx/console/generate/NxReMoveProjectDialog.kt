@@ -83,6 +83,7 @@ class NxReMoveProjectDialog(
                                                 model::project.toMutableProperty()
                                             )
                                             .comment(getShortcutHint())
+                                            .align(AlignX.FILL)
 
                                         addDocumentListener(
                                             object : BulkAwareDocumentListener.Simple {
@@ -146,6 +147,7 @@ class NxReMoveProjectDialog(
             callback()
         }
     }
+
     private fun getShortcutHint(): String {
         return "Use ${
           KeymapUtil.getFirstKeyboardShortcutText(

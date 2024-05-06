@@ -6,9 +6,11 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.jcef.*
+import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxWorkspaceRefreshListener
 import dev.nx.console.nxls.NxlsService
 import dev.nx.console.project_details.ProjectDetailsBrowser
+import dev.nx.console.utils.executeJavascriptWithCatch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -19,10 +21,10 @@ import kotlinx.serialization.json.Json
 class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
 
     private var currentLoadHtmlJob: Job? = null
-    private var currentInteractionEventHandler: JBCefJSQuery? = null
+    private var interactionEventHandler: JBCefJSQuery = createInteractionEventHandler()
 
     private var lastGraphCommand: GraphCommand? = null
-    private var messageBusConnection = project.messageBus.connect()
+    private var messageBusConnection = project.messageBus.connect(this)
 
     init {
         try {
@@ -37,8 +39,7 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
                 NxWorkspaceRefreshListener {
                     coroutineScope.launch {
                         try {
-                            val errors = NxlsService.getInstance(project).workspace()?.errors
-                            setErrorsAndRefresh(errors)
+                            refresh()
                         } catch (e: Throwable) {
                             logger<ProjectDetailsBrowser>().debug(e.message)
                         }
@@ -58,22 +59,41 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
         }
         currentLoadHtmlJob =
             coroutineScope.launch {
-                errors =
-                    this@NxGraphBrowser.errors
-                        ?: NxlsService.getInstance(project).workspace()?.errors
-                errors.also {
-                    if (it != null) {
-                        withContext(Dispatchers.EDT) {
-                            wrappedBrowserLoadHtml(getErrorHtml(it))
-                            registerResetHandler()
-                        }
-                        return@launch
+                logger<NxGraphBrowser>().debug("Loading graph html")
+                val nxWorkspace = NxlsService.getInstance(project).workspace()
+
+                val errorsToShow = this@NxGraphBrowser.errors ?: nxWorkspace?.errors
+
+                val hasProjects = nxWorkspace?.workspace?.projects?.isNotEmpty() == true
+                val needsNonExistentProject =
+                    lastGraphCommand?.let {
+                        val projectName =
+                            when (it) {
+                                is GraphCommand.FocusProject -> it.projectName
+                                is GraphCommand.FocusTarget -> it.projectName
+                                else -> null
+                            }
+
+                        projectName != null &&
+                            nxWorkspace?.workspace?.projects?.contains(projectName) != true
                     }
-                    withContext(Dispatchers.EDT) {
+                        ?: false
+
+                withContext(Dispatchers.EDT) {
+                    if (
+                        !errorsToShow.isNullOrEmpty() &&
+                            (nxWorkspace?.isPartial != true ||
+                                !hasProjects ||
+                                nxWorkspace.nxVersion.major < 19 ||
+                                needsNonExistentProject)
+                    ) {
+                        wrappedBrowserLoadHtml(getErrorHtml(errorsToShow))
+                        registerResetHandler()
+                    } else {
                         wrappedBrowserLoadHtml(
                             loadGraphHtmlBase(),
                         )
-                        registerInteractionEventHandler(browser)
+                        registerInteractionEventHandler()
                         if (lastGraphCommand != null) {
                             replayLastCommand()
                         }
@@ -85,12 +105,11 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun selectAllProjects() {
         lastGraphCommand = GraphCommand.SelectAllProjects()
         executeWhenLoaded {
-            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) {
                 thisLogger().warn("Can't select all projects because browser has been disposed.")
                 return@executeWhenLoaded
             }
-            browser.executeJavaScript(
+            browser.executeJavascriptWithCatch(
                 "window.waitForRouter?.().then(() => {console.log('navigating to all'); window.externalApi.selectAllProjects();})"
             )
         }
@@ -99,9 +118,14 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun focusProject(projectName: String) {
         lastGraphCommand = GraphCommand.FocusProject(projectName)
         executeWhenLoaded {
-            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) return@executeWhenLoaded
-            browser.executeJavaScript(
+            val nxWorkspace = NxlsService.getInstance(project).workspace()
+            if (nxWorkspace?.workspace?.projects?.contains(projectName) != true) {
+                logger<NxGraphBrowser>().warn("Project $projectName not found in workspace")
+                setErrorsAndRefresh(arrayOf(NxError("Project $projectName not found in workspace")))
+                return@executeWhenLoaded
+            }
+            browser.executeJavascriptWithCatch(
                 "window.waitForRouter?.().then(() => {console.log('navigating to $projectName'); window.externalApi.focusProject('$projectName')})"
             )
         }
@@ -110,9 +134,8 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun focusTargetGroup(targetGroup: String) {
         lastGraphCommand = GraphCommand.FocusTargetGroup(targetGroup)
         executeWhenLoaded {
-            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) return@executeWhenLoaded
-            browser.executeJavaScript(
+            browser.executeJavascriptWithCatch(
                 "window.waitForRouter?.().then(() => {console.log('navigating to group $targetGroup'); window.externalApi.selectAllTargetsByName('$targetGroup')})"
             )
         }
@@ -121,55 +144,66 @@ class NxGraphBrowser(project: Project) : NxGraphBrowserBase(project) {
     fun focusTarget(projectName: String, targetName: String) {
         lastGraphCommand = GraphCommand.FocusTarget(projectName, targetName)
         executeWhenLoaded {
-            if (errors != null) return@executeWhenLoaded
             if (browser.isDisposed) return@executeWhenLoaded
-            browser.executeJavaScript(
+            val nxWorkspace = NxlsService.getInstance(project).workspace()
+            if (nxWorkspace?.workspace?.projects?.contains(projectName) != true) {
+                logger<NxGraphBrowser>().warn("Project $projectName not found in workspace")
+                setErrorsAndRefresh(arrayOf(NxError("Project $projectName not found in workspace")))
+                return@executeWhenLoaded
+            }
+            browser.executeJavascriptWithCatch(
                 "window.waitForRouter?.().then(() => {console.log('navigating to target $projectName:$targetName'); window.externalApi.focusTarget('$projectName','$targetName')})"
             )
         }
     }
 
     private fun replayLastCommand() {
-        when (lastGraphCommand) {
-            is GraphCommand.SelectAllProjects -> selectAllProjects()
-            is GraphCommand.FocusProject ->
-                focusProject((lastGraphCommand as GraphCommand.FocusProject).projectName)
-            is GraphCommand.FocusTargetGroup ->
-                focusTargetGroup((lastGraphCommand as GraphCommand.FocusTargetGroup).targetGroup)
-            is GraphCommand.FocusTarget -> {
-                val command = lastGraphCommand as GraphCommand.FocusTarget
-                focusTarget(command.projectName, command.targetName)
+        executeWhenLoaded {
+            when (lastGraphCommand) {
+                is GraphCommand.SelectAllProjects -> selectAllProjects()
+                is GraphCommand.FocusProject ->
+                    focusProject((lastGraphCommand as GraphCommand.FocusProject).projectName)
+                is GraphCommand.FocusTargetGroup ->
+                    focusTargetGroup(
+                        (lastGraphCommand as GraphCommand.FocusTargetGroup).targetGroup
+                    )
+                is GraphCommand.FocusTarget -> {
+                    val command = lastGraphCommand as GraphCommand.FocusTarget
+                    focusTarget(command.projectName, command.targetName)
+                }
             }
         }
     }
 
-    private fun registerInteractionEventHandler(browser: JBCefBrowser) {
+    private fun createInteractionEventHandler(): JBCefJSQuery {
+        val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
+        query.addHandler { msg ->
+            try {
+                val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
+                val handled = handleGraphInteractionEventBase(messageParsed)
+                if (!handled) {
+                    logger<NxGraphBrowser>()
+                        .error("Unhandled graph interaction event: $messageParsed")
+                }
+            } catch (e: SerializationException) {
+                logger<NxGraphBrowser>()
+                    .error("Error parsing graph interaction event: ${e.message}")
+            }
+            null
+        }
+        return query
+    }
+
+    private fun registerInteractionEventHandler() {
         executeWhenLoaded {
             if (browser.isDisposed) return@executeWhenLoaded
-            currentInteractionEventHandler?.also { Disposer.dispose(it) }
-            val query = JBCefJSQuery.create(browser as JBCefBrowserBase)
-            query.addHandler { msg ->
-                try {
-                    val messageParsed = Json.decodeFromString<NxGraphInteractionEvent>(msg)
-                    val handled = handleGraphInteractionEventBase(messageParsed)
-                    if (!handled) {
-                        logger<NxGraphBrowser>()
-                            .error("Unhandled graph interaction event: $messageParsed")
-                    }
-                } catch (e: SerializationException) {
-                    logger<NxGraphBrowser>()
-                        .error("Error parsing graph interaction event: ${e.message}")
-                }
-                null
-            }
             val js =
                 """
                 window.externalApi.graphInteractionEventListener = (message) => {
-                    ${query.inject("JSON.stringify(message)")}
+                    ${interactionEventHandler.inject("JSON.stringify(message)")}
                 }
                 """
             browser.executeJavaScript(js)
-            currentInteractionEventHandler = query
         }
     }
 

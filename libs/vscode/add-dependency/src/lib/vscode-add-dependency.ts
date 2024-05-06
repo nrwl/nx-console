@@ -246,7 +246,7 @@ async function getDependencySuggestions(): Promise<
             pkg.name !== 'tao'
         )
         .map((pkg) => ({
-          name: `@${version?.major ?? 16 <= 15 ? 'nrwl' : 'nx'}/${pkg.name}`,
+          name: `@${(version?.major ?? 16) <= 15 ? 'nrwl' : 'nx'}/${pkg.name}`,
           description: pkg.description,
         }));
     }),
