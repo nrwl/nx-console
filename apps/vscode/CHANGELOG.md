@@ -1,3 +1,12 @@
+## [18.21.1](https://github.com/nrwl/nx-console/compare/vscode-v18.21.0...vscode-v18.21.1) (2024-05-06)
+
+
+### Bug Fixes
+
+* **nxls:** catch error while resetting daemon ([#2120](https://github.com/nrwl/nx-console/issues/2120)) ([8a179d7](https://github.com/nrwl/nx-console/commit/8a179d7a5b46d48e1c04a6ac1dfcd1d05a30d257))
+* refactor graph integration to use partial graphs & handle errors ([#2117](https://github.com/nrwl/nx-console/issues/2117)) ([b2e4d6d](https://github.com/nrwl/nx-console/commit/b2e4d6de596d34215335a8aacaa4523e088ad39d))
+* **vscode:** fix add dependency to show nx packages ([#2119](https://github.com/nrwl/nx-console/issues/2119)) ([d535923](https://github.com/nrwl/nx-console/commit/d5359231d6afcd25aad6f2ba158e71a78db56025))
+
 # [18.21.0](https://github.com/nrwl/nx-console/compare/vscode-v18.20.0...vscode-v18.21.0) (2024-05-02)
 
 
