@@ -1,3 +1,11 @@
+## <small>1.23.1 (2024-05-06)</small>
+
+### Bug Fixes
+
+* **intellij:** set re/move dialog input field width to fill ([#2121](https://github.com/nrwl/nx-console/issues/2121)) ([40bc6b5](https://github.com/nrwl/nx-console/commit/40bc6b504954af6dc4d88102f4f3ab3dc5671f23))
+* **nxls:** catch error while resetting daemon ([#2120](https://github.com/nrwl/nx-console/issues/2120)) ([8a179d7](https://github.com/nrwl/nx-console/commit/8a179d7a5b46d48e1c04a6ac1dfcd1d05a30d257))
+* refactor graph integration to use partial graphs & handle errors ([#2117](https://github.com/nrwl/nx-console/issues/2117)) ([b2e4d6d](https://github.com/nrwl/nx-console/commit/b2e4d6de596d34215335a8aacaa4523e088ad39d))
+
 ## 1.23.0 (2024-05-02)
 
 ### Features
