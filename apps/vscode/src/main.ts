@@ -62,6 +62,7 @@ import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { registerRefreshWorkspace } from './refresh-workspace';
+import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -241,6 +242,7 @@ async function setWorkspace(workspacePath: string) {
     initNvmTip(context);
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);
+    initErrorDiagnostics(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

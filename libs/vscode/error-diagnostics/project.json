@@ -1,0 +1,11 @@
+{
+  "name": "vscode-error-diagnostics",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/vscode/error-diagnostics/src",
+  "projectType": "library",
+  "tags": [
+    "type:vscode"
+  ],
+  "// targets": "to see all targets run: nx show project error-diagnostics --web",
+  "targets": {}
+}

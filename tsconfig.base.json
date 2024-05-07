@@ -116,6 +116,7 @@
       "@nx-console/vscode/utils": ["libs/vscode/utils/src/index.ts"],
       "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
       "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"],
+      "@nx-console/vscode/error-diagnostics": ["libs/vscode/error-diagnostics/src/index.ts"],
       "nxls-e2e": ["apps/nxls-e2e/src/index.ts"],
       "shared/nx-console-plugins": [
         "libs/shared/nx-console-plugins/src/index.ts"
