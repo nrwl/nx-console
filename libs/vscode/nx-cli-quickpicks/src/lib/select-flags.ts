@@ -1,7 +1,7 @@
 import { Option } from '@nx-console/shared/schema';
 import { QuickPickItem, window } from 'vscode';
 
-export class CliTaskFlagQuickPickItem implements QuickPickItem {
+class CliTaskFlagQuickPickItem implements QuickPickItem {
   constructor(
     readonly flagName: string,
     readonly detail = '',
@@ -9,6 +9,21 @@ export class CliTaskFlagQuickPickItem implements QuickPickItem {
     readonly label: string,
     readonly description?: string
   ) {}
+}
+
+class ExecuteCommandQuickPickItem implements QuickPickItem {
+  type = 'execute';
+  picked = true;
+  alwaysShow = true;
+
+  constructor(readonly label: string, readonly description?: string) {}
+}
+
+class CustomOptionsQuickPickItem implements QuickPickItem {
+  type = 'custom';
+  alwaysShow = true;
+
+  constructor(readonly label: string, readonly description?: string) {}
 }
 
 /**
@@ -19,30 +34,41 @@ export class CliTaskFlagQuickPickItem implements QuickPickItem {
 export async function selectFlags(
   command: string,
   options: Option[],
-  userSetFlags: { [key: string]: string } = {}
+  userSetFlags: { [key: string]: string } = {},
+  customOptions?: string
 ): Promise<string[] | undefined> {
   const flagArray = Object.entries(userSetFlags).map(
     ([flagName, value]) => `--${flagName}=${value}`
   );
+  if (customOptions) {
+    flagArray.push(customOptions);
+  }
 
   const selection = await promptForFlagToSet(
     `nx ${command} ${flagArray.join(' ')}`,
     options.filter((option) => !userSetFlags[option.name])
   );
 
-  if (!selection.flag) {
+  if (selection.execute !== undefined) {
     return selection.execute ? flagArray : undefined;
   }
 
-  const flagValue = await promptForFlagValue(selection.flag);
+  if (selection.flag) {
+    const flagValue = await promptForFlagValue(selection.flag);
 
-  if (flagValue && flagValue.length > 0) {
-    userSetFlags[selection.flag.flagName] = flagValue;
-  } else {
-    delete userSetFlags[selection.flag.flagName];
+    if (flagValue && flagValue.length > 0) {
+      userSetFlags[selection.flag.flagName] = flagValue;
+    } else {
+      delete userSetFlags[selection.flag.flagName];
+    }
+  } else if (selection.customOptions) {
+    const customOptionResult = await promptForCustomOptions(customOptions);
+    if (customOptionResult) {
+      customOptions = customOptionResult;
+    }
   }
 
-  return selectFlags(command, options, userSetFlags);
+  return selectFlags(command, options, userSetFlags, customOptions);
 }
 
 async function promptForFlagToSet(
@@ -51,13 +77,14 @@ async function promptForFlagToSet(
 ): Promise<{
   execute?: boolean;
   flag?: CliTaskFlagQuickPickItem;
+  customOptions?: boolean;
 }> {
-  const flagItems: Array<QuickPickItem | CliTaskFlagQuickPickItem> = [
-    {
-      picked: true,
-      alwaysShow: true,
-      label: `Execute: ${currentCommand}`,
-    },
+  const flagItems: Array<
+    | CliTaskFlagQuickPickItem
+    | ExecuteCommandQuickPickItem
+    | CustomOptionsQuickPickItem
+  > = [
+    new ExecuteCommandQuickPickItem(`Execute: ${currentCommand}`),
     ...options.map((option) => {
       const detail =
         option.description ??
@@ -70,6 +97,10 @@ async function promptForFlagToSet(
         option.isRequired ? 'required' : undefined
       );
     }),
+    new CustomOptionsQuickPickItem(
+      'Custom Options',
+      'Add any additional command text.'
+    ),
   ];
 
   const selection = await window.showQuickPick(flagItems, {
@@ -82,7 +113,11 @@ async function promptForFlagToSet(
 
   const flagSelected = Boolean((selection as CliTaskFlagQuickPickItem).option);
   if (!flagSelected) {
-    return { execute: true };
+    if ((selection as CustomOptionsQuickPickItem).type === 'custom') {
+      return { customOptions: true };
+    } else {
+      return { execute: true };
+    }
   } else {
     return {
       flag: selection as CliTaskFlagQuickPickItem,
@@ -106,4 +141,11 @@ function promptForFlagValue(flagToSet: CliTaskFlagQuickPickItem) {
       placeHolder,
     });
   }
+}
+
+function promptForCustomOptions(oldCustomOptions?: string) {
+  return window.showInputBox({
+    value: oldCustomOptions,
+    placeHolder: 'Enter any additional command text.',
+  });
 }
