@@ -17,11 +17,11 @@ export async function selectAffectedFlags(target: string): Promise<{
       };
     }
     default: {
-      const positional = `--target=${target}`;
       return {
         command: 'affected',
-        positional,
-        flags: await selectFlags(`affected ${positional}`, AFFECTED_OPTIONS),
+        flags: await selectFlags(`affected`, AFFECTED_OPTIONS, {
+          target,
+        }),
       };
     }
   }
