@@ -84,6 +84,7 @@ class NxReMoveProjectDialog(
                                             )
                                             .comment(getShortcutHint())
                                             .align(AlignX.FILL)
+                                            .focused()
 
                                         addDocumentListener(
                                             object : BulkAwareDocumentListener.Simple {
