@@ -13,6 +13,8 @@ jobs:
   main-linux:
     name: Main Linux
     runs-on: ubuntu-latest
+    env:
+      NX_CI_EXECUTION_ENV: 'linux'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,6 +51,7 @@ jobs:
       GIT_AUTHOR_NAME: Test
       GIT_COMMITTER_EMAIL: test@test.com
       GIT_COMMITTER_NAME: Test
+      NX_CI_EXECUTION_ENV: 'windows'
     steps:
       - uses: actions/checkout@v4
         with:
