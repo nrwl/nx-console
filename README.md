@@ -93,4 +93,4 @@ list to get started.
 The Node interpreter under **Languages & Frameworks** > **Node.js** needs to be configured to use the Node executable
 within the WSL distribution.
 You can read more on
-the [official Jetbrains docs](https://www.jetbrains.com/help/webstorm/how-to-use-wsl-development-environment-in-product.html#ws_wsl_node_interpreter_configure).
+the [official Jetbrains docs page](https://www.jetbrains.com/help/webstorm/how-to-use-wsl-development-environment-in-product.html#ws_wsl_node_interpreter_configure).
