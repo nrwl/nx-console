@@ -20,11 +20,11 @@ launch-templates:
             '../.cache/ms-playwright'
           BASE_BRANCH: 'main'
       - name: Install yarn globally
-        run: npm install -g yarn
+        script: npm install -g yarn
       - name: Add yarn to PATH
-        run: $env:Path += ";C:\Users\Workflows\AppData\Roaming\npm"
+        script: $env:Path += ";C:\Users\Workflows\AppData\Roaming\npm"
       - name: enable corepack
-        run: corepack enable
+        script: corepack enable
       - name: Install Node Modules
         uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/install-node-modules/main.yaml'
       - name: Install Browsers (if needed)
