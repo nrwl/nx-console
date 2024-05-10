@@ -111,6 +111,7 @@ export class FormValuesService {
     if (!schema) return {};
     const options = schema.options;
     const errors: Record<string, boolean | string> = {};
+
     Object.entries(formValues).forEach(([key, value]) => {
       const option = options.find((option) => option.name === key);
       if (!option) return;
