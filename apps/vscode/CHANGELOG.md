@@ -1,3 +1,12 @@
+## [18.21.2](https://github.com/nrwl/nx-console/compare/vscode-v18.21.1...vscode-v18.21.2) (2024-05-10)
+
+
+### Bug Fixes
+
+* **nxls:** filter all paths that include a cache folder ([#2128](https://github.com/nrwl/nx-console/issues/2128)) ([7acb20f](https://github.com/nrwl/nx-console/commit/7acb20fa5ad6e84944262de9b32c93cf4f009adc))
+* **vscode:** adapt cli task logic to handle affected & other commands correctly ([#2127](https://github.com/nrwl/nx-console/issues/2127)) ([0cd7787](https://github.com/nrwl/nx-console/commit/0cd77871b80617a3ca649d3d344279ebf16e6cfa))
+* **vscode:** enable command quickpicks to specify arbitrary options ([#2129](https://github.com/nrwl/nx-console/issues/2129)) ([21a2f8b](https://github.com/nrwl/nx-console/commit/21a2f8b3f23dfef4e7435d5b7643f866430745aa))
+
 ## [18.21.1](https://github.com/nrwl/nx-console/compare/vscode-v18.21.0...vscode-v18.21.1) (2024-05-06)
 
 
