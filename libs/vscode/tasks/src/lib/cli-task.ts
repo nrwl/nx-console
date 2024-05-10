@@ -81,16 +81,6 @@ export class CliTask extends Task {
 
 function getArgs(definition: CliTaskDefinition) {
   const { positional, command, flags } = definition;
-  switch (command) {
-    case 'add':
-    case 'build':
-    case 'lint':
-    case 'generate':
-    case 'run':
-    case 'serve':
-    case 'test':
-      return [command, positional, ...flags];
-    default:
-      return ['run', `${positional}:${command}`, ...flags];
-  }
+  const args = [command, positional, ...flags];
+  return args.filter((v) => v !== undefined && v !== null);
 }

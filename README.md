@@ -52,13 +52,6 @@ You can install Nx Console in the following places:
   Visual Studio Marketplace.
 - [Nx Console for JetBrains](https://plugins.jetbrains.com/plugin/21060-nx-console) from the JetBrains Marketplace
 
-### Jetbrains WSL support
-
-The Node interpreter under **Languages & Frameworks** > **Node.js** needs to be configured to use the Node executable
-within the WSL distribution.
-You can read more on
-the [official Jetbrains docs](https://www.jetbrains.com/help/webstorm/how-to-use-wsl-development-environment-in-product.html#ws_wsl_node_interpreter_configure).
-
 ## True UI for Nx & Lerna
 
 Nx Console is the UI for all Nx workspaces. It works for any generator or any architect commands. Nx Console does not
@@ -74,6 +67,12 @@ commands and install extensions without ever touching the terminal or having to 
 Also, Nx Console highlights the properties you are likely to use for built-in generators and commands, so if you haven't
 used the CLI, you don't get overwhelmed.
 
+## Compatibility
+
+The latest version of Nx Console supports all Nx versions starting at Nx 15. For older versions, we cannot guarantee compatibility or full functionality. However, we welcome contributions! If you encounter specific issues with older versions, please consider submitting a PR. Of course, if you discover any problems with newer versions of Nx, please report these issues to help us improve Nx Console.
+
+If you're looking to upgrade your version of Nx easily, refer to the [Nx migrate documentation](https://nx.dev/features/automate-updating-dependencies).
+
 # Learn More
 
 - [Documentation](https://nx.dev/core-features/integrate-with-editors) - Official documentation with video tutorials
@@ -88,3 +87,10 @@ Please read the [contributing guidelines](https://github.com/nrwl/nx-console/blo
 the issues from
 the [good first issue](https://github.com/nrwl/nx-console/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 list to get started.
+
+### Jetbrains WSL support
+
+The Node interpreter under **Languages & Frameworks** > **Node.js** needs to be configured to use the Node executable
+within the WSL distribution.
+You can read more on
+the [official Jetbrains docs](https://www.jetbrains.com/help/webstorm/how-to-use-wsl-development-environment-in-product.html#ws_wsl_node_interpreter_configure).

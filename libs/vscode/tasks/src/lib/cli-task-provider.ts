@@ -82,7 +82,7 @@ export class CliTaskProvider implements TaskProvider {
     }
 
     let task;
-    const positionals = definition.positional.match(
+    const positionals = definition.positional?.match(
       WORKSPACE_GENERATOR_NAME_REGEX
     );
     try {
