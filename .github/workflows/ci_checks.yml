@@ -23,9 +23,7 @@ jobs:
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
       - run: |
-          npx nx-cloud start-ci-run \
-            --distribute-on="3 linux-medium-js" \
-            --stop-agents-after="e2e"
+          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js"
       - uses: browser-actions/setup-chrome@v1
       - run: chrome --version
       - name: Use Node.js ${{ env.node_version }}
@@ -60,10 +58,8 @@ jobs:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
-      # - run: |
-      #     npx nx-cloud start-ci-run \
-      #       --distribute-on="3 custom-linux-medium-js" \
-      #       --stop-agents-after="e2e"
+      - run: |
+          npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --require-explicit-completion
       - uses: browser-actions/setup-chrome@v1
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
@@ -84,3 +80,4 @@ jobs:
       - run: npx nx affected --targets="build,test" --configuration=ci --exclude=nx-console
       - run: npx nx affected --targets="e2e,e2e-local" --configuration=ci --exclude=nx-console --parallel=1
         timeout-minutes: 45
+      - run: npx nx-cloud complete-ci-run
