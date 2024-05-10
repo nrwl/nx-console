@@ -12,6 +12,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
+import com.intellij.util.applyIf
 import dev.nx.console.models.NxGeneratorContext
 import dev.nx.console.models.WorkspaceLayout
 import java.awt.event.ActionEvent
@@ -84,7 +85,11 @@ class NxReMoveProjectDialog(
                                             )
                                             .comment(getShortcutHint())
                                             .align(AlignX.FILL)
-                                            .focused()
+                                            .applyIf(
+                                                reMoveGeneratorContext?.project.isNullOrEmpty()
+                                            ) {
+                                                focused()
+                                            }
 
                                         addDocumentListener(
                                             object : BulkAwareDocumentListener.Simple {
@@ -116,7 +121,13 @@ class NxReMoveProjectDialog(
                             updateDestinationDirHint(model.project)
 
                             destinationField =
-                                textField().bindText(model::directory).align(AlignX.FILL).component
+                                textField()
+                                    .bindText(model::directory)
+                                    .align(AlignX.FILL)
+                                    .applyIf(!reMoveGeneratorContext?.project.isNullOrEmpty()) {
+                                        focused()
+                                    }
+                                    .component
                         }
                         .visible(mode == "move")
                         .layout(RowLayout.PARENT_GRID)
