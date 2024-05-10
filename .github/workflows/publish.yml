@@ -36,7 +36,8 @@ jobs:
           main-branch-name: 'master'
       - name: publish
         run: |
-          yarn package
+          node ./tools/scripts/clear-dist.js
+          npx nx run vscode:package --skip-nx-cache
           yarn vsce publish --packagePath dist/apps/vscode/nx-console.vsix -p ${{ secrets.VSCE_PAT }}
           yarn ovsx publish dist/apps/vscode/nx-console.vsix -p ${{ secrets.OVSX_PAT }}
       - name: release
