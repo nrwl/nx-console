@@ -61,6 +61,13 @@ class NxExecutable {
 }
 
 fun getNxPackagePath(project: Project, basePath: String): String {
+    val nxExecutableName =
+        if (SystemInfo.isWindows && !WslPath.isWslUncPath(basePath)) "nx.bat" else "nx"
+    val nxExecutable = File(Paths.get(basePath, nxExecutableName).toString())
+    if (nxExecutable.exists()) {
+        return Paths.get(basePath, ".nx", "installation", "node_modules", "nx").toString()
+    }
+
     val yarnPnpManager = YarnPnpManager.getInstance(project)
     val virtualBaseFile = VirtualFileManager.getInstance().findFileByNioPath(Paths.get(basePath))
     if (virtualBaseFile != null && yarnPnpManager.isUnderPnp(virtualBaseFile)) {
