@@ -1,3 +1,15 @@
+## 1.24.0 (2024-05-10)
+
+### Bug Fixes
+
+* **intellij:** enable loading nx packages from .nx/installation ([#2132](https://github.com/nrwl/nx-console/issues/2132)) ([5b1a05b](https://github.com/nrwl/nx-console/commit/5b1a05b9badeca99480cfc144b6ae83f7b87e4f4))
+* **nxls:** filter all paths that include a cache folder ([#2128](https://github.com/nrwl/nx-console/issues/2128)) ([7acb20f](https://github.com/nrwl/nx-console/commit/7acb20fa5ad6e84944262de9b32c93cf4f009adc))
+
+
+### Features
+
+* **intellij:** autofocus first empty text field in re/move dialog ([#2131](https://github.com/nrwl/nx-console/issues/2131)) ([ac804b0](https://github.com/nrwl/nx-console/commit/ac804b01af8438d60b57c743a9169eed4993b47f))
+
 ## <small>1.23.1 (2024-05-06)</small>
 
 ### Bug Fixes
