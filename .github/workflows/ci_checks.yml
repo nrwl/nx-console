@@ -70,6 +70,10 @@ jobs:
           node-version: ${{ env.node_version }}
           check-latest: true
           cache: yarn
+      - name: Install yarn globally
+        run: npm install -g yarn
+      - name: Add yarn to PATH
+        run: $env:Path += ";C:\Users\Workflows\AppData\Roaming\npm"
       - run: yarn install --immutable
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v3
