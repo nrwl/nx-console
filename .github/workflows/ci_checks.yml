@@ -74,6 +74,8 @@ jobs:
         run: npm install -g yarn
       - name: Add yarn to PATH
         run: $env:Path += ";C:\Users\Workflows\AppData\Roaming\npm"
+      - name: enable corepack
+        run: corepack enable
       - run: yarn install --immutable
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v3
