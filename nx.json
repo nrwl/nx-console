@@ -100,7 +100,6 @@
       "!{projectRoot}/src/test-setup.[jt]s"
     ]
   },
-  "nxCloudAccessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
@@ -130,5 +129,7 @@
       }
     }
   ],
-  "defaultBase": "master"
+  "defaultBase": "master",
+  "nxCloudUrl": "https://staging.nx.app",
+  "nxCloudAccessToken": "ZjcwZWVlN2EtMTc1OS00NDRiLWEyMzAtODc5ZTQ0YTQ5ZTAxfHJlYWQtd3JpdGU="
 }
