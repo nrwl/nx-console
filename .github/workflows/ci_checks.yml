@@ -24,7 +24,7 @@ jobs:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
-      - run: nx-cloud validate --workflow-file=./nx/workflows/agents.yaml
+      - run: npx nx-cloud validate --workflow-file=./nx/workflows/agents.yaml
       - run: |
           npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js"
       - uses: browser-actions/setup-chrome@v1
