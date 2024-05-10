@@ -1,3 +1,10 @@
+## [18.21.3](https://github.com/nrwl/nx-console/compare/vscode-v18.21.2...vscode-v18.21.3) (2024-05-10)
+
+
+### Bug Fixes
+
+* **vscode:** adjust README with version compat info ([#2137](https://github.com/nrwl/nx-console/issues/2137)) ([237d5f9](https://github.com/nrwl/nx-console/commit/237d5f9e262e0b9d02306f21ddb79c8758f9561e))
+
 ## [18.21.2](https://github.com/nrwl/nx-console/compare/vscode-v18.21.1...vscode-v18.21.2) (2024-05-10)
 
 
