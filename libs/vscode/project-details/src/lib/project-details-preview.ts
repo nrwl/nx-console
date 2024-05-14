@@ -4,6 +4,7 @@ import {
   NxGraphServer,
   getNxGraphServer,
   handleGraphInteractionEventBase,
+  loadGraphErrorHtml,
   loadGraphBaseHtml,
 } from '@nx-console/vscode/graph-base';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
@@ -114,7 +115,7 @@ export class ProjectDetailsPreview {
       Object.keys(nxWorkspace?.workspace.projects ?? {}).length > 0;
     const hasProject =
       project?.name &&
-      nxWorkspace?.workspace.projects[project?.name] === undefined;
+      nxWorkspace?.workspace.projects[project?.name] !== undefined;
     if (
       workspaceErrors &&
       (!isPartial ||
@@ -178,22 +179,7 @@ export class ProjectDetailsPreview {
   }
 
   private loadErrorHtml(errors: NxError[]) {
-    this.webviewPanel.webview.html = /*html*/ `
-    <style>
-        pre {
-          white-space: pre-wrap;
-          border-radius: 5px;
-          border: 2px solid var(--vscode-editorWidget-border);
-          padding: 20px;
-        }
-      </style>
-      <p>Unable to load the project graph. The following error occurred:</p>
-      ${errors
-        .map(
-          (error) => `<pre>${error.message ?? ''} \n ${error.stack ?? ''}</pre>`
-        )
-        .join('')}
-    `;
+    this.webviewPanel.webview.html = loadGraphErrorHtml(errors);
     this.isShowingErrorHtml = true;
   }
 
