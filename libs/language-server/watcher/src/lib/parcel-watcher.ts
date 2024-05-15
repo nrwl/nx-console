@@ -18,11 +18,9 @@ export class ParcelWatcher {
     const module = await import('@parcel/watcher');
     const watcher = module.default;
 
-    lspLogger.log(this.workspacePath);
     this.subscription = await watcher.subscribe(
       this.workspacePath,
       (err, events) => {
-        lspLogger.log(`File change event ${JSON.stringify(events)}`);
         if (this.stopped) {
           this.subscription?.unsubscribe();
           return;
@@ -39,7 +37,9 @@ export class ParcelWatcher {
               e.path.endsWith('tsconfig.base.json')
           )
         ) {
-          lspLogger.log('Project configuration changed');
+          lspLogger.log(
+            `Project configuration changed, ${events.map((e) => e.path)}`
+          );
           this.callback();
         }
       },
