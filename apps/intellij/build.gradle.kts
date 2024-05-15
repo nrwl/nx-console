@@ -1,3 +1,4 @@
+import kotlin.io.path.Path
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 
@@ -37,12 +38,12 @@ group = properties("pluginGroup")
 repositories { mavenCentral() }
 
 configurations.all {
-  exclude("org.slf4j", "slf4j-api")
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
-  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
-  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
+    exclude("org.slf4j", "slf4j-api")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+    exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
+    exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
 }
 
 dependencies {
@@ -116,7 +117,7 @@ tasks {
                 workingDir =
                     File(
                         destinationDir,
-                        rootProject.name + "/nxls",
+                        Path(rootProject.name, "nxls").toString(),
                     )
                 commandLine = buildCommands() + "npm install --force"
             }
