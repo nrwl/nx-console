@@ -119,7 +119,7 @@ tasks {
                         destinationDir,
                         Path(rootProject.name, "nxls").toString(),
                     )
-                logger.info("Working dir: $workingDir")
+                logger.warn("Working dir: $workingDir")
                 commandLine =
                     if (isWindows()) {
                         mutableListOf(
@@ -127,6 +127,8 @@ tasks {
                             "-command",
                             "cd",
                             workingDir.path,
+                            ";",
+                            "Get-Location",
                             ";",
                             "npm",
                             "install",
