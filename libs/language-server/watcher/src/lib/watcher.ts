@@ -1,12 +1,10 @@
 import { lspLogger } from '@nx-console/language-server/utils';
 import { getNxVersion } from '@nx-console/language-server/workspace';
 import { debounce } from '@nx-console/shared/utils';
-import * as watcher from '@parcel/watcher';
-import { platform } from 'os';
 import { gte } from 'semver';
 import { DaemonWatcher } from './daemon-watcher';
 import { NativeWatcher } from './native-watcher';
-import { importNxPackagePath } from '@nx-console/shared/npm';
+import { ParcelWatcher } from './parcel-watcher';
 
 let _daemonWatcher: DaemonWatcher | undefined;
 let _nativeWatcher: NativeWatcher | undefined;
@@ -45,48 +43,11 @@ export async function languageServerWatcher(
       };
     }
   } else {
-    const subscription = await watcher.subscribe(
-      workspacePath,
-      (err, events) => {
-        if (err) {
-          lspLogger.log('Error watching files: ' + err.toString());
-        } else if (
-          events.some(
-            (e) =>
-              e.path.endsWith('project.json') ||
-              e.path.endsWith('package.json') ||
-              e.path.endsWith('nx.json') ||
-              e.path.endsWith('workspace.json') ||
-              e.path.endsWith('tsconfig.base.json')
-          )
-        ) {
-          lspLogger.log('Project configuration changed');
-          debouncedCallback();
-        }
-      },
-      await watcherOptions(workspacePath)
-    );
-
+    lspLogger.log('Nx version <16.4.0, using @parcel/watcher');
+    const parcelWatcher = new ParcelWatcher(workspacePath, debouncedCallback);
     return () => {
       lspLogger.log('Unregistering file watcher');
-      subscription.unsubscribe();
+      parcelWatcher.stop();
     };
   }
-}
-
-async function watcherOptions(
-  workspacePath: string
-): Promise<watcher.Options | undefined> {
-  const { getIgnoredGlobs } = await importNxPackagePath<
-    typeof import('nx/src/utils/ignore')
-  >(workspacePath, 'src/utils/ignore', lspLogger);
-  const options: watcher.Options = {
-    ignore: getIgnoredGlobs(workspacePath),
-  };
-
-  if (platform() === 'win32') {
-    options.backend = 'windows';
-  }
-
-  return options;
 }
