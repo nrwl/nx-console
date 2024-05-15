@@ -119,7 +119,31 @@ tasks {
                         destinationDir,
                         Path(rootProject.name, "nxls").toString(),
                     )
-                commandLine = buildCommands() + "npm install --force"
+                logger.info("Working dir: $workingDir")
+                commandLine =
+                    if (isWindows()) {
+                        mutableListOf(
+                            "powershell",
+                            "-command",
+                            "cd",
+                            workingDir.path,
+                            ";",
+                            "npm",
+                            "install",
+                            "--force"
+                        )
+                    } else {
+                        mutableListOf(
+                            "bash",
+                            "-c",
+                            "cd",
+                            workingDir.path,
+                            "&&",
+                            "npm",
+                            "install",
+                            "--force"
+                        )
+                    }
             }
         }
     }
