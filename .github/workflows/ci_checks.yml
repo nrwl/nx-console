@@ -81,6 +81,6 @@ jobs:
           java-version: 17
           cache: gradle
       # there's no need to check formatting & linting again on windows
-      - run: yarn nx affected --targets="test,build" --configuration=ci --exclude=nx-console
+      - run: yarn nx affected --targets="build,test" --configuration=ci --exclude=nx-console
       - run: yarn nx affected --targets="e2e,e2e-local" --configuration=ci --exclude=nx-console --parallel=1
         timeout-minutes: 45
