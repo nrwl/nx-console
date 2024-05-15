@@ -1,7 +1,10 @@
 import fs from 'fs-extra';
 import { normalize } from 'node:path';
 
-fs.copySync(normalize('../../dist/apps/generate-ui-v2'), normalize('./dist/generate-ui-v2'));
+fs.copySync(
+  normalize('../../dist/apps/generate-ui-v2'),
+  normalize('./dist/generate-ui-v2')
+);
 
 fs.createFileSync(normalize('./dist/generate-ui-v2/index.html'));
 fs.writeFileSync(
