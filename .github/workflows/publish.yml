@@ -5,7 +5,7 @@ on:
     tags:
       - 'vscode-v*.*.*'
 env:
-  node_version: 20
+  node_version: 18
 
 jobs:
   publish:
