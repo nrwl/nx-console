@@ -10,8 +10,12 @@
       }
     },
     "build": {
-      "inputs": ["kotlin"],
-      "outputs": ["{workspaceRoot}/dist/apps/intellij/distributions"],
+      "inputs": [
+        "kotlin"
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/apps/intellij/distributions"
+      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "node ./apps/intellij/run-gradle.js :apps:intellij:buildPlugin"
@@ -19,7 +23,9 @@
       "configurations": {
         "production-intellij": {}
       },
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "lint": {
       "executor": "nx:noop"
@@ -31,17 +37,32 @@
         "command": "node ./apps/intellij/run-gradle.js :apps:intellij:runInspections"
       }
     },
+    "install-nxls-deps": {
+      "command": "node ./tools/scripts/install-nxls-deps-intellij.js",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/intellij/idea-sandbox/plugins/nx-console/nxls"
+      ]
+    },
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
       "options": {
         "outputPath": "",
         "ci": false,
         "npm": false,
-        "plugins": ["gradle-semantic-release-plugin"],
-        "gitAssets": ["gradle.properties"]
+        "plugins": [
+          "gradle-semantic-release-plugin"
+        ],
+        "gitAssets": [
+          "gradle.properties"
+        ]
       }
     }
   },
-  "tags": ["type:intellij"],
-  "implicitDependencies": ["generate-ui", "nxls"]
+  "tags": [
+    "type:intellij"
+  ],
+  "implicitDependencies": [
+    "generate-ui",
+    "nxls"
+  ]
 }
