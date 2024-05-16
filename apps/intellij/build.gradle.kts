@@ -120,32 +120,7 @@ tasks {
                         Path(rootProject.name, "nxls").toString(),
                     )
                 logger.warn("Working dir: $workingDir")
-                commandLine =
-                    if (isWindows()) {
-                        mutableListOf(
-                            "powershell",
-                            "-command",
-                            "cd",
-                            workingDir.path,
-                            ";",
-                            "Get-Location",
-                            ";",
-                            "npm",
-                            "install",
-                            "--force"
-                        )
-                    } else {
-                        mutableListOf(
-                            "bash",
-                            "-c",
-                            "cd",
-                            workingDir.path,
-                            "&&",
-                            "npm",
-                            "install",
-                            "--force"
-                        )
-                    }
+                commandLine = buildCommands() + "npx nx run intellij:install-nxls-deps"
             }
         }
     }
