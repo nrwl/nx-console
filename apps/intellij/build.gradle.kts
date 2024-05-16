@@ -1,4 +1,3 @@
-import kotlin.io.path.Path
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 
@@ -114,11 +113,6 @@ tasks {
 
         doLast {
             exec {
-                workingDir =
-                    File(
-                        destinationDir,
-                        Path(rootProject.name, "nxls").toString(),
-                    )
                 logger.warn("Working dir: $workingDir")
                 commandLine = buildCommands() + "npx nx run intellij:install-nxls-deps"
             }
