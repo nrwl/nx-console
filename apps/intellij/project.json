@@ -35,8 +35,7 @@
       "command": "node ./tools/scripts/install-nxls-deps-intellij.js",
       "outputs": [
         "{workspaceRoot}/dist/apps/intellij/idea-sandbox/plugins/nx-console/nxls"
-      ],
-      "options": {}
+      ]
     },
     "semantic-release": {
       "executor": "@theunderscorer/nx-semantic-release:semantic-release",
