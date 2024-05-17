@@ -102,14 +102,15 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 tasks {
     runInspections { mount("${rootDir}/gradle.properties", "/data/project/gradle.properties") }
 
-    prepareSandbox {
+    prepareSandbox() {
         dependsOn("buildNxls")
         from(nxlsRoot) {
-            include("*.js")
-            include("package.json")
-            include("*.map")
-            into(File("${rootProject.name}", "nxls").path)
+            include("**/*.js")
+            include("**/package.json")
+            include("**/*.map")
+            into("${rootProject.name}/nxls")
         }
+        doNotTrackState("nothing else modifies nxls dir")
 
         doLast {
             exec {
