@@ -105,14 +105,15 @@ tasks {
     prepareSandbox {
         dependsOn("buildNxls")
         from(nxlsRoot) {
-            include("**/*.js")
-            include("**/package.json")
-            include("**/*.map")
-            into("${rootProject.name}/nxls")
+            include("*.js")
+            include("package.json")
+            include("*.map")
+            into(File("${rootProject.name}", "nxls").path)
         }
 
         doLast {
             exec {
+                logger.warn("rootproject ${rootProject.name}")
                 logger.warn("Working dir: $workingDir")
                 commandLine = buildCommands() + "npx nx run intellij:install-nxls-deps"
             }
