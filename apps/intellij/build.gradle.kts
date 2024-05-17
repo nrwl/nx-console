@@ -208,7 +208,7 @@ tasks.register<Exec>("buildNxls") {
         if (System.getenv("IDEA_DEBUG") == "true") {
             buildCommands() + "npx nx run nxls:build:debug"
         } else {
-            buildCommands() + "npx nx run nxls:build"
+            buildCommands() + "npx nx run nxls:build --verbose"
         }
     workingDir = rootDir
 }
