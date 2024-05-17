@@ -111,8 +111,6 @@ tasks {
             into("${rootProject.name}/nxls")
         }
 
-        outputs.file("${rootProject.name}/nxls")
-
         doLast {
             exec {
                 logger.warn("rootproject ${rootProject.name}")
