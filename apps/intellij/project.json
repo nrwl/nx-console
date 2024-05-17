@@ -32,7 +32,7 @@
       }
     },
     "install-nxls-deps": {
-      "command": "npm i -f --verbose",
+      "command": "npx npm@10 i -f --verbose -y",
       "outputs": [
         "{workspaceRoot}/dist/apps/intellij/idea-sandbox/plugins/nx-console/nxls"
       ],
