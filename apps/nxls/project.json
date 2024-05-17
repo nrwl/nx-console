@@ -54,6 +54,7 @@
     "build": {
       "defaultConfiguration": "production",
       "executor": "@nx/esbuild:esbuild",
+      "inputs": ["production"],
       "outputs": ["{workspaceRoot}/dist/apps/nxls"],
       "options": {
         "main": "apps/nxls/src/main.ts",
