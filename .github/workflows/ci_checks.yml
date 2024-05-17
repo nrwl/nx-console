@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  node_version: 18
+  node_version: 20
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}
 
 jobs:
@@ -35,6 +35,7 @@ jobs:
           node-version: ${{ env.node_version }}
           check-latest: true
           cache: yarn
+      - run: npm i -g npm@10
       - run: yarn install --immutable
       - name: Workspace Lint
         run: |
@@ -71,6 +72,7 @@ jobs:
           node-version: ${{ env.node_version }}
           check-latest: true
           cache: yarn
+      - run: npm i -g npm@10
       - run: yarn install --immutable
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v3
