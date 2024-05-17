@@ -2,11 +2,12 @@ const { spawn } = require('child_process');
 const os = require('os');
 
 const arg = process.argv[2];
+const addtlArgs = process.argv.slice(3);
 const gradlew = os.platform() === 'win32' ? 'gradlew.bat' : './gradlew';
 
 const gradleCommand = os.platform() === 'win32' ? 'gradlew.bat' : './gradlew';
 
-const gradleProcess = spawn(gradleCommand, [arg], { shell: true, stdio: 'inherit' });
+const gradleProcess = spawn(gradleCommand, [arg, ...addtlArgs], { shell: true, stdio: 'inherit' });
 
 gradleProcess.on('error', (err) => {
   console.error(`Failed to start subprocess: ${err}`);
