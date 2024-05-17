@@ -35,7 +35,6 @@ jobs:
           node-version: ${{ env.node_version }}
           check-latest: true
           cache: yarn
-      - run: npm i -g npm@10
       - run: yarn install --immutable
       - name: Workspace Lint
         run: |
@@ -72,7 +71,6 @@ jobs:
           node-version: ${{ env.node_version }}
           check-latest: true
           cache: yarn
-      - run: npm i -g npm@10
       - run: yarn install --immutable
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v3
