@@ -110,7 +110,8 @@ tasks {
             include("**/*.map")
             into("${rootProject.name}/nxls")
         }
-        doNotTrackState("nothing else modifies nxls dir")
+
+        outputs.file("${rootProject.name}/nxls")
 
         doLast {
             exec {
@@ -209,7 +210,7 @@ tasks.register<Exec>("buildNxls") {
         if (System.getenv("IDEA_DEBUG") == "true") {
             buildCommands() + "npx nx run nxls:build:debug"
         } else {
-            buildCommands() + "npx nx run nxls:build --verbose"
+            buildCommands() + "npx nx run nxls:build"
         }
     workingDir = rootDir
 }
