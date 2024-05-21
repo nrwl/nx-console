@@ -3,9 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vscode/output-channels/src",
   "projectType": "library",
-  "tags": [
-    "type:vscode"
-  ],
+  "tags": ["type:vscode"],
   "// targets": "to see all targets run: nx show project output-channels --web",
   "targets": {}
 }
