@@ -4,7 +4,7 @@ import {
 } from '@nx-console/language-server/types';
 import { getNxGraphServer } from '@nx-console/vscode/graph-base';
 import { getNxlsClient } from '@nx-console/vscode/lsp-client';
-import { logAndShowError } from '@nx-console/vscode/utils';
+import { logAndShowError } from '@nx-console/vscode/output-channels';
 import { commands, ExtensionContext, ProgressLocation, window } from 'vscode';
 
 const REFRESH_WORKSPACE = 'nxConsole.refreshWorkspace';

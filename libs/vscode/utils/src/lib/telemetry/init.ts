@@ -1,4 +1,4 @@
-import { getOutputChannel } from '../output-channel';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { Telemetry } from './telemetry';
 
 let telemetry: Telemetry;

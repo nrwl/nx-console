@@ -1,4 +1,4 @@
-import { getNxlsOutputChannel, getOutputChannel } from './output-channel';
+import { getNxlsOutputChannel, getOutputChannel } from './output-channels';
 import { window } from 'vscode';
 
 export function logAndShowError(message: string, error?: string) {

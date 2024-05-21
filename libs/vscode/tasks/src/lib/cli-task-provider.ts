@@ -7,10 +7,7 @@ import { Task, TaskExecution, TaskProvider, tasks, window } from 'vscode';
 import { CliTask } from './cli-task';
 import { CliTaskDefinition } from './cli-task-definition';
 import { NxTask } from './nx-task';
-import {
-  getOutputChannel,
-  logAndShowTaskCreationError,
-} from '@nx-console/vscode/utils';
+import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
 
 export class CliTaskProvider implements TaskProvider {
   private currentDryRun?: TaskExecution;

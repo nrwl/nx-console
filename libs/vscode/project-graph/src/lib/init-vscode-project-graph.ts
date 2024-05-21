@@ -11,7 +11,6 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
-  showNoNxVersionMessage,
   showNoProjectAtPathMessage,
 } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
@@ -29,6 +28,7 @@ import {
   legacyTask,
   legacyTaskButton,
 } from './legacy-implementation/project-graph';
+import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 
 let _graphWebviewManager: GraphWebviewManager | undefined;
 

@@ -12,6 +12,7 @@ import {
   Uri,
   Range,
   DiagnosticSeverity,
+  commands,
 } from 'vscode';
 
 export function initErrorDiagnostics(context: ExtensionContext) {
@@ -19,13 +20,23 @@ export function initErrorDiagnostics(context: ExtensionContext) {
 
   context.subscriptions.push(diagnosticCollection);
 
-  getNxWorkspace().then((nxWorkspace) =>
-    setDiagnostics(nxWorkspace?.errors ?? [], diagnosticCollection)
-  );
+  getNxWorkspace().then((nxWorkspace) => {
+    setDiagnostics(nxWorkspace?.errors ?? [], diagnosticCollection);
+    commands.executeCommand(
+      'setContext',
+      'nxConsole.hasWorkspaceErrors',
+      nxWorkspace?.errors?.length
+    );
+  });
 
   const listener = onWorkspaceRefreshed(async () => {
     const nxWorkspace = await getNxWorkspace();
     setDiagnostics(nxWorkspace?.errors ?? [], diagnosticCollection);
+    commands.executeCommand(
+      'setContext',
+      'nxConsole.hasWorkspaceErrors',
+      nxWorkspace?.errors?.length
+    );
   });
 
   if (listener) {

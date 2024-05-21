@@ -5,13 +5,13 @@ import { PartialDeep } from 'type-fest';
 import type { OutputChannel } from 'vscode';
 
 import type * as nxWorkspace from '@nx-console/vscode/nx-workspace';
-import * as utils from '@nx-console/vscode/utils';
+import * as outputChannels from '@nx-console/vscode/output-channels';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { MessageType } from './graph-message-type';
 
 jest.mock(
-  '@nx-console/vscode/utils',
-  (): PartialDeep<typeof utils> => ({
+  '@nx-console/vscode/output-channels',
+  (): PartialDeep<typeof outputChannels> => ({
     getOutputChannel: () => {
       return {
         appendLine: jest.fn(() => {

@@ -8,7 +8,6 @@ import {
 import * as path from 'path';
 import type { TargetConfiguration as NxTargetConfiguration } from 'nx/src/devkit-exports';
 
-import { getOutputChannel } from './output-channel';
 import {
   localDependencyPath,
   workspaceDependencyPath,
@@ -16,6 +15,7 @@ import {
 import { readAndCacheJsonFile } from '@nx-console/shared/file-system';
 import { normalizeSchema } from '@nx-console/shared/schema/normalize';
 import { getPrimitiveValue } from '@nx-console/shared/utils';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 
 export function readTargetDef(
   targetName: string,

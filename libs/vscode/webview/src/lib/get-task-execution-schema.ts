@@ -7,7 +7,7 @@ import {
   getGeneratorContextFromPath,
   getNxWorkspaceProjects,
 } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/utils';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { Uri, window } from 'vscode';
 import { selectGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
 

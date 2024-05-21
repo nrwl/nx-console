@@ -1,16 +1,11 @@
-import {
-  getNxWorkspacePath,
-  WorkspaceConfigurationStore,
-} from '@nx-console/vscode/configuration';
-import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
-import {
-  AbstractTreeProvider,
-  getOutputChannel,
-} from '@nx-console/vscode/utils';
-import { join } from 'path';
-import { commands, ExtensionContext, TreeItem } from 'vscode';
-import { RunTargetTreeItem } from './run-target-tree-item';
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
+import { AbstractTreeProvider } from '@nx-console/vscode/utils';
+import { join } from 'path';
+import { ExtensionContext, TreeItem } from 'vscode';
+import { RunTargetTreeItem } from './run-target-tree-item';
 
 const SCANNING_FOR_WORKSPACE = new TreeItem(
   'Scanning for your Nx Workspace...'

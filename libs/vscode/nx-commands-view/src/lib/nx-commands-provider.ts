@@ -1,12 +1,10 @@
 import { GlobalConfigurationStore } from '@nx-console/vscode/configuration';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
-import {
-  AbstractTreeProvider,
-  logAndShowTaskCreationError,
-} from '@nx-console/vscode/utils';
+import { AbstractTreeProvider } from '@nx-console/vscode/utils';
 import { commands, ExtensionContext } from 'vscode';
 import { NxCommandConfig, NxCommandsTreeItem } from './nx-commands-tree-item';
+import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
 
 export const EXECUTE_ARBITRARY_COMMAND = 'nxConsole.executeArbitraryCommand';
 

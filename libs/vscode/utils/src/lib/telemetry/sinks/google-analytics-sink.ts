@@ -1,10 +1,10 @@
 import { platform } from 'os';
 import { xhr, XHRResponse } from 'request-light';
 import { env, extensions } from 'vscode';
-import { getOutputChannel } from '../../output-channel';
 import { TelemetryMessageBuilder } from '../message-builder';
 import { TelemetryType } from '../record';
 import { Sink } from '../sink';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 
 class TelemetryParams {
   constructor(readonly type: string, readonly data: any) {}
