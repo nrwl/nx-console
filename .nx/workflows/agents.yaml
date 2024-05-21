@@ -23,3 +23,5 @@ launch-templates:
         uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/install-node-modules/main.yaml'
       - name: Install Browsers (if needed)
         uses: 'nrwl/nx-cloud-workflows/v3.6/workflow-steps/install-browsers/main.yaml'
+      - name: Install cypress with --force
+        script: npx cypress install --force
