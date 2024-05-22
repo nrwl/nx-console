@@ -12,7 +12,8 @@
 **Spend less time looking up command line arguments and more time shipping incredible products.**
 
 [![CI Status](https://img.shields.io/github/actions/workflow/status/nrwl/nx-console/ci_checks.yml?branch=master&label=CI&logo=github&style=flat-square)](https://github.com/nrwl/nx-console/actions/workflows/ci_checks.yml)
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/nrwl.angular-console?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/nrwl.angular-console?style=flat-square&label=Visual%20Studio%20Code%20extension&logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=nrwl.angular-console)
+[![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/dev.nx.console?style=flat-square&label=JetBrains%20plugin&logo=jetbrains)](https://plugins.jetbrains.com/plugin/21060-nx-console)
 [![GitHub](https://img.shields.io/github/license/nrwl/nx-console?style=flat-square)](https://github.com/nrwl/nx-console/blob/master/LICENSE)
 ![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/nrwl.angular-console?style=flat-square)
 [![Visual Studio Code Support](https://img.shields.io/badge/Visual%20Studio%20Code-%5E1.71.0-blue?style=flat-square&logo=visualstudiocode)](https://code.visualstudio.com)
