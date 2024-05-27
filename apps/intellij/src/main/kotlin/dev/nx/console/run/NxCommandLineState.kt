@@ -63,7 +63,7 @@ class NxCommandLineState(
                     "${nxProjects.first()}:${nxTargets.first()}${if(nxTargetsConfiguration.isBlank().not()) ":$nxTargetsConfiguration" else ""}"
                 )
 
-        if (configurator === null || configurator is CommandLineDebugConfigurator) {
+        if (configurator != null) {
             try {
                 val hideNotificationPropertyKey =
                     "dev.nx.console.hide_debug_source_map_notification"
