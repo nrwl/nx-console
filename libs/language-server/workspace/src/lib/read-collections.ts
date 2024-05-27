@@ -125,7 +125,15 @@ export async function getCollectionInfo(
     ...executorCollection.json.executors,
     ...executorCollection.json.builders,
   };
-  for (const [key, schema] of Object.entries<any>(executors)) {
+  for (const key of Object.keys(executors)) {
+    let schema = executors[key];
+    if (typeof schema === 'string') {
+      schema = await resolveDelegatedExecutor(schema, workspacePath);
+      if (!schema) {
+        continue;
+      }
+    }
+
     if (!canUse(key, schema, options.includeHidden, options.includeNgAdd)) {
       continue;
     }
@@ -270,6 +278,38 @@ function readCollectionGenerator(
       `Invalid package.json for schematic ${collectionName}:${collectionSchemaName}`
     );
   }
+}
+
+async function resolveDelegatedExecutor(
+  delegatedExecutor: string,
+  workspacePath: string
+) {
+  const [pkgName, executor] = delegatedExecutor.split(':');
+  const dependencyPath = await workspaceDependencyPath(workspacePath, pkgName);
+
+  if (!dependencyPath) {
+    return null;
+  }
+
+  const {
+    packageJson: { builders, executors },
+    packagePath,
+  } = await packageDetails(dependencyPath);
+
+  const collection = await readAndCacheJsonFile(
+    executors || builders,
+    packagePath
+  );
+
+  if (!collection.json?.[executor]) {
+    return null;
+  }
+
+  if (typeof collection.json[executor] === 'string') {
+    return resolveDelegatedExecutor(collection.json[executor], workspacePath);
+  }
+
+  return collection.json[executor];
 }
 
 /**
