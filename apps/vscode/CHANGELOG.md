@@ -1,3 +1,12 @@
+## [18.21.4](https://github.com/nrwl/nx-console/compare/vscode-v18.21.3...vscode-v18.21.4) (2024-05-27)
+
+
+### Bug Fixes
+
+* **nxls:** lazily import @parcel/watcher to avoid issues ([#2140](https://github.com/nrwl/nx-console/issues/2140)) ([8d68e8e](https://github.com/nrwl/nx-console/commit/8d68e8eba7f2aba4aa6e2832b028f251ec7f1c73))
+* **nxls:** resolve delegated executor defintions correctly ([#2150](https://github.com/nrwl/nx-console/issues/2150)) ([609f5a4](https://github.com/nrwl/nx-console/commit/609f5a436dae2ac1d8fb7620cbab90398c4b128f))
+* rework graph with reloading & errors & update nx ([#2123](https://github.com/nrwl/nx-console/issues/2123)) ([e39e8e5](https://github.com/nrwl/nx-console/commit/e39e8e5f19cfd258f955caf75505749a56443323))
+
 ## [18.21.3](https://github.com/nrwl/nx-console/compare/vscode-v18.21.2...vscode-v18.21.3) (2024-05-10)
 
 
