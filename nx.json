@@ -140,6 +140,14 @@
         "buildStorybookTargetName": "build-storybook",
         "serveStorybookTargetName": "storybook"
       }
+    },
+    {
+      "plugin": "@nx/gradle",
+      "options": {
+        "testTargetName": "test",
+        "classesTargetName": "classes",
+        "buildTargetName": "build"
+      }
     }
   ],
   "defaultBase": "master",
