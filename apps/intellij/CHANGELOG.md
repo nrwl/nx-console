@@ -1,3 +1,17 @@
+## 1.25.0 (2024-05-27)
+
+### Bug Fixes
+
+* **intellij:** repair telemetry/log check when running configurations ([#2151](https://github.com/nrwl/nx-console/issues/2151)) ([00b7ecc](https://github.com/nrwl/nx-console/commit/00b7ecc79e2ea8d58bcdc2643252ca2ad2877a08))
+* **nxls:** lazily import @parcel/watcher to avoid issues ([#2140](https://github.com/nrwl/nx-console/issues/2140)) ([8d68e8e](https://github.com/nrwl/nx-console/commit/8d68e8eba7f2aba4aa6e2832b028f251ec7f1c73))
+* **nxls:** resolve delegated executor defintions correctly ([#2150](https://github.com/nrwl/nx-console/issues/2150)) ([609f5a4](https://github.com/nrwl/nx-console/commit/609f5a436dae2ac1d8fb7620cbab90398c4b128f))
+* rework graph with reloading & errors & update nx ([#2123](https://github.com/nrwl/nx-console/issues/2123)) ([e39e8e5](https://github.com/nrwl/nx-console/commit/e39e8e5f19cfd258f955caf75505749a56443323))
+
+
+### Features
+
+* **intellij:** show information message when running a debug configuration ([#2141](https://github.com/nrwl/nx-console/issues/2141)) ([39a7284](https://github.com/nrwl/nx-console/commit/39a7284f7b7cc91e98630d7d89b59cd6824ba6ad))
+
 ## 1.24.0 (2024-05-10)
 
 ### Bug Fixes
