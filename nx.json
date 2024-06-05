@@ -167,6 +167,6 @@
     }
   ],
   "defaultBase": "master",
-  "nxCloudUrl": "https://staging.nx.app",
-  "nxCloudAccessToken": "ZDk2ZTRhZGYtODJlNS00Mjg4LWJiMGYtYjZkZWU2MWU3NjJifHJlYWQ="
+  "nxCloudAccessToken": "MDM3YTBjZTMtNjkyNi00NGQ0LTk4ZDItOGFiNDFhMWVkMmJmfHJlYWQtd3JpdGU=",
+  "nxCloudUrl": "https://staging.nx.app"
 }
