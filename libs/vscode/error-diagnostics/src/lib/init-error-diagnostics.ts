@@ -83,6 +83,11 @@ function getUriForError(error: NxError) {
     return Uri.parse(nxJsonPath);
   }
 
+  const lernaJsonPath = join(workspacePath, 'lerna.json');
+  if (existsSync(lernaJsonPath)) {
+    return Uri.parse(lernaJsonPath);
+  }
+
   return Uri.parse(workspacePath);
 }
 
