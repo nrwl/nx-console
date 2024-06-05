@@ -29,19 +29,32 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "targetDefaults": {
     "build": {
-      "inputs": ["production", "^production"],
+      "inputs": [
+        "production",
+        "^production"
+      ],
       "cache": true
     },
     "test": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js"
+      ],
       "cache": true
     },
     "lint": {
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
       "cache": true
     },
     "e2e": {
-      "inputs": ["default", "^production"],
+      "inputs": [
+        "default",
+        "^production"
+      ],
       "cache": true
     },
     "build-storybook": {
@@ -62,7 +75,11 @@
       "cache": true
     },
     "@nx/jest:jest": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/jest.preset.js"
+      ],
       "cache": true,
       "options": {
         "passWithNoTests": true
@@ -75,7 +92,10 @@
       }
     },
     "@nx/eslint:lint": {
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
       "cache": true
     }
   },
@@ -114,14 +134,18 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "exclude": ["apps/nxls-e2e/**/*"],
+      "exclude": [
+        "apps/nxls-e2e/**/*"
+      ],
       "options": {
         "targetName": "test"
       }
     },
     {
       "plugin": "@nx/jest/plugin",
-      "include": ["apps/nxls-e2e/**/*"],
+      "include": [
+        "apps/nxls-e2e/**/*"
+      ],
       "options": {
         "ciTargetName": "e2e"
       }
@@ -144,5 +168,5 @@
   ],
   "defaultBase": "master",
   "nxCloudUrl": "https://staging.nx.app",
-  "nxCloudAccessToken": "OTZmMzE2NDEtMmYzNC00MjhiLWI2M2QtMjgzMTQ4ZjgxZGNlfHJlYWQ="
+  "nxCloudAccessToken": "YThmZGJjNzMtZDQwNS00ODA5LWE2OWQtYjJjZmM4NDlmNDEwfHJlYWQtd3JpdGU="
 }
