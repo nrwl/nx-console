@@ -26,7 +26,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
       - run: npx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
       - run: |
-          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js"
+          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="auto"
       - uses: browser-actions/setup-chrome@v1
       - run: chrome --version
       - name: Use Node.js ${{ env.node_version }}
@@ -63,7 +63,7 @@ jobs:
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
       - run: |
-          npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js"
+          npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="auto"
       - uses: browser-actions/setup-chrome@v1
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
