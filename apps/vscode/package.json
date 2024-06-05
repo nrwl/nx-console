@@ -712,11 +712,7 @@
     "viewsWelcome": [
       {
         "view": "nxConsole.views.welcome",
-        "contents": "Nx Console - The UI for Nx"
-      },
-      {
-        "view": "nxConsole.views.welcome",
-        "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
+        "contents": "It looks like you're not inside an Nx workspace. If your Nx workspace is in a different folder, you can manually select it below. \n[Change Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/getting-started/editor-setup)."
       },
       {
         "view": "nxConsole.views.angular-welcome",
@@ -780,9 +776,9 @@
       "nx-console": [
         {
           "id": "nxConsole.views.welcome",
-          "name": "Welcome",
+          "name": "Welcome to Nx Console",
           "when": "!isNxWorkspace && !isAngularWorkspace",
-          "contextualTitle": "Nx Console Getting Started",
+          "contextualTitle": "Nx Console - Getting Started",
           "icon": "tree-view-icon.svg",
           "visibility": "visible"
         },
@@ -801,7 +797,8 @@
         },
         {
           "id": "nxRunTarget",
-          "name": "Generate & Run Target"
+          "name": "Generate & Run Target",
+          "when": "isNxWorkspace"
         },
         {
           "id": "nxCommands",
@@ -811,7 +808,6 @@
         {
           "id": "nxHelpAndFeedback",
           "name": "Help and Feedback",
-          "when": "isNxWorkspace",
           "visibility": "collapsed"
         }
       ]

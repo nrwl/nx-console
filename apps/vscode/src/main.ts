@@ -51,10 +51,7 @@ import {
 import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
-import {
-  NxHelpAndFeedbackProvider,
-  NxHelpAndFeedbackTreeItem,
-} from '@nx-console/vscode/nx-help-and-feedback-view';
+import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
 import { getNxWorkspace, stopDaemon } from '@nx-console/vscode/nx-workspace';
 import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
@@ -64,7 +61,6 @@ import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { registerRefreshWorkspace } from './refresh-workspace';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
-let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
 
 let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
@@ -85,6 +81,8 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
+
+    initHelpAndFeedbackView(context);
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
       LOCATE_YOUR_WORKSPACE.command?.command || '',
       async () => {
@@ -243,18 +241,11 @@ async function setWorkspace(workspacePath: string) {
 
     nxProjectsTreeProvider = initNxProjectView(context);
 
-    nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
-      treeDataProvider: new NxHelpAndFeedbackProvider(context),
-    });
-
     initNxConfigDecoration(context);
 
     new AddDependencyCodelensProvider();
 
-    context.subscriptions.push(
-      nxHelpAndFeedbackTreeView,
-      revealWebViewPanelCommand
-    );
+    context.subscriptions.push(revealWebViewPanelCommand);
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
