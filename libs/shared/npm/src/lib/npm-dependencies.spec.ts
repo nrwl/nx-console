@@ -80,4 +80,26 @@ describe('npmDependencies', () => {
       'workspace/node_modules/package-bar',
     ]);
   });
+
+  it('should return scoped packages starting with @', async () => {
+    jest
+      .mocked(directoryExists)
+      .mockImplementation((filePath) =>
+        Promise.resolve(
+          [
+            'workspace/node_modules',
+            'workspace/node_modules/@scope',
+            'workspace/.nx/installation/node_modules',
+          ].includes(filePath)
+        )
+      );
+    jest
+      .mocked(readDirectory)
+      .mockResolvedValueOnce(['@scope'])
+      .mockResolvedValueOnce(['package-foo']);
+
+    expect(await npmDependencies('workspace')).toEqual([
+      'workspace/node_modules/@scope/package-foo',
+    ]);
+  });
 });
