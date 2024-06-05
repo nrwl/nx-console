@@ -717,7 +717,7 @@
     "viewsWelcome": [
       {
         "view": "nxConsole.views.welcome",
-        "contents": "It looks like you're not inside an Nx workspace. If your Nx workspace is in a different folder, you can manually select it below. \n[Change Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/getting-started/editor-setup)."
+        "contents": "It looks like you're not inside an Nx workspace. If your Nx workspace is in a different folder, you can manually select it below. \n[Select Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/getting-started/editor-setup)."
       },
       {
         "view": "nxConsole.views.angular-welcome",
