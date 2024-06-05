@@ -537,6 +537,11 @@
         "command": "nxConsole.migrateAngularCliToNx"
       },
       {
+        "category": "Nx",
+        "title": "Show Nx Language Server Logs",
+        "command": "nxConsole.showNxlsLogs"
+      },
+      {
         "title": "Add dependency to workspace",
         "command": "nxConsole.addDependency"
       },
@@ -724,7 +729,13 @@
       },
       {
         "view": "nxProjects",
-        "contents": "We couldn't find any projects in this workspace. \n Make sure that the proper dependencies are installed locally and refresh the workspace. \n [Refresh Workspace](command:nxConsole.refreshWorkspace)\n If you're just getting started with Nx, you can [use generators](https://nx.dev/plugin-features/use-code-generators) to quickly scaffold new projects or [add them manually](https://nx.dev/reference/project-configuration)."
+        "contents": "We couldn't find any projects in this workspace. \n Make sure that the proper dependencies are installed locally and refresh the workspace. \n [Refresh Workspace](command:nxConsole.refreshWorkspace)\n If you're just getting started with Nx, you can [use generators](https://nx.dev/plugin-features/use-code-generators?utm_source=nxconsole) to quickly scaffold new projects or [add them manually](https://nx.dev/reference/project-configuration?utm_source=nxconsole).",
+        "when": "!nxConsole.hasWorkspaceErrors"
+      },
+      {
+        "view": "nxProjects",
+        "contents": "Nx caught one or more errors while computing your project graph. \n [View Errors](command:workbench.actions.view.problems)\n If the problems persist, you can try running `nx reset` to clear all caches and then [refresh the workspace](command:nxConsole.refreshWorkspace)\n For more information, view the [Nx Language Server logs](command:nxConsole.showNxlsLogs) and refer to the [Nx Troubleshooting Guide](https://nx.dev/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole) and the [Nx Console Troubleshooting Guide](https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole).",
+        "when": "nxConsole.hasWorkspaceErrors"
       }
     ],
     "walkthroughs": [

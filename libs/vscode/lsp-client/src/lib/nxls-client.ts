@@ -2,7 +2,7 @@ import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/type
 import {
   getNxlsOutputChannel,
   getOutputChannel,
-} from '@nx-console/vscode/utils';
+} from '@nx-console/vscode/output-channels';
 import { join } from 'path';
 import { Disposable, EventEmitter, ExtensionContext } from 'vscode';
 import {

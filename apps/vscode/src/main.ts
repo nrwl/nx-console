@@ -31,7 +31,6 @@ import {
 } from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
 import {
-  getOutputChannel,
   getTelemetry,
   initTelemetry,
   watchCodeLensConfigChange,
@@ -62,6 +61,11 @@ import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { registerRefreshWorkspace } from './refresh-workspace';
+import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
+import {
+  getOutputChannel,
+  initOutputChannels,
+} from '@nx-console/vscode/output-channels';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
@@ -241,6 +245,8 @@ async function setWorkspace(workspacePath: string) {
     initNvmTip(context);
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);
+    initErrorDiagnostics(context);
+    initOutputChannels(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
 

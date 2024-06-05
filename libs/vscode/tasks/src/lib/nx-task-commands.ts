@@ -12,7 +12,6 @@ import { readAndParseJson } from '@nx-console/shared/file-system';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
-  logAndShowError,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 
@@ -21,6 +20,7 @@ import {
   selectRunManyFlags,
 } from '@nx-console/vscode/nx-cli-quickpicks';
 import { NxTask } from './nx-task';
+import { logAndShowError } from '@nx-console/vscode/output-channels';
 
 export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(

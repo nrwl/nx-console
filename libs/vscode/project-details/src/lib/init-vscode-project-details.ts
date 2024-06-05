@@ -10,7 +10,6 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
-  showNoNxVersionMessage,
   showNoProjectAtPathMessage,
 } from '@nx-console/vscode/utils';
 import { dirname, join } from 'path';
@@ -28,6 +27,7 @@ import { ConfigFileCodelensProvider } from './config-file-codelens-provider';
 import { ProjectDetailsCodelensProvider } from './project-details-codelens-provider';
 import { ProjectDetailsManager } from './project-details-manager';
 import { ProjectDetailsProvider } from './project-details-provider';
+import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
 
 export function initVscodeProjectDetails(context: ExtensionContext) {
   const nxWorkspacePath = getNxWorkspacePath();

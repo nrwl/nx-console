@@ -1,5 +1,5 @@
 import { createProjectGraph } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel } from '@nx-console/vscode/utils';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { assign, createMachine, interpret } from 'xstate';
 import { MessageType } from './graph-message-type';
 

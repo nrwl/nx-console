@@ -1,5 +1,5 @@
-import { getOutputChannel } from './output-channel';
 import { window } from 'vscode';
+import { getOutputChannel } from './output-channels';
 
 export function logAndShowTaskCreationError(error: any, message?: string) {
   getOutputChannel().appendLine(
