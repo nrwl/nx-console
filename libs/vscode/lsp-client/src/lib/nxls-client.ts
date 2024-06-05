@@ -1,4 +1,7 @@
-import { NxWorkspaceRefreshNotification } from '@nx-console/language-server/types';
+import {
+  NxChangeWorkspace,
+  NxWorkspaceRefreshNotification,
+} from '@nx-console/language-server/types';
 import {
   getNxlsOutputChannel,
   getOutputChannel,
@@ -83,6 +86,10 @@ class NxlsClient {
 
   public async start(workspacePath: string) {
     if (this.state !== 'idle') {
+      if (this.workspacePath !== workspacePath) {
+        this.workspacePath = workspacePath;
+        this.sendNotification(NxChangeWorkspace, workspacePath);
+      }
       return;
     }
     this.workspacePath = workspacePath;
