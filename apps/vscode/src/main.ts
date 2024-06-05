@@ -85,7 +85,6 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
-
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
       LOCATE_YOUR_WORKSPACE.command?.command || '',
       async () => {
