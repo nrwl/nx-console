@@ -72,7 +72,7 @@ import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
 import { TaskExecutionSchema } from '@nx-console/shared/schema';
 import { NxWorkspace } from '@nx-console/shared/types';
 import { formatError } from '@nx-console/shared/utils';
-import { dirname, relative, join } from 'node:path';
+import { dirname, relative } from 'node:path';
 import {
   ClientCapabilities,
   CompletionList,
@@ -92,6 +92,7 @@ import {
 import { URI, Utils } from 'vscode-uri';
 import treeKill from 'tree-kill';
 import { ensureOnlyJsonRpcStdout } from './ensureOnlyJsonRpcStdout';
+import { loadRootEnvFiles } from './loadRootEnvFiles';
 
 process.on('unhandledRejection', (e: any) => {
   connection.console.error(formatError(`Unhandled exception`, e));
@@ -143,6 +144,8 @@ connection.onInitialize(async (params) => {
     if (!WORKING_PATH) {
       throw 'Unable to determine workspace path';
     }
+
+    loadRootEnvFiles(WORKING_PATH);
 
     CLIENT_CAPABILITIES = params.capabilities;
 
@@ -618,6 +621,8 @@ connection.onNotification(
 
 connection.onNotification(NxChangeWorkspace, async (workspacePath) => {
   WORKING_PATH = workspacePath;
+  loadRootEnvFiles(WORKING_PATH);
+
   await reconfigureAndSendNotificationWithBackoff(WORKING_PATH);
 });
 
