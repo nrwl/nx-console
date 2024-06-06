@@ -43,11 +43,11 @@ export async function npmDependencies(workspacePath: string) {
     if (npmPackageOrScope.startsWith('@')) {
       (await readDirectory(join(nodeModulesDir, npmPackageOrScope))).forEach(
         (p) => {
-          res.push(`${nodeModulesDir}/${npmPackageOrScope}/${p}`);
+          res.push(join(nodeModulesDir, npmPackageOrScope, p));
         }
       );
     } else {
-      res.push(`${nodeModulesDir}/${npmPackageOrScope}`);
+      res.push(join(nodeModulesDir, npmPackageOrScope));
     }
   }
 
