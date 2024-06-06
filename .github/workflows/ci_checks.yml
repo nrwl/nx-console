@@ -26,7 +26,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
       - run: npx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
       - run: |
-          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="auto"
+          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
       - uses: browser-actions/setup-chrome@v1
       - run: chrome --version
       - name: Use Node.js ${{ env.node_version }}
@@ -46,7 +46,7 @@ jobs:
       - run: npx nx affected --targets=e2e,e2e-local --configuration=ci --exclude=nx-console --parallel=1
   main-windows:
     name: Main Windows
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       GIT_AUTHOR_EMAIL: test@test.com
       GIT_AUTHOR_NAME: Test
@@ -63,7 +63,7 @@ jobs:
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
       - run: |
-          npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="auto"
+          npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
       - uses: browser-actions/setup-chrome@v1
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
