@@ -58,6 +58,8 @@ export class NxlsWrapper {
       this.messageReader = new StreamMessageReader(p.stdout);
       this.messageWriter = new StreamMessageWriter(p.stdin);
 
+      console.log('process', p);
+
       this.listenToLSPMessages(this.messageReader);
 
       await this.sendRequest({
