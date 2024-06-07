@@ -58,8 +58,6 @@ export class NxlsWrapper {
       this.messageReader = new StreamMessageReader(p.stdout);
       this.messageWriter = new StreamMessageWriter(p.stdin);
 
-      console.log('process', p);
-
       this.listenToLSPMessages(this.messageReader);
 
       await this.sendRequest({
@@ -166,8 +164,18 @@ export class NxlsWrapper {
   async waitForNotification(
     method: string
   ): Promise<object | any[] | undefined> {
-    return await new Promise<any>((resolve) => {
+    let timeout: NodeJS.Timeout;
+
+    return await new Promise<any>((resolve, reject) => {
+      // Set a timeout for 2 minutes
+      timeout = setTimeout(() => {
+        this.pendingNotificationMap.delete(method);
+        reject(new Error(`Timed out while waiting for ${method}`));
+      }, 2 * 60 * 1000);
+
       this.pendingNotificationMap.set(method, resolve);
+    }).finally(() => {
+      clearTimeout(timeout);
     });
   }
 
