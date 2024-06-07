@@ -1,4 +1,3 @@
-import { GeneratorType } from '@nx-console/shared/schema';
 import {
   selectGeneratorAndPromptForFlags,
   selectReMoveGenerator,
@@ -7,16 +6,11 @@ import {
   NxTreeItem,
   ProjectViewItem,
 } from '@nx-console/vscode/nx-project-view';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
-import {
-  getGeneratorContextV2,
-  getNxWorkspace,
-} from '@nx-console/vscode/nx-workspace';
+import { getGeneratorContextV2 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { getTelemetry } from '@nx-console/vscode/utils';
-import { ExtensionContext, Uri, commands, window } from 'vscode';
+import { ExtensionContext, Uri, commands } from 'vscode';
 import { openGenerateUi } from './init-generate-ui-webview';
-import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 
 export async function registerGenerateCommands(context: ExtensionContext) {
   commands.registerCommand(
@@ -46,12 +40,12 @@ export async function registerGenerateCommands(context: ExtensionContext) {
 
   commands.registerCommand(`nx.generate.ui`, () => {
     getTelemetry().featureUsed('nx.generate.ui');
-    showGenerateUi(context.extensionPath);
+    openGenerateUi();
   });
 
   commands.registerCommand(`nx.generate.ui.fileexplorer`, (uri: Uri) => {
     getTelemetry().featureUsed('nx.generate.fileexplorer');
-    showGenerateUi(context.extensionPath, uri);
+    openGenerateUi(uri);
   });
 
   commands.registerCommand(
@@ -130,36 +124,4 @@ export async function registerGenerateCommands(context: ExtensionContext) {
       projectName ? { projectName } : undefined
     );
   };
-}
-
-async function showGenerateUi(
-  extensionPath: string,
-  uri?: Uri,
-  generatorType?: GeneratorType,
-  generator?: string
-) {
-  const workspacePath = getNxWorkspacePath();
-  const validWorkspaceJson = (await getNxWorkspace())?.validWorkspaceJson;
-  if (!workspacePath) {
-    window.showErrorMessage(
-      'Nx Console requires a workspace be set to perform this action'
-    );
-    return;
-  }
-  if (!validWorkspaceJson) {
-    window.showErrorMessage('Invalid configuration file');
-    return;
-  }
-  const workspaceTreeItem = new RunTargetTreeItem(
-    'generate',
-    extensionPath,
-    generatorType,
-    generator
-  );
-
-  commands.executeCommand(
-    'nxConsole.revealWebViewPanel',
-    workspaceTreeItem,
-    uri
-  );
 }

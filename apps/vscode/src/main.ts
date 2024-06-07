@@ -22,10 +22,6 @@ import {
   NxProjectTreeProvider,
   initNxProjectView,
 } from '@nx-console/vscode/nx-project-view';
-import {
-  RunTargetTreeItem,
-  RunTargetTreeProvider,
-} from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
 import {
   getTelemetry,
@@ -62,7 +58,6 @@ import { initNxInit } from './nx-init';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
 import { registerRefreshWorkspace } from './refresh-workspace';
 
-let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let context: ExtensionContext;
@@ -101,8 +96,6 @@ export async function activate(c: ExtensionContext) {
 
     await enableTypeScriptPlugin(context);
     watchCodeLensConfigChange(context);
-
-    currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
@@ -209,7 +202,7 @@ async function setWorkspace(workspacePath: string) {
 
     const revealWebViewPanelCommand = commands.registerCommand(
       'nxConsole.revealWebViewPanel',
-      async (_: RunTargetTreeItem, contextMenuUri?: Uri) => {
+      async (_, contextMenuUri?: Uri) => {
         openGenerateUi(contextMenuUri);
       }
     );
@@ -236,7 +229,6 @@ async function setWorkspace(workspacePath: string) {
 
   registerWorkspaceFileWatcher(context, workspacePath);
 
-  currentRunTargetTreeProvider?.refresh();
   nxProjectsTreeProvider?.refresh();
 
   commands.executeCommand(
