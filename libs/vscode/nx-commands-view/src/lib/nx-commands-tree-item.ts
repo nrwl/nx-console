@@ -34,6 +34,18 @@ export class NxCommandsTreeItem extends TreeItem {
     readonly extensionPath: string
   ) {
     super('', TreeItemCollapsibleState.None);
+
+    // we want to show a unique inline action for only the generate command
+    // so we special case it here
+    if (
+      commandConfig.type === 'vscode-command' &&
+      commandConfig.command === 'nx.generate'
+    ) {
+      this.contextValue = 'vscode-command-generate';
+    } else {
+      this.contextValue = commandConfig.type;
+    }
+
     this.label = this.getLabel(commandConfig);
 
     this.command = this.getCommand(commandConfig);
