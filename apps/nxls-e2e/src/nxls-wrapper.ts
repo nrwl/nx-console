@@ -121,7 +121,14 @@ export class NxlsWrapper {
   async sendRequest(
     request: Omit<RequestMessage, 'jsonrpc' | 'id'>
   ): Promise<ResponseMessage> {
-    return await new Promise<ResponseMessage>((resolve) => {
+    let timeout: NodeJS.Timeout;
+    return await new Promise<ResponseMessage>((resolve, reject) => {
+      // Set a timeout for 2 minutes
+      timeout = setTimeout(() => {
+        this.pendingRequestMap.delete(id);
+        reject(new Error(`Request ${request.method} timed out`));
+      }, 2 * 60 * 1000);
+
       const id = this.idCounter++;
       this.pendingRequestMap.set(id, resolve);
 
@@ -138,6 +145,8 @@ export class NxlsWrapper {
         );
       }
       this.messageWriter?.write(fullRequest);
+    }).finally(() => {
+      clearTimeout(timeout);
     });
   }
 
