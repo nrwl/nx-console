@@ -1,2 +1,2 @@
 export * from './lib/init-nx-commands-view';
-export { EXECUTE_ARBITRARY_COMMAND } from './lib/nx-commands-provider';
+export { EXECUTE_ARBITRARY_COMMAND } from './lib/init-nx-commands-view';

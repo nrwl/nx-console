@@ -184,7 +184,7 @@
         },
         {
           "command": "nx.generate.ui.projectView",
-          "when": "view == nxProjects && viewItem == project && isNxWorkspace && config.nxConsole.useNewGenerateUiPreview",
+          "when": "view == nxProjects && viewItem == project && isNxWorkspace",
           "group": "navigation@1"
         },
         {
@@ -569,15 +569,15 @@
           },
           "scope": "resource",
           "default": [
+            "run",
+            "generate",
             "run-many",
             "affected",
             "affected:graph",
             "list",
-            "migrate",
-            "add-dependency",
-            "add-dev-dependency"
+            "migrate"
           ],
-          "markdownDescription": "Common Nx commands that will be available in the sidebar view. There are three categories of commands you can specify here: \n - Arbitrary Nx commands, like `build:example-app` or `nx run my-lib:test` (note that you can omit the prefixed `nx`) \n - Nx commands that are available through Nx Console, like `run-many`. They will be executed using the Nx Console UI. \n - `add-depedency` and `add-dev-dependency` commands will be executed using the Nx Console UI for adding dependencies to the workspace."
+          "markdownDescription": "Common Nx commands that will be available in the sidebar view. You can specify either \n - Arbitrary Nx commands, like `build:example-app` or `nx run my-lib:test` (note that you can omit the prefixed `nx`) or  \n - Nx commands that are available through Nx Console, like `run-many`. They will be executed using the Nx Console UI."
         },
         "nxConsole.enableGenerateFromContextMenu": {
           "type": "boolean",
@@ -643,12 +643,6 @@
             "type": "string"
           },
           "description": "Controls which collections (re)move generators will be used for a project matching a given wildcard pattern. \nIf a path matches multiple patterns, the last match will be used.\nIf a path matches no pattern, you can decide manually.\n Example: { \"libs/frontend/*\": \"@nx/angular\",  \"libs/backend/*\": \"@nx-dotnet\", }"
-        },
-        "nxConsole.useNewGenerateUiPreview": {
-          "type": "boolean",
-          "scope": "application",
-          "default": true,
-          "description": "Use the new Generate UI - still in development."
         },
         "nxConsole.showProjectDetailsView": {
           "type": "boolean",
@@ -813,11 +807,6 @@
         {
           "id": "nxProjects",
           "name": "Projects",
-          "when": "isNxWorkspace"
-        },
-        {
-          "id": "nxRunTarget",
-          "name": "Generate & Run Target",
           "when": "isNxWorkspace"
         },
         {

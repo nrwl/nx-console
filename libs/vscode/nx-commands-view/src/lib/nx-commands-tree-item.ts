@@ -1,22 +1,31 @@
-import { TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
+import {
+  Command,
+  ThemeIcon,
+  TreeItem,
+  TreeItemCollapsibleState,
+  Uri,
+} from 'vscode';
 import { join } from 'path';
-import { EXECUTE_ARBITRARY_COMMAND } from './nx-commands-provider';
+import { EXECUTE_ARBITRARY_COMMAND } from './init-nx-commands-view';
 
 export type NxCommandConfig =
   | {
       type: 'add-dependency';
-      command: 'nxConsole.addDependency';
-      label: 'Add Dependency';
     }
   | {
       type: 'add-dev-dependency';
-      command: 'nxConsole.addDevDependency';
-      label: 'Add Dev Dependency';
+    }
+  | {
+      type: 'select-workspace';
     }
   | {
       command: string;
       type: 'vscode-command' | 'arbitrary-command';
       label: string;
+    }
+  | {
+      target: string;
+      type: 'target';
     };
 
 export class NxCommandsTreeItem extends TreeItem {
@@ -24,31 +33,74 @@ export class NxCommandsTreeItem extends TreeItem {
     readonly commandConfig: NxCommandConfig,
     readonly extensionPath: string
   ) {
-    super(commandConfig.label, TreeItemCollapsibleState.None);
+    super('', TreeItemCollapsibleState.None);
+    this.label = this.getLabel(commandConfig);
 
-    this.command = {
-      title: commandConfig.label,
-      command:
-        commandConfig.type === 'arbitrary-command'
-          ? EXECUTE_ARBITRARY_COMMAND
-          : commandConfig.command,
-      arguments:
-        commandConfig.type === 'arbitrary-command'
-          ? [commandConfig.command]
-          : [],
-      tooltip:
-        commandConfig.type === 'add-dependency' ||
-        commandConfig.type === 'add-dev-dependency'
-          ? commandConfig.label
-          : `Run ${commandConfig.label}`,
-    };
+    this.command = this.getCommand(commandConfig);
 
-    this.setIcon(commandConfig);
+    this.iconPath = this.getIcon(commandConfig);
   }
 
-  setIcon(commandConfig: NxCommandConfig) {
+  private getLabel(commandConfig: NxCommandConfig): string {
     if (commandConfig.type === 'add-dependency') {
-      this.iconPath = {
+      return 'Add Dependency';
+    } else if (commandConfig.type === 'add-dev-dependency') {
+      return 'Add Dev Dependency';
+    } else if (commandConfig.type === 'select-workspace') {
+      return 'Select workspace';
+    } else if (commandConfig.type === 'target') {
+      return commandConfig.target;
+    } else {
+      return commandConfig.label;
+    }
+  }
+
+  private getCommand(commandConfig: NxCommandConfig): Command {
+    switch (commandConfig.type) {
+      case 'arbitrary-command':
+        return {
+          title: commandConfig.command,
+          command: EXECUTE_ARBITRARY_COMMAND,
+          arguments: [commandConfig.command],
+          tooltip: `Run ${commandConfig.label}`,
+        };
+      case 'vscode-command':
+        return {
+          title: commandConfig.command,
+          command: commandConfig.command,
+          tooltip: `Run ${commandConfig.label}`,
+        };
+      case 'add-dependency':
+        return {
+          title: 'Add Dependency',
+          command: 'nxConsole.addDependency',
+          tooltip: 'Add Dependency',
+        };
+      case 'add-dev-dependency':
+        return {
+          title: 'Add Dev Dependency',
+          command: 'nxConsole.addDevDependency',
+          tooltip: 'Add Dev Dependency',
+        };
+      case 'select-workspace':
+        return {
+          title: 'Select workspace',
+          command: 'nxConsole.selectWorkspaceManually',
+          tooltip: 'Select the folder that contains your Nx workspace',
+        };
+      case 'target':
+        return {
+          title: commandConfig.target,
+          command: 'nx.run',
+          arguments: [undefined, commandConfig.target],
+          tooltip: `Run ${commandConfig.target} for a project of your choosing`,
+        };
+    }
+  }
+
+  private getIcon(commandConfig: NxCommandConfig) {
+    if (commandConfig.type === 'add-dependency') {
+      return {
         light: Uri.file(
           join(this.extensionPath, 'assets', 'nx-console-light.svg')
         ),
@@ -57,7 +109,7 @@ export class NxCommandsTreeItem extends TreeItem {
         ),
       };
     } else if (commandConfig.type === 'add-dev-dependency') {
-      this.iconPath = {
+      return {
         light: Uri.file(
           join(this.extensionPath, 'assets', 'nx-console-light.svg')
         ),
@@ -65,8 +117,12 @@ export class NxCommandsTreeItem extends TreeItem {
           join(this.extensionPath, 'assets', 'nx-console-dark.svg')
         ),
       };
+    } else if (commandConfig.type === 'select-workspace') {
+      return new ThemeIcon('folder-opened');
+    } else if (commandConfig.type === 'target') {
+      return new ThemeIcon('play');
     } else {
-      this.iconPath = {
+      return {
         light: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-light.svg')),
         dark: Uri.file(join(this.extensionPath, 'assets', 'nx-cli-dark.svg')),
       };
