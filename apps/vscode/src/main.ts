@@ -1,9 +1,9 @@
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
+  Disposable,
   ExtensionContext,
   ExtensionMode,
-  FileSystemWatcher,
   RelativePattern,
   commands,
   tasks,
@@ -39,7 +39,7 @@ import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
 import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
-import { getNxWorkspace, stopDaemon } from '@nx-console/vscode/nx-workspace';
+import { stopDaemon } from '@nx-console/vscode/nx-workspace';
 import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
@@ -57,7 +57,7 @@ import { registerRefreshWorkspace } from './refresh-workspace';
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let context: ExtensionContext;
-let workspaceFileWatcher: FileSystemWatcher | undefined;
+let workspaceFileWatcher: Disposable | undefined;
 
 let isNxWorkspace = false;
 
@@ -86,6 +86,10 @@ export async function activate(c: ExtensionContext) {
 
     if (vscodeWorkspacePath) {
       await scanForWorkspace(vscodeWorkspacePath);
+
+      if (!isNxWorkspace && !workspaceFileWatcher) {
+        registerWorkspaceFileWatcher(context, vscodeWorkspacePath);
+      }
     }
 
     context.subscriptions.push(manuallySelectWorkspaceDefinitionCommand);
@@ -108,6 +112,7 @@ export async function activate(c: ExtensionContext) {
 export async function deactivate() {
   await stopDaemon();
   await getNxlsClient()?.stop();
+  workspaceFileWatcher?.dispose();
   getTelemetry().extensionDeactivated();
 }
 
@@ -236,25 +241,16 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const workspaceLayout = (await getNxWorkspace())?.workspaceLayout;
-  const workspacePackageDirs = new Set<string>();
-  if (workspaceLayout?.appsDir) {
-    workspacePackageDirs.add(workspaceLayout.appsDir);
-  }
-  if (workspaceLayout?.libsDir) {
-    workspacePackageDirs.add(workspaceLayout.libsDir);
-  }
-  workspacePackageDirs.add('packages');
-  context.subscriptions.push(
-    watchFile(
-      new RelativePattern(workspacePath, '{workspace,angular,nx,project}.json'),
-      () => {
-        if (!isNxWorkspace) {
-          setTimeout(() => {
-            setWorkspace(workspacePath);
-          }, 1000);
-        }
+  workspaceFileWatcher = watchFile(
+    new RelativePattern(workspacePath, '{workspace,angular,nx,project}.json'),
+    () => {
+      if (!isNxWorkspace) {
+        setTimeout(() => {
+          setWorkspace(workspacePath);
+        }, 1000);
       }
-    )
+    }
   );
+
+  context.subscriptions.push(workspaceFileWatcher);
 }
