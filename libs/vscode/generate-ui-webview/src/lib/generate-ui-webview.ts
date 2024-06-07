@@ -13,18 +13,17 @@ import {
   GlobalConfigurationStore,
 } from '@nx-console/vscode/configuration';
 import {
-  getNxWorkspace,
   getStartupMessage,
   getTransformedGeneratorSchema,
 } from '@nx-console/vscode/nx-workspace';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { existsSync } from 'node:fs';
 import {
+  commands,
   ExtensionContext,
   Uri,
   ViewColumn,
   WebviewPanel,
-  commands,
   window,
 } from 'vscode';
 

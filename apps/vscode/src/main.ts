@@ -5,7 +5,6 @@ import {
   ExtensionMode,
   FileSystemWatcher,
   RelativePattern,
-  Uri,
   commands,
   tasks,
   window,
@@ -35,10 +34,7 @@ import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
-import {
-  initGenerateUiWebview,
-  openGenerateUi,
-} from '@nx-console/vscode/generate-ui-webview';
+import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
 import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
@@ -200,13 +196,6 @@ async function setWorkspace(workspacePath: string) {
 
     registerRefreshWorkspace(context);
 
-    const revealWebViewPanelCommand = commands.registerCommand(
-      'nxConsole.revealWebViewPanel',
-      async (_, contextMenuUri?: Uri) => {
-        openGenerateUi(contextMenuUri);
-      }
-    );
-
     initGenerateUiWebview(context);
 
     initNxCommandsView(context);
@@ -221,8 +210,6 @@ async function setWorkspace(workspacePath: string) {
     initNxConfigDecoration(context);
 
     new AddDependencyCodelensProvider();
-
-    context.subscriptions.push(revealWebViewPanelCommand);
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
