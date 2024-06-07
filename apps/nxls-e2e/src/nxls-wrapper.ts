@@ -60,17 +60,20 @@ export class NxlsWrapper {
 
       this.listenToLSPMessages(this.messageReader);
 
-      await this.sendRequest({
-        method: 'initialize',
-        params: {
-          processId: p.pid,
-          rootUri: null,
-          capabilities: {},
-          initializationOptions: {
-            workspacePath: cwd,
+      await this.sendRequest(
+        {
+          method: 'initialize',
+          params: {
+            processId: p.pid,
+            rootUri: null,
+            capabilities: {},
+            initializationOptions: {
+              workspacePath: cwd,
+            },
           },
         },
-      });
+        5
+      );
 
       if (this.verbose) {
         console.log(`started nxls with pid ${p.pid}`);
@@ -117,15 +120,15 @@ export class NxlsWrapper {
   }
 
   async sendRequest(
-    request: Omit<RequestMessage, 'jsonrpc' | 'id'>
+    request: Omit<RequestMessage, 'jsonrpc' | 'id'>,
+    customTimeoutMinutes?: number
   ): Promise<ResponseMessage> {
     let timeout: NodeJS.Timeout;
     return await new Promise<ResponseMessage>((resolve, reject) => {
-      // Set a timeout for 2 minutes
       timeout = setTimeout(() => {
         this.pendingRequestMap.delete(id);
         reject(new Error(`Request ${request.method} timed out`));
-      }, 2 * 60 * 1000);
+      }, (customTimeoutMinutes ?? 3) * 60 * 1000);
 
       const id = this.idCounter++;
       this.pendingRequestMap.set(id, resolve);
@@ -167,11 +170,10 @@ export class NxlsWrapper {
     let timeout: NodeJS.Timeout;
 
     return await new Promise<any>((resolve, reject) => {
-      // Set a timeout for 2 minutes
       timeout = setTimeout(() => {
         this.pendingNotificationMap.delete(method);
         reject(new Error(`Timed out while waiting for ${method}`));
-      }, 2 * 60 * 1000);
+      }, 3 * 60 * 1000);
 
       this.pendingNotificationMap.set(method, resolve);
     }).finally(() => {
