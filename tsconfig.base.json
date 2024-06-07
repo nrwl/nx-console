@@ -100,9 +100,6 @@
       "@nx-console/vscode/nx-project-view": [
         "libs/vscode/nx-project-view/src/index.ts"
       ],
-      "@nx-console/vscode/nx-run-target-view": [
-        "libs/vscode/nx-run-target-view/src/index.ts"
-      ],
       "@nx-console/vscode/nx-workspace": [
         "libs/vscode/nx-workspace/src/index.ts"
       ],

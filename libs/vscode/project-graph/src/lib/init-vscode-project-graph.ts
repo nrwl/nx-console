@@ -3,7 +3,6 @@ import {
   selectTarget,
 } from '@nx-console/vscode/nx-cli-quickpicks';
 import { NxTreeItem } from '@nx-console/vscode/nx-project-view';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   getNxVersion,
   getNxWorkspaceProjects,
