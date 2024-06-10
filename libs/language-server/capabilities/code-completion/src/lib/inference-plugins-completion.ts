@@ -1,3 +1,4 @@
+import { lspLogger } from '@nx-console/language-server/utils';
 import { getNxVersion } from '@nx-console/language-server/workspace';
 import { workspaceDependencies } from '@nx-console/shared/npm';
 import { existsSync } from 'fs';
@@ -26,6 +27,7 @@ export async function inferencePluginsCompletion(
 
   for (const dependency of dependencies) {
     const hasPluginJs = existsSync(join(dependency, 'plugin.js'));
+    lspLogger.log('dependency: ', dependency);
     if (hasPluginJs) {
       const dependencyPath = dependency
         .replace(/\\/g, '/')
