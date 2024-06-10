@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NX_CI_EXECUTION_ENV: 'linux'
+      NX_VERBOSE_LOGGING: 'true'
+      NX_CLOUD_DEBUG_URLS: 'true'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,6 +46,8 @@ jobs:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
       - run: npx nx affected --targets=lint,test,build --configuration=ci --exclude=nx-console --parallel=1
       - run: npx nx affected --targets=e2e,e2e-local --configuration=ci --exclude=nx-console --parallel=1
+        env:
+          NX_CLOUD_DISTRIBUTED_EXECUTION: true
   main-windows:
     name: Main Windows
     runs-on: windows-latest
