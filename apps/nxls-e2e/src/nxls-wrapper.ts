@@ -55,6 +55,11 @@ export class NxlsWrapper {
         windowsHide: true,
       });
 
+      p.on('exit', (code) => {
+        console.log(`nxls exited with code ${code}`);
+        console.log(`nxls stderr: ${p.stderr.read()}`);
+      });
+
       this.messageReader = new StreamMessageReader(p.stdout);
       this.messageWriter = new StreamMessageWriter(p.stdin);
 
@@ -72,7 +77,7 @@ export class NxlsWrapper {
             },
           },
         },
-        5
+        10
       );
 
       if (this.verbose) {
@@ -127,7 +132,11 @@ export class NxlsWrapper {
     return await new Promise<ResponseMessage>((resolve, reject) => {
       timeout = setTimeout(() => {
         this.pendingRequestMap.delete(id);
-        reject(new Error(`Request ${request.method} timed out`));
+        reject(
+          new Error(
+            `Request ${request.method} timed out at ${new Date().toISOString()}`
+          )
+        );
       }, (customTimeoutMinutes ?? 3) * 60 * 1000);
 
       const id = this.idCounter++;
