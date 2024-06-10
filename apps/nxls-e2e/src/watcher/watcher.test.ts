@@ -5,7 +5,7 @@ import {
 import { execSync } from 'child_process';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { NxlsWrapper } from './nxls-wrapper';
+import { NxlsWrapper } from '../nxls-wrapper';
 import {
   e2eCwd,
   isWindows,
@@ -14,7 +14,7 @@ import {
   simpleReactWorkspaceOptions,
   uniq,
   waitFor,
-} from './utils';
+} from '../utils';
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
@@ -22,9 +22,7 @@ const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
 const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
 const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
-if (!isWindows()) {
-  process.env['NX_DAEMON'] = 'true';
-}
+process.env['NX_DAEMON'] = 'true';
 
 describe('watcher', () => {
   beforeAll(async () => {
