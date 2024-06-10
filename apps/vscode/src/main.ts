@@ -43,15 +43,19 @@ import { stopDaemon } from '@nx-console/vscode/nx-workspace';
 import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
+import {
+  NxStopDaemonRequest,
+  NxWorkspaceRefreshNotification,
+  NxWorkspaceRequest,
+} from '@nx-console/language-server/types';
 import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
 import {
   getOutputChannel,
   initOutputChannels,
 } from '@nx-console/vscode/output-channels';
-import { initNxInit } from './nx-init';
-
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
+import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
 
 let nxProjectsTreeProvider: NxProjectTreeProvider;
@@ -243,14 +247,61 @@ async function registerWorkspaceFileWatcher(
 
   workspaceFileWatcher = watchFile(
     new RelativePattern(workspacePath, '{workspace,angular,nx,project}.json'),
-    () => {
+    async () => {
       if (!isNxWorkspace) {
-        setTimeout(() => {
-          setWorkspace(workspacePath);
-        }, 1000);
+        await setWorkspace(workspacePath);
+        if (isNxWorkspace) {
+          getOutputChannel().appendLine(
+            'Detected Nx workspace. Refreshing workspace.'
+          );
+          refreshWorkspaceWithBackoff();
+        }
       }
     }
   );
 
   context.subscriptions.push(workspaceFileWatcher);
+
+  // when initializing Nx, there can be timing issues as the nxls starts up
+  // we make sure to refresh the workspace periodically as we start up so that we have the latest info
+  async function refreshWorkspaceWithBackoff(iteration = 1) {
+    if (iteration > 3) {
+      return;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1000 * iteration));
+
+    const nxlsClient = getNxlsClient();
+    if (!nxlsClient) {
+      return;
+    }
+
+    const workspace = await nxlsClient.sendRequest(NxWorkspaceRequest, {
+      reset: false,
+    });
+
+    const projects = workspace?.workspace.projects;
+    if (projects && Object.keys(projects).length > 0) {
+      return;
+    } else {
+      try {
+        await Promise.race([
+          nxlsClient.sendRequest(NxStopDaemonRequest, undefined),
+          new Promise((resolve) => setTimeout(resolve, 2000)),
+        ]);
+      } catch (e) {
+        // errors while stopping the daemon aren't critical
+      }
+
+      nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
+
+      await new Promise<void>((resolve) => {
+        const disposable = nxlsClient.subscribeToRefresh(() => {
+          disposable.dispose();
+          resolve();
+        });
+      });
+      refreshWorkspaceWithBackoff(iteration + 1);
+    }
+  }
 }
