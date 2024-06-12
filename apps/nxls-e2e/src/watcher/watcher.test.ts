@@ -87,7 +87,7 @@ describe('watcher', () => {
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
     console.log('----- 4x test ----- ');
-    waitFor(2000);
+    await waitFor(2000);
     console.log('--- wait for done');
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
     console.log('--- readfile done');
