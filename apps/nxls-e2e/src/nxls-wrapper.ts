@@ -27,6 +27,10 @@ export class NxlsWrapper {
     string,
     (params: object | any[] | undefined) => void
   >();
+  private earlyExitListener = (code: number) => {
+    console.log(`nxls exited with code ${code}`);
+    console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
+  };
 
   constructor(private verbose?: boolean) {
     if (verbose === undefined) {
@@ -55,10 +59,7 @@ export class NxlsWrapper {
         windowsHide: true,
       });
 
-      p.on('exit', (code) => {
-        console.log(`nxls exited with code ${code}`);
-        console.log(`nxls stderr: ${p.stderr.read()}`);
-      });
+      p.on('exit', this.earlyExitListener);
 
       this.messageReader = new StreamMessageReader(p.stdout);
       this.messageWriter = new StreamMessageWriter(p.stdin);
@@ -114,6 +115,8 @@ export class NxlsWrapper {
     this.process?.stdout?.destroy();
     this.process?.stderr?.destroy();
     this.process?.stdin?.destroy();
+
+    this.process?.removeListener('exit', this.earlyExitListener);
 
     await new Promise<void>((resolve) => {
       if (this.process?.pid) {

@@ -33,6 +33,7 @@ describe('watcher', () => {
 
     nxlsWrapper = new NxlsWrapper();
     await nxlsWrapper.startNxls(join(e2eCwd, workspaceName));
+    nxlsWrapper.setVerbose(false);
   });
 
   afterAll(async () => {
@@ -66,10 +67,10 @@ describe('watcher', () => {
   });
 
   it('should still get refresh notifications when daemon is stopped for some reason', async () => {
-    if (isWindows()) {
-      expect(true).toBe(true);
-      return;
-    }
+    // if (isWindows()) {
+    //   expect(true).toBe(true);
+    //   return;
+    // }
 
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
@@ -87,6 +88,8 @@ describe('watcher', () => {
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
+    console.log('----- 4x test ----- ');
+    nxlsWrapper.setVerbose(true);
     waitFor(500);
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
     writeFileSync(projectJsonPath, 'invalid json');
@@ -110,6 +113,8 @@ describe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
+    console.log('----- 4x test ----- ');
+    nxlsWrapper.setVerbose(false);
   });
 
   it('should not send refresh notification when project files are not changed', async () => {
