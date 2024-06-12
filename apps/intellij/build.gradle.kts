@@ -37,12 +37,12 @@ group = properties("pluginGroup")
 repositories { mavenCentral() }
 
 configurations.all {
-  exclude("org.slf4j", "slf4j-api")
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
-  exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
-  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
-  exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
+    exclude("org.slf4j", "slf4j-api")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+    exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
+    exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
 }
 
 dependencies {
@@ -102,7 +102,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 tasks {
     runInspections { mount("${rootDir}/gradle.properties", "/data/project/gradle.properties") }
 
-    prepareSandbox {
+    prepareSandbox() {
         dependsOn("buildNxls")
         from(nxlsRoot) {
             include("**/*.js")
@@ -113,12 +113,9 @@ tasks {
 
         doLast {
             exec {
-                workingDir =
-                    File(
-                        destinationDir,
-                        rootProject.name + "/nxls",
-                    )
-                commandLine = buildCommands() + "npm install --force"
+                logger.warn("rootproject ${rootProject.name}")
+                logger.warn("Working dir: $workingDir")
+                commandLine = buildCommands() + "npx nx run intellij:install-nxls-deps"
             }
         }
     }

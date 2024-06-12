@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { npmDependencies } from './npm-dependencies';
 import { directoryExists, readDirectory } from '@nx-console/shared/file-system';
 
@@ -20,9 +21,9 @@ describe('npmDependencies', () => {
       .mockImplementation((filePath) =>
         Promise.resolve(
           [
-            'workspace/node_modules',
-            'workspace/node_modules/package-foo',
-            'workspace/node_modules/package-bar',
+            join('workspace', 'node_modules'),
+            join('workspace', 'node_modules', 'package-foo'),
+            join('workspace', 'node_modules', 'package-bar'),
           ].includes(filePath)
         )
       );
@@ -31,8 +32,8 @@ describe('npmDependencies', () => {
       .mockResolvedValue(['package-foo', 'package-bar']);
 
     expect(await npmDependencies('workspace')).toEqual([
-      'workspace/node_modules/package-foo',
-      'workspace/node_modules/package-bar',
+      join('workspace', 'node_modules', 'package-foo'),
+      join('workspace', 'node_modules', 'package-bar'),
     ]);
   });
 
@@ -42,9 +43,21 @@ describe('npmDependencies', () => {
       .mockImplementation((filePath) =>
         Promise.resolve(
           [
-            'workspace/.nx/installation/node_modules',
-            'workspace/.nx/installation/node_modules/package-foo',
-            'workspace/.nx/installation/node_modules/package-bar',
+            join('workspace', '.nx', 'installation', 'node_modules'),
+            join(
+              'workspace',
+              '.nx',
+              'installation',
+              'node_modules',
+              'package-foo'
+            ),
+            join(
+              'workspace',
+              '.nx',
+              'installation',
+              'node_modules',
+              'package-bar'
+            ),
           ].includes(filePath)
         )
       );
@@ -53,8 +66,8 @@ describe('npmDependencies', () => {
       .mockResolvedValue(['package-foo', 'package-bar']);
 
     expect(await npmDependencies('workspace')).toEqual([
-      'workspace/.nx/installation/node_modules/package-foo',
-      'workspace/.nx/installation/node_modules/package-bar',
+      join('workspace', '.nx', 'installation', 'node_modules', 'package-foo'),
+      join('workspace', '.nx', 'installation', 'node_modules', 'package-bar'),
     ]);
   });
 
@@ -64,10 +77,10 @@ describe('npmDependencies', () => {
       .mockImplementation((filePath) =>
         Promise.resolve(
           [
-            'workspace/node_modules',
-            'workspace/node_modules/package-foo',
-            'workspace/node_modules/package-bar',
-            'workspace/.nx/installation/node_modules',
+            join('workspace', 'node_modules'),
+            join('workspace', 'node_modules', 'package-foo'),
+            join('workspace', 'node_modules', 'package-bar'),
+            join('workspace', '.nx', 'installation', 'node_modules'),
           ].includes(filePath)
         )
       );
@@ -76,8 +89,8 @@ describe('npmDependencies', () => {
       .mockResolvedValue(['package-foo', 'package-bar']);
 
     expect(await npmDependencies('workspace')).toEqual([
-      'workspace/node_modules/package-foo',
-      'workspace/node_modules/package-bar',
+      join('workspace', 'node_modules', 'package-foo'),
+      join('workspace', 'node_modules', 'package-bar'),
     ]);
   });
 
@@ -87,9 +100,9 @@ describe('npmDependencies', () => {
       .mockImplementation((filePath) =>
         Promise.resolve(
           [
-            'workspace/node_modules',
-            'workspace/node_modules/@scope',
-            'workspace/.nx/installation/node_modules',
+            join('workspace', 'node_modules'),
+            join('workspace', 'node_modules', '@scope'),
+            join('workspace', '.nx', 'installation', 'node_modules'),
           ].includes(filePath)
         )
       );
@@ -99,7 +112,7 @@ describe('npmDependencies', () => {
       .mockResolvedValueOnce(['package-foo']);
 
     expect(await npmDependencies('workspace')).toEqual([
-      'workspace/node_modules/@scope/package-foo',
+      join('workspace', 'node_modules', '@scope', 'package-foo'),
     ]);
   });
 });

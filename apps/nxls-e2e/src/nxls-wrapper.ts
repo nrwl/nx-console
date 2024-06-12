@@ -25,8 +25,12 @@ export class NxlsWrapper {
   >();
   private pendingNotificationMap = new Map<
     string,
-    (params: object | any[] | undefined) => void
+    [(params: object | any[] | undefined) => void, NodeJS.Timeout]
   >();
+  private earlyExitListener = (code: number) => {
+    console.log(`nxls exited with code ${code}`);
+    console.log(`nxls stderr: ${this.process?.stderr?.read()}`);
+  };
 
   constructor(private verbose?: boolean) {
     if (verbose === undefined) {
@@ -55,22 +59,27 @@ export class NxlsWrapper {
         windowsHide: true,
       });
 
+      p.on('exit', this.earlyExitListener);
+
       this.messageReader = new StreamMessageReader(p.stdout);
       this.messageWriter = new StreamMessageWriter(p.stdin);
 
       this.listenToLSPMessages(this.messageReader);
 
-      await this.sendRequest({
-        method: 'initialize',
-        params: {
-          processId: p.pid,
-          rootUri: null,
-          capabilities: {},
-          initializationOptions: {
-            workspacePath: cwd,
+      await this.sendRequest(
+        {
+          method: 'initialize',
+          params: {
+            processId: p.pid,
+            rootUri: null,
+            capabilities: {},
+            initializationOptions: {
+              workspacePath: cwd,
+            },
           },
         },
-      });
+        10
+      );
 
       if (this.verbose) {
         console.log(`started nxls with pid ${p.pid}`);
@@ -107,6 +116,8 @@ export class NxlsWrapper {
     this.process?.stderr?.destroy();
     this.process?.stdin?.destroy();
 
+    this.process?.removeListener('exit', this.earlyExitListener);
+
     await new Promise<void>((resolve) => {
       if (this.process?.pid) {
         treeKill(this.process.pid, 'SIGKILL', () => resolve());
@@ -117,9 +128,20 @@ export class NxlsWrapper {
   }
 
   async sendRequest(
-    request: Omit<RequestMessage, 'jsonrpc' | 'id'>
+    request: Omit<RequestMessage, 'jsonrpc' | 'id'>,
+    customTimeoutMinutes?: number
   ): Promise<ResponseMessage> {
-    return await new Promise<ResponseMessage>((resolve) => {
+    let timeout: NodeJS.Timeout;
+    return await new Promise<ResponseMessage>((resolve, reject) => {
+      timeout = setTimeout(() => {
+        this.pendingRequestMap.delete(id);
+        reject(
+          new Error(
+            `Request ${request.method} timed out at ${new Date().toISOString()}`
+          )
+        );
+      }, (customTimeoutMinutes ?? 3) * 60 * 1000);
+
       const id = this.idCounter++;
       this.pendingRequestMap.set(id, resolve);
 
@@ -136,6 +158,8 @@ export class NxlsWrapper {
         );
       }
       this.messageWriter?.write(fullRequest);
+    }).finally(() => {
+      clearTimeout(timeout);
     });
   }
 
@@ -155,9 +179,24 @@ export class NxlsWrapper {
   async waitForNotification(
     method: string
   ): Promise<object | any[] | undefined> {
-    return await new Promise<any>((resolve) => {
-      this.pendingNotificationMap.set(method, resolve);
+    let timeout: NodeJS.Timeout;
+
+    return await new Promise<any>((resolve, reject) => {
+      timeout = setTimeout(() => {
+        this.pendingNotificationMap.delete(method);
+        reject(new Error(`Timed out while waiting for ${method}`));
+      }, 3 * 60 * 1000);
+
+      this.pendingNotificationMap.set(method, [resolve, timeout]);
+    }).finally(() => {
+      clearTimeout(timeout);
     });
+  }
+
+  cancelWaitingForNotification(method: string) {
+    const [, timeout] = this.pendingNotificationMap.get(method) ?? [];
+    this.pendingNotificationMap.delete(method);
+    clearTimeout(timeout);
   }
 
   setVerbose(verbose: boolean) {
@@ -187,9 +226,13 @@ export class NxlsWrapper {
         }
       } else if (isNotificationMessage(message)) {
         const method = message.method;
-        const resolve = this.pendingNotificationMap.get(method);
+        const [resolve, timeout] =
+          this.pendingNotificationMap.get(method) ?? [];
         if (resolve) {
           resolve(message.params);
+        }
+        if (timeout) {
+          clearTimeout(timeout);
         }
       }
     });

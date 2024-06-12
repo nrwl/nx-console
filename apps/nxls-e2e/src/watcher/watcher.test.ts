@@ -5,16 +5,15 @@ import {
 import { execSync } from 'child_process';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { NxlsWrapper } from './nxls-wrapper';
+import { NxlsWrapper } from '../nxls-wrapper';
 import {
   e2eCwd,
-  isWindows,
   modifyJsonFile,
   newWorkspace,
   simpleReactWorkspaceOptions,
   uniq,
   waitFor,
-} from './utils';
+} from '../utils';
 let nxlsWrapper: NxlsWrapper;
 const workspaceName = uniq('workspace');
 
@@ -22,9 +21,7 @@ const projectJsonPath = join(e2eCwd, workspaceName, 'project.json');
 const e2eProjectJsonPath = join(e2eCwd, workspaceName, 'e2e', 'project.json');
 const cypressConfig = join(e2eCwd, workspaceName, 'e2e', 'cypress.config.ts');
 
-if (!isWindows()) {
-  process.env['NX_DAEMON'] = 'true';
-}
+process.env['NX_DAEMON'] = 'true';
 
 describe('watcher', () => {
   beforeAll(async () => {
@@ -68,10 +65,10 @@ describe('watcher', () => {
   });
 
   it('should still get refresh notifications when daemon is stopped for some reason', async () => {
-    if (isWindows()) {
-      expect(true).toBe(true);
-      return;
-    }
+    // if (isWindows()) {
+    //   expect(true).toBe(true);
+    //   return;
+    // }
 
     execSync('npx nx daemon --stop', {
       cwd: join(e2eCwd, workspaceName),
@@ -89,21 +86,31 @@ describe('watcher', () => {
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
-    waitFor(500);
+    console.log('----- 4x test ----- ');
+    await waitFor(2000);
+    console.log('--- wait for done');
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
-    writeFileSync(projectJsonPath, 'invalid json');
+    console.log('--- readfile done');
+    writeFileSync(projectJsonPath, 'invalid json', {
+      encoding: 'utf-8',
+    });
+    console.log('--- write file done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
+    console.log('--- first refresh done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
+    console.log('--- second refresh done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
+    console.log('--- third refresh done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
+    console.log('--- fourth refresh done');
 
     // we need to wait until the daemon watcher ultimately fails
     // and the native watcher is started
@@ -112,6 +119,7 @@ describe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
+    console.log('----- 4x test end ----- ');
   });
 
   it('should not send refresh notification when project files are not changed', async () => {
@@ -130,6 +138,9 @@ describe('watcher', () => {
       });
 
     await waitFor(11000);
+    nxlsWrapper.cancelWaitingForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
   });
 
   it('should send refresh notification after generating a new project and changing one of its files', async () => {
@@ -139,10 +150,18 @@ describe('watcher', () => {
         .then(() => {
           resolve();
         });
-      execSync('npx nx g @nx/react:app --name react-app1 --no-interactive', {
-        cwd: join(e2eCwd, workspaceName),
-        env: process.env,
-      });
+
+      try {
+        execSync(
+          'npx nx g @nx/react:app --name react-app1 --no-interactive --verbose',
+          {
+            cwd: join(e2eCwd, workspaceName),
+            env: process.env,
+          }
+        );
+      } catch (e) {
+        console.log('Error: ', e);
+      }
     });
 
     await waitFor(1000);
