@@ -63,6 +63,7 @@ import {
   getOutputChannel,
   initOutputChannels,
 } from '@nx-console/vscode/output-channels';
+import { initNxInit } from './nx-init';
 
 let runTargetTreeView: TreeView<RunTargetTreeItem>;
 
@@ -85,6 +86,7 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
+    initNxInit(context);
 
     initHelpAndFeedbackView(context);
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(

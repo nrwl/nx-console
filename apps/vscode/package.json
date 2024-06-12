@@ -336,6 +336,10 @@
           "when": "isNxWorkspace"
         },
         {
+          "command": "nx.init",
+          "when": "false"
+        },
+        {
           "command": "nx.graph.showAll",
           "when": "isNxWorkspace"
         },
@@ -548,6 +552,11 @@
       {
         "title": "Add dev dependency to workspace",
         "command": "nxConsole.addDevDependency"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx Init",
+        "command": "nx.init"
       }
     ],
     "configuration": {
@@ -717,7 +726,7 @@
     "viewsWelcome": [
       {
         "view": "nxConsole.views.welcome",
-        "contents": "It looks like you're not inside an Nx workspace. If your Nx workspace is in a different folder, you can manually select it below. \n[Select Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/getting-started/editor-setup)."
+        "contents": "It looks like you're not inside an Nx workspace. Click the button below to add nx to your current workspace by running [nx init](https://nx.dev/recipes/adopting-nx/adding-to-existing-project). \n [Add Nx](command:nx.init)\n If your Nx workspace is in a different folder, you can manually select it below. \n[Select Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/getting-started/editor-setup)."
       },
       {
         "view": "nxConsole.views.angular-welcome",
