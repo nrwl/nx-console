@@ -147,7 +147,7 @@ class DefaultNxGenerateUiFile(name: String, private val runGeneratorManager: Run
                     GeneratorSchemaPayload(
                         name = generator.data.name,
                         collection = generator.data.collection,
-                        description = generator.data.description,
+                        description = generator.data.description ?: "",
                         options = generator.options,
                         contextValues = generator.contextValues
                     )
