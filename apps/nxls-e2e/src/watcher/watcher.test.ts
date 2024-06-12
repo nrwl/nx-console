@@ -113,7 +113,7 @@ describe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    console.log('----- 4x test ----- ');
+    console.log('----- 4x test end ----- ');
     nxlsWrapper.setVerbose(false);
   });
 
@@ -145,10 +145,18 @@ describe('watcher', () => {
         .then(() => {
           resolve();
         });
-      execSync('npx nx g @nx/react:app --name react-app1 --no-interactive', {
-        cwd: join(e2eCwd, workspaceName),
-        env: process.env,
-      });
+
+      try {
+        execSync(
+          'npx nx g @nx/react:app --name react-app1 --no-interactive --verbose',
+          {
+            cwd: join(e2eCwd, workspaceName),
+            env: process.env,
+          }
+        );
+      } catch (e) {
+        console.log('Error: ', e);
+      }
     });
 
     await waitFor(1000);
