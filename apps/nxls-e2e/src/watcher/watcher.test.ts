@@ -133,6 +133,9 @@ describe('watcher', () => {
       });
 
     await waitFor(11000);
+    nxlsWrapper.cancelWaitingForNotification(
+      NxWorkspaceRefreshNotification.method
+    );
   });
 
   it('should send refresh notification after generating a new project and changing one of its files', async () => {

@@ -18,6 +18,7 @@ export async function inferencePluginsCompletion(
     inferencePluginsCompletionCache &&
     inferencePluginsCompletionCache.length > 0
   ) {
+    lspLogger.log('Returning cached inference plugins completion');
     return inferencePluginsCompletionCache;
   }
 
@@ -30,8 +31,7 @@ export async function inferencePluginsCompletion(
     lspLogger.log('dependency: ', dependency);
     if (hasPluginJs) {
       const dependencyPath = dependency
-        .split(sep)
-        .join(posix.sep)
+        .replace(/\\/g, '/')
         .split('node_modules/')
         .pop();
 

@@ -25,7 +25,7 @@ export class NxlsWrapper {
   >();
   private pendingNotificationMap = new Map<
     string,
-    (params: object | any[] | undefined) => void
+    [(params: object | any[] | undefined) => void, NodeJS.Timeout]
   >();
   private earlyExitListener = (code: number) => {
     console.log(`nxls exited with code ${code}`);
@@ -187,10 +187,16 @@ export class NxlsWrapper {
         reject(new Error(`Timed out while waiting for ${method}`));
       }, 3 * 60 * 1000);
 
-      this.pendingNotificationMap.set(method, resolve);
+      this.pendingNotificationMap.set(method, [resolve, timeout]);
     }).finally(() => {
       clearTimeout(timeout);
     });
+  }
+
+  cancelWaitingForNotification(method: string) {
+    const [, timeout] = this.pendingNotificationMap.get(method) ?? [];
+    this.pendingNotificationMap.delete(method);
+    clearTimeout(timeout);
   }
 
   setVerbose(verbose: boolean) {
@@ -220,9 +226,13 @@ export class NxlsWrapper {
         }
       } else if (isNotificationMessage(message)) {
         const method = message.method;
-        const resolve = this.pendingNotificationMap.get(method);
+        const [resolve, timeout] =
+          this.pendingNotificationMap.get(method) ?? [];
         if (resolve) {
           resolve(message.params);
+        }
+        if (timeout) {
+          clearTimeout(timeout);
         }
       }
     });

@@ -140,6 +140,7 @@ function completionItems(
         return inputNameCompletion(workingPath, node, document, true);
       }
       case CompletionType.inferencePlugins: {
+        lspLogger.log('inferencePluginsCompletion');
         return inferencePluginsCompletion(workingPath);
       }
       default: {
