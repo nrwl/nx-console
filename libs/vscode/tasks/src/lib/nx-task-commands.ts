@@ -5,12 +5,14 @@ import {
   QuickPickItem,
   QuickPickItemKind,
   tasks,
+  TaskScope,
   window,
 } from 'vscode';
 
 import { readAndParseJson } from '@nx-console/shared/file-system';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
+  getShellExecutionForConfig,
   getTelemetry,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
@@ -21,6 +23,9 @@ import {
 } from '@nx-console/vscode/nx-cli-quickpicks';
 import { NxTask } from './nx-task';
 import { logAndShowError } from '@nx-console/vscode/output-channels';
+import { CliTaskProvider } from './cli-task-provider';
+import { CliTask } from './cli-task';
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 
 export function registerNxCommands(context: ExtensionContext) {
   context.subscriptions.push(
