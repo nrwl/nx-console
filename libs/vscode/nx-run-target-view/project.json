@@ -1,8 +1,0 @@
-{
-  "name": "vscode-nx-run-target-view",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vscode/nx-run-target-view/src",
-  "projectType": "library",
-  "targets": {},
-  "tags": ["type:vscode"]
-}

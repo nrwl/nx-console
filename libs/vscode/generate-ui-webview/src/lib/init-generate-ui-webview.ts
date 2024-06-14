@@ -1,10 +1,5 @@
-import { GeneratorSchema } from '@nx-console/shared/generate-ui-types';
-import { isProjectOption } from '@nx-console/shared/schema';
 import { getGenerator } from '@nx-console/vscode/nx-cli-quickpicks';
-import {
-  getGeneratorContextV2,
-  getNxWorkspaceProjects,
-} from '@nx-console/vscode/nx-workspace';
+import { getGeneratorContextV2 } from '@nx-console/vscode/nx-workspace';
 import { ExtensionContext, Uri } from 'vscode';
 import { registerGenerateCommands } from './generate-commands';
 import { GenerateUiWebview } from './generate-ui-webview';
