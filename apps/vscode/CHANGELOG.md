@@ -1,3 +1,20 @@
+# [18.22.0](https://github.com/nrwl/nx-console/compare/vscode-v18.21.4...vscode-v18.22.0) (2024-06-17)
+
+
+### Bug Fixes
+
+* `npmDependencies` returns dependencies from `.nx/installation/node_modules` if `node_modules` is a file ([#2152](https://github.com/nrwl/nx-console/issues/2152)) ([7eb76f9](https://github.com/nrwl/nx-console/commit/7eb76f9f24c5be9d1a49eff9edc043fba21e4c0a))
+* **nxls:** load .env files in language server to make sure daemon client has access to them ([#2158](https://github.com/nrwl/nx-console/issues/2158)) ([3bb1514](https://github.com/nrwl/nx-console/commit/3bb151443bb46355f8cceca8fac5ef5624b8ab36))
+* **vscode:** empty state sidebar text & add init action ([#2163](https://github.com/nrwl/nx-console/issues/2163)) ([e25b5da](https://github.com/nrwl/nx-console/commit/e25b5da988371900af4986931e44a9ecede73f9c))
+* **vscode:** register workspace change listener in all cases ([#2162](https://github.com/nrwl/nx-console/issues/2162)) ([0bcf5ae](https://github.com/nrwl/nx-console/commit/0bcf5aefee70b9ebb0519beadfd2ba24ba853cf9))
+* **vscode:** update nxls workspacepath when changing it using the action ([#2155](https://github.com/nrwl/nx-console/issues/2155)) ([0ff5cce](https://github.com/nrwl/nx-console/commit/0ff5cced0574ec8661d5070283e29e35e825c34a))
+
+
+### Features
+
+* **vscode:** add nx errors to problems view & update empty view in error state ([#2143](https://github.com/nrwl/nx-console/issues/2143)) ([cf389ed](https://github.com/nrwl/nx-console/commit/cf389edaf77bce5c6b4249df6331c4ab853f6330))
+* **vscode:** merge run target & common commands views, refactorings and remove old generate ui ([#2166](https://github.com/nrwl/nx-console/issues/2166)) ([82d36fe](https://github.com/nrwl/nx-console/commit/82d36fee7c4f296e6fb52bc33f46329bb4bfb28e))
+
 ## [18.21.4](https://github.com/nrwl/nx-console/compare/vscode-v18.21.3...vscode-v18.21.4) (2024-05-27)
 
 
