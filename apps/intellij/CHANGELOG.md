@@ -1,3 +1,17 @@
+## 1.26.0 (2024-06-17)
+
+### Bug Fixes
+
+* `npmDependencies` returns dependencies from `.nx/installation/node_modules` if `node_modules` is a file ([#2152](https://github.com/nrwl/nx-console/issues/2152)) ([7eb76f9](https://github.com/nrwl/nx-console/commit/7eb76f9f24c5be9d1a49eff9edc043fba21e4c0a))
+* **intellij:** handle undefined generator description ([#2165](https://github.com/nrwl/nx-console/issues/2165)) ([ba89cd3](https://github.com/nrwl/nx-console/commit/ba89cd32201ecaeabf3b7ebe4b93fc82c3bd2152))
+* **nxls:** load .env files in language server to make sure daemon client has access to them ([#2158](https://github.com/nrwl/nx-console/issues/2158)) ([3bb1514](https://github.com/nrwl/nx-console/commit/3bb151443bb46355f8cceca8fac5ef5624b8ab36))
+
+
+### Features
+
+* **vscode:** add nx errors to problems view & update empty view in error state ([#2143](https://github.com/nrwl/nx-console/issues/2143)) ([cf389ed](https://github.com/nrwl/nx-console/commit/cf389edaf77bce5c6b4249df6331c4ab853f6330))
+* **vscode:** merge run target & common commands views, refactorings and remove old generate ui ([#2166](https://github.com/nrwl/nx-console/issues/2166)) ([82d36fe](https://github.com/nrwl/nx-console/commit/82d36fee7c4f296e6fb52bc33f46329bb4bfb28e))
+
 ## 1.25.0 (2024-05-27)
 
 ### Bug Fixes
