@@ -5,16 +5,7 @@
   "projectType": "application",
   "targets": {
     "test": {
-      "command": "jest --detectOpenHandles --runInBand --verbose",
-      "options": {
-        "cwd": "apps/nxls-e2e"
-      },
-      "dependsOn": [
-        {
-          "projects": "nxls",
-          "target": "build"
-        }
-      ]
+      "executor": "nx:noop"
     }
   },
   "tags": ["type:lsp"],

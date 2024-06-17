@@ -1,5 +1,5 @@
-import { stat, readdir } from 'fs/promises';
 import { join } from 'path';
+import { directoryExists, readDirectory } from '@nx-console/shared/file-system';
 
 /**
  * Get a flat list of all node_modules folders in the workspace.
@@ -20,47 +20,34 @@ export async function npmDependencies(workspacePath: string) {
   let nodeModulesDir = nodeModules;
 
   const res: string[] = [];
-  try {
-    if (!(await stat(nodeModules)).isDirectory()) {
+
+  if (!(await directoryExists(nodeModules))) {
+    if (!(await directoryExists(nodeModulesEncapsulated))) {
       return res;
-    }
-  } catch {
-    try {
-      if (!(await stat(nodeModulesEncapsulated)).isDirectory()) {
-        return res;
-      } else {
-        nodeModulesDir = nodeModulesEncapsulated;
-      }
-    } catch {
-      return res;
+    } else {
+      nodeModulesDir = nodeModulesEncapsulated;
     }
   }
 
-  const dirContents = await readdir(nodeModulesDir);
+  const dirContents = await readDirectory(nodeModulesDir);
 
   for (const npmPackageOrScope of dirContents) {
-    try {
-      if (npmPackageOrScope.startsWith('.')) {
-        continue;
-      }
-
-      const packageStats = await stat(join(nodeModulesDir, npmPackageOrScope));
-      if (!packageStats.isDirectory()) {
-        continue;
-      }
-
-      if (npmPackageOrScope.startsWith('@')) {
-        (await readdir(join(nodeModulesDir, npmPackageOrScope))).forEach(
-          (p) => {
-            res.push(`${nodeModulesDir}/${npmPackageOrScope}/${p}`);
-          }
-        );
-      } else {
-        res.push(`${nodeModulesDir}/${npmPackageOrScope}`);
-      }
-    } catch (e) {
-      // ignore packages where reading them causes an error
+    if (npmPackageOrScope.startsWith('.')) {
       continue;
+    }
+
+    if (!(await directoryExists(join(nodeModulesDir, npmPackageOrScope)))) {
+      continue;
+    }
+
+    if (npmPackageOrScope.startsWith('@')) {
+      (await readDirectory(join(nodeModulesDir, npmPackageOrScope))).forEach(
+        (p) => {
+          res.push(join(nodeModulesDir, npmPackageOrScope, p));
+        }
+      );
+    } else {
+      res.push(join(nodeModulesDir, npmPackageOrScope));
     }
   }
 

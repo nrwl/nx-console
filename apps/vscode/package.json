@@ -134,7 +134,7 @@
       "view/item/context": [
         {
           "command": "nxConsole.showProjectConfiguration",
-          "when": "view == nxProjects && viewItem == project || viewItem == target",
+          "when": "view == nxProjects && (viewItem == project || viewItem == target)",
           "group": "inline"
         },
         {
@@ -184,7 +184,7 @@
         },
         {
           "command": "nx.generate.ui.projectView",
-          "when": "view == nxProjects && viewItem == project && isNxWorkspace && config.nxConsole.useNewGenerateUiPreview",
+          "when": "view == nxProjects && viewItem == project && isNxWorkspace",
           "group": "navigation@1"
         },
         {
@@ -194,7 +194,12 @@
         },
         {
           "command": "nx.graph.task.button",
-          "when": "view == nxRunTarget && viewItem == runTarget && isNxWorkspace",
+          "when": "view == nxCommands && viewItem == target && isNxWorkspace",
+          "group": "inline@1"
+        },
+        {
+          "command": "nx.generate.ui",
+          "when": "view == nxCommands && viewItem == vscode-command-generate && isNxWorkspace",
           "group": "inline@1"
         }
       ],
@@ -334,6 +339,10 @@
         {
           "command": "nx.remove",
           "when": "isNxWorkspace"
+        },
+        {
+          "command": "nx.init",
+          "when": "false"
         },
         {
           "command": "nx.graph.showAll",
@@ -494,7 +503,8 @@
       {
         "category": "Nx",
         "title": "generate (ui)",
-        "command": "nx.generate.ui"
+        "command": "nx.generate.ui",
+        "icon": "$(browser)"
       },
       {
         "category": "Nx",
@@ -537,12 +547,22 @@
         "command": "nxConsole.migrateAngularCliToNx"
       },
       {
+        "category": "Nx",
+        "title": "Show Nx Language Server Logs",
+        "command": "nxConsole.showNxlsLogs"
+      },
+      {
         "title": "Add dependency to workspace",
         "command": "nxConsole.addDependency"
       },
       {
         "title": "Add dev dependency to workspace",
         "command": "nxConsole.addDevDependency"
+      },
+      {
+        "category": "Nx",
+        "title": "Nx Init",
+        "command": "nx.init"
       }
     ],
     "configuration": {
@@ -555,15 +575,15 @@
           },
           "scope": "resource",
           "default": [
+            "run",
+            "generate",
             "run-many",
             "affected",
             "affected:graph",
             "list",
-            "migrate",
-            "add-dependency",
-            "add-dev-dependency"
+            "migrate"
           ],
-          "markdownDescription": "Common Nx commands that will be available in the sidebar view. There are three categories of commands you can specify here: \n - Arbitrary Nx commands, like `build:example-app` or `nx run my-lib:test` (note that you can omit the prefixed `nx`) \n - Nx commands that are available through Nx Console, like `run-many`. They will be executed using the Nx Console UI. \n - `add-depedency` and `add-dev-dependency` commands will be executed using the Nx Console UI for adding dependencies to the workspace."
+          "markdownDescription": "Common Nx commands that will be available in the sidebar view. You can specify either \n - Arbitrary Nx commands, like `build:example-app` or `nx run my-lib:test` (note that you can omit the prefixed `nx`) or  \n - Nx commands that are available through Nx Console, like `run-many`. They will be executed using the Nx Console UI."
         },
         "nxConsole.enableGenerateFromContextMenu": {
           "type": "boolean",
@@ -629,12 +649,6 @@
             "type": "string"
           },
           "description": "Controls which collections (re)move generators will be used for a project matching a given wildcard pattern. \nIf a path matches multiple patterns, the last match will be used.\nIf a path matches no pattern, you can decide manually.\n Example: { \"libs/frontend/*\": \"@nx/angular\",  \"libs/backend/*\": \"@nx-dotnet\", }"
-        },
-        "nxConsole.useNewGenerateUiPreview": {
-          "type": "boolean",
-          "scope": "application",
-          "default": true,
-          "description": "Use the new Generate UI - still in development."
         },
         "nxConsole.showProjectDetailsView": {
           "type": "boolean",
@@ -712,11 +726,7 @@
     "viewsWelcome": [
       {
         "view": "nxConsole.views.welcome",
-        "contents": "Nx Console - The UI for Nx"
-      },
-      {
-        "view": "nxConsole.views.welcome",
-        "contents": "[Getting Started](https://nx.dev/using-nx/console#nx-console-for-vscode)"
+        "contents": "It looks like you're not inside an Nx workspace. Click the button below to add nx to your current workspace by running [nx init](https://nx.dev/recipes/adopting-nx/adding-to-existing-project). \n [Add Nx](command:nx.init)\n If your Nx workspace is in a different folder, you can manually select it below. \n[Select Workspace](command:nxConsole.selectWorkspaceManually)\nLearn more about Nx on [nx.dev](https://nx.dev) or check out the [Nx Console Documentation](https://nx.dev/getting-started/editor-setup)."
       },
       {
         "view": "nxConsole.views.angular-welcome",
@@ -724,7 +734,13 @@
       },
       {
         "view": "nxProjects",
-        "contents": "We couldn't find any projects in this workspace. \n Make sure that the proper dependencies are installed locally and refresh the workspace. \n [Refresh Workspace](command:nxConsole.refreshWorkspace)\n If you're just getting started with Nx, you can [use generators](https://nx.dev/plugin-features/use-code-generators) to quickly scaffold new projects or [add them manually](https://nx.dev/reference/project-configuration)."
+        "contents": "We couldn't find any projects in this workspace. \n Make sure that the proper dependencies are installed locally and refresh the workspace. \n [Refresh Workspace](command:nxConsole.refreshWorkspace)\n If you're just getting started with Nx, you can [use generators](https://nx.dev/plugin-features/use-code-generators?utm_source=nxconsole) to quickly scaffold new projects or [add them manually](https://nx.dev/reference/project-configuration?utm_source=nxconsole).",
+        "when": "!nxConsole.hasWorkspaceErrors"
+      },
+      {
+        "view": "nxProjects",
+        "contents": "Nx caught one or more errors while computing your project graph. \n [View Errors](command:workbench.actions.view.problems)\n If the problems persist, you can try running `nx reset` to clear all caches and then [refresh the workspace](command:nxConsole.refreshWorkspace)\n For more information, view the [Nx Language Server logs](command:nxConsole.showNxlsLogs) and refer to the [Nx Troubleshooting Guide](https://nx.dev/troubleshooting/troubleshoot-nx-install-issues?utm_source=nxconsole) and the [Nx Console Troubleshooting Guide](https://nx.dev/recipes/nx-console/console-troubleshooting?utm_source=nxconsole).",
+        "when": "nxConsole.hasWorkspaceErrors"
       }
     ],
     "walkthroughs": [
@@ -780,9 +796,9 @@
       "nx-console": [
         {
           "id": "nxConsole.views.welcome",
-          "name": "Welcome",
+          "name": "Welcome to Nx Console",
           "when": "!isNxWorkspace && !isAngularWorkspace",
-          "contextualTitle": "Nx Console Getting Started",
+          "contextualTitle": "Nx Console - Getting Started",
           "icon": "tree-view-icon.svg",
           "visibility": "visible"
         },
@@ -800,10 +816,6 @@
           "when": "isNxWorkspace"
         },
         {
-          "id": "nxRunTarget",
-          "name": "Generate & Run Target"
-        },
-        {
           "id": "nxCommands",
           "name": "Common Nx Commands",
           "when": "isNxWorkspace"
@@ -811,7 +823,6 @@
         {
           "id": "nxHelpAndFeedback",
           "name": "Help and Feedback",
-          "when": "isNxWorkspace",
           "visibility": "collapsed"
         }
       ]

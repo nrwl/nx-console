@@ -74,7 +74,7 @@ class V2NxGenerateUiFile(
                     GeneratorSchema(
                         generatorName = generator.data.name,
                         collectionName = generator.data.collection,
-                        description = generator.data.description,
+                        description = generator.data.description ?: "",
                         options = generator.options,
                         context = generator.contextValues
                     )

@@ -141,12 +141,14 @@ export async function getNxWorkspaceConfig(
             projectGraph = e.getPartialProjectGraph();
             sourceMaps = e.getPartialSourcemaps();
             errors = e.getErrors().map((error) => ({
+              name: error.name,
               message: error.message,
               stack: error.stack,
               file:
-                (e as any).file ??
-                ((e as any).cause as any)?.errors?.[0]?.location?.file,
+                (error as any).file ??
+                ((error as any).cause as any)?.errors?.[0]?.location?.file,
               pluginName: (error as any).pluginName,
+              cause: (error as any).cause,
             }));
             isPartial = true;
           } else {

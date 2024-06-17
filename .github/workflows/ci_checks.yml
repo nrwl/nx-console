@@ -7,11 +7,14 @@ on:
 
 env:
   node_version: 20
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_READ_WRITE_TOKEN }}
 
 jobs:
   main-linux:
     name: Main Linux
     runs-on: ubuntu-latest
+    env:
+      NX_CI_EXECUTION_ENV: 'linux'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,10 +24,9 @@ jobs:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
+      - run: npx nx-cloud validate --workflow-file=./.nx/workflows/agents.yaml
       - run: |
-          npx nx-cloud start-ci-run \
-            --distribute-on="3 linux-medium-js" \
-            --stop-agents-after="e2e"
+          npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
       - uses: browser-actions/setup-chrome@v1
       - run: chrome --version
       - name: Use Node.js ${{ env.node_version }}
@@ -40,8 +42,8 @@ jobs:
           npx nx-cloud record -- ./gradlew ktfmtCheck
         env:
           NX_CLOUD_DISTRIBUTED_EXECUTION: false
-      - run: yarn nx affected --t=lint,test,build --configuration=ci --exclude=nx-console --verbose
-      - run: yarn nx affected --t=e2e,e2e-ci --configuration=ci --exclude=nx-console --parallel=1 --verbose
+      - run: npx nx affected --targets=lint,test,build --configuration=ci --exclude=nx-console --parallel=1
+      - run: npx nx affected --targets=e2e,e2e-local --configuration=ci --exclude=nx-console --parallel=1
   main-windows:
     name: Main Windows
     runs-on: windows-latest
@@ -50,6 +52,7 @@ jobs:
       GIT_AUTHOR_NAME: Test
       GIT_COMMITTER_EMAIL: test@test.com
       GIT_COMMITTER_NAME: Test
+      NX_CI_EXECUTION_ENV: 'windows'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,10 +62,8 @@ jobs:
           main-branch-name: 'master'
       - run: git branch --track master origin/master
         if: ${{ github.event_name == 'pull_request' }}
-      # - run: |
-      #     npx nx-cloud start-ci-run \
-      #       --distribute-on="3 custom-linux-medium-js" \
-      #       --stop-agents-after="e2e"
+      - run: |
+          npx nx-cloud start-ci-run --distribute-on="3 windows-medium-js" --with-env-vars="GIT_AUTHOR_EMAIL,GIT_AUTHOR_NAME,GIT_COMMITTER_EMAIL,GIT_COMMITTER_NAME,NX_CI_EXECUTION_ENV"
       - uses: browser-actions/setup-chrome@v1
       - name: Use Node.js ${{ env.node_version }}
         uses: actions/setup-node@v2
@@ -79,7 +80,8 @@ jobs:
           distribution: zulu
           java-version: 17
           cache: gradle
-      # there's no need to check formatting & linting again on windows
-      - run: yarn nx affected --t=test,build --configuration=ci --exclude=nx-console --verbose
-      - run: yarn nx affected --t=e2e,e2e-ci --configuration=ci --exclude=nx-console --parallel=1 --verbose
-        timeout-minutes: 45
+      # there's no need to check formatting & linting again on windows, sometimes there's a timing issue with intellij:build so run it up front
+      - run: npx nx run intellij:build --info
+      - run: npx nx affected --targets="build,test" --configuration=ci --exclude=nx-console --parallel=1
+      - run: npx nx affected --targets="e2e,e2e-local" --configuration=ci --exclude=nx-console --parallel=1
+        timeout-minutes: 60

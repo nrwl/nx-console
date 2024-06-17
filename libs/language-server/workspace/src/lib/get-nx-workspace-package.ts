@@ -1,4 +1,3 @@
-// import { getOutputChannel } from '@nx-console/utils';
 import type * as NxFileUtils from 'nx/src/project-graph/file-utils';
 import type * as NxProjectGraph from 'nx/src/project-graph/project-graph';
 import type * as NxProjectGraphFileUtils from 'nx/src/project-graph/file-map-utils';

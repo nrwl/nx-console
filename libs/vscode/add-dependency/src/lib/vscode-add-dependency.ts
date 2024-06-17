@@ -7,7 +7,6 @@ import {
 import {
   getShellExecutionForConfig,
   getTelemetry,
-  logAndShowTaskCreationError,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 import { existsSync } from 'fs';
@@ -28,6 +27,7 @@ import { execSync } from 'child_process';
 import { major } from 'semver';
 import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import { importNxPackagePath } from '@nx-console/shared/npm';
+import { logAndShowTaskCreationError } from '@nx-console/vscode/output-channels';
 
 export const ADD_DEPENDENCY_COMMAND = 'nxConsole.addDependency';
 export const ADD_DEV_DEPENDENCY_COMMAND = 'nxConsole.addDevDependency';

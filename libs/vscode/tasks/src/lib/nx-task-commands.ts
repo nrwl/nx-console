@@ -12,14 +12,15 @@ import { readAndParseJson } from '@nx-console/shared/file-system';
 import { getNxWorkspace } from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
-  logAndShowError,
   resolveDependencyVersioning,
 } from '@nx-console/vscode/utils';
 
+import { getNxWorkspacePath } from '@nx-console/vscode/configuration';
 import {
   selectAffectedFlags,
   selectRunManyFlags,
 } from '@nx-console/vscode/nx-cli-quickpicks';
+import { logAndShowError } from '@nx-console/vscode/output-channels';
 import { NxTask } from './nx-task';
 
 export function registerNxCommands(context: ExtensionContext) {
@@ -151,14 +152,20 @@ async function promptForMigrate() {
   const telemetry = getTelemetry();
   telemetry.featureUsed('migrate command');
 
-  const workspacePath = (await getNxWorkspace())?.workspacePath;
+  const workspacePath = getNxWorkspacePath();
 
   if (!workspacePath) {
     return;
   }
 
+  const isEncapsulatedNx = (await getNxWorkspace())?.isEncapsulatedNx ?? false;
   const packageJson = await readAndParseJson(
-    join(workspacePath, 'package.json')
+    join(
+      workspacePath,
+      isEncapsulatedNx
+        ? join('.nx', 'installation', 'package.json')
+        : 'package.json'
+    )
   );
 
   const dependencyToMigrate = await window.showQuickPick(

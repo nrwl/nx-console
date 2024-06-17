@@ -42,8 +42,10 @@ export interface NxWorkspace {
 }
 
 export type NxError = {
+  name?: string;
   message?: string;
   file?: string;
   plugin?: string;
   stack?: string;
+  cause?: any;
 };

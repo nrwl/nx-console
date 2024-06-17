@@ -1,13 +1,10 @@
 import { existsSync } from 'fs';
 import { dirname, join, parse } from 'path';
 import {
+  Disposable,
   ExtensionContext,
   ExtensionMode,
-  FileSystemWatcher,
   RelativePattern,
-  TreeItem,
-  TreeView,
-  Uri,
   commands,
   tasks,
   window,
@@ -24,53 +21,47 @@ import {
   NxProjectTreeProvider,
   initNxProjectView,
 } from '@nx-console/vscode/nx-project-view';
-import {
-  LOCATE_YOUR_WORKSPACE,
-  RunTargetTreeItem,
-  RunTargetTreeProvider,
-} from '@nx-console/vscode/nx-run-target-view';
 import { CliTaskProvider, initTasks } from '@nx-console/vscode/tasks';
 import {
-  getOutputChannel,
   getTelemetry,
   initTelemetry,
   watchCodeLensConfigChange,
   watchFile,
 } from '@nx-console/vscode/utils';
-import { revealWebViewPanel } from '@nx-console/vscode/webview';
 
 import { fileExists } from '@nx-console/shared/file-system';
 import {
   AddDependencyCodelensProvider,
   registerVscodeAddDependency,
 } from '@nx-console/vscode/add-dependency';
-import {
-  initGenerateUiWebview,
-  openGenerateUi,
-} from '@nx-console/vscode/generate-ui-webview';
+import { initGenerateUiWebview } from '@nx-console/vscode/generate-ui-webview';
 import { createNxlsClient, getNxlsClient } from '@nx-console/vscode/lsp-client';
 import { initNxConfigDecoration } from '@nx-console/vscode/nx-config-decoration';
 import { initNxConversion } from '@nx-console/vscode/nx-conversion';
-import {
-  NxHelpAndFeedbackProvider,
-  NxHelpAndFeedbackTreeItem,
-} from '@nx-console/vscode/nx-help-and-feedback-view';
-import { getNxWorkspace, stopDaemon } from '@nx-console/vscode/nx-workspace';
+import { initHelpAndFeedbackView } from '@nx-console/vscode/nx-help-and-feedback-view';
+import { stopDaemon } from '@nx-console/vscode/nx-workspace';
 import { initVscodeProjectGraph } from '@nx-console/vscode/project-graph';
 import { enableTypeScriptPlugin } from '@nx-console/vscode/typescript-plugin';
 
+import {
+  NxStopDaemonRequest,
+  NxWorkspaceRefreshNotification,
+  NxWorkspaceRequest,
+} from '@nx-console/language-server/types';
+import { initErrorDiagnostics } from '@nx-console/vscode/error-diagnostics';
 import { initNvmTip } from '@nx-console/vscode/nvm-tip';
+import {
+  getOutputChannel,
+  initOutputChannels,
+} from '@nx-console/vscode/output-channels';
 import { initVscodeProjectDetails } from '@nx-console/vscode/project-details';
+import { initNxInit } from './nx-init';
 import { registerRefreshWorkspace } from './refresh-workspace';
 
-let runTargetTreeView: TreeView<RunTargetTreeItem>;
-let nxHelpAndFeedbackTreeView: TreeView<NxHelpAndFeedbackTreeItem | TreeItem>;
-
-let currentRunTargetTreeProvider: RunTargetTreeProvider;
 let nxProjectsTreeProvider: NxProjectTreeProvider;
 
 let context: ExtensionContext;
-let workspaceFileWatcher: FileSystemWatcher | undefined;
+let workspaceFileWatcher: Disposable | undefined;
 
 let isNxWorkspace = false;
 
@@ -85,9 +76,11 @@ export async function activate(c: ExtensionContext) {
     WorkspaceConfigurationStore.fromContext(context);
 
     initTelemetry(context.extensionMode === ExtensionMode.Production);
+    initNxInit(context);
 
+    initHelpAndFeedbackView(context);
     const manuallySelectWorkspaceDefinitionCommand = commands.registerCommand(
-      LOCATE_YOUR_WORKSPACE.command?.command || '',
+      'nxConsole.selectWorkspaceManually',
       async () => {
         manuallySelectWorkspaceDefinition();
       }
@@ -97,20 +90,16 @@ export async function activate(c: ExtensionContext) {
 
     if (vscodeWorkspacePath) {
       await scanForWorkspace(vscodeWorkspacePath);
+
+      if (!isNxWorkspace && !workspaceFileWatcher) {
+        registerWorkspaceFileWatcher(context, vscodeWorkspacePath);
+      }
     }
 
-    context.subscriptions.push(
-      runTargetTreeView,
-      manuallySelectWorkspaceDefinitionCommand
-    );
+    context.subscriptions.push(manuallySelectWorkspaceDefinitionCommand);
 
     await enableTypeScriptPlugin(context);
     watchCodeLensConfigChange(context);
-
-    currentRunTargetTreeProvider = new RunTargetTreeProvider(context);
-    runTargetTreeView = window.createTreeView('nxRunTarget', {
-      treeDataProvider: currentRunTargetTreeProvider,
-    }) as TreeView<RunTargetTreeItem>;
 
     getTelemetry().extensionActivated((Date.now() - startTime) / 1000);
   } catch (e) {
@@ -127,6 +116,7 @@ export async function activate(c: ExtensionContext) {
 export async function deactivate() {
   await stopDaemon();
   await getNxlsClient()?.stop();
+  workspaceFileWatcher?.dispose();
   getTelemetry().extensionDeactivated();
 }
 
@@ -215,54 +205,26 @@ async function setWorkspace(workspacePath: string) {
 
     registerRefreshWorkspace(context);
 
-    const revealWebViewPanelCommand = commands.registerCommand(
-      'nxConsole.revealWebViewPanel',
-      async (runTargetTreeItem: RunTargetTreeItem, contextMenuUri?: Uri) => {
-        const newGenUi = GlobalConfigurationStore.instance.get(
-          'useNewGenerateUiPreview'
-        );
-        if (newGenUi) {
-          openGenerateUi(contextMenuUri);
-        } else {
-          revealWebViewPanel({
-            runTargetTreeItem,
-            context,
-            runTargetTreeView,
-            contextMenuUri,
-            generator: runTargetTreeItem.generator,
-          });
-        }
-      }
-    );
-
     initGenerateUiWebview(context);
 
     initNxCommandsView(context);
     initNvmTip(context);
     initVscodeProjectDetails(context);
     initVscodeProjectGraph(context);
+    initErrorDiagnostics(context);
+    initOutputChannels(context);
 
     nxProjectsTreeProvider = initNxProjectView(context);
-
-    nxHelpAndFeedbackTreeView = window.createTreeView('nxHelpAndFeedback', {
-      treeDataProvider: new NxHelpAndFeedbackProvider(context),
-    });
 
     initNxConfigDecoration(context);
 
     new AddDependencyCodelensProvider();
-
-    context.subscriptions.push(
-      nxHelpAndFeedbackTreeView,
-      revealWebViewPanelCommand
-    );
   } else {
     WorkspaceConfigurationStore.instance.set('nxWorkspacePath', workspacePath);
   }
 
   registerWorkspaceFileWatcher(context, workspacePath);
 
-  currentRunTargetTreeProvider?.refresh();
   nxProjectsTreeProvider?.refresh();
 
   commands.executeCommand(
@@ -283,25 +245,63 @@ async function registerWorkspaceFileWatcher(
     workspaceFileWatcher.dispose();
   }
 
-  const workspaceLayout = (await getNxWorkspace())?.workspaceLayout;
-  const workspacePackageDirs = new Set<string>();
-  if (workspaceLayout?.appsDir) {
-    workspacePackageDirs.add(workspaceLayout.appsDir);
-  }
-  if (workspaceLayout?.libsDir) {
-    workspacePackageDirs.add(workspaceLayout.libsDir);
-  }
-  workspacePackageDirs.add('packages');
-  context.subscriptions.push(
-    watchFile(
-      new RelativePattern(workspacePath, '{workspace,angular,nx,project}.json'),
-      () => {
-        if (!isNxWorkspace) {
-          setTimeout(() => {
-            setWorkspace(workspacePath);
-          }, 1000);
+  workspaceFileWatcher = watchFile(
+    new RelativePattern(workspacePath, '{workspace,angular,nx,project}.json'),
+    async () => {
+      if (!isNxWorkspace) {
+        await setWorkspace(workspacePath);
+        if (isNxWorkspace) {
+          getOutputChannel().appendLine(
+            'Detected Nx workspace. Refreshing workspace.'
+          );
+          refreshWorkspaceWithBackoff();
         }
       }
-    )
+    }
   );
+
+  context.subscriptions.push(workspaceFileWatcher);
+
+  // when initializing Nx, there can be timing issues as the nxls starts up
+  // we make sure to refresh the workspace periodically as we start up so that we have the latest info
+  async function refreshWorkspaceWithBackoff(iteration = 1) {
+    if (iteration > 3) {
+      return;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1000 * iteration));
+
+    const nxlsClient = getNxlsClient();
+    if (!nxlsClient) {
+      return;
+    }
+
+    const workspace = await nxlsClient.sendRequest(NxWorkspaceRequest, {
+      reset: false,
+    });
+
+    const projects = workspace?.workspace.projects;
+    if (projects && Object.keys(projects).length > 0) {
+      return;
+    } else {
+      try {
+        await Promise.race([
+          nxlsClient.sendRequest(NxStopDaemonRequest, undefined),
+          new Promise((resolve) => setTimeout(resolve, 2000)),
+        ]);
+      } catch (e) {
+        // errors while stopping the daemon aren't critical
+      }
+
+      nxlsClient.sendNotification(NxWorkspaceRefreshNotification);
+
+      await new Promise<void>((resolve) => {
+        const disposable = nxlsClient.subscribeToRefresh(() => {
+          disposable.dispose();
+          resolve();
+        });
+      });
+      refreshWorkspaceWithBackoff(iteration + 1);
+    }
+  }
 }

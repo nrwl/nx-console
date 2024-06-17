@@ -4,7 +4,6 @@ import {
   ProjectViewItem,
   TargetViewItem,
 } from '@nx-console/vscode/nx-project-view';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   getNxWorkspace,
   getProjectByPath,
@@ -15,6 +14,7 @@ import { Disposable, Uri, commands, window } from 'vscode';
 import { MessageType } from './graph-message-type';
 import { GraphWebView } from './graph-webview';
 import { onWorkspaceRefreshed } from '@nx-console/vscode/lsp-client';
+import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
 
 export function legacyShowAll(graphWebView: GraphWebView) {
   graphWebView.showAllProjects();
@@ -66,7 +66,7 @@ export function legacyTask(graphWebView: GraphWebView, uri: Uri | undefined) {
 
 export function legacyTaskButton(
   graphWebView: GraphWebView,
-  item: RunTargetTreeItem | NxTreeItem | [project: string, task: string]
+  item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
 ) {
   if (item instanceof NxTreeItem) {
     const project = getTaskItem(item);
@@ -77,9 +77,10 @@ export function legacyTaskButton(
         MessageType.task
       );
     }
-  } else if (item instanceof RunTargetTreeItem) {
-    const target = item.commandString;
-    graphWebView.showAllTasks(target);
+  } else if (item instanceof NxCommandsTreeItem) {
+    if (item.commandConfig.type === 'target') {
+      graphWebView.showAllTasks(item.commandConfig.target);
+    }
   } else graphWebView.projectInWebview(item[0], item[1], MessageType.task);
 }
 
@@ -140,7 +141,7 @@ export function projectGraph() {
     commands.registerCommand(
       'nx.graph.task.button',
       async (
-        item: RunTargetTreeItem | NxTreeItem | [project: string, task: string]
+        item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
       ) => {
         getTelemetry().featureUsed('nx.graph.task.button');
 
@@ -153,9 +154,10 @@ export function projectGraph() {
               MessageType.task
             );
           }
-        } else if (item instanceof RunTargetTreeItem) {
-          const target = item.commandString;
-          graphWebView.showAllTasks(target);
+        } else if (item instanceof NxCommandsTreeItem) {
+          if (item.commandConfig.type === 'target') {
+            graphWebView.showAllTasks(item.commandConfig.target);
+          }
         } else
           graphWebView.projectInWebview(item[0], item[1], MessageType.task);
       }

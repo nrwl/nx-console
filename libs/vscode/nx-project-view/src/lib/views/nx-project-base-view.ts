@@ -3,9 +3,10 @@ import type {
   TargetConfiguration,
 } from 'nx/src/devkit-exports';
 import { getNxWorkspaceProjects } from '@nx-console/vscode/nx-workspace';
-import { getOutputChannel, getWorkspacePath } from '@nx-console/vscode/utils';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 import { join } from 'node:path';
 import { TreeItemCollapsibleState } from 'vscode';
+import { getWorkspacePath } from '@nx-console/vscode/utils';
 
 export interface ProjectViewStrategy<T> {
   getChildren(element?: T): Promise<T[] | undefined>;

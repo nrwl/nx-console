@@ -3,7 +3,6 @@ import {
   selectTarget,
 } from '@nx-console/vscode/nx-cli-quickpicks';
 import { NxTreeItem } from '@nx-console/vscode/nx-project-view';
-import { RunTargetTreeItem } from '@nx-console/vscode/nx-run-target-view';
 import {
   getNxVersion,
   getNxWorkspaceProjects,
@@ -11,7 +10,6 @@ import {
 } from '@nx-console/vscode/nx-workspace';
 import {
   getTelemetry,
-  showNoNxVersionMessage,
   showNoProjectAtPathMessage,
 } from '@nx-console/vscode/utils';
 import type { ProjectConfiguration } from 'nx/src/devkit-exports';
@@ -29,6 +27,8 @@ import {
   legacyTask,
   legacyTaskButton,
 } from './legacy-implementation/project-graph';
+import { showNoNxVersionMessage } from '@nx-console/vscode/output-channels';
+import { NxCommandsTreeItem } from '@nx-console/vscode/nx-commands-view';
 
 let _graphWebviewManager: GraphWebviewManager | undefined;
 
@@ -175,7 +175,7 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
     commands.registerCommand(
       'nx.graph.task.button',
       async (
-        item: RunTargetTreeItem | NxTreeItem | [project: string, task: string]
+        item: NxCommandsTreeItem | NxTreeItem | [project: string, task: string]
       ) => {
         getTelemetry().featureUsed('nx.graph.task.button');
         const nxVersion = await getNxVersion();
@@ -190,9 +190,12 @@ export async function initVscodeProjectGraph(context: ExtensionContext) {
             if (project && target) {
               graphWebviewManager.focusTarget(project.project, target.name);
             }
-          } else if (item instanceof RunTargetTreeItem) {
-            const target = item.commandString;
-            graphWebviewManager.showAllTargetsByName(target);
+          } else if (item instanceof NxCommandsTreeItem) {
+            if (item.commandConfig.type === 'target') {
+              graphWebviewManager.showAllTargetsByName(
+                item.commandConfig.target
+              );
+            }
           } else if (Array.isArray(item))
             graphWebviewManager.focusTarget(item[0], item[1]);
         } else {

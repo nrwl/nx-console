@@ -7,5 +7,6 @@ export default {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  testTimeout: 2700000,
+  testTimeout: 600000,
+  globalSetup: './global-setup.ts',
 };

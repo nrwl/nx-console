@@ -135,9 +135,13 @@ export async function selectGeneratorAndPromptForFlags(
     preselectedFlags
   );
 
+  if (!flags) {
+    return;
+  }
+
   return {
     generator: selection,
-    flags: flags ?? [],
+    flags,
   };
 }
 

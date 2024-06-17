@@ -5,11 +5,7 @@ import {
   getProjectGraphOutput,
   hasAffectedProjects,
 } from '@nx-console/vscode/nx-workspace';
-import {
-  getOutputChannel,
-  getTelemetry,
-  showNoProjectsMessage,
-} from '@nx-console/vscode/utils';
+import { getTelemetry, showNoProjectsMessage } from '@nx-console/vscode/utils';
 import {
   commands,
   Disposable,
@@ -25,6 +21,7 @@ import { loadError, loadHtml, loadNoProject, loadSpinner } from './load-html';
 import { join } from 'node:path';
 import { CliTaskProvider } from '@nx-console/vscode/tasks';
 import { revealNxProject } from '@nx-console/vscode/nx-config-decoration';
+import { getOutputChannel } from '@nx-console/vscode/output-channels';
 
 export class GraphWebView implements Disposable {
   panel: WebviewPanel | undefined;

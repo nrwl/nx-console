@@ -21,7 +21,7 @@ data class NxGenerator(
 data class NxGeneratorData(
     val collection: String,
     val name: String,
-    val description: String,
+    val description: String?,
     val type: String,
     val aliases: List<String>
 ) {

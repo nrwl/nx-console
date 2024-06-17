@@ -73,6 +73,9 @@
       "@nx-console/vscode/configuration": [
         "libs/vscode/configuration/src/index.ts"
       ],
+      "@nx-console/vscode/error-diagnostics": [
+        "libs/vscode/error-diagnostics/src/index.ts"
+      ],
       "@nx-console/vscode/generate-ui-webview": [
         "libs/vscode/generate-ui-webview/src/index.ts"
       ],
@@ -97,11 +100,11 @@
       "@nx-console/vscode/nx-project-view": [
         "libs/vscode/nx-project-view/src/index.ts"
       ],
-      "@nx-console/vscode/nx-run-target-view": [
-        "libs/vscode/nx-run-target-view/src/index.ts"
-      ],
       "@nx-console/vscode/nx-workspace": [
         "libs/vscode/nx-workspace/src/index.ts"
+      ],
+      "@nx-console/vscode/output-channels": [
+        "libs/vscode/output-channels/src/index.ts"
       ],
       "@nx-console/vscode/project-details": [
         "libs/vscode/project-details/src/index.ts"
@@ -115,7 +118,6 @@
       ],
       "@nx-console/vscode/utils": ["libs/vscode/utils/src/index.ts"],
       "@nx-console/vscode/verify": ["libs/vscode/verify/src/index.ts"],
-      "@nx-console/vscode/webview": ["libs/vscode/webview/src/index.ts"],
       "nxls-e2e": ["apps/nxls-e2e/src/index.ts"],
       "shared/nx-console-plugins": [
         "libs/shared/nx-console-plugins/src/index.ts"

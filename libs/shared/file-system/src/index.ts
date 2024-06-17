@@ -5,4 +5,5 @@ export { readAndCacheJsonFile } from './lib/cache-json';
 export { clearJsonCache } from './lib/cache-json';
 export { readAndParseJson } from './lib/cache-json';
 export { listFiles } from './lib/list-files';
+export { readDirectory } from './lib/read-directory';
 export { readFile } from './lib/read-file';

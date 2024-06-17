@@ -98,9 +98,13 @@
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
       "!{projectRoot}/tsconfig.storybook.json",
       "!{projectRoot}/src/test-setup.[jt]s"
+    ],
+    "sharedGlobals": [
+      {
+        "runtime": "node -p '`${process.platform}_${process.arch}`'"
+      }
     ]
   },
-  "nxCloudAccessToken": "YTg3Yzk1YWMtZTQ3MC00MTIwLTkyM2ItMjAyMGI0ZTJlZDc3fHJlYWQtd3JpdGU=",
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
@@ -110,8 +114,16 @@
     },
     {
       "plugin": "@nx/jest/plugin",
+      "exclude": ["apps/nxls-e2e/**/*"],
       "options": {
         "targetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/jest/plugin",
+      "include": ["apps/nxls-e2e/**/*"],
+      "options": {
+        "ciTargetName": "e2e"
       }
     },
     {
@@ -130,5 +142,7 @@
       }
     }
   ],
-  "defaultBase": "master"
+  "defaultBase": "master",
+  "nxCloudAccessToken": "NzA4Y2E2M2QtOTc2Ny00MzEwLWE1ODMtYTRhYjRkNjY0NWUwfHJlYWQ=",
+  "nxCloudUrl": "https://staging.nx.app"
 }
