@@ -86,31 +86,23 @@ describe('watcher', () => {
   });
 
   it('should send 4 refresh notifications after error and still handle changes', async () => {
-    console.log('----- 4x test ----- ');
     await waitFor(2000);
-    console.log('--- wait for done');
     const oldContents = readFileSync(projectJsonPath, 'utf-8');
-    console.log('--- readfile done');
     writeFileSync(projectJsonPath, 'invalid json', {
       encoding: 'utf-8',
     });
-    console.log('--- write file done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    console.log('--- first refresh done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    console.log('--- second refresh done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    console.log('--- third refresh done');
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    console.log('--- fourth refresh done');
 
     // we need to wait until the daemon watcher ultimately fails
     // and the native watcher is started
@@ -119,7 +111,6 @@ describe('watcher', () => {
     await nxlsWrapper.waitForNotification(
       NxWorkspaceRefreshNotification.method
     );
-    console.log('----- 4x test end ----- ');
   });
 
   it('should not send refresh notification when project files are not changed', async () => {
