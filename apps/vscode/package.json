@@ -198,7 +198,7 @@
           "group": "inline@1"
         },
         {
-          "command": "nx.generate",
+          "command": "nx.generate.quickpick",
           "when": "view == nxCommands && viewItem == generate && isNxWorkspace",
           "group": "inline@1"
         }
@@ -253,7 +253,7 @@
           "when": "isNxWorkspace"
         },
         {
-          "command": "nx.generate",
+          "command": "nx.generate.quickpick",
           "when": "isNxWorkspace"
         },
         {
@@ -402,7 +402,7 @@
       {
         "category": "Nx",
         "title": "Generate (quickpick)",
-        "command": "nx.generate",
+        "command": "nx.generate.quickpick",
         "icon": "$(terminal)"
       },
       {
@@ -509,12 +509,12 @@
       },
       {
         "category": "Nx",
-        "title": "Nx generate",
+        "title": "Nx Generate (UI)",
         "command": "nx.generate.ui.fileexplorer"
       },
       {
         "category": "Nx",
-        "title": "Nx generate",
+        "title": "Nx Generate (UI)",
         "command": "nx.generate.ui.projectView"
       },
       {
