@@ -20,6 +20,11 @@ export async function registerGenerateCommands(context: ExtensionContext) {
         preselectedGenerator?: string,
         preselectedFlags?: Record<string, string>
       ) => {
+        if (typeof preselectedGenerator !== 'string') {
+          // the command is called from a context menu, different signature - set to undefined as workaround
+          preselectedGenerator = undefined;
+          preselectedFlags = undefined;
+        }
         getTelemetry().featureUsed('nx.generate');
         const result = await selectGeneratorAndPromptForFlags(
           preselectedGenerator,

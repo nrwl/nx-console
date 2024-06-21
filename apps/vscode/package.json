@@ -198,8 +198,8 @@
           "group": "inline@1"
         },
         {
-          "command": "nx.generate.ui",
-          "when": "view == nxCommands && viewItem == vscode-command-generate && isNxWorkspace",
+          "command": "nx.generate",
+          "when": "view == nxCommands && viewItem == generate && isNxWorkspace",
           "group": "inline@1"
         }
       ],
@@ -401,8 +401,9 @@
       },
       {
         "category": "Nx",
-        "title": "generate",
-        "command": "nx.generate"
+        "title": "Generate (quickpick)",
+        "command": "nx.generate",
+        "icon": "$(terminal)"
       },
       {
         "category": "Nx",
@@ -502,7 +503,7 @@
       },
       {
         "category": "Nx",
-        "title": "generate (ui)",
+        "title": "Generate (ui)",
         "command": "nx.generate.ui",
         "icon": "$(browser)"
       },
@@ -576,7 +577,6 @@
           "scope": "resource",
           "default": [
             "run",
-            "generate",
             "run-many",
             "affected",
             "affected:graph",

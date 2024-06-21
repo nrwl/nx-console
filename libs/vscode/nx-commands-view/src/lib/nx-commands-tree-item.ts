@@ -9,6 +9,7 @@ import { join } from 'path';
 import { EXECUTE_ARBITRARY_COMMAND } from './init-nx-commands-view';
 
 export type NxCommandConfig =
+  | { type: 'generate' }
   | {
       type: 'add-dependency';
     }
@@ -35,16 +36,7 @@ export class NxCommandsTreeItem extends TreeItem {
   ) {
     super('', TreeItemCollapsibleState.None);
 
-    // we want to show a unique inline action for only the generate command
-    // so we special case it here
-    if (
-      commandConfig.type === 'vscode-command' &&
-      commandConfig.command === 'nx.generate'
-    ) {
-      this.contextValue = 'vscode-command-generate';
-    } else {
-      this.contextValue = commandConfig.type;
-    }
+    this.contextValue = commandConfig.type;
 
     this.label = this.getLabel(commandConfig);
 
@@ -54,7 +46,9 @@ export class NxCommandsTreeItem extends TreeItem {
   }
 
   private getLabel(commandConfig: NxCommandConfig): string {
-    if (commandConfig.type === 'add-dependency') {
+    if (commandConfig.type === 'generate') {
+      return 'Generate (UI)';
+    } else if (commandConfig.type === 'add-dependency') {
       return 'Add Dependency';
     } else if (commandConfig.type === 'add-dev-dependency') {
       return 'Add Dev Dependency';
@@ -81,6 +75,12 @@ export class NxCommandsTreeItem extends TreeItem {
           title: commandConfig.command,
           command: commandConfig.command,
           tooltip: `Run ${commandConfig.label}`,
+        };
+      case 'generate':
+        return {
+          title: 'Generate',
+          command: 'nx.generate.ui',
+          tooltip: 'Generate (UI)',
         };
       case 'add-dependency':
         return {
@@ -111,7 +111,9 @@ export class NxCommandsTreeItem extends TreeItem {
   }
 
   private getIcon(commandConfig: NxCommandConfig) {
-    if (commandConfig.type === 'add-dependency') {
+    if (commandConfig.type === 'generate') {
+      return new ThemeIcon('browser');
+    } else if (commandConfig.type === 'add-dependency') {
       return {
         light: Uri.file(
           join(this.extensionPath, 'assets', 'nx-console-light.svg')
