@@ -1,3 +1,9 @@
+## <small>1.26.1 (2024-06-24)</small>
+
+### Bug Fixes
+
+* **intellij:** check that ./nx is not a folder before assuming it as binary ([#2176](https://github.com/nrwl/nx-console/issues/2176)) ([92a3373](https://github.com/nrwl/nx-console/commit/92a33733471201e89616fc592d888f0ccb1c6f85))
+
 ## 1.26.0 (2024-06-17)
 
 ### Bug Fixes
