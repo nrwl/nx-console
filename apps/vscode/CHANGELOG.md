@@ -1,3 +1,10 @@
+# [18.23.0](https://github.com/nrwl/nx-console/compare/vscode-v18.22.0...vscode-v18.23.0) (2024-06-24)
+
+
+### Features
+
+* **vscode:** make generate ui default in sidebar ([#2182](https://github.com/nrwl/nx-console/issues/2182)) ([6867a18](https://github.com/nrwl/nx-console/commit/6867a183da4e92b9b76bc47adc9b662022177674))
+
 # [18.22.0](https://github.com/nrwl/nx-console/compare/vscode-v18.21.4...vscode-v18.22.0) (2024-06-17)
 
 
