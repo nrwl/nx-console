@@ -23,7 +23,7 @@ class NxExecutable {
                 if (SystemInfo.isWindows && !WslPath.isWslUncPath(basePath)) "nx.bat" else "nx"
             val nxExecutable = File(Paths.get(basePath, nxExecutableName).toString())
 
-            if (nxExecutable.exists()) {
+            if (nxExecutable.exists() && !nxExecutable.isDirectory()) {
                 return nxExecutable.absolutePath
             }
 

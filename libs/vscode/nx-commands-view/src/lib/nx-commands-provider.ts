@@ -25,9 +25,12 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     const targets = await this.getTargets();
     const defaultCommands = await this.getDefaultCommands();
 
-    return [...nxCommands, ...targets, ...defaultCommands].map(
-      (c) => new NxCommandsTreeItem(c, this.context.extensionPath)
-    );
+    return [
+      { type: 'generate' } as const,
+      ...nxCommands,
+      ...targets,
+      ...defaultCommands,
+    ].map((c) => new NxCommandsTreeItem(c, this.context.extensionPath));
   }
 
   async getNxCommands(): Promise<NxCommandConfig[]> {
@@ -39,7 +42,9 @@ export class NxCommandsTreeProvider extends AbstractTreeProvider<NxCommandsTreeI
     const availableCommands: NxCommandConfig[] = commonCommands
       .filter(
         (command) =>
-          command !== 'add-dependency' && command !== 'add-dev-dependency'
+          command !== 'add-dependency' &&
+          command !== 'add-dev-dependency' &&
+          command !== 'generate'
       )
       .map((command) => {
         const transformedCommand = `nx.${command.replace(':', '.')}`;

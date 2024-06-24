@@ -15,12 +15,17 @@ import { openGenerateUi } from './init-generate-ui-webview';
 export async function registerGenerateCommands(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand(
-      `nx.generate`,
+      `nx.generate.quickpick`,
       async (
         preselectedGenerator?: string,
         preselectedFlags?: Record<string, string>
       ) => {
-        getTelemetry().featureUsed('nx.generate');
+        if (typeof preselectedGenerator !== 'string') {
+          // the command is called from a context menu, different signature - set to undefined as workaround
+          preselectedGenerator = undefined;
+          preselectedFlags = undefined;
+        }
+        getTelemetry().featureUsed('nx.generate.quickpick');
         const result = await selectGeneratorAndPromptForFlags(
           preselectedGenerator,
           preselectedFlags
