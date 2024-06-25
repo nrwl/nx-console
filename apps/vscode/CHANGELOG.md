@@ -1,3 +1,17 @@
+# [18.24.0](https://github.com/nrwl/nx-console/compare/vscode-v18.23.0...vscode-v18.24.0) (2024-06-25)
+
+
+### Bug Fixes
+
+*  Update nx-schema.json ([#2178](https://github.com/nrwl/nx-console/issues/2178)) ([04280c6](https://github.com/nrwl/nx-console/commit/04280c6519b634cf8e3081026ccba8258f80b92e))
+* **vscode:** repair broken affected --graph command in sidebar ([#2185](https://github.com/nrwl/nx-console/issues/2185)) ([70941b2](https://github.com/nrwl/nx-console/commit/70941b2e19dfcdf2d37bdae9a225e15637632b3d))
+
+
+### Features
+
+* add nx connect action & vscode cloud pane ([#2186](https://github.com/nrwl/nx-console/issues/2186)) ([2326197](https://github.com/nrwl/nx-console/commit/232619729b1e4fa9c767fa7404449352f1fcff7d))
+* **misc:** add support for run-help event ([#2183](https://github.com/nrwl/nx-console/issues/2183)) ([7beb868](https://github.com/nrwl/nx-console/commit/7beb868b043c9fc6552e5b6505d6e99afcafba8a))
+
 # [18.23.0](https://github.com/nrwl/nx-console/compare/vscode-v18.22.0...vscode-v18.23.0) (2024-06-24)
 
 
