@@ -1,6 +1,7 @@
 package dev.nx.console.graph
 
 import NxGraphServer
+import StandardNxGraphServer
 import com.intellij.ide.ui.UISettingsListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
@@ -20,6 +21,7 @@ import com.intellij.util.ui.UIUtil
 import dev.nx.console.graph.ui.NxGraphDownloadHandler
 import dev.nx.console.models.NxError
 import dev.nx.console.nxls.NxRefreshWorkspaceService
+import dev.nx.console.run.NxHelpCommandService
 import dev.nx.console.run.NxTaskExecutionManager
 import dev.nx.console.telemetry.TelemetryService
 import dev.nx.console.utils.*
@@ -155,13 +157,13 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                       body {
                         background-color: $backgroundColor !important;
                         color: ${
-            getHexColor(
-            when (!JBColor.isBright()) {
-              true -> UIUtil.getActiveTextColor()
-              false -> UIUtil.getLabelForeground()
-            }
-          )
-          } !important;
+                        getHexColor(
+                            when (!JBColor.isBright()) {
+                                true -> UIUtil.getActiveTextColor()
+                                false -> UIUtil.getLabelForeground()
+                            }
+                        )
+                    } !important;
                       }
 
                     </style>
@@ -283,6 +285,14 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
                 }
                 return true
             }
+            "run-help" -> {
+                event.payload.let { (projectName, _, _, _, _, helpCommand) ->
+                    if (projectName != null && helpCommand != null) {
+                        NxHelpCommandService.getInstance(project).execute(projectName, helpCommand)
+                    }
+                }
+                return true
+            }
             else -> {
                 return false
             }
@@ -321,8 +331,9 @@ abstract class NxGraphBrowserBase(protected val project: Project) : Disposable {
               }
             </style>
 
-            <p>Unable to load the project graph. The following error${if(errors.isNotEmpty()) "s" else ""} occurred:</p>
-      ${errors.map { "<pre>${it.message ?: ""} \n ${it.stack ?: ""}</pre>" }.joinToString("\n")
+            <p>Unable to load the project graph. The following error${if (errors.isNotEmpty()) "s" else ""} occurred:</p>
+      ${
+            errors.map { "<pre>${it.message ?: ""} \n ${it.stack ?: ""}</pre>" }.joinToString("\n")
         }
       If you are unable to resolve this issue, click here to <a href="#" onclick="window.reset()">reload the project graph</a>. If that doesn't work, try running <code>nx reset</code> in the terminal & restart the IDE.
     """
@@ -447,6 +458,7 @@ data class NxGraphInteractionPayload(
     val url: String? = null,
     val taskId: String? = null,
     val targetConfigString: String? = null,
+    val helpCommand: String? = null,
 )
 
 @Serializable
