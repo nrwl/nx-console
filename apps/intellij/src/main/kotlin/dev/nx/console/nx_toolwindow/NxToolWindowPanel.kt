@@ -4,18 +4,18 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.DefaultTreeExpander
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.actions.RefreshAction
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.ActionUpdateThread
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.OnePixelDivider
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.ui.JBSplitter
 import com.intellij.ui.ScrollPaneFactory
+import com.intellij.ui.SideBorder
 import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.util.minimumHeight
 import dev.nx.console.nx_toolwindow.tree.NxProjectsTree
 import dev.nx.console.nx_toolwindow.tree.NxTreeStructure
 import dev.nx.console.nxls.NxRefreshWorkspaceAction
@@ -26,6 +26,7 @@ import dev.nx.console.settings.options.NX_TOOLWINDOW_STYLE_SETTING_TOPIC
 import dev.nx.console.settings.options.NxToolWindowStyleSettingListener
 import dev.nx.console.utils.ProjectLevelCoroutineHolderService
 import dev.nx.console.utils.nxWorkspace
+import java.awt.BorderLayout
 import javax.swing.JComponent
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,7 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
     private val projectTree = NxProjectsTree()
     private val projectStructure = NxTreeStructure(projectTree, project)
 
-    private val treeContent = ScrollPaneFactory.createScrollPane(projectTree, 0)
+    private val mainContent = createContentPanel()
     private val emptyContent = getNoProjectsPanel()
 
     init {
@@ -50,10 +51,27 @@ class NxToolWindowPanel(private val project: Project) : SimpleToolWindowPanel(tr
             if (workspace == null || workspace.workspace.projects.isEmpty()) {
                 setContent(emptyContent)
             } else {
-                setContent(treeContent)
+                setContent(mainContent)
                 projectStructure.updateNxProjects(workspace)
             }
         }
+    }
+
+    private fun createContentPanel(): JComponent {
+        val treeContent = ScrollPaneFactory.createScrollPane(projectTree, 0)
+
+        val cloudContent =
+            NxCloudPanel(project).apply {
+                layout = BorderLayout()
+                setBorder(SideBorder(OnePixelDivider.BACKGROUND, SideBorder.TOP))
+                minimumHeight = 50
+            }
+
+        val splitter = JBSplitter(true, "NxConsole.Toolwindow.Splitter", 0.7f)
+        splitter.firstComponent = treeContent
+        splitter.secondComponent = cloudContent
+
+        return splitter
     }
 
     private fun getNoProjectsPanel(): JComponent {
