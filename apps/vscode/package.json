@@ -579,7 +579,7 @@
             "run",
             "run-many",
             "affected",
-            "affected:graph",
+            "affected --graph",
             "list",
             "migrate"
           ],

@@ -64,12 +64,20 @@ export class NxCommandsTreeItem extends TreeItem {
   private getCommand(commandConfig: NxCommandConfig): Command {
     switch (commandConfig.type) {
       case 'arbitrary-command':
-        return {
-          title: commandConfig.command,
-          command: EXECUTE_ARBITRARY_COMMAND,
-          arguments: [commandConfig.command],
-          tooltip: `Run ${commandConfig.label}`,
-        };
+        if (commandConfig.command === 'affected --graph') {
+          return {
+            title: commandConfig.command,
+            command: 'nx.graph.showAffected',
+            tooltip: `Show affected projects`,
+          };
+        } else {
+          return {
+            title: commandConfig.command,
+            command: EXECUTE_ARBITRARY_COMMAND,
+            arguments: [commandConfig.command],
+            tooltip: `Run ${commandConfig.label}`,
+          };
+        }
       case 'vscode-command':
         return {
           title: commandConfig.command,
